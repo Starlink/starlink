@@ -28,6 +28,8 @@
  */
 
 #include "bltInt.h"
+#include <bltHash.h>
+#include "bltSwitch.h"
 
 #define UNKNOWN_RETURN_CODE	5
 static char *codeNames[] =
@@ -45,7 +47,7 @@ enum WatchStates {
 
 typedef struct {
     Tcl_Interp *interp;		/* Interpreter associated with the watch */
-    Tk_Uid nameId;		/* Watch identifier */
+    Blt_Uid nameId;		/* Watch identifier */
 
     /* User-configurable fields */
     enum WatchStates state;	/* Current state of watch: either
@@ -58,7 +60,7 @@ typedef struct {
 				 * is executed. */
     Tcl_Trace trace;		/* Trace handler which activates "pre"
 				 * command procedures */
-    Tcl_AsyncHandler asyncHandle;	/* Async handler which triggers the
+    Tcl_AsyncHandler asyncHandle; /* Async handler which triggers the
 				 * "post" command procedure (if one
 				 * exists) */
     int active;			/* Indicates if a trace is currently
@@ -75,20 +77,27 @@ typedef struct {
 } Watch;
 
 typedef struct {
-    Tk_Uid nameId;		/* Name identifier of the watch */
+    Blt_Uid nameId;		/* Name identifier of the watch */
     Tcl_Interp *interp;		/* Interpreter associated with the
 				 * watch */
 } WatchKey;
 
-static Tcl_HashTable watchTable;
+static Blt_HashTable watchTable;
 static int refCount = 0;
 
-#ifdef __STDC__
+static Blt_SwitchSpec switchSpecs[] = 
+{
+    {BLT_SWITCH_LIST, "-precmd", Blt_Offset(Watch, preCmd), 0},
+    {BLT_SWITCH_LIST, "-postcmd", Blt_Offset(Watch, postCmd), 0},
+    {BLT_SWITCH_BOOLEAN, "-active", Blt_Offset(Watch, state), 0},
+    {BLT_SWITCH_INT_NONNEGATIVE, "-maxlevel", Blt_Offset(Watch, maxLevel), 0},
+    {BLT_SWITCH_END, NULL, 0, 0}
+};
+
 static Tcl_CmdTraceProc PreCmdProc;
 static Tcl_AsyncProc PostCmdProc;
 static Tcl_CmdProc WatchCmd;
 static Tcl_CmdDeleteProc WatchDeleteCmd;
-#endif /* __STDC__ */
 
 /*
  *----------------------------------------------------------------------
@@ -123,17 +132,17 @@ static Tcl_CmdDeleteProc WatchDeleteCmd;
 static void
 PreCmdProc(clientData, interp, level, command, cmdProc, cmdClientData,
     argc, argv)
-    ClientData clientData;	/* not used */
-    Tcl_Interp *interp;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Not used. */
     int level;			/* Current level */
     char *command;		/* Command before substitution */
-    Tcl_CmdProc *cmdProc;	/* not used */
-    ClientData cmdClientData;	/* not used */
+    Tcl_CmdProc *cmdProc;	/* Not used. */
+    ClientData cmdClientData;	/* Not used. */
     int argc;
     char **argv;		/* Command after parsing, but before
 				 * evaluation */
 {
-    Watch *watchPtr = (Watch *)clientData;
+    Watch *watchPtr = clientData;
 
     if (watchPtr->active) {
 	return;			/* Don't re-enter from Tcl_Eval below */
@@ -146,7 +155,7 @@ PreCmdProc(clientData, interp, level, command, cmdProc, cmdClientData,
      * hanging around before allocating a new one.
      */
     if (watchPtr->args != NULL) {
-	free((char *)watchPtr->args);
+	Blt_Free(watchPtr->args);
     }
     watchPtr->args = Tcl_Merge(argc, argv);
 
@@ -211,11 +220,11 @@ PreCmdProc(clientData, interp, level, command, cmdProc, cmdClientData,
 /*ARGSUSED*/
 static int
 PostCmdProc(clientData, interp, code)
-    ClientData clientData;	/* not used */
-    Tcl_Interp *interp;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Not used. */
     int code;			/* Completion code of command */
 {
-    Watch *watchPtr = (Watch *)clientData;
+    Watch *watchPtr = clientData;
 
     if (watchPtr->active) {
 	return code;
@@ -240,17 +249,17 @@ PostCmdProc(clientData, interp, code)
 	 * ----------------------------------------------------
 	 */
 	if (interp != NULL) {
-	    errorInfo = Tcl_GetVar2(interp, "errorInfo", (char *)NULL,
+	    errorInfo = (char *)Tcl_GetVar2(interp, "errorInfo", (char *)NULL,
 		TCL_GLOBAL_ONLY);
 	    if (errorInfo != NULL) {
-		errorInfo = strdup(errorInfo);
+		errorInfo = Blt_Strdup(errorInfo);
 	    }
-	    errorCode = Tcl_GetVar2(interp, "errorCode", (char *)NULL,
+	    errorCode = (char *)Tcl_GetVar2(interp, "errorCode", (char *)NULL,
 		TCL_GLOBAL_ONLY);
 	    if (errorCode != NULL) {
-		errorCode = strdup(errorCode);
+		errorCode = Blt_Strdup(errorCode);
 	    }
-	    results = strdup(Tcl_GetStringResult(interp));
+	    results = Blt_Strdup(Tcl_GetStringResult(interp));
 	}
 	/* Create the "post" command procedure call */
 	Tcl_DStringInit(&buffer);
@@ -275,7 +284,7 @@ PostCmdProc(clientData, interp, code)
 	watchPtr->active = 0;
 
 	Tcl_DStringFree(&buffer);
-	free((char *)watchPtr->args);
+	Blt_Free(watchPtr->args);
 	watchPtr->args = NULL;
 
 	if (status != TCL_OK) {
@@ -293,12 +302,12 @@ PostCmdProc(clientData, interp, code)
 	    if (errorInfo != NULL) {
 		Tcl_SetVar2(interp, "errorInfo", (char *)NULL, errorInfo,
 		    TCL_GLOBAL_ONLY);
-		free((char *)errorInfo);
+		Blt_Free(errorInfo);
 	    }
 	    if (errorCode != NULL) {
 		Tcl_SetVar2(interp, "errorCode", (char *)NULL, errorCode,
 		    TCL_GLOBAL_ONLY);
-		free((char *)errorCode);
+		Blt_Free(errorCode);
 	    }
 	    Tcl_SetResult(interp, results, TCL_DYNAMIC);
 	}
@@ -334,10 +343,10 @@ NewWatch(interp, name)
 {
     Watch *watchPtr;
     WatchKey key;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     int dummy;
 
-    watchPtr = (Watch *)calloc(1, sizeof(Watch));
+    watchPtr = Blt_Calloc(1, sizeof(Watch));
     if (watchPtr == NULL) {
 	Tcl_AppendResult(interp, "can't allocate watch structure", (char *)NULL);
 	return NULL;
@@ -346,11 +355,11 @@ NewWatch(interp, name)
     watchPtr->maxLevel = WATCH_MAX_LEVEL;
     watchPtr->nameId = Blt_GetUid(name);
     watchPtr->interp = interp;
-    watchPtr->asyncHandle = Tcl_AsyncCreate(PostCmdProc, (ClientData)watchPtr);
+    watchPtr->asyncHandle = Tcl_AsyncCreate(PostCmdProc, watchPtr);
     key.interp = interp;
     key.nameId = watchPtr->nameId;
-    hPtr = Tcl_CreateHashEntry(&watchTable, (char *)&key, &dummy);
-    Tcl_SetHashValue(hPtr, (ClientData)watchPtr);
+    hPtr = Blt_CreateHashEntry(&watchTable, (char *)&key, &dummy);
+    Blt_SetHashValue(hPtr, watchPtr);
     return watchPtr;
 }
 
@@ -380,27 +389,27 @@ DestroyWatch(watchPtr)
     Watch *watchPtr;
 {
     WatchKey key;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
     Tcl_AsyncDelete(watchPtr->asyncHandle);
     if (watchPtr->state == WATCH_STATE_ACTIVE) {
 	Tcl_DeleteTrace(watchPtr->interp, watchPtr->trace);
     }
     if (watchPtr->preCmd != NULL) {
-	free((char *)watchPtr->preCmd);
+	Blt_Free(watchPtr->preCmd);
     }
     if (watchPtr->postCmd != NULL) {
-	free((char *)watchPtr->postCmd);
+	Blt_Free(watchPtr->postCmd);
     }
     if (watchPtr->args != NULL) {
-	free((char *)watchPtr->args);
+	Blt_Free(watchPtr->args);
     }
     key.interp = watchPtr->interp;
     key.nameId = watchPtr->nameId;
-    hPtr = Tcl_FindHashEntry(&watchTable, (char *)&key);
-    Tcl_DeleteHashEntry(hPtr);
+    hPtr = Blt_FindHashEntry(&watchTable, (char *)&key);
+    Blt_DeleteHashEntry(&watchTable, hPtr);
     Blt_FreeUid(key.nameId);
-    free((char *)watchPtr);
+    Blt_Free(watchPtr);
 }
 
 /*
@@ -425,14 +434,14 @@ NameToWatch(interp, name, flags)
     int flags;
 {
     WatchKey key;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
     key.interp = interp;
     key.nameId = Blt_FindUid(name);
     if (key.nameId != NULL) {
-	hPtr = Tcl_FindHashEntry(&watchTable, (char *)&key);
+	hPtr = Blt_FindHashEntry(&watchTable, (char *)&key);
 	if (hPtr != NULL) {
-	    return (Watch *) Tcl_GetHashValue(hPtr);
+	    return (Watch *) Blt_GetHashValue(hPtr);
 	}
     }
     if (flags & TCL_LEAVE_ERR_MSG) {
@@ -462,13 +471,13 @@ ListWatches(interp, state)
     Tcl_Interp *interp;
     enum WatchStates state;	/* Active flag */
 {
-    Tcl_HashEntry *hPtr;
-    Tcl_HashSearch cursor;
+    Blt_HashEntry *hPtr;
+    Blt_HashSearch cursor;
     register Watch *watchPtr;
 
-    for (hPtr = Tcl_FirstHashEntry(&watchTable, &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	watchPtr = (Watch *)Tcl_GetHashValue(hPtr);
+    for (hPtr = Blt_FirstHashEntry(&watchTable, &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	watchPtr = (Watch *)Blt_GetHashValue(hPtr);
 	if (watchPtr->interp == interp) {
 	    if ((state == WATCH_STATE_DONT_CARE) ||
 		(state == watchPtr->state)) {
@@ -478,7 +487,6 @@ ListWatches(interp, state)
     }
     return TCL_OK;
 }
-
 /*
  *----------------------------------------------------------------------
  *
@@ -501,80 +509,9 @@ ConfigWatch(watchPtr, interp, argc, argv)
     int argc;
     char *argv[];
 {
-    register int i;
-    char *swtch;
-    unsigned int length;
-    char c;
-
-    for (i = 0; i < argc; i++) {
-	length = strlen(argv[i]);
-	swtch = argv[i++];
-
-	if (*swtch != '-') {
-	    goto badSwitch;
-	}
-	c = swtch[1];
-	if (i == argc) {
-	    Tcl_AppendResult(interp, "no argument for \"", swtch, "\"",
-		(char *)NULL);
-	    return TCL_ERROR;
-	}
-	if ((c == 'p') && (length > 1) &&
-	    (strncmp(swtch, "-precmd", length) == 0)) {
-	    if (watchPtr->preCmd != NULL) {
-		free((char *)watchPtr->preCmd);
-		watchPtr->preCmd = NULL;
-	    }
-	    if (argv[i][0] != '\0') {
-		int dummy;
-		char **argArr;
-
-		if (Tcl_SplitList(interp, argv[i], &dummy, &argArr) != TCL_OK) {
-		    return TCL_ERROR;
-		}
-		watchPtr->preCmd = argArr;
-	    } else {
-		watchPtr->preCmd = (char **)NULL;
-	    }
-	} else if ((c == 'p') && (length > 1) &&
-	    (strncmp(swtch, "-postcmd", length) == 0)) {
-	    if (watchPtr->postCmd != NULL) {
-		free((char *)watchPtr->postCmd);
-		watchPtr->postCmd = NULL;
-	    }
-	    if (argv[i][0] != '\0') {
-		int dummy;
-		char **argArr;
-
-		if (Tcl_SplitList(interp, argv[i], &dummy, &argArr) != TCL_OK) {
-		    return TCL_ERROR;
-		}
-		watchPtr->postCmd = argArr;
-	    } else {
-		watchPtr->postCmd = (char **)NULL;
-	    }
-	} else if ((c == 'a') && (length > 1) &&
-	    (strncmp(swtch, "-active", length) == 0)) {
-	    int bool;
-
-	    if (Tcl_GetBoolean(interp, argv[i], &bool) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    watchPtr->state = (bool) ? WATCH_STATE_ACTIVE : WATCH_STATE_IDLE;
-	} else if ((c == 'm') &&
-	    (strncmp(swtch, "-maxlevel", length) == 0)) {
-	    int newLevel;
-
-	    if (Tcl_GetInt(interp, argv[i], &newLevel) != TCL_OK) {
-		return TCL_ERROR;
-	    }
-	    watchPtr->maxLevel = newLevel;
-	} else {
-	  badSwitch:
-	    Tcl_AppendResult(interp, "bad switch \"", swtch, "\": should be \
-\"-active\", \"-maxlevel\", \"-precmd\" or \"-postcmd\"", (char *)NULL);
-	    return TCL_ERROR;
-	}
+    if (Blt_ProcessSwitches(interp, switchSpecs, argc, argv, (char *)watchPtr,
+	 0) < 0) {
+	return TCL_ERROR;
     }
     /*
      * If the watch's max depth changed or its state, reset the traces.
@@ -585,7 +522,7 @@ ConfigWatch(watchPtr, interp, argc, argv)
     }
     if (watchPtr->state == WATCH_STATE_ACTIVE) {
 	watchPtr->trace = Tcl_CreateTrace(interp, watchPtr->maxLevel,
-	    PreCmdProc, (ClientData)watchPtr);
+	    PreCmdProc, watchPtr);
     }
     return TCL_OK;
 }
@@ -609,7 +546,7 @@ ConfigWatch(watchPtr, interp, argc, argv)
 /*ARGSUSED*/
 static int
 CreateOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -626,7 +563,7 @@ CreateOp(clientData, interp, argc, argv)
     if (watchPtr == NULL) {
 	return TCL_ERROR;	/* Can't create new watch */
     }
-    return (ConfigWatch(watchPtr, interp, argc - 3, argv + 3));
+    return ConfigWatch(watchPtr, interp, argc - 3, argv + 3);
 }
 
 /*
@@ -644,7 +581,7 @@ CreateOp(clientData, interp, argc, argv)
 /*ARGSUSED*/
 static int
 DeleteOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -674,7 +611,7 @@ DeleteOp(clientData, interp, argc, argv)
 /*ARGSUSED*/
 static int
 ActivateOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -690,7 +627,7 @@ ActivateOp(clientData, interp, argc, argv)
     if (state != watchPtr->state) {
 	if (watchPtr->trace == (Tcl_Trace) 0) {
 	    watchPtr->trace = Tcl_CreateTrace(interp, watchPtr->maxLevel,
-		PreCmdProc, (ClientData)watchPtr);
+		PreCmdProc, watchPtr);
 	} else {
 	    Tcl_DeleteTrace(interp, watchPtr->trace);
 	    watchPtr->trace = (Tcl_Trace) 0;
@@ -715,7 +652,7 @@ ActivateOp(clientData, interp, argc, argv)
 /*ARGSUSED*/
 static int
 NamesOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -738,7 +675,7 @@ NamesOp(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
     }
-    return (ListWatches(interp, state));
+    return ListWatches(interp, state);
 }
 
 /*
@@ -746,7 +683,7 @@ NamesOp(clientData, interp, argc, argv)
  *
  * ConfigureOp --
  *
- *	Convert the limits of the pixel values allowed into a list.
+ *	Convert the range of the pixel values allowed into a list.
  *
  * Results:
  *	The string representation of the limits is returned.
@@ -756,7 +693,7 @@ NamesOp(clientData, interp, argc, argv)
 /*ARGSUSED*/
 static int
 ConfigureOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -767,7 +704,7 @@ ConfigureOp(clientData, interp, argc, argv)
     if (watchPtr == NULL) {
 	return TCL_ERROR;
     }
-    return (ConfigWatch(watchPtr, interp, argc - 3, argv + 3));
+    return ConfigWatch(watchPtr, interp, argc - 3, argv + 3);
 }
 
 /*
@@ -785,7 +722,7 @@ ConfigureOp(clientData, interp, argc, argv)
 /*ARGSUSED*/
 static int
 InfoOp(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -838,45 +775,44 @@ InfoOp(clientData, interp, argc, argv)
 
 static Blt_OpSpec watchOps[] =
 {
-    {"activate", 1, (Blt_Operation)ActivateOp, 3, 3, "watchName",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 3, 0,
+    {"activate", 1, (Blt_Op)ActivateOp, 3, 3, "watchName",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 3, 0,
 	"watchName ?options...?"},
-    {"create", 2, (Blt_Operation)CreateOp, 3, 0, "watchName ?switches?",},
-    {"deactivate", 3, (Blt_Operation)ActivateOp, 3, 3, "watchName",},
-    {"delete", 3, (Blt_Operation)DeleteOp, 3, 3, "watchName",},
-    {"info", 1, (Blt_Operation)InfoOp, 3, 3, "watchName",},
-    {"names", 1, (Blt_Operation)NamesOp, 2, 3, "?state?",},
+    {"create", 2, (Blt_Op)CreateOp, 3, 0, "watchName ?switches?",},
+    {"deactivate", 3, (Blt_Op)ActivateOp, 3, 3, "watchName",},
+    {"delete", 3, (Blt_Op)DeleteOp, 3, 3, "watchName",},
+    {"info", 1, (Blt_Op)InfoOp, 3, 3, "watchName",},
+    {"names", 1, (Blt_Op)NamesOp, 2, 3, "?state?",},
 };
-static int numWatchOps = sizeof(watchOps) / sizeof(Blt_OpSpec);
+static int nWatchOps = sizeof(watchOps) / sizeof(Blt_OpSpec);
 
 /*ARGSUSED*/
 static int
 WatchCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
 {
-    Blt_Operation proc;
+    Blt_Op proc;
     int result;
 
-    proc = Blt_GetOperation(interp, numWatchOps, watchOps, BLT_OPER_ARG1,
-	argc, argv);
+    proc = Blt_GetOp(interp, nWatchOps, watchOps, BLT_OP_ARG1, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
     result = (*proc) (clientData, interp, argc, argv);
-    return (result);
+    return result;
 }
 
 /* ARGSUSED */
 static void
 WatchDeleteCmd(clientData)
-    ClientData clientData;	/* Unused */
+    ClientData clientData;	/* Not Used. */
 {
     refCount--;
     if (refCount == 0) {
-	Tcl_DeleteHashTable(&watchTable);
+	Blt_DeleteHashTable(&watchTable);
     }
 }
 
@@ -906,7 +842,7 @@ Blt_WatchInit(interp)
     {"watch", WatchCmd, WatchDeleteCmd};
 
     if (refCount == 0) {
-	Tcl_InitHashTable(&watchTable, sizeof(WatchKey) / sizeof(int));
+	Blt_InitHashTable(&watchTable, sizeof(WatchKey) / sizeof(int));
     }
     refCount++;
 

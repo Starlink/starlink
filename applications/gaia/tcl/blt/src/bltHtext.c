@@ -43,10 +43,11 @@
 #include "bltInt.h"
 
 #ifndef NO_HTEXT
-
-#include <ctype.h>
+#include <bltChain.h>
+#include <bltHash.h>
+#include "bltTile.h"
+ 
 #include <sys/stat.h>
-#include <X11/Xutil.h>
 #include <X11/Xatom.h>
 
 #define DEF_LINES_ALLOC 512	/* Default block of lines allocated */
@@ -62,7 +63,7 @@ typedef enum {
 
 extern Tk_CustomOption bltFillOption;
 extern Tk_CustomOption bltPadOption;
-extern Tk_CustomOption bltLengthOption;
+extern Tk_CustomOption bltDistanceOption;
 extern Tk_CustomOption bltTileOption;
 
 static int StringToWidth _ANSI_ARGS_((ClientData clientData,
@@ -96,143 +97,25 @@ static Tk_CustomOption justifyOption =
 };
 
 
-static void SlaveGeometryProc _ANSI_ARGS_((ClientData, Tk_Window));
-static void SlaveCustodyProc _ANSI_ARGS_((ClientData, Tk_Window));
+static void EmbeddedWidgetGeometryProc _ANSI_ARGS_((ClientData, Tk_Window));
+static void EmbeddedWidgetCustodyProc _ANSI_ARGS_((ClientData, Tk_Window));
 
 static Tk_GeomMgr htextMgrInfo =
 {
     "htext",			/* Name of geometry manager used by winfo */
-    SlaveGeometryProc,		/* Procedure to for new geometry requests */
-    SlaveCustodyProc,		/* Procedure when window is taken away */
+    EmbeddedWidgetGeometryProc,	/* Procedure to for new geometry requests */
+    EmbeddedWidgetCustodyProc,	/* Procedure when window is taken away */
 };
 
-typedef struct Slave {
-    struct HText *textPtr;	/* Pointer to parent's Htext structure */
-    Tk_Window tkwin;		/* Widget window */
-    int flags;
-
-    int x, y;			/* Origin of slave window in text */
-
-    /* Dimensions of the cavity surrounding the slave window */
-
-    int cavityWidth, cavityHeight;
-
-    /*
-     *  Dimensions of the slave window.  Compared against actual
-     *	slave window sizes when checking for resizing.
-     */
-    int winWidth, winHeight;
-
-    int precedingTextEnd;	/* Index (in charArr) of the the last character
-				 * immediatedly preceding the slave window */
-    int precedingTextWidth;	/* Width of normal text preceding slave */
-
-    Tk_Anchor anchor;
-    Justify justify;		/* Justification of region wrt to line */
-
-
-    /*
-     * Requested dimensions of the cavity (includes padding). If non-zero,
-     * it overrides the calculated dimension of the cavity.
-     */
-    int reqCavityWidth, reqCavityHeight;
-
-    /*
-     * Relative dimensions of cavity wrt the size of the viewport. If
-     * greater than 0.0.
-     */
-    double relCavityWidth, relCavityHeight;
-
-    /*
-     * If non-zero, overrides the requested dimension of the slave window
-     */
-    int reqSlaveWidth, reqSlaveHeight;
-
-    /*
-     * Relative dimensions of slave window wrt the size of the viewport
-     */
-    double relSlaveWidth, relSlaveHeight;
-
-    Pad padX, padY;		/* Extra padding to frame around */
-    int ipadX, ipadY;		/* internal padding for window */
-
-    Fill fill;			/* Fill style flag */
-
-} Slave;
-
-/*
- * Flag bits slaves windows:
- */
-#define SLAVE_VISIBLE	(1<<2)	/* Slave window is currently visible in the
-				 * viewport. */
-#define SLAVE_NOT_CHILD	(1<<3)	/* Slave window is not a child of hypertext
-				 * widget */
-/*
- * Defaults for slaves:
- */
-#define DEF_SLAVE_ANCHOR        "center"
-#define DEF_SLAVE_FILL		"none"
-#define DEF_SLAVE_HEIGHT	"0"
-#define DEF_SLAVE_JUSTIFY	"center"
-#define DEF_SLAVE_PAD_X		"0"
-#define DEF_SLAVE_PAD_Y		"0"
-#define DEF_SLAVE_REL_HEIGHT	"0.0"
-#define DEF_SLAVE_REL_WIDTH  	"0.0"
-#define DEF_SLAVE_WIDTH  	"0"
-
-static Tk_ConfigSpec slaveConfigSpecs[] =
-{
-    {TK_CONFIG_ANCHOR, "-anchor", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_ANCHOR, Tk_Offset(Slave, anchor),
-	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_CUSTOM, "-fill", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_FILL, Tk_Offset(Slave, fill),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
-    {TK_CONFIG_CUSTOM, "-cavityheight", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_HEIGHT, Tk_Offset(Slave, reqCavityHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
-    {TK_CONFIG_CUSTOM, "-cavitywidth", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_WIDTH, Tk_Offset(Slave, reqCavityWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
-    {TK_CONFIG_CUSTOM, "-height", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_HEIGHT, Tk_Offset(Slave, reqSlaveHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
-    {TK_CONFIG_CUSTOM, "-justify", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_JUSTIFY, Tk_Offset(Slave, justify),
-	TK_CONFIG_DONT_SET_DEFAULT, &justifyOption},
-    {TK_CONFIG_CUSTOM, "-padx", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_PAD_X, Tk_Offset(Slave, padX),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
-    {TK_CONFIG_CUSTOM, "-pady", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_PAD_Y, Tk_Offset(Slave, padY),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
-    {TK_CONFIG_DOUBLE, "-relcavityheight", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_REL_HEIGHT, Tk_Offset(Slave, relCavityHeight),
-	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_DOUBLE, "-relcavitywidth", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_REL_WIDTH, Tk_Offset(Slave, relCavityWidth),
-	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_DOUBLE, "-relheight", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_REL_HEIGHT, Tk_Offset(Slave, relSlaveHeight),
-	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_DOUBLE, "-relwidth", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_REL_WIDTH, Tk_Offset(Slave, relSlaveWidth),
-	TK_CONFIG_DONT_SET_DEFAULT},
-    {TK_CONFIG_CUSTOM, "-width", (char *)NULL, (char *)NULL,
-	DEF_SLAVE_WIDTH, Tk_Offset(Slave, reqSlaveWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
-    {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
-	(char *)NULL, 0, 0}
-};
 
 /*
  * Line --
  *
  *	Structure to contain the contents of a single line of text and
- *	the slaves on that line.
+ *	the widgets on that line.
  *
  * 	Individual lines are not configurable, although changes to the
- * 	size of slaves do effect its values.
+ * 	size of widgets do effect its values.
  */
 typedef struct {
     int offset;			/* Offset of line from y-origin (0) in
@@ -241,7 +124,8 @@ typedef struct {
     short int width, height;	/* Dimensions of the line */
     int textStart, textEnd;	/* Start and end indices of characters
 				 * forming the line in the text array */
-    Blt_List winList;		/* List of slave windows on the line of text */
+    Blt_Chain *chainPtr;	/* Chain of embedded widgets on the line of 
+				 * text */
 } Line;
 
 typedef struct {
@@ -256,7 +140,7 @@ typedef struct {
 /*
  * Hypertext widget.
  */
-typedef struct HText {
+typedef struct {
     Tk_Window tkwin;		/* Window that embodies the widget.
                                  * NULL means that the window has been
                                  * destroyed but the data structures
@@ -285,7 +169,7 @@ typedef struct HText {
 				 * background color is the foreground
 				 * attribute in GC.  */
 
-    int numRows, numColumns;	/* # of characters of the current font
+    int nRows, nColumns;	/* # of characters of the current font
 				 * for a row or column of the viewport.
 				 * Used to determine the width and height
 				 * of the text window (i.e. viewport) */
@@ -328,7 +212,7 @@ typedef struct HText {
     /* Last known size of the window: saved to
 				 * recognize when the viewport is resized. */
 
-    Tcl_HashTable slaveTab;	/* Table of slave windows */
+    Blt_HashTable widgetTable;	/* Table of embedded widgets. */
 
     /*
      * Selection display information:
@@ -355,10 +239,10 @@ typedef struct HText {
 
     char *charArr;		/* Pool of characters representing the text
 				 * to be displayed */
-    int numChars;		/* Length of the text pool */
+    int nChars;			/* Length of the text pool */
 
     Line *lineArr;		/* Array of pointers to text lines */
-    int numLines;		/* # of line entered into array. */
+    int nLines;			/* # of line entered into array. */
     int arraySize;		/* Size of array allocated. */
 
 } HText;
@@ -371,12 +255,12 @@ typedef struct HText {
 #define IGNORE_EXPOSURES (1<<1)	/* Ignore exposure events in the text
 				 * window.  Potentially many expose
 				 * events can occur while rearranging
-				 * slave windows during a single call to
+				 * embedded widgets during a single call to
 				 * the DisplayText.  */
 
 #define REQUEST_LAYOUT 	(1<<4)	/* Something has happened which
 				 * requires the layout of text and
-				 * slave window positions to be
+				 * embedded widget positions to be
 				 * recalculated.  The following
 				 * actions may cause this:
 				 *
@@ -387,10 +271,10 @@ typedef struct HText {
 				 * 2) a text attribute has changed
 				 *    (line spacing, font, etc)
 				 *
-				 * 3) a slave window has been resized or
+				 * 3) a embedded widget has been resized or
 				 *    moved.
 				 *
-				 * 4) a slave configuration option has
+				 * 4) a widget configuration option has
 				 *    changed.
 				 */
 #define TEXT_DIRTY 	(1<<5)	/* The layout was recalculated and the
@@ -399,18 +283,18 @@ typedef struct HText {
 #define GOTO_PENDING 	(1<<6)	/* Indicates the starting text line
 				 * number has changed. To be reflected
 				 * the next time the widget is redrawn. */
-#define SLAVE_APPENDED	(1<<7)	/* Indicates a slave window has just
+#define WIDGET_APPENDED	(1<<7)	/* Indicates a embedded widget has just
 				 * been appended to the text.  This is
 				 * used to determine when to add a
 				 * space to the text array */
 
-#define DEF_HTEXT_BG_COLOR		STD_COLOR_NORMAL_BG
-#define DEF_HTEXT_BG_MONO		STD_MONO_NORMAL_BG
-#define DEF_HTEXT_CURSOR		"pencil"
+#define DEF_HTEXT_BACKGROUND		STD_NORMAL_BACKGROUND
+#define DEF_HTEXT_BG_MONO		STD_NORMAL_BG_MONO
+#define DEF_HTEXT_CURSOR		"arrow"
 #define DEF_HTEXT_EXPORT_SELECTION	"1"
 
-#define DEF_HTEXT_FG_COLOR		STD_COLOR_NORMAL_FG
-#define DEF_HTEXT_FG_MONO		STD_MONO_NORMAL_FG
+#define DEF_HTEXT_FOREGROUND		STD_NORMAL_FOREGROUND
+#define DEF_HTEXT_FG_MONO		STD_NORMAL_FG_MONO
 #define DEF_HTEXT_FILE_NAME		(char *)NULL
 #define DEF_HTEXT_FONT			STD_FONT
 #define DEF_HTEXT_HEIGHT		"0"
@@ -419,12 +303,12 @@ typedef struct HText {
 #define DEF_HTEXT_MAX_WIDTH 		(char *)NULL
 #define DEF_HTEXT_SCROLL_UNITS		"10"
 #define DEF_HTEXT_SPEC_CHAR		"0x25"
-#define DEF_HTEXT_SELECT_BORDER_WIDTH 	STD_SELECT_BORDERWIDTH
-#define DEF_HTEXT_SELECT_BG_COLOR 	STD_COLOR_SELECT_BG
-#define DEF_HTEXT_SELECT_BG_MONO  	STD_MONO_SELECT_BG
-#define DEF_HTEXT_SELECT_FG_COLOR 	STD_COLOR_SELECT_FG
-#define DEF_HTEXT_SELECT_FG_MONO  	STD_MONO_SELECT_FG
-#define DEF_HTEXT_TAKE_FOCUS		(char *)NULL
+#define DEF_HTEXT_SELECT_BORDERWIDTH 	STD_SELECT_BORDERWIDTH
+#define DEF_HTEXT_SELECT_BACKGROUND 	STD_SELECT_BACKGROUND
+#define DEF_HTEXT_SELECT_BG_MONO  	STD_SELECT_BG_MONO
+#define DEF_HTEXT_SELECT_FOREGROUND 	STD_SELECT_FOREGROUND
+#define DEF_HTEXT_SELECT_FG_MONO  	STD_SELECT_FG_MONO
+#define DEF_HTEXT_TAKE_FOCUS		"1"
 #define DEF_HTEXT_TEXT			(char *)NULL
 #define DEF_HTEXT_TILE_OFFSET		"1"
 #define DEF_HTEXT_WIDTH			"0"
@@ -432,7 +316,7 @@ typedef struct HText {
 static Tk_ConfigSpec configSpecs[] =
 {
     {TK_CONFIG_COLOR, "-background", "background", "Background",
-	DEF_HTEXT_BG_COLOR, Tk_Offset(HText, normalBg), TK_CONFIG_COLOR_ONLY},
+	DEF_HTEXT_BACKGROUND, Tk_Offset(HText, normalBg), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-background", "background", "Background",
 	DEF_HTEXT_BG_MONO, Tk_Offset(HText, normalBg), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_SYNONYM, "-bg", "background", (char *)NULL, (char *)NULL, 0, 0},
@@ -446,7 +330,7 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_FONT, "-font", "font", "Font",
 	DEF_HTEXT_FONT, Tk_Offset(HText, font), 0},
     {TK_CONFIG_COLOR, "-foreground", "foreground", "Foreground",
-	DEF_HTEXT_FG_COLOR, Tk_Offset(HText, normalFg), TK_CONFIG_COLOR_ONLY},
+	DEF_HTEXT_FOREGROUND, Tk_Offset(HText, normalFg), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-foreground", "foreground", "Foreground",
 	DEF_HTEXT_FG_MONO, Tk_Offset(HText, normalFg), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_CUSTOM, "-height", "height", "Height",
@@ -454,27 +338,27 @@ static Tk_ConfigSpec configSpecs[] =
 	TK_CONFIG_DONT_SET_DEFAULT, &heightOption},
     {TK_CONFIG_CUSTOM, "-linespacing", "lineSpacing", "LineSpacing",
 	DEF_HTEXT_LINE_SPACING, Tk_Offset(HText, leader),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-maxheight", "maxHeight", "MaxHeight",
 	DEF_HTEXT_MAX_HEIGHT, Tk_Offset(HText, maxHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-maxwidth", "maxWidth", "MaxWidth",
 	DEF_HTEXT_MAX_WIDTH, Tk_Offset(HText, maxWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Background",
 	DEF_HTEXT_SELECT_BG_MONO, Tk_Offset(HText, selBorder),
 	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Background",
-	DEF_HTEXT_SELECT_BG_COLOR, Tk_Offset(HText, selBorder),
+	DEF_HTEXT_SELECT_BACKGROUND, Tk_Offset(HText, selBorder),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_CUSTOM, "-selectborderwidth", "selectBorderWidth", "BorderWidth",
-	DEF_HTEXT_SELECT_BORDER_WIDTH, Tk_Offset(HText, selBorderWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	DEF_HTEXT_SELECT_BORDERWIDTH, Tk_Offset(HText, selBorderWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Foreground",
 	DEF_HTEXT_SELECT_FG_MONO, Tk_Offset(HText, selFgColor),
 	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Foreground",
-	DEF_HTEXT_SELECT_FG_COLOR, Tk_Offset(HText, selFgColor),
+	DEF_HTEXT_SELECT_FOREGROUND, Tk_Offset(HText, selFgColor),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_INT, "-specialchar", "specialChar", "SpecialChar",
 	DEF_HTEXT_SPEC_CHAR, Tk_Offset(HText, specChar), 0},
@@ -495,23 +379,137 @@ static Tk_ConfigSpec configSpecs[] =
 	(char *)NULL, Tk_Offset(HText, xScrollCmdPrefix), TK_CONFIG_NULL_OK},
     {TK_CONFIG_CUSTOM, "-xscrollunits", "xScrollUnits", "ScrollUnits",
 	DEF_HTEXT_SCROLL_UNITS, Tk_Offset(HText, xScrollUnits),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_STRING, "-yscrollcommand", "yScrollCommand", "ScrollCommand",
 	(char *)NULL, Tk_Offset(HText, yScrollCmdPrefix), TK_CONFIG_NULL_OK},
     {TK_CONFIG_CUSTOM, "-yscrollunits", "yScrollUnits", "yScrollUnits",
 	DEF_HTEXT_SCROLL_UNITS, Tk_Offset(HText, yScrollUnits),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
 
+typedef struct {
+    HText *htPtr;		/* Pointer to parent's Htext structure */
+    Tk_Window tkwin;		/* Widget window */
+    int flags;
+
+    int x, y;			/* Origin of embedded widget in text */
+
+    int cavityWidth, cavityHeight; /* Dimensions of the cavity
+				    * surrounding the embedded widget */
+    /*
+     *  Dimensions of the embedded widget.  Compared against actual
+     *	embedded widget sizes when checking for resizing.
+     */
+    int winWidth, winHeight;
+
+    int precedingTextEnd;	/* Index (in charArr) of the the last
+				 * character immediatedly preceding
+				 * the embedded widget */
+    int precedingTextWidth;	/* Width of normal text preceding widget. */
+
+    Tk_Anchor anchor;
+    Justify justify;		/* Justification of region wrt to line */
+
+    /*
+     * Requested dimensions of the cavity (includes padding). If non-zero,
+     * it overrides the calculated dimension of the cavity.
+     */
+    int reqCavityWidth, reqCavityHeight;
+
+    /*
+     * Relative dimensions of cavity wrt the size of the viewport. If
+     * greater than 0.0.
+     */
+    double relCavityWidth, relCavityHeight;
+
+    int reqWidth, reqHeight;	/* If non-zero, overrides the requested
+				 * dimension of the embedded widget */
+
+    double relWidth, relHeight;	/* Relative dimensions of embedded
+				 * widget wrt the size of the viewport */
+
+    Blt_Pad padX, padY;		/* Extra padding to frame around */
+
+    int ipadX, ipadY;		/* internal padding for window */
+
+    int fill;			/* Fill style flag */
+
+} EmbeddedWidget;
+
+/*
+ * Flag bits embedded widgets:
+ */
+#define WIDGET_VISIBLE	(1<<2)	/* Widget is currently visible in the
+				 * viewport. */
+#define WIDGET_NOT_CHILD (1<<3) /* Widget is not a child of hypertext. */
+/*
+ * Defaults for embedded widgets:
+ */
+#define DEF_WIDGET_ANCHOR        "center"
+#define DEF_WIDGET_FILL		"none"
+#define DEF_WIDGET_HEIGHT	"0"
+#define DEF_WIDGET_JUSTIFY	"center"
+#define DEF_WIDGET_PAD_X		"0"
+#define DEF_WIDGET_PAD_Y		"0"
+#define DEF_WIDGET_REL_HEIGHT	"0.0"
+#define DEF_WIDGET_REL_WIDTH  	"0.0"
+#define DEF_WIDGET_WIDTH  	"0"
+
+static Tk_ConfigSpec widgetConfigSpecs[] =
+{
+    {TK_CONFIG_ANCHOR, "-anchor", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_ANCHOR, Tk_Offset(EmbeddedWidget, anchor),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-fill", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_FILL, Tk_Offset(EmbeddedWidget, fill),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-cavityheight", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_HEIGHT, Tk_Offset(EmbeddedWidget, reqCavityHeight),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-cavitywidth", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_WIDTH, Tk_Offset(EmbeddedWidget, reqCavityWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-height", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_HEIGHT, Tk_Offset(EmbeddedWidget, reqHeight),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-justify", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_JUSTIFY, Tk_Offset(EmbeddedWidget, justify),
+	TK_CONFIG_DONT_SET_DEFAULT, &justifyOption},
+    {TK_CONFIG_CUSTOM, "-padx", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_PAD_X, Tk_Offset(EmbeddedWidget, padX),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
+    {TK_CONFIG_CUSTOM, "-pady", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_PAD_Y, Tk_Offset(EmbeddedWidget, padY),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
+    {TK_CONFIG_DOUBLE, "-relcavityheight", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_REL_HEIGHT, Tk_Offset(EmbeddedWidget, relCavityHeight),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-relcavitywidth", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_REL_WIDTH, Tk_Offset(EmbeddedWidget, relCavityWidth),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-relheight", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_REL_HEIGHT, Tk_Offset(EmbeddedWidget, relHeight),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-relwidth", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_REL_WIDTH, Tk_Offset(EmbeddedWidget, relWidth),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-width", (char *)NULL, (char *)NULL,
+	DEF_WIDGET_WIDTH, Tk_Offset(EmbeddedWidget, reqWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
+	(char *)NULL, 0, 0}
+};
+
+
 /* Forward Declarations */
 static void DestroyText _ANSI_ARGS_((DestroyData dataPtr));
-static void SlaveEventProc _ANSI_ARGS_((ClientData clientdata, XEvent *eventPtr));
+static void EmbeddedWidgetEventProc _ANSI_ARGS_((ClientData clientdata, 
+	XEvent *eventPtr));
 static void DisplayText _ANSI_ARGS_((ClientData clientData));
-
 static void TextDeleteCmdProc _ANSI_ARGS_((ClientData clientdata));
-#ifdef __STDC__
+
 static Tcl_VarTraceProc TextVarProc;
 static Blt_TileChangedProc TileChangedProc;
 static Tk_LostSelProc TextLostSelection;
@@ -519,8 +517,6 @@ static Tk_SelectionProc TextSelectionProc;
 static Tk_EventProc TextEventProc;
 static Tcl_CmdProc TextWidgetCmd;
 static Tcl_CmdProc TextCmd;
-static Tk_EventProc SlaveEventProc;
-#endif /* __STDC__ */
 /* end of Forward Declarations */
 
 
@@ -532,7 +528,7 @@ static Tk_EventProc SlaveEventProc;
  *
  * 	Converts the justification string into its numeric
  * 	representation. This configuration option affects how the
- *	slave window is positioned with respect to the line on which
+ *	embedded widget is positioned with respect to the line on which
  *	it sits.
  *
  *	Valid style strings are:
@@ -550,9 +546,9 @@ static Tk_EventProc SlaveEventProc;
 /*ARGSUSED*/
 static int
 StringToJustify(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Justification string */
     char *widgRec;		/* Structure record */
     int offset;			/* Offset of justify in record */
@@ -574,7 +570,7 @@ StringToJustify(clientData, interp, tkwin, string, widgRec, offset)
 	    "\": should be \"center\", \"top\", or \"bottom\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    return (TCL_OK);
+    return TCL_OK;
 }
 
 /*
@@ -620,15 +616,15 @@ NameOfJustify(justify)
 /*ARGSUSED*/
 static char *
 JustifyToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Structure record */
     int offset;			/* Offset of justify record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     Justify justify = *(Justify *)(widgRec + offset);
 
-    return (NameOfJustify(justify));
+    return NameOfJustify(justify);
 }
 
 /*
@@ -661,7 +657,7 @@ GetScreenDistance(interp, tkwin, string, sizePtr, countPtr)
     int *sizePtr;
     int *countPtr;
 {
-    int numPixels, numChars;
+    int nPixels, nChars;
     char *endPtr;		/* Pointer to last character scanned */
     double value;
     int rounded;
@@ -683,24 +679,24 @@ GetScreenDistance(interp, tkwin, string, sizePtr, countPtr)
 	}
 	endPtr++;
     }
-    numPixels = numChars = 0;
+    nPixels = nChars = 0;
     rounded = ROUND(value);
     switch (*endPtr) {
     case '\0':			/* Distance in pixels */
-	numPixels = rounded;
+	nPixels = rounded;
 	break;
     case '#':			/* Number of characters */
-	numChars = rounded;
+	nChars = rounded;
 	break;
     default:			/* cm, mm, pica, inches */
 	if (Tk_GetPixels(interp, tkwin, string, &rounded) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	numPixels = rounded;
+	nPixels = rounded;
 	break;
     }
-    *sizePtr = numPixels;
-    *countPtr = numChars;
+    *sizePtr = nPixels;
+    *countPtr = nChars;
     return TCL_OK;
 }
 
@@ -717,21 +713,21 @@ GetScreenDistance(interp, tkwin, string, sizePtr, countPtr)
 /*ARGSUSED*/
 static int
 StringToHeight(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window tkwin;		/* Window */
     char *string;		/* Pixel value string */
     char *widgRec;		/* Widget record */
-    int offset;			/* not used */
+    int offset;			/* Not used. */
 {
-    HText *textPtr = (HText *)widgRec;
-    int height, numRows;
+    HText *htPtr = (HText *)widgRec;
+    int height, nRows;
 
-    if (GetScreenDistance(interp, tkwin, string, &height, &numRows) != TCL_OK) {
+    if (GetScreenDistance(interp, tkwin, string, &height, &nRows) != TCL_OK) {
 	return TCL_ERROR;
     }
-    textPtr->numRows = numRows;
-    textPtr->reqHeight = height;
+    htPtr->nRows = nRows;
+    htPtr->reqHeight = height;
     return TCL_OK;
 }
 
@@ -748,22 +744,22 @@ StringToHeight(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static int
 StringToWidth(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window tkwin;		/* Window */
     char *string;		/* Pixel value string */
     char *widgRec;		/* Widget record */
-    int offset;			/* not used */
+    int offset;			/* Not used. */
 {
-    HText *textPtr = (HText *)widgRec;
-    int width, numColumns;
+    HText *htPtr = (HText *)widgRec;
+    int width, nColumns;
 
     if (GetScreenDistance(interp, tkwin, string, &width,
-	    &numColumns) != TCL_OK) {
+	    &nColumns) != TCL_OK) {
 	return TCL_ERROR;
     }
-    textPtr->numColumns = numColumns;
-    textPtr->reqWidth = width;
+    htPtr->nColumns = nColumns;
+    htPtr->reqWidth = width;
     return TCL_OK;
 }
 
@@ -782,23 +778,23 @@ StringToWidth(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 WidthHeightToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Row/column structure record */
     int offset;			/* Offset of fill in Partition record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     int pixels = *(int *)(widgRec + offset);
-    char *resultPtr;
+    char *result;
     char string[200];
 
     sprintf(string, "%d", pixels);
-    resultPtr = strdup(string);
-    if (resultPtr == NULL) {
+    result = Blt_Strdup(string);
+    if (result == NULL) {
 	return "out of memory";
     }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (resultPtr);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
 
 /* General routines */
@@ -822,12 +818,12 @@ WidthHeightToString(clientData, tkwin, widgRec, offset, freeProcPtr)
  *----------------------------------------------------------------------
  */
 static void
-EventuallyRedraw(textPtr)
-    HText *textPtr;		/* Information about widget. */
+EventuallyRedraw(htPtr)
+    HText *htPtr;		/* Information about widget. */
 {
-    if ((textPtr->tkwin != NULL) && !(textPtr->flags & REDRAW_PENDING)) {
-	textPtr->flags |= REDRAW_PENDING;
-	Tk_DoWhenIdle(DisplayText, (ClientData)textPtr);
+    if ((htPtr->tkwin != NULL) && !(htPtr->flags & REDRAW_PENDING)) {
+	htPtr->flags |= REDRAW_PENDING;
+	Tcl_DoWhenIdle(DisplayText, htPtr);
     }
 }
 
@@ -860,11 +856,11 @@ ResizeArray(arrayPtr, elemSize, newSize, prevSize)
 	return TCL_OK;
     }
     if (newSize == 0) {		/* Free entire array */
-	free(*arrayPtr);
+	Blt_Free(*arrayPtr);
 	*arrayPtr = NULL;
 	return TCL_OK;
     }
-    newPtr = (char *)calloc(elemSize, newSize);
+    newPtr = Blt_Calloc(elemSize, newSize);
     if (newPtr == NULL) {
 	return TCL_ERROR;
     }
@@ -875,7 +871,7 @@ ResizeArray(arrayPtr, elemSize, newSize, prevSize)
 	if (size > 0) {
 	    memcpy(newPtr, *arrayPtr, size);
 	}
-	free(*arrayPtr);
+	Blt_Free(*arrayPtr);
     }
     *arrayPtr = newPtr;
     return TCL_OK;
@@ -898,8 +894,8 @@ ResizeArray(arrayPtr, elemSize, newSize, prevSize)
  * ----------------------------------------------------------------------
  */
 static int
-LineSearch(textPtr, yCoord, low, high)
-    HText *textPtr;		/* HText widget */
+LineSearch(htPtr, yCoord, low, high)
+    HText *htPtr;		/* HText widget */
     int yCoord;			/* Search y-coordinate  */
     int low, high;		/* Range of lines to search */
 {
@@ -908,13 +904,13 @@ LineSearch(textPtr, yCoord, low, high)
 
     while (low <= high) {
 	median = (low + high) >> 1;
-	linePtr = textPtr->lineArr + median;
+	linePtr = htPtr->lineArr + median;
 	if (yCoord < linePtr->offset) {
 	    high = median - 1;
 	} else if (yCoord >= (linePtr->offset + linePtr->height)) {
 	    low = median + 1;
 	} else {
-	    return (median);
+	    return median;
 	}
     }
     return -1;
@@ -936,9 +932,9 @@ LineSearch(textPtr, yCoord, low, high)
  * ----------------------------------------------------------------------
  */
 static int
-IndexSearch(textPtr, textIndex, low, high)
-    HText *textPtr;		/* HText widget */
-    int textIndex;		/* Search index */
+IndexSearch(htPtr, key, low, high)
+    HText *htPtr;		/* HText widget */
+    int key;			/* Search index */
     int low, high;		/* Range of lines to search */
 {
     int median;
@@ -946,13 +942,13 @@ IndexSearch(textPtr, textIndex, low, high)
 
     while (low <= high) {
 	median = (low + high) >> 1;
-	linePtr = textPtr->lineArr + median;
-	if (textIndex < linePtr->textStart) {
+	linePtr = htPtr->lineArr + median;
+	if (key < linePtr->textStart) {
 	    high = median - 1;
-	} else if (textIndex > linePtr->textEnd) {
+	} else if (key > linePtr->textEnd) {
 	    low = median + 1;
 	} else {
-	    return (median);
+	    return median;
 	}
     }
     return -1;
@@ -978,69 +974,68 @@ IndexSearch(textPtr, textIndex, low, high)
  * ----------------------------------------------------------------------
  */
 static int
-GetXYPosIndex(textPtr, string, indexPtr)
-    HText *textPtr;
+GetXYPosIndex(htPtr, string, indexPtr)
+    HText *htPtr;
     char *string;
     int *indexPtr;
 {
     int x, y, curX, dummy;
     int textLength, textStart;
-    int charPos, lineNum;
+    int cindex, lindex;
     Line *linePtr;
 
-    if (Blt_GetXYPosition(textPtr->interp, textPtr->tkwin, string, &x, &y)
-	!= TCL_OK) {
+    if (Blt_GetXY(htPtr->interp, htPtr->tkwin, string, &x, &y) != TCL_OK) {
 	return TCL_ERROR;
     }
     /* Locate the line corresponding to the window y-coordinate position */
 
-    y += textPtr->yOffset;
+    y += htPtr->yOffset;
     if (y < 0) {
-	lineNum = textPtr->first;
-    } else if (y >= textPtr->worldHeight) {
-	lineNum = textPtr->last;
+	lindex = htPtr->first;
+    } else if (y >= htPtr->worldHeight) {
+	lindex = htPtr->last;
     } else {
-	lineNum = LineSearch(textPtr, y, 0, textPtr->numLines - 1);
+	lindex = LineSearch(htPtr, y, 0, htPtr->nLines - 1);
     }
-    if (lineNum < 0) {
-	Tcl_AppendResult(textPtr->interp, "can't find line at \"", string, "\"",
+    if (lindex < 0) {
+	Tcl_AppendResult(htPtr->interp, "can't find line at \"", string, "\"",
 	    (char *)NULL);
 	return TCL_ERROR;
     }
-    x += textPtr->xOffset;
+    x += htPtr->xOffset;
     if (x < 0) {
 	x = 0;
-    } else if (x > textPtr->worldWidth) {
-	x = textPtr->worldWidth;
+    } else if (x > htPtr->worldWidth) {
+	x = htPtr->worldWidth;
     }
-    linePtr = textPtr->lineArr + lineNum;
+    linePtr = htPtr->lineArr + lindex;
     curX = 0;
     textStart = linePtr->textStart;
     textLength = linePtr->textEnd - linePtr->textStart;
-    if (Blt_ListGetLength(&(linePtr->winList)) > 0) {
-	Blt_ListItem item;
+    if (Blt_ChainGetLength(linePtr->chainPtr) > 0) {
+	Blt_ChainLink *linkPtr;
 	int deltaX;
-	Slave *slavePtr;
+	EmbeddedWidget *winPtr;
 
-	for (item = Blt_ListFirstItem(&(linePtr->winList));
-	    item != NULL; item = Blt_ListNextItem(item)) {
-	    slavePtr = (Slave *)Blt_ListGetValue(item);
-	    deltaX = slavePtr->precedingTextWidth + slavePtr->cavityWidth;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    winPtr = Blt_ChainGetValue(linkPtr);
+	    deltaX = winPtr->precedingTextWidth + winPtr->cavityWidth;
 	    if ((curX + deltaX) > x) {
-		textLength = (slavePtr->precedingTextEnd - textStart);
+		textLength = (winPtr->precedingTextEnd - textStart);
 		break;
 	    }
 	    curX += deltaX;
 	    /*
 	     * Skip over the trailing space. It designates the position of
-	     * a slave window in the text
+	     * a embedded widget in the text
 	     */
-	    textStart = slavePtr->precedingTextEnd + 1;
+	    textStart = winPtr->precedingTextEnd + 1;
 	}
     }
-    charPos = Tk_MeasureChars(textPtr->font, textPtr->charArr + textStart,
+    cindex = Tk_MeasureChars(htPtr->font, htPtr->charArr + textStart,
 	textLength, 10000, DEF_TEXT_FLAGS, &dummy);
-    *indexPtr = textStart + charPos;
+    *indexPtr = textStart + cindex;
     return TCL_OK;
 }
 
@@ -1072,50 +1067,50 @@ GetXYPosIndex(textPtr, string, indexPtr)
  *--------------------------------------------------------------
  */
 static int
-ParseIndex(textPtr, string, indexPtr)
-    HText *textPtr;		/* Text for which the index is being
+ParseIndex(htPtr, string, indexPtr)
+    HText *htPtr;		/* Text for which the index is being
 				 * specified. */
-    char *string;		/* Numerical index into textPtr's element
+    char *string;		/* Numerical index into htPtr's element
 				 * list, or "end" to refer to last element. */
     int *indexPtr;		/* Where to store converted relief. */
 {
     unsigned int length;
     char c;
-    Tcl_Interp *interp = textPtr->interp;
+    Tcl_Interp *interp = htPtr->interp;
 
     length = strlen(string);
     c = string[0];
 
     if ((c == 'a') && (strncmp(string, "anchor", length) == 0)) {
-	*indexPtr = textPtr->selAnchor;
+	*indexPtr = htPtr->selAnchor;
     } else if ((c == 's') && (length > 4)) {
 	if (strncmp(string, "sel.first", length) == 0) {
-	    *indexPtr = textPtr->selFirst;
+	    *indexPtr = htPtr->selFirst;
 	} else if (strncmp(string, "sel.last", length) == 0) {
-	    *indexPtr = textPtr->selLast;
+	    *indexPtr = htPtr->selLast;
 	} else {
 	    goto badIndex;	/* Not a valid index */
 	}
 	if (*indexPtr < 0) {
 	    Tcl_AppendResult(interp, "bad index \"", string,
 		"\": nothing selected in \"",
-		Tk_PathName(textPtr->tkwin), "\"", (char *)NULL);
+		Tk_PathName(htPtr->tkwin), "\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
     } else if ((c == 'p') && (length > 5) &&
 	(strncmp(string, "page.top", length) == 0)) {
 	int first;
 
-	first = textPtr->first;
+	first = htPtr->first;
 	if (first < 0) {
 	    first = 0;
 	}
-	*indexPtr = textPtr->lineArr[first].textStart;
+	*indexPtr = htPtr->lineArr[first].textStart;
     } else if ((c == 'p') && (length > 5) &&
 	(strncmp(string, "page.bottom", length) == 0)) {
-	*indexPtr = textPtr->lineArr[textPtr->last].textEnd;
+	*indexPtr = htPtr->lineArr[htPtr->last].textEnd;
     } else if (c == '@') {	/* Screen position */
-	if (GetXYPosIndex(textPtr, string, indexPtr) != TCL_OK) {
+	if (GetXYPosIndex(htPtr, string, indexPtr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     } else {
@@ -1123,61 +1118,61 @@ ParseIndex(textPtr, string, indexPtr)
 
 	period = strchr(string, '.');
 	if (period == NULL) {	/* Raw index */
-	    int textIndex;
+	    int tindex;
 
 	    if ((string[0] == 'e') && (strcmp(string, "end") == 0)) {
-		textIndex = textPtr->numChars - 1;
-	    } else if (Tcl_GetInt(interp, string, &textIndex) != TCL_OK) {
+		tindex = htPtr->nChars - 1;
+	    } else if (Tcl_GetInt(interp, string, &tindex) != TCL_OK) {
 		goto badIndex;
 	    }
-	    if (textIndex < 0) {
-		textIndex = 0;
-	    } else if (textIndex > (textPtr->numChars - 1)) {
-		textIndex = textPtr->numChars - 1;
+	    if (tindex < 0) {
+		tindex = 0;
+	    } else if (tindex > (htPtr->nChars - 1)) {
+		tindex = htPtr->nChars - 1;
 	    }
-	    *indexPtr = textIndex;
+	    *indexPtr = tindex;
 	} else {
-	    int lineNum, charPos, offset;
+	    int lindex, cindex, offset;
 	    Line *linePtr;
 	    int result;
 
 	    *period = '\0';
 	    result = TCL_OK;
 	    if ((string[0] == 'e') && (strcmp(string, "end") == 0)) {
-		lineNum = textPtr->numLines - 1;
+		lindex = htPtr->nLines - 1;
 	    } else {
-		result = Tcl_GetInt(interp, string, &lineNum);
+		result = Tcl_GetInt(interp, string, &lindex);
 	    }
 	    *period = '.';	/* Repair index string before returning */
 	    if (result != TCL_OK) {
 		goto badIndex;	/* Bad line number */
 	    }
-	    if (lineNum < 0) {
-		lineNum = 0;	/* Silently repair bad line numbers */
+	    if (lindex < 0) {
+		lindex = 0;	/* Silently repair bad line numbers */
 	    }
-	    if (textPtr->numChars == 0) {
+	    if (htPtr->nChars == 0) {
 		*indexPtr = 0;
 		return TCL_OK;
 	    }
-	    if (lineNum >= textPtr->numLines) {
-		lineNum = textPtr->numLines - 1;
+	    if (lindex >= htPtr->nLines) {
+		lindex = htPtr->nLines - 1;
 	    }
-	    linePtr = textPtr->lineArr + lineNum;
-	    charPos = 0;
+	    linePtr = htPtr->lineArr + lindex;
+	    cindex = 0;
 	    if ((*(period + 1) != '\0')) {
 		string = period + 1;
 		if ((string[0] == 'e') && (strcmp(string, "end") == 0)) {
-		    charPos = linePtr->textEnd - linePtr->textStart;
-		} else if (Tcl_GetInt(interp, string, &charPos) != TCL_OK) {
+		    cindex = linePtr->textEnd - linePtr->textStart;
+		} else if (Tcl_GetInt(interp, string, &cindex) != TCL_OK) {
 		    goto badIndex;
 		}
 	    }
-	    if (charPos < 0) {
-		charPos = 0;	/* Silently fix bogus indices */
+	    if (cindex < 0) {
+		cindex = 0;	/* Silently fix bogus indices */
 	    }
 	    offset = 0;
-	    if (textPtr->numChars > 0) {
-		offset = linePtr->textStart + charPos;
+	    if (htPtr->nChars > 0) {
+		offset = linePtr->textStart + cindex;
 		if (offset > linePtr->textEnd) {
 		    offset = linePtr->textEnd;
 		}
@@ -1185,7 +1180,7 @@ ParseIndex(textPtr, string, indexPtr)
 	    *indexPtr = offset;
 	}
     }
-    if (textPtr->numChars == 0) {
+    if (htPtr->nChars == 0) {
 	*indexPtr = 0;
     }
     return TCL_OK;
@@ -1222,19 +1217,19 @@ page.top, @x,y, index, line.char", (char *)NULL);
  *--------------------------------------------------------------
  */
 static int
-GetIndex(textPtr, string, indexPtr)
-    HText *textPtr;		/* Text for which the index is being
+GetIndex(htPtr, string, indexPtr)
+    HText *htPtr;		/* Text for which the index is being
 				 * specified. */
-    char *string;		/* Numerical index into textPtr's element
+    char *string;		/* Numerical index into htPtr's element
 				 * list, or "end" to refer to last element. */
     int *indexPtr;		/* Where to store converted relief. */
 {
-    int textIndex;
+    int tindex;
 
-    if (ParseIndex(textPtr, string, &textIndex) != TCL_OK) {
+    if (ParseIndex(htPtr, string, &tindex) != TCL_OK) {
 	return TCL_ERROR;
     }
-    *indexPtr = textIndex;
+    *indexPtr = tindex;
     return TCL_OK;
 }
 
@@ -1255,107 +1250,107 @@ GetIndex(textPtr, string, indexPtr)
  * ----------------------------------------------------------------------
  */
 static int
-GetTextPosition(textPtr, textIndex, lineNumPtr, charPosPtr)
-    HText *textPtr;
-    int textIndex;
-    int *lineNumPtr;
-    int *charPosPtr;
+GetTextPosition(htPtr, tindex, lindexPtr, cindexPtr)
+    HText *htPtr;
+    int tindex;
+    int *lindexPtr;
+    int *cindexPtr;
 {
-    int lineNum, charPos;
+    int lindex, cindex;
 
-    lineNum = charPos = 0;
-    if (textPtr->numChars > 0) {
+    lindex = cindex = 0;
+    if (htPtr->nChars > 0) {
 	Line *linePtr;
 
-	lineNum = IndexSearch(textPtr, textIndex, 0, textPtr->numLines - 1);
-	if (lineNum < 0) {
+	lindex = IndexSearch(htPtr, tindex, 0, htPtr->nLines - 1);
+	if (lindex < 0) {
 	    char string[200];
 
 	    sprintf(string, "can't determine line number from index \"%d\"",
-		textIndex);
-	    Tcl_AppendResult(textPtr->interp, string, (char *)NULL);
+		tindex);
+	    Tcl_AppendResult(htPtr->interp, string, (char *)NULL);
 	    return TCL_ERROR;
 	}
-	linePtr = textPtr->lineArr + lineNum;
-	if (textIndex > linePtr->textEnd) {
-	    textIndex = linePtr->textEnd;
+	linePtr = htPtr->lineArr + lindex;
+	if (tindex > linePtr->textEnd) {
+	    tindex = linePtr->textEnd;
 	}
-	charPos = textIndex - linePtr->textStart;
+	cindex = tindex - linePtr->textStart;
     }
-    *lineNumPtr = lineNum;
-    *charPosPtr = charPos;
+    *lindexPtr = lindex;
+    *cindexPtr = cindex;
     return TCL_OK;
 }
 
-/* Slave Procedures */
+/* EmbeddedWidget Procedures */
 /*
  *----------------------------------------------------------------------
  *
- * GetSlaveWidth --
+ * GetEmbeddedWidgetWidth --
  *
- *	Returns the width requested by the slave window. The requested
+ *	Returns the width requested by the embedded widget. The requested
  *	space also includes any internal padding which has been designated
  *	for this window.
  *
  * Results:
- *	Returns the requested width of the slave window.
+ *	Returns the requested width of the embedded widget.
  *
  *----------------------------------------------------------------------
  */
 static int
-GetSlaveWidth(slavePtr)
-    Slave *slavePtr;
+GetEmbeddedWidgetWidth(winPtr)
+    EmbeddedWidget *winPtr;
 {
     int width;
 
-    if (slavePtr->reqSlaveWidth > 0) {
-	width = slavePtr->reqSlaveWidth;
-    } else if (slavePtr->relSlaveWidth > 0.0) {
-	width = (int)((double)Tk_Width(slavePtr->textPtr->tkwin) *
-	    slavePtr->relSlaveWidth + 0.5);
+    if (winPtr->reqWidth > 0) {
+	width = winPtr->reqWidth;
+    } else if (winPtr->relWidth > 0.0) {
+	width = (int)
+	    ((double)Tk_Width(winPtr->htPtr->tkwin) * winPtr->relWidth + 0.5);
     } else {
-	width = Tk_ReqWidth(slavePtr->tkwin);
+	width = Tk_ReqWidth(winPtr->tkwin);
     }
-    width += (2 * slavePtr->ipadX);
-    return (width);
+    width += (2 * winPtr->ipadX);
+    return width;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * GetSlaveHeight --
+ * GetEmbeddedWidgetHeight --
  *
- *	Returns the height requested by the slave window. The requested
+ *	Returns the height requested by the embedded widget. The requested
  *	space also includes any internal padding which has been designated
  *	for this window.
  *
  * Results:
- *	Returns the requested height of the slave window.
+ *	Returns the requested height of the embedded widget.
  *
  *----------------------------------------------------------------------
  */
 static int
-GetSlaveHeight(slavePtr)
-    Slave *slavePtr;
+GetEmbeddedWidgetHeight(winPtr)
+    EmbeddedWidget *winPtr;
 {
     int height;
 
-    if (slavePtr->reqSlaveHeight > 0) {
-	height = slavePtr->reqSlaveHeight;
-    } else if (slavePtr->relSlaveHeight > 0.0) {
-	height = (int)((double)Tk_Height(slavePtr->textPtr->tkwin) *
-	    slavePtr->relSlaveHeight + 0.5);
+    if (winPtr->reqHeight > 0) {
+	height = winPtr->reqHeight;
+    } else if (winPtr->relHeight > 0.0) {
+	height = (int)((double)Tk_Height(winPtr->htPtr->tkwin) *
+	    winPtr->relHeight + 0.5);
     } else {
-	height = Tk_ReqHeight(slavePtr->tkwin);
+	height = Tk_ReqHeight(winPtr->tkwin);
     }
-    height += (2 * slavePtr->ipadY);
-    return (height);
+    height += (2 * winPtr->ipadY);
+    return height;
 }
 
 /*
  * --------------------------------------------------------------
  *
- * SlaveEventProc --
+ * EmbeddedWidgetEventProc --
  *
  * 	This procedure is invoked by the Tk dispatcher for various
  * 	events on hypertext widgets.
@@ -1370,44 +1365,45 @@ GetSlaveHeight(slavePtr)
  * --------------------------------------------------------------
  */
 static void
-SlaveEventProc(clientData, eventPtr)
-    ClientData clientData;	/* Information about the slave window. */
+EmbeddedWidgetEventProc(clientData, eventPtr)
+    ClientData clientData;	/* Information about the embedded widget. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Slave *slavePtr = (Slave *)clientData;
-    HText *textPtr;
+    EmbeddedWidget *winPtr = clientData;
+    HText *htPtr;
 
-    if ((slavePtr == NULL) || (slavePtr->tkwin == NULL)) {
+    if ((winPtr == NULL) || (winPtr->tkwin == NULL)) {
 	return;
     }
-    textPtr = slavePtr->textPtr;
+    htPtr = winPtr->htPtr;
 
     if (eventPtr->type == DestroyNotify) {
+	Blt_HashEntry *hPtr;
 	/*
-	 * Mark the slave as deleted by dereferencing the Tk window
+	 * Mark the widget as deleted by dereferencing the Tk window
 	 * pointer.  Zero out the height and width to collapse the area
-	 * used by the slave.  Redraw the window only if the slave is
+	 * used by the widget.  Redraw the window only if the widget is
 	 * currently visible.
 	 */
-	slavePtr->textPtr->flags |= REQUEST_LAYOUT;
-	if (Tk_IsMapped(slavePtr->tkwin) && (slavePtr->flags & SLAVE_VISIBLE)) {
-	    EventuallyRedraw(textPtr);
+	winPtr->htPtr->flags |= REQUEST_LAYOUT;
+	if (Tk_IsMapped(winPtr->tkwin) && (winPtr->flags & WIDGET_VISIBLE)) {
+	    EventuallyRedraw(htPtr);
 	}
-	Tk_DeleteEventHandler(slavePtr->tkwin, StructureNotifyMask,
-	    SlaveEventProc, (ClientData)slavePtr);
-	Tcl_DeleteHashEntry(Tcl_FindHashEntry(&(textPtr->slaveTab),
-		(char *)slavePtr->tkwin));
-	slavePtr->cavityWidth = slavePtr->cavityHeight = 0;
-	slavePtr->tkwin = NULL;
+	Tk_DeleteEventHandler(winPtr->tkwin, StructureNotifyMask,
+	    EmbeddedWidgetEventProc, winPtr);
+	hPtr = Blt_FindHashEntry(&(htPtr->widgetTable), (char *)winPtr->tkwin);
+	Blt_DeleteHashEntry(&(htPtr->widgetTable), hPtr);
+	winPtr->cavityWidth = winPtr->cavityHeight = 0;
+	winPtr->tkwin = NULL;
 
     } else if (eventPtr->type == ConfigureNotify) {
 	/*
-	 * Slaves can't request new positions. Worry only about resizing.
+	 * EmbeddedWidgets can't request new positions. Worry only about resizing.
 	 */
-	if (slavePtr->winWidth != Tk_Width(slavePtr->tkwin) ||
-	    slavePtr->winHeight != Tk_Height(slavePtr->tkwin)) {
-	    EventuallyRedraw(textPtr);
-	    textPtr->flags |= REQUEST_LAYOUT;
+	if (winPtr->winWidth != Tk_Width(winPtr->tkwin) ||
+	    winPtr->winHeight != Tk_Height(winPtr->tkwin)) {
+	    EventuallyRedraw(htPtr);
+	    htPtr->flags |= REQUEST_LAYOUT;
 	}
     }
 }
@@ -1415,54 +1411,56 @@ SlaveEventProc(clientData, eventPtr)
 /*
  *--------------------------------------------------------------
  *
- * SlaveCustodyProc --
+ * EmbeddedWidgetCustodyProc --
  *
- *	This procedure is invoked when a slave window has been
+ *	This procedure is invoked when a embedded widget has been
  *	stolen by another geometry manager.  The information and
- *	memory associated with the slave window is released.
+ *	memory associated with the embedded widget is released.
  *
  * Results:
  *	None.
  *
  * Side effects:
- *	Arranges for the widget formerly associated with the slave
- *	window to have its layout re-computed and arranged at the
+ *	Arranges for the widget formerly associated with the widget
+ *	to have its layout re-computed and arranged at the
  *	next idle point.
  *
  *--------------------------------------------------------------
  */
  /* ARGSUSED */
 static void
-SlaveCustodyProc(clientData, tkwin)
-    ClientData clientData;	/* Information about the former slave window. */
+EmbeddedWidgetCustodyProc(clientData, tkwin)
+    ClientData clientData;	/* Information about the former embedded widget. */
     Tk_Window tkwin;		/* Not used. */
 {
-    Slave *slavePtr = (Slave *)clientData;
+    Blt_HashEntry *hPtr;
+    EmbeddedWidget *winPtr = clientData;
     /*
-     * Mark the slave as deleted by dereferencing the Tk window
+     * Mark the widget as deleted by dereferencing the Tk window
      * pointer.  Zero out the height and width to collapse the area
-     * used by the slave.  Redraw the window only if the slave is
+     * used by the widget.  Redraw the window only if the widget is
      * currently visible.
      */
-    slavePtr->textPtr->flags |= REQUEST_LAYOUT;
-    if (Tk_IsMapped(slavePtr->tkwin) && (slavePtr->flags & SLAVE_VISIBLE)) {
-	EventuallyRedraw(slavePtr->textPtr);
+    winPtr->htPtr->flags |= REQUEST_LAYOUT;
+    if (Tk_IsMapped(winPtr->tkwin) && (winPtr->flags & WIDGET_VISIBLE)) {
+	EventuallyRedraw(winPtr->htPtr);
     }
-    Tk_DeleteEventHandler(slavePtr->tkwin, StructureNotifyMask,
-	SlaveEventProc, (ClientData)slavePtr);
-    Tcl_DeleteHashEntry(Tcl_FindHashEntry(&(slavePtr->textPtr->slaveTab),
-	    (char *)slavePtr->tkwin));
-    slavePtr->cavityWidth = slavePtr->cavityHeight = 0;
-    slavePtr->tkwin = NULL;
+    Tk_DeleteEventHandler(winPtr->tkwin, StructureNotifyMask,
+	EmbeddedWidgetEventProc, winPtr);
+    hPtr = Blt_FindHashEntry(&(winPtr->htPtr->widgetTable), 
+			     (char *)winPtr->tkwin);
+    Blt_DeleteHashEntry(&(winPtr->htPtr->widgetTable), hPtr);
+    winPtr->cavityWidth = winPtr->cavityHeight = 0;
+    winPtr->tkwin = NULL;
 }
 
 /*
  *--------------------------------------------------------------
  *
- * SlaveGeometryProc --
+ * EmbeddedWidgetGeometryProc --
  *
  *	This procedure is invoked by Tk_GeometryRequest for
- *	slave windows managed by the hypertext widget.
+ *	embedded widgets managed by the hypertext widget.
  *
  * Results:
  *	None.
@@ -1475,42 +1473,42 @@ SlaveCustodyProc(clientData, tkwin)
  */
  /* ARGSUSED */
 static void
-SlaveGeometryProc(clientData, tkwin)
+EmbeddedWidgetGeometryProc(clientData, tkwin)
     ClientData clientData;	/* Information about window that got new
 			         * preferred geometry.  */
     Tk_Window tkwin;		/* Other Tk-related information about the
 			         * window. */
 {
-    Slave *slavePtr = (Slave *)clientData;
+    EmbeddedWidget *winPtr = clientData;
 
-    slavePtr->textPtr->flags |= REQUEST_LAYOUT;
-    EventuallyRedraw(slavePtr->textPtr);
+    winPtr->htPtr->flags |= REQUEST_LAYOUT;
+    EventuallyRedraw(winPtr->htPtr);
 }
 
 /*
  * ----------------------------------------------------------------------
  *
- * FindSlave --
+ * FindEmbeddedWidget --
  *
- *	Searches for a slave widget matching the path name given
- *	If found, the pointer to the slave structure is returned,
+ *	Searches for a widget matching the path name given
+ *	If found, the pointer to the widget structure is returned,
  *	otherwise NULL.
  *
  * Results:
- *	The pointer to the slave structure. If not found, NULL.
+ *	The pointer to the widget structure. If not found, NULL.
  *
  * ----------------------------------------------------------------------
  */
-static Slave *
-FindSlave(textPtr, tkwin)
-    HText *textPtr;		/* Hypertext widget structure */
-    Tk_Window tkwin;		/* Path name of slave window  */
+static EmbeddedWidget *
+FindEmbeddedWidget(htPtr, tkwin)
+    HText *htPtr;		/* Hypertext widget structure */
+    Tk_Window tkwin;		/* Path name of embedded widget  */
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
-    hPtr = Tcl_FindHashEntry(&(textPtr->slaveTab), (char *)tkwin);
+    hPtr = Blt_FindHashEntry(&(htPtr->widgetTable), (char *)tkwin);
     if (hPtr != NULL) {
-	return (Slave *) Tcl_GetHashValue(hPtr);
+	return (EmbeddedWidget *) Blt_GetHashValue(hPtr);
     }
     return NULL;
 }
@@ -1518,73 +1516,74 @@ FindSlave(textPtr, tkwin)
 /*
  * ----------------------------------------------------------------------
  *
- * CreateSlave --
+ * CreateEmbeddedWidget --
  *
- * 	This procedure creates and initializes a new slave window
+ * 	This procedure creates and initializes a new embedded widget
  *	in the hyper text widget.
  *
  * Results:
  *	The return value is a pointer to a structure describing the
- *	new slave.  If an error occurred, then the return value is
- *      NULL and an error message is left in interp->result.
+ *	new embedded widget.  If an error occurred, then the return 
+ *	value is NULL and an error message is left in interp->result.
  *
  * Side effects:
- *	Memory is allocated. Slave window is mapped. Callbacks are set
- *	up for slave window resizes and geometry requests.
+ *	Memory is allocated. EmbeddedWidget window is mapped. 
+ *	Callbacks are set up for embedded widget resizes and geometry 
+ *	requests.
  *
  * ----------------------------------------------------------------------
  */
-static Slave *
-CreateSlave(textPtr, name)
-    HText *textPtr;		/* Hypertext widget */
-    char *name;			/* Name of slave window */
+static EmbeddedWidget *
+CreateEmbeddedWidget(htPtr, name)
+    HText *htPtr;		/* Hypertext widget */
+    char *name;			/* Name of embedded widget */
 {
-    Slave *slavePtr;
+    EmbeddedWidget *winPtr;
     Tk_Window tkwin;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     int isNew;
 
-    tkwin = Tk_NameToWindow(textPtr->interp, name, textPtr->tkwin);
+    tkwin = Tk_NameToWindow(htPtr->interp, name, htPtr->tkwin);
     if (tkwin == NULL) {
 	return NULL;
     }
-    if (Tk_Parent(tkwin) != textPtr->tkwin) {
-	Tcl_AppendResult(textPtr->interp, "parent window of \"", name,
-	    "\" must be \"", Tk_PathName(textPtr->tkwin), "\"", (char *)NULL);
+    if (Tk_Parent(tkwin) != htPtr->tkwin) {
+	Tcl_AppendResult(htPtr->interp, "parent window of \"", name,
+	    "\" must be \"", Tk_PathName(htPtr->tkwin), "\"", (char *)NULL);
 	return NULL;
     }
-    hPtr = Tcl_CreateHashEntry(&(textPtr->slaveTab), (char *)tkwin, &isNew);
-    /* Check is the window is already a slave of this widget */
+    hPtr = Blt_CreateHashEntry(&(htPtr->widgetTable), (char *)tkwin, &isNew);
+    /* Check is the widget is already embedded into this widget */
     if (!isNew) {
-	Tcl_AppendResult(textPtr->interp, "\"", name,
-	    "\" is already appended to ", Tk_PathName(textPtr->tkwin),
+	Tcl_AppendResult(htPtr->interp, "\"", name,
+	    "\" is already appended to ", Tk_PathName(htPtr->tkwin),
 	    (char *)NULL);
 	return NULL;
     }
-    slavePtr = (Slave *)calloc(1, sizeof(Slave));
-    assert(slavePtr);
-    slavePtr->flags = 0;
-    slavePtr->tkwin = tkwin;
-    slavePtr->textPtr = textPtr;
-    slavePtr->x = slavePtr->y = 0;
-    slavePtr->fill = FILL_NONE;
-    slavePtr->justify = JUSTIFY_CENTER;
-    slavePtr->anchor = TK_ANCHOR_CENTER;
-    Tcl_SetHashValue(hPtr, (ClientData)slavePtr);
+    winPtr = Blt_Calloc(1, sizeof(EmbeddedWidget));
+    assert(winPtr);
+    winPtr->flags = 0;
+    winPtr->tkwin = tkwin;
+    winPtr->htPtr = htPtr;
+    winPtr->x = winPtr->y = 0;
+    winPtr->fill = FILL_NONE;
+    winPtr->justify = JUSTIFY_CENTER;
+    winPtr->anchor = TK_ANCHOR_CENTER;
+    Blt_SetHashValue(hPtr, winPtr);
 
-    Tk_ManageGeometry(tkwin, &htextMgrInfo, (ClientData)slavePtr);
-    Tk_CreateEventHandler(tkwin, StructureNotifyMask, SlaveEventProc,
-	(ClientData)slavePtr);
-    return (slavePtr);
+    Tk_ManageGeometry(tkwin, &htextMgrInfo, winPtr);
+    Tk_CreateEventHandler(tkwin, StructureNotifyMask, EmbeddedWidgetEventProc,
+	  winPtr);
+    return winPtr;
 }
 
 /*
  * ----------------------------------------------------------------------
  *
- * DestroySlave --
+ * DestroyEmbeddedWidget --
  *
  * 	This procedure is invoked by DestroyLine to clean up the
- * 	internal structure of a slave.
+ * 	internal structure of a widget.
  *
  * Results:
  *	None.
@@ -1595,21 +1594,21 @@ CreateSlave(textPtr, name)
  * ----------------------------------------------------------------------
  */
 static void
-DestroySlave(slavePtr)
-    Slave *slavePtr;
+DestroyEmbeddedWidget(winPtr)
+    EmbeddedWidget *winPtr;
 {
-    /* Destroy the slave window if it still exists */
-    if (slavePtr->tkwin != NULL) {
-	Tcl_HashEntry *hPtr;
+    /* Destroy the embedded widget if it still exists */
+    if (winPtr->tkwin != NULL) {
+	Blt_HashEntry *hPtr;
 
-	Tk_DeleteEventHandler(slavePtr->tkwin, StructureNotifyMask,
-	    SlaveEventProc, (ClientData)slavePtr);
-	hPtr = Tcl_FindHashEntry(&(slavePtr->textPtr->slaveTab),
-	    (char *)slavePtr->tkwin);
-	Tcl_DeleteHashEntry(hPtr);
-	Tk_DestroyWindow(slavePtr->tkwin);
+	Tk_DeleteEventHandler(winPtr->tkwin, StructureNotifyMask,
+	    EmbeddedWidgetEventProc, winPtr);
+	hPtr = Blt_FindHashEntry(&(winPtr->htPtr->widgetTable),
+	    (char *)winPtr->tkwin);
+	Blt_DeleteHashEntry(&(winPtr->htPtr->widgetTable), hPtr);
+	Tk_DestroyWindow(winPtr->tkwin);
     }
-    free((char *)slavePtr);
+    Blt_Free(winPtr);
 }
 
 /* Line Procedures */
@@ -1631,34 +1630,34 @@ DestroySlave(slavePtr)
  * ----------------------------------------------------------------------
  */
 static Line *
-CreateLine(textPtr)
-    HText *textPtr;
+CreateLine(htPtr)
+    HText *htPtr;
 {
     Line *linePtr;
 
-    if (textPtr->numLines >= textPtr->arraySize) {
-	if (textPtr->arraySize == 0) {
-	    textPtr->arraySize = DEF_LINES_ALLOC;
+    if (htPtr->nLines >= htPtr->arraySize) {
+	if (htPtr->arraySize == 0) {
+	    htPtr->arraySize = DEF_LINES_ALLOC;
 	} else {
-	    textPtr->arraySize += textPtr->arraySize;
+	    htPtr->arraySize += htPtr->arraySize;
 	}
-	if (ResizeArray((char **)&(textPtr->lineArr), sizeof(Line),
-		textPtr->arraySize, textPtr->numLines) != TCL_OK) {
+	if (ResizeArray((char **)&(htPtr->lineArr), sizeof(Line),
+		htPtr->arraySize, htPtr->nLines) != TCL_OK) {
 	    return NULL;
 	}
     }
     /* Initialize values in the new entry */
 
-    linePtr = textPtr->lineArr + textPtr->numLines;
+    linePtr = htPtr->lineArr + htPtr->nLines;
     linePtr->offset = 0;
     linePtr->height = linePtr->width = 0;
     linePtr->textStart = 0;
     linePtr->textEnd = -1;
     linePtr->baseline = 0;
-    Blt_InitList(&(linePtr->winList), TCL_ONE_WORD_KEYS);
+    linePtr->chainPtr = Blt_ChainCreate();
 
-    textPtr->numLines++;
-    return (linePtr);
+    htPtr->nLines++;
+    return linePtr;
 }
 
 /*
@@ -1673,7 +1672,7 @@ CreateLine(textPtr)
  *	None.
  *
  * Side effects:
- *	Everything associated with the line (text and slaves) is
+ *	Everything associated with the line (text and widgets) is
  *	freed up.
  *
  * ----------------------------------------------------------------------
@@ -1682,33 +1681,32 @@ static void
 DestroyLine(linePtr)
     Line *linePtr;
 {
-    Blt_ListItem item;
-    Slave *slavePtr;
+    Blt_ChainLink *linkPtr;
+    EmbeddedWidget *winPtr;
 
-    /* Free the list of slave structures */
-
-    for (item = Blt_ListFirstItem(&(linePtr->winList));
-	item != NULL; item = Blt_ListNextItem(item)) {
-	slavePtr = (Slave *)Blt_ListGetValue(item);
-	DestroySlave(slavePtr);
+    /* Free the list of embedded widget structures */
+    for (linkPtr = Blt_ChainFirstLink(linePtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	winPtr = Blt_ChainGetValue(linkPtr);
+	DestroyEmbeddedWidget(winPtr);
     }
-    Blt_ListReset(&(linePtr->winList));
+    Blt_ChainDestroy(linePtr->chainPtr);
 }
 
 static void
-FreeText(textPtr)
-    HText *textPtr;
+FreeText(htPtr)
+    HText *htPtr;
 {
     int i;
 
-    for (i = 0; i < textPtr->numLines; i++) {
-	DestroyLine(textPtr->lineArr + i);
+    for (i = 0; i < htPtr->nLines; i++) {
+	DestroyLine(htPtr->lineArr + i);
     }
-    textPtr->numLines = 0;
-    textPtr->numChars = 0;
-    if (textPtr->charArr != NULL) {
-	free(textPtr->charArr);
-	textPtr->charArr = NULL;
+    htPtr->nLines = 0;
+    htPtr->nChars = 0;
+    if (htPtr->charArr != NULL) {
+	Blt_Free(htPtr->charArr);
+	htPtr->charArr = NULL;
     }
 }
 
@@ -1718,7 +1716,7 @@ FreeText(textPtr)
  *
  * DestroyText --
  *
- * 	This procedure is invoked by Tk_EventuallyFree or Tk_Release
+ * 	This procedure is invoked by Tcl_EventuallyFree or Tcl_Release
  *	to clean up the internal structure of a HText at a safe time
  *	(when no-one is using it anymore).
  *
@@ -1734,27 +1732,27 @@ static void
 DestroyText(dataPtr)
     DestroyData dataPtr;	/* Info about hypertext widget. */
 {
-    HText *textPtr = (HText *)dataPtr;
+    HText *htPtr = (HText *)dataPtr;
 
-    if (textPtr->drawGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->drawGC);
+    Tk_FreeOptions(configSpecs, (char *)htPtr, htPtr->display, 0);
+    if (htPtr->drawGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->drawGC);
     }
-    if (textPtr->fillGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->fillGC);
+    if (htPtr->fillGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->fillGC);
     }
-    if (textPtr->tile != NULL) {
-	Blt_FreeTile(textPtr->tile);
+    if (htPtr->tile != NULL) {
+	Blt_FreeTile(htPtr->tile);
     }
-    if (textPtr->selectGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->selectGC);
+    if (htPtr->selectGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->selectGC);
     }
-    FreeText(textPtr);
-    if (textPtr->lineArr != NULL) {
-	free((char *)textPtr->lineArr);
+    FreeText(htPtr);
+    if (htPtr->lineArr != NULL) {
+	Blt_Free(htPtr->lineArr);
     }
-    Tk_FreeOptions(configSpecs, (char *)textPtr, textPtr->display, 0);
-    Tcl_DeleteHashTable(&(textPtr->slaveTab));
-    free((char *)textPtr);
+    Blt_DeleteHashTable(&(htPtr->widgetTable));
+    Blt_Free(htPtr);
 }
 
 /*
@@ -1779,13 +1777,13 @@ TextEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
 
     if (eventPtr->type == ConfigureNotify) {
-	if ((textPtr->lastWidth != Tk_Width(textPtr->tkwin)) ||
-	    (textPtr->lastHeight != Tk_Height(textPtr->tkwin))) {
-	    textPtr->flags |= (REQUEST_LAYOUT | TEXT_DIRTY);
-	    EventuallyRedraw(textPtr);
+	if ((htPtr->lastWidth != Tk_Width(htPtr->tkwin)) ||
+	    (htPtr->lastHeight != Tk_Height(htPtr->tkwin))) {
+	    htPtr->flags |= (REQUEST_LAYOUT | TEXT_DIRTY);
+	    EventuallyRedraw(htPtr);
 	}
     } else if (eventPtr->type == Expose) {
 
@@ -1796,29 +1794,23 @@ TextEventProc(clientData, eventPtr)
 	 */
 
 	if (eventPtr->xexpose.send_event) {
-	    textPtr->flags ^= IGNORE_EXPOSURES;
+	    htPtr->flags ^= IGNORE_EXPOSURES;
 	    return;
 	}
 	if ((eventPtr->xexpose.count == 0) &&
-	    !(textPtr->flags & IGNORE_EXPOSURES)) {
-	    textPtr->flags |= TEXT_DIRTY;
-	    EventuallyRedraw(textPtr);
+	    !(htPtr->flags & IGNORE_EXPOSURES)) {
+	    htPtr->flags |= TEXT_DIRTY;
+	    EventuallyRedraw(htPtr);
 	}
     } else if (eventPtr->type == DestroyNotify) {
-	if (textPtr->tkwin != NULL) {
-	    char *cmdName;
-
-	    cmdName = Tcl_GetCommandName(textPtr->interp, textPtr->cmdToken);
-#ifdef ITCL_NAMESPACES
-	    Itk_SetWidgetCommand(textPtr->tkwin, (Tcl_Command) NULL);
-#endif /* ITCL_NAMESPACES */
-	    textPtr->tkwin = NULL;
-	    Tcl_DeleteCommand(textPtr->interp, cmdName);
+	if (htPtr->tkwin != NULL) {
+	    htPtr->tkwin = NULL;
+	    Tcl_DeleteCommandFromToken(htPtr->interp, htPtr->cmdToken);
 	}
-	if (textPtr->flags & REDRAW_PENDING) {
-	    Tk_CancelIdleCall(DisplayText, (ClientData)textPtr);
+	if (htPtr->flags & REDRAW_PENDING) {
+	    Tcl_CancelIdleCall(DisplayText, htPtr);
 	}
-	Tk_EventuallyFree((ClientData)textPtr, DestroyText);
+	Tcl_EventuallyFree(htPtr, DestroyText);
     }
 }
 
@@ -1844,7 +1836,7 @@ static void
 TextDeleteCmdProc(clientData)
     ClientData clientData;	/* Pointer to widget record for widget. */
 {
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
 
     /*
      * This procedure could be invoked either because the window was
@@ -1853,11 +1845,11 @@ TextDeleteCmdProc(clientData)
      * destroys the widget.
      */
 
-    if (textPtr->tkwin != NULL) {
+    if (htPtr->tkwin != NULL) {
 	Tk_Window tkwin;
 
-	tkwin = textPtr->tkwin;
-	textPtr->tkwin = NULL;
+	tkwin = htPtr->tkwin;
+	htPtr->tkwin = NULL;
 	Tk_DestroyWindow(tkwin);
 #ifdef ITCL_NAMESPACES
 	Itk_SetWidgetCommand(tkwin, (Tcl_Command) NULL);
@@ -1880,58 +1872,41 @@ TextDeleteCmdProc(clientData)
  *
  *----------------------------------------------------------------------
  */
+/*ARGSUSED*/
 static void
 TileChangedProc(clientData, tile)
     ClientData clientData;
-    Blt_Tile tile;
+    Blt_Tile tile;		/* Not used. */
 {
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
 
-    if (textPtr->tkwin != NULL) {
-	unsigned long gcMask;
-	XGCValues gcValues;
-	GC newGC;
-	Pixmap pixmap;
-
-	gcMask = GCBackground;
-	gcValues.foreground = textPtr->normalBg->pixel;
-	pixmap = Blt_PixmapOfTile(tile);
-	if (pixmap != None) {
-	    gcMask |= (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	}
-	newGC = Tk_GetGC(textPtr->tkwin, gcMask, &gcValues);
-	if (textPtr->fillGC != NULL) {
-	    Tk_FreeGC(textPtr->display, textPtr->fillGC);
-	}
-	textPtr->fillGC = newGC;
-	EventuallyRedraw(textPtr);
+    if (htPtr->tkwin != NULL) {
+	EventuallyRedraw(htPtr);
     }
 }
 
 /* Configuration Procedures */
 static void
-ResetTextInfo(textPtr)
-    HText *textPtr;
+ResetTextInfo(htPtr)
+    HText *htPtr;
 {
-    textPtr->first = 0;
-    textPtr->last = textPtr->numLines - 1;
-    textPtr->selFirst = textPtr->selLast = -1;
-    textPtr->selAnchor = 0;
-    textPtr->pendingX = textPtr->pendingY = 0;
-    textPtr->worldWidth = textPtr->worldHeight = 0;
-    textPtr->xOffset = textPtr->yOffset = 0;
+    htPtr->first = 0;
+    htPtr->last = htPtr->nLines - 1;
+    htPtr->selFirst = htPtr->selLast = -1;
+    htPtr->selAnchor = 0;
+    htPtr->pendingX = htPtr->pendingY = 0;
+    htPtr->worldWidth = htPtr->worldHeight = 0;
+    htPtr->xOffset = htPtr->yOffset = 0;
 }
 
 static Line *
-GetLastLine(textPtr)
-    HText *textPtr;
+GetLastLine(htPtr)
+    HText *htPtr;
 {
-    if (textPtr->numLines == 0) {
-	return (CreateLine(textPtr));
+    if (htPtr->nLines == 0) {
+	return CreateLine(htPtr);
     }
-    return (textPtr->lineArr + (textPtr->numLines - 1));
+    return (htPtr->lineArr + (htPtr->nLines - 1));
 }
 
 /*
@@ -1959,15 +1934,17 @@ ReadNamedFile(interp, fileName, bufferPtr)
     char **bufferPtr;
 {
     FILE *f;
-    int numRead, fileSize;
+    int nRead, fileSize;
     int count, bytesLeft;
     char *buffer;
-    int result = -1;
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #define fstat	 _fstat
 #define stat	 _stat
+#ifdef _MSC_VER
 #define fileno	 _fileno
 #endif
+#endif /* _MSC_VER || __BORLANDC__ */
+
     struct stat fileInfo;
 
     f = fopen(fileName, "r");
@@ -1983,30 +1960,29 @@ ReadNamedFile(interp, fileName, bufferPtr)
 	return -1;
     }
     fileSize = fileInfo.st_size + 1;
-    buffer = (char *)malloc(sizeof(char) * fileSize);
+    buffer = Blt_Malloc(sizeof(char) * fileSize);
     if (buffer == NULL) {
 	fclose(f);
 	return -1;		/* Can't allocate memory for file buffer */
     }
-    numRead = count = 0;
-    for (bytesLeft = fileInfo.st_size; bytesLeft > 0; bytesLeft -= numRead) {
-	numRead = fread(buffer + count, sizeof(char), bytesLeft, f);
-	if (numRead < 0) {
+    count = 0;
+    for (bytesLeft = fileInfo.st_size; bytesLeft > 0; bytesLeft -= nRead) {
+	nRead = fread(buffer + count, sizeof(char), bytesLeft, f);
+	if (nRead < 0) {
 	    Tcl_AppendResult(interp, "error reading \"", fileName, "\": ",
 		Tcl_PosixError(interp), (char *)NULL);
 	    fclose(f);
-	    free(buffer);
+	    Blt_Free(buffer);
 	    return -1;
-	} else if (numRead == 0) {
+	} else if (nRead == 0) {
 	    break;
 	}
-	count += numRead;
+	count += nRead;
     }
     fclose(f);
     buffer[count] = '\0';
-    result = count;
     *bufferPtr = buffer;
-    return result;
+    return count;
 }
 
 /*
@@ -2030,8 +2006,8 @@ ReadNamedFile(interp, fileName, bufferPtr)
  */
 
 static int
-CollectCommand(textPtr, inputArr, maxBytes, cmdArr)
-    HText *textPtr;		/* Widget record */
+CollectCommand(htPtr, inputArr, maxBytes, cmdArr)
+    HText *htPtr;		/* Widget record */
     char inputArr[];		/* Array of bytes representing the htext input */
     int maxBytes;		/* Maximum number of bytes left in input */
     char cmdArr[];		/* Output buffer to be filled with the Tcl
@@ -2046,7 +2022,7 @@ CollectCommand(textPtr, inputArr, maxBytes, cmdArr)
     state = count = 0;
     for (i = 0; i < maxBytes; i++) {
 	c = inputArr[i];
-	if (c == textPtr->specChar) {
+	if (c == htPtr->specChar) {
 	    state++;
 	} else if ((state == 0) && (c == '\\')) {
 	    state = 3;
@@ -2056,7 +2032,7 @@ CollectCommand(textPtr, inputArr, maxBytes, cmdArr)
 	switch (state) {
 	case 2:		/* End of command block found */
 	    cmdArr[count - 1] = '\0';
-	    return (i);
+	    return i;
 
 	case 4:		/* Escaped block designator */
 	    cmdArr[count] = c;
@@ -2068,7 +2044,7 @@ CollectCommand(textPtr, inputArr, maxBytes, cmdArr)
 	    break;
 	}
     }
-    Tcl_AppendResult(textPtr->interp, "premature end of TCL command block",
+    Tcl_AppendResult(htPtr->interp, "premature end of TCL command block",
 	(char *)NULL);
     return -1;
 }
@@ -2094,22 +2070,22 @@ CollectCommand(textPtr, inputArr, maxBytes, cmdArr)
  * ----------------------------------------------------------------------
  */
 static int
-ParseInput(interp, textPtr, input, numBytes)
+ParseInput(interp, htPtr, input, nBytes)
     Tcl_Interp *interp;
-    HText *textPtr;
+    HText *htPtr;
     char input[];
-    int numBytes;
+    int nBytes;
 {
     int c;
     int i;
     char *textArr;
     char *cmdArr;
-    int count, numLines;
+    int count, nLines;
     int length;
     int state;
     Line *linePtr;
 
-    linePtr = CreateLine(textPtr);
+    linePtr = CreateLine(htPtr);
     if (linePtr == NULL) {
 	return TCL_ERROR;	/* Error allocating the line structure */
     }
@@ -2118,21 +2094,21 @@ ParseInput(interp, textPtr, input, numBytes)
     linePtr->textStart = 0;
 
     /* In the worst case, assume the entire input could be Tcl commands */
-    cmdArr = malloc(sizeof(char) * (numBytes + 1));
+    cmdArr = Blt_Malloc(sizeof(char) * (nBytes + 1));
 
-    textArr = malloc(sizeof(char) * (numBytes + 1));
-    if (textPtr->charArr != NULL) {
-	free((char *)textPtr->charArr);
+    textArr = Blt_Malloc(sizeof(char) * (nBytes + 1));
+    if (htPtr->charArr != NULL) {
+	Blt_Free(htPtr->charArr);
     }
-    textPtr->charArr = textArr;
-    textPtr->numChars = 0;
+    htPtr->charArr = textArr;
+    htPtr->nChars = 0;
 
-    numLines = count = state = 0;
-    textPtr->flags &= ~SLAVE_APPENDED;
+    nLines = count = state = 0;
+    htPtr->flags &= ~WIDGET_APPENDED;
 
-    for (i = 0; i < numBytes; i++) {
+    for (i = 0; i < nBytes; i++) {
 	c = input[i];
-	if (c == textPtr->specChar) {
+	if (c == htPtr->specChar) {
 	    state++;
 	} else if (c == '\n') {
 	    state = -1;
@@ -2144,20 +2120,20 @@ ParseInput(interp, textPtr, input, numBytes)
 	switch (state) {
 	case 2:		/* Block of Tcl commands found */
 	    count--, i++;
-	    length = CollectCommand(textPtr, input + i, numBytes - i, cmdArr);
+	    length = CollectCommand(htPtr, input + i, nBytes - i, cmdArr);
 	    if (length < 0) {
 		goto error;
 	    }
 	    i += length;
 	    linePtr->textEnd = count;
-	    textPtr->numChars = count + 1;
+	    htPtr->nChars = count + 1;
 	    if (Tcl_Eval(interp, cmdArr) != TCL_OK) {
 		goto error;
 	    }
-	    if (textPtr->flags & SLAVE_APPENDED) {
-		/* Indicates the location a slave window in the text array */
+	    if (htPtr->flags & WIDGET_APPENDED) {
+		/* Indicates the location a embedded widget in the text array */
 		textArr[count++] = ' ';
-		textPtr->flags &= ~SLAVE_APPENDED;
+		htPtr->flags &= ~WIDGET_APPENDED;
 	    }
 	    state = 0;
 	    break;
@@ -2170,8 +2146,8 @@ ParseInput(interp, textPtr, input, numBytes)
 	case -1:		/* End of line or input */
 	    linePtr->textEnd = count;
 	    textArr[count++] = '\n';
-	    numLines++;
-	    linePtr = CreateLine(textPtr);
+	    nLines++;
+	    linePtr = CreateLine(htPtr);
 	    if (linePtr == NULL) {
 		goto error;
 	    }
@@ -2187,57 +2163,57 @@ ParseInput(interp, textPtr, input, numBytes)
     if (count > linePtr->textStart) {
 	linePtr->textEnd = count;
 	textArr[count++] = '\n';/* Every line must end with a '\n' */
-	numLines++;
+	nLines++;
     }
-    free((char *)cmdArr);
+    Blt_Free(cmdArr);
     /* Reset number of lines allocated */
-    if (ResizeArray((char **)&(textPtr->lineArr), sizeof(Line), numLines,
-	    textPtr->arraySize) != TCL_OK) {
+    if (ResizeArray((char **)&(htPtr->lineArr), sizeof(Line), nLines,
+	    htPtr->arraySize) != TCL_OK) {
 	Tcl_AppendResult(interp, "can't reallocate array of lines", (char *)NULL);
 	return TCL_ERROR;
     }
-    textPtr->numLines = textPtr->arraySize = numLines;
+    htPtr->nLines = htPtr->arraySize = nLines;
     /*  and the size of the character array */
-    if (ResizeArray(&(textPtr->charArr), sizeof(char), count,
-	    numBytes) != TCL_OK) {
+    if (ResizeArray(&(htPtr->charArr), sizeof(char), count,
+	    nBytes) != TCL_OK) {
 	Tcl_AppendResult(interp, "can't reallocate text character buffer",
 	    (char *)NULL);
 	return TCL_ERROR;
     }
-    textPtr->numChars = count;
+    htPtr->nChars = count;
     return TCL_OK;
   error:
-    free((char *)cmdArr);
+    Blt_Free(cmdArr);
     return TCL_ERROR;
 }
 
 static int
-IncludeText(interp, textPtr, fileName)
+IncludeText(interp, htPtr, fileName)
     Tcl_Interp *interp;
-    HText *textPtr;
+    HText *htPtr;
     char *fileName;
 {
     char *buffer;
     int result;
-    int numBytes;
+    int nBytes;
 
-    if ((textPtr->text == NULL) && (fileName == NULL)) {
+    if ((htPtr->text == NULL) && (fileName == NULL)) {
 	return TCL_OK;		/* Empty text string */
     }
     if (fileName != NULL) {
-	numBytes = ReadNamedFile(interp, fileName, &buffer);
-	if (numBytes < 0) {
+	nBytes = ReadNamedFile(interp, fileName, &buffer);
+	if (nBytes < 0) {
 	    return TCL_ERROR;
 	}
     } else {
-	buffer = textPtr->text;
-	numBytes = strlen(textPtr->text);
+	buffer = htPtr->text;
+	nBytes = strlen(htPtr->text);
     }
-    result = ParseInput(interp, textPtr, buffer, numBytes);
+    result = ParseInput(interp, htPtr, buffer, nBytes);
     if (fileName != NULL) {
-	free(buffer);
+	Blt_Free(buffer);
     }
-    return (result);
+    return result;
 }
 
 /* ARGSUSED */
@@ -2249,13 +2225,13 @@ TextVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
-    HText *textPtr = (HText *)clientData;
-    HText *lasttextPtr;
+    HText *htPtr = clientData;
+    HText *lasthtPtr;
 
     /* Check to see of this is the most recent trace */
-    lasttextPtr = (HText *)Tcl_VarTraceInfo2(interp, name1, name2, flags,
-	TextVarProc, (ClientData)NULL);
-    if (lasttextPtr != textPtr) {
+    lasthtPtr = (HText *)Tcl_VarTraceInfo2(interp, name1, name2, flags,
+	TextVarProc, NULL);
+    if (lasthtPtr != htPtr) {
 	return NULL;		/* Ignore all but most current trace */
     }
     if (flags & TCL_TRACE_READS) {
@@ -2263,13 +2239,13 @@ TextVarProc(clientData, interp, name1, name2, flags)
 
 	c = name2[0];
 	if ((c == 'w') && (strcmp(name2, "widget") == 0)) {
-	    Tcl_SetVar2(interp, name1, name2, Tk_PathName(textPtr->tkwin),
+	    Tcl_SetVar2(interp, name1, name2, Tk_PathName(htPtr->tkwin),
 		flags);
 	} else if ((c == 'l') && (strcmp(name2, "line") == 0)) {
 	    char buf[80];
 	    int lineNum;
 
-	    lineNum = textPtr->numLines - 1;
+	    lineNum = htPtr->nLines - 1;
 	    if (lineNum < 0) {
 		lineNum = 0;
 	    }
@@ -2278,18 +2254,18 @@ TextVarProc(clientData, interp, name1, name2, flags)
 	} else if ((c == 'i') && (strcmp(name2, "index") == 0)) {
 	    char buf[80];
 
-	    sprintf(buf, "%d", textPtr->numChars - 1);
+	    sprintf(buf, "%d", htPtr->nChars - 1);
 	    Tcl_SetVar2(interp, name1, name2, buf, flags);
 	} else if ((c == 'f') && (strcmp(name2, "file") == 0)) {
 	    char *fileName;
 
-	    fileName = textPtr->fileName;
+	    fileName = htPtr->fileName;
 	    if (fileName == NULL) {
 		fileName = "";
 	    }
 	    Tcl_SetVar2(interp, name1, name2, fileName, flags);
 	} else {
-	    return ("?unknown?");
+	    return "?unknown?";
 	}
     }
     return NULL;
@@ -2301,8 +2277,8 @@ static char *varNames[] =
 };
 
 static void
-CreateTraces(textPtr)
-    HText *textPtr;
+CreateTraces(htPtr)
+    HText *htPtr;
 {
     char **ptr;
     static char globalCmd[] = "global htext";
@@ -2310,24 +2286,22 @@ CreateTraces(textPtr)
     /*
      * Make the traced variables global to the widget
      */
-    Tcl_Eval(textPtr->interp, globalCmd);
+    Tcl_Eval(htPtr->interp, globalCmd);
     for (ptr = varNames; *ptr != NULL; ptr++) {
-	Tcl_TraceVar2(textPtr->interp, "htext", *ptr,
-	    (TCL_GLOBAL_ONLY | TCL_TRACE_READS), TextVarProc,
-	    (ClientData)textPtr);
+	Tcl_TraceVar2(htPtr->interp, "htext", *ptr,
+	    (TCL_GLOBAL_ONLY | TCL_TRACE_READS), TextVarProc, htPtr);
     }
 }
 
 static void
-DeleteTraces(textPtr)
-    HText *textPtr;
+DeleteTraces(htPtr)
+    HText *htPtr;
 {
     char **ptr;
 
     for (ptr = varNames; *ptr != NULL; ptr++) {
-	Tcl_UntraceVar2(textPtr->interp, "htext", *ptr,
-	    (TCL_GLOBAL_ONLY | TCL_TRACE_READS), TextVarProc,
-	    (ClientData)textPtr);
+	Tcl_UntraceVar2(htPtr->interp, "htext", *ptr,
+	    (TCL_GLOBAL_ONLY | TCL_TRACE_READS), TextVarProc, htPtr);
     }
 }
 
@@ -2354,15 +2328,15 @@ DeleteTraces(textPtr)
  *
  * Side effects:
  *	Configuration information, such as text string, colors, font,
- * 	etc. get set for textPtr;  old resources get freed, if there were any.
+ * 	etc. get set for htPtr;  old resources get freed, if there were any.
  * 	The hypertext is redisplayed.
  *
  * ----------------------------------------------------------------------
  */
 static int
-ConfigureText(interp, textPtr)
+ConfigureText(interp, htPtr)
     Tcl_Interp *interp;		/* Used for error reporting. */
-    HText *textPtr;		/* Information about widget; may or may not
+    HText *htPtr;		/* Information about widget; may or may not
 			         * already have values for some fields. */
 {
     XGCValues gcValues;
@@ -2375,58 +2349,49 @@ ConfigureText(interp, textPtr)
 	 * These options change the layout of the text.  Width/height
 	 * and rows/columns may change a relatively sized window or cavity.
 	 */
-	textPtr->flags |= (REQUEST_LAYOUT | TEXT_DIRTY);	/* Mark for update */
+	htPtr->flags |= (REQUEST_LAYOUT | TEXT_DIRTY);	/* Mark for update */
     }
     gcMask = GCForeground | GCFont;
-    gcValues.font = Tk_FontId(textPtr->font);
-    gcValues.foreground = textPtr->normalFg->pixel;
-    newGC = Tk_GetGC(textPtr->tkwin, gcMask, &gcValues);
-    if (textPtr->drawGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->drawGC);
+    gcValues.font = Tk_FontId(htPtr->font);
+    gcValues.foreground = htPtr->normalFg->pixel;
+    newGC = Tk_GetGC(htPtr->tkwin, gcMask, &gcValues);
+    if (htPtr->drawGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->drawGC);
     }
-    textPtr->drawGC = newGC;
+    htPtr->drawGC = newGC;
 
-    gcValues.foreground = textPtr->selFgColor->pixel;
-    newGC = Tk_GetGC(textPtr->tkwin, gcMask, &gcValues);
-    if (textPtr->selectGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->selectGC);
+    gcValues.foreground = htPtr->selFgColor->pixel;
+    newGC = Tk_GetGC(htPtr->tkwin, gcMask, &gcValues);
+    if (htPtr->selectGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->selectGC);
     }
-    textPtr->selectGC = newGC;
+    htPtr->selectGC = newGC;
 
-    if (textPtr->xScrollUnits < 1) {
-	textPtr->xScrollUnits = 1;
+    if (htPtr->xScrollUnits < 1) {
+	htPtr->xScrollUnits = 1;
     }
-    if (textPtr->yScrollUnits < 1) {
-	textPtr->yScrollUnits = 1;
+    if (htPtr->yScrollUnits < 1) {
+	htPtr->yScrollUnits = 1;
     }
-    if (textPtr->tile != NULL) {
-	Pixmap pixmap;
+    if (htPtr->tile != NULL) {
+	Blt_SetTileChangedProc(htPtr->tile, TileChangedProc, htPtr);
+    }
+    gcValues.foreground = htPtr->normalBg->pixel;
+    newGC = Tk_GetGC(htPtr->tkwin, gcMask, &gcValues);
+    if (htPtr->fillGC != NULL) {
+	Tk_FreeGC(htPtr->display, htPtr->fillGC);
+    }
+    htPtr->fillGC = newGC;
 
-	Blt_SetTileChangedProc(textPtr->tile, TileChangedProc,
-	    (ClientData)textPtr);
-	pixmap = Blt_PixmapOfTile(textPtr->tile);
-	if (pixmap != None) {
-	    gcMask |= (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	}
+    if (htPtr->nColumns > 0) {
+	htPtr->reqWidth =
+	    htPtr->nColumns * Tk_TextWidth(htPtr->font, "0", 1);
     }
-    gcValues.foreground = textPtr->normalBg->pixel;
-    newGC = Tk_GetGC(textPtr->tkwin, gcMask, &gcValues);
-    if (textPtr->fillGC != NULL) {
-	Tk_FreeGC(textPtr->display, textPtr->fillGC);
-    }
-    textPtr->fillGC = newGC;
-
-    if (textPtr->numColumns > 0) {
-	textPtr->reqWidth =
-	    textPtr->numColumns * Tk_TextWidth(textPtr->font, "0", 1);
-    }
-    if (textPtr->numRows > 0) {
+    if (htPtr->nRows > 0) {
 	Tk_FontMetrics fontMetrics;
 
-	Tk_GetFontMetrics(textPtr->font, &fontMetrics);
-	textPtr->reqHeight = textPtr->numRows * fontMetrics.linespace;
+	Tk_GetFontMetrics(htPtr->font, &fontMetrics);
+	htPtr->reqHeight = htPtr->nRows * fontMetrics.linespace;
     }
     /*
      * If the either the -text or -file option changed, read in the
@@ -2435,19 +2400,19 @@ ConfigureText(interp, textPtr)
     if (Blt_ConfigModified(configSpecs, "-file", "-text", (char *)NULL)) {
 	int result;
 
-	FreeText(textPtr);
-	CreateTraces(textPtr);	/* Create variable traces */
+	FreeText(htPtr);
+	CreateTraces(htPtr);	/* Create variable traces */
 
-	result = IncludeText(interp, textPtr, textPtr->fileName);
+	result = IncludeText(interp, htPtr, htPtr->fileName);
 
-	DeleteTraces(textPtr);
+	DeleteTraces(htPtr);
 	if (result == TCL_ERROR) {
-	    FreeText(textPtr);
+	    FreeText(htPtr);
 	    return TCL_ERROR;
 	}
-	ResetTextInfo(textPtr);
+	ResetTextInfo(htPtr);
     }
-    EventuallyRedraw(textPtr);
+    EventuallyRedraw(htPtr);
     return TCL_OK;
 }
 
@@ -2513,7 +2478,7 @@ TranslateAnchor(deltaX, deltaY, anchor)
 	point.y = deltaY;
 	break;
     }
-    return (point);
+    return point;
 }
 
 /*
@@ -2522,7 +2487,7 @@ TranslateAnchor(deltaX, deltaY, anchor)
  * ComputeCavitySize --
  *
  *	Sets the width and height of the cavity based upon the
- *	requested size of the slave window.  The requested space also
+ *	requested size of the embedded widget.  The requested space also
  *	includes any external padding which has been designated for
  *	this window.
  *
@@ -2530,39 +2495,41 @@ TranslateAnchor(deltaX, deltaY, anchor)
  *	None.
  *
  * Side Effects:
- *	The size of the cavity is set in the slave information
- *	structure.  These values can effect how the slave window is
+ *	The size of the cavity is set in the embedded widget information
+ *	structure.  These values can effect how the embedded widget is
  *	packed into the master window.
  *
  *----------------------------------------------------------------------
  */
 static void
-ComputeCavitySize(slavePtr)
-    Slave *slavePtr;
+ComputeCavitySize(winPtr)
+    EmbeddedWidget *winPtr;
 {
     int width, height;
     int twiceBW;
 
-    twiceBW = 2 * Tk_Changes(slavePtr->tkwin)->border_width;
-    if (slavePtr->reqCavityWidth > 0) {
-	width = slavePtr->reqCavityWidth;
-    } else if (slavePtr->relCavityWidth > 0.0) {
-	width = (int)((double)Tk_Width(slavePtr->textPtr->tkwin) *
-	    slavePtr->relCavityWidth + 0.5);
+    twiceBW = 2 * Tk_Changes(winPtr->tkwin)->border_width;
+    if (winPtr->reqCavityWidth > 0) {
+	width = winPtr->reqCavityWidth;
+    } else if (winPtr->relCavityWidth > 0.0) {
+	width = (int)((double)Tk_Width(winPtr->htPtr->tkwin) *
+	    winPtr->relCavityWidth + 0.5);
     } else {
-	width = GetSlaveWidth(slavePtr) + PADDING(slavePtr->padX) + twiceBW;
+	width = GetEmbeddedWidgetWidth(winPtr) + PADDING(winPtr->padX) + 
+	    twiceBW;
     }
-    slavePtr->cavityWidth = width;
+    winPtr->cavityWidth = width;
 
-    if (slavePtr->reqCavityHeight > 0) {
-	height = slavePtr->reqCavityHeight;
-    } else if (slavePtr->relCavityHeight > 0.0) {
-	height = (int)((double)Tk_Height(slavePtr->textPtr->tkwin) *
-	    slavePtr->relCavityHeight + 0.5);
+    if (winPtr->reqCavityHeight > 0) {
+	height = winPtr->reqCavityHeight;
+    } else if (winPtr->relCavityHeight > 0.0) {
+	height = (int)((double)Tk_Height(winPtr->htPtr->tkwin) *
+	    winPtr->relCavityHeight + 0.5);
     } else {
-	height = GetSlaveHeight(slavePtr) + PADDING(slavePtr->padY) + twiceBW;
+	height = GetEmbeddedWidgetHeight(winPtr) + PADDING(winPtr->padY) + 
+	    twiceBW;
     }
-    slavePtr->cavityHeight = height;
+    winPtr->cavityHeight = height;
 }
 
 /*
@@ -2571,9 +2538,9 @@ ComputeCavitySize(slavePtr)
  * LayoutLine --
  *
  *	This procedure computes the total width and height needed
- *      to contain the text and slaves for a particular line.
+ *      to contain the text and widgets for a particular line.
  *      It also calculates the baseline of the text on the line with
- *	respect to the other slaves on the line.
+ *	respect to the other widgets on the line.
  *
  * Results:
  *	None.
@@ -2581,22 +2548,22 @@ ComputeCavitySize(slavePtr)
  *----------------------------------------------------------------------
  */
 static void
-LayoutLine(textPtr, linePtr)
-    HText *textPtr;
+LayoutLine(htPtr, linePtr)
+    HText *htPtr;
     Line *linePtr;
 {
-    Slave *slavePtr;
+    EmbeddedWidget *winPtr;
     int textStart, textLength;
     int maxAscent, maxDescent, maxHeight;
     int ascent, descent;
     int median;			/* Difference of font ascent/descent values */
-    Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
     int x, y;
     int newX;
     Tk_FontMetrics fontMetrics;
 
     /* Initialize line defaults */
-    Tk_GetFontMetrics(textPtr->font, &fontMetrics);
+    Tk_GetFontMetrics(htPtr->font, &fontMetrics);
     maxAscent = fontMetrics.ascent;
     maxDescent = fontMetrics.descent;
     median = fontMetrics.ascent - fontMetrics.descent;
@@ -2607,25 +2574,25 @@ LayoutLine(textPtr, linePtr)
      * needed for the line.  We'll need this for figuring the top,
      * bottom, and center anchors.
      */
-    for (item = Blt_ListFirstItem(&(linePtr->winList));
-	item != NULL; item = Blt_ListNextItem(item)) {
-	slavePtr = (Slave *)Blt_ListGetValue(item);
-	if (slavePtr->tkwin == NULL) {
+    for (linkPtr = Blt_ChainFirstLink(linePtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	winPtr = Blt_ChainGetValue(linkPtr);
+	if (winPtr->tkwin == NULL) {
 	    continue;
 	}
-	ComputeCavitySize(slavePtr);
+	ComputeCavitySize(winPtr);
 
-	switch (slavePtr->justify) {
+	switch (winPtr->justify) {
 	case JUSTIFY_TOP:
-	    ascent = fontMetrics.ascent + slavePtr->padTop;
-	    descent = slavePtr->cavityHeight - fontMetrics.ascent;
+	    ascent = fontMetrics.ascent + winPtr->padTop;
+	    descent = winPtr->cavityHeight - fontMetrics.ascent;
 	    break;
 	case JUSTIFY_CENTER:
-	    ascent = (slavePtr->cavityHeight + median) / 2;
-	    descent = (slavePtr->cavityHeight - median) / 2;
+	    ascent = (winPtr->cavityHeight + median) / 2;
+	    descent = (winPtr->cavityHeight - median) / 2;
 	    break;
 	case JUSTIFY_BOTTOM:
-	    ascent = slavePtr->cavityHeight - fontMetrics.descent;
+	    ascent = winPtr->cavityHeight - fontMetrics.descent;
 	    descent = fontMetrics.descent;
 	    break;
 	}
@@ -2637,62 +2604,62 @@ LayoutLine(textPtr, linePtr)
 	}
     }
 
-    maxHeight = maxAscent + maxDescent + textPtr->leader;
+    maxHeight = maxAscent + maxDescent + htPtr->leader;
     x = 0;			/* Always starts from x=0 */
     y = 0;			/* Suppress compiler warning */
     textStart = linePtr->textStart;
 
     /*
-     * Pass 2: Find the placements of the text and slaves along each
+     * Pass 2: Find the placements of the text and widgets along each
      * line.
      */
-    for (item = Blt_ListFirstItem(&(linePtr->winList));
-	item != NULL; item = Blt_ListNextItem(item)) {
-	slavePtr = (Slave *)Blt_ListGetValue(item);
-	if (slavePtr->tkwin == NULL) {
+    for (linkPtr = Blt_ChainFirstLink(linePtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	winPtr = Blt_ChainGetValue(linkPtr);
+	if (winPtr->tkwin == NULL) {
 	    continue;
 	}
-	/* Get the width of the text leading to the slave */
-	textLength = (slavePtr->precedingTextEnd - textStart);
+	/* Get the width of the text leading to the widget. */
+	textLength = (winPtr->precedingTextEnd - textStart);
 	if (textLength > 0) {
-	    Tk_MeasureChars(textPtr->font, textPtr->charArr + textStart,
+	    Tk_MeasureChars(htPtr->font, htPtr->charArr + textStart,
 		textLength, 10000, TK_AT_LEAST_ONE, &newX);
-	    slavePtr->precedingTextWidth = newX;
+	    winPtr->precedingTextWidth = newX;
 	    x += newX;
 	}
-	switch (slavePtr->justify) {
+	switch (winPtr->justify) {
 	case JUSTIFY_TOP:
 	    y = maxAscent - fontMetrics.ascent;
 	    break;
 	case JUSTIFY_CENTER:
-	    y = maxAscent - (slavePtr->cavityHeight + median) / 2;
+	    y = maxAscent - (winPtr->cavityHeight + median) / 2;
 	    break;
 	case JUSTIFY_BOTTOM:
-	    y = maxAscent + fontMetrics.descent - slavePtr->cavityHeight;
+	    y = maxAscent + fontMetrics.descent - winPtr->cavityHeight;
 	    break;
 	}
-	slavePtr->x = x, slavePtr->y = y;
+	winPtr->x = x, winPtr->y = y;
 
 	/* Skip over trailing space */
-	textStart = slavePtr->precedingTextEnd + 1;
+	textStart = winPtr->precedingTextEnd + 1;
 
-	x += slavePtr->cavityWidth;
+	x += winPtr->cavityWidth;
     }
 
     /*
-     * This can be either the trailing piece of a line after the last slave
-     * or the entire line if no slaves windows are embedded in it.
+     * This can be either the trailing piece of a line after the last widget
+     * or the entire line if no widgets are embedded in it.
      */
     textLength = (linePtr->textEnd - textStart) + 1;
     if (textLength > 0) {
-	Tk_MeasureChars(textPtr->font, textPtr->charArr + textStart,
+	Tk_MeasureChars(htPtr->font, htPtr->charArr + textStart,
 	    textLength, 10000, DEF_TEXT_FLAGS, &newX);
 	x += newX;
     }
     /* Update line parameters */
     if ((linePtr->width != x) || (linePtr->height != maxHeight) ||
 	(linePtr->baseline != maxAscent)) {
-	textPtr->flags |= TEXT_DIRTY;
+	htPtr->flags |= TEXT_DIRTY;
     }
     linePtr->width = x;
     linePtr->height = maxHeight;
@@ -2705,7 +2672,7 @@ LayoutLine(textPtr, linePtr)
  * ComputeLayout --
  *
  *	This procedure computes the total width and height needed
- *      to contain the text and slaves from all the lines of text.
+ *      to contain the text and widgets from all the lines of text.
  *      It merely sums the heights and finds the maximum width of
  *	all the lines.  The width and height are needed for scrolling.
  *
@@ -2715,19 +2682,19 @@ LayoutLine(textPtr, linePtr)
  *----------------------------------------------------------------------
  */
 static void
-ComputeLayout(textPtr)
-    HText *textPtr;
+ComputeLayout(htPtr)
+    HText *htPtr;
 {
     int count;
     Line *linePtr;
     int height, width;
 
     width = height = 0;
-    for (count = 0; count < textPtr->numLines; count++) {
-	linePtr = textPtr->lineArr + count;
+    for (count = 0; count < htPtr->nLines; count++) {
+	linePtr = htPtr->lineArr + count;
 
 	linePtr->offset = height;
-	LayoutLine(textPtr, linePtr);
+	LayoutLine(htPtr, linePtr);
 	height += linePtr->height;
 	if (linePtr->width > width) {
 	    width = linePtr->width;
@@ -2736,9 +2703,9 @@ ComputeLayout(textPtr)
     /*
      * Set changed flag if new layout changed size of virtual text.
      */
-    if ((height != textPtr->worldHeight) || (width != textPtr->worldWidth)) {
-	textPtr->worldHeight = height, textPtr->worldWidth = width;
-	textPtr->flags |= TEXT_DIRTY;
+    if ((height != htPtr->worldHeight) || (width != htPtr->worldWidth)) {
+	htPtr->worldHeight = height, htPtr->worldWidth = width;
+	htPtr->flags |= TEXT_DIRTY;
     }
 }
 
@@ -2761,23 +2728,23 @@ ComputeLayout(textPtr)
  * ----------------------------------------------------------------------
  */
 static int
-GetVisibleLines(textPtr)
-    HText *textPtr;
+GetVisibleLines(htPtr)
+    HText *htPtr;
 {
     int topLine, bottomLine;
     int firstY, lastY;
     int lastLine;
 
-    if (textPtr->numLines == 0) {
-	textPtr->first = 0;
-	textPtr->last = -1;
+    if (htPtr->nLines == 0) {
+	htPtr->first = 0;
+	htPtr->last = -1;
 	return TCL_OK;
     }
-    firstY = textPtr->pendingY;
-    lastLine = textPtr->numLines - 1;
+    firstY = htPtr->pendingY;
+    lastLine = htPtr->nLines - 1;
 
     /* First line */
-    topLine = LineSearch(textPtr, firstY, 0, lastLine);
+    topLine = LineSearch(htPtr, firstY, 0, lastLine);
     if (topLine < 0) {
 	/*
 	 * This can't be. The y-coordinate offset must be corrupted.
@@ -2786,16 +2753,16 @@ GetVisibleLines(textPtr)
 	    firstY);
 	return TCL_ERROR;
     }
-    textPtr->first = topLine;
+    htPtr->first = topLine;
 
     /*
      * If there is less text than window space, the bottom line is the
      * last line of text.  Otherwise search for the line at the bottom
      * of the window.
      */
-    lastY = firstY + Tk_Height(textPtr->tkwin) - 1;
-    if (lastY < textPtr->worldHeight) {
-	bottomLine = LineSearch(textPtr, lastY, topLine, lastLine);
+    lastY = firstY + Tk_Height(htPtr->tkwin) - 1;
+    if (lastY < htPtr->worldHeight) {
+	bottomLine = LineSearch(htPtr, lastY, topLine, lastLine);
     } else {
 	bottomLine = lastLine;
     }
@@ -2807,13 +2774,12 @@ GetVisibleLines(textPtr)
 	    lastY);
 #ifdef notdef
 	fprintf(stderr, "worldHeight=%d,height=%d,top=%d,first=%d,last=%d\n",
-	    textPtr->worldHeight, Tk_Height(textPtr->tkwin), firstY,
-	    textPtr->lineArr[topLine].offset,
-	    textPtr->lineArr[lastLine].offset);
+	    htPtr->worldHeight, Tk_Height(htPtr->tkwin), firstY,
+	    htPtr->lineArr[topLine].offset, htPtr->lineArr[lastLine].offset);
 #endif
 	return TCL_ERROR;
     }
-    textPtr->last = bottomLine;
+    htPtr->last = bottomLine;
     return TCL_OK;
 }
 
@@ -2835,32 +2801,31 @@ GetVisibleLines(textPtr)
  * ----------------------------------------------------------------------
  */
 static void
-DrawSegment(textPtr, draw, linePtr, x, y, segPtr)
-    HText *textPtr;
+DrawSegment(htPtr, draw, linePtr, x, y, segPtr)
+    HText *htPtr;
     Drawable draw;
     Line *linePtr;
     int x, y;
     Segment *segPtr;
 {
-    int lastX, curPos, numChars;
+    int lastX, curPos, nChars;
     int textLength;
     int selStart, selEnd, selLength;
     Tk_FontMetrics fontMetrics;
 
 #ifdef notdef
     fprintf(stderr, "DS select: first=%d,last=%d text: first=%d,last=%d\n",
-	textPtr->selFirst, textPtr->selLast,
-	segPtr->textStart, segPtr->textEnd);
+	htPtr->selFirst, htPtr->selLast, segPtr->textStart, segPtr->textEnd);
 #endif
     textLength = (segPtr->textEnd - segPtr->textStart) + 1;
     if (textLength < 1) {
 	return;
     }
-    Tk_GetFontMetrics(textPtr->font, &fontMetrics);
-    if ((segPtr->textEnd < textPtr->selFirst) ||
-	(segPtr->textStart > textPtr->selLast)) {	/* No selected text */
-	Tk_DrawChars(textPtr->display, draw, textPtr->drawGC, textPtr->font,
-	    textPtr->charArr + segPtr->textStart, textLength - 1,
+    Tk_GetFontMetrics(htPtr->font, &fontMetrics);
+    if ((segPtr->textEnd < htPtr->selFirst) ||
+	(segPtr->textStart > htPtr->selLast)) {	/* No selected text */
+	Tk_DrawChars(htPtr->display, draw, htPtr->drawGC, htPtr->font,
+	    htPtr->charArr + segPtr->textStart, textLength - 1,
 	    x, y + linePtr->baseline);
 	return;
     }
@@ -2875,58 +2840,58 @@ DrawSegment(textPtr, draw, linePtr, x, y, segPtr)
 
     selStart = segPtr->textStart;
     selEnd = segPtr->textEnd;
-    if (textPtr->selFirst > segPtr->textStart) {
-	selStart = textPtr->selFirst;
+    if (htPtr->selFirst > segPtr->textStart) {
+	selStart = htPtr->selFirst;
     }
-    if (textPtr->selLast < segPtr->textEnd) {
-	selEnd = textPtr->selLast;
+    if (htPtr->selLast < segPtr->textEnd) {
+	selEnd = htPtr->selLast;
     }
     selLength = (selEnd - selStart) + 1;
     lastX = x;
     curPos = segPtr->textStart;
 
     if (selStart > segPtr->textStart) {	/* Text preceding selection */
-	numChars = (selStart - segPtr->textStart);
-	Tk_MeasureChars(textPtr->font, textPtr->charArr + segPtr->textStart,
-	    numChars, 10000, DEF_TEXT_FLAGS, &lastX);
+	nChars = (selStart - segPtr->textStart);
+	Tk_MeasureChars(htPtr->font, htPtr->charArr + segPtr->textStart,
+	    nChars, 10000, DEF_TEXT_FLAGS, &lastX);
 	lastX += x;
-	Tk_DrawChars(textPtr->display, draw, textPtr->drawGC, textPtr->font,
-	    textPtr->charArr + segPtr->textStart, numChars, x,
+	Tk_DrawChars(htPtr->display, draw, htPtr->drawGC, htPtr->font,
+	    htPtr->charArr + segPtr->textStart, nChars, x,
 	    y + linePtr->baseline);
 	curPos = selStart;
     }
     if (selLength > 0) {	/* The selection itself */
 	int width, nextX;
 
-	Tk_MeasureChars(textPtr->font, textPtr->charArr + selStart,
+	Tk_MeasureChars(htPtr->font, htPtr->charArr + selStart,
 	    selLength, 10000, DEF_TEXT_FLAGS, &nextX);
 	nextX += x;
 	width = (selEnd == linePtr->textEnd)
-	    ? textPtr->worldWidth - textPtr->xOffset - lastX :
+	    ? htPtr->worldWidth - htPtr->xOffset - lastX :
 	    nextX - lastX;
-	Tk_Fill3DRectangle(textPtr->tkwin, draw, textPtr->selBorder,
+	Blt_Fill3DRectangle(htPtr->tkwin, draw, htPtr->selBorder,
 	    lastX, y + linePtr->baseline - fontMetrics.ascent,
-	    width, fontMetrics.linespace, textPtr->selBorderWidth,
+	    width, fontMetrics.linespace, htPtr->selBorderWidth,
 	    TK_RELIEF_RAISED);
-	Tk_DrawChars(textPtr->display, draw, textPtr->selectGC,
-	    textPtr->font, textPtr->charArr + selStart, selLength,
+	Tk_DrawChars(htPtr->display, draw, htPtr->selectGC,
+	    htPtr->font, htPtr->charArr + selStart, selLength,
 	    lastX, y + linePtr->baseline);
 	lastX = nextX;
 	curPos = selStart + selLength;
     }
-    numChars = segPtr->textEnd - curPos;
-    if (numChars > 0) {		/* Text following the selection */
-	Tk_DrawChars(textPtr->display, draw, textPtr->drawGC, textPtr->font,
-	    textPtr->charArr + curPos, numChars - 1, lastX, y + linePtr->baseline);
+    nChars = segPtr->textEnd - curPos;
+    if (nChars > 0) {		/* Text following the selection */
+	Tk_DrawChars(htPtr->display, draw, htPtr->drawGC, htPtr->font,
+	    htPtr->charArr + curPos, nChars - 1, lastX, y + linePtr->baseline);
     }
 }
 
 /*
  * ----------------------------------------------------------------------
  *
- * MoveSlave --
+ * MoveEmbeddedWidget --
  *
- * 	Move a slave window to a new location in the hypertext
+ * 	Move a embedded widget to a new location in the hypertext
  *	parent window.  If the window has no geometry (i.e. width,
  *	or height is 0), simply unmap to window.
  *
@@ -2934,14 +2899,14 @@ DrawSegment(textPtr, draw, linePtr, x, y, segPtr)
  *	None.
  *
  * Side effects:
- *	Each slave window is moved to its new location, generating
- *      Expose events in the parent for each slave window moved.
+ *	Each embedded widget is moved to its new location, generating
+ *      Expose events in the parent for each embedded widget moved.
  *
  * ----------------------------------------------------------------------
  */
 static void
-MoveSlave(slavePtr, offset)
-    Slave *slavePtr;
+MoveEmbeddedWidget(winPtr, offset)
+    EmbeddedWidget *winPtr;
     int offset;
 {
     int winWidth, winHeight;
@@ -2950,28 +2915,34 @@ MoveSlave(slavePtr, offset)
     int x, y;
     int intBW;
 
-    winWidth = GetSlaveWidth(slavePtr);
-    winHeight = GetSlaveHeight(slavePtr);
+    winWidth = GetEmbeddedWidgetWidth(winPtr);
+    winHeight = GetEmbeddedWidgetHeight(winPtr);
     if ((winWidth < 1) || (winHeight < 1)) {
-	if (Tk_IsMapped(slavePtr->tkwin)) {
-	    Tk_UnmapWindow(slavePtr->tkwin);
+	if (Tk_IsMapped(winPtr->tkwin)) {
+	    Tk_UnmapWindow(winPtr->tkwin);
 	}
 	return;
     }
-    intBW = Tk_Changes(slavePtr->tkwin)->border_width;
-    x = (slavePtr->x + intBW + slavePtr->padLeft) -
-	slavePtr->textPtr->xOffset;
-    y = offset + (slavePtr->y + intBW + slavePtr->padTop) -
-	slavePtr->textPtr->yOffset;
+    intBW = Tk_Changes(winPtr->tkwin)->border_width;
+    x = (winPtr->x + intBW + winPtr->padLeft) -
+	winPtr->htPtr->xOffset;
+    y = offset + (winPtr->y + intBW + winPtr->padTop) -
+	winPtr->htPtr->yOffset;
 
-    width = slavePtr->cavityWidth - (2 * intBW + PADDING(slavePtr->padX));
-    if ((width < winWidth) || (slavePtr->fill & FILL_X)) {
+    width = winPtr->cavityWidth - (2 * intBW + PADDING(winPtr->padX));
+    if (width < 0) {
+	width = 0;
+    }
+    if ((width < winWidth) || (winPtr->fill & FILL_X)) {
 	winWidth = width;
     }
     deltaX = width - winWidth;
 
-    height = slavePtr->cavityHeight - (2 * intBW + PADDING(slavePtr->padY));
-    if ((height < winHeight) || (slavePtr->fill & FILL_Y)) {
+    height = winPtr->cavityHeight - (2 * intBW + PADDING(winPtr->padY));
+    if (height < 0) {
+	height = 0;
+    }
+    if ((height < winHeight) || (winPtr->fill & FILL_Y)) {
 	winHeight = height;
     }
     deltaY = height - winHeight;
@@ -2979,19 +2950,19 @@ MoveSlave(slavePtr, offset)
     if ((deltaX > 0) || (deltaY > 0)) {
 	XPoint point;
 
-	point = TranslateAnchor(deltaX, deltaY, slavePtr->anchor);
+	point = TranslateAnchor(deltaX, deltaY, winPtr->anchor);
 	x += point.x, y += point.y;
     }
-    slavePtr->winWidth = winWidth;
-    slavePtr->winHeight = winHeight;
+    winPtr->winWidth = winWidth;
+    winPtr->winHeight = winHeight;
 
-    if ((x != Tk_X(slavePtr->tkwin)) || (y != Tk_Y(slavePtr->tkwin)) ||
-	(winWidth != Tk_Width(slavePtr->tkwin)) ||
-	(winHeight != Tk_Height(slavePtr->tkwin))) {
-	Tk_MoveResizeWindow(slavePtr->tkwin, x, y, winWidth, winHeight);
-	if (!Tk_IsMapped(slavePtr->tkwin)) {
-	    Tk_MapWindow(slavePtr->tkwin);
-	}
+    if ((x != Tk_X(winPtr->tkwin)) || (y != Tk_Y(winPtr->tkwin)) ||
+	(winWidth != Tk_Width(winPtr->tkwin)) ||
+	(winHeight != Tk_Height(winPtr->tkwin))) {
+	Tk_MoveResizeWindow(winPtr->tkwin, x, y, winWidth, winHeight);
+    }
+    if (!Tk_IsMapped(winPtr->tkwin)) {
+	Tk_MapWindow(winPtr->tkwin);
     }
 }
 
@@ -3000,8 +2971,8 @@ MoveSlave(slavePtr, offset)
  *
  * DrawPage --
  *
- * 	This procedure displays the lines of text and moves the slave
- *      windows to their new positions.  It draws lines with regard to
+ * 	This procedure displays the lines of text and moves the widgets
+ *      to their new positions.  It draws lines with regard to
  *	the direction of the scrolling.  The idea here is to make the
  *	text and buttons appear to move together. Otherwise you will
  *	get a "jiggling" effect where the windows appear to bump into
@@ -3027,107 +2998,114 @@ MoveSlave(slavePtr, offset)
  * ----------------------------------------------------------------------
  */
 static void
-DrawPage(textPtr, deltaY)
-    HText *textPtr;
+DrawPage(htPtr, deltaY)
+    HText *htPtr;
     int deltaY;			/* Change from previous Y coordinate */
 {
     Line *linePtr;
-    Slave *slavePtr;
-    Tk_Window tkwin = textPtr->tkwin;
+    EmbeddedWidget *winPtr;
+    Tk_Window tkwin = htPtr->tkwin;
     Segment sgmt;
     Pixmap pixmap;
-    int forceCopy = 0;
+    int forceCopy;
     int i;
     int lineNum;
     int x, y, lastY;
-    Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
+    int width, height;
+    Display *display;
+
+    display = htPtr->display;
+    width = Tk_Width(tkwin);
+    height = Tk_Height(tkwin);
 
     /* Create an off-screen pixmap for semi-smooth scrolling. */
-    pixmap = Tk_GetPixmap(textPtr->display, Tk_WindowId(tkwin), Tk_Width(tkwin),
-	Tk_Height(tkwin), Tk_Depth(tkwin));
+    pixmap = Tk_GetPixmap(display, Tk_WindowId(tkwin), width, height,
+	  Tk_Depth(tkwin));
 
-    x = -(textPtr->xOffset);
-    y = -(textPtr->yOffset);
+    x = -(htPtr->xOffset);
+    y = -(htPtr->yOffset);
 
-    if (textPtr->tile != NULL) {
-	if (textPtr->tileOffsetPage) {
-	    XSetTSOrigin(textPtr->display, textPtr->fillGC, x, y);
+    if (htPtr->tile != NULL) {
+	if (htPtr->tileOffsetPage) {
+	    Blt_SetTSOrigin(htPtr->tkwin, htPtr->tile, x, y);
 	} else {
-	    Blt_SetTileOrigin(textPtr->tkwin, textPtr->fillGC, 0, 0);
+	    Blt_SetTileOrigin(htPtr->tkwin, htPtr->tile, 0, 0);
 	}
+	Blt_TileRectangle(htPtr->tkwin, pixmap, htPtr->tile, 0, 0, width, 
+		height);
+    } else {
+	XFillRectangle(display, pixmap, htPtr->fillGC, 0, 0, width, height);
     }
-    XFillRectangle(textPtr->display, pixmap, textPtr->fillGC, 0, 0,
-	Tk_Width(tkwin), Tk_Height(tkwin));
 
 
     if (deltaY >= 0) {
-	y += textPtr->lineArr[textPtr->first].offset;
-	lineNum = textPtr->first;
+	y += htPtr->lineArr[htPtr->first].offset;
+	lineNum = htPtr->first;
 	lastY = 0;
     } else {
-	y += textPtr->lineArr[textPtr->last].offset;
-	lineNum = textPtr->last;
-	lastY = Tk_Height(tkwin);
+	y += htPtr->lineArr[htPtr->last].offset;
+	lineNum = htPtr->last;
+	lastY = height;
     }
     forceCopy = 0;
 
     /* Draw each line */
-    for (i = textPtr->first; i <= textPtr->last; i++) {
+    for (i = htPtr->first; i <= htPtr->last; i++) {
 
 	/* Initialize character position in text buffer to start */
-	linePtr = textPtr->lineArr + lineNum;
+	linePtr = htPtr->lineArr + lineNum;
 	sgmt.textStart = linePtr->textStart;
 	sgmt.textEnd = linePtr->textEnd;
 
 	/* Initialize X position */
-	x = -(textPtr->xOffset);
-	for (item = Blt_ListFirstItem(&(linePtr->winList));
-	    item != NULL; item = Blt_ListNextItem(item)) {
-	    slavePtr = (Slave *)Blt_ListGetValue(item);
+	x = -(htPtr->xOffset);
+	for (linkPtr = Blt_ChainFirstLink(linePtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    winPtr = Blt_ChainGetValue(linkPtr);
 
-	    if (slavePtr->tkwin != NULL) {
-		slavePtr->flags |= SLAVE_VISIBLE;
-		MoveSlave(slavePtr, linePtr->offset);
+	    if (winPtr->tkwin != NULL) {
+		winPtr->flags |= WIDGET_VISIBLE;
+		MoveEmbeddedWidget(winPtr, linePtr->offset);
 	    }
-	    sgmt.textEnd = slavePtr->precedingTextEnd - 1;
+	    sgmt.textEnd = winPtr->precedingTextEnd - 1;
 	    if (sgmt.textEnd >= sgmt.textStart) {
-		DrawSegment(textPtr, pixmap, linePtr, x, y, &sgmt);
-		x += slavePtr->precedingTextWidth;
+		DrawSegment(htPtr, pixmap, linePtr, x, y, &sgmt);
+		x += winPtr->precedingTextWidth;
 	    }
-	    /* Skip over the extra trailing space which designates the slave */
-	    sgmt.textStart = slavePtr->precedingTextEnd + 1;
-	    x += slavePtr->cavityWidth;
+	    /* Skip over the extra trailing space which designates the widget */
+	    sgmt.textStart = winPtr->precedingTextEnd + 1;
+	    x += winPtr->cavityWidth;
 	    forceCopy++;
 	}
 
 	/*
-	 * This may be the text trailing the last slave or the entire
-	 * line if no slaves occur on it.
+	 * This may be the text trailing the last widget or the entire
+	 * line if no widgets occur on it.
 	 */
 	sgmt.textEnd = linePtr->textEnd;
 	if (sgmt.textEnd >= sgmt.textStart) {
-	    DrawSegment(textPtr, pixmap, linePtr, x, y, &sgmt);
+	    DrawSegment(htPtr, pixmap, linePtr, x, y, &sgmt);
 	}
 	/* Go to the top of the next line */
 	if (deltaY >= 0) {
-	    y += textPtr->lineArr[lineNum].height;
+	    y += htPtr->lineArr[lineNum].height;
 	    lineNum++;
 	}
-	if ((forceCopy > 0) && !(textPtr->flags & TEXT_DIRTY)) {
+	if ((forceCopy > 0) && !(htPtr->flags & TEXT_DIRTY)) {
 	    if (deltaY >= 0) {
-		XCopyArea(textPtr->display, pixmap, Tk_WindowId(tkwin),
-		    textPtr->drawGC, 0, lastY, Tk_Width(tkwin), y - lastY, 0,
-		    lastY);
+		XCopyArea(display, pixmap, Tk_WindowId(tkwin), htPtr->drawGC,
+			  0, lastY, width, y - lastY, 0, lastY);
 	    } else {
-		XCopyArea(textPtr->display, pixmap, Tk_WindowId(tkwin),
-		    textPtr->drawGC, 0, y, Tk_Width(tkwin), lastY - y, 0, y);
+		XCopyArea(display, pixmap, Tk_WindowId(tkwin), htPtr->drawGC,
+			  0, y, width, lastY - y, 0, y);
 	    }
 	    forceCopy = 0;	/* Reset drawing flag */
 	    lastY = y;		/* Record last Y position */
 	}
 	if ((deltaY < 0) && (lineNum > 0)) {
 	    --lineNum;
-	    y -= textPtr->lineArr[lineNum].height;
+	    y -= htPtr->lineArr[lineNum].height;
 	}
     }
     /*
@@ -3135,20 +3113,21 @@ DrawPage(textPtr, deltaY)
      * Otherwise draw any left-over block of text (either at the top
      * or bottom of the page)
      */
-    if (textPtr->flags & TEXT_DIRTY) {
-	XCopyArea(textPtr->display, pixmap, Tk_WindowId(tkwin),
-	    textPtr->drawGC, 0, 0, Tk_Width(tkwin), Tk_Height(tkwin), 0, 0);
+    if (htPtr->flags & TEXT_DIRTY) {
+	XCopyArea(display, pixmap, Tk_WindowId(tkwin),
+	    htPtr->drawGC, 0, 0, width, height, 0, 0);
     } else if (lastY != y) {
 	if (deltaY >= 0) {
-	    XCopyArea(textPtr->display, pixmap, Tk_WindowId(tkwin),
-		textPtr->drawGC, 0, lastY, Tk_Width(tkwin),
-		Tk_Height(tkwin) - lastY, 0, lastY);
+	    height -= lastY;
+	    XCopyArea(display, pixmap, Tk_WindowId(tkwin),
+		htPtr->drawGC, 0, lastY, width, height, 0, lastY);
 	} else {
-	    XCopyArea(textPtr->display, pixmap, Tk_WindowId(tkwin),
-		textPtr->drawGC, 0, 0, Tk_Width(tkwin), lastY, 0, 0);
+	    height = lastY;
+	    XCopyArea(display, pixmap, Tk_WindowId(tkwin),
+		htPtr->drawGC, 0, 0, width, height, 0, 0);
 	}
     }
-    Tk_FreePixmap(textPtr->display, pixmap);
+    Tk_FreePixmap(display, pixmap);
 }
 
 
@@ -3180,44 +3159,44 @@ SendBogusEvent(tkwin)
  *	Many of the operations which might ordinarily be performed
  *	elsewhere (e.g. in a configuration routine) are done here
  *	because of the somewhat unusual interactions occurring between
- *	the parent and slave windows.
+ *	the parent and embedded widgets.
  *
  *      Recompute the layout of the text if necessary. This is
  *	necessary if the world coordinate system has changed.
  *	Specifically, the following may have occurred:
  *
  *	  1.  a text attribute has changed (font, linespacing, etc.).
- *	  2.  slave option changed (anchor, width, height).
- *        3.  actual slave window was resized.
+ *	  2.  widget option changed (anchor, width, height).
+ *        3.  actual embedded widget was resized.
  *	  4.  new text string or file.
  *
  *      This is deferred to the display routine since potentially
- *      many of these may occur (especially slave window changes).
+ *      many of these may occur (especially embedded widget changes).
  *
  *	Set the vertical and horizontal scrollbars (if they are
  *	designated) by issuing a Tcl command.  Done here since
  *	the text window width and height are needed.
  *
  *	If the viewport position or contents have changed in the
- *	vertical direction,  the now out-of-view slave windows
- *	must be moved off the viewport.  Since slave windows will
- *	obscure the text window, it is imperative that the slaves
+ *	vertical direction,  the now out-of-view embedded widgets
+ *	must be moved off the viewport.  Since embedded widgets will
+ *	obscure the text window, it is imperative that the widgets
  *	are moved off before we try to redraw text in the same area.
  *      This is necessary only for vertical movements.  Horizontal
- *	slave window movements are handled automatically in the
+ *	embedded widget movements are handled automatically in the
  *	page drawing routine.
  *
  *      Get the new first and last line numbers for the viewport.
  *      These line numbers may have changed because either a)
  *      the viewport changed size or position, or b) the text
- *	(slave window sizes or text attributes) have changed.
+ *	(embedded widget sizes or text attributes) have changed.
  *
  *	If the viewport has changed vertically (i.e. the first or
  *      last line numbers have changed), move the now out-of-view
- *	slave windows off the viewport.
+ *	embedded widgets off the viewport.
  *
  *      Potentially many expose events may be generated when the
- *	the individual slave windows are moved and/or resized.
+ *	the individual embedded widgets are moved and/or resized.
  *	These events need to be ignored.  Since (I think) expose
  * 	events are guaranteed to happen in order, we can bracket
  *	them by sending phony events (via XSendEvent). The phony
@@ -3239,30 +3218,30 @@ static void
 DisplayText(clientData)
     ClientData clientData;	/* Information about widget. */
 {
-    HText *textPtr = (HText *)clientData;
-    Tk_Window tkwin = textPtr->tkwin;
+    HText *htPtr = clientData;
+    Tk_Window tkwin = htPtr->tkwin;
     int oldFirst;		/* First line of old viewport */
     int oldLast;		/* Last line of old viewport */
     int deltaY;			/* Change in viewport in Y direction */
     int reqWidth, reqHeight;
 
 #ifdef notdef
-    fprintf(stderr, "calling DisplayText(%s)\n", Tk_PathName(textPtr->tkwin));
+    fprintf(stderr, "calling DisplayText(%s)\n", Tk_PathName(htPtr->tkwin));
 #endif
-    textPtr->flags &= ~REDRAW_PENDING;
+    htPtr->flags &= ~REDRAW_PENDING;
     if (tkwin == NULL) {
 	return;			/* Window has been destroyed */
     }
-    if (textPtr->flags & REQUEST_LAYOUT) {
+    if (htPtr->flags & REQUEST_LAYOUT) {
 	/*
-	 * Recompute the layout when slaves are created, deleted,
+	 * Recompute the layout when widgets are created, deleted,
 	 * moved, or resized.  Also when text attributes (such as
 	 * font, linespacing) have changed.
 	 */
-	ComputeLayout(textPtr);
+	ComputeLayout(htPtr);
     }
-    textPtr->lastWidth = Tk_Width(tkwin);
-    textPtr->lastHeight = Tk_Height(tkwin);
+    htPtr->lastWidth = Tk_Width(tkwin);
+    htPtr->lastHeight = Tk_Height(tkwin);
 
     /*
      * Check the requested width and height.  We allow two modes:
@@ -3272,34 +3251,29 @@ DisplayText(clientData)
      *	   the maxWidth and maxHeight values.
      *
      * In any event, we need to calculate the size of the virtual
-     * text and then make a geometry request.  This is so that slave
-     * windows whose size is relative to the master, will be set
-     * once.
+     * text and then make a geometry request.  This is so that widgets
+     * whose size is relative to the master, will be set once.
      */
-    if (textPtr->reqWidth > 0) {
-	reqWidth = textPtr->reqWidth;
+    if (htPtr->reqWidth > 0) {
+	reqWidth = htPtr->reqWidth;
     } else {
-	reqWidth = MIN(textPtr->worldWidth, textPtr->maxWidth);
+	reqWidth = MIN(htPtr->worldWidth, htPtr->maxWidth);
 	if (reqWidth < 1) {
 	    reqWidth = 1;
 	}
     }
-    if (textPtr->reqHeight > 0) {
-	reqHeight = textPtr->reqHeight;
+    if (htPtr->reqHeight > 0) {
+	reqHeight = htPtr->reqHeight;
     } else {
-	reqHeight = MIN(textPtr->worldHeight, textPtr->maxHeight);
+	reqHeight = MIN(htPtr->worldHeight, htPtr->maxHeight);
 	if (reqHeight < 1) {
 	    reqHeight = 1;
 	}
     }
     if ((reqWidth != Tk_ReqWidth(tkwin)) || (reqHeight != Tk_ReqHeight(tkwin))) {
-#ifdef notdef
-	fprintf(stderr, "geometry request %dx%d => %dx%d\n", reqWidth, reqHeight,
-	    Tk_ReqWidth(tkwin), Tk_ReqHeight(tkwin));
-#endif
 	Tk_GeometryRequest(tkwin, reqWidth, reqHeight);
 
-	EventuallyRedraw(textPtr);
+	EventuallyRedraw(htPtr);
 	return;			/* Try again with new geometry */
     }
     if (!Tk_IsMapped(tkwin)) {
@@ -3307,59 +3281,59 @@ DisplayText(clientData)
     }
     /*
      * Turn off layout requests here, after the text window has been
-     * mapped.  Otherwise, relative slave window size requests wrt
+     * mapped.  Otherwise, relative embedded widget size requests wrt
      * to the size of parent text window will be wrong.
      */
-    textPtr->flags &= ~REQUEST_LAYOUT;
+    htPtr->flags &= ~REQUEST_LAYOUT;
 
     /* Is there a pending goto request? */
-    if (textPtr->flags & GOTO_PENDING) {
-	textPtr->pendingY = textPtr->lineArr[textPtr->reqLineNum].offset;
-	textPtr->flags &= ~GOTO_PENDING;
+    if (htPtr->flags & GOTO_PENDING) {
+	htPtr->pendingY = htPtr->lineArr[htPtr->reqLineNum].offset;
+	htPtr->flags &= ~GOTO_PENDING;
     }
-    deltaY = textPtr->pendingY - textPtr->yOffset;
-    oldFirst = textPtr->first, oldLast = textPtr->last;
+    deltaY = htPtr->pendingY - htPtr->yOffset;
+    oldFirst = htPtr->first, oldLast = htPtr->last;
 
     /*
      * If the viewport has changed size or position, or the text
-     * and/or slave windows have changed, adjust the scrollbars to
+     * and/or embedded widgets have changed, adjust the scrollbars to
      * new positions.
      */
-    if (textPtr->flags & TEXT_DIRTY) {
+    if (htPtr->flags & TEXT_DIRTY) {
 	int width, height;
 
-	width = Tk_Width(textPtr->tkwin);
-	height = Tk_Height(textPtr->tkwin);
+	width = Tk_Width(htPtr->tkwin);
+	height = Tk_Height(htPtr->tkwin);
 
 	/* Reset viewport origin and world extents */
-	textPtr->xOffset = Blt_AdjustViewport(textPtr->pendingX,
-	    textPtr->worldWidth, width,
-	    textPtr->xScrollUnits, SCROLL_MODE_LISTBOX);
-	textPtr->yOffset = Blt_AdjustViewport(textPtr->pendingY,
-	    textPtr->worldHeight, height,
-	    textPtr->yScrollUnits, SCROLL_MODE_LISTBOX);
-	if (textPtr->xScrollCmdPrefix != NULL) {
-	    Blt_UpdateScrollbar(textPtr->interp, textPtr->xScrollCmdPrefix,
-		(double)textPtr->xOffset / textPtr->worldWidth,
-		(double)(textPtr->xOffset + width) / textPtr->worldWidth);
+	htPtr->xOffset = Blt_AdjustViewport(htPtr->pendingX,
+	    htPtr->worldWidth, width,
+	    htPtr->xScrollUnits, BLT_SCROLL_MODE_LISTBOX);
+	htPtr->yOffset = Blt_AdjustViewport(htPtr->pendingY,
+	    htPtr->worldHeight, height,
+	    htPtr->yScrollUnits, BLT_SCROLL_MODE_LISTBOX);
+	if (htPtr->xScrollCmdPrefix != NULL) {
+	    Blt_UpdateScrollbar(htPtr->interp, htPtr->xScrollCmdPrefix,
+		(double)htPtr->xOffset / htPtr->worldWidth,
+		(double)(htPtr->xOffset + width) / htPtr->worldWidth);
 	}
-	if (textPtr->yScrollCmdPrefix != NULL) {
-	    Blt_UpdateScrollbar(textPtr->interp, textPtr->yScrollCmdPrefix,
-		(double)textPtr->yOffset / textPtr->worldHeight,
-		(double)(textPtr->yOffset + height) / textPtr->worldHeight);
+	if (htPtr->yScrollCmdPrefix != NULL) {
+	    Blt_UpdateScrollbar(htPtr->interp, htPtr->yScrollCmdPrefix,
+		(double)htPtr->yOffset / htPtr->worldHeight,
+		(double)(htPtr->yOffset + height) / htPtr->worldHeight);
 	}
 	/*
 	 * Given a new viewport or text height, find the first and
 	 * last line numbers of the new viewport.
 	 */
-	if (GetVisibleLines(textPtr) != TCL_OK) {
+	if (GetVisibleLines(htPtr) != TCL_OK) {
 	    return;
 	}
     }
     /*
      * 	This is a kludge: Send an expose event before and after
      * 	drawing the page of text.  Since moving and resizing of the
-     * 	slave windows will cause redundant expose events in the parent
+     * 	embedded widgets will cause redundant expose events in the parent
      * 	window, the phony events will bracket them indicating no
      * 	action should be taken.
      */
@@ -3368,45 +3342,45 @@ DisplayText(clientData)
     /*
      * If either the position of the viewport has changed or the size
      * of width or height of the entire text have changed, move the
-     * slaves from the previous viewport out of the current
-     * viewport. Worry only about the vertical slave window movements.
+     * widgets from the previous viewport out of the current
+     * viewport. Worry only about the vertical embedded widget movements.
      * The page is always draw at full width and the viewport will clip
      * the text.
      */
-    if ((textPtr->first != oldFirst) || (textPtr->last != oldLast)) {
+    if ((htPtr->first != oldFirst) || (htPtr->last != oldLast)) {
 	int offset;
 	int i;
 	int first, last;
-	Blt_ListItem item;
-	Slave *slavePtr;
+	Blt_ChainLink *linkPtr;
+	EmbeddedWidget *winPtr;
 
 	/* Figure out which lines are now out of the viewport */
 
-	if ((textPtr->first > oldFirst) && (textPtr->first <= oldLast)) {
-	    first = oldFirst, last = textPtr->first;
-	} else if ((textPtr->last < oldLast) && (textPtr->last >= oldFirst)) {
-	    first = textPtr->last, last = oldLast;
+	if ((htPtr->first > oldFirst) && (htPtr->first <= oldLast)) {
+	    first = oldFirst, last = htPtr->first;
+	} else if ((htPtr->last < oldLast) && (htPtr->last >= oldFirst)) {
+	    first = htPtr->last, last = oldLast;
 	} else {
 	    first = oldFirst, last = oldLast;
 	}
 
 	for (i = first; i <= last; i++) {
-	    offset = textPtr->lineArr[i].offset;
-	    for (item = Blt_ListFirstItem(&(textPtr->lineArr[i].winList));
-		item != NULL; item = Blt_ListNextItem(item)) {
-		slavePtr = (Slave *)Blt_ListGetValue(item);
-		if (slavePtr->tkwin != NULL) {
-		    MoveSlave(slavePtr, offset);
-		    slavePtr->flags &= ~SLAVE_VISIBLE;
+	    offset = htPtr->lineArr[i].offset;
+	    for (linkPtr = Blt_ChainFirstLink(htPtr->lineArr[i].chainPtr);
+		linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+		winPtr = Blt_ChainGetValue(linkPtr);
+		if (winPtr->tkwin != NULL) {
+		    MoveEmbeddedWidget(winPtr, offset);
+		    winPtr->flags &= ~WIDGET_VISIBLE;
 		}
 	    }
 	}
     }
-    DrawPage(textPtr, deltaY);
+    DrawPage(htPtr, deltaY);
     SendBogusEvent(tkwin);
 
     /* Reset flags */
-    textPtr->flags &= ~TEXT_DIRTY;
+    htPtr->flags &= ~TEXT_DIRTY;
 }
 
 /* Selection Procedures */
@@ -3441,22 +3415,22 @@ TextSelectionProc(clientData, offset, buffer, maxBytes)
 				 * at buffer, not including terminating
 				 * NULL character. */
 {
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
     int size;
 
-    if ((textPtr->selFirst < 0) || (!textPtr->exportSelection)) {
+    if ((htPtr->selFirst < 0) || (!htPtr->exportSelection)) {
 	return -1;
     }
-    size = (textPtr->selLast - textPtr->selFirst) + 1 - offset;
+    size = (htPtr->selLast - htPtr->selFirst) + 1 - offset;
     if (size > maxBytes) {
 	size = maxBytes;
     }
     if (size <= 0) {
 	return 0;		/* huh? */
     }
-    strncpy(buffer, textPtr->charArr + textPtr->selFirst + offset, size);
+    strncpy(buffer, htPtr->charArr + htPtr->selFirst + offset, size);
     buffer[size] = '\0';
-    return (size);
+    return size;
 }
 
 /*
@@ -3480,11 +3454,11 @@ static void
 TextLostSelection(clientData)
     ClientData clientData;	/* Information about Text widget. */
 {
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
 
-    if ((textPtr->selFirst >= 0) && (textPtr->exportSelection)) {
-	textPtr->selFirst = textPtr->selLast = -1;
-	EventuallyRedraw(textPtr);
+    if ((htPtr->selFirst >= 0) && (htPtr->exportSelection)) {
+	htPtr->selFirst = htPtr->selLast = -1;
+	EventuallyRedraw(htPtr);
     }
 }
 
@@ -3505,9 +3479,9 @@ TextLostSelection(clientData)
  *----------------------------------------------------------------------
  */
 static int
-SelectLine(textPtr, textIndex)
-    HText *textPtr;		/* Information about widget. */
-    int textIndex;		/* Index of element that is to
+SelectLine(htPtr, tindex)
+    HText *htPtr;		/* Information about widget. */
+    int tindex;			/* Index of element that is to
 				 * become the "other" end of the
 				 * selection. */
 {
@@ -3515,34 +3489,30 @@ SelectLine(textPtr, textIndex)
     int lineNum;
     Line *linePtr;
 
-    lineNum = IndexSearch(textPtr, textIndex, 0, textPtr->numLines - 1);
+    lineNum = IndexSearch(htPtr, tindex, 0, htPtr->nLines - 1);
     if (lineNum < 0) {
 	char string[200];
 
 	sprintf(string, "can't determine line number from index \"%d\"",
-	    textIndex);
-	Tcl_AppendResult(textPtr->interp, string, (char *)NULL);
+	    tindex);
+	Tcl_AppendResult(htPtr->interp, string, (char *)NULL);
 	return TCL_ERROR;
     }
-    linePtr = textPtr->lineArr + lineNum;
+    linePtr = htPtr->lineArr + lineNum;
     /*
      * Grab the selection if we don't own it already.
      */
-    if ((textPtr->exportSelection) && (textPtr->selFirst == -1)) {
-	Tk_OwnSelection(textPtr->tkwin, XA_PRIMARY, TextLostSelection,
-	    (ClientData)textPtr);
+    if ((htPtr->exportSelection) && (htPtr->selFirst == -1)) {
+	Tk_OwnSelection(htPtr->tkwin, XA_PRIMARY, TextLostSelection, htPtr);
     }
     selFirst = linePtr->textStart;
     selLast = linePtr->textEnd;
-    textPtr->selAnchor = textIndex;
-#ifdef notdef
-    fprintf(stderr, "selection first=%d,last=%d\n", selFirst, selLast);
-#endif
-    if ((textPtr->selFirst != selFirst) ||
-	(textPtr->selLast != selLast)) {
-	textPtr->selFirst = selFirst;
-	textPtr->selLast = selLast;
-	EventuallyRedraw(textPtr);
+    htPtr->selAnchor = tindex;
+    if ((htPtr->selFirst != selFirst) ||
+	(htPtr->selLast != selLast)) {
+	htPtr->selFirst = selFirst;
+	htPtr->selLast = selLast;
+	EventuallyRedraw(htPtr);
     }
     return TCL_OK;
 }
@@ -3564,41 +3534,40 @@ SelectLine(textPtr, textIndex)
  *----------------------------------------------------------------------
  */
 static int
-SelectWord(textPtr, textIndex)
-    HText *textPtr;		/* Information about widget. */
-    int textIndex;		/* Index of element that is to
+SelectWord(htPtr, tindex)
+    HText *htPtr;		/* Information about widget. */
+    int tindex;			/* Index of element that is to
 				 * become the "other" end of the
 				 * selection. */
 {
     int selFirst, selLast;
     int i;
 
-    for (i = textIndex; i < textPtr->numChars; i++) {
-	if (isspace(UCHAR(textPtr->charArr[i]))) {
+    for (i = tindex; i < htPtr->nChars; i++) {
+	if (isspace(UCHAR(htPtr->charArr[i]))) {
 	    break;
 	}
     }
     selLast = i - 1;
-    for (i = textIndex; i >= 0; i--) {
-	if (isspace(UCHAR(textPtr->charArr[i]))) {
+    for (i = tindex; i >= 0; i--) {
+	if (isspace(UCHAR(htPtr->charArr[i]))) {
 	    break;
 	}
     }
     selFirst = i + 1;
     if (selFirst > selLast) {
-	selFirst = selLast = textIndex;
+	selFirst = selLast = tindex;
     }
     /*
      * Grab the selection if we don't own it already.
      */
-    if ((textPtr->exportSelection) && (textPtr->selFirst == -1)) {
-	Tk_OwnSelection(textPtr->tkwin, XA_PRIMARY, TextLostSelection,
-	    (ClientData)textPtr);
+    if ((htPtr->exportSelection) && (htPtr->selFirst == -1)) {
+	Tk_OwnSelection(htPtr->tkwin, XA_PRIMARY, TextLostSelection, htPtr);
     }
-    textPtr->selAnchor = textIndex;
-    if ((textPtr->selFirst != selFirst) || (textPtr->selLast != selLast)) {
-	textPtr->selFirst = selFirst, textPtr->selLast = selLast;
-	EventuallyRedraw(textPtr);
+    htPtr->selAnchor = tindex;
+    if ((htPtr->selFirst != selFirst) || (htPtr->selLast != selLast)) {
+	htPtr->selFirst = selFirst, htPtr->selLast = selLast;
+	EventuallyRedraw(htPtr);
     }
     return TCL_OK;
 }
@@ -3620,9 +3589,9 @@ SelectWord(textPtr, textIndex)
  *----------------------------------------------------------------------
  */
 static int
-SelectTextBlock(textPtr, textIndex)
-    HText *textPtr;		/* Information about widget. */
-    int textIndex;		/* Index of element that is to
+SelectTextBlock(htPtr, tindex)
+    HText *htPtr;		/* Information about widget. */
+    int tindex;			/* Index of element that is to
 				 * become the "other" end of the
 				 * selection. */
 {
@@ -3632,24 +3601,23 @@ SelectTextBlock(textPtr, textIndex)
      * Grab the selection if we don't own it already.
      */
 
-    if ((textPtr->exportSelection) && (textPtr->selFirst == -1)) {
-	Tk_OwnSelection(textPtr->tkwin, XA_PRIMARY, TextLostSelection,
-	    (ClientData)textPtr);
+    if ((htPtr->exportSelection) && (htPtr->selFirst == -1)) {
+	Tk_OwnSelection(htPtr->tkwin, XA_PRIMARY, TextLostSelection, htPtr);
     }
     /*  If the anchor hasn't been set yet, assume the beginning of the text*/
-    if (textPtr->selAnchor < 0) {
-	textPtr->selAnchor = 0;
+    if (htPtr->selAnchor < 0) {
+	htPtr->selAnchor = 0;
     }
-    if (textPtr->selAnchor <= textIndex) {
-	selFirst = textPtr->selAnchor;
-	selLast = textIndex;
+    if (htPtr->selAnchor <= tindex) {
+	selFirst = htPtr->selAnchor;
+	selLast = tindex;
     } else {
-	selFirst = textIndex;
-	selLast = textPtr->selAnchor;
+	selFirst = tindex;
+	selLast = htPtr->selAnchor;
     }
-    if ((textPtr->selFirst != selFirst) || (textPtr->selLast != selLast)) {
-	textPtr->selFirst = selFirst, textPtr->selLast = selLast;
-	EventuallyRedraw(textPtr);
+    if ((htPtr->selFirst != selFirst) || (htPtr->selLast != selLast)) {
+	htPtr->selFirst = selFirst, htPtr->selLast = selLast;
+	EventuallyRedraw(htPtr);
     }
     return TCL_OK;
 }
@@ -3689,13 +3657,13 @@ SelectTextBlock(textPtr, textIndex)
  *----------------------------------------------------------------------
  */
 static int
-SelectOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+SelectOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
 {
-    int selIndex;
+    int iselection;
     unsigned int length;
     int result = TCL_OK;
     char c;
@@ -3708,9 +3676,9 @@ SelectOp(textPtr, interp, argc, argv)
 		" selection clear\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	if (textPtr->selFirst != -1) {
-	    textPtr->selFirst = textPtr->selLast = -1;
-	    EventuallyRedraw(textPtr);
+	if (htPtr->selFirst != -1) {
+	    htPtr->selFirst = htPtr->selLast = -1;
+	    EventuallyRedraw(htPtr);
 	}
 	return TCL_OK;
     } else if ((c == 'p') && (strncmp(argv[2], "present", length) == 0)) {
@@ -3719,7 +3687,7 @@ SelectOp(textPtr, interp, argc, argv)
 		" selection present\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	Tcl_AppendResult(interp, (textPtr->selFirst != -1) ? "0" : "1",
+	Tcl_AppendResult(interp, (htPtr->selFirst != -1) ? "0" : "1",
 	    (char *)NULL);
 	return TCL_OK;
     } else if ((c == 'r') && (strncmp(argv[2], "range", length) == 0)) {
@@ -3730,14 +3698,14 @@ SelectOp(textPtr, interp, argc, argv)
 		" selection range first last\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	if (GetIndex(textPtr, argv[3], &selFirst) != TCL_OK) {
+	if (GetIndex(htPtr, argv[3], &selFirst) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if (GetIndex(textPtr, argv[4], &selLast) != TCL_OK) {
+	if (GetIndex(htPtr, argv[4], &selLast) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	textPtr->selAnchor = selFirst;
-	result = SelectTextBlock(textPtr, selLast);
+	htPtr->selAnchor = selFirst;
+	SelectTextBlock(htPtr, selLast);
 	return TCL_OK;
     }
     if (argc != 4) {
@@ -3745,28 +3713,28 @@ SelectOp(textPtr, interp, argc, argv)
 	    " selection ", argv[2], " index\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    if (GetIndex(textPtr, argv[3], &selIndex) != TCL_OK) {
+    if (GetIndex(htPtr, argv[3], &iselection) != TCL_OK) {
 	return TCL_ERROR;
     }
     if ((c == 'f') && (strncmp(argv[2], "from", length) == 0)) {
-	textPtr->selAnchor = selIndex;
+	htPtr->selAnchor = iselection;
     } else if ((c == 'a') && (strncmp(argv[2], "adjust", length) == 0)) {
 	int half1, half2;
 
-	half1 = (textPtr->selFirst + textPtr->selLast) / 2;
-	half2 = (textPtr->selFirst + textPtr->selLast + 1) / 2;
-	if (selIndex < half1) {
-	    textPtr->selAnchor = textPtr->selLast;
-	} else if (selIndex > half2) {
-	    textPtr->selAnchor = textPtr->selFirst;
+	half1 = (htPtr->selFirst + htPtr->selLast) / 2;
+	half2 = (htPtr->selFirst + htPtr->selLast + 1) / 2;
+	if (iselection < half1) {
+	    htPtr->selAnchor = htPtr->selLast;
+	} else if (iselection > half2) {
+	    htPtr->selAnchor = htPtr->selFirst;
 	}
-	result = SelectTextBlock(textPtr, selIndex);
+	result = SelectTextBlock(htPtr, iselection);
     } else if ((c == 't') && (strncmp(argv[2], "to", length) == 0)) {
-	result = SelectTextBlock(textPtr, selIndex);
+	result = SelectTextBlock(htPtr, iselection);
     } else if ((c == 'w') && (strncmp(argv[2], "word", length) == 0)) {
-	result = SelectWord(textPtr, selIndex);
+	result = SelectWord(htPtr, iselection);
     } else if ((c == 'l') && (strncmp(argv[2], "line", length) == 0)) {
-	result = SelectLine(textPtr, selIndex);
+	result = SelectLine(htPtr, iselection);
     } else {
 	Tcl_AppendResult(interp, "bad selection operation \"", argv[2],
 	    "\": should be \"adjust\", \"clear\", \"from\", \"line\", \
@@ -3797,107 +3765,109 @@ SelectOp(textPtr, interp, argc, argv)
  */
 /*ARGSUSED*/
 static int
-GotoOp(textPtr, interp, argc, argv)
-    HText *textPtr;
-    Tcl_Interp *interp;		/* not used */
+GotoOp(htPtr, interp, argc, argv)
+    HText *htPtr;
+    Tcl_Interp *interp;		/* Not used. */
     int argc;
     char **argv;
 {
     int line;
 
-    line = textPtr->first;
+    line = htPtr->first;
     if (argc == 3) {
-	int textIndex;
+	int tindex;
 
-	if (GetIndex(textPtr, argv[2], &textIndex) != TCL_OK) {
+	if (GetIndex(htPtr, argv[2], &tindex) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	line = IndexSearch(textPtr, textIndex, 0, textPtr->numLines - 1);
+	line = IndexSearch(htPtr, tindex, 0, htPtr->nLines - 1);
 	if (line < 0) {
 	    char string[200];
 
 	    sprintf(string, "can't determine line number from index \"%d\"",
-		textIndex);
-	    Tcl_AppendResult(textPtr->interp, string, (char *)NULL);
+		tindex);
+	    Tcl_AppendResult(htPtr->interp, string, (char *)NULL);
 	    return TCL_ERROR;
 	}
-	textPtr->reqLineNum = line;
-	textPtr->flags |= TEXT_DIRTY;
+	htPtr->reqLineNum = line;
+	htPtr->flags |= TEXT_DIRTY;
 
 	/*
 	 * Make only a request for a change in the viewport.  Defer
 	 * the actual scrolling until the text layout is adjusted at
 	 * the next idle point.
 	 */
-	if (line != textPtr->first) {
-	    textPtr->flags |= GOTO_PENDING;
-	    EventuallyRedraw(textPtr);
+	if (line != htPtr->first) {
+	    htPtr->flags |= GOTO_PENDING;
+	    EventuallyRedraw(htPtr);
 	}
     }
-    Tcl_SetResult(textPtr->interp, Blt_Int(line), TCL_VOLATILE);
+    Tcl_SetResult(htPtr->interp, Blt_Itoa(line), TCL_VOLATILE);
     return TCL_OK;
 }
 
 
 static int
-XViewOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+XViewOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
 {
     int width, worldWidth;
 
-    width = Tk_Width(textPtr->tkwin);
-    worldWidth = textPtr->worldWidth;
+    width = Tk_Width(htPtr->tkwin);
+    worldWidth = htPtr->worldWidth;
     if (argc == 2) {
 	double fract;
 
 	/* Report first and last fractions */
-	fract = (double)textPtr->xOffset / worldWidth;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
-	fract = (double)(textPtr->xOffset + width) / worldWidth;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
+	fract = (double)htPtr->xOffset / worldWidth;
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
+	fract = (double)(htPtr->xOffset + width) / worldWidth;
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
 	return TCL_OK;
     }
-    textPtr->pendingX = textPtr->xOffset;
-    if (Blt_GetScrollInfo(interp, argc, argv, &(textPtr->pendingX), worldWidth,
-	    width, textPtr->xScrollUnits, SCROLL_MODE_LISTBOX) != TCL_OK) {
+    htPtr->pendingX = htPtr->xOffset;
+    if (Blt_GetScrollInfo(interp, argc - 2, argv + 2, &(htPtr->pendingX),
+	    worldWidth, width, htPtr->xScrollUnits, BLT_SCROLL_MODE_LISTBOX) 
+	!= TCL_OK) {
 	return TCL_ERROR;
     }
-    textPtr->flags |= TEXT_DIRTY;
-    EventuallyRedraw(textPtr);
+    htPtr->flags |= TEXT_DIRTY;
+    EventuallyRedraw(htPtr);
     return TCL_OK;
 }
 
 static int
-YViewOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+YViewOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
 {
     int height, worldHeight;
 
-    height = Tk_Height(textPtr->tkwin);
-    worldHeight = textPtr->worldHeight;
+    height = Tk_Height(htPtr->tkwin);
+    worldHeight = htPtr->worldHeight;
     if (argc == 2) {
 	double fract;
 
 	/* Report first and last fractions */
-	fract = (double)textPtr->yOffset / worldHeight;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
-	fract = (double)(textPtr->yOffset + height) / worldHeight;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
+	fract = (double)htPtr->yOffset / worldHeight;
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
+	fract = (double)(htPtr->yOffset + height) / worldHeight;
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
 	return TCL_OK;
     }
-    textPtr->pendingY = textPtr->yOffset;
-    if (Blt_GetScrollInfo(interp, argc, argv, &(textPtr->pendingY), worldHeight,
-	    height, textPtr->yScrollUnits, SCROLL_MODE_LISTBOX) != TCL_OK) {
+    htPtr->pendingY = htPtr->yOffset;
+    if (Blt_GetScrollInfo(interp, argc - 2, argv + 2, &(htPtr->pendingY),
+	    worldHeight, height, htPtr->yScrollUnits, BLT_SCROLL_MODE_LISTBOX)
+	!= TCL_OK) {
 	return TCL_ERROR;
     }
-    textPtr->flags |= TEXT_DIRTY;
-    EventuallyRedraw(textPtr);
+    htPtr->flags |= TEXT_DIRTY;
+    EventuallyRedraw(htPtr);
     return TCL_OK;
 }
 
@@ -3906,50 +3876,49 @@ YViewOp(textPtr, interp, argc, argv)
  *
  * AppendOp --
  *
- * 	This procedure creates and initializes a new hyper text slave.
+ * 	This procedure embeds a Tk widget into the hypertext.
  *
  * Results:
  *	A standard Tcl result.
  *
  * Side effects:
- *	Memory is allocated.  Slave gets configured.
+ *	Memory is allocated.  EmbeddedWidget gets configured.
  *
  * ----------------------------------------------------------------------
  */
 static int
-AppendOp(textPtr, interp, argc, argv)
-    HText *textPtr;		/* Hypertext widget */
+AppendOp(htPtr, interp, argc, argv)
+    HText *htPtr;		/* Hypertext widget */
     Tcl_Interp *interp;		/* Interpreter associated with widget */
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
     Line *linePtr;
-    Slave *slavePtr;
+    EmbeddedWidget *winPtr;
 
-    slavePtr = CreateSlave(textPtr, argv[2]);
-    if (slavePtr == NULL) {
+    winPtr = CreateEmbeddedWidget(htPtr, argv[2]);
+    if (winPtr == NULL) {
 	return TCL_ERROR;
     }
-    if (Tk_ConfigureWidget(interp, textPtr->tkwin, slaveConfigSpecs,
-	    argc - 3, argv + 3, (char *)slavePtr, 0) != TCL_OK) {
+    if (Tk_ConfigureWidget(interp, htPtr->tkwin, widgetConfigSpecs,
+	    argc - 3, argv + 3, (char *)winPtr, 0) != TCL_OK) {
 	return TCL_ERROR;
     }
     /*
-     * Append slave to list of slave windows of the last line.
+     * Append widget to list of embedded widgets of the last line.
      */
-    linePtr = GetLastLine(textPtr);
+    linePtr = GetLastLine(htPtr);
     if (linePtr == NULL) {
-	Tcl_AppendResult(textPtr->interp, "can't allocate line structure",
+	Tcl_AppendResult(htPtr->interp, "can't allocate line structure",
 	    (char *)NULL);
 	return TCL_ERROR;
     }
-    Blt_ListAppend(&(linePtr->winList), (char *)slavePtr->tkwin,
-	(ClientData)slavePtr);
-    linePtr->width += slavePtr->cavityWidth;
-    slavePtr->precedingTextEnd = linePtr->textEnd;
+    Blt_ChainAppend(linePtr->chainPtr, winPtr);
+    linePtr->width += winPtr->cavityWidth;
+    winPtr->precedingTextEnd = linePtr->textEnd;
 
-    textPtr->flags |= (SLAVE_APPENDED | REQUEST_LAYOUT);
-    EventuallyRedraw(textPtr);
+    htPtr->flags |= (WIDGET_APPENDED | REQUEST_LAYOUT);
+    EventuallyRedraw(htPtr);
     return TCL_OK;
 }
 
@@ -3958,38 +3927,38 @@ AppendOp(textPtr, interp, argc, argv)
  *
  * WindowsOp --
  *
- *	Returns a list of all the pathNames of slave windows of the
+ *	Returns a list of all the pathNames of embedded widgets of the
  *	HText widget.  If a pattern argument is given, only the names
  *	of windows matching it will be placed into the list.
  *
  * Results:
  *	Standard Tcl result.  If TCL_OK, interp->result will contain
- *	the list of the slave window pathnames.  Otherwise it will
+ *	the list of the embedded widget pathnames.  Otherwise it will
  *	contain an error message.
  *
  *----------------------------------------------------------------------
  */
 static int
-WindowsOp(textPtr, interp, argc, argv)
-    HText *textPtr;		/* Hypertext widget record */
+WindowsOp(htPtr, interp, argc, argv)
+    HText *htPtr;		/* Hypertext widget record */
     Tcl_Interp *interp;		/* Interpreter associated with widget */
     int argc;
     char **argv;
 {
-    Slave *slavePtr;
-    Tcl_HashEntry *hPtr;
-    Tcl_HashSearch cursor;
+    EmbeddedWidget *winPtr;
+    Blt_HashEntry *hPtr;
+    Blt_HashSearch cursor;
     char *name;
 
-    for (hPtr = Tcl_FirstHashEntry(&(textPtr->slaveTab), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	slavePtr = (Slave *)Tcl_GetHashValue(hPtr);
-	if (slavePtr->tkwin == NULL) {
+    for (hPtr = Blt_FirstHashEntry(&(htPtr->widgetTable), &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	winPtr = (EmbeddedWidget *)Blt_GetHashValue(hPtr);
+	if (winPtr->tkwin == NULL) {
 	    fprintf(stderr, "window `%s' is null\n",
-		Tk_PathName(Tcl_GetHashKey(&(textPtr->slaveTab), hPtr)));
+		Tk_PathName(Blt_GetHashKey(&(htPtr->widgetTable), hPtr)));
 	    continue;
 	}
-	name = Tk_PathName(slavePtr->tkwin);
+	name = Tk_PathName(winPtr->tkwin);
 	if ((argc == 2) || (Tcl_StringMatch(name, argv[2]))) {
 	    Tcl_AppendElement(interp, name);
 	}
@@ -4006,10 +3975,10 @@ WindowsOp(textPtr, interp, argc, argv)
  */
 /*ARGSUSED*/
 static int
-CgetOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+CgetOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     char *itemPtr;
@@ -4017,29 +3986,28 @@ CgetOp(textPtr, interp, argc, argv)
 
     if ((argc > 2) && (argv[2][0] == '.')) {
 	Tk_Window tkwin;
-	Slave *slavePtr;
+	EmbeddedWidget *winPtr;
 
-	/* Slave window to be configured */
-	tkwin = Tk_NameToWindow(interp, argv[2], textPtr->tkwin);
+	/* EmbeddedWidget window to be configured */
+	tkwin = Tk_NameToWindow(interp, argv[2], htPtr->tkwin);
 	if (tkwin == NULL) {
 	    return TCL_ERROR;
 	}
-	slavePtr = FindSlave(textPtr, tkwin);
-	if (slavePtr == NULL) {
+	winPtr = FindEmbeddedWidget(htPtr, tkwin);
+	if (winPtr == NULL) {
 	    Tcl_AppendResult(interp, "window \"", argv[2],
 		"\" is not managed by \"", argv[0], "\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	specsPtr = slaveConfigSpecs;
-	itemPtr = (char *)slavePtr;
+	specsPtr = widgetConfigSpecs;
+	itemPtr = (char *)winPtr;
 	argv++;
-	argc--;
     } else {
 	specsPtr = configSpecs;
-	itemPtr = (char *)textPtr;
+	itemPtr = (char *)htPtr;
     }
-    return (Tk_ConfigureValue(interp, textPtr->tkwin, specsPtr, itemPtr,
-	    argv[2], 0));
+    return Tk_ConfigureValue(interp, htPtr->tkwin, specsPtr, itemPtr,
+	    argv[2], 0);
 }
 
 /*
@@ -4057,14 +4025,14 @@ CgetOp(textPtr, interp, argc, argv)
  *
  * Side effects:
  *	Configuration information, such as text string, colors, font,
- * 	etc. get set for textPtr;  old resources get freed, if there were any.
+ * 	etc. get set for htPtr;  old resources get freed, if there were any.
  * 	The hypertext is redisplayed.
  *
  *----------------------------------------------------------------------
  */
 static int
-ConfigureOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+ConfigureOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -4074,47 +4042,47 @@ ConfigureOp(textPtr, interp, argc, argv)
 
     if ((argc > 2) && (argv[2][0] == '.')) {
 	Tk_Window tkwin;
-	Slave *slavePtr;
+	EmbeddedWidget *winPtr;
 
-	/* Slave window to be configured */
-	tkwin = Tk_NameToWindow(interp, argv[2], textPtr->tkwin);
+	/* EmbeddedWidget window to be configured */
+	tkwin = Tk_NameToWindow(interp, argv[2], htPtr->tkwin);
 	if (tkwin == NULL) {
 	    return TCL_ERROR;
 	}
-	slavePtr = FindSlave(textPtr, tkwin);
-	if (slavePtr == NULL) {
+	winPtr = FindEmbeddedWidget(htPtr, tkwin);
+	if (winPtr == NULL) {
 	    Tcl_AppendResult(interp, "window \"", argv[2],
 		"\" is not managed by \"", argv[0], "\"", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	specsPtr = slaveConfigSpecs;
-	itemPtr = (char *)slavePtr;
+	specsPtr = widgetConfigSpecs;
+	itemPtr = (char *)winPtr;
 	argv++;
 	argc--;
     } else {
 	specsPtr = configSpecs;
-	itemPtr = (char *)textPtr;
+	itemPtr = (char *)htPtr;
     }
     if (argc == 2) {
-	return (Tk_ConfigureInfo(interp, textPtr->tkwin, specsPtr, itemPtr,
-		(char *)NULL, 0));
+	return Tk_ConfigureInfo(interp, htPtr->tkwin, specsPtr, itemPtr,
+		(char *)NULL, 0);
     } else if (argc == 3) {
-	return (Tk_ConfigureInfo(interp, textPtr->tkwin, specsPtr, itemPtr,
-		argv[2], 0));
+	return Tk_ConfigureInfo(interp, htPtr->tkwin, specsPtr, itemPtr,
+		argv[2], 0);
     }
-    if (Tk_ConfigureWidget(interp, textPtr->tkwin, specsPtr, argc - 2,
+    if (Tk_ConfigureWidget(interp, htPtr->tkwin, specsPtr, argc - 2,
 	    argv + 2, itemPtr, TK_CONFIG_ARGV_ONLY) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (itemPtr == (char *)textPtr) {
+    if (itemPtr == (char *)htPtr) {
 	/* Reconfigure the master */
-	if (ConfigureText(interp, textPtr) != TCL_OK) {
+	if (ConfigureText(interp, htPtr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     } else {
-	textPtr->flags |= REQUEST_LAYOUT;
+	htPtr->flags |= REQUEST_LAYOUT;
     }
-    EventuallyRedraw(textPtr);
+    EventuallyRedraw(htPtr);
     return TCL_OK;
 }
 
@@ -4129,10 +4097,10 @@ ConfigureOp(textPtr, interp, argc, argv)
  */
 /*ARGSUSED*/
 static int
-ScanOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+ScanOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     int x, y;
@@ -4140,40 +4108,40 @@ ScanOp(textPtr, interp, argc, argv)
     unsigned int length;
 
 
-    if (Blt_GetXYPosition(interp, textPtr->tkwin, argv[3], &x, &y) != TCL_OK) {
+    if (Blt_GetXY(interp, htPtr->tkwin, argv[3], &x, &y) != TCL_OK) {
 	return TCL_ERROR;
     }
     c = argv[2][0];
     length = strlen(argv[2]);
     if ((c == 'm') && (strncmp(argv[2], "mark", length) == 0)) {
-	textPtr->scanMark.x = x, textPtr->scanMark.y = y;
-	textPtr->scanPt.x = textPtr->xOffset;
-	textPtr->scanPt.y = textPtr->yOffset;
+	htPtr->scanMark.x = x, htPtr->scanMark.y = y;
+	htPtr->scanPt.x = htPtr->xOffset;
+	htPtr->scanPt.y = htPtr->yOffset;
 
     } else if ((c == 'd') && (strncmp(argv[2], "dragto", length) == 0)) {
 	int px, py;
 
-	px = textPtr->scanPt.x - (10 * (x - textPtr->scanMark.x));
-	py = textPtr->scanPt.y - (10 * (y - textPtr->scanMark.y));
+	px = htPtr->scanPt.x - (10 * (x - htPtr->scanMark.x));
+	py = htPtr->scanPt.y - (10 * (y - htPtr->scanMark.y));
 
 	if (px < 0) {
-	    px = textPtr->scanPt.x = 0;
-	    textPtr->scanMark.x = x;
-	} else if (px >= textPtr->worldWidth) {
-	    px = textPtr->scanPt.x = textPtr->worldWidth - textPtr->xScrollUnits;
-	    textPtr->scanMark.x = x;
+	    px = htPtr->scanPt.x = 0;
+	    htPtr->scanMark.x = x;
+	} else if (px >= htPtr->worldWidth) {
+	    px = htPtr->scanPt.x = htPtr->worldWidth - htPtr->xScrollUnits;
+	    htPtr->scanMark.x = x;
 	}
 	if (py < 0) {
-	    py = textPtr->scanPt.y = 0;
-	    textPtr->scanMark.y = y;
-	} else if (py >= textPtr->worldHeight) {
-	    py = textPtr->scanPt.y = textPtr->worldHeight - textPtr->yScrollUnits;
-	    textPtr->scanMark.y = y;
+	    py = htPtr->scanPt.y = 0;
+	    htPtr->scanMark.y = y;
+	} else if (py >= htPtr->worldHeight) {
+	    py = htPtr->scanPt.y = htPtr->worldHeight - htPtr->yScrollUnits;
+	    htPtr->scanMark.y = y;
 	}
-	if ((py != textPtr->pendingY) || (px != textPtr->pendingX)) {
-	    textPtr->pendingX = px, textPtr->pendingY = py;
-	    textPtr->flags |= TEXT_DIRTY;
-	    EventuallyRedraw(textPtr);
+	if ((py != htPtr->pendingY) || (px != htPtr->pendingX)) {
+	    htPtr->pendingX = px, htPtr->pendingY = py;
+	    htPtr->flags |= TEXT_DIRTY;
+	    EventuallyRedraw(htPtr);
 	}
     } else {
 	Tcl_AppendResult(interp, "bad scan operation \"", argv[2],
@@ -4196,8 +4164,8 @@ ScanOp(textPtr, interp, argc, argv)
  *----------------------------------------------------------------------
  */
 static int
-SearchOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+SearchOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -4205,7 +4173,7 @@ SearchOp(textPtr, interp, argc, argv)
     char *startPtr, *endPtr;
     char saved;
     Tcl_RegExp regExpToken;
-    int searchFirst, searchLast;
+    int iFirst, iLast;
     int matchStart, matchEnd;
     int match;
 
@@ -4213,24 +4181,24 @@ SearchOp(textPtr, interp, argc, argv)
     if (regExpToken == NULL) {
 	return TCL_ERROR;
     }
-    searchFirst = 0;
-    searchLast = textPtr->numChars;
+    iFirst = 0;
+    iLast = htPtr->nChars;
     if (argc > 3) {
-	if (GetIndex(textPtr, argv[3], &searchFirst) != TCL_OK) {
+	if (GetIndex(htPtr, argv[3], &iFirst) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
     if (argc == 4) {
-	if (GetIndex(textPtr, argv[4], &searchLast) != TCL_OK) {
+	if (GetIndex(htPtr, argv[4], &iLast) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
-    if (searchLast < searchFirst) {
+    if (iLast < iFirst) {
 	return TCL_ERROR;
     }
     matchStart = matchEnd = -1;
-    startPtr = textPtr->charArr + searchFirst;
-    endPtr = textPtr->charArr + searchLast + 1;
+    startPtr = htPtr->charArr + iFirst;
+    endPtr = htPtr->charArr + (iLast + 1);
     saved = *endPtr;
     *endPtr = '\0';		/* Make the line a string by changing the
 				 * '\n' into a NUL byte before searching */
@@ -4241,13 +4209,13 @@ SearchOp(textPtr, interp, argc, argv)
     } else if (match > 0) {
 	Tcl_RegExpRange(regExpToken, 0, &startPtr, &endPtr);
 	if ((startPtr != NULL) || (endPtr != NULL)) {
-	    matchStart = startPtr - textPtr->charArr;
-	    matchEnd = (endPtr - textPtr->charArr - 1);
+	    matchStart = startPtr - htPtr->charArr;
+	    matchEnd = endPtr - htPtr->charArr - 1;
 	}
     }
     if (match > 0) {
-	Tcl_AppendElement(interp, Blt_Int(matchStart));
-	Tcl_AppendElement(interp, Blt_Int(matchEnd));
+	Tcl_AppendElement(interp, Blt_Itoa(matchStart));
+	Tcl_AppendElement(interp, Blt_Itoa(matchEnd));
     } else {
 	Tcl_ResetResult(interp);
     }
@@ -4264,8 +4232,8 @@ SearchOp(textPtr, interp, argc, argv)
  *----------------------------------------------------------------------
  */
 static int
-RangeOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+RangeOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -4274,19 +4242,19 @@ RangeOp(textPtr, interp, argc, argv)
     char saved;
     int textFirst, textLast;
 
-    textFirst = textPtr->selFirst;
-    textLast = textPtr->selLast;
+    textFirst = htPtr->selFirst;
+    textLast = htPtr->selLast;
     if (textFirst < 0) {
 	textFirst = 0;
-	textLast = textPtr->numChars - 1;
+	textLast = htPtr->nChars - 1;
     }
     if (argc > 2) {
-	if (GetIndex(textPtr, argv[2], &textFirst) != TCL_OK) {
+	if (GetIndex(htPtr, argv[2], &textFirst) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
     if (argc == 4) {
-	if (GetIndex(textPtr, argv[3], &textLast) != TCL_OK) {
+	if (GetIndex(htPtr, argv[3], &textLast) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
@@ -4294,8 +4262,8 @@ RangeOp(textPtr, interp, argc, argv)
 	Tcl_AppendResult(interp, "first index is greater than last", (char *)NULL);
 	return TCL_ERROR;
     }
-    startPtr = textPtr->charArr + textFirst;
-    endPtr = textPtr->charArr + textLast + 1;
+    startPtr = htPtr->charArr + textFirst;
+    endPtr = htPtr->charArr + (textLast + 1);
     saved = *endPtr;
     *endPtr = '\0';		/* Make the line into a string by
 				 * changing the * '\n' into a '\0'
@@ -4314,18 +4282,18 @@ RangeOp(textPtr, interp, argc, argv)
  */
 /*ARGSUSED*/
 static int
-IndexOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+IndexOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
-    int textIndex;
+    int tindex;
 
-    if (GetIndex(textPtr, argv[2], &textIndex) != TCL_OK) {
+    if (GetIndex(htPtr, argv[2], &tindex) != TCL_OK) {
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp, Blt_Int(textIndex), TCL_VOLATILE);
+    Tcl_SetResult(interp, Blt_Itoa(tindex), TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -4338,22 +4306,22 @@ IndexOp(textPtr, interp, argc, argv)
  */
 /*ARGSUSED*/
 static int
-LinePosOp(textPtr, interp, argc, argv)
-    HText *textPtr;
+LinePosOp(htPtr, interp, argc, argv)
+    HText *htPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
-    int lineNum, charPos, textIndex;
+    int line, cpos, tindex;
     char string[200];
 
-    if (GetIndex(textPtr, argv[2], &textIndex) != TCL_OK) {
+    if (GetIndex(htPtr, argv[2], &tindex) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (GetTextPosition(textPtr, textIndex, &lineNum, &charPos) != TCL_OK) {
+    if (GetTextPosition(htPtr, tindex, &line, &cpos) != TCL_OK) {
 	return TCL_ERROR;
     }
-    sprintf(string, "%d.%d", lineNum, charPos);
+    sprintf(string, "%d.%d", line, cpos);
     Tcl_SetResult(interp, string, TCL_VOLATILE);
     return TCL_OK;
 }
@@ -4376,26 +4344,26 @@ LinePosOp(textPtr, interp, argc, argv)
  * --------------------------------------------------------------
  */
 
-static Blt_OpSpec operSpecs[] =
+static Blt_OpSpec textOps[] =
 {
-    {"append", 1, (Blt_Operation)AppendOp, 3, 0, "window ?option value?...",},
-    {"cget", 2, (Blt_Operation)CgetOp, 3, 3, "?window? option",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 2, 0,
+    {"append", 1, (Blt_Op)AppendOp, 3, 0, "window ?option value?...",},
+    {"cget", 2, (Blt_Op)CgetOp, 3, 3, "?window? option",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 2, 0,
 	"?window? ?option value?...",},
-    {"gotoline", 2, (Blt_Operation)GotoOp, 2, 3, "?line?",},
-    {"index", 1, (Blt_Operation)IndexOp, 3, 3, "string",},
-    {"linepos", 1, (Blt_Operation)LinePosOp, 3, 3, "string",},
-    {"range", 2, (Blt_Operation)RangeOp, 2, 4, "?from? ?to?",},
-    {"scan", 2, (Blt_Operation)ScanOp, 4, 4, "oper @x,y",},
-    {"search", 3, (Blt_Operation)SearchOp, 3, 5, "pattern ?from? ?to?",},
-    {"selection", 3, (Blt_Operation)SelectOp, 3, 5, "oper ?index?",},
-    {"windows", 6, (Blt_Operation)WindowsOp, 2, 3, "?pattern?",},
-    {"xview", 1, (Blt_Operation)XViewOp, 2, 5,
+    {"gotoline", 2, (Blt_Op)GotoOp, 2, 3, "?line?",},
+    {"index", 1, (Blt_Op)IndexOp, 3, 3, "string",},
+    {"linepos", 1, (Blt_Op)LinePosOp, 3, 3, "string",},
+    {"range", 2, (Blt_Op)RangeOp, 2, 4, "?from? ?to?",},
+    {"scan", 2, (Blt_Op)ScanOp, 4, 4, "oper @x,y",},
+    {"search", 3, (Blt_Op)SearchOp, 3, 5, "pattern ?from? ?to?",},
+    {"selection", 3, (Blt_Op)SelectOp, 3, 5, "oper ?index?",},
+    {"windows", 6, (Blt_Op)WindowsOp, 2, 3, "?pattern?",},
+    {"xview", 1, (Blt_Op)XViewOp, 2, 5,
 	"?moveto fract? ?scroll number what?",},
-    {"yview", 1, (Blt_Operation)YViewOp, 2, 5,
+    {"yview", 1, (Blt_Op)YViewOp, 2, 5,
 	"?moveto fract? ?scroll number what?",},
 };
-static int numSpecs = sizeof(operSpecs) / sizeof(Blt_OpSpec);
+static int nTextOps = sizeof(textOps) / sizeof(Blt_OpSpec);
 
 static int
 TextWidgetCmd(clientData, interp, argc, argv)
@@ -4404,19 +4372,18 @@ TextWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    Blt_Operation proc;
+    Blt_Op proc;
     int result;
-    HText *textPtr = (HText *)clientData;
+    HText *htPtr = clientData;
 
-    proc = Blt_GetOperation(interp, numSpecs, operSpecs, BLT_OPER_ARG1,
-	argc, argv);
+    proc = Blt_GetOp(interp, nTextOps, textOps, BLT_OP_ARG1, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
-    Tk_Preserve((ClientData)textPtr);
-    result = (*proc) (textPtr, interp, argc, argv);
-    Tk_Release((ClientData)textPtr);
-    return (result);
+    Tcl_Preserve(htPtr);
+    result = (*proc) (htPtr, interp, argc, argv);
+    Tcl_Release(htPtr);
+    return result;
 }
 
 /*
@@ -4443,8 +4410,7 @@ TextCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    HText *textPtr;
-    Tk_Window mainWindow = (Tk_Window)clientData;
+    HText *htPtr;
     Screen *screenPtr;
     Tk_Window tkwin;
 
@@ -4453,37 +4419,40 @@ TextCmd(clientData, interp, argc, argv)
 	    " pathName ?option value?...\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    textPtr = (HText *)calloc(1, sizeof(HText));
-    assert(textPtr);
-    tkwin = Tk_CreateWindowFromPath(interp, mainWindow, argv[1], (char *)NULL);
+    htPtr = Blt_Calloc(1, sizeof(HText));
+    assert(htPtr);
+    tkwin = Tk_MainWindow(interp);
+    tkwin = Tk_CreateWindowFromPath(interp, tkwin, argv[1], (char *)NULL);
     if (tkwin == NULL) {
-	free((char *)textPtr);
+	Blt_Free(htPtr);
 	return TCL_ERROR;
     }
     /* Initialize the new hypertext widget */
 
     Tk_SetClass(tkwin, "Htext");
-    textPtr->tkwin = tkwin;
-    textPtr->display = Tk_Display(tkwin);
-    textPtr->interp = interp;
-    textPtr->numLines = textPtr->arraySize = 0;
-    textPtr->leader = 1;
-    textPtr->xScrollUnits = textPtr->yScrollUnits = 10;
-    textPtr->numRows = textPtr->numColumns = 0;
-    textPtr->selFirst = textPtr->selLast = -1;
-    textPtr->selAnchor = 0;
-    textPtr->exportSelection = TRUE;
-    textPtr->selBorderWidth = 2;
-    screenPtr = Tk_Screen(textPtr->tkwin);
-    textPtr->maxWidth = WidthOfScreen(screenPtr);
-    textPtr->maxHeight = HeightOfScreen(screenPtr);
-    Tcl_InitHashTable(&(textPtr->slaveTab), TCL_ONE_WORD_KEYS);
+    htPtr->tkwin = tkwin;
+    htPtr->display = Tk_Display(tkwin);
+    htPtr->interp = interp;
+    htPtr->nLines = htPtr->arraySize = 0;
+    htPtr->leader = 1;
+    htPtr->xScrollUnits = htPtr->yScrollUnits = 10;
+    htPtr->nRows = htPtr->nColumns = 0;
+    htPtr->selFirst = htPtr->selLast = -1;
+    htPtr->selAnchor = 0;
+    htPtr->exportSelection = TRUE;
+    htPtr->selBorderWidth = 2;
+    screenPtr = Tk_Screen(htPtr->tkwin);
+    htPtr->maxWidth = WidthOfScreen(screenPtr);
+    htPtr->maxHeight = HeightOfScreen(screenPtr);
+    Blt_InitHashTable(&(htPtr->widgetTable), BLT_ONE_WORD_KEYS);
 
     Tk_CreateSelHandler(tkwin, XA_PRIMARY, XA_STRING, TextSelectionProc,
-	(ClientData)textPtr, XA_STRING);
+	htPtr, XA_STRING);
     Tk_CreateEventHandler(tkwin, ExposureMask | StructureNotifyMask,
-	TextEventProc, (ClientData)textPtr);
-
+	TextEventProc, htPtr);
+#if (TK_MAJOR_VERSION > 4)
+    Blt_SetWindowInstanceData(tkwin, htPtr);
+#endif
     /*
      * -----------------------------------------------------------------
      *
@@ -4494,19 +4463,18 @@ TextCmd(clientData, interp, argc, argv)
      *
      * ------------------------------------------------------------------
      */
-    textPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], TextWidgetCmd,
-	(ClientData)textPtr, TextDeleteCmdProc);
+    htPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], TextWidgetCmd, htPtr, 
+	TextDeleteCmdProc);
 #ifdef ITCL_NAMESPACES
-    Itk_SetWidgetCommand(textPtr->tkwin, textPtr->cmdToken);
+    Itk_SetWidgetCommand(htPtr->tkwin, htPtr->cmdToken);
 #endif
-    if ((Tk_ConfigureWidget(interp, textPtr->tkwin, configSpecs, argc - 2,
-		argv + 2, (char *)textPtr, 0) != TCL_OK) ||
-	(ConfigureText(interp, textPtr) != TCL_OK)) {
-	Tk_DestroyWindow(textPtr->tkwin);
+    if ((Tk_ConfigureWidget(interp, htPtr->tkwin, configSpecs, argc - 2,
+		argv + 2, (char *)htPtr, 0) != TCL_OK) ||
+	(ConfigureText(interp, htPtr) != TCL_OK)) {
+	Tk_DestroyWindow(htPtr->tkwin);
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp, Tk_PathName(textPtr->tkwin), TCL_STATIC);
-
+    Tcl_SetResult(interp, Tk_PathName(htPtr->tkwin), TCL_VOLATILE);
     return TCL_OK;
 }
 

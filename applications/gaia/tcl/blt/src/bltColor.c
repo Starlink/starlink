@@ -72,101 +72,62 @@
 
 #ifndef WIN32
 
+#include "bltHash.h"
 #include "bltImage.h"
 
 #define NCOLORS		256
 
-#define	RED	0
-#define	GREEN	1
-#define BLUE	2
 
-#define R0	(cubePtr->r0)
-#define R1	(cubePtr->r1)
-#define G0	(cubePtr->g0)
-#define G1	(cubePtr->g1)
-#define B0	(cubePtr->b0)
-#define B1	(cubePtr->b1)
-
-typedef struct box {
-    int r0, r1;			/* min, max values: min exclusive max inclusive */
-    int g0, g1;
-    int b0, b1;
-    int vol;
-} Cube;
-
-typedef struct RGB {
-    unsigned short int red;
-    unsigned short int green;
-    unsigned short int blue;
-} RGB;
-
-/*
- *----------------------------------------------------------------------
- *
- * Histogram is in elements 1..HISTSIZE along each axis,
- * element 0 is for base or marginal value
- * NB: these must start out 0!
- *----------------------------------------------------------------------
- */
-
-typedef struct ColorStats {
-    float gm2[33][33][33];
-    long int wt[33][33][33];
-    long int mR[33][33][33];
-    long int mG[33][33][33];
-    long int mB[33][33][33];
-} ColorStats;
-
-typedef struct ColorControl {
-    XColor usedColors[256];	/* Colors already use, queried from the
-				 * current colormap. */
-    int numUsedColors;		/* Number of color slots used. */
-    int numFreeColors;		/* Number of free slots in the color map */
-
-    int freqArr[NCOLORS];	/* Frequency of quantized colors used */
-
-    int acceptError;		/* Threshold error value, to accept or not
-				 * accept a colormap.  The error is the
-				 * sum of the distances */
-
-    int useExact;		/* If non-zero, indicates to use the colors
-				 * from the image, not a linear color ramp */
-
-    int numKeepColors;		/* When using a private colormap, these are
-				 * the number of colors to "keep" from the
-				 * default colormap, to limit flashing. */
-    int useBest;
-
-    int numWorstColors;		/* Number of the worst matching colors to
-				 * allocate before all others. */
-} ColorControl;
-
-
-
-static int
-BuildPalette(palettePtr, numReds, numGreens, numBlues)
-    register RGB *palettePtr;
-    unsigned int numReds, numGreens, numBlues;
+static void
+GetPaletteSizes(nColors, nRedsPtr, nGreensPtr, nBluesPtr)
+    int nColors;		/* Number of colors requested. */
+    unsigned int *nRedsPtr;	/* (out) Number of red components. */
+    unsigned int *nGreensPtr;	/* (out) Number of green components. */
+    unsigned int *nBluesPtr;	/* (out) Number of blue components. */
 {
-    register unsigned int red, green, blue;
-    register int numColors;
-    unsigned int short redVal, greenVal, blueVal;
+    unsigned int nBlues, nReds, nGreens;
 
-    numColors = 0;
-    for (red = 0; red < numReds; red++) {
-	redVal = (red * USHRT_MAX) / (numReds - 1);
-	for (green = 0; green < numGreens; green++) {
-	    greenVal = (green * USHRT_MAX) / (numGreens - 1);
-	    for (blue = 0; blue < numBlues; blue++) {
-		blueVal = (blue * USHRT_MAX) / (numBlues - 1);
-		palettePtr->red = (unsigned short int)redVal;
-		palettePtr->green = (unsigned short int)greenVal;
-		palettePtr->blue = (unsigned short int)blueVal;
-		palettePtr++, numColors++;
+    assert(nColors > 1); 
+    nBlues = nReds = nGreens = 0;
+    while ((nBlues * nBlues * nBlues) <= nColors) {
+	nBlues++;
+    }
+    nBlues--;
+    while ((nReds * nReds * nBlues) <= nColors) {
+	nReds++;
+    }
+    nReds--;
+    nGreens = nColors / (nBlues * nReds);
+
+    *nRedsPtr = nReds;
+    *nGreensPtr = nGreens;
+    *nBluesPtr = nBlues;
+}
+
+static void
+BuildColorRamp(palettePtr, nColors)
+    Pix32 *palettePtr;
+    int nColors;
+{
+    register unsigned int r, g, b;
+    unsigned int short red, green, blue;
+    unsigned int nReds, nGreens, nBlues;
+
+    GetPaletteSizes(nColors, &nReds, &nGreens, &nBlues);
+    for (r = 0; r < nReds; r++) {
+	red = (r * USHRT_MAX) / (nReds - 1);
+	for (g = 0; g < nGreens; g++) {
+	    green = (g * USHRT_MAX) / (nGreens - 1);
+	    for (b = 0; b < nBlues; b++) {
+		blue = (b * USHRT_MAX) / (nBlues - 1);
+		palettePtr->Red = red;
+		palettePtr->Green = green;
+		palettePtr->Blue = blue;
+		palettePtr++;
 	    }
 	}
     }
-    return numColors;
+
 }
 
 /*
@@ -174,14 +135,15 @@ BuildPalette(palettePtr, numReds, numGreens, numBlues)
  *
  * QueryColormap --
  *
- *	Fills an array or XColors with the color values (RGB and pixel)
- *	currently allocated in the colormap.
+ *	This is for psuedo-color displays only.  Fills an array or
+ *	XColors with the color values (RGB and pixel) currently
+ *	allocated in the colormap.
  *
  * Results:
  *	The number of colors allocated is returned. The array "colorArr"
  *	will contain the XColor values of each color in the colormap.
  *
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------- 
  */
 
 static int
@@ -231,371 +193,11 @@ QueryColormap(display, colorMap, mapColors, numMapColorsPtr)
     }
     XQueryColors(display, colorMap, mapColors, numMapColors);
     *numMapColorsPtr = numMapColors;
-#ifndef notdef
+#ifdef notdef
     fprintf(stderr, "Number of colors (allocated/free) %d/%d\n", numMapColors,
 	numAvail);
 #endif
     return numAvail;
-}
-
-/*
- * Build 3-D color histogram of counts, R/G/B, c^2
- */
-static void
-Hist3d(statsPtr, image)
-    ColorStats *statsPtr;
-    ColorImage image;
-{
-    register int r, g, b;
-    float table[NCOLORS];
-    int numPixels;
-    Pix32 *pixelPtr;
-    register int i;
-
-    /* Precompute table of squares. */
-    for (i = 0; i < NCOLORS; i++) {
-	table[i] = i * i;
-    }
-    numPixels = ColorImageWidth(image) * ColorImageHeight(image);
-    pixelPtr = ColorImageData(image);
-    for (i = 0; i < numPixels; i++, pixelPtr++) {
-	/*
-	 * Reduce the number of bits (5) per color component. This
-	 * will keep the table size (2^15) reasonable without perceptually
-	 * affecting the final image.
-	 */
-	r = (pixelPtr->Red >> 3) + 1;
-	g = (pixelPtr->Green >> 3) + 1;
-	b = (pixelPtr->Blue >> 3) + 1;
-	statsPtr->wt[r][g][b] += 1;
-	statsPtr->mR[r][g][b] += pixelPtr->Red;
-	statsPtr->mG[r][g][b] += pixelPtr->Green;
-	statsPtr->mB[r][g][b] += pixelPtr->Blue;
-	statsPtr->gm2[r][g][b] +=
-	    table[pixelPtr->Red] + table[pixelPtr->Green] + table[pixelPtr->Blue];
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- * At conclusion of the histogram step, we can interpret
- *   wt[r][g][b] = sum over voxel of P(c)
- *   mR[r][g][b] = sum over voxel of r*P(c)  ,  similarly for mG, mB
- *   m2[r][g][b] = sum over voxel of c^2*P(c)
- * Actually each of these should be divided by 'size' to give the usual
- * interpretation of P() as ranging from 0 to 1, but we needn't do that here.
- *----------------------------------------------------------------------
- */
-
-/*
- *----------------------------------------------------------------------
- We now convert histogram into moments so that we can rapidly calculate
- * the sums of the above quantities over any desired box.
- *----------------------------------------------------------------------
- */
-
-static void
-M3d(wt, mR, mG, mB, gm2)	/* compute cumulative moments. */
-    long int wt[33][33][33];	/* # pixels in voxel */
-    long int mR[33][33][33];	/* Sum over voxel of red pixel values */
-    long int mG[33][33][33];	/* Sum over voxel of green pixel values */
-    long int mB[33][33][33];	/* Sum over voxel of blue pixel values */
-    float gm2[33][33][33];	/* Variance */
-{
-    register unsigned char i, r, g, b;
-    long int line, line_r, line_g, line_b;
-    long int area[33], area_r[33], area_g[33], area_b[33];
-    float line2, area2[33];
-
-    for (r = 1; r <= 32; r++) {
-	for (i = 0; i <= 32; ++i) {
-	    area2[i] = area[i] = area_r[i] = area_g[i] = area_b[i] = 0;
-	}
-	for (g = 1; g <= 32; g++) {
-	    line2 = line = line_r = line_g = line_b = 0;
-	    for (b = 1; b <= 32; b++) {
-		/* ind1 = RGBIndex(r, g, b); */
-
-		line += wt[r][g][b];
-		line_r += mR[r][g][b];
-		line_g += mG[r][g][b];
-		line_b += mB[r][g][b];
-		line2 += gm2[r][g][b];
-
-		area[b] += line;
-		area_r[b] += line_r;
-		area_g[b] += line_g;
-		area_b[b] += line_b;
-		area2[b] += line2;
-
-		/* ind2 = ind1 - 1089; [r-1][g][b] */
-		wt[r][g][b] = wt[r - 1][g][b] + area[b];
-		mR[r][g][b] = mR[r - 1][g][b] + area_r[b];
-		mG[r][g][b] = mG[r - 1][g][b] + area_g[b];
-		mB[r][g][b] = mB[r - 1][g][b] + area_b[b];
-		gm2[r][g][b] = gm2[r - 1][g][b] + area2[b];
-	    }
-	}
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- *
- *	Compute sum over a box of any given statistic
- *
- *----------------------------------------------------------------------
- */
-static INLINE long int
-Vol(cubePtr, mmt)
-    struct box *cubePtr;
-    long int mmt[33][33][33];
-{
-    return (mmt[R1][G1][B1] - mmt[R1][G1][B0] -
-	mmt[R1][G0][B1] + mmt[R1][G0][B0] -
-	mmt[R0][G1][B1] + mmt[R0][G1][B0] +
-	mmt[R0][G0][B1] - mmt[R0][G0][B0]);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- *	The next two routines allow a slightly more efficient
- *	calculation of Vol() for a proposed subbox of a given box.
- *	The sum of Top() and Bottom() is the Vol() of a subbox split
- *	in the given direction and with the specified new upper
- *	bound.
- *
- *----------------------------------------------------------------------
- */
-
-/* Compute part of Vol(cubePtr, mmt) that doesn't depend on r1, g1, or b1 */
-/* (depending on dir) */
-static long int
-Bottom(cubePtr, dir, mmt)
-    struct box *cubePtr;
-    unsigned char dir;
-    long int mmt[33][33][33];
-{
-    switch (dir) {
-    case RED:
-	return (-mmt[R0][G1][B1] + mmt[R0][G1][B0] + mmt[R0][G0][B1] -
-	    mmt[R0][G0][B0]);
-
-    case GREEN:
-	return (-mmt[R1][G0][B1] + mmt[R1][G0][B0] + mmt[R0][G0][B1] -
-	    mmt[R0][G0][B0]);
-
-    case BLUE:
-	return (-mmt[R1][G1][B0] + mmt[R1][G0][B0] + mmt[R0][G1][B0] -
-	    mmt[R0][G0][B0]);
-    }
-    return 0;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * Compute remainder of Vol(cubePtr, mmt), substituting pos for
- * r1, g1, or b1 (depending on dir)
- *
- *----------------------------------------------------------------------
- */
-static long int
-Top(cubePtr, dir, pos, mmt)
-    struct box *cubePtr;
-    unsigned char dir;
-    int pos;
-    long int mmt[33][33][33];
-{
-    switch (dir) {
-    case RED:
-	return (mmt[pos][G1][B1] - mmt[pos][G1][B0] -
-	    mmt[pos][G0][B1] + mmt[pos][G0][B0]);
-
-    case GREEN:
-	return (mmt[R1][pos][B1] - mmt[R1][pos][B0] -
-	    mmt[R0][pos][B1] + mmt[R0][pos][B0]);
-
-    case BLUE:
-	return (mmt[R1][G1][pos] - mmt[R1][G0][pos] -
-	    mmt[R0][G1][pos] + mmt[R0][G0][pos]);
-    }
-    return 0;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- *	Compute the weighted variance of a box NB: as with the raw
- *	statistics, this is really the (variance * size)
- *
- *----------------------------------------------------------------------
- */
-static float
-Var(cubePtr, statsPtr)
-    struct box *cubePtr;
-    ColorStats *statsPtr;
-{
-    float dR, dG, dB, xx;
-
-    dR = Vol(cubePtr, statsPtr->mR);
-    dG = Vol(cubePtr, statsPtr->mG);
-    dB = Vol(cubePtr, statsPtr->mB);
-    xx = (statsPtr->gm2[R1][G1][B1] - statsPtr->gm2[R1][G1][B0] -
-	statsPtr->gm2[R1][G0][B1] + statsPtr->gm2[R1][G0][B0] -
-	statsPtr->gm2[R0][G1][B1] + statsPtr->gm2[R0][G1][B0] +
-	statsPtr->gm2[R0][G0][B1] - statsPtr->gm2[R0][G0][B0]);
-
-    return (xx - (dR * dR + dG * dG + dB * dB) / (float)Vol(cubePtr, statsPtr->wt));
-}
-
-/*
- *----------------------------------------------------------------------
- *
- *	We want to minimize the sum of the variances of two subboxes.
- *	The sum(c^2) terms can be ignored since their sum over both
- *	subboxes is the same (the sum for the whole box) no matter
- *	where we split.  The remaining terms have a minus sign in
- *	the variance formula, so we drop the minus sign and MAXIMIZE
- *	the sum of the two terms.
- *
- *----------------------------------------------------------------------
- */
-static float
-Maximize(cubePtr, dir, first, last, cut, wholeR, wholeG, wholeB, wholeW,
-    statsPtr)
-    struct box *cubePtr;
-    unsigned char dir;
-    int first, last, *cut;
-    long int wholeR, wholeG, wholeB, wholeW;
-    ColorStats *statsPtr;
-{
-    register long int halfR, halfG, halfB, halfW;
-    long int baseR, baseG, baseB, baseW;
-    register int i;
-    register float temp, max;
-
-    baseR = Bottom(cubePtr, dir, statsPtr->mR);
-    baseG = Bottom(cubePtr, dir, statsPtr->mG);
-    baseB = Bottom(cubePtr, dir, statsPtr->mB);
-    baseW = Bottom(cubePtr, dir, statsPtr->wt);
-    max = 0.0;
-    *cut = -1;
-    for (i = first; i < last; i++) {
-	halfR = baseR + Top(cubePtr, dir, i, statsPtr->mR);
-	halfG = baseG + Top(cubePtr, dir, i, statsPtr->mG);
-	halfB = baseB + Top(cubePtr, dir, i, statsPtr->mB);
-	halfW = baseW + Top(cubePtr, dir, i, statsPtr->wt);
-
-	/* Now half_x is sum over lower half of box, if split at i */
-	if (halfW == 0) {	/* subbox could be empty of pixels! */
-	    continue;		/* never split into an empty box */
-	} else {
-	    temp = ((float)halfR * halfR + (float)halfG * halfG +
-		(float)halfB * halfB) / halfW;
-	}
-	halfR = wholeR - halfR;
-	halfG = wholeG - halfG;
-	halfB = wholeB - halfB;
-	halfW = wholeW - halfW;
-	if (halfW == 0) {	/* Subbox could be empty of pixels! */
-	    continue;		/* never split into an empty box */
-	} else {
-	    temp += ((float)halfR * halfR + (float)halfG * halfG +
-		(float)halfB * halfB) / halfW;
-	}
-	if (temp > max) {
-	    max = temp;
-	    *cut = i;
-	}
-    }
-    return max;
-}
-
-/*
- *----------------------------------------------------------------------
- *----------------------------------------------------------------------
- */
-static int
-Cut(set1, set2, statsPtr)
-    struct box *set1, *set2;
-    ColorStats *statsPtr;
-{
-    unsigned char dir;
-    int cutRed, cutGreen, cutBlue;
-    float maxRed, maxGreen, maxBlue;
-    long int wholeR, wholeG, wholeB, wholeW;
-
-    wholeR = Vol(set1, statsPtr->mR);
-    wholeG = Vol(set1, statsPtr->mG);
-    wholeB = Vol(set1, statsPtr->mB);
-    wholeW = Vol(set1, statsPtr->wt);
-
-    maxRed = Maximize(set1, RED, set1->r0 + 1, set1->r1, &cutRed,
-	wholeR, wholeG, wholeB, wholeW, statsPtr);
-    maxGreen = Maximize(set1, GREEN, set1->g0 + 1, set1->g1, &cutGreen,
-	wholeR, wholeG, wholeB, wholeW, statsPtr);
-    maxBlue = Maximize(set1, BLUE, set1->b0 + 1, set1->b1, &cutBlue,
-	wholeR, wholeG, wholeB, wholeW, statsPtr);
-
-    if ((maxRed >= maxGreen) && (maxRed >= maxBlue)) {
-	dir = RED;
-	if (cutRed < 0) {
-	    return 0;		/* can't split the box */
-	}
-    } else {
-	dir = ((maxGreen >= maxRed) && (maxGreen >= maxBlue)) ? GREEN : BLUE;
-    }
-    set2->r1 = set1->r1;
-    set2->g1 = set1->g1;
-    set2->b1 = set1->b1;
-
-    switch (dir) {
-    case RED:
-	set2->r0 = set1->r1 = cutRed;
-	set2->g0 = set1->g0;
-	set2->b0 = set1->b0;
-	break;
-
-    case GREEN:
-	set2->g0 = set1->g1 = cutGreen;
-	set2->r0 = set1->r0;
-	set2->b0 = set1->b0;
-	break;
-
-    case BLUE:
-	set2->b0 = set1->b1 = cutBlue;
-	set2->r0 = set1->r0;
-	set2->g0 = set1->g0;
-	break;
-    }
-    set1->vol = (set1->r1 - set1->r0) * (set1->g1 - set1->g0) *
-	(set1->b1 - set1->b0);
-    set2->vol = (set2->r1 - set2->r0) * (set2->g1 - set2->g0) *
-	(set2->b1 - set2->b0);
-    return 1;
-}
-
-/*
- *----------------------------------------------------------------------
- *--------------------------------------------------------------------
- */
-static void
-Mark(cubePtr, label, tag)
-    struct box *cubePtr;
-    int label;
-    unsigned int tag[33][33][33];
-{
-    register int r, g, b;
-
-    for (r = R0 + 1; r <= R1; r++) {
-	for (g = G0 + 1; g <= G1; g++) {
-	    for (b = B0 + 1; b <= B1; b++) {
-		tag[r][g][b] = label;
-	    }
-	}
-    }
 }
 
 static void
@@ -609,9 +211,8 @@ FindClosestColor(colorPtr, mapColors, numMapColors)
     double dist, min;
     XColor *lastMatch;
     register XColor *mapColorPtr;
-    extern double bltPosInfinity;
 
-    min = bltPosInfinity;	/* Any color is closer. */
+    min = DBL_MAX;	/* Any color is closer. */
     lastMatch = NULL;
 
     /* Linear search of color */
@@ -622,11 +223,6 @@ FindClosestColor(colorPtr, mapColors, numMapColors)
 	g = (double)mapColorPtr->green - (double)colorPtr->exact.green;
 	b = (double)mapColorPtr->blue - (double)colorPtr->exact.blue;
 
-#ifdef notdef
-	dist = (30 * r * r) + (59 * g * g) + (11 * b * b);
-	dist = 212 * r * r + 715 * g * g + 72 * b * b;
-	dist = 2.0 * (r * r) + (b * b) + 3.0 * (g * g);
-#endif
 	dist = (r * r) + (b * b) + (g * g);
 	if (dist < min) {
 	    min = dist;
@@ -642,18 +238,10 @@ static int
 CompareColors(a, b)
     void *a, *b;
 {
-    int diff;
     ColorInfo *i1Ptr, *i2Ptr;
 
     i1Ptr = *(ColorInfo **) a;
     i2Ptr = *(ColorInfo **) b;
-#ifndef notdef
-    /* Compare colors based upon frequency */
-    diff = i2Ptr->freq - i1Ptr->freq;
-    if (ABS(diff) > 100) {
-	return diff;
-    }
-#endif
     if (i2Ptr->error > i1Ptr->error) {
 	return 1;
     } else if (i2Ptr->error < i1Ptr->error) {
@@ -665,8 +253,8 @@ CompareColors(a, b)
 static float
 MatchColors(colorTabPtr, rgbPtr, numColors, numAvailColors, numMapColors,
     mapColors)
-    struct ColorTable *colorTabPtr;
-    register RGB *rgbPtr;
+    struct ColorTableStruct *colorTabPtr;
+    Pix32 *rgbPtr;
     int numColors;
     int numAvailColors;
     int numMapColors;
@@ -687,9 +275,9 @@ MatchColors(colorTabPtr, rgbPtr, numColors, numAvailColors, numMapColors,
     for (i = 0; i < numColors; i++, colorPtr++, rgbPtr++) {
 	colorPtr->index = i;
 	colorTabPtr->sortedColors[i] = colorPtr;
-	colorPtr->exact.red = rgbPtr->red;
-	colorPtr->exact.green = rgbPtr->green;
-	colorPtr->exact.blue = rgbPtr->blue;
+	colorPtr->exact.red = rgbPtr->Red;
+	colorPtr->exact.green = rgbPtr->Green;
+	colorPtr->exact.blue = rgbPtr->Blue;
 	colorPtr->exact.flags = (DoRed | DoGreen | DoBlue);
 	FindClosestColor(colorPtr, mapColors, numMapColors);
     }
@@ -720,24 +308,18 @@ MatchColors(colorTabPtr, rgbPtr, numColors, numAvailColors, numMapColors,
     return sum;
 }
 
+    
 static int
-AllocateColors(numImageColors, colorTabPtr, matchOnly)
-    int numImageColors;
-    struct ColorTable *colorTabPtr;
+AllocateColors(nImageColors, colorTabPtr, matchOnly)
+    int nImageColors;
+    struct ColorTableStruct *colorTabPtr;
     int matchOnly;
 {
     register int i;
     register ColorInfo *colorPtr;
     unsigned long int pixelValue;
 
-#ifndef notdef
-    if (colorTabPtr->numPixels > 0) {
-	fprintf(stderr, "freeing %d pixels\n", colorTabPtr->numPixels);
-	XFreeColors(colorTabPtr->display, colorTabPtr->colorMap,
-	    colorTabPtr->pixelValues, colorTabPtr->numPixels, 0);
-    }
-#endif
-    for (i = 0; i < numImageColors; i++) {
+    for (i = 0; i < nImageColors; i++) {
 	colorPtr = colorTabPtr->sortedColors[i];
 	if (matchOnly) {
 	    XAllocColor(colorTabPtr->display, colorTabPtr->colorMap,
@@ -757,390 +339,8 @@ AllocateColors(numImageColors, colorTabPtr, matchOnly)
 	}
 	colorTabPtr->pixelValues[colorPtr->index] = pixelValue;
     }
-    colorTabPtr->numPixels = numImageColors;
+    colorTabPtr->nPixels = nImageColors;
     return 1;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * QuantizeColorImage --
- *
- *	C Implementation of Wu's Color Quantizer (v. 2) (see Graphics Gems
- *	vol. II, pp. 126-133)
- *
- *	Author: Xiaolin Wu
- *		Dept. of Computer Science Univ. of Western
- *		Ontario London, Ontario
- *		N6A 5B7
- *		wu@csd.uwo.ca
- *
- *	Algorithm:
- *		Greedy orthogonal bipartition of RGB space for variance
- *		minimization aided by inclusion-exclusion tricks.  For
- *		speed no nearest neighbor search is done. Slightly
- *		better performance can be expected by more
- *		sophisticated but more expensive versions.
- *
- *	The author thanks Tom Lane at Tom_Lane@G.GP.CS.CMU.EDU for much of
- *	additional documentation and a cure to a previous bug.
- *
- *	Free to distribute, comments and suggestions are appreciated.
- *
- *----------------------------------------------------------------------
- */
-static int
-QuantizeColorImage(image, colorTabPtr)
-    ColorImage image;		/* Source image */
-    struct ColorTable *colorTabPtr;
-{
-    float error;
-    int best = 1;
-    struct box *cubePtr;
-    struct box cubeArr[NCOLORS];
-    int numColors, numFreeColors, numQuantized;
-    int numBestColors;
-    int next;
-    register long int i, weight;
-    register int k;
-    float vv[NCOLORS], temp;
-    ColorStats *statsPtr;
-    float maxError;
-    RGB palette[NCOLORS];
-    RGB *rgbPtr;
-    int numMapColors, numAvail;
-    int matchOnly;
-    XColor mapColors[NCOLORS];
-
-    /*
-     * Allocated a structure to hold color statistics.
-    */
-    statsPtr = (ColorStats *) calloc(1, sizeof(ColorStats));
-    assert(statsPtr);
-
-    Hist3d(statsPtr, image);
-    M3d(statsPtr->wt, statsPtr->mR, statsPtr->mG, statsPtr->mB,
-	statsPtr->gm2);
-
-    switch (colorTabPtr->visualInfo.class) {
-    case StaticGray:
-    case StaticColor:
-    case GrayScale:
-	maxError = 320000.0;
-	break;
-    default:
-	maxError = 121.0;
-	break;
-    }
-
-
-  retry:
-    numColors = NCOLORS;
-    matchOnly = TRUE;
-    if (best) {
-	int numReds, numGreens, numBlues;
-	static int colorVar[7][3] =
-	{
-	    {8, 8, 4, /*  #red, #green, #blue */ },
-	    {7, 7, 4, /* 8 bits, 198 colors */ },
-	    {5, 6, 4, /* 7 bits, 120 colors */ },
-	    {4, 5, 3, /* 6 bits, 60 colors */ },
-	    {3, 4, 2, /* 5 bits, 24 colors */ },
-	    {2, 3, 2, /* 4 bits, 12 colors */ },
-	    {2, 2, 2, /* 3 bits, 8 colors */ },
-	};
-
-	numAvail = QueryColormap(colorTabPtr->display, colorTabPtr->colorMap,
-	    mapColors, &numMapColors);
-
-	numReds = colorVar[1][RED];
-	numGreens = colorVar[1][GREEN];
-	numBlues = colorVar[1][BLUE];
-
-	for (i = 0; i < 7; i++) {
-	    numColors = BuildPalette(palette, numReds, numGreens, numBlues);
-	    error = MatchColors(colorTabPtr, palette, numColors, numAvail,
-		numMapColors, mapColors);
-	    fprintf(stderr, "numColors=%d, error=%f\n", numColors, error);
-	    if (error < 1.0) {
-		break;
-	    }
-	    /*
-	     * Reduce the number of shades of each primary to about
-	     * 3/4 of the previous value.  This should reduce the
-	     * total number of colors required to about half the
-	     * previous value for PseudoColor displays.
-	     * (Huh?. Try doing the math again).
-	     */
-
-	    numReds = (numReds * 3 + 2) / 4;
-	    numGreens = (numGreens * 3 + 2) / 4;
-	    numBlues = (numBlues * 3 + 2) / 4;
-	}
-	AllocateColors(numColors, colorTabPtr, FALSE);
-	numBestColors = numColors;
-	/* numColors = NCOLORS; */
-	matchOnly = TRUE;
-	maxError = 320000.0;
-	numFreeColors = 0;
-    }
-    numAvail = QueryColormap(colorTabPtr->display, colorTabPtr->colorMap,
-	mapColors, &numMapColors);
-
-    for (;;) {
-	cubeArr[0].r0 = cubeArr[0].g0 = cubeArr[0].b0 = 0;
-	cubeArr[0].r1 = cubeArr[0].g1 = cubeArr[0].b1 = 32;
-
-	next = 0;
-
-	for (i = 1; i < numColors; i++) {
-	    if (Cut(cubeArr + next, cubeArr + i, statsPtr)) {
-		/*
-		 * Volume test ensures we won't try to cut one-cell box
-		 */
-		vv[next] = (cubeArr[next].vol > 1) ?
-		    Var(cubeArr + next, statsPtr) : 0.0;
-		vv[i] = (cubeArr[i].vol > 1) ?
-		    Var(cubeArr + i, statsPtr) : 0.0;
-	    } else {
-		vv[next] = 0.0;	/* don't try to split this box again */
-		i--;		/* didn't create box i */
-	    }
-
-	    next = 0;
-	    temp = vv[0];
-	    for (k = 1; k <= i; k++) {
-		if (vv[k] > temp) {
-		    temp = vv[k];
-		    next = k;
-		}
-	    }
-	    if (temp <= 0.0) {
-		numColors = i + 1;
-		fprintf(stderr, "Only got %d boxes\n", numColors);
-		break;
-	    }
-	}
-	rgbPtr = palette;
-	for (cubePtr = cubeArr, k = 0; k < numColors; k++, cubePtr++, rgbPtr++) {
-	    weight = Vol(cubePtr, statsPtr->wt);
-	    colorTabPtr->colorInfo[k].freq = weight;
-	    if (weight) {
-		rgbPtr->red =
-		    (Vol(cubePtr, statsPtr->mR) / weight) * (NCOLORS + 1);
-		rgbPtr->green =
-		    (Vol(cubePtr, statsPtr->mG) / weight) * (NCOLORS + 1);
-		rgbPtr->blue =
-		    (Vol(cubePtr, statsPtr->mB) / weight) * (NCOLORS + 1);
-	    } else {
-		fprintf(stderr, "bogus box %d\n", k);
-		rgbPtr->red = rgbPtr->green = rgbPtr->blue = 0;
-	    }
-	}
-	error = MatchColors(colorTabPtr, palette, numColors, numAvail,
-	    numMapColors, mapColors);
-	fprintf(stderr, "!!numColors=%d, error=%f\n", numColors, error);
-	if ((error > maxError) && (numColors > 32)) {
-	    numColors /= 2;
-	    continue;
-	}
-	numQuantized = numColors;
-	break;			/* Break out of loop */
-    }
-    if (!AllocateColors(numQuantized, colorTabPtr, matchOnly)) {
-	goto retry;		/* Color map changed */
-    }
-    for (cubePtr = cubeArr, k = 0; k < numQuantized; k++, cubePtr++) {
-	Mark(cubePtr, colorTabPtr->pixelValues[k], colorTabPtr->lut);
-    }
-    free((char *)statsPtr);
-    return numQuantized;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * AllocateBestColors --
- *
- *	C Implementation of Wu's Color Quantizer (v. 2) (see Graphics Gems
- *	vol. II, pp. 126-133)
- *
- *	Author: Xiaolin Wu
- *		Dept. of Computer Science Univ. of Western
- *		Ontario London, Ontario
- *		N6A 5B7
- *		wu@csd.uwo.ca
- *
- *	Algorithm:
- *		Greedy orthogonal bipartition of RGB space for variance
- *		minimization aided by inclusion-exclusion tricks.  For
- *		speed no nearest neighbor search is done. Slightly
- *		better performance can be expected by more
- *		sophisticated but more expensive versions.
- *
- *	The author thanks Tom Lane at Tom_Lane@G.GP.CS.CMU.EDU for much of
- *	additional documentation and a cure to a previous bug.
- *
- *	Free to distribute, comments and suggestions are appreciated.
- *
- *----------------------------------------------------------------------
- */
-static int
-AllocateBestColors(image, colorTabPtr)
-    ColorImage image;		/* Source image */
-    struct ColorTable *colorTabPtr;
-{
-    float error;
-    struct box *cubePtr;
-    struct box cubeArr[NCOLORS];
-    int numColors, numFreeColors;
-    int numBestColors;
-    int next;
-    register long int i, weight;
-    register int k;
-    float vv[NCOLORS], temp;
-    ColorStats *statsPtr;
-    float maxError;
-    RGB palette[NCOLORS];
-    RGB *rgbPtr;
-    int numMapColors, numAvail;
-    int matchOnly;
-    XColor mapColors[NCOLORS];
-    unsigned int pixelValues[NCOLORS];
-    int numReds, numGreens, numBlues;
-    static int paletteChoice[7][3] =
-    {
-	{8, 8, 4, /*  #red, #green, #blue */ },
-	{7, 7, 4, /* 8 bits, 198 colors */ },
-	{5, 6, 4, /* 7 bits, 120 colors */ },
-	{4, 5, 3, /* 6 bits, 60 colors */ },
-	{3, 4, 2, /* 5 bits, 24 colors */ },
-	{2, 3, 2, /* 4 bits, 12 colors */ },
-	{2, 2, 2, /* 3 bits, 8 colors */ },
-    };
-
-    numColors = NCOLORS;
-    matchOnly = TRUE;
-
-
-    numAvail = QueryColormap(colorTabPtr->display, colorTabPtr->colorMap,
-	mapColors, &numMapColors);
-
-    numReds = paletteChoice[1][RED];
-    numGreens = paletteChoice[1][GREEN];
-
-    numBlues = paletteChoice[1][BLUE];
-
-    for (i = 0; i < 7; i++) {
-	numColors = BuildPalette(palette, numReds, numGreens, numBlues);
-	error = MatchColors(colorTabPtr, palette, numColors, numAvail,
-	    numMapColors, mapColors);
-	fprintf(stderr, "numColors=%d, error=%f\n", numColors, error);
-	if (error < 1.0) {
-	    break;
-	}
-	/*
-	 * Reduce the number of shades of each primary to about
-	 * 3/4 of the previous value.  This should reduce the
-	 * total number of colors required to about half the
-	 * previous value for PseudoColor displays.
-	 * (Huh?. Try doing the math again).
-	 */
-	numReds = (numReds * 3 + 2) / 4;
-	numGreens = (numGreens * 3 + 2) / 4;
-	numBlues = (numBlues * 3 + 2) / 4;
-    }
-
-    AllocateColors(numColors, colorTabPtr, FALSE);
-
-    numBestColors = numColors;
-    matchOnly = TRUE;
-    maxError = 320000.0;
-    numFreeColors = 0;
-
-    /*
-     * Allocated a structure to hold color statistics.
-     */
-    statsPtr = (ColorStats *) calloc(1, sizeof(ColorStats));
-    assert(statsPtr);
-
-    Hist3d(statsPtr, image);
-    M3d(statsPtr->wt, statsPtr->mR, statsPtr->mG, statsPtr->mB,
-	statsPtr->gm2);
-
-    switch (colorTabPtr->visualInfo.class) {
-    case StaticGray:
-    case StaticColor:
-    case GrayScale:
-	maxError = 320000.0;
-	break;
-    default:
-	maxError = 1.0;
-	break;
-    }
-
-    numAvail = QueryColormap(colorTabPtr->display, colorTabPtr->colorMap,
-	mapColors, &numMapColors);
-
-    cubeArr[0].r0 = cubeArr[0].g0 = cubeArr[0].b0 = 0;
-    cubeArr[0].r1 = cubeArr[0].g1 = cubeArr[0].b1 = 32;
-
-    next = 0;
-
-    numColors = NCOLORS;
-    for (i = 1; i < numColors; i++) {
-	if (Cut(cubeArr + next, cubeArr + i, statsPtr)) {
-	    /*
-	     * Volume test ensures we won't try to cut one-cell box
-	     */
-	    vv[next] = (cubeArr[next].vol > 1) ?
-		Var(cubeArr + next, statsPtr) : 0.0;
-	    vv[i] = (cubeArr[i].vol > 1) ?
-		Var(cubeArr + i, statsPtr) : 0.0;
-	} else {
-	    vv[next] = 0.0;	/* don't try to split this box again */
-	    i--;		/* didn't create box i */
-	}
-
-	next = 0;
-	temp = vv[0];
-	for (k = 1; k <= i; k++) {
-	    if (vv[k] > temp) {
-		temp = vv[k];
-		next = k;
-	    }
-	}
-	if (temp <= 0.0) {
-	    numColors = i + 1;
-	    fprintf(stderr, "Only got %d boxes\n", numColors);
-	    break;
-	}
-    }
-    rgbPtr = palette;
-    for (cubePtr = cubeArr, k = 0; k < numColors; k++, cubePtr++, rgbPtr++) {
-	weight = Vol(cubePtr, statsPtr->wt);
-	colorTabPtr->colorInfo[k].freq = weight;
-	if (weight) {
-	    rgbPtr->red = (Vol(cubePtr, statsPtr->mR) / weight) * (NCOLORS + 1);
-	    rgbPtr->green = (Vol(cubePtr, statsPtr->mG) / weight) * (NCOLORS + 1);
-	    rgbPtr->blue = (Vol(cubePtr, statsPtr->mB) / weight) * (NCOLORS + 1);
-	} else {
-	    fprintf(stderr, "bogus box %d\n", k);
-	    rgbPtr->red = rgbPtr->green = rgbPtr->blue = 0;
-	}
-    }
-    error = MatchColors(colorTabPtr, palette, numColors, numAvail,
-	numMapColors, mapColors);
-    fprintf(stderr, "!!numColors=%d, error=%f\n", numColors, error);
-
-    for (k = 0; k < numColors; k++) {
-	pixelValues[k] = colorTabPtr->colorInfo[k].best.pixel;
-    }
-    for (cubePtr = cubeArr, k = 0; k < numColors; k++, cubePtr++) {
-	Mark(cubePtr, pixelValues[k], colorTabPtr->lut);
-    }
-    free((char *)statsPtr);
-    return numColors;
 }
 
 ColorTable
@@ -1148,15 +348,15 @@ Blt_CreateColorTable(tkwin)
     Tk_Window tkwin;
 {
     XVisualInfo visualInfo, *visualInfoPtr;
-    int numVisuals;
+    int nVisuals;
     Visual *visualPtr;
     Display *display;
-    struct ColorTable *colorTabPtr;
+    struct ColorTableStruct *colorTabPtr;
 
     display = Tk_Display(tkwin);
     visualPtr = Tk_Visual(tkwin);
 
-    colorTabPtr = (ColorTable) calloc(1, sizeof(struct ColorTable));
+    colorTabPtr = Blt_Calloc(1, sizeof(struct ColorTableStruct));
     assert(colorTabPtr);
     colorTabPtr->display = Tk_Display(tkwin);
     colorTabPtr->colorMap = Tk_Colormap(tkwin);
@@ -1164,7 +364,7 @@ Blt_CreateColorTable(tkwin)
     visualInfo.screen = Tk_ScreenNumber(tkwin);
     visualInfo.visualid = XVisualIDFromVisual(visualPtr);
     visualInfoPtr = XGetVisualInfo(display, VisualScreenMask | VisualIDMask,
-	&visualInfo, &numVisuals);
+	&visualInfo, &nVisuals);
 
     colorTabPtr->visualInfo = *visualInfoPtr;
     XFree(visualInfoPtr);
@@ -1174,16 +374,16 @@ Blt_CreateColorTable(tkwin)
 
 void
 Blt_FreeColorTable(colorTabPtr)
-    struct ColorTable *colorTabPtr;
+    struct ColorTableStruct *colorTabPtr;
 {
     if (colorTabPtr == NULL) {
 	return;
     }
-    if (colorTabPtr->numPixels > 0) {
+    if (colorTabPtr->nPixels > 0) {
 	XFreeColors(colorTabPtr->display, colorTabPtr->colorMap,
-	    colorTabPtr->pixelValues, colorTabPtr->numPixels, 0);
+	    colorTabPtr->pixelValues, colorTabPtr->nPixels, 0);
     }
-    free((char *)colorTabPtr);
+    Blt_Free(colorTabPtr);
 }
 
 extern int redAdjust, greenAdjust, blueAdjust;
@@ -1198,24 +398,25 @@ extern int redMaskShift, greenMaskShift, blueMaskShift;
  *	to allocate colors across the color spectrum.
  *
  * Results:
- *	The color image is converted to greyscale.
+ *
  *
  *----------------------------------------------------------------------
  */
+/*ARGSUSED*/
 ColorTable
 Blt_DirectColorTable(interp, tkwin, image)
     Tcl_Interp *interp;
     Tk_Window tkwin;
-    ColorImage image;
+    Blt_ColorImage image;
 {
-    struct ColorTable *colorTabPtr;
+    struct ColorTableStruct *colorTabPtr;
     Visual *visualPtr;
     Display *display;
     XColor color;
-    int numReds, numGreens, numBlues;
-    int redBand, greenBand, blueBand;
-    int lastRed, lastGreen, lastBlue;
-    unsigned int red, green, blue;
+    int nr, ng, nb;
+    int rBand, gBand, bBand;
+    int rLast, gLast, bLast;
+    unsigned int r, g, b;
     unsigned int value;
     register int i;
 
@@ -1226,45 +427,44 @@ Blt_DirectColorTable(interp, tkwin, image)
     /*
      * Compute the number of distinct colors in each band
      */
-    numReds = ((unsigned int)visualPtr->red_mask >> redMaskShift) + 1;
-    numGreens = ((unsigned int)visualPtr->green_mask >> greenMaskShift) + 1;
-    numBlues = ((unsigned int)visualPtr->blue_mask >> blueMaskShift) + 1;
+    nr = ((unsigned int)visualPtr->red_mask >> redMaskShift) + 1;
+    ng = ((unsigned int)visualPtr->green_mask >> greenMaskShift) + 1;
+    nb = ((unsigned int)visualPtr->blue_mask >> blueMaskShift) + 1;
 
 #ifdef notdef
-    assert((numReds <= visualPtr->map_entries) &&
-	(numGreens <= visualPtr->map_entries) &&
-	(numBlues <= visualPtr->map_entries));
+    assert((nr <= visualPtr->map_entries) && (ng <= visualPtr->map_entries) &&
+	(nb <= visualPtr->map_entries));
 #endif
-    redBand = NCOLORS / numReds;
-    greenBand = NCOLORS / numGreens;
-    blueBand = NCOLORS / numBlues;
+    rBand = NCOLORS / nr;
+    gBand = NCOLORS / ng;
+    bBand = NCOLORS / nb;
 
   retry:
     color.flags = (DoRed | DoGreen | DoBlue);
-    lastRed = lastGreen = lastBlue = 0;
-    red = green = blue = 0;
+    rLast = gLast = bLast = 0;
+    r = g = b = 0;
     for (i = 0; i < visualPtr->map_entries; i++) {
-	if (lastRed < NCOLORS) {
-	    red = lastRed + redBand;
-	    if (red > NCOLORS) {
-		red = NCOLORS;
+	if (rLast < NCOLORS) {
+	    r = rLast + rBand;
+	    if (r > NCOLORS) {
+		r = NCOLORS;
 	    }
 	}
-	if (lastGreen < NCOLORS) {
-	    green = lastGreen + greenBand;
-	    if (green > NCOLORS) {
-		green = NCOLORS;
+	if (gLast < NCOLORS) {
+	    g = gLast + gBand;
+	    if (g > NCOLORS) {
+		g = NCOLORS;
 	    }
 	}
-	if (lastBlue < NCOLORS) {
-	    blue = lastBlue + blueBand;
-	    if (blue > NCOLORS) {
-		blue = NCOLORS;
+	if (bLast < NCOLORS) {
+	    b = bLast + bBand;
+	    if (b > NCOLORS) {
+		b = NCOLORS;
 	    }
 	}
-	color.red = (red - 1) * (NCOLORS + 1);
-	color.green = (green - 1) * (NCOLORS + 1);
-	color.blue = (blue - 1) * (NCOLORS + 1);
+	color.red = (r - 1) * (NCOLORS + 1);
+	color.green = (g - 1) * (NCOLORS + 1);
+	color.blue = (b - 1) * (NCOLORS + 1);
 
 	if (!XAllocColor(display, colorTabPtr->colorMap, &color)) {
 	    XFreeColors(display, colorTabPtr->colorMap,
@@ -1277,13 +477,16 @@ Blt_DirectColorTable(interp, tkwin, image)
 		 */
 		fprintf(stderr, "Need to allocate private colormap\n");
 		colorTabPtr->colorMap = Tk_GetColormap(interp, tkwin, ".");
-		
-		XSetWindowColormap(display, Tk_WindowId(tkwin), colorTabPtr->colorMap);
+
+		XSetWindowColormap(display, Tk_WindowId(tkwin),
+		    colorTabPtr->colorMap);
 		colorTabPtr->flags |= PRIVATE_COLORMAP;
 		goto retry;
 	    }
+#ifdef notdef
 	    fprintf(stderr, "Failed to allocate after %d colors\n", i);
-	    free((char *)colorTabPtr);
+#endif
+	    Blt_Free(colorTabPtr);
 	    return NULL;	/* Ran out of colors in private map? */
 	}
 	colorTabPtr->pixelValues[i] = color.pixel;
@@ -1291,19 +494,19 @@ Blt_DirectColorTable(interp, tkwin, image)
 	 * Fill in pixel values for each band at this intensity
 	 */
 	value = color.pixel & visualPtr->red_mask;
-	while (lastRed < red) {
-	    colorTabPtr->red[lastRed++] = value;
+	while (rLast < r) {
+	    colorTabPtr->red[rLast++] = value;
 	}
 	value = color.pixel & visualPtr->green_mask;
-	while (lastGreen < green) {
-	    colorTabPtr->green[lastGreen++] = value;
+	while (gLast < g) {
+	    colorTabPtr->green[gLast++] = value;
 	}
 	value = color.pixel & visualPtr->blue_mask;
-	while (lastBlue < blue) {
-	    colorTabPtr->blue[lastBlue++] = value;
+	while (bLast < b) {
+	    colorTabPtr->blue[bLast++] = value;
 	}
     }
-    colorTabPtr->numPixels = i;
+    colorTabPtr->nPixels = i;
     return colorTabPtr;
 }
 
@@ -1314,38 +517,37 @@ Blt_DirectColorTable(interp, tkwin, image)
  */
 static int
 GetUniqueColors(image)
-    ColorImage image;
+    Blt_ColorImage image;
 {
-    register int i, numColors;
+    register int i, nColors;
     register Pix32 *pixelPtr;
     Pix32 color;
-    Tcl_HashEntry *hPtr;
-    int isNew, numPixels;
+    Blt_HashEntry *hPtr;
+    int isNew, nPixels;
     int refCount;
-    Tcl_HashTable colorTable;
-    
-    Tcl_InitHashTable(&colorTable, TCL_ONE_WORD_KEYS);
-    
-    numPixels = ColorImageWidth(image) * ColorImageHeight(image);
-    numColors = 0;
-    pixelPtr = ColorImageData(image);
-    for (i = 0; i < numPixels; i++, pixelPtr++) {
+    Blt_HashTable colorTable;
+
+    Blt_InitHashTable(&colorTable, BLT_ONE_WORD_KEYS);
+
+    nPixels = Blt_ColorImageWidth(image) * Blt_ColorImageHeight(image);
+    nColors = 0;
+    pixelPtr = Blt_ColorImageBits(image);
+    for (i = 0; i < nPixels; i++, pixelPtr++) {
 	color.value = pixelPtr->value;
-	color.Alpha = 0;	/* Ignore alpha-channel values */
-	hPtr = Tcl_CreateHashEntry(&colorTable, (char *)color.value, &isNew);
+	color.Alpha = 0xFF;	/* Ignore alpha-channel values */
+	hPtr = Blt_CreateHashEntry(&colorTable, (char *)color.value, &isNew);
 	if (isNew) {
 	    refCount = 1;
-	    numColors++;
+	    nColors++;
 	} else {
-	    refCount = (int)Tcl_GetHashValue(hPtr);
+	    refCount = (int)Blt_GetHashValue(hPtr);
 	    refCount++;
 	}
-	Tcl_SetHashValue(hPtr, (ClientData)refCount);
+	Blt_SetHashValue(hPtr, (ClientData)refCount);
     }
-    Tcl_DeleteHashTable(&colorTable);
-    return numColors;
+    Blt_DeleteHashTable(&colorTable);
+    return nColors;
 }
-
 
 #define Blt_DefaultColormap(tkwin)  \
 	DefaultColormap(Tk_Display(tkwin), Tk_ScreenNumber(tkwin))
@@ -1353,47 +555,46 @@ GetUniqueColors(image)
 
 static void
 PrivateColormap(interp, colorTabPtr, image, tkwin)
-     Tcl_Interp *interp;
-     struct ColorTable *colorTabPtr;
-     ColorImage image;
-     Tk_Window tkwin;
+    Tcl_Interp *interp;
+    struct ColorTableStruct *colorTabPtr;
+    Blt_ColorImage image;
+    Tk_Window tkwin;
 {
     int keepColors = 0;
-    int best = 1;
     register int i;
     XColor usedColors[NCOLORS];
-    int numFreeColors, numUsedColors;
+    int nFreeColors, nUsedColors;
     Colormap colorMap;
     int inUse[NCOLORS];
     XColor *colorPtr;
     XColor *imageColors;
-    
+
     /*
      * Create a private colormap if one doesn't already exist for the
      * window.
      */
-    
+
     colorTabPtr->colorMap = colorMap = Tk_Colormap(tkwin);
-    
-    numUsedColors = 0;	/* Number of colors allocated */
-    
-    if (colorTabPtr->numPixels > 0) {
+
+    nUsedColors = 0;		/* Number of colors allocated */
+
+    if (colorTabPtr->nPixels > 0) {
 	XFreeColors(colorTabPtr->display, colorTabPtr->colorMap,
-		    colorTabPtr->pixelValues, colorTabPtr->numPixels, 0);
+	    colorTabPtr->pixelValues, colorTabPtr->nPixels, 0);
     }
-    numFreeColors = QueryColormap(colorTabPtr->display, colorMap, usedColors,
-				  &numUsedColors);
+    nFreeColors = QueryColormap(colorTabPtr->display, colorMap, usedColors,
+	&nUsedColors);
     memset((char *)inUse, 0, sizeof(int) * NCOLORS);
-    if ((numUsedColors == 0) && (keepColors > 0)) {
-	
+    if ((nUsedColors == 0) && (keepColors > 0)) {
+
 	/*
 	 * We're starting with a clean colormap so find out what colors
 	 * have been used in the default colormap.
 	 */
-	
-	numFreeColors = QueryColormap(colorTabPtr->display,
-	      Blt_DefaultColormap(tkwin), usedColors, &numUsedColors);
-	
+
+	nFreeColors = QueryColormap(colorTabPtr->display,
+	    Blt_DefaultColormap(tkwin), usedColors, &nUsedColors);
+
 	/*
 	 * Copy a number of colors from the default colormap into the private
 	 * colormap.  We can assume that this is the working set from most
@@ -1402,8 +603,8 @@ PrivateColormap(interp, colorTabPtr, image, tkwin)
 	 * in and out, at least everything else should remain unaffected.
 	 */
 
-	if (numUsedColors > keepColors) {
-	    numUsedColors = keepColors;
+	if (nUsedColors > keepColors) {
+	    nUsedColors = keepColors;
 	}
 	/*
 	 * We want to allocate colors in the same ordering as the old colormap,
@@ -1412,22 +613,17 @@ PrivateColormap(interp, colorTabPtr, image, tkwin)
 	 */
 
     }
-    for (colorPtr = usedColors, i = 0; i < numUsedColors; i++, colorPtr++) {
+    for (colorPtr = usedColors, i = 0; i < nUsedColors; i++, colorPtr++) {
 	inUse[colorPtr->pixel] = TRUE;
     }
-    
+
     /*
      * In an "exact" colormap, we try to allocate as many of colors from the
      * image as we can fit.  If necessary, we'll cheat and reduce the number
      * of colors by quantizing.
      */
-    imageColors = usedColors + numUsedColors;
-    
-    if (best) {
-	AllocateBestColors(image, colorTabPtr);
-    } else {
-	QuantizeColorImage(image, colorTabPtr);
-    }
+    imageColors = usedColors + nUsedColors;
+
     Tk_SetWindowColormap(tkwin, colorMap);
 }
 
@@ -1435,21 +631,21 @@ ColorTable
 Blt_PseudoColorTable(interp, tkwin, image)
     Tcl_Interp *interp;
     Tk_Window tkwin;
-    ColorImage image;
+    Blt_ColorImage image;
 {
-    struct ColorTable *colorTabPtr;
+    struct ColorTableStruct *colorTabPtr;
     Colormap defColorMap;
     int usePrivate;
-    
+
     colorTabPtr = Blt_CreateColorTable(tkwin);
     defColorMap = DefaultColormap(colorTabPtr->display, Tk_ScreenNumber(tkwin));
     if (colorTabPtr->colorMap == defColorMap) {
 	fprintf(stderr, "Using default colormap\n");
     }
     /* All other visuals use an 8-bit colormap */
-    colorTabPtr->lut = (unsigned int *)malloc(sizeof(unsigned int) * 33 * 33 * 33);
+    colorTabPtr->lut = Blt_Malloc(sizeof(unsigned int) * 33 * 33 * 33);
     assert(colorTabPtr->lut);
-    
+
     usePrivate = TRUE;
     if (usePrivate) {
 	PrivateColormap(interp, colorTabPtr, image, tkwin);
@@ -1461,28 +657,26 @@ Blt_PseudoColorTable(interp, tkwin, image)
     return colorTabPtr;
 }
 
-
-
 #ifdef notdef
 
 static void
 ConvoleColorImage(srcImage, destImage, kernelPtr)
-    ColorImage srcImage, destImage;
+    Blt_ColorImage srcImage, destImage;
     ConvoleKernel *kernelPtr;
 {
     Pix32 *srcPtr, *destPtr;
     Pix32 *src[MAXROWS];
     register int x, y, i, j;
     int red, green, blue;
-    
+
     /* i = 0 case, ignore left column of pixels */
-    
-    srcPtr = ColorImageData(srcImage);
-    destPtr = ColorImageData(destImage);
-    
-    width = ColorImageWidth(srcImage);
-    height = ColorImageHeight(srcImage);
-    
+
+    srcPtr = Blt_ColorImageBits(srcImage);
+    destPtr = Blt_ColorImageBits(destImage);
+
+    width = Blt_ColorImageWidth(srcImage);
+    height = Blt_ColorImageHeight(srcImage);
+
     yOffset = kernelPtr->height / 2;
     xOffset = kernelPtr->width / 2;
     for (y = yOffset; y < (height - yOffset); y++) {
@@ -1519,11 +713,11 @@ ConvoleColorImage(srcImage, destImage, kernelPtr)
     greenVal = mid[0].Green - (error * blend / blend_divisor);
     error = (blue / 5) - mid[0].Blue;
     blueVal = mid[0].Blue - (error * blend / blend_divisor);
-    
+
     out[0].Red = CLAMP(redVal);
     out[0].Green = CLAMP(greenVal);
     out[0].Blue = CLAMP(blueVal);
-    
+
     for (i = 1; i < (width - 1); i++) {
 	for (chan = 0; chan < 3; chan++) {
 	    total = bot[chan][i - 1] + bot[chan][i] + bot[chan][i + 1] +
@@ -1549,35 +743,34 @@ ConvoleColorImage(srcImage, destImage, kernelPtr)
 
 static void
 DitherRow(srcImage, destImage, lastRow, curRow)
-    ColorImage srcImage;
-    ColorImage destImage;
+    Blt_ColorImage srcImage, destImage;
     int width, height;
     int bottom, top;
 {
     int width, height;
-    
-    width = ColorImageWidth(srcImage);
-    topPtr = ColorImageData(destPtr) + (width * row);
+
+    width = Blt_ColorImageWidth(srcImage);
+    topPtr = Blt_ColorImageBits(destPtr) + (width * row);
     rowPtr = topPtr + width;
     botPtr = rowPtr + width;
-    
+
     for (x = 0; x < width; x++) {
-	
+
 	/* Clamp current error entry */
-	
+
 	midPtr->red = CLAMP(midPtr->red);
 	midPtr->blue = CLAMP(midPtr->blue);
 	midPtr->green = CLAMP(midPtr->green);
-	
+
 	r = (midPtr->red >> 3) + 1;
 	g = (midPtr->green >> 3) + 1;
 	b = (midPtr->blue >> 3) + 1;
 	index = colorTabPtr->lut[r][g][b];
-	
+
 	redVal = midPtr->red * (NCOLORS + 1);
 	greenVal = midPtr->green * (NCOLORS + 1);
 	blueVal = midPtr->blue * (NCOLORS + 1);
-	
+
 	error = colorVal - colorMap[index].red;
 	if (x < 511) {
 	    currRow[x + 1].Red = currRow[x + 1].Red + 7 * error / 16;
@@ -1588,15 +781,15 @@ DitherRow(srcImage, destImage, lastRow, curRow)
 	    nextRow[x - 1].Red = nextRow[x - 1].Red + 3 * error / 16;
 	}
 	error = row[x][c] - colormap[index][c];
-	
+
 	value = srcPtr->channel[i] * error[i];
 	value = CLAMP(value);
 	destPtr->channel[i] = value;
-	
+
 	/* Closest pixel */
 	pixel = PsuedoColorPixel();
 	error[RED] = colorPtr->Red - srcPtr->Red * (NCOLORS + 1);
-	
+
 	/* translate pixel to colorInfoPtr to get error */
 	colorTabPtr->lut[r][g][b];
 	colorPtr = PixelToColorInfo(pixel);
@@ -1606,85 +799,84 @@ DitherRow(srcImage, destImage, lastRow, curRow)
 	register int j;
 	register short *thisptr, *nextptr = NULL;
 	int chan;
-	static int numchan = 0;
+	static int nchan = 0;
 	int lastline = 0, lastpixel;
 	static int *cval = 0;
 	static rle_pixel *pixel = 0;
-	
-	if (numchan != in_hdr->ncolors)
+
+	if (nchan != in_hdr->ncolors)
 	    if (cval) {
-		free(cval);
-		free(pixel);
+		Blt_Free(cval);
+		Blt_Free(pixel);
 	    }
-	numchan = in_hdr->ncolors;
+	nchan = in_hdr->ncolors;
 	if (!cval) {
-	    if ((cval = (int *)malloc(numchan * sizeof(int))) == 0)
-		MALLOC_ERR;
-	    if ((pixel = (rle_pixel *) malloc(numchan * sizeof(rle_pixel))) == 0)
-		MALLOC_ERR;
+	    if ((cval = Blt_Malloc(nchan * sizeof(int))) == 0)
+		    malloc_ERR;
+	    if ((pixel = Blt_Malloc(nchan * sizeof(rle_pixel))) == 0)
+		malloc_ERR;
 	}
 	optr = outrow[RLE_RED];
-	
+
 	thisptr = row_top;
 	if (row_bottom)
 	    nextptr = row_bottom;
 	else
 	    lastline = 1;
-	
+
 	for (x = 0; x < width; x++) {
 	    int cmap_index = 0;
-	    
+
 	    lastpixel = (x == (width - 1));
 	    val = srcPtr->Red;
-	    
+
 	    for (chan = 0; chan < 3; chan++) {
 		cval[chan] = *thisptr++;
-		
-		/* 
+
+		/*
 		 * Current channel value has been accumulating error,
-		 * it could be out of range.  
+		 * it could be out of range.
 		 */
 		if (cval[chan] < 0)
 		    cval[chan] = 0;
 		else if (cval[chan] > 255)
 		    cval[chan] = 255;
-		
+
 		pixel[chan] = cval[chan];
 	    }
-	    
+
 	    /* find closest color */
-	    find_closest(map, numchan, maplen, pixel, &cmap_index);
+	    find_closest(map, nchan, maplen, pixel, &cmap_index);
 	    *optr++ = cmap_index;
-	    
+
 	    /* thisptr is now looking at pixel to the right of current pixel
 	     * nextptr is looking at pixel below current pixel
 	     * So, increment thisptr as stuff gets stored.  nextptr gets moved
-	     * by one, and indexing is done +/- numchan.
+	     * by one, and indexing is done +/- nchan.
 	     */
-	    for (chan = 0; chan < numchan; chan++) {
+	    for (chan = 0; chan < nchan; chan++) {
 		cval[chan] -= map[chan][cmap_index];
-		
+
 		if (!lastpixel) {
 		    thisptr[chan] += cval[chan] * 7 / 16;
 		}
 		if (!lastline) {
 		    if (j != 0) {
-			nextptr[-numchan] += cval[chan] * 3 / 16;
+			nextptr[-nchan] += cval[chan] * 3 / 16;
 		    }
 		    nextptr[0] += cval[chan] * 5 / 16;
 		    if (!lastpixel) {
-			nextptr[numchan] += cval[chan] / 16;
+			nextptr[nchan] += cval[chan] / 16;
 		    }
 		    nextptr++;
 		}
 	    }
 	}
     }
-}    
-
+}
 
 /********************************************/
-static ColorImage
+static Blt_ColorImage
 DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap, rdisp, gdisp, bdisp, maplen)
     byte *pic24, *pic8, *rmap, *gmap, *bmap, *rdisp, *gdisp, *bdisp;
     int w, h, maplen;
@@ -1694,13 +886,13 @@ DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap, rdisp, gdisp, bdisp, maplen)
        and generates an 8-bit w*h image, which it returns.
        ignores input value 'pic8'
        returns NULL on error
-       
+
        note: the rdisp,gdisp,bdisp arrays should be the 'displayed' colors,
        not the 'desired' colors
-       
+
        if pic24 is NULL, uses the passed-in pic8 (an 8-bit image) as
        the source, and the rmap,gmap,bmap arrays as the desired colors */
-    
+
     byte *np, *ep, *newpic;
     short *cache;
     int r2, g2, b2;
@@ -1709,8 +901,8 @@ DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap, rdisp, gdisp, bdisp, maplen)
     int imax, jmax;
     int key;
     long cnt1, cnt2;
-    int error[512];	/* -255 .. 0 .. +255 */
-    
+    int error[512];		/* -255 .. 0 .. +255 */
+
     /* compute somewhat non-linear floyd-steinberg error mapping table */
     for (i = j = 0; i <= 0x40; i++, j++) {
 	error[256 + i] = j;
@@ -1724,65 +916,66 @@ DoColorDither(pic24, pic8, w, h, rmap, gmap, bmap, rdisp, gdisp, bdisp, maplen)
 	error[256 + i] = j;
 	error[256 - i] = -j;
     }
-    
+
     cnt1 = cnt2 = 0;
     pwide3 = w * 3;
     imax = h - 1;
     jmax = w - 1;
     ep = (pic24) ? pic24 : pic8;
-    
+
     /* attempt to malloc things */
-    newpic = (byte *) malloc((size_t) (w * h));
-    cache = (short *)calloc((size_t) (2 << 14), sizeof(short));
-    thisline = (int *)malloc(pwide3 * sizeof(int));
-    nextline = (int *)malloc(pwide3 * sizeof(int));
+    newpic = Blt_Malloc((size_t) (w * h));
+    cache = Blt_Calloc((size_t) (2 << 14), sizeof(short));
+    thisline = Blt_Malloc(pwide3 * sizeof(int));
+    nextline = Blt_Malloc(pwide3 * sizeof(int));
     if (!cache || !newpic || !thisline || !nextline) {
 	if (newpic)
-	    free(newpic);
+	    Blt_Free(newpic);
 	if (cache)
-	    free(cache);
+	    Blt_Free(cache);
 	if (thisline)
-	    free(thisline);
+	    Blt_Free(thisline);
 	if (nextline)
-	    free(nextline);
+	    Blt_Free(nextline);
 	return (byte *) NULL;
     }
     np = newpic;
-    
+
     /* Get first line of picture in reverse order. */
-    
-    srcPtr = ColorImageData(image), tempPtr = tempArr;
+
+    srcPtr = Blt_ColorImageBits(image), tempPtr = tempArr;
     for (x = 0; x < width; x++, tempPtr++, srcPtr--) {
 	*tempPtr = *srcPtr;
     }
-    
+
     for (y = 0; y < height; y++) {
 	tempPtr = curRowPtr, curRowPtr = nextRowPtr, nextRowPtr = tempPtr;
-	
-	if (y != (height - 1)) {	/* get next line */
+
+	if (y != (height - 1)) {/* get next line */
 	    for (x = 0; x < width; x++, tempPtr++, srcPtr--)
 		*tempPtr = *srcPtr;
 	}
     }
-    
-    
-    free(thisline);
-    free(nextline);
-    free(cache);
-    
+
+
+    Blt_Free(thisline);
+    Blt_Free(nextline);
+    Blt_Free(cache);
+
     return newpic;
 }
 
 
 static void
 DitherImage(image)
-     ColorImage image;
+    Blt_ColorImage image;
 {
     int width, height;
-    
-    
-    
+
+
+
 }
+
 #endif
 
 #endif /* WIN32 */

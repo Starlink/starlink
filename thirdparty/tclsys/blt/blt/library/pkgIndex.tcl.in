@@ -1,15 +1,39 @@
 # Tcl package index file, version 1.0
 
-proc Blt_MakePkgIndex { dir } {
-    set suffix SHLIB_SUFFIX
-    set soext [lindex [split $suffix "."] 1]
-    set library libBLT$suffix
-    foreach lib { AUX_LIBS } {
-	catch { load $lib.$soext BLT }
+proc LoadBLT { version dir } {
+
+    set prefix "%LIB_PREFIX%"
+    set suffix [info sharedlibextension]
+    regsub {\.} $version {} version_no_dots
+
+    # Determine whether to load the full BLT library or
+    # the "lite" tcl-only version.
+    
+    if { [info commands tk] == "tk" } {
+        set name ${prefix}BLT${version_no_dots}${suffix}
+    } else {
+        set name ${prefix}BLTlite${version_no_dots}${suffix}
     }
-    set path [file dirname $dir]
-    package ifneeded BLT BLT_VERSION [list load [file join $path $library] BLT]
+    
+    global tcl_platform
+    if { $tcl_platform(platform) == "unix" } {
+	set library [file join $dir $name]
+	if { ![file exists $library] } {
+	    # Try the parent directory.
+	    set library [file join [file dirname $dir] $name]
+	}
+	if { ![file exists $library] } {
+	    # Default to the path generated at compilation.
+	    set library [file join "%LIB_DIR%" $name]
+	}
+    } else {
+	set library $name
+    }
+    load $library BLT
 }
 
-Blt_MakePkgIndex $dir
-rename Blt_MakePkgIndex ""
+set version "%VERSION%"
+
+package ifneeded BLT $version [list LoadBLT $version $dir]
+
+# End of package index file

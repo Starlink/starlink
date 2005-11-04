@@ -26,12 +26,11 @@
  */
 
 #include "bltInt.h"
-#include <ctype.h>
-
+#include "bltList.h"
 
 /* Namespace related routines */
 
-typedef struct TclInterp {
+typedef struct {
     char *result;
     Tcl_FreeProc *freeProc;
     int errorLine;
@@ -40,14 +39,16 @@ typedef struct TclInterp {
 
     Tcl_HashTable globalTable;	/* This is the only field we care about */
 
-    int numLevels;
+    int nLevels;
     int maxNestingDepth;
 } TclInterp;
+
+
 
 /*
  * ----------------------------------------------------------------------
  *
- * Blt_NamespaceOfVariable --
+ * Blt_GetVariableNamespace --
  *
  *	Returns the namespace context of the vector variable.  If NULL,
  *	this indicates that the variable is local to the call frame.
@@ -62,7 +63,7 @@ typedef struct TclInterp {
  * ----------------------------------------------------------------------
  */
 
-#if (TCL_MAJOR_VERSION < 8)
+#if (TCL_MAJOR_VERSION == 7)
 
 #ifdef ITCL_NAMESPACES
 
@@ -70,13 +71,15 @@ struct VarTrace;
 struct ArraySearch;
 struct NamespCacheRef;
 
-typedef struct Var {
+typedef struct VarStruct Var;
+
+struct VarStruct {
     int valueLength;
     int valueSpace;
     union {
 	char *string;
 	Tcl_HashTable *tablePtr;
-	struct Var *upvarPtr;
+	Var *upvarPtr;
     } value;
     Tcl_HashEntry *hPtr;
     int refCount;
@@ -100,13 +103,13 @@ Tcl_FindNamespace(interp, name)
     Tcl_Interp *interp;
     char *name;
 {
-    Itcl_Namespace namesp;
+    Itcl_Namespace nsToken;
 
-    if (Itcl_FindNamesp(interp, name, 0, &namesp) != TCL_OK) {
+    if (Itcl_FindNamesp(interp, name, 0, &nsToken) != TCL_OK) {
 	Tcl_ResetResult(interp);
 	return NULL;
     }
-    return (Tcl_Namespace *) namesp;
+    return (Tcl_Namespace *) nsToken;
 }
 
 Tcl_Namespace *
@@ -124,9 +127,17 @@ Tcl_GetCurrentNamespace(interp)
 }
 
 Tcl_Namespace *
-Blt_NamespaceOfVariable(interp, name)
+Blt_GetCommandNamespace(interp, cmdToken)
     Tcl_Interp *interp;
-    char *name;
+    Tcl_Command cmdToken;
+{
+    return (Tcl_Namespace *)interp;
+}
+
+Tcl_Namespace *
+Blt_GetVariableNamespace(interp, name)
+    Tcl_Interp *interp;
+    CONST char *name;
 {
     Tcl_Var varToken;
     Var *varPtr;
@@ -146,9 +157,9 @@ Blt_EnterNamespace(interp, nsPtr)
     Tcl_Interp *interp;
     Tcl_Namespace *nsPtr;
 {
-    Itcl_Namespace nameSpace = (Itcl_Namespace) nsPtr;
+    Itcl_Namespace nsToken = (Itcl_Namespace) nsPtr;
 
-    return (Tcl_CallFrame *) Itcl_ActivateNamesp(interp, nameSpace);
+    return (Tcl_CallFrame *) Itcl_ActivateNamesp(interp, nsToken);
 }
 
 void
@@ -162,13 +173,22 @@ Blt_LeaveNamespace(interp, framePtr)
 #else
 
 Tcl_Namespace *
-Blt_NamespaceOfVariable(interp, name)
+Blt_GetCommandNamespace(interp, cmdToken)
     Tcl_Interp *interp;
-    char *name;
+    Tcl_Command cmdToken;
+{
+    return (Tcl_Namespace *)interp;
+}
+
+Tcl_Namespace *
+Blt_GetVariableNamespace(interp, name)
+    Tcl_Interp *interp;
+    CONST char *name;
 {
     TclInterp *iPtr = (TclInterp *) interp;
 
-    return (Tcl_Namespace *) Tcl_FindHashEntry(&(iPtr->globalTable), name);
+    return (Tcl_Namespace *)
+	Tcl_FindHashEntry(&(iPtr->globalTable), (char *)name);
 }
 
 Tcl_CallFrame *
@@ -213,14 +233,70 @@ Tcl_FindNamespace(interp, name)
 
 #else
 
+/*
+ * A Command structure exists for each command in a namespace. The
+ * Tcl_Command opaque type actually refers to these structures.
+ */
+
+typedef struct CompileProcStruct CompileProc;
+typedef struct ImportRefStruct ImportRef;
+
+typedef struct {
+    Tcl_HashEntry *hPtr;	/* Pointer to the hash table entry that
+				 * refers to this command. The hash table is
+				 * either a namespace's command table or an
+				 * interpreter's hidden command table. This
+				 * pointer is used to get a command's name
+				 * from its Tcl_Command handle. NULL means
+				 * that the hash table entry has been
+				 * removed already (this can happen if
+				 * deleteProc causes the command to be
+				 * deleted or recreated). */
+    Tcl_Namespace *nsPtr;	/* Points to the namespace containing this
+				 * command. */
+    int refCount;		/* 1 if in command hashtable plus 1 for each
+				 * reference from a CmdName Tcl object
+				 * representing a command's name in a
+				 * ByteCode instruction sequence. This
+				 * structure can be freed when refCount
+				 * becomes zero. */
+    int cmdEpoch;		/* Incremented to invalidate any references
+				 * that point to this command when it is
+				 * renamed, deleted, hidden, or exposed. */
+    CompileProc *compileProc;	/* Procedure called to compile command. NULL
+				 * if no compile proc exists for command. */
+    Tcl_ObjCmdProc *objProc;	/* Object-based command procedure. */
+    ClientData objClientData;	/* Arbitrary value passed to object proc. */
+    Tcl_CmdProc *proc;		/* String-based command procedure. */
+    ClientData clientData;	/* Arbitrary value passed to string proc. */
+    Tcl_CmdDeleteProc *deleteProc;
+				/* Procedure invoked when deleting command
+				 * to, e.g., free all client data. */
+    ClientData deleteData;	/* Arbitrary value passed to deleteProc. */
+    int deleted;		/* Means that the command is in the process
+				 * of being deleted (its deleteProc is
+				 * currently executing). Other attempts to
+				 * delete the command should be ignored. */
+    ImportRef *importRefPtr;	/* List of each imported Command created in
+				 * another namespace when this command is
+				 * imported. These imported commands
+				 * redirect invocations back to this
+				 * command. The list is used to remove all
+				 * those imported commands when deleting
+				 * this "real" command. */
+} Command;
+
+
 struct VarTrace;
 struct ArraySearch;
 
-typedef struct Var {
+typedef struct VarStruct Var;
+
+struct VarStruct {
     union {
 	Tcl_Obj *objPtr;
 	Tcl_HashTable *tablePtr;
-	struct Var *linkPtr;
+	Var *linkPtr;
     } value;
     char *name;
     Tcl_Namespace *nsPtr;
@@ -229,20 +305,66 @@ typedef struct Var {
     struct VarTrace *tracePtr;
     struct ArraySearch *searchPtr;
     int flags;
-} Var;
+};
+
+extern Var *TclLookupVar _ANSI_ARGS_((Tcl_Interp *interp, CONST char *part1, 
+	CONST char *part2, int flags, char *mesg, int p1Flags, int p2Flags, 
+	Var ** varPtrPtr));
+
+#define VAR_SCALAR		0x1
+#define VAR_ARRAY		0x2
+#define VAR_LINK		0x4
+#define VAR_UNDEFINED	        0x8
+#define VAR_IN_HASHTABLE	0x10
+#define VAR_TRACE_ACTIVE	0x20
+#define VAR_ARRAY_ELEMENT	0x40
+#define VAR_NAMESPACE_VAR	0x80
+
+#define VAR_ARGUMENT		0x100
+#define VAR_TEMPORARY		0x200
+#define VAR_RESOLVED		0x400
+
+
+Tcl_HashTable *
+Blt_GetArrayVariableTable(interp, varName, flags)
+    Tcl_Interp *interp;
+    CONST char *varName;
+    int flags;
+{
+    Var *varPtr, *arrayPtr;
+
+    varPtr = TclLookupVar(interp, varName, (char *)NULL, flags, "read",
+	FALSE, FALSE, &arrayPtr);
+    if ((varPtr == NULL) || ((varPtr->flags & VAR_ARRAY) == 0)) {
+	return NULL;
+    }
+    return varPtr->value.tablePtr;
+}
 
 Tcl_Namespace *
-Blt_NamespaceOfVariable(interp, name)
+Blt_GetVariableNamespace(interp, name)
     Tcl_Interp *interp;
-    char *name;
+    CONST char *name;
 {
     Var *varPtr;
 
-    varPtr = (Var *) Tcl_FindNamespaceVar(interp, name, (Tcl_Namespace *) NULL, 0);
+    varPtr = (Var *)Tcl_FindNamespaceVar(interp, (char *)name, 
+	(Tcl_Namespace *)NULL, 0);
     if (varPtr == NULL) {
 	return NULL;
     }
     return varPtr->nsPtr;
+}
+
+/*ARGSUSED*/
+Tcl_Namespace *
+Blt_GetCommandNamespace(interp, cmdToken)
+    Tcl_Interp *interp;		/* Not used. */
+    Tcl_Command cmdToken;
+{
+    Command *cmdPtr = (Command *)cmdToken;
+
+    return (Tcl_Namespace *)cmdPtr->nsPtr;
 }
 
 Tcl_CallFrame *
@@ -252,11 +374,11 @@ Blt_EnterNamespace(interp, nsPtr)
 {
     Tcl_CallFrame *framePtr;
 
-    framePtr = (Tcl_CallFrame *) malloc(sizeof(Tcl_CallFrame));
+    framePtr = Blt_Malloc(sizeof(Tcl_CallFrame));
     assert(framePtr);
-    if (Tcl_PushCallFrame(interp, framePtr, (Tcl_Namespace *) nsPtr, 0)
+    if (Tcl_PushCallFrame(interp, framePtr, (Tcl_Namespace *)nsPtr, 0)
 	!= TCL_OK) {
-	free((char *)framePtr);
+	Blt_Free(framePtr);
 	return NULL;
     }
     return framePtr;
@@ -268,23 +390,23 @@ Blt_LeaveNamespace(interp, framePtr)
     Tcl_CallFrame *framePtr;
 {
     Tcl_PopCallFrame(interp);
-    free((char *)framePtr);
+    Blt_Free(framePtr);
 }
 
-#endif /* TCL_MAJOR_VERSION < 8 */
+#endif /* TCL_MAJOR_VERSION == 7 */
 
 int
 Blt_ParseQualifiedName(interp, qualName, nsPtrPtr, namePtrPtr)
     Tcl_Interp *interp;
-    char *qualName;
+    CONST char *qualName;
     Tcl_Namespace **nsPtrPtr;
-    char **namePtrPtr;
+    CONST char **namePtrPtr;
 {
     register char *p, *colon;
     Tcl_Namespace *nsPtr;
 
     colon = NULL;
-    p = qualName + strlen(qualName);
+    p = (char *)(qualName + strlen(qualName));
     while (--p > qualName) {
 	if ((*p == ':') && (*(p - 1) == ':')) {
 	    p++;		/* just after the last "::" */
@@ -294,11 +416,16 @@ Blt_ParseQualifiedName(interp, qualName, nsPtrPtr, namePtrPtr)
     }
     if (colon == NULL) {
 	*nsPtrPtr = NULL;
-	*namePtrPtr = qualName;
+	*namePtrPtr = (char *)qualName;
 	return TCL_OK;
     }
     *colon = '\0';
-    nsPtr = Tcl_FindNamespace(interp, qualName, (Tcl_Namespace *) NULL, 0);
+    if (qualName[0] == '\0') {
+	nsPtr = Tcl_GetGlobalNamespace(interp);
+    } else {
+	nsPtr = Tcl_FindNamespace(interp, (char *)qualName, 
+		(Tcl_Namespace *)NULL, 0);
+    }
     *colon = ':';
     if (nsPtr == NULL) {
 	return TCL_ERROR;
@@ -308,9 +435,28 @@ Blt_ParseQualifiedName(interp, qualName, nsPtrPtr, namePtrPtr)
     return TCL_OK;
 }
 
-#if (TCL_MAJOR_VERSION >= 8)
+char *
+Blt_GetQualifiedName(nsPtr, name, resultPtr)
+    Tcl_Namespace *nsPtr;
+    CONST char *name;
+    Tcl_DString *resultPtr;
+{
+    Tcl_DStringInit(resultPtr);
+#if (TCL_MAJOR_VERSION > 7)
+    if ((nsPtr->fullName[0] != ':') || (nsPtr->fullName[1] != ':') ||
+	(nsPtr->fullName[2] != '\0')) {
+	Tcl_DStringAppend(resultPtr, nsPtr->fullName, -1);
+    }
+#endif
+    Tcl_DStringAppend(resultPtr, "::", -1);
+    Tcl_DStringAppend(resultPtr, (char *)name, -1);
+    return Tcl_DStringValue(resultPtr);
+}
 
-typedef struct Callback {
+
+#if (TCL_MAJOR_VERSION > 7)
+
+typedef struct {
     Tcl_HashTable clientTable;
 
     /* Original clientdata and delete procedure. */
@@ -319,82 +465,99 @@ typedef struct Callback {
 
 } Callback;
 
-#ifdef __STDC__
+static Tcl_CmdProc NamespaceDeleteCmd;
 static Tcl_NamespaceDeleteProc NamespaceDeleteNotify;
-#endif
+
+#define NS_DELETE_CMD	"#NamespaceDeleteNotifier"
+
+/*ARGSUSED*/
+static int
+NamespaceDeleteCmd(clientData, interp, argc, argv)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/*  */
+    int argc;
+    char **argv;
+{
+    Tcl_AppendResult(interp, "command \"", argv[0], "\" shouldn't be invoked",
+	(char *)NULL);
+    return TCL_ERROR;
+}
 
 static void
 NamespaceDeleteNotify(clientData)
     ClientData clientData;
 {
-    Callback *callPtr = (Callback *) clientData;
-    Tcl_HashEntry *hPtr;
-    Tcl_HashSearch cursor;
+    Blt_List list;
+    Blt_ListNode node;
+    Tcl_CmdDeleteProc *deleteProc;
 
-    for (hPtr = Tcl_FirstHashEntry(&(callPtr->clientTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	Tcl_NamespaceDeleteProc *deleteProc;
-
-	deleteProc = (Tcl_NamespaceDeleteProc *) Tcl_GetHashValue(hPtr);
-	clientData = (ClientData)Tcl_GetHashKey(&(callPtr->clientTable), hPtr);
-	if (deleteProc != NULL) {
-	    (*deleteProc) (clientData);
-	}
+    list = (Blt_List)clientData;
+    for (node = Blt_ListFirstNode(list); node != NULL;
+	node = Blt_ListNextNode(node)) {
+	deleteProc = (Tcl_CmdDeleteProc *)Blt_ListGetValue(node);
+	clientData = (ClientData)Blt_ListGetKey(node);
+	(*deleteProc) (clientData);
     }
-    /* Invoke to original call back and free memory allocated for the chain */
-    if (callPtr->origDeleteProc != NULL) {
-	(*callPtr->origDeleteProc) (callPtr->origClientData);
-    }
-    Tcl_DeleteHashTable(&(callPtr->clientTable));
-    free((char *)callPtr);
+    Blt_ListDestroy(list);
 }
 
 void
-Blt_DestroyNsDeleteNotify(nsPtr, clientData)
+Blt_DestroyNsDeleteNotify(interp, nsPtr, clientData)
+    Tcl_Interp *interp;
     Tcl_Namespace *nsPtr;
     ClientData clientData;
 {
-    if (nsPtr->deleteProc == NamespaceDeleteNotify) {
-	Callback *callPtr;
-	Tcl_HashEntry *hPtr;
+    Blt_List list;
+    Blt_ListNode node;
+    char *string;
+    Tcl_CmdInfo cmdInfo;
 
-	callPtr = (Callback *) nsPtr->clientData;
-	hPtr = Tcl_FindHashEntry(&(callPtr->clientTable), (char *)clientData);
-	if (hPtr != NULL) {
-	    Tcl_DeleteHashEntry(hPtr);
-	}
+    string = Blt_Malloc(sizeof(nsPtr->fullName) + strlen(NS_DELETE_CMD) + 4);
+    strcpy(string, nsPtr->fullName);
+    strcat(string, "::");
+    strcat(string, NS_DELETE_CMD);
+    if (!Tcl_GetCommandInfo(interp, string, &cmdInfo)) {
+	goto done;
     }
+    list = (Blt_List)cmdInfo.clientData;
+    node = Blt_ListGetNode(list, clientData);
+    if (node != NULL) {
+	Blt_ListDeleteNode(node);
+    }
+  done:
+    Blt_Free(string);
 }
 
 int
-Blt_CreateNsDeleteNotify(nsPtr, clientData, deleteProc)
+Blt_CreateNsDeleteNotify(interp, nsPtr, clientData, deleteProc)
+    Tcl_Interp *interp;
     Tcl_Namespace *nsPtr;
     ClientData clientData;
-    Tcl_NamespaceDeleteProc *deleteProc;
+    Tcl_CmdDeleteProc *deleteProc;
 {
-    Callback *callPtr;
-    Tcl_HashEntry *hPtr;
-    int isNew;
+    Blt_List list;
+    char *string;
+    Tcl_CmdInfo cmdInfo;
 
-    if (nsPtr->deleteProc != NamespaceDeleteNotify) {
-	/* Attach a new call back structure to the namespace. */
-	callPtr = (Callback *) malloc(sizeof(Callback));
-	assert(callPtr);
-	callPtr->origClientData = nsPtr->clientData;
-	callPtr->origDeleteProc = nsPtr->deleteProc;
-	Tcl_InitHashTable(&(callPtr->clientTable), TCL_ONE_WORD_KEYS);
-	nsPtr->clientData = (ClientData)callPtr;
-	nsPtr->deleteProc = NamespaceDeleteNotify;
+    string = Blt_Malloc(sizeof(nsPtr->fullName) + strlen(NS_DELETE_CMD) + 4);
+    strcpy(string, nsPtr->fullName);
+    strcat(string, "::");
+    strcat(string, NS_DELETE_CMD);
+    if (!Tcl_GetCommandInfo(interp, string, &cmdInfo)) {
+	list = Blt_ListCreate(BLT_ONE_WORD_KEYS);
+	Blt_CreateCommand(interp, string, NamespaceDeleteCmd, list, 
+		NamespaceDeleteNotify);
     } else {
-	callPtr = (Callback *) nsPtr->clientData;
+	list = (Blt_List)cmdInfo.clientData;
     }
-    hPtr = Tcl_CreateHashEntry(&(callPtr->clientTable), (char *)clientData,
-	&isNew);
-    Tcl_SetHashValue(hPtr, (ClientData)deleteProc);
+    Blt_Free(string);
+    Blt_ListAppend(list, clientData, (ClientData)deleteProc);
     return TCL_OK;
 }
 
-#endif /* TCL_MAJOR_VERSION >= 8 */
+#endif /* TCL_MAJOR_VERSION > 7 */
+
+#if (TCL_VERSION_NUMBER < _VERSION(8,0,0)) 
 
 /*
  *----------------------------------------------------------------------
@@ -415,7 +578,61 @@ Tcl_Command
 Blt_CreateCommand(interp, cmdName, proc, clientData, deleteProc)
     Tcl_Interp *interp;		/* Token for command interpreter returned by
 				 * a previous call to Tcl_CreateInterp. */
-    char *cmdName;		/* Name of command. If it contains namespace
+    CONST char *cmdName;	/* Name of command. If it contains namespace
+				 * qualifiers, the new command is put in the
+				 * specified namespace; otherwise it is put
+				 * in the global namespace. */
+    Tcl_CmdProc *proc;		/* Procedure to associate with cmdName. */
+    ClientData clientData;	/* Arbitrary value passed to string proc. */
+    Tcl_CmdDeleteProc *deleteProc;
+				/* If not NULL, gives a procedure to call
+				 * when this command is deleted. */
+{
+    return Tcl_CreateCommand(interp, (char *)cmdName, proc, clientData, 
+	deleteProc);
+}
+
+/*ARGSUSED*/
+Tcl_Command
+Tcl_FindCommand(interp, cmdName, nsPtr, flags)
+    Tcl_Interp *interp;
+    char *cmdName;
+    Tcl_Namespace *nsPtr;	/* Not used. */
+    int flags;			/* Not used. */
+{
+    Tcl_HashEntry *hPtr;
+    TclInterp *iPtr = (TclInterp *) interp;
+
+    hPtr = Tcl_FindHashEntry(&iPtr->commandTable, cmdName);
+    if (hPtr == NULL) {
+	return NULL;
+    }
+    return (Tcl_Command) Tcl_GetHashValue(hPtr);
+}
+
+#endif /* TCL_MAJOR_VERSION <= 7 */
+
+#if (TCL_VERSION_NUMBER >= _VERSION(8,0,0)) 
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_CreateCommand --
+ *
+ *	Like Tcl_CreateCommand, but creates command in current namespace
+ *	instead of global, if one isn't defined.  Not a problem with
+ *	[incr Tcl] namespaces.
+ *
+ * Results:
+ *	The return value is a token for the command, which can
+ *	be used in future calls to Tcl_GetCommandName.
+ *
+ *----------------------------------------------------------------------
+ */
+Tcl_Command
+Blt_CreateCommand(interp, cmdName, proc, clientData, deleteProc)
+    Tcl_Interp *interp;		/* Token for command interpreter returned by
+				 * a previous call to Tcl_CreateInterp. */
+    CONST char *cmdName;	/* Name of command. If it contains namespace
 				 * qualifiers, the new command is put in the
 				 * specified namespace; otherwise it is put
 				 * in the global namespace. */
@@ -423,10 +640,10 @@ Blt_CreateCommand(interp, cmdName, proc, clientData, deleteProc)
     ClientData clientData;	/* Arbitrary value passed to string proc. */
     Tcl_CmdDeleteProc *deleteProc;
     /* If not NULL, gives a procedure to call
+
 				 * when this command is deleted. */
 {
-#if (TCL_MAJOR_VERSION >= 8)
-    register char *p;
+    register CONST char *p;
 
     p = cmdName + strlen(cmdName);
     while (--p > cmdName) {
@@ -450,28 +667,64 @@ Blt_CreateCommand(interp, cmdName, proc, clientData, deleteProc)
 	Tcl_DStringFree(&dString);
 	return cmdToken;
     }
-#endif
-    return Tcl_CreateCommand(interp, cmdName, proc, clientData, deleteProc);
+    return Tcl_CreateCommand(interp, (char *)cmdName, proc, clientData, 
+	deleteProc);
 }
 
-#if (TCL_MAJOR_VERSION < 8)
-
-/*ARGSUSED*/
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_CreateCommandObj --
+ *
+ *	Like Tcl_CreateCommand, but creates command in current namespace
+ *	instead of global, if one isn't defined.  Not a problem with
+ *	[incr Tcl] namespaces.
+ *
+ * Results:
+ *	The return value is a token for the command, which can
+ *	be used in future calls to Tcl_GetCommandName.
+ *
+ *----------------------------------------------------------------------
+ */
 Tcl_Command
-Tcl_FindCommand(interp, cmdName, nsPtr, flags)
-    Tcl_Interp *interp;
-    char *cmdName;
-    Tcl_Namespace *nsPtr;	/* Not used. */
-    int flags;			/* Not used. */
+Blt_CreateCommandObj(interp, cmdName, proc, clientData, deleteProc)
+    Tcl_Interp *interp;		/* Token for command interpreter returned by
+				 * a previous call to Tcl_CreateInterp. */
+    CONST char *cmdName;	/* Name of command. If it contains namespace
+				 * qualifiers, the new command is put in the
+				 * specified namespace; otherwise it is put
+				 * in the global namespace. */
+    Tcl_ObjCmdProc *proc;	/* Procedure to associate with cmdName. */
+    ClientData clientData;	/* Arbitrary value passed to string proc. */
+    Tcl_CmdDeleteProc *deleteProc;
+				/* If not NULL, gives a procedure to call
+				 * when this command is deleted. */
 {
-    Tcl_HashEntry *hPtr;
-    TclInterp *iPtr = (TclInterp *) interp;
+    register CONST char *p;
 
-    hPtr = Tcl_FindHashEntry(&iPtr->commandTable, cmdName);
-    if (hPtr == NULL) {
-	return NULL;
+    p = cmdName + strlen(cmdName);
+    while (--p > cmdName) {
+	if ((*p == ':') && (*(p - 1) == ':')) {
+	    p++;		/* just after the last "::" */
+	    break;
+	}
     }
-    return (Tcl_Command) Tcl_GetHashValue(hPtr);
-}
+    if (cmdName == p) {
+	Tcl_DString dString;
+	Tcl_Namespace *nsPtr;
+	Tcl_Command cmdToken;
 
-#endif /* TCL_MAJOR_VERSION < 8 */
+	Tcl_DStringInit(&dString);
+	nsPtr = Tcl_GetCurrentNamespace(interp);
+	Tcl_DStringAppend(&dString, nsPtr->fullName, -1);
+	Tcl_DStringAppend(&dString, "::", -1);
+	Tcl_DStringAppend(&dString, cmdName, -1);
+	cmdToken = Tcl_CreateObjCommand(interp, Tcl_DStringValue(&dString), 
+		proc, clientData, deleteProc);
+	Tcl_DStringFree(&dString);
+	return cmdToken;
+    }
+    return Tcl_CreateObjCommand(interp, (char *)cmdName, proc, clientData, 
+	deleteProc);
+}
+#endif /* TCL_VERSION_NUMBER < 8.0.0 */

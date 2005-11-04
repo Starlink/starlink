@@ -12,14 +12,14 @@ $this append $this.lab
 For example,
 %% message $this.msg -relief sunken -bd 2 -aspect 10000 -font \
  *-Courier-Medium-R-Normal-*-12-* -text {set w $htext(widget)
-label $w.face -bitmap @bitmaps/face \ 
+label $w.face -bitmap @bitmaps/face.xbm \ 
   -relief sunken -borderwidth 2
 $w append $w.face -padx 2 -pady 0.25i}
 $this append $this.msg \
         -fill both %% added this %%
 global tk_library
 label $this.face \
-        -bitmap @bitmaps/face  \
+        -bitmap @bitmaps/face.xbm  \
         -relief sunken -borderwidth 2
 $this append $this.face -padx 2 -pady 0.25i 
 %%.
@@ -146,7 +146,7 @@ proc makeplot { widget } {
         4.20000e+00 4.40000e+00 4.60000e+00 4.80000e+00 5.00000e+00 
     } 
 
-    $widget element create Y1 -xdata $X -ydata { 
+    $widget element create Y1 -x $X -y { 
         1.14471e+01 2.09373e+01 2.84608e+01 3.40080e+01 3.75691e+01 
         3.91345e+01 3.92706e+01 3.93474e+01 3.94242e+01 3.95010e+01 
         3.95778e+01 3.96545e+01 3.97313e+01 3.98081e+01 3.98849e+01 
@@ -154,7 +154,7 @@ proc makeplot { widget } {
         4.03455e+01 4.04223e+01 4.04990e+01 4.05758e+01 4.06526e+01 
     } -symbol circle -label VGS=2.0 -color blue4 -fill blue
 
-    $widget element create Y2 -xdata $X -ydata { 
+    $widget element create Y2 -x $X -y { 
         2.61825e+01 5.04696e+01 7.28517e+01 9.33192e+01 1.11863e+02 
         1.28473e+02 1.43140e+02 1.55854e+02 1.66606e+02 1.75386e+02 
         1.82185e+02 1.86994e+02 1.89802e+02 1.90683e+02 1.91047e+02 
@@ -162,7 +162,7 @@ proc makeplot { widget } {
         1.93231e+02 1.93595e+02 1.93958e+02 1.94322e+02 1.94686e+02 
     } -symbol diamond -label VGS=3.5 -color green4 -fill green
 
-    $widget element create Y3 -xdata $X -ydata { 
+    $widget element create Y3 -x $X -y { 
         4.07008e+01 7.95658e+01 1.16585e+02 1.51750e+02 1.85051e+02 
         2.16479e+02 2.46024e+02 2.73676e+02 2.99427e+02 3.23267e+02 
         3.45187e+02 3.65177e+02 3.83228e+02 3.99331e+02 4.13476e+02 
@@ -242,210 +242,322 @@ $this append $this.goto
 
          ------------------------------------------------------
 
-This is version 2.0 of the BLT library.  BLT is an extension the Tk
-toolkit, adding new widgets, geometry managers, and miscellaneous
-commands.  It does not require any patching of the Tcl or Tk source
-files.
+[This is a pre-release version of BLT.  It's basically the latest
 
-This release works with both Tk versions 3.6 and 4.0.  It may work
-with 4.1, but I haven't it tried it yet.  
+snapshot of BLT, as it moves towards a full release.  What this means
+is that the documentation and demos still need work.  Let me know
+about any configuration/compiler/installation goofs so I make sure
+they're fixed for the next release.]
 
-There are many changes in this release.  Not least of which is that
-each command no longer has a "blt_" prefix.  This wart has been
-removed since [Incr Tcl] 2.0 now includes namespaces.  There's no good
-reason to "uglify" code when the right solution is now available.
+This is version 2.4 of the BLT library.  It's an extension to the
+Tcl/Tk toolkit.  You simply compile and link with the Tcl/Tk
+libraries. It does not require the Tcl or Tk source files.
 
-BLT will automatically use namespaces if you compile with with the
-itcl-2.x versions of Tcl and Tk headers and libraries.  BLT will
-reside in its own namespace called "blt". All the normal BLT commands
-and variables will reside there.
+BLT is available from 
 
-There are too many bug fixes and changes to list here (I'm putting
-together a separate list), so check the manual pages.
+    ftp.tcltk.com 
 
-The BLT library adds the following commands to Tk:
+in the "pub/blt" directory. The URL is 
 
-table	   A table-based geometry manager for Tk.  You specify the 
-	   widget layout as row and column positions in the table.  
-	   Has many options for constraining window resizing.
-	 
-graph	   A XY graph widget.  Plots two-variable data.  Supports
-	   two sets of X and Y axes, inverted axes, custom axis
-	   layout.  
-	 
-barchart   A barchart widget.  Plots two-variable data using bars.  
-	   Supports two sets of X and Y axes, inverted axes, custom axis 
-	   layout.  
-	 
-vector	   Creates a vector of floating point values.  The vector's 
-	   components can be manipulated in three ways: through a Tcl 
-	   array variable, a Tcl command, or the C API. 
+    ftp://ftp.tcltk.com/pub/blt/BLT2.4.tar.gz
 
-spline	   Computes a spline fitting a set of data points (x and y vectors) 
-	   and produces a vector of the interpolated images (y-coordinates) 
-	   at a given set of x-coordinates.
+This release has been compiled and tested with versions:
 
-busy	   For handling user-interaction when the application is "busy".
-	   Manages an invisible "busy" window which prevents further 
-	   user device (keyboard, mouse, button, etc.) interactions.
-	   Also provides a different cursor which supersedes application
-	   cursors.
-	 
-bgexec	   Like Tcl's "exec ... &", but collects the output, error, and 
-	   status of the detached UNIX subprocesses.  Sets a Tcl variable 
-	   upon completion.  Can be used with "tkwait variable" to handle 
-	   expose events, etc. while waiting for subprocesses to finish.  
-	 
-drag&drop  Command which adds drag-n-drop capabilities to Tk.  It 
-	   provides "send"-style communication between drag-drop 
-	   sources and targets.  The result is a much more powerful
-	   drag-and-drop mechanism than is available with OpenLook
-	   or Motif.  
-	 
-htext	   A simple hypertext widget. Allows text and Tk widgets to
-	   be combined in a scrollable text window.  Any Tk widget 
-	   can be embedded and used to form hyper-links.  Other 
-	   options allow for selections and text searches.
-	 
-bitmap	   Command for creating and manipulating bitmaps from Tcl. Lets 
-	   you read and write bitmaps from Tcl. Can also define X bitmaps  
-	   and create bitmaps from text strings.  Other options let
-	   you rotate and scale bitmaps.
-	 
-winop	   Low-level Xlib calls let you raise, lower, map, or, unmap 
-	   any window.  
-	 
-watch	   Lets you specify Tcl procedures to be run before and/or
-	   after every Tcl command.  May be used for logging,
-	   tracing, profiling, or debugging or Tcl code.
-	 
-bltdebug   Prints out each Tcl command before it's executed.  
+        Tcl 7.5 / Tk 4.1
+        Tcl 7.6 / Tk 4.2
+        Tcl/Tk 8.0
+        Tcl/Tk 8.1a2
 
----------
+What is BLT? 
 
-How to get and test BLT:
+  BLT is an extension to Tk.  It adds plotting widgets (X-Y graph, 
+  barchart, stripchart), a powerful geometry manager, a new canvas 
+  item, and several new commands to Tk.  
 
-The following describes how to get and install the BLT library.
+  Plotting widgets:  
 
-0. FTP the distribution from harbor.ecn.purdue.edu
+    graph, barchart, stripchart
+                BLT has X-Y graph, barchart, and stripchart widgets that are
+                both easy to use and customize.  All the widgets work with
+                BLT vector data objects, which makes it easy to manage data.
+ 
+  Hierarchical list box:
 
-	ftp ftp.aud.alcatel.com
-	cd pub/tcl/extensions
-	binary 
-	get BLT2.0.tar.gz
-	quit
+    hierbox     Displays a general ordered tree which may be built 
+                on-the-fly or all at once.
 
-1. Uncompress and untar the distribution file.  
+  Tab set:
 
-	zcat BLT2.0.tar.gz | tar -xvf - 
-
-
-   This will create a directory "blt2.0" with the following 
-   subdirectories:
-	
-                        blt2.0
-	     ______________|_____________
-             |          |       |        |
-           demos   library     man      src
-                                         |
-                                       shared
-
-2. Run ./configure
-
-   Go into the "blt2.0" directory 
-
-	cd blt2.0
-
-   and run the auto-configuration script "./configure"
-
-	./configure 
-
-   * If you want to use gcc, it's "./configure -with-cc=gcc"
-
-	./configure -with-cc=gcc
-
-   * By default, the demo program, libBLT.a, the library files, and
-     manual pages will be installed in "/usr/local/blt".  You can 
-     change this by giving the -prefix option to ./configure.
-
-	./configure -prefix=/depot/stuff/blt
+    tabset      Can be used either as a tab notebook or simple tabset.
+                Multi-tiered and/or scrolled tabsets are available.
+                Notebook pages can be torn-off into separate windows and 
+                later put back. 
     
-  The "configure" script will print out where is finds the X, Tcl, and Tk 
-  header files and libraries.   If you see "__Edit_config.BLT__" has
-  a value, you should edit the generated file "config.BLT".  Edit the
-  paths to the correct values and re-run "configure".
+  Geometry Manager:  
 
-  The configure script creates an include file "src/bltConfig.h".
-  It will also generate new Makefiles from their respective templates 
-  (Makefile.in).
+    table       A table-based geometry manager. Lets you specify widget
+                layouts by row and column positions in the table. Unlike the
+                packer or grid, you can finely control and constrain window
+                sizes.
 
-	Makefile.in 	        ==> Makefile
-	src/Makefile.in	        ==> src/Makefile
-	src/shared/Makefile.in	==> src/shared/Makefile
-	man/Makefile.in		==> man/Makefile
-	library/Makefile.in	==> library/Makefile
+  Vector Data Object:
 
-  If "configure" can't find something (e.g. it can't find the X libraries),
-  edit the file "config.BLT" and re-run "configure".
+    vector      Lets you manage a vector of floating point values in a
+                high-level fashion.  Vectors inter-operate seamlessly with 
+                the plotting widgets. The graphs will automatically redraw 
+                themselves when the vector data changes. Vector's components 
+                can be managed through a Tcl array variable, a Tcl command, 
+                or the using its own C API.
 
-  Otherwise, you'll have to edit the Makefiles files by hand.
+  Background Program Execution:
 
+    bgexec      Like Tcl's "exec ... &", but collects the output, error, and 
+                status of the detached UNIX subprocesses.  Sets a Tcl variable 
+                upon completion.  
 
-3. Compile the demonstration program "bltwish".
+  Busy Command:
 
-	make 
+    busy        For preventing user-interactions when the application is
+                busy.  Manages an invisible "busy" window which prevents
+                further user interactions (keyboard, mouse, button, etc.).
+                Also you can provide a busy cursor that temporarily 
+                overrides those of the Tk widgets.
 
-4. Test by running the demos. 
+  New Canvas Item:
 
-   Go into the demos directory 
+    eps         An new item is added to the Tk canvas for handling
+                encapsulated PostScript.  It lets you embed an EPS file into
+                the canvas displaying either an EPS preview image found in 
+                the file, or a Tk image that you provide.  When you print 
+                the canvas the EPS item will automatically include the EPS 
+                file, translating and scaling the PostScript.  For example, 
+                you could use "eps" items to tile several PostScript pages 
+                into single page.
+
+                The "eps" item can also be used as a replacement for "image"
+                canvas items.  Unlike "image" canvas items, the image of an 
+                eps item can be printed and scaled arbitrarily.
+
+  Drag & Drop Facility:
+
+    drag&drop   Adds drag-n-drop capabilities to Tk.  It uses "send"-style 
+                communication between drag-drop sources and targets.  The 
+                result is a much more powerful drag-and-drop mechanism than 
+                is available with OpenLook or Motif.  
+
+  Bitmap Command:
+
+    bitmap      Lets you read and write bitmaps from Tcl.  You can define
+                bitmaps from ordinary text strings.  Bitmaps can also be
+                scaled and rotated.  For example, you can create a button
+                with rotated text by defining a bitmap from a text string
+                and rotating it.  You can then use the bitmap in the button
+                widget.
+
+  Miscellaneous Commands:
+
+    winop       Basic window operations. You can raise, lower, map, or, 
+                unmap windows.  Other operations let you move the pointer
+                or take photo image snapshots of Tk widgets.
+
+    bltdebug    Lets you trace the execution of Tcl commands and procedures.
+                Prints out each Tcl command before it's executed.  
+
+    watch       Lets you specify Tcl procedures to be run before and/or
+                after every Tcl command.  May be used for logging, tracing, 
+                profiling, or debugging or Tcl code.
+
+    spline      Computes a spline fitting a set of data points (x and y 
+                vectors) and produces a vector of the interpolated images 
+                (y-coordinates) at a given set of x-coordinates.
+
+    htext       A simple hypertext widget. Allows text and Tk widgets to
+                be combined in a scroll-able text window.  Any Tk widget 
+                can be embedded and used to form hyper-links.  Other 
+                options allow for selections and text searches.
+
+What's new in 2.4?
+
+ 1. "eps" canvas item.  
+
+    An encapsulated PostScript canvas item lets you embed an EPS file into 
+    the canvas.  The "eps" item displays either a EPS preview image found 
+    in the file, or a Tk image that you provide.  
+
+ 2. "hierbox" widget.
+
+    Hierarchical listbox widget. Displays a general ordered tree which 
+    may be built on-the-fly or all at once.
+
+ 3. "tabset" widget.
+
+    Can be used either as a tab notebook or simple tabset.  Tabs can 
+    be arranged in a variety of ways: multi-tiered, scrolled, and 
+    attached to any of the four sides.  Tab labels can contain both 
+    images and text (text can be arbitrarily rotated). Notebook pages 
+    can be torn-off into separate windows and replaced later. 
     
-	cd demos
+ 4. Changes to vectors.
 
-   and run the test scripts.
-	
-	./graph
+    New features:
+        
+     o  Vector expressions.  The vector now has an "expr" operation
+        that lets you perform math (including math library
+        functions) on vectors.  There are several new functions
+        (such as "max", "min", "mean" "median", "q1", "q3", "prod",
+        "sum", "adev", "sdev", "skew", ...)
 
-   If your system doesn't support "#!" in shell scripts, then it's
+                vector expr { sin(x)^2 + cos(x)^2 }
+                y expr { log(x) * $value }
 
-	../blt_wish -f ./graph
+     o  New syntax to create and destroy vectors:
+
+                vector create x 
+                vector destroy x
+ 
+        The old syntax for creating vectors still works.
+
+                vector x
+
+     o  Vectors are *not* automatically deleted when their Tcl
+        variable is unset anymore. This means that you can
+        temporarily map vectors to variables and use them as you
+        would an ordinary Tcl array (kind of like "upvar").
+
+            proc AddValue { vecName value } {
+                 $vecName variable x
+        
+                 set x(++end) $value
+            }   
+
+        There's an "-watchunset" flag to restore the old
+        behavior if you need it. 
+
+            vector create x -watchunset yes
+
+     o  Vectors still automatically create Tcl variables by
+        default.  I'd like to change this, but it silently
+        breaks lots of code, so it will stay.
+
+    Bug fixes:
+
+     o  Vector reallocation failed when shrinking the vector.
+
+     o  Vector "destroy" callback made after vector was
+        already freed.
+
+ 5. Changes to Graph, Barchart, Stripchart widgets.
+
+    New features:
+
+     o  Drop shadows for text (titles, markers, etc). Drop
+        shadows improve contrast when displaying text over a
+        background with similar color intensities.
+   
+     o  Postscript "-preview" option to generate a EPS
+        PostScript preview image that can be read and
+        displayed by the EPS canvas item.
+
+     o  New "-topvariable", "-bottomvariable",
+        "-leftvariable", and "-rightvariable" options.  They
+        specify variables to contain the current margin
+        sizes.  These variables are updated whenever the
+        graph is redrawn.
+
+     o  New "-aspect" option. Let's you maintain a particular aspect
+        ratio for the the graph.
+
+     o  Image markers can now be stretched and zoomed like
+        bitmap markers.
+
+     o  Bind operation for legend entries, markers, and elements.
+
+        Much thanks to Julian Loaring <bigj@bigj.demon.co.uk> 
+        for the suggestions.
+
+     o  New "-xor" option for line markers, lets you draw the line
+        by rubberbanded by XOR-ing without requiring the graph to
+        be redrawn.  This can be used, for example, to select regions
+        like in zooming.  
+
+        Thanks to Johannes Zellner (joze@krisal.physik.uni-karlsruhe.de) 
+        for the suggestion.
+
+    Bug fixes:
+
+     o  Closest line (point) broken when using pens styles.
+
+     o  Marker elastic coordinates were wrong.
+
+     o  PostScript bounding box included the border of the page.
+
+     o  Bad PostScript generated for barchart symbols with stipples.
+
+     o  Wrong dimensions computed with postscript " -maxpect" option.
+
+     o  Text markers fixed.
+
+        Thanks to De Clarke for the bug report and fix.
 
 
-5. Installing BLT
+     o  Renamed axis configuration from "-range" to "-autorange" to
+        match the documentation.  
 
-   The following directories will be created when BLT is installed.  
-   By default, the top directory is /usr/local/blt.  
+        Thanks to Brian Smith for the correction.
 
-       _____________|_______________
-       |     |        |     |      |  
-      bin  include   lib  blt2.0  man
-     
-   You can change the top directory by supplying the -prefix option to
-   ./configure.
+     o  Fixed polygon marker pick routine.
 
-   * If you don't install BLT, you will need to set the BLT_LIBRARY
-     environment variable or the Tcl variable "blt_library" in your
-     scripts.  Otherwise, you may not be able generate PostScript 
-     output for graphs and barcharts, or use the drag&drop facility 
-     properly.
+     o  Fixed active tab labels overlapping the selected tab.
 
-6. Adding BLT to your program.
 
-   Add the following lines to your program's Tcl_AppInit routine 
+What's incompatible with releases prior to BLT 2.4?
 
-	if (Blt_Init(interp) != TCL_OK) {
-	    return TCL_ERROR;
-        }
+ 1. Vector names must start with a letter and contain letters, digits,
+    or underscores.  
 
-   Link with libBLT.a
+    Namespace Issues:   Vector names are still global. If Tcl provides
+                        an API, vectors may in the future be created on
+                        a per-namespace basis.  Right now, there's no
+                        mechanism for detecting when a namespace has been
+                        destroyed. Which is why you can't currently
+                        prefix a vector name with a namespace qualifier.
 
-   and that's all there's to it.
+                        [Ok, there is... Thanks to Michael McLennan for
+                        pointing this out to me.  So maybe soon there 
+                        will be vectors on a per namespace basis.]
+        
+ 2. The "-mapped" options throughout the graph have been replaced
+    by the "-hide" option.  The many usages of the word "map" was 
+    getting confusing.  
 
-7. Send bugs reports, suggestions, etc. to
+        # No longer works.
+        .graph legend configure -mapped no
 
-   	gah@mhcnet.att.com or ghowlett@fast.net
+        # Instead use this.
+        .graph legend configure -hide yes    
+ 
+   
+How to compile and test BLT?
 
-   Make sure you include BLT and the version number in the subject line.
+  See the file "INSTALL" for instructions.
 
+When will the so-called "official" BLT work with Windows?  
+
+  It currently compiles and runs with MS VC++ and EGCS 1.1 under 
+  Windows 95/NT (loadable binary versions will be forthcoming).  
+  Everything pretty much works: graphs, bgexec, busy, drag&drop etc.
+   
+When will...?
+
+  In general, I can't answer the "When will" questions, mostly out of 
+  embarrassment.  My estimates of when new features and releases will
+  occur usually turn out to be way way off.  
+
+What does BLT stand for?
+
+  Whatever you want it to.
+
+--gah
 
 %%
 global endOfText
@@ -453,26 +565,27 @@ set endOfText [expr $htext(line)-1 ]
 
 global updateInterval count barchart
 global Red Green Blue
-set updateInterval 2000
+set updateInterval 200
 set count 0
 set Red bb
 set Green 00
 set Blue 33
 
 option add *barchart.title "Bar Chart" 
-option add *barchart.xTitle "X"
-option add *barchart.yTitle "Y"
-option add *barchart.y2Title "Y"
-option add *barchart.ySubTicks 0
-option add *barchart.xTicks 0
-option add *barchart.legendMapped false
-option add *barchart.AxisFont *-Courier-Bold-R-Normal-*-8-80-* 
-option add *barchart.y2Mapped true
+option add *barchart.x.title "X"
+option add *barchart.y.title "Y"
+option add *barchart.y2.title "Y"
+option add *barchart.Axis.subTicks 0
+option add *barchart.x.stepSize 0
+option add *barchart.x.Ticks 0
+option add *barchart.legend.hide yes
+option add *barchart.Axis.Font *-Courier-Bold-R-Normal-*-8-80-* 
+option add *barchart.y2.hide yes
 
 set barchart $this.barchart
 barchart $barchart -bd 2 -relief raised  -tile bgTexture2
 $barchart y2axis use y
-$this append $barchart -fill both -padx 10 -pady 10
+$this append $barchart -fill both -padx 10 -pady 10 -relwidth 0.8
 
 proc AnimateBarchart {  } {
     global updateInterval
@@ -482,8 +595,8 @@ proc AnimateBarchart {  } {
         return
     }   
     incr count
-    if { $count > 16 } {
-        $barchart element delete [lindex [$barchart element show] 0]
+    if { $count > 100 } {
+        $barchart element delete [lindex [$barchart element show] end]
     }
     set color [format "%x" [expr $count%16]]
     set Green ${color}${color}

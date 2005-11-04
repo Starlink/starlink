@@ -29,15 +29,15 @@
 
 #include "bltGraph.h"
 
-extern Tk_CustomOption bltLengthOption;
+extern Tk_CustomOption bltDistanceOption;
 extern Tk_CustomOption bltDashesOption;
 extern Tk_CustomOption bltAnyXAxisOption;
 extern Tk_CustomOption bltAnyYAxisOption;
 
 
 #define DEF_GRID_DASHES		"dot"
-#define DEF_GRID_FG_COLOR	RGB_COLOR_GREY64
-#define DEF_GRID_FG_MONO	RGB_COLOR_BLACK
+#define DEF_GRID_FOREGROUND	RGB_GREY64
+#define DEF_GRID_FG_MONO	RGB_BLACK
 #define DEF_GRID_LINE_WIDTH	"0"
 #define DEF_GRID_HIDE_BARCHART	"no"
 #define DEF_GRID_HIDE_GRAPH	"yes"
@@ -50,7 +50,7 @@ extern Tk_CustomOption bltAnyYAxisOption;
 static Tk_ConfigSpec configSpecs[] =
 {
     {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_GRID_FG_COLOR, Tk_Offset(Grid, colorPtr),
+	DEF_GRID_FOREGROUND, Tk_Offset(Grid, colorPtr),
 	TK_CONFIG_COLOR_ONLY | ALL_GRAPHS},
     {TK_CONFIG_COLOR, "-color", "color", "color",
 	DEF_GRID_FG_MONO, Tk_Offset(Grid, colorPtr),
@@ -64,7 +64,7 @@ static Tk_ConfigSpec configSpecs[] =
 	DEF_GRID_HIDE_GRAPH, Tk_Offset(Grid, hidden), GRAPH | STRIPCHART},
     {TK_CONFIG_CUSTOM, "-linewidth", "lineWidth", "Linewidth",
 	DEF_GRID_LINE_WIDTH, Tk_Offset(Grid, lineWidth),
-	TK_CONFIG_DONT_SET_DEFAULT | ALL_GRAPHS, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT | ALL_GRAPHS, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-mapx", "mapX", "MapX",
 	DEF_GRID_MAP_X_GRAPH, Tk_Offset(Grid, axes.x),
 	GRAPH | STRIPCHART, &bltAnyXAxisOption},
@@ -109,12 +109,12 @@ ConfigureGrid(graphPtr, gridPtr)
     gcValues.background = gcValues.foreground = gridPtr->colorPtr->pixel;
     gcValues.line_width = LineWidth(gridPtr->lineWidth);
     gcMask = (GCForeground | GCBackground | GCLineWidth);
-    if (gridPtr->dashes.numValues > 0) {
+    if (LineIsDashed(gridPtr->dashes)) {
 	gcValues.line_style = LineOnOffDash;
 	gcMask |= GCLineStyle;
     }
     newGC = Blt_GetPrivateGC(graphPtr->tkwin, gcMask, &gcValues);
-    if (gridPtr->dashes.numValues > 0) {
+    if (LineIsDashed(gridPtr->dashes)) {
 	Blt_SetDashes(graphPtr->display, newGC, &(gridPtr->dashes));
     }
     if (gridPtr->gc != NULL) {
@@ -126,7 +126,7 @@ ConfigureGrid(graphPtr, gridPtr)
 /*
  *----------------------------------------------------------------------
  *
- * TransformGrid --
+ * MapGrid --
  *
  *	Determines the coordinates of the line segments corresponding
  *	to the grid lines for each axis.
@@ -137,36 +137,35 @@ ConfigureGrid(graphPtr, gridPtr)
  *----------------------------------------------------------------------
  */
 void
-Blt_TransformGrid(graphPtr)
+Blt_MapGrid(graphPtr)
     Graph *graphPtr;
 {
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
-    int numSegs;
-    XSegment *segPtr;
+    int nSegments;
+    Segment2D *segments;
 
-    if (gridPtr->xSegArr != NULL) {
-	free((char *)gridPtr->xSegArr);
-	gridPtr->xSegArr = NULL;
+    if (gridPtr->x.segments != NULL) {
+	Blt_Free(gridPtr->x.segments);
+	gridPtr->x.segments = NULL;
     }
-    if (gridPtr->ySegArr != NULL) {
-	free((char *)gridPtr->ySegArr);
-	gridPtr->ySegArr = NULL;
+    if (gridPtr->y.segments != NULL) {
+	Blt_Free(gridPtr->y.segments);
+	gridPtr->y.segments = NULL;
     }
-    gridPtr->numX = gridPtr->numY = 0;
-
+    gridPtr->x.nSegments = gridPtr->y.nSegments = 0;
     /*
      * Generate line segments to represent the grid.  Line segments
      * are calculated from the major tick intervals of each axis mapped.
      */
-    numSegs = Blt_GetAxisSegments(graphPtr, gridPtr->axes.x, &segPtr);
-    if (numSegs > 0) {
-	gridPtr->numX = numSegs;
-	gridPtr->xSegArr = segPtr;
+    Blt_GetAxisSegments(graphPtr, gridPtr->axes.x, &segments, &nSegments);
+    if (nSegments > 0) {
+	gridPtr->x.nSegments = nSegments;
+	gridPtr->x.segments = segments;
     }
-    numSegs = Blt_GetAxisSegments(graphPtr, gridPtr->axes.y, &segPtr);
-    if (numSegs > 0) {
-	gridPtr->numY = numSegs;
-	gridPtr->ySegArr = segPtr;
+    Blt_GetAxisSegments(graphPtr, gridPtr->axes.y, &segments, &nSegments);
+    if (nSegments > 0) {
+	gridPtr->y.nSegments = nSegments;
+	gridPtr->y.segments = segments;
     }
 }
 
@@ -192,20 +191,20 @@ Blt_DrawGrid(graphPtr, drawable)
     if (gridPtr->hidden) {
 	return;
     }
-    if (gridPtr->numX > 0) {
-	XDrawSegments(graphPtr->display, drawable, gridPtr->gc,
-	    gridPtr->xSegArr, gridPtr->numX);
+    if (gridPtr->x.nSegments > 0) {
+	Blt_Draw2DSegments(graphPtr->display, drawable, gridPtr->gc, 
+			 gridPtr->x.segments, gridPtr->x.nSegments);
     }
-    if (gridPtr->numY > 0) {
-	XDrawSegments(graphPtr->display, drawable, gridPtr->gc,
-	    gridPtr->ySegArr, gridPtr->numY);
+    if (gridPtr->y.nSegments > 0) {
+	Blt_Draw2DSegments(graphPtr->display, drawable, gridPtr->gc,
+	    gridPtr->y.segments, gridPtr->y.nSegments);
     }
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * PrintGrid --
+ * Blt_GridToPostScript --
  *
  *	Prints the grid lines associated with each axis.
  *
@@ -215,22 +214,24 @@ Blt_DrawGrid(graphPtr, drawable)
  *----------------------------------------------------------------------
  */
 void
-Blt_PrintGrid(graphPtr, printable)
+Blt_GridToPostScript(graphPtr, psToken)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
 {
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
 
     if (gridPtr->hidden) {
 	return;
     }
-    Blt_LineAttributesToPostScript(printable, gridPtr->colorPtr,
+    Blt_LineAttributesToPostScript(psToken, gridPtr->colorPtr,
 	gridPtr->lineWidth, &(gridPtr->dashes), CapButt, JoinMiter);
-    if (gridPtr->numX > 0) {
-	Blt_SegmentsToPostScript(printable, gridPtr->xSegArr, gridPtr->numX);
+    if (gridPtr->x.nSegments > 0) {
+	Blt_2DSegmentsToPostScript(psToken, gridPtr->x.segments, 
+			gridPtr->x.nSegments);
     }
-    if (gridPtr->numY > 0) {
-	Blt_SegmentsToPostScript(printable, gridPtr->ySegArr, gridPtr->numY);
+    if (gridPtr->y.nSegments > 0) {
+	Blt_2DSegmentsToPostScript(psToken, gridPtr->y.segments, 
+			gridPtr->y.nSegments);
     }
 }
 
@@ -254,17 +255,17 @@ Blt_DestroyGrid(graphPtr)
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
 
     Tk_FreeOptions(configSpecs, (char *)gridPtr, graphPtr->display,
-	GraphType(graphPtr));
+	Blt_GraphType(graphPtr));
     if (gridPtr->gc != NULL) {
 	Blt_FreePrivateGC(graphPtr->display, gridPtr->gc);
     }
-    if (gridPtr->xSegArr != NULL) {
-	free((char *)gridPtr->xSegArr);
+    if (gridPtr->x.segments != NULL) {
+	Blt_Free(gridPtr->x.segments);
     }
-    if (gridPtr->ySegArr != NULL) {
-	free((char *)gridPtr->ySegArr);
+    if (gridPtr->y.segments != NULL) {
+	Blt_Free(gridPtr->y.segments);
     }
-    free((char *)gridPtr);
+    Blt_Free(gridPtr);
 }
 
 /*
@@ -288,14 +289,14 @@ Blt_CreateGrid(graphPtr)
 {
     Grid *gridPtr;
 
-    gridPtr = (Grid *)calloc(1, sizeof(Grid));
+    gridPtr = Blt_Calloc(1, sizeof(Grid));
     assert(gridPtr);
     gridPtr->minorGrid = TRUE;
     graphPtr->gridPtr = gridPtr;
 
     if (Blt_ConfigureWidgetComponent(graphPtr->interp, graphPtr->tkwin, "grid",
 	    "Grid", configSpecs, 0, (char **)NULL, (char *)gridPtr,
-	    GraphType(graphPtr)) != TCL_OK) {
+	    Blt_GraphType(graphPtr)) != TCL_OK) {
 	return TCL_ERROR;
     }
     ConfigureGrid(graphPtr, gridPtr);
@@ -326,7 +327,7 @@ CgetOp(graphPtr, interp, argc, argv)
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
 
     return Tk_ConfigureValue(interp, graphPtr->tkwin, configSpecs,
-	(char *)gridPtr, argv[3], GraphType(graphPtr));
+	(char *)gridPtr, argv[3], Blt_GraphType(graphPtr));
 }
 
 /*
@@ -354,9 +355,9 @@ ConfigureOp(graphPtr, interp, argc, argv)
     char **argv;
 {
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
-    unsigned int flags;
+    int flags;
 
-    flags = GraphType(graphPtr) | TK_CONFIG_ARGV_ONLY;
+    flags = Blt_GraphType(graphPtr) | TK_CONFIG_ARGV_ONLY;
     if (argc == 3) {
 	return Tk_ConfigureInfo(interp, graphPtr->tkwin, configSpecs,
 	    (char *)gridPtr, (char *)NULL, flags);
@@ -467,6 +468,7 @@ ToggleOp(graphPtr, interp, argc, argv)
     Grid *gridPtr = (Grid *)graphPtr->gridPtr;
 
     gridPtr->hidden = (!gridPtr->hidden);
+    graphPtr->flags |= REDRAW_BACKING_STORE;
     Blt_EventuallyRedrawGraph(graphPtr);
     return TCL_OK;
 }
@@ -474,13 +476,13 @@ ToggleOp(graphPtr, interp, argc, argv)
 
 static Blt_OpSpec gridOps[] =
 {
-    {"cget", 2, (Blt_Operation)CgetOp, 4, 4, "option",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 3, 0, "?options...?",},
-    {"off", 2, (Blt_Operation)UnmapOp, 3, 3, "",},
-    {"on", 2, (Blt_Operation)MapOp, 3, 3, "",},
-    {"toggle", 1, (Blt_Operation)ToggleOp, 3, 3, "",},
+    {"cget", 2, (Blt_Op)CgetOp, 4, 4, "option",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 3, 0, "?options...?",},
+    {"off", 2, (Blt_Op)UnmapOp, 3, 3, "",},
+    {"on", 2, (Blt_Op)MapOp, 3, 3, "",},
+    {"toggle", 1, (Blt_Op)ToggleOp, 3, 3, "",},
 };
-static int numGridOps = sizeof(gridOps) / sizeof(Blt_OpSpec);
+static int nGridOps = sizeof(gridOps) / sizeof(Blt_OpSpec);
 
 /*
  *----------------------------------------------------------------------
@@ -505,10 +507,9 @@ Blt_GridOp(graphPtr, interp, argc, argv)
     int argc;
     char **argv;
 {
-    Blt_Operation proc;
+    Blt_Op proc;
 
-    proc = Blt_GetOperation(interp, numGridOps, gridOps, BLT_OPER_ARG2,
-	argc, argv);
+    proc = Blt_GetOp(interp, nGridOps, gridOps, BLT_OP_ARG2, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }

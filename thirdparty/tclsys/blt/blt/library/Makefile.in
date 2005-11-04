@@ -4,55 +4,72 @@
 
 prefix       = @prefix@
 exec_prefix  = @exec_prefix@
+version      = @BLT_VERSION@
+lib_prefix    = @BLT_LIB_PREFIX@
 srcdir       = @srcdir@
 libdir       = @libdir@
-bindir       = @bindir@
 scriptdir    = @BLT_LIBRARY@
-BLT_VERSION  = @BLT_VERSION@
-AUX_LIBS     = @AUX_LIBS@
-SHLIB_SUFFIX = @SHLIB_SUFFIX@
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
+INSTALL_ROOT = 
 RM           = rm -f
 SHELL        = /bin/sh
 
-miscFiles     = bltCanvEps.pro bltGraph.pro \
-		bltDnd.tcl bltGraph.tcl bltHier.tcl bltTabset.tcl \
-		tclIndex 
+cursors = 	treeview.xbm \
+		treeview_m.xbm
 
-ddFiles      = dd-color.tcl dd-file.tcl dd-number.tcl dd-text.tcl tclIndex
+miscFiles     = \
+		bltCanvEps.pro \
+		bltGraph.pro \
+		dnd.tcl \
+		dragdrop.tcl \
+		graph.tcl \
+		hierbox.tcl \
+		tabnotebook.tcl \
+		tabset.tcl \
+		treeview.tcl \
+		tclIndex \
+		$(cursors)
 
-instdirs     = $(prefix) $(exec_prefix) $(libdir) $(scriptdir) \
-		$(scriptdir)/dd_protocols
+ddFiles      =  dd-color.tcl \
+		dd-file.tcl \
+		dd-number.tcl \
+		dd-text.tcl \
+		tclIndex
+
+instdirs     =  $(prefix) $(exec_prefix) \
+		$(libdir) $(prefix)/lib $(scriptdir) $(scriptdir)/dd_protocols
 
 all: pkgIndex
 
-install: mkdirs dragdrop files package
+pkgIndex: 
+	rm -f pkgIndex.tcl
+	sed -e 's/%VERSION%/$(version)/' $(srcdir)/pkgIndex.tcl.in | \
+	sed -e 's/%LIB_PREFIX%/$(lib_prefix)/' | \
+	sed -e 's;%LIB_DIR%;$(libdir);' > pkgIndex.tcl
+
+
+install: mkdirs pkgIndex
+	for i in $(ddFiles) ; do \
+	    $(INSTALL_DATA) $(srcdir)/dd_protocols/$$i \
+			$(INSTALL_ROOT)$(scriptdir)/dd_protocols ; \
+	done 
+	for i in $(miscFiles) ; do \
+	    $(INSTALL_DATA) $(srcdir)/$$i $(INSTALL_ROOT)$(scriptdir) ; \
+	done 
+	$(INSTALL_DATA) pkgIndex.tcl $(scriptdir)
 
 mkdirs:
 	@for i in $(instdirs) ; do \
-	    if test -d $$i ; then : ; else mkdir $$i ; fi ; \
+          if test -d $(INSTALL_ROOT)$$i ; then \
+            : ; \
+          else \
+            echo " mkdir $(INSTALL_ROOT)$$i" ; \
+            mkdir $(INSTALL_ROOT)$$i ; \
+          fi ; \
         done
 
-dragdrop: mkdirs
-	@for i in $(ddFiles) ; do \
-	    $(INSTALL_DATA) $(srcdir)/dd_protocols/$$i $(scriptdir)/dd_protocols ; \
-	done 
-
-files: mkdirs
-	@for i in $(miscFiles) ; do \
-	    $(INSTALL_DATA) $(srcdir)/$$i $(scriptdir) ; \
-	done 
-
-package: mkdirs pkgIndex.tcl
-	$(INSTALL_DATA) pkgIndex.tcl $(scriptdir)
-
-pkgIndex: 
-	rm -f pkgIndex.tcl
-	sed -e 's/BLT_VERSION/$(BLT_VERSION)/' $(srcdir)/pkgIndex.tcl.in | \
-	sed -e 's/SHLIB_SUFFIX/$(SHLIB_SUFFIX)/' | \
-	sed -e 's;AUX_LIBS;$(AUX_LIBS);' > pkgIndex.tcl
 clean:
 	$(RM) pkgIndex.tcl
 

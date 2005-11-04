@@ -2,49 +2,73 @@
 # 	Makefile for manual page files 
 # ------------------------------------------------------------------------
 
-section 	= n
 prefix  	= @prefix@
 mandir  	= @mandir@
-sectiondir 	= $(mandir)/man$(section)
+sectiondir 	= $(mandir)/mann
 srcdir		= @srcdir@
-BLT_VERSION	= @BLT_VERSION@
+version		= @BLT_VERSION@
 
-instdirs	= $(mandir) $(sectiondir)
+instdirs	= $(mandir) $(mandir)/mann $(mandir)/man3
 
-manuals		= BLT barchart bgexec bitmap bltdebug busy dragdrop \
-		  eps graph htext hierbox spline stripchart table tabset \
-		  tile vector watch winop beep cutbuffer
+MAN_N		= BLT.n barchart.n beep.n bgexec.n bitmap.n \
+		  bltdebug.n busy.n container.n cutbuffer.n \
+		  dragdrop.n eps.n graph.n hierbox.n  \
+		  hiertable.n htext.n spline.n stripchart.n \
+	 	  table.n tabset.n tile.n tree.n treeview.n vector.n \
+		  watch.n winop.n
 
+MAN_3 		= Blt_Tree.3 Blt_TreeGetNode.3 \
+		  Blt_TreeCreate.3 Blt_TreeGetToken.3 \
+		  Blt_TreeCreateNode.3 Blt_TreeName.3 \
+		  Blt_TreeDeleteNode.3 Blt_TreeNodeId.3 \
+		  Blt_TreeExists.3 Blt_TreeReleaseToken.3
+
+MANPAGES	= $(MAN_N) $(MAN_3)
+
+INSTALL  	= @INSTALL@
+INSTALL_DATA  	= @INSTALL_DATA@
+INSTALL_ROOT    = 
 SHELL    	= /bin/sh
 RM		= rm -rf
+VPATH		= $(srcdir)
 
-all: macros
+all: man.macros $(MANPAGES)
 
-install: mkdirs
-	@for i in $(manuals) ; do \
-	    src=$(srcdir)/$$i.man ; \
-	    dest=$(sectiondir)/$$i.$(section) ; \
-	    echo "installing manual $$i" ; \
-	    rm -f $$dest ; \
-	    sed -e "/man\.macros/r man.macros" -e '/man\.macros/d' \
-	    $$src > $$dest ; \
-	    chmod 444 $$dest; \
+install: mkdirs install-mann install-man3
+
+install-mann: $(MAN_N)
+	for i in *.n ; do \
+		$(INSTALL_DATA) $$i $(INSTALL_ROOT)$(mandir)/mann; \
+	done
+
+install-man3: $(MAN_3)
+	for i in *.3 ; do \
+		$(INSTALL_DATA) $$i $(INSTALL_ROOT)$(mandir)/man3; \
 	done
 
 mkdirs:
 	@for i in $(instdirs) ; do \
-	    if test ! -d $$i ; then \
-		mkdir $$i ; \
-	    fi ; \
+          if test -d $(INSTALL_ROOT)$$i ; then \
+            : ; \
+          else \
+            echo " mkdir $(INSTALL_ROOT)$$i" ; \
+            mkdir $(INSTALL_ROOT)$$i ; \
+          fi ; \
 	done
 
-macros:
-	rm -f man.macros
-	sed -e 's/BLT_VERSION/$(BLT_VERSION)/' \
-		$(srcdir)/man.macros.in > man.macros		
+.SUFFIXES: .n .mann .3 .man3
+
+.man3.3: $(srcdir)/man.macros
+	$(RM) $@
+	sed -e "/man\.macros/r $(srcdir)/man.macros" -e '/man\.macros/d'  -e 's/BLT_VERSION/$(version)/' $< > $@
+
+.mann.n: $(srcdir)/man.macros
+	$(RM) $@
+	sed -e "/man\.macros/r $(srcdir)/man.macros" -e '/man\.macros/d' -e 's/BLT_VERSION/$(version)/' $< > $@
 
 clean:
-	$(RM) man.macros
+	$(RM) *.3 *.n
 
 distclean: clean
 	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"* Makefile
+

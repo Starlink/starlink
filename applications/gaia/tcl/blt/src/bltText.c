@@ -1,3 +1,4 @@
+
 /*
  * bltText.c --
  *
@@ -26,35 +27,41 @@
 
 #include "bltInt.h"
 #include <X11/Xutil.h>
+#include "bltImage.h"
 
-#define ROTATE_0	0
-#define ROTATE_90	1
-#define ROTATE_180	2
-#define ROTATE_270	3
+#define WINDEBUG	0
 
-static GC bitmapGC;
+static Blt_HashTable bitmapGCTable;
+static int initialized;
 
 static void
-DrawCompoundText(display, drawable, gc, x, y, textPtr)
+DrawTextLayout(display, drawable, gc, font, x, y, textPtr)
     Display *display;
     Drawable drawable;
     GC gc;
+    Tk_Font font;
     register int x, y;		/* Origin of text */
-    CompoundText *textPtr;
+    TextLayout *textPtr;
 {
-    register TextSegment *segPtr = textPtr->segArr;
+    register TextFragment *fragPtr;
     register int i;
 
-    for (i = 0; i < textPtr->numSegments; i++, segPtr++) {
-	XDrawString(display, drawable, gc, x + segPtr->x, y + segPtr->y,
-	    segPtr->text, segPtr->numChars);
+    fragPtr = textPtr->fragArr;
+    for (i = 0; i < textPtr->nFrags; i++, fragPtr++) {
+#if HAVE_UTF
+	Tk_DrawChars(display, drawable, gc, font, fragPtr->text,
+	    fragPtr->count, x + fragPtr->x, y + fragPtr->y);
+#else
+	XDrawString(display, drawable, gc, x + fragPtr->x, y + fragPtr->y,
+	    fragPtr->text, fragPtr->count);
+#endif /*HAVE_UTF*/
     }
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * Blt_GetCompoundText --
+ * Blt_GetTextLayout --
  *
  *	Get the extents of a possibly multiple-lined text string.
  *
@@ -64,58 +71,57 @@ DrawCompoundText(display, drawable, gc, x, y, textPtr)
  *
  * -----------------------------------------------------------------
  */
-CompoundText *
-Blt_GetCompoundText(string, attrPtr)
+TextLayout *
+Blt_GetTextLayout(string, tsPtr)
     char string[];
-    TextAttributes *attrPtr;
+    TextStyle *tsPtr;
 {
     int maxHeight, maxWidth;
     int count;			/* Count # of characters on each line */
-    int numSegments;
+    int nFrags;
     int width;			/* Running dimensions of the text */
-    TextSegment *segPtr;
-    CompoundText *textPtr;
+    TextFragment *fragPtr;
+    TextLayout *textPtr;
     int lineHeight;
     int size;
     register char *p;
     register int i;
     Tk_FontMetrics fontMetrics;
 
-    Tk_GetFontMetrics(attrPtr->font, &fontMetrics);
-    lineHeight = fontMetrics.linespace + attrPtr->leader +
-	attrPtr->shadow.offset;
-    numSegments = 0;
+    Tk_GetFontMetrics(tsPtr->font, &fontMetrics);
+    lineHeight = fontMetrics.linespace + 
+	tsPtr->leader + tsPtr->shadow.offset;
+    nFrags = 0;
     for (p = string; *p != '\0'; p++) {
 	if (*p == '\n') {
-	    numSegments++;
+	    nFrags++;
 	}
     }
-    if (*(p - 1) != '\n') {
-	numSegments++;
+    if ((p != string) && (*(p - 1) != '\n')) {
+	nFrags++;
     }
-    size = sizeof(CompoundText) + (sizeof(TextSegment) * (numSegments - 1));
-    textPtr = (CompoundText *) calloc(1, size);
-    textPtr->numSegments = numSegments;
-
-    numSegments = count = 0;
+    size = sizeof(TextLayout) + (sizeof(TextFragment) * (nFrags - 1));
+    textPtr = Blt_Calloc(1, size);
+    textPtr->nFrags = nFrags;
+    nFrags = count = 0;
     width = maxWidth = 0;
-    maxHeight = attrPtr->padTop;
-    segPtr = textPtr->segArr;
+    maxHeight = tsPtr->padTop;
+    fragPtr = textPtr->fragArr;
     for (p = string; *p != '\0'; p++) {
 	if (*p == '\n') {
 	    if (count > 0) {
-		width = Tk_TextWidth(attrPtr->font, string, count) +
-		    attrPtr->shadow.offset;
+		width = Tk_TextWidth(tsPtr->font, string, count) +
+		    tsPtr->shadow.offset;
 		if (width > maxWidth) {
 		    maxWidth = width;
 		}
 	    }
-	    segPtr->width = width;
-	    segPtr->numChars = count;
-	    segPtr->y = maxHeight + fontMetrics.ascent;
-	    segPtr->text = string;
-	    segPtr++;
-	    numSegments++;
+	    fragPtr->width = width;
+	    fragPtr->count = count;
+	    fragPtr->y = maxHeight + fontMetrics.ascent;
+	    fragPtr->text = string;
+	    fragPtr++;
+	    nFrags++;
 	    maxHeight += lineHeight;
 	    string = p + 1;	/* Start the string on the next line */
 	    count = 0;		/* Reset to indicate the start of a new line */
@@ -123,39 +129,38 @@ Blt_GetCompoundText(string, attrPtr)
 	}
 	count++;
     }
-    if (numSegments < textPtr->numSegments) {
-	width = Tk_TextWidth(attrPtr->font, string, count) +
-	    attrPtr->shadow.offset;
+    if (nFrags < textPtr->nFrags) {
+	width = Tk_TextWidth(tsPtr->font, string, count) + tsPtr->shadow.offset;
 	if (width > maxWidth) {
 	    maxWidth = width;
 	}
-	segPtr->width = width;
-	segPtr->numChars = count;
-	segPtr->y = maxHeight + fontMetrics.ascent;
-	segPtr->text = string;
+	fragPtr->width = width;
+	fragPtr->count = count;
+	fragPtr->y = maxHeight + fontMetrics.ascent;
+	fragPtr->text = string;
 	maxHeight += lineHeight;
-	numSegments++;
+	nFrags++;
     }
-    maxHeight += attrPtr->padBottom;
-    maxWidth += PADDING(attrPtr->padX);
-    segPtr = textPtr->segArr;
-    for (i = 0; i < numSegments; i++, segPtr++) {
-	switch (attrPtr->justify) {
+    maxHeight += tsPtr->padBottom;
+    maxWidth += PADDING(tsPtr->padX);
+    fragPtr = textPtr->fragArr;
+    for (i = 0; i < nFrags; i++, fragPtr++) {
+	switch (tsPtr->justify) {
 	default:
 	case TK_JUSTIFY_LEFT:
 	    /* No offset for left justified text strings */
-	    segPtr->x = attrPtr->padLeft;
+	    fragPtr->x = tsPtr->padLeft;
 	    break;
 	case TK_JUSTIFY_RIGHT:
-	    segPtr->x = (maxWidth - segPtr->width) - attrPtr->padRight;
+	    fragPtr->x = (maxWidth - fragPtr->width) - tsPtr->padRight;
 	    break;
 	case TK_JUSTIFY_CENTER:
-	    segPtr->x = (maxWidth - segPtr->width) / 2;
+	    fragPtr->x = (maxWidth - fragPtr->width) / 2;
 	    break;
 	}
     }
     textPtr->width = maxWidth;
-    textPtr->height = maxHeight - attrPtr->leader;
+    textPtr->height = maxHeight - tsPtr->leader;
     return textPtr;
 }
 
@@ -173,9 +178,9 @@ Blt_GetCompoundText(string, attrPtr)
  * -----------------------------------------------------------------
  */
 void
-Blt_GetTextExtents(attrPtr, string, widthPtr, heightPtr)
-    TextAttributes *attrPtr;
-    char string[];
+Blt_GetTextExtents(tsPtr, string, widthPtr, heightPtr)
+    TextStyle *tsPtr;
+    char *string;
     int *widthPtr, *heightPtr;
 {
     int count;			/* Count # of characters on each line */
@@ -187,16 +192,15 @@ Blt_GetTextExtents(attrPtr, string, widthPtr, heightPtr)
     if (string == NULL) {
 	return;			/* NULL string? */
     }
-    Tk_GetFontMetrics(attrPtr->font, &fontMetrics);
-    lineHeight = fontMetrics.linespace + attrPtr->leader +
-	attrPtr->shadow.offset;
+    Tk_GetFontMetrics(tsPtr->font, &fontMetrics);
+    lineHeight = fontMetrics.linespace + tsPtr->leader + tsPtr->shadow.offset;
     count = 0;
     width = height = 0;
     for (p = string; *p != '\0'; p++) {
 	if (*p == '\n') {
 	    if (count > 0) {
-		w = Tk_TextWidth(attrPtr->font, string, count) +
-		    attrPtr->shadow.offset;
+		w = Tk_TextWidth(tsPtr->font, string, count) +
+		    tsPtr->shadow.offset;
 		if (w > width) {
 		    width = w;
 		}
@@ -210,14 +214,13 @@ Blt_GetTextExtents(attrPtr, string, widthPtr, heightPtr)
     }
     if ((count > 0) && (*(p - 1) != '\n')) {
 	height += lineHeight;
-	w = Tk_TextWidth(attrPtr->font, string, count) +
-	    attrPtr->shadow.offset;
+	w = Tk_TextWidth(tsPtr->font, string, count) + tsPtr->shadow.offset;
 	if (w > width) {
 	    width = w;
 	}
     }
-    *widthPtr = width + PADDING(attrPtr->padX);
-    *heightPtr = height + PADDING(attrPtr->padY);
+    *widthPtr = width + PADDING(tsPtr->padX);
+    *heightPtr = height + PADDING(tsPtr->padY);
 }
 
 /*
@@ -250,21 +253,22 @@ Blt_GetTextExtents(attrPtr, string, widthPtr, heightPtr)
  * -----------------------------------------------------------------
  */
 void
-Blt_GetBoundingBox(width, height, theta, rotWidthPtr, rotHeightPtr, pointArr)
+Blt_GetBoundingBox(width, height, theta, rotWidthPtr, rotHeightPtr, bbox)
     int width, height;		/* Unrotated region */
     double theta;		/* Rotation of box */
-    int *rotWidthPtr, *rotHeightPtr;	/* (out) Bounding box region */
-    XPoint *pointArr;		/* (out) Points of the rotated box */
+    double *rotWidthPtr, *rotHeightPtr;	/* (out) Bounding box region */
+    Point2D *bbox;		/* (out) Points of the rotated box */
 {
     register int i;
     double sinTheta, cosTheta;
-    double maxX, maxY;
+    double xMax, yMax;
     register double x, y;
     Point2D corner[4];
 
     theta = FMOD(theta, 360.0);
     if (FMOD(theta, (double)90.0) == 0.0) {
-	int rotWidth, rotHeight;
+	int ll, ur, ul, lr;
+	double rotWidth, rotHeight;
 	int quadrant;
 
 	/* Handle right-angle rotations specifically */
@@ -272,28 +276,34 @@ Blt_GetBoundingBox(width, height, theta, rotWidthPtr, rotHeightPtr, pointArr)
 	quadrant = (int)(theta / 90.0);
 	switch (quadrant) {
 	case ROTATE_270:	/* 270 degrees */
-	case ROTATE_90:	/* 90 degrees */
-	    rotWidth = height;
-	    rotHeight = width;
+	    ul = 3, ur = 0, lr = 1, ll = 2;
+	    rotWidth = (double)height;
+	    rotHeight = (double)width;
+	    break;
+	case ROTATE_90:		/* 90 degrees */
+	    ul = 1, ur = 2, lr = 3, ll = 0;
+	    rotWidth = (double)height;
+	    rotHeight = (double)width;
 	    break;
 	case ROTATE_180:	/* 180 degrees */
-	case ROTATE_0:		/* 0 degrees */
+	    ul = 2, ur = 3, lr = 0, ll = 1;
+	    rotWidth = (double)width;
+	    rotHeight = (double)height;
+	    break;
 	default:
-	    rotWidth = width;
-	    rotHeight = height;
+	case ROTATE_0:		/* 0 degrees */
+	    ul = 0, ur = 1, lr = 2, ll = 3;
+	    rotWidth = (double)width;
+	    rotHeight = (double)height;
 	    break;
 	}
-	if (pointArr != NULL) {
-	    int sx, sy;
-
-	    x = (double)rotWidth *0.5;
-	    y = (double)rotHeight *0.5;
-	    sx = ROUND(x);
-	    sy = ROUND(y);
-	    pointArr[3].x = pointArr[0].x = -sx;
-	    pointArr[1].y = pointArr[0].y = -sy;
-	    pointArr[2].x = pointArr[1].x = sx;
-	    pointArr[3].y = pointArr[2].y = sy;
+	if (bbox != NULL) {
+	    x = rotWidth * 0.5;
+	    y = rotHeight * 0.5;
+	    bbox[ll].x = bbox[ul].x = -x;
+	    bbox[ur].y = bbox[ul].y = -y;
+	    bbox[lr].x = bbox[ur].x = x;
+	    bbox[ll].y = bbox[lr].y = y;
 	}
 	*rotWidthPtr = rotWidth;
 	*rotHeightPtr = rotHeight;
@@ -308,22 +318,22 @@ Blt_GetBoundingBox(width, height, theta, rotWidthPtr, rotHeightPtr, pointArr)
 
     theta = (-theta / 180.0) * M_PI;
     sinTheta = sin(theta), cosTheta = cos(theta);
-    maxX = maxY = 0.0;
+    xMax = yMax = 0.0;
 
     /* Rotate the four corners and find the maximum X and Y coordinates */
 
     for (i = 0; i < 4; i++) {
 	x = (corner[i].x * cosTheta) - (corner[i].y * sinTheta);
 	y = (corner[i].x * sinTheta) + (corner[i].y * cosTheta);
-	if (x > maxX) {
-	    maxX = x;
+	if (x > xMax) {
+	    xMax = x;
 	}
-	if (y > maxY) {
-	    maxY = y;
+	if (y > yMax) {
+	    yMax = y;
 	}
-	if (pointArr != NULL) {
-	    pointArr[i].x = ROUND(x);
-	    pointArr[i].y = ROUND(y);
+	if (bbox != NULL) {
+	    bbox[i].x = x;
+	    bbox[i].y = y;
 	}
     }
 
@@ -331,8 +341,8 @@ Blt_GetBoundingBox(width, height, theta, rotWidthPtr, rotHeightPtr, pointArr)
      * By symmetry, the width and height of the bounding box are
      * twice the maximum x and y coordinates.
      */
-    *rotWidthPtr = (int)((maxX + maxX) + 0.5);
-    *rotHeightPtr = (int)((maxY + maxY) + 0.5);
+    *rotWidthPtr = xMax + xMax;
+    *rotHeightPtr = yMax + yMax;
 }
 
 /*
@@ -377,7 +387,7 @@ Blt_TranslateAnchor(x, y, width, height, anchor, transXPtr, transYPtr)
     case TK_ANCHOR_N:		/* Top center */
 	x -= (width / 2);
 	break;
-    case TK_ANCHOR_CENTER:	/* Centered */
+    case TK_ANCHOR_CENTER:	/* Center */
 	x -= (width / 2);
 	y -= (height / 2);
 	break;
@@ -401,348 +411,72 @@ Blt_TranslateAnchor(x, y, width, height, anchor, transXPtr, transYPtr)
     *transYPtr = y;
 }
 
-#ifdef	WIN32
 /*
  * -----------------------------------------------------------------
  *
- * Blt_RotateBitmap --
+ * Blt_TranslatePoint --
  *
- *	Creates a new bitmap containing the rotated image of the given
- *	bitmap.  We also need a special GC of depth 1, so that we do
- *	not need to rotate more than one plane of the bitmap.
+ * 	Translate the coordinates of a given bounding box based
+ *	upon the anchor specified.  The anchor indicates where
+ *	the given xy position is in relation to the bounding box.
+ *
+ *  		nw --- n --- ne
+ *  		|            |
+ *  		w   center   e
+ *  		|            |
+ *  		sw --- s --- se
+ *
+ * 	The coordinates returned are translated to the origin of the
+ * 	bounding box (suitable for giving to XCopyArea, XCopyPlane, etc.)
  *
  * Results:
- *	Returns a new bitmap containing the rotated image.
+ *	The translated coordinates of the bounding box are returned.
  *
  * -----------------------------------------------------------------
  */
-Pixmap
-Blt_RotateBitmap(tkwin, srcBitmap, srcWidth, srcHeight, theta,
-    destWidthPtr, destHeightPtr)
-    Tk_Window tkwin;
-    Pixmap srcBitmap;		/* Source bitmap to be rotated */
-    int srcWidth, srcHeight;	/* Width and height of the source bitmap */
-    double theta;		/* Right angle rotation to perform */
-    int *destWidthPtr, *destHeightPtr;
+Point2D
+Blt_TranslatePoint(pointPtr, width, height, anchor)
+    Point2D *pointPtr;		/* Window coordinates of anchor */
+    int width, height;		/* Extents of the bounding box */
+    Tk_Anchor anchor;		/* Direction of the anchor */
 {
-    Display *display;		/* X display */
-    Window root;		/* Root window drawable */
-    Pixmap destBitmap;
-    int destWidth, destHeight;
-    HDC src, dest;
-    TkWinDCState srcState, destState;
-    register int dx, dy;	/* Destination bitmap coordinates */
-    register int sx, sy;	/* Source bitmap coordinates */
-    unsigned long pixel;
+    Point2D trans;
 
-    /* Create a bitmap and image big enough to contain the rotated text */
-
-    display = Tk_Display(tkwin);
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
-    Blt_GetBoundingBox(srcWidth, srcHeight, theta, &destWidth, &destHeight,
-	(XPoint *)NULL);
-    destBitmap = Tk_GetPixmap(display, root, destWidth, destHeight, 1);
-    if (destBitmap == None) {
-	return None;		/* Can't allocate pixmap. */
+    trans = *pointPtr;
+    switch (anchor) {
+    case TK_ANCHOR_NW:		/* Upper left corner */
+	break;
+    case TK_ANCHOR_W:		/* Left center */
+	trans.y -= (height * 0.5);
+	break;
+    case TK_ANCHOR_SW:		/* Lower left corner */
+	trans.y -= height;
+	break;
+    case TK_ANCHOR_N:		/* Top center */
+	trans.x -= (width * 0.5);
+	break;
+    case TK_ANCHOR_CENTER:	/* Center */
+	trans.x -= (width * 0.5);
+	trans.y -= (height * 0.5);
+	break;
+    case TK_ANCHOR_S:		/* Bottom center */
+	trans.x -= (width * 0.5);
+	trans.y -= height;
+	break;
+    case TK_ANCHOR_NE:		/* Upper right corner */
+	trans.x -= width;
+	break;
+    case TK_ANCHOR_E:		/* Right center */
+	trans.x -= width;
+	trans.y -= (height * 0.5);
+	break;
+    case TK_ANCHOR_SE:		/* Lower right corner */
+	trans.x -= width;
+	trans.y -= height;
+	break;
     }
-    XSetForeground(display, bitmapGC, 0x0);
-    XFillRectangle(display, destBitmap, bitmapGC, 0, 0, destWidth, destHeight);
-
-    src = TkWinGetDrawableDC(display, srcBitmap, &srcState);
-    dest = TkWinGetDrawableDC(display, destBitmap, &destState);
-
-    theta = FMOD(theta, 360.0);
-    if (FMOD(theta, (double)90.0) == 0.0) {
-	int quadrant;
-
-	/* Handle right-angle rotations specifically */
-
-	quadrant = (int)(theta / 90.0);
-	switch (quadrant) {
-	case ROTATE_270:	/* 270 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = dy, sy = destWidth - dx - 1;
-		    pixel = GetPixel(src, sx, sy);
-		    if (pixel) {
-			SetPixelV(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_180:	/* 180 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = destWidth - dx - 1, sy = destHeight - dy - 1;
-		    pixel = GetPixel(src, sx, sy);
-		    if (pixel) {
-			SetPixelV(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_90:	/* 90 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = destHeight - dy - 1, sy = dx;
-		    pixel = GetPixel(src, sx, sy);
-		    if (pixel) {
-			SetPixelV(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_0:		/* 0 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    pixel = GetPixel(src, sx, sy);
-		    if (pixel) {
-			SetPixelV(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	default:
-	    /* The calling routine should never let this happen. */
-	    break;
-	}
-    } else {
-	double radians, sinTheta, cosTheta;
-	double srcX, srcY;	/* Center of source rectangle */
-	double destX, destY;	/* Center of destination rectangle */
-	double transX, transY;
-	double rx, ry;		/* Angle of rotation for x and y coordinates */
-
-	radians = (theta / 180.0) * M_PI;
-	sinTheta = sin(radians), cosTheta = cos(radians);
-
-	/*
-	 * Coordinates of the centers of the source and destination rectangles
-	 */
-	srcX = srcWidth * 0.5;
-	srcY = srcHeight * 0.5;
-	destX = destWidth * 0.5;
-	destY = destHeight * 0.5;
-
-	/* Rotate each pixel of dest image, placing results in source image */
-
-	for (dx = 0; dx < destWidth; dx++) {
-	    for (dy = 0; dy < destHeight; dy++) {
-
-		/* Translate origin to center of destination image */
-		transX = dx - destX;
-		transY = dy - destY;
-
-		/* Rotate the coordinates about the origin */
-		rx = (transX * cosTheta) - (transY * sinTheta);
-		ry = (transX * sinTheta) + (transY * cosTheta);
-
-		/* Translate back to the center of the source image */
-		rx += srcX;
-		ry += srcY;
-
-		sx = ROUND(rx);
-		sy = ROUND(ry);
-
-		/*
-		 * Verify the coordinates, since the destination image can be
-		 * bigger than the source
-		 */
-
-		if ((sx >= srcWidth) || (sx < 0) || (sy >= srcHeight) ||
-		    (sy < 0)) {
-		    continue;
-		}
-		pixel = GetPixel(src, sx, sy);
-		if (pixel) {
-		    SetPixelV(dest, dx, dy, pixel);
-		}
-	    }
-	}
-    }
-    TkWinReleaseDrawableDC(srcBitmap, src, &srcState);
-    TkWinReleaseDrawableDC(destBitmap, dest, &destState);
-
-    *destWidthPtr = destWidth;
-    *destHeightPtr = destHeight;
-    return destBitmap;
+    return trans;
 }
-
-#else
-/*
- * -----------------------------------------------------------------
- *
- * Blt_RotateBitmap --
- *
- *	Creates a new bitmap containing the rotated image of the given
- *	bitmap.  We also need a special GC of depth 1, so that we do
- *	not need to rotate more than one plane of the bitmap.
- *
- * Results:
- *	Returns a new bitmap containing the rotated image.
- *
- * -----------------------------------------------------------------
- */
-Pixmap
-Blt_RotateBitmap(tkwin, srcBitmap, srcWidth, srcHeight, theta,
-    destWidthPtr, destHeightPtr)
-    Tk_Window tkwin;
-    Pixmap srcBitmap;		/* Source bitmap to be rotated */
-    int srcWidth, srcHeight;	/* Width and height of the source bitmap */
-    double theta;		/* Right angle rotation to perform */
-    int *destWidthPtr, *destHeightPtr;
-{
-    Display *display;		/* X display */
-    Window root;		/* Root window drawable */
-    Pixmap destBitmap;
-    int destWidth, destHeight;
-    XImage *src, *dest;
-    register int dx, dy;	/* Destination bitmap coordinates */
-    register int sx, sy;	/* Source bitmap coordinates */
-    unsigned long pixel;
-
-    display = Tk_Display(tkwin);
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
-
-    /* Create a bitmap and image big enough to contain the rotated text */
-    Blt_GetBoundingBox(srcWidth, srcHeight, theta, &destWidth, &destHeight,
-	(XPoint *)NULL);
-    destBitmap = Tk_GetPixmap(display, root, destWidth, destHeight, 1);
-    XSetForeground(display, bitmapGC, 0x0);
-    XFillRectangle(display, destBitmap, bitmapGC, 0, 0, destWidth, destHeight);
-
-    src = XGetImage(display, srcBitmap, 0, 0, srcWidth, srcHeight, 1, ZPixmap);
-    dest = XGetImage(display, destBitmap, 0, 0, destWidth, destHeight, 1,
-	ZPixmap);
-    theta = FMOD(theta, 360.0);
-    if (FMOD(theta, (double)90.0) == 0.0) {
-	int quadrant;
-
-	/* Handle right-angle rotations specifically */
-
-	quadrant = (int)(theta / 90.0);
-	switch (quadrant) {
-	case ROTATE_270:	/* 270 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = dy, sy = destWidth - dx - 1;
-		    pixel = XGetPixel(src, sx, sy);
-		    if (pixel) {
-			XPutPixel(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_180:	/* 180 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = destWidth - dx - 1, sy = destHeight - dy - 1;
-		    pixel = XGetPixel(src, sx, sy);
-		    if (pixel) {
-			XPutPixel(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_90:	/* 90 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    sx = destHeight - dy - 1, sy = dx;
-		    pixel = XGetPixel(src, sx, sy);
-		    if (pixel) {
-			XPutPixel(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	case ROTATE_0:		/* 0 degrees */
-	    for (dx = 0; dx < destWidth; dx++) {
-		for (dy = 0; dy < destHeight; dy++) {
-		    pixel = XGetPixel(src, dx, dy);
-		    if (pixel) {
-			XPutPixel(dest, dx, dy, pixel);
-		    }
-		}
-	    }
-	    break;
-
-	default:
-	    /* The calling routine should never let this happen. */
-	    break;
-	}
-    } else {
-	double radians, sinTheta, cosTheta;
-	double srcX, srcY;	/* Center of source rectangle */
-	double destX, destY;	/* Center of destination rectangle */
-	double transX, transY;
-	double rx, ry;		/* Angle of rotation for x and y coordinates */
-
-	radians = (theta / 180.0) * M_PI;
-	sinTheta = sin(radians), cosTheta = cos(radians);
-
-	/*
-	 * Coordinates of the centers of the source and destination rectangles
-	 */
-	srcX = srcWidth * 0.5;
-	srcY = srcHeight * 0.5;
-	destX = destWidth * 0.5;
-	destY = destHeight * 0.5;
-
-	/* Rotate each pixel of dest image, placing results in source image */
-
-	for (dx = 0; dx < destWidth; dx++) {
-	    for (dy = 0; dy < destHeight; dy++) {
-
-		/* Translate origin to center of destination image */
-		transX = dx - destX;
-		transY = dy - destY;
-
-		/* Rotate the coordinates about the origin */
-		rx = (transX * cosTheta) - (transY * sinTheta);
-		ry = (transX * sinTheta) + (transY * cosTheta);
-
-		/* Translate back to the center of the source image */
-		rx += srcX;
-		ry += srcY;
-
-		sx = ROUND(rx);
-		sy = ROUND(ry);
-
-		/*
-		 * Verify the coordinates, since the destination image can be
-		 * bigger than the source
-		 */
-
-		if ((sx >= srcWidth) || (sx < 0) || (sy >= srcHeight) ||
-		    (sy < 0)) {
-		    continue;
-		}
-		pixel = XGetPixel(src, sx, sy);
-		if (pixel) {
-		    XPutPixel(dest, dx, dy, pixel);
-		}
-	    }
-	}
-    }
-    /* Write the rotated image into the destination bitmap */
-    XPutImage(display, destBitmap, bitmapGC, dest, 0, 0, 0, 0, destWidth,
-	destHeight);
-
-    /* Clean up temporary resources used */
-    XDestroyImage(src), XDestroyImage(dest);
-    *destWidthPtr = destWidth;
-    *destHeightPtr = destHeight;
-    return destBitmap;
-}
-
-#endif /* WIN32 */
 
 /*
  * -----------------------------------------------------------------
@@ -762,314 +496,100 @@ Blt_RotateBitmap(tkwin, srcBitmap, srcWidth, srcHeight, theta,
  * -----------------------------------------------------------------
  */
 Pixmap
-Blt_CreateTextBitmap(tkwin, textPtr, attrPtr, bmWidthPtr, bmHeightPtr, isMask)
+Blt_CreateTextBitmap(tkwin, textPtr, tsPtr, bmWidthPtr, bmHeightPtr)
     Tk_Window tkwin;
-    CompoundText *textPtr;	/* Text string to draw */
-    TextAttributes *attrPtr;	/* Text attributes: rotation, color, font,
+    TextLayout *textPtr;	/* Text string to draw */
+    TextStyle *tsPtr;		/* Text attributes: rotation, color, font,
 				 * linespacing, justification, etc. */
     int *bmWidthPtr;
     int *bmHeightPtr;		/* Extents of rotated text string */
-    int isMask;
 {
     int width, height;
     Pixmap bitmap;
     Display *display;
     Window root;
+    GC gc;
 #ifdef WIN32
-    HDC src;
+    HDC hDC;
     TkWinDCState state;
 #endif
     display = Tk_Display(tkwin);
 
-    width = textPtr->width + 2 * isMask;
-    height = textPtr->height + 2 * isMask;
+    width = textPtr->width;
+    height = textPtr->height;
 
     /* Create a temporary bitmap to contain the text string */
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
+    root = RootWindow(display, Tk_ScreenNumber(tkwin));
     bitmap = Tk_GetPixmap(display, root, width, height, 1);
     assert(bitmap != None);
     if (bitmap == None) {
 	return None;		/* Can't allocate pixmap. */
     }
     /* Clear the pixmap and draw the text string into it */
+    gc = Blt_GetBitmapGC(tkwin);
 #ifdef WIN32
-    src = TkWinGetDrawableDC(display, bitmap, &state);
-    PatBlt(src, 0, 0, width, height, WHITENESS);
-    TkWinReleaseDrawableDC(bitmap, src, &state);
+    hDC = TkWinGetDrawableDC(display, bitmap, &state);
+    PatBlt(hDC, 0, 0, width, height, WHITENESS);
+    TkWinReleaseDrawableDC(bitmap, hDC, &state);
 #else
-    XSetForeground(display, bitmapGC, 0);
-    XFillRectangle(display, bitmap, bitmapGC, 0, 0, width, height);
+    XSetForeground(display, gc, 0);
+    XFillRectangle(display, bitmap, gc, 0, 0, width, height);
 #endif /* WIN32 */
 
-    XSetFont(display, bitmapGC, Tk_FontId(attrPtr->font));
-    XSetForeground(display, bitmapGC, 1);
-    if (isMask) {
-	DrawCompoundText(display, bitmap, bitmapGC, 0, 0, textPtr);
-	DrawCompoundText(display, bitmap, bitmapGC, 1, 1, textPtr);
-	DrawCompoundText(display, bitmap, bitmapGC, 2, 2, textPtr);
-    } else {
-	DrawCompoundText(display, bitmap, bitmapGC, 0, 0, textPtr);
-    }
+    XSetFont(display, gc, Tk_FontId(tsPtr->font));
+    XSetForeground(display, gc, 1);
+    DrawTextLayout(display, bitmap, gc, tsPtr->font, 0, 0, textPtr);
+
 #ifdef WIN32
-    /*  
+    /*
      * Under Win32 when drawing into a bitmap, the bits are
-     * reversed. Which is why we are inverting the bitmap here.  
+     * reversed. Which is why we are inverting the bitmap here.
      */
-    src = TkWinGetDrawableDC(display, bitmap, &state);
-    PatBlt(src, 0, 0, textPtr->width, textPtr->height, DSTINVERT);
-    TkWinReleaseDrawableDC(bitmap, src, &state);
+    hDC = TkWinGetDrawableDC(display, bitmap, &state);
+    PatBlt(hDC, 0, 0, width, height, DSTINVERT);
+    TkWinReleaseDrawableDC(bitmap, hDC, &state);
 #endif
-    if (attrPtr->theta != 0.0) {
+    if (tsPtr->theta != 0.0) {
 	Pixmap rotBitmap;
 
 	/* Replace the text pixmap with a rotated one */
 
-	rotBitmap = Blt_RotateBitmap(tkwin, bitmap, textPtr->width,
-	    textPtr->height, attrPtr->theta, bmWidthPtr, bmHeightPtr);
+	rotBitmap = Blt_RotateBitmap(tkwin, bitmap, width, height, 
+		tsPtr->theta, bmWidthPtr, bmHeightPtr);
+	assert(rotBitmap);
 	if (rotBitmap != None) {
 	    Tk_FreePixmap(display, bitmap);
 	    return rotBitmap;
 	}
-	panic("could not allocate rotated bitmap");
     }
     *bmWidthPtr = textPtr->width, *bmHeightPtr = textPtr->height;
     return bitmap;
 }
 
-#ifdef WIN32
-/*
- * -----------------------------------------------------------------------
- *
- * Blt_ScaleBitmapRegion --
- *
- *	Creates a new scaled bitmap from another bitmap. The new bitmap
- *	is bounded by a specified region. Only this portion of the bitmap
- *	is scaled from the original bitmap.
- *
- *	By bounding scaling to a region we can generate a new bitmap
- *	which is no bigger than the specified viewport.
- *
- * Results:
- *	The new scaled bitmap is returned.
- *
- * Side Effects:
- *	A new pixmap is allocated. The caller must release this.
- *
- * -----------------------------------------------------------------------
- */
-Pixmap
-Blt_ScaleBitmapRegion(tkwin, srcBitmap, srcWidth, srcHeight,
-    destWidth, destHeight, regionPtr)
-    Tk_Window tkwin;
-    Pixmap srcBitmap;
-    int srcWidth, srcHeight, destWidth, destHeight;
-    ImageRegion *regionPtr;
-{
-    TkWinDCState srcState, destState;
-    HDC src, dest;
-    Pixmap destBitmap;
-    double xScale, yScale;
-    register int dx, dy;	/* Destination bitmap coordinates */
-    register int sx, sy;	/* Source bitmap coordinates */
-    unsigned long pixel;
-    Window root;
-    Display *display;
-    double tmp;
-
-    /* Create a new bitmap the size of the region and clear it */
-
-    display = Tk_Display(tkwin);
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
-    destBitmap = Tk_GetPixmap(display, root, regionPtr->width, 
-	regionPtr->height, 1);
-    if (destBitmap == None) {
-	return None;
-    }
-    XSetForeground(display, bitmapGC, 0x0);
-    XFillRectangle(display, destBitmap, bitmapGC, 0, 0, regionPtr->width,
-	regionPtr->height);
-    src = TkWinGetDrawableDC(display, srcBitmap, &srcState);
-    dest = TkWinGetDrawableDC(display, destBitmap, &destState);
-
-    /*
-     * Scale each pixel of destination image from results of source
-     * image. Verify the coordinates, since the destination image can
-     * be bigger than the source
-     */
-    xScale = (double)srcWidth / (double)destWidth;
-    yScale = (double)srcHeight / (double)destHeight;
-
-    for (dy = 0; dy < regionPtr->height; dy++) {
-	tmp = (double)(dy + regionPtr->y) * yScale;
-	sy = ROUND(tmp);
-	if (sy >= srcHeight) {
-	    continue;
-	}
-	for (dx = 0; dx < regionPtr->width; dx++) {
-	    tmp = (double)(dx + regionPtr->x) * xScale;
-	    sx = ROUND(tmp);
-	    if (sx >= srcWidth) {
-		continue;
-	    }
-	    pixel = GetPixel(src, sx, sy);
-	    if (pixel) {
-		SetPixelV(dest, dx, dy, pixel);
-	    }
-	}
-    }
-    TkWinReleaseDrawableDC(srcBitmap, src, &srcState);
-    TkWinReleaseDrawableDC(destBitmap, dest, &destState);
-    return destBitmap;
-}
-
-#else
-
-/*
- * -----------------------------------------------------------------------
- *
- * Blt_ScaleBitmapRegion --
- *
- *	Creates a new scaled bitmap from another bitmap. The new bitmap
- *	is bounded by a specified region. Only this portion of the bitmap
- *	is scaled from the original bitmap.
- *
- *	By bounding scaling to a region we can generate a new bitmap
- *	which is no bigger than the specified viewport.
- *
- * Results:
- *	The new scaled bitmap is returned.
- *
- * Side Effects:
- *	A new pixmap is allocated. The caller must release this.
- *
- * -----------------------------------------------------------------------
- */
-Pixmap
-Blt_ScaleBitmapRegion(tkwin, srcBitmap, srcWidth, srcHeight,
-    destWidth, destHeight, regionPtr)
-    Tk_Window tkwin;
-    Pixmap srcBitmap;
-    int srcWidth, srcHeight, destWidth, destHeight;
-    ImageRegion *regionPtr;
-{
-    Display *display;
-    Window root;
-    XImage *src, *dest;
-    Pixmap destBitmap;
-    double xScale, yScale;
-    register int dx, dy;	/* Destination bitmap coordinates */
-    register int sx, sy;	/* Source bitmap coordinates */
-    unsigned long pixel;
-    double tmp;
-
-    /* Create a new bitmap the size of the region and clear it */
-
-    display = Tk_Display(tkwin);
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
-    destBitmap = Tk_GetPixmap(display, root, regionPtr->width, 
-	regionPtr->height, 1);
-
-    XSetForeground(display, bitmapGC, 0x0);
-    XFillRectangle(display, destBitmap, bitmapGC, 0, 0, regionPtr->width,
-	regionPtr->height);
-
-    src = XGetImage(display, srcBitmap, 0, 0, srcWidth, srcHeight, 1, ZPixmap);
-    dest = XGetImage(display, destBitmap, 0, 0, regionPtr->width, 
-	regionPtr->height, 1, ZPixmap);
-
-    /*
-     * Scale each pixel of destination image from results of source
-     * image. Verify the coordinates, since the destination image can
-     * be bigger than the source
-     */
-    xScale = (double)srcWidth / (double)destWidth;
-    yScale = (double)srcHeight / (double)destHeight;
-
-    for (dy = 0; dy < regionPtr->height; dy++) {
-	tmp = (double)(dy + regionPtr->y) * yScale;
-	sy = ROUND(tmp);
-	if (sy >= srcHeight) {
-	    continue;
-	}
-	for (dx = 0; dx < regionPtr->width; dx++) {
-	    tmp = (double)(dx + regionPtr->x) * xScale;
-	    sx = ROUND(tmp);
-	    if (sx >= srcWidth) {
-		continue;
-	    }
-	    pixel = XGetPixel(src, sx, sy);
-	    if (pixel) {
-		XPutPixel(dest, dx, dy, pixel);
-	    }
-	}
-    }
-
-    /* Write the rotated image into the destination bitmap */
-
-    XPutImage(display, destBitmap, bitmapGC, dest, 0, 0, 0, 0, 
-	regionPtr->width, regionPtr->height);
-    XDestroyImage(src), XDestroyImage(dest);
-    return destBitmap;
-}
-
-#endif /* WIN32 */
-
-/*
- * -----------------------------------------------------------------------
- *
- * Blt_ScaleBitmap --
- *
- *	Same as Blt_ScaleBitmapRegion, except that the region is unbounded.
- *	The scaled bitmap will be a fully scaled version of the original,
- *	not a portion of it.
- *
- * Results:
- *	The new scaled bitmap is returned.
- *
- * Side Effects:
- *	A new pixmap is allocated. The caller must release this.
- *
- * -----------------------------------------------------------------------
- */
-Pixmap
-Blt_ScaleBitmap(tkwin, srcBitmap, srcWidth, srcHeight, scaledWidth, 
-	scaledHeight)
-    Tk_Window tkwin;
-    Pixmap srcBitmap;
-    int srcWidth, srcHeight, scaledWidth, scaledHeight;
-{
-    ImageRegion region;
-
-    region.x = region.y = 0;
-    region.width = scaledWidth;
-    region.height = scaledHeight;
-    return Blt_ScaleBitmapRegion(tkwin, srcBitmap, srcWidth, srcHeight,
-	scaledWidth, scaledHeight, &region);
-}
-
 /*LINTLIBRARY*/
 void
-Blt_InitTextAttributes(attrPtr)
-    TextAttributes *attrPtr;
+Blt_InitTextStyle(tsPtr)
+    TextStyle *tsPtr;
 {
     /* Initialize these attributes to zero */
-    attrPtr->leader = 0;
-    attrPtr->shadow.offset = 0;
-    attrPtr->padLeft = attrPtr->padRight = 0;
-    attrPtr->padTop = attrPtr->padBottom = 0;
-    attrPtr->shadow.color = attrPtr->activeColor =
-	attrPtr->color = (XColor *)NULL;
-    attrPtr->theta = 0.0;
-    attrPtr->state = 0;
-    attrPtr->anchor = TK_ANCHOR_CENTER;
-    attrPtr->justify = TK_JUSTIFY_CENTER;
-    attrPtr->font = NULL;
+    tsPtr->activeColor = (XColor *)NULL;
+    tsPtr->anchor = TK_ANCHOR_CENTER;
+    tsPtr->color = (XColor *)NULL;
+    tsPtr->font = NULL;
+    tsPtr->justify = TK_JUSTIFY_CENTER;
+    tsPtr->leader = 0;
+    tsPtr->padLeft = tsPtr->padRight = 0;
+    tsPtr->padTop = tsPtr->padBottom = 0;
+    tsPtr->shadow.color = (XColor *)NULL;
+    tsPtr->shadow.offset = 0;
+    tsPtr->state = 0;
+    tsPtr->theta = 0.0;
 }
 
 void
-Blt_SetTextDrawAttributes(attrPtr, font, gc, normalColor, activeColor,
-    shadowColor, theta, anchor, justify, leader, shadowOffset)
-    TextAttributes *attrPtr;
+Blt_SetDrawTextStyle(tsPtr, font, gc, normalColor, activeColor, shadowColor, 
+	theta, anchor, justify, leader, shadowOffset)
+    TextStyle *tsPtr;
     Tk_Font font;
     GC gc;
     XColor *normalColor, *activeColor, *shadowColor;
@@ -1078,23 +598,23 @@ Blt_SetTextDrawAttributes(attrPtr, font, gc, normalColor, activeColor,
     Tk_Justify justify;
     int leader, shadowOffset;
 {
-    Blt_InitTextAttributes(attrPtr);
-    attrPtr->gc = gc;
-    attrPtr->color = normalColor;
-    attrPtr->activeColor = activeColor;
-    attrPtr->shadow.color = shadowColor;
-    attrPtr->font = font;
-    attrPtr->theta = theta;
-    attrPtr->anchor = anchor;
-    attrPtr->justify = justify;
-    attrPtr->leader = leader;
-    attrPtr->shadow.offset = shadowOffset;
+    Blt_InitTextStyle(tsPtr);
+    tsPtr->activeColor = activeColor;
+    tsPtr->anchor = anchor;
+    tsPtr->color = normalColor;
+    tsPtr->font = font;
+    tsPtr->gc = gc;
+    tsPtr->justify = justify;
+    tsPtr->leader = leader;
+    tsPtr->shadow.color = shadowColor;
+    tsPtr->shadow.offset = shadowOffset;
+    tsPtr->theta = theta;
 }
 
 void
-Blt_SetTextPrintAttributes(attrPtr, font, fgColor, activeColor, shadowColor,
-    theta, anchor, justify, leader, shadowOffset)
-    TextAttributes *attrPtr;
+Blt_SetPrintTextStyle(tsPtr, font, fgColor, activeColor, shadowColor, theta, 
+	anchor, justify, leader, shadowOffset)
+    TextStyle *tsPtr;
     Tk_Font font;
     XColor *fgColor, *activeColor, *shadowColor;
     double theta;
@@ -1102,22 +622,22 @@ Blt_SetTextPrintAttributes(attrPtr, font, fgColor, activeColor, shadowColor,
     Tk_Justify justify;
     int leader, shadowOffset;
 {
-    Blt_InitTextAttributes(attrPtr);
-    attrPtr->color = fgColor;
-    attrPtr->activeColor = activeColor;
-    attrPtr->shadow.color = shadowColor;
-    attrPtr->font = font;
-    attrPtr->theta = theta;
-    attrPtr->anchor = anchor;
-    attrPtr->justify = justify;
-    attrPtr->leader = leader;
-    attrPtr->shadow.offset = shadowOffset;
+    Blt_InitTextStyle(tsPtr);
+    tsPtr->color = fgColor;
+    tsPtr->activeColor = activeColor;
+    tsPtr->shadow.color = shadowColor;
+    tsPtr->font = font;
+    tsPtr->theta = theta;
+    tsPtr->anchor = anchor;
+    tsPtr->justify = justify;
+    tsPtr->leader = leader;
+    tsPtr->shadow.offset = shadowOffset;
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * DrawText --
+ * Blt_DrawTextLayout --
  *
  *	Draw a text string, possibly rotated, using the the given
  *	window coordinates as an anchor for the text bounding box.
@@ -1138,11 +658,11 @@ Blt_SetTextPrintAttributes(attrPtr, font, fgColor, activeColor, shadowColor,
  * -----------------------------------------------------------------
  */
 void
-Blt_DrawCompoundText(tkwin, drawable, textPtr, attrPtr, x, y)
+Blt_DrawTextLayout(tkwin, drawable, textPtr, tsPtr, x, y)
     Tk_Window tkwin;
     Drawable drawable;
-    CompoundText *textPtr;
-    TextAttributes *attrPtr;	/* Text attribute information */
+    TextLayout *textPtr;
+    TextStyle *tsPtr;		/* Text attribute information */
     int x, y;			/* Window coordinates to draw text */
 {
     int width, height;
@@ -1152,11 +672,11 @@ Blt_DrawCompoundText(tkwin, drawable, textPtr, attrPtr, x, y)
     int active;
 
     display = Tk_Display(tkwin);
-    theta = FMOD(attrPtr->theta, (double)360.0);
+    theta = FMOD(tsPtr->theta, (double)360.0);
     if (theta < 0.0) {
 	theta += 360.0;
     }
-    active = attrPtr->state & STATE_ACTIVE;
+    active = tsPtr->state & STATE_ACTIVE;
     if (theta == 0.0) {
 
 	/*
@@ -1165,208 +685,234 @@ Blt_DrawCompoundText(tkwin, drawable, textPtr, attrPtr, x, y)
 	 * for engraved (disabled) and shadowed text.
 	 */
 	width = textPtr->width, height = textPtr->height;
-	Blt_TranslateAnchor(x, y, width, height, attrPtr->anchor, &x, &y);
-	if (attrPtr->state & (STATE_DISABLED | STATE_EMPHASIS)) {
-	    TkBorder *borderPtr = (TkBorder *) attrPtr->border;
+	Blt_TranslateAnchor(x, y, width, height, tsPtr->anchor, &x, &y);
+	if (tsPtr->state & (STATE_DISABLED | STATE_EMPHASIS)) {
+	    TkBorder *borderPtr = (TkBorder *) tsPtr->border;
 	    XColor *color1, *color2;
 
 	    color1 = borderPtr->lightColor, color2 = borderPtr->darkColor;
-	    if (attrPtr->state & STATE_EMPHASIS) {
+	    if (tsPtr->state & STATE_EMPHASIS) {
 		XColor *hold;
 
 		hold = color1, color1 = color2, color2 = hold;
 	    }
 	    if (color1 != NULL) {
-		XSetForeground(display, attrPtr->gc, color1->pixel);
+		XSetForeground(display, tsPtr->gc, color1->pixel);
 	    }
-	    DrawCompoundText(display, drawable, attrPtr->gc, x + 1, y + 1,
-		textPtr);
+	    DrawTextLayout(display, drawable, tsPtr->gc, tsPtr->font, x + 1, 
+		y + 1, textPtr);
 	    if (color2 != NULL) {
-		XSetForeground(display, attrPtr->gc, color2->pixel);
+		XSetForeground(display, tsPtr->gc, color2->pixel);
 	    }
-	    DrawCompoundText(display, drawable, attrPtr->gc, x, y, textPtr);
+	    DrawTextLayout(display, drawable, tsPtr->gc, tsPtr->font, x, y, 
+		textPtr);
 
 	    /* Reset the foreground color back to its original setting,
 	     * so not to invalidate the GC cache. */
-	    XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	    XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
 
 	    return;		/* Done */
 	}
-	if ((attrPtr->shadow.offset > 0) && (attrPtr->shadow.color != NULL)) {
-	    XSetForeground(display, attrPtr->gc, attrPtr->shadow.color->pixel);
-	    DrawCompoundText(display, drawable, attrPtr->gc,
-		x + attrPtr->shadow.offset, y + attrPtr->shadow.offset, textPtr);
-	    XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	if ((tsPtr->shadow.offset > 0) && (tsPtr->shadow.color != NULL)) {
+	    XSetForeground(display, tsPtr->gc, tsPtr->shadow.color->pixel);
+	    DrawTextLayout(display, drawable, tsPtr->gc, tsPtr->font, 
+		   x + tsPtr->shadow.offset, y + tsPtr->shadow.offset, textPtr);
+	    XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
 	}
 	if (active) {
-	    XSetForeground(display, attrPtr->gc, attrPtr->activeColor->pixel);
+	    XSetForeground(display, tsPtr->gc, tsPtr->activeColor->pixel);
 	}
-	DrawCompoundText(display, drawable, attrPtr->gc, x, y, textPtr);
+	DrawTextLayout(display, drawable, tsPtr->gc, tsPtr->font, x, y, 
+		textPtr);
 	if (active) {
-	    XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	    XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
 	}
 	return;			/* Done */
     }
+#ifdef WIN32
+    if (Blt_DrawRotatedText(display, drawable, x, y, theta, tsPtr, textPtr)) {
+	return;
+    }
+#endif
     /*
      * Rotate the text by writing the text into a bitmap and rotating
      * the bitmap.  Set the clip mask and origin in the GC first.  And
      * make sure we restore the GC because it may be shared.
      */
-
-    attrPtr->theta = theta;
-    bitmap = Blt_CreateTextBitmap(tkwin, textPtr, attrPtr, &width, &height, FALSE);
+    tsPtr->theta = theta;
+    bitmap = Blt_CreateTextBitmap(tkwin, textPtr, tsPtr, &width, &height);
     if (bitmap == None) {
 	return;
     }
-    Blt_TranslateAnchor(x, y, width, height, attrPtr->anchor, &x, &y);
+    Blt_TranslateAnchor(x, y, width, height, tsPtr->anchor, &x, &y);
+#ifdef notdef
     theta = FMOD(theta, (double)90.0);
-    XSetClipMask(display, attrPtr->gc, bitmap);
+#endif
+    XSetClipMask(display, tsPtr->gc, bitmap);
 
-    if (attrPtr->state & (STATE_DISABLED | STATE_EMPHASIS)) {
-	TkBorder *borderPtr = (TkBorder *) attrPtr->border;
+    if (tsPtr->state & (STATE_DISABLED | STATE_EMPHASIS)) {
+	TkBorder *borderPtr = (TkBorder *) tsPtr->border;
 	XColor *color1, *color2;
 
 	color1 = borderPtr->lightColor, color2 = borderPtr->darkColor;
-	if (attrPtr->state & STATE_EMPHASIS) {
+	if (tsPtr->state & STATE_EMPHASIS) {
 	    XColor *hold;
 
 	    hold = color1, color1 = color2, color2 = hold;
 	}
 	if (color1 != NULL) {
-	    XSetForeground(display, attrPtr->gc, color1->pixel);
+	    XSetForeground(display, tsPtr->gc, color1->pixel);
 	}
-	XSetClipOrigin(display, attrPtr->gc, x + 1, y + 1);
-	XCopyPlane(display, bitmap, drawable, attrPtr->gc, 0, 0, width, height,
-	    x + 1, y + 1, 1);
+	XSetClipOrigin(display, tsPtr->gc, x + 1, y + 1);
+	XCopyPlane(display, bitmap, drawable, tsPtr->gc, 0, 0, width, 
+		height, x + 1, y + 1, 1);
 	if (color2 != NULL) {
-	    XSetForeground(display, attrPtr->gc, color2->pixel);
+	    XSetForeground(display, tsPtr->gc, color2->pixel);
 	}
-	XSetClipOrigin(display, attrPtr->gc, x, y);
-	XCopyPlane(display, bitmap, drawable, attrPtr->gc, 0, 0, width, height,
-	    x, y, 1);
-	XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	XSetClipOrigin(display, tsPtr->gc, x, y);
+	XCopyPlane(display, bitmap, drawable, tsPtr->gc, 0, 0, width, 
+		height, x, y, 1);
+	XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
     } else {
-	if ((attrPtr->shadow.offset > 0) && (attrPtr->shadow.color != NULL)) {
-	    XSetClipOrigin(display, attrPtr->gc, x + attrPtr->shadow.offset,
-		y + attrPtr->shadow.offset);
-	    XSetForeground(display, attrPtr->gc, attrPtr->shadow.color->pixel);
-	    XCopyPlane(display, bitmap, drawable, attrPtr->gc, 0, 0, width,
-		height, x + attrPtr->shadow.offset, y + attrPtr->shadow.offset,
-		1);
-	    XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	if ((tsPtr->shadow.offset > 0) && (tsPtr->shadow.color != NULL)) {
+	    XSetClipOrigin(display, tsPtr->gc, x + tsPtr->shadow.offset,
+			   y + tsPtr->shadow.offset);
+	    XSetForeground(display, tsPtr->gc, tsPtr->shadow.color->pixel);
+	    XCopyPlane(display, bitmap, drawable, tsPtr->gc, 0, 0, width, 
+		height, x + tsPtr->shadow.offset, y + tsPtr->shadow.offset, 1);
+	    XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
 	}
 	if (active) {
-	    XSetForeground(display, attrPtr->gc, attrPtr->activeColor->pixel);
+	    XSetForeground(display, tsPtr->gc, tsPtr->activeColor->pixel);
 	}
-	XSetClipOrigin(display, attrPtr->gc, x, y);
-	XCopyPlane(display, bitmap, drawable, attrPtr->gc, 0, 0, width, height,
-	    x, y, 1);
+	XSetClipOrigin(display, tsPtr->gc, x, y);
+	XCopyPlane(display, bitmap, drawable, tsPtr->gc, 0, 0, width, height, 
+		x, y, 1);
 	if (active) {
-	    XSetForeground(display, attrPtr->gc, attrPtr->color->pixel);
+	    XSetForeground(display, tsPtr->gc, tsPtr->color->pixel);
 	}
     }
-    XSetClipMask(display, attrPtr->gc, None);
+    XSetClipMask(display, tsPtr->gc, None);
     Tk_FreePixmap(display, bitmap);
 }
 
 void
-Blt_DrawText2(tkwin, drawable, string, attrPtr, x, y, areaPtr)
+Blt_DrawText2(tkwin, drawable, string, tsPtr, x, y, areaPtr)
     Tk_Window tkwin;
     Drawable drawable;
     char string[];
-    TextAttributes *attrPtr;	/* Text attribute information */
+    TextStyle *tsPtr;		/* Text attribute information */
     int x, y;			/* Window coordinates to draw text */
-    Dimension *areaPtr;
+    Dim2D *areaPtr;
 {
-    CompoundText *textPtr;
+    TextLayout *textPtr;
     int width, height;
     double theta;
 
     if ((string == NULL) || (*string == '\0')) {
 	return;			/* Empty string, do nothing */
     }
-    textPtr = Blt_GetCompoundText(string, attrPtr);
-    Blt_DrawCompoundText(tkwin, drawable, textPtr, attrPtr, x, y);
-    theta = FMOD(attrPtr->theta, (double)360.0);
+    textPtr = Blt_GetTextLayout(string, tsPtr);
+    Blt_DrawTextLayout(tkwin, drawable, textPtr, tsPtr, x, y);
+    theta = FMOD(tsPtr->theta, (double)360.0);
     if (theta < 0.0) {
 	theta += 360.0;
     }
     width = textPtr->width;
     height = textPtr->height;
     if (theta != 0.0) {
-	Blt_GetBoundingBox(width, height, theta, &width, &height,
-	    (XPoint *)NULL);
+	double rotWidth, rotHeight;
+
+	Blt_GetBoundingBox(width, height, theta, &rotWidth, &rotHeight, 
+	   (Point2D *)NULL);
+	width = ROUND(rotWidth);
+	height = ROUND(rotHeight);
     }
-    free((char *)textPtr);
     areaPtr->width = width;
     areaPtr->height = height;
+    Blt_Free(textPtr);
 }
 
 void
-Blt_DrawText(tkwin, drawable, string, attrPtr, x, y)
+Blt_DrawText(tkwin, drawable, string, tsPtr, x, y)
     Tk_Window tkwin;
     Drawable drawable;
     char string[];
-    TextAttributes *attrPtr;	/* Text attribute information */
+    TextStyle *tsPtr;		/* Text attribute information */
     int x, y;			/* Window coordinates to draw text */
 {
-    CompoundText *textPtr;
+    TextLayout *textPtr;
 
     if ((string == NULL) || (*string == '\0')) {
 	return;			/* Empty string, do nothing */
     }
-    textPtr = Blt_GetCompoundText(string, attrPtr);
-    Blt_DrawCompoundText(tkwin, drawable, textPtr, attrPtr, x, y);
-    free((char *)textPtr);
+    textPtr = Blt_GetTextLayout(string, tsPtr);
+    Blt_DrawTextLayout(tkwin, drawable, textPtr, tsPtr, x, y);
+    Blt_Free(textPtr);
 }
 
-/*ARGSUSED*/
-void
-Blt_InitBitmapGC(interp, tkwin)
-    Tcl_Interp *interp;
+GC
+Blt_GetBitmapGC(tkwin)
     Tk_Window tkwin;
 {
-    Pixmap bitmap;
-    XGCValues gcValues;
-    unsigned int gcMask;
-    Window root;
+    int isNew;
+    GC gc;
+    Display *display;
+    Blt_HashEntry *hPtr;
 
-    root = RootWindow(Tk_Display(tkwin), Tk_ScreenNumber(tkwin));
-    bitmap = Tk_GetPixmap(Tk_Display(tkwin), root, 1, 1, 1);
-    gcValues.foreground = gcValues.background = 0;
-    gcMask = (GCForeground | GCBackground);
-    bitmapGC = Blt_GetPrivateGCFromDrawable(tkwin, bitmap, gcMask, &gcValues);
-    Tk_FreePixmap(Tk_Display(tkwin), bitmap);
+    if (!initialized) {
+	Blt_InitHashTable(&bitmapGCTable, BLT_ONE_WORD_KEYS);
+	initialized = TRUE;
+    }
+    display = Tk_Display(tkwin);
+    hPtr = Blt_CreateHashEntry(&bitmapGCTable, (char *)display, &isNew);
+    if (isNew) {
+	Pixmap bitmap;
+	XGCValues gcValues;
+	unsigned long gcMask;
+	Window root;
+
+	root = RootWindow(display, Tk_ScreenNumber(tkwin));
+	bitmap = Tk_GetPixmap(display, root, 1, 1, 1);
+	gcValues.foreground = gcValues.background = 0;
+	gcMask = (GCForeground | GCBackground);
+	gc = Blt_GetPrivateGCFromDrawable(display, bitmap, gcMask, &gcValues);
+	Tk_FreePixmap(display, bitmap);
+	Blt_SetHashValue(hPtr, gc);
+    } else {
+	gc = (GC)Blt_GetHashValue(hPtr);
+    }
+    return gc;
 }
 
 void
-Blt_ResetTextAttributes(tkwin, attrPtr)
+Blt_ResetTextStyle(tkwin, tsPtr)
     Tk_Window tkwin;
-    TextAttributes *attrPtr;
+    TextStyle *tsPtr;
 {
     GC newGC;
     XGCValues gcValues;
     unsigned long gcMask;
 
     gcMask = GCFont;
-    gcValues.font = Tk_FontId(attrPtr->font);
-    if (attrPtr->color != NULL) {
+    gcValues.font = Tk_FontId(tsPtr->font);
+    if (tsPtr->color != NULL) {
 	gcMask |= GCForeground;
-	gcValues.foreground = attrPtr->color->pixel;
+	gcValues.foreground = tsPtr->color->pixel;
     }
     newGC = Tk_GetGC(tkwin, gcMask, &gcValues);
-    if (attrPtr->gc != NULL) {
-	Tk_FreeGC(Tk_Display(tkwin), attrPtr->gc);
+    if (tsPtr->gc != NULL) {
+	Tk_FreeGC(Tk_Display(tkwin), tsPtr->gc);
     }
-    attrPtr->gc = newGC;
+    tsPtr->gc = newGC;
 }
 
 void
-Blt_FreeTextAttributes(display, attrPtr)
+Blt_FreeTextStyle(display, tsPtr)
     Display *display;
-    TextAttributes *attrPtr;
+    TextStyle *tsPtr;
 {
-    if (attrPtr->gc != NULL) {
-	Tk_FreeGC(display, attrPtr->gc);
+    if (tsPtr->gc != NULL) {
+	Tk_FreeGC(display, tsPtr->gc);
     }
 }

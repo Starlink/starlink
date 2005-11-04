@@ -1,22 +1,11 @@
 /*
  * bltUnixPipe.c --
  *
- *	Lifted from tclPipe.c and tclUnixPipe.c in the Tcl
- *	distribution, this is the first step toward freedom from the
- *	tyranny of the former Tcl_CreatePipeline API.
- *
+ *	Originally taken from tclPipe.c and tclUnixPipe.c in the Tcl
+ *	distribution, implements the former Tcl_CreatePipeline API.
  *	This file contains the generic portion of the command channel
  *	driver as well as various utility routines used in managing
  *	subprocesses.
- *
- *	[It's not clear why we needed a whole new API for I/O. Channels
- *	are one of the few losing propositions in Tcl. While it's easy
- *	to see that one needs to handle the different platform I/O
- *	semantics in a coherent fashion, it's usually better to pick
- *	an API from one of platforms (hopefully a mature, well-known model)
- *	and crowbar the other platforms to follow that.  At least then
- *	you're working from a known set of sematics. With Tcl Channels,
- *	no one's an expert and the interface is incomplete.]
  *
  * Copyright (c) 1997 by Sun Microsystems, Inc.
  *
@@ -27,27 +16,15 @@
 
 #include "bltInt.h"
 #include <fcntl.h>
+#include <signal.h>
 
-#ifdef HAVE_WAITFLAGS_H
-#   include <waitflags.h>
-#endif
-#ifdef HAVE_SYS_WAIT_H
-#   include <sys/wait.h>
-#endif
+#include "bltWait.h"
 
-#if (TCL_MAJOR_VERSION == 7) && (TCL_MINOR_VERSION > 4)
-#define FILEHANDLER_USES_TCLFILES 1
+#if (TCL_MAJOR_VERSION == 7)
 typedef pid_t Tcl_Pid;
-#else
-typedef int Tcl_File;
-#endif
 
-#if (TCL_MAJOR_VERSION == 7)
-#define Tcl_CreateFileHandler	Tk_CreateFileHander
-#define Tcl_DeleteFileHandler	Tk_DeleteFileHander
-#endif
+#define FILEHANDLER_USES_TCLFILES 1
 
-#if (TCL_MAJOR_VERSION == 7)
 static int
 Tcl_GetChannelHandle(channel, direction, clientDataPtr)
     Tcl_Channel channel;
@@ -55,18 +32,18 @@ Tcl_GetChannelHandle(channel, direction, clientDataPtr)
     ClientData *clientDataPtr;
 {
     Tcl_File file;
-    int fd;
 
     file = Tcl_GetChannelFile(channel, direction);
     if (file == NULL) {
-	return 0;
+	return TCL_ERROR;
     }
-    fd = (int)Tcl_GetFileInfo(file, NULL);
-    *clientDataPtr = (ClientData *)&fd;
-    return 1;
+    *clientDataPtr = (ClientData)Tcl_GetFileInfo(file, NULL);
+    return TCL_OK;
 }
 
-#endif
+#else
+typedef int Tcl_File;
+#endif /* TCL_MAJOR_VERSION == 7 */
 
 /*
  *----------------------------------------------------------------------
@@ -134,7 +111,7 @@ CreateTempFile(contents)
     int fd;
     size_t length = (contents == NULL) ? 0 : strlen(contents);
 
-    tmpnam(fileName);
+    mkstemp(fileName);
     fd = OpenFile(fileName, O_RDWR | O_CREAT | O_TRUNC);
     unlink(fileName);
 
@@ -692,7 +669,7 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
 {
     int *pidPtr = NULL;		/* Points to malloc-ed array holding all
 				 * the pids of child processes. */
-    int numPids;		/* Actual number of processes that exist
+    int nPids;			/* Actual number of processes that exist
 				 * at *pidPtr right now. */
     int cmdCount;		/* Count of number of distinct commands
 				 * found in argc/argv. */
@@ -733,7 +710,7 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
     Tcl_DStringInit(&execBuffer);
 
     pipeIn = curInFd = curOutFd = -1;
-    numPids = 0;
+    nPids = 0;
 
     /*
      * First, scan through all the arguments to figure out the structure
@@ -754,14 +731,18 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
 	skip = 0;
 	p = argv[i];
 	switch (*p++) {
+	case '\\':
+	    continue;
+
 	case '|':
 	    if (*p == '&') {
 		p++;
 	    }
 	    if (*p == '\0') {
 		if ((i == (lastBar + 1)) || (i == (argc - 1))) {
-		    Tcl_SetResult(interp, "illegal use of | or |& in command",
-			TCL_STATIC);
+		    Tcl_AppendResult(interp, 
+				     "illegal use of | or |& in command",
+				     (char *)NULL);
 		    goto error;
 		}
 	    }
@@ -921,31 +902,10 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
     }
     if (errorFd == -1) {
 	if (errPipePtr != NULL) {
-#ifdef notdef
-	    /*
-	     * Set up the standard error output sink for the pipeline, if
-	     * requested.  Use a temporary file which is opened, then deleted.
-	     * Could potentially just use pipe, but if it filled up it could
-	     * cause the pipeline to deadlock:  we'd be waiting for processes
-	     * to complete before reading stderr, and processes couldn't
-	     * complete because stderr was backed up.
-	     */
-
-	    errorFd = CreateTempFile((char *)NULL);
-	    if (errorFd < 0) {
-		Tcl_AppendResult(interp,
-		    "can't create error file for command: ",
-		    Tcl_PosixError(interp), (char *)NULL);
-		goto error;
-	    }
-	    *errPipePtr = errorFd;
-	    errorClose = 1;
-#else
 	    /*
 	     * Stderr from the last process in the pipeline is to go to a
 	     * pipe that can be read by the caller.
 	     */
-
 	    if (CreatePipe(errPipePtr, &errorFd) == 0) {
 		Tcl_AppendResult(interp,
 		    "can't create error pipe for command: ",
@@ -953,7 +913,6 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
 		goto error;
 	    }
 	    errorClose = 1;
-#endif
 	} else {
 	    /*
 	     * Errors from the pipeline go to stderr.
@@ -967,7 +926,7 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
      */
 
     Tcl_ReapDetachedProcs();
-    pidPtr = (int *)ckalloc((unsigned)(cmdCount * sizeof(int)));
+    pidPtr = Blt_Malloc((unsigned)(cmdCount * sizeof(int)));
 
     curInFd = inputFd;
 
@@ -1029,8 +988,8 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
 	}
 	Tcl_DStringFree(&execBuffer);
 
-	pidPtr[numPids] = pid;
-	numPids++;
+	pidPtr[nPids] = pid;
+	nPids++;
 
 
 	/*
@@ -1068,7 +1027,7 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
     if (errorClose) {
 	CloseFile(errorFd);
     }
-    return numPids;
+    return nPids;
 
     /*
      * An error occurred.  There could have been extra files open, such
@@ -1099,17 +1058,17 @@ Blt_CreatePipeline(interp, argc, argv, pidArrayPtr, inPipePtr,
 	*errPipePtr = -1;
     }
     if (pidPtr != NULL) {
-	for (i = 0; i < numPids; i++) {
+	for (i = 0; i < nPids; i++) {
 	    if (pidPtr[i] != -1) {
-#if (TCL_MAJOR_VERSION >= 8)
-		Tcl_DetachPids(1, (Tcl_Pid *)&pidPtr[i]);
-#else
+#if (TCL_MAJOR_VERSION == 7)
 		Tcl_DetachPids(1, &pidPtr[i]);
+#else
+		Tcl_DetachPids(1, (Tcl_Pid *)&pidPtr[i]);
 #endif
 	    }
 	}
-	ckfree((char *)pidPtr);
+	Blt_Free(pidPtr);
     }
-    numPids = -1;
+    nPids = -1;
     goto cleanup;
 }

@@ -1,3 +1,4 @@
+%%BeginProlog
 %
 % PostScript prolog file of the BLT graph widget.
 %
@@ -36,7 +37,7 @@
 /DrawSymbolProc 0 def			% Routine to draw symbol outline/fill
 /StippleProc 0 def			% Stipple routine (bar segments)
 /DashesProc 0 def			% Dashes routine (line segments)
- 
+  
 % Define the array ISOLatin1Encoding (which specifies how characters are 
 % encoded for ISO-8859-1 fonts), if it isn't already present (Postscript 
 % level 2 is supposed to define it, but level 1 doesn't). 
@@ -88,7 +89,7 @@ systemdict /ISOLatin1Encoding known not {
 
 % font ISOEncode font 
 % This procedure changes the encoding of a font from the default 
-% Postscript encoding to ISOLatin1.  It's typically invoked just 
+% Postscript encoding to ISOLatin1.  It is typically invoked just 
 % before invoking "setfont".  The body of this procedure comes from 
 % Section 5.6.1 of the Postscript book. 
 
@@ -189,16 +190,19 @@ systemdict /ISOLatin1Encoding known not {
 % Each stipple dot is assumed to be about one unit across in the
 % current user coordinate system.
 
-/StippleFill {
-  % Turn the path into a clip region that we can then cover with
-  % lots of images corresponding to the stipple pattern.  Warning:
-  % some Postscript interpreters get errors during strokepath for
-  % dashed lines.  If this happens, turn off dashes and try again.
+% width height string StippleFill --
+%
+% Given a path already set up and a clipping region generated from
+% it, this procedure will fill the clipping region with a stipple
+% pattern.  "String" contains a proper image description of the
+% stipple pattern and "width" and "height" give its dimensions.  Each
+% stipple dot is assumed to be about one unit across in the current
+% user coordinate system.  This procedure trashes the graphics state.
 
-  gsave
-    {eoclip}
-    {{strokepath} stopped {grestore gsave [] 0 setdash strokepath} if clip}
-    ifelse
+/StippleFill {
+    % The following code is needed to work around a NeWSprint bug.
+
+    /tmpstip 1 index def
 
     % Change the scaling so that one user unit in user coordinates
     % corresponds to the size of one stipple dot.
@@ -206,12 +210,14 @@ systemdict /ISOLatin1Encoding known not {
 
     % Compute the bounding box occupied by the path (which is now
     % the clipping region), and round the lower coordinates down
-    % to the nearest starting point for the stipple pattern.
+    % to the nearest starting point for the stipple pattern.  Be
+    % careful about negative numbers, since the rounding works
+    % differently on them.
 
     pathbbox
     4 2 roll
-    5 index div cvi 5 index mul 4 1 roll
-    6 index div cvi 6 index mul 3 2 roll
+    5 index div dup 0 lt {1 sub} if cvi 5 index mul 4 1 roll
+    6 index div dup 0 lt {1 sub} if cvi 6 index mul 3 2 roll
 
     % Stack now: width height string y1 y2 x1 x2
     % Below is a doubly-nested for loop to iterate across this area
@@ -220,20 +226,19 @@ systemdict /ISOLatin1Encoding known not {
     % each position
 
     6 index exch {
-      2 index 5 index 3 index {
-	% Stack now: width height string y1 y2 x y
+	2 index 5 index 3 index {
+	    % Stack now: width height string y1 y2 x y
 
-	gsave
-	  1 index exch translate
-	  5 index 5 index true matrix {3 index} imagemask
-	grestore
-      } for
-      pop
+	    gsave
+	    1 index exch translate
+	    5 index 5 index true matrix tmpstip imagemask
+	    grestore
+	} for
+	pop
     } for
     pop pop pop pop pop
-  grestore
-  newpath
 } bind def
+
 
 /LS {	% Stack: x1 y1 x2 y2
   newpath 4 2 roll moveto lineto stroke
@@ -300,7 +305,7 @@ systemdict /ISOLatin1Encoding known not {
     2 copy true 3 -1 roll 0 0 5 -1 roll 0 0 6 array astore 5 -1 roll
     imagemask
   grestore
-}def
+} def
 
 % Symbols:
 
@@ -368,28 +373,34 @@ systemdict /ISOLatin1Encoding known not {
 % Circle
 /Ci {
   % Stack: x y symbolSize
-  3 copy pop
-  moveto newpath
-  2 div 0 360 arc
-  closepath DrawSymbolProc
+  gsave
+    3 copy pop
+    moveto newpath
+    2 div 0 360 arc
+    closepath DrawSymbolProc
+  grestore
 } def
 
 % Square
 /Sq {
   % Stack: x y symbolSize
-  dup dup 2 div dup
-  6 -1 roll exch sub exch
-  5 -1 roll exch sub 4 -2 roll Box
-  DrawSymbolProc
+  gsave
+    dup dup 2 div dup
+    6 -1 roll exch sub exch
+    5 -1 roll exch sub 4 -2 roll Box
+    DrawSymbolProc
+  grestore
 } def
 
 % Line
 /Li {
   % Stack: x y symbolSize
-  3 1 roll exch 3 -1 roll 2 div 3 copy
-  newpath
-  sub exch moveto add exch lineto
-  stroke
+  gsave
+    3 1 roll exch 3 -1 roll 2 div 3 copy
+    newpath
+    sub exch moveto add exch lineto
+    stroke
+  grestore
 } def
 
 % Diamond
@@ -416,6 +427,25 @@ systemdict /ISOLatin1Encoding known not {
     DrawSymbolProc
   grestore
 } def
+
+% Arrow
+/Ar {
+  % Stack: x y symbolSize
+  gsave
+    3 -2 roll translate
+    BaseRatio mul 0.5 mul		% Calculate 1/2 base
+    dup 0 exch 30 cos mul		% h1 = height above center point
+					% b2 0 h1
+    newpath moveto			% point 1;  b2
+    dup 30 sin 30 cos div mul		% h2 = height below center point
+    neg					% -h2 b2
+    2 copy lineto			% point 2;  b2 h2
+    exch neg exch lineto		% 
+    closepath
+    DrawSymbolProc
+  grestore
+} def
+
 % Bitmap
 /Bm {
   % Stack: x y symbolSize
@@ -423,7 +453,9 @@ systemdict /ISOLatin1Encoding known not {
     3 1 roll translate pop DrawSymbolProc
   grestore
 } def
-    
+
+%%EndProlog
+
 %%BeginSetup
 gsave					% Save the graphics state
 

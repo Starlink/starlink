@@ -26,20 +26,55 @@
  * EPS canvas item created by George Howlett.
  */
 
+/*
+ * To do:
+ *
+ *	1. Add -rotate option.  Allow arbitrary rotation of image and EPS.
+ *	2. Draw color images instead of photos. This will eliminate the need
+ *	   to create hidden photo images.
+ *	3. Create a spiffy demo that lets you edit your page description.
+ */
 #include "bltInt.h"
 #include "bltPs.h"
 #include "bltImage.h"
-#include <ctype.h>
 
-#define DEBUG_PREVIEW 0
+#ifdef HAVE_TIFF_H
+#include "tiff.h"
+#endif
+#include <fcntl.h>
 
-#define xMin	header.x1
-#define xMax	header.x2
-#define yMin	header.y1
-#define yMax	header.y2
+#if defined(_MSC_VER) || defined(__BORLANDC__) 
+#include <io.h>
+#define open _open
+#define close _close
+#define write _write
+#define unlink _unlink
+#define lseek _lseek
+#define fdopen _fdopen
+#define fcntl _fcntl
+#ifdef _MSC_VER
+#define O_RDWR	_O_RDWR 
+#define O_CREAT	_O_CREAT
+#define O_TRUNC	_O_TRUNC
+#define O_EXCL	_O_EXCL
+#endif /* _MSC_VER */
+#endif /* _MSC_VER || __BORLANDC__ */
+
+#define DEBUG_READER 0
+#ifndef WIN32
+#define PurifyPrintf printf
+#endif
+#define PS_PREVIEW_EPSI	0
+#define PS_PREVIEW_WMF	1
+#define PS_PREVIEW_TIFF	2
+
+#define xLeft	header.x1
+#define xRight	header.x2
+#define yTop	header.y1
+#define yBottom	header.y2
 
 
-#define MAX_EPS_LINE_LENGTH 255	/* Maximum line length for a PostScript EPS file */
+#define MAX_EPS_LINE_LENGTH 255	/* Maximum line length for a EPS file */
 
 /*
  * ParseInfo --
@@ -47,7 +82,8 @@
  *	This structure is used to pass PostScript file information
  *	around to various routines while parsing the EPS file.
  */
-struct ParseInfo {
+typedef struct {
+    int maxBytes;		/* Maximum length of PostScript code.  */
     int lineNumber;		/* Current line number of EPS file */
     char line[MAX_EPS_LINE_LENGTH + 1];
     /* Buffer to contain a single line from
@@ -59,17 +95,17 @@ struct ParseInfo {
 				 * the current line.  If NULL (or if nextPtr
 				 * points a NULL byte), this indicates the
 				 * the next line needs to be read. */
-    FILE *filePtr;		/*  */
-};
+    FILE *f;			/*  */
+} ParseInfo;
 
 #define DEF_EPS_ANCHOR		"nw"
-#define DEF_EPS_OUTLINE_COLOR	RGB_COLOR_BLACK
-#define DEF_EPS_OUTLINE_MONO    RGB_COLOR_BLACK
-#define DEF_EPS_BORDER_WIDTH	STD_BORDERWIDTH
+#define DEF_EPS_OUTLINE_COLOR	RGB_BLACK
+#define DEF_EPS_OUTLINE_MONO    RGB_BLACK
+#define DEF_EPS_BORDERWIDTH	STD_BORDERWIDTH
 #define DEF_EPS_FILE_NAME	(char *)NULL
 #define DEF_EPS_FONT		STD_FONT
-#define DEF_EPS_FILL_COLOR     	STD_COLOR_NORMAL_FG
-#define DEF_EPS_FILL_MONO	STD_MONO_NORMAL_FG
+#define DEF_EPS_FILL_COLOR     	STD_NORMAL_FOREGROUND
+#define DEF_EPS_FILL_MONO	STD_NORMAL_FG_MONO
 #define DEF_EPS_HEIGHT		"0"
 #define DEF_EPS_IMAGE_NAME	(char *)NULL
 #define DEF_EPS_JUSTIFY		"center"
@@ -82,7 +118,7 @@ struct ParseInfo {
 #define DEF_EPS_TAGS		(char *)NULL
 #define DEF_EPS_TITLE		(char *)NULL
 #define DEF_EPS_TITLE_ANCHOR	"center"
-#define DEF_EPS_TITLE_COLOR	RGB_COLOR_BLACK
+#define DEF_EPS_TITLE_COLOR	RGB_BLACK
 #define DEF_EPS_TITLE_ROTATE	"0"
 #define DEF_EPS_WIDTH		"0"
 
@@ -90,18 +126,15 @@ struct ParseInfo {
  * Information used for parsing configuration specs:
  */
 
-static Tk_CustomOption tagsOption =
-{
-    Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData)NULL
-};
+static Tk_CustomOption tagsOption;
 
-extern Tk_CustomOption bltLengthOption;
+extern Tk_CustomOption bltDistanceOption;
 extern Tk_CustomOption bltShadowOption;
 
 /*
  * The structure below defines the record for each EPS item.
  */
-typedef struct EpsItem {
+typedef struct {
     Tk_Item header;		/* Generic stuff that's the same for all
 				 * types.  MUST BE FIRST IN STRUCTURE. */
     Tk_Canvas canvas;		/* Canvas containing the EPS item. */
@@ -115,16 +148,30 @@ typedef struct EpsItem {
 
     Tcl_Interp *interp;
 
-    FILE *filePtr;		/* File pointer to PostScript file. We'll
-				 * hold this as long as the EPS item is
-				 * using this file. */
+    FILE *psFile;		/* File pointer to Encapsulated
+				 * PostScript file. We'll hold this as
+				 * long as the EPS item is using this
+				 * file. */
+    size_t psStart;		/* File offset of PostScript code. */
+    size_t psLength;		/* Length of PostScript code. If zero,
+				 * indicates to read to EOF. */
+    size_t wmfStart;		/* File offset of Windows Metafile preview.  */
+    size_t wmfLength;		/* Length of WMF portion in bytes. If zero,
+				 * indicates there is no WMF preview. */
+    size_t tiffStart;		/* File offset of TIFF preview. */
+    size_t tiffLength;		/* Length of TIFF portion in bytes. If zero,
+				 * indicates there is no TIFF preview. */
+    char *previewName;
+    int previewFormat;
 
-    Tk_Image tkImage;		/* A Tk photo image provided to display in
-				 * the canvas as the EPS contents. This
-				 * will supersede any EPS preview embedded
-				 * in the PostScript itself. */
+    Tk_Image preview;		/* A Tk photo image provided as a
+				 * preview of the EPS contents. This
+				 * image supersedes any EPS preview
+				 * embedded PostScript preview (EPSI). */
 
-    Tk_PhotoHandle photo;	/* Photo handle of above Tk image. */
+    Tk_Image tmpImage;		/* Used to display the resized preview image.
+				 * Created and deleted internally. */
+
 
     Pixmap pixmap;		/* Pixmap representing scaled preview. This
 				 * isn't currently used.  For now we're
@@ -134,12 +181,13 @@ typedef struct EpsItem {
 
     ColorTable colorTable;	/* Pointer to color table */
 
-    ColorImage colorImage;	/* The original photo or PostScript
+    Blt_ColorImage colorImage;	/* The original photo or PostScript
 				 * preview image converted to a color
 				 * image.  This is kept around for
 				 * resampling or resizing the image. */
 
-    int firstLine, lastLine;	/* First and last line numbers of the
+    int firstLine, lastLine; 
+				/* First and last line numbers of the
 				 * PostScript preview.  They are used
 				 * to skip over the preview when
 				 * encapsulating PostScript for the
@@ -157,6 +205,8 @@ typedef struct EpsItem {
 				 * field, to be displayed over the top of
 				 * the EPS preview (malloc-ed).  */
 
+    Tcl_DString dString;	/* Contains the encapsulate PostScript. */
+
     /* User configurable fields */
 
     double x, y;		/* Canvas coordinates of the item */
@@ -165,11 +215,6 @@ typedef struct EpsItem {
     char *fileName;		/* Name of the encapsulated PostScript file.
 				 * If NULL, indicates that no EPS file
 				 * has be successfully loaded yet. */
-
-    char *imageName;		/* Name of a Tk photo image to be used as
-				 * the thumbnail for the EPS file. This
-				 * supersedes a preview image found in the
-				 * EPS file. */
 
     char *reqTitle;		/* Title to be displayed in the EPS item.
 				 * Supersedes the title found in the EPS
@@ -193,11 +238,14 @@ typedef struct EpsItem {
     int borderWidth;
     int relief;
 
-    TextAttributes titleAttr;	/* Font, color, etc. for title */
-    CompoundText *titleText;
+    TextStyle titleStyle;	/* Font, color, etc. for title */
 
     Pixmap stipple;		/* Stipple for image fill */
 
+    ClientData tiffPtr;
+#ifdef WIN32
+    HENHMETAFILE *hMetaFile;	/* Windows metafile. */
+#endif
 } EpsItem;
 
 static Tk_ConfigSpec configSpecs[] =
@@ -207,23 +255,24 @@ static Tk_ConfigSpec configSpecs[] =
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_SYNONYM, "-bd", "borderWidth", (char *)NULL, (char *)NULL, 0, 0},
     {TK_CONFIG_CUSTOM, "-borderwidth", "borderWidth", (char *)NULL,
-	DEF_EPS_BORDER_WIDTH, Tk_Offset(EpsItem, borderWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	DEF_EPS_BORDERWIDTH, Tk_Offset(EpsItem, borderWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_STRING, "-file", (char *)NULL, (char *)NULL,
 	DEF_EPS_FILE_NAME, Tk_Offset(EpsItem, fileName), TK_CONFIG_NULL_OK},
     {TK_CONFIG_FONT, "-font", "font", "Font",
-	DEF_EPS_FONT, Tk_Offset(EpsItem, titleAttr.font), 0},
+	DEF_EPS_FONT, Tk_Offset(EpsItem, titleStyle.font), 0},
     {TK_CONFIG_COLOR, "-fill", "fill", (char *)NULL,
 	DEF_EPS_FILL_COLOR, Tk_Offset(EpsItem, fillColor), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-fill", "fill", (char *)NULL,
 	DEF_EPS_FILL_MONO, Tk_Offset(EpsItem, fillColor), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_CUSTOM, "-height", (char *)NULL, (char *)NULL,
 	DEF_EPS_HEIGHT, Tk_Offset(EpsItem, height),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_STRING, "-image", (char *)NULL, (char *)NULL,
-	DEF_EPS_IMAGE_NAME, Tk_Offset(EpsItem, imageName), TK_CONFIG_NULL_OK},
+	DEF_EPS_IMAGE_NAME, Tk_Offset(EpsItem, previewName),
+	TK_CONFIG_NULL_OK},
     {TK_CONFIG_JUSTIFY, "-justify", "justify", "Justify",
-	DEF_EPS_JUSTIFY, Tk_Offset(EpsItem, titleAttr.justify),
+	DEF_EPS_JUSTIFY, Tk_Offset(EpsItem, titleStyle.justify),
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_BORDER, "-outline", "outline", (char *)NULL,
 	DEF_EPS_OUTLINE_COLOR, Tk_Offset(EpsItem, border),
@@ -238,10 +287,10 @@ static Tk_ConfigSpec configSpecs[] =
 	DEF_EPS_RELIEF, Tk_Offset(EpsItem, relief),
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_CUSTOM, "-shadow", "shadow", "Shadow",
-	DEF_EPS_SHADOW_COLOR, Tk_Offset(EpsItem, titleAttr.shadow),
+	DEF_EPS_SHADOW_COLOR, Tk_Offset(EpsItem, titleStyle.shadow),
 	TK_CONFIG_COLOR_ONLY, &bltShadowOption},
     {TK_CONFIG_CUSTOM, "-shadow", "shadow", "Shadow",
-	DEF_EPS_SHADOW_MONO, Tk_Offset(EpsItem, titleAttr.shadow),
+	DEF_EPS_SHADOW_MONO, Tk_Offset(EpsItem, titleStyle.shadow),
 	TK_CONFIG_MONO_ONLY, &bltShadowOption},
     {TK_CONFIG_BOOLEAN, "-showimage", "showImage", "ShowImage",
 	DEF_EPS_SHOW_IMAGE, Tk_Offset(EpsItem, showImage),
@@ -253,16 +302,16 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_STRING, "-title", (char *)NULL, (char *)NULL,
 	DEF_EPS_TITLE, Tk_Offset(EpsItem, reqTitle), TK_CONFIG_NULL_OK},
     {TK_CONFIG_ANCHOR, "-titleanchor", (char *)NULL, (char *)NULL,
-	DEF_EPS_TITLE_ANCHOR, Tk_Offset(EpsItem, titleAttr.anchor), 0},
+	DEF_EPS_TITLE_ANCHOR, Tk_Offset(EpsItem, titleStyle.anchor), 0},
     {TK_CONFIG_COLOR, "-titlecolor", (char *)NULL, (char *)NULL,
-	DEF_EPS_TITLE_COLOR, Tk_Offset(EpsItem, titleAttr.color),
+	DEF_EPS_TITLE_COLOR, Tk_Offset(EpsItem, titleStyle.color),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_DOUBLE, "-titlerotate", "titleRotate", "TitleRotate",
-	DEF_EPS_TITLE_ROTATE, Tk_Offset(EpsItem, titleAttr.theta),
+	DEF_EPS_TITLE_ROTATE, Tk_Offset(EpsItem, titleStyle.theta),
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_CUSTOM, "-width", (char *)NULL, (char *)NULL,
 	DEF_EPS_WIDTH, Tk_Offset(EpsItem, width),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
@@ -294,8 +343,36 @@ static void TranslateEps _ANSI_ARGS_((Tk_Canvas canvas, Tk_Item * itemPtr,
 	double deltaX, double deltaY));
 static int EpsToPostScript _ANSI_ARGS_((Tcl_Interp *interp, Tk_Canvas canvas,
 	Tk_Item * itemPtr, int prepass));
-static int ParseEpsFile _ANSI_ARGS_((Tcl_Interp *interp, EpsItem *epsPtr));
+static int ReadPostScript _ANSI_ARGS_((Tcl_Interp *interp, EpsItem *epsPtr));
 
+
+static char *
+SkipBlanks(piPtr) 
+     ParseInfo *piPtr;
+{
+    char *s;
+
+    for (s = piPtr->line; isspace(UCHAR(*s)); s++) {
+	/*empty*/
+    }
+    return s;
+}
+
+static int
+ReadPsLine(piPtr)
+     ParseInfo *piPtr;
+{
+    if (ftell(piPtr->f) < piPtr->maxBytes) {
+	if (fgets(piPtr->line, MAX_EPS_LINE_LENGTH, piPtr->f) != NULL) {
+	    piPtr->lineNumber++;
+#if DEBUG_READER
+	    PurifyPrintf("%d: %s\n", piPtr->lineNumber, piPtr->line);
+#endif
+	    return TRUE;
+	}
+    }
+    return FALSE;
+}
 
 /*
  *----------------------------------------------------------------------
@@ -341,36 +418,36 @@ ReverseBits(byte)
  *----------------------------------------------------------------------
  */
 static int
-GetHexValue(infoPtr, bytePtr)
-    struct ParseInfo *infoPtr;
+GetHexValue(piPtr, bytePtr)
+    ParseInfo *piPtr;
     unsigned char *bytePtr;
 {
     register char *p;
+    unsigned int byte;
 
-    p = infoPtr->nextPtr;
+    p = piPtr->nextPtr;
     if (p == NULL) {
       nextLine:
-	if (fgets(infoPtr->line, MAX_EPS_LINE_LENGTH, infoPtr->filePtr) == NULL) {
-#if DEBUG_PREVIEW
-	    fprintf(stderr, "short file\n");
+	if (!ReadPsLine(piPtr)) {
+#if DEBUG_READER
+	    PurifyPrintf("short file\n");
 #endif
 	    return TCL_ERROR;	/* Short file */
 	}
-	infoPtr->lineNumber++;
-	if (infoPtr->line[0] != '%') {
-#if DEBUG_PREVIEW
-	    fprintf(stderr, "line doesn't start with %% (%s)\n", infoPtr->line);
+	if (piPtr->line[0] != '%') {
+#if DEBUG_READER
+	    PurifyPrintf("line doesn't start with %% (%s)\n", piPtr->line);
 #endif
 	    return TCL_ERROR;
 	}
-	if ((infoPtr->line[1] == '%') &&
-	    (strncmp(infoPtr->line + 2, "EndPreview", 10) == 0)) {
-#if DEBUG_PREVIEW
-	    fprintf(stderr, "end of preview (%s)\n", infoPtr->line);
+	if ((piPtr->line[1] == '%') &&
+	    (strncmp(piPtr->line + 2, "EndPreview", 10) == 0)) {
+#if DEBUG_READER
+	    PurifyPrintf("end of preview (%s)\n", piPtr->line);
 #endif
 	    return TCL_RETURN;
 	}
-	p = infoPtr->line + 1;
+	p = piPtr->line + 1;
     }
     while (isspace((int)*p)) {
 	p++;			/* Skip spaces */
@@ -379,25 +456,26 @@ GetHexValue(infoPtr, bytePtr)
 	goto nextLine;
     }
     if ((!isxdigit((int)p[0])) || (!isxdigit((int)p[1]))) {
-#if DEBUG_PREVIEW
-	fprintf(stderr, "not a hex digit (%s)\n", infoPtr->line);
+#if DEBUG_READER
+	PurifyPrintf("not a hex digit (%s)\n", piPtr->line);
 #endif
 	return TCL_ERROR;
     }
-    *bytePtr = (infoPtr->hexTable[(int)p[0]] << 4) |
-	infoPtr->hexTable[(int)p[1]];
+    byte = (piPtr->hexTable[(int)p[0]] << 4) | piPtr->hexTable[(int)p[1]];
     p += 2;
-    infoPtr->nextPtr = p;
+    piPtr->nextPtr = p;
+    *bytePtr = byte;
     return TCL_OK;
 }
+
 
 /*
  *----------------------------------------------------------------------
  *
- * ReadEPSPreview --
+ * ReadEPSI --
  *
  *	Reads the EPS preview image from the PostScript file, converting
- *	the image into a ColorImage.  If an error occurs when parsing
+ *	the image into a Blt_ColorImage.  If an error occurs when parsing
  *	the preview, the preview is silently ignored.
  *
  * Results:
@@ -406,88 +484,67 @@ GetHexValue(infoPtr, bytePtr)
  *----------------------------------------------------------------------
  */
 static void
-ReadEPSPreview(epsPtr, infoPtr)
+ReadEPSI(epsPtr, piPtr)
     EpsItem *epsPtr;
-    struct ParseInfo *infoPtr;
+    ParseInfo *piPtr;
 {
-    ColorImage image;
-    int width, height, bitsPerPixel, numLines;
-    char *field, *beginPreview;
+    Blt_ColorImage image;
+    int width, height, bitsPerPixel, nLines;
+    char *dscBeginPreview;
 
-    /* Search for a "%%BeginPreview:" image specification*/
-
-    beginPreview = NULL;
-    while (fgets(infoPtr->line, MAX_EPS_LINE_LENGTH, infoPtr->filePtr) != NULL) {
-	infoPtr->lineNumber++;
-	if ((infoPtr->line[0] != '%') || (infoPtr->line[1] != '%')) {
-	    continue;
-	}
-	field = infoPtr->line + 2;
-	if ((field[0] == 'B') && (strncmp(field, "BeginPreview:", 13) == 0)) {
-	    beginPreview = field + 13;
-	    break;
-	} else if ((field[0] == 'E') && ((strncmp(field, "EndProlog", 9) == 0) ||
-		(strncmp(field, "EndSetup", 8) == 0))) {
-	    break;		/* Done */
-	}
-    }
-    if (beginPreview == NULL) {
-#if DEBUG_PREVIEW
-	fprintf(stderr, "No beginpreview (%s)\n", infoPtr->line);
-#endif
-	return;			/* No "%%BeginPreview:" line */
-    }
-    if (sscanf(beginPreview, "%d %d %d %d", &width, &height, &bitsPerPixel,
-	    &numLines) != 4) {
-#if DEBUG_PREVIEW
-	fprintf(stderr, "Bad beginpreview (%s)\n", beginPreview);
+    dscBeginPreview = piPtr->line + 16;
+    if (sscanf(dscBeginPreview, "%d %d %d %d", &width, &height, &bitsPerPixel, 
+	&nLines) != 4) {
+#if DEBUG_READER
+	PurifyPrintf("bad %%BeginPreview (%s) format\n", dscBeginPreview);
 #endif
 	return;
     }
-    if (((bitsPerPixel != 1) && (bitsPerPixel != 8)) ||
-	((width < 1) || (height < 1))) {
-#if DEBUG_PREVIEW
-	fprintf(stderr, "Bad beginpreview (%s)\n", beginPreview);
+    if (((bitsPerPixel != 1) && (bitsPerPixel != 8)) || (width < 1) ||
+	(width > SHRT_MAX) || (height < 1) || (height > SHRT_MAX)) {
+#if DEBUG_READER
+	PurifyPrintf("Bad %%BeginPreview (%s) values\n", dscBeginPreview);
 #endif
 	return;			/* Bad "%%BeginPreview:" information */
     }
-    epsPtr->firstLine = infoPtr->lineNumber;
-    Blt_InitHexTable(infoPtr->hexTable);
-    infoPtr->nextPtr = NULL;
+    epsPtr->firstLine = piPtr->lineNumber;
+    Blt_InitHexTable(piPtr->hexTable);
+    piPtr->nextPtr = NULL;
     image = Blt_CreateColorImage(width, height);
 
     if (bitsPerPixel == 8) {
 	int result;
-	register Pix32 *pixelPtr;
+	register Pix32 *destPtr;
 	register int x, y;
 	unsigned char byte;
 
 	for (y = height - 1; y >= 0; y--) {
-	    pixelPtr = ColorImageData(image) + (y * width);
-	    for (x = 0; x < width; x++, pixelPtr++) {
-		result = GetHexValue(infoPtr, &byte);
+	    destPtr = Blt_ColorImageBits(image) + (y * width);
+	    for (x = 0; x < width; x++, destPtr++) {
+		result = GetHexValue(piPtr, &byte);
 		if (result == TCL_ERROR) {
 		    goto error;
 		}
 		if (result == TCL_RETURN) {
 		    goto done;
 		}
-		pixelPtr->Red = pixelPtr->Green = pixelPtr->Blue = byte;
+		destPtr->Red = destPtr->Green = destPtr->Blue = ~byte;
+		destPtr->Alpha = 0xFF;
 	    }
 	}
-    } else {
+    } else if (bitsPerPixel == 1) {
 	int result;
-	register Pix32 *pixelPtr;
+	register Pix32 *destPtr;
 	register int x, y;
 	unsigned char byte;
 	register int bit;
 
-	pixelPtr = ColorImageData(image);
+	destPtr = Blt_ColorImageBits(image);
 	for (y = 0; y < height; y++) {
 	    bit = 8;
-	    for (x = 0; x < width; x++, pixelPtr++) {
+	    for (x = 0; x < width; x++, destPtr++) {
 		if (bit == 8) {
-		    result = GetHexValue(infoPtr, &byte);
+		    result = GetHexValue(piPtr, &byte);
 		    if (result == TCL_ERROR) {
 			goto error;
 		    }
@@ -498,15 +555,17 @@ ReadEPSPreview(epsPtr, infoPtr)
 		    bit = 0;
 		}
 		if (((byte >> bit) & 0x01) == 0) {
-		    pixelPtr->Red = pixelPtr->Green = pixelPtr->Blue = 0xFF;
+		    destPtr->value = 0xFFFFFFFF;
 		}
 		bit++;
 	    }
 	}
+    } else {
+	fprintf(stderr, "unknown EPSI bitsPerPixel (%d)\n", bitsPerPixel);
     }
   done:
     epsPtr->colorImage = image;
-    epsPtr->lastLine = infoPtr->lineNumber + 1;
+    epsPtr->lastLine = piPtr->lineNumber + 1;
     return;
 
   error:
@@ -519,9 +578,10 @@ ReadEPSPreview(epsPtr, infoPtr)
 /*
  *----------------------------------------------------------------------
  *
- * ParseEpsFile --
+ * ReadPostScript --
  *
- *	This routine parses the few fields we need out of an EPS file.
+ *	This routine reads and parses the few fields we need out
+ *	of an EPS file.
  *
  *	The EPS standards are outlined from Appendix H of the
  *	"PostScript Language Reference Manual" pp. 709-736.
@@ -540,95 +600,241 @@ ReadEPSPreview(epsPtr, infoPtr)
  *----------------------------------------------------------------------
  */
 static int
-ParseEpsFile(interp, epsPtr)
+ReadPostScript(interp, epsPtr)
     Tcl_Interp *interp;
     EpsItem *epsPtr;
 {
-    char *field, *title, *boundingBox;
-    int readPreview;
-    struct ParseInfo info;
+    char *field;
+    char *dscTitle, *dscBoundingBox;
+    char *dscEndComments;
+    ParseInfo pi;
 
+    pi.line[0] = '\0';
+    pi.maxBytes = epsPtr->psLength;
+    pi.lineNumber = 0;
+    pi.f = epsPtr->psFile;
 
-    info.filePtr = epsPtr->filePtr;
-    if (fgets(info.line, MAX_EPS_LINE_LENGTH, info.filePtr) == NULL) {
+    Tcl_DStringInit(&epsPtr->dString);
+    if (pi.maxBytes == 0) {
+	pi.maxBytes = INT_MAX;
+    }
+    if (epsPtr->psStart > 0) {
+	if (fseek(epsPtr->psFile, epsPtr->psStart, 0) != 0) {
+	    Tcl_AppendResult(interp, 
+			     "can't seek to start of PostScript code in \"", 
+			     epsPtr->fileName, "\"", (char *)NULL);
+	    return TCL_ERROR;
+	}
+    }
+    if (!ReadPsLine(&pi)) {
 	Tcl_AppendResult(interp, "file \"", epsPtr->fileName, "\" is empty?",
 	    (char *)NULL);
 	return TCL_ERROR;
     }
-    if (strncmp(info.line, "%!PS", 4) != 0) {
+    if (strncmp(pi.line, "%!PS", 4) != 0) {
 	Tcl_AppendResult(interp, "file \"", epsPtr->fileName,
 	    "\" doesn't start with \"%!PS\"", (char *)NULL);
 	return TCL_ERROR;
     }
+
     /*
-     * Initial field flags to NULL. We want to  look only at the first
-     * appearance of these comment fields.  The file itself may imbed
-     * another EPS file.
+     * Initialize field flags to NULL. We want to look only at the
+     * first appearance of these comment fields.  The file itself may
+     * have another EPS file embedded into it.  
      */
-    boundingBox = title = NULL;
-    readPreview = TRUE;
-
-    info.lineNumber = 1;
-    while (fgets(info.line, MAX_EPS_LINE_LENGTH, info.filePtr) != NULL) {
-	info.lineNumber++;
-	if ((info.line[0] == '%') &&
-	    (info.line[1] == '%')) {	/* Header comment */
-	    field = info.line + 2;
-	    if ((field[0] == 'B') &&
-		(strncmp(field, "BoundingBox:", 12) == 0)) {
-		if (boundingBox == NULL) {
-		    int numFields;
-
-		    boundingBox = field + 12;
-		    numFields = sscanf(boundingBox, "%d %d %d %d",
-			&(epsPtr->llx), &(epsPtr->lly),
-			&(epsPtr->urx), &(epsPtr->ury));
-		    if (numFields != 4) {
+    dscBoundingBox = dscTitle = dscEndComments = NULL;
+    pi.lineNumber = 1;
+    while (ReadPsLine(&pi)) {
+	pi.lineNumber++;
+	if ((pi.line[0] == '%') && (pi.line[1] == '%')) { /* Header comment */
+	    field = pi.line + 2;
+	    if (field[0] == 'B') {
+		if (strncmp(field, "BeginSetup", 8) == 0) {
+		    break;	/* Done */
+		}
+		if (strncmp(field, "BeginProlog", 8) == 0) {
+		    break;	/* Done */
+		}
+		if ((strncmp(field, "BoundingBox:", 12) == 0) &&
+		    (dscBoundingBox == NULL)) {
+		    int nFields;
+		    
+		    dscBoundingBox = field + 12;
+		    nFields = sscanf(dscBoundingBox, "%d %d %d %d",
+				     &(epsPtr->llx), &(epsPtr->lly),
+				     &(epsPtr->urx), &(epsPtr->ury));
+		    if (nFields != 4) {
 			Tcl_AppendResult(interp,
-			    "bad \"%%BoundingBox\" values: \"",
-			    boundingBox, "\"", (char *)NULL);
+					 "bad \"%%BoundingBox\" values: \"",
+					 dscBoundingBox, "\"", (char *)NULL);
 			goto error;
 		    }
 		}
 	    } else if ((field[0] == 'T') &&
 		(strncmp(field, "Title:", 6) == 0)) {
-		if (title == NULL) {
-		    title = strdup(field + 6);
+		if (dscTitle == NULL) {
+		    dscTitle = Blt_Strdup(field + 6);
 		}
 	    } else if (field[0] == 'E') {
 		if (strncmp(field, "EndComments", 11) == 0) {
-		    break;	/* Done */
-		}
-		if (strncmp(field, "EndSetup", 8) == 0) {
-		    readPreview = FALSE;
+		    dscEndComments = field;
 		    break;	/* Done */
 		}
 	    }
 	}			/* %% */
     }
-    if (boundingBox == NULL) {
-	Tcl_AppendResult(interp, "\"BoundingBox:\" not found in file \"",
-	    epsPtr->fileName, "\"", (char *)NULL);
-      error:
-	if (title != NULL) {
-	    free(title);
+    if (dscBoundingBox == NULL) {
+	Tcl_AppendResult(interp, "no \"%%BoundingBox:\" found in \"",
+			 epsPtr->fileName, "\"", (char *)NULL);
+	goto error;
+    }
+    if (dscEndComments != NULL) {
+	/* Check if a "%%BeginPreview" immediately follows */
+	while (ReadPsLine(&pi)) {
+	    field = SkipBlanks(&pi);
+	    if (field[0] != '\0') {
+		break;
+	    }
 	}
-	return TCL_ERROR;	/* BoundingBox: is required. */
-    }
-    if (title != NULL) {
-	epsPtr->title = title;
-    }
-    if (readPreview) {
-#ifdef notdef
-	if ((readPreview) && (epsPtr->photo == NULL)) {
+	if (strncmp(pi.line, "%%BeginPreview:", 15) == 0) {
+	    ReadEPSI(epsPtr, &pi);
 	}
-#endif
-	/* Read the EPS preview image if no preview image was supplied */
-	ReadEPSPreview(epsPtr, &info);
     }
-    rewind(epsPtr->filePtr);
+    if (dscTitle != NULL) {
+	epsPtr->title = dscTitle;
+    }
+    /* Finally save the PostScript into a dynamic string. */
+    while (ReadPsLine(&pi)) {
+	Tcl_DStringAppend(&epsPtr->dString, pi.line, -1);
+	Tcl_DStringAppend(&epsPtr->dString, "\n", 1);
+    }
     return TCL_OK;
+ error:
+    if (dscTitle != NULL) {
+	Blt_Free(dscTitle);
+    }
+    return TCL_ERROR;	/* BoundingBox: is required. */
 }
+
+static int
+OpenEpsFile(interp, epsPtr)
+    Tcl_Interp *interp;
+    EpsItem *epsPtr;
+{
+    FILE *f;
+#ifdef WIN32
+    DOSEPSHEADER dosHeader;
+    int nBytes;
+#endif
+
+    f = fopen(epsPtr->fileName, "rb");
+    if (f == NULL) {
+	Tcl_AppendResult(epsPtr->interp, "can't open \"", epsPtr->fileName,
+	    "\": ", Tcl_PosixError(epsPtr->interp), (char *)NULL);
+	return TCL_ERROR;
+    }
+    epsPtr->psFile = f;
+    epsPtr->psStart = epsPtr->psLength = 0L;
+    epsPtr->wmfStart = epsPtr->wmfLength = 0L;
+    epsPtr->tiffStart = epsPtr->tiffLength = 0L;
+    
+#ifdef WIN32
+    nBytes = fread(&dosHeader, sizeof(DOSEPSHEADER), 1, f);
+    if ((nBytes == sizeof(DOSEPSHEADER)) &&
+	(dosHeader.magic[0] == 0xC5) && (dosHeader.magic[1] == 0xD0) &&
+	(dosHeader.magic[2] == 0xD3) && (dosHeader.magic[3] == 0xC6)) {
+
+	/* DOS EPS file */
+	epsPtr->psStart = dosHeader.psStart;
+	epsPtr->wmfStart = dosHeader.wmfStart;
+	epsPtr->wmfLength = dosHeader.wmfLength;
+	epsPtr->tiffStart = dosHeader.tiffStart;
+	epsPtr->tiffLength = dosHeader.tiffLength;
+	epsPtr->previewFormat = PS_PREVIEW_EPSI;
+#ifdef HAVE_TIFF_H
+	if (epsPtr->tiffLength > 0) {
+	    epsPtr->previewFormat = PS_PREVIEW_TIFF;
+	}	    
+#endif /* HAVE_TIFF_H */
+	if (epsPtr->wmfLength > 0) {
+	    epsPtr->previewFormat = PS_PREVIEW_WMF;
+	}
+    }
+    fseek(f, 0, 0);
+#endif /* WIN32 */
+    return ReadPostScript(interp, epsPtr);
+}
+
+static void
+CloseEpsFile(epsPtr)
+    EpsItem *epsPtr;
+{
+    if (epsPtr->psFile != NULL) {
+	fclose(epsPtr->psFile);
+	epsPtr->psFile = NULL;
+    }
+}
+
+#ifdef HAVE_TIFF_H
+static void
+ReadTiffPreview(epsPtr)
+    EpsItem *epsPtr;
+{
+    unsigned int width, height;
+    Blt_ColorImage image;
+    Pix32 *dataPtr;
+    FILE *f;
+    int n;
+
+    TIFFGetField(epsPtr->tiffPtr, TIFFTAG_IMAGEWIDTH, &width);
+    TIFFGetField(epsPtr->tiffPtr, TIFFTAG_IMAGELENGTH, &height);
+    image = Blt_CreateColorImage(width, height);
+    dataPtr = Blt_ColorImageBits(image);
+    if (!TIFFReadRGBAImage(epsPtr->tiffPtr, width, height, dataPtr, 0)) {
+	Blt_FreeColorImage(image);
+	return;
+    }
+    /* Reverse the order of the components for each pixel. */
+    /* ... */
+    epsPtr->colorImage = image;
+}
+#endif
+
+#ifdef notdef
+ReadWMF(f, epsPtr, headerPtr)
+    FILE *f;
+{
+    HANDLE hMem;
+    Tk_Window tkwin;
+
+    if (fseek(f, headerPtr->wmfStart, 0) != 0) {
+	Tcl_AppendResult(interp, "can't seek in \"", epsPtr->fileName, 
+			 "\"", (char *)NULL);
+	return TCL_ERROR;
+    }
+    hMem = GlobalAlloc(GHND, size);
+    if (hMem == NULL) {
+	Tcl_AppendResult(graphPtr->interp, "can't allocate global memory:", 
+			 Blt_LastError(), (char *)NULL);
+	return TCL_ERROR;
+    }
+    buffer = (LPVOID)GlobalLock(hMem);
+    /* Read the header and see what kind of meta file it is. */
+    fread(buffer, sizeof(unsigned char), headerPtr->wmfLength, f);
+    mfp.mm = 0;
+    mfp.xExt = epsPtr->width;
+    mfp.yExt = epsPtr->height;
+    mfp.hMF = hMetaFile;
+    tkwin = Tk_CanvasTkwin(epsPtr->canvas);
+    hRefDC = TkWinGetDrawableDC(Tk_Display(tkwin), Tk_WindowId(tkwin), &state);
+    hDC = CreateEnhMetaFile(hRefDC, NULL, NULL, NULL);
+    mfp.hMF = CloseEnhMetaFile(hDC);
+    hMetaFile = SetWinMetaFileBits(size, buffer, MM_ANISOTROPIC, &pict);
+	Tcl_AppendResult(graphPtr->interp, "can't get metafile data:", 
+		Blt_LastError(), (char *)NULL);
+	goto error;
+}
+#endif
 
 /*
  *----------------------------------------------------------------------
@@ -657,14 +863,21 @@ DeleteEps(canvas, itemPtr, display)
     EpsItem *epsPtr = (EpsItem *)itemPtr;
 
     Tk_FreeOptions(configSpecs, (char *)epsPtr, display, 0);
+    CloseEpsFile(epsPtr);
     if (epsPtr->colorImage != NULL) {
 	Blt_FreeColorImage(epsPtr->colorImage);
     }
-    if (epsPtr->tkImage != NULL) {
-	Tk_FreeImage(epsPtr->tkImage);
+    if (epsPtr->preview != NULL) {
+	Tk_FreeImage(epsPtr->preview);
+    }
+    if (epsPtr->previewName != NULL) {
+	Blt_Free(epsPtr->previewName);
+    }
+    if (epsPtr->tmpImage != NULL) {
+	Blt_DestroyTemporaryImage(epsPtr->interp, epsPtr->tmpImage);
     }
     if (epsPtr->pixmap != None) {
-#ifdef notdef
+#ifdef notyet
 	Blt_FreeColorTable(epsPtr->colorTable);
 #endif
 	Tk_FreePixmap(display, epsPtr->pixmap);
@@ -675,13 +888,10 @@ DeleteEps(canvas, itemPtr, display)
     if (epsPtr->fillGC != NULL) {
 	Tk_FreeGC(display, epsPtr->fillGC);
     }
-    Blt_FreeTextAttributes(display, &(epsPtr->titleAttr));
+    Blt_FreeTextStyle(display, &(epsPtr->titleStyle));
 
-    if (epsPtr->filePtr != NULL) {
-	fclose(epsPtr->filePtr);
-    }
     if (epsPtr->title != NULL) {
-	free((char *)epsPtr->title);
+	Blt_Free(epsPtr->title);
     }
 }
 
@@ -731,13 +941,14 @@ CreateEps(interp, canvas, itemPtr, argc, argv)
     epsPtr->borderWidth = 2;
     epsPtr->canvas = canvas;
     epsPtr->fileName = NULL;
-    epsPtr->filePtr = NULL;
+    epsPtr->psFile = NULL;
     epsPtr->fillGC = NULL;
     epsPtr->fillColor = NULL;
     epsPtr->colorImage = NULL;
-    epsPtr->imageName = NULL;
+    epsPtr->previewName = NULL;
+    epsPtr->preview = NULL;
     epsPtr->interp = interp;
-    epsPtr->photo = NULL;
+    epsPtr->tmpImage = NULL;
     epsPtr->pixmap = None;
     epsPtr->firstLine = epsPtr->lastLine = -1;
     epsPtr->relief = TK_RELIEF_SUNKEN;
@@ -746,16 +957,16 @@ CreateEps(interp, canvas, itemPtr, argc, argv)
     epsPtr->showImage = TRUE;
     epsPtr->quick = FALSE;
     epsPtr->title = NULL;
-    epsPtr->tkImage = NULL;
     epsPtr->lastWidth = epsPtr->lastHeight = 0;
     epsPtr->width = epsPtr->height = 0;
     epsPtr->x = epsPtr->y = 0.0;
     epsPtr->llx = epsPtr->lly = epsPtr->urx = epsPtr->ury = 0;
     epsPtr->canvasX = epsPtr->canvasY = 0;
-    memset(&(epsPtr->titleAttr), 0, sizeof(TextAttributes));
+    Tcl_DStringInit(&epsPtr->dString);
+    memset(&(epsPtr->titleStyle), 0, sizeof(TextStyle));
 #define PAD	8
-    epsPtr->titleAttr.padLeft = epsPtr->titleAttr.padRight = PAD;
-    epsPtr->titleAttr.padTop = epsPtr->titleAttr.padBottom = PAD;
+    epsPtr->titleStyle.padLeft = epsPtr->titleStyle.padRight = PAD;
+    epsPtr->titleStyle.padTop = epsPtr->titleStyle.padBottom = PAD;
 
     /*
      * Process the arguments to fill in the item record.
@@ -793,19 +1004,19 @@ CreateEps(interp, canvas, itemPtr, argc, argv)
 static void
 ImageChangedProc(clientData, x, y, width, height, imageWidth, imageHeight)
     ClientData clientData;
-    int x, y, width, height;	/* Not used */
-    int imageWidth, imageHeight;/* Not used */
+    int x, y, width, height;	/* Not used. */
+    int imageWidth, imageHeight;/* Not used. */
 {
-    EpsItem *epsPtr = (EpsItem *)clientData;
+    EpsItem *epsPtr = clientData;
 
-    if ((epsPtr->tkImage == NULL) || (Blt_TkImageDeleted(epsPtr->tkImage))) {
-	epsPtr->tkImage = NULL;
-	if (epsPtr->imageName != NULL) {
-	    free((char *)epsPtr->imageName);
-	    epsPtr->imageName = NULL;
+    if ((epsPtr->preview == NULL) || (Tk_ImageIsDeleted(epsPtr->preview))) {
+	epsPtr->preview = NULL;
+	if (epsPtr->previewName != NULL) {
+	    Blt_Free(epsPtr->previewName);
+	    epsPtr->previewName = NULL;
 	}
-	Tk_CanvasEventuallyRedraw(epsPtr->canvas, epsPtr->xMin, epsPtr->yMin,
-	    epsPtr->xMax, epsPtr->yMax);
+	Tk_CanvasEventuallyRedraw(epsPtr->canvas, epsPtr->xLeft, epsPtr->yTop,
+	    epsPtr->xRight, epsPtr->yBottom);
     }
 }
 
@@ -847,52 +1058,49 @@ ConfigureEps(interp, canvas, itemPtr, argc, argv, flags)
 	    argv, (char *)epsPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
+    /* Determine the size of the EPS item */
+    width = height = 0;
     /*
      * Check for a "-image" option specifying an image to be displayed
      * representing the EPS canvas item.
      */
     if (Blt_ConfigModified(configSpecs, "-image", (char *)NULL)) {
-	if (epsPtr->tkImage != NULL) {
-	    Tk_FreeImage(epsPtr->tkImage);	/* Release the old Tk image */
+	if (epsPtr->preview != NULL) {
+	    Tk_FreeImage(epsPtr->preview);	/* Release old Tk image */
 	    Blt_FreeColorImage(epsPtr->colorImage);
-	    epsPtr->tkImage = NULL;
-	    epsPtr->photo = NULL;
+	    epsPtr->preview = NULL;
 	    epsPtr->colorImage = NULL;
 	}
-	if (epsPtr->imageName != NULL) {
-	    ImageRegion region;
+	if (epsPtr->previewName != NULL) {
+	    Tk_PhotoHandle photo;	/* Photo handle to Tk image. */
 	    /*
 	     * Allocate a new image, if one was named.
 	     */
-	    epsPtr->photo = Blt_FindPhoto(interp, epsPtr->imageName);
-	    if (epsPtr->photo == NULL) {
-		Tcl_AppendResult(interp, "image \"", epsPtr->imageName,
+	    photo = Blt_FindPhoto(interp, epsPtr->previewName);
+	    if (photo == NULL) {
+		Tcl_AppendResult(interp, "image \"", epsPtr->previewName,
 		    "\" doesn't  exist or is not a photo image",
 		    (char *)NULL);
 		return TCL_ERROR;
 	    }
-	    epsPtr->tkImage = Tk_GetImage(interp, tkwin, epsPtr->imageName,
-		ImageChangedProc, (ClientData)epsPtr);
-	    if (epsPtr->tkImage == NULL) {
+	    epsPtr->preview = Tk_GetImage(interp, tkwin, epsPtr->previewName, 
+			ImageChangedProc, epsPtr);
+	    if (epsPtr->preview == NULL) {
 		Tcl_AppendResult(interp, "can't find an image \"",
-		    epsPtr->imageName, "\"", (char *)NULL);
-		free((char *)epsPtr->imageName);
-		epsPtr->imageName = NULL;
+		    epsPtr->previewName, "\"", (char *)NULL);
+		Blt_Free(epsPtr->previewName);
+		epsPtr->previewName = NULL;
 		return TCL_ERROR;
 	    }
-	    epsPtr->lastWidth = epsPtr->lastHeight = 0;
-	    Tk_SizeOfImage(epsPtr->tkImage, &(region.width), &(region.height));
-	    region.x = region.y = 0;
-	    epsPtr->colorImage = Blt_PhotoToColorImage(epsPtr->photo, &region);
+	    epsPtr->colorImage = Blt_PhotoToColorImage(photo);
+	    width = Blt_ColorImageWidth(epsPtr->colorImage);
+	    height = Blt_ColorImageHeight(epsPtr->colorImage);
 	}
     }
     if (Blt_ConfigModified(configSpecs, "-file", (char *)NULL)) {
-	if (epsPtr->filePtr != NULL) {
-	    fclose(epsPtr->filePtr);
-	    epsPtr->filePtr = NULL;
-	}
+	CloseEpsFile(epsPtr);
 	if (epsPtr->pixmap != None) {
-#ifdef notdef
+#ifdef notyet
 	    Blt_FreeColorTable(epsPtr->colorTable);
 #endif
 	    Tk_FreePixmap(Tk_Display(tkwin), epsPtr->pixmap);
@@ -904,19 +1112,21 @@ ConfigureEps(interp, canvas, itemPtr, argc, argv, flags)
 	}
 	epsPtr->firstLine = epsPtr->lastLine = -1;
 	if (epsPtr->fileName != NULL) {
-	    epsPtr->filePtr = fopen(epsPtr->fileName, "r");
-	    if (epsPtr->filePtr == NULL) {
-		Tcl_AppendResult(interp, "can't open \"", epsPtr->fileName,
-		    "\": ", Tcl_PosixError(interp), (char *)NULL);
+	    if (OpenEpsFile(interp, epsPtr) != TCL_OK) {
 		return TCL_ERROR;
 	    }
-	    ParseEpsFile(interp, epsPtr);
 	}
     }
-    /* Determine the size of the EPS item */
-    width = height = 0;
-    if (epsPtr->tkImage != NULL) {
-	Tk_SizeOfImage(epsPtr->tkImage, &width, &height);
+    if ((epsPtr->colorImage != NULL) && (epsPtr->tmpImage == NULL)) {
+	epsPtr->tmpImage = Blt_CreateTemporaryImage(interp, tkwin, epsPtr);
+	if (epsPtr->tmpImage == NULL) {
+	    return TCL_ERROR;
+	}
+    } else if ((epsPtr->colorImage == NULL) && (epsPtr->tmpImage != NULL)) {
+	Blt_DestroyTemporaryImage(epsPtr->interp, epsPtr->tmpImage);
+    }
+    if (epsPtr->preview != NULL) {
+	Tk_SizeOfImage(epsPtr->preview, &width, &height);
     }
     if (epsPtr->width == 0) {
 	if (epsPtr->fileName != NULL) {
@@ -930,7 +1140,7 @@ ConfigureEps(interp, canvas, itemPtr, argc, argv, flags)
 	}
 	epsPtr->height = height;
     }
-    Blt_ResetTextAttributes(tkwin, &(epsPtr->titleAttr));
+    Blt_ResetTextStyle(tkwin, &(epsPtr->titleStyle));
 
     if (Blt_ConfigModified(configSpecs, "-quick", (char *)NULL)) {
 	epsPtr->lastWidth = epsPtr->lastHeight = 0;
@@ -959,7 +1169,7 @@ ConfigureEps(interp, canvas, itemPtr, argc, argv, flags)
 	Tk_FreeGC(Tk_Display(tkwin), epsPtr->fillGC);
     }
     epsPtr->fillGC = newGC;
-
+    CloseEpsFile(epsPtr);
     ComputeEpsBbox(canvas, epsPtr);
     return TCL_OK;
 }
@@ -996,7 +1206,7 @@ EpsCoords(interp, canvas, itemPtr, argc, argv)
 
     if ((argc != 0) && (argc != 2)) {
 	Tcl_AppendResult(interp, "wrong # coordinates: expected 0 or 2, got ",
-	    Blt_Int(argc), (char *)NULL);
+	    Blt_Itoa(argc), (char *)NULL);
 	return TCL_ERROR;
     }
     if (argc == 2) {
@@ -1011,8 +1221,8 @@ EpsCoords(interp, canvas, itemPtr, argc, argv)
 	ComputeEpsBbox(canvas, epsPtr);
 	return TCL_OK;
     }
-    Tcl_AppendElement(interp, Blt_Double(interp, epsPtr->x));
-    Tcl_AppendElement(interp, Blt_Double(interp, epsPtr->y));
+    Tcl_AppendElement(interp, Blt_Dtoa(interp, epsPtr->x));
+    Tcl_AppendElement(interp, Blt_Dtoa(interp, epsPtr->y));
     return TCL_OK;
 }
 
@@ -1046,11 +1256,11 @@ ComputeEpsBbox(canvas, epsPtr)
     x = ROUND(epsPtr->x), y = ROUND(epsPtr->y);
     Blt_TranslateAnchor(x, y, epsPtr->width, epsPtr->height, epsPtr->anchor,
 	&x, &y);
-    epsPtr->xMin = epsPtr->canvasX = x;
-    epsPtr->yMin = epsPtr->canvasY = y;
+    epsPtr->xLeft = epsPtr->canvasX = x;
+    epsPtr->yTop = epsPtr->canvasY = y;
 
     /*
-     * The xMax and yMax are (weirdly) exterior to the item.  Can't
+     * The right and bottom are (weirdly) exterior to the item.  Can't
      * complain much since it's documented in the Tk_CreateItemType
      * manual page.
      *
@@ -1060,8 +1270,8 @@ ComputeEpsBbox(canvas, epsPtr)
      * should it cover any pixels with x-coordinate greater than or
      * equal to x2 or y-coordinate greater than or equal to y2."
      */
-    epsPtr->xMax = x + epsPtr->width;
-    epsPtr->yMax = y + epsPtr->height;
+    epsPtr->xRight = x + epsPtr->width;
+    epsPtr->yBottom = y + epsPtr->height;
 }
 
 /*
@@ -1107,34 +1317,28 @@ DisplayEps(canvas, itemPtr, display, drawable, x, y, width, height)
     if ((epsPtr->showImage) && (epsPtr->colorImage != NULL) &&
 	((epsPtr->lastWidth != epsPtr->width) ||
 	    (epsPtr->lastHeight != epsPtr->height))) {
-	ImageRegion srcRegion, destRegion;
-	ColorImage image;
+	Blt_ColorImage image;
 
-	srcRegion.x = srcRegion.y = 0;
-	srcRegion.width = ColorImageWidth(epsPtr->colorImage);
-	srcRegion.height = ColorImageHeight(epsPtr->colorImage);
-	destRegion.x = destRegion.y = 0;
-	destRegion.width = epsPtr->width;
-	destRegion.height = epsPtr->height;
 	if (epsPtr->quick) {
-	    image = Blt_ResizeColorImage(epsPtr->colorImage, &srcRegion,
-		&destRegion);
+	    image = Blt_ResizeColorImage(epsPtr->colorImage, 0, 0,
+			Blt_ColorImageWidth(epsPtr->colorImage),
+			Blt_ColorImageHeight(epsPtr->colorImage),
+			epsPtr->width, epsPtr->height);
 	} else {
-	    image = Blt_ResampleColorImage(epsPtr->colorImage, &srcRegion,
-		&destRegion, bltBoxFilter, bltBoxFilter);
+	    image = Blt_ResampleColorImage(epsPtr->colorImage, epsPtr->width,
+		epsPtr->height, bltBoxFilterPtr, bltBoxFilterPtr);
 	}
-	if (epsPtr->photo != NULL) {
+	if (epsPtr->tmpImage != NULL) {
+	    Tk_PhotoHandle photo;
 	    /*
 	     * Resize the Tk photo image used to represent the EPS item.
-	     *
-	     * We will over-write the current image with a resampled one.
-	     * This can be screwy, especially if someone is sharing the
-	     * image.  But it's this or force the user to create another
-	     * photo image for us.
+	     * We will over-write the temporary image with a resampled one.
 	     */
-	    Blt_ColorImageToPhoto(image, epsPtr->photo);
+	    photo = Blt_FindPhoto(epsPtr->interp, 
+				  Blt_NameOfImage(epsPtr->tmpImage));
+	    Blt_ColorImageToPhoto(image, photo);
 	} else {
-#ifdef notdef
+#ifdef notyet
 	    epsPtr->pixmap = Blt_ColorImageToPixmap(epsPtr->interp, tkwin,
 		image, &(epsPtr->colorTable));
 #endif
@@ -1159,7 +1363,7 @@ DisplayEps(canvas, itemPtr, display, drawable, x, y, width, height)
     }
     width = epsPtr->width;
     height = epsPtr->height;
-    noImage = ((!epsPtr->showImage) || ((epsPtr->tkImage == NULL) &&
+    noImage = ((!epsPtr->showImage) || ((epsPtr->tmpImage == NULL) &&
 	    (epsPtr->pixmap == None)));
     if (noImage) {
 	if ((twiceBW >= width) || (twiceBW >= height)) {
@@ -1178,34 +1382,38 @@ DisplayEps(canvas, itemPtr, display, drawable, x, y, width, height)
 	    XCopyArea(Tk_Display(tkwin), epsPtr->pixmap, drawable,
 		epsPtr->fillGC, 0, 0, width, height, x, y);
 	} else {
-	    Tk_RedrawImage(epsPtr->tkImage, 0, 0, width, height, drawable,
-		x, y);
+	    Tk_RedrawImage(epsPtr->tmpImage, 0, 0, width, height, drawable, 
+			   x, y);
 	}
     }
 
     if (title != NULL) {
-	CompoundText *textPtr;
-	int rotWidth, rotHeight;
+	TextLayout *textPtr;
+	double rotWidth, rotHeight;
+	int destWidth, destHeight;
 
 	/* Translate the title to an anchor position within the EPS item */
-	textPtr = Blt_GetCompoundText(title, &(epsPtr->titleAttr));
-	Blt_GetBoundingBox(textPtr->width, textPtr->height,
-	    epsPtr->titleAttr.theta, &rotWidth, &rotHeight, (XPoint *)NULL);
-	if ((rotWidth <= width) && (rotHeight <= height)) {
+	textPtr = Blt_GetTextLayout(title, &(epsPtr->titleStyle));
+	Blt_GetBoundingBox(textPtr->width, textPtr->height, 
+	     epsPtr->titleStyle.theta, &rotWidth, &rotHeight, (Point2D *)NULL);
+	destWidth = (int)ceil(rotWidth);
+	destHeight = (int)ceil(rotHeight);
+	if ((destWidth <= width) && (destHeight <= height)) {
 	    int titleX, titleY;
 
-	    Blt_TranslateAnchor(x, y, width, height, epsPtr->titleAttr.anchor,
+	    Blt_TranslateAnchor(x, y, width, height, epsPtr->titleStyle.anchor,
 		&titleX, &titleY);
 	    if (noImage) {
 		titleX += epsPtr->borderWidth;
 		titleY += epsPtr->borderWidth;
 	    }
-	    Blt_DrawText(tkwin, drawable, title, &(epsPtr->titleAttr), titleX,
-		titleY);
+	    Blt_DrawTextLayout(tkwin, drawable, textPtr, &(epsPtr->titleStyle),
+			       titleX, titleY);
 	}
+	Blt_Free(textPtr);
     }
     if ((noImage) && (epsPtr->border != NULL)) {
-	Tk_Draw3DRectangle(tkwin, drawable, epsPtr->border, x, y,
+	Blt_Draw3DRectangle(tkwin, drawable, epsPtr->border, x, y,
 	    epsPtr->width, epsPtr->height, epsPtr->borderWidth, epsPtr->relief);
     }
 }
@@ -1242,17 +1450,17 @@ EpsToPoint(canvas, itemPtr, coordArr)
     /*
      * Point is outside rectangle.
      */
-    if (coordArr[0] < epsPtr->xMin) {
-	dx = epsPtr->xMin - coordArr[0];
-    } else if (coordArr[0] > epsPtr->xMax) {
-	dx = coordArr[0] - epsPtr->xMax;
+    if (coordArr[0] < epsPtr->xLeft) {
+	dx = epsPtr->xLeft - coordArr[0];
+    } else if (coordArr[0] > epsPtr->xRight) {
+	dx = coordArr[0] - epsPtr->xRight;
     } else {
 	dx = 0;
     }
-    if (coordArr[1] < epsPtr->yMin) {
-	dy = epsPtr->yMin - coordArr[1];
-    } else if (coordArr[1] > epsPtr->yMax) {
-	dy = coordArr[1] - epsPtr->yMax;
+    if (coordArr[1] < epsPtr->yTop) {
+	dy = epsPtr->yTop - coordArr[1];
+    } else if (coordArr[1] > epsPtr->yBottom) {
+	dy = coordArr[1] - epsPtr->yBottom;
     } else {
 	dy = 0;
     }
@@ -1280,21 +1488,21 @@ EpsToPoint(canvas, itemPtr, coordArr)
  */
 /*ARGSUSED*/
 static int
-EpsToArea(canvas, itemPtr, rectArr)
+EpsToArea(canvas, itemPtr, area)
     Tk_Canvas canvas;		/* Canvas containing item. */
     Tk_Item *itemPtr;		/* Item to check against rectangle. */
-    double *rectArr;		/* Pointer to array of four coordinates
+    double area[];		/* Pointer to array of four coordinates
 				 * (x1, y1, x2, y2) describing rectangular
 				 * area.  */
 {
     EpsItem *epsPtr = (EpsItem *)itemPtr;
 
-    if ((rectArr[2] <= epsPtr->xMin) || (rectArr[0] >= epsPtr->xMax) ||
-	(rectArr[3] <= epsPtr->yMin) || (rectArr[1] >= epsPtr->yMax)) {
+    if ((area[2] <= epsPtr->xLeft) || (area[0] >= epsPtr->xRight) ||
+	(area[3] <= epsPtr->yTop) || (area[1] >= epsPtr->yBottom)) {
 	return -1;
     }
-    if ((rectArr[0] <= epsPtr->xMin) && (rectArr[1] <= epsPtr->yMin) &&
-	(rectArr[2] >= epsPtr->xMax) && (rectArr[3] >= epsPtr->yMax)) {
+    if ((area[0] <= epsPtr->xLeft) && (area[1] <= epsPtr->yTop) &&
+	(area[2] >= epsPtr->xRight) && (area[3] >= epsPtr->yBottom)) {
 	return 1;
     }
     return 0;
@@ -1396,95 +1604,77 @@ EpsToPostScript(interp, canvas, itemPtr, prepass)
 				 * final Postscript is being created. */
 {
     EpsItem *epsPtr = (EpsItem *)itemPtr;
-    Tcl_DString dString;
-    Printable printable;
+    PsToken psToken;
     Tk_Window tkwin;
-    float xScale, yScale;
+    double xScale, yScale;
     int x, y, width, height;
-    int lineNum;
 
     if (prepass) {
 	return TCL_OK;
     }
     tkwin = Tk_CanvasTkwin(epsPtr->canvas);
-    Tcl_DStringInit(&dString);
-    printable = Blt_PrintObject(interp, tkwin, &dString);
+    psToken = Blt_GetPsToken(interp, tkwin);
     x = epsPtr->canvasX;
     y = (int)Tk_CanvasPsY(canvas, (double)epsPtr->canvasY + epsPtr->height);
 
     if (epsPtr->fileName == NULL) {
-	if (epsPtr->photo != NULL) {
-	    /* No PostScript file, generate PostScript of image instead. */
-	    Blt_PrintFormat(printable, "gsave\n");
+	/* No PostScript file, generate PostScript of resized image instead. */
+	if (epsPtr->tmpImage != NULL) {
+	    Tk_PhotoHandle photo;
 
+	    Blt_FormatToPostScript(psToken, "gsave\n");
 	    /*
 	     * First flip the PostScript y-coordinate axis so that the
 	     * origin is the upper-left corner like our color image.
 	     */
-	    Blt_PrintFormat(printable, "  %d %d translate\n",
+	    Blt_FormatToPostScript(psToken, "  %d %d translate\n",
 		x, y + epsPtr->height);
-	    Blt_PrintFormat(printable, "  1 -1 scale\n");
+	    Blt_FormatToPostScript(psToken, "  1 -1 scale\n");
 
-	    Blt_PhotoToPostScript(printable, epsPtr->photo, 0, 0);
-	    Blt_PrintFormat(printable, "grestore\n");
+	    photo = Blt_FindPhoto(epsPtr->interp, 
+			Blt_NameOfImage(epsPtr->tmpImage));
+	    Blt_PhotoToPostScript(psToken, photo, 0.0, 0.0);
+	    Blt_FormatToPostScript(psToken, "grestore\n");
 
-	    Tcl_AppendResult(interp, Tcl_DStringValue(&dString), (char *)NULL);
-	    Tcl_DStringFree(&dString);
-	    free((char *)printable);
+	    Tcl_AppendResult(interp, Blt_PostScriptFromToken(psToken), 
+		     (char *)NULL);
+	    Blt_ReleasePsToken(psToken);
 	}
 	return TCL_OK;
     }
-    if (epsPtr->filePtr == NULL) {
-	Tcl_AppendResult(interp, "can't get handle to EPS file", (char *)NULL);
-	goto error;
-    }
+
     /* Copy in the PostScript prolog for EPS encapsulation. */
 
-    if (Blt_FileToPostScript(printable, "bltCanvEps.pro") != TCL_OK) {
+    if (Blt_FileToPostScript(psToken, "bltCanvEps.pro") != TCL_OK) {
 	goto error;
     }
-    Blt_PrintAppend(printable, "BeginEPSF\n", (char *)NULL);
+    Blt_AppendToPostScript(psToken, "BeginEPSF\n", (char *)NULL);
 
     width = epsPtr->width;
     height = epsPtr->height;
-    xScale = (float)width / (float)(epsPtr->urx - epsPtr->llx);
-    yScale = (float)height / (float)(epsPtr->ury - epsPtr->lly);
+    xScale = (double)width / (double)(epsPtr->urx - epsPtr->llx);
+    yScale = (double)height / (double)(epsPtr->ury - epsPtr->lly);
 
     /* Set up scaling and translation transformations for the EPS item */
 
-    Blt_PrintFormat(printable, "%d %d translate\n", x, y);
-    Blt_PrintFormat(printable, "%g %g scale\n", xScale, yScale);
-    Blt_PrintFormat(printable, "%d %d translate\n", -(epsPtr->llx),
+    Blt_FormatToPostScript(psToken, "%d %d translate\n", x, y);
+    Blt_FormatToPostScript(psToken, "%g %g scale\n", xScale, yScale);
+    Blt_FormatToPostScript(psToken, "%d %d translate\n", -(epsPtr->llx),
 	-(epsPtr->lly));
-    Blt_PrintFormat(printable, "%d %d %d %d SetClipRegion\n", epsPtr->llx,
-	epsPtr->lly, epsPtr->urx, epsPtr->ury);
-    rewind(epsPtr->filePtr);
-    Blt_PrintAppend(printable, "%% including \"", epsPtr->fileName, "\"\n\n",
-	(char *)NULL);
-    lineNum = 0;
-    while (fgets(printable->scratchArr, PRINTABLE_SCRATCH_LENGTH,
-	    epsPtr->filePtr) != NULL) {
-	lineNum++;
-	if ((lineNum > epsPtr->lastLine) || (lineNum < epsPtr->firstLine)) {
-	    Tcl_DStringAppend(&dString, printable->scratchArr, -1);
-	}
-    }
-    if (ferror(epsPtr->filePtr)) {
-	Tcl_AppendResult(interp, "error reading EPS file \"", epsPtr->fileName,
-	    "\": ", Tcl_PosixError(interp), (char *)NULL);
-	fclose(epsPtr->filePtr);
-	epsPtr->filePtr = NULL;
-	goto error;
-    }
-    Blt_PrintAppend(printable, "EndEPSF\n", (char *)NULL);
-    Tcl_AppendResult(interp, Tcl_DStringValue(&dString), (char *)NULL);
-    Tcl_DStringFree(&dString);
-    free((char *)printable);
+    Blt_FormatToPostScript(psToken, "%d %d %d %d SetClipRegion\n", 
+	epsPtr->llx, epsPtr->lly, epsPtr->urx, epsPtr->ury);
+    Blt_AppendToPostScript(psToken, "%% including \"", epsPtr->fileName, 
+			   "\"\n\n", (char *)NULL);
+
+    Blt_AppendToPostScript(psToken, Tcl_DStringValue(&epsPtr->dString),
+		   (char *)NULL);
+    Blt_AppendToPostScript(psToken, "EndEPSF\n", (char *)NULL);
+    Tcl_AppendResult(interp, Blt_PostScriptFromToken(psToken), (char *)NULL);
+    Blt_ReleasePsToken(psToken);
     return TCL_OK;
 
   error:
-    Tcl_DStringFree(&dString);
-    free((char *)printable);
+    Blt_ReleasePsToken(psToken);
     return TCL_ERROR;
 }
 
@@ -1519,7 +1709,10 @@ static Tk_ItemType epsItemType =
 /*ARGSUSED*/
 void
 Blt_InitEpsCanvasItem(interp)
-    Tcl_Interp *interp;		/* Not used */
+    Tcl_Interp *interp;		/* Not used. */
 {
     Tk_CreateItemType(&epsItemType);
+    /* Initialize custom canvas option routines. */
+    tagsOption.parseProc = Tk_CanvasTagsParseProc;
+    tagsOption.printProc = Tk_CanvasTagsPrintProc;
 }

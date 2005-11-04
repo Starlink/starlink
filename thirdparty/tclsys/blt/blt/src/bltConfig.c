@@ -26,7 +26,13 @@
  */
 
 #include "bltInt.h"
-#include <X11/Xutil.h>
+#if defined(__STDC__)
+#include <stdarg.h>
+#else
+#include <varargs.h>
+#endif
+
+#include "bltTile.h"
 
 static int StringToFill _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
@@ -50,16 +56,42 @@ Tk_CustomOption bltPadOption =
     StringToPad, PadToString, (ClientData)0
 };
 
-static int StringToLength _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp,
-	Tk_Window tkwin, char *string, char *widgRec, int flags));
-static char *LengthToString _ANSI_ARGS_((ClientData, Tk_Window, char *, int,
+static int StringToDistance _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
+	int flags));
+static char *DistanceToString _ANSI_ARGS_((ClientData, Tk_Window, char *, int,
 	Tcl_FreeProc **));
 
-Tk_CustomOption bltLengthOption =
+Tk_CustomOption bltDistanceOption =
 {
-    StringToLength, LengthToString, (ClientData)0
+    StringToDistance, DistanceToString, (ClientData)PIXELS_NONNEGATIVE
 };
 
+Tk_CustomOption bltPositiveDistanceOption =
+{
+    StringToDistance, DistanceToString, (ClientData)PIXELS_POSITIVE
+};
+
+Tk_CustomOption bltAnyDistanceOption =
+{
+    StringToDistance, DistanceToString, (ClientData)PIXELS_ANY
+};
+
+static int StringToCount _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
+	int flags));
+static char *CountToString _ANSI_ARGS_((ClientData, Tk_Window, char *, int,
+	Tcl_FreeProc **));
+
+Tk_CustomOption bltCountOption =
+{
+    StringToCount, CountToString, (ClientData)COUNT_NONNEGATIVE
+};
+
+Tk_CustomOption bltPositiveCountOption =
+{
+    StringToCount, CountToString, (ClientData)COUNT_POSITIVE
+};
 
 static int StringToDashes _ANSI_ARGS_((ClientData, Tcl_Interp *, Tk_Window,
 	char *, char *, int));
@@ -113,18 +145,28 @@ Tk_CustomOption bltListOption =
     StringToList, ListToString, (ClientData)0
 };
 
+static int StringToTile _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp,
+	Tk_Window tkwin, char *value, char *widgRec, int flags));
+static char *TileToString _ANSI_ARGS_((ClientData clientData, Tk_Window tkwin,
+	char *widgRec, int offset, Tcl_FreeProc **freeProcPtr));
+
+Tk_CustomOption bltTileOption =
+{
+    StringToTile, TileToString, (ClientData)0
+};
+
 /*
  *----------------------------------------------------------------------
  *
  * Blt_NameOfFill --
  *
- *	Converts the integer representing the fill style into a string.
+ *	Converts the integer representing the fill direction into a string.
  *
  *----------------------------------------------------------------------
  */
 char *
 Blt_NameOfFill(fill)
-    Fill fill;
+    int fill;
 {
     switch (fill) {
     case FILL_X:
@@ -159,14 +201,14 @@ Blt_NameOfFill(fill)
 /*ARGSUSED*/
 static int
 StringToFill(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Fill style string */
     char *widgRec;		/* Cubicle structure record */
     int offset;			/* Offset of style in record */
 {
-    Fill *fillPtr = (Fill *)(widgRec + offset);
+    int *fillPtr = (int *)(widgRec + offset);
     unsigned int length;
     char c;
 
@@ -185,7 +227,7 @@ StringToFill(clientData, interp, tkwin, string, widgRec, offset)
 	    "\": should be \"none\", \"x\", \"y\", or \"both\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    return (TCL_OK);
+    return TCL_OK;
 }
 
 /*
@@ -203,15 +245,15 @@ StringToFill(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 FillToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of fill in widget record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
-    Fill fill = *(Fill *)(widgRec + offset);
+    int fill = *(int *)(widgRec + offset);
 
-    return (Blt_NameOfFill(fill));
+    return Blt_NameOfFill(fill);
 }
 
 /*
@@ -228,7 +270,7 @@ int
 Blt_StringToFlag(clientData, interp, tkwin, string, widgRec, offset)
     ClientData clientData;	/* Bit mask to be tested in status word */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Fill style string */
     char *widgRec;		/* Cubicle structure record */
     int offset;			/* Offset of style in record */
@@ -264,10 +306,10 @@ Blt_StringToFlag(clientData, interp, tkwin, string, widgRec, offset)
 char *
 Blt_FlagToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     ClientData clientData;	/* Bit mask to be test in status word */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of fill in widget record */
-    Tcl_FreeProc **freeProcPtr;	/* Unused */
+    Tcl_FreeProc **freeProcPtr;	/* Not Used. */
 {
     unsigned int mask = (unsigned int)clientData;	/* Bit to be tested */
     unsigned int bool = *(unsigned int *)(widgRec + offset);
@@ -275,24 +317,26 @@ Blt_FlagToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     return (bool & mask) ? "1" : "0";
 }
 
+
 /*
  *----------------------------------------------------------------------
  *
- * Blt_GetLength --
+ * Blt_GetPixels --
  *
- *	Like Tk_GetPixels, but doesn't allow negative pixel values.
+ *	Like Tk_GetPixels, but checks for negative, zero.
  *
  * Results:
  *	A standard Tcl result.
  *
  *----------------------------------------------------------------------
  */
-/*ARGSUSED*/
 int
-Blt_GetLength(interp, tkwin, string, valuePtr)
+Blt_GetPixels(interp, tkwin, string, check, valuePtr)
     Tcl_Interp *interp;
     Tk_Window tkwin;
     char *string;
+    int check;			/* Can be PIXELS_POSITIVE, PIXELS_NONNEGATIVE,
+				 * or PIXELS_ANY, */
     int *valuePtr;
 {
     int length;
@@ -300,10 +344,28 @@ Blt_GetLength(interp, tkwin, string, valuePtr)
     if (Tk_GetPixels(interp, tkwin, string, &length) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (length < 0) {
-	Tcl_AppendResult(interp, "can't have negative screen distance \"",
-	    string, "\"", (char *)NULL);
+    if (length >= SHRT_MAX) {
+	Tcl_AppendResult(interp, "bad distance \"", string, "\": ",
+	    "too big to represent", (char *)NULL);
 	return TCL_ERROR;
+    }
+    switch (check) {
+    case PIXELS_NONNEGATIVE:
+	if (length < 0) {
+	    Tcl_AppendResult(interp, "bad distance \"", string, "\": ",
+		"can't be negative", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	break;
+    case PIXELS_POSITIVE:
+	if (length <= 0) {
+	    Tcl_AppendResult(interp, "bad distance \"", string, "\": ",
+		"must be positive", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	break;
+    case PIXELS_ANY:
+	break;
     }
     *valuePtr = length;
     return TCL_OK;
@@ -312,7 +374,7 @@ Blt_GetLength(interp, tkwin, string, valuePtr)
 /*
  *----------------------------------------------------------------------
  *
- * StringToLength --
+ * StringToDistance --
  *
  *	Like TK_CONFIG_PIXELS, but adds an extra check for negative
  *	values.
@@ -321,23 +383,22 @@ Blt_GetLength(interp, tkwin, string, valuePtr)
  */
 /*ARGSUSED*/
 static int
-StringToLength(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+StringToDistance(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Indicated how to check distance */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window tkwin;		/* Window */
     char *string;		/* Pixel value string */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of pixel size in record */
 {
-    int *lengthPtr = (int *)(widgRec + offset);
-
-    return (Blt_GetLength(interp, tkwin, string, lengthPtr));
+    int *valuePtr = (int *)(widgRec + offset);
+    return Blt_GetPixels(interp, tkwin, string, (int)clientData, valuePtr);
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * LengthToString --
+ * DistanceToString --
  *
  *	Returns the string representing the positive pixel size.
  *
@@ -348,22 +409,109 @@ StringToLength(clientData, interp, tkwin, string, widgRec, offset)
  */
 /*ARGSUSED*/
 static char *
-LengthToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+DistanceToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset in widget record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
-    int length = *(int *)(widgRec + offset);
+    int value = *(int *)(widgRec + offset);
     char *result;
-    char string[200];
 
-    sprintf(string, "%d", length);
-    result = strdup(string);
+    result = Blt_Strdup(Blt_Itoa(value));
     assert(result);
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
+}
+
+int
+Blt_GetInt(interp, string, check, valuePtr)
+    Tcl_Interp *interp;
+    char *string;
+    int check;			/* Can be COUNT_POSITIVE, COUNT_NONNEGATIVE,
+				 * or COUNT_ANY, */
+    int *valuePtr;
+{
+    int count;
+
+    if (Tcl_GetInt(interp, string, &count) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    switch (check) {
+    case COUNT_NONNEGATIVE:
+	if (count < 0) {
+	    Tcl_AppendResult(interp, "bad value \"", string, "\": ",
+		"can't be negative", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	break;
+    case COUNT_POSITIVE:
+	if (count <= 0) {
+	    Tcl_AppendResult(interp, "bad value \"", string, "\": ",
+		"must be positive", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	break;
+    case COUNT_ANY:
+	break;
+    }
+    *valuePtr = count;
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * StringToCount --
+ *
+ *	Like TK_CONFIG_PIXELS, but adds an extra check for negative
+ *	values.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+StringToCount(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Indicated how to check distance */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* Pixel value string */
+    char *widgRec;		/* Widget record */
+    int offset;			/* Offset of pixel size in record */
+{
+    int *valuePtr = (int *)(widgRec + offset);
+    return Blt_GetInt(interp, string, (int)clientData, valuePtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * CountToString --
+ *
+ *	Returns the string representing the positive pixel size.
+ *
+ * Results:
+ *	The pixel size string is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static char *
+CountToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Widget structure record */
+    int offset;			/* Offset in widget record */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    int value = *(int *)(widgRec + offset);
+    char *result;
+
+    result = Blt_Strdup(Blt_Itoa(value));
+    assert(result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
 
 /*
@@ -392,41 +540,43 @@ LengthToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToPad(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window tkwin;		/* Window */
     char *string;		/* Pixel value string */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of pad in widget */
 {
-    Pad *padPtr = (Pad *)(widgRec + offset);
-    int numElem;
+    Blt_Pad *padPtr = (Blt_Pad *)(widgRec + offset);
+    int nElem;
     int pad, result;
     char **padArr;
 
-    if (Tcl_SplitList(interp, string, &numElem, &padArr) != TCL_OK) {
+    if (Tcl_SplitList(interp, string, &nElem, &padArr) != TCL_OK) {
 	return TCL_ERROR;
     }
     result = TCL_ERROR;
-    if ((numElem < 1) || (numElem > 2)) {
+    if ((nElem < 1) || (nElem > 2)) {
 	Tcl_AppendResult(interp, "wrong # elements in padding list",
 	    (char *)NULL);
 	goto error;
     }
-    if (Blt_GetLength(interp, tkwin, padArr[0], &pad) != TCL_OK) {
+    if (Blt_GetPixels(interp, tkwin, padArr[0], PIXELS_NONNEGATIVE, &pad)
+	!= TCL_OK) {
 	goto error;
     }
     padPtr->side1 = pad;
-    if ((numElem > 1) &&
-	(Blt_GetLength(interp, tkwin, padArr[1], &pad) != TCL_OK)) {
+    if ((nElem > 1) &&
+	(Blt_GetPixels(interp, tkwin, padArr[1], PIXELS_NONNEGATIVE, &pad)
+	    != TCL_OK)) {
 	goto error;
     }
     padPtr->side2 = pad;
     result = TCL_OK;
 
   error:
-    free((char *)padArr);
-    return (result);
+    Blt_Free(padArr);
+    return result;
 }
 
 /*
@@ -447,23 +597,23 @@ StringToPad(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 PadToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Structure record */
     int offset;			/* Offset of pad in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
-    Pad *padPtr = (Pad *)(widgRec + offset);
+    Blt_Pad *padPtr = (Blt_Pad *)(widgRec + offset);
     char *result;
     char string[200];
 
     sprintf(string, "%d %d", padPtr->side1, padPtr->side2);
-    result = strdup(string);
+    result = Blt_Strdup(string);
     if (result == NULL) {
 	return "out of memory";
     }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
 
 /*
@@ -492,7 +642,7 @@ PadToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToShadow(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window tkwin;		/* Window */
     char *string;		/* Pixel value string */
@@ -506,33 +656,33 @@ StringToShadow(clientData, interp, tkwin, string, widgRec, offset)
     colorPtr = NULL;
     dropOffset = 0;
     if ((string != NULL) && (string[0] != '\0')) {
-	int numElem;
+	int nElem;
 	char **elemArr;
 
-	if (Tcl_SplitList(interp, string, &numElem, &elemArr) != TCL_OK) {
+	if (Tcl_SplitList(interp, string, &nElem, &elemArr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if ((numElem < 1) || (numElem > 2)) {
+	if ((nElem < 1) || (nElem > 2)) {
 	    Tcl_AppendResult(interp, "wrong # elements in drop shadow value",
 		(char *)NULL);
-	    free((char *)elemArr);
+	    Blt_Free(elemArr);
 	    return TCL_ERROR;
 	}
 	colorPtr = Tk_GetColor(interp, tkwin, Tk_GetUid(elemArr[0]));
 	if (colorPtr == NULL) {
-	    free((char *)elemArr);
+	    Blt_Free(elemArr);
 	    return TCL_ERROR;
 	}
 	dropOffset = 1;
-	if (numElem == 2) {
-	    if (Blt_GetLength(interp, tkwin, elemArr[1], &dropOffset)
-		!= TCL_OK) {
+	if (nElem == 2) {
+	    if (Blt_GetPixels(interp, tkwin, elemArr[1], PIXELS_NONNEGATIVE,
+		    &dropOffset) != TCL_OK) {
 		Tk_FreeColor(colorPtr);
-		free((char *)elemArr);
+		Blt_Free(elemArr);
 		return TCL_ERROR;
 	    }
 	}
-	free((char *)elemArr);
+	Blt_Free(elemArr);
     }
     if (shadowPtr->color != NULL) {
 	Tk_FreeColor(shadowPtr->color);
@@ -560,11 +710,11 @@ StringToShadow(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 ShadowToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Structure record */
     int offset;			/* Offset of pad in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     Shadow *shadowPtr = (Shadow *) (widgRec + offset);
     char *result;
@@ -575,8 +725,8 @@ ShadowToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 
 	sprintf(string, "%s %d", Tk_NameOfColor(shadowPtr->color),
 	    shadowPtr->offset);
-	result = strdup(string);
-	*freeProcPtr = (Tcl_FreeProc *)free;
+	result = Blt_Strdup(string);
+	*freeProcPtr = (Tcl_FreeProc *)Blt_Free;
     }
     return result;
 }
@@ -606,68 +756,67 @@ static int
 GetDashes(interp, string, dashesPtr)
     Tcl_Interp *interp;
     char *string;
-    Dashes *dashesPtr;
+    Blt_Dashes *dashesPtr;
 {
     if ((string == NULL) || (*string == '\0')) {
-	dashesPtr->numValues = 0;
+	dashesPtr->values[0] = 0;
     } else if (strcmp(string, "dash") == 0) {	/* 5 2 */
-	dashesPtr->numValues = 2;
-	dashesPtr->valueArr[0] = 5;
-	dashesPtr->valueArr[1] = 2;
+	dashesPtr->values[0] = 5;
+	dashesPtr->values[1] = 2;
+	dashesPtr->values[2] = 0;
     } else if (strcmp(string, "dot") == 0) {	/* 1 */
-	dashesPtr->numValues = 1;
-	dashesPtr->valueArr[0] = 1;
+	dashesPtr->values[0] = 1;
+	dashesPtr->values[1] = 0;
     } else if (strcmp(string, "dashdot") == 0) {	/* 2 4 2 */
-	dashesPtr->numValues = 3;
-	dashesPtr->valueArr[0] = 2;
-	dashesPtr->valueArr[1] = 4;
-	dashesPtr->valueArr[2] = 2;
+	dashesPtr->values[0] = 2;
+	dashesPtr->values[1] = 4;
+	dashesPtr->values[2] = 2;
+	dashesPtr->values[3] = 0;
     } else if (strcmp(string, "dashdotdot") == 0) {	/* 2 4 2 2 */
-	dashesPtr->numValues = 4;
-	dashesPtr->valueArr[0] = 2;
-	dashesPtr->valueArr[1] = 4;
-	dashesPtr->valueArr[2] = 2;
-	dashesPtr->valueArr[3] = 2;
+	dashesPtr->values[0] = 2;
+	dashesPtr->values[1] = 4;
+	dashesPtr->values[2] = 2;
+	dashesPtr->values[3] = 2;
+	dashesPtr->values[4] = 0;
     } else {
-	int numValues;
+	int nValues;
 	char **strArr;
 	long int value;
 	register int i;
 
-	if (Tcl_SplitList(interp, string, &numValues, &strArr) != TCL_OK) {
+	if (Tcl_SplitList(interp, string, &nValues, &strArr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if (numValues > 11) {	/* This is the postscript limit */
-	    Tcl_AppendResult(interp, "too many values for dash list in \"", string, "\"",
-		(char *)NULL);
-	    free((char *)strArr);
+	if (nValues > 11) {	/* This is the postscript limit */
+	    Tcl_AppendResult(interp, "too many values in dash list \"", 
+			     string, "\"", (char *)NULL);
+	    Blt_Free(strArr);
 	    return TCL_ERROR;
 	}
-	for (i = 0; i < numValues; i++) {
+	for (i = 0; i < nValues; i++) {
 	    if (Tcl_ExprLong(interp, strArr[i], &value) != TCL_OK) {
-		free((char *)strArr);
+		Blt_Free(strArr);
 		return TCL_ERROR;
 	    }
 	    /*
 	     * Backward compatibility:
 	     * Allow list of 0 to turn off dashes
 	     */
-	    if ((value == 0) && (numValues == 1)) {
+	    if ((value == 0) && (nValues == 1)) {
 		break;
 	    }
 	    if ((value < 1) || (value > 255)) {
 		Tcl_AppendResult(interp, "dash value \"", strArr[i],
 		    "\" is out of range", (char *)NULL);
-		free((char *)strArr);
+		Blt_Free(strArr);
 		return TCL_ERROR;
 	    }
-	    dashesPtr->valueArr[i] = (unsigned char)value;
+	    dashesPtr->values[i] = (unsigned char)value;
 	}
-	dashesPtr->numValues = i;
-	free((char *)strArr);
+	/* Make sure the array ends with a NUL byte  */
+	dashesPtr->values[i] = 0;
+	Blt_Free(strArr);
     }
-    /* Make sure the array ends with a NUL byte  */
-    dashesPtr->valueArr[dashesPtr->numValues] = '\0';
     return TCL_OK;
 
 }
@@ -690,16 +839,16 @@ GetDashes(interp, string, dashesPtr)
 /*ARGSUSED*/
 static int
 StringToDashes(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* New dash value list */
     char *widgRec;		/* Widget record */
     int offset;			/* offset to Dashes structure */
 {
-    Dashes *dashesPtr = (Dashes *)(widgRec + offset);
+    Blt_Dashes *dashesPtr = (Blt_Dashes *)(widgRec + offset);
 
-    return (GetDashes(interp, string, dashesPtr));
+    return GetDashes(interp, string, dashesPtr);
 }
 
 /*
@@ -717,32 +866,30 @@ StringToDashes(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 DashesToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget record */
     int offset;			/* offset of Dashes in record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
 {
-    Dashes *dashesPtr = (Dashes *)(widgRec + offset);
-    Tcl_DString dStr;
-    register int i;
+    Blt_Dashes *dashesPtr = (Blt_Dashes *)(widgRec + offset);
+    Tcl_DString dString;
+    unsigned char *p;
     char *result;
-    char string[200];
 
-    if (dashesPtr->numValues == 0) {
+    if (dashesPtr->values[0] == 0) {
 	return "";
     }
-    Tcl_DStringInit(&dStr);
-    for (i = 0; i < dashesPtr->numValues; i++) {
-	sprintf(string, "%d", (int)dashesPtr->valueArr[i]);
-	Tcl_DStringAppendElement(&dStr, string);
+    Tcl_DStringInit(&dString);
+    for (p = dashesPtr->values; *p != 0; p++) {
+	Tcl_DStringAppendElement(&dString, Blt_Itoa(*p));
     }
-    result = Tcl_DStringValue(&dStr);
-    if (result == dStr.staticSpace) {
-	result = strdup(result);
+    result = Tcl_DStringValue(&dString);
+    if (result == dString.staticSpace) {
+	result = Blt_Strdup(result);
     }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
 
 /*
@@ -758,15 +905,15 @@ DashesToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToUid(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Fill style string */
     char *widgRec;		/* Cubicle structure record */
     int offset;			/* Offset of style in record */
 {
-    Tk_Uid *uidPtr = (Tk_Uid *)(widgRec + offset);
-    Tk_Uid newId;
+    Blt_Uid *uidPtr = (Blt_Uid *)(widgRec + offset);
+    Blt_Uid newId;
 
     newId = NULL;
     if ((string != NULL) && (*string != '\0')) {
@@ -794,13 +941,13 @@ StringToUid(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 UidToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of fill in widget record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
-    Tk_Uid uid = *(Tk_Uid *)(widgRec + offset);
+    Blt_Uid uid = *(Blt_Uid *)(widgRec + offset);
 
     return (uid == NULL) ? "" : uid;
 }
@@ -818,9 +965,9 @@ UidToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToState(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representation of option value */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of field in record */
@@ -856,11 +1003,11 @@ StringToState(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 StateToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of fill in widget record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     int state = *(int *)(widgRec + offset);
 
@@ -888,28 +1035,28 @@ StateToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToList(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representation of option value */
     char *widgRec;		/* Widget structure record */
     int offset;			/* Offset of field in record */
 {
     char ***listPtr = (char ***)(widgRec + offset);
     char **elemArr;
-    int numElem;
+    int nElem;
 
     if (*listPtr != NULL) {
-	free((char *)*listPtr);
+	Blt_Free(*listPtr);
 	*listPtr = NULL;
     }
     if ((string == NULL) || (*string == '\0')) {
 	return TCL_OK;
     }
-    if (Tcl_SplitList(interp, string, &numElem, &elemArr) != TCL_OK) {
+    if (Tcl_SplitList(interp, string, &nElem, &elemArr) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (numElem > 0) {
+    if (nElem > 0) {
 	*listPtr = elemArr;
     }
     return TCL_OK;
@@ -930,7 +1077,7 @@ StringToList(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 ListToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget structure record. */
     int offset;			/* Offset of fill in widget record. */
@@ -950,9 +1097,274 @@ ListToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     }
     result = Tcl_DStringValue(&dString);
     if (result == dString.staticSpace) {
-	result = strdup(result);
+	result = Blt_Strdup(result);
     }
     Tcl_DStringFree(&dString);
-    *freeProcPtr = (Tcl_FreeProc *)free;
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
     return result;
 }
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * StringToTile --
+ *
+ *	Converts the name of an image into a tile.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+StringToTile(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Window on same display as tile */
+    char *string;		/* Name of image */
+    char *widgRec;		/* Widget structure record */
+    int offset;			/* Offset of tile in record */
+{
+    Blt_Tile *tilePtr = (Blt_Tile *)(widgRec + offset);
+    Blt_Tile tile, oldTile;
+
+    oldTile = *tilePtr;
+    tile = NULL;
+    if ((string != NULL) && (*string != '\0')) {
+	if (Blt_GetTile(interp, tkwin, string, &tile) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+    }
+    /* Don't delete the information for the old tile, until we know
+     * that we successfully allocated a new one. */
+    if (oldTile != NULL) {
+	Blt_FreeTile(oldTile);
+    }
+    *tilePtr = tile;
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TileToString --
+ *
+ *	Returns the name of the tile.
+ *
+ * Results:
+ *	The name of the tile is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static char *
+TileToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Widget structure record */
+    int offset;			/* Offset of tile in record */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    Blt_Tile tile = *(Blt_Tile *)(widgRec + offset);
+
+    return Blt_NameOfTile(tile);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_ConfigModified --
+ *
+ *      Given the configuration specifications and one or more option
+ *	patterns (terminated by a NULL), indicate if any of the matching
+ *	configuration options has been reset.
+ *
+ * Results:
+ *      Returns 1 if one of the options has changed, 0 otherwise.
+ *
+ *----------------------------------------------------------------------
+ */
+int Blt_ConfigModified
+TCL_VARARGS_DEF(Tk_ConfigSpec *, arg1)
+{
+    va_list argList;
+    Tk_ConfigSpec *specs;
+    register Tk_ConfigSpec *specPtr;
+    register char *option;
+
+    specs = TCL_VARARGS_START(Tk_ConfigSpec *, arg1, argList);
+    while ((option = va_arg(argList, char *)) != NULL) {
+	for (specPtr = specs; specPtr->type != TK_CONFIG_END; specPtr++) {
+	    if ((Tcl_StringMatch(specPtr->argvName, option)) &&
+		(specPtr->specFlags & TK_CONFIG_OPTION_SPECIFIED)) {
+		va_end(argList);
+		return 1;
+	    }
+	}
+    }
+    va_end(argList);
+    return 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_ConfigureWidgetComponent --
+ *
+ *	Configures a component of a widget.  This is useful for
+ *	widgets that have multiple components which aren't uniquely
+ *	identified by a Tk_Window. It allows us, for example, set
+ *	resources for axes of the graph widget. The graph really has
+ *	only one window, but its convenient to specify components in a
+ *	hierarchy of options.
+ *
+ *		*graph.x.logScale yes
+ *		*graph.Axis.logScale yes
+ *		*graph.temperature.scaleSymbols yes
+ *		*graph.Element.scaleSymbols yes
+ *
+ *	This is really a hack to work around the limitations of the Tk
+ *	resource database.  It creates a temporary window, needed to
+ *	call Tk_ConfigureWidget, using the name of the component.
+ *
+ * Results:
+ *      A standard Tcl result.
+ *
+ * Side Effects:
+ *	A temporary window is created merely to pass to Tk_ConfigureWidget.
+ *
+ *----------------------------------------------------------------------
+ */
+int
+Blt_ConfigureWidgetComponent(interp, parent, resName, className, specsPtr, 
+	argc, argv, widgRec, flags)
+    Tcl_Interp *interp;
+    Tk_Window parent;		/* Window to associate with component */
+    char resName[];		/* Name of component */
+    char className[];
+    Tk_ConfigSpec *specsPtr;
+    int argc;
+    char *argv[];
+    char *widgRec;
+    int flags;
+{
+    Tk_Window tkwin;
+    int result;
+    char *tempName;
+    int isTemporary = FALSE;
+
+    tempName = Blt_Strdup(resName);
+
+    /* Window name can't start with an upper case letter */
+    tempName[0] = tolower(resName[0]);
+
+    /*
+     * Create component if a child window by the component's name
+     * doesn't already exist.
+     */
+    tkwin = Blt_FindChild(parent, tempName);
+    if (tkwin == NULL) {
+	tkwin = Tk_CreateWindow(interp, parent, tempName, (char *)NULL);
+	isTemporary = TRUE;
+    }
+    if (tkwin == NULL) {
+	Tcl_AppendResult(interp, "can't find window in \"", 
+		 Tk_PathName(parent), "\"", (char *)NULL);
+	return TCL_ERROR;
+    }
+    assert(Tk_Depth(tkwin) == Tk_Depth(parent));
+    Blt_Free(tempName);
+
+    Tk_SetClass(tkwin, className);
+    result = Tk_ConfigureWidget(interp, tkwin, specsPtr, argc, argv, widgRec,
+	flags);
+    if (isTemporary) {
+	Tk_DestroyWindow(tkwin);
+    }
+    return result;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_StringToEnum --
+ *
+ *	Converts the string into its enumerated type.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+int
+Blt_StringToEnum(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Vectors of valid strings. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* String to match. */
+    char *widgRec;		/* Widget record. */
+    int offset;			/* Offset of field in record */
+{
+    int *enumPtr = (int *)(widgRec + offset);
+    char c;
+    register char **p;
+    register int i;
+    int count;
+
+    c = string[0];
+    count = 0;
+    for (p = (char **)clientData; *p != NULL; p++) {
+	if ((c == p[0][0]) && (strcmp(string, *p) == 0)) {
+	    *enumPtr = count;
+	    return TCL_OK;
+	}
+	count++;
+    }
+    *enumPtr = -1;
+
+    Tcl_AppendResult(interp, "bad value \"", string, "\": should be ",
+		(char *)NULL);
+    p = (char **)clientData; 
+    if (count > 0) {
+	Tcl_AppendResult(interp, p[0], (char *)NULL);
+    }
+    for (i = 1; i < (count - 1); i++) {
+	Tcl_AppendResult(interp, " ", p[i], ", ", (char *)NULL);
+    }
+    if (count > 1) {
+	Tcl_AppendResult(interp, " or ", p[count - 1], ".", (char *)NULL);
+    }
+    return TCL_ERROR;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_EnumToString --
+ *
+ *	Returns the string associated with the enumerated type.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+char *
+Blt_EnumToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* List of strings. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Widget record */
+    int offset;			/* Offset of field in widget record */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    int value = *(int *)(widgRec + offset);
+    char **p;
+    int count;
+
+    count = 0;
+    for (p = (char **)clientData; *p != NULL; p++) {
+	count++;
+    }
+    if ((value >= count) || (value < 0)) {
+	return "unknown value";
+    }
+    p = (char **)clientData;
+    return p[value];
+}
+

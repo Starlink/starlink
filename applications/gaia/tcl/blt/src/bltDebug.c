@@ -27,23 +27,82 @@
 
 #ifndef NO_BLTDEBUG
 
-static Blt_List watchList;
+#ifdef TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#include <time.h>
+#else
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif /* HAVE_SYS_TIME_H */
+#endif /* TIME_WITH_SYS_TIME */
 
-#ifdef __STDC__
+#include "bltChain.h"
+static Blt_Chain watchChain;
+
 static Tcl_CmdTraceProc DebugProc;
 static Tcl_CmdProc DebugCmd;
-#endif
+
+typedef struct {
+    char *pattern;
+    char *name;
+} WatchInfo;
+
+static WatchInfo *
+GetWatch(name)
+    char *name;
+{
+    Blt_ChainLink *linkPtr;
+    char c;
+    WatchInfo *infoPtr;
+
+    c = name[0];
+    for (linkPtr = Blt_ChainFirstLink(&watchChain); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	infoPtr = Blt_ChainGetValue(linkPtr);
+	if ((infoPtr->name[0] == c) && (strcmp(name, infoPtr->name) == 0)) {
+	    return infoPtr;
+	}
+    }
+    linkPtr = Blt_ChainAllocLink(sizeof(WatchInfo));
+    infoPtr = Blt_ChainGetValue(linkPtr);
+    infoPtr->name = Blt_Strdup(name);
+    Blt_ChainLinkAfter(&watchChain, linkPtr, (Blt_ChainLink *)NULL);
+    return infoPtr;
+}
+
+static void
+DeleteWatch(watchName)
+    char *watchName;
+{
+    Blt_ChainLink *linkPtr;
+    char c;
+    WatchInfo *infoPtr;
+
+    c = watchName[0];
+    for (linkPtr = Blt_ChainFirstLink(&watchChain); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	infoPtr = Blt_ChainGetValue(linkPtr);
+	if ((infoPtr->name[0] == c) && 
+	    (strcmp(infoPtr->name, watchName) == 0)) {
+	    Blt_Free(infoPtr->name);
+	    Blt_ChainDeleteLink(&watchChain, linkPtr);
+	    return;
+	}
+    }
+}
 
 /*ARGSUSED*/
 static void
 DebugProc(clientData, interp, level, command, proc, cmdClientData,
     argc, argv)
-    ClientData clientData;	/* not used */
-    Tcl_Interp *interp;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Not used. */
     int level;			/* Current level */
     char *command;		/* Command before substitution */
-    Tcl_CmdProc *proc;		/* not used */
-    ClientData cmdClientData;	/* not used */
+    Tcl_CmdProc *proc;		/* Not used. */
+    ClientData cmdClientData;	/* Not used. */
     int argc;
     char **argv;		/* Command after parsing, but before
 				 * evaluation */
@@ -53,21 +112,30 @@ DebugProc(clientData, interp, level, command, proc, cmdClientData,
     char *string;
     Tcl_Channel errChannel;
     Tcl_DString dString;
+    char prompt[200];
+    register char *p;
+    char *lineStart;
+    int count;
 
     /* This is pretty crappy, but there's no way to trigger stack pops */
     for (i = level + 1; i < 200; i++) {
 	traceStack[i] = 0;
     }
-    if (Blt_ListGetLength(&watchList) > 0) {
-	register Blt_ListItem item;
+    if (Blt_ChainGetLength(&watchChain) > 0) {
+	WatchInfo *infoPtr;
+	int found;
+	Blt_ChainLink *linkPtr;
 
-	for (item = Blt_ListFirstItem(&watchList); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    if (Tcl_StringMatch(argv[0], Blt_ListGetKey(item))) {
+	found = FALSE;
+	for (linkPtr = Blt_ChainFirstLink(&watchChain); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    infoPtr = Blt_ChainGetValue(linkPtr);
+	    if (Tcl_StringMatch(argv[0], infoPtr->name)) {
+		found = TRUE;
 		break;
 	    }
 	}
-	if ((item != NULL) && (level < 200)) {
+	if ((found) && (level < 200)) {
 	    traceStack[level] = 1;
 	    traceStack[level + 1] = 1;
 	}
@@ -78,23 +146,99 @@ DebugProc(clientData, interp, level, command, proc, cmdClientData,
     /*
      * Use stderr channel, for compatibility with systems that don't have a
      * tty (like WIN32).  In reality, it doesn't make a difference since
-     * the WIN32 console can't handle large streams of data anyways.
+     * Tk's Win32 console can't handle large streams of data anyways.
      */
     errChannel = Tcl_GetStdChannel(TCL_STDERR);
     if (errChannel == NULL) {
 	Tcl_AppendResult(interp, "can't get stderr channel", (char *)NULL);
-	Tk_BackgroundError(interp);
+	Tcl_BackgroundError(interp);
 	return;
     }
     Tcl_DStringInit(&dString);
-    Tcl_DStringAppend(&dString, Blt_Int(level), -1);
-    Tcl_DStringAppend(&dString, ">\t", -1);
-    Tcl_DStringAppend(&dString, command, -1);
-    Tcl_DStringAppend(&dString, "\n\t", -1);
+
+    sprintf(prompt, "%-2d-> ", level);
+    p = command;
+    /* Skip leading spaces in command line. */
+    while(isspace(UCHAR(*p))) {
+	p++;
+    }
+    lineStart = p;
+    count = 0;
+    for (/* empty */; *p != '\0'; /* empty */) {
+	if (*p == '\n') {
+	    if (count > 0) {
+		Tcl_DStringAppend(&dString, "     ", -1);
+	    } else {
+		Tcl_DStringAppend(&dString, prompt, -1);
+	    }
+	    Tcl_DStringAppend(&dString, lineStart, p - lineStart);
+	    Tcl_DStringAppend(&dString, "\n", -1);
+	    p++;
+	    lineStart = p;
+	    count++;
+	    if (count > 6) {
+		break;
+	    }
+	} else {
+	    p++;
+	}
+    }   
+    while (isspace(UCHAR(*lineStart))) {
+	lineStart++;
+    }
+    if (lineStart < p) {
+	if (count > 0) {
+	    Tcl_DStringAppend(&dString, "     ", -1);
+	} else {
+	    Tcl_DStringAppend(&dString, prompt, -1);
+	}
+	Tcl_DStringAppend(&dString, lineStart, p - lineStart);
+	if (count <= 6) {
+	    Tcl_DStringAppend(&dString, "\n", -1);
+	}
+    }
+    if (count > 6) {
+	Tcl_DStringAppend(&dString, "     ...\n", -1);
+    }
     string = Tcl_Merge(argc, argv);
-    Tcl_DStringAppend(&dString, string, -1);
-    free(string);
+    lineStart = string;
+    sprintf(prompt, "  <- ");
+    count = 0;
+    for (p = string; *p != '\0'; /* empty */) {
+	if (*p == '\n') {
+	    if (count > 0) {
+		Tcl_DStringAppend(&dString, "     ", -1);
+	    } else {
+		Tcl_DStringAppend(&dString, prompt, -1);
+	    }
+	    count++;
+	    Tcl_DStringAppend(&dString, lineStart, p - lineStart);
+	    Tcl_DStringAppend(&dString, "\n", -1);
+	    p++;
+	    lineStart = p;
+	    if (count > 6) {
+		break;
+	    }
+	} else {
+	    p++;
+	}
+    }   
+    if (lineStart < p) {
+	if (count > 0) {
+	    Tcl_DStringAppend(&dString, "     ", -1);
+	} else {
+	    Tcl_DStringAppend(&dString, prompt, -1);
+	}
+	Tcl_DStringAppend(&dString, lineStart, p - lineStart);
+	if (count <= 6) {
+	    Tcl_DStringAppend(&dString, "\n", -1);
+	}
+    }
+    if (count > 6) {
+	Tcl_DStringAppend(&dString, "      ...\n", -1);
+    }
     Tcl_DStringAppend(&dString, "\n", -1);
+    Blt_Free(string);
     Tcl_Write(errChannel, (char *)Tcl_DStringValue(&dString), -1);
     Tcl_Flush(errChannel);
     Tcl_DStringFree(&dString);
@@ -103,7 +247,7 @@ DebugProc(clientData, interp, level, command, proc, cmdClientData,
 /*ARGSUSED*/
 static int
 DebugCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;
     int argc;
     char **argv;
@@ -113,34 +257,33 @@ DebugCmd(clientData, interp, argc, argv)
     int newLevel;
     char c;
     int length;
-    Blt_ListItem item;
+    WatchInfo *infoPtr;
+    Blt_ChainLink *linkPtr;
     register int i;
 
     if (argc == 1) {
-	Tcl_SetResult(interp, Blt_Int(level), TCL_VOLATILE);
+	Tcl_SetResult(interp, Blt_Itoa(level), TCL_VOLATILE);
 	return TCL_OK;
     }
     c = argv[1][0];
     length = strlen(argv[1]);
     if ((c == 'w') && (strncmp(argv[1], "watch", length) == 0)) {
-	/* Add patterns of command names to watch to the list */
+	/* Add patterns of command names to watch to the chain */
 	for (i = 2; i < argc; i++) {
-	    item = Blt_ListFind(&watchList, argv[i]);
-	    if (item == NULL) {
-		Blt_ListAppend(&watchList, argv[i], (ClientData)0);
-	    }
+	    GetWatch(argv[i]);
 	}
     } else if ((c == 'i') && (strncmp(argv[1], "ignore", length) == 0)) {
 	for (i = 2; i < argc; i++) {
-	    Blt_ListDelete(&watchList, argv[i]);
+	    DeleteWatch(argv[i]);
 	}
     } else {
 	goto levelTest;
     }
     /* Return the current watch patterns */
-    for (item = Blt_ListFirstItem(&watchList); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	Tcl_AppendElement(interp, Blt_ListGetKey(item));
+    for (linkPtr = Blt_ChainFirstLink(&watchChain); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	infoPtr = Blt_ChainGetValue(linkPtr);
+	Tcl_AppendElement(interp, infoPtr->name);
     }
     return TCL_OK;
 
@@ -163,7 +306,7 @@ DebugCmd(clientData, interp, argc, argv)
 	token = Tcl_CreateTrace(interp, newLevel, DebugProc, (ClientData)0);
     }
     level = newLevel;
-    Tcl_SetResult(interp, Blt_Int(level), TCL_VOLATILE);
+    Tcl_SetResult(interp, Blt_Itoa(level), TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -174,7 +317,7 @@ Blt_DebugInit(interp)
     static Blt_CmdSpec cmdSpec =
     {"bltdebug", DebugCmd,};
 
-    Blt_InitList(&watchList, TCL_STRING_KEYS);
+    Blt_ChainInit(&watchChain);
     if (Blt_InitCmd(interp, "blt", &cmdSpec) == NULL) {
 	return TCL_ERROR;
     }

@@ -19,7 +19,7 @@
  * whatsoever resulting from loss of use, data or profits, whether in
  * an action of contract, negligence or other tortuous action, arising
  * out of or in connection with the use or performance of this
- * software.  
+ * software.
  */
 
 #ifndef _BLT_PS_H
@@ -28,17 +28,22 @@
 #include "bltImage.h"
 
 typedef enum {
-    PS_MODE_MONOCHROME, 
-    PS_MODE_GREYSCALE, 
+    PS_MODE_MONOCHROME,
+    PS_MODE_GREYSCALE,
     PS_MODE_COLOR
 } PsColorMode;
 
-typedef struct Printable {
+typedef struct PsTokenStruct *PsToken;
+
+struct PsTokenStruct {
     Tcl_Interp *interp;		/* Interpreter to report errors to. */
-    Tk_Window tkwin;		/* Tk_Window used to get font and color 
+
+    Tk_Window tkwin;		/* Tk_Window used to get font and color
 				 * information */
-    Tcl_DString *dStrPtr;	/* Dynamic string used to contain the 
+
+    Tcl_DString dString;	/* Dynamic string used to contain the
 				 * PostScript generated. */
+
     char *fontVarName;		/* Name of a Tcl array variable to convert
 				 * X font names to PostScript fonts. */
 
@@ -47,95 +52,103 @@ typedef struct Printable {
 
     PsColorMode colorMode;	/* Mode: color or greyscale */
 
-#define PRINTABLE_SCRATCH_LENGTH  (BUFSIZ*2)
-    /* 
+#define PSTOKEN_BUFSIZ	((BUFSIZ*2)-1)
+    /*
      * Utility space for building strings.  Currently used to create
-     * PostScript output for the "postscript" command.  
+     * PostScript output for the "postscript" command.
      */
-    char scratchArr[PRINTABLE_SCRATCH_LENGTH];
-} *Printable;
+    char scratchArr[PSTOKEN_BUFSIZ+1];
+};
 
-extern Printable Blt_PrintObject _ANSI_ARGS_((Tcl_Interp *interp, Tk_Window tkwin,
-	Tcl_DString *dStrPtr));
+extern PsToken Blt_GetPsToken _ANSI_ARGS_((Tcl_Interp *interp, 
+			   Tk_Window tkwin));
 
-extern void Blt_PrintAppend _ANSI_ARGS_(TCL_VARARGS(Printable, printable));
+extern void Blt_ReleasePsToken _ANSI_ARGS_((PsToken psToken));
 
-extern void Blt_PrintFormat _ANSI_ARGS_(TCL_VARARGS(Printable, printable));
+extern char *Blt_PostScriptFromToken _ANSI_ARGS_((PsToken psToken));
+extern char *Blt_ScratchBufferFromToken _ANSI_ARGS_((PsToken psToken));
 
-extern void Blt_3DRectangleToPostScript _ANSI_ARGS_((Printable printable,
-	Tk_3DBorder border, int x, int y, int width, int height,
+extern void Blt_AppendToPostScript _ANSI_ARGS_(TCL_VARARGS(PsToken, psToken));
+
+extern void Blt_FormatToPostScript _ANSI_ARGS_(TCL_VARARGS(PsToken, psToken));
+
+extern void Blt_Draw3DRectangleToPostScript _ANSI_ARGS_((PsToken psToken,
+	Tk_3DBorder border, double x, double y, int width, int height,
 	int borderWidth, int relief));
 
-extern void Blt_3DFillRectangle _ANSI_ARGS_((Printable printable, 
-	Tk_3DBorder border, int x, int y, int width, int height, 
+extern void Blt_Fill3DRectangleToPostScript _ANSI_ARGS_((PsToken psToken,
+	Tk_3DBorder border, double x, double y, int width, int height,
 	int borderWidth, int relief));
 
-extern void Blt_BackgroundToPostScript _ANSI_ARGS_((Printable printable,
+extern void Blt_BackgroundToPostScript _ANSI_ARGS_((PsToken psToken,
 	XColor *colorPtr));
 
-extern void Blt_BitmapToPostScript _ANSI_ARGS_((Printable printable, 
+extern void Blt_BitmapDataToPostScript _ANSI_ARGS_((PsToken psToken,
 	Display *display, Pixmap bitmap, int width, int height));
 
-extern void Blt_ClearBackgroundToPostScript _ANSI_ARGS_((Printable printable));
+extern void Blt_ClearBackgroundToPostScript _ANSI_ARGS_((PsToken psToken));
 
-extern void Blt_ColorImageToPsData _ANSI_ARGS_((ColorImage image, int numComponents,
-	Tcl_DString *dStrPtr, char *prefix));
+extern int Blt_ColorImageToPsData _ANSI_ARGS_((Blt_ColorImage image,
+	int nComponents, Tcl_DString * resultPtr, char *prefix));
 
-extern int Blt_ColorImageToGreyscale _ANSI_ARGS_((ColorImage srcImage, 
-	ColorImage destImage));
+extern void Blt_ColorImageToPostScript _ANSI_ARGS_((PsToken psToken,
+	Blt_ColorImage image, double x, double y));
 
-extern void Blt_ColorImageToPostScript _ANSI_ARGS_((Printable printable, 
-	ColorImage image, int x, int y));
-
-extern void Blt_ForegroundToPostScript _ANSI_ARGS_((Printable printable,
+extern void Blt_ForegroundToPostScript _ANSI_ARGS_((PsToken psToken,
 	XColor *colorPtr));
 
-extern void Blt_FontToPostScript _ANSI_ARGS_((Printable printable, Tk_Font font));
+extern void Blt_FontToPostScript _ANSI_ARGS_((PsToken psToken, Tk_Font font));
 
-extern void Blt_WindowToPostScript _ANSI_ARGS_((Printable printable, 
-	Tk_Window tkwin, int x, int y));
+extern void Blt_WindowToPostScript _ANSI_ARGS_((PsToken psToken,
+	Tk_Window tkwin, double x, double y));
 
-extern void Blt_LineDashesToPostScript _ANSI_ARGS_((Printable printable, 
-	Dashes *dashesPtr));
+extern void Blt_LineDashesToPostScript _ANSI_ARGS_((PsToken psToken,
+	Blt_Dashes *dashesPtr));
 
-extern void Blt_LineWidthToPostScript _ANSI_ARGS_((Printable printable, 
+extern void Blt_LineWidthToPostScript _ANSI_ARGS_((PsToken psToken,
 	int lineWidth));
 
-extern void Blt_LinesToPostScript _ANSI_ARGS_((Printable printable,
-	XPoint *pointArr, int numPoints));
+extern void Blt_PathToPostScript _ANSI_ARGS_((PsToken psToken,
+	Point2D *screenPts, int nScreenPts));
 
-extern void Blt_PhotoToPostScript _ANSI_ARGS_((Printable printable,
-	Tk_PhotoHandle photoToken, int x, int y));
+extern void Blt_PhotoToPostScript _ANSI_ARGS_((PsToken psToken,
+	Tk_PhotoHandle photoToken, double x, double y));
 
-extern void Blt_PolygonToPostScript _ANSI_ARGS_((Printable printable, 
-	XPoint *pointArr, int numPoints));
+extern void Blt_PolygonToPostScript _ANSI_ARGS_((PsToken psToken,
+	Point2D *screenPts, int nScreenPts));
 
-extern void Blt_PrintLine _ANSI_ARGS_((Printable printable, XPoint *pointArr, 
-	int numPoints));
+extern void Blt_LineToPostScript _ANSI_ARGS_((PsToken psToken, 
+	XPoint *pointArr, int nPoints));
 
-extern void Blt_PrintText _ANSI_ARGS_((Printable printable, char *string, 
-	TextAttributes *attrPtr, int x, int y));
+extern void Blt_TextToPostScript _ANSI_ARGS_((PsToken psToken, char *string,
+	TextStyle *attrPtr, double x, double y));
 
-extern void Blt_RectangleToPostScript _ANSI_ARGS_((Printable printable, int x, 
-	int y, int width, int height));
+extern void Blt_RectangleToPostScript _ANSI_ARGS_((PsToken psToken, double x,
+	double y, int width, int height));
 
-extern void Blt_RectanglesToPostScript _ANSI_ARGS_((Printable printable, 
-	XRectangle *rectArr, int numRects));
+extern void Blt_RegionToPostScript _ANSI_ARGS_((PsToken psToken, double x,
+	double y, int width, int height));
 
-extern void Blt_PrintBitmap _ANSI_ARGS_((Printable printable, Display *display,
-	Pixmap bitmap, double scaleX, double scaleY));
+extern void Blt_RectanglesToPostScript _ANSI_ARGS_((PsToken psToken,
+	XRectangle *rectArr, int nRects));
 
-extern void Blt_SegmentsToPostScript _ANSI_ARGS_((Printable printable,
-	XSegment *segArr, int numSegs));
+extern void Blt_BitmapToPostScript _ANSI_ARGS_((PsToken psToken, 
+	Display *display, Pixmap bitmap, double scaleX, double scaleY));
 
-extern void Blt_StippleToPostScript _ANSI_ARGS_((Printable printable, 
-	Display *display, Pixmap bitmap, int width, int height, int fgOrBg));
+extern void Blt_SegmentsToPostScript _ANSI_ARGS_((PsToken psToken,
+	XSegment *segArr, int nSegs));
 
-extern void Blt_LineAttributesToPostScript _ANSI_ARGS_((Printable printable, 
-	XColor *colorPtr, int lineWidth, Dashes *dashesPtr, int capStyle,
+extern void Blt_StippleToPostScript _ANSI_ARGS_((PsToken psToken,
+	Display *display, Pixmap bitmap));
+
+extern void Blt_LineAttributesToPostScript _ANSI_ARGS_((PsToken psToken,
+	XColor *colorPtr, int lineWidth, Blt_Dashes *dashesPtr, int capStyle,
 	int joinStyle));
 
-extern int Blt_FileToPostScript _ANSI_ARGS_((Printable printable, 
+extern int Blt_FileToPostScript _ANSI_ARGS_((PsToken psToken,
 	char *fileName));
+
+extern void Blt_2DSegmentsToPostScript _ANSI_ARGS_((PsToken psToken, 
+	Segment2D *segments, int nSegments));
 
 #endif /* BLT_PS_H */

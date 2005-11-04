@@ -1,6 +1,38 @@
-#!../bltwish
+#!../src/bltwish
 
-source bltDemo.tcl
+package require BLT
+
+
+# --------------------------------------------------------------------------
+# Starting with Tcl 8.x, the BLT commands are stored in their own 
+# namespace called "blt".  The idea is to prevent name clashes with
+# Tcl commands and variables from other packages, such as a "table"
+# command in two different packages.  
+#
+# You can access the BLT commands in a couple of ways.  You can prefix
+# all the BLT commands with the namespace qualifier "blt::"
+#  
+#    blt::graph .g
+#    blt::table . .g -resize both
+# 
+# or you can import all the command into the global namespace.
+#
+#    namespace import blt::*
+#    graph .g
+#    table . .g -resize both
+#
+# --------------------------------------------------------------------------
+if { $tcl_version >= 8.0 } {
+    namespace import blt::*
+    namespace import -force blt::tile::*
+}
+source scripts/demo.tcl
+
+if { ([info exists tcl_platform]) && ($tcl_platform(platform) == "windows") } {
+    source scripts/send.tcl
+    SendInit
+    SendVerify
+}
 
 # ----------------------------------------------------------------------
 # This procedure is invoked each time a token is grabbed from the
@@ -42,9 +74,10 @@ label .sample -text "Color" -height 2 -borderwidth 3 -relief sunken
 # Set up the color sample as a drag&drop source for "color" values
 # and "string" values
 #
-drag&drop source .sample -packagecmd {package_color %t}
+drag&drop source .sample -packagecmd {package_color %t} 
 drag&drop source .sample handler color
-drag&drop source .sample handler string
+drag&drop source .sample handler string 
+
 #
 # Set up the color sample as a drag&drop target for "color" values:
 #
@@ -80,8 +113,10 @@ bind .color.value <KeyPress-Return> {set_color [%W get]}
 #
 # Set up the entry widget as a drag&drop source for "string" values:
 #
-drag&drop source .color.value -packagecmd {package_string [%W get] %t}
-drag&drop source .color.value handler string
+drag&drop source .color.value \
+	-packagecmd {package_string [%W get] %t} \
+	-selftarget yes
+drag&drop source .color.value handler string 
 
 #
 # Set up the entry widget as a drag&drop target for "string" values:
@@ -135,8 +170,6 @@ proc adjust_color {args} {
     }
 }
 
-button .sample.test -text "x"
-
 table . \
     0,0 .sample -columnspan 2 -pady {0 4} \
     1,0 .color  -columnspan 2 -padx 4 -pady 4 \
@@ -148,5 +181,3 @@ table . \
     4,1 .blueSample 
 
 eval table configure . [winfo children .] -fill both
-
-table .sample .sample.test

@@ -1,77 +1,149 @@
+#!../src/bltwish
 
-set X { 
-    2.00000e-01 4.00000e-01 6.00000e-01 8.00000e-01 1.00000e+00 
-    1.20000e+00 1.40000e+00 1.60000e+00 1.80000e+00 2.00000e+00 
-    2.20000e+00 2.40000e+00 2.60000e+00 2.80000e+00 3.00000e+00 
-    3.20000e+00 3.40000e+00 3.60000e+00 3.80000e+00 4.00000e+00 
-    4.20000e+00 4.40000e+00 4.60000e+00 4.80000e+00 5.00000e+00 
-} 
+package require BLT
 
-set Y1 { 
-    1.14471e+01 2.09373e+01 2.84608e+01 3.40080e+01 3.75691e+01 
-    3.91345e+01 3.92706e+01 3.93474e+01 3.94242e+01 3.95010e+01 
-    3.95778e+01 3.96545e+01 3.97313e+01 3.98081e+01 3.98849e+01 
-    3.99617e+01 4.00384e+01 4.01152e+01 4.01920e+01 4.02688e+01 
-    4.03455e+01 4.04223e+01 4.04990e+01 4.05758e+01 4.06526e+01 
+# --------------------------------------------------------------------------
+# Starting with Tcl 8.x, the BLT commands are stored in their own 
+# namespace called "blt".  The idea is to prevent name clashes with
+# Tcl commands and variables from other packages, such as a "table"
+# command in two different packages.  
+#
+# You can access the BLT commands in a couple of ways.  You can prefix
+# all the BLT commands with the namespace qualifier "blt::"
+#  
+#    blt::graph .g
+#    blt::table . .g -resize both
+# 
+# or you can import all the command into the global namespace.
+#
+#    namespace import blt::*
+#    graph .g
+#    table . .g -resize both
+#
+# --------------------------------------------------------------------------
+
+if { $tcl_version >= 8.0 } {
+    namespace import blt::*
+    namespace import -force blt::tile::*
 }
 
-set Y2 { 
-    2.61825e+01 5.04696e+01 7.28517e+01 9.33192e+01 1.11863e+02 
-    1.28473e+02 1.43140e+02 1.55854e+02 1.66606e+02 1.75386e+02 
-    1.82185e+02 1.86994e+02 1.89802e+02 1.90683e+02 1.91047e+02 
-    1.91411e+02 1.91775e+02 1.92139e+02 1.92503e+02 1.92867e+02 
-    1.93231e+02 1.93595e+02 1.93958e+02 1.94322e+02 1.94686e+02 
+source scripts/demo.tcl
+
+if { [winfo screenvisual .] != "staticgray" } {
+    option add *print.background yellow
+    option add *quit.background red
+    set image [image create photo -file ./images/rain.gif]
+    option add *Graph.Tile $image
+    option add *Label.Tile $image
+    option add *Frame.Tile $image
+    option add *Htext.Tile $image
+    option add *TileOffset 0
 }
 
-set Y3 { 
-    4.07008e+01 7.95658e+01 1.16585e+02 1.51750e+02 1.85051e+02 
-    2.16479e+02 2.46024e+02 2.73676e+02 2.99427e+02 3.23267e+02 
-    3.45187e+02 3.65177e+02 3.83228e+02 3.99331e+02 4.13476e+02 
-    4.25655e+02 4.35856e+02 4.44073e+02 4.50294e+02 4.54512e+02 
-    4.56716e+02 4.57596e+02 4.58448e+02 4.59299e+02 4.60151e+02 
+set graph [graph .g]
+htext .header \
+    -text {\
+This is an example of the graph widget.  It displays two-variable data 
+with assorted line attributes and symbols.  To create a postscript file 
+"xy.ps", press the %%
+    button $htext(widget).print -text print -command {
+        puts stderr [time {
+	   blt::busy hold .
+	   update
+	   .g postscript output demo1.eps 
+	   update
+	   blt::busy release .
+	   update
+        }]
+    } 
+    $htext(widget) append $htext(widget).print
+%% button.}
+
+source scripts/graph1.tcl
+
+htext .footer \
+    -text {Hit the %%
+button $htext(widget).quit -text quit -command { exit } 
+$htext(widget) append $htext(widget).quit 
+%% button when you've seen enough.%%
+label $htext(widget).logo -bitmap BLT
+$htext(widget) append $htext(widget).logo -padx 20
+%%}
+
+proc MultiplexView { args } { 
+    eval .g axis view y $args
+    eval .g axis view y2 $args
 }
 
+scrollbar .xbar \
+    -command { .g axis view x } \
+    -orient horizontal -relief flat \
+    -highlightthickness 0 -elementborderwidth 2 -bd 0
+scrollbar .ybar \
+    -command MultiplexView \
+    -orient vertical -relief flat  -highlightthickness 0 -elementborderwidth 2
+table . \
+    0,0 .header -cspan 3 -fill x \
+    1,0 .g  -fill both -cspan 3 -rspan 3 \
+    2,3 .ybar -fill y  -padx 0 -pady 0 \
+    4,1 .xbar -fill x \
+    5,0 .footer -cspan 3 -fill x
 
-proc FormatLabel { w value } {
-    return $value
+table configure . c3 r0 r4 r5 -resize none
+
+.g postscript configure \
+    -center yes \
+    -maxpect yes \
+    -landscape no \
+    -preview yes
+
+.g axis configure x \
+    -scrollcommand { .xbar set } \
+    -scrollmax 10 \
+    -scrollmin 2 
+
+.g axis configure y \
+    -scrollcommand { .ybar set }
+
+.g axis configure y2 \
+    -scrollmin 0.0 -scrollmax 1.0 \
+    -hide no \
+    -title "Y2" 
+
+.g legend configure \
+    -activerelief flat \
+    -activeborderwidth 1  \
+    -position top -anchor ne
+
+.g pen configure "activeLine" \
+    -showvalues y
+.g element bind all <Enter> {
+    %W legend activate [%W element get current]
+}
+.g configure -plotpady { 1i 0 } 
+.g element bind all <Leave> {
+    %W legend deactivate [%W element get current]
+}
+.g axis bind all <Enter> {
+    set axis [%W axis get current]
+    %W axis configure $axis -background lightblue2
+}
+.g axis bind all <Leave> {
+    set axis [%W axis get current]
+    %W axis configure $axis -background "" 
+}
+.g configure -leftvariable left 
+trace variable left w "UpdateTable .g"
+proc UpdateTable { graph p1 p2 how } {
+    table configure . c0 -width [$graph extents leftmargin]
+    table configure . c2 -width [$graph extents rightmargin]
+    table configure . r1 -height [$graph extents topmargin]
+    table configure . r3 -height [$graph extents bottommargin]
 }
 
-#option add *Graph.aspect		1.25
-option add *Graph.title			"A Simple X-Y Graph"
-option add *Graph.x.loose		yes
-option add *Graph.x.title		"X Axis Label"
-option add *Graph.y.title		"Y Axis Label" 
-option add *Graph.y.rotate		90
+set image2 [image create photo -file images/blt98.gif]
+.g element configure line2 -areapattern @bitmaps/sharky.xbm \
 
-option add *Legend.activeRelief		sunken
-option add *Legend.background		""
-option add *Legend.activeBackground	khaki2
-option add *Graph.background		brown
-option add *Element.xData		$X 
-option add *activeLine.Color		yellow4
-option add *activeLine.Fill		yellow
-option add *Element.smooth		natural
-option add *Element.pixels		6
-option add *Element.scaleSymbols	yes
-
-option add *Graph.line1.symbol		circle
-option add *Graph.line1.color		red4
-option add *Graph.line1.fill		red1
-
-option add *Graph.line2.symbol		square
-option add *Graph.line2.color		purple4
-option add *Graph.line2.fill		purple1
-
-option add *Graph.line3.symbol		triangle
-option add *Graph.line3.color		green4
-option add *Graph.line3.fill		green1
-
-graph $graph -width 4i -height 5i
-$graph element create line1 -ydata $Y2 
-$graph element create line2 -ydata $Y3 
-$graph element create line3 -ydata $Y1 
-
-Blt_ZoomStack $graph
-Blt_Crosshairs $graph
-Blt_ActiveLegend $graph
-Blt_ClosestPoint $graph
+#	-areaforeground blue -areabackground ""
+.g element configure line3 -areatile $image2
+.g configure -title [pwd]

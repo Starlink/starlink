@@ -55,7 +55,7 @@ RotateErrorProc(clientData, errEventPtr)
     ClientData clientData;
     XErrorEvent *errEventPtr;
 {
-    int *errorPtr = (int *)clientData;
+    int *errorPtr = clientData;
 
     *errorPtr = TCL_ERROR;
     return 0;
@@ -70,7 +70,7 @@ GetOp(interp, tkwin, argc, argv)
 {
     char *string;
     int buffer;
-    int numBytes;
+    int nBytes;
 
     buffer = 0;
     if (argc == 3) {
@@ -78,17 +78,17 @@ GetOp(interp, tkwin, argc, argv)
 	    return TCL_ERROR;
 	}
     }
-    string = XFetchBuffer(Tk_Display(tkwin), &numBytes, buffer);
+    string = XFetchBuffer(Tk_Display(tkwin), &nBytes, buffer);
     if (string != NULL) {
 	int limit;
 	register char *p;
 	register int i;
 	int c;
 
-	if (string[numBytes - 1] == '\0') {
-	    limit = numBytes - 1;
+	if (string[nBytes - 1] == '\0') {
+	    limit = nBytes - 1;
 	} else {
-	    limit = numBytes;
+	    limit = nBytes;
 	}
 	for (p = string, i = 0; i < limit; i++, p++) {
 	    c = (unsigned char)*p;
@@ -96,18 +96,18 @@ GetOp(interp, tkwin, argc, argv)
 		*p = ' ';	/* Convert embedded NUL bytes */
 	    }
 	}
-	if (limit == numBytes) {
+	if (limit == nBytes) {
 	    char *newPtr;
 
 	    /*
 	     * Need to copy the string into a bigger buffer so we can
 	     * add a NUL byte on the end.
 	     */
-	    newPtr = (char *)malloc(numBytes + 1);
+	    newPtr = Blt_Malloc(nBytes + 1);
 	    assert(newPtr);
-	    memcpy(newPtr, string, numBytes);
-	    newPtr[numBytes] = '\0';
-	    free(string);
+	    memcpy(newPtr, string, nBytes);
+	    newPtr[nBytes] = '\0';
+	    Blt_Free(string);
 	    string = newPtr;
 	}
 	Tcl_SetResult(interp, string, TCL_DYNAMIC);
@@ -139,7 +139,7 @@ RotateOp(interp, tkwin, argc, argv)
     }
     result = TCL_OK;
     handler = Tk_CreateErrorHandler(Tk_Display(tkwin), BadMatch,
-	X_RotateProperties, -1, RotateErrorProc, (ClientData)&result);
+	X_RotateProperties, -1, RotateErrorProc, &result);
     XRotateBuffers(Tk_Display(tkwin), count);
     Tk_DeleteErrorHandler(handler);
     XSync(Tk_Display(tkwin), False);
@@ -188,9 +188,9 @@ SetOp(interp, tkwin, argc, argv)
  */
 static Blt_OpSpec cbOps[] =
 {
-    {"get", 1, (Blt_Operation)GetOp, 2, 3, "?buffer?",},
-    {"rotate", 1, (Blt_Operation)RotateOp, 2, 3, "?count?",},
-    {"set", 1, (Blt_Operation)SetOp, 3, 4, "value ?buffer?",},
+    {"get", 1, (Blt_Op)GetOp, 2, 3, "?buffer?",},
+    {"rotate", 1, (Blt_Op)RotateOp, 2, 3, "?count?",},
+    {"set", 1, (Blt_Op)SetOp, 3, 4, "value ?buffer?",},
 };
 static int numCbOps = sizeof(cbOps) / sizeof(Blt_OpSpec);
 
@@ -220,17 +220,17 @@ CutbufferCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    Tk_Window tkwin = (Tk_Window)clientData;
-    Blt_Operation proc;
+    Tk_Window tkwin;
+    Blt_Op proc;
     int result;
 
-    proc = Blt_GetOperation(interp, numCbOps, cbOps, BLT_OPER_ARG1,
-	argc, argv);
+    proc = Blt_GetOp(interp, numCbOps, cbOps, BLT_OP_ARG1, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
+    tkwin = Tk_MainWindow(interp);
     result = (*proc) (interp, tkwin, argc, argv);
-    return (result);
+    return result;
 }
 
 /*

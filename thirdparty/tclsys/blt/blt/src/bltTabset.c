@@ -30,15 +30,17 @@
 #include "bltInt.h"
 
 #ifndef NO_TABSET
+#include "bltBind.h"
+#include "bltChain.h"
+#include "bltHash.h"
+#include "bltTile.h"
 
-#include "bltList.h"
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
-#include <ctype.h>
-
-#if (TK_MAJOR_VERSION < 8)
+#if (TK_MAJOR_VERSION == 4)
 #define TK_REPARENTED           0x2000
 #endif
+
+#define INVALID_FAIL	0
+#define INVALID_OK	1
 
 /*
  * The macro below is used to modify a "char" value (e.g. by casting
@@ -48,19 +50,25 @@
 #define CLAMP(val,low,hi)	\
 	(((val) < (low)) ? (low) : ((val) > (hi)) ? (hi) : (val))
 
-#define GAP			2
-#define SELECT_PAD		5
-#define OUTER_PAD		1
+#define GAP			3
+#define SELECT_PADX		4
+#define SELECT_PADY		2
+#define OUTER_PAD		2
 #define LABEL_PAD		1
 #define LABEL_PADX		2
 #define LABEL_PADY		2
-#define IMAGE_PAD		2
+#define IMAGE_PAD		1
 #define CORNER_OFFSET		3
 
-#define POSITION_END		(-1)
-#define WORLD(s, sx)		((sx) - (s)->inset + (s)->scrollOffset)
+#define TAB_SCROLL_OFFSET	10
 
-#define SCREEN(s, wx)		((wx) - (s)->scrollOffset + (s)->inset)
+#define SLANT_NONE		0
+#define SLANT_LEFT		1
+#define SLANT_RIGHT		2
+#define SLANT_BOTH		(SLANT_LEFT | SLANT_RIGHT)
+
+#define END			(-1)
+#define ODD(x)			((x) | 0x01)
 
 #define TABWIDTH(s, t)		\
   ((s)->side & SIDE_VERTICAL) ? (t)->height : (t)->width)
@@ -76,7 +84,7 @@
    (Tk_Height((s)->tkwin) - 2 * (s)->inset))
 
 #define GETATTR(t,attr)		\
-   (((t)->attr != NULL) ? (t)->attr : (t)->setPtr->defAttrs.attr)
+   (((t)->attr != NULL) ? (t)->attr : (t)->setPtr->defTabStyle.attr)
 
 /*
  * ----------------------------------------------------------------------------
@@ -108,6 +116,8 @@
 #define TABSET_STATIC		(1<<8)
 #define TABSET_MULTIPLE_TIER	(1<<9)
 
+#define PERFORATION_ACTIVE	(1<<10)
+
 #define SIDE_TOP		(1<<0)
 #define SIDE_RIGHT		(1<<1)
 #define SIDE_LEFT		(1<<2)
@@ -116,52 +126,58 @@
 #define SIDE_VERTICAL	(SIDE_LEFT | SIDE_RIGHT)
 #define SIDE_HORIZONTAL (SIDE_TOP | SIDE_BOTTOM)
 
-#define DEF_TABSET_ACTIVE_BG_COLOR	RGB_COLOR_GREY90
-#define DEF_TABSET_ACTIVE_BG_MONO	STD_MONO_ACTIVE_BG
-#define DEF_TABSET_ACTIVE_FG_COLOR	STD_COLOR_ACTIVE_FG
-#define DEF_TABSET_ACTIVE_FG_MONO	STD_MONO_ACTIVE_FG
-#define DEF_TABSET_BG_MONO		STD_MONO_NORMAL_BG
-#define DEF_TABSET_BG_COLOR		STD_COLOR_NORMAL_BG
-#define DEF_TABSET_BORDER_WIDTH		STD_BORDERWIDTH
+#define TAB_LABEL		(ClientData)0
+#define TAB_PERFORATION		(ClientData)1
+
+#define DEF_TABSET_ACTIVE_BACKGROUND	RGB_GREY90
+#define DEF_TABSET_ACTIVE_BG_MONO	STD_ACTIVE_BG_MONO
+#define DEF_TABSET_ACTIVE_FOREGROUND	STD_ACTIVE_FOREGROUND
+#define DEF_TABSET_ACTIVE_FG_MONO	STD_ACTIVE_FG_MONO
+#define DEF_TABSET_BG_MONO		STD_NORMAL_BG_MONO
+#define DEF_TABSET_BACKGROUND		STD_NORMAL_BACKGROUND
+#define DEF_TABSET_BORDERWIDTH		"1"
 #define DEF_TABSET_COMMAND		(char *)NULL
 #define DEF_TABSET_CURSOR		(char *)NULL
-#define DEF_TABSET_DASHES		"dash"
-#define DEF_TABSET_FG_COLOR		STD_COLOR_NORMAL_FG
-#define DEF_TABSET_FG_MONO		STD_MONO_NORMAL_FG
+#define DEF_TABSET_DASHES		"1"
+#define DEF_TABSET_FOREGROUND		STD_NORMAL_FOREGROUND
+#define DEF_TABSET_FG_MONO		STD_NORMAL_FG_MONO
 #define DEF_TABSET_FONT			STD_FONT
 #define DEF_TABSET_GAP			"3"
 #define DEF_TABSET_HEIGHT		"0"
-#define DEF_TABSET_HIGHLIGHT_BG_COLOR	STD_COLOR_NORMAL_BG
-#define DEF_TABSET_HIGHLIGHT_BG_MONO	STD_MONO_NORMAL_BG
-#define DEF_TABSET_HIGHLIGHT_COLOR	RGB_COLOR_BLACK
+#define DEF_TABSET_HIGHLIGHT_BACKGROUND	STD_NORMAL_BACKGROUND
+#define DEF_TABSET_HIGHLIGHT_BG_MONO	STD_NORMAL_BG_MONO
+#define DEF_TABSET_HIGHLIGHT_COLOR	RGB_BLACK
 #define DEF_TABSET_HIGHLIGHT_WIDTH	"2"
-#define DEF_TABSET_NORMAL_BG_COLOR 	STD_COLOR_NORMAL_BG
-#define DEF_TABSET_NORMAL_FG_MONO	STD_MONO_ACTIVE_FG
+#define DEF_TABSET_NORMAL_BACKGROUND 	STD_NORMAL_BACKGROUND
+#define DEF_TABSET_NORMAL_FG_MONO	STD_ACTIVE_FG_MONO
+#define DEF_TABSET_OUTER_PAD		"3"
 #define DEF_TABSET_RELIEF		"sunken"
 #define DEF_TABSET_ROTATE		"0.0"
 #define DEF_TABSET_SCROLL_INCREMENT 	"0"
-#define DEF_TABSET_SELECT_BG_COLOR 	RGB_COLOR_GREY82
-#define DEF_TABSET_SELECT_BG_MONO  	STD_MONO_SELECT_BG
-#define DEF_TABSET_SELECT_BORDER_WIDTH 	"1"
+#define DEF_TABSET_SELECT_BACKGROUND 	STD_NORMAL_BACKGROUND
+#define DEF_TABSET_SELECT_BG_MONO  	STD_SELECT_BG_MONO
+#define DEF_TABSET_SELECT_BORDERWIDTH 	"1"
 #define DEF_TABSET_SELECT_CMD		(char *)NULL
-#define DEF_TABSET_SELECT_FG_COLOR 	STD_COLOR_SELECT_FG
-#define DEF_TABSET_SELECT_FG_MONO  	STD_MONO_SELECT_FG
+#define DEF_TABSET_SELECT_FOREGROUND 	STD_SELECT_FOREGROUND
+#define DEF_TABSET_SELECT_FG_MONO  	STD_SELECT_FG_MONO
 #define DEF_TABSET_SELECT_MODE		"multiple"
 #define DEF_TABSET_SELECT_RELIEF	"raised"
 #define DEF_TABSET_SELECT_PAD		"5"
-#define DEF_TABSET_SHADOW_COLOR		RGB_COLOR_BLACK
+#define DEF_TABSET_SHADOW_COLOR		RGB_BLACK
 #define DEF_TABSET_SIDE			"top"
-#define DEF_TABSET_TAB_BG_COLOR		RGB_COLOR_GREY75
-#define DEF_TABSET_TAB_BG_MONO		STD_MONO_SELECT_BG
+#define DEF_TABSET_SLANT		"none"
+#define DEF_TABSET_TAB_BACKGROUND		RGB_GREY82
+#define DEF_TABSET_TAB_BG_MONO		STD_SELECT_BG_MONO
 #define DEF_TABSET_TAB_RELIEF		"raised"
 #define DEF_TABSET_TAKE_FOCUS		"1"
-#define DEF_TABSET_TEXT_COLOR		STD_COLOR_NORMAL_FG
-#define DEF_TABSET_TEXT_MONO		STD_MONO_NORMAL_FG
+#define DEF_TABSET_TEXT_COLOR		STD_NORMAL_FOREGROUND
+#define DEF_TABSET_TEXT_MONO		STD_NORMAL_FG_MONO
 #define DEF_TABSET_TEXT_SIDE		"left"
-#define DEF_TABSET_TIERS		"0"
+#define DEF_TABSET_TIERS		"1"
 #define DEF_TABSET_TILE			(char *)NULL
 #define DEF_TABSET_WIDTH		"0"
-#define DEF_TABSET_TAB_WIDTH		"no"
+#define DEF_TABSET_SAME_WIDTH		"yes"
+#define DEF_TABSET_TEAROFF		"yes"
 #define DEF_TABSET_PAGE_WIDTH		"0"
 #define DEF_TABSET_PAGE_HEIGHT		"0"
 
@@ -176,9 +192,11 @@
 #define DEF_TAB_FONT			(char *)NULL
 #define DEF_TAB_HEIGHT			"0"
 #define DEF_TAB_IMAGE			(char *)NULL
-#define DEF_TAB_PAD			"0"
+#define DEF_TAB_IPAD			"0"
+#define DEF_TAB_PAD			"3"
+#define DEF_TAB_PERF_COMMAND		(char *)NULL
 #define DEF_TAB_SELECT_BG		(char *)NULL
-#define DEF_TAB_SELECT_BORDER_WIDTH 	"1"
+#define DEF_TAB_SELECT_BORDERWIDTH 	"1"
 #define DEF_TAB_SELECT_CMD		(char *)NULL
 #define DEF_TAB_SELECT_FG	 	(char *)NULL
 #define DEF_TAB_SHADOW			(char *)NULL
@@ -190,21 +208,23 @@
 #define DEF_TAB_WIDTH			"0"
 #define DEF_TAB_WINDOW			(char *)NULL
 
-typedef struct Tabset Tabset;
+typedef struct TabsetStruct Tabset;
 
-static void SlaveGeometryProc _ANSI_ARGS_((ClientData, Tk_Window));
-static void SlaveCustodyProc _ANSI_ARGS_((ClientData, Tk_Window));
+static void EmbeddedWidgetGeometryProc _ANSI_ARGS_((ClientData, Tk_Window));
+static void EmbeddedWidgetCustodyProc _ANSI_ARGS_((ClientData, Tk_Window));
 
 static Tk_GeomMgr tabMgrInfo =
 {
     "tabset",			/* Name of geometry manager used by winfo */
-    SlaveGeometryProc,		/* Procedure to for new geometry requests */
-    SlaveCustodyProc,		/* Procedure when window is taken away */
+    EmbeddedWidgetGeometryProc,	/* Procedure to for new geometry requests */
+    EmbeddedWidgetCustodyProc,	/* Procedure when window is taken away */
 };
 
 extern Tk_CustomOption bltDashesOption;
 extern Tk_CustomOption bltFillOption;
-extern Tk_CustomOption bltLengthOption;
+extern Tk_CustomOption bltDistanceOption;
+extern Tk_CustomOption bltPositiveDistanceOption;
+extern Tk_CustomOption bltPositiveCountOption;
 extern Tk_CustomOption bltListOption;
 extern Tk_CustomOption bltPadOption;
 extern Tk_CustomOption bltShadowOption;
@@ -233,6 +253,13 @@ static char *SideToString _ANSI_ARGS_((ClientData clientData,
 	Tk_Window tkwin, char *widgRec, int offset,
 	Tcl_FreeProc **freeProcPtrPtr));
 
+static int StringToSlant _ANSI_ARGS_((ClientData clientData,
+	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
+	int offset));
+static char *SlantToString _ANSI_ARGS_((ClientData clientData,
+	Tk_Window tkwin, char *widgRec, int offset,
+	Tcl_FreeProc **freeProcPtrPtr));
+
 /*
  * Contains a pointer to the widget that's currently being configured.
  * This is used in the custom configuration parse routine for images.
@@ -254,6 +281,11 @@ static Tk_CustomOption windowOption =
     StringToWindow, WindowToString, (ClientData)0,
 };
 
+static Tk_CustomOption slantOption =
+{
+    StringToSlant, SlantToString, (ClientData)0,
+};
+
 /*
  * TabImage --
  *
@@ -267,24 +299,23 @@ static Tk_CustomOption windowOption =
  *	images that maintains a reference count for each image.
  */
 
-typedef struct TabImage {
+typedef struct TabImageStruct {
     int refCount;		/* Reference counter for this image. */
     Tk_Image tkImage;		/* The Tk image being cached. */
     int width, height;		/* Dimensions of the cached image. */
-    Tcl_HashEntry *hashPtr;	/* Hash table pointer to the image. */
+    Blt_HashEntry *hashPtr;	/* Hash table pointer to the image. */
 
-}       *TabImage;
+} *TabImage;
 
 #define ImageHeight(image)	((image)->height)
 #define ImageWidth(image)	((image)->width)
-#define ImageData(image)	((image)->tkImage)
+#define ImageBits(image)	((image)->tkImage)
 
 #define TAB_VISIBLE	(1<<0)
 #define TAB_REDRAW	(1<<2)
 
 typedef struct {
-    Tk_Uid nameId;		/* Identifier for tab entry */
-    int index;			/* Index of the tab in the list */
+    char *name;			/* Identifier for tab entry */
     int state;			/* State of the tab: Disabled, active, or
 				 * normal. */
     unsigned int flags;
@@ -296,23 +327,23 @@ typedef struct {
     int worldWidth, worldHeight;/* Dimensions of the tab, corrected for
 				 * orientation (-side).  It includes the
 				 * border, padding, label, etc. */
-    int scrnX, scrnY;
-    short int scrnWidth, scrnHeight;	/*  */
+    int screenX, screenY;
+    short int screenWidth, screenHeight;	/*  */
 
     Tabset *setPtr;		/* Tabset that includes this
 				 * tab. Needed for callbacks can pass
 				 * only a tab pointer.  */
-    Tk_Uid tags;
+    Blt_Uid tags;
 
     /*
      * Tab label:
      */
-    Tk_Uid text;		/* String displayed as the tab's label. */
+    Blt_Uid text;		/* String displayed as the tab's label. */
     TabImage image;		/* Image displayed as the label. */
 
     short int textWidth, textHeight;
     short int labelWidth, labelHeight;
-    Pad iPadX, iPadY;		/* Internal padding around the text */
+    Blt_Pad iPadX, iPadY;	/* Internal padding around the text */
 
     Tk_Font font;
 
@@ -338,57 +369,58 @@ typedef struct {
     Pixmap stipple;		/* Stipple for outline of embedded window
 				 * when torn off. */
     /*
-     * Embedded Window:
+     * Embedded widget information:
      */
-    Tk_Window tkwin;		/* Window to be mapped when the tab is
+    Tk_Window tkwin;		/* Widget to be mapped when the tab is
 				 * selected.  If NULL, don't make
 				 * space for the page. */
 
     int reqWidth, reqHeight;	/* If non-zero, overrides the
 				 * requested dimensions of the
-				 * embedded window. */
+				 * embedded widget. */
 
     Tk_Window container;	/* The window containing the embedded
-				 * window.  Does not necessarily have
+				 * widget.  Does not necessarily have
 				 * to be the parent. */
 
     Tk_Anchor anchor;		/* Anchor: indicates how the embedded
-				 * window is positioned within the
+				 * widget is positioned within the
 				 * extra space on the page. */
 
-    Pad padX, padY;		/* Padding around embedded window */
+    Blt_Pad padX, padY;		/* Padding around embedded widget */
 
-    Fill fill;			/* Indicates how the window should
+    int fill;			/* Indicates how the window should
 				 * fill the page. */
 
     /*
      * Auxillary information:
      */
-    Tk_Uid command;		/* Command (malloc-ed) invoked when the tab
+    Blt_Uid command;		/* Command (malloc-ed) invoked when the tab
 				 * is selected */
-    Tk_Uid data;		/* This value isn't used in C code.
+    Blt_Uid data;		/* This value isn't used in C code.
 				 * It may be used by clients in Tcl bindings
 				 * to associate extra data (other than the
 				 * label or name) with the tab. */
 
-    Blt_ListItem item;		/* Pointer to where the tab resides in the
+    Blt_ChainLink *linkPtr;	/* Pointer to where the tab resides in the
 				 * list of tabs. */
+    Blt_Uid perfCommand;		/* Command (malloc-ed) invoked when the tab
+				 * is selected */
     GC textGC;
     GC backGC;
 
-    Blt_Tile bgTile;
-    GC tileGC;
+    Blt_Tile tile;
 
 } Tab;
 
 static Tk_ConfigSpec tabConfigSpecs[] =
 {
     {TK_CONFIG_BORDER, "-activebackground", "activeBackground",
-	"ActiveBackground",
-	DEF_TAB_ACTIVE_BG, Tk_Offset(Tab, activeBorder), TK_CONFIG_NULL_OK},
+	"ActiveBackground", DEF_TAB_ACTIVE_BG, 
+	Tk_Offset(Tab, activeBorder), TK_CONFIG_NULL_OK},
     {TK_CONFIG_COLOR, "-activeforeground", "activeForeground",
-	"ActiveForeground",
-	DEF_TAB_ACTIVE_FG, Tk_Offset(Tab, activeFgColor), TK_CONFIG_NULL_OK},
+	"ActiveForeground", DEF_TAB_ACTIVE_FG, 
+	Tk_Offset(Tab, activeFgColor), TK_CONFIG_NULL_OK},
     {TK_CONFIG_ANCHOR, "-anchor", "anchor", "Anchor",
 	DEF_TAB_ANCHOR, Tk_Offset(Tab, anchor), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
@@ -415,22 +447,29 @@ static Tk_ConfigSpec tabConfigSpecs[] =
 	DEF_TAB_IMAGE, Tk_Offset(Tab, image),
 	TK_CONFIG_NULL_OK, &imageOption},
     {TK_CONFIG_CUSTOM, "-ipadx", "iPadX", "PadX",
-	DEF_TAB_PAD, Tk_Offset(Tab, iPadX),
+	DEF_TAB_IPAD, Tk_Offset(Tab, iPadX),
 	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
     {TK_CONFIG_CUSTOM, "-ipady", "iPadY", "PadY",
-	DEF_TAB_PAD, Tk_Offset(Tab, iPadY),
+	DEF_TAB_IPAD, Tk_Offset(Tab, iPadY),
 	TK_CONFIG_DONT_SET_DEFAULT, &bltPadOption},
     {TK_CONFIG_CUSTOM, "-padx", "padX", "PadX",
 	DEF_TAB_PAD, Tk_Offset(Tab, padX), 0, &bltPadOption},
     {TK_CONFIG_CUSTOM, "-pady", "padY", "PadY",
 	DEF_TAB_PAD, Tk_Offset(Tab, padY), 0, &bltPadOption},
+    {TK_CONFIG_CUSTOM, "-perforationcommand", "perforationcommand", 
+	"PerforationCommand",
+	DEF_TAB_PERF_COMMAND, Tk_Offset(Tab, perfCommand),
+	TK_CONFIG_NULL_OK, &bltUidOption},
     {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Background",
-	DEF_TAB_SELECT_BG, Tk_Offset(Tab, selBorder), 0},
+	DEF_TAB_SELECT_BG, Tk_Offset(Tab, selBorder), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Foreground",
+	DEF_TAB_SELECT_FG, Tk_Offset(Tab, selColor), TK_CONFIG_NULL_OK},
     {TK_CONFIG_CUSTOM, "-shadow", "shadow", "Shadow",
 	DEF_TAB_SHADOW, Tk_Offset(Tab, shadow),
 	TK_CONFIG_NULL_OK, &bltShadowOption},
     {TK_CONFIG_CUSTOM, "-state", "state", "State",
-	DEF_TAB_STATE, Tk_Offset(Tab, state), 0, &bltStateOption},
+	DEF_TAB_STATE, Tk_Offset(Tab, state), 
+	TK_CONFIG_DONT_SET_DEFAULT, &bltStateOption},
     {TK_CONFIG_BITMAP, "-stipple", "stipple", "Stipple",
 	DEF_TAB_STIPPLE, Tk_Offset(Tab, stipple), 0},
     {TK_CONFIG_CUSTOM, "-text", "Text", "Text",
@@ -441,10 +480,10 @@ static Tk_ConfigSpec tabConfigSpecs[] =
 	TK_CONFIG_NULL_OK, &windowOption},
     {TK_CONFIG_CUSTOM, "-windowheight", "windowHeight", "WindowHeight",
 	DEF_TAB_HEIGHT, Tk_Offset(Tab, reqHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-windowwidth", "windowWidth", "WindowWidth",
 	DEF_TAB_WIDTH, Tk_Offset(Tab, reqWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
@@ -452,7 +491,7 @@ static Tk_ConfigSpec tabConfigSpecs[] =
 /*
  * TabAttributes --
  */
-typedef struct TabAttributes {
+typedef struct {
     Tk_Window tkwin;		/* Default window to map pages. */
 
     int reqWidth, reqHeight;	/* Requested tab size. */
@@ -470,16 +509,18 @@ typedef struct TabAttributes {
     Tk_3DBorder border;		/* Normal background. */
     Tk_3DBorder selBorder;	/* Selected background. */
 
-    Dashes dashes;
+    Blt_Dashes dashes;
     GC normalGC, activeGC;
     int relief;
     char *command;
+    char *perfCommand;		/* Command (malloc-ed) invoked when the tab
+				 * is selected */
     double rotate;
     int textSide;
 
 } TabAttributes;
 
-struct Tabset {
+struct TabsetStruct {
     Tk_Window tkwin;		/* Window that embodies the widget.
                                  * NULL means that the window has been
                                  * destroyed but the data structures
@@ -501,7 +542,8 @@ struct Tabset {
 				 * Indicates how much interior stuff must
 				 * be offset from outside edges to leave
 				 * room for borders. */
-    int pageInset;		/* Total width of 3-D folder border + corner,
+
+    int inset2;			/* Total width of 3-D folder border + corner,
 				 * Indicates how much interior stuff must
 				 * be offset from outside edges of folder.*/
 
@@ -539,23 +581,22 @@ struct Tabset {
     int side;			/* How tabset is oriented: either SIDE_LEFT,
 				 * SIDE_RIGHT, SIDE_TOP, or SIDE_BOTTOM. */
 
+    int slant;
+    int overlap;
     int gap;
     int tabWidth, tabHeight;
-    int selectPad;		/* Padding around label of the selected tab. */
+    int xSelectPad, ySelectPad;	/* Padding around label of the selected tab. */
+    int outerPad;		/* Padding around the exterior of the tabset
+				 * and folder. */
 
-    TabAttributes defAttrs;	/* Global attribute information specific to
+    TabAttributes defTabStyle;	/* Global attribute information specific to
 				 * tabs. */
-    GC copyGC;
-
-    Blt_Tile bgTile;
-
-    GC tileGC;			/* GC for tiling the window. The foreground
-				 * attribute is the default text color. */
+    Blt_Tile tile;
 
     int reqWidth, reqHeight;	/* Requested dimensions of the tabset
 				 * window. */
-    int pageWidth, pageHeight;
-    int reqPageWidth, reqPageHeight;	/* Dimenions of page. */
+    int pageWidth, pageHeight;	/* Dimensions of a page in the folder. */
+    int reqPageWidth, reqPageHeight;	/* Requested dimensions of a page. */
 
     int lastX, lastY;
     /*
@@ -580,9 +621,10 @@ struct Tabset {
     int reqTiers;		/* Requested number of tiers. Zero means to
 				 * dynamically scroll if there are too many
 				 * tabs to be display on a single tier. */
-    int numTiers;		/* Actual number of tiers. */
+    int nTiers;			/* Actual number of tiers. */
 
-    Tcl_HashTable imageTable;
+    Blt_HashTable imageTable;
+
 
     Tab *selectPtr;		/* The currently selected tab.
 				 * (i.e. its page is displayed). */
@@ -595,68 +637,66 @@ struct Tabset {
 
     Tab *startPtr;		/* The first tab on the first tier. */
 
-    Blt_List tabList;		/* List of tab entries. Used to
+    Blt_Chain *chainPtr;	/* List of tab entries. Used to
 				 * arrange placement of tabs. */
 
-    Tcl_HashTable tabTable;	/* Hash table of tab entries. Used for
+    Blt_HashTable tabTable;	/* Hash table of tab entries. Used for
 				 * lookups of tabs by name. */
 
-    int numVisible;		/* Number of tabs that are currently visible
+    int nVisible;		/* Number of tabs that are currently visible
 				 * in the view port. */
 
-    BindTable bindTable;	/* Tab binding information */
+    Blt_BindTable bindTable;	/* Tab binding information */
+    Blt_HashTable tagTable;	/* Table of bind tags. */
+
+    int tearoff;
 };
 
 static Tk_ConfigSpec configSpecs[] =
 {
     {TK_CONFIG_BORDER, "-activebackground", "activeBackground",
 	"activeBackground",
-	DEF_TABSET_ACTIVE_BG_COLOR, Tk_Offset(Tabset, defAttrs.activeBorder),
+	DEF_TABSET_ACTIVE_BACKGROUND, Tk_Offset(Tabset, defTabStyle.activeBorder),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_BORDER, "-activebackground", "activeBackground",
 	"activeBackground",
-	DEF_TABSET_ACTIVE_BG_MONO, Tk_Offset(Tabset, defAttrs.activeBorder),
+	DEF_TABSET_ACTIVE_BG_MONO, Tk_Offset(Tabset, defTabStyle.activeBorder),
 	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_COLOR, "-activeforeground", "activeForeground",
-	"activeForeground",
-	DEF_TABSET_ACTIVE_FG_COLOR, Tk_Offset(Tabset, defAttrs.activeFgColor),
-	TK_CONFIG_COLOR_ONLY},
+	"activeForeground", DEF_TABSET_ACTIVE_FOREGROUND, 
+	Tk_Offset(Tabset, defTabStyle.activeFgColor), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-activeforeground", "activeForeground",
-	"activeForeground",
-	DEF_TABSET_ACTIVE_FG_MONO, Tk_Offset(Tabset, defAttrs.activeFgColor),
-	TK_CONFIG_MONO_ONLY},
+	"activeForeground", DEF_TABSET_ACTIVE_FG_MONO, 
+	Tk_Offset(Tabset, defTabStyle.activeFgColor), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
 	DEF_TABSET_BG_MONO, Tk_Offset(Tabset, border), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_TABSET_BG_COLOR, Tk_Offset(Tabset, border), TK_CONFIG_COLOR_ONLY},
+	DEF_TABSET_BACKGROUND, Tk_Offset(Tabset, border), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_SYNONYM, "-bd", "borderWidth", (char *)NULL, (char *)NULL, 0, 0},
     {TK_CONFIG_SYNONYM, "-bg", "background", (char *)NULL, (char *)NULL, 0, 0},
     {TK_CONFIG_ACTIVE_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_TABSET_CURSOR, Tk_Offset(Tabset, cursor), TK_CONFIG_NULL_OK},
     {TK_CONFIG_CUSTOM, "-borderwidth", "borderWidth", "BorderWidth",
-	DEF_TABSET_BORDER_WIDTH, Tk_Offset(Tabset, borderWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	DEF_TABSET_BORDERWIDTH, Tk_Offset(Tabset, borderWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-dashes", "dashes", "Dashes",
-	DEF_TABSET_DASHES, Tk_Offset(Tabset, defAttrs.dashes),
+	DEF_TABSET_DASHES, Tk_Offset(Tabset, defTabStyle.dashes),
 	TK_CONFIG_NULL_OK, &bltDashesOption},
-    {TK_CONFIG_SYNONYM, "-fg", "foreground", (char *)NULL, (char *)NULL, 0, 0},
+    {TK_CONFIG_SYNONYM, "-fg", "tabForeground", (char *)NULL, 
+	(char *)NULL, 0, 0},
     {TK_CONFIG_FONT, "-font", "font", "Font",
-	DEF_TABSET_FONT, Tk_Offset(Tabset, defAttrs.font), 0},
-    {TK_CONFIG_COLOR, "-foreground", "foreground", "Foreground",
-	DEF_TABSET_TEXT_COLOR, Tk_Offset(Tabset, defAttrs.textColor),
-	TK_CONFIG_COLOR_ONLY},
-    {TK_CONFIG_COLOR, "-foreground", "foreground", "Foreground",
-	DEF_TABSET_TEXT_MONO, Tk_Offset(Tabset, defAttrs.textColor),
-	TK_CONFIG_MONO_ONLY},
-    {TK_CONFIG_CUSTOM, "-gap", "gap", "Gap",
+	DEF_TABSET_FONT, Tk_Offset(Tabset, defTabStyle.font), 0},
+    {TK_CONFIG_SYNONYM, "-foreground", "tabForeground", (char *)NULL, 
+	(char *)NULL, 0, 0},
+    {TK_CONFIG_PIXELS, "-gap", "gap", "Gap",
 	DEF_TABSET_GAP, Tk_Offset(Tabset, gap),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-height", "height", "Height",
 	DEF_TABSET_HEIGHT, Tk_Offset(Tabset, reqHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_COLOR, "-highlightbackground", "highlightBackground",
 	"HighlightBackground",
-	DEF_TABSET_HIGHLIGHT_BG_COLOR, Tk_Offset(Tabset, highlightBgColor),
+	DEF_TABSET_HIGHLIGHT_BACKGROUND, Tk_Offset(Tabset, highlightBgColor),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-highlightbackground", "highlightBackground",
 	"HighlightBackground",
@@ -668,73 +708,93 @@ static Tk_ConfigSpec configSpecs[] =
 	"HighlightThickness",
 	DEF_TABSET_HIGHLIGHT_WIDTH, Tk_Offset(Tabset, highlightWidth),
 	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-outerpad", "outerPad", "OuterPad",
+	DEF_TABSET_OUTER_PAD, Tk_Offset(Tabset, outerPad),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-pageheight", "pageHeight", "PageHeight",
 	DEF_TABSET_PAGE_HEIGHT, Tk_Offset(Tabset, reqPageHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-pagewidth", "pageWidth", "PageWidth",
 	DEF_TABSET_PAGE_WIDTH, Tk_Offset(Tabset, reqPageWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_STRING, "-perforationcommand", "perforationcommand", 
+	"PerforationCommand",
+	DEF_TAB_PERF_COMMAND, Tk_Offset(Tabset, defTabStyle.perfCommand),
+	TK_CONFIG_NULL_OK, &bltUidOption},
     {TK_CONFIG_RELIEF, "-relief", "relief", "Relief",
 	DEF_TABSET_RELIEF, Tk_Offset(Tabset, relief), 0},
     {TK_CONFIG_DOUBLE, "-rotate", "rotate", "Rotate",
-	DEF_TABSET_ROTATE, Tk_Offset(Tabset, defAttrs.rotate),
+	DEF_TABSET_ROTATE, Tk_Offset(Tabset, defTabStyle.rotate),
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_BOOLEAN, "-samewidth", "sameWidth", "SameWidth",
-	DEF_TABSET_TAB_WIDTH, Tk_Offset(Tabset, defAttrs.constWidth),
+	DEF_TABSET_SAME_WIDTH, Tk_Offset(Tabset, defTabStyle.constWidth),
 	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_STRING, "-scrollcommand", "scrollCommand", "ScrollCommand",
 	(char *)NULL, Tk_Offset(Tabset, scrollCmdPrefix), TK_CONFIG_NULL_OK},
-    {TK_CONFIG_CUSTOM, "-scrollincrement", "scrollIncrement", "ScrollIncrement",
+    {TK_CONFIG_CUSTOM, "-scrollincrement", "scrollIncrement",
+	"ScrollIncrement",
 	DEF_TABSET_SCROLL_INCREMENT, Tk_Offset(Tabset, scrollUnits),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
-    {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Background",
-	DEF_TABSET_SELECT_BG_MONO, Tk_Offset(Tabset, defAttrs.selBorder),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltPositiveDistanceOption},
+    {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Foreground",
+	DEF_TABSET_SELECT_BG_MONO, Tk_Offset(Tabset, defTabStyle.selBorder),
 	TK_CONFIG_MONO_ONLY},
-    {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Background",
-	DEF_TABSET_SELECT_BG_COLOR, Tk_Offset(Tabset, defAttrs.selBorder),
+    {TK_CONFIG_BORDER, "-selectbackground", "selectBackground", "Foreground",
+	DEF_TABSET_SELECT_BACKGROUND, Tk_Offset(Tabset, defTabStyle.selBorder),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_STRING, "-selectcommand", "selectCommand", "SelectCommand",
-	DEF_TABSET_SELECT_CMD, Tk_Offset(Tabset, defAttrs.command),
+	DEF_TABSET_SELECT_CMD, Tk_Offset(Tabset, defTabStyle.command),
 	TK_CONFIG_NULL_OK},
-    {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Foreground",
-	DEF_TABSET_SELECT_FG_MONO, Tk_Offset(Tabset, defAttrs.selColor),
+    {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Background",
+	DEF_TABSET_SELECT_FG_MONO, Tk_Offset(Tabset, defTabStyle.selColor),
 	TK_CONFIG_MONO_ONLY},
-    {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Foreground",
-	DEF_TABSET_SELECT_FG_COLOR, Tk_Offset(Tabset, defAttrs.selColor),
+    {TK_CONFIG_COLOR, "-selectforeground", "selectForeground", "Background",
+	DEF_TABSET_SELECT_FOREGROUND, Tk_Offset(Tabset, defTabStyle.selColor),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_CUSTOM, "-selectpad", "selectPad", "SelectPad",
-	DEF_TABSET_SELECT_PAD, Tk_Offset(Tabset, selectPad),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	DEF_TABSET_SELECT_PAD, Tk_Offset(Tabset, xSelectPad),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_COLOR, "-shadowcolor", "shadowColor", "ShadowColor",
 	DEF_TABSET_SHADOW_COLOR, Tk_Offset(Tabset, shadowColor), 0},
     {TK_CONFIG_CUSTOM, "-side", "side", "side",
 	DEF_TABSET_SIDE, Tk_Offset(Tabset, side),
 	TK_CONFIG_DONT_SET_DEFAULT, &sideOption},
+    {TK_CONFIG_CUSTOM, "-slant", "slant", "Slant",
+	DEF_TABSET_SLANT, Tk_Offset(Tabset, slant),
+	TK_CONFIG_DONT_SET_DEFAULT, &slantOption},
     {TK_CONFIG_BORDER, "-tabbackground", "tabBackground", "Background",
-	DEF_TABSET_TAB_BG_MONO, Tk_Offset(Tabset, defAttrs.border),
+	DEF_TABSET_TAB_BG_MONO, Tk_Offset(Tabset, defTabStyle.border),
 	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_BORDER, "-tabbackground", "tabBackground", "Background",
-	DEF_TABSET_TAB_BG_COLOR, Tk_Offset(Tabset, defAttrs.border),
+	DEF_TABSET_TAB_BACKGROUND, Tk_Offset(Tabset, defTabStyle.border),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_CUSTOM, "-tabborderwidth", "tabBorderWidth", "BorderWidth",
-	DEF_TABSET_BORDER_WIDTH, Tk_Offset(Tabset, defAttrs.borderWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	DEF_TABSET_BORDERWIDTH, Tk_Offset(Tabset, defTabStyle.borderWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_COLOR, "-tabforeground", "tabForeground", "Foreground",
+	DEF_TABSET_TEXT_COLOR, Tk_Offset(Tabset, defTabStyle.textColor),
+	TK_CONFIG_COLOR_ONLY},
+    {TK_CONFIG_COLOR, "-tabforeground", "tabForeground", "Foreground",
+	DEF_TABSET_TEXT_MONO, Tk_Offset(Tabset, defTabStyle.textColor),
+	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_RELIEF, "-tabrelief", "tabRelief", "TabRelief",
-	DEF_TABSET_TAB_RELIEF, Tk_Offset(Tabset, defAttrs.relief), 0},
+	DEF_TABSET_TAB_RELIEF, Tk_Offset(Tabset, defTabStyle.relief), 0},
     {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
 	DEF_TABSET_TAKE_FOCUS, Tk_Offset(Tabset, takeFocus), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_BOOLEAN, "-tearoff", "tearoff", "Tearoff",
+	DEF_TABSET_TEAROFF, Tk_Offset(Tabset, tearoff),
+	TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_CUSTOM, "-textside", "textSide", "TextSide",
-	DEF_TABSET_TEXT_SIDE, Tk_Offset(Tabset, defAttrs.textSide),
+	DEF_TABSET_TEXT_SIDE, Tk_Offset(Tabset, defTabStyle.textSide),
 	TK_CONFIG_DONT_SET_DEFAULT, &sideOption},
     {TK_CONFIG_CUSTOM, "-tiers", "tiers", "Tiers",
 	DEF_TABSET_TIERS, Tk_Offset(Tabset, reqTiers),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltPositiveCountOption},
     {TK_CONFIG_CUSTOM, "-tile", "tile", "Tile",
-	(char *)NULL, Tk_Offset(Tabset, bgTile), TK_CONFIG_NULL_OK,
+	(char *)NULL, Tk_Offset(Tabset, tile), TK_CONFIG_NULL_OK,
 	&bltTileOption},
     {TK_CONFIG_CUSTOM, "-width", "width", "Width",
 	DEF_TABSET_WIDTH, Tk_Offset(Tabset, reqWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
@@ -742,38 +802,49 @@ static Tk_ConfigSpec configSpecs[] =
 /* Forward Declarations */
 static void DestroyTabset _ANSI_ARGS_((DestroyData dataPtr));
 static void DestroyTearoff _ANSI_ARGS_((DestroyData dataPtr));
-static void SlaveEventProc _ANSI_ARGS_((ClientData clientdata,
+static void EmbeddedWidgetEventProc _ANSI_ARGS_((ClientData clientdata,
 	XEvent *eventPtr));
 static void TearoffEventProc _ANSI_ARGS_((ClientData clientdata,
 	XEvent *eventPtr));
 static void TabsetEventProc _ANSI_ARGS_((ClientData clientdata,
 	XEvent *eventPtr));
-static void DrawLabel _ANSI_ARGS_((Tabset * setPtr, Tab * tabPtr,
+static void DrawLabel _ANSI_ARGS_((Tabset *setPtr, Tab *tabPtr,
 	Drawable drawable));
-static void DisplayFolder _ANSI_ARGS_((Tabset * setPtr, Tab * tabPtr,
+static void DrawFolder _ANSI_ARGS_((Tabset *setPtr, Tab *tabPtr,
 	Drawable drawable));
 static void DisplayTabset _ANSI_ARGS_((ClientData clientData));
 static void DisplayTearoff _ANSI_ARGS_((ClientData clientData));
 static void TabsetInstDeletedCmd _ANSI_ARGS_((ClientData clientdata));
 static int TabsetInstCmd _ANSI_ARGS_((ClientData clientdata,
 	Tcl_Interp *interp, int argc, char **argv));
-static void GetWindowRegion _ANSI_ARGS_((Tab * tabPtr, Tk_Window parent,
+static void GetWindowRectangle _ANSI_ARGS_((Tab *tabPtr, Tk_Window parent,
 	int tearOff, XRectangle *rectPtr));
 static void ArrangeWindow _ANSI_ARGS_((Tk_Window tkwin, XRectangle *rectPtr,
 	int force));
-static void EventuallyRedraw _ANSI_ARGS_((Tabset * setPtr));
-static void EventuallyRedrawTearoff _ANSI_ARGS_((Tab * tabPtr));
-static void ComputeLayout _ANSI_ARGS_((Tabset * setPtr));
-static void DrawOuterBorders _ANSI_ARGS_((Tabset * setPtr, Drawable drawable));
+static void EventuallyRedraw _ANSI_ARGS_((Tabset *setPtr));
+static void EventuallyRedrawTearoff _ANSI_ARGS_((Tab *tabPtr));
+static void ComputeLayout _ANSI_ARGS_((Tabset *setPtr));
+static void DrawOuterBorders _ANSI_ARGS_((Tabset *setPtr, Drawable drawable));
 
-#ifdef __STDC__
 static Tk_ImageChangedProc ImageChangedProc;
 static Blt_TileChangedProc TileChangedProc;
-static BindTagProc GetTags;
-static BindPickProc PickTab;
+static Blt_BindTagProc GetTags;
+static Blt_BindPickProc PickTab;
 static Tcl_IdleProc AdoptWindow;
 static Tcl_CmdProc TabsetCmd;
-#endif /* __STDC__ */
+
+static ClientData
+MakeTag(setPtr, tagName)
+    Tabset *setPtr;
+    char *tagName;
+{
+    Blt_HashEntry *hPtr;
+    int isNew;
+
+    hPtr = Blt_CreateHashEntry(&(setPtr->tagTable), tagName, &isNew);
+    assert(hPtr);
+    return Blt_GetHashKey(&(setPtr->tagTable), hPtr);
+}
 
 /*
  *----------------------------------------------------------------------
@@ -784,28 +855,36 @@ static Tcl_CmdProc TabsetCmd;
  *	the world view is always tabs up.
  *
  * Results:
- *	The screen coordinates are returned via *xScrnPtr and *yScrnPtr.
+ *	The screen coordinates are returned via *xScreenPtr and *yScreenPtr.
  *
  *----------------------------------------------------------------------
  */
 static void
-WorldToScreen(setPtr, x, y, xScrnPtr, yScrnPtr)
+WorldToScreen(setPtr, x, y, xScreenPtr, yScreenPtr)
     Tabset *setPtr;
     int x, y;
-    int *xScrnPtr, *yScrnPtr;
+    int *xScreenPtr, *yScreenPtr;
 {
     int sx, sy;
 
     sx = sy = 0;		/* Suppress compiler warning. */
-    /* Translate X-Y to screen coordinates */
-    x += (setPtr->inset - setPtr->scrollOffset);
-    y += setPtr->yPad + setPtr->inset;
+
+    /* Translate world X-Y to screen coordinates */
+    /*
+     * Note that the world X-coordinate is translated by the selected label's
+     * X padding. This is done only to keep the scroll range is between
+     * 0.0 and 1.0, rather adding/subtracting the pad in various locations.
+     * It may be changed back in the future.
+     */
+    x += (setPtr->inset + setPtr->xSelectPad - setPtr->scrollOffset);
+    y += setPtr->inset + setPtr->yPad;
+
     switch (setPtr->side) {
     case SIDE_TOP:
 	sx = x, sy = y;		/* Do nothing */
 	break;
     case SIDE_RIGHT:
-	sx = Tk_Width(setPtr->tkwin) - y - 1;
+	sx = Tk_Width(setPtr->tkwin) - y;
 	sy = x;
 	break;
     case SIDE_LEFT:
@@ -813,11 +892,11 @@ WorldToScreen(setPtr, x, y, xScrnPtr, yScrnPtr)
 	break;
     case SIDE_BOTTOM:
 	sx = x;
-	sy = Tk_Height(setPtr->tkwin) - y - 1;
+	sy = Tk_Height(setPtr->tkwin) - y;
 	break;
     }
-    *xScrnPtr = sx;
-    *yScrnPtr = sy;
+    *xScreenPtr = sx;
+    *yScreenPtr = sy;
 }
 
 /*
@@ -842,7 +921,7 @@ EventuallyRedraw(setPtr)
 {
     if ((setPtr->tkwin != NULL) && !(setPtr->flags & TABSET_REDRAW)) {
 	setPtr->flags |= TABSET_REDRAW;
-	Tk_DoWhenIdle(DisplayTabset, (ClientData)setPtr);
+	Tcl_DoWhenIdle(DisplayTabset, setPtr);
     }
 }
 
@@ -868,7 +947,7 @@ EventuallyRedrawTearoff(tabPtr)
 {
     if ((tabPtr->tkwin != NULL) && !(tabPtr->flags & TAB_REDRAW)) {
 	tabPtr->flags |= TAB_REDRAW;
-	Tk_DoWhenIdle(DisplayTearoff, (ClientData)tabPtr);
+	Tcl_DoWhenIdle(DisplayTearoff, tabPtr);
     }
 }
 
@@ -890,10 +969,10 @@ EventuallyRedrawTearoff(tabPtr)
 static void
 ImageChangedProc(clientData, x, y, width, height, imageWidth, imageHeight)
     ClientData clientData;
-    int x, y, width, height;	/* Not used */
-    int imageWidth, imageHeight;/* Not used */
+    int x, y, width, height;	/* Not used. */
+    int imageWidth, imageHeight;/* Not used. */
 {
-    Tabset *setPtr = (Tabset *) clientData;
+    Tabset *setPtr = clientData;
 
     setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     EventuallyRedraw(setPtr);
@@ -923,31 +1002,30 @@ GetImage(setPtr, interp, tkwin, name)
     Tk_Window tkwin;
     char *name;
 {
-    struct TabImage *imagePtr;
+    struct TabImageStruct *imagePtr;
     int isNew;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
-    hPtr = Tcl_CreateHashEntry(&(setPtr->imageTable), (char *)name, &isNew);
+    hPtr = Blt_CreateHashEntry(&(setPtr->imageTable), (char *)name, &isNew);
     if (isNew) {
 	Tk_Image tkImage;
 	int width, height;
 
-	tkImage = Tk_GetImage(interp, tkwin, name, ImageChangedProc,
-	    (ClientData)setPtr);
+	tkImage = Tk_GetImage(interp, tkwin, name, ImageChangedProc, setPtr);
 	if (tkImage == NULL) {
-	    Tcl_DeleteHashEntry(hPtr);
+	    Blt_DeleteHashEntry(&(setPtr->imageTable), hPtr);
 	    return NULL;
 	}
 	Tk_SizeOfImage(tkImage, &width, &height);
-	imagePtr = (struct TabImage *)malloc(sizeof(struct TabImage));
+	imagePtr = Blt_Malloc(sizeof(struct TabImageStruct));
 	imagePtr->tkImage = tkImage;
 	imagePtr->hashPtr = hPtr;
 	imagePtr->refCount = 1;
 	imagePtr->width = width;
 	imagePtr->height = height;
-	Tcl_SetHashValue(hPtr, (ClientData)imagePtr);
+	Blt_SetHashValue(hPtr, imagePtr);
     } else {
-	imagePtr = (struct TabImage *)Tcl_GetHashValue(hPtr);
+	imagePtr = Blt_GetHashValue(hPtr);
 	imagePtr->refCount++;
     }
     return imagePtr;
@@ -972,14 +1050,15 @@ GetImage(setPtr, interp, tkwin, name)
  *----------------------------------------------------------------------
  */
 static void
-FreeImage(imagePtr)
-    struct TabImage *imagePtr;
+FreeImage(setPtr, imagePtr)
+    Tabset *setPtr;
+    struct TabImageStruct *imagePtr;
 {
     imagePtr->refCount--;
     if (imagePtr->refCount == 0) {
-	Tcl_DeleteHashEntry(imagePtr->hashPtr);
+	Blt_DeleteHashEntry(&(setPtr->imageTable), imagePtr->hashPtr);
 	Tk_FreeImage(imagePtr->tkImage);
-	free((char *)imagePtr);
+	Blt_Free(imagePtr);
     }
 }
 
@@ -1008,7 +1087,7 @@ StringToImage(clientData, interp, tkwin, string, widgRec, offset)
     char *widgRec;		/* Widget record */
     int offset;			/* Offset to field in structure */
 {
-    Tabset *setPtr = *(Tabset **) clientData;
+    Tabset *setPtr = *(Tabset **)clientData;
     TabImage *imagePtr = (TabImage *) (widgRec + offset);
     TabImage image;
 
@@ -1020,7 +1099,7 @@ StringToImage(clientData, interp, tkwin, string, widgRec, offset)
 	}
     }
     if (*imagePtr != NULL) {
-	FreeImage(*imagePtr);
+	FreeImage(setPtr, *imagePtr);
     }
     *imagePtr = image;
     return TCL_OK;
@@ -1043,18 +1122,18 @@ StringToImage(clientData, interp, tkwin, string, widgRec, offset)
 static char *
 ImageToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     ClientData clientData;	/* Pointer to tabset containing image. */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of field in record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
 {
-    Tabset *setPtr = *(Tabset **) clientData;
+    Tabset *setPtr = *(Tabset **)clientData;
     TabImage *imagePtr = (TabImage *) (widgRec + offset);
 
     if (*imagePtr == NULL) {
 	return "";
     }
-    return Tcl_GetHashKey(&(setPtr->imageTable), (*imagePtr)->hashPtr);
+    return Blt_GetHashKey(&(setPtr->imageTable), (*imagePtr)->hashPtr);
 }
 
 /*
@@ -1074,14 +1153,14 @@ ImageToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToWindow(clientData, interp, parent, string, widgRec, offset)
-    ClientData clientData;	/* Not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window parent;		/* Parent window */
     char *string;		/* String representation. */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset to field in structure */
 {
-    Tab *tabPtr = (Tab *) widgRec;
+    Tab *tabPtr = (Tab *)widgRec;
     Tk_Window *tkwinPtr = (Tk_Window *)(widgRec + offset);
     Tk_Window old, tkwin;
     Tabset *setPtr;
@@ -1098,7 +1177,7 @@ StringToWindow(clientData, interp, parent, string, widgRec, offset)
 	    return TCL_OK;
 	}
 	/*
-	 * Allow only windows that are children of the tabset window to be
+	 * Allow only widgets that are children of the tabset to be
 	 * embedded into the page.  This way we can make assumptions about
 	 * the window based upon its parent; either it's the tabset window
 	 * or it has been torn off.
@@ -1110,9 +1189,9 @@ StringToWindow(clientData, interp, parent, string, widgRec, offset)
 		(char *)NULL);
 	    return TCL_ERROR;
 	}
-	Tk_ManageGeometry(tkwin, &tabMgrInfo, (ClientData)tabPtr);
-	Tk_CreateEventHandler(tkwin, StructureNotifyMask, SlaveEventProc,
-	    (ClientData)tabPtr);
+	Tk_ManageGeometry(tkwin, &tabMgrInfo, tabPtr);
+	Tk_CreateEventHandler(tkwin, StructureNotifyMask, 
+		EmbeddedWidgetEventProc, tabPtr);
 
 	/*
 	 * We need to make the window to exist immediately.  If the
@@ -1124,11 +1203,11 @@ StringToWindow(clientData, interp, parent, string, widgRec, offset)
     }
     if (old != NULL) {
 	if (tabPtr->container != NULL) {
-	    Tk_EventuallyFree((ClientData)tabPtr, DestroyTearoff);
+	    Tcl_EventuallyFree(tabPtr, DestroyTearoff);
 	}
-	Tk_DeleteEventHandler(old, StructureNotifyMask, SlaveEventProc,
-	    (ClientData)tabPtr);
-	Tk_ManageGeometry(old, (Tk_GeomMgr *) NULL, (ClientData)tabPtr);
+	Tk_DeleteEventHandler(old, StructureNotifyMask, 
+	      EmbeddedWidgetEventProc, tabPtr);
+	Tk_ManageGeometry(old, (Tk_GeomMgr *) NULL, tabPtr);
 	Tk_UnmapWindow(old);
     }
     *tkwinPtr = tkwin;
@@ -1151,8 +1230,8 @@ StringToWindow(clientData, interp, parent, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 WindowToString(clientData, parent, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* Not used */
-    Tk_Window parent;		/* Not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window parent;		/* Not used. */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of field in record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
@@ -1183,7 +1262,7 @@ WindowToString(clientData, parent, widgRec, offset, freeProcPtr)
 /*ARGSUSED */
 static int
 StringToSide(clientData, interp, parent, string, widgRec, offset)
-    ClientData clientData;	/* Not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window parent;		/* Parent window */
     char *string;		/* Option value string */
@@ -1227,8 +1306,8 @@ StringToSide(clientData, interp, parent, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 SideToString(clientData, parent, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window parent;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window parent;		/* Not used. */
     char *widgRec;		/* Widget record */
     int offset;			/* offset of windows array in record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
@@ -1247,6 +1326,92 @@ SideToString(clientData, parent, widgRec, offset, freeProcPtr)
     }
     return "unknown side value";
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * StringToSlant --
+ *
+ *	Converts the slant style string into its numeric representation.
+ *
+ *	Valid style strings are:
+ *
+ *	  "none"   Both sides are straight.
+ * 	  "left"   Left side is slanted.
+ *	  "right"  Right side is slanted.
+ *	  "both"   Both sides are slanted.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+StringToSlant(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* String representation of attribute. */
+    char *widgRec;		/* Widget record */
+    int offset;			/* Offset of field in widget record. */
+{
+    int *slantPtr = (int *)(widgRec + offset);
+    unsigned int length;
+    char c;
+
+    c = string[0];
+    length = strlen(string);
+    if ((c == 'n') && (strncmp(string, "none", length) == 0)) {
+	*slantPtr = SLANT_NONE;
+    } else if ((c == 'l') && (strncmp(string, "left", length) == 0)) {
+	*slantPtr = SLANT_LEFT;
+    } else if ((c == 'r') && (strncmp(string, "right", length) == 0)) {
+	*slantPtr = SLANT_RIGHT;
+    } else if ((c == 'b') && (strncmp(string, "both", length) == 0)) {
+	*slantPtr = SLANT_BOTH;
+    } else {
+	Tcl_AppendResult(interp, "bad argument \"", string,
+	    "\": should be \"none\", \"left\", \"right\", or \"both\"",
+	    (char *)NULL);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * SlantToString --
+ *
+ *	Returns the slant style string based upon the slant flags.
+ *
+ * Results:
+ *	The slant style string is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static char *
+SlantToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Widget structure record. */
+    int offset;			/* Offset of field in widget record. */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    int slant = *(int *)(widgRec + offset);
+
+    switch (slant) {
+    case SLANT_LEFT:
+	return "left";
+    case SLANT_RIGHT:
+	return "right";
+    case SLANT_NONE:
+	return "none";
+    case SLANT_BOTH:
+	return "both";
+    default:
+	return "unknown value";
+    }
+}
 
 
 static int
@@ -1255,8 +1420,29 @@ WorldY(tabPtr)
 {
     int tier;
 
-    tier = tabPtr->setPtr->numTiers - tabPtr->tier;
+    tier = tabPtr->setPtr->nTiers - tabPtr->tier;
     return tier * tabPtr->setPtr->tabHeight;
+}
+
+static int
+TabIndex(setPtr, tabPtr) 
+    Tabset *setPtr;
+    Tab *tabPtr;
+{
+    Tab *t2Ptr;
+    int count;
+    Blt_ChainLink *linkPtr;
+    
+    count = 0;
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	t2Ptr = Blt_ChainGetValue(linkPtr);
+	if (t2Ptr == tabPtr) {
+	    return count;
+	}
+	count++;
+    }
+    return -1;
 }
 
 /*
@@ -1291,27 +1477,28 @@ RenumberTiers(setPtr, tabPtr)
 {
     int tier;
     Tab *prevPtr;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr, *lastPtr;
 
     setPtr->focusPtr = setPtr->selectPtr = tabPtr;
-    Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
+    Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr, NULL);
 
     tier = tabPtr->tier;
-    for (item = Blt_ListPrevItem(tabPtr->item); item != NULL; /*empty*/ ) {
-	prevPtr = (Tab *) Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainPrevLink(tabPtr->linkPtr); linkPtr != NULL;
+	linkPtr = lastPtr) {
+	lastPtr = Blt_ChainPrevLink(linkPtr);
+	prevPtr = Blt_ChainGetValue(linkPtr);
 	if ((prevPtr == NULL) || (prevPtr->tier != tier)) {
 	    break;
 	}
 	tabPtr = prevPtr;
-	item = Blt_ListPrevItem(item);
     }
     setPtr->startPtr = tabPtr;
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
 	tabPtr->tier = (tabPtr->tier - tier + 1);
 	if (tabPtr->tier < 1) {
-	    tabPtr->tier += setPtr->numTiers;
+	    tabPtr->tier += setPtr->nTiers;
 	}
 	tabPtr->worldY = WorldY(tabPtr);
     }
@@ -1320,12 +1507,35 @@ RenumberTiers(setPtr, tabPtr)
 /*
  * ----------------------------------------------------------------------
  *
- * FindTab --
+ * TabExists --
  *
  *	Searches for a tab based upon its name.
  *
  * Results:
- *	A standard Tcl result.  Note that no error message is generated
+ *	Returns TRUE if the tab exists, FALSE otherwise.
+ *
+ * ----------------------------------------------------------------------
+ */
+static int
+TabExists(setPtr, string)
+    Tabset *setPtr;
+    char *string;
+{
+    Blt_HashEntry *hPtr;
+
+    hPtr = Blt_FindHashEntry(&(setPtr->tabTable), string);
+    return (hPtr != NULL);
+}
+
+/*
+ * ----------------------------------------------------------------------
+ *
+ * GetTabByName --
+ *
+ *	Searches for a tab based upon its name.
+ *
+ * Results:
+ *	A standard Tcl result.  An error message is generated if
  *	the tab can't be found.
  *
  * Side Effects:
@@ -1335,27 +1545,22 @@ RenumberTiers(setPtr, tabPtr)
  * ----------------------------------------------------------------------
  */
 static int
-FindTab(setPtr, name, tabPtrPtr)
+GetTabByName(setPtr, string, tabPtrPtr)
     Tabset *setPtr;
-    char *name;
+    char *string;
     Tab **tabPtrPtr;
 {
-    Tk_Uid nameId;
-    Tcl_HashEntry *hPtr;
-
+    Blt_HashEntry *hPtr;
     *tabPtrPtr = NULL;
-    nameId = Blt_FindUid(name);
-    if (nameId == NULL) {
-	return TCL_ERROR;	/* If a Tk_Uid doesn't already exist for that
-				 * string, then the string can't possibly
-				 * represent a tab. */
+
+    hPtr = Blt_FindHashEntry(&(setPtr->tabTable), string);
+    if (hPtr != NULL) {
+	*tabPtrPtr = (Tab *)Blt_GetHashValue(hPtr);
+	return TCL_OK;
     }
-    hPtr = Tcl_FindHashEntry(&(setPtr->tabTable), nameId);
-    if (hPtr == NULL) {
-	return TCL_ERROR;
-    }
-    *tabPtrPtr = (Tab *) Tcl_GetHashValue(hPtr);
-    return TCL_OK;
+    Tcl_AppendResult(setPtr->interp, "can't find tab named \"", string,
+     "\" in \"", Tk_PathName(setPtr->tkwin), "\"", (char *)NULL);
+    return TCL_ERROR;
 }
 
 /*
@@ -1374,129 +1579,167 @@ FindTab(setPtr, name, tabPtrPtr)
  *----------------------------------------------------------------------
  */
 static ClientData
-PickTab(clientData, x, y)
+PickTab(clientData, x, y, contextPtr)
     ClientData clientData;
     int x, y;			/* Screen coordinates to test. */
+    ClientData *contextPtr;	/* (out) If non-NULL, will contain the
+				 * context of the tab selected.  */
 {
-    Tabset *setPtr = (Tabset *) clientData;	/* Tabset widget record. */
+    Tabset *setPtr = clientData;	/* Tabset widget record. */
     Tab *tabPtr;
-    Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
 
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
+    tabPtr = setPtr->selectPtr;
+    if ((setPtr->tearoff) && (tabPtr != NULL) && 
+	(tabPtr->container == NULL) && (tabPtr->tkwin != NULL)) {
+	int top, bottom, left, right;
+	int sx, sy;
+
+	/* Check first for perforation on the selected tab. */
+	WorldToScreen(setPtr, tabPtr->worldX + 2, 
+	      tabPtr->worldY + tabPtr->worldHeight + 4, &sx, &sy);
+	if (setPtr->side & SIDE_HORIZONTAL) {
+	    left = sx - 2;
+	    right = left + tabPtr->screenWidth;
+	    top = sy - 4;
+	    bottom = sy + 4;
+	} else {
+	    left = sx - 4;
+	    right = sx + 4;
+	    top = sy - 2;
+	    bottom = top + tabPtr->screenHeight;
+	}
+	if ((x >= left) && (y >= top) && (x < right) && (y < bottom)) {
+	    if (contextPtr != NULL) {
+		*contextPtr = TAB_PERFORATION;
+	    }
+	    return tabPtr;
+	}
+    } 
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
 	if (!(tabPtr->flags & TAB_VISIBLE)) {
 	    continue;
 	}
-	if ((x >= tabPtr->scrnX) && (y >= tabPtr->scrnY) &&
-	    (x < (tabPtr->scrnX + tabPtr->scrnWidth)) &&
-	    (y < (tabPtr->scrnY + tabPtr->scrnHeight))) {
-	    return (ClientData) tabPtr;
+	if ((x >= tabPtr->screenX) && (y >= tabPtr->screenY) &&
+	    (x <= (tabPtr->screenX + tabPtr->screenWidth)) &&
+	    (y < (tabPtr->screenY + tabPtr->screenHeight))) {
+	    if (contextPtr != NULL) {
+		*contextPtr = TAB_LABEL;
+	    }
+	    return tabPtr;
 	}
     }
     return NULL;
 }
 
 static Tab *
-TabLeft(setPtr, tabPtr)
-    Tabset *setPtr;
+TabLeft(tabPtr)
     Tab *tabPtr;
 {
-    Blt_ListItem item;
+    if (tabPtr != NULL) {
+	Blt_ChainLink *linkPtr;
 
-    item = Blt_ListPrevItem(tabPtr->item);
-    if (item != NULL) {
-	Tab *newPtr;
-
-	newPtr = (Tab *) Blt_ListGetValue(item);
-	/* Move only if the next tab is on another tier. */
-	if (newPtr->tier == tabPtr->tier) {
-	    tabPtr = newPtr;
+	linkPtr = Blt_ChainPrevLink(tabPtr->linkPtr);
+	if (linkPtr != NULL) {
+	    Tab *newPtr;
+	    
+	    newPtr = Blt_ChainGetValue(linkPtr);
+	    /* Move only if the next tab is on another tier. */
+	    if (newPtr->tier == tabPtr->tier) {
+		tabPtr = newPtr;
+	    }
 	}
     }
     return tabPtr;
 }
 
 static Tab *
-TabRight(setPtr, tabPtr)
-    Tabset *setPtr;
+TabRight(tabPtr)
     Tab *tabPtr;
 {
-    Blt_ListItem item;
-
-    item = Blt_ListNextItem(tabPtr->item);
-    if (item != NULL) {
-	Tab *newPtr;
-
-	newPtr = (Tab *) Blt_ListGetValue(item);
-	/* Move only if the next tab is on another tier. */
-	if (newPtr->tier == tabPtr->tier) {
-	    tabPtr = newPtr;
+    if (tabPtr != NULL) {
+	Blt_ChainLink *linkPtr;
+	
+	linkPtr = Blt_ChainNextLink(tabPtr->linkPtr);
+	if (linkPtr != NULL) {
+	    Tab *newPtr;
+	    
+	    newPtr = Blt_ChainGetValue(linkPtr);
+	    /* Move only if the next tab is on another tier. */
+	    if (newPtr->tier == tabPtr->tier) {
+		tabPtr = newPtr;
+	    }
 	}
     }
     return tabPtr;
 }
 
 static Tab *
-TabUp(setPtr)
-    Tabset *setPtr;
-{
-    int x, y;
-    int worldX, worldY;
+TabUp(tabPtr)
     Tab *tabPtr;
+{
+    if (tabPtr != NULL) {
+	Tabset *setPtr;
+	int x, y;
+	int worldX, worldY;
 
-    tabPtr = setPtr->focusPtr;
-    worldX = tabPtr->worldX + (tabPtr->worldWidth / 2);
-    worldY = tabPtr->worldY - (setPtr->tabHeight / 2);
-    WorldToScreen(setPtr, worldX, worldY, &x, &y);
-
-    tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    if (tabPtr == NULL) {
-	/*
-	 * We might have inadvertly picked the gap between two tabs,
-	 * so if the first pick fails, try again a little to the left.
-	 */
-	WorldToScreen(setPtr, worldX + setPtr->gap, worldY, &x, &y);
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    }
-    if ((tabPtr == NULL) &&
-	(setPtr->focusPtr->tier < (setPtr->numTiers - 1))) {
-	WorldToScreen(setPtr, worldX, worldY - setPtr->tabHeight, &x, &y);
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    }
-    if (tabPtr == NULL) {
-	tabPtr = setPtr->focusPtr;
+	setPtr = tabPtr->setPtr;
+	worldX = tabPtr->worldX + (tabPtr->worldWidth / 2);
+	worldY = tabPtr->worldY - (setPtr->tabHeight / 2);
+	WorldToScreen(setPtr, worldX, worldY, &x, &y);
+	
+	tabPtr = PickTab(setPtr, x, y, NULL);
+	if (tabPtr == NULL) {
+	    /*
+	     * We might have inadvertly picked the gap between two tabs,
+	     * so if the first pick fails, try again a little to the left.
+	     */
+	    WorldToScreen(setPtr, worldX + setPtr->gap, worldY, &x, &y);
+	    tabPtr = PickTab(setPtr, x, y, NULL);
+	}
+	if ((tabPtr == NULL) &&
+	    (setPtr->focusPtr->tier < (setPtr->nTiers - 1))) {
+	    WorldToScreen(setPtr, worldX, worldY - setPtr->tabHeight, &x, &y);
+	    tabPtr = PickTab(setPtr, x, y, NULL);
+	}
+	if (tabPtr == NULL) {
+	    tabPtr = setPtr->focusPtr;
+	}
     }
     return tabPtr;
 }
 
 static Tab *
-TabDown(setPtr)
-    Tabset *setPtr;
-{
-    int x, y;
-    int worldX, worldY;
+TabDown(tabPtr)
     Tab *tabPtr;
+{
+    if (tabPtr != NULL) {
+	Tabset *setPtr;
+	int x, y;
+	int worldX, worldY;
 
-    tabPtr = setPtr->focusPtr;
-    worldX = tabPtr->worldX + (tabPtr->worldWidth / 2);
-    worldY = tabPtr->worldY + (3 * setPtr->tabHeight) / 2;
-    WorldToScreen(setPtr, worldX, worldY, &x, &y);
-    tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    if (tabPtr == NULL) {
-	/*
-	 * We might have inadvertly picked the gap between two tabs,
-	 * so if the first pick fails, try again a little to the left.
-	 */
-	WorldToScreen(setPtr, worldX - setPtr->gap, worldY, &x, &y);
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    }
-    if ((tabPtr == NULL) && (setPtr->focusPtr->tier > 2)) {
-	WorldToScreen(setPtr, worldX, worldY + setPtr->tabHeight, &x, &y);
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
-    }
-    if (tabPtr == NULL) {
-	tabPtr = setPtr->focusPtr;
+	setPtr = tabPtr->setPtr;
+	worldX = tabPtr->worldX + (tabPtr->worldWidth / 2);
+	worldY = tabPtr->worldY + (3 * setPtr->tabHeight) / 2;
+	WorldToScreen(setPtr, worldX, worldY, &x, &y);
+	tabPtr = PickTab(setPtr, x, y, NULL);
+	if (tabPtr == NULL) {
+	    /*
+	     * We might have inadvertly picked the gap between two tabs,
+	     * so if the first pick fails, try again a little to the left.
+	     */
+	    WorldToScreen(setPtr, worldX - setPtr->gap, worldY, &x, &y);
+	    tabPtr = PickTab(setPtr, x, y, NULL);
+	}
+	if ((tabPtr == NULL) && (setPtr->focusPtr->tier > 2)) {
+	    WorldToScreen(setPtr, worldX, worldY + setPtr->tabHeight, &x, &y);
+	    tabPtr = PickTab(setPtr, x, y, NULL);
+	}
+	if (tabPtr == NULL) {
+	    tabPtr = setPtr->focusPtr;
+	}
     }
     return tabPtr;
 }
@@ -1504,22 +1747,21 @@ TabDown(setPtr)
 /*
  *----------------------------------------------------------------------
  *
- * GetIndex --
+ * GetTabByIndex --
  *
  *	Converts a string representing a tab index into a tab pointer.
  *	The index may be in one of the following forms:
  *
  *	 number		Tab at position in the list of tabs.
- *	 name		Name of the tab.
  *	 @x,y		Tab closest to the specified X-Y screen coordinates.
- *	 "tabActive"	Tab mouse is located over.
- *	 "tabFocus"	Tab is the widget's focus.
- *	 "tabSelect"	Currently selected tab.
- *	 "tabRight"	Next tab from the focus tab.
- *	 "tabLeft"	Previous tab from the focus tab.
- *	 "tabUp"	Next tab from the focus tab.
- *	 "tabDown"	Previous tab from the focus tab.
- *	 "tabEnd"	Last tab in list.
+ *	 "active"	Tab mouse is located over.
+ *	 "focus"	Tab is the widget's focus.
+ *	 "select"	Currently selected tab.
+ *	 "right"	Next tab from the focus tab.
+ *	 "left"		Previous tab from the focus tab.
+ *	 "up"		Next tab from the focus tab.
+ *	 "down"		Previous tab from the focus tab.
+ *	 "end"		Last tab in list.
  *
  * Results:
  *	If the string is successfully converted, TCL_OK is returned.
@@ -1530,183 +1772,152 @@ TabDown(setPtr)
  *----------------------------------------------------------------------
  */
 static int
-GetIndex(setPtr, string, tabPtrPtr)
+GetTabByIndex(setPtr, string, tabPtrPtr, allowNull)
     Tabset *setPtr;
     char *string;
     Tab **tabPtrPtr;
+    int allowNull;	/* Allow NULL tabPtr */
 {
     Tab *tabPtr;
-    Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
     int position;
     char c;
 
     c = string[0];
-    item = NULL;
     tabPtr = NULL;
     if (setPtr->focusPtr == NULL) {
 	setPtr->focusPtr = setPtr->selectPtr;
-	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
+	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr, NULL);
     }
     if ((isdigit(UCHAR(c))) &&
 	(Tcl_GetInt(setPtr->interp, string, &position) == TCL_OK)) {
-	item = Blt_ListFindNthItem(&(setPtr->tabList), position, 1);
-	if (item != NULL) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	linkPtr = Blt_ChainGetNthLink(setPtr->chainPtr, position);
+	if (linkPtr == NULL) {
+	    Tcl_AppendResult(setPtr->interp, "can't find tab \"", string,
+		"\" in \"", Tk_PathName(setPtr->tkwin), "\": no such index", 
+		(char *)NULL);
+	    return TCL_ERROR;
 	}
-    } else if ((c == 't') && (string[1] == 'a') && (string[2] == 'b')) {
-	unsigned int length;
-	char *suffix;
-
-	suffix = string + 3;
-	c = suffix[0];
-	length = strlen(suffix);
-
-	/*
-	 * "tabActive"	Tab mouse is located over.
-	 * "tabFocus"	Tab is the widget's focus.
-	 * "tabSelect"	Currently selected tab.
-	 * "tabRight"	Next tab from the focus tab.
-	 * "tabLeft"	Previous tab from the focus tab.
-	 * "tabUp"	Next tab from the focus tab.
-	 * "tabDown"	Previous tab from the focus tab.
-	 * "tabEnd"	Last tab in list.
-	 */
-	if ((c == 'A') && (length > 0) &&
-	    (strncmp(suffix, "Active", length) == 0)) {
-	    tabPtr = setPtr->activePtr;
-	} else if ((c == 'S') && (length > 0) &&
-	    (strncmp(suffix, "Select", length) == 0)) {
-	    tabPtr = (Tab *) Blt_GetCurrentItem(setPtr->bindTable);
-	} else if ((c == 'F') && (length > 0) &&
-	    (strncmp(suffix, "Focus", length) == 0)) {
-	    tabPtr = setPtr->focusPtr;
-	} else if ((c == 'U') && (length > 0) &&
-	    (strncmp(suffix, "Up", length) == 0)) {
-	    switch (setPtr->side) {
-	    case SIDE_LEFT:
-	    case SIDE_RIGHT:
-		tabPtr = TabLeft(setPtr, setPtr->focusPtr);
-		break;
-
-	    case SIDE_BOTTOM:
-		tabPtr = TabDown(setPtr);
-		break;
-
-	    case SIDE_TOP:
-		tabPtr = TabUp(setPtr);
-		break;
-	    }
-	} else if ((c == 'D') && (length > 0) &&
-	    (strncmp(suffix, "Down", length) == 0)) {
-	    switch (setPtr->side) {
-	    case SIDE_LEFT:
-	    case SIDE_RIGHT:
-		tabPtr = TabRight(setPtr, setPtr->focusPtr);
-		break;
-
-	    case SIDE_BOTTOM:
-		tabPtr = TabUp(setPtr);
-		break;
-
-	    case SIDE_TOP:
-		tabPtr = TabDown(setPtr);
-		break;
-	    }
-	} else if ((c == 'L') && (length > 0) &&
-	    (strncmp(suffix, "Left", length) == 0)) {
-	    switch (setPtr->side) {
-	    case SIDE_LEFT:
-		tabPtr = TabUp(setPtr);
-		break;
-
-	    case SIDE_RIGHT:
-		tabPtr = TabDown(setPtr);
-		break;
-
-	    case SIDE_BOTTOM:
-	    case SIDE_TOP:
-		tabPtr = TabLeft(setPtr, setPtr->focusPtr);
-		break;
-	    }
-	} else if ((c == 'R') && (length > 0) &&
-	    (strncmp(suffix, "Right", length) == 0)) {
-	    switch (setPtr->side) {
-	    case SIDE_LEFT:
-		tabPtr = TabDown(setPtr);
-		break;
-
-	    case SIDE_RIGHT:
-		tabPtr = TabUp(setPtr);
-		break;
-
-	    case SIDE_BOTTOM:
-	    case SIDE_TOP:
-		tabPtr = TabRight(setPtr, setPtr->focusPtr);
-		break;
-	    }
-	} else if ((c == 'E') && (length > 0) &&
-	    (strncmp(suffix, "End", length) == 0)) {
-	    item = Blt_ListLastItem(&(setPtr->tabList));
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-
-	} else {
-	    goto checkName;
+	tabPtr = Blt_ChainGetValue(linkPtr);
+    } else if ((c == 'a') && (strcmp(string, "active") == 0)) {
+	tabPtr = setPtr->activePtr;
+    } else if ((c == 'c') && (strcmp(string, "current") == 0)) {
+	tabPtr = (Tab *)Blt_GetCurrentItem(setPtr->bindTable);
+    } else if ((c == 's') && (strcmp(string, "select") == 0)) {
+	tabPtr = setPtr->selectPtr;
+    } else if ((c == 'f') && (strcmp(string, "focus") == 0)) {
+	tabPtr = setPtr->focusPtr;
+    } else if ((c == 'u') && (strcmp(string, "up") == 0)) {
+	switch (setPtr->side) {
+	case SIDE_LEFT:
+	case SIDE_RIGHT:
+	    tabPtr = TabLeft(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_BOTTOM:
+	    tabPtr = TabDown(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_TOP:
+	    tabPtr = TabUp(setPtr->focusPtr);
+	    break;
+	}
+    } else if ((c == 'd') && (strcmp(string, "down") == 0)) {
+	switch (setPtr->side) {
+	case SIDE_LEFT:
+	case SIDE_RIGHT:
+	    tabPtr = TabRight(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_BOTTOM:
+	    tabPtr = TabUp(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_TOP:
+	    tabPtr = TabDown(setPtr->focusPtr);
+	    break;
+	}
+    } else if ((c == 'l') && (strcmp(string, "left") == 0)) {
+	switch (setPtr->side) {
+	case SIDE_LEFT:
+	    tabPtr = TabUp(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_RIGHT:
+	    tabPtr = TabDown(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_BOTTOM:
+	case SIDE_TOP:
+	    tabPtr = TabLeft(setPtr->focusPtr);
+	    break;
+	}
+    } else if ((c == 'r') && (strcmp(string, "right") == 0)) {
+	switch (setPtr->side) {
+	case SIDE_LEFT:
+	    tabPtr = TabDown(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_RIGHT:
+	    tabPtr = TabUp(setPtr->focusPtr);
+	    break;
+	    
+	case SIDE_BOTTOM:
+	case SIDE_TOP:
+	    tabPtr = TabRight(setPtr->focusPtr);
+	    break;
+	}
+    } else if ((c == 'e') && (strcmp(string, "end") == 0)) {
+	linkPtr = Blt_ChainLastLink(setPtr->chainPtr);
+	if (linkPtr != NULL) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	}
     } else if (c == '@') {
 	int x, y;
 
-	if (Blt_GetXYPosition(setPtr->interp, setPtr->tkwin, string,
-		&x, &y) != TCL_OK) {
+	if (Blt_GetXY(setPtr->interp, setPtr->tkwin, string, &x, &y) 
+	    != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
+	tabPtr = PickTab(setPtr, x, y, NULL);
     } else {
-      checkName:
-	FindTab(setPtr, string, &tabPtr);
-    }
-    *tabPtrPtr = tabPtr;
-    Tcl_ResetResult(setPtr->interp);
-    return TCL_OK;
-}
-
-static int
-TabIndex(setPtr, string, tabPtrPtr)
-    Tabset *setPtr;
-    char *string;
-    Tab **tabPtrPtr;
-{
-    if (GetIndex(setPtr, string, tabPtrPtr) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    if (*tabPtrPtr == NULL) {
 	Tcl_AppendResult(setPtr->interp, "can't find tab \"", string,
 	    "\" in \"", Tk_PathName(setPtr->tkwin), "\"", (char *)NULL);
 	return TCL_ERROR;
     }
+    *tabPtrPtr = tabPtr;
+    Tcl_ResetResult(setPtr->interp);
+
+    if ((!allowNull) && (tabPtr == NULL)) {
+	Tcl_AppendResult(setPtr->interp, "can't find tab \"", string,
+	    "\" in \"", Tk_PathName(setPtr->tkwin), "\"", (char *)NULL);
+	return TCL_ERROR;
+    }	
     return TCL_OK;
 }
-
 
 static Tab *
 NextOrLastTab(tabPtr)
     Tab *tabPtr;
 {
-    Blt_ListItem item;
+    if (tabPtr->linkPtr != NULL) {
+	Blt_ChainLink *linkPtr;
 
-    item = Blt_ListNextItem(tabPtr->item);
-    if (item == NULL) {
-	item = Blt_ListPrevItem(tabPtr->item);
+	linkPtr = Blt_ChainNextLink(tabPtr->linkPtr);
+	if (linkPtr == NULL) {
+	    linkPtr = Blt_ChainPrevLink(tabPtr->linkPtr);
+	}
+	if (linkPtr != NULL) {
+	    return Blt_ChainGetValue(linkPtr);
+	}
     }
-    if (item == NULL) {
-	return NULL;
-    }
-    return (Tab *) Blt_ListGetValue(item);
+    return NULL;
 }
 
 /*
  * --------------------------------------------------------------
  *
- * SlaveEventProc --
+ * EmbeddedWidgetEventProc --
  *
  * 	This procedure is invoked by the Tk dispatcher for various
  * 	events on embedded widgets contained in the tabset.
@@ -1715,17 +1926,17 @@ NextOrLastTab(tabPtr)
  *	None.
  *
  * Side effects:
- *	When an embedded window gets deleted, internal structures get
+ *	When an embedded widget gets deleted, internal structures get
  *	cleaned up.  When it gets resized, the tabset is redisplayed.
  *
  * --------------------------------------------------------------
  */
 static void
-SlaveEventProc(clientData, eventPtr)
+EmbeddedWidgetEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about the tab window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Tab *tabPtr = (Tab *) clientData;
+    Tab *tabPtr = clientData;
 
     if ((tabPtr == NULL) || (tabPtr->tkwin == NULL)) {
 	return;
@@ -1753,7 +1964,7 @@ SlaveEventProc(clientData, eventPtr)
 	    EventuallyRedraw(tabPtr->setPtr);
 	}
 	Tk_DeleteEventHandler(tabPtr->tkwin, StructureNotifyMask,
-	    SlaveEventProc, (ClientData)tabPtr);
+	    EmbeddedWidgetEventProc, tabPtr);
 	tabPtr->tkwin = NULL;
 	break;
 
@@ -1763,7 +1974,7 @@ SlaveEventProc(clientData, eventPtr)
 /*
  * ----------------------------------------------------------------------
  *
- * SlaveCustodyProc --
+ * EmbeddedWidgetCustodyProc --
  *
  *	This procedure is invoked when a tab window has been
  *	stolen by another geometry manager.  The information and
@@ -1781,11 +1992,11 @@ SlaveEventProc(clientData, eventPtr)
  */
  /* ARGSUSED */
 static void
-SlaveCustodyProc(clientData, tkwin)
+EmbeddedWidgetCustodyProc(clientData, tkwin)
     ClientData clientData;	/* Information about the former tab window. */
     Tk_Window tkwin;		/* Not used. */
 {
-    Tab *tabPtr = (Tab *) clientData;
+    Tab *tabPtr = clientData;
     Tabset *setPtr;
 
     if ((tabPtr == NULL) || (tabPtr->tkwin == NULL)) {
@@ -1793,7 +2004,7 @@ SlaveCustodyProc(clientData, tkwin)
     }
     setPtr = tabPtr->setPtr;
     if (tabPtr->container != NULL) {
-	Tk_EventuallyFree((ClientData)tabPtr, DestroyTearoff);
+	Tcl_EventuallyFree(tabPtr, DestroyTearoff);
     }
     /*
      * Mark the tab as deleted by dereferencing the Tk window
@@ -1802,10 +2013,11 @@ SlaveCustodyProc(clientData, tkwin)
      */
     if (tabPtr->tkwin != NULL) {
 	if (Tk_IsMapped(tabPtr->tkwin) && (setPtr->selectPtr == tabPtr)) {
+	    setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
 	    EventuallyRedraw(setPtr);
 	}
 	Tk_DeleteEventHandler(tabPtr->tkwin, StructureNotifyMask,
-	    SlaveEventProc, (ClientData)tabPtr);
+	    EmbeddedWidgetEventProc, tabPtr);
 	tabPtr->tkwin = NULL;
     }
 }
@@ -1813,7 +2025,7 @@ SlaveCustodyProc(clientData, tkwin)
 /*
  * -------------------------------------------------------------------------
  *
- * SlaveGeometryProc --
+ * EmbeddedWidgetGeometryProc --
  *
  *	This procedure is invoked by Tk_GeometryRequest for tab
  *	windows managed by the widget.
@@ -1829,18 +2041,19 @@ SlaveCustodyProc(clientData, tkwin)
  */
  /* ARGSUSED */
 static void
-SlaveGeometryProc(clientData, tkwin)
+EmbeddedWidgetGeometryProc(clientData, tkwin)
     ClientData clientData;	/* Information about window that got new
 			         * preferred geometry.  */
     Tk_Window tkwin;		/* Other Tk-related information about the
 			         * window. */
 {
-    Tab *tabPtr = (Tab *) clientData;
+    Tab *tabPtr = clientData;
 
     if ((tabPtr == NULL) || (tabPtr->tkwin == NULL)) {
 	fprintf(stderr, "%s: line %d \"tkwin is null\"", __FILE__, __LINE__);
 	return;
     }
+    tabPtr->setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     EventuallyRedraw(tabPtr->setPtr);
 }
 
@@ -1856,15 +2069,18 @@ DestroyTab(setPtr, tabPtr)
     Tabset *setPtr;
     Tab *tabPtr;
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
     if (tabPtr->flags & TAB_REDRAW) {
-	Tk_CancelIdleCall(DisplayTearoff, (ClientData)tabPtr);
+	Tcl_CancelIdleCall(DisplayTearoff, tabPtr);
     }
     if (tabPtr->container != NULL) {
 	Tk_DestroyWindow(tabPtr->container);
     }
     if (tabPtr->tkwin != NULL) {
+	Tk_ManageGeometry(tabPtr->tkwin, (Tk_GeomMgr *)NULL, tabPtr);
+	Tk_DeleteEventHandler(tabPtr->tkwin, StructureNotifyMask, 
+		EmbeddedWidgetEventProc, tabPtr);
 	if (Tk_IsMapped(tabPtr->tkwin)) {
 	    Tk_UnmapWindow(tabPtr->tkwin);
 	}
@@ -1877,7 +2093,7 @@ DestroyTab(setPtr, tabPtr)
     }
     if (tabPtr == setPtr->focusPtr) {
 	setPtr->focusPtr = setPtr->selectPtr;
-	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
+	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr, NULL);
     }
     if (tabPtr == setPtr->startPtr) {
 	setPtr->startPtr = NULL;
@@ -1886,15 +2102,15 @@ DestroyTab(setPtr, tabPtr)
     if (tabPtr->text != NULL) {
 	Blt_FreeUid(tabPtr->text);
     }
-    hPtr = Tcl_FindHashEntry(&(setPtr->tabTable), tabPtr->nameId);
+    hPtr = Blt_FindHashEntry(&(setPtr->tabTable), tabPtr->name);
     assert(hPtr);
-    Tcl_DeleteHashEntry(hPtr);
+    Blt_DeleteHashEntry(&(setPtr->tabTable), hPtr);
 
     if (tabPtr->image != NULL) {
-	FreeImage(tabPtr->image);
+	FreeImage(setPtr, tabPtr->image);
     }
-    if (tabPtr->nameId != NULL) {
-	Blt_FreeUid(tabPtr->nameId);
+    if (tabPtr->name != NULL) {
+	Blt_Free(tabPtr->name);
     }
     if (tabPtr->textGC != NULL) {
 	Tk_FreeGC(setPtr->display, tabPtr->textGC);
@@ -1902,20 +2118,17 @@ DestroyTab(setPtr, tabPtr)
     if (tabPtr->backGC != NULL) {
 	Tk_FreeGC(setPtr->display, tabPtr->backGC);
     }
-    if (tabPtr->tileGC != NULL) {
-	Tk_FreeGC(setPtr->display, tabPtr->tileGC);
-    }
     if (tabPtr->command != NULL) {
 	Blt_FreeUid(tabPtr->command);
     }
-    if (tabPtr->item != NULL) {
-	Blt_ListDeleteItem(tabPtr->item);
+    if (tabPtr->linkPtr != NULL) {
+	Blt_ChainDeleteLink(setPtr->chainPtr, tabPtr->linkPtr);
     }
     if (tabPtr->tags != NULL) {
 	Blt_FreeUid(tabPtr->tags);
     }
-    Blt_DeleteAllBindings(setPtr->bindTable, (ClientData)tabPtr);
-    free((char *)tabPtr);
+    Blt_DeleteBindings(setPtr->bindTable, tabPtr);
+    Blt_Free(tabPtr);
 }
 
 /*
@@ -1937,70 +2150,21 @@ CreateTab(setPtr, name)
     char *name;
 {
     Tab *tabPtr;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     int isNew;
 
-    tabPtr = (Tab *) calloc(1, sizeof(Tab));
+    tabPtr = Blt_Calloc(1, sizeof(Tab));
     assert(tabPtr);
     tabPtr->setPtr = setPtr;
-    tabPtr->nameId = Blt_GetUid(name);
+    tabPtr->name = Blt_Strdup(name);
     tabPtr->text = Blt_GetUid(name);
     tabPtr->fill = FILL_NONE;
     tabPtr->anchor = TK_ANCHOR_CENTER;
     tabPtr->container = NULL;
     tabPtr->state = STATE_NORMAL;
-    tabPtr->index = -1;
-    hPtr = Tcl_CreateHashEntry(&(setPtr->tabTable), tabPtr->nameId, &isNew);
-    Tcl_SetHashValue(hPtr, (ClientData)tabPtr);
+    hPtr = Blt_CreateHashEntry(&(setPtr->tabTable), name, &isNew);
+    Blt_SetHashValue(hPtr, tabPtr);
     return tabPtr;
-}
-
-/*
- *--------------------------------------------------------------
- *
- * GetPosition --
- *
- *	Convert a string representing a position in the list of children
- *	to its numeric value.  A position index can be in one of
- *	the following forms.
- *
- * 	  number		- number of the item in the tab list, indexed
- *			  from zero.
- *	  "end"		- last position in the tab list.
- *
- * Results:
- *	A standard Tcl result.  If "string" is a valid index, then
- *	*indexPtr is filled with the corresponding numeric index.
- *	Otherwise an error message is left in interp->result.
- *
- * Side effects:
- *	None.
- *
- *--------------------------------------------------------------
- */
-static int
-GetPosition(interp, string, indexPtr)
-    Tcl_Interp *interp;		/* Interpreter to report results back to. */
-    char *string;		/* Numerical index into the tab list or "end"
-				 * to refer to last element. */
-    int *indexPtr;		/* Where to store converted relief. */
-{
-    if ((string[0] == 'e') && (strcmp(string, "end") == 0)) {
-	*indexPtr = POSITION_END;	/* Indicates last position in tab list. */
-    } else {
-	int position;
-
-	if (Tcl_GetInt(interp, string, &position) != TCL_OK) {
-	    return TCL_ERROR;
-	}
-	if (position < 0) {
-	    Tcl_AppendResult(interp, "bad position \"", string, "\"",
-		(char *)NULL);
-	    return TCL_ERROR;
-	}
-	*indexPtr = position;
-    }
-    return TCL_OK;
 }
 
 /*
@@ -2018,32 +2182,15 @@ GetPosition(interp, string, indexPtr)
  *
  *----------------------------------------------------------------------
  */
+/*ARGSUSED*/
 static void
 TileChangedProc(clientData, tile)
     ClientData clientData;
-    Blt_Tile tile;
+    Blt_Tile tile;		/* Not used. */
 {
-    Tabset *setPtr = (Tabset *) clientData;
+    Tabset *setPtr = clientData;
 
     if (setPtr->tkwin != NULL) {
-	GC newGC;
-	Pixmap pixmap;
-
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(tile);
-	if (pixmap != None) {
-	    unsigned long gcMask;
-	    XGCValues gcValues;
-
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(setPtr->tkwin, gcMask, &gcValues);
-	}
-	if (setPtr->tileGC != NULL) {
-	    Tk_FreeGC(setPtr->display, setPtr->tileGC);
-	}
-	setPtr->tileGC = newGC;
 	EventuallyRedraw(setPtr);
     }
 }
@@ -2063,43 +2210,39 @@ ConfigureTab(setPtr, tabPtr)
     font = GETATTR(tabPtr, font);
     labelWidth = labelHeight = 0;
     if (tabPtr->text != NULL) {
-	TextAttributes attr;
+	TextStyle ts;
+	double rotWidth, rotHeight;
 
-	Blt_InitTextAttributes(&attr);
-	attr.font = font;
-	attr.shadow.offset = tabPtr->shadow.offset;
-	Blt_GetTextExtents(&attr, tabPtr->text, &labelWidth, &labelHeight);
-	Blt_GetBoundingBox(labelWidth, labelHeight, setPtr->defAttrs.rotate,
-	    &labelWidth, &labelHeight, (XPoint *)NULL);
+	Blt_InitTextStyle(&ts);
+	ts.font = font;
+	ts.shadow.offset = tabPtr->shadow.offset;
+	ts.padX.side1 = ts.padX.side2 = 2;
+	Blt_GetTextExtents(&ts, tabPtr->text, &labelWidth, &labelHeight);
+	Blt_GetBoundingBox(labelWidth, labelHeight, setPtr->defTabStyle.rotate,
+	    &rotWidth, &rotHeight, (Point2D *)NULL);
+	labelWidth = ROUND(rotWidth);
+	labelHeight = ROUND(rotHeight);
     }
     tabPtr->textWidth = (short int)labelWidth;
     tabPtr->textHeight = (short int)labelHeight;
     if (tabPtr->image != NULL) {
-	if (setPtr->defAttrs.textSide & SIDE_VERTICAL) {
-	    labelWidth += ImageWidth(tabPtr->image);
-	    labelHeight = MAX(labelHeight, ImageHeight(tabPtr->image));
+	int width, height;
+
+	width = ImageWidth(tabPtr->image) + 2 * IMAGE_PAD;
+	height = ImageHeight(tabPtr->image) + 2 * IMAGE_PAD;
+	if (setPtr->defTabStyle.textSide & SIDE_VERTICAL) {
+	    labelWidth += width;
+	    labelHeight = MAX(labelHeight, height);
 	} else {
-	    labelHeight += ImageHeight(tabPtr->image);
-	    labelWidth = MAX(labelWidth, ImageWidth(tabPtr->image));
+	    labelHeight += height;
+	    labelWidth = MAX(labelWidth, width);
 	}
     }
     labelWidth += PADDING(tabPtr->iPadX);
     labelHeight += PADDING(tabPtr->iPadY);
 
-    tabPtr->labelWidth = labelWidth;
-    tabPtr->labelHeight = labelHeight;
-
-    /* Set the size of the tab from the label or image dimensions. */
-
-    if (setPtr->side & SIDE_VERTICAL) {
-	tabPtr->worldWidth = labelHeight;
-	tabPtr->worldHeight = labelWidth;
-    } else {
-	tabPtr->worldWidth = labelWidth;
-	tabPtr->worldHeight = labelHeight;
-    }
-    tabPtr->worldWidth += 2 * (setPtr->pageInset + LABEL_PADX);
-    tabPtr->worldHeight += 2 * (setPtr->pageInset + LABEL_PADY);
+    tabPtr->labelWidth = ODD(labelWidth);
+    tabPtr->labelHeight = ODD(labelHeight);
 
     newGC = NULL;
     if (tabPtr->text != NULL) {
@@ -2129,24 +2272,9 @@ ConfigureTab(setPtr, tabPtr)
     /*
      * GC for tiled background.
      */
-    newGC = NULL;
-    if (tabPtr->bgTile != NULL) {
-	Pixmap pixmap;
-
-	Blt_SetTileChangedProc(tabPtr->bgTile, TileChangedProc,
-	    (ClientData)setPtr);
-	pixmap = Blt_PixmapOfTile(tabPtr->bgTile);
-	if (pixmap != None) {
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(setPtr->tkwin, gcMask, &gcValues);
-	}
+    if (tabPtr->tile != NULL) {
+	Blt_SetTileChangedProc(tabPtr->tile, TileChangedProc, setPtr);
     }
-    if (tabPtr->tileGC != NULL) {
-	Tk_FreeGC(setPtr->display, tabPtr->tileGC);
-    }
-    tabPtr->tileGC = newGC;
     if (tabPtr->flags & TAB_VISIBLE) {
 	EventuallyRedraw(setPtr);
     }
@@ -2175,7 +2303,7 @@ TearoffEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about the tab window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Tab *tabPtr = (Tab *) clientData;
+    Tab *tabPtr = clientData;
 
     if ((tabPtr == NULL) || (tabPtr->tkwin == NULL) ||
 	(tabPtr->container == NULL)) {
@@ -2195,7 +2323,7 @@ TearoffEventProc(clientData, eventPtr)
     case DestroyNotify:
 	if (tabPtr->flags & TAB_REDRAW) {
 	    tabPtr->flags &= ~TAB_REDRAW;
-	    Tk_CancelIdleCall(DisplayTearoff, clientData);
+	    Tcl_CancelIdleCall(DisplayTearoff, clientData);
 	}
 	Tk_DestroyWindow(tabPtr->container);
 	tabPtr->container = NULL;
@@ -2231,6 +2359,9 @@ GetReqWidth(tabPtr)
     }
     width += PADDING(tabPtr->padX) +
 	2 * Tk_Changes(tabPtr->tkwin)->border_width;
+    if (width < 1) {
+	width = 1;
+    }
     return width;
 }
 
@@ -2258,8 +2389,11 @@ GetReqHeight(tabPtr)
     } else {
 	height = Tk_ReqHeight(tabPtr->tkwin);
     }
-    height += PADDING(tabPtr->padY) +
+    height += PADDING(tabPtr->padY) + 
 	2 * Tk_Changes(tabPtr->tkwin)->border_width;
+    if (height < 1) {
+	height = 1;
+    }
     return height;
 }
 
@@ -2331,7 +2465,7 @@ TranslateAnchor(dx, dy, anchor, xPtr, yPtr)
 
 
 static void
-GetWindowRegion(tabPtr, parent, tearoff, rectPtr)
+GetWindowRectangle(tabPtr, parent, tearoff, rectPtr)
     Tab *tabPtr;
     Tk_Window parent;
     int tearoff;
@@ -2340,30 +2474,32 @@ GetWindowRegion(tabPtr, parent, tearoff, rectPtr)
     int pad;
     Tabset *setPtr;
     int cavityWidth, cavityHeight;
-    int winWidth, winHeight;
+    int width, height;
     int dx, dy;
     int x, y;
 
     setPtr = tabPtr->setPtr;
-    pad = setPtr->inset + setPtr->pageInset;
+    pad = setPtr->inset + setPtr->inset2;
+
     if (!tearoff) {
 	switch (setPtr->side) {
 	case SIDE_RIGHT:
 	case SIDE_BOTTOM:
-	    x = (short)(setPtr->inset + setPtr->pageInset);
-	    y = (short)(setPtr->inset + setPtr->pageInset);
+	    x = setPtr->inset + setPtr->inset2;
+	    y = setPtr->inset + setPtr->inset2;
 	    break;
 
 	case SIDE_LEFT:
-	    x = (short)setPtr->pageTop;
-	    y = (short)(setPtr->inset + setPtr->pageInset);
+	    x = setPtr->pageTop;
+	    y = setPtr->inset + setPtr->inset2;
 	    break;
 
 	case SIDE_TOP:
-	    x = (short)(setPtr->inset + setPtr->pageInset);
-	    y = (short)setPtr->pageTop;
+	    x = setPtr->inset + setPtr->inset2;
+	    y = setPtr->pageTop;
 	    break;
 	}
+
 	if (setPtr->side & SIDE_VERTICAL) {
 	    cavityWidth = Tk_Width(setPtr->tkwin) - (setPtr->pageTop + pad);
 	    cavityHeight = Tk_Height(setPtr->tkwin) - (2 * pad);
@@ -2371,87 +2507,113 @@ GetWindowRegion(tabPtr, parent, tearoff, rectPtr)
 	    cavityWidth = Tk_Width(setPtr->tkwin) - (2 * pad);
 	    cavityHeight = Tk_Height(setPtr->tkwin) - (setPtr->pageTop + pad);
 	}
+
     } else {
-	x = setPtr->inset + setPtr->pageInset;
+	x = setPtr->inset + setPtr->inset2;
 #define TEAR_OFF_TAB_SIZE	5
-	y = setPtr->inset + setPtr->pageInset + setPtr->yPad +
-	    OUTER_PAD + TEAR_OFF_TAB_SIZE;
+	y = setPtr->inset + setPtr->inset2 + setPtr->yPad + setPtr->outerPad +
+	    TEAR_OFF_TAB_SIZE;
 	cavityWidth = Tk_Width(parent) - (2 * pad);
 	cavityHeight = Tk_Height(parent) - (y + pad);
     }
-    winWidth = GetReqWidth(tabPtr);
-    winHeight = GetReqHeight(tabPtr);
+    cavityWidth -= PADDING(tabPtr->padX);
+    cavityHeight -= PADDING(tabPtr->padY);
+    if (cavityWidth < 1) {
+	cavityWidth = 1;
+    }
+    if (cavityHeight < 1) {
+	cavityHeight = 1;
+    }
+    width = GetReqWidth(tabPtr);
+    height = GetReqHeight(tabPtr);
 
     /*
-     * Always fill the window if its inside the tearoff.
+     * Resize the embedded window is of the following is true:
+     *
+     *	1) It's been torn off.
+     *  2) The -fill option (horizontal or vertical) is set.
+     *  3) the window is bigger than the cavity.
      */
-    if ((parent != setPtr->tkwin) || (cavityWidth < winWidth) ||
-	(tabPtr->fill & FILL_X)) {
-	winWidth = cavityWidth;
+    if ((tearoff) || (cavityWidth < width) || (tabPtr->fill & FILL_X)) {
+	width = cavityWidth;
     }
-    if ((parent != setPtr->tkwin) || (cavityHeight < winHeight) ||
-	(tabPtr->fill & FILL_Y)) {
-	winHeight = cavityHeight;
+    if ((tearoff) || (cavityHeight < height) || (tabPtr->fill & FILL_Y)) {
+	height = cavityHeight;
     }
-    dx = (cavityWidth - winWidth);
-    dy = (cavityHeight - winHeight);
+    dx = (cavityWidth - width);
+    dy = (cavityHeight - height);
     if ((dx > 0) || (dy > 0)) {
 	TranslateAnchor(dx, dy, tabPtr->anchor, &x, &y);
     }
-    rectPtr->x = x + tabPtr->padLeft;
-    rectPtr->y = y + tabPtr->padTop;
-    rectPtr->width = winWidth - PADDING(tabPtr->padX);
-    rectPtr->height = winHeight - PADDING(tabPtr->padY);
+    /* Remember that X11 windows must be at least 1 pixel. */
+    if (width < 1) {
+	width = 1;
+    }
+    if (height < 1) {
+	height = 1;
+    }
+    rectPtr->x = (short)(x + tabPtr->padLeft);
+    rectPtr->y = (short)(y + tabPtr->padTop);
+    rectPtr->width = (short)width;
+    rectPtr->height = (short)height;
 }
 
 static void
-ArrangeWindow(tkwin, regionPtr, force)
+ArrangeWindow(tkwin, rectPtr, force)
     Tk_Window tkwin;
-    XRectangle *regionPtr;
+    XRectangle *rectPtr;
     int force;
 {
     if ((force) ||
-	(regionPtr->x != Tk_X(tkwin)) ||
-	(regionPtr->y != Tk_Y(tkwin)) ||
-	(regionPtr->width != Tk_Width(tkwin)) ||
-	(regionPtr->height != Tk_Height(tkwin))) {
-	Tk_MoveResizeWindow(tkwin, regionPtr->x, regionPtr->y, regionPtr->width,
-	    regionPtr->height);
+	(rectPtr->x != Tk_X(tkwin)) || 
+	(rectPtr->y != Tk_Y(tkwin)) ||
+	(rectPtr->width != Tk_Width(tkwin)) ||
+	(rectPtr->height != Tk_Height(tkwin))) {
+	Tk_MoveResizeWindow(tkwin, rectPtr->x, rectPtr->y, rectPtr->width,
+	    rectPtr->height);
     }
     if (!Tk_IsMapped(tkwin)) {
 	Tk_MapWindow(tkwin);
     }
 }
-
+
+
 /*ARGSUSED*/
 static void
-GetTags(table, object, tagArr, numTagsPtr)
-    BindTable table;
+GetTags(table, object, context, list)
+    Blt_BindTable table;
     ClientData object;
-    ClientData tagArr[];
-    int *numTagsPtr;
+    ClientData context;		/* Not used. */
+    Blt_List list;
 {
-    Tab *tabPtr = (Tab *) object;
+    Tab *tabPtr = (Tab *)object;
     Tabset *setPtr;
-    int numTags;
 
-    setPtr = (Tabset *) table->clientData;
-    tagArr[0] = (ClientData)Tk_GetUid(tabPtr->nameId);
-    numTags = 1;
-    if (tabPtr->tags != NULL) {
-	int numNames;
-	char **nameArr;
-	register char **p;
-
-	if (Tcl_SplitList(tabPtr->setPtr->interp, tabPtr->tags, &numNames,
-		&nameArr) == TCL_OK) {
-	    for (p = nameArr; (*p != NULL) && (numTags < 10); p++, numTags++) {
-		tagArr[numTags] = (ClientData)Tk_GetUid((ClientData)*p);
+    setPtr = (Tabset *)table->clientData;
+    if (context == TAB_PERFORATION) {
+	Blt_ListAppend(list, MakeTag(setPtr, "Perforation"), 0);
+    } else if (context == TAB_LABEL) {
+	Blt_ListAppend(list, MakeTag(setPtr, tabPtr->name), 0);
+	if (tabPtr->tags != NULL) {
+	    int nNames;
+	    char **names;
+	    register char **p;
+	    
+	    /* 
+	     * This is a space/time trade-off in favor of space.  The tags
+	     * are stored as character strings in a hash table.  That way,
+	     * tabs can share the strings. It's likely that they will.  The
+	     * down side is that the same string is split over an over again. 
+	     */
+	    if (Tcl_SplitList((Tcl_Interp *)NULL, tabPtr->tags, &nNames, 
+		      &names) == TCL_OK) {
+		for (p = names; *p != NULL; p++) {
+		    Blt_ListAppend(list, MakeTag(setPtr, *p), 0);
+		}
+		Blt_Free(names);
 	    }
-	    free((char *)nameArr);
 	}
     }
-    *numTagsPtr = numTags;
 }
 
 /*
@@ -2476,7 +2638,7 @@ TabsetEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Tabset *setPtr = (Tabset *) clientData;
+    Tabset *setPtr = clientData;
 
     switch (eventPtr->type) {
     case Expose:
@@ -2504,20 +2666,13 @@ TabsetEventProc(clientData, eventPtr)
 
     case DestroyNotify:
 	if (setPtr->tkwin != NULL) {
-	    char *cmdName;
-
-	    cmdName = Tcl_GetCommandName(setPtr->interp,
-		setPtr->cmdToken);
-#ifdef ITCL_NAMESPACES
-	    Itk_SetWidgetCommand(setPtr->tkwin, (Tcl_Command) NULL);
-#endif /* ITCL_NAMESPACES */
-	    Tcl_DeleteCommand(setPtr->interp, cmdName);
 	    setPtr->tkwin = NULL;
+	    Tcl_DeleteCommandFromToken(setPtr->interp, setPtr->cmdToken);
 	}
 	if (setPtr->flags & TABSET_REDRAW) {
-	    Tk_CancelIdleCall(DisplayTabset, (ClientData)setPtr);
+	    Tcl_CancelIdleCall(DisplayTabset, setPtr);
 	}
-	Tk_EventuallyFree((ClientData)setPtr, DestroyTabset);
+	Tcl_EventuallyFree(setPtr, DestroyTabset);
 	break;
 
     }
@@ -2528,7 +2683,7 @@ TabsetEventProc(clientData, eventPtr)
  *
  * DestroyTabset --
  *
- * 	This procedure is invoked by Tk_EventuallyFree or Tk_Release
+ * 	This procedure is invoked by Tcl_EventuallyFree or Tcl_Release
  * 	to clean up the internal structure of the widget at a safe
  * 	time (when no-one is using it anymore).
  *
@@ -2544,33 +2699,31 @@ static void
 DestroyTabset(dataPtr)
     DestroyData dataPtr;	/* Pointer to the widget record. */
 {
-    Tabset *setPtr = (Tabset *) dataPtr;
+    Tabset *setPtr = (Tabset *)dataPtr;
     Tab *tabPtr;
-    register Blt_ListItem item, nextItem;
+    Blt_ChainLink *linkPtr;
 
-    if (setPtr->tileGC != NULL) {
-	Tk_FreeGC(setPtr->display, setPtr->tileGC);
-    }
     if (setPtr->highlightGC != NULL) {
 	Tk_FreeGC(setPtr->display, setPtr->highlightGC);
     }
-    if (setPtr->bgTile != NULL) {
-	Blt_FreeTile(setPtr->bgTile);
+    if (setPtr->tile != NULL) {
+	Blt_FreeTile(setPtr->tile);
     }
-    if (setPtr->defAttrs.activeGC != NULL) {
-	Blt_FreePrivateGC(setPtr->display, setPtr->defAttrs.activeGC);
+    if (setPtr->defTabStyle.activeGC != NULL) {
+	Blt_FreePrivateGC(setPtr->display, setPtr->defTabStyle.activeGC);
     }
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	/*empty*/ ) {
-	nextItem = Blt_ListNextItem(item);
-	tabPtr = (Tab *) Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
+	tabPtr->linkPtr = NULL;
 	DestroyTab(setPtr, tabPtr);
-	item = nextItem;
     }
+    Blt_ChainDestroy(setPtr->chainPtr);
     Blt_DestroyBindingTable(setPtr->bindTable);
-    Tcl_DeleteHashTable(&(setPtr->tabTable));
+    Blt_DeleteHashTable(&(setPtr->tabTable));
+    Blt_DeleteHashTable(&(setPtr->tagTable));
     Tk_FreeOptions(configSpecs, (char *)setPtr, setPtr->display, 0);
-    free((char *)setPtr);
+    Blt_Free(setPtr);
 }
 
 /*
@@ -2587,7 +2740,7 @@ CreateTabset(interp, tkwin)
 {
     Tabset *setPtr;
 
-    setPtr = (Tabset *) calloc(1, sizeof(Tabset));
+    setPtr = Blt_Calloc(1, sizeof(Tabset));
     assert(setPtr);
 
     Tk_SetClass(tkwin, "Tabset");
@@ -2598,19 +2751,29 @@ CreateTabset(interp, tkwin)
     setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     setPtr->side = SIDE_TOP;
     setPtr->borderWidth = setPtr->highlightWidth = 2;
-    setPtr->selectPad = SELECT_PAD;
+    setPtr->ySelectPad = SELECT_PADY;
+    setPtr->xSelectPad = SELECT_PADX;
     setPtr->relief = TK_RELIEF_SUNKEN;
-    setPtr->defAttrs.relief = TK_RELIEF_RAISED;
-    setPtr->defAttrs.borderWidth = 2;
-    setPtr->defAttrs.textSide = SIDE_LEFT;
+    setPtr->defTabStyle.relief = TK_RELIEF_RAISED;
+    setPtr->defTabStyle.borderWidth = 1;
+    setPtr->defTabStyle.constWidth = TRUE;
+    setPtr->defTabStyle.textSide = SIDE_LEFT;
     setPtr->scrollUnits = 2;
     setPtr->corner = CORNER_OFFSET;
     setPtr->gap = GAP;
-    setPtr->bindTable = Blt_CreateBindingTable(interp, tkwin, (ClientData)setPtr,
-	PickTab, GetTags);
-    Blt_InitList(&(setPtr->tabList), TCL_ONE_WORD_KEYS);
-    Tcl_InitHashTable(&(setPtr->tabTable), TCL_ONE_WORD_KEYS);
-    Tcl_InitHashTable(&(setPtr->imageTable), TCL_STRING_KEYS);
+    setPtr->outerPad = OUTER_PAD;
+    setPtr->slant = SLANT_NONE;
+    setPtr->overlap = 0;
+    setPtr->tearoff = TRUE;
+    setPtr->bindTable = Blt_CreateBindingTable(interp, tkwin, setPtr, PickTab, 
+	GetTags);
+    setPtr->chainPtr = Blt_ChainCreate();
+    Blt_InitHashTable(&(setPtr->tabTable), BLT_STRING_KEYS);
+    Blt_InitHashTable(&(setPtr->imageTable), BLT_STRING_KEYS);
+    Blt_InitHashTable(&(setPtr->tagTable), BLT_STRING_KEYS);
+#if (TK_MAJOR_VERSION > 4)
+    Blt_SetWindowInstanceData(tkwin, setPtr);
+#endif
     return setPtr;
 }
 
@@ -2653,8 +2816,8 @@ ConfigureTabset(interp, setPtr, argc, argv, flags)
 	    (char *)setPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (Blt_ConfigModified(configSpecs, "-width", "-height", "-side",
-	    (char *)NULL)) {
+    if (Blt_ConfigModified(configSpecs, "-width", "-height", "-side", "-gap",
+	    "-slant", (char *)NULL)) {
 	setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     }
     if ((setPtr->reqHeight > 0) && (setPtr->reqWidth > 0)) {
@@ -2674,183 +2837,50 @@ ConfigureTabset(interp, setPtr, argc, argv, flags)
     /*
      * GC for tiled background.
      */
-    newGC = NULL;
-    if (setPtr->bgTile != NULL) {
-	Pixmap pixmap;
-
-	Blt_SetTileChangedProc(setPtr->bgTile, TileChangedProc,
-	    (ClientData)setPtr);
-	pixmap = Blt_PixmapOfTile(setPtr->bgTile);
-	if (pixmap != None) {
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(setPtr->tkwin, gcMask, &gcValues);
-	}
+    if (setPtr->tile != NULL) {
+	Blt_SetTileChangedProc(setPtr->tile, TileChangedProc, setPtr);
     }
-    if (setPtr->tileGC != NULL) {
-	Tk_FreeGC(setPtr->display, setPtr->tileGC);
-    }
-    setPtr->tileGC = newGC;
-
     /*
      * GC for active line.
      */
     gcMask = GCForeground | GCLineWidth | GCLineStyle | GCCapStyle;
-    gcValues.foreground = setPtr->defAttrs.activeFgColor->pixel;
+    gcValues.foreground = setPtr->defTabStyle.activeFgColor->pixel;
     gcValues.line_width = 0;
     gcValues.cap_style = CapProjecting;
-    gcValues.line_style = (setPtr->defAttrs.dashes.numValues > 0)
+    gcValues.line_style = (LineIsDashed(setPtr->defTabStyle.dashes))
 	? LineOnOffDash : LineSolid;
 
     newGC = Blt_GetPrivateGC(setPtr->tkwin, gcMask, &gcValues);
-    if (setPtr->defAttrs.dashes.numValues > 0) {
-	setPtr->defAttrs.dashes.offset = 2;
-	Blt_SetDashes(setPtr->display, newGC, &(setPtr->defAttrs.dashes));
+    if (LineIsDashed(setPtr->defTabStyle.dashes)) {
+	setPtr->defTabStyle.dashes.offset = 2;
+	Blt_SetDashes(setPtr->display, newGC, &(setPtr->defTabStyle.dashes));
     }
-    if (setPtr->defAttrs.activeGC != NULL) {
-	Blt_FreePrivateGC(setPtr->display, setPtr->defAttrs.activeGC);
+    if (setPtr->defTabStyle.activeGC != NULL) {
+	Blt_FreePrivateGC(setPtr->display, setPtr->defTabStyle.activeGC);
     }
-    setPtr->defAttrs.activeGC = newGC;
+    setPtr->defTabStyle.activeGC = newGC;
 
-    setPtr->defAttrs.rotate = FMOD(setPtr->defAttrs.rotate, 360.0);
-    if (setPtr->defAttrs.rotate < 0.0) {
-	setPtr->defAttrs.rotate += 360.0;
+    setPtr->defTabStyle.rotate = FMOD(setPtr->defTabStyle.rotate, 360.0);
+    if (setPtr->defTabStyle.rotate < 0.0) {
+	setPtr->defTabStyle.rotate += 360.0;
     }
-    setPtr->inset = setPtr->highlightWidth + setPtr->borderWidth + OUTER_PAD;
+    setPtr->inset = setPtr->highlightWidth + setPtr->borderWidth +
+	setPtr->outerPad;
     if (Blt_ConfigModified(configSpecs, "-font", "-*foreground", "-rotate",
 	    "-*background", "-side", (char *)NULL)) {
-	register Blt_ListItem item;
+	Blt_ChainLink *linkPtr;
 	Tab *tabPtr;
 
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    ConfigureTab(setPtr, tabPtr);
 	}
 	setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     }
-    if (setPtr->scrollUnits < 1) {
-	setPtr->scrollUnits = 1;
-    }
-    setPtr->pageInset = setPtr->defAttrs.borderWidth + setPtr->corner;
+    setPtr->inset2 = setPtr->defTabStyle.borderWidth + setPtr->corner;
     EventuallyRedraw(setPtr);
     return TCL_OK;
-}
-
-/*
- * ------------------------------------------------------------------------
- *
- * TabsetCmd --
- *
- * 	This procedure is invoked to process the Tcl command that
- * 	corresponds to a widget managed by this module. See the user
- * 	documentation for details on what it does.
- *
- * Results:
- *	A standard Tcl result.
- *
- * Side Effects:
- *	See the user documentation.
- *
- * -----------------------------------------------------------------------
- */
-/* ARGSUSED */
-static int
-TabsetCmd(clientData, interp, argc, argv)
-    ClientData clientData;	/* Main window associated with interpreter. */
-    Tcl_Interp *interp;		/* Current interpreter. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings. */
-{
-    Tabset *setPtr;
-    Tk_Window tkwin;
-    static int initialized = FALSE;
-    unsigned int mask;
-
-    if (!initialized) {
-	static char initCmd[] =
-	{"\n\
-set file [file join $blt_library bltTabset.tcl]\n\
-if { [file readable $file] } {\n\
-    source $file\n\
-} \n"
-	};
-	if (Tcl_GlobalEval(interp, initCmd) != TCL_OK) {
-	    Tcl_AddErrorInfo(interp,
-		"\n    (while loading bindings for blt::tabset)");
-	    return TCL_ERROR;
-	}
-	initialized = TRUE;
-    }
-    if (argc < 2) {
-	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
-	    " pathName ?option value?...\"", (char *)NULL);
-	return TCL_ERROR;
-    }
-    tkwin = (Tk_Window)clientData;
-    tkwin = Tk_CreateWindowFromPath(interp, tkwin, argv[1], (char *)NULL);
-    if (tkwin == NULL) {
-	return TCL_ERROR;
-    }
-    setPtr = CreateTabset(interp, tkwin);
-    if (ConfigureTabset(interp, setPtr, argc - 2, argv + 2, 0) != TCL_OK) {
-	Tk_DestroyWindow(setPtr->tkwin);
-	return TCL_ERROR;
-    }
-    mask = (ExposureMask | StructureNotifyMask | FocusChangeMask);
-    Tk_CreateEventHandler(tkwin, mask, TabsetEventProc, (ClientData)setPtr);
-    setPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], TabsetInstCmd,
-	(ClientData)setPtr, TabsetInstDeletedCmd);
-#ifdef ITCL_NAMESPACES
-    Itk_SetWidgetCommand(setPtr->tkwin, setPtr->cmdToken);
-#endif
-    /*
-     * Try to invoke a procedure to initialize various bindings on tabs.
-     * This can fail if the initialization file wasn't sourced above.
-     * We silently ignore any errors.
-     */
-    Tcl_VarEval(interp, "blt::InitTabBindings ", argv[1], (char *)NULL);
-    Tcl_SetResult(interp, Tk_PathName(setPtr->tkwin), TCL_STATIC);
-    return TCL_OK;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * TabsetInstDeletedCmd --
- *
- *	This procedure can be called if the window was destroyed
- *	(tkwin will be NULL) and the command was deleted
- *	automatically.  In this case, we need to do nothing.
- *
- *	Otherwise this routine was called because the command was
- *	deleted.  Then we need to clean-up and destroy the widget.
- *
- * Results:
- *	None.
- *
- * Side Effects:
- *	The widget is destroyed.
- *
- *----------------------------------------------------------------------
- */
-static void
-TabsetInstDeletedCmd(clientData)
-    ClientData clientData;	/* Pointer to widget record for widget. */
-{
-    Tabset *setPtr = (Tabset *) clientData;
-
-    if (setPtr->tkwin != NULL) {
-	Tk_Window tkwin;
-
-	tkwin = setPtr->tkwin;
-	setPtr->tkwin = NULL;
-	Tk_DestroyWindow(tkwin);
-#ifdef ITCL_NAMESPACES
-	Itk_SetWidgetCommand(tkwin, (Tcl_Command) NULL);
-#endif /* ITCL_NAMESPACES */
-    }
 }
 
 /*
@@ -2882,14 +2912,13 @@ ActivateOp(setPtr, interp, argc, argv)
 
     if (argv[2][0] == '\0') {
 	tabPtr = NULL;
-    } else if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    } else if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_OK) != TCL_OK) {
 	return TCL_ERROR;
     }
     if ((tabPtr != NULL) && (tabPtr->state == STATE_DISABLED)) {
 	tabPtr = NULL;
     }
     oldPtr = setPtr->activePtr;
-
 
     setPtr->activePtr = tabPtr;
     drawable = Tk_WindowId(setPtr->tkwin);
@@ -2899,11 +2928,11 @@ ActivateOp(setPtr, interp, argc, argv)
 	selPtr = setPtr->selectPtr;
 	redraw = FALSE;
 	if (oldPtr != NULL) {
-	    if ((oldPtr == TabLeft(setPtr, setPtr->selectPtr)) ||
-		(oldPtr == TabRight(setPtr, setPtr->selectPtr))) {
+	    if ((selPtr != NULL) && 
+		((oldPtr == TabLeft(selPtr)) || (oldPtr == TabRight(selPtr)))) {
 		redraw = TRUE;
 	    }
-	    if ((oldPtr->tier == 2) &&
+	    if ((selPtr != NULL) && (oldPtr->tier == 2) &&
 		(oldPtr->worldX + oldPtr->worldWidth) >= (selPtr->worldX) &&
 		(oldPtr->worldX < (selPtr->worldX + selPtr->worldWidth))) {
 		redraw = TRUE;
@@ -2912,11 +2941,11 @@ ActivateOp(setPtr, interp, argc, argv)
 	    }
 	}
 	if ((tabPtr != NULL) && (!redraw)) {
-	    if ((tabPtr == TabLeft(setPtr, setPtr->selectPtr)) ||
-		(tabPtr == TabRight(setPtr, setPtr->selectPtr))) {
+	    if ((selPtr != NULL) && 
+		((tabPtr == TabLeft(selPtr)) || (tabPtr == TabRight(selPtr)))) {
 		redraw = TRUE;
 	    }
-	    if ((tabPtr->tier == 2) &&
+	    if ((selPtr != NULL) && (tabPtr->tier == 2) &&
 		(tabPtr->worldX + tabPtr->worldWidth) >= (selPtr->worldX) &&
 		(tabPtr->worldX < (selPtr->worldX + selPtr->worldWidth))) {
 		redraw = TRUE;
@@ -2946,11 +2975,23 @@ static int
 BindOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
-    return Blt_ConfigureBindings(interp, setPtr->bindTable, Tk_GetUid(argv[2]),
-	argc - 3, argv + 3);
+    if (argc == 2) {
+	Blt_HashEntry *hPtr;
+	Blt_HashSearch cursor;
+	char *tagName;
+
+	for (hPtr = Blt_FirstHashEntry(&(setPtr->tagTable), &cursor);
+	    hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	    tagName = Blt_GetHashKey(&(setPtr->tagTable), hPtr);
+	    Tcl_AppendElement(interp, tagName);
+	}
+	return TCL_OK;
+    }
+    return Blt_ConfigureBindings(interp, setPtr->bindTable,
+	MakeTag(setPtr, argv[2]), argc - 3, argv + 3);
 }
 
 /*
@@ -2965,7 +3006,7 @@ static int
 CgetOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     tabSet = setPtr;
@@ -3031,30 +3072,31 @@ static int
 DeleteOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     Tab *firstPtr, *lastPtr;
 
     lastPtr = NULL;
-    if (TabIndex(setPtr, argv[2], &firstPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &firstPtr, INVALID_FAIL) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if ((argc == 4) && (TabIndex(setPtr, argv[3], &lastPtr) != TCL_OK)) {
+    if ((argc == 4) && 
+	(GetTabByIndex(setPtr, argv[3], &lastPtr, INVALID_FAIL) != TCL_OK)) {
 	return TCL_ERROR;
     }
     if (lastPtr == NULL) {
 	DestroyTab(setPtr, firstPtr);
     } else {
 	Tab *tabPtr;
-	register Blt_ListItem item, nextItem;
+	Blt_ChainLink *linkPtr, *nextLinkPtr;
 
 	tabPtr = NULL;		/* Suppress compiler warning. */
 
 	/* Make sure that the first tab is before the last. */
-	for (item = firstPtr->item; item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	for (linkPtr = firstPtr->linkPtr; linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    if (tabPtr == lastPtr) {
 		break;
 	    }
@@ -3062,12 +3104,12 @@ DeleteOp(setPtr, interp, argc, argv)
 	if (tabPtr != lastPtr) {
 	    return TCL_OK;
 	}
-	item = firstPtr->item;
-	while (item != NULL) {
-	    nextItem = Blt_ListNextItem(item);
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	linkPtr = firstPtr->linkPtr;
+	while (linkPtr != NULL) {
+	    nextLinkPtr = Blt_ChainNextLink(linkPtr);
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    DestroyTab(setPtr, tabPtr);
-	    item = nextItem;
+	    linkPtr = nextLinkPtr;
 	    if (tabPtr == lastPtr) {
 		break;
 	    }
@@ -3097,15 +3139,12 @@ FocusOp(setPtr, interp, argc, argv)
 {
     Tab *tabPtr;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_FAIL) != TCL_OK) {
 	return TCL_ERROR;
-    }
-    if ((tabPtr != NULL) && (tabPtr->state == STATE_DISABLED)) {
-	tabPtr = NULL;
     }
     if (tabPtr != NULL) {
 	setPtr->focusPtr = tabPtr;
-	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
+	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr, NULL);
 	EventuallyRedraw(setPtr);
     }
     return TCL_OK;
@@ -3130,18 +3169,41 @@ static int
 IndexOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			
     char **argv;
 {
     Tab *tabPtr;
+    int search;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
-	return TCL_ERROR;
+#define SEARCH_NAMES	1
+#define SEARCH_INDICES	2
+    search = SEARCH_INDICES;
+    if (argc == 4) {
+	if (strcmp(argv[2], "-index") == 0) {
+	    search = SEARCH_INDICES;
+	} else if (strcmp(argv[2], "-name") == 0) {
+	    search = SEARCH_NAMES;
+	} else {
+	    Tcl_AppendResult(interp, "bad switch \"", argv[2], 
+		     "\": should be \"-index\" or \"-name\"", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	argv++;
+    }
+    if (search == SEARCH_INDICES) {
+	if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_OK) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+    } else {
+	if (GetTabByName(setPtr, argv[2], &tabPtr) != TCL_OK) {
+	    return TCL_ERROR;
+	}
     }
     if (tabPtr == NULL) {
 	Tcl_SetResult(interp, "", TCL_STATIC);
     } else {
-	Tcl_SetResult(interp, Blt_Int(tabPtr->index), TCL_VOLATILE);
+	Tcl_SetResult(interp, Blt_Itoa(TabIndex(setPtr, tabPtr)), 
+		TCL_VOLATILE);
     }
     return TCL_OK;
 }
@@ -3165,18 +3227,18 @@ static int
 GetOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     Tab *tabPtr;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_OK) != TCL_OK) {
 	return TCL_ERROR;
     }
     if (tabPtr == NULL) {
 	Tcl_SetResult(interp, "", TCL_STATIC);
     } else {
-	Tcl_SetResult(interp, tabPtr->nameId, TCL_VOLATILE);
+	Tcl_SetResult(interp, tabPtr->name, TCL_VOLATILE);
     }
     return TCL_OK;
 }
@@ -3197,32 +3259,46 @@ static int
 InsertOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     Tab *tabPtr;
-    int position;
     register int i;
     char **options;
-    Blt_ListItem item, beforeItem;
-    Blt_List *listPtr;
+    Blt_ChainLink *linkPtr, *beforeLinkPtr;
     int start, count;
+    char c;
 
-    if (GetPosition(setPtr->interp, argv[2], &position) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    listPtr = &(setPtr->tabList);
-    if ((position == POSITION_END) ||
-	(position >= Blt_ListGetLength(listPtr))) {
-	beforeItem = NULL;
+    c = argv[2][0];
+    if ((c == 'e') && (strcmp(argv[2], "end") == 0)) {
+	beforeLinkPtr = NULL;
+    } else if (isdigit(UCHAR(c))) {
+	int position;
+
+	if (Tcl_GetInt(interp, argv[2], &position) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (position < 0) {
+	    beforeLinkPtr = Blt_ChainFirstLink(setPtr->chainPtr);
+	} else if (position > Blt_ChainGetLength(setPtr->chainPtr)) {
+	    beforeLinkPtr = NULL;
+	} else {
+	    beforeLinkPtr = Blt_ChainGetNthLink(setPtr->chainPtr, position);
+	}
     } else {
-	beforeItem = Blt_ListFindNthItem(listPtr, position, 1);
+	Tab *beforePtr;
+
+	if (GetTabByIndex(setPtr, argv[2], &beforePtr, INVALID_FAIL) 
+	    != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	beforeLinkPtr = beforePtr->linkPtr;
     }
     tabSet = setPtr;
     setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     EventuallyRedraw(setPtr);
     for (i = 3; i < argc; /*empty*/ ) {
-	if (FindTab(setPtr, argv[i], &tabPtr) == TCL_OK) {
+	if (TabExists(setPtr, argv[i])) {
 	    Tcl_AppendResult(setPtr->interp, "tab \"", argv[i],
 		"\" already exists in \"", Tk_PathName(setPtr->tkwin), "\"",
 		(char *)NULL);
@@ -3246,8 +3322,9 @@ InsertOp(setPtr, interp, argc, argv)
 	}
 	count = i - start;
 	options = argv + start;
-	if (Blt_ConfigureWidgetComponent(interp, setPtr->tkwin, tabPtr->nameId,
-		"Tab", tabConfigSpecs, count, options, (char *)tabPtr, 0) != TCL_OK) {
+	if (Blt_ConfigureWidgetComponent(interp, setPtr->tkwin, tabPtr->name,
+		"Tab", tabConfigSpecs, count, options, (char *)tabPtr, 0)
+	    != TCL_OK) {
 	    DestroyTab(setPtr, tabPtr);
 	    return TCL_ERROR;
 	}
@@ -3255,36 +3332,35 @@ InsertOp(setPtr, interp, argc, argv)
 	    DestroyTab(setPtr, tabPtr);
 	    return TCL_ERROR;
 	}
-	item = Blt_ListNewItem(listPtr, tabPtr->nameId);
-	if (beforeItem == NULL) {
-	    Blt_ListAppendItem(listPtr, item);
+	linkPtr = Blt_ChainNewLink();
+	if (beforeLinkPtr == NULL) {
+	    Blt_ChainAppendLink(setPtr->chainPtr, linkPtr);
 	} else {
-	    Blt_ListLinkBefore(listPtr, item, beforeItem);
+	    Blt_ChainLinkBefore(setPtr->chainPtr, linkPtr, beforeLinkPtr);
 	}
-	tabPtr->index = Blt_ListGetLength(&(setPtr->tabList));
-	tabPtr->item = item;
-	Blt_ListSetValue(item, (ClientData)tabPtr);
+	tabPtr->linkPtr = linkPtr;
+	Blt_ChainSetValue(linkPtr, tabPtr);
     }
     return TCL_OK;
+
 }
 
 /*
  * Preprocess the command string for percent substitution.
  */
 static void
-PercentSubst(setPtr, tabPtr, command, cmdStrPtr)
+PercentSubst(setPtr, tabPtr, command, resultPtr)
     Tabset *setPtr;
     Tab *tabPtr;
     char *command;
-    Tcl_DString *cmdStrPtr;
+    Tcl_DString *resultPtr;
 {
     register char *last, *p;
-
     /*
      * Get the full path name of the node, in case we need to
      * substitute for it.
      */
-    Tcl_DStringInit(cmdStrPtr);
+    Tcl_DStringInit(resultPtr);
     for (last = p = command; *p != '\0'; p++) {
 	if (*p == '%') {
 	    char *string;
@@ -3292,7 +3368,7 @@ PercentSubst(setPtr, tabPtr, command, cmdStrPtr)
 
 	    if (p > last) {
 		*p = '\0';
-		Tcl_DStringAppend(cmdStrPtr, last, -1);
+		Tcl_DStringAppend(resultPtr, last, -1);
 		*p = '%';
 	    }
 	    switch (*(p + 1)) {
@@ -3303,10 +3379,10 @@ PercentSubst(setPtr, tabPtr, command, cmdStrPtr)
 		string = Tk_PathName(setPtr->tkwin);
 		break;
 	    case 'i':		/* Tab Index */
-		string = Blt_Int(tabPtr->index);
+		string = Blt_Itoa(TabIndex(setPtr, tabPtr));
 		break;
 	    case 'n':		/* Tab name */
-		string = tabPtr->nameId;
+		string = tabPtr->name;
 		break;
 	    default:
 		if (*(p + 1) == '\0') {
@@ -3316,14 +3392,14 @@ PercentSubst(setPtr, tabPtr, command, cmdStrPtr)
 		string = buf;
 		break;
 	    }
-	    Tcl_DStringAppend(cmdStrPtr, string, -1);
+	    Tcl_DStringAppend(resultPtr, string, -1);
 	    p++;
 	    last = p + 1;
 	}
     }
     if (p > last) {
 	*p = '\0';
-	Tcl_DStringAppend(cmdStrPtr, last, -1);
+	Tcl_DStringAppend(resultPtr, last, -1);
     }
 }
 
@@ -3358,46 +3434,26 @@ InvokeOp(setPtr, interp, argc, argv)
     Tab *tabPtr;
     char *command;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_FAIL) != TCL_OK) {
 	return TCL_ERROR;
     }
     if ((tabPtr == NULL) || (tabPtr->state == STATE_DISABLED)) {
 	return TCL_OK;
     }
+    Tcl_Preserve(tabPtr);
     command = GETATTR(tabPtr, command);
     if (command != NULL) {
-	Tcl_DString cmdString;
+	Tcl_DString dString;
 	int result;
 
-	PercentSubst(setPtr, tabPtr, command, &cmdString);
-	result = Tcl_GlobalEval(setPtr->interp, Tcl_DStringValue(&cmdString));
-	Tcl_DStringFree(&cmdString);
+	PercentSubst(setPtr, tabPtr, command, &dString);
+	result = Tcl_GlobalEval(setPtr->interp, Tcl_DStringValue(&dString));
+	Tcl_DStringFree(&dString);
 	if (result != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
-    if ((setPtr->selectPtr != NULL) && (setPtr->selectPtr != tabPtr) &&
-	(setPtr->selectPtr->tkwin != NULL)) {
-	if (setPtr->selectPtr->container == NULL) {
-	    if (Tk_IsMapped(setPtr->selectPtr->tkwin)) {
-		Tk_UnmapWindow(setPtr->selectPtr->tkwin);
-	    }
-	} else {
-	    /* Redraw now unselected container. */
-	    EventuallyRedrawTearoff(setPtr->selectPtr);
-	}
-    }
-    setPtr->focusPtr = setPtr->selectPtr = tabPtr;
-    Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
-    if ((setPtr->numTiers > 1) && (tabPtr->tier != setPtr->startPtr->tier)) {
-	RenumberTiers(setPtr, tabPtr);
-	Blt_PickCurrentItem(setPtr->bindTable);
-    }
-    setPtr->flags |= (TABSET_SCROLL);
-    if (tabPtr->container != NULL) {
-	EventuallyRedrawTearoff(tabPtr);
-    }
-    EventuallyRedraw(setPtr);
+    Tcl_Release(tabPtr);
     return TCL_OK;
 }
 
@@ -3415,13 +3471,13 @@ static int
 MoveOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     Tab *tabPtr, *linkPtr;
     int before;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_FAIL) != TCL_OK) {
 	return TCL_ERROR;
     }
     if ((tabPtr == NULL) || (tabPtr->state == STATE_DISABLED)) {
@@ -3436,17 +3492,17 @@ MoveOp(setPtr, interp, argc, argv)
 	    "\": should be \"after\" or \"before\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    if (TabIndex(setPtr, argv[4], &linkPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[4], &linkPtr, INVALID_FAIL) != TCL_OK) {
 	return TCL_ERROR;
     }
     if (tabPtr == linkPtr) {
 	return TCL_OK;
     }
-    Blt_ListUnlinkItem(tabPtr->item);
+    Blt_ChainUnlinkLink(setPtr->chainPtr, tabPtr->linkPtr);
     if (before) {
-	Blt_ListLinkBefore(&(setPtr->tabList), tabPtr->item, linkPtr->item);
+	Blt_ChainLinkBefore(setPtr->chainPtr, tabPtr->linkPtr, linkPtr->linkPtr);
     } else {
-	Blt_ListLinkAfter(&(setPtr->tabList), tabPtr->item, linkPtr->item);
+	Blt_ChainLinkAfter(setPtr->chainPtr, tabPtr->linkPtr, linkPtr->linkPtr);
     }
     setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
     EventuallyRedraw(setPtr);
@@ -3468,15 +3524,74 @@ NearestOp(setPtr, interp, argc, argv)
 	(Tk_GetPixels(interp, setPtr->tkwin, argv[3], &y) != TCL_OK)) {
 	return TCL_ERROR;
     }
-    if (setPtr->numVisible > 0) {
-	tabPtr = (Tab *) PickTab((ClientData)setPtr, x, y);
+    if (setPtr->nVisible > 0) {
+	tabPtr = PickTab(setPtr, x, y, NULL);
 	if (tabPtr != NULL) {
-	    Tcl_SetResult(interp, tabPtr->nameId, TCL_VOLATILE);
+	    Tcl_SetResult(interp, tabPtr->name, TCL_VOLATILE);
 	}
     }
     return TCL_OK;
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * SelectOp --
+ *
+ * 	This procedure is called to selecta tab.
+ *
+ *	  .h select index
+ *
+ * Results:
+ *	A standard Tcl result.  If TCL_ERROR is returned, then
+ *	interp->result contains an error message.
+ *
+ * Side Effects:
+ *	Configuration information, such as text string, colors, font,
+ * 	etc. get set;  old resources get freed, if there were any.
+ * 	The widget is redisplayed if needed.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+SelectOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;		/* Not used. */
+    int argc;
+    char **argv;
+{
+    Tab *tabPtr;
+
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_OK) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    if ((tabPtr == NULL) || (tabPtr->state == STATE_DISABLED)) {
+	return TCL_OK;
+    }
+    if ((setPtr->selectPtr != NULL) && (setPtr->selectPtr != tabPtr) &&
+	(setPtr->selectPtr->tkwin != NULL)) {
+	if (setPtr->selectPtr->container == NULL) {
+	    if (Tk_IsMapped(setPtr->selectPtr->tkwin)) {
+		Tk_UnmapWindow(setPtr->selectPtr->tkwin);
+	    }
+	} else {
+	    /* Redraw now unselected container. */
+	    EventuallyRedrawTearoff(setPtr->selectPtr);
+	}
+    }
+    setPtr->selectPtr = tabPtr;
+    if ((setPtr->nTiers > 1) && (tabPtr->tier != setPtr->startPtr->tier)) {
+	RenumberTiers(setPtr, tabPtr);
+	Blt_PickCurrentItem(setPtr->bindTable);
+    }
+    setPtr->flags |= (TABSET_SCROLL);
+    if (tabPtr->container != NULL) {
+	EventuallyRedrawTearoff(tabPtr);
+    }
+    EventuallyRedraw(setPtr);
+    return TCL_OK;
+}
 
 static int
 ViewOp(setPtr, interp, argc, argv)
@@ -3492,18 +3607,19 @@ ViewOp(setPtr, interp, argc, argv)
 	double fract;
 
 	/*
-	 * Note that we are bounding the fractions between 0.0 and 1.0
-	 * to support the "canvas"-style of scrolling.
+	 * Note: we are bounding the fractions between 0.0 and 1.0 to
+	 * support the "canvas"-style of scrolling.
 	 */
+
 	fract = (double)setPtr->scrollOffset / setPtr->worldWidth;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
 	fract = (double)(setPtr->scrollOffset + width) / setPtr->worldWidth;
-	Tcl_AppendElement(interp, Blt_Double(interp, CLAMP(fract, 0.0, 1.0)));
+	Tcl_AppendElement(interp, Blt_Dtoa(interp, CLAMP(fract, 0.0, 1.0)));
 	return TCL_OK;
     }
-    if (Blt_GetScrollInfo(interp, argc, argv, &(setPtr->scrollOffset),
-	    setPtr->worldWidth, width, setPtr->scrollUnits, SCROLL_MODE_CANVAS)
-	!= TCL_OK) {
+    if (Blt_GetScrollInfo(interp, argc - 2, argv + 2, &(setPtr->scrollOffset),
+	    setPtr->worldWidth, width, setPtr->scrollUnits, 
+	    BLT_SCROLL_MODE_CANVAS) != TCL_OK) {
 	return TCL_ERROR;
     }
     setPtr->flags |= TABSET_SCROLL;
@@ -3511,172 +3627,20 @@ ViewOp(setPtr, interp, argc, argv)
     return TCL_OK;
 }
 
-/*
- *----------------------------------------------------------------------
- *
- * CgetOpOp --
- *
- *	  .h tab cget index option
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
-static int
-CgetOpOp(setPtr, interp, argc, argv)
-    Tabset *setPtr;
-    Tcl_Interp *interp;
-    int argc;			/* not used */
-    char **argv;
-{
-    Tab *tabPtr;
-
-    if (TabIndex(setPtr, argv[3], &tabPtr) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    tabSet = setPtr;
-    return Tk_ConfigureValue(interp, setPtr->tkwin, tabConfigSpecs,
-	(char *)tabPtr, argv[4], 0);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * ConfigureOpOp --
- *
- * 	This procedure is called to process a list of configuration
- *	options database, in order to reconfigure the options for
- *	one or more tabs in the widget.
- *
- *	  .h tab configure index ?index...? ?option value?...
- *
- * Results:
- *	A standard Tcl result.  If TCL_ERROR is returned, then
- *	interp->result contains an error message.
- *
- * Side Effects:
- *	Configuration information, such as text string, colors, font,
- * 	etc. get set;  old resources get freed, if there were any.
- * 	The widget is redisplayed if needed.
- *
- *----------------------------------------------------------------------
- */
-static int
-ConfigureOpOp(setPtr, interp, argc, argv)
-    Tabset *setPtr;
-    Tcl_Interp *interp;
-    int argc;
-    char **argv;
-{
-    int numTabs, numOpts, result;
-    char **options;
-    register int i;
-    Tab *tabPtr;
-
-
-    /* Figure out where the option value pairs begin */
-    argc -= 3;
-    argv += 3;
-    for (i = 0; i < argc; i++) {
-	if (argv[i][0] == '-') {
-	    break;
-	}
-	if (TabIndex(setPtr, argv[i], &tabPtr) != TCL_OK) {
-	    return TCL_ERROR;	/* Can't find node. */
-	}
-    }
-    numTabs = i;		/* Number of tab indices specified */
-    numOpts = argc - i;		/* Number of options specified */
-    options = argv + i;		/* Start of options in argv  */
-
-    for (i = 0; i < numTabs; i++) {
-	TabIndex(setPtr, argv[i], &tabPtr);
-	if (argc == 1) {
-	    return Tk_ConfigureInfo(interp, setPtr->tkwin, tabConfigSpecs,
-		(char *)tabPtr, (char *)NULL, 0);
-	} else if (argc == 2) {
-	    return Tk_ConfigureInfo(interp, setPtr->tkwin, tabConfigSpecs,
-		(char *)tabPtr, argv[2], 0);
-	}
-	tabSet = setPtr;
-	Tcl_Preserve((ClientData)tabPtr);
-	result = Tk_ConfigureWidget(interp, setPtr->tkwin, tabConfigSpecs,
-	    numOpts, options, (char *)tabPtr, TK_CONFIG_ARGV_ONLY);
-	if (result == TCL_OK) {
-	    result = ConfigureTab(setPtr, tabPtr);
-	}
-	Tcl_Release((ClientData)tabPtr);
-	if (result == TCL_ERROR) {
-	    return TCL_ERROR;
-	}
-	if (tabPtr->flags & TAB_VISIBLE) {
-	    setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
-	    EventuallyRedraw(setPtr);
-	}
-    }
-    return TCL_OK;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * NamesOpOp --
- *
- *	  .h tab names pattern
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
-static int
-NamesOpOp(setPtr, interp, argc, argv)
-    Tabset *setPtr;
-    Tcl_Interp *interp;
-    int argc;			/* Not used */
-    char **argv;		/* Not used */
-{
-    Tab *tabPtr;
-    Blt_ListItem item;
-
-    if (argc == 3) {
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    Tcl_AppendElement(interp, tabPtr->nameId);
-	}
-    } else {
-	register int i;
-
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    for (i = 3; i < argc; i++) {
-		if (Tcl_StringMatch(tabPtr->nameId, argv[i])) {
-		    Tcl_AppendElement(interp, tabPtr->nameId);
-		    break;
-		}
-	    }
-	}
-    }
-    return TCL_OK;
-}
 
 static void
 AdoptWindow(clientData)
     ClientData clientData;
 {
-    Tab *tabPtr = (Tab *) clientData;
-    Tk_FakeWin *fakePtr;
-    int x, y, inset;
-    int result;
+    Tab *tabPtr = clientData;
+    int x, y;
+    Tabset *setPtr = tabPtr->setPtr;
 
-    inset = tabPtr->setPtr->borderWidth + OUTER_PAD;
-    x = inset + tabPtr->setPtr->gap + tabPtr->setPtr->corner;
-    y = inset;
-    result = Blt_ReparentWindow(tabPtr->setPtr->display,
-	Tk_WindowId(tabPtr->tkwin), Tk_WindowId(tabPtr->container), x, y);
-    if (result == TCL_OK) {
-	fakePtr = (Tk_FakeWin *) tabPtr->tkwin;
-	fakePtr->flags |= TK_REPARENTED;
-    }
+    x = setPtr->inset + setPtr->inset2 + tabPtr->padLeft;
+#define TEAR_OFF_TAB_SIZE	5
+    y = setPtr->inset + setPtr->inset2 + setPtr->yPad +
+	setPtr->outerPad + TEAR_OFF_TAB_SIZE + tabPtr->padTop;
+    Blt_RelinkWindow(tabPtr->tkwin, tabPtr->container, x, y);
     Tk_MapWindow(tabPtr->tkwin);
 }
 
@@ -3684,7 +3648,7 @@ static void
 DestroyTearoff(dataPtr)
     DestroyData dataPtr;
 {
-    Tab *tabPtr = (Tab *) dataPtr;
+    Tab *tabPtr = (Tab *)dataPtr;
 
     if (tabPtr->container != NULL) {
 	Tabset *setPtr;
@@ -3693,22 +3657,17 @@ DestroyTearoff(dataPtr)
 
 	tkwin = tabPtr->container;
 	if (tabPtr->flags & TAB_REDRAW) {
-	    Tk_CancelIdleCall(DisplayTearoff, (ClientData)tabPtr);
+	    Tcl_CancelIdleCall(DisplayTearoff, tabPtr);
 	}
 	Tk_DeleteEventHandler(tkwin, StructureNotifyMask, TearoffEventProc,
-	    (ClientData)tabPtr);
+	    tabPtr);
 	if (tabPtr->tkwin != NULL) {
-	    Tk_FakeWin *fakePtr;
-	    XRectangle region;
+	    XRectangle rect;
 
-	    GetWindowRegion(tabPtr, setPtr->tkwin, FALSE, &region);
-	    Blt_ReparentWindow(setPtr->display, Tk_WindowId(tabPtr->tkwin),
-		Tk_WindowId(setPtr->tkwin), region.x, region.y);
-	    fakePtr = (Tk_FakeWin *) tabPtr->tkwin;
-	    fakePtr->flags &= ~TK_REPARENTED;
-
+	    GetWindowRectangle(tabPtr, setPtr->tkwin, FALSE, &rect);
+	    Blt_RelinkWindow(tabPtr->tkwin, setPtr->tkwin, rect.x, rect.y);
 	    if (tabPtr == setPtr->selectPtr) {
-		ArrangeWindow(tabPtr->tkwin, &region, TRUE);
+		ArrangeWindow(tabPtr->tkwin, &rect, TRUE);
 	    } else {
 		Tk_UnmapWindow(tabPtr->tkwin);
 	    }
@@ -3738,7 +3697,7 @@ CreateTearoff(setPtr, name, tabPtr)
     }
     Tk_SetClass(tkwin, "Tearoff");
     Tk_CreateEventHandler(tkwin, (ExposureMask | StructureNotifyMask),
-	TearoffEventProc, (ClientData)tabPtr);
+	TearoffEventProc, tabPtr);
     if (Tk_WindowId(tabPtr->tkwin) == None) {
 	Tk_MakeWindowExist(tabPtr->tkwin);
     }
@@ -3747,8 +3706,10 @@ CreateTearoff(setPtr, name, tabPtr)
 	width = (tabPtr->reqWidth > 0)
 	    ? tabPtr->reqWidth : Tk_ReqWidth(tabPtr->tkwin);
     }
-    width += PADDING(tabPtr->padX) + 2 * Tk_Changes(tabPtr->tkwin)->border_width;
-    width += 2 * (setPtr->borderWidth + OUTER_PAD);
+    width += PADDING(tabPtr->padX) + 2 *
+	Tk_Changes(tabPtr->tkwin)->border_width;
+    width += 2 * (setPtr->inset2 + setPtr->inset);
+#define TEAR_OFF_TAB_SIZE	5
     height = Tk_Height(tabPtr->tkwin);
     if (height < 2) {
 	height = (tabPtr->reqHeight > 0)
@@ -3756,15 +3717,16 @@ CreateTearoff(setPtr, name, tabPtr)
     }
     height += PADDING(tabPtr->padY) +
 	2 * Tk_Changes(tabPtr->tkwin)->border_width;
-    height += 2 * setPtr->inset + TEAR_OFF_TAB_SIZE + 2 * OUTER_PAD;
+    height += setPtr->inset + setPtr->inset2 + setPtr->yPad +
+	TEAR_OFF_TAB_SIZE + setPtr->outerPad;
     Tk_GeometryRequest(tkwin, width, height);
     Tk_UnmapWindow(tabPtr->tkwin);
-    Tk_MoveWindow(tabPtr->tkwin, 0, 0);
-    Tcl_SetResult(setPtr->interp, Tk_PathName(tkwin), TCL_STATIC);
+    /* Tk_MoveWindow(tabPtr->tkwin, 0, 0); */
+    Tcl_SetResult(setPtr->interp, Tk_PathName(tkwin), TCL_VOLATILE);
 #ifdef WIN32
-    AdoptWindow((ClientData)tabPtr);
+    AdoptWindow(tabPtr);
 #else
-    Tk_DoWhenIdle(AdoptWindow, (ClientData)tabPtr);
+    Tcl_DoWhenIdle(AdoptWindow, tabPtr);
 #endif
     return TCL_OK;
 }
@@ -3772,7 +3734,226 @@ CreateTearoff(setPtr, name, tabPtr)
 /*
  *----------------------------------------------------------------------
  *
- * TearOffOpOp --
+ * TabCgetOp --
+ *
+ *	  .h tab cget index option
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+TabCgetOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;
+{
+    Tab *tabPtr;
+
+    if (GetTabByName(setPtr, argv[3], &tabPtr) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    tabSet = setPtr;
+    return Tk_ConfigureValue(interp, setPtr->tkwin, tabConfigSpecs,
+	(char *)tabPtr, argv[4], 0);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabConfigureOp --
+ *
+ * 	This procedure is called to process a list of configuration
+ *	options database, in order to reconfigure the options for
+ *	one or more tabs in the widget.
+ *
+ *	  .h tab configure index ?index...? ?option value?...
+ *
+ * Results:
+ *	A standard Tcl result.  If TCL_ERROR is returned, then
+ *	interp->result contains an error message.
+ *
+ * Side Effects:
+ *	Configuration information, such as text string, colors, font,
+ * 	etc. get set;  old resources get freed, if there were any.
+ * 	The widget is redisplayed if needed.
+ *
+ *----------------------------------------------------------------------
+ */
+static int
+TabConfigureOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;
+    char **argv;
+{
+    int nTabs, nOpts, result;
+    char **options;
+    register int i;
+    Tab *tabPtr;
+
+    /* Figure out where the option value pairs begin */
+    argc -= 3;
+    argv += 3;
+    for (i = 0; i < argc; i++) {
+	if (argv[i][0] == '-') {
+	    break;
+	}
+	if (GetTabByName(setPtr, argv[i], &tabPtr) != TCL_OK) {
+	    return TCL_ERROR;	/* Can't find node. */
+	}
+    }
+    nTabs = i;			/* Number of tab indices specified */
+    nOpts = argc - i;		/* Number of options specified */
+    options = argv + i;		/* Start of options in argv  */
+
+    for (i = 0; i < nTabs; i++) {
+	GetTabByName(setPtr, argv[i], &tabPtr);
+	if (argc == 1) {
+	    return Tk_ConfigureInfo(interp, setPtr->tkwin, tabConfigSpecs,
+		(char *)tabPtr, (char *)NULL, 0);
+	} else if (argc == 2) {
+	    return Tk_ConfigureInfo(interp, setPtr->tkwin, tabConfigSpecs,
+		(char *)tabPtr, argv[2], 0);
+	}
+	tabSet = setPtr;
+	Tcl_Preserve(tabPtr);
+	result = Tk_ConfigureWidget(interp, setPtr->tkwin, tabConfigSpecs,
+	    nOpts, options, (char *)tabPtr, TK_CONFIG_ARGV_ONLY);
+	if (result == TCL_OK) {
+	    result = ConfigureTab(setPtr, tabPtr);
+	}
+	Tcl_Release(tabPtr);
+	if (result == TCL_ERROR) {
+	    return TCL_ERROR;
+	}
+	if (tabPtr->flags & TAB_VISIBLE) {
+	    setPtr->flags |= (TABSET_LAYOUT | TABSET_SCROLL);
+	    EventuallyRedraw(setPtr);
+	}
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabDockallOp --
+ *
+ *	  .h tab dockall
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+TabDockallOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;		/* Not used. */
+{
+    Tab *tabPtr;
+    Blt_ChainLink *linkPtr;
+
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	 linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
+	if (tabPtr->container != NULL) {
+	    Tcl_EventuallyFree(tabPtr, DestroyTearoff);
+	}
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabPageHeight --
+ *
+ *	  .h tab pageheight
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+TabPageHeight(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;		/* Not used. */
+{
+    Tcl_SetResult(interp, Blt_Itoa(VPORTHEIGHT(setPtr)), TCL_VOLATILE);
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabPageWidth --
+ *
+ *	  .h tab pagewidth
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+TabPageWidth(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;		/* Not used. */
+{
+    Tcl_SetResult(interp, Blt_Itoa(VPORTWIDTH(setPtr)), TCL_VOLATILE);
+    return TCL_OK;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabNamesOp --
+ *
+ *	  .h tab names pattern
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+TabNamesOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;		/* Not used. */
+{
+    Tab *tabPtr;
+    Blt_ChainLink *linkPtr;
+
+    if (argc == 3) {
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    Tcl_AppendElement(interp, tabPtr->name);
+	}
+    } else {
+	register int i;
+
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    for (i = 3; i < argc; i++) {
+		if (Tcl_StringMatch(tabPtr->name, argv[i])) {
+		    Tcl_AppendElement(interp, tabPtr->name);
+		    break;
+		}
+	    }
+	}
+    }
+    return TCL_OK;
+}
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabTearoffOp --
  *
  *	  .h tab tearoff index ?title?
  *
@@ -3780,44 +3961,44 @@ CreateTearoff(setPtr, name, tabPtr)
  */
 /*ARGSUSED*/
 static int
-TearoffOpOp(setPtr, interp, argc, argv)
+TabTearoffOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     Tab *tabPtr;
     int result;
     Tk_Window tkwin;
 
-    result = TCL_OK;
-
-    if (GetIndex(setPtr, argv[3], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[3], &tabPtr, INVALID_OK) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if ((tabPtr->tkwin == NULL) || (tabPtr->state == STATE_DISABLED)) {
+    if ((tabPtr == NULL) || (tabPtr->tkwin == NULL) ||
+	(tabPtr->state == STATE_DISABLED)) {
 	return TCL_OK;		/* No-op */
     }
     if (argc == 4) {
 	Tk_Window parent;
 
-	parent = (tabPtr->container == NULL) ? setPtr->tkwin : tabPtr->container;
-	Tcl_SetResult(setPtr->interp, Tk_PathName(parent), TCL_STATIC);
+	parent = (tabPtr->container == NULL)
+	    ? setPtr->tkwin : tabPtr->container;
+	Tcl_SetResult(setPtr->interp, Tk_PathName(parent), TCL_VOLATILE);
 	return TCL_OK;
     }
-    Tk_Preserve((ClientData)tabPtr);
+    Tcl_Preserve(tabPtr);
     result = TCL_OK;
 
     tkwin = Tk_NameToWindow(interp, argv[4], setPtr->tkwin);
     Tcl_ResetResult(interp);
 
     if (tabPtr->container != NULL) {
-	Tk_EventuallyFree((ClientData)tabPtr, DestroyTearoff);
+	Tcl_EventuallyFree(tabPtr, DestroyTearoff);
     }
     if ((tkwin != setPtr->tkwin) && (tabPtr->container == NULL)) {
 	result = CreateTearoff(setPtr, argv[4], tabPtr);
     }
-    Tk_Release((ClientData)tabPtr);
+    Tcl_Release(tabPtr);
     EventuallyRedraw(setPtr);
     return result;
 }
@@ -3834,16 +4015,19 @@ TearoffOpOp(setPtr, interp, argc, argv)
  *
  *----------------------------------------------------------------------
  */
-static Blt_OpSpec tabOperSpecs[] =
+static Blt_OpSpec tabOps[] =
 {
-    {"cget", 2, (Blt_Operation)CgetOpOp, 5, 5, "index option",},
-    {"configure", 2, (Blt_Operation)ConfigureOpOp, 4, 0,
-	"index ?option value?...",},
-    {"names", 1, (Blt_Operation)NamesOpOp, 3, 0, "?pattern...?",},
-    {"tearoff", 1, (Blt_Operation)TearoffOpOp, 4, 5, "index ?parent?",},
+    {"cget", 2, (Blt_Op)TabCgetOp, 5, 5, "nameOrIndex option",},
+    {"configure", 2, (Blt_Op)TabConfigureOp, 4, 0,
+	"nameOrIndex ?option value?...",},
+    {"dockall", 1, (Blt_Op)TabDockallOp, 3, 3, "" }, 
+    {"names", 1, (Blt_Op)TabNamesOp, 3, 0, "?pattern...?",},
+    {"pageheight", 5, (Blt_Op)TabPageHeight, 3, 3, "", },
+    {"pagewidth", 5, (Blt_Op)TabPageWidth, 3, 3, "", },
+    {"tearoff", 1, (Blt_Op)TabTearoffOp, 4, 5, "index ?parent?",},
 };
 
-static int numTabSpecs = sizeof(tabOperSpecs) / sizeof(Blt_OpSpec);
+static int nTabOps = sizeof(tabOps) / sizeof(Blt_OpSpec);
 
 static int
 TabOp(setPtr, interp, argc, argv)
@@ -3852,11 +4036,132 @@ TabOp(setPtr, interp, argc, argv)
     int argc;
     char **argv;
 {
-    Blt_Operation proc;
+    Blt_Op proc;
     int result;
 
-    proc = Blt_GetOperation(interp, numTabSpecs, tabOperSpecs,
-	BLT_OPER_ARG2, argc, argv);
+    proc = Blt_GetOp(interp, nTabOps, tabOps, BLT_OP_ARG2, argc, argv, 0);
+    if (proc == NULL) {
+	return TCL_ERROR;
+    }
+    result = (*proc) (setPtr, interp, argc, argv);
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * PerforationActivateOp --
+ *
+ * 	This procedure is called to activate (highlight) the
+ * 	perforation.
+ *
+ *	  .h perforation activate boolean
+ *
+ * Results:
+ *	A standard Tcl result.  If TCL_ERROR is returned, then
+ *	interp->result contains an error message.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+PerforationActivateOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;		/* Not used. */
+    int argc;
+    char **argv;
+{
+    int bool;
+
+    if (Tcl_GetBoolean(interp, argv[3], &bool) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    if (bool) {
+	setPtr->flags |= PERFORATION_ACTIVE;
+    } else {
+	setPtr->flags &= ~PERFORATION_ACTIVE;
+    }
+    EventuallyRedraw(setPtr);
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * PerforationInvokeOp --
+ *
+ * 	This procedure is called to invoke a perforation command.
+ *
+ *	  .t perforation invoke
+ *
+ * Results:
+ *	A standard Tcl result.  If TCL_ERROR is returned, then
+ *	interp->result contains an error message.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+PerforationInvokeOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;		/* Not used. */
+    int argc;
+    char **argv;
+{
+
+    if (setPtr->selectPtr != NULL) {
+	char *cmd;
+	
+	cmd = GETATTR(setPtr->selectPtr, perfCommand);
+	if (cmd != NULL) {
+	    Tcl_DString dString;
+	    int result;
+	    
+	    PercentSubst(setPtr, setPtr->selectPtr, cmd, &dString);
+	    Tcl_Preserve(setPtr);
+	    result = Tcl_GlobalEval(interp, Tcl_DStringValue(&dString));
+	    Tcl_Release(setPtr);
+	    Tcl_DStringFree(&dString);
+	    if (result != TCL_OK) {
+		return TCL_ERROR;
+	    }
+	}
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * PerforationOp --
+ *
+ *	This procedure handles tab operations.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ *----------------------------------------------------------------------
+ */
+static Blt_OpSpec perforationOps[] =
+{
+    {"activate", 1, (Blt_Op)PerforationActivateOp, 4, 4, "boolean" }, 
+    {"invoke", 1, (Blt_Op)PerforationInvokeOp, 3, 3, "",},
+};
+
+static int nPerforationOps = sizeof(perforationOps) / sizeof(Blt_OpSpec);
+
+static int
+PerforationOp(setPtr, interp, argc, argv)
+    Tabset *setPtr;
+    Tcl_Interp *interp;
+    int argc;
+    char **argv;
+{
+    Blt_Op proc;
+    int result;
+
+    proc = Blt_GetOp(interp, nPerforationOps, perforationOps, BLT_OP_ARG2, 
+	argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
@@ -3878,7 +4183,7 @@ static int
 ScanOp(setPtr, interp, argc, argv)
     Tabset *setPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
     int x, y;
@@ -3920,7 +4225,7 @@ ScanOp(setPtr, interp, argc, argv)
 	}
 	offset = setPtr->scanOffset + (10 * delta);
 	offset = Blt_AdjustViewport(offset, setPtr->worldWidth,
-	    VPORTWIDTH(setPtr), setPtr->scrollUnits, SCROLL_MODE_CANVAS);
+	    VPORTWIDTH(setPtr), setPtr->scrollUnits, BLT_SCROLL_MODE_CANVAS);
 	setPtr->scrollOffset = offset;
 	setPtr->flags |= TABSET_SCROLL;
 	EventuallyRedraw(setPtr);
@@ -3938,23 +4243,34 @@ SeeOp(setPtr, interp, argc, argv)
 {
     Tab *tabPtr;
 
-    if (GetIndex(setPtr, argv[2], &tabPtr) != TCL_OK) {
+    if (GetTabByIndex(setPtr, argv[2], &tabPtr, INVALID_OK) != TCL_OK) {
 	return TCL_ERROR;
     }
     if (tabPtr != NULL) {
 	int left, right, width;
 
 	width = VPORTWIDTH(setPtr);
-	left = setPtr->scrollOffset + setPtr->selectPad;
-	right = setPtr->scrollOffset + width - setPtr->selectPad;
+	left = setPtr->scrollOffset + setPtr->xSelectPad;
+	right = setPtr->scrollOffset + width - setPtr->xSelectPad;
 
 	/* If the tab is partially obscured, scroll so that it's
 	 * entirely in view. */
 	if (tabPtr->worldX < left) {
-	    setPtr->scrollOffset = tabPtr->worldX - setPtr->selectPad;
+	    setPtr->scrollOffset = tabPtr->worldX - TAB_SCROLL_OFFSET;
 	} else if ((tabPtr->worldX + tabPtr->worldWidth) >= right) {
+	    Blt_ChainLink *linkPtr;
+
 	    setPtr->scrollOffset = tabPtr->worldX + tabPtr->worldWidth -
-		width + setPtr->selectPad;
+		(width - 2 * setPtr->xSelectPad);
+	    linkPtr = Blt_ChainNextLink(tabPtr->linkPtr); 
+	    if (linkPtr != NULL) {
+		Tab *nextPtr;
+
+		nextPtr = Blt_ChainGetValue(linkPtr);
+		if (nextPtr->tier == tabPtr->tier) {
+		    setPtr->scrollOffset += TAB_SCROLL_OFFSET;
+		}
+	    }
 	}
 	setPtr->flags |= TABSET_SCROLL;
 	EventuallyRedraw(setPtr);
@@ -3970,93 +4286,44 @@ SizeOp(setPtr, interp, argc, argv)
     int argc;			/* Not used. */
     char **argv;		/* Not used. */
 {
-    Tcl_SetResult(interp, Blt_Int(Blt_ListGetLength(&(setPtr->tabList))),
+    Tcl_SetResult(interp, Blt_Itoa(Blt_ChainGetLength(setPtr->chainPtr)),
 	TCL_VOLATILE);
     return TCL_OK;
 }
 
 
-
-static void
-WidenTabs(setPtr, startPtr, numTabs, extraSpace)
-    Tabset *setPtr;
-    Tab *startPtr;
-    int numTabs;
-    int extraSpace;
-{
-    register Tab *tabPtr;
-    register int i;
-    int adjustSize;
-    register Blt_ListItem item;
-    int x;
-
-    x = startPtr->tier;
-    while (extraSpace > 0) {
-	adjustSize = extraSpace / numTabs;
-	if (adjustSize == 0) {
-	    adjustSize = 1;
-	}
-	item = startPtr->item;
-	for (i = 0; (item != NULL) && (i < numTabs) && (extraSpace > 0); i++) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    extraSpace -= adjustSize;
-	    tabPtr->worldWidth += adjustSize;
-	    assert(x == tabPtr->tier);
-	    item = Blt_ListNextItem(item);
-	}
-    }
-    x = setPtr->selectPad;
-    item = startPtr->item;
-    for (i = 0; (i < numTabs) && (item != NULL); i++) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
-	tabPtr->worldX = x;
-	x += tabPtr->worldWidth + setPtr->gap;
-	item = Blt_ListNextItem(item);
-    }
-}
-
 static int
 CountTabs(setPtr)
     Tabset *setPtr;
 {
-    int numTabs;
+    int count;
     int width, height;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
     register Tab *tabPtr;
     register int pageWidth, pageHeight;
-    register int maxWidth, maxHeight;
+    int labelWidth, labelHeight;
+    int tabWidth, tabHeight;
 
     pageWidth = pageHeight = 0;
-    maxWidth = maxHeight = 0;
-    numTabs = 0;
+    count = 0;
+
+    labelWidth = labelHeight = 0;
 
     /*
-     * Determine how much space is needed for each tab.  This will
-     * also give us the maximum tab height.
+     * Pass 1:  Figure out the maximum area needed for a label and a
+     *		page.  Both the label and page dimensions are adjusted
+     *		for orientation.  In addition, reset the visibility
+     *		flags and reorder the tabs.
      */
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
-
-	if (setPtr->side & SIDE_VERTICAL) {
-	    tabPtr->worldWidth = tabPtr->labelHeight;
-	    tabPtr->worldHeight = tabPtr->labelWidth;
-	} else {
-	    tabPtr->worldWidth = tabPtr->labelWidth;
-	    tabPtr->worldHeight = tabPtr->labelHeight;
-	}
-	tabPtr->worldWidth += 2 * (setPtr->pageInset + LABEL_PADX);
-	tabPtr->worldHeight += 2 * (setPtr->pageInset + LABEL_PADY);
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
 
 	/* Reset visibility flag and order of tabs. */
 
 	tabPtr->flags &= ~TAB_VISIBLE;
-	tabPtr->index = numTabs++;
+	count++;
 
-	/*
-	 * Find the maximum page dimensions based of the requested
-	 * size of the embedded window for each tab.
-	 */
 	if (tabPtr->tkwin != NULL) {
 	    width = GetReqWidth(tabPtr);
 	    if (pageWidth < width) {
@@ -4067,29 +4334,94 @@ CountTabs(setPtr)
 		pageHeight = height;
 	    }
 	}
-	/* Track the maximum tab dimensions. */
-
-	if (maxWidth < tabPtr->worldWidth) {
-	    maxWidth = tabPtr->worldWidth;
+	if (labelWidth < tabPtr->labelWidth) {
+	    labelWidth = tabPtr->labelWidth;
 	}
-	if (maxHeight < tabPtr->worldHeight) {
-	    maxHeight = tabPtr->worldHeight;
+	if (labelHeight < tabPtr->labelHeight) {
+	    labelHeight = tabPtr->labelHeight;
 	}
     }
-    setPtr->tabWidth = maxWidth;
-    setPtr->tabHeight = maxHeight;
+
+    setPtr->overlap = 0;
 
     /*
-     * If constant-width tabs are selected, reset the sizes for each
-     * tab to the maximum size.
+     * Pass 2:	Set the individual sizes of each tab.  This is different
+     *		for constant and variable width tabs.  Add the extra space
+     *		needed for slanted tabs, now that we know maximum tab
+     *		height.
      */
-    if (setPtr->defAttrs.constWidth) {
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    tabPtr->worldWidth = setPtr->tabWidth;
+    if (setPtr->defTabStyle.constWidth) {
+	int slant;
+
+	tabWidth = 2 * setPtr->inset2;
+	tabHeight = setPtr->inset2 /* + 4 */;
+
+	if (setPtr->side & SIDE_VERTICAL) {
+	    tabWidth += labelHeight;
+	    tabHeight += labelWidth;
+	    slant = labelWidth;
+	} else {
+	    tabWidth += labelWidth;
+	    tabHeight += labelHeight;
+	    slant = labelHeight;
+	}
+	if (setPtr->slant & SLANT_LEFT) {
+	    tabWidth += slant;
+	    setPtr->overlap += tabHeight / 2;
+	}
+	if (setPtr->slant & SLANT_RIGHT) {
+	    tabWidth += slant;
+	    setPtr->overlap += tabHeight / 2;
+	}
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    tabPtr->worldWidth = tabWidth;
+	    tabPtr->worldHeight = tabHeight;
+	}
+    } else {
+	int slant;
+
+	tabWidth = tabHeight = 0;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+
+	    width = 2 * setPtr->inset2;
+	    height = setPtr->inset2 /* + 4 */;
+	    if (setPtr->side & SIDE_VERTICAL) {
+		width += tabPtr->labelHeight;
+		height += labelWidth;
+		slant = labelWidth;
+	    } else {
+		width += tabPtr->labelWidth;
+		height += labelHeight;
+		slant = labelHeight;
+	    }
+	    width += (setPtr->slant & SLANT_LEFT) ? slant : setPtr->corner;
+	    width += (setPtr->slant & SLANT_RIGHT) ? slant : setPtr->corner;
+
+	    tabPtr->worldWidth = width; /* + 2 * (setPtr->corner + setPtr->xSelectPad) */ ;
+	    tabPtr->worldHeight = height;
+
+	    if (tabWidth < width) {
+		tabWidth = width;
+	    }
+	    if (tabHeight < height) {
+		tabHeight = height;
+	    }
+	}
+	if (setPtr->slant & SLANT_LEFT) {
+	    setPtr->overlap += tabHeight / 2;
+	}
+	if (setPtr->slant & SLANT_RIGHT) {
+	    setPtr->overlap += tabHeight / 2;
 	}
     }
+
+    setPtr->tabWidth = tabWidth;
+    setPtr->tabHeight = tabHeight;
+
     /*
      * Let the user override any page dimension.
      */
@@ -4101,70 +4433,114 @@ CountTabs(setPtr)
     if (setPtr->reqPageHeight > 0) {
 	setPtr->pageHeight = setPtr->reqPageHeight;
     }
-    return numTabs;
+    return count;
 }
 
 
 static void
-AdjustTabSizes(setPtr, numTabs)
+WidenTabs(setPtr, startPtr, nTabs, adjustment)
     Tabset *setPtr;
-    int numTabs;
+    Tab *startPtr;
+    int nTabs;
+    int adjustment;
 {
-    int tabsPerTier, expand;
+    register Tab *tabPtr;
+    register int i;
+    int ration;
+    Blt_ChainLink *linkPtr;
+    int x;
+
+    x = startPtr->tier;
+    while (adjustment > 0) {
+	ration = adjustment / nTabs;
+	if (ration == 0) {
+	    ration = 1;
+	}
+	linkPtr = startPtr->linkPtr;
+	for (i = 0; (linkPtr != NULL) && (i < nTabs) && (adjustment > 0); i++) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    adjustment -= ration;
+	    tabPtr->worldWidth += ration;
+	    assert(x == tabPtr->tier);
+	    linkPtr = Blt_ChainNextLink(linkPtr);
+	}
+    }
+    /*
+     * Go back and reset the world X-coordinates of the tabs,
+     * now that their widths have changed.
+     */
+    x = 0;
+    linkPtr = startPtr->linkPtr;
+    for (i = 0; (i < nTabs) && (linkPtr != NULL); i++) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
+	tabPtr->worldX = x;
+	x += tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
+	linkPtr = Blt_ChainNextLink(linkPtr);
+    }
+}
+
+
+static void
+AdjustTabSizes(setPtr, nTabs)
+    Tabset *setPtr;
+    int nTabs;
+{
+    int tabsPerTier;
     int total, count, extra;
     Tab *startPtr, *nextPtr;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
     register Tab *tabPtr;
     int x, maxWidth;
 
-    tabsPerTier = (numTabs + (setPtr->numTiers - 1)) / setPtr->numTiers;
-    x = setPtr->selectPad;
+    tabsPerTier = (nTabs + (setPtr->nTiers - 1)) / setPtr->nTiers;
+    x = 0;
     maxWidth = 0;
-    if (setPtr->defAttrs.constWidth) {
+    if (setPtr->defTabStyle.constWidth) {
 	register int i;
 
-	item = Blt_ListFirstItem(&(setPtr->tabList));
+	linkPtr = Blt_ChainFirstLink(setPtr->chainPtr);
 	count = 1;
-	while (item != NULL) {
+	while (linkPtr != NULL) {
 	    for (i = 0; i < tabsPerTier; i++) {
-		tabPtr = (Tab *) Blt_ListGetValue(item);
+		tabPtr = Blt_ChainGetValue(linkPtr);
 		tabPtr->tier = count;
 		tabPtr->worldX = x;
-		x += tabPtr->worldWidth + setPtr->gap;
-		item = Blt_ListNextItem(item);
+		x += tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
+		linkPtr = Blt_ChainNextLink(linkPtr);
 		if (x > maxWidth) {
 		    maxWidth = x;
 		}
-		if (item == NULL) {
+		if (linkPtr == NULL) {
 		    goto done;
 		}
 	    }
 	    count++;
-	    x = setPtr->selectPad;
+	    x = 0;
 	}
     }
   done:
     /* Add to tab widths to fill out row. */
-    expand = (((numTabs % tabsPerTier) == 0) || (!setPtr->defAttrs.constWidth));
-    if (!expand) {
+    if (((nTabs % tabsPerTier) != 0) && (setPtr->defTabStyle.constWidth)) {
 	return;
     }
     startPtr = NULL;
     count = total = 0;
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL; /*empty*/ ) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	/*empty*/ ) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
 	if (startPtr == NULL) {
 	    startPtr = tabPtr;
 	}
 	count++;
-	total += tabPtr->worldWidth + setPtr->gap;
-	item = Blt_ListNextItem(item);
-	if (item != NULL) {
-	    nextPtr = (Tab *) Blt_ListGetValue(item);
+	total += tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
+	linkPtr = Blt_ChainNextLink(linkPtr);
+	if (linkPtr != NULL) {
+	    nextPtr = Blt_ChainGetValue(linkPtr);
 	    if (tabPtr->tier == nextPtr->tier) {
 		continue;
 	    }
 	}
+	total += setPtr->overlap;
 	extra = setPtr->worldWidth - total;
 	assert(count > 0);
 	if (extra > 0) {
@@ -4186,27 +4562,26 @@ static void
 ComputeLayout(setPtr)
     Tabset *setPtr;
 {
-    int width, height;
-    Blt_ListItem item;
+    int width;
+    Blt_ChainLink *linkPtr;
     Tab *tabPtr;
     int x, extra;
-    int numTiers, numTabs;
+    int nTiers, nTabs;
 
-    setPtr->numTiers = 0;
+    setPtr->nTiers = 0;
     setPtr->pageTop = 0;
     setPtr->worldWidth = 1;
     setPtr->yPad = 0;
 
-    numTiers = 0;
-    numTabs = CountTabs(setPtr);
-    if (numTabs == 0) {
+    nTabs = CountTabs(setPtr);
+    if (nTabs == 0) {
 	return;
     }
     /* Reset the pointers to the selected and starting tab. */
     if (setPtr->selectPtr == NULL) {
-	item = Blt_ListFirstItem(&(setPtr->tabList));
-	if (item != NULL) {
-	    setPtr->selectPtr = (Tab *) Blt_ListGetValue(item);
+	linkPtr = Blt_ChainFirstLink(setPtr->chainPtr);
+	if (linkPtr != NULL) {
+	    setPtr->selectPtr = Blt_ChainGetValue(linkPtr);
 	}
     }
     if (setPtr->startPtr == NULL) {
@@ -4214,17 +4589,15 @@ ComputeLayout(setPtr)
     }
     if (setPtr->focusPtr == NULL) {
 	setPtr->focusPtr = setPtr->selectPtr;
-	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr);
+	Blt_SetFocusItem(setPtr->bindTable, setPtr->focusPtr, NULL);
     }
-    width = Tk_Width(setPtr->tkwin) - (2 * setPtr->inset) -
-	setPtr->selectPad - setPtr->corner;
-    height = Tk_Height(setPtr->tkwin) - 2 *
-	(setPtr->corner + setPtr->selectPad);
 
     if (setPtr->side & SIDE_VERTICAL) {
-	int temp;
-
-	temp = width, width = height, height = temp;
+        width = Tk_Height(setPtr->tkwin) - 
+		2 * (setPtr->corner + setPtr->xSelectPad);
+    } else {
+        width = Tk_Width(setPtr->tkwin) - (2 * setPtr->inset) -
+		setPtr->xSelectPad - setPtr->corner;
     }
     setPtr->flags |= TABSET_STATIC;
     if (setPtr->reqTiers > 1) {
@@ -4233,60 +4606,62 @@ ComputeLayout(setPtr)
 	/* Static multiple tier mode. */
 
 	/* Sum tab widths and determine the number of tiers needed. */
-	numTiers = 1;
-	total = x = setPtr->selectPad;
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	nTiers = 1;
+	total = x = 0;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    if ((x + tabPtr->worldWidth) > width) {
-		numTiers++;
-		x = setPtr->selectPad;
+		nTiers++;
+		x = 0;
 	    }
 	    tabPtr->worldX = x;
-	    tabPtr->tier = numTiers;
-	    extra = tabPtr->worldWidth + setPtr->gap;
+	    tabPtr->tier = nTiers;
+	    extra = tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
 	    total += extra, x += extra;
 	}
 	maxWidth = width;
 
-	if (numTiers > setPtr->reqTiers) {
+	if (nTiers > setPtr->reqTiers) {
 	    /*
 	     * The tabs do not fit into the requested number of tiers.
              * Go into scrolling mode.
 	     */
 	    width = ((total + setPtr->tabWidth) / setPtr->reqTiers);
-	    x = setPtr->selectPad;
-	    numTiers = 1;
-	    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-		item = Blt_ListNextItem(item)) {
-		tabPtr = (Tab *) Blt_ListGetValue(item);
-		tabPtr->tier = numTiers;
+	    x = 0;
+	    nTiers = 1;
+	    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr);
+		linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+		tabPtr = Blt_ChainGetValue(linkPtr);
+		tabPtr->tier = nTiers;
 		/*
 		 * Keep adding tabs to a tier until we overfill it.
 		 */
 		tabPtr->worldX = x;
-		x += tabPtr->worldWidth + setPtr->gap;
+		x += tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
 		if (x > width) {
-		    numTiers++;
+		    nTiers++;
 		    if (x > maxWidth) {
 			maxWidth = x;
 		    }
-		    x = setPtr->selectPad;
+		    x = 0;
 		}
 	    }
 	    setPtr->flags &= ~TABSET_STATIC;
 	}
 	setPtr->worldWidth = maxWidth;
-	setPtr->numTiers = numTiers;
+	setPtr->nTiers = nTiers;
 
-	if (numTiers > 1) {
-	    AdjustTabSizes(setPtr, numTabs);
+	if (nTiers > 1) {
+	    AdjustTabSizes(setPtr, nTabs);
 	}
-	if (!(setPtr->flags & TABSET_STATIC)) {
-	    setPtr->worldWidth += (setPtr->selectPad + setPtr->corner);
-	} else {
+	if (setPtr->flags & TABSET_STATIC) {
 	    setPtr->worldWidth = VPORTWIDTH(setPtr);
+	} else {
+	    /* Do you add an offset ? */
+	    setPtr->worldWidth += (setPtr->xSelectPad + setPtr->corner);
 	}
+	setPtr->worldWidth += setPtr->overlap;
 	if (setPtr->selectPtr != NULL) {
 	    RenumberTiers(setPtr, setPtr->selectPtr);
 	}
@@ -4294,38 +4669,40 @@ ComputeLayout(setPtr)
 	/*
 	 * Scrollable single tier mode.
 	 */
-	numTiers = 1;
-	x = setPtr->selectPad;
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    tabPtr->tier = numTiers;
+	nTiers = 1;
+	x = 0;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    tabPtr->tier = nTiers;
 	    tabPtr->worldX = x;
 	    tabPtr->worldY = 0;
-	    x += tabPtr->worldWidth + setPtr->gap;
+	    x += tabPtr->worldWidth + setPtr->gap - setPtr->overlap;
 	}
-	setPtr->worldWidth = x + setPtr->corner + setPtr->gap +
-	    setPtr->selectPad;
+	setPtr->worldWidth = x + setPtr->corner - setPtr->gap +
+	    setPtr->xSelectPad + setPtr->overlap;
 	setPtr->flags &= ~TABSET_STATIC;
-	setPtr->yPad = setPtr->selectPad;
     }
-    setPtr->numTiers = numTiers;
-    setPtr->pageTop = (setPtr->numTiers * setPtr->tabHeight) +
-	setPtr->inset + setPtr->pageInset + setPtr->yPad;
+    if (nTiers == 1) {
+	setPtr->yPad = setPtr->ySelectPad;
+    }
+    setPtr->nTiers = nTiers;
+    setPtr->pageTop = setPtr->inset + setPtr->yPad /* + 4 */ +
+	(setPtr->nTiers * setPtr->tabHeight) + setPtr->inset2;
 
     if (setPtr->side & SIDE_VERTICAL) {
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    tabPtr->scrnWidth = (short int)setPtr->tabHeight;
-	    tabPtr->scrnHeight = (short int)tabPtr->worldWidth;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    tabPtr->screenWidth = (short int)setPtr->tabHeight;
+	    tabPtr->screenHeight = (short int)tabPtr->worldWidth;
 	}
     } else {
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
-	    tabPtr->scrnWidth = (short int)tabPtr->worldWidth;
-	    tabPtr->scrnHeight = (short int)setPtr->tabHeight;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
+	    tabPtr->screenWidth = (short int)tabPtr->worldWidth;
+	    tabPtr->screenHeight = (short int)setPtr->tabHeight;
 	}
     }
 }
@@ -4334,75 +4711,76 @@ static void
 ComputeVisibleTabs(setPtr)
     Tabset *setPtr;
 {
-    int numVisibleTabs;
+    int nVisibleTabs;
     register Tab *tabPtr;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
 
-    setPtr->numVisible = 0;
-    if (Blt_ListGetLength(&(setPtr->tabList)) == 0) {
+    setPtr->nVisible = 0;
+    if (Blt_ChainGetLength(setPtr->chainPtr) == 0) {
 	return;
     }
-    numVisibleTabs = 0;
+    nVisibleTabs = 0;
     if (setPtr->flags & TABSET_STATIC) {
 
 	/* Static multiple tier mode. */
 
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    tabPtr->flags |= TAB_VISIBLE;
-	    numVisibleTabs++;
+	    nVisibleTabs++;
 	}
     } else {
 	int width, offset;
 	/*
 	 * Scrollable (single or multiple) tier mode.
 	 */
-	offset = setPtr->scrollOffset - (OUTER_PAD + setPtr->selectPad);
-	width = VPORTWIDTH(setPtr) + setPtr->scrollOffset + 2 * OUTER_PAD;
-	for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	    item = Blt_ListNextItem(item)) {
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	offset = setPtr->scrollOffset - (setPtr->outerPad + setPtr->xSelectPad);
+	width = VPORTWIDTH(setPtr) + setPtr->scrollOffset +
+	    2 * setPtr->outerPad;
+	for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	    linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    if ((tabPtr->worldX >= width) ||
 		((tabPtr->worldX + tabPtr->worldWidth) < offset)) {
 		tabPtr->flags &= ~TAB_VISIBLE;
 	    } else {
 		tabPtr->flags |= TAB_VISIBLE;
-		numVisibleTabs++;
+		nVisibleTabs++;
 	    }
 	}
     }
-    for (item = Blt_ListFirstItem(&(setPtr->tabList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tabPtr = (Tab *) Blt_ListGetValue(item);
-	tabPtr->scrnX = tabPtr->scrnY = -1000;
+    for (linkPtr = Blt_ChainFirstLink(setPtr->chainPtr); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tabPtr = Blt_ChainGetValue(linkPtr);
+	tabPtr->screenX = tabPtr->screenY = -1000;
 	if (tabPtr->flags & TAB_VISIBLE) {
 	    WorldToScreen(setPtr, tabPtr->worldX, tabPtr->worldY,
-		&(tabPtr->scrnX), &(tabPtr->scrnY));
+		&(tabPtr->screenX), &(tabPtr->screenY));
 	    switch (setPtr->side) {
 	    case SIDE_RIGHT:
-		tabPtr->scrnX -= setPtr->tabHeight;
+		tabPtr->screenX -= setPtr->tabHeight;
 		break;
 
 	    case SIDE_BOTTOM:
-		tabPtr->scrnY -= setPtr->tabHeight;
+		tabPtr->screenY -= setPtr->tabHeight;
 		break;
 	    }
 	}
     }
-    setPtr->numVisible = numVisibleTabs;
+    setPtr->nVisible = nVisibleTabs;
     Blt_PickCurrentItem(setPtr->bindTable);
 }
 
 
 static void
-Draw3DFolder(setPtr, tabPtr, drawable, side, pointArr, numPoints)
+Draw3DFolder(setPtr, tabPtr, drawable, side, pointArr, nPoints)
     Tabset *setPtr;
     Tab *tabPtr;
     Drawable drawable;
     int side;
     XPoint pointArr[];
-    int numPoints;
+    int nPoints;
 {
     GC gc;
     int relief, borderWidth;
@@ -4413,32 +4791,31 @@ Draw3DFolder(setPtr, tabPtr, drawable, side, pointArr, numPoints)
     } else {
 	border = tabPtr->border;
 	if (border == NULL) {
-	    border = setPtr->defAttrs.border;
+	    border = setPtr->defTabStyle.border;
 	}
     }
-    relief = setPtr->defAttrs.relief;
+    relief = setPtr->defTabStyle.relief;
     if ((side == SIDE_RIGHT) || (side == SIDE_TOP)) {
-	borderWidth = -setPtr->defAttrs.borderWidth;
+	borderWidth = -setPtr->defTabStyle.borderWidth;
 	if (relief == TK_RELIEF_SUNKEN) {
 	    relief = TK_RELIEF_RAISED;
 	} else if (relief == TK_RELIEF_RAISED) {
 	    relief = TK_RELIEF_SUNKEN;
 	}
     } else {
-	borderWidth = setPtr->defAttrs.borderWidth;
+	borderWidth = setPtr->defTabStyle.borderWidth;
     }
     /* Draw the outline of the folder. */
     gc = Tk_GCForColor(setPtr->shadowColor, drawable);
-    XDrawLines(setPtr->display, drawable, gc, pointArr, numPoints,
-	CoordModeOrigin);
+    XDrawLines(setPtr->display, drawable, gc, pointArr, nPoints, CoordModeOrigin);
     /* And the folder itself. */
-    if (tabPtr->tileGC != NULL) {
-	XFillPolygon(setPtr->display, drawable, tabPtr->tileGC, pointArr,
-	    numPoints, Convex, CoordModeOrigin);
-	Tk_Draw3DPolygon(setPtr->tkwin, drawable, border, pointArr, numPoints,
+    if (tabPtr->tile != NULL) {
+	Blt_TilePolygon(setPtr->tkwin, drawable, tabPtr->tile, pointArr,
+	    nPoints);
+	Tk_Draw3DPolygon(setPtr->tkwin, drawable, border, pointArr, nPoints,
 	    borderWidth, relief);
     } else {
-	Tk_Fill3DPolygon(setPtr->tkwin, drawable, border, pointArr, numPoints,
+	Tk_Fill3DPolygon(setPtr->tkwin, drawable, border, pointArr, nPoints,
 	    borderWidth, relief);
     }
 }
@@ -4460,20 +4837,20 @@ DrawLabel(setPtr, tabPtr, drawable)
     Tab *tabPtr;
     Drawable drawable;
 {
-    int x, y, width, height;
-    int dx, dy;
-    int textX, textY, imgX, imgY;
+    int x, y, dx, dy;
+    int tx, ty, ix, iy;
     int imgWidth, imgHeight;
-    int labelWidth, labelHeight;
     int active, selected;
     XColor *fgColor, *bgColor;
     Tk_3DBorder border;
-    XRectangle clipRect;
-    int tabInset;
+    GC gc;
 
     if (!(tabPtr->flags & TAB_VISIBLE)) {
 	return;
     }
+    x = tabPtr->screenX;
+    y = tabPtr->screenY;
+
     active = (setPtr->activePtr == tabPtr);
     selected = (setPtr->selectPtr == tabPtr);
 
@@ -4489,77 +4866,89 @@ DrawLabel(setPtr, tabPtr, drawable)
 	activeBorder = GETATTR(tabPtr, activeBorder);
 	bgColor = Tk_3DBorderColor(activeBorder);
     }
-    tabInset = setPtr->pageInset;
+    dx = (tabPtr->screenWidth - tabPtr->labelWidth) / 2;
+    dy = (tabPtr->screenHeight - tabPtr->labelHeight) / 2;
 
 
-    x = tabPtr->scrnX + tabInset;
-    y = tabPtr->scrnY + tabInset;
-
-    width = tabPtr->scrnWidth - 2 * tabInset;
-    height = tabPtr->scrnHeight - 2 * tabInset;
-    clipRect.x = x - 1, clipRect.y = y - 1;
-    clipRect.width = width + 1, clipRect.height = height + 1;
-
-    {
-	GC gc;
-
-	/*
-	 * Draw the correct background color.
-	 */
-	gc = Tk_GCForColor(bgColor, drawable);
-	XFillRectangles(setPtr->display, drawable, gc, &clipRect, 1);
-	if ((setPtr->flags & TABSET_FOCUS) && (setPtr->focusPtr == tabPtr)) {
-	    XDrawRectangles(setPtr->display, drawable,
-		setPtr->defAttrs.activeGC, &clipRect, 1);
+    /*
+     * The label position is computed with screen coordinates.  This
+     * is because both text and image components are oriented in
+     * screen coordinate space, and not according to the orientation
+     * of the tabs themselves.  That's why we have to consider the
+     * side when correcting for left/right slants.
+     */
+    switch (setPtr->side) {
+    case SIDE_TOP:
+    case SIDE_BOTTOM:
+	if (setPtr->slant == SLANT_LEFT) {
+	    x += setPtr->overlap;
+	} else if (setPtr->slant == SLANT_RIGHT) {
+	    x -= setPtr->overlap;
 	}
+	break;
+    case SIDE_LEFT:
+    case SIDE_RIGHT:
+	if (setPtr->slant == SLANT_LEFT) {
+	    y += setPtr->overlap;
+	} else if (setPtr->slant == SLANT_RIGHT) {
+	    y -= setPtr->overlap;
+	}
+	break;
     }
+
+    /*
+     * Draw the active or normal background color over the entire
+     * label area.  This includes both the tab's text and image.
+     * The rectangle should be 2 pixels wider/taller than this
+     * area. So if the label consists of just an image, we get an
+     * halo around the image when the tab is active.
+     */
+    gc = Tk_GCForColor(bgColor, drawable);
+    XFillRectangle(setPtr->display, drawable, gc, x + dx, y + dy,
+	tabPtr->labelWidth, tabPtr->labelHeight);
+    if ((setPtr->flags & TABSET_FOCUS) && (setPtr->focusPtr == tabPtr)) {
+	XDrawRectangle(setPtr->display, drawable, setPtr->defTabStyle.activeGC,
+	    x + dx, y + dy, tabPtr->labelWidth - 1, tabPtr->labelHeight - 1);
+    }
+    tx = ty = ix = iy = 0;	/* Suppress compiler warning. */
+
+    imgWidth = imgHeight = 0;
     if (tabPtr->image != NULL) {
 	imgWidth = ImageWidth(tabPtr->image);
 	imgHeight = ImageHeight(tabPtr->image);
-    } else {
-	imgWidth = imgHeight = 0;
     }
-    x = tabPtr->scrnX;
-    y = tabPtr->scrnY;
-    labelWidth = tabPtr->labelWidth + PADDING(tabPtr->iPadX);
-    labelHeight = tabPtr->labelHeight + PADDING(tabPtr->iPadY);
-    dx = (tabPtr->scrnWidth - labelWidth) / 2;
-    dy = (tabPtr->scrnHeight - labelHeight) / 2;
-
-    textX = textY = imgX = imgY = 0;	/* Suppress compiler warning. */
-    switch (setPtr->defAttrs.textSide) {
+    switch (setPtr->defTabStyle.textSide) {
     case SIDE_LEFT:
-	textX = x + dx + tabPtr->iPadX.side1;
-	textY = y + (tabPtr->scrnHeight - tabPtr->textHeight) / 2;
-	imgX = textX + tabPtr->textWidth + IMAGE_PAD;
-	imgY = y + (tabPtr->scrnHeight - imgHeight) / 2;
+	tx = x + dx + tabPtr->iPadX.side1;
+	ty = y + (tabPtr->screenHeight - tabPtr->textHeight) / 2;
+	ix = tx + tabPtr->textWidth + IMAGE_PAD;
+	iy = y + (tabPtr->screenHeight - imgHeight) / 2;
 	break;
     case SIDE_RIGHT:
-	imgX = x + dx + tabPtr->iPadX.side1;
-	imgY = y + (tabPtr->scrnHeight - imgHeight) / 2;
-	textX = imgX + imgWidth + IMAGE_PAD;
-	textY = y + (tabPtr->scrnHeight - tabPtr->textHeight) / 2;
+	ix = x + dx + tabPtr->iPadX.side1 + IMAGE_PAD;
+	iy = y + (tabPtr->screenHeight - imgHeight) / 2;
+	tx = ix + imgWidth;
+	ty = y + (tabPtr->screenHeight - tabPtr->textHeight) / 2;
 	break;
     case SIDE_BOTTOM:
-	imgY = y + dy + tabPtr->iPadY.side1;
-	imgX = x + (tabPtr->scrnWidth - imgWidth) / 2;
-	textY = imgY + imgHeight + IMAGE_PAD;
-	textX = x + (tabPtr->scrnWidth - tabPtr->textWidth) / 2;
+	iy = y + dy + tabPtr->iPadY.side1 + IMAGE_PAD;
+	ix = x + (tabPtr->screenWidth - imgWidth) / 2;
+	ty = iy + imgHeight;
+	tx = x + (tabPtr->screenWidth - tabPtr->textWidth) / 2;
 	break;
     case SIDE_TOP:
-	textX = x + (tabPtr->scrnWidth - tabPtr->textWidth) / 2;
-	textY = y + dy + tabPtr->iPadY.side1;
-	imgX = x + (tabPtr->scrnWidth - imgWidth) / 2;
-	imgY = textY + tabPtr->textHeight + IMAGE_PAD;
+	tx = x + (tabPtr->screenWidth - tabPtr->textWidth) / 2;
+	ty = y + dy + tabPtr->iPadY.side1 + IMAGE_PAD;
+	ix = x + (tabPtr->screenWidth - imgWidth) / 2;
+	iy = ty + tabPtr->textHeight;
 	break;
     }
     if (tabPtr->image != NULL) {
-	Tk_RedrawImage(ImageData(tabPtr->image), 0, 0,
-	    ImageWidth(tabPtr->image), ImageHeight(tabPtr->image), drawable,
-	    imgX, imgY);
+	Tk_RedrawImage(ImageBits(tabPtr->image), 0, 0, imgWidth, imgHeight,
+	    drawable, ix, iy);
     }
     if (tabPtr->text != NULL) {
-	TextAttributes attr;
+	TextStyle ts;
 	XColor *activeColor;
 
 	activeColor = fgColor;
@@ -4568,34 +4957,98 @@ DrawLabel(setPtr, tabPtr, drawable)
 	} else if (active) {
 	    activeColor = GETATTR(tabPtr, activeFgColor);
 	}
-	Blt_SetTextDrawAttributes(&attr, GETATTR(tabPtr, font), tabPtr->textGC,
+	Blt_SetDrawTextStyle(&ts, GETATTR(tabPtr, font), tabPtr->textGC,
 	    fgColor, activeColor, tabPtr->shadow.color,
-	    setPtr->defAttrs.rotate, TK_ANCHOR_NW, TK_JUSTIFY_LEFT,
+	    setPtr->defTabStyle.rotate, TK_ANCHOR_NW, TK_JUSTIFY_LEFT,
 	    0, tabPtr->shadow.offset);
-	attr.state = tabPtr->state;
-	attr.border = border;
-	if (selected || active) {
-	    attr.state |= STATE_ACTIVE;
+	ts.state = tabPtr->state;
+	ts.border = border;
+	ts.padX.side1 = ts.padX.side2 = 2;
+	if ((selected) || (active)) {
+	    ts.state |= STATE_ACTIVE;
 	}
-	Blt_DrawText(setPtr->tkwin, drawable, tabPtr->text, &attr, textX, textY);
+	Blt_DrawText(setPtr->tkwin, drawable, tabPtr->text, &ts, tx, ty);
     }
 }
 
+
+static void
+DrawPerforation(setPtr, tabPtr, drawable)
+    Tabset *setPtr;
+    Tab *tabPtr;
+    Drawable drawable;
+{
+    XPoint pointArr[2];
+    int x, y;
+    int segmentWidth, max;
+    Tk_3DBorder border, perfBorder;
+
+    if ((tabPtr->container != NULL) || (tabPtr->tkwin == NULL)) {
+	return;
+    }
+    WorldToScreen(setPtr, tabPtr->worldX + 2, 
+	  tabPtr->worldY + tabPtr->worldHeight + 2, &x, &y);
+    border = GETATTR(tabPtr, selBorder);
+    segmentWidth = 3;
+    if (setPtr->flags & PERFORATION_ACTIVE) {
+	perfBorder = GETATTR(tabPtr, activeBorder);
+    } else {
+	perfBorder = GETATTR(tabPtr, selBorder);
+    }	
+    if (setPtr->side & SIDE_HORIZONTAL) {
+	pointArr[0].x = x;
+	pointArr[0].y = pointArr[1].y = y;
+	max = tabPtr->screenX + tabPtr->screenWidth - 2;
+	Blt_Fill3DRectangle(setPtr->tkwin, drawable, perfBorder,
+	       x - 2, y - 4, tabPtr->screenWidth, 8, 0, TK_RELIEF_FLAT);
+	while (pointArr[0].x < max) {
+	    pointArr[1].x = pointArr[0].x + segmentWidth;
+	    if (pointArr[1].x > max) {
+		pointArr[1].x = max;
+	    }
+	    Tk_Draw3DPolygon(setPtr->tkwin, drawable, border, pointArr, 2, 1,
+			     TK_RELIEF_RAISED);
+	    pointArr[0].x += 2 * segmentWidth;
+	}
+    } else {
+	pointArr[0].x = pointArr[1].x = x;
+	pointArr[0].y = y;
+	max  = tabPtr->screenY + tabPtr->screenHeight - 2;
+	Blt_Fill3DRectangle(setPtr->tkwin, drawable, perfBorder,
+	       x - 4, y - 2, 8, tabPtr->screenHeight, 0, TK_RELIEF_FLAT);
+	while (pointArr[0].y < max) {
+	    pointArr[1].y = pointArr[0].y + segmentWidth;
+	    if (pointArr[1].y > max) {
+		pointArr[1].y = max;
+	    }
+	    Tk_Draw3DPolygon(setPtr->tkwin, drawable, border, pointArr, 2, 1,
+			     TK_RELIEF_RAISED);
+	    pointArr[0].y += 2 * segmentWidth;
+	}
+    }
+}
+
+#define NextPoint(px, py) \
+	pointPtr->x = (px), pointPtr->y = (py), pointPtr++, nPoints++
+#define EndPoint(px, py) \
+	pointPtr->x = (px), pointPtr->y = (py), nPoints++
+
 #define BottomLeft(px, py) \
-	pointPtr->x = (px) + setPtr->corner, pointPtr->y = (py), pointPtr++, \
-	pointPtr->x = (px), pointPtr->y = (py) - setPtr->corner, pointPtr++
+	NextPoint((px) + setPtr->corner, (py)), \
+	NextPoint((px), (py) - setPtr->corner)
 
 #define TopLeft(px, py) \
-	pointPtr->x = (px), pointPtr->y = (py) + setPtr->corner, pointPtr++, \
-	pointPtr->x = (px) + setPtr->corner, pointPtr->y = (py), pointPtr++
+	NextPoint((px), (py) + setPtr->corner), \
+	NextPoint((px) + setPtr->corner, (py))
 
 #define TopRight(px, py) \
-	pointPtr->x = (px) - setPtr->corner, pointPtr->y = (py), pointPtr++, \
-	pointPtr->x = (px), pointPtr->y = (py) + setPtr->corner, pointPtr++
+	NextPoint((px) - setPtr->corner, (py)), \
+	NextPoint((px), (py) + setPtr->corner)
 
 #define BottomRight(px, py) \
-	pointPtr->x = (px), pointPtr->y = (py) - setPtr->corner, pointPtr++, \
-	pointPtr->x = (px) - setPtr->corner, pointPtr->y = (py), pointPtr++
+	NextPoint((px), (py) - setPtr->corner), \
+	NextPoint((px) - setPtr->corner, (py))
+
 
 /*
  * From the left edge:
@@ -4629,18 +5082,18 @@ DrawLabel(setPtr, tabPtr, drawable)
  *
  */
 static void
-DisplayFolder(setPtr, tabPtr, drawable)
+DrawFolder(setPtr, tabPtr, drawable)
     Tabset *setPtr;
     Tab *tabPtr;
     Drawable drawable;
 {
-    XPoint pointArr[15];
+    XPoint pointArr[16];
     XPoint *pointPtr;
     int width, height;
-    int xMin, yMax, xMax, yMin, yBot;
+    int left, bottom, right, top, yBot, yTop;
     int x, y;
     register int i;
-    int numPoints;
+    int nPoints;
 
     width = VPORTWIDTH(setPtr);
     height = VPORTHEIGHT(setPtr);
@@ -4648,20 +5101,33 @@ DisplayFolder(setPtr, tabPtr, drawable)
     x = tabPtr->worldX;
     y = tabPtr->worldY;
 
+    nPoints = 0;
     pointPtr = pointArr;
 
     /* Remember these are all world coordinates. */
-    xMin = setPtr->scrollOffset;
-    xMax = xMin + width;
+    /*
+     * x	Left side of tab.
+     * y	Top of tab.
+     * yTop	Top of folder.
+     * yBot	Bottom of the tab.
+     * left	Left side of the folder.
+     * right	Right side of the folder.
+     * top	Top of folder.
+     * bottom	Bottom of folder.
+     */
+    left = setPtr->scrollOffset - setPtr->xSelectPad;
+    right = left + width;
+    yTop = y + tabPtr->worldHeight;
     yBot = setPtr->pageTop - (setPtr->inset + setPtr->yPad);
-    yMin = yBot - setPtr->pageInset;
+    top = yBot - setPtr->inset2 /* - 4 */;
 
     if (setPtr->pageHeight == 0) {
-	yMax = yBot + 2 * setPtr->corner;
+	bottom = yBot + 2 * setPtr->corner;
     } else {
-	yMax = height - setPtr->yPad - 1;
+	bottom = height - setPtr->yPad - 1;
     }
     if (tabPtr != setPtr->selectPtr) {
+
 	/*
 	 * Case 1: Unselected tab
 	 *
@@ -4672,13 +5138,27 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	 *   0+ . . +7
 	 *
 	 */
-	BottomLeft(x, yBot);
-	TopLeft(x, y);
-	TopRight(x + tabPtr->worldWidth, y);
-	BottomRight(x + tabPtr->worldWidth, yBot);
-	numPoints = 9;
+
+	if (setPtr->slant & SLANT_LEFT) {
+	    NextPoint(x, yBot);
+	    NextPoint(x, yTop);
+	    NextPoint(x + setPtr->tabHeight, y);
+	} else {
+	    BottomLeft(x, yBot);
+	    TopLeft(x, y);
+	}
+	x += tabPtr->worldWidth;
+	if (setPtr->slant & SLANT_RIGHT) {
+	    NextPoint(x - setPtr->tabHeight, y);
+	    NextPoint(x, yTop);
+	    NextPoint(x, yBot);
+	} else {
+	    TopRight(x, y);
+	    BottomRight(x, yBot);
+	}
 
     } else if (!(tabPtr->flags & TAB_VISIBLE)) {
+
 	/*
 	 * Case 2: Selected tab not visible in viewport.  Draw folder only.
 	 *
@@ -4689,33 +5169,32 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	 *   0+------+7
 	 *
 	 */
-	TopLeft(xMin, yMin);
-	TopRight(xMax, yMin);
-	BottomRight(xMax, yMax);
-	BottomLeft(xMin, yMax);
-	numPoints = 9;
 
+	TopLeft(left, top);
+	TopRight(right, top);
+	BottomRight(right, bottom);
+	BottomLeft(left, bottom);
     } else {
 	int flags;
 	int tabWidth;
 
-	numPoints = 14;
-	x -= setPtr->selectPad;
-	y -= setPtr->selectPad;
-	tabWidth = tabPtr->worldWidth + 2 * setPtr->selectPad;
+	x -= setPtr->xSelectPad;
+	y -= setPtr->yPad;
+	tabWidth = tabPtr->worldWidth + 2 * setPtr->xSelectPad;
 
 #define CLIP_NONE	0
 #define CLIP_LEFT	(1<<0)
 #define CLIP_RIGHT	(1<<1)
 	flags = 0;
-	if (x < xMin) {
+	if (x < left) {
 	    flags |= CLIP_LEFT;
 	}
-	if ((x + tabWidth) > xMax) {
+	if ((x + tabWidth) > right) {
 	    flags |= CLIP_RIGHT;
 	}
 	switch (flags) {
 	case CLIP_NONE:
+
 	    /*
 	     *  worldX, worldY
 	     *          |
@@ -4730,26 +5209,38 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	     *13+                              +10
 	     *  12+-------------------------+11
 	     */
-	    if (x < (xMin + setPtr->corner)) {
-		pointPtr->x = xMin, pointPtr->y = yMin, pointPtr++;
+
+	    if (x < (left + setPtr->corner)) {
+		NextPoint(left, top);
 	    } else {
-		TopLeft(xMin, yMin);
+		TopLeft(left, top);
 	    }
-	    pointPtr->x = x, pointPtr->y = yMin, pointPtr++;
-	    TopLeft(x, y);
-	    TopRight(x + tabWidth, y);
-	    pointPtr->x = x + tabWidth, pointPtr->y = yMin, pointPtr++;
-	    if ((x + tabWidth) > (xMax - setPtr->corner)) {
-		pointPtr->x = xMax;
-		pointPtr->y = yMin + setPtr->corner, pointPtr++;
+	    if (setPtr->slant & SLANT_LEFT) {
+		NextPoint(x, yTop);
+		NextPoint(x + setPtr->tabHeight + setPtr->yPad, y);
 	    } else {
-		TopRight(xMax, yMin);
+		NextPoint(x, top);
+		TopLeft(x, y);
 	    }
-	    BottomRight(xMax, yMax);
-	    BottomLeft(xMin, yMax);
+	    x += tabWidth;
+	    if (setPtr->slant & SLANT_RIGHT) {
+		NextPoint(x - setPtr->tabHeight - setPtr->yPad, y);
+		NextPoint(x, yTop);
+	    } else {
+		TopRight(x, y);
+		NextPoint(x, top);
+	    }
+	    if (x > (right - setPtr->corner)) {
+		NextPoint(right, top + setPtr->corner);
+	    } else {
+		TopRight(right, top);
+	    }
+	    BottomRight(right, bottom);
+	    BottomLeft(left, bottom);
 	    break;
 
 	case CLIP_LEFT:
+
 	    /*
 	     *  worldX, worldY
 	     *          |
@@ -4764,17 +5255,38 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	     *                   13+           +10
 	     *                     12+--------+11
 	     */
-	    pointPtr->x = xMin, pointPtr->y = yBot, pointPtr++;
-	    BottomLeft(x, yBot);
-	    TopLeft(x, y);
-	    TopRight(x + tabWidth, y);
-	    pointPtr->x = x + tabWidth, pointPtr->y = yMin, pointPtr++;
-	    TopRight(xMax, yMin);
-	    BottomRight(xMax, yMax);
-	    BottomLeft(xMin, yMax);
+
+	    NextPoint(left, yBot);
+	    if (setPtr->slant & SLANT_LEFT) {
+		NextPoint(x, yBot);
+		NextPoint(x, yTop);
+		NextPoint(x + setPtr->tabHeight + setPtr->yPad, y);
+	    } else {
+		BottomLeft(x, yBot);
+		TopLeft(x, y);
+	    }
+
+	    x += tabWidth;
+	    if (setPtr->slant & SLANT_RIGHT) {
+		NextPoint(x - setPtr->tabHeight - setPtr->yPad, y);
+		NextPoint(x, yTop);
+		NextPoint(x, top);
+	    } else {
+		TopRight(x, y);
+		NextPoint(x, top);
+	    }
+	    if (x > (right - setPtr->corner)) {
+		NextPoint(right, top + setPtr->corner);
+	    } else {
+		TopRight(right, top);
+	    }
+	    /* TopRight(right, top); */
+	    BottomRight(right, bottom);
+	    BottomLeft(left, bottom);
 	    break;
 
 	case CLIP_RIGHT:
+
 	    /*
 	     *              worldX, worldY
 	     *                     |
@@ -4789,17 +5301,37 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	     *         4+           +1
 	     *           3+-------+2
 	     */
-	    pointPtr->x = xMax, pointPtr->y = yBot, pointPtr++;
-	    BottomRight(xMax, yMax);
-	    BottomLeft(xMin, yMax);
-	    TopLeft(xMin, yMin);
-	    pointPtr->x = x, pointPtr->y = yMin, pointPtr++;
-	    TopLeft(x, y);
-	    TopRight(x + tabWidth, y);
-	    BottomRight(x + tabWidth, yBot);
+
+	    NextPoint(right, yBot);
+	    BottomRight(right, bottom);
+	    BottomLeft(left, bottom);
+	    /* TopLeft(left, top); */
+	    if (x < (left + setPtr->corner)) {
+		NextPoint(left, top);
+	    } else {
+		TopLeft(left, top);
+	    }
+	    NextPoint(x, top);
+
+	    if (setPtr->slant & SLANT_LEFT) {
+		NextPoint(x, yTop);
+		NextPoint(x + setPtr->tabHeight + setPtr->yPad, y);
+	    } else {
+		TopLeft(x, y);
+	    }
+	    x += tabWidth;
+	    if (setPtr->slant & SLANT_RIGHT) {
+		NextPoint(x - setPtr->tabHeight - setPtr->yPad, y);
+		NextPoint(x, yTop);
+		NextPoint(x, yBot);
+	    } else {
+		TopRight(x, y);
+		BottomRight(x, yBot);
+	    }
 	    break;
 
 	case (CLIP_LEFT | CLIP_RIGHT):
+
 	    /*
 	     *  worldX, worldY
 	     *     |
@@ -4814,33 +5346,46 @@ DisplayFolder(setPtr, tabPtr, drawable)
 	     *         13+          +10
 	     *          12+-------+11
 	     */
-	    pointPtr->x = xMin, pointPtr->y = yBot, pointPtr++;
-	    BottomLeft(x, yBot);
-	    TopLeft(x, y);
-	    TopRight(x + tabWidth, y);
-	    BottomRight(x + tabWidth, yBot);
-	    pointPtr->x = xMax, pointPtr->y = yBot, pointPtr++;
-	    BottomRight(xMax, yMax);
-	    BottomLeft(xMin, yMax);
+
+	    NextPoint(left, yBot);
+	    if (setPtr->slant & SLANT_LEFT) {
+		NextPoint(x, yBot);
+		NextPoint(x, yTop);
+		NextPoint(x + setPtr->tabHeight + setPtr->yPad, y);
+	    } else {
+		BottomLeft(x, yBot);
+		TopLeft(x, y);
+	    }
+	    x += tabPtr->worldWidth;
+	    if (setPtr->slant & SLANT_RIGHT) {
+		NextPoint(x - setPtr->tabHeight - setPtr->yPad, y);
+		NextPoint(x, yTop);
+		NextPoint(x, yBot);
+	    } else {
+		TopRight(x, y);
+		BottomRight(x, yBot);
+	    }
+	    NextPoint(right, yBot);
+	    BottomRight(right, bottom);
+	    BottomLeft(left, bottom);
 	    break;
 	}
     }
-    pointPtr->x = pointArr[0].x;
-    pointPtr->y = pointArr[0].y;
-    for (i = 0; i < numPoints; i++) {
+    EndPoint(pointArr[0].x, pointArr[0].y);
+    for (i = 0; i < nPoints; i++) {
 	WorldToScreen(setPtr, pointArr[i].x, pointArr[i].y, &x, &y);
 	pointArr[i].x = x;
 	pointArr[i].y = y;
     }
-    Draw3DFolder(setPtr, tabPtr, drawable, setPtr->side, pointArr, numPoints);
+    Draw3DFolder(setPtr, tabPtr, drawable, setPtr->side, pointArr, nPoints);
     DrawLabel(setPtr, tabPtr, drawable);
     if (tabPtr->container != NULL) {
-	XRectangle region;
+	XRectangle rect;
 
-	/* Draw rectangle covering the spot representing the window  */
-	GetWindowRegion(tabPtr, setPtr->tkwin, FALSE, &region);
+	/* Draw a rectangle covering the spot representing the window  */
+	GetWindowRectangle(tabPtr, setPtr->tkwin, FALSE, &rect);
 	XFillRectangles(setPtr->display, drawable, tabPtr->backGC,
-	    &region, 1);
+	    &rect, 1);
     }
 }
 
@@ -4855,7 +5400,7 @@ DrawOuterBorders(setPtr, drawable)
      * that hang over the edge will be clipped.
      */
     if (setPtr->borderWidth > 0) {
-	Tk_Draw3DRectangle(setPtr->tkwin, drawable, setPtr->border,
+	Blt_Draw3DRectangle(setPtr->tkwin, drawable, setPtr->border,
 	    setPtr->highlightWidth, setPtr->highlightWidth,
 	    Tk_Width(setPtr->tkwin) - 2 * setPtr->highlightWidth,
 	    Tk_Height(setPtr->tkwin) - 2 * setPtr->highlightWidth,
@@ -4869,8 +5414,8 @@ DrawOuterBorders(setPtr, drawable)
 	color = (setPtr->flags & TABSET_FOCUS)
 	    ? setPtr->highlightColor : setPtr->highlightBgColor;
 	gc = Tk_GCForColor(color, drawable);
-	Tk_DrawFocusHighlight(setPtr->tkwin, gc, setPtr->highlightWidth,
-	    drawable);
+	Tk_DrawFocusHighlight(setPtr->tkwin, gc, setPtr->highlightWidth, 
+	      drawable);
     }
 }
 
@@ -4899,7 +5444,7 @@ static void
 DisplayTabset(clientData)
     ClientData clientData;	/* Information about widget. */
 {
-    Tabset *setPtr = (Tabset *) clientData;
+    Tabset *setPtr = clientData;
     Pixmap drawable;
     int width, height;
 
@@ -4929,11 +5474,11 @@ DisplayTabset(clientData)
 	    height = setPtr->pageHeight;
 	}
 	if (setPtr->side & SIDE_VERTICAL) {
-	    width += setPtr->pageTop + setPtr->inset + setPtr->pageInset;
-	    height += 2 * (setPtr->inset + setPtr->pageInset);
+	    width += setPtr->pageTop + setPtr->inset + setPtr->inset2;
+	    height += (setPtr->inset + setPtr->inset2);
 	} else {
-	    height += setPtr->pageTop + setPtr->inset + setPtr->pageInset;
-	    width += 2 * (setPtr->inset + setPtr->pageInset);
+	    height += setPtr->pageTop + setPtr->inset + setPtr->inset2;
+	    width += (setPtr->inset + setPtr->inset2);
 	}
 	if ((Tk_ReqWidth(setPtr->tkwin) != width) ||
 	    (Tk_ReqHeight(setPtr->tkwin) != height)) {
@@ -4944,7 +5489,7 @@ DisplayTabset(clientData)
 	width = VPORTWIDTH(setPtr);
 	setPtr->scrollOffset = Blt_AdjustViewport(setPtr->scrollOffset,
 	    setPtr->worldWidth, width, setPtr->scrollUnits,
-	    SCROLL_MODE_CANVAS);
+	    BLT_SCROLL_MODE_CANVAS);
 	if (setPtr->scrollCmdPrefix != NULL) {
 	    Blt_UpdateScrollbar(setPtr->interp, setPtr->scrollCmdPrefix,
 		(double)setPtr->scrollOffset / setPtr->worldWidth,
@@ -4965,39 +5510,43 @@ DisplayTabset(clientData)
      * Clear the background either by tiling a pixmap or filling with
      * a solid color. Tiling takes precedence.
      */
-    if (setPtr->bgTile != NULL) {
-	Blt_SetTileOrigin(setPtr->tkwin, setPtr->tileGC, 0, 0);
-	XFillRectangle(setPtr->display, drawable, setPtr->tileGC, 0, 0,
+    if (setPtr->tile != NULL) {
+	Blt_SetTileOrigin(setPtr->tkwin, setPtr->tile, 0, 0);
+	Blt_TileRectangle(setPtr->tkwin, drawable, setPtr->tile, 0, 0,
 	    Tk_Width(setPtr->tkwin), height);
     } else {
-	Tk_Fill3DRectangle(setPtr->tkwin, drawable, setPtr->border, 0, 0,
+	Blt_Fill3DRectangle(setPtr->tkwin, drawable, setPtr->border, 0, 0,
 	    Tk_Width(setPtr->tkwin), height, 0, TK_RELIEF_FLAT);
     }
 
-    if (setPtr->numVisible > 0) {
+    if (setPtr->nVisible > 0) {
 	register int i;
 	register Tab *tabPtr;
-	register Blt_ListItem item;
+	Blt_ChainLink *linkPtr;
 
-	item = setPtr->startPtr->item;
-	for (i = 0; i < Blt_ListGetLength(&(setPtr->tabList)); i++) {
-	    item = Blt_ListPrevItem(item);
-	    if (item == NULL) {
-		item = Blt_ListLastItem(&(setPtr->tabList));
+	linkPtr = setPtr->startPtr->linkPtr;
+	for (i = 0; i < Blt_ChainGetLength(setPtr->chainPtr); i++) {
+	    linkPtr = Blt_ChainPrevLink(linkPtr);
+	    if (linkPtr == NULL) {
+		linkPtr = Blt_ChainLastLink(setPtr->chainPtr);
 	    }
-	    tabPtr = (Tab *) Blt_ListGetValue(item);
+	    tabPtr = Blt_ChainGetValue(linkPtr);
 	    if ((tabPtr != setPtr->selectPtr) &&
 		(tabPtr->flags & TAB_VISIBLE)) {
-		DisplayFolder(setPtr, tabPtr, drawable);
+		DrawFolder(setPtr, tabPtr, drawable);
 	    }
 	}
-	DisplayFolder(setPtr, setPtr->selectPtr, drawable);
+	DrawFolder(setPtr, setPtr->selectPtr, drawable);
+	if (setPtr->tearoff) {
+	    DrawPerforation(setPtr, setPtr->selectPtr, drawable);
+	}
+
 	if ((setPtr->selectPtr->tkwin != NULL) &&
 	    (setPtr->selectPtr->container == NULL)) {
-	    XRectangle region;
+	    XRectangle rect;
 
-	    GetWindowRegion(setPtr->selectPtr, setPtr->tkwin, FALSE, &region);
-	    ArrangeWindow(setPtr->selectPtr->tkwin, &region, 0);
+	    GetWindowRectangle(setPtr->selectPtr, setPtr->tkwin, FALSE, &rect);
+	    ArrangeWindow(setPtr->selectPtr->tkwin, &rect, 0);
 	}
     }
     DrawOuterBorders(setPtr, drawable);
@@ -5044,15 +5593,17 @@ DisplayTearoff(clientData)
     Tabset *setPtr;
     Tab *tabPtr;
     Drawable drawable;
-    XPoint pointArr[15];
+    XPoint pointArr[16];
     XPoint *pointPtr;
     int width, height;
-    int xMin, yMax, xMax, yMin;
+    int left, bottom, right, top;
     int x, y;
-    int numPoints;
+    int nPoints;
     Tk_Window tkwin;
+    Tk_Window parent;
+    XRectangle rect;
 
-    tabPtr = (Tab *) clientData;
+    tabPtr = clientData;
     if (tabPtr == NULL) {
 	return;
     }
@@ -5068,12 +5619,12 @@ DisplayTearoff(clientData)
      * Clear the background either by tiling a pixmap or filling with
      * a solid color. Tiling takes precedence.
      */
-    if (setPtr->bgTile != NULL) {
-	Blt_SetTileOrigin(tkwin, setPtr->tileGC, 0, 0);
-	XFillRectangle(setPtr->display, drawable, setPtr->tileGC, 0, 0,
+    if (setPtr->tile != NULL) {
+	Blt_SetTileOrigin(tkwin, setPtr->tile, 0, 0);
+	Blt_TileRectangle(tkwin, drawable, setPtr->tile, 0, 0,
 	    Tk_Width(tkwin), Tk_Height(tkwin));
     } else {
-	Tk_Fill3DRectangle(setPtr->tkwin, drawable, setPtr->border, 0, 0,
+	Blt_Fill3DRectangle(tkwin, drawable, setPtr->border, 0, 0,
 	    Tk_Width(tkwin), Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
     }
 
@@ -5082,14 +5633,10 @@ DisplayTearoff(clientData)
     x = setPtr->inset + setPtr->gap + setPtr->corner;
     y = setPtr->inset;
 
-    pointPtr = pointArr;
-
-    xMin = setPtr->inset;
-    xMax = setPtr->inset + width;
-    yMin = setPtr->inset + setPtr->corner + setPtr->selectPad;
-    yMax = setPtr->inset + height;
-
-    numPoints = 14;
+    left = setPtr->inset;
+    right = setPtr->inset + width;
+    top = setPtr->inset + setPtr->corner + setPtr->xSelectPad;
+    bottom = setPtr->inset + height;
 
     /*
      *  worldX, worldY
@@ -5105,30 +5652,29 @@ DisplayTearoff(clientData)
      *13+                              +10
      *  12+-------------------------+11
      */
-    TopLeft(xMin, yMin);
-    pointPtr->x = x, pointPtr->y = yMin, pointPtr++;
+
+    nPoints = 0;
+    pointPtr = pointArr;
+
+    TopLeft(left, top);
+    NextPoint(x, top);
     TopLeft(x, y);
-    TopRight(x + tabPtr->worldWidth, y);
-    pointPtr->x = x + tabPtr->worldWidth, pointPtr->y = yMin, pointPtr++;
-    TopRight(xMax, yMin);
-    BottomRight(xMax, yMax);
-    BottomLeft(xMin, yMax);
-    pointPtr->x = pointArr[0].x;
-    pointPtr->y = pointArr[0].y;
-    Draw3DFolder(setPtr, tabPtr, drawable, SIDE_TOP, pointArr, numPoints);
+    x += tabPtr->worldWidth;
+    TopRight(x, y);
+    NextPoint(x, top);
+    TopRight(right, top);
+    BottomRight(right, bottom);
+    BottomLeft(left, bottom);
+    EndPoint(pointArr[0].x, pointArr[0].y);
+    Draw3DFolder(setPtr, tabPtr, drawable, SIDE_TOP, pointArr, nPoints);
 
-    {
-	Tk_Window parent;
-	XRectangle region;
+    parent = (tabPtr->container == NULL) ? setPtr->tkwin : tabPtr->container;
+    GetWindowRectangle(tabPtr, parent, TRUE, &rect);
+    ArrangeWindow(tabPtr->tkwin, &rect, TRUE);
 
-	parent = (tabPtr->container == NULL)
-	    ? setPtr->tkwin : tabPtr->container;
-	GetWindowRegion(tabPtr, parent, TRUE, &region);
-	ArrangeWindow(tabPtr->tkwin, &region, TRUE);
-    }
     /* Draw 3D border. */
     if ((setPtr->borderWidth > 0) && (setPtr->relief != TK_RELIEF_FLAT)) {
-	Tk_Draw3DRectangle(tkwin, drawable, setPtr->border, 0, 0,
+	Blt_Draw3DRectangle(tkwin, drawable, setPtr->border, 0, 0,
 	    Tk_Width(tkwin), Tk_Height(tkwin), setPtr->borderWidth,
 	    setPtr->relief);
     }
@@ -5150,30 +5696,33 @@ DisplayTearoff(clientData)
  *
  * --------------------------------------------------------------
  */
-static Blt_OpSpec operSpecs[] =
+static Blt_OpSpec tabsetOps[] =
 {
-    {"activate", 1, (Blt_Operation)ActivateOp, 3, 3, "tab",},
-    {"bind", 1, (Blt_Operation)BindOp, 3, 5, "tab ?sequence command?",},
-    {"cget", 2, (Blt_Operation)CgetOp, 3, 3, "option",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 2, 0, "?option value?...",},
-    {"delete", 1, (Blt_Operation)DeleteOp, 2, 0, "firstTab ?lastTab?",},
-    {"focus", 1, (Blt_Operation)FocusOp, 3, 3, "tab",},
-    {"get", 1, (Blt_Operation)GetOp, 3, 3, "tab",},
-    {"index", 3, (Blt_Operation)IndexOp, 3, 5, "string",},
-    {"insert", 3, (Blt_Operation)InsertOp, 3, 0,
-	"position label ?label...? ?option value?",},
-    {"invoke", 3, (Blt_Operation)InvokeOp, 3, 3, "tab",},
-    {"move", 1, (Blt_Operation)MoveOp, 5, 5, "tab after|before tab",},
-    {"nearest", 1, (Blt_Operation)NearestOp, 4, 4, "x y",},
-    {"scan", 2, (Blt_Operation)ScanOp, 5, 5, "dragto|mark x y",},
-    {"see", 2, (Blt_Operation)SeeOp, 3, 3, "tab",},
-    {"size", 2, (Blt_Operation)SizeOp, 2, 2, "",},
-    {"tab", 1, (Blt_Operation)TabOp, 2, 0, "oper args",},
-    {"view", 1, (Blt_Operation)ViewOp, 2, 5,
+    {"activate", 1, (Blt_Op)ActivateOp, 3, 3, "index",},
+    {"bind", 1, (Blt_Op)BindOp, 2, 5, "index ?sequence command?",},
+    {"cget", 2, (Blt_Op)CgetOp, 3, 3, "option",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 2, 0, "?option value?...",},
+    {"delete", 1, (Blt_Op)DeleteOp, 2, 0, "first ?last?",},
+    {"focus", 1, (Blt_Op)FocusOp, 3, 3, "index",},
+    {"get", 1, (Blt_Op)GetOp, 3, 3, "index",},
+    {"highlight", 1, (Blt_Op)ActivateOp, 3, 3, "index",},
+    {"index", 3, (Blt_Op)IndexOp, 3, 5, "string",},
+    {"insert", 3, (Blt_Op)InsertOp, 3, 0,
+	"index name ?name...? ?option value?",},
+    {"invoke", 3, (Blt_Op)InvokeOp, 3, 3, "index",},
+    {"move", 1, (Blt_Op)MoveOp, 5, 5, "name after|before index",},
+    {"nearest", 1, (Blt_Op)NearestOp, 4, 4, "x y",},
+    {"perforation", 1, (Blt_Op)PerforationOp, 2, 0, "args",},
+    {"scan", 2, (Blt_Op)ScanOp, 5, 5, "dragto|mark x y",},
+    {"see", 3, (Blt_Op)SeeOp, 3, 3, "index",},
+    {"select", 3, (Blt_Op)SelectOp, 3, 3, "index",},
+    {"size", 2, (Blt_Op)SizeOp, 2, 2, "",},
+    {"tab", 1, (Blt_Op)TabOp, 2, 0, "oper args",},
+    {"view", 1, (Blt_Op)ViewOp, 2, 5,
 	"?moveto fract? ?scroll number what?",},
 };
 
-static int numSpecs = sizeof(operSpecs) / sizeof(Blt_OpSpec);
+static int nTabsetOps = sizeof(tabsetOps) / sizeof(Blt_OpSpec);
 
 static int
 TabsetInstCmd(clientData, interp, argc, argv)
@@ -5182,19 +5731,138 @@ TabsetInstCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Vector of argument strings. */
 {
-    Blt_Operation proc;
-    Tabset *setPtr = (Tabset *) clientData;
+    Blt_Op proc;
+    Tabset *setPtr = clientData;
     int result;
 
-    proc = Blt_GetOperation(interp, numSpecs, operSpecs,
-	BLT_OPER_ARG1, argc, argv);
+    proc = Blt_GetOp(interp, nTabsetOps, tabsetOps, BLT_OP_ARG1, 
+	argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
-    Tk_Preserve((ClientData)setPtr);
+    Tcl_Preserve(setPtr);
     result = (*proc) (setPtr, interp, argc, argv);
-    Tk_Release((ClientData)setPtr);
+    Tcl_Release(setPtr);
     return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TabsetInstDeletedCmd --
+ *
+ *	This procedure can be called if the window was destroyed
+ *	(tkwin will be NULL) and the command was deleted
+ *	automatically.  In this case, we need to do nothing.
+ *
+ *	Otherwise this routine was called because the command was
+ *	deleted.  Then we need to clean-up and destroy the widget.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	The widget is destroyed.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+TabsetInstDeletedCmd(clientData)
+    ClientData clientData;	/* Pointer to widget record for widget. */
+{
+    Tabset *setPtr = clientData;
+
+    if (setPtr->tkwin != NULL) {
+	Tk_Window tkwin;
+
+	tkwin = setPtr->tkwin;
+	setPtr->tkwin = NULL;
+	Tk_DestroyWindow(tkwin);
+#ifdef ITCL_NAMESPACES
+	Itk_SetWidgetCommand(tkwin, (Tcl_Command) NULL);
+#endif /* ITCL_NAMESPACES */
+    }
+}
+
+/*
+ * ------------------------------------------------------------------------
+ *
+ * TabsetCmd --
+ *
+ * 	This procedure is invoked to process the Tcl command that
+ * 	corresponds to a widget managed by this module. See the user
+ * 	documentation for details on what it does.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side Effects:
+ *	See the user documentation.
+ *
+ * -----------------------------------------------------------------------
+ */
+/* ARGSUSED */
+static int
+TabsetCmd(clientData, interp, argc, argv)
+    ClientData clientData;	/* Main window associated with interpreter. */
+    Tcl_Interp *interp;		/* Current interpreter. */
+    int argc;			/* Number of arguments. */
+    char **argv;		/* Argument strings. */
+{
+    Tabset *setPtr;
+    Tk_Window tkwin;
+    unsigned int mask;
+    Tcl_CmdInfo cmdInfo;
+
+    if (argc < 2) {
+	Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
+	    " pathName ?option value?...\"", (char *)NULL);
+	return TCL_ERROR;
+    }
+    tkwin = Tk_CreateWindowFromPath(interp, Tk_MainWindow(interp), argv[1],
+	(char *)NULL);
+    if (tkwin == NULL) {
+	return TCL_ERROR;
+    }
+    setPtr = CreateTabset(interp, tkwin);
+    if (ConfigureTabset(interp, setPtr, argc - 2, argv + 2, 0) != TCL_OK) {
+	Tk_DestroyWindow(setPtr->tkwin);
+	return TCL_ERROR;
+    }
+    mask = (ExposureMask | StructureNotifyMask | FocusChangeMask);
+    Tk_CreateEventHandler(tkwin, mask, TabsetEventProc, setPtr);
+    setPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], TabsetInstCmd,
+	setPtr, TabsetInstDeletedCmd);
+#ifdef ITCL_NAMESPACES
+    Itk_SetWidgetCommand(setPtr->tkwin, setPtr->cmdToken);
+#endif
+
+    /*
+     * Try to invoke a procedure to initialize various bindings on
+     * tabs.  Source the file containing the procedure now if the
+     * procedure isn't currently defined.  We deferred this to now so
+     * that the user could set the variable "blt_library" within the
+     * script.
+     */
+    if (!Tcl_GetCommandInfo(interp, "blt::TabsetInit", &cmdInfo)) {
+	static char initCmd[] = "source [file join $blt_library tabset.tcl]";
+
+	if (Tcl_GlobalEval(interp, initCmd) != TCL_OK) {
+	    char info[200];
+
+	    sprintf(info, "\n    (while loading bindings for %s)", argv[0]);
+	    Tcl_AddErrorInfo(interp, info);
+	    Tk_DestroyWindow(setPtr->tkwin);
+	    return TCL_ERROR;
+	}
+    }
+    if (Tcl_VarEval(interp, "blt::TabsetInit ", argv[1], (char *)NULL)
+	!= TCL_OK) {
+	Tk_DestroyWindow(setPtr->tkwin);
+	return TCL_ERROR;
+    }
+    Tcl_SetResult(interp, Tk_PathName(setPtr->tkwin), TCL_VOLATILE);
+    return TCL_OK;
 }
 
 int

@@ -19,82 +19,90 @@
  * whatsoever resulting from loss of use, data or profits, whether in
  * an action of contract, negligence or other tortuous action, arising
  * out of or in connection with the use or performance of this
- * software.  
+ * software.
  */
 #ifndef _BLT_LIST_H
 #define _BLT_LIST_H
 
-typedef struct Blt_List Blt_List;
+typedef struct Blt_ListStruct *Blt_List;
+typedef struct Blt_ListNodeStruct *Blt_ListNode;
 
 /*
- * A Blt_ListItem is the container structure for the Blt_List.
+ * A Blt_ListNode is the container structure for the Blt_List.
  */
-typedef struct Blt_ListItem {
-    struct Blt_ListItem *prevPtr;	/* Link to the previous item */
-    struct Blt_ListItem *nextPtr;	/* Link to the next item */
-    ClientData clientData;		/* Pointer to the data object */
-    struct Blt_List *listPtr;		/* List to eventually insert item */
-    union {                             /* Key has one of these forms: */
-        char *oneWordValue;             /* One-word value for key. */
-        int *words[1];                  /* Multiple integer words for key.
-                                         * The actual size will be as large
-                                         * as necessary for this table's
-                                         * keys. */
-        char string[4];                 /* String for key.  The actual size
-                                         * will be as large as needed to hold
-                                         * the key. */
-    } key;                              /* MUST BE LAST FIELD IN RECORD!! */
-} *Blt_ListItem;
+struct Blt_ListNodeStruct {
+    struct Blt_ListNodeStruct *prevPtr; /* Link to the previous node */
+    struct Blt_ListNodeStruct *nextPtr; /* Link to the next node */
+    ClientData clientData;	/* Pointer to the data object */
+    struct Blt_ListStruct *listPtr; /* List to eventually insert node */
+    union {			/* Key has one of these forms: */
+	CONST char *oneWordValue; /* One-word value for key. */
+	int *words[1];		/* Multiple integer words for key.
+				 * The actual size will be as large
+				 * as necessary for this table's
+				 * keys. */
+	char string[4];		/* String for key.  The actual size
+				 * will be as large as needed to hold
+				 * the key. */
+    } key;			/* MUST BE LAST FIELD IN RECORD!! */
+};
 
-typedef int (Blt_ListCompareProc)_ANSI_ARGS_((Blt_ListItem *, Blt_ListItem *));
+typedef int (Blt_ListCompareProc) _ANSI_ARGS_((Blt_ListNode *node1Ptr, 
+	Blt_ListNode *node2Ptr));
 
 /*
  * A Blt_List is a doubly chained list structure.
  */
-struct Blt_List {
-    struct Blt_ListItem *headPtr;	/* Pointer to first element in list */
-    struct Blt_ListItem *tailPtr;	/* Pointer to last element in list */
-    int numEntries;		/* Number of elements in list */
-    int type;			/* Type of keys in list */
+struct Blt_ListStruct {
+    struct Blt_ListNodeStruct *headPtr;	/* Pointer to first element in list */
+    struct Blt_ListNodeStruct *tailPtr;	/* Pointer to last element in list */
+    int nNodes;			/* Number of node currently in the list. */
+    int type;			/* Type of keys in list. */
 };
 
-extern void Blt_InitList _ANSI_ARGS_((Blt_List *listPtr, int type));
-extern Blt_List *Blt_CreateList _ANSI_ARGS_((int type));
-extern void Blt_ListDestroy _ANSI_ARGS_((Blt_List *listPtr));
-extern Blt_ListItem Blt_ListNewItem _ANSI_ARGS_((Blt_List *listPtr, char *key));
-extern Blt_ListItem Blt_ListAppend _ANSI_ARGS_((Blt_List *listPtr, char *key, 
-	ClientData clientData));
-extern Blt_ListItem Blt_ListPrepend _ANSI_ARGS_((Blt_List *listPtr, char *key, 
-	ClientData clientData));
-extern void Blt_ListReset _ANSI_ARGS_((Blt_List *listPtr));
-extern void Blt_ListLinkAfter _ANSI_ARGS_((Blt_List *listPtr, Blt_ListItem item,
-	Blt_ListItem afterItem));
-extern void Blt_ListLinkBefore _ANSI_ARGS_((Blt_List *listPtr, 
-	Blt_ListItem item, Blt_ListItem beforeItem));
-extern void Blt_ListUnlinkItem _ANSI_ARGS_((Blt_ListItem item));
-extern Blt_ListItem Blt_ListFind _ANSI_ARGS_((Blt_List *listPtr, char *name));
-extern void Blt_ListDeleteItem _ANSI_ARGS_((Blt_ListItem item));
-extern void Blt_ListDelete _ANSI_ARGS_((Blt_List *listPtr, char *name));
-extern Blt_ListItem Blt_ListFindNthItem _ANSI_ARGS_((Blt_List *listPtr, 
-	int position, int direction));
-extern void Blt_ListSort _ANSI_ARGS_((Blt_List *listPtr, 
-	Blt_ListCompareProc *proc));
+EXTERN void Blt_ListInit _ANSI_ARGS_((Blt_List list, int type));
+EXTERN void Blt_ListReset _ANSI_ARGS_((Blt_List list));
+EXTERN Blt_List Blt_ListCreate _ANSI_ARGS_((int type));
+EXTERN void Blt_ListDestroy _ANSI_ARGS_((Blt_List list));
+EXTERN Blt_ListNode Blt_ListCreateNode _ANSI_ARGS_((Blt_List list, 
+	CONST char *key));
+EXTERN void Blt_ListDeleteNode _ANSI_ARGS_((Blt_ListNode node));
 
-#define Blt_ListGetLength(list) (((list) == NULL) ? 0 : (list)->numEntries)
-#define Blt_ListFirstItem(list) (((list) == NULL) ? NULL : (list)->headPtr)
-#define Blt_ListLastItem(list)	(((list) == NULL) ? NULL : (list)->tailPtr)
-#define Blt_ListPrevItem(item)	((item)->prevPtr)
-#define Blt_ListNextItem(item) 	((item)->nextPtr)
-#define Blt_ListGetKey(item)	(((item)->listPtr->type == TCL_STRING_KEYS) \
-		 ? (item)->key.string : (item)->key.oneWordValue)
-#define Blt_ListGetValue(item)  	((item)->clientData)
-#define Blt_ListSetValue(item, value) \
-	((item)->clientData = (ClientData)(value))
-#define Blt_ListAppendItem(list, item) \
-	(Blt_ListLinkBefore((list), (item), (Blt_ListItem)NULL))
-#define Blt_ListPrependItem(list, item) \
-	(Blt_ListLinkAfter((list), (item), (Blt_ListItem)NULL))
+EXTERN Blt_ListNode Blt_ListAppend _ANSI_ARGS_((Blt_List list, CONST char *key,
+	ClientData clientData));
+EXTERN Blt_ListNode Blt_ListPrepend _ANSI_ARGS_((Blt_List list, CONST char *key,
+	ClientData clientData));
+EXTERN void Blt_ListLinkAfter _ANSI_ARGS_((Blt_List list, Blt_ListNode node, 
+	Blt_ListNode afterNode));
+EXTERN void Blt_ListLinkBefore _ANSI_ARGS_((Blt_List list, Blt_ListNode node, 
+	Blt_ListNode beforeNode));
+EXTERN void Blt_ListUnlinkNode _ANSI_ARGS_((Blt_ListNode node));
+EXTERN Blt_ListNode Blt_ListGetNode _ANSI_ARGS_((Blt_List list, 
+	CONST char *key));
+EXTERN void Blt_ListDeleteNodeByKey _ANSI_ARGS_((Blt_List list, 
+	CONST char *key));
+EXTERN Blt_ListNode Blt_ListGetNthNode _ANSI_ARGS_((Blt_List list,
+	int position, int direction));
+EXTERN void Blt_ListSort _ANSI_ARGS_((Blt_List list,
+	Blt_ListCompareProc * proc));
+
+#define Blt_ListGetLength(list) \
+	(((list) == NULL) ? 0 : ((struct Blt_ListStruct *)list)->nNodes)
+#define Blt_ListFirstNode(list) \
+	(((list) == NULL) ? NULL : ((struct Blt_ListStruct *)list)->headPtr)
+#define Blt_ListLastNode(list)	\
+	(((list) == NULL) ? NULL : ((struct Blt_ListStruct *)list)->tailPtr)
+#define Blt_ListPrevNode(node)	((node)->prevPtr)
+#define Blt_ListNextNode(node) 	((node)->nextPtr)
+#define Blt_ListGetKey(node)	\
+	(((node)->listPtr->type == BLT_STRING_KEYS) \
+		 ? (node)->key.string : (node)->key.oneWordValue)
+#define Blt_ListGetValue(node)  	((node)->clientData)
+#define Blt_ListSetValue(node, value) \
+	((node)->clientData = (ClientData)(value))
+#define Blt_ListAppendNode(list, node) \
+	(Blt_ListLinkBefore((list), (node), (Blt_ListNode)NULL))
+#define Blt_ListPrependNode(list, node) \
+	(Blt_ListLinkAfter((list), (node), (Blt_ListNode)NULL))
 
 #endif /* _BLT_LIST_H */
-
-

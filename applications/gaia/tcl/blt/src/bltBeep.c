@@ -41,9 +41,7 @@
  *----------------------------------------------------------------------
  */
 
-#ifdef __STDC__
 static Tcl_CmdProc BeepCmd;
-#endif
 
 /* ARGSUSED */
 static int
@@ -53,7 +51,6 @@ BeepCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    Tk_Window tkwin = (Tk_Window)clientData;
     int percent;
 
     if (argc > 2) {
@@ -73,7 +70,7 @@ BeepCmd(clientData, interp, argc, argv)
 	    return TCL_ERROR;
 	}
     }
-    XBell(Tk_Display(tkwin), percent);
+    XBell(Tk_Display(Tk_MainWindow(interp)), percent);
     return TCL_OK;
 }
 

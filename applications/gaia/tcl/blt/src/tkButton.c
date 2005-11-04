@@ -19,6 +19,8 @@
 
 #ifndef NO_TILEBUTTON
 
+#include "bltTile.h"
+
 extern Tk_CustomOption bltTileOption;
 /*
  * The definitions below provide symbolic names for the default colors.
@@ -40,24 +42,25 @@ extern Tk_CustomOption bltTileOption;
 static Tk_Uid tkNormalUid, tkActiveUid, tkDisabledUid;
 
 #define DEF_BUTTON_ANCHOR		"center"
-#define DEF_BUTTON_ACTIVE_BG_COLOR	STD_COLOR_ACTIVE_BG
-#define DEF_BUTTON_ACTIVE_BG_MONO	RGB_COLOR_BLACK
-#define DEF_BUTTON_ACTIVE_FG_COLOR	RGB_COLOR_BLACK
-#define DEF_BUTTON_ACTIVE_FG_MONO	RGB_COLOR_WHITE
-#define DEF_BUTTON_BG_COLOR		STD_COLOR_NORMAL_BG
-#define DEF_BUTTON_BG_MONO		RGB_COLOR_WHITE
+#define DEF_BUTTON_ACTIVE_BACKGROUND	STD_ACTIVE_BACKGROUND
+#define DEF_BUTTON_ACTIVE_BG_MONO	RGB_BLACK
+#define DEF_BUTTON_ACTIVE_FOREGROUND	RGB_BLACK
+#define DEF_BUTTON_ACTIVE_FG_MONO	RGB_WHITE
+#define DEF_BUTTON_BACKGROUND		STD_NORMAL_BACKGROUND
+#define DEF_BUTTON_BG_MONO		RGB_WHITE
 #define DEF_BUTTON_BITMAP		""
-#define DEF_BUTTON_BORDER_WIDTH		"2"
+#define DEF_BUTTON_BORDERWIDTH		"2"
 #define DEF_BUTTON_CURSOR		""
 #define DEF_BUTTON_COMMAND		""
+#define DEF_BUTTON_COMPOUND		"none"
 #define DEF_BUTTON_DEFAULT              "disabled"
-#define DEF_BUTTON_DISABLED_FG_COLOR	STD_COLOR_DISABLE_FG
+#define DEF_BUTTON_DISABLED_FOREGROUND	STD_DISABLE_FOREGROUND
 #define DEF_BUTTON_DISABLED_FG_MONO	""
-#define DEF_BUTTON_FG			RGB_COLOR_BLACK
+#define DEF_BUTTON_FG			RGB_BLACK
 #define DEF_BUTTON_FONT			"-Adobe-Helvetica-Bold-R-Normal--*-120-*-*-*-*-*-*"
 #define DEF_BUTTON_HEIGHT		"0"
-#define DEF_BUTTON_HIGHLIGHT_BG		STD_COLOR_NORMAL_BG
-#define DEF_BUTTON_HIGHLIGHT		RGB_COLOR_BLACK
+#define DEF_BUTTON_HIGHLIGHT_BG		STD_NORMAL_BACKGROUND
+#define DEF_BUTTON_HIGHLIGHT		RGB_BLACK
 #define DEF_LABEL_HIGHLIGHT_WIDTH	"0"
 #define DEF_BUTTON_HIGHLIGHT_WIDTH	"2"
 #define DEF_BUTTON_IMAGE		(char *) NULL
@@ -65,14 +68,16 @@ static Tk_Uid tkNormalUid, tkActiveUid, tkDisabledUid;
 #define DEF_BUTTON_JUSTIFY		"center"
 #define DEF_BUTTON_OFF_VALUE		"0"
 #define DEF_BUTTON_ON_VALUE		"1"
+#define DEF_BUTTON_OVER_RELIEF		"raised"
 #define DEF_BUTTON_PADX			"3m"
 #define DEF_LABCHKRAD_PADX		"1"
 #define DEF_BUTTON_PADY			"1m"
 #define DEF_LABCHKRAD_PADY		"1"
 #define DEF_BUTTON_RELIEF		"raised"
+#define DEF_BUTTON_REPEAT_DELAY		"0"
 #define DEF_LABCHKRAD_RELIEF		"flat"
-#define DEF_BUTTON_SELECT_COLOR		STD_COLOR_INDICATOR
-#define DEF_BUTTON_SELECT_MONO		RGB_COLOR_BLACK
+#define DEF_BUTTON_SELECT_COLOR		STD_INDICATOR_COLOR
+#define DEF_BUTTON_SELECT_MONO		RGB_BLACK
 #define DEF_BUTTON_SELECT_IMAGE		(char *) NULL
 #define DEF_BUTTON_STATE		"normal"
 #define DEF_LABEL_TAKE_FOCUS		"0"
@@ -143,6 +148,10 @@ typedef struct {
 				 * border exists. */
     int borderWidth;		/* Width of border. */
     int relief;			/* 3-d effect: TK_RELIEF_RAISED, etc. */
+    int overRelief;		/* Value of -overrelief option: specifies a 3-d
+				 * effect for the border, such as
+				 * TK_RELIEF_RAISED, to be used when the mouse
+				 * is over the button. */
     int highlightWidth;		/* Width in pixels of highlight to draw
 				 * around widget when it has the focus.
 				 * <= 0 means don't draw a highlight. */
@@ -201,7 +210,7 @@ typedef struct {
 				 * in pixels. */
     int textHeight;		/* Height needed to display text as requested,
 				 * in pixels. */
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     Tk_TextLayout textLayout;	/* Saved text layout information. */
 #endif
     int indicatorSpace;		/* Horizontal space (in pixels) allocated for
@@ -237,10 +246,18 @@ typedef struct {
     char *command;		/* Command to execute when button is
 				 * invoked; valid for buttons only.
 				 * If not NULL, it's malloc-ed. */
+    char *compound;		/* Value of -compound option; specifies whether
+				 * the button should show both an image and
+				 * text, and, if so, how. */
+    int repeatDelay;		/* Value of -repeatdelay option; specifies
+				 * the number of ms after which the button will
+				 * start to auto-repeat its command. */
+    int repeatInterval;		/* Value of -repeatinterval option; specifies
+				 * the number of ms between auto-repeat
+				 * invocataions of the button command. */
     int flags;			/* Various flags;  see below for
 				 * definitions. */
     Blt_Tile tile, activeTile;
-    GC tileGC, activeTileGC;
 } Button;
 
 /*
@@ -301,15 +318,15 @@ static int configFlags[] =
 static Tk_ConfigSpec configSpecs[] =
 {
     {TK_CONFIG_BORDER, "-activebackground", "activeBackground", "Foreground",
-	DEF_BUTTON_ACTIVE_BG_COLOR, Tk_Offset(Button, activeBorder),
-	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK
-	| TK_CONFIG_COLOR_ONLY},
+	DEF_BUTTON_ACTIVE_BACKGROUND, Tk_Offset(Button, activeBorder),
+	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK | 
+        TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_BORDER, "-activebackground", "activeBackground", "Foreground",
 	DEF_BUTTON_ACTIVE_BG_MONO, Tk_Offset(Button, activeBorder),
 	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK
 	| TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_COLOR, "-activeforeground", "activeForeground", "Background",
-	DEF_BUTTON_ACTIVE_FG_COLOR, Tk_Offset(Button, activeFg),
+	DEF_BUTTON_ACTIVE_FOREGROUND, Tk_Offset(Button, activeFg),
 	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK
 	| TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-activeforeground", "activeForeground", "Background",
@@ -322,7 +339,7 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_ANCHOR, "-anchor", "anchor", "Anchor",
 	DEF_BUTTON_ANCHOR, Tk_Offset(Button, anchor), ALL_MASK},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_BUTTON_BG_COLOR, Tk_Offset(Button, normalBorder),
+	DEF_BUTTON_BACKGROUND, Tk_Offset(Button, normalBorder),
 	ALL_MASK | TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
 	DEF_BUTTON_BG_MONO, Tk_Offset(Button, normalBorder),
@@ -335,17 +352,20 @@ static Tk_ConfigSpec configSpecs[] =
 	DEF_BUTTON_BITMAP, Tk_Offset(Button, bitmap),
 	ALL_MASK | TK_CONFIG_NULL_OK},
     {TK_CONFIG_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
-	DEF_BUTTON_BORDER_WIDTH, Tk_Offset(Button, borderWidth), ALL_MASK},
+	DEF_BUTTON_BORDERWIDTH, Tk_Offset(Button, borderWidth), ALL_MASK},
     {TK_CONFIG_STRING, "-command", "command", "Command",
 	DEF_BUTTON_COMMAND, Tk_Offset(Button, command),
 	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK | TK_CONFIG_NULL_OK},
+    {TK_CONFIG_STRING, "-compound", "compound", "Compound",
+	DEF_BUTTON_COMPOUND, Tk_Offset(Button, compound), 
+	ALL_MASK | TK_CONFIG_NULL_OK},
     {TK_CONFIG_ACTIVE_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_BUTTON_CURSOR, Tk_Offset(Button, cursor),
 	ALL_MASK | TK_CONFIG_NULL_OK},
     {TK_CONFIG_UID, "-default", "default", "Default",
 	DEF_BUTTON_DEFAULT, Tk_Offset(Button, defaultState), BUTTON_MASK},
     {TK_CONFIG_COLOR, "-disabledforeground", "disabledForeground",
-	"DisabledForeground", DEF_BUTTON_DISABLED_FG_COLOR,
+	"DisabledForeground", DEF_BUTTON_DISABLED_FOREGROUND,
 	Tk_Offset(Button, disabledFg), BUTTON_MASK | CHECK_BUTTON_MASK
 	| RADIO_BUTTON_MASK | TK_CONFIG_COLOR_ONLY | TK_CONFIG_NULL_OK},
     {TK_CONFIG_COLOR, "-disabledforeground", "disabledForeground",
@@ -389,6 +409,9 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_STRING, "-onvalue", "onValue", "Value",
 	DEF_BUTTON_ON_VALUE, Tk_Offset(Button, onValue),
 	CHECK_BUTTON_MASK},
+    {TK_CONFIG_RELIEF, "-overrelief", "overRelief", "OverRelief",
+	DEF_BUTTON_OVER_RELIEF, Tk_Offset(Button, overRelief),
+	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK | TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_PIXELS, "-padx", "padX", "Pad",
 	DEF_BUTTON_PADX, Tk_Offset(Button, padX), BUTTON_MASK},
     {TK_CONFIG_PIXELS, "-padx", "padX", "Pad",
@@ -404,6 +427,9 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_RELIEF, "-relief", "relief", "Relief",
 	DEF_LABCHKRAD_RELIEF, Tk_Offset(Button, relief),
 	LABEL_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK},
+    {TK_CONFIG_INT, "-repeatdelay", "repeatDelay", "RepeatDelay",
+	DEF_BUTTON_REPEAT_DELAY, Tk_Offset(Button, repeatDelay),
+ 	BUTTON_MASK | CHECK_BUTTON_MASK | RADIO_BUTTON_MASK},
     {TK_CONFIG_BORDER, "-selectcolor", "selectColor", "Background",
 	DEF_BUTTON_SELECT_COLOR, Tk_Offset(Button, selectBorder),
 	CHECK_BUTTON_MASK | RADIO_BUTTON_MASK | TK_CONFIG_COLOR_ONLY
@@ -497,12 +523,18 @@ static void DestroyButton _ANSI_ARGS_((Button *butPtr));
 static void DisplayButton _ANSI_ARGS_((ClientData clientData));
 static int InvokeButton _ANSI_ARGS_((Button *butPtr));
 
-#ifdef __STDC__
 static Blt_TileChangedProc TileChangedProc;
 static Tcl_CmdProc ButtonCmd, LabelCmd, CheckbuttonCmd, RadiobuttonCmd;
-#endif 
 
-#if (TK_MAJOR_VERSION < 8)
+EXTERN int TkCopyAndGlobalEval _ANSI_ARGS_((Tcl_Interp *interp, char *script));
+
+#if (TK_MAJOR_VERSION > 4)
+EXTERN void TkComputeAnchor _ANSI_ARGS_((Tk_Anchor anchor, Tk_Window tkwin, 
+	int padX, int padY, int innerWidth, int innerHeight, int *xPtr, 
+	int *yPtr));
+#endif
+
+#if (TK_MAJOR_VERSION == 4)
 /*
  *---------------------------------------------------------------------------
  *
@@ -656,6 +688,7 @@ RadiobuttonCmd(clientData, interp, argc, argv)
  *--------------------------------------------------------------
  */
 
+/*ARGSUSED*/
 static int
 ButtonCreate(clientData, interp, argc, argv, type)
     ClientData clientData;	/* Main window associated with
@@ -668,8 +701,7 @@ ButtonCreate(clientData, interp, argc, argv, type)
 				 * TYPE_RADIO_BUTTON. */
 {
     register Button *butPtr;
-    Tk_Window tkwin = (Tk_Window)clientData;
-    Tk_Window new;
+    Tk_Window tkwin;
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -680,19 +712,20 @@ ButtonCreate(clientData, interp, argc, argv, type)
      * Create the new window.
      */
 
-    new = Tk_CreateWindowFromPath(interp, tkwin, argv[1], (char *)NULL);
-    if (new == NULL) {
+    tkwin = Tk_CreateWindowFromPath(interp, Tk_MainWindow(interp), argv[1],
+	(char *)NULL);
+    if (tkwin == NULL) {
 	return TCL_ERROR;
     }
     /*
      * Initialize the data structure for the button.
      */
 
-    butPtr = (Button *)ckalloc(sizeof(Button));
-    butPtr->tkwin = new;
-    butPtr->display = Tk_Display(new);
+    butPtr = Blt_Malloc(sizeof(Button));
+    butPtr->tkwin = tkwin;
+    butPtr->display = Tk_Display(tkwin);
     butPtr->widgetCmd = Tcl_CreateCommand(interp, Tk_PathName(butPtr->tkwin),
-	ButtonWidgetCmd, (ClientData)butPtr, ButtonCmdDeletedProc);
+	ButtonWidgetCmd, butPtr, ButtonCmdDeletedProc);
 #ifdef ITCL_NAMESPACES
     Itk_SetWidgetCommand(butPtr->tkwin, butPtr->widgetCmd);
 #endif /* ITCL_NAMESPACES */
@@ -735,7 +768,7 @@ ButtonCreate(clientData, interp, argc, argv, type)
     butPtr->padY = 0;
     butPtr->anchor = TK_ANCHOR_CENTER;
     butPtr->justify = TK_JUSTIFY_CENTER;
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     butPtr->textLayout = NULL;
 #endif
     butPtr->indicatorOn = 0;
@@ -750,19 +783,21 @@ ButtonCreate(clientData, interp, argc, argv, type)
     butPtr->takeFocus = NULL;
     butPtr->flags = 0;
     butPtr->tile = butPtr->activeTile = NULL;
-    butPtr->tileGC = butPtr->activeTileGC = None;
     butPtr->defaultState = tkDisabledUid;
+    butPtr->compound = NULL;
+    butPtr->repeatDelay = 0;
+    butPtr->overRelief = TK_RELIEF_RAISED;
 
-    Tk_SetClass(new, classNames[type]);
+    Tk_SetClass(tkwin, classNames[type]);
     Tk_CreateEventHandler(butPtr->tkwin,
 	ExposureMask | StructureNotifyMask | FocusChangeMask,
-	ButtonEventProc, (ClientData)butPtr);
+	ButtonEventProc, butPtr);
     if (ConfigureButton(interp, butPtr, argc - 2, argv + 2,
 	    configFlags[type]) != TCL_OK) {
 	Tk_DestroyWindow(butPtr->tkwin);
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp, Tk_PathName(butPtr->tkwin), TCL_STATIC);
+    Tcl_SetResult(interp, Tk_PathName(butPtr->tkwin), TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -791,7 +826,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    register Button *butPtr = (Button *)clientData;
+    register Button *butPtr = clientData;
     int result = TCL_OK;
     size_t length;
     int c;
@@ -801,7 +836,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
 	    " option ?arg arg ...?\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    Tcl_Preserve((ClientData)butPtr);
+    Tcl_Preserve(butPtr);
     c = argv[1][0];
     length = strlen(argv[1]);
     if ((c == 'c') && (strncmp(argv[1], "cget", length) == 0)
@@ -861,7 +896,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
 		Tk_SetBackgroundFromBorder(butPtr->tkwin,
 		    (butPtr->state == tkActiveUid) ? butPtr->activeBorder
 		    : butPtr->normalBorder);
-		DisplayButton((ClientData)butPtr);
+		DisplayButton(butPtr);
 
 		/*
 		 * Special note: must cancel any existing idle handler
@@ -869,7 +904,7 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
 		 * cleared the REDRAW_PENDING flag.
 		 */
 
-		Tcl_CancelIdleCall(DisplayButton, (ClientData)butPtr);
+		Tcl_CancelIdleCall(DisplayButton, butPtr);
 #ifndef WIN32
 		XFlush(butPtr->display);
 #endif
@@ -920,11 +955,11 @@ ButtonWidgetCmd(clientData, interp, argc, argv)
 	    optionStrings[butPtr->type], (char *)NULL);
 	goto error;
     }
-    Tcl_Release((ClientData)butPtr);
+    Tcl_Release(butPtr);
     return result;
 
   error:
-    Tcl_Release((ClientData)butPtr);
+    Tcl_Release(butPtr);
     return TCL_ERROR;
 }
 
@@ -959,7 +994,7 @@ DestroyButton(butPtr)
     if (butPtr->textVarName != NULL) {
 	Tcl_UntraceVar(butPtr->interp, butPtr->textVarName,
 	    TCL_GLOBAL_ONLY | TCL_TRACE_WRITES | TCL_TRACE_UNSETS,
-	    ButtonTextVarProc, (ClientData)butPtr);
+	    ButtonTextVarProc, butPtr);
     }
     if (butPtr->image != NULL) {
 	Tk_FreeImage(butPtr->image);
@@ -990,16 +1025,10 @@ DestroyButton(butPtr)
     if (butPtr->activeTile != NULL) {
 	Blt_FreeTile(butPtr->activeTile);
     }
-    if (butPtr->activeTileGC != None) {
-	Tk_FreeGC(butPtr->display, butPtr->activeTileGC);
-    }
     if (butPtr->tile != NULL) {
 	Blt_FreeTile(butPtr->tile);
     }
-    if (butPtr->tileGC != None) {
-	Tk_FreeGC(butPtr->display, butPtr->tileGC);
-    }
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     Tk_FreeTextLayout(butPtr->textLayout);
 #endif
     Tk_FreeOptions(configSpecs, (char *)butPtr, butPtr->display,
@@ -1007,42 +1036,20 @@ DestroyButton(butPtr)
     Tcl_EventuallyFree((ClientData)butPtr, TCL_DYNAMIC);
 }
 
+/*ARGSUSED*/
 static void
 TileChangedProc(clientData, tile)
     ClientData clientData;
-    Blt_Tile tile;
+    Blt_Tile tile;		/* Not used. */
 {
-    Button *butPtr = (Button *)clientData;
+    Button *butPtr = clientData;
 
     if (butPtr->tkwin != NULL) {
-	GC newGC;
-	Pixmap pixmap;
-	GC *gcPtr;
-
-	gcPtr = (tile == butPtr->tile)
-	    ? &(butPtr->tileGC) : &(butPtr->activeTileGC);
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(tile);
-	if (pixmap != None) {
-	    unsigned long gcMask;
-	    XGCValues gcValues;
-
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(butPtr->tkwin, gcMask, &gcValues);
-	}
-	if (*gcPtr != NULL) {
-	    Tk_FreeGC(butPtr->display, *gcPtr);
-	}
-	*gcPtr = newGC;
-
 	/*
-	 * Lastly, arrange for the button to be redisplayed.
+	 * Arrange for the button to be redisplayed.
 	 */
-
 	if (Tk_IsMapped(butPtr->tkwin) && !(butPtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayButton, (ClientData)butPtr);
+	    Tcl_DoWhenIdle(DisplayButton, (ClientData)butPtr);
 	    butPtr->flags |= REDRAW_PENDING;
 	}
     }
@@ -1136,44 +1143,12 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
     gcValues.background = Tk_3DBorderColor(butPtr->normalBorder)->pixel;
 
     if (butPtr->tile != NULL) {
-	Pixmap pixmap;
-
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(butPtr->tile);
-	if (pixmap != None) {
-	    unsigned long gcMask;
-
-	    Blt_SetTileChangedProc(butPtr->tile, TileChangedProc,
+	Blt_SetTileChangedProc(butPtr->tile, TileChangedProc,
 		(ClientData)butPtr);
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(butPtr->tkwin, gcMask, &gcValues);
-	}
-	if (butPtr->tileGC != NULL) {
-	    Tk_FreeGC(butPtr->display, butPtr->tileGC);
-	}
-	butPtr->tileGC = newGC;
     }
     if (butPtr->activeTile != NULL) {
-	Pixmap pixmap;
-
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(butPtr->activeTile);
-	if (pixmap != None) {
-	    unsigned long gcMask;
-
-	    Blt_SetTileChangedProc(butPtr->activeTile, TileChangedProc,
+	Blt_SetTileChangedProc(butPtr->activeTile, TileChangedProc,
 		(ClientData)butPtr);
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(butPtr->tkwin, gcMask, &gcValues);
-	}
-	if (butPtr->activeTileGC != NULL) {
-	    Tk_FreeGC(butPtr->display, butPtr->activeTileGC);
-	}
-	butPtr->activeTileGC = newGC;
     }
     /*
      * Note: GraphicsExpose events are disabled in normalTextGC because it's
@@ -1236,11 +1211,10 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
 	butPtr->padY = 0;
     }
     if (butPtr->type >= TYPE_CHECK_BUTTON) {
-	char *value;
+	CONST char *value;
 
 	if (butPtr->selVarName == NULL) {
-	    butPtr->selVarName = (char *)ckalloc((unsigned)
-		(strlen(Tk_Name(butPtr->tkwin)) + 1));
+	    butPtr->selVarName = Blt_Malloc(strlen(Tk_Name(butPtr->tkwin)) + 1);
 	    strcpy(butPtr->selVarName, Tk_Name(butPtr->tkwin));
 	}
 	/*
@@ -1309,7 +1283,7 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
 	 * exist, and fetch its current value.
 	 */
 
-	char *value;
+	CONST char *value;
 
 	value = Tcl_GetVar(interp, butPtr->textVarName, TCL_GLOBAL_ONLY);
 	if (value == NULL) {
@@ -1319,9 +1293,9 @@ ConfigureButton(interp, butPtr, argc, argv, flags)
 	    }
 	} else {
 	    if (butPtr->text != NULL) {
-		ckfree(butPtr->text);
+		Blt_Free(butPtr->text);
 	    }
-	    butPtr->text = (char *)ckalloc((unsigned)(strlen(value) + 1));
+	    butPtr->text = Blt_Malloc(strlen(value) + 1);
 	    strcpy(butPtr->text, value);
 	}
 	Tcl_TraceVar(interp, butPtr->textVarName,
@@ -1386,7 +1360,7 @@ static void
 DisplayButton(clientData)
     ClientData clientData;	/* Information about widget. */
 {
-    register Button *butPtr = (Button *)clientData;
+    register Button *butPtr = clientData;
     GC gc;
     Tk_3DBorder border;
     Pixmap pixmap;
@@ -1399,13 +1373,13 @@ DisplayButton(clientData)
 				 * it is a flavor of button, so we offset
 				 * the text to make the button appear to
 				 * move up and down as the relief changes. */
-    GC tileGC;
+    Blt_Tile tile;
 
     butPtr->flags &= ~REDRAW_PENDING;
     if ((butPtr->tkwin == NULL) || !Tk_IsMapped(tkwin)) {
 	return;
     }
-    tileGC = butPtr->tileGC;
+    tile = butPtr->tile;
     border = butPtr->normalBorder;
     if ((butPtr->state == tkDisabledUid) && (butPtr->disabledFg != NULL)) {
 	gc = butPtr->disabledGC;
@@ -1413,7 +1387,7 @@ DisplayButton(clientData)
 	&& !Tk_StrictMotif(butPtr->tkwin)) {
 	gc = butPtr->activeTextGC;
 	border = butPtr->activeBorder;
-	tileGC = butPtr->activeTileGC;
+	tile = butPtr->activeTile;
     } else {
 	gc = butPtr->normalTextGC;
     }
@@ -1442,12 +1416,12 @@ DisplayButton(clientData)
 
     pixmap = Tk_GetPixmap(butPtr->display, Tk_WindowId(tkwin),
 	Tk_Width(tkwin), Tk_Height(tkwin), Tk_Depth(tkwin));
-    if (tileGC != NULL) {
-	Blt_SetTileOrigin(tkwin, tileGC, 0, 0);
-	XFillRectangle(butPtr->display, pixmap, tileGC, 0, 0, Tk_Width(tkwin),
+    if (tile != NULL) {
+	Blt_SetTileOrigin(tkwin, tile, 0, 0);
+	Blt_TileRectangle(tkwin, pixmap, tile, 0, 0, Tk_Width(tkwin),
 	    Tk_Height(tkwin));
     } else {
-	Tk_Fill3DRectangle(tkwin, pixmap, border, 0, 0, Tk_Width(tkwin),
+	Blt_Fill3DRectangle(tkwin, pixmap, border, 0, 0, Tk_Width(tkwin),
 	    Tk_Height(tkwin), 0, TK_RELIEF_FLAT);
     }
 
@@ -1482,12 +1456,12 @@ DisplayButton(clientData)
 	    }
 	} else {
 	    XSetClipOrigin(butPtr->display, gc, x, y);
-	    if (tileGC != NULL) {
+	    if (tile != NULL) {
 		XSetClipMask(butPtr->display, gc, butPtr->bitmap);
 	    }
 	    XCopyPlane(butPtr->display, butPtr->bitmap, pixmap, gc, 0, 0,
 		(unsigned int)width, (unsigned int)height, x, y, 1);
-	    if (tileGC != NULL) {
+	    if (tile != NULL) {
 		XSetClipMask(butPtr->display, gc, None);
 	    }
 	    XSetClipOrigin(butPtr->display, gc, 0, 0);
@@ -1512,7 +1486,7 @@ DisplayButton(clientData)
 	    x += offset;
 	    y += offset;
 	}
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
 	Tk_DrawTextLayout(butPtr->display, pixmap, gc, butPtr->textLayout,
 	    x, y, 0, -1);
 	Tk_UnderlineTextLayout(butPtr->display, pixmap, gc,
@@ -1538,7 +1512,7 @@ DisplayButton(clientData)
 	x -= butPtr->indicatorSpace;
 	y -= dim / 2;
 	if (dim > 2 * butPtr->borderWidth) {
-	    Tk_Draw3DRectangle(tkwin, pixmap, border, x, y, dim, dim,
+	    Blt_Draw3DRectangle(tkwin, pixmap, border, x, y, dim, dim,
 		butPtr->borderWidth,
 		(butPtr->flags & SELECTED) ? TK_RELIEF_SUNKEN :
 		TK_RELIEF_RAISED);
@@ -1554,7 +1528,7 @@ DisplayButton(clientData)
 		XFillRectangle(butPtr->display, pixmap, borderGC, x, y,
 		    (unsigned int)dim, (unsigned int)dim);
 	    } else {
-		Tk_Fill3DRectangle(tkwin, pixmap, butPtr->normalBorder, x, y,
+		Blt_Fill3DRectangle(tkwin, pixmap, butPtr->normalBorder, x, y,
 		    dim, dim, butPtr->borderWidth, TK_RELIEF_FLAT);
 	    }
 	}
@@ -1620,12 +1594,12 @@ DisplayButton(clientData)
 	int inset = butPtr->highlightWidth;
 	if (butPtr->defaultState == tkActiveUid) {
 	    inset += 2;
-	    Tk_Draw3DRectangle(tkwin, pixmap, border, inset, inset,
+	    Blt_Draw3DRectangle(tkwin, pixmap, border, inset, inset,
 		Tk_Width(tkwin) - 2 * inset, Tk_Height(tkwin) - 2 * inset,
 		1, TK_RELIEF_SUNKEN);
 	    inset += 3;
 	}
-	Tk_Draw3DRectangle(tkwin, pixmap, border, inset, inset,
+	Blt_Draw3DRectangle(tkwin, pixmap, border, inset, inset,
 	    Tk_Width(tkwin) - 2 * inset, Tk_Height(tkwin) - 2 * inset,
 	    butPtr->borderWidth, relief);
     }
@@ -1711,7 +1685,7 @@ ComputeButtonGeometry(butPtr)
 	int avgWidth;
 	Tk_FontMetrics fm;
 
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
 	Tk_FreeTextLayout(butPtr->textLayout);
 	butPtr->textLayout = Tk_ComputeTextLayout(butPtr->font,
 	    butPtr->text, -1, butPtr->wrapLength, butPtr->justify, 0,
@@ -1736,7 +1710,8 @@ ComputeButtonGeometry(butPtr)
 	if ((butPtr->type >= TYPE_CHECK_BUTTON) && butPtr->indicatorOn) {
 	    butPtr->indicatorDiameter = fm.linespace;
 	    if (butPtr->type == TYPE_CHECK_BUTTON) {
-		butPtr->indicatorDiameter = (80 * butPtr->indicatorDiameter) / 100;
+		butPtr->indicatorDiameter = 
+		    (80 * butPtr->indicatorDiameter) / 100;
 	    }
 	    butPtr->indicatorSpace = butPtr->indicatorDiameter + avgWidth;
 	}
@@ -1785,7 +1760,7 @@ ButtonEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Button *butPtr = (Button *)clientData;
+    Button *butPtr = clientData;
     if ((eventPtr->type == Expose) && (eventPtr->xexpose.count == 0)) {
 	goto redraw;
     } else if (eventPtr->type == ConfigureNotify) {
@@ -1797,17 +1772,15 @@ ButtonEventProc(clientData, eventPtr)
 	goto redraw;
     } else if (eventPtr->type == DestroyNotify) {
 	if (butPtr->tkwin != NULL) {
-#ifdef ITCL_NAMESPACES
-	    Itk_SetWidgetCommand(butPtr->tkwin, (Tcl_Command) NULL);
-#endif
 	    butPtr->tkwin = NULL;
-	    Tcl_DeleteCommand(butPtr->interp,
-		Tcl_GetCommandName(butPtr->interp, butPtr->widgetCmd));
+	    Tcl_DeleteCommandFromToken(butPtr->interp, butPtr->widgetCmd);
 	}
 	if (butPtr->flags & REDRAW_PENDING) {
 	    Tcl_CancelIdleCall(DisplayButton, (ClientData)butPtr);
 	}
-	Tk_EventuallyFree((ClientData)butPtr, (Tcl_FreeProc *)DestroyButton);
+	/* This is a hack to workaround a bug in 8.3.3. */
+	DestroyButton((ClientData)butPtr);
+	/* Tcl_EventuallyFree((ClientData)butPtr, (Tcl_FreeProc *)Blt_Free); */
     } else if (eventPtr->type == FocusIn) {
 	if (eventPtr->xfocus.detail != NotifyInferior) {
 	    butPtr->flags |= GOT_FOCUS;
@@ -1854,7 +1827,7 @@ static void
 ButtonCmdDeletedProc(clientData)
     ClientData clientData;	/* Pointer to widget record for widget. */
 {
-    Button *butPtr = (Button *)clientData;
+    Button *butPtr = clientData;
     Tk_Window tkwin = butPtr->tkwin;
 
     /*
@@ -1899,7 +1872,8 @@ InvokeButton(butPtr)
 {
     if (butPtr->type == TYPE_CHECK_BUTTON) {
 	if (butPtr->flags & SELECTED) {
-	    if (Tcl_SetVar(butPtr->interp, butPtr->selVarName, butPtr->offValue,
+	    if (Tcl_SetVar(butPtr->interp, butPtr->selVarName, 
+			   butPtr->offValue,
 		    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG) == NULL) {
 		return TCL_ERROR;
 	    }
@@ -1949,8 +1923,8 @@ ButtonVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Second part of variable name. */
     int flags;			/* Information about what happened. */
 {
-    register Button *butPtr = (Button *)clientData;
-    char *value;
+    register Button *butPtr = clientData;
+    CONST char *value;
 
     /*
      * If the variable is being unset, then just re-establish the
@@ -2022,8 +1996,8 @@ ButtonTextVarProc(clientData, interp, name1, name2, flags)
     char *name2;		/* Not used. */
     int flags;			/* Information about what happened. */
 {
-    register Button *butPtr = (Button *)clientData;
-    char *value;
+    register Button *butPtr = clientData;
+    CONST char *value;
 
     /*
      * If the variable is unset, then immediately recreate it unless
@@ -2045,9 +2019,9 @@ ButtonTextVarProc(clientData, interp, name1, name2, flags)
 	value = "";
     }
     if (butPtr->text != NULL) {
-	ckfree(butPtr->text);
+	Blt_Free(butPtr->text);
     }
-    butPtr->text = (char *)ckalloc((unsigned)(strlen(value) + 1));
+    butPtr->text = Blt_Malloc(strlen(value) + 1);
     strcpy(butPtr->text, value);
     ComputeButtonGeometry(butPtr);
 
@@ -2087,7 +2061,7 @@ ButtonImageProc(clientData, x, y, width, height, imgWidth, imgHeight)
 					 * (may be <= 0). */
     int imgWidth, imgHeight;	/* New dimensions of image. */
 {
-    register Button *butPtr = (Button *)clientData;
+    register Button *butPtr = clientData;
 
     if (butPtr->tkwin != NULL) {
 	ComputeButtonGeometry(butPtr);
@@ -2126,7 +2100,7 @@ ButtonSelectImageProc(clientData, x, y, width, height, imgWidth, imgHeight)
 					 * (may be <= 0). */
     int imgWidth, imgHeight;	/* New dimensions of image. */
 {
-    register Button *butPtr = (Button *)clientData;
+    register Button *butPtr = clientData;
 
     /*
      * Don't recompute geometry:  it's controlled by the primary image.
@@ -2161,7 +2135,7 @@ Blt_ButtonInit(interp)
     tkNormalUid = Tk_GetUid("normal");
     tkDisabledUid = Tk_GetUid("disabled");
     tkActiveUid = Tk_GetUid("active");
-    return (Blt_InitCmds(interp, "blt::tile", cmdSpecs, 4));
+    return Blt_InitCmds(interp, "blt::tile", cmdSpecs, 4);
 }
 
 #endif /* NO_TILEBUTTON */

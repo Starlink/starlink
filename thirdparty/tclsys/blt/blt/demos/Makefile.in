@@ -4,9 +4,9 @@
 
 prefix =	@prefix@
 exec_prefix =	@exec_prefix@
+version =	@BLT_VERSION@
 libdir =	@libdir@
-bindir =	@bindir@
-scriptdir =	@BLT_LIBRARY@
+scriptdir =	$(prefix)/lib/blt$(version)
 destdir =	$(scriptdir)/demos
 srcdir =	@srcdir@
 
@@ -14,68 +14,77 @@ SHELL =		/bin/sh
 RM =		rm -rf
 INSTALL =	@INSTALL@
 INSTALL_DATA =	@INSTALL_DATA@
+INSTALL_ROOT = 
 
-instdirs =	$(prefix) $(exec_prefix) $(libdir) $(scriptdir) $(destdir) \
-		$(destdir)/bitmaps $(destdir)/images
+instdirs =	$(prefix) \
+		$(exec_prefix) \
+		$(libdir) \
+		$(scriptdir) \
+		$(destdir) \
+		$(destdir)/bitmaps \
+		$(destdir)/bitmaps/hand \
+		$(destdir)/bitmaps/fish \
+		$(destdir)/images \
+		$(destdir)/scripts
 
-scripts =	barchart barchart2 barchart2.tcl barchart3 barchart4 barchart5 \
-		bgexec bgexec2 bgexec3 bgexec4 bg-test3.tcl \
-		bitmap \
-		bltDemo.tcl bltGrPs.tcl \
-		busy \
-		calendar \
-		dragdrop.tcl dragdrop2.tcl \
-		eps \
-		form \
-		graph graph1.tcl graph2 graph2.tcl graph3 graph3.tcl \
-		graph4 graph5 graph5.tcl graph6 graph7 \
-		hier hier2 hier3 hier4 \
-		htext htext.txt \
-		page.tcl patterns.tcl \
-		spline stripchart \
-		tabset tabset2 tabset3 tabset4 
-
-images  =	buckskin.gif chalk.gif clouds.gif corrugated_metal.gif \
-		folder.gif mini-book1.gif mini-book2.gif mini-display.gif \
-		mini-doc.gif mini-filemgr.gif mini-ofolder.gif \
-		mini-windows.gif ofolder.gif qv100.t.gif rain.gif \
-		smblue_rock.gif stopsign.gif tan_paper.gif tan_paper2.gif \
-		txtrflag.gif out.ps
-
-bitmaps	=	eyes.bm face fc_left fc_left1 fc_left1m fc_leftm fc_mid \
-		fc_midm fc_right fc_right1 fc_right1m fc_rightm greenback \
-		hobbes.xbm hobbes_mask.xbm sharky.bm xbob.bm
+demos 	=	barchart1.tcl barchart2.tcl barchart3.tcl barchart4.tcl \
+		barchart5.tcl \
+		bgexec1.tcl bgexec2.tcl bgexec3.tcl bgexec4.tcl \
+		bitmap.tcl \
+		busy1.tcl busy2.tcl \
+		dnd1.tcl dnd2.tcl dragdrop1.tcl dragdrop2.tcl \
+		eps.tcl \
+		graph1.tcl graph2.tcl graph3.tcl graph4.tcl graph5.tcl \
+		graph6.tcl graph7.tcl \
+		hierbox1.tcl hierbox2.tcl hierbox3.tcl hierbox4.tcl \
+		hiertable1.tcl hiertable2.tcl \
+		htext1.tcl htext.txt \
+		spline.tcl stripchart1.tcl \
+		tabset1.tcl tabset2.tcl tabset3.tcl tabset4.tcl \
+		tabnotebook1.tcl tabnotebook2.tcl tabnotebook3.tcl \
+		treeview1.tcl \
+		winop1.tcl winop2.tcl
 
 all:
 
-install: inst-dirs inst-bitmaps inst-images inst-scripts 
+install: mkdirs install-bitmaps install-images install-scripts 
 
-inst-scripts: 
-	for i in $(scripts) ; do \
-	    src=$(srcdir)/$$i ; \
-	    dest=$(destdir)/$$i ; \
-	    rm -f $$dest ; \
-	    echo "#!$(bindir)/bltwish" > $$dest ; \
-	    cat $$src >> $$dest ; \
-	    chmod 555 $$dest; \
+install-scripts: 
+	for i in $(srcdir)/scripts/*.tcl ; do \
+            $(INSTALL) $$i $(INSTALL_ROOT)$(destdir)/scripts ; \
+	done 
+	for i in $(demos) ; do \
+            $(INSTALL) $(srcdir)/$$i $(INSTALL_ROOT)$(destdir)/$$i ; \
 	done 
 
-inst-bitmaps: 
-	for i in $(bitmaps) ; do \
-	    $(INSTALL_DATA) $(srcdir)/bitmaps/$$i $(destdir)/bitmaps ; \
+install-bitmaps: 
+	for i in $(srcdir)/bitmaps/*.xbm ; do \
+	    $(INSTALL_DATA) $$i $(INSTALL_ROOT)$(destdir)/bitmaps ; \
+	done 
+	for i in $(srcdir)/bitmaps/hand/*.xbm ; do \
+	    $(INSTALL_DATA) $$i $(INSTALL_ROOT)$(destdir)/bitmaps/hand ; \
+	done 
+	for i in $(srcdir)/bitmaps/fish/*.xbm ; do \
+	    $(INSTALL_DATA) $$i $(INSTALL_ROOT)$(destdir)/bitmaps/fish ; \
 	done 
 
-inst-images: 
-	for i in $(images) ; do \
-	    $(INSTALL_DATA) $(srcdir)/images/$$i $(destdir)/images ; \
+install-images: 
+	for i in $(srcdir)/images/*.gif $(srcdir)/images/*.ps ; do \
+	    $(INSTALL_DATA) $$i $(INSTALL_ROOT)$(destdir)/images ; \
 	done 
 
-inst-dirs:
+mkdirs:
 	@for i in $(instdirs) ; do \
-	    if test -d $$i ; then : ; else mkdir $$i ; fi ; \
+          if test -d $(INSTALL_ROOT)"$$i" ; then \
+            : ; \
+          else \
+            echo " mkdir $(INSTALL_ROOT)$$i" ; \
+            mkdir $(INSTALL_ROOT)"$$i" ; \
+          fi ; \
         done
 
 clean:
+	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"* 
 
 distclean: clean
-	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"* Makefile
+	$(RM) *.ps Makefile

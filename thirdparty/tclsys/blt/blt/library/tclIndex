@@ -6,8 +6,8 @@
 # element name is the name of a command and the value is
 # a script that loads the command.
 
-set auto_index(Blt_ActiveLegend) "source $dir/bltGraph.tcl"
-set auto_index(Blt_Crosshairs) "source $dir/bltGraph.tcl"
-set auto_index(Blt_ZoomStack) "source $dir/bltGraph.tcl"
-set auto_index(Blt_PrintKey) "source $dir/bltGraph.tcl"
-set auto_index(Blt_ClosestPoint) "source $dir/bltGraph.tcl"
+set auto_index(Blt_ActiveLegend) [list source $dir/graph.tcl]
+set auto_index(Blt_Crosshairs) [list source $dir/graph.tcl]
+set auto_index(Blt_ZoomStack) [list source $dir/graph.tcl]
+set auto_index(Blt_PrintKey) [list source $dir/graph.tcl]
+set auto_index(Blt_ClosestPoint) [list source $dir/graph.tcl]

@@ -1,4 +1,5 @@
-The following describes how to compile and install the BLT library.
+This file describes how to compile and install the BLT library for UNIX.
+[See the file ./win/README for details on how to build under Win32.]
 
 1. Uncompress and untar the distribution file.  
 
@@ -7,11 +8,11 @@ The following describes how to compile and install the BLT library.
    This will create a directory "blt2.4" with the following subdirectories:
 
      		   blt2.4
-      	______________|______________
-     	|          |       |        |
-      demos   library     man      src
-     				    |
-     				  shared
+      	______________|_____________________________
+     	|       |       |      |      |    | 	   |
+      demos  examples  html library  man  src	  win
+        |		      	           |       |
+     scripts			         shared   X11
 
 2. Run ./configure
 
@@ -26,20 +27,24 @@ The following describes how to compile and install the BLT library.
 
        Switches:
 
-       --with-tcl=dir	Top level directory where the Tcl and/or Tk 
-     			header files and libraries are installed. Will 
-     			search both "$dir/include" and "$dir/lib".
+       --prefix=path	Specifies the path where "bltwish", the BLT
+     			header files, libraries, scripts, and manual
+     			pages are installed. The default is 
+			"/usr/local/blt".  
 
-       --with-tk=dir	Top level directory where the Tk header files 
-     			and libraries are installed.
+                        This switch also indicates where to find the 
+			Tcl/Tk header files and libraries. You can use 
+			the --with-tcl and --with-tk switches to override 
+			this value if the location of the Tcl/Tk files 
+			is different.
+
+       --with-tcl=dir	Directory where Tcl and/or Tk is installed.
+
+       --with-tk=dir	Directory where Tk is installed	if different 
+			from "--with-tcl".
 
        --with-cc=program  Lets you specify the C compiler, such as 
      			  "acc" or "gcc". 
-
-       --prefix=path	By default, the bltwish demo program, the BLT
-     			header files, libraries, scripts, and manual
-     			pages are installed in "/usr/local/blt".  This 
-     			lets you pick another location.
 
   The configure script creates a header file "src/bltConfig.h". It will also 
   generate new Makefiles from their respective templates (Makefile.in).
@@ -54,19 +59,21 @@ The following describes how to compile and install the BLT library.
 
         make 
 
+   The program "bltwish" will be created in the ./src directory.
+
 4. Test by running the demos. 
 
    Go into the demos directory 
 
         cd demos
 
-   and run the test scripts.
+   and run the test scripts.  
 
-        ./graph
+        ./graph1.tcl
 
    If your system doesn't support "#!" in shell scripts, then it's
 
-        ../bltwish ./graph
+        ../src/bltwish ./graph1.tcl
 
 
 5. Installing BLT
@@ -106,9 +113,3 @@ The following describes how to compile and install the BLT library.
 
    then link with libBLT.a.  And that's all there's to it.
      
-7. Send bugs reports, suggestions, etc. to
-
-        gah@bell-labs.com and/or ghowlett@fast.net
-
-   Make sure you include BLT and the version number in the subject line.
- 

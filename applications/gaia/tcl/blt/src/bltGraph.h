@@ -19,15 +19,25 @@
  * whatsoever resulting from loss of use, data or profits, whether in
  * an action of contract, negligence or other tortuous action, arising
  * out of or in connection with the use or performance of this
- * software.  
+ * software.
  */
 
-#ifndef _GRAPH_H
-#define _GRAPH_H
+#ifndef _BLT_GRAPH_H
+#define _BLT_GRAPH_H
 
 #include "bltInt.h"
+#include "bltHash.h"
+#include "bltBind.h"
+#include "bltChain.h"
 #include "bltPs.h"
+#include "bltTile.h"
+
+typedef struct GraphStruct Graph;
+typedef struct ElementStruct Element;
+typedef struct LegendStruct Legend;
+
 #include "bltGrAxis.h"
+#include "bltGrLegd.h"
 
 #define MARKER_UNDER	1	/* Draw markers designated to lie underneath
 				 * elements, grids, legend, etc. */
@@ -37,7 +47,6 @@
 #define PADX		2	/* Padding between labels/titles */
 #define PADY    	2	/* Padding between labels */
 
-#define TITLE_PAD	5	/* Padding between titles (axis and graph) */
 #define MINIMUM_MARGIN	20	/* Minimum margin size */
 
 
@@ -51,34 +60,14 @@
  *
  * -------------------------------------------------------------------
  */
-typedef struct Graph Graph;
-typedef struct Element Element;
-
-typedef struct Extents2D {
-    double xMin, xMax, yMin, yMax;
-} Extents2D;
-
-typedef struct Extents3D {
-    double xMin, xMax, yMin, yMax, zMin, zMax;
-} Extents3D;
-
-#define PointInRegion(e,x,y) \
-	(((x) <= (e)->xMax) && ((x) >= (e)->xMin) && \
-	 ((y) <= (e)->yMax) && ((y) >= (e)->yMin))
-
 #define PointInGraph(g,x,y) \
-	(((x) <= (g)->xMax) && ((x) >= (g)->xMin) && \
-	 ((y) <= (g)->yMax) && ((y) >= (g)->yMin))
-
-#define PointInRectangle(r,x0,y0) \
-	(((x0) <= (int)((r)->x + (r)->width - 1)) && ((x0) >= (int)(r)->x) && \
-	 ((y0) <= (int)((r)->y + (r)->height - 1)) && ((y0) >= (int)(r)->y))
-
+	(((x) <= (g)->right) && ((x) >= (g)->left) && \
+	 ((y) <= (g)->bottom) && ((y) >= (g)->top))
 
 /*
  * -------------------------------------------------------------------
  *
- * ObjectType --
+ * ClassType --
  *
  *	Enumerates the different types of graph elements this program
  *	produces.  An element can be either a line or a bar.
@@ -86,28 +75,26 @@ typedef struct Extents3D {
  * -------------------------------------------------------------------
  */
 typedef enum {
-    TYPE_UNKNOWN,
-    TYPE_ELEM_LINE,	
-    TYPE_ELEM_STRIP,	
-    TYPE_ELEM_BAR,	
-    TYPE_MARKER_BITMAP,
-    TYPE_MARKER_IMAGE,
-    TYPE_MARKER_LINE,
-    TYPE_MARKER_POLYGON,
-    TYPE_MARKER_TEXT,
-    TYPE_MARKER_WINDOW
+    CLASS_UNKNOWN,
+    CLASS_LINE_ELEMENT,
+    CLASS_STRIP_ELEMENT,
+    CLASS_BAR_ELEMENT,
+    CLASS_BITMAP_MARKER,
+    CLASS_IMAGE_MARKER,
+    CLASS_LINE_MARKER,
+    CLASS_POLYGON_MARKER,
+    CLASS_TEXT_MARKER,
+    CLASS_WINDOW_MARKER
 
-} ObjectType;
-
+} ClassType;
 
 /*
  * Mask values used to selectively enable GRAPH or BARCHART entries in
  * the various configuration specs.
  */
-#define GraphType(g)	(TK_CONFIG_USER_BIT << (g)->type)
-#define GRAPH		(TK_CONFIG_USER_BIT << TYPE_ELEM_LINE)
-#define STRIPCHART	(TK_CONFIG_USER_BIT << TYPE_ELEM_STRIP)
-#define BARCHART	(TK_CONFIG_USER_BIT << TYPE_ELEM_BAR)
+#define GRAPH		(TK_CONFIG_USER_BIT << 1)
+#define STRIPCHART	(TK_CONFIG_USER_BIT << 2)
+#define BARCHART	(TK_CONFIG_USER_BIT << 3)
 #define LINE_GRAPHS	(GRAPH | STRIPCHART)
 #define ALL_GRAPHS	(GRAPH | BARCHART | STRIPCHART)
 
@@ -131,6 +118,7 @@ typedef struct {
 				 * abscissa */
     int count;
     double lastY;
+
 } FreqInfo;
 
 /*
@@ -146,47 +134,46 @@ typedef struct {
     Axis2D axes;		/* Axis mapping of element */
 } FreqKey;
 
-typedef enum  BarModes {
-    MODE_NORMAL,		/* Bars are displayed according to their
-				 * x,y coordinates. If two bars have the
-				 * same abscissa, the bars will overlay
-				 * each other. */
-    MODE_STACKED,		/* Coordinates with the same abscissa are
-				 * displayed as bar segments stacked upon
-				 * each other. The order of stacking is the
-				 * order of the element display list and
-				 * the order of the data values. */
-    MODE_ALIGNED,		/* Coordinates with the same abscissa are
-				 * displayed as thinner bar segments aligned
-				 * one next to the other. The order of the
-				 * alignment is the order of the element
-				 * display list and the order of the data
-				 * values. */
-    MODE_OVERLAP		/* Coordinates with the same abscissa are
-				 * displayed as thinner bar segments aligned
-				 * one next to the other. The order of the
-				 * alignment is the order of the element
-				 * display list and the order of the data
-				 * values. */
+/*
+ * BarModes --
+ *
+ *	Bar elements are displayed according to their x-y coordinates.
+ *	If two bars have the same abscissa (x-coordinate), the bar
+ *	segments will be drawn according to one of the following
+ *	modes:
+ */
+
+typedef enum BarModes {
+    MODE_INFRONT,		/* Each successive segment is drawn in
+				 * front of the previous. */
+    MODE_STACKED,		/* Each successive segment is drawn
+				 * stacked above the previous. */
+    MODE_ALIGNED,		/* Each successive segment is drawn
+				 * aligned to the previous from
+				 * right-to-left. */
+    MODE_OVERLAP		/* Like "aligned", each successive segment
+				 * is drawn from right-to-left. In addition
+				 * the segments will overlap each other
+				 * by a small amount */
 } BarMode;
 
-typedef struct Pen Pen;
-typedef struct Marker Marker;
+typedef struct PenStruct Pen;
+typedef struct MarkerStruct Marker;
 
 typedef Pen *(PenCreateProc) _ANSI_ARGS_((void));
 typedef int (PenConfigureProc) _ANSI_ARGS_((Graph *graphPtr, Pen *penPtr));
 typedef void (PenDestroyProc) _ANSI_ARGS_((Graph *graphPtr, Pen *penPtr));
 
-struct Pen {
+struct PenStruct {
     char *name;			/* Pen style identifier.  If NULL pen
 				 * was statically allocated. */
-    ObjectType type;		/* Type of pen */
+    Blt_Uid classUid;		/* Type of pen */
     char *typeId;		/* String token identifying the type of pen */
     unsigned int flags;		/* Indicates if the pen element is active or
 				 * normal */
     int refCount;		/* Reference count for elements using
 				 * this pen. */
-    Tcl_HashEntry *hashPtr;
+    Blt_HashEntry *hashPtr;
 
     Tk_ConfigSpec *configSpecs;	/* Configuration specifications */
 
@@ -196,7 +183,7 @@ struct Pen {
 };
 
 typedef enum {
-    PS_MONO_BACKGROUND, 
+    PS_MONO_BACKGROUND,
     PS_MONO_FOREGROUND
 } MonoAttribute;
 
@@ -207,11 +194,11 @@ typedef enum {
  *	PostScript commands to print the graph.
  *
  */
-typedef struct {
+typedef struct  {
+    /* User configurable fields */
+
     int decorations;		/* If non-zero, print graph with
 				 * color background and 3D borders */
-
-    /* User configurable fields */
 
     int reqWidth, reqHeight;	/* If greater than zero, represents the
 				 * requested dimensions of the printed graph */
@@ -220,7 +207,7 @@ typedef struct {
 				 * page. Can constrain the size of the graph
 				 * if the graph (plus padding) is larger than
 				 * the size of the page. */
-    Pad padX, padY;		/* Requested padding on the exterior of the
+    Blt_Pad padX, padY;		/* Requested padding on the exterior of the
 				 * graph. This forms the bounding box for
 				 * the page. */
     PsColorMode colorMode;	/* Selects the color mode for PostScript page
@@ -231,24 +218,28 @@ typedef struct {
     char *fontVarName;		/* If non-NULL, is the name of a Tcl array
 				 * variable containing X to PostScript font
 				 * translations */
-    int landscape;		/* If non-zero, rotate page 90 degrees */
+    int landscape;		/* If non-zero, orient the page 90 degrees */
     int center;			/* If non-zero, center the graph on the page */
     int maxpect;		/* If non-zero, indicates to scale the graph
 				 * so that it fills the page (maintaining the
 				 * aspect ratio of the graph) */
     int addPreview;		/* If non-zero, generate a preview image and
 				 * add it to the PostScript output */
+    int footer;			/* If non-zero, a footer with the title, date
+				 * and user will be added to the PostScript
+				 * output outside of the bounding box. */
+    int previewFormat;		/* Format of EPS preview:
+				 * PS_PREVIEW_WMF, PS_PREVIEW_EPSI, or
+				 * PS_PREVIEW_TIFF. */
 
     /* Computed fields */
-    
-    int bbox[4];		/* Bounding box of PostScript plot. */
-    float pageScale;		/* Scale of page. Set if "-maxpect" option 
+
+    int left, bottom;		/* Bounding box of PostScript plot. */
+    int right, top;
+
+    double pageScale;		/* Scale of page. Set if "-maxpect" option
 				 * is set, otherwise 1.0. */
-    int pageHeight;		/* Page height, used to translate to
-				 * X11 coordinates. */
-
 } PostScript;
-
 
 /*
  * -------------------------------------------------------------------
@@ -267,16 +258,17 @@ typedef struct {
     int hidden;			/* If non-zero, grid isn't displayed. */
     int minorGrid;		/* If non-zero, draw grid line for minor
 				 * axis ticks too */
-    Dashes dashes;		/* Dashstyle of the grid. This represents
+    Blt_Dashes dashes;		/* Dashstyle of the grid. This represents
 				 * an array of alternatingly drawn pixel
 				 * values. */
     int lineWidth;		/* Width of the grid lines */
     XColor *colorPtr;		/* Color of the grid lines */
 
-    XSegment *xSegArr;		/* X-axis grid lines */
-    int numX;			/* # of segment in the X-axis array */
-    XSegment *ySegArr;		/* Y-axis grid lines */
-    int numY;			/* # of segments in the Y-axis array */
+    struct GridSegments {
+	Segment2D *segments;	/* Array of line segments representing the
+				 * x or y grid lines */
+	int nSegments;		/* # of axis segments. */
+    } x, y;	
 
 } Grid;
 
@@ -290,74 +282,37 @@ typedef struct {
  *
  * -------------------------------------------------------------------
  */
-typedef struct Crosshairs Crosshairs;
-
-typedef enum LegendSites {
-    LEGEND_SITE_BOTTOM,		/* Legend is drawn in the bottom margin */
-    LEGEND_SITE_LEFT,		/* Legend is drawn in the left margin */
-    LEGEND_SITE_RIGHT,		/* Legend is drawn in the right margin */
-    LEGEND_SITE_TOP,		/* Legend is drawn in the top margin, below
-				 * the title of the graph */
-    LEGEND_SITE_PLOT,		/* Legend is drawn in the plot area */
-    LEGEND_SITE_XY		/* Legend is drawn at a specified x,y
-				 * window coordinate */
-} LegendSite;
+typedef struct CrosshairsStruct Crosshairs;
 
 typedef struct {
-    LegendSite site;
-    int x, y;
-} LegendPosition;
+    short int width, height;	/* Extents of the margin */
 
-/*
- *
- * Legend --
- *
- * 	Contains information specific to how the legend will be
- *	displayed.
- *
- */
-typedef struct {
-    int flags;
-    ObjectType type;		/* Type of marker. */
-    int hidden;			/* If non-zero, don't display the legend. */
-    int width, height;		/* Dimensions of the legend */
-    LegendPosition anchorPos;	/* Window coordinates of legend positioning
-				 * point. Used in conjunction with the anchor
-				 * to determine the location of the legend. */
-    int raised;			/* If non-zero, draw the legend last, above
-				 * everything else. */
+    short int axesOffset;
+    short int axesTitleLength;	/* Width of the widest title to be shown. 
+				 * Multiple titles are displayed in 
+				 * another margin. This is the minimum
+				 * space requirement. */
+    unsigned int nAxes;		/* Number of axes to be displayed */
+    Blt_Chain *axes;		/* Extra axes associated with this margin */
 
-    Pad ipadX, ipadY;		/* # of pixels padding around legend entries */
-    Pad padX, padY;		/* # of pixels padding to exterior of legend */
-    TextAttributes entryAttr;
-    int numEntries;		/* Number of labels (and symbols) to display */
+    char *varName;		/* If non-NULL, name of variable to be
+				 * updated when the margin size changes */
 
-    int numCols, numRows;	/* Number of columns and rows in legend */
+    int reqSize;		/* Requested size of margin */
+    int site;			/* Indicates where margin is located: 
+				 * left/right/top/bottom. */
+} Margin;
 
-    int maxSymSize;		/* Size of largest symbol to be displayed.
-				 * Used to calculate size of legend */
-    Tk_Anchor anchor;		/* Anchor of legend. Used to interpret the
-				 * positioning point of the legend in the
-				 * graph*/
+#define MARGIN_NONE	-1
+#define MARGIN_BOTTOM	0	
+#define MARGIN_LEFT	1 
+#define MARGIN_TOP	2			
+#define MARGIN_RIGHT	3
 
-    int x, y;			/* Origin of legend */
-
-    int borderWidth;		/* Width of legend 3-D border */
-    int relief;			/* 3-d effect of border around the legend:
-				 * TK_RELIEF_RAISED etc. */
-    Tk_3DBorder activeBorder;	/* Background color for active legend
-				 * entries. */
-    int activeRelief;		/* 3-d effect: TK_RELIEF_RAISED etc. */
-    int entryBorderWidth;	/* Width of border around each entry in the
-				 * legend */
-    XColor *fillColor;
-    GC fillGC;			/* Fill color background GC */
-
-    BindTable bindTable;
-
-} Legend;
-
-#define GetLegendSite(g)  ((g)->legendPtr->anchorPos.site)
+#define rightMargin	margins[MARGIN_RIGHT]
+#define leftMargin	margins[MARGIN_LEFT]
+#define topMargin	margins[MARGIN_TOP]
+#define bottomMargin	margins[MARGIN_BOTTOM]
 
 /*
  * -------------------------------------------------------------------
@@ -369,7 +324,7 @@ typedef struct {
  *
  * -------------------------------------------------------------------
  */
-struct Graph {
+struct GraphStruct {
     unsigned int flags;		/* Flags;  see below for definitions. */
     Tcl_Interp *interp;		/* Interpreter associated with graph */
     Tk_Window tkwin;		/* Window that embodies the graph.  NULL
@@ -380,49 +335,64 @@ struct Graph {
 				 * among other things, to release
 				 * resources after tkwin has already gone
 				 * away. */
-    Tcl_HashEntry *hashPtr;	/* Entry of graph in global hash table
-				 * used to track down graphs from windows. */
-
     Tcl_Command cmdToken;	/* Token for graph's widget command. */
 
+    char *data;			/* This value isn't used in C code.
+				 * It may be used in Tcl bindings to
+				 * associate extra data. */
+
     Tk_Cursor cursor;
+
+    int inset;			/* Sum of focus highlight and 3-D
+				 * border.  Indicates how far to 
+				 * offset the graph from outside 
+				 * edge of the window. */
 
     int borderWidth;		/* Width of the exterior border */
     int relief;			/* Relief of the exterior border */
     Tk_3DBorder border;		/* 3-D border used to delineate the plot
 				 * surface and outer edge of window */
+    
+    int highlightWidth;		/* Width in pixels of highlight to draw
+				 * around widget when it has the focus.
+				 * <= 0 means don't draw a highlight. */
+    XColor *highlightBgColor;	/* Color for drawing traversal highlight
+				 * area when highlight is off. */
+    XColor *highlightColor;	/* Color for drawing traversal highlight. */
 
-    TextAttributes titleAttr; /* Graph title */
-    char *titleText;
-    int titleX, titleY;
-
+    char *title;
+    short int titleX, titleY;
+    TextStyle titleTextStyle;	/* Graph title */
+    
     char *takeFocus;
-
+    
     int reqWidth, reqHeight;	/* Requested size of graph window */
     int width, height;		/* Size of graph window or PostScript
 				 * page */
+    
+    Blt_HashTable penTable;	/* Table of pens */
+    
+    struct Component {
+	Blt_HashTable table;	/* Hash table of ids. */
+	Blt_Chain *displayList;	/* Display list. */
+	Blt_HashTable tagTable;	/* Table of bind tags. */
+    } elements, markers, axes;
+    
+    Blt_Uid classUid;		/* Default element type */
 
-    Tcl_HashTable penTable;	/* Table of pens */
-    Tcl_HashTable elemTable;	/* Hash table of data elements. */
-    Tcl_HashTable markerTable;	/* Hash table of markers */
-    Tcl_HashTable axisTable;	/* Table of axes */
-    Tcl_HashTable elemTagTable;	/* Hash table of element binding tags. */
-    Tcl_HashTable markerTagTable;/* Hash table of marker binding tags. */
-
-    Blt_List elemList;		/* List describing order to draw elements */
-    ObjectType type;		/* Default element type: either TYPE_ELEM_LINE,
-				 * TYPE_ELEM_STRIP, or TYPE_ELEM_BAR */
-
-    Blt_List markerList;	/* Display list of markers */
+    Blt_BindTable bindTable;
     int nextMarkerId;		/* Tracks next marker identifier available */
-
-    BindTable bindTable;
-
-    Axis axisArr[4];		/* Coordinate axis info: see bltGrAxis.c */
-    Axis *bottomAxis, *topAxis, *leftAxis, *rightAxis;
-
+    
+    Blt_Chain *axisChain[4];	/* Chain of axes for each of the
+				 * margins.  They're separate from the
+				 * margin structures to make it easier
+				 * to invert the X-Y axes by simply
+				 * switching chain pointers.  
+				 */
+    Margin margins[4];
+    
     PostScript *postscript;	/* PostScript options: see bltGrPS.c */
-    Legend *legendPtr;		/* Legend information: see bltGrLegd.c */
+    Legend *legend;		/* Legend information: see bltGrLegd.c */
     Crosshairs *crosshairs;	/* Crosshairs information: see bltGrHairs.c */
     Grid *gridPtr;		/* Grid attribute information */
 
@@ -437,41 +407,33 @@ struct Graph {
 				 * margins. The fill is governed by
 				 * the background color or the tiled
 				 * pixmap. */
-    int plotBW;			/* Width of interior 3-D border. */
+    int plotBorderWidth;	/* Width of interior 3-D border. */
     int plotRelief;		/* 3-d effect: TK_RELIEF_RAISED etc. */
     XColor *plotBg;		/* Color of plotting surface */
 
     GC plotFillGC;		/* Used to fill the plotting area with a
 				 * solid background color. The fill color
 				 * is stored in "plotBg". */
-    /*
-     * The following are the requested sizes for the margins surrounding the 
-     * plotting area. If non-zero, the requested margin will override the
-     * computed size.
-     */
-    int reqLeftMargin, reqRightMargin, reqTopMargin, reqBottomMargin;
-
-    int leftMargin, rightMargin, topMargin, bottomMargin;
 
     /* If non-zero, force plot to conform to aspect ratio W/H */
-    double aspectRatio;
+    double aspect;
 
-    /* Variables to be updated when the margins are recalculated. */
-    char *leftVar, *rightVar, *topVar, *bottomVar;
+    short int left, right;	/* Coordinates of plot bbox */
+    short int top, bottom;	
 
-    int xMin, yMax;		/* Lower left coordinate of plot bbox */
-    int xMax, yMin;		/* Upper right coordinate of plot bbox */
-
-    Pad padX;			/* Vertical padding for plotarea */
+    Blt_Pad padX;		/* Vertical padding for plotarea */
     int vRange, vOffset;	/* Vertical axis range and offset from the
 				 * left side of the graph window. Used to
 				 * transform coordinates to vertical
 				 * axes. */
-    Pad padY;			/* Horizontal padding for plotarea */
+    Blt_Pad padY;		/* Horizontal padding for plotarea */
     int hRange, hOffset;	/* Horizontal axis range and offset from
 				 * the top of the graph window. Used to
 				 * transform horizontal axes */
+    double vScale, hScale;
 
+    int doubleBuffer;		/* If non-zero, draw the graph into a pixmap
+				 * first to reduce flashing. */
     int backingStore;		/* If non-zero, cache elements by drawing
 				 * them into a pixmap */
     Pixmap backPixmap;		/* Pixmap used to cache elements
@@ -500,15 +462,17 @@ struct Graph {
 				 * x-values in bar elements (malloc-ed).
 				 * This information can also be accessed
 				 * by the frequency hash table */
-    Tcl_HashTable freqTable;	/* */
-    int numStacks;		/* Number of entries in frequency array.
+    Blt_HashTable freqTable;	/* */
+    int nStacks;		/* Number of entries in frequency array.
 				 * If zero, indicates nothing special needs
 				 * to be done for "stack" or "align" modes */
+    char *dataCmd;		/* New data callback? */
 
 };
 
 /*
- * Flag bits for graphs:
+ * Bit flags definitions:
+ *
  * 	All kinds of state information kept here.  All these
  *	things happen when the window is available to draw into
  *	(DisplayGraph). Need the window width and height before
@@ -519,174 +483,202 @@ struct Graph {
  *	Same goes for maintaining a pixmap to double buffer graph
  *	elements.  Need to mark when the pixmap needs to updated.
  *
+ *
+ *	MAP_ITEM		Indicates that the element/marker/axis
+ *				configuration has changed such that
+ *				its layout of the item (i.e. its
+ *				position in the graph window) needs
+ *				to be recalculated.
+ *
+ *	MAP_ALL			Indicates that the layout of the axes and 
+ *				all elements and markers and the graph need 
+ *				to be recalculated. Otherwise, the layout
+ *				of only those markers and elements that
+ *				have changed will be reset. 
+ *
+ *	GET_AXIS_GEOMETRY	Indicates that the size of the axes needs 
+ *				to be recalculated. 
+ *
+ *	RESET_AXES		Flag to call to Blt_ResetAxes routine.  
+ *				This routine recalculates the scale offset
+ *				(used for mapping coordinates) of each axis.
+ *				If an axis limit has changed, then it sets 
+ *				flags to re-layout and redraw the entire 
+ *				graph.  This needs to happend before the axis
+ *				can compute transformations between graph and 
+ *				screen coordinates. 
+ *
+ *	LAYOUT_NEEDED		
+ *
+ *	REDRAW_BACKING_STORE	If set, redraw all elements into the pixmap 
+ *				used for buffering elements. 
+ *
+ *	REDRAW_PENDING		Non-zero means a DoWhenIdle handler has 
+ *				already been queued to redraw this window. 
+ *
+ *	DRAW_LEGEND		Non-zero means redraw the legend. If this is 
+ *				the only DRAW_* flag, the legend display 
+ *				routine is called instead of the graph 
+ *				display routine. 
+ *
+ *	DRAW_MARGINS		Indicates that the margins bordering 
+ *				the plotting area need to be redrawn. 
+ *				The possible reasons are:
+ *
+ *				1) an axis configuration changed
+ *				2) an axis limit changed
+ *				3) titles have changed
+ *				4) window was resized. 
+ *
+ *	GRAPH_FOCUS	
  */
-#define	COORDS_ALL_PARTS (1<<1)	/* Indicates that the layout
-				 * of the axes and all elements and
-				 * markers and the graph need to be
-				 * recalculated. Otherwise, the layout
-				 * of only those markers and elements that
-				 * have changed will be reset. */
 
+#define	MAP_ITEM		(1<<0) /* 0x0001 */
+#define	MAP_ALL			(1<<1) /* 0x0002 */
+#define	GET_AXIS_GEOMETRY	(1<<2) /* 0x0004 */
+#define RESET_AXES		(1<<3) /* 0x0008 */
+#define LAYOUT_NEEDED		(1<<4) /* 0x0010 */
 
-#define	GET_AXIS_GEOMETRY (1<<2)/* Indicates that the extents of the
-				  * axes needs to be recalculated. */
+#define REDRAW_PENDING		(1<<8) /* 0x0100 */
+#define DRAW_LEGEND		(1<<9) /* 0x0200 */
+#define DRAW_MARGINS		(1<<10)/* 0x0400 */
+#define	REDRAW_BACKING_STORE	(1<<11)/* 0x0800 */
 
-#define RESET_AXES	  (1<<3)/* Flag to call to Blt_ResetAxes
-				 * routine.  This routine recalculates the
-				 * scale offset (used for mapping
-				 * coordinates) of each axis.  If an axis
-				 * min or max limit has changed, then it
-				 * sets flags to relayout and redraw the
-				 * entire graph.  This routine also needs
-				 * to be called before the axis can be
-				 * used to compute transformations between
-				 * graph and screen coordinates. */
+#define GRAPH_FOCUS		(1<<12)/* 0x1000 */
+#define DATA_CHANGED		(1<<13)/* 0x2000 */
 
-#define LAYOUT_NEEDED	(1<<4)
-#define	REDRAW_BACKING_STORE	(1<<5)	/* If set, redraw all elements into the
-				 * pixmap used for buffering elements. */
-
-#define REDRAW_PENDING 	(1<<6)	/* Non-zero means a DoWhenIdle
-				 * handler has already been queued to
-				 * redraw this window. */
-
-#define DRAW_LEGEND     (1<<7)	/* Non-zero means redraw the legend.
-				 * If this is the only DRAW_ flag, the
-				 * legend display routine is called instead
-				 * of the graph display routine. */
-
-#define DRAW_PLOT_AREA	(1<<8)
-#define REDRAW_MARGINS	(1<<9)	/* Non-zero means that the region that
-				 * borders the plotting surface of the
-				 * graph needs to be redrawn. The
-				 * possible reasons are:
-				 *
-				 * 1) an axis configuration changed
-				 *
-				 * 2) an axis limit changed
-				 *
-				 * 3) titles have changed
-				 *
-				 * 4) window was resized. */
-
-#define	COORDS_WORLD 	(COORDS_ALL_PARTS|RESET_AXES|GET_AXIS_GEOMETRY|REDRAW_BACKING_STORE)
-#define REDRAW_WORLD	(DRAW_PLOT_AREA | REDRAW_MARGINS | DRAW_LEGEND)
-
-#define SET_ALL_FLAGS	(REDRAW_WORLD | COORDS_WORLD | RESET_AXES)
+#define	MAP_WORLD		(MAP_ALL|RESET_AXES|GET_AXIS_GEOMETRY)
+#define REDRAW_WORLD		(DRAW_MARGINS | DRAW_LEGEND)
+#define RESET_WORLD		(REDRAW_WORLD | MAP_WORLD)
 
 /*
  * ---------------------- Forward declarations ------------------------
  */
 
-extern int Blt_CreateLegend _ANSI_ARGS_((Graph *graphPtr));
 extern int Blt_CreatePostScript _ANSI_ARGS_((Graph *graphPtr));
 extern int Blt_CreateCrosshairs _ANSI_ARGS_((Graph *graphPtr));
 extern int Blt_CreateGrid _ANSI_ARGS_((Graph *graphPtr));
-extern Point2D Blt_InvTransform2DPt _ANSI_ARGS_((Graph *graphPtr, double x,
-	double y, Axis2D * pairPtr));
-extern Point2D Blt_Transform2DPt _ANSI_ARGS_((Graph *graphPtr, double x,
-	double y, Axis2D * pairPtr));
-extern Graph *Blt_FindGraph _ANSI_ARGS_((Tk_Window tkwin));
+extern double Blt_InvHMap _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr, 
+	double x));
+extern double Blt_InvVMap _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr, 
+	double x));
+extern double Blt_HMap _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr, double x));
+extern double Blt_VMap _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr, double y));
+extern Point2D Blt_InvMap2D _ANSI_ARGS_((Graph *graphPtr, double x,
+	double y, Axis2D *pairPtr));
+extern Point2D Blt_Map2D _ANSI_ARGS_((Graph *graphPtr, double x,
+	double y, Axis2D *pairPtr));
+extern Graph *Blt_GetGraphFromWindowData _ANSI_ARGS_((Tk_Window tkwin));
 extern void Blt_AdjustAxisPointers _ANSI_ARGS_((Graph *graphPtr));
-extern int Blt_ClipSegment _ANSI_ARGS_((Extents2D * extentsPtr, Point2D * p1Ptr,
-	Point2D * p2Ptr, XSegment *segPtr));
+extern int Blt_LineRectClip _ANSI_ARGS_((Extents2D *extsPtr, Point2D *p,
+	Point2D *q));
+extern int Blt_PolyRectClip _ANSI_ARGS_((Extents2D *extsPtr, Point2D *inputPts,
+	int nInputPts, Point2D *outputPts));
+
 extern void Blt_ComputeStacks _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_ConfigureCrosshairs _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyAxes _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyCrosshairs _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyGrid _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyElements _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_DestroyLegend _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyMarkers _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyPostScript _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DrawAxes _ANSI_ARGS_((Graph *graphPtr, Drawable drawable));
-extern void Blt_DrawAxisLimits _ANSI_ARGS_((Graph *graphPtr, 
+extern void Blt_DrawAxisLimits _ANSI_ARGS_((Graph *graphPtr,
 	Drawable drawable));
 extern void Blt_DrawElements _ANSI_ARGS_((Graph *graphPtr, Drawable drawable));
-extern void Blt_DrawActiveElements _ANSI_ARGS_((Graph *graphPtr, 
+extern void Blt_DrawActiveElements _ANSI_ARGS_((Graph *graphPtr,
 	Drawable drawable));
-extern void Blt_DrawGraph _ANSI_ARGS_((Graph *graphPtr, Drawable drawable, 
+extern void Blt_DrawGraph _ANSI_ARGS_((Graph *graphPtr, Drawable drawable,
 	int backingStore));
 extern void Blt_DrawGrid _ANSI_ARGS_((Graph *graphPtr, Drawable drawable));
-extern void Blt_DrawLegend _ANSI_ARGS_((Graph *graphPtr, Drawable drawable));
-extern void Blt_DrawMarkers _ANSI_ARGS_((Graph *graphPtr, Drawable drawable, 
+extern void Blt_DrawMarkers _ANSI_ARGS_((Graph *graphPtr, Drawable drawable,
 	int under));
-extern int Blt_GetAxisMargin _ANSI_ARGS_((Axis *axisPtr));
+extern void Blt_Draw2DSegments _ANSI_ARGS_((Display *display, 
+	Drawable drawable, GC gc, Segment2D *segments, int nSegments));
 extern int Blt_GetCoordinate _ANSI_ARGS_((Tcl_Interp *interp,
 	char *expr, double *valuePtr));
-extern int Blt_GetElement _ANSI_ARGS_((Graph *graphPtr, char *name,
-	Element **elemPtrPtr));
 extern void Blt_InitFreqTable _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_LayoutGraph _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_LayoutMargins _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_LayoutLegend _ANSI_ARGS_((Graph *graphPtr, int width,
-	int height));
 extern void Blt_EventuallyRedrawGraph _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_ResetAxes _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_ResetStacks _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_SetClipRegion _ANSI_ARGS_((Graph *graphPtr, Extents2D * extentsPtr));
+extern void Blt_GraphExtents _ANSI_ARGS_((Graph *graphPtr, Extents2D *extsPtr));
 extern void Blt_DisableCrosshairs _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_EnableCrosshairs _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_TransformAxis _ANSI_ARGS_((Graph *graphPtr,
-	Axis *axisPtr));
-extern void Blt_TransformElements _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_TransformGraph _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_TransformMarkers _ANSI_ARGS_((Graph *graphPtr));
-extern void Blt_TransformGrid _ANSI_ARGS_((Graph *graphPtr));
+extern void Blt_MapAxes _ANSI_ARGS_((Graph *graphPtr));
+extern void Blt_MapElements _ANSI_ARGS_((Graph *graphPtr));
+extern void Blt_MapGraph _ANSI_ARGS_((Graph *graphPtr));
+extern void Blt_MapMarkers _ANSI_ARGS_((Graph *graphPtr));
+extern void Blt_MapGrid _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_UpdateCrosshairs _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_DestroyPens _ANSI_ARGS_((Graph *graphPtr));
-extern int Blt_GetPen _ANSI_ARGS_((Graph *graphPtr, char *name, ObjectType type,
-	Pen **penPtrPtr));
+extern int Blt_GetPen _ANSI_ARGS_((Graph *graphPtr, char *name, 
+	Blt_Uid classUid, Pen **penPtrPtr));
 extern Pen *Blt_BarPen _ANSI_ARGS_((char *penName));
 extern Pen *Blt_LinePen _ANSI_ARGS_((char *penName));
-extern Pen *Blt_CreatePen _ANSI_ARGS_((Graph *graphPtr, char *penName, 
-	ObjectType type, int numOpts, char **options));
+extern Pen *Blt_CreatePen _ANSI_ARGS_((Graph *graphPtr, char *penName,
+	Blt_Uid classUid, int nOpts, char **options));
 extern int Blt_InitLinePens _ANSI_ARGS_((Graph *graphPtr));
 extern int Blt_InitBarPens _ANSI_ARGS_((Graph *graphPtr));
 extern void Blt_FreePen _ANSI_ARGS_((Graph *graphPtr, Pen *penPtr));
 
 extern int Blt_VirtualAxisOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
-extern int Blt_AxisOp _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr, int argc,
+extern int Blt_AxisOp _ANSI_ARGS_((Graph *graphPtr, int margin, int argc, 
 	char **argv));
 extern int Blt_ElementOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
-	int argc, char **argv, ObjectType type));
+	int argc, char **argv, Blt_Uid classUid));
 extern int Blt_GridOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
 extern int Blt_CrosshairsOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
-	int argc, char **argv));
-extern int Blt_LegendOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
 extern int Blt_MarkerOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
 extern int Blt_PenOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
+extern int Blt_PointInPolygon _ANSI_ARGS_((Point2D *samplePtr, 
+	Point2D *screenPts, int nScreenPts));
+extern int Blt_RegionInPolygon _ANSI_ARGS_((Extents2D *extsPtr, Point2D *points,
+	int nPoints, int enclosed));
+extern int Blt_PointInSegments _ANSI_ARGS_((Point2D *samplePtr, 
+	Segment2D *segments, int nSegments, double halo));
 extern int Blt_PostScriptOp _ANSI_ARGS_((Graph *graphPtr, Tcl_Interp *interp,
 	int argc, char **argv));
 extern int Blt_GraphUpdateNeeded _ANSI_ARGS_((Graph *graphPtr));
 extern int Blt_DefaultAxes _ANSI_ARGS_((Graph *graphPtr));
+extern Axis *Blt_GetFirstAxis _ANSI_ARGS_((Blt_Chain *chainPtr));
 extern void Blt_UpdateAxisBackgrounds _ANSI_ARGS_((Graph *graphPtr));
-extern int Blt_GetAxisSegments _ANSI_ARGS_((Graph *graphPtr,
-	VirtualAxis * axisPtr, XSegment **segPtrPtr));
-
-extern ObjectType Blt_GetElementType _ANSI_ARGS_((char *string));
-extern char *Blt_NameOfElementType _ANSI_ARGS_((ObjectType type));
-extern int Blt_NameToElement _ANSI_ARGS_((Graph *graphPtr, char *name, 
-	Element **elemPtrPtr));
-extern Marker *Blt_NearestMarker _ANSI_ARGS_((Graph *graphPtr, int x, int y, 
+extern void Blt_GetAxisSegments _ANSI_ARGS_((Graph *graphPtr, Axis *axisPtr,
+	Segment2D **segPtrPtr, int *nSegmentsPtr));
+extern Marker *Blt_NearestMarker _ANSI_ARGS_((Graph *graphPtr, int x, int y,
 	int under));
-extern int Blt_NameToMarker _ANSI_ARGS_((Graph *graphPtr, char *name, 
-	Marker **markerPtrPtr));
+extern Axis *Blt_NearestAxis _ANSI_ARGS_((Graph *graphPtr, int x, int y));
+
 
 typedef ClientData (MakeTagProc) _ANSI_ARGS_((Graph *graphPtr, char *tagName));
-extern ClientData Blt_MakeElementTag _ANSI_ARGS_((Graph *graphPtr, 
-	char *tagName));
-extern ClientData Blt_MakeMarkerTag _ANSI_ARGS_((Graph *graphPtr, 
-	char *tagName));
+extern MakeTagProc Blt_MakeElementTag;
+extern MakeTagProc Blt_MakeMarkerTag;
+extern MakeTagProc Blt_MakeAxisTag;
 
+extern Blt_BindTagProc Blt_GraphTags;
+extern Blt_BindTagProc Blt_AxisTags;
+
+extern int Blt_GraphType _ANSI_ARGS_((Graph *graphPtr));
 
 /* ---------------------- Global declarations ------------------------ */
 
-extern double bltNegInfinity, bltPosInfinity;
+extern Blt_Uid bltBarElementUid;
+extern Blt_Uid bltLineElementUid;
+extern Blt_Uid bltStripElementUid;
+extern Blt_Uid bltLineMarkerUid;
+extern Blt_Uid bltBitmapMarkerUid;
+extern Blt_Uid bltImageMarkerUid;
+extern Blt_Uid bltTextMarkerUid;
+extern Blt_Uid bltPolygonMarkerUid;
+extern Blt_Uid bltWindowMarkerUid;
+extern Blt_Uid bltXAxisUid;
+extern Blt_Uid bltYAxisUid;
 
-#endif /* _GRAPH_H */
+#endif /* _BLT_GRAPH_H */

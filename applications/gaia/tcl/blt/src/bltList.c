@@ -25,52 +25,56 @@
  */
 
 #include "bltInt.h"
+#include "bltList.h"
 
-static struct Blt_ListItem *
+static struct Blt_ListNodeStruct *
 FindString(listPtr, key)
-    Blt_List *listPtr;		/* List to search */
-    char *key;			/* Key to match */
+    struct Blt_ListStruct *listPtr; /* List to search */
+    CONST char *key;		/* Key to match */
 {
-    register struct Blt_ListItem *iPtr;
+    register struct Blt_ListNodeStruct *nodePtr;
     char c;
 
     c = key[0];
-    for (iPtr = listPtr->headPtr; iPtr != NULL; iPtr = iPtr->nextPtr) {
-	if ((c == iPtr->key.string[0]) &&
-	    (strcmp(key, iPtr->key.string) == 0)) {
-	    return iPtr;
+    for (nodePtr = listPtr->headPtr; nodePtr != NULL; 
+	 nodePtr = nodePtr->nextPtr) {
+	if ((c == nodePtr->key.string[0]) &&
+	    (strcmp(key, nodePtr->key.string) == 0)) {
+	    return nodePtr;
 	}
     }
     return NULL;
 }
 
-static struct Blt_ListItem *
+static Blt_ListNode
 FindOneWord(listPtr, key)
-    Blt_List *listPtr;		/* List to search */
-    char *key;			/* Key to match */
+    struct Blt_ListStruct *listPtr; /* List to search */
+    CONST char *key;		/* Key to match */
 {
-    register struct Blt_ListItem *iPtr;
+    register struct Blt_ListNodeStruct *nodePtr;
 
-    for (iPtr = listPtr->headPtr; iPtr != NULL; iPtr = iPtr->nextPtr) {
-	if (key == iPtr->key.oneWordValue) {
-	    return iPtr;
+    for (nodePtr = listPtr->headPtr; nodePtr != NULL; 
+	 nodePtr = nodePtr->nextPtr) {
+	if (key == nodePtr->key.oneWordValue) {
+	    return nodePtr;
 	}
     }
     return NULL;
 }
 
-static struct Blt_ListItem *
+static Blt_ListNode
 FindArray(listPtr, key)
-    Blt_List *listPtr;		/* List to search */
-    char *key;			/* Key to match */
+    struct Blt_ListStruct *listPtr; /* List to search */
+    CONST char *key;		/* Key to match */
 {
-    register struct Blt_ListItem *iPtr;
-    int numBytes;
+    register struct Blt_ListNodeStruct *nodePtr;
+    int nBytes;
 
-    numBytes = sizeof(int) * listPtr->type;
-    for (iPtr = listPtr->headPtr; iPtr != NULL; iPtr = iPtr->nextPtr) {
-	if (memcmp(key, iPtr->key.words, numBytes) == 0) {
-	    return iPtr;
+    nBytes = sizeof(int) * listPtr->type;
+    for (nodePtr = listPtr->headPtr; nodePtr != NULL; 
+	 nodePtr = nodePtr->nextPtr) {
+	if (memcmp(key, nodePtr->key.words, nBytes) == 0) {
+	    return nodePtr;
 	}
     }
     return NULL;
@@ -79,7 +83,26 @@ FindArray(listPtr, key)
 /*
  *----------------------------------------------------------------------
  *
- * Blt_CreateList --
+ * FreeNode --
+ *
+ *	Free the memory allocated for the node.
+ *
+ * Results:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+FreeNode(nodePtr)
+    struct Blt_ListNodeStruct *nodePtr;
+{
+    Blt_Free(nodePtr);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_ListCreate --
  *
  *	Creates a new linked list structure and initializes its pointers
  *
@@ -88,88 +111,72 @@ FindArray(listPtr, key)
  *
  *----------------------------------------------------------------------
  */
-Blt_List *
-Blt_CreateList(type)
+/*LINTLIBRARY*/
+Blt_List 
+Blt_ListCreate(type)
     int type;
 {
-    Blt_List *listPtr;
+    struct Blt_ListStruct *listPtr;
 
-    listPtr = (Blt_List *)malloc(sizeof(Blt_List));
+    listPtr = Blt_Malloc(sizeof(struct Blt_ListStruct));
     if (listPtr != NULL) {
-	Blt_InitList(listPtr, type);
+	Blt_ListInit(listPtr, type);
     }
-    return (listPtr);
+    return listPtr;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListNewItem --
+ * Blt_ListCreateNode --
  *
- *	Creates a list entry holder.  This routine does not insert
- *	the entry into the list, nor does it no attempt to maintain
- *	consistency of the keys.  For example, more than one entry
+ *	Creates a list node holder.  This routine does not insert
+ *	the node into the list, nor does it no attempt to maintain
+ *	consistency of the keys.  For example, more than one node
  *	may use the same key.
  *
  * Results:
- *	The return value is the pointer to the newly created entry.
+ *	The return value is the pointer to the newly created node.
  *
  * Side Effects:
  *	The key is not copied, only the Uid is kept.  It is assumed
- *	this key will not change in the life of the entry.
+ *	this key will not change in the life of the node.
  *
  *----------------------------------------------------------------------
  */
-Blt_ListItem
-Blt_ListNewItem(listPtr, key)
-    Blt_List *listPtr;
-    char *key;			/* Unique key to reference object */
+/*LINTLIBRARY*/
+Blt_ListNode
+Blt_ListCreateNode(listPtr, key)
+    struct Blt_ListStruct *listPtr;
+    CONST char *key;		/* Unique key to reference object */
 {
-    register struct Blt_ListItem *iPtr;
+    register struct Blt_ListNodeStruct *nodePtr;
     int keySize;
 
-    if (listPtr->type == TCL_STRING_KEYS) {
+    if (listPtr->type == BLT_STRING_KEYS) {
 	keySize = strlen(key) + 1;
+    } else if (listPtr->type == BLT_ONE_WORD_KEYS) {
+	keySize = sizeof(int);
     } else {
 	keySize = sizeof(int) * listPtr->type;
     }
-    iPtr = (struct Blt_ListItem *)
-	calloc(1, sizeof(struct Blt_ListItem) + keySize - 4);
-    assert(iPtr);
-    iPtr->clientData = (ClientData)NULL;
-    iPtr->nextPtr = iPtr->prevPtr = NULL;
-    iPtr->listPtr = listPtr;
+    nodePtr = Blt_Calloc(1, sizeof(struct Blt_ListNodeStruct) + keySize - 4);
+    assert(nodePtr);
+    nodePtr->clientData = NULL;
+    nodePtr->nextPtr = nodePtr->prevPtr = NULL;
+    nodePtr->listPtr = listPtr;
     switch (listPtr->type) {
-    case TCL_STRING_KEYS:
-	strcpy(iPtr->key.string, key);
+    case BLT_STRING_KEYS:
+	strcpy(nodePtr->key.string, key);
 	break;
-    case TCL_ONE_WORD_KEYS:
-	iPtr->key.oneWordValue = key;
+    case BLT_ONE_WORD_KEYS:
+	nodePtr->key.oneWordValue = key;
 	break;
     default:
-	memcpy(iPtr->key.words, key, keySize);
+	memcpy(nodePtr->key.words, key, keySize);
 	break;
     }
-    return iPtr;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * FreeItem --
- *
- *	Free the memory allocated for the entry.
- *
- * Results:
- *	None.
- *
- *----------------------------------------------------------------------
- */
-static void
-FreeItem(iPtr)
-    struct Blt_ListItem *iPtr;
-{
-    free((char *)iPtr);
+    return nodePtr;
 }
 
 /*
@@ -179,27 +186,28 @@ FreeItem(iPtr)
  *
  *	Removes all the entries from a list, removing pointers to the
  *	objects and keys (not the objects or keys themselves).  The
- *	entry counter is reset to zero.
+ *	node counter is reset to zero.
  *
  * Results:
  *	None.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
 Blt_ListReset(listPtr)
-    Blt_List *listPtr;		/* List to clear */
+    struct Blt_ListStruct *listPtr; /* List to clear */
 {
     if (listPtr != NULL) {
-	register struct Blt_ListItem *oldPtr;
-	register struct Blt_ListItem *iPtr = listPtr->headPtr;
+	register struct Blt_ListNodeStruct *oldPtr;
+	register struct Blt_ListNodeStruct *nodePtr = listPtr->headPtr;
 
-	while (iPtr != NULL) {
-	    oldPtr = iPtr;
-	    iPtr = iPtr->nextPtr;
-	    FreeItem(oldPtr);
-	    Blt_InitList(listPtr, listPtr->type);
+	while (nodePtr != NULL) {
+	    oldPtr = nodePtr;
+	    nodePtr = nodePtr->nextPtr;
+	    FreeNode(oldPtr);
 	}
+	Blt_ListInit(listPtr, listPtr->type);
     }
 }
 
@@ -215,20 +223,21 @@ Blt_ListReset(listPtr)
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
 Blt_ListDestroy(listPtr)
-    Blt_List *listPtr;
+    struct Blt_ListStruct *listPtr;
 {
     if (listPtr != NULL) {
 	Blt_ListReset(listPtr);
-	free((char *)listPtr);
+	Blt_Free(listPtr);
     }
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_InitList --
+ * Blt_ListInit --
  *
  *	Initializes a linked list.
  *
@@ -237,12 +246,13 @@ Blt_ListDestroy(listPtr)
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_InitList(listPtr, type)
-    Blt_List *listPtr;
+Blt_ListInit(listPtr, type)
+    struct Blt_ListStruct *listPtr;
     int type;
 {
-    listPtr->numEntries = 0;
+    listPtr->nNodes = 0;
     listPtr->headPtr = listPtr->tailPtr = NULL;
     listPtr->type = type;
 }
@@ -252,41 +262,42 @@ Blt_InitList(listPtr, type)
  *
  * Blt_ListLinkAfter --
  *
- *	Inserts an entry following a given entry.
+ *	Inserts an node following a given node.
  *
  * Results:
  *	None.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_ListLinkAfter(listPtr, iPtr, afterPtr)
-    Blt_List *listPtr;
-    struct Blt_ListItem *iPtr;
-    struct Blt_ListItem *afterPtr;
+Blt_ListLinkAfter(listPtr, nodePtr, afterPtr)
+    struct Blt_ListStruct *listPtr;
+    struct Blt_ListNodeStruct *nodePtr;
+    struct Blt_ListNodeStruct *afterPtr;
 {
     if (listPtr->headPtr == NULL) {
-	listPtr->tailPtr = listPtr->headPtr = iPtr;
+	listPtr->tailPtr = listPtr->headPtr = nodePtr;
     } else {
 	if (afterPtr == NULL) {
 	    /* Prepend to the front of the list */
-	    iPtr->nextPtr = listPtr->headPtr;
-	    iPtr->prevPtr = NULL;
-	    listPtr->headPtr->prevPtr = iPtr;
-	    listPtr->headPtr = iPtr;
+	    nodePtr->nextPtr = listPtr->headPtr;
+	    nodePtr->prevPtr = NULL;
+	    listPtr->headPtr->prevPtr = nodePtr;
+	    listPtr->headPtr = nodePtr;
 	} else {
-	    iPtr->nextPtr = afterPtr->nextPtr;
-	    iPtr->prevPtr = afterPtr;
+	    nodePtr->nextPtr = afterPtr->nextPtr;
+	    nodePtr->prevPtr = afterPtr;
 	    if (afterPtr == listPtr->tailPtr) {
-		listPtr->tailPtr = iPtr;
+		listPtr->tailPtr = nodePtr;
 	    } else {
-		afterPtr->nextPtr->prevPtr = iPtr;
+		afterPtr->nextPtr->prevPtr = nodePtr;
 	    }
-	    afterPtr->nextPtr = iPtr;
+	    afterPtr->nextPtr = nodePtr;
 	}
     }
-    iPtr->listPtr = listPtr;
-    listPtr->numEntries++;
+    nodePtr->listPtr = listPtr;
+    listPtr->nNodes++;
 }
 
 /*
@@ -294,49 +305,50 @@ Blt_ListLinkAfter(listPtr, iPtr, afterPtr)
  *
  * Blt_ListLinkBefore --
  *
- *	Inserts an entry preceding a given entry.
+ *	Inserts an node preceding a given node.
  *
  * Results:
  *	None.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_ListLinkBefore(listPtr, iPtr, beforePtr)
-    Blt_List *listPtr;		/* List to contain new entry */
-    struct Blt_ListItem *iPtr;	/* New entry to be inserted */
-    struct Blt_ListItem *beforePtr;	/* Entry to link before */
+Blt_ListLinkBefore(listPtr, nodePtr, beforePtr)
+    struct Blt_ListStruct *listPtr; /* List to contain new node */
+    struct Blt_ListNodeStruct *nodePtr;	/* New node to be inserted */
+    struct Blt_ListNodeStruct *beforePtr;	/* Node to link before */
 {
     if (listPtr->headPtr == NULL) {
-	listPtr->tailPtr = listPtr->headPtr = iPtr;
+	listPtr->tailPtr = listPtr->headPtr = nodePtr;
     } else {
 	if (beforePtr == NULL) {
 	    /* Append onto the end of the list */
-	    iPtr->nextPtr = NULL;
-	    iPtr->prevPtr = listPtr->tailPtr;
-	    listPtr->tailPtr->nextPtr = iPtr;
-	    listPtr->tailPtr = iPtr;
+	    nodePtr->nextPtr = NULL;
+	    nodePtr->prevPtr = listPtr->tailPtr;
+	    listPtr->tailPtr->nextPtr = nodePtr;
+	    listPtr->tailPtr = nodePtr;
 	} else {
-	    iPtr->prevPtr = beforePtr->prevPtr;
-	    iPtr->nextPtr = beforePtr;
+	    nodePtr->prevPtr = beforePtr->prevPtr;
+	    nodePtr->nextPtr = beforePtr;
 	    if (beforePtr == listPtr->headPtr) {
-		listPtr->headPtr = iPtr;
+		listPtr->headPtr = nodePtr;
 	    } else {
-		beforePtr->prevPtr->nextPtr = iPtr;
+		beforePtr->prevPtr->nextPtr = nodePtr;
 	    }
-	    beforePtr->prevPtr = iPtr;
+	    beforePtr->prevPtr = nodePtr;
 	}
     }
-    iPtr->listPtr = listPtr;
-    listPtr->numEntries++;
+    nodePtr->listPtr = listPtr;
+    listPtr->nNodes++;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListUnlinkItem --
+ * Blt_ListUnlinkNode --
  *
- *	Unlinks an entry from the given list. The entry itself is
+ *	Unlinks an node from the given list. The node itself is
  *	not deallocated, but only removed from the list.
  *
  * Results:
@@ -344,55 +356,57 @@ Blt_ListLinkBefore(listPtr, iPtr, beforePtr)
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_ListUnlinkItem(iPtr)
-    struct Blt_ListItem *iPtr;
+Blt_ListUnlinkNode(nodePtr)
+    struct Blt_ListNodeStruct *nodePtr;
 {
-    Blt_List *listPtr;
+    struct Blt_ListStruct *listPtr;
 
-    listPtr = iPtr->listPtr;
+    listPtr = nodePtr->listPtr;
     if (listPtr != NULL) {
-	if (listPtr->headPtr == iPtr) {
-	    listPtr->headPtr = iPtr->nextPtr;
+	if (listPtr->headPtr == nodePtr) {
+	    listPtr->headPtr = nodePtr->nextPtr;
 	}
-	if (listPtr->tailPtr == iPtr) {
-	    listPtr->tailPtr = iPtr->prevPtr;
+	if (listPtr->tailPtr == nodePtr) {
+	    listPtr->tailPtr = nodePtr->prevPtr;
 	}
-	if (iPtr->nextPtr != NULL) {
-	    iPtr->nextPtr->prevPtr = iPtr->prevPtr;
+	if (nodePtr->nextPtr != NULL) {
+	    nodePtr->nextPtr->prevPtr = nodePtr->prevPtr;
 	}
-	if (iPtr->prevPtr != NULL) {
-	    iPtr->prevPtr->nextPtr = iPtr->nextPtr;
+	if (nodePtr->prevPtr != NULL) {
+	    nodePtr->prevPtr->nextPtr = nodePtr->nextPtr;
 	}
-	iPtr->listPtr = NULL;
-	listPtr->numEntries--;
+	nodePtr->listPtr = NULL;
+	listPtr->nNodes--;
     }
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListFind --
+ * Blt_ListGetNode --
  *
- *	Find the first entry matching the key given.
+ *	Find the first node matching the key given.
  *
  * Results:
- *	Returns the pointer to the entry.  If no entry matching
+ *	Returns the pointer to the node.  If no node matching
  *	the key given is found, then NULL is returned.
  *
  *----------------------------------------------------------------------
  */
 
-Blt_ListItem
-Blt_ListFind(listPtr, key)
-    Blt_List *listPtr;		/* List to search */
-    char *key;			/* Key to match */
+/*LINTLIBRARY*/
+Blt_ListNode
+Blt_ListGetNode(listPtr, key)
+    struct Blt_ListStruct *listPtr; /* List to search */
+    CONST char *key;		/* Key to match */
 {
     if (listPtr != NULL) {
 	switch (listPtr->type) {
-	case TCL_STRING_KEYS:
+	case BLT_STRING_KEYS:
 	    return FindString(listPtr, key);
-	case TCL_ONE_WORD_KEYS:
+	case BLT_ONE_WORD_KEYS:
 	    return FindOneWord(listPtr, key);
 	default:
 	    return FindArray(listPtr, key);
@@ -404,110 +418,117 @@ Blt_ListFind(listPtr, key)
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListDeleteItem --
+ * Blt_ListDeleteNode --
  *
- *	Unlinks and deletes the given entry.
+ *	Unlinks and deletes the given node.
  *
  * Results:
  *	None.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_ListDeleteItem(iPtr)
-    struct Blt_ListItem *iPtr;
+Blt_ListDeleteNode(nodePtr)
+    struct Blt_ListNodeStruct *nodePtr;
 {
-    Blt_ListUnlinkItem(iPtr);
-    FreeItem(iPtr);
+    Blt_ListUnlinkNode(nodePtr);
+    FreeNode(nodePtr);
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListDelete --
+ * Blt_ListDeleteNodeByKey --
  *
- *	Find the entry and free the memory allocated for the entry.
+ *	Find the node and free the memory allocated for the node.
  *
  * Results:
  *	None.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
-Blt_ListDelete(listPtr, key)
-    Blt_List *listPtr;
-    char *key;
+Blt_ListDeleteNodeByKey(listPtr, key)
+    struct Blt_ListStruct *listPtr;
+    CONST char *key;
 {
-    struct Blt_ListItem *iPtr;
+    struct Blt_ListNodeStruct *nodePtr;
 
-    iPtr = Blt_ListFind(listPtr, key);
-    if (iPtr != NULL) {
-	Blt_ListDeleteItem(iPtr);
+    nodePtr = Blt_ListGetNode(listPtr, key);
+    if (nodePtr != NULL) {
+	Blt_ListDeleteNode(nodePtr);
     }
 }
 
-Blt_ListItem
+/*LINTLIBRARY*/
+Blt_ListNode
 Blt_ListAppend(listPtr, key, clientData)
-    Blt_List *listPtr;
-    char *key;
+    struct Blt_ListStruct *listPtr;
+    CONST char *key;
     ClientData clientData;
 {
-    struct Blt_ListItem *iPtr;
+    struct Blt_ListNodeStruct *nodePtr;
 
-    iPtr = Blt_ListNewItem(listPtr, key);
-    Blt_ListSetValue(iPtr, clientData);
-    Blt_ListAppendItem(listPtr, iPtr);
-    return iPtr;
+    nodePtr = Blt_ListCreateNode(listPtr, key);
+    Blt_ListSetValue(nodePtr, clientData);
+    Blt_ListAppendNode(listPtr, nodePtr);
+    return nodePtr;
 }
 
-Blt_ListItem
+/*LINTLIBRARY*/
+Blt_ListNode
 Blt_ListPrepend(listPtr, key, clientData)
-    Blt_List *listPtr;
-    char *key;
+    struct Blt_ListStruct *listPtr;
+    CONST char *key;
     ClientData clientData;
 {
-    struct Blt_ListItem *iPtr;
+    struct Blt_ListNodeStruct *nodePtr;
 
-    iPtr = Blt_ListNewItem(listPtr, key);
-    Blt_ListSetValue(iPtr, clientData);
-    Blt_ListPrependItem(listPtr, iPtr);
-    return iPtr;
+    nodePtr = Blt_ListCreateNode(listPtr, key);
+    Blt_ListSetValue(nodePtr, clientData);
+    Blt_ListPrependNode(listPtr, nodePtr);
+    return nodePtr;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ListFindNthItem --
+ * Blt_ListGetNthNode --
  *
- *	Find the entry based upon a given position in list.
+ *	Find the node based upon a given position in list.
  *
  * Results:
- *	Returns the pointer to the item, if that numbered element
+ *	Returns the pointer to the node, if that numbered element
  *	exists. Otherwise NULL.
  *
  *----------------------------------------------------------------------
  */
-Blt_ListItem
-Blt_ListFindNthItem(listPtr, position, direction)
-    Blt_List *listPtr;		/* List to traverse */
-    int position;		/* Index of item to select from front
+/*LINTLIBRARY*/
+Blt_ListNode
+Blt_ListGetNthNode(listPtr, position, direction)
+    struct Blt_ListStruct *listPtr; /* List to traverse */
+    int position;		/* Index of node to select from front
 				 * or back of the list. */
     int direction;
 {
-    register struct Blt_ListItem *iPtr;
+    register struct Blt_ListNodeStruct *nodePtr;
 
     if (listPtr != NULL) {
 	if (direction > 0) {
-	    for (iPtr = listPtr->headPtr; iPtr != NULL; iPtr = iPtr->nextPtr) {
+	    for (nodePtr = listPtr->headPtr; nodePtr != NULL; 
+		 nodePtr = nodePtr->nextPtr) {
 		if (position == 0) {
-		    return iPtr;
+		    return nodePtr;
 		}
 		position--;
 	    }
 	} else {
-	    for (iPtr = listPtr->tailPtr; iPtr != NULL; iPtr = iPtr->prevPtr) {
+	    for (nodePtr = listPtr->tailPtr; nodePtr != NULL; 
+		 nodePtr = nodePtr->prevPtr) {
 		if (position == 0) {
-		    return iPtr;
+		    return nodePtr;
 		}
 		position--;
 	    }
@@ -521,48 +542,49 @@ Blt_ListFindNthItem(listPtr, position, direction)
  *
  * Blt_ListSort --
  *
- *	Find the entry based upon a given position in list.
+ *	Find the node based upon a given position in list.
  *
  * Results:
- *	Returns the pointer to the item, if that numbered element
+ *	Returns the pointer to the node, if that numbered element
  *	exists. Otherwise NULL.
  *
  *----------------------------------------------------------------------
  */
+/*LINTLIBRARY*/
 void
 Blt_ListSort(listPtr, proc)
-    Blt_List *listPtr;		/* List to traverse */
+    struct Blt_ListStruct *listPtr; /* List to traverse */
     Blt_ListCompareProc *proc;
 {
-    struct Blt_ListItem **itemArr;
-    register struct Blt_ListItem *iPtr;
+    struct Blt_ListNodeStruct **nodeArr;
+    register struct Blt_ListNodeStruct *nodePtr;
     register int i;
 
-    if (listPtr->numEntries < 2) {
+    if (listPtr->nNodes < 2) {
 	return;
     }
-    itemArr = (struct Blt_ListItem **)
-	malloc(sizeof(struct Blt_ListItem *) * (listPtr->numEntries + 1));
-    if (itemArr == NULL) {
+    nodeArr = Blt_Malloc(sizeof(Blt_List) * (listPtr->nNodes + 1));
+    if (nodeArr == NULL) {
 	return;			/* Out of memory. */
     }
     i = 0;
-    for (iPtr = listPtr->headPtr; iPtr != NULL; iPtr = iPtr->nextPtr) {
-	itemArr[i++] = iPtr;
+    for (nodePtr = listPtr->headPtr; nodePtr != NULL; 
+	 nodePtr = nodePtr->nextPtr) {
+	nodeArr[i++] = nodePtr;
     }
-    qsort((char *)itemArr, listPtr->numEntries, sizeof(struct Blt_ListItem *),
-	             (QSortCompareProc *)proc);
+    qsort((char *)nodeArr, listPtr->nNodes, 
+		sizeof(struct Blt_ListNodeStruct *), (QSortCompareProc *)proc);
 
     /* Rethread the list. */
-    iPtr = itemArr[0];
-    listPtr->headPtr = iPtr;
-    iPtr->prevPtr = NULL;
-    for (i = 1; i < listPtr->numEntries; i++) {
-	iPtr->nextPtr = itemArr[i];
-	iPtr->nextPtr->prevPtr = iPtr;
-	iPtr = iPtr->nextPtr;
+    nodePtr = nodeArr[0];
+    listPtr->headPtr = nodePtr;
+    nodePtr->prevPtr = NULL;
+    for (i = 1; i < listPtr->nNodes; i++) {
+	nodePtr->nextPtr = nodeArr[i];
+	nodePtr->nextPtr->prevPtr = nodePtr;
+	nodePtr = nodePtr->nextPtr;
     }
-    listPtr->tailPtr = iPtr;
-    iPtr->nextPtr = NULL;
-    free((char *)itemArr);
+    listPtr->tailPtr = nodePtr;
+    nodePtr->nextPtr = NULL;
+    Blt_Free(nodeArr);
 }

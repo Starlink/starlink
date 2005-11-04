@@ -26,101 +26,65 @@
  * software.
  */
 #include "bltGraph.h"
-
-#include <ctype.h>
+#include "bltChain.h"
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 
 #include "bltGrElem.h"
 
-#define LINE_INIT_SYMBOL_SCALE	(1<<10)
 #define COLOR_DEFAULT	(XColor *)1
+#define PATTERN_SOLID	((Pixmap)1)
 
-#define PEN_INCREASING  1	/* Draw line segments for only those data points
-				 * whose abscissas are monotonically increasing
-				 * in order */
-#define PEN_DECREASING  2	/* Lines will be drawn between only those points
-				 * whose abscissas are decreasing in order */
+#define PEN_INCREASING  1	/* Draw line segments for only those
+				 * data points whose abscissas are
+				 * monotonically increasing in
+				 * order */
+#define PEN_DECREASING  2	/* Lines will be drawn between only
+				 * those points whose abscissas are
+				 * decreasing in order */
 
 #define PEN_BOTH_DIRECTIONS	(PEN_INCREASING | PEN_DECREASING)
  /* Lines will be drawn between points regardless of the ordering of
   * the abscissas */
 
-#define BROKEN_TRACE(penDir,last,next) \
-    (((((penDir) & PEN_DECREASING) == 0) && ((next) < (last))) || \
-     ((((penDir) & PEN_INCREASING) == 0) && ((next) > (last))))
+#define BROKEN_TRACE(dir,last,next) \
+    (((((dir) & PEN_DECREASING) == 0) && ((next) < (last))) || \
+     ((((dir) & PEN_INCREASING) == 0) && ((next) > (last))))
 
-#define PEN_STEP	1
-#define PEN_LINEAR	2
-#define PEN_NATURAL	3
-#define PEN_QUADRATIC	4
+#define DRAW_SYMBOL(linePtr) \
+	(((linePtr)->symbolCounter % (linePtr)->symbolInterval) == 0)
 
-static int StringToSmooth _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *SmoothToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
+typedef enum { 
+    PEN_SMOOTH_NONE,		/* Line segments */
+    PEN_SMOOTH_STEP,		/* Step-and-hold */
+    PEN_SMOOTH_NATURAL,		/* Natural cubic spline */
+    PEN_SMOOTH_QUADRATIC,	/* Quadratic spline */
+    PEN_SMOOTH_CATROM,		/* Catrom parametric spline */
+    PEN_SMOOTH_LAST		/* Sentinel */
+} Smoothing;
 
-static Tk_CustomOption smoothOption =
-{
-    StringToSmooth, SmoothToString, (ClientData)0
+typedef struct {
+    char *name;
+    Smoothing value;
+} SmoothingInfo;
+
+static SmoothingInfo smoothingInfo[] = {
+    { "linear",		PEN_SMOOTH_NONE },
+    { "step",		PEN_SMOOTH_STEP },
+    { "natural",	PEN_SMOOTH_NATURAL },
+    { "cubic",		PEN_SMOOTH_NATURAL },
+    { "quadratic",	PEN_SMOOTH_QUADRATIC },
+    { "catrom",		PEN_SMOOTH_CATROM },
+    { (char *)NULL,	PEN_SMOOTH_LAST }
 };
 
-static int StringToStyles _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *StylesToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
 
-static Tk_CustomOption stylesOption =
-{
-    StringToStyles, StylesToString, (ClientData)0
-};
+typedef struct {
+    Point2D *screenPts;		/* Array of transformed coordinates */
+    int nScreenPts;		/* Number of coordinates */
+    int *dataToStyle;		/* Index of pen styles  */
+    int *indices;		/* Maps segments/traces to data points */
 
-static int StringToPenDir _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *PenDirToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
-
-static Tk_CustomOption penDirOption =
-{
-    StringToPenDir, PenDirToString, (ClientData)0
-};
-
-static int StringToSymbol _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *SymbolToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
-
-static Tk_CustomOption bltSymbolOption =
-{
-    StringToSymbol, SymbolToString, (ClientData)0
-};
-
-extern Tk_CustomOption bltColorOption;
-extern Tk_CustomOption bltDashesOption;
-extern Tk_CustomOption bltDataOption;
-extern Tk_CustomOption bltDataPairsOption;
-extern Tk_CustomOption bltLengthOption;
-extern Tk_CustomOption bltLinePenOption;
-extern Tk_CustomOption bltListOption;
-extern Tk_CustomOption bltSymbolOption;
-extern Tk_CustomOption bltXAxisOption;
-extern Tk_CustomOption bltYAxisOption;
-
-typedef struct TransformInfo {
-    Point2D *points;		/* Array of transformed coordinates */
-    int numPoints;		/* Number of coordinates */
-    int *styleDir;		/* Index of pen styles  */
-    int *indexArr;		/* Maps segments/traces to data points */
-
-} TransformInfo;
+} MapInfo;
 
 /*
  * Symbol types for line elements
@@ -135,175 +99,349 @@ typedef enum {
     SYMBOL_SPLUS,
     SYMBOL_SCROSS,
     SYMBOL_TRIANGLE,
+    SYMBOL_ARROW,
     SYMBOL_BITMAP
 } SymbolType;
 
 typedef struct {
     SymbolType type;		/* Type of symbol to be drawn/printed */
+
     int size;			/* Requested size of symbol in pixels */
 
-    /* The last two fields are used only for symbols of type SYMBOL_BITMAP */
+    XColor *outlineColor;	/* Outline color */
+
+    int outlineWidth;		/* Width of the outline */
+
+    GC outlineGC;		/* Outline graphics context */
+
+    XColor *fillColor;		/* Normal fill color */
+
+    GC fillGC;			/* Fill graphics context */
+
+    /* The last two fields are used only for bitmap symbols. */
 
     Pixmap bitmap;		/* Bitmap to determine foreground/background
 				 * pixels of the symbol */
-    Pixmap mask;		/* Bitmap representing the transparent pixels
-				 * of the symbol */
+
+    Pixmap mask;		/* Bitmap representing the transparent
+				 * pixels of the symbol */
+
 } Symbol;
 
 typedef struct {
-    int numPoints;		/* Number of points in the continuous trace */
-    XPoint *pointArr;		/* Array of points (malloc-ed) forming the
+    int start;			/* Index into the X-Y coordinate
+				 * arrays indicating where trace
+				 * starts. */
+
+    int nScreenPts;		/* Number of points in the continuous
+				 * trace */
+
+    Point2D *screenPts;		/* Array of screen coordinates
+				 * (malloc-ed) representing the
 				 * trace. */
-    int *indexArr;		/* Indices of points in data vectors */
+
+    int *symbolToData;		/* Reverse mapping of screen
+				 * coordinate indices back to their
+				 * data coordinates */
 } Trace;
 
-typedef struct LinePen {
-    char *name;			/* Pen style identifier.  Statically allocated
-				 * pens have no name (NULL). */
-    ObjectType type;		/* Type of pen */
-    char *typeId;		/* String token identifying the type of pen */
-    unsigned int flags;		/* Indicates if the pen element is active or
-				 * normal */
-    int refCount;		/* Reference count for elements using this
-				 * pen. */
-    Tcl_HashEntry *hashPtr;
+typedef struct {
+    char *name;			/* Name of pen style. If the pen was
+				 * statically allocated the name will
+				 * be NULL. */
+
+    Blt_Uid classUid;		/* Type of pen */
+
+    char *typeId;		/* String token identifying the type
+				 * of pen */
+
+    unsigned int flags;		/* Indicates if the pen element is
+				 * active or normal */
+
+    int refCount;		/* Reference count for elements using
+				 * this pen. */
+    Blt_HashEntry *hashPtr;
+
     Tk_ConfigSpec *configSpecs;	/* Configuration specifications */
 
     PenConfigureProc *configProc;
     PenDestroyProc *destroyProc;
 
+    /* Symbol attributes. */
     Symbol symbol;		/* Element symbol type */
 
-    XColor *outlineColor;	/* Symbol outline color */
-    int outlineWidth;		/* Width of the outline */
-    GC outlineGC;		/* Outline graphics context */
+    /* Trace attributes. */
+    int traceWidth;		/* Width of the line segments. If
+				 * lineWidth is 0, no line will be
+				 * drawn, only symbols. */
 
-    XColor *fillColor;		/* Normal symbol fill color */
-    GC fillGC;			/* Fill graphics context */
+    Blt_Dashes traceDashes;	/* Dash on-off list value */
 
-    int lineWidth;		/* Width of the line segments. If lineWidth is
-				 * 0, no line will be drawn, only symbols. */
-    Dashes dashes;		/* Dash on-off list value */
-    XColor *penColor;		/* Line segment color */
-    XColor *penOffColor;	/* Line segment dash gap color */
-    GC penGC;			/* Line segment graphics context */
+    XColor *traceColor;		/* Line segment color */
+
+    XColor *traceOffColor;	/* Line segment dash gap color */
+
+    GC traceGC;			/* Line segment graphics context */
+    
+    /* Error bar attributes. */
+    int errorBarShow;		/* Describes which error bars to
+				 * display: none, x, y, or * both. */
+
+    int errorBarLineWidth;	/* Width of the error bar segments. */
+
+    int errorBarCapWidth;	/* Width of the cap on error bars. */
+
+    XColor *errorBarColor;	/* Color of the error bar. */
+
+    GC errorBarGC;		/* Error bar graphics context. */
+
+    /* Show value attributes. */
+    int valueShow;		/* Indicates whether to display data
+				 * value.  Values are x, y, both, or 
+				 * none. */
+    char *valueFormat;		/* A printf format string. */
+
+    TextStyle valueStyle;	/* Text attributes (color, font,
+				 * rotation, etc.) of the value. */
 
 } LinePen;
 
-typedef struct LineStyle {
+typedef struct {
+    Weight weight;		/* Weight range where this pen is valid. */
 
-    LinePen *penPtr;		/* Pen to draw */
-    Limits weight;		/* Range of weights */
+    LinePen *penPtr;		/* Pen used to draw symbols, traces, error 
+				 * bars, segments, etc. */
 
-    int symbolSize;		/* Scaled size of the pen's symbol. */
+    Segment2D *xErrorBars;	/* Point to start of this pen's X-error bar 
+				 * segments in the element's array. */
+    Segment2D *yErrorBars;	/* Point to start of this pen's Y-error bar 
+				 * segments in the element's array. */
+    int xErrorBarCnt;		/* # of error bars for this pen. */
+    int yErrorBarCnt;		/* # of error bars for this pen. */
 
-    XPoint *pointPtr;		/* Points to start of array for this pen. */
-    int numPoints;		/* Number of points for this pen. */
+    int errorBarCapWidth;	/* Length of the cap ends on each
+				 * error bar. */
 
-    /* The following fields are used only for stripcharts. */
+    int symbolSize;		/* Size of the pen's symbol scaled to the
+				 * current graph size. */
 
-    XSegment *segPtr;		/* Points to start of line segments for
-				 * this pen */
-    int numSegments;		/* Number of line segments for this pen. */
+    /* Graph specific data. */
 
-} LineStyle;
+    Point2D *symbolPts;		/* Points to start of array for this pen. */
+
+    int nSymbolPts;		/* # of points for this pen. */
+
+    /* The last two fields are used only for stripcharts. */
+
+    Segment2D *strips;		/* Points to start of the line segments
+				 * for this pen. */
+
+    int nStrips;		/* # of line segments for this pen. */
+
+} LinePenStyle;
 
 typedef struct {
-    char *name;			/* Identifier to refer the element. Used in the
-				 * "insert", "delete", or "show", commands. */
-    ObjectType type;		/* Type of element; either TYPE_ELEM_BAR,
-				 * TYPE_ELEM_LINE, or TYPE_ELEM_STRIP */
-    Graph *graphPtr;		/* Graph widget of element*/
-    unsigned int flags;		/* Indicates if the entire element is active, or
-				 * if coordinates need to be calculated */
-    char **tags;
-    int hidden;			/* If non-zero, don't display the element. */
+    char *name;			/* Identifier used to refer the
+				 * element. Used in the "insert",
+				 * "delete", or "show", operations. */
 
-    Tcl_HashEntry *hashPtr;
+    Blt_Uid classUid;		/* Type of element */
+
+    Graph *graphPtr;		/* Graph widget of element*/
+
+    unsigned int flags;		/* Indicates if the entire element is
+				 * active, or if coordinates need to
+				 * be calculated */
+
+    char **tags;
+
+    int hidden;			/* If non-zero, don't display the
+				 * element. */
+
+    Blt_HashEntry *hashPtr;
+
     char *label;		/* Label displayed in legend */
+
     int labelRelief;		/* Relief of label in legend. */
 
     Axis2D axes;
+
     ElemVector x, y, w;		/* Contains array of numeric values */
 
-    int *reqActiveArr;		/* Array of indices (malloc-ed) which indicate
-				 * which data points are active (drawn with
-				 * "active" colors). */
-    int reqNumActive;		/* Number of active data points. Special case:
-				 * if reqNumActive<0, then all data points
-				 * are drawn active. */
-    ElemClassInfo *infoPtr;
+    ElemVector xError;		/* Relative/symmetric X error values. */
+    ElemVector yError;		/* Relative/symmetric Y error values. */
+    ElemVector xHigh, xLow;	/* Absolute/asymmetric X-coordinate high/low
+				   error values. */
+    ElemVector yHigh, yLow;	/* Absolute/asymmetric Y-coordinate high/low
+				   error values. */
 
-    /*
-     * Line specific configurable attributes
-     */
+    int *activeIndices;		/* Array of indices (malloc-ed) that
+				 * indicate the data points are active
+				 * (drawn with "active" colors). */
+
+    int nActiveIndices;		/* Number of active data points.
+				 * Special case: if < 0 then all data
+				 * points are drawn active. */
+
+    ElementProcs *procsPtr;
+    Tk_ConfigSpec *configSpecs;	/* Configuration specifications */
+
+    Segment2D *xErrorBars;	/* Point to start of this pen's X-error bar 
+				 * segments in the element's array. */
+    Segment2D *yErrorBars;	/* Point to start of this pen's Y-error bar 
+				 * segments in the element's array. */
+    int xErrorBarCnt;		/* # of error bars for this pen. */
+    int yErrorBarCnt;		/* # of error bars for this pen. */
+
+    int *xErrorToData;		/* Maps individual error bar segments back
+				 * to the data point associated with it. */
+    int *yErrorToData;		/* Maps individual error bar segments back
+				 * to the data point associated with it. */
+
+    int errorBarCapWidth;	/* Length of cap on error bars */
+
+    LinePen *activePenPtr;	/* Pen to draw "active" elements. */
+    LinePen *normalPenPtr;	/* Pen to draw elements normally. */
+
+    Blt_Chain *palette;		/* Array of pen styles: pens are associated
+				 * with specific ranges of data.*/
 
     /* Symbol scaling */
     int scaleSymbols;		/* If non-zero, the symbols will scale
 				 * in size as the graph is zoomed
 				 * in/out.  */
+
     double xRange, yRange;	/* Initial X-axis and Y-axis ranges:
 				 * used to scale the size of element's
 				 * symbol. */
 
-    /* Standard Pens */
-    LinePen normalPen;
-    LinePen *activePenPtr, *normalPenPtr;
-
-    /* Alternate pens */
-    LineStyle *styles;		/* Array of pen styles */
-    int numStyles;		/* # of pen styles */
+    int state;
+    /*
+     * Line specific configurable attributes
+     */
+    LinePen builtinPen;
 
     /* Line smoothing */
-    int reqSmooth;		/* Requested smoothing function to use for line
-				 * segments connecting the points */
-    int smooth;			/* Actual smoothing function used. */
+    Smoothing reqSmooth;	/* Requested smoothing function to use
+				 * for connecting the data points */
 
+    Smoothing smooth;		/* Smoothing function used. */
+
+    double rTolerance;		/* Tolerance to reduce the number of
+				 * points displayed. */
     /*
      * Drawing related data structures.
      */
 
-    /* Fill area under curve */
-    ColorPair fillColors;
+    /* Area-under-curve fill attributes. */
+    XColor *fillFgColor;
+    XColor *fillBgColor;
     GC fillGC;
-    Pixmap stipple;		/* Stipple for fill area */
-    XPoint *fillArr;		/* Array of points used to draw polygon to fill
-				 * area under the curve */
+
+    Blt_Tile fillTile;		/* Tile for fill area. */
+    Pixmap fillStipple;		/* Stipple for fill area. */
+
+    int nFillPts;
+    Point2D *fillPts;		/* Array of points used to draw
+				 * polygon to fill area under the
+				 * curve */
 
     /* Symbol points */
-    XPoint *pointArr;		/* Holds the screen coordinates of all the data
-				 * points for the element. */
-    int numPoints;		/* Number of points */
-    int *pointMap;		/* Contains indices of data points. It's
-				 * first used to map pens to visible points
-				 * to sort them by pen style, and later to
-				 * find data points from the index of a
-				 * visible point.
-				 */
+    Point2D *symbolPts;		/* Holds the screen coordinates of all
+				 * the data points for the element. */
+    int nSymbolPts;		/* Number of points */
+
+    int *symbolToData;		/* Contains indices of data points.
+				 * It's first used to map pens to the
+				 * visible points to sort them by pen
+				 * style, and later to find data
+				 * points from the index of a visible
+				 * point. */
 
     /* Active symbol points */
-    XPoint *activeArr;		/* Active points */
-    int numActive;
+    Point2D *activePts;		/* Array of indices representing the
+				 * "active" points. */
+    int nActivePts;		/* Number of indices in the above array. */
 
+    int *activeToData;		/* Contains indices of data points.
+				 * It's first used to map pens to the
+				 * visible points to sort them by pen
+				 * style, and later to find data
+				 * points from the index of a visible
+				 * point. */
 
-    /* Line graph specific fields */
-    int penDir;			/* Indicates if a change in the pen direction
-				 * should be considered a retrace (line segment
-				 * is not drawn). */
-    Blt_List traces;		/* List of traces. A trace is a continuous
-				 * segmented line.  New traces are generated
-				 * when either 1) the segment changes the pen
-				 * direction, or 2) the end point is clipped by
-				 * the plotting area. */
+    int reqMaxSymbols;
+    int symbolInterval;
+    int symbolCounter;
 
-    /* Stripchart specific fields */
-    XSegment *segArr;		/* Holds the all the drawn line segments of the
-				 * element trace. The segments are grouped by
-				 * pen style. */
-    int numSegments;		/* Number of line segments to be drawn */
-    int *segMap;		/* Pen to visible line segment mapping */
+    /* X-Y graph-specific fields */
+
+    int penDir;			/* Indicates if a change in the pen
+				 * direction should be considered a
+				 * retrace (line segment is not
+				 * drawn). */
+
+    Blt_Chain *traces;	/* List of traces (a trace is a series
+				 * of contiguous line segments).  New
+				 * traces are generated when either
+				 * the next segment changes the pen
+				 * direction, or the end point is
+				 * clipped by the plotting area. */
+
+    /* Stripchart-specific fields */
+
+    Segment2D *strips;		/* Holds the the line segments of the
+				 * element trace. The segments are
+				 * grouped by pen style. */
+    int nStrips;		/* Number of line segments to be drawn. */
+    int *stripToData;		/* Pen to visible line segment mapping. */
 
 } Line;
+
+static Tk_OptionParseProc StringToPattern;
+static Tk_OptionPrintProc PatternToString;
+static Tk_OptionParseProc StringToSmooth;
+static Tk_OptionPrintProc SmoothToString;
+extern Tk_OptionParseProc Blt_StringToStyles;
+extern Tk_OptionPrintProc Blt_StylesToString;
+static Tk_OptionParseProc StringToPenDir;
+static Tk_OptionPrintProc PenDirToString;
+static Tk_OptionParseProc StringToSymbol;
+static Tk_OptionPrintProc SymbolToString;
+
+static Tk_CustomOption patternOption =
+{
+    StringToPattern, PatternToString, (ClientData)0
+};
+static Tk_CustomOption smoothOption =
+{
+    StringToSmooth, SmoothToString, (ClientData)0
+};
+static Tk_CustomOption stylesOption =
+{
+    Blt_StringToStyles, Blt_StylesToString, (ClientData)sizeof(LinePenStyle)
+};
+static Tk_CustomOption penDirOption =
+{
+    StringToPenDir, PenDirToString, (ClientData)0
+};
+static Tk_CustomOption symbolOption =
+{
+    StringToSymbol, SymbolToString, (ClientData)0
+};
+extern Tk_CustomOption bltColorOption;
+extern Tk_CustomOption bltDashesOption;
+extern Tk_CustomOption bltDataOption;
+extern Tk_CustomOption bltDataPairsOption;
+extern Tk_CustomOption bltDistanceOption;
+extern Tk_CustomOption bltListOption;
+extern Tk_CustomOption bltLinePenOption;
+extern Tk_CustomOption bltShadowOption;
+extern Tk_CustomOption bltXAxisOption;
+extern Tk_CustomOption bltYAxisOption;
+extern Tk_CustomOption bltTileOption;
+extern Tk_CustomOption bltFillOption;
+extern Tk_CustomOption bltStateOption;
 
 #define DEF_LINE_ACTIVE_PEN		"activeLine"
 #define DEF_LINE_AXIS_X			"x"
@@ -312,134 +450,48 @@ typedef struct {
 #define DEF_LINE_DATA			(char *)NULL
 #define DEF_LINE_FILL_COLOR    		"defcolor"
 #define DEF_LINE_FILL_MONO		"defcolor"
+#define DEF_LINE_HIDE			"no"
 #define DEF_LINE_LABEL			(char *)NULL
 #define DEF_LINE_LABEL_RELIEF		"flat"
-#define DEF_LINE_HIDE			"no"
+#define DEF_LINE_MAX_SYMBOLS		"0"
 #define DEF_LINE_OFFDASH_COLOR    	(char *)NULL
 #define DEF_LINE_OFFDASH_MONO		(char *)NULL
 #define DEF_LINE_OUTLINE_COLOR		"defcolor"
 #define DEF_LINE_OUTLINE_MONO		"defcolor"
 #define DEF_LINE_OUTLINE_WIDTH 		"1"
+#define DEF_LINE_PATTERN		(char *)NULL
+#define DEF_LINE_PATTERN_BG		"white"
+#define DEF_LINE_PATTERN_FG		"black"
+#define DEF_LINE_PATTERN_TILE		(char *)NULL
+#define DEF_LINE_PEN_COLOR		RGB_NAVYBLUE
+#define DEF_LINE_PEN_DIRECTION		"both"
+#define DEF_LINE_PEN_MONO		RGB_BLACK
+#define DEF_LINE_PEN_WIDTH		"1"
 #define DEF_LINE_PIXELS			"0.125i"
-#define DEF_LINE_SCALE_SYMBOLS		"no"
+#define DEF_LINE_REDUCE			"0.0"
+#define DEF_LINE_SCALE_SYMBOLS		"yes"
 #define DEF_LINE_SMOOTH			"linear"
-#define DEF_LINE_STYLES			""
+#define DEF_LINE_STATE			"normal"
 #define DEF_LINE_STIPPLE		(char *)NULL
+#define DEF_LINE_STYLES			""
 #define DEF_LINE_SYMBOL			"circle"
 #define DEF_LINE_TAGS			"all"
-#define DEF_LINE_PEN_DIRECTION		"both"
-#define DEF_LINE_PEN_COLOR		RGB_COLOR_NAVYBLUE
-#define DEF_LINE_PEN_MONO		RGB_COLOR_BLACK
-#define DEF_LINE_PEN_WIDTH		"1"
 #define DEF_LINE_X_DATA			(char *)NULL
 #define DEF_LINE_Y_DATA			(char *)NULL
 
-static Tk_ConfigSpec configSpecs[] =
-{
-    {TK_CONFIG_CUSTOM, "-activepen", "activePen", "ActivePen",
-	DEF_LINE_ACTIVE_PEN, Tk_Offset(Line, activePenPtr),
-	TK_CONFIG_NULL_OK | GRAPH | STRIPCHART, &bltLinePenOption},
-    {TK_CONFIG_CUSTOM, "-bindtags", "bindTags", "BindTags",
-	DEF_LINE_TAGS, Tk_Offset(Line, tags),
-	TK_CONFIG_NULL_OK | GRAPH | STRIPCHART, &bltListOption},
-    {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_LINE_PEN_COLOR, Tk_Offset(Line, normalPen.penColor),
-	TK_CONFIG_COLOR_ONLY | GRAPH | STRIPCHART},
-    {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_LINE_PEN_MONO, Tk_Offset(Line, normalPen.penColor),
-	TK_CONFIG_MONO_ONLY | GRAPH | STRIPCHART},
-    {TK_CONFIG_CUSTOM, "-dashes", "dashes", "Dashes",
-	DEF_LINE_DASHES, Tk_Offset(Line, normalPen.dashes),
-	TK_CONFIG_NULL_OK | GRAPH | STRIPCHART, &bltDashesOption},
-    {TK_CONFIG_CUSTOM, "-data", "data", "Data",
-	DEF_LINE_DATA, 0, GRAPH | STRIPCHART, &bltDataPairsOption},
-    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
-	DEF_LINE_FILL_COLOR, Tk_Offset(Line, normalPen.fillColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | GRAPH | STRIPCHART,
-	&bltColorOption},
-    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
-	DEF_LINE_FILL_MONO, Tk_Offset(Line, normalPen.fillColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | GRAPH | STRIPCHART,
-	&bltColorOption},
-    {TK_CONFIG_BOOLEAN, "-hide", "hide", "Hide",
-	DEF_LINE_HIDE, Tk_Offset(Line, hidden),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART},
-    {TK_CONFIG_STRING, "-label", "label", "Label",
-	(char *)NULL, Tk_Offset(Line, label),
-	TK_CONFIG_NULL_OK | GRAPH | STRIPCHART},
-    {TK_CONFIG_RELIEF, "-labelrelief", "labelRelief", "LabelRelief",
-	DEF_LINE_LABEL_RELIEF, Tk_Offset(Line, labelRelief),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART},
-    {TK_CONFIG_CUSTOM, "-linewidth", "lineWidth", "LineWidth",
-	DEF_LINE_PEN_WIDTH, Tk_Offset(Line, normalPen.lineWidth),
-	GRAPH | STRIPCHART, &bltLengthOption},
-    {TK_CONFIG_CUSTOM, "-mapx", "mapX", "MapX",
-	DEF_LINE_AXIS_X, Tk_Offset(Line, axes.x),
-	GRAPH | STRIPCHART, &bltXAxisOption},
-    {TK_CONFIG_CUSTOM, "-mapy", "mapY", "MapY",
-	DEF_LINE_AXIS_Y, Tk_Offset(Line, axes.y), GRAPH | STRIPCHART,
-	&bltYAxisOption},
-    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
-	DEF_LINE_OFFDASH_COLOR, Tk_Offset(Line, normalPen.penOffColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | GRAPH | STRIPCHART,
-	&bltColorOption},
-    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
-	DEF_LINE_OFFDASH_MONO, Tk_Offset(Line, normalPen.penOffColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | GRAPH | STRIPCHART,
-	&bltColorOption},
-    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
-	DEF_LINE_OUTLINE_COLOR, Tk_Offset(Line, normalPen.outlineColor),
-	TK_CONFIG_COLOR_ONLY | GRAPH | STRIPCHART, &bltColorOption},
-    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
-	DEF_LINE_OUTLINE_MONO, Tk_Offset(Line, normalPen.outlineColor),
-	TK_CONFIG_MONO_ONLY | GRAPH | STRIPCHART, &bltColorOption},
-    {TK_CONFIG_CUSTOM, "-outlinewidth", "outlineWidth", "OutlineWidth",
-	DEF_LINE_OUTLINE_WIDTH, Tk_Offset(Line, normalPen.outlineWidth),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART, &bltLengthOption},
-    {TK_CONFIG_CUSTOM, "-pen", "pen", "Pen",
-	(char *)NULL, Tk_Offset(Line, normalPenPtr),
-	TK_CONFIG_NULL_OK | GRAPH | STRIPCHART, &bltLinePenOption},
-    {TK_CONFIG_CUSTOM, "-pixels", "pixels", "Pixels",
-	DEF_LINE_PIXELS, Tk_Offset(Line, normalPen.symbol.size),
-	GRAPH | STRIPCHART, &bltLengthOption},
-    {TK_CONFIG_BOOLEAN, "-scalesymbols", "scaleSymbols", "ScaleSymbols",
-	DEF_LINE_SCALE_SYMBOLS, Tk_Offset(Line, scaleSymbols),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART},
-    {TK_CONFIG_CUSTOM, "-smooth", "smooth", "Smooth",
-	DEF_LINE_SMOOTH, Tk_Offset(Line, reqSmooth),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART, &smoothOption},
-#ifdef notdef
-    {TK_CONFIG_BITMAP, "-stipple", "stipple", "Stipple",
-	DEF_LINE_STIPPLE, Tk_Offset(Line, stipple),
-	TK_CONFIG_NULL_OK | GRAPH},
-#endif
-    {TK_CONFIG_CUSTOM, "-styles", "styles", "Styles",
-	DEF_LINE_STYLES, 0,
-	GRAPH | STRIPCHART | TK_CONFIG_NULL_OK, &stylesOption},
-    {TK_CONFIG_CUSTOM, "-symbol", "symbol", "Symbol",
-	DEF_LINE_SYMBOL, Tk_Offset(Line, normalPen.symbol),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH | STRIPCHART, &bltSymbolOption},
-    {TK_CONFIG_CUSTOM, "-trace", "trace", "Trace",
-	DEF_LINE_PEN_DIRECTION, Tk_Offset(Line, penDir),
-	TK_CONFIG_DONT_SET_DEFAULT | GRAPH, &penDirOption},
-    {TK_CONFIG_CUSTOM, "-weights", "weights", "Weights",
-	(char *)NULL, Tk_Offset(Line, w), GRAPH | STRIPCHART, &bltDataOption},
-    {TK_CONFIG_CUSTOM, "-xdata", "xData", "XData",
-	(char *)NULL, Tk_Offset(Line, x), GRAPH | STRIPCHART, &bltDataOption},
-    {TK_CONFIG_CUSTOM, "-ydata", "yData", "YData",
-	(char *)NULL, Tk_Offset(Line, y), GRAPH | STRIPCHART, &bltDataOption},
-    {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
-};
+#define DEF_LINE_ERRORBAR_COLOR		"defcolor"
+#define DEF_LINE_ERRORBAR_LINE_WIDTH	"1"
+#define DEF_LINE_ERRORBAR_CAP_WIDTH	"1"
+#define DEF_LINE_SHOW_ERRORBARS		"both"
 
-
-#define DEF_PEN_ACTIVE_COLOR		RGB_COLOR_BLUE
-#define DEF_PEN_ACTIVE_MONO		RGB_COLOR_BLACK
+#define DEF_PEN_ACTIVE_COLOR		RGB_BLUE
+#define DEF_PEN_ACTIVE_MONO		RGB_BLACK
 #define DEF_PEN_DASHES			(char *)NULL
 #define DEF_PEN_FILL_COLOR    		"defcolor"
 #define DEF_PEN_FILL_MONO		"defcolor"
 #define DEF_PEN_LINE_WIDTH		"1"
-#define DEF_PEN_NORMAL_COLOR		RGB_COLOR_NAVYBLUE
-#define DEF_PEN_NORMAL_MONO		RGB_COLOR_BLACK
+#define DEF_PEN_NORMAL_COLOR		RGB_NAVYBLUE
+#define DEF_PEN_NORMAL_MONO		RGB_BLACK
 #define DEF_PEN_OFFDASH_COLOR    	(char *)NULL
 #define DEF_PEN_OFFDASH_MONO		(char *)NULL
 #define DEF_PEN_OUTLINE_COLOR		"defcolor"
@@ -448,75 +500,426 @@ static Tk_ConfigSpec configSpecs[] =
 #define DEF_PEN_PIXELS			"0.125i"
 #define DEF_PEN_SYMBOL			"circle"
 #define DEF_PEN_TYPE			"line"
+#define	DEF_PEN_VALUE_ANCHOR		"s"
+#define	DEF_PEN_VALUE_COLOR		RGB_BLACK
+#define	DEF_PEN_VALUE_FONT		STD_FONT_SMALL
+#define	DEF_PEN_VALUE_FORMAT		"%g"
+#define	DEF_PEN_VALUE_ROTATE		(char *)NULL
+#define	DEF_PEN_VALUE_SHADOW		(char *)NULL
+#define DEF_PEN_SHOW_VALUES		"no"
 
-static Tk_ConfigSpec penConfigSpecs[] =
+static Tk_ConfigSpec lineElemConfigSpecs[] =
 {
+    {TK_CONFIG_CUSTOM, "-activepen", "activePen", "ActivePen",
+	DEF_LINE_ACTIVE_PEN, Tk_Offset(Line, activePenPtr),
+	TK_CONFIG_NULL_OK, &bltLinePenOption},
+    {TK_CONFIG_CUSTOM, "-areapattern", "areaPattern", "AreaPattern",
+        DEF_LINE_PATTERN, Tk_Offset(Line, fillStipple), 
+        TK_CONFIG_NULL_OK, &patternOption},
+    {TK_CONFIG_COLOR, "-areaforeground", "areaForeground", "areaForeground",
+	DEF_LINE_PATTERN_FG, Tk_Offset(Line, fillFgColor), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_COLOR, "-areabackground", "areaBackground", "areaBackground",
+	DEF_LINE_PATTERN_BG, Tk_Offset(Line, fillBgColor), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_CUSTOM, "-areatile", "areaTile", "AreaTile",
+	DEF_LINE_PATTERN_TILE, Tk_Offset(Line, fillTile), 
+	TK_CONFIG_NULL_OK, &bltTileOption},
+    {TK_CONFIG_CUSTOM, "-bindtags", "bindTags", "BindTags",
+	DEF_LINE_TAGS, Tk_Offset(Line, tags),
+	TK_CONFIG_NULL_OK, &bltListOption},
     {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_PEN_ACTIVE_COLOR, Tk_Offset(LinePen, penColor),
-	TK_CONFIG_COLOR_ONLY | ACTIVE_PEN},
+	DEF_LINE_PEN_COLOR, Tk_Offset(Line, builtinPen.traceColor),
+	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_PEN_ACTIVE_MONO, Tk_Offset(LinePen, penColor),
-	TK_CONFIG_MONO_ONLY | ACTIVE_PEN},
-    {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_PEN_NORMAL_COLOR, Tk_Offset(LinePen, penColor),
-	TK_CONFIG_COLOR_ONLY | NORMAL_PEN},
-    {TK_CONFIG_COLOR, "-color", "color", "Color",
-	DEF_PEN_NORMAL_MONO, Tk_Offset(LinePen, penColor),
-	TK_CONFIG_MONO_ONLY | NORMAL_PEN},
+	DEF_LINE_PEN_MONO, Tk_Offset(Line, builtinPen.traceColor),
+	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_CUSTOM, "-dashes", "dashes", "Dashes",
-	DEF_PEN_DASHES, Tk_Offset(LinePen, dashes),
-	TK_CONFIG_NULL_OK | ALL_PENS, &bltDashesOption},
+	DEF_LINE_DASHES, Tk_Offset(Line, builtinPen.traceDashes),
+	TK_CONFIG_NULL_OK, &bltDashesOption},
+    {TK_CONFIG_CUSTOM, "-data", "data", "Data",
+	DEF_LINE_DATA, 0, 0, &bltDataPairsOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcolor", "errorBarColor", "ErrorBarColor",
+	DEF_LINE_ERRORBAR_COLOR, Tk_Offset(Line, builtinPen.errorBarColor), 
+	0, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-errorbarwidth", "errorBarWidth", "ErrorBarWidth",
+	DEF_LINE_ERRORBAR_LINE_WIDTH, 
+	Tk_Offset(Line, builtinPen.errorBarLineWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcap", "errorBarCap", "ErrorBarCap", 
+	DEF_LINE_ERRORBAR_CAP_WIDTH, 
+	Tk_Offset(Line, builtinPen.errorBarCapWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
-	DEF_PEN_FILL_COLOR, Tk_Offset(LinePen, fillColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_FILL_COLOR, Tk_Offset(Line, builtinPen.symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY, &bltColorOption},
     {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
-	DEF_PEN_FILL_MONO, Tk_Offset(LinePen, fillColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_FILL_MONO, Tk_Offset(Line, builtinPen.symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY, &bltColorOption},
+    {TK_CONFIG_BOOLEAN, "-hide", "hide", "Hide",
+	DEF_LINE_HIDE, Tk_Offset(Line, hidden), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_STRING, "-label", "label", "Label",
+	(char *)NULL, Tk_Offset(Line, label), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_RELIEF, "-labelrelief", "labelRelief", "LabelRelief",
+	DEF_LINE_LABEL_RELIEF, Tk_Offset(Line, labelRelief),
+	TK_CONFIG_DONT_SET_DEFAULT}, 
     {TK_CONFIG_CUSTOM, "-linewidth", "lineWidth", "LineWidth",
-	(char *)NULL, Tk_Offset(LinePen, lineWidth), ALL_PENS, &bltLengthOption},
+	DEF_LINE_PEN_WIDTH, Tk_Offset(Line, builtinPen.traceWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-mapx", "mapX", "MapX",
+        DEF_LINE_AXIS_X, Tk_Offset(Line, axes.x), 0, &bltXAxisOption},
+    {TK_CONFIG_CUSTOM, "-mapy", "mapY", "MapY",
+	DEF_LINE_AXIS_Y, Tk_Offset(Line, axes.y), 0, &bltYAxisOption},
+    {TK_CONFIG_CUSTOM, "-maxsymbols", "maxSymbols", "MaxSymbols",
+	DEF_LINE_MAX_SYMBOLS, Tk_Offset(Line, reqMaxSymbols),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
-	DEF_PEN_OFFDASH_COLOR, Tk_Offset(LinePen, penOffColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_OFFDASH_COLOR, Tk_Offset(Line, builtinPen.traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY, &bltColorOption},
     {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
-	DEF_PEN_OFFDASH_MONO, Tk_Offset(LinePen, penOffColor),
-	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_OFFDASH_MONO, Tk_Offset(Line, builtinPen.traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY, &bltColorOption},
     {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
-	DEF_PEN_OUTLINE_COLOR, Tk_Offset(LinePen, outlineColor),
-	TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_OUTLINE_COLOR, Tk_Offset(Line, builtinPen.symbol.outlineColor),
+	TK_CONFIG_COLOR_ONLY, &bltColorOption},
     {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
-	DEF_PEN_OUTLINE_MONO, Tk_Offset(LinePen, outlineColor),
-	TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+	DEF_LINE_OUTLINE_MONO, Tk_Offset(Line, builtinPen.symbol.outlineColor),
+	TK_CONFIG_MONO_ONLY, &bltColorOption},
     {TK_CONFIG_CUSTOM, "-outlinewidth", "outlineWidth", "OutlineWidth",
-	DEF_PEN_OUTLINE_WIDTH, Tk_Offset(LinePen, outlineWidth),
-	TK_CONFIG_DONT_SET_DEFAULT | ALL_PENS, &bltLengthOption},
+	DEF_LINE_OUTLINE_WIDTH, Tk_Offset(Line, builtinPen.symbol.outlineWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-pen", "pen", "Pen",
+	(char *)NULL, Tk_Offset(Line, normalPenPtr),
+	TK_CONFIG_NULL_OK, &bltLinePenOption},
     {TK_CONFIG_CUSTOM, "-pixels", "pixels", "Pixels",
-	DEF_PEN_PIXELS, Tk_Offset(LinePen, symbol.size),
-	ALL_PENS, &bltLengthOption},
+	DEF_LINE_PIXELS, Tk_Offset(Line, builtinPen.symbol.size),
+	GRAPH | STRIPCHART, &bltDistanceOption},
+    {TK_CONFIG_DOUBLE, "-reduce", "reduce", "Reduce",
+	DEF_LINE_REDUCE, Tk_Offset(Line, rTolerance),
+	GRAPH | STRIPCHART | TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_BOOLEAN, "-scalesymbols", "scaleSymbols", "ScaleSymbols",
+	DEF_LINE_SCALE_SYMBOLS, Tk_Offset(Line, scaleSymbols),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-showerrorbars", "showErrorBars", "ShowErrorBars",
+	DEF_LINE_SHOW_ERRORBARS, Tk_Offset(Line, builtinPen.errorBarShow),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-showvalues", "showValues", "ShowValues",
+	DEF_PEN_SHOW_VALUES, Tk_Offset(Line, builtinPen.valueShow),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-smooth", "smooth", "Smooth",
+	DEF_LINE_SMOOTH, Tk_Offset(Line, reqSmooth),
+	TK_CONFIG_DONT_SET_DEFAULT, &smoothOption},
+    {TK_CONFIG_CUSTOM, "-state", "state", "State",
+	DEF_LINE_STATE, Tk_Offset(Line, state), 
+	TK_CONFIG_DONT_SET_DEFAULT, &bltStateOption},
+    {TK_CONFIG_CUSTOM, "-styles", "styles", "Styles",
+	DEF_LINE_STYLES, Tk_Offset(Line, palette), 
+        TK_CONFIG_NULL_OK, &stylesOption},
     {TK_CONFIG_CUSTOM, "-symbol", "symbol", "Symbol",
-	DEF_PEN_SYMBOL, Tk_Offset(LinePen, symbol),
-	TK_CONFIG_DONT_SET_DEFAULT | ALL_PENS, &bltSymbolOption},
-    {TK_CONFIG_STRING, "-type", (char *)NULL, (char *)NULL,
-	DEF_PEN_TYPE, Tk_Offset(Pen, typeId), ALL_PENS | TK_CONFIG_NULL_OK},
+	DEF_LINE_SYMBOL, Tk_Offset(Line, builtinPen.symbol),
+	TK_CONFIG_DONT_SET_DEFAULT, &symbolOption},
+    {TK_CONFIG_CUSTOM, "-trace", "trace", "Trace",
+	DEF_LINE_PEN_DIRECTION, Tk_Offset(Line, penDir),
+	TK_CONFIG_DONT_SET_DEFAULT, &penDirOption},
+    {TK_CONFIG_ANCHOR, "-valueanchor", "valueAnchor", "ValueAnchor",
+	DEF_PEN_VALUE_ANCHOR, 
+        Tk_Offset(Line, builtinPen.valueStyle.anchor), 0},
+    {TK_CONFIG_COLOR, "-valuecolor", "valueColor", "ValueColor",
+	DEF_PEN_VALUE_COLOR, Tk_Offset(Line, builtinPen.valueStyle.color), 0},
+    {TK_CONFIG_FONT, "-valuefont", "valueFont", "ValueFont",
+	DEF_PEN_VALUE_FONT, Tk_Offset(Line, builtinPen.valueStyle.font), 0},
+    {TK_CONFIG_STRING, "-valueformat", "valueFormat", "ValueFormat",
+	DEF_PEN_VALUE_FORMAT, Tk_Offset(Line, builtinPen.valueFormat),
+	TK_CONFIG_NULL_OK},
+    {TK_CONFIG_DOUBLE, "-valuerotate", "valueRotate", "ValueRotate",
+	DEF_PEN_VALUE_ROTATE, Tk_Offset(Line, builtinPen.valueStyle.theta), 0},
+    {TK_CONFIG_CUSTOM, "-valueshadow", "valueShadow", "ValueShadow",
+	DEF_PEN_VALUE_SHADOW, Tk_Offset(Line, builtinPen.valueStyle.shadow),
+	0, &bltShadowOption},
+    {TK_CONFIG_CUSTOM, "-weights", "weights", "Weights",
+	(char *)NULL, Tk_Offset(Line, w), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-x", "xData", "XData",
+	(char *)NULL, Tk_Offset(Line, x), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xdata", "xData", "XData",
+	(char *)NULL, Tk_Offset(Line, x), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xerror", "xError", "XError", 
+        (char *)NULL, Tk_Offset(Line, xError), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xhigh", "xHigh", "XHigh", 
+        (char *)NULL, Tk_Offset(Line, xHigh), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xlow", "xLow", "XLow", 
+        (char *)NULL, Tk_Offset(Line, xLow), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-y", "yData", "YData", 
+	(char *)NULL, Tk_Offset(Line, y), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-ydata", "yData", "YData",
+	(char *)NULL, Tk_Offset(Line, y), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-yerror", "yError", "YError", 
+        (char *)NULL, Tk_Offset(Line, yError), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-yhigh", "yHigh", "YHigh", 
+        (char *)NULL, Tk_Offset(Line, yHigh), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-ylow", "yLow", "YLow", 
+        (char *)NULL, Tk_Offset(Line, yLow), 0, &bltDataOption},
     {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
 };
 
+
+static Tk_ConfigSpec stripElemConfigSpecs[] =
+{
+    {TK_CONFIG_CUSTOM, "-activepen", "activePen", "ActivePen",
+	DEF_LINE_ACTIVE_PEN, Tk_Offset(Line, activePenPtr),
+	TK_CONFIG_NULL_OK, &bltLinePenOption},
+    {TK_CONFIG_CUSTOM, "-bindtags", "bindTags", "BindTags",
+	DEF_LINE_TAGS, Tk_Offset(Line, tags),
+	TK_CONFIG_NULL_OK, &bltListOption},
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_LINE_PEN_COLOR, Tk_Offset(Line, builtinPen.traceColor),
+	TK_CONFIG_COLOR_ONLY},
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_LINE_PEN_MONO, Tk_Offset(Line, builtinPen.traceColor),
+	TK_CONFIG_MONO_ONLY},
+    {TK_CONFIG_CUSTOM, "-dashes", "dashes", "Dashes",
+	DEF_LINE_DASHES, Tk_Offset(Line, builtinPen.traceDashes),
+	TK_CONFIG_NULL_OK, &bltDashesOption},
+    {TK_CONFIG_CUSTOM, "-data", "data", "Data",
+	DEF_LINE_DATA, 0, 0, &bltDataPairsOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcolor", "errorBarColor", "ErrorBarColor",
+	DEF_LINE_ERRORBAR_COLOR, Tk_Offset(Line, builtinPen.errorBarColor), 
+	0, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-errorbarwidth", "errorBarWidth", "ErrorBarWidth",
+	DEF_LINE_ERRORBAR_LINE_WIDTH, 
+	Tk_Offset(Line, builtinPen.errorBarLineWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcap", "errorBarCap", 
+	"ErrorBarCap", DEF_LINE_ERRORBAR_CAP_WIDTH, 
+	Tk_Offset(Line, builtinPen.errorBarCapWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
+	DEF_LINE_FILL_COLOR, Tk_Offset(Line, builtinPen.symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
+	DEF_LINE_FILL_MONO, Tk_Offset(Line, builtinPen.symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY, &bltColorOption},
+    {TK_CONFIG_BOOLEAN, "-hide", "hide", "Hide",
+	DEF_LINE_HIDE, Tk_Offset(Line, hidden), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_STRING, "-label", "label", "Label",
+	(char *)NULL, Tk_Offset(Line, label), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_RELIEF, "-labelrelief", "labelRelief", "LabelRelief",
+	DEF_LINE_LABEL_RELIEF, Tk_Offset(Line, labelRelief),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-linewidth", "lineWidth", "LineWidth",
+        DEF_LINE_PEN_WIDTH, Tk_Offset(Line, builtinPen.traceWidth), 
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-mapx", "mapX", "MapX",
+	DEF_LINE_AXIS_X, Tk_Offset(Line, axes.x), 0, &bltXAxisOption},
+    {TK_CONFIG_CUSTOM, "-mapy", "mapY", "MapY",
+	DEF_LINE_AXIS_Y, Tk_Offset(Line, axes.y), 0, &bltYAxisOption},
+    {TK_CONFIG_CUSTOM, "-maxsymbols", "maxSymbols", "MaxSymbols",
+	DEF_LINE_MAX_SYMBOLS, Tk_Offset(Line, reqMaxSymbols),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
+	DEF_LINE_OFFDASH_COLOR, Tk_Offset(Line, builtinPen.traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
+	DEF_LINE_OFFDASH_MONO, Tk_Offset(Line, builtinPen.traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
+	DEF_LINE_OUTLINE_COLOR, Tk_Offset(Line, builtinPen.symbol.outlineColor),
+	TK_CONFIG_COLOR_ONLY, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
+	DEF_LINE_OUTLINE_MONO, Tk_Offset(Line, builtinPen.symbol.outlineColor),
+	TK_CONFIG_MONO_ONLY, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outlinewidth", "outlineWidth", "OutlineWidth",
+	DEF_LINE_OUTLINE_WIDTH, Tk_Offset(Line, builtinPen.symbol.outlineWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-pen", "pen", "Pen",
+	(char *)NULL, Tk_Offset(Line, normalPenPtr), 
+        TK_CONFIG_NULL_OK, &bltLinePenOption},
+    {TK_CONFIG_CUSTOM, "-pixels", "pixels", "Pixels",
+        DEF_LINE_PIXELS, Tk_Offset(Line, builtinPen.symbol.size), 0,
+	&bltDistanceOption},
+    {TK_CONFIG_BOOLEAN, "-scalesymbols", "scaleSymbols", "ScaleSymbols",
+	DEF_LINE_SCALE_SYMBOLS, Tk_Offset(Line, scaleSymbols),
+	TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-showerrorbars", "showErrorBars", "ShowErrorBars",
+	DEF_LINE_SHOW_ERRORBARS, Tk_Offset(Line, builtinPen.errorBarShow),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-showvalues", "showValues", "ShowValues",
+	DEF_PEN_SHOW_VALUES, Tk_Offset(Line, builtinPen.valueShow),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-smooth", "smooth", "Smooth",
+	DEF_LINE_SMOOTH, Tk_Offset(Line, reqSmooth),
+	TK_CONFIG_DONT_SET_DEFAULT, &smoothOption},
+    {TK_CONFIG_CUSTOM, "-styles", "styles", "Styles",
+	DEF_LINE_STYLES, Tk_Offset(Line, palette), 
+	TK_CONFIG_NULL_OK, &stylesOption},
+    {TK_CONFIG_CUSTOM, "-symbol", "symbol", "Symbol",
+	DEF_LINE_SYMBOL, Tk_Offset(Line, builtinPen.symbol),
+	TK_CONFIG_DONT_SET_DEFAULT, &symbolOption},
+    {TK_CONFIG_ANCHOR, "-valueanchor", "valueAnchor", "ValueAnchor",
+	DEF_PEN_VALUE_ANCHOR, 
+        Tk_Offset(Line, builtinPen.valueStyle.anchor), 0},
+    {TK_CONFIG_COLOR, "-valuecolor", "valueColor", "ValueColor",
+	DEF_PEN_VALUE_COLOR, Tk_Offset(Line, builtinPen.valueStyle.color), 0},
+    {TK_CONFIG_FONT, "-valuefont", "valueFont", "ValueFont",
+	DEF_PEN_VALUE_FONT, Tk_Offset(Line, builtinPen.valueStyle.font), 0},
+    {TK_CONFIG_STRING, "-valueformat", "valueFormat", "ValueFormat",
+	DEF_PEN_VALUE_FORMAT, Tk_Offset(Line, builtinPen.valueFormat),
+	TK_CONFIG_NULL_OK},
+    {TK_CONFIG_DOUBLE, "-valuerotate", "valueRotate", "ValueRotate",
+	DEF_PEN_VALUE_ROTATE, Tk_Offset(Line, builtinPen.valueStyle.theta), 0},
+    {TK_CONFIG_CUSTOM, "-valueshadow", "valueShadow", "ValueShadow",
+	DEF_PEN_VALUE_SHADOW, Tk_Offset(Line, builtinPen.valueStyle.shadow), 0,
+	&bltShadowOption},
+    {TK_CONFIG_CUSTOM, "-weights", "weights", "Weights",
+	(char *)NULL, Tk_Offset(Line, w), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-x", "xData", "XData",
+	(char *)NULL, Tk_Offset(Line, x), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xdata", "xData", "XData",
+	(char *)NULL, Tk_Offset(Line, x), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-y", "yData", "YData",
+	(char *)NULL, Tk_Offset(Line, y), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xerror", "xError", "XError", (char *)NULL, 
+	Tk_Offset(Line, xError), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-ydata", "yData", "YData",
+	(char *)NULL, Tk_Offset(Line, y), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-yerror", "yError", "YError", (char *)NULL, 
+	Tk_Offset(Line, yError), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xhigh", "xHigh", "XHigh", (char *)NULL, 
+	Tk_Offset(Line, xHigh), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-xlow", "xLow", "XLow", (char *)NULL, 
+	Tk_Offset(Line, xLow), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-yhigh", "yHigh", "YHigh", (char *)NULL, 
+	Tk_Offset(Line, xHigh), 0, &bltDataOption},
+    {TK_CONFIG_CUSTOM, "-ylow", "yLow", "YLow", (char *)NULL, 
+	Tk_Offset(Line, yLow), 0, &bltDataOption},
+    {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
+};
+
+static Tk_ConfigSpec linePenConfigSpecs[] =
+{
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_PEN_ACTIVE_COLOR, Tk_Offset(LinePen, traceColor),
+	TK_CONFIG_COLOR_ONLY | ACTIVE_PEN},
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_PEN_ACTIVE_MONO, Tk_Offset(LinePen, traceColor),
+	TK_CONFIG_MONO_ONLY | ACTIVE_PEN},
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_PEN_NORMAL_COLOR, Tk_Offset(LinePen, traceColor),
+	TK_CONFIG_COLOR_ONLY | NORMAL_PEN},
+    {TK_CONFIG_COLOR, "-color", "color", "Color",
+	DEF_PEN_NORMAL_MONO, Tk_Offset(LinePen, traceColor),
+	TK_CONFIG_MONO_ONLY | NORMAL_PEN},
+    {TK_CONFIG_CUSTOM, "-dashes", "dashes", "Dashes",
+	DEF_PEN_DASHES, Tk_Offset(LinePen, traceDashes),
+	TK_CONFIG_NULL_OK | ALL_PENS, &bltDashesOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcolor", "errorBarColor", "ErrorBarColor",
+	DEF_LINE_ERRORBAR_COLOR, Tk_Offset(LinePen, errorBarColor), 
+	ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-errorbarwidth", "errorBarWidth", "ErrorBarWidth",
+	DEF_LINE_ERRORBAR_LINE_WIDTH, Tk_Offset(LinePen, errorBarLineWidth),
+        ALL_PENS | TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-errorbarcap", "errorBarCap", 
+	"ErrorBarCap", DEF_LINE_ERRORBAR_CAP_WIDTH, 
+	Tk_Offset(LinePen, errorBarCapWidth),
+        TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
+	DEF_PEN_FILL_COLOR, Tk_Offset(LinePen, symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-fill", "fill", "Fill",
+	DEF_PEN_FILL_MONO, Tk_Offset(LinePen, symbol.fillColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-linewidth", "lineWidth", "LineWidth",
+	(char *)NULL, Tk_Offset(LinePen, traceWidth), 
+	ALL_PENS | TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
+	DEF_PEN_OFFDASH_COLOR, Tk_Offset(LinePen, traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-offdash", "offDash", "OffDash",
+	DEF_PEN_OFFDASH_MONO, Tk_Offset(LinePen, traceOffColor),
+	TK_CONFIG_NULL_OK | TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
+	DEF_PEN_OUTLINE_COLOR, Tk_Offset(LinePen, symbol.outlineColor),
+	TK_CONFIG_COLOR_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outline", "outline", "Outline",
+	DEF_PEN_OUTLINE_MONO, Tk_Offset(LinePen, symbol.outlineColor),
+	TK_CONFIG_MONO_ONLY | ALL_PENS, &bltColorOption},
+    {TK_CONFIG_CUSTOM, "-outlinewidth", "outlineWidth", "OutlineWidth",
+	DEF_PEN_OUTLINE_WIDTH, Tk_Offset(LinePen, symbol.outlineWidth),
+	TK_CONFIG_DONT_SET_DEFAULT | ALL_PENS, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-pixels", "pixels", "Pixels",
+	DEF_PEN_PIXELS, Tk_Offset(LinePen, symbol.size),
+	ALL_PENS, &bltDistanceOption},
+    {TK_CONFIG_CUSTOM, "-showerrorbars", "showErrorBars", "ShowErrorBars",
+	DEF_LINE_SHOW_ERRORBARS, Tk_Offset(LinePen, errorBarShow),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-showvalues", "showValues", "ShowValues",
+	DEF_PEN_SHOW_VALUES, Tk_Offset(LinePen, valueShow),
+	ALL_PENS | TK_CONFIG_DONT_SET_DEFAULT, &bltFillOption},
+    {TK_CONFIG_CUSTOM, "-symbol", "symbol", "Symbol",
+	DEF_PEN_SYMBOL, Tk_Offset(LinePen, symbol),
+	TK_CONFIG_DONT_SET_DEFAULT | ALL_PENS, &symbolOption},
+    {TK_CONFIG_STRING, "-type", (char *)NULL, (char *)NULL,
+	DEF_PEN_TYPE, Tk_Offset(Pen, typeId), ALL_PENS | TK_CONFIG_NULL_OK},
+    {TK_CONFIG_ANCHOR, "-valueanchor", "valueAnchor", "ValueAnchor",
+	DEF_PEN_VALUE_ANCHOR, Tk_Offset(LinePen, valueStyle.anchor), ALL_PENS},
+    {TK_CONFIG_COLOR, "-valuecolor", "valueColor", "ValueColor",
+	DEF_PEN_VALUE_COLOR, Tk_Offset(LinePen, valueStyle.color), ALL_PENS},
+    {TK_CONFIG_FONT, "-valuefont", "valueFont", "ValueFont",
+	DEF_PEN_VALUE_FONT, Tk_Offset(LinePen, valueStyle.font), ALL_PENS},
+    {TK_CONFIG_STRING, "-valueformat", "valueFormat", "ValueFormat",
+	DEF_PEN_VALUE_FORMAT, Tk_Offset(LinePen, valueFormat),
+	ALL_PENS | TK_CONFIG_NULL_OK},
+    {TK_CONFIG_DOUBLE, "-valuerotate", "valueRotate", "ValueRotate",
+	DEF_PEN_VALUE_ROTATE, Tk_Offset(LinePen, valueStyle.theta), ALL_PENS},
+    {TK_CONFIG_CUSTOM, "-valueshadow", "valueShadow", "ValueShadow",
+	DEF_PEN_VALUE_SHADOW, Tk_Offset(LinePen, valueStyle.shadow),
+	ALL_PENS, &bltShadowOption},
+    {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
+};
+
+typedef double (DistanceProc) _ANSI_ARGS_((int x, int y, Point2D *p, 
+	Point2D *q, Point2D *t));
+
 /* Forward declarations */
-#ifdef __STDC__
 static PenConfigureProc ConfigurePen;
 static PenDestroyProc DestroyPen;
-static ElemClosestProc ClosestLine;
-static ElemConfigProc ConfigureLine;
-static ElemDestroyProc DestroyLine;
-static ElemDrawProc DrawActiveLine;
-static ElemDrawProc DrawNormalLine;
-static ElemDrawSymbolProc DrawSymbol;
-static ElemExtentsProc ExtentsLine;
-static ElemPrintProc PrintActiveLine;
-static ElemPrintProc PrintNormalLine;
-static ElemPrintSymbolProc PrintSymbol;
-static ElemTransformProc TransformLine;
-#endif /* __STDC__ */
-
+static ElementClosestProc ClosestLine;
+static ElementConfigProc ConfigureLine;
+static ElementDestroyProc DestroyLine;
+static ElementDrawProc DrawActiveLine;
+static ElementDrawProc DrawNormalLine;
+static ElementDrawSymbolProc DrawSymbol;
+static ElementExtentsProc GetLineExtents;
+static ElementToPostScriptProc ActiveLineToPostScript;
+static ElementToPostScriptProc NormalLineToPostScript;
+static ElementSymbolToPostScriptProc SymbolToPostScript;
+static ElementMapProc MapLine;
+static DistanceProc DistanceToY;
+static DistanceProc DistanceToX;
+static DistanceProc DistanceToLine;
+static Blt_TileChangedProc TileChangedProc;
+
+#ifdef WIN32
+
+static int tkpWinRopModes[] =
+{
+    R2_BLACK,			/* GXclear */
+    R2_MASKPEN,			/* GXand */
+    R2_MASKPENNOT,		/* GXandReverse */
+    R2_COPYPEN,			/* GXcopy */
+    R2_MASKNOTPEN,		/* GXandInverted */
+    R2_NOT,			/* GXnoop */
+    R2_XORPEN,			/* GXxor */
+    R2_MERGEPEN,		/* GXor */
+    R2_NOTMERGEPEN,		/* GXnor */
+    R2_NOTXORPEN,		/* GXequiv */
+    R2_NOT,			/* GXinvert */
+    R2_MERGEPENNOT,		/* GXorReverse */
+    R2_NOTCOPYPEN,		/* GXcopyInverted */
+    R2_MERGENOTPEN,		/* GXorInverted */
+    R2_NOTMASKPEN,		/* GXnand */
+    R2_WHITE			/* GXset */
+};
+
+#endif
+
 INLINE static int
 Round(x)
     register double x;
@@ -526,41 +929,112 @@ Round(x)
 
 /*
  * ----------------------------------------------------------------------
- *
- * InRange --
- *
- *	Determines if a value lies within a given interval.
- *
- *	The value is normalized and compared against the interval
- *	[0..1], where 0.0 is the minimum and 1.0 is the maximum.
- *	DBL_EPSILON is the smallest number that can be represented
- *	on the host machine, such that (1.0 + epsilon) != 1.0.
- *
- *	Please note, *max* can't equal *min*.
- *
- * Results:
- *	Returns whether the value lies outside of the given range.
- *	If value is outside of the interval [min..max], 1 is returned;
- *	0 otherwise.
- *
- * ----------------------------------------------------------------------
- */
-INLINE static int
-OutOfRange(value, limitsPtr)
-    register double value;
-    Limits *limitsPtr;
-{
-    register double norm;
-
-    norm = (value - limitsPtr->min) / (limitsPtr->range);
-    return (((norm - 1.0) > DBL_EPSILON) || (((1.0 - norm) - 1.0) > DBL_EPSILON));
-}
-
-/*
- * ----------------------------------------------------------------------
  * 	Custom configuration option (parse and print) routines
  * ----------------------------------------------------------------------
  */
+
+static int
+StringToBitmap(interp, tkwin, symbolPtr, string)
+    Tcl_Interp *interp;
+    Tk_Window tkwin;
+    Symbol *symbolPtr;
+    char *string;
+{
+    Pixmap bitmap, mask;
+    char **elemArr;
+    int nElems;
+    int result;
+
+    if (Tcl_SplitList(interp, string, &nElems, &elemArr) != TCL_OK) {
+	return TCL_ERROR;
+    }
+
+    if (nElems > 2) {
+	Tcl_AppendResult(interp, "too many elements in bitmap list \"", string,
+		 "\": should be \"bitmap mask\"", (char *)NULL);
+	result = TCL_ERROR;
+	goto error;
+    }
+    mask = None;
+    bitmap = Tk_GetBitmap(interp, tkwin, Tk_GetUid(elemArr[0]));
+    if (bitmap == None) {
+	result = TCL_BREAK;
+	Tcl_ResetResult(interp);
+	goto error;
+    }
+    if ((nElems > 1) && (elemArr[1][0] != '\0')) {
+	mask = Tk_GetBitmap(interp, tkwin, Tk_GetUid(elemArr[1]));
+	if (mask == None) {
+	    Tk_FreeBitmap(Tk_Display(tkwin), bitmap);
+	    result = TCL_ERROR;
+	    goto error;
+	}
+    }
+    Blt_Free(elemArr);
+    if (symbolPtr->bitmap != None) {
+	Tk_FreeBitmap(Tk_Display(tkwin), symbolPtr->bitmap);
+    }
+    symbolPtr->bitmap = bitmap;
+    if (symbolPtr->mask != None) {
+	Tk_FreeBitmap(Tk_Display(tkwin), symbolPtr->mask);
+    }
+    symbolPtr->mask = mask;
+    return TCL_OK;
+  error:
+    Blt_Free(elemArr);
+    return result;
+}
+
+/*ARGSUSED*/
+static char *
+PatternToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;
+    char *widgRec;		/* Element information record */
+    int offset;			/* Offset of field in record */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    Pixmap stipple = *(Pixmap *)(widgRec + offset);
+
+    if (stipple == None) {
+	return "";
+    } 
+    if (stipple == PATTERN_SOLID) {
+	return "solid";
+    } 
+    return Tk_NameOfBitmap(Tk_Display(tkwin), stipple);
+}
+
+/*ARGSUSED*/
+static int
+StringToPattern(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* String representing field */
+    char *widgRec;		/* Element information record */
+    int offset;			/* Offset of field in record */
+{
+    Pixmap *stipplePtr = (Pixmap *)(widgRec + offset);
+    Pixmap stipple;
+
+    if ((string == NULL) || (string[0] == '\0')) {
+	stipple = None;
+    } else if (strcmp(string, "solid") == 0) {
+	stipple = PATTERN_SOLID;
+    } else {
+	stipple = Tk_GetBitmap(interp, tkwin, Tk_GetUid(string));
+	if (stipple == None) {
+	    return TCL_ERROR;
+	}
+    }
+    if ((*stipplePtr != None) && (*stipplePtr != PATTERN_SOLID)) {
+	Tk_FreeBitmap(Tk_Display(tkwin), *stipplePtr);
+    }
+    *stipplePtr = stipple;
+    return TCL_OK;
+}
+
 
 /*
  *----------------------------------------------------------------------
@@ -597,61 +1071,12 @@ NameOfSymbol(symbolPtr)
 	return "scross";
     case SYMBOL_TRIANGLE:
 	return "triangle";
+    case SYMBOL_ARROW:
+	return "arrow";
     case SYMBOL_BITMAP:
 	return "bitmap";
     }
     return NULL;
-}
-
-static int
-StringToBitmap(interp, tkwin, symbolPtr, string)
-    Tcl_Interp *interp;
-    Tk_Window tkwin;
-    Symbol *symbolPtr;
-    char string[];
-{
-    Pixmap bitmap, mask;
-    char **nameArr;
-    int numBitmaps;
-    int result;
-
-    if (Tcl_SplitList(interp, string, &numBitmaps, &nameArr) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    bitmap = mask = None;
-    if (numBitmaps > 2) {
-	Tcl_AppendResult(interp, "too many elements in bitmap list \"", string,
-	    "\": should be \"bitmap mask\"", (char *)NULL);
-	result = TCL_ERROR;
-	goto error;
-    }
-    bitmap = Tk_GetBitmap(interp, tkwin, Tk_GetUid(nameArr[0]));
-    if (bitmap == None) {
-	result = TCL_BREAK;
-	Tcl_ResetResult(interp);
-	goto error;
-    }
-    if (numBitmaps > 1) {
-	mask = Tk_GetBitmap(interp, tkwin, Tk_GetUid(nameArr[1]));
-	if (mask == None) {
-	    Tk_FreeBitmap(Tk_Display(tkwin), bitmap);
-	    result = TCL_ERROR;
-	    goto error;
-	}
-    }
-    free((char *)nameArr);
-    if (symbolPtr->bitmap != None) {
-	Tk_FreeBitmap(Tk_Display(tkwin), symbolPtr->bitmap);
-    }
-    symbolPtr->bitmap = bitmap;
-    if (symbolPtr->mask != None) {
-	Tk_FreeBitmap(Tk_Display(tkwin), symbolPtr->mask);
-    }
-    symbolPtr->mask = mask;
-    return TCL_OK;
-  error:
-    free((char *)nameArr);
-    return result;
 }
 
 /*
@@ -671,9 +1096,9 @@ StringToBitmap(interp, tkwin, symbolPtr, string)
 /*ARGSUSED*/
 static int
 StringToSymbol(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representing symbol type */
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of symbol type field in record */
@@ -709,15 +1134,18 @@ StringToSymbol(clientData, interp, tkwin, string, widgRec, offset)
 	symbolPtr->type = SYMBOL_SCROSS;
     } else if ((c == 't') && (strncmp(string, "triangle", length) == 0)) {
 	symbolPtr->type = SYMBOL_TRIANGLE;
+    } else if ((c == 'a') && (strncmp(string, "arrow", length) == 0)) {
+	symbolPtr->type = SYMBOL_ARROW;
     } else {
 	int result;
 
 	result = StringToBitmap(interp, tkwin, symbolPtr, string);
 	if (result != TCL_OK) {
 	    if (result != TCL_ERROR) {
-		Tcl_AppendResult(interp, "bad symbol \"", string, "\": should be \
-\"none\", \"circle\", \"square\", \"diamond\", \"plus\", \"cross\", \"splus\", \
-\"scross\", \"triangle\", or the name of a bitmap", (char *)NULL);
+		Tcl_AppendResult(interp, "bad symbol \"", string, 
+"\": should be \"none\", \"circle\", \"square\", \"diamond\", \"plus\", \
+\"cross\", \"splus\", \"scross\", \"triangle\", \"arrow\" \
+or the name of a bitmap", (char *)NULL);
 	    }
 	    return TCL_ERROR;
 	}
@@ -741,29 +1169,26 @@ StringToSymbol(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 SymbolToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tk_Window tkwin;
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of symbol type field in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     Symbol *symbolPtr = (Symbol *)(widgRec + offset);
     char *result;
 
     if (symbolPtr->type == SYMBOL_BITMAP) {
-	Tcl_DString dStr;
+	Tcl_DString dString;
 
-	Tcl_DStringInit(&dStr);
-	Tcl_DStringAppendElement(&dStr,
+	Tcl_DStringInit(&dString);
+	Tcl_DStringAppendElement(&dString,
 	    Tk_NameOfBitmap(Tk_Display(tkwin), symbolPtr->bitmap));
-	Tcl_DStringAppendElement(&dStr, (symbolPtr->mask == None) ? "" :
+	Tcl_DStringAppendElement(&dString, (symbolPtr->mask == None) ? "" :
 	    Tk_NameOfBitmap(Tk_Display(tkwin), symbolPtr->mask));
-	result = Tcl_DStringValue(&dStr);
-	if (result == dStr.staticSpace) {
-	    result = strdup(result);
-	}
-	Tcl_DStringFree(&dStr);
-	*freeProcPtr = (Tcl_FreeProc *)free;
+	result = Blt_Strdup(Tcl_DStringValue(&dString));
+	Tcl_DStringFree(&dString);
+	*freeProcPtr = (Tcl_FreeProc *)Blt_Free;
     } else {
 	result = NameOfSymbol(symbolPtr);
     }
@@ -783,21 +1208,13 @@ SymbolToString(clientData, tkwin, widgRec, offset, freeProcPtr)
  *----------------------------------------------------------------------
  */
 static char *
-NameOfSmooth(smooth)
-    int smooth;
+NameOfSmooth(value)
+    Smoothing value;
 {
-    switch (smooth) {
-    case PEN_LINEAR:
-	return "linear";
-    case PEN_STEP:
-	return "step";
-    case PEN_NATURAL:
-	return "natural";
-    case PEN_QUADRATIC:
-	return "quadratic";
-    default:
+    if ((value < 0) || (value >= PEN_SMOOTH_LAST)) {
 	return "unknown smooth value";
     }
+    return smoothingInfo[value].name;
 }
 
 /*
@@ -817,35 +1234,25 @@ NameOfSmooth(smooth)
 /*ARGSUSED*/
 static int
 StringToSmooth(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representing smooth type */
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of smooth type field in record */
 {
-    int *smoothPtr = (int *)(widgRec + offset);
-    unsigned int length;
-    char c;
+    Smoothing *valuePtr = (Smoothing *)(widgRec + offset);
+    register SmoothingInfo *siPtr;
 
-    c = string[0];
-    length = strlen(string);
-    if ((c == 'n') && (strncmp(string, "natural", length) == 0)) {
-	*smoothPtr = PEN_NATURAL;
-    } else if ((c == 'c') && (strncmp(string, "cubic", length) == 0)) {
-	*smoothPtr = PEN_NATURAL;
-    } else if ((c == 'q') && (strncmp(string, "quadratic", length) == 0)) {
-	*smoothPtr = PEN_QUADRATIC;
-    } else if ((c == 's') && (strncmp(string, "step", length) == 0)) {
-	*smoothPtr = PEN_STEP;
-    } else if ((c == 'l') && (strncmp(string, "linear", length) == 0)) {
-	*smoothPtr = PEN_LINEAR;
-    } else {
-	Tcl_AppendResult(interp, "bad smooth value \"", string, "\": should be \
-linear, natural, quadratic, or step", (char *)NULL);
-	return TCL_ERROR;
+    for (siPtr = smoothingInfo; siPtr->name != NULL; siPtr++) {
+	if (strcmp(string, siPtr->name) == 0) {
+	    *valuePtr = siPtr->value;
+	    return TCL_OK;
+	}
     }
-    return TCL_OK;
+    Tcl_AppendResult(interp, "bad smooth value \"", string, "\": should be \
+linear, step, natural, or quadratic", (char *)NULL);
+    return TCL_ERROR;
 }
 
 /*
@@ -863,11 +1270,11 @@ linear, natural, quadratic, or step", (char *)NULL);
 /*ARGSUSED*/
 static char *
 SmoothToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of smooth type field in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     int smooth = *(int *)(widgRec + offset);
 
@@ -891,9 +1298,9 @@ SmoothToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToPenDir(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representing pen direction */
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of pen direction field in record */
@@ -962,205 +1369,37 @@ NameOfPenDir(penDir)
 /*ARGSUSED*/
 static char *
 PenDirToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Element information record */
     int offset;			/* Offset of pen direction field in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     int penDir = *(int *)(widgRec + offset);
 
     return NameOfPenDir(penDir);
 }
 
-int
-Blt_GetPenStyle(graphPtr, string, type, stylePtr)
-    Graph *graphPtr;
-    char *string;
-    ObjectType type;
-    PenStyle *stylePtr;
-{
-    int numElem;
-    char **elemArr;
-    Pen *penPtr;
-    double min, max;
-
-    if (Tcl_SplitList(graphPtr->interp, string, &numElem, &elemArr) != TCL_OK) {
-	return TCL_ERROR;
-    }
-    if (Blt_GetPen(graphPtr, elemArr[0], type, &penPtr) != TCL_OK) {
-	free((char *)elemArr);
-	return TCL_ERROR;
-    }
-    if ((numElem == 3) &&
-	((Tcl_GetDouble(graphPtr->interp, elemArr[1], &min) != TCL_OK) ||
-	    (Tcl_GetDouble(graphPtr->interp, elemArr[2], &max) != TCL_OK))) {
-	free((char *)elemArr);
-	return TCL_ERROR;
-    }
-    free((char *)elemArr);
-    stylePtr->penPtr = penPtr;
-    SetLimits(stylePtr->weight, min, max);
-    return TCL_OK;
-}
-
-static void
-FreeLineStyles(linePtr, styles, numStyles)
-    Line *linePtr;
-    LineStyle styles[];
-    int numStyles;
-{
-    register int i;
-
-    /*
-     * Always ignore the first array slot. It's occupied by the built-in
-     * "normal" pen of the element.
-     */
-    for (i = 1; i < numStyles; i++) {
-	Blt_FreePen(linePtr->graphPtr, (Pen *)styles[i].penPtr);
-    }
-    free((char *)styles);
-}
 
 /*
- * Clear the number of points and segments, in case there are no segments or
- * points
+ * Clear the number of points and segments, in case there are no
+ * segments or points
  */
 static void
-ClearStyles(linePtr)
-    Line *linePtr;
+ClearPalette(palette)
+    Blt_Chain *palette;
 {
-    register LineStyle *stylePtr;
-    register int i;
+    register LinePenStyle *stylePtr;
+    Blt_ChainLink *linkPtr;
 
-    for (stylePtr = linePtr->styles, i = 0; i < linePtr->numStyles;
-	i++, stylePtr++) {
-	stylePtr->numSegments = stylePtr->numPoints = 0;
+    for (linkPtr = Blt_ChainFirstLink(palette); linkPtr != NULL;
+	 linkPtr = Blt_ChainNextLink(linkPtr)) {
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	stylePtr->nStrips = stylePtr->nSymbolPts = 0;
+	stylePtr->xErrorBarCnt = stylePtr->yErrorBarCnt = 0;
     }
 }
 
-/*
- *----------------------------------------------------------------------
- *
- * StringToStyles --
- *
- *	Parse the list of style names.
- *
- * Results:
- *	The return value is a standard Tcl result.
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
-static int
-StringToStyles(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
-    Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
-    char *string;		/* String representing style list */
-    char *widgRec;		/* Element information record */
-    int offset;			/* Offset of symbol type field in record */
-{
-    Line *linePtr = (Line *)(widgRec);
-    register int i;
-    int numStyles;
-    char **elemArr;
-    LineStyle *styles, *stylePtr;
-
-    elemArr = NULL;
-    if ((string == NULL) || (*string == '\0')) {
-	numStyles = 0;
-    } else {
-	if (Tcl_SplitList(interp, string, &numStyles, &elemArr) != TCL_OK) {
-	    numStyles = 0;
-	}
-    }
-    /* Convert the styles into pen pointers and store in an array  */
-    stylePtr = styles = (LineStyle *)calloc(numStyles + 1, sizeof(LineStyle));
-    assert(styles);
-
-    /* First pen is always the "normal" pen, we'll set the style later */
-    stylePtr++;
-
-    for (i = 0; i < numStyles; i++, stylePtr++) {
-	SetLimits(stylePtr->weight, (double)i, (double)(i + 1));
-	if (Blt_GetPenStyle(linePtr->graphPtr, elemArr[i], linePtr->type,
-		(PenStyle *)stylePtr) != TCL_OK) {
-	    free((char *)elemArr);
-	    FreeLineStyles(linePtr, styles, i);
-	    return TCL_ERROR;
-	}
-    }
-    if (elemArr != NULL) {
-	free((char *)elemArr);
-    }
-    if (linePtr->styles != NULL) {
-	FreeLineStyles(linePtr, linePtr->styles, linePtr->numStyles);
-    }
-    linePtr->numStyles = numStyles + 1;
-    linePtr->styles = styles;
-    return TCL_OK;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * StylesToString --
- *
- *	Convert the style information into a string.
- *
- * Results:
- *	The string representing the style information is returned.
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
-static char *
-StylesToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
-    char *widgRec;		/* Element information record */
-    int offset;			/* not used */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
-{
-    Line *linePtr = (Line *)(widgRec);
-    char string[TCL_DOUBLE_SPACE];
-    Tcl_DString dStr;
-    Tcl_Interp *interp = linePtr->graphPtr->interp;
-    register LineStyle *stylePtr;
-    register int i;
-    char *result;
-
-    if (linePtr->numStyles < 2) {
-	return "";
-    }
-    Tcl_DStringInit(&dStr);
-    for (i = 1; i < linePtr->numStyles; i++) {
-	stylePtr = linePtr->styles + i;
-	Tcl_DStringStartSublist(&dStr);
-	Tcl_DStringAppendElement(&dStr, stylePtr->penPtr->name);
-	Tcl_PrintDouble(interp, stylePtr->weight.min, string);
-	Tcl_DStringAppendElement(&dStr, string);
-	Tcl_PrintDouble(interp, stylePtr->weight.max, string);
-	Tcl_DStringAppendElement(&dStr, string);
-	Tcl_DStringEndSublist(&dStr);
-    }
-    result = Tcl_DStringValue(&dStr);
-
-    /*
-     * If memory wasn't allocated for the dynamic string, do it here (it's
-     * currently on the stack), so that Tcl can free it normally.
-     *
-     * Of course, we'll eventually get burned by directly using the fields of
-     * the Tcl_DString structure.  It works today, but maybe not tomorrow.
-     * But then again, Tcl's C API guarantees nothing.
-     */
-    if (result == dStr.staticSpace) {
-	result = strdup(result);
-    }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return result;
-}
 
 /*
  *----------------------------------------------------------------------
@@ -1193,29 +1432,31 @@ ConfigurePen(graphPtr, penPtr)
     XGCValues gcValues;
     XColor *colorPtr;
 
+    Blt_ResetTextStyle(graphPtr->tkwin, &(lpPtr->valueStyle));
     /*
      * Set the outline GC for this pen: GCForeground is outline color.
      * GCBackground is the fill color (only used for bitmap symbols).
      */
     gcMask = (GCLineWidth | GCForeground);
-    colorPtr = lpPtr->outlineColor;
+    colorPtr = lpPtr->symbol.outlineColor;
     if (colorPtr == COLOR_DEFAULT) {
-	colorPtr = lpPtr->penColor;
+	colorPtr = lpPtr->traceColor;
     }
     gcValues.foreground = colorPtr->pixel;
     if (lpPtr->symbol.type == SYMBOL_BITMAP) {
-	colorPtr = lpPtr->fillColor;
+	colorPtr = lpPtr->symbol.fillColor;
 	if (colorPtr == COLOR_DEFAULT) {
-	    colorPtr = lpPtr->penColor;
+	    colorPtr = lpPtr->traceColor;
 	}
 	/*
-	 * Use a clip mask if either
+	 * Set a clip mask if either
 	 *	1) no background color was designated or
 	 *	2) a masking bitmap was specified.
 	 *
-	 * These aren't the bitmaps we'll be using, but it
-	 * makes it unlikely that anyone else will be sharing this
-	 * when we set the clip origin (as the bitmap is drawn).
+	 * These aren't necessarily the bitmaps we'll be using for
+	 * clipping. But this makes it unlikely that anyone else will
+	 * be sharing this GC when we set the clip origin (at the time
+	 * the bitmap is drawn).
 	 */
 	if (colorPtr != NULL) {
 	    gcValues.background = colorPtr->pixel;
@@ -1229,29 +1470,29 @@ ConfigurePen(graphPtr, penPtr)
 	    gcMask |= GCClipMask;
 	}
     }
-    gcValues.line_width = LineWidth(lpPtr->outlineWidth);
+    gcValues.line_width = LineWidth(lpPtr->symbol.outlineWidth);
     newGC = Tk_GetGC(graphPtr->tkwin, gcMask, &gcValues);
-    if (lpPtr->outlineGC != NULL) {
-	Tk_FreeGC(graphPtr->display, lpPtr->outlineGC);
+    if (lpPtr->symbol.outlineGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->symbol.outlineGC);
     }
-    lpPtr->outlineGC = newGC;
+    lpPtr->symbol.outlineGC = newGC;
 
-    /* Fills for symbols: GCForeground is fill color */
+    /* Fill GC for symbols: GCForeground is fill color */
 
     gcMask = (GCLineWidth | GCForeground);
-    colorPtr = lpPtr->fillColor;
+    colorPtr = lpPtr->symbol.fillColor;
     if (colorPtr == COLOR_DEFAULT) {
-	colorPtr = lpPtr->penColor;
+	colorPtr = lpPtr->traceColor;
     }
     newGC = NULL;
     if (colorPtr != NULL) {
 	gcValues.foreground = colorPtr->pixel;
 	newGC = Tk_GetGC(graphPtr->tkwin, gcMask, &gcValues);
     }
-    if (lpPtr->fillGC != NULL) {
-	Tk_FreeGC(graphPtr->display, lpPtr->fillGC);
+    if (lpPtr->symbol.fillGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->symbol.fillGC);
     }
-    lpPtr->fillGC = newGC;
+    lpPtr->symbol.fillGC = newGC;
 
     /* Line segments */
 
@@ -1260,31 +1501,45 @@ ConfigurePen(graphPtr, penPtr)
     gcValues.cap_style = CapButt;
     gcValues.join_style = JoinRound;
     gcValues.line_style = LineSolid;
-    gcValues.line_width = LineWidth(lpPtr->lineWidth);
+    gcValues.line_width = LineWidth(lpPtr->traceWidth);
 
-    colorPtr = lpPtr->penOffColor;
+    colorPtr = lpPtr->traceOffColor;
     if (colorPtr == COLOR_DEFAULT) {
-	colorPtr = lpPtr->penColor;
+	colorPtr = lpPtr->traceColor;
     }
     if (colorPtr != NULL) {
 	gcMask |= GCBackground;
 	gcValues.background = colorPtr->pixel;
     }
-    gcValues.foreground = lpPtr->penColor->pixel;
-    if (lpPtr->dashes.numValues > 0) {
-	gcValues.line_width = lpPtr->lineWidth;
-	gcValues.line_style =
+    gcValues.foreground = lpPtr->traceColor->pixel;
+    if (LineIsDashed(lpPtr->traceDashes)) {
+	gcValues.line_width = lpPtr->traceWidth;
+	gcValues.line_style = 
 	    (colorPtr == NULL) ? LineOnOffDash : LineDoubleDash;
     }
     newGC = Blt_GetPrivateGC(graphPtr->tkwin, gcMask, &gcValues);
-    if (lpPtr->penGC != NULL) {
-	Blt_FreePrivateGC(graphPtr->display, lpPtr->penGC);
+    if (lpPtr->traceGC != NULL) {
+	Blt_FreePrivateGC(graphPtr->display, lpPtr->traceGC);
     }
-    if (lpPtr->dashes.numValues > 0) {
-	lpPtr->dashes.offset = lpPtr->dashes.valueArr[0] / 2;
-	Blt_SetDashes(graphPtr->display, newGC, &(lpPtr->dashes));
+    if (LineIsDashed(lpPtr->traceDashes)) {
+	lpPtr->traceDashes.offset = lpPtr->traceDashes.values[0] / 2;
+	Blt_SetDashes(graphPtr->display, newGC, &(lpPtr->traceDashes));
     }
-    lpPtr->penGC = newGC;
+    lpPtr->traceGC = newGC;
+
+    gcMask = (GCLineWidth | GCForeground);
+    colorPtr = lpPtr->errorBarColor;
+    if (colorPtr == COLOR_DEFAULT) {
+	colorPtr = lpPtr->traceColor;
+    }
+    gcValues.line_width = LineWidth(lpPtr->errorBarLineWidth);
+    gcValues.foreground = colorPtr->pixel;
+    newGC = Tk_GetGC(graphPtr->tkwin, gcMask, &gcValues);
+    if (lpPtr->errorBarGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->errorBarGC);
+    }
+    lpPtr->errorBarGC = newGC;
+
     return TCL_OK;
 }
 
@@ -1310,14 +1565,18 @@ DestroyPen(graphPtr, penPtr)
 {
     LinePen *lpPtr = (LinePen *)penPtr;
 
-    if (lpPtr->outlineGC != NULL) {
-	Tk_FreeGC(graphPtr->display, lpPtr->outlineGC);
+    Blt_FreeTextStyle(graphPtr->display, &(lpPtr->valueStyle));
+    if (lpPtr->symbol.outlineGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->symbol.outlineGC);
     }
-    if (lpPtr->fillGC != NULL) {
-	Tk_FreeGC(graphPtr->display, lpPtr->fillGC);
+    if (lpPtr->symbol.fillGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->symbol.fillGC);
     }
-    if (lpPtr->penGC != NULL) {
-	Blt_FreePrivateGC(graphPtr->display, lpPtr->penGC);
+    if (lpPtr->errorBarGC != NULL) {
+	Tk_FreeGC(graphPtr->display, lpPtr->errorBarGC);
+    }
+    if (lpPtr->traceGC != NULL) {
+	Blt_FreePrivateGC(graphPtr->display, lpPtr->traceGC);
     }
     if (lpPtr->symbol.bitmap != None) {
 	Tk_FreeBitmap(graphPtr->display, lpPtr->symbol.bitmap);
@@ -1334,18 +1593,19 @@ static void
 InitPen(penPtr)
     LinePen *penPtr;
 {
-    penPtr->outlineWidth = 1;
-    penPtr->lineWidth = 1;
-    penPtr->symbol.type = SYMBOL_CIRCLE;
-    penPtr->symbol.bitmap = None;
-    penPtr->symbol.mask = None;
-    penPtr->outlineColor = COLOR_DEFAULT;
-    penPtr->fillColor = COLOR_DEFAULT;
-    penPtr->configSpecs = penConfigSpecs;
+    Blt_InitTextStyle(&penPtr->valueStyle);
     penPtr->configProc = ConfigurePen;
+    penPtr->configSpecs = linePenConfigSpecs;
     penPtr->destroyProc = DestroyPen;
+    penPtr->errorBarLineWidth = 1;
+    penPtr->errorBarShow = SHOW_BOTH;
     penPtr->flags = NORMAL_PEN;
     penPtr->name = "";
+    penPtr->symbol.bitmap = penPtr->symbol.mask = None;
+    penPtr->symbol.outlineColor = penPtr->symbol.fillColor = COLOR_DEFAULT;
+    penPtr->symbol.outlineWidth = penPtr->traceWidth = 1;
+    penPtr->symbol.type = SYMBOL_CIRCLE;
+    penPtr->valueShow = SHOW_NONE;
 }
 
 Pen *
@@ -1354,14 +1614,14 @@ Blt_LinePen(penName)
 {
     LinePen *penPtr;
 
-    penPtr = (LinePen *)calloc(1, sizeof(LinePen));
+    penPtr = Blt_Calloc(1, sizeof(LinePen));
     assert(penPtr);
     InitPen(penPtr);
-    penPtr->name = strdup(penName);
+    penPtr->name = Blt_Strdup(penName);
     if (strcmp(penName, "activeLine") == 0) {
 	penPtr->flags = ACTIVE_PEN;
     }
-    return (Pen *) penPtr;
+    return (Pen *)penPtr;
 }
 
 /*
@@ -1392,8 +1652,8 @@ Blt_LinePen(penName)
  *----------------------------------------------------------------------
  */
 static int
-ScaleSymbol(linePtr, normalSize)
-    Line *linePtr;
+ScaleSymbol(elemPtr, normalSize)
+    Element *elemPtr;
     int normalSize;
 {
     int maxSize;
@@ -1401,92 +1661,39 @@ ScaleSymbol(linePtr, normalSize)
     int newSize;
 
     scale = 1.0;
-    if (linePtr->scaleSymbols) {
+    if (elemPtr->scaleSymbols) {
 	double xRange, yRange;
 
-	xRange = linePtr->axes.x->range;
-	yRange = linePtr->axes.y->range;
-	if (linePtr->flags & LINE_INIT_SYMBOL_SCALE) {
+	xRange = (elemPtr->axes.x->max - elemPtr->axes.x->min);
+	yRange = (elemPtr->axes.y->max - elemPtr->axes.y->min);
+	if (elemPtr->flags & SCALE_SYMBOL) {
 	    /* Save the ranges as a baseline for future scaling. */
-	    linePtr->xRange = xRange;
-	    linePtr->yRange = yRange;
-	    linePtr->flags &= ~LINE_INIT_SYMBOL_SCALE;
+	    elemPtr->xRange = xRange;
+	    elemPtr->yRange = yRange;
+	    elemPtr->flags &= ~SCALE_SYMBOL;
 	} else {
 	    double xScale, yScale;
 
 	    /* Scale the symbol by the smallest change in the X or Y axes */
-	    xScale = linePtr->xRange / xRange;
-	    yScale = linePtr->yRange / yRange;
+	    xScale = elemPtr->xRange / xRange;
+	    yScale = elemPtr->yRange / yRange;
 	    scale = MIN(xScale, yScale);
 	}
     }
     newSize = Round(normalSize * scale);
+
     /*
-     * Don't let the size of symbols go unbounded. The X drawing routines assume
-     * coordinates to be a signed short int.
+     * Don't let the size of symbols go unbounded. Both X and Win32
+     * drawing routines assume coordinates to be a signed short int.
      */
-    maxSize = (int)MIN(linePtr->graphPtr->hRange, linePtr->graphPtr->vRange);
+    maxSize = (int)MIN(elemPtr->graphPtr->hRange, elemPtr->graphPtr->vRange);
     if (newSize > maxSize) {
 	newSize = maxSize;
     }
+
     /* Make the symbol size odd so that its center is a single pixel. */
     newSize |= 0x01;
     return newSize;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * GetWeights --
- *
- *	Creates an array of style indices and fills it based on the weight
- *	of each data point.
- *
- * Results:
- *	None.
- *
- * Side effects:
- *	Memory is freed and allocated for the index array.
- *
- *----------------------------------------------------------------------
- */
-static int *
-GetWeights(linePtr, numPoints)
-    Line *linePtr;
-    int numPoints;
-{
-    register int i;
-    register int styleNum;
-    int numWeights;		/* Number of weights to be examined.  If there
-				 * are more data points, they will default to
-				 * the normal pen. */
-    int *styleDir;		/* Directory of styles.  Each element represents
-				 * the style for the data point at that index */
-    LineStyle *stylePtr;
-    double *w;			/* Weight vector */
-
-    /*
-     * Create an array of style indices, initializing each index to 0.  The 0th
-     * index represents the default line style (i.e. "normal" pen).
-     */
-    styleDir = (int *)calloc(numPoints, sizeof(int));
-    assert(styleDir);
-    numWeights = MIN(linePtr->w.numValues, numPoints);
-    w = linePtr->w.valueArr;
-
-    stylePtr = linePtr->styles;
-    stylePtr++;
-
-    for (styleNum = 1; styleNum < linePtr->numStyles; styleNum++, stylePtr++) {
-	stylePtr->symbolSize = ScaleSymbol(linePtr, stylePtr->penPtr->symbol.size);
-	for (i = 0; i < numWeights; i++) {
-	    if ((styleDir[i] > 0) || (OutOfRange(w[i], &(stylePtr->weight)))) {
-		continue;	/* Don't overwrite styles already set */
-	    }
-	    styleDir[i] = styleNum;
-	}
-    }
-    return styleDir;
 }
 
 /*
@@ -1506,32 +1713,48 @@ GetWeights(linePtr, numPoints)
  *----------------------------------------------------------------------
  */
 static void
-GetScreenPoints(graphPtr, linePtr, tmpPtr)
+GetScreenPoints(graphPtr, linePtr, mapPtr)
     Graph *graphPtr;
     Line *linePtr;
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
     double *x, *y;
-    register int i;
-    register Point2D *pointArr;
-    register int *indexArr;
-    int numPoints;
+    register int i, n;
+    register int count;
+    register Point2D *screenPts;
+    register int *indices;
 
-    numPoints = NumberOfPoints(linePtr);
+    n = NumberOfPoints(linePtr);
     x = linePtr->x.valueArr;
     y = linePtr->y.valueArr;
-    pointArr = (Point2D *)malloc(sizeof(Point2D) * numPoints);
-    assert(pointArr);
-    indexArr = (int *)malloc(sizeof(int) * numPoints);
-    assert(indexArr);
+    screenPts = Blt_Malloc(sizeof(Point2D) * n);
+    assert(screenPts);
+    indices = Blt_Malloc(sizeof(int) * n);
+    assert(indices);
 
-    for (i = 0; i < numPoints; i++) {
-	pointArr[i] = Blt_Transform2DPt(graphPtr, x[i], y[i], &(linePtr->axes));
-	indexArr[i] = i;
+    count = 0;			/* Count the valid screen coordinates */
+    if (graphPtr->inverted) {
+	for (i = 0; i < n; i++) {
+	    if ((FINITE(x[i])) && (FINITE(y[i]))) {
+ 		screenPts[count].x = Blt_HMap(graphPtr, linePtr->axes.y, y[i]);
+		screenPts[count].y = Blt_VMap(graphPtr, linePtr->axes.x, x[i]);
+		indices[count] = i;
+		count++;
+	    }
+	}
+    } else {
+	for (i = 0; i < n; i++) {
+	    if ((FINITE(x[i])) && (FINITE(y[i]))) {
+		screenPts[count].x = Blt_HMap(graphPtr, linePtr->axes.x, x[i]);
+		screenPts[count].y = Blt_VMap(graphPtr, linePtr->axes.y, y[i]);
+		indices[count] = i;
+		count++;
+	    }
+	}
     }
-    tmpPtr->points = pointArr;
-    tmpPtr->numPoints = numPoints;
-    tmpPtr->indexArr = indexArr;
+    mapPtr->screenPts = screenPts;
+    mapPtr->nScreenPts = count;
+    mapPtr->indices = indices;
 }
 
 /*
@@ -1551,32 +1774,35 @@ GetScreenPoints(graphPtr, linePtr, tmpPtr)
  *----------------------------------------------------------------------
  */
 static void
-ReducePoints(tmpPtr)
-    TransformInfo *tmpPtr;
+ReducePoints(mapPtr, tolerance)
+    MapInfo *mapPtr;
+    double tolerance;
 {
-    register int i, n;
-    Point2D *points;
-    int *indexArr;
+    register int i, k, n;
+    Point2D *screenPts;
+    int *indices, *simple;
 
-    points = tmpPtr->points;
-    indexArr = tmpPtr->indexArr;
-    n = 0;
-    for (i = 1; i < tmpPtr->numPoints; i++) {
-	if ((ROUND(points[i].x) == ROUND(points[n].x)) &&
-	    (ROUND(points[i].y) == ROUND(points[n].y))) {
-	    continue;		/* Points are the same. */
-	}
-	n++;
-	if (n < i) {
-	    points[n] = points[i];
-	    indexArr[n] = tmpPtr->indexArr[i];
-	}
+    simple	= Blt_Malloc(sizeof(int) * mapPtr->nScreenPts);
+    indices	= Blt_Malloc(sizeof(int) * mapPtr->nScreenPts);
+    screenPts	= Blt_Malloc(sizeof(Point2D) * mapPtr->nScreenPts);
+    n = Blt_SimplifyLine(mapPtr->screenPts, 0, mapPtr->nScreenPts - 1, 
+		 tolerance, simple);
+    for (i = 0; i < n; i++) {
+	k = simple[i];
+	screenPts[i] = mapPtr->screenPts[k];
+	indices[i] = mapPtr->indices[k];
     }
-    n++;
 #ifdef notdef
-    fprintf(stderr, "reduced from %d to %d\n", tmpPtr->numPoints, n);
+    if (n < mapPtr->nScreenPts) {
+	fprintf(stderr, "reduced from %d to %d\n", mapPtr->nScreenPts, n);
+    }
 #endif
-    tmpPtr->numPoints = n;
+    Blt_Free(mapPtr->screenPts);
+    Blt_Free(mapPtr->indices);
+    Blt_Free(simple);
+    mapPtr->screenPts = screenPts;
+    mapPtr->indices = indices;
+    mapPtr->nScreenPts = n;
 }
 
 /*
@@ -1584,8 +1810,8 @@ ReducePoints(tmpPtr)
  *
  * GenerateSteps --
  *
- *	Resets the coordinate and pen index arrays adding new held
- *	points for step-and-hold type smoothing.
+ *	Resets the coordinate and pen index arrays adding new points
+ *	for step-and-hold type smoothing.
  *
  * Results:
  *	None.
@@ -1594,43 +1820,43 @@ ReducePoints(tmpPtr)
  *	The temporary arrays for screen coordinates and pen indices
  *	are updated.
  *
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------- 
  */
 static void
-GenerateSteps(tmpPtr)
-    TransformInfo *tmpPtr;
+GenerateSteps(mapPtr)
+    MapInfo *mapPtr;
 {
     int newSize;
     register int i, count;
-    Point2D *newArr;
-    int *indexArr;
+    Point2D *screenPts;
+    int *indices;
 
-    newSize = ((tmpPtr->numPoints - 1) * 2) + 1;
-    newArr = (Point2D *)malloc(newSize * sizeof(Point2D));
-    assert(newArr);
-    indexArr = (int *)malloc(sizeof(int) * newSize);
-    assert(indexArr);
+    newSize = ((mapPtr->nScreenPts - 1) * 2) + 1;
+    screenPts = Blt_Malloc(newSize * sizeof(Point2D));
+    assert(screenPts);
+    indices = Blt_Malloc(sizeof(int) * newSize);
+    assert(indices);
 
-    newArr[0] = tmpPtr->points[0];
-    indexArr[0] = 0;
+    screenPts[0] = mapPtr->screenPts[0];
+    indices[0] = 0;
 
     count = 1;
-    for (i = 1; i < tmpPtr->numPoints; i++) {
-	newArr[count + 1] = tmpPtr->points[i];
+    for (i = 1; i < mapPtr->nScreenPts; i++) {
+	screenPts[count + 1] = mapPtr->screenPts[i];
 
-	/* Hold last y coordinate, use new x coordinate */
-	newArr[count].x = newArr[count + 1].x;
-	newArr[count].y = newArr[count - 1].y;
+	/* Hold last y-coordinate, use new x-coordinate */
+	screenPts[count].x = screenPts[count + 1].x;
+	screenPts[count].y = screenPts[count - 1].y;
 
 	/* Use the same style for both the hold and the step points */
-	indexArr[count] = indexArr[count + 1] = tmpPtr->indexArr[i];
+	indices[count] = indices[count + 1] = mapPtr->indices[i];
 	count += 2;
     }
-    free((char *)tmpPtr->points);
-    free((char *)tmpPtr->indexArr);
-    tmpPtr->indexArr = indexArr;
-    tmpPtr->points = newArr;
-    tmpPtr->numPoints = newSize;
+    Blt_Free(mapPtr->screenPts);
+    Blt_Free(mapPtr->indices);
+    mapPtr->indices = indices;
+    mapPtr->screenPts = screenPts;
+    mapPtr->nScreenPts = newSize;
 }
 
 /*
@@ -1638,8 +1864,8 @@ GenerateSteps(tmpPtr)
  *
  * GenerateSpline --
  *
- *	Computes a spline based upon the data points, returning a
- *	new (larger) coordinate array or points.
+ *	Computes a spline based upon the data points, returning a new
+ *	(larger) coordinate array or points.
  *
  * Results:
  *	None.
@@ -1648,157 +1874,262 @@ GenerateSteps(tmpPtr)
  *	The temporary arrays for screen coordinates and data indices
  *	are updated based upon spline.
  *
+ * FIXME:  Can't interpolate knots along the Y-axis.   Need to break
+ *	   up point array into interchangable X and Y vectors earlier.
+ *	   Pass extents (left/right or top/bottom) as parameters.
+ *
  *----------------------------------------------------------------------
  */
 static void
-GenerateSpline(graphPtr, linePtr, tmpPtr)
+GenerateSpline(graphPtr, linePtr, mapPtr)
     Graph *graphPtr;
     Line *linePtr;
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
-    int extraPoints;
-    double *x1, *x2, *y1, *y2;
+    int extra;
     register int i, j, count;
-    Point2D *newArr;
-    int *indexArr;
-    int newSize;
-    int failed;
+    Point2D *origPts, *intpPts;
+    int *indices;
+    int nIntpPts, nOrigPts;
+    int result;
     int x;
 
-    assert(tmpPtr->numPoints > 0);
-    for (i = 0, j = 1; j < tmpPtr->numPoints; i++, j++) {
-	if (tmpPtr->points[j].x <= tmpPtr->points[i].x) {
+    nOrigPts = mapPtr->nScreenPts;
+    origPts = mapPtr->screenPts;
+    assert(mapPtr->nScreenPts > 0);
+    for (i = 0, j = 1; j < nOrigPts; i++, j++) {
+	if (origPts[j].x <= origPts[i].x) {
 	    return;		/* Points are not monotonically increasing */
 	}
     }
-    if ((tmpPtr->points[0].x > (double)graphPtr->xMax) ||
-	(tmpPtr->points[tmpPtr->numPoints - 1].x < (double)graphPtr->xMin)) {
+    if (((origPts[0].x > (double)graphPtr->right)) ||
+	((origPts[mapPtr->nScreenPts - 1].x < (double)graphPtr->left))) {
 	return;			/* All points are clipped */
     }
     /*
-     * The abscissas of the extra interpolated points will be each pixel across
-     * the plotting area.  This is the advantage of interpolating the screen
-     * coordinates instead of the data points.
+     * The spline is computed in screen coordinates instead of data
+     * points so that we can select the abscissas of the interpolated
+     * points from each pixel horizontally across the plotting area.
      */
-
-    extraPoints = (graphPtr->xMax - graphPtr->xMin) + 1;
-    if (extraPoints < 1) {
+    extra = (graphPtr->right - graphPtr->left) + 1;
+    if (extra < 1) {
 	return;
     }
-    newSize = tmpPtr->numPoints + extraPoints + 1;
-    newArr = (Point2D *)malloc(newSize * sizeof(Point2D));
-    assert(newArr);
+    nIntpPts = nOrigPts + extra + 1;
+    intpPts = Blt_Malloc(nIntpPts * sizeof(Point2D));
+    assert(intpPts);
 
-    indexArr = (int *)malloc(sizeof(int) * newSize);
-    assert(indexArr);
-    /*
-     * Allocate one big array which will contain smaller arrays of
-     *	(2) the original x and y coordinates, and
-     *	(2) the interpolated x and y coordinates
-     */
+    indices = Blt_Malloc(sizeof(int) * nIntpPts);
+    assert(indices);
 
-    x1 = (double *)malloc(((tmpPtr->numPoints + newSize) * 2) * sizeof(double));
-    y1 = x1 + tmpPtr->numPoints;
-    x2 = y1 + tmpPtr->numPoints;
-    y2 = x2 + newSize;
-    assert(x1);
-
-    /*
-     * Copy the transformed screen coordinates into x1 and y1 vectors.  This is
-     * necessary because the spline routines need the x-y coordinates passed as
-     * individual arrays, not an array of Point2D coordinates.
-     */
-
-    for (i = 0; i < tmpPtr->numPoints; i++) {
-	x1[i] = tmpPtr->points[i].x;
-	y1[i] = tmpPtr->points[i].y;
-    }
-
-    /*
-     * Now populate the x2 array with original x cooridinates and extra
-     * x-coordinates representing each pixel in the plotting area the line
-     * segment contains.
-     */
-
+    /* Populate the x2 array with both the original X-coordinates and
+     * extra X-coordinates for each horizontal pixel that the line
+     * segment contains. */
     count = 0;
-    for (i = 0, j = 1; j < tmpPtr->numPoints; i++, j++) {
+    for (i = 0, j = 1; j < nOrigPts; i++, j++) {
 
 	/* Add the original x-coordinate */
-	x2[count] = x1[i];
+	intpPts[count].x = origPts[i].x;
 
 	/* Include the starting offset of the point in the offset array */
-	indexArr[count] = tmpPtr->indexArr[i];
+	indices[count] = mapPtr->indices[i];
 	count++;
 
-	/*
-	 * Is any part of the interval (line segment) in the plotting area?
-	 */
-	if ((x1[j] >= (double)graphPtr->xMin) ||
-	    (x1[i] <= (double)graphPtr->xMax)) {
+	/* Is any part of the interval (line segment) in the plotting
+	 * area?  */
+	if ((origPts[j].x >= (double)graphPtr->left) || 
+	    (origPts[i].x <= (double)graphPtr->right)) {
 	    int last;
 
-	    x = (int)(x1[i] + 1.0);
+	    x = (int)(origPts[i].x + 1.0);
 
 	    /*
-	     * Since the line segment may be partially clipped on the left or
-	     * right side, the points we need to interpolate will be interior to
-	     * the plotting area.
+	     * Since the line segment may be partially clipped on the
+	     * left or right side, the points to interpolate are
+	     * always interior to the plotting area.
 	     *
-	     *           xMin			    xMax
+	     *           left			    right
 	     *      x1----|--------------------------|---x2
 	     *
-	     * So pick the greater of starting x-coordinate and the left edge
-	     * and the lesser of the last x-coordinate and the right edge.
+	     * Pick the max of the starting X-coordinate and the
+	     * left edge and the min of the last X-coordinate and
+	     * the right edge.
 	     */
+	    x = MAX(x, graphPtr->left);
+	    last = (int)MIN(origPts[j].x, graphPtr->right);
 
-	    x = MAX(x, graphPtr->xMin);
-	    last = (int)MIN(x1[j], graphPtr->xMax);
-
-	    /* Now add extra x-coordinates to visible portion of the interval */
+	    /* Add the extra x-coordinates to the interval. */
 	    while (x < last) {
-		indexArr[count] = tmpPtr->indexArr[i];
-		x2[count++] = (double)x;
+		indices[count] = mapPtr->indices[i];
+		intpPts[count++].x = (double)x;
 		x++;
 	    }
 	}
     }
-
-    failed = 0;
-    if (linePtr->smooth == PEN_NATURAL) {
-	failed = Blt_NaturalSpline(x1, y1, tmpPtr->numPoints, x2, y2, count);
-    } else if (linePtr->smooth == PEN_QUADRATIC) {
-	failed = Blt_QuadraticSpline(x1, y1, tmpPtr->numPoints, x2, y2, count,
-	    0.0);
+    nIntpPts = count;
+    result = FALSE;
+    if (linePtr->smooth == PEN_SMOOTH_NATURAL) {
+	result = Blt_NaturalSpline(origPts, nOrigPts, intpPts, nIntpPts);
+    } else if (linePtr->smooth == PEN_SMOOTH_QUADRATIC) {
+	result = Blt_QuadraticSpline(origPts, nOrigPts, intpPts, nIntpPts);
     }
-    if (!failed) {
-	/*
-	 * Merge the points of the spline, from the x and y vectors, back into
-	 * the array of Point2D structures.  Also, update the pen indices.
-	 */
-	free((char *)tmpPtr->points);
-	for (i = 0; i < count; i++) {
-	    newArr[i].x = x2[i], newArr[i].y = y2[i];
-	}
-	free((char *)tmpPtr->indexArr);
-	tmpPtr->indexArr = indexArr;
-	tmpPtr->points = newArr;
-	tmpPtr->numPoints = count;
+    if (!result) {
+	/* The spline interpolation failed.  We'll fallback to the
+	 * current coordinates and do no smoothing (standard line
+	 * segments).  */
+	linePtr->smooth = PEN_SMOOTH_NONE;
+	Blt_Free(intpPts);
+	Blt_Free(indices);
     } else {
-	/*
-	 * The spline interpolation failed.  We'll fallback to the current
-	 * coordinates and do no smoothing (standard line segments).
-	 */
-	linePtr->smooth = PEN_LINEAR;
-	free((char *)newArr);
-	free((char *)indexArr);
+	Blt_Free(mapPtr->screenPts);
+	Blt_Free(mapPtr->indices);
+	mapPtr->indices = indices;
+	mapPtr->screenPts = intpPts;
+	mapPtr->nScreenPts = nIntpPts;
     }
-    free((char *)x1);
 }
+
 
 /*
  *----------------------------------------------------------------------
  *
- * ComputePoints --
+ * GenerateParametricSpline --
+ *
+ *	Computes a spline based upon the data points, returning a new
+ *	(larger) coordinate array or points.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	The temporary arrays for screen coordinates and data indices
+ *	are updated based upon spline.
+ *
+ * FIXME:  Can't interpolate knots along the Y-axis.   Need to break
+ *	   up point array into interchangable X and Y vectors earlier.
+ *	   Pass extents (left/right or top/bottom) as parameters.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+GenerateParametricSpline(graphPtr, linePtr, mapPtr)
+    Graph *graphPtr;
+    Line *linePtr;
+    MapInfo *mapPtr;
+{
+    Extents2D exts;
+    Point2D *origPts, *intpPts;
+    Point2D p, q;
+    double dist;
+    int *indices;
+    int nIntpPts, nOrigPts;
+    int result;
+    register int i, j, count;
+
+    nOrigPts = mapPtr->nScreenPts;
+    origPts = mapPtr->screenPts;
+    assert(mapPtr->nScreenPts > 0);
+
+    Blt_GraphExtents(graphPtr, &exts);
+
+    /* 
+     * Populate the x2 array with both the original X-coordinates and
+     * extra X-coordinates for each horizontal pixel that the line
+     * segment contains. 
+     */
+    count = 1;
+    for (i = 0, j = 1; j < nOrigPts; i++, j++) {
+        p = origPts[i];
+        q = origPts[j];
+	count++;
+        if (Blt_LineRectClip(&exts, &p, &q)) {
+	    count += (int)(hypot(q.x - p.x, q.y - p.y) * 0.5);
+	}
+    }
+    nIntpPts = count;
+    intpPts = Blt_Malloc(nIntpPts * sizeof(Point2D));
+    assert(intpPts);
+
+    indices = Blt_Malloc(sizeof(int) * nIntpPts);
+    assert(indices);
+
+    /* 
+     * FIXME: This is just plain wrong.  The spline should be computed
+     *        and evaluated in separate steps.  This will mean breaking
+     *	      up this routine since the catrom coefficients can be
+     *	      independently computed for original data point.  This 
+     *	      also handles the problem of allocating enough points 
+     *	      since evaluation is independent of the number of points 
+     *		to be evalualted.  The interpolated 
+     *	      line segments should be clipped, not the original segments.
+     */
+    count = 0;
+    for (i = 0, j = 1; j < nOrigPts; i++, j++) {
+        p = origPts[i];
+        q = origPts[j];
+
+        dist = hypot(q.x - p.x, q.y - p.y);
+        /* Add the original x-coordinate */
+        intpPts[count].x = (double)i;
+        intpPts[count].y = 0.0;
+
+        /* Include the starting offset of the point in the offset array */
+        indices[count] = mapPtr->indices[i];
+        count++;
+
+        /* Is any part of the interval (line segment) in the plotting
+         * area?  */
+
+        if (Blt_LineRectClip(&exts, &p, &q)) {
+            double distP, distQ;
+
+            distP = hypot(p.x - origPts[i].x, p.y - origPts[i].y);
+            distQ = hypot(q.x - origPts[i].x, q.y - origPts[i].y);
+            distP += 2.0;
+            while(distP <= distQ) {
+                /* Point is indicated by its interval and parameter t. */
+                intpPts[count].x = (double)i;
+                intpPts[count].y =  distP / dist;
+                indices[count] = mapPtr->indices[i];
+                count++;
+                distP += 2.0;
+            }
+        }
+    }
+    intpPts[count].x = (double)i;
+    intpPts[count].y = 0.0;
+    indices[count] = mapPtr->indices[i];
+    count++;
+    nIntpPts = count;
+    result = FALSE;
+    if (linePtr->smooth == PEN_SMOOTH_NATURAL) {
+        result = Blt_NaturalParametricSpline(origPts, nOrigPts, &exts, FALSE,
+                            intpPts, nIntpPts);
+    } else if (linePtr->smooth == PEN_SMOOTH_CATROM) {
+        result = Blt_CatromParametricSpline(origPts, nOrigPts, intpPts,
+                                            nIntpPts);
+    }
+    if (!result) {
+        /* The spline interpolation failed.  We'll fallback to the
+         * current coordinates and do no smoothing (standard line
+         * segments).  */
+        linePtr->smooth = PEN_SMOOTH_NONE;
+        Blt_Free(intpPts);
+        Blt_Free(indices);
+    } else {
+        Blt_Free(mapPtr->screenPts);
+        Blt_Free(mapPtr->indices);
+        mapPtr->indices = indices;
+        mapPtr->screenPts = intpPts;
+        mapPtr->nScreenPts = nIntpPts;
+    }
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * MapSymbols --
  *
  *	Creates two arrays of points and pen indices, filled with
  *	the screen coordinates of the visible
@@ -1812,41 +2143,43 @@ GenerateSpline(graphPtr, linePtr, tmpPtr)
  *----------------------------------------------------------------------
  */
 static void
-ComputePoints(graphPtr, linePtr, tmpPtr)
+MapSymbols(graphPtr, linePtr, mapPtr)
     Graph *graphPtr;
     Line *linePtr;
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
-    Extents2D extents;
-    XPoint *pointArr;
-    int *indexArr;
+    Extents2D exts;
+    Point2D *symbolPts;
+    int *indices;
     register int i, count;
-    register Point2D *coordPtr;
 
-    Blt_SetClipRegion(graphPtr, &extents);
-    pointArr = (XPoint *)malloc(sizeof(XPoint) * tmpPtr->numPoints);
-    assert(pointArr);
-    indexArr = (int *)malloc(sizeof(int) * tmpPtr->numPoints);
-    assert(indexArr);
-    count = 0;
-    for (coordPtr = tmpPtr->points, i = 0; i < tmpPtr->numPoints;
-	i++, coordPtr++) {
-	if (PointInRegion(&extents, coordPtr->x, coordPtr->y)) {
-	    pointArr[count].x = (int)(coordPtr->x);
-	    pointArr[count].y = (int)(coordPtr->y);
-	    indexArr[count] = tmpPtr->indexArr[i];
+    symbolPts = Blt_Malloc(sizeof(Point2D) * mapPtr->nScreenPts);
+    assert(symbolPts);
+
+    indices = Blt_Malloc(sizeof(int) * mapPtr->nScreenPts);
+    assert(indices);
+
+    Blt_GraphExtents(graphPtr, &exts);
+    count = 0;			/* Count the number of visible points */
+
+    for (i = 0; i < mapPtr->nScreenPts; i++) {
+	if (PointInRegion(&exts, mapPtr->screenPts[i].x, 
+		  mapPtr->screenPts[i].y)) {
+	    symbolPts[count].x = mapPtr->screenPts[i].x;
+	    symbolPts[count].y = mapPtr->screenPts[i].y;
+	    indices[count] = mapPtr->indices[i];
 	    count++;
 	}
     }
-    linePtr->pointArr = pointArr;
-    linePtr->numPoints = count;
-    linePtr->pointMap = indexArr;
+    linePtr->symbolPts = symbolPts;
+    linePtr->nSymbolPts = count;
+    linePtr->symbolToData = indices;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ComputeActivePoints --
+ * MapActiveSymbols --
  *
  *	Creates an array of points of the active graph coordinates.
  *
@@ -1859,52 +2192,62 @@ ComputePoints(graphPtr, linePtr, tmpPtr)
  *----------------------------------------------------------------------
  */
 static void
-ComputeActivePoints(graphPtr, linePtr)
+MapActiveSymbols(graphPtr, linePtr)
     Graph *graphPtr;
     Line *linePtr;
 {
-    Extents2D extents;
+    Extents2D exts;
     double x, y;
-    int numActive;
-    Point2D point;
-    XPoint *activeArr;
+    int count;
+    Point2D *activePts;
     register int i;
-    int activeIndex;
-    int numPoints;
+    int pointIndex;
+    int nPoints;
+    int *activeToData;
 
-    Blt_SetClipRegion(graphPtr, &extents);
-    numActive = 0;
-    activeArr = (XPoint *)malloc(sizeof(XPoint) * linePtr->reqNumActive);
-    assert(activeArr);
-    numPoints = NumberOfPoints(linePtr);
-    for (i = 0; i < linePtr->reqNumActive; i++) {
-	activeIndex = linePtr->reqActiveArr[i];
-	if (activeIndex >= numPoints) {
+    if (linePtr->activePts != NULL) {
+	Blt_Free(linePtr->activePts);
+	linePtr->activePts = NULL;
+    }
+    if (linePtr->activeToData != NULL) {
+	Blt_Free(linePtr->activeToData);
+	linePtr->activeToData = NULL;
+    }
+    Blt_GraphExtents(graphPtr, &exts);
+    activePts = Blt_Malloc(sizeof(Point2D) * linePtr->nActiveIndices);
+    assert(activePts);
+    activeToData = Blt_Malloc(sizeof(int) * linePtr->nActiveIndices);
+    nPoints = NumberOfPoints(linePtr);
+    count = 0;			/* Count the visible active points */
+    for (i = 0; i < linePtr->nActiveIndices; i++) {
+	pointIndex = linePtr->activeIndices[i];
+	if (pointIndex >= nPoints) {
 	    continue;		/* Index not available */
 	}
-	x = linePtr->x.valueArr[activeIndex];
-	y = linePtr->y.valueArr[activeIndex];
-	point = Blt_Transform2DPt(graphPtr, x, y, &(linePtr->axes));
-	if (PointInRegion(&extents, point.x, point.y)) {
-	    activeArr[numActive].x = (int)(point.x);
-	    activeArr[numActive].y = (int)(point.y);
-	    numActive++;
+	x = linePtr->x.valueArr[pointIndex];
+	y = linePtr->y.valueArr[pointIndex];
+	activePts[count] = Blt_Map2D(graphPtr, x, y, &(linePtr->axes));
+	activeToData[count] = pointIndex;
+	if (PointInRegion(&exts, activePts[count].x, activePts[count].y)) {
+	    count++;
 	}
     }
-    if (numActive > 0) {
-	linePtr->activeArr = activeArr;
+    if (count > 0) {
+	linePtr->activePts = activePts;
+	linePtr->activeToData = activeToData;
     } else {
-	/* No indices were available */
-	free((char *)activeArr);
+	/* No active points were visible. */
+	Blt_Free(activePts);
+	Blt_Free(activeToData);	
     }
-    linePtr->numActive = numActive;
-    linePtr->flags &= ~ELEM_UPDATE_ACTIVE;
+    linePtr->nActivePts = count;
+    linePtr->flags &= ~ACTIVE_PENDING;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ComputeSegments --
+ * MapStrip --
  *
  *	Creates an array of line segments of the graph coordinates.
  *
@@ -1917,44 +2260,45 @@ ComputeActivePoints(graphPtr, linePtr)
  *----------------------------------------------------------------------
  */
 static void
-ComputeSegments(graphPtr, linePtr, tmpPtr)
+MapStrip(graphPtr, linePtr, mapPtr)
     Graph *graphPtr;
     Line *linePtr;
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
-    Extents2D extents;
-    XSegment *segArr;
-    int *indexArr;
-    register Point2D *p1Ptr, *p2Ptr;
+    Extents2D exts;
+    Segment2D *strips;
+    int *indices, *indexPtr;
+    register Point2D *endPtr, *pointPtr;
+    register Segment2D *segPtr;
     register int count;
-    register int i;
 
-    Blt_SetClipRegion(graphPtr, &extents);
-    indexArr = (int *)malloc(sizeof(int) * tmpPtr->numPoints);
-    assert(indexArr);
-    segArr = (XSegment *)malloc(tmpPtr->numPoints * sizeof(XSegment));
-    assert(segArr);
-    count = 0;
-    p1Ptr = tmpPtr->points;
-    p2Ptr = p1Ptr + 1;
-    if (tmpPtr->indexArr != NULL) {
-	for (i = 1; i < tmpPtr->numPoints; i++, p1Ptr++, p2Ptr++) {
-	    if (Blt_ClipSegment(&extents, p1Ptr, p2Ptr, segArr + count)) {
-		indexArr[count] = tmpPtr->indexArr[i];
-		count++;
-	    }
-	}
-    } else {
-	for (i = 1; i < tmpPtr->numPoints; i++, p1Ptr++, p2Ptr++) {
-	    if (Blt_ClipSegment(&extents, p1Ptr, p2Ptr, segArr + count)) {
-		indexArr[count] = tmpPtr->indexArr[i];
-		count++;
-	    }
+    indices = Blt_Malloc(sizeof(int) * mapPtr->nScreenPts);
+    assert(indices);
+
+    /* 
+     * Create array to hold points for line segments (not polyline 
+     * coordinates).  So allocate twice the number of points.  
+     */
+    segPtr = strips = Blt_Malloc(mapPtr->nScreenPts * sizeof(Segment2D));
+    assert(strips);
+
+    Blt_GraphExtents(graphPtr, &exts);
+    count = 0;			/* Count the number of segments. */
+    indexPtr = mapPtr->indices;
+    for (pointPtr = mapPtr->screenPts, 
+	     endPtr = mapPtr->screenPts + (mapPtr->nScreenPts - 1);
+	 pointPtr < endPtr; pointPtr++, indexPtr++) {
+	segPtr->p = pointPtr[0];
+	segPtr->q = pointPtr[1];
+	if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+	    segPtr++;
+	    indices[count] = *indexPtr;
+	    count++;
 	}
     }
-    linePtr->segMap = indexArr;
-    linePtr->numSegments = count;
-    linePtr->segArr = segArr;
+    linePtr->stripToData = indices;
+    linePtr->nStrips = count;
+    linePtr->strips = strips;
 }
 
 /*
@@ -1974,87 +2318,143 @@ ComputeSegments(graphPtr, linePtr, tmpPtr)
  *----------------------------------------------------------------------
  */
 static void
-MergePens(linePtr)
+MergePens(linePtr, dataToStyle)
     Line *linePtr;
+    PenStyle **dataToStyle;
 {
-    LineStyle *stylePtr;
-    register int count;
-    register int i, styleNum;
-    int *styleDir;
+    LinePenStyle *stylePtr;
+    register int i;
+    Blt_ChainLink *linkPtr;
 
-    stylePtr = linePtr->styles;
-    stylePtr->symbolSize = ScaleSymbol(linePtr, stylePtr->penPtr->symbol.size);
-
-    if (linePtr->numStyles < 2) {
-	stylePtr->numSegments = linePtr->numSegments;
-	stylePtr->segPtr = linePtr->segArr;
-	stylePtr->numPoints = linePtr->numPoints;
-	stylePtr->pointPtr = linePtr->pointArr;
+    if (Blt_ChainGetLength(linePtr->palette) < 2) {
+	linkPtr = Blt_ChainFirstLink(linePtr->palette);
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	stylePtr->nStrips = linePtr->nStrips;
+	stylePtr->strips = linePtr->strips;
+	stylePtr->nSymbolPts = linePtr->nSymbolPts;
+	stylePtr->symbolPts = linePtr->symbolPts;
+	stylePtr->xErrorBarCnt = linePtr->xErrorBarCnt;
+	stylePtr->yErrorBarCnt = linePtr->yErrorBarCnt;
+	stylePtr->xErrorBars = linePtr->xErrorBars;
+	stylePtr->yErrorBars = linePtr->yErrorBars;
+	stylePtr->errorBarCapWidth = linePtr->errorBarCapWidth;
 	return;
     }
-    styleDir = GetWeights(linePtr, NumberOfPoints(linePtr));
 
-    /*
-     * We have more than one style, so we need to group line segments and points
-     * of like pen styles.
-     */
-    if (linePtr->numSegments > 0) {
-	XSegment *segArr;
-	int *indexArr;
-	register XSegment *segPtr;
+    /* We have more than one style. Group line segments and points of
+     * like pen styles.  */
+
+    if (linePtr->nStrips > 0) {
+	Segment2D *strips;
+	int *stripToData;
+	register Segment2D *segPtr;
 	register int *indexPtr;
+	int dataIndex;
 
-	segArr = (XSegment *)malloc(linePtr->numSegments * sizeof(XSegment));
-	indexArr = (int *)malloc(linePtr->numSegments * sizeof(int));
-	assert(segArr && indexArr);
-	segPtr = segArr, indexPtr = indexArr;
-	for (stylePtr = linePtr->styles, styleNum = 0;
-	    styleNum < linePtr->numStyles; styleNum++, stylePtr++) {
-	    count = 0;
-	    stylePtr->segPtr = segPtr;
-	    for (i = 0; i < linePtr->numSegments; i++) {
-		if (styleDir[linePtr->segMap[i]] == styleNum) {
-		    *segPtr++ = linePtr->segArr[i];
-		    *indexPtr++ = i;
-		    count++;
+	strips = Blt_Malloc(linePtr->nStrips * sizeof(Segment2D));
+	stripToData = Blt_Malloc(linePtr->nStrips * sizeof(int));
+	assert(strips && stripToData);
+	segPtr = strips, indexPtr = stripToData;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    stylePtr->strips = segPtr;
+	    for (i = 0; i < linePtr->nStrips; i++) {
+		dataIndex = linePtr->stripToData[i];
+		if (dataToStyle[dataIndex] == (PenStyle *)stylePtr) {
+		    *segPtr++ = linePtr->strips[i];
+		    *indexPtr++ = dataIndex;
 		}
 	    }
-	    stylePtr->numSegments = count;
+	    stylePtr->nStrips = segPtr - stylePtr->strips;
 	}
-	free((char *)linePtr->segArr);
-	linePtr->segArr = segArr;
-	free((char *)linePtr->segMap);
-	linePtr->segMap = indexArr;
+	Blt_Free(linePtr->strips);
+	linePtr->strips = strips;
+	Blt_Free(linePtr->stripToData);
+	linePtr->stripToData = stripToData;
     }
-    if (linePtr->numPoints > 0) {
-	XPoint *pointArr;
+    if (linePtr->nSymbolPts > 0) {
 	int *indexPtr;
-	register XPoint *pointPtr;
-	register int *indexArr;
+	register Point2D *symbolPts, *pointPtr;
+	register int *symbolToData;
+	int dataIndex;
 
-	pointArr = (XPoint *)malloc(linePtr->numPoints * sizeof(XPoint));
-	indexArr = (int *)malloc(linePtr->numPoints * sizeof(int));
-	assert(pointArr && indexArr);
-	pointPtr = pointArr, indexPtr = indexArr;
-	for (stylePtr = linePtr->styles, styleNum = 0;
-	    styleNum < linePtr->numStyles; styleNum++, stylePtr++) {
-	    count = 0;
-	    stylePtr->pointPtr = pointPtr;
-	    for (i = 0; i < linePtr->numPoints; i++) {
-		if (styleDir[linePtr->pointMap[i]] == styleNum) {
-		    *pointPtr++ = linePtr->pointArr[i];
-		    *indexPtr++ = i;
-		    count++;
+	symbolPts = Blt_Malloc(linePtr->nSymbolPts * sizeof(Point2D));
+	symbolToData = Blt_Malloc(linePtr->nSymbolPts * sizeof(int));
+	assert(symbolPts && symbolToData);
+	pointPtr = symbolPts, indexPtr = symbolToData;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    stylePtr->symbolPts = pointPtr;
+	    for (i = 0; i < linePtr->nSymbolPts; i++) {
+		dataIndex = linePtr->symbolToData[i];
+		if (dataToStyle[dataIndex] == (PenStyle *)stylePtr) {
+		    *pointPtr++ = linePtr->symbolPts[i];
+		    *indexPtr++ = dataIndex;
 		}
 	    }
-	    stylePtr->numPoints = count;
+	    stylePtr->nSymbolPts = pointPtr - stylePtr->symbolPts;
 	}
-	free((char *)linePtr->pointArr);
-	linePtr->pointArr = pointArr;
-	free((char *)linePtr->pointMap);
-	linePtr->pointMap = indexArr;
+	Blt_Free(linePtr->symbolPts);
+	linePtr->symbolPts = symbolPts;
+	Blt_Free(linePtr->symbolToData);
+	linePtr->symbolToData = symbolToData;
     }
-    free((char *)styleDir);
+    if (linePtr->xErrorBarCnt > 0) {
+	Segment2D *xErrorBars, *segPtr;
+	int *xErrorToData, *indexPtr;
+	int dataIndex;
+
+	xErrorBars = Blt_Malloc(linePtr->xErrorBarCnt * sizeof(Segment2D));
+	xErrorToData = Blt_Malloc(linePtr->xErrorBarCnt * sizeof(int));
+	assert(xErrorBars);
+	segPtr = xErrorBars, indexPtr = xErrorToData;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); 
+	     linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    stylePtr->xErrorBars = segPtr;
+	    for (i = 0; i < linePtr->xErrorBarCnt; i++) {
+		dataIndex = linePtr->xErrorToData[i];
+		if (dataToStyle[dataIndex] == (PenStyle *)stylePtr) {
+		    *segPtr++ = linePtr->xErrorBars[i];
+		    *indexPtr++ = dataIndex;
+		}
+	    }
+	    stylePtr->xErrorBarCnt = segPtr - stylePtr->xErrorBars;
+	}
+	Blt_Free(linePtr->xErrorBars);
+	linePtr->xErrorBars = xErrorBars;
+	Blt_Free(linePtr->xErrorToData);
+	linePtr->xErrorToData = xErrorToData;
+    }
+    if (linePtr->yErrorBarCnt > 0) {
+	Segment2D *errorBars, *segPtr;
+	int *errorToData, *indexPtr;
+	int dataIndex;
+
+	errorBars = Blt_Malloc(linePtr->yErrorBarCnt * sizeof(Segment2D));
+	errorToData = Blt_Malloc(linePtr->yErrorBarCnt * sizeof(int));
+	assert(errorBars);
+	segPtr = errorBars, indexPtr = errorToData;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); 
+	     linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    stylePtr->yErrorBars = segPtr;
+	    for (i = 0; i < linePtr->yErrorBarCnt; i++) {
+		dataIndex = linePtr->yErrorToData[i];
+		if (dataToStyle[dataIndex] == (PenStyle *)stylePtr) {
+		    *segPtr++ = linePtr->yErrorBars[i];
+		    *indexPtr++ = dataIndex;
+		}
+	    }
+	    stylePtr->yErrorBarCnt = segPtr - stylePtr->yErrorBars;
+	}
+	Blt_Free(linePtr->yErrorBars);
+	linePtr->yErrorBars = errorBars;
+	Blt_Free(linePtr->yErrorToData);
+	linePtr->yErrorToData = errorToData;
+    }
 }
 
 #define CLIP_TOP	(1<<0)
@@ -2062,33 +2462,32 @@ MergePens(linePtr)
 #define CLIP_RIGHT	(1<<2)
 #define CLIP_LEFT	(1<<3)
 
-
 INLINE static int
-OutCode(extentsPtr, x, y)
-    Extents2D *extentsPtr;
-    double x, y;
+OutCode(extsPtr, p)
+    Extents2D *extsPtr;
+    Point2D *p;
 {
     int code;
 
     code = 0;
-    if (x > extentsPtr->xMax) {
+    if (p->x > extsPtr->right) {
 	code |= CLIP_RIGHT;
-    } else if (x < extentsPtr->xMin) {
+    } else if (p->x < extsPtr->left) {
 	code |= CLIP_LEFT;
     }
-    if (y > extentsPtr->yMax) {
+    if (p->y > extsPtr->bottom) {
 	code |= CLIP_BOTTOM;
-    } else if (y < extentsPtr->yMin) {
+    } else if (p->y < extsPtr->top) {
 	code |= CLIP_TOP;
     }
     return code;
 }
 
 static int
-ClipSegment(extentsPtr, code1, code2, p1Ptr, p2Ptr)
-    Extents2D *extentsPtr;
+ClipSegment(extsPtr, code1, code2, p, q)
+    Extents2D *extsPtr;
     register int code1, code2;
-    register Point2D *p1Ptr, *p2Ptr;
+    register Point2D *p, *q;
 {
     int inside, outside;
 
@@ -2101,31 +2500,31 @@ ClipSegment(extentsPtr, code1, code2, p1Ptr, p2Ptr)
      */
     while ((!outside) && (!inside)) {
 	if (code1 == 0) {
-	    Point2D *ptr;
+	    Point2D *tmp;
 	    int code;
 
-	    ptr = p1Ptr;
-	    p1Ptr = p2Ptr, p2Ptr = ptr;
+	    /* Swap pointers and out codes */
+	    tmp = p, p = q, q = tmp;
 	    code = code1, code1 = code2, code2 = code;
 	}
 	if (code1 & CLIP_LEFT) {
-	    p1Ptr->y += (p2Ptr->y - p1Ptr->y) *
-		(extentsPtr->xMin - p1Ptr->x) / (p2Ptr->x - p1Ptr->x);
-	    p1Ptr->x = extentsPtr->xMin;
+	    p->y += (q->y - p->y) *
+		(extsPtr->left - p->x) / (q->x - p->x);
+	    p->x = extsPtr->left;
 	} else if (code1 & CLIP_RIGHT) {
-	    p1Ptr->y += (p2Ptr->y - p1Ptr->y) *
-		(extentsPtr->xMax - p1Ptr->x) / (p2Ptr->x - p1Ptr->x);
-	    p1Ptr->x = extentsPtr->xMax;
+	    p->y += (q->y - p->y) *
+		(extsPtr->right - p->x) / (q->x - p->x);
+	    p->x = extsPtr->right;
 	} else if (code1 & CLIP_BOTTOM) {
-	    p1Ptr->x += (p2Ptr->x - p1Ptr->x) *
-		(extentsPtr->yMax - p1Ptr->y) / (p2Ptr->y - p1Ptr->y);
-	    p1Ptr->y = extentsPtr->yMax;
+	    p->x += (q->x - p->x) *
+		(extsPtr->bottom - p->y) / (q->y - p->y);
+	    p->y = extsPtr->bottom;
 	} else if (code1 & CLIP_TOP) {
-	    p1Ptr->x += (p2Ptr->x - p1Ptr->x) *
-		(extentsPtr->yMin - p1Ptr->y) / (p2Ptr->y - p1Ptr->y);
-	    p1Ptr->y = extentsPtr->yMin;
+	    p->x += (q->x - p->x) *
+		(extsPtr->top - p->y) / (q->y - p->y);
+	    p->y = extsPtr->top;
 	}
-	code1 = OutCode(extentsPtr, p1Ptr->x, p1Ptr->y);
+	code1 = OutCode(extsPtr, p);
 
 	inside = ((code1 | code2) == 0);
 	outside = ((code1 & code2) != 0);
@@ -2147,50 +2546,54 @@ ClipSegment(extentsPtr, code1, code2, p1Ptr, p2Ptr)
  *----------------------------------------------------------------------
  */
 static void
-SaveTrace(linePtr, start, length, tmpPtr)
+SaveTrace(linePtr, start, length, mapPtr)
     Line *linePtr;
     int start;			/* Starting index of the trace in data point
 				 * array.  Used to figure out closest point */
     int length;			/* Number of points forming the trace */
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
     Trace *tracePtr;
-    XPoint *pointArr;
-    int *indexArr;
+    Point2D *screenPts;
+    int *indices;
     register int i, j;
 
-    tracePtr = (Trace *)malloc(sizeof(Trace));
+    tracePtr = Blt_Malloc(sizeof(Trace));
     assert(tracePtr);
-    pointArr = (XPoint *)malloc(sizeof(XPoint) * length);
-    assert(pointArr);
-    indexArr = (int *)malloc(sizeof(int) * length);
-    assert(indexArr);
+    screenPts = Blt_Malloc(sizeof(Point2D) * length);
+    assert(screenPts);
+    indices = Blt_Malloc(sizeof(int) * length);
+    assert(indices);
 
     /* Copy the screen coordinates of the trace into the point array */
 
-    if (tmpPtr->indexArr != NULL) {
+    if (mapPtr->indices != NULL) {
 	for (i = 0, j = start; i < length; i++, j++) {
-	    pointArr[i].x = (int)(tmpPtr->points[j].x);
-	    pointArr[i].y = (int)(tmpPtr->points[j].y);
-	    indexArr[i] = tmpPtr->indexArr[j];
+	    screenPts[i].x = mapPtr->screenPts[j].x;
+	    screenPts[i].y = mapPtr->screenPts[j].y;
+	    indices[i] = mapPtr->indices[j];
 	}
     } else {
 	for (i = 0, j = start; i < length; i++, j++) {
-	    pointArr[i].x = (int)(tmpPtr->points[j].x);
-	    pointArr[i].y = (int)(tmpPtr->points[j].y);
-	    indexArr[i] = j;
+	    screenPts[i].x = mapPtr->screenPts[j].x;
+	    screenPts[i].y = mapPtr->screenPts[j].y;
+	    indices[i] = j;
 	}
     }
-    tracePtr->numPoints = length;
-    tracePtr->pointArr = pointArr;
-    tracePtr->indexArr = indexArr;
-    Blt_ListAppend(&(linePtr->traces), (char *)start, (ClientData)tracePtr);
+    tracePtr->nScreenPts = length;
+    tracePtr->screenPts = screenPts;
+    tracePtr->symbolToData = indices;
+    tracePtr->start = start;
+    if (linePtr->traces == NULL) {
+	linePtr->traces = Blt_ChainCreate();
+    }
+    Blt_ChainAppend(linePtr->traces, tracePtr);
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * DeleteTraces --
+ * FreeTraces --
  *
  *	Deletes all the traces for the line.
  *
@@ -2200,26 +2603,27 @@ SaveTrace(linePtr, start, length, tmpPtr)
  *----------------------------------------------------------------------
  */
 static void
-DeleteTraces(linePtr)
+FreeTraces(linePtr)
     Line *linePtr;
 {
-    register Blt_ListItem item;
-    register Trace *tracePtr;
+    Blt_ChainLink *linkPtr;
+    Trace *tracePtr;
 
-    for (item = Blt_ListFirstItem(&(linePtr->traces)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tracePtr = (Trace *)Blt_ListGetValue(item);
-	free((char *)tracePtr->indexArr);
-	free((char *)tracePtr->pointArr);
-	free((char *)tracePtr);
+    for (linkPtr = Blt_ChainFirstLink(linePtr->traces); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tracePtr = Blt_ChainGetValue(linkPtr);
+	Blt_Free(tracePtr->symbolToData);
+	Blt_Free(tracePtr->screenPts);
+	Blt_Free(tracePtr);
     }
-    Blt_ListReset(&(linePtr->traces));
+    Blt_ChainDestroy(linePtr->traces);
+    linePtr->traces = NULL;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ComputeTraces --
+ * MapTraces --
  *
  *	Creates an array of line segments of the graph coordinates.
  *
@@ -2231,34 +2635,33 @@ DeleteTraces(linePtr)
  *
  *----------------------------------------------------------------------
  */
-
 static void
-ComputeTraces(graphPtr, linePtr, tmpPtr)
+MapTraces(graphPtr, linePtr, mapPtr)
     Graph *graphPtr;
     Line *linePtr;
-    TransformInfo *tmpPtr;
+    MapInfo *mapPtr;
 {
     int start, count;
     int code1, code2;
-    Point2D *p1Ptr, *p2Ptr;
-    Point2D savePoint;
-    Extents2D extents;
+    Point2D *p, *q;
+    Point2D s;
+    Extents2D exts;
     register int i;
     int broken, offscreen;
 
-    Blt_SetClipRegion(graphPtr, &extents);
+    Blt_GraphExtents(graphPtr, &exts);
     count = 1;
-    code1 = OutCode(&extents, tmpPtr->points[0].x, tmpPtr->points[0].y);
-    p1Ptr = tmpPtr->points;
-    p2Ptr = p1Ptr + 1;
-    for (i = 1; i < tmpPtr->numPoints; i++, p1Ptr++, p2Ptr++) {
-	code2 = OutCode(&extents, p2Ptr->x, p2Ptr->y);
+    code1 = OutCode(&exts, mapPtr->screenPts);
+    p = mapPtr->screenPts;
+    q = p + 1;
+    for (i = 1; i < mapPtr->nScreenPts; i++, p++, q++) {
+	code2 = OutCode(&exts, q);
 	if (code2 != 0) {
 	    /* Save the coordinates of the last point, before clipping */
-	    savePoint = *p2Ptr;
+	    s = *q;
 	}
-	broken = BROKEN_TRACE(linePtr->penDir, p1Ptr->x, p2Ptr->x);
-	offscreen = ClipSegment(&extents, code1, code2, p1Ptr, p2Ptr);
+	broken = BROKEN_TRACE(linePtr->penDir, p->x, q->x);
+	offscreen = ClipSegment(&exts, code1, code2, p, q);
 	if (broken || offscreen) {
 
 	    /*
@@ -2270,7 +2673,7 @@ ComputeTraces(graphPtr, linePtr, tmpPtr)
 
 	    if (count > 1) {
 		start = i - count;
-		SaveTrace(linePtr, start, count, tmpPtr);
+		SaveTrace(linePtr, start, count, mapPtr);
 		count = 1;
 	    }
 	} else {
@@ -2284,8 +2687,8 @@ ComputeTraces(graphPtr, linePtr, tmpPtr)
 		 */
 
 		start = i - (count - 1);
-		SaveTrace(linePtr, start, count, tmpPtr);
-		tmpPtr->points[i] = savePoint;
+		SaveTrace(linePtr, start, count, mapPtr);
+		mapPtr->screenPts[i] = s;
 		count = 1;
 	    }
 	}
@@ -2293,42 +2696,128 @@ ComputeTraces(graphPtr, linePtr, tmpPtr)
     }
     if (count > 1) {
 	start = i - count;
-	SaveTrace(linePtr, start, count, tmpPtr);
+	SaveTrace(linePtr, start, count, mapPtr);
     }
-}
-
-static void
-ResetLineInfo(linePtr)
-    Line *linePtr;
-{
-    DeleteTraces(linePtr);
-    if (linePtr->pointArr != NULL) {
-	free((char *)linePtr->pointArr);
-    }
-    if (linePtr->pointMap != NULL) {
-	free((char *)linePtr->pointMap);
-    }
-    if (linePtr->segArr != NULL) {
-	free((char *)linePtr->segArr);
-    }
-    if (linePtr->segMap != NULL) {
-	free((char *)linePtr->segMap);
-    }
-    if (linePtr->activeArr != NULL) {
-	free((char *)linePtr->activeArr);
-    }
-    linePtr->segArr = NULL;
-    linePtr->pointArr = NULL;
-    linePtr->activeArr = NULL;
-    linePtr->segMap = linePtr->pointMap = NULL;
-    ClearStyles(linePtr);
-    linePtr->numActive = linePtr->numPoints = linePtr->numSegments = 0;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * TransformLine --
+ * MapFillArea --
+ *
+ *	Creates an array of points that represent a polygon that fills
+ *	the area under the element.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Memory is  allocated for the polygon point array.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+MapFillArea(graphPtr, linePtr, mapPtr)
+    Graph *graphPtr;
+    Line *linePtr;
+    MapInfo *mapPtr;
+{
+    Point2D *origPts, *clipPts;
+    Extents2D exts;
+    double maxY;
+    register int i, n;
+
+    if (linePtr->fillPts != NULL) {
+	Blt_Free(linePtr->fillPts);
+	linePtr->fillPts = NULL;
+	linePtr->nFillPts = 0;
+    }
+    if (mapPtr->nScreenPts < 3) {
+	return;
+    }
+    n = mapPtr->nScreenPts + 3;
+    Blt_GraphExtents(graphPtr, &exts);
+
+    maxY = (double)graphPtr->bottom;
+    origPts = Blt_Malloc(sizeof(Point2D) * n);
+    for (i = 0; i < mapPtr->nScreenPts; i++) {
+	origPts[i].x = mapPtr->screenPts[i].x + 1;
+	origPts[i].y = mapPtr->screenPts[i].y;
+	if (origPts[i].y > maxY) {
+	    maxY = origPts[i].y;
+	}
+    }	
+    /* Add edges to make (if necessary) the polygon fill to the bottom
+     * of plotting window */
+    origPts[i].x = origPts[i - 1].x;
+    origPts[i].y = maxY;
+    i++;
+    origPts[i].x = origPts[0].x; 
+    origPts[i].y = maxY;
+    i++;
+    origPts[i] = origPts[0];
+
+    clipPts = Blt_Malloc(sizeof(Point2D) * n * 3);
+    assert(clipPts);
+    n = Blt_PolyRectClip(&exts, origPts, n - 1, clipPts);
+
+    Blt_Free(origPts);
+    if (n < 3) {
+	Blt_Free(clipPts);
+    } else {
+	linePtr->fillPts = clipPts;
+	linePtr->nFillPts = n;
+    }
+}
+
+static void
+ResetLine(linePtr)
+    Line *linePtr;
+{
+    FreeTraces(linePtr);
+    ClearPalette(linePtr->palette);
+    if (linePtr->symbolPts != NULL) {
+	Blt_Free(linePtr->symbolPts);
+    }
+    if (linePtr->symbolToData != NULL) {
+	Blt_Free(linePtr->symbolToData);
+    }
+    if (linePtr->strips != NULL) {
+	Blt_Free(linePtr->strips);
+    }
+    if (linePtr->stripToData != NULL) {
+	Blt_Free(linePtr->stripToData);
+    }
+    if (linePtr->activePts != NULL) {
+	Blt_Free(linePtr->activePts);
+    }
+    if (linePtr->activeToData != NULL) {
+	Blt_Free(linePtr->activeToData);
+    }
+    if (linePtr->xErrorBars != NULL) {
+	Blt_Free(linePtr->xErrorBars);
+    }
+    if (linePtr->xErrorToData != NULL) {
+	Blt_Free(linePtr->xErrorToData);
+    }
+    if (linePtr->yErrorBars != NULL) {
+	Blt_Free(linePtr->yErrorBars);
+    }
+    if (linePtr->yErrorToData != NULL) {
+	Blt_Free(linePtr->yErrorToData);
+    }
+    linePtr->xErrorBars = linePtr->yErrorBars = linePtr->strips = NULL;
+    linePtr->symbolPts = linePtr->activePts = NULL;
+    linePtr->stripToData = linePtr->symbolToData = linePtr->xErrorToData = 
+	linePtr->yErrorToData = linePtr->activeToData = NULL;
+    linePtr->nActivePts = linePtr->nSymbolPts = linePtr->nStrips = 
+	linePtr->xErrorBarCnt = linePtr->yErrorBarCnt = 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * MapLine --
  *
  *	Calculates the actual window coordinates of the line element.
  *	The window coordinates are saved in an allocated point array.
@@ -2342,63 +2831,330 @@ ResetLineInfo(linePtr)
  *----------------------------------------------------------------------
  */
 static void
-TransformLine(graphPtr, elemPtr)
+MapLine(graphPtr, elemPtr)
     Graph *graphPtr;		/* Graph widget record */
     Element *elemPtr;		/* Element component record */
 {
     Line *linePtr = (Line *)elemPtr;
-    TransformInfo tmp;
-    int numPoints;
-
-    ResetLineInfo(linePtr);
-    numPoints = NumberOfPoints(linePtr);
-    if (numPoints < 1) {
+    MapInfo mapInfo;
+    int size, nPoints;
+    PenStyle **dataToStyle;
+    Blt_ChainLink *linkPtr;
+    LinePenStyle *stylePtr;
+    
+    ResetLine(linePtr);
+    nPoints = NumberOfPoints(linePtr);
+    if (nPoints < 1) {
 	return;			/* No data points */
     }
-    GetScreenPoints(graphPtr, linePtr, &tmp);
-    ReducePoints(&tmp);
-    ComputePoints(graphPtr, linePtr, &tmp);
-    if ((linePtr->flags & ELEM_UPDATE_ACTIVE) && (linePtr->reqNumActive > 0)) {
-	ComputeActivePoints(graphPtr, linePtr);
+    GetScreenPoints(graphPtr, linePtr, &mapInfo);
+    MapSymbols(graphPtr, linePtr, &mapInfo);
+
+    if ((linePtr->flags & ACTIVE_PENDING) && (linePtr->nActiveIndices > 0)) {
+	MapActiveSymbols(graphPtr, linePtr);
     }
     /*
-     * Compute connecting line segments if they are to be displayed.
+     * Map connecting line segments if they are to be displayed.
      */
-    if ((numPoints > 1) &&
-	((graphPtr->type == TYPE_ELEM_STRIP) ||
-	    (linePtr->normalPen.lineWidth > 0))) {
+    if ((nPoints > 1) && ((graphPtr->classUid == bltStripElementUid) ||
+	    (linePtr->builtinPen.traceWidth > 0))) {
 	linePtr->smooth = linePtr->reqSmooth;
 
 	/*
 	 * Do smoothing if necessary.  This can extend the coordinate array,
-	 * so both tmp.points and tmp.numPoints may be change.
+	 * so both mapInfo.points and mapInfo.nPoints may change.
 	 */
 
 	switch (linePtr->smooth) {
-	case PEN_STEP:
-	    GenerateSteps(&tmp);
+	case PEN_SMOOTH_STEP:
+	    GenerateSteps(&mapInfo);
 	    break;
 
-	case PEN_NATURAL:
-	case PEN_QUADRATIC:
-	    if (tmp.numPoints < 3) {
-		/* Can't interpolate with only two points. */
-		linePtr->smooth = PEN_LINEAR;
+	case PEN_SMOOTH_NATURAL:
+	case PEN_SMOOTH_QUADRATIC:
+	    if (mapInfo.nScreenPts < 3) {
+		/* Can't interpolate with less than three points. */
+		linePtr->smooth = PEN_SMOOTH_NONE;
 	    } else {
-		GenerateSpline(graphPtr, linePtr, &tmp);
+		GenerateSpline(graphPtr, linePtr, &mapInfo);
 	    }
 	    break;
-	}
 
-	if (graphPtr->type == TYPE_ELEM_STRIP) {
-	    ComputeSegments(graphPtr, linePtr, &tmp);
+	case PEN_SMOOTH_CATROM:
+	    if (mapInfo.nScreenPts < 3) {
+		/* Can't interpolate with less than three points. */
+		linePtr->smooth = PEN_SMOOTH_NONE;
+	    } else {
+		GenerateParametricSpline(graphPtr, linePtr, &mapInfo);
+	    }
+	    break;
+
+	default:
+	    break;
+	}
+	if (linePtr->rTolerance > 0.0) {
+	    ReducePoints(&mapInfo, linePtr->rTolerance);
+	}
+	if ((linePtr->fillTile != NULL) || (linePtr->fillStipple != None)) {
+	    MapFillArea(graphPtr, linePtr, &mapInfo);
+	}
+	if (graphPtr->classUid == bltStripElementUid) {
+	    MapStrip(graphPtr, linePtr, &mapInfo);
 	} else {
-	    ComputeTraces(graphPtr, linePtr, &tmp);
+	    MapTraces(graphPtr, linePtr, &mapInfo);
 	}
     }
-    free((char *)tmp.points);
-    free((char *)tmp.indexArr);
-    MergePens(linePtr);
+    Blt_Free(mapInfo.screenPts);
+    Blt_Free(mapInfo.indices);
+
+    /* Set the symbol size of all the pen styles. */
+    for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	 linkPtr = Blt_ChainNextLink(linkPtr)) {
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	size = ScaleSymbol(elemPtr, stylePtr->penPtr->symbol.size);
+	stylePtr->symbolSize = size;
+	stylePtr->errorBarCapWidth = (stylePtr->penPtr->errorBarCapWidth > 0) 
+	    ? stylePtr->penPtr->errorBarCapWidth : (int)(size * 0.6666666);
+	stylePtr->errorBarCapWidth /= 2;
+    }
+    dataToStyle = Blt_StyleMap((Element *)linePtr);
+    if (((linePtr->yHigh.nValues > 0) && (linePtr->yLow.nValues > 0)) ||
+	((linePtr->xHigh.nValues > 0) && (linePtr->xLow.nValues > 0)) ||
+	(linePtr->xError.nValues > 0) || (linePtr->yError.nValues > 0)) {
+	Blt_MapErrorBars(graphPtr, (Element *)linePtr, dataToStyle);
+    }
+    MergePens(linePtr, dataToStyle);
+    Blt_Free(dataToStyle);
+}
+
+static double
+DistanceToLine(x, y, p, q, t)
+    int x, y;			/* Sample X-Y coordinate. */
+    Point2D *p, *q;		/* End points of the line segment. */
+    Point2D *t;			/* (out) Point on line segment. */
+{
+    double right, left, top, bottom;
+
+    *t = Blt_GetProjection(x, y, p, q);
+    if (p->x > q->x) {
+	right = p->x, left = q->x;
+    } else {
+	left = p->x, right = q->x;
+    }
+    if (p->y > q->y) {
+	bottom = p->y, top = q->y;
+    } else {
+	top = p->y, bottom = q->y;
+    }
+    if (t->x > right) {
+	t->x = right;
+    } else if (t->x < left) {
+	t->x = left;
+    }
+    if (t->y > bottom) {
+	t->y = bottom;
+    } else if (t->y < top) {
+	t->y = top;
+    }
+    return hypot((t->x - x), (t->y - y));
+}
+
+static double
+DistanceToX(x, y, p, q, t)
+    int x, y;			/* Search X-Y coordinate. */
+    Point2D *p, *q;		/* End points of the line segment. */
+    Point2D *t;			/* (out) Point on line segment. */
+{
+    double dx, dy;
+    double dist;
+
+    if (p->x > q->x) {
+	if ((x > p->x) || (x < q->x)) {
+	    return DBL_MAX; /* X-coordinate outside line segment. */
+	}
+    } else {
+	if ((x > q->x) || (x < p->x)) {
+	    return DBL_MAX; /* X-coordinate outside line segment. */
+	}
+    }
+    dx = p->x - q->x;
+    dy = p->y - q->y;
+    t->x = (double)x;
+    if (FABS(dx) < DBL_EPSILON) {
+	double d1, d2;
+	/* Same X-coordinate indicates a vertical line.  Pick the
+	 * closest end point. */
+	d1 = p->y - y;
+	d2 = q->y - y;
+	if (FABS(d1) < FABS(d2)) {
+	    t->y = p->y, dist = d1;
+	} else {
+	    t->y = q->y, dist = d2;
+	}
+    } else if (FABS(dy) < DBL_EPSILON) {
+	/* Horizontal line. */
+	t->y = p->y, dist = p->y - y;
+    } else {
+	double m, b;
+		
+	m = dy / dx;
+	b = p->y - (m * p->x);
+	t->y = (x * m) + b;
+	dist = y - t->y;
+    }
+   return FABS(dist);
+}
+
+static double
+DistanceToY(x, y, p, q, t)
+    int x, y;			/* Search X-Y coordinate. */
+    Point2D *p, *q;		/* End points of the line segment. */
+    Point2D *t;			/* (out) Point on line segment. */
+{
+    double dx, dy;
+    double dist;
+
+    if (p->y > q->y) {
+	if ((y > p->y) || (y < q->y)) {
+	    return DBL_MAX;
+	}
+    } else {
+	if ((y > q->y) || (y < p->y)) {
+	    return DBL_MAX;
+	}
+    }
+    dx = p->x - q->x;
+    dy = p->y - q->y;
+    t->y = y;
+    if (FABS(dy) < DBL_EPSILON) {
+	double d1, d2;
+
+	/* Save Y-coordinate indicates an horizontal line. Pick the
+	 * closest end point. */
+	d1 = p->x - x;
+	d2 = q->x - x;
+	if (FABS(d1) < FABS(d2)) {
+	    t->x = p->x, dist = d1;
+	} else {
+	    t->x = q->x, dist = d2;
+	}
+    } else if (FABS(dx) < DBL_EPSILON) {
+	/* Vertical line. */
+	t->x = p->x, dist = p->x - x;
+    } else {
+	double m, b;
+	
+	m = dy / dx;
+	b = p->y - (m * p->x);
+	t->x = (y - b) / m;
+	dist = x - t->x;
+    }
+    return FABS(dist);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ClosestTrace --
+ *
+ *	Find the line segment closest to the given window coordinate
+ *	in the element.
+ *
+ * Results:
+ *	If a new minimum distance is found, the information regarding
+ *	it is returned via searchPtr.
+ *
+ *----------------------------------------------------------------------
+ */
+static int
+ClosestTrace(graphPtr, linePtr, searchPtr, distProc)
+    Graph *graphPtr;		/* Graph widget record */
+    Line *linePtr;		/* Line element record */
+    ClosestSearch *searchPtr;	/* Info about closest point in element */
+    DistanceProc *distProc;
+{
+    Blt_ChainLink *linkPtr;
+    Point2D closest, b;
+    Trace *tracePtr;
+    double dist, minDist;
+    register Point2D *pointPtr, *endPtr;
+    int i;
+
+    i = -1;			/* Suppress compiler warning. */
+    minDist = searchPtr->dist;
+    for (linkPtr = Blt_ChainFirstLink(linePtr->traces); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tracePtr = Blt_ChainGetValue(linkPtr);
+	for (pointPtr = tracePtr->screenPts, 
+		 endPtr = tracePtr->screenPts + (tracePtr->nScreenPts - 1);
+	     pointPtr < endPtr; pointPtr++) {
+	    dist = (*distProc)(searchPtr->x, searchPtr->y, pointPtr, 
+		pointPtr + 1, &b);
+	    if (dist < minDist) {
+		closest = b;
+		i = tracePtr->symbolToData[pointPtr - tracePtr->screenPts];
+		minDist = dist;
+	    }
+	}
+    }
+    if (minDist < searchPtr->dist) {
+	searchPtr->dist = minDist;
+	searchPtr->elemPtr = (Element *)linePtr;
+	searchPtr->index = i;
+	searchPtr->point = Blt_InvMap2D(graphPtr, closest.x, closest.y,
+	    &(linePtr->axes));
+	return TRUE;
+    }
+    return FALSE;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * ClosestStrip --
+ *
+ *	Find the line segment closest to the given window coordinate
+ *	in the element.
+ *
+ * Results:
+ *	If a new minimum distance is found, the information regarding
+ *	it is returned via searchPtr.
+ *
+ *----------------------------------------------------------------------
+ */
+static int
+ClosestStrip(graphPtr, linePtr, searchPtr, distProc)
+    Graph *graphPtr;		/* Graph widget record */
+    Line *linePtr;		/* Line element record */
+    ClosestSearch *searchPtr;	/* Info about closest point in element */
+    DistanceProc *distProc;
+{
+    Point2D closest, b;
+    double dist, minDist;
+    int count;
+    int i;
+    register Segment2D *s;
+
+    i = 0;
+    minDist = searchPtr->dist;
+    s = linePtr->strips;
+    for (count = 0; count < linePtr->nStrips; count++, s++) {
+	dist = (*distProc)(searchPtr->x, searchPtr->y, &(s->p), &(s->q), &b);
+	if (dist < minDist) {
+	    closest = b;
+	    i = linePtr->stripToData[count];
+	    minDist = dist;
+	}
+    }
+    if (minDist < searchPtr->dist) {
+	searchPtr->dist = minDist;
+	searchPtr->elemPtr = (Element *)linePtr;
+	searchPtr->index = i;
+	searchPtr->point = Blt_InvMap2D(graphPtr, closest.x, closest.y,
+	    &(linePtr->axes));
+	return TRUE;
+    }
+    return FALSE;
 }
 
 /*
@@ -2423,186 +3179,52 @@ ClosestPoint(linePtr, searchPtr)
 {
     double dist, minDist;
     double dx, dy;
-    register int i;
-    int dataIndex;
+    int count, i;
+    register Point2D *pointPtr;
 
     minDist = searchPtr->dist;
+    i = 0;
 
     /*
-     * Test the sample point from the array of transformed points instead of
-     * the line's data points.
-     *
-     * The advantages are
-     *   1) we won't select a point that's offscreen, and
+     * Instead of testing each data point in graph coordinates, look at
+     * the array of mapped screen coordinates. The advantages are
+     *   1) only examine points that are visible (unclipped), and
      *   2) the computed distance is already in screen coordinates.
      */
-    for (i = 0; i < linePtr->numPoints; i++) {
-	dx = (double)(searchPtr->x - linePtr->pointArr[i].x);
-	dy = (double)(searchPtr->y - linePtr->pointArr[i].y);
-	dist = hypot(dx, dy);
+    pointPtr = linePtr->symbolPts;
+    for (count = 0; count < linePtr->nSymbolPts; count++, pointPtr++) {
+	dx = (double)(searchPtr->x - pointPtr->x);
+	dy = (double)(searchPtr->y - pointPtr->y);
+	if (searchPtr->along == SEARCH_BOTH) {
+	    dist = hypot(dx, dy);
+	} else if (searchPtr->along == SEARCH_X) {
+	    dist = dx;
+	} else if (searchPtr->along == SEARCH_Y) {
+	    dist = dy;
+	} else {
+	    /* This can't happen */
+	    continue;
+	}
 	if (dist < minDist) {
-	    dataIndex = linePtr->pointMap[i];
+	    i = linePtr->symbolToData[count];
 	    minDist = dist;
 	}
     }
     if (minDist < searchPtr->dist) {
 	searchPtr->elemPtr = (Element *)linePtr;
 	searchPtr->dist = minDist;
-	searchPtr->index = dataIndex;
-	searchPtr->point.x = linePtr->x.valueArr[dataIndex];
-	searchPtr->point.y = linePtr->y.valueArr[dataIndex];
+	searchPtr->index = i;
+	searchPtr->point.x = linePtr->x.valueArr[i];
+	searchPtr->point.y = linePtr->y.valueArr[i];
     }
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ClosestSegment --
+ * GetLineExtents --
  *
- *	Find the line segment closest to the given window coordinate
- *	in the element.
- *
- * Results:
- *	If a new minimum distance is found, the information regarding
- *	it is returned via searchPtr.
- *
- *----------------------------------------------------------------------
- */
-static void
-ClosestSegment(graphPtr, linePtr, searchPtr)
-    Graph *graphPtr;		/* Graph widget record */
-    Line *linePtr;		/* Line element record */
-    ClosestSearch *searchPtr;	/* Info about closest point in element */
-{
-    double dist, minDist;
-    Point2D savePoint, proj;
-    register XSegment *segPtr;
-    register int i;
-    int location = 0;
-    int xMin, xMax, yMin, yMax;
-
-    minDist = searchPtr->dist;
-    for (segPtr = linePtr->segArr, i = 0; i < linePtr->numSegments;
-	i++, segPtr++) {
-	proj = Blt_GetProjection(searchPtr->x, searchPtr->y,
-	    segPtr->x1, segPtr->y1, segPtr->x2, segPtr->y2);
-	if (segPtr->x1 > segPtr->x2) {
-	    xMax = segPtr->x1, xMin = segPtr->x2;
-	} else {
-	    xMax = segPtr->x2, xMin = segPtr->x1;
-	}
-	if (segPtr->y1 > segPtr->y2) {
-	    yMax = segPtr->y1, yMin = segPtr->y2;
-	} else {
-	    yMax = segPtr->y2, yMin = segPtr->y1;
-	}
-	if (proj.x > xMax) {
-	    proj.x = xMax;
-	} else if (proj.x < xMin) {
-	    proj.x = xMin;
-	}
-	if (proj.y > yMax) {
-	    proj.y = yMax;
-	} else if (proj.y < yMin) {
-	    proj.y = yMin;
-	}
-	dist = hypot((proj.x - searchPtr->x), (proj.y - searchPtr->y));
-	if (dist < minDist) {
-	    savePoint = proj;
-	    location = linePtr->segMap[i];
-	    minDist = dist;
-	}
-    }
-    if (minDist < searchPtr->dist) {
-	searchPtr->dist = minDist;
-	searchPtr->elemPtr = (Element *)linePtr;
-	searchPtr->index = location;
-	searchPtr->point = Blt_InvTransform2DPt(graphPtr, savePoint.x,
-	    savePoint.y, &(linePtr->axes));
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * ClosestTrace --
- *
- *	Find the line segment closest to the given window coordinate
- *	in the element.
- *
- * Results:
- *	If a new minimum distance is found, the information regarding
- *	it is returned via searchPtr.
- *
- *----------------------------------------------------------------------
- */
-static void
-ClosestTrace(graphPtr, linePtr, searchPtr)
-    Graph *graphPtr;		/* Graph widget record */
-    Line *linePtr;		/* Line element record */
-    ClosestSearch *searchPtr;	/* Info about closest point in element */
-{
-    double dist, minDist;
-    Point2D savePoint, proj;
-    XPoint *p1Ptr, *p2Ptr;
-    register int i;
-    int location = 0;
-    Trace *tracePtr;
-    Blt_ListItem item;
-    int xMin, xMax, yMin, yMax;
-
-    minDist = searchPtr->dist;
-    for (item = Blt_ListFirstItem(&(linePtr->traces)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tracePtr = (Trace *)Blt_ListGetValue(item);
-	p1Ptr = tracePtr->pointArr, p2Ptr = p1Ptr + 1;
-	for (i = 0; i < (tracePtr->numPoints - 1); i++, p1Ptr++, p2Ptr++) {
-	    proj = Blt_GetProjection(searchPtr->x, searchPtr->y, p1Ptr->x,
-		p1Ptr->y, p2Ptr->x, p2Ptr->y);
-	    if (p1Ptr->x > p2Ptr->x) {
-		xMax = p1Ptr->x, xMin = p2Ptr->x;
-	    } else {
-		xMin = p1Ptr->x, xMax = p2Ptr->x;
-	    }
-	    if (p1Ptr->y > p2Ptr->y) {
-		yMax = p1Ptr->y, yMin = p2Ptr->y;
-	    } else {
-		yMin = p1Ptr->y, yMax = p2Ptr->y;
-	    }
-	    if (proj.x > (double)xMax) {
-		proj.x = (double)xMax;
-	    } else if (proj.x < (double)xMin) {
-		proj.x = (double)xMin;
-	    }
-	    if (proj.y > (double)yMax) {
-		proj.y = (double)yMax;
-	    } else if (proj.y < (double)yMin) {
-		proj.y = (double)yMin;
-	    }
-	    dist = hypot((proj.x - (double)searchPtr->x),
-		(proj.y - (double)searchPtr->y));
-	    if (dist < minDist) {
-		savePoint = proj;
-		location = tracePtr->indexArr[i];
-		minDist = dist;
-	    }
-	}
-    }
-    if (minDist < searchPtr->dist) {
-	searchPtr->dist = minDist;
-	searchPtr->elemPtr = (Element *)linePtr;
-	searchPtr->index = location;
-	searchPtr->point = Blt_InvTransform2DPt(graphPtr, savePoint.x,
-	    savePoint.y, &(linePtr->axes));
-    }
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * GetLimits --
- *
- *	Retrieves the limits of the line element
+ *	Retrieves the range of the line element
  *
  * Results:
  *	Returns the number of data points in the element.
@@ -2610,31 +3232,147 @@ ClosestTrace(graphPtr, linePtr, searchPtr)
  *----------------------------------------------------------------------
  */
 static void
-GetLimits(vecPtr, logScale, minPtr, maxPtr)
-    ElemVector *vecPtr;
-    int logScale;
-    double *minPtr, *maxPtr;
-{
-    *minPtr = bltPosInfinity, *maxPtr = bltNegInfinity;
-    if (vecPtr->numValues > 0) {
-	*minPtr = vecPtr->min;
-	if ((*minPtr <= 0.0) && (logScale)) {
-	    *minPtr = Blt_FindElemVectorMinimum(vecPtr, DBL_MIN);
-	}
-	*maxPtr = vecPtr->max;
-    }
-}
-
-/*ARGSUSED*/
-static void
-ExtentsLine(elemPtr, extsPtr)
+GetLineExtents(elemPtr, extsPtr)
     Element *elemPtr;
     Extents2D *extsPtr;
 {
-    GetLimits(&(elemPtr->x), elemPtr->axes.x->logScale,
-	&(extsPtr->xMin), &(extsPtr->xMax));
-    GetLimits(&(elemPtr->y), elemPtr->axes.y->logScale,
-	&(extsPtr->yMin), &(extsPtr->yMax));
+    int nPoints;
+
+    extsPtr->top = extsPtr->left = DBL_MAX;
+    extsPtr->bottom = extsPtr->right = -DBL_MAX;
+
+    nPoints = NumberOfPoints(elemPtr);
+    if (nPoints < 1) {
+	return;
+    } 
+    extsPtr->right = elemPtr->x.max;
+    if ((elemPtr->x.min <= 0.0) && (elemPtr->axes.x->logScale)) {
+	extsPtr->left = Blt_FindElemVectorMinimum(&elemPtr->x, DBL_MIN);
+    } else {
+	extsPtr->left = elemPtr->x.min;
+    }
+    extsPtr->bottom = elemPtr->y.max;
+    if ((elemPtr->y.min <= 0.0) && (elemPtr->axes.y->logScale)) {
+	extsPtr->top = Blt_FindElemVectorMinimum(&elemPtr->y, DBL_MIN);
+    } else {
+	extsPtr->top = elemPtr->y.min;
+    }
+
+    /* Correct the data limits for error bars */
+
+    if (elemPtr->xError.nValues > 0) {
+	register int i;
+	double x;
+	
+	nPoints = MIN(elemPtr->xError.nValues, nPoints);
+	for (i = 0; i < nPoints; i++) {
+	    x = elemPtr->x.valueArr[i] + elemPtr->xError.valueArr[i];
+	    if (x > extsPtr->right) {
+		extsPtr->right = x;
+	    }
+	    x = elemPtr->x.valueArr[i] - elemPtr->xError.valueArr[i];
+	    if (elemPtr->axes.x->logScale) {
+		if (x < 0.0) {
+		    x = -x;	/* Mirror negative values, instead
+				 * of ignoring them. */
+		}
+		if ((x > DBL_MIN) && (x < extsPtr->left)) {
+		    extsPtr->left = x;
+		}
+	    } else if (x < extsPtr->left) {
+		extsPtr->left = x;
+	    }
+	}		     
+    } else {
+	if ((elemPtr->xHigh.nValues > 0) && 
+	    (elemPtr->xHigh.max > extsPtr->right)) {
+	    extsPtr->right = elemPtr->xHigh.max;
+	}
+	if (elemPtr->xLow.nValues > 0) {
+	    double left;
+	    
+	    if ((elemPtr->xLow.min <= 0.0) && 
+		(elemPtr->axes.x->logScale)) {
+		left = Blt_FindElemVectorMinimum(&elemPtr->xLow, DBL_MIN);
+	    } else {
+		left = elemPtr->xLow.min;
+	    }
+	    if (left < extsPtr->left) {
+		extsPtr->left = left;
+	    }
+	}
+    }
+    
+    if (elemPtr->yError.nValues > 0) {
+	register int i;
+	double y;
+	
+	nPoints = MIN(elemPtr->yError.nValues, nPoints);
+	for (i = 0; i < nPoints; i++) {
+	    y = elemPtr->y.valueArr[i] + elemPtr->yError.valueArr[i];
+	    if (y > extsPtr->bottom) {
+		extsPtr->bottom = y;
+	    }
+	    y = elemPtr->y.valueArr[i] - elemPtr->yError.valueArr[i];
+	    if (elemPtr->axes.y->logScale) {
+		if (y < 0.0) {
+		    y = -y;	/* Mirror negative values, instead
+				 * of ignoring them. */
+		}
+		if ((y > DBL_MIN) && (y < extsPtr->left)) {
+		    extsPtr->top = y;
+		}
+	    } else if (y < extsPtr->top) {
+		extsPtr->top = y;
+	    }
+	}		     
+    } else {
+	if ((elemPtr->yHigh.nValues > 0) && 
+	    (elemPtr->yHigh.max > extsPtr->bottom)) {
+	    extsPtr->bottom = elemPtr->yHigh.max;
+	}
+	if (elemPtr->yLow.nValues > 0) {
+	    double top;
+	    
+	    if ((elemPtr->yLow.min <= 0.0) && 
+		(elemPtr->axes.y->logScale)) {
+		top = Blt_FindElemVectorMinimum(&elemPtr->yLow, DBL_MIN);
+	    } else {
+		top = elemPtr->yLow.min;
+	    }
+	    if (top < extsPtr->top) {
+		extsPtr->top = top;
+	    }
+	}
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TileChangedProc
+ *
+ *	Rebuilds the designated GC with the new tile pixmap.
+ *
+ * Results:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static void
+TileChangedProc(clientData, tile)
+    ClientData clientData;
+    Blt_Tile tile;		/* Not used. */
+{
+    Line *linePtr = clientData;
+    Graph *graphPtr;
+
+    graphPtr = linePtr->graphPtr;
+    if (graphPtr->tkwin != NULL) {
+	graphPtr->flags |= REDRAW_WORLD;
+	Blt_EventuallyRedrawGraph(graphPtr);
+    }
 }
 
 /*
@@ -2663,9 +3401,12 @@ ConfigureLine(graphPtr, elemPtr)
     Element *elemPtr;
 {
     Line *linePtr = (Line *)elemPtr;
-    Tk_ConfigSpec *specsPtr;
+    unsigned long gcMask;
+    XGCValues gcValues;
+    GC newGC;
+    Blt_ChainLink *linkPtr;
 
-    if (ConfigurePen(graphPtr, (Pen *)&(linePtr->normalPen)) != TCL_OK) {
+    if (ConfigurePen(graphPtr, (Pen *)&(linePtr->builtinPen)) != TCL_OK) {
 	return TCL_ERROR;
     }
     /*
@@ -2673,18 +3414,52 @@ ConfigureLine(graphPtr, elemPtr)
      * been selected.
      */
     if (linePtr->normalPenPtr == NULL) {
-	linePtr->normalPenPtr = &(linePtr->normalPen);
+	linePtr->normalPenPtr = &(linePtr->builtinPen);
     }
-    if (linePtr->styles != NULL) {
-	linePtr->styles[0].penPtr = linePtr->normalPenPtr;
+    linkPtr = Blt_ChainFirstLink(linePtr->palette);
+    if (linkPtr != NULL) {
+	LinePenStyle *stylePtr;
+
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	stylePtr->penPtr = linePtr->normalPenPtr;
     }
-    specsPtr = linePtr->infoPtr->configSpecs;
-    if (Blt_ConfigModified(specsPtr, "-scalesymbols", (char *)NULL)) {
-	linePtr->flags |= (COORDS_NEEDED | LINE_INIT_SYMBOL_SCALE);
+    if (linePtr->fillTile != NULL) {
+	Blt_SetTileChangedProc(linePtr->fillTile, TileChangedProc, linePtr);
     }
-    if (Blt_ConfigModified(specsPtr, "-pixels", "-trace", "-*data", "-smooth",
-	    "-map*", "-label", "-hide", (char *)NULL)) {
-	linePtr->flags |= COORDS_NEEDED;
+    /*
+     * Set the outline GC for this pen: GCForeground is outline color.
+     * GCBackground is the fill color (only used for bitmap symbols).
+     */
+    gcMask = 0;
+    if (linePtr->fillFgColor != NULL) {
+	gcMask |= GCForeground;
+	gcValues.foreground = linePtr->fillFgColor->pixel;
+    }
+    if (linePtr->fillBgColor != NULL) {
+	gcMask |= GCBackground;
+	gcValues.background = linePtr->fillBgColor->pixel;
+    }
+    if ((linePtr->fillStipple != None) && 
+	(linePtr->fillStipple != PATTERN_SOLID)) {
+	gcMask |= (GCStipple | GCFillStyle);
+	gcValues.stipple = linePtr->fillStipple;
+	gcValues.fill_style = (linePtr->fillBgColor == NULL) 
+	    ? FillStippled : FillOpaqueStippled;
+    }
+    newGC = Tk_GetGC(graphPtr->tkwin, gcMask, &gcValues);
+    if (linePtr->fillGC != NULL) {
+	Tk_FreeGC(graphPtr->display, linePtr->fillGC);
+    }
+    linePtr->fillGC = newGC;
+
+    if (Blt_ConfigModified(linePtr->configSpecs, "-scalesymbols", 
+	(char *)NULL)) {
+	linePtr->flags |= (MAP_ITEM | SCALE_SYMBOL);
+    }
+    if (Blt_ConfigModified(linePtr->configSpecs, "-pixels", "-trace", "-*data",
+	 "-smooth", "-map*", "-label", "-hide", "-x", "-y", "-areapattern",
+			   (char *)NULL)) {
+	linePtr->flags |= MAP_ITEM;
     }
     return TCL_OK;
 }
@@ -2710,16 +3485,229 @@ ClosestLine(graphPtr, elemPtr, searchPtr)
     ClosestSearch *searchPtr;	/* Info about closest point in element */
 {
     Line *linePtr = (Line *)elemPtr;
+    int mode;
 
-    if (searchPtr->interpolate) {
-	if (elemPtr->type == TYPE_ELEM_STRIP) {
-	    ClosestSegment(graphPtr, linePtr, searchPtr);
+    mode = searchPtr->mode;
+    if (mode == SEARCH_AUTO) {
+	LinePen *penPtr = linePtr->normalPenPtr;
+
+	mode = SEARCH_POINTS;
+	if ((NumberOfPoints(linePtr) > 1) && (penPtr->traceWidth > 0)) {
+	    mode = SEARCH_TRACES;
+	}
+    }
+    if (mode == SEARCH_POINTS) {
+	ClosestPoint(linePtr, searchPtr);
+    } else {
+	DistanceProc *distProc;
+	int found;
+
+	if (searchPtr->along == SEARCH_X) {
+	    distProc = DistanceToX;
+	} else if (searchPtr->along == SEARCH_Y) {
+	    distProc = DistanceToY;
 	} else {
-	    ClosestTrace(graphPtr, linePtr, searchPtr);
+	    distProc = DistanceToLine;
+	}
+	if (elemPtr->classUid == bltStripElementUid) {
+	    found = ClosestStrip(graphPtr, linePtr, searchPtr, distProc);
+	} else {
+	    found = ClosestTrace(graphPtr, linePtr, searchPtr, distProc);
+	}
+	if ((!found) && (searchPtr->along != SEARCH_BOTH)) {
+	    ClosestPoint(linePtr, searchPtr);
+	}
+    }
+}
+
+/*
+ * XDrawLines() points: XMaxRequestSize(dpy) - 3
+ * XFillPolygon() points:  XMaxRequestSize(dpy) - 4
+ * XDrawSegments() segments:  (XMaxRequestSize(dpy) - 3) / 2
+ * XDrawRectangles() rectangles:  (XMaxRequestSize(dpy) - 3) / 2
+ * XFillRectangles() rectangles:  (XMaxRequestSize(dpy) - 3) / 2
+ * XDrawArcs() or XFillArcs() arcs:  (XMaxRequestSize(dpy) - 3) / 3
+ */
+
+#define MAX_DRAWLINES(d)	Blt_MaxRequestSize(d, sizeof(XPoint))
+#define MAX_DRAWPOLYGON(d)	Blt_MaxRequestSize(d, sizeof(XPoint))
+#define MAX_DRAWSEGMENTS(d)	Blt_MaxRequestSize(d, sizeof(XSegment))
+#define MAX_DRAWRECTANGLES(d)	Blt_MaxRequestSize(d, sizeof(XRectangle))
+#define MAX_DRAWARCS(d)		Blt_MaxRequestSize(d, sizeof(XArc))
+
+#ifdef WIN32
+
+static void
+DrawCircles(
+    Display *display,
+    Drawable drawable,
+    Line *linePtr,
+    LinePen *penPtr,
+    int nSymbolPts,
+    Point2D *symbolPts,
+    int radius)
+{
+    HBRUSH brush, oldBrush;
+    HPEN pen, oldPen;
+    HDC dc;
+    TkWinDCState state;
+    register Point2D *pointPtr, *endPtr;
+
+    if (drawable == None) {
+	return;			/* Huh? */
+    }
+    if ((penPtr->symbol.fillGC == NULL) && 
+	(penPtr->symbol.outlineWidth == 0)) {
+	return;
+    }
+    dc = TkWinGetDrawableDC(display, drawable, &state);
+    /* SetROP2(dc, tkpWinRopModes[penPtr->symbol.fillGC->function]); */
+    if (penPtr->symbol.fillGC != NULL) {
+	brush = CreateSolidBrush(penPtr->symbol.fillGC->foreground);
+    } else {
+	brush = GetStockBrush(NULL_BRUSH);
+    }
+    if (penPtr->symbol.outlineWidth > 0) {
+	pen = Blt_GCToPen(dc, penPtr->symbol.outlineGC);
+    } else {
+	pen = GetStockPen(NULL_PEN);
+    }
+    oldPen = SelectPen(dc, pen);
+    oldBrush = SelectBrush(dc, brush);
+    for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	 pointPtr < endPtr; pointPtr++) {
+	Ellipse(dc, (int)pointPtr->x - radius, (int)pointPtr->y - radius,
+	    (int)pointPtr->x + radius + 1, (int)pointPtr->y + radius + 1);
+    }
+    DeleteBrush(SelectBrush(dc, oldBrush));
+    DeletePen(SelectPen(dc, oldPen));
+    TkWinReleaseDrawableDC(drawable, dc, &state);
+}
+
+#else
+
+static void
+DrawCircles(display, drawable, linePtr, penPtr, nSymbolPts, symbolPts, radius)
+    Display *display;
+    Drawable drawable;
+    Line *linePtr;
+    LinePen *penPtr;
+    int nSymbolPts;
+    Point2D *symbolPts;
+    int radius;
+{
+    register int i;
+    XArc *arcArr;		/* Array of arcs (circle) */
+    register XArc *arcPtr;
+    int reqSize, nArcs;
+    int s;
+    int count;
+    register Point2D *pointPtr, *endPtr;
+
+    s = radius + radius;
+    arcArr = Blt_Malloc(nSymbolPts * sizeof(XArc));
+    arcPtr = arcArr;
+
+    if (linePtr->symbolInterval > 0) {
+	count = 0;
+	for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	     pointPtr < endPtr; pointPtr++) {
+	    if (DRAW_SYMBOL(linePtr)) {
+		arcPtr->x = (short int)pointPtr->x - radius;
+		arcPtr->y = (short int)pointPtr->y - radius;
+		arcPtr->width = arcPtr->height = (unsigned short)s;
+		arcPtr->angle1 = 0;
+		arcPtr->angle2 = 23040;
+		arcPtr++, count++;
+	    }
+	    linePtr->symbolCounter++;
 	}
     } else {
-	ClosestPoint(linePtr, searchPtr);
+	count = nSymbolPts;
+	for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	     pointPtr < endPtr; pointPtr++) {
+	    arcPtr->x = (short int)pointPtr->x - radius;
+	    arcPtr->y = (short int)pointPtr->y - radius;
+	    arcPtr->width = arcPtr->height = (unsigned short)s;
+	    arcPtr->angle1 = 0;
+	    arcPtr->angle2 = 23040;
+	    arcPtr++;
+	}
     }
+    reqSize = MAX_DRAWARCS(display);
+    for (i = 0; i < count; i += reqSize) {
+	nArcs = ((i + reqSize) > count) ? (count - i) : reqSize;
+	if (penPtr->symbol.fillGC != NULL) {
+	    XFillArcs(display, drawable, penPtr->symbol.fillGC, arcArr + i, 
+		      nArcs);
+	}
+	if (penPtr->symbol.outlineWidth > 0) {
+	    XDrawArcs(display, drawable, penPtr->symbol.outlineGC, arcArr + i, 
+		      nArcs);
+	}
+    }
+    Blt_Free(arcArr);
+}
+
+#endif
+
+static void
+DrawSquares(display, drawable, linePtr, penPtr, nSymbolPts, symbolPts, r)
+    Display *display;
+    Drawable drawable;
+    Line *linePtr;
+    LinePen *penPtr;
+    int nSymbolPts;
+    register Point2D *symbolPts;
+    int r;
+{
+    XRectangle *rectArr;
+    register Point2D *pointPtr, *endPtr;
+    register XRectangle *rectPtr;
+    int reqSize, nRects;
+    int s;
+    register int i;
+    int count;
+
+    s = r + r;
+    rectArr = Blt_Malloc(nSymbolPts * sizeof(XRectangle));
+    rectPtr = rectArr;
+
+    if (linePtr->symbolInterval > 0) {
+	count = 0;
+	for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	     pointPtr < endPtr; pointPtr++) {
+	    if (DRAW_SYMBOL(linePtr)) {
+		rectPtr->x = (short int)(pointPtr->x - r);
+		rectPtr->y = (short int)(pointPtr->y - r);
+		rectPtr->width = rectPtr->height = (unsigned short)s;
+		rectPtr++, count++;
+	    }
+	    linePtr->symbolCounter++;
+	}
+    } else {
+	count = nSymbolPts;
+	for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	     pointPtr < endPtr; pointPtr++) {
+	    rectPtr->x = (short int)(pointPtr->x - r);
+	    rectPtr->y = (short int)(pointPtr->y - r);
+	    rectPtr->width = rectPtr->height = (unsigned short)s;
+	    rectPtr++;
+	}
+    }
+    reqSize = MAX_DRAWRECTANGLES(display);
+    for (i = 0; i < count; i += reqSize) {
+	nRects = ((i + reqSize) > count) ? (count - i) : reqSize;
+	if (penPtr->symbol.fillGC != NULL) {
+	    XFillRectangles(display, drawable, penPtr->symbol.fillGC, 
+			    rectArr + i, nRects);
+	}
+	if (penPtr->symbol.outlineWidth > 0) {
+	    XDrawRectangles(display, drawable, penPtr->symbol.outlineGC, 
+			    rectArr + i, nRects);
+	}
+    }
+    Blt_Free(rectArr);
 }
 
 /*
@@ -2741,41 +3729,38 @@ ClosestLine(graphPtr, elemPtr, searchPtr)
  * -----------------------------------------------------------------
  */
 static void
-DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
+DrawSymbols(graphPtr, drawable, linePtr, penPtr, size, nSymbolPts, symbolPts)
     Graph *graphPtr;		/* Graph widget record */
     Drawable drawable;		/* Pixmap or window to draw into */
+    Line *linePtr;
     LinePen *penPtr;
     int size;			/* Size of element */
-    int numPoints;		/* Number of coordinates in array */
-    register XPoint *pointPtr;	/* Array of x,y coordinates for line */
+    int nSymbolPts;		/* Number of coordinates in array */
+    Point2D *symbolPts;		/* Array of x,y coordinates for line */
 {
-    XPoint template[13];	/* Template for polygon symbols */
+    XPoint pattern[13];		/* Template for polygon symbols */
     int r1, r2;
     register int i, n;
-    int maxReqWords;
+    int count;
+    register Point2D *pointPtr, *endPtr;
 #define SQRT_PI		1.77245385090552
 #define S_RATIO		0.886226925452758
 
-    /*
-     * XDrawLines() points:  XMaxRequestSize(dpy) - 3
-     * XFillPolygon() points:  XMaxRequestSize(dpy) - 4
-     * XDrawSegments() segments:  (XMaxRequestSize(dpy) - 3) / 2
-     * XDrawRectangles() rectangles:  (XMaxRequestSize(dpy) - 3) / 2
-     * XFillRectangles() rectangles:  (XMaxRequestSize(dpy) - 3) / 2
-     * XDrawArcs() or XFillArcs() arcs:  (XMaxRequestSize(dpy) - 3) / 3
-     */
-
-#define MAXDRAWLINES		(maxReqWords - 3)
-#define MAXDRAWPOLYGON		(maxReqWords - 4)
-#define MAXDRAWSEGMENTS		((maxReqWords - 3) / 2)
-#define MAXDRAWRECTANGLES	((maxReqWords - 3) / 2)
-#define MAXDRAWARCS		((maxReqWords - 3) / 3)
-
-    maxReqWords = XMaxRequestSize(graphPtr->display);
     if (size < 3) {
-	if (penPtr->fillGC != NULL) {
-	    XDrawPoints(graphPtr->display, drawable, penPtr->fillGC, pointPtr,
-		numPoints, CoordModeOrigin);
+	if (penPtr->symbol.fillGC != NULL) {
+	    XPoint *points;
+	    
+	    points = Blt_Malloc(nSymbolPts * sizeof(XPoint));
+	    count = 0;
+	    for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		 pointPtr < endPtr; pointPtr++) {
+		points[count].x = (short int)pointPtr->x;
+		points[count].y = (short int)pointPtr->y;
+		count++;
+	    }
+	    XDrawPoints(graphPtr->display, drawable, penPtr->symbol.fillGC, 
+			points, nSymbolPts, CoordModeOrigin);
+	    Blt_Free(points);
 	}
 	return;
     }
@@ -2787,71 +3772,13 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	break;
 
     case SYMBOL_SQUARE:
-	{
-	    XRectangle *rectArr;
-	    register XRectangle *rectPtr;
-	    int reqSize, numRects;
-	    int s;
-
-	    s = r2 + r2;
-	    rectArr = (XRectangle *)malloc(numPoints * sizeof(XRectangle));
-	    rectPtr = rectArr;
-	    for (i = 0; i < numPoints; i++, pointPtr++, rectPtr++) {
-		rectPtr->x = pointPtr->x - r2;
-		rectPtr->y = pointPtr->y - r2;
-		rectPtr->width = rectPtr->height = (unsigned short)s;
-	    }
-	    reqSize = MAXDRAWRECTANGLES;
-	    for (i = 0; i < numPoints; i += reqSize) {
-		numRects =
-		    ((i + reqSize) > numPoints) ? (numPoints - i) : reqSize;
-		if (penPtr->fillGC != NULL) {
-		    XFillRectangles(graphPtr->display, drawable, penPtr->fillGC,
-			rectArr + i, numRects);
-		}
-		if (penPtr->outlineWidth > 0) {
-		    XDrawRectangles(graphPtr->display, drawable,
-			penPtr->outlineGC, rectArr + i, numRects);
-		}
-	    }
-	    free((char *)rectArr);
-	}
+	DrawSquares(graphPtr->display, drawable, linePtr, penPtr, nSymbolPts,
+	    symbolPts, r2);
 	break;
 
     case SYMBOL_CIRCLE:
-	{
-	    XArc *arcArr;	/* Array of arcs (circle) */
-	    register XArc *arcPtr;
-	    int reqSize, numArcs;
-	    int s;
-
-	    s = r1 + r1;
-	    arcArr = (XArc *) malloc(numPoints * sizeof(XArc));
-	    arcPtr = arcArr;
-	    for (i = 0; i < numPoints; i++, arcPtr++, pointPtr++) {
-		arcPtr->x = pointPtr->x - r1;
-		arcPtr->y = pointPtr->y - r1;
-		arcPtr->width = arcPtr->height = (unsigned short)s;
-		arcPtr->angle1 = 0;
-		arcPtr->angle2 = 23040;
-	    }
-	    reqSize = MAXDRAWARCS;
-	    for (i = 0; i < numPoints; i += reqSize) {
-		numArcs = reqSize;
-		if ((i + reqSize) > numPoints) {
-		    numArcs = numPoints - i;
-		}
-		if (penPtr->fillGC != NULL) {
-		    XFillArcs(graphPtr->display, drawable, penPtr->fillGC,
-			arcArr + i, numArcs);
-		}
-		if (penPtr->outlineWidth > 0) {
-		    XDrawArcs(graphPtr->display, drawable, penPtr->outlineGC,
-			arcArr + i, numArcs);
-		}
-	    }
-	    free((char *)arcArr);
-	}
+	DrawCircles(graphPtr->display, drawable, linePtr, penPtr, nSymbolPts,
+	    symbolPts, r1);
 	break;
 
     case SYMBOL_SPLUS:
@@ -2859,41 +3786,63 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	{
 	    XSegment *segArr;	/* Array of line segments (splus, scross) */
 	    register XSegment *segPtr;
-	    int reqSize, numSegments, numSegs;
+	    int reqSize, nSegs, chunk;
 
 	    if (penPtr->symbol.type == SYMBOL_SCROSS) {
 		r2 = Round(r2 * M_SQRT1_2);
-		template[3].y = template[2].x = template[0].x = template[0].y = -r2;
-		template[3].x = template[2].y = template[1].y = template[1].x = r2;
+		pattern[3].y = pattern[2].x = pattern[0].x = pattern[0].y = -r2;
+		pattern[3].x = pattern[2].y = pattern[1].y = pattern[1].x = r2;
 	    } else {
-		template[0].y = template[1].y = template[2].x = template[3].x = 0;
-		template[0].x = template[2].y = -r2;
-		template[1].x = template[3].y = r2;
+		pattern[0].y = pattern[1].y = pattern[2].x = pattern[3].x = 0;
+		pattern[0].x = pattern[2].y = -r2;
+		pattern[1].x = pattern[3].y = r2;
 	    }
-	    numSegments = numPoints * 2;
-	    segArr = (XSegment *)malloc(numSegments * sizeof(XSegment));
+	    segArr = Blt_Malloc(nSymbolPts * 2 * sizeof(XSegment));
 	    segPtr = segArr;
-	    for (i = 0; i < numPoints; i++, pointPtr++) {
-		segPtr->x1 = template[0].x + pointPtr->x;
-		segPtr->y1 = template[0].y + pointPtr->y;
-		segPtr->x2 = template[1].x + pointPtr->x;
-		segPtr->y2 = template[1].y + pointPtr->y;
-		segPtr++;
-		segPtr->x1 = template[2].x + pointPtr->x;
-		segPtr->y1 = template[2].y + pointPtr->y;
-		segPtr->x2 = template[3].x + pointPtr->x;
-		segPtr->y2 = template[3].y + pointPtr->y;
-		segPtr++;
+	    if (linePtr->symbolInterval > 0) {
+		count = 0;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    if (DRAW_SYMBOL(linePtr)) {
+			segPtr->x1 = pattern[0].x + (short int)pointPtr->x;
+			segPtr->y1 = pattern[0].y + (short int)pointPtr->y;
+			segPtr->x2 = pattern[1].x + (short int)pointPtr->x;
+			segPtr->y2 = pattern[1].y + (short int)pointPtr->y;
+			segPtr++;
+			segPtr->x1 = pattern[2].x + (short int)pointPtr->x;
+			segPtr->y1 = pattern[2].y + (short int)pointPtr->y;
+			segPtr->x2 = pattern[3].x + (short int)pointPtr->x;
+			segPtr->y2 = pattern[3].y + (short int)pointPtr->y;
+			segPtr++;
+			count++;
+		    }
+		    linePtr->symbolCounter++;
+		}
+	    } else {
+		count = nSymbolPts;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    segPtr->x1 = pattern[0].x + (short int)pointPtr->x;
+		    segPtr->y1 = pattern[0].y + (short int)pointPtr->y;
+		    segPtr->x2 = pattern[1].x + (short int)pointPtr->x;
+		    segPtr->y2 = pattern[1].y + (short int)pointPtr->y;
+		    segPtr++;
+		    segPtr->x1 = pattern[2].x + (short int)pointPtr->x;
+		    segPtr->y1 = pattern[2].y + (short int)pointPtr->y;
+		    segPtr->x2 = pattern[3].x + (short int)pointPtr->x;
+		    segPtr->y2 = pattern[3].y + (short int)pointPtr->y;
+		    segPtr++;
+		}
 	    }
+	    nSegs = count * 2;
 	    /* Always draw skinny symbols regardless of the outline width */
-	    reqSize = MAXDRAWSEGMENTS;
-	    for (i = 0; i < numSegments; i += reqSize) {
-		numSegs = ((i + reqSize) > numSegments)
-		    ? (numSegments - i) : reqSize;
-		XDrawSegments(graphPtr->display, drawable, penPtr->outlineGC,
-		    segArr + i, numSegs);
+	    reqSize = MAX_DRAWSEGMENTS(graphPtr->display);
+	    for (i = 0; i < nSegs; i += reqSize) {
+		chunk = ((i + reqSize) > nSegs) ? (nSegs - i) : reqSize;
+		XDrawSegments(graphPtr->display, drawable, 
+			penPtr->symbol.outlineGC, segArr + i, chunk);
 	    }
-	    free((char *)segArr);
+	    Blt_Free(segArr);
 	}
 	break;
 
@@ -2901,7 +3850,7 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
     case SYMBOL_CROSS:
 	{
 	    XPoint *polygon;
-	    register XPoint *pntPtr;
+	    register XPoint *p;
 	    int d;		/* Small delta for cross/plus thickness */
 
 	    d = (r2 / 3);
@@ -2917,57 +3866,75 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	     *          9   8
 	     */
 
-	    template[0].x = template[11].x = template[12].x = -r2;
-	    template[2].x = template[1].x = template[10].x = template[9].x = -d;
-	    template[3].x = template[4].x = template[7].x = template[8].x = d;
-	    template[5].x = template[6].x = r2;
-	    template[2].y = template[3].y = -r2;
-	    template[0].y = template[1].y = template[4].y = template[5].y =
-		template[12].y = -d;
-	    template[11].y = template[10].y = template[7].y = template[6].y = d;
-	    template[9].y = template[8].y = r2;
+	    pattern[0].x = pattern[11].x = pattern[12].x = -r2;
+	    pattern[2].x = pattern[1].x = pattern[10].x = pattern[9].x = -d;
+	    pattern[3].x = pattern[4].x = pattern[7].x = pattern[8].x = d;
+	    pattern[5].x = pattern[6].x = r2;
+	    pattern[2].y = pattern[3].y = -r2;
+	    pattern[0].y = pattern[1].y = pattern[4].y = pattern[5].y =
+		pattern[12].y = -d;
+	    pattern[11].y = pattern[10].y = pattern[7].y = pattern[6].y = d;
+	    pattern[9].y = pattern[8].y = r2;
 
 	    if (penPtr->symbol.type == SYMBOL_CROSS) {
 		double dx, dy;
 
 		/* For the cross symbol, rotate the points by 45 degrees. */
 		for (n = 0; n < 12; n++) {
-		    dx = (double)template[n].x * M_SQRT1_2;
-		    dy = (double)template[n].y * M_SQRT1_2;
-		    template[n].x = Round(dx - dy);
-		    template[n].y = Round(dx + dy);
+		    dx = (double)pattern[n].x * M_SQRT1_2;
+		    dy = (double)pattern[n].y * M_SQRT1_2;
+		    pattern[n].x = Round(dx - dy);
+		    pattern[n].y = Round(dx + dy);
 		}
-		template[12] = template[0];
+		pattern[12] = pattern[0];
 	    }
-	    polygon = (XPoint *)malloc(numPoints * 13 * sizeof(XPoint));
-	    pntPtr = polygon;
-	    for (i = 0; i < numPoints; i++, pointPtr++) {
-		for (n = 0; n < 13; n++, pntPtr++) {
-		    pntPtr->x = template[n].x + pointPtr->x;
-		    pntPtr->y = template[n].y + pointPtr->y;
+	    polygon = Blt_Malloc(nSymbolPts * 13 * sizeof(XPoint));
+	    p = polygon;
+	    if (linePtr->symbolInterval > 0) {
+		count = 0;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    if (DRAW_SYMBOL(linePtr)) {
+			for (n = 0; n < 13; n++) {
+			    p->x = pattern[n].x + (short int)pointPtr->x;
+			    p->y = pattern[n].y + (short int)pointPtr->y;
+			    p++;
+			}
+			count++;
+		    }
+		    linePtr->symbolCounter++;
+		}
+	    } else {
+		count = nSymbolPts;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    for (n = 0; n < 13; n++) {
+			p->x = pattern[n].x + (short int)pointPtr->x;
+			p->y = pattern[n].y + (short int)pointPtr->y;
+			p++;
+		    }
 		}
 	    }
-
-	    if (penPtr->fillGC != NULL) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 13) {
-		    XFillPolygon(graphPtr->display, drawable, penPtr->fillGC,
-			pntPtr, 13, Complex, CoordModeOrigin);
+	    if (penPtr->symbol.fillGC != NULL) {
+		for (p = polygon, i = 0; i < count; i++, p += 13) {
+		    XFillPolygon(graphPtr->display, drawable, 
+			penPtr->symbol.fillGC, p, 13, Complex, CoordModeOrigin);
 		}
 	    }
-	    if (penPtr->outlineWidth > 0) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 13) {
-		    XDrawLines(graphPtr->display, drawable, penPtr->outlineGC,
-			pntPtr, 13, CoordModeOrigin);
+	    if (penPtr->symbol.outlineWidth > 0) {
+		for (p = polygon, i = 0; i < count; i++, p += 13) {
+		    XDrawLines(graphPtr->display, drawable, 
+			penPtr->symbol.outlineGC, p, 13, CoordModeOrigin);
 		}
 	    }
-	    free((char *)polygon);
+	    Blt_Free(polygon);
 	}
 	break;
 
     case SYMBOL_DIAMOND:
 	{
 	    XPoint *polygon;
-	    register XPoint *pntPtr;
+	    register XPoint *p;
 
 	    /*
 	     *
@@ -2979,39 +3946,58 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	     *            3         last points.
 	     *
 	     */
-	    template[1].y = template[0].x = -r1;
-	    template[2].y = template[3].x = template[0].y = template[1].x = 0;
-	    template[3].y = template[2].x = r1;
-	    template[4] = template[0];
+	    pattern[1].y = pattern[0].x = -r1;
+	    pattern[2].y = pattern[3].x = pattern[0].y = pattern[1].x = 0;
+	    pattern[3].y = pattern[2].x = r1;
+	    pattern[4] = pattern[0];
 
-	    polygon = (XPoint *)malloc(numPoints * 5 * sizeof(XPoint));
-	    for (pntPtr = polygon, i = 0; i < numPoints; i++, pointPtr++) {
-		for (n = 0; n < 5; n++, pntPtr++) {
-		    pntPtr->x = template[n].x + pointPtr->x;
-		    pntPtr->y = template[n].y + pointPtr->y;
+	    polygon = Blt_Malloc(nSymbolPts * 5 * sizeof(XPoint));
+	    p = polygon;
+	    if (linePtr->symbolInterval > 0) {
+		count = 0;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    if (DRAW_SYMBOL(linePtr)) {
+			for (n = 0; n < 5; n++, p++) {
+			    p->x = pattern[n].x + (short int)pointPtr->x;
+			    p->y = pattern[n].y + (short int)pointPtr->y;
+			}
+			count++;
+		    }
+		    linePtr->symbolCounter++;
+		}
+	    } else {
+		count = nSymbolPts;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    for (n = 0; n < 5; n++, p++) {
+			p->x = pattern[n].x + (short int)pointPtr->x;
+			p->y = pattern[n].y + (short int)pointPtr->y;
+		    }
 		}
 	    }
-	    if (penPtr->fillGC != NULL) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 5) {
-		    XFillPolygon(graphPtr->display, drawable, penPtr->fillGC,
-			pntPtr, 5, Convex, CoordModeOrigin);
+	    if (penPtr->symbol.fillGC != NULL) {
+		for (p = polygon, i = 0; i < count; i++, p += 5) {
+		    XFillPolygon(graphPtr->display, drawable, 
+			 penPtr->symbol.fillGC, p, 5, Convex, CoordModeOrigin);
 
 		}
 	    }
-	    if (penPtr->outlineWidth > 0) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 5) {
-		    XDrawLines(graphPtr->display, drawable, penPtr->outlineGC,
-			pntPtr, 5, CoordModeOrigin);
+	    if (penPtr->symbol.outlineWidth > 0) {
+		for (p = polygon, i = 0; i < count; i++, p += 5) {
+		    XDrawLines(graphPtr->display, drawable, 
+		       penPtr->symbol.outlineGC, p, 5, CoordModeOrigin);
 		}
 	    }
-	    free((char *)polygon);
+	    Blt_Free(polygon);
 	}
 	break;
 
     case SYMBOL_TRIANGLE:
+    case SYMBOL_ARROW:
 	{
 	    XPoint *polygon;
-	    register XPoint *pntPtr;
+	    register XPoint *p;
 	    double b;
 	    int b2, h1, h2;
 #define H_RATIO		1.1663402261671607
@@ -3034,33 +4020,59 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	     *
 	     */
 
-	    template[3].x = template[0].x = 0;
-	    template[3].y = template[0].y = -h1;
-	    template[1].x = b2;
-	    template[2].y = template[1].y = h2;
-	    template[2].x = -b2;
-
-	    polygon = (XPoint *)malloc(numPoints * 4 * sizeof(XPoint));
-	    pntPtr = polygon;
-	    for (i = 0; i < numPoints; i++, pointPtr++) {
-		for (n = 0; n < 4; n++, pntPtr++) {
-		    pntPtr->x = template[n].x + pointPtr->x;
-		    pntPtr->y = template[n].y + pointPtr->y;
+	    if (penPtr->symbol.type == SYMBOL_ARROW) {
+		pattern[3].x = pattern[0].x = 0;
+		pattern[3].y = pattern[0].y = h1;
+		pattern[1].x = b2;
+		pattern[2].y = pattern[1].y = -h2;
+		pattern[2].x = -b2;
+	    } else {
+		pattern[3].x = pattern[0].x = 0;
+		pattern[3].y = pattern[0].y = -h1;
+		pattern[1].x = b2;
+		pattern[2].y = pattern[1].y = h2;
+		pattern[2].x = -b2;
+	    }
+	    polygon = Blt_Malloc(nSymbolPts * 4 * sizeof(XPoint));
+	    p = polygon;
+	    if (linePtr->symbolInterval > 0) {
+		count = 0;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    if (DRAW_SYMBOL(linePtr)) {
+			for (n = 0; n < 4; n++) {
+			    p->x = pattern[n].x + (short int)pointPtr->x;
+			    p->y = pattern[n].y + (short int)pointPtr->y;
+			    p++;
+			}
+			count++;
+		    }
+		    linePtr->symbolCounter++;
+		}
+	    } else {
+		count = nSymbolPts;
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    for (n = 0; n < 4; n++) {
+			p->x = pattern[n].x + (short int)pointPtr->x;
+			p->y = pattern[n].y + (short int)pointPtr->y;
+			p++;
+		    }
 		}
 	    }
-	    if (penPtr->fillGC != NULL) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 4) {
-		    XFillPolygon(graphPtr->display, drawable, penPtr->fillGC,
-			pntPtr, 4, Convex, CoordModeOrigin);
+	    if (penPtr->symbol.fillGC != NULL) {
+		for (p = polygon, i = 0; i < count; i++, p += 4) {
+		    XFillPolygon(graphPtr->display, drawable, 
+			penPtr->symbol.fillGC, p, 4, Convex, CoordModeOrigin);
 		}
 	    }
-	    if (penPtr->outlineWidth > 0) {
-		for (pntPtr = polygon, i = 0; i < numPoints; i++, pntPtr += 4) {
-		    XDrawLines(graphPtr->display, drawable, penPtr->outlineGC,
-			pntPtr, 4, CoordModeOrigin);
+	    if (penPtr->symbol.outlineWidth > 0) {
+		for (p = polygon, i = 0; i < count; i++, p += 4) {
+		    XDrawLines(graphPtr->display, drawable, 
+			penPtr->symbol.outlineGC, p, 4, CoordModeOrigin);
 		}
 	    }
-	    free((char *)polygon);
+	    Blt_Free(polygon);
 	}
 	break;
     case SYMBOL_BITMAP:
@@ -3076,8 +4088,8 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	    mask = None;
 
 	    /*
-	     * Compute the size of the scaled bitmap.  Stretch the bitmap
-	     * to fit a nxn bounding box.
+	     * Compute the size of the scaled bitmap.  Stretch the
+	     * bitmap to fit a nxn bounding box.
 	     */
 	    sx = (double)size / (double)width;
 	    sy = (double)size / (double)height;
@@ -3085,26 +4097,50 @@ DrawSymbols(graphPtr, drawable, penPtr, size, numPoints, pointPtr)
 	    bmWidth = (int)(width * scale);
 	    bmHeight = (int)(height * scale);
 
+	    XSetClipMask(graphPtr->display, penPtr->symbol.outlineGC, None);
 	    if (penPtr->symbol.mask != None) {
-		mask = Blt_ScaleBitmap(graphPtr->tkwin, penPtr->symbol.mask, 
-		   width, height, bmWidth, bmHeight);
-		XSetClipMask(graphPtr->display, penPtr->outlineGC, mask);
+		mask = Blt_ScaleBitmap(graphPtr->tkwin, penPtr->symbol.mask,
+		    width, height, bmWidth, bmHeight);
+		XSetClipMask(graphPtr->display, penPtr->symbol.outlineGC, 
+			     mask);
 	    }
-	    bitmap = Blt_ScaleBitmap(graphPtr->tkwin, penPtr->symbol.bitmap, 
+	    bitmap = Blt_ScaleBitmap(graphPtr->tkwin, penPtr->symbol.bitmap,
 		width, height, bmWidth, bmHeight);
-	    if (penPtr->fillGC == NULL) {
-		XSetClipMask(graphPtr->display, penPtr->outlineGC, bitmap);
+	    if (penPtr->symbol.fillGC == NULL) {
+		XSetClipMask(graphPtr->display, penPtr->symbol.outlineGC, 
+			     bitmap);
 	    }
 	    dx = bmWidth / 2;
 	    dy = bmHeight / 2;
-	    for (i = 0; i < numPoints; i++, pointPtr++) {
-		x = pointPtr->x - dx;
-		y = pointPtr->y - dy;
-		if ((penPtr->fillGC == NULL) || (mask != None)) {
-		    XSetClipOrigin(graphPtr->display, penPtr->outlineGC, x, y);
+	    if (linePtr->symbolInterval > 0) {
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    if (DRAW_SYMBOL(linePtr)) {
+			x = (int)pointPtr->x - dx;
+			y = (int)pointPtr->y - dy;
+			if ((penPtr->symbol.fillGC == NULL) || (mask != None)) {
+			    XSetClipOrigin(graphPtr->display,
+				penPtr->symbol.outlineGC, x, y);
+			}
+			XCopyPlane(graphPtr->display, bitmap, drawable,
+			    penPtr->symbol.outlineGC, 0, 0, bmWidth, bmHeight, 
+				   x, y, 1);
+		    }
+		    linePtr->symbolCounter++;
 		}
-		XCopyPlane(graphPtr->display, bitmap, drawable,
-		    penPtr->outlineGC, 0, 0, bmWidth, bmHeight, x, y, 1);
+	    } else {
+		for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+		     pointPtr < endPtr; pointPtr++) {
+		    x = (int)pointPtr->x - dx;
+		    y = (int)pointPtr->y - dy;
+		    if ((penPtr->symbol.fillGC == NULL) || (mask != None)) {
+			XSetClipOrigin(graphPtr->display, 
+				       penPtr->symbol.outlineGC, x, y);
+		    }
+		    XCopyPlane(graphPtr->display, bitmap, drawable,
+			penPtr->symbol.outlineGC, 0, 0, bmWidth, bmHeight, 
+			       x, y, 1);
+		}
 	    }
 	    Tk_FreePixmap(graphPtr->display, bitmap);
 	    if (mask != None) {
@@ -3136,29 +4172,131 @@ DrawSymbol(graphPtr, drawable, elemPtr, x, y, size)
     Drawable drawable;		/* Pixmap or window to draw into */
     Element *elemPtr;		/* Line element information */
     int x, y;			/* Center position of symbol */
-    int size;			/* Size of element */
+    int size;			/* Size of symbol. */
 {
     Line *linePtr = (Line *)elemPtr;
     LinePen *penPtr = linePtr->normalPenPtr;
 
-    if (penPtr->lineWidth > 0) {
+    if (penPtr->traceWidth > 0) {
 	/*
-	 * Draw an extra line offset by one pixel from the previous to give
-	 * a thicker appearance.  This is only for the legend entry.  This
-	 * routine is never called for drawing the actual line segments.
+	 * Draw an extra line offset by one pixel from the previous to
+	 * give a thicker appearance.  This is only for the legend
+	 * entry.  This routine is never called for drawing the actual
+	 * line segments.
 	 */
-	XDrawLine(graphPtr->display, drawable, penPtr->penGC, x - size, y,
-	    x + size, y);
-	XDrawLine(graphPtr->display, drawable, penPtr->penGC, x - size,
-	    y + 1, x + size, y + 1);
+	XDrawLine(graphPtr->display, drawable, penPtr->traceGC, x - size, 
+		y, x + size, y);
+	XDrawLine(graphPtr->display, drawable, penPtr->traceGC, x - size,
+		y + 1, x + size, y + 1);
     }
     if (penPtr->symbol.type != SYMBOL_NONE) {
-	XPoint point;
+	Point2D point;
 
 	point.x = x, point.y = y;
-	DrawSymbols(graphPtr, drawable, linePtr->normalPenPtr, size, 1, &point);
+	DrawSymbols(graphPtr, drawable, linePtr, linePtr->normalPenPtr, size,
+	    1, &point);
     }
 }
+
+#ifdef WIN32
+
+static void
+DrawTraces(
+    Graph *graphPtr,
+    Drawable drawable,		/* Pixmap or window to draw into */
+    Line *linePtr,
+    LinePen *penPtr)
+{
+    Blt_ChainLink *linkPtr;
+    HBRUSH brush, oldBrush;
+    HDC dc;
+    HPEN pen, oldPen;
+    POINT *points;
+    TkWinDCState state;
+    Trace *tracePtr;
+    int j;
+    int nPoints, remaining;
+    register POINT *p;
+    register int count;
+
+    /*  
+     * Depending if the line is wide (> 1 pixel), arbitrarily break
+     * the line in sections of 100 points.  This bit of weirdness has
+     * to do with wide geometric pens.  The longer the polyline, the
+     * slower it draws.  The trade off is that we lose dash and cap
+     * uniformity for unbearably slow polyline draws.
+     */
+    if (penPtr->traceGC->line_width > 1) {
+	nPoints = 100;
+    } else {
+	nPoints = Blt_MaxRequestSize(graphPtr->display, sizeof(POINT)) - 1;
+    }
+    points = Blt_Malloc((nPoints + 1) * sizeof(POINT));
+
+    dc = TkWinGetDrawableDC(graphPtr->display, drawable, &state);
+
+    pen = Blt_GCToPen(dc, penPtr->traceGC);
+    oldPen = SelectPen(dc, pen);
+    brush = CreateSolidBrush(penPtr->traceGC->foreground);
+    oldBrush = SelectBrush(dc, brush);
+    SetROP2(dc, tkpWinRopModes[penPtr->traceGC->function]);
+
+    for (linkPtr = Blt_ChainFirstLink(linePtr->traces); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tracePtr = Blt_ChainGetValue(linkPtr);
+
+	/*
+	 * If the trace has to be split into separate XDrawLines
+	 * calls, then the end point of the current trace is also the
+	 * starting point of the new split.
+	 */
+
+	/* Step 1. Convert and draw the first section of the trace.
+	 *	   It may contain the entire trace. */
+
+	for (p = points, count = 0; count < MIN(nPoints, tracePtr->nScreenPts); 
+	     count++, p++) {
+	    p->x = (int)tracePtr->screenPts[count].x;
+	    p->y = (int)tracePtr->screenPts[count].y;
+	}
+	Polyline(dc, points, count);
+
+	/* Step 2. Next handle any full-size chunks left. */
+
+	while ((count + nPoints) < tracePtr->nScreenPts) {
+	    /* Start with the last point of the previous trace. */
+	    points[0].x = points[nPoints - 1].x;
+	    points[0].y = points[nPoints - 1].y;
+
+	    for (p = points + 1, j = 0; j < nPoints; j++, count++, p++) {
+		p->x = (int)tracePtr->screenPts[count].x;
+		p->y = (int)tracePtr->screenPts[count].y;
+	    }
+	    Polyline(dc, points, nPoints + 1);
+	}
+	
+	/* Step 3. Convert and draw the remaining points. */
+
+	remaining = tracePtr->nScreenPts - count;
+	if (remaining > 0) {
+	    /* Start with the last point of the previous trace. */
+	    points[0].x = points[nPoints - 1].x;
+	    points[0].y = points[nPoints - 1].y;
+
+	    for (p = points + 1; count < tracePtr->nScreenPts; count++, p++) {
+		p->x = (int)tracePtr->screenPts[count].x;
+		p->y = (int)tracePtr->screenPts[count].y;
+	    }	    
+	    Polyline(dc, points, remaining + 1);
+	}
+    }
+    Blt_Free(points);
+    DeletePen(SelectPen(dc, oldPen));
+    DeleteBrush(SelectBrush(dc, oldBrush));
+    TkWinReleaseDrawableDC(drawable, dc, &state);
+}
+
+#else
 
 static void
 DrawTraces(graphPtr, drawable, linePtr, penPtr)
@@ -3167,32 +4305,114 @@ DrawTraces(graphPtr, drawable, linePtr, penPtr)
     Line *linePtr;
     LinePen *penPtr;
 {
-    register Blt_ListItem item;
-    register Trace *tracePtr;
-    int maxPoints, numPoints;
-    register int i;
-    int start, extra;
+    Blt_ChainLink *linkPtr;
+    Trace *tracePtr;
+    XPoint *points;
+    int j;
+    int nPoints, remaining;
+    register XPoint *p;
+    register int count;
 
-    maxPoints = ((XMaxRequestSize(graphPtr->display) * 4) / sizeof(XPoint)) - 2;
-    for (item = Blt_ListFirstItem(&(linePtr->traces)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tracePtr = (Trace *)Blt_ListGetValue(item);
+    nPoints = Blt_MaxRequestSize(graphPtr->display, sizeof(XPoint)) - 1;
+    points = Blt_Malloc((nPoints + 1) * sizeof(XPoint));
+	    
+    for (linkPtr = Blt_ChainFirstLink(linePtr->traces); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	int n;
+
+	tracePtr = Blt_ChainGetValue(linkPtr);
 
 	/*
 	 * If the trace has to be split into separate XDrawLines
-	 * calls, then we need to make sure we make the last point
-	 * to the starting point of the new split.
+	 * calls, then the end point of the current trace is also the
+	 * starting point of the new split.
 	 */
-	start = extra = 0;
-	for (i = 0; i < tracePtr->numPoints; i += maxPoints) {
-	    numPoints = MIN((tracePtr->numPoints - i), maxPoints);
-	    XDrawLines(graphPtr->display, drawable, penPtr->penGC,
-		tracePtr->pointArr + start, numPoints + extra, CoordModeOrigin);
-	    start = i + maxPoints - 1;
-	    extra = 1;
+	/* Step 1. Convert and draw the first section of the trace.
+	 *	   It may contain the entire trace. */
+
+	n = MIN(nPoints, tracePtr->nScreenPts); 
+	for (p = points, count = 0; count < n; count++, p++) {
+	    p->x = (short int)tracePtr->screenPts[count].x;
+	    p->y = (short int)tracePtr->screenPts[count].y;
+	}
+	XDrawLines(graphPtr->display, drawable, penPtr->traceGC, points, 
+	   count, CoordModeOrigin);
+
+	/* Step 2. Next handle any full-size chunks left. */
+
+	while ((count + nPoints) < tracePtr->nScreenPts) {
+	    /* Start with the last point of the previous trace. */
+	    points[0].x = points[nPoints - 1].x;
+	    points[0].y = points[nPoints - 1].y;
+	    
+	    for (p = points + 1, j = 0; j < nPoints; j++, count++, p++) {
+		p->x = (short int)tracePtr->screenPts[count].x;
+		p->y = (short int)tracePtr->screenPts[count].y;
+	    }
+	    XDrawLines(graphPtr->display, drawable, penPtr->traceGC, points, 
+		       nPoints + 1, CoordModeOrigin);
+	}
+	
+	/* Step 3. Convert and draw the remaining points. */
+
+	remaining = tracePtr->nScreenPts - count;
+	if (remaining > 0) {
+	    /* Start with the last point of the previous trace. */
+	    points[0].x = points[nPoints - 1].x;
+	    points[0].y = points[nPoints - 1].y;
+	    for (p = points + 1; count < tracePtr->nScreenPts; count++, p++) {
+		p->x = (short int)tracePtr->screenPts[count].x;
+		p->y = (short int)tracePtr->screenPts[count].y;
+	    }	    
+	    XDrawLines(graphPtr->display, drawable, penPtr->traceGC, points, 
+		remaining + 1, CoordModeOrigin);
 	}
     }
+    Blt_Free(points);
 }
+#endif /* WIN32 */
+
+static void
+DrawValues(graphPtr, drawable, linePtr, penPtr, nSymbolPts, symbolPts, 
+	   pointToData)
+    Graph *graphPtr;
+    Drawable drawable;
+    Line *linePtr;
+    LinePen *penPtr;
+    int nSymbolPts;
+    Point2D *symbolPts;
+    int *pointToData;
+{
+    Point2D *pointPtr, *endPtr;
+    int count;
+    char string[TCL_DOUBLE_SPACE * 2 + 2];
+    char *fmt;
+    double x, y;
+    
+    fmt = penPtr->valueFormat;
+    if (fmt == NULL) {
+	fmt = "%g";
+    }
+    count = 0;
+    for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	 pointPtr < endPtr; pointPtr++) {
+	x = linePtr->x.valueArr[pointToData[count]];
+	y = linePtr->y.valueArr[pointToData[count]];
+	count++;
+	if (penPtr->valueShow == SHOW_X) {
+	    sprintf(string, fmt, x); 
+	} else if (penPtr->valueShow == SHOW_Y) {
+	    sprintf(string, fmt, y); 
+	} else if (penPtr->valueShow == SHOW_BOTH) {
+	    sprintf(string, fmt, x);
+	    strcat(string, ",");
+	    sprintf(string + strlen(string), fmt, y);
+	}
+	Blt_DrawText(graphPtr->tkwin, drawable, string, &(penPtr->valueStyle), 
+		(int)pointPtr->x, (int)pointPtr->y);
+    } 
+}
+
 
 /*
  *----------------------------------------------------------------------
@@ -3200,10 +4420,10 @@ DrawTraces(graphPtr, drawable, linePtr, penPtr)
  * DrawActiveLine --
  *
  *	Draws the connected line(s) representing the element. If the
- *	line is made up of non-line symbols and the line width parameter
- *	has been set (linewidth > 0), the element will also be drawn as
- *	a line (with the linewidth requested).  The line may consist of
- *	separate line segments.
+ *	line is made up of non-line symbols and the line width
+ *	parameter has been set (linewidth > 0), the element will also
+ *	be drawn as a line (with the linewidth requested).  The line
+ *	may consist of separate line segments.
  *
  * Results:
  *	None.
@@ -3226,27 +4446,44 @@ DrawActiveLine(graphPtr, drawable, elemPtr)
     if (penPtr == NULL) {
 	return;
     }
-    symbolSize = ScaleSymbol(linePtr, penPtr->symbol.size);
-    if (linePtr->reqNumActive > 0) {
-	if (linePtr->flags & ELEM_UPDATE_ACTIVE) {
-	    ComputeActivePoints(graphPtr, linePtr);
+    symbolSize = ScaleSymbol(elemPtr, linePtr->activePenPtr->symbol.size);
+
+    /* 
+     * nActiveIndices 
+     *	  > 0		Some points are active.  Uses activeArr.
+     *	  < 0		All points are active.
+     *    == 0		No points are active.
+     */
+    if (linePtr->nActiveIndices > 0) {
+	if (linePtr->flags & ACTIVE_PENDING) {
+	    MapActiveSymbols(graphPtr, linePtr);
 	}
 	if (penPtr->symbol.type != SYMBOL_NONE) {
-	    DrawSymbols(graphPtr, drawable, penPtr, symbolSize,
-		linePtr->numActive, linePtr->activeArr);
+	    DrawSymbols(graphPtr, drawable, linePtr, penPtr, symbolSize,
+		linePtr->nActivePts, linePtr->activePts);
 	}
-    } else if (linePtr->reqNumActive < 0) {
-	if (penPtr->lineWidth > 0) {
-	    if (linePtr->numSegments > 0) {
-		XDrawSegments(graphPtr->display, drawable, penPtr->penGC,
-		    linePtr->segArr, linePtr->numSegments);
-	    } else if (Blt_ListGetLength(&(linePtr->traces)) > 0) {
+	if (penPtr->valueShow != SHOW_NONE) {
+	    DrawValues(graphPtr, drawable, linePtr, penPtr, 
+		       linePtr->nActivePts, linePtr->activePts, 
+		       linePtr->activeToData);
+	}
+    } else if (linePtr->nActiveIndices < 0) { 
+	if (penPtr->traceWidth > 0) {
+	    if (linePtr->nStrips > 0) {
+		Blt_Draw2DSegments(graphPtr->display, drawable, 
+			penPtr->traceGC, linePtr->strips, linePtr->nStrips);
+	    } else if (Blt_ChainGetLength(linePtr->traces) > 0) {
 		DrawTraces(graphPtr, drawable, linePtr, penPtr);
 	    }
 	}
 	if (penPtr->symbol.type != SYMBOL_NONE) {
-	    DrawSymbols(graphPtr, drawable, penPtr, symbolSize,
-		linePtr->numPoints, linePtr->pointArr);
+	    DrawSymbols(graphPtr, drawable, linePtr, penPtr, symbolSize,
+		linePtr->nSymbolPts, linePtr->symbolPts);
+	}
+	if (penPtr->valueShow != SHOW_NONE) {
+	    DrawValues(graphPtr, drawable, linePtr, penPtr,
+		       linePtr->nSymbolPts, linePtr->symbolPts, 
+		       linePtr->symbolToData);
 	}
     }
 }
@@ -3277,40 +4514,101 @@ DrawNormalLine(graphPtr, drawable, elemPtr)
     Element *elemPtr;		/* Element to be drawn */
 {
     Line *linePtr = (Line *)elemPtr;
-    LinePen *penPtr = linePtr->normalPenPtr;
-    register LineStyle *stylePtr;
-    register int i;
+    LinePen *penPtr;
+    Blt_ChainLink *linkPtr;
+    register LinePenStyle *stylePtr;
+    unsigned int count;
 
-    /* Draw lines */
-    if (graphPtr->type == TYPE_ELEM_STRIP) {
-	for (stylePtr = linePtr->styles, i = 0; i < linePtr->numStyles;
-	    i++, stylePtr++) {
-	    if ((stylePtr->numSegments > 0) &&
-		(stylePtr->penPtr->lineWidth > 0)) {
-		XDrawSegments(graphPtr->display, drawable,
-		    stylePtr->penPtr->penGC, stylePtr->segPtr,
-		    stylePtr->numSegments);
+    /* Fill area under the curve */
+    if (linePtr->fillPts != NULL) {
+	XPoint *points;
+	Point2D *endPtr, *pointPtr;
+
+	points = Blt_Malloc(sizeof(XPoint) * linePtr->nFillPts);
+	count = 0;
+	for(pointPtr = linePtr->fillPts, 
+		endPtr = linePtr->fillPts + linePtr->nFillPts;
+	    pointPtr < endPtr; pointPtr++) {
+	    points[count].x = (short int)pointPtr->x;
+	    points[count].y = (short int)pointPtr->y;
+	    count++;
+	}
+	if (linePtr->fillTile != NULL) {
+	    Blt_SetTileOrigin(graphPtr->tkwin, linePtr->fillTile, 0, 0);
+	    Blt_TilePolygon(graphPtr->tkwin, drawable, linePtr->fillTile, 
+			    points, linePtr->nFillPts);
+	} else if (linePtr->fillStipple != None) {
+	    XFillPolygon(graphPtr->display, drawable, linePtr->fillGC, 
+		 points, linePtr->nFillPts, Complex, CoordModeOrigin);
+	}
+	Blt_Free(points);
+    }
+
+    /* Lines: stripchart segments or graph traces. */
+
+    if (linePtr->nStrips > 0) {
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    penPtr = stylePtr->penPtr;
+	    if ((stylePtr->nStrips > 0) && (penPtr->errorBarLineWidth > 0)) {
+		Blt_Draw2DSegments(graphPtr->display, drawable, 
+			penPtr->traceGC, stylePtr->strips, stylePtr->nStrips);
 	    }
 	}
-    } else if ((Blt_ListGetLength(&(linePtr->traces)) > 0) &&
-	(penPtr->lineWidth > 0)) {
-	DrawTraces(graphPtr, drawable, linePtr, penPtr);
+    } else if ((Blt_ChainGetLength(linePtr->traces) > 0) &&
+	(linePtr->normalPenPtr->traceWidth > 0)) {
+	DrawTraces(graphPtr, drawable, linePtr, linePtr->normalPenPtr);
     }
-    /* Draw symbols */
-    for (stylePtr = linePtr->styles, i = 0; i < linePtr->numStyles;
-	i++, stylePtr++) {
-	if ((stylePtr->numPoints > 0) &&
-	    (stylePtr->penPtr->symbol.type != SYMBOL_NONE)) {
-	    DrawSymbols(graphPtr, drawable, stylePtr->penPtr,
-		stylePtr->symbolSize, stylePtr->numPoints, stylePtr->pointPtr);
+
+    if (linePtr->reqMaxSymbols > 0) {
+	int total;
+
+	total = 0;
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    total += stylePtr->nSymbolPts;
 	}
+	linePtr->symbolInterval = total / linePtr->reqMaxSymbols;
+	linePtr->symbolCounter = 0;
     }
+
+    /* Symbols, error bars, values. */
+
+    count = 0;
+    for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	 linkPtr = Blt_ChainNextLink(linkPtr)) {
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	penPtr = stylePtr->penPtr;
+	if ((stylePtr->xErrorBarCnt > 0) && (penPtr->errorBarShow & SHOW_X)) {
+	    Blt_Draw2DSegments(graphPtr->display, drawable, penPtr->errorBarGC, 
+			       stylePtr->xErrorBars, stylePtr->xErrorBarCnt);
+	}
+	if ((stylePtr->yErrorBarCnt > 0) && (penPtr->errorBarShow & SHOW_Y)) {
+	    Blt_Draw2DSegments(graphPtr->display, drawable, penPtr->errorBarGC, 
+			       stylePtr->yErrorBars, stylePtr->yErrorBarCnt);
+	}
+	if ((stylePtr->nSymbolPts > 0) && 
+	    (penPtr->symbol.type != SYMBOL_NONE)) {
+	    DrawSymbols(graphPtr, drawable, linePtr, penPtr, 
+			stylePtr->symbolSize, stylePtr->nSymbolPts, 
+			stylePtr->symbolPts);
+	}
+	if (penPtr->valueShow != SHOW_NONE) {
+	    DrawValues(graphPtr, drawable, linePtr, penPtr, 
+		       stylePtr->nSymbolPts, stylePtr->symbolPts, 
+		       linePtr->symbolToData + count);
+	}
+	count += stylePtr->nSymbolPts;
+    }
+    linePtr->symbolInterval = 0;
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * GetSymbolPrintInfo --
+ * GetSymbolPostScriptInfo --
  *
  *	Set up the PostScript environment with the macros and
  *	attributes needed to draw the symbols of the element.
@@ -3321,18 +4619,18 @@ DrawNormalLine(graphPtr, drawable, elemPtr)
  * -----------------------------------------------------------------
  */
 static void
-GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
+GetSymbolPostScriptInfo(graphPtr, psToken, penPtr, size)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
     LinePen *penPtr;
     int size;
 {
     XColor *outlineColor, *fillColor, *defaultColor;
 
     /* Set line and foreground attributes */
-    outlineColor = penPtr->outlineColor;
-    fillColor = penPtr->fillColor;
-    defaultColor = penPtr->penColor;
+    outlineColor = penPtr->symbol.outlineColor;
+    fillColor = penPtr->symbol.fillColor;
+    defaultColor = penPtr->traceColor;
 
     if (fillColor == COLOR_DEFAULT) {
 	fillColor = defaultColor;
@@ -3341,11 +4639,12 @@ GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
 	outlineColor = defaultColor;
     }
     if (penPtr->symbol.type == SYMBOL_NONE) {
-	Blt_LineAttributesToPostScript(printable, defaultColor,
-	    penPtr->lineWidth + 2, &(penPtr->dashes), CapButt, JoinMiter);
+	Blt_LineAttributesToPostScript(psToken, defaultColor,
+	    penPtr->traceWidth + 2, &(penPtr->traceDashes), 
+	    CapButt, JoinMiter);
     } else {
-	Blt_LineWidthToPostScript(printable, penPtr->outlineWidth);
-	Blt_LineDashesToPostScript(printable, (Dashes *)NULL);
+	Blt_LineWidthToPostScript(psToken, penPtr->symbol.outlineWidth);
+	Blt_LineDashesToPostScript(psToken, (Blt_Dashes *)NULL);
     }
 
     /*
@@ -3353,7 +4652,7 @@ GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
      * paint both the bitmap and its mask. Otherwise fill and stroke
      * the path formed already.
      */
-    Blt_PrintAppend(printable, "\n/DrawSymbolProc {\n", (char *)NULL);
+    Blt_AppendToPostScript(psToken, "\n/DrawSymbolProc {\n", (char *)NULL);
     switch (penPtr->symbol.type) {
     case SYMBOL_NONE:
 	break;			/* Do nothing */
@@ -3363,8 +4662,9 @@ GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
 	    double sx, sy, scale;
 
 	    /*
-	     * Compute how much to scale the bitmap.  Don't let the scaled
-	     * bitmap exceed the bounding square for the symbol.
+	     * Compute how much to scale the bitmap.  Don't let the
+	     * scaled bitmap exceed the bounding square for the
+	     * symbol.
 	     */
 	    Tk_SizeOfBitmap(graphPtr->display, penPtr->symbol.bitmap,
 		&width, &height);
@@ -3373,45 +4673,43 @@ GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
 	    scale = MIN(sx, sy);
 
 	    if ((penPtr->symbol.mask != None) && (fillColor != NULL)) {
-		Blt_PrintAppend(printable,
+		Blt_AppendToPostScript(psToken,
 		    "\n  % Bitmap mask is \"",
 		    Tk_NameOfBitmap(graphPtr->display, penPtr->symbol.mask),
 		    "\"\n\n  ", (char *)NULL);
-		Blt_BackgroundToPostScript(printable, fillColor);
-		Blt_PrintBitmap(printable, graphPtr->display,
+		Blt_BackgroundToPostScript(psToken, fillColor);
+		Blt_BitmapToPostScript(psToken, graphPtr->display,
 		    penPtr->symbol.mask, scale, scale);
 	    }
-	    Blt_PrintAppend(printable,
+	    Blt_AppendToPostScript(psToken,
 		"\n  % Bitmap symbol is \"",
 		Tk_NameOfBitmap(graphPtr->display, penPtr->symbol.bitmap),
 		"\"\n\n  ", (char *)NULL);
-	    Blt_ForegroundToPostScript(printable, outlineColor);
-	    Blt_PrintBitmap(printable, graphPtr->display, penPtr->symbol.bitmap,
-		scale, scale);
+	    Blt_ForegroundToPostScript(psToken, outlineColor);
+	    Blt_BitmapToPostScript(psToken, graphPtr->display, 
+			penPtr->symbol.bitmap, scale, scale);
 	}
 	break;
     default:
-	Blt_PrintAppend(printable, "  gsave\n", (char *)NULL);
 	if (fillColor != NULL) {
-	    Blt_PrintAppend(printable, "    ", (char *)NULL);
-	    Blt_BackgroundToPostScript(printable, fillColor);
-	    Blt_PrintAppend(printable, "    Fill\n", (char *)NULL);
+	    Blt_AppendToPostScript(psToken, "  ", (char *)NULL);
+	    Blt_BackgroundToPostScript(psToken, fillColor);
+	    Blt_AppendToPostScript(psToken, "  Fill\n", (char *)NULL);
 	}
-	if ((outlineColor != NULL) && (penPtr->outlineWidth > 0)) {
-	    Blt_PrintAppend(printable, "    ", (char *)NULL);
-	    Blt_ForegroundToPostScript(printable, outlineColor);
-	    Blt_PrintAppend(printable, "    stroke\n", (char *)NULL);
+	if ((outlineColor != NULL) && (penPtr->symbol.outlineWidth > 0)) {
+	    Blt_AppendToPostScript(psToken, "  ", (char *)NULL);
+	    Blt_ForegroundToPostScript(psToken, outlineColor);
+	    Blt_AppendToPostScript(psToken, "  stroke\n", (char *)NULL);
 	}
-	Blt_PrintAppend(printable, "  grestore\n", (char *)NULL);
 	break;
     }
-    Blt_PrintAppend(printable, "} def\n\n", (char *)NULL);
+    Blt_AppendToPostScript(psToken, "} def\n\n", (char *)NULL);
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * PrintSymbols --
+ * SymbolsToPostScript --
  *
  * 	Draw a symbol centered at the given x,y window coordinate
  *	based upon the element symbol type and size.
@@ -3426,44 +4724,46 @@ GetSymbolPrintInfo(graphPtr, printable, penPtr, size)
  * -----------------------------------------------------------------
  */
 static void
-PrintSymbols(graphPtr, printable, penPtr, size, numPoints, pointPtr)
+SymbolsToPostScript(graphPtr, psToken, penPtr, size, nSymbolPts, symbolPts)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
     LinePen *penPtr;
     int size;
-    int numPoints;
-    register XPoint *pointPtr;
+    int nSymbolPts;
+    Point2D *symbolPts;
 {
-    float symbolSize;
-    register int i;
+    double symbolSize;
+    register Point2D *pointPtr, *endPtr;
     static char *symbolMacros[] =
     {
-	"Li", "Sq", "Ci", "Di", "Pl", "Cr", "Sp", "Sc", "Tr", "Bm", (char *)NULL,
+	"Li", "Sq", "Ci", "Di", "Pl", "Cr", "Sp", "Sc", "Tr", "Ar", "Bm", 
+	(char *)NULL,
     };
+    GetSymbolPostScriptInfo(graphPtr, psToken, penPtr, size);
 
-    GetSymbolPrintInfo(graphPtr, printable, penPtr, size);
-
-    symbolSize = (float)size;
+    symbolSize = (double)size;
     switch (penPtr->symbol.type) {
     case SYMBOL_SQUARE:
     case SYMBOL_CROSS:
     case SYMBOL_PLUS:
     case SYMBOL_SCROSS:
     case SYMBOL_SPLUS:
-	symbolSize = (float)Round(size * S_RATIO);
+	symbolSize = (double)Round(size * S_RATIO);
 	break;
     case SYMBOL_TRIANGLE:
-	symbolSize = (float)Round(size * 0.7);
+    case SYMBOL_ARROW:
+	symbolSize = (double)Round(size * 0.7);
 	break;
     case SYMBOL_DIAMOND:
-	symbolSize = (float)Round(size * M_SQRT1_2);
+	symbolSize = (double)Round(size * M_SQRT1_2);
 	break;
 
     default:
 	break;
     }
-    for (i = 0; i < numPoints; i++, pointPtr++) {
-	Blt_PrintFormat(printable, "%d %d %g %s\n", pointPtr->x,
+    for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	 pointPtr < endPtr; pointPtr++) {
+	Blt_FormatToPostScript(psToken, "%g %g %g %s\n", pointPtr->x,
 	    pointPtr->y, symbolSize, symbolMacros[penPtr->symbol.type]);
     }
 }
@@ -3471,7 +4771,7 @@ PrintSymbols(graphPtr, printable, penPtr, size, numPoints, pointPtr)
 /*
  * -----------------------------------------------------------------
  *
- * PrintSymbol --
+ * SymbolToPostScript --
  *
  * 	Draw the symbol centered at the each given x,y coordinate.
  *
@@ -3484,77 +4784,149 @@ PrintSymbols(graphPtr, printable, penPtr, size, numPoints, pointPtr)
  * -----------------------------------------------------------------
  */
 static void
-PrintSymbol(graphPtr, printable, elemPtr, x, y, size)
+SymbolToPostScript(graphPtr, psToken, elemPtr, x, y, size)
     Graph *graphPtr;		/* Graph widget record */
-    Printable printable;
+    PsToken psToken;
     Element *elemPtr;		/* Line element information */
-    int x, y;			/* Center position of symbol */
+    double x, y;		/* Center position of symbol */
     int size;			/* Size of element */
 {
     Line *linePtr = (Line *)elemPtr;
     LinePen *penPtr = linePtr->normalPenPtr;
 
-    if (penPtr->lineWidth > 0) {
+    if (penPtr->traceWidth > 0) {
 	/*
-	 * Draw an extra line offset by one pixel from the previous to give
-	 * a thicker appearance.  This is only for the legend entry.  This
-	 * routine is never called for drawing the actual line segments.
+	 * Draw an extra line offset by one pixel from the previous to
+	 * give a thicker appearance.  This is only for the legend
+	 * entry.  This routine is never called for drawing the actual
+	 * line segments.
 	 */
-	Blt_LineAttributesToPostScript(printable, penPtr->penColor,
-	    penPtr->lineWidth + 2, &(penPtr->dashes), CapButt, JoinMiter);
-	Blt_PrintFormat(printable, "%d %d %d Li\n", x, y, size + size);
+	Blt_LineAttributesToPostScript(psToken, penPtr->traceColor,
+	    penPtr->traceWidth + 2, &(penPtr->traceDashes), CapButt, JoinMiter);
+	Blt_FormatToPostScript(psToken, "%g %g %d Li\n", x, y, size + size);
     }
     if (penPtr->symbol.type != SYMBOL_NONE) {
-	XPoint point;
+	Point2D point;
 
 	point.x = x, point.y = y;
-	PrintSymbols(graphPtr, printable, penPtr, size, 1, &point);
+	SymbolsToPostScript(graphPtr, psToken, penPtr, size, 1, &point);
     }
 }
 
-
 static void
-SetLineAttributes(printable, penPtr)
-    Printable printable;
+SetLineAttributes(psToken, penPtr)
+    PsToken psToken;
     LinePen *penPtr;
 {
     /* Set the attributes of the line (color, dashes, linewidth) */
-    Blt_LineAttributesToPostScript(printable, penPtr->penColor,
-	penPtr->lineWidth, &(penPtr->dashes), CapButt, JoinMiter);
-    if ((penPtr->dashes.numValues > 0) && (penPtr->penOffColor != NULL)) {
-	Blt_PrintAppend(printable, "/DashesProc {\n  gsave\n    ",
+    Blt_LineAttributesToPostScript(psToken, penPtr->traceColor,
+	penPtr->traceWidth, &(penPtr->traceDashes), CapButt, JoinMiter);
+    if ((LineIsDashed(penPtr->traceDashes)) && 
+	(penPtr->traceOffColor != NULL)) {
+	Blt_AppendToPostScript(psToken, "/DashesProc {\n  gsave\n    ",
 	    (char *)NULL);
-	Blt_BackgroundToPostScript(printable, penPtr->penOffColor);
-	Blt_PrintAppend(printable, "    ", (char *)NULL);
-	Blt_LineDashesToPostScript(printable, (Dashes *)NULL);
-	Blt_PrintAppend(printable, "stroke\n  grestore\n} def\n",
+	Blt_BackgroundToPostScript(psToken, penPtr->traceOffColor);
+	Blt_AppendToPostScript(psToken, "    ", (char *)NULL);
+	Blt_LineDashesToPostScript(psToken, (Blt_Dashes *)NULL);
+	Blt_AppendToPostScript(psToken, "stroke\n  grestore\n} def\n",
 	    (char *)NULL);
     } else {
-	Blt_PrintAppend(printable, "/DashesProc {} def\n", (char *)NULL);
+	Blt_AppendToPostScript(psToken, "/DashesProc {} def\n", (char *)NULL);
     }
 }
 
 static void
-PrintTraces(printable, linePtr, penPtr)
-    Printable printable;
+TracesToPostScript(psToken, linePtr, penPtr)
+    PsToken psToken;
     Line *linePtr;
     LinePen *penPtr;
 {
-    register Blt_ListItem item;
-    register Trace *tracePtr;
+    Blt_ChainLink *linkPtr;
+    Trace *tracePtr;
+    register Point2D *pointPtr, *endPtr;
+    int count;
 
-    SetLineAttributes(printable, penPtr);
-    for (item = Blt_ListFirstItem(&(linePtr->traces)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	tracePtr = (Trace *)Blt_ListGetValue(item);
-	Blt_PrintLine(printable, tracePtr->pointArr, tracePtr->numPoints);
+    SetLineAttributes(psToken, penPtr);
+    for (linkPtr = Blt_ChainFirstLink(linePtr->traces); linkPtr != NULL;
+	linkPtr = Blt_ChainNextLink(linkPtr)) {
+	tracePtr = Blt_ChainGetValue(linkPtr);
+	if (tracePtr->nScreenPts <= 0) {
+	    continue;
+	}
+#define PS_MAXPATH	1500	/* Maximum number of components in a PostScript
+				 * (level 1) path. */
+	pointPtr = tracePtr->screenPts;
+	Blt_FormatToPostScript(psToken, " newpath %g %g moveto\n", 
+			       pointPtr->x, 
+			       pointPtr->y);
+	pointPtr++;
+	count = 0;
+	for (endPtr = tracePtr->screenPts + (tracePtr->nScreenPts - 1);
+	     pointPtr < endPtr; pointPtr++) {
+	    Blt_FormatToPostScript(psToken, " %g %g lineto\n", 
+				   pointPtr->x, 
+				   pointPtr->y);
+	    if ((count % PS_MAXPATH) == 0) {
+		Blt_FormatToPostScript(psToken,
+			       "DashesProc stroke\n newpath  %g %g moveto\n", 
+				       pointPtr->x, 
+				       pointPtr->y);
+	    }
+	    count++;
+	}
+	Blt_FormatToPostScript(psToken, " %g %g lineto\n", 
+			       pointPtr->x, 
+			       pointPtr->y);
+	Blt_AppendToPostScript(psToken, "DashesProc stroke\n", (char *)NULL);
     }
 }
+
+
+static void
+ValuesToPostScript(psToken, linePtr, penPtr, nSymbolPts, symbolPts, 
+		   pointToData)
+    PsToken psToken;
+    Line *linePtr;
+    LinePen *penPtr;
+    int nSymbolPts;
+    Point2D *symbolPts;
+    int *pointToData;
+{
+    Point2D *pointPtr, *endPtr;
+    int count;
+    char string[TCL_DOUBLE_SPACE * 2 + 2];
+    char *fmt;
+    double x, y;
+    
+    fmt = penPtr->valueFormat;
+    if (fmt == NULL) {
+	fmt = "%g";
+    }
+    count = 0;
+    for (pointPtr = symbolPts, endPtr = symbolPts + nSymbolPts;
+	 pointPtr < endPtr; pointPtr++) {
+	x = linePtr->x.valueArr[pointToData[count]];
+	y = linePtr->y.valueArr[pointToData[count]];
+	count++;
+	if (penPtr->valueShow == SHOW_X) {
+	    sprintf(string, fmt, x); 
+	} else if (penPtr->valueShow == SHOW_Y) {
+	    sprintf(string, fmt, y); 
+	} else if (penPtr->valueShow == SHOW_BOTH) {
+	    sprintf(string, fmt, x);
+	    strcat(string, ",");
+	    sprintf(string + strlen(string), fmt, y);
+	}
+	Blt_TextToPostScript(psToken, string, &(penPtr->valueStyle), 
+		     pointPtr->x, pointPtr->y);
+    } 
+}
+
 
 /*
  *----------------------------------------------------------------------
  *
- * PrintActiveLine --
+ * ActiveLineToPostScript --
  *
  *	Generates PostScript commands to draw as "active" the points
  *	(symbols) and or line segments (trace) representing the
@@ -3569,9 +4941,9 @@ PrintTraces(printable, linePtr, penPtr)
  *----------------------------------------------------------------------
  */
 static void
-PrintActiveLine(graphPtr, printable, elemPtr)
+ActiveLineToPostScript(graphPtr, psToken, elemPtr)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
     Element *elemPtr;
 {
     Line *linePtr = (Line *)elemPtr;
@@ -3581,29 +4953,37 @@ PrintActiveLine(graphPtr, printable, elemPtr)
     if (penPtr == NULL) {
 	return;
     }
-    symbolSize = ScaleSymbol(linePtr, penPtr->symbol.size);
-    if (linePtr->reqNumActive > 0) {
-	if (linePtr->flags & ELEM_UPDATE_ACTIVE) {
-	    ComputeActivePoints(graphPtr, linePtr);
+    symbolSize = ScaleSymbol(elemPtr, penPtr->symbol.size);
+    if (linePtr->nActiveIndices > 0) {
+	if (linePtr->flags & ACTIVE_PENDING) {
+	    MapActiveSymbols(graphPtr, linePtr);
 	}
 	if (penPtr->symbol.type != SYMBOL_NONE) {
-	    PrintSymbols(graphPtr, printable, penPtr, symbolSize,
-		linePtr->numActive, linePtr->activeArr);
+	    SymbolsToPostScript(graphPtr, psToken, penPtr, symbolSize,
+		linePtr->nActivePts, linePtr->activePts);
 	}
-    } else if (linePtr->reqNumActive < 0) {
-	if (penPtr->lineWidth > 0) {
-	    if (linePtr->numSegments > 0) {
-		SetLineAttributes(printable, penPtr);
-		Blt_SegmentsToPostScript(printable, linePtr->segArr,
-		    linePtr->numSegments);
+	if (penPtr->valueShow != SHOW_NONE) {
+	    ValuesToPostScript(psToken, linePtr, penPtr, linePtr->nActivePts,
+		       linePtr->activePts, linePtr->activeToData);
+	}
+    } else if (linePtr->nActiveIndices < 0) {
+	if (penPtr->traceWidth > 0) {
+	    if (linePtr->nStrips > 0) {
+		SetLineAttributes(psToken, penPtr);
+		Blt_2DSegmentsToPostScript(psToken, linePtr->strips, 
+			  linePtr->nStrips);
 	    }
-	    if (Blt_ListGetLength(&(linePtr->traces)) > 0) {
-		PrintTraces(printable, linePtr, (LinePen *)penPtr);
+	    if (Blt_ChainGetLength(linePtr->traces) > 0) {
+		TracesToPostScript(psToken, linePtr, (LinePen *)penPtr);
 	    }
 	}
 	if (penPtr->symbol.type != SYMBOL_NONE) {
-	    PrintSymbols(graphPtr, printable, penPtr, symbolSize,
-		linePtr->numPoints, linePtr->pointArr);
+	    SymbolsToPostScript(graphPtr, psToken, penPtr, symbolSize,
+		linePtr->nSymbolPts, linePtr->symbolPts);
+	}
+	if (penPtr->valueShow != SHOW_NONE) {
+	    ValuesToPostScript(psToken, linePtr, penPtr, linePtr->nSymbolPts, 
+		       linePtr->symbolPts, linePtr->symbolToData);
 	}
     }
 }
@@ -3611,7 +4991,7 @@ PrintActiveLine(graphPtr, printable, elemPtr)
 /*
  *----------------------------------------------------------------------
  *
- * PrintLine --
+ * NormalLineToPostScript --
  *
  *	Similar to the DrawLine procedure, prints PostScript related
  *	commands to form the connected line(s) representing the element.
@@ -3625,38 +5005,94 @@ PrintActiveLine(graphPtr, printable, elemPtr)
  *----------------------------------------------------------------------
  */
 static void
-PrintNormalLine(graphPtr, printable, elemPtr)
+NormalLineToPostScript(graphPtr, psToken, elemPtr)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
     Element *elemPtr;
 {
     Line *linePtr = (Line *)elemPtr;
-    LineStyle *stylePtr;
-    register int i;
+    register LinePenStyle *stylePtr;
+    Blt_ChainLink *linkPtr;
+    LinePen *penPtr;
+    unsigned int count;
+    XColor *colorPtr;
 
+    /* Draw fill area */
+    if (linePtr->fillPts != NULL) {
+	/* Create a path to use for both the polygon and its outline. */
+	Blt_PathToPostScript(psToken, linePtr->fillPts, linePtr->nFillPts);
+	Blt_AppendToPostScript(psToken, "closepath\n", (char *)NULL);
+
+	/* If the background fill color was specified, draw the
+	 * polygon in a solid fashion with that color.  */
+	if (linePtr->fillBgColor != NULL) {
+	    Blt_BackgroundToPostScript(psToken, linePtr->fillBgColor);
+	    Blt_AppendToPostScript(psToken, "Fill\n", (char *)NULL);
+	}
+	Blt_ForegroundToPostScript(psToken, linePtr->fillFgColor);
+	if (linePtr->fillTile != NULL) {
+	    /* TBA: Transparent tiling is the hard part. */
+	} else if ((linePtr->fillStipple != None) &&
+		   (linePtr->fillStipple != PATTERN_SOLID)) {
+	    /* Draw the stipple in the foreground color. */
+	    Blt_StippleToPostScript(psToken, graphPtr->display,
+		    linePtr->fillStipple);
+	} else {
+	    Blt_AppendToPostScript(psToken, "Fill\n", (char *)NULL);
+	}
+    }
     /* Draw lines */
-    if (graphPtr->type == TYPE_ELEM_STRIP) {
-	for (stylePtr = linePtr->styles, i = 0; i < linePtr->numStyles;
-	    i++, stylePtr++) {
-	    if ((stylePtr->numSegments > 0) &&
-		(stylePtr->penPtr->lineWidth > 0)) {
-		SetLineAttributes(printable, stylePtr->penPtr);
-		Blt_SegmentsToPostScript(printable, stylePtr->segPtr,
-		    stylePtr->numSegments);
+    if (linePtr->nStrips > 0) {
+	for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    penPtr = stylePtr->penPtr;
+	    if ((stylePtr->nStrips > 0) && (penPtr->traceWidth > 0)) {
+		SetLineAttributes(psToken, penPtr);
+		Blt_2DSegmentsToPostScript(psToken, stylePtr->strips,
+			stylePtr->nStrips);
 	    }
 	}
-    } else if ((Blt_ListGetLength(&(linePtr->traces)) > 0) &&
-	(linePtr->normalPenPtr->lineWidth > 0)) {
-	PrintTraces(printable, linePtr, linePtr->normalPenPtr);
+    } else if ((Blt_ChainGetLength(linePtr->traces) > 0) &&
+	(linePtr->normalPenPtr->traceWidth > 0)) {
+	TracesToPostScript(psToken, linePtr, linePtr->normalPenPtr);
     }
-    /* Draw symbols */
-    for (stylePtr = linePtr->styles, i = 0; i < linePtr->numStyles;
-	i++, stylePtr++) {
-	if ((stylePtr->numPoints > 0) &&
-	    (stylePtr->penPtr->symbol.type != SYMBOL_NONE)) {
-	    PrintSymbols(graphPtr, printable, stylePtr->penPtr,
-		stylePtr->symbolSize, stylePtr->numPoints, stylePtr->pointPtr);
+
+    /* Draw symbols, error bars, values. */
+
+    count = 0;
+    for (linkPtr = Blt_ChainFirstLink(linePtr->palette); linkPtr != NULL;
+	 linkPtr = Blt_ChainNextLink(linkPtr)) {
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	penPtr = stylePtr->penPtr;
+	colorPtr = penPtr->errorBarColor;
+	if (colorPtr == COLOR_DEFAULT) {
+	    colorPtr = penPtr->traceColor;
 	}
+	if ((stylePtr->xErrorBarCnt > 0) && (penPtr->errorBarShow & SHOW_X)) {
+	    Blt_LineAttributesToPostScript(psToken, colorPtr,
+		penPtr->errorBarLineWidth, NULL, CapButt, JoinMiter);
+	    Blt_2DSegmentsToPostScript(psToken, stylePtr->xErrorBars,
+		stylePtr->xErrorBarCnt);
+	}
+	if ((stylePtr->yErrorBarCnt > 0) && (penPtr->errorBarShow & SHOW_Y)) {
+	    Blt_LineAttributesToPostScript(psToken, colorPtr,
+		   penPtr->errorBarLineWidth, NULL, CapButt, JoinMiter);
+	    Blt_2DSegmentsToPostScript(psToken, stylePtr->yErrorBars,
+		stylePtr->yErrorBarCnt);
+	}
+	if ((stylePtr->nSymbolPts > 0) &&
+	    (stylePtr->penPtr->symbol.type != SYMBOL_NONE)) {
+	    SymbolsToPostScript(graphPtr, psToken, penPtr, 
+				stylePtr->symbolSize, stylePtr->nSymbolPts, 
+				stylePtr->symbolPts);
+	}
+	if (penPtr->valueShow != SHOW_NONE) {
+	    ValuesToPostScript(psToken, linePtr, penPtr, 
+			       stylePtr->nSymbolPts, stylePtr->symbolPts, 
+			       linePtr->symbolToData + count);
+	}
+	count += stylePtr->nSymbolPts;
     }
 }
 
@@ -3675,6 +5111,13 @@ PrintNormalLine(graphPtr, printable, elemPtr)
  *
  *----------------------------------------------------------------------
  */
+#define FreeVector(v) \
+    if ((v).clientId != NULL) { \
+	Blt_FreeVectorId((v).clientId); \
+    } else if ((v).valueArr != NULL) { \
+	Blt_Free((v).valueArr); \
+    } 
+
 static void
 DestroyLine(graphPtr, elemPtr)
     Graph *graphPtr;
@@ -3682,37 +5125,47 @@ DestroyLine(graphPtr, elemPtr)
 {
     Line *linePtr = (Line *)elemPtr;
 
-    if (linePtr->normalPenPtr != &(linePtr->normalPen)) {
+    if (linePtr->normalPenPtr != &(linePtr->builtinPen)) {
 	Blt_FreePen(graphPtr, (Pen *)linePtr->normalPenPtr);
     }
-    DestroyPen(graphPtr, (Pen *)&(linePtr->normalPen));
+    DestroyPen(graphPtr, (Pen *)&(linePtr->builtinPen));
     if (linePtr->activePenPtr != NULL) {
 	Blt_FreePen(graphPtr, (Pen *)linePtr->activePenPtr);
     }
-    if (linePtr->x.clientId != NULL) {
-	Blt_FreeVectorId(linePtr->x.clientId);
-    } else if (linePtr->x.valueArr != NULL) {
-	free((char *)linePtr->x.valueArr);
-    }
-    if (linePtr->y.clientId != NULL) {
-	Blt_FreeVectorId(linePtr->y.clientId);
-    } else if (linePtr->y.valueArr != NULL) {
-	free((char *)linePtr->y.valueArr);
-    }
-    if (linePtr->w.clientId != NULL) {
-	Blt_FreeVectorId(linePtr->w.clientId);
-    } else if (linePtr->w.valueArr != NULL) {
-	free((char *)linePtr->w.valueArr);
-    }
-    if (linePtr->reqActiveArr != NULL) {
-	free((char *)linePtr->reqActiveArr);
+
+    FreeVector(linePtr->w);
+    FreeVector(linePtr->x);
+    FreeVector(linePtr->xHigh);
+    FreeVector(linePtr->xLow);
+    FreeVector(linePtr->xError);
+    FreeVector(linePtr->y);
+    FreeVector(linePtr->yHigh);
+    FreeVector(linePtr->yLow);
+    FreeVector(linePtr->yError);
+
+    ResetLine(linePtr);
+    if (linePtr->palette != NULL) {
+	Blt_FreePalette(graphPtr, linePtr->palette);
+	Blt_ChainDestroy(linePtr->palette);
     }
     if (linePtr->tags != NULL) {
-	free((char *)linePtr->tags);
+	Blt_Free(linePtr->tags);
     }
-    ResetLineInfo(linePtr);
-    if (linePtr->styles != NULL) {
-	free((char *)linePtr->styles);
+    if (linePtr->activeIndices != NULL) {
+	Blt_Free(linePtr->activeIndices);
+    }
+    if (linePtr->fillPts != NULL) {
+	Blt_Free(linePtr->fillPts);
+    }
+    if (linePtr->fillTile != NULL) {
+	Blt_FreeTile(linePtr->fillTile);
+    }
+    if ((linePtr->fillStipple != None) && 
+	(linePtr->fillStipple != PATTERN_SOLID)) {
+	Tk_FreeBitmap(graphPtr->display, linePtr->fillStipple);
+    }
+    if (linePtr->fillGC != NULL) {
+	Tk_FreeGC(graphPtr->display, linePtr->fillGC);
     }
 }
 
@@ -3732,36 +5185,50 @@ DestroyLine(graphPtr, elemPtr)
  *----------------------------------------------------------------------
  */
 
-static ElemClassInfo lineClassInfo =
+static ElementProcs lineProcs =
 {
-    configSpecs,
-    ClosestLine,		/* Find closest element/data point */
-    ConfigureLine,		/* Configure line element */
-    DestroyLine,		/* Destroy the line element */
-    DrawActiveLine,		/* Draw the line using its "active" attributes */
-    DrawNormalLine,		/* Draw the line using its "normal" attributes */
-    DrawSymbol,			/* Draw the line's symbol */
-    ExtentsLine,		/* Find the extents of the element's data */
-    PrintActiveLine,		/* Print the line using its "active" attributes */
-    PrintNormalLine,		/* Print the line using its "normal" attributes */
-    PrintSymbol,		/* Print the line's symbol */
-    TransformLine,		/* Compute the screen coordinates for the line */
+    ClosestLine,		/* Finds the closest element/data point */
+    ConfigureLine,		/* Configures the element. */
+    DestroyLine,		/* Destroys the element. */
+    DrawActiveLine,		/* Draws active element */
+    DrawNormalLine,		/* Draws normal element */
+    DrawSymbol,			/* Draws the element symbol. */
+    GetLineExtents,		/* Find the extents of the element's data. */
+    ActiveLineToPostScript,	/* Prints active element. */
+    NormalLineToPostScript,	/* Prints normal element. */
+    SymbolToPostScript,		/* Prints the line's symbol. */
+    MapLine			/* Compute element's screen coordinates. */
 };
 
 Element *
-Blt_LineElement()
+Blt_LineElement(graphPtr, name, classUid)
+    Graph *graphPtr;
+    char *name;
+    Blt_Uid classUid;
 {
     register Line *linePtr;
 
-    linePtr = (Line *)calloc(1, sizeof(Line));
+    linePtr = Blt_Calloc(1, sizeof(Line));
     assert(linePtr);
-    linePtr->infoPtr = &lineClassInfo;
-    linePtr->penDir = PEN_BOTH_DIRECTIONS;
-    linePtr->reqSmooth = PEN_LINEAR;
-    linePtr->flags = LINE_INIT_SYMBOL_SCALE;
-    linePtr->normalPenPtr = &(linePtr->normalPen);
+    linePtr->procsPtr = &lineProcs;
+    if (classUid == bltLineElementUid) {
+	linePtr->configSpecs = lineElemConfigSpecs;
+    } else {
+	linePtr->configSpecs = stripElemConfigSpecs;
+    }
+
+    /* By default an element's name and label are the same. */
+    linePtr->label = Blt_Strdup(name);
+    linePtr->name = Blt_Strdup(name);
+
+    linePtr->classUid = classUid;
+    linePtr->flags = SCALE_SYMBOL;
+    linePtr->graphPtr = graphPtr;
     linePtr->labelRelief = TK_RELIEF_FLAT;
+    linePtr->normalPenPtr = &linePtr->builtinPen;
+    linePtr->palette = Blt_ChainCreate();
+    linePtr->penDir = PEN_BOTH_DIRECTIONS;
+    linePtr->reqSmooth = PEN_SMOOTH_NONE;
     InitPen(linePtr->normalPenPtr);
-    Blt_InitList(&(linePtr->traces), TCL_ONE_WORD_KEYS);
-    return (Element *) linePtr;
+    return (Element *)linePtr;
 }

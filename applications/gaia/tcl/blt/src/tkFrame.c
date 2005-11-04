@@ -18,20 +18,22 @@
 #include "bltInt.h"
 
 #ifndef NO_TILEFRAME
+
+#include "bltTile.h"
 /*
  * Defaults for frames:
  */
 
-#define DEF_FRAME_BG_COLOR		STD_COLOR_NORMAL_BG
-#define DEF_FRAME_BG_MONO		STD_MONO_NORMAL_BG
-#define DEF_FRAME_BORDER_WIDTH		"0"
+#define DEF_FRAME_BACKGROUND		STD_NORMAL_BACKGROUND
+#define DEF_FRAME_BG_MONO		STD_NORMAL_BG_MONO
+#define DEF_FRAME_BORDERWIDTH		"0"
 #define DEF_FRAME_CLASS			"Frame"
 #define DEF_FRAME_COLORMAP		""
 #define DEF_FRAME_CONTAINER		"0"
 #define DEF_FRAME_CURSOR		""
 #define DEF_FRAME_HEIGHT		"0"
-#define DEF_FRAME_HIGHLIGHT_BG		STD_COLOR_NORMAL_BG
-#define DEF_FRAME_HIGHLIGHT		RGB_COLOR_BLACK
+#define DEF_FRAME_HIGHLIGHT_BG		STD_NORMAL_BACKGROUND
+#define DEF_FRAME_HIGHLIGHT		RGB_BLACK
 #define DEF_FRAME_HIGHLIGHT_WIDTH	"0"
 #define DEF_FRAME_RELIEF		"flat"
 #define DEF_FRAME_TAKE_FOCUS		"0"
@@ -114,7 +116,6 @@ typedef struct {
     int flags;			/* Various flags;  see below for
 				 * definitions. */
     Blt_Tile tile;
-    GC tileGC;
 } Frame;
 
 /*
@@ -142,7 +143,7 @@ typedef struct {
 static Tk_ConfigSpec configSpecs[] =
 {
     {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_FRAME_BG_COLOR, Tk_Offset(Frame, border),
+	DEF_FRAME_BACKGROUND, Tk_Offset(Frame, border),
 	BOTH | TK_CONFIG_COLOR_ONLY | TK_CONFIG_NULL_OK},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
 	DEF_FRAME_BG_MONO, Tk_Offset(Frame, border),
@@ -152,7 +153,7 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_SYNONYM, "-bg", "background", (char *)NULL,
 	(char *)NULL, 0, BOTH},
     {TK_CONFIG_PIXELS, "-borderwidth", "borderWidth", "BorderWidth",
-	DEF_FRAME_BORDER_WIDTH, Tk_Offset(Frame, borderWidth), BOTH},
+	DEF_FRAME_BORDERWIDTH, Tk_Offset(Frame, borderWidth), BOTH},
     {TK_CONFIG_STRING, "-class", "class", "Class",
 	DEF_FRAME_CLASS, Tk_Offset(Frame, className), FRAME},
     {TK_CONFIG_STRING, "-class", "class", "Class",
@@ -160,10 +161,10 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_STRING, "-colormap", "colormap", "Colormap",
 	DEF_FRAME_COLORMAP, Tk_Offset(Frame, colormapName),
 	BOTH | TK_CONFIG_NULL_OK},
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     {TK_CONFIG_BOOLEAN, "-container", "container", "Container",
 	DEF_FRAME_CONTAINER, Tk_Offset(Frame, isContainer), BOTH},
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
     {TK_CONFIG_ACTIVE_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_FRAME_CURSOR, Tk_Offset(Frame, cursor), BOTH | TK_CONFIG_NULL_OK},
     {TK_CONFIG_PIXELS, "-height", "height", "Height",
@@ -176,11 +177,11 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_PIXELS, "-highlightthickness", "highlightThickness",
 	"HighlightThickness",
 	DEF_FRAME_HIGHLIGHT_WIDTH, Tk_Offset(Frame, highlightWidth), BOTH},
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     {TK_CONFIG_STRING, "-menu", "menu", "Menu",
 	DEF_TOPLEVEL_MENU, Tk_Offset(Frame, menuName),
 	TOPLEVEL | TK_CONFIG_NULL_OK},
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
     {TK_CONFIG_RELIEF, "-relief", "relief", "Relief",
 	DEF_FRAME_RELIEF, Tk_Offset(Frame, relief), BOTH},
     {TK_CONFIG_STRING, "-screen", "screen", "Screen",
@@ -192,10 +193,10 @@ static Tk_ConfigSpec configSpecs[] =
     {TK_CONFIG_CUSTOM, "-tile", "tile", "Tile",
 	(char *)NULL, Tk_Offset(Frame, tile), BOTH | TK_CONFIG_NULL_OK,
 	&bltTileOption},
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     {TK_CONFIG_STRING, "-use", "use", "Use",
-	DEF_FRAME_USE, Tk_Offset(Frame, useThis), BOTH | TK_CONFIG_NULL_OK},
-#endif /* TK_MAJOR_VERSION >= 8 */
+	DEF_FRAME_USE, Tk_Offset(Frame, useThis), TOPLEVEL|TK_CONFIG_NULL_OK},
+#endif
     {TK_CONFIG_STRING, "-visual", "visual", "Visual",
 	DEF_FRAME_VISUAL, Tk_Offset(Frame, visualName),
 	BOTH | TK_CONFIG_NULL_OK},
@@ -222,19 +223,35 @@ static int FrameWidgetCmd _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char **argv));
 static void MapFrame _ANSI_ARGS_((ClientData clientData));
 
-#ifdef __STDC__
 static Blt_TileChangedProc TileChangedProc;
 static Tcl_CmdProc FrameCmd, ToplevelCmd;
-#endif 
 
 #ifdef TILE_MAINWINDOW
-extern
+EXTERN
 #else
 static
 #endif
 int TkCreateFrame _ANSI_ARGS_((ClientData clientData,
 	Tcl_Interp *interp, int argc, char **argv,
 	int toplevel, char *appName));
+
+EXTERN void TkSetWindowMenuBar _ANSI_ARGS_((Tcl_Interp *interp, Tk_Window tkwin,
+        char *oldMenuName, char *menuName));
+
+EXTERN Tk_Window TkCreateMainWindow _ANSI_ARGS_((Tcl_Interp * interp, 
+	char * screenName, char * baseName));
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION > 3)
+#define TkSetClassProcs	Tk_SetClassProcs
+#else 
+EXTERN void TkSetClassProcs _ANSI_ARGS_((Tk_Window tkwin, void *procs, 
+	ClientData instanceData));
+#endif /* TK_MAJOR_VERSION == 8 && TK_MINOR_VERSION > 3 */
+
+EXTERN void TkpSetMainMenubar _ANSI_ARGS_((Tcl_Interp * interp, Tk_Window tkwin,
+	char * menuName));
+EXTERN int TkpUseWindow _ANSI_ARGS_((Tcl_Interp * interp, Tk_Window tkwin, 
+	char * string));
+EXTERN void TkpMakeContainer _ANSI_ARGS_((Tk_Window tkwin));
 
 
 /*
@@ -297,6 +314,7 @@ ToplevelCmd(clientData, interp, argc, argv)
  *--------------------------------------------------------------
  */
 
+/*ARGSUSED*/
 #ifndef TILE_MAINWINDOW
 static
 #endif /* TILE_MAINWINDOW */
@@ -314,14 +332,14 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
 				 * NULL:  gives the base name to use for the
 				 * new application. */
 {
-    Tk_Window tkwin = (Tk_Window)clientData;
     Frame *framePtr;
-    Tk_Window new = NULL;
+    Tk_Window new;
     char *className, *screenName, *visualName, *colormapName, *arg, *useOption;
     int i, c, length, depth;
     unsigned int mask;
     Colormap colormap;
     Visual *visual;
+    Tk_Window tkwin;
 
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -380,6 +398,7 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     if (screenName == NULL) {
 	screenName = (toplevel) ? "" : NULL;
     }
+    tkwin = Tk_MainWindow(interp);
     if (tkwin != NULL) {
 	new = Tk_CreateWindowFromPath(interp, tkwin, argv[1], screenName);
     } else {
@@ -396,15 +415,15 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
 	goto error;
     }
     if (className == NULL) {
-	className = Tk_GetOption(new, "class", "Class");
+	className = (char *)Tk_GetOption(new, "class", "Class");
 	if (className == NULL) {
 	    className = (toplevel) ? "Toplevel" : "Frame";
 	}
     }
     Tk_SetClass(new, className);
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     if (useOption == NULL) {
-	useOption = Tk_GetOption(new, "use", "Use");
+	useOption = (char *)Tk_GetOption(new, "use", "Use");
     }
     if (useOption != NULL) {
 	if (TkpUseWindow(interp, new, useOption) != TCL_OK) {
@@ -413,10 +432,10 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     }
 #endif
     if (visualName == NULL) {
-	visualName = Tk_GetOption(new, "visual", "Visual");
+	visualName = (char *)Tk_GetOption(new, "visual", "Visual");
     }
     if (colormapName == NULL) {
-	colormapName = Tk_GetOption(new, "colormap", "Colormap");
+	colormapName = (char *)Tk_GetOption(new, "colormap", "Colormap");
     }
     if (visualName != NULL) {
 	visual = Tk_GetVisual(interp, new, visualName, &depth,
@@ -448,16 +467,13 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
      * in the widget record from the special options.
      */
 
-    framePtr = (Frame *) ckalloc(sizeof(Frame));
+    framePtr = Blt_Malloc(sizeof(Frame));
     framePtr->tkwin = new;
     framePtr->display = Tk_Display(new);
     framePtr->interp = interp;
     framePtr->widgetCmd = Tcl_CreateCommand(interp,
 	Tk_PathName(new), FrameWidgetCmd,
 	(ClientData)framePtr, FrameCmdDeletedProc);
-#ifdef ITCL_NAMESPACES
-    Itk_SetWidgetCommand(tkwin, framePtr->widgetCmd);
-#endif /* ITCL_NAMESPACES */
     framePtr->className = NULL;
     framePtr->mask = (toplevel) ? TOPLEVEL : FRAME;
     framePtr->screenName = NULL;
@@ -478,10 +494,9 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     framePtr->useThis = NULL;
     framePtr->flags = 0;
     framePtr->tile = NULL;
-    framePtr->tileGC = NULL;
     framePtr->menuName = NULL;
 
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     /*
      * Store backreference to frame widget in window structure.
      */
@@ -496,7 +511,7 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     if (ConfigureFrame(interp, framePtr, argc - 2, argv + 2, 0) != TCL_OK) {
 	goto error;
     }
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     if ((framePtr->isContainer)) {
 	if (framePtr->useThis == NULL) {
 	    TkpMakeContainer(framePtr->tkwin);
@@ -510,7 +525,7 @@ TkCreateFrame(clientData, interp, argc, argv, toplevel, appName)
     if (toplevel) {
 	Tcl_DoWhenIdle(MapFrame, (ClientData)framePtr);
     }
-    Tcl_SetResult(interp, Tk_PathName(new), TCL_STATIC);
+    Tcl_SetResult(interp, Tk_PathName(new), TCL_VOLATILE);
     return TCL_OK;
 
   error:
@@ -546,7 +561,7 @@ FrameWidgetCmd(clientData, interp, argc, argv)
     char **argv;		/* Argument strings. */
 {
     register Frame *framePtr = (Frame *) clientData;
-    int result = TCL_OK;
+    int result;
     size_t length;
     int c, i;
 
@@ -646,7 +661,7 @@ DestroyFrame(memPtr)
     DestroyData *memPtr;	/* Info about frame widget. */
 {
     register Frame *framePtr = (Frame *) memPtr;
-
+    
     Tk_FreeOptions(configSpecs, (char *)framePtr, framePtr->display,
 	framePtr->mask);
     if (framePtr->tile != NULL) {
@@ -655,7 +670,7 @@ DestroyFrame(memPtr)
     if (framePtr->colormap != None) {
 	Tk_FreeColormap(framePtr->display, framePtr->colormap);
     }
-    ckfree((char *)framePtr);
+    Blt_Free(framePtr);
 }
 
 /*
@@ -677,26 +692,8 @@ TileChangedProc(clientData, tile)
     Frame *framePtr = (Frame *) clientData;
 
     if (framePtr->tkwin != NULL) {
-	GC newGC;
-	Pixmap pixmap;
-
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(tile);
-	if (pixmap != None) {
-	    unsigned long gcMask;
-	    XGCValues gcValues;
-
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(framePtr->tkwin, gcMask, &gcValues);
-	}
-	if (framePtr->tileGC != NULL) {
-	    Tk_FreeGC(framePtr->display, framePtr->tileGC);
-	}
-	framePtr->tileGC = newGC;
 	if (!(framePtr->flags & REDRAW_PENDING)) {
-	    Tk_DoWhenIdle(DisplayFrame, (ClientData)framePtr);
+	    Tcl_DoWhenIdle(DisplayFrame, (ClientData)framePtr);
 	    framePtr->flags |= REDRAW_PENDING;
 	}
     }
@@ -732,49 +729,30 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
     char **argv;		/* Arguments. */
     int flags;			/* Flags to pass to Tk_ConfigureWidget. */
 {
+#if (TK_MAJOR_VERSION > 4)
     char *oldMenuName;
 
     /*
      * Need the old menubar name for the menu code to delete it.
      */
 
-    oldMenuName = NULL;
-#if (TK_MAJOR_VERSION >= 8)
     if (framePtr->menuName == NULL) {
 	oldMenuName = NULL;
     } else {
-	oldMenuName = ckalloc(strlen(framePtr->menuName) + 1);
+	oldMenuName = Blt_Malloc(strlen(framePtr->menuName) + 1);
 	strcpy(oldMenuName, framePtr->menuName);
     }
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 
     if (Tk_ConfigureWidget(interp, framePtr->tkwin, configSpecs,
 	    argc, argv, (char *)framePtr, flags | framePtr->mask) != TCL_OK) {
 	return TCL_ERROR;
     }
     if (framePtr->tile != NULL) {
-	GC newGC;
-	Pixmap pixmap;
-
-	newGC = NULL;
-	pixmap = Blt_PixmapOfTile(framePtr->tile);
-	if (pixmap != None) {
-	    XGCValues gcValues;
-	    unsigned long gcMask;
-
-	    gcMask = (GCTile | GCFillStyle);
-	    gcValues.fill_style = FillTiled;
-	    gcValues.tile = pixmap;
-	    newGC = Tk_GetGC(framePtr->tkwin, gcMask, &gcValues);
-	}
-	if (framePtr->tileGC != NULL) {
-	    Tk_FreeGC(framePtr->display, framePtr->tileGC);
-	}
-	framePtr->tileGC = newGC;
 	Blt_SetTileChangedProc(framePtr->tile, TileChangedProc,
 	    (ClientData)framePtr);
     }
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     if (((oldMenuName == NULL) && (framePtr->menuName != NULL))
 	|| ((oldMenuName != NULL) && (framePtr->menuName == NULL))
 	|| ((oldMenuName != NULL) && (framePtr->menuName != NULL)
@@ -782,7 +760,7 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
 	TkSetWindowMenuBar(interp, framePtr->tkwin, oldMenuName,
 	    framePtr->menuName);
     }
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
     if (framePtr->border != NULL) {
 	Tk_SetBackgroundFromBorder(framePtr->tkwin, framePtr->border);
     } else {
@@ -797,11 +775,11 @@ ConfigureFrame(interp, framePtr, argc, argv, flags)
 	Tk_GeometryRequest(framePtr->tkwin, framePtr->width,
 	    framePtr->height);
     }
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     if (oldMenuName != NULL) {
-	ckfree(oldMenuName);
+	Blt_Free(oldMenuName);
     }
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 
     if (Tk_IsMapped(framePtr->tkwin)) {
 	if (!(framePtr->flags & REDRAW_PENDING)) {
@@ -841,19 +819,20 @@ DisplayFrame(clientData)
 	|| framePtr->isContainer) {
 	return;
     }
-    if (framePtr->tileGC == NULL) {
-	Tk_Fill3DRectangle(tkwin, Tk_WindowId(tkwin),
+    if (framePtr->tile == NULL) {
+	Blt_Fill3DRectangle(tkwin, Tk_WindowId(tkwin),
 	    framePtr->border, framePtr->highlightWidth,
 	    framePtr->highlightWidth,
 	    Tk_Width(tkwin) - 2 * framePtr->highlightWidth,
 	    Tk_Height(tkwin) - 2 * framePtr->highlightWidth,
 	    framePtr->borderWidth, framePtr->relief);
     } else {
-	Blt_SetTileOrigin(tkwin, framePtr->tileGC, 0, 0);
-	XFillRectangle(framePtr->display, Tk_WindowId(tkwin), framePtr->tileGC,
-	    0, 0, Tk_Width(tkwin), Tk_Height(tkwin));
-	if ((framePtr->border != NULL) && (framePtr->relief != TK_RELIEF_FLAT)) {
-	    Tk_Draw3DRectangle(tkwin, Tk_WindowId(tkwin),
+	Blt_SetTileOrigin(tkwin, framePtr->tile, 0, 0);
+	Blt_TileRectangle(tkwin, Tk_WindowId(tkwin), framePtr->tile, 0, 0, 
+		Tk_Width(tkwin), Tk_Height(tkwin));
+	if ((framePtr->border != NULL) && 
+	    (framePtr->relief != TK_RELIEF_FLAT)) {
+	    Blt_Draw3DRectangle(tkwin, Tk_WindowId(tkwin),
 		framePtr->border, framePtr->highlightWidth,
 		framePtr->highlightWidth,
 		Tk_Width(tkwin) - 2 * framePtr->highlightWidth,
@@ -904,14 +883,14 @@ FrameEventProc(clientData, eventPtr)
 	|| (eventPtr->type == ConfigureNotify)) {
 	goto redraw;
     } else if (eventPtr->type == DestroyNotify) {
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
 	if (framePtr->menuName != NULL) {
 	    TkSetWindowMenuBar(framePtr->interp, framePtr->tkwin,
 		framePtr->menuName, NULL);
-	    ckfree(framePtr->menuName);
+	    Blt_Free(framePtr->menuName);
 	    framePtr->menuName = NULL;
 	}
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 	if (framePtr->tkwin != NULL) {
 
 	    /*
@@ -923,16 +902,11 @@ FrameEventProc(clientData, eventPtr)
 	     * could be gone by then.  To do so, delete the event handler
 	     * explicitly (normally it's done implicitly by Tk_DestroyWindow).
 	     */
-
 	    Tk_DeleteEventHandler(framePtr->tkwin,
 		ExposureMask | StructureNotifyMask | FocusChangeMask,
 		FrameEventProc, (ClientData)framePtr);
-#ifdef ITCL_NAMESPACES
-	    Itk_SetWidgetCommand(framePtr->tkwin, (Tcl_Command) NULL);
-#endif
 	    framePtr->tkwin = NULL;
-	    Tcl_DeleteCommand(framePtr->interp,
-		Tcl_GetCommandName(framePtr->interp, framePtr->widgetCmd));
+	    Tcl_DeleteCommandFromToken(framePtr->interp, framePtr->widgetCmd);
 	}
 	if (framePtr->flags & REDRAW_PENDING) {
 	    Tcl_CancelIdleCall(DisplayFrame, (ClientData)framePtr);
@@ -953,11 +927,11 @@ FrameEventProc(clientData, eventPtr)
 		goto redraw;
 	    }
 	}
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     } else if (eventPtr->type == ActivateNotify) {
 	TkpSetMainMenubar(framePtr->interp, framePtr->tkwin,
 	    framePtr->menuName);
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
     }
     return;
 
@@ -993,14 +967,14 @@ FrameCmdDeletedProc(clientData)
     Frame *framePtr = (Frame *) clientData;
     Tk_Window tkwin = framePtr->tkwin;
 
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     if (framePtr->menuName != NULL) {
 	TkSetWindowMenuBar(framePtr->interp, framePtr->tkwin,
 	    framePtr->menuName, NULL);
-	ckfree(framePtr->menuName);
+	Blt_Free(framePtr->menuName);
 	framePtr->menuName = NULL;
     }
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 
     /*
      * This procedure could be invoked either because the window was
@@ -1011,9 +985,6 @@ FrameCmdDeletedProc(clientData)
 
     if (tkwin != NULL) {
 	framePtr->tkwin = NULL;
-#ifdef ITCL_NAMESPACES
-	Itk_SetWidgetCommand(tkwin, (Tcl_Command) NULL);
-#endif
 	Tk_DestroyWindow(tkwin);
     }
 }
@@ -1049,7 +1020,7 @@ MapFrame(clientData)
      */
 
     Tcl_Preserve((ClientData)framePtr);
-    while (1) {
+    for(;;) {
 	if (Tcl_DoOneEvent(TCL_IDLE_EVENTS) == 0) {
 	    break;
 	}
@@ -1087,12 +1058,12 @@ MapFrame(clientData)
  *--------------------------------------------------------------
  */
 
-#ifdef notdef
+#ifdef notdef	
 void
 TkInstallFrameMenu(tkwin)
     Tk_Window tkwin;		/* The window that was just created. */
 {
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
 #define Tk_InstanceData(tkwin)	(((Tk_FakeWin *)(tkwin))->dummy18)
 #define Tk_MainPtr(tkwin)	(((Tk_FakeWin *)(tkwin))->dummy5)
     if (Tk_MainPtr(tkwin) != NULL) {
@@ -1101,7 +1072,7 @@ TkInstallFrameMenu(tkwin)
 	framePtr = (Frame *) Tk_InstanceData(tkwin);
 	TkpMenuNotifyToplevelCreate(framePtr->interp, framePtr->menuName);
     }
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 }
 
 #endif
@@ -1120,7 +1091,7 @@ Blt_FrameInit(interp)
 	{"tiletoplevel", ToplevelCmd,},
 #endif /* HAVE_NAMESPACES */
     };
-    return (Blt_InitCmds(interp, "blt::tile", cmdSpecs, 2));
+    return Blt_InitCmds(interp, "blt::tile", cmdSpecs, 2);
 }
 
 #endif /* NO_TILEFRAME */

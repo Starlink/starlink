@@ -26,53 +26,96 @@
  */
 
 #include "bltGraph.h"
-#include <ctype.h>
+#include "bltChain.h"
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 
-static int StringToData _ANSI_ARGS_((ClientData clientData, Tcl_Interp *interp,
-	Tk_Window tkwin, char *string, char *widgRec, int offset));
-static char *DataToString _ANSI_ARGS_((ClientData clientData, Tk_Window tkwin,
-	char *widgRec, int offset, Tcl_FreeProc **freeProcPtr));
 
+static Tk_OptionParseProc StringToData;
+static Tk_OptionPrintProc DataToString;
+static Tk_OptionParseProc StringToDataPairs;
+static Tk_OptionPrintProc DataPairsToString;
+static Tk_OptionParseProc StringToAlong;
+static Tk_OptionPrintProc AlongToString;
+static Tk_CustomOption alongOption =
+{
+    StringToAlong, AlongToString, (ClientData)0
+};
 Tk_CustomOption bltDataOption =
 {
     StringToData, DataToString, (ClientData)0
 };
-
-static int StringToDataPairs _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *DataPairsToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
-
 Tk_CustomOption bltDataPairsOption =
 {
     StringToDataPairs, DataPairsToString, (ClientData)0
 };
+extern Tk_CustomOption bltDistanceOption;
+
 
+static int counter;
+
 #include "bltGrElem.h"
 
 extern Element *Blt_BarElement();
 extern Element *Blt_LineElement();
 
-#ifdef __STDC__
 static Blt_VectorChangedProc VectorChangedProc;
-#endif /* __STDC__ */
 
-extern Tk_CustomOption bltLengthOption;
-
+EXTERN int Blt_VectorExists2 _ANSI_ARGS_((Tcl_Interp *interp, char *vecName));
 
-/* ----------------------------------------------------------------------
+/*
+ * ----------------------------------------------------------------------
  * Custom option parse and print procedures
  * ----------------------------------------------------------------------
  */
+static int
+GetPenStyle(graphPtr, string, type, stylePtr)
+    Graph *graphPtr;
+    char *string;
+    Blt_Uid type;
+    PenStyle *stylePtr;
+{
+    Pen *penPtr;
+    Tcl_Interp *interp = graphPtr->interp;
+    char **elemArr;
+    int nElem;
+
+    elemArr = NULL;
+    if (Tcl_SplitList(interp, string, &nElem, &elemArr) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    if ((nElem != 1) && (nElem != 3)) {
+	Tcl_AppendResult(interp, "bad style \"", string, "\": should be ", 
+		 "\"penName\" or \"penName min max\"", (char *)NULL);
+	if (elemArr != NULL) {
+	    Blt_Free(elemArr);
+	}
+	return TCL_ERROR;
+    }
+    if (Blt_GetPen(graphPtr, elemArr[0], type, &penPtr) != TCL_OK) {
+	Blt_Free(elemArr);
+	return TCL_ERROR;
+    }
+    if (nElem == 3) {
+	double min, max;
+
+	if ((Tcl_GetDouble(interp, elemArr[1], &min) != TCL_OK) ||
+	    (Tcl_GetDouble(interp, elemArr[2], &max) != TCL_OK)) {
+	    Blt_Free(elemArr);
+	    return TCL_ERROR;
+	}
+	SetWeight(stylePtr->weight, min, max);
+    }
+    stylePtr->penPtr = penPtr;
+    Blt_Free(elemArr);
+    return TCL_OK;
+}
+
+
 static void
 SyncElemVector(vPtr)
     ElemVector *vPtr;
 {
-    vPtr->numValues = Blt_VecLength(vPtr->vecPtr);
+    vPtr->nValues = Blt_VecLength(vPtr->vecPtr);
     vPtr->valueArr = Blt_VecData(vPtr->vecPtr);
     vPtr->min = Blt_VecMin(vPtr->vecPtr);
     vPtr->max = Blt_VecMax(vPtr->vecPtr);
@@ -81,7 +124,7 @@ SyncElemVector(vPtr)
 /*
  *----------------------------------------------------------------------
  *
- * FindLimits --
+ * FindRange --
  *
  *	Find the minimum, positive minimum, and maximum values in a
  *	given vector and store the results in the vector structure.
@@ -96,25 +139,33 @@ SyncElemVector(vPtr)
  *----------------------------------------------------------------------
  */
 static void
-FindLimits(vPtr)
+FindRange(vPtr)
     ElemVector *vPtr;
 {
     register int i;
     register double *x;
     register double min, max;
 
-    if ((vPtr->numValues < 1) || (vPtr->valueArr == NULL)) {
-	return;			/* This shouldn't ever happen */
+    if ((vPtr->nValues < 1) || (vPtr->valueArr == NULL)) {
+	return;			/* This shouldn't ever happen. */
     }
     x = vPtr->valueArr;
 
-    /*  Initialize values to track the vector limits */
-    min = max = x[0];
-    for (i = 1; i < vPtr->numValues; i++) {
-	if (x[i] < min) {
-	    min = x[i];
-	} else if (x[i] > max) {
-	    max = x[i];
+    min = DBL_MAX, max = -DBL_MAX;
+    for(i = 0; i < vPtr->nValues; i++) {
+	if (FINITE(x[i])) {
+	    min = max = x[i];
+	    break;
+	}
+    }
+    /*  Initialize values to track the vector range */
+    for (/* empty */; i < vPtr->nValues; i++) {
+	if (FINITE(x[i])) {
+	    if (x[i] < min) {
+		min = x[i];
+	    } else if (x[i] > max) {
+		max = x[i];
+	    }
 	}
     }
     vPtr->min = min, vPtr->max = max;
@@ -143,17 +194,23 @@ Blt_FindElemVectorMinimum(vPtr, minLimit)
     double minLimit;
 {
     register int i;
-    register double *x;
-    register double min;
+    register double *arr;
+    register double min, x;
 
-    min = bltPosInfinity;
-    x = vPtr->valueArr;
-    for (i = 0; i <= vPtr->numValues; i++) {
-	if ((x[i] > minLimit) && (min > x[i])) {
-	    min = x[i];
+    min = DBL_MAX;
+    arr = vPtr->valueArr;
+    for (i = 0; i < vPtr->nValues; i++) {
+	x = arr[i];
+	if (x < 0.0) {
+	    /* What do you do about negative values when using log
+	     * scale values seems like a grey area.  Mirror. */
+	    x = -x;
+	}
+	if ((x > minLimit) && (min > x)) {
+	    min = x;
 	}
     }
-    if (min == bltPosInfinity) {
+    if (min == DBL_MAX) {
 	min = minLimit;
     }
     return min;
@@ -167,10 +224,10 @@ FreeDataVector(vPtr)
 	Blt_FreeVectorId(vPtr->clientId);	/* Free the old vector */
 	vPtr->clientId = NULL;
     } else if (vPtr->valueArr != NULL) {
-	free((char *)vPtr->valueArr);
+	Blt_Free(vPtr->valueArr);
     }
     vPtr->valueArr = NULL;
-    vPtr->numValues = 0;
+    vPtr->nValues = 0;
 }
 
 /*
@@ -193,7 +250,7 @@ VectorChangedProc(interp, clientData, notify)
     ClientData clientData;
     Blt_VectorNotify notify;
 {
-    ElemVector *vPtr = (ElemVector *)clientData;
+    ElemVector *vPtr = clientData;
     Element *elemPtr = vPtr->elemPtr;
     Graph *graphPtr = elemPtr->graphPtr;
 
@@ -201,18 +258,17 @@ VectorChangedProc(interp, clientData, notify)
     case BLT_VECTOR_NOTIFY_DESTROY:
 	vPtr->clientId = NULL;
 	vPtr->valueArr = NULL;
-	vPtr->numValues = 0;
+	vPtr->nValues = 0;
 	break;
 
     case BLT_VECTOR_NOTIFY_UPDATE:
     default:
-	Blt_GetVectorById(interp, vPtr->clientId, &(vPtr->vecPtr));
+	Blt_GetVectorById(interp, vPtr->clientId, &vPtr->vecPtr);
 	SyncElemVector(vPtr);
 	break;
-
     }
     graphPtr->flags |= RESET_AXES;
-    elemPtr->flags |= COORDS_NEEDED;
+    elemPtr->flags |= MAP_ITEM;
     if (!elemPtr->hidden) {
 	graphPtr->flags |= REDRAW_BACKING_STORE;
 	Blt_EventuallyRedrawGraph(graphPtr);
@@ -220,50 +276,51 @@ VectorChangedProc(interp, clientData, notify)
 }
 
 static int
-EvalExprList(interp, list, numElemPtr, dataPtrPtr)
+EvalExprList(interp, list, nElemPtr, arrayPtr)
     Tcl_Interp *interp;
     char *list;
-    int *numElemPtr;
-    double **dataPtrPtr;
+    int *nElemPtr;
+    double **arrayPtr;
 {
-    int numElem;
+    int nElem;
     char **elemArr;
-    double *dataArr;
+    double *array;
     int result;
 
     result = TCL_ERROR;
     elemArr = NULL;
-    if (Tcl_SplitList(interp, list, &numElem, &elemArr) != TCL_OK) {
+    if (Tcl_SplitList(interp, list, &nElem, &elemArr) != TCL_OK) {
 	return TCL_ERROR;
     }
-    dataArr = NULL;
-    if (numElem > 0) {
-	register double *dataPtr;
+    array = NULL;
+    if (nElem > 0) {
+	register double *valuePtr;
 	register int i;
 
-	dataArr = (double *)malloc(sizeof(double) * numElem);
-	if (dataArr == NULL) {
+	counter++;
+	array = Blt_Malloc(sizeof(double) * nElem);
+	if (array == NULL) {
 	    Tcl_AppendResult(interp, "can't allocate new vector", (char *)NULL);
 	    goto badList;
 	}
-	dataPtr = dataArr;
-	for (i = 0; i < numElem; i++) {
-	    if (Tcl_ExprDouble(interp, elemArr[i], dataPtr) != TCL_OK) {
+	valuePtr = array;
+	for (i = 0; i < nElem; i++) {
+	    if (Tcl_ExprDouble(interp, elemArr[i], valuePtr) != TCL_OK) {
 		goto badList;
 	    }
-	    dataPtr++;
+	    valuePtr++;
 	}
     }
     result = TCL_OK;
 
   badList:
-    free((char *)elemArr);
-    *dataPtrPtr = dataArr;
-    *numElemPtr = numElem;
+    Blt_Free(elemArr);
+    *arrayPtr = array;
+    *nElemPtr = nElem;
     if (result != TCL_OK) {
-	free((char *)dataArr);
+	Blt_Free(array);
     }
-    return (result);
+    return result;
 }
 
 /*
@@ -289,7 +346,7 @@ static int
 StringToData(clientData, interp, tkwin, string, widgRec, offset)
     ClientData clientData;	/* Type of axis vector to fill */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Tcl list of expressions */
     char *widgRec;		/* Element record */
     int offset;			/* Offset of vector in Element record */
@@ -298,29 +355,30 @@ StringToData(clientData, interp, tkwin, string, widgRec, offset)
     ElemVector *vPtr = (ElemVector *)(widgRec + offset);
 
     FreeDataVector(vPtr);
-    if (Blt_VectorExists(interp, string)) {
+    if (Blt_VectorExists2(interp, string)) {
 	Blt_VectorId clientId;
 
 	clientId = Blt_AllocVectorId(interp, string);
-	if (Blt_GetVectorById(interp, clientId, &(vPtr->vecPtr)) != TCL_OK) {
+	if (Blt_GetVectorById(interp, clientId, &vPtr->vecPtr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	Blt_SetVectorChangedProc(clientId, VectorChangedProc, (ClientData)vPtr);
+	Blt_SetVectorChangedProc(clientId, VectorChangedProc, vPtr);
 	vPtr->elemPtr = elemPtr;
 	vPtr->clientId = clientId;
 	SyncElemVector(vPtr);
+	elemPtr->flags |= MAP_ITEM;
     } else {
 	double *newArr;
-	int numValues;
+	int nValues;
 
-	if (EvalExprList(interp, string, &numValues, &newArr) != TCL_OK) {
+	if (EvalExprList(interp, string, &nValues, &newArr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if (numValues > 0) {
+	if (nValues > 0) {
 	    vPtr->valueArr = newArr;
 	}
-	vPtr->numValues = numValues;
-	FindLimits(vPtr);
+	vPtr->nValues = nValues;
+	FindRange(vPtr);
     }
     return TCL_OK;
 }
@@ -341,40 +399,41 @@ StringToData(clientData, interp, tkwin, string, widgRec, offset)
 static char *
 DataToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     ClientData clientData;	/* Type of axis vector to print */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Element record */
     int offset;			/* Offset of vector in Element record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
 {
-    Element *elemPtr = (Element *)(widgRec);
     ElemVector *vPtr = (ElemVector *)(widgRec + offset);
-    Tcl_DString dStr;
-    char string[TCL_DOUBLE_SPACE + 1];
+    Element *elemPtr = (Element *)(widgRec);
+    Tcl_DString dString;
     char *result;
-    register int i;
+    char string[TCL_DOUBLE_SPACE + 1];
+    double *p, *endPtr; 
 
     if (vPtr->clientId != NULL) {
 	return Blt_NameOfVectorId(vPtr->clientId);
     }
-    if (vPtr->numValues == 0) {
+    if (vPtr->nValues == 0) {
 	return "";
     }
-    Tcl_DStringInit(&dStr);
-    for (i = 0; i < vPtr->numValues; i++) {
-	Tcl_PrintDouble(elemPtr->graphPtr->interp, vPtr->valueArr[i], string);
-	Tcl_DStringAppendElement(&dStr, string);
+    Tcl_DStringInit(&dString);
+    endPtr = vPtr->valueArr + vPtr->nValues;
+    for (p = vPtr->valueArr; p < endPtr; p++) {
+	Tcl_PrintDouble(elemPtr->graphPtr->interp, *p, string);
+	Tcl_DStringAppendElement(&dString, string);
     }
-    result = Tcl_DStringValue(&dStr);
+    result = Tcl_DStringValue(&dString);
 
     /*
      * If memory wasn't allocated for the dynamic string, do it here (it's
      * currently on the stack), so that Tcl can free it normally.
      */
-    if (result == dStr.staticSpace) {
-	result = strdup(result);
+    if (result == dString.staticSpace) {
+	result = Blt_Strdup(result);
     }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
 
 /*
@@ -382,61 +441,62 @@ DataToString(clientData, tkwin, widgRec, offset, freeProcPtr)
  *
  * StringToDataPairs --
  *
- *	This procedure is like StringToData except that it
- *	interprets the list of numeric expressions as X Y coordinate
- *	pairs.  The minimum and maximum for both the X and Y vectors are
+ *	This procedure is like StringToData except that it interprets
+ *	the list of numeric expressions as X Y coordinate pairs.  The
+ *	minimum and maximum for both the X and Y vectors are
  *	determined.
  *
  * Results:
- *	The return value is a standard Tcl result.  The vectors are passed
- *	back via the widget record (elemPtr).
+ *	The return value is a standard Tcl result.  The vectors are
+ *	passed back via the widget record (elemPtr).
  *
  *----------------------------------------------------------------------
  */
 /*ARGSUSED*/
 static int
 StringToDataPairs(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* Tcl list of numeric expressions */
     char *widgRec;		/* Element record */
-    int offset;			/* not used */
+    int offset;			/* Not used. */
 {
     Element *elemPtr = (Element *)widgRec;
-    int numElem, newSize;
+    int nElem;
+    unsigned int newSize;
     double *newArr;
 
-    if (EvalExprList(interp, string, &numElem, &newArr) != TCL_OK) {
+    if (EvalExprList(interp, string, &nElem, &newArr) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if (numElem & 1) {
+    if (nElem & 1) {
 	Tcl_AppendResult(interp, "odd number of data points", (char *)NULL);
-	free((char *)newArr);
+	Blt_Free(newArr);
 	return TCL_ERROR;
     }
-    numElem /= 2;
-    newSize = numElem * sizeof(double);
+    nElem /= 2;
+    newSize = nElem * sizeof(double);
 
-    FreeDataVector(&(elemPtr->x));
-    FreeDataVector(&(elemPtr->y));
+    FreeDataVector(&elemPtr->x);
+    FreeDataVector(&elemPtr->y);
 
-    elemPtr->x.valueArr = (double *)malloc(newSize);
-    elemPtr->y.valueArr = (double *)malloc(newSize);
+    elemPtr->x.valueArr = Blt_Malloc(newSize);
+    elemPtr->y.valueArr = Blt_Malloc(newSize);
     assert(elemPtr->x.valueArr && elemPtr->y.valueArr);
-    elemPtr->x.numValues = elemPtr->y.numValues = numElem;
+    elemPtr->x.nValues = elemPtr->y.nValues = nElem;
 
     if (newSize > 0) {
 	register double *dataPtr;
 	register int i;
 
-	for (dataPtr = newArr, i = 0; i < numElem; i++) {
+	for (dataPtr = newArr, i = 0; i < nElem; i++) {
 	    elemPtr->x.valueArr[i] = *dataPtr++;
 	    elemPtr->y.valueArr[i] = *dataPtr++;
 	}
-	free((char *)newArr);
-	FindLimits(&(elemPtr->x));
-	FindLimits(&(elemPtr->y));
+	Blt_Free(newArr);
+	FindRange(&elemPtr->x);
+	FindRange(&elemPtr->y);
     }
     return TCL_OK;
 }
@@ -457,10 +517,10 @@ StringToDataPairs(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 DataPairsToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Element information record */
-    int offset;			/* not used */
+    int offset;			/* Not used. */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
 {
     Element *elemPtr = (Element *)widgRec;
@@ -469,71 +529,482 @@ DataPairsToString(clientData, tkwin, widgRec, offset, freeProcPtr)
     int length;
     char *result;
     char string[TCL_DOUBLE_SPACE + 1];
-    Tcl_DString dStr;
+    Tcl_DString dString;
 
     length = NumberOfPoints(elemPtr);
     if (length < 1) {
 	return "";
     }
-    Tcl_DStringInit(&dStr);
+    Tcl_DStringInit(&dString);
     for (i = 0; i < length; i++) {
 	Tcl_PrintDouble(interp, elemPtr->x.valueArr[i], string);
-	Tcl_DStringAppendElement(&dStr, string);
+	Tcl_DStringAppendElement(&dString, string);
 	Tcl_PrintDouble(interp, elemPtr->y.valueArr[i], string);
-	Tcl_DStringAppendElement(&dStr, string);
+	Tcl_DStringAppendElement(&dString, string);
     }
-    result = Tcl_DStringValue(&dStr);
+    result = Tcl_DStringValue(&dString);
 
     /*
-     * If memory wasn't allocated for the dynamic string, do it here (it's
-     * currently on the stack), so that Tcl can free it normally.
+     * If memory wasn't allocated for the dynamic string, do it here
+     * (it's currently on the stack), so that Tcl can free it
+     * normally.
      */
-    if (result == dStr.staticSpace) {
-	result = strdup(result);
+    if (result == dString.staticSpace) {
+	result = Blt_Strdup(result);
     }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return (result);
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
 }
-
+
 /*
- * Generic element routines:
+ *----------------------------------------------------------------------
+ *
+ * StringToAlong --
+ *
+ *	Given a Tcl list of numeric expression representing the element
+ *	values, convert into an array of double precision values. In
+ *	addition, the minimum and maximum values are saved.  Since
+ *	elastic values are allow (values which translate to the
+ *	min/max of the graph), we must try to get the non-elastic
+ *	minimum and maximum.
+ *
+ * Results:
+ *	The return value is a standard Tcl result.  The vector is passed
+ *	back via the vPtr.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+StringToAlong(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* String representation of value. */
+    char *widgRec;		/* Widget record. */
+    int offset;			/* Offset of field in widget record. */
+{
+    int *intPtr = (int *)(widgRec + offset);
+
+    if ((string[0] == 'x') && (string[1] == '\0')) {
+	*intPtr = SEARCH_X;
+    } else if ((string[0] == 'y') && (string[1] == '\0')) { 
+	*intPtr = SEARCH_Y;
+    } else if ((string[0] == 'b') && (strcmp(string, "both") == 0)) {
+	*intPtr = SEARCH_BOTH;
+    } else {
+	Tcl_AppendResult(interp, "bad along value \"", string, "\"",
+			 (char *)NULL);
+	return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * AlongToString --
+ *
+ *	Convert the vector of floating point values into a Tcl list.
+ *
+ * Results:
+ *	The string representation of the vector is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static char *
+AlongToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Widget record */
+    int offset;			/* Offset of field in widget record */
+    Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
+{
+    int along = *(int *)(widgRec + offset);
+
+    switch (along) {
+    case SEARCH_X:
+	return "x";
+    case SEARCH_Y:
+	return "y";
+    case SEARCH_BOTH:
+	return "both";
+    default:
+	return "unknown along value";
+    }
+}
+
+void
+Blt_FreePalette(graphPtr, palette)
+    Graph *graphPtr;
+    Blt_Chain *palette;
+{
+    Blt_ChainLink *linkPtr;
+
+    /* Skip the first slot. It contains the built-in "normal" pen of
+     * the element.  */
+    linkPtr = Blt_ChainFirstLink(palette);
+    if (linkPtr != NULL) {
+	register PenStyle *stylePtr;
+	Blt_ChainLink *nextPtr;
+
+	for (linkPtr = Blt_ChainNextLink(linkPtr); linkPtr != NULL; 
+	     linkPtr = nextPtr) {
+	    nextPtr =  Blt_ChainNextLink(linkPtr);
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    Blt_FreePen(graphPtr, stylePtr->penPtr);
+	    Blt_ChainDeleteLink(palette, linkPtr);
+	}
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_StringToStyles --
+ *
+ *	Parse the list of style names.
+ *
+ * Results:
+ *	The return value is a standard Tcl result.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+int
+Blt_StringToStyles(clientData, interp, tkwin, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
+    Tcl_Interp *interp;		/* Interpreter to send results back to */
+    Tk_Window tkwin;		/* Not used. */
+    char *string;		/* String representing style list */
+    char *widgRec;		/* Element information record */
+    int offset;			/* Offset of symbol type field in record */
+{
+    Blt_Chain *palette = *(Blt_Chain **)(widgRec + offset);
+    Blt_ChainLink *linkPtr;
+    Element *elemPtr = (Element *)(widgRec);
+    PenStyle *stylePtr;
+    char **elemArr;
+    int nStyles;
+    register int i;
+    size_t size = (size_t)clientData;
+
+    elemArr = NULL;
+    Blt_FreePalette(elemPtr->graphPtr, palette);
+    if ((string == NULL) || (*string == '\0')) {
+	nStyles = 0;
+    } else if (Tcl_SplitList(interp, string, &nStyles, &elemArr) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    /* Reserve the first entry for the "normal" pen. We'll set the
+     * style later */
+    linkPtr = Blt_ChainFirstLink(palette);
+    if (linkPtr == NULL) {
+	linkPtr = Blt_ChainAllocLink(size);
+	Blt_ChainLinkBefore(palette, linkPtr, NULL);
+    }
+    stylePtr = Blt_ChainGetValue(linkPtr);
+    stylePtr->penPtr = elemPtr->normalPenPtr;
+
+    for (i = 0; i < nStyles; i++) {
+	linkPtr = Blt_ChainAllocLink(size);
+	stylePtr = Blt_ChainGetValue(linkPtr);
+	stylePtr->weight.min = (double)i;
+	stylePtr->weight.max = (double)i + 1.0;
+	stylePtr->weight.range = 1.0;
+	if (GetPenStyle(elemPtr->graphPtr, elemArr[i], elemPtr->classUid,
+	    (PenStyle *)stylePtr) != TCL_OK) {
+	    Blt_Free(elemArr);
+	    Blt_FreePalette(elemPtr->graphPtr, palette);
+	    return TCL_ERROR;
+	}
+	Blt_ChainLinkBefore(palette, linkPtr, NULL);
+    }
+    if (elemArr != NULL) {
+	Blt_Free(elemArr);
+    }
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_StylesToString --
+ *
+ *	Convert the style information into a string.
+ *
+ * Results:
+ *	The string representing the style information is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+char *
+Blt_StylesToString(clientData, tkwin, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
+    char *widgRec;		/* Element information record */
+    int offset;			/* Not used. */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
+{
+    Blt_Chain *palette = *(Blt_Chain **)(widgRec + offset);
+    Tcl_DString dString;
+    char *result;
+    Blt_ChainLink *linkPtr;
+
+    Tcl_DStringInit(&dString);
+    linkPtr = Blt_ChainFirstLink(palette);
+    if (linkPtr != NULL) {
+	Element *elemPtr = (Element *)(widgRec);
+	char string[TCL_DOUBLE_SPACE];
+	Tcl_Interp *interp;
+	PenStyle *stylePtr;
+
+	interp = elemPtr->graphPtr->interp;
+	for (linkPtr = Blt_ChainNextLink(linkPtr); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+	    Tcl_DStringStartSublist(&dString);
+	    Tcl_DStringAppendElement(&dString, stylePtr->penPtr->name);
+	    Tcl_PrintDouble(interp, stylePtr->weight.min, string);
+	    Tcl_DStringAppendElement(&dString, string);
+	    Tcl_PrintDouble(interp, stylePtr->weight.max, string);
+	    Tcl_DStringAppendElement(&dString, string);
+	    Tcl_DStringEndSublist(&dString);
+	}
+    }
+    result = Blt_Strdup(Tcl_DStringValue(&dString));
+    *freeProcPtr = (Tcl_FreeProc *)Blt_Free;
+    return result;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_StyleMap --
+ *
+ *	Creates an array of style indices and fills it based on the weight
+ *	of each data point.
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Memory is freed and allocated for the index array.
+ *
+ *----------------------------------------------------------------------
  */
 
-ObjectType
-Blt_GetElementType(string)
-    char *string;
+PenStyle **
+Blt_StyleMap(elemPtr)
+    Element *elemPtr;
 {
-    unsigned int length;
-    char c;
+    register int i;
+    int nWeights;		/* Number of weights to be examined.
+				 * If there are more data points than
+				 * weights, they will default to the
+				 * normal pen. */
 
-    c = string[0];
-    length = strlen(string);
-    if ((c == 'l') && (strncmp(string, "line", length) == 0)) {
-	return TYPE_ELEM_LINE;
-    } else if ((c == 's') && (strncmp(string, "strip", length) == 0)) {
-	return TYPE_ELEM_STRIP;
-    } else if ((c == 'b') && (strncmp(string, "bar", length) == 0)) {
-	return TYPE_ELEM_BAR;
+    PenStyle **dataToStyle;	/* Directory of styles.  Each array
+				 * element represents the style for
+				 * the data point at that index */
+    Blt_ChainLink *linkPtr;
+    PenStyle *stylePtr;
+    double *w;			/* Weight vector */
+    int nPoints;
+
+    nPoints = NumberOfPoints(elemPtr);
+    nWeights = MIN(elemPtr->w.nValues, nPoints);
+    w = elemPtr->w.valueArr;
+    linkPtr = Blt_ChainFirstLink(elemPtr->palette);
+    stylePtr = Blt_ChainGetValue(linkPtr);
+
+    /* 
+     * Create a style mapping array (data point index to style), 
+     * initialized to the default style.
+     */
+    dataToStyle = Blt_Malloc(nPoints * sizeof(PenStyle *));
+    assert(dataToStyle);
+    for (i = 0; i < nPoints; i++) {
+	dataToStyle[i] = stylePtr;
+    }
+
+    for (i = 0; i < nWeights; i++) {
+	for (linkPtr = Blt_ChainLastLink(elemPtr->palette); linkPtr != NULL;
+	     linkPtr = Blt_ChainPrevLink(linkPtr)) {
+	    stylePtr = Blt_ChainGetValue(linkPtr);
+
+	    if (stylePtr->weight.range > 0.0) {
+		double norm;
+
+		norm = (w[i] - stylePtr->weight.min) / stylePtr->weight.range;
+		if (((norm - 1.0) <= DBL_EPSILON) && 
+		    (((1.0 - norm) - 1.0) <= DBL_EPSILON)) {
+		    dataToStyle[i] = stylePtr;
+		    break;		/* Done: found range that matches. */
+		}
+	    }
+	}
+    }
+    return dataToStyle;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_MapErrorBars --
+ *
+ *	Creates two arrays of points and pen indices, filled with
+ *	the screen coordinates of the visible
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Memory is freed and allocated for the index array.
+ *
+ *----------------------------------------------------------------------
+ */
+void
+Blt_MapErrorBars(graphPtr, elemPtr, dataToStyle)
+    Graph *graphPtr;
+    Element *elemPtr;
+    PenStyle **dataToStyle;
+{
+    int n, nPoints;
+    Extents2D exts;
+    PenStyle *stylePtr;
+
+    Blt_GraphExtents(graphPtr, &exts);
+    nPoints = NumberOfPoints(elemPtr);
+    if (elemPtr->xError.nValues > 0) {
+	n = MIN(elemPtr->xError.nValues, nPoints);
     } else {
-	return TYPE_UNKNOWN;
+	n = MIN3(elemPtr->xHigh.nValues, elemPtr->xLow.nValues, nPoints);
+    }
+    if (n > 0) {
+	Segment2D *errorBars;
+	Segment2D *segPtr;
+	double high, low;
+	double x, y;
+	int *errorToData;
+	int *indexPtr;
+	register int i;
+		
+	segPtr = errorBars = Blt_Malloc(n * 3 * sizeof(Segment2D));
+	indexPtr = errorToData = Blt_Malloc(n * 3 * sizeof(int));
+	for (i = 0; i < n; i++) {
+	    x = elemPtr->x.valueArr[i];
+	    y = elemPtr->y.valueArr[i];
+	    stylePtr = dataToStyle[i];
+	    if ((FINITE(x)) && (FINITE(y))) {
+		if (elemPtr->xError.nValues > 0) {
+		    high = x + elemPtr->xError.valueArr[i];
+		    low = x - elemPtr->xError.valueArr[i];
+		} else {
+		    high = elemPtr->xHigh.valueArr[i];
+		    low = elemPtr->xLow.valueArr[i];
+		}
+		if ((FINITE(high)) && (FINITE(low)))  {
+		    Point2D p, q;
+
+		    p = Blt_Map2D(graphPtr, high, y, &elemPtr->axes);
+		    q = Blt_Map2D(graphPtr, low, y, &elemPtr->axes);
+		    segPtr->p = p;
+		    segPtr->q = q;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		    /* Left cap */
+		    segPtr->p.x = segPtr->q.x = p.x;
+		    segPtr->p.y = p.y - stylePtr->errorBarCapWidth;
+		    segPtr->q.y = p.y + stylePtr->errorBarCapWidth;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		    /* Right cap */
+		    segPtr->p.x = segPtr->q.x = q.x;
+		    segPtr->p.y = q.y - stylePtr->errorBarCapWidth;
+		    segPtr->q.y = q.y + stylePtr->errorBarCapWidth;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		}
+	    }
+	}
+	elemPtr->xErrorBars = errorBars;
+	elemPtr->xErrorBarCnt = segPtr - errorBars;
+	elemPtr->xErrorToData = errorToData;
+    }
+    if (elemPtr->yError.nValues > 0) {
+	n = MIN(elemPtr->yError.nValues, nPoints);
+    } else {
+	n = MIN3(elemPtr->yHigh.nValues, elemPtr->yLow.nValues, nPoints);
+    }
+    if (n > 0) {
+	Segment2D *errorBars;
+	Segment2D *segPtr;
+	double high, low;
+	double x, y;
+	int *errorToData;
+	int *indexPtr;
+	register int i;
+		
+	segPtr = errorBars = Blt_Malloc(n * 3 * sizeof(Segment2D));
+	indexPtr = errorToData = Blt_Malloc(n * 3 * sizeof(int));
+	for (i = 0; i < n; i++) {
+	    x = elemPtr->x.valueArr[i];
+	    y = elemPtr->y.valueArr[i];
+	    stylePtr = dataToStyle[i];
+	    if ((FINITE(x)) && (FINITE(y))) {
+		if (elemPtr->yError.nValues > 0) {
+		    high = y + elemPtr->yError.valueArr[i];
+		    low = y - elemPtr->yError.valueArr[i];
+		} else {
+		    high = elemPtr->yHigh.valueArr[i];
+		    low = elemPtr->yLow.valueArr[i];
+		}
+		if ((FINITE(high)) && (FINITE(low)))  {
+		    Point2D p, q;
+		    
+		    p = Blt_Map2D(graphPtr, x, high, &elemPtr->axes);
+		    q = Blt_Map2D(graphPtr, x, low, &elemPtr->axes);
+		    segPtr->p = p;
+		    segPtr->q = q;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		    /* Top cap. */
+		    segPtr->p.y = segPtr->q.y = p.y;
+		    segPtr->p.x = p.x - stylePtr->errorBarCapWidth;
+		    segPtr->q.x = p.x + stylePtr->errorBarCapWidth;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		    /* Bottom cap. */
+		    segPtr->p.y = segPtr->q.y = q.y;
+		    segPtr->p.x = q.x - stylePtr->errorBarCapWidth;
+		    segPtr->q.x = q.x + stylePtr->errorBarCapWidth;
+		    if (Blt_LineRectClip(&exts, &segPtr->p, &segPtr->q)) {
+			segPtr++;
+			*indexPtr++ = i;
+		    }
+		}
+	    }
+	}
+	elemPtr->yErrorBars = errorBars;
+	elemPtr->yErrorBarCnt = segPtr - errorBars;
+	elemPtr->yErrorToData = errorToData;
     }
 }
 
-char *
-Blt_NameOfElementType(type)
-    ObjectType type;
-{
-    switch (type) {
-    case TYPE_ELEM_LINE:
-	return "line";
-    case TYPE_ELEM_STRIP:
-	return "strip";
-    case TYPE_ELEM_BAR:
-	return "bar";
-    default:
-	return "unknown element type";
-    }
-}
 
 /*
  *----------------------------------------------------------------------
@@ -555,57 +1026,50 @@ GetIndex(interp, elemPtr, string, indexPtr)
     char *string;
     int *indexPtr;
 {
-    long elemIndex;
+    long ielem;
     int last;
 
     last = NumberOfPoints(elemPtr) - 1;
     if ((*string == 'e') && (strcmp("end", string) == 0)) {
-	elemIndex = last;
-    } else if (Tcl_ExprLong(interp, string, &elemIndex) != TCL_OK) {
+	ielem = last;
+    } else if (Tcl_ExprLong(interp, string, &ielem) != TCL_OK) {
 	return TCL_ERROR;
     }
-#ifdef notdef
-    if ((elemIndex < 0) || (elemIndex > last)) {
-	Tcl_AppendResult(interp, "index \"", string,
-	    "\" is out of range for element", (char *)NULL);
-	return TCL_ERROR;
-    }
-#endif
-    *indexPtr = (int)elemIndex;
+    *indexPtr = (int)ielem;
     return TCL_OK;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_NameToElement --
+ * NameToElement --
  *
  *	Find the element represented the given name,  returning
- *	a pointer to its data structure in *elemPtrPtr*.
+ *	a pointer to its data structure via elemPtrPtr.
  *
  * Results:
  *     	A standard TCL result.
  *
  *----------------------------------------------------------------------
  */
-int
-Blt_NameToElement(graphPtr, name, elemPtrPtr)
+static int
+NameToElement(graphPtr, name, elemPtrPtr)
     Graph *graphPtr;
     char *name;
     Element **elemPtrPtr;
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
     if (name == NULL) {
 	return TCL_ERROR;
     }
-    hPtr = Tcl_FindHashEntry(&(graphPtr->elemTable), name);
+    hPtr = Blt_FindHashEntry(&graphPtr->elements.table, name);
     if (hPtr == NULL) {
 	Tcl_AppendResult(graphPtr->interp, "can't find element \"", name,
 	    "\" in \"", Tk_PathName(graphPtr->tkwin), "\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    *elemPtrPtr = (Element *)Tcl_GetHashValue(hPtr);
+    *elemPtrPtr = (Element *)Blt_GetHashValue(hPtr);
     return TCL_OK;
 }
 
@@ -626,32 +1090,38 @@ DestroyElement(graphPtr, elemPtr)
     Graph *graphPtr;
     Element *elemPtr;
 {
-    Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
 
-    Tk_FreeOptions(elemPtr->infoPtr->configSpecs, (char *)elemPtr,
-	graphPtr->display, GraphType(elemPtr));
+    Blt_DeleteBindings(graphPtr->bindTable, elemPtr);
+    Blt_LegendRemoveElement(graphPtr->legend, elemPtr);
+
+    Tk_FreeOptions(elemPtr->specsPtr, (char *)elemPtr, graphPtr->display, 0);
     /*
      * Call the element's own destructor to release the memory and
      * resources allocated for it.
      */
-    Blt_DeleteAllBindings(graphPtr->bindTable, (ClientData)elemPtr);
-    (*elemPtr->infoPtr->destroyProc) (graphPtr, elemPtr);
+    (*elemPtr->procsPtr->destroyProc) (graphPtr, elemPtr);
 
     /* Remove it also from the element display list */
-    item = Blt_ListFind(&(graphPtr->elemList), elemPtr->name);
-    if (item != NULL) {
-	Blt_ListDeleteItem(item);
-	graphPtr->flags |= SET_ALL_FLAGS;
-	Blt_EventuallyRedrawGraph(graphPtr);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	if (elemPtr == Blt_ChainGetValue(linkPtr)) {
+	    Blt_ChainDeleteLink(graphPtr->elements.displayList, linkPtr);
+	    if (!elemPtr->hidden) {
+		graphPtr->flags |= RESET_WORLD;
+		Blt_EventuallyRedrawGraph(graphPtr);
+	    }
+	    break;
+	}
     }
     /* Remove the element for the graph's hash table of elements */
     if (elemPtr->hashPtr != NULL) {
-	Tcl_DeleteHashEntry(elemPtr->hashPtr);
+	Blt_DeleteHashEntry(&graphPtr->elements.table, elemPtr->hashPtr);
     }
     if (elemPtr->name != NULL) {
-	free((char *)elemPtr->name);
+	Blt_Free(elemPtr->name);
     }
-    free((char *)elemPtr);
+    Blt_Free(elemPtr);
 }
 
 /*
@@ -667,60 +1137,54 @@ DestroyElement(graphPtr, elemPtr)
  *----------------------------------------------------------------------
  */
 static int
-CreateElement(graphPtr, interp, argc, argv, type)
+CreateElement(graphPtr, interp, argc, argv, classUid)
     Graph *graphPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
-    ObjectType type;
+    Blt_Uid classUid;
 {
     Element *elemPtr;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     int isNew;
 
-    hPtr = Tcl_CreateHashEntry(&(graphPtr->elemTable), argv[3], &isNew);
+    if (argv[3][0] == '-') {
+	Tcl_AppendResult(graphPtr->interp, "name of element \"", argv[3], 
+			 "\" can't start with a '-'", (char *)NULL);
+	return TCL_ERROR;
+    }
+    hPtr = Blt_CreateHashEntry(&graphPtr->elements.table, argv[3], &isNew);
     if (!isNew) {
 	Tcl_AppendResult(interp, "element \"", argv[3],
 	    "\" already exists in \"", argv[0], "\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    if (type == TYPE_ELEM_BAR) {
-	elemPtr = Blt_BarElement();
-    } else {
-	/* Stripcharts are line graphs with some options enabled */
-	elemPtr = Blt_LineElement();
+    if (classUid == bltBarElementUid) {
+	elemPtr = Blt_BarElement(graphPtr, argv[3], classUid);
+    } else { 
+	/* Stripcharts are line graphs with some options enabled. */	
+	elemPtr = Blt_LineElement(graphPtr, argv[3], classUid);
     }
     elemPtr->hashPtr = hPtr;
-
-    /* By default the element's name and it's label are the same. */
-    elemPtr->label = strdup(argv[3]);
-    elemPtr->name = strdup(argv[3]);
-    elemPtr->graphPtr = graphPtr;
-    elemPtr->hidden = 0;
-    elemPtr->type = type;
-    Tcl_SetHashValue(hPtr, (ClientData)elemPtr);
+    Blt_SetHashValue(hPtr, elemPtr);
 
     if (Blt_ConfigureWidgetComponent(interp, graphPtr->tkwin, elemPtr->name,
-	    "Element", elemPtr->infoPtr->configSpecs, argc - 4, argv + 4,
-	    (char *)elemPtr, GraphType(elemPtr)) != TCL_OK) {
+	    "Element", elemPtr->specsPtr, argc - 4, argv + 4, 
+		(char *)elemPtr, 0) != TCL_OK) {
 	DestroyElement(graphPtr, elemPtr);
 	return TCL_ERROR;
     }
-    (*elemPtr->infoPtr->configProc) (graphPtr, elemPtr);
+    (*elemPtr->procsPtr->configProc) (graphPtr, elemPtr);
+    Blt_ChainPrepend(graphPtr->elements.displayList, elemPtr);
 
     if (!elemPtr->hidden) {
-	/*
-	 * If the element hasn't been configured as hidden, add the new element
-	 * to the display list and redraw the graph.
-	 */
-	Blt_ListAppend(&(graphPtr->elemList), elemPtr->name,
-	    (ClientData)elemPtr);
+	/* If the new element isn't hidden then redraw the graph.  */
 	graphPtr->flags |= REDRAW_BACKING_STORE;
 	Blt_EventuallyRedrawGraph(graphPtr);
     }
-    elemPtr->flags |= COORDS_NEEDED;
+    elemPtr->flags |= MAP_ITEM;
     graphPtr->flags |= RESET_AXES;
-    Tcl_SetResult(interp, elemPtr->name, TCL_STATIC);
+    Tcl_SetResult(interp, elemPtr->name, TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -736,7 +1200,7 @@ CreateElement(graphPtr, interp, argc, argv, type)
  *
  * Results:
  *	The return value is a standard Tcl result.  Only if the Tcl list
- *	cannot be split, a TCL_ERROR is returned and interp->result contains
+ *	can not be split, a TCL_ERROR is returned and interp->result contains
  *	an error message.
  *
  * Side effects:
@@ -749,42 +1213,28 @@ RebuildDisplayList(graphPtr, newList)
     Graph *graphPtr;		/* Graph widget record */
     char *newList;		/* Tcl list of element names */
 {
-    int numNames;		/* Number of names found in Tcl name list */
+    int nNames;			/* Number of names found in Tcl name list */
     char **nameArr;		/* Broken out array of element names */
-    Tcl_HashSearch cursor;
     register int i;
-    register Tcl_HashEntry *hPtr;
     Element *elemPtr;		/* Element information record */
 
-    if (Tcl_SplitList(graphPtr->interp, newList, &numNames,
-	    &nameArr) != TCL_OK) {
+    if (Tcl_SplitList(graphPtr->interp, newList, &nNames, &nameArr) != TCL_OK) {
 	Tcl_AppendResult(graphPtr->interp, "can't split name list \"", newList,
 	    "\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    /*
-     * Clear the display list and mark all elements as hidden.
-     */
-    Blt_ListReset(&(graphPtr->elemList));
-    for (hPtr = Tcl_FirstHashEntry(&(graphPtr->elemTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	elemPtr = (Element *)Tcl_GetHashValue(hPtr);
-	elemPtr->hidden = TRUE;
-    }
+    /* Clear the display list and mark all elements as hidden.  */
+    Blt_ChainReset(graphPtr->elements.displayList);
 
-    /*
-     * Rebuild the display list, checking that each name it exists
-     * (currently ignoring invalid element names).
-     */
-    for (i = 0; i < numNames; i++) {
-	if (Blt_NameToElement(graphPtr, nameArr[i], &elemPtr) == TCL_OK) {
-	    elemPtr->hidden = FALSE;
-	    Blt_ListAppend(&(graphPtr->elemList), elemPtr->name,
-		(ClientData)elemPtr);
+    /* Rebuild the display list, checking that each name it exists
+     * (currently ignoring invalid element names).  */
+    for (i = 0; i < nNames; i++) {
+	if (NameToElement(graphPtr, nameArr[i], &elemPtr) == TCL_OK) {
+	    Blt_ChainAppend(graphPtr->elements.displayList, elemPtr);
 	}
     }
-    free((char *)nameArr);
-    graphPtr->flags |= SET_ALL_FLAGS;
+    Blt_Free(nameArr);
+    graphPtr->flags |= RESET_WORLD;
     Blt_EventuallyRedrawGraph(graphPtr);
     Tcl_ResetResult(graphPtr->interp);
     return TCL_OK;
@@ -810,38 +1260,40 @@ void
 Blt_DestroyElements(graphPtr)
     Graph *graphPtr;
 {
-    Tcl_HashEntry *hPtr;
-    Tcl_HashSearch cursor;
+    Blt_HashEntry *hPtr;
+    Blt_HashSearch cursor;
     Element *elemPtr;
 
-    for (hPtr = Tcl_FirstHashEntry(&(graphPtr->elemTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	elemPtr = (Element *)Tcl_GetHashValue(hPtr);
+    for (hPtr = Blt_FirstHashEntry(&graphPtr->elements.table, &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	elemPtr = (Element *)Blt_GetHashValue(hPtr);
 	elemPtr->hashPtr = NULL;
 	DestroyElement(graphPtr, elemPtr);
     }
-    Tcl_DeleteHashTable(&(graphPtr->elemTable));
-    Tcl_DeleteHashTable(&(graphPtr->elemTagTable));
-    Blt_ListReset(&(graphPtr->elemList));
+    Blt_DeleteHashTable(&graphPtr->elements.table);
+    Blt_DeleteHashTable(&graphPtr->elements.tagTable);
+    Blt_ChainDestroy(graphPtr->elements.displayList);
 }
 
 void
-Blt_TransformElements(graphPtr)
+Blt_MapElements(graphPtr)
     Graph *graphPtr;
 {
     Element *elemPtr;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
 
-    if (graphPtr->mode != MODE_NORMAL) {
+    if (graphPtr->mode != MODE_INFRONT) {
 	Blt_ResetStacks(graphPtr);
     }
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
-	if ((graphPtr->flags & COORDS_ALL_PARTS) ||
-	    (elemPtr->flags & COORDS_NEEDED)) {
-	    (*elemPtr->infoPtr->transformProc) (graphPtr, elemPtr);
-	    elemPtr->flags &= ~COORDS_NEEDED;
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
+	if (elemPtr->hidden) {
+	    continue;
+	}
+	if ((graphPtr->flags & MAP_ALL) || (elemPtr->flags & MAP_ITEM)) {
+	    (*elemPtr->procsPtr->mapProc) (graphPtr, elemPtr);
+	    elemPtr->flags &= ~MAP_ITEM;
 	}
     }
 }
@@ -868,13 +1320,15 @@ Blt_DrawElements(graphPtr, drawable)
     Graph *graphPtr;
     Drawable drawable;		/* Pixmap or window to draw into */
 {
-    register Blt_ListItem item;
-    register Element *elemPtr;
+    Blt_ChainLink *linkPtr;
+    Element *elemPtr;
 
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
-	(*elemPtr->infoPtr->drawNormalProc) (graphPtr, drawable, elemPtr);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
+	if (!elemPtr->hidden) {
+	    (*elemPtr->procsPtr->drawNormalProc) (graphPtr, drawable, elemPtr);
+	}
     }
 }
 
@@ -900,14 +1354,14 @@ Blt_DrawActiveElements(graphPtr, drawable)
     Graph *graphPtr;
     Drawable drawable;		/* Pixmap or window to draw into */
 {
-    register Blt_ListItem item;
-    register Element *elemPtr;
+    Blt_ChainLink *linkPtr;
+    Element *elemPtr;
 
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
-	if (elemPtr->flags & ELEM_ACTIVE) {
-	    (*elemPtr->infoPtr->drawActiveProc) (graphPtr, drawable, elemPtr);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
+	if ((!elemPtr->hidden) && (elemPtr->flags & ELEM_ACTIVE)) {
+	    (*elemPtr->procsPtr->drawActiveProc) (graphPtr, drawable, elemPtr);
 	}
     }
 }
@@ -915,7 +1369,7 @@ Blt_DrawActiveElements(graphPtr, drawable)
 /*
  * -----------------------------------------------------------------
  *
- * Blt_PrintElements --
+ * Blt_ElementsToPostScript --
  *
  *	Generates PostScript output for each graph element in the
  *	element display list.
@@ -923,70 +1377,73 @@ Blt_DrawActiveElements(graphPtr, drawable)
  * -----------------------------------------------------------------
  */
 void
-Blt_PrintElements(graphPtr, printable)
+Blt_ElementsToPostScript(graphPtr, psToken)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
 {
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
     Element *elemPtr;
 
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
-
-	/* Comment the PostScript to indicate the start of the element */
-	Blt_PrintFormat(printable, "\n%% Element \"%s\"\n\n", elemPtr->name);
-	(*elemPtr->infoPtr->printNormalProc) (graphPtr, printable, elemPtr);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
+	if (!elemPtr->hidden) {
+	    /* Comment the PostScript to indicate the start of the element */
+	    Blt_FormatToPostScript(psToken, "\n%% Element \"%s\"\n\n", 
+		elemPtr->name);
+	    (*elemPtr->procsPtr->printNormalProc) (graphPtr, psToken, elemPtr);
+	}
     }
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * Blt_PrintActiveElements --
+ * Blt_ActiveElementsToPostScript --
  *
  * -----------------------------------------------------------------
  */
 void
-Blt_PrintActiveElements(graphPtr, printable)
+Blt_ActiveElementsToPostScript(graphPtr, psToken)
     Graph *graphPtr;
-    Printable printable;
+    PsToken psToken;
 {
-    register Blt_ListItem item;
-    register Element *elemPtr;
+    Blt_ChainLink *linkPtr;
+    Element *elemPtr;
 
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
 	if ((!elemPtr->hidden) && (elemPtr->flags & ELEM_ACTIVE)) {
-	    Blt_PrintFormat(printable, "\n%% Active Element \"%s\"\n\n",
+	    Blt_FormatToPostScript(psToken, "\n%% Active Element \"%s\"\n\n",
 		elemPtr->name);
-	    (*elemPtr->infoPtr->printActiveProc) (graphPtr, printable, elemPtr);
+	    (*elemPtr->procsPtr->printActiveProc) (graphPtr, psToken, elemPtr);
 	}
     }
 }
-
 
 int
 Blt_GraphUpdateNeeded(graphPtr)
     Graph *graphPtr;
 {
-    register Blt_ListItem item;
-    register Element *elemPtr;
+    Blt_ChainLink *linkPtr;
+    Element *elemPtr;
 
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
+	if (elemPtr->hidden) {
+	    continue;
+	}
 	/* Check if the x or y vectors have notifications pending */
-	if (((elemPtr->x.clientId != NULL) &&
-		(Blt_VectorNotifyPending(elemPtr->x.clientId))) ||
-	    ((elemPtr->y.clientId != NULL) &&
-		(Blt_VectorNotifyPending(elemPtr->y.clientId)))) {
+	if ((Blt_VectorNotifyPending(elemPtr->x.clientId)) ||
+	    (Blt_VectorNotifyPending(elemPtr->y.clientId))) {
 	    return 1;
 	}
     }
     return 0;
 }
+
 
 /*
  *----------------------------------------------------------------------
@@ -1010,34 +1467,34 @@ ActivateOp(graphPtr, interp, argc, argv)
     Element *elemPtr;
     register int i;
     int *activeArr;
-    int reqNumActive;
+    int nActiveIndices;
 
     if (argc == 3) {
-	register Tcl_HashEntry *hPtr;
-	Tcl_HashSearch cursor;
+	register Blt_HashEntry *hPtr;
+	Blt_HashSearch cursor;
 
 	/* List all the currently active elements */
-	for (hPtr = Tcl_FirstHashEntry(&(graphPtr->elemTable), &cursor);
-	    hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	    elemPtr = (Element *)Tcl_GetHashValue(hPtr);
+	for (hPtr = Blt_FirstHashEntry(&graphPtr->elements.table, &cursor);
+	    hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	    elemPtr = (Element *)Blt_GetHashValue(hPtr);
 	    if (elemPtr->flags & ELEM_ACTIVE) {
 		Tcl_AppendElement(graphPtr->interp, elemPtr->name);
 	    }
 	}
 	return TCL_OK;
     }
-    if (Blt_NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
+    if (NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
 	return TCL_ERROR;	/* Can't find named element */
     }
-    elemPtr->flags |= ELEM_ACTIVE | ELEM_UPDATE_ACTIVE;
+    elemPtr->flags |= ELEM_ACTIVE | ACTIVE_PENDING;
 
     activeArr = NULL;
-    reqNumActive = -1;
+    nActiveIndices = -1;
     if (argc > 4) {
 	register int *activePtr;
 
-	reqNumActive = argc - 4;
-	activePtr = activeArr = (int *)malloc(sizeof(int) * reqNumActive);
+	nActiveIndices = argc - 4;
+	activePtr = activeArr = Blt_Malloc(sizeof(int) * nActiveIndices);
 	assert(activeArr);
 	for (i = 4; i < argc; i++) {
 	    if (GetIndex(interp, elemPtr, argv[i], activePtr) != TCL_OK) {
@@ -1046,11 +1503,11 @@ ActivateOp(graphPtr, interp, argc, argv)
 	    activePtr++;
 	}
     }
-    if (elemPtr->reqActiveArr != NULL) {
-	free((char *)elemPtr->reqActiveArr);
+    if (elemPtr->activeIndices != NULL) {
+	Blt_Free(elemPtr->activeIndices);
     }
-    elemPtr->reqNumActive = reqNumActive;
-    elemPtr->reqActiveArr = activeArr;
+    elemPtr->nActiveIndices = nActiveIndices;
+    elemPtr->activeIndices = activeArr;
     Blt_EventuallyRedrawGraph(graphPtr);
     return TCL_OK;
 }
@@ -1060,11 +1517,12 @@ Blt_MakeElementTag(graphPtr, tagName)
     Graph *graphPtr;
     char *tagName;
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     int isNew;
 
-    hPtr = Tcl_CreateHashEntry(&(graphPtr->elemTagTable), tagName, &isNew);
-    return (ClientData) Tcl_GetHashKey(&(graphPtr->elemTagTable), hPtr);
+    hPtr = Blt_CreateHashEntry(&graphPtr->elements.tagTable, tagName, &isNew);
+    assert(hPtr);
+    return Blt_GetHashKey(&graphPtr->elements.tagTable, hPtr);
 }
 
 /*
@@ -1084,6 +1542,18 @@ BindOp(graphPtr, interp, argc, argv)
     int argc;
     char **argv;
 {
+    if (argc == 3) {
+	Blt_HashEntry *hPtr;
+	Blt_HashSearch cursor;
+	char *tagName;
+
+	for (hPtr = Blt_FirstHashEntry(&graphPtr->elements.tagTable, &cursor);
+	    hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	    tagName = Blt_GetHashKey(&graphPtr->elements.tagTable, hPtr);
+	    Tcl_AppendElement(interp, tagName);
+	}
+	return TCL_OK;
+    }
     return Blt_ConfigureBindings(interp, graphPtr->bindTable,
 	Blt_MakeElementTag(graphPtr, argv[3]), argc - 4, argv + 4);
 }
@@ -1107,7 +1577,7 @@ CreateOp(graphPtr, interp, argc, argv, type)
     Tcl_Interp *interp;
     int argc;
     char **argv;
-    ObjectType type;
+    Blt_Uid type;
 {
     return CreateElement(graphPtr, interp, argc, argv, type);
 }
@@ -1129,11 +1599,11 @@ CgetOp(graphPtr, interp, argc, argv)
 {
     Element *elemPtr;
 
-    if (Blt_NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
+    if (NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
 	return TCL_ERROR;	/* Can't find named element */
     }
-    if (Tk_ConfigureValue(interp, graphPtr->tkwin, elemPtr->infoPtr->configSpecs,
-	    (char *)elemPtr, argv[4], GraphType(elemPtr)) != TCL_OK) {
+    if (Tk_ConfigureValue(interp, graphPtr->tkwin, elemPtr->specsPtr,
+	    (char *)elemPtr, argv[4], 0) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -1144,14 +1614,26 @@ CgetOp(graphPtr, interp, argc, argv)
  *
  * ClosestOp --
  *
- *	Find the element closest to the window coordinates specified.
+ *	Find the element closest to the specified screen coordinates.
+ *	Options:
+ *	-halo		Consider points only with this maximum distance
+ *			from the picked coordinate.
+ *	-interpolate	Find closest point along element traces, not just
+ *			data points.
+ *	-along
  *
  * Results:
- *	Returns TCL_OK if no errors occurred. The result field of the
- *	interpreter may contain a list containing the element name,
- *	the index of the closest point, and the x and y graph coordinates
- *	of the point is stored.  If an error occurred, returns TCL_ERROR
- *	and an error message is left in interp->result.
+ *	A standard Tcl result. If an element could be found within
+ *	the halo distance, the interpreter result is "1", otherwise
+ *	"0".  If a closest element exists, the designated Tcl array
+ *	variable will be set with the following information:
+ *
+ *	1) the element name,
+ *	2) the index of the closest point,
+ *	3) the distance (in screen coordinates) from the picked X-Y
+ *	   coordinate and the closest point,
+ *	4) the X coordinate (graph coordinate) of the closest point,
+ *	5) and the Y-coordinate.
  *
  *----------------------------------------------------------------------
  */
@@ -1159,9 +1641,11 @@ CgetOp(graphPtr, interp, argc, argv)
 static Tk_ConfigSpec closestSpecs[] =
 {
     {TK_CONFIG_CUSTOM, "-halo", (char *)NULL, (char *)NULL,
-	(char *)NULL, Tk_Offset(ClosestSearch, halo), 0, &bltLengthOption},
+	(char *)NULL, Tk_Offset(ClosestSearch, halo), 0, &bltDistanceOption},
     {TK_CONFIG_BOOLEAN, "-interpolate", (char *)NULL, (char *)NULL,
-	(char *)NULL, Tk_Offset(ClosestSearch, interpolate), 0},
+	(char *)NULL, Tk_Offset(ClosestSearch, mode), 0 }, 
+    {TK_CONFIG_CUSTOM, "-along", (char *)NULL, (char *)NULL,
+	(char *)NULL, Tk_Offset(ClosestSearch, along), 0, &alongOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
@@ -1174,28 +1658,29 @@ ClosestOp(graphPtr, interp, argc, argv)
     char **argv;		/* List of element names */
 {
     Element *elemPtr;
-    ClosestSearch info;
-    int i;
+    ClosestSearch search;
+    int i, x, y;
     int flags = TCL_LEAVE_ERR_MSG;
+    int found;
 
     if (graphPtr->flags & RESET_AXES) {
 	Blt_ResetAxes(graphPtr);
     }
-    if (Tk_GetPixels(interp, graphPtr->tkwin, argv[3], &(info.x)) != TCL_OK) {
+    if (Tk_GetPixels(interp, graphPtr->tkwin, argv[3], &x) != TCL_OK) {
 	Tcl_AppendResult(interp, ": bad window x-coordinate", (char *)NULL);
 	return TCL_ERROR;
     }
-    if (Tk_GetPixels(interp, graphPtr->tkwin, argv[4], &(info.y)) != TCL_OK) {
+    if (Tk_GetPixels(interp, graphPtr->tkwin, argv[4], &y) != TCL_OK) {
 	Tcl_AppendResult(interp, ": bad window y-coordinate", (char *)NULL);
 	return TCL_ERROR;
     }
     if (graphPtr->inverted) {
-	int hold;
+	int temp;
 
-	hold = info.x, info.x = info.y, info.y = hold;
+	temp = x, x = y, y = temp;
     }
     for (i = 6; i < argc; i += 2) {	/* Count switches-value pairs */
-	if ((argv[i][0] != '-') ||
+	if ((argv[i][0] != '-') || 
 	    ((argv[i][1] == '-') && (argv[i][2] == '\0'))) {
 	    break;
 	}
@@ -1203,70 +1688,96 @@ ClosestOp(graphPtr, interp, argc, argv)
     if (i > argc) {
 	i = argc;
     }
-    info.interpolate = 0;
-    info.halo = graphPtr->halo;
-    info.index = -1;
+
+    search.mode = SEARCH_POINTS;
+    search.halo = graphPtr->halo;
+    search.index = -1;
+    search.along = SEARCH_BOTH;
+    search.x = x;
+    search.y = y;
 
     if (Tk_ConfigureWidget(interp, graphPtr->tkwin, closestSpecs, i - 6,
-	    argv + 6, (char *)&info, TK_CONFIG_ARGV_ONLY) != TCL_OK) {
-	return TCL_ERROR;	/* Error processing option */
+	    argv + 6, (char *)&search, TK_CONFIG_ARGV_ONLY) != TCL_OK) {
+	return TCL_ERROR;	/* Error occurred processing an option. */
     }
     if ((i < argc) && (argv[i][0] == '-')) {
 	i++;			/* Skip "--" */
     }
-    info.dist = (double)(info.halo + 1);
+    search.dist = (double)(search.halo + 1);
 
     if (i < argc) {
+	Blt_ChainLink *linkPtr;
+
 	for ( /* empty */ ; i < argc; i++) {
-	    if (Blt_NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
+	    if (NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
 		return TCL_ERROR;	/* Can't find named element */
 	    }
-	    if (elemPtr->hidden) {
+	    found = FALSE;
+	    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+		 linkPtr == NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+		if (elemPtr == Blt_ChainGetValue(linkPtr)) {
+		    found = TRUE;
+		    break;
+		}
+	    }
+	    if ((!found) || (elemPtr->hidden)) {
 		Tcl_AppendResult(interp, "element \"", argv[i], "\" is hidden",
-		    (char *)NULL);
+			(char *)NULL);
 		return TCL_ERROR;	/* Element isn't visible */
 	    }
-	    (*elemPtr->infoPtr->closestProc) (graphPtr, elemPtr, &info);
+	    /* Check if the X or Y vectors have notifications pending */
+	    if ((elemPtr->flags & MAP_ITEM) ||
+		(Blt_VectorNotifyPending(elemPtr->x.clientId)) ||
+		(Blt_VectorNotifyPending(elemPtr->y.clientId))) {
+		continue;
+	    }
+	    (*elemPtr->procsPtr->closestProc) (graphPtr, elemPtr, &search);
 	}
     } else {
-	register Blt_ListItem item;
-	/*
+	Blt_ChainLink *linkPtr;
+
+	/* 
 	 * Find the closest point from the set of displayed elements,
-	 * searching the display list from back to front.  That way, if
-	 * the points from two different elements overlay each other exactly,
-	 * the one that's on top (visible) is picked.
+	 * searching the display list from back to front.  That way if
+	 * the points from two different elements overlay each other
+	 * exactly, the last one picked will be the topmost.  
 	 */
-	for (item = Blt_ListLastItem(&(graphPtr->elemList)); item != NULL;
-	    item = Blt_ListPrevItem(item)) {
-	    elemPtr = (Element *)Blt_ListGetValue(item);
-	    if (!elemPtr->hidden) {
-		(*elemPtr->infoPtr->closestProc) (graphPtr, elemPtr, &info);
+	for (linkPtr = Blt_ChainLastLink(graphPtr->elements.displayList);
+	    linkPtr != NULL; linkPtr = Blt_ChainPrevLink(linkPtr)) {
+	    elemPtr = Blt_ChainGetValue(linkPtr);
+	    /* Check if the X or Y vectors have notifications pending */
+	    if ((elemPtr->hidden) || 
+		(elemPtr->flags & MAP_ITEM) ||
+		(Blt_VectorNotifyPending(elemPtr->x.clientId)) ||
+		(Blt_VectorNotifyPending(elemPtr->y.clientId))) {
+		continue;
 	    }
+	    (*elemPtr->procsPtr->closestProc)(graphPtr, elemPtr, &search);
 	}
 
     }
-    if (info.dist < (double)info.halo) {
+    if (search.dist < (double)search.halo) {
 	char string[200];
 	/*
 	 *  Return an array of 5 elements
 	 */
 	if (Tcl_SetVar2(interp, argv[5], "name",
-		info.elemPtr->name, flags) == NULL) {
+		search.elemPtr->name, flags) == NULL) {
 	    return TCL_ERROR;
 	}
-	sprintf(string, "%d", info.index);
+	sprintf(string, "%d", search.index);
 	if (Tcl_SetVar2(interp, argv[5], "index", string, flags) == NULL) {
 	    return TCL_ERROR;
 	}
-	Tcl_PrintDouble(interp, info.point.x, string);
+	Tcl_PrintDouble(interp, search.point.x, string);
 	if (Tcl_SetVar2(interp, argv[5], "x", string, flags) == NULL) {
 	    return TCL_ERROR;
 	}
-	Tcl_PrintDouble(interp, info.point.y, string);
+	Tcl_PrintDouble(interp, search.point.y, string);
 	if (Tcl_SetVar2(interp, argv[5], "y", string, flags) == NULL) {
 	    return TCL_ERROR;
 	}
-	Tcl_PrintDouble(interp, info.dist, string);
+	Tcl_PrintDouble(interp, search.dist, string);
 	if (Tcl_SetVar2(interp, argv[5], "dist", string, flags) == NULL) {
 	    return TCL_ERROR;
 	}
@@ -1289,8 +1800,9 @@ ClosestOp(graphPtr, interp, argc, argv)
  *	arguments and calls the element specification configuration
  *	routine. If zero or one command line options are given, only
  *	information about the option(s) is returned in interp->result.
- *      If the element configuration has changed and the element is
- *	currently displayed, the axis limits are updated and recomputed.
+ *	If the element configuration has changed and the element is
+ *	currently displayed, the axis limits are updated and
+ *	recomputed.
  *
  * Results:
  *	The return value is a standard Tcl result.
@@ -1298,7 +1810,7 @@ ClosestOp(graphPtr, interp, argc, argv)
  * Side Effects:
  *	Graph will be redrawn to reflect the new display list.
  *
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------- 
  */
 static int
 ConfigureOp(graphPtr, interp, argc, argv)
@@ -1312,7 +1824,6 @@ ConfigureOp(graphPtr, interp, argc, argv)
     int numNames, numOpts;
     char **options;
     register int i;
-    Tk_ConfigSpec *specsPtr;
 
     /* Figure out where the option value pairs begin */
     argc -= 3;
@@ -1321,7 +1832,7 @@ ConfigureOp(graphPtr, interp, argc, argv)
 	if (argv[i][0] == '-') {
 	    break;
 	}
-	if (Blt_NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
+	if (NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
 	    return TCL_ERROR;	/* Can't find named element */
 	}
     }
@@ -1329,60 +1840,43 @@ ConfigureOp(graphPtr, interp, argc, argv)
     numOpts = argc - i;		/* Number of options specified */
     options = argv + numNames;	/* Start of options in argv  */
 
-    flags = TK_CONFIG_ARGV_ONLY | GraphType(elemPtr);
     for (i = 0; i < numNames; i++) {
-	Blt_NameToElement(graphPtr, argv[i], &elemPtr);
-	specsPtr = elemPtr->infoPtr->configSpecs;
+	NameToElement(graphPtr, argv[i], &elemPtr);
+	flags = TK_CONFIG_ARGV_ONLY;
 	if (numOpts == 0) {
-	    return (Tk_ConfigureInfo(interp, graphPtr->tkwin, specsPtr,
-		    (char *)elemPtr, (char *)NULL, flags));
+	    return Tk_ConfigureInfo(interp, graphPtr->tkwin, 
+		elemPtr->specsPtr, (char *)elemPtr, (char *)NULL, flags);
 	} else if (numOpts == 1) {
-	    return (Tk_ConfigureInfo(interp, graphPtr->tkwin, specsPtr,
-		    (char *)elemPtr, options[0], flags));
+	    return Tk_ConfigureInfo(interp, graphPtr->tkwin, 
+		elemPtr->specsPtr, (char *)elemPtr, options[0], flags);
 	}
-	if (Tk_ConfigureWidget(interp, graphPtr->tkwin, specsPtr, numOpts,
-		options, (char *)elemPtr, flags) != TCL_OK) {
+	if (Tk_ConfigureWidget(interp, graphPtr->tkwin, elemPtr->specsPtr, 
+		numOpts, options, (char *)elemPtr, flags) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	if ((*elemPtr->infoPtr->configProc) (graphPtr, elemPtr) != TCL_OK) {
+	if ((*elemPtr->procsPtr->configProc) (graphPtr, elemPtr) != TCL_OK) {
 	    return TCL_ERROR;	/* Failed to configure element */
 	}
-	if (Blt_ConfigModified(specsPtr, "-hide", (char *)NULL)) {
-	    Blt_ListItem item;
-
-	    item = Blt_ListFind(&(graphPtr->elemList), elemPtr->name);
-	    if ((elemPtr->hidden) != (item == NULL)) {
-		/*
-		 * The element's "hidden" variable is out of sync with the
-		 * display list. [That's what you get for having two ways
-		 * to do the same thing.] Update the display list by
-		 * either by adding or removing the element.
-		 */
-		if (item == NULL) {
-		    Blt_ListAppend(&(graphPtr->elemList), elemPtr->name,
-			(ClientData)elemPtr);
-		} else {
-		    Blt_ListDeleteItem(item);
-		}
-	    }
+	if (Blt_ConfigModified(elemPtr->specsPtr, "-hide", (char *)NULL)) {
 	    graphPtr->flags |= RESET_AXES;
-	    elemPtr->flags |= COORDS_NEEDED;
+	    elemPtr->flags |= MAP_ITEM;
 	}
-	/*
-	 * If data points or axes have changed, reset the axes (may affect
-	 * autoscaling) and recalculate the screen points of the element.
-	 */
-	if (Blt_ConfigModified(specsPtr, "-*data", "-map*", (char *)NULL)) {
-	    graphPtr->flags |= RESET_AXES;
-	    elemPtr->flags |= COORDS_NEEDED;
+	/* If data points or axes have changed, reset the axes (may
+	 * affect autoscaling) and recalculate the screen points of
+	 * the element. */
+
+	if (Blt_ConfigModified(elemPtr->specsPtr, "-*data", "-map*", "-x",
+		       "-y", (char *)NULL)) {
+	    graphPtr->flags |= RESET_WORLD;
+	    elemPtr->flags |= MAP_ITEM;
 	}
 	/* The new label may change the size of the legend */
-	if (Blt_ConfigModified(specsPtr, "-label", (char *)NULL)) {
-	    graphPtr->flags |= (COORDS_WORLD | REDRAW_WORLD);
+	if (Blt_ConfigModified(elemPtr->specsPtr, "-label", (char *)NULL)) {
+	    graphPtr->flags |= (MAP_WORLD | REDRAW_WORLD);
 	}
     }
     /* Update the pixmap if any configuration option changed */
-    graphPtr->flags |= REDRAW_BACKING_STORE | REDRAW_MARGINS;
+    graphPtr->flags |= (REDRAW_BACKING_STORE | DRAW_MARGINS);
     Blt_EventuallyRedrawGraph(graphPtr);
     return TCL_OK;
 }
@@ -1403,7 +1897,7 @@ ConfigureOp(graphPtr, interp, argc, argv)
 static int
 DeactivateOp(graphPtr, interp, argc, argv)
     Graph *graphPtr;		/* Graph widget */
-    Tcl_Interp *interp;		/* not used */
+    Tcl_Interp *interp;		/* Not used. */
     int argc;			/* Number of element names */
     char **argv;		/* List of element names */
 {
@@ -1411,15 +1905,15 @@ DeactivateOp(graphPtr, interp, argc, argv)
     register int i;
 
     for (i = 3; i < argc; i++) {
-	if (Blt_NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
+	if (NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
 	    return TCL_ERROR;	/* Can't find named element */
 	}
 	elemPtr->flags &= ~ELEM_ACTIVE;
-	if (elemPtr->reqActiveArr != NULL) {
-	    free((char *)elemPtr->reqActiveArr);
-	    elemPtr->reqActiveArr = NULL;
+	if (elemPtr->activeIndices != NULL) {
+	    Blt_Free(elemPtr->activeIndices);
+	    elemPtr->activeIndices = NULL;
 	}
-	elemPtr->reqNumActive = 0;
+	elemPtr->nActiveIndices = 0;
     }
     Blt_EventuallyRedrawGraph(graphPtr);
     return TCL_OK;
@@ -1433,13 +1927,13 @@ DeactivateOp(graphPtr, interp, argc, argv)
  *	Delete the named elements from the graph.
  *
  * Results:
- *	TCL_ERROR is returned if any of the named elements can not be found.
- *	Otherwise TCL_OK is returned;
+ *	TCL_ERROR is returned if any of the named elements can not be
+ *	found.  Otherwise TCL_OK is returned;
  *
  * Side Effects:
- *	If the element is currently displayed, the plotting area of the
- *	graph is redrawn. Memory and resources allocated by the elements
- *	are released.
+ *	If the element is currently displayed, the plotting area of
+ *	the graph is redrawn. Memory and resources allocated by the
+ *	elements are released.
  *
  *----------------------------------------------------------------------
  */
@@ -1447,7 +1941,7 @@ DeactivateOp(graphPtr, interp, argc, argv)
 static int
 DeleteOp(graphPtr, interp, argc, argv)
     Graph *graphPtr;		/* Graph widget */
-    Tcl_Interp *interp;		/* not used */
+    Tcl_Interp *interp;		/* Not used. */
     int argc;			/* Number of element names */
     char **argv;		/* List of element names */
 {
@@ -1455,7 +1949,7 @@ DeleteOp(graphPtr, interp, argc, argv)
     register int i;
 
     for (i = 3; i < argc; i++) {
-	if (Blt_NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
+	if (NameToElement(graphPtr, argv[i], &elemPtr) != TCL_OK) {
 	    return TCL_ERROR;	/* Can't find named element */
 	}
 	DestroyElement(graphPtr, elemPtr);
@@ -1469,13 +1963,11 @@ DeleteOp(graphPtr, interp, argc, argv)
  *
  * ExistsOp --
  *
- *	Runs through the given list of element entries and builds a
- *	Tcl list of element names.  This procedure is used in the
- *	"names" and "show" commands.
+ *	Indicates if the named element exists in the graph.
  *
  * Results:
- *	The return value is a standard Tcl result.
- *	interp->result contains the list of element names.
+ *	The return value is a standard Tcl result.  The interpreter
+ *	result will contain "1" or "0".
  *
  *----------------------------------------------------------------------
  */
@@ -1484,13 +1976,13 @@ static int
 ExistsOp(graphPtr, interp, argc, argv)
     Graph *graphPtr;
     Tcl_Interp *interp;
-    int argc;			/* unused */
+    int argc;			/* Not used. */
     char **argv;
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
 
-    hPtr = Tcl_FindHashEntry(&(graphPtr->elemTable), argv[3]);
-    Tcl_SetResult(interp, (hPtr == NULL) ? "0" : "1", TCL_STATIC);
+    hPtr = Blt_FindHashEntry(&graphPtr->elements.table, argv[3]);
+    Blt_SetBooleanResult(interp, (hPtr != NULL));
     return TCL_OK;
 }
 
@@ -1499,18 +1991,13 @@ ExistsOp(graphPtr, interp, argc, argv)
  *
  * GetOp --
  *
- * 	Find the legend entry from the given argument.  The argument
- *	can be either a screen position "@x,y" or the name of an
- *	element.
- *
- *	I don't know how useful it is to test with the name of an
- *	element.
+ * 	Returns the name of the picked element (using the element
+ *	bind operation).  Right now, the only name accepted is
+ *	"current".
  *
  * Results:
- *	A standard Tcl result.
- *
- * Side Effects:
- *	Graph will be redrawn to reflect the new legend attributes.
+ *	A standard Tcl result.  The interpreter result will contain
+ *	the name of the element.
  *
  *----------------------------------------------------------------------
  */
@@ -1519,7 +2006,7 @@ static int
 GetOp(graphPtr, interp, argc, argv)
     Graph *graphPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char *argv[];
 {
     register Element *elemPtr;
@@ -1527,9 +2014,11 @@ GetOp(graphPtr, interp, argc, argv)
     if ((argv[3][0] == 'c') && (strcmp(argv[3], "current") == 0)) {
 	elemPtr = (Element *)Blt_GetCurrentItem(graphPtr->bindTable);
 	/* Report only on elements. */
-	if ((elemPtr != NULL) && (elemPtr->type > TYPE_UNKNOWN) &&
-	    (elemPtr->type < TYPE_MARKER_BITMAP)) {
-	    Tcl_SetResult(interp, elemPtr->name, TCL_STATIC);
+	if ((elemPtr != NULL) && 
+	    ((elemPtr->classUid == bltBarElementUid) ||
+	    (elemPtr->classUid == bltLineElementUid) ||
+	    (elemPtr->classUid == bltStripElementUid))) {
+	    Tcl_SetResult(interp, elemPtr->name, TCL_VOLATILE);
 	}
     }
     return TCL_OK;
@@ -1540,13 +2029,13 @@ GetOp(graphPtr, interp, argc, argv)
  *
  * NamesOp --
  *
- *	Runs through the given list of element entries and builds a
- *	Tcl list of element names.  This procedure is used in the
- *	"names" and "show" commands.
+ *	Returns the names of the elements is the graph matching
+ *	one of more patterns provided.  If no pattern arguments
+ *	are given, then all element names will be returned.
  *
  * Results:
- *	The return value is a standard Tcl result.
- *	interp->result contains the list of element names.
+ *	The return value is a standard Tcl result. The interpreter
+ *	result will contain a Tcl list of the element names.
  *
  *----------------------------------------------------------------------
  */
@@ -1558,13 +2047,13 @@ NamesOp(graphPtr, interp, argc, argv)
     char **argv;
 {
     Element *elemPtr;
-    Tcl_HashSearch cursor;
-    register Tcl_HashEntry *hPtr;
+    Blt_HashSearch cursor;
+    register Blt_HashEntry *hPtr;
     register int i;
 
-    for (hPtr = Tcl_FirstHashEntry(&(graphPtr->elemTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	elemPtr = (Element *)Tcl_GetHashValue(hPtr);
+    for (hPtr = Blt_FirstHashEntry(&graphPtr->elements.table, &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	elemPtr = (Element *)Blt_GetHashValue(hPtr);
 	if (argc == 3) {
 	    Tcl_AppendElement(graphPtr->interp, elemPtr->name);
 	    continue;
@@ -1584,11 +2073,11 @@ NamesOp(graphPtr, interp, argc, argv)
  *
  * ShowOp --
  *
- *	Displays or rebuilds the element display list.
+ *	Queries or resets the element display list.
  *
  * Results:
- *	The return value is a standard Tcl result. interp->result
- *	will contain the new display list of element names.
+ *	The return value is a standard Tcl result. The interpreter
+ *	result will contain the new display list of element names.
  *
  *----------------------------------------------------------------------
  */
@@ -1600,16 +2089,16 @@ ShowOp(graphPtr, interp, argc, argv)
     char **argv;
 {
     Element *elemPtr;
-    register Blt_ListItem item;
+    Blt_ChainLink *linkPtr;
 
     if (argc == 4) {
 	if (RebuildDisplayList(graphPtr, argv[3]) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
-    for (item = Blt_ListFirstItem(&(graphPtr->elemList)); item != NULL;
-	item = Blt_ListNextItem(item)) {
-	elemPtr = (Element *)Blt_ListGetValue(item);
+    for (linkPtr = Blt_ChainFirstLink(graphPtr->elements.displayList);
+	linkPtr != NULL; linkPtr = Blt_ChainNextLink(linkPtr)) {
+	elemPtr = Blt_ChainGetValue(linkPtr);
 	Tcl_AppendElement(interp, elemPtr->name);
     }
     return TCL_OK;
@@ -1625,8 +2114,8 @@ ShowOp(graphPtr, interp, argc, argv)
  *
  * Results:
  *	A standard Tcl result. Returns the type of the element in
- *	interp->result. If the identifier given doesn't represent
- *	an element, then an error message is left in interp->result.
+ *	interp->result. If the identifier given doesn't represent an
+ *	element, then an error message is left in interp->result.
  *
  *----------------------------------------------------------------------
  */
@@ -1635,51 +2124,50 @@ static int
 TypeOp(graphPtr, interp, argc, argv)
     Graph *graphPtr;		/* Graph widget */
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;		/* Element name */
 {
     Element *elemPtr;
 
-    if (Blt_NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
+    if (NameToElement(graphPtr, argv[3], &elemPtr) != TCL_OK) {
 	return TCL_ERROR;	/* Can't find named element */
     }
-    Tcl_SetResult(interp, Blt_NameOfElementType(elemPtr->type), TCL_STATIC);
+    Tcl_SetResult(interp, elemPtr->classUid, TCL_STATIC);
     return TCL_OK;
 }
 
 /*
  * Global routines:
  */
-
 static Blt_OpSpec elemOps[] =
 {
-    {"activate", 1, (Blt_Operation)ActivateOp, 3, 0, "?elemName? ?index...?",},
-    {"bind", 1, (Blt_Operation)BindOp, 4, 6, "elemName sequence command",},
-    {"cget", 2, (Blt_Operation)CgetOp, 5, 5, "elemName option",},
-    {"closest", 2, (Blt_Operation)ClosestOp, 6, 0,
+    {"activate", 1, (Blt_Op)ActivateOp, 3, 0, "?elemName? ?index...?",},
+    {"bind", 1, (Blt_Op)BindOp, 3, 6, "elemName sequence command",},
+    {"cget", 2, (Blt_Op)CgetOp, 5, 5, "elemName option",},
+    {"closest", 2, (Blt_Op)ClosestOp, 6, 0,
 	"x y varName ?option value?... ?elemName?...",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 4, 0,
+    {"configure", 2, (Blt_Op)ConfigureOp, 4, 0,
 	"elemName ?elemName?... ?option value?...",},
-    {"create", 2, (Blt_Operation)CreateOp, 4, 0, "elemName ?option value?...",},
-    {"deactivate", 3, (Blt_Operation)DeactivateOp, 3, 0, "?elemName?...",},
-    {"delete", 3, (Blt_Operation)DeleteOp, 3, 0, "?elemName?...",},
-    {"exists", 1, (Blt_Operation)ExistsOp, 4, 4, "elemName",},
-    {"get", 1, (Blt_Operation)GetOp, 4, 4, "name",},
-    {"names", 1, (Blt_Operation)NamesOp, 3, 0, "?pattern?...",},
-    {"show", 1, (Blt_Operation)ShowOp, 3, 4, "?elemList?",},
-    {"type", 1, (Blt_Operation)TypeOp, 4, 4, "elemName",},
+    {"create", 2, (Blt_Op)CreateOp, 4, 0, "elemName ?option value?...",},
+    {"deactivate", 3, (Blt_Op)DeactivateOp, 3, 0, "?elemName?...",},
+    {"delete", 3, (Blt_Op)DeleteOp, 3, 0, "?elemName?...",},
+    {"exists", 1, (Blt_Op)ExistsOp, 4, 4, "elemName",},
+    {"get", 1, (Blt_Op)GetOp, 4, 4, "name",},
+    {"names", 1, (Blt_Op)NamesOp, 3, 0, "?pattern?...",},
+    {"show", 1, (Blt_Op)ShowOp, 3, 4, "?elemList?",},
+    {"type", 1, (Blt_Op)TypeOp, 4, 4, "elemName",},
 };
 static int numElemOps = sizeof(elemOps) / sizeof(Blt_OpSpec);
 
 
 /*
- *--------------------------------------------------------------
+ * ----------------------------------------------------------------
  *
  * Blt_ElementOp --
  *
- *	This procedure is invoked to process the Tcl command
- *	that corresponds to a widget managed by this module.
- *	See the user documentation for details on what it does.
+ *	This procedure is invoked to process the Tcl command that
+ *	corresponds to a widget managed by this module.  See the user
+ *	documentation for details on what it does.
  *
  * Results:
  *	A standard Tcl result.
@@ -1687,7 +2175,7 @@ static int numElemOps = sizeof(elemOps) / sizeof(Blt_OpSpec);
  * Side effects:
  *	See the user documentation.
  *
- *--------------------------------------------------------------
+ * ----------------------------------------------------------------
  */
 int
 Blt_ElementOp(graphPtr, interp, argc, argv, type)
@@ -1695,13 +2183,12 @@ Blt_ElementOp(graphPtr, interp, argc, argv, type)
     Tcl_Interp *interp;
     int argc;			/* # arguments */
     char **argv;		/* Argument list */
-    ObjectType type;
+    Blt_Uid type;
 {
-    Blt_Operation proc;
+    Blt_Op proc;
     int result;
 
-    proc = Blt_GetOperation(interp, numElemOps, elemOps, BLT_OPER_ARG2,
-	argc, argv);
+    proc = Blt_GetOp(interp, numElemOps, elemOps, BLT_OP_ARG2, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
@@ -1710,5 +2197,5 @@ Blt_ElementOp(graphPtr, interp, argc, argv, type)
     } else {
 	result = (*proc) (graphPtr, interp, argc, argv);
     }
-    return (result);
+    return result;
 }

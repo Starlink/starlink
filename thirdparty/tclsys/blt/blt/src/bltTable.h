@@ -1,7 +1,8 @@
 /*
  * bltTable.h --
  *
- *	This module implements a table geometry manager for the Tk toolkit.
+ *	This module implements a table-based geometry manager
+ *	for the BLT toolkit.
  *
  * Copyright 1993-1998 Lucent Technologies, Inc.
  *
@@ -23,45 +24,57 @@
  * out of or in connection with the use or performance of this
  * software.
  *
- * Table geometry manager was created by George Howlett.  */
+ *	The table geometry manager was created by George Howlett.
+ */
 
-typedef struct Editor Editor;
+#ifndef _BLT_TABLE_H
+#define _BLT_TABLE_H
+
+#include "bltChain.h"
+#include "bltHash.h"
+#include "bltList.h"
+
+typedef struct {
+    Blt_HashTable tableTable;	/* Hash table of table structures keyed by 
+				 * the address of the reference Tk window */
+} TableInterpData;
+
+
+typedef struct EditorStruct Editor;
 typedef void (EditorDrawProc) _ANSI_ARGS_((Editor *editor));
-typedef void (EditorDestroyProc) _ANSI_ARGS_((Editor *editor));
+typedef void (EditorDestroyProc) _ANSI_ARGS_((DestroyData destroyData));
 
-struct Editor {
+struct EditorStruct {
     int gridLineWidth;
     int buttonHeight;
-    int cubiclePad;
+    int entryPad;
     int minSize;		/* Minimum size to allow any partition */
 
     EditorDrawProc *drawProc;
     EditorDestroyProc *destroyProc;
 };
 
-#define numRows		rows.length
-#define rowArr		rows.array
-#define numCols		columns.length
-#define colArr		columns.array
+#define nRows		rowInfo.chainPtr->nLinks
+#define nColumns	columnInfo.chainPtr->nLinks
 
 /*
  * Limits --
  *
  * 	Defines the bounding of a size (width or height) in the table.
- * 	It may be related to the partition, cubicle, or table size.  The
- * 	window pointers are used to associate * sizes with the requested
- * 	size of other windows.
- *
+ * 	It may be related to the partition, entry, or table size.  The
+ * 	widget pointers are used to associate sizes with the requested
+ * 	size of other widgets.
  */
+
 typedef struct {
     int flags;			/* Flags indicate whether using default
 				 * values for limits or not. See flags
 				 * below. */
     int max, min;		/* Values for respective limits. */
     int nom;			/* Nominal starting value. */
-    Tk_Window maxWin, minWin;	/* If non-NULL, represents windows whose
+    Tk_Window wMax, wMin;	/* If non-NULL, represents widgets whose
 				 * requested sizes will be set as limits. */
-    Tk_Window nomWin;		/* If non-NULL represents window whose
+    Tk_Window wNom;		/* If non-NULL represents widget whose
 				 * requested size will be the nominal
 				 * size. */
 } Limits;
@@ -71,9 +84,9 @@ typedef struct {
 #define LIMITS_SET_MAX  (LIMITS_SET_BIT<<1)
 #define LIMITS_SET_NOM  (LIMITS_SET_BIT<<2)
 
-#define LIMITS_DEF_MIN	0	/* Default minimum limit  */
-#define LIMITS_DEF_MAX	SHRT_MAX/* Default maximum limit */
-#define LIMITS_DEF_NOM	-1000	/* Default nomimal value.  Indicates if a
+#define LIMITS_MIN	0	/* Default minimum limit  */
+#define LIMITS_MAX	SHRT_MAX/* Default maximum limit */
+#define LIMITS_NOM	-1000	/* Default nomimal value.  Indicates if a
 				 * partition has received any space yet */
 
 typedef int (LimitsProc) _ANSI_ARGS_((int value, Limits *limitsPtr));
@@ -81,14 +94,14 @@ typedef int (LimitsProc) _ANSI_ARGS_((int value, Limits *limitsPtr));
 /*
  * Resize --
  *
- * 	These flags indicate in what ways each partition in a table
- *	can be resized from its normal dimensions.  The normal size
- *	of a partition is the amount of space needed to contain the
- *	slave windows that span it.  The table may then be stretched
- *	or shrunk depending if the master window is larger or smaller
- *	than the table. This can occur if 1) the user resizes the
- *	toplevel window, or 2) the master window is in turn packed
- *	into a larger window and the "fill" option is set.
+ *	These flags indicate in what ways each partition in a table
+ *	can be resized from its default dimensions.  The normal size of
+ *	a row/column is the minimum amount of space needed to hold the
+ *	widgets that span it.  The table may then be stretched or
+ *	shrunk depending if the container is larger or smaller than
+ *	the table. This can occur if 1) the user resizes the toplevel
+ *	widget, or 2) the container is in turn packed into a larger
+ *	widget and the "fill" option is set.
  *
  * 	  RESIZE_NONE 	  - No resizing from normal size.
  *	  RESIZE_EXPAND   - Do not allow the size to decrease.
@@ -97,267 +110,253 @@ typedef int (LimitsProc) _ANSI_ARGS_((int value, Limits *limitsPtr));
  *			    The size may decrease however.
  *	  RESIZE_BOTH     - Allow the size to increase or
  *			    decrease from the normal size.
- *
+ *	  RESIZE_VIRGIN   - Special case of the resize flag.  Used to
+ *			    indicate the initial state of the flag.
+ *			    Empty rows/columns are treated differently
+ *			    if this row/column is set.
  */
-typedef enum {
-    RESIZE_NONE,
-    RESIZE_EXPAND,
-    RESIZE_SHRINK,
-    RESIZE_BOTH
-} Resize;
+
+#define RESIZE_NONE	0
+#define RESIZE_EXPAND	(1<<0)
+#define RESIZE_SHRINK	(1<<1)
+#define RESIZE_BOTH	(RESIZE_EXPAND | RESIZE_SHRINK)
+#define RESIZE_VIRGIN	(1<<2)
 
 /*
- * Weight --
- *
- * 	These flags indicate in what ways each partition in a table
- *	can be resized from its normal dimensions.  The normal size
- *	of a partition is the amount of space needed to contain the
- *	slave windows that span it.  The table may then be stretched
- *	or shrunk depending if the master window is larger or smaller
- *	than the table. This can occur if 1) the user resizes the
- *	toplevel window, or 2) the master window is in turn packed
- *	into a larger window and the "fill" option is set.
- *
- * 	  RESIZE_NONE 	  - No resizing from normal size.
- *	  RESIZE_EXPAND   - Do not allow the size to decrease.
- *			    The size may increase however.
- *        RESIZE_SHRINK   - Do not allow the size to increase.
- *			    The size may decrease however.
- *	  RESIZE_BOTH     - Allow the size to increase or
- *			    decrease from the normal size.
- *
+ * Control --
  */
-typedef enum {
-    WEIGHT_NORMAL,		/* Consider the slave window when
+#define CONTROL_NORMAL	1.0	/* Consider the widget when
 				 * calculating the row heights and
 				 * column widths.  */
-    WEIGHT_NONE,		/* Ignore the slave window.  The
-				 * height and width of the slave will
-				 * not affect the column widths and
-				 * row heights of the partitions it
-				 * spans.  */
-    WEIGHT_FULL			/* Consider only this slave window
-				 * when determining the column widths
+#define CONTROL_NONE	0.0	/* Ignore the widget.  The height and
+				 * width of the rows/columns spanned
+				 * by this widget will not affected by
+				 * the size of the widget.
+				 */
+#define CONTROL_FULL	-1.0	/* Consider only this widget when
+				 * determining the column widths
 				 * and row heights of the partitions
-				 * it spans.  */
-} Weight;
+				 * it spans. */
+#define EXCL_PAD 	0
+#define INCL_PAD	1
 
-#define EXCLUDE_PAD 	0
-#define INCLUDE_PAD	1
+typedef struct TableStruct Table;
+typedef struct RowColumnStruct RowColumn;
 
-struct Table;
-
-/* 
- * Cubicle -- 
- * 
- *	A cubicle contains a slave widget and its padding. It may span
- *	multiple partitions and have requested limits which constrain
- *	the size of it.  Several cubicles can start at cell in the
- *	table, but a cubicle contains only one widget.  
+/*
+ * Entry --
+ *
+ *	An entry holds a widget and describes how the widget should
+ *	appear in a range of cells.
+ *	 1. padding.
+ *	 2. how many rows/columns the entry spans.
+ *	 3. size bounds for the widget.
+ *
+ *	Several entries may start at the same cell in
+ *	the table, but a entry can hold only one widget.
  */
 
-typedef struct {
-    Tk_Window tkwin;		/* Slave widget */
+typedef struct  {
+    Tk_Window tkwin;		/* Widget to be managed. */
 
-    struct Table *tablePtr;	/* Table managing this widget */
+    Table *tablePtr;		/* Table managing this widget */
 
-    int extBW;			/* Last known exterior border width of
-				 * widget */
+    int borderWidth;		/* The external border width of
+				 * the widget. This is needed to check if
+				 * Tk_Changes(tkwin)->border_width changes.
+				 */
 
     int manageWhenNeeded;	/* If non-zero, allow joint custody of
-				 * the widget.  Claim the widget when
-				 * the table is mapped. Don't destroy
-				 * the cubicle if the table loses
-				 * custody of the widget. */
+				 * the widget.  This is for cases
+				 * where the same widget may be shared
+				 * between two different tables
+				 * (e.g. same graph on two different
+				 * notebook pages).  Claim the widget
+				 * only when the table is
+				 * mapped. Don't destroy the entry if
+				 * the table loses custody of the
+				 * widget. */
 
-    Limits reqWidth, reqHeight;	/* Bounds for width and height requests 
+    Limits reqWidth, reqHeight;	/* Bounds for width and height requests
 				 * made by the widget. */
+    struct PositionInfo {
+	RowColumn *rcPtr;	/* Row or column where this entry starts. */
 
-    int rowSpan;		/* Number of rows spanned */
-    int rowIndex;		/* Starting row of span */
-    int colSpan;		/* Number of columns spanned */
-    int colIndex;		/* Starting column of span */
+	int span;		/* Number of rows or columns spanned. */
+	double control;		/* Weight of widget in the row or column. */
 
-    Weight rowWeight;
-    Weight columnWeight;
+	Blt_ChainLink *linkPtr;	/* Link to widget in the chain of spans */
+
+	Blt_Chain *chainPtr;	/* Pointer to the chain of spans. */
+    } row, column;
 
     Tk_Anchor anchor;		/* Anchor type: indicates how the
 				 * widget is positioned if extra space
-				 * is available in the cubicle */
+				 * is available in the entry */
 
-    Pad padX;			/* Extra horizontal padding around the
+    Blt_Pad padX;		/* Extra padding placed left and right of the
+				 * widget. */
+    Blt_Pad padY;		/* Extra padding placed above and below the
 				 * widget */
-    Pad padY;			/* Extra vertical padding around the widget */
 
-    int ipadX, ipadY;		/* Extra padding inside of the widget
-				 * (in addition to the requested size
-				 * of the widget) */
+    int ipadX, ipadY;		/* Extra padding added to the interior of
+				 * the widget (i.e. adds to the requested
+				 * size of the widget) */
 
-    Fill fill;			/* Indicates how the widget should
-				 * fill the cubicle */
+    int fill;			/* Indicates how the widget should
+				 * fill the span of cells it occupies. */
 
-    int originX, originY;	/* Origin of the widget wrt master window */
+    int x, y;			/* Origin of widget wrt container. */
 
-    /*   
-     * The following pointers are used by the table to track the
-     * cubicle.  The list items are used to cleanup when the cubicle
-     * is no longer needed.  
-     */
-    Blt_ListItem rowItem;	/* Pointer into list of row spans.*/
-    Blt_ListItem colItem;	/* Pointer into list of column spans. */
-    Blt_ListItem slaveItem;	/* Pointer into list of slave windows. */
-    Tcl_HashEntry *hashPtr;	/* Pointer into table of slave windows. */
+    Blt_ChainLink *linkPtr;	/* Pointer into list of entries. */
 
-} Cubicle;
+    Blt_HashEntry *hashPtr;	/* Pointer into table of entries. */
+
+} Entry;
 
 /*
- * Partition --
+ * RowColumn --
  *
- * 	A partition creates a definable space (row or column) in the
- * 	table. It may have both requested minimum or maximum values which
- * 	constrain the size of it.
- *
+ * 	Creates a definable space (row or column) in the table. It may
+ * 	have both requested minimum or maximum values which constrain
+ * 	the size of it.
  */
-typedef struct {
+
+struct RowColumnStruct {
     int index;			/* Index of row or column */
 
     int size;			/* Current size of the partition. This size
 				 * is bounded by minSize and maxSize. */
 
-    /* 
+    /*
      * nomSize and size perform similar duties.  I need to keep track
      * of the amount of space allocated to the partition (using size).
      * But at the same time, I need to indicate that space can be
      * parcelled out to this partition.  If a nominal size was set for
-     * this partition, I don't want to add space.  
+     * this partition, I don't want to add space.
      */
 
     int nomSize;		/* The nominal size (neither expanded
 				 * nor shrunk) of the partition based
 				 * upon the requested sizes of the
-				 * slave windows spanning this
-				 * partition. */
+				 * widgets spanning this partition. */
 
     int minSize, maxSize;	/* Size constraints on the partition */
 
     int offset;			/* Offset of the partition (in pixels)
-				 * from the origin of the master
-				 * window */
+				 * from the origin of the container. */
 
-    int minSpan;		/* Minimum spanning window in
+    int minSpan;		/* Minimum spanning widget in
 				 * partition. Used for bookkeeping
 				 * when growing a span of partitions
 				 * */
 
-    Cubicle *control;		/* Pointer to the cubicle containing
-				 * the slave window spanning this
-				 * partition which controls its size.
-				 * This is used to know when a
-				 * partition is used or not. */
+    double weight;		/* Weight of row or column */
 
-    Resize resize;		/* Indicates if the partition should
+    Entry *control;		/* Pointer to the entry that is
+				 * determining the size of this
+				 * partition.  This is used to know
+				 * when a partition is occupied. */
+
+    int resize;			/* Indicates if the partition should
 				 * shrink or expand from its nominal
 				 * size. */
 
-    Pad pad;			/* Pads the partition beyond its nominal
+    Blt_Pad pad;		/* Pads the partition beyond its nominal
 				 * size */
 
     Limits reqSize;		/* Requested bounds for the size of
 				 * the partition. The partition will
 				 * not expand or shrink beyond these
 				 * limits, regardless of how it was
-				 * specified (max slave size).  This
+				 * specified (max widget size).  This
 				 * includes any extra padding which
 				 * may be specified. */
 
-    int maxSpan;		/* Maximum spanning window to consider
-				 * when growing a span of partitions. 
-				 * A value of zero indicates that all 
+    int maxSpan;		/* Maximum spanning widget to consider
+				 * when growing a span of partitions.
+				 * A value of zero indicates that all
 				 * spans should be considered. */
 
-} Partition;
+    int count;
+
+    Blt_ChainLink *linkPtr;
+
+};
 
 #define DEF_TBL_RESIZE	"both"
 #define DEF_TBL_PAD	"0"
 #define DEF_TBL_MAXSPAN	"0"
 
 
-/* 
+/*
  * This is the default number of elements in the statically
  * pre-allocated column and row arrays.  This number should reflect a
- * useful number of row and columns, which fit most applications.  
+ * useful number of row and columns, which fit most applications.
  */
 #define DEF_ARRAY_SIZE	32
 
-typedef Cubicle *(CubicleSearchProc) _ANSI_ARGS_((struct Table *tablePtr,
-	Tk_Window tkwin, int flags));
+typedef Entry *(EntrySearchProc) _ANSI_ARGS_((Table *tablePtr, 
+	Tk_Window tkwin));
 
 /*
- * RowCol --
+ * PartitionInfo --
  *
- * 	Manages an array of partitions.  The array of partitions
- * 	represents * either the rows or the columns in the table.
- * 
+ * 	Manages the rows or columns of the table.  Contains
+ *	a chain of partitions (representing the individiual
+ *	rows or columns).
+ *
  */
-typedef struct {
+typedef struct PartitionInfo {
     char *type;			/* String identifying the type of
 				 * partition: "row" or "column". */
-    int length;			/* Number of partitions currently used */
-    int size;			/* Number of partitions allocated */
-
-    Partition *array;		/* Pointer to array of partition
-				 * information: Initially points to
-				 * defSpace */
-
-    /* Pre-allocated array of partitions. */
-
-    Partition defSpace[DEF_ARRAY_SIZE];
-
+    Blt_Chain *chainPtr;
+    Blt_List list;		/* Linked list of bins of widgets
+				 * keyed by increasing span. */
     Tk_ConfigSpec *configSpecs;
-
-} RowCol;
+    int reqLength;
+    int ePad;			/* Extra padding for row/column
+				 * needed to display editor marks */
+} PartitionInfo;
 
 /*
  * Table structure
  */
-typedef struct Table {
+struct TableStruct {
     int flags;			/* See the flags definitions below. */
-    Tk_Window searchWin;	/* Main window of window hierarchy */
-    Tk_Window tkwin;		/* The master window in which the
-				 * slave windows are arranged. */
-    Tcl_Interp *interp;		/* Interpreter associated with all windows */
+    Tk_Window tkwin;		/* The container widget into which
+				 * other widgets are arranged. */
+    Tcl_Interp *interp;		/* Interpreter associated with all
+				 * widgets */
 
-    Blt_List cubicles;		/* List of cubicles in the table. The
-				 * key is the address of the slave
-				 * tkwin */
-    Blt_List rowSpans;		/* Linked list of bins of windows of
-				 * increasing row span. */
-    Blt_List colSpans;		/* Linked list of bins of windows of
-				 * increasing column span. */
-    Tcl_HashTable slaveTable;	/* Table of slave windows.  Serves as
-				 * a directory to look up widgets */
-    Pad padX, padY;
+    Blt_Chain *chainPtr;	/* Chain of entries in the table. */
+
+    Blt_HashTable entryTable;	/* Table of entries.  Serves as a
+				 * directory to look up entries from
+				 * widget their names. */
+    Blt_Pad padX, padY;
 
     int propagate;		/* If non-zero, the table will make a
 				 * geometry request on behalf of the
-				 * master window. */
+				 * container widget. */
 
-    int editorTablePad, editorCubiclePad, editorPartitionPad;
+    int eTablePad, eEntryPad;
 
-    RowCol columns, rows;	/* Manages row and column partitions */
+    PartitionInfo columnInfo;
+    PartitionInfo rowInfo;	/* Manages row and column partitions */
 
-    int masterWidth;		/* Last known width of the master window */
-    int masterHeight;		/* Last known height of the master window */
-    int normalWidth;		/* Normal width of the table */
-    int normalHeight;		/* Normal height of the table */
+    Dim2D container;		/* Last known dimenion of the container. */
+    Dim2D normal;		/* Normal dimensions of the table */
     Limits reqWidth, reqHeight;	/* Constraints on the table's normal
 				 * width and height */
     Editor *editPtr;		/* If non-NULL, indicates that the
 				 * table is currently being edited */
-    Tk_IdleProc *arrangeProc;
-    CubicleSearchProc *findCubicleProc;
-
-} Table;
+    Tcl_IdleProc *arrangeProc;
+    EntrySearchProc *findEntryProc;
+    Blt_HashEntry *hashPtr;	/* Used to delete the table from its
+				 * hashtable. */
+    Blt_HashTable *tablePtr;
+};
 
 /*
  * Table flags definitions
@@ -368,23 +367,24 @@ typedef struct Table {
 				 * before the table is actually
 				 * reconfigured. */
 #define REQUEST_LAYOUT 	(1<<1)	/* Get the requested sizes of the
-				 * slave windows before
-				 * expanding/shrinking the size of the
-				 * master window.  It's necessary to
-				 * recompute the layout every time a
-				 * partition or cubicle is added,
-				 * reconfigured, or deleted, but not
-				 * when the master window is
+				 * widgets before expanding/shrinking
+				 * the size of the container.  It's
+				 * necessary to recompute the layout
+				 * every time a partition or entry is
+				 * added, reconfigured, or deleted,
+				 * but not when the container is
 				 * resized. */
-#define NON_PARENT	(1<<2)	/* The table is managing slaves which
-				 * are not children of the master
-				 * window. This requires that they are
-				 * moved when the master window is
-				 * moved (a definite performance
+#define NON_PARENT	(1<<2)	/* The table is managing widgets that
+				 * arern't children of the container.
+				 * This requires that they are
+				 * manually moved when the container
+				 * is moved (a definite performance
 				 * hit). */
 /*
  * Forward declarations
  */
 
-extern Table *Blt_FindTable _ANSI_ARGS_((Tcl_Interp *interp, char *pathName,
-	Tk_Window searchWin, int flags));
+extern int Blt_GetTable _ANSI_ARGS_((TableInterpData *dataPtr, 
+	Tcl_Interp *interp, char *pathName, Table **tablePtrPtr));
+
+#endif /* _BLT_TABLE_H */

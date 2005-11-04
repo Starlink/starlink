@@ -1,3 +1,4 @@
+
 /*
  * bltImage.c --
  *
@@ -27,137 +28,13 @@
 
 #include "bltInt.h"
 #include "bltImage.h"
-#include <ctype.h>
+#include "bltHash.h"
 #include <X11/Xutil.h>
 #ifndef WIN32
 #include <X11/Xproto.h>
 #endif
 
 #define CLAMP(c)	((((c) < 0.0) ? 0.0 : ((c) > 255.0) ? 255.0 : (c)))
-
-
-/*
- * Each call to Tk_GetImage returns a pointer to one of the following
- * structures, which is used as a token by clients (widgets) that
- * display images.
- */
-typedef struct TkImage {
-    Tk_Window tkwin;		/* Window passed to Tk_GetImage (needed to
-				 * "re-get" the image later if the manager
-				 * changes). */
-    Display *display;		/* Display for tkwin.  Needed because when
-				 * the image is eventually freed tkwin may
-				 * not exist anymore. */
-    struct TkImageMaster *masterPtr;
-				/* Master for this image (identifiers image
-				 * manager, for example). */
-    ClientData instanceData;
-				/* One word argument to pass to image manager
-				 * when dealing with this image instance. */
-    Tk_ImageChangedProc *changeProc;
-				/* Code in widget to call when image changes
-				 * in a way that affects redisplay. */
-    ClientData widgetClientData;
-				/* Argument to pass to changeProc. */
-    struct Image *nextPtr;	/* Next in list of all image instances
-				 * associated with the same name. */
-
-} TkImage;
-
-/*
- * For each image master there is one of the following structures,
- * which represents a name in the image table and all of the images
- * instantiated from it.  Entries in mainPtr->imageTable point to
- * these structures.
- */
-typedef struct TkImageMaster {
-    Tk_ImageType *typePtr;	/* Information about image type.  NULL means
-				 * that no image manager owns this image:  the
-				 * image was deleted. */
-    ClientData masterData;	/* One-word argument to pass to image mgr
-				 * when dealing with the master, as opposed
-				 * to instances. */
-    int width, height;		/* Last known dimensions for image. */
-    Tcl_HashTable *tablePtr;	/* Pointer to hash table containing image
-				 * (the imageTable field in some TkMainInfo
-				 * structure). */
-    Tcl_HashEntry *hPtr;	/* Hash entry in mainPtr->imageTable for
-				 * this structure (used to delete the hash
-				 * entry). */
-    TkImage *instancePtr;	/* Pointer to first in list of instances
-				 * derived from this name. */
-} TkImageMaster;
-
-/*
- * ----------------------------------------------------------------------
- *
- * Tk_ImageDeleted --
- *
- *	Is there any other way to determine if an image has been
- *	deleted?
- *
- * Results:
- *	Returns 1 if the image has been deleted, 0 otherwise.
- *
- * ----------------------------------------------------------------------
- */
-/*LINTLIBRARY*/
-int
-Blt_TkImageDeleted(tkImage)
-    Tk_Image tkImage;		/* Token for image. */
-{
-    TkImage *imagePtr = (TkImage *) tkImage;
-
-    return (imagePtr->masterPtr->typePtr == NULL);
-}
-
-/*LINTLIBRARY*/
-Tk_ImageMaster
-Blt_TkImageMaster(tkImage)
-    Tk_Image tkImage;		/* Token for image. */
-{
-    TkImage *imagePtr = (TkImage *) tkImage;
-
-    return (Tk_ImageMaster) imagePtr->masterPtr;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * ResizeImageData
- *
- *      Reallocates the data for a color image to a designated
- *	width and height.
- *
- * Results:
- *      None.
- *
- * Side Effects:
- *	The data allocated for the image is changed (if needed).
- *
- *----------------------------------------------------------------------
- */
-static void
-ResizeImageData(imagePtr, width, height)
-    struct ColorImage *imagePtr;
-    int width, height;		/* Dimensions of new image */
-{
-    Pix32 *dataPtr;
-    unsigned int numPixels;
-
-    if ((width == imagePtr->width) && (height == imagePtr->height)) {
-	return;			/* No change. */
-    }
-    if (imagePtr->dataPtr != NULL) {
-	free((char *)imagePtr->dataPtr);
-    }
-    numPixels = width * height;
-    dataPtr = (Pix32 *) calloc(numPixels, sizeof(Pix32));
-    assert(dataPtr);
-    imagePtr->width = width;
-    imagePtr->height = height;
-    imagePtr->dataPtr = dataPtr;
-}
 
 /*
  *----------------------------------------------------------------------
@@ -174,22 +51,21 @@ ResizeImageData(imagePtr, width, height)
  *
  *----------------------------------------------------------------------
  */
-ColorImage
+Blt_ColorImage
 Blt_CreateColorImage(width, height)
     int width, height;		/* Dimensions of new image */
 {
-    unsigned int numPixels;
-    Pix32 *dataPtr;
     struct ColorImage *imagePtr;
+    size_t size;
 
-    numPixels = width * height;
-    dataPtr = (Pix32 *) calloc(numPixels, sizeof(Pix32));
-    assert(dataPtr);
-    imagePtr = (struct ColorImage *)malloc(sizeof(struct ColorImage));
+    size = width * height;
+    imagePtr = Blt_Malloc(sizeof(struct ColorImage));
     assert(imagePtr);
+    imagePtr->bits = Blt_Malloc(sizeof(Pix32) * size);
+    assert(imagePtr->bits);
+
     imagePtr->width = width;
     imagePtr->height = height;
-    imagePtr->dataPtr = dataPtr;
     return imagePtr;
 }
 
@@ -206,39 +82,78 @@ Blt_CreateColorImage(width, height)
  *----------------------------------------------------------------------
  */
 void
-Blt_FreeColorImage(image)
-    ColorImage image;
+Blt_FreeColorImage(imagePtr)
+    struct ColorImage *imagePtr;
 {
-    Pix32 *dataPtr;
-
-    dataPtr = ColorImageData(image);
-    free((char *)dataPtr);
-    free((char *)image);
+    Blt_Free(imagePtr->bits);
+    Blt_Free(imagePtr);
 }
 
 void
-Blt_GammaCorrectColorImage(image, newGamma)
-    ColorImage image;
+Blt_GammaCorrectColorImage(src, newGamma)
+    Blt_ColorImage src;
     double newGamma;
 {
-    unsigned int numPixels;
-    register Pix32 *dataPtr;
+    unsigned int nPixels;
+    register Pix32 *srcPtr, *endPtr;
     register unsigned int i;
     double value;
-    unsigned char table[256];
+    unsigned char lut[256];
     double invGamma;
 
     invGamma = 1.0 / newGamma;
     for (i = 0; i < 256; i++) {
 	value = 255.0 * pow((double)i / 255.0, invGamma);
-	table[i] = (unsigned char)CLAMP(value);
+	lut[i] = (unsigned char)CLAMP(value);
     }
-    numPixels = ColorImageWidth(image) * ColorImageHeight(image);
-    dataPtr = ColorImageData(image);
-    for (i = 0; i < numPixels; i++, dataPtr++) {
-	dataPtr->Red = table[dataPtr->Red];
-	dataPtr->Green = table[dataPtr->Green];
-	dataPtr->Blue = table[dataPtr->Blue];
+    nPixels = Blt_ColorImageWidth(src) * Blt_ColorImageHeight(src);
+    srcPtr = Blt_ColorImageBits(src);
+    for (endPtr = srcPtr + nPixels; srcPtr < endPtr; srcPtr++) {
+	srcPtr->Red = lut[srcPtr->Red];
+	srcPtr->Green = lut[srcPtr->Green];
+	srcPtr->Blue = lut[srcPtr->Blue];
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_ColorImageToGreyscale --
+ *
+ *	Converts a color image to PostScript grey scale (1 component)
+ *	output.  Luminosity isn't computed using the old NTSC formula,
+ *
+ *	    Y = 0.299 * Red + 0.587 * Green + 0.114 * Blue
+ *
+ *      but the following
+ *
+ *	    Y = 0.212671 * Red + 0.715160 * Green + 0.072169 * Blue
+ *
+ *	which better represents contemporary monitors.
+ *
+ * Results:
+ *	The color image is converted to greyscale.
+ *
+ *----------------------------------------------------------------------
+ */
+void
+Blt_ColorImageToGreyscale(image)
+    Blt_ColorImage image;
+{
+    register Pix32 *srcPtr, *endPtr;
+    double Y;
+    int nPixels;
+    int width, height;
+
+    width = Blt_ColorImageWidth(image);
+    height = Blt_ColorImageHeight(image);
+    nPixels = width * height;
+    srcPtr = Blt_ColorImageBits(image);
+    for (endPtr = srcPtr + nPixels; srcPtr < endPtr; srcPtr++) {
+	Y = ((0.212671 * (double)srcPtr->Red) +
+	     (0.715160 * (double)srcPtr->Green) +
+	     (0.072169 * (double)srcPtr->Blue));
+	srcPtr->Red = srcPtr->Green = srcPtr->Blue = (unsigned char)CLAMP(Y);
     }
 }
 
@@ -255,15 +170,15 @@ Blt_GammaCorrectColorImage(image, newGamma)
  *----------------------------------------------------------------------
  */
 void
-Blt_ColorImageToPhoto(image, photo)
-    ColorImage image;		/* Image to use as source */
+Blt_ColorImageToPhoto(src, photo)
+    Blt_ColorImage src;		/* Image to use as source */
     Tk_PhotoHandle photo;	/* Photo to write color image into */
 {
     Tk_PhotoImageBlock dest;
     int width, height;
 
-    width = ColorImageWidth(image);
-    height = ColorImageHeight(image);
+    width = Blt_ColorImageWidth(src);
+    height = Blt_ColorImageHeight(src);
 
     Tk_PhotoGetImage(photo, &dest);
     dest.pixelSize = sizeof(Pix32);
@@ -273,7 +188,8 @@ Blt_ColorImageToPhoto(image, photo)
     dest.offset[0] = Tk_Offset(Pix32, Red);
     dest.offset[1] = Tk_Offset(Pix32, Green);
     dest.offset[2] = Tk_Offset(Pix32, Blue);
-    dest.pixelPtr = (unsigned char *)ColorImageData(image);
+    dest.offset[3] = Tk_Offset(Pix32, Alpha); 
+    dest.pixelPtr = (unsigned char *)Blt_ColorImageBits(src);
     Tk_PhotoSetSize(photo, width, height);
     Tk_PhotoPutBlock(photo, &dest, 0, 0, width, height);
 }
@@ -281,496 +197,193 @@ Blt_ColorImageToPhoto(image, photo)
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ColorImageToPhoto --
+ * Blt_PhotoRegionToColorImage --
  *
- *      Create a color image from a Tk photo.
+ *      Create a photo to a color image.
  *
  * Results:
  *      The new color image is returned.
  *
  *----------------------------------------------------------------------
  */
-ColorImage
-Blt_PhotoToColorImage(photo, regionPtr)
+Blt_ColorImage
+Blt_PhotoRegionToColorImage(photo, x, y, width, height)
     Tk_PhotoHandle photo;	/* Source photo image to scale */
-    ImageRegion *regionPtr;	/* Region of source image to copy */
+    int x, y;
+    int width, height;
 {
     Tk_PhotoImageBlock src;
-    ColorImage image;
+    Blt_ColorImage image;
     register Pix32 *destPtr;
-    register unsigned char *srcPtr;
-    register int regionOffset;
-    register int x, y;
+    register unsigned char *srcData;
+    register int offset;
+    unsigned int offR, offG, offB, offA;
 
     Tk_PhotoGetImage(photo, &src);
-    if (regionPtr->width < 1) {
-	regionPtr->width = src.width;
+    if (x < 0) {
+	x = 0;
+    } 
+    if (y < 0) {
+	y = 0;
     }
-    if (regionPtr->height < 1) {
-	regionPtr->height = src.height;
+    if (width < 0) {
+	width = src.width;
     }
-    image = Blt_CreateColorImage(regionPtr->width, regionPtr->height);
-    regionOffset = (regionPtr->x * src.pixelSize) + (regionPtr->y * src.pitch);
-    destPtr = ColorImageData(image);
-    for (y = 0; y < regionPtr->height; y++) {
-	srcPtr = src.pixelPtr + regionOffset;
-	for (x = 0; x < regionPtr->width; x++, destPtr++) {
-	    destPtr->Red = srcPtr[src.offset[0]];
-	    destPtr->Green = srcPtr[src.offset[1]];
-	    destPtr->Blue = srcPtr[src.offset[2]];
-	    srcPtr += src.pixelSize;
-	}
-	regionOffset += src.pitch;
+    if (height < 0) {
+	height = src.height;
     }
+    if ((x + width) > src.width) {
+	width = src.width - x;
+    }
+    if ((height + y) > src.height) {
+	height = src.width - y;
+    }
+    image = Blt_CreateColorImage(width, height);
+    destPtr = Blt_ColorImageBits(image);
+
+    offset = (x * src.pixelSize) + (y * src.pitch);
+
+    offR = src.offset[0];
+    offG = src.offset[1];
+    offB = src.offset[2];
+    offA = src.offset[3];
+
+    if (src.pixelSize == 4) {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = srcData[offR];
+	        destPtr->Green = srcData[offG];
+	        destPtr->Blue = srcData[offB];
+	        destPtr->Alpha = srcData[offA];
+	        srcData += src.pixelSize;
+	        destPtr++;
+	    }
+	    offset += src.pitch;
+        }
+    } else if (src.pixelSize == 3) {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = srcData[offR];
+	        destPtr->Green = srcData[offG];
+	        destPtr->Blue = srcData[offB];
+		/* No transparency information */
+	        destPtr->Alpha = (unsigned char)-1;
+	        srcData += src.pixelSize;
+	        destPtr++;
+	    }
+	    offset += src.pitch;
+        }
+    } else {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = destPtr->Green = destPtr->Blue = srcData[offA];
+		/* No transparency information */
+	        destPtr->Alpha = (unsigned char)-1;
+	        srcData += src.pixelSize;
+	        destPtr++;
+	    }
+	    offset += src.pitch;
+        }
+    } 
     return image;
 }
 
-#ifdef WIN32
-
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ColorImageToPixmap --
+ * Blt_PhotoToColorImage --
  *
- *      Converts a color image into a pixmap.
- *
- *	Right now this only handles TrueColor visuals.
+ *      Create a photo to a color image.
  *
  * Results:
- *      The new pixmap is returned.
+ *      The new color image is returned.
  *
  *----------------------------------------------------------------------
  */
-Pixmap
-Blt_ColorImageToPixmap(interp, tkwin, image, colorTablePtr)
-    Tcl_Interp *interp;
-    Tk_Window tkwin;
-    ColorImage image;
-    ColorTable *colorTablePtr;	/* Points to array of colormap indices */
+Blt_ColorImage
+Blt_PhotoToColorImage(photo)
+    Tk_PhotoHandle photo;	/* Source photo image to scale */
+
 {
-    HDC pixmapDC;
-    TkWinDCState state;
-    Display *display;
-    int width, height, depth;
-    Pixmap pixmap;
-    register int x, y;
-    register Pix32 *srcPtr;
-    COLORREF rgb;
-
-    *colorTablePtr = NULL;
-    width = ColorImageWidth(image);
-    height = ColorImageHeight(image);
-    display = Tk_Display(tkwin);
-    depth = Tk_Depth(tkwin);
-
-    pixmap = Tk_GetPixmap(display, Tk_WindowId(tkwin), width, height, depth);
-    pixmapDC = TkWinGetDrawableDC(display, pixmap, &state);
-
-    srcPtr = ColorImageData(image);
-    for (y = 0; y < height; y++) {
-	for (x = 0; x < width; x++, srcPtr++) {
-	    rgb = PALETTERGB(srcPtr->Red, srcPtr->Green, srcPtr->Blue);
-	    SetPixelV(pixmapDC, x, y, rgb);
-	}
-    }
-    TkWinReleaseDrawableDC(pixmap, pixmapDC, &state);
-    return pixmap;
-}
-
-#else
-
-int redAdjust, greenAdjust, blueAdjust;
-int redMaskShift, greenMaskShift, blueMaskShift;
-
-/*
- *----------------------------------------------------------------------
- *
- * ShiftCount --
- *
- *	Returns the position of the least significant (low) bit in
- *	the given mask.
- *
- *	For TrueColor and DirectColor visuals, a pixel value is
- *	formed by OR-ing the red, green, and blue colormap indices
- *	into a single 32-bit word.  The visual's color masks tell
- *	you where in the word the indices are supposed to be.  The
- *	masks contain bits only where the index is found.  By counting
- *	the leading zeros in the mask, we know how many bits to shift
- *	to the individual red, green, and blue values to form a pixel.
- *
- * Results:
- *      The number of the least significant bit.
- *
- *----------------------------------------------------------------------
- */
-static int
-ShiftCount(mask)
-    register unsigned int mask;
-{
-    register int count;
-
-    for (count = 0; count < 32; count++) {
-	if (mask & 0x01) {
-	    break;
-	}
-	mask >>= 1;
-    }
-    return count;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * CountBits --
- *
- *	Returns the number of bits set in the given mask.
- *
- * Results:
- *      The number of bits to set in the mask.
- *
- *----------------------------------------------------------------------
- */
-static int
-CountBits(mask)
-    register unsigned int mask;
-{
-    register int count;
-
-    count = 0;
-    while (mask != 0L) {
-	if (mask & 0x01) {
-	    count++;
-	}
-	mask >>= 1;		/* Keep shifting off bits until there
-				 * are no more left. */
-    }
-    return count;
-}
-
-static void
-ComputeMasks(visualPtr)
-    Visual *visualPtr;
-{
-    int count;
-
-    redMaskShift = ShiftCount((unsigned int)visualPtr->red_mask);
-    greenMaskShift = ShiftCount((unsigned int)visualPtr->green_mask);
-    blueMaskShift = ShiftCount((unsigned int)visualPtr->blue_mask);
-
-    redAdjust = greenAdjust = blueAdjust = 0;
-    count = CountBits((unsigned int)visualPtr->red_mask);
-    if (count < 8) {
-	redAdjust = 8 - count;
-    }
-    count = CountBits((unsigned int)visualPtr->green_mask);
-    if (count < 8) {
-	greenAdjust = 8 - count;
-    }
-    count = CountBits((unsigned int)visualPtr->blue_mask);
-    if (count < 8) {
-	blueAdjust = 8 - count;
-    }
-#ifdef notdef
-    fprintf(stderr, "adjust r=%d,g=%d,b=%d shift r=%d,g=%d,b=%d\n",
-	redAdjust, greenAdjust, blueAdjust, redMaskShift, greenMaskShift,
-	blueMaskShift);
-#endif
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * TrueColorPixel --
- *
- *      Computes a pixel index from the 3 component RGB values.
- *
- * Results:
- *      The pixel index is returned.
- *
- *----------------------------------------------------------------------
- */
-static INLINE unsigned int
-TrueColorPixel(visualPtr, pixelPtr)
-    Visual *visualPtr;
-    Pix32 *pixelPtr;
-{
-    unsigned int red, green, blue;
-
-    /*
-     * The number of bits per color may be less than eight. For example,
-     * 15/16 bit displays (hi-color) use only 5 bits, 8-bit displays
-     * use 2 or 3 bits (don't ask me why you'd have an 8-bit TrueColor
-     * display). So shift off the least significant bits.
-     */
-    red = ((unsigned int)pixelPtr->Red >> redAdjust);
-    green = ((unsigned int)pixelPtr->Green >> greenAdjust);
-    blue = ((unsigned int)pixelPtr->Blue >> blueAdjust);
-
-    /* Shift each color into the proper location of the pixel index. */
-    red = (red << redMaskShift) & visualPtr->red_mask;
-    green = (green << greenMaskShift) & visualPtr->green_mask;
-    blue = (blue << blueMaskShift) & visualPtr->blue_mask;
-    return (red | green | blue);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * DirectColorPixel --
- *
- *      Translates the 3 component RGB values into a pixel index.
- *      This differs from TrueColor only in that it first translates
- *	the RGB values through a color table.
- *
- * Results:
- *      The pixel index is returned.
- *
- *----------------------------------------------------------------------
- */
-static INLINE unsigned int
-DirectColorPixel(colorTabPtr, pixelPtr)
-    struct ColorTable *colorTabPtr;
-    Pix32 *pixelPtr;
-{
-    unsigned int red, green, blue;
-
-    red = colorTabPtr->red[pixelPtr->Red];
-    green = colorTabPtr->green[pixelPtr->Green];
-    blue = colorTabPtr->blue[pixelPtr->Blue];
-    return (red | green | blue);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * PseudoColorPixel --
- *
- *      Translates the 3 component RGB values into a pixel index.
- *      This differs from TrueColor only in that it first translates
- *	the RGB values through a color table.
- *
- * Results:
- *      The pixel index is returned.
- *
- *----------------------------------------------------------------------
- */
-static INLINE unsigned int
-PseudoColorPixel(pixelPtr, lut)
-    Pix32 *pixelPtr;
-    unsigned int *lut;
-{
-    int red, green, blue;
-    int pixel;
-
-    red = (pixelPtr->Red >> 3) + 1;
-    green = (pixelPtr->Green >> 3) + 1;
-    blue = (pixelPtr->Blue >> 3) + 1;
-    pixel = RGBIndex(red, green, blue);
-    return lut[pixel];
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * Blt_ColorImageToPixmap --
- *
- *      Converts a color image into a pixmap.
- *
- *	Right now this only handles TrueColor visuals.
- *
- * Results:
- *      The new pixmap is returned.
- *
- *----------------------------------------------------------------------
- */
-Pixmap
-Blt_ColorImageToPixmap(interp, tkwin, image, colorTablePtr)
-    Tcl_Interp *interp;
-    Tk_Window tkwin;
-    ColorImage image;
-    ColorTable *colorTablePtr;	/* Points to array of colormap indices */
-{
-    Display *display;
+    Blt_ColorImage image;
+    Tk_PhotoImageBlock src;
     int width, height;
-    Pixmap pixmap;
-    GC pixmapGC;
-    Visual *visualPtr;
-    XImage *imagePtr;
-    int numPixels;
+    register Pix32 *destPtr;
+    register int offset;
+    register int x, y;
+    register unsigned char *srcData;
 
-    visualPtr = Tk_Visual(tkwin);
-    width = ColorImageWidth(image);
-    height = ColorImageHeight(image);
-    display = Tk_Display(tkwin);
-
-    ComputeMasks(visualPtr);
-
-    *colorTablePtr = NULL;
-    imagePtr = XCreateImage(Tk_Display(tkwin), visualPtr, Tk_Depth(tkwin),
-	ZPixmap, 0, (char *)NULL, width, height, 32, 0);
-    assert(imagePtr);
-
-    numPixels = width * height;
-    imagePtr->data = (char *)malloc(sizeof(Pix32) * numPixels);
-    assert(imagePtr->data);
-
-    imagePtr->byte_order = MSBFirst;	/* Force the byte order */
-    imagePtr->bitmap_bit_order = imagePtr->byte_order;
-    imagePtr->bytes_per_line = width * sizeof(Pix32);
-
-    switch (visualPtr->class) {
-    case TrueColor:
-	{
-	    register int x, y;
-	    register Pix32 *srcPtr;
-	    register char *destPtr;
-	    unsigned int pixel;
-	    int rowOffset;
-
-	    /*
-	     * Compute the colormap locations directly from pixel RGB values.
-	     */
-	    srcPtr = ColorImageData(image);
-	    rowOffset = 0;
-	    for (y = 0; y < height; y++) {
-		destPtr = imagePtr->data + rowOffset;
-		for (x = 0; x < width; x++, srcPtr++) {
-		    pixel = TrueColorPixel(visualPtr, srcPtr);
-		    switch (imagePtr->bits_per_pixel) {
-		    case 32:
-			*destPtr++ = (pixel >> 24) & 0xFF;
-			/*FALLTHRU*/
-		    case 24:
-			*destPtr++ = (pixel >> 16) & 0xFF;
-			/*FALLTHRU*/
-		    case 16:
-			*destPtr++ = (pixel >> 8) & 0xFF;
-			/*FALLTHRU*/
-		    case 8:
-			*destPtr++ = pixel & 0xFF;
-			/*FALLTHRU*/
-		    }
-		}
-		rowOffset += imagePtr->bytes_per_line;
+    Tk_PhotoGetImage(photo, &src);
+    width = src.width;
+    height = src.height;
+    image = Blt_CreateColorImage(width, height);
+    destPtr = Blt_ColorImageBits(image);
+    offset = 0;
+    if (src.pixelSize == 4) {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = srcData[src.offset[0]];
+	        destPtr->Green = srcData[src.offset[1]];
+	        destPtr->Blue = srcData[src.offset[2]];
+	        destPtr->Alpha = srcData[src.offset[3]];
+	        srcData += src.pixelSize;
+	        destPtr++;
 	    }
-	}
-	break;
-
-    case DirectColor:
-	{
-	    register int x, y;
-	    register Pix32 *srcPtr;
-	    register char *destPtr;
-	    unsigned int pixel;
-	    int rowOffset;
-	    struct ColorTable *colorTabPtr;
-
-	    /* Build a color table first */
-	    colorTabPtr = Blt_DirectColorTable(interp, tkwin, image);
-
-	    /*
-	     * Compute the colormap locations directly from pixel RGB values.
-	     */
-	    srcPtr = ColorImageData(image);
-	    rowOffset = 0;
-	    for (y = 0; y < height; y++) {
-		destPtr = imagePtr->data + rowOffset;
-		for (x = 0; x < width; x++, srcPtr++) {
-		    pixel = DirectColorPixel(colorTabPtr, srcPtr);
-		    switch (imagePtr->bits_per_pixel) {
-		    case 32:
-			*destPtr++ = (pixel >> 24) & 0xFF;
-			/*FALLTHRU*/
-		    case 24:
-			*destPtr++ = (pixel >> 16) & 0xFF;
-			/*FALLTHRU*/
-		    case 16:
-			*destPtr++ = (pixel >> 8) & 0xFF;
-			/*FALLTHRU*/
-		    case 8:
-			*destPtr++ = pixel & 0xFF;
-			/*FALLTHRU*/
-		    }
-		}
-		rowOffset += imagePtr->bytes_per_line;
+	    offset += src.pitch;
+        }
+    } else if (src.pixelSize == 3) {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = srcData[src.offset[0]];
+	        destPtr->Green = srcData[src.offset[1]];
+	        destPtr->Blue = srcData[src.offset[2]];
+		/* No transparency information */
+	        destPtr->Alpha = (unsigned char)-1;
+	        srcData += src.pixelSize;
+	        destPtr++;
 	    }
-	    *colorTablePtr = colorTabPtr;
-	}
-	break;
-
-    case GrayScale:
-    case StaticGray:
-    case PseudoColor:
-    case StaticColor:
-	{
-	    register int x, y;
-	    register Pix32 *srcPtr;
-	    register char *destPtr;
-	    unsigned int pixel;
-	    int rowOffset;
-	    struct ColorTable *colorTabPtr;
-
-	    colorTabPtr = Blt_PseudoColorTable(interp, tkwin, image);
-
-	    srcPtr = ColorImageData(image);
-	    rowOffset = 0;
-	    for (y = 0; y < height; y++) {
-		destPtr = imagePtr->data + rowOffset;
-		for (x = 0; x < width; x++, srcPtr++) {
-		    pixel = PseudoColorPixel(srcPtr, colorTabPtr->lut);
-		    switch (imagePtr->bits_per_pixel) {
-		    case 32:
-			*destPtr++ = (pixel >> 24) & 0xFF;
-			/*FALLTHRU*/
-		    case 24:
-			*destPtr++ = (pixel >> 16) & 0xFF;
-			/*FALLTHRU*/
-		    case 16:
-			*destPtr++ = (pixel >> 8) & 0xFF;
-			/*FALLTHRU*/
-		    case 8:
-			*destPtr++ = pixel & 0xFF;
-			/*FALLTHRU*/
-		    }
-		}
-		rowOffset += imagePtr->bytes_per_line;
+	    offset += src.pitch;
+        }
+    } else {
+        for (y = 0; y < height; y++) {
+	    srcData = src.pixelPtr + offset;
+	    for (x = 0; x < width; x++) {
+	        destPtr->Red = destPtr->Green = destPtr->Blue = 
+		    srcData[src.offset[0]];
+		/* No transparency information */
+	        destPtr->Alpha = (unsigned char)-1;
+	        srcData += src.pixelSize;
+	        destPtr++;
 	    }
-	    free((char *)colorTabPtr->lut);
-	    *colorTablePtr = colorTabPtr;
-	}
-	break;
-    default:
-	return None;		/* Bad or unknown visual class. */
-    }
-
-    pixmapGC = Tk_GetGC(tkwin, 0L, (XGCValues *)NULL);
-    pixmap = Tk_GetPixmap(display, Tk_WindowId(tkwin), width, height,
-	Tk_Depth(tkwin));
-    XPutImage(display, pixmap, pixmapGC, imagePtr, 0, 0, 0, 0, width, height);
-    XDestroyImage(imagePtr);
-    Tk_FreeGC(display, pixmapGC);
-    return pixmap;
+	    offset += src.pitch;
+        }
+    } 
+    return image;
 }
 
-#endif /* WIN32 */
 /*
  *	filter function definitions
  */
 
-#ifdef __STDC__
-static ImageFilterProc DefaultFilter;
-static ImageFilterProc BellFilter;
-static ImageFilterProc BesselFilter;
-static ImageFilterProc BoxFilter;
-static ImageFilterProc BSplineFilter;
-static ImageFilterProc CatromFilter;
-static ImageFilterProc DummyFilter;
-static ImageFilterProc GaussianFilter;
-static ImageFilterProc Lanczos3Filter;
-static ImageFilterProc MitchellFilter;
-static ImageFilterProc SincFilter;
-static ImageFilterProc TriangleFilter;
-#endif
+static ResampleFilterProc DefaultFilter;
+static ResampleFilterProc BellFilter;
+static ResampleFilterProc BesselFilter;
+static ResampleFilterProc BoxFilter;
+static ResampleFilterProc BSplineFilter;
+static ResampleFilterProc CatRomFilter;
+static ResampleFilterProc DummyFilter;
+static ResampleFilterProc GaussianFilter;
+static ResampleFilterProc GiFilter;
+static ResampleFilterProc Lanczos3Filter;
+static ResampleFilterProc MitchellFilter;
+static ResampleFilterProc SincFilter;
+static ResampleFilterProc TriangleFilter;
+static Tk_ImageChangedProc TempImageChangedProc;
 
 static double
 DefaultFilter(x)
@@ -780,7 +393,7 @@ DefaultFilter(x)
 	x = -x;
     }
     if (x < 1.0) {
-	/* f(x) = 2|x|^3 - 3|x|^2 + 1, -1 <= x <= 1 */
+	/* f(x) = 2x^3 - 3x^2 + 1, -1 <= x <= 1 */
 	return (2.0 * x - 3.0) * x * x + 1.0;
     }
     return 0.0;
@@ -807,13 +420,10 @@ static double
 BoxFilter(x)
     double x;
 {
-    if (x < -0.5) {
+    if ((x < -0.5) || (x > 0.5)) {
 	return 0.0;
     }
-    if (x <= 0.5) {
-	return 1.0;
-    }
-    return 0.0;
+    return 1.0;
 }
 
 static double
@@ -833,7 +443,7 @@ static double
 BellFilter(x)
     double x;
 {
-    if (x < 0) {
+    if (x < 0.0) {
 	x = -x;
     }
     if (x < 0.5) {
@@ -852,7 +462,7 @@ BSplineFilter(x)
 {
     double x2;
 
-    if (x < 0) {
+    if (x < 0.0) {
 	x = -x;
     }
     if (x < 1) {
@@ -879,10 +489,10 @@ static double
 SincFilter(x)
     double x;
 {
+    x *= M_PI;
     if (x == 0.0) {
 	return 1.0;
     }
-    x *= M_PI;
     return (sin(x) / x);
 }
 
@@ -890,16 +500,22 @@ static double
 BesselFilter(x)
     double x;
 {
+#ifdef NEED_DECL_J1
     extern double j1 _ANSI_ARGS_((double value));
+#endif
     /*
      * See Pratt "Digital Image Processing" p. 97 for Bessel functions
      * zeros are at approx x=1.2197, 2.2331, 3.2383, 4.2411, 5.2428, 6.2439,
      * 7.2448, 8.2454
      */
+#ifdef __BORLANDC__
+    return 0.0;
+#else
     return (x == 0.0) ? M_PI / 4.0 : j1(M_PI * x) / (x + x);
+#endif
 }
 
-#define SQRT_2PI		0.79788456080286541	/* sqrt(2.0 / M_PI) */
+#define SQRT_2PI	0.79788456080286541	/* sqrt(2.0 / M_PI) */
 
 static double
 GaussianFilter(x)
@@ -921,8 +537,8 @@ Lanczos3Filter(x)
     return 0.0;
 }
 
-#define	B	0.3333333333333333	/* (1.0 / 3.0) */
-#define	C	0.3333333333333333	/* (1.0 / 3.0) */
+#define	B		0.3333333333333333	/* (1.0 / 3.0) */
+#define	C		0.3333333333333333	/* (1.0 / 3.0) */
 
 static double
 MitchellFilter(x)
@@ -950,7 +566,7 @@ MitchellFilter(x)
  * Catmull-Rom spline
  */
 static double
-CatromFilter(x)
+CatRomFilter(x)
     double x;
 {
     if (x < -2.) {
@@ -971,86 +587,86 @@ CatromFilter(x)
     return 0.0;
 }
 
-typedef struct FilterInfo {
-    char *name;
-    int numChars;
-    struct Image1DFilter filter;
-} FilterInfo;
-
-static FilterInfo filterTable[] =
+/* approximation to the gaussian integral [x, inf) */
+static double
+GiFilter(x)
+    double x;
 {
- /*
-     * Name          # chars   support  function
-     */
-    {"bell", 3,
-	{1.5, BellFilter},},
-    {"box", 2,
-	{0.5, BoxFilter},},
-    {"bessel", 3,
-	{(float)3.2383, BesselFilter},},
-    {"bspline", 2,
-	{2.0, BSplineFilter},},
-    {"catrom", 1,
-	{2.0, CatromFilter},},
-    {"default", 2,
-	{1.0, DefaultFilter},},
-    {"dummy", 2,
-	{0.5, DummyFilter},},
-    {"gaussian", 1,
-	{4.0, GaussianFilter},},
-    {"lanczos3", 1,
-	{3.0, Lanczos3Filter},},
-    {"mitchell", 1,
-	{2.0, MitchellFilter},},
-    {"none", 3,
-	{0.0, (ImageFilterProc *)NULL},},
-    {"sinc", 1,
-	{2.0, SincFilter},},
-    {"triangle", 1,
-	{1.0, TriangleFilter},},
+    if (x > 1.5) {
+	return 0.0;
+    } else if (x < -1.5) {
+	return 1.0;
+    } else {
+#define I6 0.166666666666667
+#define I4 0.25
+#define I3 0.333333333333333
+	double x2 = x * x;
+	double x3 = x2 * x;
+
+	if (x > 0.5) {
+	    return .5625  - ( x3 * I6 - 3 * x2 * I4 + 1.125 * x);
+	} else if (x > -0.5) {
+	    return 0.5    - (0.75 * x - x3 * I3);
+	} else {
+	    return 0.4375 + (-x3 * I6 - 3 * x2 * I4 - 1.125 * x);
+	}
+    }
+}
+
+
+
+static ResampleFilter filterTable[] =
+{
+    /* name,     function,		support */
+    {"bell",     BellFilter,		1.5	 },
+    {"bessel",   BesselFilter,		3.2383   },
+    {"box",      BoxFilter,		0.5      },
+    {"bspline",  BSplineFilter,		2.0	 },
+    {"catrom",   CatRomFilter,		2.0	 },
+    {"default",  DefaultFilter,		1.0	 },
+    {"dummy",    DummyFilter,		0.5	 },
+    {"gauss8",   GaussianFilter,	8.0	 },
+    {"gaussian", GaussianFilter,	1.25	 },
+    {"gi",	 GiFilter,		1.25	 },
+    {"lanczos3", Lanczos3Filter,	3.0	 },
+    {"mitchell", MitchellFilter,	2.0	 },
+    {"none",     (ResampleFilterProc *)NULL,	0.0	 },
+    {"sinc",     SincFilter,		4.0	 },
+    {"triangle", TriangleFilter,	1.0	 },
 };
 
-static int numFilters = sizeof(filterTable) / sizeof(FilterInfo);
+static int nFilters = sizeof(filterTable) / sizeof(ResampleFilter);
 
-Image1DFilter bltBoxFilter = &(filterTable[1].filter);
+ResampleFilter *bltBoxFilterPtr = &(filterTable[1]);
 
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_FindImage1DFilter --
+ * Blt_GetResampleFilter --
  *
  *      Finds a 1-D filter associated by the given filter name.
  *
  * Results:
  *      A standard Tcl result.  Returns TCL_OK is the filter was
  *	found.  The filter information (proc and support) is returned
- *	via filterPtr. Otherwise TCL_ERROR is returned and an error
+ *	via filterPtrPtr. Otherwise TCL_ERROR is returned and an error
  *	message is left in interp->result.
  *
  *----------------------------------------------------------------------
  */
 int
-Blt_FindImage1DFilter(interp, name, filterPtr)
+Blt_GetResampleFilter(interp, name, filterPtrPtr)
     Tcl_Interp *interp;
     char *name;
-    Image1DFilter *filterPtr;
+    ResampleFilter **filterPtrPtr;
 {
-    char c;
-    int length;
-    register int i;
-    register FilterInfo *infoPtr;
+    ResampleFilter *filterPtr, *endPtr;
 
-    c = name[0];
-    length = strlen(name);
-    for (infoPtr = filterTable, i = 0; i < numFilters; i++, infoPtr++) {
-	if ((c == infoPtr->name[0]) && (length >= infoPtr->numChars) &&
-	    (strncmp(name, infoPtr->name, length) == 0)) {
-	    if (infoPtr->filter.proc == NULL) {
-		*filterPtr = NULL;
-	    } else {
-		*filterPtr = &(infoPtr->filter);
-	    }
+    endPtr = filterTable + nFilters;
+    for (filterPtr = filterTable; filterPtr < endPtr; filterPtr++) {
+	if (strcmp(name, filterPtr->name) == 0) {
+	    *filterPtrPtr = (filterPtr->proc == NULL) ? NULL : filterPtr;
 	    return TCL_OK;
 	}
     }
@@ -1059,90 +675,133 @@ Blt_FindImage1DFilter(interp, name, filterPtr)
 }
 
 
+/*
+ * Scaled integers are fixed point values.  The upper 18 bits is the integer
+ * portion, the lower 14 bits the fractional remainder.  Must be careful
+ * not to overflow the values (especially during multiplication). 
+ *
+ * The following operations are defined:
+ * 
+ *	S * n		Scaled integer times an integer.
+ *	S1 + S2		Scaled integer plus another scaled integer.
+ *
+ */
+
+#define float2si(f)	(int)((f) * 16384.0 + 0.5)
+#define uchar2si(b)	(((int)(b)) << 14)
+#define si2int(s)	(((s) + 8192) >> 14)
+
+#ifdef notdef
 typedef struct {
     int pixel;
-    float weight;
+    union Weight {
+	int i;			/* Fixed point, scaled integer. */
+	float f;
+    } weight;
 } Sample;
 
 typedef struct {
     int count;			/* Number of contributors */
-    Sample *sampleArr;		/* Array of contributors */
+    Sample *samples;		/* Array of contributors */
 } Contribution;
 
+typedef struct {
+    int pixel;
+    union Weight {
+	int i;			/* Fixed point, scaled integer. */
+	float f;
+    } weight;
+} Sample;
+#endif
 
-static void
-ComputeContributors(srcWidth, destWidth, filterPtr, contribPtrPtr,
-    samplePtrPtr)
+
+typedef union {
+    int i;			/* Fixed point, scaled integer. */
+    float f;
+} Weight;
+
+typedef struct {
+    int count;			/* Number of samples. */
+    int start;
+    Weight weights[1];		/* Array of weights. */
+} Sample;
+
+static size_t
+ComputeWeights(srcWidth, destWidth, filterPtr, samplePtrPtr)
     int srcWidth, destWidth;
-    struct Image1DFilter *filterPtr;
-    Contribution **contribPtrPtr;
+    ResampleFilter *filterPtr;
     Sample **samplePtrPtr;
 {
-    Contribution *contribArr;
-    Sample *samplePool, *sampleArr;
+    Sample *samples;
     double scale;
-    int sampleSize;
+    int filterSize;
     double center;
-    register Contribution *contribPtr;
-    register Sample *samplePtr;
+    register Sample *s;
+    register Weight *weight;
     register int x, i;
     register int left, right;	/* filter bounds */
-    float factor, sum;
+    double factor, sum;
+    size_t size;
 
     /* Pre-calculate filter contributions for a row */
-    contribArr = (Contribution *)calloc(destWidth, sizeof(Contribution));
-    assert(contribArr);
-
     scale = (double)destWidth / (double)srcWidth;
 
     if (scale < 1.0) {
-	double width, fscale;
+	double radius, fscale;
 
 	/* Downsample */
 
-	width = filterPtr->support / scale;
+	radius = filterPtr->support / scale;
 	fscale = 1.0 / scale;
-	sampleSize = (int)(width * 2 + 2);
-	samplePool = (Sample *)malloc(sampleSize * destWidth * sizeof(Sample));
-	sampleArr = samplePool;
-	for (contribPtr = contribArr, x = 0; x < destWidth; x++, contribPtr++) {
-	    center = (double)x *fscale;
+	filterSize = (int)(radius * 2 + 2);
+
+	size = sizeof(Sample) + (filterSize - 1) * sizeof(Weight);
+	samples = Blt_Calloc(destWidth, size);
+	assert(samples);
+
+	s = samples;
+	for (x = 0; x < destWidth; x++) {
+	    center = (double)x * fscale;
 
 	    /* Determine bounds of filter and its density */
-	    left = (int)(center - width + 0.5);
+	    left = (int)(center - radius + 0.5);
 	    if (left < 0) {
 		left = 0;
 	    }
-	    right = (int)(center + width + 0.5);
+	    right = (int)(center + radius + 0.5);
 	    if (right >= srcWidth) {
 		right = srcWidth - 1;
 	    }
 	    sum = 0.0;
-	    for (samplePtr = sampleArr, i = left; i <= right;
-		i++, samplePtr++) {
-		samplePtr->weight = (float)
+	    s->start = left;
+	    for (weight = s->weights, i = left; i <= right; i++, weight++) {
+		weight->f = (float)
 		    (*filterPtr->proc) (((double)i + 0.5 - center) * scale);
-		sum += samplePtr->weight;
+		sum += weight->f;
 	    }
-	    factor = (float)((sum == 0.0) ? 1.0 : (1.0 / sum));
-	    for (samplePtr = sampleArr, i = left; i <= right;
-		i++, samplePtr++) {
-		samplePtr->pixel = i;
-		samplePtr->weight *= factor;
+	    s->count = right - left + 1;
+
+	    factor = (sum == 0.0) ? 1.0 : (1.0 / sum);
+	    for (weight = s->weights, i = left; i <= right; i++, weight++) {
+		weight->f = (float)(weight->f * factor);
+		weight->i = float2si(weight->f);
 	    }
-	    contribPtr->count = right - left + 1;
-	    contribPtr->sampleArr = sampleArr;
-	    sampleArr += sampleSize;
+	    s = (Sample *)((char *)s + size);
 	}
     } else {
+	double fscale;
 	/* Upsample */
 
-	sampleSize = (int)(filterPtr->support * 2 + 2);
-	samplePool = (Sample *)malloc(sampleSize * destWidth * sizeof(Sample));
-	sampleArr = samplePool;
+	filterSize = (int)(filterPtr->support * 2 + 2);
+	size = sizeof(Sample) + (filterSize - 1) * sizeof(Weight);
+	samples = Blt_Calloc(destWidth, size);
+	assert(samples);
 
-	for (contribPtr = contribArr, x = 0; x < destWidth; x++, contribPtr++) {
-	    center = (double)x / scale;
+	fscale = 1.0 / scale;
+
+	s = samples;
+	for (x = 0; x < destWidth; x++) {
+	    center = (double)x * fscale;
 	    left = (int)(center - filterPtr->support + 0.5);
 	    if (left < 0) {
 		left = 0;
@@ -1152,148 +811,135 @@ ComputeContributors(srcWidth, destWidth, filterPtr, contribPtrPtr,
 		right = srcWidth - 1;
 	    }
 	    sum = 0.0;
-	    for (samplePtr = sampleArr, i = left; i <= right;
-		i++, samplePtr++) {
-		samplePtr->weight =
-		    (float)(*filterPtr->proc) ((double)i + 0.5 - center);
-		sum += samplePtr->weight;
+	    s->start = left;
+	    for (weight = s->weights, i = left; i <= right; i++, weight++) {
+		weight->f = (float)
+		    (*filterPtr->proc) ((double)i - center + 0.5);
+		sum += weight->f;
 	    }
-	    factor = (float)((sum == 0.0) ? 1.0 : (1.0 / sum));
-	    for (samplePtr = sampleArr, i = left; i <= right;
-		i++, samplePtr++) {
-		samplePtr->pixel = i;
-		samplePtr->weight *= factor;
+	    s->count = right - left + 1;
+	    factor = (sum == 0.0) ? 1.0 : (1.0 / sum);
+	    for (weight = s->weights, i = left; i <= right; i++, weight++) {
+		weight->f = (float)(weight->f * factor);
+		weight->i = float2si(weight->f);
 	    }
-	    contribPtr->count = right - left + 1;
-	    contribPtr->sampleArr = sampleArr;
-	    sampleArr += sampleSize;
+	    s = (Sample *)((char *)s + size);
 	}
     }
-    *samplePtrPtr = samplePool;
-    *contribPtrPtr = contribArr;
+    *samplePtrPtr = samples;
+    return size;
 }
 
-static ColorImage
-ZoomImageVertically(srcImage, srcRegionPtr, destRegionPtr, filter)
-    ColorImage srcImage;
-    ImageRegion *srcRegionPtr;	/* Region of source image to resample */
-    ImageRegion *destRegionPtr;	/* Region of destination image to redraw */
-    Image1DFilter filter;
+/* 
+ * The following macro converts a fixed-point scaled integer to a
+ * byte, clamping the value between 0 and 255.  
+ */
+#define SICLAMP(s) \
+    (unsigned char)(((s) < 0) ? 0 : ((s) > 4177920) ? 255 : (si2int(s)))
+
+static void
+ZoomImageVertically(src, dest, filterPtr)
+    Blt_ColorImage src, dest;
+    ResampleFilter *filterPtr;
 {
-    Contribution *contribArr, *contribPtr;
-    register Sample *samplePtr;
-    Sample *sampleArr;
-    register int x, y, i;
-    ColorImage destImage;
-    register Pix32 *srcPtr, *destPtr;
-    float red, green, blue;
-    Pix32 *pixelPtr;
-    int destOffset;
-    int srcWidth, srcHeight;
+    Sample *samples, *s, *endPtr;
     int destWidth, destHeight;
+    int red, green, blue, alpha;
+    int srcWidth, srcHeight;
+    register Pix32 *srcColumnPtr;
+    register Pix32 *srcPtr, *destPtr;
+    register Weight *weight;
+    int x, i;
+    size_t size;		/* Size of sample. */
 
-    srcWidth = srcRegionPtr->width;
-    srcHeight = srcRegionPtr->height;
-    destWidth = destRegionPtr->width;
-    destHeight = destRegionPtr->height;
-
-    destImage = Blt_CreateColorImage(destWidth, destHeight);
+    srcWidth = Blt_ColorImageWidth(src);
+    srcHeight = Blt_ColorImageHeight(src);
+    destWidth = Blt_ColorImageWidth(dest);
+    destHeight = Blt_ColorImageHeight(dest);
 
     /* Pre-calculate filter contributions for a row */
-    ComputeContributors(srcHeight, destHeight, filter, &contribArr, &sampleArr);
+    size = ComputeWeights(srcHeight, destHeight, filterPtr, &samples);
+    endPtr = (Sample *)((char *)samples + (destHeight * size));
 
     /* Apply filter to zoom vertically from tmp to destination */
     for (x = 0; x < srcWidth; x++) {
-	destOffset = x;
-	srcPtr = ColorImageData(srcImage) + x;
-	for (contribPtr = contribArr, y = 0; y < destHeight; y++,
-	    contribPtr++) {
-	    red = green = blue = 0.0;
-	    for (samplePtr = contribPtr->sampleArr, i = 0;
-		i < contribPtr->count; i++, samplePtr++) {
-		pixelPtr = srcPtr + (samplePtr->pixel * srcWidth);
-		red += (float)pixelPtr->Red * samplePtr->weight;
-		green += (float)pixelPtr->Green * samplePtr->weight;
-		blue += (float)pixelPtr->Blue * samplePtr->weight;
+	srcColumnPtr = Blt_ColorImageBits(src) + x;
+	destPtr = Blt_ColorImageBits(dest) + x;
+	for (s = samples; s < endPtr; s = (Sample *)((char *)s + size)) {
+	    red = green = blue = alpha = 0;
+	    srcPtr = srcColumnPtr + (s->start * srcWidth);
+	    for (weight = s->weights, i = 0; i < s->count; i++, weight++) {
+		red += srcPtr->Red * weight->i;
+		green += srcPtr->Green * weight->i;
+		blue += srcPtr->Blue * weight->i;
+		alpha += srcPtr->Alpha * weight->i;
+		srcPtr += srcWidth;
 	    }
-	    destPtr = ColorImageData(destImage) + destOffset;
-	    destPtr->Red = (unsigned char)CLAMP(red);
-	    destPtr->Green = (unsigned char)CLAMP(green);
-	    destPtr->Blue = (unsigned char)CLAMP(blue);
-	    destOffset += destWidth;
+	    destPtr->Red = SICLAMP(red);
+	    destPtr->Green = SICLAMP(green);
+	    destPtr->Blue = SICLAMP(blue);
+	    destPtr->Alpha = SICLAMP(alpha);
+	    destPtr += destWidth;
+
 	}
     }
-
     /* Free the memory allocated for filter weights */
-    free((char *)sampleArr);
-    free((char *)contribArr);
-
-    return destImage;
+    Blt_Free(samples);
 }
 
-static ColorImage
-ZoomImageHorizontally(srcImage, srcRegionPtr, destRegionPtr, filter)
-    ColorImage srcImage;
-    ImageRegion *srcRegionPtr;	/* Region of source image to resample */
-    ImageRegion *destRegionPtr;	/* Region of destination image to redraw */
-    Image1DFilter filter;
+static void
+ZoomImageHorizontally(src, dest, filterPtr)
+    Blt_ColorImage src, dest;
+    ResampleFilter *filterPtr;
 {
-    Contribution *contribArr, *contribPtr;
-    register Sample *samplePtr;
-    Sample *sampleArr;
-    register int x, y, i;
-    ColorImage destImage;
-    register Pix32 *srcPtr, *destPtr;
-    float red, green, blue;
-    Pix32 *pixelPtr;
-    int srcOffset, destOffset;
+    Sample *samples, *s, *endPtr;
+    Weight *weight;
+    int destWidth;
+    int red, green, blue, alpha;
     int srcWidth, srcHeight;
-    int destWidth, destHeight;
+    int y, i;
+    register Pix32 *srcPtr, *destPtr;
+    register Pix32 *srcRowPtr;
+    size_t size;		/* Size of sample. */
 
-    srcWidth = srcRegionPtr->width;
-    srcHeight = srcRegionPtr->height;
-    destWidth = destRegionPtr->width;
-    destHeight = destRegionPtr->height;
-
-    destImage = Blt_CreateColorImage(destWidth, destHeight);
+    srcWidth = Blt_ColorImageWidth(src);
+    srcHeight = Blt_ColorImageHeight(src);
+    destWidth = Blt_ColorImageWidth(dest);
 
     /* Pre-calculate filter contributions for a row */
-    ComputeContributors(srcWidth, destWidth, filter, &contribArr, &sampleArr);
+    size = ComputeWeights(srcWidth, destWidth, filterPtr, &samples);
+    endPtr = (Sample *)((char *)samples + (destWidth * size));
 
     /* Apply filter to zoom horizontally from srcPtr to tmpPixels */
-    srcOffset = srcRegionPtr->x + (srcRegionPtr->y * srcWidth);
-    destOffset = 0;
+    srcRowPtr = Blt_ColorImageBits(src);
+    destPtr = Blt_ColorImageBits(dest);
     for (y = 0; y < srcHeight; y++) {
-	srcPtr = ColorImageData(srcImage) + srcOffset;
-	destPtr = ColorImageData(destImage) + destOffset;
-	for (contribPtr = contribArr, x = 0; x < destWidth;
-	    x++, destPtr++, contribPtr++) {
-	    red = green = blue = 0.0;
-	    for (samplePtr = contribPtr->sampleArr, i = 0;
-		i < contribPtr->count; i++, samplePtr++) {
-		pixelPtr = srcPtr + samplePtr->pixel;
-		red += (float)pixelPtr->Red * samplePtr->weight;
-		green += (float)pixelPtr->Green * samplePtr->weight;
-		blue += (float)pixelPtr->Blue * samplePtr->weight;
+	for (s = samples; s < endPtr; s = (Sample *)((char *)s + size)) {
+	    red = green = blue = alpha = 0;
+	    srcPtr = srcRowPtr + s->start;
+	    for (weight = s->weights, i = 0; i < s->count; i++, weight++) {
+		red += srcPtr->Red * weight->i;
+		green += srcPtr->Green * weight->i;
+		blue += srcPtr->Blue * weight->i;
+		alpha += srcPtr->Alpha * weight->i;
+		srcPtr++;
 	    }
-	    destPtr->Red = (unsigned char)CLAMP(red);
-	    destPtr->Green = (unsigned char)CLAMP(green);
-	    destPtr->Blue = (unsigned char)CLAMP(blue);
+	    destPtr->Red = SICLAMP(red);
+	    destPtr->Green = SICLAMP(green);
+	    destPtr->Blue = SICLAMP(blue);
+	    destPtr->Alpha = SICLAMP(alpha);
+	    destPtr++;
 	}
-	destOffset += destWidth;
-	srcOffset += srcWidth;
+	srcRowPtr += srcWidth;
     }
     /* free the memory allocated for horizontal filter weights */
-    free((char *)sampleArr);
-    free((char *)contribArr);
-
-    return destImage;
+    Blt_Free(samples);
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * Blt_ResampleImage --
+ * Blt_ResampleColorImage --
  *
  *      Resamples a given color image using 1-D filters and returns
  *	a new color image of the designated size.
@@ -1304,46 +950,25 @@ ZoomImageHorizontally(srcImage, srcRegionPtr, destRegionPtr, filter)
  *
  *----------------------------------------------------------------------
  */
-ColorImage
-Blt_ResampleColorImage(image, srcRegionPtr, destRegionPtr, horzFilter,
-    vertFilter)
-    ColorImage image;
-    ImageRegion *srcRegionPtr;	/* Region of source image to resample */
-    ImageRegion *destRegionPtr;	/* Region of destination image to redraw */
-    Image1DFilter horzFilter, vertFilter;
+Blt_ColorImage
+Blt_ResampleColorImage(src, width, height, horzFilterPtr, vertFilterPtr)
+    Blt_ColorImage src;
+    int width, height;
+    ResampleFilter *horzFilterPtr, *vertFilterPtr;
 {
-    ColorImage tmpImage, destImage;
-    ImageRegion tmpRegion;
-    int count1, count2;
-    int vertSupport, horzSupport;
+    Blt_ColorImage tmp, dest;
 
-    vertSupport = (int)ceil(vertFilter->support * 2.0);
-    horzSupport = (int)ceil(horzFilter->support * 2.0);
+    /* 
+     * It's usually faster to zoom vertically last.  This has to do
+     * with the fact that images are stored in contiguous rows.
+     */
 
-    tmpRegion.x = tmpRegion.y = 0;
-
-    /* Determine if it's cheaper to first zoom vertically or horizontally */
-    count1 = destRegionPtr->width * (srcRegionPtr->height *
-	horzSupport + destRegionPtr->height * vertSupport);
-    count2 = destRegionPtr->height * (srcRegionPtr->width *
-	vertSupport + destRegionPtr->width * horzSupport);
-    if (count1 < count2) {
-	tmpRegion.width = srcRegionPtr->width;
-	tmpRegion.height = destRegionPtr->height;
-	tmpImage = ZoomImageVertically(image, srcRegionPtr, &tmpRegion,
-	    vertFilter);
-	destImage = ZoomImageHorizontally(tmpImage, &tmpRegion, destRegionPtr,
-	    horzFilter);
-    } else {
-	tmpRegion.height = srcRegionPtr->height;
-	tmpRegion.width = destRegionPtr->width;
-	tmpImage = ZoomImageHorizontally(image, srcRegionPtr, &tmpRegion,
-	    horzFilter);
-	destImage = ZoomImageVertically(tmpImage, &tmpRegion, destRegionPtr,
-	    vertFilter);
-    }
-    Blt_FreeColorImage(tmpImage);
-    return destImage;
+    tmp = Blt_CreateColorImage(width, Blt_ColorImageHeight(src));
+    ZoomImageHorizontally(src, tmp, horzFilterPtr);
+    dest = Blt_CreateColorImage(width, height);
+    ZoomImageVertically(tmp, dest, vertFilterPtr);
+    Blt_FreeColorImage(tmp);
+    return dest;
 }
 
 /*
@@ -1351,52 +976,33 @@ Blt_ResampleColorImage(image, srcRegionPtr, destRegionPtr, horzFilter,
  *
  * Blt_ResamplePhoto --
  *
- *      Resamples a Tk photo image using 1-D filters and returns
- *	writes the new image into another Tk photo.  It is possible
- *	for the source and destination to be the same photos.
+ *      Resamples a Tk photo image using 1-D filters and writes the
+ *      image into another Tk photo.  It is possible for the
+ *      source and destination to be the same photo.
  *
  * Results:
  *      The designated destination photo will contain the resampled
  *	color image. The original photo is left intact.
  *
- *----------------------------------------------------------------------
+ *---------------------------------------------------------------------- 
  */
 void
-Blt_ResamplePhoto(srcPhoto, destPhoto, srcRegionPtr, horzFilter, vertFilter)
+Blt_ResamplePhoto(srcPhoto, x, y, width, height, destPhoto, horzFilterPtr, 
+	vertFilterPtr)
     Tk_PhotoHandle srcPhoto;	/* Source photo image to scale */
+    int x, y;
+    int width, height;
     Tk_PhotoHandle destPhoto;	/* Resulting scaled photo image */
-    ImageRegion *srcRegionPtr;	/* Region of source image to resample */
-    Image1DFilter horzFilter, vertFilter;
+    ResampleFilter *horzFilterPtr, *vertFilterPtr;
 {
-    ColorImage image, destImage;
-    Tk_PhotoImageBlock src, dest;
-    ImageRegion srcRegion, destRegion;
+    Blt_ColorImage srcImage, destImage;
+    Tk_PhotoImageBlock dest;
 
-    Tk_PhotoGetImage(srcPhoto, &src);
     Tk_PhotoGetImage(destPhoto, &dest);
-
-    if (srcRegionPtr->width < 1) {
-	srcRegionPtr->width = src.width;
-    }
-    if (srcRegionPtr->height < 1) {
-	srcRegionPtr->height = src.height;
-    }
-    image = Blt_PhotoToColorImage(srcPhoto, srcRegionPtr);
-    srcRegion.x = srcRegion.y = 0;
-    srcRegion.width = srcRegionPtr->width;
-    srcRegion.height = srcRegionPtr->height;
-    destRegion.x = destRegion.y = 0;
-    destRegion.width = dest.width;
-    destRegion.height = dest.height;
-    if (destRegion.width < 1) {
-	destRegion.width = srcRegionPtr->width;
-    }
-    if (destRegion.height < 1) {
-	destRegion.height = srcRegionPtr->height;
-    }
-    destImage = Blt_ResampleColorImage(image, &srcRegion, &destRegion,
-	horzFilter, vertFilter);
-    Blt_FreeColorImage(image);
+    srcImage = Blt_PhotoRegionToColorImage(srcPhoto, x, y, width, height);
+    destImage = Blt_ResampleColorImage(srcImage, dest.width, dest.height,
+	horzFilterPtr, vertFilterPtr);
+    Blt_FreeColorImage(srcImage);
     Blt_ColorImageToPhoto(destImage, destPhoto);
     Blt_FreeColorImage(destImage);
 }
@@ -1410,7 +1016,7 @@ Blt_ResamplePhoto(srcPhoto, destPhoto, srcRegionPtr, horzFilter, vertFilter)
  *	destination image.  This routine performs raw scaling of
  *	the image and unlike Blt_ResamplePhoto does not handle
  *	aliasing effects from subpixel sampling. It is possible
- *	for the source and destination to be the same photos.
+ *	for the source and destination to be the same photo.
  *
  * Results:
  *      The designated destination photo will contain the resampled
@@ -1419,54 +1025,87 @@ Blt_ResamplePhoto(srcPhoto, destPhoto, srcRegionPtr, horzFilter, vertFilter)
  *----------------------------------------------------------------------
  */
 void
-Blt_ResizePhoto(srcPhoto, destPhoto, srcRegionPtr)
-    Tk_PhotoHandle srcPhoto;	/* Source photo image to scale */
-    Tk_PhotoHandle destPhoto;	/* Resulting scaled photo image */
-    ImageRegion *srcRegionPtr;	/* Region of source image to be scaled */
+Blt_ResizePhoto(srcPhoto, x, y, width, height, destPhoto)
+    Tk_PhotoHandle srcPhoto;	/* Source photo image to scaled. */
+    register int x, y;		/* Region of source photo to be
+				 * scaled. */
+    int width, height;
+    Tk_PhotoHandle destPhoto;	/* (out) Resulting scaled photo image.
+				 * Scaling factors are derived from
+				 * the destination photo's
+				 * dimensions. */
 {
-    register int x, y;
-    register int sx, sy;
-    float scaleX, scaleY;
-    ColorImage destImage;
+    double xScale, yScale;
+    Blt_ColorImage destImage;
     Pix32 *destPtr;
     Tk_PhotoImageBlock src, dest;
-    unsigned char *srcPtr;
-    int offset;
+    unsigned char *srcPtr, *srcRowPtr;
+    int *mapX, *mapY;
+    register int sx, sy;
+    int left, right, top, bottom;
 
     Tk_PhotoGetImage(srcPhoto, &src);
     Tk_PhotoGetImage(destPhoto, &dest);
 
-    if (srcRegionPtr->width < 1) {
-	srcRegionPtr->width = src.width;
-    }
-    if (srcRegionPtr->height < 1) {
-	srcRegionPtr->height = src.height;
-    }
+    left = x, top = y, right = x + width - 1, bottom = y + height - 1;
     destImage = Blt_CreateColorImage(dest.width, dest.height);
-
-    scaleX = (float)srcRegionPtr->width / (float)dest.width;
-    scaleY = (float)srcRegionPtr->height / (float)dest.height;
-
-    destPtr = ColorImageData(destImage);
-    for (y = 0; y < dest.height; y++) {
-	sy = (int)(scaleY * (float)y + 0.5);
-	if (sy > (int)(srcRegionPtr->height)) {
-	    continue;
+    xScale = (double)width / (double)dest.width;
+    yScale = (double)height / (double)dest.height;
+    mapX = (int *)Blt_Malloc(sizeof(int) * dest.width);
+    mapY = (int *)Blt_Malloc(sizeof(int) * dest.height);
+    for(x = 0; x < dest.width; x++) {
+	sx = (int)(xScale * (double)(x + left));
+	if (sx > right) {
+	    sx = right;
 	}
-	offset = ((sy + srcRegionPtr->y) * src.pitch) +
-	    (srcRegionPtr->x * src.pixelSize);
-	for (x = 0; x < dest.width; x++) {
-	    sx = (int)(scaleX * (float)x + 0.5);
-	    if (sx > (int)(srcRegionPtr->width)) {
-		continue;
-	    }
-	    srcPtr = src.pixelPtr + offset + (sx * src.pixelSize);
-	    destPtr->Red = srcPtr[src.offset[0]];
-	    destPtr->Green = srcPtr[src.offset[1]];
-	    destPtr->Blue = srcPtr[src.offset[2]];
-	    destPtr++;
-	}
+	mapX[x] = sx;
     }
+    for(y = 0; y < dest.height; y++) {
+	sy = (int)(yScale * (double)(y + top));
+	if (sy > bottom) {
+	    sy = bottom;
+	}
+	mapY[y] = sy;
+    }
+    destPtr = Blt_ColorImageBits(destImage);
+    if (src.pixelSize == 4) {
+	for (y = 0; y < dest.height; y++) {
+	    srcRowPtr = src.pixelPtr + (mapY[y] * src.pitch);
+	    for (x = 0; x < dest.width; x++) {
+		srcPtr = srcRowPtr + (mapX[x] * src.pixelSize);
+		destPtr->Red = srcPtr[src.offset[0]];
+		destPtr->Green = srcPtr[src.offset[1]];
+		destPtr->Blue = srcPtr[src.offset[2]];
+		destPtr->Alpha = srcPtr[src.offset[3]];
+		destPtr++;
+	    }
+	}
+    } else if (src.pixelSize == 3) {
+	for (y = 0; y < dest.height; y++) {
+	    srcRowPtr = src.pixelPtr + (mapY[y] * src.pitch);
+	    for (x = 0; x < dest.width; x++) {
+		srcPtr = srcRowPtr + (mapX[x] * src.pixelSize);
+		destPtr->Red = srcPtr[src.offset[0]];
+		destPtr->Green = srcPtr[src.offset[1]];
+		destPtr->Blue = srcPtr[src.offset[2]];
+		destPtr->Alpha = (unsigned char)-1;
+		destPtr++;
+	    }
+	}
+    } else  {
+	for (y = 0; y < dest.height; y++) {
+	    srcRowPtr = src.pixelPtr + (mapY[y] * src.pitch);
+	    for (x = 0; x < dest.width; x++) {
+		srcPtr = srcRowPtr + (mapX[x] * src.pixelSize);
+		destPtr->Red = destPtr->Green = destPtr->Blue = 
+		    srcPtr[src.offset[0]];
+		destPtr->Alpha = (unsigned char)-1;
+		destPtr++;
+	    }
+	}
+    }	
+    Blt_Free(mapX);
+    Blt_Free(mapY);
     Blt_ColorImageToPhoto(destImage, destPhoto);
     Blt_FreeColorImage(destImage);
 }
@@ -1478,8 +1117,8 @@ Blt_ResizePhoto(srcPhoto, destPhoto, srcRegionPtr)
  *
  *	Scales the region of the source image to the size of the
  *	destination image.  This routine performs raw scaling of
- *	the image and unlike Blt_ResamplePhoto does not compensate
- *	for aliasing effects from subpixel sampling.
+ *	the image and unlike Blt_ResamplePhoto does not perform
+ *	any antialiasing.
  *
  * Results:
  *      Returns the new resized color image.  The original image
@@ -1487,90 +1126,160 @@ Blt_ResizePhoto(srcPhoto, destPhoto, srcRegionPtr)
  *
  *----------------------------------------------------------------------
  */
-ColorImage
-Blt_ResizeColorImage(image, srcRegionPtr, destRegionPtr)
-    ColorImage image;		/* Source photo image to scale */
-    ImageRegion *srcRegionPtr;	/* Region of source image to be scaled */
-    ImageRegion *destRegionPtr;	/* Region of destination image */
+Blt_ColorImage
+Blt_ResizeColorImage(src, x, y, width, height, destWidth, destHeight)
+    Blt_ColorImage src;		/* Source color image to be scaled. */
+    register int x, y;		/* Region of source image to scaled. */
+    int width, height;
+    int destWidth, destHeight;	/* Requested dimensions of the scaled
+				 * image. */
 {
-    register int x, y;
     register int sx, sy;
-    float scaleX, scaleY;
-    ColorImage destImage;
-    Pix32 *srcPtr, *destPtr;
-    int offset;
+    double xScale, yScale;
+    Blt_ColorImage dest;
+    Pix32 *srcPtr, *srcRowPtr, *destPtr;
+    int *mapX, *mapY;
+    int left, right, top, bottom;
 
-    if (srcRegionPtr->width < 1) {
-	srcRegionPtr->width = ColorImageWidth(image);
+    left = x, top = y; right = x + width - 1, bottom = y + height - 1;
+
+    dest = Blt_CreateColorImage(destWidth, destHeight);
+    xScale = (double)width / (double)destWidth;
+    yScale = (double)height / (double)destHeight;
+    mapX = (int *)Blt_Malloc(sizeof(int) * destWidth);
+    mapY = (int *)Blt_Malloc(sizeof(int) * destHeight);
+    for(x = 0; x < destWidth; x++) {
+	sx = (int)(xScale * (double)(x + left));
+	if (sx > right) {
+	    sx = right;
+	} 
+	mapX[x] = sx;
     }
-    if (srcRegionPtr->height < 1) {
-	srcRegionPtr->height = ColorImageHeight(image);
+    for(y = 0; y < destHeight; y++) {
+	sy = (int)(yScale * (double)(y + top));
+	if (sy > bottom) {
+	    sy = bottom;
+	} 
+	mapY[y] = sy;
     }
-    destImage = Blt_CreateColorImage(destRegionPtr->width,
-	destRegionPtr->height);
-
-    scaleX = (float)srcRegionPtr->width / (float)destRegionPtr->width;
-    scaleY = (float)srcRegionPtr->height / (float)destRegionPtr->height;
-
-    destPtr = ColorImageData(destImage);
-    for (y = 0; y < destRegionPtr->height; y++) {
-	sy = (int)(scaleY * (float)y + 0.5);
-	if (sy > (int)(srcRegionPtr->height)) {
-	    continue;
-	}
-	offset = ((sy + srcRegionPtr->y) * ColorImageWidth(image)) +
-	    srcRegionPtr->x;
-	for (x = 0; x < destRegionPtr->width; x++) {
-	    sx = (int)(scaleX * (float)x + 0.5);
-	    if (sx > (int)(srcRegionPtr->width)) {
-		continue;
-	    }
-	    srcPtr = ColorImageData(image) + offset + sx;
-	    destPtr->Red = srcPtr->Red;
-	    destPtr->Green = srcPtr->Green;
-	    destPtr->Blue = srcPtr->Blue;
-	    /* Don't copy alpha-channel information. */
+    destPtr = Blt_ColorImageBits(dest);
+    for (y = 0; y < destHeight; y++) {
+	srcRowPtr = Blt_ColorImageBits(src) + 
+	    (Blt_ColorImageWidth(src) * mapY[y]);
+	for (x = 0; x < destWidth; x++) {
+	    srcPtr = srcRowPtr + mapX[x];
+	    destPtr->value = srcPtr->value; /* Copy the pixel. */
 	    destPtr++;
 	}
     }
-    return destImage;
+    Blt_Free(mapX);
+    Blt_Free(mapY);
+    return dest;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_ResizeColorSubimage --
+ *
+ *	Scales the region of the source image to the size of the
+ *	destination image.  This routine performs raw scaling of
+ *	the image and unlike Blt_ResamplePhoto does not perform
+ *	any antialiasing.
+ *
+ * Results:
+ *      Returns the new resized color image.  The original image
+ *	is left intact.
+ *
+ *----------------------------------------------------------------------
+ */
+Blt_ColorImage
+Blt_ResizeColorSubimage(
+    Blt_ColorImage src,		/* Source color image to be scaled. */
+    int regionX, 
+    int regionY,		/* Offset of subimage in destination. */
+    int regionWidth,		/* Dimension of subimage. */
+    int regionHeight,
+    int destWidth, 
+    int destHeight)		/* Dimensions of the entire scaled
+				   image. */
+{
+    Blt_ColorImage dest;
+    Pix32 *srcPtr, *srcRowPtr, *destPtr;
+    double xScale, yScale;
+    int *mapX, *mapY;
+    int srcWidth, srcHeight;
+    register int sx, sy;
+    register int x, y;
+
+    srcWidth = Blt_ColorImageWidth(src);
+    srcHeight = Blt_ColorImageHeight(src);
+
+    xScale = (double)srcWidth / (double)destWidth;
+    yScale = (double)srcHeight / (double)destHeight;
+    mapX = Blt_Malloc(sizeof(int) * regionWidth);
+    mapY = Blt_Malloc(sizeof(int) * regionHeight);
+
+    /* Precompute scaling factors for each row and column. */
+    for(x = 0; x < regionWidth; x++) {
+	sx = (int)(xScale * (double)(x + regionX));
+	if (sx >= srcWidth) {
+	    sx = srcWidth - 1;
+	} 
+	mapX[x] = sx;
+    }
+    for(y = 0; y < regionHeight; y++) {
+	sy = (int)(yScale * (double)(y + regionY));
+	if (sy > srcHeight) {
+	    sy = srcHeight - 1;
+	} 
+	mapY[y] = sy;
+    }
+
+    dest = Blt_CreateColorImage(regionWidth, regionHeight);
+    destPtr = Blt_ColorImageBits(dest);
+    for (y = 0; y < regionHeight; y++) {
+	srcRowPtr = Blt_ColorImageBits(src) + 
+	    (Blt_ColorImageWidth(src) * mapY[y]);
+	for (x = 0; x < regionWidth; x++) {
+	    srcPtr = srcRowPtr + mapX[x];
+	    destPtr->value = srcPtr->value; /* Copy the pixel. */
+	    destPtr++;
+	}
+    }
+    Blt_Free(mapX);
+    Blt_Free(mapY);
+    return dest;
 }
 
 /*
  * FIXME: Boundary handling could be better (pixels are replicated).
  *	  It's slow. Take boundary tests out of inner loop.
  */
-ColorImage
-Blt_ConvolveColorImage(srcImage, filterPtr)
-    ColorImage srcImage;
-    Image2DFilter *filterPtr;
+Blt_ColorImage
+Blt_ConvolveColorImage(src, filterPtr)
+    Blt_ColorImage src;
+    Filter2D *filterPtr;
 {
-    ColorImage destImage;
-    Pix32 *srcData, *destData;
+    Blt_ColorImage dest;
     register Pix32 *srcPtr, *destPtr;
 #define MAXROWS	24
     register int sx, sy, dx, dy;
     register int x, y;
-    float red, green, blue;
+    double red, green, blue;
     int width, height;
     int radius;
-    register float *valuePtr;
-    int filterWidth;
+    register double *valuePtr;
 
-    width = ColorImageWidth(srcImage);
-    height = ColorImageHeight(srcImage);
+    width = Blt_ColorImageWidth(src);
+    height = Blt_ColorImageHeight(src);
 
-    destImage = Blt_CreateColorImage(width, height);
-    srcData = ColorImageData(srcImage);
-    destData = ColorImageData(destImage);
-
+    dest = Blt_CreateColorImage(width, height);
     radius = (int)filterPtr->support;
     if (radius < 1) {
 	radius = 1;
     }
-    filterWidth = radius * 2;
-#define PIXELOFFSET(x,y) (((y) * width) + (x))
-    destPtr = destData;
+    destPtr = Blt_ColorImageBits(dest);
     for (dy = 0; dy < height; dy++) {
 	for (dx = 0; dx < width; dx++) {
 	    red = green = blue = 0.0;
@@ -1579,26 +1288,23 @@ Blt_ConvolveColorImage(srcImage, filterPtr)
 		y = sy;
 		if (y < 0) {
 		    y = 0;
-		}  else if (y >= height) {
+		} else if (y >= height) {
 		    y = height - 1;
 		}
 		for (sx = (dx - radius); sx <= (dx + radius); sx++) {
 		    x = sx;
 		    if (x < 0) {
 			x = 0;
-		    }  else if (sx >= width) {
+		    } else if (sx >= width) {
 			x = width - 1;
 		    }
+		    srcPtr = Blt_ColorImagePixel(src, x, y);
+		    red += *valuePtr * (double)srcPtr->Red;
+		    green += *valuePtr * (double)srcPtr->Green;
+		    blue += *valuePtr * (double)srcPtr->Blue;
 #ifdef notdef
-		    fprintf(stderr, "%d,%d r=%d\n", x, y, radius);
-#endif
-		    srcPtr = srcData + PIXELOFFSET(x, y);
-		    red += *valuePtr * (float)srcPtr->Red;
-		    green += *valuePtr * (float)srcPtr->Green;
-		    blue += *valuePtr * (float)srcPtr->Blue;
-#ifdef notdef
-		    fprintf(stderr, "%d,%d = r=%f,g=%f,b=%f\n", x, y, 
-			    red, green, blue);
+		    fprintf(stderr, "%d,%d = r=%f,g=%f,b=%f\n", x, y,
+			red, green, blue);
 #endif
 		    valuePtr++;
 		}
@@ -1606,264 +1312,16 @@ Blt_ConvolveColorImage(srcImage, filterPtr)
 	    red /= filterPtr->sum;
 	    green /= filterPtr->sum;
 	    blue /= filterPtr->sum;
-#ifdef notdef
-	    fprintf(stderr, "%d,%d = r=%f,g=%f,b=%f\n", x, y, red, green, blue);
-#endif
 	    destPtr->Red = (unsigned char)CLAMP(red);
 	    destPtr->Green = (unsigned char)CLAMP(green);
 	    destPtr->Blue = (unsigned char)CLAMP(blue);
+	    destPtr->Alpha = (unsigned char)-1;
 	    destPtr++;
 	}
     }
-    return destImage;
+    return dest;
 }
 
-#ifdef WIN32
-/*
- *----------------------------------------------------------------------
- *
- * Blt_DrawableToColorImage --
- *
- *      Takes a snapshot of an X drawable (pixmap or window) and
- *	converts it to a color image.
- *
- * Results:
- *      Returns a color image of the drawable.  If an error occurred,
- *	NULL is returned.
- *
- *----------------------------------------------------------------------
- */
-ColorImage
-Blt_DrawableToColorImage(tkwin, drawable, width, height, regionPtr)
-    Tk_Window tkwin;
-    Drawable drawable;
-    int width, height;		/* Dimension of the drawable. */
-    ImageRegion *regionPtr;	/* Region to be snapped. */
-{
-    HDC drawDC;
-    TkWinDCState state;
-    register Pix32 *destPtr;
-    ColorImage image;
-    register int x, y;
-    COLORREF rgb;
-
-
-    if ((regionPtr->x > width) || (regionPtr->y > height)) {
-	return NULL;		/* Bad region X-Y coordinates */
-    }
-    /* Fix region dimensions if necessary */
-
-    if (regionPtr->width < 1) {
-	regionPtr->width = width;
-    } else if ((regionPtr->x + regionPtr->width) > width) {
-	regionPtr->width = width - regionPtr->x;
-    }
-    if (regionPtr->height < 1) {
-	regionPtr->height = height;
-    } else if ((regionPtr->y + regionPtr->height) > height) {
-	regionPtr->height = height - regionPtr->y;
-    }
-    drawDC = TkWinGetDrawableDC(Tk_Display(tkwin), drawable, &state);
-    /*
-     * Allocate an array of pixels big enough to hold the image.
-     */
-    image = Blt_CreateColorImage(regionPtr->width, regionPtr->height);
-    destPtr = ColorImageData(image);
-    for (y = 0; y < regionPtr->height; y++) {
-	for (x = 0; x < regionPtr->width; x++) {
-	    rgb = GetPixel(drawDC, x + regionPtr->x, y + regionPtr->y);
-	    destPtr->Red = (unsigned char)GetRValue(rgb);
-	    destPtr->Green = (unsigned char)GetGValue(rgb);
-	    destPtr->Blue = (unsigned char)GetBValue(rgb);
-	    destPtr++;
-	}
-    }
-    TkWinReleaseDrawableDC(drawable, drawDC, &state);
-    return image;
-}
-
-#else
-
-/* ARGSUSED */
-static int
-XGetImageErrorProc(clientData, errEventPtr)
-    ClientData clientData;
-    XErrorEvent *errEventPtr;
-{
-    int *errorPtr = (int *)clientData;
-
-    *errorPtr = TCL_ERROR;
-    return 0;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * Blt_DrawableToColorImage --
- *
- *      Takes a snapshot of an X drawable (pixmap or window) and
- *	converts it to a color image.
- *
- *	The trick here is to efficiently convert the pixel values
- *	(indices into the color table) into RGB color values.  In the
- *	days of 8-bit displays, it was simpler to get RGB values for
- *	all 256 indices into the colormap.  Instead we'll build a
- *	hashtable of unique pixels and from that an array of pixels to
- *	pass to XQueryColors.  For TrueColor visuals, we'll simple
- *	compute the colors from the pixel.
- *
- *	[I don't know how much faster it would be to take advantage
- *	of all the different visual types.  This pretty much depends
- *	on the size of the image and the number of colors it uses.]
- *
- * Results:
- *      Returns a color image of the drawable.  If an error occurred,
- *	NULL is returned.
- *
- *----------------------------------------------------------------------
- */
-ColorImage
-Blt_DrawableToColorImage(tkwin, drawable, width, height, regionPtr)
-    Tk_Window tkwin;
-    Drawable drawable;
-    int width, height;		/* Dimension of the drawable. */
-    ImageRegion *regionPtr;	/* Region to be snapped. */
-{
-    XImage *imagePtr;
-    ColorImage image;
-    register Pix32 *destPtr;
-    unsigned long pixel;
-    int result = TCL_OK;
-    Tk_ErrorHandler errHandler;
-    register int x, y;
-    Visual *visualPtr;
-
-    errHandler = Tk_CreateErrorHandler(Tk_Display(tkwin), BadMatch,
-	X_GetImage, -1, XGetImageErrorProc, (ClientData)&result);
-    imagePtr = XGetImage(Tk_Display(tkwin), drawable, 0, 0, width, height,
-	AllPlanes, ZPixmap);
-    Tk_DeleteErrorHandler(errHandler);
-    XSync(Tk_Display(tkwin), False);
-    if (result != TCL_OK) {
-	return NULL;
-    }
-    if ((regionPtr->x > width) || (regionPtr->y > height)) {
-	return NULL;		/* Bad region X-Y coordinates */
-    }
-    /* Fix region dimensions if necessary */
-    if (regionPtr->width < 1) {
-	regionPtr->width = width;
-    } else if ((regionPtr->x + regionPtr->width) > width) {
-	regionPtr->width = width - regionPtr->x;
-    }
-    if (regionPtr->height < 1) {
-	regionPtr->height = height;
-    } else if ((regionPtr->y + regionPtr->height) > height) {
-	regionPtr->height = height - regionPtr->y;
-    }
-    /*
-     * First allocate an array of pixels big enough to hold the image.
-     */
-    image = Blt_CreateColorImage(regionPtr->width, regionPtr->height);
-
-    visualPtr = Tk_Visual(tkwin);
-    if (visualPtr->class == TrueColor) {
-	unsigned int red, green, blue;
-	/*
-	 * Directly compute the RGB color values from the pixel index
-	 * rather than of going through XQueryColors.
-	 */
-	ComputeMasks(visualPtr);
-	destPtr = ColorImageData(image);
-	for (y = 0; y < regionPtr->height; y++) {
-	    for (x = 0; x < regionPtr->width; x++) {
-		pixel = XGetPixel(imagePtr, x + regionPtr->x, y + regionPtr->y);
-
-		red = (pixel & visualPtr->red_mask) >> redMaskShift;
-		green = (pixel & visualPtr->green_mask) >> greenMaskShift;
-		blue = (pixel & visualPtr->blue_mask) >> blueMaskShift;
-		/*
-		 * The number of bits per color in the pixel may be
-		 * less than eight. For example, 15/16 bit displays
-		 * (hi-color) use only 5 bits, 8-bit displays use 2 or
-		 * 3 bits (don't ask me why you'd have an 8-bit
-		 * TrueColor display). So shift back the least
-		 * significant bits.
-		 */
-		destPtr->Red = (unsigned char)(red << redAdjust);
-		destPtr->Green = (unsigned char)(green << greenAdjust);
-		destPtr->Blue = (unsigned char)(blue << blueAdjust);
-		destPtr++;
-	    }
-	}
-	XDestroyImage(imagePtr);
-    } else {
-	Tcl_HashEntry *hPtr;
-	Tcl_HashSearch cursor;
-	Tcl_HashTable colorFreqTable;
-	XColor *colorPtr, *colorArr;
-	int numPixels;
-	int numColors;
-	int isNew;
-	register int i;
-
-	/*
-	 * Fill the array with each pixel of the image. At the same time, build
-	 * up a hashtable of the pixels used.
-	 */
-	numPixels = regionPtr->width * regionPtr->height;
-	Tcl_InitHashTable(&colorFreqTable, TCL_ONE_WORD_KEYS);
-	destPtr = ColorImageData(image);
-	for (y = 0; y < regionPtr->height; y++) {
-	    for (x = 0; x < regionPtr->width; x++) {
-		pixel = XGetPixel(imagePtr, x + regionPtr->x, y + regionPtr->y);
-		hPtr = Tcl_CreateHashEntry(&colorFreqTable, (char *)pixel, &isNew);
-		if (isNew) {
-		    Tcl_SetHashValue(hPtr, (char *)pixel);
-		}
-		destPtr->value = pixel;
-		destPtr++;
-	    }
-	}
-	XDestroyImage(imagePtr);
-
-	/*
-	 * Convert the hashtable of pixels into an array of XColors so that we
-	 * can call XQueryColors with it. XQueryColors will convert the pixels
-	 * into their RGB values.
-	 */
-	numColors = colorFreqTable.numEntries;
-	colorArr = (XColor *)malloc(sizeof(XColor) * numColors);
-	assert(colorArr);
-
-	colorPtr = colorArr;
-	for (hPtr = Tcl_FirstHashEntry(&colorFreqTable, &cursor); hPtr != NULL;
-	    hPtr = Tcl_NextHashEntry(&cursor)) {
-	    colorPtr->pixel = (unsigned long)Tcl_GetHashValue(hPtr);
-	    Tcl_SetHashValue(hPtr, (char *)colorPtr);
-	    colorPtr++;
-	}
-	XQueryColors(Tk_Display(tkwin), Tk_Colormap(tkwin), colorArr, numColors);
-
-	/*
-	 * Go again through the array of pixels, replacing each pixel of the
-	 * image with its RGB value.
-	 */
-	destPtr = ColorImageData(image);
-	for (i = 0; i < numPixels; i++, destPtr++) {
-	    hPtr = Tcl_FindHashEntry(&colorFreqTable, (char *)destPtr->value);
-	    colorPtr = (XColor *)Tcl_GetHashValue(hPtr);
-	    destPtr->Red = (unsigned char)(colorPtr->red >> 8);
-	    destPtr->Green = (unsigned char)(colorPtr->green >> 8);
-	    destPtr->Blue = (unsigned char)(colorPtr->blue >> 8);
-	}
-	free((char *)colorArr);
-	Tcl_DeleteHashTable(&colorFreqTable);
-    }
-    return image;
-}
-
-#endif /* WIN32 */
 
 /*
  *----------------------------------------------------------------------
@@ -1882,46 +1340,44 @@ Blt_DrawableToColorImage(tkwin, drawable, width, height, regionPtr)
  *----------------------------------------------------------------------
  */
 int
-Blt_SnapPhoto(interp, tkwin, drawable, width, height, destWidth, destHeight,
-    photoName)
+Blt_SnapPhoto(interp, tkwin, drawable, x, y, width, height, destWidth, 
+	destHeight, photoName, inputGamma)
     Tcl_Interp *interp;		/* Interpreter to report errors back to */
     Tk_Window tkwin;
     Drawable drawable;		/* Window or pixmap to be snapped */
+    int x, y;			/* Offset of image from drawable origin. */
     int width, height;		/* Dimension of the drawable */
     int destWidth, destHeight;	/* Desired size of the Tk photo */
     char *photoName;		/* Name of an existing Tk photo image. */
+    double inputGamma;
 {
     Tk_PhotoHandle photo;	/* The photo image to write into. */
-    ColorImage image;
-    ImageRegion region;
+    Blt_ColorImage image;
 
     photo = Blt_FindPhoto(interp, photoName);
     if (photo == NULL) {
-	Tcl_AppendResult(interp, "image \"", photoName, "\" doesn't",
-	    " exist or is not a photo image", (char *)NULL);
+	Tcl_AppendResult(interp, "can't find photo \"", photoName, "\"", 
+		(char *)NULL);
 	return TCL_ERROR;
     }
-    region.x = region.y = region.width = region.height = 0;
-    image = Blt_DrawableToColorImage(tkwin, drawable, width, height, &region);
+    image = Blt_DrawableToColorImage(tkwin, drawable, x, y, width, height, 
+	inputGamma);
     if (image == NULL) {
 	Tcl_AppendResult(interp,
 	    "can't grab window or pixmap (possibly obscured?)", (char *)NULL);
 	return TCL_ERROR;	/* Can't grab window image */
     }
     if ((destWidth != width) || (destHeight != height)) {
-	ImageRegion destRegion;
-	ColorImage destImage;
+	Blt_ColorImage destImage;
 
 	/*
 	 * The requested size for the destination image is different than
 	 * that of the source snapshot.  Resample the image as necessary.
 	 * We'll use a cheap box filter. I'm assuming that the destination
-	 * image will usually be smaller than the original.
+	 * image will typically be smaller than the original.
 	 */
-	destRegion.x = destRegion.y = 0;
-	destRegion.width = destWidth, destRegion.height = destHeight;
-	destImage = Blt_ResampleColorImage(image, &region, &destRegion,
-	    bltBoxFilter, bltBoxFilter);
+	destImage = Blt_ResampleColorImage(image, destWidth, destHeight, 
+		bltBoxFilterPtr, bltBoxFilterPtr);
 	Blt_FreeColorImage(image);
 	image = destImage;
     }
@@ -1930,140 +1386,7 @@ Blt_SnapPhoto(interp, tkwin, drawable, width, height, destWidth, destHeight,
     return TCL_OK;
 }
 
-#if HAVE_JPEGLIB_H
-#undef HAVE_STDLIB_H
-#undef EXTERN
-#include "jpeglib.h"
-#include <setjmp.h>
-
-typedef struct ErrorInfo {
-    struct jpeg_error_mgr pub;	/* "public" fields */
-    jmp_buf jmpBuf;
-} ErrorInfo;
-
-static void ErrorReadingJPEG _ANSI_ARGS_((j_common_ptr jpegInfo));
-
-/*
- * Here's the routine that will replace the standard error_exit method:
- */
-
-static void
-ErrorReadingJPEG(jpegInfo)
-    j_common_ptr jpegInfo;
-{
-    struct ErrorInfo *jpegErrorPtr = (ErrorInfo *)jpegInfo->err;
-
-    longjmp(jpegErrorPtr->jmpBuf, 1);
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * Blt_JPEGToColorImage --
- *
- *      Reads a JPEG file and converts it into a color image.
- *
- * Results:
- *      The color image is returned.  If an error occured, such
- *	as the designated file could not be opened, NULL is returned.
- *
- *----------------------------------------------------------------------
- */
-ColorImage
-Blt_JPEGToColorImage(interp, fileName)
-    Tcl_Interp *interp;
-    char *fileName;
-{
-    struct jpeg_decompress_struct jpegInfo;
-    ColorImage image;
-    unsigned int imageWidth, imageHeight;
-    register Pix32 *destPtr;
-    ErrorInfo jpegError;
-    FILE *f;
-    JSAMPLE **readBuffer;
-    int row_stride;
-    register int i;
-    register JSAMPLE *bufPtr;
-
-    f = fopen(fileName, "rb");
-    if (f == NULL) {
-	Tcl_AppendResult(interp, "can't open \"", fileName, "\":",
-	    Tcl_PosixError(interp), (char *)NULL);
-	return NULL;
-    }
-    image = NULL;
-
-    /* Step 1: allocate and initialize JPEG decompression object */
-
-    /* We set up the normal JPEG error routines, then override error_exit. */
-    jpegInfo.err = jpeg_std_error(&jpegError.pub);
-    jpegError.pub.error_exit = ErrorReadingJPEG;
-
-    if (setjmp(jpegError.jmpBuf)) {
-	jpeg_destroy_decompress(&jpegInfo);
-	fclose(f);
-	return NULL;
-    }
-    jpeg_create_decompress(&jpegInfo);
-    jpeg_stdio_src(&jpegInfo, f);
-
-    jpeg_read_header(&jpegInfo, TRUE);	/* Step 3: read file parameters */
-
-    jpeg_start_decompress(&jpegInfo);	/* Step 5: Start decompressor */
-    imageWidth = jpegInfo.output_width;
-    imageHeight = jpegInfo.output_height;
-    if ((imageWidth < 1) || (imageHeight < 1)) {
-	Tcl_AppendResult(interp, "bad JPEG image size", (char *)NULL);
-	fclose(f);
-	return NULL;
-    }
-    /* JSAMPLEs per row in output buffer */
-    row_stride = imageWidth * jpegInfo.output_components;
-
-    /* Make a one-row-high sample array that will go away when done
-       with image */
-    readBuffer = (*jpegInfo.mem->alloc_sarray)
-	((j_common_ptr) & jpegInfo, JPOOL_IMAGE, row_stride, 1);
-    image = Blt_CreateColorImage(imageWidth, imageHeight);
-    destPtr = ColorImageData(image);
-    while (jpegInfo.output_scanline < imageHeight) {
-	jpeg_read_scanlines(&jpegInfo, readBuffer, 1);
-	bufPtr = readBuffer[0];
-	for (i = 0; i < (int)imageWidth; i++) {
-	    if (jpegInfo.output_components == 1) {
-		destPtr->Red = destPtr->Green = destPtr->Blue = *bufPtr++;
-	    } else {
-		destPtr->Red = *bufPtr++;
-		destPtr->Green = *bufPtr++;
-		destPtr->Blue = *bufPtr++;
-	    }
-	    destPtr++;
-	}
-    }
-    jpeg_finish_decompress(&jpegInfo);	/* We can ignore the return value
-					* since suspension is not
-					* possible with the stdio data
-					* source.  */
-    jpeg_destroy_decompress(&jpegInfo);
-
-    /* After finish_decompress, we can close the input file.
-     * Here we postpone it until after no more JPEG errors are possible,
-     * so as to simplify the setjmp error logic above.  (Actually, I don't
-     * think that jpeg_destroy can do an error exit, but why assume anything...)
-     */
-    fclose(f);
-
-    /* At this point you may want to check to see whether any corrupt-data
-     * warnings occurred (test whether jerr.pub.num_warnings is nonzero).
-     */
-
-    /*
-     * We're ready to call the Tk_Photo routines. They'll take the RGB
-     * array we've processed to build the Tk image of the JPEG.
-     */
-    return image;
-}
-
+#if HAVE_JPEG
 /*
  *----------------------------------------------------------------------
  *
@@ -2080,20 +1403,13 @@ Blt_JPEGToColorImage(interp, fileName)
  *----------------------------------------------------------------------
  */
 int
-Blt_JPEGToPhoto(interp, fileName, photoName)
+Blt_JPEGToPhoto(interp, fileName, photo)
     Tcl_Interp *interp;
     char *fileName;
-    char *photoName;
-{
     Tk_PhotoHandle photo;	/* The photo image to write into. */
-    ColorImage image;
+{
+    Blt_ColorImage image;
 
-    photo = Blt_FindPhoto(interp, photoName);
-    if (photo == NULL) {
-	Tcl_AppendResult(interp, "image \"", photoName, "\" doesn't",
-	    " exist or is not a photo image", (char *)NULL);
-	return TCL_ERROR;
-    }
     image = Blt_JPEGToColorImage(interp, fileName);
     if (image == NULL) {
 	return TCL_ERROR;
@@ -2102,458 +1418,1359 @@ Blt_JPEGToPhoto(interp, fileName, photoName)
     Blt_FreeColorImage(image);
     return TCL_OK;
 }
+#endif /* HAVE_JPEG */
 
-#endif /* HAVE_JPEGLIB_H */
-
-
-/*
- *----------------------------------------------------------------------
+/* 
+ * --------------------------------------------------------------------------
  *
- * Blt_ColorImageToGreyscale --
+ * ShearY --
  *
- *	Converts a color image to PostScript grey scale (1 component)
- *	output.  Luminosity isn't computed using the old NTSC formula,
+ *	Shears a row horizontally. Antialiasing limited to filtering
+ *	two adjacent pixels.  So the shear angle must be between +-45
+ *	degrees.
+ *	
+ * Results:   
+ *	None.
  *
- *	    Y = 0.299 * Red + 0.587 * Green + 0.114 * Blue
+ * Side Effects:
+ *	The sheared image is drawn into the destination color image.
  *
- *      but the following
- *
- *	    Y = 0.212671 * Red + 0.715160 * Green + 0.072169 * Blue
- *
- *	which better represents contemporary monitors.
- *
- * Results:
- *	The color image is converted to greyscale.
- *
- *----------------------------------------------------------------------
+ * --------------------------------------------------------------------------
  */
-int
-Blt_ColorImageToGreyscale(srcImage, destImage)
-    ColorImage srcImage, destImage;
+static void 
+ShearY(src, dest, y, offset, frac, bgColor)
+    Blt_ColorImage src, dest;
+    int y;			/* Designates the row to be sheared */
+    int offset;			/* Difference between  of  */
+    double frac;
+    Pix32 bgColor;
 {
-    register Pix32 *srcPtr, *destPtr;
-    float y;
-    register int i;
-    int numPixels;
-    int width, height;
+    Pix32 *srcPtr, *destPtr;
+    Pix32 *srcRowPtr, *destRowPtr;
+    register int x, dx;
+    int destWidth;
+    int srcWidth;
+    int red, blue, green, alpha;
+    int leftRed, leftGreen, leftBlue, leftAlpha;
+    int oldLeftRed, oldLeftGreen, oldLeftBlue, oldLeftAlpha;
+    int ifrac;
 
-    width = ColorImageWidth(srcImage);
-    height = ColorImageHeight(srcImage);
-    ResizeImageData(destImage, width, height);
-    numPixels = width * height;
-    srcPtr = ColorImageData(srcImage);
-    destPtr = ColorImageData(destImage);
-    for (i = 0; i < numPixels; i++, srcPtr++, destPtr++) {
-	y = (float)((0.212671 * (float)srcPtr->Red) +
-	    (0.715160 * (float)srcPtr->Green) +
-	    (0.072169 * (float)srcPtr->Blue));
-	destPtr->Red = destPtr->Green = destPtr->Blue = (unsigned char)CLAMP(y);
+    srcWidth = Blt_ColorImageWidth(src);
+    destWidth = Blt_ColorImageWidth(dest);
+
+    destRowPtr = Blt_ColorImageBits(dest) + (y * destWidth);
+    srcRowPtr = Blt_ColorImageBits(src) + (y * srcWidth);
+
+    destPtr = destRowPtr;
+    for (x = 0; x < offset; x++) { 
+        *destPtr++ = bgColor;
     }
-    return TCL_OK;
-}
+    destPtr = destRowPtr + offset;
+    srcPtr = srcRowPtr;
+    dx = offset;
+
+    oldLeftRed = uchar2si(bgColor.Red);
+    oldLeftGreen = uchar2si(bgColor.Green);
+    oldLeftBlue = uchar2si(bgColor.Blue);
+    oldLeftAlpha = uchar2si(bgColor.Alpha);
+
+    ifrac = float2si(frac);
+    for (x = 0; x < srcWidth; x++, dx++) { /* Loop through row pixels */
+	leftRed = srcPtr->Red * ifrac;
+	leftGreen = srcPtr->Green * ifrac;
+	leftBlue = srcPtr->Blue * ifrac;
+	leftAlpha = srcPtr->Alpha * ifrac;
+        if ((dx >= 0) && (dx < destWidth)) {
+	    red = uchar2si(srcPtr->Red) - (leftRed - oldLeftRed);
+	    green = uchar2si(srcPtr->Green) - (leftGreen - oldLeftGreen);
+	    blue = uchar2si(srcPtr->Blue) - (leftBlue - oldLeftBlue);
+	    alpha = uchar2si(srcPtr->Alpha) - (leftAlpha - oldLeftAlpha);
+	    destPtr->Red = SICLAMP(red);
+	    destPtr->Green = SICLAMP(green);
+	    destPtr->Blue = SICLAMP(blue);
+	    destPtr->Alpha = SICLAMP(alpha);
+        }
+	oldLeftRed = leftRed;
+	oldLeftGreen = leftGreen;
+	oldLeftBlue = leftBlue;
+	oldLeftAlpha = leftAlpha;
+	srcPtr++, destPtr++;
+    }
+    x = srcWidth + offset;  
+    destPtr = Blt_ColorImageBits(dest) + (y * destWidth) + x;
+    if (x < destWidth) {
+	leftRed = uchar2si(bgColor.Red);
+	leftGreen = uchar2si(bgColor.Green);
+	leftBlue = uchar2si(bgColor.Blue);
+	leftAlpha = uchar2si(bgColor.Alpha);
+
+	red = leftRed + oldLeftRed - (bgColor.Red * ifrac);
+	green = leftGreen + oldLeftGreen - (bgColor.Green * ifrac);
+	blue = leftBlue + oldLeftBlue - (bgColor.Blue * ifrac);
+	alpha = leftAlpha + oldLeftAlpha - (bgColor.Alpha * ifrac);
+	destPtr->Red = SICLAMP(red);
+	destPtr->Green = SICLAMP(green);
+	destPtr->Blue = SICLAMP(blue);
+	destPtr->Alpha = SICLAMP(alpha);
+	destPtr++;
+    }
+    for (x++; x < destWidth; x++) {
+        *destPtr++ = bgColor;
+    }
+}  
+
+/* 
+ * --------------------------------------------------------------------------
+ *
+ * ShearX --
+ *
+ *	Shears a column. Antialiasing is limited to filtering two
+ *	adjacent pixels.  So the shear angle must be between +-45
+ *	degrees.
+ *	
+ * Results:   
+ *	None.
+ *
+ * Side Effects:
+ *	The sheared image is drawn into the destination color image.
+ *
+ * -------------------------------------------------------------------------- 
+ */
+static void
+ShearX(src, dest, x, offset, frac, bgColor)
+    Blt_ColorImage src, dest;
+    int x;			/* Column in source image to be sheared. */
+    int offset;			/* Offset of */
+    double frac;			/* Fraction of subpixel. */
+    Pix32 bgColor;
+{
+    Pix32 *srcPtr, *destPtr;
+    register int y, dy;
+#ifdef notef
+    int srcWidth;
+    int destWidth;
+#endif
+    int destHeight;
+    int srcHeight;
+    int red, blue, green, alpha;
+    int leftRed, leftGreen, leftBlue, leftAlpha;
+    int oldLeftRed, oldLeftGreen, oldLeftBlue, oldLeftAlpha;
+    int ifrac;
 
 #ifdef notdef
+    srcWidth = Blt_ColorImageWidth(src);
+    destWidth = Blt_ColorImageWidth(dest);
+#endif
+    srcHeight = Blt_ColorImageHeight(src);
+    destHeight = Blt_ColorImageHeight(dest);
+#ifdef notdef
+    destPtr = Blt_ColorImageBits(dest) + x;
+#endif
+    for (y = 0; y < offset; y++) {
+	destPtr = Blt_ColorImagePixel(dest, x, y);
+        *destPtr = bgColor;
+#ifdef notdef
+	destPtr += destWidth;
+#endif
+    }
+
+    oldLeftRed = uchar2si(bgColor.Red);
+    oldLeftGreen = uchar2si(bgColor.Green);
+    oldLeftBlue = uchar2si(bgColor.Blue);
+    oldLeftAlpha = uchar2si(bgColor.Alpha);
+#ifdef notdef
+    destPtr = Blt_ColorImageBits(dest) + x + offset;
+    srcPtr = Blt_ColorImageBits(src) + x;
+#endif
+    dy = offset;
+    ifrac = float2si(frac);
+    for (y = 0; y < srcHeight; y++, dy++) {
+	srcPtr = Blt_ColorImagePixel(src, x, y);
+	leftRed = srcPtr->Red * ifrac;
+	leftGreen = srcPtr->Green * ifrac;
+	leftBlue = srcPtr->Blue * ifrac;
+	leftAlpha = srcPtr->Alpha * ifrac;
+        if ((dy >= 0) && (dy < destHeight)) {
+	    destPtr = Blt_ColorImagePixel(dest, x, dy);
+	    red = uchar2si(srcPtr->Red) - (leftRed - oldLeftRed);
+	    green = uchar2si(srcPtr->Green) - (leftGreen - oldLeftGreen);
+	    blue = uchar2si(srcPtr->Blue) - (leftBlue - oldLeftBlue);
+	    alpha = uchar2si(srcPtr->Alpha) - (leftAlpha - oldLeftAlpha);
+	    destPtr->Red = SICLAMP(red);
+	    destPtr->Green = SICLAMP(green);
+	    destPtr->Blue = SICLAMP(blue);
+	    destPtr->Alpha = SICLAMP(alpha);
+        }
+	oldLeftRed = leftRed;
+	oldLeftGreen = leftGreen;
+	oldLeftBlue = leftBlue;
+	oldLeftAlpha = leftAlpha;
+#ifdef notdef
+	srcPtr += srcWidth; 
+	destPtr += destWidth;
+#endif
+    }
+    y = srcHeight + offset;  
+#ifdef notdef
+    destPtr = Blt_ColorImageBits(dest) + (y * destWidth) + x + offset;
+#endif
+    if (y < destHeight) {
+	leftRed = uchar2si(bgColor.Red);
+	leftGreen = uchar2si(bgColor.Green);
+	leftBlue = uchar2si(bgColor.Blue);
+	leftAlpha = uchar2si(bgColor.Alpha);
+
+	destPtr = Blt_ColorImagePixel(dest, x, y);
+	red = leftRed + oldLeftRed - (bgColor.Red * ifrac);
+	green = leftGreen + oldLeftGreen - (bgColor.Green * ifrac);
+	blue = leftBlue + oldLeftBlue - (bgColor.Blue  * ifrac);
+	alpha = leftAlpha + oldLeftAlpha - (bgColor.Alpha  * ifrac);
+	destPtr->Red = SICLAMP(red);
+	destPtr->Green = SICLAMP(green);
+	destPtr->Blue = SICLAMP(blue);
+	destPtr->Alpha = SICLAMP(alpha);
+#ifdef notdef
+	destPtr += destWidth;
+#endif
+    }
+    
+    for (y++; y < destHeight; y++) {
+	destPtr = Blt_ColorImagePixel(dest, x, y);
+	*destPtr = bgColor;
+#ifdef notdef
+	destPtr += destWidth; 
+#endif
+    }
+}  
+
+/* 
+ * ---------------------------------------------------------------------------
+ *
+ * Rotate45 --
+ *
+ *	Rotates an image by a given angle.  The angle must be in the
+ *	range -45.0 to 45.0 inclusive.  Anti-aliasing filtering is
+ *	performed on two adjacent pixels, so the angle can't be so
+ *	great as to force a sheared pixel to occupy 3 destination
+ *	pixels.  Performs a three shear rotation described below.
+ *
+ *	Reference: Alan W. Paeth, "A Fast Algorithm for General Raster
+ *		   Rotation", Graphics Gems, pp 179-195.  
+ *
+ *
+ * Results:  
+ *	Returns a newly allocated rotated image.
+ *
+ * --------------------------------------------------------------------------- 
+ */
+static Blt_ColorImage
+Rotate45(src, theta, bgColor)
+    Blt_ColorImage src;
+    double theta;
+    Pix32 bgColor;
+{
+    int tmpWidth, tmpHeight;
+    int srcWidth, srcHeight;
+    double sinTheta, cosTheta, tanTheta;
+    double  skewf;
+    int skewi;
+    Blt_ColorImage tmp1, tmp2, dest;
+    register int x, y;
+
+    sinTheta = sin(theta);
+    cosTheta = cos(theta);
+    tanTheta = tan(theta * 0.5);
+    
+    srcWidth = Blt_ColorImageWidth(src);
+    srcHeight = Blt_ColorImageHeight(src);
+
+    tmpWidth = srcWidth + (int)(srcHeight * FABS(tanTheta));
+    tmpHeight = srcHeight;
+
+    /* 1st shear */
+
+    tmp1 = Blt_CreateColorImage(tmpWidth, tmpHeight);
+    assert(tmp1);
+
+    if (tanTheta >= 0.0) {	/* Positive angle */
+	for (y = 0; y < tmpHeight; y++) {  
+	    skewf = (y + 0.5) * tanTheta;
+	    skewi = (int)floor(skewf);
+	    ShearY(src, tmp1, y, skewi, skewf - skewi, bgColor);
+	}
+    } else {			/* Negative angle */
+	for (y = 0; y < tmpHeight; y++) {  
+	    skewf = ((y - srcHeight) + 0.5) * tanTheta;
+	    skewi = (int)floor(skewf);
+	    ShearY(src, tmp1, y, skewi, skewf - skewi, bgColor);
+	}
+    }
+    tmpHeight = (int)(srcWidth * FABS(sinTheta) + srcHeight * cosTheta) + 1;
+
+    tmp2 = Blt_CreateColorImage(tmpWidth, tmpHeight);
+    assert(tmp2);
+
+    /* 2nd shear */
+
+    if (sinTheta > 0.0) {	/* Positive angle */
+        skewf = (srcWidth - 1) * sinTheta;
+    } else {			/* Negative angle */
+        skewf = (srcWidth - tmpWidth) * -sinTheta;
+    }
+    for (x = 0; x < tmpWidth; x++) {
+	skewi = (int)floor(skewf);
+        ShearX(tmp1, tmp2, x, skewi, skewf - skewi, bgColor);
+	skewf -= sinTheta;
+    }
+
+    Blt_FreeColorImage(tmp1);
+
+    /* 3rd shear */
+
+    tmpWidth = (int)(srcHeight * FABS(sinTheta) + srcWidth * cosTheta) + 1;
+
+    dest = Blt_CreateColorImage(tmpWidth, tmpHeight);
+    assert(dest);
+
+    if (sinTheta >= 0.0) {	/* Positive angle */
+        skewf = (srcWidth - 1) * sinTheta * -tanTheta;
+    } else {			/* Negative angle */
+        skewf = tanTheta * ((srcWidth - 1) * -sinTheta - (tmpHeight - 1));
+    }
+    for (y = 0; y < tmpHeight; y++) {
+	skewi = (int)floor(skewf);
+        ShearY(tmp2, dest, y, skewi, skewf - skewi, bgColor);
+	skewf += tanTheta;
+    }
+    Blt_FreeColorImage(tmp2);
+    return dest;      
+}
+
+/* 
+ * ---------------------------------------------------------------------------
+ *
+ * CopyColorImage --
+ *
+ *	Creates a copy of the given color image.  
+ *
+ * Results:  
+ *	Returns the new copy.
+ *
+ * --------------------------------------------------------------------------- 
+ */
+static Blt_ColorImage
+CopyColorImage(src)
+    Blt_ColorImage src;
+{
+    unsigned int width, height;
+    Pix32 *srcPtr, *destPtr;
+    Blt_ColorImage dest;
+
+    width = Blt_ColorImageWidth(src);
+    height = Blt_ColorImageHeight(src);
+    dest = Blt_CreateColorImage(width, height);
+    srcPtr = Blt_ColorImageBits(src);
+    destPtr = Blt_ColorImageBits(dest);
+    memcpy(destPtr, srcPtr, width * height * sizeof(Pix32));
+    return dest;
+}
+
+/* 
+ * ---------------------------------------------------------------------------
+ *
+ * Rotate90 --
+ *
+ *	Rotates the given color image by 90 degrees.  This is part
+ *	of the special case right-angle rotations that do not create
+ *	subpixel aliasing.
+ *
+ * Results:  
+ *	Returns a newly allocated, rotated color image.
+ *
+ * --------------------------------------------------------------------------- 
+ */
+static Blt_ColorImage
+Rotate90(src)
+    Blt_ColorImage src;
+{
+    int width, height, offset;
+    Pix32 *srcPtr, *destPtr;
+    Blt_ColorImage dest;
+    register int x, y;
+
+    height = Blt_ColorImageWidth(src);
+    width = Blt_ColorImageHeight(src);
+
+    srcPtr = Blt_ColorImageBits(src);
+    dest = Blt_CreateColorImage(width, height);
+    offset = (height - 1) * width;
+
+    for (x = 0; x < width; x++) {
+	destPtr = Blt_ColorImageBits(dest) + offset + x;
+	for (y = 0; y < height; y++) {
+	    *destPtr = *srcPtr++;
+	    destPtr -= width;
+	}
+    }
+    return dest;
+}
+
+/* 
+ * ---------------------------------------------------------------------------
+ *
+ * Rotate180 --
+ *
+ *	Rotates the given color image by 180 degrees.  This is one of
+ *	the special case orthogonal rotations that do not create
+ *	subpixel aliasing.
+ *
+ * Results:  
+ *	Returns a newly allocated, rotated color image.
+ *
+ * --------------------------------------------------------------------------- 
+ */
+static Blt_ColorImage
+Rotate180(src)
+    Blt_ColorImage src;
+{
+    int width, height, offset;
+    Pix32 *srcPtr, *destPtr;
+    Blt_ColorImage dest;
+    register int x, y;
+
+    width = Blt_ColorImageWidth(src);
+    height = Blt_ColorImageHeight(src);
+    dest = Blt_CreateColorImage(width, height);
+
+    srcPtr = Blt_ColorImageBits(src);
+    offset = (height - 1) * width;
+    for (y = 0; y < height; y++) {
+	destPtr = Blt_ColorImageBits(dest) + offset + width - 1;
+	for (x = 0; x < width; x++) {
+	    *destPtr-- = *srcPtr++;
+	}
+	offset -= width;
+    }
+    return dest;
+}
+
+/* 
+ * ---------------------------------------------------------------------------
+ *
+ * Rotate270 --
+ *
+ *	Rotates the given color image by 270 degrees.  This is part
+ *	of the special case right-angle rotations that do not create
+ *	subpixel aliasing.
+ *
+ * Results:  
+ *	Returns a newly allocated, rotated color image.
+ *
+ * --------------------------------------------------------------------------- 
+ */
+static Blt_ColorImage
+Rotate270(src)
+    Blt_ColorImage src;
+{
+    int width, height;
+    Pix32 *srcPtr, *destPtr;
+    Blt_ColorImage dest;
+    register int x, y;
+
+    height = Blt_ColorImageWidth(src);
+    width = Blt_ColorImageHeight(src);
+    dest = Blt_CreateColorImage(width, height);
+
+    srcPtr = Blt_ColorImageBits(src);
+    for (x = width - 1; x >= 0; x--) {
+	destPtr = Blt_ColorImageBits(dest) + x;
+	for (y = 0; y < height; y++) {
+	    *destPtr = *srcPtr++;
+	    destPtr += width;
+	}
+    }
+    return dest;
+}
+
 /*
  *----------------------------------------------------------------------
  *
  * Blt_RotateColorImage --
  *
- *	Rotates a color image.
+ *	Rotates a color image by a given # of degrees.
  *
  * Results:
- *	The color image is converted to greyscale.
+ *	Returns a newly allocated, rotated color image.
  *
  *----------------------------------------------------------------------
  */
-ColorImage
-Blt_RotateColorImage(srcImage, theta)
-    ColorImage srcImage;
-    double theta;
+Blt_ColorImage
+Blt_RotateColorImage(src, angle)
+    Blt_ColorImage src;
+    double angle;
 {
-    register Pix32 *srcPtr, *destPtr;
-    float y;
-    register int i;
-    int numPixels;
-    int width, height;
+    Blt_ColorImage dest, tmp;
+    int quadrant;
+    
+    tmp = src;			/* Suppress compiler warning. */
 
-    width = ColorImageWidth(srcImage);
-    height = ColorImageHeight(srcImage);
-    destImage = Blt_CreateColorImage(height, width);
-    numPixels = width * height;
-    srcDataPtr = ColorImageData(srcImage);
-    destDataPtr = ColorImageData(destImage);
-    quadrant = (int)(theta / 90.0);
+    /* Make the angle positive between 0 and 360 degrees. */ 
+    angle = FMOD(angle, 360.0);
+    if (angle < 0.0) {
+	angle += 360.0;
+    }
+    quadrant = ROTATE_0;
+    if ((angle > 45.0) && (angle <= 135.0)) {
+        quadrant = ROTATE_90;
+        angle -= 90.0;
+    } else if ((angle > 135.0) && (angle <= 225.0)) { 
+        quadrant = ROTATE_180;
+        angle -= 180.0;
+    } else if ((angle > 225.0) && (angle <= 315.0)) { 
+        quadrant = ROTATE_270;
+        angle -= 270.0;
+    } else if (angle > 315.0) {
+	angle -= 360.0;
+    }
+    /* 
+     * If necessary, create a temporary image that's been rotated
+     * by a right-angle.  We'll then rotate this color image between
+     * -45 to 45 degrees to arrive at its final angle.  
+     */
     switch (quadrant) {
     case ROTATE_270:		/* 270 degrees */
-	for (x = 0; x < width; x++) {
-	    for (y = 0; y < height; y++) {
-		dx = y, dy = destWidth - x - 1;
-
-		destPtr = destDataPtr + (y * height) + x;
-		srcPtr = srcDataPtr + (
-		    *destPtr++ = pixel;
-	    }
-	}
-	break;
-
-    case ROTATE_180:		/* 180 degrees */
-	for (dx = 0; dx < destWidth; dx++) {
-	    for (dy = 0; dy < destHeight; dy++) {
-		sx = destWidth - dx - 1, sy = destHeight - dy - 1;
-		XPutPixel(dest, dx, dy, XGetPixel(src, sx, sy));
-	    }
-	}
+	tmp = Rotate270(src);
 	break;
 
     case ROTATE_90:		/* 90 degrees */
-	for (dx = 0; dx < destWidth; dx++) {
-	    for (dy = 0; dy < destHeight; dy++) {
-		sx = destHeight - dy - 1, sy = dx;
-		XPutPixel(dest, dx, dy, XGetPixel(src, sx, sy));
-	    }
-	}
+	tmp = Rotate90(src);
+	break;
+
+    case ROTATE_180:		/* 180 degrees */
+	tmp = Rotate180(src);
 	break;
 
     case ROTATE_0:		/* 0 degrees */
-	for (dx = 0; dx < destWidth; dx++) {
-	    for (dy = 0; dy < destHeight; dy++) {
-		XPutPixel(dest, dx, dy, XGetPixel(src, dx, dy));
+	if (angle == 0.0) {
+	    tmp = CopyColorImage(src); /* Make a copy of the source. */
+	} 
+	break;
+    }
+
+    assert((angle >= -45.0) && (angle <= 45.0));
+
+    dest = tmp;
+    if (angle != 0.0) {
+	double theta;
+	Pix32 *srcPtr;
+	Pix32 bgColor;
+
+	/* FIXME: pick up background blending color from somewhere */
+	srcPtr = Blt_ColorImageBits(src);
+	bgColor = *srcPtr;
+	bgColor.Red = bgColor.Green = bgColor.Blue = 0xFF;
+	bgColor.Alpha = 0x00;	/* Transparent background */
+	theta = (angle / 180.0) * M_PI;
+	dest = Rotate45(tmp, theta, bgColor);
+	if (tmp != src) {
+	    Blt_FreeColorImage(tmp);
+	}
+    } 
+    return dest;
+}
+
+#define NC		256
+enum ColorIndices { RED, GREEN, BLUE };
+
+#define R0	(cubePtr->r0)
+#define R1	(cubePtr->r1)
+#define G0	(cubePtr->g0)
+#define G1	(cubePtr->g1)
+#define B0	(cubePtr->b0)
+#define B1	(cubePtr->b1)
+
+typedef struct {
+    int r0, r1;			/* min, max values: 
+				 * min exclusive max inclusive */
+    int g0, g1;
+    int b0, b1;
+    int vol;
+} Cube;
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Histogram is in elements 1..HISTSIZE along each axis,
+ * element 0 is for base or marginal value
+ * NB: these must start out 0!
+ *----------------------------------------------------------------------
+ */
+typedef struct {
+    long int wt[33][33][33];	/* # pixels in voxel */
+    long int mR[33][33][33];	/* Sum over voxel of red pixel values */
+    long int mG[33][33][33];	/* Sum over voxel of green pixel values */
+    long int mB[33][33][33];	/* Sum over voxel of blue pixel values */
+    long int gm2[33][33][33];	/* Variance */
+} ColorImageStatistics;
+
+/*
+ * Build 3-D color histogram of counts, R/G/B, c^2
+ */
+static ColorImageStatistics *
+GetColorImageStatistics(image)
+    Blt_ColorImage image;
+{
+    register int r, g, b;
+#define MAX_INTENSITIES	256
+    unsigned int sqr[MAX_INTENSITIES];
+    int numPixels;
+    Pix32 *srcPtr, *endPtr;
+    register int i;
+    ColorImageStatistics *s;
+
+    s = Blt_Calloc(1, sizeof(ColorImageStatistics));
+    assert(s);
+
+    /* Precompute table of squares. */
+    for (i = 0; i < MAX_INTENSITIES; i++) {
+	sqr[i] = i * i;
+    }
+    numPixels = Blt_ColorImageWidth(image) * Blt_ColorImageHeight(image);
+
+    for (srcPtr = Blt_ColorImageBits(image), endPtr = srcPtr + numPixels;
+	 srcPtr < endPtr; srcPtr++) {
+	/*
+	 * Reduce the number of bits (5) per color component. This
+	 * will keep the table size (2^15) reasonable without perceptually
+	 * affecting the final image.
+	 */
+	r = (srcPtr->Red >> 3) + 1;
+	g = (srcPtr->Green >> 3) + 1;
+	b = (srcPtr->Blue >> 3) + 1;
+	s->wt[r][g][b] += 1;
+	s->mR[r][g][b] += srcPtr->Red;
+	s->mG[r][g][b] += srcPtr->Green;
+	s->mB[r][g][b] += srcPtr->Blue;
+	s->gm2[r][g][b] += sqr[srcPtr->Red] + sqr[srcPtr->Green] + 
+	    sqr[srcPtr->Blue];
+    }
+    return s;
+}
+
+/*
+ *----------------------------------------------------------------------
+ * At conclusion of the histogram step, we can interpret
+ *   wt[r][g][b] = sum over voxel of P(c)
+ *   mR[r][g][b] = sum over voxel of r*P(c)  ,  similarly for mG, mB
+ *   m2[r][g][b] = sum over voxel of c^2*P(c)
+ * Actually each of these should be divided by 'size' to give the usual
+ * interpretation of P() as ranging from 0 to 1, but we needn't do that here.
+ *----------------------------------------------------------------------
+ */
+
+/*
+ *----------------------------------------------------------------------
+ We now convert histogram into moments so that we can rapidly calculate
+ * the sums of the above quantities over any desired box.
+ *----------------------------------------------------------------------
+ */
+
+static void
+M3d(s)	/* compute cumulative moments. */
+    ColorImageStatistics *s;
+{
+    register unsigned char i, r, g, b, r0;
+    long int line, rLine, gLine, bLine;
+    long int area[33], rArea[33], gArea[33], bArea[33];
+    unsigned int line2, area2[33];
+
+    for (r = 1, r0 = 0; r <= 32; r++, r0++) {
+	for (i = 0; i <= 32; ++i) {
+	    area2[i] = area[i] = rArea[i] = gArea[i] = bArea[i] = 0;
+	}
+	for (g = 1; g <= 32; g++) {
+	    line2 = line = rLine = gLine = bLine = 0;
+	    for (b = 1; b <= 32; b++) {
+		/* ind1 = RGBIndex(r, g, b); */
+
+		line += s->wt[r][g][b];
+		rLine += s->mR[r][g][b];
+		gLine += s->mG[r][g][b];
+		bLine += s->mB[r][g][b];
+		line2 += s->gm2[r][g][b];
+
+		area[b] += line;
+		rArea[b] += rLine;
+		gArea[b] += gLine;
+		bArea[b] += bLine;
+		area2[b] += line2;
+
+		/* ind2 = ind1 - 1089; [r0][g][b] */
+		s->wt[r][g][b] = s->wt[r0][g][b] + area[b];
+		s->mR[r][g][b] = s->mR[r0][g][b] + rArea[b];
+		s->mG[r][g][b] = s->mG[r0][g][b] + gArea[b];
+		s->mB[r][g][b] = s->mB[r0][g][b] + bArea[b];
+		s->gm2[r][g][b] = s->gm2[r0][g][b] + area2[b];
 	    }
 	}
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ *	Compute sum over a box of any given statistic
+ *
+ *----------------------------------------------------------------------
+ */
+static INLINE 
+long int
+Volume(cubePtr, m)
+    Cube *cubePtr;
+    long int m[33][33][33];
+{
+    return (m[R1][G1][B1] - m[R1][G1][B0] - m[R1][G0][B1] + m[R1][G0][B0] -
+	    m[R0][G1][B1] + m[R0][G1][B0] + m[R0][G0][B1] - m[R0][G0][B0]);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ *	The next two routines allow a slightly more efficient
+ *	calculation of Volume() for a proposed subbox of a given box.
+ *	The sum of Top() and Bottom() is the Volume() of a subbox split
+ *	in the given direction and with the specified new upper
+ *	bound.
+ *
+ *----------------------------------------------------------------------
+ */
+
+/* Compute part of Volume(cubePtr, mmt) that doesn't depend on r1, g1, or b1 */
+/* (depending on dir) */
+static long int
+Bottom(cubePtr, dir, m)
+    Cube *cubePtr;
+    unsigned char dir;
+    long int m[33][33][33];	/* Moment */
+{
+    switch (dir) {
+    case RED:
+	return -m[R0][G1][B1] + m[R0][G1][B0] + m[R0][G0][B1] - m[R0][G0][B0];
+    case GREEN:
+	return -m[R1][G0][B1] + m[R1][G0][B0] + m[R0][G0][B1] - m[R0][G0][B0];
+    case BLUE:
+	return -m[R1][G1][B0] + m[R1][G0][B0] + m[R0][G1][B0] - m[R0][G0][B0];
+    }
+    return 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Compute remainder of Volume(cubePtr, mmt), substituting pos for
+ * r1, g1, or b1 (depending on dir)
+ *
+ *----------------------------------------------------------------------
+ */
+static long int
+Top(cubePtr, dir, pos, m)
+    Cube *cubePtr;
+    unsigned char dir;
+    int pos;
+    long int m[33][33][33];
+{
+    switch (dir) {
+    case RED:
+	return (m[pos][G1][B1] - m[pos][G1][B0] - 
+		m[pos][G0][B1] + m[pos][G0][B0]);
+
+    case GREEN:
+	return (m[R1][pos][B1] - m[R1][pos][B0] - 
+		m[R0][pos][B1] + m[R0][pos][B0]);
+
+    case BLUE:
+	return (m[R1][G1][pos] - m[R1][G0][pos] -
+		m[R0][G1][pos] + m[R0][G0][pos]);
+    }
+    return 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ *	Compute the weighted variance of a box NB: as with the raw
+ *	statistics, this is really the (variance * size)
+ *
+ *----------------------------------------------------------------------
+ */
+static double
+Variance(cubePtr, s)
+    Cube *cubePtr;
+    ColorImageStatistics *s;
+{
+    double dR, dG, dB, xx;
+
+    dR = Volume(cubePtr, s->mR);
+    dG = Volume(cubePtr, s->mG);
+    dB = Volume(cubePtr, s->mB);
+    xx = (s->gm2[R1][G1][B1] - s->gm2[R1][G1][B0] -
+	  s->gm2[R1][G0][B1] + s->gm2[R1][G0][B0] -
+	  s->gm2[R0][G1][B1] + s->gm2[R0][G1][B0] +
+	  s->gm2[R0][G0][B1] - s->gm2[R0][G0][B0]);
+    return (xx - (dR * dR + dG * dG + dB * dB) / Volume(cubePtr, s->wt));
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ *	We want to minimize the sum of the variances of two subboxes.
+ *	The sum(c^2) terms can be ignored since their sum over both
+ *	subboxes is the same (the sum for the whole box) no matter
+ *	where we split.  The remaining terms have a minus sign in
+ *	the variance formula, so we drop the minus sign and MAXIMIZE
+ *	the sum of the two terms.
+ *
+ *----------------------------------------------------------------------
+ */
+static double
+Maximize(cubePtr, dir, first, last, cut, rWhole, gWhole, bWhole, wWhole, s)
+    Cube *cubePtr;
+    unsigned char dir;
+    int first, last, *cut;
+    long int rWhole, gWhole, bWhole, wWhole;
+    ColorImageStatistics *s;
+{
+    register long int rHalf, gHalf, bHalf, wHalf;
+    long int rBase, gBase, bBase, wBase;
+    register int i;
+    register double temp, max;
+
+    rBase = Bottom(cubePtr, dir, s->mR);
+    gBase = Bottom(cubePtr, dir, s->mG);
+    bBase = Bottom(cubePtr, dir, s->mB);
+    wBase = Bottom(cubePtr, dir, s->wt);
+    max = 0.0;
+    *cut = -1;
+    for (i = first; i < last; i++) {
+	rHalf = rBase + Top(cubePtr, dir, i, s->mR);
+	gHalf = gBase + Top(cubePtr, dir, i, s->mG);
+	bHalf = bBase + Top(cubePtr, dir, i, s->mB);
+	wHalf = wBase + Top(cubePtr, dir, i, s->wt);
+
+	/* Now half_x is sum over lower half of box, if split at i */
+	if (wHalf == 0) {	/* subbox could be empty of pixels! */
+	    continue;		/* never split into an empty box */
+	} else {
+	    temp = ((double)rHalf * rHalf + (float)gHalf * gHalf +
+		    (double)bHalf * bHalf) / wHalf;
+	}
+	rHalf = rWhole - rHalf;
+	gHalf = gWhole - gHalf;
+	bHalf = bWhole - bHalf;
+	wHalf = wWhole - wHalf;
+	if (wHalf == 0) {	/* Subbox could be empty of pixels! */
+	    continue;		/* never split into an empty box */
+	} else {
+	    temp += ((double)rHalf * rHalf + (float)gHalf * gHalf +
+		(double)bHalf * bHalf) / wHalf;
+	}
+	if (temp > max) {
+	    max = temp;
+	    *cut = i;
+	}
+    }
+    return max;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *----------------------------------------------------------------------
+ */
+static int
+Cut(set1, set2, s)
+    Cube *set1, *set2;
+    ColorImageStatistics *s;
+{
+    unsigned char dir;
+    int rCut, gCut, bCut;
+    double rMax, gMax, bMax;
+    long int rWhole, gWhole, bWhole, wWhole;
+
+    rWhole = Volume(set1, s->mR);
+    gWhole = Volume(set1, s->mG);
+    bWhole = Volume(set1, s->mB);
+    wWhole = Volume(set1, s->wt);
+
+    rMax = Maximize(set1, RED, set1->r0 + 1, set1->r1, &rCut,
+	rWhole, gWhole, bWhole, wWhole, s);
+    gMax = Maximize(set1, GREEN, set1->g0 + 1, set1->g1, &gCut,
+	rWhole, gWhole, bWhole, wWhole, s);
+    bMax = Maximize(set1, BLUE, set1->b0 + 1, set1->b1, &bCut,
+	rWhole, gWhole, bWhole, wWhole, s);
+
+    if ((rMax >= gMax) && (rMax >= bMax)) {
+	dir = RED;
+	if (rCut < 0) {
+	    return 0;		/* can't split the box */
+	}
+    } else {
+	dir = ((gMax >= rMax) && (gMax >= bMax)) ? GREEN : BLUE;
+    }
+    set2->r1 = set1->r1;
+    set2->g1 = set1->g1;
+    set2->b1 = set1->b1;
+
+    switch (dir) {
+    case RED:
+	set2->r0 = set1->r1 = rCut;
+	set2->g0 = set1->g0;
+	set2->b0 = set1->b0;
 	break;
 
-    default:
+    case GREEN:
+	set2->g0 = set1->g1 = gCut;
+	set2->r0 = set1->r0;
+	set2->b0 = set1->b0;
+	break;
 
-	y = (0.212671 * (float)srcPtr->Red) +
-	    (0.715160 * (float)srcPtr->Green) +
-	    (0.072169 * (float)srcPtr->Blue);
-	destPtr->Red = destPtr->Green = destPtr->Blue = (unsigned char)CLAMP(y);
+    case BLUE:
+	set2->b0 = set1->b1 = bCut;
+	set2->r0 = set1->r0;
+	set2->g0 = set1->g0;
+	break;
     }
-    return TCL_OK;
+    set1->vol = (set1->r1 - set1->r0) * (set1->g1 - set1->g0) *
+	(set1->b1 - set1->b0);
+    set2->vol = (set2->r1 - set2->r0) * (set2->g1 - set2->g0) *
+	(set2->b1 - set2->b0);
+    return 1;
 }
 
-#endif
 
-#ifdef notdef
-
-/*
- *----------------------------------------------------------------------
- *
- * StringToColormap --
- *
- *	Convert a string into a colormap.
- *
- * Results:
- *	If the string is successfully converted, TCL_OK is returned.
- *	Otherwise, TCL_ERROR is returned and an error message is left in
- *	interp->result.
- *
- * Side Effects:
- *	The padding structure passed is updated with the new values.
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
 static int
-    StringToColormap(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
-    Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* Window */
-    char *string;		/* Pixel value string */
-    char *widgRec;		/* Widget record */
-    int offset;			/* Offset of pad in widget */
+SplitColorSpace(s, cubes, nColors)
+    ColorImageStatistics *s;
+    Cube *cubes;
+    int nColors;
 {
-    Colormap *colorMapPtr = (Colormap *) (widgRec + offset);
+    double *vv, temp;
+    register int i;
+    register int n, k;
 
-    if (*colorMapPtr != None) {
-	Tk_FreeColormap(Tk_Display(tkwin), *colorMapPtr);
-	*colorMapPtr = None;
-    }
-    if ((string != NULL) && (string[0] != '\0')) {
-	Colormap colorMap;
-
-	colorMap = Tk_GetColormap(interp, tkwin, string);
-	if (colorMap == None) {
-	    return TCL_ERROR;
+    vv = Blt_Malloc(sizeof(double) * nColors);
+    assert(vv);
+    
+    cubes[0].r0 = cubes[0].g0 = cubes[0].b0 = 0;
+    cubes[0].r1 = cubes[0].g1 = cubes[0].b1 = 32;
+    for (i = 1, n = 0; i < nColors; i++) {
+	if (Cut(cubes + n, cubes + i, s)) {
+	    /*
+	     * Volume test ensures we won't try to cut one-cell box
+	     */
+	    vv[n] = vv[i] = 0.0;
+	    if (cubes[n].vol > 1) {
+		vv[n] = Variance(cubes + n, s);
+	    }
+	    if (cubes[i].vol > 1) {
+		vv[i] = Variance(cubes + i, s);
+	    }
+	} else {
+	    vv[n] = 0.0;	/* don't try to split this box again */
+	    i--;		/* didn't create box i */
 	}
-	*colorMapPtr = colorMap;
+	
+	n = 0;
+	temp = vv[0];
+	for (k = 1; k <= i; k++) {
+	    if (vv[k] > temp) {
+		temp = vv[k];
+		n = k;
+	    }
+	}
+	if (temp <= 0.0) {
+	    i++;
+	    fprintf(stderr, "Only got %d boxes\n", i);
+	    break;
+	}
     }
+    Blt_Free(vv);
+    return i;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *--------------------------------------------------------------------
+ */
+static void
+Mark(cubePtr, label, tag)
+    Cube *cubePtr;
+    int label;
+    unsigned int tag[33][33][33];
+{
+    register int r, g, b;
+
+    for (r = R0 + 1; r <= R1; r++) {
+	for (g = G0 + 1; g <= G1; g++) {
+	    for (b = B0 + 1; b <= B1; b++) {
+		tag[r][g][b] = label;
+	    }
+	}
+    }
+}
+
+static unsigned int *
+CreateColorLookupTable(s, cubes, nColors)
+    ColorImageStatistics *s;
+    Cube *cubes;
+    int nColors;
+{
+    unsigned int *lut;
+    Pix32 color;
+    unsigned int red, green, blue;
+    unsigned int weight;
+    register Cube *cubePtr;
+    register int i;
+
+    lut = Blt_Calloc(sizeof(unsigned int), 33 * 33 * 33);
+    assert(lut);
+
+    color.Alpha = (unsigned char)-1;
+    for (cubePtr = cubes, i = 0; i < nColors; i++, cubePtr++) {
+	weight = Volume(cubePtr, s->wt);
+	if (weight) {
+	    red = (Volume(cubePtr, s->mR) / weight) * (NC + 1);
+	    green = (Volume(cubePtr, s->mG) / weight) * (NC + 1);
+	    blue = (Volume(cubePtr, s->mB) / weight) * (NC + 1);
+	} else {
+	    fprintf(stderr, "bogus box %d\n", i);
+	    red = green = blue = 0;
+	}
+	color.Red = red >> 8;
+	color.Green = green >> 8;
+	color.Blue = blue >> 8;
+	Mark(cubePtr, color.value, lut);
+    }
+    return lut;
+}
+
+static void
+MapColors(src, dest, lut) 
+     Blt_ColorImage src, dest;
+     unsigned int lut[33][33][33];
+{
+    /* Apply the color lookup table against the original image */
+    int width, height;
+    int count;
+    Pix32 *srcPtr, *destPtr, *endPtr;
+    unsigned char alpha;
+    
+    width = Blt_ColorImageWidth(src);
+    height = Blt_ColorImageHeight(src);
+    count = width * height;
+    
+    srcPtr = Blt_ColorImageBits(src);
+    destPtr = Blt_ColorImageBits(dest);
+    for (endPtr = destPtr + count; destPtr < endPtr; srcPtr++, destPtr++) {
+	alpha = srcPtr->Alpha;
+	destPtr->value = lut[srcPtr->Red>>3][srcPtr->Green>>3][srcPtr->Blue>>3];
+	destPtr->Alpha = alpha;
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Blt_QuantizeColorImage --
+ *
+ *	C Implementation of Wu's Color Quantizer (v. 2) (see Graphics Gems
+ *	vol. II, pp. 126-133)
+ *
+ *	Author: Xiaolin Wu
+ *		Dept. of Computer Science Univ. of Western
+ *		Ontario London, Ontario
+ *		N6A 5B7
+ *		wu@csd.uwo.ca
+ *
+ *	Algorithm:
+ *		Greedy orthogonal bipartition of RGB space for variance
+ *		minimization aided by inclusion-exclusion tricks.  For
+ *		speed no nearest neighbor search is done. Slightly
+ *		better performance can be expected by more
+ *		sophisticated but more expensive versions.
+ *
+ *	The author thanks Tom Lane at Tom_Lane@G.GP.CS.CMU.EDU for much of
+ *	additional documentation and a cure to a previous bug.
+ *
+ *	Free to distribute, comments and suggestions are appreciated.
+ *
+ *----------------------------------------------------------------------
+ */
+int
+Blt_QuantizeColorImage(src, dest, reduceColors)
+    Blt_ColorImage src, dest;	/* Source and destination images. */
+    int reduceColors;		/* Reduced number of colors. */
+{
+    Cube *cubes;
+    ColorImageStatistics *statistics;
+    int nColors;
+    unsigned int *lut;
+
+    /*
+     * Allocated a structure to hold color statistics.
+     */
+    statistics = GetColorImageStatistics(src);
+    M3d(statistics);
+
+    cubes = Blt_Malloc(sizeof(Cube) * reduceColors);
+    assert(cubes);
+
+    nColors = SplitColorSpace(statistics, cubes, reduceColors);
+    assert(nColors <= reduceColors);
+
+    lut = CreateColorLookupTable(statistics, cubes, nColors);
+    Blt_Free(statistics);
+    Blt_Free(cubes);
+    MapColors(src, dest, lut);
+    Blt_Free(lut);
     return TCL_OK;
 }
 
-/*
- *----------------------------------------------------------------------
- *
- * ColormapToString --
- *
- *	Converts the two pad values into a Tcl list.  Each pad has two
- *	pixel values.  For vertical pads, they represent the top and bottom
- *	margins.  For horizontal pads, they're the left and right margins.
- *	All pad values are non-negative integers.
- *
- * Results:
- *	The padding list is returned.
- *
- *----------------------------------------------------------------------
- */
-/*ARGSUSED*/
-static char *
-ColormapToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
-    char *widgRec;		/* Structure record */
-    int offset;			/* Offset of pad in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+Region2D *
+Blt_SetRegion(x, y, width, height, regionPtr)
+    int x, y, width, height;
+    Region2D *regionPtr;	
 {
-    TextAttributes *attrPtr = (TextAttributes *)(widgRec + offset);
-    char *result;
-    char string[200];
-
-    sprintf(string, "%s %d", Tk_NameOfColor(attrPtr->shadowColor),
-	attrPtr->shadowOffset);
-    result = strdup(string);
-    if (result == NULL) {
-	return "out of memory";
-    }
-    *freeProcPtr = (Tcl_FreeProc *)free;
-    return result;
+    regionPtr->left = x;
+    regionPtr->top = y;
+    regionPtr->right = x + width - 1;
+    regionPtr->bottom = y + height - 1;
+    return regionPtr;
 }
 
-/*
- * Definition of the structure associated with color image masters.
- */
-typedef struct ColorImageMaster {
-    Tk_ImageMaster tkMaster;	/* Tk's token for image master.  NULL means
-				 * the image is being deleted. */
-    Tcl_Interp *interp;		/* Interpreter associated with the
-				 * application using this image. */
-    Tcl_Command cmdToken;	/* Token for image command (used to delete
-				 * it when the image goes away).  NULL means
-				 * the image command has already been
-				 * deleted. */
-    ImageRegion reqRegion;	/* Requested region of source to be copied
-				 * into the image */
-    char *fileString;		/* Name of file to read into image. */
-    char *dataString;		/* String represents the 4 component data
-				 * of the image (RGBA). */
-    char *colorMap;		/* String represents the 4 component data
-				 * of the image (RGBA). */
-    char *format;		/* User-specified format of data in image
-				 * file or string value. */
-
-    Blt_List instances;		/* List of instances of image displayed on the
-				 * screen. In most cases this will be only
-				 * one. */
-
-    int flags;			/* Sundry flags, defined below. */
-    double gamma;		/* Display gamma value to correct for. */
-
-    ColorImage original;	/* The original image */
-
-} ColorImageMaster;
 
 /*
- * Bit definitions for the flags field of a ColorImageMaster.
- * COLOR_IMAGE:			1 means that the image has different color
- *				components.
- * IMAGE_CHANGED:		1 means that the instances of this image
- *				need to be redithered.
+ * Each call to Tk_GetImage returns a pointer to one of the following
+ * structures, which is used as a token by clients (widgets) that
+ * display images.
  */
+typedef struct TkImageStruct {
+    Tk_Window tkwin;		/* Window passed to Tk_GetImage (needed to
+				 * "re-get" the image later if the manager
+				 * changes). */
+    Display *display;		/* Display for tkwin.  Needed because when
+				 * the image is eventually freed tkwin may
+				 * not exist anymore. */
+    struct TkImageMasterStruct *masterPtr;
+				/* Master for this image (identifiers image
+				 * manager, for example). */
+    ClientData instanceData;
+				/* One word argument to pass to image manager
+				 * when dealing with this image instance. */
+    Tk_ImageChangedProc *changeProc;
+				/* Code in widget to call when image changes
+				 * in a way that affects redisplay. */
+    ClientData widgetClientData;
+				/* Argument to pass to changeProc. */
+    struct Image *nextPtr;	/* Next in list of all image instances
+				 * associated with the same name. */
 
-#define COLOR_IMAGE		1
-#define IMAGE_CHANGED		2
+} TkImage;
 
 /*
- * The following data structure represents all of the instances of
- * a photo image in windows on a given screen that are using the
- * same colormap.
+ * For each image master there is one of the following structures,
+ * which represents a name in the image table and all of the images
+ * instantiated from it.  Entries in mainPtr->imageTable point to
+ * these structures.
  */
+typedef struct TkImageMasterStruct {
+    Tk_ImageType *typePtr;	/* Information about image type.  NULL means
+				 * that no image manager owns this image:  the
+				 * image was deleted. */
+    ClientData masterData;	/* One-word argument to pass to image mgr
+				 * when dealing with the master, as opposed
+				 * to instances. */
+    int width, height;		/* Last known dimensions for image. */
+    Blt_HashTable *tablePtr;	/* Pointer to hash table containing image
+				 * (the imageTable field in some TkMainInfo
+				 * structure). */
+    Blt_HashEntry *hPtr;	/* Hash entry in mainPtr->imageTable for
+				 * this structure (used to delete the hash
+				 * entry). */
+    TkImage *instancePtr;	/* Pointer to first in list of instances
+				 * derived from this name. */
+} TkImageMaster;
 
-typedef struct ColorPixmap {
-    Pixmap pixmap;
-    ColorTable *colorTabPtr;
-} ColorPixmap;
 
+typedef struct TkPhotoMasterStruct TkPhotoMaster;
+typedef struct TkColorTableStruct TkColorTable;
 
-typedef struct ColorImageInstance {
-    ColorImageMaster *masterPtr;/* Pointer to master for image. */
-
+typedef struct TkPhotoInstanceStruct {
+    TkPhotoMaster *masterPtr;	/* Pointer to master for image. */
     Display *display;		/* Display for windows using this instance. */
-
     Colormap colormap;		/* The image may only be used in windows with
 				 * this particular colormap. */
-
+    struct TkPhotoInstanceStruct *nextPtr;
+				/* Pointer to the next instance in the list
+				 * of instances associated with this master. */
+    int refCount;		/* Number of instances using this structure. */
     Tk_Uid palette;		/* Palette for these particular instances. */
-
-    double gamma;		/* Gamma value for these instances. */
-
-    int keepColors;		/* Number of colors to "keep" from the default
-				 * colormap when using a private colormap. */
-
-    int exactColors;		/* A boolean that indicates if we should try
-				 * to allocate "exact" colors or "best" match
-				 * the colors that are currently allocated.
-				 */
-    int quantize;
-
-    ColorImage image;		/* If NULL, this indicates that we should get
-				 * the image from the master. */
-
-    ColorPixmap colorPixmap;	/* The color pixmap (pixmap + palette) */
-
-} ColorImageInstance;
+    double outputGamma;		/* Gamma value for these instances. */
+    Tk_Uid defaultPalette;	/* Default palette to use if a palette
+				 * is not specified for the master. */
+    TkColorTable *colorTablePtr;	/* Pointer to information about colors
+				 * allocated for image display in windows
+				 * like this one. */
+    Pixmap pixels;		/* X pixmap containing dithered image. */
+    int width, height;		/* Dimensions of the pixmap. */
+    char *error;		/* Error image, used in dithering. */
+    XImage *imagePtr;		/* Image structure for converted pixels. */
+    XVisualInfo visualInfo;	/* Information about the visual that these
+				 * windows are using. */
+    GC gc;			/* Graphics context for writing images
+				 * to the pixmap. */
+} TkPhotoInstance;
 
 /*
- * The type record for color images:
- */
-static int CreateImageProc _ANSI_ARGS_((Tcl_Interp *interp, char *name,
-	int argc, char **argv, Tk_ImageType * typePtr, Tk_ImageMaster master,
-	ClientData *clientDataPtr));
-static ClientData GetImageProc _ANSI_ARGS_((Tk_Window tkwin,
-	ClientData clientData));
-static void DisplayImageProc _ANSI_ARGS_((ClientData clientData,
-	Display *display, Drawable drawable, int imageX, int imageY,
-	int width, int height, int drawableX, int drawableY));
-static void FreeImageProc _ANSI_ARGS_((ClientData clientData,
-	Display *display));
-static void DeleteImageProc _ANSI_ARGS_((ClientData clientData));
-
-static Tk_ImageType ColorImageType = {
-    "color",			/* name */
-    CreateImageProc,		/* createProc */
-    GetImageProc,		/* getProc */
-    DisplayImageProc,		/* displayProc */
-    FreeImageProc,		/* freeProc */
-    DeleteImageProc,		/* deleteProc */
-    (Tk_ImageType *) NULL	/* nextPtr */
-};
-
-/*
- * Information used for parsing configuration specifications:
- */
-static Tk_ConfigSpec configSpecs[] = {
-    {
-	TK_CONFIG_CUSTOM, "-colormap", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_COLORMAP, Tk_Offset(ColorImageMaster, palette),
-	0, &bltColormapOption
-    },
-    {
-	TK_CONFIG_STRING, "-data", (char *)NULL, (char *)NULL,
-	(char *)NULL, Tk_Offset(ColorImageMaster, dataString),
-	TK_CONFIG_NULL_OK
-    },
-    {
-	TK_CONFIG_BOOLEAN, "-exact", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_EXACT_COLORS, Tk_Offset(ColorImageMaster, exactColors), 0
-    },
-    {
-	TK_CONFIG_STRING, "-format", (char *)NULL, (char *)NULL,
-	(char *)NULL, Tk_Offset(ColorImageMaster, format), TK_CONFIG_NULL_OK
-    },
-    {
-	TK_CONFIG_STRING, "-file", (char *)NULL, (char *)NULL,
-	(char *)NULL, Tk_Offset(ColorImageMaster, fileString),
-	TK_CONFIG_NULL_OK
-    },
-    {
-	TK_CONFIG_DOUBLE, "-gamma", (char *)NULL, (char *)NULL,
-	DEF_PHOTO_GAMMA, Tk_Offset(ColorImageMaster, gamma), 0
-    },
-    {
-	TK_CONFIG_BOOLEAN, "-greyscale", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_GREYSCALE, Tk_Offset(ColorImageMaster, greyscale), 0
-    },
-    {
-	TK_CONFIG_INT, "-height", (char *)NULL, (char *)NULL,
-	DEF_PHOTO_HEIGHT, Tk_Offset(ColorImageMaster, height), 0
-    },
-    {
-	TK_CONFIG_INT, "-keep", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_KEEP_COLORS, Tk_Offset(ColorImageMaster, keepColors), 0
-    },
-    {
-	TK_CONFIG_UID, "-palette", (char *)NULL, (char *)NULL,
-	DEF_PHOTO_PALETTE, Tk_Offset(ColorImageMaster, palette), 0
-    },
-    {
-	TK_CONFIG_CUSTOM, "-region", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_REGION, Tk_Offset(ColorImageMaster, reqRegion), 0
-    },
-    {
-	TK_CONFIG_INT, "-width", (char *)NULL, (char *)NULL,
-	DEF_PHOTO_WIDTH, Tk_Offset(ColorImageMaster, width), 0
-    },
-    {
-	TK_CONFIG_WINDOW, "-window", (char *)NULL, (char *)NULL,
-	DEF_IMAGE_WINDOW, Tk_Offset(ColorImageMaster, window), 0
-    },
-    {
-	TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
-	(char *)NULL, 0, 0
-    }
-};
-
-/*
- *----------------------------------------------------------------------
+ * ----------------------------------------------------------------------
  *
- * CreateImageProc --
+ * Tk_ImageDeleted --
  *
- *	This procedure is called by the Tk image code to create
- *	a new color image.
+ *	Is there any other way to determine if an image has been
+ *	deleted?
  *
  * Results:
- *	A standard Tcl result.
+ *	Returns 1 if the image has been deleted, 0 otherwise.
  *
- * Side effects:
- *	The data structure for a new color image is allocated and
- *	initialized.
- *
- *----------------------------------------------------------------------
+ * ----------------------------------------------------------------------
  */
-
-static int
-    CreateImageProc(interp, name, argc, argv, typePtr, master, clientDataPtr)
-    Tcl_Interp *interp;		/* Interpreter for application containing
-				 * image. */
-    char *name;			/* Name to use for image. */
-    int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings for options (doesn't
-				 * include image name or type). */
-    Tk_ImageType *typePtr;	/* Pointer to our type record (not used). */
-    Tk_ImageMaster master;	/* Token for image, to be used by us in
-				 * later callbacks. */
-    ClientData *clientDataPtr;	/* Store manager's token for image here;
-				 * it will be returned in later callbacks. */
+/*LINTLIBRARY*/
+int
+Tk_ImageIsDeleted(tkImage)
+    Tk_Image tkImage;		/* Token for image. */
 {
-    ImageMaster *serverPtr;
+    TkImage *imagePtr = (TkImage *) tkImage;
 
-    /*
-     * Allocate and initialize the photo image master record.
-     */
-
-    masterPtr = (ImageMaster *)calloc(sizeof(ImageMaster));
-    masterPtr->tkMaster = master;
-    masterPtr->interp = interp;
-    if (name != NULL) {
-	masterPtr->imageCmd = Tcl_CreateCommand(interp, name, ColorImageCmd,
-	    (ClientData)masterPtr, ColorImageCmdDeletedProc);
+    if (imagePtr->masterPtr == NULL) {
+	return TRUE;
     }
-    masterPtr->palette = NULL;
-    masterPtr->pix24 = NULL;
-    masterPtr->instancePtr = NULL;
-    masterPtr->validRegion = TkCreateRegion();
+    return (imagePtr->masterPtr->typePtr == NULL);
+}
 
-    Blt_InitList(&(masterPtr->clients), TCL_ONE_WORD_KEYS);
+/*LINTLIBRARY*/
+Tk_ImageMaster
+Tk_ImageGetMaster(tkImage)
+    Tk_Image tkImage;		/* Token for image. */
+{
+    TkImage *imagePtr = (TkImage *)tkImage;
 
-    /*
-     * Process configuration options given in the image create command.
-     */
-    if (ConfigureColorImage(interp, masterPtr, argc, argv, 0) != TCL_OK) {
-	DeleteImageProc((ClientData)masterPtr);
-	return TCL_ERROR;
+    return (Tk_ImageMaster) imagePtr->masterPtr;
+}
+
+/*LINTLIBRARY*/
+Tk_ImageType *
+Tk_ImageGetType(tkImage)
+    Tk_Image tkImage;		/* Token for image. */
+{
+    TkImage *imagePtr = (TkImage *)tkImage;
+
+    return imagePtr->masterPtr->typePtr;
+}
+
+/*LINTLIBRARY*/
+Pixmap
+Tk_ImageGetPhotoPixmap(tkImage)
+    Tk_Image tkImage;		/* Token for image. */
+{
+    TkImage *imagePtr = (TkImage *)tkImage;
+
+    if (strcmp(imagePtr->masterPtr->typePtr->name, "photo") == 0) {
+	TkPhotoInstance *instPtr = (TkPhotoInstance *)imagePtr->instanceData;
+	return instPtr->pixels;
     }
-    *clientDataPtr = (ClientData)masterPtr;
+    return None;
+}
+
+/*LINTLIBRARY*/
+GC
+Tk_ImageGetPhotoGC(photoImage)
+    Tk_Image photoImage;		/* Token for image. */
+{
+    TkImage *imagePtr = (TkImage *) photoImage;
+    if (strcmp(imagePtr->masterPtr->typePtr->name, "photo") == 0) {
+	TkPhotoInstance *instPtr = (TkPhotoInstance *)imagePtr->instanceData;
+	return instPtr->gc;
+    }
+    return NULL;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TempImageChangedProc
+ *
+ *	The image is over-written each time it's resized.  We always
+ *	resample from the color image we saved when the photo image
+ *	was specified (-image option). So we only worry if the image
+ *	is deleted.
+ *
+ * Results:
+ *	None.
+ *
+ *---------------------------------------------------------------------- 
+ */
+/* ARGSUSED */
+static void
+TempImageChangedProc(clientData, x, y, width, height, imageWidth, imageHeight)
+    ClientData clientData;
+    int x, y, width, height;	/* Not used. */
+    int imageWidth, imageHeight;/* Not used. */
+{
+#ifdef notdef
+    fprintf(stderr, "should be redrawing temp image\n");
+#endif
+}
+
+Tk_Image 
+Blt_CreateTemporaryImage(interp, tkwin, clientData)
+    Tcl_Interp *interp;
+    Tk_Window tkwin;
+    ClientData clientData;
+{
+    Tk_Image token;
+    char *name;			/* Contains image name. */
+
+    if (Tcl_Eval(interp, "image create photo") != TCL_OK) {
+	return NULL;
+    }
+    name = (char *)Tcl_GetStringResult(interp);
+    token = Tk_GetImage(interp, tkwin, name, TempImageChangedProc, clientData);
+    if (token == NULL) {
+	return NULL;
+    }
+    return token;
+}
+
+int
+Blt_DestroyTemporaryImage(interp, tkImage)
+    Tcl_Interp *interp;
+    Tk_Image tkImage;
+{
+    if (tkImage != NULL) {
+	if (Tcl_VarEval(interp, "image delete ", Blt_NameOfImage(tkImage), 
+			(char *)NULL) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	Tk_FreeImage(tkImage);
+    }
     return TCL_OK;
 }
 
-#endif
+char *
+Blt_NameOfImage(tkImage)
+    Tk_Image tkImage;
+{
+    Tk_ImageMaster master;
+
+    master = Tk_ImageGetMaster(tkImage);
+    return Tk_NameOfImage(master);
+}

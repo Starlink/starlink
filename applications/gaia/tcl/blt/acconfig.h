@@ -14,15 +14,26 @@
    Leave the following blank line there!!  Autoheader needs it.  */
 
 
+#define BLT_CONFIG_H  	1		
+
 /* Define if DBL_EPSILON is not defined in float.h */
 #undef BLT_DBL_EPSILON
 
 /* Define if drand48 isn't declared in math.h. */
-#undef NO_DECL_DRAND48
+#undef NEED_DECL_DRAND48
+
+/* Define if srand48 isn't declared in math.h. */
+#undef NEED_DECL_SRAND48
 
 /* Define if strdup isn't declared in a standard header file. */
-#undef NO_DECL_STRDUP
+#undef NEED_DECL_STRDUP
+
+/* Define if j1 isn't declared in a standard header file. */
+#undef NEED_DECL_J1
 
 /* Define if union wait type is defined incorrectly.  */
-#undef NO_UNION_WAIT
+#undef HAVE_UNION_WAIT
+
+/* Define if isfinite is found in libm.  */
+#undef HAVE_ISFINITE
 

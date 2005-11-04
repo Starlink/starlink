@@ -39,117 +39,152 @@
 #define PS_MAXPATH	1500	/* Maximum number of components in a PostScript
 				 * (level 1) path. */
 
-Printable
-Blt_PrintObject(interp, tkwin, dStrPtr)
+PsToken
+Blt_GetPsToken(interp, tkwin)
     Tcl_Interp *interp;
     Tk_Window tkwin;
-    Tcl_DString *dStrPtr;
 {
-    struct Printable *printPtr;
+    struct PsTokenStruct *tokenPtr;
 
-    printPtr = (struct Printable *)malloc(sizeof(struct Printable));
-    assert(printPtr);
-    printPtr->fontVarName = printPtr->colorVarName = NULL;
-    printPtr->interp = interp;
-    printPtr->tkwin = tkwin;
-    printPtr->dStrPtr = dStrPtr;
-    printPtr->colorMode = PS_MODE_COLOR;
-    return printPtr;
+    tokenPtr = Blt_Malloc(sizeof(struct PsTokenStruct));
+    assert(tokenPtr);
+
+    tokenPtr->fontVarName = tokenPtr->colorVarName = NULL;
+    tokenPtr->interp = interp;
+    tokenPtr->tkwin = tkwin;
+    tokenPtr->colorMode = PS_MODE_COLOR;
+    Tcl_DStringInit(&(tokenPtr->dString));
+    return tokenPtr;
 }
 
 void
-     Blt_PrintAppend
-TCL_VARARGS_DEF(Printable, arg1)
+Blt_ReleasePsToken(tokenPtr)
+    struct PsTokenStruct *tokenPtr;
+{
+    Tcl_DStringFree(&(tokenPtr->dString));
+    Blt_Free(tokenPtr);
+}
+
+char *
+Blt_PostScriptFromToken(tokenPtr)
+    struct PsTokenStruct *tokenPtr;
+{
+    return Tcl_DStringValue(&(tokenPtr->dString));
+}
+
+char *
+Blt_ScratchBufferFromToken(tokenPtr)
+    struct PsTokenStruct *tokenPtr;
+{
+    return tokenPtr->scratchArr;
+}
+
+void
+Blt_AppendToPostScript
+TCL_VARARGS_DEF(PsToken, arg1)
 {
     va_list argList;
-    Printable printable;
+    struct PsTokenStruct *tokenPtr;
     char *string;
 
-    printable = TCL_VARARGS_START(Printable, arg1, argList);
+    tokenPtr = TCL_VARARGS_START(struct PsTokenStruct, arg1, argList);
     for (;;) {
 	string = va_arg(argList, char *);
 	if (string == NULL) {
 	    break;
 	}
-	Tcl_DStringAppend(printable->dStrPtr, string, -1);
+	Tcl_DStringAppend(&(tokenPtr->dString), string, -1);
     }
 }
 
 void
-     Blt_PrintFormat
-TCL_VARARGS_DEF(Printable, arg1)
+Blt_FormatToPostScript
+TCL_VARARGS_DEF(PsToken, arg1)
 {
     va_list argList;
-    Printable printable;
+    struct PsTokenStruct *tokenPtr;
     char *fmt;
 
-    printable = TCL_VARARGS_START(Printable, arg1, argList);
+    tokenPtr = TCL_VARARGS_START(struct PsTokenStruct, arg1, argList);
     fmt = va_arg(argList, char *);
-    vsprintf(printable->scratchArr, fmt, argList);
+    vsprintf(tokenPtr->scratchArr, fmt, argList);
     va_end(argList);
-    Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    Tcl_DStringAppend(&(tokenPtr->dString), tokenPtr->scratchArr, -1);
 }
 
 int
-Blt_FileToPostScript(printable, fileName)
-    Printable printable;
+Blt_FileToPostScript(tokenPtr, fileName)
+    struct PsTokenStruct *tokenPtr;
     char *fileName;
 {
-    FILE *f;
+    Tcl_Channel channel;
+    Tcl_DString dString;
+    Tcl_Interp *interp;
+    char *buf;
     char *libDir;
-    char *pathName;
-    Tcl_DString filePath;
-    Tcl_Interp *interp = printable->interp;
+    int nBytes;
+
+    interp = tokenPtr->interp;
+    buf = tokenPtr->scratchArr;
 
     /*
-     * Read a standard prolog file from file and append it to the
-     * generated PostScript output stored in interp->result.
+     * Read in a standard prolog file from file and append it to the
+     * PostScript output stored in the Tcl_DString in tokenPtr.
      */
-    libDir = Tcl_GetVar(interp, "blt_library", TCL_GLOBAL_ONLY);
+
+    libDir = (char *)Tcl_GetVar(interp, "blt_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
 	Tcl_AppendResult(interp, "couldn't find BLT script library:",
 	    "global variable \"blt_library\" doesn't exist", (char *)NULL);
 	return TCL_ERROR;
     }
-    Tcl_DStringInit(&filePath);
-    Tcl_DStringAppend(&filePath, libDir, -1);
-    Tcl_DStringAppend(&filePath, "/", -1);
-    Tcl_DStringAppend(&filePath, fileName, -1);
-    pathName = Tcl_DStringValue(&filePath);
-
-    f = fopen(pathName, "r");
-    if (f == NULL) {
-	Tcl_AppendResult(interp, "couldn't open prologue file \"", pathName,
-	    "\": ", Tcl_PosixError(interp), (char *)NULL);
+    Tcl_DStringInit(&dString);
+    Tcl_DStringAppend(&dString, libDir, -1);
+    Tcl_DStringAppend(&dString, "/", -1);
+    Tcl_DStringAppend(&dString, fileName, -1);
+    fileName = Tcl_DStringValue(&dString);
+    Blt_AppendToPostScript(tokenPtr, "\n% including file \"", fileName, 
+	"\"\n\n", (char *)NULL);
+    channel = Tcl_OpenFileChannel(interp, fileName, "r", 0);
+    if (channel == NULL) {
+	Tcl_AppendResult(interp, "couldn't open prologue file \"", fileName,
+		 "\": ", Tcl_PosixError(interp), (char *)NULL);
 	return TCL_ERROR;
     }
-    Blt_PrintAppend(printable, "\n% including file \"", pathName, "\"\n\n",
-	(char *)NULL);
-
-    while (fgets(printable->scratchArr, PRINTABLE_SCRATCH_LENGTH, f) != NULL) {
-	Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    for(;;) {
+	nBytes = Tcl_Read(channel, buf, PSTOKEN_BUFSIZ);
+	if (nBytes < 0) {
+	    Tcl_AppendResult(interp, "error reading prologue file \"", 
+		     fileName, "\": ", Tcl_PosixError(interp), 
+		     (char *)NULL);
+	    Tcl_Close(interp, channel);
+	    Tcl_DStringFree(&dString);
+	    return TCL_ERROR;
+	}
+	if (nBytes == 0) {
+	    break;
+	}
+	buf[nBytes] = '\0';
+	Blt_AppendToPostScript(tokenPtr, buf, (char *)NULL);
     }
-    if (ferror(f)) {
-	Tcl_AppendResult(interp, "error reading prologue file \"", pathName,
-	    "\": ", Tcl_PosixError(interp), (char *)NULL);
-	fclose(f);
-	Tcl_DStringFree(&filePath);
-	return TCL_ERROR;
-    }
-    fclose(f);
-    Tcl_DStringFree(&filePath);
+    Tcl_DStringFree(&dString);
+    Tcl_Close(interp, channel);
     return TCL_OK;
 }
-
 /*
  *----------------------------------------------------------------------
  *
  * XColorToPostScript --
  *
  *	Convert the a XColor (from its RGB values) to a PostScript
- *	command.  If a Tcl color map variable exists, it will be
+ *	command.  If a Tk color map variable exists, it will be
  *	consulted for a PostScript translation based upon the color
  *	name.
+ *
+ *	Maps an X color intensity (0 to 2^16-1) to a floating point
+ *      value [0..1].  Many versions of Tk don't properly handle the 
+ *	the lower 8 bits of the color intensity, so we can only 
+ *	consider the upper 8 bits. 
  *
  * Results:
  *	The string representing the color mode is returned.
@@ -157,62 +192,58 @@ Blt_FileToPostScript(printable, fileName)
  *----------------------------------------------------------------------
  */
 static void
-XColorToPostScript(printable, colorPtr)
-    Printable printable;
+XColorToPostScript(tokenPtr, colorPtr)
+    struct PsTokenStruct *tokenPtr;
     XColor *colorPtr;		/* Color value to be converted */
 {
-    /*
-     * Remember when mapping the intergral color intensity to
-     * the interval [0..1], color values run from 0 to 65535,
-     * not 1 to 65536.
+    /* 
+     * Shift off the lower byte before dividing because some versions
+     * of Tk don't fill the lower byte correctly.  
      */
-    sprintf(printable->scratchArr, "%g %g %g",
-	((double)colorPtr->red / 65535.0),
-	((double)colorPtr->green / 65535.0),
-	((double)colorPtr->blue / 65535.0));
-    Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    Blt_FormatToPostScript(tokenPtr, "%g %g %g",
+	((double)(colorPtr->red >> 8) / 255.0),
+	((double)(colorPtr->green >> 8) / 255.0),
+	((double)(colorPtr->blue >> 8) / 255.0));
 }
 
 void
-Blt_BackgroundToPostScript(printable, colorPtr)
-    Printable printable;
+Blt_BackgroundToPostScript(tokenPtr, colorPtr)
+    struct PsTokenStruct *tokenPtr;
     XColor *colorPtr;
 {
     /* If the color name exists in Tcl array variable, use that translation */
-    if (printable->colorVarName != NULL) {
-	char *colorDesc;
+    if (tokenPtr->colorVarName != NULL) {
+	CONST char *psColor;
 
-	colorDesc = Tcl_GetVar2(printable->interp, printable->colorVarName,
+	psColor = Tcl_GetVar2(tokenPtr->interp, tokenPtr->colorVarName,
 	    Tk_NameOfColor(colorPtr), 0);
-	if (colorDesc != NULL) {
-	    Blt_PrintAppend(printable, colorDesc, " ", (char *)NULL);
+	if (psColor != NULL) {
+	    Blt_AppendToPostScript(tokenPtr, " ", psColor, "\n", (char *)NULL);
 	    return;
 	}
-    } else {
-	XColorToPostScript(printable, colorPtr);
     }
-    Tcl_DStringAppend(printable->dStrPtr, " SetBgColor\n", -1);
+    XColorToPostScript(tokenPtr, colorPtr);
+    Blt_AppendToPostScript(tokenPtr, " SetBgColor\n", (char *)NULL);
 }
 
 void
-Blt_ForegroundToPostScript(printable, colorPtr)
-    Printable printable;
+Blt_ForegroundToPostScript(tokenPtr, colorPtr)
+    struct PsTokenStruct *tokenPtr;
     XColor *colorPtr;
 {
     /* If the color name exists in Tcl array variable, use that translation */
-    if (printable->colorVarName != NULL) {
-	char *colorDesc;
+    if (tokenPtr->colorVarName != NULL) {
+	CONST char *psColor;
 
-	colorDesc = Tcl_GetVar2(printable->interp, printable->colorVarName,
+	psColor = Tcl_GetVar2(tokenPtr->interp, tokenPtr->colorVarName,
 	    Tk_NameOfColor(colorPtr), 0);
-	if (colorDesc != NULL) {
-	    Blt_PrintAppend(printable, colorDesc, " ", (char *)NULL);
+	if (psColor != NULL) {
+	    Blt_AppendToPostScript(tokenPtr, " ", psColor, "\n", (char *)NULL);
 	    return;
 	}
-    } else {
-	XColorToPostScript(printable, colorPtr);
     }
-    Tcl_DStringAppend(printable->dStrPtr, " SetFgColor\n", -1);
+    XColorToPostScript(tokenPtr, colorPtr);
+    Blt_AppendToPostScript(tokenPtr, " SetFgColor\n", (char *)NULL);
 }
 
 /*
@@ -262,10 +293,90 @@ ByteToHex(byte, string)
     string[1] = hexDigits[byte & 0x0F];
 }
 
+#ifdef WIN32
 /*
  * -------------------------------------------------------------------------
  *
- * Blt_BitmapToPostScript --
+ * Blt_BitmapDataToPostScript --
+ *
+ *      Output a PostScript image string of the given bitmap image.
+ *      It is assumed the image is one bit deep and a zero value
+ *      indicates an off-pixel.  To convert to PostScript, the bits
+ *      need to be reversed from the X11 image order.
+ *
+ * Results:
+ *      None.
+ *
+ * Side Effects:
+ *      The PostScript image string is appended.
+ *
+ * -------------------------------------------------------------------------
+ */
+void
+Blt_BitmapDataToPostScript(
+    struct PsTokenStruct *tokenPtr,
+    Display *display,
+    Pixmap bitmap,
+    int width, int height)
+{
+    register unsigned char byte;
+    register int x, y, bitPos;
+    unsigned long pixel;
+    int byteCount;
+    char string[10];
+    unsigned char *srcBits, *srcPtr;
+    int bytesPerRow;
+
+    srcBits = Blt_GetBitmapData(display, bitmap, width, height, &bytesPerRow);
+    if (srcBits == NULL) {
+        OutputDebugString("Can't get bitmap data");
+	return;
+    }
+    Blt_AppendToPostScript(tokenPtr, "\t<", (char *)NULL);
+    byteCount = bitPos = 0;	/* Suppress compiler warning */
+    for (y = height - 1; y >= 0; y--) {
+	srcPtr = srcBits + (bytesPerRow * y);
+	byte = 0;
+	for (x = 0; x < width; x++) {
+	    bitPos = x % 8;
+	    pixel = (*srcPtr & (0x80 >> bitPos));
+	    if (pixel) {
+		byte |= (unsigned char)(1 << bitPos);
+	    }
+	    if (bitPos == 7) {
+		byte = ReverseBits(byte);
+		ByteToHex(byte, string);
+		string[2] = '\0';
+		byteCount++;
+		srcPtr++;
+		byte = 0;
+		if (byteCount >= 30) {
+		    string[2] = '\n';
+		    string[3] = '\t';
+		    string[4] = '\0';
+		    byteCount = 0;
+		}
+		Blt_AppendToPostScript(tokenPtr, string, (char *)NULL);
+	    }
+	}			/* x */
+	if (bitPos != 7) {
+	    byte = ReverseBits(byte);
+	    ByteToHex(byte, string);
+	    string[2] = '\0';
+	    Blt_AppendToPostScript(tokenPtr, string, (char *)NULL);
+	    byteCount++;
+	}
+    }				/* y */
+    Blt_Free(srcBits);
+    Blt_AppendToPostScript(tokenPtr, ">\n", (char *)NULL);
+}
+
+#else
+
+/*
+ * -------------------------------------------------------------------------
+ *
+ * Blt_BitmapDataToPostScript --
  *
  *      Output a PostScript image string of the given bitmap image.
  *      It is assumed the image is one bit deep and a zero value
@@ -281,8 +392,8 @@ ByteToHex(byte, string)
  * -------------------------------------------------------------------------
  */
 void
-Blt_BitmapToPostScript(printable, display, bitmap, width, height)
-    Printable printable;
+Blt_BitmapDataToPostScript(tokenPtr, display, bitmap, width, height)
+    struct PsTokenStruct *tokenPtr;
     Display *display;
     Pixmap bitmap;
     int width, height;
@@ -290,30 +401,17 @@ Blt_BitmapToPostScript(printable, display, bitmap, width, height)
     register unsigned char byte = 0;
     register int x, y, bitPos;
     unsigned long pixel;
-#ifdef WIN32
-    TkWinDCState state;
-    HDC image;
-#else 
     XImage *imagePtr;
-#endif /*WIN32*/
     int byteCount;
     char string[10];
 
-#ifdef WIN32
-    image = TkWinGetDrawableDC(display, bitmap, &state);
-#else 
     imagePtr = XGetImage(display, bitmap, 0, 0, width, height, 1, ZPixmap);
-#endif /*WIN32*/
-    Tcl_DStringAppend(printable->dStrPtr, "\t<", -1);
+    Blt_AppendToPostScript(tokenPtr, "\t<", (char *)NULL);
     byteCount = bitPos = 0;	/* Suppress compiler warning */
     for (y = 0; y < height; y++) {
 	byte = 0;
 	for (x = 0; x < width; x++) {
-#ifdef WIN32
-	    pixel = GetPixel(image, x, y);
-#else 
 	    pixel = XGetPixel(imagePtr, x, y);
-#endif /*WIN32*/
 	    bitPos = x % 8;
 	    byte |= (unsigned char)(pixel << bitPos);
 	    if (bitPos == 7) {
@@ -328,24 +426,22 @@ Blt_BitmapToPostScript(printable, display, bitmap, width, height)
 		    string[4] = '\0';
 		    byteCount = 0;
 		}
-		Tcl_DStringAppend(printable->dStrPtr, string, -1);
+		Blt_AppendToPostScript(tokenPtr, string, (char *)NULL);
 	    }
 	}			/* x */
 	if (bitPos != 7) {
 	    byte = ReverseBits(byte);
 	    ByteToHex(byte, string);
 	    string[2] = '\0';
-	    Tcl_DStringAppend(printable->dStrPtr, string, -1);
+	    Blt_AppendToPostScript(tokenPtr, string, (char *)NULL);
 	    byteCount++;
 	}
     }				/* y */
-    Tcl_DStringAppend(printable->dStrPtr, ">\n", -1);
-#ifdef WIN32
-    TkWinReleaseDrawableDC(bitmap, image, &state);
-#else 
+    Blt_AppendToPostScript(tokenPtr, ">\n", (char *)NULL);
     XDestroyImage(imagePtr);
-#endif /*WIN32*/
 }
+
+#endif /* WIN32 */
 
 /*
  *----------------------------------------------------------------------
@@ -365,30 +461,35 @@ Blt_BitmapToPostScript(printable, display, bitmap, width, height)
  *
  *----------------------------------------------------------------------
  */
-void
-Blt_ColorImageToPsData(image, numComponents, dStrPtr, prefix)
-    ColorImage image;
-    int numComponents;
-    Tcl_DString *dStrPtr;
+int
+Blt_ColorImageToPsData(image, nComponents, resultPtr, prefix)
+    Blt_ColorImage image;
+    int nComponents;
+    Tcl_DString *resultPtr;
     char *prefix;
 {
     char string[10];
     register int count;
     register int x, y;
     register Pix32 *pixelPtr;
+    unsigned char byte;
     int width, height;
     int offset;
+    int nLines;
+    width = Blt_ColorImageWidth(image);
+    height = Blt_ColorImageHeight(image);
 
-    width = ColorImageWidth(image);
-    height = ColorImageHeight(image);
-
+    nLines = 0;
     count = 0;
-    Tcl_DStringAppend(dStrPtr, prefix, -1);
     offset = (height - 1) * width;
-    if (numComponents == 3) {
+    if (nComponents == 3) {
 	for (y = (height - 1); y >= 0; y--) {
-	    pixelPtr = ColorImageData(image) + offset;
+	    pixelPtr = Blt_ColorImageBits(image) + offset;
 	    for (x = 0; x < width; x++, pixelPtr++) {
+		if (count == 0) {
+		    Tcl_DStringAppend(resultPtr, prefix, -1);
+		    Tcl_DStringAppend(resultPtr, " ", -1);
+		}
 		count += 6;
 		ByteToHex(pixelPtr->Red, string);
 		ByteToHex(pixelPtr->Green, string + 2);
@@ -396,33 +497,42 @@ Blt_ColorImageToPsData(image, numComponents, dStrPtr, prefix)
 		string[6] = '\0';
 		if (count >= 60) {
 		    string[6] = '\n';
-		    string[7] = prefix[0];
-		    string[8] = '\0';
+		    string[7] = '\0';
 		    count = 0;
+		    nLines++;
 		}
-		Tcl_DStringAppend(dStrPtr, string, -1);
+		Tcl_DStringAppend(resultPtr, string, -1);
 	    }
 	    offset -= width;
 	}
-    } else if (numComponents == 1) {
+    } else if (nComponents == 1) {
 	for (y = (height - 1); y >= 0; y--) {
-	    pixelPtr = ColorImageData(image) + offset;
+	    pixelPtr = Blt_ColorImageBits(image) + offset;
 	    for (x = 0; x < width; x++, pixelPtr++) {
+		if (count == 0) {
+		    Tcl_DStringAppend(resultPtr, prefix, -1);
+		    Tcl_DStringAppend(resultPtr, " ", -1);
+		}
 		count += 2;
-		ByteToHex(pixelPtr->Red, string);
+		byte = ~(pixelPtr->Red);
+		ByteToHex(byte, string);
 		string[2] = '\0';
 		if (count >= 60) {
 		    string[2] = '\n';
-		    string[3] = prefix[0];
-		    string[4] = '\0';
+		    string[3] = '\0';
 		    count = 0;
+		    nLines++;
 		}
-		Tcl_DStringAppend(dStrPtr, string, -1);
+		Tcl_DStringAppend(resultPtr, string, -1);
 	    }
 	    offset -= width;
 	}
     }
-    Tcl_DStringAppend(dStrPtr, "\n", -1);
+    if (count != 0) {
+	Tcl_DStringAppend(resultPtr, "\n", -1);
+	nLines++;
+    }
+    return nLines;
 }
 
 /*
@@ -431,7 +541,7 @@ Blt_ColorImageToPsData(image, numComponents, dStrPtr, prefix)
  * NameOfAtom --
  *
  *	Wrapper routine for Tk_GetAtomName.  Returns NULL instead of
- *	"?bad atom?" if the atom cannot be found.
+ *	"?bad atom?" if the atom can't be found.
  *
  * Results:
  *	The name of the atom is returned if found. Otherwise NULL.
@@ -449,12 +559,11 @@ NameOfAtom(tkwin, atom)
     if ((result[0] == '?') && (strcmp(result, "?bad atom?") == 0)) {
 	return NULL;
     }
-    return (result);
+    return result;
 }
 
-#ifndef  WIN32
 
-typedef struct FontMap {
+typedef struct {
     char *alias;
     char *fontName;
 } FontMap;
@@ -480,8 +589,9 @@ static FontMap psFontMap[] =
     {"ZapfDingbats", "ZapfDingbats",},
 };
 
-static int numFontNames = (sizeof(psFontMap) / sizeof(FontMap));
+static int nFontNames = (sizeof(psFontMap) / sizeof(FontMap));
 
+#ifndef  WIN32
 /*
  * -----------------------------------------------------------------
  *
@@ -506,6 +616,7 @@ XFontStructToPostScript(tkwin, fontPtr)
     Atom atom;
     char *fullName, *family, *foundry;
     register char *src, *dest;
+    int familyLen;
     char *start;
     static char string[200];	/* What size? */
 
@@ -529,19 +640,23 @@ XFontStructToPostScript(tkwin, fontPtr)
     if ((foundry == NULL) || (family == NULL)) {
 	return NULL;
     }
-    src = fullName + strlen(family);
+    src = NULL;
+    familyLen = strlen(family);
+    if (strncasecmp(fullName, family, familyLen) == 0) {
+	src = fullName + familyLen;
+    }
     if (strcmp(foundry, "Adobe") != 0) {
 	register int i;
 
 	if (strncasecmp(family, "itc ", 4) == 0) {
 	    family += 4;	/* Throw out the "itc" prefix */
 	}
-	for (i = 0; i < numFontNames; i++) {
+	for (i = 0; i < nFontNames; i++) {
 	    if (strcasecmp(family, psFontMap[i].alias) == 0) {
 		family = psFontMap[i].fontName;
 	    }
 	}
-	if (i == numFontNames) {
+	if (i == nFontNames) {
 	    family = "Helvetica";	/* Default to a known font */
 	}
     }
@@ -557,11 +672,13 @@ XFontStructToPostScript(tkwin, fontPtr)
      *
      * ex. " Bold Italic" ==> "BoldItalic"
      */
-    while (*src != '\0') {
-	if ((*src != ' ') && (*src != '-')) {
-	    *dest++ = *src;
+    if (src != NULL) {
+	while (*src != '\0') {
+	    if ((*src != ' ') && (*src != '-')) {
+		*dest++ = *src;
+	    }
+	    src++;
 	}
-	src++;
     }
     if (dest == start) {
 	--dest;			/* Remove '-' to leave just the family name */
@@ -569,24 +686,27 @@ XFontStructToPostScript(tkwin, fontPtr)
     *dest = '\0';		/* Make a valid string */
     return string;
 }
-#endif /* !WIN32 */
 
+#endif /* !WIN32 */
 
+
 /*
  * -------------------------------------------------------------------
  * Routines to convert X drawing functions to PostScript commands.
  * -------------------------------------------------------------------
  */
 void
-Blt_ClearBackgroundToPostScript(printable)
-    Printable printable;
+Blt_ClearBackgroundToPostScript(tokenPtr)
+    struct PsTokenStruct *tokenPtr;
 {
-    Tcl_DStringAppend(printable->dStrPtr, " 1.0 1.0 1.0 SetBgColor\n", -1);
+    Blt_AppendToPostScript(tokenPtr, 
+	" 1.0 1.0 1.0 SetBgColor\n", 
+	(char *)NULL);
 }
 
 void
-Blt_CapStyleToPostScript(printable, capStyle)
-    Printable printable;
+Blt_CapStyleToPostScript(tokenPtr, capStyle)
+    struct PsTokenStruct *tokenPtr;
     int capStyle;
 {
     /*
@@ -596,140 +716,166 @@ Blt_CapStyleToPostScript(printable, capStyle)
     if (capStyle > 0) {
 	capStyle--;
     }
-    sprintf(printable->scratchArr, "%d setlinecap\n", capStyle);
-    Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    Blt_FormatToPostScript(tokenPtr, 
+	"%d setlinecap\n", 
+	capStyle);
 }
 
 void
-Blt_JoinStyleToPostScript(printable, joinStyle)
-    Printable printable;
+Blt_JoinStyleToPostScript(tokenPtr, joinStyle)
+    struct PsTokenStruct *tokenPtr;
     int joinStyle;
 {
     /*
      * miter = 0, round = 1, bevel = 2
      */
-    sprintf(printable->scratchArr, "%d setlinejoin\n", joinStyle);
-    Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    Blt_FormatToPostScript(tokenPtr, 
+	"%d setlinejoin\n", 
+	joinStyle);
 }
 
 void
-Blt_LineWidthToPostScript(printable, lineWidth)
-    Printable printable;
+Blt_LineWidthToPostScript(tokenPtr, lineWidth)
+    struct PsTokenStruct *tokenPtr;
     int lineWidth;
 {
     if (lineWidth < 1) {
 	lineWidth = 1;
     }
-    sprintf(printable->scratchArr, "%d setlinewidth\n", lineWidth);
-    Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
+    Blt_FormatToPostScript(tokenPtr, 
+	"%d setlinewidth\n", 
+	lineWidth);
 }
 
 void
-Blt_LineDashesToPostScript(printable, dashesPtr)
-    Printable printable;
-    Dashes *dashesPtr;
+Blt_LineDashesToPostScript(tokenPtr, dashesPtr)
+    struct PsTokenStruct *tokenPtr;
+    Blt_Dashes *dashesPtr;
 {
 
-    Tcl_DStringAppend(printable->dStrPtr, "[ ", -1);
+    Blt_AppendToPostScript(tokenPtr, "[ ", (char *)NULL);
     if (dashesPtr != NULL) {
-	register int i;
+	unsigned char *p;
 
-	for (i = 0; i < dashesPtr->numValues; i++) {
-	    Blt_PrintFormat(printable, " %d", dashesPtr->valueArr[i]);
+	for (p = dashesPtr->values; *p != 0; p++) {
+	    Blt_FormatToPostScript(tokenPtr, " %d", *p);
 	}
     }
-    Tcl_DStringAppend(printable->dStrPtr, "] 0 setdash\n", -1);
+    Blt_AppendToPostScript(tokenPtr, "] 0 setdash\n", (char *)NULL);
 }
 
 void
-Blt_LineAttributesToPostScript(printable, colorPtr, lineWidth, dashesPtr,
+Blt_LineAttributesToPostScript(tokenPtr, colorPtr, lineWidth, dashesPtr,
     capStyle, joinStyle)
-    Printable printable;
+    struct PsTokenStruct *tokenPtr;
     XColor *colorPtr;
     int lineWidth;
-    Dashes *dashesPtr;
+    Blt_Dashes *dashesPtr;
     int capStyle, joinStyle;
 {
-    Blt_JoinStyleToPostScript(printable, joinStyle);
-    Blt_CapStyleToPostScript(printable, capStyle);
-    Blt_ForegroundToPostScript(printable, colorPtr);
-    Blt_LineWidthToPostScript(printable, lineWidth);
-    Blt_LineDashesToPostScript(printable, dashesPtr);
+    Blt_JoinStyleToPostScript(tokenPtr, joinStyle);
+    Blt_CapStyleToPostScript(tokenPtr, capStyle);
+    Blt_ForegroundToPostScript(tokenPtr, colorPtr);
+    Blt_LineWidthToPostScript(tokenPtr, lineWidth);
+    Blt_LineDashesToPostScript(tokenPtr, dashesPtr);
+    Blt_AppendToPostScript(tokenPtr, "/DashesProc {} def\n", (char *)NULL);
 }
 
 void
-Blt_RectangleToPostScript(printable, x, y, width, height)
-    Printable printable;
-    int x, y;
+Blt_RectangleToPostScript(tokenPtr, x, y, width, height)
+    struct PsTokenStruct *tokenPtr;
+    double x, y;
     int width, height;
 {
-    Blt_PrintFormat(printable, "%d %d %d %d Box Fill\n\n", x, y, width - 1,
-	height - 1);
+    Blt_FormatToPostScript(tokenPtr, 
+	"%g %g %d %d Box fill\n\n", 
+	x, y, width, height);
 }
 
 void
-Blt_LinesToPostScript(printable, pointPtr, numPoints)
-    Printable printable;
-    register XPoint *pointPtr;
-    int numPoints;
+Blt_RegionToPostScript(tokenPtr, x, y, width, height)
+    struct PsTokenStruct *tokenPtr;
+    double x, y;
+    int width, height;
 {
-    register int i;
+    Blt_FormatToPostScript(tokenPtr, "%g %g %d %d Box\n\n", 
+			   x, y, width, height);
+}
 
-    Blt_PrintFormat(printable, "newpath %d %d moveto\n", pointPtr->x,
-	pointPtr->y);
+void
+Blt_PathToPostScript(tokenPtr, screenPts, nScreenPts)
+    struct PsTokenStruct *tokenPtr;
+    register Point2D *screenPts;
+    int nScreenPts;
+{
+    register Point2D *pointPtr, *endPtr;
+
+    pointPtr = screenPts;
+    Blt_FormatToPostScript(tokenPtr, "newpath %g %g moveto\n", 
+	pointPtr->x, pointPtr->y);
     pointPtr++;
-    for (i = 1; i < numPoints; i++, pointPtr++) {
-	Blt_PrintFormat(printable, "%d %d lineto\n",
-	    pointPtr->x, pointPtr->y);
+    endPtr = screenPts + nScreenPts;
+    while (pointPtr < endPtr) {
+	Blt_FormatToPostScript(tokenPtr, "%g %g lineto\n",
+		pointPtr->x, pointPtr->y);
+	pointPtr++;
     }
 }
 
 void
-Blt_PolygonToPostScript(printable, pointArr, numPoints)
-    Printable printable;
-    XPoint *pointArr;
-    int numPoints;
+Blt_PolygonToPostScript(tokenPtr, screenPts, nScreenPts)
+    struct PsTokenStruct *tokenPtr;
+    Point2D *screenPts;
+    int nScreenPts;
 {
-    Blt_LinesToPostScript(printable, pointArr, numPoints);
-    Blt_PrintFormat(printable, "%d %d ", pointArr[0].x, pointArr[0].y);
-    Blt_PrintAppend(printable, " lineto closepath Fill\n", (char *)NULL);
+    Blt_PathToPostScript(tokenPtr, screenPts, nScreenPts);
+    Blt_FormatToPostScript(tokenPtr, "%g %g ", screenPts[0].x, screenPts[0].y);
+    Blt_AppendToPostScript(tokenPtr, " lineto closepath Fill\n", (char *)NULL);
 }
 
 void
-Blt_SegmentsToPostScript(printable, segPtr, numSegments)
-    Printable printable;
+Blt_SegmentsToPostScript(tokenPtr, segPtr, nSegments)
+    struct PsTokenStruct *tokenPtr;
     register XSegment *segPtr;
-    int numSegments;
+    int nSegments;
 {
     register int i;
 
-    for (i = 0; i < numSegments; i++, segPtr++) {
-	Blt_PrintFormat(printable, "%d %d %d %d LS\n", segPtr->x1,
-	    segPtr->y1, segPtr->x2, segPtr->y2);
+    for (i = 0; i < nSegments; i++, segPtr++) {
+	Blt_FormatToPostScript(tokenPtr, "%d %d moveto\n", 
+			       segPtr->x1, segPtr->y1);
+	Blt_FormatToPostScript(tokenPtr, " %d %d lineto\n", 
+			       segPtr->x2, segPtr->y2);
+	Blt_AppendToPostScript(tokenPtr, "DashesProc stroke\n", (char *)NULL);
     }
 }
 
 
 void
-Blt_RectanglesToPostScript(printable, rectArr, numRects)
-    Printable printable;
+Blt_RectanglesToPostScript(tokenPtr, rectArr, nRects)
+    struct PsTokenStruct *tokenPtr;
     XRectangle rectArr[];
-    int numRects;
+    int nRects;
 {
     register int i;
 
-    for (i = 0; i < numRects; i++) {
-	Blt_RectangleToPostScript(printable, rectArr[i].x, rectArr[i].y,
-	    (int)rectArr[i].width, (int)rectArr[i].height);
+    for (i = 0; i < nRects; i++) {
+	Blt_RectangleToPostScript(tokenPtr, 
+		  (double)rectArr[i].x, (double)rectArr[i].y, 
+		  (int)rectArr[i].width, (int)rectArr[i].height);
     }
 }
 
+#ifndef TK_RELIEF_SOLID
+#define TK_RELIEF_SOLID		-1	/* Set the an impossible value. */
+#endif /* TK_RELIEF_SOLID */
+
 void
-Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
+Blt_Draw3DRectangleToPostScript(tokenPtr, border, x, y, width, height,
     borderWidth, relief)
-    Printable printable;
+    struct PsTokenStruct *tokenPtr;
     Tk_3DBorder border;		/* Token for border to draw. */
-    int x, y;			/* Coordinates of rectangle */
+    double x, y;		/* Coordinates of rectangle */
     int width, height;		/* Region to be drawn. */
     int borderWidth;		/* Desired width for border, in pixels. */
     int relief;			/* Should be either TK_RELIEF_RAISED or
@@ -740,21 +886,28 @@ Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
     XColor lightColor, darkColor;
     XColor *lightColorPtr, *darkColorPtr;
     XColor *topColor, *bottomColor;
-    XPoint points[7];
+    Point2D points[7];
     int twiceWidth = (borderWidth * 2);
 
     if ((width < twiceWidth) || (height < twiceWidth)) {
 	return;
     }
-    if ((borderPtr->lightColor == NULL) || (borderPtr->darkColor == NULL)) {
-	Screen *screenPtr;
-
-	lightColor = *borderPtr->bgColor;
-	screenPtr = Tk_Screen(printable->tkwin);
-	if (lightColor.pixel == WhitePixelOfScreen(screenPtr)) {
+    if ((relief == TK_RELIEF_SOLID) ||
+	(borderPtr->lightColor == NULL) || (borderPtr->darkColor == NULL)) {
+	if (relief == TK_RELIEF_SOLID) {
 	    darkColor.red = darkColor.blue = darkColor.green = 0x00;
+	    lightColor.red = lightColor.blue = lightColor.green = 0x00;
+	    relief = TK_RELIEF_SUNKEN;
 	} else {
-	    darkColor.red = darkColor.blue = darkColor.green = 0xFF;
+	    Screen *screenPtr;
+
+	    lightColor = *borderPtr->bgColor;
+	    screenPtr = Tk_Screen(tokenPtr->tkwin);
+	    if (lightColor.pixel == WhitePixelOfScreen(screenPtr)) {
+		darkColor.red = darkColor.blue = darkColor.green = 0x00;
+	    } else {
+		darkColor.red = darkColor.blue = darkColor.green = 0xFF;
+	    }
 	}
 	lightColorPtr = &lightColor;
 	darkColorPtr = &darkColor;
@@ -762,6 +915,7 @@ Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
 	lightColorPtr = borderPtr->lightColor;
 	darkColorPtr = borderPtr->darkColor;
     }
+
 
     /*
      * Handle grooves and ridges with recursive calls.
@@ -772,14 +926,13 @@ Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
 
 	halfWidth = borderWidth / 2;
 	insideOffset = borderWidth - halfWidth;
-	Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
-	    halfWidth, (relief == TK_RELIEF_GROOVE) ? TK_RELIEF_SUNKEN :
-	    TK_RELIEF_RAISED);
-	Blt_3DRectangleToPostScript(printable, border, x + insideOffset,
-	    y + insideOffset, width - insideOffset * 2,
-	    height - insideOffset * 2, halfWidth,
-	    (relief == TK_RELIEF_GROOVE) ? TK_RELIEF_RAISED :
-	    TK_RELIEF_SUNKEN);
+	Blt_Draw3DRectangleToPostScript(tokenPtr, border, (double)x, (double)y,
+	    width, height, halfWidth, 
+	    (relief == TK_RELIEF_GROOVE) ? TK_RELIEF_SUNKEN : TK_RELIEF_RAISED);
+	Blt_Draw3DRectangleToPostScript(tokenPtr, border, 
+  	    (double)(x + insideOffset), (double)(y + insideOffset), 
+	    width - insideOffset * 2, height - insideOffset * 2, halfWidth,
+	    (relief == TK_RELIEF_GROOVE) ? TK_RELIEF_RAISED : TK_RELIEF_SUNKEN);
 	return;
     }
     if (relief == TK_RELIEF_RAISED) {
@@ -791,10 +944,10 @@ Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
     } else {
 	topColor = bottomColor = borderPtr->bgColor;
     }
-    Blt_BackgroundToPostScript(printable, bottomColor);
-    Blt_RectangleToPostScript(printable, x, y + height - borderWidth, width,
+    Blt_BackgroundToPostScript(tokenPtr, bottomColor);
+    Blt_RectangleToPostScript(tokenPtr, x, y + height - borderWidth, width,
 	borderWidth);
-    Blt_RectangleToPostScript(printable, x + width - borderWidth, y,
+    Blt_RectangleToPostScript(tokenPtr, x + width - borderWidth, y,
 	borderWidth, height);
     points[0].x = points[1].x = points[6].x = x;
     points[0].y = points[6].y = y + height;
@@ -805,18 +958,17 @@ Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
     points[4].x = points[5].x = x + borderWidth;
     points[5].y = y + height - borderWidth;
     if (relief != TK_RELIEF_FLAT) {
-	Blt_BackgroundToPostScript(printable, topColor);
+	Blt_BackgroundToPostScript(tokenPtr, topColor);
     }
-    Blt_PolygonToPostScript(printable, points, 7);
+    Blt_PolygonToPostScript(tokenPtr, points, 7);
 }
 
-#ifdef notdef
 void
-Blt_Fill3DRectangleToPostScript(printable, border, x, y, width, height,
+Blt_Fill3DRectangleToPostScript(tokenPtr, border, x, y, width, height,
     borderWidth, relief)
-    Printable printable;
+    struct PsTokenStruct *tokenPtr;
     Tk_3DBorder border;		/* Token for border to draw. */
-    int x, y;			/* Coordinates of top-left of border area */
+    double x, y;		/* Coordinates of top-left of border area */
     int width, height;		/* Dimension of border to be drawn. */
     int borderWidth;		/* Desired width for border, in pixels. */
     int relief;			/* Should be either TK_RELIEF_RAISED or
@@ -830,27 +982,28 @@ Blt_Fill3DRectangleToPostScript(printable, border, x, y, width, height,
      * Setting the pen color as foreground or background only affects
      * the plot when the colormode option is "monochrome".
      */
-    Blt_BackgroundToPostScript(printable, borderPtr->bgColor);
-    Blt_RectangleToPostScript(printable, x, y, width, height);
-    Blt_3DRectangleToPostScript(printable, border, x, y, width, height,
+    Blt_BackgroundToPostScript(tokenPtr, borderPtr->bgColor);
+    Blt_RectangleToPostScript(tokenPtr, x, y, width, height);
+    Blt_Draw3DRectangleToPostScript(tokenPtr, border, x, y, width, height,
 	borderWidth, relief);
 }
 
-#endif
-
 void
-Blt_StippleToPostScript(printable, display, bitmap, width, height, fillOrStroke)
-    Printable printable;
+Blt_StippleToPostScript(tokenPtr, display, bitmap)
+    struct PsTokenStruct *tokenPtr;
     Display *display;
     Pixmap bitmap;
-    int width, height;
-    int fillOrStroke;
-
 {
-    Blt_PrintFormat(printable, "    %d %d\n", width, height);
-    Blt_BitmapToPostScript(printable, display, bitmap, width, height);
-    Blt_PrintAppend(printable, "    ", (fillOrStroke) ? "true" : "false",
-	" StippleFill\n", (char *)NULL);
+    int width, height;
+
+    Tk_SizeOfBitmap(display, bitmap, &width, &height);
+    Blt_FormatToPostScript(tokenPtr, 
+	"gsave\n  clip\n  %d %d\n", 
+	width, height);
+    Blt_BitmapDataToPostScript(tokenPtr, display, bitmap, width, height);
+    Blt_AppendToPostScript(tokenPtr, 
+	"  StippleFill\ngrestore\n", 
+	(char *)NULL);
 }
 
 /*
@@ -867,39 +1020,44 @@ Blt_StippleToPostScript(printable, display, bitmap, width, height, fillOrStroke)
  *----------------------------------------------------------------------
  */
 void
-Blt_ColorImageToPostScript(printable, image, x, y)
-    Printable printable;
-    ColorImage image;
-    int x, y;
+Blt_ColorImageToPostScript(tokenPtr, image, x, y)
+    struct PsTokenStruct *tokenPtr;
+    Blt_ColorImage image;
+    double x, y;
 {
     int width, height;
     int tmpSize;
 
-    width = ColorImageWidth(image);
-    height = ColorImageHeight(image);
+    width = Blt_ColorImageWidth(image);
+    height = Blt_ColorImageHeight(image);
 
     tmpSize = width;
-    if (printable->colorMode == PS_MODE_COLOR) {
+    if (tokenPtr->colorMode == PS_MODE_COLOR) {
 	tmpSize *= 3;
     }
-    Blt_PrintFormat(printable, "\n/tmpStr %d string def\n", tmpSize);
-    Blt_PrintAppend(printable, "gsave\n", (char *)NULL);
-    Blt_PrintFormat(printable, "  %d %d translate\n", x, y);
-    Blt_PrintFormat(printable, "  %d %d scale\n", width, height);
-    Blt_PrintFormat(printable, "  %d %d 8\n", width, height);
-    Blt_PrintFormat(printable, "  [%d 0 0 %d 0 %d] ", width, -height,
+    Blt_FormatToPostScript(tokenPtr, "\n/tmpStr %d string def\n", tmpSize);
+    Blt_AppendToPostScript(tokenPtr, "gsave\n", (char *)NULL);
+    Blt_FormatToPostScript(tokenPtr, "  %g %g translate\n", x, y);
+    Blt_FormatToPostScript(tokenPtr, "  %d %d scale\n", width, height);
+    Blt_FormatToPostScript(tokenPtr, "  %d %d 8\n", width, height);
+    Blt_FormatToPostScript(tokenPtr, "  [%d 0 0 %d 0 %d] ", width, -height,
 	height);
-    Blt_PrintAppend(printable, "{\n    currentfile tmpStr readhexstring pop\n  } ",
+    Blt_AppendToPostScript(tokenPtr, 
+	"{\n    currentfile tmpStr readhexstring pop\n  } ",
 	(char *)NULL);
-    if (printable->colorMode != PS_MODE_COLOR) {
-	Blt_PrintAppend(printable, "image\n", (char *)NULL);
-	Blt_ColorImageToGreyscale(image, image);
-	Blt_ColorImageToPsData(image, 1, printable->dStrPtr, " ");
+    if (tokenPtr->colorMode != PS_MODE_COLOR) {
+	Blt_AppendToPostScript(tokenPtr, "image\n", (char *)NULL);
+	Blt_ColorImageToGreyscale(image);
+	Blt_ColorImageToPsData(image, 1, &(tokenPtr->dString), " ");
     } else {
-	Blt_PrintAppend(printable, "false 3 colorimage\n", (char *)NULL);
-	Blt_ColorImageToPsData(image, 3, printable->dStrPtr, " ");
+	Blt_AppendToPostScript(tokenPtr, 
+		"false 3 colorimage\n", 
+		(char *)NULL);
+	Blt_ColorImageToPsData(image, 3, &(tokenPtr->dString), " ");
     }
-    Blt_PrintAppend(printable, "\ngrestore\n\n", (char *)NULL);
+    Blt_AppendToPostScript(tokenPtr, 
+	"\ngrestore\n\n", 
+	(char *)NULL);
 }
 
 /*
@@ -916,30 +1074,28 @@ Blt_ColorImageToPostScript(printable, image, x, y)
  *----------------------------------------------------------------------
  */
 void
-Blt_WindowToPostScript(printable, tkwin, x, y)
-    Printable printable;
+Blt_WindowToPostScript(tokenPtr, tkwin, x, y)
+    struct PsTokenStruct *tokenPtr;
     Tk_Window tkwin;
-    int x, y;
+    double x, y;
 {
-    ColorImage image;
+    Blt_ColorImage image;
     int width, height;
-    ImageRegion region;
 
     width = Tk_Width(tkwin);
     height = Tk_Height(tkwin);
-    region.x = region.y = region.width = region.height = 0;
-    image = Blt_DrawableToColorImage(tkwin, Tk_WindowId(tkwin), width, height,
-	&region);
+    image = Blt_DrawableToColorImage(tkwin, Tk_WindowId(tkwin), 0, 0, width, 
+	height, GAMMA);
     if (image == NULL) {
 	/* Can't grab window image so paint the window area grey */
-	Blt_PrintAppend(printable, "% Can't grab window \"",
+	Blt_AppendToPostScript(tokenPtr, "% Can't grab window \"",
 	    Tk_PathName(tkwin), "\"\n", (char *)NULL);
-	Blt_PrintAppend(printable, "0.5 0.5 0.5 SetBgColor\n",
+	Blt_AppendToPostScript(tokenPtr, "0.5 0.5 0.5 SetBgColor\n",
 	    (char *)NULL);
-	Blt_RectangleToPostScript(printable, x, y, width, height);
+	Blt_RectangleToPostScript(tokenPtr, x, y, width, height);
 	return;
     }
-    Blt_ColorImageToPostScript(printable, image, x, y);
+    Blt_ColorImageToPostScript(tokenPtr, image, x, y);
     Blt_FreeColorImage(image);
 }
 
@@ -957,22 +1113,20 @@ Blt_WindowToPostScript(printable, tkwin, x, y)
  *
  * Side Effects:
  *      The PostScript output representing the photo is appended to
- *	the printable's dynamic string.
+ *	the tokenPtr's dynamic string.
  *
  * -------------------------------------------------------------------------
  */
 void
-Blt_PhotoToPostScript(printable, photo, x, y)
-    Printable printable;
+Blt_PhotoToPostScript(tokenPtr, photo, x, y)
+    struct PsTokenStruct *tokenPtr;
     Tk_PhotoHandle photo;
-    register int x, y;		/* Origin of photo image */
+    double x, y;		/* Origin of photo image */
 {
-    ImageRegion region;
-    ColorImage image;
+    Blt_ColorImage image;
 
-    region.x = region.y = region.width = region.height = 0;
-    image = Blt_PhotoToColorImage(photo, &region);
-    Blt_ColorImageToPostScript(printable, image, x, y);
+    image = Blt_PhotoToColorImage(photo);
+    Blt_ColorImageToPostScript(tokenPtr, image, x, y);
     Blt_FreeColorImage(image);
 }
 
@@ -1004,68 +1158,52 @@ Blt_PhotoToPostScript(printable, photo, x, y)
  */
 
 void
-Blt_FontToPostScript(printable, font)
-    Printable printable;
+Blt_FontToPostScript(tokenPtr, font)
+    struct PsTokenStruct *tokenPtr;
     Tk_Font font;		/* Tk font to query about */
 {
     XFontStruct *fontPtr = (XFontStruct *)font;
-    Tcl_Interp *interp = printable->interp;
-    char *family, *fontName;
-    float pointSize;
-    register char **p;
-
-    static char *psFonts[] =
-    {
-	"Arial",
-	"AvantGarde",
-	"Bookman",
-	"Courier",
-	"Geneva",
-	"Helvetica",
-	"Monaco",
-	"New Century Schoolbook",
-	"NewCenturySchlbk",
-	"New York",
-	"Palatino",
-	"Symbol",
-	"Times",
-	"ZapfChancery",
-	"ZapfDingBats",
-	(char *)NULL,
-    };
+    Tcl_Interp *interp = tokenPtr->interp;
+    char *fontName;
+    double pointSize;
+#if (TK_MAJOR_VERSION > 4)
+    Tk_Uid family;
+    register int i;
+#endif /* TK_MAJOR_VERSION > 4 */
 
     fontName = Tk_NameOfFont(font);
     pointSize = 12.0;
-
     /*
      * Use the font variable information if it exists.
      */
-    if (printable->fontVarName != NULL) {
+    if (tokenPtr->fontVarName != NULL) {
 	char *fontInfo;
 
-	fontInfo = Tcl_GetVar2(interp, printable->fontVarName, fontName, 0);
+	fontInfo = (char *)Tcl_GetVar2(interp, tokenPtr->fontVarName, fontName,
+	       0);
 	if (fontInfo != NULL) {
-	    int numProps;
+	    int nProps;
 	    char **propArr = NULL;
 
-	    if (Tcl_SplitList(interp, fontInfo,
-		    &numProps, &propArr) == TCL_OK) {
+	    if (Tcl_SplitList(interp, fontInfo, &nProps, &propArr) == TCL_OK) {
 		int newSize;
 
 		fontName = propArr[0];
-		if ((numProps == 2) &&
+		if ((nProps == 2) &&
 		    (Tcl_GetInt(interp, propArr[1], &newSize) == TCL_OK)) {
-		    pointSize = (float)newSize;
+		    pointSize = (double)newSize;
 		}
 	    }
-	    Blt_PrintFormat(printable, "%g /%s SetFont\n", pointSize, fontName);
+	    Blt_FormatToPostScript(tokenPtr, 
+				   "%g /%s SetFont\n", 
+				   pointSize, fontName);
 	    if (propArr != (char **)NULL) {
-		free((char *)propArr);
+		Blt_Free(propArr);
 	    }
 	    return;
 	}
     }
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
 
     /*
      * Otherwise do a quick test to see if it's a PostScript font.
@@ -1074,101 +1212,134 @@ Blt_FontToPostScript(printable, font)
      * PostScript font.
      */
     family = ((TkFont *) fontPtr)->fa.family;
-    for (p = psFonts; *p != NULL; p++) {
-	if (strncasecmp(*p, family, strlen(*p)) == 0) {
+    for (i = 0; i < nFontNames; i++) {
+	if (strncasecmp(psFontMap[i].alias, family, strlen(psFontMap[i].alias))
+		 == 0) {
 	    Tcl_DString dString;
 
 	    Tcl_DStringInit(&dString);
-	    pointSize = (float)Tk_PostscriptFontName(font, &dString);
+	    pointSize = (double)Tk_PostscriptFontName(font, &dString);
 	    fontName = Tcl_DStringValue(&dString);
-	    Blt_PrintFormat(printable, "%g /%s SetFont\n", pointSize,
+	    Blt_FormatToPostScript(tokenPtr, "%g /%s SetFont\n", pointSize,
 		fontName);
 	    Tcl_DStringFree(&dString);
 	    return;
 	}
     }
 
-#endif /* TK_MAJOR_VERSION >= 8 */
+#endif /* TK_MAJOR_VERSION > 4 */
 
     /*
      * Can't find it. Try to use the current point size.
      */
-    family = NULL;
     fontName = NULL;
     pointSize = 12.0;
 
 #ifndef  WIN32
-#if (TK_MAJOR_VERSION >= 8)
+#if (TK_MAJOR_VERSION > 4)
     /* Can you believe what I have to go through to get an XFontStruct? */
-    fontPtr = XLoadQueryFont(Tk_Display(printable->tkwin), Tk_NameOfFont(font));
+    fontPtr = XLoadQueryFont(Tk_Display(tokenPtr->tkwin), Tk_NameOfFont(font));
 #endif
     if (fontPtr != NULL) {
 	unsigned long fontProp;
 
 	if (XGetFontProperty(fontPtr, XA_POINT_SIZE, &fontProp) != False) {
-	    pointSize = (float)fontProp / 10.0;
+	    pointSize = (double)fontProp / 10.0;
 	}
-	fontName = XFontStructToPostScript(printable->tkwin, fontPtr);
-#if (TK_MAJOR_VERSION >= 8)
-	XFreeFont(Tk_Display(printable->tkwin), fontPtr);
-#endif
+	fontName = XFontStructToPostScript(tokenPtr->tkwin, fontPtr);
+#if (TK_MAJOR_VERSION > 4)
+	XFreeFont(Tk_Display(tokenPtr->tkwin), fontPtr);
+#endif /* TK_MAJOR_VERSION > 4 */
     }
 #endif /* !WIN32 */
     if ((fontName == NULL) || (fontName[0] == '\0')) {
 	fontName = "Helvetica-Bold";	/* Defaulting to a known PS font */
     }
-    Blt_PrintFormat(printable, "%g /%s SetFont\n", pointSize, fontName);
+    Blt_FormatToPostScript(tokenPtr, "%g /%s SetFont\n", pointSize, fontName);
 }
 
 static void
-PrintCompoundText(printable, x, y, textPtr)
-    Printable printable;
+TextLayoutToPostScript(tokenPtr, x, y, textPtr)
+    struct PsTokenStruct *tokenPtr;
     int x, y;
-    CompoundText *textPtr;
+    TextLayout *textPtr;
 {
-    register char *src, *dest;
-    register int count;
-    TextSegment *segPtr;
-    register int i, j;
+    char *src, *dst, *end;
+    int count;			/* Counts the # of bytes written to
+				 * the intermediate scratch buffer. */
+    TextFragment *fragPtr;
+    int i;
+    unsigned char c;
+#if HAVE_UTF
+    Tcl_UniChar ch;
+#endif
+    int limit;
 
-    segPtr = textPtr->segArr;
-    for (i = 0; i < textPtr->numSegments; i++, segPtr++) {
-	if (segPtr->numChars < 1) {
+    limit = PSTOKEN_BUFSIZ - 4; /* High water mark for the scratch
+				   * buffer. */
+    fragPtr = textPtr->fragArr;
+    for (i = 0; i < textPtr->nFrags; i++, fragPtr++) {
+	if (fragPtr->count < 1) {
 	    continue;
 	}
-	Tcl_DStringAppend(printable->dStrPtr, "(", -1);
+	Blt_AppendToPostScript(tokenPtr, "(", (char *)NULL);
 	count = 0;
-	dest = printable->scratchArr;
-	src = segPtr->text;
-	for (j = 0; j < segPtr->numChars; j++) {
-	    if (count > BUFSIZ) {
-		/* Don't let the buffer overflow with a big text string */
-		*dest = '\0', dest = printable->scratchArr;
-		Tcl_DStringAppend(printable->dStrPtr, dest, -1);
+	dst = tokenPtr->scratchArr;
+	src = fragPtr->text;
+	end = fragPtr->text + fragPtr->count;
+	while (src < end) {
+	    if (count > limit) {
+		/* Don't let the scatch buffer overflow */
+		dst = tokenPtr->scratchArr;
+		dst[count] = '\0';
+		Blt_AppendToPostScript(tokenPtr, dst, (char *)NULL);
 		count = 0;
 	    }
+#if HAVE_UTF
 	    /*
-	     * If special PostScript characters characters "\", "(",
-	     * and ")" are contained in the text string, prepend
-	     * backslashes to them.
+	     * INTL: For now we just treat the characters as binary
+	     * data and display the lower byte.  Eventually this should
+	     * be revised to handle international postscript fonts.
 	     */
-	    if ((*src == '\\') || (*src == '(') || (*src == ')')) {
-		*dest++ = '\\';
+	    src += Tcl_UtfToUniChar(src, &ch);
+	    c = (unsigned char)(ch & 0xff);
+#else 
+	    c = *src++;
+#endif
+
+	    if ((c == '\\') || (c == '(') || (c == ')')) {
+		/*
+		 * If special PostScript characters characters "\", "(",
+		 * and ")" are contained in the text string, prepend
+		 * backslashes to them.
+		 */
+		*dst++ = '\\';
+		*dst++ = c;
+		count += 2;
+	    } else if ((c < ' ') || (c > '~')) {
+		/* 
+		 * Present non-printable characters in their octal
+		 * representation.
+		 */
+		sprintf(dst, "\\%03o", c);
+		dst += 4;
+		count += 4;
+	    } else {
+		*dst++ = c;
+		count++;
 	    }
-	    *dest++ = *src++;
-	    count++;
 	}
-	*dest = '\0';
-	Tcl_DStringAppend(printable->dStrPtr, printable->scratchArr, -1);
-	Blt_PrintFormat(printable, ") %d %d %d DrawAdjText\n",
-	    segPtr->width, x + segPtr->x, y + segPtr->y);
+	tokenPtr->scratchArr[count] = '\0';
+	Blt_AppendToPostScript(tokenPtr, tokenPtr->scratchArr, (char *)NULL);
+	Blt_FormatToPostScript(tokenPtr, ") %d %d %d DrawAdjText\n",
+	    fragPtr->width, x + fragPtr->x, y + fragPtr->y);
     }
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * Blt_PrintText --
+ * Blt_TextToPostScript --
  *
  *      Output PostScript commands to print a text string. The string
  *      may be rotated at any arbitrary angle, and placed according
@@ -1185,53 +1356,57 @@ PrintCompoundText(printable, x, y, textPtr)
  * -----------------------------------------------------------------
  */
 void
-Blt_PrintText(printable, string, attrPtr, x, y)
-    Printable printable;
+Blt_TextToPostScript(tokenPtr, string, tsPtr, x, y)
+    struct PsTokenStruct *tokenPtr;
     char *string;		/* String to convert to PostScript */
-    TextAttributes *attrPtr;	/* Text attribute information */
-    int x, y;			/* Window coordinates where to print text */
+    TextStyle *tsPtr;		/* Text attribute information */
+    double x, y;		/* Window coordinates where to print text */
 {
     double theta;
-    int bbWidth, bbHeight;
-    CompoundText *textPtr;
+    double rotWidth, rotHeight;
+    TextLayout *textPtr;
+    Point2D anchorPos;
 
-    if ((string == NULL) || (*string == '\0')) {	/* Empty string, do nothing */
+    if ((string == NULL) || (*string == '\0')) { /* Empty string, do nothing */
 	return;
     }
-    theta = FMOD(attrPtr->theta, (double)360.0);
-    textPtr = Blt_GetCompoundText(string, attrPtr);
-    Blt_GetBoundingBox(textPtr->width, textPtr->height, theta,
-	&bbWidth, &bbHeight, (XPoint *)NULL);
+    theta = FMOD(tsPtr->theta, (double)360.0);
+    textPtr = Blt_GetTextLayout(string, tsPtr);
+    Blt_GetBoundingBox(textPtr->width, textPtr->height, theta, &rotWidth, 
+		       &rotHeight, (Point2D *)NULL);
     /*
      * Find the center of the bounding box
      */
-    Blt_TranslateAnchor(x, y, bbWidth, bbHeight, attrPtr->anchor, &x, &y);
-    x += (bbWidth / 2);
-    y += (bbHeight / 2);
+    anchorPos.x = x, anchorPos.y = y;
+    anchorPos = Blt_TranslatePoint(&anchorPos, ROUND(rotWidth), 
+	ROUND(rotHeight), tsPtr->anchor);
+    anchorPos.x += (rotWidth * 0.5);
+    anchorPos.y += (rotHeight * 0.5);
 
     /* Initialize text (sets translation and rotation) */
-    Blt_PrintFormat(printable, "%d %d %g %d %d BeginText\n", textPtr->width,
-	textPtr->height, attrPtr->theta, x, y);
+    Blt_FormatToPostScript(tokenPtr, "%d %d %g %g %g BeginText\n", 
+	textPtr->width, textPtr->height, tsPtr->theta, anchorPos.x, 
+	anchorPos.y);
 
-    Blt_FontToPostScript(printable, attrPtr->font);
+    Blt_FontToPostScript(tokenPtr, tsPtr->font);
 
     /* All coordinates are now relative to what was set by BeginText */
-    if ((attrPtr->shadow.offset > 0) && (attrPtr->shadow.color != NULL)) {
-	Blt_ForegroundToPostScript(printable, attrPtr->shadow.color);
-	PrintCompoundText(printable, attrPtr->shadow.offset,
-	    attrPtr->shadow.offset, textPtr);
+    if ((tsPtr->shadow.offset > 0) && (tsPtr->shadow.color != NULL)) {
+	Blt_ForegroundToPostScript(tokenPtr, tsPtr->shadow.color);
+	TextLayoutToPostScript(tokenPtr, tsPtr->shadow.offset, 
+	       tsPtr->shadow.offset, textPtr);
     }
-    Blt_ForegroundToPostScript(printable, (attrPtr->state & STATE_ACTIVE)
-	? attrPtr->activeColor : attrPtr->color);
-    PrintCompoundText(printable, 0, 0, textPtr);
-    free((char *)textPtr);
-    Blt_PrintAppend(printable, "EndText\n", (char *)NULL);
+    Blt_ForegroundToPostScript(tokenPtr, (tsPtr->state & STATE_ACTIVE)
+	? tsPtr->activeColor : tsPtr->color);
+    TextLayoutToPostScript(tokenPtr, 0, 0, textPtr);
+    Blt_Free(textPtr);
+    Blt_AppendToPostScript(tokenPtr, "EndText\n", (char *)NULL);
 }
 
 /*
  * -----------------------------------------------------------------
  *
- * Blt_PrintLine --
+ * Blt_LineToPostScript --
  *
  *      Outputs PostScript commands to print a multi-segmented line.
  *      It assumes a procedure DashesProc was previously defined.
@@ -1240,59 +1415,76 @@ Blt_PrintText(printable, string, attrPtr, x, y)
  *      None.
  *
  * Side Effects:
- *      Line is printed.
+ *      Segmented line is printed.
  *
  * -----------------------------------------------------------------
  */
 void
-Blt_PrintLine(printable, pointPtr, numPoints)
-    Printable printable;
+Blt_LineToPostScript(tokenPtr, pointPtr, nPoints)
+    struct PsTokenStruct *tokenPtr;
     register XPoint *pointPtr;
-    int numPoints;
+    int nPoints;
 {
     register int i;
 
-    if (numPoints <= 0) {
+    if (nPoints <= 0) {
 	return;
     }
-    Blt_PrintFormat(printable, " newpath %d %d moveto\n", pointPtr->x,
-	pointPtr->y);
+    Blt_FormatToPostScript(tokenPtr, " newpath %d %d moveto\n", 
+			   pointPtr->x, pointPtr->y);
     pointPtr++;
-    for (i = 1; i < (numPoints - 1); i++, pointPtr++) {
-	Blt_PrintFormat(printable, " %d %d lineto\n", pointPtr->x,
-	    pointPtr->y);
+    for (i = 1; i < (nPoints - 1); i++, pointPtr++) {
+	Blt_FormatToPostScript(tokenPtr, " %d %d lineto\n", 
+			       pointPtr->x, pointPtr->y);
 	if ((i % PS_MAXPATH) == 0) {
-	    Blt_PrintFormat(printable,
-		"DashesProc stroke\n newpath  %d %d moveto\n", pointPtr->x,
-		pointPtr->y);
+	    Blt_FormatToPostScript(tokenPtr,
+		"DashesProc stroke\n newpath  %d %d moveto\n", 
+				   pointPtr->x, pointPtr->y);
 	}
     }
-    Blt_PrintFormat(printable, " %d %d lineto\n", pointPtr->x,
-	pointPtr->y);
-    Blt_PrintAppend(printable, "DashesProc stroke\n", (char *)NULL);
+    Blt_FormatToPostScript(tokenPtr, " %d %d lineto\n", 
+			   pointPtr->x, pointPtr->y);
+    Blt_AppendToPostScript(tokenPtr, "DashesProc stroke\n", (char *)NULL);
 }
 
 void
-Blt_PrintBitmap(printable, display, bitmap, scaleX, scaleY)
-    Printable printable;
+Blt_BitmapToPostScript(tokenPtr, display, bitmap, scaleX, scaleY)
+    struct PsTokenStruct *tokenPtr;
     Display *display;
     Pixmap bitmap;		/* Bitmap to be converted to PostScript */
     double scaleX, scaleY;
 {
     int width, height;
-    float scaledWidth, scaledHeight;
+    double scaledWidth, scaledHeight;
 
     Tk_SizeOfBitmap(display, bitmap, &width, &height);
-    scaledWidth = (float)(width * scaleX);
-    scaledHeight = (float)(height * scaleY);
-    Blt_PrintAppend(printable, "  gsave\n", (char *)NULL);
-    Blt_PrintFormat(printable, "    %g %g translate\n", scaledWidth * -0.5,
-	scaledHeight * 0.5);
-    Blt_PrintFormat(printable, "    %g %g scale\n", scaledWidth,
-	-scaledHeight);
-    Blt_PrintFormat(printable, "    %d %d true [%d 0 0 %d 0 %d] {", width,
-	height, width, -height, height);
-    Blt_BitmapToPostScript(printable, display, bitmap, width, height);
-    Blt_PrintAppend(printable, "    } imagemask\n  grestore\n",
+    scaledWidth = (double)width * scaleX;
+    scaledHeight = (double)height * scaleY;
+    Blt_AppendToPostScript(tokenPtr, "  gsave\n", (char *)NULL);
+    Blt_FormatToPostScript(tokenPtr, "    %g %g translate\n", 
+			   scaledWidth * -0.5, scaledHeight * 0.5);
+    Blt_FormatToPostScript(tokenPtr, "    %g %g scale\n", 
+			   scaledWidth, -scaledHeight);
+    Blt_FormatToPostScript(tokenPtr, "    %d %d true [%d 0 0 %d 0 %d] {", 
+			   width, height, width, -height, height);
+    Blt_BitmapDataToPostScript(tokenPtr, display, bitmap, width, height);
+    Blt_AppendToPostScript(tokenPtr, "    } imagemask\n  grestore\n",
 	(char *)NULL);
+}
+
+void
+Blt_2DSegmentsToPostScript(psToken, segPtr, nSegments)
+    PsToken psToken;
+    register Segment2D *segPtr;
+    int nSegments;
+{
+    register Segment2D *endPtr;
+
+    for (endPtr = segPtr + nSegments; segPtr < endPtr; segPtr++) {
+	Blt_FormatToPostScript(psToken, "%g %g moveto\n", 
+			       segPtr->p.x, segPtr->p.y);
+	Blt_FormatToPostScript(psToken, " %g %g lineto\n", 
+			       segPtr->q.x, segPtr->q.y);
+	Blt_AppendToPostScript(psToken, "DashesProc stroke\n", (char *)NULL);
+    }
 }

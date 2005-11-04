@@ -26,37 +26,27 @@
  */
 
 #include "bltGraph.h"
-#include <ctype.h>
 #include <X11/Xutil.h>
-#include <X11/Xatom.h>
 
-static int StringToColor _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *ColorToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
-
+static Tk_OptionParseProc StringToColor;
+static Tk_OptionPrintProc ColorToString;
+static Tk_OptionParseProc StringToPen;
+static Tk_OptionPrintProc PenToString;
 Tk_CustomOption bltColorOption =
 {
     StringToColor, ColorToString, (ClientData)0
 };
-
-static int StringToPen _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *PenToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtr));
-
-Tk_CustomOption bltLinePenOption =
+Tk_CustomOption bltPenOption =
 {
-    StringToPen, PenToString, (ClientData)TYPE_ELEM_LINE
+    StringToPen, PenToString, (ClientData)0
 };
-
 Tk_CustomOption bltBarPenOption =
 {
-    StringToPen, PenToString, (ClientData)TYPE_ELEM_BAR
+    StringToPen, PenToString, (ClientData)&bltBarElementUid
+};
+Tk_CustomOption bltLinePenOption =
+{
+    StringToPen, PenToString, (ClientData)&bltLineElementUid
 };
 
 /*
@@ -75,9 +65,9 @@ Tk_CustomOption bltBarPenOption =
 /*ARGSUSED*/
 static int
 StringToColor(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representing color */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of color field in record */
@@ -146,11 +136,11 @@ NameOfColor(colorPtr)
 /*ARGSUSED*/
 static char *
 ColorToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget information record */
     int offset;			/* Offset of symbol type in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     XColor *colorPtr = *(XColor **)(widgRec + offset);
 
@@ -172,22 +162,26 @@ ColorToString(clientData, tkwin, widgRec, offset, freeProcPtr)
 /*ARGSUSED*/
 static int
 StringToPen(clientData, interp, tkwin, string, widgRec, offset)
-    ClientData clientData;	/* not used */
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
-    Tk_Window tkwin;		/* not used */
+    Tk_Window tkwin;		/* Not used. */
     char *string;		/* String representing pen */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of pen field in record */
 {
-    ObjectType type = (ObjectType) clientData;
+    Blt_Uid classUid = *(Blt_Uid *)clientData; /* Element type. */
     Pen **penPtrPtr = (Pen **)(widgRec + offset);
     Pen *penPtr;
     Graph *graphPtr;
 
     penPtr = NULL;
-    graphPtr = Blt_FindGraph(tkwin);
+    graphPtr = Blt_GetGraphFromWindowData(tkwin);
+
+    if (classUid == NULL) {	
+	classUid = graphPtr->classUid;
+    }
     if ((string != NULL) && (string[0] != '\0')) {
-	if (Blt_GetPen(graphPtr, string, type, &penPtr) != TCL_OK) {
+	if (Blt_GetPen(graphPtr, string, classUid, &penPtr) != TCL_OK) {
 	    return TCL_ERROR;
 	}
     }
@@ -214,11 +208,11 @@ StringToPen(clientData, interp, tkwin, string, widgRec, offset)
 /*ARGSUSED*/
 static char *
 PenToString(clientData, tkwin, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* not used */
-    Tk_Window tkwin;		/* not used */
+    ClientData clientData;	/* Not used. */
+    Tk_Window tkwin;		/* Not used. */
     char *widgRec;		/* Widget information record */
     int offset;			/* Offset of pen in record */
-    Tcl_FreeProc **freeProcPtr;	/* not used */
+    Tcl_FreeProc **freeProcPtr;	/* Not used. */
 {
     Pen *penPtr = *(Pen **)(widgRec + offset);
 
@@ -242,17 +236,17 @@ NameToPen(graphPtr, name)
     Graph *graphPtr;
     char *name;
 {
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     Pen *penPtr;
 
-    hPtr = Tcl_FindHashEntry(&(graphPtr->penTable), name);
+    hPtr = Blt_FindHashEntry(&(graphPtr->penTable), name);
     if (hPtr == NULL) {
       notFound:
 	Tcl_AppendResult(graphPtr->interp, "can't find pen \"", name,
 	    "\" in \"", Tk_PathName(graphPtr->tkwin), "\"", (char *)NULL);
 	return NULL;
     }
-    penPtr = (Pen *)Tcl_GetHashValue(hPtr);
+    penPtr = (Pen *)Blt_GetHashValue(hPtr);
     if (penPtr->flags & PEN_DELETE_PENDING) {
 	goto notFound;
     }
@@ -267,12 +261,12 @@ DestroyPen(graphPtr, penPtr)
     Tk_FreeOptions(penPtr->configSpecs, (char *)penPtr, graphPtr->display, 0);
     (*penPtr->destroyProc) (graphPtr, penPtr);
     if ((penPtr->name != NULL) && (penPtr->name[0] != '\0')) {
-	free(penPtr->name);
+	Blt_Free(penPtr->name);
     }
     if (penPtr->hashPtr != NULL) {
-	Tcl_DeleteHashEntry(penPtr->hashPtr);
+	Blt_DeleteHashEntry(&(graphPtr->penTable), penPtr->hashPtr);
     }
-    free((char *)penPtr);
+    Blt_Free(penPtr);
 }
 
 void
@@ -287,64 +281,77 @@ Blt_FreePen(graphPtr, penPtr)
 }
 
 Pen *
-Blt_CreatePen(graphPtr, penName, type, numOpts, options)
+Blt_CreatePen(graphPtr, penName, classUid, nOpts, options)
     Graph *graphPtr;
     char *penName;
-    ObjectType type;
-    int numOpts;
+    Blt_Uid classUid;
+    int nOpts;
     char **options;
 {
+    
     Pen *penPtr;
-    Tcl_HashEntry *hPtr;
+    Blt_HashEntry *hPtr;
     unsigned int length, configFlags;
     int isNew;
     register int i;
 
     /*
-     * Prescan the option list for a "-type" entry.  This will indicate
+     * Scan the option list for a "-type" entry.  This will indicate
      * what type of pen we are creating. Otherwise we'll default to the
-     * suggested type.
+     * suggested type.  Last -type option wins.
      */
-    for (i = 0; i < numOpts; i += 2) {
+    for (i = 0; i < nOpts; i += 2) {
 	length = strlen(options[i]);
-	if ((length > 1) && (strncmp(options[i], "-type", length) == 0)) {
-	    type = Blt_GetElementType(options[i + 1]);
-	    if (type == TYPE_UNKNOWN) {
+	if ((length > 2) && (strncmp(options[i], "-type", length) == 0)) {
+	    char *arg;
+
+	    arg = options[i + 1];
+	    if (strcmp(arg, "bar") == 0) {
+		classUid = bltBarElementUid;
+	    } else if (strcmp(arg, "line") != 0) {
+		classUid = bltLineElementUid;
+	    } else if (strcmp(arg, "strip") != 0) {
+		classUid = bltLineElementUid;
+	    } else {
 		Tcl_AppendResult(graphPtr->interp, "unknown pen type \"",
-		    options[i + 1], "\" specified", (char *)NULL);
+		    arg, "\" specified", (char *)NULL);
 		return NULL;
 	    }
 	}
     }
-    hPtr = Tcl_CreateHashEntry(&(graphPtr->penTable), penName, &isNew);
+    if (classUid == bltStripElementUid) {
+	classUid = bltLineElementUid;
+    }
+    hPtr = Blt_CreateHashEntry(&(graphPtr->penTable), penName, &isNew);
     if (!isNew) {
-	penPtr = (Pen *)Tcl_GetHashValue(hPtr);
+	penPtr = (Pen *)Blt_GetHashValue(hPtr);
 	if (!(penPtr->flags & PEN_DELETE_PENDING)) {
 	    Tcl_AppendResult(graphPtr->interp, "pen \"", penName,
 		"\" already exists in \"", Tk_PathName(graphPtr->tkwin), "\"",
 		(char *)NULL);
 	    return NULL;
 	}
-	if (penPtr->type != type) {
+	if (penPtr->classUid != classUid) {
 	    Tcl_AppendResult(graphPtr->interp, "pen \"", penName,
-		"\" in use: can't change pen type", (char *)NULL);
+		"\" in-use: can't change pen type from \"", penPtr->classUid, 
+		"\" to \"", classUid, "\"", (char *)NULL);
 	    return NULL;
 	}
 	penPtr->flags &= ~PEN_DELETE_PENDING;
     } else {
-	if (type == TYPE_ELEM_BAR) {
+	if (classUid == bltBarElementUid) {
 	    penPtr = Blt_BarPen(penName);
 	} else {
 	    penPtr = Blt_LinePen(penName);
 	}
-	penPtr->type = type;
+	penPtr->classUid = classUid;
 	penPtr->hashPtr = hPtr;
-	Tcl_SetHashValue(hPtr, (ClientData)penPtr);
+	Blt_SetHashValue(hPtr, penPtr);
     }
 
     configFlags = (penPtr->flags & (ACTIVE_PEN | NORMAL_PEN));
     if (Blt_ConfigureWidgetComponent(graphPtr->interp, graphPtr->tkwin,
-	    penPtr->name, "Pen", penPtr->configSpecs, numOpts, options,
+	    penPtr->name, "Pen", penPtr->configSpecs, nOpts, options,
 	    (char *)penPtr, configFlags) != TCL_OK) {
 	if (isNew) {
 	    DestroyPen(graphPtr, penPtr);
@@ -356,10 +363,10 @@ Blt_CreatePen(graphPtr, penName, type, numOpts, options)
 }
 
 int
-Blt_GetPen(graphPtr, name, type, penPtrPtr)
+Blt_GetPen(graphPtr, name, classUid, penPtrPtr)
     Graph *graphPtr;
     char *name;
-    ObjectType type;
+    Blt_Uid classUid;
     Pen **penPtrPtr;
 {
     Pen *penPtr;
@@ -368,11 +375,13 @@ Blt_GetPen(graphPtr, name, type, penPtrPtr)
     if (penPtr == NULL) {
 	return TCL_ERROR;
     }
-    if (penPtr->type != type) {
-	Tcl_AppendResult(graphPtr->interp, "pen \"", name, "\" is of the type \"",
-	    Blt_NameOfElementType(penPtr->type), "\"", (char *)NULL);
-	Tcl_AppendResult(graphPtr->interp, "wanted type \"",
-	    Blt_NameOfElementType(type), "\"", (char *)NULL);
+    if (classUid == bltStripElementUid) {
+	classUid = bltLineElementUid;
+    }
+    if (penPtr->classUid != classUid) {
+	Tcl_AppendResult(graphPtr->interp, "pen \"", name, 
+		"\" is the wrong type (is \"", penPtr->classUid, "\"", 
+		", wanted \"", classUid, "\")", (char *)NULL);
 	return TCL_ERROR;
     }
     penPtr->refCount++;
@@ -399,17 +408,17 @@ void
 Blt_DestroyPens(graphPtr)
     Graph *graphPtr;
 {
-    Tcl_HashEntry *hPtr;
-    Tcl_HashSearch cursor;
+    Blt_HashEntry *hPtr;
+    Blt_HashSearch cursor;
     Pen *penPtr;
 
-    for (hPtr = Tcl_FirstHashEntry(&(graphPtr->penTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	penPtr = (Pen *)Tcl_GetHashValue(hPtr);
+    for (hPtr = Blt_FirstHashEntry(&(graphPtr->penTable), &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	penPtr = (Pen *)Blt_GetHashValue(hPtr);
 	penPtr->hashPtr = NULL;
 	DestroyPen(graphPtr, penPtr);
     }
-    Tcl_DeleteHashTable(&(graphPtr->penTable));
+    Blt_DeleteHashTable(&(graphPtr->penTable));
 }
 
 /*
@@ -430,7 +439,7 @@ static int
 CgetOp(interp, graphPtr, argc, argv)
     Tcl_Interp *interp;
     Graph *graphPtr;
-    int argc;			/* Not used */
+    int argc;			/* Not used. */
     char *argv[];
 {
     Pen *penPtr;
@@ -468,9 +477,9 @@ ConfigureOp(interp, graphPtr, argc, argv)
     int argc;
     char *argv[];
 {
-    unsigned int configFlags;
+    int flags;
     Pen *penPtr;
-    int numNames, numOpts;
+    int nNames, nOpts;
     int redraw;
     char **options;
     register int i;
@@ -486,24 +495,23 @@ ConfigureOp(interp, graphPtr, argc, argv)
 	    return TCL_ERROR;
 	}
     }
-    numNames = i;		/* Number of pen names specified */
-    numOpts = argc - i;		/* Number of options specified */
+    nNames = i;			/* Number of pen names specified */
+    nOpts = argc - i;		/* Number of options specified */
     options = argv + i;		/* Start of options in argv  */
 
     redraw = 0;
-    for (i = 0; i < numNames; i++) {
+    for (i = 0; i < nNames; i++) {
 	penPtr = NameToPen(graphPtr, argv[i]);
-	configFlags = TK_CONFIG_ARGV_ONLY |
-	    (penPtr->flags & (ACTIVE_PEN | NORMAL_PEN));
-	if (numOpts == 0) {
-	    return (Tk_ConfigureInfo(interp, graphPtr->tkwin, penPtr->configSpecs,
-		    (char *)penPtr, (char *)NULL, configFlags));
-	} else if (numOpts == 1) {
-	    return (Tk_ConfigureInfo(interp, graphPtr->tkwin, penPtr->configSpecs,
-		    (char *)penPtr, options[0], configFlags));
+	flags = TK_CONFIG_ARGV_ONLY | (penPtr->flags & (ACTIVE_PEN|NORMAL_PEN));
+	if (nOpts == 0) {
+	    return Tk_ConfigureInfo(interp, graphPtr->tkwin, 
+		    penPtr->configSpecs, (char *)penPtr, (char *)NULL, flags);
+	} else if (nOpts == 1) {
+	    return Tk_ConfigureInfo(interp, graphPtr->tkwin, 
+		    penPtr->configSpecs, (char *)penPtr, options[0], flags);
 	}
 	if (Tk_ConfigureWidget(interp, graphPtr->tkwin, penPtr->configSpecs,
-		numOpts, options, (char *)penPtr, configFlags) != TCL_OK) {
+		nOpts, options, (char *)penPtr, flags) != TCL_OK) {
 	    break;
 	}
 	(*penPtr->configProc) (graphPtr, penPtr);
@@ -512,10 +520,10 @@ ConfigureOp(interp, graphPtr, argc, argv)
 	}
     }
     if (redraw) {
-	graphPtr->flags |= REDRAW_BACKING_STORE | REDRAW_MARGINS;
+	graphPtr->flags |= REDRAW_BACKING_STORE | DRAW_MARGINS;
 	Blt_EventuallyRedrawGraph(graphPtr);
     }
-    if (i < numNames) {
+    if (i < nNames) {
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -542,11 +550,12 @@ CreateOp(interp, graphPtr, argc, argv)
 {
     Pen *penPtr;
 
-    penPtr = Blt_CreatePen(graphPtr, argv[3], graphPtr->type, argc - 4, argv + 4);
+    penPtr = Blt_CreatePen(graphPtr, argv[3], graphPtr->classUid, argc - 4, 
+	argv + 4);
     if (penPtr == NULL) {
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp, penPtr->name, TCL_STATIC);
+    Tcl_SetResult(interp, penPtr->name, TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -613,14 +622,14 @@ NamesOp(interp, graphPtr, argc, argv)
     int argc;
     char **argv;
 {
-    Tcl_HashSearch cursor;
+    Blt_HashSearch cursor;
     Pen *penPtr;
     register int i;
-    register Tcl_HashEntry *hPtr;
+    register Blt_HashEntry *hPtr;
 
-    for (hPtr = Tcl_FirstHashEntry(&(graphPtr->penTable), &cursor);
-	hPtr != NULL; hPtr = Tcl_NextHashEntry(&cursor)) {
-	penPtr = (Pen *)Tcl_GetHashValue(hPtr);
+    for (hPtr = Blt_FirstHashEntry(&(graphPtr->penTable), &cursor);
+	hPtr != NULL; hPtr = Blt_NextHashEntry(&cursor)) {
+	penPtr = (Pen *)Blt_GetHashValue(hPtr);
 	if (penPtr->flags & PEN_DELETE_PENDING) {
 	    continue;
 	}
@@ -664,21 +673,21 @@ TypeOp(interp, graphPtr, argc, argv)
     if (penPtr == NULL) {
 	return TCL_ERROR;
     }
-    Tcl_SetResult(interp, Blt_NameOfElementType(penPtr->type), TCL_STATIC);
+    Tcl_SetResult(interp, penPtr->classUid, TCL_STATIC);
     return TCL_OK;
 }
 
 static Blt_OpSpec penOps[] =
 {
-    {"cget", 2, (Blt_Operation)CgetOp, 5, 5, "penName option",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 4, 0,
+    {"cget", 2, (Blt_Op)CgetOp, 5, 5, "penName option",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 4, 0,
 	"penName ?penName?... ?option value?...",},
-    {"create", 2, (Blt_Operation)CreateOp, 4, 0, "penName ?option value?...",},
-    {"delete", 2, (Blt_Operation)DeleteOp, 3, 0, "?penName?...",},
-    {"names", 1, (Blt_Operation)NamesOp, 3, 0, "?pattern?...",},
-    {"type", 1, (Blt_Operation)TypeOp, 4, 4, "penName",},
+    {"create", 2, (Blt_Op)CreateOp, 4, 0, "penName ?option value?...",},
+    {"delete", 2, (Blt_Op)DeleteOp, 3, 0, "?penName?...",},
+    {"names", 1, (Blt_Op)NamesOp, 3, 0, "?pattern?...",},
+    {"type", 1, (Blt_Op)TypeOp, 4, 4, "penName",},
 };
-static int numPenOps = sizeof(penOps) / sizeof(Blt_OpSpec);
+static int nPenOps = sizeof(penOps) / sizeof(Blt_OpSpec);
 
 int
 Blt_PenOp(graphPtr, interp, argc, argv)
@@ -687,12 +696,11 @@ Blt_PenOp(graphPtr, interp, argc, argv)
     int argc;
     char **argv;
 {
-    Blt_Operation proc;
+    Blt_Op proc;
 
-    proc = Blt_GetOperation(interp, numPenOps, penOps, BLT_OPER_ARG2,
-	argc, argv);
+    proc = Blt_GetOp(interp, nPenOps, penOps, BLT_OP_ARG2, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
-    return ((*proc) (interp, graphPtr, argc, argv));
+    return (*proc) (interp, graphPtr, argc, argv);
 }

@@ -1,33 +1,28 @@
 
-[This is a pre-release version of BLT.  It's basically the latest
-
-snapshot of BLT, as it moves towards a full release.  What this means
-is that the documentation and demos still need work.  Let me know
-about any configuration/compiler/installation goofs so I make sure
-they're fixed for the next release.]
-
 This is version 2.4 of the BLT library.  It's an extension to the
 Tcl/Tk toolkit.  You simply compile and link with the Tcl/Tk
 libraries. It does not require the Tcl or Tk source files.
 
 BLT is available from 
 
-    ftp.tcltk.com 
+    www.sourceforge.net/projects/blt/files
 
-in the "pub/blt" directory. The URL is 
-
-    ftp://ftp.tcltk.com/pub/blt/BLT2.4.tar.gz
-
-This release has been compiled and tested with versions:
+This release has been built and tested with the following Tcl/Tk
+versions:
 
 	Tcl 7.5 / Tk 4.1
 	Tcl 7.6 / Tk 4.2
 	Tcl/Tk 8.0
-	Tcl/Tk 8.1a2
+	Tcl/Tk 8.1
+	Tcl/Tk 8.2
+	Tcl/Tk 8.3 
+        Tcl/Tk 8.4 thru 8.4.0
+
+Avoid alpha and beta versions of Tcl/Tk.  They probably won't work.
 
 What is BLT? 
 
-  BLT is an extension to Tk.  It adds plotting widgets (X-Y graph, 
+  BLT is an extension to Tcl/Tk.  It adds plotting widgets (X-Y graph, 
   barchart, stripchart), a powerful geometry manager, a new canvas 
   item, and several new commands to Tk.  
 
@@ -38,10 +33,12 @@ What is BLT?
 		both easy to use and customize.  All the widgets work with
 		BLT vector data objects, which makes it easy to manage data.
  
-  Hierarchical list box:
+  Tree viewer
 
-    hierbox 	Displays a general ordered tree which may be built 
+    treeview 	Displays a general ordered tree which may be built 
 		on-the-fly or all at once.
+
+    tree 	Tree data object.  
 
   Tab set:
 
@@ -133,179 +130,35 @@ What is BLT?
 		can be embedded and used to form hyper-links.  Other 
 		options allow for selections and text searches.
 
-What's new in 2.4?
-
- 1. "eps" canvas item.  
-
-    An encapsulated PostScript canvas item lets you embed an EPS file into 
-    the canvas.  The "eps" item displays either a EPS preview image found 
-    in the file, or a Tk image that you provide.  
-
- 2. "hierbox" widget.
-
-    Hierarchical listbox widget. Displays a general ordered tree which 
-    may be built on-the-fly or all at once.
-
- 3. "tabset" widget.
-
-    Can be used either as a tab notebook or simple tabset.  Tabs can 
-    be arranged in a variety of ways: multi-tiered, scrolled, and 
-    attached to any of the four sides.  Tab labels can contain both 
-    images and text (text can be arbitrarily rotated). Notebook pages 
-    can be torn-off into separate windows and replaced later. 
-    
- 4. Changes to vectors.
-
-    New features:
-	
-     o	Vector expressions.  The vector now has an "expr" operation
-	that lets you perform math (including math library
-	functions) on vectors.  There are several new functions
-	(such as "max", "min", "mean" "median", "q1", "q3", "prod",
-	"sum", "adev", "sdev", "skew", ...)
-
-		vector expr { sin(x)^2 + cos(x)^2 }
-		y expr { log(x) * $value }
-
-     o	New syntax to create and destroy vectors:
-
-		vector create x 
-		vector destroy x
- 
-	The old syntax for creating vectors still works.
-
-		vector x
-
-     o	Vectors are *not* automatically deleted when their Tcl
-	variable is unset anymore. This means that you can
-	temporarily map vectors to variables and use them as you
-	would an ordinary Tcl array (kind of like "upvar").
-
-	    proc AddValue { vecName value } {
-		 $vecName variable x
-	
-		 set x(++end) $value
-	    }	
-
-	There's an "-watchunset" flag to restore the old
-	behavior if you need it. 
-
-	    vector create x -watchunset yes
-
-     o  Vectors still automatically create Tcl variables by
-	default.  I'd like to change this, but it silently
-	breaks lots of code, so it will stay.
-
-    Bug fixes:
-
-     o  Vector reallocation failed when shrinking the vector.
-
-     o  Vector "destroy" callback made after vector was
-	already freed.
-
- 5. Changes to Graph, Barchart, Stripchart widgets.
-
-    New features:
-
-     o 	Drop shadows for text (titles, markers, etc). Drop
-	shadows improve contrast when displaying text over a
-	background with similar color intensities.
-   
-     o  Postscript "-preview" option to generate a EPS
-	PostScript preview image that can be read and
-	displayed by the EPS canvas item.
-
-     o  New "-topvariable", "-bottomvariable",
-	"-leftvariable", and "-rightvariable" options.  They
-	specify variables to contain the current margin
-	sizes.  These variables are updated whenever the
-	graph is redrawn.
-
-     o  New "-aspect" option. Let's you maintain a particular aspect
-	ratio for the the graph.
-
-     o  Image markers can now be stretched and zoomed like
-        bitmap markers.
-
-     o  Bind operation for legend entries, markers, and elements.
-
-	Much thanks to Julian Loaring <bigj@bigj.demon.co.uk> 
-	for the suggestions.
-
-     o  New "-xor" option for line markers, lets you draw the line
-	by rubberbanded by XOR-ing without requiring the graph to
-	be redrawn.  This can be used, for example, to select regions
-	like in zooming.  
-
-	Thanks to Johannes Zellner (joze@krisal.physik.uni-karlsruhe.de) 
-	for the suggestion.
-
-    Bug fixes:
-
-     o	Closest line (point) broken when using pens styles.
-
-     o	Marker elastic coordinates were wrong.
-
-     o	PostScript bounding box included the border of the page.
-
-     o	Bad PostScript generated for barchart symbols with stipples.
-
-     o	Wrong dimensions computed with postscript " -maxpect" option.
-
-     o  Text markers fixed.
-
-	Thanks to De Clarke for the bug report and fix.
-
-
-     o  Renamed axis configuration from "-range" to "-autorange" to
-	match the documentation.  
-
-	Thanks to Brian Smith for the correction.
-
-     o  Fixed polygon marker pick routine.
-
-     o  Fixed active tab labels overlapping the selected tab.
-
-
-What's incompatible with releases prior to BLT 2.4?
-
- 1. Vector names must start with a letter and contain letters, digits,
-    or underscores.  
-
-    Namespace Issues:	Vector names are still global. If Tcl provides
-			an API, vectors may in the future be created on
-			a per-namespace basis.  Right now, there's no
-			mechanism for detecting when a namespace has been
-			destroyed. Which is why you can't currently
-			prefix a vector name with a namespace qualifier.
-
-			[Ok, there is... as pointed out to me by Michael
-			McLennan.  But it's not pretty.  So maybe soon
-		        there will be vectors on a per namespace basis.]
-	
- 2. The "-mapped" options throughout the graph have been replaced
-    by the "-hide" option.  The many usages of the word "map" was 
-    getting confusing.  
-
-	# No longer works.
-	.graph legend configure -mapped no
-
-	# Instead use this.
-	.graph legend configure -hide yes    
- 
    
 How to compile and test BLT?
 
   See the file "INSTALL" for instructions.
 
-When will the so-called "official" BLT work with Windows?  
 
-  It's on my ever-sliding schedule. Fortunately, much of the work (if not
-  all) has already been done by Gordon Chaffee and Robin Becker. Many thanks
-  to the both of them for their fantastic efforts.  
+Does BLT work under Windows?
 
-  My goal is to get "busy" and "bgexec" (at least for NT) working too.
-   
+  Yes.  Windows 95/98/ME/NT/2000/XP.  I've compiled it with both
+  MS VC++ 5.0/6.0p4 and EGCS 1.1.1.  Self-installing pre-compiled versions 
+  are available.
+
+What are the differences between the Windows and Unix releases?
+
+  All commands work: graphs, bgexec, busy, drag&drop etc. except
+  the "container", and "cutbuffer" widgets. 
+
+  The "drag&drop" command still needs to use "send" to transfer
+  information between Tk applications.  You can use 
+
+	./demos/scripts/send.tcl 
+
+  to imitate "send" using DDE.  Just source the script and execute
+	
+   	SendInit	
+	SendVerify
+
+  to set up the new send command.
+
 When will...?
 
   In general, I can't answer the "When will" questions, mostly out of 
@@ -315,5 +168,16 @@ When will...?
 What does BLT stand for?
 
   Whatever you want it to.
+
+Where to send bugs reports, suggestions, etc. ?
+
+	gah@siliconmetrics.com 
+
+	     -and- 
+
+	ghowlett@grandecom.net
+
+  (best to send to both addresses)  Make sure you include BLT 
+  and the version number in the subject line.
 
 --gah

@@ -1,3 +1,4 @@
+
 /*
  * bltContainer.c --
  *
@@ -29,39 +30,70 @@
 #include "bltInt.h"
 
 #ifndef NO_CONTAINER
-
-#include "bltList.h"
-#include <X11/Xutil.h>
-#include <X11/Xatom.h>
+#include "bltChain.h"
 #ifndef WIN32
 #include <X11/Xproto.h>
+#include <X11/Xutil.h>
 #endif
-#include <ctype.h>
+
+#define XDEBUG
+
+#define SEARCH_TRIES	100	/* Maximum number of attempts to check for
+				 * a given window before failing. */
+#define SEARCH_INTERVAL 20	/* Number milliseconds to wait after each 
+				 * attempt to find a window. */
+
+#define SEARCH_TKWIN	(1<<0)	/* Search via Tk window pathname. */
+#define SEARCH_XID	(1<<1)	/* Search via an XID 0x0000000. */
+#define SEARCH_CMD	(1<<2)	/* Search via a command-line arguments. */
+#define SEARCH_NAME	(1<<3)	/* Search via the application name. */
+#define SEARCH_ALL	(SEARCH_TKWIN | SEARCH_XID | SEARCH_CMD | SEARCH_NAME)
 
 #define CONTAINER_REDRAW		(1<<1)
 #define CONTAINER_MAPPED		(1<<2)
 #define CONTAINER_FOCUS			(1<<4)
+#define CONTAINER_INIT			(1<<5)
+#define CONTAINER_MOVE			(1<<7)
 
-#define DEF_CONTAINER_BG_MONO		STD_MONO_NORMAL_BG
-#define DEF_CONTAINER_BG_COLOR		STD_COLOR_NORMAL_BG
-#define DEF_CONTAINER_BORDER_WIDTH	STD_BORDERWIDTH
+#define DEF_CONTAINER_BG_MONO		STD_NORMAL_BG_MONO
+#define DEF_CONTAINER_BACKGROUND		STD_NORMAL_BACKGROUND
+#define DEF_CONTAINER_BORDERWIDTH	STD_BORDERWIDTH
 #define DEF_CONTAINER_COMMAND		(char *)NULL
 #define DEF_CONTAINER_CURSOR		(char *)NULL
 #define DEF_CONTAINER_HEIGHT		"0"
-#define DEF_CONTAINER_HIGHLIGHT_BG_COLOR	STD_COLOR_NORMAL_BG
-#define DEF_CONTAINER_HIGHLIGHT_BG_MONO	STD_MONO_NORMAL_BG
-#define DEF_CONTAINER_HIGHLIGHT_COLOR	RGB_COLOR_BLACK
+#define DEF_CONTAINER_HIGHLIGHT_BACKGROUND STD_NORMAL_BACKGROUND
+#define DEF_CONTAINER_HIGHLIGHT_BG_MONO	STD_NORMAL_BG_MONO
+#define DEF_CONTAINER_HIGHLIGHT_COLOR	RGB_BLACK
 #define DEF_CONTAINER_HIGHLIGHT_WIDTH	"2"
 #define DEF_CONTAINER_RELIEF		"sunken"
 #define DEF_CONTAINER_TAKE_FOCUS	"0"
+#define DEF_CONTAINER_TIMEOUT		"20"
 #define DEF_CONTAINER_WIDTH		"0"
 #define DEF_CONTAINER_WINDOW		(char *)NULL
 
-#if (TK_MAJOR_VERSION < 8)
+#if (TK_MAJOR_VERSION == 4)
 #define TK_REPARENTED			0x2000
 #endif
 
-typedef struct Container {
+typedef struct SearchInfoStruct SearchInfo;
+typedef void (SearchProc) _ANSI_ARGS_((Display *display, Window window, 
+       SearchInfo *searchPtr));
+
+struct SearchInfoStruct {
+    SearchProc *proc;
+    char *pattern;		/* Search pattern. */
+
+    Window window;		/* XID of last window that matches criteria. */
+    int nMatches;		/* Number of windows that match the pattern. */
+    int saveNames;		/* Indicates to save the names of the
+				 * window XIDs that match the search
+				 * criteria. */
+    Tcl_DString dString;	/* Will contain the strings of the
+				 * window XIDs matching the search
+				 * criteria. */
+};
+
+typedef struct {
     Tk_Window tkwin;		/* Window that embodies the widget.
                                  * NULL means that the window has been
                                  * destroyed but the data structures
@@ -78,26 +110,33 @@ typedef struct Container {
 
     unsigned int flags;		/* For bit-field definitions, see above. */
 
-    int inset;			/* Total width of borders; traversal
-				 * highlight and 3-D border. Indicates the
-				 * offset from outside edges to leave room
-				 * for borders. */
+    int inset;			/* Total width of borders; focus
+				 * highlight and 3-D border. Indicates
+				 * the offset from outside edges to
+				 * leave room for borders. */
 
     Tk_Cursor cursor;		/* X Cursor */
 
-    Tk_3DBorder border;		/* 3D border surrounding the embedded
+    Tk_3DBorder border;		/* 3D border surrounding the adopted
 				 * window. */
     int borderWidth;		/* Width of 3D border. */
     int relief;			/* 3D border relief. */
 
+    Tk_Window tkToplevel;	/* Toplevel (wrapper) window of
+				 * container.  It's used to track the
+				 * location of the container. If it
+				 * moves we need to notify the
+				 * embedded application. */
     /*
      * Focus highlight ring
      */
-    int highlightWidth;		/* Width in pixels of highlight to draw
-				 * around widget when it has the focus.
-				 * <= 0 means don't draw a highlight. */
-    XColor *highlightBgColor;	/* Color for drawing traversal highlight
-				 * area when highlight is off. */
+    int highlightWidth;		/* Width in pixels of highlight to
+				 * draw around widget when it has the
+				 * focus.  <= 0 means don't draw a
+				 * highlight. */
+    XColor *highlightBgColor;	/* Color for drawing traversal
+				 * highlight area when highlight is
+				 * off. */
     XColor *highlightColor;	/* Color for drawing traversal highlight. */
 
     GC highlightGC;		/* GC for focus highlight. */
@@ -110,26 +149,47 @@ typedef struct Container {
     int reqWidth, reqHeight;	/* Requested dimensions of the container
 				 * window. */
 
-    Window windowId;		/* X window Id of embedded window contained
-				 * by the widget.  If None, no window is
-				 * embedded. */
-    XSizeHints hints;
-    int x, y, width, height;
+    Window adopted;		/* X window Id or Win32 handle of adopted 
+				 * window contained by the widget.  If None, 
+				 * no window has been reparented. */
+    Tk_Window tkAdopted;	/* Non-NULL if this is a Tk window that's 
+				 * been adopted. */
+    int adoptedX, adoptedY;	/* Current position of the adopted window. */
+    int adoptedWidth;		/* Current width of the adopted window. */
+    int adoptedHeight;		/* Current height of the adopted window. */
+
+    int origX, origY;
+    int origWidth, origHeight;	/* Dimensions of the window when it
+				 * was adopted.  When the window is
+				 * released it's returned to it's
+				 * original dimensions. */
+
+    int timeout;
 } Container;
 
-static int StringToXId _ANSI_ARGS_((ClientData clientData,
-	Tcl_Interp *interp, Tk_Window tkwin, char *string, char *widgRec,
-	int offset));
-static char *XIdToString _ANSI_ARGS_((ClientData clientData,
-	Tk_Window tkwin, char *widgRec, int offset,
-	Tcl_FreeProc **freeProcPtrPtr));
 
-static Tk_CustomOption xIdOption =
+static Tk_OptionParseProc StringToXID;
+static Tk_OptionPrintProc XIDToString;
+
+static Tk_CustomOption XIDOption =
 {
-    StringToXId, XIdToString, (ClientData)0,
+    StringToXID, XIDToString, (ClientData)(SEARCH_TKWIN | SEARCH_XID),
 };
 
-extern Tk_CustomOption bltLengthOption;
+#ifndef WIN32
+static Tk_CustomOption XIDNameOption =
+{
+    StringToXID, XIDToString, (ClientData)SEARCH_NAME,
+};
+
+static Tk_CustomOption XIDCmdOption =
+{
+    StringToXID, XIDToString, (ClientData)SEARCH_CMD,
+};
+#endif
+
+extern Tk_CustomOption bltDistanceOption;
+extern Tk_CustomOption bltPositiveCountOption;
 
 static Tk_ConfigSpec configSpecs[] =
 {
@@ -137,64 +197,172 @@ static Tk_ConfigSpec configSpecs[] =
 	DEF_CONTAINER_BG_MONO, Tk_Offset(Container, border),
 	TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_BORDER, "-background", "background", "Background",
-	DEF_CONTAINER_BG_COLOR, Tk_Offset(Container, border),
+	DEF_CONTAINER_BACKGROUND, Tk_Offset(Container, border),
 	TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_SYNONYM, "-bd", "borderWidth", (char *)NULL, (char *)NULL, 0, 0},
     {TK_CONFIG_SYNONYM, "-bg", "background", (char *)NULL, (char *)NULL, 0, 0},
+    {TK_CONFIG_CUSTOM, "-borderwidth", "borderWidth", "BorderWidth",
+	DEF_CONTAINER_BORDERWIDTH, Tk_Offset(Container, borderWidth),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
+#ifndef WIN32
+    {TK_CONFIG_CUSTOM, "-command", "command", "Command",
+	DEF_CONTAINER_WINDOW, Tk_Offset(Container, adopted),
+	TK_CONFIG_DONT_SET_DEFAULT, &XIDCmdOption},
+#endif
     {TK_CONFIG_ACTIVE_CURSOR, "-cursor", "cursor", "Cursor",
 	DEF_CONTAINER_CURSOR, Tk_Offset(Container, cursor), TK_CONFIG_NULL_OK},
-    {TK_CONFIG_CUSTOM, "-borderwidth", "borderWidth", "BorderWidth",
-	DEF_CONTAINER_BORDER_WIDTH, Tk_Offset(Container, borderWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
     {TK_CONFIG_CUSTOM, "-height", "height", "Height",
 	DEF_CONTAINER_HEIGHT, Tk_Offset(Container, reqHeight),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_COLOR, "-highlightbackground", "highlightBackground",
-	"HighlightBackground",
-	DEF_CONTAINER_HIGHLIGHT_BG_COLOR, Tk_Offset(Container, highlightBgColor),
-	TK_CONFIG_COLOR_ONLY},
+	"HighlightBackground", DEF_CONTAINER_HIGHLIGHT_BACKGROUND, 
+	Tk_Offset(Container, highlightBgColor), TK_CONFIG_COLOR_ONLY},
     {TK_CONFIG_COLOR, "-highlightbackground", "highlightBackground",
-	"HighlightBackground",
-	DEF_CONTAINER_HIGHLIGHT_BG_MONO, Tk_Offset(Container, highlightBgColor),
-	TK_CONFIG_MONO_ONLY},
+	"HighlightBackground", DEF_CONTAINER_HIGHLIGHT_BG_MONO, 
+	Tk_Offset(Container, highlightBgColor), TK_CONFIG_MONO_ONLY},
     {TK_CONFIG_COLOR, "-highlightcolor", "highlightColor", "HighlightColor",
-	DEF_CONTAINER_HIGHLIGHT_COLOR, Tk_Offset(Container, highlightColor), 0},
+	DEF_CONTAINER_HIGHLIGHT_COLOR, 
+	Tk_Offset(Container, highlightColor), 0},
     {TK_CONFIG_PIXELS, "-highlightthickness", "highlightThickness",
 	"HighlightThickness",
 	DEF_CONTAINER_HIGHLIGHT_WIDTH, Tk_Offset(Container, highlightWidth),
 	TK_CONFIG_DONT_SET_DEFAULT},
+#ifndef WIN32
+    {TK_CONFIG_CUSTOM, "-name", "name", "Name",
+	DEF_CONTAINER_WINDOW, Tk_Offset(Container, adopted),
+	TK_CONFIG_DONT_SET_DEFAULT, &XIDNameOption},
+#endif
     {TK_CONFIG_RELIEF, "-relief", "relief", "Relief",
 	DEF_CONTAINER_RELIEF, Tk_Offset(Container, relief), 0},
     {TK_CONFIG_STRING, "-takefocus", "takeFocus", "TakeFocus",
 	DEF_CONTAINER_TAKE_FOCUS, Tk_Offset(Container, takeFocus),
 	TK_CONFIG_NULL_OK},
+    {TK_CONFIG_CUSTOM, "-timeout", "timeout", "Timeout",
+	DEF_CONTAINER_TIMEOUT, Tk_Offset(Container, timeout),
+	TK_CONFIG_DONT_SET_DEFAULT, &bltPositiveCountOption},
     {TK_CONFIG_CUSTOM, "-width", "width", "Width",
 	DEF_CONTAINER_WIDTH, Tk_Offset(Container, reqWidth),
-	TK_CONFIG_DONT_SET_DEFAULT, &bltLengthOption},
+	TK_CONFIG_DONT_SET_DEFAULT, &bltDistanceOption},
     {TK_CONFIG_CUSTOM, "-window", "window", "Window",
-	DEF_CONTAINER_WINDOW, Tk_Offset(Container, windowId),
-	TK_CONFIG_DONT_SET_DEFAULT, &xIdOption},
+	DEF_CONTAINER_WINDOW, Tk_Offset(Container, adopted),
+	TK_CONFIG_DONT_SET_DEFAULT, &XIDOption},
     {TK_CONFIG_END, (char *)NULL, (char *)NULL, (char *)NULL,
 	(char *)NULL, 0, 0}
 };
 
 /* Forward Declarations */
-static void DestroyContainer _ANSI_ARGS_((DestroyData dataPtr));
-static void ContainerEventProc _ANSI_ARGS_((ClientData clientdata,
-	XEvent *eventPtr));
-static void DisplayContainer _ANSI_ARGS_((ClientData clientData));
-static void ContainerInstDeletedCmd _ANSI_ARGS_((ClientData clientdata));
-static int ContainerInstCmd _ANSI_ARGS_((ClientData clientdata,
-	Tcl_Interp *interp, int argc, char **argv));
-static void EventuallyRedraw _ANSI_ARGS_((Container * contPtr));
+static Tcl_IdleProc DisplayContainer;
+static Tcl_CmdProc ContainerInstCmd;
+static Tcl_CmdDeleteProc ContainerInstCmdDeleteProc;
+static Tk_EventProc ToplevelEventProc;
+static Tk_GenericProc AdoptedWindowEventProc;
+static Tk_EventProc ContainerEventProc;
+static Tcl_FreeProc DestroyContainer;
+static Tcl_CmdProc ContainerCmd;
 
+static void EventuallyRedraw _ANSI_ARGS_((Container *cntrPtr));
+
+#ifdef notdef
+/*
+ *----------------------------------------------------------------------
+ *
+ * GetWindowId --
+ *
+ *      Returns the XID for the Tk_Window given.  Starting in Tk 8.0,
+ *      the toplevel widgets are wrapped by another window.
+ *      Currently there's no way to get at that window, other than
+ *      what is done here: query the X window hierarchy and grab the
+ *      parent.
+ *
+ * Results:
+ *      Returns the X Window ID of the widget.  If it's a toplevel, then
+ *	the XID of the wrapper is returned.
+ *
+ *----------------------------------------------------------------------
+ */
+Window
+GetXID(tkwin)
+    Tk_Window tkwin;
+{
+    HWND hWnd;
+    TkWinWindow *twdPtr;
+
+    hWnd = Tk_GetHWND(Tk_WindowId(tkwin));
+#if (TK_MAJOR_VERSION > 4)
+    if (Tk_IsTopLevel(tkwin)) {
+	hWnd = GetParent(hWnd);
+    }
+#endif /* TK_MAJOR_VERSION > 4 */
+    twdPtr = Blt_Malloc(sizeof(TkWinWindow));
+    twdPtr->handle = hWnd;
+    twdPtr->type = TWD_WINDOW;
+    twdPtr->winPtr = tkwin;
+    return (Window)twdPtr;
+}
+#endif
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * NameOfId --
+ *
+ *	Returns a string representing the given XID.
+ *
+ * Results:
+ *	A static string containing either the hexidecimal number or
+ *	the pathname of a Tk window.
+ *
+ *----------------------------------------------------------------------
+ */
+static char *
+NameOfId(display, window)
+    Display *display;		/* Display containing both the container widget
+				 * and the adopted window. */
+    Window window;		/* XID of the adopted window. */
+{
+    if (window != None) {
+	Tk_Window tkwin;
+	static char string[200];
+
+	/* See first if it's a window that Tk knows about.  */
+	/*
+	 * Note:  If the wrapper window is reparented, Tk pretends it's
+	 *        no longer connected to the toplevel, so if you look for
+	 *	  the child of the wrapper tkwin, it's NULL.  
+	 */
+	tkwin = Tk_IdToWindow(display, window); 
+	if ((tkwin != NULL) && (Tk_PathName(tkwin) != NULL)) {
+	    return Tk_PathName(tkwin); 
+	} 
+	sprintf(string, "0x%x", (unsigned int)window);
+	return string;
+    }
+    return "";			/* Return empty string if XID is None. */
+}
+
+#ifndef WIN32
+/*
+ *----------------------------------------------------------------------
+ *
+ * XGeometryErrorProc --
+ *
+ *	Flags errors generated from XGetGeometry calls to the X server.
+ *
+ * Results:
+ *	Always returns 0.
+ *
+ * Side Effects:
+ *	Sets a flag, indicating an error occurred.
+ *
+ *----------------------------------------------------------------------
+ */
 /* ARGSUSED */
 static int
-XGeometryErrorProc(clientData, errEventPtr)
+XGeometryErrorProc(clientData, eventPtr)
     ClientData clientData;
-    XErrorEvent *errEventPtr;
+    XErrorEvent *eventPtr;	/* Not used. */
 {
-    int *errorPtr = (int *)clientData;
+    int *errorPtr = clientData;
 
     *errorPtr = TCL_ERROR;
     return 0;
@@ -203,7 +371,438 @@ XGeometryErrorProc(clientData, errEventPtr)
 /*
  *----------------------------------------------------------------------
  *
- * StringToXId --
+ * GetAdoptedWindowGeometry --
+ *
+ *	Computes the requested geometry of the container using the 
+ *	size of adopted window as a reference.  
+ *
+ * Results:
+ *	A standard Tcl result. 
+ *
+ * Side Effects:
+ *	Sets a flag, indicating an error occurred.
+ *
+ *----------------------------------------------------------------------
+ */
+static int
+GetAdoptedWindowGeometry(interp, cntrPtr)
+    Tcl_Interp *interp;
+    Container *cntrPtr;
+{
+    int x, y, width, height, borderWidth, depth;
+    int xOffset, yOffset;
+    Window root, dummy;
+    Tk_ErrorHandler handler;
+    int result;
+    int any = -1;
+    
+    width = height = 1;
+    xOffset = yOffset = 0;
+    if (cntrPtr->adopted != None) {
+	handler = Tk_CreateErrorHandler(cntrPtr->display, any, X_GetGeometry, 
+		any, XGeometryErrorProc, &result);
+	root = RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));
+	XTranslateCoordinates(cntrPtr->display, cntrPtr->adopted,
+		      root, 0, 0, &xOffset, &yOffset, &dummy);
+	result = XGetGeometry(cntrPtr->display, cntrPtr->adopted, &root, 
+		&x, &y, (unsigned int *)&width, (unsigned int *)&height,
+	      (unsigned int *)&borderWidth, (unsigned int *)&depth);
+	Tk_DeleteErrorHandler(handler);
+	XSync(cntrPtr->display, False);
+	if (result == 0) {
+	    Tcl_AppendResult(interp, "can't get geometry for \"", 
+		     NameOfId(cntrPtr->display, cntrPtr->adopted), "\"", 
+		     (char *)NULL);
+	    return TCL_ERROR;
+	}
+	cntrPtr->origX = xOffset;
+	cntrPtr->origY = yOffset;
+	cntrPtr->origWidth = width;
+	cntrPtr->origHeight = height;
+    } else {
+	cntrPtr->origX = cntrPtr->origY = 0;
+	cntrPtr->origWidth = cntrPtr->origHeight = 0;
+    }
+    cntrPtr->adoptedX = x;
+    cntrPtr->adoptedY = y;
+    cntrPtr->adoptedWidth = width;
+    cntrPtr->adoptedHeight = height;
+    return TCL_OK;
+}
+
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  GetChildren --
+ *
+ *	Returns a chain of the child windows according to their stacking
+ *	order.  The window ids are ordered from top to bottom.
+ *
+ * ------------------------------------------------------------------------
+ */
+static Blt_Chain *
+GetChildren(display, window)
+    Display *display;
+    Window window;
+{
+    Window *children;
+    unsigned int nChildren;
+    Window dummy;
+
+    if (!XQueryTree(display, window, &dummy /*parent*/, &dummy /*root*/, 
+		   &children, &nChildren)) {
+	return NULL;
+    }
+    if (nChildren > 0) {
+	Blt_Chain *chainPtr;
+	register int i;
+
+	chainPtr = Blt_ChainCreate();
+	for (i = 0; i < nChildren; i++) {
+	    /*
+	     *  XQuery returns windows in bottom to top order.
+	     *  We'll reverse the order.
+	     */
+	    Blt_ChainPrepend(chainPtr, (ClientData)children[i]);
+	}
+	if (children != NULL) {
+	    XFree((char *)children);
+	}
+	return chainPtr;
+    }
+    return NULL;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * NameSearch --
+ *
+ *	Traverses the entire window hierarchy, searching for windows 
+ *	matching the name field in the SearchInfo structure. This 
+ *	routine is recursively called for each successive level in 
+ *	the window hierarchy.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	The SearchInfo structure will track the number of windows that 
+ *	match the given criteria.
+ *	
+ *----------------------------------------------------------------------
+ */
+static void
+NameSearch(display, window, searchPtr)
+    Display *display;
+    Window window;
+    SearchInfo *searchPtr;
+{
+    Blt_Chain *chainPtr;
+    char *wmName;
+
+    if (XFetchName(display, window, &wmName)) {
+	/* Compare the name of the window to the search pattern. */
+	if (Tcl_StringMatch(wmName, searchPtr->pattern)) {
+	    if (searchPtr->saveNames) { /* Record names of matching windows. */
+		Tcl_DStringAppendElement(&(searchPtr->dString), 
+			 NameOfId(display, window));
+		Tcl_DStringAppendElement(&(searchPtr->dString), wmName);
+	    }
+	    searchPtr->window = window;
+	    searchPtr->nMatches++;
+	}
+	XFree(wmName);
+    }
+    /* Process the window's descendants. */
+    chainPtr = GetChildren(display, window);
+    if (chainPtr != NULL) {
+	Blt_ChainLink *linkPtr;
+	Window child;
+
+	for (linkPtr = Blt_ChainFirstLink(chainPtr); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    child = (Window)Blt_ChainGetValue(linkPtr);
+	    NameSearch(display, child, searchPtr);
+	}
+	Blt_ChainDestroy(chainPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * CmdSearch --
+ *
+ *	Traverses the entire window hierarchy, searching for windows 
+ *	matching the command-line specified in the SearchInfo structure.  
+ *	This routine is recursively called for each successive level
+ *	in the window hierarchy.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	The SearchInfo structure will track the number of windows that 
+ *	match the given command-line.
+ *	
+ *----------------------------------------------------------------------
+ */
+static void
+CmdSearch(display, window, searchPtr)
+    Display *display;
+    Window window;
+    SearchInfo *searchPtr;
+{
+    Blt_Chain *chainPtr;
+    int cmdArgc;
+    char **cmdArgv;
+
+    if (XGetCommand(display, window, &cmdArgv, &cmdArgc)) {
+	char *string;
+
+	string = Tcl_Merge(cmdArgc, cmdArgv);
+	XFreeStringList(cmdArgv);
+	if (Tcl_StringMatch(string, searchPtr->pattern)) {
+	    if (searchPtr->saveNames) { /* Record names of matching windows. */
+		Tcl_DStringAppendElement(&(searchPtr->dString), 
+			 NameOfId(display, window));
+		Tcl_DStringAppendElement(&(searchPtr->dString), string);
+	    }
+	    searchPtr->window = window;
+	    searchPtr->nMatches++;
+	}
+	Blt_Free(string);
+    }
+    /* Process the window's descendants. */
+    chainPtr = GetChildren(display, window);
+    if (chainPtr != NULL) {
+	Blt_ChainLink *linkPtr;
+	Window child;
+
+	for (linkPtr = Blt_ChainFirstLink(chainPtr); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    child = (Window)Blt_ChainGetValue(linkPtr);
+	    CmdSearch(display, child, searchPtr);
+	}
+	Blt_ChainDestroy(chainPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TimeoutProc --
+ *
+ *	Procedure called when the timer event elapses.  Used to wait
+ *	between attempts checking for the designated window.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	Sets a flag, indicating the timeout occurred.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+TimeoutProc(clientData)
+    ClientData clientData;
+{
+    int *expirePtr = clientData;
+
+    *expirePtr = TRUE;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TestAndWaitForWindow --
+ *
+ *	Searches, possibly multiple times, for windows matching the
+ *	criteria given, using the search proc also given.
+ *
+ * Results:
+ *	None.
+ *
+ * Side Effects:
+ *	Sets a flag, indicating the timeout occurred.
+ *
+ *----------------------------------------------------------------------
+ */
+static void
+TestAndWaitForWindow(cntrPtr, searchPtr)
+    Container *cntrPtr;		/* Container widget record. */
+    SearchInfo *searchPtr;	/* Search criteria. */
+{
+    Window root;
+    Tcl_TimerToken timerToken;
+    int expire;
+    int i;
+
+    /* Get the root window to start the search.  */
+    root = RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));
+    timerToken = NULL;
+    for (i = 0; i < SEARCH_TRIES; i++) {
+	searchPtr->nMatches = 0;
+	(*searchPtr->proc)(cntrPtr->display, root, searchPtr);
+	if (searchPtr->nMatches > 0) {
+	    if (timerToken != NULL) {
+		Tcl_DeleteTimerHandler(timerToken);
+	    }
+	    return;
+	}
+	expire = FALSE;
+	/*   
+	 * If the X11 application associated with the adopted window
+	 * was just started (via "exec" or "bgexec"), the window may
+	 * not exist yet.  We have to wait a little bit for the program
+	 * to start up.  Create a timer event break us out of an wait 
+	 * loop.  We'll wait for a given interval for the adopted window
+	 * to appear.
+	 */
+	timerToken = Tcl_CreateTimerHandler(cntrPtr->timeout, TimeoutProc, 
+		&expire);
+	while (!expire) {
+	    /* Should file events be allowed? */
+	    Tcl_DoOneEvent(TCL_TIMER_EVENTS | TCL_WINDOW_EVENTS | 
+			   TCL_FILE_EVENTS);
+	}
+    }	
+}
+#else 
+
+
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  GetChildren --
+ *
+ *	Returns a chain of the child windows according to their stacking
+ *	order.  The window ids are ordered from top to bottom.
+ *
+ * ------------------------------------------------------------------------
+ */
+static Blt_Chain *
+GetChildren(Display *display, Window window)
+{
+    Blt_Chain *chainPtr;
+    HWND hWnd;
+    HWND parent;
+
+    parent = Tk_GetHWND(window);
+    chainPtr = Blt_ChainCreate();
+    for (hWnd = GetTopWindow(parent); hWnd != NULL;
+	hWnd = GetNextWindow(hWnd, GW_HWNDNEXT)) {
+	Blt_ChainAppend(chainPtr, (ClientData)hWnd);
+    }
+    return chainPtr;
+}
+
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * GetAdoptedWindowGeometry --
+ *
+ *	Computes the requested geometry of the container using the 
+ *	size of adopted window as a reference.  
+ *
+ * Results:
+ *	A standard Tcl result. 
+ *
+ * Side Effects:
+ *	Sets a flag, indicating an error occurred.
+ *
+ *----------------------------------------------------------------------
+ */
+static int
+GetAdoptedWindowGeometry(Tcl_Interp *interp, Container *cntrPtr)
+{
+    int x, y, width, height;
+    int xOffset, yOffset;
+    Window root, dummy;
+    
+    width = height = 1;
+    xOffset = yOffset = 0;
+    x = y = 0;
+    if (cntrPtr->adopted != None) {
+	HWND hWnd;
+	RECT rect;
+
+	hWnd = Tk_GetHWND(cntrPtr->adopted);
+	if (GetWindowRect(hWnd, &rect)) {
+	    x = rect.left;
+	    y = rect.top;
+	    width = rect.right - rect.left + 1;
+	    height = rect.bottom - rect.top + 1;
+	} else {
+	    Tcl_AppendResult(interp, "can't get geometry for \"", 
+		     NameOfId(cntrPtr->display, cntrPtr->adopted), "\"", 
+		     (char *)NULL);
+	    return TCL_ERROR;
+	}
+	root = RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));
+	XTranslateCoordinates(cntrPtr->display, cntrPtr->adopted,
+		      root, 0, 0, &xOffset, &yOffset, &dummy);
+	cntrPtr->origX = xOffset;
+	cntrPtr->origY = yOffset;
+	cntrPtr->origWidth = width;
+	cntrPtr->origHeight = height;
+    } else {
+	cntrPtr->origX = cntrPtr->origY = 0;
+	cntrPtr->origWidth = cntrPtr->origHeight = 0;
+    }
+    cntrPtr->adoptedX = x;
+    cntrPtr->adoptedY = y;
+    cntrPtr->adoptedWidth = width;
+    cntrPtr->adoptedHeight = height;
+    return TCL_OK;
+}
+
+#endif /*WIN32*/
+
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  MapTree --
+ *
+ *	Maps each window in the hierarchy.  This is needed because 
+ *
+ *  Results:
+ *	None.
+ *
+ *  Side Effects:
+ *	Each window in the hierarchy is mapped.
+ *
+ * ------------------------------------------------------------------------
+ */
+static void
+MapTree(display, window)
+    Display *display;
+    Window window;
+{
+    Blt_Chain *chainPtr;
+
+    XMapWindow(display, window);
+    chainPtr = GetChildren(display, window);
+    if (chainPtr != NULL) {
+	Blt_ChainLink *linkPtr;
+	Window child;
+
+	for (linkPtr = Blt_ChainFirstLink(chainPtr); linkPtr != NULL;
+	     linkPtr = Blt_ChainNextLink(linkPtr)) {
+	    child = (Window)Blt_ChainGetValue(linkPtr);
+	    MapTree(display, child);
+	}
+	Blt_ChainDestroy(chainPtr);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * StringToXID --
  *
  *	Converts a string into an X window Id.
  *
@@ -212,111 +811,110 @@ XGeometryErrorProc(clientData, errEventPtr)
  *	Otherwise, TCL_ERROR is returned and an error message is left
  *	in interpreter's result field.
  *
- *----------------------------------------------------------------------
- */
+ *---------------------------------------------------------------------- */
 /*ARGSUSED*/
 static int
-StringToXId(clientData, interp, parent, string, widgRec, offset)
-    ClientData clientData;	/* Not used */
+StringToXID(clientData, interp, parent, string, widgRec, offset)
+    ClientData clientData;	/* Not used. */
     Tcl_Interp *interp;		/* Interpreter to send results back to */
     Tk_Window parent;		/* Parent window */
     char *string;		/* String representation. */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset to field in structure */
 {
-    Container *contPtr = (Container *) widgRec;
+    unsigned int flags = (int)clientData;
+    Container *cntrPtr = (Container *)widgRec;
     Window *winPtr = (Window *) (widgRec + offset);
-    Window windowId;
-    long mask;
+    Tk_Window tkAdopted;
+    Window window;
 
-
-    if (string[0] == '.') {
+    tkAdopted = NULL;
+    window = None;
+    if ((flags & SEARCH_TKWIN) && (string[0] == '.')) {
 	Tk_Window tkwin;
 
 	tkwin = Tk_NameToWindow(interp, string, Tk_MainWindow(interp));
 	if (tkwin == NULL) {
 	    return TCL_ERROR;
 	}
-	windowId = Blt_WindowId(tkwin);
-    } else if ((string[0] == '0') && (string[1] == 'x')) {
-	int newId;
-
-	if (Tcl_GetInt(interp, string, &newId) != TCL_OK) {
+	if (!Tk_IsTopLevel(tkwin)) {
+	    Tcl_AppendResult(interp, "can't reparent non-toplevel Tk windows",
+			     (char *)NULL);
 	    return TCL_ERROR;
 	}
-	windowId = newId;
+	tkAdopted = tkwin;
+	Tk_MakeWindowExist(tkwin);
+	window = Blt_GetRealWindowId(tkwin);
+#ifndef WIN32
+    } else if ((flags & SEARCH_XID) && (string[0] == '0') && 
+	       (string[1] == 'x')) {
+	int token;
+
+	/* Hexidecimal string specifying the Window token. */
+	if (Tcl_GetInt(interp, string, &token) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	window = token;
     } else if ((string == NULL) || (string[0] == '\0')) {
-	windowId = None;
+	window = None;
     } else {
-	Tcl_AppendResult(interp, "bad window id \"", string, "\"",
-	    (char *)NULL);
-	return TCL_ERROR;
-    }
+	SearchInfo search;
 
-    if (windowId != None) {
-	int x, y, width, height, borderWidth, depth;
+	memset(&search, 0, sizeof(search));
+	if (flags & (SEARCH_NAME | SEARCH_CMD)) {
+	    search.pattern = string;
+	    if (flags & SEARCH_NAME) {
+		search.proc = NameSearch;
+	    } else if (flags & SEARCH_CMD) {
+		search.proc = CmdSearch;
+	    }
+	    TestAndWaitForWindow(cntrPtr, &search);
+	    if (search.nMatches > 1) {
+		Tcl_AppendResult(interp, "more than one window matches \"", 
+			 string, "\"", (char *)NULL);
+		return TCL_ERROR;
+	    }
+	}
+	if (search.nMatches == 0) {
+	    Tcl_AppendResult(interp, "can't find window from pattern \"", 
+			     string, "\"", (char *)NULL);
+	    return TCL_ERROR;
+	}
+	window = search.window;
+#endif /*WIN32*/
+    }
+    if (*winPtr != None) {
 	Window root;
-	Tk_ErrorHandler handler;
-	int result;
-	int any = -1;
 
-	handler = Tk_CreateErrorHandler(contPtr->display, any, X_GetGeometry,
-	    any, XGeometryErrorProc, (ClientData)&result);
-	result = XGetGeometry(contPtr->display, windowId, &root, &x, &y,
-	    (unsigned int *)&width, (unsigned int *)&height,
-	    (unsigned int *)&borderWidth, (unsigned int *)&depth);
-	Tk_DeleteErrorHandler(handler);
-	XSync(contPtr->display, False);
-	if (result == 0) {
-	    Tcl_AppendResult(interp, "can't get window geometry for \"",
-		string, "\"", (char *)NULL);
+	root = RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));
+	if (Blt_ReparentWindow(cntrPtr->display, *winPtr, root, 
+		       cntrPtr->origX, cntrPtr->origY) 
+	    != TCL_OK) {
+	    Tcl_AppendResult(interp, "can't restore \"", 
+			 NameOfId(cntrPtr->display, *winPtr), 
+			"\" window to root", (char *)NULL);
 	    return TCL_ERROR;
 	}
-	XSetWindowBorderWidth(contPtr->display, windowId, 0);
-
-	result = XGetWMNormalHints(contPtr->display, windowId,
-	    &(contPtr->hints), &mask);
-	if (result == 0) {
-	    Tcl_AppendResult(interp, "can't get window hints for \"",
-		string, "\"", (char *)NULL);
-	    return TCL_ERROR;
-	}
-	if (contPtr->hints.width > 0) {
-	    width = contPtr->hints.width;
-	}
-	if (contPtr->hints.height > 0) {
-	    width = contPtr->hints.height;
-	}
-	/* Set the requested width and height on behalf of the
-	 * embedded window. */
-	contPtr->x = x;
-	contPtr->y = y;
-	contPtr->width = width;
-	contPtr->height = height;
-
-	if (contPtr->reqWidth > 0) {
-	    width = contPtr->reqWidth;
+	cntrPtr->flags &= ~CONTAINER_MAPPED;
+	if (cntrPtr->tkAdopted == NULL) {
+	    /* This wasn't a Tk window.  So deselect the event mask. */
+	    XSelectInput(cntrPtr->display, *winPtr, 0);
 	} else {
-	    width += 2 * contPtr->inset;
+	    MapTree(cntrPtr->display, *winPtr);
 	}
-	if (contPtr->reqHeight > 0) {
-	    height = contPtr->reqHeight;
-	} else {
-	    height += 2 * contPtr->inset;
-	}
-	if ((Tk_ReqWidth(contPtr->tkwin) != width) ||
-	    (Tk_ReqHeight(contPtr->tkwin) != height)) {
-	    Tk_GeometryRequest(contPtr->tkwin, width, height);
-	}
+	XMoveResizeWindow(cntrPtr->display, *winPtr, cntrPtr->origX,
+		  cntrPtr->origY, cntrPtr->origWidth, cntrPtr->origHeight);
     }
-    *winPtr = windowId;
+    cntrPtr->tkAdopted = tkAdopted;
+    *winPtr = window;
     return TCL_OK;
 }
+
 
 /*
  *----------------------------------------------------------------------
  *
- * XIdToString --
+ * XIDToString --
  *
  *	Converts the Tk window back to its string representation (i.e.
  *	its name).
@@ -328,30 +926,23 @@ StringToXId(clientData, interp, parent, string, widgRec, offset)
  */
 /*ARGSUSED*/
 static char *
-XIdToString(clientData, parent, widgRec, offset, freeProcPtr)
-    ClientData clientData;	/* Not used */
-    Tk_Window parent;		/* Not used */
+XIDToString(clientData, parent, widgRec, offset, freeProcPtr)
+    ClientData clientData;	/* Not used. */
+    Tk_Window parent;		/* Not used. */
     char *widgRec;		/* Widget record */
     int offset;			/* Offset of field in record */
     Tcl_FreeProc **freeProcPtr;	/* Memory deallocation scheme to use */
 {
-    Container *contPtr = (Container *) widgRec;
-    Window windowId = *(Window *) (widgRec + offset);
-    Tk_Window tkwin, mainWindow;
-    static char string[20];
+    Container *cntrPtr = (Container *) widgRec;
+    Window window = *(Window *)(widgRec + offset);
 
-    if (windowId == None) {
-	return "";
-    }
-    mainWindow = Tk_MainWindow(contPtr->interp);
-    tkwin = Tk_IdToWindow(Tk_Display(mainWindow), windowId);
-    if (tkwin != NULL) {
-	return Tk_PathName(tkwin);
-    }
-    sprintf(string, "0x%x", (unsigned int)windowId);
-    return string;
+    if (cntrPtr->tkAdopted != NULL) {
+	return Tk_PathName(cntrPtr->tkAdopted);
+    } 
+    return NameOfId(cntrPtr->display, window);
 }
-
+
+
 /*
  *----------------------------------------------------------------------
  *
@@ -369,19 +960,19 @@ XIdToString(clientData, parent, widgRec, offset, freeProcPtr)
  *----------------------------------------------------------------------
  */
 static void
-EventuallyRedraw(contPtr)
-    Container *contPtr;
+EventuallyRedraw(cntrPtr)
+    Container *cntrPtr;
 {
-    if ((contPtr->tkwin != NULL) && !(contPtr->flags & CONTAINER_REDRAW)) {
-	contPtr->flags |= CONTAINER_REDRAW;
-	Tk_DoWhenIdle(DisplayContainer, (ClientData)contPtr);
+    if ((cntrPtr->tkwin != NULL) && !(cntrPtr->flags & CONTAINER_REDRAW)) {
+	cntrPtr->flags |= CONTAINER_REDRAW;
+	Tcl_DoWhenIdle(DisplayContainer, cntrPtr);
     }
 }
 
 /*
  * --------------------------------------------------------------
  *
- * EmbeddedEventProc --
+ * AdoptedWindowEventProc --
  *
  * 	This procedure is invoked by the Tk dispatcher for various
  * 	events on the encapsulated window.
@@ -396,21 +987,18 @@ EventuallyRedraw(contPtr)
  * --------------------------------------------------------------
  */
 static int
-EmbeddedEventProc(clientData, eventPtr)
+AdoptedWindowEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about the tab window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Container *contPtr = (Container *) clientData;
+    Container *cntrPtr = (Container *) clientData;
 
-    if ((contPtr->windowId == None) ||
-	(eventPtr->xany.window != contPtr->windowId)) {
+    if (eventPtr->xany.window != cntrPtr->adopted) {
 	return 0;
     }
-    if ((eventPtr->type == DestroyNotify) ||
-	(eventPtr->type == ReparentNotify)) {
-	contPtr->windowId = None;
-	EventuallyRedraw(contPtr);
-	Tk_DeleteGenericHandler(EmbeddedEventProc, clientData);
+    if (eventPtr->type == DestroyNotify) {
+	cntrPtr->adopted = None;
+	EventuallyRedraw(cntrPtr);
     }
     return 1;
 }
@@ -437,12 +1025,12 @@ ContainerEventProc(clientData, eventPtr)
     ClientData clientData;	/* Information about window. */
     XEvent *eventPtr;		/* Information about event. */
 {
-    Container *contPtr = (Container *) clientData;
+    Container *cntrPtr = clientData;
 
     switch (eventPtr->type) {
     case Expose:
 	if (eventPtr->xexpose.count == 0) {
-	    EventuallyRedraw(contPtr);
+	    EventuallyRedraw(cntrPtr);
 	}
 	break;
 
@@ -450,34 +1038,62 @@ ContainerEventProc(clientData, eventPtr)
     case FocusOut:
 	if (eventPtr->xfocus.detail != NotifyInferior) {
 	    if (eventPtr->type == FocusIn) {
-		contPtr->flags |= CONTAINER_FOCUS;
+		cntrPtr->flags |= CONTAINER_FOCUS;
 	    } else {
-		contPtr->flags &= ~CONTAINER_FOCUS;
+		cntrPtr->flags &= ~CONTAINER_FOCUS;
 	    }
-	    EventuallyRedraw(contPtr);
+	    EventuallyRedraw(cntrPtr);
 	}
 	break;
 
     case ConfigureNotify:
-	EventuallyRedraw(contPtr);
+	EventuallyRedraw(cntrPtr);
 	break;
 
     case DestroyNotify:
-	if (contPtr->tkwin != NULL) {
-	    char *cmdName;
-
-	    cmdName = Tcl_GetCommandName(contPtr->interp, contPtr->cmdToken);
-#ifdef ITCL_NAMESPACES
-	    Itk_SetWidgetCommand(contPtr->tkwin, (Tcl_Command) NULL);
-#endif /* ITCL_NAMESPACES */
-	    Tcl_DeleteCommand(contPtr->interp, cmdName);
-	    contPtr->tkwin = NULL;
+	if (cntrPtr->tkwin != NULL) {
+	    cntrPtr->tkwin = NULL;
+	    Tcl_DeleteCommandFromToken(cntrPtr->interp, cntrPtr->cmdToken);
 	}
-	if (contPtr->flags & CONTAINER_REDRAW) {
-	    Tk_CancelIdleCall(DisplayContainer, (ClientData)contPtr);
+	if (cntrPtr->flags & CONTAINER_REDRAW) {
+	    Tcl_CancelIdleCall(DisplayContainer, cntrPtr);
 	}
-	Tk_EventuallyFree((ClientData)contPtr, DestroyContainer);
+	Tcl_EventuallyFree(cntrPtr, DestroyContainer);
 	break;
+    }
+}
+
+/*
+ * --------------------------------------------------------------
+ *
+ * ToplevelEventProc --
+ *
+ *	Some applications assume that they are always a toplevel
+ *	window and play tricks accordingly.  For example, Netscape
+ *	positions menus in relation to the toplevel.  But if the
+ *	container's toplevel is moved, this positioning is wrong.  
+ *	So watch if the toplevel is moved.  
+ *
+ *	[This would be easier and cleaner if Tk toplevels weren't so
+ *	botched by the addition of menubars.  It's not enough to
+ *	track the )
+ *
+ * Results:
+ *	None.
+ *
+ * --------------------------------------------------------------
+ */
+static void
+ToplevelEventProc(clientData, eventPtr)
+    ClientData clientData;	/* Information about the tab window. */
+    XEvent *eventPtr;		/* Information about event. */
+{
+    Container *cntrPtr = clientData;
+
+    if ((cntrPtr->adopted != None) && (cntrPtr->tkwin != NULL) &&
+	(eventPtr->type == ConfigureNotify)) {
+	cntrPtr->flags |= CONTAINER_MOVE;
+	EventuallyRedraw(cntrPtr);
     }
 }
 
@@ -486,7 +1102,7 @@ ContainerEventProc(clientData, eventPtr)
  *
  * DestroyContainer --
  *
- * 	This procedure is invoked by Tk_EventuallyFree or Tk_Release
+ * 	This procedure is invoked by Tcl_EventuallyFree or Tcl_Release
  * 	to clean up the internal structure of the widget at a safe
  * 	time (when no-one is using it anymore).
  *
@@ -502,16 +1118,20 @@ static void
 DestroyContainer(dataPtr)
     DestroyData dataPtr;	/* Pointer to the widget record. */
 {
-    Container *contPtr = (Container *) dataPtr;
+    Container *cntrPtr = (Container *) dataPtr;
 
-    if (contPtr->highlightGC != NULL) {
-	Tk_FreeGC(contPtr->display, contPtr->highlightGC);
+    if (cntrPtr->highlightGC != NULL) {
+	Tk_FreeGC(cntrPtr->display, cntrPtr->highlightGC);
     }
-    if (contPtr->windowId != None) {
-	Tk_DeleteGenericHandler(EmbeddedEventProc, (ClientData)contPtr);
+    if (cntrPtr->flags & CONTAINER_INIT) {
+	Tk_DeleteGenericHandler(AdoptedWindowEventProc, cntrPtr);
     }
-    Tk_FreeOptions(configSpecs, (char *)contPtr, contPtr->display, 0);
-    free((char *)contPtr);
+    if (cntrPtr->tkToplevel != NULL) {
+	Tk_DeleteEventHandler(cntrPtr->tkToplevel, StructureNotifyMask, 
+		ToplevelEventProc, cntrPtr);
+    }
+    Tk_FreeOptions(configSpecs, (char *)cntrPtr, cntrPtr->display, 0);
+    Blt_Free(cntrPtr);
 }
 
 /*
@@ -529,15 +1149,15 @@ DestroyContainer(dataPtr)
  *
  * Side Effects:
  *	Configuration information, such as text string, colors, font,
- *	etc. get set for contPtr; old resources get freed, if there
+ *	etc. get set for cntrPtr; old resources get freed, if there
  *	were any.  The widget is redisplayed.
  *
  * ----------------------------------------------------------------------
  */
 static int
-ConfigureContainer(interp, contPtr, argc, argv, flags)
+ConfigureContainer(interp, cntrPtr, argc, argv, flags)
     Tcl_Interp *interp;		/* Interpreter to report errors. */
-    Container *contPtr;		/* Information about widget; may or
+    Container *cntrPtr;		/* Information about widget; may or
 			         * may not already have values for
 			         * some fields. */
     int argc;
@@ -547,58 +1167,74 @@ ConfigureContainer(interp, contPtr, argc, argv, flags)
     XGCValues gcValues;
     unsigned long gcMask;
     GC newGC;
-    Window old;
+    int width, height;
 
-    old = contPtr->windowId;
-    if (Tk_ConfigureWidget(interp, contPtr->tkwin, configSpecs, argc, argv,
-	    (char *)contPtr, flags) != TCL_OK) {
+    if (Tk_ConfigureWidget(interp, cntrPtr->tkwin, configSpecs, argc, argv,
+	    (char *)cntrPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
-    if ((contPtr->reqHeight > 0) && (contPtr->reqWidth > 0)) {
-	Tk_GeometryRequest(contPtr->tkwin, contPtr->reqWidth,
-	    contPtr->reqHeight);
+    cntrPtr->inset = cntrPtr->borderWidth + cntrPtr->highlightWidth;
+    if (Tk_WindowId(cntrPtr->tkwin) == None) {
+	Tk_MakeWindowExist(cntrPtr->tkwin);
     }
-    contPtr->inset = contPtr->borderWidth + contPtr->highlightWidth;
-    if (Blt_ConfigModified(configSpecs, "-window", (char *)NULL)) {
-
-	if (old != None) {
-	    XUnmapWindow(contPtr->display, old);
-	}
-	contPtr->flags &= ~CONTAINER_MAPPED;
-	if (contPtr->windowId != None) {
-	    if (Tk_WindowId(contPtr->tkwin) == None) {
-		Tk_MakeWindowExist(contPtr->tkwin);
-	    }
-	    if (Blt_ReparentWindow(contPtr->display, contPtr->windowId,
-		    Tk_WindowId(contPtr->tkwin), contPtr->inset,
-		    contPtr->inset) != TCL_OK) {
-		Tcl_AppendResult(interp, "can't reparent window", (char *)NULL);
+    if (GetAdoptedWindowGeometry(interp, cntrPtr) != TCL_OK) {
+	return TCL_ERROR;
+    }
+    if (Blt_ConfigModified(configSpecs, "-window", "-name", "-command", 
+			   (char *)NULL)) {
+	cntrPtr->flags &= ~CONTAINER_MAPPED;
+	if (cntrPtr->adopted != None) {
+	    if (Blt_ReparentWindow(cntrPtr->display, cntrPtr->adopted,
+		    Tk_WindowId(cntrPtr->tkwin), cntrPtr->inset,
+		    cntrPtr->inset) != TCL_OK) {
+		Tcl_AppendResult(interp, "can't adopt window \"", 
+			 NameOfId(cntrPtr->display, cntrPtr->adopted), 
+			 "\"", (char *)NULL);
 		return TCL_ERROR;
 	    }
-	    XSelectInput(contPtr->display, contPtr->windowId,
-		StructureNotifyMask);
-	    Tk_CreateGenericHandler(EmbeddedEventProc, (ClientData)contPtr);
+	    XSelectInput(cntrPtr->display, cntrPtr->adopted, 
+		 StructureNotifyMask);
+	    if ((cntrPtr->flags & CONTAINER_INIT) == 0) {
+		Tk_CreateGenericHandler(AdoptedWindowEventProc, cntrPtr);
+		cntrPtr->flags |= CONTAINER_INIT;
+	    }
 	}
     }
+    /* Add the designated inset to the requested dimensions. */
+    width = cntrPtr->origWidth + 2 * cntrPtr->inset; 
+    height = cntrPtr->origHeight + 2 * cntrPtr->inset;
+
+    if (cntrPtr->reqWidth > 0) {
+	width = cntrPtr->reqWidth;
+    } 
+    if (cntrPtr->reqHeight > 0) {
+	height = cntrPtr->reqHeight;
+    } 
+    /* Set the requested width and height for the container. */
+    if ((Tk_ReqWidth(cntrPtr->tkwin) != width) ||
+	(Tk_ReqHeight(cntrPtr->tkwin) != height)) {
+	Tk_GeometryRequest(cntrPtr->tkwin, width, height);
+    }
+
     /*
      * GC for focus highlight.
      */
     gcMask = GCForeground;
-    gcValues.foreground = contPtr->highlightColor->pixel;
-    newGC = Tk_GetGC(contPtr->tkwin, gcMask, &gcValues);
-    if (contPtr->highlightGC != NULL) {
-	Tk_FreeGC(contPtr->display, contPtr->highlightGC);
+    gcValues.foreground = cntrPtr->highlightColor->pixel;
+    newGC = Tk_GetGC(cntrPtr->tkwin, gcMask, &gcValues);
+    if (cntrPtr->highlightGC != NULL) {
+	Tk_FreeGC(cntrPtr->display, cntrPtr->highlightGC);
     }
-    contPtr->highlightGC = newGC;
+    cntrPtr->highlightGC = newGC;
 
-    EventuallyRedraw(contPtr);
+    EventuallyRedraw(cntrPtr);
     return TCL_OK;
 }
 
 /*
  *----------------------------------------------------------------------
  *
- * ContainerInstDeletedCmd --
+ * ContainerInstCmdDeleteProc --
  *
  *	This procedure can be called if the window was destroyed
  *	(tkwin will be NULL) and the command was deleted
@@ -616,16 +1252,16 @@ ConfigureContainer(interp, contPtr, argc, argv, flags)
  *----------------------------------------------------------------------
  */
 static void
-ContainerInstDeletedCmd(clientData)
+ContainerInstCmdDeleteProc(clientData)
     ClientData clientData;	/* Pointer to widget record for widget. */
 {
-    Container *contPtr = (Container *) clientData;
+    Container *cntrPtr = clientData;
 
-    if (contPtr->tkwin != NULL) {
+    if (cntrPtr->tkwin != NULL) {
 	Tk_Window tkwin;
 
-	tkwin = contPtr->tkwin;
-	contPtr->tkwin = NULL;
+	tkwin = cntrPtr->tkwin;
+	cntrPtr->tkwin = NULL;
 	Tk_DestroyWindow(tkwin);
 #ifdef ITCL_NAMESPACES
 	Itk_SetWidgetCommand(tkwin, (Tcl_Command) NULL);
@@ -658,7 +1294,7 @@ ContainerCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    Container *contPtr;
+    Container *cntrPtr;
     Tk_Window tkwin;
     unsigned int mask;
 
@@ -667,34 +1303,38 @@ ContainerCmd(clientData, interp, argc, argv)
 	    " pathName ?option value?...\"", (char *)NULL);
 	return TCL_ERROR;
     }
-    tkwin = (Tk_Window)clientData;
+    tkwin = Tk_MainWindow(interp);
     tkwin = Tk_CreateWindowFromPath(interp, tkwin, argv[1], (char *)NULL);
     if (tkwin == NULL) {
 	return TCL_ERROR;
     }
-    contPtr = (Container *) calloc(1, sizeof(Container));
-    assert(contPtr);
+    cntrPtr = Blt_Calloc(1, sizeof(Container));
+    assert(cntrPtr);
+    cntrPtr->tkwin = tkwin;
+    cntrPtr->display = Tk_Display(tkwin);
+    cntrPtr->interp = interp;
+    cntrPtr->flags = 0;
+    cntrPtr->timeout = SEARCH_INTERVAL;
+    cntrPtr->borderWidth = cntrPtr->highlightWidth = 2;
+    cntrPtr->relief = TK_RELIEF_SUNKEN;
     Tk_SetClass(tkwin, "Container");
-    contPtr->tkwin = tkwin;
-    contPtr->display = Tk_Display(tkwin);
-    contPtr->interp = interp;
-    contPtr->flags = 0;
-    contPtr->borderWidth = contPtr->highlightWidth = 2;
-    contPtr->relief = TK_RELIEF_SUNKEN;
-
-    if (ConfigureContainer(interp, contPtr, argc - 2, argv + 2, 0) != TCL_OK) {
-	Tk_DestroyWindow(contPtr->tkwin);
+#if (TK_MAJOR_VERSION > 4)
+    Blt_SetWindowInstanceData(tkwin, cntrPtr);
+#endif
+    if (ConfigureContainer(interp, cntrPtr, argc - 2, argv + 2, 0) != TCL_OK) {
+	Tk_DestroyWindow(cntrPtr->tkwin);
 	return TCL_ERROR;
     }
     mask = (StructureNotifyMask | ExposureMask | FocusChangeMask);
-    Tk_CreateEventHandler(tkwin, mask, ContainerEventProc, (ClientData)contPtr);
-    contPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], ContainerInstCmd,
-	(ClientData)contPtr, ContainerInstDeletedCmd);
+    Tk_CreateEventHandler(tkwin, mask, ContainerEventProc, cntrPtr);
+    cntrPtr->cmdToken = Tcl_CreateCommand(interp, argv[1], ContainerInstCmd,
+	cntrPtr, ContainerInstCmdDeleteProc);
 #ifdef ITCL_NAMESPACES
-    Itk_SetWidgetCommand(contPtr->tkwin, contPtr->cmdToken);
+    Itk_SetWidgetCommand(cntrPtr->tkwin, cntrPtr->cmdToken);
 #endif
     Tk_MakeWindowExist(tkwin);
-    Tcl_SetResult(interp, Tk_PathName(contPtr->tkwin), TCL_STATIC);
+
+    Tcl_SetResult(interp, Tk_PathName(cntrPtr->tkwin), TCL_VOLATILE);
     return TCL_OK;
 }
 
@@ -717,61 +1357,220 @@ static void
 DisplayContainer(clientData)
     ClientData clientData;	/* Information about widget. */
 {
-    Container *contPtr = (Container *) clientData;
+    Container *cntrPtr = clientData;
     Drawable drawable;
     int width, height;
 
-    contPtr->flags &= ~CONTAINER_REDRAW;
-    if (contPtr->tkwin == NULL) {
+    cntrPtr->flags &= ~CONTAINER_REDRAW;
+    if (cntrPtr->tkwin == NULL) {
 	return;			/* Window has been destroyed. */
     }
-    if (!Tk_IsMapped(contPtr->tkwin)) {
+    if (!Tk_IsMapped(cntrPtr->tkwin)) {
 	return;
     }
-    drawable = Tk_WindowId(contPtr->tkwin);
-    if (contPtr->windowId != None) {
-	width = Tk_Width(contPtr->tkwin) - (2 * contPtr->inset);
-	height = Tk_Height(contPtr->tkwin) - (2 * contPtr->inset);
-	if ((contPtr->x != contPtr->inset) ||
-	    (contPtr->y != contPtr->inset) ||
-	    (contPtr->width != width) ||
-	    (contPtr->height != height)) {
-	    XMoveResizeWindow(contPtr->display, contPtr->windowId,
-		contPtr->inset, contPtr->inset, width, height);
-	    contPtr->width = width, contPtr->height = height;
-	    contPtr->x = contPtr->y = contPtr->inset;
+    drawable = Tk_WindowId(cntrPtr->tkwin);
+
+#ifndef WIN32
+    if (cntrPtr->tkToplevel == NULL) {
+	Window window;
+	Tk_Window tkToplevel;
+
+	/* Create an event handler for the toplevel of the container. */
+	tkToplevel = Blt_Toplevel(cntrPtr->tkwin);
+	window = Blt_GetRealWindowId(tkToplevel);
+	cntrPtr->tkToplevel = Tk_IdToWindow(cntrPtr->display, window); 
+	if (cntrPtr->tkToplevel != NULL) {
+	    Tk_CreateEventHandler(cntrPtr->tkToplevel, StructureNotifyMask, 
+		ToplevelEventProc, cntrPtr);
 	}
-	if (!(contPtr->flags & CONTAINER_MAPPED)) {
-	    XMapWindow(contPtr->display, contPtr->windowId);
-	    contPtr->flags |= CONTAINER_MAPPED;
+    }
+#endif /* WIN32 */
+    if (cntrPtr->adopted != None) {
+#ifndef WIN32
+	if (cntrPtr->flags & CONTAINER_MOVE) {
+	    /* 
+	     * Some applications like Netscape cache its location to
+	     * position its popup menus. But when it's reparented, it
+	     * thinks it's always at the same position.  It doesn't
+	     * know when the container's moved.  The hack here is to
+	     * force the application to update its coordinates by
+	     * moving the adopted window (over by 1 pixel and
+	     * then back in case the application is comparing the last
+	     * location).  
+	     */
+	    XMoveWindow(cntrPtr->display, cntrPtr->adopted,
+			cntrPtr->inset + 1, cntrPtr->inset + 1);
+	    XMoveWindow(cntrPtr->display, cntrPtr->adopted,
+			cntrPtr->inset, cntrPtr->inset);
+	    cntrPtr->flags &= ~CONTAINER_MOVE;
 	}
-	if (contPtr->borderWidth > 0) {
-	    Tk_Draw3DRectangle(contPtr->tkwin, drawable, contPtr->border,
-		contPtr->highlightWidth, contPtr->highlightWidth,
-		Tk_Width(contPtr->tkwin) - 2 * contPtr->highlightWidth,
-		Tk_Height(contPtr->tkwin) - 2 * contPtr->highlightWidth,
-		contPtr->borderWidth, contPtr->relief);
+#endif /* WIN32 */
+	/* Compute the available space inside the container. */
+	width = Tk_Width(cntrPtr->tkwin) - (2 * cntrPtr->inset);
+	height = Tk_Height(cntrPtr->tkwin) - (2 * cntrPtr->inset);
+
+	if ((cntrPtr->adoptedX != cntrPtr->inset) || 
+	    (cntrPtr->adoptedY != cntrPtr->inset) ||
+	    (cntrPtr->adoptedWidth != width) || 
+	    (cntrPtr->adoptedHeight != height)) {
+	    /* Resize the window to the new size */
+	    if (width < 1) {
+		width = 1;
+	    }
+	    if (height < 1) {
+		height = 1;
+	    }
+	    XMoveResizeWindow(cntrPtr->display, cntrPtr->adopted,
+		cntrPtr->inset, cntrPtr->inset, width, height);
+	    cntrPtr->adoptedWidth = width;
+	    cntrPtr->adoptedHeight = height;
+	    cntrPtr->adoptedX = cntrPtr->adoptedY = cntrPtr->inset;
+	    if (cntrPtr->tkAdopted != NULL) {
+		Tk_ResizeWindow(cntrPtr->tkAdopted, width, height);
+	    }
+	}
+#ifndef WIN32
+	if (!(cntrPtr->flags & CONTAINER_MAPPED)) {
+	    XMapWindow(cntrPtr->display, cntrPtr->adopted);
+	    cntrPtr->flags |= CONTAINER_MAPPED;
+	}
+#endif
+	if (cntrPtr->borderWidth > 0) {
+	    Blt_Draw3DRectangle(cntrPtr->tkwin, drawable, cntrPtr->border,
+		cntrPtr->highlightWidth, cntrPtr->highlightWidth,
+		Tk_Width(cntrPtr->tkwin) - 2 * cntrPtr->highlightWidth,
+		Tk_Height(cntrPtr->tkwin) - 2 * cntrPtr->highlightWidth,
+		cntrPtr->borderWidth, cntrPtr->relief);
 	}
     } else {
-	Tk_Fill3DRectangle(contPtr->tkwin, drawable, contPtr->border,
-	    contPtr->highlightWidth, contPtr->highlightWidth,
-	    Tk_Width(contPtr->tkwin) - 2 * contPtr->highlightWidth,
-	    Tk_Height(contPtr->tkwin) - 2 * contPtr->highlightWidth,
-	    contPtr->borderWidth, contPtr->relief);
+	Blt_Fill3DRectangle(cntrPtr->tkwin, drawable, cntrPtr->border,
+	    cntrPtr->highlightWidth, cntrPtr->highlightWidth,
+	    Tk_Width(cntrPtr->tkwin) - 2 * cntrPtr->highlightWidth,
+	    Tk_Height(cntrPtr->tkwin) - 2 * cntrPtr->highlightWidth,
+	    cntrPtr->borderWidth, cntrPtr->relief);
     }
 
     /* Draw focus highlight ring. */
-    if (contPtr->highlightWidth > 0) {
+    if (cntrPtr->highlightWidth > 0) {
 	XColor *color;
 	GC gc;
 
-	color = (contPtr->flags & CONTAINER_FOCUS)
-	    ? contPtr->highlightColor : contPtr->highlightBgColor;
+	color = (cntrPtr->flags & CONTAINER_FOCUS)
+	    ? cntrPtr->highlightColor : cntrPtr->highlightBgColor;
 	gc = Tk_GCForColor(color, drawable);
-	Tk_DrawFocusHighlight(contPtr->tkwin, gc, contPtr->highlightWidth,
+	Tk_DrawFocusHighlight(cntrPtr->tkwin, gc, cntrPtr->highlightWidth,
 	    drawable);
     }
 }
+
+#ifdef notdef
+/*
+ *----------------------------------------------------------------------
+ *
+ * SendOp --
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+SendOp(cntrPtr, interp, argc, argv)
+    Container *cntrPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;
+{
+
+    if (cntrPtr->adopted != None) {
+	XEvent event;
+	char *p;
+	KeySym symbol;
+	int xid;
+	Window window;
+
+	if (Tcl_GetInt(interp, argv[2], &xid) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+	window = (Window)xid;
+	event.xkey.type = KeyPress;
+	event.xkey.serial = 0;
+	event.xkey.display = cntrPtr->display;
+	event.xkey.window = event.xkey.subwindow = window;
+	event.xkey.time = CurrentTime;
+	event.xkey.x = event.xkey.x = 100;
+	event.xkey.root = 
+	    RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));	
+	event.xkey.x_root = Tk_X(cntrPtr->tkwin) + cntrPtr->inset;
+	event.xkey.x_root = Tk_Y(cntrPtr->tkwin) + cntrPtr->inset;
+	event.xkey.state = 0;
+	event.xkey.same_screen = TRUE;
+	
+	for (p = argv[3]; *p != '\0'; p++) {
+	    if (*p == '\r') {
+		symbol = XStringToKeysym("Return");
+	    } else if (*p == ' ') {
+		symbol = XStringToKeysym("space");
+	    } else {
+		char save;
+
+		save = *(p+1);
+		*(p+1) = '\0';
+		symbol = XStringToKeysym(p);
+		*(p+1) = save;
+	    }
+	    event.xkey.keycode = XKeysymToKeycode(cntrPtr->display, symbol);
+	    event.xkey.type = KeyPress;
+	    if (!XSendEvent(cntrPtr->display, window, False, KeyPress, &event)) {
+		fprintf(stderr, "send press event failed\n");
+	    }
+	    event.xkey.type = KeyRelease;
+	    if (!XSendEvent(cntrPtr->display, window, False, KeyRelease, 
+			    &event)) {
+		fprintf(stderr, "send release event failed\n");
+	    }
+	}
+    }
+    return TCL_OK;
+}
+#endif
+
+#ifndef WIN32
+/*
+ *----------------------------------------------------------------------
+ *
+ * FindOp --
+ *
+ *----------------------------------------------------------------------
+ */
+/*ARGSUSED*/
+static int
+FindOp(cntrPtr, interp, argc, argv)
+    Container *cntrPtr;
+    Tcl_Interp *interp;
+    int argc;			/* Not used. */
+    char **argv;
+{
+    Window root;
+    SearchInfo search;
+
+    memset(&search, 0, sizeof(search));
+    search.pattern = argv[3];
+    Tcl_DStringInit(&(search.dString));
+    search.saveNames = TRUE;	/* Indicates to record all matching XIDs. */
+    if (strcmp(argv[2], "-name") == 0) {
+	search.proc = NameSearch;
+    } else if (strcmp(argv[2], "-command") == 0) {
+	search.proc = CmdSearch;
+    } else {
+	Tcl_AppendResult(interp, "missing \"-name\" or \"-command\" switch",
+			 (char *)NULL);
+	return TCL_ERROR;
+    }
+    root = RootWindow(cntrPtr->display, Tk_ScreenNumber(cntrPtr->tkwin));
+    (*search.proc)(cntrPtr->display, root, &search);
+    Tcl_DStringResult(interp, &search.dString);
+    return TCL_OK;
+}
+#endif /*WIN32*/
 
 /*
  *----------------------------------------------------------------------
@@ -782,14 +1581,14 @@ DisplayContainer(clientData)
  */
 /*ARGSUSED*/
 static int
-CgetOp(contPtr, interp, argc, argv)
-    Container *contPtr;
+CgetOp(cntrPtr, interp, argc, argv)
+    Container *cntrPtr;
     Tcl_Interp *interp;
-    int argc;			/* not used */
+    int argc;			/* Not used. */
     char **argv;
 {
-    return Tk_ConfigureValue(interp, contPtr->tkwin, configSpecs,
-	(char *)contPtr, argv[2], 0);
+    return Tk_ConfigureValue(interp, cntrPtr->tkwin, configSpecs,
+	(char *)cntrPtr, argv[2], 0);
 }
 
 /*
@@ -807,30 +1606,30 @@ CgetOp(contPtr, interp, argc, argv)
  *
  * Side Effects:
  *	Configuration information, such as text string, colors, font,
- *	etc. get set for contPtr; old resources get freed, if there
+ *	etc. get set for cntrPtr; old resources get freed, if there
  *	were any.  The widget is redisplayed.
  *
  *----------------------------------------------------------------------
  */
 static int
-ConfigureOp(contPtr, interp, argc, argv)
-    Container *contPtr;
+ConfigureOp(cntrPtr, interp, argc, argv)
+    Container *cntrPtr;
     Tcl_Interp *interp;
     int argc;
     char **argv;
 {
     if (argc == 2) {
-	return Tk_ConfigureInfo(interp, contPtr->tkwin, configSpecs,
-	    (char *)contPtr, (char *)NULL, 0);
+	return Tk_ConfigureInfo(interp, cntrPtr->tkwin, configSpecs,
+	    (char *)cntrPtr, (char *)NULL, 0);
     } else if (argc == 3) {
-	return Tk_ConfigureInfo(interp, contPtr->tkwin, configSpecs,
-	    (char *)contPtr, argv[2], 0);
+	return Tk_ConfigureInfo(interp, cntrPtr->tkwin, configSpecs,
+	    (char *)cntrPtr, argv[2], 0);
     }
-    if (ConfigureContainer(interp, contPtr, argc - 2, argv + 2,
+    if (ConfigureContainer(interp, cntrPtr, argc - 2, argv + 2,
 	    TK_CONFIG_ARGV_ONLY) != TCL_OK) {
 	return TCL_ERROR;
     }
-    EventuallyRedraw(contPtr);
+    EventuallyRedraw(cntrPtr);
     return TCL_OK;
 }
 
@@ -850,13 +1649,19 @@ ConfigureOp(contPtr, interp, argc, argv)
  *
  * --------------------------------------------------------------
  */
-static Blt_OpSpec operSpecs[] =
+static Blt_OpSpec opSpecs[] =
 {
-    {"cget", 2, (Blt_Operation)CgetOp, 3, 3, "option",},
-    {"configure", 2, (Blt_Operation)ConfigureOp, 2, 0, "?option value?...",},
+    {"cget", 2, (Blt_Op)CgetOp, 3, 3, "option",},
+    {"configure", 2, (Blt_Op)ConfigureOp, 2, 0, "?option value?...",},
+#ifndef WIN32
+    {"find", 1, (Blt_Op)FindOp, 3, 4, "?-command|-name? pattern",},
+#endif /*WIN32*/
+#ifdef notdef
+    {"send", 1, (Blt_Op)SendOp, 4, 4, "window string",},
+#endif
 };
 
-static int numSpecs = sizeof(operSpecs) / sizeof(Blt_OpSpec);
+static int nSpecs = sizeof(opSpecs) / sizeof(Blt_OpSpec);
 
 static int
 ContainerInstCmd(clientData, interp, argc, argv)
@@ -865,18 +1670,17 @@ ContainerInstCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Vector of argument strings. */
 {
-    Blt_Operation proc;
-    Container *contPtr = (Container *) clientData;
+    Blt_Op proc;
+    Container *cntrPtr = clientData;
     int result;
 
-    proc = Blt_GetOperation(interp, numSpecs, operSpecs,
-	BLT_OPER_ARG1, argc, argv);
+    proc = Blt_GetOp(interp, nSpecs, opSpecs, BLT_OP_ARG1, argc, argv, 0);
     if (proc == NULL) {
 	return TCL_ERROR;
     }
-    Tk_Preserve((ClientData)contPtr);
-    result = (*proc) (contPtr, interp, argc, argv);
-    Tk_Release((ClientData)contPtr);
+    Tcl_Preserve(cntrPtr);
+    result = (*proc)(cntrPtr, interp, argc, argv);
+    Tcl_Release(cntrPtr);
     return result;
 }
 
