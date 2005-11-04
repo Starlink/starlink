@@ -37,7 +37,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id$
+ *     RCS:  $Id: itcl_parse.c,v 1.4 2000/01/03 15:56:48 csmith Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -53,6 +53,11 @@ typedef struct ProtectionCmdInfo {
     int pLevel;               /* protection level */
     ItclObjectInfo *info;     /* info regarding all known objects */
 } ProtectionCmdInfo;
+
+/*
+ *  FORWARD DECLARATIONS
+ */
+static void ItclFreeParserCommandData _ANSI_ARGS_((char* cdata));
 
 
 /*
@@ -116,21 +121,24 @@ Itcl_ParseInit(interp, info)
     pInfo->info = info;
 
     Tcl_CreateObjCommand(interp, "::itcl::parser::public",
-        Itcl_ClassProtectionCmd, (ClientData)pInfo, (Tcl_CmdDeleteProc*)free);
+        Itcl_ClassProtectionCmd, (ClientData)pInfo,
+	    (Tcl_CmdDeleteProc*) ItclFreeParserCommandData);
 
     pInfo = (ProtectionCmdInfo*)ckalloc(sizeof(ProtectionCmdInfo));
     pInfo->pLevel = ITCL_PROTECTED;
     pInfo->info = info;
 
     Tcl_CreateObjCommand(interp, "::itcl::parser::protected",
-        Itcl_ClassProtectionCmd, (ClientData)pInfo, (Tcl_CmdDeleteProc*)free);
+        Itcl_ClassProtectionCmd, (ClientData)pInfo,
+	    (Tcl_CmdDeleteProc*) ItclFreeParserCommandData);
 
     pInfo = (ProtectionCmdInfo*)ckalloc(sizeof(ProtectionCmdInfo));
     pInfo->pLevel = ITCL_PRIVATE;
     pInfo->info = info;
 
     Tcl_CreateObjCommand(interp, "::itcl::parser::private",
-        Itcl_ClassProtectionCmd, (ClientData)pInfo, (Tcl_CmdDeleteProc*)free);
+        Itcl_ClassProtectionCmd, (ClientData)pInfo,
+	    (Tcl_CmdDeleteProc*) ItclFreeParserCommandData);
 
     /*
      *  Set the runtime variable resolver for the parser namespace,
@@ -1046,4 +1054,23 @@ Itcl_ParseVarResolver(interp, name, contextNs, flags, rPtr)
      *  that might get set while the parser namespace is active.
      */
     return TCL_CONTINUE;
+}
+
+
+
+/*
+ * ------------------------------------------------------------------------
+ *  ItclFreeParserCommandData()
+ *
+ *  This callback will free() up memory dynamically allocated
+ *  and passed as the ClientData argument to Tcl_CreateObjCommand.
+ *  This callback is required because one can not simply pass
+ *  a pointer to the free() or ckfree() to Tcl_CreateObjCommand.
+ * ------------------------------------------------------------------------
+ */
+static void
+ItclFreeParserCommandData(cdata)
+    char* cdata;  /* client data to be destroyed */
+{
+    ckfree(cdata);
 }

@@ -3,7 +3,7 @@ dnl	generate the file "configure", which is run during [incr Tcl]
 dnl installation to configure the system for the local environment.
 
 AC_INIT(itcl/generic/itcl.h)
-# RCS: $Id$
+# RCS: $Id: configure.in,v 1.4 2001/06/05 16:27:35 smithc Exp $
 
 AC_CONFIG_AUX_DIR(config)
 AC_PREREQ(2.0)
@@ -18,7 +18,8 @@ AC_PREREQ(2.0)
 AC_PREFIX_DEFAULT(/usr/local)
 AC_PREFIX_PROGRAM(itclsh)
 
-AC_CONFIG_SUBDIRS(itcl/unix itk/unix iwidgets2.2.0/unix iwidgets3.0.0/unix)
+AC_CONFIG_SUBDIRS(itcl itk)
 
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile,
+	chmod +x ${srcdir}/config/install-sh ${srcdir}/config/mkinstalldirs)

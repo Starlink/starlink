@@ -33,7 +33,7 @@ chowncmd=""
 chgrpcmd=""
 stripcmd=""
 rmcmd="$rmprog -f"
-mvcmd="$mvprog"
+mvcmd="$mvprog -f"
 src=""
 dst=""
 

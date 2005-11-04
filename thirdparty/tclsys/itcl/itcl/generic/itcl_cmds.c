@@ -21,7 +21,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id$
+ *     RCS:  $Id: itcl_cmds.c,v 1.13 2001/05/22 01:50:21 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -94,12 +94,17 @@ namespace eval ::itcl {\n\
 
 static char safeInitScript[] =
 "proc ::itcl::local {class name args} {\n\
-    set ptr [uplevel eval [list $class $name] $args]\n\
+    set ptr [uplevel [list $class $name] $args]\n\
     uplevel [list set itcl-local-$ptr $ptr]\n\
     set cmd [uplevel namespace which -command $ptr]\n\
     uplevel [list trace variable itcl-local-$ptr u \"::itcl::delete object $cmd; list\"]\n\
     return $ptr\n\
 }";
+
+extern ItclStubs itclStubs;
+
+
+int itclCompatFlags = -1;
 
 
 /*
@@ -125,9 +130,9 @@ Initialize(interp)
     Tcl_Namespace *itclNs;
     ItclObjectInfo *info;
 
-    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 1) == NULL) {
+    if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
 	return TCL_ERROR;
-    }
+    };
 
     /*
      *  See if [incr Tcl] is already installed.
@@ -136,6 +141,26 @@ Initialize(interp)
         Tcl_SetResult(interp, "already installed: [incr Tcl]", TCL_STATIC);
         return TCL_ERROR;
     }
+
+    /*
+     *  Set the compatability options.  Stubs allows us to load into many
+     *  version of the Tcl core.  Some problems have crept-in, and we need
+     *  to adapt dynamically regarding use of some internal structures that
+     *  have changed since 8.1.0
+     *
+     *  TODO: make a TIP for exporting a Tcl_CommandIsDeleted function in the core.
+     */
+    if (itclCompatFlags == -1) {
+	int maj, min, ptch, type;
+
+	itclCompatFlags = 0;
+	Tcl_GetVersion(&maj, &min, &ptch, &type);
+
+	if ((maj == 8) && (min >= 4)) {
+	    itclCompatFlags = ITCL_COMPAT_USECMDFLAGS;
+	}
+    }
+
 
     /*
      *  Initialize the ensemble package first, since we need this
@@ -304,7 +329,8 @@ Initialize(interp)
     /*
      *  Package is now loaded.
      */
-    if (Tcl_PkgProvide(interp, "Itcl", ITCL_VERSION) != TCL_OK) {
+    if (Tcl_PkgProvideEx(interp, "Itcl", ITCL_VERSION,
+            (ClientData) &itclStubs) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;
@@ -389,7 +415,15 @@ ItclDelObjectInfo(cdata)
     while (entry) {
         contextObj = (ItclObject*)Tcl_GetHashValue(entry);
         Tcl_DeleteCommandFromToken(info->interp, contextObj->accessCmd);
-        entry = Tcl_NextHashEntry(&place);
+	    /*
+	     * Fix 227804: Whenever an object to delete was found we
+	     * have to reset the search to the beginning as the
+	     * current entry in the search was deleted and accessing it
+	     * is therefore not allowed anymore.
+	     */
+
+	    entry = Tcl_FirstHashEntry(&info->objects, &place);
+	    /*entry = Tcl_NextHashEntry(&place);*/
     }
     Tcl_DeleteHashTable(&info->objects);
 
@@ -413,11 +447,11 @@ ItclDelObjectInfo(cdata)
  * ------------------------------------------------------------------------
  *  Itcl_FindClassesCmd()
  *
- *  Part of the "::info" ensemble.  Invoked by Tcl whenever the user
- *  issues an "info classes" command to query the list of classes
- *  in the current namespace.  Handles the following syntax:
+ *  Invoked by Tcl whenever the user issues an "itcl::find classes"
+ *  command to query the list of known classes.  Handles the following
+ *  syntax:
  *
- *    info classes ?<pattern>?
+ *    find classes ?<pattern>?
  *
  *  Returns TCL_OK/TCL_ERROR to indicate success/failure.
  * ------------------------------------------------------------------------
@@ -435,12 +469,12 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
     int forceFullNames = 0;
 
     char *pattern;
-    char *name;
-    int i, nsearch, newEntry;
+    CONST char *name;
+    int newEntry, handledActiveNs;
     Tcl_HashTable unique;
     Tcl_HashEntry *entry;
     Tcl_HashSearch place;
-    Tcl_Namespace *search[2];
+    Itcl_Stack search;
     Tcl_Command cmd, originalCmd;
     Namespace *nsPtr;
     Tcl_Obj *listPtr, *objPtr;
@@ -458,22 +492,25 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
     }
 
     /*
-     *  Search through all commands in the current namespace and
-     *  in the global namespace.  If we find any commands that
+     *  Search through all commands in the current namespace first,
+     *  in the global namespace next, then in all child namespaces
+     *  in this interpreter.  If we find any commands that
      *  represent classes, report them.
      */
     listPtr = Tcl_NewListObj(0, (Tcl_Obj* CONST*)NULL);
 
-    nsearch = 0;
-    search[nsearch++] = activeNs;
-    if (activeNs != globalNs) {
-        search[nsearch++] = globalNs;
-    }
+    Itcl_InitStack(&search);
+    Itcl_PushStack((ClientData)globalNs, &search);
+    Itcl_PushStack((ClientData)activeNs, &search);  /* last in, first out! */
 
     Tcl_InitHashTable(&unique, TCL_ONE_WORD_KEYS);
 
-    for (i=0; i < nsearch; i++) {
-        nsPtr = (Namespace*)search[i];
+    handledActiveNs = 0;
+    while (Itcl_GetStackSize(&search) > 0) {
+        nsPtr = (Namespace*)Itcl_PopStack(&search);
+        if (nsPtr == (Namespace*)activeNs && handledActiveNs) {
+            continue;
+        }
 
         entry = Tcl_FirstHashEntry(&nsPtr->cmdTable, &place);
         while (entry) {
@@ -513,8 +550,20 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
             }
             entry = Tcl_NextHashEntry(&place);
         }
+        handledActiveNs = 1;  /* don't process the active namespace twice */
+
+        /*
+         *  Push any child namespaces onto the stack and continue
+         *  the search in those namespaces.
+         */
+        entry = Tcl_FirstHashEntry(&nsPtr->childTable, &place);
+        while (entry != NULL) {
+            Itcl_PushStack(Tcl_GetHashValue(entry), &search);
+            entry = Tcl_NextHashEntry(&place);
+        }
     }
     Tcl_DeleteHashTable(&unique);
+    Itcl_DeleteStack(&search);
 
     Tcl_SetObjResult(interp, listPtr);
     return TCL_OK;
@@ -525,11 +574,11 @@ Itcl_FindClassesCmd(clientData, interp, objc, objv)
  * ------------------------------------------------------------------------
  *  Itcl_FindObjectsCmd()
  *
- *  Part of the "::info" ensemble.  Invoked by Tcl whenever the user
- *  issues an "info objects" command to query the list of known objects.
- *  Handles the following syntax:
+ *  Invoked by Tcl whenever the user issues an "itcl::find objects"
+ *  command to query the list of known objects.  Handles the following
+ *  syntax:
  *
- *    info objects ?-class <className>? ?-isa <className>? ?<pattern>?
+ *    find objects ?-class <className>? ?-isa <className>? ?<pattern>?
  *
  *  Returns TCL_OK/TCL_ERROR to indicate success/failure.
  * ------------------------------------------------------------------------
@@ -550,12 +599,13 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
     ItclClass *isaDefn = NULL;
 
     char *name, *token;
-    int i, pos, nsearch, newEntry, match;
+    CONST char *cmdName;
+    int pos, newEntry, match, handledActiveNs;
     ItclObject *contextObj;
     Tcl_HashTable unique;
     Tcl_HashEntry *entry;
     Tcl_HashSearch place;
-    Tcl_Namespace *search[2];
+    Itcl_Stack search;
     Tcl_Command cmd, originalCmd;
     Namespace *nsPtr;
     Command *cmdPtr;
@@ -592,6 +642,16 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
             }
             pos++;
         }
+
+        /*
+         * Last token? Take it as the pattern, even if it starts
+         * with a "-".  This allows us to match object names that
+         * start with "-".
+         */
+        else if (pos == objc-1 && !pattern) {
+            pattern = token;
+            forceFullNames = (strstr(pattern, "::") != NULL);
+        }
         else {
             break;
         }
@@ -604,22 +664,25 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
     }
 
     /*
-     *  Search through all commands in the current namespace and
-     *  in the global namespace.  If we find any commands that
+     *  Search through all commands in the current namespace first,
+     *  in the global namespace next, then in all child namespaces
+     *  in this interpreter.  If we find any commands that
      *  represent objects, report them.
      */
     listPtr = Tcl_NewListObj(0, (Tcl_Obj* CONST*)NULL);
 
-    nsearch = 0;
-    search[nsearch++] = activeNs;
-    if (activeNs != globalNs) {
-        search[nsearch++] = globalNs;
-    }
+    Itcl_InitStack(&search);
+    Itcl_PushStack((ClientData)globalNs, &search);
+    Itcl_PushStack((ClientData)activeNs, &search);  /* last in, first out! */
 
     Tcl_InitHashTable(&unique, TCL_ONE_WORD_KEYS);
 
-    for (i=0; i < nsearch; i++) {
-        nsPtr = (Namespace*)search[i];
+    handledActiveNs = 0;
+    while (Itcl_GetStackSize(&search) > 0) {
+        nsPtr = (Namespace*)Itcl_PopStack(&search);
+        if (nsPtr == (Namespace*)activeNs && handledActiveNs) {
+            continue;
+        }
 
         entry = Tcl_FirstHashEntry(&nsPtr->cmdTable, &place);
         while (entry) {
@@ -648,8 +711,8 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
                     Tcl_GetCommandFullName(interp, cmd, objPtr);
                     name = Tcl_GetStringFromObj(objPtr, (int*)NULL);
                 } else {
-                    name = Tcl_GetCommandName(interp, cmd);
-                    objPtr = Tcl_NewStringObj(name, -1);
+                    cmdName = Tcl_GetCommandName(interp, cmd);
+                    objPtr = Tcl_NewStringObj(cmdName, -1);
                 }
 
                 Tcl_CreateHashEntry(&unique, (char*)cmd, &newEntry);
@@ -681,8 +744,20 @@ Itcl_FindObjectsCmd(clientData, interp, objc, objv)
             }
             entry = Tcl_NextHashEntry(&place);
         }
+        handledActiveNs = 1;  /* don't process the active namespace twice */
+
+        /*
+         *  Push any child namespaces onto the stack and continue
+         *  the search in those namespaces.
+         */
+        entry = Tcl_FirstHashEntry(&nsPtr->childTable, &place);
+        while (entry != NULL) {
+            Itcl_PushStack(Tcl_GetHashValue(entry), &search);
+            entry = Tcl_NextHashEntry(&place);
+        }
     }
     Tcl_DeleteHashTable(&unique);
+    Itcl_DeleteStack(&search);
 
     Tcl_SetObjResult(interp, listPtr);
     return TCL_OK;

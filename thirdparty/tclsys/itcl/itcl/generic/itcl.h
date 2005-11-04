@@ -39,7 +39,10 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id$
+ *       modified for Stubs 5/20/1999 by 
+ *           David Gravereaux <davygrvy@bigfoot.com>
+ *
+ *     RCS:  $Id: itcl.h,v 1.15 2001/05/25 00:12:29 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -51,16 +54,22 @@
 
 #include "tcl.h"
 
+#undef TCL_STORAGE_CLASS
 #ifdef BUILD_itcl
-# undef TCL_STORAGE_CLASS
 # define TCL_STORAGE_CLASS DLLEXPORT
+#else
+# ifdef USE_ITCL_STUBS
+#  define TCL_STORAGE_CLASS
+# else
+#  define TCL_STORAGE_CLASS DLLIMPORT
+# endif
 #endif
 
-#define ITCL_VERSION "3.0"
-#define ITCL_PATCH_LEVEL "3.0.1"
+#define ITCL_VERSION "3.2"
+#define ITCL_PATCH_LEVEL "3.2.1"
 #define ITCL_MAJOR_VERSION 3
-#define ITCL_MINOR_VERSION 0
-#define ITCL_RELEASE_LEVEL 0
+#define ITCL_MINOR_VERSION 2
+#define ITCL_RELEASE_LEVEL 1
 
 /* 
  * A special definition used to allow this header file to be included 
@@ -69,7 +78,7 @@
  * and procedure declarations, that occur below.
  */
 
-#ifndef RESOURCE_INCLUDED
+#ifndef RC_INVOKED
 
 /*
  * Protection levels:
@@ -128,57 +137,37 @@ typedef struct Itcl_InterpState_ *Itcl_InterpState;
 
 
 /*
- *  Exported functions
+ * Include the public function declarations that are accessible via
+ * the stubs table.
  */
-EXTERN int Itcl_Init _ANSI_ARGS_((Tcl_Interp *interp));
-EXTERN int Itcl_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
 
-EXTERN int Itcl_RegisterC _ANSI_ARGS_((Tcl_Interp *interp,
-    char *name, Tcl_CmdProc *proc, ClientData clientData,
-    Tcl_CmdDeleteProc *deleteProc));
-EXTERN int Itcl_RegisterObjC _ANSI_ARGS_((Tcl_Interp *interp,
-    char *name, Tcl_ObjCmdProc *proc, ClientData clientData,
-    Tcl_CmdDeleteProc *deleteProc));
-EXTERN int Itcl_FindC _ANSI_ARGS_((Tcl_Interp *interp, char *name,
-    Tcl_CmdProc **argProcPtr, Tcl_ObjCmdProc **objProcPtr,
-    ClientData *cDataPtr));
+#include "itclDecls.h"
 
-EXTERN void Itcl_InitStack _ANSI_ARGS_((Itcl_Stack *stack));
-EXTERN void Itcl_DeleteStack _ANSI_ARGS_((Itcl_Stack *stack));
-EXTERN void Itcl_PushStack _ANSI_ARGS_((ClientData cdata,
-    Itcl_Stack *stack));
-EXTERN ClientData Itcl_PopStack _ANSI_ARGS_((Itcl_Stack *stack));
-EXTERN ClientData Itcl_PeekStack _ANSI_ARGS_((Itcl_Stack *stack));
-EXTERN ClientData Itcl_GetStackValue _ANSI_ARGS_((Itcl_Stack *stack,
-    int pos));
 
-EXTERN void Itcl_InitList _ANSI_ARGS_((Itcl_List *listPtr));
-EXTERN void Itcl_DeleteList _ANSI_ARGS_((Itcl_List *listPtr));
-EXTERN Itcl_ListElem* Itcl_CreateListElem _ANSI_ARGS_((Itcl_List *listPtr));
-EXTERN Itcl_ListElem* Itcl_DeleteListElem _ANSI_ARGS_((Itcl_ListElem *elemPtr));
-EXTERN Itcl_ListElem* Itcl_InsertList _ANSI_ARGS_((Itcl_List *listPtr,
-    ClientData val));
-EXTERN Itcl_ListElem* Itcl_InsertListElem _ANSI_ARGS_((Itcl_ListElem *pos,
-    ClientData val));
-EXTERN Itcl_ListElem* Itcl_AppendList _ANSI_ARGS_((Itcl_List *listPtr,
-    ClientData val));
-EXTERN Itcl_ListElem* Itcl_AppendListElem _ANSI_ARGS_((Itcl_ListElem *pos,
-    ClientData val));
-EXTERN void Itcl_SetListValue _ANSI_ARGS_((Itcl_ListElem *elemPtr,
-    ClientData val));
+/*
+ * Itcl_InitStubs is used by extensions like Itk that can be linked
+ * against the itcl stubs library.  If we are not using stubs
+ * then this reduces to package require.
+ */
 
-EXTERN void Itcl_EventuallyFree _ANSI_ARGS_((ClientData cdata,
-    Tcl_FreeProc *fproc));
-EXTERN void Itcl_PreserveData _ANSI_ARGS_((ClientData cdata));
-EXTERN void Itcl_ReleaseData _ANSI_ARGS_((ClientData cdata));
+#ifdef USE_ITCL_STUBS
 
-EXTERN Itcl_InterpState Itcl_SaveInterpState _ANSI_ARGS_((Tcl_Interp* interp,
-    int status));
-EXTERN int Itcl_RestoreInterpState _ANSI_ARGS_((Tcl_Interp* interp,
-    Itcl_InterpState state));
-EXTERN void Itcl_DiscardInterpState _ANSI_ARGS_((Itcl_InterpState state));
+#ifdef __cplusplus
+extern "C"
+#endif
+CONST char *	Itcl_InitStubs _ANSI_ARGS_((Tcl_Interp *interp,
+			    char *version, int exact));
+#else
+#define Itcl_InitStubs(interp, version, exact) \
+      Tcl_PkgRequire(interp, "Itcl", version, exact)
+#endif
 
-#endif /* RESOURCE INCLUDED */
+/*
+ * Public functions that are not accessible via the stubs table.
+ */
+
+
+#endif /* RC_INVOKED */
 
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT

@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: widget.test,v 1.4 2000/07/06 06:43:33 mmc Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itk
 
 # ----------------------------------------------------------------------
 #  Simple mega-widget
@@ -157,7 +162,7 @@ test widget-1.10 {check the invocation of "config" code} {
 } {{} {test message}}
 
 test widget-1.11a {configure using the "code" command} {
-    .testWidget0 do {configure -command [code $this action "button press"]}
+    .testWidget0 do {configure -command [itcl::code $this action "button press"]}
     .testWidget0 cget -command
 } {namespace inscope ::TestWidget {::.testWidget0 action {button press}}}
 
@@ -204,7 +209,7 @@ test widget-1.16 {dead components are removed from the component list} {
 } {hull test1 test2}
 
 test widget-1.17 {use "configbody" command to change "config" code} {
-    configbody TestWidget::status {lappend status "new"}
+    itcl::configbody TestWidget::status {lappend status "new"}
 } {}
 
 test widget-1.18 {"config" code can really change} {
@@ -215,7 +220,7 @@ test widget-1.18 {"config" code can really change} {
 } {new new}
 
 test widget-1.19 {"config" code can change back} {
-    configbody TestWidget::status {lappend status $itk_option(-status)}
+    itcl::configbody TestWidget::status {lappend status $itk_option(-status)}
 } {}
 
 test widget-1.20 {mega-widgets show up on the object list} {
@@ -237,7 +242,33 @@ test widget-1.23 {when an object is deleted the widget is destroyed} {
     winfo exists .testWidget0
 } {0}
 
+test widget-1.24 {recreate another test widget} {
+    TestWidget .testWidget
+} {.testWidget}
+
+test widget-1.25 {when an internal component is destroyed, it is removed from the list of components, and any dead options disappear} {
+    list [lsort [.testWidget component]] \
+         [.testWidget configure] \
+      [catch {destroy [.testWidget component test1]}] \
+         [.testWidget component] \
+         [.testWidget do {return [lsort [array names itk_component]]}] \
+         [.testWidget configure]
+} {{hull test1 test2} {{-background background Background linen linen} {-borderwidth borderWidth BorderWidth 2 2} {-clientdata clientData ClientData {} {}} {-command command Command {} {}} {-cursor cursor Cursor {} {}} {-foreground foreground Foreground navy navy} {-highlight highlight Foreground white white} {-normal normal Background ivory ivory} {-status status Status {} {}} {-text text Text {} {}}} 0 {hull test2} {hull test2} {{-background background Background linen linen} {-borderwidth borderWidth BorderWidth 2 2} {-clientdata clientData ClientData {} {}} {-command command Command {} {}} {-cursor cursor Cursor {} {}} {-foreground foreground Foreground navy navy} {-highlight highlight Foreground white white} {-normal normal Background ivory ivory} {-status status Status {} {}}}}
+
+test widget-1.26 {when an internal component is deleted (but not destroyed) it is disconnected from the option list and its binding tags are updated} {
+    set comp [.testWidget component test2]
+    list [bindtags $comp] \
+         [bind itk-destroy-$comp <Destroy>] \
+      [catch {.testWidget do {itk_component delete test2}}] \
+         [bindtags $comp] \
+         [bind itk-destroy-$comp <Destroy>] \
+         [.testWidget configure]
+} {{itk-destroy-.testWidget.t2 .testWidget.t2 Button . all} {namespace inscope ::itk::Archetype {::.testWidget itk_component delete test2}} 0 {.testWidget.t2 Button . all} {} {{-background background Background linen linen} {-clientdata clientData ClientData {} {}} {-cursor cursor Cursor {} {}} {-status status Status {} {}}}}
+
 # ----------------------------------------------------------------------
 #  Clean up
 # ----------------------------------------------------------------------
 itcl::delete class TestWidget
+
+::tcltest::cleanupTests
+exit

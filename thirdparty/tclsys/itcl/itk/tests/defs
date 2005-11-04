@@ -10,6 +10,11 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # SCCS: @(#) defs 1.44 96/10/08 17:26:58
+# ------------------------------------------------------------------
+# THIS SCRIPT IS NOW DEPRECATED!  It is kept for older Tcl
+# installations that don't have the "tcltest" package.
+# Instead, use "package require tcltest" in the test suite.
+# ------------------------------------------------------------------
 
 if ![info exists VERBOSE] {
     set VERBOSE 0
@@ -79,6 +84,8 @@ if {[info commands memory] == ""} {
 #			async close on a pipe.
 #	unixExecs     - 1 means this machine has commands such as 'cat',
 #			'echo' etc available.
+
+package require Itk
 
 catch {unset testConfig}
 if {$tcl_platform(platform) == "unix"} {

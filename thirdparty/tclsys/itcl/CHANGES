@@ -1936,6 +1936,106 @@
   load their .dll.  Also fixed iwidgets/catalog to package require
   Itcl, Itk, and to import ::itcl::* to get "class" defined. (BW)
 
+12/21/99 (bug fix)
+  Fixed tests for auto_mkindex to work properly outside of itkwish.
+  Tests now include "namespace import itcl::*" instead of assuming that
+  this behavior is built into the wish.
+
+4/18/00 (feature enhancement)
+  Fixed itcl::find to find classes and objects in *all* namespaces
+  in the interpreter.  Until this fix, the itcl::find command would
+  report only the objects in the active namespace or the global
+  namespace.  Being able to find classes/objects in all namespaces
+  makes debugging easier.  Thanks to Chad Smith for pushing to make
+  this change happen.
+
+6/26/00 (bug fix)
+  Fixed Itcl_ClassVarResolver so that the formal parameters in a
+  method/proc take precedence over class data members.
+
+6/30/00 (bug fix)
+  Fixed all itcl/itk/iwidgets3.0.0 tests to run cleanly with the new
+  tcltest package.
+
+7/1/00 (bug fix)
+  Fixed "itk_component delete" so that the composite option list is
+  cleaned up whenever a component is deleted.  For example, suppose
+  a component is the sole contributor of -font.  When that component
+  is removed via "itk_component delete", the -font option goes away
+  as well.  Also fixed the handling of the itk-delete-* binding for
+  the component.  When the component is removed, the binding tag
+  is also removed by itk::remove_destroy_hook.
+
+7/5/00 (bug fix)
+  Fixed the check done during object creation to avoid clobbering
+  existing commands.  Previously, itcl would look for any command--
+  in the local *and* global namespace--that might be clobbered.
+  Now, it looks for commands only in the local namespace, since
+  those are the only ones that could truly be clobbered.
+
+7/5/00 (cleanup)
+  Removed obsolete Makefile/configure files in the various "unix"
+  directories.  Makefiles and configure files now reside one level
+  above, in the standard TEA place.
+
+7/11/00 (stubs cleanup) <welch@ajubasolutions.com>
+  Fix the build so static links do not use the stubs library. 
+
+8/1/00 (stubs cleanup) <davygrvy@ajubasolutions.com>
+  Added missing declarations for Itcl_InitStubs and Itk_InitStubs
+  and simplified how Itcl Stubs are set in Initialize() of itk_cmds.c
+
+8/1/00 (Makefile) <welch@ajubasolutions.com>
+  Added config/installFiles.tcl and changed the various Makefile.in
+  files to use this instead of install-sh.  installFiles.tcl can
+  optimize out a copy if the target file is already up-to-date.
+  This eliminates conflicts from parallel builds on different platforms
+  where one build is zipping up the installed files while another platform
+  is copying platform-independent files (i.e., the iwidgets demos).
+
+8/4/00 (stubs cleanup) <davygrvy@ajubasolutions.com>
+  Fixed dll linkage problem with the prototypes of the 2 XX_InitStubs
+  functions use. I copied the core too literally.  Stubs libraries are
+  always static, so there's no need to play games with __declspec on
+  windows.
+
+8/7/00 (stubs cleanup) <welch@ajubasolutions.com>
+  Cleaned up use of Itcl_InitStubs by Itk.  Finally got it right after
+  much flailing about.  itcl.h has the correct definitions, and
+  itclStubLib.c has the correct #ifdefs.
+  Also nuked extra definitions of itclStubsPtr from the itk_cmds.c file.
+
+8/17/00 (more stubs cleanup) <davygrvy@ajubasolutions.com>
+  Tcl_InitStubs in itcl/generic/itcl_cmds.c was using the TCL_VERSION macro
+  set by the tcl.h header.  Changed it to be "8.1" instead as it doesn't
+  matter unless Itcl needs special/new features of the core it's header is
+  from.  But it doesn't..  so hard code it for an 8.1 minimum to make the
+  Itcl library have a better version range with the core as specific
+  version tracking with the core isn't needed (at this time).
+
 ==========================================================================
- ----------------------- RELEASE 3.0.1 - 10/19/98 -----------------------
+ ------------------------ RELEASE 3.2 - 08/18/00 ------------------------
 ==========================================================================
+
+9/22/00 (stubs cleanup) <davygrvy@ajubasolutions.com>
+  Itcl_InitStub prototype in itcl/generic/itcl.h was getting name mangled
+  by c++ compilers.  Fixed with an 'extern "C"' appropriately applied.
+
+4/07/01 (bug fix) <davygrvy@pobox.com>
+  Tcl's internal header, tclInt.h, in 8.4a2 got a small change in the Command
+  structure that needed 2 changes in Itcl to resolve.  1) #if/#else/#endif blocks
+  added in itcl_class.c and itc_ensemble.c allowing Itcl to compile. 2) added
+  a global variable called itclCompatFlags that's sets a flag in Itcl_Init()
+  that will modify the logic around access to cmdPtr->flags/deleted.  This
+  way, any core compile will yield a fully forward/backward compatible
+  binary (correct logic set at runtime).
+
+5/22/01 (bug fixes) <davygrvy@pobox.com>
+  makefile.vc lives again!  Brought back from it's death to conquere windows
+  once again for users who prefer to avoid (or can't understand or get the tools
+  installed for) the TEA build system.
+
+  Also, numerous fixes relating to Kevin Kenny's Tcl API mods for better CONST
+  support.  The latest headers for Tcl where throwing warnings all over the place
+  about type errors.  I fixed the sources, but haven't checked against older
+  headers yet.

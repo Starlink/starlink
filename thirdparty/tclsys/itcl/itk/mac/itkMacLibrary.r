@@ -89,6 +89,6 @@ read 'TEXT' (ITK_LIBRARY_RESOURCES+12, "itk:tclIndex", purgeable)
 	"::mac:tclIndex";
 data 'TEXT' (ITK_LIBRARY_RESOURCES+13,"pkgIndex",purgeable, preload) {
 	"# Tcl package index file, version 1.0\n"
-	"package ifneeded Itk 3.0 [list package require Itcl 3.0 \; load [file join $dir itk30[info sharedlibextension]] Itk \; source -rsrc itk:tclIndex]\n"
+	"package ifneeded Itk 3.1 [list package require Itcl 3.1 \; load [file join $dir itk31[info sharedlibextension]] Itk \; source -rsrc itk:tclIndex]\n"
 };
 

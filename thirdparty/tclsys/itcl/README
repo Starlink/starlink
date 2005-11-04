@@ -1,11 +1,13 @@
 ------------------------------------------------------------------------
-               [incr Tcl] - version 3.0 for Tcl/Tk 8.0.3
+         [incr Tcl] - version 3.2 for Tcl/Tk 8.0.3 and beyond
 ------------------------------------------------------------------------
-  As much as possible, I've tried to make itcl3.0 backward-compatible
+  This is a bug-fix release in the itcl3.x series.
+
+  As much as possible, I've tried to make itcl3.x backward-compatible
   with earlier releases.  The class definition syntax has not changed
   at all from itcl2.2, and the old itcl1.x syntax is still supported.
   But you'll notice changes related to the new namespace mechanism in
-  Tcl 8.0.  For information on incompatibilities and porting to itcl3.0,
+  Tcl 8.0.  For information on incompatibilities and porting to itcl3.x,
   read the INCOMPATIBLE file in this directory, or check out the itcl
   web site:
 
@@ -16,12 +18,13 @@
   read the acknowledgements section below.
 
   Send comments or suggestions to the [incr Tcl] mailing list
-  (itcl@tcltk.com) or directly to me (mmclennan@lucent.com).
+  (itcl@scriptics.com) or directly to me (mmc@cadence.com).
   If you want to subscribe to the mailing list, send a message
   with the subject "subscribe" to "itcl-request@tcltk.com".
 
 ========================================================================
-           Copyright (c) 1993-1998   Lucent Technologies, Inc.
+        Copyright (c) 1993-1998   Lucent Technologies, Inc.
+        Copyright (c) 1998-2000   Cadence Design Systems, Inc.
 ========================================================================
 
  OVERVIEW
@@ -95,33 +98,34 @@
 
  Getting started
 ------------------------------------------------------------------------
- Read the first part of the CHANGES file for a brief overview of
- new commands, and a summary of important changes.  Consult the
- man pages for detailed information on particular commands.
+ If you're just getting started with [incr Tcl], check out these
+ useful resources:
 
- Check out our web site on WebNet for the latest news:
+   - FREE TUTORIAL on our web site:  http://www.tcltk.com/itcl/
 
-     http://www.tcltk.com/itcl/
+   - BOOK:  "[incr Tcl/Tk] from the Ground Up," by Chad Smith
+            (ISBN 0-07-212106-8)
 
- >> NOTE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
- >>                                                             <<
- >>   If you are just getting started with [incr Tcl], be sure  <<
- >>   to download the TUTORIAL on our web site.  This has over  <<
- >>   100 pages of introductory text and code examples.         <<
- >>                                                             <<
- >>   Also, run the "catalog" demo to get an overview of the    <<
- >>   [incr Widgets] package.  On Windows and Macintosh         <<
- >>   systems, this is installed as one of the executables.     <<
- >>   On Unix systems, this is installed in the                 <<
- >>   "lib/itcl/iwidgets3.0.0/demos" library directory.         <<
- >>                                                             <<
- >><<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+   - BOOK:  "Tcl/Tk Tools," edited by Mark Harrison
+            (ISBN 1-56592-218-2)
+
+ Also, run the "catalog" demo to get an overview of the [incr Widgets]
+ package.  On Windows and Macintosh systems, this is installed as one
+ of the executables.  On Unix systems, this is installed in the
+ "lib/itcl/iwidgets3.0.0/demos" library directory.
 
  The file "iwidgets3.0.0/doc/iwidgets.ps" contains a tutorial
- introduction to the [incr Widgets] package.  The mega-widget
- classes in this package show off most of the functionality in
- this release.  You can use them as a pattern to create your
- own widget classes.
+ introduction to the [incr Widgets] package.  The mega-widget classes
+ in [incr Widgets] show off most of the functionality in this release.
+ You can use them as a pattern to create your own widget classes.
+
+ If you're a seasoned itcl professional, check the CHANGES file for a
+ summary of recent enhancements.  Consult the man pages for detailed
+ information on particular commands.
+
+ Check out our web site for the latest news:
+
+     http://www.tcltk.com/itcl/
 
 
  Installation on Unix Systems
@@ -131,24 +135,24 @@
         ftp ftp.tcltk.com
         cd pub/itcl
         binary
-        get itcl3.0.tar.gz
+        get itcl3.2.tar.gz
         quit
 
 
   2)  Uncompress and untar the distribution:
 
-        gunzip itcl3.0.tar.gz
-        tar xvf itcl3.0.tar
+        gunzip itcl3.2.tar.gz
+        tar xvf itcl3.2.tar
 
 
   3)  Run the configuration script:
 
-        cd itcl3.0
+        cd itcl3.2
         ./configure
 
       or, for systems that don't recognize "#!" in shell scripts:
 
-        cd itcl3.0
+        cd itcl3.2
         /bin/sh ./configure
 
       The "configure" script finds the appropriate compiler flags and
@@ -160,10 +164,16 @@
 
         ./configure --prefix=/your/install/path
 
-      By default, everything will be build with non-shared libraries.
-      You can request shared libraries and dynamic loading like this:
+      If your Tcl installation is sitting somewhere other than right
+      next to this package, you may have to tell configure where to
+      find it:
 
-        ./configure --enable-shared
+        ./configure --with-tcl=/usr/local/tcl/lib
+
+      If you like the gcc compiler and/or want to debug, you can add
+      those options as well:
+
+        ./configure --enable-gcc --enable-symbols
 
 
   4)  Build the libraries and the executables.  From the toplevel
@@ -178,43 +188,37 @@
         make install
 
 
-  6)  Use the final product.  This distribution creates and installs
-      four executables:
-      
-        tclsh8.0 ......... tclsh for Tcl8.0
-        wish8.0 .......... wish for Tk8.0
-        itclsh3.0 ........ tclsh + namespaces + classes
-        itkwish3.0 ....... wish + namespaces + classes + megawidgets
+  6)  Use the final product:
 
-      If you configured this distribution with "--enabled-shared" to
-      request dynamic loading, you can use "tclsh" or "wish" as the
-      core program and load everything else as needed.
+        $ tclsh
+        % package require Itcl
+        % itcl::class Foo { method testing {} { return "testing!" } }
 
-      If you did not configure for dynamic loading, you will probably
-      want to use the "itkwish3.0" program instead.  This includes
-      everything you need to use [incr Widgets], and you won't have
-      to worry about LD_LIBRARY_PATH at all.
+      If you don't like the itcl:: prefix, you can import the itcl
+      commands into the global namespace:
+
+        % namespace import -force itcl::*
+        % class Foo { ... }
+
+      Note that you'll find the same behavior with [incr Widgets]:
+
+        $ wish
+        % package require Iwidgets
+        % iwidgets::optionmenu .om
+        % namespace import -force iwidgets::*
+        % optionmenu .om
 
 
- Installation on Windows 95, NT, and 3.1.x
+ Installation on Windows 95/98/NT
 ------------------------------------------------------------------------
- This distribution has been built for Windows 95/NT systems using
- the makefiles in the "win" directory.  These makefiles are for
- Visual C++, version 4.0 or beyond.  Just edit the "makefile.vc"
- in the toplevel directory to include the appropriate paths on
- your system.  Then, type:
-
-     nmake dist -f makefile.vc
-     nmake dist-install -f makefile.vc
-     nmake dist-clean -f makefile.vc
+ Follow the usual TEA instructions for building under Windows.
+ Requires Cygwin and Visual C++ 6.0.
 
 
  Installation on Macintosh Systems
 ------------------------------------------------------------------------
- This distribution has been built on Macintosh systems, but still
- needs some work to get things running smoothly.  If anyone has
- access to a Macintosh machine, I invite them to help with this
- porting effort.
+ Many thanks to Jim Ingham for putting up Macintosh binaries for
+ various releases.  Check out http://www.tcltk.com/itcl for downloads.
 
 
  Integrating [incr Tcl] with other extensions
@@ -253,11 +257,13 @@
 
  Acknowledgements
 ------------------------------------------------------------------------
- Thanks to everyone for being patient with me while I put together
- this release.  It took much longer than expected, due to a series
- of other interruptions.  Thanks to Matt Newman for providing the
- Tcl-only "tcl++" package that helped so many people move forward
- while they were waiting for this release.
+ Thanks to Chad Smith for writing an excellent, comprehensive
+ book "[incr Tcl/Tk] from the Ground Up," for many helpful bug
+ reports, and for nudging me along to fix things.
+
+ Thanks to Matt Newman for providing the Tcl-only "tcl++" package
+ that helped so many people move forward while waiting for the
+ itcl3.0 release.
 
  Thanks to John Ousterhout and the Scriptics team for bundling this
  package with their TclPro product.  It's gratifying to see [incr Tcl]
@@ -281,7 +287,7 @@
 
  Thanks to Alfredo Jahn and Bret Schuhmacher at WebNet for helping
  to create the [incr Tcl] web site, and for maintaining the
- [incr Tcl] mailing list.
+ [incr Tcl] mailing list for many years.
 
  Thanks to extension writers like Mark Diekhans (tclX) and Ioi Lam (Tix)
  for making their packages compatible with [incr Tcl].
@@ -306,12 +312,9 @@
  for putting up with all of this.
 
 --Michael
-                                                              ...
----------------------------------------------------------  ':'...''. ---
-  Michael J. McLennan 2C-226      mmclennan@lucent.com   '::.''''':;:
-  Lucent Technologies                                   '::;       ;;:
-  1247 S Cedar Crest Blvd                               :::,,       :;;
-  Allentown, PA  18103             Lucent Technologies  ;:;'        ;:;
-  phone: 610-712-2842            Bell Labs Innovations   ;;:       .;:
-    fax: 610-712-2773                                     :;:,   ,:;:
-                                                           ':;;;:;:'
+. . . . . . . . . . . . . . . . .                  ---_-----------
+                                . . . . . . . . . | c a d e n c e |
+      Michael McLennan          .                  ---------------
+      mmc@cadence.com           .      Cadence Design Systems, Inc.
+      phone: 610-398-6348       .      7535 Windsor Dr. Suite A-200
+        fax: 610-530-7985       .      Allentown, PA  18195

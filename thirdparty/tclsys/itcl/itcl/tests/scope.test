@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: scope.test,v 1.3 2000/06/01 20:34:36 wart Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itcl
 
 # ----------------------------------------------------------------------
 #  Syntax of the "scope" command
@@ -177,10 +182,10 @@ test scope-3.7 {code command provides access to methods} {
 test scope-3.8 {scope command allows access to slots in an array} {
     test_scope0 mcontext set varray(0) "defined"
     test_scope::pcontext set carray(0) "defined"
-    list [catch {test_scope0 mcontext scope varray(0)} msg] $msg \
-         [catch {test_scope0 mcontext scope varray(1)} msg] $msg \
-         [catch {test_scope::pcontext scope carray(0)} msg] $msg \
-         [catch {test_scope::pcontext scope carray(1)} msg] $msg
+    list [catch {test_scope0 mcontext itcl::scope varray(0)} msg] $msg \
+         [catch {test_scope0 mcontext itcl::scope varray(1)} msg] $msg \
+         [catch {test_scope::pcontext itcl::scope carray(0)} msg] $msg \
+         [catch {test_scope::pcontext itcl::scope carray(1)} msg] $msg
 } {0 {@itcl ::test_scope0 ::test_scope::varray(0)} 0 {@itcl ::test_scope0 ::test_scope::varray(1)} 0 ::test_scope::carray(0) 0 ::test_scope::carray(1)}
 
 itcl::delete class test_scope
@@ -200,8 +205,11 @@ test scope-4.1 {define simple namespace with things to export} {
 
 test scope-4.2 {scope command allows access to slots in an array} {
     test_scope_ns::pcontext set array(0) "defined"
-    list [catch {test_scope_ns::pcontext scope array(0)} msg] $msg \
-         [catch {test_scope_ns::pcontext scope array(1)} msg] $msg
+    list [catch {test_scope_ns::pcontext itcl::scope array(0)} msg] $msg \
+         [catch {test_scope_ns::pcontext itcl::scope array(1)} msg] $msg
 } {0 ::test_scope_ns::array(0) 0 ::test_scope_ns::array(1)}
 
 namespace delete test_scope_ns
+
+::tcltest::cleanupTests
+return

@@ -22,6 +22,7 @@
 # Should be able to handle simple class definitions, even if
 # they are prefaced with white space.
 #
+namespace import itcl::*
 namespace import blt::*
 
 class Simple1 {
@@ -49,7 +50,7 @@ itcl::ensemble ens {
 # Should be able to handle "body" and "configbody" declarations.
 #
 body Simple2::bump {} {incr x $by}
-configbody Simple2::by {if {$by <= 0} {error "bad increment}}
+configbody Simple2::by {if {$by <= 0} {error "bad increment"}}
 
 #
 # Should be able to handle class declarations within namespaces,
@@ -64,7 +65,7 @@ namespace eval buried {
         proc find {args} {}
     }
     body inside::bump {} {incr x $by}
-    configbody inside::by {if {$by <= 0} {error "bad increment}}
+    configbody inside::by {if {$by <= 0} {error "bad increment"}}
 
     class ::top {
         method skip {x y z} {}

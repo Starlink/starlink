@@ -23,7 +23,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id$
+ *     RCS:  $Id: itcl_ensemble.c,v 1.6 2001/04/08 06:17:33 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -91,11 +91,6 @@ Tcl_ObjType itclEnsInvocType = {
     SetEnsInvocFromAny                  /* setFromAnyProc */
 };
 
-/*
- *  Boolean flag indicating whether or not the "ensemble" object
- *  type has been registered with the Tcl compiler.
- */
-static int ensInitialized = 0;
 
 /*
  *  Forward declarations for the procedures used in this file.
@@ -166,9 +161,8 @@ int
 Itcl_EnsembleInit(interp)
     Tcl_Interp *interp;         /* interpreter being initialized */
 {
-    if (!ensInitialized) {
+    if (Tcl_GetObjType(itclEnsInvocType.name) == NULL) {
         Tcl_RegisterObjType(&itclEnsInvocType);
-        ensInitialized = 1;
     }
 
     Tcl_CreateObjCommand(interp, "::itcl::ensemble",
@@ -819,7 +813,11 @@ CreateEnsemble(interp, parentEnsData, ensName)
     cmdPtr->clientData = NULL;
     cmdPtr->deleteProc = DeleteEnsemble;
     cmdPtr->deleteData = cmdPtr->objClientData;
-    cmdPtr->deleted = 0;
+    #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
+      cmdPtr->deleted = 0;
+    #else
+      cmdPtr->flags = 0;
+    #endif
     cmdPtr->importRefPtr = NULL;
 
     ensPart->cmdPtr = cmdPtr;
@@ -896,7 +894,11 @@ AddEnsemblePart(interp, ensData, partName, usageInfo,
     cmdPtr->clientData = NULL;
     cmdPtr->deleteProc = deleteProc;
     cmdPtr->deleteData = (ClientData)clientData;
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
     cmdPtr->deleted = 0;
+#else
+    cmdPtr->flags = 0;
+#endif
     cmdPtr->importRefPtr = NULL;
 
     ensPart->cmdPtr = cmdPtr;
@@ -1626,7 +1628,7 @@ Itcl_EnsembleCmd(clientData, interp, objc, objv)
      *  another "ensemble" command.  Use the current ensemble as
      *  the parent, and find or create an ensemble part within it.
      */
-    ensName = TclGetStringFromObj(objv[1], (int*)NULL);
+    ensName = Tcl_GetStringFromObj(objv[1], (int*)NULL);
 
     if (ensData) {
         if (FindEnsemblePart(interp, ensData, ensName, &ensPart) != TCL_OK) {
@@ -1693,6 +1695,7 @@ Itcl_EnsembleCmd(clientData, interp, objc, objv)
     }
     else if (objc > 3) {
         objPtr = Tcl_NewListObj(objc-2, objv+2);
+        Tcl_IncrRefCount(objPtr);  /* stop Eval trashing it */
         status = Tcl_EvalObj(ensInfo->parser, objPtr);
         Tcl_DecrRefCount(objPtr);  /* we're done with the object */
     }
@@ -2103,6 +2106,7 @@ DupEnsInvocInternalRep(srcPtr, copyPtr)
 
     if (prevArgObj) {
         objPtr = Tcl_DuplicateObj(prevArgObj);
+        Tcl_IncrRefCount(objPtr);
         copyPtr->internalRep.twoPtrValue.ptr2 = (VOID *) objPtr;
     }
 }
@@ -2154,7 +2158,7 @@ SetEnsInvocFromAny(interp, objPtr)
      *  keep the string around as if it were the command line
      *  invocation.
      */
-    argObj = Tcl_NewStringObj(name, -1);
+    argObj = Tcl_NewStringObj(name, length);
 
     /*
      *  Free the old representation and install a new one.

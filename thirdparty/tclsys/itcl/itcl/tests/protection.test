@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: protection.test,v 1.3 2000/06/01 20:34:35 wart Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itcl
 
 # ----------------------------------------------------------------------
 #  Class members are protected by access restrictions
@@ -294,7 +299,7 @@ test protect-2.23 {*cannot* access non-overloaded private method from base class
   test_pr_derived0 prom
   test_pr_derived0 pubm}}
 
-eval namespace delete [find classes test_pr*]
+eval namespace delete [itcl::find classes test_pr*]
 
 # ----------------------------------------------------------------------
 #  Access restrictions don't mess up "info"
@@ -367,4 +372,7 @@ test protect-3.13 {private base class commons can be accessed from class} {
     } msg] $msg
 } {0 {private common ::test_info_base::pribc pribc-value pribc-value}}
 
-eval namespace delete [find classes test_info*]
+eval namespace delete [itcl::find classes test_info*]
+
+::tcltest::cleanupTests
+return

@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: import.test,v 1.2 2000/06/01 20:34:35 wart Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itcl
 
 # ----------------------------------------------------------------------
 #  Test "itcl::import::stub" command
@@ -148,3 +153,6 @@ test import-2.3 {itcl::class will overwrite stubs in an existing namespace} {
 } {0 xx ::test::buried}
 
 catch {interp delete $interp}
+
+::tcltest::cleanupTests
+return

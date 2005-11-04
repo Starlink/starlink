@@ -148,7 +148,7 @@ resource 'STR ' (-16397, purgeable) {
 
 data 'TEXT' (ITCL_LIBRARY_RESOURCES+1,"pkgIndex",purgeable, preload) {
 	"# Tcl package index file, version 1.0\n"
-	"package ifneeded Itcl 3.0 [list load [file join $dir itcl30[info sharedlibextension]] Itcl]\n"
+	"package ifneeded Itcl 3.1 [list load [file join $dir itcl31[info sharedlibextension]] Itcl]\n"
 };
 
 

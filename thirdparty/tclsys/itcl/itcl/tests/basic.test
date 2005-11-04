@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: basic.test,v 1.4 2000/07/06 06:43:30 mmc Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itcl
 
 # ----------------------------------------------------------------------
 #  Simple class definition
@@ -41,7 +46,7 @@ test basic-1.1 {define a simple class} {
 } ""
 
 test basic-1.2 {class is now defined} {
-    find classes Counter
+    itcl::find classes Counter
 } {Counter}
 
 test basic-1.3 {access command exists with class name} {
@@ -65,15 +70,15 @@ test basic-1.6 {objects have an access command} {
 } {::x}
 
 test basic-1.7a {objects are added to the master list} {
-    find objects x
+    itcl::find objects x
 } {x}
 
 test basic-1.7b {objects are added to the master list} {
-    find objects -class Counter x
+    itcl::find objects -class Counter x
 } {x}
 
 test basic-1.8 {objects can be deleted} {
-    list [delete object x] [namespace which -command x]
+    list [itcl::delete object x] [namespace which -command x]
 } {{} {}}
 
 test basic-1.9 {objects can be recreated with the same name} {
@@ -82,8 +87,13 @@ test basic-1.9 {objects can be recreated with the same name} {
 
 test basic-1.10 {objects can be destroyed by deleting their access command} {
     rename ::x ""
-    find objects x
+    itcl::find objects x
 } {}
+
+test basic-1.11 {find command supports object names starting with -} {
+    Counter -foo
+    itcl::find objects -class Counter -foo
+} {-foo}
 
 # ----------------------------------------------------------------------
 #  #auto names
@@ -139,7 +149,7 @@ test basic-3.6 {configure actually changes public variable} {
 
 test basic-3.7 {class procs can be accessed} {
     Counter::num
-} {6}
+} {7}
 
 test basic-3.8 {obsolete syntax is no longer allowed} {
     list [catch "Counter :: num" msg] $msg
@@ -152,8 +162,8 @@ Instead, remove the spaces from your procedure invocations:
 #  Classes can be destroyed and redefined
 # ----------------------------------------------------------------------
 test basic-4.1 {classes can be destroyed} {
-    list [delete class Counter] \
-         [find classes Counter] \
+    list [itcl::delete class Counter] \
+         [itcl::find classes Counter] \
          [namespace children :: Counter] \
          [namespace which -command Counter]
 } {{} {} {} {}}
@@ -177,9 +187,9 @@ test basic-4.4 {objects can be created from the new class} {
 } {counter0 counter1}
 
 test basic-4.5 {when a class is destroyed, its objects are deleted} {
-    list [lsort [find objects counter*]] \
-         [delete class Counter] \
-         [lsort [find objects counter*]]
+    list [lsort [itcl::find objects counter*]] \
+         [itcl::delete class Counter] \
+         [lsort [itcl::find objects counter*]]
 } {{counter0 counter1} {} {}}
 
 # ----------------------------------------------------------------------
@@ -317,3 +327,6 @@ test basic-6.7 {common variables can be unset} {
 test basic-6.8 {common variables can be redefined} {
     test_arrays0 do set undefined "scalar"
 } {scalar}
+
+::tcltest::cleanupTests
+return

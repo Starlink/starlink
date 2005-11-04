@@ -4,7 +4,7 @@
 #   AUTHOR:  Michael J. McLennan       Phone: (610)712-2842
 #            AT&T Bell Laboratories   E-mail: michael.mclennan@att.com
 #
-#      RCS:  $Id: Outlet.tcl,v 1.1.1.1 1995/09/09 02:23:16 mmc Exp $
+#      RCS:  $Id: Outlet.tcl,v 1.1 1998/07/27 18:41:30 stanton Exp $
 # ----------------------------------------------------------------------
 #               Copyright (c) 1993  AT&T Bell Laboratories
 # ======================================================================

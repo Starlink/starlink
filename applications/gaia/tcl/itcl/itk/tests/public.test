@@ -6,14 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: public.test,v 1.2 2000/06/01 21:32:36 wart Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itk
 
 # ----------------------------------------------------------------------
 #  Define a base class with public variables and a simple mega-widget
@@ -73,3 +78,6 @@ test public-1.4 {config code gets fired off} {
 #  Clean up
 # ----------------------------------------------------------------------
 itcl::delete class TestPublic test_public_base
+
+::tcltest::cleanupTests
+exit

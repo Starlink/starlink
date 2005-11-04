@@ -10,6 +10,11 @@
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
 # SCCS: @(#) defs 1.44 96/10/08 17:26:58
+# ------------------------------------------------------------------
+# THIS SCRIPT IS NOW DEPRECATED!  It is kept for older Tcl
+# installations that don't have the "tcltest" package.
+# Instead, use "package require tcltest" in the test suite.
+# ------------------------------------------------------------------
 
 if ![info exists VERBOSE] {
     set VERBOSE 0
@@ -81,6 +86,9 @@ if {[info commands memory] == ""} {
 #			'echo' etc available.
 
 catch {unset testConfig}
+
+package require Itcl
+
 if {$tcl_platform(platform) == "unix"} {
     set testConfig(unixOnly) 1
     set testConfig(tempNotPc) 1

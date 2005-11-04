@@ -6,21 +6,26 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id$
+#      RCS:  $Id: namespace.test,v 1.4 2000/07/06 06:43:30 mmc Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
+package require tcltest
+namespace import -force ::tcltest::*
+
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+package require Itcl
 
 # ----------------------------------------------------------------------
 #  Classes within namespaces
 # ----------------------------------------------------------------------
 test namespace-1.1 {same class name can be used in different namespaces} {
     namespace eval test_ns_1 {
-        class Counter {
+        itcl::class Counter {
             variable num 0
             method ++ {{by 1}} {
                 incr num $by
@@ -30,9 +35,10 @@ test namespace-1.1 {same class name can be used in different namespaces} {
             }
             common tag 1
         }
+        proc exists {} { return "don't clobber me!" }
     }
     namespace eval test_ns_2 {
-        class Counter {
+        itcl::class Counter {
             variable num 0
             method ++ {{by 2}} {
                 if {$num == 0} {
@@ -67,8 +73,21 @@ test namespace-1.4 {create an object in another namespace} {
 } {c 1 2 4 8}
 
 test namespace-1.5 {can find classes wrapped in a namespace} {
-    list [catch {test_ns_1::c do find objects -isa Counter} msg] $msg \
-         [catch {test_ns_1::c do find objects -class Counter} msg] $msg
-} {0 {} 0 {}}
+    list [catch {test_ns_1::c do itcl::find objects -isa Counter} msg] $msg \
+         [catch {test_ns_1::c do itcl::find objects -class Counter} msg] $msg
+} {0 ::test_ns_1::c 0 ::test_ns_1::c}
+
+test namespace-1.6 {can't create an object that clobbers a command in this namespace} {
+    list [catch {namespace eval test_ns_1 {Counter exists}} msg] $msg
+} {1 {command "exists" already exists in namespace "::test_ns_1"}}
+
+test namespace-1.7 {can create an object that shadows a command in the global namespace} {
+    list [catch {namespace eval test_ns_1 {Counter lreplace}} msg] $msg \
+         [catch {itcl::find objects *lreplace} msg] $msg \
+         [namespace eval test_ns_1 {namespace which lreplace}]
+} {0 lreplace 0 ::test_ns_1::lreplace ::test_ns_1::lreplace}
 
 namespace delete test_ns_1 test_ns_2
+
+::tcltest::cleanupTests
+return
