@@ -3,7 +3,7 @@
  *
  *    External declarations for the extended Tcl library.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclExtend.h,v 8.12.2.4 1998/08/09 01:10:04 markd Exp $
+ * $Id: tclExtend.h,v 8.27 2000/06/14 07:48:24 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -21,6 +21,15 @@
 
 #include <stdio.h>
 #include "tcl.h"
+
+/*
+ * The following is needed on Windows to deal with export/import of DLL
+ * functions.  See tcl???/win/README.
+ */
+#ifdef BUILD_TCLX
+# undef TCL_STORAGE_CLASS
+# define TCL_STORAGE_CLASS DLLEXPORT
+#endif
 
 /*
  * The versions for TclX and TkX.  This is based on the versions of Tcl and Tk
@@ -33,21 +42,25 @@
  * version numbers in hopes that we will remember to change it.
  *
  * Examples:
- *   Release        _VERSION  _FULL_VERSION
- *   7.5.0           7.5.0     7.5.0
- *   7.5.1 beta 1    7.5.1     7.5.1b1
- *   7.5.1 patch 1   7.5.1.1   7.5.1p1
+ *   Release        _VERSION  _FULL_VERSION  _PATCHLEVEL
+ *   8.2            8.2       8.2            0
+ *   8.2 beta 1     8.2       8.2b2          0
+ *   8.2 patch 1    8.2       8.2.1          1
  */
 
-#define TCLX_PATCHLEVEL      0
+#define TCLX_PATCHLEVEL     0
 
-#define TCLX_VERSION        "8.0.3"
-#define TCLX_FULL_VERSION   "8.0.3"
+#define TCLX_VERSION        "8.3"
+#define TCLX_FULL_VERSION   "8.3.0"
 
-#define TKX_VERSION         "8.0.3"
-#define TKX_FULL_VERSION    "8.0.3"
+#define TKX_VERSION         "8.3"
+#define TKX_FULL_VERSION    "8.3.0"
 
 #define TCLX_DEBUG
+
+/* Removed TclX_Main, use macro instead */
+#define TclX_Main(argc, argv, proc) \
+    TclX_MainEx(argc, argv, proc, Tcl_CreateInterp())
 
 /*
  * Generic void pointer.
@@ -79,19 +92,40 @@ typedef int
                                            ClientData  clientData,
                                            int         background,
                                            int         signalNum));
+
+EXTERN void
+TclX_ShellExit _ANSI_ARGS_((Tcl_Interp *interp,
+                            int         exitCode));
+
+EXTERN int
+TclX_Eval _ANSI_ARGS_((Tcl_Interp  *interp,
+                       unsigned     options,
+                       char        *cmd));
+
+EXTERN int
+TclXRuntimeInit _ANSI_ARGS_((Tcl_Interp *interp,
+                             char       *which,
+                             char       *defaultLib,
+                             char       *version));
+
 /*
  * Exported TclX initialization functions.
  */
-EXTERN void
-TclX_Main _ANSI_ARGS_((int              argc,
-                       char           **argv,
-                       Tcl_AppInitProc *appInitProc));
+
+EXTERN void		TclX_MainEx _ANSI_ARGS_((int argc, char ** argv, 
+				Tcl_AppInitProc * appInitProc, 
+				Tcl_Interp * interp));
 
 EXTERN int
 Tclx_Init _ANSI_ARGS_((Tcl_Interp *interp));
 
 EXTERN int
 Tclx_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
+
+EXTERN char*
+TclX_InitTclStubs _ANSI_ARGS_((Tcl_Interp *interp,
+			       char       *version,
+			       int         exact));
 
 EXTERN int
 Tclx_InitStandAlone _ANSI_ARGS_((Tcl_Interp *interp));
@@ -138,6 +172,9 @@ TclX_SplitWinCmdLine _ANSI_ARGS_((int    *argcPtr,
 /*
  * Exported utility functions.
  */
+EXTERN void
+TclX_AppendObjResult _ANSI_ARGS_(TCL_VARARGS_DEF(Tcl_Interp *, interpArg));
+
 EXTERN char * 
 TclX_DownShift _ANSI_ARGS_((char       *targetStr,
                             CONST char *sourceStr));
@@ -243,9 +280,28 @@ TclX_AsyncCommandLoop _ANSI_ARGS_((Tcl_Interp *interp,
                                    char       *prompt1,
                                    char       *prompt2));
 
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLIMPORT
+
+
 /*
  * Tk with TclX initialization.
  */
+
+#ifdef BUILD_tkx
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLEXPORT
+#endif
+
+/* Removed TclX_Main, use macro instead */
+#define TkX_Main(argc, argv, proc) \
+    TkX_MainEx(argc, argv, proc, Tcl_CreateInterp())
+
+EXTERN void
+TkX_MainEx _ANSI_ARGS_((int            argc,
+                      char             **argv,
+                      Tcl_AppInitProc  *appInitProc,
+		      Tcl_Interp       *interp));
 
 EXTERN int
 Tkx_Init _ANSI_ARGS_((Tcl_Interp  *interp));
@@ -256,11 +312,6 @@ Tkx_InitStandAlone _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN int
 Tkx_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
 
-EXTERN void
-TkX_Main _ANSI_ARGS_((int               argc,
-                      char            **argv,
-                      Tcl_AppInitProc  *appInitProc));
-
 /*
  * These are for Windows only.
  */
@@ -270,6 +321,11 @@ TkX_ConsoleInit _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN void
 TkX_Panic _ANSI_ARGS_(TCL_VARARGS_DEF(char *,fmt));
 
+/*
+ * Return storage class to default state see tcl8.0.3+/generic/tcl.h or
+ * tk8.0.3+/generic/tk.h
+ */
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLIMPORT
+
 #endif
-
-

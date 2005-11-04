@@ -3,7 +3,7 @@
 #
 # Visual C++ 2.x and 4.0 makefile for Extended Tk on Windows.
 #------------------------------------------------------------------------------
-# Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: makefile.vc,v 8.6 1997/12/14 21:33:03 markd Exp $
+# $Id: makefile.vc,v 8.9 1999/06/26 00:25:53 surles Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -39,8 +39,7 @@ TKXTESTOBJS = \
 TKXOBJS = \
         $(TMP_DIR)\tkXinit.obj \
         $(TMP_DIR)\tkXshell.obj \
-        $(TMP_DIR)\tkXwinUtil.obj \
-        $(TMP_DIR)\tkConsole.obj
+        $(TMP_DIR)\tkXwinUtil.obj
 
 WISHX = wishx.exe
 TKTEST = tktest.exe
@@ -55,9 +54,7 @@ test: all $(TKTEST) runtest.bat runtest.tcl
         .\runtest -geometry +0+0 runtest.tcl
 
 tkXvc.def: $(TKXOBJS)
-        $(DUMPEXTS) -o $@ $(TKX_DLL) @<<
-        $(TKXOBJS)
-<<
+        $(DUMPEXTS) -o $@ $(TKX_DLL_NAME) $(TKXOBJS)
 
 $(TKX_DLL): $(TKXOBJS) tkXvc.def $(TMP_DIR)\tkx.res
         set LIB=$(LIB)
@@ -97,7 +94,7 @@ tkx.tcl: $(TKX_RUNTIME_DIR)\tkx.tcl
 runwishx.bat: makefile.vc ..\..\win\common.vc
         -del runwishx.bat
         @echo echo off>>runwishx.bat
-        @echo PATH $(TKX_WIN_DIR);$(TK_WIN_DIR);$(TCLX_WIN_DIR);$(TCL_WIN_DIR);%PATH%>>runwishx.bat
+        @echo PATH $(TKX_WIN_DIR);$(TK_BUILD_DIR);$(TCLX_WIN_DIR);$(TCL_BUILD_DIR);%PATH%>>runwishx.bat
         @echo set TCL_LIBRARY=$(TCL_RUNTIME_DIR)>>runwishx.bat
         @echo set TK_LIBRARY=$(TK_RUNTIME_DIR)>>runwishx.bat
         @echo set TCLX_LIBRARY=$(TCLX_WIN_DIR)>>runwishx.bat
@@ -108,7 +105,7 @@ runwishx.bat: makefile.vc ..\..\win\common.vc
 runtest.bat: makefile.vc ..\..\win\common.vc
         -del runtest.bat
         @echo echo off>>runtest.bat
-        @echo PATH $(TKX_WIN_DIR);$(TK_WIN_DIR);$(TCLX_WIN_DIR);$(TCL_WIN_DIR);%PATH%>>runtest.bat
+        @echo PATH $(TKX_WIN_DIR);$(TK_BUILD_DIR);$(TCLX_WIN_DIR);$(TCL_BUILD_DIR);%PATH%>>runtest.bat
         @echo set TCL_LIBRARY=$(TCL_RUNTIME_DIR)>>runtest.bat
         @echo set TK_LIBRARY=$(TK_RUNTIME_DIR)>>runtest.bat
         @echo set TCLX_LIBRARY=$(TCLX_WIN_DIR)>>runtest.bat
@@ -155,11 +152,15 @@ clean:
 $(TMP_DIR)\tkXinit.obj: $(TKX_GENERIC_DIR)\tkXinit.c
         $(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TKX_INCLUDES) \
             $(TKX_DEFINES) -DTKX_LIBRARY="\"$(TKX_INST_RUNTIMEU)\"" \
-            -Fo$(TMP_DIR)\ $?
+            -DBUILD_tkx -Fo$(TMP_DIR)\ $?
 
-$(TMP_DIR)\tkConsole.obj: $(TK_GENERIC_DIR)\tkConsole.c
+$(TMP_DIR)\tkXAppInit.obj: $(TKX_WIN_DIR)\tkXAppInit.c
         $(cc32) $(cdebug) $(cflags) $(cvars) $(TKX_INCLUDES) \
-                $(TKX_DEFINES) -Fo$(TMP_DIR)\ $?
+            $(TKX_DEFINES) -Fo$(TMP_DIR)\ $?
+
+$(TMP_DIR)\tkXwinTest.obj: $(TKX_WIN_DIR)\tkXwinTest.c
+        $(cc32) $(cdebug) $(cflags) $(cvars) $(TKX_INCLUDES) \
+            $(TKX_DEFINES) -Fo$(TMP_DIR)\ $?
 
 $(TMP_DIR)\tkTest.obj: $(TK_GENERIC_DIR)\tkTest.c
         $(cc32) $(cdebug) $(cflags) $(cvars) $(TKX_INCLUDES) \
@@ -174,11 +175,11 @@ $(TMP_DIR)\tkSquare.obj: $(TK_GENERIC_DIR)\tkSquare.c
 #
 {$(TKX_GENERIC_DIR)}.c{$(TMP_DIR)}.obj:
     $(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TKX_INCLUDES) \
-          $(TKX_DEFINES) -Fo$(TMP_DIR)\ $<
+          $(TKX_DEFINES) -DBUILD_tkx -Fo$(TMP_DIR)\ $<
 
 {$(TKX_WIN_DIR)}.c{$(TMP_DIR)}.obj:
     $(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TKX_INCLUDES) \
-          $(TKX_DEFINES) -Fo$(TMP_DIR)\ $<
+          $(TKX_DEFINES) -DBUILD_tkx -Fo$(TMP_DIR)\ $<
 
 {$(TKX_WIN_DIR)}.rc{$(TMP_DIR)}.res:
         $(rc32) -fo $@ -r -i $(TCLX_GENERIC_DIR) -i $(TCLX_WIN_DIR) $<

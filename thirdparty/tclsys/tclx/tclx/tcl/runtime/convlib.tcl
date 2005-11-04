@@ -5,7 +5,7 @@
 # package library.
 # 
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -14,7 +14,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: convlib.tcl,v 8.6 1997/11/12 07:20:59 markd Exp $
+# $Id: convlib.tcl,v 8.7 1999/03/31 06:37:47 markd Exp $
 #------------------------------------------------------------------------------
 #
 

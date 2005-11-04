@@ -3,7 +3,7 @@
 .\"
 .\" Extended command set and environment for Tcl.
 .\"----------------------------------------------------------------------------
-.\" Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+.\" Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 .\"
 .\" Permission to use, copy, modify, and distribute this software and its
 .\" documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 .\" software for any purpose.  It is provided "as is" without express or
 .\" implied warranty.
 .\"----------------------------------------------------------------------------
-.\" $Id: TclX.n,v 8.12.2.1 1998/08/08 16:43:53 markd Exp $
+.\" $Id: TclX.n,v 8.19 2001/08/02 00:10:24 hobbs Exp $
 .\"----------------------------------------------------------------------------
 .\"
 .TH "TclX" TCL "" "Tcl"
@@ -20,6 +20,9 @@
 .SH NAME
 TclX \- Extended Tcl: Extended command set for Tcl
 '
+.SH SYNOPSIS
+\fBpackage require Tclx\fR
+.PP
 .SH "INTRODUCTION"
 .PP
 This man page contains the documentation for all of the extensions that are
@@ -209,6 +212,11 @@ catalogs, always returning the default string.
 .B have_posix_signals
 Return \fB1\fR if Posix signals are available (\fBblock\fR and \fBunblock\fR
 options available for the signal command).  \fB0\fR is returned if Posix
+signals are not available.
+.TP
+.B have_signal_restart
+Return \fB1\fR if restartable signals are available (\fB-restart\fR
+option available for the signal command).  \fB0\fR is returned if restartable
 signals are not available.
 .TP
 .B have_truncate
@@ -831,10 +839,14 @@ option.  This causes a blocked system call, such as \fBread\fR or
 \fBwaitpid\fR to be restarted rather than generate an error.  Failure
 to do this may results in unexpected errors when a signal arrives
 while in one of these system calls.
+When available, the \fB-restart\fR option can prevent this problem.
 .IP
 If \fB-restart\fR is specified, restart blocking system calls rather than
 generating an error.  The signal will be handled once the Tcl command 
 that issued the system call completes.
+The \fB-restart\fR options is not available on all operating systems and
+its use will generate an error when it is not supported.  
+Use \fBinfox have_signal_restart\fR to check for availability.
 .IP
 Specify the action to take when a Unix signal is received by Extended
 Tcl, or a program that embeds it.  \fISiglist\fR is a list
@@ -914,6 +926,8 @@ processes in the background).
 .B sleep \fIseconds\fR
 .br
 Sleep the Extended Tcl process for \fIseconds\fR seconds.
+\fISeconds\FR, if specified as a decimal number, 
+is truncated to an integer value. 
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2143,7 +2157,7 @@ they are equal and \fB1\fR if \fIstring1\fR is greater than \fIstring2\fR.
 If \fB\-local\fR is specified, the strings are compared according to the
 collation environment of the current locale.
 .sp
-This command does not work with binary data.
+This command does not work with binary or UTF data.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2158,6 +2172,8 @@ While string concatenation is normally performed by the parser, it is
 occasionally useful to have a command that returns a string.
 The is generally useful when a command to evaluate is required.
 No separators are inserted between the strings.
+.sp
+This command is UTF-aware.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2172,6 +2188,8 @@ It returns \fB1\fR if \fIstring1\fR and \fIstring2\fR are the identical
 and \fB0\fR if they are not.
 This command is a short-cut for \fBstring compare\fR and avoids the
 problems with string expressions being treated unintentionally as numbers.
+.sp
+This command is UTF-aware and will also work on binary data.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2188,6 +2206,8 @@ If the expression \fIindexExpr\fR starts with the string \fBend\fR, then
 \fBend\fR is replaced with the index of the last character in the string.  If
 the expression starts with \fBlen\fR, then \fBlen\fR is replaced with the
 length of the string.
+.sp
+This command is UTF-aware.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2204,6 +2224,8 @@ This command is a shortcut for:
     string length string
 .ft R
 .fi
+.sp
+This command is UTF-aware.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2221,6 +2243,8 @@ If the expression \fIfirstExpr\fR or \fBlastExpr\fR starts with the string
 \fBend\fR, then \fBend\fR is replaced with the index of the last character in
 the string.  If the expression starts with \fBlen\fR, then \fBlen\fR is
 replaced with the length of the string.
+.sp
+This command is UTF-aware.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2238,6 +2262,8 @@ If the expression \fIfirstExpr\fR or \fBlengthExpr\fR starts with the string
 \fBend\fR, then \fBend\fR is replaced with the index of the last character in
 the string.  If the expression starts with \fBlen\fR, then \fBlen\fR is
 replaced with the length of the string.
+.sp
+This command is UTF-aware.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2289,7 +2315,7 @@ than 0200).
 .TP
 .B ctype char \fInumber\fR
 Converts the numeric value, \fIstring\fR, to an ASCII character.  Number must
-be in the range 0 through 255.
+be in the range 0 through the maximum Unicode values.
 .TP
 .B ctype \fI?\-failindex var? cntrl \fIstring\fR
 Tests that all characters are ``control characters'' as defined by the
@@ -2308,7 +2334,7 @@ set.
 .TP
 .B ctype ord \fIcharacter\fR
 Convert a character into its decimal numeric value.  The first character of
-the string is converted.
+the string is converted to its numeric Unicode value.
 .TP
 .B ctype \fI?\-failindex var? space \fIstring\fR
 Tests that all characters are either a space, horizontal-tab, carriage
@@ -2346,6 +2372,8 @@ first character that did not match the class is returned in \fIvar\fR.
 .br
 Returns \fIstring\fR, replicated the number of times indicated by the
 expression \fIcountExpr\fR.
+.sp
+This command is UTF-aware and will work with binary data.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2367,6 +2395,9 @@ For example:
 .ft R
 .if
 returns "FOOBAR".
+.sp
+This command currently only supports characters in ASCII range; UTF-8 characters
+out of this range will generate an error.
 '\"@:
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
@@ -2412,7 +2443,7 @@ Message catalogs are global to the process, an application with multiple
 Tcl interpreters within the same process may pass and share message catalog
 handles.
 '
-'\"@help: tcl/internation/catopen
+'\"@help: tcl/intl/catopen
 '\"@brief: Open a message catalog.
 .TP
 .B catopen\fR ?\fB\-fail\fR | \fB\-nofail\fR? \fIcatname\fR
@@ -2434,7 +2465,7 @@ message catalog.  If the handle from a failed \fBcatopen\fR is passed to
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
 '
-'\"@help: tcl/internation/catgets
+'\"@help: tcl/intl/catgets
 '\"@brief: Retrieve a message from a message catalog.
 .TP
 .B catgets \fIcatHandle setnum msgnum defaultstr\fR
@@ -2449,7 +2480,7 @@ string, \fIdefaultstr\fR, is returned.
 '\"@:This command is provided by Extended Tcl.
 '\"@endhelp
 '
-'\"@help: tcl/internation/catclose
+'\"@help: tcl/intl/catclose
 '\"@brief: Close a message catalog.
 .TP
 .B catclose\fR ?\fB\-fail\fR | \fB\-nofail\fR? \fIcathandle\fR

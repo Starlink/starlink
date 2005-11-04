@@ -4,7 +4,7 @@
  *  Test support functions for the Extended Tcl test program.
  *
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXtest.c,v 8.7 1997/08/10 22:21:16 markd Exp $
+ * $Id: tclXtest.c,v 8.10 1999/03/31 06:37:47 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -177,8 +177,8 @@ Tclxtest_Init (interp)
      * Force interpreter to be deleted at the end.  Helps find corruption and
      * memory leaks.
      */
-    TclX_ObjSetVar2S (interp,  "TCLXENV", "deleteInterpAtShellExit",
-                      Tcl_NewBooleanObj (TRUE), TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp,  "TCLXENV", "deleteInterpAtShellExit",
+                  Tcl_NewBooleanObj(TRUE), TCL_GLOBAL_ONLY);
 
     Tcl_CreateCommand (interp, "tclx_test_eval", TclxTestEvalCmd,
                        (ClientData) NULL, (Tcl_CmdDeleteProc*) NULL);

@@ -8,7 +8,7 @@
  * is not available on that platform.  This results in code with minimal
  * number of #ifdefs.
  *-----------------------------------------------------------------------------
- * Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -17,7 +17,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXwinOS.c,v 8.7 1997/08/08 16:51:14 markd Exp $
+ * $Id: tclXwinOS.c,v 8.12 2000/06/14 21:56:27 wart Exp $
  *-----------------------------------------------------------------------------
  * The code for reading directories is based on TclMatchFiles from the Tcl
  * distribution file win/tclWinFile.c
@@ -428,7 +428,7 @@ TclXOSsetitimer (Tcl_Interp *interp,
 void
 TclXOSsleep (unsigned seconds)
 {
-    Sleep (seconds*100);
+    Sleep(seconds*1000);
 }
 
 /*-----------------------------------------------------------------------------
@@ -571,27 +571,16 @@ void
 TclXOSElapsedTime (clock_t *realTime,
                    clock_t *cpuTime)
 {
-#if 0
-???
-    static struct timeval startTime = {0, 0};
-    struct timeval currentTime;
-    struct tms cpuTimes;
-
+    static DWORD startTime = 0;
+  
     /*
      * If this is the first call, get base time.
      */
-    if ((startTime.tv_sec == 0) && (startTime.tv_usec == 0))
-        gettimeofday (&startTime, NULL);
-    
-    gettimeofday (&currentTime, NULL);
-    currentTime.tv_sec  = currentTime.tv_sec  - startTime.tv_sec;
-    currentTime.tv_usec = currentTime.tv_usec - startTime.tv_usec;
-    *realTime = (currentTime.tv_sec  * 1000) + (currentTime.tv_usec / 1000);
+    if (startTime == 0) {
+	startTime = GetTickCount ();
+    }
+    *realTime = GetTickCount () - startTime;
     *cpuTime = 0;
-#else
-    *realTime = 0;
-    *cpuTime = 0;
-#endif
 }
 
 /*-----------------------------------------------------------------------------
@@ -614,7 +603,16 @@ TclXOSkill (Tcl_Interp *interp,
             int         signal,
             char       *funcName)
 {
-    return TclXNotAvailableError (interp, funcName);
+    HANDLE processHandle;
+
+    processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, (int) pid);
+    if (processHandle == NULL) {
+	Tcl_AppendResult(interp, "invalid pid", (char *) NULL);
+	return TCL_ERROR;
+    }
+
+    TerminateProcess(processHandle, 7);
+    return TCL_OK;
 }
 
 /*-----------------------------------------------------------------------------

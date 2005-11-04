@@ -3,7 +3,7 @@
  *
  * Support for the dup command on Windows.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXwinDup.c,v 8.5 1997/08/08 16:51:12 markd Exp $
+ * $Id: tclXwinDup.c,v 8.6 1999/03/31 06:37:54 markd Exp $
  *-----------------------------------------------------------------------------
  */
 

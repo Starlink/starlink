@@ -3,7 +3,7 @@
 #
 # Tests for the lgets command.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: lgets.test,v 8.4 1997/09/25 03:56:38 markd Exp $
+# $Id: lgets.test,v 8.8 1999/03/31 06:37:50 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -174,6 +174,7 @@ catch {close $fh}
 # FIX: Doesn't work right on Win32.
 if [cequal $tcl_platform(platform) windows] {
     echo "    * lgets tests not completely ported to Win32, some tests skipped"
+    TestRemove test1.tmp test2.tmp
     return
 }
 
@@ -287,7 +288,6 @@ Test lgets-6.0 {lgets corner cases} {
     close $fh
     set inlist
 } 0 [list {\\server} {\home} {foo\}}]
-
 
 
 TestRemove test1.tmp test2.tmp

@@ -4,7 +4,7 @@
  * Provides a default version of the Tcl_AppInit procedure for use with
  * applications built with Extended Tcl on  Windows 95/NT systems.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,37 +13,21 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXAppInit.c,v 8.3 1997/07/01 02:58:16 markd Exp $
+ * $Id: tclXAppInit.c,v 8.6 2000/07/11 04:42:02 welch Exp $
  *-----------------------------------------------------------------------------
  */
 
-#include "tclExtend.h"
-
-
-
-/*-----------------------------------------------------------------------------
- * main --
- *
- * This is the main program for the application.
- *-----------------------------------------------------------------------------
+/*
+ * As a shell (i.e., the main program) we cannot be using the stubs table.
  */
-int
-main (int    argc,
-      char **argv)
-{
-
-#ifndef BORLAND
-    TclX_SplitWinCmdLine (&argc, &argv);
+#ifdef USE_TCL_STUBS
+#undef USE_TCL_STUBS
 #endif
 
-    TclX_Main (argc, argv, Tcl_AppInit);
-
-    return 0;                   /* Needed only to prevent compiler warning. */
-}
-
+#include "tclExtend.h"
 
 /*-----------------------------------------------------------------------------
- * Tcl_AppInit --
+ * TclX_AppInit --
  *
  * This procedure performs application-specific initialization.  Most
  * applications, especially those that incorporate additional packages, will
@@ -55,7 +39,7 @@ main (int    argc,
  *-----------------------------------------------------------------------------
  */
 int
-Tcl_AppInit (Tcl_Interp *interp)
+TclX_AppInit (Tcl_Interp *interp)
 {
     if (Tcl_Init (interp) == TCL_ERROR) {
         return TCL_ERROR;
@@ -80,4 +64,19 @@ Tcl_AppInit (Tcl_Interp *interp)
     return TCL_OK;
 }
 
+
+/*-----------------------------------------------------------------------------
+ * main --
+ *
+ * This is the main program for the application.
+ *-----------------------------------------------------------------------------
+ */
+int
+main (int    argc,
+      char **argv)
+{
+    TclX_MainEx (argc, argv, TclX_AppInit, Tcl_CreateInterp());
+
+    return 0;                   /* Needed only to prevent compiler warning. */
+}
 

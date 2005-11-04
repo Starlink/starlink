@@ -3,7 +3,7 @@
  *
  * Extended Tcl file-related commands.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXfilecmds.c,v 8.13 1997/07/08 06:35:26 markd Exp $
+ * $Id: tclXfilecmds.c,v 8.16 1999/03/31 06:37:43 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -87,14 +87,13 @@ TclX_PipeObjCmd (clientData, interp, objc, objv)
         TclX_AppendObjResult (interp, channelNames [0], " ",
                               channelNames [1], (char *) NULL);
     } else {
-        if (Tcl_ObjSetVar2 (interp, objv [1], (Tcl_Obj *) NULL,
-                            Tcl_NewStringObj (channelNames [0], -1),
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL)
+        if (Tcl_ObjSetVar2(interp, objv[1], NULL, Tcl_NewStringObj(channelNames [0], -1),
+                           TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL)
             goto errorExit;
 
-        if (Tcl_ObjSetVar2 (interp, objv [2], (Tcl_Obj *) NULL,
-                            Tcl_NewStringObj (channelNames [1], -1),
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL)
+        if (Tcl_ObjSetVar2(interp, objv[2], NULL,
+                           Tcl_NewStringObj(channelNames [1], -1),
+                           TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL)
             goto errorExit;
     }
 

@@ -3,7 +3,7 @@
  *
  * Tcl command to create and manage processes.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXprocess.c,v 8.9 1997/12/14 21:33:00 markd Exp $
+ * $Id: tclXprocess.c,v 8.11 2001/05/19 16:45:23 andreas_kupries Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -300,15 +300,18 @@ TclX_ProcessInit (interp)
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc*) NULL);
 
-    Tcl_CreateObjCommand (interp,
+    /* Avoid conflict with "expect".
+     */
+
+    TclX_CreateObjCommand (interp,
                           "fork",
 			  TclX_ForkObjCmd,
                           (ClientData) NULL,
-			  (Tcl_CmdDeleteProc*) NULL);
+			  (Tcl_CmdDeleteProc*) NULL, 0);
 
-    Tcl_CreateObjCommand (interp,
+    TclX_CreateObjCommand (interp,
                           "wait",
                           TclX_WaitObjCmd,
                           (ClientData) NULL,
-                          (Tcl_CmdDeleteProc*) NULL);
+                          (Tcl_CmdDeleteProc*) NULL, 0);
 }

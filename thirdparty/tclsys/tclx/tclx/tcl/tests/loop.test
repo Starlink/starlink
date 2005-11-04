@@ -3,7 +3,7 @@
 #
 # Tests for the loop command.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: loop.test,v 8.2 1997/08/23 18:55:46 markd Exp $
+# $Id: loop.test,v 8.4 2001/01/18 04:23:49 diekhans Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -141,5 +141,7 @@ Test loop-1.15 {loop tests} {
     set a
 } 0 {6 5 4 3 2}
 
-
+Test loop-2.1 {loop test} {
+    loop i 0 5 {error "an error"}
+} 1 {an error}
 

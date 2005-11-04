@@ -4,7 +4,7 @@
  * Initialization code for the wishx and other Tk & Extended Tcl based
  * applications.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tkXinit.c,v 8.3 1997/08/23 18:56:10 markd Exp $
+ * $Id: tkXinit.c,v 8.7 2000/06/14 07:48:24 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -60,13 +60,24 @@ InitSetup (interp)
 int Tkx_Init (interp)
     Tcl_Interp *interp;
 {
+    /* 
+     * Initialize the stubs before making any calls to Tcl or Tk APIs.
+     */
+
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) {
+	abort();
+    }
+    if (Tk_InitStubs(interp, TK_VERSION, 0) == NULL) {
+	abort();
+    }
+
     if (InitSetup(interp) != TCL_OK) {
 	goto errorExit;
     }
-    if (TclXRuntimeInit (interp,
-                         "tk",
-                         TKX_LIBRARY,
-                         TKX_FULL_VERSION) == TCL_ERROR)
+    if (TclXRuntimeInit(interp,
+                        "tk",
+                        TKX_LIBRARY,
+                        TKX_VERSION) == TCL_ERROR)
         goto errorExit;
 
     return TCL_OK;

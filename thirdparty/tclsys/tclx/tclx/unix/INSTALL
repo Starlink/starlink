@@ -2,11 +2,11 @@
 INSTALLATION INSTRUCTIONS FOR EXTENDED TCL ON UNIX AND UNIX-LIKE SYSTEMS
 ------------------------------------------------------------------------
 
-$Id: INSTALL,v 8.9.2.1 1998/07/08 05:21:21 markd Exp $
+$Id: INSTALL,v 8.17 1999/08/10 23:19:31 redman Exp $
 
 COMPATIBILITY
 =============
-This version is compatible Tcl 8.0p2 and Tk 8.0p2.
+This version is compatible Tcl 8.2.0 and Tk 8.2.0
 
 QUICK START
 ===========
@@ -18,7 +18,7 @@ in the manner that addresses the needs of most users.   If you:
       directories adjacent to the TclX source directory.  i.e.
 
                             mybuilddir/
-                 tcl8.0/      tk8.0/      tclX8.0.3/
+                tcl8.2/      tk8.2/      tclX8.2/
  
     o are installing under /usr/local.
 
@@ -26,10 +26,8 @@ in the manner that addresses the needs of most users.   If you:
 
 ...then the following steps will build, test and install TclX:
 
-    cd tclX8.0.3/unix
+    cd tclX8.2/unix
     configure          # add --enable-shared to build shared libraries
-    # If there are patches in tclX8.0.3/TCL-REQUIRED-PATCHES:
-        make patch-tcl-core
     make
     make test          # Run both standard and extended Tcl tests
     make tktest        # Run Tk tests with wishx
@@ -46,8 +44,7 @@ EXTENDED TCL SOURCE DIRECTORY HIERARCHY
 
 To successfully build and install Extended Tcl, you must have already
 built Tcl and Tk, and make their built source trees available to
-Extended Tcl during the build process.  Their location relative to the 
-tclX8.0.3 directory is configured by editing tclX8.0.3/unix/Config.mk.
+Extended Tcl during the build process. 
 
 The following directories are included under the TclX directory:
 
@@ -70,62 +67,33 @@ The following directories are included under the TclX directory:
 
   o doc - Unformatted manual pages for TclX.
 
-REQUIRED PATCHES
-================
-
-In some releases of Extended Tcl, particularly beta releases, it is sometimes
-necessary for us to ship patches to the Tcl core to fix or work around a
-problem, etc.  These patches usually come from postings to the
-comp.lang.tcl newsgroup made by the Sunscript team.
-
-If any patches are included in this package's TCL-REQUIRED-PATCHES directory,
-they must be installed into the corresponding version of Tcl you're
-building with.
-
-You may either install the patches by hand, or, go ahead and cd to "unix" and
-configure TclX.  This will put a rule in your tclX8.0b1/unix/Makefile
-where you can then say "make patch-tcl-core" to make the patches on the
-Tcl core.  If any patch is reversed or has already been applied, it
-is ignored.
-
-
 HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
 ==========================================
 
-    o Configure, compile and install Tcl 8.0 following the instructions that
-      come with Tcl.  Tcl 8.0 can be obtained from
+    o Configure, compile and install Tcl 8.2 following the instructions that
+      come with Tcl.  Tcl 8.2 can be obtained from
 
-	ftp://ftp.smli.com/pub/tcl/
-
-	ftp://mirror.neosoft.com/pub/tcl/mirror/ftp.smli.com/
+	ftp://ftp.scriptics.com/pub/tcl/
 
     o If you are going to be using Tk and want to build an Extended Tcl wish
       shell (wishx), you will also need to configure, compile and install 
-      Tk 8.0.  Generic instructions on how to build and work worth packages
+      Tk 8.2.  Generic instructions on how to build and work worth packages
       configured by "configure" scripts may be found in the file
       INSTALL.generic, located in the same directory as the file you are
       currently reading.
 
-    o If there are patchs in tclX8.0.3/TCL-REQUIRED-PATCHES, then install
-      these patches to Tcl and rebuild it.
-
-    o After building and installing Tcl and Tk, cd to tclX8.0.3/unix
-
-    o Edit Config.mk in the build directory following the instructions in the
-      file.  You normally won't need to change anything, unless you require
-      any special configuration options.  
-
-      If the --srcdir option to configure is used, Config.mk is copied from the 
-      source directory to the build directory.  This file is
-      used to specify values that can't be figured out by the configure script.
-      This includes the location of the Tcl and Tk distributions.  It's also
-      used to specify the sections that the Tcl manual pages are to be
-      installed in.  This must be done before running configure, as 
-      configure uses this file to fine tclConfig.sh and tkConfig.sh.
+    o After building and installing Tcl and Tk, cd to tclX8.2/unix
 
     o Enter ./configure to run the configure script.  If you are going to
       be compiling with gcc, set the environment variable CC to "gcc".
       The following options are recognized by the TclX configure script:
+        o -- with-tcl=dir
+          Specifies the full path to the built Tcl source directory.
+          By default, configure searchs for the Tcl distribution.
+
+        o -- with-tk=dir
+          Specifies the full path to the built Tk source directory.
+          By default, configure searchs for the Tk distribution.
 
         o --enable-shared=YES|NO
           If "YES", build and link with shared libraries if "NO", no shared
@@ -133,7 +101,7 @@ HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
 	  "--enable-shared" with no argument, it enables building shared 
 	  libraries.
 
-        o --with-tk=YES|NO
+        o --enable-tk=YES|NO
           If "YES", compile Tk specific code and wishx, if "NO", no Tk related
           code will be compiled.  Default is "YES".
  
@@ -142,7 +110,7 @@ HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
           use this to compile in a separate directory from the source.  You
           must create a directory called "unix" in your build tree and run
           configure while in the "unix" directory.  The --srcdir argument must
-          specify the "tclX8.0.3/unix" directory, not the top-level TclX 
+          specify the "tclX8.2/unix" directory, not the top-level TclX 
           directory.
           Note: The source directory must be clean, it can't contain a built
           copy of TclX.
@@ -160,8 +128,7 @@ HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
       correct files to be built.
  
     o Now do a "make" to compile TclX.  The following variables maybe passed
-      to on the make command line to override values set by configure or in
-      Config.mk:
+      to on the make command line to override values set by configure:
 
          CC - The C compiler to use.
          CFLAGS - The optimization flags to pass to the C compiler.
@@ -174,8 +141,8 @@ HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
       can't be run directly.  To run them before installation, use the
       "runtcl" and "runwishx" scripts generated in the unix directory.
 
-    o Extended Tcl comes with help pages that are built from the Tcl 8.0 and
-      Tk 8.0 manual pages as well as the TclX manual page.  If you are building
+    o Extended Tcl comes with help pages that are built from the Tcl 8.2 and
+      Tk 8.2 manual pages as well as the TclX manual page.  If you are building
       TclX with a later version of Tcl or Tk, you might want to rebuild these
       manual pages.  If new manual pages have been added, you can add them
       by editing the "unix/tools/tclmanpages" and "unix/tools/tkmanpages".
@@ -209,7 +176,7 @@ Tk and the tests for Extended Tcl, which test both the new commands added by
 Extended Tcl and the procedures defined in the Extended Tcl procedure
 library.
 
-    o Run TclX tests by typing "make test" in the tclX8.0.3/unix directory.
+    o Run TclX tests by typing "make test" in the tclX8.2/unix directory.
       This runs both the TclX specific tests and an the Tcl tests though
       a interpreter built with TclX.
 
@@ -228,8 +195,8 @@ library.
 
     o If you're having trouble with the Berkeley tests, and you suspect that
       the extensions might be involved, you can build a special minimal
-      version of Berkeley Tcl by cd'ing to the tcl8.0 directory and doing
-      a "make test".  Similarly, you can do "make test" in the tk8.0 directory.
+      version of Berkeley Tcl by cd'ing to the tcl8.2 directory and doing
+      a "make test".  Similarly, you can do "make test" in the tk8.2 directory.
       If the test works with standard Tcl or Tk and fails with TclX, contact
       us.
 

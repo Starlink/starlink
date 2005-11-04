@@ -5,7 +5,7 @@
 # are not on a known development machine, due to difficutly in certain
 # environments.  Set the environment variable TCLX_FULL_TESTS to override.
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -14,7 +14,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: server.test,v 8.5 1997/12/24 16:37:59 markd Exp $
+# $Id: server.test,v 8.7 1999/03/31 06:37:52 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -251,9 +251,10 @@ if [catch {
 #
 
 proc TestServer {toClient} {
+    signal ignore SIGPIPE
     set reqFH [server_create]
+    fconfigure $toClient -buffering line
     puts $toClient [lindex [fstat $reqFH localhost] 2]
-    flush $toClient
     set readIds $reqFH
 
     while 1 {

@@ -3,7 +3,7 @@
 #
 # Tests for the keylget, keylkeys, keylset, and keyldel commands.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: keylist.test,v 8.5 1997/11/12 06:47:50 markd Exp $
+# $Id: keylist.test,v 8.7 1999/03/31 06:37:50 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -127,11 +127,6 @@ Test keylist-1.21 {keylget tests} {
     keylget keyedlist keyB
 } 1 {keyed list key may not be an empty string}
 
-Test keylist-1.23 {keylget tests} {
-    set keyedlist [list [list "Key\0A" valueA] {keyB valueB} {keyD valueD}]
-    keylget keyedlist keyB
-} 1 {keyed list key may not be a binary string}
-
 Test keylist-1.24 {keylget tests} {
     set keyedlist {{{key.A} valueA} {keyB valueB} {keyD valueD}}
     keylget keyedlist keyB
@@ -201,11 +196,6 @@ Test keylist-2.9 {keylkeys tests} {
     keylkeys list4
 } 0 {keyA keyB keyD}
 
-Test keylist-2.10 {keylkeys tests} {
-    keylget list4 key\0B
-} 1 {keyed list key may not be a binary string}
-
-
 Test keylist-3.1 {keylset tests} {
     catch {unset keyedlist}
     keylset keyedlist keyA valueA
@@ -267,11 +257,6 @@ Test keylist-3.8.1 {keylset tests} {
     catch {unset keyedlist}
     keylset keyedlist {} valueA
 } 1 {keyed list key may not be an empty string}
-
-Test keylist-3.8.3 {keylset tests} {
-    catch {unset keyedlist}
-    keylset keyedlist "key\0A" valueA
-} 1 {keyed list key may not be a binary string}
 
 Test keylist-3.9 {keylset tests} {
     set keyedlist {}    
@@ -400,10 +385,6 @@ Test keylist-4.15 {keyldel tests} {
     keyldel keyedlist B A
     set keyedlist
 } 0 {{C {{CC {{CCC ccc}}}}}}
-
-Test keylist-4.16 {keyldel tests} {
-    keyldel list4 key\0B
-} 1 {keyed list key may not be a binary string}
 
 # Handling of empty lists.
 

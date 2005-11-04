@@ -3,7 +3,7 @@
 #
 # Tests for the signal and kill commands.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: signal.test,v 8.2.2.1 1998/08/08 16:43:56 markd Exp $
+# $Id: signal.test,v 8.4 1999/03/31 06:37:51 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -133,7 +133,7 @@ Test signal-1.8.3 {signal tests} {
     signal get {SIGHUP SIGINT}
 } 0 {{SIGHUP {error 0 {} 0}} {SIGINT {error 0 {} 0}}}
 
-if [infox have_posix_signals] {
+if [infox have_signal_restart] {
     Test signal-1.8.4 {signal tests} {
         signal -restart error {SIGHUP SIGINT}
         signal get {SIGHUP SIGINT}
@@ -323,7 +323,9 @@ if [infox have_posix_signals] {
 }
 
 # Check -restart
-if [infox have_posix_signals] {
+if ![infox have_signal_restart] {
+    echo Notice: restarting of interrupted system calls is not available on this system.
+} else {
     Test signal-3.0 {kill tests} {
         # Start program on a pipe, but don't doing anything until we send it
         # something to make timing issues smaller.

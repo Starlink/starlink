@@ -3,7 +3,7 @@
  *
  *      Extended TCL string and character manipulation commands.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXstring.c,v 8.15 1997/12/14 21:33:00 markd Exp $
+ * $Id: tclXstring.c,v 8.25 1999/04/23 10:00:07 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -24,6 +24,12 @@
 /*
  * Prototypes of internal functions.
  */
+static int
+CheckForUniCode _ANSI_ARGS_((Tcl_Interp *interp,
+                             char *str,
+                             int strLen,
+                             char *which));
+
 static unsigned int
 ExpandString _ANSI_ARGS_((unsigned char *inStr,
                           int            inLength,
@@ -107,22 +113,24 @@ TclX_CindexObjCmd (dummy, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    int stringLen, idx;
-    char *stringPtr;
+    int strLen, utfLen, idx, numBytes;
+    char *str, buf [TCL_UTF_MAX];
 
     if (objc != 3)
         return TclX_WrongArgs (interp, objv[0], "string indexExpr");
     
-    stringPtr = Tcl_GetStringFromObj (objv[1], &stringLen);
+    str = Tcl_GetStringFromObj (objv[1], &strLen);
+    utfLen = Tcl_NumUtfChars(str, strLen);
 
-    if (TclX_RelativeExpr (interp, objv [2], stringLen, &idx) != TCL_OK) {
+    if (TclX_RelativeExpr (interp, objv [2], utfLen, &idx) != TCL_OK) {
         return TCL_ERROR;
     }
 
-    if ((idx < 0) || (idx >= stringLen))
+    if ((idx < 0) || (idx >= utfLen))
         return TCL_OK;
 
-    Tcl_SetStringObj (Tcl_GetObjResult (interp), stringPtr + idx, 1);
+    numBytes = Tcl_UniCharToUtf(Tcl_UniCharAtIndex(str, idx), buf);
+    Tcl_SetStringObj (Tcl_GetObjResult (interp), buf, numBytes);
     return TCL_OK;
 }
 
@@ -143,17 +151,16 @@ TclX_ClengthObjCmd (dummy, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    int length;
+    char *str;
+    int strLen;
 
     if (objc != 2)
         return TclX_WrongArgs (interp, objv[0], "string");
 
-    Tcl_GetStringFromObj (objv[1], &length);
-
-    Tcl_SetIntObj (Tcl_GetObjResult (interp), length);
+    str = Tcl_GetStringFromObj (objv[1], &strLen);
+    Tcl_SetIntObj (Tcl_GetObjResult (interp), Tcl_NumUtfChars(str, strLen));
     return TCL_OK;
 }
-
 
 
 /*-----------------------------------------------------------------------------
@@ -172,18 +179,13 @@ TclX_CconcatObjCmd (dummy, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    Tcl_Obj    *resultPtr = Tcl_GetObjResult (interp);
-    int         idx;
-    int         stringLength;
-    char       *stringPtr;
+    Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
+    int idx, strLen;
+    char *str;
 
-    /*
-     * FIX: It would be faster if we calculated up how much space we needed all
-     * at once.  Also we could iterate a pointer into objv until NULL
-     */
     for (idx = 1; idx < objc; idx++) {
-	stringPtr = Tcl_GetStringFromObj (objv [idx], &stringLength);
-	Tcl_AppendToObj (resultPtr, stringPtr, stringLength);
+	str = Tcl_GetStringFromObj(objv[idx], &strLen);
+	Tcl_AppendToObj(resultPtr, str, strLen);
     }
     return TCL_OK;
 }
@@ -207,9 +209,9 @@ TclX_CrangeObjCmd (clientData, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    int first, subLen, fullLen;
+    int strLen, utfLen, first, subLen;
     int isRange = (int) clientData;
-    char *targetString;
+    char *str, *start, *end;
 
     if (objc != 4) {
         if (isRange)
@@ -220,16 +222,17 @@ TclX_CrangeObjCmd (clientData, interp, objc, objv)
                                    "string firstExpr lengthExpr");
     }
 
-    targetString = Tcl_GetStringFromObj (objv [1], &fullLen);
+    str = Tcl_GetStringFromObj (objv [1], &strLen);
+    utfLen = Tcl_NumUtfChars(str, strLen);
 
-    if (TclX_RelativeExpr (interp, objv [2], fullLen, &first) != TCL_OK) {
+    if (TclX_RelativeExpr (interp, objv [2], utfLen, &first) != TCL_OK) {
         return TCL_ERROR;
     }
 
-    if ((first < 0) || (first >= fullLen))
+    if ((first < 0) || (first >= utfLen))
         return TCL_OK;
 
-    if (TclX_RelativeExpr (interp, objv [3], fullLen, &subLen) != TCL_OK) {
+    if (TclX_RelativeExpr (interp, objv [3], utfLen, &subLen) != TCL_OK) {
         return TCL_ERROR;
     }
         
@@ -239,12 +242,12 @@ TclX_CrangeObjCmd (clientData, interp, objc, objv)
         subLen = subLen - first +1;
     }
 
-    if (first + subLen > fullLen)
-        subLen = fullLen - first;
+    if (first + subLen > utfLen)
+        subLen = utfLen - first;
 
-    Tcl_SetObjResult (interp,
-                      Tcl_NewStringObj (targetString + first,
-                                        subLen));
+    start = Tcl_UtfAtIndex(str, first);
+    end = Tcl_UtfAtIndex(start, subLen);
+    Tcl_SetStringObj(Tcl_GetObjResult(interp), start, end - start);
     return TCL_OK;
 }
 
@@ -272,6 +275,7 @@ TclX_CcollateObjCmd (dummy, interp, objc, objv)
     char *string2;
     int string2Len;
 
+    /*FIX: Not utf clean (FIXUTF), can it ever be... */
     if ((objc < 3) || (objc > 4))
         return TclX_WrongArgs (interp, objv[0], "?options? string1 string2");
 
@@ -363,55 +367,68 @@ TclX_CtokenObjCmd (dummy, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    Tcl_Obj      *varValueObj;
-    Tcl_DString   string;
-    char         *varValue;
-    char         *startPtr;
-    char         *tokenString;
-    int           tokenLen;
-    int           varValueLen;
-    int           tokenStrLen;
-    Tcl_Obj      *newVarValueObj;
+    Tcl_Obj* stringVarObj;
+    char* string;
+    int strByteLen;
+    int strByteIdx;
+    char* separators;
+    int separatorsLen;
+    int tokenByteIdx;
+    int tokenByteLen;
+    Tcl_DString token;
+    Tcl_UniChar uniChar;
+    int utfBytes;
+    Tcl_Obj *newVarValueObj;
 
-    if (objc != 3)
-        return TclX_WrongArgs (interp, objv[0], "strvar separators");
+    if (objc != 3) {
+        return TclX_WrongArgs(interp, objv[0], "strvar separators");
+    }
     
-    varValueObj = Tcl_ObjGetVar2 (interp, objv [1], (Tcl_Obj *) NULL,
-                                  TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1);
-
-    varValue = Tcl_GetStringFromObj (varValueObj, &varValueLen);
-
-    if (varValue == NULL)
-        return TCL_ERROR;
-
-    Tcl_DStringInit (&string);
-    Tcl_DStringAppend (&string, varValue, varValueLen);
-
-    tokenString = Tcl_GetStringFromObj (objv [2], &tokenStrLen);
-
-    if ((strlen (varValue) != (size_t) varValueLen) ||
-        (strlen (tokenString) != (size_t) tokenStrLen)) {
-        TclX_AppendObjResult (interp, "The ",
-                              Tcl_GetStringFromObj (objv [0], NULL),
-                              " command does not support binary data",
-                              (char *) NULL);
+    stringVarObj = Tcl_ObjGetVar2(interp, objv[1], NULL,
+                                  TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1);
+    if (stringVarObj == NULL) {
         return TCL_ERROR;
     }
+    string = Tcl_GetStringFromObj(stringVarObj, &strByteLen);
+    separators = Tcl_GetStringFromObj(objv[2], &separatorsLen);
 
-    startPtr = string.string + strspn (string.string, tokenString);
-    tokenLen = strcspn (startPtr, tokenString);
+    /* Find the start of the token */
+    strByteIdx = 0;
+    while (strByteIdx < strByteLen) {
+        utfBytes = Tcl_UtfToUniChar(string+strByteIdx, &uniChar);
+        if (Tcl_UtfFindFirst(separators, uniChar) == NULL) {
+            break;  /* Reached a separator */
+        }
+        strByteIdx += utfBytes;
+    }
+    tokenByteIdx = strByteIdx;
 
-    newVarValueObj = Tcl_NewStringObj (startPtr + tokenLen, -1);
+    /* Find end of the token */
+    while (strByteIdx < strByteLen) {
+        utfBytes = Tcl_UtfToUniChar(string+strByteIdx, &uniChar);
+        if (Tcl_UtfFindFirst(separators, uniChar) != NULL) {
+            break;  /* Reached a separator */
+        }
+        strByteIdx += utfBytes;
+    }
+    tokenByteLen = strByteIdx-tokenByteIdx;
 
-    if (Tcl_ObjSetVar2 (interp, objv [1], (Tcl_Obj *) NULL, newVarValueObj,
-                        TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1) == NULL) {
-        Tcl_DStringFree (&string);
+    /* Copy token, before replacing variable, as its coming from old var */
+    Tcl_DStringInit(&token);
+    Tcl_DStringAppend(&token, string+tokenByteIdx, tokenByteLen);
+
+    /* Set variable argument to new string. */
+    newVarValueObj = Tcl_NewStringObj(string+strByteIdx,
+                                      strByteLen-strByteIdx);
+    if (Tcl_SetVar2Ex(interp, Tcl_GetStringFromObj(objv[1], NULL), NULL,
+                      newVarValueObj,
+                      TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {
+        Tcl_DStringFree (&token);
         Tcl_DecrRefCount (newVarValueObj);
         return TCL_ERROR;
     }
 
-    Tcl_AppendToObj (Tcl_GetObjResult (interp), startPtr, tokenLen);
-    Tcl_DStringFree (&string);
+    Tcl_DStringResult(interp, &token);
     return TCL_OK;
 }
 
@@ -448,6 +465,34 @@ TclX_CequalObjCmd (dummy, interp, objc, objv)
                         (memcmp (string1Ptr, string2Ptr, string1Len) == 0)));
     return TCL_OK;
 }
+
+/*-----------------------------------------------------------------------------
+ * Check for non-ascii characters in a translit string until we actually
+ * make it work for UniCode.
+ *-----------------------------------------------------------------------------
+ */
+static int CheckForUniCode(interp, str, strLen, which)
+    Tcl_Interp  *interp;
+    char *str;
+    int strLen;
+    char *which;
+{
+    int idx, nbytes;
+    Tcl_UniChar uc;
+
+    for (idx = 0; idx < strLen; idx++) {
+        nbytes = Tcl_UtfToUniChar(&str[idx], &uc);
+        if (nbytes != 1) {
+            Tcl_AppendResult(interp, "Unicode character found in ", which,
+                             ", the translit command does not yet support Unicode",
+                             (char*)NULL);
+            return TCL_ERROR;
+        }
+    }
+    return TCL_OK;
+}
+
+
 
 /*-----------------------------------------------------------------------------
  * ExpandString --
@@ -461,7 +506,7 @@ TclX_CequalObjCmd (dummy, interp, objc, objv)
 #define MAX_EXPANSION 255
 
 static unsigned int
-ExpandString (inStr, inLength, outStr, outLengthPtr)
+ExpandString(inStr, inLength, outStr, outLengthPtr)
     unsigned char *inStr;
     int            inLength;
     unsigned char  outStr [];
@@ -493,6 +538,7 @@ ExpandString (inStr, inLength, outStr, outLengthPtr)
  *
  * Results:
  *  Standard Tcl results.
+ * FIXME:  Does not currently support non-ascii characters.
  *-----------------------------------------------------------------------------
  */
 static int
@@ -500,7 +546,7 @@ TclX_TranslitObjCmd (dummy, interp, objc, objv)
     ClientData   dummy;
     Tcl_Interp  *interp;
     int          objc;
-    Tcl_Obj    *CONST objv[];
+    Tcl_Obj     *CONST objv[];
 {
     unsigned char from [MAX_EXPANSION+1];
     int           fromLen;
@@ -518,6 +564,8 @@ TclX_TranslitObjCmd (dummy, interp, objc, objv)
     int            idx;
     int            stringIndex;
 
+    /*FIX: Not UTF-safe.(FIXUTF) */
+
     if (objc != 4)
         return TclX_WrongArgs (interp, objv[0], "from to string");
 
@@ -525,6 +573,10 @@ TclX_TranslitObjCmd (dummy, interp, objc, objv)
      * Expand ranges into descrete values.
      */
     fromString = Tcl_GetStringFromObj (objv[1], &fromStringLen);
+    if (CheckForUniCode(interp, fromString, fromStringLen,
+                        "in-range") != TCL_OK) {
+        return TCL_ERROR;
+    }
     if (!ExpandString ((unsigned char *) fromString, fromStringLen,
                        from, &fromLen)) {
         TclX_AppendObjResult (interp, "inrange expansion too long",
@@ -533,6 +585,10 @@ TclX_TranslitObjCmd (dummy, interp, objc, objv)
     }
 
     toString = Tcl_GetStringFromObj (objv [2], &toStringLen);
+    if (CheckForUniCode(interp, toString, toStringLen,
+                        "out-range") != TCL_OK) {
+        return TCL_ERROR;
+    }
     if (!ExpandString ((unsigned char *) toString, toStringLen,
                        to, &toLen)) {
         TclX_AppendObjResult (interp, "outrange expansion too long",
@@ -559,7 +615,17 @@ TclX_TranslitObjCmd (dummy, interp, objc, objv)
     for (; idx < fromLen; idx++)
         map [from [idx]] = -1;
 
-    transStringObj = Tcl_DuplicateObj (objv [3]);
+    /*
+     * Get a string object to transform.
+     */
+    transString = Tcl_GetStringFromObj (objv[3], &transStringLen);
+    if (CheckForUniCode(interp, transString, transStringLen,
+                        "string to translate") != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+
+    transStringObj = Tcl_NewStringObj (transString, transStringLen);
     transString = Tcl_GetStringFromObj (transStringObj, &transStringLen);
 
     for (s = (unsigned char *) transString, stringIndex = 0; 
@@ -598,83 +664,79 @@ TclX_CtypeObjCmd (dummy, interp, objc, objv)
     int          objc;
     Tcl_Obj    *CONST objv[];
 {
-    int             failIndex = FALSE;
-    register char  *class;
-    register char  *scanPtr;
-    int             scanStringLen;
-    int             classLen;
-    int             optStrLen;
+    int failIndex = FALSE;
+    char *optStr, *class, *charStr;
+    int charStrLen, cnt, idx;
+    char *failVar = NULL;
+    Tcl_Obj *classObj, *stringObj;
+    int number;
+    char charBuf[TCL_UTF_MAX];
+    Tcl_UniChar uniChar;
 
-    Tcl_Obj        *failVarObj = NULL;
-    Tcl_Obj        *classObj;
-    Tcl_Obj        *stringObj;
+#define IS_8BIT_UNICHAR(c) (c <= 255)
 
-    char           *optionString;
-    int             index;
+    if (TCL_UTF_MAX > sizeof(number)) {
+        panic("TclX_CtypeObjCmd: UTF character longer than a int");
+    }
 
-    if (objc < 3)
+    /*FIX: Split into multiple procs */
+    /*FIX: Should use UtfNext to walk string */
+
+    if (objc < 3) {
         goto wrongNumArgs;
+    }
 
-    optionString = Tcl_GetStringFromObj (objv [1], &optStrLen);
-    if (*optionString == '-') {
-        if (STREQU (optionString, "-failindex")) {
+    optStr = Tcl_GetStringFromObj(objv[1], NULL);
+    if (*optStr == '-') {
+        if (STREQU(optStr, "-failindex")) {
             failIndex = TRUE;
         } else {
-            int len;
-            TclX_AppendObjResult (interp, "invalid option \"",
-                                  Tcl_GetStringFromObj (objv [1], &len),
-                                  "\", must be -failindex", (char *) NULL);
+            TclX_AppendObjResult(interp, "invalid option \"",
+                                 Tcl_GetStringFromObj (objv [1], NULL),
+                                 "\", must be -failindex", (char *) NULL);
             return TCL_ERROR;
         }
     }
     if (failIndex) {
-        if (objc != 5) 
+        if (objc != 5) {
             goto wrongNumArgs;
-        failVarObj = objv [2];
-        classObj = objv [3];
-        stringObj = objv [4];
+        }
+        failVar = Tcl_GetStringFromObj(objv[2], NULL);
+        classObj = objv[3];
+        stringObj = objv[4];
     } else {
-        if (objc != 3) 
+        if (objc != 3) {
             goto wrongNumArgs;
-        classObj = objv [1];
-        stringObj = objv [2];
+        }
+        classObj = objv[1];
+        stringObj = objv[2];
     }
-    scanPtr = Tcl_GetStringFromObj (stringObj, &scanStringLen);
-    class = Tcl_GetStringFromObj (classObj, &classLen);
+    charStr = Tcl_GetStringFromObj(stringObj, &charStrLen);
+    charStrLen = Tcl_NumUtfChars(charStr, charStrLen);
+    class = Tcl_GetStringFromObj(classObj, NULL);
 
     /*
      * Handle conversion requests.
      */
-    if (STREQU (class, "char")) {
-        long number;
-        char myChar;
-
-        if (failIndex) 
+    if (STREQU(class, "char")) {
+        if (failIndex) {
           goto failInvalid;
-        if (Tcl_GetLongFromObj (interp, stringObj, &number) != TCL_OK)
-            return TCL_ERROR;
-        if ((number < 0) || (number > 255)) {
-            TclX_AppendObjResult (interp,
-                                  "number must be in the range 0..255", 
-                                  (char *) NULL);
+        }
+        if (Tcl_GetIntFromObj(interp, stringObj, &number) != TCL_OK) {
             return TCL_ERROR;
         }
-
-        myChar = (char) number;
-        Tcl_SetStringObj (Tcl_GetObjResult (interp),
-                          &myChar, 1);
+        cnt = Tcl_UniCharToUtf(number, charBuf);
+        charBuf[cnt] = '\0';
+        Tcl_SetStringObj(Tcl_GetObjResult(interp), charBuf, cnt);
         return TCL_OK;
     }
 
-    if (STREQU (class, "ord")) {
-        if (failIndex) 
+    if (STREQU(class, "ord")) {
+        if (failIndex) {
           goto failInvalid;
-
-        /*
-         * Mask to prevent sign extension.
-         */
-        Tcl_SetIntObj (Tcl_GetObjResult (interp), 
-                       0xff & scanPtr [0]);
+        }
+        Tcl_UtfToUniChar(charStr, &uniChar);
+        Tcl_SetIntObj(Tcl_GetObjResult(interp), (int)uniChar);
         return TCL_OK;
     }
 
@@ -683,65 +745,98 @@ TclX_CtypeObjCmd (dummy, interp, objc, objv)
      * fails.  The value of `index' after the loops indicating if it succeeds
      * or fails and where it fails.
      */
-    if (STREQU (class, "alnum")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isalnum (UCHAR (*(scanPtr + index))))
+    if (STREQU(class, "alnum")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsAlnum(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "alpha")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isalpha (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "alpha")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsAlpha(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "ascii")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isascii (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "ascii")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            if (!IS_8BIT_UNICHAR(uniChar)
+                || !isascii(UCHAR(uniChar))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "cntrl")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!iscntrl (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "cntrl")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            /* Only accepts ascii controls */
+            if (!IS_8BIT_UNICHAR(uniChar)
+                || !iscntrl(UCHAR(uniChar))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "digit")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isdigit (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "digit")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsDigit(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "graph")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isgraph (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "graph")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            if (!IS_8BIT_UNICHAR(uniChar)) {
+                goto notSupportedUni;
+            }
+            if (!isgraph(UCHAR(uniChar))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "lower")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!islower (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "lower")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsLower(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "print")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isprint (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "print")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            if (!IS_8BIT_UNICHAR(uniChar)) {
+                goto notSupportedUni;
+            }
+            if (!isprint(UCHAR(uniChar))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "punct")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!ispunct (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "punct")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            if (!IS_8BIT_UNICHAR(uniChar)) {
+                goto notSupportedUni;
+            }
+            if (!ispunct(UCHAR(uniChar))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "space")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isspace (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "space")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsSpace(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "upper")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isupper (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "upper")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            if (!Tcl_UniCharIsUpper(Tcl_UniCharAtIndex(charStr, idx))) {
                 break;
+            }
         }
-    } else if (STREQU (class, "xdigit")) {
-        for (index = 0; index < scanStringLen; index++) {
-            if (!isxdigit (UCHAR (*(scanPtr + index))))
+    } else if (STREQU(class, "xdigit")) {
+        for (idx = 0; idx < charStrLen; idx++) {
+            uniChar = Tcl_UniCharAtIndex(charStr, idx);
+            if (!IS_8BIT_UNICHAR(uniChar)) {
+                goto notSupportedUni;
+            }
+            if (!isxdigit(UCHAR(uniChar))) {
                 break;
+            }
         }
     } else {
         TclX_AppendObjResult (interp, "unrecognized class specification: \"",
@@ -758,17 +853,17 @@ TclX_CtypeObjCmd (dummy, interp, objc, objv)
      * false for a null string.  Optionally return the failed index if there
      * is no match.
      */
-    if ((index != 0) && (*(scanPtr + index) == 0))
+    if ((idx != 0) && (idx == charStrLen)) {
         Tcl_SetBooleanObj (Tcl_GetObjResult (interp), TRUE);
-    else {
+    } else {
         /*
          * If the fail index was requested, set the variable here.
          */
         if (failIndex) {
-            Tcl_Obj *iObj = Tcl_NewIntObj (index);
+            Tcl_Obj *iObj = Tcl_NewIntObj (idx);
 
-            if (Tcl_ObjSetVar2 (interp, failVarObj, (Tcl_Obj *) NULL, 
-                    iObj, TCL_LEAVE_ERR_MSG | TCL_PARSE_PART1) == NULL) {
+            if (Tcl_SetVar2Ex(interp, failVar, NULL, 
+                              iObj, TCL_LEAVE_ERR_MSG|TCL_PARSE_PART1) == NULL) {
                 Tcl_DecrRefCount (iObj);
                 return TCL_ERROR;
             }
@@ -782,6 +877,11 @@ TclX_CtypeObjCmd (dummy, interp, objc, objv)
     
   failInvalid:
     TclX_AppendObjResult (interp, "-failindex option is invalid for class \"",
+                          class, "\"", (char *) NULL);
+    return TCL_ERROR;
+
+ notSupportedUni:
+    TclX_AppendObjResult (interp, "unicode characters not supported for class \"",
                           class, "\"", (char *) NULL);
     return TCL_ERROR;
 }

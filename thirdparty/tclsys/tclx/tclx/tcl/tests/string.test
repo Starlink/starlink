@@ -3,7 +3,7 @@
 #
 # Tests for the string-related commands.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: string.test,v 8.7 1997/08/23 18:55:57 markd Exp $
+# $Id: string.test,v 8.12 1999/06/26 03:35:23 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -64,16 +64,32 @@ Test string-1.11 {cindex tests} {
     cindex A\0BCDEFG 1
 } 0 "\0"
 
+Test string-1.12 {cindex unicode tests} {
+    cindex \u7266abc\u7266x 1
+} 0 "a"
+
+Test string-1.13 {cindex unicode tests} {
+    cindex \u7266abc\u7266x 0
+} 0 "\u7266"
+
+Test string-1.14 {cindex unicode tests} {
+    cindex \u7266abc\u7266x 4
+} 0 "\u7266"
+
+Test string-1.15 {cindex unicode tests} {
+    cindex \u7266abc\u7266x 5
+} 0 "x"
+
 
 # Test the 'clength' command.
 
 Test string-2.1 {clength tests} {
     clength ABCDEFG
-} 0 {7}
+} 0 7
 
 Test string-2.2 {clength tests} {
     clength "ABCD XYZ"
-} 0 {8}
+} 0 8
 
 Test string-2.3 {clength tests} {
     clength
@@ -81,7 +97,15 @@ Test string-2.3 {clength tests} {
 
 Test string-2.4 {clength tests} {
     clength "AB\0D X\0Z"
-} 0 {8}
+} 0 8
+
+Test string-2.5 {clength unicode tests} {
+    clength \u7266abc\u7266x
+} 0 6
+
+Test string-2.6 {clength unicode tests} {
+    clength abc\u7266x\u7266
+} 0 6
 
 # Test the crange command.
 
@@ -133,6 +157,11 @@ Test string-3.11 {crange tests} {
 } 0 "C\0E\0G"
 
 
+Test string-3.12 {crange unicode tests} {
+    crange \u7266abc\u7266x 2 end
+} 0 "bc\u7266x"
+
+
 # Test the 'replicate' command
 
 Test string-4.1 {replicate tests} {
@@ -150,6 +179,10 @@ Test string-4.3 {replicate tests} {
 Test string-4.4 {replicate tests} {
     replicate Ab\0d 4
 } 0 "Ab\0dAb\0dAb\0dAb\0d"
+
+Test string-4.5 {replicate unicode tests} {
+    replicate \u7266abc\u7266x  3
+} 0 "\u7266abc\u7266x\u7266abc\u7266x\u7266abc\u7266x"
 
 # Test the csubstr command.
 
@@ -194,6 +227,14 @@ Test string-5.8 {csubstr tests} {
     csubstr AB\0D 0 len
 } 0 "AB\0D"
 
+Test string-5.9 {csubstr unicode tests} {
+    csubstr \u7266abc\u7266x 0 1
+} 0 \u7266
+
+Test string-5.10 {csubstr unicode tests} {
+    csubstr \u7266abc\u7266x 1 end-1
+} 0 abc\u7266
+
 # Test the translit command.
 
 Test string-6.1 {translit tests} {
@@ -207,14 +248,35 @@ Test string-6.2 {translit tests} {
     translit {A-MN-Za-mn-z} {N-ZA-Mn-za-m} $str2
 } 0 {Captain Midnight Secret Decoder Ring}
 
-Test string-6.3 {translit tests} {
-    set str "abc\0\1\2ABC"
-    set str2 [translit "\0-\2ABCabc" "XYZdef\0\0\0"  $str]
-} 0 "\0\0\0XYZdef"
-
 Test string-6.4 {translit tests} {
     translit
 } 1 {wrong # args: translit from to string}
+
+# Type conversion was broken.
+Test string-6.5 {translit tests} {
+    catch {unset xxx}
+    set s [list This_is_a_test value]
+    array set xxx [translit _ - $s]
+    array get xxx
+} 0 {This-is-a-test value}
+catch {unset xxx}
+
+# Check for detection of unsupported UniCode
+Test string-6.6 {translit tests} {
+    set str "Captain Midnight Secret Decoder Ring"
+    translit "A-MN-Za-m\u1234-z" "N-ZA-Mn-za-m" $str
+} 1 {Unicode character found in in-range, the translit command does not yet support Unicode}
+
+Test string-6.7 {translit tests} {
+    set str "Captain Midnight Secret Decoder Ring"
+    translit "A-MN-Za-mn-z" "N-ZA-Mn-za-\u5134" $str
+} 1 {Unicode character found in out-range, the translit command does not yet support Unicode}
+
+Test string-6.8 {translit tests} {
+    set str "Captain Midnight Secret \u1543ecoder Ring"
+    translit "A-MN-Za-mn-z" "N-ZA-Mn-za-m" $str
+} 1 {Unicode character found in string to translate, the translit command does not yet support Unicode}
+
 
 # Test the ctoken command
 
@@ -244,6 +306,10 @@ Test string-7.3 {ctoken tests} {
           "a"     "   test   " \
           "test"  "   " \
           ""      ""]
+Test string-7.2 {ctoken tests} {
+    ctoken "No such variable" " \t"
+} 1 {can't read "No such variable": no such variable}
+
 
 Test string-9.1 {cequal tests} {
     cequal
@@ -271,6 +337,14 @@ Test string-9.6 {cequal tests} {
 
 Test string-9.7 {cequal tests} {
     cequal file5 file4
+} 0 0
+
+Test string-9.8 {cequal unicode tests} {
+    cequal \u7266abc\u7266x \u7266abc\u7266x
+} 0 1
+
+Test string-9.9 {cequal unicode tests} {
+    cequal \u7266abc\u7267x \u7266abc\u7266x
 } 0 0
 
 # ccollate command

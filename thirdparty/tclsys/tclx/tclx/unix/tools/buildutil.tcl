@@ -3,7 +3,7 @@
 #
 # Utility procedures used by the build and install tools.
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: buildutil.tcl,v 8.6 1997/12/14 21:33:04 markd Exp $
+# $Id: buildutil.tcl,v 8.8 2000/07/14 18:08:03 welch Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -56,7 +56,7 @@ proc CopyFile {sourceFile target} {
         set targetFile $target
     }
 
-    file delete $targetFile
+    file delete -force $targetFile
     set sourceFH [open $sourceFile r]
     set targetFH [open $targetFile w]
     fconfigure $sourceFH -translation binary -eofchar {}

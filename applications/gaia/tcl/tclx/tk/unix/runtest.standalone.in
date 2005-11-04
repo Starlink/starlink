@@ -1,5 +1,7 @@
 #!/bin/sh
-TCL_PROGRAM=@bldbasedir@/tcl/unix/tcl.standalone
-TKTEST=@bldbasedir@/tk/unix/tktest.standalone
+
+TCL_PROGRAM="@TCLX_BIN_DIR@"/tcl.standalone
+TKTEST=@TKX_BIN_DIR@/tktest.standalone
 export TCL_PROGRAM
+
 exec $TKTEST ${1+"$@"}

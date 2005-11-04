@@ -1,4 +1,6 @@
 #!/bin/sh
-TCL_PROGRAM=@bldbasedir@/tcl/unix/tclXtest.standalone
+
+TCL_PROGRAM="@TCLX_BIN_DIR@/tclXtest.standalone"
 export TCL_PROGRAM
+
 exec $TCL_PROGRAM ${1+"$@"}

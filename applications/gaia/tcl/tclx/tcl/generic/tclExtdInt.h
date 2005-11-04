@@ -3,7 +3,7 @@
  *
  * Standard internal include file for Extended Tcl.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclExtdInt.h,v 8.21 1997/12/14 18:25:08 markd Exp $
+ * $Id: tclExtdInt.h,v 8.27 2001/05/19 16:45:23 andreas_kupries Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -83,29 +83,6 @@
 #    define TRUE   (1)
 #    define FALSE  (0)
 #endif
-
-/*
- * Structure to hold a regular expression, plus a Boyer-Moore compiled
- * pattern.  Also structure to return submatch info.
- */
-
-typedef struct {
-    regexp *progPtr;
-    char   *boyerMoorePtr;
-    int     noCase;
-    int     numSubExprs;
-} TclX_regexp;
-
-typedef struct {
-    int start;
-    int end;
-} Tcl_SubMatchInfo [NSUBEXP];
-
-/*
- * Flags used by TclX_RegExpCompileObj:
- */
-#define TCLX_REXP_NO_CASE         1   /* Do matching regardless of case    */
-#define TCLX_REXP_BOTH_ALGORITHMS 2   /* Use boyer-moore along with regexp */
 
 /*
  * Flags used by TclX_Eval and friends.
@@ -219,18 +196,18 @@ typedef int
 /*
  * Prototypes for utility procedures.
  */
-Tcl_Obj *
-TclX_ObjGetVar2S _ANSI_ARGS_((Tcl_Interp *interp,
-                              char *part1Ptr,
-                              char *part2Ptr,
-                              int flags));
 
-extern Tcl_Obj *
-TclX_ObjSetVar2S _ANSI_ARGS_((Tcl_Interp *interp,
-                              char *part1Ptr,
-                              char *part2Ptr,
-                              Tcl_Obj *newValuePtr,
-                              int flags));
+extern int
+TclX_CreateObjCommand _ANSI_ARGS_((Tcl_Interp* interp, char* cmdName,
+				   Tcl_ObjCmdProc *proc, ClientData clientData,
+				   Tcl_CmdDeleteProc *deleteProc, int flags));
+
+/* Special flags for "TclX_CreateObjCommand".
+ */
+
+#define TCLX_CMD_NOPREFIX	1	/* don't define with "exp_" prefix */
+#define TCLX_CMD_REDEFINE	2	/* stomp on old commands with same name */
+
 
 extern int
 TclX_StrToOffset _ANSI_ARGS_((CONST char *string,
@@ -241,11 +218,6 @@ int
 TclX_GetUnsignedFromObj _ANSI_ARGS_((Tcl_Interp *interp,
                                      Tcl_Obj    *objPtr,
                                      unsigned   *valuePtr));
-
-extern int
-TclX_Eval _ANSI_ARGS_((Tcl_Interp  *interp,
-                       unsigned     options,
-                       char        *cmd));
 
 extern int
 TclX_VarEval _ANSI_ARGS_(TCL_VARARGS(Tcl_Interp *, arg1));
@@ -283,34 +255,11 @@ TclX_GetOffsetFromObj _ANSI_ARGS_((Tcl_Interp *interp,
                                    Tcl_Obj    *objPtr,
                                    off_t      *offsetPtr));
 
-extern void
-TclX_RegExpClean _ANSI_ARGS_((TclX_regexp *regExpPtr));
-
-extern int
-TclX_RegExpCompileObj _ANSI_ARGS_((Tcl_Interp   *interp,
-                                   TclX_regexp  *regExpPtr,
-                                   Tcl_Obj      *expression,
-                                   int          flags));
-
-extern int
-TclX_RegExpExecute _ANSI_ARGS_((Tcl_Interp       *interp,
-                                TclX_regexp      *regExpPtr,
-                                char             *matchStrIn,
-                                char             *matchStrLower,
-                                Tcl_SubMatchInfo  subMatchInfo));
-
-
 extern int
 TclX_RelativeExpr _ANSI_ARGS_((Tcl_Interp  *interp,
                                Tcl_Obj     *exprPtr,
                                int          stringLen,
                                int         *exprResultPtr));
-
-extern int
-TclXRuntimeInit _ANSI_ARGS_((Tcl_Interp *interp,
-                             char       *which,
-                             char       *defaultLib,
-                             char       *version));
 
 extern int
 TclX_SetChannelOption _ANSI_ARGS_((Tcl_Interp  *interp,
@@ -328,15 +277,9 @@ TclX_WrongArgs _ANSI_ARGS_((Tcl_Interp *interp,
                             Tcl_Obj    *commandNameObj, 
 			    char       *string));
 
-extern void
-TclX_AppendObjResult _ANSI_ARGS_(TCL_VARARGS_DEF (Tcl_Interp *,arg1));
-
 extern int
 TclX_IsNullObj _ANSI_ARGS_((Tcl_Obj *objPtr));
 
-void
-TclX_ShellExit _ANSI_ARGS_((Tcl_Interp *interp,
-                            int         exitCode));
 
 
 /*

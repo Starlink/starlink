@@ -3,7 +3,7 @@
  *
  * Extended Tcl lgets command.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXlgets.c,v 8.5 1997/09/25 03:56:36 markd Exp $
+ * $Id: tclXlgets.c,v 8.8 1999/03/31 06:37:45 markd Exp $
  *-----------------------------------------------------------------------------
  */
 /* 
@@ -473,8 +473,8 @@ TclX_LgetsObjCmd (clientData, interp, objc, objv)
     } else {
         int resultLen;
 
-        if (Tcl_ObjSetVar2 (interp, objv[2], NULL, dataObj,
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL) {
+        if (Tcl_ObjSetVar2(interp, objv[2], NULL, dataObj,
+                           TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL) {
             goto errorExit;
         }
 
@@ -515,8 +515,8 @@ TclX_LgetsObjCmd (clientData, interp, objc, objv)
          * instead of original error.
          * FIX: Need functions to save/restore error state.
          */
-        if (Tcl_ObjSetVar2 (interp, objv[2], NULL, dataObj,
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) != NULL) {
+        if (Tcl_ObjSetVar2(interp, objv[2], NULL, dataObj,
+                           TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) != NULL) {
             Tcl_SetObjResult (interp, saveResult);  /* Restore old message */
         }
         Tcl_DecrRefCount (saveResult);

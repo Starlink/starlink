@@ -1,5 +1,6 @@
 #!/bin/sh
 # script for running TclX before installation
 
-TCL=@bldbasedir@/tcl/unix/tcl.standalone
+TCL="@TCLX_BIN_DIR@/tcl.standalone"
+
 exec $TCL ${1+"$@"}

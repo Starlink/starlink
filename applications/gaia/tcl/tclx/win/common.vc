@@ -3,7 +3,7 @@
 #
 # Visual C++ 2.x and 4.0 common include file for Windows.
 #------------------------------------------------------------------------------
-# Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: common.vc,v 8.6 1997/12/24 16:38:37 markd Exp $
+# $Id: common.vc,v 8.14 2000/07/13 00:23:08 welch Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -32,8 +32,8 @@ PREFIXU=C:/tcl
 #
 # TclX and TkX versions.
 #
-TCLX_VERSION = 8.0.3
-TKX_VERSION  = 8.0.3
+TCLX_VERSION = 8.3.0
+TKX_VERSION  = 8.3.0
 
 #
 # Project directories
@@ -41,6 +41,7 @@ TKX_VERSION  = 8.0.3
 # o ROOT- Absolute path to the top of source tree.
 # o TMP_DIR - Location where .obj files should be stored during build.
 #   This maybe absolute or relative to the win build directories.
+#   (In practice any value other than "." may not yet work!)
 # o TOOLS32 - Location of VC++ 32-bit development tools. Note that the
 #   VC++ 2.0 header files are broken, so you need to use the ones that
 #   come with the developer network CD's, or later versions of VC++.
@@ -49,39 +50,61 @@ TKX_VERSION  = 8.0.3
 
 ROOT     = ..\..
 TMP_DIR  = .
-TOOLS32	= c:\Program Files\DevStudio\Vc
+TOOLS32	= c:\Program Files\DevStudio\VC
 IDE32	= c:\Program Files\DevStudio\SharedIDE
 
 # Comment the following line to compile with symbols
-#NODEBUG=1
+NODEBUG=1
+ 
+!IF "$(NODEBUG)" == "1"
+cdebug = -Ox -Oy- -Gs -GD
+!ELSE
+cdebug = -Z7 -Od -WX
+!ENDIF
 
 # uncomment the following two lines to compile with TCL_MEM_DEBUG
 #DEBUGDEFINES   =-DTCL_MEM_DEBUG
 
+
+# Tcl/Tk build directories and library extensions depend on NODEBUG.
+!IF "$(NODEBUG)" == "1"
+TCL_TMP_DIR     = Release
+TK_TMP_DIR	= Release
+TCL_DBGX        =
+TK_DBGX         =
+!ELSE
+TCL_TMP_DIR     = Debug
+TK_TMP_DIR	= Debug
+TCL_DBGX        = d
+TK_DBGX         = d
+!ENDIF
+
 #
 # Tcl build directories and files.
 #
-TCL_DIR          = $(ROOT)\..\tcl8.0
+TCL_DIR          = $(ROOT)\..\tcl8.3
 TCL_GENERIC_DIR  = $(TCL_DIR)\generic
 TCL_WIN_DIR      = $(TCL_DIR)\win
+TCL_BUILD_DIR    = $(TCL_WIN_DIR)\$(TCL_TMP_DIR)
 TCL_RUNTIME_DIR  = $(TCL_DIR)\library
 TCL_TESTS_DIR    = $(TCL_DIR)\tests
-TCL_LIB          = $(TCL_WIN_DIR)\tcl80.lib
-TCL_DLL          = $(TCL_WIN_DIR)\tcl80.dll
-TCL_SALIB        = $(TCL_WIN_DIR)\tcl80sa.lib
+TCL_LIB          = $(TCL_WIN_DIR)\tcl83.lib
+TCL_DLL          = $(TCL_WIN_DIR)\tcl83.dll
+TCL_SALIB        = $(TCL_WIN_DIR)\tcl83sa.lib
 
 #
 # TK build directories and files.
 #
-TK_DIR           = $(ROOT)\..\tk8.0
+TK_DIR           = $(ROOT)\..\tk8.3
 TK_GENERIC_DIR   = $(TK_DIR)\generic
 TK_WIN_DIR       = $(TK_DIR)\win
+TK_BUILD_DIR     = $(TK_WIN_DIR)\$(TK_TMP_DIR)
 TK_XLIB_DIR      = $(TK_DIR)\xlib
 TK_RUNTIME_DIR   = $(TK_DIR)\library
 TK_TESTS_DIR     = $(TK_DIR)\tests
-TK_LIB           = $(TK_WIN_DIR)\tk80.lib
-TK_DLL           = $(TK_WIN_DIR)\tk80.dll
-TK_SALIB         = $(TK_WIN_DIR)\tk80sa.dll
+TK_LIB           = $(TK_WIN_DIR)\tk83.lib
+TK_DLL           = $(TK_WIN_DIR)\tk83.dll
+TK_SALIB         = $(TK_WIN_DIR)\tk83sa.dll
 
 #
 # TclX directories.
@@ -89,9 +112,9 @@ TK_SALIB         = $(TK_WIN_DIR)\tk80sa.dll
 TCLX_WIN_DIR      = $(ROOT)\tcl\win
 TCLX_GENERIC_DIR  = $(ROOT)\tcl\generic
 TCLX_RUNTIME_DIR  = $(ROOT)\tcl\runtime
-TCLX_LIB          = $(TCLX_WIN_DIR)\tclx803.lib
-TCLX_DLL          = $(TCLX_WIN_DIR)\tclx803.dll
-TCLX_SALIB        = $(TCLX_WIN_DIR)\tclx803s.lib
+TCLX_LIB          = $(TCLX_WIN_DIR)\tclx83.lib
+TCLX_DLL          = $(TCLX_WIN_DIR)\tclx83.dll
+TCLX_SALIB        = $(TCLX_WIN_DIR)\tclx83s.lib
 TCLX_INST_BIN     = $(PREFIX)\bin
 TCLX_INST_INCL    = $(PREFIX)\include
 TCLX_INST_LIB     = $(PREFIX)\lib
@@ -105,9 +128,9 @@ TCLX_INST_RUNTIMEU= $(TCLX_INST_LIBU)/tclX$(TCLX_VERSION)
 TKX_WIN_DIR      = $(ROOT)\tk\win
 TKX_GENERIC_DIR  = $(ROOT)\tk\generic
 TKX_RUNTIME_DIR  = $(ROOT)\tk\runtime
-TKX_LIB          = $(TKX_WIN_DIR)\tkx803.lib
-TKX_DLL          = $(TKX_WIN_DIR)\tkx803.dll
-TKX_SALIB        = $(TKX_WIN_DIR)\tkx803sa.dll
+TKX_LIB          = $(TKX_WIN_DIR)\tkx83.lib
+TKX_DLL          = $(TKX_WIN_DIR)\tkx83.dll
+TKX_SALIB        = $(TKX_WIN_DIR)\tkx83sa.dll
 TKX_INST_BIN     = $(PREFIX)\bin
 TKX_INST_INCL    = $(PREFIX)\include
 TKX_INST_LIB     = $(PREFIX)\lib
@@ -148,3 +171,7 @@ TARGETOS=BOTH
  
 # We need user32 in console mode for handling sockets.
 baselibs=$(baselibs) user32.lib
+
+# VC++ 5.0 complains if /MACHINE is not supplied.
+MACHINE = IX86
+lflags  = $(lflags) /MACHINE:$(MACHINE)

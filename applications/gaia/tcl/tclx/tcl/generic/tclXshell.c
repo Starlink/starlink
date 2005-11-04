@@ -3,7 +3,7 @@
  *
  * Support code for the Extended Tcl shell.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXshell.c,v 8.5 1997/08/10 22:18:29 markd Exp $
+ * $Id: tclXshell.c,v 8.10 2000/06/14 07:48:24 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -204,7 +204,7 @@ ParseCmdLine (interp, argc, argv)
 
 
 /*-----------------------------------------------------------------------------
- * TclX_Main --
+ * TclX_MainEx --
  *
  *   This function runs the TclX shell, including parsing the command line and
  * calling the Tcl_AppInit function at the approriate place.  It either enters
@@ -220,25 +220,37 @@ ParseCmdLine (interp, argc, argv)
  *-----------------------------------------------------------------------------
  */
 void
-TclX_Main (argc, argv, appInitProc)
+TclX_MainEx (argc, argv, appInitProc, interp)
     int               argc;
     char            **argv;
     Tcl_AppInitProc  *appInitProc;
-{
     Tcl_Interp *interp;
+{
     char *evalStr;
 
-    Tcl_FindExecutable (argv [0]);
-
     /* 
-     * Create a basic Tcl interpreter.
+     * Initialize the stubs before making any calls to Tcl APIs.
      */
-    interp = Tcl_CreateInterp();
+    if (Tcl_InitStubs(interp, TCL_VERSION, 0) == NULL) {
+	abort();
+    }
+    if (TclX_InitTclStubs(interp, TCLX_VERSION, 0) == NULL) {
+	abort();
+    }
 
+#ifdef __WIN32 
+#ifndef BORLAND
+    TclX_SplitWinCmdLine (&argc, &argv);
+#endif
+#endif
+    
+    Tcl_FindExecutable(argv[0]);
+    
     /*
      * Do command line parsing.  This does not return on an error.  Information
      * for command line is saved in Tcl variables.
      */
+
     ParseCmdLine (interp, argc, argv);
 
     /*

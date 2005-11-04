@@ -5,7 +5,7 @@
  * Tcl handles.  Provides a mechanism for managing expandable tables that are
  * addressed by textual handles.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -14,7 +14,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXhandles.c,v 8.4 1997/07/04 20:23:52 markd Exp $
+ * $Id: tclXhandles.c,v 8.6 1999/03/31 06:37:44 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -171,7 +171,7 @@ ExpandTable (tblHdrPtr, neededIdx)
             (tblHdrPtr->tableSize * tblHdrPtr->entrySize));
     LinkInNewEntries (tblHdrPtr, tblHdrPtr->tableSize, numNewEntries);
     tblHdrPtr->tableSize += numNewEntries;
-    ckfree (oldbodyPtr);
+    ckfree ((char *) oldbodyPtr);
     
 }
 
@@ -376,7 +376,7 @@ TclX_HandleTblRelease (headerPtr)
 
     tblHdrPtr->useCount--;
     if (tblHdrPtr->useCount <= 0) {
-        ckfree (tblHdrPtr->bodyPtr);
+        ckfree ((char *) tblHdrPtr->bodyPtr);
         ckfree ((char *) tblHdrPtr);
     }
 }

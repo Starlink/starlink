@@ -3,7 +3,7 @@
  *
  *   Interactive command loop, C and Tcl callable.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXcmdloop.c,v 8.9 1997/07/04 20:23:43 markd Exp $
+ * $Id: tclXcmdloop.c,v 8.12 1999/03/31 06:37:43 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -89,26 +89,16 @@ static int
 IsSetVarCmd (command)
     char  *command;
 {
-    char *nextPtr, *lastChar;
-    int wordCnt;
+    Tcl_Parse tclParse;
+    int numWords;
 
     if ((!STRNEQU (command, "set", 3)) || (!ISSPACE (command [3])))
         return FALSE;  /* Quick check */
 
-    /*
-     * Loop to count the words in the command.
-     */
-    wordCnt = 0;
-    nextPtr = command;
-    lastChar = command + strlen (command) - 1;
-    while (*nextPtr != '\0') {
-        nextPtr = TclWordEnd (nextPtr, lastChar, FALSE, NULL);
-        nextPtr++;  /* Character after the word */
-        while ((*nextPtr != '\0') && (ISSPACE (*nextPtr)))
-            nextPtr++;
-        wordCnt++;
-    }
-    return wordCnt > 2 ? TRUE : FALSE;
+    Tcl_ParseCommand(NULL, command, -1, 1, &tclParse);
+    numWords = tclParse.numWords;
+    Tcl_FreeParse(&tclParse);
+    return numWords > 2 ? TRUE : FALSE;
 }
 
 /*-----------------------------------------------------------------------------

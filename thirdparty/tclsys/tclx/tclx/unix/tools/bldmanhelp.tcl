@@ -21,7 +21,7 @@
 #    o helpdir is the directory to create the help files in.
 #    o brief is the brief file to create.
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -30,7 +30,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: bldmanhelp.tcl,v 8.2 1997/08/23 18:56:29 markd Exp $
+# $Id: bldmanhelp.tcl,v 8.4 2000/07/14 18:08:03 welch Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -147,7 +147,7 @@ GenInputFile $docDir $manInfoTbl $tmpFile
 
 buildhelp $helpDir $brief [list $tmpFile]
 
-file delete $tmpFile
+file delete -force $tmpFile
 
 if $gotErrors {
     puts stderr "Errors occured processing manual files"

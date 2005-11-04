@@ -5,7 +5,7 @@
  * applications built with Extended Tcl and Tk on Windows 95/NT systems.
  * This is based on the the UCB Tk file tkAppInit.c
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -14,9 +14,20 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tkXAppInit.c,v 8.4 1997/08/23 18:56:21 markd Exp $
+ * $Id: tkXAppInit.c,v 8.9 2000/07/11 04:42:08 welch Exp $
  *-----------------------------------------------------------------------------
  */
+
+/*
+ * As a main program, we cannot link against the stubs table.
+ */
+
+#ifdef USE_TCL_STUBS
+#undef USE_TCL_STUBS
+#endif
+#ifdef USE_TK_STUBS
+#undef USE_TK_STUBS
+#endif
 
 #include "tclExtend.h"
 #include "tk.h"
@@ -26,17 +37,6 @@
 #undef WIN32_LEAN_AND_MEAN
 #include <malloc.h>
 #include <locale.h>
-
-/*
- * The following declarations refer to internal Tk routines.  These
- * interfaces are available for use, but are not supported.
- */
-
-EXTERN void
-TkConsoleCreate (void);
-
-EXTERN int
-TkConsoleInit (Tcl_Interp *interp);
 
 
 /*-----------------------------------------------------------------------------
@@ -52,9 +52,8 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
     LPSTR lpszCmdLine;
     int nCmdShow;
 {
-    char **argv;
-    int argc;
-    char buffer [MAX_PATH];
+    char **argv = NULL;		/* Initialize the arg to avoid warnings. */
+    int argc = 0;		/* Initialize the arg to avoid warnings. */
 
     /*
      * Set up the default locale to be standard "C" locale so parsing
@@ -69,22 +68,10 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
      * This is only needed for Windows 3.x, since NT dynamically expands
      * the queue.
      */
+
+#ifndef __WIN32__
     SetMessageQueue(64);
-
-    /*
-     * Create the console channels and install them as the standard
-     * channels.  All I/O will be discarded until TkConsoleInit is
-     * called to attach the console to a text widget.
-     */
-    TkConsoleCreate();
-
-    /*
-     * Parse the command line. Since Windows programs don't get passed the
-     * command name as the first argument, we need to fetch it explicitly.
-     */
-    TclX_SplitWinCmdLine (&argc, &argv);
-    GetModuleFileName (NULL, buffer, sizeof (buffer));
-    argv[0] = buffer;
+#endif /* __WIN32__ */
 
     TkX_Main(argc, argv, Tcl_AppInit);
 
@@ -109,7 +96,6 @@ Tcl_AppInit (Tcl_Interp *interp)
     if (Tcl_Init (interp) == TCL_ERROR) {
         goto errorExit;
     }
-
     if (Tclx_Init(interp) == TCL_ERROR) {
         goto errorExit;
     }
@@ -125,6 +111,13 @@ Tcl_AppInit (Tcl_Interp *interp)
     }
     Tcl_StaticPackage(interp, "Tkx", Tkx_Init, Tkx_SafeInit);
 
+    /*
+     * Create the console channels and install them as the standard
+     * channels.  All I/O will be discarded until Tk_CreateConsoleWindow
+     * is called to attach the console to a text widget.
+     */
+    Tk_InitConsoleChannels(interp);
+    
     /*
      * Initialize the console for interactive applications.
      */
@@ -147,6 +140,7 @@ Tcl_AppInit (Tcl_Interp *interp)
 
   errorExit:
     TkX_Panic ("%s\n", interp->result);
+    return TCL_ERROR;
 }
 
 

@@ -4,7 +4,7 @@
 # This file provides commands compatible with older versions of Extended Tcl.
 # 
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: compat.tcl,v 8.5 1997/08/23 18:55:18 markd Exp $
+# $Id: compat.tcl,v 8.6 1999/03/31 06:37:47 markd Exp $
 #------------------------------------------------------------------------------
 #
 

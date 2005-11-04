@@ -3,7 +3,7 @@
 #
 # Tests for the lmatch command.
 #---------------------------------------------------------------------------
-# Copyright 1993-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1993-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -72,7 +72,7 @@ Test lmatch-2.2.1 {search modes} {
 
 Test lmatch-2.3 {search modes} {
     lmatch -regexp {xyz bbcc *bc*} *bc*
-} 1 {couldn't compile regular expression pattern: ?+* follows nothing}
+} 1 {couldn't compile regular expression pattern: quantifier operand invalid}
 
 Test lmatch-2.4 {search modes} {
     lmatch -regexp {b.x ^bc xy bcx bca} ^bc

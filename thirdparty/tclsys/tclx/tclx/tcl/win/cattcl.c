@@ -3,7 +3,7 @@
  *    A crude version of cat used in the build to concatenate Tcl source
  * files into a library.
  *-----------------------------------------------------------------------------
- * Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: cattcl.c,v 8.3 1997/08/08 16:51:11 markd Exp $
+ * $Id: cattcl.c,v 8.4 1999/03/31 06:37:54 markd Exp $
  *-----------------------------------------------------------------------------
  */
 

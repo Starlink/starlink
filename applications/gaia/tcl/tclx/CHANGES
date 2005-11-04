@@ -1378,6 +1378,9 @@
     interp state on signals. Debugged and submitted by the ever-helpful
     <Viktor-Dukhovni@deshaw.com>.
 -------------------------------------------------------------------------------
+29 Jan 98:
+  o Converted scanfile to use new regular expression facility.
+-------------------------------------------------------------------------------
 2 Feb 98:
   o Added --with-tcl dir and --with-tk configure options.  Contributed by
     <Viktor-Dukhovni@deshaw.com>.
@@ -1392,6 +1395,51 @@
 -------------------------------------------------------------------------------
 7 Aug 98:
   o Added -restart option to the signal command.
--------------------------------------------------------------------------------
+===============================================================================
 8 Aug 98: Released TclX 8.0.3
+===============================================================================
+19 Sept 98:
+  o Fixed TclX copy of Tcl auto_load proc out of sync; this broken ITcl.
+-------------------------------------------------------------------------------
+20 Sept 98:
+  o Include several Windows build fixes from Viktor Dukhovni <viktor@nyc.deshaw.com>.
+  o Renamed --with-tk configure option to --enable-tk.
+    Supplied by Viktor Dukhovni <viktor@nyc.deshaw.com>.
+-------------------------------------------------------------------------------
+28 Sept 98:
+  o Handle systems that don't implement restart of system calls on signal.
+    Added infox have_signal_restart.
+-------------------------------------------------------------------------------
+5 May 99:
+  o Ported most commands work with 8.1 Unicode.
+  o Completed port to 8.1.
+===============================================================================
+5 May 99: Released TclX 8.1.0
+===============================================================================
+10 May 99:
+  o Fixed tests to build when threads are enabled.
+  o Pickup TK_LD_SEARCH_FLAGS in configure.
+-------------------------------------------------------------------------------
+22 June 99:
+  o Moved TclX_AppendObjResult to be an external API for testing
+  o Upgraded the patch levels to be "8.1.2"
+  o Defined TclX_MainEx to take an interp as an argument.  TclX_Main is
+    now a macro that calls TclX_MainEx.  When passing the interp argument,
+    Tcl_CreateInterp() is called.  This is done so TclX can use stubs.
+-------------------------------------------------------------------------------
+25 Jun 99:
+  o TclX version numbering and library naming change.  The third number is
+    now the patch level.
+===============================================================================
+25 Jun 99: Released TclX 8.1.1
+===============================================================================
+4 Jul 99:
+  o Cleaned up configuration to work better with new Tcl autoconf macros.
+    Deleted Config.mk, all configration variables are set in Common.mk.
+  o --with-tcl and --with-tk now work.
+===============================================================================
+25 Jun 99: Released TclX 8.1.1
+===============================================================================
+===============================================================================
+6 Feb 2000: Released TclX 8.2.0
 ===============================================================================

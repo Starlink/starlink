@@ -1,8 +1,10 @@
 #!/bin/sh
 # script for running TclX before installation
 
-TCL_LIBRARY=@TCL_SRC@/library
-TCLX_LIBRARY=@bldbasedir@/tcl/unix
-TCL=@bldbasedir@/tcl/unix/tcl.static
+TCL_LIBRARY="@TCL_LIBRARY_DIR@"
+TCLX_LIBRARY="@TK_RUNTIME_DIR@"
+TCL="@TCLX_BIN_DIR@/tcl.static"
+
 export TCL_LIBRARY TCLX_LIBRARY
+
 exec $TCL ${1+"$@"}

@@ -3,7 +3,7 @@
 #
 # Tests for the scancontext and scanfile commands.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: filescan.test,v 8.5.2.2 1998/07/29 07:59:12 markd Exp $
+# $Id: filescan.test,v 8.9 1999/03/31 06:37:49 markd Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -326,11 +326,11 @@ proc ChkSubMatch {id matchInfoVar} {
 set testFH [open TEST.TMP r]
 
 set testCH [scancontext create]
-scanmatch $testCH {\A*(x*)B*(c*)DD} {
+scanmatch $testCH {A*(x*)B*(c*)DD} {
     ChkSubMatch 4 matchInfo
 }
 
-scanmatch -nocase $testCH {\Aa(x*)B(C*)Dd} {
+scanmatch -nocase $testCH {Aa(x*)B(C*)Dd} {
     ChkSubMatch 5 matchInfo
 }
 
@@ -400,12 +400,8 @@ scancontext delete $testCH
 set testCH [scancontext create]
 
 Test filescan-7.1 {filescan tests} {
-    scanmatch $testCH {a(} {}
-} 1 {error in regular expression: unmatched ()}
-
-Test filescan-7.2 {filescan tests} {
-    scanmatch $testCH (x)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.)(.) {}
-} 1 {error in regular expression: too many ()}
+    scanmatch $testCH {a[} {}
+} 1 {couldn't compile regular expression pattern: brackets [] not balanced}
 
 #
 # Test the copy file manipulation by sorting a file of numbered lines into two

@@ -4,7 +4,7 @@
  * Tcl_AppInit and main functions for the Extended Tcl test program on Win32.
  *
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tkXwinTest.c,v 8.2 1997/08/23 18:56:22 markd Exp $
+ * $Id: tkXwinTest.c,v 8.4 1999/06/26 00:25:53 surles Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -25,17 +25,6 @@
 #undef WIN32_LEAN_AND_MEAN
 #include <malloc.h>
 #include <locale.h>
-
-/*
- * The following declarations refer to internal Tk routines.  These
- * interfaces are available for use, but are not supported.
- */
-
-extern void
-TkConsoleCreate (void);
-
-extern int
-TkConsoleInit (Tcl_Interp *interp);
 
 int
 Tktest_Init (Tcl_Interp *interp);
@@ -56,7 +45,6 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
 {
     char **argv;
     int argc;
-    char buffer [MAX_PATH];
 
     /*
      * Set up the default locale to be standard "C" locale so parsing
@@ -72,21 +60,6 @@ WinMain(hInstance, hPrevInstance, lpszCmdLine, nCmdShow)
      * the queue.
      */
     SetMessageQueue(64);
-
-    /*
-     * Create the console channels and install them as the standard
-     * channels.  All I/O will be discarded until TkConsoleInit is
-     * called to attach the console to a text widget.
-     */
-    TkConsoleCreate();
-
-    /*
-     * Parse the command line. Since Windows programs don't get passed the
-     * command name as the first argument, we need to fetch it explicitly.
-     */
-    TclX_SplitWinCmdLine (&argc, &argv);
-    GetModuleFileName (NULL, buffer, sizeof (buffer));
-    argv[0] = buffer;
 
     TkX_Main(argc, argv, Tcl_AppInit);
 
@@ -124,6 +97,13 @@ Tcl_AppInit (interp)
         goto errorExit;
     }
     Tcl_StaticPackage(interp, "Tkx", Tkx_Init, (Tcl_PackageInitProc *) NULL);
+
+    /*
+     * Create the console channels and install them as the standard
+     * channels.  All I/O will be discarded until Tk_CreateConsoleWindow
+     * is called to attach the console to a text widget.
+     */
+    Tk_InitConsoleChannels(interp);
 
     if (TkX_ConsoleInit (interp) == TCL_ERROR)
         goto errorExit;

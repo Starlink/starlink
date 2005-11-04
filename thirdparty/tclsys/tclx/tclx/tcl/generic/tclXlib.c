@@ -3,7 +3,7 @@
  *
  * Tcl commands to load libraries of Tcl code.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXlib.c,v 8.20.2.1 1998/04/26 20:03:53 markd Exp $
+ * $Id: tclXlib.c,v 8.25.10.1 2001/10/24 22:57:02 hobbs Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -274,9 +274,10 @@ MakeAbsFile (interp, fileName, absNamePtr)
     Tcl_DString *absNamePtr;
 {
     char  *curDir;
-    Tcl_DString joinBuf;
+    Tcl_DString joinBuf, cwdBuffer;
 
     Tcl_DStringSetLength (absNamePtr, 1);
+    Tcl_DStringInit (&cwdBuffer);
 
     fileName = Tcl_TranslateFileName (interp, fileName, absNamePtr);
     if (fileName == NULL)
@@ -297,7 +298,7 @@ MakeAbsFile (interp, fileName, absNamePtr)
      * Otherwise its relative to the current directory, get the directory
      * and join into a path.
      */
-    curDir = TclGetCwd (interp);
+    curDir = Tcl_GetCwd (interp, &cwdBuffer);
     if (curDir == NULL)
         goto errorExit;
 
@@ -307,9 +308,11 @@ MakeAbsFile (interp, fileName, absNamePtr)
     Tcl_DStringAppend (absNamePtr, joinBuf.string, -1);
     Tcl_DStringFree (&joinBuf);
 
+    Tcl_DStringFree (&cwdBuffer);
     return Tcl_DStringValue (absNamePtr);
 
   errorExit:
+    Tcl_DStringFree (&cwdBuffer);
     return NULL;
 }
 
@@ -350,8 +353,8 @@ SetPackageIndexEntry (interp, packageName, fileName, offset, length)
     pkgDataObjv [2] = Tcl_NewIntObj ((int) length);
     pkgDataPtr = Tcl_NewListObj (3, pkgDataObjv);
 
-    if (TclX_ObjSetVar2S (interp, AUTO_PKG_INDEX, packageName, pkgDataPtr,
-                          TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG) == NULL) {
+    if (Tcl_SetVar2Ex(interp, AUTO_PKG_INDEX, packageName, pkgDataPtr,
+                      TCL_GLOBAL_ONLY|TCL_LEAVE_ERR_MSG) == NULL) {
         Tcl_DecrRefCount (pkgDataPtr);
         return TCL_ERROR;
     }
@@ -389,8 +392,8 @@ GetPackageIndexEntry (interp, packageName, fileNamePtr, offsetPtr, lengthPtr)
     /*
      * Look up the package entry in the array.
      */
-    pkgDataPtr = TclX_ObjGetVar2S (interp, AUTO_PKG_INDEX, packageName,
-                                   TCL_GLOBAL_ONLY);
+    pkgDataPtr = Tcl_GetVar2Ex(interp, AUTO_PKG_INDEX, packageName,
+                               TCL_GLOBAL_ONLY);
     if (pkgDataPtr == NULL) {
         TclX_AppendObjResult (interp, "entry not found in \"auto_pkg_index\"",
                               " for package \"", packageName, "\"",
@@ -973,6 +976,7 @@ TclX_LibraryInit (interp)
 {
     int result;
 
+    /* Hack in our own auto-loading */
     result = TclX_Eval (interp, TCLX_EVAL_GLOBAL, autoloadCmd);
     if (result == TCL_ERROR) {
         return TCL_ERROR;

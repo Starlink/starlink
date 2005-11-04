@@ -3,7 +3,7 @@
  *
  * Extended Tcl binary file search command.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,15 +12,11 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXbsearch.c,v 8.8 1997/08/08 10:04:19 markd Exp $
+ * $Id: tclXbsearch.c,v 8.12 1999/03/31 06:37:43 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
 #include "tclExtdInt.h"
-
-/*
- * FIX: Does not support binary data.
- */
 
 /*
  * Control block used to pass data used by the binary search routines.
@@ -353,8 +349,8 @@ TclX_BsearchObjCmd (clientData, interp, objc, objv)
 
         valPtr = Tcl_NewStringObj (Tcl_DStringValue (&searchCB.lineBuf),
                                    -1);
-        if (Tcl_ObjSetVar2 (interp, objv [3], NULL, valPtr,
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL) {
+        if (Tcl_ObjSetVar2(interp, objv[3], NULL, valPtr,
+                           TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL) {
             Tcl_DecrRefCount (valPtr);
             goto errorExit;
         }

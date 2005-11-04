@@ -4,7 +4,7 @@
  * Provides a test version of the Tcl_AppInit procedure for use with
  * applications built with Extended Tcl on  Windows 95/NT systems.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXwinTest.c,v 8.3 1997/07/01 02:58:17 markd Exp $
+ * $Id: tclXwinTest.c,v 8.5 1999/06/23 00:32:42 surles Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -36,11 +36,6 @@ int
 main (int    argc,
       char **argv)
 {
-
-#ifndef BORLAND
-    TclX_SplitWinCmdLine (&argc, &argv);
-#endif
-
     TclX_Main (argc, argv, Tcl_AppInit);
     return 0;                   /* Needed only to prevent compiler warning. */
 }

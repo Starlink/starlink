@@ -1,9 +1,11 @@
 #!/bin/sh
-TCL_LIBRARY=@TCL_SRC@/library
-TCLX_LIBRARY=@bldbasedir@/tcl/unix
-TK_LIBRARY=@TK_SRC@/library
-TKX_LIBRARY=@bldbasedir@/tk/unix
-TCL_PROGRAM=@bldbasedir@/tcl/unix/tcl.static
-TKTEST=@bldbasedir@/tk/unix/tktest.static
+
+TCL_LIBRARY="@TCL_LIBRARY_DIR@"
+TCLX_LIBRARY="@TCLX_RUNTIME_DIR@"
+TK_LIBRARY="@TK_LIBRARY_DIR@"
+TKX_LIBRARY="@TKX_RUNTIME_DIR@"
+TCL_PROGRAM="@TCLX_BIN_DIR@"/tcl.static
+TKTEST=@TKX_BIN_DIR@/tktest.static
 export TCL_LIBRARY TCLX_LIBRARY TK_LIBRARY TKX_LIBRARY TCL_PROGRAM
+
 exec $TKTEST ${1+"$@"}

@@ -4,7 +4,7 @@
 # Tests for commands and functionallity involved in demand loadable Tcl
 # libraries.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -13,13 +13,15 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: tcllib.test,v 8.7 1997/11/11 05:33:20 markd Exp $
+# $Id: tcllib.test,v 8.11 1999/03/31 06:37:52 markd Exp $
 #------------------------------------------------------------------------------
 #
 
 
 if [cequal [info procs Test] {}] {source testlib.tcl}
 eval $SAVED_UNKNOWN
+
+auto_load auto_reset  ;# Make sure we have this before changing path.
 
 global save_auto_path auto_path
 set save_auto_path $auto_path
@@ -360,16 +362,10 @@ Test tcllib-9.3 {successful library access} {
     TclXLibTest::TclLibNSD
 } 0 {***TclXLibTest::TclLibNSC*** ***TclXLibTest::TclLibNSD***}
 
-#catch {file delete -force tcllib1.dir}
-#catch {file delete -force tcllib2.dir}
+TestRemove tcllib1.dir tcllib2.dir
 
-#rename TclLibCleanUp {}
-#rename PutFile {}
-#rename TclLibReset {}
+rename TclLibCleanUp {}
+rename PutFile {}
+rename TclLibReset {}
 
-#set auto_path $save_auto_path
-#rename unknown {}
-
-
-
-
+set auto_path $save_auto_path

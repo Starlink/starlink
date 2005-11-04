@@ -3,7 +3,7 @@
 #
 # Various command dealing with tlib package libraries.
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -32,7 +32,7 @@
 # ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
 # PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #------------------------------------------------------------------------------
-# $Id: tcllib.tcl,v 8.2 1997/08/23 18:55:26 markd Exp $
+# $Id: tcllib.tcl,v 8.3 1999/03/31 06:37:48 markd Exp $
 #------------------------------------------------------------------------------
 #
 

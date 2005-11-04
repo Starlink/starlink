@@ -4,7 +4,7 @@
  * Tcl commands to access unix system calls that are portable to other
  * platforms.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXoscmds.c,v 8.8 1997/07/04 20:23:57 markd Exp $
+ * $Id: tclXoscmds.c,v 8.11 2001/08/02 00:10:24 hobbs Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -230,15 +230,15 @@ TclX_SleepObjCmd (clientData, interp, objc, objv)
     int         objc;
     Tcl_Obj   *CONST objv[];
 {
-    int time;
+    double time;
 
     if (objc != 2)
 	return TclX_WrongArgs (interp, objv [0], "seconds");
 
-    if (Tcl_GetIntFromObj (interp, objv [1], &time) != TCL_OK)
+    if (Tcl_GetDoubleFromObj (interp, objv [1], &time) != TCL_OK)
         return TCL_ERROR;
 
-    TclXOSsleep (time);
+    TclXOSsleep ((int) time);
     return TCL_OK;
 }
 
@@ -387,11 +387,11 @@ TclX_OsCmdsInit (interp)
                           (ClientData) NULL,
 			  (Tcl_CmdDeleteProc*) NULL);
 
-    Tcl_CreateObjCommand (interp,
+    TclX_CreateObjCommand (interp,
 			  "sleep",
 			  TclX_SleepObjCmd,
                           (ClientData) NULL,
-			  (Tcl_CmdDeleteProc*) NULL);
+			  (Tcl_CmdDeleteProc*) NULL, 0);
 
     Tcl_CreateObjCommand (interp,
                           "sync",
@@ -399,11 +399,11 @@ TclX_OsCmdsInit (interp)
                           (ClientData) NULL,
 			  (Tcl_CmdDeleteProc*) NULL);
 
-    Tcl_CreateObjCommand (interp,
+    TclX_CreateObjCommand (interp,
                           "system",
 			  TclX_SystemObjCmd,
                           (ClientData) NULL,
-			  (Tcl_CmdDeleteProc*) NULL);
+			  (Tcl_CmdDeleteProc*) NULL, 0);
 
     Tcl_CreateObjCommand (interp,
 			  "umask",

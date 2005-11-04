@@ -1,12 +1,12 @@
 #-----------------------------------------------------------------------------
 # tclx.tcl -- Extended Tcl initialization.
 #-----------------------------------------------------------------------------
-# $Id: tclx.tcl,v 8.2 1997/11/11 05:33:19 markd Exp $
+# $Id: tclx.tcl,v 8.3 1999/05/03 17:30:36 markd Exp $
 #-----------------------------------------------------------------------------
 
 if {[info exists tclx_library] && ![cequal $tclx_library {}]} {
     set auto_index(buildpackageindex) {source [file join $tclx_library buildidx.tcl]}
-    if ![lcontain $auto_path $tclx_library] {
+    if {![info exists auto_path] || ![lcontain $auto_path $tclx_library]} {
 	lappend auto_path $tclx_library
     }
 }

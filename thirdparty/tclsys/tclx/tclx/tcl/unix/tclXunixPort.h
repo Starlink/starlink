@@ -3,7 +3,7 @@
  *
  * Portability include file for Unix systems.
  *-----------------------------------------------------------------------------
- * Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXunixPort.h,v 8.2 1997/07/08 06:15:06 markd Exp $
+ * $Id: tclXunixPort.h,v 8.4 1999/03/31 06:37:53 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -107,6 +107,18 @@ extern long random ();
 #ifdef NO_FLOOR_PROTO_
 extern double floor ();
 #endif
+
+/*
+ * If sigaction is available, check for restartable signals.
+ */
+#ifndef NO_SIGACTION
+#    ifndef SA_RESTART
+#        define NO_SIG_RESTART
+#    endif
+#else
+#    define NO_SIG_RESTART
+#endif
+
 
 /*
  * Define a macro to call wait pid.  We don't use Tcl_WaitPid on Unix because

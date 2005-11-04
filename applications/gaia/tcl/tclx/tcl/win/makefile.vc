@@ -3,7 +3,7 @@
 #
 # Visual C++ 2.x, 4.0, and 5.0 makefile for Extended Tcl on Windows.
 #------------------------------------------------------------------------------
-# Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: makefile.vc,v 8.8.2.1 1998/07/06 16:01:23 markd Exp $
+# $Id: makefile.vc,v 8.11 1999/06/23 00:32:42 surles Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -61,7 +61,6 @@ TCLXOBJS = \
 	$(TMP_DIR)\tclXosCmds.obj \
 	$(TMP_DIR)\tclXprocess.obj \
 	$(TMP_DIR)\tclXprofile.obj \
-	$(TMP_DIR)\tclXregexp.obj \
 	$(TMP_DIR)\tclXshell.obj \
 	$(TMP_DIR)\tclXsignal.obj \
 	$(TMP_DIR)\tclXsocket.obj \
@@ -108,7 +107,7 @@ test: all $(TCLXTEST) runtest.bat
 	..\win\runtest.bat all
 
 tclXvc.def: $(DUMPEXTS) $(TCLXOBJS)
-	$(DUMPEXTS) -o $@ $(TCLX_DLL) @<<
+	$(DUMPEXTS) -o $@ $(TCLX_DLL_NAME) @<<
 	$(TCLXOBJS)
 <<
 
@@ -181,7 +180,7 @@ cattcl.exe: $(TMP_DIR)\cattcl.obj
 runtcl.bat: makefile.vc ..\..\win\common.vc
 	-del runtcl.bat
 	@echo echo off>>runtcl.bat
-	@echo PATH $(TCLX_WIN_DIR);$(TCL_WIN_DIR);%PATH%>>runtcl.bat
+	@echo PATH $(TCLX_WIN_DIR);$(TCL_BUILD_DIR);%PATH%>>runtcl.bat
 	@echo set TCL_LIBRARY=$(TCL_RUNTIME_DIR)>>runtcl.bat
 	@echo set TCLX_LIBRARY=$(TCLX_WIN_DIR)>>runtcl.bat
 	@echo set TCL_PROGRAM=$(TCLX_WIN_DIR)\tcl.exe>>runtcl.bat
@@ -191,7 +190,7 @@ runtcl.bat: makefile.vc ..\..\win\common.vc
 runtest.bat: makefile.vc ..\..\win\common.vc
 	-del runtest.bat
 	@echo echo off>>runtest.bat
-	@echo PATH $(TCLX_WIN_DIR);$(TCL_WIN_DIR);%PATH%>>runtest.bat
+	@echo PATH $(TCLX_WIN_DIR);$(TCL_BUILD_DIR);%PATH%>>runtest.bat
 	@echo set TCL_LIBRARY=$(TCL_RUNTIME_DIR)>>runtest.bat
 	@echo set TCLX_LIBRARY=$(TCLX_WIN_DIR)>>runtest.bat
 	@echo set TCL_PROGRAM=$(TCLX_WIN_DIR)\tclXtest.exe>>runtest.bat
@@ -219,7 +218,7 @@ install:
 	puts $$fd "#"
 	puts $$fd "# Package index for TclX $$xversion."
 	puts $$fd "#"
-	puts $$fd "if {\[info tclversion] < $$version} return"
+	puts $$fd "if {[catch {package require Tcl $$version}]} return"
 	puts $$fd "package ifneeded Tclx $$xversion\\"
 	puts $$fd "\t\[list load \[file join \$$dir $$dllPath] Tclx]"
 	close $$fd
@@ -249,7 +248,11 @@ clean:
 $(TMP_DIR)\tclXinit.obj: $(TCLX_GENERIC_DIR)\tclXinit.c
 	$(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TCLX_INCLUDES) \
 	  $(TCLX_DEFINES) -DTCLX_LIBRARY="\"$(TCLX_INST_RUNTIMEU)\"" \
-	  -Fo$(TMP_DIR)\ $?
+	  -DBUILD_TCLX -Fo$(TMP_DIR)\ $?
+
+$(TMP_DIR)\tclXAppInit.obj: $(TCLX_WIN_DIR)\tclXAppInit.c
+	$(cc32) $(cdebug) $(cflags) $(cvars) $(TCLX_INCLUDES) \
+		$(TCLX_DEFINES) -Fo$(TMP_DIR)\ $?
 
 $(TMP_DIR)\tclXwinTest.obj: $(TCLX_WIN_DIR)\tclXwinTest.c
 	$(cc32) $(cdebug) $(cflags) $(cvars) $(TCLX_INCLUDES) \
@@ -280,15 +283,15 @@ $(TMP_DIR)\cattcl.obj: $(TCLX_WIN_DIR)\cattcl.c
 #
 {$(TCLX_GENERIC_DIR)}.c{$(TMP_DIR)}.obj:
 	$(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TCLX_INCLUDES) \
-		$(TCLX_DEFINES) -Fo$(TMP_DIR)\ $<
+		$(TCLX_DEFINES) -DBUILD_TCLX -Fo$(TMP_DIR)\ $<
 
 {$(TCLX_WIN_DIR)}.c{$(TMP_DIR)}.obj:
 	$(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TCLX_INCLUDES) \
-		$(TCLX_DEFINES) -Fo$(TMP_DIR)\ $<
+		$(TCLX_DEFINES) -DBUILD_TCLX -Fo$(TMP_DIR)\ $<
 
 {$(ROOT)\tcl\compat}.c{$(TMP_DIR)}.obj:
 	$(cc32) $(cdebug) $(cflags) $(cvarsdll) $(TCLX_INCLUDES) \
-		$(TCLX_DEFINES) -Fo$(TMP_DIR)\ $<
+		$(TCLX_DEFINES) -DBUILD_TCLX -Fo$(TMP_DIR)\ $<
 
 {$(TCLX_WIN_DIR)}.rc{$(TMP_DIR)}.res:
 	$(rc32) -fo $@ -r -i $(TCLX_GENERIC_DIR) -i $(TCLX_WIN_DIR) $<

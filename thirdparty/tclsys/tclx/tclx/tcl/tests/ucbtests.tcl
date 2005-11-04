@@ -3,20 +3,8 @@
 # and issues notices about expected discrepancies.  While Tcl is now at Sun,
 # this is called ucbtests.tcl, well, just because we always have.
 # 
-# Requires a single argument of the path to the Tcl source directory.
+# Must be run with a current directory of the Tcl tests directory.
 #
-
-if {$argc != 1} {
-    puts stderr "Wrong # of args: $argv0 tclsrcdir"
-    exit 1
-}
-set tclTestDir [lindex $argv 0]/tests
-
-if ![file isdirectory $tclTestDir] {
-    puts stderr "Directory \"$tclTestDir\" does not exist"
-    exit 1
-}
-cd $tclTestDir
 
 #
 # Table of tests that should be skipped.

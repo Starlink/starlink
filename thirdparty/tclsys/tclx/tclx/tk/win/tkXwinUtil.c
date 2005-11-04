@@ -3,7 +3,7 @@
  *
  * Support routines for TkX based programs.
  *-----------------------------------------------------------------------------
- * Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tkXwinUtil.c,v 8.2 1997/08/23 18:56:23 markd Exp $
+ * $Id: tkXwinUtil.c,v 8.4 1999/06/26 00:25:53 surles Exp $
  *-----------------------------------------------------------------------------
  */
 #include "tclExtdInt.h"
@@ -20,9 +20,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
-
-extern int
-TkConsoleInit (Tcl_Interp *interp);
 
 
 /*-----------------------------------------------------------------------------
@@ -42,7 +39,7 @@ TkX_ConsoleInit (Tcl_Interp *interp)
     char *flag = Tcl_GetVar(interp, "tcl_interactive", TCL_GLOBAL_ONLY);
 
     if ((flag != NULL) && !STREQU (flag, "0")) {
-	if (TkConsoleInit (interp) == TCL_ERROR) {
+	if (Tk_CreateConsoleWindow (interp) == TCL_ERROR) {
             return TCL_ERROR;
 	}
     }

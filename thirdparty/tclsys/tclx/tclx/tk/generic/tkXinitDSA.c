@@ -3,7 +3,7 @@
  *
  * Dummy version of Tkx_InitStandalone for shared libraries.
  *-----------------------------------------------------------------------------
- * Copyright 1997-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1997-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -14,7 +14,7 @@
  *-----------------------------------------------------------------------------
  * This file donated bu Jan Nijtman <nijtmans@worldaccess.nl>
  *-----------------------------------------------------------------------------
- * $Id: tkXinitDSA.c,v 8.1 1997/08/30 22:30:03 markd Exp $
+ * $Id: tkXinitDSA.c,v 8.2 1999/03/31 06:37:55 markd Exp $
  *-----------------------------------------------------------------------------
  */
 #include "tclExtend.h"

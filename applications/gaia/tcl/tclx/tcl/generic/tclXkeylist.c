@@ -3,7 +3,7 @@
  *
  *  Extended Tcl keyed list commands and interfaces.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXkeylist.c,v 8.15 1997/12/14 21:32:58 markd Exp $
+ * $Id: tclXkeylist.c,v 8.18 1999/03/31 06:37:45 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -949,13 +949,14 @@ TclX_KeylgetObjCmd (clientData, interp, objc, objv)
     Tcl_Obj     *CONST objv[];
 {
     Tcl_Obj *keylPtr, *valuePtr;
-    char *key;
+    char *varName, *key;
     int keyLen, status;
 
     if ((objc < 2) || (objc > 4)) {
         return TclX_WrongArgs (interp, objv [0],
                                "listvar ?key? ?retvar | {}?");
     }
+    varName = Tcl_GetStringFromObj (objv [1], NULL);
 
     /*
      * Handle request for list of keys, use keylkeys command.
@@ -963,8 +964,8 @@ TclX_KeylgetObjCmd (clientData, interp, objc, objv)
     if (objc == 2)
         return TclX_KeylkeysObjCmd (clientData, interp, objc, objv);
 
-    keylPtr = Tcl_ObjGetVar2 (interp, objv [1], NULL, 
-                              TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG);
+    keylPtr = Tcl_GetVar2Ex(interp, varName, NULL, 
+                            TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG);
     if (keylPtr == NULL) {
         return TCL_ERROR;
     }
@@ -1008,8 +1009,8 @@ TclX_KeylgetObjCmd (clientData, interp, objc, objv)
      * Variable (or empty variable name) specified.
      */
     if (!TclX_IsNullObj (objv [3])) {
-        if (Tcl_ObjSetVar2 (interp, objv [3], NULL, valuePtr,
-                            TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL)
+        if (Tcl_SetVar2Ex(interp, Tcl_GetStringFromObj(objv [3], NULL), NULL,
+                          valuePtr, TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL)
             return TCL_ERROR;
     }
     Tcl_SetBooleanObj (Tcl_GetObjResult (interp), TRUE);
@@ -1030,20 +1031,21 @@ TclX_KeylsetObjCmd (clientData, interp, objc, objv)
     Tcl_Obj     *CONST objv[];
 {
     Tcl_Obj *keylVarPtr, *newVarObj;
-    char *key;
+    char *varName, *key;
     int idx, keyLen;
 
     if ((objc < 4) || ((objc % 2) != 0)) {
         return TclX_WrongArgs (interp, objv [0],
                                "listvar key value ?key value...?");
     }
+    varName = Tcl_GetStringFromObj (objv [1], NULL);
 
     /*
      * Get the variable that we are going to update.  If the var doesn't exist,
      * create it.  If it is shared by more than being a variable, duplicated
      * it.
      */
-    keylVarPtr = Tcl_ObjGetVar2 (interp, objv [1], NULL, TCL_PARSE_PART1);
+    keylVarPtr = Tcl_GetVar2Ex(interp, varName, NULL, TCL_PARSE_PART1);
     if ((keylVarPtr == NULL) || (Tcl_IsShared (keylVarPtr))) {
         if (keylVarPtr == NULL) {
             keylVarPtr = TclX_NewKeyedListObj ();
@@ -1065,8 +1067,8 @@ TclX_KeylsetObjCmd (clientData, interp, objc, objv)
         }
     }
 
-    if (Tcl_ObjSetVar2 (interp, objv [1], NULL, keylVarPtr,
-                        TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG) == NULL) {
+    if (Tcl_SetVar2Ex(interp, varName, NULL, keylVarPtr,
+                      TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG) == NULL) {
         goto errorExit;
     }
 
@@ -1093,26 +1095,27 @@ TclX_KeyldelObjCmd (clientData, interp, objc, objv)
     Tcl_Obj     *CONST objv[];
 {
     Tcl_Obj *keylVarPtr, *keylPtr;
-    char *key;
+    char *varName, *key;
     int idx, keyLen, status;
 
     if (objc < 3) {
         return TclX_WrongArgs (interp, objv [0], "listvar key ?key ...?");
     }
+    varName = Tcl_GetStringFromObj (objv [1], NULL);
 
     /*
      * Get the variable that we are going to update.  If it is shared by more
      * than being a variable, duplicated it.
      */
-    keylVarPtr = Tcl_ObjGetVar2 (interp, objv [1], NULL, 
-                                 TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG);
+    keylVarPtr = Tcl_GetVar2Ex(interp, varName, NULL, 
+                               TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG);
     if (keylVarPtr == NULL) {
         return TCL_ERROR;
     }
     if (Tcl_IsShared (keylVarPtr)) {
         keylPtr = Tcl_DuplicateObj (keylVarPtr);
-        keylVarPtr = Tcl_ObjSetVar2 (interp, objv [1], NULL, keylPtr,
-                                     TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG);
+        keylVarPtr = Tcl_SetVar2Ex(interp, varName, NULL, keylPtr,
+                                   TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG);
         if (keylVarPtr == NULL) {
             Tcl_DecrRefCount (keylPtr);
             return TCL_ERROR;
@@ -1156,14 +1159,16 @@ TclX_KeylkeysObjCmd (clientData, interp, objc, objv)
     Tcl_Obj     *CONST objv[];
 {
     Tcl_Obj *keylPtr, *listObjPtr;
-    char *key;
+    char *varName, *key;
     int keyLen, status;
 
     if ((objc < 2) || (objc > 3)) {
         return TclX_WrongArgs (interp, objv [0], "listvar ?key?");
     }
-    keylPtr = Tcl_ObjGetVar2 (interp, objv [1], NULL, 
-                              TCL_PARSE_PART1 | TCL_LEAVE_ERR_MSG);
+    varName = Tcl_GetStringFromObj (objv [1], NULL);
+
+    keylPtr = Tcl_GetVar2Ex(interp, varName, NULL, 
+                            TCL_PARSE_PART1|TCL_LEAVE_ERR_MSG);
     if (keylPtr == NULL) {
         return TCL_ERROR;
     }

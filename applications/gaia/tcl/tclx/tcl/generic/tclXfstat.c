@@ -3,7 +3,7 @@
  *
  * Extended Tcl fstat command.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXfstat.c,v 8.6 1997/08/08 10:04:22 markd Exp $
+ * $Id: tclXfstat.c,v 8.9 1999/03/31 06:37:44 markd Exp $
  *-----------------------------------------------------------------------------
  */
 #include "tclExtdInt.h"
@@ -171,86 +171,72 @@ ReturnStatArray (interp, ttyDev, statBufPtr, arrayObj)
     struct stat  *statBufPtr;
     Tcl_Obj      *arrayObj;
 {
-    Tcl_Obj *idxObj = Tcl_NewObj ();
+    char *varName = Tcl_GetStringFromObj (arrayObj, NULL);
 
-    Tcl_SetStringObj (idxObj, "dev", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_dev),
+    if  (Tcl_SetVar2Ex(interp, varName, "dev",
+                       Tcl_NewIntObj((int)statBufPtr->st_dev),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "ino",
+                       Tcl_NewIntObj((int)statBufPtr->st_ino),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "mode",
+                       Tcl_NewIntObj((int)statBufPtr->st_mode),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "nlink",
+                       Tcl_NewIntObj((int)statBufPtr->st_nlink),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "uid",
+                       Tcl_NewIntObj((int)statBufPtr->st_uid),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "gid",
+                       Tcl_NewIntObj((int)statBufPtr->st_gid),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "size",
+                       Tcl_NewLongObj((long)statBufPtr->st_size),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "atime",
+                       Tcl_NewLongObj((long)statBufPtr->st_atime),
+                       TCL_LEAVE_ERR_MSG) == NULL)
+        goto errorExit;
+
+    if  (Tcl_SetVar2Ex(interp, varName, "mtime",
+                         Tcl_NewLongObj((long)statBufPtr->st_mtime),
                          TCL_LEAVE_ERR_MSG) == NULL)
         goto errorExit;
 
-    Tcl_SetStringObj (idxObj, "ino", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_ino),
-                         TCL_LEAVE_ERR_MSG) == NULL)
+    if  (Tcl_SetVar2Ex(interp, varName, "ctime",
+                       Tcl_NewLongObj((long)statBufPtr->st_ctime),
+                       TCL_LEAVE_ERR_MSG) == NULL)
         goto errorExit;
 
-    Tcl_SetStringObj (idxObj, "mode", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_mode),
+    if (Tcl_SetVar2Ex(interp, varName, "tty",
+                      Tcl_NewBooleanObj(ttyDev),
                       TCL_LEAVE_ERR_MSG) == NULL)
         goto errorExit;
 
-    Tcl_SetStringObj (idxObj, "nlink", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_nlink),
-                         TCL_LEAVE_ERR_MSG) == NULL)
+    if (Tcl_SetVar2Ex(interp, varName, "type",
+                      Tcl_NewStringObj(StrFileType(statBufPtr), -1),
+                      TCL_LEAVE_ERR_MSG) == NULL)
         goto errorExit;
 
-    Tcl_SetStringObj (idxObj, "uid", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_uid),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "gid", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewIntObj ((int) statBufPtr->st_gid),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "size", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewLongObj ((long) statBufPtr->st_size),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "atime", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewLongObj ((long) statBufPtr->st_atime),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "mtime", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewLongObj ((long) statBufPtr->st_mtime),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "ctime", -1);
-    if  (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                         Tcl_NewLongObj ((long) statBufPtr->st_ctime),
-                         TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "tty", -1);
-    if (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                        Tcl_NewBooleanObj (ttyDev),
-                        TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_SetStringObj (idxObj, "type", -1);
-    if (Tcl_ObjSetVar2 (interp, arrayObj, idxObj,
-                        Tcl_NewStringObj (StrFileType (statBufPtr), -1),
-                        TCL_LEAVE_ERR_MSG) == NULL)
-        goto errorExit;
-
-    Tcl_DecrRefCount (idxObj);
     return TCL_OK;
 
   errorExit:
-    Tcl_DecrRefCount (idxObj);
-    goto errorExit;
+    return TCL_ERROR;
 }
 
 /*-----------------------------------------------------------------------------

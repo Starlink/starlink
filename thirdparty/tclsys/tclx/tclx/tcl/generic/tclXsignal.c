@@ -4,7 +4,7 @@
  * Tcl Unix signal support routines and the signal and commands.  The #ifdefs
  * around several common Unix signals existing are for Windows.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXsignal.c,v 8.12.2.1 1998/08/08 16:43:55 markd Exp $
+ * $Id: tclXsignal.c,v 8.16 1999/03/31 06:37:46 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -189,6 +189,17 @@ typedef RETSIGTYPE (*signalProcPtr_t) _ANSI_ARGS_((int));
 #endif
 
 /*
+ * SunOS has sigaction but uses SA_INTERRUPT rather than SA_RESTART which
+ * has the opposite meaning.
+ */
+#ifndef NO_SIGACTION
+#if defined(SA_INTERRUPT) && !defined(SA_RESTART)
+#define USE_SA_INTERRUPT
+#endif
+#endif
+
+
+/*
  * Symbolic signal actions that can be associated with a signal.
  */
 static char *SIGACT_DEFAULT = "default";
@@ -214,14 +225,13 @@ static ClientData                 appSigErrorClientData = NULL;
 /*
  * Counters of signals that have occured but have not been processed.
  */
-static unsigned signalsReceived [MAXSIG];
+static unsigned signalsReceived[MAXSIG];
 
 /*
  * Table of commands to evaluate when a signal occurs.  If the command is
  * NULL and the signal is received, an error is returned.
  */
-/*FIX: need to allow binary data in commands */
-static char *signalTrapCmds [MAXSIG];
+static char *signalTrapCmds[MAXSIG];
 
 /*
  * Prototypes of internal functions.
@@ -373,7 +383,11 @@ GetSignalState (signalNum, sigProcPtr, restart)
     if (sigaction (signalNum, NULL, &currentState) < 0)
         return TCL_ERROR;
     *sigProcPtr = currentState.sa_handler;
+#ifdef USE_SA_INTERRUPT
+    *restart = ((currentState.sa_flags & SA_INTERRUPT) == 0);
+#else
     *restart = ((currentState.sa_flags & SA_RESTART) != 0);
+#endif
     return TCL_OK;
 #else
     signalProcPtr_t  actionFunc;
@@ -418,9 +432,15 @@ SetSignalState (signalNum, sigFunc, restart)
     newState.sa_handler = sigFunc;
     sigfillset (&newState.sa_mask);
     newState.sa_flags = 0;
+#ifdef USE_SA_INTERRUPT
+    if (!restart) {
+        newState.sa_flags |= SA_INTERRUPT;
+    }
+#else
     if (restart) {
         newState.sa_flags |= SA_RESTART;
     }
+#endif
 
     if (sigaction (signalNum, &newState, NULL) < 0)
         return TCL_ERROR;
@@ -1352,10 +1372,9 @@ TclX_SignalObjCmd (clientData, interp, objc, objv)
         TclX_WrongArgs (interp, objv [0], "?-restart? action signalList ?command?");
         return TCL_ERROR;
     }
-#ifdef NO_SIGACTION
+#ifdef NO_SIG_RESTART
     if (restart) {
-        TclX_AppendObjResult(interp, "this system does not support POSIX ",
-                             "signals (sigaction); -restart no implemented",
+        TclX_AppendObjResult(interp, "restarting of system calls from signals is not available on this system",
                              NULL);
         return TCL_ERROR;
     }

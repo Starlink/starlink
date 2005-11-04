@@ -3,7 +3,7 @@
 #
 # Tests for the ctype command.
 #---------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,11 +12,23 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: chartype.test,v 8.2 1997/08/23 18:55:29 markd Exp $
+# $Id: chartype.test,v 8.6 1999/03/31 06:37:49 markd Exp $
 #------------------------------------------------------------------------------
 #
 
 if [cequal [info procs Test] {}] {source testlib.tcl}
+
+# Use format to convert number to character.
+proc numToChar num {
+    return [format %c $num]
+}
+
+# Use scan to convert character to number.
+proc charToNum str {
+    scan $str %c num
+    return $num
+}
+
 
 Test chartype-1.1 {ctype tests} {
     ctype digit 01234567
@@ -184,39 +196,35 @@ Test chartype-1.26 {ctype tests} {
 
 Test chartype-1.27 {ctype char tests} {
     ctype char 65
-} 0 {A}
+} 0 [numToChar 65]
 
 Test chartype-1.28 {ctype char tests} {
     ctype char 97
-} 0 {a}
+} 0 [numToChar 97]
 
 Test chartype-1.29 {ctype char tests} {
     ctype char 57
-} 0 {9}
+} 0 [numToChar 57]
 
 Test chartype-1.30 {ctype char tests} {
     ctype char 35
-} 0 {#}
-
-Test chartype-1.31 {ctype char tests} {
-    ctype char 256
-} 1 {number must be in the range 0..255}
+} 0 [numToChar 35]
 
 Test chartype-1.32 {ctype ord tests} {
     ctype ord A
-} 0 {65}
+} 0 [charToNum A]
 
 Test chartype-1.33 {ctype ord tests} {
     ctype ord a
-} 0 {97}
+} 0 [charToNum a]
 
 Test chartype-1.34 {ctype ord tests} {
     ctype ord 9
-} 0 {57}
+} 0 [charToNum 9]
 
 Test chartype-1.35 {ctype ord tests} {
-    ctype ord "#"
-} 0 {35}
+    ctype ord  "#"
+} 0 [charToNum \#]
 
 Test chartype-1.36 {ctype ord tests} {
     ctype ord
@@ -228,18 +236,18 @@ Test chartype-1.37 {ctype ord tests} {
 
 Test chartype-1.38 {ctype ord tests} {
     ctype ord \377
-} 0 {255}
+} 0 [charToNum \377]
 
 Test chartype-1.39 {ctype ord tests} {
     ctype ord \277
-} 0 {191}
+} 0 [charToNum \277]
 
 Test chartype-1.40 {ctype ord tests} {
     ctype char 255
-} 0  \377
+} 0 [numToChar 255]
 
 Test chartype-1.41 {ctype ord tests} {
-    ctype char 191
-} 0  \277
+    ctype char 1722
+} 0  [numToChar 1722]
 
 

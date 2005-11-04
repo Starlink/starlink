@@ -3,7 +3,7 @@
  *
  * Mathematical Tcl commands.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXmath.c,v 8.6 1997/07/04 20:23:56 markd Exp $
+ * $Id: tclXmath.c,v 8.7 1999/03/31 06:37:45 markd Exp $
  *-----------------------------------------------------------------------------
  */
 

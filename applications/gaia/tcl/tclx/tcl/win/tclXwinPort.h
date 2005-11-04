@@ -3,7 +3,7 @@
  *
  * Portability include file for MS Windows systems.
  *-----------------------------------------------------------------------------
- * Copyright 1996-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1996-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXwinPort.h,v 8.2 1997/04/17 05:00:01 markd Exp $
+ * $Id: tclXwinPort.h,v 8.4 1999/03/31 06:37:55 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -50,11 +50,17 @@
 #ifndef MAXDOUBLE
 #    define MAXDOUBLE HUGE_VAL
 #endif
+
+/*
+ * No restartable signals in WIN32.
+ */
+#define NO_SIG_RESTART
+
 /*
  * Define a macro to call wait pid.  We don't use Tcl_WaitPid on Unix because
  * it delays signals.
  */
-#define TCLX_WAITPID(pid, status, options) Tcl_WaitPid (pid, status, options)
+#define TCLX_WAITPID(pid, status, options) Tcl_WaitPid ((Tcl_Pid)pid, status, options)
 
 #define bcopy(from, to, length)    memmove((to), (from), (length))
 

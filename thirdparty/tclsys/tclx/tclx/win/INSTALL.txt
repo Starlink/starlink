@@ -22,25 +22,25 @@ To build the release:
 
    o You need Borland C++ 5.01 or above or Visual C++ 4.0 or above.
      
-   o Tcl 8.0p2 and Tk 8.0p2 should be in a directory adjacent to the tclX8.0.3
+   o Tcl 8.2 and Tk 8.2 should be in a directory adjacent to the tclX8.2
      directory or the paths in common.bc/common.vc need to be changed.
 
 
 BORLAND BUILD
 
-   o Edit tclX8.0.3/win/common.bc to set the macro TOOLS to the path to the
+   o Edit tclX8.2/win/common.bc to set the macro TOOLS to the path to the
      install directory for Borland C++.  By default, this is c:\bc5.
 
-   o Edit tclX8.0.3/win/common.bc to set the macro PREFIX to the location
+   o Edit tclX8.2/win/common.bc to set the macro PREFIX to the location
      you want TclX installed.  This PREFIX's parent directory must exist, all
      other directories, including PREFIX will be built if they don't exist.
      The resulting directories that will be used for installation are:
         $(PREFIX)/bin - Executables and DLLs.
-        $(PREFIX)/lib/tclX8.0.3 - Runtime Tcl code and help files for TclX.
-        $(PREFIX)/lib/tkX8.0.3 - Runtime Tcl code and help files for TkX.
+        $(PREFIX)/lib/tclX8.2.0 - Runtime Tcl code and help files for TclX.
+        $(PREFIX)/lib/tkX8.2.0 - Runtime Tcl code and help files for TkX.
         $(PREFIX)/include - Include files.
 
-   o To compile, cd to tclX8.0.3/win and enter the command:
+   o To compile, cd to tclX8.2.0/win and enter the command:
 
         make -f makefile.bc
 
@@ -55,19 +55,19 @@ BORLAND BUILD
 
 MICROSOFT VISUAL C++ BUILD
 
-   o Edit tclX8.0.3/win/common.vc to set the macro TOOLS32 to the path to the
+   o Edit tclX8.2/win/common.vc to set the macro TOOLS32 to the path to the
      install directory for MS Visual C++ 4.o.  By default, this is c:\msdev.
 
-   o Edit tclX8.0.3/win/common.vc to set the macro PREFIX to the location
+   o Edit tclX8.2/win/common.vc to set the macro PREFIX to the location
      you want TclX installed.  This PREFIX's parent directory must exist, all
      other directories, including PREFIX will be built if they don't exist.
      The resulting directories that will be used for installation are:
         $(PREFIX)/bin - Executables and DLLs.
-        $(PREFIX)/lib/tclX8.0.3 - Runtime Tcl code and help files for TclX.
-        $(PREFIX)/lib/tkX8.0.3 - Runtime Tcl code and help files for TkX.
+        $(PREFIX)/lib/tclX8.2 - Runtime Tcl code and help files for TclX.
+        $(PREFIX)/lib/tkX8.2 - Runtime Tcl code and help files for TkX.
         $(PREFIX)/include - Include files.
 
-   o To compile, cd to tclX8.0.3/win and enter the command:
+   o To compile, cd to tclX8.2/win and enter the command:
 
         nmake -f makefile.vc
 
@@ -85,7 +85,7 @@ MICROSOFT VISUAL C++ BUILD
         o In the Open dialog:
             o Set the "Files of Type" field to be "All Files (*.*)"
             o Set the "Open As" field to be "Makefile"
-            o Now select "tclX8.0.3/tcl/win/makefile.vc" using the
+            o Now select "tclX8.2/tcl/win/makefile.vc" using the
               standard open dialog.
         o A warning dialog will come up asking if you want to wrap a
           workspace around the makefile.  Answer "Yes'.
