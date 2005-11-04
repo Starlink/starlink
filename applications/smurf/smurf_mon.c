@@ -108,6 +108,7 @@ void smurf_mon( int * status ) {
   snprintf( appname, SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
 	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
+  msgIfget("MSG_FILTER", status);
 
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
@@ -115,6 +116,9 @@ void smurf_mon( int * status ) {
   }
   else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
     smurf_makemap( status );
+  }
+  else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
+    smurf_flatfield( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

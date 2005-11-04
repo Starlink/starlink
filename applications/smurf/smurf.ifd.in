@@ -27,6 +27,14 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	  parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
+
      }
 
      action makemap {
@@ -52,6 +60,45 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	  parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
+
+     }
+
+     action flatfield {
+
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input timeseries}
+            helpkey *
+          }
+
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Flatfielded timeseries}
+            helpkey *
+          }
+
+	  parameter msg_filter {
+	    type _CHAR
+	    prompt {Message level}
+	    default NORM
+	    vpath DEFAULT	
+	    helpkey *
+	  }
      }
 
    }

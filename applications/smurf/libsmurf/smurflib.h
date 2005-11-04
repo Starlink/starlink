@@ -56,5 +56,6 @@
 #define SMURF_LIB_DEFINED
 
 void smurf_extinction( int * );
+void smurf_flatfield( int * );
 
 #endif /* SMURF_LIB_DEFINED */
