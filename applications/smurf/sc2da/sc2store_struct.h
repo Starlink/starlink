@@ -8,6 +8,8 @@
 
 /* Structure containing per-frame header items */
 
+#ifndef SC2STORE_STRUCT_DEFINED
+#define SC2STORE_STRUCT_DEFINED
 
 struct sc2head
 {
@@ -54,4 +56,4 @@ struct sc2head
    float wvm_time;
 };
 
-
+#endif /* SC2STORE_STRUCT_DEFINED */
