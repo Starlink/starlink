@@ -65,6 +65,7 @@
 #define SMF_PATH_MAX GRP__SZNAM
 
 enum {
+  SMF__NULL,
   SMF__INTEGER,
   SMF__FLOAT,
   SMF__DOUBLE
@@ -75,8 +76,6 @@ typedef struct smfFile {
   int isSc2store;
   char name[SMF_PATH_MAX+1];
 } smfFile;
-
-enum { blah=2 };
 
 typedef struct smfHead {
   struct sc2head * sc2head;

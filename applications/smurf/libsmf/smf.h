@@ -68,6 +68,6 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
 
-void smf_fits_crchan( int nfits, char ** headrec, AstFitsChan ** fits, int *status);
+void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
 #endif /* SMF_DEFINED */
