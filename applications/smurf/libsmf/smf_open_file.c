@@ -17,7 +17,13 @@
 
 *  Arguments:
 *     ingrp = const Grp * (Given)
-*        ...
+*        NDG group identifier
+*     index = int (Given)
+*        Index corresponding to required file in group
+*     mode = char * (Given)
+*        File access mode
+*     data = smfData * (Returned)
+*        Pointer to smfData struct containing file info and data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -51,7 +57,7 @@
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -63,7 +69,7 @@
 #include "star/ndg.h"
 #include "ndf.h"
 #include "ast.h"
-
+#include "smf.h"
 #include "smf_typ.h"
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status) {
@@ -85,7 +91,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
   smfFile *file;
   smfHead *hdr;
-  smfDA *da;
+  smfDA *da = NULL;
 
   AstFitsChan *fits = NULL;
   AstFrameSet *iwcs = NULL;
@@ -95,8 +101,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
   struct sc2head *frhead; /* structure for headers for a frame */
   char headrec[80][81];   /* FITS headers */
   int j;                  /* loop counter */
-  int maxfits;            /* maximum number of FITS headers */
-  int maxlen;             /* maximum length of a FITS header */
+  int maxfits = 80;            /* maximum number of FITS headers */
+  int maxlen = 81;             /* maximum length of a FITS header */
   int nfits;              /* number of FITS headers */
   int nframes;            /* number of frames */
   int *tstream;           /* pointer to array data */
@@ -109,7 +115,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
   ndfDim( indf, NDF__MXDIM, ndfdims, &ndims, status );
 
   pname = filename;
-  grpGet( igrp, i, 1, &pname, SMF_PATH_MAX, status);
+  grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
+
 
   ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP, status);
 
@@ -119,7 +126,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
   } else if (ndims == 3) {
     if (strncmp(dtype, "_UWORD", 6) == 0) {
       isNDF = 0;
-    } 
+    } else {
+      isNDF = 1;
+    }
     isTseries = 1;
   } else {
     if ( *status == SAI__OK) {
@@ -139,11 +148,13 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     hdr->wcs = NULL;
 
     if (isNDF) {
+      (*data)->da = NULL;
 
       ndfState( indf, "QUALITY", &qexists, status);
       ndfState( indf, "VARIANCE", &vexists, status);
 
       ndfMap( indf, "DATA", dtype, mode, &outdata, &nout, status );
+
 
       if (qexists) {
 	ndfMap( indf, "QUALITY", dtype, mode, &outdata[2], &nout, status );
@@ -152,7 +163,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
       }
   
-      smf_fits_rdhead( indf, &fits, status); /* START HERE */
+      /*      smf_fits_rdhead( indf, &fits, status); */
+      /* START HERE */
 
       if ( !isTseries ) {
 	ndfGtwcs( indf, &iwcs, status);
@@ -182,10 +194,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       sc2store_rdtstream( pname, SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname, &frhead,
-			  &tstream, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
+			  &outdata[0], &(da->dksquid), &(da->flatcal), &(da->flatpar), 
 			  status);
 
-      smf_fits_crchan( nfits, headrec, &fits, status); /* AND HERE */
+      /*      smf_fits_crchan( nfits, headrec, &fits, status); 
+       */
+      /* AND HERE */
 
       itype = SMF__INTEGER;
       
