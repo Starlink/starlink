@@ -71,6 +71,10 @@
 #include "ast.h"
 #include "smf.h"
 #include "smf_typ.h"
+#include "mers.h"
+#include <string.h>
+#include <stdlib.h>
+#include "sc2da/sc2store.h"
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status) {
 
@@ -85,9 +89,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
   void *outdata[] = { NULL, NULL, NULL };
   int isNDF = 1;
   int isTseries = 0;
-  int itype;
+  int itype = SMF__NULL;
   int i;
   int nout;
+
+  int *tdata;
 
   smfFile *file;
   smfHead *hdr;
@@ -100,13 +106,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
   int colsize;            /* number of pixels in column (returned) */
   struct sc2head *frhead; /* structure for headers for a frame */
   char headrec[80][81];   /* FITS headers */
-  int j;                  /* loop counter */
   int maxfits = 80;            /* maximum number of FITS headers */
   int maxlen = 81;             /* maximum length of a FITS header */
   int nfits;              /* number of FITS headers */
   int nframes;            /* number of frames */
-  int *tstream;           /* pointer to array data */
   int rowsize;            /* number of pixels in row (returned) */
+  char *phead = NULL;
 
   if ( *status != SAI__OK ) return;
 
@@ -163,7 +168,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
       }
   
-      /*      smf_fits_rdhead( indf, &fits, status); */
+      smf_fits_rdhead( indf, &fits, status);
       /* START HERE */
 
       if ( !isTseries ) {
@@ -194,11 +199,17 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       sc2store_rdtstream( pname, SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname, &frhead,
-			  &outdata[0], &(da->dksquid), &(da->flatcal), &(da->flatpar), 
+			  &tdata, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
 			  status);
 
-      /*      smf_fits_crchan( nfits, headrec, &fits, status); 
-       */
+      outdata[0] = tdata;
+
+      printf("%s \n",&(headrec[2][0]));
+
+      phead = &(headrec[0][0]);
+
+      smf_fits_crchan( nfits, phead, &fits, status); 
+
       /* AND HERE */
 
       itype = SMF__INTEGER;
@@ -211,6 +222,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     (*data)->dtype = itype;
     strncpy(file->name, pname, SMF_PATH_MAX);
     hdr->fitshdr = fits;
+    astShow(fits);
 
     for (i=0; i<3; i++) {
       ((*data)->pntr)[i] = outdata[i];
