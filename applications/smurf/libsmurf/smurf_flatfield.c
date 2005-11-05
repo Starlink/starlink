@@ -26,14 +26,13 @@
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded
 *     FLAT = NDF (Read)
-*          File containing the flatfield solution
+*          Optional file containing flatfield solution
 *     OUT = NDF (Write)
 *          Output file
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
-*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -53,13 +52,13 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -72,6 +71,7 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
 
 #include "star/ndg.h"
 #include "star/grp.h"
@@ -87,49 +87,37 @@
 
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2store_struct.h"
-#include "sc2da/sc2store_sys.h"
 #include "sc2da/sc2math.h"
 #include "sc2da/sc2store.h"
 
-#define SMF_PATH_MAX 4096
 
 void smurf_flatfield( int *status ) {
 
   int flag;                  /* */
-  int fndf;                  /* Flatfield NDF identifier */
+  /*  int fndf; */                 /* Flatfield NDF identifier */
   int i;                     /* Counter, index */
+  int j;                     /* Counter, index */
   Grp *igrp = NULL;
-  int indf;                  /* Input NDF identifier */
-  dim_t indims[2];    /* Copy of the NDF dimensions */
-  char name[SMF_PATH_MAX];   /* */
   int ndfdims[NDF__MXDIM];   /* Dimensions of input NDF */
   int ndims;                 /* Number of active dimensions in input */
   Grp *ogrp = NULL;
   int outndf;                  /* Output NDF identifier */
   int outsize;               /* Total number of NDF names in the output group */
-  int size;                  /* */
+  int size;                  /* Number of files in input group */
   int nboll;
   int nout;
   double *outdata = NULL;
+  int indf;
+  int rawdata;
 
-  /* Pasted from readsc2ndf */
-  int colsize;            /* number of pixels in column (returned) */
-  int *dksquid;           /* pointer to dark SQUID data */
+  smfDA * da;
+  smfData * data;
+  smfFile * file;
+
+  void * pntr[3];
+
   char *pname;
-  char filename[SMF_PATH_MAX];     /* name of file */
-  struct sc2head *frhead; /* structure for headers for a frame */
-  double *flatcal;        /* pointer to flatfield calibration */
-  double *flatpar;        /* pointer to flatfield parameters */
-  char headrec[80][81];   /* FITS headers */
-  char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
-  int j;                  /* loop counter */
-  int maxfits;            /* maximum number of FITS headers */
-  int maxlen;             /* maximum length of a FITS header */
-  int nfits;              /* number of FITS headers */
-  int nflat;              /* number of flat coeffs per bol */
-  int nframes;            /* number of frames */
   int *tstream;           /* pointer to array data */
-  int rowsize;            /* number of pixels in row (returned) */
 
   /* Main routine */
   ndfBegin();
@@ -140,74 +128,79 @@ void smurf_flatfield( int *status ) {
   /* Read flatfield file */
   /*  ndfAssoc( "FLAT", "READ", &fndf, status );*/
 
-  /* */
-  /*  sc2store_rdflat();*/
-
   /* Get output file(s) */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
-  pname = filename;
 
   for (i=1; i<=size; i++ ) {
-    /*    msgOut("smurf_flatfield","About to call NDFAS",status)*/
+
+    /* Q&D open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, i, "READ", &indf, status );
     ndgNdfpr( indf, " ", ogrp, i, &outndf, status );
     ndfAnnul( &indf, status);
 
-    grpGet( igrp, i, 1, &pname, SMF_PATH_MAX, status);
+    smf_open_file( igrp, i, "READ", &data, status);
 
+    file = data->file;
+    pname = file->name;
     msgSetc("FILE", pname);
     msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
 
+    da = data->da;
+    if ( da != NULL ) {
+      msgSetc("FLATNAME", da->flatname);
+      msgSeti("NFRAMES", (data->dims)[2]);
+      msgOutif(MSG__VERB, " ", "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", status);
+    } else { /* What if 10 out of 20 are bad? .... */
+      if ( *status == SAI__OK) {
+	*status = SAI__ERROR;
+	errRep( "smurf_flatfield", "Flatfield has already been applied",status);
+      }
+    }
 
-    sc2store_rdtstream( pname, SC2STORE_FLATLEN, maxlen, maxfits, 
-			&nfits, headrec, &colsize, &rowsize, 
-			&nframes, &nflat, flatname, &frhead,
-			&tstream, &dksquid, &flatcal, &flatpar, status);
-
-    sc2store_free( status );
-
-    msgSetc("FLATNAME", flatname);
-    msgSeti("NFRAMES", nframes);
-    msgOutif(MSG__VERB, " ", "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", status);
-
-    msgOutif(MSG__VERB," ","Read the time stream ", status);
-    /*    msgOut("smurf_flatfield","About to call NDFPR",status)*/
-   
 
     ndfStype( "_DOUBLE", outndf, "DATA", status);
 
     ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
     ndfDim( outndf, NDF__MXDIM, ndfdims, &ndims, status );
 
-    if ( *status == SAI__OK ) {
-      indims[0] = (dim_t)ndfdims[0];
-      indims[1] = (dim_t)ndfdims[1];
-    }
-
     /* Check ndims = 3 */
-    /*    nboll = ndfdims[0] * ndfdims[1];*/
-    /*    nframes = ndfdims[2];*/
-
-    /* Use values returned from sc2store_rdtsream */
-    nboll = rowsize * colsize;
-
-    /* Check nout = row*col*nframes */
     if ( *status == SAI__OK ) {
-      if (nout != rowsize*colsize*nframes) {
-	printf ("Error: nout = %d  rowsize*colsize*nframes = %d \n",
-		nout,rowsize*colsize*nframes);
-      }
-      for (j=0; j<nout; j++) {
-	outdata[j] = (double)tstream[j];
+      if ( ndims != 3 ) {
+	msgSeti( "NDIMS", ndims);
+	*status = SAI__ERROR;
+	errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3",status);
       }
     }
 
+    /* Check nout = nrows * ncols * nframes */
+    if ( *status == SAI__OK ) {
+      if (nout != (data->dims)[0]*(data->dims)[1]*(data->dims)[2]) {
+	msgSeti( "NR", (data->dims)[0]);
+	msgSeti( "NC", (data->dims)[1]);
+	msgSeti( "NF", (data->dims)[2]);
+	msgSeti( "NOUT", nout);
+	*status = SAI__ERROR;
+	errRep( "smurf_flatfield", "Number of input pixels not equal to the number of output pixels (^NR*^NC*^NF != ^NOUT)",status);
+      } else {
+	pntr[0] = (data->pntr)[0];
+	tstream = pntr[0]; /* Input time series data */
+	printf("%p %p %p \n",(data->pntr)[0],(data->pntr)[1],(data->pntr)[2]);
+	for (j=0; j<nout; j++) {
+	  outdata[j] = (double)tstream[j];
+	}
+      }
+    }
 
-    msgOutif(MSG__VERB," ","About to apply flat field ", status);
-    sc2math_flatten( nboll, nframes, flatname, nflat, flatcal, flatpar, 
-		     outdata, status);
+    /* */
+    if ( *status == SAI__OK) {
+      nboll = (data->dims)[0]*(data->dims)[1];
 
+      /* Apply the flat field to the data */
+      msgOutif(MSG__VERB," ","Applying flat field ", status);
+      sc2math_flatten( nboll, (data->dims)[2], da->flatname, da->nflat, da->flatcal, 
+		       da->flatpar, outdata, status);
+    } 
     msgOutif(MSG__VERB," ","Flat field applied", status);
     ndfAnnul( &outndf, status);
   }
