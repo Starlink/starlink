@@ -109,10 +109,12 @@ void smurf_flatfield( int *status ) {
   double *outdata = NULL;
   int indf;
   int rawdata;
+  int subsysnr; /* dummy var to print */
 
   smfDA * da;
   smfData * data;
   smfFile * file;
+  smfHead * head;
 
   void * pntr[3];
 
@@ -191,6 +193,18 @@ void smurf_flatfield( int *status ) {
 	}
       }
     }
+
+    /* Print something interesting from the FITS header */
+    head = data->hdr;
+    if ( !astGetFitsI( head->fitshdr, "SUBSYSNR", &subsysnr) ) {
+      if ( *status == SAI__OK) {
+	*status = SAI__ERROR;
+	msgSetc("FITS", "SUBSYSNR");
+	errRep("smurf_flatfield", "Unable to retrieve ^SUBSYSNR", status);
+      }
+    }
+    msgSeti("FITS",subsysnr);
+    msgOut(" ","SUBSYSNR = ^FITS", status);
 
     /* */
     if ( *status == SAI__OK) {
