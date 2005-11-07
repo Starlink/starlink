@@ -9,7 +9,7 @@
  * modules and work on more file types.  However, right now, I don't see a
  * good way to do this on Win32.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -18,7 +18,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXselect.c,v 8.8 1997/07/08 13:06:32 markd Exp $
+ * $Id: tclXselect.c,v 8.9 1999/03/31 06:37:46 markd Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -27,7 +27,6 @@
 #ifndef NO_SELECT
 
 #ifndef NO_SYS_SELECT_H
-#define panic panicDummy
 #   include <sys/select.h>
 #endif
 

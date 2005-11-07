@@ -3,7 +3,7 @@
  *
  * Utility functions for Extended Tcl.
  *-----------------------------------------------------------------------------
- * Copyright 1991-1997 Karl Lehenbauer and Mark Diekhans.
+ * Copyright 1991-1999 Karl Lehenbauer and Mark Diekhans.
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
  * software for any purpose.  It is provided "as is" without express or
  * implied warranty.
  *-----------------------------------------------------------------------------
- * $Id: tclXutil.c,v 8.21.2.1 1998/04/26 20:03:54 markd Exp $
+ * $Id: tclXutil.c,v 8.29 2001/05/19 16:45:23 andreas_kupries Exp $
  *-----------------------------------------------------------------------------
  */
 
@@ -45,82 +45,6 @@ char *tclXWrongArgs = "wrong # args: ";
 
 
 /*-----------------------------------------------------------------------------
- * TclX_ObjGetVar2S --
- *    Front-end to Tcl_ObjGetVar2 that takes strings for that name parts.
- * FIX: Should be in base Tcl.
- *-----------------------------------------------------------------------------
- */
-Tcl_Obj *
-TclX_ObjGetVar2S (interp, part1Ptr, part2Ptr, flags)
-    Tcl_Interp *interp;
-    char *part1Ptr;
-    char *part2Ptr;
-    int flags;
-{
-    Tcl_Obj *part1ObjPtr;
-    Tcl_Obj *part2ObjPtr;
-    Tcl_Obj *varValuePtr;
-
-    part1ObjPtr = Tcl_NewStringObj (part1Ptr, -1);
-    Tcl_IncrRefCount (part1ObjPtr);
-    if (part2Ptr == NULL) {
-        part2ObjPtr = NULL;
-    } else {
-        part2ObjPtr = Tcl_NewStringObj (part2Ptr, -1);
-        Tcl_IncrRefCount (part2ObjPtr);
-    }
-    
-    varValuePtr = Tcl_ObjGetVar2 (interp, part1ObjPtr, part2ObjPtr, flags);
-
-    Tcl_DecrRefCount (part1ObjPtr);
-    if (part2ObjPtr != NULL) {
-        Tcl_DecrRefCount (part2ObjPtr);
-    }
-    
-    return varValuePtr;
-}
-
-
-/*-----------------------------------------------------------------------------
- * TclX_ObjSetVar2S --
- *    Front-end to Tcl_ObjSetVar2 that takes strings for that name parts.
- * FIX: Should be in base Tcl.
- *-----------------------------------------------------------------------------
- */
-Tcl_Obj *
-TclX_ObjSetVar2S (interp, part1Ptr, part2Ptr, newValuePtr, flags)
-    Tcl_Interp *interp;
-    char *part1Ptr;
-    char *part2Ptr;
-    Tcl_Obj *newValuePtr;
-    int flags;
-{
-    Tcl_Obj *part1ObjPtr;
-    Tcl_Obj *part2ObjPtr;
-    Tcl_Obj *varValuePtr;
-
-    part1ObjPtr = Tcl_NewStringObj (part1Ptr, -1);
-    Tcl_IncrRefCount (part1ObjPtr);
-    if (part2Ptr == NULL) {
-        part2ObjPtr = NULL;
-    } else {
-        part2ObjPtr = Tcl_NewStringObj (part2Ptr, -1);
-        Tcl_IncrRefCount (part2ObjPtr);
-    }
-    
-    varValuePtr = Tcl_ObjSetVar2 (interp, part1ObjPtr, part2ObjPtr,
-                                  newValuePtr, flags);
-
-    Tcl_DecrRefCount (part1ObjPtr);
-    if (part2ObjPtr != NULL) {
-        Tcl_DecrRefCount (part2ObjPtr);
-    }
-    
-    return varValuePtr;
-}
-
-
-/*-----------------------------------------------------------------------------
  * TclX_StrToInt --
  *      Convert an Ascii string to an number of the specified base.
  *
@@ -134,7 +58,6 @@ TclX_ObjSetVar2S (interp, part1Ptr, part2Ptr, newValuePtr, flags)
  *
  * Returns:
  *      Returns 1 if the string was a valid number, 0 invalid.
- * FIX: Delete when done with objs.
  *-----------------------------------------------------------------------------
  */
 int
@@ -195,7 +118,6 @@ TclX_StrToInt (string, base, intPtr)
  *
  * Returns:
  *      Returns 1 if the string was a valid number, 0 invalid.
- * FIX: Delete when done with objs.
  *-----------------------------------------------------------------------------
  */
 int
@@ -242,7 +164,6 @@ TclX_StrToUnsigned (string, base, unsignedPtr)
  *
  * Returns:
  *      Returns 1 if the string was a valid number, 0 invalid.
- * FIX: Delete when done with objs.
  *-----------------------------------------------------------------------------
  */
 int
@@ -304,7 +225,7 @@ TclX_StrToOffset (string, base, offsetPtr)
  *
  * Returns:
  *   A pointer to the down-shifted string
- * FIX: Make object based.
+ * FIX: Make object based interface.
  *-----------------------------------------------------------------------------
  */
 char *
@@ -341,7 +262,7 @@ TclX_DownShift (targetStr, sourceStr)
  * Returns:
  *   A pointer to the up-shifted string.
  * FIX: Get strcasecmp and replace this with it.
- * FIX: Make object based.
+ * FIX: Make object based interface
  *-----------------------------------------------------------------------------
  */
 char *
@@ -589,19 +510,20 @@ CallEvalErrorHandler (interp)
      * should be removed eventually. FIX: Delete.
      */
     if (!Tcl_GetCommandInfo (interp, ERROR_HANDLER, &cmdInfo)) {
-        errorHandler = TclX_ObjGetVar2S (interp, ERROR_HANDLER, NULL,
-                                         TCL_GLOBAL_ONLY);
+        errorHandler = Tcl_GetVar2Ex(interp, ERROR_HANDLER, NULL,
+                                     TCL_GLOBAL_ONLY);
         if (errorHandler == NULL)
             return TCL_ERROR;  /* No handler specified */
     } else {
         errorHandler = Tcl_NewStringObj (ERROR_HANDLER, -1);
     }
     command = Tcl_NewListObj (0, NULL);
+    Tcl_IncrRefCount (command);
     Tcl_ListObjAppendElement (NULL, command, errorHandler);
     Tcl_ListObjAppendElement (NULL, command,
                               Tcl_GetObjResult (interp));
                               
-    result = Tcl_GlobalEvalObj (interp, command);
+    result = Tcl_EvalObjEx (interp, command, TCL_EVAL_GLOBAL);
     if (result == TCL_ERROR) {
         Tcl_AddErrorInfo (interp,
                           "\n    (while processing tclx_errorHandler)");
@@ -1084,7 +1006,7 @@ TclX_AppendObjResult TCL_VARARGS_DEF (Tcl_Interp *, arg1)
     resultPtr = Tcl_GetObjResult (interp);
 
     if (Tcl_IsShared(resultPtr)) {
-        resultPtr = Tcl_NewStringObj(0, 0);
+        resultPtr = Tcl_NewStringObj((char *)NULL, 0);
         Tcl_SetObjResult(interp, resultPtr);
     }
 
@@ -1166,14 +1088,12 @@ TclX_SaveResultErrorInfo (interp)
 
     saveObjv [0] = Tcl_DuplicateObj (Tcl_GetObjResult (interp));
     
-    saveObjv [1] = TclX_ObjGetVar2S (interp, ERRORINFO, NULL,
-                                     TCL_GLOBAL_ONLY);
+    saveObjv [1] = Tcl_GetVar2Ex(interp, ERRORINFO, NULL, TCL_GLOBAL_ONLY);
     if (saveObjv [1] == NULL) {
         saveObjv [1] = Tcl_NewObj ();
     }
 
-    saveObjv [2] = TclX_ObjGetVar2S (interp, ERRORCODE, NULL,
-                                     TCL_GLOBAL_ONLY);
+    saveObjv [2] = Tcl_GetVar2Ex(interp, ERRORCODE, NULL, TCL_GLOBAL_ONLY);
     if (saveObjv [2] == NULL) {
         saveObjv [2] = Tcl_NewObj ();
     }
@@ -1216,11 +1136,8 @@ TclX_RestoreResultErrorInfo (interp, saveObjPtr)
         panic ("invalid TclX result save object");
     }
 
-    TclX_ObjSetVar2S (interp, ERRORCODE, NULL, saveObjv[2],
-		      TCL_GLOBAL_ONLY);
-
-    TclX_ObjSetVar2S (interp, ERRORINFO, NULL, saveObjv[1],
-		      TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp, ERRORCODE, NULL, saveObjv[2], TCL_GLOBAL_ONLY);
+    Tcl_SetVar2Ex(interp, ERRORINFO, NULL, saveObjv[1], TCL_GLOBAL_ONLY);
 
     Tcl_SetObjResult (interp, saveObjv[0]);
 
@@ -1273,17 +1190,63 @@ TclX_ShellExit (interp, exitCode)
      * interpreter.
      */
     deleteInterp = FALSE;
-    varValue = TclX_ObjGetVar2S (interp, "TCLXENV", "deleteInterpAtShellExit",
-                                 TCL_GLOBAL_ONLY);
+    varValue = Tcl_GetVar2Ex(interp, "TCLXENV", "deleteInterpAtShellExit",
+                             TCL_GLOBAL_ONLY);
     if (varValue != NULL) {
         Tcl_GetBooleanFromObj (NULL, varValue, &deleteInterp);
     }
     
     if (deleteInterp) {
+        Tcl_DeleteInterp (interp);
         Tcl_Exit (0);
     } else {
-        Tcl_DeleteInterp (interp);
         Tcl_Exit (0);
     }
 #endif    
+}
+
+/*-----------------------------------------------------------------------------
+ * TclX_CreateObjCommand --
+ *
+ * Handles the creation of TclX commands. Used for commands who come
+ * in conflict with other extensions.
+ *
+ * Parameters:
+ *   o Like Tcl_CreateObjCommand
+ *   o flags - Additional flags to control the behaviour of the procedure.
+ *----------------------------------------------------------------------------- */
+
+int
+TclX_CreateObjCommand (interp, cmdName, proc, clientData, deleteProc, flags)
+     Tcl_Interp*        interp;
+     char*              cmdName;
+     Tcl_ObjCmdProc*    proc;
+     ClientData         clientData;
+     Tcl_CmdDeleteProc* deleteProc;
+     int                flags;
+{
+  Namespace *globalNsPtr = (Namespace *) Tcl_GetGlobalNamespace(interp);
+  Namespace *currNsPtr   = (Namespace *) Tcl_GetCurrentNamespace(interp);
+  char cmdnamebuf[80];
+
+  if ((flags & TCLX_CMD_REDEFINE) ||
+      !(Tcl_FindHashEntry(&globalNsPtr->cmdTable,cmdName) ||
+	Tcl_FindHashEntry(&currNsPtr->cmdTable,cmdName))) {
+
+      Tcl_CreateObjCommand(interp,cmdName,
+			   proc,clientData,deleteProc);
+  }
+
+  if (!(cmdName[0] == 't' &&
+	cmdName[1] == 'c' &&
+	cmdName[2] == 'l' &&
+	cmdName[3] == 'x')
+      && !(flags & TCLX_CMD_NOPREFIX)) {
+
+      sprintf(cmdnamebuf,"tclx_%s",cmdName);
+      Tcl_CreateObjCommand(interp,cmdnamebuf,proc,clientData,
+			   deleteProc);
+  }
+
+  return TCL_OK;
 }
