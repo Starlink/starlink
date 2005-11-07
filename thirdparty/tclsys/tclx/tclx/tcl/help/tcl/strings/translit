@@ -1,9 +1,0 @@
-       translit inrange outrange string
-              Translate characters in string, changing characters
-              occurring in inrange to the corresponding character
-              in  outrange.  Inrange  and outrange may be list of
-              characters or a range in the form `A-M'.  For exam-
-              ple:
-                      translit a-z A-Z foobar
-
-              This command is provided by Extended Tcl.

@@ -1,6 +1,0 @@
-       lcontain list element
-              Determine if the element is a list element of list.
-              If the element is  contained  in  the  list,  1  is
-              returned, otherwise, 0 is returned.
-
-              This command is provided by Extended Tcl.

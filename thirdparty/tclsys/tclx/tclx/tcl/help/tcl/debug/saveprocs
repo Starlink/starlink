@@ -1,6 +1,0 @@
-       saveprocs fileName ?proc...?
-              This  procedure  saves  the definition of the named
-              procedure, or all currently defined  procedures  if
-              none is specified, to the named file.
-
-              This procedure is provided by Extended Tcl.
