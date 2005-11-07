@@ -29,11 +29,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-11-04 (AGG):
 *        Initial test version
+*     2005-11-07 (TIMJ):
+*        Fix logic that ditinguishes sc2store from datGetc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,9 +81,18 @@ int maxfits;
 const char* astsource ( );
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status ) {
+  size_t len;
+  
+  /* Sc2store header records are each null terminated at the last non-whitespace
+     character so we need to search for a null in the first 81 characters to
+     distinguish this from the "read a block" approach. The quick way to do this
+     is to use strlen since we know that all the strings are terminated somewhere.
+  */
 
+  len = strlen( headrec );
 
-  if ( headrec[80] == '\0' ) {
+  if ( len <= 81 ) {
+    /* individually terminated or a single string */
     step = 81;
   } else {
     step = 80;
@@ -107,6 +119,7 @@ const char* astsource () {
   if (hdritem == NULL) return NULL;
 
   strncpy( hdritem, card, 80 );
+  hdritem[80] = '\0';
   curindex++;
   card += step;
   
