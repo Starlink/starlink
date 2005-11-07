@@ -1,137 +1,75 @@
 # ------------------------------------------------------------------------
-#       Makefile for demonstation shell of BLT library
+#       Makefile for BLT distribution
 # ------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------
-#       C Compiler options
-# ------------------------------------------------------------------------
-
-DEFINES      =
-CFLAGS       = @CFLAGS@ @DEFS@
-EXTRA_CFLAGS = @GCCFLAGS@
-CC 	     = @CC@
 
 # ------------------------------------------------------------------------
 #       Source and target installation directories
 # ------------------------------------------------------------------------
 
-prefix	     = @prefix@
-exec_prefix  = @exec_prefix@
-srcdir	     = @srcdir@
-bindir       = @bindir@
-includedir   = @includedir@
-libdir	     = @libdir@
+prefix =	@prefix@
+exec_prefix  =	@exec_prefix@
+srcdir =	@srcdir@
+bindir =	@bindir@
+includedir =	@includedir@
+libdir =	@libdir@
+version =	@BLT_VERSION@
+scriptdir =	$(prefix)/lib/blt$(version)
 
-instdirs  = $(prefix) $(exec_prefix) $(bindir) $(libdir) $(includedir)
-
-# ------------------------------------------------------------------------
-#       Include directives for Tcl, Tk, and X include files
-# ------------------------------------------------------------------------
-
-INCLUDES     = -I. @INCLUDES@
-
-# ------------------------------------------------------------------------
-#       Libraries directives for Tcl, Tk, X11, and BLT
-# ------------------------------------------------------------------------
-
-LIBRARIES    = @LIBS@
+instdirs =	$(prefix) \
+		$(exec_prefix) \
+		$(bindir) \
+		$(libdir) \
+		$(includedir) \
+		$(scriptdir)
 
 # ------------------------------------------------------------------------
 #       Don't edit anything beyond this point
 # ------------------------------------------------------------------------
 
-demo 	     = bltwish
-headers	     = blt.h
+INSTALL =	@INSTALL@
+INSTALL_DATA =	@INSTALL_DATA@
+INSTALL_ROOT = 
+SHELL =		/bin/sh
+RM =		rm -f
 
-CC_SWITCHES  = $(EXTRA_CFLAGS) $(DEFINES) $(INCLUDES) $(CFLAGS)
-LDFLAGS      = @LDFLAGS@
-INSTALL      = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-RANLIB 	     = @RANLIB@
-SHELL 	     = /bin/sh
-RM 	     = rm -f
-LN_S	     = @LN_S@
+subdirs =	src library man demos 
 
-subdirs	     = src src/shared demos library man
+all:  
+	(cd src; $(MAKE) all)
+	(cd library; $(MAKE) all)
+	(cd man; $(MAKE) all)
+	(cd demos; $(MAKE) all)
 
-all:  bltwish @SHLIB_TARGET@ lib.tcl manuals
+install: mkdirs install-all 
 
-bltwish: static
-	@echo "making BLT demo \"bltwish\"..."
-	$(RM) bltwish
-	$(CC) $(CC_SWITCHES) $(LDFLAGS) \
-		$(srcdir)/bltUnixMain.c -o bltwish ./src/libBLT.a $(LIBRARIES)
-	@echo "make finished on `date`"
-
-shared:
-	(cd src/shared; $(MAKE) CFLAGS="$(CFLAGS)" all)
-static:
-	(cd src; $(MAKE) CFLAGS="$(CFLAGS)" all)
-
-lib.tcl:
-	(cd library; $(MAKE) CFLAGS="$(CFLAGS)" all)
-manuals:
-	(cd man; $(MAKE) CFLAGS="$(CFLAGS)" all)
-
-
-install: bltwish mkdirs install-headers install-libs
-	$(INSTALL) -m 0755 bltwish $(bindir)/bltwish@BLT_VERSION@
-	(cd $(bindir); $(RM) bltwish ; $(LN_S) bltwish@BLT_VERSION@ bltwish)
+install-all:
+	(cd src; $(MAKE) install)
+	(cd library; $(MAKE) install)
+	(cd man; $(MAKE) install)
+	(cd demos; $(MAKE) install)
+	$(INSTALL_DATA) $(srcdir)/README $(INSTALL_DIR)$(scriptdir)
+	$(INSTALL_DATA) $(srcdir)/PROBLEMS $(INSTALL_DIR)$(scriptdir)
+	$(INSTALL_DATA) $(srcdir)/NEWS $(INSTALL_DIR)$(scriptdir)
 
 mkdirs:
 	@for i in $(instdirs) ; do \
-	    if test ! -d $$i ; then \
-		echo " mkdir $$i" ; \
-		mkdir $$i ; \
-	    fi ; \
+          if test -d $(INSTALL_ROOT)$$i ; then \
+	    : ; \
+	  else \
+            echo " mkdir $(INSTALL_ROOT)$$i" ; \
+            mkdir $(INSTALL_ROOT)$$i ; \
+          fi ; \
         done
 
-install-headers:
-	@for i in $(headers) ; do \
-	    echo "installing $(includedir)/$$i..." ; \
-	    $(INSTALL_DATA) -m 0444 $(srcdir)/$$i $(includedir) ; \
-	done
-
-install-libs:
-	@for i in $(subdirs) ; do \
-	    (cd $$i; $(MAKE) install) ; \
-	done
-
 clean:
-	@for i in $(subdirs) ; do \
-	    echo "cleaning $$i..." ; \
-	    (cd $$i; $(MAKE) clean) ; \
-	done
-	$(RM) bltwish *.bak *\~ "#"* *pure* .pure*
-
-.c.o:
-	$(CC) -c $(CC_SWITCHES) $<
+	(cd src; $(MAKE) clean)
+	(cd library; $(MAKE) clean)
+	(cd man; $(MAKE) clean)
+	(cd demos; $(MAKE) clean)
+	$(RM) *.bak *\~ "#"* *pure* .pure*
 
 GENERATED_FILES = \
-	config.status config.cache config.log \
-	config.BLT src/bltConfig.h \
-	Makefile \
-	src/Makefile \
-	src/TAGS \
-	src/shared/Makefile \
-	man/Makefile \
-	library/Makefile \
-	demos/*.ps
+	config.status config.cache config.log Makefile 
 
-distclean:
-	@for i in $(subdirs) ; do \
-	    echo "cleaning $$i..." ; \
-	    (cd $$i; $(MAKE) distclean) ; \
-	done
-	$(RM) bltwish *.bak *\~ "#"* *pure* .pure*
+distclean: clean
 	$(RM) $(GENERATED_FILES)
-
-PUREFLAGS=
-pure: static
-	$(PURIFYHOME)/purify $(PUREFLAGS) $(CC) $(CC_SWITCHES) \
-		$(srcdir)/bltUnixMain.c -o bltwish ./src/libBLT.a $(LIBRARIES)
-
-QUANTIFYFLAGS=
-quant: static
-	$(QUANTIFYHOME)/quantify $(QUANTIFYFLAGS) $(CC) $(CC_SWITCHES) \
-		$(srcdir)/bltUnixMain.c -o bltwish ./src/libBLT.a $(LIBRARIES)
