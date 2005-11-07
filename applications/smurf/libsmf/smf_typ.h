@@ -26,6 +26,8 @@
 *  History:
 *     2005-11-02 (AGG):
 *        Initial test version
+*     2005-11-07 (TIMJ):
+*        Document some of the struct items
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -64,24 +66,34 @@
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 
-enum {
+/* Different data types supported by SMURF */
+
+typedef enum smf_dtype {
   SMF__NULL,
   SMF__INTEGER,
   SMF__FLOAT,
   SMF__DOUBLE
-};
+} smf_dtype;
+
+/* Global information about the data file itself */
 
 typedef struct smfFile {
-  int ndfid;
-  int isSc2store;
-  char name[SMF_PATH_MAX+1];
+  int ndfid;                /* NDF ID of file if opened by SMURF */
+  int isSc2store;           /* True if file opened by sc2store library */
+  char name[SMF_PATH_MAX+1]; /* Name of file */
 } smfFile;
 
+/* Contains header general header information obtained from the file */
+
 typedef struct smfHead {
-  struct sc2head * sc2head;
-  AstFrameSet * wcs;
-  AstFitsChan * fitshdr;
+  struct sc2head * sc2head; /* Time slice structure for same slice as wcs */
+  AstFrameSet * wcs;       /* Framset for a particular time slice */
+  AstFitsChan * fitshdr;   /* FITS header from the file */
 } smfHead;
+
+/* This structure contains ancilliary information obtained from a raw
+   data file that may be useful to SMURF.
+*/
 
 typedef struct smfDA {
   int *dksquid;           /* pointer to dark SQUID data */
@@ -91,14 +103,18 @@ typedef struct smfDA {
   int nflat;              /* number of flat coeffs per bol */
 } smfDA;
 
+/* This struct is used to contain all information related to a particular
+   data file (where possible since sc2store does not return a handle).
+*/
+
 typedef struct smfData {
-  smfFile * file;
-  smfHead * hdr;
-  smfDA * da;
-  int dtype;
-  void * pntr[3];
-  dim_t dims[NDF__MXDIM];
-  int ndims;
+  smfFile * file;         /* File information */
+  smfHead * hdr;          /* Header information */
+  smfDA * da;             /* If sc2store, associated data arrays */
+  smf_dtype dtype;        /* Data type of DATA and VARIANCE arrays */
+  void * pntr[3];         /* Array of pointers to DATA, VARIANCE and QUALITY */
+  dim_t dims[NDF__MXDIM];  /* Dimensions of data array */
+  int ndims;              /* Number of active dimensions in "dims" */
 } smfData;
 
 #endif /* SMF_TYP_DEFINED */
