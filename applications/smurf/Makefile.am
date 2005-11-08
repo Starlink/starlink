@@ -13,7 +13,8 @@ smurf_mon_SOURCES = smurf_mon.c $(DA_FILES)
 # Tasks
 smurf_mon_TASKS = extinction flatfield makemap
 
-DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/sc2dat.c sc2da/ers.c
+DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/sc2dat.c sc2da/ers.c \
+sc2da/sc2ast.c
 
 # Linking
 smurf_mon_LDADD = libsmurf/libsmurf.la libsmf/libsmf.la \
