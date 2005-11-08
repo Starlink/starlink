@@ -25,7 +25,6 @@ int subnum,             /* subarray number, 0-7 (given) */
 double az,              /* Boresight azimuth in radians (given) */
 double el,              /* Boresight elevation in radians (given) */
 double tai,             /* TAI (supplied as a Modified Julian Date) */
-double elevation,       /* telescope elevation in radians (given) */
 double p,               /* parallactic angle in radians (given) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
@@ -51,7 +50,8 @@ int *status             /* global status (given and returned) */
      20Jun2005 : add zpixelframe (bdk)
      23Aug2005 : De-projection (Az,El) rather than (RA,Dec), and leave
                  final SkyFrame describing (Az,El). Also, replace supplied 
-                 (ra,dec) parameters by (az,el,tai).
+                 (ra,dec) parameters by (az,el,tai). (dsb)
+     07Nov2005 : Remove duplicate elevation argument (timj)
  
 */
 
@@ -77,7 +77,6 @@ int *status             /* global status (given and returned) */
    AstMatrixMap *rotmap;
    AstPolyMap *polymap;
    AstShiftMap *shiftmap;
-   AstWcsMap *radecmap;
    AstZoomMap *radmap;
    AstZoomMap *zoommap;
    AstShiftMap *zshiftmap;
@@ -261,12 +260,12 @@ int *status             /* global status (given and returned) */
      "Title=NASMYTH,Label(1)=NORTH,Unit(1)=mm,Label(2)=UP,Unit(2)=mm" );
    astAddFrame ( frameset, AST__CURRENT, polymap, nasmythframe );
 
-/* Rotate into Cassegrain coordinates, "E" is telescope elevation. */
+/* Rotate into Cassegrain coordinates, "el" is telescope elevation. */
 
-   cassrot[0] = cos(elevation);
-   cassrot[1] = -sin(elevation);
-   cassrot[2] = sin(elevation);
-   cassrot[3] = cos(elevation);
+   cassrot[0] = cos(el);
+   cassrot[1] = -sin(el);
+   cassrot[2] = sin(el);
+   cassrot[3] = cos(el);
    cassmap = astMatrixMap ( 2, 2, 0, cassrot, "" );
    cassframe = astFrame ( 2, 
      "Domain=CASS,Label(1)=Az,Unit(1)=mm,Label(2)=El,Unit(2)=mm" );
