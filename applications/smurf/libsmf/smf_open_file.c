@@ -32,11 +32,14 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-11-03 (AGG):
 *        Initial test version
+*     2005-110-07 (TIMJ):
+*        Need to cache locator to FRAMEDATA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -148,9 +151,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
     file = malloc( sizeof(smfFile));
     (*data)->file = file;
+    strcpy( file->xloc, DAT__NOLOC );
     hdr = malloc( sizeof(smfHead));
     (*data)->hdr = hdr;
     hdr->wcs = NULL;
+    hdr->sc2head = NULL;
 
     if (isNDF) {
       (*data)->da = NULL;
@@ -174,6 +179,15 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       if ( !isTseries ) {
 	ndfGtwcs( indf, &iwcs, status);
 	hdr->wcs = iwcs;
+      } else {
+	/* Need to get the location of the extension for sc2head parsing */
+	/* Store the locator in the struct for now in case annulling it annulls
+	   all the children */
+	ndfXloc( indf, "FRAMEDATA", "READ", file->xloc, status );
+
+        /* And need to map the header */
+	sc2store_headrmap( file->xloc, ndfdims[2], status );
+
       }
 
       if ( strncmp(dtype, "_DOUBLE", 7 ) ){
