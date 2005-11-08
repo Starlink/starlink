@@ -43,6 +43,9 @@
 *  History:
 *     11-FEB-1993 (DSB):
 *        Original version.
+*     8-NOV-2005 (DSB):
+*        Annul the error set by DAT_NCOMP when an empty structure is
+*        encountered.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -56,6 +59,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT constants
+      INCLUDE 'DAT_ERR'          ! DAT error constants
       INCLUDE 'IRA_PAR'          ! IRA constants.
       INCLUDE 'IRA_ERR'          ! IRA errors.
 
@@ -118,11 +122,17 @@
 *  See if the extension is a structure.
          CALL DAT_STRUC( XLOC, STRUC, STATUS )
 
-*  If so, find the number of components within the extension.
-         IF( STRUC ) THEN
+*  If so, find the number of components within the extension. DAT_NCOMP 
+*  reports an error (DAT__OBJIN) if the structure is empty. If this 
+*  happens, annul the error and set the number of components to zero 
+         IF( STRUC .AND. STATUS .EQ. SAI__OK ) THEN
             CALL DAT_NCOMP( XLOC, NCOMP, STATUS )
+            IF( STATUS .EQ. DAT__OBJIN ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NCOMP = 0
+            END IF           
 
-*  If the extension is a primative, set the number of components to 
+*  If the extension is a primitive, set the number of components to 
 *  zero.
          ELSE
             NCOMP = 0
