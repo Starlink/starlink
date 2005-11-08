@@ -3,8 +3,9 @@
 void sc2ast_createwcs
 (
 int subnum,             /* subarray number, 0-7 (given) */
-double ra,              /* right ascension in radians (given) */
-double dec,             /* declination in radians (given) */
+double az,              /* Azimuth in radians (given) */
+double el,              /* Elevation in radians (given) */
+double tai,             /* TAI (supplied as an MJD) */
 double elevation,       /* telescope elevation in radians (given) */
 double p,               /* parallactic angle in radians (given) */
 AstFrameSet **fset,     /* constructed frameset (returned) */

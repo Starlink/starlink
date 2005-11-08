@@ -12,6 +12,9 @@
 #define MM2DEG 0.001429                /* scale at array in degrees */
 #define PIBY2 1.57079632679
 #define PIX2MM 1.135                   /* pixel interval in mm */
+#define SPD 86400.0                    /* Seconds per day */
+#define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
+#define JCMT_LAT "N19:49:22.11"        /* Geodetic latitude of JCMT */
 
 
 /*+ sc2ast_createwcs - create WCS description */
@@ -19,8 +22,9 @@
 void sc2ast_createwcs
 (
 int subnum,             /* subarray number, 0-7 (given) */
-double ra,              /* right ascension in radians (given) */
-double dec,             /* declination in radians (given) */
+double az,              /* Boresight azimuth in radians (given) */
+double el,              /* Boresight elevation in radians (given) */
+double tai,             /* TAI (supplied as a Modified Julian Date) */
 double elevation,       /* telescope elevation in radians (given) */
 double p,               /* parallactic angle in radians (given) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
@@ -34,6 +38,7 @@ int *status             /* global status (given and returned) */
    Authors :
      B.D.Kelly (bdk@roe.ac.uk)
      Tim Jenness (timj@jach.hawaii.edu)
+     D.S. Berry (dsb@ast.man.ac.uk)
    History :
      01Apr2005 : original (bdk)
      21Apr2005 : update comments and add labels to some of the frames
@@ -44,27 +49,30 @@ int *status             /* global status (given and returned) */
      10May2005 : fix syntax error in xoff and add more frame names (bdk)
      18May2005 : Check subnam range (timj)
      20Jun2005 : add zpixelframe (bdk)
+     23Aug2005 : De-projection (Az,El) rather than (RA,Dec), and leave
+                 final SkyFrame describing (Az,El). Also, replace supplied 
+                 (ra,dec) parameters by (az,el,tai).
+ 
 */
 
 {
    AstFitsChan *fitschan;
    AstFrame *cassframe;
+   AstFrame *cassdegframe;
    AstFrame *focusframe;
    AstFrame *frame850;
    AstFrame *gridframe;
    AstFrame *mmframe;
    AstFrame *nasmythframe;
-   AstFrame *ratanframe;
-   AstFrame *ratandegframe;
    AstFrame *revframe;
    AstFrame *rotframe;
    AstFrame *zpixelframe;
    AstFrameSet *frameset;
    AstFrameSet *fitsframeset;
    AstSkyFrame *skyframe;
+   AstMapping *azelmap;
    AstMatrixMap *cassmap;
    AstMatrixMap *flipmap;
-   AstMatrixMap *ratanmap;
    AstMatrixMap *revmap;
    AstMatrixMap *rotmap;
    AstPolyMap *polymap;
@@ -160,7 +168,6 @@ int *status             /* global status (given and returned) */
 
 
    static double cassrot[4];
-   static double ratanrot[4];
 
 
    if ( *status != SAI__OK ) return;
@@ -265,40 +272,41 @@ int *status             /* global status (given and returned) */
      "Domain=CASS,Label(1)=Az,Unit(1)=mm,Label(2)=El,Unit(2)=mm" );
    astAddFrame ( frameset, AST__CURRENT, cassmap, cassframe );
 
-/* Rotate into Standard (RA,Dec) tangent plane coordinates, "p" is the
-   parallactic angle. */
-
-   ratanrot[0] = -cos(p);
-   ratanrot[1] = sin(p);
-   ratanrot[2] = sin(p);
-   ratanrot[3] = cos(p);
-   ratanmap = astMatrixMap ( 2, 2, 0, ratanrot, "" );
-   ratanframe = astFrame ( 2, "Domain=RATANMM" );
-   astAddFrame ( frameset, AST__CURRENT, ratanmap, ratanframe );
-
 /* Convert units from mm to degrees, MM2DEG is the effective plate scale. */
 
    radmap = astZoomMap ( 2, MM2DEG, "" );
-   ratandegframe = astFrame ( 2, "Domain=RATANDEG" );
-   astAddFrame ( frameset, AST__CURRENT, radmap, ratandegframe );
+   cassdegframe = astFrame ( 2, "Domain=CASSDEG" );
+   astAddFrame ( frameset, AST__CURRENT, radmap, cassdegframe );
 
-/* Create a celestial to tangent plane mapping via a FITS description */
+/* Create a celestial to tangent plane mapping via a FITS description. First 
+   create the FitsChan, then store the required FITS WCS header cards in
+   it, then rewind the FitsChan, then read a FrameSet from the FitsChan. */
 
    fitschan = astFitsChan ( NULL, NULL, "" );
 
-   sc2ast_makefitschan ( 0.0, 0.0, 1.0, 1.0, ra*90.0/PIBY2,
-     dec*90.0/PIBY2, "RA---TAN", "DEC--TAN", fitschan, status );
+   sc2ast_makefitschan ( 0.0, 0.0, 1.0, 1.0, az*90.0/PIBY2,
+     el*90.0/PIBY2, "CLON-TAN", "CLAT-TAN", fitschan, status );
 
    astClear ( fitschan, "Card" );
 
    fitsframeset = astRead ( fitschan );
 
-/* Extract the mapping going from tangent plane to celestial */
+/* Extract the mapping going from tangent plane to spherical (Az,El) from
+   the FrameSet returned by the above call to astRead. */
 
-   radecmap = astGetMapping ( fitsframeset, AST__BASE, AST__CURRENT );
+   azelmap = astGetMapping ( fitsframeset, AST__BASE, AST__CURRENT );
 
-   skyframe = astSkyFrame ( "" );
-   astAddFrame ( frameset, AST__CURRENT, radecmap, skyframe );
+/* Create a SkyFrame describing (Az,El) and add it into the FrameSet
+   using the above Mapping to connect it to the Cartesian Cassegrain
+   coordinates Frame. Hard-wire the geodetic longitude and latitude of
+   JCMT into this Frame. Note, the Epoch value should be TDB, but we
+   supply TT (=TAI+32.184 sec) instead since the difference is only 1-2
+   milliseconds. */
+   skyframe = astSkyFrame ( "system=AzEl" );
+   astSetC( skyframe, "ObsLon", JCMT_LON );
+   astSetC( skyframe, "ObsLat", JCMT_LAT );   
+   astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, tai + 32.184/SPD );
+   astAddFrame ( frameset, AST__CURRENT, azelmap, skyframe );
 
    *fset = frameset;
 }
