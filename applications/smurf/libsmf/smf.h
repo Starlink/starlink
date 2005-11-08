@@ -20,11 +20,17 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-09-27 (AGG):
 *        Initial test version
+*     2005-11-04 (AGG):
+*        Add smf_open_file, smf_fits_rdhead and smf_fits_crchan
+*     2005-11-07 (TIMJ):
+*        Alphabetize.
+*        Add smf_tslice_ast, add smf_fits_getI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -64,10 +70,14 @@
 void smf_correct_extinction(AstFrameSet *, const dim_t[], 
 			    float, float *, int *);
 
+void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
+
+void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, int * status );
+
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
 
-void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
+void smf_tslice_ast (smfData * data, int index, AstFrameSet ** wcs, int * status );
 
 #endif /* SMF_DEFINED */
