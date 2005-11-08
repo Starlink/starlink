@@ -16,6 +16,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PWD: Peter W. Draper(JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -25,6 +26,8 @@
 *        Changed to use EMS instead of ERR.
 *     26-AUG-1992 (RFWS):
 *        Removed calls to HDS_START and HDS_STOP - no longer needed.
+*     08-NOV-2005 (PWD):
+*        Added call to HDS_TUNE to switch on 64 bit mode.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,6 +64,9 @@
 
 *  Initialise the global status.
       STATUS = SAI__OK
+
+*  Make check work for version 4 files.
+      CALL HDS_TUNE( '64BIT', 1, STATUS )
 
 *  Create a new container file with a data array inside it.
       CALL HDS_NEW( 'hds_test', 'HDS_TEST', 'NDF', 0, DIM, LOC1,
