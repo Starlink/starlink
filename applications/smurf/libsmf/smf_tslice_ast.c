@@ -98,7 +98,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
 
-void smf_tslice_ast (smfData * data, int index, AstFrameSet ** wcs, int * status ) {
+void smf_tslice_ast (smfData * data, int index, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
   smfFile *       file;      /* Local copy of File structure */

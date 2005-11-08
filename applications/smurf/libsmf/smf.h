@@ -78,6 +78,6 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
 
-void smf_tslice_ast (smfData * data, int index, AstFrameSet ** wcs, int * status );
+void smf_tslice_ast (smfData * data, int index, int * status );
 
 #endif /* SMF_DEFINED */
