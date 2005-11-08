@@ -47,10 +47,12 @@ hdsGtune(char *param_str,
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     PWD:  P.W. Draper       (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,8 +62,10 @@ hdsGtune(char *param_str,
 *        Added auto-initialisation of HDS.
 *     30-NOV-1992 (RFWS):
 *        Added support for the "SHELL" tuning parameter.
-*     13-DEC-2001 (BKM)
+*     13-DEC-2001 (BKM):
 *        Convert to a C function with FORTRAN wrapper.
+*     08-NOV-2005 (PWD):
+*        Incorporate 64 bit changes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,6 +127,10 @@ hdsGtune(char *param_str,
       else if ( strncmp( name, "WAIT", 4 ) == 0 )
       {
          *value = hds_gl_wait;
+      }
+      else if ( strncmp( name, "64BIT", 5 ) == 0 )
+      {
+          *value = hds_gl_c64bit;
       }
 
 /* If the tuning parameter name was not recognised, then report an error.   */
