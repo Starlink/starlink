@@ -6,7 +6,6 @@ int subnum,             /* subarray number, 0-7 (given) */
 double az,              /* Azimuth in radians (given) */
 double el,              /* Elevation in radians (given) */
 double tai,             /* TAI (supplied as an MJD) */
-double p,               /* parallactic angle in radians (given) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );

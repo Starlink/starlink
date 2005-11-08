@@ -25,7 +25,6 @@ int subnum,             /* subarray number, 0-7 (given) */
 double az,              /* Boresight azimuth in radians (given) */
 double el,              /* Boresight elevation in radians (given) */
 double tai,             /* TAI (supplied as a Modified Julian Date) */
-double p,               /* parallactic angle in radians (given) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -52,7 +51,7 @@ int *status             /* global status (given and returned) */
                  final SkyFrame describing (Az,El). Also, replace supplied 
                  (ra,dec) parameters by (az,el,tai). (dsb)
      07Nov2005 : Remove duplicate elevation argument (timj)
- 
+                 Remove unused parallactic angle argument (timj)
 */
 
 {
