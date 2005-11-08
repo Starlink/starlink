@@ -62,7 +62,8 @@
 #include "sc2da/sc2store_par.h"
 #include "ast.h"
 #include "ndf.h"
-#include "grp.h"
+#include "star/grp.h"
+#include "dat_par.h"
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 
@@ -80,7 +81,9 @@ typedef enum smf_dtype {
 typedef struct smfFile {
   int ndfid;                /* NDF ID of file if opened by SMURF */
   int isSc2store;           /* True if file opened by sc2store library */
+  int isTstream;            /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
+  char xloc[DAT__SZLOC];     /* Locator to .MORE.FRAMEDATA (if applicable) */
 } smfFile;
 
 /* Contains header general header information obtained from the file */
