@@ -75,7 +75,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 
 
    } else {
-
+      jj++;
       np = (cupidGC.ndim==1) ? CUPID__GCNP1 : 
            ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 ); 
 

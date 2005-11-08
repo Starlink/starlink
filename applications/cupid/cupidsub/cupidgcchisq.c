@@ -167,6 +167,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    last call. In order to avoid instability, we only do this modification 
    for a few iterations near the start, and then allow the fitting
    process to complete with fixed weights. */
+/*
          if( cupidGC.nf > 2 && cupidGC.nf < 10 ) {
             if( res != 0.0 && m != 0.0 ) {
                wf = ( res - *pu )/ res;
@@ -176,6 +177,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
                *pw *= wf;
             }
          }
+*/
 
 /* Save the residual and model value at this pixel */
          *pu = res;

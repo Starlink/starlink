@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int ilevel, double rms ){
+                       int *lbnd, int ilevel, double rms ){
 /*
 *  Name:
 *     cupidGCListClump
@@ -13,7 +13,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
-*                            int ilevel, double rms )
+*                            int *lbnd, int ilevel, double rms )
 
 *  Description:
 *     This function adds a clump to the output list. 
@@ -26,6 +26,8 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *     par
 *        The parameters describing the Gaussian fit to the clump (see
 *        cupidGCFit.cgen for a description)..
+*     lbnd
+*        Lower pixel bounds of supplied data array.
 *     chisq
 *        The chi-squared associated with the fit.
 *     ilevel
@@ -74,13 +76,13 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
       msgOut( "", "      Peak intensity: ^V", status );
       msgSetd( "V", par[ 1 ]*rms );
       msgOut( "", "      Constant background: ^V", status );
-      msgSetd( "V", par[ 2 ] );
+      msgSetd( "V", par[ 2 ] + lbnd[ 0 ] - 1.5 );
       msgOut( "", "      Centre on 1st axis: ^V", status );
       msgSetd( "V", par[ 3 ] );
       msgOut( "", "      FWHM on 1st axis: ^V", status );
 
       if( ndim > 1 ) {
-         msgSetd( "V", par[ 4 ] );
+         msgSetd( "V", par[ 4 ] + lbnd[ 1 ] - 1.5 );
          msgOut( "", "      Centre on 2nd axis: ^V", status );
          msgSetd( "V", par[ 5 ] );
          msgOut( "", "      FWHM on 2nd axis: ^V", status );
@@ -88,7 +90,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
          msgOut( "", "      Position angle: ^V", status );
 
          if( ndim > 2 ) {
-            msgSetd( "V", par[ 7 ] );
+            msgSetd( "V", par[ 7 ] + lbnd[ 2 ] - 1.5 );
             msgOut( "", "      Centre on vel axis: ^V", status );
             msgSetd( "V", par[ 8 ] );
             msgOut( "", "      FWHM on vel axis: ^V", status );

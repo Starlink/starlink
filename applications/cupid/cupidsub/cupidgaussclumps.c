@@ -204,10 +204,10 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    pixel found above.*/
          cupidGCIterate( type, res, imax, sum, iclump, rms, gcconfig,
                          &iter, ilevel );
-         if( iter ) {
 
 /* If so, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
+         if( iter ) {
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
                             iclump, velax, x );
 
@@ -217,7 +217,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                iclump++;
 
 /* Add the clump to the output list. */
-               cupidGCListClump( iclump, ndim, x, chisq, ilevel, rms );
+               cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel, rms );
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */

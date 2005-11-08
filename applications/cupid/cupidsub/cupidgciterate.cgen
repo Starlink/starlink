@@ -1,8 +1,9 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "cupid.h"
-#include <limits.h>
 #include "mers.h"
+#include <limits.h>
+#include <math.h>
 
 void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
                       double rms, AstKeyMap *config, int *iter, int ilevel ){
@@ -82,11 +83,11 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
    stop. This target value is a user-specified fraction of the total data
    sum in the original data. */
    if( iclump == 0 ) {
-      sum_thresh = cupidConfigD( config, "MININTEGRAL", 0.01 )*sum;
+      sum_thresh = fabs( cupidConfigD( config, "MININTEGRAL", 0.01 )*sum );
 
 /* Also store the smallest peak value to which a gaussian should be
    fitted. This value is a user-specified multiple of the RMS noise. */
-      val_thresh = cupidConfigD( config, "THRESHOLD", 2.0 )*rms;
+      val_thresh = fabs( cupidConfigD( config, "THRESHOLD", 2.0 )*rms );
 
 /* Also store the maximum allowed number of clumps to be fitted. */
       maxclumps = cupidConfigI( config, "MAXCLUMPS", INT_MAX );
@@ -105,7 +106,7 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
          msgOut( "", "   Sum of residuals: ^SUM (target is ^TH)", status );
       }
 
-      if( sum > sum_thresh ) {
+      if( fabs( sum ) > sum_thresh ) {
 
 /* We also finish iterating if the peak value is too small. The limit is
    a user-specified multiple of the noise. */
@@ -116,7 +117,7 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
             msgOut( "", "   Peak value: ^AMAX (target is ^TH)", status );
          }
 
-         if( array[ imax ] > val_thresh ) {
+         if( fabs( array[ imax ] ) > val_thresh ) {
 
 /* We also finish iterating if we have already fitted the maximum allowed 
    number of clumps. */

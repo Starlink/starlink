@@ -142,7 +142,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    if( !ret ) res[ imax ] = CGEN_BAD;
 
 
-/*   CGEN_FUNCTION(cupidGCDump)( NULL, 0, NULL );  */
+   CGEN_FUNCTION(cupidGCDump)( NULL, 0, NULL );  
 
 
    return ret;  

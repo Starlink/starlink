@@ -283,7 +283,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       msgOut( "", "   Integrated background intensity: ^V (in ^N pixels)", status );
    }
 
-/*   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims ); */
+   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims ); 
 
 }
 
