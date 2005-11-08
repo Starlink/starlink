@@ -36,8 +36,12 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2005-11-02 (TIMJ):
-*        Initial test version
+*     2005-11-04 (AGG):
+*        Initial test version. Copy from smurf_extinction
+*     2005-11-05 (AGG):
+*        Factor out I/O code to smf_open_file
+*     2005-11-07 (TIMJ):
+*        Replace fits example code with call to smf_fits_getI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -196,13 +200,7 @@ void smurf_flatfield( int *status ) {
 
     /* Print something interesting from the FITS header */
     head = data->hdr;
-    if ( !astGetFitsI( head->fitshdr, "SUBSYSNR", &subsysnr) ) {
-      if ( *status == SAI__OK) {
-	*status = SAI__ERROR;
-	msgSetc("FITS", "SUBSYSNR");
-	errRep("smurf_flatfield", "Unable to retrieve ^SUBSYSNR", status);
-      }
-    }
+    smf_fits_getI( head, "SUBSYSNR", &subsysnr, status );
     msgSeti("FITS",subsysnr);
     msgOut(" ","SUBSYSNR = ^FITS", status);
 
