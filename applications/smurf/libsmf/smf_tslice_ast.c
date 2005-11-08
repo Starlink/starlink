@@ -101,8 +101,6 @@
 void smf_tslice_ast (smfData * data, int index, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
-  smfFile *       file;      /* Local copy of File structure */
-  double          pa;        /* Parallactic angle for time slice */
   struct sc2head  sc2hdr;    /* Local structure for sc2head data if required */
   struct sc2head *sc2tmp;    /* Pointer to either sc2hdr or hdr->sc2head */
   int             subsysnum; /* Subsystem numeric id. 0 - 8 */
@@ -161,14 +159,6 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
     }
   }
 
-  /* Now get the file information */
-  file = data->file;
-  if ( file == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME, "Supplied smfFile is a NULL pointer. Possible programming error.", status);
-    return;
-  }
-
   /* Decide whether we are populating sc2head from the header or a local copy */
   if (hdr->sc2head != NULL ) {
     sc2tmp = hdr->sc2head;
@@ -177,18 +167,16 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
   }
 
   /* Need to get the sub system ID */
+  /* If we only have the sub system name we can use an sc2ast routine to convert */
   smf_fits_getI( hdr, "SUBSYSNR", &subsysnum, status );
 
   /* Get the sc2head structure for this time slice */
   sc2store_headget( index, sc2tmp, status );
 
-  /* Need the parallactic angle: FPANG = EL + PA */
-  pa = sc2tmp->tcs_tr_ang - sc2tmp->tcs_az_ang;
-
   /* See if we have a WCS or not */
   if (hdr->wcs == NULL ) {
     /* Must create one */
-    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2, sc2tmp->rts_end, pa, &(hdr->wcs), status );
+    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2, sc2tmp->rts_end, &(hdr->wcs), status );
   } else {
     /* Modify in place */
     
