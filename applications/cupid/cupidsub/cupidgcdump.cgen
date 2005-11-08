@@ -76,19 +76,8 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 
    } else {
 
-      printf("%d: chisq: %g\n", ++jj, cupidGC.chisq );
-
       np = (cupidGC.ndim==1) ? CUPID__GCNP1 : 
            ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 ); 
-
-      printf(" Init. pars: " );
-      for( i = 0; i < np; i++ ) printf( "%g ", cupidGC.initpars[ i ] );
-      printf("\n" );
-
-      printf(" Final pars: " );
-      for( i = 0; i < np; i++ ) printf( "%g ", cupidGC.pars[ i ] );
-      printf("\n" );
-      printf(" Fit RMS: %g\n", cupidGC.fitRms );
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
          lbnd[ i ] = cupidGC.lbnd[ i ];

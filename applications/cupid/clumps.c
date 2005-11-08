@@ -64,7 +64,7 @@ void clumps() {
 *        values will be used for any unspecified parameters. [current value]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen. It
-*        should be in the range 0 to 3. A value of zero will suppress all 
+*        should be in the range 0 to 4. A value of zero will suppress all 
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
@@ -324,7 +324,7 @@ void clumps() {
    }          
 
 /* Get the interaction level. */
-   parGdr0i( "ILEVEL", 1, 0, 3, 1, &ilevel, status );
+   parGdr0i( "ILEVEL", 1, 0, 4, 1, &ilevel, status );
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );

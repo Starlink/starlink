@@ -64,8 +64,12 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 /* Report information to standard output if requested. */
    if( ilevel > 2 ) {
 
+      msgSetd( "V", chisq );
+      msgOut( "", "   Chi-squared ^V:", status );
+
       msgSeti( "N", iclump );
       msgOut( "", "   Storing clump ^N:", status );
+
       msgSetd( "V", par[ 0 ]*rms );
       msgOut( "", "      Peak intensity: ^V", status );
       msgSetd( "V", par[ 1 ]*rms );

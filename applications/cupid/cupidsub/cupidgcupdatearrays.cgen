@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
+#include "mers.h"
 
 /* Global Variables: */
 /* ================= */
@@ -12,7 +13,7 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                                          int *dims, double *par, double rms,
                                          double mlim, int imax, 
-                                         CGEN_TYPE *out ){
+                                         CGEN_TYPE *out, int ilevel ){
 
 /*
 *  Name:
@@ -25,7 +26,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *  Synopsis:
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
 *                                  int *dims, double *par, double rms,
-*                                  double mlim, int imax, CGEN_TYPE *out )
+*                                  double mlim, int imax, CGEN_TYPE *out,
+*                                  int ilevel )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array.
@@ -54,6 +56,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *     out
 *        Pointer to the output array to receive the sum of the Gaussian
 *        models, or NULL if no output is required.
+*     ilevel
+*        Level of information to display on standard output.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -80,8 +84,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    double bg;             /* Background for model */
    double m;              /* Model value */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
+   double sum;            /* Integrated clump intensity */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
+   int area;              /* Used area of clump in pixels */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
@@ -138,6 +144,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    more = 1;
    first = 1;
    peakok = 0;
+   sum = 0.0;
+   area = 0;
    while( more ){
       more = 0;
 
@@ -195,6 +203,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Pass on if the current pixel is not within the bounds of the input
    array. */
                   if( ok ) {
+                     area++;
 
 /* If the supplied residual is bad at this point, we leave it unchanged
    and set the corresponding output pixel (if any) bad. */
@@ -222,6 +231,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                         m *= rms;
                         if( res ) res[ j ] -= (CGEN_TYPE) m;
                         if( out ) out[ j ] += (CGEN_TYPE) m;
+                        sum += m;
                      }
                   }
 
@@ -262,6 +272,16 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    if( res ) for( j = 0; j < nel; j++ ) if( res[ j ] != CGEN_BAD ) res[ j ] -= bg;
    if( out ) for( j = 0; j < nel; j++ ) if( out[ j ] != CGEN_BAD ) out[ j ] += bg;
 
+/* Display info */
+   if( ilevel > 3 ) {
+      msgSetd( "V", sum );
+      msgSeti( "N", area );
+      msgOut( "", "   Integrated clump intensity: ^V (in ^N pixels)", status );
+
+      msgSetd( "V", bg*nel );
+      msgSeti( "N", nel );
+      msgOut( "", "   Integrated background intensity: ^V (in ^N pixels)", status );
+   }
 
 /*   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims ); */
 

@@ -222,11 +222,16 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                    mlim, imax, ipo );
+                                    mlim, imax, ipo, ilevel );
 
             } else if( ilevel > 2 ) {
                msgOut( "", "   No clump fitted.", status );
             }
+
+         } else if( ilevel > 2 ) {
+            msgBlank( status );
+            msgOut( "", "   Termination criterion reached.", status );
+            msgBlank( status );
          }
       }
    }
