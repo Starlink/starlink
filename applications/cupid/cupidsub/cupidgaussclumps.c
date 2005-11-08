@@ -133,6 +133,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iclump;          /* Number of clumps found so far */
    int imax;            /* Index of element with largest residual */
    int iter;            /* Continue finding more clumps? */
+   int niter;           /* Iterations performed so far */
    void *res;           /* Pointer to residuals array */
 
 /* Abort if an error has already occurred. */
@@ -186,7 +187,14 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
       iter = 1;
+      niter = 1;
       while( iter ) {
+
+         if( ilevel > 2 ) {
+            msgBlank( status );
+            msgSetd( "N", niter++ );
+            msgOut( "", "Iteration ^N:", status );
+         }
 
 /* Find the 1D vector index of the element with the largest value in the 
    residuals array. Also find the total data sum in the residuals array. */
@@ -194,7 +202,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Determine if a gaussian clump should be fitted to the peak around the 
    pixel found above.*/
-         cupidGCIterate( type, res, imax, sum, iclump, rms, gcconfig, &iter );
+         cupidGCIterate( type, res, imax, sum, iclump, rms, gcconfig,
+                         &iter, ilevel );
          if( iter ) {
 
 /* If so, make an initial guess at the Gaussian clump parameters centred
@@ -208,13 +217,16 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                iclump++;
 
 /* Add the clump to the output list. */
-               cupidGCListClump( iclump, ndim, x, chisq );
+               cupidGCListClump( iclump, ndim, x, chisq, ilevel, rms );
 
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
                                     mlim, imax, ipo );
-            } 
+
+            } else if( ilevel > 2 ) {
+               msgOut( "", "   No clump fitted.", status );
+            }
          }
       }
    }
@@ -222,6 +234,11 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Free resources */
    res = astFree( res );
    dims = astFree( dims );
+
+   cupidGC.data = astFree( cupidGC.data );
+   cupidGC.weight = astFree( cupidGC.weight );
+   cupidGC.res = astFree( cupidGC.res );
+   cupidGC.resu = astFree( cupidGC.resu );
 
 }
 

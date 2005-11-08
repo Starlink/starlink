@@ -115,13 +115,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    int rem;               /* Remaining count of pixels */
    int ubnd[ 3 ];         /* Externally ordered upper bounds */
 
-   static double wwidth;  /* Ratio of weight function FWHM to observed FWHM */
    static double beamfwhm;/* User supplied beam width in pixels */
    static double beta;    /* Scale factor for used section */
    static double fbeam;   /* Ratio of observed clump size to beam width */
    static double fvel;    /* Ratio of observed clump velocity width to vel res */
    static double velres;  /* User supplied velocity resolution in pixels */
    static double wmin;    /* Minimum weight value to use */
+   static double wwidth;  /* Ratio of weight function FWHM to observed FWHM */
    static int fax[ 3 ];   /* The internal axis indices */
    static int npar;       /* Number of parameters in fit */
 
@@ -212,6 +212,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       cupidGC.data = NULL;
       cupidGC.weight = NULL;
       cupidGC.res = NULL;
+      cupidGC.resu = NULL;
 
       cupidGC.model = NULL;
       cupidGC.initmodel = NULL;
@@ -335,6 +336,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    cupidGC.data = astGrow( cupidGC.data, cupidGC.nel, sizeof( double ) );
    cupidGC.weight = astGrow( cupidGC.weight, cupidGC.nel, sizeof( double ) );
    cupidGC.res = astGrow( cupidGC.res, cupidGC.nel, sizeof( double ) );
+   cupidGC.resu = astGrow( cupidGC.resu, cupidGC.nel, sizeof( double ) );
 
 /* Initialise pointers to the next element to be used in the arrays
    defining the data to be fitted. Note, the elements in these arays have

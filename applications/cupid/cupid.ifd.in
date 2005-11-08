@@ -208,6 +208,13 @@ package cupid {
             helpkey *
           }
 
+         parameter model {
+            type NDF
+            access WRITE
+            prompt {Output NDF without noise}
+            helpkey *
+          }
+
          parameter nclump {
             type _INTEGER
             access READ

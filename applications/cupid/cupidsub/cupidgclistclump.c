@@ -1,8 +1,9 @@
 #include "sae_par.h"
 #include "cupid.h"
-#include <stdio.h>
+#include "mers.h"
 
-void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
+void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
+                       int ilevel, double rms ){
 /*
 *  Name:
 *     cupidGCListClump
@@ -11,7 +12,8 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
 *     Add a clump to the output list. 
 
 *  Synopsis:
-*     void cupidGCListClump( int iclump, int ndim, double *par, double chisq )
+*     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
+*                            int ilevel, double rms )
 
 *  Description:
 *     This function adds a clump to the output list. 
@@ -26,6 +28,10 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
 *        cupidGCFit.cgen for a description)..
 *     chisq
 *        The chi-squared associated with the fit.
+*     ilevel
+*        The amount of information to display to standard output.
+*     rms
+*        The RMWS noise level.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -41,7 +47,6 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
 */      
 
 /* Local Variables: */
-   int i;               /* Parameter index */
    int np;              /* Number of parameters */
 
 /* Abort if an error has already occurred. */
@@ -56,10 +61,39 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq ){
       np = CUPID__GCNP3;
    }
 
-/* List them */
-   printf( "\nClump %d:  chi_sq: %g  pars: ", iclump, chisq );
-   for( i = 0; i < np; i++ ) printf( "%g ", par[ i ] );
-   printf("\n");
+/* Report information to standard output if requested. */
+   if( ilevel > 2 ) {
 
+      msgSeti( "N", iclump );
+      msgOut( "", "   Storing clump ^N:", status );
+      msgSetd( "V", par[ 0 ]*rms );
+      msgOut( "", "      Peak intensity: ^V", status );
+      msgSetd( "V", par[ 1 ]*rms );
+      msgOut( "", "      Constant background: ^V", status );
+      msgSetd( "V", par[ 2 ] );
+      msgOut( "", "      Centre on 1st axis: ^V", status );
+      msgSetd( "V", par[ 3 ] );
+      msgOut( "", "      FWHM on 1st axis: ^V", status );
+
+      if( ndim > 1 ) {
+         msgSetd( "V", par[ 4 ] );
+         msgOut( "", "      Centre on 2nd axis: ^V", status );
+         msgSetd( "V", par[ 5 ] );
+         msgOut( "", "      FWHM on 2nd axis: ^V", status );
+         msgSetd( "V", par[ 6 ] );
+         msgOut( "", "      Position angle: ^V", status );
+
+         if( ndim > 2 ) {
+            msgSetd( "V", par[ 7 ] );
+            msgOut( "", "      Centre on vel axis: ^V", status );
+            msgSetd( "V", par[ 8 ] );
+            msgOut( "", "      FWHM on vel axis: ^V", status );
+            msgSetd( "V", par[ 9 ] );
+            msgOut( "", "      Vel gradient on 1st axis: ^V", status );
+            msgSetd( "V", par[ 10 ] );
+            msgOut( "", "      Vel gradient on 2nd axis: ^V", status );
+         }
+      }
+   }
 }
 

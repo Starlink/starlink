@@ -89,7 +89,10 @@ void makeclumps() {
 *     NCLUMP = _INTEGER (Read)
 *        The number fo clumps to create.
 *     OUT = NDF (Write)
-*        The NDF to receive the simulated data.
+*        The NDF to receive the simulated data, including instrumental
+*        blurring and noise.
+*     MODEL = NDF (Write)
+*        The NDF to receive the simulated data, excluding noise.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
 *        There will be one row per clump, and a subset of the following 
@@ -196,14 +199,9 @@ void makeclumps() {
    double *t;                    /* Pointer to next table entry */
    double *tab;                  /* Table to be written to output catalogue */
    double par[ 11 ];             /* Clump parameters */
-   float *a;                     /* Pointer to start of next input plane */
-   float *amar;                  /* Pointer to work array */
-   float *b;                     /* Pointer to start of next output plane */
    float *d;                     /* Pointer to next output element */
-   float *ipc;                   /* Pointer to copy of data array */
+   float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
-   float *w;                     /* Pointer to work array */
-   float *wmar;                  /* Pointer to work array */
    float angle[ 2 ];             /* Values for ANGLE parameter */
    float back;                   /* Background level */
    float beamfwhm;               /* Value of BEAMFWHM parameter */
@@ -216,21 +214,15 @@ void makeclumps() {
    float pos2[ 2 ];              /* Distribution values for axis 2 position */
    float pos3[ 2 ];              /* Distribution values for axis 3 position */
    float rms;                    /* Standard deviation of Gaussian noise */
-   float sigma;                  /* Sigma for smoothing kernel */
    float trunc;                  /* Min usable clump value */
    float velfwhm;                /* Value of VELFWHM parameter */
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
    int addnoise;                 /* Add Gaussian noise to output array? */
-   int axes[ 3 ];                /* Axis permutation array */
-   int bad;                      /* Any bad values created? */
-   int coloff;                   /* Unused work space */
-   int dimo[ 3 ];                /* Dimensions after axis permutation */
    int dims[ 3 ];                /* Dimensions before axis permutation */
-   int expoff;                   /* Unused work space */
    int i;                        /* Loop count */
-   int ibox;                     /* Half-width of smoothing box */
-   int indf;                     /* Identifier for output NDF */
+   int indf2;                    /* Identifier for output NDF without noise */
+   int indf;                     /* Identifier for output NDF with noise */
    int inperm[ 10 ];             /* Input axis permutation array */
    int lbnd[ 3 ];                /* Lower pixel bounds */
    int nclump;                   /* Number of clumps to create */
@@ -238,11 +230,7 @@ void makeclumps() {
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
    int normal;                   /* Clump parameters normally distributed? */
-   int np;                       /* Number of elements per plane */
    int nval;                     /* Number of values supplied */
-   int nx;                       /* Length of 1st dimension */
-   int ny;                       /* Length of 2nd dimension */
-   int nz;                       /* Length of 3rd dimension */
    int outperm[ 3 ];             /* Output axis permutation array */
    int ubnd[ 3 ];                /* Upper pixel bounds */
 
@@ -259,11 +247,13 @@ void makeclumps() {
    parGet1i( "LBND", 3, lbnd, &ndim, status );
    parExaci( "UBND", ndim, ubnd, status );
 
-/* Create the output NDF. */
+/* Create the output NDFs. */
    ndfCreat( "OUT", "_REAL", ndim, lbnd, ubnd, &indf, status );
+   ndfCreat( "MODEL", "_REAL", ndim, lbnd, ubnd, &indf2, status );
 
-/* Map the DATA component of the output NDF. */
+/* Map the DATA component of the output NDFs. */
    ndfMap( indf, "DATA", "_REAL", "WRITE", (void *) &ipd, &nel, status );
+   ndfMap( indf2, "DATA", "_REAL", "WRITE", (void *) &ipd2, &nel, status );
 
 /* Get the other needed parameters. Which are needed depends on whether
    we are producing 1, 2 or 3 dimensional data. */
@@ -327,7 +317,7 @@ void makeclumps() {
    peak[ 1 ] /= rms;
 
 /* Fill the output array with the background value. */
-   kpg1Fillr( back, nel, ipd, status );
+   kpg1Fillr( back, nel, ipd2, status );
  
 /* Allocate memory for the output table array */
    ncol = ( ndim == 1 ) ? 3 : ( (ndim ==2 ) ? 6 : 10 );
@@ -344,6 +334,8 @@ void makeclumps() {
    arrays describing the mean value and range on each axis. */
 
    dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+   dims[ 1 ] = 1;
+   dims[ 2 ] = 1;
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
    astSetC( frm1, "Symbol(1)", "PeakValue" );
@@ -428,104 +420,21 @@ void makeclumps() {
       }
 
 /* Add the clump into the output array. */
-      cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0, ipd );
+      cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0, ipd2 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
 
    }
 
-/* Smooth the data, plane by plane, using the instrument beam, if required. */
-   if( ndim > 1 && beamfwhm > 0.0 ) {
-
-      sigma = 0.5*beamfwhm/sqrt( log( 2.0 ) );
-      ibox = (int) ( sigma*sqrt( log( maxpeak )) + 1 );
-      nx = dims[ 0 ];
-      ny = dims[ 1 ];
-      nz = dims[ 2 ];
-
-      ipc = astStore( NULL, ipd, nel*sizeof( float ) );
-      w = astMalloc( sizeof( float )*( 2*ibox + 1 ) );
-      amar = astMalloc( sizeof( float )*nx );
-      wmar = astMalloc( sizeof( float )*nx );
-
-      a = ipc;
-      b = ipd;
-      np = nx*ny;
-      for( i = 0; i < nz; i++, a += np, b += np ) {
-         kpg1Gausr( sigma, ibox, 1, 0.0, nx, ny, 0, 0, a, b, &bad, w, 
-                    amar, wmar, status );
-      }   
-
-      ipc = astFree( ipc );      
-      w = astFree( w );
-      amar = astFree( amar );
-      wmar = astFree( wmar );
-   }
-
-/* Smooth the data using the velocity resolution, if required. */
-   if( ndim != 2 && velfwhm > 0.0 ) {
-
-/* If required, permute the axes of the array so that the velocity axis is 
-   axis 1. Otherwise just copy the array. */
-      if( ndim == 3 ) {
-         dimo[ 0 ] = dims[ 2 ];
-         dimo[ 1 ] = dims[ 0 ];
-         dimo[ 2 ] = dims[ 1 ];
-         axes[ 0 ] = 3;
-         axes[ 1 ] = 1;
-         axes[ 2 ] = 2;
-         nx = dimo[ 0 ];
-         nz = dimo[ 1 ]*dimo[ 2 ];
-         ipc = astMalloc( sizeof( float )*nel );
-         kpg1Manir( 3, dims, ipd, 3, dimo, axes, &coloff, &expoff, ipc, 
-                    status );
-      } else {
-         nx = dims[ 0 ];
-         nz = 1;
-         ipc = astStore( NULL, ipd, nel*sizeof( float ) );
-      }
-
-/* Smooth each 1D row */
-      sigma = 0.5*velfwhm/sqrt( log( 2.0 ) );
-      ibox = (int) ( sigma*sqrt( log( maxpeak )) + 1 );
-
-      w = astMalloc( sizeof( float )*( 2*ibox + 1 ) );
-      amar = astMalloc( sizeof( float )*nx );
-      wmar = astMalloc( sizeof( float )*nx );
-
-      a = ipc;
-      b = ipd;
-      for( i = 0; i < nz; i++, a += nx, b += nx ) {
-         kpg1Gausr( sigma, ibox, 1, 0.0, nx, 1, 0, 0, a, b, &bad, w, 
-                    amar, wmar, status );
-      }   
-
-/* If required, permute the axes back to their original order. */
-      if( ndim == 3 ) {
-         ipc = astStore( ipc, ipd, nel*sizeof( float ) );
-         axes[ 0 ] = 2;
-         axes[ 1 ] = 3;
-         axes[ 2 ] = 1;
-         kpg1Manir( 3, dimo, ipc, 3, dims, axes, &coloff, &expoff, ipd, 
-                    status );
-      } 
-
-      ipc = astFree( ipc );      
-      w = astFree( w );
-      amar = astFree( amar );
-      wmar = astFree( wmar );
-
-   }
-
 /* Add Gaussian noise to the data. */
+   memcpy( ipd, ipd2,sizeof( float )*nel );
    if( addnoise ) {
       d = ipd;
       for( i = 0; i < nel; i++, d++ ) {
          *d +=  pdaRnnor( 0.0, rms );
       }
    }
-
 
 /* Create a Mapping (a PermMap) from the Frame representing the "ncol" clump
    parameters, to the "ndim" Frame representing clump centre positions. The

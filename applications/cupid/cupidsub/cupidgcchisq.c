@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "cupid.h"
+#include <math.h>
 
 /* Global Variables: */
 /* ================= */
@@ -82,6 +83,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    double *pim;            /* Pointer for next initial model value */
    double *pm;             /* Pointer for storing next model value */
    double *pr;             /* Pointer for storing next scaled residual */
+   double *pu;             /* Pointer for storing next unscaled residual */
    double *prs;            /* Pointer for storing next absolute residual */
    double *pw;             /* Pointer to next weight value to use */
    double *py;             /* Pointer to next data value to use */
@@ -90,7 +92,10 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    double res;             /* Difference between data and model value */
    double ret;             /* Returned value */
    double rr;              /* A factor for the residual to suppress -ve residuals */
+   double sum2;            /* Sum of the squared residuals */
    double t;               /* Temporary storage */
+   double wf;              /* Weight factor */
+   double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
    int i;                  /* Parameter index */
    int iax;                /* Axis index */
@@ -101,6 +106,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    static double v_off;    /* Offset on vel axis from data to model peak */
    static double x0_off;   /* Offset on axis 0 from data to model peak */
    static double x1_off;   /* Offset on axis 1 from data to model peak */
+   static int inv = 0;
 
 /* Initialise */
    ret = VAL__BADD;
@@ -110,6 +116,10 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 
 /* If neccessary, re-calculate cached intermediate values */
    if( newp ) {
+
+      inv++;
+/*      printf( "cupidGCChiSq invocation %d\n", inv ); */
+
 
 /* The difference between the model peak value and the data peak value. */
       pdiff = par[ 0 ] + par[ 1 ] - cupidGC.ymax;
@@ -128,9 +138,12 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       py = cupidGC.data;
       pw = cupidGC.weight;
       pr = cupidGC.res;
+      pu = cupidGC.resu;
       pm = cupidGC.model;
       prs = cupidGC.resids;
 
+      wsum = 0.0;
+      sum2 = 0.0;
       for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
 /* Loop round every element in the section of the data array which is
@@ -141,9 +154,32 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
          m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ) );
-         *pm = m;
          res = *py - m;
-         *prs = res;
+
+/* If the changing of the model parameters make little difference to the
+   residuals at a given place in the data, then those residuals should be
+   given less wieght since they could dominate the chi-squared value. If
+   the residual at the current pixel has not change by much since the 
+   previous call, reduce the weight associated with the pixel. However,
+   if the parameter has not change by much then you would not expect the
+   residuals to change by much. Therefore, do not reduce the weight by so
+   much if the model value at this pixel has not changed by much since the
+   last call. In order to avoid instability, we only do this modification 
+   for a few iterations near the start, and then allow the fitting
+   process to complete with fixed weights. */
+         if( cupidGC.nf > 2 && cupidGC.nf < 10 ) {
+            if( res != 0.0 && m != 0.0 ) {
+               wf = ( res - *pu )/ res;
+               wf /= ( m - *pm )/ m;
+               wf = fabs( wf );
+               wf = ( wf < 0.1 ) ? 0.1 : ( wf > 1.0 ) ? 1.0 : wf ;
+               *pw *= wf;
+            }
+         }
+
+/* Save the residual and model value at this pixel */
+         *pu = res;
+         *pm = m;
 
 /* Determine a scale factor which encourages the fitted intensity to stay
    below the observed intensity. This does the same job as the 
@@ -158,14 +194,21 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    in a work array (pr) so that we do not need to calculate them again if 
    this function is called subsequently to find the gradient for the same
    set of parameer values. */
+         wsum += *pw;
          *pr = *pw*res*rr;         
          chisq += *pr*res;
+         *prs = *pr*res;
 
+/* Sum the squared residuals for forming the unweighted RMS of the model
+   about the data. */
+         sum2 += res*res;
+ 
 /* Move the pointers on to the next pixel in the section of the data
    array being fitted. */
          py++;
          pw++;
          pr++;
+         pu++;
          pm++;
          prs++;
 
@@ -179,12 +222,15 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
             if( ++iax == ndim ) break;
             x[ iax ] += 1.0;
          }
-
       }
 
 /* Divide by the number of degrees of freedom (the sum of the weights
    minus the number of parameters being fitted). */
+      cupidGC.ndf = wsum - ( ( ndim == 1 ) ? 4 : ( ( ndim == 2 ) ? 7 : 11 ));
       chisq /= cupidGC.ndf;
+
+/* Store the RMS of the fit. */
+      cupidGC.fitRms = sqrt( sum2/cupidGC.nel );
 
 /* Modify this basic chi-squared value as described in the Stutski &
    Gusten paper. */

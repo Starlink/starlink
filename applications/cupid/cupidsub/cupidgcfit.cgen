@@ -39,7 +39,27 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     x 
 *        A pointer to an array containing the initial guess at the
 *        Gaussian parameters. The array is returned holding the best fit
-*        parameter values.
+*        parameter values. How many of these are used depends on the number
+*        of pixel axes in the data "ndim": if ndim is 1 only elements 0 to 
+*        3 are used, if ndim is 2 only elements 0 to 6 are used, if ndim
+*        is 3 all elements are used. All axis values are represented in GRID 
+*        pixels: 
+*
+*           x[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
+*           x[1]: Constant intensity offset ("b0" in Stutski & Gusten)
+*           x[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
+*           x[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
+*           x[4]: Model centre on axis 1 ("x2_0" in Stutski & Gusten)
+*           x[5]: Intrinsic FWHM on axis 1 ("D_xi_2" in Stutski & Gusten)
+*           x[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
+*                 In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
+*           x[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
+*           x[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
+*                                                   Gusten)
+*           x[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
+*                 in Stutski & Gusten), in vel. pixels per spatial pixel.
+*           x[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
+*                 in Stutski & Gusten), in vel. pixels per spatial pixel.
 *     chisq
 *        A pointer to a location at which to return the chi-squared
 *        associated with the returned fit.
@@ -108,6 +128,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
 
+/* See if the signal to noise ratio for the fit is OK. */
+   if( ret ) {
+     if( cupidGC.fitRms > 0.5*x[ 0 ] ) ret = 0;
+   }
+
 /* Return the final chi-squared value */
    *chisq = v[ 9 ];
 
@@ -115,6 +140,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    array bad if no fit was performed. This prevents the any subsequent 
    attempt to fit a Gaussian to the same peak value.*/
    if( !ret ) res[ imax ] = CGEN_BAD;
+
+
+/*   CGEN_FUNCTION(cupidGCDump)( NULL, 0, NULL );  */
+
+
    return ret;  
 }
 

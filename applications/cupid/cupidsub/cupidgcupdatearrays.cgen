@@ -257,7 +257,13 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;
 
-   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );
+/* Remove the background level from the residuals and add it to the model. */
+   bg *= rms;
+   if( res ) for( j = 0; j < nel; j++ ) if( res[ j ] != CGEN_BAD ) res[ j ] -= bg;
+   if( out ) for( j = 0; j < nel; j++ ) if( out[ j ] != CGEN_BAD ) out[ j ] += bg;
+
+
+/*   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims ); */
 
 }
 

@@ -2,9 +2,10 @@
 #include "ast.h"
 #include "cupid.h"
 #include <limits.h>
+#include "mers.h"
 
 void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
-                      double rms, AstKeyMap *config, int *iter ){
+                      double rms, AstKeyMap *config, int *iter, int ilevel ){
 /*
 *  Name:
 *     cupidGCIterate<X>
@@ -15,7 +16,7 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 
 *  Synopsis:
 *     void cupidGCIterate<X>( CGEN_TYPE *array, int imax, double sum, int iclump,
-*                           double rms, AstKeyMap *config, int *iter );
+*                           double rms, AstKeyMap *config, int *iter, int ilevel );
 
 *  Description:
 *     This functions determines if a gaussian clump should be fitted to the 
@@ -41,6 +42,8 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 *     iter
 *        Address of an int in which to return a flag indicating if
 *        a Gaussian should be fitted to the supplied peak.
+*     ilevel
+*        Information level to display on standard output.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCIterate macro 
@@ -96,10 +99,23 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 /* We finish iterating when the sum of the residuals in the supplied array 
    is less than the target value recorded on the first entry to this
    function. */
+      if( ilevel > 2 ) {
+         msgSetd( "SUM", sum );
+         msgSetd( "TH", sum_thresh );
+         msgOut( "", "   Sum of residuals: ^SUM (target is ^TH)", status );
+      }
+
       if( sum > sum_thresh ) {
 
 /* We also finish iterating if the peak value is too small. The limit is
    a user-specified multiple of the noise. */
+
+         if( ilevel > 2 ) {
+            msgSetd( "AMAX", (double) array[ imax ] );
+            msgSetd( "TH", val_thresh );
+            msgOut( "", "   Peak value: ^AMAX (target is ^TH)", status );
+         }
+
          if( array[ imax ] > val_thresh ) {
 
 /* We also finish iterating if we have already fitted the maximum allowed 
