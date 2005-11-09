@@ -77,6 +77,9 @@ void grpValid( Grp *, int *, int * );
 Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
 
+
+/* Semi-Public function prototypes: For Fortran interface wrappers only */
+/* -------------------------------------------------------------------- */
 void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
 F77_INTEGER_TYPE grp1Getid( Grp *, int * );
 
