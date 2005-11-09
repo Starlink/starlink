@@ -49,6 +49,9 @@
 *  History:
 *     2005-11-07 (TIMJ):
 *        Initial version.
+*     2005-11-08 (TIMJ):
+*        For now simply (inefficiently) create a new frameset each time
+*        round rather than reusing an existing one.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -176,13 +179,17 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
   /* See if we have a WCS or not */
   if (hdr->wcs == NULL ) {
     /* Must create one */
-    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2, sc2tmp->rts_end, &(hdr->wcs), status );
+    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
+		      sc2tmp->rts_end, &(hdr->wcs), status );
   } else {
-    /* Modify in place */
-    
+    /* Ideally we want to modify in place to reduce malloc/free */
+    /* For now take the inefficient and simpler approach */
+    astAnnul( hdr->wcs );
+    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
+		      sc2tmp->rts_end, &(hdr->wcs), status );
   }
 
-  astShow( hdr->wcs );
+  /* astShow( hdr->wcs ); */
 
   return;
 }
