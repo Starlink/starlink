@@ -203,3 +203,36 @@ void grpValid( Grp *igrp, int *valid, int *status ){
 
 
 
+F77_SUBROUTINE(grp_new)( CHARACTER(TYPE), 
+                         INTEGER(IGRP), 
+                         INTEGER(STATUS)
+                         TRAIL(TYPE) );
+
+
+Grp *grpNew( const char *type, int *status ){
+   DECLARE_CHARACTER_DYN(TYPE);
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(STATUS);
+   Grp *ret;
+
+   F77_CREATE_CHARACTER( TYPE, strlen( type ) );
+   F77_EXPORT_CHARACTER( type, TYPE, TYPE_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_new)( CHARACTER_ARG(TYPE),
+                      INTEGER_ARG(&IGRP),
+                      INTEGER_ARG(&STATUS) 
+                      TRAIL_ARG(TYPE) );
+
+   F77_FREE_CHARACTER( TYPE );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   ret = grpInit( status );
+   grp1Setid( ret, IGRP, status );
+
+   return ret;
+}
+
+
+
+
