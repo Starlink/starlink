@@ -72,7 +72,11 @@ void smf_correct_extinction(AstFrameSet *, const dim_t[],
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
+/* Do not return the result since we want the interface to remain the same when a
+   string is required. If we return a string we have to know who should free it */
 void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, int * status );
+void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, int * status );
+void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], int * status );
 
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
