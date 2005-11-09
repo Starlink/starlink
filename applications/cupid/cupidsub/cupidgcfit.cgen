@@ -128,11 +128,6 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
 
-/* See if the signal to noise ratio for the fit is OK. */
-   if( ret ) {
-     if( cupidGC.fitRms > 0.5*x[ 0 ] ) ret = 0;
-   }
-
 /* Return the final chi-squared value */
    *chisq = v[ 9 ];
 

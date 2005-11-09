@@ -15,7 +15,7 @@ CupidGC cupidGC;
 
 
 void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       double *ipv, unsigned char *ipq, double rms, 
+                       double *ipv, float *rmask, double rms, 
                        AstKeyMap *config, int velax, int ilevel, void *ipo ){
 /*
 *  Name:
@@ -27,7 +27,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                            void *ipd, double *ipv, unsigned char *ipq, 
+*                            void *ipd, double *ipv, float *rmask, 
 *                            double rms, AstKeyMap *config, int velax,
 *                            void *ipo )
 
@@ -62,18 +62,11 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to the input Variance array, or NULL if there is no Variance
 *        array. The elements should be stored in Fortran order. The data 
 *        type of this array is "double".
-*     ipq
-*        Pointer to the Quality array. The elements should be stored in
-*        Fortran order. If this is not NULL, a mask is written to the
-*        array identifying which clump each pixel belongs to. A value of 
-*        zero indicates that the pixel is not contained within any clump.
-*        A non-zero value indicates that the pixel is part of the clump
-*        which has the same non-zero index within the returned catalogue.
-*        Only the first 511 clumps can be identified in this way. Any
-*        subsequent clumps are not included in the mask. If a pixel
-*        contributes to more than one clump, then the quality value 
-*        associated with the pixel will be the index of the last clump
-*        found.
+*     rmask
+*        Pointer to a mask array. The elements should be stored in
+*        Fortran order. If this is not NULL, then pixels which fall
+*        within any clump are set to 1.0 (all other pixels are left 
+*        unchanged).
 *     rms
 *        The global RMS error in the data array.
 *     config
@@ -166,15 +159,19 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       urms = cupidConfigD( gcconfig, "RMS", VAL__BADD );
       if( urms != VAL__BADD ) {
          rms = urms;
-         if( ilevel > 1 ) {
+         if( ilevel > 2 ) {
             msgSetd( "N", rms );
             msgOut( "", "User-supplied RMS noise: ^N", status );
          }
       }
 
-      if( ilevel > 1 ) {
+      if( ilevel > 2 ) {
          msgSetd( "N", rms );
          msgOut( "", "RMS noise level actually used: ^N", status );
+
+      } else if( ilevel > 1 ) {
+         msgSetd( "N", rms );
+         msgOut( "", "RMS noise level used: ^N", status );
       }
 
 /* Get the lowest value (normalised to the RMS noise level) at which
@@ -187,12 +184,13 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
       iter = 1;
-      niter = 1;
+      niter = 0;
       while( iter ) {
 
+         ++niter;         
          if( ilevel > 2 ) {
             msgBlank( status );
-            msgSetd( "N", niter++ );
+            msgSetd( "N", niter );
             msgOut( "", "Iteration ^N:", status );
          }
 
@@ -222,18 +220,39 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                    mlim, imax, ipo, ilevel );
+                                    mlim, imax, ipo, ilevel, rmask );
 
             } else if( ilevel > 2 ) {
                msgOut( "", "   No clump fitted.", status );
             }
 
          } else if( ilevel > 2 ) {
-            msgBlank( status );
             msgOut( "", "   Termination criterion reached.", status );
             msgBlank( status );
          }
       }
+   }
+
+   if( ilevel > 1 ) {
+      if( niter == 1 ){
+         msgOut( "", "No fit attempted", status );
+      } else {
+         msgSeti( "M", niter - 1 - iclump );
+         msgSeti( "N", niter - 1 );
+         msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
+      }
+   }
+
+   if( ilevel > 0 ) {
+      if( iclump == 0 ) {
+         msgOut( "", "No clumps found", status );
+      } else if( iclump == 1 ){
+         msgOut( "", "One clump found", status );
+      } else {
+         msgSeti( "N", iclump );
+         msgOut( "", "^N clumps found", status );
+      }
+      msgBlank( status );
    }
 
 /* Free resources */

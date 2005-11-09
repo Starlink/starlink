@@ -12,8 +12,8 @@ extern CupidGC cupidGC;
 
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                                          int *dims, double *par, double rms,
-                                         double mlim, int imax, 
-                                         CGEN_TYPE *out, int ilevel ){
+                                         double mlim, int imax, CGEN_TYPE *out,
+                                         int ilevel, float *rmask ){
 
 /*
 *  Name:
@@ -27,7 +27,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
 *                                  int *dims, double *par, double rms,
 *                                  double mlim, int imax, CGEN_TYPE *out,
-*                                  int ilevel )
+*                                  int ilevel, float *rmask )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array.
@@ -58,6 +58,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        models, or NULL if no output is required.
 *     ilevel
 *        Level of information to display on standard output.
+*     rmask
+*        Pointer to a mask array. The elements should be stored in
+*        Fortran order. If this is not NULL, then pixels which fall
+*        within any clump are set to 1.0 (all other pixels are left 
+*        unchanged).
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -219,10 +224,12 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If the model value is higher than the supplied limit, indicate that the
    face needs to be extended further. Indicate that some of the peak at
-   least is above the threshold and on the image. */
+   least is above the threshold and on the image. Also indicate that the
+   pixel is within a clumpo in any returned mask. */
                         if( m > mlim ) {
                            extend[ iax ][ iedge ] = 1;
                            peakok = 1;
+                           if( rmask ) rmask[ j ] = 1.0;
                         }
 
 /* Scale the model using the RMS noise so that it has the same
@@ -283,7 +290,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       msgOut( "", "   Integrated background intensity: ^V (in ^N pixels)", status );
    }
 
-   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims ); 
+/*   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );  */
 
 }
 

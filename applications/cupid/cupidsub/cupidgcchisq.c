@@ -92,9 +92,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    double res;             /* Difference between data and model value */
    double ret;             /* Returned value */
    double rr;              /* A factor for the residual to suppress -ve residuals */
-   double sum2;            /* Sum of the squared residuals */
    double t;               /* Temporary storage */
-   double wf;              /* Weight factor */
    double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
    int i;                  /* Parameter index */
@@ -143,7 +141,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       prs = cupidGC.resids;
 
       wsum = 0.0;
-      sum2 = 0.0;
       for( iax = 0; iax < ndim; iax++ ) x[ iax ] = cupidGC.lbnd[ iax ];
 
 /* Loop round every element in the section of the data array which is
@@ -201,10 +198,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
          chisq += *pr*res;
          *prs = *pr*res;
 
-/* Sum the squared residuals for forming the unweighted RMS of the model
-   about the data. */
-         sum2 += res*res;
- 
 /* Move the pointers on to the next pixel in the section of the data
    array being fitted. */
          py++;
@@ -230,9 +223,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    minus the number of parameters being fitted). */
       cupidGC.ndf = wsum - ( ( ndim == 1 ) ? 4 : ( ( ndim == 2 ) ? 7 : 11 ));
       chisq /= cupidGC.ndf;
-
-/* Store the RMS of the fit. */
-      cupidGC.fitRms = sqrt( sum2/cupidGC.nel );
 
 /* Modify this basic chi-squared value as described in the Stutski &
    Gusten paper. */

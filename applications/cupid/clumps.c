@@ -31,9 +31,10 @@ void clumps() {
 
 *  Description:
 *     This application identifies clumps within a 1, 2 or 3 dimensional NDF,
-*     and creates an output catalogue containing the clump parameters.
-*     The algorithm used to identify the clumps can be chosen from a
-*     list of supported algorithms.
+*     storing information about the clumps in the CUPID extension of the
+*     supplied NDF. Optionally, an output catalogue can be created containing 
+*     the clump parameters. The algorithm used to identify the clumps can be 
+*     chosen from a list of supported algorithms.
 
 *  Usage:
 *     clumps in outcat method mask
@@ -68,22 +69,21 @@ void clumps() {
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
-*        The 2 or 3 dimensional NDF to be analysed. The Quality component
-*        of this NDF will be updated if the parameter MASK is set true.
-*        In this case the NDF must not be write-protected. If MASK is set
-*        false, then read access only is required, and so the NDF may be
-*        write protected.
+*        The 1, 2 or 3 dimensional NDF to be analysed. Information about
+*        the identified clumps will be stored in the CUPID extension of
+*        the supplied NDF, and so the NDF must not be write protected.
+*        Other applications within the CUPID package can be used to
+*        display this information in various ways.
 *     MASK = _LOGICAL (Read)
-*        If true, then a mask identifying the pixels within each clump 
-*        is written to the Quality array of the supplied NDF, replacing
-*        any existing Quality array. For this purpose, the Quality array
-*        is considered to be an array of unsigned bytes, and a value
-*        between zero and 511 will be written to each element. This is
-*        the row number within the output catalogue for the clump 
-*        containing the corresponding data pixel. If a pixel contributes
-*        to more than one clump, then the corresponding element of the 
-*        Quality array will hold the row number of the last clump to be 
-*        found at that pixel. [current value]
+*        If true, then any Quality component in the supplied NDF is
+*        replaced by a mask which indicates if each pixel is inside or
+*        outside a clump. Two quality bits will be used; one is set if
+*        and only if the pixel is contained within one or more clumps,
+*        the other is set if and only if the pixel is not contained within 
+*        any clump. These two quality bits have names associated with
+*        them which can be used with the KAPPA applications SETQUAL, 
+*        QUALTOBAD, REMQUAL, SHOWQUAL. The names used are "CLUMP" and
+*        "BACKGROUND". [current value]
 *     METHOD = LITERAL (Read)
 *        The algorithm to use. Each algorithm is described in more detail
 *        in the "Algorithms:" section below. Can be one of:
@@ -95,14 +95,15 @@ void clumps() {
 *        set via the CONFIG parameter.   [current value]
 *     OUT = NDF (Write)
 *        Only used if METHOD is GaussClumps. It is an optional output NDF in 
-*        which to store the fitted Gaussian clumps. No output NDF will be 
-*        produced if a null (!) value is supplied. Otherwise, the output NDF 
-*        will be the same shape and size as the input NDF, and will inherit 
-*        its AXIS, WCS and QUALITY components (plus any extensions). The Data 
-*        array will be filled with the sum of the fitted Gaussian models for 
-*        all the clumps which have been found. [!]
+*        which to store the sum of all the fitted Gaussian clumps. No output 
+*        NDF will be produced if a null (!) value is supplied. Otherwise, the 
+*        output NDF will be the same shape and size as the input NDF, and will 
+*        inherit its AXIS, WCS and QUALITY components (plus any extensions). 
+*        The Data array will be filled with the sum of the fitted Gaussian 
+*        models for all the clumps which have been found. [!]
 *     OUTCAT = FILENAME (Write)
-*        The output catalogue in which to store the clump parameters.
+*        An optional output catalogue in which to store the clump parameters.
+*        No catalogue will be produced if a null (!) value is supplied [!]
 
 *  Algorithms:
 *     - GaussClumps: Described by Stutski & Gusten (1990, ApJ 356, 513).
@@ -219,11 +220,14 @@ void clumps() {
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
+   char qlocs[ 5 ][ DAT__SZLOC ]; /* HDS locators for quality name information */
+   char xloc[ DAT__SZLOC ];     /* HDS locator for CUPID extension */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
+   float *rmask;                /* Pointer to cump mask array */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
@@ -240,13 +244,13 @@ void clumps() {
    int size;                    /* Size of the "grp" group */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
+   int there;                   /* Extension exists? */
    int type;                    /* Integer identifier for data type */
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
    int velax;                   /* Index of the velocity pixel axis (if any) */
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
-   void *ipq;                   /* Pointer to Quality array */
    
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -257,50 +261,8 @@ void clumps() {
 /* Start an NDF context */
    ndfBegin();
 
-/* See if a mask is to be written to the Quality component of the NDF. */
-   parGet0l( "MASK", &mask, status );
-
-/* Get an identifier for the input NDF, opening it with the minimum
-   required access. */
-   if( mask ) {
-      ndfAssoc( "IN", "UPDATE", &indf, status );
-   } else {
-      ndfAssoc( "IN", "READ", &indf, status );
-   }
-
-/* Choose the data type to use when mapping the NDF Data array. */
-   ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
-             status );
-   if( !strcmp( itype, "_DOUBLE" ) ) {
-      type = CUPID__DOUBLE;
-   } else {
-      type = CUPID__FLOAT;
-   }
-
-/* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
-             15,  status );
-
-/* GaussClumps can produce an optional output NDF holding the fitted 
-   Gaussians. See if this is necessary. If not, annull the error. If so,
-   map the data array, filling it with zeros. */
-   ipo = NULL;
-   if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
-      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
-      } else {
-         ndfMap( indf2, "DATA", itype, "WRITE/ZERO", &ipo, &el, status );
-      }
-   }
-
-/* If required map the input NDFs quality array. */
-   if( mask ) {
-      ndfMap( indf, "Quality", "_UBYTE", "WRITE/ZERO", &ipq, &el, 
-              status );
-   } else {
-      ipq = NULL;
-   }
+/* Get an identifier for the input NDF. */
+   ndfAssoc( "IN", "UPDATE", &indf, status );
 
 /* Get the dimensions of the NDF, and count the significant ones. */
    ndfDim( indf, NDF__MXDIM, dim, &ndim, status );
@@ -322,9 +284,6 @@ void clumps() {
       }
       goto L999;
    }          
-
-/* Get the interaction level. */
-   parGdr0i( "ILEVEL", 1, 0, 4, 1, &ilevel, status );
 
 /* Get the WCS FrameSet and the significant axis bounds. */
    kpg1Asget( indf, nsig, 1, 0, 0, sdim, slbnd, subnd, &iwcs, status );
@@ -392,14 +351,28 @@ void clumps() {
       }
    }         
 
+/* Choose the data type to use when mapping the NDF Data array. */
+   ndfMtype( "_REAL,_DOUBLE", indf, indf, "DATA", itype, 20, dtype, 20,
+             status );
+   if( !strcmp( itype, "_DOUBLE" ) ) {
+      type = CUPID__DOUBLE;
+   } else {
+      type = CUPID__FLOAT;
+   }
+
 /* Map the Data array. */
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
-/* If there is a vriance array, map it and find the global RMS error. */
+/* Get the interaction level. */
+   parGdr0i( "ILEVEL", 1, 0, 4, 1, &ilevel, status );
+
+/* If there is a variance array, map it and find the global RMS error. */
    ndfState( indf, "VARIANCE", &var, status );
    if( var && *status == SAI__OK ) {   
       ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
+      sum = 0.0;
+      n = 0;
       for( i = 0; i < el; i++ ) {
          if( ipv[ i ] != VAL__BADD ) {
             sum += ipv[ i ]*ipv[ i ];
@@ -409,7 +382,7 @@ void clumps() {
 
       if( n > 0 ) {
          rms = sqrtf( sum/n );
-         if( ilevel > 1 ) {
+         if( ilevel > 2 ) {
             msgSetd( "N", rms );
             msgOut( "", "RMS noise from Variance component: ^N", status );
          }
@@ -424,10 +397,57 @@ void clumps() {
    } else {
       ipv = NULL;
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
-      if( ilevel > 1 ) {
+      if( ilevel > 2 ) {
          msgSetd( "N", rms );
          msgOut( "", "RMS noise from Data component: ^N", status );
       }
+   }
+
+/* Determine which algorithm to use. */
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
+             15,  status );
+
+/* GaussClumps can produce an optional output NDF holding the fitted 
+   Gaussians. See if this is necessary. If not, annull the error. If so,
+   map the data array, filling it with zeros. */
+   ipo = NULL;
+   if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
+      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+      } else {
+         ndfMap( indf2, "DATA", itype, "WRITE/ZERO", &ipo, &el, status );
+         ndfSbad( 1, indf2, "DATA", status );
+      }
+   }
+
+/* Delete any existing CUPID extension in the NDF, and then create a new
+   one. */
+   ndfXstat( indf, "CUPID", &there, status );
+   if( there ) ndfXdel( indf, "CUPID", status );
+   ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+
+/* If required allocate room for a mask holding bad values for points which 
+   are not inside any clump. Fill it with bad values. */
+   parGet0l( "MASK", &mask, status );
+   if( mask ) {
+      rmask = astMalloc( sizeof( float )*(size_t) el );
+      if( rmask ) {
+         for( i = 0; i < el; i++ ) rmask[ i ] = VAL__BADR;
+
+/* Delete any existing quality name information from the supplied NDF, and 
+   create a structure to hold new quality name info. */
+         irqDelet( indf, status ); 
+         irqNew( indf, "CUPID", qlocs, status );
+
+/* Add in two quality names; "CLUMP"and "BACKGROUND". */
+         irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
+                   status );
+         irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+                   status );
+      }
+   } else {
+      rmask = NULL;
    }
 
 /* Abort if an error has occurred. */
@@ -451,12 +471,12 @@ void clumps() {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq, 
-                       rms, keymap, velax, ilevel, ipo ); 
+      cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rmask, rms, 
+                        keymap, velax, ilevel, ipo ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
-      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, (unsigned char *) ipq,
-                     keymap, velax, ilevel ); 
+      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rmask, keymap, 
+                      velax, ilevel ); 
 
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -464,8 +484,20 @@ void clumps() {
               "implemented.", status );
    }
 
+/* Transfer any pixel mask to the NDF quality array. */
+   if( mask ){
+      irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
+      irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+   }
+
 /* Tidy up */
 L999:
+
+/* Release the quality name information. */
+   if( mask ) {
+      rmask = astFree( rmask );
+      irqRlse( qlocs, status );
+   }
 
 /* End the NDF context */
    ndfEnd( status );
@@ -477,7 +509,7 @@ L999:
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
       errRep( "CLUMPS_ERR", "CLUMPS: Failed to identify clumps of emission "
-              "within a 2- or 3-D NDF.", status );
+              "within a 1, 2 or 3-D NDF.", status );
    }
 }
 

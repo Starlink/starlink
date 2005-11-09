@@ -22,7 +22,6 @@ typedef struct CupidGC  {
    double *resu;           /* Pointer to array to receive unscale residuals */
    double *weight;         /* Pointer to weights for section being fitted */
    double beam_sq;         /* Square of spatial beam FWHM in pixels */   
-   double fitRms;          /* The RMS of the fit */
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
    double ndf;             /* Number of degrees of freedom */
    double s0p1;            /* Chi-square stiffness parameter s0, minus 1.0 */
@@ -93,10 +92,10 @@ double cupidGCModel( int, double *, double *, int, int, int );
 float cupidRanVal( int, float[2] );
 int cupidConfigI( AstKeyMap *, const char *, int );
 void clumps();
-void cupidClumpFind( int, int, int *, int *, void *, void *, unsigned char *, AstKeyMap *, int, int );
+void cupidClumpFind( int, int, int *, int *, void *, void *, float *, AstKeyMap *, int, int );
 void cupidGCListClump( int, int, double *, double, int *, int, double );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
-void cupidGaussClumps( int, int, int *, int *, void *, double *, unsigned char *, double, AstKeyMap *, int, int, void * );
+void cupidGaussClumps( int, int, int *, int *, void *, double *, float *, double, AstKeyMap *, int, int, void * );
 void cupidhelp();
 void makeclumps();

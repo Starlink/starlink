@@ -4,7 +4,7 @@
 #include "ast.h"
 
 void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-                     void *ipd, void *ipv, unsigned char *ipq, 
+                     void *ipd, void *ipv, float *rmask, 
                      AstKeyMap *config, int velax, int ilevel ){
 /*
 *  Name:
@@ -16,7 +16,7 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 
 *  Synopsis:
 *     void cupidClumpFind( type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, void *ipv, unsigned char *ipq, 
+*                          void *ipd, void *ipv, float *rmask, 
 *                          AstKeyMap *config, int velax, int ilevel )
 
 *  Description:
@@ -48,15 +48,11 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 *        Pointer to the input Variance array, or NULL if there is no Variance
 *        array. The elements should be stored in Fortran order. The data 
 *        type of this array is given by "itype".
-*     ipq
-*        Pointer to the Quality array. The elements should be stored in
-*        Fortran order. If this is not NULL, a mask is written to the
-*        array identifying which clump each pixel belongs to. A value of 
-*        zero indicates that the pixel is not contained within any clump.
-*        A non-zero value indicates that the pixel is part of the clump
-*        which has the same non-zero index within the returned catalogue.
-*        Only the first 511 clumps can be identified in this way. Any
-*        subsequent clumps are not included in the mask.
+*     rmask
+*        Pointer to a mask array. The elements should be stored in
+*        Fortran order. If this is not NULL, then pixels which fall
+*        within any clump are set to 1.0 (all other pixels are left 
+*        unchanged).
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
