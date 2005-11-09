@@ -23,11 +23,14 @@
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
 
  *  History:
  *     2005-Oct-21 (TIMJ):
  *        Original version
+ *     2005-Nov-09 (PWD):
+ *        Added fix for Microsoft/MINGW's handling of "long long" printfs.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -92,8 +95,13 @@
 #elif SIZEOF_LONG_LONG == 8
 #define INT_BIG  "long long int"
 #define UINT_BIG "unsigned long long int"
+#if __MINGW32__
+#define INT_BIG_S "I64d"
+#define INT_BIG_U "I64u"
+#else
 #define INT_BIG_S "lld"
 #define INT_BIG_U "llu"
+#endif
 #else
 error unable to find an 8 byte integer type
 #endif
