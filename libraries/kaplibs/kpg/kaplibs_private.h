@@ -23,4 +23,5 @@
 /* ----------------------------------- */
 void kpg1Kymp1( Grp *, AstKeyMap **, int * );
 void kpg1Kymp2( const char *, AstKeyMap *, int * );
+void kpg1Kygp1( AstKeyMap *, Grp **, const char *, int * );
 

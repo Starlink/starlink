@@ -29,7 +29,9 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
 
 *  Arguments:
 *     KEYMAP = INTEGER (Given)
-*        An AST pointer to the existing KeyMap.
+*        An AST pointer to the existing KeyMap. Numerical entries which 
+*        have bad values (VAL__BADI for integer entries or VAL__BADD for 
+*        floating point entries) are not copied into the group.
 *     IGRP = INTEGER (Returned)
 *        A GRP identifier for the group to which to append the "name=value" 
 *        strings read from the KeyMap. A new group is created if GRP__NOID 
@@ -55,17 +57,19 @@ F77_SUBROUTINE(kpg1_kygrp)( INTEGER(KEYMAP), INTEGER(IGRP), INTEGER(STATUS) ) {
    GENPTR_INTEGER(STATUS)
 
    AstKeyMap *keymap;
-   Grp igrp;
+   Grp *grp;
    int status;
 
    F77_IMPORT_INTEGER( *STATUS, status );
 
    keymap = astI2P( *KEYMAP );
-   grp1Setid( &igrp, *IGRP, &status );
+   grp = grpInit( &status );
+   grp1Setid( grp, *IGRP, &status );
 
-   kpg1Kygp1( keymap, &igrp, NULL, &status );
+   kpg1Kygp1( keymap, &grp, NULL, &status );
 
-   F77_EXPORT_INTEGER( grp1Getid( &igrp, &status ), *IGRP );
+   F77_EXPORT_INTEGER( grp1Getid( grp, &status ), *IGRP );
    F77_EXPORT_INTEGER( status, *STATUS );
+   grpFree( &grp, &status );
 
 }

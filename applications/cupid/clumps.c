@@ -490,6 +490,9 @@ void clumps() {
       irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
    }
 
+/* Store the configuration in the CUPID extension. */
+   cupidStoreConfig( xloc, keymap );
+
 /* Tidy up */
 L999:
 
@@ -498,6 +501,9 @@ L999:
       rmask = astFree( rmask );
       irqRlse( qlocs, status );
    }
+
+/* Relase the extension locator.*/
+   datAnnul( xloc, status );
 
 /* End the NDF context */
    ndfEnd( status );

@@ -32,7 +32,9 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 
 *  Parameters
 *     keymap
-*        A pointer to the KeyMap.
+*        A pointer to the KeyMap. Numerical entries which have bad values
+*        (VAL__BADI for integer entries or VAL__BADD for floating point
+*        entries) are not copied into the group.
 *     igrp
 *        A location at which is stored a pointer to the Grp structure
 *        to which the name=value strings are to be appended. A new group is 
@@ -64,11 +66,11 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 /* Local Variables: */ 
    AstObject *obj;              /* Pointer to nested AST Object */
    char *text;                  /* Sum of concatenated strings */
-   const char *cval;            /* Pointer to entry value */
    const char *key;             /* Key string for current entry in KeyMap */
    const char *value;           /* Value of current entry in KeyMap */
    double dval;                 /* Double value */
    int *old_status;             /* Pointer to original status variable */
+   int bad;                     /* Is the numerical entry value bad? */
    int i;                       /* Index into supplied KeyMap */
    int ival;                    /* Integer value */
    int n;                       /* Number of entries in the KeyMap */
@@ -114,24 +116,25 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
       } else {
 
 /* If it is a numerical type, see if it has a bad value. */
-         cval = NULL;
+         bad = 0;
          if( type == AST__INTTYPE && astMapGet0I( keymap, key, &ival ) ){
-            if( ival == VAL__BADI ) cval = "<bad>";
+            if( ival == VAL__BADI ) bad = 1;
          } else if( type == AST__DOUBLETYPE && astMapGet0D( keymap, key, &dval ) ){
-            if( dval == VAL__BADD ) cval = "<bad>";
+            if( dval == VAL__BADD ) bad = 1;
          } 
 
 /* If it not bad, get its formatted value. */
-         if( !cval && astMapGet0C( keymap, key, &value ) ) cval = value;
+         if( !bad && astMapGet0C( keymap, key, &value ) ) {
 
 /* Put it in the group. */
-         nc = 0;
-         text = astAppendString( NULL, &nc, prefix );
-         text = astAppendString( text, &nc, key );
-         text = astAppendString( text, &nc, "=" );
-         text = astAppendString( text, &nc, cval );
-         grpPut1( *igrp, text, 0, status );
-         text = astFree( text );
+            nc = 0;
+            text = astAppendString( NULL, &nc, prefix );
+            text = astAppendString( text, &nc, key );
+            text = astAppendString( text, &nc, "=" );
+            text = astAppendString( text, &nc, value );
+            grpPut1( *igrp, text, 0, status );
+            text = astFree( text );
+         }
       }
    }
 
