@@ -70,10 +70,11 @@ void clumps() {
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
 *        The 1, 2 or 3 dimensional NDF to be analysed. Information about
-*        the identified clumps will be stored in the CUPID extension of
-*        the supplied NDF, and so the NDF must not be write protected.
-*        Other applications within the CUPID package can be used to
-*        display this information in various ways.
+*        the identified clumps and the configuration parameters used will 
+*        be stored in the CUPID extension of the supplied NDF, and so the 
+*        NDF must not be write protected. Other applications within the 
+*        CUPID package can be used to display this information in various 
+*        ways.
 *     MASK = _LOGICAL (Read)
 *        If true, then any Quality component in the supplied NDF is
 *        replaced by a mask which indicates if each pixel is inside or
