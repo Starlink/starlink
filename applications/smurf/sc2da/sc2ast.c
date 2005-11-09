@@ -385,42 +385,26 @@ int *status               /* global status (given and returned) */
      Contruct a set of FITS headers and put them into an AST FitsChan.
    Authors :
      B.D.Kelly (bdk@roe.ac.uk)
+     T.Jenness (timj@jach)
    History :
      13Apr2005 : original (bdk)
+     08Nov2005 : Use astSetFits rather than intermediate strings (timj)
 */
 
 {
-   char fbuff[80];       /* store for a FITS record */
 
    if ( *status != SAI__OK ) return;
-/*
-   astSetFitsF ( fitschan, "CRPIX1", 0.0, " ", 0 );
-   astSetFitsF ( fitschan, "CRPIX2", 0.0, " ", 0 );
-   astSetFitsF ( fitschan, "CD1_1", 1.0, " ", 0 );
-   astSetFitsF ( fitschan, "CD2_2", 1.0, " ", 0 );
-   astSetFitsF ( fitschan, "CRVAL1", ra*90.0/PIBY2, " ", 0 );
-   astSetFitsF ( fitschan, "CRVAL2", dec*90.0/PIBY2, " ", 0 );
-   astSetFitsS ( fitschan, "CTYPE1", "RA---TAN", " ", 0 );
-   astSetFitsS ( fitschan, "CTYPE2", "DEC--TAN", " ", 0 );
-*/
 
-   sprintf ( fbuff, "CRPIX1  = %e", crpix1 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CRPIX2  = %e", crpix2 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CD1_1   = %e", cd1_1 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CD2_2   = %e", cd2_2 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CRVAL1  = %e", crval1 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CRVAL2  = %e", crval2 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CTYPE1  = '%s'", ctype1 );
-   astPutFits ( fitschan, fbuff, 0 );
-   sprintf ( fbuff, "CTYPE2  = '%s'", ctype2 );
-   astPutFits ( fitschan, fbuff, 0 );
+   astSetFitsF ( fitschan, "CRPIX1", crpix1, " ", 0 );
+   astSetFitsF ( fitschan, "CRPIX2", crpix2, " ", 0 );
+   astSetFitsF ( fitschan, "CD1_1", cd1_1, " ", 0 );
+   astSetFitsF ( fitschan, "CD2_2", cd2_2, " ", 0 );
+   astSetFitsF ( fitschan, "CRVAL1", crval1, " ", 0 );
+   astSetFitsF ( fitschan, "CRVAL2", crval2, " ", 0 );
+   astSetFitsS ( fitschan, "CTYPE1", ctype1, " ", 0 );
+   astSetFitsS ( fitschan, "CTYPE2", ctype2, " ", 0 );
 
+   return;
 }
 
 
