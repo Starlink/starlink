@@ -10,7 +10,7 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie}
 \newcommand{\stardocdate}      {2005 November 4}
 \newcommand{\stardoctitle}     {C-shell Cookbook}
-\newcommand{\stardocversion}   {Version 1.1}
+\newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1724,7 +1724,7 @@ If you run simultaneously more than one shell script executing
 Starlink applications, or run such a script in the background while
 you continue an interactive session, you may notice some strange
 behaviour with parameters.   Starlink applications uses files in
-the directory \$ADAM\_USER to store parameter values.  If you don't
+the directory {\tt \$ADAM\_USER} to store parameter values.  If you don't
 tell your script or interactive session where this is located,
 tasks will use the same directory.  To prevent sharing of the
 parameter files use the following tip.
@@ -1740,15 +1740,87 @@ parameter files use the following tip.
      # end of script
 \end{verbatim}
 This creates a temporary directory ({\tt /user1/dro/vela/junk\_\$\$})
-and redefines \$ADAM\_USER to point to it.  Both exist only while the
+and redefines {\tt \$ADAM\_USER} to point to it.  Both exist only while the
 script runs.  The \$\$ substitutes the process identification number
 and so makes a unique name.  The backslash in \verb+\rm+ overrides
 any alias {\tt rm}.
 
 If you are executing graphics tasks which use the \xref{graphics
-database}{sun95}{se_agitate}, you may also need to redefine \$AGI\_USER
-to another directory.  Usually, it is satisfactory to equate \$AGI\_USER
-to the \$ADAM\_USER directory.
+database}{sun95}{se_agitate}, you may also need to redefine {\tt
+\$AGI\_USER} to another directory.  Usually, it is satisfactory to 
+equate {\tt \$AGI\_USER} to the {\tt \$ADAM\_USER} directory.
+
+\subsection{\xlabel{sc4_se_exit_status}How to test whether or not a
+Starlink task has failed}\label{sc4_se_exit_status}
+
+In a typical script involving Starlink software, you will invoke
+several applications.  Should any of them fail, you normally do not
+want the script to continue, unless an error is sometimes expected and
+your shell script can take appropriate action.  Either way you want a
+test that the application has succeeded.  
+
+If you set the ADAM\_EXIT \htmlref{{\sf environment
+variable}}{sc4_gl_env} to {\tt 1} in your script before calling
+Starlink applications then the {\tt status} variable after each task,
+will indicate whether or not the task has failed, where 1 means
+failure and 0 success.
+
+\small
+\begin{verbatim}
+     setenv ADAM_EXIT 1
+         .    .    .
+         .    .    .
+         .    .    .
+     stats allsky > /dev/null
+     echo $status
+     1
+     stats $KAPPA_DIR/comwest > /dev/null
+     echo $status
+     0
+\end{verbatim}
+\normalsize
+
+The NDF allsky is absent from the current directory, so {\bf stats}
+fails, reflected in the value of {\tt status}, whereas 
+\$KAPPA\_DIR/comwest does exist.
+
+Here's an example in action.
+\small
+\begin{verbatim}
+     setenv ADAM_EXIT 1
+         .    .    .
+         .    .    .
+         .    .    .
+     normalize in1=$ndfgen in2=$ndfin out=! device=! > /dev/null
+     if ( $status == 1 ) then
+        echo "normalize failed comparing $ndf1 and $ndf2."
+        goto tidy
+     else
+        set offset = `parget offset normalize`
+        set scale = `parget slope normalize`
+     endif
+         .    .    .
+         .    .    .
+         .    .    .
+     tidy:
+     \rm ${ndfgen}.sdf
+\end{verbatim}
+\normalsize
+
+The script first switches on the ADAM\_EXIT facility.  A little later
+you create an NDF represented by {\tt \$ndfgen} and then compare it with
+the input NDF {\tt \$ndfin} using \xref{{\bf normalize}}{sun95}{NORMALIZE}.
+If the task fails, you issue an error message and move to a block of
+code, normally near the end of the script, where various cleaning 
+operations occur.  In this case it removes the generated NDF.
+
+When {\bf normalize} terminates successfully, the script accesses the
+\htmlref{{\sf output parameters}}{sc4_gl_opar} for later processing
+with \xref{{\bf parget}}{sun95}{PARGET}.  This is explained in
+\begin{htmlonly}
+\htmlonly{\htmlref{Passing information between Starlink applications}{sc4_se_info_parameter}.}
+\end{htmlonly}
+\latexonly{Section~\ref{sc4_se_passing_info}.}
 
 \newpage
 \section{\xlabel{sc4_se_passing_info}Passing information between
@@ -4241,7 +4313,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       environment such as the terminal type or home directory.  It is
       defined with the {\bf setenv} command.  By convention, environment
       variables appear in uppercase.  Environment variables are often
-      used to refer to a directory.
+      used to refer to a directory or to tune software.
 
 \item {\bf\label{sc4_gl_figaro}Figaro}\\
       A general astronomical data-reduction package but concentrating
@@ -4298,7 +4370,12 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       A channel through which some Starlink applications write their
       results.  These tend to be applications that do not create an
       output dataset, such as statistics and dataset attributes.  They
-      are sometimes called ``Results parameters''.
+      are sometimes called ``Results parameters''.  For examples see
+\begin{htmlonly}
+      \htmlonly{\htmlref{Passing information between
+      Starlink applications}{sc4_se_info_parameter}.}
+\end{htmlonly}
+      \latexonly{Section~\ref{sc4_se_passing_info}.}
 
 \item {\bf\label{sc4_gl_path}Path}\\
       A list of directories which the system searches in turn to
@@ -4325,7 +4402,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       themselves, to refine the search.  Regular expressions empower
       utilities like {\bf grep}, {\bf sed} and {\bf awk}.  Although
       similar to shell \htmlref{wildcards}{sc4_gl_wild} there are
-      differences so be careful.
+      differences, so be careful.
 
 %      \begin{tabular}{lp{100mm}}
 %      Regular expression & Meaning \\ \hline
@@ -4351,7 +4428,11 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \item {\bf\label{sc4_gl_she_var}Shell variable}\\
       An identifier that can store one or more strings.  Variables
       enable string processing, and integer and logical expressions
-      in the \htmlref{shell}{sc4_gl_she}.
+      in the \htmlref{shell}{sc4_gl_she}.  See
+\begin{htmlonly}
+      \htmlref{Shell Variables}{sc4_se_variables}
+\end{htmlonly}
+      \latexonly{Section~\ref{sc4_se_variables}} for more details.
 
 \item {\bf\label{sc4_gl_std_inp}Standard input}\\
       The file from which most UNIX programmes read their input data.
