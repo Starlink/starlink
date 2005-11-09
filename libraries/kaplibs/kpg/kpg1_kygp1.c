@@ -2,6 +2,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "ast.h"
+#include "prm_par.h"
 #include "star/grp.h"
 #include "kaplibs_private.h"
 
@@ -63,10 +64,13 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 /* Local Variables: */ 
    AstObject *obj;              /* Pointer to nested AST Object */
    char *text;                  /* Sum of concatenated strings */
+   const char *cval;            /* Pointer to entry value */
    const char *key;             /* Key string for current entry in KeyMap */
    const char *value;           /* Value of current entry in KeyMap */
+   double dval;                 /* Double value */
    int *old_status;             /* Pointer to original status variable */
    int i;                       /* Index into supplied KeyMap */
+   int ival;                    /* Integer value */
    int n;                       /* Number of entries in the KeyMap */
    int nc;                      /* Length of "text" excluding trailing null */
    int type;                    /* Data type of current entry in KeyMap */
@@ -107,12 +111,25 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
          }
 
 /* If it is a primitive, format it and add it to the group. */
-      } else if( astMapGet0C( keymap, key, &value ) ) {
+      } else {
+
+/* If it is a numerical type, see if it has a bad value. */
+         cval = NULL;
+         if( type == AST__INTTYPE && astMapGet0I( keymap, key, &ival ) ){
+            if( ival == VAL__BADI ) cval = "<bad>";
+         } else if( type == AST__DOUBLETYPE && astMapGet0D( keymap, key, &dval ) ){
+            if( dval == VAL__BADD ) cval = "<bad>";
+         } 
+
+/* If it not bad, get its formatted value. */
+         if( !cval && astMapGet0C( keymap, key, &value ) ) cval = value;
+
+/* Put it in the group. */
          nc = 0;
          text = astAppendString( NULL, &nc, prefix );
          text = astAppendString( text, &nc, key );
          text = astAppendString( text, &nc, "=" );
-         text = astAppendString( text, &nc, value );
+         text = astAppendString( text, &nc, cval );
          grpPut1( *igrp, text, 0, status );
          text = astFree( text );
       }
