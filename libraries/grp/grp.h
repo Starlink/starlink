@@ -75,6 +75,7 @@ void grpGet( Grp *, int, int, char *const *, int, int * );
 void grpDelet( Grp **, int * );
 void grpValid( Grp *, int *, int * );
 Grp *grpNew( const char *, int * );
+void grpPut1( Grp *, const char *, int, int * );
 
 void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
 F77_INTEGER_TYPE grp1Getid( Grp *, int * );

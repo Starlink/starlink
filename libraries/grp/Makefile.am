@@ -50,7 +50,7 @@ BASIC_F_ROUTINES = grp1_cdesc.f grp1_conc.f grp1_cpoin.f grp1_eledt.f \
   grp1_trunc.f grp_copy.f grp_delet.f grp_get.f grp_getcc.f grp_getcs.f \
   grp_grpex.f grp_grpsz.f grp_gtype.f grp_head.f grp_index.f grp_infoc.f \
   grp_infoi.f grp_listf.f grp_new.f grp_own.f grp_ptype.f grp_purge.f \
-  grp_put.f grp_remov.f grp_setcc.f grp_setcs.f grp_setsz.f grp_sown.f \
+  grp_put.f grp_put1.f grp_remov.f grp_setcc.f grp_setcs.f grp_setsz.f grp_sown.f \
   grp_valid.f grp1_index.f grp1_chkcc.f grp1_rmesc.f grp1_vrbtm.f
 
 #  Additional Fortran routines required for the standalone library.

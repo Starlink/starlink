@@ -6,14 +6,14 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun150.6}
-\newcommand{\stardocnumber}    {150.6}
+\newcommand{\stardocsource}    {sun150.7}
+\newcommand{\stardocnumber}    {150.7}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {29th September 2005}
+\newcommand{\stardocdate}      {9th November 2005}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
-\newcommand{\stardocversion}   {Version 3.2}
+\newcommand{\stardocversion}   {Version 3.3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1351,6 +1351,9 @@ using \htmlref{GRP\_PUT}{GRP_PUT}, the \verb+^+ character would {\em not} cause 
 from the file LIST.DAT. Instead the string would be stored in the group exactly
 as supplied.
 
+The routine \htmlref{GRP\_PUT1}{GRP_PUT1} is like GRP\_PUT except that it
+stores just a single name, and so has a simpler interface.
+
 The routine \htmlref{GRP\_GROUP}{GRP_GROUP} obtains a group expression from the environment using a
 specified parameter and expands it into a list of literal names. These names are
 appended to the end of a group, which must previously have been created. An
@@ -1775,6 +1778,8 @@ group}
 group}
 \noteroutine{\htmlref{GRP\_PUT}{GRP_PUT}}{( IGRP, SIZE, NAMES, INDEX, STATUS )}
             {Store a list of explicit names in a group}
+\noteroutine{\htmlref{GRP\_PUT1}{GRP_PUT1}}{( IGRP, NAME, INDEX, STATUS )}
+            {Store a single name in a group}
 \noteroutine{\htmlref{GRP\_REMOV}{GRP_REMOV}}{( IGRP1, NAME, IGRP2, STATUS )}
             {Remove all occurrences of a given name from a group, putting the results in a new group}
 \noteroutine{\htmlref{GRP\_SETCC}{GRP_SETCC}}{( IGRP, CCLIST, CC, STATUS )}
@@ -1873,6 +1878,8 @@ calling application}
             {Add names specified by a given group expression into a group}
 \noteroutine{\htmlref{GRP\_PUT}{GRP_PUT}}{( IGRP, SIZE, NAMES, INDEX, STATUS )}
             {Store a list of explicit names in a group}
+\noteroutine{\htmlref{GRP\_PUT1}{GRP_PUT1}}{( IGRP, NAME, INDEX, STATUS )}
+            {Store a single name in a group}
 
 
 
@@ -3184,6 +3191,48 @@ environment}
    }
 }
 \sstroutine{
+   GRP\_PUT1
+}{
+   Put a single name into a group
+}{
+   \sstdescription{
+      The given name is stored in the group in the form in which it is
+      supplied (including any control characters). It overwrites
+      any previous name stored at the specified index. The name can be 
+      appended to the end of the group by giving INDEX a value of zero 
+      or one greater than the current size of the group. An error is 
+      reported if the name is added beyond the end of the group (i.e.  
+      if adding the name would result in a gap within the group for 
+      which no names would be defined).
+   }
+   \sstinvocation{
+      CALL GRP\_PUT1( IGRP, NAME, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name to be stored in the group. 
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index at which to store the name. A value of zero
+         causes the names to be appended to the end of the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    GRP\_REMOV
 }{
    Remove all occurrences of a given name from a group
@@ -3573,6 +3622,13 @@ library (see \xref{SUN/121}{sun121}{}), the CHR library (see
 Peter Draper is thanked for his work on porting the original IRH\_ package to
 UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
 improvements to the GRP\_ package.
+
+\section{Changes and New Features in V3.3}
+The following changes have occurred in the GRP\_ system since version 3.2:
+
+\begin{enumerate}
+\item The GRP\_PUT1 routine has been added.
+\end{enumerate}
 
 \section{Changes and New Features in V3.2}
 The following changes have occurred in the GRP\_ system since version 3.1:

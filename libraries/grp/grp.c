@@ -34,6 +34,7 @@
 #include "grp_err.h"
 #include "sae_par.h"
 #include "merswrap.h"
+#include <string.h>
 
 /* Wrapper function implementations. */
 /* ================================= */
@@ -231,6 +232,38 @@ Grp *grpNew( const char *type, int *status ){
    grp1Setid( ret, IGRP, status );
 
    return ret;
+}
+
+
+
+F77_SUBROUTINE(grp_put1)( INTEGER(IGRP), 
+                          CHARACTER(NAME), 
+                          INTEGER(INDEX), 
+                          INTEGER(STATUS)
+                          TRAIL(NAME) );
+
+
+void grpPut1( Grp *grp, const char *name, int index, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_CHARACTER_DYN(NAME);
+   DECLARE_INTEGER(INDEX);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grp1Getid( grp, status );
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+   F77_EXPORT_INTEGER( index, INDEX );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_put1)( INTEGER_ARG(&IGRP),
+                       CHARACTER_ARG(NAME),
+                       INTEGER_ARG(&INDEX),
+                       INTEGER_ARG(&STATUS) 
+                       TRAIL_ARG(NAME) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
 
