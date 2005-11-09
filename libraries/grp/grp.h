@@ -73,8 +73,11 @@ void grpFree( Grp **, int * );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
 void grpDelet( Grp **, int * );
+void grpValid( Grp *, int *, int * );
 
 void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
 F77_INTEGER_TYPE grp1Getid( Grp *, int * );
+
+
 
 #endif

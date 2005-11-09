@@ -177,3 +177,29 @@ void grpGet( Grp *igrp, int index, int size, char *const *names, int len,
 }
 
 
+
+
+F77_SUBROUTINE(grp_valid)( INTEGER(IGRP), 
+                           LOGICAL(VALID),
+                           INTEGER(STATUS) );
+
+void grpValid( Grp *igrp, int *valid, int *status ){
+   DECLARE_INTEGER(IGRP);
+   DECLARE_LOGICAL(VALID);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grp1Getid( igrp, status );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(grp_valid)( INTEGER_ARG(&IGRP),
+                        LOGICAL_ARG(&VALID),
+                        INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_LOGICAL( VALID, *valid );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
+
+
