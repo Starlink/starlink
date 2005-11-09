@@ -15,7 +15,7 @@
 #define SPD 86400.0                    /* Seconds per day */
 #define JCMT_LON "W155:28:37.20"       /* Longitude of JCMT */
 #define JCMT_LAT "N19:49:22.11"        /* Geodetic latitude of JCMT */
-
+const double RAD2DEG = 90.0 / PIBY2;   /* Convert Radians to degrees */
 
 /*+ sc2ast_createwcs - create WCS description */
 
@@ -52,6 +52,7 @@ int *status             /* global status (given and returned) */
                  (ra,dec) parameters by (az,el,tai). (dsb)
      07Nov2005 : Remove duplicate elevation argument (timj)
                  Remove unused parallactic angle argument (timj)
+     08Nov2005 : Use RAD2DEG global rather than 90*PIBY2 (timj)
 */
 
 {
@@ -282,8 +283,8 @@ int *status             /* global status (given and returned) */
 
    fitschan = astFitsChan ( NULL, NULL, "" );
 
-   sc2ast_makefitschan ( 0.0, 0.0, 1.0, 1.0, az*90.0/PIBY2,
-     el*90.0/PIBY2, "CLON-TAN", "CLAT-TAN", fitschan, status );
+   sc2ast_makefitschan ( 0.0, 0.0, 1.0, 1.0, az*RAD2DEG,
+     el*RAD2DEG, "CLON-TAN", "CLAT-TAN", fitschan, status );
 
    astClear ( fitschan, "Card" );
 
