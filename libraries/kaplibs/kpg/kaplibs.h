@@ -32,6 +32,7 @@
 
 #include "ast.h"
 #include "star/grp.h"
+#include "star/hds.h"
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Fillr( float, int, float *, int * );
@@ -42,4 +43,9 @@ void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, i
 void kpg1Pseed( int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 
+void irqDelet( int, int * );
+void irqRlse( char [5][DAT__SZLOC], int * );
+void irqNew( int, const char *, char [5][DAT__SZLOC], int * );
+void irqAddqn( char [5][DAT__SZLOC], const char *, int, const char *, int * );
+void irqSetqm( char [5][DAT__SZLOC], int, const char *, int, float *, int *, int * );
 #endif

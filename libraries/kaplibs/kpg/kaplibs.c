@@ -37,6 +37,7 @@
 #include "star/grp.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
+#include <string.h>
 
 
 /* Wrapper function implementations. */
@@ -271,3 +272,176 @@ void kpg1Pseed( int *status ){
    F77_CALL(kpg1_pseed)( INTEGER_ARG(&STATUS) );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_delet)( INTEGER(INDF),
+                           INTEGER(STATUS) );
+
+void irqDelet( int indf, int *status ){
+   DECLARE_INTEGER(INDF);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_CALL(irq_delet)( INTEGER_ARG(&INDF),
+                        INTEGER_ARG(&STATUS)  );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_rlse)( CHARACTER_ARRAY(LOCS), 
+                          INTEGER(STATUS)
+                          TRAIL(LOCS) );
+
+void irqRlse( char locs[5][DAT__SZLOC], int *status ){
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_INTEGER(STATUS);
+
+   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
+   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
+   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
+   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
+   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_CALL(irq_rlse)( CHARACTER_ARRAY_ARG(LOCS),
+                       INTEGER_ARG(&STATUS) 
+                       TRAIL_ARG(LOCS) );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+/* ------------------------------------- */
+
+F77_SUBROUTINE(irq_new)( INTEGER(INDF),
+                         CHARACTER(XNAME), 
+                         CHARACTER_ARRAY(LOCS), 
+                         INTEGER(STATUS)
+                         TRAIL(XNAME)
+                         TRAIL(LOCS) );
+
+void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC], 
+             int *status ){
+   DECLARE_INTEGER(INDF);
+   DECLARE_CHARACTER_DYN(XNAME);  
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_CREATE_CHARACTER( XNAME, strlen( xname ) );
+   F77_EXPORT_CHARACTER( xname, XNAME, XNAME_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_new)( INTEGER_ARG(&INDF),
+                      CHARACTER_ARG(XNAME),
+                      CHARACTER_ARRAY_ARG(LOCS),
+                      INTEGER_ARG(&STATUS) 
+                      TRAIL_ARG(XNAME)
+                      TRAIL_ARG(LOCS) );
+
+   cnfImprt( LOCS[0], DAT__SZLOC, locs[0] );
+   cnfImprt( LOCS[1], DAT__SZLOC, locs[1] );
+   cnfImprt( LOCS[2], DAT__SZLOC, locs[2] );
+   cnfImprt( LOCS[3], DAT__SZLOC, locs[3] );
+   cnfImprt( LOCS[4], DAT__SZLOC, locs[4] );
+
+   F77_FREE_CHARACTER( XNAME );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_addqn)( CHARACTER_ARRAY(LOCS), 
+                           CHARACTER(QNAME), 
+                           LOGICAL(DEFLT),
+                           CHARACTER(COMMNT), 
+                           INTEGER(STATUS)
+                           TRAIL(LOCS)
+                           TRAIL(QNAME)
+                           TRAIL(COMMNT) );
+
+void irqAddqn( char locs[5][DAT__SZLOC], const char *qname, int deflt,
+               const char *commnt, int *status ){
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_DYN(QNAME);  
+   DECLARE_LOGICAL(DEFLT);
+   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_INTEGER(STATUS);
+
+   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
+   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
+   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
+   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
+   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+
+   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
+   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_EXPORT_LOGICAL( deflt, DEFLT );
+   F77_CREATE_CHARACTER( COMMNT, strlen( commnt ) );
+   F77_EXPORT_CHARACTER( commnt, COMMNT, COMMNT_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_addqn)( CHARACTER_ARRAY_ARG(LOCS),
+                        CHARACTER_ARG(QNAME),
+                        LOGICAL_ARG(&DEFLT),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS) 
+                        TRAIL_ARG(LOCS) 
+                        TRAIL_ARG(QNAME) 
+                        TRAIL_ARG(COMMNT) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_setqm)( CHARACTER_ARRAY(LOCS), 
+                           LOGICAL(BAD),
+                           CHARACTER(QNAME), 
+                           INTEGER(SIZE),
+                           REAL_ARRAY(MASK), 
+                           INTEGER(SET),
+                           INTEGER(STATUS)
+                           TRAIL(LOCS)
+                           TRAIL(QNAME) );
+
+void irqSetqm( char locs[5][DAT__SZLOC], int bad, const char *qname, int size,
+               float *mask, int *set, int *status ){
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_LOGICAL(BAD);
+   DECLARE_CHARACTER_DYN(QNAME);  
+   DECLARE_INTEGER(SIZE);
+   DECLARE_REAL_ARRAY_DYN(MASK);  
+   DECLARE_INTEGER(SET);
+   DECLARE_INTEGER(STATUS);
+
+   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
+   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
+   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
+   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
+   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
+   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_EXPORT_INTEGER( size, SIZE );
+   F77_CREATE_REAL_ARRAY( MASK, size );
+   F77_EXPORT_REAL_ARRAY( mask, MASK, size );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_setqm)( CHARACTER_ARRAY_ARG(LOCS),
+                        LOGICAL_ARG(&BAD),
+                        CHARACTER_ARG(QNAME),
+                        INTEGER_ARG(&SIZE),
+                        REAL_ARRAY_ARG(MASK),
+                        INTEGER_ARG(&SET),
+                        INTEGER_ARG(&STATUS) 
+                        TRAIL_ARG(LOCS) 
+                        TRAIL_ARG(QNAME) );
+
+   F77_IMPORT_INTEGER( SET, *set );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_REAL( MASK );
+}
+
+
