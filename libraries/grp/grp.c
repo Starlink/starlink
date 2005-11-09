@@ -19,11 +19,18 @@
 
 *  Authors:
 *     DSB: David S Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-SEP-2005 (DSB):
 *        Original version.
+*     03-NOV-2005 (TIMJ):
+*        Use Grp* rather than plain integer
+*     09-NOV-2005 (DSB):
+*        Add grpValid, grpNew and grpPut1
+*     09-NOV-2005 (TIMJ):
+*        Fix return value of grp1Getid if input Grp* is NULL
 *     {enter_further_changes_here}
 */
 
@@ -89,6 +96,7 @@ F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
     *status = GRP__INTER;
     errRep( "GRP1_GETID_ERR", "Grp struct pointer was null in getid",
 	    status);
+    return (F77_INTEGER_TYPE) GRP__NOID;
   }
   return igrp->igrp;
 }
