@@ -163,6 +163,12 @@ void kpg1Gausr( float sigma, int ibox, int sambad, float wlim, int nx,
 
 /* ------------------------------- */
 
+void kpg1Kygrp( AstKeyMap *keymap, Grp **igrp, int *status ){
+  kpg1Kygp1( keymap, igrp, NULL, status );
+}
+
+/* ------------------------------- */
+
 void kpg1Kymap( Grp *igrp, AstKeyMap **keymap, int *status ){
   kpg1Kymp1( igrp, keymap, status );
 }
