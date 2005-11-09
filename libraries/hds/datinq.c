@@ -5,7 +5,7 @@
 /*+DATINQ.C-*/
 
 #include <stdio.h>
-#include <strings.h>             /* Includes prototype for "index()"        */
+#include <strings.h>
 
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "hds1.h"                /* Global definitions for HDS              */
@@ -58,8 +58,8 @@ datName(char locator_str[DAT__SZLOC],
 
 /* Convert to C string */
    name_str[DAT__SZNAM] = '\0';
-   if( (p =index(name_str, ' ')) != NULL )
-       *p = '\0'; 
+   if( (p = strchr( name_str, ' ' ) ) != NULL )
+       *p = '\0';
 
    return hds_gl_status;
 }
@@ -175,8 +175,8 @@ datType(char locator_str[DAT__SZLOC],
 
 /* Convert returned type to C string */
    type_str[DAT__SZTYP] = '\0';
-   if( (p =index(type_str, ' ')) != NULL )
-       *p = '\0'; 
+   if( ( p = strchr( type_str, ' ' ) ) != NULL )
+       *p = '\0';
 
    return hds_gl_status;
 }
@@ -557,7 +557,7 @@ datLen(char locator_str[DAT__SZLOC],
 /*============================*/
 /* DAT_STATE - Object state ? */
 /*============================*/
-int   
+int
 datState(char locator_str[DAT__SZLOC],
          int *state,
          int *status)

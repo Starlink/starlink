@@ -6,7 +6,7 @@
 
 /* Include files */
 #include <ctype.h>               /* Character classification                */
-#include <strings.h>             /* Includes prototype for "index()"        */
+#include <strings.h>             /* String handling functions               */
 
 #include "ems.h"                 /* EMS error reporting routines            */
 
@@ -178,7 +178,7 @@ hdsGroup(char locator_str[DAT__SZLOC],
 
 /* Convert to C string */
    group_str[DAT__SZGRP] = '\0';
-   if( (p=index(group_str,' ')) != NULL)
+   if( ( p = strchr( group_str,' ' ) ) != NULL)
       *p = '\0';
 
    return hds_gl_status;
