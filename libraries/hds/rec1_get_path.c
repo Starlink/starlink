@@ -131,7 +131,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
       int stat_val;              /* Shell process status information        */
       pid_t pid;                 /* ID of shell process                     */
 
-#if defined __MINGW32__
+#if __MINGW32__
       /* Use Windows separator */
 #define SLASH  '\\'
 #else
@@ -213,7 +213,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 /* Ignore the possible presence of special characters if the HDS__SHELL     */
 /* tuning parameter specifies that shell expansion of such characters is    */
 /* not to occur.                                                            */
-#if defined __MINGW32__
+#if __MINGW32__
       /* MinGW doesn't offer a shell facility so make sure it is disabled */
       hds_gl_shell = HDS__NOSHELL;
       special = 0;
@@ -341,7 +341,7 @@ a shell process - ^MESSAGE",
 /* directory.                                                               */
       if ( _ok( hds_gl_status ) )
       {
-#if defined __MINGW32__
+#if __MINGW32__
          /* Windows has absolute names starting with "x:" where x
           * is the drive letter */
          absolute = ( basename[ 1 ] == ':' );

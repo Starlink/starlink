@@ -2,7 +2,7 @@
 #  include <config.h>
 #endif
 
-#if defined( vms ) || defined __MINGW32__
+#if defined( vms ) || __MINGW32__
 void rec1_shell( void ){};       /* This routine not used on VMS and        */
                                  /* Windows systems                         */ 
 #else

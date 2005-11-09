@@ -152,7 +152,7 @@ void rec1_get_fid( void ){};     /* This routine is not used on VMS systems */
          fid->st_ino = statbuf.st_ino;
          fid->st_dev = statbuf.st_dev;
 
-#if defined __MING32__
+#if __MINGW32__
          /* Windows doesn't have inodes, so we need additional information to
           * determine if a file is really the same as another file. This extra
           * bit is stored in st_rdev (which usually a duplicate of device) */
