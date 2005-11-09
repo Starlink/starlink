@@ -202,7 +202,7 @@ void grpValid( Grp *igrp, int *valid, int *status ){
       F77_IMPORT_INTEGER( STATUS, *status );
 
    } else {
-      valid = 0;
+      *valid = 0;
    }      
 
    return;
