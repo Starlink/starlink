@@ -39,7 +39,7 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     - See also smf_fits_getD and smf_fits_getC
+*     - See also smf_fits_getD and smf_fits_getS
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
