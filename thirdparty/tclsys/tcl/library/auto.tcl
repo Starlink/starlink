@@ -3,7 +3,7 @@
 # utility procs formerly in init.tcl dealing with auto execution
 # of commands and can be auto loaded themselves.
 #
-# RCS: @(#) $Id: auto.tcl,v 1.12.2.5 2005/01/27 22:26:17 dgp Exp $
+# RCS: @(#) $Id: auto.tcl,v 1.12.2.8 2005/06/27 18:20:26 dgp Exp $
 #
 # Copyright (c) 1991-1993 The Regents of the University of California.
 # Copyright (c) 1994-1998 Sun Microsystems, Inc.
@@ -16,27 +16,26 @@
 #
 # Destroy all cached information for auto-loading and auto-execution,
 # so that the information gets recomputed the next time it's needed.
-# Also delete any procedures that are listed in the auto-load index,
-# except some of those defined in the Tcl script library.
+# Also delete any procedures that are listed in the auto-load index
+# except those defined in this file.
 #
 # Arguments: 
 # None.
 
 proc auto_reset {} {
-    if {[array exists ::auto_index]} {
-        foreach cmdName [array names ::auto_index] {
-	    if {[string match auto_* $cmdName]} {continue}
-	    set fqcn [namespace which $cmdName]
-	    if {$fqcn eq ""} {continue}
-	    if {[catch {info args $fqcn}]} {continue}
-	    if {[lsearch -exact {
-		::unknown ::pkg_mkIndex ::tclPkgSetup ::tcl_findLibrary
-		::pkg_compareExtension ::tclPkgUnknown ::tcl::MacOSXPkgUnknown
-		::tcl::MacPkgUnknown} $fqcn] != -1} {continue}
-            rename $fqcn {}
-        }
+    global auto_execs auto_index auto_oldpath
+    foreach p [info procs] {
+	if {[info exists auto_index($p)] && ![string match auto_* $p]
+		&& ([lsearch -exact {unknown pkg_mkIndex tclPkgSetup
+			tcl_findLibrary pkg_compareExtension
+			tclPkgUnknown tcl::MacOSXPkgUnknown
+			tcl::MacPkgUnknown} $p] < 0)} {
+	    rename $p {}
+	}
     }
-    unset -nocomplain ::auto_execs ::auto_index ::auto_oldpath
+    catch {unset auto_execs}
+    catch {unset auto_index}
+    catch {unset auto_oldpath}
 }
 
 # tcl_findLibrary --

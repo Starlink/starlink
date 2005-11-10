@@ -1,6 +1,6 @@
 Recent user-visible changes to Tcl:
 
-RCS: @(#) $Id: changes,v 1.79.2.18 2005/06/02 22:52:15 hobbs Exp $
+RCS: @(#) $Id: changes,v 1.79.2.26 2005/06/27 18:20:16 dgp Exp $
 
 1. No more [command1] [command2] construct for grouping multiple
 commands on a single command line.
@@ -6206,3 +6206,26 @@ Can support [load] from memory as well (steffen)
 Documentation improvements [1075433,1085127,1117017,1124160,1149605,etc.]
 
 --- Released 8.4.10, June 4, 2005 --- See ChangeLog for details ---
+
+2005-06-06 (bug fix)[1213678] Windows/gcc: crash in stack.test (kenny)
+
+2005-06-07 (bug fix) Unix: --enable-threads compile failure (fellows)
+
+2005-06-18 (bug fix)[1154163] [format %h] on 64-bit OS's (kraft,fellows)
+
+2005-06-21 (bug fix)[1201035,1224585] execution trace crashes (porter)
+
+2005-06-21 (bug fix)[1194458] Windows: [file split] (kenny,porter)
+
+2005-06-22 (bug fix)[1225727] Windows: pipe finalization crash (kenny)
+
+2005-06-22 (bug fix)[1225571] Windows: [file pathtype] buffer overflow (thoyts)
+
+2005-06-22 (bug fix)[1225044] Windows: UMR in pipe close (kenny)
+
+2005-06-23 (bug fix)[1225957] Windows/gcc: crashes in assembler code (kenny)
+
+2005-06-27 (revert)[1101670] [auto_reset] disabled in non-global namespace.
+Restores Tcl 8.4.9 behavior (porter)
+
+--- Released 8.4.11, June 28, 2005 --- See ChangeLog for details ---

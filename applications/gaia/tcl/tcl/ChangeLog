@@ -1,8 +1,160 @@
+2005-06-27  Don Porter  <dgp@users.sourceforge.net>
+
+	*** 8.4.11 TAGGED FOR RELEASE ***
+
+	* library/auto.tcl:	Reverted to Revision 1.12.2.3 (Tcl 8.4.9).
+	Restores the (buggy) behavior of [auto_reset] that fails to clear
+	away auto-loaded commands from non-global namespaces.  Fixing this
+	bug exposed an unknown number of buggy files out there (including at
+	least portions of the Tk script library) that cannot tolerate double
+	[source]-ing.  The burden of fixing these exposed bugs will not be
+	forced on package/extension/application authors until Tcl 8.5.
+
+2005-06-24  Kevin Kenny  <kennykb@acm.org>
+
+	* generic/tclEvent.c (Tcl_Finalize):
+	* generic/tclInt.h:
+	* generic/tclPreserve.c (TclFinalizePreserve): Changed the
+	finalization logic so that Tcl_Preserve finalizes after exit
+	handlers run; a lot of code called from Tk's exit handlers
+	presumes tha Tcl_Preserve will still work even from an exit
+	handler.  Also, made the assertion check that no exit handlers
+	are created in Tcl_Finalize conditional on TCL_MEM_DEBUG to
+	avoid spurious panics in the "stable" release.
+	
+2005-06-24  Don Porter  <dgp@users.sourceforge.net>
+
+	* library/auto.tcl:	Make file safe to re-[source] without
+	destroying registered auto_mkindex_parser hooks.
+
+2005-06-23  Daniel Steffen  <das@users.sourceforge.net>
+
+	* tools/tcltk-man2html.tcl: fixed useversion glob pattern to accept
+	multi-digit patchlevels.
+	
+2005-06-23  Kevin Kenny  <kennykb@acm.org>
+
+	* win/tclWinChan.c: More rewriting of __asm__ blocks that
+	* win/tclWinFCmd.c: implement SEH in GCC, because mingw's
+	gcc 3.4.2 is not as forgiving of violations committed by
+	the old code and caused panics. [Bug #1225957]
+	
+2005-06-23  Daniel Steffen  <das@users.sourceforge.net>
+
+	* unix/Makefile.in (install-private-headers): rewrite tclPort.h when
+	installing private headers to remove ../unix relative #include path to
+	tclUnixPort.h (which is incorrect at the installed location).
+
+2005-06-22  Kevin Kenny <kennykb@acm.org>
+
+	* generic/tclInt.h:    			    Changed the finalization
+	* generic/tclEvent.c (Tcl_Finalize):        logic to defer the
+	* generic/tclIO.c (TclFinalizeIOSubsystem): shutdown of the pipe
+	* unix/tclUnixPipe.c (TclFinalizePipes):    management until after
+	* win/tclWinPipe.c (TclFinalizePipes):      all channels have been
+	    closed, in order to avoid a situation where the Windows
+	    PipeCloseProc2 would re-establish the exit handler after
+	    exit handlers had already run, corrupting the heap.
+	    [Bug #1225727]
+	Corrected a read of uninitialized memory in PipeCloseProc2,
+	which (at least on certain configurations) caused a great
+	number of tests to either fail or hang [Bug #1225044].
+	
+2005-06-22  Andreas Kupries <andreask@activestate.com>
+
+	* generic/tclInt.h: Followup to change made on 2005-06-18 by
+	  Daniel Steffen. There are compilers (*) who error out on the
+	  redefinition of WORDS_BIGENDIAN. We have to undef the previous
+	  definition (on the command line) first to make this
+	  acceptable. (*): AIX native.
+
+2005-06-22  Don Porter  <dgp@users.sourceforge.net>
+
+	* win/tclWinFile.c:	Potential buffer overflow.  [Bug 1225571]
+	Thanks to Pat Thoyts for discovery and fix.
+
+	* tests/safe.test:	Backport performance improvement from 
+	reduced $::auto_path.
+
+2005-06-21  Pat Thoyts  <patthoyts@users.sourceforge.net>
+
+	* tests/winDde.test: Added some waits to the dde server script to
+	let event processing run after we create the dde server and before
+	we exit the server process. This avoids 'server did not respond'
+	errors.
+
+2005-06-21  Kevin Kenny  <kennykb@acm.org>
+
+	* generic/tclFileName.c: Corrected a problem where a directory name
+	containing a colon can crash the process on Windows [Bug 1194458].
+	* tests/fileName.test: Added test for [file split] and
+	[file join] with a name containing a colon.
+	* win/tclWinPipe.c: Reverted davygrvy's changes of 2005-04-19;
+	they cause multiple failures in io.test.  [Bug 1225044, still open].
+	
+2005-06-21  Don Porter  <dgp@users.sourceforge.net>
+
+	* generic/tclBasic.c:	Made the walk of the active trace list aware
+	* generic/tclCmdMZ.c:	of the direction of trace scanning, so the
+	* generic/tclInt.h:	proper correction can be made. [Bug 1224585]
+	* tests/trace.test (trace-34.2,3):
+
+	* generic/tclBasic.c (Tcl_DeleteTrace):	Added missing walk of the
+	* tests/trace.test (trace-34.1):	list of active traces to
+	cleanup references to traces being deleted. [Bug 1201035]
+
+2005-06-20  Don Porter  <dgp@users.sourceforge.net>
+
+	* doc/FileSystem.3: added missing Tcl_GlobTypeData documentation
+	[Bug 935853]
+
+2005-06-18  Daniel Steffen  <das@users.sourceforge.net>
+
+	* generic/tclInt.h: ensure WORDS_BIGENDIAN is defined correctly with fat
+	compiles on Darwin (i.e. ppc and i386 at the same time), the configure
+	AC_C_BIGENDIAN check is not sufficient in this case because a single run
+	of the compiler builds for two architectures with different endianness.
+
+	* unix/tcl.m4 (Darwin): add -headerpad_max_install_names to LDFLAGS to
+	ensure we can always relocate binaries with install_name_tool.
+
+	* unix/configure: autoconf-2.13
+
+2005-06-18  Don Porter  <dgp@users.sourceforge.net>
+
+	* changes:		Update changes for 8.4.11 release
+
+	* README:		Bump version number to 8.4.11
+	* generic/tcl.h:
+	* tools/tcl.wse.in:
+	* unix/configure.in:
+	* unix/tcl.spec:
+	* win/README.binary:
+	* win/configure.in:
+
+	* unix/configure:	autoconf
+	* win/configure:	
+
+2005-06-18  Donal K. Fellows  <donal.k.fellows@man.ac.uk>
+
+	* generic/tclCmdAH.c (Tcl_FormatObjCmd): Fix for [Bug 1154163]; only
+	* tests/format.test: insert 'l' modifier when it is needed.
+
+2005-06-07  Donal K. Fellows  <donal.k.fellows@man.ac.uk>
+
+	* unix/tclUnixNotfy.c (Tcl_FinalizeNotifier): Add dummy variable
+	so threaded build compiles.
+
+2005-06-06  Kevin B. Kenny  <kennykb@acm.org>
+
+	* win/tclWin32Dll.c: Corrected another buglet in the assembly
+	code for stack probing on Win32/gcc. [Bug #1213678]
+
 2005-06-03  Daniel Steffen  <das@users.sourceforge.net>
 
 	*** 8.4.10 TAGGED FOR RELEASE ***
 
-	* unix/tclLoadDyld.c: fixed header confilict when building this file
+	* unix/tclLoadDyld.c: fixed header conflict when building this file
 	with USE_TCL_STUBS.
 	
 	* macosx/Makefile: fixed 'embedded' target.

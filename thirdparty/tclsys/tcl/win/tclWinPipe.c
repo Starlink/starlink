@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tclWinPipe.c,v 1.33.2.10 2005/04/19 16:28:22 davygrvy Exp $
+ * RCS: @(#) $Id: tclWinPipe.c,v 1.33.2.13 2005/06/22 21:30:20 kennykb Exp $
  */
 
 #include "tclWinInt.h"
@@ -201,7 +201,6 @@ static DWORD WINAPI	PipeReaderThread(LPVOID arg);
 static void		PipeSetupProc(ClientData clientData, int flags);
 static void		PipeWatchProc(ClientData instanceData, int mask);
 static DWORD WINAPI	PipeWriterThread(LPVOID arg);
-static void		ProcExitHandler(ClientData clientData);
 static int		TempFileName(WCHAR name[MAX_PATH]);
 static int		WaitForRead(PipeInfo *infoPtr, int blocking);
 
@@ -263,7 +262,6 @@ PipeInit()
 	if (!initialized) {
 	    initialized = 1;
 	    procList = NULL;
-	    Tcl_CreateExitHandler(ProcExitHandler, NULL);
 	}
 	Tcl_MutexUnlock(&pipeMutex);
     }
@@ -304,7 +302,7 @@ PipeExitHandler(
 /*
  *----------------------------------------------------------------------
  *
- * ProcExitHandler --
+ * TclpFinalizePipes --
  *
  *	This function is called to cleanup the process list before
  *	Tcl is unloaded.
@@ -318,9 +316,8 @@ PipeExitHandler(
  *----------------------------------------------------------------------
  */
 
-static void
-ProcExitHandler(
-    ClientData clientData)	/* Old window proc */
+void
+TclpFinalizePipes()
 {
     Tcl_MutexLock(&pipeMutex);
     initialized = 0;
@@ -1887,7 +1884,7 @@ PipeClose2Proc(
 
     errorCode = 0;
     if ((!flags || (flags == TCL_CLOSE_READ))
-	    && (pipePtr->readFile != NULL)) {
+	&& (pipePtr->readFile != NULL)) {
 	/*
 	 * Clean up the background thread if necessary.  Note that this
 	 * must be done before we can close the file, since the 
@@ -1916,7 +1913,7 @@ PipeClose2Proc(
 		 */
 
 		if (WaitForSingleObject(pipePtr->readThread, 20)
-			== WAIT_TIMEOUT) {
+		    == WAIT_TIMEOUT) {
 		    /*
 		     * The thread must be blocked waiting for the pipe to
 		     * become readable in ReadFile().  There isn't a clean way
@@ -1952,7 +1949,7 @@ PipeClose2Proc(
 	pipePtr->readFile = NULL;
     }
     if ((!flags || (flags & TCL_CLOSE_WRITE))
-	    && (pipePtr->writeFile != NULL)) {
+	&& (pipePtr->writeFile != NULL)) {
 
 	if (pipePtr->writeThread) {
 	    /*
@@ -1985,7 +1982,7 @@ PipeClose2Proc(
 		 */
 
 		if (WaitForSingleObject(pipePtr->writeThread, 20)
-			== WAIT_TIMEOUT) {
+		    == WAIT_TIMEOUT) {
 		    /*
 		     * The thread must be blocked waiting for the pipe to
 		     * consume input in WriteFile().  There isn't a clean way
@@ -2038,8 +2035,8 @@ PipeClose2Proc(
      */
 
     for (nextPtrPtr = &(tsdPtr->firstPipePtr), infoPtr = *nextPtrPtr;
-	    infoPtr != NULL;
-	    nextPtrPtr = &infoPtr->nextPtr, infoPtr = *nextPtrPtr) {
+	 infoPtr != NULL;
+	 nextPtrPtr = &infoPtr->nextPtr, infoPtr = *nextPtrPtr) {
 	if (infoPtr == (PipeInfo *)pipePtr) {
 	    *nextPtrPtr = infoPtr->nextPtr;
 	    break;
@@ -2057,8 +2054,13 @@ PipeClose2Proc(
 	Tcl_ReapDetachedProcs();
 
 	if (pipePtr->errorFile) {
-	    TclpCloseFile(pipePtr->errorFile);
+	    if (TclpCloseFile(pipePtr->errorFile) != 0) {
+		if ( errorCode == 0 ) {
+		    errorCode = errno;
+		}
+	    }
 	}
+	result = 0;
     } else {
 	/*
 	 * Wrap the error file into a channel and give it to the cleanup
@@ -2070,18 +2072,18 @@ PipeClose2Proc(
 
 	    filePtr = (WinFile*)pipePtr->errorFile;
 	    errChan = Tcl_MakeFileChannel((ClientData) filePtr->handle,
-		    TCL_READABLE);
+					  TCL_READABLE);
 	    ckfree((char *) filePtr);
 	} else {
 	    errChan = NULL;
 	}
 
 	result = TclCleanupChildren(interp, pipePtr->numPids,
-		pipePtr->pidPtr, errChan);
+				    pipePtr->pidPtr, errChan);
     }
 
     if (pipePtr->numPids > 0) {
-	ckfree((char *) pipePtr->pidPtr);
+        ckfree((char *) pipePtr->pidPtr);
     }
 
     if (pipePtr->writeBuf != NULL) {
@@ -2091,7 +2093,7 @@ PipeClose2Proc(
     ckfree((char*) pipePtr);
 
     if (errorCode == 0) {
-	return result;
+        return result;
     }
     return errorCode;
 }
