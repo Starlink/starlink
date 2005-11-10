@@ -326,7 +326,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Create an NDF containing the model values calculated abovem with bad
    values at all other pixels. The size of this NDF is the minimum needed
    to contain the clump. */
-      ndfOpen( loc, name, mode, stat, indf, place, status )
+/*      ndfOpen( loc, name, mode, stat, indf, place, status ) */
 
 
 
