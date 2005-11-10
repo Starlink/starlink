@@ -6,19 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: import.test,v 1.2 2000/06/01 20:34:35 wart Exp $
+#      RCS:  $Id: import.test,v 1.6 2004/04/29 05:57:42 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
-package require tcltest
-namespace import -force ::tcltest::*
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest 2.1
+    namespace import -force ::tcltest::test
+}
 
-if {[string compare test [info procs test]] == 1} then {source defs}
-
-package require Itcl
+::tcltest::loadTestedCommands
 
 # ----------------------------------------------------------------------
 #  Test "itcl::import::stub" command
@@ -40,15 +40,15 @@ test import-1.3 {"stub exists" requires one argument} {
 } {1 {wrong # args: should be "itcl::import::stub exists name"} 1 {wrong # args: should be "itcl::import::stub exists name"}}
 
 set interp [interp create]
-$interp eval {
-    package require Itcl
+$interp eval [subst -novariables {
+    [::tcltest::configure -load]
     proc auto_load {cmd {namespace {}}} {
         global debug
-        proc $cmd {args} [format {return "%s: $args"} $cmd]
+        proc $cmd {args} \[format {return "%s: $args"} $cmd\]
         append debug "(auto_load: $cmd)"
         return 1
     }
-}
+}]
 
 test import-1.4 {"stub create" creates a stub that triggers autoloading} {
     $interp eval {
@@ -64,7 +64,7 @@ test import-1.5 {"stub exists" recognizes stubs created by "stub create"} {
     $interp eval {
         set debug ""
         itcl::import::stub create foo::bar::stub1
-        proc foo::bar::proc1 {args} {return "proc1: $args"}
+        proc foo::bar::proc1 {{args {}}} {return "proc1: $args"}
         list [itcl::import::stub exists foo::bar::stub1] \
              [itcl::import::stub exists foo::bar::proc1]
     }
@@ -88,13 +88,13 @@ catch {interp delete $interp}
 #  Test "itcl::import::stub" command
 # ----------------------------------------------------------------------
 set interp [interp create]
-$interp eval {
-    package require Itcl
+$interp eval [subst -novariables {
+    [::tcltest::configure -load]
     proc auto_load {cmd {namespace {}}} {
-        proc $cmd {args} [format {return "%s: $args"} $cmd]
+        proc $cmd {args} \[format {return "%s: $args"} $cmd\]
         return 1
     }
-}
+}]
 
 test import-2.1 {initialize some commands for autoloading} {
     $interp eval {

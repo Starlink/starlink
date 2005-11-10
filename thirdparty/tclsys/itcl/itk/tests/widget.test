@@ -6,7 +6,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: widget.test,v 1.4 2000/07/06 06:43:33 mmc Exp $
+#      RCS:  $Id: widget.test,v 1.6 2004/09/22 09:37:09 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -16,9 +16,8 @@
 package require tcltest
 namespace import -force ::tcltest::*
 
-if {[string compare test [info procs test]] == 1} then {source defs}
+::tcltest::loadTestedCommands
 
-package require Itk
 
 # ----------------------------------------------------------------------
 #  Simple mega-widget
@@ -264,6 +263,128 @@ test widget-1.26 {when an internal component is deleted (but not destroyed) it i
          [bind itk-destroy-$comp <Destroy>] \
          [.testWidget configure]
 } {{itk-destroy-.testWidget.t2 .testWidget.t2 Button . all} {namespace inscope ::itk::Archetype {::.testWidget itk_component delete test2}} 0 {.testWidget.t2 Button . all} {} {{-background background Background linen linen} {-clientdata clientData ClientData {} {}} {-cursor cursor Cursor {} {}} {-status status Status {} {}}}}
+
+test widget-1.27 {when a mega-widget object is deleted, its window and any
+        components are destroyed (even if in another window) } {
+    catch {destroy .t1}
+    catch {rename .t1.bw {}}
+    catch {itcl::delete class ButtonWidget}
+
+    itcl::class ButtonWidget {
+        inherit itk::Widget
+
+        constructor {args} {
+            eval itk_initialize $args
+
+            itk_component add button {
+                button $itk_option(-container).b -text Button
+            } {}
+            pack $itk_component(button)
+        }
+
+        itk_option define -container container Container {}
+    }
+
+    toplevel .t1
+    frame .t1.f
+    ButtonWidget .t1.bw -container .t1.f
+
+    pack .t1.f
+    pack .t1.bw
+
+    set button [.t1.bw component button]
+    itcl::delete object .t1.bw
+    set result [list $button [winfo exists $button]]
+    destroy .t1
+    itcl::delete class ButtonWidget
+    set result
+} {.t1.f.b 0}
+
+test widget-1.28 {when a window that contains a megawidget component
+        is destroyed, the component is removed from the megawidget} {
+    catch {destroy .t1}
+    catch {rename .t1.bw {}}
+    catch {itcl::delete class ButtonWidget}
+
+    itcl::class ButtonWidget {
+        inherit itk::Widget
+
+        constructor {args} {
+            eval itk_initialize $args
+
+            itk_component add button {
+                button $itk_option(-container).b -text Button
+            } {}
+            pack $itk_component(button)
+        }
+
+        itk_option define -container container Container {}
+    }
+
+    toplevel .t1
+    frame .t1.f
+    ButtonWidget .t1.bw -container .t1.f
+
+    pack .t1.f
+    pack .t1.bw
+    set result [list [.t1.bw component]]
+    destroy .t1.f
+    lappend result [list [.t1.bw component]]
+
+    itcl::delete object .t1.bw
+    destroy .t1
+    itcl::delete class ButtonWidget
+    set result
+} {{button hull} hull}
+
+test widget-1.29 {when destroying a component that is inside another
+        window protect against that case where one component destroy
+        actually destroys other contained components} {
+    catch {destroy .t1}
+    catch {rename .t1.bw {}}
+    catch {itcl::delete class ButtonWidget}
+
+    itcl::class ButtonWidget {
+        inherit itk::Widget
+
+        constructor {args} {
+            eval itk_initialize $args
+
+            # Note, the component names matter here since
+            # [.t2 component] returns names in hash order.
+            # We need to delete cframe first since it
+            # is the parent of cbutton.
+
+            itk_component add cframe {
+                button $itk_option(-container).cframe
+            } {}
+            pack $itk_component(cframe)
+
+            itk_component add cbutton {
+                button $itk_component(cframe).b -text Button
+            } {}
+            pack $itk_component(cbutton)
+        }
+
+        itk_option define -container container Container {}
+    }
+
+    toplevel .t1
+    frame .t1.f
+    ButtonWidget .t1.bw -container .t1.f
+
+    pack .t1.f
+    pack .t1.bw
+    set result [list [.t1.bw component]]
+    # destructor should destroy cframe but not cbutton
+    itcl::delete object .t1.bw
+    lappend result [winfo exists .t1.f.cframe]
+
+    destroy .t1
+    itcl::delete class ButtonWidget
+    set result
+} {{hull cframe cbutton} 0}
+
 
 # ----------------------------------------------------------------------
 #  Clean up

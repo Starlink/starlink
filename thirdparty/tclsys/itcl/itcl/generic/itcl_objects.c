@@ -22,7 +22,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_objects.c,v 1.5 2001/05/22 15:32:47 davygrvy Exp $
+ *     RCS:  $Id: itcl_objects.c,v 1.13 2003/12/23 03:11:04 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -38,7 +38,7 @@ static void ItclReportObjectUsage _ANSI_ARGS_((Tcl_Interp *interp,
     ItclObject* obj));
 
 static char* ItclTraceThisVar _ANSI_ARGS_((ClientData cdata,
-    Tcl_Interp *interp, char *name1, char *name2, int flags));
+    Tcl_Interp *interp, CONST char *name1, CONST char *name2, int flags));
 
 static void ItclDestroyObject _ANSI_ARGS_((ClientData cdata));
 static void ItclFreeObject _ANSI_ARGS_((char* cdata));
@@ -73,7 +73,7 @@ static void ItclCreateObjVar _ANSI_ARGS_((Tcl_Interp *interp,
 int
 Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
     Tcl_Interp *interp;      /* interpreter mananging new object */
-    char* name;              /* name of new object */
+    CONST char* name;        /* name of new object */
     ItclClass *cdefn;        /* class for new object */
     int objc;                /* number of arguments */
     Tcl_Obj *CONST objv[];   /* argument objects */
@@ -102,8 +102,8 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
      *  only in the current namespace context.  Otherwise, we might
      *  find a global command, but that wouldn't be clobbered!
      */
-    cmd = Tcl_FindCommand(interp, name, (Tcl_Namespace*)NULL,
-        TCL_NAMESPACE_ONLY);
+    cmd = Tcl_FindCommand(interp, (CONST84 char *)name,
+	(Tcl_Namespace*)NULL, TCL_NAMESPACE_ONLY);
 
     if (cmd != NULL && !Itcl_IsStub(cmd)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
@@ -192,7 +192,7 @@ Itcl_CreateObject(interp, name, cdefn, objc, objv, roPtr)
                 if (cdPtr == cdefnPtr) {
                     ItclCreateObjVar(interp, vdefn, newObj);
                     Tcl_SetVar2(interp, "this", (char*)NULL, "", 0);
-                    Tcl_TraceVar2(interp, "this", (char*)NULL,
+                    Tcl_TraceVar2(interp, "this", NULL,
                         TCL_TRACE_READS|TCL_TRACE_WRITES, ItclTraceThisVar,
                         (ClientData)newObj);
                 }
@@ -490,7 +490,7 @@ ItclDestructBase(interp, contextObj, contextClass, flags)
 int
 Itcl_FindObject(interp, name, roPtr)
     Tcl_Interp *interp;      /* interpreter containing this object */
-    char *name;              /* name of the object */
+    CONST char *name;        /* name of the object */
     ItclObject **roPtr;      /* returns: object data or NULL */
 {
     Tcl_Namespace *contextNs = NULL;
@@ -522,9 +522,8 @@ Itcl_FindObject(interp, name, roPtr)
         *roPtr = NULL;
     }
 
-    if (cmdName != name) {
-        ckfree(cmdName);
-    }
+    ckfree(cmdName);
+
     return TCL_OK;
 }
 
@@ -704,15 +703,15 @@ Itcl_HandleInstance(clientData, interp, objc, objv)
  *  anything goes wrong, this returns NULL.
  * ------------------------------------------------------------------------
  */
-char*
+CONST char*
 Itcl_GetInstanceVar(interp, name, contextObj, contextClass)
     Tcl_Interp *interp;       /* current interpreter */
-    char *name;               /* name of desired instance variable */
+    CONST char *name;         /* name of desired instance variable */
     ItclObject *contextObj;   /* current object */
     ItclClass *contextClass;  /* name is interpreted in this scope */
 {
     ItclContext context;
-    char *val;
+    CONST char *val;
 
     /*
      *  Make sure that the current namespace context includes an
@@ -736,7 +735,8 @@ Itcl_GetInstanceVar(interp, name, contextObj, contextClass)
         return NULL;
     }
 
-    val = Tcl_GetVar2(interp, name, (char*)NULL, TCL_LEAVE_ERR_MSG);
+    val = Tcl_GetVar2(interp, (CONST84 char *)name, (char*)NULL,
+	    TCL_LEAVE_ERR_MSG);
     Itcl_PopContext(interp, &context);
 
     return val;
@@ -849,11 +849,11 @@ ItclReportObjectUsage(interp, contextObj)
 /* ARGSUSED */
 static char*
 ItclTraceThisVar(cdata, interp, name1, name2, flags)
-    ClientData cdata;        /* object instance data */
-    Tcl_Interp *interp;      /* interpreter managing this variable */
-    char *name1;             /* variable name */
-    char *name2;             /* unused */
-    int flags;               /* flags indicating read/write */
+    ClientData cdata;	    /* object instance data */
+    Tcl_Interp *interp;	    /* interpreter managing this variable */
+    CONST char *name1;	    /* variable name */
+    CONST char *name2;	    /* unused */
+    int flags;		    /* flags indicating read/write */
 {
     ItclObject *contextObj = (ItclObject*)cdata;
     char *objName;
@@ -871,8 +871,8 @@ ItclTraceThisVar(cdata, interp, name1, name2, flags)
                 contextObj->accessCmd, objPtr);
         }
 
-        objName = Tcl_GetStringFromObj(objPtr, (int*)NULL);
-        Tcl_SetVar(interp, name1, objName, 0);
+        objName = Tcl_GetString(objPtr);
+        Tcl_SetVar(interp, (CONST84 char *)name1, objName, 0);
 
         Tcl_DecrRefCount(objPtr);
         return NULL;
@@ -1144,7 +1144,7 @@ ItclCreateObjVar(interp, vdefn, contextObj)
 int
 Itcl_ScopedVarResolver(interp, name, contextNs, flags, rPtr)
     Tcl_Interp *interp;        /* current interpreter */
-    char *name;                /* variable name being resolved */
+    CONST char *name;                /* variable name being resolved */
     Tcl_Namespace *contextNs;  /* current namespace context */
     int flags;                 /* TCL_LEAVE_ERR_MSG => leave error message */
     Tcl_Var *rPtr;             /* returns: resolved variable */
@@ -1175,7 +1175,8 @@ Itcl_ScopedVarResolver(interp, name, contextNs, flags, rPtr)
         errs = NULL;
     }
 
-    if (Tcl_SplitList(errs, name, &namec, &namev) != TCL_OK) {
+    if (Tcl_SplitList(errs, (CONST84 char *)name, &namec, &namev)
+	    != TCL_OK) {
         return TCL_ERROR;
     }
     if (namec != 3) {

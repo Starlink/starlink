@@ -23,7 +23,6 @@
 # they are prefaced with white space.
 #
 namespace import itcl::*
-namespace import blt::*
 
 class Simple1 {
     variable x 0
@@ -34,11 +33,6 @@ class Simple1 {
     public variable by 1
     public method bump {}
   }
-
-itcl_class OldStyle {
-  public x 0
-  method foo {args} {return $args}
-}
 
 itcl::ensemble ens {
     part one {x} {}

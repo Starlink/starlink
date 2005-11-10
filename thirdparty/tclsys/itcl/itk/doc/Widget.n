@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: $Id: Widget.n,v 1.1 1998/07/27 18:45:36 stanton Exp $
+'\" RCS: $Id: Widget.n,v 1.2 2004/09/01 04:23:10 davygrvy Exp $
 '\"
 .so man.macros
 .TH Widget n 3.0 itk "[incr\ Tk]"
@@ -60,7 +60,7 @@ option add *TextDisplay.textBackground ivory widgetDefault
 option add *TextDisplay.width 40 widgetDefault
 option add *TextDisplay.height 10 widgetDefault
 
-class TextDisplay {
+itcl::class TextDisplay {
     inherit itk::Widget
 
     constructor {args} {
@@ -87,20 +87,20 @@ class TextDisplay {
     public method append {info}
 }
 
-body TextDisplay::display {info} {
+itcl::body TextDisplay::display {info} {
     $itk_component(text) configure -state normal
     $itk_component(text) delete 1.0 end
     $itk_component(text) insert 1.0 $info
     $itk_component(text) configure -state disabled
 }
 
-body TextDisplay::append {info} {
+itcl::body TextDisplay::append {info} {
     $itk_component(text) configure -state normal
     $itk_component(text) insert end $info
     $itk_component(text) configure -state disabled
 }
 
-usual TextDisplay {
+itk::usual TextDisplay {
     keep -background -cursor -foreground -font
     keep -activebackground -activerelief
     keep -highlightcolor -highlightthickness

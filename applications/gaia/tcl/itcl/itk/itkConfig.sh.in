@@ -13,8 +13,6 @@
 
 # Itcl's version number.
 ITCL_VERSION='@ITCL_VERSION@'
-ITCL_MAJOR_VERSION='@ITCL_MAJOR_VERSION@'
-ITCL_MINOR_VERSION='@ITCL_MINOR_VERSION@'
 
 # The name of the Itk library (may be either a .a file or a shared library):
 ITK_LIB_FILE=@ITK_LIB_FILE@

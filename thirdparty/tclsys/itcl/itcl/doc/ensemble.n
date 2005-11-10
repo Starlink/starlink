@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\" 
-'\" RCS: $Id: ensemble.n,v 1.1 1998/07/27 18:42:00 stanton Exp $
+'\" RCS: $Id: ensemble.n,v 1.4 2004/09/25 22:50:43 davygrvy Exp $
 '\" 
 .so man.macros
 .TH ensemble n 3.0 itcl "[incr\ Tcl]"
@@ -13,7 +13,7 @@
 .SH NAME
 ensemble \- create or modify a composite command
 .SH SYNOPSIS
-\fBensemble \fIensName\fR ?\fIcommand arg arg...\fR?
+\fBitcl::ensemble \fIensName\fR ?\fIcommand arg arg...\fR?
 .br
 or
 .br
@@ -150,14 +150,14 @@ wait window .
 .CE
 The Tcl package could define the following ensemble:
 .CS
-ensemble wait part variable {name} {
+itcl::ensemble wait part variable {name} {
     uplevel vwait $name
 }
 .CE
 The Tk package could add some options to this ensemble, with a
 command like this:
 .CS
-ensemble wait {
+itcl::ensemble wait {
     part visibility {name} {
         tkwait visibility $name
     }

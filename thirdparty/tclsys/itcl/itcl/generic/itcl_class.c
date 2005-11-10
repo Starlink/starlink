@@ -23,7 +23,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_class.c,v 1.9 2001/05/22 01:35:38 davygrvy Exp $
+ *     RCS:  $Id: itcl_class.c,v 1.18 2004/12/14 08:16:23 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -67,10 +67,10 @@ extern int itclCompatFlags;
  */
 int
 Itcl_CreateClass(interp, path, info, rPtr)
-    Tcl_Interp* interp;      /* interpreter that will contain new class */
-    char* path;              /* name of new class */
-    ItclObjectInfo *info;    /* info for all known objects */
-    ItclClass **rPtr;        /* returns: pointer to class definition */
+    Tcl_Interp* interp;		/* interpreter that will contain new class */
+    CONST char* path;		/* name of new class */
+    ItclObjectInfo *info;	/* info for all known objects */
+    ItclClass **rPtr;		/* returns: pointer to class definition */
 {
     char *head, *tail;
     Tcl_DString buffer;
@@ -89,8 +89,8 @@ Itcl_CreateClass(interp, path, info, rPtr)
      *  We'll just replace the namespace data below with the
      *  proper class data.
      */
-    classNs = Tcl_FindNamespace(interp, path, (Tcl_Namespace*)NULL,
-        /* flags */ 0);
+    classNs = Tcl_FindNamespace(interp, (CONST84 char *)path,
+	    (Tcl_Namespace*)NULL, /* flags */ 0);
 
     if (classNs != NULL && Itcl_IsClassNamespace(classNs)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
@@ -105,8 +105,8 @@ Itcl_CreateClass(interp, path, info, rPtr)
      *  usual Tcl commands from being clobbered when a programmer
      *  makes a bogus call like "class info".
      */
-    cmd = Tcl_FindCommand(interp, path, (Tcl_Namespace*)NULL,
-        /* flags */ TCL_NAMESPACE_ONLY);
+    cmd = Tcl_FindCommand(interp, (CONST84 char *)path,
+	    (Tcl_Namespace*)NULL, /* flags */ TCL_NAMESPACE_ONLY);
 
     if (cmd != NULL && !Itcl_IsStub(cmd)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
@@ -181,7 +181,7 @@ Itcl_CreateClass(interp, path, info, rPtr)
     Itcl_PreserveData((ClientData)cdPtr);
 
     if (classNs == NULL) {
-        classNs = Tcl_CreateNamespace(interp, path,
+        classNs = Tcl_CreateNamespace(interp, (CONST84 char *)path,
             (ClientData)cdPtr, ItclDestroyClassNamesp);
     }
     else {
@@ -398,9 +398,15 @@ ItclDestroyClassNamesp(cdata)
     elem = Itcl_FirstListElem(&cdefnPtr->derived);
     while (elem) {
         cdPtr = (ItclClass*)Itcl_GetListValue(elem);
-        elem = Itcl_NextListElem(elem);  /* advance here--elem will go away */
-
         Tcl_DeleteNamespace(cdPtr->namesp);
+
+	/* As the first namespace is now destroyed we have to get the
+         * new first element of the hash table. We cannot go to the
+         * next element from the current one, because the current one
+         * is deleted. itcl Patch #593112, for Bug #577719.
+	 */
+
+        elem = Itcl_FirstListElem(&cdefnPtr->derived);
     }
 
     /*
@@ -652,7 +658,7 @@ Itcl_IsClass(cmd)
 ItclClass*
 Itcl_FindClass(interp, path, autoload)
     Tcl_Interp* interp;      /* interpreter containing class */
-    char* path;              /* path name for class */
+    CONST char* path;              /* path name for class */
 {
     Tcl_Namespace* classNs;
 
@@ -717,7 +723,7 @@ Itcl_FindClass(interp, path, autoload)
 Tcl_Namespace*
 Itcl_FindClassNamespace(interp, path)
     Tcl_Interp* interp;        /* interpreter containing class */
-    char* path;                /* path name for class */
+    CONST char* path;                /* path name for class */
 {
     Tcl_Namespace* contextNs = Tcl_GetCurrentNamespace(interp);
     Tcl_Namespace* classNs;
@@ -728,8 +734,8 @@ Itcl_FindClassNamespace(interp, path)
      *  see if it's the current namespace, and try the global
      *  namespace as well.
      */
-    classNs = Tcl_FindNamespace(interp, path, (Tcl_Namespace*)NULL,
-        /* flags */ 0);
+    classNs = Tcl_FindNamespace(interp, (CONST84 char *)path,
+	    (Tcl_Namespace*)NULL, /* flags */ 0);
 
     if ( !classNs && contextNs->parentPtr != NULL &&
          (*path != ':' || *(path+1) != ':') ) {
@@ -909,7 +915,7 @@ Itcl_HandleClass(clientData, interp, objc, objv)
         objc-2, objv+2, &newObj);
 
     if (result == TCL_OK) {
-        Tcl_SetResult(interp, objName, TCL_VOLATILE);
+        Tcl_SetObjResult(interp, Tcl_NewStringObj(objName, -1));
     }
 
     Tcl_DStringFree(&buffer);
@@ -933,12 +939,12 @@ Itcl_HandleClass(clientData, interp, objc, objv)
  */
 int
 Itcl_ClassCmdResolver(interp, name, context, flags, rPtr)
-    Tcl_Interp *interp;       /* current interpreter */
-    CONST char* name;               /* name of the command being accessed */
-    Tcl_Namespace *context;   /* namespace performing the resolution */
-    int flags;                /* TCL_LEAVE_ERR_MSG => leave error messages
-                               *   in interp if anything goes wrong */
-    Tcl_Command *rPtr;        /* returns: resolved command */
+    Tcl_Interp *interp;		/* current interpreter */
+    CONST char* name;		/* name of the command being accessed */
+    Tcl_Namespace *context;	/* namespace performing the resolution */
+    int flags;			/* TCL_LEAVE_ERR_MSG => leave error messages
+				 *   in interp if anything goes wrong */
+    Tcl_Command *rPtr;		/* returns: resolved command */
 {
     ItclClass *cdefn = (ItclClass*)context->clientData;
 
@@ -1053,7 +1059,7 @@ Itcl_ClassCmdResolver(interp, name, context, flags, rPtr)
 int
 Itcl_ClassVarResolver(interp, name, context, flags, rPtr)
     Tcl_Interp *interp;       /* current interpreter */
-    char* name;               /* name of the variable being accessed */
+    CONST char* name;	      /* name of the variable being accessed */
     Tcl_Namespace *context;   /* namespace performing the resolution */
     int flags;                /* TCL_LEAVE_ERR_MSG => leave error messages
                                *   in interp if anything goes wrong */
@@ -1206,7 +1212,7 @@ Itcl_ClassVarResolver(interp, name, context, flags, rPtr)
 int
 Itcl_ClassCompiledVarResolver(interp, name, length, context, rPtr)
     Tcl_Interp *interp;         /* current interpreter */
-    char* name;                 /* name of the variable being accessed */
+    CONST char* name;                 /* name of the variable being accessed */
     int length;                 /* number of characters in name */
     Tcl_Namespace *context;     /* namespace performing the resolution */
     Tcl_ResolvedVarInfo **rPtr; /* returns: info that makes it possible to
@@ -1675,13 +1681,13 @@ Itcl_DeleteVarDefn(vdefn)
  *  anything goes wrong, this returns NULL.
  * ------------------------------------------------------------------------
  */
-char*
+CONST char*
 Itcl_GetCommonVar(interp, name, contextClass)
     Tcl_Interp *interp;        /* current interpreter */
-    char *name;                /* name of desired instance variable */
+    CONST char *name;                /* name of desired instance variable */
     ItclClass *contextClass;   /* name is interpreted in this scope */
 {
-    char *val = NULL;
+    CONST char *val = NULL;
     int result;
     Tcl_CallFrame frame;
 
@@ -1694,7 +1700,7 @@ Itcl_GetCommonVar(interp, name, contextClass)
                  contextClass->namesp, /*isProcCallFrame*/ 0);
 
     if (result == TCL_OK) {
-        val = Tcl_GetVar2(interp, name, (char*)NULL, 0);
+        val = Tcl_GetVar2(interp, (CONST84 char *)name, (char*)NULL, 0);
         Tcl_PopCallFrame(interp);
     }
     return val;
@@ -1714,7 +1720,7 @@ ItclMember*
 Itcl_CreateMember(interp, cdefn, name)
     Tcl_Interp* interp;            /* interpreter managing this action */
     ItclClass *cdefn;              /* class definition */
-    char* name;                    /* name of new member */
+    CONST char* name;              /* name of new member */
 {
     ItclMember *memPtr;
     int fullsize;

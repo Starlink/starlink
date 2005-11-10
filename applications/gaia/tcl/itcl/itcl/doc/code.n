@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: $Id: code.n,v 1.1 1998/07/27 18:41:59 stanton Exp $
+'\" RCS: $Id: code.n,v 1.3 2004/09/25 22:50:43 davygrvy Exp $
 '\"
 .so man.macros
 .TH code n 3.0 itcl "[incr\ Tcl]"
@@ -13,7 +13,7 @@
 .SH NAME
 code \- capture the namespace context for a code fragment
 .SH SYNOPSIS
-\fBcode \fR?\fB-namespace \fIname\fR? \fIcommand \fR?\fIarg arg ...\fR?
+\fBitcl::code \fR?\fB-namespace \fIname\fR? \fIcommand \fR?\fIarg arg ...\fR?
 .BE
 
 .SH DESCRIPTION

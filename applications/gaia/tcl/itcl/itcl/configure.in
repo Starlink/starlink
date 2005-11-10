@@ -1,171 +1,90 @@
+#!/bin/bash -norc
 #--------------------------------------------------------------------
 # Sample configure.in for Tcl Extensions.  The only places you should
 # need to modify this file are marked by the string __CHANGE__
 #--------------------------------------------------------------------
 
-#--------------------------------------------------------------------
-# __CHANGE__
-# This very first macro is used to verify that the configure script can 
-# find the sources.  The argument to AC_INIT should be a unique filename
-# for this package, and can be a relative path, such as:
-#
-# AC_INIT(../generic/tcl.h)
-#--------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# This initializes the environment with PACKAGE_NAME and PACKAGE_VERSION
+# set as provided.  These will also be added as -D defs in your Makefile
+# so you can encode the package version directly into the source files.
+#-----------------------------------------------------------------------
 
-AC_INIT(generic/itcl.h)
-AC_CONFIG_AUX_DIR(../config)
+AC_INIT([itcl], [3.3])
 
 #--------------------------------------------------------------------
-# __CHANGE__
-# Set your package name and version numbers here.  The NODOT_VERSION is
-# required for constructing the library name on systems that don't like
-# dots in library names (Windows).  The VERSION variable is used on the
-# other systems.
+# Call TEA_INIT as the first TEA_ macro to set up initial vars.
+# This will define a ${TEA_PLATFORM} variable == "unix" or "windows"
+# as well as PKG_LIB_FILE and PKG_STUB_LIB_FILE.
 #--------------------------------------------------------------------
 
-PACKAGE=itcl
+TEA_INIT([3.2])
 
-MAJOR_VERSION=3
-MINOR_VERSION=2
-PATCHLEVEL=.1
-
-VERSION=${MAJOR_VERSION}.${MINOR_VERSION}
-NODOT_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
-
-
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
-
-#--------------------------------------------------------------------
-# We put this here so that you can compile with -DVERSION="1.2" to
-# encode the package version directly into the source files.
-#--------------------------------------------------------------------
-
-eval AC_DEFINE_UNQUOTED(VERSION, "${VERSION}")
-
-#------------------------------------------------------------------------
-# Handle the --prefix=... option
-#------------------------------------------------------------------------
-
-if test "${prefix}" = "NONE"; then
-    prefix=/usr/local
+AC_PROG_LN_S
+CONFIG_CLEAN_FILES=
+if test ! -d $srcdir/tclconfig ; then
+    if test -d $srcdir/../tclconfig ; then
+	$LN_S $srcdir/../tclconfig tclconfig
+	CONFIG_CLEAN_FILES=tclconfig
+    fi
 fi
-if test "${exec_prefix}" = "NONE"; then
-    exec_prefix=$prefix
-fi
+AC_SUBST(CONFIG_CLEAN_FILES)
 
-#--------------------------------------------------------------------
-# Check whether --enable-gcc or --disable-gcc was given.  Do this 
-# before AC_CYGWIN is called so the compiler can 
-# be fully tested by built-in autoconf tools.
-# This macro also calls AC_PROG_CC to set the compiler if --enable-gcc
-# was not used.
-#--------------------------------------------------------------------
-
-SC_ENABLE_GCC
-AC_PROG_INSTALL
-
-#--------------------------------------------------------------------
-# Checks to see if the make program sets the $MAKE variable.
-#--------------------------------------------------------------------
-
-AC_PROG_MAKE_SET
-
-#--------------------------------------------------------------------
-# Find ranlib
-#--------------------------------------------------------------------
-
-AC_PROG_RANLIB
-
-#--------------------------------------------------------------------
-# This macro performs additional compiler tests.
-#--------------------------------------------------------------------
-
-AC_CYGWIN
-
-#--------------------------------------------------------------------
-# Determines the correct binary file extension (.o, .obj, .exe etc.)
-#--------------------------------------------------------------------
-
-AC_OBJEXT
-AC_EXEEXT
-
-#--------------------------------------------------------------------
-# "cygpath" is used on windows to generate native path names for include
-# files.
-# These variables should only be used with the compiler and linker since
-# they generate native path names.
-#
-# Unix tclConfig.sh points SRC_DIR at the top-level directory of
-# the Tcl sources, while the Windows tclConfig.sh points SRC_DIR at
-# the win subdirectory.  Hence the different usages of SRC_DIR below.
-#
-# This must be done before calling SC_PUBLIC_TCL_HEADERS
-#
-# RELPATH is used to locate binary extensions relative to the lib directory.
-# It is only needed if mkIndex.tcl can't generate an installed pkgIndex.tcl
-# file for you.
-#--------------------------------------------------------------------
-
-case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
-	CYGPATH="cygpath -w"
-	AC_CHECK_PROG(CYGPATH, cygpath, cygpath -w, echo)
-	RELPATH=".. .. bin"
-    ;;
-    *)
-	CYGPATH=echo
-	RELPATH=..
-    ;;
-esac
-
-AC_SUBST(CYGPATH)
-AC_SUBST(RELPATH)
-
-#--------------------------------------------------------------------
-# Includes for this package
-#--------------------------------------------------------------------
-
-ITCL_GENERIC_DIR_NATIVE=`${CYGPATH} ${srcdir}/generic`
-ITCL_WIN_DIR_NATIVE=`${CYGPATH} ${srcdir}/win`
-ITCL_UNIX_DIR_NATIVE=`${CYGPATH} ${srcdir}/unix`
-
-case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
-	ITCL_PLATFORM_DIR_NATIVE=${ITCL_WIN_DIR_NATIVE}
-    ;;
-    *)
-	ITCL_PLATFORM_DIR_NATIVE=${ITCL_UNIX_DIR_NATIVE}
-    ;;
-esac
-
-ITCL_INCLUDES="-I\"${ITCL_GENERIC_DIR_NATIVE}\" -I\"${ITCL_PLATFORM_DIR_NATIVE}\""
-
-AC_SUBST(ITCL_GENERIC_DIR_NATIVE)
-AC_SUBST(ITCL_WIN_DIR_NATIVE)
-AC_SUBST(ITCL_UNIX_DIR_NATIVE)
-AC_SUBST(ITCL_INCLUDES)
+AC_CONFIG_AUX_DIR(tclconfig)
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
 #--------------------------------------------------------------------
 
-SC_PATH_TCLCONFIG
-SC_LOAD_TCLCONFIG
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
 
-#--------------------------------------------------------------------
+#-----------------------------------------------------------------------
+# Handle the --prefix=... option by defaulting to what Tcl gave.
+# Must be called after TEA_LOAD_TCLCONFIG and before TEA_SETUP_COMPILER.
+#-----------------------------------------------------------------------
+
+TEA_PREFIX
+
+#-----------------------------------------------------------------------
+# Standard compiler checks.
+# This sets up CC by using the CC env var, or looks for gcc otherwise.
+# This also calls AC_PROG_CC, AC_PROG_INSTALL and a few others to create
+# the basic setup necessary to compile executables.
+#-----------------------------------------------------------------------
+
+TEA_SETUP_COMPILER
+
+#-----------------------------------------------------------------------
 # __CHANGE__
-# Choose which headers you need.  Extension authors should try very
-# hard to only rely on the Tcl public header files.  Internal headers
-# contain private data structures and are subject to change without
-# notice.
-# This must be done AFTER calling SC_PATH_TCLCONFIG/SC_LOAD_TCLCONFIG
-# so that we can extract TCL_SRC_DIR from the config file (in the case
-# of private headers
-#--------------------------------------------------------------------
+# Specify the C source files to compile in TEA_ADD_SOURCES,
+# public headers that need to be installed in TEA_ADD_HEADERS,
+# stub library C source files to compile in TEA_ADD_STUB_SOURCES,
+# and runtime Tcl library files in TEA_ADD_TCL_SOURCES.
+# This defines PKG(_STUB)_SOURCES, PKG(_STUB)_OBJECTS, PKG_HEADERS
+# and PKG_TCL_SOURCES.
+#-----------------------------------------------------------------------
 
-#SC_PUBLIC_TCL_HEADERS
-SC_PRIVATE_TCL_HEADERS
+TEA_ADD_SOURCES([itclStubInit.c
+		itcl_bicmds.c
+		itcl_class.c
+		itcl_cmds.c
+		itcl_ensemble.c
+		itcl_linkage.c
+		itcl_methods.c
+		itcl_migrate.c
+		itcl_objects.c
+		itcl_parse.c
+		itcl_util.c])
+TEA_ADD_HEADERS([generic/itcl.h
+		generic/itclDecls.h
+		generic/itclInt.h
+		generic/itclIntDecls.h])
+TEA_ADD_INCLUDES([-I\"`${CYGPATH} ${srcdir}/generic`\"])
+TEA_ADD_LIBS([])
+TEA_ADD_CFLAGS([])
+TEA_ADD_STUB_SOURCES([itclStubLib.c])
+TEA_ADD_TCL_SOURCES([library/itcl.tcl])
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -184,74 +103,68 @@ SC_PRIVATE_TCL_HEADERS
 # your system.
 #--------------------------------------------------------------------
 
-case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
-	AC_DEFINE(BUILD_itcl)
-	CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc50.pch"
-	PLATFORM_SOURCES='$(WIN_SOURCES)'
-	PLATFORM_OBJECTS='$(WIN_OBJECTS)'
-	PLATFORM_DIR='$(WIN_DIR)'
-    ;;
-    *)
-	CLEANFILES=
-	PLATFORM_SOURCES='$(UNIX_SOURCES)'
-	PLATFORM_OBJECTS='$(UNIX_OBJECTS)'
-	PLATFORM_DIR='$(UNIX_DIR)'
-    ;;
-esac
+if test "${TEA_PLATFORM}" = "windows" ; then
+    AC_DEFINE(BUILD_itcl)
+    CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc*.pch"
+    TEA_ADD_SOURCES([dllEntryPoint.c])
+else
+    CLEANFILES=
+    #TEA_ADD_SOURCES([])
+fi
 
 AC_SUBST(CLEANFILES)
-AC_SUBST(PLATFORM_SOURCES)
-AC_SUBST(PLATFORM_OBJECTS)
-AC_SUBST(PLATFORM_DIR)
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# Choose which headers you need.  Extension authors should try very
+# hard to only rely on the Tcl public header files.  Internal headers
+# contain private data structures and are subject to change without
+# notice.
+# This must be done AFTER calling TEA_PATH_TCLCONFIG/TEA_LOAD_TCLCONFIG
+# so that we can extract TCL_SRC_DIR from the config file (in the case
+# of private headers
+#--------------------------------------------------------------------
+
+#TEA_PUBLIC_TCL_HEADERS
+TEA_PRIVATE_TCL_HEADERS
+
+#--------------------------------------------------------------------
+# We need to enable the threading macros found in tcl.h and tclInt.h.
+# The use of the threading features is determined by the core the
+# extension is loaded into, but we need to compile with these macros
+# turned on.
+#--------------------------------------------------------------------
+
+AC_DEFINE(TCL_THREADS)
 
 #--------------------------------------------------------------------
 # Check whether --enable-threads or --disable-threads was given.
-# So far only Tcl responds to this one.
+# This auto-enables if Tcl was compiled threaded.
 #--------------------------------------------------------------------
 
-SC_ENABLE_THREADS
+#TEA_ENABLE_THREADS
 
 #--------------------------------------------------------------------
 # The statement below defines a collection of symbols related to
 # building as a shared library instead of a static library.
 #--------------------------------------------------------------------
 
-SC_ENABLE_SHARED
+TEA_ENABLE_SHARED
 
 #--------------------------------------------------------------------
 # This macro figures out what flags to use with the compiler/linker
 # when building shared/static debug/optimized objects.  This information
-# is all taken from the tclConfig.sh file.
+# can be taken from the tclConfig.sh file, but this figures it all out.
 #--------------------------------------------------------------------
 
-CFLAGS_DEBUG=${TCL_CFLAGS_DEBUG}
-CFLAGS_OPTIMIZE=${TCL_CFLAGS_OPTIMIZE}
-LDFLAGS_DEBUG=${TCL_LDFLAGS_DEBUG}
-LDFLAGS_OPTIMIZE=${TCL_LDFLAGS_OPTIMIZE}
-SHLIB_LD=${TCL_SHLIB_LD}
-STLIB_LD=${TCL_STLIB_LD}
-SHLIB_CFLAGS=${TCL_SHLIB_CFLAGS}
-
-AC_SUBST(CFLAGS_DEBUG)
-AC_SUBST(CFLAGS_OPTIMIZE)
-AC_SUBST(STLIB_LD)
-AC_SUBST(SHLIB_LD)
-AC_SUBST(SHLIB_CFLAGS)
-AC_SUBST(SHLIB_LDFLAGS)
+TEA_CONFIG_CFLAGS
 
 #--------------------------------------------------------------------
 # Set the default compiler switches based on the --enable-symbols 
 # option.
 #--------------------------------------------------------------------
 
-SC_ENABLE_SYMBOLS
-
-if test "${SHARED_BUILD}" = "1" ; then
-    CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING} ${SHLIB_CFLAGS}'
-else
-    CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING}'
-fi
+TEA_ENABLE_SYMBOLS
 
 #--------------------------------------------------------------------
 # Everyone should be linking against the Tcl stub library.  If you
@@ -266,45 +179,11 @@ fi
 
 #--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
-# depends on values set by the SC_ENABLE_SHARED, SC_ENABLE_SYMBOLS,
-# and SC_LOAD_TCLCONFIG macros above.
+# depends on values set by the TEA_ENABLE_SHARED, TEA_ENABLE_SYMBOLS,
+# and TEA_LOAD_TCLCONFIG macros above.
 #--------------------------------------------------------------------
 
-SC_MAKE_LIB
-
-#--------------------------------------------------------------------
-# eval these two values to dereference the ${DBGX} variable.
-#--------------------------------------------------------------------
-
-eval "SHARED_LIB_SUFFIX=${TCL_SHARED_LIB_SUFFIX}"
-eval "UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}"
-
-#--------------------------------------------------------------------
-# Shared libraries and static libraries have different names.
-#--------------------------------------------------------------------
-
-case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*|*CYGWIN_98*|*CYGWIN_95*)
-	if test "${SHARED_BUILD}" = "1" ; then
-	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS}"
-	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
-	    RANLIB=:
-	else
-	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${UNSHARED_LIB_SUFFIX}"
-	fi
-	eval "${PACKAGE}stub_LIB_FILE=${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
-	;;
-    *)
-	if test "${SHARED_BUILD}" = "1" ; then
-	    SHLIB_LD_LIBS="${TCL_BUILD_STUB_LIB_SPEC}"
-	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${SHARED_LIB_SUFFIX}"
-	    RANLIB=:
-	else
-	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${UNSHARED_LIB_SUFFIX}"
-	fi
-	eval "${PACKAGE}stub_LIB_FILE=lib${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
-	;;
-esac
+TEA_MAKE_LIB
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -313,16 +192,10 @@ esac
 # library.
 #--------------------------------------------------------------------
 
-AC_SUBST(itclstub_LIB_FILE)
+itcl_STUB_LIB_FILE=${PKG_STUB_LIB_FILE}
+itcl_LIB_FILE=${PKG_LIB_FILE}
+AC_SUBST(itcl_STUB_LIB_FILE)
 AC_SUBST(itcl_LIB_FILE)
-AC_SUBST(SHLIB_LD_LIBS)
-
-#--------------------------------------------------------------------
-# Cache the stub library name so that the itk configure script can pick
-# it up.
-#--------------------------------------------------------------------
-
-AC_CACHE_VAL(ac_cv_itclstub_LIB_FILE, ac_cv_itclstub_LIB_FILE=${itclstub_LIB_FILE})
 
 #--------------------------------------------------------------------
 # Find tclsh so that we can run pkg_mkIndex to generate the pkgIndex.tcl
@@ -332,11 +205,43 @@ AC_CACHE_VAL(ac_cv_itclstub_LIB_FILE, ac_cv_itclstub_LIB_FILE=${itclstub_LIB_FIL
 # versions have bugs in the pkg_mkIndex routine.
 #--------------------------------------------------------------------
 
-SC_PROG_TCLSH
+TEA_PROG_TCLSH
+
+#--------------------------------------------------------------------
+# These are for itclConfig.sh
+#--------------------------------------------------------------------
+
+# pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
+eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval itcl_LIB_FLAG="-litcl${PACKAGE_VERSION}${DBGX}"
+    eval itcl_STUB_LIB_FLAG="-litclstub${PACKAGE_VERSION}${DBGX}"
+else
+    eval itcl_LIB_FLAG="-litcl`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+    eval itcl_STUB_LIB_FLAG="-litclstub`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+fi
+itcl_BUILD_LIB_SPEC="-L`pwd` ${itcl_LIB_FLAG}"
+itcl_LIB_SPEC="-L${pkglibdir} ${itcl_LIB_FLAG}"
+
+itcl_BUILD_STUB_LIB_SPEC="-L`pwd` ${itcl_STUB_LIB_FLAG}"
+itcl_STUB_LIB_SPEC="-L${pkglibdir} ${itcl_STUB_LIB_FLAG}"
+itcl_BUILD_STUB_LIB_PATH="`pwd`/${itcl_STUB_LIB_FILE}"
+itcl_STUB_LIB_PATH="${pkglibdir}/${itcl_STUB_LIB_FILE}"
+
+AC_SUBST(itcl_BUILD_LIB_SPEC)
+AC_SUBST(itcl_LIB_SPEC)
+AC_SUBST(itcl_BUILD_STUB_LIB_SPEC)
+AC_SUBST(itcl_STUB_LIB_SPEC)
+AC_SUBST(itcl_BUILD_STUB_LIB_PATH)
+AC_SUBST(itcl_STUB_LIB_PATH)
+
+# itcl_SRC_DIR must be a fully qualified path
+eval itcl_SRC_DIR="$srcdir"
+itcl_SRC_DIR=`cd "${itcl_SRC_DIR}"; pwd`
+AC_SUBST(itcl_SRC_DIR)
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile \
-	pkgIndex.tcl itclConfig.sh])
+AC_OUTPUT([Makefile pkgIndex.tcl itclConfig.sh])

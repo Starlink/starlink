@@ -1,25 +1,31 @@
+#!/bin/bash -norc
 dnl	This file is an input file used by the GNU "autoconf" program to
 dnl	generate the file "configure", which is run during [incr Tcl]
 dnl installation to configure the system for the local environment.
-
-AC_INIT(itcl/generic/itcl.h)
-# RCS: $Id: configure.in,v 1.4 2001/06/05 16:27:35 smithc Exp $
-
-AC_CONFIG_AUX_DIR(config)
-AC_PREREQ(2.0)
-
-# -----------------------------------------------------------------------
 #
-#   Set up a new default --prefix.  If a previous installation of
-#   [incr Tcl] can be found searching $PATH use that directory.
-#
-# -----------------------------------------------------------------------
+# RCS: $Id: configure.in,v 1.8 2005/02/14 10:37:36 jcw Exp $
 
-AC_PREFIX_DEFAULT(/usr/local)
-AC_PREFIX_PROGRAM(itclsh)
+builtin(include,tclconfig/tcl.m4)
 
-AC_CONFIG_SUBDIRS(itcl itk)
+#-----------------------------------------------------------------------
+# We need to do some TEA stuff here to handle --prefix correctly
+# in this toplevel configure file.  autoconf is broken in multiple
+# ways.  It passes --prefix, but not --exec-prefix to configure
+# subdirs.  This would not be a problem if it properly passed
+# whether --prefix was set, but this is not true with ac2.57.
+#-----------------------------------------------------------------------
 
+AC_INIT([itcl-master], [3.3])
 
-AC_OUTPUT(Makefile,
-	chmod +x ${srcdir}/config/install-sh ${srcdir}/config/mkinstalldirs)
+TEA_INIT([3.2])
+
+AC_CONFIG_AUX_DIR(tclconfig)
+
+TEA_PATH_TCLCONFIG
+TEA_LOAD_TCLCONFIG
+
+TEA_PREFIX
+
+AC_CONFIG_SUBDIRS([itcl itk])
+
+AC_OUTPUT([Makefile], [chmod +x ${srcdir}/tclconfig/install-sh])

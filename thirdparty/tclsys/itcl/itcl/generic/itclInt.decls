@@ -1,15 +1,17 @@
 # itclInt.decls --
 #
 #	This file contains the declarations for all unsupported
-#	functions that are exported by the Tcl library.  This file
-#	is used to generate the itclIntDecls.h and itclIntStub.c
-#	files
+#	functions that are exported by the Itcl library.
+#
+#	By "unsupported", it should be noted that due to Tcl's hiding
+#	of the data types used, we inherit this hidden-ness ourselves,
+#	too, unfortunately.
 #
 # Copyright (c) 1998-1999 by Scriptics Corporation.
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 # 
-# RCS: @(#) $Id: itclInt.decls,v 1.2 2001/05/22 01:35:38 davygrvy Exp $
+# RCS: @(#) $Id: itclInt.decls,v 1.8 2003/12/17 02:54:39 davygrvy Exp $
 
 library itcl
 
@@ -29,10 +31,10 @@ declare 1 generic {
     int Itcl_IsClass (Tcl_Command cmd)
 }
 declare 2 generic {
-    ItclClass* Itcl_FindClass (Tcl_Interp* interp, char* path, int autoload)
+    ItclClass* Itcl_FindClass (Tcl_Interp* interp, CONST char* path, int autoload)
 }
 declare 3 generic {
-    int Itcl_FindObject (Tcl_Interp *interp, char *name, ItclObject **roPtr)
+    int Itcl_FindObject (Tcl_Interp *interp, CONST char *name, ItclObject **roPtr)
 }
 declare 4 generic {   
     int Itcl_IsObject (Tcl_Command cmd)
@@ -57,18 +59,18 @@ declare 10 generic {
         ItclObjectInfo *info)
 }
 declare 11 generic {
-    void Itcl_ParseNamespPath (char *name, Tcl_DString *buffer, \
+    void Itcl_ParseNamespPath (CONST char *name, Tcl_DString *buffer, \
         char **head, char **tail)
 }
 declare 12 generic {
-    int Itcl_DecodeScopedCommand (Tcl_Interp *interp, char *name, \
+    int Itcl_DecodeScopedCommand (Tcl_Interp *interp, CONST char *name, \
         Tcl_Namespace **rNsPtr, char **rCmdPtr)
 }
 declare 13 generic {
     int Itcl_EvalArgs (Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[])
 }
 declare 14 generic {
-    Tcl_Obj* Itcl_CreateArgs (Tcl_Interp *interp, char *string, \
+    Tcl_Obj* Itcl_CreateArgs (Tcl_Interp *interp, CONST char *string, \
         int objc, Tcl_Obj *CONST objv[])
 }
 declare 15 generic {
@@ -138,14 +140,14 @@ declare 30 generic {
 #
 
 declare 31 generic {
-    int Itcl_CreateClass (Tcl_Interp* interp, char* path, \
+    int Itcl_CreateClass (Tcl_Interp* interp, CONST char* path, \
         ItclObjectInfo *info, ItclClass **rPtr)
 }
 declare 32 generic {
     int Itcl_DeleteClass (Tcl_Interp *interp, ItclClass *cdefnPtr)
 }
 declare 33 generic {
-    Tcl_Namespace* Itcl_FindClassNamespace (Tcl_Interp* interp, char* path)
+    Tcl_Namespace* Itcl_FindClassNamespace (Tcl_Interp* interp, CONST char* path)
 }
 declare 34 generic {
     int Itcl_HandleClass (ClientData clientData, Tcl_Interp *interp, \
@@ -156,11 +158,11 @@ declare 35 generic {
         Tcl_Namespace *context, int flags, Tcl_Command *rPtr)
 }
 declare 36 generic {
-    int Itcl_ClassVarResolver (Tcl_Interp *interp, char* name, \
+    int Itcl_ClassVarResolver (Tcl_Interp *interp, CONST char* name, \
         Tcl_Namespace *context, int flags, Tcl_Var *rPtr)
 }
 declare 37 generic {
-    int Itcl_ClassCompiledVarResolver (Tcl_Interp *interp, char* name, \
+    int Itcl_ClassCompiledVarResolver (Tcl_Interp *interp, CONST char* name, \
         int length, Tcl_Namespace *context, Tcl_ResolvedVarInfo **rPtr)
 }
 declare 38 generic {
@@ -174,12 +176,12 @@ declare 40 generic {
     void Itcl_DeleteVarDefn (ItclVarDefn *vdefn)
 }
 declare 41 generic {
-    char* Itcl_GetCommonVar (Tcl_Interp *interp, char *name, \
+    CONST char* Itcl_GetCommonVar (Tcl_Interp *interp, CONST char *name, \
         ItclClass *contextClass)
 }
 declare 42 generic {
     ItclMember* Itcl_CreateMember (Tcl_Interp* interp, ItclClass *cdefn, \
-        char* name)
+        CONST char* name)
 }
 declare 43 generic {
     void Itcl_DeleteMember (ItclMember *memPtr)
@@ -191,7 +193,7 @@ declare 43 generic {
 #
 
 declare 44 generic {
-    int Itcl_CreateObject (Tcl_Interp *interp, char* name, ItclClass *cdefn, \
+    int Itcl_CreateObject (Tcl_Interp *interp, CONST char* name, ItclClass *cdefn, \
         int objc, Tcl_Obj *CONST objv[], ItclObject **roPtr)
 }
 declare 45 generic {
@@ -206,11 +208,11 @@ declare 47 generic {
         int objc, Tcl_Obj *CONST objv[])
 }
 declare 48 generic {
-    char* Itcl_GetInstanceVar (Tcl_Interp *interp, char *name, \
+    CONST char* Itcl_GetInstanceVar (Tcl_Interp *interp, CONST char *name, \
         ItclObject *contextObj, ItclClass *contextClass)
 }
 declare 49 generic {
-    int Itcl_ScopedVarResolver (Tcl_Interp *interp, char *name, \
+    int Itcl_ScopedVarResolver (Tcl_Interp *interp, CONST char *name, \
         Tcl_Namespace *contextNs, int flags, Tcl_Var *rPtr)
 }
 
@@ -228,30 +230,31 @@ declare 51 generic {
         Tcl_Obj *CONST objv[])
 }
 declare 52 generic {
-    int Itcl_CreateMethod (Tcl_Interp* interp, ItclClass *cdefn, char* name, \
-        char* arglist, char* body)
+    int Itcl_CreateMethod (Tcl_Interp* interp, ItclClass *cdefn,
+	CONST char* name, CONST char* arglist, CONST char* body)
 }
 declare 53 generic {
-    int Itcl_CreateProc (Tcl_Interp* interp, ItclClass *cdefn, char* name, \
-        char* arglist, char* body)
+    int Itcl_CreateProc (Tcl_Interp* interp, ItclClass *cdefn,
+	CONST char* name, CONST char* arglist, CONST char* body)
 }
 declare 54 generic {
     int Itcl_CreateMemberFunc (Tcl_Interp* interp, ItclClass *cdefn, \
-        char* name, char* arglist, char* body, ItclMemberFunc** mfuncPtr)
+        CONST char* name, CONST char* arglist, CONST char* body, \
+	ItclMemberFunc** mfuncPtr)
 }
 declare 55 generic {
     int Itcl_ChangeMemberFunc (Tcl_Interp* interp, ItclMemberFunc* mfunc, \
-        char* arglist, char* body)
+        CONST char* arglist, CONST char* body)
 }
 declare 56 generic {
-    void Itcl_DeleteMemberFunc (char* cdata)
+    void Itcl_DeleteMemberFunc (CONST char* cdata)
 }
 declare 57 generic {
     int Itcl_CreateMemberCode (Tcl_Interp* interp, ItclClass *cdefn, \
-        char* arglist, char* body, ItclMemberCode** mcodePtr)
+        CONST char* arglist, CONST char* body, ItclMemberCode** mcodePtr)
 }
 declare 58 generic {
-    void Itcl_DeleteMemberCode (char* cdata)
+    void Itcl_DeleteMemberCode (CONST char* cdata)
 }
 declare 59 generic {
     int Itcl_GetMemberCode (Tcl_Interp* interp, ItclMember* member)
@@ -266,11 +269,11 @@ declare 61 generic {
         Tcl_Obj *CONST objv[])
 }
 declare 62 generic {
-    int Itcl_CreateArgList (Tcl_Interp* interp, char* decl, int* argcPtr, \
+    int Itcl_CreateArgList (Tcl_Interp* interp, CONST char* decl, int* argcPtr, \
         CompiledLocal** argPtr)
 }
 declare 63 generic {
-    CompiledLocal* Itcl_CreateArg (char* name, char* init)
+    CompiledLocal* Itcl_CreateArg (CONST char* name, CONST char* init)
 }
 declare 64 generic {
     void Itcl_DeleteArgList (CompiledLocal *arglist)
@@ -303,7 +306,7 @@ declare 71 generic {
         ItclClass *contextClass)
 }
 declare 72 generic {
-    int Itcl_InvokeMethodIfExists (Tcl_Interp *interp, char *name, \
+    int Itcl_InvokeMethodIfExists (Tcl_Interp *interp, CONST char *name, \
         ItclClass *contextClass, ItclObject *contextObj, int objc, \
         Tcl_Obj *CONST objv[])
 }
@@ -360,7 +363,7 @@ declare 84 generic {
         int objc, Tcl_Obj *CONST objv[])
 }
 declare 85 generic {
-    int Itcl_ParseVarResolver (Tcl_Interp *interp, char* name, \
+    int Itcl_ParseVarResolver (Tcl_Interp *interp, CONST char* name, \
         Tcl_Namespace *contextNs, int flags, Tcl_Var* rPtr)
 }
 
@@ -433,22 +436,22 @@ declare 100 generic {
     int Itcl_EnsembleInit (Tcl_Interp *interp)
 }
 declare 101 generic {
-    int Itcl_CreateEnsemble (Tcl_Interp *interp, char* ensName)
+    int Itcl_CreateEnsemble (Tcl_Interp *interp, CONST char* ensName)
 }
 declare 102 generic {
-    int Itcl_AddEnsemblePart (Tcl_Interp *interp, char* ensName, \
-        char* partName, char* usageInfo, Tcl_ObjCmdProc *objProc, \
+    int Itcl_AddEnsemblePart (Tcl_Interp *interp, CONST char* ensName, \
+        CONST char* partName, CONST char* usageInfo, Tcl_ObjCmdProc *objProc, \
         ClientData clientData, Tcl_CmdDeleteProc *deleteProc)
 }
 declare 103 generic {
-    int Itcl_GetEnsemblePart (Tcl_Interp *interp, char *ensName, \
-        char *partName, Tcl_CmdInfo *infoPtr)
+    int Itcl_GetEnsemblePart (Tcl_Interp *interp, CONST char *ensName, \
+        CONST char *partName, Tcl_CmdInfo *infoPtr)
 }
 declare 104 generic {
     int Itcl_IsEnsemble (Tcl_CmdInfo* infoPtr)
 }
 declare 105 generic {
-    int Itcl_GetEnsembleUsage (Tcl_Interp *interp, char *ensName, \
+    int Itcl_GetEnsembleUsage (Tcl_Interp *interp, CONST char *ensName, \
         Tcl_Obj *objPtr)
 }
 declare 106 generic {
@@ -473,12 +476,13 @@ declare 109 generic {
 #  Commands provided for backward compatibility
 #
 
-declare 110 generic {
-    int Itcl_OldInit (Tcl_Interp* interp, ItclObjectInfo* info)
-}
-declare 111 generic {
-    int Itcl_InstallOldBiMethods (Tcl_Interp *interp, ItclClass *cdefn)
-}
+# not used anymore (3.3)
+#declare 110 generic {
+#    int Itcl_OldInit (Tcl_Interp* interp, ItclObjectInfo* info)
+#}
+#declare 111 generic {
+#    int Itcl_InstallOldBiMethods (Tcl_Interp *interp, ItclClass *cdefn)
+#}
 
 
 #
@@ -496,5 +500,14 @@ declare 114 generic {
     Var* _TclNewVar (void)
 }
 declare 115 generic {
-    void Itcl_Assert (char *testExpr, char *fileName, int lineNum)
+    void Itcl_Assert (CONST char *testExpr, CONST char *fileName, int lineNum)
+}
+
+declare 116 generic {
+    int Itcl_IsObjectCmd (ClientData clientData, Tcl_Interp *interp, \
+    int objc, Tcl_Obj *CONST objv[])
+}
+declare 117 generic {
+    int Itcl_IsClassCmd (ClientData clientData, Tcl_Interp *interp, \
+    int objc, Tcl_Obj *CONST objv[])
 }

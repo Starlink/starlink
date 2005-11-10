@@ -12,7 +12,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_migrate.c,v 1.1 1998/07/27 18:41:47 stanton Exp $
+ *     RCS:  $Id: itcl_migrate.c,v 1.2 2003/12/24 01:09:56 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -49,7 +49,7 @@ _Tcl_GetCallFrame(interp, level)
     CallFrame *framePtr;
 
     if (level < 0) {
-        panic("itcl: _Tcl_GetCallFrame called with bad number of levels");
+        Tcl_Panic("itcl: _Tcl_GetCallFrame called with bad number of levels");
     }
 
     framePtr = iPtr->varFramePtr;

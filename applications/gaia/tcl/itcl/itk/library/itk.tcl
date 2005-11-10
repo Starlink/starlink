@@ -9,7 +9,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: itk.tcl,v 1.2 2000/07/06 06:43:33 mmc Exp $
+#      RCS:  $Id: itk.tcl,v 1.3 2002/05/14 22:53:28 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -37,6 +37,7 @@ if {$tcl_platform(os) == "MacOS"} {
 #  Tcl than C.
 # ----------------------------------------------------------------------
 proc ::itk::remove_destroy_hook {widget} {
+    if {![winfo exists $widget]} {return}
     set tags [bindtags $widget]
     set i [lsearch $tags "itk-destroy-$widget"]
     if {$i >= 0} {

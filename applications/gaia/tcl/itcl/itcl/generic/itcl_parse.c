@@ -37,7 +37,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_parse.c,v 1.4 2000/01/03 15:56:48 csmith Exp $
+ *     RCS:  $Id: itcl_parse.c,v 1.7 2004/11/15 20:14:07 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -364,7 +364,7 @@ Itcl_ClassInheritCmd(clientData, interp, objc, objv)
          *  parent namespace (currently active).  If not, try
          *  to autoload its definition.
          */
-        token = Tcl_GetStringFromObj(*objv, (int*)NULL);
+        token = Tcl_GetString(*objv);
         baseCdefnPtr = Itcl_FindClass(interp, token, /* autoload */ 1);
         if (!baseCdefnPtr) {
             Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
@@ -643,13 +643,13 @@ Itcl_ClassConstructorCmd(clientData, interp, objc, objv)
      *  If there is an object initialization statement, pick this
      *  out and take the last argument as the constructor body.
      */
-    arglist = Tcl_GetStringFromObj(objv[1], (int*)NULL);
+    arglist = Tcl_GetString(objv[1]);
     if (objc == 3) {
-        body = Tcl_GetStringFromObj(objv[2], (int*)NULL);
+        body = Tcl_GetString(objv[2]);
     } else {
         cdefnPtr->initCode = objv[2];
         Tcl_IncrRefCount(cdefnPtr->initCode);
-        body = Tcl_GetStringFromObj(objv[3], (int*)NULL);
+        body = Tcl_GetString(objv[3]);
     }
 
     if (Itcl_CreateMethod(interp, cdefnPtr, name, arglist, body) != TCL_OK) {
@@ -960,10 +960,10 @@ Itcl_ClassCommonCmd(clientData, interp, objc, objv)
     Itcl_BuildVirtualTables(cdefnPtr);
 
     if (init) {
-        init = Tcl_SetVar(interp, vdefn->member->name, init,
+        CONST char *val = Tcl_SetVar(interp, vdefn->member->name, init,
             TCL_NAMESPACE_ONLY);
 
-        if (!init) {
+        if (!val) {
             Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
                 "cannot initialize common variable \"",
                 vdefn->member->name, "\"",
@@ -1013,7 +1013,7 @@ Itcl_ClassCommonCmd(clientData, interp, objc, objv)
 int
 Itcl_ParseVarResolver(interp, name, contextNs, flags, rPtr)
     Tcl_Interp *interp;        /* current interpreter */
-    char* name;                /* name of the variable being accessed */
+    CONST char* name;                /* name of the variable being accessed */
     Tcl_Namespace *contextNs;  /* namespace context */
     int flags;                 /* TCL_GLOBAL_ONLY => global variable
                                 * TCL_NAMESPACE_ONLY => namespace variable */

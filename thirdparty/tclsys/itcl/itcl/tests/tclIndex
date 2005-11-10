@@ -8,7 +8,6 @@
 
 set auto_index(Simple1) [list source [file join $dir mkindex.itcl]]
 set auto_index(Simple2) [list source [file join $dir mkindex.itcl]]
-set auto_index(OldStyle) [list source [file join $dir mkindex.itcl]]
 set auto_index(ens) [list source [file join $dir mkindex.itcl]]
 set auto_index(::Simple2::bump) [list source [file join $dir mkindex.itcl]]
 set auto_index(::Simple2::by) [list source [file join $dir mkindex.itcl]]

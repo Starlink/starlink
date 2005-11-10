@@ -112,4 +112,3 @@ dist-clean:
 	$(MAKE) clean
 	cd $(ITKDIR)\Win
 	$(MAKE) clean
-

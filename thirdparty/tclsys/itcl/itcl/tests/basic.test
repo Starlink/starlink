@@ -6,19 +6,19 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: basic.test,v 1.4 2000/07/06 06:43:30 mmc Exp $
+#      RCS:  $Id: basic.test,v 1.8 2004/12/14 08:13:58 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
 # See the file "license.terms" for information on usage and
 # redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 
-package require tcltest
-namespace import -force ::tcltest::*
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest 2.1
+    namespace import -force ::tcltest::test
+}
 
-if {[string compare test [info procs test]] == 1} then {source defs}
-
-package require Itcl
+::tcltest::loadTestedCommands
 
 # ----------------------------------------------------------------------
 #  Simple class definition
@@ -94,6 +94,33 @@ test basic-1.11 {find command supports object names starting with -} {
     Counter -foo
     itcl::find objects -class Counter -foo
 } {-foo}
+test basic-1.12 {is command with class argument} {
+    itcl::is class Counter
+} {1}
+
+test basic-1.13 {is command with class argument (global namespace)} {
+    itcl::is class ::Counter
+} {1}
+
+test basic-1.14 {is command with class argument (wrapped in code command)} {
+    itcl::is class [itcl::code Counter]
+} {1}
+
+test basic-1.14 {is command with class argument (class does not exist)} {
+    itcl::is class Count
+} {0}
+
+test basic-1.15 {is command with object argument} {
+    itcl::is object -foo
+} {1}
+
+test basic-1.16 {is command with object argument (object does not exist)} {
+    itcl::is object xxx
+} {0}
+
+test basic-1.15 {is command with object argument (with code command)} {
+    itcl::is object [itcl::code -- -foo]
+} {1}
 
 # ----------------------------------------------------------------------
 #  #auto names
@@ -186,7 +213,13 @@ test basic-4.4 {objects can be created from the new class} {
     list [Counter #auto] [Counter #auto]
 } {counter0 counter1}
 
-test basic-4.5 {when a class is destroyed, its objects are deleted} {
+test basic-4.5 {namespaces for #auto are prepended to the command name} {
+    namespace eval someNS1 {}
+    namespace eval someNS2 {}
+    list [Counter someNS1::#auto] [Counter someNS2::#auto]
+} [list someNS1::counter2 someNS2::counter3]
+
+test basic-4.6 {when a class is destroyed, its objects are deleted} {
     list [lsort [itcl::find objects counter*]] \
          [itcl::delete class Counter] \
          [lsort [itcl::find objects counter*]]
@@ -297,7 +330,7 @@ test basic-6.2 {test array access for instance variables} {
 
 test basic-6.3 {test array access for commons} {
     lsort [test_arrays0 do array get colors]
-} {#0000ff #00ff00 #ff0000 blue green red}
+} [list #0000ff #00ff00 #ff0000 blue green red]
 
 test basic-6.4 {test array access for instance variables via "upvar"} {
     test_arrays0 do test_arrays_get nums

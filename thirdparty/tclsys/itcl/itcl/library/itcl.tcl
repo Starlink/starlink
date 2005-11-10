@@ -9,7 +9,7 @@
 #            mmclennan@lucent.com
 #            http://www.tcltk.com/itcl
 #
-#      RCS:  $Id: itcl.tcl,v 1.4 2001/04/14 21:35:54 davygrvy Exp $
+#      RCS:  $Id: itcl.tcl,v 1.5 2002/09/29 19:30:27 davygrvy Exp $
 # ----------------------------------------------------------------------
 #            Copyright (c) 1993-1998  Lucent Technologies, Inc.
 # ======================================================================
@@ -50,19 +50,17 @@ proc ::itcl::local {class name args} {
 # USAGE:  itcl::class name body
 # Adds an entry for the given class declaration.
 #
-foreach cmd {itcl::class itcl_class} {
-    auto_mkindex_parser::command $cmd {name body} {
-        variable index
-        variable scriptFile
-        append index "set [list auto_index([fullname $name])]"
-        append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
+auto_mkindex_parser::command itcl::class {name body} {
+    variable index
+    variable scriptFile
+    append index "set [list auto_index([fullname $name])]"
+    append index " \[list source \[file join \$dir [list $scriptFile]\]\]\n"
 
-        variable parser
-        variable contextStack
-        set contextStack [linsert $contextStack 0 $name]
-        $parser eval $body
-        set contextStack [lrange $contextStack 1 end]
-    }
+    variable parser
+    variable contextStack
+    set contextStack [linsert $contextStack 0 $name]
+    $parser eval $body
+    set contextStack [lrange $contextStack 1 end]
 }
 
 #

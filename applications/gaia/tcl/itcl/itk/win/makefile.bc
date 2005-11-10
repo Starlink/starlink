@@ -225,4 +225,3 @@ clean:
 	-@$(RM) $(TMPDIR)\Rc\*.res
 	-@$(RM) $(TMPDIR)\*.obj
 	-@$(RM) *.cfg
-

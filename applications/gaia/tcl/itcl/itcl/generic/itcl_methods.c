@@ -23,7 +23,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itcl_methods.c,v 1.6 2001/05/22 23:48:58 davygrvy Exp $
+ *     RCS:  $Id: itcl_methods.c,v 1.14 2005/02/11 17:15:14 hobbs Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -294,9 +294,9 @@ int
 Itcl_CreateMethod(interp, cdefn, name, arglist, body)
     Tcl_Interp* interp;  /* interpreter managing this action */
     ItclClass *cdefn;    /* class definition */
-    char* name;          /* name of new method */
-    char* arglist;       /* space-separated list of arg names */
-    char* body;          /* body of commands for the method */
+    CONST char* name;    /* name of new method */
+    CONST char* arglist; /* space-separated list of arg names */
+    CONST char* body;    /* body of commands for the method */
 {
     ItclMemberFunc *mfunc;
     Tcl_DString buffer;
@@ -331,8 +331,8 @@ Itcl_CreateMethod(interp, cdefn, name, arglist, body)
     name = Tcl_DStringValue(&buffer);
 
     Itcl_PreserveData((ClientData)mfunc);
-    mfunc->accessCmd = Tcl_CreateObjCommand(interp, name, Itcl_ExecMethod,
-        (ClientData)mfunc, Itcl_ReleaseData);
+    mfunc->accessCmd = Tcl_CreateObjCommand(interp, (CONST84 char *)name,
+	Itcl_ExecMethod, (ClientData)mfunc, Itcl_ReleaseData);
 
     Tcl_DStringFree(&buffer);
     return TCL_OK;
@@ -345,7 +345,7 @@ Itcl_CreateMethod(interp, cdefn, name, arglist, body)
  *
  *  Installs a class proc into the namespace associated with a class.
  *  If another command with the same name is already installed, then
- *  it is overwritten.  Returns TCL_OK on success, or TCL_ERROR (along
+ *  it is overwritten.  Returns TCL_OK on success, or TCL_ERROR  (along
  *  with an error message in the specified interp) if anything goes
  *  wrong.
  * ------------------------------------------------------------------------
@@ -354,9 +354,9 @@ int
 Itcl_CreateProc(interp, cdefn, name, arglist, body)
     Tcl_Interp* interp;  /* interpreter managing this action */
     ItclClass *cdefn;    /* class definition */
-    char* name;          /* name of new proc */
-    char* arglist;       /* space-separated list of arg names */
-    char* body;          /* body of commands for the proc */
+    CONST char* name;    /* name of new proc */
+    CONST char* arglist; /* space-separated list of arg names */
+    CONST char* body;    /* body of commands for the proc */
 {
     ItclMemberFunc *mfunc;
     Tcl_DString buffer;
@@ -396,8 +396,8 @@ Itcl_CreateProc(interp, cdefn, name, arglist, body)
     name = Tcl_DStringValue(&buffer);
 
     Itcl_PreserveData((ClientData)mfunc);
-    mfunc->accessCmd = Tcl_CreateObjCommand(interp, name, Itcl_ExecProc,
-        (ClientData)mfunc, Itcl_ReleaseData);
+    mfunc->accessCmd = Tcl_CreateObjCommand(interp, (CONST84 char *)name,
+	Itcl_ExecProc, (ClientData)mfunc, Itcl_ReleaseData);
 
     Tcl_DStringFree(&buffer);
     return TCL_OK;
@@ -423,9 +423,9 @@ int
 Itcl_CreateMemberFunc(interp, cdefn, name, arglist, body, mfuncPtr)
     Tcl_Interp* interp;            /* interpreter managing this action */
     ItclClass *cdefn;              /* class definition */
-    char* name;                    /* name of new member */
-    char* arglist;                 /* space-separated list of arg names */
-    char* body;                    /* body of commands for the method */
+    CONST char* name;              /* name of new member */
+    CONST char* arglist;           /* space-separated list of arg names */
+    CONST char* body;              /* body of commands for the method */
     ItclMemberFunc** mfuncPtr;     /* returns: pointer to new method defn */
 {
     int newEntry;
@@ -518,8 +518,8 @@ int
 Itcl_ChangeMemberFunc(interp, mfunc, arglist, body)
     Tcl_Interp* interp;            /* interpreter managing this action */
     ItclMemberFunc* mfunc;         /* command member being changed */
-    char* arglist;                 /* space-separated list of arg names */
-    char* body;                    /* body of commands for the method */
+    CONST char* arglist;           /* space-separated list of arg names */
+    CONST char* body;              /* body of commands for the method */
 {
     ItclMemberCode *mcode = NULL;
     Tcl_Obj *objPtr;
@@ -579,7 +579,7 @@ Itcl_ChangeMemberFunc(interp, mfunc, arglist, body)
  */
 void
 Itcl_DeleteMemberFunc(cdata)
-    char* cdata;  /* pointer to member function definition */
+    CONST char* cdata;  /* pointer to member function definition */
 {
     ItclMemberFunc* mfunc = (ItclMemberFunc*)cdata;
 
@@ -618,8 +618,8 @@ int
 Itcl_CreateMemberCode(interp, cdefn, arglist, body, mcodePtr)
     Tcl_Interp* interp;            /* interpreter managing this action */
     ItclClass *cdefn;              /* class containing this member */
-    char* arglist;                 /* space-separated list of arg names */
-    char* body;                    /* body of commands for the method */
+    CONST char* arglist;           /* space-separated list of arg names */
+    CONST char* body;              /* body of commands for the method */
     ItclMemberCode** mcodePtr;     /* returns: pointer to new implementation */
 {
     int argc;
@@ -668,11 +668,12 @@ Itcl_CreateMemberCode(interp, cdefn, arglist, body, mcodePtr)
     procPtr->cmdPtr->nsPtr = (Namespace*)cdefn->namesp;
 
     if (body) {
-        procPtr->bodyPtr = Tcl_NewStringObj(body, -1);
-        Tcl_IncrRefCount(procPtr->bodyPtr);
+        procPtr->bodyPtr = Tcl_NewStringObj((CONST84 char *)body, -1);
     } else {
-        procPtr->bodyPtr = NULL;
+        procPtr->bodyPtr = Tcl_NewStringObj((CONST84 char *)"", -1);
+        mcode->flags |= ITCL_IMPLEMENT_NONE;
     }
+    Tcl_IncrRefCount(procPtr->bodyPtr);
 
     /*
      *  Plug the argument list into the "compiled locals" list.
@@ -695,7 +696,7 @@ Itcl_CreateMemberCode(interp, cdefn, arglist, body, mcodePtr)
      *  as a symbolic name for a C procedure.
      */
     if (body == NULL) {
-        mcode->flags |= ITCL_IMPLEMENT_NONE;
+        /* No-op */
     }
     else if (*body == '@') {
         Tcl_CmdProc *argCmdProc;
@@ -745,7 +746,7 @@ Itcl_CreateMemberCode(interp, cdefn, arglist, body, mcodePtr)
  */
 void
 Itcl_DeleteMemberCode(cdata)
-    char* cdata;  /* pointer to member function definition */
+    CONST char* cdata;  /* pointer to member function definition */
 {
     ItclMemberCode* mcode = (ItclMemberCode*)cdata;
 
@@ -789,15 +790,16 @@ Itcl_GetMemberCode(interp, member)
     Tcl_Interp* interp;        /* interpreter managing this action */
     ItclMember* member;        /* member containing code body */
 {
-    ItclMemberCode *mcode = member->code;
-
     int result;
+    ItclMemberCode *mcode = member->code;
+    assert(mcode != NULL);
 
     /*
      *  If the implementation has not yet been defined, try to
      *  autoload it now.
      */
-    if ((mcode->flags & ITCL_IMPLEMENT_NONE) != 0) {
+
+    if (!Itcl_IsMemberCodeImplemented(mcode)) {
         result = Tcl_VarEval(interp, "::auto_load ", member->fullname,
             (char*)NULL);
 
@@ -820,8 +822,9 @@ Itcl_GetMemberCode(interp, member)
      *    the member and look at the current code pointer again.
      */
     mcode = member->code;
+    assert(mcode != NULL);
 
-    if ((mcode->flags & ITCL_IMPLEMENT_NONE) != 0) {
+    if (!Itcl_IsMemberCodeImplemented(mcode)) {
         Tcl_AppendStringsToObj(Tcl_GetObjResult(interp),
             "member function \"", member->fullname,
             "\" is not defined and cannot be autoloaded",
@@ -1003,7 +1006,7 @@ Itcl_EvalMemberCode(interp, mfunc, member, contextObj, objc, objv)
         result = Tcl_EvalObj(interp, mcode->procPtr->bodyPtr);
     }
     else {
-        panic("itcl: bad implementation flag for %s", member->fullname);
+        Tcl_Panic("itcl: bad implementation flag for %s", member->fullname);
     }
 
     /*
@@ -1050,7 +1053,7 @@ evalMemberCodeDone:
 int
 Itcl_CreateArgList(interp, decl, argcPtr, argPtr)
     Tcl_Interp* interp;       /* interpreter managing this function */
-    char* decl;               /* string representing argument list */
+    CONST char* decl;         /* string representing argument list */
     int* argcPtr;             /* returns number of args in argument list */
     CompiledLocal** argPtr;   /* returns pointer to parsed argument list */
 {
@@ -1064,7 +1067,8 @@ Itcl_CreateArgList(interp, decl, argcPtr, argPtr)
     *argcPtr = 0;
 
     if (decl) {
-        if (Tcl_SplitList(interp, decl, &argc, &argv) != TCL_OK) {
+        if (Tcl_SplitList(interp, (CONST84 char *)decl, &argc, &argv)
+		!= TCL_OK) {
             return TCL_ERROR;
         }
 
@@ -1142,8 +1146,8 @@ Itcl_CreateArgList(interp, decl, argcPtr, argPtr)
  */
 CompiledLocal*
 Itcl_CreateArg(name, init)
-    char* name;     /* name of new argument */
-    char* init;     /* initial value */
+    CONST char* name;     /* name of new argument */
+    CONST char* init;     /* initial value */
 {
     CompiledLocal *localPtr = NULL;
     int nameLen;
@@ -1164,7 +1168,7 @@ Itcl_CreateArg(name, init)
     localPtr->resolveInfo = NULL;
 
     if (init != NULL) {
-        localPtr->defValuePtr = Tcl_NewStringObj(init, -1);
+        localPtr->defValuePtr = Tcl_NewStringObj((CONST84 char *)init, -1);
         Tcl_IncrRefCount(localPtr->defValuePtr);
     } else {
         localPtr->defValuePtr = NULL;
@@ -1338,7 +1342,7 @@ Itcl_GetMemberFuncUsage(mfunc, contextObj, objPtr)
     Tcl_Obj *objPtr;            /* returns: string showing usage */
 {
     int argcount;
-    CONST char *name;
+    char *name;
     CompiledLocal *arglist, *argPtr;
     Tcl_HashEntry *entry;
     ItclMemberFunc *mf;
@@ -1365,25 +1369,22 @@ Itcl_GetMemberFuncUsage(mfunc, contextObj, objPtr)
                 Tcl_GetCommandFullName(contextObj->classDefn->interp,
                     contextObj->classDefn->accessCmd, objPtr);
                 Tcl_AppendToObj(objPtr, " ", -1);
-                name = Tcl_GetCommandName(contextObj->classDefn->interp,
-                    contextObj->accessCmd);
+                name = (char *) Tcl_GetCommandName(
+		    contextObj->classDefn->interp, contextObj->accessCmd);
                 Tcl_AppendToObj(objPtr, name, -1);
             } else {
                 Tcl_AppendToObj(objPtr, mfunc->member->fullname, -1);
             }
-        }
-        else if (contextObj && contextObj->accessCmd) {
-            name = Tcl_GetCommandName(contextObj->classDefn->interp,
+        } else if (contextObj && contextObj->accessCmd) {
+            name = (char *) Tcl_GetCommandName(contextObj->classDefn->interp,
                 contextObj->accessCmd);
             Tcl_AppendStringsToObj(objPtr, name, " ", mfunc->member->name,
                 (char*)NULL);
-        }
-        else {
+        } else {
             Tcl_AppendStringsToObj(objPtr, "<object> ", mfunc->member->name,
                 (char*)NULL);
         }
-    }
-    else {
+    } else {
         Tcl_AppendToObj(objPtr, mfunc->member->fullname, -1);
     }
 
@@ -1672,6 +1673,24 @@ Itcl_PushContext(interp, member, contextClass, contextObj, contextPtr)
         framePtr->numCompiledLocals = localCt;
         framePtr->compiledLocals = contextPtr->compiledLocals;
 
+        /*
+         * Invoking TclInitCompiledLocals with a framePtr->procPtr->bodyPtr
+         * that is not a compiled byte code type leads to a crash. So
+         * make sure that the body is compiled here. This needs to
+         * be done even if the body of the Itcl method is not implemented
+         * as a Tcl proc or has no implementation. The empty string should
+         * have been defined as the body if no implementation was defined.
+         */
+        assert(mcode->procPtr->bodyPtr != NULL);
+
+        result = TclProcCompileProc(interp, mcode->procPtr,
+            mcode->procPtr->bodyPtr, (Namespace*)member->classDefn->namesp,
+            "body for", member->fullname);
+
+        if (result != TCL_OK) {
+            return result;
+        }
+
         TclInitCompiledLocals(interp, framePtr,
             (Namespace*)contextClass->namesp);
     }
@@ -1852,12 +1871,12 @@ Itcl_AssignArgs(interp, objc, objv, mfunc)
          argPtr=argPtr->nextPtr, argsLeft--, varPtr++, objv++, objc--)
     {
         if (!TclIsVarArgument(argPtr)) {
-            panic("local variable %s is not argument but should be",
+            Tcl_Panic("local variable %s is not argument but should be",
                 argPtr->name);
             return TCL_ERROR;
         }
         if (TclIsVarTemporary(argPtr)) {
-            panic("local variable is temporary but should be an argument");
+            Tcl_Panic("local variable is temporary but should be an argument");
             return TCL_ERROR;
         }
 
@@ -2171,7 +2190,7 @@ ItclHandleConfig(interp, argc, vars, vals, contextObj)
     int result = TCL_OK;
 
     int i;
-    char *val;
+    CONST char *val;
     Tcl_DString lastval;
     ItclContext context;
     Tcl_CallFrame *oldFramePtr, *uplevelFramePtr;
@@ -2360,7 +2379,7 @@ Itcl_ConstructBase(interp, contextObj, contextClass)
 int
 Itcl_InvokeMethodIfExists(interp, name, contextClass, contextObj, objc, objv)
     Tcl_Interp *interp;       /* interpreter */
-    char *name;               /* name of desired method */
+    CONST char *name;         /* name of desired method */
     ItclClass *contextClass;  /* current class being constructed */
     ItclObject *contextObj;   /* object being constructed */
     int objc;                 /* number of arguments */

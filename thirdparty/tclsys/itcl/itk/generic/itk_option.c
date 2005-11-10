@@ -16,7 +16,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itk_option.c,v 1.1 1998/07/27 18:45:25 stanton Exp $
+ *     RCS:  $Id: itk_option.c,v 1.4 2002/08/11 04:12:54 davygrvy Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -29,7 +29,7 @@
  *  FORWARD DECLARATIONS
  */
 static char* ItkTraceClassDestroy _ANSI_ARGS_((ClientData cdata,
-    Tcl_Interp *interp, char *name1, char *name2, int flags));
+    Tcl_Interp *interp, CONST char *name1, CONST char *name2, int flags));
 static Tcl_HashTable* ItkGetClassesWithOptInfo _ANSI_ARGS_((
     Tcl_Interp *interp));
 static void ItkFreeClassesWithOptInfo _ANSI_ARGS_((ClientData cdata,
@@ -204,7 +204,7 @@ Itk_ConfigClassOption(interp, contextObj, cdata, newval)
     Tcl_Interp *interp;        /* interpreter managing the class */
     ItclObject *contextObj;    /* object being configured */
     ClientData cdata;          /* class option */
-    char *newval;              /* new value for this option */
+    CONST char *newval;        /* new value for this option */
 {
     ItkClassOption *opt = (ItkClassOption*)cdata;
     int result = TCL_OK;
@@ -340,8 +340,8 @@ static char*
 ItkTraceClassDestroy(cdata, interp, name1, name2, flags)
     ClientData cdata;          /* class definition data */
     Tcl_Interp *interp;        /* interpreter managing the class */
-    char *name1;               /* name of variable involved in trace */
-    char *name2;               /* name of array element within variable */
+    CONST char *name1;               /* name of variable involved in trace */
+    CONST char *name2;         /* name of array element within variable */
     int flags;                 /* flags describing trace */
 {
     ItclClass *cdefn = (ItclClass*)cdata;

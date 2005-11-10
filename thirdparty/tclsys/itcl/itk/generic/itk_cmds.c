@@ -16,7 +16,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: itk_cmds.c,v 1.12 2001/06/22 04:38:54 davygrvy Exp $
+ *     RCS:  $Id: itk_cmds.c,v 1.16 2005/03/25 21:08:03 hobbs Exp $
  * ========================================================================
  *           Copyright (c) 1993-1998  Lucent Technologies, Inc.
  * ------------------------------------------------------------------------
@@ -73,6 +73,13 @@ namespace eval ::itk {\n\
             lappend dirs [file join $bindir .. library]\n\
             lappend dirs [file join $bindir .. .. library]\n\
             lappend dirs [file join $bindir .. .. itk library]\n\
+            # On MacOSX, check the directories in the tcl_pkgPath\n\
+            if {[string equal $::tcl_platform(platform) \"unix\"] && \
+                    [string equal $::tcl_platform(os) \"Darwin\"]} {\n\
+                foreach d $::tcl_pkgPath {\n\
+                    lappend dirs [file join $d itk$version]\n\
+                }\n\
+            }\n\
         }\n\
         foreach i $dirs {\n\
             set library $i\n\
@@ -111,17 +118,28 @@ Initialize(interp)
 {
     Tcl_Namespace *itkNs, *parserNs;
     ClientData parserInfo;
-    extern ItkStubs itkStubs;
 
+#ifndef USE_TCL_STUBS
+    if (Tcl_PkgRequire(interp, "Tcl", TCL_VERSION, 0) == NULL) {
+      return TCL_ERROR;
+    }
+    if (Tcl_PkgRequire(interp, "Tk", TK_VERSION, 0) == NULL) {
+      return TCL_ERROR;
+    }
+    if (Tcl_PkgRequire(interp, "Itcl", ITCL_VERSION, 0) == NULL) {
+      return TCL_ERROR;
+    }
+#else
     if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
-	return TCL_ERROR;
-    };
+      return TCL_ERROR;
+    }
     if (Tk_InitStubs(interp, "8.1", 0) == NULL) {
 	return TCL_ERROR;
     };
     if (Itcl_InitStubs(interp, ITCL_VERSION, 1) == NULL) {
 	return TCL_ERROR;
     }
+#endif
 
 
     /*
@@ -199,8 +217,8 @@ Initialize(interp)
     Tcl_CreateObjCommand(interp, "::itcl::configbody", Itk_ConfigBodyCmd,
         (ClientData)NULL, (Tcl_CmdDeleteProc*)NULL);
 
-    Tcl_SetVar(interp, "::itk::version", ITCL_VERSION, 0);
-    Tcl_SetVar(interp, "::itk::patchLevel", ITCL_PATCH_LEVEL, 0);
+    Tcl_SetVar(interp, "::itk::version", ITK_VERSION, 0);
+    Tcl_SetVar(interp, "::itk::patchLevel", ITK_PATCH_LEVEL, 0);
 
     /*
      *  Signal that the package has been loaded and provide the Itk Stubs table
@@ -208,10 +226,20 @@ Initialize(interp)
      *  someone could be extending Itk.  Who is to say that Itk is the
      *  end-of-the-line?
      */
-    if (Tcl_PkgProvideEx(interp, "Itk", ITCL_VERSION,
-            (ClientData) &itkStubs) != TCL_OK) {
+
+#if TCL_DOES_STUBS
+    {
+	extern ItkStubs itkStubs;
+	if (Tcl_PkgProvideEx(interp, "Itk", ITK_VERSION,
+		(ClientData) &itkStubs) != TCL_OK) {
+	    return TCL_ERROR;
+	}
+    }
+#else
+    if (Tcl_PkgProvide(interp, "Itk", ITK_VERSION) != TCL_OK) {
 	return TCL_ERROR;
     }
+#endif
     return TCL_OK;
 }
 

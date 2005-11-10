@@ -210,4 +210,3 @@ clean:
 	-@$(RM) itcl.def
 	-@$(RM) $(TMPDIR)\*.obj
 	-@$(RM) *.cfg
-

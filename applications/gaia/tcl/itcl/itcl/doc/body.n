@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: $Id: body.n,v 1.1 1998/07/27 18:41:58 stanton Exp $
+'\" RCS: $Id: body.n,v 1.4 2004/09/25 22:50:43 davygrvy Exp $
 '\"
 .so man.macros
 .TH body n 3.0 itcl "[incr\ Tcl]"
@@ -13,7 +13,7 @@
 .SH NAME
 body \- change the body for a class method/proc
 .SH SYNOPSIS
-\fBbody \fIclassName\fB::\fIfunction args body\fR
+\fBitcl::body \fIclassName\fB::\fIfunction args body\fR
 .BE
 
 .SH DESCRIPTION
@@ -86,7 +86,7 @@ of the constructor/destructor must be included in the class
 definition, but they can be redefined via the \fBbody\fR command
 as well.
 .CS
-class File {
+itcl::class File {
     private variable fid ""
     constructor {name access} {
         set fid [open $name $access]
@@ -100,13 +100,13 @@ class File {
     method eof {}
 }
 
-body File::get {} {
+itcl::body File::get {} {
     return [gets $fid]
 }
-body File::put {line} {
+itcl::body File::put {line} {
     puts $fid $line
 }
-body File::eof {} {
+itcl::body File::eof {} {
     return [::eof $fid]
 }
 
@@ -117,7 +117,7 @@ File x /etc/passwd "r"
 while {![x eof]} {
     puts "=> [x get]"
 }
-delete object x
+itcl::delete object x
 .CE
 
 .SH KEYWORDS

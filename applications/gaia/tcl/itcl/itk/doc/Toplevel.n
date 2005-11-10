@@ -4,7 +4,7 @@
 '\" See the file "license.terms" for information on usage and redistribution
 '\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 '\"
-'\" RCS: $Id: Toplevel.n,v 1.3 1998/08/11 14:40:53 welch Exp $
+'\" RCS: $Id: Toplevel.n,v 1.4 2004/09/01 04:23:10 davygrvy Exp $
 '\"
 .so man.macros
 .TH Toplevel n 3.0 itk "[incr\ Tk]"
@@ -68,7 +68,7 @@ user can dismiss by pushing the "Dismiss" button.
 .CS
 option add *MessageInfo.title "Notice" widgetDefault
 
-class MessageInfo {
+itcl::class MessageInfo {
     inherit itk::Toplevel
 
     constructor {args} {
@@ -117,7 +117,7 @@ class MessageInfo {
     }
 }
 
-usual MessageInfo {
+itk::usual MessageInfo {
     keep -background -cursor -foreground -font
     keep -activebackground -activeforeground -disabledforeground
     keep -highlightcolor -highlightthickness

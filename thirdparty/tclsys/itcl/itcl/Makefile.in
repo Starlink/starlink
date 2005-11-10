@@ -7,14 +7,46 @@
 #	replaced in the actual Makefile.
 #
 # Copyright (c) 1999 Scriptics Corporation.
+# Copyright (c) 2002-2004 ActiveState Corporation.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
 #
-# RCS: @(#) $Id: Makefile.in,v 1.15 2001/05/29 15:51:16 andreas_kupries Exp $
+# RCS: @(#) $Id: Makefile.in,v 1.27 2005/03/25 22:58:48 dgp Exp $
 
 #========================================================================
-# Edit the following few lines when writing a new extension
+# The names of the source files is defined in the configure script.
+# The object files are used for linking into the final library.
+# This will be used when a dist target is added to the Makefile.
+# It is not important to specify the directory, as long as it is the
+# $(srcdir) or in the generic, win or unix subdirectory.
+#========================================================================
+
+PKG_SOURCES	= @PKG_SOURCES@
+PKG_OBJECTS	= @PKG_OBJECTS@
+
+PKG_STUB_SOURCES = @PKG_STUB_SOURCES@
+PKG_STUB_OBJECTS = @PKG_STUB_OBJECTS@
+
+#========================================================================
+# PKG_TCL_SOURCES identifies Tcl runtime files that are associated with
+# this package that need to be installed, if any.
+#========================================================================
+
+PKG_TCL_SOURCES = @PKG_TCL_SOURCES@
+
+#========================================================================
+# This is a list of header files to be installed
+# itk.h includes itclInt.h, which needs itclIntDecls.h,
+# so we must install them.
+#========================================================================
+
+PKG_HEADERS	= @PKG_HEADERS@
+
+#========================================================================
+# Nothing of the variables below this line need to be changed.  Please
+# check the TARGETS section below to make sure the make targets are
+# correct.
 #========================================================================
 
 #========================================================================
@@ -23,215 +55,98 @@
 # library that we are building.
 #========================================================================
 
-lib_BINARIES=$(itcl_LIB_FILE) $(itclstub_LIB_FILE)
-BINARIES=$(lib_BINARIES)
+PKG_LIB_FILE	= @PKG_LIB_FILE@
+PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
-#========================================================================
-# Enumerate the names of the source files included in this package.
-# This will be used when a dist target is added to the Makefile.
-#========================================================================
+lib_BINARIES	= $(PKG_LIB_FILE) $(PKG_STUB_LIB_FILE)
+BINARIES	= $(lib_BINARIES)
 
-WIN_DIR=$(srcdir)/win
-UNIX_DIR=$(srcdir)/unix
-GENERIC_DIR=$(srcdir)/generic
-PLATFORM_DIR=@PLATFORM_DIR@
+SHELL		= @SHELL@
 
-WIN_SOURCES=$(PLATFORM_DIR)/tclAppInit.c \
-	$(PLATFORM_DIR)/dllEntryPoint.c
-UNIX_SOURCES=$(PLATFORM_DIR)/tclAppInit.c
-GENERIC_SOURCES = $(GENERIC_DIR)/itclStubInit.c \
-	$(GENERIC_DIR)/itclStubLib.c \
-	$(GENERIC_DIR)/itcl_bicmds.c \
-	$(GENERIC_DIR)/itcl_class.c \
-	$(GENERIC_DIR)/itcl_cmds.c \
-	$(GENERIC_DIR)/itcl_ensemble.c \
-	$(GENERIC_DIR)/itcl_linkage.c \
-	$(GENERIC_DIR)/itcl_methods.c \
-	$(GENERIC_DIR)/itcl_migrate.c \
-	$(GENERIC_DIR)/itcl_objects.c \
-	$(GENERIC_DIR)/itcl_obsolete.c \
-	$(GENERIC_DIR)/itcl_parse.c \
-	$(GENERIC_DIR)/itcl_util.c
-PLATFORM_SOURCES = @PLATFORM_SOURCES@
-itcl_SOURCES = $(PLATFORM_SOURCES) $(GENERIC_SOURCES)
-SOURCES = $(itcl_SOURCES)
+srcdir		= @srcdir@
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
 
-#========================================================================
-# Enumerate the names of the object files included in this package.
-# These objects are created and linked into the final library.  In
-# most cases these object files will correspond to the source files
-# above.
-#
-#========================================================================
+bindir		= @bindir@
+libdir		= @libdir@
+datadir		= @datadir@
+mandir		= @mandir@
+includedir	= @includedir@
 
-WIN_OBJECTS = dllEntryPoint.$(OBJEXT)
-UNIX_OBJECTS =
-GENERIC_OBJECTS = itclStubInit.$(OBJEXT) \
-	itcl_bicmds.$(OBJEXT) \
-	itcl_class.$(OBJEXT) \
-	itcl_cmds.$(OBJEXT) \
-	itcl_ensemble.$(OBJEXT) \
-	itcl_linkage.$(OBJEXT) \
-	itcl_methods.$(OBJEXT) \
-	itcl_migrate.$(OBJEXT) \
-	itcl_objects.$(OBJEXT) \
-	itcl_obsolete.$(OBJEXT) \
-	itcl_parse.$(OBJEXT) \
-	itcl_util.$(OBJEXT)
-PLATFORM_OBJECTS = @PLATFORM_OBJECTS@
-itclstub_OBJECTS = itclStubLib.$(OBJEXT)
-itcl_OBJECTS = $(PLATFORM_OBJECTS) $(GENERIC_OBJECTS)
-OBJECTS = $(itcl_OBJECTS) $(itclstub_OBJECTS)
+DESTDIR		=
 
-#========================================================================
-# The substitution of "exampleA_LIB_FILE" into the variable name below
-# let's us refer to the objects for the library without knowing the name
-# of the library in advance.  It also lets us use the "$@" variable in
-# the rule for building the library, so we can refer to both the list of 
-# objects and the library itself in a platform-independent manner.
-#========================================================================
+PKG_DIR		= $(PACKAGE_NAME)$(PACKAGE_VERSION)
+pkgdatadir	= $(datadir)/$(PKG_DIR)
+pkglibdir	= $(libdir)/$(PKG_DIR)
+pkgincludedir	= $(includedir)/$(PKG_DIR)
 
-itcl_LIB_FILE = @itcl_LIB_FILE@
-@itcl_LIB_FILE@_OBJECTS = $(itcl_OBJECTS)
+top_builddir	= .
 
-itclstub_LIB_FILE = @itclstub_LIB_FILE@
-@itclstub_LIB_FILE@_OBJECTS = $(itclstub_OBJECTS)
+INSTALL		= @INSTALL@
+INSTALL_PROGRAM	= @INSTALL_PROGRAM@
+INSTALL_DATA	= @INSTALL_DATA@
+INSTALL_SCRIPT	= @INSTALL_SCRIPT@
 
-#========================================================================
-# This is a list of header files to be installed
-# itk.h includes itclInt.h, which needs itclIntDecls.h, so we must install them.
-#========================================================================
-
-GENERIC_HDRS= \
-	$(srcdir)/generic/itcl.h \
-	$(srcdir)/generic/itclDecls.h \
-	$(srcdir)/generic/itclInt.h \
-	$(srcdir)/generic/itclIntDecls.h
-
-#========================================================================
-# Add additional lines to handle any additional AC_SUBST cases that
-# have been added to the configure script.
-#========================================================================
-
-SAMPLE_NEW_VAR=@SAMPLE_NEW_VAR@
-
-ITCL_LIBRARY = $(prefix)/lib/itcl$(VERSION)
-
-ITCL_GENERIC_DIR_NATIVE = @ITCL_GENERIC_DIR_NATIVE@
-ITCL_UNIX_DIR_NATIVE = @ITCL_UNIX_DIR_NATIVE@
-ITCL_WIN_DIR_NATIVE = @ITCL_WIN_DIR_NATIVE@
-
-#========================================================================
-# Nothing of the variables below this line need to be changed.  Please
-# check the TARGETS section below to make sure the make targets are
-# correct.
-#========================================================================
-
-SHELL = @SHELL@
-
-srcdir = @srcdir@
-top_srcdir = @top_srcdir@
-prefix = @prefix@
-exec_prefix = @exec_prefix@
-
-bindir = @bindir@
-sbindir = @sbindir@
-libexecdir = @libexecdir@
-datadir = @datadir@
-sysconfdir = @sysconfdir@
-sharedstatedir = @sharedstatedir@
-localstatedir = @localstatedir@
-libdir = @libdir@
-infodir = @infodir@
-mandir = @mandir@
-includedir = @includedir@
-oldincludedir = /usr/include
-
-DESTDIR =
-
-pkgdatadir = $(datadir)/@PACKAGE@@VERSION@
-pkglibdir = $(libdir)/@PACKAGE@@VERSION@
-pkgincludedir = $(includedir)/@PACKAGE@@VERSION@
-
-top_builddir = .
-
-#INSTALL = $(top_srcdir)/../config/install-sh -c
-INSTALL = $(TCLSH_PROG) `@CYGPATH@ $(srcdir)/../config/installFile.tcl` -c
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_SCRIPT = @INSTALL_SCRIPT@
-INSTALL_STRIP_FLAG =
-transform = @program_transform_name@
-
-NORMAL_INSTALL = :
-PRE_INSTALL = :
-POST_INSTALL = :
-NORMAL_UNINSTALL = :
-PRE_UNINSTALL = :
-POST_UNINSTALL = :
-
-PACKAGE = @PACKAGE@
-VERSION = @VERSION@
-CC = @CC@
-CFLAGS_DEBUG = @CFLAGS_DEBUG@
-CFLAGS_DEFAULT = @CFLAGS_DEFAULT@
-CFLAGS_OPTIMIZE = @CFLAGS_OPTIMIZE@
-CLEANFILES = @CLEANFILES@
-EXEEXT = @EXEEXT@
-LDFLAGS_DEBUG = @LDFLAGS_DEBUG@
-LDFLAGS_DEFAULT = @LDFLAGS_DEFAULT@
-LDFLAGS_OPTIMIZE = @LDFLAGS_OPTIMIZE@
-MAKE_LIB = @MAKE_LIB@
-MAKE_SHARED_LIB = @MAKE_SHARED_LIB@
-MAKE_STATIC_LIB = @MAKE_STATIC_LIB@
-OBJEXT = @OBJEXT@
-RANLIB = @RANLIB@
-SHLIB_CFLAGS = @SHLIB_CFLAGS@
-SHLIB_LD = @SHLIB_LD@
-SHLIB_LDFLAGS = @SHLIB_LDFLAGS@
-SHLIB_LD_LIBS = @SHLIB_LD_LIBS@
-STLIB_LD = @STLIB_LD@
-TCL_BIN_DIR = @TCL_BIN_DIR@
-TCL_DEFS = @TCL_DEFS@
-TCL_EXTRA_CFLAGS = @TCL_EXTRA_CFLAGS@
-TCL_LD_FLAGS = @TCL_LD_FLAGS@
-TCL_LIBS = @TCL_LIBS@
-TCL_SHLIB_LD_LIBS = @TCL_SHLIB_LD_LIBS@
-TCL_SRC_DIR = @TCL_SRC_DIR@
-TCL_DBGX = @TCL_DBGX@
-TCL_STUB_LIB_FILE = @TCL_STUB_LIB_FILE@
-TCL_STUB_LIB_SPEC = @TCL_STUB_LIB_SPEC@
-TCL_TOOL_DIR_NATIVE = @TCL_TOOL_DIR_NATIVE@
+PACKAGE_NAME	= @PACKAGE_NAME@
+PACKAGE_VERSION	= @PACKAGE_VERSION@
+CC		= @CC@
+CFLAGS_DEFAULT	= @CFLAGS_DEFAULT@
+CFLAGS_WARNING	= @CFLAGS_WARNING@
+CLEANFILES	= @CLEANFILES@
+EXEEXT		= @EXEEXT@
+LDFLAGS_DEFAULT	= @LDFLAGS_DEFAULT@
+MAKE_LIB	= @MAKE_LIB@
+MAKE_SHARED_LIB	= @MAKE_SHARED_LIB@
+MAKE_STATIC_LIB	= @MAKE_STATIC_LIB@
+MAKE_STUB_LIB	= @MAKE_STUB_LIB@
+OBJEXT		= @OBJEXT@
+RANLIB		= @RANLIB@
+RANLIB_STUB	= @RANLIB_STUB@
+SHLIB_CFLAGS	= @SHLIB_CFLAGS@
+SHLIB_LD	= @SHLIB_LD@
+SHLIB_LD_FLAGS	= @SHLIB_LD_FLAGS@
+SHLIB_LD_LIBS	= @SHLIB_LD_LIBS@
+STLIB_LD	= @STLIB_LD@
+TCL_DEFS	= @TCL_DEFS@
+TCL_BIN_DIR	= @TCL_BIN_DIR@
+TCL_SRC_DIR	= @TCL_SRC_DIR@
+# This is necessary for packages that use private Tcl headers
 TCL_TOP_DIR_NATIVE = @TCL_TOP_DIR_NATIVE@
-TCL_UNIX_DIR_NATIVE = @TCL_UNIX_DIR_NATIVE@
-TCL_WIN_DIR_NATIVE = @TCL_WIN_DIR_NATIVE@
-INCLUDE_DIR_NATIVE = @INCLUDE_DIR_NATIVE@
-TCL_BMAP_DIR_NATIVE = @TCL_BMAP_DIR_NATIVE@
-TCL_PLATFORM_DIR_NATIVE = @TCL_PLATFORM_DIR_NATIVE@
-TCL_GENERIC_DIR_NATIVE = @TCL_GENERIC_DIR_NATIVE@
-TCLSH_PROG = @TCLSH_PROG@
-ITCL_INCLUDES = @ITCL_INCLUDES@
 
-AUTOCONF = autoconf
+# Not used, but retained for reference of what libs Tcl required
+TCL_LIBS	= @TCL_LIBS@
 
-LDFLAGS = $(LDFLAGS_DEFAULT)
+#========================================================================
+# TCLLIBPATH seeds the auto_path in Tcl's init.tcl so we can test our
+# package without installing.  The other environment variables allow us
+# to test against an uninstalled Tcl.  Add special env vars that you
+# require for testing here (like TCLX_LIBRARY).
+#========================================================================
 
-INCLUDES = @TCL_INCLUDES@ @ITCL_INCLUDES@
+EXTRA_PATH	= $(top_builddir):$(TCL_BIN_DIR)
+TCLSH_ENV	= TCL_LIBRARY=`@CYGPATH@ $(TCL_SRC_DIR)/library` \
+		  ITCL_LIBRARY=`@CYGPATH@ $(srcdir)/library` \
+		  @LD_LIBRARY_PATH_VAR@="$(EXTRA_PATH):$(@LD_LIBRARY_PATH_VAR@)" \
+		  PATH="$(EXTRA_PATH):$(PATH)" \
+		  TCLLIBPATH="$(top_builddir)"
+TCLSH_PROG	= @TCLSH_PROG@
+TCLSH		= $(TCLSH_ENV) $(TCLSH_PROG)
+SHARED_BUILD	= @SHARED_BUILD@
 
-EXTRA_CFLAGS = $(AC_FLAGS) $(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) $(NO_DEPRECATED_FLAGS) $(TCL_EXTRA_CFLAGS)
+INCLUDES	= @PKG_INCLUDES@ @TCL_INCLUDES@
 
-DEFS = @DEFS@ $(EXTRA_CFLAGS) -DITCL_LIBRARY=\"$(ITCL_LIBRARY)\"
+PKG_CFLAGS	= @PKG_CFLAGS@
 
-ACLOCAL_M4 = $(srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/../config/mkinstalldirs
+DEFS		= @DEFS@ $(PKG_CFLAGS) \
+		  -DITCL_LIBRARY=\"$(pkglibdir)\" -DUSE_NON_CONST
 
-CPPFLAGS = @CPPFLAGS@
-LIBS = @LIBS@
-AR = ar
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+CONFIG_CLEAN_FILES = @CONFIG_CLEAN_FILES@ Makefile itclConfig.sh pkgIndex.tcl
+
+CPPFLAGS	= @CPPFLAGS@
+LIBS		= @PKG_LIBS@ @LIBS@
+AR		= @AR@
+CFLAGS		= @CFLAGS@
+COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 
 #========================================================================
 # Start of user-definable TARGETS section
@@ -269,16 +184,11 @@ install-binaries: binaries install-lib-binaries install-bin-binaries
 #========================================================================
 
 install-libraries: libraries
-	$(mkinstalldirs) $(includedir)
-	@echo "Installing header files in $(includedir)"
-	@for i in $(GENERIC_HDRS) ; do \
-	    echo "Installing $$i" ; \
-	    $(INSTALL_DATA) $$i $(includedir) ; \
-	done;
-	@echo "Installing library files in $(ITCL_LIBRARY)"
-	@for i in $(srcdir)/library/*.tcl ; do \
-	    echo "Installing $$i" ; \
-	    $(INSTALL_DATA) $$i $(ITCL_LIBRARY) ; \
+	@mkdir -p $(DESTDIR)$(includedir)
+	@echo "Installing header files in $(DESTDIR)$(includedir)"
+	@list='$(PKG_HEADERS)'; for i in $$list; do \
+	    echo "Installing $(srcdir)/$$i" ; \
+	    $(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(includedir) ; \
 	done;
 
 #========================================================================
@@ -287,104 +197,113 @@ install-libraries: libraries
 #========================================================================
 
 install-doc: doc
-	$(mkinstalldirs) $(mandir)/mann
-	@echo "Installing man pages in $(mandir)"
-	@for i in $(srcdir)/doc/*.n; \
-	    do \
+	@mkdir -p $(DESTDIR)$(mandir)/mann
+	@echo "Installing man pages in $(DESTDIR)$(mandir)"
+	@cd $(srcdir)/doc; for i in *.n; do \
 	    echo "Installing $$i"; \
-	    rm -f $(mandir)/mann/`basename $$i`; \
-	    $(INSTALL_DATA) $$i $(mandir)/mann ; \
-	    done
+	    rm -f $(DESTDIR)$(mandir)/mann/`basename $$i`; \
+	    sed -e '/man\.macros/r man.macros' -e '/man\.macros/d' \
+		$$i > $(DESTDIR)$(mandir)/mann/$$i; \
+	    chmod 444 $(DESTDIR)$(mandir)/mann/$$i; \
+	done
 
-test: $(TCLSH_PROG)
-	$(TCLSH_PROG) `@CYGPATH@ $(srcdir)/tests/all.tcl` \
-		-exedir `@CYGPATH@ $(bindir)` $(TESTFLAGS)
+test: binaries libraries
+	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all.tcl` -load "package require Itcl" $(TESTFLAGS)
+
+shell: binaries libraries
+	@$(TCLSH) $(SCRIPT)
+
+gdb:
+	$(TCLSH_ENV) gdb $(TCLSH_PROG) $(SCRIPT)
 
 depend:
 
 #========================================================================
-# Enumerate the names of the object files included in this package.
-# These objects are created and linked into the final library.  In
-# most cases these object files will correspond to the source files
-# above.
+# $(PKG_LIB_FILE) should be listed as part of the BINARIES variable
+# mentioned above.  That will ensure that this target is built when you
+# run "make binaries".
 #
-# $(exampleA_LIB_FILE) should be listed as part of the BINARIES variable
-# at the top of the Makefile.  That will ensure that this target is built
-# when you run "make binaries".
-#
-# You shouldn't need to modify this target, except to change the package
-# name from "exampleA" to your package's name.
+# The $(PKG_OBJECTS) objects are created and linked into the final
+# library.  In most cases these object files will correspond to the
+# source files above.
 #========================================================================
 
-$(itcl_LIB_FILE): $(itcl_OBJECTS)
-	-rm -f $(itcl_LIB_FILE)
-	@MAKE_LIB@
-	$(RANLIB) $(itcl_LIB_FILE)
+$(PKG_LIB_FILE): $(PKG_OBJECTS)
+	-rm -f $(PKG_LIB_FILE)
+	${MAKE_LIB}
+	$(RANLIB) $(PKG_LIB_FILE)
 
-$(itclstub_LIB_FILE): $(itclstub_OBJECTS)
-	-rm -f $(itclstub_LIB_FILE)
-	@MAKE_STATIC_LIB@
-	$(RANLIB) $(itclstub_LIB_FILE)
+$(PKG_STUB_LIB_FILE): $(PKG_STUB_OBJECTS)
+	-rm -f $(PKG_STUB_LIB_FILE)
+	${MAKE_STUB_LIB}
+	$(RANLIB_STUB) $(PKG_STUB_LIB_FILE)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
-# Unfortunately, there does not seem to be any other way to do this
-# in a Makefile-independent way.  We can't use VPATH because it picks up
-# object files that may be located in the source directory.
 #
 # In the following lines, $(srcdir) refers to the toplevel directory
 # containing your extension.  If your sources are in a subdirectory,
 # you will have to modify the paths to reflect this:
 #
-# exampleA.$(OBJEXT): $(srcdir)/src/win/exampleA.c
-# 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/src/win/exampleA.c` -o $@
+# exampleA.$(OBJEXT): $(srcdir)/generic/exampleA.c
+# 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/generic/exampleA.c` -o $@
+#
+# Setting the VPATH variable to a list of paths will cause the makefile
+# to look into these paths when resolving .c to .obj dependencies.
+# As necessary, add $(srcdir):$(srcdir)/compat:....
 #========================================================================
 
-dllEntryPoint.$(OBJEXT): $(WIN_DIR)/dllEntryPoint.c
-	$(COMPILE) -c `@CYGPATH@ $(WIN_DIR)/dllEntryPoint.c` -o $@
+VPATH = $(srcdir)/unix:$(srcdir)/generic:$(srcdir)/win
 
-tclAppInit.$(OBJEXT): $(PLATFORM_DIR)/tclAppInit.c
-	$(COMPILE) -c `@CYGPATH@ $(PLATFORM_DIR)/tclAppInit.c` -o $@
+.c.$(OBJEXT):
+	$(COMPILE) -c `@CYGPATH@ $<` -o $@
 
-itclStubInit.$(OBJEXT): $(GENERIC_DIR)/itclStubInit.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itclStubInit.c` -o $@
+#========================================================================
+# Distribution creation
+# You may need to tweak this target to make it work correctly.
+#========================================================================
 
-itclStubLib.$(OBJEXT): $(GENERIC_DIR)/itclStubLib.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itclStubLib.c` -o $@
+#COMPRESS       = tar cvf $(PKG_DIR).tar $(PKG_DIR); compress $(PKG_DIR).tar
+COMPRESS        = gtar zcvf $(PKG_DIR).tar.gz $(PKG_DIR)
+DIST_ROOT       = /tmp/dist
+DIST_DIR        = $(DIST_ROOT)/$(PKG_DIR)
 
-itcl_bicmds.$(OBJEXT): $(GENERIC_DIR)/itcl_bicmds.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_bicmds.c` -o $@
+dist-clean:
+	rm -rf $(DIST_DIR) $(DIST_ROOT)/$(PKG_DIR).tar.*
 
-itcl_class.$(OBJEXT): $(GENERIC_DIR)/itcl_class.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_class.c` -o $@
+dist: dist-clean doc
+	mkdir -p $(DIST_DIR)
+	cp -p $(srcdir)/license* $(srcdir)/aclocal.m4 $(srcdir)/configure \
+		$(srcdir)/*.in  $(DIST_DIR)/
+	chmod 664 $(DIST_DIR)/Makefile.in $(DIST_DIR)/aclocal.m4
+	chmod 775 $(DIST_DIR)/configure $(DIST_DIR)/configure.in
 
-itcl_cmds.$(OBJEXT): $(GENERIC_DIR)/itcl_cmds.c Makefile
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_cmds.c` -o $@
+	mkdir $(DIST_DIR)/tclconfig
+	cp $(srcdir)/tclconfig/install-sh $(srcdir)/tclconfig/tcl.m4 \
+		$(DIST_DIR)/tclconfig/
+	chmod 664 $(DIST_DIR)/tclconfig/tcl.m4
+	chmod +x $(DIST_DIR)/tclconfig/install-sh
 
-itcl_ensemble.$(OBJEXT): $(GENERIC_DIR)/itcl_ensemble.c Makefile
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_ensemble.c` -o $@
+	list='doc generic library tests tests/old win win/rc'; \
+	for p in $$list; do \
+	    if test -d $(srcdir)/$$p ; then \
+		mkdir $(DIST_DIR)/$$p; \
+		for q in $(srcdir)/$$p/*; do \
+		    if test -f $$q ; then \
+			cp -p $$q $(DIST_DIR)/$$p/; \
+		    fi; \
+		done; \
+	    fi; \
+	done
 
-itcl_linkage.$(OBJEXT): $(GENERIC_DIR)/itcl_linkage.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_linkage.c` -o $@
+	list='CHANGES ChangeLog INCOMPATIBLE README TODO'; \
+	for p in $$list; do \
+	    if test -f $(srcdir)/../$$p ; then \
+		cp -p $(srcdir)/../$$p $(DIST_DIR)/; \
+	    fi; \
+	done
 
-itcl_methods.$(OBJEXT): $(GENERIC_DIR)/itcl_methods.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_methods.c` -o $@
-
-itcl_migrate.$(OBJEXT): $(GENERIC_DIR)/itcl_migrate.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_migrate.c` -o $@
-
-itcl_objects.$(OBJEXT): $(GENERIC_DIR)/itcl_objects.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_objects.c` -o $@
-
-itcl_obsolete.$(OBJEXT): $(GENERIC_DIR)/itcl_obsolete.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_obsolete.c` -o $@
-
-itcl_parse.$(OBJEXT): $(GENERIC_DIR)/itcl_parse.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_parse.c` -o $@
-
-itcl_util.$(OBJEXT): $(GENERIC_DIR)/itcl_util.c
-	$(COMPILE) -c `@CYGPATH@ $(GENERIC_DIR)/itcl_util.c` -o $@
-
+	(cd $(DIST_ROOT); $(COMPRESS);)
 
 #========================================================================
 # End of user-definable section
@@ -403,9 +322,8 @@ clean:
 
 distclean: clean
 	-rm -f *.tab.c
-	-rm -f Makefile $(CONFIG_CLEAN_FILES)
-	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
-	-rm -f config.status
+	-rm -f $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log config.status
 
 #========================================================================
 # Install binary object libraries.  On Windows this includes both .dll and
@@ -419,31 +337,39 @@ distclean: clean
 # You should not have to modify this target.
 #========================================================================
 
-install-lib-binaries: installdirs
+install-lib-binaries:
+	@mkdir -p $(DESTDIR)$(pkglibdir)
 	@list='$(lib_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
+	    echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$$p"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(pkglibdir)/$$p; \
+	    stub=`echo $$p|sed -e "s/.*\(stub\).*/\1/"`; \
+	    if test "x$$stub" = "xstub"; then \
+		echo " $(RANLIB_STUB) $(DESTDIR)$(pkglibdir)/$$p"; \
+		$(RANLIB_STUB) $(DESTDIR)$(pkglibdir)/$$p; \
+	    else \
+		echo " $(RANLIB) $(DESTDIR)$(pkglibdir)/$$p"; \
+		$(RANLIB) $(DESTDIR)$(pkglibdir)/$$p; \
+	    fi; \
 	    ext=`echo $$p|sed -e "s/.*\.//"`; \
 	    if test "x$$ext" = "xdll"; then \
-	        echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p"; \
-	        $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p; \
 		lib=`basename $$p|sed -e 's/.[^.]*$$//'`.lib; \
 		if test -f $$lib; then \
-		    echo " $(INSTALL_PROGRAM) $$lib $(DESTDIR)$(libdir)/$$lib"; \
-	            $(INSTALL_PROGRAM) $$lib $(DESTDIR)$(libdir)/$$lib; \
+		    echo " $(INSTALL_DATA) $$lib $(DESTDIR)$(pkglibdir)/$$lib"; \
+	            $(INSTALL_DATA) $$lib $(DESTDIR)$(pkglibdir)/$$lib; \
 		fi; \
-	    else \
-		echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/$$p"; \
-	        $(INSTALL_PROGRAM) $$p $(DESTDIR)$(libdir)/$$p; \
 	    fi; \
-	  else :; fi; \
+	  fi; \
 	done
-	@list='$(lib_BINARIES)'; for p in $$list; do \
-	  if test -f $$p; then \
-	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
-	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
-	  else :; fi; \
+	@list='$(PKG_TCL_SOURCES)'; for p in $$list; do \
+	  if test -f $(srcdir)/$$p; then \
+	    destp=`basename $$p`; \
+	    echo " Install $$destp $(DESTDIR)$(pkglibdir)/$$destp"; \
+	    $(INSTALL_DATA) $(srcdir)/$$p $(DESTDIR)$(pkglibdir)/$$destp; \
+	  fi; \
 	done
-	$(INSTALL_DATA) pkgIndex.tcl $(pkglibdir)
+	$(INSTALL_DATA) pkgIndex.tcl $(DESTDIR)$(pkglibdir)
+	$(INSTALL_DATA) itclConfig.sh $(DESTDIR)$(libdir)
 
 #========================================================================
 # Install binary executables (e.g. .exe files)
@@ -451,40 +377,34 @@ install-lib-binaries: installdirs
 # You should not have to modify this target.
 #========================================================================
 
-install-bin-binaries: installdirs
+install-bin-binaries:
+	@mkdir -p $(DESTDIR)$(bindir)
 	@list='$(bin_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(DESTDIR)$(bindir)/$$p; \
-	  else :; fi; \
+	    echo " $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p"; \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p; \
+	  fi; \
 	done
 
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .c .$(OBJEXT)
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-#config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-#	$(SHELL) ./config.status --recheck
-#$(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
-#	cd $(srcdir) && $(AUTOCONF)
-
-
 uninstall-binaries:
-	@$(NORMAL_UNINSTALL)
-	list='$(BINARIES)'; for p in $$list; do \
-	  rm -f $(DESTDIR)$(libdir)/$$p; \
+	list='$(lib_BINARIES)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(pkglibdir)/$$p; \
+	done
+	list='$(PKG_TCL_SOURCES)'; for p in $$list; do \
+	  p=`basename $$p`; \
+	  rm -f $(DESTDIR)$(pkglibdir)/$$p; \
+	done
+	list='$(bin_BINARIES)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/$$p; \
 	done
 
-installdirs:
-	$(mkinstalldirs)  $(DESTDIR)$(libdir)
-	$(mkinstalldirs)  $(DESTDIR)$(bindir)
-	$(mkinstalldirs)  $(DESTDIR)$(pkglibdir)
-	$(mkinstalldirs)  $(ITCL_LIBRARY)
-
-.PHONY: all binaries clean depend distclean doc install installdirs \
-libraries test
+.PHONY: all binaries clean depend distclean doc install libraries test
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
