@@ -27,7 +27,17 @@ package @PACKAGE@ {
             helpkey *
           }
 
-	  parameter msg_filter {
+	 parameter tau {
+	    position 3
+	    type _REAL
+	    vpath {PROMPT }
+	    prompt {Zenith optical depth at start, end of scan}
+	    ppath GLOBAL CURRENT
+	    default 0.1
+	    helpkey *
+	  }
+
+	 parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
 	    default NORM
