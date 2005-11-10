@@ -4,7 +4,7 @@
 # Makefile to build a wish with Extended Tcl (wishx).
 # 
 #------------------------------------------------------------------------------
-# Copyright 1992-1995 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: Makefile.in,v 8.24 1997/12/16 17:08:30 markd Exp $
+# $Id: Makefile.in,v 8.43 2000/08/10 02:21:48 wart Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -22,7 +22,10 @@
 #
 srcdir = @srcdir@
 @MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Common.mk@MAKEQUOTE@
-@MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Config.mk@MAKEQUOTE@
+
+# LD_LIBRARY_FLAGS may embed the LIB_RUNTIME_DIR macro
+libdir			= @libdir@
+LIB_RUNTIME_DIR		= $(libdir)
 
 #------------------------------------------------------------------------------
 # Local macros.
@@ -35,22 +38,17 @@ CC_SWITCHES = ${CPPFLAGS} ${XCFLAGS} ${SYSCFLAGS} \
 	      -I${TKX_UNIX_BLD_DIR} -I${TCLX_UNIX_BLD_DIR} \
 	      -I${TCL_GENERIC_DIR} -I${TCL_UNIX_DIR} ${CFLAGS} ${TK_XINCLUDES}
 
-LD_SWITCHES = ${LDFLAGS} ${TCL_LD_FLAGS} ${XLDFLAGS} ${XCFLAGS} ${CFLAGS}
+LD_SWITCHES = ${LDFLAGS} ${TCL_LD_FLAGS} \
+	      ${TK_CC_SEARCH_FLAGS} ${TCL_CC_SEARCH_FLAGS} \
+	      ${XLDFLAGS} ${XCFLAGS} ${CFLAGS}
 
-# The ordering of the libraries is important.  Some X libs on SysV include
-# "random" in a BSD module.  This would conflict with the one in the TclX
-# library if it was brought in.
+ALL_LIBS = ${TKX_BUILD_LIB_SPEC} ${TK_BUILD_LIB_SPEC} \
+	   ${TCLX_BUILD_LIB_SPEC} ${TCL_BUILD_LIB_SPEC} \
+	   ${XLDLIBS} ${TK_LIBS} ${TCLX_LIBS}
 
-LIBS = ${TKX_LD_SEARCH_FLAGS} ${TK_LIB} ${TK_XLIBSW} @SHARED_LIBS@
-
-ALL_LIBS = ${TKX_BUILD_LIB_SPEC} ${TK_LIB} ${TK_XLIBSW} \
-	   ${TCLX_BUILD_LIB_SPEC} ${TCL_LIB} ${TK_LIBS} ${TCLX_LIBS} \
-	   ${XLDLIBS} ${TKX_CC_SEARCH_FLAGS}
-
-STATIC_LIBS = ${TKX_STLIB_NAME} ${TK_UNIX_DIR}/${TK_STLIB_NAME} ${TK_XLIBSW} \
-              ${TCLX_UNIX_SRC_DIR}/${TCLX_STLIB_NAME} \
-	      ${TCL_UNIX_DIR}/${TCL_STLIB_NAME} \
-              ${TK_LIBS} ${TCLX_LIBS} ${XLDLIBS} ${TKX_CC_SEARCH_FLAGS}
+STATIC_LIBS = ${TKX_STLIB_NAME} ${TK_UNIX_DIR}/${TK_STLIB_NAME} \
+	      ${TCLX_STLIB_NAME} ${TCL_UNIX_DIR}/${TCL_STLIB_NAME} \
+	      ${XLDLIBS} ${TK_LIBS} ${TCLX_LIBS} ${TCL_LIBS}
 
 #------------------------------------------------------------------------------
 # Source and target macros.
@@ -74,18 +72,24 @@ STANDALONE_OBJS = tkx.o
 LIBTCLX = ../../tcl/unix/${TCLX_STLIB_NAME}
 TCL = ../../tcl/unix/tcl
 
-HELP_DIR = ${srcbasedir}/tk/help
+HELP_DIR = @HELP_DIR@/tk
 
-TEST_OBJS = tkTest.o tkSquare.o tkXunixTest.o
+TEST_OBJS = tkTest.o tkSquare.o tclThreadTest.o tkXunixTest.o
 
-TEST_SAOBJS = tkTest.o tkSquare.o tkXunixTestSA.o
+TEST_SAOBJS = tkTest.o tkSquare.o tclThreadTest.o tkXunixTestSA.o
 
 #------------------------------------------------------------------------------
 # Dependencies for generating the libraries and linking the executable.
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: wishx RUNTIME 
+all: binaries libraries doc
+
+binaries: wishx tktest
+
+libraries: RUNTIME
+
+doc:
 
 static: wishx.static tktest.static
 
@@ -110,8 +114,8 @@ ${TKX_STLIB_NAME}: ${OBJS}
 @TKX_SHLIB_BUILD_TARGET@: ${SOBJS}
 	rm -f ${TKX_SHLIB_NAME}
 	${TCL_SHLIB_LD} -o ${TKX_SHLIB_NAME} ${SOBJS} \
-	    ${TK_BUILD_LIB_SPEC} ${TCLX_BUILD_LIB_SPEC} \
-	    ${TCL_BUILD_LIB_SPEC} ${TCL_SHLIB_LD_LIBS}
+	    ${TK_BUILD_STUB_LIB_SPEC} ${TCLX_BUILD_LIB_SPEC} \
+	    ${TCL_BUILD_STUB_LIB_SPEC} ${TCL_SHLIB_LD_LIBS}
 
 hello:	hello.c
 	${CC} ${LD_SWITCHES} -o $@ hello.c ${STATIC_LIBS}
@@ -165,14 +169,17 @@ tktest.standalone: ${TEST_SAOBJS} @TKX_STLIB_BUILD_REF@ ${TCL}
 	${CC} ${LD_SWITCHES} ${TEST_SAOBJS} ${STATIC_LIBS} \
 	    -o $@ || (rm -f $@; exit 1)
 
-tkTest.o: ${TK_SRC}/generic/tkTest.c
-	${CC} -c ${CC_SWITCHES} ${TK_SRC}/generic/tkTest.c
+tkTest.o: ${TK_SRC_DIR}/generic/tkTest.c
+	${CC} -c ${CC_SWITCHES} ${TK_SRC_DIR}/generic/tkTest.c
 
-tkSquare.o: ${TK_SRC}/generic/tkSquare.c
-	${CC} -c ${CC_SWITCHES} ${TK_SRC}/generic/tkSquare.c
+tkSquare.o: ${TK_SRC_DIR}/generic/tkSquare.c
+	${CC} -c ${CC_SWITCHES} ${TK_SRC_DIR}/generic/tkSquare.c
 
 tkXtest.o: ${TKX_GENERIC_DIR}/tkXtest.c
 	${CC} -c ${CC_SWITCHES} ${TKX_GENERIC_DIR}/tkXtest.c
+
+tclThreadTest.o: ${TCL_SRC_DIR}/generic/tclThreadTest.c
+	${CC} -c ${CC_SWITCHES} ${TCL_SRC_DIR}/generic/tclThreadTest.c
 
 #------------------------------------------------------------------------------
 # If test directory in not in build tree, copy it from the source tree.
@@ -185,33 +192,38 @@ ${bldbasedir}/tk/tests:
 # Run the UCB tests with wishx.
 
 test: all
-	echo "cd ${TK_SRC}/tests; source all; exit" | \
-	    ./runtest -geometry +0+0
-
+	dir=`pwd` && cd ${TK_SRC_DIR}/tests && $${dir}/runtest -geometry +0+0 all.tcl
 test.static: all
-	echo "cd ${TK_SRC}/tests; source all; exit" | \
-	    ./runtest.static -geometry +0+0
-
-test.verbose: all
-	echo "cd ${TK_SRC}/tests; set VERBOSE 1; source all; exit" | \
-	    ./runtest -geometry +0+0
+	dir=`pwd` && cd ${TK_SRC_DIR}/tests && $${dir}/runtest.static -geometry +0+0 all.tcl
 
 #------------------------------------------------------------------------------
 # Build help for Tk.  These files are normally part of the distribution and
 # not rebuilt by users.
 #
+BUILDHELP=@BUILDHELP@
 buildhelp:
-	rm -rf ${HELP_DIR} help
-	mkdir ${HELP_DIR}
-	${BLDMANHELP} ${TK_SRC}/doc ${srcbasedir}/unix/tools/tkmanpages \
+	rm -rf ${HELP_DIR} help help.tmp
+	if test ! -d @HELP_DIR@ ; then \
+	    mkdir -p @HELP_DIR@ ;\
+	fi
+	mkdir -p ${HELP_DIR}
+	${BLDMANHELP} ${TK_SRC_DIR}/doc ${TCLX_TOOLS_SRC_DIR}/tkmanpages \
 	    ${HELP_DIR} Tk.brf
+	${INSTCOPY} ${HELP_DIR} ${INSTALL_ROOT}${TKX_INST_RUNTIME}/help
 
 #------------------------------------------------------------------------------
 
-install: install-exec install-runtime
+install: install-binaries install-libraries install-doc
+
+install-binaries: install-exec
+
+install-libraries:  install-runtime install-misc
+
+install-doc:
+
+install-misc: ${BUILDHELP}
 	${INSTCOPY} ${TKX_UNIX_SRC_DIR}/tkXAppInit.c \
 	    ${INSTALL_ROOT}${TKX_INST_RUNTIME}
-	${INSTCOPY} ${HELP_DIR} ${INSTALL_ROOT}${TKX_INST_RUNTIME}/help
 
 install-runtime:
 	${INSTCOPY} tkx.tcl ${INSTALL_ROOT}${TKX_INST_RUNTIME}
@@ -222,7 +234,7 @@ install-exec:
 	    ${RANLIB} ${INSTALL_ROOT}${TKX_INST_LIB}/${TKX_STLIB_NAME}; \
 	fi
 	${INSTCOPY} tkxConfig.sh ${INSTALL_ROOT}${TKX_INST_LIB}
-	if test "@BUILD_SHARED@" = "YES"; then \
+	if test "@SHARED_BUILD@" = "1"; then \
 	    ${INSTCOPY} ${TKX_SHLIB_NAME} ${INSTALL_ROOT}${TKX_INST_LIB} ;\
 	    ${INSTCOPY} pkgIndex.tcl ${INSTALL_ROOT}${TKX_EXEC_RUNTIME} ;\
 	fi
@@ -259,7 +271,7 @@ distclean: clean
 # Dependencies for generating objects.
 #
 tkXinit.o: ${TKX_GENERIC_DIR}/tkXinit.c Makefile
-	${CC} -c ${CC_SWITCHES} -DTKX_LIBRARY=\"${TKX_INST_RUNTIME}\" \
+	${CC} -c ${CC_SWITCHES} -DTKX_LIBRARY=\"${TKX_LIBRARY_PATH}\" \
 	  ${TKX_GENERIC_DIR}/tkXinit.c
 
 tkXshell.o: ${TKX_GENERIC_DIR}/tkXshell.c
@@ -303,7 +315,7 @@ tkXunixTestSA.c: ${TKX_UNIX_SRC_DIR}/tkXunixTest.c Makefile
 tkXinit..o: ${TKX_GENERIC_DIR}/tkXinit.c Makefile
 	@OBJ_SAVE@
 	${CC} -c ${CC_SHOBJ_FLAG} ${CC_SWITCHES} ${TCL_SHLIB_CFLAGS} \
-	    -DTKX_LIBRARY=\"${TKX_INST_RUNTIME}\" ${TKX_GENERIC_DIR}/tkXinit.c
+	    -DTKX_LIBRARY=\"${TKX_LIBRARY_PATH}\" ${TKX_GENERIC_DIR}/tkXinit.c
 	@OBJ_RESTORE@
 
 tkXinitDSA..o: ${TKX_GENERIC_DIR}/tkXinitDSA.c Makefile

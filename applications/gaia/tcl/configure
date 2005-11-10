@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="itcl3.0.1/itcl/generic/itcl.h"
 ac_default_prefix=/usr/local
-ac_subdirs_all="$ac_subdirs_all tcl8.0.3/unix tk8.0.3/unix itcl3.0.1 tclX8.0.3/unix blt2.4g tkhtml"
+ac_subdirs_all="$ac_subdirs_all tcl/unix tk/unix itcl itcl/iwidgets tclX/unix blt tkhtml"
 ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ac_prefix_program subdirs LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
@@ -1326,7 +1326,7 @@ fi
 
 
 
-subdirs="$subdirs tcl8.0.3/unix tk8.0.3/unix itcl3.0.1 tclX8.0.3/unix blt2.4g tkhtml"
+subdirs="$subdirs tcl/unix tk/unix itcl itcl/iwidgets tclX/unix blt tkhtml"
 
 
           ac_config_files="$ac_config_files Makefile"

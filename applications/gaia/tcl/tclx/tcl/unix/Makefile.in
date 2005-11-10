@@ -3,7 +3,7 @@
 #
 # Makefile for Extended Tcl C sources. 
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -12,7 +12,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: Makefile.in,v 8.21 1997/12/14 20:25:57 markd Exp $
+# $Id: Makefile.in,v 8.38 2000/08/10 02:21:48 wart Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -21,26 +21,34 @@
 #
 srcdir = @srcdir@
 @MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Common.mk@MAKEQUOTE@
-@MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Config.mk@MAKEQUOTE@
+bldbasedir = @bldbasedir@
+
+test_dir = ${srcbasedir}/tcl/tests
+this_dir = ${srcbasedir}/tcl/unix
+
+# LD_LIBRARY_FLAGS may embed the LIB_RUNTIME_DIR macro
+libdir			= @libdir@
+LIB_RUNTIME_DIR		= $(libdir)
 
 #------------------------------------------------------------------------------
 # Local macros.
 #
-CC_SWITCHES = ${CPPFLAGS} ${XCFLAGS} ${SYSCFLAGS} \
+CC_SWITCHES = ${CPPFLAGS} ${XCFLAGS} ${CFLAGS} ${SYSCFLAGS} \
 	      ${TCL_DEFS} ${TCLX_DEFS} \
 	      -I${TCLX_GENERIC_DIR} -I${TCLX_UNIX_SRC_DIR} \
 	      -I${TCLX_UNIX_BLD_DIR} \
-	      -I${TCL_GENERIC_DIR} -I${TCL_UNIX_DIR} ${CFLAGS}
+	      -I${TCL_GENERIC_DIR} -I${TCL_UNIX_DIR}
 
-LD_SWITCHES = ${LDFLAGS} ${TCL_LD_FLAGS} ${XLDFLAGS} ${XCFLAGS} ${CFLAGS}
+LD_SWITCHES = ${LDFLAGS} ${TCL_LD_FLAGS} ${TCL_LD_SEARCH_FLAGS} \
+	      ${XLDFLAGS} ${XCFLAGS} ${CFLAGS}
 
-LIBS = ${TCLX_LD_SEARCH_FLAGS} @SHARED_LIBS@
+LIBS = @SHARED_LIBS@
 
-ALL_LIBS = ${TCLX_BUILD_LIB_SPEC} ${TCL_LIB} ${TCLX_LIBS} ${TCL_LIBS} \
-	   ${XLDLIBS} ${TCLX_CC_SEARCH_FLAGS}
+ALL_LIBS = ${TCLX_BUILD_LIB_SPEC} ${TCL_BUILD_LIB_SPEC} \
+	   ${XLDLIBS} ${TCLX_LIBS} ${TCL_LIBS}
 
 STATIC_LIBS = ${TCLX_STLIB_NAME} ${TCL_UNIX_DIR}/${TCL_STLIB_NAME} \
-	     ${TCLX_LIBS} ${TCL_LIBS} ${XLDLIBS} ${TCLX_CC_SEARCH_FLAGS}
+	      ${XLDLIBS} ${TCLX_LIBS} ${TCL_LIBS}
 
 #------------------------------------------------------------------------------
 # Source and target macros.
@@ -52,7 +60,7 @@ GENERIC_OBJS = \
     tclXfilescan.o   tclXflock.o      tclXfstat.o      tclXgeneral.o  \
     tclXhandles.o    tclXunixId.o     tclXinit.o       tclXkeylist.o  \
     tclXlib.o        tclXlist.o       tclXmath.o       tclXmsgcat.o   \
-    tclXlibInit.o    tclXprocess.o    tclXprofile.o    tclXregexp.o   \
+    tclXlibInit.o    tclXprocess.o    tclXprofile.o   \
     tclXselect.o     tclXunixSock.o   tclXsignal.o     tclXshell.o    \
     tclXstring.o     tclXsocket.o     tclXunixCmds.o   tclXutil.o     \
     tclXunixOS.o     tclXoscmds.o     tclXunixDup.o    tclXlgets.o
@@ -70,7 +78,7 @@ GENERIC_SOBJS = \
     tclXlib@SHOBJ_SUFFIX@        tclXlist@SHOBJ_SUFFIX@     \
     tclXmath@SHOBJ_SUFFIX@       tclXmsgcat@SHOBJ_SUFFIX@   \
     tclXlibInit@SHOBJ_SUFFIX@    tclXprocess@SHOBJ_SUFFIX@  \
-    tclXprofile@SHOBJ_SUFFIX@    tclXregexp@SHOBJ_SUFFIX@   \
+    tclXprofile@SHOBJ_SUFFIX@    \
     tclXselect@SHOBJ_SUFFIX@     tclXunixSock@SHOBJ_SUFFIX@ \
     tclXsignal@SHOBJ_SUFFIX@     tclXshell@SHOBJ_SUFFIX@    \
     tclXstring@SHOBJ_SUFFIX@     tclXsocket@SHOBJ_SUFFIX@   \
@@ -113,18 +121,26 @@ STANDALONE_OBJS = \
     stringfile.o     tcllib.o         fmath.o          buildhelp.o \
     buildidx.o       autoload.o       tclx.o
 
-HELP_DIR = ${srcbasedir}/tcl/help
+HELP_DIR = @HELP_DIR@/tcl
 
-TEST_OBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o tclXunixTest.o
+TEST_OBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o \
+	tclThreadTest.o tclXunixTest.o
 
-TEST_SAOBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o tclXunixTestSA.o
+TEST_SAOBJS = tclTest.o tclTestObj.o tclUnixTest.o tclXtest.o \
+	tclThreadTest.o tclXunixTestSA.o
 
 #------------------------------------------------------------------------------
 # Dependencies for generating the libraries and linking the executable.
 # If a link fails, purge the executable, as some systems leave invalid
 # executables around.
 #
-all: tcl RUNTIME tclXtest
+all: binaries libraries doc
+
+binaries: tcl checkup RUNTIME tclXtest
+
+libraries: tcl.tndx tcl.tlib tclx.tcl buildidx.tcl
+
+doc:
 
 static:	tcl.static tclXtest.static
 
@@ -173,7 +189,7 @@ checkup.done: tcl tcl.tlib tcl.tndx tclx.tcl buildidx.tcl autoload.tcl
 # unless we don't have them.
 #
 RUNTIME: tcl.tlib tcl.tndx tclx.tcl buildidx.tcl autoload.tcl help.tmp \
-         dltest.tmp
+         dltest.tmp checkup
 
 tcl.tlib: ${TLIB_SRCS} autoload.tcl
 	-rm -f tcl.tlib tcl.tndx
@@ -233,14 +249,17 @@ tclXunixTestSA.c: ${TCLX_UNIX_SRC_DIR}/tclXunixTest.c
 	    -e s/Tclx_Init/Tclx_InitStandAlone/ \
 	    ${TCLX_UNIX_SRC_DIR}/tclXunixTest.c > tclXunixTestSA.c
 
-tclTest.o: ${TCL_SRC}/generic/tclTest.c
-	${CC} -c ${CC_SWITCHES} ${TCL_SRC}/generic/tclTest.c
+tclTest.o: ${TCL_SRC_DIR}/generic/tclTest.c
+	${CC} -c ${CC_SWITCHES} ${TCL_SRC_DIR}/generic/tclTest.c
 
-tclTestObj.o: ${TCL_SRC}/generic/tclTestObj.c
-	${CC} -c ${CC_SWITCHES} ${TCL_SRC}/generic/tclTestObj.c
+tclTestObj.o: ${TCL_SRC_DIR}/generic/tclTestObj.c
+	${CC} -c ${CC_SWITCHES} ${TCL_SRC_DIR}/generic/tclTestObj.c
 
-tclUnixTest.o: ${TCL_SRC}/unix/tclUnixTest.c
-	${CC} -c ${CC_SWITCHES} ${TCL_SRC}/unix/tclUnixTest.c
+tclUnixTest.o: ${TCL_SRC_DIR}/unix/tclUnixTest.c
+	${CC} -c ${CC_SWITCHES} ${TCL_SRC_DIR}/unix/tclUnixTest.c
+
+tclThreadTest.o: ${TCL_SRC_DIR}/generic/tclThreadTest.c
+	${CC} -c ${CC_SWITCHES} ${TCL_SRC_DIR}/generic/tclThreadTest.c
 
 dltest.tmp: dltest
 	touch dltest.tmp
@@ -265,13 +284,13 @@ test.standalone: ucbtests.standalone testx.standalone
 test.verbose: ucbtests.verbose testx.verbose
 
 ucbtests: all
-	./runtest ${srcbasedir}/tcl/tests/ucbtests.tcl ${TCL_SRC}
+	(cd ${TCL_SRC_DIR}/tests && ${bldbasedir}/tcl/unix/runtest ${test_dir}/ucbtests.tcl)
 
 ucbtests.static: all
-	./runtest.static ${srcbasedir}/tcl/tests/ucbtests.tcl ${TCL_SRC}
+	(cd ${TCL_SRC_DIR}/tests && ${bldbasedir}/tcl/unix/runtest.static ${test_dir}/ucbtests.tcl)
 
 ucbtests.standalone: all
-	./runtest.standalone ${srcbasedir}/tcl/tests/ucbtests.tcl ${TCL_SRC}
+	(cd ${TCL_SRC_DIR}/tests && ${bldbasedir}/tcl/unix/runtest.standalone ${test_dir}/ucbtests.tcl)
 
 testx: all
 	./runtest -c "cd ${srcbasedir}/tcl/tests; source all"
@@ -289,33 +308,47 @@ testx.verbose: all
 # Build help for Tcl & TclX.  These files are normally part of the
 # distribution and not rebuilt by users.
 #
+BUILDHELP=@BUILDHELP@
 buildhelp: tcl tcl.tndx
-	rm -rf ${HELP_DIR} help
-	mkdir ${HELP_DIR}
-	${BLDMANHELP} ${TCL_SRC}/doc ${srcbasedir}/unix/tools/tclmanpages \
+	rm -rf ${HELP_DIR} help help.tmp
+	if test ! -d @HELP_DIR@ ; then \
+	    mkdir -p @HELP_DIR@ ; \
+	fi
+	mkdir -p ${HELP_DIR}
+	${BLDMANHELP} ${TCL_SRC_DIR}/doc ${TCLX_TOOLS_SRC_DIR}/tclmanpages \
 	    ${HELP_DIR} Tcl.brf
-	${RUNTCL} -c "buildhelp ${HELP_DIR} TclX.brf ${srcbasedir}/doc/TclX.n"
+	${RUNTCL} -c "buildhelp ${HELP_DIR} TclX.brf ${TCLX_DOC_DIR}/TclX.n"
+	${INSTCOPY} ${HELP_DIR} ${INSTALL_ROOT}${TCLX_INST_RUNTIME}/help
 
 #------------------------------------------------------------------------------
 
-install: install-runtime install-exec
+install: install-binaries install-libraries install-doc
+
+install-binaries: install-exec
+
+install-libraries: install-runtime install-misc
+
+install-doc: 
+
+install-misc: ${BUILDHELP}
 	${INSTCOPY} ${TCLX_GENERIC_DIR}/tclExtend.h \
 	    ${INSTALL_ROOT}${TCLX_INST_INCL}
 	${INSTCOPY} ${TCLX_UNIX_SRC_DIR}/tclXAppInit.c \
 	    ${INSTALL_ROOT}${TCLX_INST_RUNTIME}
-	${INSTCOPY} ${HELP_DIR} ${INSTALL_ROOT}${TCLX_INST_RUNTIME}/help
 
 install-runtime:
 	${INSTCOPY} tclx.tcl tcl.tlib tcl.tndx buildidx.tcl autoload.tcl \
 	    ${INSTALL_ROOT}${TCLX_INST_RUNTIME}
 
 install-exec:
+	${INSTCOPY} tcl ${INSTALL_ROOT}${TCLX_INST_BIN}
+	${STRIP} ${INSTALL_ROOT}${TCLX_INST_BIN}/tcl
 	if test "X@TCLX_STLIB_BUILD_REF@" != "X"; then \
 	    ${INSTCOPY} ${TCLX_STLIB_NAME} ${INSTALL_ROOT}${TCLX_INST_LIB}; \
 	    ${RANLIB} ${INSTALL_ROOT}${TCLX_INST_LIB}/${TCLX_STLIB_NAME}; \
 	fi
 	${INSTCOPY} tclxConfig.sh ${INSTALL_ROOT}${TCLX_INST_LIB}
-	if test "@BUILD_SHARED@" = "YES"; then \
+	if test "@SHARED_BUILD@" = "1"; then \
 	    ${INSTCOPY} ${TCLX_SHLIB_NAME} ${INSTALL_ROOT}${TCLX_INST_LIB} ;\
 	    ${INSTCOPY} pkgIndex.tcl ${INSTALL_ROOT}${TCLX_EXEC_RUNTIME} ;\
 	fi
@@ -395,7 +428,7 @@ tclXhandles.o: ${TCLX_GENERIC_DIR}/tclXhandles.c
 	${CC} -c ${CC_SWITCHES} ${TCLX_GENERIC_DIR}/tclXhandles.c
 
 tclXinit.o: ${TCLX_GENERIC_DIR}/tclXinit.c Makefile
-	${CC} -c ${CC_SWITCHES} -DTCLX_LIBRARY=\"${TCLX_INST_RUNTIME}\" \
+	${CC} -c ${CC_SWITCHES} -DTCLX_LIBRARY=\"${TCLX_LIBRARY_PATH}\" \
 	    ${TCLX_GENERIC_DIR}/tclXinit.c
 
 tclXinitSA.o: ${TCLX_GENERIC_DIR}/tclXinitSA.c ${STANDALONE_SRCS}
@@ -433,9 +466,6 @@ tclXprocess.o: ${TCLX_GENERIC_DIR}/tclXprocess.c
 
 tclXprofile.o: ${TCLX_GENERIC_DIR}/tclXprofile.c tclxConfig.sh
 	${CC} -c ${CC_SWITCHES} ${TCLX_GENERIC_DIR}/tclXprofile.c
-
-tclXregexp.o: ${TCLX_GENERIC_DIR}/tclXregexp.c
-	${CC} -c ${CC_SWITCHES} ${TCLX_GENERIC_DIR}/tclXregexp.c
 
 tclXselect.o: ${TCLX_GENERIC_DIR}/tclXselect.c
 	${CC} -c ${CC_SWITCHES} ${TCLX_GENERIC_DIR}/tclXselect.c
@@ -575,7 +605,7 @@ tclXhandles..o: ${TCLX_GENERIC_DIR}/tclXhandles.c
 tclXinit..o: ${TCLX_GENERIC_DIR}/tclXinit.c Makefile
 	@OBJ_SAVE@
 	${CC} -c ${CC_SHOBJ_FLAG} ${CC_SWITCHES} ${TCL_SHLIB_CFLAGS} \
-	    -DTCLX_LIBRARY=\"${TCLX_INST_RUNTIME}\" \
+	    -DTCLX_LIBRARY=\"${TCLX_LIBRARY_PATH}\" \
 	    ${TCLX_GENERIC_DIR}/tclXinit.c
 	@OBJ_RESTORE@
 
@@ -631,12 +661,6 @@ tclXprofile..o: ${TCLX_GENERIC_DIR}/tclXprofile.c tclxConfig.sh
 	@OBJ_SAVE@
 	${CC} -c ${CC_SHOBJ_FLAG} ${CC_SWITCHES} ${TCL_SHLIB_CFLAGS} \
 	    ${TCLX_GENERIC_DIR}/tclXprofile.c
-	@OBJ_RESTORE@
-
-tclXregexp..o: ${TCLX_GENERIC_DIR}/tclXregexp.c
-	@OBJ_SAVE@
-	${CC} -c ${CC_SHOBJ_FLAG} ${CC_SWITCHES} ${TCL_SHLIB_CFLAGS} \
-	    ${TCLX_GENERIC_DIR}/tclXregexp.c
 	@OBJ_RESTORE@
 
 tclXselect..o: ${TCLX_GENERIC_DIR}/tclXselect.c

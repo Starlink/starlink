@@ -645,7 +645,7 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 	    SHLIB_LD_LIBS='${LIBS}'
 	    SHLIB_SUFFIX=".so"
 	    DL_OBJS="tclLoadDl.o"
-	    LIBOBJS="$LIBOBJS tclLoadAix.o"
+	    AC_LIBOBJ([tclLoadAix])
 	    DL_LIBS="-lld"
 	    LDFLAGS=""
 	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
@@ -1640,7 +1640,7 @@ AC_DEFUN(SC_BUGGY_STRTOD, [
 	    AC_MSG_RESULT(ok)
 	else
 	    AC_MSG_RESULT(buggy)
-	    LIBOBJS="$LIBOBJS fixstrtod.o"
+	    AC_LIBOBJ([fixstrtod])
 	    AC_DEFINE(strtod, fixstrtod)
 	fi
     fi

@@ -171,7 +171,7 @@ if test "${blt_have_gcc}" = "yes" ; then
 fi
 AC_SUBST(GCCFLAGS)
 
-AC_CYGWIN
+dnl AC_CYGWIN
 
 blt_lib_prefix="lib"
 case $target in
@@ -332,13 +332,13 @@ AC_MSG_RESULT([$blt_cv_have_isfinite])
 
 AC_MSG_CHECKING([whether DBL_EPSILON is defined in float.h])
 AC_CACHE_VAL(blt_cv_found_dbl_epsilon,
-    AC_EGREP_CPP(yes,	
+    AC_EGREP_CPP(blt_yes,	
    [
 #ifdef HAVE_FLOAT_H
 #include <float.h>
 #endif
 #ifdef DBL_EPSILON
- yes
+ blt_yes
 #endif
 ], blt_cv_found_dbl_epsilon=yes, blt_cv_found_dbl_epsilon=no) 
 )

@@ -18,6 +18,6 @@ AC_PREREQ(2.0)
 AC_PREFIX_DEFAULT(/usr/local)
 AC_PREFIX_PROGRAM(itclsh)
 
-AC_CONFIG_SUBDIRS(tcl8.0.3/unix tk8.0.3/unix itcl3.0.1 tclX8.0.3/unix blt2.4g tkhtml)
+AC_CONFIG_SUBDIRS(tcl/unix tk/unix itcl itcl/iwidgets tclX/unix blt tkhtml)
 
 AC_OUTPUT(Makefile)

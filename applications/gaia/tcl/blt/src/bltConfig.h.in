@@ -1,23 +1,21 @@
-/* src/bltConfig.h.in.  Generated automatically from configure.in by autoheader.  */
+/* src/bltConfig.h.in.  Generated from configure.in by autoheader.  */
+/* acconfig.h
+   This file is in the public domain.
 
-/* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
-#undef HAVE_SYS_WAIT_H
+   Descriptive text for the C preprocessor macros that
+   the distributed Autoconf macros can define.
+   No software package will use all of them; autoheader copies the ones
+   your configure.in uses into your configuration header file templates.
 
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef pid_t
+   The entries are in sort -df order: alphabetical, case insensitive,
+   ignoring punctuation (such as underscores).  Although this order
+   can split up related entries, it makes it easier to check whether
+   a given entry is in the file.
 
-/* Define to `unsigned' if <sys/types.h> doesn't define.  */
-#undef size_t
+   Leave the following blank line there!!  Autoheader needs it.  */
 
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
-
-/* Define if you can safely include both <sys/time.h> and <time.h>.  */
-#undef TIME_WITH_SYS_TIME
-
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-#undef WORDS_BIGENDIAN
+
+#define BLT_CONFIG_H  	1		
 
 /* Define if DBL_EPSILON is not defined in float.h */
 #undef BLT_DBL_EPSILON
@@ -40,101 +38,145 @@
 /* Define if isfinite is found in libm.  */
 #undef HAVE_ISFINITE
 
-/* The number of bytes in a int.  */
-#undef SIZEOF_INT
 
-/* The number of bytes in a long.  */
-#undef SIZEOF_LONG
-
-/* The number of bytes in a long long.  */
-#undef SIZEOF_LONG_LONG
-
-/* The number of bytes in a void *.  */
-#undef SIZEOF_VOID_P
-
-/* Define if you have the XExtendedMaxRequestSize function.  */
-#undef HAVE_XEXTENDEDMAXREQUESTSIZE
-
-/* Define if you have the drand48 function.  */
-#undef HAVE_DRAND48
-
-/* Define if you have the finite function.  */
-#undef HAVE_FINITE
-
-/* Define if you have the isnan function.  */
-#undef HAVE_ISNAN
-
-/* Define if you have the srand48 function.  */
-#undef HAVE_SRAND48
-
-/* Define if you have the strcasecmp function.  */
-#undef HAVE_STRCASECMP
-
-/* Define if you have the strdup function.  */
-#undef HAVE_STRDUP
-
-/* Define if you have the strncasecmp function.  */
-#undef HAVE_STRNCASECMP
-
-/* Define if you have the <ctype.h> header file.  */
+/* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
-/* Define if you have the <errno.h> header file.  */
+/* Define to 1 if you have the `drand48' function. */
+#undef HAVE_DRAND48
+
+/* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
-/* Define if you have the <float.h> header file.  */
+/* Define to 1 if you have the `finite' function. */
+#undef HAVE_FINITE
+
+/* Define to 1 if you have the <float.h> header file. */
 #undef HAVE_FLOAT_H
 
-/* Define if you have the <ieeefp.h> header file.  */
+/* Define to 1 if you have the <ieeefp.h> header file. */
 #undef HAVE_IEEEFP_H
 
-/* Define if you have the <inttypes.h> header file.  */
+/* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define if you have the <jpeglib.h> header file.  */
+/* Define to 1 if you have the `isnan' function. */
+#undef HAVE_ISNAN
+
+/* Define to 1 if you have the <jpeglib.h> header file. */
 #undef HAVE_JPEGLIB_H
 
-/* Define if you have the <limits.h> header file.  */
-#undef HAVE_LIMITS_H
-
-/* Define if you have the <malloc.h> header file.  */
-#undef HAVE_MALLOC_H
-
-/* Define if you have the <math.h> header file.  */
-#undef HAVE_MATH_H
-
-/* Define if you have the <memory.h> header file.  */
-#undef HAVE_MEMORY_H
-
-/* Define if you have the <setjmp.h> header file.  */
-#undef HAVE_SETJMP_H
-
-/* Define if you have the <stdlib.h> header file.  */
-#undef HAVE_STDLIB_H
-
-/* Define if you have the <string.h> header file.  */
-#undef HAVE_STRING_H
-
-/* Define if you have the <sys/param.h> header file.  */
-#undef HAVE_SYS_PARAM_H
-
-/* Define if you have the <sys/time.h> header file.  */
-#undef HAVE_SYS_TIME_H
-
-/* Define if you have the <sys/wait.h> header file.  */
-#undef HAVE_SYS_WAIT_H
-
-/* Define if you have the <unistd.h> header file.  */
-#undef HAVE_UNISTD_H
-
-/* Define if you have the <waitflags.h> header file.  */
-#undef HAVE_WAITFLAGS_H
-
-/* Define if you have the m library (-lm).  */
+/* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
-/* Define if you have the nsl library (-lnsl).  */
+/* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
-/* Define if you have the socket library (-lsocket).  */
+/* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <math.h> header file. */
+#undef HAVE_MATH_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <setjmp.h> header file. */
+#undef HAVE_SETJMP_H
+
+/* Define to 1 if you have the `srand48' function. */
+#undef HAVE_SRAND48
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strncasecmp' function. */
+#undef HAVE_STRNCASECMP
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <waitflags.h> header file. */
+#undef HAVE_WAITFLAGS_H
+
+/* Define to 1 if you have the `XExtendedMaxRequestSize' function. */
+#undef HAVE_XEXTENDEDMAXREQUESTSIZE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of a `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
+
+/* The size of a `void *', as computed by sizeof. */
+#undef SIZEOF_VOID_P
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t

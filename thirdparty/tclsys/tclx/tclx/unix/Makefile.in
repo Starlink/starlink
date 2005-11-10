@@ -4,7 +4,7 @@
 # Top-level Unix makefile for Extended Tcl.
 # 
 #------------------------------------------------------------------------------
-# Copyright 1992-1997 Karl Lehenbauer and Mark Diekhans.
+# Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose and without fee is hereby granted, provided
@@ -13,7 +13,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: Makefile.in,v 8.5 1997/08/31 05:48:24 markd Exp $
+# $Id: Makefile.in,v 8.10 1999/08/20 23:30:13 wart Exp $
 #------------------------------------------------------------------------------
 #
 
@@ -23,7 +23,6 @@
 srcdir = @srcdir@
 
 @MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Common.mk@MAKEQUOTE@
-@MAKEINCLUDE@ @MAKEQUOTE@@bldbasedir@/unix/Config.mk@MAKEQUOTE@
 
 #------------------------------------------------------------------------------
 # Flags that were passed on the command line that are to be passed on to
@@ -33,10 +32,17 @@ PASS_FLAGS = "CC=${CC}" "CFLAGS=${CFLAGS}" "LDFLAGS=${LDFLAGS}"
 
 #------------------------------------------------------------------------------
 
-all: TCLX TKX_${TKX_BUILD}
+all: binaries libraries doc
 
-TCLX: 
-	(cd tools && ${MAKE} ${PASS_FLAGS} all)
+binaries: TCLX TKX_${TKX_BUILD}
+
+libraries:
+	(cd ../tcl/unix && ${MAKE} ${PASS_FLAGS} libraries)
+
+doc:
+	(cd ../tcl/unix && ${MAKE} ${PASS_FLAGS} doc)
+
+TCLX: TOOLS
 	(cd ../tcl/unix && ${MAKE} ${PASS_FLAGS} all)
 
 TKX_YES: TOOLS
@@ -111,7 +117,13 @@ buildhelp:
 #------------------------------------------------------------------------------
 # Install Extended Tcl.
 #
-install: all TCLX_INSTALL TKX_INSTALL_${TKX_BUILD} TCLX_INSTALL_MAN
+install: all install-binaries install-libraries install-doc
+
+install-binaries: TCLX_INSTALL_BIN TKX_INSTALL_BIN_${TKX_BUILD}
+
+install-libraries: TCLX_INSTALL TKX_INSTALL_${TKX_BUILD}
+
+install-doc: TCLX_INSTALL_MAN
 
 install-exec: all TCLX_INSTALL_EXEC  TKX_INSTALL_EXEC_${TKX_BUILD}
 
@@ -121,33 +133,26 @@ TCLX_INSTALL:
 TCLX_INSTALL_EXEC:
 	(cd ../tcl/unix && ${MAKE} install-exec)
 
+TCLX_INSTALL_BIN:
+	(cd ../tcl/unix && ${MAKE} install-binaries)
+
 TKX_INSTALL_YES:
 	(cd ../tk/unix && ${MAKE} install)
 
 TKX_INSTALL_EXEC_YES:
 	(cd ../tk/unix && ${MAKE} install-exec)
 
+TKX_INSTALL_BIN_YES:
+	(cd ../tk/unix && ${MAKE} install-binaries)
+
 TKX_INSTALL_NO:
 TKX_INSTALL_EXEC_NO:
+TKX_INSTALL_BIN_NO:
 
 TCLX_INSTALL_MAN:
 	${CPMANPAGES} -rmcat @${MAN_DIR_SEPARATOR}@ \
 	    ${TCLX_MAN_CMD_SECTION} ${TCLX_MAN_FUNC_SECTION} @@ \
 	    ${srcbasedir}/doc ${INSTALL_ROOT}${TCLX_INST_MAN}
-
-#------------------------------------------------------------------------------
-# Perform required patches to the Tcl core
-
-PATCH=patch
-patch-tcl-core:
-	@echo "Patching Tcl core in '${TCLSRC}' with required patches."
-	@cd ${TCL_SRC}; \
-	    for i in ${srcbasedir}/TCL-REQUIRED-PATCHES/*.patch ; \
-	    do \
-		echo patching $$i; \
-		${PATCH} --strip=0 --forward <$$i || \
-		    echo PATCH FAILED, $i to ${TCL_SRC}; \
-	    done;
 
 #------------------------------------------------------------------------------
 # Clean up all files that were built by make.

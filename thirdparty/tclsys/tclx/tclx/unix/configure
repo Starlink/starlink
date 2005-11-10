@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS srcbasedir bldbasedir UNAME_OUT DATE_OUT TKX_BUILD BUILD_SHARED TCLX_VERSION TCLX_FULL_VERSION TKX_VERSION TKX_FULL_VERSION TCLX_INST_LIB TKX_INST_LIB TCL_VERSION TCL_SRC TCL_BUILD TK_SRC TK_BUILD TCL_DEFS TCL_LIBS TCL_EXEC_PREFIX TCL_SHLIB_CFLAGS TCL_SHLIB_LD TCL_SHLIB_LD_LIBS TCL_DL_LIBS TCL_LD_FLAGS TCL_LD_SEARCH_FLAGS TCL_BUILD_LIB_SPEC TCL_LIB_SPEC TK_VERSION TK_DEFS TK_LIBS TK_EXEC_PREFIX TK_XINCLUDES TK_XLIBSW TK_LD_SEARCH_FLAGS TK_BUILD_LIB_SPEC TK_LIB_SPEC CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SYSCFLAGS RANLIB ac_ct_RANLIB PATCH SHOBJ_SUFFIX TCL_STLIB_NAME TK_STLIB_NAME TCLX_STLIB_NAME TCLX_SHLIB_NAME TCLX_STLIB_BUILD_REF TCLX_SHLIB_BUILD_REF TCLX_SHLIB_BUILD_TARGET TKX_STLIB_NAME TKX_SHLIB_NAME TKX_STLIB_BUILD_REF TKX_SHLIB_BUILD_REF TKX_SHLIB_BUILD_TARGET TCLX_BUILD_LIB_SPEC TCLX_LIB_SPEC TKX_BUILD_LIB_SPEC TKX_LIB_SPEC TCLX_LIB_NAME TKX_LIB_NAME OBJ_SAVE OBJ_RESTORE CC_SHOBJ_FLAG SHARED_LIBS TCLX_BUILD_STANDALONE TCLX_BUILD_DUMMY_STANDALONE TKX_BUILD_STANDALONE TKX_BUILD_DUMMY_STANDALONE TCLX_LD_SEARCH_FLAGS TCLX_CC_SEARCH_FLAGS TKX_LD_SEARCH_FLAGS TKX_CC_SEARCH_FLAGS LN_S HAVE_SYML MAKEINCLUDE MAKEQUOTE CPP EGREP MAN_DIR_SEPARATOR LIBOBJS TCLX_LIBS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS srcbasedir bldbasedir UNAME_OUT DATE_OUT TKX_BUILD SHARED_BUILD TCLX_VERSION TCLX_FULL_VERSION TKX_VERSION TKX_FULL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_VERSION TCL_DEFS TCL_LIBS TCL_EXEC_PREFIX TCL_SHLIB_CFLAGS TCL_SHLIB_LD TCL_SHLIB_LD_LIBS TCL_DL_LIBS TCL_LD_FLAGS TCL_LD_SEARCH_FLAGS TCL_EXTRA_CFLAGS TCL_CFLAGS_WARNING TCL_BUILD_LIB_SPEC TCL_LIB_SPEC TCL_BUILD_STUB_LIB_SPEC TCL_STUB_LIB_SPEC TCL_LIB_DIR TCL_LIBRARY_DIR TK_BIN_DIR TK_SRC_DIR TK_LIB_FILE TK_VERSION TK_DEFS TK_LIBS TK_EXEC_PREFIX TK_XINCLUDES TK_XLIBSW TK_LD_SEARCH_FLAGS TK_BUILD_LIB_SPEC TK_LIB_SPEC TK_BUILD_STUB_LIB_SPEC TK_STUB_LIB_SPEC TK_LIB_DIR TK_LIBRARY_DIR TCLX_INST_LIB TKX_INST_LIB CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SYSCFLAGS RANLIB ac_ct_RANLIB LIBOBJS CPP EGREP DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING TCLX_DBGX TKX_DBGX TCL_DBGX TK_DBGX SHOBJ_SUFFIX TCL_STLIB_NAME TK_STLIB_NAME TCLX_STLIB_NAME TCLX_SHLIB_NAME TCLX_STLIB_BUILD_REF TCLX_SHLIB_BUILD_REF TCLX_SHLIB_BUILD_TARGET TKX_STLIB_NAME TKX_SHLIB_NAME TKX_STLIB_BUILD_REF TKX_SHLIB_BUILD_REF TKX_SHLIB_BUILD_TARGET TCLX_BUILD_LIB_SPEC TCLX_LIB_SPEC TKX_BUILD_LIB_SPEC TKX_LIB_SPEC TCLX_LIB_NAME TKX_LIB_NAME TCLX_BIN_DIR TCLX_LIB_DIR TCLX_RUNTIME_DIR TKX_BIN_DIR TKX_LIB_DIR TKX_RUNTIME_DIR OBJ_SAVE OBJ_RESTORE CC_SHOBJ_FLAG SHARED_LIBS TCLX_BUILD_STANDALONE TCLX_BUILD_DUMMY_STANDALONE TKX_BUILD_STANDALONE TKX_BUILD_DUMMY_STANDALONE LN_S HAVE_SYML MAKEINCLUDE MAKEQUOTE MAN_DIR_SEPARATOR LIBSOBJS NROFF BUILDHELP HELP_DIR TCLX_LIBS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -840,12 +840,21 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-shared         build and link with shared libraries
+  --enable-tk=YES|NO         build Tk specific code and wishx
+  --enable-shared         build and link with shared libraries --enable-shared
+  --enable-gcc            allow use of gcc if available --disable-gcc
+  --enable-64bit          enable 64bit support (where applicable)
+  --enable-64bit-vis      enable 64bit Sparc VIS support
+  --disable-load          disallow dynamic loading and "load" command
+  --enable-symbols        build with debugging symbols --disable-symbols
+  --enable-threads        build with threads
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-tk=YES|NO         build Tk specific code and wishx
+  --with-tcl              directory containing tcl configuration (tclConfig.sh)
+  --with-tk               directory containing tk configuration (tkConfig.sh)
+  --with-help              directory containing generated help files
 
 Some influential environment variables:
   CC          C compiler command
@@ -1294,16 +1303,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-# From configure.in Revision: 8.20.2.1 .
-
-# If `configure' is invoked (in)directly via `make', ensure that it
-# encounters no `make' conflicts.  Ignore error if shell does not have
-# unset, but at least set these to empty values.
-#
-MFLAGS=
-MAKEFLAGS=
-MAKELEVEL=
-unset MFLAGS MAKEFLAGS MAKELEVEL 2>/dev/null
+# From configure.in Revision: 8.33.4.1 .
 
 #------------------------------------------------------------------------------
 # Define srcbasedir and bldbasedir as absolute paths to the top of the TclX
@@ -1355,14 +1355,13 @@ if test ! -d ../tk/unix ; then
 fi
 
 #------------------------------------------------------------------------------
-# Check command line looking for the --with-tk=YES/NO option.
+# Check command line looking for the --enable-tk=YES/NO option.
 #------------------------------------------------------------------------------
 
-
-# Check whether --with-tk or --without-tk was given.
-if test "${with_tk+set}" = set; then
-  withval="$with_tk"
-  TKX_BUILD=$withval
+# Check whether --enable-tk or --disable-tk was given.
+if test "${enable_tk+set}" = set; then
+  enableval="$enable_tk"
+  TKX_BUILD=$enableval
 else
   TKX_BUILD=YES
 fi;
@@ -1379,8 +1378,8 @@ echo "${ECHO_T}Will not build Tk specific code and wishx" >&6
         TKX_BUILD=NO
         ;;
      *)
-        { { echo "$as_me:$LINENO: error: Invalid argument to --with-tk=" >&5
-echo "$as_me: error: Invalid argument to --with-tk=" >&2;}
+        { { echo "$as_me:$LINENO: error: Invalid argument to --enable-tk=" >&5
+echo "$as_me: error: Invalid argument to --enable-tk=" >&2;}
    { (exit expected YES or NO); exit expected YES or NO; }; }
         ;;
 esac
@@ -1390,31 +1389,38 @@ esac
 # Check for the --enable-shared option.
 #------------------------------------------------------------------------------
 
-# Check whether --enable-shared or --disable-shared was given.
+
+    echo "$as_me:$LINENO: checking how to build libraries" >&5
+echo $ECHO_N "checking how to build libraries... $ECHO_C" >&6
+    # Check whether --enable-shared or --disable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval="$enable_shared"
-  BUILD_SHARED=$enableval
+  tcl_ok=$enableval
 else
-  BUILD_SHARED=NO
+  tcl_ok=yes
 fi;
-case "$BUILD_SHARED" in
-    YES|yes)
-        echo "$as_me:$LINENO: result: Will build shared libraries" >&5
-echo "${ECHO_T}Will build shared libraries" >&6
-        BUILD_SHARED=YES
-        ;;
-    NO|no)
-        echo "$as_me:$LINENO: result: Will not build shared libraries" >&5
-echo "${ECHO_T}Will not build shared libraries" >&6
-        BUILD_SHARED=NO
-        ;;
-     *)
-        { { echo "$as_me:$LINENO: error: Invalid argument to --enable-shared=" >&5
-echo "$as_me: error: Invalid argument to --enable-shared=" >&2;}
-   { (exit expected YES or NO); exit expected YES or NO; }; }
-        exit 1
-        ;;
-esac
+
+    if test "${enable_shared+set}" = set; then
+	enableval="$enable_shared"
+	tcl_ok=$enableval
+    else
+	tcl_ok=yes
+    fi
+
+    if test "$tcl_ok" = "yes" ; then
+	echo "$as_me:$LINENO: result: shared" >&5
+echo "${ECHO_T}shared" >&6
+	SHARED_BUILD=1
+    else
+	echo "$as_me:$LINENO: result: static" >&5
+echo "${ECHO_T}static" >&6
+	SHARED_BUILD=0
+	cat >>confdefs.h <<\_ACEOF
+#define STATIC_BUILD 1
+_ACEOF
+
+    fi
+
 
 
 #------------------------------------------------------------------------------
@@ -1429,8 +1435,7 @@ test "x$exec_prefix" = xNONE && exec_prefix=$prefix
 
 
 #------------------------------------------------------------------------------
-# Extract the version information out of tclExtend.h so it can be assigned
-# to macros.
+# Extract the version information out of tclExtend.h.
 #------------------------------------------------------------------------------
 
 echo "$as_me:$LINENO: checking TclX versions" >&5
@@ -1448,88 +1453,126 @@ echo "${ECHO_T}$TCLX_FULL_VERSION" >&6
 
 
 #------------------------------------------------------------------------------
-# If Config.mk is not in the build directory, copy it local.
+# Get location of Tcl source directory and configuration information from
+# tclConfig.sh.
 #------------------------------------------------------------------------------
 
-if test ! -r Config.mk ; then
-    echo "Copying $srcdir/Config.mk to build directory"
-    cp $srcdir/Config.mk  Config.mk || exit 1
+
+    #
+    # Ok, lets find the tcl configuration
+    # First, look for one uninstalled.
+    # the alternative search directory is invoked by --with-tcl
+    #
+
+    if test x"${no_tcl}" = x ; then
+	# we reset no_tcl in case something fails here
+	no_tcl=true
+
+# Check whether --with-tcl or --without-tcl was given.
+if test "${with_tcl+set}" = set; then
+  withval="$with_tcl"
+  with_tclconfig=${withval}
+fi;
+	echo "$as_me:$LINENO: checking for Tcl configuration" >&5
+echo $ECHO_N "checking for Tcl configuration... $ECHO_C" >&6
+	if test "${ac_cv_c_tclconfig+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+	    # First check to see if --with-tclconfig was specified.
+	    if test x"${with_tclconfig}" != x ; then
+		if test -f "${with_tclconfig}/tclConfig.sh" ; then
+		    ac_cv_c_tclconfig=`(cd ${with_tclconfig}; pwd)`
+		else
+		    { { echo "$as_me:$LINENO: error: ${with_tclconfig} directory doesn't contain tclConfig.sh" >&5
+echo "$as_me: error: ${with_tclconfig} directory doesn't contain tclConfig.sh" >&2;}
+   { (exit 1); exit 1; }; }
+		fi
+	    fi
+
+	    # then check for a private Tcl installation
+	    if test x"${ac_cv_c_tclconfig}" = x ; then
+		for i in \
+			../tcl \
+			`ls -dr ../tcl[8-9].[0-9]* 2>/dev/null` \
+			../../tcl \
+			`ls -dr ../../tcl[8-9].[0-9]* 2>/dev/null` \
+			../../../tcl \
+			`ls -dr ../../../tcl[8-9].[0-9]* 2>/dev/null` ; do
+		    if test -f "$i/unix/tclConfig.sh" ; then
+			ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
+			break
+		    fi
+		done
+	    fi
+
+	    # check in a few common install locations
+	    if test x"${ac_cv_c_tclconfig}" = x ; then
+		for i in `ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/local/lib 2>/dev/null` ; do
+		    if test -f "$i/tclConfig.sh" ; then
+			ac_cv_c_tclconfig=`(cd $i; pwd)`
+			break
+		    fi
+		done
+	    fi
+
+	    # check in a few other private locations
+	    if test x"${ac_cv_c_tcliconfig}" = x ; then
+		for i in \
+			${srcdir}/../tcl \
+			`ls -dr ${srcdir}/../tcl[8-9].[0-9]* 2>/dev/null` ; do
+		    if test -f "$i/unix/tclConfig.sh" ; then
+		    ac_cv_c_tclconfig=`(cd $i/unix; pwd)`
+		    break
+		fi
+		done
+	    fi
+
 fi
 
-#------------------------------------------------------------------------------
-# Generate tmp makefile that outputs macro values in Config.mk as shell
-# variables.  Validate that we can find Tcl and Tk files.  Note, we have to
-# deal with 3 parsings by the shell plus a parsing by make, use care in
-# changing this.
-#------------------------------------------------------------------------------
 
-echo "$as_me:$LINENO: checking macro values from Config.mk" >&5
-echo $ECHO_N "checking macro values from Config.mk... $ECHO_C" >&6
-cat Config.mk >confmakefile
-echo "srcbasedir=$srcbasedir" >>confmakefile
-echo "bldbasedir=$bldbasedir" >>confmakefile
-echo "prefix=$prefix" >>confmakefile
-echo "exec_prefix=$exec_prefix" >>confmakefile
-echo "all:" >>confmakefile
-echo '	@echo TCL_CONFIG=\"${TCL_CONFIG}\"' >>confmakefile
-echo '	@echo TCL_SRC=\"${TCL_SRC}\"' >>confmakefile
-echo '	@echo TCL_BUILD=\"${TCL_BUILD}\"' >>confmakefile
-echo '	@echo TK_CONFIG=\"${TK_CONFIG}\"' >>confmakefile
-echo '	@echo TK_SRC=\"${TK_SRC}\"' >>confmakefile
-echo '	@echo TK_BUILD=\"${TK_BUILD}\"' >>confmakefile
-echo '	@echo TCLX_INST_LIB=\"${TCLX_INST_LIB}\"' >>confmakefile
-echo '	@echo TKX_INST_LIB=\"${TKX_INST_LIB}\"' >>confmakefile
-echo ".NO_PARALLEL: all" >>confmakefile
-
-eval `${MAKE-make} -f confmakefile`
-rm confmakefile
-
-if test ! -r "$TCL_CONFIG" ; then
-    echo "$as_me:$LINENO: result: failed" >&5
-echo "${ECHO_T}failed" >&6
-    { { echo "$as_me:$LINENO: error: Config.mk does not set TCL_CONFIG to a valid path to
-    tclConfig.sh. TclX expects the Tcl to be built in the directory:
-        $TCL_CONFIG
-    Either build Tcl in this location or edit the value of TCL_CONFIG in
-    unix/Config.mk." >&5
-echo "$as_me: error: Config.mk does not set TCL_CONFIG to a valid path to
-    tclConfig.sh. TclX expects the Tcl to be built in the directory:
-        $TCL_CONFIG
-    Either build Tcl in this location or edit the value of TCL_CONFIG in
-    unix/Config.mk." >&2;}
-   { (exit 1); exit 1; }; }
-fi
-if test "$TKX_BUILD" = "YES"; then
-    if test ! -r "$TK_CONFIG" ; then
-        echo "$as_me:$LINENO: result: failed" >&5
-echo "${ECHO_T}failed" >&6
-        { { echo "$as_me:$LINENO: error: Config.mk does not set TK_CONFIG to a valid path to
-    tkConfig.sh. TclX expects the Tk to be built in the directory:
-         $TK_CONFIG
-    Either build Tk in this location or edit the value of TK_CONFIG in
-    unix/Config.mk." >&5
-echo "$as_me: error: Config.mk does not set TK_CONFIG to a valid path to
-    tkConfig.sh. TclX expects the Tk to be built in the directory:
-         $TK_CONFIG
-    Either build Tk in this location or edit the value of TK_CONFIG in
-    unix/Config.mk." >&2;}
-   { (exit 1); exit 1; }; }
+	if test x"${ac_cv_c_tclconfig}" = x ; then
+	    TCL_BIN_DIR="# no Tcl configs found"
+	    { echo "$as_me:$LINENO: WARNING: Can't find Tcl configuration definitions" >&5
+echo "$as_me: WARNING: Can't find Tcl configuration definitions" >&2;}
+	    exit 0
+	else
+	    no_tcl=
+	    TCL_BIN_DIR=${ac_cv_c_tclconfig}
+	    echo "$as_me:$LINENO: result: found $TCL_BIN_DIR/tclConfig.sh" >&5
+echo "${ECHO_T}found $TCL_BIN_DIR/tclConfig.sh" >&6
+	fi
     fi
-fi
-echo "$as_me:$LINENO: result: ok" >&5
-echo "${ECHO_T}ok" >&6
+
+
+    echo "$as_me:$LINENO: checking for existence of $TCL_BIN_DIR/tclConfig.sh" >&5
+echo $ECHO_N "checking for existence of $TCL_BIN_DIR/tclConfig.sh... $ECHO_C" >&6
+
+    if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
+        echo "$as_me:$LINENO: result: loading" >&5
+echo "${ECHO_T}loading" >&6
+	. $TCL_BIN_DIR/tclConfig.sh
+    else
+        echo "$as_me:$LINENO: result: file not found" >&5
+echo "${ECHO_T}file not found" >&6
+    fi
+
+    #
+    # The eval is required to do the TCL_DBGX substitution in the
+    # TCL_LIB_FILE variable
+    #
+
+    eval TCL_LIB_FILE=${TCL_LIB_FILE}
+    eval TCL_LIB_FLAG=${TCL_LIB_FLAG}
 
 
 
 
-# Get defines from tclConfig.sh
-. $TCL_CONFIG
-
-LIBS=$TCL_LIBS   # Need for tests.
 
 
-
-
+LIBS=$TCL_LIBS   # Need for configure tests.
 
 
 
@@ -1545,13 +1588,127 @@ TCL_SHLIB_CFLAGS=`echo "$TCL_SHLIB_CFLAGS" |sed -e "s|-fPIC|-fpic|" -e "s|-PIC|-
 
 
 
-# Get defines from tkConfig.sh
+
+
+
+
+# These are substituted into the run scripts
+TCL_LIB_DIR="${TCL_BIN_DIR}"
+TCL_LIBRARY_DIR="${TCL_SRC_DIR}/library"
+
+
+
+#------------------------------------------------------------------------------
+# Get location of Tk source directory and configuration information from
+# tkConfig.sh.
+#------------------------------------------------------------------------------
+
 if test "$TKX_BUILD" = "YES"; then
-   . $TK_CONFIG
+
+    #
+    # Ok, lets find the tk configuration
+    # First, look for one uninstalled.
+    # the alternative search directory is invoked by --with-tk
+    #
+
+    if test x"${no_tk}" = x ; then
+	# we reset no_tk in case something fails here
+	no_tk=true
+
+# Check whether --with-tk or --without-tk was given.
+if test "${with_tk+set}" = set; then
+  withval="$with_tk"
+  with_tkconfig=${withval}
+fi;
+	echo "$as_me:$LINENO: checking for Tk configuration" >&5
+echo $ECHO_N "checking for Tk configuration... $ECHO_C" >&6
+	if test "${ac_cv_c_tkconfig+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+	    # First check to see if --with-tkconfig was specified.
+	    if test x"${with_tkconfig}" != x ; then
+		if test -f "${with_tkconfig}/tkConfig.sh" ; then
+		    ac_cv_c_tkconfig=`(cd ${with_tkconfig}; pwd)`
+		else
+		    { { echo "$as_me:$LINENO: error: ${with_tkconfig} directory doesn't contain tkConfig.sh" >&5
+echo "$as_me: error: ${with_tkconfig} directory doesn't contain tkConfig.sh" >&2;}
+   { (exit 1); exit 1; }; }
+		fi
+	    fi
+
+	    # then check for a private Tk library
+	    if test x"${ac_cv_c_tkconfig}" = x ; then
+		for i in \
+			../tk \
+			`ls -dr ../tk[8-9].[0-9]* 2>/dev/null` \
+			../../tk \
+			`ls -dr ../../tk[8-9].[0-9]* 2>/dev/null` \
+			../../../tk \
+			`ls -dr ../../../tk[8-9].[0-9]* 2>/dev/null` ; do
+		    if test -f "$i/unix/tkConfig.sh" ; then
+			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
+			break
+		    fi
+		done
+	    fi
+	    # check in a few common install locations
+	    if test x"${ac_cv_c_tkconfig}" = x ; then
+		for i in `ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/local/lib 2>/dev/null` ; do
+		    if test -f "$i/tkConfig.sh" ; then
+			ac_cv_c_tkconfig=`(cd $i; pwd)`
+			break
+		    fi
+		done
+	    fi
+	    # check in a few other private locations
+	    if test x"${ac_cv_c_tkconfig}" = x ; then
+		for i in \
+			${srcdir}/../tk \
+			`ls -dr ${srcdir}/../tk[8-9].[0-9]* 2>/dev/null` ; do
+		    if test -f "$i/unix/tkConfig.sh" ; then
+			ac_cv_c_tkconfig=`(cd $i/unix; pwd)`
+			break
+		    fi
+		done
+	    fi
+
 fi
 
-# Tk doesn't provide its own search flags, but should.
-TK_LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
+	if test x"${ac_cv_c_tkconfig}" = x ; then
+	    TK_BIN_DIR="# no Tk configs found"
+	    { echo "$as_me:$LINENO: WARNING: Can't find Tk configuration definitions" >&5
+echo "$as_me: WARNING: Can't find Tk configuration definitions" >&2;}
+	    exit 0
+	else
+	    no_tk=
+	    TK_BIN_DIR=${ac_cv_c_tkconfig}
+	    echo "$as_me:$LINENO: result: found $TK_BIN_DIR/tkConfig.sh" >&5
+echo "${ECHO_T}found $TK_BIN_DIR/tkConfig.sh" >&6
+	fi
+    fi
+
+
+
+    echo "$as_me:$LINENO: checking for existence of $TCLCONFIG" >&5
+echo $ECHO_N "checking for existence of $TCLCONFIG... $ECHO_C" >&6
+
+    if test -f "$TK_BIN_DIR/tkConfig.sh" ; then
+        echo "$as_me:$LINENO: checking loading $TK_BIN_DIR/tkConfig.sh" >&5
+echo $ECHO_N "checking loading $TK_BIN_DIR/tkConfig.sh... $ECHO_C" >&6
+	. $TK_BIN_DIR/tkConfig.sh
+    else
+        echo "$as_me:$LINENO: result: could not find $TK_BIN_DIR/tkConfig.sh" >&5
+echo "${ECHO_T}could not find $TK_BIN_DIR/tkConfig.sh" >&6
+    fi
+
+
+
+
+
+fi
 
 
 
@@ -1560,6 +1717,21 @@ TK_LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
 
 
 
+
+
+
+
+
+# These are substituted into the run scripts
+TK_LIB_DIR="${TK_BIN_DIR}"
+TK_LIBRARY_DIR="${TK_SRC_DIR}/library"
+
+
+
+#------------------------------------------------------------------------------
+# The TclX and TkX runtime directories.  This is where the shared runtime and
+# help files are installed.
+#------------------------------------------------------------------------------
 
 
 
@@ -1568,17 +1740,17 @@ TK_LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
 # variable is not set, the compiler used to build Tcl is used.
 #------------------------------------------------------------------------------
 
-echo "$as_me:$LINENO: checking which C compiler to use" >&5
-echo $ECHO_N "checking which C compiler to use... $ECHO_C" >&6
-if test "X$CC" = "X"; then
-    CC=$TCL_CC
-    echo "$as_me:$LINENO: result: using C compiler specified in tclConfig.sh: $CC" >&5
-echo "${ECHO_T}using C compiler specified in tclConfig.sh: $CC" >&6
+
+    # Check whether --enable-gcc or --disable-gcc was given.
+if test "${enable_gcc+set}" = set; then
+  enableval="$enable_gcc"
+  ok=$enableval
 else
-    echo "$as_me:$LINENO: result: using C compiler specified in by CC env var: $CC" >&5
-echo "${ECHO_T}using C compiler specified in by CC env var: $CC" >&6
-fi
-ac_ext=c
+  ok=no
+fi;
+    if test "$ok" = "yes"; then
+	CC=gcc
+	ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -2508,6 +2680,739 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+    else
+	CC=${CC-cc}
+    fi
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}gcc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="${ac_tool_prefix}gcc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_CC"; then
+  ac_ct_CC=$CC
+  # Extract the first word of "gcc", so it can be a program name with args.
+set dummy gcc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="gcc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  CC=$ac_ct_CC
+else
+  CC="$ac_cv_prog_CC"
+fi
+
+if test -z "$CC"; then
+  if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}cc", so it can be a program name with args.
+set dummy ${ac_tool_prefix}cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="${ac_tool_prefix}cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_CC"; then
+  ac_ct_CC=$CC
+  # Extract the first word of "cc", so it can be a program name with args.
+set dummy cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  CC=$ac_ct_CC
+else
+  CC="$ac_cv_prog_CC"
+fi
+
+fi
+if test -z "$CC"; then
+  # Extract the first word of "cc", so it can be a program name with args.
+set dummy cc; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+  ac_prog_rejected=no
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    if test "$as_dir/$ac_word$ac_exec_ext" = "/usr/ucb/cc"; then
+       ac_prog_rejected=yes
+       continue
+     fi
+    ac_cv_prog_CC="cc"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+if test $ac_prog_rejected = yes; then
+  # We found a bogon in the path, so make sure we never use it.
+  set dummy $ac_cv_prog_CC
+  shift
+  if test $# != 0; then
+    # We chose a different compiler from the bogus one.
+    # However, it has the same basename, so the bogon will be chosen
+    # first if we set CC to just the basename; use the full file name.
+    shift
+    ac_cv_prog_CC="$as_dir/$ac_word${1+' '}$@"
+  fi
+fi
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$CC"; then
+  if test -n "$ac_tool_prefix"; then
+  for ac_prog in cl
+  do
+    # Extract the first word of "$ac_tool_prefix$ac_prog", so it can be a program name with args.
+set dummy $ac_tool_prefix$ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CC"; then
+  ac_cv_prog_CC="$CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_CC="$ac_tool_prefix$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+CC=$ac_cv_prog_CC
+if test -n "$CC"; then
+  echo "$as_me:$LINENO: result: $CC" >&5
+echo "${ECHO_T}$CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    test -n "$CC" && break
+  done
+fi
+if test -z "$CC"; then
+  ac_ct_CC=$CC
+  for ac_prog in cl
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_CC+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_CC"; then
+  ac_cv_prog_ac_ct_CC="$ac_ct_CC" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_CC="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_CC=$ac_cv_prog_ac_ct_CC
+if test -n "$ac_ct_CC"; then
+  echo "$as_me:$LINENO: result: $ac_ct_CC" >&5
+echo "${ECHO_T}$ac_ct_CC" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$ac_ct_CC" && break
+done
+
+  CC=$ac_ct_CC
+fi
+
+fi
+
+
+test -z "$CC" && { { echo "$as_me:$LINENO: error: no acceptable C compiler found in \$PATH
+See \`config.log' for more details." >&5
+echo "$as_me: error: no acceptable C compiler found in \$PATH
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+
+# Provide some information about the compiler.
+echo "$as_me:$LINENO:" \
+     "checking for C compiler version" >&5
+ac_compiler=`set X $ac_compile; echo $2`
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler --version </dev/null >&5\"") >&5
+  (eval $ac_compiler --version </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler -v </dev/null >&5\"") >&5
+  (eval $ac_compiler -v </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+{ (eval echo "$as_me:$LINENO: \"$ac_compiler -V </dev/null >&5\"") >&5
+  (eval $ac_compiler -V </dev/null >&5) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }
+
+echo "$as_me:$LINENO: checking whether we are using the GNU C compiler" >&5
+echo $ECHO_N "checking whether we are using the GNU C compiler... $ECHO_C" >&6
+if test "${ac_cv_c_compiler_gnu+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+#ifndef __GNUC__
+       choke me
+#endif
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_compiler_gnu=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_compiler_gnu=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_cv_c_compiler_gnu=$ac_compiler_gnu
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_c_compiler_gnu" >&5
+echo "${ECHO_T}$ac_cv_c_compiler_gnu" >&6
+GCC=`test $ac_compiler_gnu = yes && echo yes`
+ac_test_CFLAGS=${CFLAGS+set}
+ac_save_CFLAGS=$CFLAGS
+CFLAGS="-g"
+echo "$as_me:$LINENO: checking whether $CC accepts -g" >&5
+echo $ECHO_N "checking whether $CC accepts -g... $ECHO_C" >&6
+if test "${ac_cv_prog_cc_g+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_prog_cc_g=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_prog_cc_g=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_prog_cc_g" >&5
+echo "${ECHO_T}$ac_cv_prog_cc_g" >&6
+if test "$ac_test_CFLAGS" = set; then
+  CFLAGS=$ac_save_CFLAGS
+elif test $ac_cv_prog_cc_g = yes; then
+  if test "$GCC" = yes; then
+    CFLAGS="-g -O2"
+  else
+    CFLAGS="-g"
+  fi
+else
+  if test "$GCC" = yes; then
+    CFLAGS="-O2"
+  else
+    CFLAGS=
+  fi
+fi
+echo "$as_me:$LINENO: checking for $CC option to accept ANSI C" >&5
+echo $ECHO_N "checking for $CC option to accept ANSI C... $ECHO_C" >&6
+if test "${ac_cv_prog_cc_stdc+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_prog_cc_stdc=no
+ac_save_CC=$CC
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <stdarg.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+/* Most of the following tests are stolen from RCS 5.7's src/conf.sh.  */
+struct buf { int x; };
+FILE * (*rcsopen) (struct buf *, struct stat *, int);
+static char *e (p, i)
+     char **p;
+     int i;
+{
+  return p[i];
+}
+static char *f (char * (*g) (char **, int), char **p, ...)
+{
+  char *s;
+  va_list v;
+  va_start (v,p);
+  s = g (p, va_arg (v,int));
+  va_end (v);
+  return s;
+}
+
+/* OSF 4.0 Compaq cc is some sort of almost-ANSI by default.  It has
+   function prototypes and stuff, but not '\xHH' hex character constants.
+   These don't provoke an error unfortunately, instead are silently treated
+   as 'x'.  The following induces an error, until -std1 is added to get
+   proper ANSI mode.  Curiously '\x00'!='x' always comes out true, for an
+   array size at least.  It's necessary to write '\x00'==0 to get something
+   that's true only with -std1.  */
+int osf4_cc_array ['\x00' == 0 ? 1 : -1];
+
+int test (int i, double x);
+struct s1 {int (*f) (int a);};
+struct s2 {int (*f) (double a);};
+int pairnames (int, char **, FILE *(*)(struct buf *, struct stat *, int), int, int);
+int argc;
+char **argv;
+int
+main ()
+{
+return f (e, argv, 0) != argv[0]  ||  f (e, argv, 1) != argv[1];
+  ;
+  return 0;
+}
+_ACEOF
+# Don't try gcc -ansi; that turns off useful extensions and
+# breaks some systems' header files.
+# AIX			-qlanglvl=ansi
+# Ultrix and OSF/1	-std1
+# HP-UX 10.20 and later	-Ae
+# HP-UX older versions	-Aa -D_HPUX_SOURCE
+# SVR4			-Xc -D__EXTENSIONS__
+for ac_arg in "" -qlanglvl=ansi -std1 -Ae "-Aa -D_HPUX_SOURCE" "-Xc -D__EXTENSIONS__"
+do
+  CC="$ac_save_CC $ac_arg"
+  rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_prog_cc_stdc=$ac_arg
+break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext
+done
+rm -f conftest.$ac_ext conftest.$ac_objext
+CC=$ac_save_CC
+
+fi
+
+case "x$ac_cv_prog_cc_stdc" in
+  x|xno)
+    echo "$as_me:$LINENO: result: none needed" >&5
+echo "${ECHO_T}none needed" >&6 ;;
+  *)
+    echo "$as_me:$LINENO: result: $ac_cv_prog_cc_stdc" >&5
+echo "${ECHO_T}$ac_cv_prog_cc_stdc" >&6
+    CC="$CC $ac_cv_prog_cc_stdc" ;;
+esac
+
+# Some people use a C++ compiler to compile C.  Since we use `exit',
+# in C++ we need to declare it.  In case someone uses the same compiler
+# for both compiling C and C++ we need to have the C++ compiler decide
+# the declaration of exit, since it's the most demanding environment.
+cat >conftest.$ac_ext <<_ACEOF
+#ifndef __cplusplus
+  choke me
+#endif
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  for ac_declaration in \
+   '' \
+   'extern "C" void std::exit (int) throw (); using std::exit;' \
+   'extern "C" void std::exit (int); using std::exit;' \
+   'extern "C" void exit (int) throw ();' \
+   'extern "C" void exit (int);' \
+   'void exit (int);'
+do
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_declaration
+#include <stdlib.h>
+int
+main ()
+{
+exit (42);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+continue
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_declaration
+int
+main ()
+{
+exit (42);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+done
+rm -f conftest*
+if test -n "$ac_declaration"; then
+  echo '#ifdef __cplusplus' >>confdefs.h
+  echo $ac_declaration      >>confdefs.h
+  echo '#endif'             >>confdefs.h
+fi
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
 #------------------------------------------------------------------------------
 # If we're using GCC, see if the compiler understands -pipe.  If so, use it.
@@ -2715,412 +3620,7 @@ fi
 
 
 #------------------------------------------------------------------------------
-# If we can find "patch", set up to use it.
-#------------------------------------------------------------------------------
-
-# Extract the first word of "patch", so it can be a program name with args.
-set dummy patch; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_PATCH+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $PATCH in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_PATCH="$PATCH" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_PATCH="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  test -z "$ac_cv_path_PATCH" && ac_cv_path_PATCH="false"
-  ;;
-esac
-fi
-PATCH=$ac_cv_path_PATCH
-
-if test -n "$PATCH"; then
-  echo "$as_me:$LINENO: result: $PATCH" >&5
-echo "${ECHO_T}$PATCH" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine the names of the TclX libraries and the link specifications and
-# other shared library stuff.
-#------------------------------------------------------------------------------
-
-#
-# Generate the library names using the Tcl macros.
-#
-SHLIB_SUFFIX=${TCL_SHLIB_SUFFIX}
-
-VERSION=$TCL_VERSION
-eval "TCL_STLIB_NAME=libtcl${TCL_UNSHARED_LIB_SUFFIX}"
-
-VERSION=$TK_VERSION
-eval "TK_STLIB_NAME=libtk${TCL_UNSHARED_LIB_SUFFIX}"
-
-VERSION=$TCLX_VERSION
-eval "TCLX_STLIB_NAME=libtclx${TCL_UNSHARED_LIB_SUFFIX}"
-eval "TCLX_SHLIB_NAME=libtclx${TCL_SHARED_LIB_SUFFIX}"
-
-VERSION=$TKX_VERSION
-eval "TKX_STLIB_NAME=libtkx${TCL_UNSHARED_LIB_SUFFIX}"
-eval "TKX_SHLIB_NAME=libtkx${TCL_SHARED_LIB_SUFFIX}"
-
-#
-# Determine suffix to use for the object files for the shared library.
-#
-if test "x${TCL_SHLIB_CFLAGS}" != "x"; then
-    SHOBJ_SUFFIX="..o"
-else
-    SHOBJ_SUFFIX=".o"
-fi
-
-#
-# Determine the arguments for specifying the prefered TclX libraries on the
-# link lines.
-# A few system (AIX) have the same extension of shared and static libraries,
-# so shlib target must not be defined if not being build.
-#
-case "$BUILD_SHARED" in
-    YES)
-        TCLX_LIB_FLAG="-ltclx${TCLX_VERSION}"
-        TKX_LIB_FLAG="-ltkx${TKX_VERSION}"
-        if test "X${TCL_LIB_VERSIONS_OK}" = "Xnodots" ; then
-            TCLX_LIB_FLAG=`echo ${TCLX_LIB_FLAG} | tr -d .`
-            TKX_LIB_FLAG=`echo ${TKX_LIB_FLAG} | tr -d .`
-        fi
-        TCLX_BUILD_LIB_SPEC="-L$bldbasedir/tcl/unix ${TCLX_LIB_FLAG}"
-        TCLX_LIB_SPEC="-L$TCLX_INST_LIB ${TCLX_LIB_FLAG}"
-        TKX_BUILD_LIB_SPEC="-L$bldbasedir/tk/unix ${TKX_LIB_FLAG}"
-        TKX_LIB_SPEC="-L$TCLX_INST_LIB ${TKX_LIB_FLAG}"
-        TCLX_STLIB_BUILD_REF=${TCLX_STLIB_NAME}
-        TKX_STLIB_BUILD_REF=${TKX_STLIB_NAME}
-        TCLX_SHLIB_BUILD_REF=${TCLX_SHLIB_NAME}
-        TKX_SHLIB_BUILD_REF=${TKX_SHLIB_NAME}
-        TCLX_SHLIB_BUILD_TARGET=${TCLX_SHLIB_NAME}
-        TKX_SHLIB_BUILD_TARGET=${TKX_SHLIB_NAME}
-	TCLX_LIB_NAME=${TCLX_SHLIB_NAME}
-	TKX_LIB_NAME=${TKX_SHLIB_NAME}
-        ;;
-    NO|no)
-        echo "$as_me:$LINENO: result: Will not build shared libraries" >&5
-echo "${ECHO_T}Will not build shared libraries" >&6
-        BUILD_SHARED=NO
-        TCLX_BUILD_LIB_SPEC="$bldbasedir/tcl/unix/${TCLX_STLIB_NAME}"
-        TCLX_LIB_SPEC="$TCLX_INST_LIB/${TCLX_STLIB_NAME}"
-        TKX_BUILD_LIB_SPEC="$bldbasedir/tk/unix/${TKX_STLIB_NAME}"
-        TKX_LIB_SPEC="$TCLX_INST_LIB/${TKX_STLIB_NAME}"
-        TCLX_STLIB_BUILD_REF=${TCLX_STLIB_NAME}
-        TKX_STLIB_BUILD_REF=${TKX_STLIB_NAME}
-        TCLX_SHLIB_BUILD_REF=""
-        TKX_SHLIB_BUILD_REF=""
-        TCLX_SHLIB_BUILD_TARGET=NO_SHLIB
-        TKX_SHLIB_BUILD_TARGET=NO_SHLIB
- 	TCLX_LIB_NAME=${TCLX_STLIB_NAME}
- 	TKX_LIB_NAME=${TKX_STLIB_NAME}
-        ;;
-esac
-
-#
-# If the names ended up the same, dont build twice.
-#
-if test "x$TCLX_STLIB_BUILD_TARGET" = "x$TCLX_SHLIB_BUILD_TARGET"; then
-	TCLX_BUILD_STANDALONE="tclXinitSA${SHOBJ_SUFFIX}"
-	TKX_BUILD_STANDALONE="tkXinitSA${SHOBJ_SUFFIX}"
-	TCLX_BUILD_DUMMY_STANDALONE="tclXinitSA${SHOBJ_SUFFIX}"
-	TKX_BUILD_DUMMY_STANDALONE="tkXinitSA${SHOBJ_SUFFIX}"
-else
-	TCLX_BUILD_STANDALONE="tclXinitSA.o"
-	TKX_BUILD_STANDALONE="tkXinitSA.o"
-	TCLX_BUILD_DUMMY_STANDALONE="tclXinitDSA${SHOBJ_SUFFIX}"
-	TKX_BUILD_DUMMY_STANDALONE="tkXinitDSA${SHOBJ_SUFFIX}"
-fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#------------------------------------------------------------------------------
-# Test for UnixWare -o bug.  Macros are used in targets to build the shared
-# objects.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking for UnixWare -o bug" >&5
-echo $ECHO_N "checking for UnixWare -o bug... $ECHO_C" >&6
-rm -rf conftest*
-cat > conftest.$ac_ext <<EOF
-int main() { return 0; }
-EOF
-${CC-cc} -c -o conftest..o conftest.$ac_ext
-if test -f conftest..o; then
-    OBJ_SAVE="@:"
-    OBJ_RESTORE="@:"
-    CC_SHOBJ_FLAG='-o $@'
-    echo "$as_me:$LINENO: result: OK" >&5
-echo "${ECHO_T}OK" >&6
-else
-    OBJ_SAVE='@b=`basename $@ ..o`; if test -f $$b.o ; then rm -f $$b.sav; mv $$b.o $$b.sav'
-    OBJ_RESTORE='@b=`basename $@ ..o`;mv $$b.o $@; if test -f $$b.sav ; then mv$$b.sav $$b'
-    CC_SHOBJ_FLAG=""
-    echo "$as_me:$LINENO: result: buggy" >&5
-echo "${ECHO_T}buggy" >&6
-fi
-rm -rf conftest*
-
-
-
-
-
-#------------------------------------------------------------------------------
-# Test if there are shared versions of the socket, math and c libraries.
-#------------------------------------------------------------------------------
-
-SHARED_LIBS=""
-if test "x${SHLIB_SUFFIX}" = "x..o" -o "x${SHLIB_SUFFIX}" = "x.a"; then
-    if test "x${SHLIB_CFLAGS}" = "x-G 0"; then
-	TEST_SUFFIX="_G0.a"
-    else
-	TEST_SUFFIX=".a"
-    fi
-else
-    if test "x${TCL_SHARED_LIB_SUFFIX}" = 'x${VERSION}.a' -a "x${SHLIB_SUFFIX}" = "x.so"; then
-	TEST_SUFFIX=".a"
-	SHARED_LIBS="${TCL_LIB_SPEC}"
-    else
-	TEST_SUFFIX="${SHLIB_SUFFIX}"
-    fi
-fi
-
-dirs="/lib/libm${TEST_SUFFIX}* /usr/lib/libm${TEST_SUFFIX}*"
-for i in $dirs ; do
-    if test -f $i; then
-	SHARED_LIBS="${SHARED_LIBS} -lm"
-	break;
-    fi
-done
-dirs="/lib/libc${TEST_SUFFIX}* /usr/lib/libc${TEST_SUFFIX}*"
-for i in $dirs ; do
-    if test -f $i; then
-	SHARED_LIBS="${SHARED_LIBS} -lc"
-	break;
-    fi
-done
-
-
-#------------------------------------------------------------------------------
-# Check for Plus patch being installed. Does libtcl.a contains a definition of
-# Tcl_InitStandAlone() and does Tk contain Tk_InitStandAlone.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking standalone support of Tcl (Plus patch)" >&5
-echo $ECHO_N "checking standalone support of Tcl (Plus patch)... $ECHO_C" >&6
-if test -f "${TCL_BUILD}/unix/${TCL_STLIB_NAME}"; then
-    x=`nm -p "${TCL_BUILD}/unix/${TCL_STLIB_NAME}" |grep 'Tcl_InitStandAlone'`
-    if test "x$x" != "x"; then
-        # Build variables already set
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_TCL_STANDALONE 1
-_ACEOF
-
-    else
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	TCLX_BUILD_STANDALONE=""
-	TCLX_BUILD_DUMMY_STANDALONE=""
-    fi
-else
-    echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-    TCLX_BUILD_STANDALONE=""
-    TCLX_BUILD_DUMMY_STANDALONE=""
-fi
-
-
-
-echo "$as_me:$LINENO: checking standalone support of Tk (Plus patch)" >&5
-echo $ECHO_N "checking standalone support of Tk (Plus patch)... $ECHO_C" >&6
-if test "${TKX_BUILD}" = "YES" -a -f "${TK_BUILD}/unix/${TK_STLIB_NAME}"; then
-    x=`nm -p "${TK_BUILD}/unix/${TK_STLIB_NAME}" |grep 'Tk_InitStandAlone'`
-    if test "x$x" != "x"; then
-        # Build variables already set
-	echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_TK_STANDALONE 1
-_ACEOF
-
-    else
-	echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-	TKX_BUILD_STANDALONE=""
-	TKX_BUILD_DUMMY_STANDALONE=""
-    fi
-else
-    echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-    TKX_BUILD_STANDALONE=""
-    TKX_BUILD_DUMMY_STANDALONE=""
-fi
-
-
-
-#------------------------------------------------------------------------------
-# Determine the search path argument for the installed TclX libraries.
-#-----------------------------------------------------------------------------
-
-if test "X$TCL_LD_SEARCH_FLAGS" != "X"; then
-    LIB_RUNTIME_DIR="$TCL_EXEC_PREFIX/lib"
-    if test "X$TCLX_INST_LIB" != "X$TCL_EXEC_PREFIX/lib"; then
-      LIB_RUNTIME_DIR="$LIB_RUNTIME_DIR:$TCLX_INST_LIB"
-    fi
-fi
-if test "${TCL_LD_SEARCH_FLAGS}" = '-L${LIB_RUNTIME_DIR}'; then
-    LIB_RUNTIME_DIR=`echo ${LIB_RUNTIME_DIR} |sed -e 's/:/ -L/g'`
-fi
-eval "TCLX_CC_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
-
-case $TCL_SHLIB_LD in
-    *cc*-shared*)
-	TCLX_LD_SEARCH_FLAGS="${TCLX_CC_SEARCH_FLAGS}"
-	;;
-    *)
-	TCLX_LD_SEARCH_FLAGS=`echo ${TCLX_CC_SEARCH_FLAGS} |sed -e "s|-Wl,||g" -e "s|,| |g"`
-
-	;;
-esac
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine the search path argument for the installed TkX libraries.
-#-----------------------------------------------------------------------------
-
-if test "X$TCL_LD_SEARCH_FLAGS" != "X"; then
-    LIB_RUNTIME_DIR="$TCL_EXEC_PREFIX/lib"
-    if test "X$TCLX_INST_LIB" != "X$TCL_EXEC_PREFIX/lib"; then
-      LIB_RUNTIME_DIR="$LIB_RUNTIME_DIR:$TCLX_INST_LIB"
-    fi
-    if test "X$TKX_INST_LIB" != "X$TCL_EXEC_PREFIX/lib" -a \
-       "X$TKX_INST_LIB" != "X$TCLX_INST_LIB"; then
-      LIB_RUNTIME_DIR="$LIB_RUNTIME_DIR:$TKX_INST_LIB"
-    fi
-    X11_LIB_DIR=`echo ${TK_XLIBSW} |sed -e "s|-L||" -e "s/ .*$//g" -e "s/-l.*$//g" -e "s|/libX11.*$||" -e "s|/libXhp11.*$||"`
-    if test "x${X11_LIB_DIR}" != "x"; then
-	LIB_RUNTIME_DIR="${LIB_RUNTIME_DIR}:${X11_LIB_DIR}"
-    fi
-    if test "${TCL_LD_SEARCH_FLAGS}" = '-L${LIB_RUNTIME_DIR}'; then
-	LIB_RUNTIME_DIR=`echo ${LIB_RUNTIME_DIR} |sed -e 's/:/ -L/g'`
-    fi
-fi
-eval "TKX_CC_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
-case $TCL_SHLIB_LD in
-    *ld*)
-	TKX_LD_SEARCH_FLAGS=`echo ${TKX_CC_SEARCH_FLAGS} |sed -e "s|-Wl,||g" -e "s|,| |g"`
-	;;
-    *)
-	TKX_LD_SEARCH_FLAGS="${TKX_CC_SEARCH_FLAGS}"
-	;;
-esac
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine if we have symbolic links on the filesystem we are building
-# on.  They are needed the setup the help so the help test will work.
-# If we don't have them, we have to copy the files.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking whether ln -s works" >&5
-echo $ECHO_N "checking whether ln -s works... $ECHO_C" >&6
-LN_S=$as_ln_s
-if test "$LN_S" = "ln -s"; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me:$LINENO: result: no, using $LN_S" >&5
-echo "${ECHO_T}no, using $LN_S" >&6
-fi
-
-if test "$LN_S" = "ln"; then
-    HAVE_SYML="NO"
-else
-    HAVE_SYML="YES"
-fi
-
-
-#------------------------------------------------------------------------------
-# Some make programs require includes to be
-#     .include "file"
-# others...
-#     include file
-# Checks the MAKE environment variable for the name of the make command to use.
-#------------------------------------------------------------------------------
-
-echo "$as_me:$LINENO: checking \"how make handles includes\"" >&5
-echo $ECHO_N "checking \"how make handles includes\"... $ECHO_C" >&6
-cat > confmakeinc <<EOF
-
-EOF
-  cat > confmakefile <<EOF
-include confmakeinc
-
-all:
-EOF
-
-if ${MAKE-make} -f confmakefile >/dev/null 2>/dev/null; then
-    MAKEINCLUDE="include"
-    MAKEQUOTE=''
-    echo "$as_me:$LINENO: result: common make include syntax" >&5
-echo "${ECHO_T}common make include syntax" >&6
-else
-    MAKEINCLUDE=".include"
-    MAKEQUOTE='"'
-    echo "$as_me:$LINENO: result: BSD make include syntax" >&5
-echo "${ECHO_T}BSD make include syntax" >&6
-fi
-rm confmakefile confmakeinc
-
-
-
-
-#------------------------------------------------------------------------------
-# Check for system header files.
+# Test if we are to include debugging symbols in the binary targets
 #------------------------------------------------------------------------------
 
 ac_ext=c
@@ -3611,6 +4111,2162 @@ fi
 done
 
 
+
+
+    # Step 0.a: Enable 64 bit support?
+
+    echo "$as_me:$LINENO: checking if 64bit support is requested" >&5
+echo $ECHO_N "checking if 64bit support is requested... $ECHO_C" >&6
+    # Check whether --enable-64bit or --disable-64bit was given.
+if test "${enable_64bit+set}" = set; then
+  enableval="$enable_64bit"
+
+else
+  enableval="no"
+fi;
+
+    if test "$enableval" = "yes"; then
+	do64bit=yes
+    else
+	do64bit=no
+    fi
+    echo "$as_me:$LINENO: result: $do64bit" >&5
+echo "${ECHO_T}$do64bit" >&6
+
+    # Step 0.b: Enable Solaris 64 bit VIS support?
+
+    echo "$as_me:$LINENO: checking if 64bit Sparc VIS support is requested" >&5
+echo $ECHO_N "checking if 64bit Sparc VIS support is requested... $ECHO_C" >&6
+    # Check whether --enable-64bit-vis or --disable-64bit-vis was given.
+if test "${enable_64bit_vis+set}" = set; then
+  enableval="$enable_64bit_vis"
+
+else
+  enableval="no"
+fi;
+
+    if test "$enableval" = "yes"; then
+	# Force 64bit on with VIS
+	do64bit=yes
+	do64bitVIS=yes
+    else
+	do64bitVIS=no
+    fi
+    echo "$as_me:$LINENO: result: $do64bitVIS" >&5
+echo "${ECHO_T}$do64bitVIS" >&6
+
+    # Step 1: set the variable "system" to hold the name and version number
+    # for the system.  This can usually be done via the "uname" command, but
+    # there are a few systems, like Next, where this doesn't work.
+
+    echo "$as_me:$LINENO: checking system version (for dynamic loading)" >&5
+echo $ECHO_N "checking system version (for dynamic loading)... $ECHO_C" >&6
+    if test -f /usr/lib/NextStep/software_version; then
+	system=NEXTSTEP-`awk '/3/,/3/' /usr/lib/NextStep/software_version`
+    else
+	system=`uname -s`-`uname -r`
+	if test "$?" -ne 0 ; then
+	    echo "$as_me:$LINENO: result: unknown (can't find uname command)" >&5
+echo "${ECHO_T}unknown (can't find uname command)" >&6
+	    system=unknown
+	else
+	    # Special check for weird MP-RAS system (uname returns weird
+	    # results, and the version is kept in special file).
+
+	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
+		system=MP-RAS-`awk '{print }' /etc/.relid'`
+	    fi
+	    if test "`uname -s`" = "AIX" ; then
+		system=AIX-`uname -v`.`uname -r`
+	    fi
+	    echo "$as_me:$LINENO: result: $system" >&5
+echo "${ECHO_T}$system" >&6
+	fi
+    fi
+
+    echo "$as_me:$LINENO: checking if gcc is being used" >&5
+echo $ECHO_N "checking if gcc is being used... $ECHO_C" >&6
+    if test "$CC" = "gcc" -o `$CC -v 2>&1 | grep -c gcc` != "0" ; then
+	using_gcc="yes"
+    else
+	using_gcc="no"
+    fi
+
+    echo "$as_me:$LINENO: result: $using_gcc ($CC)" >&5
+echo "${ECHO_T}$using_gcc ($CC)" >&6
+
+    # Step 2: check for existence of -ldl library.  This is needed because
+    # Linux can use either -ldl or -ldld for dynamic loading.
+
+    echo "$as_me:$LINENO: checking for dlopen in -ldl" >&5
+echo $ECHO_N "checking for dlopen in -ldl... $ECHO_C" >&6
+if test "${ac_cv_lib_dl_dlopen+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldl  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char dlopen ();
+int
+main ()
+{
+dlopen ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_dl_dlopen=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_dl_dlopen=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_dl_dlopen" >&5
+echo "${ECHO_T}$ac_cv_lib_dl_dlopen" >&6
+if test $ac_cv_lib_dl_dlopen = yes; then
+  have_dl=yes
+else
+  have_dl=no
+fi
+
+
+    # Step 3: set configuration options based on system name and version.
+
+    do64bit_ok=no
+    fullSrcDir=`cd $srcdir; pwd`
+    EXTRA_CFLAGS=""
+    TCL_EXPORT_FILE_SUFFIX=""
+    UNSHARED_LIB_SUFFIX=""
+    TCL_TRIM_DOTS='`echo ${VERSION} | tr -d .`'
+    ECHO_VERSION='`echo ${VERSION}`'
+    TCL_LIB_VERSIONS_OK=ok
+    CFLAGS_DEBUG=-g
+    CFLAGS_OPTIMIZE=-O
+    if test "$using_gcc" = "yes" ; then
+	CFLAGS_WARNING="-Wall -Wconversion -Wno-implicit-int"
+    else
+	CFLAGS_WARNING=""
+    fi
+    TCL_NEEDS_EXP_FILE=0
+    TCL_BUILD_EXP_FILE=""
+    TCL_EXP_FILE=""
+    STLIB_LD="ar cr"
+    case $system in
+	AIX-4.[2-9])
+	    if test "${TCL_THREADS}" = "1" -a "$using_gcc" = "no" ; then
+		# AIX requires the _r compiler when gcc isn't being used
+		if test "${CC}" != "cc_r" ; then
+		    CC=${CC}_r
+		fi
+		echo "$as_me:$LINENO: result: Using $CC for compiling with threads" >&5
+echo "${ECHO_T}Using $CC for compiling with threads" >&6
+	    fi
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="$fullSrcDir/ldAix /bin/ld -bhalt:4 -bM:SRE -bE:lib.exp -H512 -T512 -bnoentry"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+	    TCL_NEEDS_EXP_FILE=1
+	    TCL_EXPORT_FILE_SUFFIX='${VERSION}\$\{DBGX\}.exp'
+	    ;;
+	AIX-*)
+	    if test "${TCL_THREADS}" = "1" -a "$using_gcc" = "no" ; then
+		# AIX requires the _r compiler when gcc isn't being used
+		if test "${CC}" != "cc_r" ; then
+		    CC=${CC}_r
+		fi
+		echo "$as_me:$LINENO: result: Using $CC for compiling with threads" >&5
+echo "${ECHO_T}Using $CC for compiling with threads" >&6
+	    fi
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="$fullSrcDir/ldAix /bin/ld -bhalt:4 -bM:SRE -bE:lib.exp -H512 -T512 -bnoentry"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    case $LIBOBJS in
+    "tclLoadAix.$ac_objext"   | \
+  *" tclLoadAix.$ac_objext"   | \
+    "tclLoadAix.$ac_objext "* | \
+  *" tclLoadAix.$ac_objext "* ) ;;
+  *) LIBOBJS="$LIBOBJS tclLoadAix.$ac_objext" ;;
+esac
+
+	    DL_LIBS="-lld"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+	    TCL_NEEDS_EXP_FILE=1
+	    TCL_EXPORT_FILE_SUFFIX='${VERSION}\$\{DBGX\}.exp'
+	    ;;
+	BSD/OS-2.1*|BSD/OS-3*)
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="shlicc -r"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	BSD/OS-4.*)
+	    SHLIB_CFLAGS="-export-dynamic -fPIC"
+	    SHLIB_LD="cc -shared"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS="-export-dynamic"
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	dgux*)
+	    SHLIB_CFLAGS="-K PIC"
+	    SHLIB_LD="cc -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	HP-UX-*.08.*|HP-UX-*.09.*|HP-UX-*.10.*|HP-UX-*.11.*)
+	    SHLIB_SUFFIX=".sl"
+	    echo "$as_me:$LINENO: checking for shl_load in -ldld" >&5
+echo $ECHO_N "checking for shl_load in -ldld... $ECHO_C" >&6
+if test "${ac_cv_lib_dld_shl_load+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-ldld  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char shl_load ();
+int
+main ()
+{
+shl_load ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_dld_shl_load=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_dld_shl_load=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_dld_shl_load" >&5
+echo "${ECHO_T}$ac_cv_lib_dld_shl_load" >&6
+if test $ac_cv_lib_dld_shl_load = yes; then
+  tcl_ok=yes
+else
+  tcl_ok=no
+fi
+
+	    if test "$tcl_ok" = yes; then
+		SHLIB_CFLAGS="+z"
+		SHLIB_LD="ld -b"
+		SHLIB_LD_LIBS=""
+		DL_OBJS="tclLoadShl.o"
+		DL_LIBS="-ldld"
+		LDFLAGS="-Wl,-E"
+		LD_SEARCH_FLAGS='-Wl,+s,+b,${LIB_RUNTIME_DIR}:.'
+	    fi
+	    ;;
+	IRIX-4.*)
+	    SHLIB_CFLAGS="-G 0"
+	    SHLIB_SUFFIX=".a"
+	    SHLIB_LD="echo tclLdAout $CC \{$SHLIB_CFLAGS\} | `pwd`/tclsh -r -G 0"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    DL_OBJS="tclLoadAout.o"
+	    DL_LIBS=""
+	    LDFLAGS="-Wl,-D,08000000"
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+	    SHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
+	    ;;
+	IRIX-5.*|IRIX-6.*|IRIX64-6.5*)
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="ld -n32 -shared -rdata_shared"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+	    if test "$using_gcc" = "yes" ; then
+		EXTRA_CFLAGS="-mabi=n32"
+		LDFLAGS="-mabi=n32"
+	    else
+		case $system in
+		    IRIX-6.3)
+			# Use to build 6.2 compatible binaries on 6.3.
+			EXTRA_CFLAGS="-n32 -D_OLD_TERMIOS"
+			;;
+		    *)
+			EXTRA_CFLAGS="-n32"
+			;;
+		esac
+		LDFLAGS="-n32"
+	    fi
+	    ;;
+	IRIX64-6.*)
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="ld -32 -shared -rdata_shared"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+	    ;;
+	Linux*)
+	    SHLIB_CFLAGS="-fPIC"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+
+	    # egcs-2.91.66 on Redhat Linux 6.0 generates lots of warnings
+	    # when you inline the string and math operations.  Turn this off to
+	    # get rid of the warnings.
+
+	    CFLAGS_OPTIMIZE="${CFLAGS_OPTIMIZE} -D__NO_STRING_INLINES -D__NO_MATH_INLINES"
+
+	    if test "$have_dl" = yes; then
+		SHLIB_LD="${CC} -shared"
+		DL_OBJS="tclLoadDl.o"
+		DL_LIBS="-ldl"
+		LDFLAGS="-rdynamic"
+		LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+	    else
+		if test "${ac_cv_header_dld_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for dld.h" >&5
+echo $ECHO_N "checking for dld.h... $ECHO_C" >&6
+if test "${ac_cv_header_dld_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_dld_h" >&5
+echo "${ECHO_T}$ac_cv_header_dld_h" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking dld.h usability" >&5
+echo $ECHO_N "checking dld.h usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <dld.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking dld.h presence" >&5
+echo $ECHO_N "checking dld.h presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <dld.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: dld.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: dld.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: dld.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: dld.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: dld.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: dld.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: dld.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: dld.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: dld.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dld.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: dld.h: in the future, the compiler will take precedence" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------------ ##
+## Report this to the AC_PACKAGE_NAME lists.  ##
+## ------------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for dld.h" >&5
+echo $ECHO_N "checking for dld.h... $ECHO_C" >&6
+if test "${ac_cv_header_dld_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_dld_h=$ac_header_preproc
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_dld_h" >&5
+echo "${ECHO_T}$ac_cv_header_dld_h" >&6
+
+fi
+if test $ac_cv_header_dld_h = yes; then
+
+		    SHLIB_LD="ld -shared"
+		    DL_OBJS="tclLoadDld.o"
+		    DL_LIBS="-ldld"
+		    LDFLAGS=""
+		    LD_SEARCH_FLAGS=""
+fi
+
+
+	    fi
+	    if test "`uname -m`" = "alpha" ; then
+		EXTRA_CFLAGS="-mieee"
+	    fi
+	    ;;
+	MP-RAS-02*)
+	    SHLIB_CFLAGS="-K PIC"
+	    SHLIB_LD="cc -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	MP-RAS-*)
+	    SHLIB_CFLAGS="-K PIC"
+	    SHLIB_LD="cc -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS="-Wl,-Bexport"
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	NetBSD-*|FreeBSD-[1-2].*|OpenBSD-*)
+	    # Not available on all versions:  check for include file.
+	    if test "${ac_cv_header_dlfcn_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for dlfcn.h" >&5
+echo $ECHO_N "checking for dlfcn.h... $ECHO_C" >&6
+if test "${ac_cv_header_dlfcn_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_dlfcn_h" >&5
+echo "${ECHO_T}$ac_cv_header_dlfcn_h" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking dlfcn.h usability" >&5
+echo $ECHO_N "checking dlfcn.h usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <dlfcn.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking dlfcn.h presence" >&5
+echo $ECHO_N "checking dlfcn.h presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <dlfcn.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: dlfcn.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: dlfcn.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: dlfcn.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: dlfcn.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: dlfcn.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: dlfcn.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: dlfcn.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: dlfcn.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: dlfcn.h: in the future, the compiler will take precedence" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------------ ##
+## Report this to the AC_PACKAGE_NAME lists.  ##
+## ------------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for dlfcn.h" >&5
+echo $ECHO_N "checking for dlfcn.h... $ECHO_C" >&6
+if test "${ac_cv_header_dlfcn_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_dlfcn_h=$ac_header_preproc
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_dlfcn_h" >&5
+echo "${ECHO_T}$ac_cv_header_dlfcn_h" >&6
+
+fi
+if test $ac_cv_header_dlfcn_h = yes; then
+
+		# NetBSD/SPARC needs -fPIC, -fpic will not do.
+		SHLIB_CFLAGS="-fPIC"
+		SHLIB_LD="ld -Bshareable -x"
+		SHLIB_LD_LIBS=""
+		SHLIB_SUFFIX=".so"
+		DL_OBJS="tclLoadDl.o"
+		DL_LIBS=""
+		LDFLAGS=""
+		LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+		echo "$as_me:$LINENO: checking for ELF" >&5
+echo $ECHO_N "checking for ELF... $ECHO_C" >&6
+		cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+#ifdef __ELF__
+	yes
+#endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP "yes" >/dev/null 2>&1; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+		    SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.so'
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+		    SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.so.1.0'
+
+fi
+rm -f conftest*
+
+
+else
+
+		SHLIB_CFLAGS=""
+		SHLIB_LD="echo tclLdAout $CC \{$SHLIB_CFLAGS\} | `pwd`/tclsh -r"
+		SHLIB_LD_LIBS='${LIBS}'
+		SHLIB_SUFFIX=".a"
+		DL_OBJS="tclLoadAout.o"
+		DL_LIBS=""
+		LDFLAGS=""
+		LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+		SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.a'
+
+fi
+
+
+
+	    # FreeBSD doesn't handle version numbers with dots.
+
+	    UNSHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.a'
+	    TCL_LIB_VERSIONS_OK=nodots
+	    ;;
+	FreeBSD-*)
+	    # FreeBSD 3.* and greater have ELF.
+	    SHLIB_CFLAGS="-fPIC"
+	    SHLIB_LD="ld -Bshareable -x"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LDFLAGS="-export-dynamic"
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	NEXTSTEP-*)
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD="cc -nostdlib -r"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadNext.o"
+	    DL_LIBS=""
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	OS/390-*)
+	    CFLAGS_OPTIMIZE=""      # Optimizer is buggy
+	    cat >>confdefs.h <<\_ACEOF
+#define _OE_SOCKETS 1
+_ACEOF
+  # needed in sys/socket.h
+	    ;;
+	OSF1-1.0|OSF1-1.1|OSF1-1.2)
+	    # OSF/1 1.[012] from OSF, and derivatives, including Paragon OSF/1
+	    SHLIB_CFLAGS=""
+	    # Hack: make package name same as library name
+	    SHLIB_LD='ld -R -export :'
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadOSF.o"
+	    DL_LIBS=""
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	OSF1-1.*)
+	    # OSF/1 1.3 from OSF using ELF, and derivatives, including AD2
+	    SHLIB_CFLAGS="-fPIC"
+	    SHLIB_LD="ld -shared"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	OSF1-V*)
+	    # Digital OSF/1
+	    SHLIB_CFLAGS=""
+	    SHLIB_LD='ld -shared -expect_unresolved "*"'
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+	    if test "$using_gcc" = "no" ; then
+		EXTRA_CFLAGS="-DHAVE_TZSET -std1"
+	    fi
+	    # see pthread_intro(3) for pthread support on osf1, k.furukawa
+	    if test "${TCL_THREADS}" = "1" ; then
+		EXTRA_CFLAGS="${EXTRA_CFLAGS} -DTCL_THREAD_STACK_MIN=PTHREAD_STACK_MIN*64"
+		if test "$using_gcc" = "no" ; then
+		    EXTRA_CFLAGS="${EXTRA_CFLAGS} -pthread"
+		    LDFLAGS="-pthread"
+		else
+		    LIBS=`echo $LIBS | sed s/-lpthreads//`
+		    LIBS="$LIBS -lpthread -lmach -lexc"
+		fi
+	    fi
+
+	    ;;
+	RISCos-*)
+	    SHLIB_CFLAGS="-G 0"
+	    SHLIB_LD="echo tclLdAout $CC \{$SHLIB_CFLAGS\} | `pwd`/tclsh -r -G 0"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".a"
+	    DL_OBJS="tclLoadAout.o"
+	    DL_LIBS=""
+	    LDFLAGS="-Wl,-D,08000000"
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+	    ;;
+	SCO_SV-3.2*)
+	    # Note, dlopen is available only on SCO 3.2.5 and greater. However,
+	    # this test works, since "uname -s" was non-standard in 3.2.4 and
+	    # below.
+	    if test "$using_gcc" = "yes" ; then
+	    	SHLIB_CFLAGS="-fPIC -melf"
+	    	LDFLAGS="-melf -Wl,-Bexport"
+	    else
+	    	SHLIB_CFLAGS="-Kpic -belf"
+	    	LDFLAGS="-belf -Wl,-Bexport"
+	    fi
+	    SHLIB_LD="ld -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	SINIX*5.4*)
+	    SHLIB_CFLAGS="-K PIC"
+	    SHLIB_LD="cc -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS=""
+	    ;;
+	SunOS-4*)
+	    SHLIB_CFLAGS="-PIC"
+	    SHLIB_LD="ld"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+
+	    # SunOS can't handle version numbers with dots in them in library
+	    # specs, like -ltcl7.5, so use -ltcl75 instead.  Also, it
+	    # requires an extra version number at the end of .so file names.
+	    # So, the library has to have a name like libtcl75.so.1.0
+
+	    SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.so.1.0'
+	    UNSHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.a'
+	    TCL_LIB_VERSIONS_OK=nodots
+	    ;;
+	SunOS-5.[0-6]*)
+	    SHLIB_CFLAGS="-KPIC"
+	    SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+
+	    # Note: need the LIBS below, otherwise Tk won't find Tcl's
+	    # symbols when dynamically loaded into tclsh.
+
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    LDFLAGS=""
+	    LD_SEARCH_FLAGS='-Wl,-R,${LIB_RUNTIME_DIR}'
+	    ;;
+	SunOS-5*)
+	    SHLIB_CFLAGS="-KPIC"
+	    SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+	    LDFLAGS=""
+
+	    do64bit_ok=no
+	    if test "$do64bit" = "yes" ; then
+		arch=`isainfo`
+		if test "$arch" = "sparcv9 sparc" ; then
+			if test "$using_gcc" = "no" ; then
+			    do64bit_ok=yes
+			    if test "$do64bitVIS" = "yes" ; then
+				EXTRA_CFLAGS="-xarch=v9a"
+			    	LDFLAGS="-xarch=v9a"
+			    else
+				EXTRA_CFLAGS="-xarch=v9"
+			    	LDFLAGS="-xarch=v9"
+			    fi
+			else
+			    { echo "$as_me:$LINENO: WARNING: \"64bit mode not supported with GCC on $system\"" >&5
+echo "$as_me: WARNING: \"64bit mode not supported with GCC on $system\"" >&2;}
+			fi
+		else
+		    { echo "$as_me:$LINENO: WARNING: \"64bit mode only supported sparcv9 system\"" >&5
+echo "$as_me: WARNING: \"64bit mode only supported sparcv9 system\"" >&2;}
+		fi
+	    fi
+
+	    # Note: need the LIBS below, otherwise Tk won't find Tcl's
+	    # symbols when dynamically loaded into tclsh.
+
+	    SHLIB_LD_LIBS='${LIBS}'
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    if test "$using_gcc" = "yes" ; then
+		LD_SEARCH_FLAGS='-Wl,-R,${LIB_RUNTIME_DIR}'
+	    else
+		LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
+	    fi
+	    ;;
+	ULTRIX-4.*)
+	    SHLIB_CFLAGS="-G 0"
+	    SHLIB_SUFFIX=".a"
+	    SHLIB_LD="echo tclLdAout $CC \{$SHLIB_CFLAGS\} | `pwd`/tclsh -r -G 0"
+	    SHLIB_LD_LIBS='${LIBS}'
+	    DL_OBJS="tclLoadAout.o"
+	    DL_LIBS=""
+	    LDFLAGS="-Wl,-D,08000000"
+	    LD_SEARCH_FLAGS='-L${LIB_RUNTIME_DIR}'
+	    if test "$using_gcc" = "no" ; then
+		EXTRA_CFLAGS="-DHAVE_TZSET -std1"
+	    fi
+	    ;;
+	UNIX_SV* | UnixWare-5*)
+	    SHLIB_CFLAGS="-KPIC"
+	    SHLIB_LD="cc -G"
+	    SHLIB_LD_LIBS=""
+	    SHLIB_SUFFIX=".so"
+	    DL_OBJS="tclLoadDl.o"
+	    DL_LIBS="-ldl"
+	    # Some UNIX_SV* systems (unixware 1.1.2 for example) have linkers
+	    # that don't grok the -Bexport option.  Test that it does.
+	    hold_ldflags=$LDFLAGS
+	    echo "$as_me:$LINENO: checking for ld accepts -Bexport flag" >&5
+echo $ECHO_N "checking for ld accepts -Bexport flag... $ECHO_C" >&6
+	    LDFLAGS="${LDFLAGS} -Wl,-Bexport"
+	    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+int
+main ()
+{
+int i;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  found=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+found=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+	    LDFLAGS=$hold_ldflags
+	    echo "$as_me:$LINENO: result: $found" >&5
+echo "${ECHO_T}$found" >&6
+	    if test $found = yes; then
+	    LDFLAGS="-Wl,-Bexport"
+	    else
+	    LDFLAGS=""
+	    fi
+	    LD_SEARCH_FLAGS=""
+	    ;;
+    esac
+
+    if test "$do64bit" = "yes" -a "$do64bit_ok" = "no" ; then
+    { echo "$as_me:$LINENO: WARNING: \"64bit support being disabled -- don\'t know magic for this platform\"" >&5
+echo "$as_me: WARNING: \"64bit support being disabled -- don\'t know magic for this platform\"" >&2;}
+    fi
+
+    # Step 4: If pseudo-static linking is in use (see K. B. Kenny, "Dynamic
+    # Loading for Tcl -- What Became of It?".  Proc. 2nd Tcl/Tk Workshop,
+    # New Orleans, LA, Computerized Processes Unlimited, 1994), then we need
+    # to determine which of several header files defines the a.out file
+    # format (a.out.h, sys/exec.h, or sys/exec_aout.h).  At present, we
+    # support only a file format that is more or less version-7-compatible.
+    # In particular,
+    #	- a.out files must begin with `struct exec'.
+    #	- the N_TXTOFF on the `struct exec' must compute the seek address
+    #	  of the text segment
+    #	- The `struct exec' must contain a_magic, a_text, a_data, a_bss
+    #	  and a_entry fields.
+    # The following compilation should succeed if and only if either sys/exec.h
+    # or a.out.h is usable for the purpose.
+    #
+    # Note that the modified COFF format used on MIPS Ultrix 4.x is usable; the
+    # `struct exec' includes a second header that contains information that
+    # duplicates the v7 fields that are needed.
+
+    if test "x$DL_OBJS" = "xtclLoadAout.o" ; then
+	echo "$as_me:$LINENO: checking sys/exec.h" >&5
+echo $ECHO_N "checking sys/exec.h... $ECHO_C" >&6
+	cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sys/exec.h>
+int
+main ()
+{
+
+	    struct exec foo;
+	    unsigned long seek;
+	    int flag;
+#if defined(__mips) || defined(mips)
+	    seek = N_TXTOFF (foo.ex_f, foo.ex_o);
+#else
+	    seek = N_TXTOFF (foo);
+#endif
+	    flag = (foo.a_magic == OMAGIC);
+	    return foo.a_text + foo.a_data + foo.a_bss + foo.a_entry;
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  tcl_ok=usable
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+tcl_ok=unusable
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+	echo "$as_me:$LINENO: result: $tcl_ok" >&5
+echo "${ECHO_T}$tcl_ok" >&6
+	if test $tcl_ok = usable; then
+	    cat >>confdefs.h <<\_ACEOF
+#define USE_SYS_EXEC_H 1
+_ACEOF
+
+	else
+	    echo "$as_me:$LINENO: checking a.out.h" >&5
+echo $ECHO_N "checking a.out.h... $ECHO_C" >&6
+	    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <a.out.h>
+int
+main ()
+{
+
+		struct exec foo;
+		unsigned long seek;
+		int flag;
+#if defined(__mips) || defined(mips)
+		seek = N_TXTOFF (foo.ex_f, foo.ex_o);
+#else
+		seek = N_TXTOFF (foo);
+#endif
+		flag = (foo.a_magic == OMAGIC);
+		return foo.a_text + foo.a_data + foo.a_bss + foo.a_entry;
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  tcl_ok=usable
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+tcl_ok=unusable
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+	    echo "$as_me:$LINENO: result: $tcl_ok" >&5
+echo "${ECHO_T}$tcl_ok" >&6
+	    if test $tcl_ok = usable; then
+		cat >>confdefs.h <<\_ACEOF
+#define USE_A_OUT_H 1
+_ACEOF
+
+	    else
+		echo "$as_me:$LINENO: checking sys/exec_aout.h" >&5
+echo $ECHO_N "checking sys/exec_aout.h... $ECHO_C" >&6
+		cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sys/exec_aout.h>
+int
+main ()
+{
+
+		    struct exec foo;
+		    unsigned long seek;
+		    int flag;
+#if defined(__mips) || defined(mips)
+		    seek = N_TXTOFF (foo.ex_f, foo.ex_o);
+#else
+		    seek = N_TXTOFF (foo);
+#endif
+		    flag = (foo.a_midmag == OMAGIC);
+		    return foo.a_text + foo.a_data + foo.a_bss + foo.a_entry;
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  tcl_ok=usable
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+tcl_ok=unusable
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+		echo "$as_me:$LINENO: result: $tcl_ok" >&5
+echo "${ECHO_T}$tcl_ok" >&6
+		if test $tcl_ok = usable; then
+		    cat >>confdefs.h <<\_ACEOF
+#define USE_SYS_EXEC_AOUT_H 1
+_ACEOF
+
+		else
+		    DL_OBJS=""
+		fi
+	    fi
+	fi
+    fi
+
+    # Step 5: disable dynamic loading if requested via a command-line switch.
+
+    # Check whether --enable-load or --disable-load was given.
+if test "${enable_load+set}" = set; then
+  enableval="$enable_load"
+  tcl_ok=$enableval
+else
+  tcl_ok=yes
+fi;
+    if test "$tcl_ok" = "no"; then
+	DL_OBJS=""
+    fi
+
+    if test "x$DL_OBJS" != "x" ; then
+	BUILD_DLTEST="\$(DLTEST_TARGETS)"
+    else
+	echo "Can't figure out how to do dynamic loading or shared libraries"
+	echo "on this system."
+	SHLIB_CFLAGS=""
+	SHLIB_LD=""
+	SHLIB_SUFFIX=""
+	DL_OBJS="tclLoadNone.o"
+	DL_LIBS=""
+	LDFLAGS=""
+	LD_SEARCH_FLAGS=""
+	BUILD_DLTEST=""
+    fi
+
+    # If we're running gcc, then change the C flags for compiling shared
+    # libraries to the right flags for gcc, instead of those for the
+    # standard manufacturer compiler.
+
+    if test "$DL_OBJS" != "tclLoadNone.o" ; then
+	if test "$using_gcc" = "yes" ; then
+	    case $system in
+		AIX-*)
+		    ;;
+		BSD/OS*)
+		    ;;
+		IRIX*)
+		    ;;
+		NetBSD-*|FreeBSD-*|OpenBSD-*)
+		    ;;
+		RISCos-*)
+		    ;;
+		SCO_SV-3.2*)
+		    ;;
+		ULTRIX-4.*)
+		    ;;
+		*)
+		    SHLIB_CFLAGS="-fPIC"
+		    ;;
+	    esac
+	fi
+    fi
+
+    if test "$SHARED_LIB_SUFFIX" = "" ; then
+	SHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}${SHLIB_SUFFIX}'
+    fi
+    if test "$UNSHARED_LIB_SUFFIX" = "" ; then
+	UNSHARED_LIB_SUFFIX='${VERSION}\$\{DBGX\}.a'
+    fi
+
+
+
+
+
+
+
+    echo "$as_me:$LINENO: checking for build with symbols" >&5
+echo $ECHO_N "checking for build with symbols... $ECHO_C" >&6
+    # Check whether --enable-symbols or --disable-symbols was given.
+if test "${enable_symbols+set}" = set; then
+  enableval="$enable_symbols"
+  tcl_ok=$enableval
+else
+  tcl_ok=no
+fi;
+    if test "$tcl_ok" = "yes"; then
+	CFLAGS_DEFAULT="${CFLAGS_DEBUG}"
+	LDFLAGS_DEFAULT="${LDFLAGS_DEBUG}"
+	DBGX=g
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+    else
+	CFLAGS_DEFAULT="${CFLAGS_OPTIMIZE}"
+	LDFLAGS_DEFAULT="${LDFLAGS_OPTIMIZE}"
+	DBGX=""
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+    fi
+
+
+CFLAGS="${CFLAGS_DEFAULT}"
+TCLX_DBGX=${DBGX}
+TKX_DBGX=${DBGX}
+
+
+
+
+
+#------------------------------------------------------------------------------
+# Set this back to ${TCL_DBGX} because the UNSHARED_LIB_SUFFIX references
+# below refer to DBGX, not TCL_DBGX
+#------------------------------------------------------------------------------
+
+DBGX=${TCL_DBGX}
+
+#------------------------------------------------------------------------------
+# The tclX shell still needs to know this value so that it can construct
+# the correct library name for libtcl.
+#------------------------------------------------------------------------------
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine the names of the TclX libraries and the link specifications and
+# other shared library stuff.
+#------------------------------------------------------------------------------
+
+#
+# Generate the library names using the Tcl macros.
+#
+SHLIB_SUFFIX=${TCL_SHLIB_SUFFIX}
+
+VERSION=$TCL_VERSION
+eval "TCL_STLIB_NAME=libtcl${TCL_UNSHARED_LIB_SUFFIX}"
+
+VERSION=$TK_VERSION
+eval "TK_STLIB_NAME=libtk${TCL_UNSHARED_LIB_SUFFIX}"
+
+DBGX=${TCLX_DBGX}
+VERSION=$TCLX_VERSION
+eval "TCLX_STLIB_NAME=libtclx${UNSHARED_LIB_SUFFIX}"
+eval "TCLX_SHLIB_NAME=libtclx${SHARED_LIB_SUFFIX}"
+eval "TCLX_SHLIB_NAME=${TCLX_SHLIB_NAME}"
+
+DBGX=${TKX_DBGX}
+VERSION=$TKX_VERSION
+eval "TKX_STLIB_NAME=libtkx${UNSHARED_LIB_SUFFIX}"
+eval "TKX_SHLIB_NAME=libtkx${SHARED_LIB_SUFFIX}"
+eval "TKX_SHLIB_NAME=${TKX_SHLIB_NAME}"
+
+#
+# Determine suffix to use for the object files for the shared library.
+#
+if test "x${TCL_SHLIB_CFLAGS}" != "x"; then
+    SHOBJ_SUFFIX="..o"
+else
+    SHOBJ_SUFFIX=".o"
+fi
+
+#
+# Determine the arguments for specifying the prefered TclX libraries on the
+# link lines.
+# A few system (AIX) have the same extension of shared and static libraries,
+# so shlib target must not be defined if not being build.
+#
+case "$SHARED_BUILD" in
+    1)
+        TCLX_LIB_FLAG="-ltclx${TCLX_VERSION}${TCLX_DBGX}"
+        TKX_LIB_FLAG="-ltkx${TKX_VERSION}${TCLX_DBGX}"
+        if test "X${TCL_LIB_VERSIONS_OK}" = "Xnodots" ; then
+            TCLX_LIB_FLAG=`echo ${TCLX_LIB_FLAG} | tr -d .`
+            TKX_LIB_FLAG=`echo ${TKX_LIB_FLAG} | tr -d .`
+        fi
+        TCLX_BUILD_LIB_SPEC="-L$bldbasedir/tcl/unix ${TCLX_LIB_FLAG}"
+        TCLX_LIB_SPEC="-L$TCLX_INST_LIB ${TCLX_LIB_FLAG}"
+        TKX_BUILD_LIB_SPEC="-L$bldbasedir/tk/unix ${TKX_LIB_FLAG}"
+        TKX_LIB_SPEC="-L$TCLX_INST_LIB ${TKX_LIB_FLAG}"
+        TCLX_STLIB_BUILD_REF=${TCLX_STLIB_NAME}
+        TKX_STLIB_BUILD_REF=${TKX_STLIB_NAME}
+        TCLX_SHLIB_BUILD_REF=${TCLX_SHLIB_NAME}
+        TKX_SHLIB_BUILD_REF=${TKX_SHLIB_NAME}
+        TCLX_SHLIB_BUILD_TARGET=${TCLX_SHLIB_NAME}
+        TKX_SHLIB_BUILD_TARGET=${TKX_SHLIB_NAME}
+	TCLX_LIB_NAME=${TCLX_SHLIB_NAME}
+	TKX_LIB_NAME=${TKX_SHLIB_NAME}
+        ;;
+    0)
+        echo "$as_me:$LINENO: result: Will not build shared libraries" >&5
+echo "${ECHO_T}Will not build shared libraries" >&6
+        TCLX_BUILD_LIB_SPEC="$bldbasedir/tcl/unix/${TCLX_STLIB_NAME}"
+        TCLX_LIB_SPEC="$TCLX_INST_LIB/${TCLX_STLIB_NAME}"
+        TKX_BUILD_LIB_SPEC="$bldbasedir/tk/unix/${TKX_STLIB_NAME}"
+        TKX_LIB_SPEC="$TCLX_INST_LIB/${TKX_STLIB_NAME}"
+        TCLX_STLIB_BUILD_REF=${TCLX_STLIB_NAME}
+        TKX_STLIB_BUILD_REF=${TKX_STLIB_NAME}
+        TCLX_SHLIB_BUILD_REF=""
+        TKX_SHLIB_BUILD_REF=""
+        TCLX_SHLIB_BUILD_TARGET=NO_SHLIB
+        TKX_SHLIB_BUILD_TARGET=NO_SHLIB
+ 	TCLX_LIB_NAME=${TCLX_STLIB_NAME}
+ 	TKX_LIB_NAME=${TKX_STLIB_NAME}
+        ;;
+esac
+
+#
+# If the names ended up the same, dont build twice.
+#
+if test "x$TCLX_STLIB_BUILD_TARGET" = "x$TCLX_SHLIB_BUILD_TARGET"; then
+	TCLX_BUILD_STANDALONE="tclXinitSA${SHOBJ_SUFFIX}"
+	TKX_BUILD_STANDALONE="tkXinitSA${SHOBJ_SUFFIX}"
+	TCLX_BUILD_DUMMY_STANDALONE="tclXinitSA${SHOBJ_SUFFIX}"
+	TKX_BUILD_DUMMY_STANDALONE="tkXinitSA${SHOBJ_SUFFIX}"
+else
+	TCLX_BUILD_STANDALONE="tclXinitSA.o"
+	TKX_BUILD_STANDALONE="tkXinitSA.o"
+	TCLX_BUILD_DUMMY_STANDALONE="tclXinitDSA${SHOBJ_SUFFIX}"
+	TKX_BUILD_DUMMY_STANDALONE="tkXinitDSA${SHOBJ_SUFFIX}"
+fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# These are substituted into the run scripts
+TCLX_BIN_DIR="${bldbasedir}/tcl/unix"
+TCLX_LIB_DIR="${bldbasedir}/tcl/unix"
+TCLX_RUNTIME_DIR="${bldbasedir}/tcl/unix"
+
+
+
+
+TKX_BIN_DIR="${bldbasedir}/tk/unix"
+TKX_LIB_DIR="${bldbasedir}/tk/unix"
+TKX_RUNTIME_DIR="${bldbasedir}/tk/unix"
+
+
+
+
+#------------------------------------------------------------------------------
+# Test for UnixWare -o bug.  Macros are used in targets to build the shared
+# objects.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking for UnixWare -o bug" >&5
+echo $ECHO_N "checking for UnixWare -o bug... $ECHO_C" >&6
+rm -rf conftest*
+cat > conftest.$ac_ext <<EOF
+int main() { return 0; }
+EOF
+${CC-cc} -c -o conftest..o conftest.$ac_ext
+if test -f conftest..o; then
+    OBJ_SAVE="@:"
+    OBJ_RESTORE="@:"
+    CC_SHOBJ_FLAG='-o $@'
+    echo "$as_me:$LINENO: result: OK" >&5
+echo "${ECHO_T}OK" >&6
+else
+    OBJ_SAVE='@b=`basename $@ ..o`; if test -f $$b.o ; then rm -f $$b.sav; mv $$b.o $$b.sav'
+    OBJ_RESTORE='@b=`basename $@ ..o`;mv $$b.o $@; if test -f $$b.sav ; then mv$$b.sav $$b'
+    CC_SHOBJ_FLAG=""
+    echo "$as_me:$LINENO: result: buggy" >&5
+echo "${ECHO_T}buggy" >&6
+fi
+rm -rf conftest*
+
+
+
+
+
+#------------------------------------------------------------------------------
+# Test if there are shared versions of the socket, math and c libraries.
+#------------------------------------------------------------------------------
+
+SHARED_LIBS=""
+if test "x${SHLIB_SUFFIX}" = "x..o" -o "x${SHLIB_SUFFIX}" = "x.a"; then
+    if test "x${SHLIB_CFLAGS}" = "x-G 0"; then
+	TEST_SUFFIX="_G0.a"
+    else
+	TEST_SUFFIX=".a"
+    fi
+else
+    if test "x${TCL_SHARED_LIB_SUFFIX}" = 'x${VERSION}.a' -a "x${SHLIB_SUFFIX}" = "x.so"; then
+	TEST_SUFFIX=".a"
+	SHARED_LIBS="${TCL_LIB_SPEC}"
+    else
+	TEST_SUFFIX="${SHLIB_SUFFIX}"
+    fi
+fi
+
+dirs="/lib/libm${TEST_SUFFIX}* /usr/lib/libm${TEST_SUFFIX}*"
+for i in $dirs ; do
+    if test -f $i; then
+	SHARED_LIBS="${SHARED_LIBS} -lm"
+	break;
+    fi
+done
+dirs="/lib/libc${TEST_SUFFIX}* /usr/lib/libc${TEST_SUFFIX}*"
+for i in $dirs ; do
+    if test -f $i; then
+	SHARED_LIBS="${SHARED_LIBS} -lc"
+	break;
+    fi
+done
+
+
+#------------------------------------------------------------------------------
+# Check for Plus patch being installed. Does libtcl.a contains a definition of
+# Tcl_InitStandAlone() and does Tk contain Tk_InitStandAlone.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking standalone support of Tcl (Plus patch)" >&5
+echo $ECHO_N "checking standalone support of Tcl (Plus patch)... $ECHO_C" >&6
+if test -f "${TCL_BUILD}/unix/${TCL_STLIB_NAME}"; then
+    x=`nm -p "${TCL_BUILD}/unix/${TCL_STLIB_NAME}" |grep 'Tcl_InitStandAlone'`
+    if test "x$x" != "x"; then
+        # Build variables already set
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+        cat >>confdefs.h <<\_ACEOF
+#define HAVE_TCL_STANDALONE 1
+_ACEOF
+
+    else
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	TCLX_BUILD_STANDALONE=""
+	TCLX_BUILD_DUMMY_STANDALONE=""
+    fi
+else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+    TCLX_BUILD_STANDALONE=""
+    TCLX_BUILD_DUMMY_STANDALONE=""
+fi
+
+
+
+echo "$as_me:$LINENO: checking standalone support of Tk (Plus patch)" >&5
+echo $ECHO_N "checking standalone support of Tk (Plus patch)... $ECHO_C" >&6
+if test "${TKX_BUILD}" = "YES" -a -f "${TK_BUILD}/unix/${TK_STLIB_NAME}"; then
+    x=`nm -p "${TK_BUILD}/unix/${TK_STLIB_NAME}" |grep 'Tk_InitStandAlone'`
+    if test "x$x" != "x"; then
+        # Build variables already set
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+        cat >>confdefs.h <<\_ACEOF
+#define HAVE_TK_STANDALONE 1
+_ACEOF
+
+    else
+	echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+	TKX_BUILD_STANDALONE=""
+	TKX_BUILD_DUMMY_STANDALONE=""
+    fi
+else
+    echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+    TKX_BUILD_STANDALONE=""
+    TKX_BUILD_DUMMY_STANDALONE=""
+fi
+
+
+
+#------------------------------------------------------------------------------
+# Determine if Tcl was built with threading support.
+#------------------------------------------------------------------------------
+
+    echo "$as_me:$LINENO: checking for building with threads" >&5
+echo $ECHO_N "checking for building with threads... $ECHO_C" >&6
+    # Check whether --enable-threads or --disable-threads was given.
+if test "${enable_threads+set}" = set; then
+  enableval="$enable_threads"
+  tcl_ok=$enableval
+else
+  tcl_ok=no
+fi;
+
+    if test "$tcl_ok" = "yes"; then
+	echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+	TCL_THREADS=1
+	cat >>confdefs.h <<\_ACEOF
+#define TCL_THREADS 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define _REENTRANT 1
+_ACEOF
+
+	cat >>confdefs.h <<\_ACEOF
+#define _THREAD_SAFE 1
+_ACEOF
+
+	echo "$as_me:$LINENO: checking for pthread_mutex_init in -lpthread" >&5
+echo $ECHO_N "checking for pthread_mutex_init in -lpthread... $ECHO_C" >&6
+if test "${ac_cv_lib_pthread_pthread_mutex_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpthread  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char pthread_mutex_init ();
+int
+main ()
+{
+pthread_mutex_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_pthread_pthread_mutex_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_pthread_pthread_mutex_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_pthread_pthread_mutex_init" >&5
+echo "${ECHO_T}$ac_cv_lib_pthread_pthread_mutex_init" >&6
+if test $ac_cv_lib_pthread_pthread_mutex_init = yes; then
+  tcl_ok=yes
+else
+  tcl_ok=no
+fi
+
+	if test "$tcl_ok" = "no"; then
+	    # Check a little harder for __pthread_mutex_init in the same
+	    # library, as some systems hide it there until pthread.h is
+	    # defined.  We could alternatively do an AC_TRY_COMPILE with
+	    # pthread.h, but that will work with libpthread really doesn't
+	    # exist, like AIX 4.2.  [Bug: 4359]
+	    echo "$as_me:$LINENO: checking for __pthread_mutex_init in -lpthread" >&5
+echo $ECHO_N "checking for __pthread_mutex_init in -lpthread... $ECHO_C" >&6
+if test "${ac_cv_lib_pthread___pthread_mutex_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpthread  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char __pthread_mutex_init ();
+int
+main ()
+{
+__pthread_mutex_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_pthread___pthread_mutex_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_pthread___pthread_mutex_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_pthread___pthread_mutex_init" >&5
+echo "${ECHO_T}$ac_cv_lib_pthread___pthread_mutex_init" >&6
+if test $ac_cv_lib_pthread___pthread_mutex_init = yes; then
+  tcl_ok=yes
+else
+  tcl_ok=no
+fi
+
+	fi
+
+	if test "$tcl_ok" = "yes"; then
+	    # The space is needed
+	    THREADS_LIBS=" -lpthread"
+	else
+	    echo "$as_me:$LINENO: checking for pthread_mutex_init in -lpthreads" >&5
+echo $ECHO_N "checking for pthread_mutex_init in -lpthreads... $ECHO_C" >&6
+if test "${ac_cv_lib_pthreads_pthread_mutex_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpthreads  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char pthread_mutex_init ();
+int
+main ()
+{
+pthread_mutex_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_pthreads_pthread_mutex_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_pthreads_pthread_mutex_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_pthreads_pthread_mutex_init" >&5
+echo "${ECHO_T}$ac_cv_lib_pthreads_pthread_mutex_init" >&6
+if test $ac_cv_lib_pthreads_pthread_mutex_init = yes; then
+  tcl_ok=yes
+else
+  tcl_ok=no
+fi
+
+	    if test "$tcl_ok" = "yes"; then
+		# The space is needed
+		THREADS_LIBS=" -lpthreads"
+	    else
+		echo "$as_me:$LINENO: checking for pthread_mutex_init in -lc" >&5
+echo $ECHO_N "checking for pthread_mutex_init in -lc... $ECHO_C" >&6
+if test "${ac_cv_lib_c_pthread_mutex_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lc  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char pthread_mutex_init ();
+int
+main ()
+{
+pthread_mutex_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_c_pthread_mutex_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_c_pthread_mutex_init=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_c_pthread_mutex_init" >&5
+echo "${ECHO_T}$ac_cv_lib_c_pthread_mutex_init" >&6
+if test $ac_cv_lib_c_pthread_mutex_init = yes; then
+  tcl_ok=yes
+else
+  tcl_ok=no
+fi
+
+	    	if test "$tcl_ok" = "no"; then
+	    	    TCL_THREADS=0
+		    { echo "$as_me:$LINENO: WARNING: \"Don t know how to find pthread lib on your system - you must disable thread support or edit the LIBS in the Makefile...\"" >&5
+echo "$as_me: WARNING: \"Don t know how to find pthread lib on your system - you must disable thread support or edit the LIBS in the Makefile...\"" >&2;}
+	    	fi
+	    fi
+	fi
+
+	# Does the pthread-implementation provide
+	# 'pthread_attr_setstacksize' ?
+
+
+for ac_func in pthread_attr_setstacksize
+do
+as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $ac_func" >&5
+echo $ECHO_N "checking for $ac_func... $ECHO_C" >&6
+if eval "test \"\${$as_ac_var+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define $ac_func to an innocuous variant, in case <limits.h> declares $ac_func.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define $ac_func innocuous_$ac_func
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char $ac_func (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef $ac_func
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $ac_func ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_$ac_func) || defined (__stub___$ac_func)
+choke me
+#else
+char (*f) () = $ac_func;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != $ac_func;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_var=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_var=no"
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_var'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_var'}'`" >&6
+if test `eval echo '${'$as_ac_var'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_func" | $as_tr_cpp` 1
+_ACEOF
+
+fi
+done
+
+    else
+	TCL_THREADS=0
+	echo "$as_me:$LINENO: result: no (default)" >&5
+echo "${ECHO_T}no (default)" >&6
+    fi
+
+
+#------------------------------------------------------------------------------
+# Determine if we have symbolic links on the filesystem we are building
+# on.  They are needed the setup the help so the help test will work.
+# If we don't have them, we have to copy the files.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether ln -s works" >&5
+echo $ECHO_N "checking whether ln -s works... $ECHO_C" >&6
+LN_S=$as_ln_s
+if test "$LN_S" = "ln -s"; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me:$LINENO: result: no, using $LN_S" >&5
+echo "${ECHO_T}no, using $LN_S" >&6
+fi
+
+if test "$LN_S" = "ln"; then
+    HAVE_SYML="NO"
+else
+    HAVE_SYML="YES"
+fi
+
+
+#------------------------------------------------------------------------------
+# Some make programs require includes to be
+#     .include "file"
+# others...
+#     include file
+# Checks the MAKE environment variable for the name of the make command to use.
+#------------------------------------------------------------------------------
+
+echo "$as_me:$LINENO: checking \"how make handles includes\"" >&5
+echo $ECHO_N "checking \"how make handles includes\"... $ECHO_C" >&6
+cat > confmakeinc <<EOF
+
+EOF
+  cat > confmakefile <<EOF
+include confmakeinc
+
+all:
+EOF
+
+if ${MAKE-make} -f confmakefile >/dev/null 2>/dev/null; then
+    MAKEINCLUDE="include"
+    MAKEQUOTE=''
+    echo "$as_me:$LINENO: result: common make include syntax" >&5
+echo "${ECHO_T}common make include syntax" >&6
+else
+    MAKEINCLUDE=".include"
+    MAKEQUOTE='"'
+    echo "$as_me:$LINENO: result: BSD make include syntax" >&5
+echo "${ECHO_T}BSD make include syntax" >&6
+fi
+rm confmakefile confmakeinc
+
+
+
+
+#------------------------------------------------------------------------------
+# Check for system header files.
+#------------------------------------------------------------------------------
+
 if test "${ac_cv_header_limits_h+set}" = set; then
   echo "$as_me:$LINENO: checking for limits.h" >&5
 echo $ECHO_N "checking for limits.h... $ECHO_C" >&6
@@ -3909,6 +6565,72 @@ fi
 #------------------------------------------------------------------------------
 # Check for missing typedefs.
 #------------------------------------------------------------------------------
+
+echo "$as_me:$LINENO: checking for clock_t" >&5
+echo $ECHO_N "checking for clock_t... $ECHO_C" >&6
+if test "${ac_cv_type_clock_t+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+int
+main ()
+{
+if ((clock_t *) 0)
+  return 0;
+if (sizeof (clock_t))
+  return 0;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_type_clock_t=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_type_clock_t=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_type_clock_t" >&5
+echo "${ECHO_T}$ac_cv_type_clock_t" >&6
+if test $ac_cv_type_clock_t = yes; then
+  :
+else
+
+cat >>confdefs.h <<_ACEOF
+#define clock_t long
+_ACEOF
+
+fi
 
 echo "$as_me:$LINENO: checking for time_t" >&5
 echo $ECHO_N "checking for time_t... $ECHO_C" >&6
@@ -6327,211 +9049,11 @@ fi
 #------------------------------------------------------------------------------
 # Check for missing functions that we need.  Must be done after library checks.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking for random" >&5
-echo $ECHO_N "checking for random... $ECHO_C" >&6
-if test "${ac_cv_func_random+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* Define random to an innocuous variant, in case <limits.h> declares random.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define random innocuous_random
 
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char random (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
+#AC_LIBOBJ([random])
+#AC_LIBOBJ([rename])
 
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef random
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char random ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_random) || defined (__stub___random)
-choke me
-#else
-char (*f) () = random;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != random;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_random=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func_random=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_random" >&5
-echo "${ECHO_T}$ac_cv_func_random" >&6
-if test $ac_cv_func_random = yes; then
-  :
-else
-  case $LIBOBJS in
-    "random.$ac_objext"   | \
-  *" random.$ac_objext"   | \
-    "random.$ac_objext "* | \
-  *" random.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS random.$ac_objext" ;;
-esac
-
-fi
-
-echo "$as_me:$LINENO: checking for rename" >&5
-echo $ECHO_N "checking for rename... $ECHO_C" >&6
-if test "${ac_cv_func_rename+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-/* Define rename to an innocuous variant, in case <limits.h> declares rename.
-   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-#define rename innocuous_rename
-
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char rename (); below.
-    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
-    <limits.h> exists even on freestanding compilers.  */
-
-#ifdef __STDC__
-# include <limits.h>
-#else
-# include <assert.h>
-#endif
-
-#undef rename
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char rename ();
-/* The GNU C library defines this for functions which it implements
-    to always fail with ENOSYS.  Some functions are actually named
-    something starting with __ and the normal name is an alias.  */
-#if defined (__stub_rename) || defined (__stub___rename)
-choke me
-#else
-char (*f) () = rename;
-#endif
-#ifdef __cplusplus
-}
-#endif
-
-int
-main ()
-{
-return f != rename;
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_func_rename=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_func_rename=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-fi
-echo "$as_me:$LINENO: result: $ac_cv_func_rename" >&5
-echo "${ECHO_T}$ac_cv_func_rename" >&6
-if test $ac_cv_func_rename = yes; then
-  :
-else
-  case $LIBOBJS in
-    "rename.$ac_objext"   | \
-  *" rename.$ac_objext"   | \
-    "rename.$ac_objext "* | \
-  *" rename.$ac_objext "* ) ;;
-  *) LIBOBJS="$LIBOBJS rename.$ac_objext" ;;
-esac
-
-fi
+LIBSOBJS=`echo $LIBOBJS |sed -e s/\\\\.o/$SHOBJ_SUFFIX/g`
 
 
 #------------------------------------------------------------------------------
@@ -6624,12 +9146,86 @@ _ACEOF
 fi
 
 #------------------------------------------------------------------------------
+# Determine if we have enough tools to generate the help files.
+# Allow --with-helpdir to specify help file outputs
+#------------------------------------------------------------------------------
+
+for ac_prog in nroff
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_NROFF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $NROFF in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_NROFF="$NROFF" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in ${PATH}
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_NROFF="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+NROFF=$ac_cv_path_NROFF
+
+if test -n "$NROFF"; then
+  echo "$as_me:$LINENO: result: $NROFF" >&5
+echo "${ECHO_T}$NROFF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  test -n "$NROFF" && break
+done
+test -n "$NROFF" || NROFF=":"
+
+
+if test "x${NROFF}" = "x:" ; then
+    { echo "$as_me:$LINENO: WARNING: No nroff executable found.  Cannot build help files." >&5
+echo "$as_me: WARNING: No nroff executable found.  Cannot build help files." >&2;} ;
+    BUILDHELP=
+else
+    BUILDHELP=buildhelp
+fi
+
+
+
+# Check whether --with-help or --without-help was given.
+if test "${with_help+set}" = set; then
+  withval="$with_help"
+  with_help=${withval}
+fi;
+if test x"${with_help}" != x ; then
+    HELP_DIR=${with_help}
+else
+    HELP_DIR=${srcbasedir}/tcl/help
+fi
+
+
+#------------------------------------------------------------------------------
 # Generate the make files.
 #------------------------------------------------------------------------------
 
 
 
                                                                                                                                                                                                                   ac_config_files="$ac_config_files Makefile Common.mk runtcl runtcl.static runtcl.standalone runwishx runwishx.static runwishx.standalone tools/Makefile ../tcl/unix/Makefile ../tcl/unix/tclxConfig.sh ../tcl/unix/pkgIndex.tcl ../tcl/unix/runtest ../tcl/unix/runtest.static ../tcl/unix/runtest.standalone ../tk/unix/Makefile ../tk/unix/tkxConfig.sh ../tk/unix/pkgIndex.tcl ../tk/unix/runtest ../tk/unix/runtest.static ../tk/unix/runtest.standalone"
+          ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -7073,6 +9669,9 @@ Usage: $0 [OPTIONS] [FILE]...
 Configuration files:
 $config_files
 
+Configuration commands:
+$config_commands
+
 Report bugs to <bug-autoconf@gnu.org>."
 _ACEOF
 
@@ -7201,6 +9800,7 @@ do
   "../tk/unix/runtest" ) CONFIG_FILES="$CONFIG_FILES ../tk/unix/runtest" ;;
   "../tk/unix/runtest.static" ) CONFIG_FILES="$CONFIG_FILES ../tk/unix/runtest.static" ;;
   "../tk/unix/runtest.standalone" ) CONFIG_FILES="$CONFIG_FILES ../tk/unix/runtest.standalone" ;;
+  "default" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
@@ -7213,6 +9813,7 @@ done
 # bizarre bug on SunOS 4.1.3.
 if $ac_need_defaults; then
   test "${CONFIG_FILES+set}" = set || CONFIG_FILES=$config_files
+  test "${CONFIG_COMMANDS+set}" = set || CONFIG_COMMANDS=$config_commands
 fi
 
 # Have a temporary directory for convenience.  Make it in the build tree
@@ -7289,18 +9890,15 @@ s,@bldbasedir@,$bldbasedir,;t t
 s,@UNAME_OUT@,$UNAME_OUT,;t t
 s,@DATE_OUT@,$DATE_OUT,;t t
 s,@TKX_BUILD@,$TKX_BUILD,;t t
-s,@BUILD_SHARED@,$BUILD_SHARED,;t t
+s,@SHARED_BUILD@,$SHARED_BUILD,;t t
 s,@TCLX_VERSION@,$TCLX_VERSION,;t t
 s,@TCLX_FULL_VERSION@,$TCLX_FULL_VERSION,;t t
 s,@TKX_VERSION@,$TKX_VERSION,;t t
 s,@TKX_FULL_VERSION@,$TKX_FULL_VERSION,;t t
-s,@TCLX_INST_LIB@,$TCLX_INST_LIB,;t t
-s,@TKX_INST_LIB@,$TKX_INST_LIB,;t t
+s,@TCL_BIN_DIR@,$TCL_BIN_DIR,;t t
+s,@TCL_SRC_DIR@,$TCL_SRC_DIR,;t t
+s,@TCL_LIB_FILE@,$TCL_LIB_FILE,;t t
 s,@TCL_VERSION@,$TCL_VERSION,;t t
-s,@TCL_SRC@,$TCL_SRC,;t t
-s,@TCL_BUILD@,$TCL_BUILD,;t t
-s,@TK_SRC@,$TK_SRC,;t t
-s,@TK_BUILD@,$TK_BUILD,;t t
 s,@TCL_DEFS@,$TCL_DEFS,;t t
 s,@TCL_LIBS@,$TCL_LIBS,;t t
 s,@TCL_EXEC_PREFIX@,$TCL_EXEC_PREFIX,;t t
@@ -7310,8 +9908,17 @@ s,@TCL_SHLIB_LD_LIBS@,$TCL_SHLIB_LD_LIBS,;t t
 s,@TCL_DL_LIBS@,$TCL_DL_LIBS,;t t
 s,@TCL_LD_FLAGS@,$TCL_LD_FLAGS,;t t
 s,@TCL_LD_SEARCH_FLAGS@,$TCL_LD_SEARCH_FLAGS,;t t
+s,@TCL_EXTRA_CFLAGS@,$TCL_EXTRA_CFLAGS,;t t
+s,@TCL_CFLAGS_WARNING@,$TCL_CFLAGS_WARNING,;t t
 s,@TCL_BUILD_LIB_SPEC@,$TCL_BUILD_LIB_SPEC,;t t
 s,@TCL_LIB_SPEC@,$TCL_LIB_SPEC,;t t
+s,@TCL_BUILD_STUB_LIB_SPEC@,$TCL_BUILD_STUB_LIB_SPEC,;t t
+s,@TCL_STUB_LIB_SPEC@,$TCL_STUB_LIB_SPEC,;t t
+s,@TCL_LIB_DIR@,$TCL_LIB_DIR,;t t
+s,@TCL_LIBRARY_DIR@,$TCL_LIBRARY_DIR,;t t
+s,@TK_BIN_DIR@,$TK_BIN_DIR,;t t
+s,@TK_SRC_DIR@,$TK_SRC_DIR,;t t
+s,@TK_LIB_FILE@,$TK_LIB_FILE,;t t
 s,@TK_VERSION@,$TK_VERSION,;t t
 s,@TK_DEFS@,$TK_DEFS,;t t
 s,@TK_LIBS@,$TK_LIBS,;t t
@@ -7321,6 +9928,12 @@ s,@TK_XLIBSW@,$TK_XLIBSW,;t t
 s,@TK_LD_SEARCH_FLAGS@,$TK_LD_SEARCH_FLAGS,;t t
 s,@TK_BUILD_LIB_SPEC@,$TK_BUILD_LIB_SPEC,;t t
 s,@TK_LIB_SPEC@,$TK_LIB_SPEC,;t t
+s,@TK_BUILD_STUB_LIB_SPEC@,$TK_BUILD_STUB_LIB_SPEC,;t t
+s,@TK_STUB_LIB_SPEC@,$TK_STUB_LIB_SPEC,;t t
+s,@TK_LIB_DIR@,$TK_LIB_DIR,;t t
+s,@TK_LIBRARY_DIR@,$TK_LIBRARY_DIR,;t t
+s,@TCLX_INST_LIB@,$TCLX_INST_LIB,;t t
+s,@TKX_INST_LIB@,$TKX_INST_LIB,;t t
 s,@CC@,$CC,;t t
 s,@CFLAGS@,$CFLAGS,;t t
 s,@LDFLAGS@,$LDFLAGS,;t t
@@ -7331,7 +9944,17 @@ s,@OBJEXT@,$OBJEXT,;t t
 s,@SYSCFLAGS@,$SYSCFLAGS,;t t
 s,@RANLIB@,$RANLIB,;t t
 s,@ac_ct_RANLIB@,$ac_ct_RANLIB,;t t
-s,@PATCH@,$PATCH,;t t
+s,@LIBOBJS@,$LIBOBJS,;t t
+s,@CPP@,$CPP,;t t
+s,@EGREP@,$EGREP,;t t
+s,@DL_LIBS@,$DL_LIBS,;t t
+s,@CFLAGS_DEBUG@,$CFLAGS_DEBUG,;t t
+s,@CFLAGS_OPTIMIZE@,$CFLAGS_OPTIMIZE,;t t
+s,@CFLAGS_WARNING@,$CFLAGS_WARNING,;t t
+s,@TCLX_DBGX@,$TCLX_DBGX,;t t
+s,@TKX_DBGX@,$TKX_DBGX,;t t
+s,@TCL_DBGX@,$TCL_DBGX,;t t
+s,@TK_DBGX@,$TK_DBGX,;t t
 s,@SHOBJ_SUFFIX@,$SHOBJ_SUFFIX,;t t
 s,@TCL_STLIB_NAME@,$TCL_STLIB_NAME,;t t
 s,@TK_STLIB_NAME@,$TK_STLIB_NAME,;t t
@@ -7351,6 +9974,12 @@ s,@TKX_BUILD_LIB_SPEC@,$TKX_BUILD_LIB_SPEC,;t t
 s,@TKX_LIB_SPEC@,$TKX_LIB_SPEC,;t t
 s,@TCLX_LIB_NAME@,$TCLX_LIB_NAME,;t t
 s,@TKX_LIB_NAME@,$TKX_LIB_NAME,;t t
+s,@TCLX_BIN_DIR@,$TCLX_BIN_DIR,;t t
+s,@TCLX_LIB_DIR@,$TCLX_LIB_DIR,;t t
+s,@TCLX_RUNTIME_DIR@,$TCLX_RUNTIME_DIR,;t t
+s,@TKX_BIN_DIR@,$TKX_BIN_DIR,;t t
+s,@TKX_LIB_DIR@,$TKX_LIB_DIR,;t t
+s,@TKX_RUNTIME_DIR@,$TKX_RUNTIME_DIR,;t t
 s,@OBJ_SAVE@,$OBJ_SAVE,;t t
 s,@OBJ_RESTORE@,$OBJ_RESTORE,;t t
 s,@CC_SHOBJ_FLAG@,$CC_SHOBJ_FLAG,;t t
@@ -7359,18 +9988,15 @@ s,@TCLX_BUILD_STANDALONE@,$TCLX_BUILD_STANDALONE,;t t
 s,@TCLX_BUILD_DUMMY_STANDALONE@,$TCLX_BUILD_DUMMY_STANDALONE,;t t
 s,@TKX_BUILD_STANDALONE@,$TKX_BUILD_STANDALONE,;t t
 s,@TKX_BUILD_DUMMY_STANDALONE@,$TKX_BUILD_DUMMY_STANDALONE,;t t
-s,@TCLX_LD_SEARCH_FLAGS@,$TCLX_LD_SEARCH_FLAGS,;t t
-s,@TCLX_CC_SEARCH_FLAGS@,$TCLX_CC_SEARCH_FLAGS,;t t
-s,@TKX_LD_SEARCH_FLAGS@,$TKX_LD_SEARCH_FLAGS,;t t
-s,@TKX_CC_SEARCH_FLAGS@,$TKX_CC_SEARCH_FLAGS,;t t
 s,@LN_S@,$LN_S,;t t
 s,@HAVE_SYML@,$HAVE_SYML,;t t
 s,@MAKEINCLUDE@,$MAKEINCLUDE,;t t
 s,@MAKEQUOTE@,$MAKEQUOTE,;t t
-s,@CPP@,$CPP,;t t
-s,@EGREP@,$EGREP,;t t
 s,@MAN_DIR_SEPARATOR@,$MAN_DIR_SEPARATOR,;t t
-s,@LIBOBJS@,$LIBOBJS,;t t
+s,@LIBSOBJS@,$LIBSOBJS,;t t
+s,@NROFF@,$NROFF,;t t
+s,@BUILDHELP@,$BUILDHELP,;t t
+s,@HELP_DIR@,$HELP_DIR,;t t
 s,@TCLX_LIBS@,$TCLX_LIBS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
@@ -7606,6 +10232,135 @@ s,@abs_top_builddir@,$ac_abs_top_builddir,;t t
 
 done
 _ACEOF
+cat >>$CONFIG_STATUS <<\_ACEOF
+
+#
+# CONFIG_COMMANDS section.
+#
+for ac_file in : $CONFIG_COMMANDS; do test "x$ac_file" = x: && continue
+  ac_dest=`echo "$ac_file" | sed 's,:.*,,'`
+  ac_source=`echo "$ac_file" | sed 's,[^:]*:,,'`
+  ac_dir=`(dirname "$ac_dest") 2>/dev/null ||
+$as_expr X"$ac_dest" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$ac_dest" : 'X\(//\)[^/]' \| \
+	 X"$ac_dest" : 'X\(//\)$' \| \
+	 X"$ac_dest" : 'X\(/\)' \| \
+	 .     : '\(.\)' 2>/dev/null ||
+echo X"$ac_dest" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
+  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
+  	  /^X\(\/\/\)$/{ s//\1/; q; }
+  	  /^X\(\/\).*/{ s//\1/; q; }
+  	  s/.*/./; q'`
+  { if $as_mkdir_p; then
+    mkdir -p "$ac_dir"
+  else
+    as_dir="$ac_dir"
+    as_dirs=
+    while test ! -d "$as_dir"; do
+      as_dirs="$as_dir $as_dirs"
+      as_dir=`(dirname "$as_dir") 2>/dev/null ||
+$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X"$as_dir" : 'X\(//\)[^/]' \| \
+	 X"$as_dir" : 'X\(//\)$' \| \
+	 X"$as_dir" : 'X\(/\)' \| \
+	 .     : '\(.\)' 2>/dev/null ||
+echo X"$as_dir" |
+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
+  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
+  	  /^X\(\/\/\)$/{ s//\1/; q; }
+  	  /^X\(\/\).*/{ s//\1/; q; }
+  	  s/.*/./; q'`
+    done
+    test ! -n "$as_dirs" || mkdir $as_dirs
+  fi || { { echo "$as_me:$LINENO: error: cannot create directory \"$ac_dir\"" >&5
+echo "$as_me: error: cannot create directory \"$ac_dir\"" >&2;}
+   { (exit 1); exit 1; }; }; }
+
+  ac_builddir=.
+
+if test "$ac_dir" != .; then
+  ac_dir_suffix=/`echo "$ac_dir" | sed 's,^\.[\\/],,'`
+  # A "../" for each directory in $ac_dir_suffix.
+  ac_top_builddir=`echo "$ac_dir_suffix" | sed 's,/[^\\/]*,../,g'`
+else
+  ac_dir_suffix= ac_top_builddir=
+fi
+
+case $srcdir in
+  .)  # No --srcdir option.  We are building in place.
+    ac_srcdir=.
+    if test -z "$ac_top_builddir"; then
+       ac_top_srcdir=.
+    else
+       ac_top_srcdir=`echo $ac_top_builddir | sed 's,/$,,'`
+    fi ;;
+  [\\/]* | ?:[\\/]* )  # Absolute path.
+    ac_srcdir=$srcdir$ac_dir_suffix;
+    ac_top_srcdir=$srcdir ;;
+  *) # Relative path.
+    ac_srcdir=$ac_top_builddir$srcdir$ac_dir_suffix
+    ac_top_srcdir=$ac_top_builddir$srcdir ;;
+esac
+
+# Do not use `cd foo && pwd` to compute absolute paths, because
+# the directories may not exist.
+case `pwd` in
+.) ac_abs_builddir="$ac_dir";;
+*)
+  case "$ac_dir" in
+  .) ac_abs_builddir=`pwd`;;
+  [\\/]* | ?:[\\/]* ) ac_abs_builddir="$ac_dir";;
+  *) ac_abs_builddir=`pwd`/"$ac_dir";;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_top_builddir=${ac_top_builddir}.;;
+*)
+  case ${ac_top_builddir}. in
+  .) ac_abs_top_builddir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_top_builddir=${ac_top_builddir}.;;
+  *) ac_abs_top_builddir=$ac_abs_builddir/${ac_top_builddir}.;;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_srcdir=$ac_srcdir;;
+*)
+  case $ac_srcdir in
+  .) ac_abs_srcdir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_srcdir=$ac_srcdir;;
+  *) ac_abs_srcdir=$ac_abs_builddir/$ac_srcdir;;
+  esac;;
+esac
+case $ac_abs_builddir in
+.) ac_abs_top_srcdir=$ac_top_srcdir;;
+*)
+  case $ac_top_srcdir in
+  .) ac_abs_top_srcdir=$ac_abs_builddir;;
+  [\\/]* | ?:[\\/]* ) ac_abs_top_srcdir=$ac_top_srcdir;;
+  *) ac_abs_top_srcdir=$ac_abs_builddir/$ac_top_srcdir;;
+  esac;;
+esac
+
+
+  { echo "$as_me:$LINENO: executing $ac_dest commands" >&5
+echo "$as_me: executing $ac_dest commands" >&6;}
+  case $ac_dest in
+    default ) chmod a+xr,go-w runtcl
+           chmod a+xr,go-w runtcl.static
+           chmod a+xr,go-w runtcl.standalone
+           chmod a+xr,go-w runwishx
+           chmod a+xr,go-w runwishx.static
+           chmod a+xr,go-w runwishx.standalone
+           chmod a+xr,go-w ../tcl/unix/runtest
+           chmod a+xr,go-w ../tcl/unix/runtest.static
+           chmod a+xr,go-w ../tcl/unix/runtest.standalone
+           chmod a+xr,go-w ../tk/unix/runtest
+           chmod a+xr,go-w ../tk/unix/runtest.static
+           chmod a+xr,go-w ../tk/unix/runtest.standalone ;;
+  esac
+done
+_ACEOF
 
 cat >>$CONFIG_STATUS <<\_ACEOF
 
@@ -7636,19 +10391,3 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
-
-chmod a+xr,a-w runtcl
-chmod a+xr,a-w runtcl.static
-chmod a+xr,a-w runtcl.standalone
-
-chmod a+xr,a-w runwishx
-chmod a+xr,a-w runwishx.static
-chmod a+xr,a-w runwishx.standalone
-
-chmod a+xr,a-w ../tcl/unix/runtest
-chmod a+xr,a-w ../tcl/unix/runtest.static
-chmod a+xr,a-w ../tcl/unix/runtest.standalone
-
-chmod a+xr,a-w ../tk/unix/runtest
-chmod a+xr,a-w ../tk/unix/runtest.static
-chmod a+xr,a-w ../tk/unix/runtest.standalone
