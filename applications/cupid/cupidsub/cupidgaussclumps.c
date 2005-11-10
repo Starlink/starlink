@@ -241,8 +241,9 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    HDS "Clump" structure containing information about the clump. An HDS
    locator for this new Clump structure is added into the "clist" sring. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                 mlim, imax, ipo, ilevel, rmask,
-                                 clist + ( iclump - 1 )*( DAT__SZLOC + 1 ) );
+                                 mlim, imax, ipo, ilevel, rmask, slbnd,    
+                                 clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
+                                 iclump );
 
 /* Tell the user if no clump could be fitted around the current peak
    pixel value */
@@ -292,6 +293,9 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.weight = astFree( cupidGC.weight );
    cupidGC.res = astFree( cupidGC.res );
    cupidGC.resu = astFree( cupidGC.resu );
+
+/* Save the number of clumps found. */
+   *nclump = iclump;
 
 /* Return the list of clump structure locators. */
    return clist;

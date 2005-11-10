@@ -57,7 +57,7 @@ void cupidStoreClumps( char *xloc, char *clist, int nclump ){
 
 /* Loop round all the supplied locators. */
    loc = clist;
-   for( i = 0; i < nclump; i++ ) {
+   for( i = 1; i <= nclump; i++ ) {
 
 /* Get a locator for the cell of the array. */
       datCell( aloc, 1, &i, cloc, status );

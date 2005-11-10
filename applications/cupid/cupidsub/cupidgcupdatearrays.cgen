@@ -13,7 +13,8 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                                          int *dims, double *par, double rms,
                                          double mlim, int imax, CGEN_TYPE *out,
-                                         int ilevel, float *rmask, char *cloc ){
+                                         int ilevel, float *rmask, int *lbnd,
+                                         char *cloc, int iclump ){
 
 /*
 *  Name:
@@ -27,7 +28,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
 *                                  int *dims, double *par, double rms,
 *                                  double mlim, int imax, CGEN_TYPE *out,
-*                                  int ilevel, float *rmask, char *cloc )
+*                                  int ilevel, float *rmask, int *lbnd,
+*                                  char *cloc, int iclump )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array.
@@ -63,10 +65,15 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        Fortran order. If this is not NULL, then pixels which fall
 *        within any clump are set to 1.0 (all other pixels are left 
 *        unchanged).
+*     lbnd
+*        Pointer to array holding the pixel indices of the first pixelin
+*        the user-supplied NDF.
 *     cloc
 *        Pointer to a string to recieve an HDS locator for a newly
 *        created structure describing the clump. This pointer may be NULL
 *        in which case no HDS structure is created.
+*     iclump
+*        Clump index.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -246,24 +253,24 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                            extend[ iax ][ iedge ] = 1;
                            peakok = 1;
                            if( rmask ) rmask[ j ] = 1.0;
-                        }
 
 /* Scale the model using the RMS noise so that it has the same
    normalisation as the residuals and input data, and then subtract it
    from the residuals and add it to the output (if any). */
-                        m *= rms;
-                        if( res ) res[ j ] -= (CGEN_TYPE) m;
-                        if( out ) out[ j ] += (CGEN_TYPE) m;
-                        sum += m;
+                           m *= rms;
+                           if( res ) res[ j ] -= (CGEN_TYPE) m;
+                           if( out ) out[ j ] += (CGEN_TYPE) m;
+                           sum += m;
 
 /* Add this model value and its associated pixel indices into the lists */
-                        ilist = list_size++;
-                        mlist = astGrow( mlist, list_size, sizeof( double ) );
-                        plist = astGrow( plist, list_size, psize );
-                        mlist[ ilist ] = m;
-                        pnext = plist + ilist*psize;
-                        for( jax = 0; jax < ndim; jax ++ ) {
-                           pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
+                           ilist = list_size++;
+                           mlist = astGrow( mlist, list_size, sizeof( double ) );
+                           plist = astGrow( plist, list_size, psize );
+                           mlist[ ilist ] = m;
+                           pnext = plist + ilist*ndim;
+                           for( jax = 0; jax < ndim; jax ++ ) {
+                              pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
+                           }
                         }
                      }
                   }
@@ -318,20 +325,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If required, create an HDS structure holding information about the
    clump. */
-   if( cloc ) {
-
-/* Create the structure. */
-
-
-/* Create an NDF containing the model values calculated abovem with bad
-   values at all other pixels. The size of this NDF is the minimum needed
-   to contain the clump. */
-/*      ndfOpen( loc, name, mode, stat, indf, place, status ) */
-
-
-
-
-   }
+   if( cloc ) cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
+                             mlist, plist, lbnd, iclump );
 
 /* Free resources */
    mlist = astFree( mlist );
