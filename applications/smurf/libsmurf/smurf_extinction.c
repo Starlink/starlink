@@ -79,6 +79,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
+#include "par.h"
 
 #include "libsmf/smf.h"
 #include "smurflib.h"
@@ -86,31 +87,60 @@
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
-  void * indataArr[1];  /* Pointer to input data */
-  float * indata = NULL;
-  int indf = 0;       /* Input NDF identifier */
-  dim_t indims[2];    /* Copy of the NDF dimensions */
-  int ndfdims[NDF__MXDIM]; /* Dimensions of input NDF */
-  int ndims;          /* Number of active dimensions in input */
-  int nin;            /* Number of input data points */
-  int nout;           /* Number of output data points */
-  void * outdataArr[1];    /* Pointer to output data */
-  float * outdata = NULL;
-  int outndf = 0;         /* Output NDF identifier */
-  float tau;          /* tau at this wavelength */
+  void * indataArr[1];       /* Pointer to input data */
+  float * indata = NULL;     /* Pointer to actual input data */
+  int indf = 0;              /* Input NDF identifier */
+  dim_t indims[2];           /* Copy of the NDF dimensions */
+  int ndfdims[NDF__MXDIM];   /* Dimensions of input NDF */
+  int ndims;                 /* Number of active dimensions in input */
+  int nin;                   /* Number of input data points */
+  int nout;                  /* Number of output data points */
+  void * outdataArr[1];      /* Pointer to output data */
+  float * outdata = NULL;    /* Pointer to actual output data */
+  int outndf = 0;            /* Output NDF identifier */
+  float tau;                 /* Zenith tau at this wavelength */
+  float tauArr[2];           /* */
+  float taubeg;
+  float tauend;
+  int ntau;                  /* Number of tau values read from cmd line */
   AstFrameSet * wcs = NULL;  /* Pointer to frame set */
-
-  tau = 0.5;
 
   /* Main routine */
 
   ndfBegin();
 
-  msgOut("smurf_extinction","Inside EXTINCTION", status );
+  /*  msgOut("smurf_extinction","Inside EXTINCTION", status );*/
 
   /* Read the input and output files */
   ndfAssoc( "IN", "READ", &indf, status );
   ndfProp( indf, "WCS", "OUT", &outndf, status );
+
+  /* Get zenith tau from user */
+  /*  parGet0r( "TAU", &tau, status);*/
+
+  /* FUTURE: Could use parGdr0r with suggested limits based on
+     wavelength obtained from header to prevent users entering
+     unphysical values */
+  parGet1r( "TAU", 2, &tauArr, &ntau, status);
+
+  /* Check number of tau values given */
+  if ( ntau == 1 ) {
+    taubeg = tauArr[0];
+    tauend = taubeg;
+  } else if (ntau == 2) {
+    taubeg = tauArr[0];
+    tauend = tauArr[1];
+  } else {
+    /* Something VERY weird happened.... */
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      msgSeti("NT", ntau);
+      errRep("smurf_extinction", 
+	     "Number of optical depth values given = ^NT, should be 1 or 2", status);
+    }
+  }
+
+  tau = taubeg;
 
   /* Check type of input data array */
 
@@ -124,7 +154,7 @@ void smurf_extinction( int * status ) {
       *status = SAI__ERROR;
       msgSeti( "NIN", nin);
       msgSeti( "NOUT", nout);
-      errRep( "smurf_extinction", "Number of input pixels not equal to the number of output pixels (^NIN != ^NOUT)",status);
+      errRep( "smurf_extinction", "Number of input pixels not equal to the number of output pixels (^NIN != ^NOUT)", status);
     }
   }
 
