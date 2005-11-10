@@ -3,6 +3,7 @@
 #include "prm_par.h"
 #include "ast.h"
 #include "cupid.h"
+#include "star/hds.h"
 
 
 /* Global Variables: */
@@ -14,9 +15,10 @@
 CupidGC cupidGC;
 
 
-void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                       double *ipv, float *rmask, double rms, 
-                       AstKeyMap *config, int velax, int ilevel, void *ipo ){
+char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
+                        double *ipv, float *rmask, double rms, 
+                        AstKeyMap *config, int velax, int ilevel, void *ipo,
+                        int *nclump ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -26,10 +28,10 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the GAUSSCLUMPS algorithm.
 
 *  Synopsis:
-*     void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                            void *ipd, double *ipv, float *rmask, 
-*                            double rms, AstKeyMap *config, int velax,
-*                            void *ipo )
+*     char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
+*                             void *ipd, double *ipv, float *rmask, 
+*                             double rms, AstKeyMap *config, int velax,
+*                             void *ipo, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -81,6 +83,16 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        stored in Fortran order. The data type of this array is given by 
 *        "itype". If supplied, it is assumed that the array has been
 *        initialised to hold zero at every pixel.
+*     nclump
+*        Pointer to an int to receive the number of clumps found.
+
+*  Retured Value:
+*     A pointer to a dynamically allocated character string, which should
+*     be freed using astFree when no longer needed. It will contain a
+*     list of HDS locators. The number of locators in the list is given
+*     by the value returned in "*nclump". Each locator will occupy
+*     (DAT__SZLOC+1) elements of the character array, and will locate a
+*     "Clump" structure describing a single clump.
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -115,6 +127,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
+   char *clist;         /* Pointer to returns list of HDS locators */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mlim;         /* Truncation level for Gaussians */
    double sum;          /* Sum of all residuals */
@@ -130,7 +143,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    void *res;           /* Pointer to residuals array */
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return NULL;
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -180,6 +193,7 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
+      clist = NULL;
 
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
@@ -214,18 +228,29 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             if( cupidGCFit( type, res, imax, x, &chisq ) ) {
                iclump++;
 
-/* Add the clump to the output list. */
+/* Display the clump parameters on the screen if required. */
                cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel, rms );
 
-/* Remove the fit from the residuals array, and add it onto the total fit
-   array. */
-               cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                    mlim, imax, ipo, ilevel, rmask );
+/* Extend the returned array of HDS Clump structures to include room for
+   the new one. This list is actually a long character string containing
+   room for "iclump" HDS locators. */
+               clist = astGrow( clist, iclump, DAT__SZLOC + 1 );
 
+/* Remove the fit from the residuals array, and add it onto the total fit
+   array. This also updates any output array and mask, and creates a
+   HDS "Clump" structure containing information about the clump. An HDS
+   locator for this new Clump structure is added into the "clist" sring. */
+               cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
+                                 mlim, imax, ipo, ilevel, rmask,
+                                 clist + ( iclump - 1 )*( DAT__SZLOC + 1 ) );
+
+/* Tell the user if no clump could be fitted around the current peak
+   pixel value */
             } else if( ilevel > 2 ) {
                msgOut( "", "   No clump fitted.", status );
             }
 
+/* Tell the user if one of the trmination criteria has ben met. */
          } else if( ilevel > 2 ) {
             msgOut( "", "   Termination criterion reached.", status );
             msgBlank( status );
@@ -233,6 +258,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
    }
 
+/* Tell the user how many iterations have been performed (i.e. how many
+   attempts there have been to fit a Gaussian peak). */
    if( ilevel > 1 ) {
       if( niter == 1 ){
          msgOut( "", "No fit attempted", status );
@@ -243,6 +270,8 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
    }
 
+/* Tell the user how many of the iterations resulted in a succesful fit
+   to a peak. */
    if( ilevel > 0 ) {
       if( iclump == 0 ) {
          msgOut( "", "No clumps found", status );
@@ -263,6 +292,9 @@ void cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.weight = astFree( cupidGC.weight );
    cupidGC.res = astFree( cupidGC.res );
    cupidGC.resu = astFree( cupidGC.resu );
+
+/* Return the list of clump structure locators. */
+   return clist;
 
 }
 

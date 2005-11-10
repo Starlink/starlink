@@ -12,7 +12,7 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
 *     cupidStoreConfig
 
 *  Purpose:
-*     Get the value of a configuration parameter.
+*     Store the configuraton used by CLUMPS in the given CUPID extension.
 
 *  Synopsis:
 *     void cupidStoreConfig( char *loc, AstKeyMap *config )
@@ -42,8 +42,8 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
 
 /* Local Variables: */
    Grp *grp;              /* Pointer to group */
-   char aloc[ DAT__SZLOC ];/* HDS locator for entire CONFIG array */
-   char cloc[ DAT__SZLOC ];/* HDS locator for single cell of ONFIG array */
+   char aloc[ DAT__SZLOC + 1 ];/* HDS locator for entire CONFIG array */
+   char cloc[ DAT__SZLOC + 1 ];/* HDS locator for single cell of ONFIG array */
    char name[ GRP__SZNAM + 1 ];/* Value extracted from GRP group */
    char *pname;          /* Pointer to pass to grpGet */
    int el;               /* Index of element to store */

@@ -421,7 +421,7 @@ void makeclumps() {
 
 /* Add the clump into the output array. */
       cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            ipd2, 0, NULL );
+                            ipd2, 0, NULL, NULL );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];

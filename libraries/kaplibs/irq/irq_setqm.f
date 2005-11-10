@@ -194,7 +194,7 @@
 *  pixels currently hold the quality.
          IF( FIXED ) THEN
             CALL IRQ1_RBIT( LOCS, BIT, STATUS )
-            CALL IRQ1_QSET( BIT, .FALSE., SIZE, %VAL( CNF_PVAL( PNT ) ), 
+            CALL IRQ1_QSET( BIT, .FALSE., SIZE, %VAL( CNF_PVAL( PNT ) ),
      :                      STATUS )
          END IF
 

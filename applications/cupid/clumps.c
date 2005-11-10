@@ -217,12 +217,13 @@ void clumps() {
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
+   char *clist;                 /* List of HDS locators for Clump structures */
    char attr[ 30 ];             /* AST attribute name */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
-   char qlocs[ 5 ][ DAT__SZLOC ]; /* HDS locators for quality name information */
-   char xloc[ DAT__SZLOC ];     /* HDS locator for CUPID extension */
+   char qlocs[ 5 ][ DAT__SZLOC + 1 ]; /* HDS locators for quality name information */
+   char xloc[ DAT__SZLOC + 1 ]; /* HDS locator for CUPID extension */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
@@ -238,6 +239,7 @@ void clumps() {
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
+   int nclump;                  /* Number of locators in "clist" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
@@ -472,8 +474,8 @@ void clumps() {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rmask, rms, 
-                        keymap, velax, ilevel, ipo ); 
+      clist = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rmask, 
+                                rms, keymap, velax, ilevel, ipo, &nclump ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rmask, keymap, 
@@ -494,6 +496,10 @@ void clumps() {
 /* Store the configuration in the CUPID extension. */
    cupidStoreConfig( xloc, keymap );
 
+/* Store the clump properties in the CUPID extension. This also annuls the
+   HDS locators stored within "clist". */
+   cupidStoreClumps( xloc, clist, nclump );
+
 /* Tidy up */
 L999:
 
@@ -505,6 +511,11 @@ L999:
 
 /* Relase the extension locator.*/
    datAnnul( xloc, status );
+
+/* Release the memory containing the list of HDS structures describing the 
+   clumps. The actual locators should already have been freed in
+   cupidStoreClumps. */
+   clist = astFree( clist );
 
 /* End the NDF context */
    ndfEnd( status );

@@ -300,7 +300,7 @@ F77_SUBROUTINE(irq_rlse)( CHARACTER_ARRAY(LOCS),
                           INTEGER(STATUS)
                           TRAIL(LOCS) );
 
-void irqRlse( char locs[5][DAT__SZLOC], int *status ){
+void irqRlse( char locs[5][DAT__SZLOC+1], int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_INTEGER(STATUS);
 
@@ -326,7 +326,7 @@ F77_SUBROUTINE(irq_new)( INTEGER(INDF),
                          TRAIL(XNAME)
                          TRAIL(LOCS) );
 
-void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC], 
+void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1], 
              int *status ){
    DECLARE_INTEGER(INDF);
    DECLARE_CHARACTER_DYN(XNAME);  
@@ -366,7 +366,7 @@ F77_SUBROUTINE(irq_addqn)( CHARACTER_ARRAY(LOCS),
                            TRAIL(QNAME)
                            TRAIL(COMMNT) );
 
-void irqAddqn( char locs[5][DAT__SZLOC], const char *qname, int deflt,
+void irqAddqn( char locs[5][DAT__SZLOC+1], const char *qname, int deflt,
                const char *commnt, int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_CHARACTER_DYN(QNAME);  
@@ -411,7 +411,7 @@ F77_SUBROUTINE(irq_setqm)( CHARACTER_ARRAY(LOCS),
                            TRAIL(LOCS)
                            TRAIL(QNAME) );
 
-void irqSetqm( char locs[5][DAT__SZLOC], int bad, const char *qname, int size,
+void irqSetqm( char locs[5][DAT__SZLOC+1], int bad, const char *qname, int size,
                float *mask, int *set, int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_LOGICAL(BAD);

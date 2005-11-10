@@ -45,8 +45,8 @@ void kpg1Pseed( int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 
 void irqDelet( int, int * );
-void irqRlse( char [5][DAT__SZLOC], int * );
-void irqNew( int, const char *, char [5][DAT__SZLOC], int * );
-void irqAddqn( char [5][DAT__SZLOC], const char *, int, const char *, int * );
-void irqSetqm( char [5][DAT__SZLOC], int, const char *, int, float *, int *, int * );
+void irqRlse( char [5][DAT__SZLOC+1], int * );
+void irqNew( int, const char *, char [5][DAT__SZLOC+1], int * );
+void irqAddqn( char [5][DAT__SZLOC+1], const char *, int, const char *, int * );
+void irqSetqm( char [5][DAT__SZLOC+1], int, const char *, int, float *, int *, int * );
 #endif
