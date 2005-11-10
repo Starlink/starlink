@@ -17,6 +17,7 @@ dnl $Id: configure.in,v 8.33.4.1 2002/11/02 02:48:14 karll Exp $
 dnl----------------------------------------------------------------------------
 AC_INIT(../tcl/generic/tclExtend.h)
 ifdef([AC_REVISION],AC_REVISION($Revision: 8.33.4.1 $),)dnl
+AC_CONFIG_AUX_DIR(config)
 
 #------------------------------------------------------------------------------
 # Define srcbasedir and bldbasedir as absolute paths to the top of the TclX
@@ -94,7 +95,7 @@ AC_SUBST(TKX_BUILD)
 #------------------------------------------------------------------------------
 # Check for the --enable-shared option.
 #------------------------------------------------------------------------------
-
+AC_CANONICAL_TARGET
 SC_ENABLE_SHARED
 AC_SUBST(SHARED_BUILD)
 

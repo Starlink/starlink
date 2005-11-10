@@ -57,8 +57,8 @@ getConfig() {
   echo "checking for ${name}"
   TCL_CONFIG_DIR=""
   places="$prefix/lib \
-  $PWD/../tcl8.0.3/unix \
-  $PWD/../tk8.0.3/unix \
+  $PWD/../tcl/unix \
+  $PWD/../tk/unix \
   /usr/local/lib \
   /usr/lib"
   for dir in $places; do

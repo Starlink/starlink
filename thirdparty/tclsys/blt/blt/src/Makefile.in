@@ -199,8 +199,9 @@ install-lib: $(lib_a) $(tcl_only_lib_a)
 	$(INSTALL_DATA) $(tcl_only_lib_a) $(INSTALL_ROOT)$(libdir)/$(tcl_only_libvers_a)
 	(cd $(INSTALL_ROOT)$(libdir); $(RM) $(tcl_only_lib_a) ; $(LN_S) $(tcl_only_libvers_a) $(tcl_only_lib_a))
 	$(RANLIB) $(INSTALL_ROOT)$(libdir)/$(tcl_only_libvers_a)
-	(cd shared; $(MAKE) install) 
-
+	if test "x@SHLIB_TARGET@" = "xbuild_shared"; then \
+	  (cd shared; $(MAKE) install)  ;\
+	fi
 mkdirs:
 	@for i in $(instdirs) ; do \
           if test -d $(INSTALL_ROOT)$$i ; then \
@@ -226,7 +227,9 @@ xref:
 clean:
 	$(RM) $(OBJS) bltInit.o $(lib_a) $(tcl_only_lib_a) \
 		$(bltsh)* $(bltwish)* *pure* .pure*
-	(cd shared; $(MAKE) clean) 
+	if test "x@SHLIB_TARGET@" = "xbuild_shared"; then \
+	  (cd shared; $(MAKE) clean)  ;\
+	fi
 
 distclean: clean
 	$(RM) $(srcdir)/*.bak $(srcdir)/*\~ $(srcdir)/"#"*  Makefile

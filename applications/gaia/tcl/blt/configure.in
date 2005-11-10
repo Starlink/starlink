@@ -175,16 +175,9 @@ dnl AC_CYGWIN
 
 blt_lib_prefix="lib"
 case $target in
-  *-*-cygwin*|*-*-mingw*)
+  *-*-mingw*)
     blt_platform="win"
-    if test "$ac_cv_cygwin" = "yes" ; then
-      blt_lib_prefix="cyg"
-    else 
-      blt_lib_prefix=""
-    fi
-    ;;
-  *-*-macosx)
-    blt_platform="macosx"
+    blt_lib_prefix=""
     ;;
   *)
     blt_platform="unix"
@@ -493,6 +486,7 @@ else
   for dir in \
    $prefix \
    $exec_prefix \
+   ../tcl \
    $blt_cv_tcl_lib 
   do
     if test -r "$dir/tclConfig.sh" ; then
@@ -589,8 +583,9 @@ else
   for dir in \
    $prefix \
    $exec_prefix \
+   ../tk \
    $blt_cv_tk_lib \
-   $blt_cv_tcl_lib 
+   $blt_cv_tcl_lib
   do
     if test -r "$dir/tkConfig.sh" ; then
       tk_config_sh="$dir/tkConfig.sh"
@@ -610,9 +605,9 @@ else
     for dir in \
      ../tcl \
      `ls -dr ../tk[[4-9]].[[0-9]]* 2>/dev/null` \
-     ../../tcl \
+     ../../tk \
      `ls -dr ../../tk[[4-9]].[[0-9]]* 2>/dev/null` \
-     ../../../tcl \
+     ../../../tk \
      `ls -dr ../../../tk[[4-9]].[[0-9]]* 2>/dev/null`
     do
       if test -r "$dir/$blt_platform/tkConfig.sh"; then
@@ -1138,7 +1133,7 @@ case $target in
     SHLIB_LD_FLAGS='-shared -Wl,-E -Wl,-soname,$@'
     ;;
 
-  *-*-cygwin* | *-*-mingw*)
+  *-*-mingw*)
     SHLIB_LD="${CC}"
     SHLIB_LD_FLAGS='-shared -Wl,-E -Wl,--out-implib,$@'
     EXTRA_LIB_SPECS="-lwinspool"
