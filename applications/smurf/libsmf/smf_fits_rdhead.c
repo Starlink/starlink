@@ -24,12 +24,15 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine for reading FITS information from an NDF
+*
+*     This is the main routine for reading FITS information from an
+*     NDF. The header is stored as a 1-D array of characters and
+*     individual FITS records are determined by stepping through the
+*     array in chunks of 80 or 81 depending on whether each record is
+*     null-terminated.
+*     
 
-
-*  Authors:
-*     Andy Gibb (UBC)
-*     {enter_new_authors_here}
+*  Authors: Andy Gibb (UBC) {enter_new_authors_here}
 
 *  History:
 *     2005-11-04 (AGG):
@@ -72,39 +75,49 @@
 
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
 
-  char fitsloc[DAT__SZLOC];
-  int ndim;
-  int fitsdim[NDF__MXDIM];
-  int nfits;
-  char *fitsrec = NULL;
+  char fitsloc[DAT__SZLOC]; /* HDS locator for FITS header */
+  int ndim;                 /* Dimensions of FITS header array*/
+  int fitsdim[NDF__MXDIM];  /* Number of elements in each dimension */
+  int nfits;                /* Number of FITS records in header */
+  char *fitsrec = NULL;     /* Pointer to the FITS header array */
 
   hdsdim dims[1];
 
   if ( *status != SAI__OK ) return;
 
+  /* Find the HDS locator to the FITS component */
   ndfXloc( indf, "FITS", "READ", fitsloc, status);
-
+  /* Determine the dimensionality of the FITS component */
   datShape( fitsloc, NDF__MXDIM, fitsdim, &ndim, status);
 
+  printf("ndim = %d \n",ndim);
+
+  /*  Check dimensions */
   if (ndim != 1) {
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti("NDIM", ndim);
-      errRep("smf_fits_rdhead","Number of dimensions = ^NDIM; should be 2", status);
+      errRep("smf_fits_rdhead","Number of dimensions = ^NDIM; should be 1", status);
     }
   }
 
+  /* Get number of FITS header entries: HDS `knows' it's reading
+     80-char strings rather than a simple array of characters */
   datSize( fitsloc, &nfits, status );
 
-  printf("%d \n",nfits);
+  printf("nfits = %d \n",nfits);
 
+  /* Allocate the memory for the FITS header */
   if ( *status == SAI__OK) {
     fitsrec = malloc( sizeof(char) * nfits * 80 + 1);
   }
 
+  /* Proceed with retrieving the FITS header */
   if (fitsrec != NULL) {
     dims[0] = nfits;
+    /* Retrieve nfits records each of length 80 and store in fitsrec */
     datGetC( fitsloc, 1, dims, fitsrec, 80, status);
+    /* Add string terminator */
     fitsrec[nfits*80] = '\0';
   } else {
     if ( *status == SAI__OK ) {
@@ -112,11 +125,14 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
       errRep("smf_fits_rdhead","Unable to allocate memory for FITS header", status);
     }
   }
+  /* Create an AstFitsChan from the FITS header */
   smf_fits_crchan( nfits, fitsrec, fchan, status);
+  /* Free up the memory */
   free(fitsrec);
+  /* Free up the NDF */
   datAnnul(fitsloc, status);
 
-  printf("%s \n",fitsrec);
+  printf("fitsrec: %s \n",fitsrec);
 
   return;
 }
