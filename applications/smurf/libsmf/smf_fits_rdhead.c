@@ -24,7 +24,6 @@
 *        Pointer to global status.
 
 *  Description:
-*
 *     This is the main routine for reading FITS information from an
 *     NDF. The header is stored as a 1-D array of characters and
 *     individual FITS records are determined by stepping through the
@@ -32,11 +31,16 @@
 *     null-terminated.
 *     
 
-*  Authors: Andy Gibb (UBC) {enter_new_authors_here}
+*  Authors:
+*     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     2005-11-04 (AGG):
 *        Initial test version
+*     2005-11-09 (AGG):
+*        Add comments and fix error message
 *     {enter_further_changes_here}
 
 *  Copyright:
