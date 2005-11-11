@@ -28,7 +28,7 @@
 *     NDF. The header is stored as a 1-D array of characters and
 *     individual FITS records are determined by stepping through the
 *     array in chunks of 80 or 81 depending on whether each record is
-*     null-terminated.
+*     null-terminated. Returns with
 *     
 
 *  Authors:
@@ -41,6 +41,8 @@
 *        Initial test version
 *     2005-11-09 (AGG):
 *        Add comments and fix error message
+*     2005-11-10 (AGG):
+*        Add test for existence of FITS extension
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,13 +86,25 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   int fitsdim[NDF__MXDIM];  /* Number of elements in each dimension */
   int nfits;                /* Number of FITS records in header */
   char *fitsrec = NULL;     /* Pointer to the FITS header array */
+  int hasfits;              /* Flag to indicate whether FITS extension exists */
 
   hdsdim dims[1];
 
   if ( *status != SAI__OK ) return;
 
+  /* Test whether FITS extension is present */
+  ndfXstat( indf, "FITS", hasfits, status);
+  if ( hasfits == 0) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      msgOut("smf_fits_rdhead", "Input file does not have a FITS extension", status);
+    }
+    return;
+  }
+
   /* Find the HDS locator to the FITS component */
   ndfXloc( indf, "FITS", "READ", fitsloc, status);
+
   /* Determine the dimensionality of the FITS component */
   datShape( fitsloc, NDF__MXDIM, fitsdim, &ndim, status);
 
