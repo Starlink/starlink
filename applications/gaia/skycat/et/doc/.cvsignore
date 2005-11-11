@@ -1,2 +1,0 @@
-Makefile doc2ascii doc2html doc2latex html2rtf doc2docbook
-ET.txt *.html ET.rtf ET.tex *.log *.aux *.dvi ET.ps ET.docbook

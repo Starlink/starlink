@@ -1,8 +1,0 @@
-config.* Makefile et.c bell browser help2tk colorhelp.tcl color
-configure.in-
-dclock etwish fontchooser hello httpd runscript tkdiff tkedit
-install
-linuxstat tkterm et2c
-tmp
-tmp.c
-tmp.tcl
