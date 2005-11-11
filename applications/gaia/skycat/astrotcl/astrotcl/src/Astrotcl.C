@@ -1,31 +1,29 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Astrotcl.C,v 1.6 1999/03/11 20:58:40 abrighto Exp $"
+ * "@(#) $Id: Astrotcl.C,v 1.6 2005/02/02 01:43:04 brighton Exp $"
  *
  * Astrotcl.C - Initialize Astrotcl package
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  21 Nov 97  Created
+ * pbiereic        26/08/99   Changed Astrotcl_Init()
  */
-static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.6 1999/03/11 20:58:40 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.6 2005/02/02 01:43:04 brighton Exp $";
 
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <strstream>
+#include <cstdlib>
+#include <cstring>
+#include <csignal>
+#include <cstdio>
+#include <iostream>
 #include <sys/types.h>
-#include <new.h>
 #include <unistd.h>
-#include <math.h>
-#include <assert.h>
+#include <cmath>
+#include <cassert>
 #include <tcl.h>
 #include <tk.h>
 #include "error.h"
 #include "define.h"
-#include "config.h"
 
 extern "C" int TclWorldCoords_Init(Tcl_Interp* interp);
 
@@ -46,6 +44,8 @@ static int astrotcl_cmd(ClientData, Tcl_Interp* interp, int argc, char** argv)
 extern "C"
 int Astrotcl_Init(Tcl_Interp* interp)  
 {
+    char buf[1024];
+
     static int initialized = 0;
     if (initialized++)
 	return TCL_OK;
@@ -59,31 +59,35 @@ int Astrotcl_Init(Tcl_Interp* interp)
     defineAstrotclBitmaps(interp);
 
     // add a dummy tcl command (this command doesn't do anything currently)
-    Tcl_CreateCommand(interp, "astrotcl", astrotcl_cmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "astrotcl", (Tcl_CmdProc*)astrotcl_cmd, NULL, NULL);
     
     // add the wcs command
     TclWorldCoords_Init(interp);
-    
-    // The astrotcl_library path can be found in several places.  Here is the order
-    // in which the are searched.
-    //		1) the variable may already exist
-    //		2) env array
-    //		3) the compiled in value of ASTROTCL_LIBRARY
-    char* libDir = Tcl_GetVar(interp, "astrotcl_library", TCL_GLOBAL_ONLY);
-    if (libDir == NULL) {
-	libDir = Tcl_GetVar2(interp, "env", "ASTROTCL_LIBRARY", TCL_GLOBAL_ONLY);
-    }
-    if (libDir == NULL) {
-	libDir = ASTROTCL_LIBRARY;
-    }
 
-    // Set the global Tcl variables astrotcl_library and astrotcl_version 
-    // and add astrotcl_library to the auto_path.
-    Tcl_SetVar(interp, "astrotcl_library", libDir, TCL_GLOBAL_ONLY);
+    // Set the global Tcl variable astrotcl_version 
     Tcl_SetVar(interp, "astrotcl_version", ASTROTCL_VERSION, TCL_GLOBAL_ONLY);
 
-    char cmd[1048];
-    sprintf(cmd, "lappend auto_path %s", libDir);
-    int status = Tcl_Eval(interp, cmd);
-    return status; 
+    /*
+     * Use Tcl script to search for AstrotclInit.tcl and run the initialization tcl script
+     */
+
+    // defines for AstrotclInit.icc:
+#   define Pkg_findinit Astrotcl_findinit
+#   include "AstrotclInit.icc"
+
+    // defines for calling the script
+#   define Pkg "Astrotcl"
+#   define Pkg_proc "Astrotcl_findinit"
+    char* pkg_library = ASTROTCL_LIBRARY;
+
+    Tcl_SetVar(interp, "Pkg_findinit", Pkg_proc, TCL_GLOBAL_ONLY);
+
+    if (Tcl_GlobalEval(interp, Pkg_findinit) == TCL_ERROR)
+        return TCL_ERROR;
+
+    sprintf(buf, "%s %s %s", Pkg_proc, Pkg, pkg_library);
+    if (Tcl_GlobalEval(interp, buf) == TCL_ERROR)
+        return TCL_ERROR;
+    
+    return TCL_OK;
 }

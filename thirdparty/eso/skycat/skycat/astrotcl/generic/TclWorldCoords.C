@@ -22,7 +22,7 @@ using namespace std;
 #include <cstdlib>
 #include <sstream>
 #include "config.h"
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 #include "TclWorldCoords.h"
 
 
