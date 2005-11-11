@@ -15,7 +15,7 @@
 #include "error.h"
 #include "define.h"
 #include "Mem.h"
-#include "Compress.h"
+#include "Compress.hxx"
 
 #define TTEST(x) {if (!(x)){printf("%s: line %d: Test failed\n", __FILE__, __LINE__); exit(1);}}
 

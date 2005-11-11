@@ -84,4 +84,5 @@ distclean: clean depclean
 
 man:
 
+include @SRC_ROOT@/makefile.mk
 include ../../depend.mk
