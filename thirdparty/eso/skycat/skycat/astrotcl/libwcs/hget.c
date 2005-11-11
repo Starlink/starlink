@@ -34,18 +34,21 @@
  *              software for any purpose.  It is provided "as is" without
  *              express or implied warranty.
 
+ *** 5th October 2000: Peter W. Draper (PWD).
+ *   Changed hgetc to deal with the FITS standard possibility of a
+ *   keyword with no value (i.e KEYWORD               /Comment). This
+ *   is apparently a comment only keyword and is indicated by the
+ *   absence of an equals sign.
+
 */
 
 #include <stdio.h>
 #include <string.h>		/* NULL, strlen, strstr, strcpy */
 #include "fitshead.h"	/* FITS header extraction subroutines */
 #include <stdlib.h>
-#ifndef VMS
 #include <limits.h>
-#else
-#define INT_MAX  2147483647 /* Biggest number that can fit in long */
-#define SHRT_MAX 32767
-#endif
+#define MAXINT  INT_MAX /* Biggest number that can fit in long */
+#define MAXSHORT SHRT_MAX
 #define VLENGTH 81
 
 #ifdef USE_SAOLIB
@@ -54,7 +57,7 @@ static int use_saolib=0;
 
 char *hgetc ();
 
-char val[VLENGTH+1];
+static char val[VLENGTH+1];
 
 static int lhead0 = 0;	/* Length of header string */
 
@@ -772,6 +775,15 @@ char *keyword0;	/* character string containing the name of the keyword
 	    c1 = strsrch (q2,"/");
 	    }
 	else {
+
+/*	    v1 = strsrch (line,"=")+1; */
+/*  PWD: change here. Equals may be missing, in which case keyword has */
+/*  no value and line is equivalent to a comment, just fudge the
+/*  equals position to the standard column 9, after all a "NULL+1" v1
+/*  isn't good for anything. */
+	    v1 = strsrch (line,"=");
+            if ( v1 == NULL ) v1 = line + 9;
+            v1++;
 	    c1 = strsrch (line,"/");
 	    if (c1 != NULL)
 		v2 = c1;
