@@ -66,7 +66,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        within any clump are set to 1.0 (all other pixels are left 
 *        unchanged).
 *     lbnd
-*        Pointer to array holding the pixel indices of the first pixelin
+*        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
 *     cloc
 *        Pointer to a string to recieve an HDS locator for a newly
@@ -333,7 +333,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       }
 
       cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
-                     mlist, plist, lbnd, iclump );
+                     mlist, plist, lbnd, iclump, cupidGC.dax );
    }
 
 /* Free resources */

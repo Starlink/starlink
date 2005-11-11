@@ -67,6 +67,8 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
    AstFrameSet *iwcs;            /* FrameSet to be stored in output catalogue */
    AstMapping *map;              /* Mapping from "frm1" to "frm2" */
    char dloc[ DAT__SZLOC + 1 ];  /* Component locator */
+   const char *vg1;              /* First velocity gradient column name */
+   const char *vg2;              /* Second velocity gradient column name */
    double *t;                    /* Pointer to next table value */
    int inperm[ 3 ];              /* Input axis permutation array */
    int j;                        /* Loop index */
@@ -86,6 +88,11 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
               "programming error).", status );
    }
 
+/* Indicate we do not yet know the names of the two velocity gradient
+   columns. */
+   vg1 = NULL;
+   vg2 = NULL;
+
 /* Determine the number of columns in the catalogue (this equals the
    number of rows in the table). */
    ncol = ( ( ndim == 1 ) ? CUPID__GCNP1 : ( 
@@ -104,63 +111,92 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
       datAnnul( dloc, status );
       
       datFind( cloc, "PEAK", dloc, status );
-      datPutD( dloc, 0, NULL, t, status );
+      datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
    
       datFind( cloc, "OFFSET", dloc, status );
-      datPutD( dloc, 0, NULL, t, status );
+      datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
          
-      datFind( cloc, "XCENTRE", dloc, status );
-      datPutD( dloc, 0, NULL, t, status );
+      datFind( cloc, "CENTRE1", dloc, status );
+      datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
          
-      datFind( cloc, "XFWHM", dloc, status );
-      datPutD( dloc, 0, NULL, t, status );
+      datFind( cloc, "FWHM1", dloc, status );
+      datGetD( dloc, 0, NULL, t, status );
       t += size;
       datAnnul( dloc, status );
    
       if( ndim > 1 ) {
-         datFind( cloc, "YCENTRE", dloc, status );
-         datPutD( dloc, 0, NULL, t, status );
+         datFind( cloc, "CENTRE2", dloc, status );
+         datGetD( dloc, 0, NULL, t, status );
          t += size;
          datAnnul( dloc, status );
             
-         datFind( cloc, "YFWHM", dloc, status );
-         datPutD( dloc, 0, NULL, t, status );
+         datFind( cloc, "FWHM2", dloc, status );
+         datGetD( dloc, 0, NULL, t, status );
          t += size;
          datAnnul( dloc, status );
             
          datFind( cloc, "ANGLE", dloc, status );
-         datPutD( dloc, 0, NULL,  t, status );
+         datGetD( dloc, 0, NULL,  t, status );
          t += size;
          datAnnul( dloc, status );
             
          if( ndim > 2 ) {
    
-            datFind( cloc, "VCENTRE", dloc, status );
-            datPutD( dloc, 0, NULL, t, status );
+            datFind( cloc, "CENTRE3", dloc, status );
+            datGetD( dloc, 0, NULL, t, status );
             t += size;
             datAnnul( dloc, status );
                
-            datFind( cloc, "VFWHM", dloc, status );
-            datPutD( dloc, 0, NULL, t, status );
+            datFind( cloc, "FWHM3", dloc, status );
+            datGetD( dloc, 0, NULL, t, status );
             t += size;
             datAnnul( dloc, status );
             
-            datFind( cloc, "VGRADX", dloc, status );
-            datPutD( dloc, 0, NULL, t, status );
-            t += size;
-            datAnnul( dloc, status );
+            if( *status == SAI__OK ) {
+               datFind( cloc, "VGRAD1", dloc, status );
+               if( *status == SAI__OK ) {
+                  datGetD( dloc, 0, NULL, t, status );
+                  t += size;
+                  datAnnul( dloc, status );
+                  vg1 = "VGRAD1";
+               } else {
+                  errAnnul( status );
+               }
+            }
    
-            datFind( cloc, "VGRADY", dloc, status );
-            datPutD( dloc, 0, NULL, t, status );
-            t += size;
-            datAnnul( dloc, status );
+            if( *status == SAI__OK ) {
+               datFind( cloc, "VGRAD2", dloc, status );
+               if( *status == SAI__OK ) {
+                  datGetD( dloc, 0, NULL, t, status );
+                  t += size;
+                  datAnnul( dloc, status );
+                  if( !vg1 ) {
+                     vg1 = "VGRAD2";
+                  } else {
+                     vg2 = "VGRAD2";
+                  }
+               } else {
+                  errAnnul( status );
+               }
+            }
    
+            if( *status == SAI__OK ) {
+               datFind( cloc, "VGRAD3", dloc, status );
+               if( *status == SAI__OK ) {
+                  datGetD( dloc, 0, NULL, t, status );
+                  t += size;
+                  datAnnul( dloc, status );
+                  vg2 = "VGRAD3";
+               } else {
+                  errAnnul( status );
+               }
+            }
          }
       }      
    }
@@ -179,24 +215,24 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
       frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
 
 /* Set the attributes of these two Frames */
-      astSetC( frm1, "Symbol(1)", "Sum" );
-      astSetC( frm1, "Symbol(2)", "Peak" );
-      astSetC( frm1, "Symbol(3)", "Offset" );
-      astSetC( frm1, "Symbol(4)", "XCentre" );
-      astSetC( frm1, "Symbol(5)", "XFWHM" );
+      astSetC( frm1, "Symbol(1)", "SUM" );
+      astSetC( frm1, "Symbol(2)", "PEAK" );
+      astSetC( frm1, "Symbol(3)", "OFFSET" );
+      astSetC( frm1, "Symbol(4)", "CENTRE1" );
+      astSetC( frm1, "Symbol(5)", "FWHM1" );
       astSetC( frm2, "Symbol(1)", "P1" );
    
       if( ndim > 1 ) {
-         astSetC( frm1, "Symbol(6)", "YCentre" );
-         astSetC( frm1, "Symbol(7)", "YFWHM" );
-         astSetC( frm1, "Symbol(8)", "Angle" );
+         astSetC( frm1, "Symbol(6)", "CENTRE2" );
+         astSetC( frm1, "Symbol(7)", "FWHM2" );
+         astSetC( frm1, "Symbol(8)", "ANGLE" );
          astSetC( frm2, "Symbol(2)", "P2" );
    
          if( ndim > 2 ) {
-            astSetC( frm1, "Symbol(9)",  "VCentre" );
-            astSetC( frm1, "Symbol(10)", "VFWHM" );
-            astSetC( frm1, "Symbol(11)", "VGradX" );
-            astSetC( frm1, "Symbol(12)", "VGradY" );
+            astSetC( frm1, "Symbol(9)",  "CENTRE3" );
+            astSetC( frm1, "Symbol(10)", "FWHM3" );
+            astSetC( frm1, "Symbol(11)", vg1 );
+            astSetC( frm1, "Symbol(12)", vg2 );
             astSetC( frm2, "Symbol(3)", "P3" );
          }
       }

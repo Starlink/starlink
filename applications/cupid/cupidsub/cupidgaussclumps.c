@@ -127,7 +127,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
-   char *clist;         /* Pointer to returns list of HDS locators */
+   char *clist;         /* Pointer to list of returned HDS locators */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mlim;         /* Truncation level for Gaussians */
    double sum;          /* Sum of all residuals */
@@ -239,7 +239,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Remove the fit from the residuals array, and add it onto the total fit
    array. This also updates any output array and mask, and creates a
    HDS "Clump" structure containing information about the clump. An HDS
-   locator for this new Clump structure is added into the "clist" sring. */
+   locator for this new Clump structure is added into the "clist" ring. */
                cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
                                  mlim, imax, ipo, ilevel, rmask, slbnd,    
                                  clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),

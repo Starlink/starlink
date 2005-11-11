@@ -2,6 +2,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/kaplibs.h"
+#include "star/hds.h"
 #include "ast.h"
 #include "par.h"
 #include "star/pda.h"
@@ -191,13 +192,8 @@ void makeclumps() {
 */      
 
 /* Local Variables: */
-   AstFrame *frm1;               /* Frame describing clump parameters */
-   AstFrame *frm2;               /* Frame describing clump centres */
-   AstFrameSet *iwcs;            /* FrameSet to be stored in output catalogue */
-   AstMapping *map;              /* Mapping from "frm1" to "frm2" */
+   char *clist;                  /* Pointer to list of HDS locators */
    char text[ 8 ];               /* Value of PARDIST parameter */
-   double *t;                    /* Pointer to next table entry */
-   double *tab;                  /* Table to be written to output catalogue */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
@@ -223,15 +219,12 @@ void makeclumps() {
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
    int indf;                     /* Identifier for output NDF with noise */
-   int inperm[ 10 ];             /* Input axis permutation array */
    int lbnd[ 3 ];                /* Lower pixel bounds */
    int nclump;                   /* Number of clumps to create */
-   int ncol;                     /* Nu,ber of columns in output catalogue */
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
    int normal;                   /* Clump parameters normally distributed? */
    int nval;                     /* Number of values supplied */
-   int outperm[ 3 ];             /* Output axis permutation array */
    int ubnd[ 3 ];                /* Upper pixel bounds */
 
 /* Abort if an error has already occurred. */
@@ -319,30 +312,13 @@ void makeclumps() {
 /* Fill the output array with the background value. */
    kpg1Fillr( back, nel, ipd2, status );
  
-/* Allocate memory for the output table array */
-   ncol = ( ( ndim == 1 ) ? CUPID__GCNP1 : ( 
-              (ndim ==2 ) ? CUPID__GCNP2 : CUPID__GCNP3 ) ) - 1;
-   tab = astMalloc( sizeof(double)*nclump*ncol );
-
-/* Create a Frame with "ncol" axes describing the table columns. */
-   frm1 = astFrame( ncol, "Domain=PARAMETERS,Title=Clump parameters" );
-
-/* Create a Frame with "ndim" axes describing the pixel coords at the
-   clump centre. */
-   frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
-
 /* Clump positions are chosen from a uniform distribution. Set up the
    arrays describing the mean value and range on each axis. */
-
    dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
    dims[ 1 ] = 1;
    dims[ 2 ] = 1;
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
-   astSetC( frm1, "Symbol(1)", "PeakValue" );
-   astSetC( frm1, "Symbol(2)", "Centre1" );
-   astSetC( frm1, "Symbol(3)", "FWHM1" );
-   astSetC( frm2, "Symbol(1)", "P1" );
 
    if( ndim > 1 ) {
 
@@ -350,22 +326,10 @@ void makeclumps() {
       pos2[ 0 ] = 0.5*( dims[ 1 ]  + 1 );
       pos2[ 1 ] = 0.5*dims[ 1 ];
 
-      astSetC( frm1, "Symbol(4)", "Centre2" );
-      astSetC( frm1, "Symbol(5)", "FWHM2" );
-      astSetC( frm1, "Symbol(6)", "PosAngle" );
-      astSetC( frm2, "Symbol(2)", "P2" );
-
       if( ndim > 2 ) {
          dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
          pos3[ 0 ] = 0.5*( dims[ 2 ]  + 1 );
          pos3[ 1 ] = 0.5*dims[ 2 ];
-
-         astSetC( frm1, "Symbol(7)",  "Centre3" );
-         astSetC( frm1, "Symbol(8)",  "FWHM3" );
-         astSetC( frm1, "Symbol(9)",  "VGrad1" );
-         astSetC( frm1, "Symbol(10)", "VGrad2" );
-         astSetC( frm2, "Symbol(3)", "P3" );
-
       }
    }
 
@@ -373,56 +337,40 @@ void makeclumps() {
    kpg1Pseed( status );
 
 /* Loop round creating clumps. */
+   clist = NULL;
    maxpeak = 1.0;
    for( i = 0; i < nclump && *status == SAI__OK; i++ ) {
-      t = tab + i;
 
-/* Determine the parameter values to use for the clump and store them in
-   the catalogue table. */
+/* Determine the parameter values to use for the clump. */
       par[ 0 ] = cupidRanVal( normal, peak );
       par[ 1 ] = 0.0;
       par[ 2 ] = (int) cupidRanVal( 0, pos1 );
       par[ 3 ] = cupidRanVal( normal, fwhm1 );
-
-      *t = par[ 0 ];
-      t += nclump;
-      *t = par[ 2 ] + lbnd[ 0 ] - 1.5;
-      t += nclump;
-      *t = par[ 3 ];
-      t += nclump;
 
       if( ndim > 1 ) {
          par[ 4 ] = (int) cupidRanVal( 0, pos2 );
          par[ 5 ] = cupidRanVal( normal, fwhm2 );
          par[ 6 ] = cupidRanVal( 0, angle );
 
-         *t = par[ 4 ] + lbnd[ 1 ] - 1.5;
-         t += nclump;
-         *t = par[ 5 ];
-         t += nclump;
-         *t = par[ 6 ];
-         t += nclump;
-
          if( ndim > 2 ) {
             par[ 7 ] = cupidRanVal( 0, pos3 );
             par[ 8 ] = cupidRanVal( normal, fwhm3 );
             par[ 9 ] = cupidRanVal( normal, vgrad1 );
             par[ 10 ] = cupidRanVal( normal, vgrad2 );
-
-            *t = par[ 7 ] + lbnd[ 2 ] - 1.5;
-            t += nclump;
-            *t = par[ 8 ];
-            t += nclump;
-            *t = par[ 9 ];
-            t += nclump;
-            *t = par[ 10 ];
-
          }
       }
 
-/* Add the clump into the output array. */
+/* Extend the array of HDS Clump structures to include room for the new one. 
+   This list is actually a long character string containing room for "i" 
+   HDS locators. */
+      clist = astGrow( clist, i + 1, DAT__SZLOC + 1 );
+
+/* Add the clump into the output array. This also creates an HDS "Clump" 
+   structure containing information about the clump. An HDS locator for 
+   this new Clump structure is added into the "clist" ring. */
       cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            ipd2, 0, NULL, NULL, NULL, 0 );
+                            ipd2, 0, NULL, lbnd, 
+                            clist + i*( DAT__SZLOC + 1), i );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -438,35 +386,10 @@ void makeclumps() {
       }
    }
 
-/* Create a Mapping (a PermMap) from the Frame representing the "ncol" clump
-   parameters, to the "ndim" Frame representing clump centre positions. The
-   inverse transformation supplies bad values for the other parameters. */
-   for( i = 0; i < ncol; i++ ) inperm[ i ] = 0;
-
-   inperm[ 2 ] = 0;
-   inperm[ 4 ] = 1;
-   inperm[ 7 ] = 2;
-
-   outperm[ 0 ] = 2;
-   outperm[ 1 ] = 4;
-   outperm[ 2 ] = 7;
-
-   map = (AstMapping *) astPermMap( ncol, inperm, ndim, outperm, NULL, "" );
-
-/* Create a FrameSet to store in the output catalogue. It has two Frames,
-   the base Frame has "ncol" axes - each axis describes one of the table
-   columns. The current Frame has 2 axes and describes the clump (x,y)
-   position. */
-   iwcs = astFrameSet( frm1, "ID=FIXED_BASE" );
-   astAddFrame( iwcs, AST__BASE, map, frm2 );
-   astSetI( iwcs, "CURRENT", 1 );
-
-/* Create the output catalogue */
-   kpg1Wrlst( "OUTCAT", nclump, nclump, ncol, tab, AST__BASE, iwcs,
-              "Output from CUPID:MAKECLUMPS", 1, NULL, 1, status );
-
-/* Free resources */
-   tab = astFree( tab );
+/* Store the clump properties in the output catalogue. This also annuls the 
+   HDS locators stored within "clist". */
+   cupidStoreClumps( "OUTCAT", NULL, clist, nclump, ndim, 
+                     "Output from CUPID:MAKECLUMPS" );
 
 /* End the NDF context */
    ndfEnd( status );

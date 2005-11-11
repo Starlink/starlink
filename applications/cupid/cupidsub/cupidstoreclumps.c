@@ -30,7 +30,7 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
 *     param
 *        The ADAM parameter to associate with the output catalogue.
 *     xloc
-*        HDS locator for the CUPID extension.
+*        HDS locator for the CUPID extension. May be NULL.
 *     clist
 *        A pointer to a character string containing a list of "nclump"
 *        HDS locators, each occupying ( DAT__SZLOC + 1 ) elements of the
@@ -85,14 +85,8 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
       loc = clist;
       for( i = 1; i <= nclump && *status == SAI__OK; i++ ) {
 
-/* Get a locator for the cell of the array. */
-         datCell( aloc, 1, &i, cloc, status );
-
 /* Copy the clump parameters into the table. */
-         cupidClumpCat( NULL, cloc, tab, nclump, i, ndim, ttl );
-
-/* Annul the cell locators. */
-         datAnnul( cloc, status );
+         cupidClumpCat( NULL, loc, tab, nclump, i, ndim, ttl );
 
 /* Get a pointer to the next locator. */
          loc += DAT__SZLOC + 1;
@@ -105,31 +99,41 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
       tab = astFree( tab );
    }
  
+/* If required, store information in the NDF extension */
+   if( xloc ) {
+
 /* Create an array of "nclump" Clump structures in the extension, and get
    a locator to it. */
-   datNew( xloc, "CLUMPS", "CLUMP", 1, &nclump, status );
-   datFind( xloc, "CLUMPS", aloc, status );
+      datNew( xloc, "CLUMPS", "CLUMP", 1, &nclump, status );
+      datFind( xloc, "CLUMPS", aloc, status );
 
 /* Loop round all the supplied locators. */
-   loc = clist;
-   for( i = 1; i <= nclump; i++ ) {
+      loc = clist;
+      for( i = 1; i <= nclump; i++ ) {
 
 /* Get a locator for the cell of the array. */
-      datCell( aloc, 1, &i, cloc, status );
+         datCell( aloc, 1, &i, cloc, status );
 
 /* Copy the Clump object located by the next element in the "clist" array
    into the current cell. */
-      cupidDatCopy( loc, cloc );
+         cupidDatCopy( loc, cloc );
 
-/* Annul both locators. */
-      datAnnul( loc, status );
-      datAnnul( cloc, status );
+/* Annul the cell locator. */
+         datAnnul( cloc, status );
 
 /* Get a pointer to the next locator. */
-      loc += DAT__SZLOC + 1;
-
-   }
+         loc += DAT__SZLOC + 1;
+      }
 
 /* Annul the locator to the array within the extension */   
-   datAnnul( aloc, status );
+      datAnnul( aloc, status );
+   }
+
+/* Loop round all the supplied locators, annulling them. */
+   loc = clist;
+   for( i = 0; i < nclump; i++ ) {
+      datAnnul( loc, status );
+      loc += DAT__SZLOC + 1;
+   }
+
 }

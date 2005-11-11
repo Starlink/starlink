@@ -97,7 +97,7 @@ void cupidGCListClump( int, int, double *, double, int *, int, double );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 char *cupidGaussClumps( int, int, int *, int *, void *, double *, float *, double, AstKeyMap *, int, int, void *, int * );
-void cupidHdsClump( char *, double, double *, double, int, int *, int *, int, double *, int *, int *, int );
+void cupidHdsClump( char *, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int * );
 void cupidStoreClumps( const char *, char *, char *, int, int, const char * );
 void cupidStoreConfig( char *, AstKeyMap * );
 void cupidClumpCat( const char *, char *, double *, int, int, int , const char * );
