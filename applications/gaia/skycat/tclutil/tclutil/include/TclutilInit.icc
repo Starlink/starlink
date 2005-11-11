@@ -1,0 +1,73 @@
+/*
+ * E.S.O. - VLT project 
+ * "@(#) $Id: TclutilInit.icc,v 1.2 2005/02/02 01:43:02 brighton Exp $"
+ *
+ * TclutilInit.icc - inline include for searching the initialization
+ * tcl library
+ *
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * pbiereic        28/08/99  Created
+ */
+
+/* Tcl procedure to search for an init for either Cat, Rtd, Tclutil or Astrotcl
+ * startup file. If found, the startup file is sourced.
+ * The algorithm is, with $w being either Rtd, Tclutil or Astrotcl
+ *     o the variable $w_library may already exist (lowercase for $w)
+ *     o env array env($w_LIBRARY) (uppercase for $w)
+ *     o best guess if default directory does not work:
+ *        - file from which the dynamic package was loaded ([info loaded])
+ *        - [info nameofexectutable]/../lib/$w
+ *     o the compiled in value of $w_LIBRARY (uppercase for $w)
+ */
+
+static char Pkg_findinit [] =  
+"									\n"
+"proc $Pkg_findinit { Pkg compiledInLib } {				\n"
+"    set PKG [string toupper $Pkg]					\n"
+"    set pkg [string tolower $Pkg]					\n"
+"    set initFile ${Pkg}Init.tcl					\n"
+"									\n"
+"    global env ${pkg}_library						\n"
+"									\n"
+"    set dirs {}							\n"
+"    if {[info exists ${pkg}_library]} {				\n"
+"        lappend dirs [set ${pkg}_library]				\n"
+"    }									\n"
+"									\n"
+"    if {[info exists env(${PKG}_LIBRARY)]} {				\n"
+"        lappend dirs $env(${PKG}_LIBRARY)				\n"
+"    }									\n"
+"									\n"
+"    foreach d [info loaded] {						\n"
+"        if {[lsearch $d ${Pkg}] != -1} {   				\n"
+"            set dl [file dirname [lindex $d 0]]/$pkg  			\n"
+"	    set cwd [pwd]						\n"
+"	    if { ! [catch {cd $dl}]} {					\n"
+"                lappend dirs [pwd]					\n"
+"                cd $cwd						\n"
+"                break							\n"
+"            }								\n"
+"        }								\n"
+"    }									\n"
+"									\n"
+"    set bin [file dirname [info nameofexecutable]]			\n"
+"    lappend dirs [file dirname $bin]/lib/$pkg				\n"
+"									\n"
+"    lappend dirs $compiledInLib					\n"
+"									\n"
+"    foreach libDir $dirs {						\n"
+"        set init [file join $libDir $initFile]	        		\n"
+"        if [file exists $init] {					\n"
+"            if { ![info exists ${pkg}_library] } {			\n"
+"                set ${pkg}_library $libDir				\n"
+"            } 								\n"
+"            uplevel #0 source [list $init]; return			\n"
+"        }								\n"
+"    }									\n"
+"    set msg \"Can't find $initFile in the following directories:\n\"   \n"
+"    foreach d $dirs {append msg \"  $d\n\"}				\n"
+"    append msg \"This probably means that $Pkg wasn't installed properly.\n\"\n"
+"    error $msg								\n"
+"}									\n"
+;

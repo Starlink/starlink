@@ -1,0 +1,15 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: makefile.mk.in,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $"
+#
+# Definitions included by Makefiles
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# pbiereic        24/08/99  created
+#
+
+# to redefine the installation root directory use 'make INSTALL_TARGET=<dir>'
+# or set the env. variable INSTALL_TARGET before calling 'make'
+#ifndef INSTALL_TARGET
+    INSTALL_TARGET = @INSTALL_TARGET@
+#endif

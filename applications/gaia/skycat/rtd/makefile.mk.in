@@ -1,0 +1,154 @@
+# E.S.O. - VLT project 
+# "@(#) $Id: makefile.mk.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+#
+# Definitions included by Makefiles
+#
+# who             when      what
+# --------------  --------  ----------------------------------------
+# pbiereic        24/08/99  created
+# pbiereic        01/03/01  added standard options
+#
+
+AT			= @
+MAKEFLAGS		= --no-print-directory -s
+
+# to redefine the installation root directory use 'make INSTALL_TARGET=<dir>'
+# or set the env. variable INSTALL_TARGET before calling 'make'
+
+INSTALL_TARGET		= @INSTALL_TARGET@
+
+# ------------------------------------------------------------------------
+# 	C Compiler options 
+# ------------------------------------------------------------------------
+
+# C compiler
+CC			= @CC@
+
+# C++ compiler
+CXX			= @CXX@
+
+# other flags to pass to compiler
+CFLAGS			= @CXXDEBUGFLAGS@
+
+LD_SHFLG		= @LD_SHFLG@
+
+# for make depend
+DEPEND_TARGET		= @DEPEND_TARGET@
+
+# info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
+
+SHLIB_CFLAGS		= @SHLIB_CFLAGS@
+
+
+# ------------------------------------------------------------------------
+# 	Directories containing Tcl, Tk, and X include files and libraries
+# ------------------------------------------------------------------------
+
+TCL_INCLUDE		= @TCLINCSW@
+TK_INCLUDE		= @TKINCSW@
+X_INCLUDE		= @XINCSW@
+
+TCLTKLIBS 		= \
+			@ITK_LIB_SPEC@ \
+			@TK_LIB_SPEC@ \
+			@BLT_LIB_SPEC@ \
+			@TCLX_LIB_SPEC@ \
+			@ITCL_LIB_SPEC@ \
+			@TCL_LIB_SPEC@
+
+ITCL_VERSION		= @ITCL_VERSION@
+TCL_VERSION		= @TCL_VERSION@
+
+# misc system libs
+EXTRA_LIBS 		= @LIBS@
+LIBS 			= @LIBS@
+# X Libraries 
+X_LIB 			= @XLIBSW@
+
+# Tclutil library
+TCLUTIL_LIB		= @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC	= @TCLUTIL_LIB_STATIC@
+
+# Astrotcl library
+ASTROTCL_LIB		= @ASTROTCL_LIB@
+ASTROTCL_LIB_STATIC	= @ASTROTCL_LIB_STATIC@
+
+# subdirs in dependent packages (objects included in master lib)
+ASTROTCL_SUBDIRS	= @ASTROTCL_SUBDIRS@
+TCLUTIL_SUBDIRS		= @TCLUTIL_SUBDIRS_NOTIX@
+
+# Take include files from the build dirs, if present
+BUILD_INCLUDES		= @TCLUTIL_BUILD_INCLUDES@ \
+			@ASTROTCL_BUILD_INCLUDES@
+
+# install programs
+INSTALL			= @INSTALL@
+INSTALL_DATA		= @INSTALL_DATA@
+RANLIB			= @RANLIB@
+SHELL			= /bin/sh
+AR			= ar rc
+RM			= rm -f
+LN			= ln -s
+
+# install directories
+TOPDIR			= ${INSTALL_TARGET}
+LIBDIR			= @LIBDIR@
+BINDIR			= @BINDIR@
+RTD_DIR			= @RTD_DIR@
+BINDIR			= @BINDIR@
+INCDIR			= @INCDIR@
+MANDIR			= @MANDIR@
+
+CC_SWITCHES		= @SHLIB_CFLAGS@ $(CFLAGS) $(DEFINES) $(INCLUDES)
+DEPEND_FLAGS		= $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+
+# ------------------------------------------------------------------------
+# Standard rules
+# ------------------------------------------------------------------------
+
+.SUFFIXES: .c .C
+.c.o: @SRC_ROOT@/makefile.mk
+	@echo "Compiling: $< "
+	$(AT)$(CC) -c $(CC_SWITCHES) $<
+
+.C.o: @SRC_ROOT@/makefile.mk
+	@echo "Compiling: $< "
+	$(AT)$(CXX) -c $(CC_SWITCHES) $<
+
+.PHONY: all do_all
+all: do_all
+	@echo "`pwd`: . . . 'all' done" 
+
+.PHONY: All
+All: all do_All
+	@echo "`pwd`: . . . 'All' done" 
+
+.PHONY: do_All
+do_All:
+	$(AT)cd @SRC_ROOT@; $(MAKE) all
+
+.PHONY: clean do_clean
+clean: do_clean
+	$(AT)$(RM) *\~ "#"* *.o core
+	@echo "`pwd`: . . . 'clean' done" 
+
+.PHONY: distclean do_distclean
+distclean: do_distclean
+	$(AT)$(RM) Makefile *.flc *.so *.sl
+	@echo "`pwd`: . . . 'distclean' done" 
+
+.PHONY: install do_install
+install: do_install
+	@echo "`pwd`: . . . 'install' done" 
+
+.PHONY: man do_man
+man: do_man
+	@echo "`pwd`: . . . 'man' done" 
+
+.PHONY: depend do_depend
+depend: do_depend
+
+
+.PHONY: pwd
+pwd:
+	@echo "*** Directory: `pwd` ***"

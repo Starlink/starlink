@@ -1,0 +1,13 @@
+#!/bin/csh -f
+
+
+set dir = $PWD
+
+foreach i ( tclutil astrotcl rtd cat )
+	(cd $i ;\
+	 echo "Running configure in dir: $dir/$i" ;\
+	 configure -prefix $dir/../install --with-gcc --with-notcl ;\
+	 echo "starting make in $i" ;\
+         make )
+end
+

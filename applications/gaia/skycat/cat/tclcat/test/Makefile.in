@@ -1,0 +1,77 @@
+# E.S.O. - VLT project/ESO Archive
+# "@(#) $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
+#
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  08 Mar 96  Created
+# ------------------------------------------------------------------------
+
+CC           	= @CC@
+CXX           	= @CXX@
+CFLAGS  	= @CXXDEBUGFLAGS@
+TOPDIR      	= @DESTDIR@
+LIBDIR      	= @LIBDIR@
+DEPEND_TARGET	= @DEPEND_TARGET@
+
+SRCS 		=  
+
+OBJS 		=  
+
+PROGS 		=  
+
+INCLUDES	= 
+
+CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+LIBRARIES       = 
+
+DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
+SHELL    	= /bin/sh
+AR       	= ar rc
+RM       	= rm -f
+
+TCL_APPS        = \
+		tAstroCat tAstroImage tPreviewPlot tTcsCat
+
+all: tcl_apps
+
+test: $(PROGS)
+
+All:
+	cd ../..; $(MAKE); $(MAKE)
+
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo '#!/bin/sh' > $$i; \
+	    cat ../demos/cat.sh | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
+
+
+install:
+
+clean: 
+	$(RM) $(PROGS) $(OBJS) $(TCL_APPS) *\~ "#"* *.o
+
+distclean: clean 
+	rm -f Makefile depclean
+
+.SUFFIXES: .C
+.c.o:
+	$(CC) -c $(CC_SWITCHES) $<
+
+.C.o:
+	$(CXX) -c $(CC_SWITCHES) $<
+
+man:
+
+include @SRC_ROOT@/makefile.mk
+include ../../depend.mk

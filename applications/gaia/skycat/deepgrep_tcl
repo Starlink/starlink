@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# search sources for given string
+#
+
+# fgrep "$@" `find . -name -name '*.tcl'-print`
+
+find . -name '*.tcl' -exec fgrep "$@" {} /dev/null \;

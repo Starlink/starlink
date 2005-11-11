@@ -1,0 +1,87 @@
+// -*-c++-*-
+#ifndef _RtdCoords_h_
+#define _RtdCoords_h_
+
+/*
+ * E.S.O. - VLT project 
+ * "@(#) $Id: RtdCoords.icc,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
+ *
+ * RtdCoords.h - definitions for the Rtdimage coordinate conversion methods
+ * 
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * Allan Brighton  05/10/95  Created
+ * pbiereic        01/03/01  created (copied from RtdImage.h)
+ */
+public:
+
+// coordinate conversion types
+enum CoordinateType {
+    CT_NONE = 	0, 
+    CT_IMAGE =	'i',
+    CT_CANVAS = 'c',
+    CT_SCREEN = 's',
+    CT_WCS = 	'w',
+    CT_DEG = 	'd',
+    CT_CHIP = 	'C'
+};
+
+// return the enum CoordinateType value given the string name
+CoordinateType getCoordinateType(const char* s);
+
+// convert coords from string form
+int convertCoordsStr(int dist_flag, 
+		     const char* inx_buf, const char* iny_buf,
+		     char* outx_buf, char* outy_buf,
+		     double& x, double& y,
+		     const char* in_type, const char* out_type);
+
+// convert coords from doubles
+int convertCoords(int dist_flag, double& x, double& y, 
+		  const char* in_type, const char* out_type);
+
+// convert coords as doubles (for WCS, assumes equinox of image, 
+// coord type only specifies first letter and no equinox).
+int convertCoords(int dist_flag, double& x, double& y, 
+		  char in_type, char out_type);
+
+// Utility method to change the equinox of ra and dec if dist_flag is 0
+void changeEquinox(int dist_flag, double& ra, double& dec, 
+		   const char* in_equinox, const char* out_equinox);
+
+// utility methods to convert between different coordinate systems
+int canvasToChipCoords		(double& x, double& y, int dist_flag);
+int canvasToImageCoords		(double& x, double& y, int dist_flag);
+int canvasToScreenCoords	(double& x, double& y, int dist_flag);
+int canvasToWorldCoords		(double& x, double& y, int dist_flag);
+int chipToCanvasCoords		(double& x, double& y, int dist_flag);
+int chipToImageCoords		(double& x, double& y, int dist_flag);
+int chipToScreenCoords		(double& x, double& y, int dist_flag);
+int chipToWorldCoords		(double& x, double& y, int dist_flag);
+int imageToCanvasCoords		(double& x, double& y, int dist_flag);
+int imageToChipCoords		(double& x, double& y, int dist_flag);
+int imageToScreenCoords		(double& x, double& y, int dist_flag);
+int imageToWorldCoords		(double& x, double& y, int dist_flag);
+int screenToCanvasCoords	(double& x, double& y, int dist_flag);
+int screenToChipCoords		(double& x, double& y, int dist_flag);
+int screenToImageCoords		(double& x, double& y, int dist_flag);
+int screenToWorldCoords		(double& x, double& y, int dist_flag);
+int worldToCanvasCoords		(double& x, double& y, int dist_flag);
+int worldToChipCoords		(double& x, double& y, int dist_flag);
+int worldToImageCoords		(double& x, double& y, int dist_flag);
+int worldToScreenCoords		(double& x, double& y, int dist_flag);
+
+    // -- short cuts --
+
+protected:
+
+// these coordinate conversion methods are only needed internally
+int   screenToXImageCoords	(double& x, double& y);
+int   xImageToImageCoords	(double& x, double& y, int dist_flag);
+int   imageToRawImageCoords	(double& x, double& y);
+void  coordsToDist		(double& x, double& y);
+void  distToCoords		(double& x, double& y);
+void  doTrans			(double& x, double& y, int distFlag = 0);
+void  undoTrans			(double& x, double& y, int distFlag = 0);
+
+#endif /* _RtdCoords_h_ */
