@@ -3492,10 +3492,11 @@ AC_DEFUN(TEA_PROG_TCLSH, [
 
 	if test -f "$ac_cv_path_tclsh" ; then
 	    TCLSH_PROG=$ac_cv_path_tclsh
-	    AC_MSG_RESULT([$TCLSH_PROG])
 	else
-	    AC_MSG_ERROR([No tclsh found in PATH: $search_path])
+	    TCLSH_PROG=tclsh
+	    #AC_MSG_ERROR([No tclsh found in PATH: $search_path])
 	fi
+        AC_MSG_RESULT([$TCLSH_PROG])
     fi
     AC_SUBST(TCLSH_PROG)
 ])
@@ -3543,11 +3544,12 @@ AC_DEFUN(TEA_PROG_WISH, [
 	])
 
 	if test -f "$ac_cv_path_wish" ; then
-	WISH_PROG=$ac_cv_path_wish
-	    AC_MSG_RESULT([$WISH_PROG])
+	    WISH_PROG=$ac_cv_path_wish
 	else
-	    AC_MSG_ERROR([No wish found in PATH: $search_path])
+	    WISH_PROG=wish
+	    #AC_MSG_ERROR([No wish found in PATH: $search_path])
 	fi
+	AC_MSG_RESULT([$WISH_PROG])
     fi
     AC_SUBST(WISH_PROG)
 ])
