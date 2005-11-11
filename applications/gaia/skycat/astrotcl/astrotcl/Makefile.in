@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.3 1998/11/16 21:15:37 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $"
 #
 # who             when      what
 # --------------  --------  ----------------------------------------
@@ -48,7 +48,7 @@ X_INCLUDE     = @XINCSW@
 
 # X Libraries 
 X_LIB        = @XLIBSW@
-EXTRA_LIBS   = @LIBS@
+EXTRA_LIBS   = @LIBS@ @LIB_STDCPP@
 
 TCLTKLIBS = @ITK_LIB_SPEC@ @TK_LIB_SPEC@ @BLT_LIB_SPEC@ \
 	    @TCLX_LIB_SPEC@ @ITCL_LIB_SPEC@ @TCL_LIB_SPEC@
@@ -113,7 +113,6 @@ INSTALL      = @INSTALL@
 RANLIB 	     = @RANLIB@
 SHELL 	     = /bin/sh
 RM 	     = rm -f
-LN 	     = ln -s
 
 # ------------------------------------------------------------------------
 
@@ -151,7 +150,6 @@ install-bin:
 	chmod 0755 $(demo_wish)
 	$(INSTALL) $(demo_wish) $(BINDIR)
 	$(RM) $(ASTROTCL_DIR)/bin
-	$(LN) $(BINDIR) $(ASTROTCL_DIR)/bin
 
 install-man: 
 	@(cd man; $(MAKE) install)
@@ -194,4 +192,6 @@ FORCE:
 
 .C.o:
 	$(CXX) -c $(CC_SWITCHES) $<
+
+include @SRC_ROOT@/makefile.mk
 
