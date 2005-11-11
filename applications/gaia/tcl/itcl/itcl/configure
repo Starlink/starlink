@@ -6411,13 +6411,12 @@ fi
 
 	if test -f "$ac_cv_path_tclsh" ; then
 	    TCLSH_PROG=$ac_cv_path_tclsh
-	    echo "$as_me:$LINENO: result: $TCLSH_PROG" >&5
-echo "${ECHO_T}$TCLSH_PROG" >&6
 	else
-	    { { echo "$as_me:$LINENO: error: No tclsh found in PATH: $search_path" >&5
-echo "$as_me: error: No tclsh found in PATH: $search_path" >&2;}
-   { (exit 1); exit 1; }; }
+	    TCLSH_PROG=tclsh
+	    #AC_MSG_ERROR([No tclsh found in PATH: $search_path])
 	fi
+        echo "$as_me:$LINENO: result: $TCLSH_PROG" >&5
+echo "${ECHO_T}$TCLSH_PROG" >&6
     fi
 
 
@@ -9458,13 +9457,12 @@ fi
 
 	if test -f "$ac_cv_path_tclsh" ; then
 	    TCLSH_PROG=$ac_cv_path_tclsh
-	    echo "$as_me:$LINENO: result: $TCLSH_PROG" >&5
-echo "${ECHO_T}$TCLSH_PROG" >&6
 	else
-	    { { echo "$as_me:$LINENO: error: No tclsh found in PATH: $search_path" >&5
-echo "$as_me: error: No tclsh found in PATH: $search_path" >&2;}
-   { (exit 1); exit 1; }; }
+	    TCLSH_PROG=tclsh
+	    #AC_MSG_ERROR([No tclsh found in PATH: $search_path])
 	fi
+        echo "$as_me:$LINENO: result: $TCLSH_PROG" >&5
+echo "${ECHO_T}$TCLSH_PROG" >&6
     fi
 
 
