@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.4 1998/11/16 21:22:42 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # Makefile.in"
 # 
@@ -104,4 +104,5 @@ distclean: clean depclean
 
 man:
 
+include @SRC_ROOT@/makefile.mk
 include ../../depend.mk

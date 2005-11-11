@@ -14,7 +14,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "error.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 #define TEST(x) {if (!(x)){printf("%s: line %d: Test failed\n", __FILE__, __LINE__);  exit(1) ;}}
 

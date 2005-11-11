@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ImageIO.C,v 1.6 1998/05/18 21:22:19 abrighto Exp $" 
+ * "@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 brighton Exp $" 
  *
  * ImageIO.C - method definitions for class ImageIO, for managing image
  *             I/O and storage
@@ -16,24 +16,21 @@
  * Peter W. Draper 24/06/99  Changed to use FITS_LONG as type in byte
  *                           swapping. "long" is 8 bytes on alphas and 64 SUNs.
  */
-static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.6 1998/05/18 21:22:19 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 brighton Exp $";
 
 
 /* see Apple Developer Connection Tech Notes
   http://developer.apple.com/technotes/tn2002/tn2071.html */
 #if ! ( defined(__APPLE__) && defined(__MACH__) )
 #include <netinet/in.h>
-#endif
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include "error.h"
 #include "ImageIO.h"
 #include "config.h"
 
-// The type "long" may have up to 64 bits on alpha machines. FITS
-// defines the long we want to use as 32 bits, so use a macro to
-// replace the long data type with plain int when appropriate.
-#if SIZEOF_LONG == 8
+// The type "long" may have 64 bits.
+#if LONGSIZE == 64
 #define FITS_LONG int 
 #else 
 #define FITS_LONG long 
