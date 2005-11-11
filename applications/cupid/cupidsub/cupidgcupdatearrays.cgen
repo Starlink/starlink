@@ -186,14 +186,15 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    will not need to be extended any further. */
             if( extend[ iax ][ iedge ] ) {
                more = 1;
+               extend[ iax ][ iedge ] = 0;
 
                if( iedge ) {
                   lbox[ iax ]--;
+                  face_done = ( lbox[ iax ] == 0 );
                } else {
                   ubox[ iax ]++;
+                  face_done = ( ubox[ iax ] > dims[ iax ] );
                }
-
-               extend[ iax ][ iedge ] = 0;
 
 /* Set up the GRID bounds of the section representing this face. Also set
    the GRID coords of the first point to test. Also, get the corresponding 
@@ -212,7 +213,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                }
 
 /* Now loop round all the pixels on the face. */
-               face_done = 0;
                while( !face_done ){
 
 /* Get the corresponding 1-dimensional index into the input array. Also check
@@ -325,8 +325,16 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If required, create an HDS structure holding information about the
    clump. */
-   if( cloc ) cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
-                             mlist, plist, lbnd, iclump );
+   if( cloc ) {
+
+      for( jax = 0; jax < ndim; jax++ ) {
+         lbox[ jax ]++;
+         ubox[ jax ]--;
+      }
+
+      cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
+                     mlist, plist, lbnd, iclump );
+   }
 
 /* Free resources */
    mlist = astFree( mlist );
