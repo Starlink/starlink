@@ -19,11 +19,12 @@
  *                           non-const member can be used within this
  *                           member. 
  *                 15/08/00  Made write virtual so it can be overriden.
- *                 13/06/05  Made setHDU virtual so it can be overriden.
+ * pbiereic        17/02/03  Revised byte-order issues
+ * Peter W. Draper 13/06/05  Made setHDU virtual so it can be overriden.
  */
 
-#include <stdio.h>
-#include <iostream.h>
+#include <cstdio>
+#include <iostream>
 #include "ImageIO.h"
 #include "fitsio.h"
 
@@ -45,7 +46,7 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
-    static void *reallocFile(void* p, size_t newsize);
+    static void* FitsIO::reallocFile(void* p, size_t newsize);
 
 protected:   
     //  PWD: Move here so that derived classes can manipulate (needed to get
@@ -104,12 +105,11 @@ public:
     // destructor
     ~FitsIO();
 
+    // Return a copy of this object that shares the data, but can have a different current HDU
+    FitsIO* copy();
+
     // initialize world coordinates (based on the image header)
     int wcsinit();
-
-    // return true if this class uses native byte ordering
-    // (FITS uses network byte order, so return 0 here).
-    int nativeByteOrder() const {return 0;}
 
     // return the class name as a string
     const char* classname() const {return "FitsIO";}
@@ -169,6 +169,8 @@ public:
     //  write a (ASCII formatted) copy of the FITS header to the given stream.
     int getFitsHeader(ostream& os) const;
 
+    // write data to disk (network byte ordered, NBO)
+    int fwriteNBO(char *data, int tsize, int size, FILE *f) const;
 
     // Insert the given FITS keyword and value and return 0 if OK
     // If there is not enough space in the header, the file size is
@@ -181,10 +183,6 @@ public:
     
     // -- HDU access --
     
-    //  Return fitsfile reference so this can be used in related
-    //  classes. 
-    fitsfile *getFitsFile() { return fitsio_; }
-
     // Return the total number of HDUs
     int getNumHDUs();
 
@@ -228,4 +226,4 @@ public:
     int setTableValue(long row, int col, const char* value);
 };
 
-#endif _FitsIO_h_
+#endif /* _FitsIO_h_ */
