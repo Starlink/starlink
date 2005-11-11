@@ -16,8 +16,8 @@
 static const char* const rcsId="@(#) $Id$";
 
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include "error.h"
 #include "WCS.hxx"
 

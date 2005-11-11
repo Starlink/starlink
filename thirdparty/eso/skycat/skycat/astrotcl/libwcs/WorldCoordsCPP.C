@@ -13,24 +13,23 @@
 static const char* const rcsId="@(#) $Id$";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
 #include "error.h"
 #include "wcs.h"
 #include "WorldCoords.hxx"
 
-// prototypes for ESO Archive routines used 
-// (the header files are not ANSI C or C++ compat...)
+// prototypes C  routines used (the header files are not ANSI C or C++ compat...)
 extern "C" {
     // used to convert equinox
     int prej_q (double q0[2],	// IN: ra+dec at equinox eq0 in degrees 
 		double q1[2], 	// OUT: precessed to equinox eq1	
 		double eq0, 	// IN: Initial equinox (Julian Years)	
-		double eq1 	// IN: Final equinox (Julian Years) 	
-	);
+		double eq1);	// IN: Final equinox (Julian Years) 	
 }
+
 
 /*
  * check range of ra,dec values and return 0 if OK
@@ -49,10 +48,28 @@ int WorldCoords::checkRange()
 }
 
 
+/** Set the equinox from the string and return 0 if okay (defaults to 2000). */
+static int getEquinox(const char* equinoxStr, double& equinox) {
+    if (!equinoxStr || strcmp(equinoxStr, "J2000") == 0) {
+	equinox = 2000.;
+	return 0;
+    }
+    if (strcmp(equinoxStr, "B1950") == 0) {
+	equinox = 1950.;
+	return 0;
+    }
+    if (*equinoxStr == 'J' || *equinoxStr == 'B')
+	equinoxStr++;
+
+    if (sscanf(equinoxStr, "%lf", &equinox) == 1) {
+	return 0;
+    }
+    return 1;
+}
+
+
 /*
- * convert from the given equinox to J2000.0. We always keep coordinates
- * in J2000 internally to avoid confusion when doing arithmetic, etc, 
- * and only convert for printing.
+ * convert from one equinox to another.
  */
 int WorldCoords::convertEquinox(double from_equinox, double to_equinox)
 {
@@ -77,6 +94,42 @@ int WorldCoords::convertEquinox(double from_equinox, double to_equinox)
 
 
 /*
+ * Convert from one equinox (or named coordinate system) to another.
+ * The first 2 parameters may be numbers, such as "2000" or "1950", or
+ * coordinate system names, like "J2000", "FK5", "GALACTIC", "ECLIPTIC", ...
+ * Epoch is the besselian epoch in years.
+ * If dflag is 1, the ra value was converted to hours by dividing by 15
+ */
+int WorldCoords::convertEquinox(const char* fromEquinoxStr, const char* toEquinoxStr, double epoch, int dflag)
+{
+    // check for numerical equinox
+    double from_equinox = 0.;
+    double to_equinox = 0.;
+    if (getEquinox(fromEquinoxStr, from_equinox) == 0 && getEquinox(toEquinoxStr, to_equinox) == 0)
+	return convertEquinox(from_equinox, to_equinox);
+    
+    // convert from one system to another
+    int sys1 = wcscsys((char*)fromEquinoxStr);
+    if (sys1 == -1)
+	return error("bad equinox value: ", fromEquinoxStr);
+    int sys2 = wcscsys((char*)toEquinoxStr);
+    if (sys2 == -1)
+	return error("bad equinox value: ", toEquinoxStr);
+    double dtheta = ra_.val();
+    if (dflag)
+	dtheta *= 15;  // hours to degrees
+    double dphi = dec_.val();
+    wcscon(sys1, sys2, from_equinox, to_equinox, &dtheta, &dphi, epoch);
+    if (sys2 == WCS_J2000 || sys2 == WCS_B1950)
+	dtheta /= 15;  // degrees to hours
+    ra_ = HMS(dtheta);	
+    dec_ = HMS(dphi);
+    dec_.show_sign(1);
+    return 0;
+}
+
+
+/*
  * constructor: note that the ra arg is H:M:S, while dec is D:M:S
  */
 WorldCoords::WorldCoords(const HMS& ra, const HMS& dec, double equinox)
@@ -84,6 +137,18 @@ WorldCoords::WorldCoords(const HMS& ra, const HMS& dec, double equinox)
 {
     dec_.show_sign(1);
     status_ = checkRange() || convertEquinox(equinox);
+}
+
+
+/*
+ * constructor: note that the ra arg is H:M:S, while dec is D:M:S.
+ * EquinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+WorldCoords::WorldCoords(const HMS& ra, const HMS& dec, const char* equinoxStr)
+    : ra_(ra), dec_(dec) 
+{
+    dec_.show_sign(1);
+    status_ = convertEquinox(equinoxStr);
 }
 
 
@@ -99,6 +164,18 @@ WorldCoords::WorldCoords(double ra, double dec, double equinox)
 
 
 /*
+ * constructor: note that the ra and dec args are both in degrees.
+ * equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+WorldCoords::WorldCoords(double ra, double dec, const char* equinoxStr)
+    : ra_(ra/15), dec_(dec) 
+{
+    dec_.show_sign(1);
+    status_ = convertEquinox(equinoxStr);
+}
+
+
+/*
  * constructor: note that r... is H:M:S, while d... is D:M:S
  */
 WorldCoords::WorldCoords(double rh, int rm, double rs, double dd, int dm, double ds,
@@ -107,6 +184,18 @@ WorldCoords::WorldCoords(double rh, int rm, double rs, double dd, int dm, double
 {
     dec_.show_sign(1);
     status_ = checkRange() || convertEquinox(equinox);
+}
+   
+/*
+ * constructor: note that r... is H:M:S, while d... is D:M:S.
+ * equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+WorldCoords::WorldCoords(double rh, int rm, double rs, double dd, int dm, double ds,
+		const char* equinoxStr)
+    : ra_(rh, rm, rs), dec_(dd, dm, ds) 
+{
+    dec_.show_sign(1);
+    status_ = convertEquinox(equinoxStr);
 }
    
 
@@ -129,18 +218,47 @@ WorldCoords::WorldCoords(const char* ra_str, const char* dec_str, double equinox
     : status_(0), ra_(ra_str, hflag), dec_(dec_str)
 {
     if (ra_.isNull()) {
-	status_ = error("error in RA value: ",
-			"expected \"H:M:S.sss\" or \"H.hhh\"");
+        status_ = 1;
 	return;
     }
     if (dec_.isNull()) {
-	status_ = error("error in DEC value: ",
-			"expected \"[+-]D:M:S.sss\" or \"[+-]D.ddd\"");
+	status_ = 1;
 	return;
     }
 	
     dec_.show_sign(1);
     status_ = checkRange() || convertEquinox(equinox);
+}
+
+/*
+ * constructor - parse coordinates in string format as above, except that
+ * equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+WorldCoords::WorldCoords(const char* ra_str, const char* dec_str, const char* equinoxStr, int hflag)
+    : status_(0), dec_(dec_str)
+{
+    int dflag = 0;  // set to 1 if ra was divided by 15
+    ra_ = HMS(ra_str, hflag, &dflag);
+
+    if (ra_.isNull()) {
+        status_ = 1;
+	return;
+    }
+    if (dec_.isNull()) {
+	status_ = 1;
+	return;
+    }
+	
+    dec_.show_sign(1);
+
+    double equinox = 2000.;
+    if (getEquinox(equinoxStr, equinox) == 0) {
+	status_ = checkRange() || convertEquinox(equinox);
+    }
+    else {
+	// hack - need to know if the RA value is in hours or deg
+	status_ = convertEquinox(equinoxStr, "J2000", 0., dflag);
+    }
 }
 
 
@@ -177,10 +295,36 @@ void WorldCoords::print(char* ra_buf, char* dec_buf, double equinox, int hmsFlag
 
 
 /*
- * Print the coordinates to the given stream.
- * 
+ * Print the coordinates in the given buffers:
  * If hmsFlag is non-zero, in H:M:S [+-]D:M:S format, otherwise in decimal
  * degrees.
+ * Here equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ * The printed coordinates are converted to the given equinox (or system).
+ */
+void WorldCoords::print(char* ra_buf, char* dec_buf, const char* equinoxStr, int hmsFlag) 
+{
+    double equinox = 2000.;
+    if (getEquinox(equinoxStr, equinox) == 0) {
+	print(ra_buf, dec_buf, equinox, hmsFlag);
+    }
+    else {
+	// make tmp copy and convert equinox before printing
+	WorldCoords tmp = *this;
+	tmp.convertEquinox("J2000", equinoxStr);
+	if (hmsFlag) {
+	    tmp.ra_.print(ra_buf); 
+	    tmp.dec_.print(dec_buf);
+	}
+	else {
+	    sprintf(ra_buf, "%.17g", tmp.ra_deg());
+	    sprintf(dec_buf, "%.17g", tmp.dec_deg());
+	}
+    }
+}
+
+
+/*
+ * Print the coordinates to the given stream in the given equinox.
  */
 void WorldCoords::print(ostream& os, double equinox)
 {
@@ -197,6 +341,25 @@ void WorldCoords::print(ostream& os, double equinox)
     
 
 /*
+ * Print the coordinates to the given stream in the given equinox (or system).
+ * Here equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+void WorldCoords::print(ostream& os, const char* equinoxStr)
+{
+    double equinox = 2000.;
+    if (getEquinox(equinoxStr, equinox) == 0) {
+	print(os, equinox);
+    }
+    else {
+	// make tmp copy and convert equinox before printing
+	WorldCoords tmp = *this;
+	tmp.convertEquinox("J2000", equinoxStr);
+	os << tmp;
+    }
+}
+
+    
+/*
  * get ra and dec in degrees in the given equinox
  */
 void WorldCoords::get(double& ra, double& dec, double equinox)
@@ -211,6 +374,26 @@ void WorldCoords::get(double& ra, double& dec, double equinox)
 	tmp.convertEquinox(2000.0, equinox);
 	ra = tmp.ra_deg();
 	dec = tmp.dec_deg();
+    }
+}
+
+    
+/*
+ * Get ra and dec in degrees in the given equinox.
+ * Here equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
+ */
+void WorldCoords::get(double& ra, double& dec, const char* equinoxStr)
+{
+    double equinox = 2000.;
+    if (getEquinox(equinoxStr, equinox) == 0) {
+	get(ra, dec, equinox);
+    }
+    else {
+	// make tmp copy and convert equinox 
+	WorldCoords tmp = *this;
+	tmp.convertEquinox("J2000", equinoxStr);
+	ra = tmp.ra_.val();
+	dec = tmp.dec_.val();
     }
 }
 
