@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ImageIO.h,v 1.8 1998/05/18 21:22:15 abrighto Exp $" 
+ * "@(#) $Id: ImageIO.h,v 1.5 2005/02/02 01:43:04 brighton Exp $" 
  *
  * ImageIO.h - declarations for class ImageIO, an abstract base class 
  *             representing the contents of an image file (or other
@@ -29,8 +29,8 @@
  */
 
 
-#include <iostream.h>
-#include <math.h>
+#include <iostream>
+#include <cmath>
 #include "WCS.hxx"
 #include "Mem.h"
 
@@ -75,7 +75,10 @@ protected:
 	: width_(width), height_(height), bitpix_(bitpix), 
 	  bzero_(bzero), bscale_(bscale), 
 	  header_(header), data_(data),
-	  refcnt_(1), status_(0) {}
+	  refcnt_(1), status_(0), usingNetBO_(1) {}
+
+    // FITS uses network byte order (=big Endian).
+    int usingNetBO_;
 
 public:
     // destructor
@@ -85,10 +88,6 @@ public:
 
     // initialize world coordinates (based on the image header)
     virtual int wcsinit() = 0;
-
-    // return true if this class uses native byte ordering
-    // (FITS uses network byte order, so FitsIO would return 0 here).
-    virtual int nativeByteOrder() const = 0;
 
     // If byte swapping is needed for this machine and image, make a byte
     // swapped copy of the image data, otherwise, do nothing.
@@ -129,11 +128,21 @@ public:
     int height() const {return height_;}
     int bitpix() const {return bitpix_;}
     double bscale() const {return bscale_;}
+    void bscale(double d) {bscale_ = d;}
     double bzero() const {return bzero_;}
+    void bzero(double d) {bzero_ = d;}
     Mem& header() {return header_;}
     Mem& data() {return data_;}
     int status() const {return status_;}
     void status(int s) {status_ = s;}
+
+    // return true if this class uses native byte ordering
+    // (FITS uses network byte order, so FitsIO would return 0 here).
+    //int usingNetBO() const = 0;
+
+    // class uses network byte ordering (=big Endian)
+    int usingNetBO() const {return usingNetBO_;}
+    void usingNetBO(int bo) {usingNetBO_ = bo;}
 
     // return the object used to manage world coordinates
     WCS& wcs() const {return (WCS&)wcs_;}
@@ -180,11 +189,6 @@ public:
     // assignment
     ImageIO& operator=(const ImageIO&);
 
-    // return true if the ImageIORep subclass uses native byte ordering
-    int nativeByteOrder() const {
-	return rep_->nativeByteOrder();
-    }
-
     // write the data to an image file 
     int write(const char *filename) const {
 	return rep_->write(filename);
@@ -223,6 +227,33 @@ public:
 	return rep_->get(keyword);
     }
 
+    // get the value for the given image header keyword or return the 
+    // supplied default value if not found
+    int get(const char* keyword, double& val, double defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, float& val, float defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, int& val, int defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, long& val, long defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, unsigned char& val, unsigned char defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, unsigned short& val, unsigned short defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    int get(const char* keyword, short& val, short defVal) const {
+	if (rep_->get(keyword, val) != 0) val = defVal; return 0;
+    }
+    char* get(const char* keyword, const char* defVal) const {
+	char* s = rep_->get(keyword); return (s != NULL) ? s : (char*)defVal;
+    }
+
     //  write a (ASCII formatted) copy of the FITS header to the given stream.
     int getFitsHeader(ostream& os) const {
 	return rep_->getFitsHeader(os);
@@ -242,9 +273,14 @@ public:
     int height() const {return rep_->height();}
     int bitpix() const {return rep_->bitpix();}
     double bscale() const {return rep_->bscale();}
+    void bscale(double d) {rep_->bscale(d);}
     double bzero() const {return rep_->bzero();}
+    void bzero(double d) {rep_->bzero(d);}
     const Mem& header() const {return rep_->header();}
     const Mem& data() const {return rep_->data();}
+
+    int usingNetBO() const {return rep_->usingNetBO();}
+    void usingNetBO(int bo) {rep_->usingNetBO(bo);}
 
     // return a reference to the object used to manage world coordinates
     WCS& wcs() const {return rep_->wcs();}
