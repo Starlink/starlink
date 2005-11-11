@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: depend.mk,v 1.1 1997/11/28 01:36:56 abrighto Exp $
+# $Id: depend.mk,v 1.2 2005/02/02 01:43:04 brighton Exp $
 #
 # depend.mk - include Makefile for generating automatic dependencies
 #

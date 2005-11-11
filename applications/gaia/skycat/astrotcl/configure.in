@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.11 1998/12/24 00:37:11 abrighto Exp $
+# $Id: configure.in,v 1.2 2005/02/02 01:43:04 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
@@ -9,6 +9,7 @@
 # who             when       what
 # --------------  --------   ---------------------------------------------
 # Allan Brighton  26 Nov 97  Created
+# P.Biereichel    26/06/99   Option --with-vltgnu added
 #
 # -----------------------------------------------------------------------
 
@@ -54,8 +55,19 @@ AC_PROG_RANLIB
 AC_PROG_CPP
 AC_PROG_CXX
     
-AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
-AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
+LIB_STDCPP=""
+VLTGNU=0
+AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
+if test "$VLTGNU" = "1" ; then
+  CC=gcc
+  CXX=gcc
+  LIB_STDCPP="-lstdc++"
+else
+  AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+fi
+
+AC_SUBST(LIB_STDCPP)
+AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
 
 # -----------------------------------------------------------------------
 #
@@ -145,7 +157,7 @@ AC_SUBST(LIB_RUNTIME_DIR)
 # -----------------------------------------------------------------------
 
 NO_TCL=0
-AC_ARG_WITH(notcl, [--with-notcl         Build a version with no Tcl access], NO_TCL=1)
+AC_ARG_WITH(notcl, [--with-notcl       build a version with no Tcl access], NO_TCL=1)
 AC_SUBST(NO_TCL)
 
 # The list of source dirs depends on whether we have Tcl access or not
@@ -186,7 +198,9 @@ AC_SUBST(CXX_DEPEND_FLAGS)
 # set OS version string
 #
 # -----------------------------------------------------------------------
-OSVERSION="`uname -s`-`uname -r`"
+OS=`uname -s`
+OSVERSION="${OS}-`uname -r`"
+AC_SUBST(OS)
 AC_SUBST(OSVERSION)
 
 # -----------------------------------------------------------------------
@@ -242,7 +256,14 @@ fi
 SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
 
 # Base command to use for combining object files into a shared library:
-SHLIB_LD=$TCLUTIL_SHLIB_LD
+if test "$VLTGNU" = "1" ; then
+        SHLIB_LD="gcc -ansi -shared -fPIC"
+        if test "$OS" = "HP-UX" ; then
+                SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
+        fi
+else
+        SHLIB_LD=$TCLUTIL_SHLIB_LD
+fi
 
 # Suffix to use for the name of a shared library.
 SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
@@ -366,16 +387,18 @@ AC_SUBST(TCLUTIL_BUILD_INCLUDES)
 #--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
-DESTDIR=$prefix
-BINDIR=$DESTDIR/bin
-LIBDIR=$DESTDIR/lib
-INCDIR=$DESTDIR/include/astrotcl
-MANDIR=$DESTDIR/man
+INSTALL_TARGET=$prefix
+DESTDIR="\${INSTALL_TARGET}"
+BINDIR="\${INSTALL_TARGET}"/bin
+LIBDIR="\${INSTALL_TARGET}"/lib
+INCDIR="\${INSTALL_TARGET}"/include/astrotcl
+MANDIR="\${INSTALL_TARGET}"/man
 ASTROTCL_DIR=$LIBDIR/astrotcl
 ASTROTCL_LIBRARY=$ASTROTCL_DIR
 ASTROTCL_BUILD_LIBRARY=$SRC_ROOT/astrotcl/library
 ASTROTCL_BUILD_INCLUDES="-I$SRC_ROOT/wcslib/include -I$SRC_ROOT/imageio/include -I$SRC_ROOT/compress/include"
 
+AC_SUBST(INSTALL_TARGET)
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
 AC_SUBST(LIBDIR)
@@ -520,6 +543,18 @@ esac
 AC_SUBST(ARCH)dnl
 AC_SUBST(CFLAGS)dnl
 AC_SUBST(LIBPRE)dnl
+
+# ================= test whether we need trigod.c ================
+
+AC_MSG_CHECKING("whether we need trigod.c")
+libs_save=$LIBS
+LIBS="$LIBS -lm"
+AC_TRY_LINK([#include <math.h>], [cosd(1.0);],
+[AC_MSG_RESULT("no"); TRIGOD_C=""; TRIGOD_O=""],
+AC_MSG_RESULT("yes"); TRIGOD_C="trigod.c"; TRIGOD_O="trigod.o")
+LIBS=$libs_save
+AC_SUBST(TRIGOD_C)
+AC_SUBST(TRIGOD_O)
 
 # ================= test for the unix ftruncate function ================
 
@@ -666,13 +701,17 @@ echo "
 install astrotcl binaries in           => $BINDIR
 install astrotcl libraries in          => $LIBDIR
 install astrotcl include files in      => $INCDIR
-install astrotcl tcl library files in  => $ASTROTCL_DIR"
+install astrotcl tcl library files in  => $ASTROTCL_DIR
+
+default install dir INSTALL_TARGET     => $INSTALL_TARGET"
 
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
+export NO_TCL
 AC_OUTPUT(\
 	Makefile \
+	makefile.mk \
         astrotclConfig.sh \
         \
 	astrotcl/Makefile \
@@ -706,6 +745,6 @@ AC_OUTPUT(\
 	imageio/test/Makefile \
 	imageio/man/Makefile \
 	\
-	, chmod +x astrotcl/demos/astrotcl.sh; sh makelinks; make -k depend \
+	, if test "$NO_TCL" = "0" ; then sh makelinks; fi; make -k depend \
 )
 
