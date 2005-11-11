@@ -43,6 +43,10 @@
 *        Original version.
 *     7-AUG-2003 (DSB):
 *        Normalise the supplied positions.
+*     11-NOV-2005 (DSB):
+*        Allow up to 50 axes (this allows tables such as those produced by 
+*        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
+*        displayed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,17 +83,20 @@
       INTEGER NSP                  ! No. of spaces between fields
       PARAMETER( NSP = 3 ) 
 
+      INTEGER MXDIM                ! Max number of axes
+      PARAMETER( MXDIM = 50 ) 
+
 *  Local Variables:
       CHARACTER ATTRIB*15          ! AST attribute name
       CHARACTER LINE*( GRP__SZNAM )! Buffer for text
       CHARACTER TEXT*40            ! AST attribute value
-      DOUBLE PRECISION C( NDF__MXDIM ) ! Buffer for a single position
+      DOUBLE PRECISION C( MXDIM )  ! Buffer for a single position
       INTEGER BLEN                 ! Length of each line
       INTEGER I                    ! Axis index
       INTEGER IAT                  ! No. of characters in a string
       INTEGER K                    ! Position index
-      INTEGER MXWID( 0 : NDF__MXDIM )! Field widths
-      INTEGER TAB( 0 : NDF__MXDIM + 1 )! Field starting positions
+      INTEGER MXWID( 0 : MXDIM )   ! Field widths
+      INTEGER TAB( 0 : MXDIM + 1 ) ! Field starting positions
 *.
 
 *  Check the global inherited status.

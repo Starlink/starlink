@@ -62,6 +62,10 @@
 *  History:
 *     16-SEP-1998 (DSB):
 *        Original version.
+*     11-NOV-2005 (DSB):
+*        Allow up to 50 axes (this allows tables such as those produced by 
+*        CUPID:CLUMPS which have more than NDF__MXDIM columns to be
+*        displayed).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,16 +102,20 @@
 *  Status:
       INTEGER STATUS               ! Global status
 
+*  Local Constants:
+      INTEGER MXDIM
+      PARAMETER (MXDIM = 50)
+
 *  Local Variables:
       CHARACTER ID*6               ! Formatted identifier
       CHARACTER TEXT*80            ! Marker text
       DOUBLE PRECISION DX          ! X position offset to label centre
       DOUBLE PRECISION DY          ! Y position offset to label centre
-      DOUBLE PRECISION LPOS( NDF__MXDIM )! Local copy of a position
+      DOUBLE PRECISION LPOS( MXDIM )! Local copy of a position
       DOUBLE PRECISION NLG1        ! NumLabGap(1)
       DOUBLE PRECISION NLG2        ! NumLabGap(2)
       DOUBLE PRECISION SIZE        ! Size for numerical labels
-      DOUBLE PRECISION START( NDF__MXDIM )! Start of closing curve
+      DOUBLE PRECISION START( MXDIM )! Start of closing curve
       DOUBLE PRECISION SZ0         ! Original size for strings
       DOUBLE PRECISION WD0         ! Original width for strings
       INTEGER CL0                  ! Original colour index for strings
