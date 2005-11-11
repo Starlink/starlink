@@ -1,7 +1,7 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: Makefile.in,v 1.2 1998/11/16 21:16:37 abrighto Exp $" 
-# $Id: Makefile.in,v 1.2 1998/11/16 21:16:37 abrighto Exp $
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
+# $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $
 #
 # ------------------------------------------------------------------------
 # 	Makefile for include dir
@@ -10,8 +10,8 @@
 TOPDIR      	= @DESTDIR@
 INCDIR      	= @INCDIR@
 
-SRCS 		=  ImageIO.h FitsIO.hxx \
-		   cfortran.h compress.h drvrsmem.h eval_defs.h eval_tab.h \
+SRCS 		=  ImageIO.h FitsIO.hxx
+SRCS_OPTL	=  fortran.h compress.h drvrsmem.h eval_defs.h eval_tab.h \
 		   f77_wrap.h fitsio.h fitsio2.h group.h grparser.h longnam.h \
 		   pctype.h region.h
 
@@ -19,4 +19,5 @@ INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@
 SHELL    	= /bin/sh
 
+include @SRC_ROOT@/makefile.mk
 include ../../include.mk
