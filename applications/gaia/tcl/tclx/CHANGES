@@ -281,7 +281,7 @@
 -------------------------------------------------------------------------------
  1 Oct 92:
    o Wait command was changed to take only one pid.  This is in preparation
-     for supporting full waitpid functionallity once the support has been
+     for supporting full waitpid functionality once the support has been
      added to UCB Tcl.  (*POTENTIAL INCOMPATIBILITY*)
 -------------------------------------------------------------------------------
  2 Oct 92:
@@ -520,7 +520,7 @@
   o Incorporated fix to the profile command that caused it to count upleveled
     CPU time twice.  Patch supplied by Bob Mazanec <mazanec@hci.cirr.com>.
   o Changed for_recursive_glob and recursive_glob to not follow symbolic links.
-  o Merged the "showprocs" functionallity into "showproc", they were almost the
+  o Merged the "showprocs" functionality into "showproc", they were almost the
     same.  (*POTENTIAL INCOMPATIBILITY*)
   o Changed shell initialization so it doesn't change the prompt hooks if they
     have already be set during startup.
@@ -717,7 +717,7 @@
 ===============================================================================
 20 Nov 93:
    o Improved tclhelp program:  can resize text windows,  added apropos
-     functionallity.
+     functionality.
 -------------------------------------------------------------------------------
 22 Nov 93:
    o Fixed problems with building with a seperate build directory.
@@ -1099,10 +1099,10 @@
     and created tkx.tcl.
 -------------------------------------------------------------------------------
 10 Mar 96:
-  o Removed socket functionallity that duplicated Tcl's. Deprecated the
+  o Removed socket functionality that duplicated Tcl's. Deprecated the
     server_connect, server_create, server_accept and  server_cntl commands.
     Renamed server_info to be host_info and moved the server_cntl
-    functionallity info the fcntl command.   Compatbility with these commands
+    functionality info the fcntl command.   Compatbility with these commands
     is still supported for old scripts.
   o Since sockets are now required to build base Tcl, they are no longer
     optional with TclX.

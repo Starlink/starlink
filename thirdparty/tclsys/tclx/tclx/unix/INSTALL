@@ -2,7 +2,7 @@
 INSTALLATION INSTRUCTIONS FOR EXTENDED TCL ON UNIX AND UNIX-LIKE SYSTEMS
 ------------------------------------------------------------------------
 
-$Id: INSTALL,v 8.17 1999/08/10 23:19:31 redman Exp $
+$Id: INSTALL,v 8.18 2002/12/17 21:52:10 hobbs Exp $
 
 COMPATIBILITY
 =============
@@ -87,34 +87,16 @@ HOW TO BUILD EXTENDED TCL FOR UNIX SYSTEMS
     o Enter ./configure to run the configure script.  If you are going to
       be compiling with gcc, set the environment variable CC to "gcc".
       The following options are recognized by the TclX configure script:
-        o -- with-tcl=dir
+        o --with-tcl=dir
           Specifies the full path to the built Tcl source directory.
           By default, configure searchs for the Tcl distribution.
 
-        o -- with-tk=dir
-          Specifies the full path to the built Tk source directory.
-          By default, configure searchs for the Tk distribution.
-
-        o --enable-shared=YES|NO
-          If "YES", build and link with shared libraries if "NO", no shared
-          libraries will be compiled.  Default is "NO".  If you say
+        o --enable-shared=yes|no
+          If "yes", build and link with shared libraries if "no", no shared
+          libraries will be compiled.  Default is "no".  If you say
 	  "--enable-shared" with no argument, it enables building shared 
 	  libraries.
-
-        o --enable-tk=YES|NO
-          If "YES", compile Tk specific code and wishx, if "NO", no Tk related
-          code will be compiled.  Default is "YES".
  
-        o --srcdir=DIR
-          If you are using a make that supports VPATH (e.g. GNU make) you can
-          use this to compile in a separate directory from the source.  You
-          must create a directory called "unix" in your build tree and run
-          configure while in the "unix" directory.  The --srcdir argument must
-          specify the "tclX8.2/unix" directory, not the top-level TclX 
-          directory.
-          Note: The source directory must be clean, it can't contain a built
-          copy of TclX.
-
         o --prefix=PREFIX
           Directory under which the "include" and "man" directories are
           found for installation. 

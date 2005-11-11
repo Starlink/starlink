@@ -13,10 +13,10 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: tclmanpages,v 8.8 2001/05/24 19:45:20 andreas_kupries Exp $
+# $Id: tclmanpages,v 8.9 2004/12/01 23:30:17 hobbs Exp $
 #------------------------------------------------------------------------------
 #
-return {
+set docs {
     {Tcl.n          tcl/intro/syntax}
     {append.n       tcl/strings/append}
     {after.n        tcl/events/after}
@@ -85,7 +85,6 @@ return {
     {registry.n     tcl/files/registry}
     {regsub.n       tcl/strings/regsub}
     {rename.n       tcl/control/rename}
-    {resource.n     tcl/files/resource}
     {return.n       tcl/control/return}
     {safe.n         tcl/control/safe}
     {scan.n         tcl/strings/scan}
@@ -112,4 +111,11 @@ return {
     {tclsh.1        tcl/intro/tclsh}
 }
 
+if {$tcl_version <= 8.4} {
+   lappend docs {resource.n     tcl/files/resource}
+}
+if {$tcl_version >= 8.4} {
+   lappend docs {lset.n	        tcl/lists/lset}
+}
 
+return $docs

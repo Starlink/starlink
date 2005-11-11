@@ -3,7 +3,7 @@
 #
 # Tcl program to copy files during the installation of Tcl.  This is used
 # because "copy -r" is not ubiquitous.  It also adds some minor additional
-# functionallity.
+# functionality.
 #
 #------------------------------------------------------------------------------
 # Copyright 1992-1999 Karl Lehenbauer and Mark Diekhans.
@@ -15,7 +15,7 @@
 # software for any purpose.  It is provided "as is" without express or
 # implied warranty.
 #------------------------------------------------------------------------------
-# $Id: instcopy.tcl,v 8.5 2000/07/14 18:08:03 welch Exp $
+# $Id: instcopy.tcl,v 8.7 2002/11/12 21:35:31 karll Exp $
 #------------------------------------------------------------------------------
 #
 # It is run in the following manner:
@@ -31,6 +31,9 @@
 #  o targetdir - Target directory to copy the files to.  If the directory does
 #    not exist, it is created (including parent directories).
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+package require Tclx
+source [file join [file dirname [info script]] buildutil.tcl]
 
 #------------------------------------------------------------------------------
 # Usage --
