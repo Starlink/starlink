@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: cat_env.sh.in,v 1.1 1997/12/02 10:26:54 abrighto Exp $" 
+# "@(#) $Id: cat_env.sh.in,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $" 
 #
 # This script is sourced by the cat startup file, cat.sh, 
 # if present, to set up the environment for running the cat demo
@@ -13,13 +13,29 @@
 #  who      when      what
 # -------- ---------  ------------------
 # abrighto 28 Nov 97  created 
+# pbiereic 26/08/99   uses relative pathes
+
+abs_path()
+{
+	cwd=$PWD
+	cd $1
+	absPath=`pwd`
+	cd $cwd
+}
 
 # use the local development Tcl/Tk files and shared library
-TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@
+abs_path "`pwd`/../../../tclutil/tclutil/library"
+TCLUTIL_LIBRARY=$absPath
 export TCLUTIL_LIBRARY
 
-ASTROTCL_LIBRARY=@ASTROTCL_BUILD_LIBRARY@
+abs_path "`pwd`/../../../astrotcl/astrotcl/library"
+ASTROTCL_LIBRARY=$absPath
 export ASTROTCL_LIBRARY
 
-CAT_LIBRARY=@CAT_BUILD_LIBRARY@
+abs_path "`pwd`/../library"
+CAT_LIBRARY=$absPath
 export CAT_LIBRARY
+
+echo "CAT_LIBRARY=\t\t$CAT_LIBRARY"
+echo "TCLUTIL_LIBRARY=\t$TCLUTIL_LIBRARY"
+echo "ASTROTCL_LIBRARY=\t$ASTROTCL_LIBRARY"

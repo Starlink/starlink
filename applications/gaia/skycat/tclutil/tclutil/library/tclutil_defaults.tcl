@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: tclutil_defaults.tcl,v 1.5 1998/07/28 21:24:23 abrighto Exp $"
+# "@(#) $Id: tclutil_defaults.tcl,v 1.5 2005/02/02 01:43:02 brighton Exp $"
 #
 # defaults.tcl - set widget defaults
 #
@@ -11,6 +11,8 @@
 # set general widget defaults
 
 proc util::setXdefaults {} {
+    ::global tcl_version
+
     option add *foreground Black 
     option add *background #B2B2B2 
     option add *DisabledForeground Gray90
@@ -115,14 +117,27 @@ proc util::setXdefaults {} {
     # general bindings
 
     # make delete and backspace work like they should
-    bind Entry <Delete> {tkEntryBackspace %W}
-    bind Entry <BackSpace> {tkEntryBackspace %W}
-    bind Text <Delete> {tkEntryBackspace %W}
-    bind Text <BackSpace> {tkEntryBackspace %W}
+    if {$tcl_version > 8.3} {
+	# tk8.4+ version
+	bind Entry <Delete> {::tk::EntryBackspace %W}
+	bind Entry <BackSpace> {::tk::EntryBackspace %W}
+	bind Text <Delete> {::tk::EntryBackspace %W}
+	bind Text <BackSpace> {::tk::EntryBackspace %W}
+	bind Button <Return> { ::tk::ButtonInvoke %W }
+	bind Radiobutton <Return> { ::tk::CheckRadioInvoke %W }
+	bind Checkbutton <Return> { ::tk::CheckRadioInvoke %W }
+    } else {
+	# tk8.3 version
+	bind Entry <Delete> {tkEntryBackspace %W}
+	bind Entry <BackSpace> {tkEntryBackspace %W}
+	bind Text <Delete> {tkEntryBackspace %W}
+	bind Text <BackSpace> {tkEntryBackspace %W}
+	bind Button <Return> { tkButtonInvoke %W }
+	bind Radiobutton <Return> { tkCheckRadioInvoke %W }
+	bind Checkbutton <Return> { tkCheckRadioInvoke %W }
+    }
 
-    bind Button <Return> { tkButtonInvoke %W }
-    bind Radiobutton <Return> { tkCheckRadioInvoke %W }
-    bind Checkbutton <Return> { tkCheckRadioInvoke %W }
+
     bind Listbox <1> {+ focus %W }
     bind Listbox <3> { %W selection clear 0 end }
     bind Scale <ButtonPress-1> {+ focus %W }

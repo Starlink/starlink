@@ -11,8 +11,8 @@
  *
  */
 
-#include <tkInt.h>
 #include <tixPort.h>
+#include <tkInt.h>
 #include <tix.h>
 
 /*

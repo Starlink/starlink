@@ -16,11 +16,6 @@ libraries. The development environment here includes C++, Itcl, TclX,
 BLT and optionally other packages that can be linked in statically or
 dynamically as needed.
 
---------------------------------------------
-Contact: Allan Brighton (abrighto@eso.org)
-         ESO - European Southern Observatory
---------------------------------------------
-
 For installation instructions, see the file INSTALL in this directory.
 
 See the CHANGES file in this directory for a list of recent changes.
@@ -49,7 +44,7 @@ found at run time:
 For more information, please refer to the postscript documentation,
 which can be retrieved via anon ftp from:
 
-   ftp://ftp.archive.eso.org/pub/skycat/doc
+	ftp://ftp.eso.org/pub/archive/skycat/doc
 
 The sources for the man pages can be found in the source tree under
 the "man" directories.

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: Rtd.tcl,v 1.59 1999/03/11 21:00:22 abrighto Exp $"
+# "@(#) $Id: Rtd.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # Rtd.tcl - real-time image display application class
 # See man page Rtd(n) for a complete description.
@@ -16,6 +16,11 @@
 #                          added -panel_layout option to allow changing the
 #                          order of the zoom and pan windows in the layout
 #                          (default is the same as before, no change).
+# P.Biereichel 22/03/99    Added bias subtraction to real-time menu
+# P.Biereichel 04/08/99    Added itk_options -attach, -geometry
+#                          Added rtd_status and rtd_about
+# P.Biereichel 25/05/00    Added auto scale
+# P.Biereichel 20/04/04    Added $w_ to input_dialog in method set_camera
 
 itk::usual Rtd {}
 
@@ -58,10 +63,14 @@ itcl::class rtd::Rtd {
 	if {$itk_option(-number) == 1} {
 	    setXdefaults
 	}
+	wm protocol $w_ WM_DELETE_WINDOW "[code $this close]"
 
 	feedback "initializing user interface..."
-
-	wm title $w_ "Rtd - Real-Time Image Display, version [rtd_version] ($itk_option(-number))"
+	if {"$itk_option(-number)" == "1"} {
+	    wm title $w_ "Rtd - Real-Time Display, version [rtd_version]"
+	} else {
+	    wm title $w_ "Rtd - Real-Time Display, version [rtd_version] ($itk_option(-number))"
+	}
 	wm iconname $w_ Rtd
 	
 	# set rtd camera if not set on command line, default to environment var
@@ -88,12 +97,12 @@ itcl::class rtd::Rtd {
 	    # optional RtdImage image icon
 	    itk_component add icon {
 		rtd::RtdImageIcon $w_.icon \
-		    -image $itk_component(image) \
-		    -usexshm $itk_option(-usexshm) \
-                    -usexsync $itk_option(-usexsync) \
-		    -verbose $itk_option(-verbose) \
-		    -subsample $itk_option(-subsample) \
-		    -center 0
+			-image $itk_component(image) \
+			-usexshm $itk_option(-usexshm) \
+			-usexsync $itk_option(-usexsync) \
+			-verbose $itk_option(-verbose) \
+			-subsample $itk_option(-subsample) \
+			-center 0
 	    }
 	    wm iconwindow $w_ $w_.icon
 	}
@@ -109,13 +118,17 @@ itcl::class rtd::Rtd {
 	    set prog [file rootname [file tail $argv0]]
 	    catch {
 		puts "\n$prog: unable to allocate enough colors for image display \
-                      in the default colormap - using a private colormap. If this \
-                      causes any problems with color flashing, try exiting other \
-                      color intensive applications (such as netscape) first\n"
+			in the default colormap - using a private colormap. If this \
+			causes any problems with color flashing, try exiting other \
+			color intensive applications (such as netscape) first\n"
 	    }
 	}
+	if {$attach_} {
+	    after idle [code $this attach_camera]
+	} else {
+	    after idle "$itk_component(image) updateCameraStatus $itk_option(-camera)"
+	}
     }
-
     
     # this method can be redefined in a subclass to get feedback during
     # startup
@@ -141,44 +154,56 @@ itcl::class rtd::Rtd {
 	# RtdImageCtrl(n) widget containing image and control panel.
 	itk_component add image {
 	    rtd::RtdImageCtrl $image_ \
-		-file $itk_option(-file) \
-		-usexshm $itk_option(-usexshm) \
-                -usexsync $itk_option(-usexsync) \
-		-verbose $itk_option(-verbose) \
-		-shm_header $itk_option(-shm_header) \
-		-shm_data $itk_option(-shm_data) \
-		-min_colors $itk_option(-min_colors) \
-		-max_colors $itk_option(-max_colors) \
-		-drag_scroll $itk_option(-drag_scroll) \
-		-scrollbars $itk_option(-scrollbars) \
-		-subsample $itk_option(-subsample) \
-		-use_zoom_view $itk_option(-use_zoom_view) \
-		-zoom_view_propagate $itk_option(-zoom_view_propagate) \
-		-with_zoom_window $itk_option(-with_zoom_window) \
-		-dozoom $itk_option(-dozoom) \
-		-with_pan_window $itk_option(-with_pan_window) \
-		-zoom_factor $itk_option(-zoom_factor) \
-		-zoom_width $itk_option(-zoom_width) \
-		-zoom_height $itk_option(-zoom_height) \
-		-pan_width $itk_option(-pan_width) \
-		-pan_height $itk_option(-pan_height) \
-		-colorramp_height $itk_option(-colorramp_height) \
-		-color_scale $itk_option(-color_scale) \
-		-default_cmap $itk_option(-default_cmap) \
-		-default_itt $itk_option(-default_itt) \
-		-with_colorramp $itk_option(-with_colorramp) \
-		-rapid_frame_command [code $this rapid_frame_command] \
-		-feedback [code $this feedback] \
-		-port $itk_option(-port) \
-		-shorthelpwin $this \
-		-debug $itk_option(-debug) \
-		-float_panel $itk_option(-float_panel) \
-		-panel_layout $itk_option(-panel_layout) \
-		-with_grid $itk_option(-with_grid) \
-		-with_warp $itk_option(-with_warp) \
-		-min_scale $itk_option(-min_scale) \
-		-max_scale $itk_option(-max_scale) \
-		-pickobjectorient $itk_option(-pickobjectorient)
+		    -file $itk_option(-file) \
+		    -usexshm $itk_option(-usexshm) \
+		    -usexsync $itk_option(-usexsync) \
+		    -verbose $itk_option(-verbose) \
+		    -shm_header $itk_option(-shm_header) \
+		    -shm_data $itk_option(-shm_data) \
+		    -min_colors $itk_option(-min_colors) \
+		    -max_colors $itk_option(-max_colors) \
+		    -drag_scroll $itk_option(-drag_scroll) \
+		    -scrollbars $itk_option(-scrollbars) \
+		    -subsample $itk_option(-subsample) \
+		    -sampmethod $itk_option(-sampmethod) \
+		    -use_zoom_view $itk_option(-use_zoom_view) \
+		    -zoom_view_propagate $itk_option(-zoom_view_propagate) \
+		    -with_zoom_window $itk_option(-with_zoom_window) \
+		    -dozoom $itk_option(-dozoom) \
+		    -with_pan_window $itk_option(-with_pan_window) \
+		    -zoom_factor $itk_option(-zoom_factor) \
+		    -zoom_width $itk_option(-zoom_width) \
+		    -zoom_height $itk_option(-zoom_height) \
+		    -pan_width $itk_option(-pan_width) \
+		    -pan_height $itk_option(-pan_height) \
+		    -colorramp_height $itk_option(-colorramp_height) \
+		    -color_scale $itk_option(-color_scale) \
+		    -default_cmap $itk_option(-default_cmap) \
+		    -default_itt $itk_option(-default_itt) \
+		    -with_colorramp $itk_option(-with_colorramp) \
+		    -rapid_frame_command [code $this rapid_frame_command] \
+		    -feedback [code $this feedback] \
+		    -port $itk_option(-port) \
+		    -shorthelpwin $this \
+		-debug [expr {$itk_option(-debug) != 0}] \
+		    -camera $itk_option(-camera) \
+		    -float_panel $itk_option(-float_panel) \
+		    -panel_layout $itk_option(-panel_layout) \
+		    -panel_orient $itk_option(-panel_orient) \
+		    -with_grid $itk_option(-with_grid) \
+		    -with_warp $itk_option(-with_warp) \
+		    -min_scale $itk_option(-min_scale) \
+		    -max_scale $itk_option(-max_scale) \
+		    -pickobjectorient $itk_option(-pickobjectorient) \
+		    -updatePick $itk_option(-updatePick) \
+		    -xscale $itk_option(-xscale) \
+		    -yscale $itk_option(-yscale) \
+		    -image_directory $itk_option(-image_directory)
+	}
+	# If this is a cloned widget, use a different image name
+	if {[cget -number] > 1} {
+	    $itk_component(image) config -name \
+		    "[$itk_component(image) cget -name][cget -number]"
 	}
     }
 
@@ -194,6 +219,7 @@ itcl::class rtd::Rtd {
 	add_view_menu
 	add_graphics_menu
 	add_realtime_menu
+	add_help_menu
     }
 
 
@@ -203,54 +229,61 @@ itcl::class rtd::Rtd {
 	set m [add_menubutton File]
 
 	add_short_help $itk_component(menubar).file \
-	    {File menu: load, save, print, clear image, new window, exit application}
+		{File menu: load, save, print, clear image, new window, exit application}
 
 	add_menuitem $m command "Open..." \
-	    {Open and display an image file} \
-	    -command [code $image_ open] \
-	    -accelerator "Control-o"
+		{Open and display an image file} \
+		-command [code $image_ open] \
+		-accelerator "Control-o"
 
 	add_menuitem $m command "Reopen" \
-	    {Reload the image display after the image has changed on disk} \
-	    -command [code $image_ reopen] \
-	    -accelerator "Control-v"
+		{Reload the image display after the image has changed on disk} \
+		-command [code $image_ reopen] \
+		-accelerator "Control-v"
 
 	add_menuitem $m command "Save as..." \
-	    {Save the current image to a file} \
-	    -command [code $image_ save_as] \
-	    -accelerator "Control-s"
+		{Save the current image to a file} \
+		-command [code $image_ save_as] \
+		-accelerator "Control-s"
 
 	add_menuitem $m command "Save region as..." \
-	    {Save a section of the current image to a file} \
-	    -command [code $image_ save_region_as] \
-	    -accelerator "Control-S"
+		{Save a section of the current image to a file} \
+		-command [code $image_ save_region_as] \
+		-accelerator "Control-S"
 
 	add_menuitem $m command "Print..." \
-	    {Print the current image to a file or printer} \
-	    -command [code $image_ print] \
-	    -accelerator "Control-P"
+		{Print the current image to a file or printer} \
+		-command [code $image_ print] \
+		-accelerator "Control-P"
 
 	add_menuitem $m command Clear \
-	    {Clear the image display} \
-	    -command [code $this clear]
+		{Clear the image display} \
+		-command [code $this clear]
 
 	$m add separator
 
+        add_menuitem $m command "Bias Image..." \
+		{Control subtraction of a bias image} \
+		-command [code $image_ set_bias] \
+		-accelerator "Control-b"
+
+        $m add separator
+
 	add_menuitem $m command "New Window" \
-	    {Display up a new main window} \
-	    -command [code $this clone] \
-	    -accelerator "Control-n"
+		{Display up a new main window} \
+		-command [code $this clone] \
+		-accelerator "Control-n"
 
 	add_menuitem $m command "Close" \
-	    {Close the main window and exit if there are no more windows} \
-	    -command "after idle destroy $w_"
+		{Close the main window and exit if there are no more windows} \
+		-command [code $this close]
 
 	$m add separator
 
 	add_menuitem $m command Exit \
-	    {Exit the application} \
-	    -command [code $this quit] \
-	    -accelerator "Control-q"
+		{Exit the application} \
+		-command [code $this quit] \
+		-accelerator "Control-q"
     }
 
 
@@ -261,73 +294,86 @@ itcl::class rtd::Rtd {
 	set m [add_menubutton View]
 
 	add_short_help $itk_component(menubar).view \
-	    {View menu: manipulate colors, cut levels, pixel info}
+		{View menu: manipulate colors, cut levels, pixel info}
 
 	add_menuitem $m command "Colors..." \
-	    {Display a window for manipulating the image colormap} \
-	    -command [code $image_ set_colors] \
-	    -accelerator "Control-c"
+		{Display a window for manipulating the image colormap} \
+		-command [code $image_ set_colors] \
+		-accelerator "Control-c"
 
 	add_menuitem $m command "Cut Levels..." \
-	    {Display a window for manipulating the image cut levels} \
-	    -command [code $image_ component info cut_level_dialog] \
-	    -accelerator "Control-l"
+		{Display a window for manipulating the image cut levels} \
+		-command [code $image_ component info cut_level_dialog] \
+		-accelerator "Control-l"
 
 	add_menuitem $m command "Cuts..." \
-	    {Display a graph of pixel values along a line drawn interactively over the image} \
-	    -command [code $image_ spectrum] \
-	    -accelerator "Control-u"
+		{Display a graph of pixel values along a line drawn interactively over the image} \
+		-command [code $image_ spectrum] \
+		-accelerator "Control-u"
 
 	add_menuitem $m command "Pick Object..." \
-	    {Select an object or star in the image and display statistics} \
-	    -command [code $image_ pick_dialog] \
-	    -accelerator "Control-p"
+		{Select an object or star in the image and display statistics} \
+		-command [code $image_ pick_dialog] \
+		-accelerator "Control-p"
 
 	add_menuitem $m command "Fits header..." \
-	    {Display the FITS header for the current image} \
-	    -command [code $image_ view_fits_header] \
-	    -accelerator "Control-f"
+		{Display the FITS header for the current image} \
+		-command [code $image_ view_fits_hdu_header] \
+		-accelerator "Control-f"
 
 	# XXX note: the WCS Info impl. still needs work to display the 
 	# correct values (setting values is OK)
-	#
-	#add_menuitem $m command "WCS Info..." \
-	#    {Set/Display World Coordinate information for the current image} \
-	#   -command [code $image_ wcs_info_dialog]
+	# pbiereic: Let's wait for an SPR
+	add_menuitem $m command "WCS Info..." \
+		{Set/Display World Coordinate information for the current image} \
+		-command [code $image_ wcs_info_dialog]
 
 	add_menuitem $m cascade "Pixel Table..." \
-	    {Display a table of pixel values surrounding the mouse cursor} \
-	    -menu [menu $m.pix]
+		{Display a table of pixel values surrounding the mouse cursor} \
+		-menu [menu $m.pix]
 	$m.pix add command -label "3x3" -command [code $image_ pixel_table 3 3]
 	$m.pix add command -label "5x5" -command [code $image_ pixel_table 5 5]
 	$m.pix add command -label "7x7" -command [code $image_ pixel_table 7 7]
 	$m.pix add command -label "9x9" -command [code $image_ pixel_table 9 9]
 
 	add_menuitem $m cascade "Magnification" \
-	    {Set the magnification factor of the image display} \
-	    -menu [menu $m.mag]
+		{Set the magnification factor of the image display} \
+		-menu [menu $m.mag]
 	after idle [code $itk_component(image) component info component trans fill_mag_menu $m.mag]
 
 	$m add separator
 
 	if { ! $itk_option(-float_panel) } {
 	    add_menuitem $m checkbutton "Hide Control Panel" \
-		{Toggle the visibility of the upper control panel} \
-		-variable $w_.hide_control_panel -onvalue 1 -offvalue 0 \
-		-command [code $image_ hide_control_panel $w_.hide_control_panel]
+		    {Toggle the visibility of the upper control panel} \
+		    -variable $w_.hide_control_panel -onvalue 1 -offvalue 0 \
+		    -command [code $image_ hide_control_panel $w_.hide_control_panel]
 	}
 
 	add_menuitem $m checkbutton "Hide Popup Windows" \
-	    {Toggle the visibility of the popup windows} \
-	    -variable $w_.hide_windows -onvalue 1 -offvalue 0 \
-	    -command [code $this hide_windows $w_.hide_windows]
+		{Toggle the visibility of the popup windows} \
+		-variable $w_.hide_windows -onvalue 1 -offvalue 0 \
+		-command [code $this hide_windows $w_.hide_windows]
 
 	if {0} {
-	add_menuitem $m checkbutton "Show Grid" \
-	    {Toggle the visibility of the image ra,dec grid} \
-	    -variable $w_.image.grid -onvalue 1 -offvalue 0 \
-	    -command [code $image_ show_grid $w_.image.grid]
+	    add_menuitem $m checkbutton "Show Grid" \
+		    {Toggle the visibility of the image ra,dec grid} \
+		    -variable $w_.image.grid -onvalue 1 -offvalue 0 \
+		    -command [code $image_ show_grid $w_.image.grid]
 	}
+
+        $m add separator
+        
+        add_menuitem $m checkbutton "Auto scale" \
+                {Scale the image to the max. visible size} \
+                -variable $w_.autoscale -onvalue 1 -offvalue 0 \
+                -command [code $image_ autoscale $w_.autoscale]
+
+	$m add separator
+
+	add_menuitem $m command "Select FITS HDU..." \
+	    {Display the available FITS HDUs (header/data units) and select the current HDU} \
+	    -command [code $image_ display_fits_hdus]
     }
 
 
@@ -337,12 +383,12 @@ itcl::class rtd::Rtd {
 	set m [add_menubutton Graphics]
 
 	add_short_help $itk_component(menubar).graphics \
-	    {Graphics menu: display graphics window or set graphics options}
+		{Graphics menu: display graphics window or set graphics options}
 
 	add_menuitem $m command "Toolbox..." \
-	    {Display the graphics toolbox for drawing on the image} \
-	    -command [code $image_ show_toolbox] \
-	    -accelerator "Control-t"
+		{Display the graphics toolbox for drawing on the image} \
+		-command [code $image_ show_toolbox] \
+		-accelerator "Control-t"
 
 	$m add separator
 
@@ -350,9 +396,9 @@ itcl::class rtd::Rtd {
 	$m add separator
 
 	add_menuitem $m checkbutton "Hide Graphics" \
-	    {Toggle the visibility of the image line graphics} \
-	    -variable $w_.hide_graphics -onvalue 1 -offvalue 0 \
-	    -command [code $image_ hide_graphics $w_.hide_graphics]
+		{Toggle the visibility of the image line graphics} \
+		-variable $w_.hide_graphics -onvalue 1 -offvalue 0 \
+		-command [code $image_ hide_graphics $w_.hide_graphics]
     }
 
 
@@ -362,34 +408,34 @@ itcl::class rtd::Rtd {
 	set m [add_menubutton "Real-time"]
 
 	add_short_help $itk_component(menubar).real-time \
-	    {Real-time menu: real-time display commands. rapid frame}
+		{Real-time menu: real-time display commands. rapid frame}
 
 	add_menuitem $m command "Attach Camera" \
-	    {Attach the real-time camera - start receiving images} \
-	    -command [code $this attach_camera] \
-	    -accelerator "Control-a"
+		{Attach the real-time camera - start receiving images} \
+		-command [code $this attach_camera] \
+		-accelerator "Control-a"
 
 	add_menuitem $m command "Detach Camera" \
-	    {Detach the real-time camera - stop receiving images} \
-	    -command [code $this detach_camera] \
-	    -accelerator "Control-d"
+		{Detach the real-time camera - stop receiving images} \
+		-command [code $this detach_camera] \
+		-accelerator "Control-d"
 
 	add_menuitem $m command "Set Camera..." \
-	    {Set the real-time camera name} \
-	    -command [code $this set_camera]
+		{Set the real-time camera name} \
+		-command [code $this set_camera]
 
 	$m add separator
 
 	add_menuitem $m cascade "Rapid Frame" \
-	    {Create a rapid frame by interactively drawing a rectangle on the image} \
-	    -menu [menu $m.rapid]
+		{Create a rapid frame by interactively drawing a rectangle on the image} \
+		-menu [menu $m.rapid]
 
 	$m.rapid add command -label "In Canvas" \
-	    -command [code $image_ rapid_frame 0]
+		-command [code $image_ rapid_frame 0]
 	$m.rapid add command -label "In Separate Window" \
-	    -command [code $image_ rapid_frame 1]
+		-command [code $image_ rapid_frame 1]
 	$m.rapid add command -label "Delete Rapid Frame" \
-	    -command [code $image_ delete_rapid_frame]
+		-command [code $image_ delete_rapid_frame]
 
 	$m add separator
 
@@ -397,25 +443,41 @@ itcl::class rtd::Rtd {
 	set $w_.preview_mode 0
 
 	add_menuitem $m checkbutton "Preview Mode" \
-	    {Preview mode: copy the real-time image from shared memory to local memory} \
-	    -variable $w_.preview_mode -onvalue 1 -offvalue 0 \
-	    -command [code $image_ preview $w_.preview_mode]
+		{Preview mode: copy the real-time image from shared memory to local memory} \
+		-variable $w_.preview_mode -onvalue 1 -offvalue 0 \
+		-command [code $image_ preview $w_.preview_mode]
 
         $m add separator
 
         add_menuitem $m command "Record/Playback Images..." \
-            {Record and playback real time images} \
-            -command [code $this record]
+		{Record and playback real time images} \
+		-command [code $this record]
 
 	if {$itk_option(-with_perftest)} {
 	    $m add separator
 	    
 	    add_menuitem $m command "Performance..." \
-		{Performance test: enable interactive performance test parameters} \
-		-command [code $image_ perftest]
+		    {Performance test: enable interactive performance test parameters} \
+		    -command [code $image_ perftest]
 	}
     }
 
+    # add a menubutton with help items
+
+    protected method add_help_menu {} {
+        set m [add_menubutton "Help" {} right]
+
+        add_menuitem $m command "Status..." \
+		{Display a window with status information} \
+		-command [code $this rtd_status]
+
+        add_menuitem $m command "About Rtd..." \
+		{Display a window with information about this Rtd version} \
+		-command [code $this rtd_about]
+
+        add_short_help $itk_component(menubar).help \
+		{Help menu: display information about this application}
+    }
 
     # make a new main window
 
@@ -426,49 +488,62 @@ itcl::class rtd::Rtd {
     }
 
 
+    # close the application
+
+    public method close {} {
+	delete object $this
+    }
+
     # quit the application
 
     public method quit {} {
 	delete object $this
-	# destroy $w_
+	after idle exit
     }
 
     # attach the current camera
 
     public method attach_camera {} {
-	$image_ attach_camera $itk_option(-camera)
-
 	# debug: for testing
-	if {$itk_option(-debug)} {
-	    catch {kill $rapid_pid_}
-	    if {[catch {set rapid_pid_ \
-			    [exec $itk_option(-testprog) \
-				 -v $itk_option(-verbose) \
-				 -t $itk_option(-interval) &]} msg]} {
-				     error_dialog "error starting $itk_option(-testprog): $msg"
-				 }
-	    } 
+	if {$itk_option(-debug) == 1} {
+	    utilReUseWidget rtd::tRtd $w_.tRtd \
+		    -camera $itk_option(-camera) \
+		    -rtdimage $image_ \
+		    -testprog [cget -testprog] \
+		    -interval $itk_option(-interval)
 	}
- 
+	$image_ attach_camera $itk_option(-camera)
+	$itk_component(image) updateCameraStatus $itk_option(-camera)
+    }
+	
     # detach the current camera
 
     public method detach_camera {} {
-	# debug: for testing
-	if {$itk_option(-debug)} {
-	    catch {kill $rapid_pid_}
+	if {$itk_option(-debug) && [winfo exists $w_.tRtd]} {
+	    $w_.tRtd close
+	} else {
+	    $image_ detach_camera
 	}
-
-        $image_ detach_camera
+	$itk_component(image) updateCameraStatus $itk_option(-camera)
     }
- 
+    
 
     # popup a window to query for new camera
     
     public method set_camera {} {
-        set cam [input_dialog "The current camera is: \"$itk_option(-camera)\"\n\n\
-                               Please enter a new camera name:"]
+	set sts [[$image_ get_image] camera attach]
+	if {$sts} {
+	    set s "\"$itk_option(-camera)\" is attached"
+	} else {
+	    set s "\"$itk_option(-camera)\" is detached"
+	}
+        set cam [input_dialog "The current camera is: \"$itk_option(-camera)\"\n$s\n\
+		Please enter a new camera name:" $w_]
         if { $cam != "" } {
             configure -camera $cam
+	    if {$sts} {
+		attach_camera
+	    }
         }
     }
 
@@ -516,24 +591,87 @@ itcl::class rtd::Rtd {
     #  w, h = dimensions of frame.
 
     protected method rapid_frame_command {frameId name op x y w h} {
-	if {$itk_option(-debug)} {
-	    catch {kill $rapid_pid_}
-	    if {"$op" != "delete"} {
-		set im [$image_ get_image] 
-		$im convert dist $x $y canvas ix iy image
-		$im convert dist $w $h canvas iw ih image
-		if {[catch {set rapid_pid_ [exec $itk_option(-testprog) \
-						-v $itk_option(-verbose) \
-						-t $itk_option(-interval) \
-						-x $ix -y $iy -w $iw -h $ih -f $frameId &]} msg]} {
-		    error_dialog "error starting $itk_option(-testprog): $msg"
-		} else {
-		    	$image_ attach_camera $itk_option(-camera)
-		}
-	    } 
+	if {! $itk_option(-debug)} { return }
+
+	catch {kill $rapid_pid_}
+	if {"$op" == "delete"} { return }
+
+	set im [$image_ get_image] 
+	$im convert dist $x $y canvas ix iy image
+	$im convert dist $w $h canvas iw ih image
+	if {[catch {set rapid_pid_ [exec $itk_option(-testprog) \
+		-v $itk_option(-verbose) \
+		-t $itk_option(-interval) \
+		-x $ix -y $iy -w $iw -h $ih -f $frameId &]} msg]} {
+	    error_dialog "error starting $itk_option(-testprog): $msg"
+	} else {
+	    $image_ attach_camera $itk_option(-camera)
 	}
     }
 
+    
+    # display a popup window with status information
+    
+    public method rtd_status {} {
+	set t1 "Rtd [package versions Rtd], Status"
+	set s1 "Object:\t\t[[$image_ get_image] object]"
+	set s2 "Camera name:\t[cget -camera]"
+	if {[[$image_ get_image] camera attach]} {
+	    set s3 "Camera:\t\tattached"
+	} else {
+	    set s3 "Camera:\t\tdetached"
+	}
+        DialogWidget $w_.rtd_status \
+		-messagewidth 6i \
+		-justify left \
+		-text "$t1\n\n$s1\n$s2\n$s3" \
+		-title "Status"
+        $w_.rtd_status activate
+    }
+    
+    # display a popup window with information about Rtd
+    
+    public method rtd_about {} {
+	global tcl_pkgPath rtd_library tclutil_library astrotcl_library
+
+        set rtdLoaded {}
+        foreach d [info loaded] {
+            if {[lsearch $d Rtd] != -1} {
+                set rtdLoaded [lindex $d 0]
+                break
+            }
+        }
+
+	set t1 "Rtd version:\t[package versions Rtd]"
+	set t2 "Rtd shared library:\t[abs_path $rtdLoaded]"
+	set t3 "Rtd library path:\t[abs_path $rtd_library]"
+	set t4 "Tclutil lib path:\t[abs_path $tclutil_library]"
+	set t5 "Astrotcl lib path:\t[abs_path $astrotcl_library]"
+	set t6 "Tcl version:\t[info patchlevel]"
+	set t7 "Tcl package path:\t$tcl_pkgPath"
+	set t8 "Package versions:\t"
+	foreach el "Tclx Itcl Itk Tkx BLT" {
+	    set t8 "$t8$el[package versions $el] "
+	}
+        DialogWidget $w_.rtd_about \
+		-messagewidth 12i \
+		-justify left \
+		-text "$t1\n$t2\n$t3\n$t4\n$t5\n$t6\n$t7\n$t8" \
+		-title "About"
+        $w_.rtd_about activate
+    }
+
+    # return absolute pathname
+
+    protected method abs_path { path } {
+        set dir [file dirname $path]
+        set tail [file tail $path]
+        set cwd [pwd]
+        set err [catch {set adir [cd $dir ; pwd]}]
+        cd $cwd
+        if { $err } { return $path }
+        return [file join $adir $tail]
+    }
     
     # -- public variables (also program options) -- 
 
@@ -569,8 +707,19 @@ itcl::class rtd::Rtd {
     itk_option define -verbose verbose Verbose {0}
 
     # flag: if true, use faster subsampling algorithm when shrinking images,
-    # otherwise use max pixel algorithm
-    itk_option define -subsample subsample Subsample {1}
+    # otherwise use a pixel algorithm defined by option -sampmethod
+    itk_option define -subsample subsample Subsample {1} {
+	if {[info exists itk_component(image)]} {
+	    $itk_component(image) config -subsample $itk_option(-subsample)
+	}
+    }
+
+    # sampling method to used when option -subsample is 0
+    itk_option define -sampmethod sampmethod Sampmethod {0} {
+	if {[info exists itk_component(image)]} {
+	    $itk_component(image) config -sampmethod $itk_option(-sampmethod)
+	}
+    }
 
     # default (midas) colormap
     itk_option define -default_cmap default_cmap Default_cmap {real}
@@ -579,13 +728,20 @@ itcl::class rtd::Rtd {
     itk_option define -default_itt default_itt Default_itt {ramp}
 
     # camera name: default: $env(RTD_CAMERA), if set, otherwise RTDSIMULATOR
-    itk_option define -camera camera Camera {}
+    itk_option define -camera camera Camera {} {
+	if {[info exists itk_component(image)]} {
+	    $itk_component(image) updateCameraStatus $itk_option(-camera)
+	}
+    }
 
     # Panel layout order: set to one of {saoimage reverse default}
     # to change the layout ordering of the panel windows.
     # "saoimage" puts the info first, followed by pan and zoom,
     # "reverse" reverses the default order, which is {zoom info pan}.
     itk_option define -panel_layout panel_layout Panel_layout {}
+
+    # Panel orient: one of {horizontal vertical} (default: horizontal)
+    itk_option define -panel_orient panel_orient Panel_orient {}
 
     # zooming factor
     itk_option define -zoom_factor zoom_factor Zoom_factor 4
@@ -639,13 +795,17 @@ itcl::class rtd::Rtd {
 
     # default port for remote connections (0 means system chooses a port)
     itk_option define -port port Port 0
-   
+    
     # debugging flag: enables real-time simulation with $testProg (below)
     itk_option define -debug debug Debug 0 {
         global ::env
-        if {$itk_option(-debug) != 0} {
-            set env(RTD_CAMERA) rtdtest
-            configure -camera rtdtest
+        if {$itk_option(-debug) == 1} {
+	    set cam rtdtest
+	    if {[cget -number] > 1} {
+		set cam "$cam[cget -number]"
+	    }
+            set env(RTD_CAMERA) $cam
+            configure -camera $cam
         }
     }
 
@@ -680,6 +840,35 @@ itcl::class rtd::Rtd {
     # -orient option for Pick Object window
     itk_option define -pickobjectorient pickObjectOrient PickObjectOrient {vertical}
 
+    # option to update RtdImagePick after a real-time image event
+    itk_option define -updatePick updatePick UpdatePick {1}
+
+    # default scaling factor
+    itk_option define -xscale xscale Xscale 1
+    itk_option define -yscale yscale Yscale 1
+
+    # attach to camera
+    itk_option define -attach attach Attach {0} {
+	set attach_ [cget -attach]
+    }
+
+    # Rtd's window geometry
+    itk_option define -rtd_geometry rtd_geometry Rtd_geometry {} {
+	if {"$itk_option(-rtd_geometry)" != ""} {
+	    after idle [code "wm geometry $w_ $itk_option(-rtd_geometry)"]
+	}
+    }
+
+    # Rtd's window title
+    itk_option define -rtd_title rtd_title Rtd_title {} {
+	if {"$itk_option(-rtd_title)" != ""} {
+	    after idle [code "wm title $w_ {$itk_option(-rtd_title)}"]
+	}
+    }
+
+    # Default directory for loading images
+    itk_option define -image_directory image_directory Image_directory {}
+
     # -- protected variables -- 
 
     # name of main image (class RtdImageCtrl or a derived class)
@@ -687,4 +876,7 @@ itcl::class rtd::Rtd {
 
     # pid of test prog used to generate rapid frames (debug)
     protected variable rapid_pid_
+
+    # attach to camera after widget was initialized
+    protected variable attach_ 0
 }

@@ -3,7 +3,7 @@
 #define _ITTInfo_h_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.h,v 1.4 1998/09/28 21:54:26 abrighto Exp $" 
+ * "@(#) $Id: ITTInfo.h,v 1.4 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ITTInfo.h - class definitions for reading in ITT 
  *             (intensity transfer table) files
@@ -13,10 +13,12 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <sys/types.h>
-#include <iostream.h>
+#include <iostream>
 
 enum {MAX_ITT=256};            /* work with 8bit color */
 

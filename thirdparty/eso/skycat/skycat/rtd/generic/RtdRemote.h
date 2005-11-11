@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdRemote.h,v 1.5 1999/03/19 20:09:32 abrighto Exp $" 
+ * "@(#) $Id: RtdRemote.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
  *
  * RtdRemote.h - class definitions for managing remote access to the RTD
  * 
@@ -15,7 +15,8 @@
  * Allan Brighton  04/03/96  Created
  */
 
-#include <tk.h>
+#include "config.h"
+#include "tk.h"
 
 
 /*

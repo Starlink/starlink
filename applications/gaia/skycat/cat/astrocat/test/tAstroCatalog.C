@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * $Id: tAstroCatalog.C,v 1.5 1998/02/02 20:18:52 abrighto Exp $
+ * $Id: tAstroCatalog.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tAstroCatalog.C - test cases for class AstroCatalog
  * 
@@ -10,7 +10,7 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "AstroCatalog.h"
@@ -37,64 +37,64 @@ main()
     q.radius(10);
     q.maxRows(10);
 
-    cout << "Query GSC for objects at pos " 
+    std::cout << "Query GSC for objects at pos " 
 	 << q.pos() << ", in radius " 
 	 << q.radius1() << ".." << q.radius2() 
 	 << ":" 
-	 << endl;
+	 << std::endl;
 
     QueryResult result;
     int num_results = cat->query(q, "./tAstroCatalog.out", result);
     if (num_results < 0) {
-	cout << "Query returned an error\n";
+	std::cout << "Query returned an error\n";
 	exit(1);
     }
 
-    cout << "Query returns: " 
+    std::cout << "Query returns: " 
 	 << num_results 
 	 << " objects, out of " 
 	 << q.maxRows() 
 	 << " requested" 
-	 << endl;
+	 << std::endl;
 
-    cout << "More objects ?: " 
+    std::cout << "More objects ?: " 
 	 << (cat->more() ? "YES" : "NO") 
-	 << endl;
+	 << std::endl;
 
-    cout << "---Result List---" 
-	 << endl;
+    std::cout << "---Result List---" 
+	 << std::endl;
 
     int ncols = cat->numCols();
     int i, j;
-    cout << "columns:\n";
+    std::cout << "columns:\n";
     for (i = 0; i < ncols; i++) 
-	cout << cat->colName(i) << "\t";
-    cout << "\n\nresults:\n";
+	std::cout << cat->colName(i) << "\t";
+    std::cout << "\n\nresults:\n";
 
     char* s;
     for (i = 0; i < num_results; i++) {
 	// print the Id
 	if (result.get(i, 0, s) == 0)
-	    cout << s << "\t";
+	    std::cout << s << "\t";
 	else
-	    cout << "ERROR\t";
+	    std::cout << "ERROR\t";
 	    
 	// print the position in H:M:S+D:M:S
 	if (result.getPos(i, pos) == 0)
-	    cout << pos.ra() << "\t" << pos.dec() << "\t";
+	    std::cout << pos.ra() << "\t" << pos.dec() << "\t";
 	else
-	    cout << "ERROR\t";
+	    std::cout << "ERROR\t";
 
 	// print the other columns
 	for (j = 3; j < ncols; j++) {
 	    if (result.get(i, j, s) == 0)
-		cout << s << "\t";
+		std::cout << s << "\t";
 	    else
-		cout << "ERROR\t";
+		std::cout << "ERROR\t";
 	}
-	cout << endl;
+	std::cout << std::endl;
     }
-    cout << "-----------------" << endl;
+    std::cout << "-----------------" << std::endl;
     
     return 0;
 }

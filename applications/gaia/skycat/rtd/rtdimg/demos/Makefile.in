@@ -1,63 +1,62 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.8 1997/12/03 22:27:12 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 
 # ------------------------------------------------------------------------
 # 	Makefile for RTD demo directory
 # ------------------------------------------------------------------------
 
-INSTALL      = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-RTD_DIR      = @RTD_DIR@
-BINDIR       = @BINDIR@
-RM           = rm -f
-SHELL        = /bin/sh
-
 # starter shell script
-SCRIPTS      = rtd.sh
+START_SCRIPT = rtd.sh
 
-# symbolic links to install for Tcl apps
-TCL_LINKS    = rtd rtdctrl
+# local Tcl applications
+TCL_APPS     = rtd rtdctrl rmipc
+
+# local Tcl applications to install
+INST_TCL_APPS  = rtd
 
 # other files to install
-FILES        = rtd.tcl rtdctrl.tcl Xdefaults 
+FILES        = Xdefaults
 
+do_all: tcl_apps
+	@rm -f test.fits; ln -s ../images/ngc1275.fits test.fits
 
-all: tcl_links
-
-# make links to the startup script for starting the Tcl applications
-tcl_links:
-	@for i in $(TCL_LINKS); do rm -f $$i; ln -s rtd.sh $$i; done
-	@rm -f test.gzfits; ln -s ../images/ngc1275.gzfits test.gzfits
-
-All: 
-	cd ..; $(MAKE)
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo '#!/bin/sh' > $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    echo '# E.S.O. - VLT project' >> $$i; \
+	    echo "# $$i version @RTD_VERSION@" >> $$i; \
+	    echo "# Installation date: `date`" >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $(START_SCRIPT) | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl >> $$i; \
+	    chmod +x $$i ; \
+	done
 
 install-top:
 	@test -d $(BINDIR) || mkdir $(BINDIR) 
-	@test -d $(RTD_DIR) || mkdir $(RTD_DIR) 
-	@test -d $(RTD_DIR)/demos || mkdir $(RTD_DIR)/demos 
+	@test -d $(RTD_DIR) || mkdir $(RTD_DIR)
+	@test -d $(RTD_DIR)/demos || mkdir $(RTD_DIR)/demos
 
-install: install-top
-	@set -x; for i in $(SCRIPTS) ; do \
-	    $(INSTALL_DATA) -m 775 $$i $(RTD_DIR)/demos ; \
-	done 
-	@set -x; for i in $(FILES) ; do \
+do_install: install-top
+	@for i in $(FILES) ; do \
 	    $(INSTALL_DATA) -m 664 $$i $(RTD_DIR)/demos ; \
 	done 
-	@set -x; for i in $(TCL_LINKS); do \
-	    rm -f $(BINDIR)/$$i $(RTD_DIR)/demos/$$i; \
-	    (cd $(RTD_DIR)/demos; ln -s rtd.sh $$i) ; \
-	    (cd $(BINDIR); ln -s ../lib/rtd/demos/$$i $$i) ; \
+	@for i in $(INST_TCL_APPS); do \
+	    $(INSTALL_DATA) -m 775 $$i $(BINDIR)/$$i ; \
 	done
+	$(INSTALL_DATA) -m 775 tRemote.tcl $(RTD_DIR)/demos/tRemote
 
-clean:
-	$(RM) *\~ "#"* core
+do_clean:
+	$(RM) $(TCL_APPS)
 
-depend:
+do_distclean: clean
+	$(RM) $(START_SCRIPT) rtd_env.sh
 
-distclean: clean
-	rm -f Makefile rtd.sh
+include ../../makefile.mk
 
-man:

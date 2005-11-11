@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalogObject.C,v 1.6 1996/11/21 15:17:02 abrighto Exp $
+ * $Id: TcsCatalogObject.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
  *
  * TcsCatalogObject.C - method definitions for class TcsCatalogObject
  * 
@@ -10,26 +10,16 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.6 1996/11/21 15:17:02 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
 
-#include "config.h"  //  From skycat util
 
-#include <string.h>
-#include <stdlib.h>
-#include <iostream.h>
-#include <fstream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstring>
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "TcsCatalogObject.h"
 
 
@@ -178,7 +168,7 @@ TcsCatalogObject::~TcsCatalogObject()
 /*
  * output operator (Tcl list format)
  */
-ostream& operator<<(ostream& os, const TcsCatalogObject& t)
+std::ostream& operator<<(std::ostream& os, const TcsCatalogObject& t)
 {
     os << '{' << t.id_ << '}';
 
@@ -244,7 +234,7 @@ ostream& operator<<(ostream& os, const TcsCatalogObject& t)
 /*
  * print this object as a tab separated row
  */
-int TcsCatalogObject::printTableRow(ostream& os)
+int TcsCatalogObject::printTableRow(std::ostream& os)
 {
     char t = '\t';
     
@@ -264,7 +254,7 @@ int TcsCatalogObject::printTableRow(ostream& os)
        << preview_ << t
        << distance_ << t
        << pa_
-       << endl;
+       << std::endl;
     return 0;
 }
  
@@ -274,8 +264,9 @@ int TcsCatalogObject::printTableRow(ostream& os)
  */
 void TcsCatalogObject::print(char* buf, int bufsize) 
 {
-    STRSTD::ostrstream os(buf, bufsize);
-    os << *this << ends;
+    std::ostringstream os;
+    os << *this;
+    strncpy(buf, os.str().c_str(), bufsize);
 }
 
 
@@ -283,7 +274,7 @@ void TcsCatalogObject::print(char* buf, int bufsize)
  * print the headings to the given ostream 
  * to match the output of the above output operator (<<).
  */
-void TcsCatalogObject::printHeadings(ostream& os) 
+void TcsCatalogObject::printHeadings(std::ostream& os) 
 {
     for (int i = 0; i < numCols_; i++) {
 	os << colNames_[i];
@@ -299,9 +290,9 @@ void TcsCatalogObject::printHeadings(ostream& os)
  */
 void TcsCatalogObject::printHeadings(char* buf, int bufsize) 
 {
-    STRSTD::ostrstream os(buf, bufsize);
+    std::ostringstream os;
     printHeadings(os);
-    os << ends;
+    strncpy(buf, os.str().c_str(), bufsize);
 }
 
 

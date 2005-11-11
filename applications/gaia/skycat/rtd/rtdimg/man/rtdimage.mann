@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: rtdimage.mann,v 1.13 1998/09/30 10:15:32 abrighto Exp $" 
+# "@(#) $Id: rtdimage.mann,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -115,7 +115,7 @@ if the image is zoomed).
 
 Detector chip coordinates may be the same as image coordinates, but
 can also have an additional offset and/or binning factor. The FITS
-keywords "HIERARCH ESO DET WIN STRX" and "...STRY" are used for
+keywords "HIERARCH ESO DET WIN1 STRX" and "...STRY" are used for
 the offset, if present.
 
 The rtdimage "convert" subcommand can be used to convert between any

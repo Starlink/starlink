@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.5 1998/03/29 20:27:20 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
 #
 # Makefile.in
 #
@@ -18,4 +18,5 @@ RM		= rm -rf
 
 # all depend clean distclean install man : 
 
+include @SRC_ROOT@/makefile.mk
 include ../../man.mk

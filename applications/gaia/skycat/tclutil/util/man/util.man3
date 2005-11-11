@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: util.man3,v 1.1 1998/01/15 22:08:45 abrighto Exp $" 
+# "@(#) $Id: util.man3,v 1.2 2005/02/02 01:43:01 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 

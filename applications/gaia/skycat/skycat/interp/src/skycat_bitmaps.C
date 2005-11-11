@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: skycat_bitmaps.C,v 1.2 1998/03/12 20:19:02 abrighto Exp $"
+ * "@(#) $Id: skycat_bitmaps.C,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $"
  *
  * Tk Bitmap/Pixmap definitions
  *
@@ -16,4 +16,5 @@
 void defineSkycatBitmaps(Tcl_Interp *interp) {
     #include "skycat-logo.xpm"
     Tix_DefinePixmap(interp, Tk_GetUid("skycat_logo"), skycat_logo_xpm);
+
 }

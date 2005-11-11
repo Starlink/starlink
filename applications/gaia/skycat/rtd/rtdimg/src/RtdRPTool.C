@@ -13,6 +13,7 @@
  *			     changed names, added inheritance
  * P.Biereichel    07/07/97  Adapted for shared library. Code improved
  *                           and bugs fixed
+ * pbiereic        28/05/01  Included Allan's changes for tcl8.3.3
  */
 
 #include <unistd.h>
@@ -28,7 +29,12 @@ static Tk_ImageType rtdRecorderType = {
     RtdRecorder::DisplayImage,  /* displayProc */
     RtdRecorder::FreeImage,	/* freeProc */
     RtdRecorder::DeleteImage,	/* deleteProc */
-    (Tk_ImageType *)NULL	/* nextPtr */
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    (Tk_ImagePostscriptProc *) NULL,    /* postscriptProc */
+#endif
+
+    (Tk_ImageType *)NULL
 };
 
 static Tk_ImageType rtdPlaybackType = {
@@ -38,6 +44,11 @@ static Tk_ImageType rtdPlaybackType = {
     RtdPlayback::DisplayImage,
     RtdPlayback::FreeImage,
     RtdPlayback::DeleteImage,
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    (Tk_ImagePostscriptProc *) NULL,    /* postscriptProc */
+#endif
+
     (Tk_ImageType *)NULL
 };
 
@@ -301,14 +312,25 @@ void RtdRPTool::cleanup()
  *	TCL_OK
  */
 int RtdRecorder::CreateImage(
-    Tcl_Interp *interp,		// Interpreter for application containing image.
-    char *name,			// Name to use for image.
-    int argc,			// Number of arguments.
-    char **argv,		// Argument strings for options
-    Tk_ImageType *typePtr,	// Pointer to our type record (not used). 
+    Tcl_Interp *interp,         // Interpreter for application containing image.
+    char *name,                 // Name to use for image.
+    int argc,                   // Number of arguments.
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    Tcl_Obj *CONST objv[],      // Argument objects for options
+#else
+    char **argv,                // Argument strings for options
+#endif
+    Tk_ImageType *typePtr,      // Pointer to our type record (not used). 
     Tk_ImageMaster master,
     ClientData *clientDataPtr)
 {
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    // just generate an argv from the objv argument
+    char* argv[64];  // there shouldn't be more than a few options...
+    for(int i = 0; i < argc; i++)
+        argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
     RtdRecorder *im = new RtdRecorder(interp, name, argc, argv, master);
 
     return TCL_OK;
@@ -321,15 +343,15 @@ int RtdRecorder::CreateImage(
  *	As for RtdRPTool - arguments are just passed on to baseclass.
  */
 RtdRecorder::RtdRecorder(Tcl_Interp *interp, char *instname, int argc, char **argv, Tk_ImageMaster master) :
-  RtdRPTool(interp, instname, argc, argv, master),
-  fileFormat_(FITS_CUBE),
-  fileSize_(MAXFILESIZE),
-  attached_(0),
-  subImage_(0),
-  x0_(0),
-  y0_(0),
-  width_(0),
-  height_(0)
+    RtdRPTool(interp, instname, argc, argv, master),
+    fileFormat_(FITS_CUBE),
+    fileSize_(MAXFILESIZE),
+    attached_(0),
+    subImage_(0),
+    x0_(0),
+    y0_(0),
+    width_(0),
+    height_(0)
 {
     // Default camera name is RTDSIMULATOR.
     strcpy(camera_, "RTDSIMULATOR");
@@ -442,7 +464,7 @@ int RtdRecorder::record(int argc, char *argv[])
 
     if (!fileFormat_) {
         fprintf(stderr, "FileFormat object is NULL\n");
-      }
+    }
 
     // Set up an object to control the file handling. File will be opened
     // after the first image event.
@@ -465,13 +487,13 @@ int RtdRecorder::record(int argc, char *argv[])
     if (!attached_) {
     	if (rtdAttachImageEvt(eventHndl_, camera_, NULL) != RTD_OK) {
 	    return error("Error attaching camera to server");
-    	}
+	}
     }
     attached_ = 1;
 
     // Set up a file handler to detect the incoming image events.
     Tk_CreateFileHandler(eventHndl_->socket, TK_READABLE, fileEventProc, 
-	(ClientData)this);
+			 (ClientData)this);
 
     return TCL_OK;
 }
@@ -505,7 +527,7 @@ int RtdRecorder::stop(int argc, char *argv[])
 	rtdDetachImageEvt(eventHndl_, camera_, NULL);
 
 
-    // Get any outstanding images from the queue and process their semaphores.
+	// Get any outstanding images from the queue and process their semaphores.
 	if (rtdRecvImageInfo(eventHndl_, &imageInfo, 0, NULL) != RTD_ERROR) {
 	    rtdShmServicePacket(&imageInfo);
 	}
@@ -639,14 +661,26 @@ int RtdRecorder::subimage(int argc, char *argv[])
  *	TCL_OK
  */
 int RtdPlayback::CreateImage(
-    Tcl_Interp *interp,		// Interpreter for application containing image.
-    char *name,			// Name to use for image.
-    int argc,			// Number of arguments.
-    char **argv,		// Argument strings for options
-    Tk_ImageType *typePtr,	// Pointer to our type record (not used). 
+    Tcl_Interp *interp,         // Interpreter for application containing image.
+    char *name,                 // Name to use for image.
+    int argc,                   // Number of arguments.
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    Tcl_Obj *CONST objv[],      // Argument objects for options (not including image name or type)
+#else
+    char **argv,                // Argument strings for options (not including image name or type)
+#endif
+    Tk_ImageType *typePtr,      // Pointer to our type record (not used). 
     Tk_ImageMaster master,
     ClientData *clientDataPtr)
 {
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    // just generate an argv from the objv argument
+    char* argv[64];  // there shouldn't be more than a few options...
+    for(int i = 0; i < argc; i++)
+        argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
+
     RtdPlayback *im = new RtdPlayback(interp, name, argc, argv, master);
 
     return TCL_OK;
@@ -659,11 +693,11 @@ int RtdPlayback::CreateImage(
  *	As for RtdRPTool - arguments are just passed on to baseclass.
  */
 RtdPlayback::RtdPlayback(Tcl_Interp *interp, char *instname, int argc, char **argv, Tk_ImageMaster master) :
-  RtdRPTool(interp, instname, argc, argv, master),
-  direction_(1),
-  playSpeed_(SPEED_SLOW),
-  timer_((Tcl_TimerToken)-1),
-  spool_(0)
+    RtdRPTool(interp, instname, argc, argv, master),
+    direction_(1),
+    playSpeed_(SPEED_SLOW),
+    timer_((Tcl_TimerToken)-1),
+    spool_(0)
 {}
 
 /*
@@ -717,22 +751,22 @@ void RtdPlayback::makeTimeOut()
 
     // Determine time interval based on user requirements.
     switch(playSpeed_) {
-	case SPEED_SLOW:
-	    timePeriod = SLOWSPEED;
-	    break;
-	case SPEED_FAST:
-	    timePeriod = FASTSPEED;
-	    break;
-	case SPEED_RT:
-	    // In this case, the period reflects the timestamp data recorded
-	    // when the images were recorded.
-	    timePeriod = fileHandler->getTimeIncrement(direction_);
-	    break;
-	default:
-	    // Unknown speed type.
-	    fprintf(stderr, "Error: unknown replay speed type");
-	    timePeriod = SLOWSPEED;
-	    break;
+    case SPEED_SLOW:
+	timePeriod = SLOWSPEED;
+	break;
+    case SPEED_FAST:
+	timePeriod = FASTSPEED;
+	break;
+    case SPEED_RT:
+	// In this case, the period reflects the timestamp data recorded
+	// when the images were recorded.
+	timePeriod = fileHandler->getTimeIncrement(direction_);
+	break;
+    default:
+	// Unknown speed type.
+	fprintf(stderr, "Error: unknown replay speed type");
+	timePeriod = SLOWSPEED;
+	break;
     }
 
     // Invoke callback.

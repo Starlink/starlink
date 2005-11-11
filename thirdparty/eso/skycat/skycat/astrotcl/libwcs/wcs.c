@@ -1,5 +1,5 @@
 /*** File libwcs/wcs.c
- *** September 29, 1998
+ *** July 3, 2000
  *** By Doug Mink, Harvard-Smithsonian Center for Astrophysics
 
  * Module:	wcs.c (World Coordinate Systems)
@@ -15,13 +15,13 @@
  * Subroutine:	wcscdset (wcs, cd) sets rotation and scaling from a CD matrix
  * Subroutine:	wcspcset (wcs,cdelt1,cdelt2,pc) sets rotation and scaling
  * Subroutine:	wcseqset (wcs, equinox) resets an existing WCS structure to new equinox
- * Subroutine:	setdefwcs (oldwcs) set flag to use AIPS WCS subroutines
- * Subroutine:	getdefwcs (oldwcs) get value of flag to use AIPS WCS subroutines
  * Subroutine:	iswcs(wcs) returns 1 if WCS structure is filled, else 0
  * Subroutine:	nowcs(wcs) returns 0 if WCS structure is filled, else 1
  * Subroutine:	wcscent (wcs) prints the image center and size in WCS units
  * Subroutine:	wcssize (wcs, cra, cdec, dra, ddec) returns image center and size
  * Subroutine:	wcsfull (wcs, cra, cdec, width, height) returns image center and size
+ * Subroutine:	wcsrange (wcs, ra1, ra2, dec1, dec2) returns image coordinate limits
+
  * Subroutine:	wcsshift (wcs,cra,cdec) resets the center of a WCS structure
  * Subroutine:	wcsdist (x1,y1,x2,y2) compute angular distance between ra/dec or lat/long
  * Subroutine:	wcscominit (wcs,command) sets up a command format for execution by wcscom
@@ -31,16 +31,28 @@
  * Subroutine:	getwcsin (wcs) returns current input coordinate system used by wcs2pix
  * Subroutine:	setwcsdeg(wcs, new) sets WCS output in degrees or hh:mm:ss
  * Subroutine:	getradecsys(wcs) returns current coordinate system type
- * Subroutine:	wcscom (wcs,file,x,y) executes a command using the current world coordinates
+ * Subroutine:	wcscom (wcs,file,x,y,wcstr) executes a command using the current world coordinates
  * Subroutine:	setwcslin (wcs, mode) sets output string mode for LINEAR
  * Subroutine:	pix2wcst (wcs,xpix,ypix,wcstring,lstr) pixels -> sky coordinate string
  * Subroutine:	pix2wcs (wcs,xpix,ypix,xpos,ypos) pixel coordinates -> sky coordinates
  * Subroutine:	wcsc2pix (wcs,xpos,ypos,coorsys,xpix,ypix,offscl) sky coordinates -> pixel coordinates
  * Subroutine:	wcs2pix (wcs,xpos,ypos,xpix,ypix,offscl) sky coordinates -> pixel coordinates
  * Subroutine:  wcszin (izpix) sets third dimension for pix2wcs() and pix2wcst()
- * Subroutine:  wcszout () returns third dimension from wcs2pix()
+ * Subroutine:  wcszout (wcs) returns third dimension from wcs2pix()
+ * Subroutine:	setwcsfile (filename)  Set file name for error messages 
+ * Subroutine:	setwcserr (errmsg)  Set error message 
+ * Subroutine:	wcserr()  Print error message 
+ * Subroutine:	setdefwcs (wcsproj)  Set flag to choose AIPS or WCSLIB WCS subroutines 
+ * Subroutine:	getdefwcs()  Get flag to switch between AIPS and WCSLIB subroutines 
+ * Subroutine:	savewcscoor (wcscoor)
+ * Subroutine:	getwcscoor()  Return preset output default coordinate system 
+ * Subroutine:	savewcscom (i, wcscom)  Save specified WCS command 
+ * Subroutine:	setwcscom (wcs)  Initialize WCS commands 
+ * Subroutine:	getwcscom (i)  Return specified WCS command 
+ * Subroutine:	wcsfree (wcs)  Free storage used by WCS structure
+ * Subroutine:	freewcscom (wcs)  Free storage used by WCS commands 
 
- * Copyright:   1998 Smithsonian Astrophysical Observatory
+ * Copyright:   2000 Smithsonian Astrophysical Observatory
  *              You may do anything you like with this file except remove
  *              this copyright.  The Smithsonian Astrophysical Observatory
  *              makes no representations about the suitability of this
@@ -49,8 +61,8 @@
 
  */
 
-#include <string.h>		/* strstr, NULL */
 #include <stdio.h>		/* stderr */
+#include <string.h>		/* strstr, NULL */
 #include <math.h>
 #include "wcs.h"
 #include "fitshead.h"
@@ -59,16 +71,25 @@
 #endif
 
 static char wcserrmsg[80];
+static char wcsfile[256]={""};
 static void wcslibrot();
 void wcsrotset();
-static int oldwcs0 = 0;
-static double zpix = 1.0;
+static int wcsproj0 = 0;
+static int izpix = 0;
+static double zpix = 0.0;
 
 void
 wcsfree (wcs)
 struct WorldCoor *wcs;	/* WCS structure */
 {
+    if (nowcs (wcs))
+	return;
+
     freewcscom (wcs);
+    if (wcs->lin.imgpix != NULL)
+	free (wcs->lin.imgpix);
+    if (wcs->lin.piximg != NULL)
+	free (wcs->lin.piximg);
     free (wcs);
     return;
 }
@@ -94,8 +115,6 @@ char	*proj;	/* Projection */
 {
     struct WorldCoor *wcs;
     double cdelt1, cdelt2;
-    char *str;
-    char envar[16];
 
     wcs = (struct WorldCoor *) calloc (1, sizeof(struct WorldCoor));
 
@@ -110,7 +129,7 @@ char	*proj;	/* Projection */
     wcs->nxpix = nxpix;
     wcs->nypix = nypix;
 
-    wcs->oldwcs = oldwcs0;
+    wcs->wcsproj = wcsproj0;
 
     wcs->crpix[0] = xrpix;
     wcs->crpix[1] = yrpix;
@@ -139,7 +158,7 @@ char	*proj;	/* Projection */
     strcat (wcs->ctype[1],proj);
 
     if (wcstype (wcs, wcs->ctype[0], wcs->ctype[1])) {
-	free (wcs);
+	wcsfree (wcs);
 	return (NULL);
 	}
     
@@ -153,9 +172,9 @@ char	*proj;	/* Projection */
     /* Coordinate reference frame and equinox */
     wcs->equinox =  (double) equinox;
     if (equinox > 1980)
-	strcpy (wcs->radecsys,"J2000");
+	strcpy (wcs->radecsys,"FK5");
     else
-	strcpy (wcs->radecsys,"B1950");
+	strcpy (wcs->radecsys,"FK4");
     if (epoch > 0)
 	wcs->epoch = epoch;
     else
@@ -196,8 +215,6 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
 		 * no effect if 0 */
 {
     struct WorldCoor *wcs;
-    char *str;
-    char envar[16];
 
     wcs = (struct WorldCoor *) calloc (1, sizeof(struct WorldCoor));
 
@@ -212,7 +229,7 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
     wcs->nxpix = naxis1;
     wcs->nypix = naxis2;
 
-    wcs->oldwcs = oldwcs0;
+    wcs->wcsproj = wcsproj0;
 
     wcs->crpix[0] = crpix1;
     wcs->crpix[1] = crpix2;
@@ -221,7 +238,7 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
     wcs->lin.crpix = wcs->crpix;
 
     if (wcstype (wcs, ctype1, ctype2)) {
-	free (wcs);
+	wcsfree (wcs);
 	return (NULL);
 	}
     if (wcs->latbase == 90)
@@ -230,12 +247,7 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
 	crval2 = crval2 - 90.0;
 
     wcs->crval[0] = crval1;
-    if (wcs->syswcs == WCS_NPOLE)
-	wcs->crval[1] = 90.0 - crval2;
-    else if (wcs->syswcs == WCS_SPA)
-	wcs->crval[1] = crval2 - 90.0;
-    else
-	wcs->crval[1] = crval2;
+    wcs->crval[1] = crval2;
     wcs->xref = wcs->crval[0];
     wcs->yref = wcs->crval[1];
     wcs->cel.ref[0] = wcs->crval[0];
@@ -250,7 +262,7 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
 
     else {
 	wcsdeltset (wcs, 1.0, 1.0, crota);
-	(void)sprintf (wcserrmsg,"WCSRESET: setting CDELT to 1\n");
+	setwcserr ("WCSRESET: setting CDELT to 1");
 	}
     wcs->lin.cdelt = wcs->cdelt;
     wcs->lin.pc = wcs->pc;
@@ -258,9 +270,9 @@ double	epoch;	/* Epoch of coordinates, used for FK4/FK5 conversion
     /* Coordinate reference frame and equinox */
     wcs->equinox =  (double) equinox;
     if (equinox > 1980)
-	strcpy (wcs->radecsys,"J2000");
+	strcpy (wcs->radecsys,"FK5");
     else
-	strcpy (wcs->radecsys,"B1950");
+	strcpy (wcs->radecsys,"FK4");
     if (epoch > 0)
 	wcs->epoch = epoch;
     else
@@ -381,39 +393,58 @@ char	*ctype2;	/* FITS WCS projection for axis 2 */
 		wcs->prjcode = i;
 	    }
 
-	/* Handle obsolete projection */
-	if (wcs->prjcode == WCS_NCP)
-	    wcs->oldwcs = 1;
+	/* Handle "obsolete" NCP projection */
+	if (wcs->prjcode == WCS_NCP) {
+	    if (wcs->wcsproj == WCS_BEST)
+		wcs->wcsproj = WCS_OLD;
+	    else if (wcs->wcsproj == WCS_ALT)
+		wcs->wcsproj = WCS_NEW;
+	    }
 
 	/* Work around bug in WCSLIB handling of CAR projection */
-	if (wcs->prjcode == WCS_CAR)
-	    wcs->oldwcs = 1;
+	else if (wcs->prjcode == WCS_CAR) {
+	    if (wcs->wcsproj == WCS_BEST)
+		wcs->wcsproj = WCS_OLD;
+	    else if (wcs->wcsproj == WCS_ALT)
+		wcs->wcsproj = WCS_NEW;
+	    }
 
 	/* Work around bug in WCSLIB handling of COE projection */
-	if (wcs->prjcode == WCS_COE)
-	    wcs->oldwcs = 1;
+	else if (wcs->prjcode == WCS_COE) {
+	    if (wcs->wcsproj == WCS_BEST)
+		wcs->wcsproj = WCS_OLD;
+	    else if (wcs->wcsproj == WCS_ALT)
+		wcs->wcsproj = WCS_NEW;
+	    }
 
-	if (wcs->oldwcs && (
+	else if (wcs->wcsproj == WCS_BEST)
+	    wcs->wcsproj = WCS_NEW;
+
+	else if (wcs->wcsproj == WCS_ALT)
+	    wcs->wcsproj = WCS_OLD;
+
+	if (wcs->wcsproj == WCS_OLD && (
 	    wcs->prjcode != WCS_STG && wcs->prjcode != WCS_AIT &&
 	    wcs->prjcode != WCS_MER && wcs->prjcode != WCS_GLS &&
 	    wcs->prjcode != WCS_ARC && wcs->prjcode != WCS_TAN &&
 	    wcs->prjcode != WCS_TNX && wcs->prjcode != WCS_SIN &&
 	    wcs->prjcode != WCS_PIX && wcs->prjcode != WCS_LIN &&
-	    wcs->prjcode != WCS_CAR && wcs->prjcode != WCS_COE))
-	    wcs->oldwcs = 0;
+	    wcs->prjcode != WCS_CAR && wcs->prjcode != WCS_COE &&
+	    wcs->prjcode != WCS_NCP))
+	    wcs->wcsproj = WCS_NEW;
 
-	/* Handle NOAO corrected TNX as TAN if oldwcs is set */
-	if (wcs->oldwcs && wcs->prjcode == WCS_TNX) {
+	/* Handle NOAO corrected TNX as uncorrected TAN if oldwcs is set */
+	if (wcs->wcsproj == WCS_OLD && wcs->prjcode == WCS_TNX) {
 	    wcs->ctype[0][6] = 'A';
 	    wcs->ctype[0][7] = 'N';
 	    wcs->prjcode = WCS_TAN;
 	    }
 	}
 
-    /* If not linear or sky coordinates, drop out with error message */
+    /* If not sky coordinates, assume linear */
     else {
-	(void)sprintf (wcserrmsg,"WCSTYPE: CTYPE1 not sky coordinates or LINEAR -> no WCS\n");
-	return (1);
+	wcs->prjcode = WCS_LIN;
+	return (0);
 	}
 
     /* Second coordinate type */
@@ -473,8 +504,8 @@ char	*ctype2;	/* FITS WCS projection for axis 2 */
 	wcs->ptype[2] = ctype2[iproj+2];
 	wcs->ptype[3] = 0;
 
-	if (!strncmp (wcs->c1type, "DEC", 3) ||
-	    !strncmp (wcs->c1type, "GLAT", 4))
+	if (!strncmp (ctype1, "DEC", 3) ||
+	    !strncmp (ctype1+1, "LAT", 3))
 	    wcs->coorflip = 1;
 	else
 	    wcs->coorflip = 0;
@@ -491,10 +522,9 @@ char	*ctype2;	/* FITS WCS projection for axis 2 */
 	    if (wcs->ctype[1][i] == ' ') wcs->ctype[1][i] = '-';
 	}
 
-    /* If not linear or sky coordinates, drop out with error message */
+    /* If not sky coordinates, assume linear */
     else {
-	(void)sprintf (wcserrmsg,"WCSTYPE: CTYPE2 not sky coordinates or LINEAR -> no WCS\n");
-	return (1);
+	wcs->prjcode = WCS_LIN;
 	}
 
     return (0);
@@ -511,9 +541,6 @@ double cdelt1, cdelt2;		/* scale in degrees/pixel, ignored if cd is not NULL */
 double crota;			/* Rotation angle in degrees, ignored if cd is not NULL */
 double *cd;			/* Rotation matrix, used if not NULL */
 {
-    int i, j;
-    double *pci;
-    extern int matinv();
 
     if (nowcs (wcs))
 	return (-1);
@@ -557,7 +584,7 @@ double *cd;			/* Rotation matrix, used if not NULL */
     else {
 	wcs->xinc = 1.0;
 	wcs->yinc = 1.0;
-	(void)sprintf (wcserrmsg,"WCSRESET: setting CDELT to 1\n");
+	setwcserr ("WCSRESET: setting CDELT to 1");
 	}
 
     /* Coordinate reference frame, equinox, and epoch */
@@ -687,10 +714,9 @@ double crota;		/* Rotation counterclockwise in degrees */
 {
     extern int matinv();
     double *pci;
-    double crot, srot, s;
-    int i, j, naxes;
+    double crot, srot;
+    int i, j;
 
-    naxes = wcs->naxes;
     wcs->cdelt[0] = cdelt1;
     if (cdelt2 != 0.0)
 	wcs->cdelt[1] = cdelt2;
@@ -709,11 +735,16 @@ double crota;		/* Rotation counterclockwise in degrees */
 	    }
 	}
     wcs->rotmat = 0;
+
+    /* If image is reversed, value of CROTA is flipped, too */
     wcs->rot = crota;
+    crot = cos (degrad(wcs->rot));
+    if (cdelt1 * cdelt2 > 0)
+	srot = sin (-degrad(wcs->rot));
+    else
+	srot = sin (degrad(wcs->rot));
 
     /* Set CD matrix */
-    crot = cos (degrad(wcs->rot));
-    srot = sin (degrad(wcs->rot));
     wcs->cd[0] = wcs->cdelt[0] * crot;
     if (wcs->cdelt[0] < 0)
 	wcs->cd[1] = -fabs (wcs->cdelt[1]) * srot;
@@ -816,7 +847,6 @@ double *pc;		/* Rotation matrix, ignored if NULL */
 {
     extern int matinv();
     double *pci, *pc0i;
-    double crot, srot, s;
     int i, j, naxes;
 
     if (pc == NULL)
@@ -936,6 +966,14 @@ struct WorldCoor *wcs;	/* World coordinate system structure */
 {
     int off;
     double cra, cdec, xc, xn, xe, yc, yn, ye;
+
+    /* If image is one-dimensional, leave rotation angle alone */
+    if (wcs->nxpix < 1.5 || wcs->nypix < 1.5) {
+	wcs->imrot = wcs->rot;
+	wcs->pa_north = wcs->rot + 90.0;
+	wcs->pa_east = wcs->rot + 180.0;
+	return;
+	}
 
     wcs->xinc = fabs (wcs->xinc);
     wcs->yinc = fabs (wcs->yinc);
@@ -1110,10 +1148,10 @@ struct WorldCoor *wcs;		/* World coordinate system structure */
 	(void) pix2wcs (wcs,xpix,wcs->nypix,&xpos2,&ypos2);
 	if (wcs->syswcs == WCS_LINEAR) {
 	    height = ypos2 - ypos1;
-	    if (width < 100.0)
-	    (void)fprintf (stderr, " height = %.5f %s ",width, wcs->units[1]);
+	    if (height < 100.0)
+	    (void)fprintf (stderr, " height = %.5f %s ",height, wcs->units[1]);
 	    else
-	    (void)fprintf (stderr, " height = %.3f %s ",width, wcs->units[1]);
+	    (void)fprintf (stderr, " height = %.3f %s ",height, wcs->units[1]);
 	    }
 	else {
 	    height = wcsdist (xpos1,ypos1,xpos2,ypos2);
@@ -1144,9 +1182,9 @@ struct WorldCoor *wcs;		/* World coordinate system structure */
 	    if (secpix < 100.0)
 		(void) fprintf (stderr, "  %.3f arcsec/pixel\n",secpix);
 	    else if (secpix < 3600.0)
-		(void) fprintf (stderr, "  %.3f arcmin/pixel\n",secpix*60.0);
+		(void) fprintf (stderr, "  %.3f arcmin/pixel\n",secpix/60.0);
 	    else
-		(void) fprintf (stderr, "  %.3f degrees/pixel\n",secpix*3600.0);
+		(void) fprintf (stderr, "  %.3f degrees/pixel\n",secpix/3600.0);
 	    }
 	}
     return;
@@ -1169,7 +1207,7 @@ double	*ddec;		/* Half-width in declination (deg) (returned) */
     /* Find right ascension and declination of coordinates */
     if (iswcs(wcs)) {
 	wcsfull (wcs, cra, cdec, &width, &height);
-	*dra = 0.5 * width;
+	*dra = 0.5 * width / cos (degrad (*cdec));
 	*ddec = 0.5 * height;
 	}
     else {
@@ -1231,6 +1269,64 @@ double	*height;	/* Height in degrees (returned) */
 	*cdec = 0.0;
 	*width = 0.0;
 	*height = 0.0;
+	}
+
+    return;
+}
+
+
+/* Return minimum and maximum RA and Dec of image in degrees */
+
+void
+wcsrange (wcs, ra1, ra2, dec1, dec2)
+
+struct WorldCoor *wcs;	/* World coordinate system structure */
+double	*ra1;		/* Minimum right ascension of image (deg) (returned) */
+double	*ra2;		/* Maximum right ascension of image (deg) (returned) */
+double	*dec1;		/* Minimum declination of image (deg) (returned) */
+double	*dec2;		/* Maximum declination of image (deg) (returned) */
+
+{
+    double xpos1, xpos2, xpos3, xpos4, ypos1, ypos2, ypos3, ypos4;
+
+    if (iswcs(wcs)) {
+
+	/* Compute image corner coordinates in degrees */
+	(void) pix2wcs (wcs,1.0,1.0,&xpos1,&ypos1);
+	(void) pix2wcs (wcs,1.0,wcs->nypix,&xpos2,&ypos2);
+	(void) pix2wcs (wcs,wcs->nxpix,1.0,&xpos3,&ypos3);
+	(void) pix2wcs (wcs,wcs->nxpix,wcs->nypix,&xpos4,&ypos4);
+
+	/* Find minimum right ascension or longitude */
+	*ra1 = xpos1;
+	if (xpos2 < *ra1) *ra1 = xpos2;
+	if (xpos3 < *ra1) *ra1 = xpos3;
+	if (xpos4 < *ra1) *ra1 = xpos4;
+
+	/* Find maximum right ascension or longitude */
+	*ra2 = xpos1;
+	if (xpos2 > *ra2) *ra2 = xpos2;
+	if (xpos3 > *ra2) *ra2 = xpos3;
+	if (xpos4 > *ra2) *ra2 = xpos4;
+
+	/* Find minimum declination or latitude */
+	*dec1 = ypos1;
+	if (ypos2 < *dec1) *dec1 = ypos2;
+	if (ypos3 < *dec1) *dec1 = ypos3;
+	if (ypos4 < *dec1) *dec1 = ypos4;
+
+	/* Find maximum declination or latitude */
+	*dec2 = ypos1;
+	if (ypos2 > *dec2) *dec2 = ypos2;
+	if (ypos3 > *dec2) *dec2 = ypos3;
+	if (ypos4 > *dec2) *dec2 = ypos4;
+	}
+
+    else {
+	*ra1 = 0.0;
+	*ra2 = 0.0;
+	*dec1 = 0.0;
+	*dec2 = 0.0;
 	}
 
     return;
@@ -1316,36 +1412,31 @@ char	*command;		/* command with %s where coordinates will go */
 /* Execute Unix command with world coordinates (from x,y) and/or filename */
 
 void
-wcscom ( wcs, i, filename, xfile, yfile )
+wcscom ( wcs, i, filename, xfile, yfile, wcstring )
 
 struct WorldCoor *wcs;		/* World coordinate system structure */
 int	i;			/* Number of command (0-9) to execute */
 char	*filename;		/* Image file name */
 double	xfile,yfile;		/* Image pixel coordinates for WCS command */
+char	*wcstring;		/* WCS String from pix2wcst() */
 {
-    char wcstring[32];
-    int lstr = 32;
     char command[120];
     char comform[120];
     char xystring[32];
     char *fileform, *posform, *imform;
     int ier;
 
-    if (nowcs (wcs))
+    if (nowcs (wcs)) {
+	(void)fprintf(stderr,"WCSCOM: no WCS\n");
 	return;
+	}
 
     if (wcs->command_format[i] != NULL)
 	strcpy (comform, wcs->command_format[i]);
     else
 	strcpy (comform, "sgsc -ah %s");
 
-    if (nowcs (wcs))
-	(void)fprintf(stderr,"WCSCOM: no WCS\n");
-
-    else if (comform[0] > 0) {
-
-	/* Get WCS coordinates for this image coordinate */
-	(void) pix2wcst (wcs,xfile,yfile,wcstring,lstr);
+    if (comform[0] > 0) {
 
 	/* Create and execute search command */
 	fileform = strsrch (comform,"%f");
@@ -1484,7 +1575,8 @@ char	*coorsys;	/* Input world coordinate system:
     if (wcs->wcson) {
 
 	/* Set output in degrees flag and number of decimal places */
-	if (wcs->sysout == WCS_GALACTIC || wcs->sysout == WCS_ECLIPTIC) {
+	if (wcs->sysout == WCS_GALACTIC || wcs->sysout == WCS_ECLIPTIC ||
+	    wcs->sysout == WCS_PLANET) {
 	    wcs->degout = 1;
 	    wcs->ndec = 5;
 	    }
@@ -1492,7 +1584,7 @@ char	*coorsys;	/* Input world coordinate system:
 	    wcs->degout = 1;
 	    wcs->ndec = 5;
 	    }
-	else if (wcs->sysout == WCS_NPOLE) {
+	else if (wcs->sysout == WCS_NPOLE || wcs->sysout == WCS_SPA) {
 	    wcs->degout = 1;
 	    wcs->ndec = 5;
 	    }
@@ -1719,8 +1811,14 @@ int	lstr;		/* Length of world coordinate string (returned) */
 	else if (wcs->degout == 0) {
 	    minlength = 18 + (2 * wcs->ndec);
 	    if (lstr > minlength) {
-		ra2str (rastr, 32, xpos, wcs->ndec);
-		dec2str (decstr, 32, ypos, wcs->ndec-1);
+		if (wcs->sysout == WCS_J2000 || wcs->sysout == WCS_B1950) {
+		    ra2str (rastr, 32, xpos, wcs->ndec);
+		    dec2str (decstr, 32, ypos, wcs->ndec-1);
+		    }
+		else {
+		    dec2str (rastr, 32, xpos, wcs->ndec);
+		    dec2str (decstr, 32, ypos, wcs->ndec);
+		    }
 		if (wcs->tabsys)
 		    (void)sprintf (wcstring,"%s	%s", rastr, decstr);
 		else
@@ -1749,6 +1847,15 @@ int	lstr;		/* Length of world coordinate string (returned) */
 		    strcat (wcstring,"	ecliptic");
 		else
 		    strcat (wcstring," ecliptic");
+	    }
+
+	/* Label planet coordinates */
+	else if (wcs->sysout == WCS_PLANET) {
+	    if (lstr > 9 && wcs->printsys)
+		if (wcs->tabsys)
+		    strcat (wcstring,"	planet");
+		else
+		    strcat (wcstring," planet");
 	    }
 
 	/* Label alt-az coordinates */
@@ -1856,7 +1963,7 @@ double	*xpos,*ypos;	/* RA and Dec in degrees (returned) */
     extern int platepos();
     extern int worldpos();
     extern int tnxpos();
-    extern void fk4prec(),fk5prec(), wcscon();
+    extern void wcscon();
 
     if (nowcs (wcs))
 	return;
@@ -1886,7 +1993,7 @@ double	*xpos,*ypos;	/* RA and Dec in degrees (returned) */
 	}
 
     /* Use Classic AIPS projections */
-    else if (wcs->oldwcs == 1 || wcs->prjcode <= 0) {
+    else if (wcs->wcsproj == WCS_OLD || wcs->prjcode <= 0) {
 	if (worldpos (xpix, ypix, wcs, &xp, &yp))
 	    wcs->offscl = 1;
 	}
@@ -1897,7 +2004,11 @@ double	*xpos,*ypos;	/* RA and Dec in degrees (returned) */
 	    	
 
     /* Do not change coordinates if offscale */
-    if (!wcs->offscl) {
+    if (wcs->offscl) {
+	*xpos = 0.0;
+	*ypos = 0.0;
+	}
+    else {
 
 	/* Convert coordinates to output system, if not LINEAR */
         if (wcs->prjcode > 0) {
@@ -1915,10 +2026,6 @@ double	*xpos,*ypos;	/* RA and Dec in degrees (returned) */
 	wcs->ypos = yp;
 	*xpos = xp;
 	*ypos = yp;
-	}
-    else {
-	*xpos = 0.0;
-	*ypos = 0.0;
 	}
     return;
 }
@@ -1947,7 +2054,8 @@ struct WorldCoor *wcs;	/* World coordinate system structure */
 double	xpos,ypos;	/* World coordinates in degrees */
 char	*coorsys;	/* Input world coordinate system:
 			   FK4, FK5, B1950, J2000, GALACTIC, ECLIPTIC
-			   fk4, fk5, b1950, j2000, galactic, ecliptic */
+			   fk4, fk5, b1950, j2000, galactic, ecliptic
+			   * If NULL, use image WCS */
 double	*xpix,*ypix;	/* Image coordinates in pixels */
 int	*offscl;	/* 0 if within bounds, else off scale */
 {
@@ -1959,7 +2067,7 @@ int	*offscl;	/* 0 if within bounds, else off scale */
     extern int platepix();
     extern int worldpix();
     extern int tnxpix();
-    extern void fk4prec(), fk5prec(), wcscon();
+    extern void wcscon();
 
     if (nowcs (wcs))
 	return;
@@ -1971,8 +2079,14 @@ int	*offscl;	/* 0 if within bounds, else off scale */
 	yp = 90.0 - yp;
     else if (wcs->latbase == -90)
 	yp = yp - 90.0;
-    sysin = wcscsys (coorsys);
-    eqin = wcsceq (coorsys);
+    if (coorsys == NULL) {
+	sysin = wcs->syswcs;
+	eqin = wcs->equinox;
+	}
+    else {
+	sysin = wcscsys (coorsys);
+	eqin = wcsceq (coorsys);
+	}
     wcs->zpix = 1.0;
 
     /* Convert coordinates to same system as image */
@@ -1990,17 +2104,17 @@ int	*offscl;	/* 0 if within bounds, else off scale */
     /* Use SAO polynomial plate fit */
     else if (wcs->prjcode == WCS_PLT) {
 	if (platepix (xp, yp, wcs, xpix, ypix))
-	    wcs->offscl = 1;
+	    *offscl = 1;
 	}
 
     /* Use NOAO IRAF corrected plane tangent projection */
     else if (wcs->prjcode == WCS_TNX) {
 	if (tnxpix (xp, yp, wcs, xpix, ypix))
-	    wcs->offscl = 1;
+	    *offscl = 1;
 	}
 
     /* Use Classic AIPS projections */
-    else if (wcs->oldwcs == 1 || wcs->prjcode <= 0) {
+    else if (wcs->wcsproj == WCS_OLD || wcs->prjcode <= 0) {
 	if (worldpix (xp, yp, wcs, xpix, ypix))
 	    *offscl = 1;
 	}
@@ -2010,16 +2124,19 @@ int	*offscl;	/* 0 if within bounds, else off scale */
 	*offscl = 1;
 	}
 
-    if (*xpix < 0 || *ypix < 0)
-	*offscl = 1;
-    else if (*xpix > wcs->nxpix + 1 || *ypix > wcs->nypix + 1)
-	*offscl = 1;
+    /* Set off-scale flag to 2 if off image but within bounds of projection */
+    if (!*offscl) {
+	if (*xpix < 0.5 || *ypix < 0.5)
+	    *offscl = 2;
+	else if (*xpix > wcs->nxpix + 0.5 || *ypix > wcs->nypix + 0.5)
+	    *offscl = 2;
+	}
 
-    wcs->xpix = *xpix;
-    wcs->ypix = *ypix;
     wcs->offscl = *offscl;
     wcs->xpos = xpos;
     wcs->ypos = ypos;
+    wcs->xpix = *xpix;
+    wcs->ypix = *ypix;
     return;
 }
 
@@ -2041,17 +2158,24 @@ double  *ypos;           /* y (dec) coordinate (deg) */
     int wcsrev();
     double wcscrd[4], imgcrd[4], pixcrd[4];
     double phi, theta;
-    
+    const char ctype[4][9];
+
+    memcpy(ctype, wcs->ctype, sizeof(ctype));
+
     *xpos = 0.0;
     *ypos = 0.0;
 
     pixcrd[0] = xpix;
     pixcrd[1] = ypix;
-    pixcrd[2] = zpix;
+    if (wcs->prjcode == WCS_CSC || wcs->prjcode == WCS_QSC ||
+	wcs->prjcode == WCS_TSC)
+	pixcrd[2] = (double) (izpix + 1);
+    else
+	pixcrd[2] = zpix;
     pixcrd[3] = 1.0;
     for (i = 0; i < 4; i++)
 	imgcrd[i] = 0.0;
-    offscl = wcsrev (wcs->ctype, &wcs->wcsl, pixcrd, &wcs->lin, imgcrd,
+    offscl = wcsrev (ctype, &wcs->wcsl, pixcrd, &wcs->lin, imgcrd,
 		    &wcs->prj, &phi, &theta, wcs->crval, &wcs->cel, wcscrd);
     if (offscl == 0) {
 	*xpos = wcscrd[wcs->wcsl.lng];
@@ -2074,27 +2198,50 @@ double  *ypix;          /* y pixel number  (dec or lat without rotation) */
 
 {
     int offscl;
-    int i;
-    int wcsfwd();
+    int wcsfwd(), wcsset();
     double wcscrd[4], imgcrd[4], pixcrd[4];
     double phi, theta;
+    const char ctype[4][9];
 
-    *xpix = -1.0;
-    *ypix = -1.0;
+    memcpy(ctype, wcs->ctype, sizeof(ctype));
+
+    *xpix = 0.0;
+    *ypix = 0.0;
     if (wcs->wcsl.flag != WCSSET) {
-	if (wcsset (wcs->lin.naxis, wcs->ctype, &wcs->wcsl) )
+	if (wcsset (wcs->lin.naxis, ctype, &wcs->wcsl) )
 	    return (1);
 	}
+
+    /* Set input for WCSLIB subroutines */
+    wcscrd[0] = 0.0;
+    wcscrd[1] = 0.0;
+    wcscrd[2] = 0.0;
+    wcscrd[3] = 0.0;
     wcscrd[wcs->wcsl.lng] = xpos;
     wcscrd[wcs->wcsl.lat] = ypos;
-    for (i = 0; i < 4; i++)
-	pixcrd[i] = 0.0;
-    offscl = wcsfwd (wcs->ctype, &wcs->wcsl, wcscrd, wcs->crval, &wcs->cel,
+
+    /* Initialize output for WCSLIB subroutines */
+    pixcrd[0] = 0.0;
+    pixcrd[1] = 0.0;
+    pixcrd[2] = 1.0;
+    pixcrd[3] = 1.0;
+    imgcrd[0] = 0.0;
+    imgcrd[1] = 0.0;
+    imgcrd[2] = 1.0;
+    imgcrd[3] = 1.0;
+
+    /* Invoke WCSLIB subroutines for coordinate conversion */
+    offscl = wcsfwd (ctype, &wcs->wcsl, wcscrd, wcs->crval, &wcs->cel,
 		     &phi, &theta, &wcs->prj, imgcrd, &wcs->lin, pixcrd);
-    if (offscl == 0) {
+
+    if (!offscl) {
 	*xpix = pixcrd[0];
 	*ypix = pixcrd[1];
-	wcs->zpix = pixcrd[2];
+	if (wcs->prjcode == WCS_CSC || wcs->prjcode == WCS_QSC ||
+	    wcs->prjcode == WCS_TSC)
+	    wcs->zpix = pixcrd[2] - 1.0;
+	else
+	    wcs->zpix = pixcrd[2];
 	}
     return (offscl);
 }
@@ -2103,14 +2250,16 @@ double  *ypix;          /* y pixel number  (dec or lat without rotation) */
 /* Set third dimension for cube projections */
 
 int
-wcszin (izpix)
+wcszin (izpix0)
 
-int	izpix;		/* coordinate in third dimension
-			   (if <= 0, return current value without changing it */
+int	izpix0;		/* coordinate in third dimension
+			   (if < 0, return current value without changing it */
 {
-	if (izpix > 0)
-	    zpix = (double) izpix;
-	return ((int) zpix);
+    if (izpix0 > -1) {
+	izpix = izpix0;
+	zpix = (double) izpix0;
+	}
+    return (izpix);
 }
 
 
@@ -2121,31 +2270,44 @@ wcszout (wcs)
 
 struct WorldCoor *wcs;  /* WCS parameter structure */
 {
-	return ((int) wcs->zpix);
+    return ((int) wcs->zpix);
 }
 
+/* Set file name for error messages */
+void
+setwcsfile (filename)
+char *filename;	/* FITS or IRAF file with WCS */
+{   if (strlen (filename) < 256)
+	strcpy (wcsfile, filename);
+    else
+	strncpy (wcsfile, filename, 255);
+    return; }
 
-/* Error messages */
+/* Set error message */
 void
 setwcserr (errmsg)
 char *errmsg;	/* Error mesage  < 80 char */
 { strcpy (wcserrmsg, errmsg); return; }
 
+/* Print error message */
 void
 wcserr ()
-{ fprintf (stderr, "%s\n",wcserrmsg); return; }
+{   if (strlen (wcsfile) > 0)
+	fprintf (stderr, "%s in file %s\n",wcserrmsg, wcsfile);
+    else
+	fprintf (stderr, "%s\n",wcserrmsg);
+    return; }
 
 
 /* Flag to use AIPS WCS subroutines instead of WCSLIB */
 void
-setdefwcs (oldwcs)
-int oldwcs;
-{ oldwcs0 = oldwcs; return; }
+setdefwcs (wp)
+int wp;
+{ wcsproj0 = wp; return; }
 
 int
 getdefwcs ()
-{ return (oldwcs0); }
-
+{ return (wcsproj0); }
 
 /* Save output default coordinate system */
 static char wcscoor0[16];
@@ -2183,7 +2345,7 @@ setwcscom (wcs)
 struct WorldCoor *wcs;  /* WCS parameter structure */
 {
     char envar[16];
-    int lcom, i;
+    int i;
     char *str;
     if (nowcs(wcs))
 	return;
@@ -2197,15 +2359,15 @@ struct WorldCoor *wcs;  /* WCS parameter structure */
 	else if ((str = getenv (envar)) != NULL)
 	    wcscominit (wcs, i, str);
 	else if (i == 1)
-	    wcscominit (wcs, i, "suac -ah %s");
+	    wcscominit (wcs, i, "suac -ah %s");	/* F1= Search USNO A Catalog */
 	else if (i == 2)
-	    wcscominit (wcs, i, "sgsc -ah %s");
+	    wcscominit (wcs, i, "sgsc -ah %s");	/* F2= Search HST GSC */
 	else if (i == 3)
-	    wcscominit (wcs, i, "stycho -ah %s");
+	    wcscominit (wcs, i, "sact -ah %s"); /* F3= Search USNO ACT Catalog */
 	else if (i == 4)
-	    wcscominit (wcs, i, "sppm -ah %s");
+	    wcscominit (wcs, i, "sppm -ah %s");	/* F4= Search PPM Catalog */
 	else if (i == 5)
-	    wcscominit (wcs, i, "ssao -ah %s");
+	    wcscominit (wcs, i, "ssao -ah %s");	/* F5= Search SAO Catalog */
 	else
 	    wcs->command_format[i] = NULL;
 	}
@@ -2410,4 +2572,32 @@ struct WorldCoor *wcs;  /* WCS parameter structure */
  * Sep  3 1998	Set CD rotation and cdelts from sky axis position angles
  * Sep 16 1998	Add option to use North Polar Angle instead of Latitude
  * Sep 29 1998	Initialize additional WCS commands from the environment
+ * Oct 14 1998	Fix bug in wcssize() which didn't divide dra by cos(dec)
+ * Nov 12 1998	Fix sign of CROTA when either axis is reflected
+ * Dec  2 1998	Fix non-arcsecond scale factors in wcscent()
+ * Dec  2 1998	Add PLANET coordinate system to pix2wcst()
+
+ * Jan 20 1999	Free lin.imgpix and lin.piximg in wcsfree()
+ * Feb 22 1999	Fix bug setting latitude reference value of latbase != 0
+ * Feb 22 1999	Fix bug so that quad cube faces are 0-5, not 1-6
+ * Mar 16 1999	Always initialize all 4 imgcrds and pixcrds in wcspix()
+ * Mar 16 1999	Always return (0,0) from wcs2pix if offscale
+ * Apr  7 1999	Add code to put file name in error messages
+ * Apr  7 1999	Document utility subroutines at end of file
+ * May  6 1999	Fix bug printing height of LINEAR image
+ * Jun 16 1999	Add wcsrange() to return image RA and Dec limits
+ * Jul  8 1999	Always use FK5 and FK4 instead of J2000 and B1950 in RADECSYS
+ * Aug 16 1999	Print dd:mm:ss dd:mm:ss if not J2000 or B1950 output
+ * Aug 20 1999	Add WCS string argument to wcscom(); don't compute it there
+ * Aug 20 1999	Change F3 WCS command default from Tycho to ACT
+ * Oct 15 1999	Free wcs using wcsfree()
+ * Oct 21 1999	Drop declarations of unused functions after lint
+ * Oct 25 1999	Drop out of wcsfree() if wcs is null pointer
+ * Nov 17 1999	Fix bug which caused software to miss NCP projection
+ *
+ * Jan 24 2000	Default to AIPS for NCP, CAR, and COE proj.; if -z use WCSLIB
+ * Feb 24 2000	If coorsys is null in wcsc2pix, wcs->radecin is assumed
+ * May 10 2000	In wcstype(), default to WCS_LIN, not error (after Bill Joye)
+ * Jun 22 2000	In wcsrotset(), leave rotation angle alone in 1-d image
+ * Jul  3 2000	Initialize wcscrd[] to zero in wcspix()
  */

@@ -628,7 +628,7 @@ GetDItemStyle(ddPtr, diTypePtr, styleName, isNew_ret)
 	stylePtr = diTypePtr->styleCreateProc(ddPtr->interp,
 	    ddPtr->tkwin, diTypePtr, styleName);
 	stylePtr->base.styleCmd = Tcl_CreateCommand(ddPtr->interp,
-	    styleName, StyleCmd, (ClientData)stylePtr, StyleCmdDeletedProc);
+	    styleName, (Tcl_CmdProc*)StyleCmd, (ClientData)stylePtr, StyleCmdDeletedProc);
 	stylePtr->base.interp 	 = ddPtr->interp;
 	stylePtr->base.tkwin  	 = ddPtr->tkwin;
 	stylePtr->base.diTypePtr = diTypePtr;

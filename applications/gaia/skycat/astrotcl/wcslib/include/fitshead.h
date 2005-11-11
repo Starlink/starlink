@@ -1,5 +1,5 @@
 /* fitshead.h  FITS header access subroutines
- * June 25, 1998
+ * March 27, 2000
  * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
  */
 
@@ -47,6 +47,11 @@ extern "C" {
 	const char* keyword,	/* FITS keyword */
 	const int lstr,		/* maximum length of returned string */
 	char* string);		/* null-terminated string value (returned) */
+    int hgetm (			/* Extract string from multiple keywords */
+	const char* hstring,	/* FITS header string */
+	const char* keyword,	/* FITS keyword */
+	const int lstr,		/* maximum length of returned string */
+	char* string);		/* null-terminated string value (returned) */
     int hgetndec(		/* Find number of decimal places in FITS value*/
 	const char* hstring,	/* FITS header string */
 	const char* keyword,	/* FITS keyword */
@@ -73,7 +78,9 @@ extern "C" {
 
     int hlength(		/* Set length of unterminated FITS header */
         char    *header,        /* FITS header */
-        const int lhead);	/* Maximum length of FITS header */
+        const int lhead);	/* Allocated length of FITS header */
+    int gethlength(		/* Get length of current FITS header */
+        char    *header);	/* FITS header */
 
     double str2ra(		/* Return RA in degrees from string */
 	const char* in);	/* Character string (hh:mm:ss.sss or dd.dddd) */
@@ -124,48 +131,53 @@ extern "C" {
 	char* string);		/* null-terminated string value (returned) */
 
 /* Subroutines in hput.c */
-    void hputi2(		/* Implant short value into FITS header */
+/* All hput* routines return 0 if successful, else -1 */
+    int hputi2(		/* Implant short value into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const short ival);	/* short value */
-    void hputi4(		/* Implant int value into FITS header */
+    int hputi4(		/* Implant int value into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const int ival);	/* int value */
-    void hputr4(		/* Implant float value into FITS header */
+    int hputr4(		/* Implant float value into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const float rval);	/* float value */
-    void hputr8(		/* Implant short into FITS header */
+    int hputr8(		/* Implant short into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const double dval);	/* double value */
-    void hputnr8(	/* double with specified number of decimal places */
+    int hputnr8(	/* double with specified number of decimal places */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const int ndec,		/* Number of decimal places in keyword value */
 	const double dval);	/* double value */
-    void hputs(			/* Implant short into FITS header */
+    int hputs(			/* Quoted character string into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const char* cval);	/* Character string value */
-    void hputcom(		/* Add comment to keyword line in FITS header */
+    int hputm(			/* Quoted character string, mutiple keywords */
+	char* hstring,		/* FITS header string (modified) */
+	const char* keyword,	/* FITS keyword */
+	const char* cval);	/* Character string value */
+    int hputcom(		/* Add comment to keyword line in FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const char* comment);	/* Comment string */
-    void hputra(	/* Right ascension in degrees into hh:mm:ss.sss */
+    int hputra(	/* Right ascension in degrees into hh:mm:ss.sss */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const double ra);	/* Right ascension in degrees */
-    void hputdec(		/* Declination in degrees into dd:mm:ss.ss */
+    int hputdec(		/* Declination in degrees into dd:mm:ss.ss */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const double dec);	/* Declination in degrees */
-    void hputl(			/* Implant boolean value into FITS header */
+    int hputl(			/* Implant boolean value into FITS header */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const int lval);	/* 0->F, else ->T */
-    void hputc(			/* Implant character string without quotes */
+    int hputc(			/* Implant character string without quotes */
 	char* hstring,		/* FITS header string (modified) */
 	const char* keyword,	/* FITS keyword */
 	const char* cval);	/* Character string value */
@@ -213,9 +225,11 @@ extern int hgetr4();	/* float */
 extern int hgetr8();	/* double */
 extern int hgetra();	/* Right ascension in degrees from string */
 extern int hgetdec();	/* Declination in degrees from string */
-extern int hgetdate(); /* Date in years from FITS date string */
+extern int hgetdate();	/* Date in years from FITS date string */
 extern int hgetl();	/* T->1, F->0 from FITS logical entry */
 extern int hgets();	/* Previously allocated string */
+extern int hgetm();	/* Previously allocated string from multiple keywords */
+extern char *hgetc();	/* Return pointer to string */
 extern int hgetndec();	/* Number of decimal places in keyword value */
 
 /* Subroutines to convert strings to RA and Dec in degrees */
@@ -239,28 +253,33 @@ extern char *strnsrch ();	/* s1 ls1 characters long */
 /* Set length of header which is not null-terminated */
 extern int hlength();
 
+/* Get length of current FITS header */
+extern int gethlength();
+
 /* Subroutines in iget.c */
 extern int mgets();	/* Previously allocated string from multiline keyword */
 extern int mgetr8();	/* double from multiline keyword */
 extern int mgeti4();	/* int from multiline keyword */
-extern igeti4();	/* long integer from IRAF compound keyword value */
-extern igetr4();	/* real from IRAF compound keyword value */
-extern igetr8();	/* double from IRAF compound keyword value */
-extern igets();		/* character string from IRAF compound keyword value */
+extern int igeti4();	/* long integer from IRAF compound keyword value */
+extern int igetr4();	/* real from IRAF compound keyword value */
+extern int igetr8();	/* double from IRAF compound keyword value */
+extern int igets();	/* character string from IRAF compound keyword value */
 
 /* Subroutines in hput.c */
 
 /* Implant a value into a FITS header for given keyword */
-extern void hputi4();	/* int */
-extern void hputi2();	/* short */
-extern void hputr4();	/* float */
-extern void hputr8();	/* double */
-extern void hputnr8();	/* double with specified number of decimal places */
-extern void hputra();	/* Right ascension in degrees into hh:mm:ss.sss */
-extern void hputdec();	/* Declination in degrees into dd:mm:ss.ss */
-extern void hputl();	/* 0 -> F, else T FITS logical entry */
-extern void hputs();	/* Character string */
-extern void hputc();	/* Character string without quotes */
+extern int hputi4();	/* int */
+extern int hputi2();	/* short */
+extern int hputr4();	/* float */
+extern int hputr8();	/* double */
+extern int hputnr8();	/* double with specified number of decimal places */
+extern int hputra();	/* Right ascension in degrees into hh:mm:ss.sss */
+extern int hputdec();	/* Declination in degrees into dd:mm:ss.ss */
+extern int hputl();	/* 0 -> F, else T FITS logical entry */
+extern int hputs();	/* Quoted character string */
+extern int hputm();	/* Quoted character string into mutiple keywords */
+extern int hputc();	/* Character string without quotes (returns 0 if OK) */
+extern int hputcom();	/* Comment after keyword=value (returns 0 if OK) */
 
 extern int hdel();	/* Delete a keyword line from a FITS header */
 extern int hadd();	/* Add a keyword line to a FITS header */
@@ -305,4 +324,13 @@ extern char *getutime(); /* Return current UT as an ISO-format string */
  * Jun 24 1998	Add string lengths to ra2str(), dec2str, and deg2str() calls
  * Jun 25 1998	Fix other C++ declarations with added string lengths
  * Aug 31 1998	Add current date subroutines getltime() and getutime()
+ * Oct 28 1998	Add missing hgetc() to non c++ declarations
+ *
+ * Oct  6 1999	Add gethlength() to return current size of header
+ * Oct 14 1999	All HPUT subroutines now return an error code, 0 if OK, else -1
+ * Oct 15 1999	Add hputcom() declaration
+ * Oct 21 1999	Add hgetm() declaration
+ *
+ * Mar 22 2000	Add int to iget*() declarations
+ * Mar 27 2000	Add hputm() declaration
  */

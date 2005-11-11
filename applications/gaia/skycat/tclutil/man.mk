@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: man.mk,v 1.3 1998/03/29 20:28:33 abrighto Exp $" 
+# "@(#) $Id: man.mk,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # Makefile.in 
 #
@@ -9,6 +9,7 @@
 # who      when     what
 # -------- -------- ------------------
 # abrighto 15/04/96 created
+# pbiereic 03/09/99 option to generate man pages from sources
 #
 # ------------------------------------------------------------------------
 # 	Make include file for manual page files 
@@ -17,26 +18,56 @@
 # This make include file assumes that $(MAN_SECTIONS) is set to the list
 # of man page sections (1 3 n ...) and $(MANDIR) is set to the install dir
 # for man pages.
+# The man pages can be generated directly from the sources. The path to the
+# sources is defined by $(MAN1), $(MAN3) or $(MANn)
 
 all:
 
 man: 
 	-@d="`date '+%d %h %y'`" ;\
-	set -x ;\
 	test -d ../doc || mkdir ../doc ;\
-	for i in $(MAN_SECTIONS) ;\
-	do \
-		test -d man$$i || mkdir man$$i ;\
-		test -d doc$$i || mkdir doc$$i ;\
-		for j in *.man$$i ;\
-		do \
-		  n=`basename $$j .man$$i` ;\
-		  echo "generating man page for $$n" ;\
-		  docDoManPages $$j $$i "$$d" ;\
-		  mv ../doc/$$n.* doc$$i ;\
-		  rm -f man$$i/$$i* ../doc/$$i* ;\
-		done ;\
-	done ;\
+	if [ ! -z "$(MAN_SECTIONS)" ] ; then \
+	  for i in $(MAN_SECTIONS) ;\
+	  do \
+	    if [ ! -z "$$i" ] ; then \
+	      del="" ; \
+	      test -d man$$i || mkdir man$$i ;\
+	      test -d doc$$i || mkdir doc$$i ;\
+              mp= ; \
+	      case $$i in  \
+	      1) \
+	        mp="$(MAN1)" ;; \
+	      3) \
+	        mp="$(MAN3)" ;; \
+	      n) \
+	        mp="$(MANn)" ;; \
+	      esac ; \
+	      if [ ! -z "$$mp" ] ; then \
+	        for j in $$mp ; \
+	        do \
+	          nam=`basename $$j` ; \
+	          nam=`echo $$nam | sed 's/\./\//'` ; \
+	          nam="`dirname $$nam`.man$$i" ; \
+	          ln -s $$j $$nam ;\
+	          del="$$del $$nam" ; \
+	        done ;\
+	      fi ; \
+	      \
+	      for j in *.man$$i ;\
+	      do \
+	        if [ "$$j" != "*.man$$i" ] ; then \
+	          n=`basename $$j .man$$i` ;\
+	          echo "generating man page for $$n" ;\
+	          docDoManPages $$j $$i "$$d" > /dev/null ;\
+	          mv ../doc/$$n.* doc$$i ;\
+	          rm -f man$$i/$$i* ../doc/$$i* ;\
+	        fi ; \
+	      done ;\
+	      \
+	      rm -f $$del ;\
+	    fi ; \
+	  done ;\
+	fi
 
 
 # Install the man pages in the man install dir.
@@ -79,7 +110,7 @@ install:
 	done
 
 clean:
-	$(RM) *\~ "#"* ../doc/*.* man*/*.* doc*/*.*
+	rm -fr man* doc*
 
 distclean: clean
-	rm -f Makefile	
+	rm -f Makefile

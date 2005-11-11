@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ProgressBar.tcl,v 1.7 1998/10/30 18:18:23 abrighto Exp $"
+# "@(#) $Id: ProgressBar.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # ProgressBar.tcl - widget to display a message and a progress bar
 #                   in a frame while doing some work that may take 
@@ -134,14 +134,14 @@ itcl::class util::ProgressBar {
         
     # set the starting point for the scale
     itk_option define -from from From {0} {
-	$itk_component(scale) config -from [expr $itk_option(-from) - 1]
+	$itk_component(scale) config -from [expr {$itk_option(-from) - 1}]
     }
 
     # set the end point for the scale
     itk_option define -to to To {20} {
 	look_busy 0
 	$itk_component(scale) config \
-	    -to [expr $itk_option(-to) + 1] \
+	    -to [expr {$itk_option(-to) + 1}] \
 	    -troughcolor $itk_option(-busycolor)
     }
 

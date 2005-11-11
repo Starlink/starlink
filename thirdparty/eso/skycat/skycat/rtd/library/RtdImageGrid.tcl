@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageGrid.tcl,v 1.11 1998/10/28 17:42:28 abrighto Exp $"
+# "@(#) $Id: RtdImageGrid.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageGrid.tcl - itcl class to display an ra,dec grid over an image.
 #
@@ -33,11 +33,11 @@ itcl::class rtd::RtdImageGrid {
     # return ra + inc in deg
 
     protected method inc_ra {ra inc} {
-	set ra [expr $ra+$inc]
+	set ra [expr {$ra+$inc}]
 	if {$ra >= 360} {
-	    set ra [expr $ra-360]
+	    set ra [expr {$ra-360}]
 	} elseif {$ra < 0} {
-	    set ra [expr 360+$ra]
+	    set ra [expr {360+$ra}]
 	}
 	return $ra
     }
@@ -46,11 +46,11 @@ itcl::class rtd::RtdImageGrid {
     # return dec + inc in deg
 
     protected method inc_dec {dec inc} {
-	set dec [expr $dec+$inc]
+	set dec [expr {$dec+$inc}]
 	if {$dec >= 90} {
-	    set dec [expr 180-$dec]
+	    set dec [expr {180-$dec}]
 	} elseif {$dec <= -90} {
-	    set dec [expr -180-$dec]
+	    set dec [expr {-180-$dec}]
 	}
 	return $dec
     }
@@ -85,8 +85,8 @@ itcl::class rtd::RtdImageGrid {
     protected method draw {} {
 
 	# get image size in arcsec
-	set wcsw [expr [$image_ wcswidth]*60]
-	set wcsh [expr [$image_ wcsheight]*60]
+	set wcsw [expr {[$image_ wcswidth]*60}]
+	set wcsh [expr {[$image_ wcsheight]*60}]
 	# puts "wcswidth in arcsec: $wcsw, height: $wcsh"
 
 	# size of grid box in arcsecs, choose default is not specified
@@ -100,17 +100,17 @@ itcl::class rtd::RtdImageGrid {
 	}
 	
 	while {$wcsw/$size_ > $maxlines} {
-	    set size_ [expr $size_*2]
+	    set size_ [expr {$size_*2}]
 	}
 	while {$wcsw/$size_ < $minlines} {
-	    set size_ [expr $size_/2]
+	    set size_ [expr {$size_/2}]
 	    if {"$size_" <= 0.0} {
 		return
 	    }
 	}
 	
 	# size in deg
-	set size_deg [expr $size_/3600.]
+	set size_deg [expr {$size_/3600.}]
 
 	# get image equinox
 	set equinox [$image_ wcsequinox]
@@ -124,9 +124,9 @@ itcl::class rtd::RtdImageGrid {
 	    # at pole
 	    set at_pole 1
 	    set nx 13 
-	    set ny [expr int($wcsh/$size_+1)]
+	    set ny [expr {int($wcsh/$size_+1)}]
 	    set ra0 0
-	    set ra_inc [expr 360./($nx-1)]
+	    set ra_inc [expr {360./($nx-1)}]
 	    if {$dec0 < 0} {
 		# puts "at south pole"
 		set dec0 -90
@@ -143,22 +143,22 @@ itcl::class rtd::RtdImageGrid {
 	    # not at pole
 
 	    # get max number of ra,dec lines
-	    set nx [expr int($wcsw/$size_+1)]
-	    set ny [expr int($wcsh/$size_+1)]
+	    set nx [expr {int($wcsw/$size_+1)}]
+	    set ny [expr {int($wcsh/$size_+1)}]
 
 	    # round ra and dec to $size border
 	    set ra_inc $size_deg
-	    set ra_sec [expr int($ra0*3600.)]
-	    set ra_sec [expr $ra_sec + ($size_ - fmod($ra_sec,$size_))]
-	    set ra0 [expr $ra_sec/3600.]
+	    set ra_sec [expr {int($ra0*3600.)}]
+	    set ra_sec [expr {$ra_sec + ($size_ - fmod($ra_sec,$size_))}]
+	    set ra0 [expr {$ra_sec/3600.}]
 
 	    set dec_inc $size_deg
-	    set dec_sec [expr int($dec0*3600.)]
-	    set dec_sec [expr $dec_sec + ($size_ - fmod($dec_sec,$size_))]
-	    set dec0 [expr $dec_sec/3600.]
+	    set dec_sec [expr {int($dec0*3600.)}]
+	    set dec_sec [expr {$dec_sec + ($size_ - fmod($dec_sec,$size_))}]
+	    set dec0 [expr {$dec_sec/3600.}]
 	
 	    # make the ra increment relative to dec0 (ra changes faster as dec nears the pole)
-	    set ra_inc [expr $ra_inc/cos(($dec0/180.)*$pi_)]
+	    set ra_inc [expr {$ra_inc/cos(($dec0/180.)*$pi_)}]
 
 	    # start in the center and inc in both directions
 	    set ra_inc_list "$ra_inc -$ra_inc"

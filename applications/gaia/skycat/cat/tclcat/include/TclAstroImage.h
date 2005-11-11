@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclAstroImage.h,v 1.8 1998/08/21 10:45:37 abrighto Exp $
+ * $Id: TclAstroImage.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
  *
  * TclAstroImage.h - Tcl interface to the AstroImage C++ class for 
  * 		     accessing images from catalogs
@@ -19,7 +19,7 @@
  * Allan Brighton  26 Sep 95  Created
  */
 
-#include <stdio.h>
+#include <cstdio>
 #include "TclCommand.h"
 #include "AstroImage.h"
 

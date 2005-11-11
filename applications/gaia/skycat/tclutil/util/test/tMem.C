@@ -1,21 +1,23 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tMem.C,v 1.4 1998/12/03 22:11:51 abrighto Exp $
+ * $Id: tMem.C,v 1.4 2005/02/02 01:43:00 brighton Exp $
  *
  * tMem.C - test cases for class Mem
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  08 Mar 96  Created
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #include "error.h"
 #include "Mem.h"
 

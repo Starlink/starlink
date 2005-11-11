@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.2 1997/12/03 22:26:34 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # Makefile.in
 # 
@@ -19,6 +19,8 @@ SHELL    	= /bin/sh
 RM		= rm -rf
 
 all depend: 
+
+include @SRC_ROOT@/makefile.mk
 
 man install clean distclean:
 #include ../../man.mk

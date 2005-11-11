@@ -888,7 +888,7 @@ static int	get_raw
 )
 {
     boolean	test_swap();
-    void	swap_bytes();
+    void	h_swap_bytes();
     /* void	pr_format_message(); */
 
     int         i;
@@ -940,7 +940,7 @@ static int	get_raw
 
 	if (tswap)
 	{
-	    swap_bytes(sa, ny * sizeof(short));
+	    h_swap_bytes(sa, ny * sizeof(short));
 	}
 
 

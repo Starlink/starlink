@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TableListSort.tcl,v 1.6 1998/10/28 17:46:41 abrighto Exp $"
+# "@(#) $Id: TableListSort.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # TableListSort.tcl - itcl popup widget for sorting contents of a TableList
 #

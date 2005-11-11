@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: CatalogInfo.tcl,v 1.18 1999/03/15 12:30:12 abrighto Exp $"
+# "@(#) $Id: CatalogInfo.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
 #
 # CatalogInfo.tcl - widget for browsing through a hierarchical list of catalogs
 #
@@ -346,9 +346,11 @@ itcl::class cat::CatalogInfo {
 	    set newpath "$path${sep_}$name"
 	}
 	set text $name
+	
+	set dirPath [split $path $sep_]
 
 	# get server type and display string for it
-	if {[catch {set serv_type [$astrocat_ servtype $name]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $name $dirPath]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -419,17 +421,20 @@ itcl::class cat::CatalogInfo {
 	# get name and type of selected catalog
 	if {"$path" == "$rootdir_"} {
 	    set name $rootdir_
+	    set dirPath ""
 	} else {
-	    set name [lindex [split $path $sep_] end]
+	    set list [split $path $sep_]
+	    set name [lindex $list end]
+	    set dirPath [lrange $list 0 [expr [llength $list]-2]]
 	}
-	if {[catch {set serv_type [$astrocat_ servtype $name]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $name $dirPath]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
 
 	if {"$serv_type" != "directory"} {
 	    # catalog types
-	    select_catalog $name
+	    select_catalog $path
 	    return
 	} 
 
@@ -443,7 +448,8 @@ itcl::class cat::CatalogInfo {
 	} else {
 	    # get and display list of catalogs under this node
 	    busy {
-		set status [catch {set catalog_list [lsort [$astrocat_ info {} $name]]} msg]
+		set dirPath [split $path $sep_]
+		set status [catch {set catalog_list [lsort [$astrocat_ info {} $dirPath]]} msg]
 	    }
 	    if {$status} {
 		error_dialog $msg $w_
@@ -468,10 +474,13 @@ itcl::class cat::CatalogInfo {
 	# get name and type of selected catalog
 	if {"$path" == "$rootdir_"} {
 	    set name $rootdir_
+	    set dirPath ""
 	} else {
-	    set name [lindex [split $path $sep_] end]
+	    set list [split $path $sep_]
+	    set name [lindex $list end]
+	    set dirPath [lrange $list 0 [expr [llength $list]-2]]
 	}
-	if {[catch {set serv_type [$astrocat_ servtype $name]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $name $dirPath]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -526,9 +535,10 @@ itcl::class cat::CatalogInfo {
 
     protected method select_catalog {path} {
 	set catalog_path_ [split $path $sep_]
+	set catalog_dir_ [lrange $catalog_path_ 0 [expr [llength $catalog_path_]-2]]
 	set catalog_ [lindex $catalog_path_ end]
 
-	if {[catch {set serv_type [$astrocat_ servtype $catalog_]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $catalog_ $catalog_dir_]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -552,7 +562,7 @@ itcl::class cat::CatalogInfo {
     # open a window to search the selected catalog
 
     protected method open_catalog {args} {
-	if {[catch {set serv_type [$astrocat_ servtype $catalog_]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $catalog_ $catalog_dir_]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -564,7 +574,8 @@ itcl::class cat::CatalogInfo {
 	    $itk_option(-debug) \
 	    0 \
 	    $serv_type \
-	    $itk_option(-callerw)     
+	    $itk_option(-callerw) \
+	    $catalog_dir_
     } 
 
 
@@ -587,14 +598,12 @@ itcl::class cat::CatalogInfo {
     # add the selected catalog to the catalog list
 
     protected method add_catalog {} {
-	set catdir [lindex $catalog_path_ [expr [llength $catalog_path_]-1]]
-
-	if {[catch {set e [$astrocat_ entry get $catalog_ $catdir]} msg]} {
+	if {[catch {set e [$astrocat_ entry get $catalog_ $catalog_dir_]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
 	
-	if {[catch {set shortName [$astrocat_ shortname $catalog_]} msg]} {
+	if {[catch {set shortName [$astrocat_ shortname $catalog_ $catalog_dir_]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -671,7 +680,7 @@ itcl::class cat::CatalogInfo {
 
     protected method remove_catalog {} {
 	# if this is a directory...
-	if {[catch {set serv_type [$astrocat_ servtype $catalog_]} msg]} {
+	if {[catch {set serv_type [$astrocat_ servtype $catalog_ $catalog_dir_]} msg]} {
 	    error_dialog $msg $w_
 	    return
 	}
@@ -770,6 +779,9 @@ itcl::class cat::CatalogInfo {
 
     # full path name of currently selected catalog
     protected variable catalog_path_
+
+    # currently selected catalog directory (as a list of catalog directories in the path)
+    protected variable catalog_dir_
 
     # set to true if the catalog configuration has been edited and needs to be saved
     protected variable save_needed_ 0

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: AstroImage.h,v 1.8 1998/08/21 10:45:27 abrighto Exp $
+ * $Id: AstroImage.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
  *
  * AstroImage.h - base class definitions for classes that retrieve an image
  *                from a catalog based on object name, position, width and height.
@@ -20,7 +20,7 @@
  */
 
 
-#include <stdio.h>
+#include <cstdio>
 #include "HTTP.h"
 #include "WorldOrImageCoords.h"
 #include "CatalogInfo.h"

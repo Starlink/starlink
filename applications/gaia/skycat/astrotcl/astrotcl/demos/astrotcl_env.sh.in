@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: astrotcl_env.sh.in,v 1.1 1997/12/02 10:26:17 abrighto Exp $" 
+# "@(#) $Id: astrotcl_env.sh.in,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # This script is sourced by the astrotcl startup file, astrotcl.sh, 
 # if present, to set up the environment for running the astrotcl demo
@@ -13,10 +13,19 @@
 #  who      when      what
 # -------- ---------  ------------------
 # abrighto 28 Nov 97  created 
+# pbiereic 26/08/99   uses relative pathes
+
+abs_path()
+{
+	cwd=$PWD
+	cd $1
+	absPath=`pwd`
+	cd $cwd
+}
 
 # use the local development Tcl/Tk files and shared library
-TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@
-export TCLUTIL_LIBRARY
-
-ASTROTCL_LIBRARY=@ASTROTCL_BUILD_LIBRARY@
+abs_path "`pwd`/../../../astrotcl/astrotcl/library"
+ASTROTCL_LIBRARY=$absPath
 export ASTROTCL_LIBRARY
+
+echo "ASTROTCL_LIBRARY=\t$ASTROTCL_LIBRARY"

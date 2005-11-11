@@ -1,16 +1,18 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tWorldOrImageCoords.C,v 1.1 1997/11/28 01:33:26 abrighto Exp $
+ * $Id: tWorldOrImageCoords.C,v 1.4 2005/02/02 01:43:03 brighton Exp $
  *
  * tWorldOrImageCoords.C - test cases for class WorldOrImageCoords
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 97  Created
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "WorldOrImageCoords.h"

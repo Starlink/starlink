@@ -40,6 +40,7 @@
 ************************************************************************
 -*/
 
+#include <stdio.h>
 #include <memory.h>
 
 /* allan: 22.03.98: was varargs.h */
@@ -291,7 +292,8 @@ int		press_setopt
 
     if ( streq( type, PR_UNIX ) )
     {
-	local_press.lp_verbose = va_arg( args, boolean );
+	/* local_press.lp_verbose = va_arg( args, boolean );  allan: XXX error with gcc-2.96 */
+	local_press.lp_verbose = va_arg( args, int );
 	va_end( args );
     }
     else if ( streq( type, PR_HCOMP ) )
@@ -312,7 +314,8 @@ int		press_setopt
     }
     else if ( streq( type, PR_NONE ) )
     {
-	local_press.lp_verbose = va_arg( args, boolean );
+	/** local_press.lp_verbose = va_arg( args, boolean ); XXX allan: error with gcc-2.96 */
+	local_press.lp_verbose = va_arg( args, int );
 	va_end( args );
     }
     else

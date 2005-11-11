@@ -5,6 +5,117 @@ This file contains a list of changes to the Skycat software and user
 interface. The latest changes are at the top.
 
 
+--------------- 04.04.05 released skycat-2.7.4 -----------------
+
+* Merged in RTD changes from Peter Biereichel
+
+* Minor bug fixes and testing with latest compilers
+
+--------------- 20.01.03 released skycat-2.7.3 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
+--------------- 27.02.02 released skycat-2.7.2 -----------------
+
+* Fixed problem with temporary downloaded image files being deleted too soon.
+  (Now they are only deleted after they are loaded, so that the OS can delete
+   them later on.)
+
+--------------- 13.12.01 released skycat-2.7.1 -----------------
+--------------- 27.08.01 released skycat-2.7 -----------------
+
+* Included IWidgets in the skycat single binary version (used by
+  the new FITS header viewer).
+
+* Removed redundant HDU display code in SkycatCtrl.tcl, since most
+  of this is now done in the base class.
+
+--------------- 22.08.01 released skycat-2.6.10 -----------------
+--------------- 30.07.01 released skycat-2.6.9 -----------------
+--------------- 20.06.01 released skycat-2.6.8 -----------------
+
+* Fixed problem selecting catalog symbols in tk8.3.x
+
+--------------- 18.05.01 released skycat-2.6.7 -----------------
+
+* Ported to tcl8.3.3 (still compatible with earlier versions).
+
+--------------- 17.02.01 released skycat-2.6.5 -----------------
+--------------- 09.11.00 released skycat-2.6.4 -----------------
+
+* See ../CHANGES.
+
+--------------- 20.09.00 released skycat-2.6.3 -----------------
+
+* Added code to handle galactic and ecliptic coordinates.
+
+--------------- 25.05.00 released skycat-2.6.2 -----------------
+
+* Added the procedure "display_catalog {catalogName}" to the SkyCat
+  itcl class, for use via the remote interface. Now you can send 
+  this command to open a catalog window to display a catalog 
+  (name from the skycat config file) or a local catalog file (path name).
+
+* Removed an error message in SkycatCtrl.tcl that caused problems
+  when the image header and data were in separate files.
+
+--------------- 21.03.00 released skycat-2.6.1 -----------------
+
+* Tested compiling with Sun-CC 4.2 and fixed a number of incompatibilities.
+
+--------------- 02.03.00 released skycat-2.6 -----------------
+
+* Changed the default layout of the main panel to be on the left
+  instead of the top (use "skycat -panel_orient horizontal" to
+  get the old behavior). 
+
+* Added code to check for valid command line options. (Previously the
+  command line options were passed to the SkyCat Itcl class directly,
+  but there seems to be a bug in the current Tcl or Itcl version that
+  caused the application to crash when passed an invalid option.)
+
+---------------  27.12.99 released skycat-2.5.3 -----------------
+
+---------------  15.12.99 released skycat-2.5.2 -----------------
+
+* See ../CHANGES.
+
+---------------  02.11.99 released skycat-2.5.1 -----------------
+
+* See ../CHANGES.
+
+---------------  25.10.99 released skycat-2.5 --------------------
+
+* Merged in changes made by Peter Biereichel
+
+---------------  09.9.99 released skycat-2.4.7 -------------------
+
+* Updated for egcs/gcc-2.95.
+
+---------------  14.7.99 released skycat-2.4.5 -------------------
+
+* See ../CHANGES.
+
+---------------  21.6.99 released skycat-2.4.4 -------------------
+
+* See ../CHANGES.
+
+---------------  16.5.99 released skycat-2.4.3 -------------------
+
+* HDU Display: Reversed the row order for displaying image extensions
+  when sorting by CRPIX values.
+
+---------------  02.04.99 released skycat-2.4.2 -------------------
+
+* Updated rtd with Peter Biereichel's changes.
+
+---------------  25.03.99 released skycat-2.4.1 -------------------
+
+* Added a check when saving catalog data to a compressed image,
+  this this is not implemented.
+ 
+* Fixed bug in startup when creating history catalog.
+
 ---------------  22.03.99 released skycat-2.4 ---------------------
 
 * Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.

@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.4 1998/10/28 17:36:09 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $"
 
 # ------------------------------------------------------------------------
 # 	Makefile for Tcl library files 
@@ -11,7 +11,7 @@ INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 LIBDIR       = @LIBDIR@
 ASTROTCL_DIR = @ASTROTCL_DIR@
-ITCL_VERSION = @ITCL_VERSION@
+TCL_VERSION  = @TCL_VERSION@
 RM           = rm -f
 SHELL        = /bin/sh
 FILES        = *.tcl tclIndex
@@ -33,13 +33,13 @@ install-files: install-top
 	    $(INSTALL_DATA) $$i $(ASTROTCL_DIR) ; \
 	done 
 
-install: install-files
+install: index install-files
 
 clean:
 	$(RM) *\~ "#"*
 
 index tclIndex: FORCE
-	itclsh$(ITCL_VERSION) ./mkIndex.tcl
+	tclsh$(TCL_VERSION) ./mkIndex.tcl
 
 depend:
 
@@ -55,3 +55,6 @@ doc:
 cleandoc:
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

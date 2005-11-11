@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: skyCatInit.tcl,v 1.2 1999/03/16 21:17:35 abrighto Exp $"
+# "@(#) $Id: skyCatInit.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $"
 #
 # skyCatInit.tcl - This script generates a scriptics prowrap config 
 #                file on the stdout.

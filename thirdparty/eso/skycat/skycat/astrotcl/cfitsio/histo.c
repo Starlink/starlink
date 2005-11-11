@@ -1,8 +1,8 @@
 /*   Globally defined histogram parameters */
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <stdlib.h>
 #include "fitsio2.h"
 
 typedef struct {  /*  Structure holding all the histogramming information   */

@@ -1,3 +1,3 @@
 # Tcl package index file, version 1.0
 
-package ifneeded Cat @CAT_VERSION@ [list load "[file join [file dirname $dir] libcat@SHLIB_SUFFIX@]" Cat]
+package ifneeded Cat @CAT_VERSION@ "load [list $dir/../libcat@SHLIB_SUFFIX@]"

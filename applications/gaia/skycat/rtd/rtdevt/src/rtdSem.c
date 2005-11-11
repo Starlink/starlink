@@ -8,7 +8,12 @@
 * D.Hopkinson 21/01/97  Created.
 * D.Hopkinson 27/02/97  Updated to include shared memory creation/
 *			destruction.
-* P.Biereichel 14/06/97 Added rtdShmFillNext
+* pbiereic    14/06/97  Added rtdShmFillNext()
+* pbiereic    22/10/99  Bug fixed in rtdShmDelete
+* pbiereic    01/03/01  Added: rtdSemIncrement(), rtdSemGetVal()
+* pbiereic    28/05/01  Removed SEM_UNDO in rtdShmFill (see system parameter
+*                       semaem on HP which specifies the maximum amount the value
+*                       of a semaphore can be changed by an undo operation)
 *
 * Description:
 *	This module contains several utility routines for the creation,
@@ -17,6 +22,7 @@
 */
 /************************************************************************
 *   NAME
+*    rtdSem - utility routines for semaphores and shared memory
 *
 *    rtdShmCreate	- Initialise shared memory and semaphore set.
 *
@@ -26,7 +32,7 @@
 *
 *    rtdShmDelete	- Remove the shared memory/semaphore set.
 *
-*    rtdShmLocked	- Detect whether a particular shm segment is locked.
+*    rtdShmLocked	- Detect if a particular shm segment is locked.
 *
 *    rtdShmFillFirst    - Fill the first free segment of shared memory.
 *
@@ -40,6 +46,7 @@
 *    
 *    SYNOPSIS
 *    #include "rtdSem.h"
+*
 *    int rtdShmCreate(int	num,
 *          	      rtdShm	*shmPtr,
 *                     int	width,
@@ -51,7 +58,7 @@
 *                   rtdShm	*shmPtr,
 *		    int		verbose)
 * 
-*    int rtdShmStruct(int		index,
+*    int rtdShmStruct(int	index,
 *                   rtdIMAGE_INFO *imageInfo,
 *                   rtdShm	*shmPtr)
 *
@@ -99,7 +106,7 @@
 *   following convenience routines, although the fields of the
 *   structure should be self-explanatory.
 *
-*   rtdShmCreate() allocates the required number of buffers of shared
+* - rtdShmCreate() allocates the required number of buffers of shared
 *   memory of the required size, given the height, width, and data
 *   type of the FITS image that is to be created. It also creates a
 *   single semaphore set, the number of items in the set being equal
@@ -111,8 +118,8 @@
 *   If the shared memory has already been allocated, this routine returns
 *   immediately.
 * 
-*   rtdShmFill() is used to fill a particular piece of shared memory 
-*   (specified by the index argument) with data. Before doing to, the
+* - rtdShmFill() is used to fill a particular piece of shared memory 
+*   (specified by the index argument) with data. Before doing so, the
 *   semaphore corresponding to the shared memory is set to one.
 *
 *   If the shared memory is currently locked, the routine returns
@@ -121,26 +128,31 @@
 *   set by the CCD for a period of time longer then RTD_SEM_TIMEOUT
 *   (defined in rtdSem.h). In this case, the semaphore is reset and
 *   the processing continues.
+*
+*   If the data pointer is NULL then it is assumed that the data in
+*   shared memory will be filled by the camera process after successful
+*   call to rtdShmFill(). This is usually done when the camera process
+*   transfers huge images (or image arrays) directly to shared memory.
 * 
-*   rtdShmStruct() fills the image information structure with the
+* - rtdShmStruct() fills the image information structure with the
 *   information that is specific to the shared memory/semaphore
 *   locking, i.e. the shared memory ID, the semaphore ID, and the
 *   number of the shared memory in the multi-buffered cycle
 *   (...imageInfo->shmNum).
 *
-*   rtdShmDelete() removes the shared memory areas and semaphore, and
+* - rtdShmDelete() removes the shared memory areas and semaphore, and
 *   frees the memory associated with their storage.
 *
-*   rtdShmLocked() is used to detect whether or not a particular piece
+* - rtdShmLocked() is used to detect whether or not a particular piece
 *   of shared memory is currently locked, and returns the semaphore state.
 *   As with rtdShmFill, if it detects a semaphore timeout it resets the
 *   semaphore, and returns the new value.
 *   
-*   rtdShmFillFirst() cycles over the shared memory buffers and fills the
+* - rtdShmFillFirst() cycles over the shared memory buffers and fills the
 *   first free (unlocked) buffer with the data supplied in the argument.
 *   The number of the filled buffer is returned.
 *   
-*   rtdShmFillNext() cycles over the shared memory buffers and fills the
+* - rtdShmFillNext() cycles over the shared memory buffers and fills the
 *   next free (unlocked) buffer with the data supplied in the argument.
 *   The index starts at index+1.
 *   The number of the filled buffer is returned.
@@ -148,15 +160,15 @@
 *   The following routines are only used within the RTD software at the
 *   moment.
 *
-*   rtdShmServicePacket() processes an image event with respect to the
+* - rtdShmServicePacket() processes an image event with respect to the
 *   semaphore information that it holds, but does no more. This is used
 *   (for example) in situations where image events may be skipped by the
 *   RTD, but the skipped packets must still be serviced to free up the
 *   shared memory.
 *
-*   rtdSemDecrement() decrements the chosen semaphore by one.
+* - rtdSemDecrement() decrements the chosen semaphore by one.
 *
-*   rtdSemReset() resets the chosen semaphore to zero.
+* - rtdSemReset() resets the chosen semaphore to zero.
 *
 *   RETURN VALUES
 *
@@ -167,7 +179,7 @@
 *   The scheme that has been chosen for the shared memory locking is as
 *   follows. In a multi-buffered system, each piece of shared memory is
 *   made to correspond to a single item from a semaphore set. If the state
-*   of this item is high, the the CCD does not write to that piece of
+*   of this item is high, then the CCD does not write to that piece of
 *   memory. The RTD is never prevented from reading memory.
 *
 *   When a CCD writes into shared memory, it sets the semaphore for that
@@ -232,7 +244,7 @@
 *	    // (rtdShmFillFirst has the same effect, except always starts
 *	    // from zero).
 *   	    while (rtdShmFill(i, data, &shmInfo, 0) == -1) {
-*   	    	i++;
+*   	       sleep(1);
 *   	    }
 *   
 *   	    imageInfo.dataType = DATASIZE;
@@ -248,8 +260,6 @@
 *   	    // forward image event
 *   	    rtdSendImageInfo(&eventHndl, &imageInfo, NULL);
 *   
-*   	    sleep(1);
-*   
 *   	    i = (i + 1) % NUM_BUF;
 *       }
 *
@@ -257,6 +267,13 @@
 *	rtdShmDelete(&shmInfo);
 *	free(data);
 *   }
+*
+*   WARNINGS
+*       If you are not using semaphore locking then set semId=-1 in the
+*       image event structure (see rtdImageEvent.h). Since semId=0 is
+*       a valid number it can happen that rtdServer decrements a
+*       semaphore created by another process which can lead to serious
+*       problems!
 *
 *   SEE ALSO
 *
@@ -272,9 +289,9 @@
 #ifndef HAVE_UNION_SEMUN
 /* argument type needed by semctl - not used here */
 union semun {
-    int val; /* used for SETVAL only */
+    int val;              /* used for SETVAL only */
     struct semid_ds *buf; /* for IPC_STAT and IPC_SET */
-    ushort *array;  /* used for GETALL and SETALL */
+    ushort *array;        /* used for GETALL and SETALL */
 };
 #endif
 static union semun semun_;
@@ -305,43 +322,46 @@ static union semun semun_;
  */
 int rtdShmCreate(int num, rtdShm *shmPtr, int width, int height, int type)
 {
-    int i, shmSize;
+    int i, shmSize, shmId, semId;
 
     /*
      * Check if the shared memory Ids have been allocated. If so, return.
      */
-    if (shmPtr->shmId) {
+    if (shmPtr->shmId)
 	return 0;
-    }
 
-    shmSize = width * height * (abs(type) / 8);
-    shmPtr->shmWidth = width;
-    shmPtr->shmHeight = height;
+    shmPtr->shmWidth     = width;
+    shmPtr->shmHeight    = height;
     shmPtr->shmImageType = type;
-
-    shmPtr->num = num;
+    shmPtr->num          = num;
+    shmSize = width * height * (abs(type) / 8);
 
     /*
      * Create new shared memory areas and allocate memory for the IDs.
      */
-    shmPtr->shmId = (int *)calloc(1, num * sizeof(int));
+    if ((shmPtr->shmId = (int *)calloc(num, sizeof(int))) == NULL) {
+	fprintf(stderr, "Unable to allocate memory\n");
+	return -1;
+    }
     for (i = 0; i < num; i++) {
-	if ((shmPtr->shmId[i] = shmget(IPC_PRIVATE, shmSize, 
-	    RTD_PERMS | IPC_CREAT)) == -1) {
+	shmId = shmget(IPC_PRIVATE, shmSize,  RTD_PERMS | IPC_CREAT);
+	if (shmId  == -1) {
 	    perror("rtdShmCreate");
 	    fprintf(stderr, "Error in creating shared memory #%d\n", i);
 	    return -1;
 	}
+	shmPtr->shmId[i] = shmId;
     }
 
     /*
      * Create the set of semaphores (one for each shared memory area)
      */
-    if ((shmPtr->semId = semget(IPC_PRIVATE, num, 0666 | IPC_CREAT)) == -1) {
+    semId = semget(IPC_PRIVATE, num, RTD_PERMS | IPC_CREAT);
+    if (semId == -1) {
 	perror("Unable to create semaphore");
 	return 0;
     }
-
+    shmPtr->semId = semId;
     /*
      * Allocate an array of timestamps for the semaphores
      */
@@ -350,7 +370,7 @@ int rtdShmCreate(int num, rtdShm *shmPtr, int width, int height, int type)
 	return -1;
     }
 
-    return shmPtr->semId;
+    return semId;
 }
 
 /*
@@ -373,54 +393,53 @@ int rtdShmCreate(int num, rtdShm *shmPtr, int width, int height, int type)
  */
 int rtdShmFill(int index, char *data, rtdShm *shmPtr, int verbose)
 {
-    char *ptr;			/* Pointer to shared memory area */
+    char *ptr;		/* Pointer to shared memory area */
     int shmSize;		/* Size of shared memory area */
-    struct timeval tm;		/* Timestamp structure for semaphore */
+    struct timeval tm;	/* Timestamp structure for semaphore */
 
     struct sembuf semLock[2] = {
 	0, 0, 0,		/* Wait for [#] to equal zero */
-	0, 1, SEM_UNDO		/* Increment [#] by one       */
-				/* Don't forget the undo flag for bad exits. */
+	0, 1, 0	/* Increment [#] by one */
     };
-
+  
     shmSize = shmPtr->shmWidth * shmPtr->shmHeight * 
 	abs(shmPtr->shmImageType) / 8;
-
+    
     /* Check if the semaphore is locked. Return immediately if it is */
     if (rtdShmLocked(shmPtr, index)) {
-	if (verbose)
-	    printf("Semaphore %d is already locked\n", index);
-	return -1;
+        if (verbose)
+            printf("Semaphore %d is already locked\n", index);
+        return -1;
     }
-
-    /* Get the current timestamp information */
+    
+/* Get the current timestamp information */
     gettimeofday(&tm, NULL);
 
-    /*
-     * Set the required semaphore to one, if the semaphore was created
-     * successfully. This will be reset to zero
-     * when all the RTDs have finished reading the image information.
-     *
-     * At the same time as locking the semaphore, timestamp the operation
-     * so that we can detect semaphore zombies.
-     */
+/*
+ * Set the required semaphore to one, if the semaphore was created
+ * successfully. This will be reset to zero
+ * when all the RTDs have finished reading the image information.
+ *
+ * At the same time as locking the semaphore, timestamp the operation
+ * so that we can detect semaphore zombies.
+ */
     semLock[0].sem_num = (unsigned short)index;
     semLock[1].sem_num = (unsigned short)index;
 
     if (shmPtr->semId != -1) {
-    	semop(shmPtr->semId, &semLock[0], 2);
-    	shmPtr->timestamp[index] = tm.tv_sec + (tm.tv_usec / 1000000.);
+	semop(shmPtr->semId, &semLock[0], 2);
+	shmPtr->timestamp[index] = tm.tv_sec + (tm.tv_usec / 1000000.);
 
-    	if (verbose) {
-	    if (semctl(shmPtr->semId, index, GETVAL, semun_)) {
-	    	fprintf(stderr, "Semaphore %d locked\n", (index + 1));
-	    }
-    	}
+	if (verbose && rtdSemGetVal(shmPtr->semId, index)) 
+	    fprintf(stderr, "Semaphore %d locked\n", (index + 1));
     }
-    /*
-     * Fill the shared memory up. First attach to the memory, then simply
-     * copy the data across.
-     */
+/*
+ * Fill the shared memory up. First attach to the memory, then simply
+ * copy the data across.
+ */
+    if (data == NULL)
+	return 0;
+
     ptr = (char *)shmat(shmPtr->shmId[index], NULL, 0);
     if (ptr != NULL && ptr != (void *)-1) {
 	if (memcpy(ptr, data, shmSize) == NULL) {
@@ -430,14 +449,14 @@ int rtdShmFill(int index, char *data, rtdShm *shmPtr, int verbose)
 	}
     }
     else {
-    	if (verbose)
+	if (verbose)
 	    fprintf(stderr, "Unable to attach to shared memory %d\n",
 		    shmPtr->shmId[index]);
-    	rtdSemDecrement(shmPtr->semId, index);
+	rtdSemDecrement(shmPtr->semId, index);
 	return -1;
     }
 
-    /* Finally, detach from the shared memory. */
+/* Finally, detach from the shared memory. */
     shmdt(ptr);
 
     return 0;
@@ -461,14 +480,13 @@ int rtdShmFillFirst(char *data, rtdShm *shmPtr)
     int i;		/* Index counter */
     int status = -1;	/* Return status */
 
-    /*
-     * Cycle over all the buffers, chcking to see if they're locked.
-     * When an unlocked buffer is found, fill it with the data.
-     */
+/*
+ * Cycle over all the buffers, chcking to see if they're locked.
+ * When an unlocked buffer is found, fill it with the data.
+ */
     for (i = 0; i < shmPtr->num; i++) {
-	if ((status = rtdShmFill(i, data, shmPtr, 0)) == 0) {
+	if ((status = rtdShmFill(i, data, shmPtr, 0)) == 0) 
 	    break;
-	}
     }
 
     return (status == -1 ? status : i);
@@ -500,9 +518,8 @@ int rtdShmFillNext(int index, char *data, rtdShm *shmPtr)
      */
     for (i = 0; i < shmPtr->num; i++) {
 	j = (index+i) % shmPtr->num;
-	if ((status = rtdShmFill(j, data, shmPtr, 0)) == 0) {
+	if ((status = rtdShmFill(j, data, shmPtr, 0)) == 0) 
 	    break;
-	}
     }
     return (status == -1 ? status : j);
 }
@@ -527,8 +544,8 @@ int rtdShmFillNext(int index, char *data, rtdShm *shmPtr)
 int rtdShmStruct(int index, rtdIMAGE_INFO *imageInfo, rtdShm *shmPtr)
 {
     /* Fill in the required fields of the image information structure. */
-    imageInfo->shmId = shmPtr->shmId[index];
-    imageInfo->semId = shmPtr->semId;
+    imageInfo->shmId  = shmPtr->shmId[index];
+    imageInfo->semId  = shmPtr->semId;
     imageInfo->shmNum = index;
 
     return 0;
@@ -561,9 +578,8 @@ int rtdShmLocked(rtdShm *shmPtr, int index)
      * If the semaphore was not created successfully, then just return
      * "locked".
      */
-    if (shmPtr->semId == -1) {
+    if (shmPtr->semId == -1) 
 	return 1;
-    }
 
     /*
      * First check the current state of the semaphore. If it is high (1)
@@ -572,15 +588,14 @@ int rtdShmLocked(rtdShm *shmPtr, int index)
      * out on the semaphore for over RTD_SEM_TIMEOUT), in which case clear
      * the semaphore and continue.
      */
-    semval = semctl(shmPtr->semId, index, GETVAL, semun_);
+    semval = rtdSemGetVal(shmPtr->semId, index);
     if (semval < 0)
 	return 1;
     if (semval == 0)
 	return 0;
     if (tmStamp - shmPtr->timestamp[index] > RTD_SEM_TIMEOUT) {
-	while(semctl(shmPtr->semId, index, GETVAL, semun_) > 0) {
+	while(rtdSemGetVal(shmPtr->semId, index) > 0) 
 	    rtdSemDecrement(shmPtr->semId, index);
-	}
 	return 0;
     }
     return 1;
@@ -602,10 +617,8 @@ int rtdShmLocked(rtdShm *shmPtr, int index)
 void rtdShmServicePacket(rtdIMAGE_INFO *imageInfo)
 {
     /* Simply decrement the semaphore specified in the image information */
-    if (imageInfo->semId != -1) {
-	/* printf("Unlocked semaphore\n"); */
-    	rtdSemDecrement(imageInfo->semId, imageInfo->shmNum);
-    }
+    if (imageInfo->semId != -1) 
+	rtdSemDecrement(imageInfo->semId, imageInfo->shmNum);
 }
 
 /*
@@ -624,22 +637,21 @@ int rtdShmDelete(rtdShm *shmPtr)
 
     if (shmPtr == NULL)
 	return 0;
-    if (shmPtr->num < 1) {
+    if (shmPtr->num < 1) 
 	return 0;
-    }
 
     /* Delete the shared memory first. */
     if (shmPtr->shmId) {
-	for (i = 0; i < shmPtr->num; i++) {
+	for (i = 0; i < shmPtr->num; i++) 
 	    shmctl(shmPtr->shmId[i], IPC_RMID, NULL);
-	}
 	free(shmPtr->shmId);
 	shmPtr->shmId = NULL;
     }
 
     /* Delete the semaphore. */
     if (shmPtr->semId != -1) {
-        return semctl(shmPtr->semId, 0, IPC_RMID, semun_);
+	if (semctl(shmPtr->semId, 0, IPC_RMID, semun_) != 0)
+	    return -1;
     }
 
     /* Delete the timestamp allocation */
@@ -666,21 +678,29 @@ int rtdShmDelete(rtdShm *shmPtr)
 void rtdSemDecrement(int semId, int semNum)
 {
     int cnt;
-    struct sembuf semDec[1] = {
+    struct sembuf semDec = {
 	0, -1, IPC_NOWAIT
     };
 
     /* Check the semaphore was created successfully */
-    if (semId == -1) {
+    if (semId == -1) 
 	return;
-    }
 
     /* Perform the decrementation */
-    semDec[0].sem_num = (unsigned short)semNum;
-    cnt = semctl(semId, semNum, GETVAL, semun_);
-    if (cnt > 0) {
-	semop(semId, &semDec[0], 1);
-    }
+    semDec.sem_num = (unsigned short)semNum;
+    cnt = rtdSemGetVal(semId, semNum);
+    if (cnt > 0) 
+	semop(semId, &semDec, 1);
+}
+/*
+ * This routine return the current value of a semaphore
+ */
+
+int rtdSemGetVal(int semId, int semNum)
+{
+    if (semId == -1) 
+	return -1;
+    return semctl(semId, semNum, GETVAL, semun_);
 }
 
 /*
@@ -702,12 +722,29 @@ void rtdSemReset(int semId, int semNum)
     };
 
     /* Check the semaphore was created successfully */
-    if (semId == -1) {
+    if (semId == -1) 
 	return;
-    }
 
     /* Perform the reset */
     semDec[0].sem_num = (unsigned short)semNum;
-    semDec[0].sem_op = -(short)semctl(semId, semNum, GETVAL, semun_);
+    semDec[0].sem_op  = -(short)rtdSemGetVal(semId, semNum);
     semop(semId, &semDec[0], 1);
+}
+
+int rtdSemIncrement(int semId, int semNum, int increment)
+{
+    struct sembuf semInc;
+
+    semInc.sem_num = 0;
+    semInc.sem_op  = increment;  /* Increment [#] by increment */
+    semInc.sem_flg = SEM_UNDO; 
+
+    if (semId == -1) 
+	return RTD_ERROR;
+    
+    if (increment != 0) {
+	semInc.sem_num = (unsigned short)semNum;
+	semop(semId, &semInc, 1);
+    }
+    return RTD_OK;
 }

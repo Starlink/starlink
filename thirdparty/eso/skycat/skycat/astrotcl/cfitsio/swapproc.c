@@ -10,8 +10,8 @@
 /*  Government purposes to publish, distribute, translate, copy, exhibit,  */
 /*  and perform such material.                                             */
 
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/
 void ffswap2(short *svalues,  /* IO - pointer to shorts to be swapped       */

@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: test.tcl,v 1.4 1997/12/02 10:27:21 abrighto Exp $" 
+# "@(#) $Id: test.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # test.tcl - tcl defs to set up environment for test scripts
 #
@@ -16,9 +16,18 @@ foreach pkg {RTD ASTROTCL TCLUTIL BLT} {
 	lappend auto_path $env(${pkg}_LIBRARY)
     }
 }
+proc tkerror {msg} {
+    global errorInfo
+    puts stderr "$errorInfo"
+    tkerror__ "error: $msg"
+}
+
+# for debugging: print all errors on stderr
+catch {tkerror}
+rename tkerror tkerror__
 
 # add blt namespace to the import list in the current namespace context
-import add ::blt
+#import add ::blt
 
 set tk_strictMotif 0
 tk appname Rtd
@@ -28,5 +37,6 @@ if {[catch {package require Rtd} msg]} {
 	puts "error loading Rtd package: $msg"
 	exit 1
 }
+rtd::setXdefaults
 
 utilPrintErrors

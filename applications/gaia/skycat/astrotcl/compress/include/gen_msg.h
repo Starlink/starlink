@@ -45,4 +45,4 @@ typedef struct	msg
 
 extern	void	msg_append();
 extern	void	msg_clear();
-extern	void	msg_format();
+extern	void	msg_format(char	*buffer, char *prefix, int num_msgs, MSG *msgs, int status, ...);

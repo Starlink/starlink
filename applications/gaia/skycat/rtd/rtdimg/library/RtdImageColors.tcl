@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageColors.tcl,v 1.23 1999/03/22 21:41:31 abrighto Exp $"
+# "@(#) $Id: RtdImageColors.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageColors.tcl - itcl widget for managing colormap for an rtdimage
 # 
@@ -10,6 +10,7 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 95  Created
+# pbiereic        04/11/03   Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
 
 itk::usual RtdImageColors {}
 
@@ -251,9 +252,11 @@ itcl::class rtd::RtdImageColors {
 	update idletasks
 	busy {
 	    lassign [$image_ alloccolors] allocated_ free_
+	    # XXX needed for bug in tcl 8.4.3
+	    set bug "$allocated_ $free_"
 
 	    set n $itk_option(-min_free)
-	    set to [max $n [expr ($free_+$allocated_)-$n]]
+	    set to [max $n [expr {($free_+$allocated_)-$n}]]
 	    $itk_component(allocated) config \
 		-to $to \
 		-value $allocated_

@@ -21,8 +21,8 @@
     
 #include "fitsio.h"
 #include "group.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*---------------------------------------------------------------------------
  Change record:

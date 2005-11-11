@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.4 1998/10/28 17:35:54 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:38 brighton Exp $"
 #
 # Makefile.in
 #
@@ -68,12 +68,14 @@ itcltags:
 # generate man page sources from itcl source files (run make man afterwards)
 doc cleandoc:
 	-for i in tclutil/tclutil astrotcl/astrotcl rtd/rtdimg cat/tclcat skycat/interp ;\
-	 do (cd $$i/library; echo "$$i/library:"; $(MAKE) $@) done
+	 do (if test -d $$i/library; then \
+		cd $$i/library; echo "$$i/library:"; $(MAKE) $@) done
 
 # generate the tclIndex files
 tclIndex index:
-	-for i in tclutil/tclutil astrotcl/astrotcl rtd/rtdimg cat/tclcat skycat/interp plugins/gaia/gaia ;\
-	 do (cd $$i/library; echo "$$i/library:"; $(MAKE) $@) done
+	-for i in tclutil/tclutil astrotcl/astrotcl rtd/rtdimg cat/tclcat skycat/interp ;\
+	 do (if test -d $$i/library; then \
+		cd $$i/library; echo "$$i/library:"; $(MAKE) $@; fi) done
 
 # run make in the given subdirs...
 $(SUBDIRS): FORCE

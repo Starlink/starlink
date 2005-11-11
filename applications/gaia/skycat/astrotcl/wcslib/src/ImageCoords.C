@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: ImageCoords.C,v 1.2 1998/07/30 22:20:10 abrighto Exp $
+ * $Id: ImageCoords.C,v 1.4 2005/02/02 01:43:04 brighton Exp $
  *
  * ImageCoords.C - method definitions for class ImageCoords
  * 
@@ -10,13 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: ImageCoords.C,v 1.2 1998/07/30 22:20:10 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageCoords.C,v 1.4 2005/02/02 01:43:04 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
 #include "error.h"
 #include "ImageCoords.h"
 

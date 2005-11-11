@@ -12,7 +12,7 @@
 *	int		h_put_data	: Writes data to output.
 *	static int	put_raw		: Writes raw data to output.
 *	static int	put_fits	: Writes fits data to output.
-*	void		swap_bytes	: Swaps bytes in an array.
+*	void		h_swap_bytes	: Swaps bytes in an array.
 *	boolean		test_swap	: Check to see if swaping is necessary.
 *
 *   Date		: Mar 15, 1993
@@ -151,7 +151,7 @@ static int	put_raw
     boolean	swap 
 )
 {
-    void	swap_bytes();
+    void	h_swap_bytes();
     boolean	test_swap();
 
     int		i;
@@ -209,7 +209,7 @@ static int	put_raw
 
 	if ( tswap ) 
 	{
-	    swap_bytes( sa, ny * sizeof( short ) );
+	    h_swap_bytes( sa, ny * sizeof( short ) );
 	}
 	PR_CHECK( char_out( sa, ny * sizeof( short ) ) );
     }
@@ -291,7 +291,7 @@ static int	put_fits
 ************************************************************************
 *
 *   Synopsis:
-*	void	swap_bytes( a, n )
+*	void	h_swap_bytes( a, n )
 *
 *   Purpose:
 *	Swaps the bytes in a.
@@ -304,12 +304,12 @@ static int	put_fits
 *	void
 *
 *   References:
-*	Copied from the hcompress swap_bytes routine.
+*	Copied from the hcompress h_swap_bytes routine.
 *	Programmer: R. White		Date: 17 April 1992
 *
 ************************************************************************
 -*/
-void	swap_bytes
+void	h_swap_bytes
 (
     byte	a[],
     int		n

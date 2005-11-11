@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclAstroCat.h,v 1.18 1998/08/21 10:45:37 abrighto Exp $
+ * $Id: TclAstroCat.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
  *
  * TclAstroCat.h - Tcl interface to the AstroCatalog C++ class for 
  * 	 	  accessing astronomical catalogs
@@ -29,7 +29,7 @@ class TclAstroCat : public TclCommand {
 protected:
     AstroCatalog* cat_;		// pointer to current open catalog
     WorldOrImageCoords pos1_, pos2_;	// saved positions from last query
-    double equinox_;		// saved equinox from last query
+    char equinoxStr_[32];	// saved equinox option from last query
     FILE* feedback_;		// file ptr for feedback during xfer, if set
     QueryResult* result_;	// saved pointer to results of previous query
    
@@ -38,14 +38,14 @@ protected:
     
     // convert tcl list to QueryResult given column headings
     virtual int getQueryResult(int numCols, char** colNames, const char* list, 
-			       double equinox, QueryResult& r);
+			       const char* equinoxStr, QueryResult& r);
 
     // Save (or insert) query results to the given file.
     virtual int saveQueryResult(const char* filename, int numCols, char** colNames, 
-				char* info, int iflag, double equinox = 2000.);
+				char* info, int iflag, const char* equinoxStr = NULL);
     // Remove query results from the given file.
     virtual int removeQueryResult(const char* filename, int numCols, char** colNames, 
-				  char* info, double equinox = 2000.);
+				  char* info, const char* equinoxStr = NULL);
 
     // append the given keyword/value pair to the list
     virtual void appendKeyVal(const char* keyword, const char* value);
@@ -53,9 +53,12 @@ protected:
     virtual int appendListVal(const char* value);
 
     // convert tcl list cat entry to config file format
-    virtual int tclListToConfigStreamValue(const char* tclList, ostream& os);
-    virtual int tclListToConfigStreamLine(const char* tclList, ostream& os);
-    virtual int tclListToConfigStream(const char* tclList, ostream& os);
+    virtual int tclListToConfigStreamValue(const char* tclList, std::ostream& os);
+    virtual int tclListToConfigStreamLine(const char* tclList, std::ostream& os);
+    virtual int tclListToConfigStream(const char* tclList, std::ostream& os);
+
+    // Return the catalog directory entry for the given name or path
+    CatalogInfoEntry* lookupCatalogDirectoryEntry(const char* dirList);
 
 public:
     // constructor

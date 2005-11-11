@@ -1,6 +1,6 @@
 /*
  * This file is generated from $(INCLUDESRC)/keysymdef.h.  Do not edit.
- * RCS: $Id: ks_names.h,v 1.2 1999/03/11 21:02:22 abrighto Exp $ 
+ * RCS: $Id: ks_names.h,v 1.2 2005/02/02 01:43:02 brighton Exp $ 
  */
 { "BackSpace", 0xFF08 },
 { "Tab", 0xFF09 },

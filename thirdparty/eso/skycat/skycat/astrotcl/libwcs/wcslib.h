@@ -1,7 +1,36 @@
 #ifndef wcslib_h_
 #define wcslib_h_
 
-#include <math.h>
+/*=============================================================================
+*
+*   WCSLIB - an implementation of the FITS WCS proposal.
+*   Copyright (C) 1995-1999, Mark Calabretta
+*
+*   This library is free software; you can redistribute it and/or modify it
+*   under the terms of the GNU Library General Public License as published
+*   by the Free Software Foundation; either version 2 of the License, or (at
+*   your option) any later version.
+*
+*   This library is distributed in the hope that it will be useful, but
+*   WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library
+*   General Public License for more details.
+*
+*   You should have received a copy of the GNU Library General Public License
+*   along with this library; if not, write to the Free Software Foundation,
+*   Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*
+*   Correspondence concerning WCSLIB may be directed to:
+*      Internet email: mcalabre@atnf.csiro.au
+*      Postal address: Dr. Mark Calabretta,
+*                      Australia Telescope National Facility,
+*                      P.O. Box 76,
+*                      Epping, NSW, 2121,
+*                      AUSTRALIA
+*
+*   Author: Mark Calabretta, Australia Telescope National Facility
+*   $Id: wcslib.h,v 1.2 2005/02/02 01:43:04 brighton Exp $
+*===========================================================================*/
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,39 +40,6 @@ extern "C" {
 #ifndef const
 #define const
 #endif
-#endif
-
-#ifdef TRIGD
-#include <TRIGD>
-#else /* not TRIGD */
-#if __STDC__ || defined(__cplusplus)
-   double cosdeg(const double);
-   double sindeg(const double);
-   double tandeg(const double);
-   double acosdeg(const double);
-   double asindeg(const double);
-   double atandeg(const double);
-   double atan2deg(const double, const double);
-#else
-   double cosdeg();
-   double sindeg();
-   double tandeg();
-   double acosdeg();
-   double asindeg();
-   double atandeg();
-   double atan2deg();
-#endif
-
-/* Domain tolerance for asin and acos functions. */
-#define WCSTRIG_TOL 1e-10
-#endif /* TRIGD */
-
-#ifdef __cplusplus
-};
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 struct prjprm {
@@ -162,26 +158,11 @@ extern const char *prjset_errmsg[];
 extern const char *prjfwd_errmsg[];
 extern const char *prjrev_errmsg[];
 
-#ifndef PI
-#define PI      3.141592653589793238462643
-#endif
-#define D2R	PI/180.0
-#define R2D	180.0/PI
-#define SQRT2	1.4142135623730950488
-#define SQRT2INV 1.0/SQRT2
-
 #define PRJSET 137
 
-#ifdef __cplusplus
-};
-#endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern int skycat_npcode;
-extern char skycat_pcodes[25][4];
+extern int npcode;
+extern char pcodes[25][4];
 
 struct celprm {
    int flag;
@@ -225,20 +206,6 @@ extern const char *celrev_errmsg[];
 
 #define CELSET 137
 
-#ifdef __cplusplus
-}
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#if !defined(__STDC__) && !defined(__cplusplus)
-#ifndef const
-#define const
-#endif
-#endif
-
 struct linprm {
    int flag;
    int naxis;
@@ -266,13 +233,6 @@ extern const char *linrev_errmsg[];
 
 #define LINSET 137
 
-#ifdef __cplusplus
-};
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct wcsprm {
    int flag;
@@ -339,15 +299,58 @@ extern const char *wcsmix_errmsg[];
 
 #define WCSSET 137
 
+
+#if __STDC__  || defined(__cplusplus)
+   int sphfwd(const double, const double,
+              const double [],
+              double *, double *);
+   int sphrev(const double, const double,
+              const double [],
+              double *, double *);
+#else
+   int sphfwd(), sphrev();
+#endif
+
+#ifndef PI
+#define PI 3.141592653589793238462643
+#endif
+#define D2R PI/180.0
+#define R2D 180.0/PI
+#define SQRT2 1.4142135623730950488
+#define SQRT2INV 1.0/SQRT2
+
+#if !defined(__STDC__) && !defined(__cplusplus)
+#ifndef const
+#define const
+#endif
+#endif
+
+#if __STDC__ || defined(__cplusplus)
+   double cosdeg(const double);
+   double sindeg(const double);
+   double tandeg(const double);
+   double acosdeg(const double);
+   double asindeg(const double);
+   double atandeg(const double);
+   double atan2deg(const double, const double);
+#else
+   double cosdeg();
+   double sindeg();
+   double tandeg();
+   double acosdeg();
+   double asindeg();
+   double atandeg();
+   double atan2deg();
+#endif
+
+/* Domain tolerance for asin and acos functions. */
+#define WCSTRIG_TOL 1e-10
+
 #ifdef __cplusplus
 };
 #endif
 
 #endif /* wcslib_h_ */
 
-/* Apr 15 1998	"deg" added to function names by Doug Mink, SAO
- * May 27 1998	ifndef WCSLIB changed to ifndef wcslib_h_
- * May 27 1998	ifndef WCSTRIG changed to ifndef wcstrig_h_
- * May 27 1998	ifndef CEL changed to ifndef cel_h_
- * May 27 1998	ifndef LIN changed to ifndef lin_h_
+/* Feb  3 2000	Doug Mink - Make cplusplus ifdefs for braces all-inclusive
  */

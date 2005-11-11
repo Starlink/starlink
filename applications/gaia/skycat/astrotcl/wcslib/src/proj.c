@@ -1,9 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
-*   wcstrig function names changed by Doug Mink, SAO, April 15, 1998
-*   proj.h include file added to wcslib.h by Doug Mink, SAO, September 28, 1998
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -134,7 +132,8 @@
 *      int flag
 *         This flag must be set to zero whenever any of p[10] or r0 are set
 *         or changed.  This signals the initialization routine to recompute
-*         intermediaries.
+*         intermediaries.  flag may also be set to -1 to disable strict bounds
+*         checking for the AZP, TAN, SIN, ZPN, and COP projections.
 *      double r0
 *         r0; The radius of the generating sphere for the projection, a linear
 *         scaling parameter.  If this is zero, it will be reset to the default
@@ -166,12 +165,14 @@
 *      However, all forward projections will accept any value of phi and will
 *      not normalize it.
 *
-*      Although many of the forward projections will accept values of theta
-*      outside the range [-90,90] such latitudes are not meaningful and should
-*      normally be marked as an error.  However, in the interests of
-*      efficiency, the forward projection routines do not check for this,
-*      although they do check for any invalid values of theta within the
-*      range [-90,90].
+*      The forward projection routines do not explicitly check that theta lies
+*      within the range [-90,90].  They do check for any value of theta which
+*      produces an invalid argument to the projection equations (e.g. leading
+*      to division by zero).  The forward routines for AZP, TAN, SIN, ZPN, and
+*      COP also return error 2 if (phi,theta) corresponds to the overlapped
+*      (far) side of the projection but also return the corresponding value of
+*      (x,y).  This strict bounds checking may be relaxed by setting prj->flag
+*      to -1 (rather than 0) when these projections are initialized.
 *
 *   Reverse routines:
 *
@@ -182,19 +183,17 @@
 *
 *   Accuracy
 *   --------
-*   Closure to a precision of at least 1.0-10 degree of longitude and latitude
+*   Closure to a precision of at least 1E-10 degree of longitude and latitude
 *   has been verified for typical projection parameters on the 1 degree grid
 *   of native longitude and latitude (to within 5 degrees of any latitude
 *   where the projection may diverge).
 *
-*   Notwithstanding this, absolutely no claim is made for the accuracy or
-*   reliability of these routines.  They are supplied as is, with no warranty
-*   of fitness for any purpose.
-*
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: proj.c,v 1.6 1998/10/01 08:23:59 abrighto Exp $
+*   $Id: proj.c,v 1.2 2005/02/02 01:43:03 brighton Exp $
 *===========================================================================*/
 
+#include <stdlib.h>
+#include <math.h>
 #include "wcslib.h"
 
 /* Map error number to error message for each function. */
@@ -228,6 +227,8 @@ const char *prjrev_errmsg[] = {
 *      prj->r0     r0; reset to 180/pi if 0.
 *      prj->w[0]   r0*(mu+1)
 *      prj->w[1]   1/prj->w[0]
+*      prj->w[2]   Boundary parameter, -mu    for |mu| <= 1,
+*                                      -1/mu  for |mu| >= 1.
 *===========================================================================*/
 
 int azpset(prj)
@@ -243,8 +244,18 @@ struct prjprm *prj;
    }
 
    prj->w[1] = 1.0/prj->w[0];
+   if (fabs(prj->p[1]) <= 1.0) {
+      prj->w[2] = -prj->p[1];
+   } else {
+      prj->w[2] = -1.0/prj->p[1];
+   }
 
-   prj->flag = PRJSET;
+   if (prj->flag == -1) {
+      prj->flag = -PRJSET;
+   } else {
+      prj->flag = PRJSET;
+   }
+
    return 0;
 }
 
@@ -257,20 +268,26 @@ struct prjprm *prj;
 double *x, *y;
 
 {
-   double r, s;
+   double r, s, sthe;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (azpset(prj)) return 1;
    }
 
-   s = prj->p[1] + sindeg(theta);
+   sthe = sindeg (theta);
+
+   s = prj->p[1] + sthe;
    if (s == 0.0) {
       return 2;
    }
 
-   r =  prj->w[0]*cosdeg(theta)/s;
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   r =  prj->w[0]*cosdeg (theta)/s;
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
+
+   if (prj->flag == PRJSET && sthe < prj->w[2]) {
+      return 2;
+   }
 
    return 0;
 }
@@ -287,7 +304,7 @@ double *phi, *theta;
    double r, rho, s;
    const double tol = 1.0e-13;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (azpset(prj)) return 1;
    }
 
@@ -295,7 +312,7 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
 
    rho = r*prj->w[1];
@@ -304,9 +321,9 @@ double *phi, *theta;
       if (fabs(s) > 1.0+tol) {
          return 2;
       }
-      *theta = atan2deg(1.0,rho) - copysign(90.0,s);
+      *theta = atan2deg (1.0,rho) - copysign(90.0,s);
    } else {
-      *theta = atan2deg(1.0,rho) - asindeg(s);
+      *theta = atan2deg (1.0,rho) - asindeg (s);
    }
 
    return 0;
@@ -326,7 +343,12 @@ struct prjprm *prj;
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
-   prj->flag = PRJSET;
+   if (prj->flag == -1) {
+      prj->flag = -PRJSET;
+   } else {
+      prj->flag = PRJSET;
+   }
+
    return 0;
 }
 
@@ -341,16 +363,22 @@ double *x, *y;
 {
    double r, s;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if(tanset(prj)) return 1;
    }
 
-   s = sindeg(theta);
-   if (s == 0.0) return 2;
+   s = sindeg (theta);
+   if (s <= 0.0) {
+      return 2;
+   }
 
-   r =  prj->r0*cosdeg(theta)/s;
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   r =  prj->r0*cosdeg (theta)/s;
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
+
+   if (prj->flag == PRJSET && s < 0.0) {
+      return 2;
+   }
 
    return 0;
 }
@@ -366,7 +394,7 @@ double *phi, *theta;
 {
    double r;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (tanset(prj)) return 1;
    }
 
@@ -374,9 +402,9 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
-   *theta = atan2deg(prj->r0, r);
+   *theta = atan2deg (prj->r0, r);
 
    return 0;
 }
@@ -409,7 +437,12 @@ struct prjprm *prj;
    prj->w[3] = prj->w[2] + 2.0;
    prj->w[4] = prj->w[1] - 1.0;
 
-   prj->flag = PRJSET;
+   if (prj->flag == -1) {
+      prj->flag = -PRJSET;
+   } else {
+      prj->flag = PRJSET;
+   }
+
    return 0;
 }
 
@@ -422,9 +455,9 @@ struct prjprm *prj;
 double *x, *y;
 
 {
-   double cthe, t, z;
+   double cphi, cthe, sphi, t, z;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (sinset(prj)) return 1;
    }
 
@@ -433,16 +466,34 @@ double *x, *y;
       if (theta > 0.0) {
          z = -t*t/2.0;
       } else {
-         z = 2.0 - t*t/2.0;
+         z = -2.0 + t*t/2.0;
       }
       cthe = t;
    } else {
-      z =  sindeg(theta) - 1.0;
-      cthe = cosdeg(theta);
+      z =  sindeg (theta) - 1.0;
+      cthe = cosdeg (theta);
    }
 
-   *x =  prj->r0*(cthe*sindeg(phi) + prj->p[1]*z);
-   *y = -prj->r0*(cthe*cosdeg(phi) + prj->p[2]*z);
+   cphi = cosdeg (phi);
+   sphi = sindeg (phi);
+   *x =  prj->r0*(cthe*sphi + prj->p[1]*z);
+   *y = -prj->r0*(cthe*cphi + prj->p[2]*z);
+
+   /* Validate this solution. */
+   if (prj->flag == PRJSET) {
+      if (prj->w[1] == 0.0) {
+         /* Orthographic projection. */
+         if (theta < 0.0) {
+            return 2;
+         }
+      } else {
+         /* "Synthesis" projection. */
+         t = atandeg (prj->p[1]*sphi + prj->p[2]*cphi);
+         if (theta < t) {
+            return 2;
+         }
+      }
+   }
 
    return 0;
 }
@@ -459,7 +510,7 @@ double *phi, *theta;
    const double tol = 1.0e-13;
    double a, b, c, d, r2, sth, sth1, sth2, sxy, x0, xp, y0, yp, z;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (sinset(prj)) return 1;
    }
 
@@ -471,15 +522,15 @@ double *phi, *theta;
    if (prj->w[1] == 0.0) {
       /* Orthographic projection. */
       if (r2 != 0.0) {
-         *phi = atan2deg(x0, -y0);
+         *phi = atan2deg (x0, -y0);
       } else {
          *phi = 0.0;
       }
 
       if (r2 < 0.5) {
-         *theta = acosdeg(sqrt(r2));
+         *theta = acosdeg (sqrt(r2));
       } else if (r2 <= 1.0) {
-         *theta = asindeg(sqrt(1.0 - r2));
+         *theta = asindeg (sqrt(1.0 - r2));
       } else {
          return 2;
       }
@@ -520,7 +571,7 @@ double *phi, *theta;
             return 2;
          }
 
-         *theta = asindeg(sth);
+         *theta = asindeg (sth);
          z = sth - 1.0;
       }
 
@@ -529,7 +580,7 @@ double *phi, *theta;
       if (xp == 0.0 && yp == 0.0) {
          *phi = 0.0;
       } else {
-         *phi = atan2deg(yp,xp);
+         *phi = atan2deg (yp,xp);
       }
    }
 
@@ -560,6 +611,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -578,14 +630,14 @@ double *x, *y;
       if (stgset(prj)) return 1;
    }
 
-   s = 1.0 + sindeg(theta);
+   s = 1.0 + sindeg (theta);
    if (s == 0.0) {
       return 2;
    }
 
-   r =  prj->w[0]*cosdeg(theta)/s;
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   r =  prj->w[0]*cosdeg (theta)/s;
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
 
    return 0;
 }
@@ -609,9 +661,9 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
-   *theta = 90.0 - 2.0*atandeg(r*prj->w[1]);
+   *theta = 90.0 - 2.0*atandeg (r*prj->w[1]);
 
    return 0;
 }
@@ -640,6 +692,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -659,8 +712,8 @@ double *x, *y;
    }
 
    r =  prj->w[0]*(90.0 - theta);
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
 
    return 0;
 }
@@ -684,7 +737,7 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
    *theta = 90.0 - r*prj->w[1];
 
@@ -775,7 +828,12 @@ struct prjprm *prj;
       prj->w[1] = r;
    }
 
-   prj->flag = PRJSET;
+   if (prj->flag == -1) {
+      prj->flag = -PRJSET;
+   } else {
+      prj->flag = PRJSET;
+   }
+
    return 0;
 }
 
@@ -791,19 +849,24 @@ double *x, *y;
    int   j;
    double r, s;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (zpnset(prj)) return 1;
    }
 
    s = (90.0 - theta)*D2R;
+
    r = 0.0;
    for (j = 9; j >= 0; j--) {
       r = r*s + prj->p[j];
    }
    r = prj->r0*r;
 
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
+
+   if (prj->flag == PRJSET && s > prj->w[0]) {
+      return 2;
+   }
 
    return 0;
 }
@@ -821,7 +884,7 @@ double *phi, *theta;
    double a, b, c, d, lambda, r, r1, r2, rt, zd, zd1, zd2;
    const double tol = 1.0e-13;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (zpnset(prj)) return 1;
    }
 
@@ -915,7 +978,7 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
    *theta = 90.0 - zd*R2D;
 
@@ -946,6 +1009,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -964,9 +1028,9 @@ double *x, *y;
       if (zeaset(prj)) return 1;
    }
 
-   r =  prj->w[0]*sindeg((90.0 - theta)/2.0);
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   r =  prj->w[0]*sindeg ((90.0 - theta)/2.0);
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
 
    return 0;
 }
@@ -991,13 +1055,13 @@ double *phi, *theta;
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
 
    if (fabs(r-prj->w[0]) < tol) {
       *theta = -90.0;
    } else {
-      *theta = 90.0 - 2.0*asindeg(r*prj->w[1]);
+      *theta = 90.0 - 2.0*asindeg (r*prj->w[1]);
    }
 
    return 0;
@@ -1012,13 +1076,14 @@ double *phi, *theta;
 *
 *   Given and/or returned:
 *      prj->r0     r0; reset to 180/pi if 0.
-*      prj->w[0]   ln(cos(xi_b))/tan(xi_b)**2, where xi_b = (90-theta_b)/2
-*      prj->w[1]   1/2 - prj->w[0]
-*      prj->w[2]   r0*prj->w[1]
-*      prj->w[3]   tol, cutoff for using small angle approximation, in
+*      prj->w[0]   2*r0
+*      prj->w[1]   ln(cos(xi_b))/tan(xi_b)**2, where xi_b = (90-theta_b)/2
+*      prj->w[2]   1/2 - prj->w[1]
+*      prj->w[3]   2*r0*prj->w[2]
+*      prj->w[4]   tol, cutoff for using small angle approximation, in
 *                  radians.
-*      prj->w[4]   prj->w[1]*tol
-*      prj->w[5]   (180/pi)/prj->w[1]
+*      prj->w[5]   prj->w[2]*tol
+*      prj->w[6]   (180/pi)/prj->w[2]
 *===========================================================================*/
 
 int airset(prj)
@@ -1031,23 +1096,25 @@ struct prjprm *prj;
 
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
+   prj->w[0] = 2.0*prj->r0;
    if (prj->p[1] == 90.0) {
-      prj->w[0] = -0.5;
-      prj->w[1] =  1.0;
+      prj->w[1] = -0.5;
+      prj->w[2] =  1.0;
    } else if (prj->p[1] > -90.0) {
-      cxi = cosdeg((90.0 - prj->p[1])/2.0);
-      prj->w[0] = log(cxi)*(cxi*cxi)/(1.0-cxi*cxi);
-      prj->w[1] = 0.5 - prj->w[0];
+      cxi = cosdeg ((90.0 - prj->p[1])/2.0);
+      prj->w[1] = log(cxi)*(cxi*cxi)/(1.0-cxi*cxi);
+      prj->w[2] = 0.5 - prj->w[1];
    } else {
       return 1;
    }
 
-   prj->w[2] = prj->r0 * prj->w[1];
-   prj->w[3] = tol;
-   prj->w[4] = prj->w[1]*tol;
-   prj->w[5] = R2D/prj->w[1];
+   prj->w[3] = prj->w[0] * prj->w[2];
+   prj->w[4] = tol;
+   prj->w[5] = prj->w[2]*tol;
+   prj->w[6] = R2D/prj->w[2];
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1070,19 +1137,19 @@ double *x, *y;
       r = 0.0;
    } else if (theta > -90.0) {
       xi = D2R*(90.0 - theta)/2.0;
-      if (xi < prj->w[3]) {
-         r = xi*prj->w[2];
+      if (xi < prj->w[4]) {
+         r = xi*prj->w[3];
       } else {
-         cxi = cosdeg((90.0 - theta)/2.0);
+         cxi = cosdeg ((90.0 - theta)/2.0);
          txi = sqrt(1.0-cxi*cxi)/cxi;
-         r = -prj->r0*(log(cxi)/txi + prj->w[0]*txi);
+         r = -prj->w[0]*(log(cxi)/txi + prj->w[1]*txi);
       }
    } else {
       return 2;
    }
 
-   *x =  r*sindeg(phi);
-   *y = -r*cosdeg(phi);
+   *x =  r*sindeg (phi);
+   *y = -r*cosdeg (phi);
 
    return 0;
 }
@@ -1104,12 +1171,12 @@ double *phi, *theta;
       if (airset(prj)) return 1;
    }
 
-   r = sqrt(x*x + y*y)/prj->r0;
+   r = sqrt(x*x + y*y)/prj->w[0];
 
    if (r == 0.0) {
       xi = 0.0;
-   } else if (r < prj->w[4]) {
-      xi = r*prj->w[5];
+   } else if (r < prj->w[5]) {
+      xi = r*prj->w[6];
    } else {
       /* Find a solution interval. */
       x1 = 1.0;
@@ -1117,7 +1184,7 @@ double *phi, *theta;
       for (j = 0; j < 30; j++) {
          x2 = x1/2.0;
          txi = sqrt(1.0-x2*x2)/x2;
-         r2 = -(log(x2)/txi + prj->w[0]*txi);
+         r2 = -(log(x2)/txi + prj->w[1]*txi);
 
          if (r2 >= r) break;
          x1 = x2;
@@ -1136,7 +1203,7 @@ double *phi, *theta;
          cxi = x2 - lambda*(x2-x1);
 
          txi = sqrt(1.0-cxi*cxi)/cxi;
-         rt = -(log(cxi)/txi + prj->w[0]*txi);
+         rt = -(log(cxi)/txi + prj->w[1]*txi);
 
          if (rt < r) {
              if (r-rt < tol) break;
@@ -1150,13 +1217,13 @@ double *phi, *theta;
       }
       if (j == 100) return 2;
 
-      xi = acosdeg(cxi);
+      xi = acosdeg (cxi);
    }
 
    if (r == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(x, -y);
+      *phi = atan2deg (x, -y);
    }
    *theta = 90.0 - 2.0*xi;
 
@@ -1218,6 +1285,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1236,13 +1304,13 @@ double *x, *y;
       if (cypset(prj)) return 1;
    }
 
-   s = prj->p[1] + cosdeg(theta);
+   s = prj->p[1] + cosdeg (theta);
    if (s == 0.0) {
          return 2;
       }
 
    *x = prj->w[0]*phi;
-   *y = prj->w[2]*sindeg(theta)/s;
+   *y = prj->w[2]*sindeg (theta)/s;
 
    return 0;
 }
@@ -1264,7 +1332,7 @@ double *phi, *theta;
 
    *phi   = x*prj->w[1];
    eta    = y*prj->w[3];
-   *theta = atan2deg(eta,1.0) + asindeg(eta*prj->p[1]/sqrt(eta*eta+1.0));
+   *theta = atan2deg (eta,1.0) + asindeg (eta*prj->p[1]/sqrt(eta*eta+1.0));
 
    return 0;
 }
@@ -1294,6 +1362,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1359,6 +1428,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1380,7 +1450,7 @@ double *x, *y;
    }
 
    *x = prj->w[0]*phi;
-   *y = prj->r0*log(tandeg((90.0+theta)/2.0));
+   *y = prj->r0*log(tandeg ((90.0+theta)/2.0));
 
    return 0;
 }
@@ -1399,7 +1469,7 @@ double *phi, *theta;
    }
 
    *phi   = x*prj->w[1];
-   *theta = 2.0*atandeg(exp(y/prj->r0)) - 90.0;
+   *theta = 2.0*atandeg (exp(y/prj->r0)) - 90.0;
 
    return 0;
 }
@@ -1444,6 +1514,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1461,7 +1532,7 @@ double *x, *y;
    }
 
    *x = prj->w[0]*phi;
-   *y = prj->w[2]*sindeg(theta);
+   *y = prj->w[2]*sindeg (theta);
 
    return 0;
 }
@@ -1476,6 +1547,7 @@ double *phi, *theta;
 
 {
    double s;
+   const double tol = 1.0e-13;
 
    if (prj->flag != PRJSET) {
       if (ceaset(prj)) return 1;
@@ -1483,11 +1555,14 @@ double *phi, *theta;
 
    s = y*prj->w[3];
    if (fabs(s) > 1.0) {
-      return 2;
+      if (fabs(s) > 1.0+tol) {
+         return 2;
+      }
+      s = copysign(1.0,s);
    }
 
    *phi   = x*prj->w[1];
-   *theta = asindeg(s);
+   *theta = asindeg (s);
 
    return 0;
 }
@@ -1517,24 +1592,29 @@ struct prjprm *prj;
 {
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
-   prj->w[0] = sindeg(prj->p[1]);
+   prj->w[0] = sindeg (prj->p[1]);
    if (prj->w[0] == 0.0) {
       return 1;
    }
 
    prj->w[1] = 1.0/prj->w[0];
 
-   prj->w[3] = prj->r0*cosdeg(prj->p[2]);
+   prj->w[3] = prj->r0*cosdeg (prj->p[2]);
    if (prj->w[3] == 0.0) {
       return 1;
    }
 
    prj->w[4] = 1.0/prj->w[3];
-   prj->w[5] = 1.0/tandeg(prj->p[1]);
+   prj->w[5] = 1.0/tandeg (prj->p[1]);
 
    prj->w[2] = prj->w[3]*prj->w[5];
 
-   prj->flag = PRJSET;
+   if (prj->flag == -1) {
+      prj->flag = -PRJSET;
+   } else {
+      prj->flag = PRJSET;
+   }
+
    return 0;
 }
 
@@ -1547,17 +1627,27 @@ struct prjprm *prj;
 double *x, *y;
 
 {
-   double a, r;
+   double a, r, s, t;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (copset(prj)) return 1;
    }
 
-   a = prj->w[0]*phi;
-   r = prj->w[2] - prj->w[3]*tandeg(theta-prj->p[1]);
+   t = theta - prj->p[1];
+   s = cosdeg (t);
+   if (s == 0.0) {
+      return 2;
+   }
 
-   *x =             r*sindeg(a);
-   *y = prj->w[2] - r*cosdeg(a);
+   a = prj->w[0]*phi;
+   r = prj->w[2] - prj->w[3]*sindeg (t)/s;
+
+   *x =             r*sindeg (a);
+   *y = prj->w[2] - r*cosdeg (a);
+
+   if (prj->flag == PRJSET && r*prj->w[0] < 0.0) {
+      return 2;
+   }
 
    return 0;
 }
@@ -1573,7 +1663,7 @@ double *phi, *theta;
 {
    double a, dy, r;
 
-   if (prj->flag != PRJSET) {
+   if (abs(prj->flag) != PRJSET) {
       if (copset(prj)) return 1;
    }
 
@@ -1584,11 +1674,11 @@ double *phi, *theta;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2deg(x/r, dy/r);
+      a = atan2deg (x/r, dy/r);
    }
 
    *phi   = a*prj->w[1];
-   *theta = prj->p[1] + atandeg(prj->w[5] - r*prj->w[4]);
+   *theta = prj->p[1] + atandeg (prj->w[5] - r*prj->w[4]);
 
    return 0;
 }
@@ -1617,9 +1707,9 @@ struct prjprm *prj;
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
    if (prj->p[2] == 0.0) {
-      prj->w[0] = prj->r0*sindeg(prj->p[1])*D2R;
+      prj->w[0] = prj->r0*sindeg (prj->p[1])*D2R;
    } else {
-      prj->w[0] = prj->r0*sindeg(prj->p[1])*sindeg(prj->p[2])/prj->p[2];
+      prj->w[0] = prj->r0*sindeg (prj->p[1])*sindeg(prj->p[2])/prj->p[2];
    }
 
    if (prj->w[0] == 0.0) {
@@ -1627,10 +1717,11 @@ struct prjprm *prj;
    }
 
    prj->w[1] = 1.0/prj->w[0];
-   prj->w[2] = prj->r0*cosdeg(prj->p[2])*cosdeg(prj->p[1])/prj->w[0];
+   prj->w[2] = prj->r0*cosdeg (prj->p[2])*cosdeg (prj->p[1])/prj->w[0];
    prj->w[3] = prj->w[2] + prj->p[1];
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1652,8 +1743,8 @@ double *x, *y;
    a = prj->w[0]*phi;
    r = prj->w[3] - theta;
 
-   *x =             r*sindeg(a);
-   *y = prj->w[2] - r*cosdeg(a);
+   *x =             r*sindeg (a);
+   *y = prj->w[2] - r*cosdeg (a);
 
    return 0;
 }
@@ -1680,7 +1771,7 @@ double *phi, *theta;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2deg(x/r, dy/r);
+      a = atan2deg (x/r, dy/r);
    }
 
    *phi   = a*prj->w[1];
@@ -1701,7 +1792,7 @@ double *phi, *theta;
 *      prj->r0     r0; reset to 180/pi if 0.
 *      prj->w[0]   C = (sin(theta1) + sin(theta2))/2
 *      prj->w[1]   1/C
-*      prj->w[2]   Y0 = chi*sqrt(psi - 2C*sindeg(sigma))
+*      prj->w[2]   Y0 = chi*sqrt(psi - 2C*sindeg (sigma))
 *      prj->w[3]   chi = r0/C
 *      prj->w[4]   psi = 1 + sin(theta1)*sin(theta2)
 *      prj->w[5]   2C
@@ -1722,7 +1813,7 @@ struct prjprm *prj;
    theta1 = prj->p[1] - prj->p[2];
    theta2 = prj->p[1] + prj->p[2];
 
-   prj->w[0] = (sindeg(theta1) + sindeg(theta2))/2.0;
+   prj->w[0] = (sindeg (theta1) + sindeg (theta2))/2.0;
    if (prj->w[0] == 0.0) {
       return 1;
    }
@@ -1730,15 +1821,16 @@ struct prjprm *prj;
    prj->w[1] = 1.0/prj->w[0];
 
    prj->w[3] = prj->r0/prj->w[0];
-   prj->w[4] = 1.0 + sindeg(theta1)*sindeg(theta2);
+   prj->w[4] = 1.0 + sindeg (theta1)*sindeg (theta2);
    prj->w[5] = 2.0*prj->w[0];
    prj->w[6] = prj->w[3]*prj->w[3]*prj->w[4];
    prj->w[7] = 1.0/(2.0*prj->r0*prj->w[3]);
    prj->w[8] = prj->w[3]*sqrt(prj->w[4] + prj->w[5]);
 
-   prj->w[2] = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sindeg(prj->p[1]));
+   prj->w[2] = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sindeg (prj->p[1]));
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1761,11 +1853,11 @@ double *x, *y;
    if (theta == -90.0) {
       r = prj->w[8];
    } else {
-      r = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sindeg(theta));
+      r = prj->w[3]*sqrt(prj->w[4] - prj->w[5]*sindeg (theta));
    }
 
-   *x =             r*sindeg(a);
-   *y = prj->w[2] - r*cosdeg(a);
+   *x =             r*sindeg (a);
+   *y = prj->w[2] - r*cosdeg (a);
 
    return 0;
 }
@@ -1793,7 +1885,7 @@ double *phi, *theta;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2deg(x/r, dy/r);
+      a = atan2deg (x/r, dy/r);
    }
 
    *phi = a*prj->w[1];
@@ -1810,7 +1902,7 @@ double *phi, *theta;
             return 2;
          }
       } else {
-         *theta = asindeg(w);
+         *theta = asindeg (w);
       }
    }
 
@@ -1848,14 +1940,14 @@ struct prjprm *prj;
    theta1 = prj->p[1] - prj->p[2];
    theta2 = prj->p[1] + prj->p[2];
 
-   tan1 = tandeg((90.0 - theta1)/2.0);
-   cos1 = cosdeg(theta1);
+   tan1 = tandeg ((90.0 - theta1)/2.0);
+   cos1 = cosdeg (theta1);
 
    if (theta1 == theta2) {
-      prj->w[0] = sindeg(theta1);
+      prj->w[0] = sindeg (theta1);
    } else {
-      tan2 = tandeg((90.0 - theta2)/2.0);
-      cos2 = cosdeg(theta2);
+      tan2 = tandeg ((90.0 - theta2)/2.0);
+      cos2 = cosdeg (theta2);
       prj->w[0] = log(cos2/cos1)/log(tan2/tan1);
    }
    if (prj->w[0] == 0.0) {
@@ -1868,10 +1960,11 @@ struct prjprm *prj;
    if (prj->w[3] == 0.0) {
       return 1;
    }
-   prj->w[2] = prj->w[3]*pow(tandeg((90.0 - prj->p[1])/2.0),prj->w[0]);
+   prj->w[2] = prj->w[3]*pow(tandeg ((90.0 - prj->p[1])/2.0),prj->w[0]);
    prj->w[4] = 1.0/prj->w[3];
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1898,11 +1991,11 @@ double *x, *y;
          return 2;
       }
    } else {
-      r = prj->w[3]*pow(tandeg((90.0 - theta)/2.0),prj->w[0]);
+      r = prj->w[3]*pow(tandeg ((90.0 - theta)/2.0),prj->w[0]);
    }
 
-   *x =             r*sindeg(a);
-   *y = prj->w[2] - r*cosdeg(a);
+   *x =             r*sindeg (a);
+   *y = prj->w[2] - r*cosdeg (a);
 
    return 0;
 }
@@ -1929,7 +2022,7 @@ double *phi, *theta;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2deg(x/r, dy/r);
+      a = atan2deg (x/r, dy/r);
    }
 
    *phi = a*prj->w[1];
@@ -1940,7 +2033,7 @@ double *phi, *theta;
          return 2;
       }
    } else {
-      *theta = 90.0 - 2.0*atandeg(pow(r*prj->w[4],prj->w[1]));
+      *theta = 90.0 - 2.0*atandeg (pow(r*prj->w[4],prj->w[1]));
    }
 
    return 0;
@@ -1955,7 +2048,7 @@ double *phi, *theta;
 *   Given and/or returned:
 *      prj->r0     r0; reset to 180/pi if 0.
 *      prj->w[1]   r0*pi/180
-*      prj->w[2]   Y0 = r0*cot(theta1) + theta1
+*      prj->w[2]   Y0 = r0*(cot(theta1) + theta1*pi/180)
 *===========================================================================*/
 
 int bonset(prj)
@@ -1966,13 +2059,14 @@ struct prjprm *prj;
    if (prj->r0 == 0.0) {
       prj->r0 = R2D;
       prj->w[1] = 1.0;
-      prj->w[2] = prj->r0*cosdeg(prj->p[1])/sindeg(prj->p[1]) + prj->p[1];
+      prj->w[2] = prj->r0*cosdeg (prj->p[1])/sindeg (prj->p[1]) + prj->p[1];
    } else {
       prj->w[1] = prj->r0*D2R;
-      prj->w[2] = prj->r0*(cosdeg(prj->p[1])/sindeg(prj->p[1]) + prj->p[1]*D2R);
+      prj->w[2] = prj->r0*(cosdeg (prj->p[1])/sindeg (prj->p[1]) + prj->p[1]*D2R);
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -1997,10 +2091,10 @@ double *x, *y;
    }
 
    r = prj->w[2] - theta*prj->w[1];
-   a = prj->r0*phi*cosdeg(theta)/r;
+   a = prj->r0*phi*cosdeg (theta)/r;
 
-   *x =             r*sindeg(a);
-   *y = prj->w[2] - r*cosdeg(a);
+   *x =             r*sindeg (a);
+   *y = prj->w[2] - r*cosdeg (a);
 
    return 0;
 }
@@ -2032,15 +2126,15 @@ double *phi, *theta;
    if (r == 0.0) {
       a = 0.0;
    } else {
-      a = atan2deg(x/r, dy/r);
+      a = atan2deg (x/r, dy/r);
    }
 
    *theta = (prj->w[2] - r)/prj->w[1];
-   costhe = cosdeg(*theta);
+   costhe = cosdeg (*theta);
    if (costhe == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = a*(r/prj->r0)/cosdeg(*theta);
+      *phi = a*(r/prj->r0)/cosdeg (*theta);
    }
 
    return 0;
@@ -2073,6 +2167,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2091,8 +2186,8 @@ double *x, *y;
       if (pcoset(prj)) return 1;
    }
 
-   costhe = cosdeg(theta);
-   sinthe = sindeg(theta);
+   costhe = cosdeg (theta);
+   sinthe = sindeg (theta);
    a = phi*sinthe;
 
    if (sinthe == 0.0) {
@@ -2100,8 +2195,8 @@ double *x, *y;
       *y = 0.0;
    } else {
       cotthe = costhe/sinthe;
-      *x = prj->r0*cotthe*sindeg(a);
-      *y = prj->r0*(cotthe*(1.0 - cosdeg(a)) + theta*D2R);
+      *x = prj->r0*cotthe*sindeg (a);
+      *y = prj->r0*(cotthe*(1.0 - cosdeg (a)) + theta*D2R);
    }
 
    return 0;
@@ -2162,7 +2257,7 @@ double *phi, *theta;
 
          /* Compute the residue. */
          ymthe = y - prj->w[0]*(*theta);
-         tanthe = tandeg(*theta);
+         tanthe = tandeg (*theta);
          f = xx + ymthe*(ymthe - prj->w[2]/tanthe);
 
          /* Check for convergence. */
@@ -2184,7 +2279,7 @@ double *phi, *theta;
       if (xp == 0.0 && yp == 0.0) {
          *phi = 0.0;
       } else {
-         *phi = atan2deg(yp, xp)/sindeg(*theta);
+         *phi = atan2deg (yp, xp)/sindeg (*theta);
       }
    }
 
@@ -2215,6 +2310,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2231,7 +2327,7 @@ double *x, *y;
       if (glsset(prj)) return 1;
    }
 
-   *x = prj->w[0]*phi*cosdeg(theta);
+   *x = prj->w[0]*phi*cosdeg (theta);
    *y = prj->w[0]*theta;
 
    return 0;
@@ -2293,6 +2389,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2311,7 +2408,7 @@ double *x, *y;
       if (parset(prj)) return 1;
    }
 
-   s = sindeg(theta/3.0);
+   s = sindeg (theta/3.0);
    *x = prj->w[0]*phi*(1.0 - 4.0*s*s);
    *y = prj->w[2]*s;
 
@@ -2349,7 +2446,7 @@ double *phi, *theta;
       *phi = prj->w[1]*x/t;
    }
 
-   *theta = 3.0*asindeg(s);
+   *theta = 3.0*asindeg (s);
 
    return 0;
 }
@@ -2378,6 +2475,7 @@ struct prjprm *prj;
    prj->w[3] = 1.0/(2.0*prj->r0);
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2396,10 +2494,10 @@ double *x, *y;
       if (aitset(prj)) return 1;
    }
 
-   costhe = cosdeg(theta);
-   w = sqrt(prj->w[0]/(1.0 + costhe*cosdeg(phi/2.0)));
-   *x = 2.0*w*costhe*sindeg(phi/2.0);
-   *y = w*sindeg(theta);
+   costhe = cosdeg (theta);
+   w = sqrt(prj->w[0]/(1.0 + costhe*cosdeg (phi/2.0)));
+   *x = 2.0*w*costhe*sindeg (phi/2.0);
+   *y = w*sindeg (theta);
 
    return 0;
 }
@@ -2414,6 +2512,7 @@ double *phi, *theta;
 
 {
    double s, u, xp, yp, z;
+   const double tol = 1.0e-13;
 
    if (prj->flag != PRJSET) {
       if (aitset(prj)) return 1;
@@ -2421,12 +2520,20 @@ double *phi, *theta;
 
    u = 1.0 - x*x*prj->w[2] - y*y*prj->w[1];
    if (u < 0.0) {
-      return 2;
+      if (u < -tol) {
+         return 2;
+      }
+
+      u = 0.0;
    }
+
    z = sqrt(u);
    s = z*y/prj->r0;
-   if (s < -1.0 || s > 1.0) {
-      return 2;
+   if (fabs(s) > 1.0) {
+      if (fabs(s) > 1.0+tol) {
+         return 2;
+      }
+      s = copysign(1.0,s);
    }
 
    xp = 2.0*z*z - 1.0;
@@ -2434,9 +2541,9 @@ double *phi, *theta;
    if (xp == 0.0 && yp == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = 2.0*atan2deg(yp, xp);
+      *phi = 2.0*atan2deg (yp, xp);
    }
-   *theta = asindeg(s);
+   *theta = asindeg (s);
 
    return 0;
 }
@@ -2466,6 +2573,7 @@ struct prjprm *prj;
    prj->w[4] = 2.0/PI;
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2493,7 +2601,7 @@ double *x, *y;
       *x = prj->w[1]*phi;
       *y = 0.0;
    } else {
-      u  = PI*sindeg(theta);
+      u  = PI*sindeg (theta);
       v0 = -PI;
       v1 =  PI;
       v  = u;
@@ -2567,7 +2675,7 @@ double *phi, *theta;
       z = copysign(1.0,z);
    }
 
-   *theta = asindeg(z);
+   *theta = asindeg (z);
 
    return 0;
 }
@@ -2596,6 +2704,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2630,10 +2739,10 @@ double *x, *y;
       if (cscset(prj)) return 1;
    }
 
-   costhe = cosdeg(theta);
-   l = costhe*cosdeg(phi);
-   m = costhe*sindeg(phi);
-   n = sindeg(theta);
+   costhe = cosdeg (theta);
+   l = costhe*cosdeg (phi);
+   m = costhe*sindeg (phi);
+   n = sindeg (theta);
 
    face = 0;
    rho  = n;
@@ -2779,29 +2888,31 @@ double *phi, *theta;
    xf = x*prj->w[1];
    yf = y*prj->w[1];
 
-   /* Determine the face. */
-   if (xf > 7.0) {
-      return 2;
-   } else if (xf > 5.0) {
+   /* Check bounds. */
+   if (fabs(xf) <= 1.0) {
+      if (fabs(yf) > 3.0) return 2;
+   } else {
+      if (fabs(xf) > 7.0) return 2;
       if (fabs(yf) > 1.0) return 2;
+   }
+
+   /* Map negative faces to the other side. */
+   if (xf < -1.0) xf += 8.0;
+
+   /* Determine the face. */
+   if (xf > 5.0) {
       face = 4;
       xf = xf - 6.0;
    } else if (xf > 3.0) {
-      if (fabs(yf) > 1.0) return 2;
       face = 3;
       xf = xf - 4.0;
    } else if (xf > 1.0) {
-      if (fabs(yf) > 1.0) return 2;
       face = 2;
       xf = xf - 2.0;
-   } else if (xf < -1.0) {
-      return 2;
    } else if (yf > 1.0) {
-      if (yf > 3.0) return 2;
       face = 0;
       yf = yf - 2.0;
    } else if (yf < -1.0) {
-      if (yf < -3.0) return 2;
       face = 5;
       yf = yf + 2.0;
    } else {
@@ -2862,9 +2973,9 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(m, l);
+      *phi = atan2deg (m, l);
    }
-   *theta = asindeg(n);
+   *theta = asindeg (n);
 
    return 0;
 }
@@ -2893,6 +3004,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -2919,10 +3031,10 @@ double *x, *y;
       return 0;
    }
 
-   costhe = cosdeg(theta);
-   l = costhe*cosdeg(phi);
-   m = costhe*sindeg(phi);
-   n = sindeg(theta);
+   costhe = cosdeg (theta);
+   l = costhe*cosdeg (phi);
+   m = costhe*sindeg (phi);
+   n = sindeg (theta);
 
    face = 0;
    rho  = n;
@@ -3031,22 +3143,22 @@ double *x, *y;
       psi = eta/xi;
       chi = 1.0 + psi*psi;
       xf  = -sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      yf  = (xf/15.0)*(atandeg(psi) - asindeg(psi/sqrt(chi+chi)));
+      yf  = (xf/15.0)*(atandeg (psi) - asindeg (psi/sqrt(chi+chi)));
    } else if (xi >= fabs(eta)) {
       psi = eta/xi;
       chi = 1.0 + psi*psi;
       xf  =  sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      yf  = (xf/15.0)*(atandeg(psi) - asindeg(psi/sqrt(chi+chi)));
+      yf  = (xf/15.0)*(atandeg (psi) - asindeg (psi/sqrt(chi+chi)));
    } else if (-eta > fabs(xi)) {
       psi = xi/eta;
       chi = 1.0 + psi*psi;
       yf  = -sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      xf  = (yf/15.0)*(atandeg(psi) - asindeg(psi/sqrt(chi+chi)));
+      xf  = (yf/15.0)*(atandeg (psi) - asindeg (psi/sqrt(chi+chi)));
    } else if (eta > fabs(xi)) {
       psi = xi/eta;
       chi = 1.0 + psi*psi;
       yf  =  sqrt(rhu/(1.0-1.0/sqrt(1.0+chi)));
-      xf  = (yf/15.0)*(atandeg(psi) - asindeg(psi/sqrt(chi+chi)));
+      xf  = (yf/15.0)*(atandeg (psi) - asindeg (psi/sqrt(chi+chi)));
    }
 
    if (fabs(xf) > 1.0) {
@@ -3089,29 +3201,31 @@ double *phi, *theta;
    xf = x*prj->w[1];
    yf = y*prj->w[1];
 
-   /* Determine the face. */
-   if (xf > 7.0) {
-      return 2;
-   } else if (xf > 5.0) {
+   /* Check bounds. */
+   if (fabs(xf) <= 1.0) {
+      if (fabs(yf) > 3.0) return 2;
+   } else {
+      if (fabs(xf) > 7.0) return 2;
       if (fabs(yf) > 1.0) return 2;
+   }
+
+   /* Map negative faces to the other side. */
+   if (xf < -1.0) xf += 8.0;
+
+   /* Determine the face. */
+   if (xf > 5.0) {
       face = 4;
       xf = xf - 6.0;
    } else if (xf > 3.0) {
-      if (fabs(yf) > 1.0) return 2;
       face = 3;
       xf = xf - 4.0;
    } else if (xf > 1.0) {
-      if (fabs(yf) > 1.0) return 2;
       face = 2;
       xf = xf - 2.0;
-   } else if (xf < -1.0) {
-      return 2;
    } else if (yf > 1.0) {
-      if (yf > 3.0) return 2;
       face = 0;
       yf = yf - 2.0;
    } else if (yf < -1.0) {
-      if (yf < -3.0) return 2;
       face = 5;
       yf = yf + 2.0;
    } else {
@@ -3127,7 +3241,7 @@ double *phi, *theta;
          rhu = 0.0;
       } else {
          w = 15.0*yf/xf;
-         psi = sindeg(w)/(cosdeg(w) - SQRT2INV);
+         psi = sindeg (w)/(cosdeg (w) - SQRT2INV);
          chi = 1.0 + psi*psi;
          rhu = xf*xf*(1.0 - 1.0/sqrt(1.0 + chi));
          rho = 1.0 - rhu;
@@ -3140,7 +3254,7 @@ double *phi, *theta;
          rhu = 0.0;
       } else {
          w = 15.0*xf/yf;
-         psi = sindeg(w)/(cosdeg(w) - SQRT2INV);
+         psi = sindeg (w)/(cosdeg (w) - SQRT2INV);
          chi = 1.0 + psi*psi;
          rhu = yf*yf*(1.0 - 1.0/sqrt(1.0 + chi));
          rho = 1.0 - rhu;
@@ -3230,9 +3344,9 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(m, l);
+      *phi = atan2deg (m, l);
    }
-   *theta = asindeg(n);
+   *theta = asindeg (n);
 
    return 0;
 }
@@ -3261,6 +3375,7 @@ struct prjprm *prj;
    }
 
    prj->flag = PRJSET;
+
    return 0;
 }
 
@@ -3281,10 +3396,10 @@ double *x, *y;
       if (tscset(prj)) return 1;
    }
 
-   costhe = cosdeg(theta);
-   l = costhe*cosdeg(phi);
-   m = costhe*sindeg(phi);
-   n = sindeg(theta);
+   costhe = cosdeg (theta);
+   l = costhe*cosdeg (phi);
+   m = costhe*sindeg (phi);
+   n = sindeg (theta);
 
    face = 0;
    rho  = n;
@@ -3378,41 +3493,43 @@ double *phi, *theta;
    xf = x*prj->w[1];
    yf = y*prj->w[1];
 
-   /* Determine the face. */
-   if (xf > 7.0) {
-      return 2;
-   } else if (xf > 5.0) {
+   /* Check bounds. */
+   if (fabs(xf) <= 1.0) {
+      if (fabs(yf) > 3.0) return 2;
+   } else {
+      if (fabs(xf) > 7.0) return 2;
       if (fabs(yf) > 1.0) return 2;
+   }
+
+   /* Map negative faces to the other side. */
+   if (xf < -1.0) xf += 8.0;
+
+   /* Determine the face. */
+   if (xf > 5.0) {
       /* face = 4 */
       xf = xf - 6.0;
       m  = -1.0/sqrt(1.0 + xf*xf + yf*yf);
       l  = -m*xf;
       n  = -m*yf;
    } else if (xf > 3.0) {
-      if (fabs(yf) > 1.0) return 2;
       /* face = 3 */
       xf = xf - 4.0;
       l  = -1.0/sqrt(1.0 + xf*xf + yf*yf);
       m  =  l*xf;
       n  = -l*yf;
    } else if (xf > 1.0) {
-      if (fabs(yf) > 1.0) return 2;
       /* face = 2 */
       xf = xf - 2.0;
       m  =  1.0/sqrt(1.0 + xf*xf + yf*yf);
       l  = -m*xf;
       n  =  m*yf;
-   } else if (xf < -1.0) {
-      return 2;
    } else if (yf > 1.0) {
-      if (yf > 3.0) return 2;
       /* face = 0 */
       yf = yf - 2.0;
       n  = 1.0/sqrt(1.0 + xf*xf + yf*yf);
       l  = -n*yf;
       m  =  n*xf;
    } else if (yf < -1.0) {
-      if (yf < -3.0) return 2;
       /* face = 5 */
       yf = yf + 2.0;
       n  = -1.0/sqrt(1.0 + xf*xf + yf*yf);
@@ -3428,12 +3545,16 @@ double *phi, *theta;
    if (l == 0.0 && m == 0.0) {
       *phi = 0.0;
    } else {
-      *phi = atan2deg(m, l);
+      *phi = atan2deg (m, l);
    }
-   *theta = asindeg(n);
+   *theta = asindeg (n);
 
    return 0;
 }
-/* Apr 30 1998	Define copysign only if it is not defined
- * Sep 28 1998	Include wcslib.h instead of proj.h
+/* Dec 20 1999	Doug Mink - Change cosd() and sind() to cosdeg() and sindeg()
+ * Dec 20 1999	Doug Mink - Include wcslib.h, which includes proj.h, wcsmath.h
+ * Dec 20 1999	Doug Mink - Define copysign only if it is not defined
+ * Dec 20 1999	Doug Mink - tanfwd() returns error if s<=0.0, not only if s==0.0
+ *
+ * Jun  2 2000	Doug Mink - include stdlib.h to get abs()
  */

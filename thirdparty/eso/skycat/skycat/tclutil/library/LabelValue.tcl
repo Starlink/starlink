@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelValue.tcl,v 1.4 1998/10/28 17:46:39 abrighto Exp $"
+# "@(#) $Id: LabelValue.tcl,v 1.3 2005/02/02 01:43:02 brighton Exp $"
 #
 # LabelValue.tcl - Widget displaying a label and a selectable value
 #
@@ -23,6 +23,6 @@ itcl::class util::LabelValue {
     constructor {args} {
 	#itk_option remove LabelEntry::state LabelWidget::state
 	eval itk_initialize $args
-	$itk_component(entry) config -state disabled
+	#$itk_component(entry) config -state disabled
     }
 }

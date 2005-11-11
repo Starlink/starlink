@@ -1,7 +1,7 @@
 #******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: rtdServerTool.tcl,v 1.2 1997/04/11 10:47:41 abrighto Exp $" 
+# "@(#) $Id: rtdServerTool.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # rtdServerTool.tcl
 #

@@ -7,6 +7,252 @@ and user interface. The latest changes are at the top.
 See also the CHANGES files in the tclutil, astrotcl, rtd, cat and
 skycat directories for changes specific to those packages.
 
+--------------- 04.04.05 released skycat-2.7.4 -----------------
+
+* Merged in RTD changes from Peter Biereichel
+
+* Minor bug fixes and testing with latest compilers
+
+--------------- 20.01.03 released skycat-2.7.3 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1:
+  Changed the syntax for standard #include files from:
+  <file.h> to <file> (for C++) and <cfile> for C.
+  
+  For example: changed <iostream.h> to <iostream> and
+  change <stdio.h> to <cstdio>.
+
+  The Standard C++ Header files are:
+
+     algorithm bitset complex deque exception fstream functional
+     iomanip ios iosfwd iostream istream iterator limits list locale map
+     memory new numeric ostream queue set sstream stack stdexcept streambuf
+     typeinfo utility valarray vector
+
+  The Standard C Header files are:
+ 
+     assert ctype errno float iso646 limits locale math setjmp signal
+     stdarg stddef stdio stdlib string time
+
+
+* Added std:: namespace prefix to all standard C++ names.
+  (For example: std::iostream, std::string, std::list, std::endl).
+
+--------------- 27.02.02 released skycat-2.7.2 -----------------
+
+* Fixed problem with temporary downloaded image files being deleted too soon.
+  (Now they are only deleted after they are loaded, so that the OS can delete
+   them later on.)
+
+--------------- 13.12.01 released skycat-2.7.1 -----------------
+
+* Enabled WCS coordinate conversion outside of the image area (by request).
+
+* fixed problem with equinox syntax reported by David Terrett.
+
+--------------- 27.08.01 released skycat-2.7 -----------------
+
+* Merged in rtd and catalog changes from Peter Biereichel.
+
+* Fixed the -float_panel and -panel_orient options as well as the
+  show/hide control panel menu item.
+
+* Included IWidgets in the skycat single binary version (used by
+  the new FITS header viewer).
+
+--------------- 22.08.01 released skycat-2.6.10 -----------------
+
+* Fixed a bug that caused skycat to access data outside
+  the image array for some (very small) images, which could
+  cause the application to crash or display incorrect values.
+
+--------------- 30.07.01 released skycat-2.6.9 -----------------
+
+* Fixed problem with X shared memory, ssh and X11 forwarding:
+  (X shm areas are not freed, so don't use them in this case)
+
+--------------- 20.06.01 released skycat-2.6.8 -----------------
+
+* Fixed problem selecting catalog symbols in tk8.3.x
+
+--------------- 18.05.01 released skycat-2.6.7 -----------------
+
+* Ported to tcl8.3.3 (still compatible with earlier versions).
+
+--------------- 11.05.01 released skycat-2.6.6 -----------------
+
+* Fix for displaying multi-extension FITS images (see rtd/CHANGES)
+
+--------------- 17.02.01 released skycat-2.6.5 -----------------
+
+* Fixed a bug converting coordinates between deg and wcs using the rtd
+  tcl subcommand "convert".
+
+* Fixed a minor bug that occurred when a catalog config entry had a copyright
+  field but no x,y or ra,dec columns defined.
+
+--------------- 09.11.00 released skycat-2.6.4 -----------------
+
+* Fixed a bug that occurred when attempting to load an image file that
+  was a relative path to a relative symbolic link. 
+  (For example: skycat ../x.fits, where x.fits is a link to y.fits).
+
+--------------- 20.09.00 released skycat-2.6.3 -----------------
+
+* Fixed a bug in the display of galactic and ecliptic coordinates: RA
+  was being displayed in hours and the equinox was displayed as
+  2000. Now RA is displayed in degrees in those cases and the equinox
+  field displays "GALACTIC" or "ECLIPTIC".
+
+* Upgraded the WCS library to wcssubs-2.8.3. 
+
+--------------- 25.05.00 released skycat-2.6.2 -----------------
+
+* Added the procedure "display_catalog {catalogName}" to the SkyCat
+  itcl class, for use via the remote interface. Now you can send 
+  this command to open a catalog window to display a catalog 
+  (name from the skycat config file) or a local catalog file (path name).
+
+* Note: the Solaris and HP single binary versions are now built with
+  the same gcc compiler used to build the VLT software (There were
+  previously some subtle incompatibilities).
+
+* Removed an error message that caused problems  when the image header 
+  and data were in separate files.
+
+* Minor layout changes.
+
+--------------- 21.03.00 released skycat-2.6.1 -----------------
+
+* Tested compiling with Sun-CC 4.2 and fixed a number of incompatibilities.
+
+--------------- 02.03.00 released skycat-2.6 -----------------
+
+* Added support for displaying WFI type images, which contain
+  multiple image extensions, as a single image, based on the
+  CRPIX values in the extensions. The default bahavoir is as
+  before, except that there is a new button in the HDU window
+  "Display as one Image".
+
+* Added a new button in the HDU window: "Use Settings from Main Image"
+  that sets the colormap, color scaling options and cut levels for the
+  preview images from the main image. This is needed, since the preview
+  images often appear black when they have not been not prescaled.
+
+* Merged the Skycat and RTD versions of the HDU window. Now the
+  Skycat version is a subclass of the RTD version.
+
+* Tested Skycat build with Tcl8.2/Tk8.2 and Scriptics TclPro-1.3
+  and made minor changes in the Skycat configure script to
+  support this. See ./INSTALL for details.
+  
+* Added a new Skycat/RTD option: -panel_orient horizontal|vertical
+  and added code to support having the main info panel on the
+  left with a vertical orientation. The default for RTD is horizontal,
+  as before.
+
+* Changed the default layout of the Skycat main panel to be on the
+  left instead of the top (use "skycat -panel_orient horizontal" to
+  get the old behavior). 
+
+* Added code to check for valid command line options (The previous
+  version sometimes crashed when passed invalid options).
+
+--------------- 27.12.99 released skycat-2.5.3 -----------------
+
+* Minor bug fixes for the pick object window (to handle
+  transformations correctly).
+
+---------------  15.12.99 released skycat-2.5.2 -----------------
+
+* Merged in RTD changes made by Peter Biereichel (see rtd/CHANGES)
+
+* Fixed minor bug in pick object window (rectangle was not being displayed
+  in the center of the image).
+
+
+---------------  02.11.99 released skycat-2.5.1 -----------------
+
+* Fixed a bug dealing with leading zeros in formatting the seconds of RA
+  (Could lead to incorrect plots and/or displayed values for RA).
+
+---------------  25.10.99 released skycat-2.5 --------------------
+
+* Merged in changes made by Peter Biereichel
+
+---------------  09.9.99 released skycat-2.4.7 -------------------
+
+* Fixed a bug in the formatting/printing of RA values (sometimes the
+  fractional part of the seconds was incorrect).
+
+* Updated for egcs/gcc-2.95 (This compiler version is stricter
+  for C++ code and even fails the solaris X11 header files, unless
+  told to ignore the errors...).
+
+---------------  22.7.99 released skycat-2.4.6 -------------------
+
+* TCS catalogs: fixed a bug dealing with TCS catalogs (error message
+  was "empty TCS result"). 
+
+* Fixed problem with catalog directory hierarchies. Previously, catalog
+  names had to be unique in the entire catalog hierarchy. Now, the interface
+  has been changed slightly to fix this (see cat/CHANGES). 
+
+---------------  14.7.99 released skycat-2.4.5 -------------------
+
+* Fixed a bug in the FITS I/O that caused problems under HP-UX when
+  loading FITS tables.
+
+* TCS catalogs: fixed a bug dealing with TCS catalogs (error message
+  was "empty TCS result"). 
+
+---------------  21.6.99 released skycat-2.4.4 -------------------
+
+* catalogs: allow empty RA and DEC columns in query results
+  where ra_col and dec_col are defined (previously an error mesage
+  was generated: "error in RA value, expected HH:MM:SS").
+
+* Fixed problem with double-click in FileSelect widget.
+
+---------------  16.15.99 released skycat-2.4.3 -------------------
+
+* HDU Display: Reversed the row order for displaying image extensions
+  when sorting by CRPIX values (The order was previously incorrect).
+
+* Fits I/O: For image files with multiple image extensions: Now each
+  header is merged with the primary HDU header when checking for
+  WCS keywords. Keywords in the extension header override the same
+  keywords in the primary header.
+
+* Fixed a number of RTD related bugs (see rtd/CHANGES).
+
+
+---------------  02.04.99 released skycat-2.4.2 -------------------
+
+* Added changes from Peter Biereichel:
+  new rtdimage subcommand 'biasimage' and widget 'RtdImageBias'
+  for on-the-fly bias image subtraction. The widget can be called from
+  the real-time menu (See rtd/CHANGES).
+
+* Fixed from HP-UX related bugs dealing with dynamic loading
+  (see tclutil/CHANGES).
+
+---------------  25.03.99 released skycat-2.4.1 -------------------
+
+* Added a check when saving catalog data to a compressed image,
+  since this is not implemented.
+
+* Fixed the Exit menu item to really exit and not just close
+  the window, in the case where there is more than one main
+  window.
+
+* Fixed bug in startup when creating history catalog.
+
+* In the skycatgaia binary release, there was a problem with the
+  ardmask binary (The release contained an older version).
+
+* Fixed problems with BLT graphs and zooming.
+
 ---------------  22.03.99 released skycat-2.4 ---------------------
 
 * Tested with SuSE-Linux-6.0 (gnulibc), TclPro-1.2, tcl8.0.5, the
@@ -40,6 +286,11 @@ skycat directories for changes specific to those packages.
 
 * Fixed a bug in the handling of local catalogs and "mmap" that could
   cause a core dump in certain cases.
+
+* Added a work around to Tk's limit on canvas coordinates to short
+  range. Now the canvas (and image) coordinates do not have to be
+  clipped to short range. This limit previously caused problems when
+  zooming in large images.
 
 ---------------  4.02.99 released skycat-2.3.2 ----------------------
 

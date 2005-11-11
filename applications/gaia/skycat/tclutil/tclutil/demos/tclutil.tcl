@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: tclutil.tcl,v 1.4 1998/10/28 17:45:45 abrighto Exp $" 
+# "@(#) $Id: tclutil.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # tclutil.tcl - example application script for tclutil package
 #

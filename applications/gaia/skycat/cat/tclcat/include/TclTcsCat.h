@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclTcsCat.h,v 1.6 1998/04/02 21:15:13 abrighto Exp $
+ * $Id: TclTcsCat.h,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
  *
  * TclTcsCat.h - Tcl interface to the TcsCatalog C++ class for 
  * 	 	 accessing TCS catalogs
@@ -30,10 +30,10 @@ protected:
 
     // Save (or insert) query results to the given file.
     virtual int saveQueryResult(const char* filename, int numCols, char** colNames, 
-				char* info, int iflag, double equinox = 2000.);
+				char* info, int iflag, const char* equinoxStr);
     // Remove query results from the given file.
     virtual int removeQueryResult(const char* filename, int numCols, char** colNames, 
-				  char* info, double equinox = 2000.);
+				  char* info, const char* equinoxStr);
 public:
     // constructor
     TclTcsCat(Tcl_Interp*, const char* cmdname, const char* instname);

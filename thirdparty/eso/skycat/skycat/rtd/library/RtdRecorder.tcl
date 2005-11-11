@@ -73,19 +73,16 @@ itcl::class rtd::RtdRecorderTool {
 	itk_component add progressBar {
             scale $itk_component(status).progressBar \
                 -orient horizontal \
-                -borderwidth 2 \
-		-length 100 \
-		-width 10 \
                 -sliderlength 0 \
-		-state disabled \
-		-troughcolor grey80 \
-		-bg grey80 \
                 -from 0 \
                 -to 1 \
                 -showvalue 0 \
+		-width 8 \
                 -highlightthickness 0
+        } {
+            keep -width -length
         }
-
+	
 	# LabelEntry(n) widget, image count
 	itk_component add imagecount {
 	    util::LabelEntry $itk_component(status).imagecount \
@@ -215,7 +212,7 @@ itcl::class rtd::RtdRecorderTool {
 	itk_component add rewind {
 	    button $itk_component(pbaction2).rewind \
 		-bitmap double_left \
-		-command [code $this spool "rewind"] \
+		-command [code $this spool "rewind"]
 	} {
 	    keep -state
 	}
@@ -278,12 +275,12 @@ itcl::class rtd::RtdRecorderTool {
 	    $itk_component(protect)     1,1 -anchor e -fill x	    
 
 	blt::table $itk_component(pbaction2) \
-	    $itk_component(play)        1,0 -anchor w -fill none \
-	    $itk_component(rewind)      1,1 -anchor w -fill none \
-	    $itk_component(ff)          1,2 -anchor w -fill none \
-	    $itk_component(single)      1,3 -anchor w -fill none \
-	    $itk_component(record)      1,4 -anchor w -fill none \
-	    $itk_component(stop)        1,5 -anchor w -fill none \
+ 	    $itk_component(play)        1,0 -anchor w -fill none \
+ 	    $itk_component(rewind)      1,1 -anchor w -fill none \
+ 	    $itk_component(ff)          1,2 -anchor w -fill none \
+            $itk_component(single)      1,3 -anchor w -fill none \
+ 	    $itk_component(record)      1,4 -anchor w -fill none \
+ 	    $itk_component(stop)        1,5 -anchor w -fill none
 
 	pack $itk_component(status) $itk_component(fileframe) $itk_component(action) \
 	     $itk_component(pbaction1) -side top -anchor w -fill x -expand 0 -padx 5 -pady 5
@@ -394,7 +391,7 @@ itcl::class rtd::RtdRecorderTool {
 
     # update progress bar and image count
 
-    protected method update_progress {args} {
+    public method update_progress {args} {
 	global ::$w_.cmode ::$w_.direction
 	if {$recording_} {
 	    set var $rtdrecorder_
@@ -408,11 +405,12 @@ itcl::class rtd::RtdRecorderTool {
 	}
 	$itk_component(imagecount) config -value $count
 	$itk_component(ncounts) config -value $ncount
+
 	set w $itk_component(progressBar)
-	$w config -state normal -from 0 -to $ncount -troughcolor blue
-	$w set 0
-	$w config -bg grey80
-	$w set $count
+	$w config -state normal
+	$w config -from 0 -to $ncount -sliderlength 25 -troughcolor blue -bg grey80
+	$w set [expr {$count -1}]
+	update
 	$w config -state disabled
 	# puts "$count,$ncount bof=$bof eof=$eof"
 	if {([set $w_.cmode] == 0 && $eof != 0)} {
@@ -510,10 +508,10 @@ itcl::class rtd::RtdRecorderTool {
     # create a rapid frame.
 
     protected method make_rapid_frame {region_id x0 y0 x1 y1} {
-	set xoffset [expr int($x0)]
-	set yoffset [expr int($y0)]
-	set width [expr int($x1-$x0+1)]
-	set height [expr int($y1-$y0+1)]
+	set xoffset [expr {int($x0)}]
+	set yoffset [expr {int($y0)}]
+	set width [expr {int($x1-$x0+1)}]
+	set height [expr {int($y1-$y0+1)}]
 	set subimage_ 1
 
 	RtdImageFrame $w_.subimage \
@@ -587,7 +585,7 @@ itcl::class rtd::RtdRecorderTool {
 	    return $file
 	}
 	set basename [file split $file]
-	set basename [lindex $basename [expr [llength $basename] -1]]
+	set basename [lindex $basename [expr {[llength $basename] -1}]]
 	set ext [file extension $file]
 	if {"$ext" == ""} {
 	    set file [file join $dirname $basename.fits]

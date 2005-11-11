@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelEntry.tcl,v 1.8 1998/10/28 17:46:38 abrighto Exp $"
+# "@(#) $Id: LabelEntry.tcl,v 1.3 2005/02/02 01:43:02 brighton Exp $"
 #
 # LabelEntry.tcl - Itk widget for displaying a labeled entry
 #
@@ -68,7 +68,7 @@ itcl::class util::LabelEntry {
 	set str [get]
 
 	set insertPos [$itk_component(entry) index insert] 
-	set firstPart [string range $str 0 [expr $insertPos - 1]]
+	set firstPart [string range $str 0 [expr {$insertPos - 1}]]
 	set lastPart [string range $str $insertPos end]
 
 	append rtnVal $firstPart $char $lastPart

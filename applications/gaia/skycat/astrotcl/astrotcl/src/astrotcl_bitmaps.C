@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: astrotcl_bitmaps.C,v 1.1 1998/03/02 21:14:08 abrighto Exp $"
+ * "@(#) $Id: astrotcl_bitmaps.C,v 1.2 2005/02/02 01:43:04 brighton Exp $"
  *
  * Bitmap definitions for Tk
  *

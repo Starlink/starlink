@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: HelpWin.tcl,v 1.4 1998/10/28 17:46:38 abrighto Exp $"
+# "@(#) $Id: HelpWin.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # HelpWin.tcl - Itcl class for displaying a text window with a help text.
 #

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdPerformanceTool.C,v 1.3 1997/12/09 18:04:09 abrighto Exp $"
+ * "@(#) $Id: RtdPerformanceTool.C,v 1.3 2005/02/02 01:43:03 brighton Exp $"
  *
  * RtdPerformanceTool.C - member routines for class RtdPerformanceTool,
  *             manages manipulation of performance data
@@ -13,8 +13,8 @@
 
 #include "RtdPerformanceTool.h"
 #include "tcl.h"
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 /*
  * Const array of process type identifiers for performance testing.

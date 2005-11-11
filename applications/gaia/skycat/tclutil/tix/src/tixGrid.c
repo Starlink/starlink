@@ -405,7 +405,7 @@ Tix_GridCmd(clientData, interp, argc, argv)
 	ExposureMask|StructureNotifyMask|FocusChangeMask,
 	WidgetEventProc, (ClientData) wPtr);
     wPtr->widgetCmd = Tcl_CreateCommand(interp,
-	Tk_PathName(wPtr->dispData.tkwin), WidgetCommand, (ClientData) wPtr,
+	Tk_PathName(wPtr->dispData.tkwin), (Tcl_CmdProc*)WidgetCommand, (ClientData) wPtr,
 	WidgetCmdDeletedProc);
 
     if (WidgetConfigure(interp, wPtr, argc-2, argv+2, 0) != TCL_OK) {

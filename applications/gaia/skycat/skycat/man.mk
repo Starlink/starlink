@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: man.mk,v 1.3 1998/03/29 20:28:07 abrighto Exp $" 
+# "@(#) $Id: man.mk,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $" 
 #
 # Makefile.in 
 #

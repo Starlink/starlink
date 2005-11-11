@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.3 1997/04/11 10:49:41 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # Makefile.in
 # 
@@ -12,12 +12,7 @@
 # 	Makefile for manual page files 
 # ------------------------------------------------------------------------
 
-TOPDIR  	= @DESTDIR@
-MANDIR  	= @MANDIR@
 MAN_SECTIONS    = 1 3 n
-SHELL    	= /bin/sh
-RM		= rm -rf
 
-all depend: 
-
+include ../../makefile.mk
 include ../../man.mk

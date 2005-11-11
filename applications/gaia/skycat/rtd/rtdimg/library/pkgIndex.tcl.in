@@ -1,4 +1,4 @@
 # Tcl package index file, version 1.0
 
-package ifneeded Rtd @RTD_VERSION@ [list load "[file join [file dirname $dir] librtd@SHLIB_SUFFIX@]" Rtd]
-package ifneeded Rtdrecord @RTD_VERSION@ [list load "[file join [file dirname $dir] librtd@SHLIB_SUFFIX@]" Rtdrecord]
+package ifneeded Rtd @RTD_VERSION@ "load [list $dir/../librtd@SHLIB_SUFFIX@]"
+package ifneeded Rtdrecord @RTD_VERSION@ "load [list $dir/../librtd@SHLIB_SUFFIX@]"

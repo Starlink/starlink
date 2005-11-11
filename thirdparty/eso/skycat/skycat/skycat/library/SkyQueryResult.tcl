@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SkyQueryResult.tcl,v 1.9 1998/12/29 20:19:49 abrighto Exp $
+# @(#) $Id: SkyQueryResult.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
 #
 # SkyQueryResult.tcl - Widget for viewing query results with skycat image support.
 #
@@ -67,6 +67,23 @@ itcl::class skycat::SkyQueryResult {
     
     public method save_with_image {entry} {
 	set image [$skycat get_image]
+
+	# make sure file exists
+	set file [$image cget -file]
+	set suffix [file extension $file]
+
+	switch -exact -- "$suffix" {
+	    ".gz" -
+	    ".gzfits" -
+	    ".gfits" -
+	    ".Z" -
+	    ".cfits" -
+	    ".hfits" {
+		error_dialog "Can't save catalog data to compressed image file."
+		return
+	    }
+	}
+
 	set headings [$image hdu listheadings]
 	
 	# get the short name of the catalog and use it as the table name
@@ -79,7 +96,7 @@ itcl::class skycat::SkyQueryResult {
 	    }
 	}
 	# build the name from the catalog name and the file base name
-	set file [file tail [file rootname [$image cget -file]]]
+	set file [file tail [file rootname $file]]
 	if {[string first "$file-" $extname] == 0} {
 	    set extname [string range $extname [expr [string length $file]+1] end]
 	}

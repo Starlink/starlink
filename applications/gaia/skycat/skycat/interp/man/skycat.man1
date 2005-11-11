@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: skycat.man1,v 1.2 1998/03/30 22:25:27 abrighto Exp $
+# $Id: skycat.man1,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 

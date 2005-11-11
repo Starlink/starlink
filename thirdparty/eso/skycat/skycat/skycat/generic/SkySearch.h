@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: SkySearch.h,v 1.2 1998/04/02 21:16:54 abrighto Exp $
+ * $Id: SkySearch.h,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
  *
  * SkySearch.h - C++ class to extend the "astrocat" Tcl command
  *               (class TclAstroCat) with image plotting capabilities.

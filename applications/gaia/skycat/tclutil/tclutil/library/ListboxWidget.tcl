@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ListboxWidget.tcl,v 1.8 1998/10/28 17:46:39 abrighto Exp $"
+# "@(#) $Id: ListboxWidget.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # ListboxWidget.tcl - Widget for scrolled lists, based on the Tk listbox
 #
@@ -229,10 +229,10 @@ itcl::class util::ListboxWidget {
 	foreach i $rlist {
 	    set s [$listbox_ get $i]
 	    $listbox_ delete $i
-	    $listbox_ insert [expr $i+1] $s
+	    $listbox_ insert [expr {$i+1}] $s
 	}
-	select_rows [expr [lindex $list 0]+1] \
-	    [expr [lindex $rlist 0]+1]
+	select_rows [expr {[lindex $list 0]+1}] \
+	    [expr {[lindex $rlist 0]+1}]
     }
 
     
@@ -246,9 +246,9 @@ itcl::class util::ListboxWidget {
 	foreach i $list {
 	    set s [$listbox_ get $i]
 	    $listbox_ delete $i
-	    $listbox_ insert [expr $i-1] $s
+	    $listbox_ insert [expr {$i-1}] $s
 	}
-	select_rows [expr [lindex $list 0]-1] [expr $i-1]
+	select_rows [expr {[lindex $list 0]-1}] [expr {$i-1}]
     }
 
 

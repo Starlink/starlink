@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelEntryScale.tcl,v 1.9 1998/10/28 17:46:38 abrighto Exp $"
+# "@(#) $Id: LabelEntryScale.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # LabelEntryScale.tcl - Widget combining a labeled entry with a scale widget
 #
@@ -87,7 +87,7 @@ itcl::class util::LabelEntryScale {
     # increment (1) or decrement (-1) the value by the current increment
 
     protected method increment {sign} {
-	set v [expr [get]+($sign*$itk_option(-increment))]
+	set v [expr {[get]+($sign*$itk_option(-increment))}]
 	if {$v >= $itk_option(-from) && $v <= $itk_option(-to)} {
 	    config -value $v
 	    if {"$itk_option(-command)" != ""} {

@@ -1,11 +1,11 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ShortImageData.C,v 1.8 1999/03/19 20:10:09 abrighto Exp $" 
+ * "@(#) $Id: ShortImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
  *
  * ShortImageData.C - member functions for class ShortImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
@@ -15,13 +15,14 @@
  */
 
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <assert.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cassert>
+#include <cmath>
 #include "ShortImageData.h"
+#include "define.h"
 
 
 /*
@@ -33,7 +34,7 @@ void ShortImageData::initShortConversion()
     scaledLowCut_ = (short)lowCut_;
     scaledHighCut_ = (short)highCut_;
     if (haveBlank_)
-      scaledBlankPixelValue_ = LOOKUP_BLANK; // PWD: use last bin
+	scaledBlankPixelValue_ = LOOKUP_BLANK; // PWD: use last bin
 }
 
 
@@ -44,4 +45,13 @@ void ShortImageData::initShortConversion()
  */
 #define CLASS_NAME ShortImageData
 #define DATA_TYPE short
+#ifndef NTOH
+#    define NTOH(x) SWAP16(x)
+#endif
 #include "ImageTemplates.C"
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef NTOH
+
+
+

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: EnterObject.tcl,v 1.14 1999/02/04 19:18:51 abrighto Exp $
+# @(#) $Id: EnterObject.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # EnterObject.tcl - Widget for entering data to add to a local catalog.
 #

@@ -1,13 +1,3 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/tclutil.sh "$0" "$@"
-#
-# This is a simple TableList demo. This time we display the contents
-# of the local /etc/passwd file, just to get some data...
-#
-# Copyright (c) 1994 Allan Brighton (abrighto@eso.org)
-
-
 source test.tcl
 
 itcl::class PwDemo {
@@ -27,6 +17,7 @@ itcl::class PwDemo {
 	# create the TableList
 	itk_component add tlist {
 	    TableList $w_.tlist \
+		-hscroll 1 \
 		-menubar $itk_component(menubar) \
 		-title "Contents of Passwd File" \
 		-selectmode extended

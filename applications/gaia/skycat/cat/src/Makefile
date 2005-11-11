@@ -1,5 +1,5 @@
 # E.S.O. - VLT project / ESO Archive
-# "@(#) $Id: Makefile,v 1.9 1998/09/04 20:29:36 abrighto Exp $"
+# "@(#) $Id: Makefile,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $"
 #
 # Makefile 
 #

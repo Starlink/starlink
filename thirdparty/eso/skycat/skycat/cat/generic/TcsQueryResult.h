@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsQueryResult.h,v 1.8 1997/10/30 21:46:48 abrighto Exp $
+ * $Id: TcsQueryResult.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
  *
  * TcsQueryResult.h - class definitions for accessing results of a 
  *                    TCS catalog query
@@ -62,7 +62,7 @@ protected:
     virtual int getObjFromTable(int row, TcsCatalogObject&);
 
     // print table title and other info
-    virtual void printTableTop(ostream& os, const char* title = NULL);
+    virtual void printTableTop(std::ostream& os, const char* title = NULL);
 
 public:
     // constructor: initialize empty table
@@ -80,11 +80,11 @@ public:
     virtual int clear();
 
     // fill the table from the given buffer in tab table format
-    virtual int init(const char* buf, int maxRows = 0);
+    virtual int init(const char* buf, int maxRows = 0, int owner = 0);
 
     // fill the table from the given buffer in tab table format, with headings
     // specified separately
-    virtual int init(int numCols, char** colNames, const char* buf, int maxRows = 0);
+    virtual int init(int numCols, char** colNames, const char* buf, int maxRows = 0, int owner = 0);
 
     // access a TcsCatalog (GSC/PPM) result row: fill out the given TcsCatalogObject
     virtual int getObj(int row, TcsCatalogObject&) const;
@@ -94,7 +94,7 @@ public:
     TcsCatalogObject* getObj(int row) const;
 
     // print the given table row to the given stream
-    virtual int printRow(ostream& os, int row) const; 
+    virtual int printRow(std::ostream& os, int row) const; 
 
     // -- redefine these to deal with TCS columns --
 

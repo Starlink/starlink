@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: HTTP.h,v 1.6 1998/07/17 19:42:03 abrighto Exp $
+ * $Id: HTTP.h,v 1.5 2005/02/02 01:43:01 brighton Exp $
  *
  * HTTP.h - utility class for communicating with the HTTP daemon
  * 
@@ -14,16 +14,18 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 16 Jun 98  Added support for proxy servers
+ * pbiereic        17/02/03  Added 'using namespace std'.
  */
 
-#include <stdio.h>
-#include <string.h>
+using namespace std;
+#include <cstdio>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <iostream.h>
+#include <iostream>
 
 
 /*

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelChoice.tcl,v 1.7 1998/10/28 17:46:38 abrighto Exp $"
+# "@(#) $Id: LabelChoice.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # LabelChoice.tcl - Widget for choosing options using a label and radiobuttons
 #
@@ -58,9 +58,9 @@ itcl::class util::LabelChoice {
 	set i 0
 	# determine how many rows and columns
 	if {$rows != 0} {
-	    set cols [expr $n/$rows+1]
+	    set cols [expr {$n/$rows+1}]
 	} elseif {$cols != 0} {
-	    set rows [expr $n/$cols+1]
+	    set rows [expr {$n/$cols+1}]
 	} elseif {"$itk_option(-orient)" == "horizontal"} {
 	    set rows 1
 	    set cols $n

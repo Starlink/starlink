@@ -14,7 +14,7 @@
  * D. Hopkinson    21/11/96  Created
  */
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "rtdImageEvent.h"
 

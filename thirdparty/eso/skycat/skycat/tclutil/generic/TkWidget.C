@@ -1,30 +1,26 @@
 /*
  * TkWidget.C - base class definitions for Tk widgets implemented in C++
  *
- * "@(#) $Id: TkWidget.C,v 1.1 1997/11/28 01:38:31 abrighto Exp $"
+ * "@(#) $Id: TkWidget.C,v 1.6 2005/02/02 01:43:02 brighton Exp $"
  *
  * See the man page for a complete description.
  *
- * -----------------------------------------------------------------------------
- * Copyright 1994 Allan Brighton.
  * 
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose and without fee is hereby granted,
- * provided that the above copyright notice appear in all copies.  
- * Allan Brighton make no representations about the suitability of this 
- * software for any purpose. It is provided "as is" without express or 
- * implied warranty.
- * -----------------------------------------------------------------------------
- *
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.1 1997/11/28 01:38:31 abrighto Exp $";
+
+static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
 
 
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <iostream.h>
+using namespace std;
+#include <cstdlib>
+#include <cctype>
+#include <iostream>
+#include <cstring>
+#include "config.h"
 #include "TkWidget.h"
 
 
@@ -182,7 +178,7 @@ int TkWidget::initWidget(int argc, char* argv[])
 int TkWidget::configureWidget(int argc, char* argv[], int flags)
 {
     if (Tk_ConfigureWidget(interp_, tkwin_, configSpecsPtr_,
-	    argc, argv, (char*)optionsPtr_, flags) != TCL_OK) {
+			   argc, argv, (char*)optionsPtr_, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;

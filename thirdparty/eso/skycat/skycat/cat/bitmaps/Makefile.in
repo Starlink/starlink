@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.7 1999/03/11 20:59:24 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
 #
 # Makefile.in
 #
@@ -28,7 +28,7 @@ All:
 # generate a C file that creates all of the bitmap files
 # in this directory and installs them for Tk access by basename
 $(TARGET): $(FILES)
-	itclsh@ITCL_VERSION@  bitmaps.tcl > $(TARGET)
+	tclsh@TCL_VERSION@  bitmaps.tcl > $(TARGET)
 
 install:
 
@@ -41,4 +41,6 @@ distclean: clean
 	rm -f Makefile	
 
 man:
+
+include @SRC_ROOT@/makefile.mk
 

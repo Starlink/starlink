@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclWorldCoords.h,v 1.2 1998/01/29 22:26:15 abrighto Exp $
+ * $Id: TclWorldCoords.h,v 1.2 2005/02/02 01:43:04 brighton Exp $
  *
  * TclWorldCoords.h - Tcl interface to the WorldCoords C++ class for 
  * 		      manipulating world coordinates 

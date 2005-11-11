@@ -1,5 +1,5 @@
 /* File saoimage/wcslib/dsspos.c
- * September 10, 1998
+ * October 21, 1999
  * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
 
  * Module:	dsspos.c (Plate solution WCS conversion)
@@ -13,8 +13,8 @@
 */
 
 #include <math.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "wcs.h"
 
 int
@@ -133,7 +133,6 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
   int    max_iterations = 50;
   int    i;
   double xr, yr; 	/* position in radians */
-  double cond2r = 1.745329252e-2;
 
   *xpix = 0.0;
   *ypix = 0.0;
@@ -290,4 +289,6 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
  * Apr  7 1998	Change amd_i_coeff to i_coeff
  * Sep  4 1998	Fix possible divide by zero in dsspos() from Allen Harris, SAO
  * Sep 10 1998	Fix possible divide by zero in dsspix() from Allen Harris, SAO
+ *
+ * Oct 21 1999	Drop declaration of cond2r in dsspix()
  */

@@ -9,9 +9,9 @@
 /*  Government purposes to publish, distribute, translate, copy, exhibit,  */
 /*  and perform such material.                                             */
 
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
 #include <errno.h>

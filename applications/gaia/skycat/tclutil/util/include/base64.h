@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: base64.h,v 1.1 1998/07/16 16:27:54 abrighto Exp $
+ * $Id: base64.h,v 1.2 2005/02/02 01:43:01 brighton Exp $
  *
  * base64.h - declarations for base64 encoding and decoding
  *            utility routines.

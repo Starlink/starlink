@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclWorldCoords.C,v 1.2 1998/01/29 22:26:20 abrighto Exp $
+ * $Id: TclWorldCoords.C,v 1.7 2005/02/02 01:43:04 brighton Exp $
  *
  * TclWorldCoords.C - method definitions for class TclWorldCoords
  *                    (Tcl interface to the WorldCoords class)
@@ -10,26 +10,19 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Nov 95  Created
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.2 1998/01/29 22:26:20 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.7 2005/02/02 01:43:04 brighton Exp $";
 
-#include "config.h"  //  From skycat util
 
-#include <string.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include "WorldCoords.hxx"
+using namespace std;
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <cstdlib>
+#include <sstream>
+#include "config.h"
+#include "WorldCoords.h"
 #include "TclWorldCoords.h"
 
 
@@ -73,7 +66,7 @@ int TclWorldCoords::call(const char* name, int len, int argc, char* argv[])
 extern "C"
 int TclWorldCoords_Init(Tcl_Interp* interp)  
 {
-    Tcl_CreateCommand(interp, "wcs", TclWorldCoords::wcsCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "wcs", (Tcl_CmdProc*)TclWorldCoords::wcsCmd, NULL, NULL);
     return TCL_OK;
 }
 
@@ -116,10 +109,9 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
 {
     if (wcs.status() != 0)
 	return TCL_ERROR;
-    char buf[32];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << wcs << ends;
-    return set_result(buf);
+    ostringstream os;
+    os << wcs;
+    return set_result(os.str().c_str());
 }
 
 
@@ -128,10 +120,9 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
  */
 int TclWorldCoords::set_hms_result(const HMS& hms)
 {
-    char buf[32];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << hms << ends;
-    return set_result(buf);
+    ostringstream os;
+    os << hms;
+    return set_result(os.str().c_str());
 }
 
 

@@ -1,14 +1,12 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.5 1997/06/02 10:50:03 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # Component level Makefile
 
 SUBDIRS = src include test man
 
-all install clean depend man: FORCE
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
 
-distclean: clean
-	rm -f Makefile */.objs
+do_all do_install do_clean do_depend do_man:
+	$(AT)for i in $(SUBDIRS); do (cd $$i; $(MAKE) $@) done
 
-FORCE:
+include ../makefile.mk

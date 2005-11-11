@@ -16,6 +16,7 @@
 #define _TIX_PORT_H_
 
 #ifndef _TCL
+#include "config.h"
 #include "tcl.h"
 #endif
 

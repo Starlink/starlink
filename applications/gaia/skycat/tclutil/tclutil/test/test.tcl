@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: test.tcl,v 1.4 1998/10/28 17:47:28 abrighto Exp $" 
+# "@(#) $Id: test.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # test.tcl - tcl defs to set up environment for test scripts
 #
@@ -15,6 +15,16 @@ foreach pkg {BLT} {
 	lappend auto_path $env(${pkg}_LIBRARY)
     }
 }
+
+proc tkerror {msg} {
+    global errorInfo
+    puts stderr "$errorInfo"
+    tkerror__ "error: $msg"
+}
+
+# for debugging: print all errors on stderr
+catch {tkerror}
+rename tkerror tkerror__
 
 lappend auto_path ../library
 package require Tclutil

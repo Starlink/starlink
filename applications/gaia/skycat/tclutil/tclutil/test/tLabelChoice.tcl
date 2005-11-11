@@ -1,11 +1,6 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/tclutil.sh "$0" "$@"
-
 source test.tcl
 
 set w [LabelChoice .lc \
-	   -orient vertical \
 	   -text "Test label:" \
 	   -choice {one two three four five six seven eight nine ten eleven twelve {a b c} {d e f}} \
 	   -value three \
@@ -17,6 +12,7 @@ set w [LabelChoice .lc \
 	   -borderwidth 3 \
 	   -variable xxx \
 	   -command puts \
+	   -orient vertical \
 	  ]
 pack $w -fill both -expand 1
 

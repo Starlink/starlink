@@ -1,9 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995, Mark Calabretta
-*   wcstrig function names changed by Doug Mink, SAO, April 15, 1998
-*   wcstrig.h include file added to wcslib.h by Doug Mink, SAO, September 28, 1998
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -88,19 +86,16 @@
 *                           0: Success.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: sph.c,v 1.6 1998/10/01 08:23:59 abrighto Exp $
+*   $Id: sph.c,v 1.2 2005/02/02 01:43:03 brighton Exp $
 *===========================================================================*/
 
+#include <math.h>
 #include "wcslib.h"
 
 #ifndef __STDC__
 #ifndef const
 #define const
 #endif
-#endif
-
-#ifndef copysign
-#define copysign(X, Y) ((Y) < 0.0 ? -fabs(X) : fabs(X))
 #endif
 
 const double tol = 1.0e-5;
@@ -113,22 +108,22 @@ double *phi, *theta;
 {
    double coslat, coslng, dlng, dphi, sinlat, sinlng, x, y, z;
 
-   coslat = cosdeg(lat);
-   sinlat = sindeg(lat);
+   coslat = cosdeg (lat);
+   sinlat = sindeg (lat);
 
    dlng = lng - eul[0];
-   coslng = cosdeg(dlng);
-   sinlng = sindeg(dlng);
+   coslng = cosdeg (dlng);
+   sinlng = sindeg (dlng);
 
    /* Compute the native longitude. */
    x = sinlat*eul[4] - coslat*eul[3]*coslng;
    if (fabs(x) < tol) {
       /* Rearrange formula to reduce roundoff errors. */
-      x = -cosdeg(lat+eul[1]) + coslat*eul[3]*(1.0 - coslng);
+      x = -cosdeg (lat+eul[1]) + coslat*eul[3]*(1.0 - coslng);
    }
    y = -coslat*sinlng;
    if (x != 0.0 || y != 0.0) {
-      dphi = atan2deg(y, x);
+      dphi = atan2deg (y, x);
    } else {
       /* Change of origin of longitude. */
       dphi = dlng - 180.0;
@@ -149,11 +144,14 @@ double *phi, *theta;
       if (*theta < -90.0) *theta = -180.0 - *theta;
    } else {
       z = sinlat*eul[3] + coslat*eul[4]*coslng;
+      /* Use an alternative formula for greater numerical accuracy. */
       if (fabs(z) > 0.99) {
-         /* Use an alternative formula for greater numerical accuracy. */
-         *theta = copysign(acosdeg(sqrt(x*x+y*y)), z);
+	if (z < 0)
+           *theta = -acosdeg (sqrt(x*x+y*y));
+	else
+           *theta =  acosdeg (sqrt(x*x+y*y));
       } else {
-         *theta = asindeg(z);
+         *theta = asindeg (z);
       }
    }
 
@@ -170,22 +168,22 @@ double *lng, *lat;
 {
    double cosphi, costhe, dlng, dphi, sinphi, sinthe, x, y, z;
 
-   costhe = cosdeg(theta);
-   sinthe = sindeg(theta);
+   costhe = cosdeg (theta);
+   sinthe = sindeg (theta);
 
    dphi = phi - eul[2];
-   cosphi = cosdeg(dphi);
-   sinphi = sindeg(dphi);
+   cosphi = cosdeg (dphi);
+   sinphi = sindeg (dphi);
 
    /* Compute the celestial longitude. */
    x = sinthe*eul[4] - costhe*eul[3]*cosphi;
    if (fabs(x) < tol) {
       /* Rearrange formula to reduce roundoff errors. */
-      x = -cosdeg(theta+eul[1]) + costhe*eul[3]*(1.0 - cosphi);
+      x = -cosdeg (theta+eul[1]) + costhe*eul[3]*(1.0 - cosphi);
    }
    y = -costhe*sinphi;
    if (x != 0.0 || y != 0.0) {
-      dlng = atan2deg(y, x);
+      dlng = atan2deg (y, x);
    } else {
       /* Change of origin of longitude. */
       dlng = dphi + 180.0;
@@ -212,16 +210,22 @@ double *lng, *lat;
       if (*lat < -90.0) *lat = -180.0 - *lat;
    } else {
       z = sinthe*eul[3] + costhe*eul[4]*cosphi;
+
+      /* Use an alternative formula for greater numerical accuracy. */
       if (fabs(z) > 0.99) {
-         /* Use an alternative formula for greater numerical accuracy. */
-         *lat = copysign(acosdeg(sqrt(x*x+y*y)), z);
+	 if (z < 0)
+            *lat = -acosdeg (sqrt(x*x+y*y));
+	 else
+            *lat =  acosdeg (sqrt(x*x+y*y));
       } else {
-         *lat = asindeg(z);
+         *lat = asindeg (z);
       }
    }
 
    return 0;
 }
-/* Apr 30 1998	Define copysign only if it is not already defined
- * Sep 28 1998	Include wcslib.h instead of wcstrig.h
+/* Dec 20 1999	Doug Mink - Change cosd() and sind() to cosdeg() and sindeg()
+ * Dec 20 1999	Doug Mink - Include wcslib.h, which includes wcstrig.h, sph.h
+ * Dec 20 1999	Doug Mink - Define copysign only if it is not already defined
+ * Jan  5 2000	Doug Mink - Drop copysign
  */

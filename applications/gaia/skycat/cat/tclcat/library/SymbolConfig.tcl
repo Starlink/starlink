@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SymbolConfig.tcl,v 1.11 1998/10/28 17:37:23 abrighto Exp $
+# @(#) $Id: SymbolConfig.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # SymbolConfig.tcl - Widget for editing plot symbol information
 #

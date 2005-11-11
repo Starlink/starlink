@@ -1,5 +1,5 @@
 /* File saoimage/wcslib/platepos.c
- * September 10, 1998
+ * February 29, 2000
  * By Doug Mink, Harvard-Smithsonian Center for Astrophysics
 
  * Module:	platepos.c (Plate solution WCS conversion
@@ -13,8 +13,8 @@
 */
 
 #include <math.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "wcs.h"
 
 int
@@ -118,7 +118,7 @@ double	*xpix;		/* x pixel number  (RA or long without rotation) */
 double	*ypix;		/* y pixel number  (dec or lat without rotation) */
 
 {
-    double div,xi,eta,x,y,xy,x2,y2,x2y,y2x,x3,y3,r2,dx,dy;
+    double xi,eta,x,y,xy,x2,y2,x2y,y2x,x3,y3,r2,dx,dy;
     double tdec,ctan,ccos,traoff, craoff, etar, xir;
     double f,fx,fy,g,gx,gy;
     double ra0, dec0, ra, dec;
@@ -127,7 +127,6 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
     int    i;
     int	ncoeff1 = wcs->ncoeff1;
     int	ncoeff2 = wcs->ncoeff2;
-    double xr, yr; 	/* position in radians */
 
     /* Convert RA and Dec in radians to standard coordinates on a plate */
     ra = degrad (xpos);
@@ -145,14 +144,17 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
     eta = raddeg (etar);
 
     /* Set initial value for x,y */
-    if (wcs->x_coeff[1] == 0.0)
+    x = xi * wcs->dc[0] + eta * wcs->dc[1];
+    y = xi * wcs->dc[2] + eta * wcs->dc[3];
+
+    /* if (wcs->x_coeff[1] == 0.0)
 	x = xi - wcs->x_coeff[0];
     else
 	x = (xi - wcs->x_coeff[0]) / wcs->x_coeff[1];
     if (wcs->y_coeff[2] == 0.0)
 	y = eta - wcs->y_coeff[0];
     else
-	y = (eta - wcs->y_coeff[0]) / wcs->y_coeff[2];
+	y = (eta - wcs->y_coeff[0]) / wcs->y_coeff[2]; */
 
     /* Iterate by Newton's method */
     for (i = 0; i < max_iterations; i++) {
@@ -357,4 +359,9 @@ struct WorldCoor *wcs;  /* WCS structure */
  * Apr 16 1998	Drom NCOEFF header parameter
  * Apr 28 1998  Change projection flags to WCS_*
  * Sep 10 1998	Check for xc1 and yc2 divide by zero after Allen Harris, SAO
+ *
+ * Oct 21 1999	Drop unused variables after lint
+ *
+ * Feb 29 2000	Use inverse CD matrix to get initial X,Y in platepix()
+ *		as suggested by Paolo Montegriffo from Bologna Ast. Obs.
  */

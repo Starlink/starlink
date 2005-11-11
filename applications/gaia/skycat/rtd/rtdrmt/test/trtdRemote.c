@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: trtdRemote.c,v 1.3 1997/04/11 10:51:11 abrighto Exp $"
+ * "@(#) $Id: trtdRemote.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
  *
  * trtdRemote.C - test cases for remote interface to the RTD
  * 
@@ -103,7 +103,7 @@ static void test_shm(int data_id, int header_id)
 	    }
 	    /* cause rtd to update the display */
 	    send_rtd("shm update");
-		}
+	}
     }
 }
 

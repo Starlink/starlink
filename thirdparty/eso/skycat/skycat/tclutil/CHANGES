@@ -4,7 +4,81 @@ CHANGES to Tclutil
 This file contains a list of changes to the Tclutil software.
 The latest changes are at the top.
 
-------------------------------------------------------------------------
+--------------- 04.04.05 released tclutil-1.2.8 -----------------
+
+* workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
+
+* Updated configure.in for APR2004 (tcl8.4, itcl3.3)
+
+* Generally 'using namespace std' instead of specifying ::std
+
+* Made the menu toolbar a bit smaller (it's planned to add an icon toolbar
+  underneath the menu toolbar.
+
+--------------- 20.01.03 released tclutil-1.2.5 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
+--------------- 27.08.01 released tclutil-1.2.4 -----------------
+
+* Merged in minor changes from Peter Biereichel (added some #include files).
+
+--------------- 18.05.01 released tclutil-1.2.3 -----------------
+
+* Ported to tcl8.3.3 (still compatible with earlier versions).
+
+--------------- 09.11.00 released tclutil-1.2.3  -----------------
+
+* Fixed a bug that occurred when attempting to memory map a file that
+  was a relative path to a relative symbolic link. 
+  (For example: Mem("../x.fits"), where x.fits is a link to y.fits).
+  The util/Mem class previously tried to resolve symbolic links, but didn't
+  get it right in this one case. The new version does not try to
+  resolve the links (commented out the call to fileRealname()).
+
+--------------- 02.03.00 released tclutil-1.2.2  -----------------
+
+* Added an optional argument to TopLevelWidget::start to specify the
+  valid options for an application. This was as a workaround to
+  what may be a bug in Tcl or Itcl that caused the application
+  to crash when an unknown argument was given.
+
+---------------  14.12.99 released tclutil-1.2.1 ------------------
+
+* Merged in changes made by Peter Biereichel (see below):
+
+* Mem.C: use _exit() in the signal handler to avoid that the message queue
+  of a possible parent process (see Batch.tcl) is closed.
+
+* Mem.C: attach to shm with SHM_RDONLY when owner=0
+
+---------------  25.10.99 released tclutil-1.2 --------------------
+
+* Merged in changes made by Peter Biereichel
+
+---------------  09.09.99 released tclutil-1.1.5 ------------------------
+
+* Updated for egcs/gcc-2.95 (This compiler version is stricter
+  for C++ code and even fails the solaris X11 header files, unless
+  told to ignore the errors...). Added check in configure.in
+  for solaris and gcc-2.95*, to include the -fpermissive flag with g++.
+
+---------------  21.06.99 released tclutil-1.1.4 ------------------------
+
+* FileSelect.tcl: changed listbox bindings from <1> to <ButtonRelease-1>
+  to avoid conflict with default bindings.
+
+---------------  01.04.99 released tclutil-1.1.3 ------------------------
+
+* Replaced sys_errlist[] with strerror() in error.C to get around
+  porting problems.
+
+* changed tclsh$vers to itclsh$vers in tix/src/Makefile.in, since
+  tclsh was often not found.
+
+* Added workaround in configure.in to tcl8.0.5 configure script
+  bug dealing with HP-UX machines and the TCL_SHLIB_LD variable
+  defined in tclConfig.sh (was set wrong for HP).
 
 ---------------  22.03.99 released tclutil-1.1.2 ------------------------
 
@@ -30,6 +104,12 @@ The latest changes are at the top.
 
 * Merged in changes from Peter W. Draper (Starlink) to support 16 and
   24 bit color.
+
+* Added routine Tk_CanvasWindowCoordsNoClip() in tkCanvasImagePs.c to
+  work around Tk's limit on canvas coordinates to short range. Now
+  the canvas coordinates do not have to be clipped to short range.
+
+* bltGraph.tcl: Added patch for blt2.4g from Peter Draper.
 
 ---------------  28.12.98 released tclutil-1.1.1 ------------------------
 

@@ -18,10 +18,20 @@
  * Prototypes for procedures used only locally in this file:
  */
 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
 static int		ImgXpmCreate _ANSI_ARGS_((Tcl_Interp *interp,
-			    char *name, int argc, char **argv,
-			    Tk_ImageType *typePtr, Tk_ImageMaster master,
-			    ClientData *clientDataPtr));
+						  char *name, int argc, 
+						  Tcl_Obj *CONST objv[],
+						  Tk_ImageType *typePtr, Tk_ImageMaster master,
+						  ClientData *clientDataPtr));
+#else
+static int		ImgXpmCreate _ANSI_ARGS_((Tcl_Interp *interp,
+						  char *name, int argc, 
+						  char **argv,
+						  Tk_ImageType *typePtr, Tk_ImageMaster master,
+						  ClientData *clientDataPtr));
+#endif
+
 static ClientData	ImgXpmGet _ANSI_ARGS_((Tk_Window tkwin,
 			    ClientData clientData));
 static void		ImgXpmDisplay _ANSI_ARGS_((ClientData clientData,
@@ -79,6 +89,11 @@ Tk_ImageType tixPixmapImageType = {
     ImgXpmDisplay,		/* displayProc */
     ImgXpmFree,			/* freeProc */
     ImgXpmDelete,		/* deleteProc */
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    (Tk_ImagePostscriptProc *) NULL,    /* postscriptProc */
+#endif
+
     (Tk_ImageType *) NULL	/* nextPtr */
 };
 
@@ -107,13 +122,22 @@ static int xpmTableInited = 0;
  *----------------------------------------------------------------------
  */
 static int
-ImgXpmCreate(interp, name, argc, argv, typePtr, master, clientDataPtr)
+ImgXpmCreate(interp, name, argc, 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+	     objv, /* allan: 05/01: added #ifdefs for tk8.3 */
+#else
+	     argv, 
+#endif
+	     typePtr, master, clientDataPtr)
     Tcl_Interp *interp;		/* Interpreter for application containing
 				 * image. */
     char *name;			/* Name to use for image. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings for options (doesn't
-				 * include image name or type). */
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    Tcl_Obj *CONST objv[];      /* Argument objects for options (not including image name or type) */
+#else
+    char **argv;		/* Argument strings for options (not including image name or type) */
+#endif
     Tk_ImageType *typePtr;	/* Pointer to our type record (not used). */
     Tk_ImageMaster master;	/* Token for image, to be used by us in
 				 * later callbacks. */
@@ -121,6 +145,15 @@ ImgXpmCreate(interp, name, argc, argv, typePtr, master, clientDataPtr)
 				 * it will be returned in later callbacks. */
 {
     PixmapMaster *masterPtr;
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    /* just generate an argv from the objv argument */
+    char* argv[64];  /* there shouldn't be more than a few options... */
+    int i;
+    for(i = 0; i < argc; i++)
+	argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
 
     masterPtr = (PixmapMaster *) ckalloc(sizeof(PixmapMaster));
     masterPtr->tkMaster = master;
@@ -268,7 +301,7 @@ ImgXpmGetData(interp, masterPtr)
     int code = TCL_OK;
 
     if (masterPtr->id != NULL) {
-	data = ImgXpmGetDataFromId(interp, masterPtr->id);
+	data = (char**)ImgXpmGetDataFromId(interp, (char*)masterPtr->id);
 	isAllocated = 0;
     }
     else if (masterPtr->fileString != NULL) {

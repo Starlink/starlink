@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: SkyCatCtrl.tcl,v 1.38 1999/03/22 21:42:15 abrighto Exp $
+# $Id: SkyCatCtrl.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
 #
 # SkyCatCtrl.tcl - image display widget with catalog extensions
 #
@@ -114,52 +114,43 @@ itcl::class skycat::SkyCatCtrl {
     
 
     # This method is called by the image code whenever a new image is loaded.
-    # It is redefined here to handle multiple HDUs in FITS files.
 
     protected method new_image_cmd {} {
  	RtdImageCtrl::new_image_cmd
 	
-	# display HDU list, if there are multiple HDUs
-	update_fits_hdus
-
 	# check for saved line graphics
 	after idle [code $this load_graphics_from_image]
+
+	# delete temp files once they are loaded
+	set filename [$image_ cget -file]
+	if {[string match {/tmp/cat[0-9]*} $filename]} {
+	    catch {file delete $filename}
+	}
     }
 
     
     # display a popup window listing the HDUs in the current image, if any
 
     public method display_fits_hdus {} {
+        if {[catch {set n [$image_ hdu count]}]} {
+            set n 0
+        }
+
+	if {$n <= 1} {
+	    warning_dialog "There are no FITS extensions" $w_
+	    return
+	}
+
 	utilReUseWidget skycat::SkyCatHduChooser $w_.hdu \
-	    -image $this \
 	    -center 0 \
-	    -transient 0
+            -image $this \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -usexshm $itk_option(-usexshm) \
+            -usexsync $itk_option(-usexsync) \
+            -verbose $itk_option(-verbose)
     }
 
 
-    # Update the popup window listing the HDUs in the current image
-
-    public method update_fits_hdus {} {
-	if {[catch {set n [$image_ hdu count]}]} {
-	    set n 0
-	}
-
-	# display and hide window automatically as needed
-	if {[winfo exists $w_.hdu]} {
-	    if {$n > 1} {
-		after idle [code $w_.hdu show_hdu_list]
-	    } else {
-		after idle "destroy $w_.hdu"
-	    }
-	} else {
-	    # if there is more than one HDU, display the HDU select window
-	    if {$n > 1} {
-		display_fits_hdus
-	    }
-	}
-    }
-
-    
     # update the toplevel window header and icon name to include the name
     # of the file being displayed
 
@@ -359,7 +350,10 @@ itcl::class skycat::SkyCatCtrl {
 
 	# get the hdu
 	set headings [$image_ hdu listheadings]
-	set hdu_list [$image_ hdu list]
+	if {[catch {set hdu_list [$image_ hdu list]}]} {
+	    # avoid problem when image and header are in separate files...
+	    return
+	}
 	set hdu 0
 	foreach i $hdu_list {
 	    eval lassign [list $i] $headings

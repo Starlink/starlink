@@ -1,7 +1,7 @@
 #******************************************************************************
 # E.S.O. - VLT project
 # 
-# "@(#) $Id: RtdServerTool.tcl,v 1.13 1998/10/28 17:42:31 abrighto Exp $"
+# "@(#) $Id: RtdServerTool.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdServerTool.tcl - class for controlling the realtime image server
 #                     simulation
@@ -213,7 +213,7 @@ itcl::class rtd::RtdServerTool {
     public method timerSet { } { 
 	global ::sec ::msec
 	set rtdTimerSet "RTDTCL TIMERSET"
-	puts $writeFd "$rtdTimerSet $sec [expr $msec * 1000] "
+	puts $writeFd "$rtdTimerSet $sec [expr {$msec * 1000}] "
 	flush $writeFd
     }
 
@@ -275,7 +275,7 @@ itcl::class rtd::RtdServerTool {
     itk_option define -rtd rtd Rtd .rtd
     
     # FITS file to use for the simulation.
-    itk_option define -fits_file fits_file Fits_file {test.gzfits}
+    itk_option define -fits_file fits_file Fits_file {test.fits}
     
     #
     # protected variables

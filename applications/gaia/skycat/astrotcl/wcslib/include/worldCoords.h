@@ -3,7 +3,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: worldCoords.h,v 1.1 1997/11/28 01:32:55 abrighto Exp $
+ * $Id: worldCoords.h,v 1.2 2005/02/02 01:43:04 brighton Exp $
  *
  * worldCoords.h - C interface to C++ class WorldCoords
  *

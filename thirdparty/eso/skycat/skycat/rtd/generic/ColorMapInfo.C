@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ColorMapInfo.C,v 1.5 1999/03/19 20:09:48 abrighto Exp $"
+ * "@(#) $Id: ColorMapInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $"
  *
  * ColorMapInfo.C - member routines for class ColorMapInfo
  * 
@@ -12,16 +12,18 @@
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 14/07/98  Changed interpolate to get last colorcell 
  *                           (so pure white/black is available in principle).
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: ColorMapInfo.C,v 1.5 1999/03/19 20:09:48 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ColorMapInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $";
 
 
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <fstream.h>
+using namespace std;
+#include <cmath>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include "ColorMapInfo.h"
 #include "util.h"
 #include "error.h"
@@ -52,7 +54,7 @@ ColorMapInfo::~ColorMapInfo()
     // remove from list
     if (this == cmaps_) {
 	cmaps_ = next_;
-    } 
+    }
     else {
 	for (ColorMapInfo* m = cmaps_; m; m = m->next_) {
 	    if (m->next_ == this) {
@@ -129,8 +131,8 @@ void ColorMapInfo::interpolate(XColor* colorCells, int colorCount)
 {
     int index;
     for (int i=0; i<colorCount; i++) {
-      index = (i * (MAX_COLOR - 1))/(colorCount - 1); 
-      // PWD: now /(colorCount - 1) to get last color cell
+	index = (i * (MAX_COLOR - 1))/(colorCount - 1); 
+	// PWD: now /(colorCount - 1) to get last color cell
 	colorCells[i].red = (ushort)(rgb_[index].red * 65535);
 	colorCells[i].green = (ushort)(rgb_[index].green * 65535);
 	colorCells[i].blue = (ushort)(rgb_[index].blue * 65535);

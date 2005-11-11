@@ -1,6 +1,7 @@
-#ifndef lint
-static char SccsId[] = "%W%  %G%";
-#endif
+/* File iraf2fits.c
+ * July 20, 2000
+ * By Doug Mink
+ */
 
 /* Module:	iraf2fits.c (Translate IRAF header to FITS header)
  * Purpose:	Translate IRAF header to FITS header
@@ -104,18 +105,17 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
 {
     int lfhead;		/* Actual length of FITS header (returned) */
     char *objname;	/* object name from FITS file */
-    int i, j, k, nax, nbits, nbytes;
+    int i, j, k, nax, nbits;
     char *pixname, *bang, *chead;
     char *fitsheader;
     int nblock, nlines;
     char *fhead, *fhead1, *fp, endline[81];
-    char *irafline;
     char fitsline[81];
     int pixtype;
     char irafchar;
     int n, ib, imu, pixoff, impixoff;
     int imndim, imphyslen, impixtype;
-    /* char *calloc_errchk(); (allan: def was missing) */
+    char *calloc_errchk();
 
     /* Set up last line of FITS header */
     (void)strncpy (endline,"END", 3);
@@ -141,8 +141,7 @@ int	*nbfits;	/* Number of bytes in FITS header (returned) */
     /*  Initialize FITS header */
     nblock = (nlines * 80) / 2880;
     *nbfits = (nblock + 3) * 2880;
-    /* fitsheader = calloc_errchk(*nbfits, 1, "FITS header"); (allan: def was missing) */
-    fitsheader = calloc(*nbfits, 1);
+    fitsheader = calloc_errchk(*nbfits, 1, "FITS header");
     fhead = fitsheader;
     lfhead = 0;
     (void)strncpy (fitsheader, endline, 80);
@@ -402,7 +401,7 @@ char	*irafheader;	/* IRAF image header */
 int	offset;		/* Number of bytes to skip before number */
 
 {
-    char *ctemp, *cheader;
+    char *ctemp;
     int  temp;
 
     ctemp = (char *) &temp;
@@ -456,7 +455,7 @@ int	offset;		/* Number of bytes to skip before string */
 int	nc;		/* Maximum number of characters in string */
 
 {
-    char *ctemp, *cheader;
+    char *ctemp;
     int i;
 
     ctemp = (char *) malloc (nc+1);
@@ -681,4 +680,6 @@ machswap ()
  * Jan 14 1998	Fix byte swapping so files can be read on any machine
  * Apr 15 1998	Declare irafswap subroutines static
  * Apr 17 1998	Add data type values for unsigned byte and unsigned short
+
+ * Jul 20 2000	Drop unused variables
  */

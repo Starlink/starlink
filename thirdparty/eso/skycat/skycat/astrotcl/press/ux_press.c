@@ -38,6 +38,7 @@
 ****  C A N A D I A N   A S T R O N O M Y   D A T A   C E N T R E  *****
 ************************************************************************
 -*/
+#include <stdio.h>
 #include <memory.h>
 
 #include "gen_types.h"

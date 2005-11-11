@@ -1,6 +1,4 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/cat.sh "$0" "$@"
+source test.tcl
 
 puts "testing the astrocat Tcl command..."
 astrocat cat

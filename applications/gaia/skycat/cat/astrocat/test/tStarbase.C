@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * $Id: tStarbase.C,v 1.1 1996/06/28 14:24:30 abrighto Exp $
+ * $Id: tStarbase.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tStarbase.C - test cases for class LocalCatalog
  * 
@@ -10,8 +10,8 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <stdlib.h>
 #include "error.h"
 #include "Starbase.h"
@@ -19,13 +19,13 @@
 /* 
  * util: print the file to the stream
  */
-static int print_file(const char* filename, ostream& os) {
-    ifstream is(filename);
+static int print_file(const char* filename, std::ostream& os) {
+    std::ifstream is(filename);
     if (!is)
 	return 1;
     char buf[1024];
     while(is.getline(buf, sizeof(buf)))
-	os << buf << endl;
+	os << buf << std::endl;
     return 0;
 }
 
@@ -49,27 +49,27 @@ main()
 	exit(1);
     } 
 
-    cout << "Results of starbase search at pos " 
-	 << pos << ", in file: test.table: " << endl;
+    std::cout << "Results of starbase search at pos " 
+	 << pos << ", in file: test.table: " << std::endl;
 
     int num_results = result.numRows();
     if (num_results <= 0) {
-	cout << "no result rows\n";
+	std::cout << "no result rows\n";
 	exit(1);
     }
 
-    cout << "starbase search returns: " 
+    std::cout << "starbase search returns: " 
 	 << num_results 
 	 << " objects" 
-	 << endl;
+	 << std::endl;
 
-    cout << "---Result List---" 
-	 << endl;
+    std::cout << "---Result List---" 
+	 << std::endl;
 
     result.save(cout);
-    cout << "-----------------" << endl;
+    std::cout << "-----------------" << std::endl;
 
-    cout << "testing starbase sort:\n";
+    std::cout << "testing starbase sort:\n";
 
     char* filename = "tStarbase.out";
     if (result.save(filename) != 0) {
@@ -87,7 +87,7 @@ main()
 	printf("starbase sort returned error\n");
 	exit(1);
     }
-    cout << "After sort by col 0:\n";
+    std::cout << "After sort by col 0:\n";
     print_file(filename, cout);
 
     if (s.uniq() != 0) {
@@ -95,7 +95,7 @@ main()
 	exit(1);
     }
 
-    cout << "After uniq by col 0:\n";
+    std::cout << "After uniq by col 0:\n";
     print_file(filename, cout);
 
     exit(0);

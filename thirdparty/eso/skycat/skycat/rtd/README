@@ -7,10 +7,9 @@ Display), a Tk widget, library and application for viewing FITS images
 from shared memory or files.
 
 --------------------------------------
-Contacts: Allan Brighton (abrighto@eso.org)
+Contacts: Allan Brighton (abrighton@gemini.edu)
           Peter Biereichel (pbiereic@eso.org)
-
-ESO - European Southern Observatory
+          ESO - European Southern Observatory
 --------------------------------------
 
 For installation instructions, see the file INSTALL in this directory.
@@ -44,7 +43,7 @@ time:
 For more information, please refer to the postscript documentation,
 which can be retrieved via anon ftp from:
 
-   ftp://ftp.archive.eso.org/pub/skycat/doc 
+	ftp://ftp.eso.org/pub/archive/skycat/doc
 
 The sources for the man pages can be found in the source tree under
 the "man" directories.

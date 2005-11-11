@@ -123,9 +123,96 @@
 
    Once the file is closed then the socket is closed.
 
-$Id: drvrnet.c,v 1.2 1999/01/14 16:55:17 abrighto Exp $
+$Id: drvrnet.c,v 1.2 2005/02/02 01:43:04 brighton Exp $
 
 $Log: drvrnet.c,v $
+Revision 1.2  2005/02/02 01:43:04  brighton
+merged with ESO Rtd version
+
+Revision 2.74  2005/01/31 15:19:06  vltsccm
+rtd2.74
+
+Revision 2.73  2004/12/14 13:17:17  vltsccm
+rtd2.73
+
+Revision 2.72  2004/07/20 14:16:54  vltsccm
+rtd2.72
+
+Revision 2.71  2004/07/11 13:19:02  vltsccm
+rtd2.71
+
+Revision 2.70  2004/06/28 17:35:02  vltsccm
+rtd2.70
+
+Revision 2.69  2004/06/21 11:26:53  vltsccm
+rtd2.69
+
+Revision 2.68  2004/04/20 17:28:03  vltsccm
+rtd2.68
+
+Revision 2.67  2004/04/07 13:37:27  vltsccm
+rtd2.67
+
+Revision 2.66  2004/03/22 15:43:47  vltsccm
+rtd2.66
+
+Revision 2.65  2003/11/04 16:10:56  vltsccm
+rtd2.65
+
+Revision 2.64  2003/10/21 12:16:55  vltsccm
+rtd2.64
+
+Revision 2.63  2003/07/02 11:31:50  vltsccm
+rtd2.63
+
+Revision 2.62  2003/07/01 12:30:34  vltsccm
+rtd2.62
+
+Revision 2.61  2003/06/30 13:35:02  vltsccm
+rtd2.61
+
+Revision 2.60  2003/06/06 11:13:14  vltsccm
+rtd2.60
+
+Revision 2.59  2003/03/19 17:42:36  vltsccm
+rtd2.59
+
+Revision 2.58  2003/03/09 18:43:31  vltsccm
+rtd2.58
+
+Revision 1.1.1.1  2002/04/04 20:11:41  brighton
+Imported sources
+
+Revision 1.4  2001/08/27 10:10:12  abrighto
+Merged in changes from pbiereic
+
+Revision 2.51  2001/08/22 08:45:12  vltsccm
+rtd2.51
+
+Revision 1.3  1999/10/25 11:42:03  abrighto
+merged changes from Peter Biereichel
+
+Revision 2.34  1999/09/17 14:46:21  vltsccm
+rtd2.34
+
+Revision 2.33  1999/08/16 14:46:33  vltsccm
+rtd2.33
+
+Revision 2.32  1999/07/30 09:45:14  vltsccm
+rtd2.32
+
+Revision 2.31  1999/07/28 17:02:51  vltsccm
+rtd2.31
+
+Revision 2.30  1999/07/20 16:59:40  vltsccm
+rtd2.30
+
+Revision 2.29  1999/07/20 15:19:48  vltsccm
+rtd2.29
+
+Revision 2.28  1999/07/13 12:22:03  vltsccm
+rtd2.28
+
 Revision 1.2  1999/01/14 16:55:17  abrighto
 upgrade cfitsio, fix gaia lib problem
 
@@ -144,6 +231,7 @@ Baltimore MD 21218 USA              ¦ http://faxafloi.stsci.edu:4547/
  */
 
 #ifdef HAVE_NET_SERVICES
+#include <stdio.h>
 #include <string.h>
 
 #include <sys/types.h>
@@ -153,7 +241,6 @@ Baltimore MD 21218 USA              ¦ http://faxafloi.stsci.edu:4547/
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>

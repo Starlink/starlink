@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: DialogWidget.tcl,v 1.7 1998/10/28 17:46:36 abrighto Exp $"
+# "@(#) $Id: DialogWidget.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # DialogWidget.tcl - Base class of dialog widget classes
 #
@@ -94,7 +94,7 @@ itcl::class util::DialogWidget {
 
 	# add optional buttons
 	add_buttons
-}
+    }
 
     
     # Create a row of buttons at the bottom of the dialog.

@@ -3,7 +3,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: slasubs.h,v 1.3 1998/07/30 22:19:48 abrighto Exp $" 
+ * "@(#) $Id: slasubs.h,v 1.3 2005/02/02 01:43:04 brighton Exp $" 
  *
  * slasubs.h - #defines to change names in slasubs.c to avoid name conflicts
  *             with sla libraries.
@@ -23,4 +23,4 @@
 #define slaDeuler SAO__slaDeuler
 
 
-#endif _slasubs_h_
+#endif /* _slasubs_h_ */

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: InputDialog.tcl,v 1.7 1998/10/28 17:46:38 abrighto Exp $"
+# "@(#) $Id: InputDialog.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # InputDialog.tcl - Dialog to display a message and get input from the user
 #

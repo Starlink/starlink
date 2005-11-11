@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: astroCatalog.C,v 1.6 1998/09/08 19:42:55 abrighto Exp $
+ * $Id: astroCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * astroCatalog.C - C interface implementation for C++ class AstroCatalog
  * 
@@ -10,19 +10,18 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Oct 95  Created
  */
-static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.6 1998/09/08 19:42:55 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
 
-#include <iostream.h>
-#include <strstream>
+#include <iostream>
 #include <errno.h>
 #include "error.h"
 
 // include the C++ and C interfaces
 #include "AstroCatalog.h"
 extern "C" {
-#include "astroCatalog.hxx"
+#include "astroCatalog.h"
 }
 
 

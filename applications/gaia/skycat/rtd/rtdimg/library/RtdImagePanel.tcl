@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImagePanel.tcl,v 1.28 1998/10/28 17:42:29 abrighto Exp $"
+# "@(#) $Id: RtdImagePanel.tcl,v 1.3 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePanel.tcl - widget for displaying relevant image information
 #                     in tabular (blt_table) format
@@ -10,6 +10,9 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  12 Oct 95  Created
+# P.Biereichel    22/03/99   Added code for bias subtraction
+# P.Biereichel    09/08/99   Added camera status
+# pbiereic        19/03/03   Always update lcut/hcut (method updateValues)
 
 itk::usual RtdImagePanel {}
 
@@ -48,7 +51,6 @@ itcl::class rtd::RtdImagePanel {
 	make_layout
     }
 
-
     # do the widget layout, aligning the items in rows and colums
 
     protected method make_layout {} {
@@ -79,6 +81,8 @@ itcl::class rtd::RtdImagePanel {
 	set var $image_
 	global ::$var
 
+	set row -1
+
 	# XXX should probably use blt table for labels and values here...
 
 	# display object name
@@ -91,12 +95,16 @@ itcl::class rtd::RtdImagePanel {
 		    -orient horizontal \
 		    -labelfont $itk_option(-labelfont) \
 		    -labelwidth $itk_option(-labelwidth) \
+		    -valuewidth $itk_option(-valuewidth) \
 		    -anchor e \
-		    -relief groove \
-		    -valuewidth 50
+		    -relief groove
 	    } 
-	    blt::table $w_ \
-		$itk_component(object)  0,0 -fill x -anchor e -columnspan 3
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		blt::table $w_ $itk_component(object)  [incr row],0 -fill x -anchor e
+	    } else {
+		blt::table $w_ $itk_component(object)  [incr row],0 -fill x -anchor e -columnspan 3
+	    }
+
 	    add_short_help $itk_component(object) \
 		{Object name (file or camera name, if object not known)}
 	}
@@ -140,10 +148,17 @@ itcl::class rtd::RtdImagePanel {
 		    -relief groove \
 		    -anchor e
 	    } 
-	    blt::table $w_ \
-		$itk_component(x)       1,0 -fill x -anchor w \
-		$itk_component(y)       1,1 -fill x -anchor w \
-		$itk_component(value)   1,2 -fill x -anchor w
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		blt::table $w_ \
+			$itk_component(x)       [incr row],0 -fill x -anchor w \
+			$itk_component(y)       [incr row],0 -fill x -anchor w \
+			$itk_component(value)   [incr row],0 -fill x -anchor w
+	    } else {
+		blt::table $w_ \
+			$itk_component(x)       [incr row],0 -fill x -anchor w \
+			$itk_component(y)       $row,1 -fill x -anchor w \
+			$itk_component(value)   $row,2 -fill x -anchor w
+	    }
 	    
 	    # workaround for bug in itcl2.0
 	    $itk_component(x) config -textvariable ${var}(X)
@@ -196,10 +211,17 @@ itcl::class rtd::RtdImagePanel {
 		    -relief groove \
 		    -anchor e
 	    } 
-	    blt::table $w_ \
-		$itk_component(ra)      2,0 -fill x -anchor w \
-		$itk_component(dec)     2,1 -fill x -anchor w \
-		$itk_component(equinox) 2,2 -fill x -anchor w
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		blt::table $w_ \
+		    $itk_component(ra)      [incr row],0 -fill x -anchor w \
+		    $itk_component(dec)     [incr row],0 -fill x -anchor w \
+		    $itk_component(equinox) [incr row],0 -fill x -anchor w
+	    } else {
+		blt::table $w_ \
+		    $itk_component(ra)      [incr row],0 -fill x -anchor w \
+		    $itk_component(dec)     $row,1 -fill x -anchor w \
+		    $itk_component(equinox) $row,2 -fill x -anchor w
+	    }
 
 	    # workaround for bug in itcl2.0
 	    $itk_component(ra) config -textvariable ${var}(RA)
@@ -246,10 +268,17 @@ itcl::class rtd::RtdImagePanel {
 		    -relief groove \
 		    -anchor e
 	    } 
-	    blt::table $w_ \
-		$itk_component(min)     3,0 -fill x -anchor w \
-		$itk_component(max)     3,1 -fill x -anchor w \
-		$itk_component(bitpix)  3,2 -fill x -anchor w
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		blt::table $w_ \
+			$itk_component(min)     [incr row],0 -fill x -anchor w \
+			$itk_component(max)     [incr row],0 -fill x -anchor w \
+			$itk_component(bitpix)  [incr row],0 -fill x -anchor w
+	    } else {
+		blt::table $w_ \
+			$itk_component(min)     [incr row],0 -fill x -anchor w \
+			$itk_component(max)     $row,1 -fill x -anchor w \
+			$itk_component(bitpix)  $row,2 -fill x -anchor w
+	    }
 
 	    add_short_help $itk_component(min) {Estimated minimum raw image value}
 	    add_short_help $itk_component(max) {Estimated maximum raw image value}
@@ -288,10 +317,17 @@ itcl::class rtd::RtdImagePanel {
 	    }  {
 		keep -state
 	    }
-	    blt::table $w_ \
-		$itk_component(low)     4,0 -fill x -anchor w \
-		$itk_component(high)    4,1 -fill x -anchor w \
-		$itk_component(lrframe) 4,2 -fill x -anchor w
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		blt::table $w_ \
+			$itk_component(low)     [incr row],0 -fill x -anchor w \
+			$itk_component(high)    [incr row],0 -fill x -anchor w \
+			$itk_component(lrframe) [incr row],0 -fill x -anchor w
+	    } else {
+		blt::table $w_ \
+			$itk_component(low)     [incr row],0 -fill x -anchor w \
+			$itk_component(high)    $row,1 -fill x -anchor w \
+			$itk_component(lrframe) $row,2 -fill x -anchor w
+	    }
 
 	    add_short_help $itk_component(low) \
 		{Image low cut value, type return after editing value}
@@ -310,6 +346,7 @@ itcl::class rtd::RtdImagePanel {
 		    -valuefont $itk_option(-valuefont) \
 		    -labelwidth [max $itk_option(-labelwidth) 5] \
 		    -relief flat \
+		    -panel_orient $itk_option(-panel_orient) \
 		    -min_scale $itk_option(-min_scale) \
 		    -max_scale $itk_option(-max_scale) \
 		    -image $itk_option(-image)
@@ -317,19 +354,64 @@ itcl::class rtd::RtdImagePanel {
 		keep -state
 	    }
 	    blt::table $w_ \
-		$itk_component(trans)   5,0 -fill x -anchor w -columnspan 2
+		$itk_component(trans)   [incr row],0 -fill x -anchor w -columnspan 2
+	}
+
+	# canvas for real-time status display
+	itk_component add cameraStatus {
+	    canvas $w_.status -width 0 -height 0
+	}
+	if { "$itk_option(-panel_orient)" == "vertical" } {
+	    $w_.status config -width 10 -height 36
+	    blt::table $w_ \
+		    $itk_component(cameraStatus)  [incr row],0 -fill both -anchor nw
+	} else {
+	    blt::table $w_ \
+		    $itk_component(cameraStatus)  $row,2 -fill both -anchor nw
 	}
 
 	blt::table configure $w_ c2 -padx 1m
     }
+    
+    public method camSts { args } {
+	set var $image_
+	global ::$var
 
+	lassign [set ${var}(ATTACHED)] sts camera
+	updateCameraStatus $camera $sts
+    }
+
+    # update camera status display
+
+    public method updateCameraStatus {camera status} {
+	if {$status == 0} {
+	    set sts Detached
+	} else {
+	    set sts Attached
+	}
+	$itk_component(cameraStatus) delete cameraStatus
+	if {"$camera" == "RTDSIMULATOR"} { return }
+	$itk_component(cameraStatus) create text 6 3 \
+		-text "Camera: \t$camera\n\t$sts" \
+		-anchor nw -font $itk_option(-labelfont) -tags cameraStatus
+    }
+    
+    # Flash a green circle for real-time image events
+
+    public method flash {onoff} {
+	if {$onoff == 1} {
+	    $itk_component(cameraStatus) create oval 25 17 35 27 -fill green -tags flash
+	} else {
+	    $itk_component(cameraStatus) delete flash
+	}
+    }
     
     # set the cut levels when the user types them in and hits return
     
     protected method set_cut_levels {args} {
 	set low [$itk_component(low) get] 
 	set high [$itk_component(high) get]
-	if {[catch {expr $low} msg] || [catch {expr $high} msg]} {
+	if {[catch {expr {$low}} msg] || [catch {expr {$high}} msg]} {
 	    error_dialog $msg
 	} else {
 	    $image_ cut $low $high
@@ -362,6 +444,23 @@ itcl::class rtd::RtdImagePanel {
 	}
     }
 
+    # update the HDU window with the latest cut levels, if needed
+
+    public method update_hdu_window {} {
+	lassign [$image_ cut] low high
+	if {"$low" == "" || "$high" == ""} {
+	    return
+	}
+	set l [$itk_component(low) cget -value]
+	set h [$itk_component(high) cget -value]
+	if {$low != $l || $high != $h} {
+	    set w [utilNamespaceTail $itk_option(-image)].hdu
+	    if {[winfo exists $w] && [winfo viewable $w]} {
+		$w set_cut_levels $low $high
+	    }
+	}
+    }
+
 
     # set the cut levels automatically using median filtering...
     
@@ -377,7 +476,7 @@ itcl::class rtd::RtdImagePanel {
 	if {$itk_option(-showobject)} {
 	    set s [$image_ object]
 	    if {"$s" == ""} {
-		set s [$image_ cget -file]
+		set s [file tail [$image_ cget -file]]
 	    }
 	    $itk_component(object) config -value $s
 	}
@@ -388,30 +487,44 @@ itcl::class rtd::RtdImagePanel {
 	    $itk_component(bitpix) config -value [$image_ bitpix]
 	}
 
+	#update_hdu_window
+
 	if {$itk_option(-showcut)} {
 	    #  avoid conflict with user typing
 	    lassign [$image_ cut] low high
-	    set f [focus]
-	    if {"$f" != "[$itk_component(low) component entry]"} {
-		$itk_component(low) config -value $low
-	    } 
-	    if {"$f" != "[$itk_component(high) component entry]"} {
-		$itk_component(high) config -value $high
-	    }
+
+	    $itk_component(high) config -value $high
+	    $itk_component(low) config -value $low
+
+# 	    set f [focus]
+# 	    if {"$f" != "[$itk_component(low) component entry]"} {
+# 		$itk_component(low) config -value $low
+# 	    } 
+# 	    if {"$f" != "[$itk_component(high) component entry]"} {
+# 		$itk_component(high) config -value $high
+# 	    }
 	}
 	update_cut_window
+       
+        # update the bias display window, if needed
+        if {[winfo exists .bias]} {
+            .bias update_cuts
+        }
 
 	if {$itk_option(-showtrans)} {
 	    $itk_component(trans) update_trans
 	}
     }
-    
 
     # -- options --
 
     # main RtdImage widget (set by caller)
     itk_option define -image image Image {} {
 	set image_ [$itk_option(-image) get_image]
+	set var $image_
+	global ::$var
+	set ${var}(ATTACHED) "0 0"
+	trace variable ${var}(ATTACHED) w [code $this camSts]
     }
 
     # Flag: if true, display the object name
@@ -459,6 +572,9 @@ itcl::class rtd::RtdImagePanel {
 
     # maximum allowed scale value
     itk_option define -max_scale max_scale Max_scale 20
+
+    # Panel orient: one of {horizontal vertical} (default: horizontal)
+    itk_option define -panel_orient panel_orient Panel_orient {}
 
     # -- protected vars -- 
     

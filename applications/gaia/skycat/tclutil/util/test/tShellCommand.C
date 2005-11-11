@@ -1,19 +1,21 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tShellCommand.C,v 1.2 1997/12/02 10:28:43 abrighto Exp $
+ * $Id: tShellCommand.C,v 1.4 2005/02/02 01:43:00 brighton Exp $
  *
  * tShellCommand.C - test cases for class ShellCommand
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  12 Jun 96  Created
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include "error.h"
 #include "ShellCommand.h"
 
@@ -49,6 +51,7 @@ main()
     createTestFile(TEST_FILE);
     char cmd[1024];
     sprintf(cmd, "cat %s", TEST_FILE);
+    
     ShellCommand sh(cmd);
     printf("command '%s' returns:\nstatus: %d\nstdout: '%s'\nstderr: '%s'\n",
 	   cmd, sh.status(), sh.stdOut(), sh.stdErr());

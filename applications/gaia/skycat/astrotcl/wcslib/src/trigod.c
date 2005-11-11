@@ -11,6 +11,8 @@
 .VERSION 1.1	05-Dec-1988: Added inverse functions.
 ________________________________________*/
 
+#ifndef __hpux__ 
+
 #include "trigo.h"
 #include "osdefos.h"
 
@@ -142,6 +144,6 @@ double asind(x)
 /*=========================================================================*/
 
                                                            
-                                                               
-                                                               
+#endif /* HP_UX */                                                               
+                                             
                                         

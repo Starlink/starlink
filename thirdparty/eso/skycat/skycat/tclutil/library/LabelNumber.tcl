@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelNumber.tcl,v 1.7 1998/10/28 17:46:39 abrighto Exp $"
+# "@(#) $Id: LabelNumber.tcl,v 1.2 2005/02/01 04:19:07 brighton Exp $"
 #
 # LabelNumber.tcl - Widget displaying a label, a number, and arrow buttons
 #
@@ -62,11 +62,7 @@ itcl::class util::LabelNumber {
     protected method increment {sign} {
 	set v [expr [get]+($sign*$itk_option(-increment))]
 	if {$v >= $itk_option(-min) && $v <= $itk_option(-max)} {
-	    set w $itk_option(-valuewidth)
-	    if {"$w" == "" || "$w" <= 0} {
-		set w 3
-	    }
-	    config -value [format "%${w}d" $v]
+	    config -value [format "%g" $v]
 	    if {"$itk_option(-command)" != ""} {
 		set cmd $itk_option(-command)
 		lappend cmd $v

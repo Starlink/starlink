@@ -1,13 +1,3 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/tclutil.sh "$0" "$@"
-#
-# This is a simple DoubleTableList demo. Display the contents
-# of the local /etc/passwd file, just to get some data...
-#
-# Copyright (c) 1994 Allan Brighton (abrighto@eso.org)
-
-
 source test.tcl
 
 itcl::class PwDemo {

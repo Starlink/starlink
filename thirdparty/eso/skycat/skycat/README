@@ -17,20 +17,16 @@ Skycat home page:
 	http://archive.eso.org/skycat/
 
 Sources and binaries:
-	ftp://ftp.archive.eso.org/pub/skycat/README.html
-
-GAIA Extensions (added by Peter Draper <P.W.Draper@durham.ac.uk>):
-	ftp://ftp.archive.eso.org/pub/skycat/plugins/README.html
+	ftp://ftp.eso.org/pub/archive/skycat/README.html
 
 Postscript, PDF, and FrameMaker Documentation:
-	ftp://ftp.archive.eso.org/pub/skycat/doc/
+	ftp://ftp.eso.org/pub/archive/skycat/doc
 
 HTML Docs:
-	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
-
+	http://archive.eso.org/skycat/docs/skycat-man.html
 ------------------------------------------------------------------
-Contact: Allan Brighton (abrighto@eso.org) 
-         Miguel Albrecht (malbrech@eso.org)
+Contact: Allan Brighton (abrighton@gemini.edu) 
+         Andreas Wicenec (awicenec@eso.org)
          Peter Biereichel (pbiereic@eso.org) (RTD issues)
 
 ESO - European Southern Observatory
@@ -52,11 +48,11 @@ Documentation
 The latest documentation (in postscript, FrameMaker, and PDF formats)
 is available under:
 
-	ftp://ftp.archive.eso.org/pub/skycat/doc
+	ftp://ftp.eso.org/pub/archive/skycat/doc
 
 An HTML version is also available from:
 
-	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
+	http://archive.eso.org/skycat/docs/skycat-man.html
 
 The Skycat application is based on the following packages:
 

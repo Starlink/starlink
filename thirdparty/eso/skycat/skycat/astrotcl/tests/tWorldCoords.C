@@ -1,19 +1,21 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tWorldCoords.C,v 1.2 1998/02/09 08:00:44 abrighto Exp $
+ * $Id: tWorldCoords.C,v 1.4 2005/02/02 01:43:03 brighton Exp $
  *
  * tWorldCoords.C - test cases for class WorldCoords
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 
 main() 
 {
@@ -92,6 +94,10 @@ main()
     WorldCoords c17(ra, dec);
     cout << " == " << c17 << endl;
 
+    // test reported problem when using equinox J2000.0 (with extra ".0")
+    cout << "\ntest use of equinox J2000.0 (with extra .0)\n";
+    WorldCoords c18("22:45:22.74", "-39:34:14.63", "J2000.0");
+    cout << " == " << c18 << endl;
     return(0);
 }
 

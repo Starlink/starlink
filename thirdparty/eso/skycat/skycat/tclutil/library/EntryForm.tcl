@@ -1,11 +1,12 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: EntryForm.tcl,v 1.10 1999/03/11 21:01:31 abrighto Exp $"
+# "@(#) $Id: EntryForm.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # EntryForm.tcl - Form dialog for entering data at given labels
 #
-# who         when       what
-# --------   ---------   ----------------------------------------------
-# A.Brighton 26 Jun 96   created
+# who           when       what
+# --------     ---------   ----------------------------------------------
+# A.Brighton   26 Jun 96   created
+# P.Biereichel 04/08/99    Added option -scroll
 
 
 itk::usual EntryForm {}
@@ -33,22 +34,30 @@ itcl::class util::EntryForm {
 	}
 	pack $itk_component(title) -side top -fill x -pady 2m -padx 2m
 
-	# Canvas used to add a scrollbar
-	itk_component add canvas {
-	    CanvasWidget $w_.canvas
-	}
-	set canvas [$w_.canvas component canvas]
-	pack $w_.canvas -side top -fill both -expand 1 \
-	    -padx 1m -pady 1m -ipadx 1m -ipady 1m
+	if {$itk_option(-scroll)} {
+	    # Canvas used to add a scrollbar
+	    itk_component add canvas {
+		CanvasWidget $w_.canvas
+	    }
+	    set canvas [$w_.canvas component canvas]
+	    pack $w_.canvas -side top -fill both -expand 1 \
+		    -padx 1m -pady 1m -ipadx 1m -ipady 1m
 
-	# Frame containing entries.
-	itk_component add entries {
-	    set f [frame $canvas.entries -bd 3 -relief groove]
+	    # Frame containing entries.
+	    itk_component add entries {
+		set f [frame $canvas.entries -bd 3 -relief groove]
+	    }
+	    
+	    $canvas create window 0 0 -window $f -anchor nw -tags frame
+	    $canvas configure -background [$f cget -background]
+	    bind $canvas <Configure> [code $this resize $f $canvas %w %h]
+	} else {
+	    itk_component add entries {
+		set f [frame $w_.entries -bd 3 -relief groove]
+	    }
+	    pack $f -side top -fill both -expand 1 \
+		    -padx 1m -pady 1m -ipadx 1m -ipady 1m
 	}
-
-	$canvas create window 0 0 -window $f -anchor nw -tags frame
-	$canvas configure -background [$f cget -background]
-	bind $canvas <Configure> [code $this resize $f $canvas %w %h]
 	
 	blt::table $f
 	set row 0
@@ -190,6 +199,9 @@ itcl::class util::EntryForm {
     # list {{label cmd} {label cmd}} of additional buttons to display
     itk_option define -buttons buttons Buttons {} 
 
+    # use scrollbar option
+    itk_option define -scroll scroll Scroll {1} 
+
 
     # -- protected vars --
     
@@ -199,7 +211,3 @@ itcl::class util::EntryForm {
     # flag: set to 1 after init
     protected variable initialized_ 0
 }
-
-
-
-    

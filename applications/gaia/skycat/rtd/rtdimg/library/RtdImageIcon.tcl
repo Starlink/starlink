@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageIcon.tcl,v 1.11 1998/10/28 17:42:28 abrighto Exp $"
+# "@(#) $Id: RtdImageIcon.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageIcon.tcl - itcl widget to display current image in icon window
 # 

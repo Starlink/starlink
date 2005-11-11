@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tQueryResult.C,v 1.5 1997/10/07 11:43:31 abrighto Exp $
+ * $Id: tQueryResult.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tQueryResult.C - test cases for class QueryResult
  * 
@@ -9,25 +9,25 @@
  * Allan Brighton  26 Sep 95  Created
  */
 
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Mem.h"
 #include "error.h"
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "QueryResult.h"
 
 /* 
  * util: print the file to the stream
  */
-static int print_file(const char* filename, ostream& os) {
-    ifstream is(filename);
+static int print_file(const char* filename, std::ostream& os) {
+    std::ifstream is(filename);
     if (!is)
 	return 1;
     char buf[1024];
     while(is.getline(buf, sizeof(buf)))
-	os << buf << endl;
+	os << buf << std::endl;
     return 0;
 }
 
@@ -51,7 +51,7 @@ main()
 	printf("test 1 failed");
 	exit(1);
     }
-    cout << "table t = \n" << t;
+    std::cout << "table t = \n" << t;
 
     int n;
     double d;
@@ -94,7 +94,7 @@ main()
     }
 
     // -- test insert --
-    cout << "testing insert of rows:\n";
+    std::cout << "testing insert of rows:\n";
 
     // save table t to a file
     char* filename = "tQueryResult.out";
@@ -118,20 +118,20 @@ main()
 	printf("test 10 failed");
 	exit(1);
     }
-    cout << "table t2 = \n" << t2;
+    std::cout << "table t2 = \n" << t2;
 
     if (t2.insert(filename) != 0) {
 	printf("test 11 failed");
 	exit(1);
     }
 
-    cout << "result after insert:\n";
+    std::cout << "result after insert:\n";
     if (print_file(filename, cout) != 0) {
 	printf("test 12 failed");
 	exit(1);
     }
 
-    cout << "testing remove of rows:\n";
+    std::cout << "testing remove of rows:\n";
     if (t.remove(filename, 0) != 0) {
 	printf("test 13 failed");
 	exit(1);

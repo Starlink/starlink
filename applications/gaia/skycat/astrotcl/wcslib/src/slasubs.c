@@ -3,9 +3,9 @@
  *** April 13, 1998
  */
 
+#include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include "slasubs.h"
 
 /*  slaDcs2c (a, b, v): Spherical coordinates to direction cosines.
  *  slaDcc2s (v, a, b):  Direction cosines to spherical coordinates.

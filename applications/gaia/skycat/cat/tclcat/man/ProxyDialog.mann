@@ -18,7 +18,7 @@ SYNOPSIS
  ProxyDialog <path> ?options?
 
 DESCRIPTION
- E.S.O. - VLT project/ESO Archive @(#) $Id: ProxyDialog.tcl,v 1.2
+ E.S.O. - VLT project/ESO Archive @(#) $Id: ProxyDialog.tcl,v 1.2+++++++++++
  1998/10/28 17:37:23 abrighto Exp $
  
  ProxyDialog.tcl - user interface class for defining a proxy server

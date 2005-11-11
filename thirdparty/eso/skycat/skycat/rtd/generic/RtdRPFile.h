@@ -15,9 +15,9 @@
  * A.Brighton	   08/12/97  fixed lots of C++ errors found by SunPro CC
  */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <sys/shm.h>
 #include <sys/stat.h>
 
@@ -61,7 +61,6 @@ protected:
     char* instname_;            // name of tcl command created for this object
     char* fileName_;             // filename
 
-    RtdRPFile();				// Null Constructor.
     RtdRPFile(Tcl_Interp* interp, char* instname,
               char *fileName, char *accFlag, double maxFileSize);               // Constructor.
 
@@ -147,10 +146,7 @@ public:
     // Constructor - call base class constructor.
     RtdFITSCube(Tcl_Interp* interp, char* instname, char *fileName, char *accFlag, double maxFileSize) :
 	RtdRPFile(interp, instname, fileName, accFlag, maxFileSize),
-	   FITSHeaderSize_(0) {}
-
-    // NULL constructor.
-    RtdFITSCube() : RtdRPFile() {}
+	FITSHeaderSize_(0) {}
 
     // Destructor.
     ~RtdFITSCube();
@@ -178,9 +174,6 @@ public:
     // Constructor - call base class contructor.
     RtdFITSComp(Tcl_Interp* interp, char* instname, char *fileName, char *accFlag, double maxFileSize) :
 	RtdRPFile(interp, instname, fileName, accFlag, maxFileSize) {}
-
-    // NULL constructor.
-    RtdFITSComp() : RtdRPFile() {}
 
     // Destructor - call base class destructor.
     ~RtdFITSComp() {}

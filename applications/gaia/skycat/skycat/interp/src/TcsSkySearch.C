@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TcsSkySearch.C,v 1.1 1998/04/02 21:17:26 abrighto Exp $
+ * $Id: TcsSkySearch.C,v 1.3 2003/01/16 22:09:10 brighton Exp $
  *
  * TcsSkySearch.C - method definitions for class TcsSkySearch
  *
@@ -15,9 +15,10 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  2 Apr 98  Created
  */
-static const char* const rcsId="@(#) $Id: TcsSkySearch.C,v 1.1 1998/04/02 21:17:26 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TcsSkySearch.C,v 1.3 2003/01/16 22:09:10 brighton Exp $";
 
 
+#include "config.h"
 #include "TcsSkySearch.h"
 
 
@@ -29,7 +30,7 @@ extern "C"
 int TcsSkySearch_Init(Tcl_Interp* interp)  
 {
     // install the tcscat command 
-    Tcl_CreateCommand(interp, "tcscat", TcsSkySearch::tcsCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "tcscat", (Tcl_CmdProc*)TcsSkySearch::tcsCatCmd, NULL, NULL);
     return TCL_OK;
 }
 

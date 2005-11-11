@@ -4,6 +4,74 @@ CHANGES to the "catlib" Catalog Interface Library
 This file contains a list of changes to the "catlib" libraries. 
 The latest changes are at the top.
 
+--------------- 20.01.03 released cat-3.7.4 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
+--------------- 27.02.02 released catlib-3.7.3 -----------------
+
+* Fixed problem with temporary downloaded image files being deleted too soon.
+  (Now they are only deleted after they are loaded, so that the OS can delete
+   them later on.)
+
+--------------- 27.08.01 released catlib-3.7.2 -----------------
+
+* Merged in minor changes from Peter Biereichel (added some #include files).
+
+--------------- 17.02.01 released catlib-3.7.1 -----------------
+
+* Fixed a bug that occurred when a catalog config entry had a copyright
+  field but no x,y or ra,dec columns defined.
+
+--------------- 20.09.00 released catlib-3.7 -----------------
+
+* Added changes to support galactic and ecliptic coordinates
+  (pass equinox as a string instead of a double, where the
+  value may be a number (2000, 1950, ...) or a coordinate
+  system name ("FK5, "GALACTIC", ...).
+
+--------------- 02.03.00 released catlib-3.6 -----------------
+
+* TclAstroCat.C::queryCmd: now returns a TCL_ERROR if a table row does
+  not contain a valid coordinate position when it should. The previous
+  versions tried to continue, but the error message overwrote the result
+  of the query (in the Tcl result).
+
+---------------  25.10.99 released catlib-3.5 --------------------
+
+* Merged in changes made by Peter Biereichel
+
+---------------  09.09.99 released catlib-3.4.1 --------------------
+
+* Updated for egcs/gcc-2.95.
+
+---------------  22.07.99 released catlib-3.4 ----------------------
+
+* TCS catalogs: fixed a bug dealing with TCS catalogs (error message
+  was "empty TCS result"). The problem was caused by adding an extra
+  parameter to the init() method in the base class (TabTable), but not 
+  in the derived class (TcsQueryResult), so that inheritance did not
+  work as expected.
+
+* Fixed problem with catalog directory hierarchies. Previously, catalog
+  names had to be unique in the entire catalog hierarchy. Now, the interface
+  has been changed slightly to fix this. A catalog directory argument may
+  now be either a name, as before, or a tcl list of catalog directories,
+  forming a path to the catalog's parent directory. Also, catalogs are now
+  searched for only in the given directory, not recursively down the tree.
+  The "astrocat open" command now also takes an optional directory argument,
+  so that you can open a catalog in a specific directory.
+
+  The changes are all backward compatible, except for one: there is no
+  more recursive search for catalogs in the tree. However, it is not
+  likely that this feature was used.
+
+--------------- 21.06.99 released catlib-3.3.3 ----------------------
+
+* TclAstroCat.C: allow empty RA and DEC columns in query results
+  where ra_col and dec_col are defined (previously an error mesage
+  was generated: "error in RA value, expected HH:MM:SS").
+
 ---------------  22.03.99 released catlib-3.3.2 ----------------------
 
 * Replaced itclsh2.2 with itclsh@ITCL_VERSION@ in Makefile.in.

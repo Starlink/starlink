@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: tclutil_bitmaps.C,v 1.1 1998/03/02 21:16:26 abrighto Exp $"
+ * "@(#) $Id: tclutil_bitmaps.C,v 1.2 2005/02/02 01:43:02 brighton Exp $"
  *
  * Bitmap definitions for Tk
  *
@@ -13,152 +13,65 @@
 
 
 void defineTclutilBitmaps(Tcl_Interp *interp) {
-    #include "abc.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("abc"), (char*)abc_bits, abc_width, abc_height);
-
-    #include "information.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("information"), (char*)information_bits, information_width, information_height);
-
-    #include "anyselect.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("anyselect"), (char*)anyselect_bits, anyselect_width, anyselect_height);
-
-    #include "ar10_13_3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar10_13_3"), (char*)ar10_13_3_bits, ar10_13_3_width, ar10_13_3_height);
-
-    #include "ar12_11_3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar12_11_3"), (char*)ar12_11_3_bits, ar12_11_3_width, ar12_11_3_height);
-
-    #include "ar12_12_3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar12_12_3"), (char*)ar12_12_3_bits, ar12_12_3_width, ar12_12_3_height);
-
     #include "ar6_6_4.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("ar6_6_4"), (char*)ar6_6_4_bits, ar6_6_4_width, ar6_6_4_height);
-
-    #include "ar8_10_3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar8_10_3"), (char*)ar8_10_3_bits, ar8_10_3_width, ar8_10_3_height);
-
-    #include "ar8_12_9.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar8_12_9"), (char*)ar8_12_9_bits, ar8_12_9_width, ar8_12_9_height);
-
-    #include "ar8_8_6.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ar8_8_6"), (char*)ar8_8_6_bits, ar8_8_6_width, ar8_8_6_height);
-
-    #include "arc.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("arc"), (char*)arc_bits, arc_width, arc_height);
 
     #include "arrowboth.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("arrowboth"), (char*)arrowboth_bits, arrowboth_width, arrowboth_height);
 
-    #include "arrowfirst.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("arrowfirst"), (char*)arrowfirst_bits, arrowfirst_width, arrowfirst_height);
+    #include "files.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("files"), (char*)files_bits, files_width, files_height);
 
-    #include "arrowlast.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("arrowlast"), (char*)arrowlast_bits, arrowlast_width, arrowlast_height);
+    #include "width1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("width1"), (char*)width1_bits, width1_width, width1_height);
+
+    #include "width2.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("width2"), (char*)width2_bits, width2_width, width2_height);
+
+    #include "width3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("width3"), (char*)width3_bits, width3_width, width3_height);
+
+    #include "width4.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("width4"), (char*)width4_bits, width4_width, width4_height);
 
     #include "arrownone.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("arrownone"), (char*)arrownone_bits, arrownone_width, arrownone_height);
 
-    #include "b1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("b1"), (char*)b1_bits, b1_width, b1_height);
-
-    #include "b2.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("b2"), (char*)b2_bits, b2_width, b2_height);
-
-    #include "b3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("b3"), (char*)b3_bits, b3_width, b3_height);
+    #include "circle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("circle"), (char*)circle_bits, circle_width, circle_height);
 
     #include "dir.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("dir"), (char*)dir_bits, dir_width, dir_height);
 
-    #include "circle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("circle"), (char*)circle_bits, circle_width, circle_height);
-
-    #include "decr.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("decr"), (char*)decr_bits, decr_width, decr_height);
+    #include "shiftb1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("shiftb1"), (char*)shiftb1_bits, shiftb1_width, shiftb1_height);
 
     #include "down.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("down"), (char*)down_bits, down_width, down_height);
 
-    #include "down_arrow.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("down_arrow"), (char*)down_arrow_bits, down_arrow_width, down_arrow_height);
-
-    #include "dragb1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("dragb1"), (char*)dragb1_bits, dragb1_width, dragb1_height);
-
-    #include "dragb2.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("dragb2"), (char*)dragb2_bits, dragb2_width, dragb2_height);
-
-    #include "dragb3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("dragb3"), (char*)dragb3_bits, dragb3_width, dragb3_height);
-
-    #include "file.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("file"), (char*)file_bits, file_width, file_height);
-
-    #include "files.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("files"), (char*)files_bits, files_width, files_height);
-
-    #include "flipx.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("flipx"), (char*)flipx_bits, flipx_width, flipx_height);
-
-    #include "flipy.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("flipy"), (char*)flipy_bits, flipy_width, flipy_height);
-
-    #include "freehand.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("freehand"), (char*)freehand_bits, freehand_width, freehand_height);
-
-    #include "incr.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("incr"), (char*)incr_bits, incr_width, incr_height);
-
-    #include "left_arrow.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("left_arrow"), (char*)left_arrow_bits, left_arrow_width, left_arrow_height);
-
     #include "label.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("label"), (char*)label_bits, label_width, label_height);
 
+    #include "polygon.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("polygon"), (char*)polygon_bits, polygon_width, polygon_height);
+
+    #include "ar10_13_3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar10_13_3"), (char*)ar10_13_3_bits, ar10_13_3_width, ar10_13_3_height);
+
+    #include "right.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("right"), (char*)right_bits, right_width, right_height);
+
+    #include "ar8_10_3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar8_10_3"), (char*)ar8_10_3_bits, ar8_10_3_width, ar8_10_3_height);
+
     #include "left.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("left"), (char*)left_bits, left_width, left_height);
-
-    #include "magnify.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("magnify"), (char*)magnify_bits, magnify_width, magnify_height);
-
-    #include "line.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("line"), (char*)line_bits, line_width, line_height);
-
-    #include "link.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("link"), (char*)link_bits, link_width, link_height);
-
-    #include "objselect.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("objselect"), (char*)objselect_bits, objselect_width, objselect_height);
-
-    #include "right_arrow.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("right_arrow"), (char*)right_arrow_bits, right_arrow_width, right_arrow_height);
-
-    #include "oval.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("oval"), (char*)oval_bits, oval_width, oval_height);
 
     #include "pat0.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("pat0"), (char*)pat0_bits, pat0_width, pat0_height);
 
     #include "pat1.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("pat1"), (char*)pat1_bits, pat1_width, pat1_height);
-
-    #include "pat10.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat10"), (char*)pat10_bits, pat10_width, pat10_height);
-
-    #include "pat11.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat11"), (char*)pat11_bits, pat11_width, pat11_height);
-
-    #include "pat12.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat12"), (char*)pat12_bits, pat12_width, pat12_height);
-
-    #include "pat13.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat13"), (char*)pat13_bits, pat13_width, pat13_height);
-
-    #include "pat14.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat14"), (char*)pat14_bits, pat14_width, pat14_height);
-
-    #include "pat15.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pat15"), (char*)pat15_bits, pat15_width, pat15_height);
 
     #include "pat2.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("pat2"), (char*)pat2_bits, pat2_width, pat2_height);
@@ -184,58 +97,145 @@ void defineTclutilBitmaps(Tcl_Interp *interp) {
     #include "pat9.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("pat9"), (char*)pat9_bits, pat9_width, pat9_height);
 
-    #include "polygon.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("polygon"), (char*)polygon_bits, polygon_width, polygon_height);
-
-    #include "polyline.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("polyline"), (char*)polyline_bits, polyline_width, polyline_height);
-
-    #include "smooth.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("smooth"), (char*)smooth_bits, smooth_width, smooth_height);
-
-    #include "region.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("region"), (char*)region_bits, region_width, region_height);
-
-    #include "right.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("right"), (char*)right_bits, right_width, right_height);
-
     #include "rotate.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("rotate"), (char*)rotate_bits, rotate_width, rotate_height);
 
-    #include "rectangle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
+    #include "anyselect.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("anyselect"), (char*)anyselect_bits, anyselect_width, anyselect_height);
 
-    #include "shrink.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("shrink"), (char*)shrink_bits, shrink_width, shrink_height);
+    #include "freehand.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("freehand"), (char*)freehand_bits, freehand_width, freehand_height);
 
-    #include "shiftb1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("shiftb1"), (char*)shiftb1_bits, shiftb1_width, shiftb1_height);
+    #include "magnify.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("magnify"), (char*)magnify_bits, magnify_width, magnify_height);
 
-    #include "shiftdragb1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("shiftdragb1"), (char*)shiftdragb1_bits, shiftdragb1_width, shiftdragb1_height);
+    #include "file.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("file"), (char*)file_bits, file_width, file_height);
+
+    #include "b1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("b1"), (char*)b1_bits, b1_width, b1_height);
+
+    #include "b2.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("b2"), (char*)b2_bits, b2_width, b2_height);
+
+    #include "b3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("b3"), (char*)b3_bits, b3_width, b3_height);
 
     #include "square.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("square"), (char*)square_bits, square_width, square_height);
 
+    #include "smooth.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("smooth"), (char*)smooth_bits, smooth_width, smooth_height);
+
     #include "text.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("text"), (char*)text_bits, text_width, text_height);
+
+    #include "ar8_8_6.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar8_8_6"), (char*)ar8_8_6_bits, ar8_8_6_width, ar8_8_6_height);
+
+    #include "pat10.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat10"), (char*)pat10_bits, pat10_width, pat10_height);
+
+    #include "pat11.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat11"), (char*)pat11_bits, pat11_width, pat11_height);
+
+    #include "pat12.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat12"), (char*)pat12_bits, pat12_width, pat12_height);
+
+    #include "pat13.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat13"), (char*)pat13_bits, pat13_width, pat13_height);
+
+    #include "pat14.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat14"), (char*)pat14_bits, pat14_width, pat14_height);
+
+    #include "pat15.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pat15"), (char*)pat15_bits, pat15_width, pat15_height);
+
+    #include "abc.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("abc"), (char*)abc_bits, abc_width, abc_height);
+
+    #include "decr.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("decr"), (char*)decr_bits, decr_width, decr_height);
+
+    #include "ar12_11_3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar12_11_3"), (char*)ar12_11_3_bits, ar12_11_3_width, ar12_11_3_height);
+
+    #include "shrink.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("shrink"), (char*)shrink_bits, shrink_width, shrink_height);
+
+    #include "oval.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("oval"), (char*)oval_bits, oval_width, oval_height);
+
+    #include "objselect.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("objselect"), (char*)objselect_bits, objselect_width, objselect_height);
+
+    #include "flipx.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("flipx"), (char*)flipx_bits, flipx_width, flipx_height);
+
+    #include "flipy.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("flipy"), (char*)flipy_bits, flipy_width, flipy_height);
+
+    #include "ar8_12_9.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar8_12_9"), (char*)ar8_12_9_bits, ar8_12_9_width, ar8_12_9_height);
+
+    #include "polyline.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("polyline"), (char*)polyline_bits, polyline_width, polyline_height);
+
+    #include "ar12_12_3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ar12_12_3"), (char*)ar12_12_3_bits, ar12_12_3_width, ar12_12_3_height);
+
+    #include "down_arrow.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("down_arrow"), (char*)down_arrow_bits, down_arrow_width, down_arrow_height);
+
+    #include "shiftdragb1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("shiftdragb1"), (char*)shiftdragb1_bits, shiftdragb1_width, shiftdragb1_height);
 
     #include "up.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("up"), (char*)up_bits, up_width, up_height);
 
+    #include "dragb1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("dragb1"), (char*)dragb1_bits, dragb1_width, dragb1_height);
+
+    #include "dragb2.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("dragb2"), (char*)dragb2_bits, dragb2_width, dragb2_height);
+
+    #include "dragb3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("dragb3"), (char*)dragb3_bits, dragb3_width, dragb3_height);
+
+    #include "arrowfirst.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("arrowfirst"), (char*)arrowfirst_bits, arrowfirst_width, arrowfirst_height);
+
     #include "up_arrow.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("up_arrow"), (char*)up_arrow_bits, up_arrow_width, up_arrow_height);
 
-    #include "width1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("width1"), (char*)width1_bits, width1_width, width1_height);
+    #include "arc.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("arc"), (char*)arc_bits, arc_width, arc_height);
 
-    #include "width2.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("width2"), (char*)width2_bits, width2_width, width2_height);
+    #include "incr.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("incr"), (char*)incr_bits, incr_width, incr_height);
 
-    #include "width3.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("width3"), (char*)width3_bits, width3_width, width3_height);
+    #include "region.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("region"), (char*)region_bits, region_width, region_height);
 
-    #include "width4.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("width4"), (char*)width4_bits, width4_width, width4_height);
+    #include "rectangle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
+
+    #include "arrowlast.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("arrowlast"), (char*)arrowlast_bits, arrowlast_width, arrowlast_height);
+
+    #include "left_arrow.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("left_arrow"), (char*)left_arrow_bits, left_arrow_width, left_arrow_height);
+
+    #include "line.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("line"), (char*)line_bits, line_width, line_height);
+
+    #include "right_arrow.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("right_arrow"), (char*)right_arrow_bits, right_arrow_width, right_arrow_height);
+
+    #include "link.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("link"), (char*)link_bits, link_width, link_height);
+
+    #include "information.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("information"), (char*)information_bits, information_width, information_height);
 
 }

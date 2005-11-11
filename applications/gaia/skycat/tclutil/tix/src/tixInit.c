@@ -376,7 +376,7 @@ Tix_Init_Internal(interp, doSource)
 	return TCL_ERROR;
     }
 
-    if ((appName = Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY))== NULL) {
+    if ((appName = (char*)Tcl_GetVar(interp, "argv0", TCL_GLOBAL_ONLY))== NULL) {
 	appName = "tixwish";
     }
 

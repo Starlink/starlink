@@ -5,6 +5,7 @@
  *
  */
 
+#include <tixPort.h>
 #include <tixInt.h>
 
 

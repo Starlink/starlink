@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: rtd_defaults.tcl,v 1.1 1997/11/28 01:35:14 abrighto Exp $"
+# "@(#) $Id: rtd_defaults.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # defaults.tcl - set widget defaults
 #

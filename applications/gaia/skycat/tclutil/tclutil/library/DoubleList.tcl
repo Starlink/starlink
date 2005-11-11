@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: DoubleList.tcl,v 1.7 1998/11/20 14:20:15 abrighto Exp $"
+# "@(#) $Id: DoubleList.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # DoubleList.tcl - Widget displaying two lists with arrows between them
 # 

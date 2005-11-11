@@ -1,9 +1,7 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
-*
-*   lin.h include file added to wcslib.h by Doug Mink, SAO, September 28, 1998
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -140,7 +138,7 @@
 *   leak will result.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: lin.c,v 1.6 1998/10/01 08:23:58 abrighto Exp $
+*   $Id: lin.c,v 1.2 2005/02/02 01:43:04 brighton Exp $
 *===========================================================================*/
 
 #include <math.h>
@@ -163,16 +161,11 @@ const char *linrev_errmsg[] = {
    "PC matrix is singular"};
 
 
-#ifndef __convexc__
-#if ! ( defined(__APPLE__) && defined(__MACH__) )
+#ifdef __convexc__
+#include <stdlib.h>
+#else
 #include <malloc.h>
-#else
-#include <stdlib.h>
 #endif
-#else
-#include <stdlib.h>
-#endif
-  
 
 int linset(lin)
 
@@ -427,6 +420,5 @@ double inv[];
 
    return 0;
 }
-
-/* Sep 28 1998	Include wcslib.h instead of lin.h
+/* Dec 20 1999	Doug Mink - Include wcslib.h, which includes lin.h
  */

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CheckEntry.tcl,v 1.8 1998/10/28 17:46:36 abrighto Exp $"
+# "@(#) $Id: CheckEntry.tcl,v 1.2 2005/02/01 04:19:07 brighton Exp $"
 #
 # CheckEntry.tcl - Itcl widget combining a checkbutton and an entry
 #
@@ -23,19 +23,25 @@ itcl::class util::CheckEntry {
 
 	# Tk checkbutton widget
 	itk_component add check {
-	    checkbutton $w_.check -variable $variable_ 
+	    checkbutton $w_.check -variable $variable_
 	} {
-	    keep -text
+	    keep -text -background -foreground -anchor
+	    rename -font -labelfont labelFont LabelFont
+	    rename -width -labelwidth labelWidth LabelWidth
 	}
 	pack $itk_component(check) \
-	    -side left -padx 1m -pady 2m -ipadx 1m
+	    -side left -fill x -expand 1 -ipadx 1m
 
 	# Tk entry widget
 	itk_component add entry {
 	    entry $w_.entry -relief sunken
+	} {
+	    keep -relief -borderwidth -textvariable -show
+	    rename -font -valuefont valueFont ValueFont
+	    rename -width -valuewidth valueWidth ValueWidth
 	}
 	pack $itk_component(entry) \
-	    -side left -expand 1 -fill x -padx 2m -pady 2m -ipadx 2m -ipady 1m
+	    -side left -expand 1 -fill x -padx 1m -ipadx 1m
 
 	bind $itk_component(entry) <1> "[bind Entry <1>]; $itk_component(check) select"
 

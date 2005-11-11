@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: SAOWCS.C,v 1.8 1998/11/16 21:23:08 abrighto Exp $" 
+ * "@(#) $Id: SAOWCS.C,v 1.3 2005/02/02 01:43:04 brighton Exp $" 
  *
  * SAOWCS.C - method definitions for class SAOWCS, an implementation
  *            of the abstract WCS (WCSRep) class interface based on 
@@ -17,12 +17,13 @@
  *                 17 Mar 98  Renamed from WSCRep, made WCSRep abstract,
  *                            to allow new implementations based on other
  *                            libraries.
+ * pbiereic        11/10/99   Added deltset()
  */
-static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.8 1998/11/16 21:23:08 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.3 2005/02/02 01:43:04 brighton Exp $";
 
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include "error.h"
 #include "SAOWCS.h"
 
@@ -80,6 +81,12 @@ void SAOWCS::setEquinox()
     // make sure equinox has a valid value
     equinox_ = wcs_->equinox;
     strcpy(equinoxStr_, wcs_->radecout);
+
+    if (wcs_->sysout == WCS_B1950 || wcs_->sysout == WCS_J2000)
+	sprintf(equinoxStr_, "%g", equinox_);
+    else {
+	strcpy(equinoxStr_, wcs_->radecout);
+    }
 }
 
 
@@ -96,16 +103,19 @@ void SAOWCS::setEquinox()
 char* SAOWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) const
 {
     buf[0] = '\0';
-    if (isWcs() && x > 0 && y > 0 && x < pixWidth() && y < pixHeight()) {
+    if (isWcs() /* && x > 0 && y > 0 && x < pixWidth() && y < pixHeight()*/) {
 	if (hms_flag == 0) {
 	    ::pix2wcst(wcs_, x, y, buf, bufsz);
 	}
 	else {
 	    double ra, dec;
 	    ::pix2wcs(wcs_, x, y, &ra, &dec);
-	    if (!wcs_->offscl) {
-		char rastr[16], decstr[16];
-		::ra2str(rastr, sizeof(rastr), ra, 3);
+	    if (! (wcs_->offscl == 1)) {
+		char rastr[32], decstr[32];
+		if (wcs_->degout == 0 || wcs_->sysout == WCS_J2000 || wcs_->sysout == WCS_B1950) 
+		    ::ra2str(rastr, sizeof(rastr), ra, 3);
+		else
+		    ::dec2str(rastr, sizeof(rastr), ra, 3);
 		::dec2str(decstr, sizeof(decstr), dec, 2);
 		sprintf (buf, "%s %s %s", rastr, decstr, equinoxStr_);
 	    }
@@ -153,7 +163,7 @@ int SAOWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     int	offscl = 0;		// set to 1 if offscale
     ::wcs2pix(wcs_, ra, dec, &x, &y, &offscl);
 
-    if (offscl)
+    if (offscl == 1)
 	return error("can't convert world coords: off scale");
     return 0;
 }
@@ -235,6 +245,22 @@ int SAOWCS::shift(double ra, double dec, double equinox)
     return 0;
 }
 
+/*
+ * Set rotation and scaling
+ *
+ * Args:
+ *      cdelt1     = scale in degrees/pixel (axis 1); degrees = arcsec/3600.
+ *      cdelt2     = scale in degrees/pixel (axis 2)
+ *      rotation   = rotation angle in degrees
+*/
+int SAOWCS::deltset(double cdelt1, double cdelt2, double rotation)
+{
+    if (!isWcs())  
+	return error("image does not support world coords");
+
+    ::wcsdeltset(wcs_, cdelt1, cdelt2, rotation);
+    return 0;
+}
 
 /*
  * set up the WCS structure from the given information about the image

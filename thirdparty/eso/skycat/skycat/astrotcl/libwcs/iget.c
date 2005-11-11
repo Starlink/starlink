@@ -1,5 +1,5 @@
 /*** File libwcs/iget.c
- *** July 9, 1998
+ *** July 29, 2000
  *** By Doug Mink, Harvard-Smithsonian Center for Astrophysics
 
  * Module:	iget.c (Get IRAF FITS Header parameter values)
@@ -14,7 +14,7 @@
  * Subroutine:	igetc  (hstring,keyword) returns character string
  * Subroutine:	isearch (hstring,keyword) returns pointer to header string entry
 
- * Copyright:   1998 Smithsonian Astrophysical Observatory
+ * Copyright:   1999 Smithsonian Astrophysical Observatory
  *              You may do anything you like with this file except remove
  *              this copyright.  The Smithsonian Astrophysical Observatory
  *              makes no representations about the suitability of this
@@ -23,13 +23,16 @@
 
 */
 
-#include <string.h>		/* NULL, strlen, strstr, strcpy */
 #include <stdio.h>
+#include <string.h>		/* NULL, strlen, strstr, strcpy */
 #include "fitshead.h"	/* FITS header extraction subroutines */
 #include <stdlib.h>
+#ifndef VMS
 #include <limits.h>
-#define MAXINT  INT_MAX /* Biggest number that can fit in long */
-#define MAXSHORT SHRT_MAX
+#else
+#define INT_MAX  2147483647 /* Biggest number that can fit in long */
+#define SHRT_MAX 32767
+#endif
 
 static char *igetc();
 static char *isearch();
@@ -164,11 +167,11 @@ int minint;
 
 /* Translate value from ASCII to binary */
 	if (value != NULL) {
-	    minint = -MAXINT - 1;
+	    minint = -INT_MAX - 1;
 	    strcpy (val, value);
 	    dval = atof (val);
-	    if (dval+0.001 > MAXINT)
-		*ival = MAXINT;
+	    if (dval+0.001 > INT_MAX)
+		*ival = INT_MAX;
 	    else if (dval >= 0)
 		*ival = (int) (dval + 0.001);
 	    else if (dval-0.001 < minint)
@@ -208,9 +211,9 @@ int minshort;
 	if (value != NULL) {
 	    strcpy (val, value);
 	    dval = atof (val);
-	    minshort = -MAXSHORT - 1;
-	    if (dval+0.001 > MAXSHORT)
-		*ival = MAXSHORT;
+	    minshort = -SHRT_MAX - 1;
+	    if (dval+0.001 > SHRT_MAX)
+		*ival = SHRT_MAX;
 	    else if (dval >= 0)
 		*ival = (short) (dval + 0.001);
 	    else if (dval-0.001 < minshort)
@@ -338,23 +341,17 @@ char *keyword0;	/* character string containing the name of the keyword
 	static char cval[500];
 	char *value;
 	char cwhite[8];
-	char squot[2],dquot[2],lbracket[2],rbracket[2],slash[2];
+	char lbracket[2],rbracket[2];
 	char keyword[16];
 	char line[500];
 	char *vpos,*cpar;
-	char *q1, *q2, *v1, *v2, *c1, *brack1, *brack2;
+	char *c1, *brack1, *brack2;
 	int ipar, i;
 
-	squot[0] = 39;
-	squot[1] = 0;
-	dquot[0] = 34;
-	dquot[1] = 0;
 	lbracket[0] = 91;
 	lbracket[1] = 0;
 	rbracket[0] = 93;
 	rbracket[1] = 0;
-	slash[0] = 47;
-	slash[1] = 0;
 
 /* Find length of variable name */
 	strcpy (keyword,keyword0);
@@ -377,13 +374,13 @@ char *keyword0;	/* character string containing the name of the keyword
 	i = 0;
 	if (*vpos == '"') {
 	     vpos++;
-	     while (*vpos != '"')
+	     while (*vpos && *vpos != '"' && i < 500)
 		line[i++] = *vpos++;
 	     }
 
 /* Otherwise copy until next space or tab */
 	else {
-	     while (*vpos != ' ' && *vpos != (char)9 && *vpos > 0)
+	     while (*vpos != ' ' && *vpos != (char)9 && *vpos > 0 && i < 500)
 		line[i++] = *vpos++;
 	     }
 
@@ -498,4 +495,10 @@ char *keyword;	/* character string containing the name of the variable
  * Apr 24 1998	Add MGETI4(), MGETR8(), and MGETS() for single step IRAF ext.
  * Jun  1 1998	Add VMS patch from Harry Payne at STScI
  * Jul  9 1998	Fix bracket token extraction after Paul Sydney
+
+ * May  5 1999	values.h -> POSIX limits.h: MAXINT->INT_MAX, MAXSHORT->SHRT_MAX
+ * Oct 21 1999	Fix declarations after lint
+ *
+ * Feb 11 2000	Stop search for end of quoted keyword if more than 500 chars
+ * Jul 20 2000	Drop unused variables squot, dquot, and slash in igetc()
  */

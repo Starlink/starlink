@@ -3,7 +3,7 @@
 #define _ErrorHandler_H_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ErrorHandler.h,v 1.1 1997/11/28 01:37:33 abrighto Exp $" 
+ * "@(#) $Id: ErrorHandler.h,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
  *
  * ErrorHandler.h - class for managing Tk Error Handler for catching
  *                  X errors

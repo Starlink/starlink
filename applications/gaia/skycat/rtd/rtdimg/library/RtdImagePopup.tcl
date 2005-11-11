@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePopup.tcl,v 1.23 1998/12/03 22:11:09 abrighto Exp $"
+# "@(#) $Id: RtdImagePopup.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePopup.tcl - A toplevel widget for displaying rapid frames for RtdImage
 # 
@@ -84,8 +84,8 @@ itcl::class rtd::RtdImagePopup {
 	# create a dummy rect to get events for image
 	set rectId_ [$target_canvas_ create rectangle \
 			 $itk_option(-xoffset) $itk_option(-yoffset) \
-			 [expr $itk_option(-xoffset)+$itk_option(-width)-1] \
-			 [expr $itk_option(-yoffset)+$itk_option(-height)-1] \
+			 [expr {$itk_option(-xoffset)+$itk_option(-width)-1}] \
+			 [expr {$itk_option(-yoffset)+$itk_option(-height)-1}] \
 			 -tags imagerect \
 			 -fill black \
 			 -stipple pat7]
@@ -247,8 +247,8 @@ itcl::class rtd::RtdImagePopup {
 	    after idle [code $itk_component(image) center]
 	} elseif {"$op" == "resize" || "$op" == "move"} {
 	    lassign [$target_canvas_ bbox $itk_option(-region_id)] x0 y0 x1 y1
-	    set w [expr $x1-$x0+1]
-	    set h [expr $y1-$y0+1]
+	    set w [expr {$x1-$x0+1}]
+	    set h [expr {$y1-$y0+1}]
 	    $target_canvas_ coords $rectId_ $x0 $y0 $x1 $y1
 
 	    # note: we assume here that the rapid frame has its own memory area 
@@ -309,7 +309,7 @@ itcl::class rtd::RtdImagePopup {
     itk_option define -subsample subsample Subsample 1
    
     # X shared memory option
-    itk_option define -usexshm usexshm Usexshm 1
+    itk_option define -usexshm useXshm UseXshm 1
 
     # X synchronisation option
     itk_option define -usexsync useXsync UseXsync 1

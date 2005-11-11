@@ -1,6 +1,6 @@
 # E.S.O. - VLT project/ESO Archive
 #
-# "@(#) $Id: include.mk,v 1.1 1998/02/08 18:13:26 abrighto Exp $" 
+# "@(#) $Id: include.mk,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $" 
 #
 # Makefile.in
 # 

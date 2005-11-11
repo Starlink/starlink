@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: rtd.man1,v 1.4 1997/11/12 15:59:16 abrighto Exp $" 
+# "@(#) $Id: rtd.man1,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -33,6 +33,21 @@ OPTIONS
 	the image, i.e.: if the image is shrunk by 1/3, only
 	every third pixel is displayed. Otherwise, the maximum
 	value is taken from the group of pixels.
+
+-sampmethod n (experimental)
+	If option 'subsample' is false, the following methods can be
+        used for displaying a shrunk image (i.e. an image with a scale
+        factor < 1):
+        SAMP_METHOD_MAX              0  /* max value of all pixels in a NxN box (default) */
+        SAMP_METHOD_MIN              1  /* min value of all pixels in a NxN box */
+        SAMP_METHOD_MEAN             2  /* mean value of all pixels in a NxN box */
+        SAMP_METHOD_MEDIAN           3  /* median value of all pixels in a NxN box */
+        SAMP_METHOD_MAX_CROSS        4  /* max value of pixels on a diagonal cross in a NxN box */
+        SAMP_METHOD_MIN_CROSS        5  /* min value of pixels on a diagonal cross in a NxN box */
+        SAMP_METHOD_MEAN_CROSS       6  /* mean value of pixels on a diagonal cross in a NxN box */
+        SAMP_METHOD_MEDIAN_CROSS     7  /* median value of pixels on a diagonal cross in a NxN box */
+        SAMP_METHOD_MEDIAN_CHESS     8  /* median value of pixels in a chess-board like box */
+        SAMP_METHOD_MEDIAN_9         9  /* median value of a 3x3 box */
 
 -usexshm bool
 	If bool is true (default), attempt to use X shared

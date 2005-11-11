@@ -18,10 +18,10 @@
 extern "C" {
 #include "tk.h"
 #include "itcl.h"
-#include "itk.h"
+  /* #include "itk.h" */
 #include "tclExtend.h"
 #include "blt.h"
-#include <math.h>
+  /* #include <math.h> */
 #include <proTbcLoad.h>
 #include <proWrap.h>
 
@@ -40,7 +40,7 @@ extern int Skycat_Init(Tcl_Interp *interp);
  * Sun shared libraries to be used for Tcl.
  */
 
-// extern "C" int matherr(struct exception*);
+extern "C" int matherr(struct exception*);
 int *tclDummyMathPtr = (int *) matherr;
 
 #ifdef TK_TEST
@@ -149,6 +149,11 @@ ProTclAppInit(Tcl_Interp* interp)
     }
 
     if (!Tcl_SetVar(interp, "::itcl::native", "1", TCL_LEAVE_ERR_MSG)) {
+        return TCL_ERROR;
+    }
+
+    // IWidgets (needed after merging changes in RTD from pbiereic
+    if (! Tcl_PkgRequire(interp, "Iwidgets", 0, 0)) {
         return TCL_ERROR;
     }
 

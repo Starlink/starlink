@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.7 1998/10/28 17:44:47 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
 #
 # Makefile.in
 #
@@ -16,7 +16,7 @@ SKYCAT_DIR   = @SKYCAT_DIR@
 RM           = rm -f
 SHELL        = /bin/sh
 FILES        = *.tcl tclIndex
-ITCL_VERSION  = @ITCL_VERSION@
+TCL_VERSION  = @TCL_VERSION@
 srcdir	     = @srcdir@
 LIBDIR       = @LIBDIR@
 
@@ -44,7 +44,7 @@ clean:
 	$(RM) *\~ "#"*
 
 index tclIndex:
-	itclsh$(ITCL_VERSION) ./mkIndex.tcl
+	tclsh$(TCL_VERSION) ./mkIndex.tcl
 
 depend:
 

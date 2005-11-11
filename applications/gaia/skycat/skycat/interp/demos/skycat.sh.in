@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # E.S.O. - VLT project/ESO Archive
-# $Id: skycat.sh.in,v 1.15 1999/03/19 20:10:14 abrighto Exp $ 
+# $Id: skycat.sh.in,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $ 
 #
 # skycat.sh.in - This script is used to start Tcl/Tk applications
 #

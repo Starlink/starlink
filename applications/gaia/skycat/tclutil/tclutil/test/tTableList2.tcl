@@ -1,7 +1,3 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/tclutil.sh "$0" "$@"
-#
 # This is a simple program to demonstrate the TableList itcl widget 
 # by displaying generated rows and columns of data
 #
@@ -10,9 +6,6 @@ exec ../demos/tclutil.sh "$0" "$@"
 #
 # (The numrows and numcols options determine how man rows and columns 
 # are inserted in the table)
-#
-# Copyright (c) 1994 Allan Brighton (abrighto@eso.org)
-
 
 source test.tcl
 

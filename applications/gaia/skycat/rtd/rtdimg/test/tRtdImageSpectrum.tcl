@@ -1,9 +1,3 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/rtd.sh "$0" "$@"
-
-# Start with: ../demos/rtd.sh tRtdImageSpectrum.tcl in order to set BLT_LIBRARY
-
 proc make_spectrum {line_id x0 y0 x1 y1} {
     
     RtdImageSpectrum .rtd.spectrum \
@@ -19,7 +13,7 @@ proc make_spectrum {line_id x0 y0 x1 y1} {
 source test.tcl
 
 set w [RtdImage .rtd \
-	   -file ../images/ngc1275.gzfits \
+	   -file ../images/ngc1275.fits \
 	   -scrollbars 1 \
 	   -drag_scroll 1 \
            -graphics 1 \

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45:59 abrighto Exp $
+ * $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
  *
  * TclQueryUtil.C - utility routines used by TclAstroCat and TclTcsCat
  * 
@@ -10,17 +10,17 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  14 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45:59 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <strstream>
-#include <tcl.h>
+#include "config.h"
+#include "tcl.h"
 #include "error.h"
 #include "AstroCatalog.h"
 
@@ -28,7 +28,7 @@ static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45
 /*
  * This utility routine generates an AstroQuery object, given the command
  * line arguments for a Tcl query command. In addition, the world coordinate
- * position(s) and equinox of the query are returned.
+ * position and equinox arguments of the query are returned.
  *
  * This assumes a Tcl query command with the following syntax:
  *
@@ -53,7 +53,9 @@ static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45
  *     otherwise world coords.
  *
  *  -equinox $equinox
- *     equinox for position (default 2000).
+ *     equinox for position (default 2000). May also be a string of the form
+ *     "J2000", "B1950", "GALACTIC", "ECLIPTIC", to indicate the type of the
+ *     search coordinates.
  *  
  *  -width $w
  *  -height $h
@@ -109,22 +111,22 @@ static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.12 1998/08/21 10:45
  * Note that not all catalogs will support sorting by all fields.
  *
  * On return, the AstroQuery object is set so that it cat be passed to a
- * query routine. In additionm the world coordinate position(s) and
- * equinox are set, if applicable.
+ * query routine. In addition the world coordinate position and
+ * equinox args are set, if applicable. 
  *
  * The feedback argument, if not null, should be a pointer to an open
  * file to which feedback information should be printed during the query.
  */
 int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[], 
 		  AstroQuery& q, WorldOrImageCoords& pos1, WorldOrImageCoords& pos2, 
-		  double& equinox, FILE* feedback, CatalogInfoEntry* entry)
+		  char* equinoxStr, FILE* feedback, CatalogInfoEntry* entry)
 {
     // set defaults
     int status = 0;
     pos1.setNull(); pos2.setNull();
     int isWcs = entry->isWcs();
     int isPix = entry->isPix();
-    equinox = 2000.0;
+    strcpy(equinoxStr, "2000");
     double radius1 = 0.0, radius2 = 0.0;
     double mag1 = 0.0, mag2 = 0.0;
     double width = 0.0, height = 0.0;
@@ -178,11 +180,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 	else if (strcmp(option, "-equinox") == 0) {
 	    if (got_pos) 
 		return error("-equinox should precede the -pos argument");
-	    while(*value && !isdigit(*value))
-		value++;	// skip "J" in J 2000, or "B" in B 1950
-	    if (*value && Tcl_GetDouble(interp, value, &equinox) != TCL_OK) {
-		return error("bad value for equinox: ", interp->result);
-	    }
+	    strcpy(equinoxStr, value);
 	}
 	else if (strcmp(option, "-nrows") == 0) {
 	    if (Tcl_GetInt(interp, value, &nrows) != TCL_OK)
@@ -197,7 +195,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		return error("bad -height value: ", interp->result);
 	}
 	else {
-	    // handle options which may have a tcl list of values
+	    // handle options whic<h may have a tcl list of values
 	    if (Tcl_SplitList(interp, value, &numValues, &values) != TCL_OK) 
 		return TCL_ERROR;
 	    
@@ -221,7 +219,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		}
 		if (numValues == 4) {
 		    if (isWcs) 
-			pos2 = WorldCoords(values[2], values[3], equinox, 1);
+			pos2 = WorldCoords(values[2], values[3], equinoxStr, 1);
 		    else if (isPix)
 			pos2 = ImageCoords(values[2], values[3]);
 		    if (pos2.status()) {
@@ -230,7 +228,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		    }
 		}
 		if (isWcs)
-		    pos1 = WorldCoords(values[0], values[1], equinox, 1);
+		    pos1 = WorldCoords(values[0], values[1], equinoxStr, 1);
 		else if (isPix)
 		    pos1 = ImageCoords(values[0], values[1]);
 		if (pos1.status()) {
@@ -342,20 +340,20 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 	    return TCL_ERROR;
     
     if (numCols && colNames) 
-	if (q.colNames(numCols, colNames, 1))
+	if (q.colNames(numCols, (char**)colNames, 1))
 	    return TCL_ERROR;
 
     if (nrows && q.maxRows(nrows)) 
 	return TCL_ERROR;
 
     if (numSortCols && sortCols) {
-	if (q.sort(numSortCols, sortCols, 1))
+	if (q.sort(numSortCols, (char**)sortCols, 1))
 	    return TCL_ERROR;
 	q.sortOrder(*sortOrder == 'i' ? 1 : -1);
     }
 
     if (numSearchCols && searchCols) {
-	if (q.condition(numSearchCols, searchCols, minValues, maxValues, 1))
+	if (q.condition(numSearchCols, (char**)searchCols, (char**)minValues, (char**)maxValues, 1))
 	    return TCL_ERROR;
     }
 

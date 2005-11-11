@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: RtdImagePick.tcl,v 1.24 1998/11/20 14:19:47 abrighto Exp $"
+# "@(#) $Id: RtdImagePick.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePick.tcl - widget to select an object in an image using a centroid alg.
 #
@@ -18,6 +18,9 @@
 #                             Use init {} method, added "initialized_" flag.
 #                             Fixed comments for itcldoc and added public and 
 #                             protected keywords to methods (for doc).
+# pbiereic          14/12/99  Apply transformations when a picked object is zoomed
+# pbiereic          04/11/03  Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
+
 
 
 itk::usual RtdImagePick {}
@@ -54,6 +57,7 @@ itcl::class rtd::RtdImagePick {
 	make_layout
 	update_scale
 	incr initialized_
+	wm resizable $w_ 0 0	
     }
 
     
@@ -62,7 +66,7 @@ itcl::class rtd::RtdImagePick {
     protected method make_layout {} {
         # main controls frame
         pack [set mainf [frame $w_.mainf]] \
-            -side top -fill both -expand 1 -padx 1m -pady 1m -ipadx 1m -ipady 1m
+            -side top -fill both -expand 0 -padx 2 -pady 2 -ipadx 0 -ipady 0
 
         pack [set topf [frame $mainf.topf]] \
             -side top -fill both -expand 1
@@ -83,12 +87,12 @@ itcl::class rtd::RtdImagePick {
 
     protected method make_labels {w {side left}} {
         # frame for labels
-        pack [set labelf [frame $w.labelf -bd 2 -relief groove]] \
-            -side $side -fill both -expand 0
+        set labelf [frame $w.labelf -bd 2 -relief groove]
+        pack $labelf -side $side -fill both -expand 1
 
         # title for label area
         pack [label $labelf.title -text "Image Statistics:" ] \
-            -side top -padx 1m -pady 1m
+            -side top -pady 1m
         
 	# LabelValue(n) widget: "Image X" 
         itk_component add x {
@@ -148,7 +152,7 @@ itcl::class rtd::RtdImagePick {
 	# LabelValue(n) widget for "Peak object level above bg"
         itk_component add object {
             util::LabelValue $labelf.object \
-                -text "Peak value above bg:" \
+                -text "Peak above bg:" \
                 -labelfont $itk_option(-labelfont) \
                 -valuefont $itk_option(-valuefont) \
                 -valuewidth $itk_option(-valuewidth) \
@@ -202,7 +206,9 @@ itcl::class rtd::RtdImagePick {
         } 
 
         foreach el {x y ra dec equinox object background fwhm angle nsize} {
-            [$itk_component($el) component entry] config -justify right
+            [$itk_component($el) component entry] config -justify right -highlightthickness 0
+	    pack [$itk_component($el) component label] [$itk_component($el) component entry] \
+		    -ipadx 0 -ipady 0 -pady 1 -padx 0
         }
         pack \
             $itk_component(x) \
@@ -215,7 +221,7 @@ itcl::class rtd::RtdImagePick {
             $itk_component(fwhm) \
             $itk_component(angle) \
             $itk_component(nsize) \
-            -side top -padx 0.5m -pady 0.0m
+            -side top -padx 0.0m -pady 0.0m -fill x -expand 1
 
         add_short_help $itk_component(x) \
 	    {X image pixel coordinate (or X detector chip coord if known)}
@@ -251,13 +257,15 @@ itcl::class rtd::RtdImagePick {
 
         # add a frame to show the size of the square selected by the scale
         pack [label $rectf.label -text "Area of image to be examined:" ] \
-            -side top -padx 1m -pady 1m
+            -side top -padx 0 -pady 1m
 
-        pack [set rf [frame $rectf.rf \
-                          -bd 0 -relief flat \
-                          -width $itk_option(-maxsize) \
-                          -height $itk_option(-maxsize)]] \
-            -fill none -expand 1 -anchor c
+        set rf [frame $rectf.rf \
+		-bd 0 -relief flat \
+		-width $itk_option(-maxsize) \
+		-height $itk_option(-maxsize)]
+	
+        pack $rf -fill none -expand 1 -anchor c
+	
 
         # This component displays the section of the image that will be used for
 	# the centroid algorithm and statistics.
@@ -271,13 +279,15 @@ itcl::class rtd::RtdImagePick {
 		-propagate 0 \
 		-usexshm 1 \
 		-usexsync 1 \
-		-borderwidth 2 \
+		-borderwidth 0 \
 		-relief groove \
 		-shelp {PickImage: displays section of image being examined}
         }
         set zoomImage [$itk_component(zoomView) component image]
         set image_ [$zoomImage get_image]
         set canvas_ [$zoomImage get_canvas]
+        catch {pack forget [$itk_component(zoomImage) component hscrollf] \
+		[$itk_component(zoomImage) component vscrollf]}
 
         catch {destroy [$itk_component(zoomView) component check]}
         global ::$itk_component(zoomView).dozoom
@@ -300,31 +310,34 @@ itcl::class rtd::RtdImagePick {
             frame $w_.buttons -borderwidth 2 -relief groove
         }
         pack $itk_component(buttons) \
-            -side top -fill x -padx 1m -pady 1m
+            -side top -fill x -expand 1 -ipadx 2 -padx 0 -pady 0
         
 	# "Pick Object" button
         itk_component add pick {
             button $w_.pick \
 		-text "Pick Object" \
+		-padx 0.1m \
 		-command [code $this pick_object]
         }
 	# Cancel button
         itk_component add cancel {
             button $w_.cancel \
 		-text "Cancel" \
+		-padx 0.1m \
 		-command [code $this cancel]
         }
 	# Close button
         itk_component add close {
             button $w_.close \
 		-text "Close" \
+		-padx 0.1m \
 		-command [code $this close]
         }
         pack \
             $itk_component(pick) \
             $itk_component(cancel) \
             $itk_component(close) \
-            -side left -expand 1 -padx 2m -pady 2m -in $itk_component(buttons)
+            -side left -fill x -expand 1 -padx 0.5m -pady 0.5m -in $itk_component(buttons)
         add_short_help $itk_component(pick) \
             {Pick Object: {bitmap b1} = select object in image and display center and other statistics}
         add_short_help $itk_component(cancel) {Cancel: cancel the current pick operation}
@@ -345,7 +358,7 @@ itcl::class rtd::RtdImagePick {
         cancel
         set waiting_ $wait
         $itk_component(zoomView) config -command {}
-        $itk_component(zoomView) zoom
+        $itk_component(zoomView) enter_image $target_image_
         $itk_component(zoomView) config -command [code $this scale_changed]
         $w_ configure -cursor cross
         $itk_component(pick) config -state disabled
@@ -356,17 +369,19 @@ itcl::class rtd::RtdImagePick {
             set list_ [pick_object_in_image]
         } else {
             lassign $parms imageX_ imageY_ n
-            set scale [expr double($itk_option(-maxsize)) / $n]
+	    # XXX needed for bug in tcl 8.4.3
+	    set bug "$imageX_ $imageX_"
+            set scale [expr {double($itk_option(-maxsize)) / $n}]
             set scale [round $scale]
             lassign [$image_ scale] cscale
-            $itk_component(zoomView) inc_zoom [expr $scale - $cscale]
+            $itk_component(zoomView) inc_zoom [expr {$scale - $cscale}]
             update
         }
         $itk_component(pick) config -state normal
         $w_ configure -cursor {}
         $target_image_ zoomview stop
 
-        utilRaiseWindow $w_
+        #utilRaiseWindow $w_  ; # too slow if already raised (on Linux guest)
         if { $waiting_ } { return }
 
         if {[llength $list_] == 10} {
@@ -434,6 +449,21 @@ itcl::class rtd::RtdImagePick {
         set $w_.picked $retval
     }
 
+    # return the center image coordinates of the blinking marker or
+    # -1 if the marker is not active. If user defined coordinates
+    # are defined then return them instead.
+
+    protected method getMarkCoords {} {
+        if {$imageX_ > 0 && $imageY_ > 0} {
+            return "$imageX_ $imageY_"
+        }
+        lassign [$target_canvas_ coords $pickc_] cx cy
+        if {"$cx" == "" || "$cy" == ""} {
+            return -1
+        }
+        $target_image_ convert coords $cx $cy canvas x y image
+        return "$x $y"
+    }
 
     # callback from isrtdZoomView when the scaling was changed
 
@@ -441,17 +471,35 @@ itcl::class rtd::RtdImagePick {
         set width [set height $itk_option(-maxsize)]
         $image_ convert dist $width $height canvas nxsize nysize image
         $itk_component(nsize) config -value [format_val $nxsize]
+        lassign [getMarkCoords] imageX imageY
         set_values {}
         cancel 0
 
         # update the view if fwhm has been calculated
-        if {$imageX_ < 1 || $imageY_ < 1} { 
-	    return
-	}
-        $image_ convert dist $width $height canvas nxsize nysize image
-        set xc [expr $imageX_-($nxsize/2.0)]
-        set yc [expr [$image_ height]-$imageY_-($nysize/2.0)]
+        if {$imageX < 1} { return }
+
+        # handle transformations for updating the view
+        set flip [expr {[$target_image_ flip X] << 1 | [$target_image_ flip Y]}]
+        switch $flip {
+            0 {   #; none
+		set xc [expr {$imageX - ($nxsize/2.0)}]
+		set yc [expr {[$image_ height] - $imageY - ($nysize/2.0)}]
+              }
+            1 {   #; flipY
+		set xc [expr {$imageX - ($nxsize/2.0)}]
+		set yc [expr {$imageY - ($nysize/2.0)}]
+              }
+            2 {   #; flipX
+		set xc [expr {[$image_ width]  - $imageX - ($nxsize/2.0)}]
+		set yc [expr {[$image_ height] - $imageY - ($nysize/2.0)}]
+              }
+            3 {   #; flipX and flipY
+		set xc [expr {[$image_ width]  - $imageX - ($nxsize/2.0)}]
+		set yc [expr {$imageY - ($nysize/2.0)}]
+              }
+        }
         $target_image_ view update $image_ $xc $yc $width $height 0 0 0 0 image
+
         set list_ {}
         if { $waiting_ } {
 	    return
@@ -486,6 +534,14 @@ itcl::class rtd::RtdImagePick {
     protected method set_values {list {with_rmt 1}} {
         lassign $list x y ra dec equinox fwhmX fwhmY angle object background
 
+        # create a dot which is used to mark the center pixel
+	$target_canvas_ delete $pickc_
+	if {"$x" != "" && "$y" != ""} {
+            $target_image_ convert coords $x $y image xc yc canvas
+            $target_canvas_ create oval $xc $yc $xc $yc \
+                -tags "$pickc_ objects" 
+	}
+
 	# display x,y in chip coords
 	if {"$x" != "" && "$y" != ""} {
 	    $target_image_ convert coords $x $y image xc yc chip
@@ -512,15 +568,16 @@ itcl::class rtd::RtdImagePick {
         } else {
             $itk_component(fwhm)   config -value "Can't do"
             [$itk_component(fwhm)  component entry] config -foreground red
-            $itk_component(angle)  config -value "___oOo___"
+            $itk_component(angle)  config -value ""
         }
-        if {"$x" != "" && "$y"} {
+        if {"$x" != "" && "$y" != ""} {
             set imageX_ $x
             set imageY_ $y
         }
         if {"$x" != "" && "$y" != "" && $fwhmX < 50 && $fwhmY < 50} {
             mark_spot $x $y $image_ $canvas_ $angle $fwhmX $fwhmY
             mark_spot $x $y $target_image_ $target_canvas_ $angle $fwhmX $fwhmY 1
+
             if {$set_result_ && $with_rmt} {
                 if {$x < 0 || $y < 0 || $x > [$image_ width] || $y > [$image_ height]} {
                     set_result -1
@@ -543,71 +600,42 @@ itcl::class rtd::RtdImagePick {
     # mark the given x,y image coordinate point in the given image/canvas with
     # a cross with the given width, height (image pixels) and angle (deg).
 
-    protected method mark_spot {imagex imagey image canvas angle width height {blink 0}} {
-        # get canvas coords from image coords
-        $image convert coords $imagex $imagey image xc yc canvas
-        $image convert dist $width $height image w h canvas
-
-        # get bounding box
-        set dx [expr $w/2]
-        set dy [expr $h/2]
-
-        set x1 [expr $xc+$dx]
-        set y1 $yc
-
-        set x2 $xc
-        set y2 [expr $yc-$dy]
-
-        set x3 [expr $xc-$dx]
-        set y3 $yc
-
-        set x4 $xc
-        set y4 [expr $yc+$dy]
-
+    protected method mark_spot {xc yc image canvas angle w h {blink 0}} {
         
-        # rotate by angle
         # convert to radian
-        set rad [expr $angle/57.2958]
-        set cosa [expr cos($rad)]
-        set sina [expr sin($rad)]
+        set rad [expr {$angle/57.2958}]
 
-        set rx1 [expr $xc+$cosa*$dx]
-        set ry1 [expr $y1-$sina*$dx]
+        # deltas for X and Y axis
+        set dxX [expr {cos($rad) * $w/2.0}]
+        set dyX [expr {sin($rad) * $w/2.0}]
+        set dxY [expr {cos($rad) * $h/2.0}]
+        set dyY [expr {sin($rad) * $h/2.0}]
 
-        set rx3 [expr $xc-$cosa*$dx]
-        set ry3 [expr $y1+$sina*$dx]
+	# compute end points for X-axis and convert them to canvas coordinates
+        $image convert coords [expr {$xc + $dxX}] [expr {$yc + $dyX}] image x1X y1X canvas
+        $image convert coords [expr {$xc - $dxX}] [expr {$yc - $dyX}] image x2X y2X canvas
 
-        set rx2 [expr $x2-$sina*$dy]
-        set ry2 [expr $yc-$cosa*$dy]
+	# the Y-axis is rotated "by hand" so that it appears perpendicular to the X-axis
+	$image convert coords [expr {$xc + $dyY}] [expr {$yc - $dxY}] image x1Y y1Y canvas
+        $image convert coords [expr {$xc - $dyY}] [expr {$yc + $dxY}] image x2Y y2Y canvas
 
-        set rx4 [expr $x2+$sina*$dy]
-        set ry4 [expr $yc+$cosa*$dy]
-
+	# draw X and Y axis lines with an outer thick black line
+	# and inner thin white line 
         set bg black
-        set fg white
         set tags "mark objects"
         $canvas delete $tags
-        
-        $canvas create line $rx3 $ry3 $rx1 $ry1 \
-            -fill $bg \
-            -width 5 \
-            -tags "$tags $bg"
 
-        $canvas create line $rx2 $ry2 $rx4 $ry4 \
-            -fill $bg \
-            -width 5 \
-            -tags "$tags $bg"
-
-        $canvas create line $rx3 $ry3 $rx1 $ry1 \
-            -fill $fg \
-            -width 2 \
-            -tags "$tags $fg"
-
-        $canvas create line $rx2 $ry2 $rx4 $ry4 \
-            -fill $fg \
-            -width 2 \
-            -tags "$tags $fg"
-
+	foreach width {5 2} {
+	    $canvas create line $x1X $y1X $x2X $y2X \
+		    -fill $bg \
+		    -width $width \
+		    -tags "$tags $bg"
+	    $canvas create line $x1Y $y1Y $x2Y $y2Y \
+		    -fill $bg \
+		    -width $width \
+		    -tags "$tags $bg"
+	    set bg white
+	}
         if {$blink} {
             blink_mark $canvas $tags
         }
@@ -624,7 +652,7 @@ itcl::class rtd::RtdImagePick {
 	set idx1 $color
 	set cols "black white"
 	set col1 [lindex $cols $idx1]
-	set idx2 [expr ! $color]
+	set idx2 [expr {! $color}]
 	set col2 [lindex $cols $idx2]
 	$canvas itemconfigure white -fill $col2
 	$canvas itemconfigure black -fill $col1
@@ -637,11 +665,11 @@ itcl::class rtd::RtdImagePick {
 
     public method cancel {{with_pick 1}} {
 	$canvas_ delete mark
-	$target_canvas_ delete mark
+	$target_canvas_ delete mark $pickc_
 	if {$with_pick} {
 	    cancel_pick
-	    set imageX_ -1
-	    set imageY_ -1
+            set imageX_ -1
+            set imageY_ -1
 	    set waiting_ 0
 	}
     }
@@ -695,7 +723,7 @@ itcl::class rtd::RtdImagePick {
 
     # returns statistics after image event
 
-    protected method update_now {} {
+    public method update_now {} {
         global ::$w_.picked
         if [$image_ isclear] { return }
         if {! $waiting_ } {
@@ -710,6 +738,11 @@ itcl::class rtd::RtdImagePick {
         set_values $list
     }
 
+    # return name of global variable which contains the statistics
+
+    public method get_pickVar {} {
+	return $w_.picked
+    }
 
     # -- options --
 
@@ -739,10 +772,10 @@ itcl::class rtd::RtdImagePick {
     itk_option define -wcsfont wcsFont WcsFont -*-symbol-*-*-*-*-14-*-*-*-*-*-*-*
 
     # set the width for  displaying labels and values
-    itk_option define -labelwidth labelWidth LabelWidth 18
+    itk_option define -labelwidth labelWidth LabelWidth 16
 
     # set the width for  displaying labels and values
-    itk_option define -valuewidth valueWidth ValueWidth 12
+    itk_option define -valuewidth valueWidth ValueWidth 11
 
     # set the max size of the image sample area (screen dist)
     itk_option define -maxsize maxSize MaxSize 200
@@ -778,12 +811,6 @@ itcl::class rtd::RtdImagePick {
     
     protected variable set_result_ 0
 
-    # X coord of last picked object
-    protected variable imageX_ -1
-
-    # Y coord of last picked object
-    protected variable imageY_ -1
-
     # output of last statistics command after scaling and pick object command
     protected variable list_
 
@@ -795,5 +822,14 @@ itcl::class rtd::RtdImagePick {
 
     # set to 1 after init {} was called
     protected variable initialized_ 0
+
+    # requested X coordinate
+    protected variable imageX_ -1
+
+    # requested Y coordinate
+    protected variable imageY_ -1
+
+    # tag Id for dot in canvas
+    protected variable pickc_ "pickc"
 }
 

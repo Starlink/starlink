@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: astrocat.mann,v 1.2 1998/10/30 18:17:11 abrighto Exp $
+# $Id: astrocat.mann,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -28,9 +28,15 @@ The astrocat Tcl command creates a new Tcl command with the same name
 as its argument ($instName) that provides the subcommands described
 below. 
 
-SUBCOMMANDS
-$instName authorize
-$instName authorize username passwd ?realm server?
+CATALOG DIRECTORIES
+Catalogs may be organized in hierarchies, with catalog directories containing
+other catalogs. Some subcommands accept an optional "directory" argument,
+which may be either the name of the catalog directory, or a tcl list of
+directories forming a catalog directory path. Note that only catalog
+directories may be specified in this way, not the catalog names themselves.
+
+SUBCOMMANDS $instName authorize $instName authorize username passwd
+?realm server?
 	If the previous HTTP GET returned an authorization error: (The
 	HTML error text returned in Tcl contained the string:
 	"Authorization Required"), the application can ask the user to
@@ -111,9 +117,9 @@ $instName entry remove $name
 	...}
 
 	If the "directory" argument is specified, the entry is searched for
-	starting in the given catalog directory, otherwise it is searched for
+	in the given catalog directory, otherwise it is searched for
 	starting at the top level directory (the catalog entries are linked
-	in a hierarchical list or directory structure).
+	in a hierarchical list or directory structure). 
 
 	"entry update" allows you to update fields in the catalog's config
 	entry.  Some fields, such as the catalog name and URL can not be
@@ -228,9 +234,11 @@ $instName more
 	(i.e.: not all rows that were found were returned due to
 	limits).
 
-$instName open
-	Open the given astromonical catalog and refer to it in future
-	queries.
+$instName open name ?directory?
+	Open the named astromonical catalog and refer to it in future
+	queries. If a directory argument is given, it may be either the
+ 	name of the catalog directory to search, or a tcl list forming 
+        the path to the catalog directory.
 
 $instName plot $graph $element $filename $xVector $yVector
 	Plot the contents of the given tab table file in the given 

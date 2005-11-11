@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: astrotcl.tcl,v 1.5 1998/10/28 17:36:02 abrighto Exp $" 
+# "@(#) $Id: astrotcl.tcl,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # astrotcl.tcl - example application script for astrotcl package
 #

@@ -1,6 +1,6 @@
 #!/bin/sh
 # E.S.O. - VLT project 
-# "@(#) $Id: makelinks,v 1.4 1998/12/23 12:33:24 abrighto Exp $"
+# "@(#) $Id: makelinks,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # script to make some links used during development
 #

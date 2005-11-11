@@ -1,14 +1,16 @@
 /*************************************************************************
 * E.S.O. - VLT project
-* "@(#) $Id: rtdImageEvent.c,v 1.9 1998/05/18 21:22:59 abrighto Exp $"
+* "@(#) $Id: rtdImageEvent.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 * rtdImageEvent.c
 *
-* who        when      what
-* ---------  --------  ----------------------------------------------
-* T.Herlin   11/05/94  Created
-* A.Brighton 05/02/96  add htons calls after reported problems on OSF machines
-* D.Hopkinson 01/04/97 add cleanup of semaphores on skipped images
-* P.Biereichel 16/06/97 add setsockopt(..SO_REUSEADDR..) in rtdInitServer
+* who            when      what
+* ---------      --------  ----------------------------------------------
+* T.Herlin       11/05/94  Created
+* A.Brighton     05/02/96  add htons calls after reported problems on OSF machines
+* D.Hopkinson    01/04/97  add cleanup of semaphores on skipped images
+* pbiereic       16/06/97  add setsockopt(..SO_REUSEADDR..) in rtdInitServer
+* J.Stegmeier    19/03/99  Added TCP_NODELAY for faster image update
+* pbiereic       01/03/01  Added: rtdServerPing(), rtdSleep()
 */
 /************************************************************************
 *   NAME
@@ -23,6 +25,8 @@
 *    rtdDetachImageEvt - detach notification of image events.
 *
 *    rtdRecvImageInfo  - receive image event information from rtdServer.
+*
+*    int rtdServerPing - "ping" the rtdServer
 *
 *    rtdClose          - close event handel.
 *    
@@ -48,6 +52,9 @@
 *                        rtdIMAGE_INFO     *imageInfo,
 *                        int                verbose,
 *                        char              *error)
+*
+*   int rtdServerPing(rtdIMAGE_EVT_HNDL *eventHndl,
+*           		 char              *error)
 *
 *   int rtdClose(rtdIMAGE_EVT_HNDL *eventHndl,
 *                char              *error)
@@ -81,6 +88,9 @@
 *   by rtdInitImageEvt, imageInfo a pointer to a rtdIMAGE_INFO structure.
 *   If verbose is non-zero diagnostic messages are printed.
 *   
+*   rtdServerPing() is used by RTD to check that the rtdServer is still
+*   responding.
+*
 *   rtdClose()
 *   Closes connection to rtdServer. Use when finished with real-time display
 *   or repeated errors occuring on rtdSendImageInfo.
@@ -145,13 +155,20 @@
 *
 *  if (shmId) shmctl(shmId,IPC_RMID,NULL);
 *
+*   WARNINGS
+*       If you are not using semaphore locking then set semId=-1 in the
+*       image event structure (see rtdImageEvent.h). Since semId=0 is
+*       a valid number it can happen that rtdServer decrements a
+*       semaphore created by another process which can lead to serious
+*       problems!
+*
 *   SEE ALSO
 *
 *   rtdServer(1)
 *
 *-------------------------------------------------------------------------
 */
-static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.9 1998/05/18 21:22:59 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.2 2005/02/02 01:43:03 brighton Exp $";
 
 
 /*
@@ -170,6 +187,7 @@ static const char* const rcsId="@(#) $Id: rtdImageEvent.c,v 1.9 1998/05/18 21:22
 #include <sys/filio.h>
 #endif
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <signal.h>
 #include <unistd.h>
 #include <time.h>
@@ -188,12 +206,12 @@ int rtdInitImageEvt(char              *requestor,
     int s;                          /* connected socket descriptor */
     struct hostent *hp;             /* pointer to host info for remote host */
     struct servent *sp;             /* pointer to service information */
-/*    long timevar;      */             /* contains time returned by time() */
     char *ctime();                  /* declare time formatting routine */
     
     struct sockaddr_in rtdClientAddr;  /* for local socket address */
-    struct sockaddr_in rtdServerAddr; /* for peer socket address */
+    struct sockaddr_in rtdServerAddr;  /* for peer socket address */
     int addrlen;
+    int optval;
 
     char buf[256];
 
@@ -245,8 +263,11 @@ int rtdInitImageEvt(char              *requestor,
     s = socket (AF_INET, SOCK_STREAM, 0);
     if (s == -1) {
 	rtdSetError(subr, error, RTD_ERR_CREAT_SOCKET);
-        return RTD_ERROR;
+	return RTD_ERROR;
     }
+
+    optval = 1;
+    setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (const char *)&optval, sizeof optval);
 
     /* Try to connect to the remote server at the address
      * which was just built into rtdServerAddr.
@@ -254,7 +275,7 @@ int rtdInitImageEvt(char              *requestor,
     if (connect(s, (struct sockaddr *)&rtdServerAddr, sizeof(struct sockaddr_in)) == -1) {
 	rtdSetError(subr, error, RTD_ERR_CONNECT_SOCKET);
 	close(s);
-        return RTD_ERROR;
+	return RTD_ERROR;
     }
     /*
      */
@@ -264,8 +285,8 @@ int rtdInitImageEvt(char              *requestor,
 	return RTD_ERROR;
     }
     /*
-    printf("Connected to %s on port %u at %s",
-           RTD_SERVICE, ntohs(rtdClientAddr.sin_port), ctime(&timevar));
+      printf("Connected to %s on port %u at %s",
+      RTD_SERVICE, ntohs(rtdClientAddr.sin_port), ctime(&timevar));
     */
 
     /* Insert event handle data */
@@ -276,6 +297,11 @@ int rtdInitImageEvt(char              *requestor,
     return RTD_OK;
 }
 
+/*
+ * rtdSetError prints an error message on stdout if the error pointer
+ * is NULL; otherwise it just returns. See also the NOTE - which says
+ * that the "error field" is reserved for the future.
+ */
 void rtdSetError(char *subr, char *error, char *msg)
 {
     if (error)
@@ -325,7 +351,7 @@ int rtdInitServer(int  *listenSocket,
     ls = socket (AF_INET, SOCK_STREAM, 0);
     if (ls == -1) {
 	rtdSetError(subr, error, RTD_ERR_CREAT_SOCKET);
-        return RTD_ERROR;
+	return RTD_ERROR;
     }
 
     /* set socket options (for HP set all bytes to 1!) */
@@ -335,7 +361,7 @@ int rtdInitServer(int  *listenSocket,
     /* Bind the listen address to the socket. */
     if (bind(ls, (struct sockaddr *)&rtdServerAddr, sizeof(struct sockaddr_in)) == -1) {
 	rtdSetError(subr, error, RTD_ERR_BIND_SOCKET);
-        return RTD_ERROR;
+	return RTD_ERROR;
     }
 
     /* Initiate the listen on the socket so remote users
@@ -344,16 +370,17 @@ int rtdInitServer(int  *listenSocket,
      */
     if (listen(ls, 5) == -1) {
 	rtdSetError(subr, error, RTD_ERR_LISTEN_SOCKET);
-        return RTD_ERROR;
+	return RTD_ERROR;
     }
 
     *listenSocket = ls;
     return RTD_OK;
 }
 
-
 /* 
- * catch SIGPIPE on writes to the socket
+ * Write nbyte to socket. If the pipe is broken (i.e. when rtdServer was
+ * killed) ignore the signal for backwards compatibility, so that the
+ * client can continue.
  */
 int rtdWrite(int fd, void* buf, int nbyte)
 {
@@ -389,7 +416,7 @@ int rtdSendImageInfo(rtdIMAGE_EVT_HNDL  *eventHndl,
     strncpy(rtdPacket->body.data.hdr.reqName,eventHndl->reqName, RTD_NAMELEN);
     memcpy(&rtdPacket->body.data.rtdImageInfo, imageInfo, sizeof(rtdIMAGE_INFO));
     rtdPacket->body.data.rtdImageInfo.version = RTD_EVT_VERSION;
-    
+
     /* use unbuffered write operation */
     if (rtdWrite(eventHndl->socket, rtdPacket,sizeof(rtdPACKET)) != sizeof(rtdPACKET)) {
 	rtdSetError(subr, error, RTD_ERR_DATAWRITE);
@@ -431,7 +458,7 @@ int rtdRecvImageInfo(rtdIMAGE_EVT_HNDL *eventHndl,
 	 * the shm buffer is locked */
 	if (ioctl(eventHndl->socket, FIONREAD, &nbytes) != 0) {
 	    if (verbose)
-		printf("rtdRecvImageInfo: ioctl failed\n");
+		rtdSetError(subr, error, "rtdRecvImageInfo: ioctl failed\n");
 	    return RTD_ERROR;
 	}
 
@@ -446,7 +473,7 @@ int rtdRecvImageInfo(rtdIMAGE_EVT_HNDL *eventHndl,
 	    return RTD_ERROR;
 	}
 
-        if (n == sizeof(rtdPACKET)) {
+	if (n == sizeof(rtdPACKET)) {
 	    if (rtdPacket.body.data.rtdImageInfo.semId) {
 		break;
 	    }
@@ -454,11 +481,11 @@ int rtdRecvImageInfo(rtdIMAGE_EVT_HNDL *eventHndl,
 	if (nbytes > sizeof(rtdPACKET)) {
 	    if (verbose)
 		printf("%s: ignoring unread packets\n", subr);
-        } else
+	} else
 	    break;
     }
 
-    if (n < 32) {  /* hardcoded! We need at least the info struct until binningY */
+    if (n < 32) /* hardcoded! We need at least the info struct until binningY */ {
 	rtdSetError(subr, error, RTD_ERR_UNKNOWN_SIZE);
 	return RTD_ERROR;
     }
@@ -549,6 +576,39 @@ int rtdDetachImageEvt(rtdIMAGE_EVT_HNDL *eventHndl,
     return RTD_OK;
 }
 
+int rtdServerPing(rtdIMAGE_EVT_HNDL *eventHndl,
+		  char              *error)
+{
+    char *subr = "rtdServerPing";
+    rtdPACKET rtdPacket;
+
+    memset(&rtdPacket,'\0',sizeof(rtdPACKET));
+    
+    /* check input parameters */
+    if (eventHndl == NULL) {
+	rtdSetError(subr, error, RTD_ERR_NULL_PTR);
+	return RTD_ERROR;
+    }
+    
+    if (eventHndl->socket == 0) {
+	rtdSetError(subr, error, RTD_ERR_NO_SOCKET);
+	return RTD_ERROR;
+    }
+    
+    /* setup protocol packet */
+    rtdPacket.opcode = PING;
+    rtdPacket.body.data.hdr.reqType = RTDWIDGET; /* RTD SW */
+    strncpy(rtdPacket.body.data.hdr.reqName,eventHndl->reqName, RTD_NAMELEN);
+    
+    /* use unbuffered write operation */
+    if (rtdWrite(eventHndl->socket, &rtdPacket,sizeof(rtdPACKET)) != sizeof(rtdPACKET)) {
+	rtdSetError(subr, error, RTD_ERR_DATAWRITE);
+	return RTD_ERROR;
+    }
+
+    return RTD_OK;
+}
+
 int rtdClose(rtdIMAGE_EVT_HNDL *eventHndl,
              char              *error)
 {
@@ -561,4 +621,12 @@ int rtdClose(rtdIMAGE_EVT_HNDL *eventHndl,
     close(eventHndl->socket);
     eventHndl->socket = 0;
     return RTD_OK;
+}
+
+void rtdSleep(int msec) 
+{
+    struct timeval time;
+    time.tv_sec  = msec / 1000;
+    time.tv_usec = (msec % 1000) * 1000;
+    select(0, (fd_set *) 0, (fd_set *) 0, (fd_set *) 0, &time);
 }

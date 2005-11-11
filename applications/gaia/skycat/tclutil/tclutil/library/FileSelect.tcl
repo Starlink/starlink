@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: FileSelect.tcl,v 1.7 1998/10/28 17:46:37 abrighto Exp $"
+# "@(#) $Id: FileSelect.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # FileSelect.tcl - OSF/Motif standard file selection dialog
 #
@@ -234,8 +234,8 @@ itcl::class util::FileSelect {
 	# events for the filter and select entry widgets control the default
 	# button display, and return is mapped to the default button as well.
 	#
-        bind $fs(dirs) <1> [code $this _selectdir %y]
-        bind $fs(files) <1> [code $this _selectfile %y]
+        bind $fs(dirs) <ButtonRelease-1> [code $this _selectdir %y]
+        bind $fs(files) <ButtonRelease-1> [code $this _selectfile %y]
         bind $fs(dirs) <Double-1> [code $this _dclickdir %y]
         bind $fs(files) <Double-1> [code $this _dclickfile %y]
 

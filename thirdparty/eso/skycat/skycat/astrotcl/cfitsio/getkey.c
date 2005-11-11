@@ -10,9 +10,9 @@
 /*  Government purposes to publish, distribute, translate, copy, exhibit,  */
 /*  and perform such material.                                             */
 
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <ctype.h>
 /* stddef.h is apparently needed to define size_t */
 #include <stddef.h>

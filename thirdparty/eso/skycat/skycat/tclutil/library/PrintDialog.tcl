@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: PrintDialog.tcl,v 1.8 1998/10/28 17:46:40 abrighto Exp $"
+# "@(#) $Id: PrintDialog.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # PrintDialog.tcl - Base class of Popup dialogs for specifying printer options
 #
@@ -196,7 +196,7 @@ itcl::class util::PrintDialog {
 	    return $file
 	}
 	set basename [file split $file]
-	set basename [lindex $basename [expr [llength $basename] -1]]
+	set basename [lindex $basename [expr {[llength $basename] -1}]]
 	set ext [file extension $file]
 	if {"$ext" == ""} {
 	    set file [file join $dirname $basename$itk_option(-suffix)]

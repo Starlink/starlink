@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageCut.tcl,v 1.22 1999/03/15 12:31:11 abrighto Exp $"
+# "@(#) $Id: RtdImageCut.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageCut.tcl - itcl widget for setting cut levels for an RtdImage widget
 # 
@@ -156,7 +156,6 @@ itcl::class rtd::RtdImageCut {
 	# Someone also changed the default symbol to circle also - why?
 	regsub -all {\.} v$graph_.xVector _ xVector_ 
 	regsub -all {\.} v$graph_.yVector _ yVector_ 
-
 	if {$tcl_version >= 8.0} {
 	    $graph_ legend config -hide 1
 	    if {![info exists $xVector_]} {
@@ -251,11 +250,11 @@ itcl::class rtd::RtdImageCut {
 	add_button close Close quit
 	
         blt::table $itk_component(buttons) \
-            $itk_component(set)       1,0 -anchor w -fill none -padx 2m -pady 2m \
-            $itk_component(reset)     1,1 -anchor w -fill none -padx 2m -pady 2m \
-            $itk_component(median)    1,2 -anchor w -fill none -padx 2m -pady 2m \
-            $itk_component(update)    1,3 -anchor w -fill none -padx 2m -pady 2m \
-            $itk_component(close)     1,4 -anchor w -fill none -padx 2m -pady 2m
+            $itk_component(set)       1,0 -anchor w -fill x -padx 1m -pady 2m \
+            $itk_component(reset)     1,1 -anchor w -fill x -padx 1m -pady 2m \
+            $itk_component(median)    1,2 -anchor w -fill x -padx 1m -pady 2m \
+            $itk_component(update)    1,3 -anchor w -fill x -padx 1m -pady 2m \
+            $itk_component(close)     1,4 -anchor w -fill x -padx 1m -pady 2m
     }
 
     # add a button to the buttons frame
@@ -295,8 +294,8 @@ itcl::class rtd::RtdImageCut {
 	}
 
 	# adapt new scale range
-	setb_lowcut [expr $low <= $low_] $low
-	setb_highcut [expr $high >= $high_] $high
+	setb_lowcut [expr {$low <= $low_}] $low
+	setb_highcut [expr {$high >= $high_}] $high
 	update
 
 	# plot the distribution of pixel values
@@ -373,7 +372,7 @@ itcl::class rtd::RtdImageCut {
 
     protected method update_increment {} {
 	lassign [get_cuts] low high
-	set increment [expr ($high-$low)/100.0]
+	set increment [expr {($high-$low)/100.0}]
 	if {$increment <= 0} {
 	    return
 	}
@@ -389,7 +388,7 @@ itcl::class rtd::RtdImageCut {
     protected method setb_lowcut {setlow value} {
 	lassign [get_cuts] low high
 	if {$value >= $high} {
-	    set value [expr $high - 1]
+	    set value [expr {$high - 1}]
 	}
 	if {$setlow} {
 	    set low_ $value
@@ -404,7 +403,7 @@ itcl::class rtd::RtdImageCut {
 	lassign [get_cuts] low high
 	
 	if {$value <= $low} {
-	    set value [expr $low + 1]
+	    set value [expr {$low + 1}]
 	}
 	if {$sethigh} {
 	    set high_ $value
@@ -427,7 +426,7 @@ itcl::class rtd::RtdImageCut {
     protected method update_lowcut {low high} {
 	global ::$w_.lowcut
 	set from $low_
-	set to [expr $high - 1.0]
+	set to [expr {$high - 1.0}]
 	if {$from > $low} {
 	    set from $low
 	}
@@ -442,7 +441,7 @@ itcl::class rtd::RtdImageCut {
 
     protected method update_highcut {low high} {
 	global ::$w_.highcut
-	set from [expr $low + 1.0]
+	set from [expr {$low + 1.0}]
 	set to $high_
 	if {$from > $high} {
 	    set from $high
@@ -451,7 +450,7 @@ itcl::class rtd::RtdImageCut {
 	    set to $high
 	}
 	if {$from == $to} {
-	    set from [expr $from - 1.0]
+	    set from [expr {$from - 1.0}]
 	}
 	$itk_component(highcut) config -from $from -to $to
 	set $w_.highcut $high

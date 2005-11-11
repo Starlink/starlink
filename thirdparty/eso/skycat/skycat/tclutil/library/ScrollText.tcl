@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ScrollText.tcl,v 1.6 1998/10/28 17:46:40 abrighto Exp $"
+# "@(#) $Id: ScrollText.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # ScrollText.tcl - Itcl class for displaying a text window with scrollbars.
 #

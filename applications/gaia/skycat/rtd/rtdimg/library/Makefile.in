@@ -1,53 +1,32 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.8 1998/10/28 17:42:26 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 
 # ------------------------------------------------------------------------
 # 	Makefile for RTD Tcl library files 
 # ------------------------------------------------------------------------
 
-INSTALL      = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-LIBDIR       = @LIBDIR@
-RTD_DIR      = @RTD_DIR@
-ITCL_VERSION = @ITCL_VERSION@
-RM           = rm -f
-SHELL        = /bin/sh
 FILES        = *.tcl tclIndex
 srcdir	     = @srcdir@
 
-all:
-
-All: 
-	cd ..; $(MAKE)
 
 # in the src tree, the tcl sources are in the "library" dir (like tcl/tk)
 # in the install tree, they are in, for example, /usr/local/lib/rtd
 install-top:
-	test -d $(LIBDIR) || mkdir $(LIBDIR) 
-	test -d $(RTD_DIR) || mkdir $(RTD_DIR) 
-	(cd $(RTD_DIR); rm -rf library; ln -s . library)
+	$(AT)test -d $(LIBDIR) || mkdir $(LIBDIR) 
+	$(AT)test -d $(RTD_DIR) || mkdir $(RTD_DIR) 
 
 install-files: install-top
-	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	$(AT)for i in $(srcdir)/$(FILES) ; do \
 	    $(INSTALL_DATA) $$i $(RTD_DIR) ; \
 	done 
 
-install: install-files
+do_install: index install-files
 
-clean:
-	$(RM) *\~ "#"*
-
-index tclIndex: FORCE
-	itclsh$(ITCL_VERSION) ./mkIndex.tcl
-
-depend:
-
-distclean: clean
-	rm -f Makefile	
-
-man:
+.PHONY: index tclIndex
+index tclIndex:
+	tclsh$(TCL_VERSION) ./mkIndex.tcl
 
 # generate man pages for itcl classes
 doc: 
@@ -55,6 +34,7 @@ doc:
 
 # remove generated man pages
 cleandoc:
-	rm -f ../man/[A-Z]*.mann
+	$(RM) ../man/[A-Z]*.mann
 
-FORCE:
+include ../../makefile.mk
+

@@ -10,9 +10,9 @@
 /*  Government purposes to publish, distribute, translate, copy, exhibit,  */
 /*  and perform such material.                                             */
 
+#include <stdlib.h>
 #include <limits.h>
 #include <string.h>
-#include <stdlib.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/
 int ffppruj( fitsfile *fptr,  /* I - FITS file pointer                       */

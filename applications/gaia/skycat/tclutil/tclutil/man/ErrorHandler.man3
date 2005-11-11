@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: ErrorHandler.man3,v 1.2 1998/03/29 20:28:58 abrighto Exp $" 
+# "@(#) $Id: ErrorHandler.man3,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 

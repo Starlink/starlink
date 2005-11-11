@@ -1,9 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
-*   Function names changed by Doug Mink, SAO, April 15, 1998
-*   wcstrig.h include file added to wcslib.h by Doug Mink, SAO, September 28, 1998
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -32,17 +30,14 @@
 *   The functions defined herein are trigonometric or inverse trigonometric
 *   functions which take or return angular arguments in decimal degrees.
 *
-*   $Id: wcstrig.c,v 1.6 1998/10/01 08:23:59 abrighto Exp $
+*   $Id: wcstrig.c,v 1.2 2005/02/02 01:43:03 brighton Exp $
 *---------------------------------------------------------------------------*/
 
+#include <math.h>
 #include "wcslib.h"
+const double d2r = PI / 180.0;
+const double r2d = 180.0 / PI;
 
-#ifndef PI	/* often defined in math.h */
-#define PI 3.141592653589793238462643
-#endif
-
-static const double d2r = PI / 180.0;
-static const double r2d = 180.0 / PI;
 
 double cosdeg (angle)
 
@@ -111,7 +106,7 @@ const double angle;
 
 /*--------------------------------------------------------------------------*/
 
-double acosdeg (v)
+double acosdeg(v)
 
 const double v;
 
@@ -186,7 +181,7 @@ const double x, y;
 
    return atan2(y,x)*r2d;
 }
-/* Apr 30 1998	Define PI only if not defined already
- * Jul 30 1998	Make r2d and d2r static to avoid conflicts - Allan Brighton
- * Sep 28 1998	wcstrig.h now part of wcslib.h
+/* Dec 20 1999	Doug Mink - Change cosd() and sind() to cosdeg() and sindeg()
+ * Dec 20 1999	Doug Mink - Include wcslib.h, which includes wcstrig.h
+ * Dec 20 1999	Doug Mink - Use PI from wcslib.h, not locally defined
  */

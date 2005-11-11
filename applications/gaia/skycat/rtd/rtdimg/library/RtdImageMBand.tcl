@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageMBand.tcl,v 1.14 1998/10/28 17:42:28 abrighto Exp $"
+# "@(#) $Id: RtdImageMBand.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageMBand.tcl - itcl class to display a "measure band" 
 #                     showing the distance between 2 points in world coordinates
@@ -63,7 +63,7 @@ itcl::class rtd::RtdImageMBand {
 	
 	# create labels for width, height, diagonal
 	foreach i {width height diag} {
-	    $canvas_ create rectangle $x $y [expr $x+1] [expr $y+1] \
+	    $canvas_ create rectangle $x $y [expr {$x+1}] [expr {$y+1}] \
 		-fill $itk_option(-fill_color) \
 		-outline $itk_option(-outline_color) \
 		-tags "mband mband_${i}_rect"

@@ -14,8 +14,8 @@
 /*
  * tclInt.h is needed for the va_list declaration.
  */
-#include <tclInt.h>
 #include <tixPort.h>
+#include <tclInt.h>
 #include <tixInt.h>
 
 /*
@@ -70,14 +70,14 @@ TixSaveInterpState(interp, statePtr)
 	statePtr->result = NULL;
     }
 
-    p = Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
+    p = (char*)Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
     if (p) {
 	statePtr->errorInfo = (char*)strdup(p);
     } else {
 	statePtr->errorInfo = NULL;
     }
 
-    p = Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
+    p = (char*)Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
     if (p) {
 	statePtr->errorCode = (char*)strdup(p);
     } else {
@@ -512,6 +512,7 @@ Tix_GlobalVarEval(iPtr, p, va_alist)
     char *string;
     Tcl_Interp *interp;
     int result;
+    int status;
 
 #ifdef TCL_VARARGS_DEF
     /*
@@ -536,7 +537,7 @@ Tix_GlobalVarEval(iPtr, p, va_alist)
     Tcl_DStringFree(&buf);
     return result;
 #else
-    va_start(argList);
+    va_start(argList, status);
     interp = va_arg(argList, Tcl_Interp *);
     Tcl_DStringInit(&buf);
     while (1) {

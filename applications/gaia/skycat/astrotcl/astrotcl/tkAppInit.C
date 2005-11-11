@@ -1,6 +1,6 @@
 /* 
  * tkAppInit.C -- 
- * "@(#) $Id: tkAppInit.C,v 1.2 1997/12/04 17:46:45 abrighto Exp $"
+ * "@(#) $Id: tkAppInit.C,v 1.2 2005/02/02 01:43:04 brighton Exp $"
  * ---------------------------------------------------------------------
  * NOTE: This file was modified by adding the BLT, Itcl and TclX extensions.
  *       It was also modified to be compiled with a C++ compiler,
@@ -21,7 +21,7 @@ static char sccsid[] = "@(#) tkAppInit.c 1.12 94/12/17 16:30:56";
 #endif /* not lint */
 
 #include <stdlib.h>
-#include <new.h>
+
 
 
 /* declare command procedures here */

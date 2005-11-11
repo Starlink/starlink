@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.2 1999/03/11 21:01:41 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 
 # ------------------------------------------------------------------------
 # 	Makefile for Tcl library files 
@@ -30,7 +30,7 @@ clean:
 
 index tclIndex: FORCE
 	test -x tixindex || chmod +x tixindex
-	itclsh@ITCL_VERSION@ ../tools/tixindex *.tcl
+	tclsh@TCL_VERSION@ ../tools/tixindex *.tcl
 
 depend:
 
@@ -45,3 +45,6 @@ doc:
 cleandoc:
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

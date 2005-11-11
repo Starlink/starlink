@@ -1,7 +1,7 @@
 # canvastext.tcl - utility routines for working with canvase text items
 #
 # Author: Allan Brighton
-# "@(#) $Id: canvastext.tcl,v 1.2 1998/02/20 18:15:15 abrighto Exp $"
+# "@(#) $Id: canvastext.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 
 
 proc ct_move_to_char {canvas item index} {
@@ -12,7 +12,7 @@ proc ct_move_to_char {canvas item index} {
 proc ct_cursor_position_in_line {canvas item} {
     set sxx [ct_search_backward_char $canvas $item "\n"]
     set cxx [$canvas index $item insert]
-    return ([expr $cxx - $sxx])
+    return ([expr {$cxx - $sxx}])
 }
 
 
@@ -37,7 +37,7 @@ proc ct_search_forward_char {canvas item char} {
 proc ct_search_backward_char {canvas item char} {
     if {![lempty $item]} {
 	set text  [lindex [$canvas itemconfigure $item -text] 4]
-	loop i [expr "[$canvas index $item insert] - 1"] 0 -1 {
+	loop i [expr {[$canvas index $item insert] - 1}] 0 -1 {
 	    if {$char == [string index $text $i]} {
 		return $i
 	    }
@@ -49,7 +49,7 @@ proc ct_search_backward_char {canvas item char} {
 
 proc ct_move_forward_or_end {canvas item n} {
     set start [$canvas index $item insert]
-    set end [expr $start + $n]
+    set end [expr {$start + $n}]
     set text  [lindex [$canvas itemconfigure $item -text] 4]
 
     for { set pos $start } {[expr {$pos < $end}]} {incr pos 1} {
@@ -79,25 +79,25 @@ proc ct_end_of_text {canvas item} {
 
 proc ct_forward_char {canvas item n} {
     set position [$canvas index $item insert]
-    $canvas icursor $item [expr $position + $n]
+    $canvas icursor $item [expr {$position + $n}]
 }
 
 
 proc ct_backward_char {canvas item n} {
     set position [$canvas index $item insert]
-    $canvas icursor $item [expr $position - $n]
+    $canvas icursor $item [expr {$position - $n}]
 }
 
 
 proc ct_delete_char {canvas item} {
     set position [$canvas index $item insert]
-    $canvas dchar $item [expr $position]
+    $canvas dchar $item [expr {$position}]
 }
 
 
 proc ct_backward_delete_char {canvas item} {
     set position [$canvas index $item insert]
-    $canvas dchars $item [expr $position - 1]
+    $canvas dchars $item [expr {$position - 1}]
 }
 
 
@@ -107,7 +107,7 @@ proc ct_kill_line {canvas item} {
     if {[string index $text $ins] == "\n"} {
 	$canvas dchars $item $ins
     } else {
-	$canvas dchars $item $ins [expr "[ct_search_forward_char $canvas $item "\n"] - 1"]
+	$canvas dchars $item $ins [expr {[ct_search_forward_char $canvas $item "\n"] - 1}]
     }
 }
 
@@ -120,19 +120,19 @@ proc ct_beginning_of_line {canvas item} {
 
 proc ct_end_of_line {canvas item} {
     set nindex [ ct_search_forward_char $canvas $item "\n" ]      
-    ct_move_to_char $canvas $item [expr $nindex]
+    ct_move_to_char $canvas $item [expr {$nindex}]
 }
 
 proc ct_next_line {canvas item} {
     set offset [ct_cursor_position_in_line $item $canvas]
     ct_end_of_line
     ct_forward_char $canvas $item 1
-    ct_move_forward_or_end $canvas $item [expr $offset -1]
+    ct_move_forward_or_end $canvas $item [expr {$offset -1}]
 }
 
 
 proc ct_previous_line {canvas item} {
-    set offset [expr [ct_cursor_position_in_line $canvas $item] - 1]
+    set offset [expr {[ct_cursor_position_in_line $canvas $item] - 1}]
     ct_beginning_of_line $canvas $item
     ct_backward_char $canvas $item 1
     ct_beginning_of_line $canvas $item

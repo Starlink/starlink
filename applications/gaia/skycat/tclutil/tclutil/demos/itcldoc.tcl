@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: itcldoc.tcl,v 1.10 1998/11/20 14:20:06 abrighto Exp $" 
+# "@(#) $Id: itcldoc.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # itcldoc.tcl - script to extract man pages from itcl class source files.
 #

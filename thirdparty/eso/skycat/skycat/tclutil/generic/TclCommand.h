@@ -17,16 +17,7 @@
  *
  * See the man page for a complete description.
  * -----------------------------------------------------------------------------
- * Copyright 1994 Allan Brighton.
- * 
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose and without fee is hereby granted,
- * provided that the above copyright notice appear in all copies.  
- * Allan Brighton make no representations about the suitability of this 
- * software for any purpose. It is provided "as is" without express or 
- * implied warranty.
- * -----------------------------------------------------------------------------
- * "@(#) $Id: TclCommand.h,v 1.6 1998/03/12 20:19:27 abrighto Exp $" 
+ * "@(#) $Id: TclCommand.h,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
  */
 
 #include <tcl.h>

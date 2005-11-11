@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project / ESO Archive
- * $Id: tTcsCatalog.C,v 1.4 1998/02/02 20:18:52 abrighto Exp $
+ * $Id: tTcsCatalog.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tTcsCatalog.C - test cases for class TcsCatalog
  * 
@@ -10,7 +10,7 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "TcsCatalog.h"
@@ -37,54 +37,54 @@ main()
     q.radius(10);
     q.maxRows(10);
 
-    cout << "Query GSC for objects at pos " 
+    std::cout << "Query GSC for objects at pos " 
 	 << q.pos() << ", in radius " 
 	 << q.radius1() << ".." << q.radius2() 
 	 << ":" 
-	 << endl;
+	 << std::endl;
 
     TcsQueryResult result;
     int num_results = cat->query(q, "./tTcsCatalog.out", result);
     if (num_results < 0) {
-	cout << "Query returned an error\n";
+	std::cout << "Query returned an error\n";
 	exit(1);
     }
 
-    cout << "Query returns: " 
+    std::cout << "Query returns: " 
 	 << num_results 
 	 << " objects, out of " 
 	 << q.maxRows() 
 	 << " requested" 
-	 << endl;
+	 << std::endl;
 
-    cout << "More objects ?: " 
+    std::cout << "More objects ?: " 
 	 <<  (cat->more() ? "YES" : "NO") 
-	 << endl;
+	 << std::endl;
 
-    cout << "---Result List---" 
-	 << endl;
+    std::cout << "---Result List---" 
+	 << std::endl;
 
     // print the column headings
-    cout << "Results:\n\n";
+    std::cout << "Results:\n\n";
     TcsCatalogObject::printHeadings(cout);
-    cout << "\n-\n";
+    std::cout << "\n-\n";
 
     // print out the rows
     TcsCatalogObject obj;	// holds data for one row
     for (int row = 0; row < num_results; row++) {
 	if (result.getObj(row, obj) != 0)
-	    cout << "row " << row << ": ERROR\n";
+	    std::cout << "row " << row << ": ERROR\n";
 	else 
-	    cout << obj << endl;
+	    std::cout << obj << std::endl;
     }
 
     // -- test VLT type interface --
-    cout << "\ntest VLT style interface:\n\n";
+    std::cout << "\ntest VLT style interface:\n\n";
     if (cat->searchClosestStar(pos, 0., 15, obj) != 0) {
-	cout << "searchClosestStar: returned error\n";
+	std::cout << "searchClosestStar: returned error\n";
     } 
     else {
-	cout << "searchClosestStar for " << pos << ": returned row:\n" << obj << endl;
+	std::cout << "searchClosestStar for " << pos << ": returned row:\n" << obj << std::endl;
     }
 
     return 0;

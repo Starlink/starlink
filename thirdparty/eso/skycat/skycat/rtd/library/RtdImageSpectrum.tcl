@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageSpectrum.tcl,v 1.25 1999/03/15 12:31:12 abrighto Exp $"
+# "@(#) $Id: RtdImageSpectrum.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageSpectrum.tcl - itcl widget for displaying graph of image data values 
 #                        along a line
@@ -14,7 +14,8 @@
 # Allan Brighton  01 Jun 95  Created
 # Allan Brighton  28 Jun 96  Changed GUI name to "Cuts", 
 #                            (suggested by M. Albrecht)
-# Peter Bieeichel 22/07/97   Added value display at cursor position
+# pbiereic        22/07/97   Added value display at cursor position
+# pbiereic        27/06/03   VLTSW20030157: Motion bindings 
 
 itk::usual RtdImageSpectrum {}
 
@@ -112,7 +113,12 @@ itcl::class rtd::RtdImageSpectrum {
         ::Blt_ActiveLegend $graph_
         ::Blt_Crosshairs $graph_
         ::Blt_ClosestPoint $graph_
-	bind bltCrosshairs <Any-Motion> "catch {$this dispXY %x %y; %W crosshairs configure -position @%x,%y}"
+
+ 	if {$tcl_version >= 8.3} {
+	    bind $graph_ <Any-Motion> "catch {$this dispXY %x %y; %W crosshairs configure -position @%x,%y}"
+	} else {
+	    bind bltCrosshairs <Any-Motion> "catch {$this dispXY %x %y; %W crosshairs configure -position @%x,%y}"
+	}
 
 	# Tk frame for X,Y positions.
 	itk_component add fpos {
@@ -141,7 +147,7 @@ itcl::class rtd::RtdImageSpectrum {
    
     # display x, y values at cursor position
 
-    protected method dispXY {x y} {
+    public method dispXY {x y} {
 	global ::tcl_version
 	if {$tcl_version < 8.0} {
 	    global $yVector_
@@ -150,7 +156,7 @@ itcl::class rtd::RtdImageSpectrum {
 	    return
 	}
 	lassign [$graph_ invtransform $x $y] x y
-	set x [expr int(round($x))]
+	set x [expr {int(round($x))}]
 	if {$x < 1 || $x >= $numValues_} {
 	    return
 	}

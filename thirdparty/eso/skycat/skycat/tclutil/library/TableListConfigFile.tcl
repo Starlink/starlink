@@ -1,11 +1,12 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TableListConfigFile.tcl,v 1.4 1998/10/28 17:46:41 abrighto Exp $"
+# "@(#) $Id: TableListConfigFile.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # TableListConfigFile.tcl - Class for managing config info for TableList widget
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
+# pbiereic        04/11/03   Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
 
 itk::usual TableListConfigFile {}
 
@@ -79,7 +80,9 @@ itcl::class util::TableListConfigFile {
 	    } else {
 		# sorting options
 		lassign [gets $fd] sort_by_ sort_order_ sort_type_
-
+		# XXX needed for bug in tcl 8.4.3
+		set bug "$sort_by_ $sort_order_ $sort_type_"
+		
 		# headings and column options
 		set order_ {}
 		foreach i [gets $fd] {

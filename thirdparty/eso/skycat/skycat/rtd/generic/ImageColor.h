@@ -3,7 +3,7 @@
 #define _ImageColor_h_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageColor.h,v 1.9 1999/03/19 20:09:32 abrighto Exp $" 
+ * "@(#) $Id: ImageColor.h,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ImageColor.h - class definitions for class ImageColor
  * 

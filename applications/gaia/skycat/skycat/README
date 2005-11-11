@@ -11,10 +11,7 @@ Catalog library package (cat).  These should already be installed, or
 compiled in the ../rtd and ../cat directories.
 
 -------------------------------------------
-Contacts: Allan Brighton (abrighto@eso.org)
-          Miguel Albrecht (malbrech@eso.org)
-
-ESO - European Southern Observatory
+Contacts: Allan Brighton (abrighton@gemini.edu)
 -------------------------------------------
 
 For installation instructions, see the file INSTALL in this directory.
@@ -106,11 +103,11 @@ Documentation
 The latest documentation (in postscript, FrameMaker, and PDF formats)
 is available under:
 
-	ftp://ftp.archive.eso.org/pub/skycat/doc
+	ftp://ftp.eso.org/pub/archive/skycat/doc
 
 An HTML version is also available from:
 
-	http://arcdev.hq.eso.org/~archeso/skycat/skycat-man.html
+	http://www.eso.org/~archeso/skycat/skycat-man.html
 
 The Skycat application is based on the following packages:
 

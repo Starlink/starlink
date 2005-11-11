@@ -138,10 +138,20 @@ typedef union CmpItemPtr {
 /*
  * The type record for bitmap images:
  */
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
 static int		ImgCmpCreate _ANSI_ARGS_((Tcl_Interp *interp,
-			    char *name, int argc, char **argv,
-			    Tk_ImageType *typePtr, Tk_ImageMaster master,
-			    ClientData *clientDataPtr));
+						  char *name, int argc, 
+						  Tcl_Obj *CONST objv[],
+						  Tk_ImageType *typePtr, Tk_ImageMaster master,
+						  ClientData *clientDataPtr));
+#else
+static int		ImgCmpCreate _ANSI_ARGS_((Tcl_Interp *interp,
+						  char *name, int argc, 
+						  char **argv,
+						  Tk_ImageType *typePtr, Tk_ImageMaster master,
+						  ClientData *clientDataPtr));
+#endif
+
 static ClientData	ImgCmpGet _ANSI_ARGS_((Tk_Window tkwin,
 			    ClientData clientData));
 static void		ImgCmpDisplay _ANSI_ARGS_((ClientData clientData,
@@ -159,6 +169,11 @@ Tk_ImageType tixCompoundImageType = {
     ImgCmpDisplay,		/* displayProc */
     ImgCmpFree,			/* freeProc */
     ImgCmpDelete,		/* deleteProc */
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    (Tk_ImagePostscriptProc *) NULL,    /* postscriptProc */
+#endif
+
     (Tk_ImageType *) NULL	/* nextPtr */
 };
 
@@ -367,15 +382,24 @@ static void		CmpEventProc _ANSI_ARGS_((ClientData clientData,
  *----------------------------------------------------------------------
  */
 
-	/* ARGSUSED */
+/* ARGSUSED */
 static int
-ImgCmpCreate(interp, name, argc, argv, typePtr, master, clientDataPtr)
+ImgCmpCreate(interp, name, argc, 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+	     objv, /* allan: 05/01: added #ifdefs for tk8.3 */
+#else
+	     argv, 
+#endif
+	     typePtr, master, clientDataPtr)
     Tcl_Interp *interp;		/* Interpreter for application containing
 				 * image. */
     char *name;			/* Name to use for image. */
     int argc;			/* Number of arguments. */
-    char **argv;		/* Argument strings for options (doesn't
-				 * include image name or type). */
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    Tcl_Obj *CONST objv[];      /* Argument objects for options (not including image name or type) */
+#else
+    char **argv;		/* Argument strings for options (not including image name or type) */
+#endif
     Tk_ImageType *typePtr;	/* Pointer to our type record (not used). */
     Tk_ImageMaster master;	/* Token for image, to be used by us in
 				 * later callbacks. */
@@ -383,6 +407,15 @@ ImgCmpCreate(interp, name, argc, argv, typePtr, master, clientDataPtr)
 				 * it will be returned in later callbacks. */
 {
     CmpMaster *masterPtr;
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    /* just generate an argv from the objv argument */
+    char* argv[64];  /* there shouldn't be more than a few options... */
+    int i;
+    for(i = 0; i < argc; i++)
+	argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
 
     masterPtr = (CmpMaster *) ckalloc(sizeof(CmpMaster));
     masterPtr->tkMaster = master;
@@ -644,7 +677,7 @@ ImgCmpCmd(clientData, interp, argc, argv)
 	    "\": must be cget or configure", (char *) NULL);
 	return TCL_ERROR;
     }
-    return TCL_OK;
+    /*return TCL_OK; allan: 27.8.01: stmt not reached */
 }
 
 /*----------------------------------------------------------------------
@@ -1325,7 +1358,7 @@ ImgCmpDelete(masterData)
     }
     masterPtr->tkMaster = NULL;
     if (masterPtr->imageCmd != NULL) {
-	char * cmd = Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
+	char * cmd = (char*)Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
 	masterPtr->imageCmd = NULL;
 	Tcl_DeleteCommand(masterPtr->interp, cmd);
     }
@@ -1438,7 +1471,7 @@ CmpEventProc(clientData, eventPtr)
 
     if (eventPtr->type == DestroyNotify) {
 	if (masterPtr->imageCmd != NULL) {
-	    cmd = Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
+	    cmd = (char*)Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
 	    masterPtr->imageCmd = NULL;
 	    Tcl_DeleteCommand(masterPtr->interp, cmd);
 	}

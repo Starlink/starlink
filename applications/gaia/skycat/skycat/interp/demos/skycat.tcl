@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# $Id: skycat.tcl,v 1.17 1998/12/29 20:19:44 abrighto Exp $ 
+# $Id: skycat.tcl,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $ 
 #
 # skycat.tcl - image display application with catalog support 
 #              (AstroCatalog classes)

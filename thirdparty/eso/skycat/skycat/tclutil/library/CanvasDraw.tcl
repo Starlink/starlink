@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasDraw.tcl,v 1.20 1998/11/20 14:20:14 abrighto Exp $"
+# "@(#) $Id: CanvasDraw.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # CanvasDraw.tcl - Add interactive drawing capabilities to a Tk canvas.
 #
@@ -1097,10 +1097,10 @@ itcl::class util::CanvasDraw {
 	    deselect_object $id
 	    return
 	}
-	set xm [expr $x0+($x1-$x0)/2]
-	set ym [expr $y0+($y1-$y0)/2]
+	set xm [expr {$x0+($x1-$x0)/2}]
+	set ym [expr {$y0+($y1-$y0)/2}]
 	
-	set w [expr $itk_option(-gripwidth)/2]
+	set w [expr {$itk_option(-gripwidth)/2}]
 	foreach i [list \
 		       "nw $x0 $y0" \
 		       "n $xm $y0" \
@@ -1112,8 +1112,8 @@ itcl::class util::CanvasDraw {
 		       "w $x0 $ym" ] {
 	    lassign $i side x y 
 	    $canvas_ coords grip.$id.$side \
-		[expr $x-$w] [expr $y-$w] \
-		[expr $x+$w] [expr $y+$w]
+		[expr {$x-$w}] [expr {$y-$w}] \
+		[expr {$x+$w}] [expr {$y+$w}]
 	}
     }
 
@@ -1122,16 +1122,16 @@ itcl::class util::CanvasDraw {
 
     public method adjust_line_selection {id} {
 	lassign [$canvas_ coords $id] x0 y0 x1 y1
-	set xm [expr $x0+($x1-$x0)/2]
-	set ym [expr $y0+($y1-$y0)/2]
-	set w [expr $itk_option(-gripwidth)/2]
+	set xm [expr {$x0+($x1-$x0)/2}]
+	set ym [expr {$y0+($y1-$y0)/2}]
+	set w [expr {$itk_option(-gripwidth)/2}]
 	foreach i [list \
 		       "e $x0 $y0" \
 		       "w $x1 $y1" ] {
 	    lassign $i side x y 
 	    $canvas_ coords grip.$id.$side \
-		[expr $x-$w] [expr $y-$w] \
-		[expr $x+$w] [expr $y+$w]
+		[expr {$x-$w}] [expr {$y-$w}] \
+		[expr {$x+$w}] [expr {$y+$w}]
 	}
     }
 
@@ -1213,7 +1213,7 @@ itcl::class util::CanvasDraw {
                 set posy_ 3
             }
             n  {
-                set startx_ [expr $x0+($x1-$x0)/2.]
+                set startx_ [expr {$x0+($x1-$x0)/2.}]
                 set starty_ $y1
                 set dragx_ 0
                 set dragy_ 1
@@ -1230,7 +1230,7 @@ itcl::class util::CanvasDraw {
             }
             e  {
                 set startx_ $x0
-                set starty_ [expr $y0+($y1-$y0)/2.]
+                set starty_ [expr {$y0+($y1-$y0)/2.}]
                 set dragx_ 1
                 set dragy_ 0
                 set posx_ 0
@@ -1245,7 +1245,7 @@ itcl::class util::CanvasDraw {
                 set posy_ 1
             }
             s  {
-                set startx_ [expr $x0+($x1-$x0)/2.]
+                set startx_ [expr {$x0+($x1-$x0)/2.}]
                 set starty_ $y0
                 set dragx_ 0
                 set dragy_ 1
@@ -1262,7 +1262,7 @@ itcl::class util::CanvasDraw {
             }
             w  {
                 set startx_ $x1
-                set starty_ [expr $y0+($y1-$y0)/2.]
+                set starty_ [expr {$y0+($y1-$y0)/2.}]
                 set dragx_ 1
                 set dragy_ 0
                 set posx_ 2
@@ -1290,22 +1290,22 @@ itcl::class util::CanvasDraw {
         set dx [set dy 1]
         if {$constrain && $dragx_ && $dragy_} {
             if {abs($startx_-$x) > abs($starty_-$y)} {
-                set x [expr $startx_+($y-$starty_)]
+                set x [expr {$startx_+($y-$starty_)}]
             } else {
-                set y [expr $starty_+($x-$startx_)]
+                set y [expr {$starty_+($x-$startx_)}]
             }
         }
 
         if {$dragx_} {
-            set d [expr $endx_-$startx_]
+            set d [expr {$endx_-$startx_}]
             if {$d != 0} {
-                set dx [expr ($x-$startx_)/$d]
+                set dx [expr {($x-$startx_)/$d}]
             }
         } 
         if {$dragy_} {
-            set d [expr $endy_-$starty_]
+            set d [expr {$endy_-$starty_}]
             if {$d != 0} {
-                set dy [expr ($y-$starty_)/$d]
+                set dy [expr {($y-$starty_)/$d}]
             }
         }
         if {$dx < 0 || $dy < 0} {
@@ -1322,14 +1322,14 @@ itcl::class util::CanvasDraw {
             set dx 0
             set endx_ $x
         } else {
-            set dx [expr $startx_ - [lindex $pos $posx_]]
+            set dx [expr {$startx_ - [lindex $pos $posx_]}]
             set endx_ [lindex $pos $posx2_]
         }
         if {$posy_ == -1} {
             set dy 0
             set endy_ $y
         } else {
-            set dy [expr $starty_ - [lindex $pos $posy_]]
+            set dy [expr {$starty_ - [lindex $pos $posy_]}]
             set endy_ [lindex $pos $posy2_]
         }
         $canvas_ move $id $dx $dy
@@ -1356,7 +1356,7 @@ itcl::class util::CanvasDraw {
     # return 1 if the given item has the given tag
 
     public method item_has_tag {item tag} {
-	return [expr [lsearch -exact [$canvas_ gettags $item] $tag] != -1]
+	return [expr {[lsearch -exact [$canvas_ gettags $item] $tag] != -1}]
     }
 
 
@@ -1385,18 +1385,18 @@ itcl::class util::CanvasDraw {
 	    select_object $id
 	    mark $x $y
 	}
-	set dx [expr $x-($startx_+$xoffset_)]
-	set dy [expr $y-($starty_+$yoffset_)]
-	set xoffset_ [expr $x-$startx_]
-	set yoffset_ [expr $y-$starty_]
+	set dx [expr {$x-($startx_+$xoffset_)}]
+	set dy [expr {$y-($starty_+$yoffset_)}]
+	set xoffset_ [expr {$x-$startx_}]
+	set yoffset_ [expr {$y-$starty_}]
 	
 	if {$itk_option(-clipping)} {
 	    # don't allow a move outside of drawing area
 	    lassign [$canvas_ bbox $w_.selected] x0 y0 x1 y1
-	    set dx0 [expr $x0_-$x0]
-	    set dy0 [expr $y0_-$y0]
-	    set dx1 [expr $x1_-$x1]
-	    set dy1 [expr $y1_-$y1]
+	    set dx0 [expr {$x0_-$x0}]
+	    set dy0 [expr {$y0_-$y0}]
+	    set dx1 [expr {$x1_-$x1}]
+	    set dy1 [expr {$y1_-$y1}]
 	    if {$dx < $dx0} {
 		set dx $dx0
 	    } elseif {$dx > $dx1} {
@@ -1613,9 +1613,9 @@ itcl::class util::CanvasDraw {
 	clip x y
 	if {$constrain} {
 	    if {abs($startx_-$x)>abs($starty_-$y)} {
-		set x [expr $startx_+($y-$starty_)]
+		set x [expr {$startx_+($y-$starty_)}]
 	    } else {
-		set y [expr $starty_+($x-$startx_)]
+		set y [expr {$starty_+($x-$startx_)}]
 	    }
 	}
 	$canvas_ coords $obj_id_ $startx_ $starty_ $x $y
@@ -1653,9 +1653,9 @@ itcl::class util::CanvasDraw {
 	clip x y
 	if {$constrain} {
 	    if {abs($startx_-$x)>abs($starty_-$y)} {
-		set x [expr $startx_+($y-$starty_)]
+		set x [expr {$startx_+($y-$starty_)}]
 	    } else {
-		set y [expr $starty_+($x-$startx_)]
+		set y [expr {$starty_+($x-$startx_)}]
 	    }
 	}
 	if {$itk_option(-withrotate)} {
@@ -1673,9 +1673,9 @@ itcl::class util::CanvasDraw {
 	clip x y
 	if {$constrain} {
 	    if {abs($startx_-$x)>abs($starty_-$y)} {
-		set x [expr $startx_+($y-$starty_)]
+		set x [expr {$startx_+($y-$starty_)}]
 	    } else {
-		set y [expr $starty_+($x-$startx_)]
+		set y [expr {$starty_+($x-$startx_)}]
 	    }
 	}
 	$canvas_ coords $obj_id_ \
@@ -1731,7 +1731,7 @@ itcl::class util::CanvasDraw {
 		set n [llength $coords]
 		set ncoords {}
 		for {set i 0} {$i < $n} {incr i 2} {
-		    lappend ncoords [lindex $coords [expr $i+1]] [lindex $coords $i]
+		    lappend ncoords [lindex $coords [expr {$i+1}]] [lindex $coords $i]
 		}
 		eval $canvas_ coords $id $ncoords
 	    }
@@ -1750,8 +1750,8 @@ itcl::class util::CanvasDraw {
 		set n [llength $coords]
 		set ncoords {}
 		for {set i 0} {$i < $n} {incr i 2} {
-		    lappend ncoords [expr $maxx-[lindex $coords $i]] \
-			    [lindex $coords [expr $i+1]] 
+		    lappend ncoords [expr {$maxx-[lindex $coords $i]}] \
+			[lindex $coords [expr {$i+1}]] 
 		}
 		eval $canvas_ coords $id $ncoords
 	    }
@@ -1770,7 +1770,7 @@ itcl::class util::CanvasDraw {
 		set n [llength $coords]
 		set ncoords {}
 		for {set i 0} {$i < $n} {incr i 2} {
-		    lappend ncoords [lindex $coords $i] [expr $maxy-[lindex $coords [expr $i+1]]] 
+		    lappend ncoords [lindex $coords $i] [expr {$maxy-[lindex $coords [expr {$i+1}]]}] 
 		}
 		eval $canvas_ coords $id $ncoords
 	    }
@@ -1786,8 +1786,8 @@ itcl::class util::CanvasDraw {
 
 	# get center of object
 	lassign [$canvas_ bbox $w_.selected] x0 y0 x1 y1
-	set rotate_cx_ [expr ($x1+$x0)/2.]
-	set rotate_cy_ [expr ($y1+$y0)/2.]
+	set rotate_cx_ [expr {($x1+$x0)/2.}]
+	set rotate_cy_ [expr {($y1+$y0)/2.}]
     }
 
 
@@ -1795,13 +1795,13 @@ itcl::class util::CanvasDraw {
     # (in radians) and return a list {x y} as the result.
 
      public method rotate_point {x y cx cy angle} {
-	set x [expr $x-$cx]
-	set y [expr $y-$cy]
+	 set x [expr {$x-$cx}]
+	 set y [expr {$y-$cy}]
 	set tmp $x
-	set cosa [expr cos($angle)]
-	set sina [expr sin($angle)]
-	set x [expr $x*$cosa+$y*$sina+$cx]
-	set y [expr -$tmp*$sina+$y*$cosa+$cy]
+	 set cosa [expr {cos($angle)}]
+	 set sina [expr {sin($angle)}]
+	 set x [expr {$x*$cosa+$y*$sina+$cx}]
+	 set y [expr {-$tmp*$sina+$y*$cosa+$cy}]
 	return "$x $y"
     }
         
@@ -1810,21 +1810,21 @@ itcl::class util::CanvasDraw {
 
     protected method update_rotate {id x y} {
         clip x y
-	set dx [expr $rotate_cx_-double($x+0.5)]
-	set dy [expr $rotate_cy_-double($y+0.5)]
-	set a [expr atan2($dx,$dy)]
+	set dx [expr {$rotate_cx_-double($x+0.5)}]
+	set dy [expr {$rotate_cy_-double($y+0.5)}]
+	set a [expr {atan2($dx,$dy)}]
 	if {"$rotate_angle_" == ""} {
 	    set rotate_angle_ $a
 	    return
 	}
-	set angle [expr $a-$rotate_angle_]
+	set angle [expr {$a-$rotate_angle_}]
 	set rotate_angle_ $a
 	set coords [$canvas_ coords $id]
 	set cmd [list $canvas_ coords $id]
 	set n [llength $coords]
 	for {set i 0} {$i<$n} {incr i 2} {
 	    set x [lindex $coords $i]
-	    set y [lindex $coords [expr $i+1]]
+	    set y [lindex $coords [expr {$i+1}]]
 	    append cmd " [rotate_point $x $y $rotate_cx_ $rotate_cy_ $angle]"
 	}
 	eval $cmd
@@ -1867,10 +1867,10 @@ itcl::class util::CanvasDraw {
 	    lassign $itk_option(-bbox) x0_ y0_ x1_ y1_
 	    # leave room for the selection grips, line width, etc
 	    set w $itk_option(-gripwidth)
-	    set x0_ [expr $x0_-$w]
-	    set y0_ [expr $y0_-$w]
-	    set x1_ [expr $x1_+$w]
-	    set y1_ [expr $y1_+$w]
+	    set x0_ [expr {$x0_-$w}]
+	    set y0_ [expr {$y0_-$w}]
+	    set x1_ [expr {$x1_+$w}]
+	    set y1_ [expr {$y1_+$w}]
 	}
     }
 
@@ -2125,5 +2125,5 @@ itcl::class util::CanvasDraw {
     protected common pi_ 3.14159265358979323846
 
     # const PI/180.
-    protected common rad_ [expr $pi_/180.]
+    protected common rad_ [expr {$pi_/180.}]
 }

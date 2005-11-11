@@ -18,7 +18,9 @@ static char SccsHistEqId[] = "%W%  %G%";
  *		{n} <who> -- <does what> -- <when>
  */
 
+#ifndef MAX
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 /* link describes a section of the histogram to have levels allocated */
 typedef struct histogramLink {
@@ -55,4 +57,4 @@ void histogram_equalize (
      int color_levels,		/* i: number of levels in color map */
      unsigned long *pixels);	/* i: map to hardware entries */
 
-#endif _histeq_h_
+#endif /* _histeq_h_ */

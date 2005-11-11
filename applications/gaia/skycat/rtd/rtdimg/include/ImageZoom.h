@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageZoom.h,v 1.2 1997/04/11 10:48:12 abrighto Exp $" 
+ * "@(#) $Id: ImageZoom.h,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ImageZoom.h - class definitions for RtdImage Zoom Window
  * 
@@ -37,7 +37,7 @@ protected:
 public:
     // constructor: initialize the zoom window
     ImageZoom(Tk_Window tkwin, GC copyGC, int width, int height, int factor,
-			   int usingXShm, int verbose);
+	      int usingXShm, int verbose);
     
     // destructor: clean up resources
     ~ImageZoom();

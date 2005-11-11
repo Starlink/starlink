@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageTrans.tcl,v 1.18 1998/10/28 17:42:30 abrighto Exp $"
+# "@(#) $Id: RtdImageTrans.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageTrans.tcl - itcl widget for scaling, rotating and flipping an RtdImage widget
 # 
@@ -47,12 +47,18 @@ itcl::class rtd::RtdImageTrans {
 	} {
 	    keep -state -background -foreground
 	}
-	pack $itk_component(choose) -side left -fill x -ipadx 1m -ipady 1m 
+	if { "$itk_option(-panel_orient)" == "vertical" } {
+	    pack $itk_component(choose) -side top -fill x -ipadx 0.5m -ipady 0.5m 
+	} else {
+	    pack $itk_component(choose) -side left -fill x -ipadx 0.5m -ipady 0.5m 
+	}
 	   
 	# help text displayed when mouse enters widget
 	add_short_help $w_ {Image Scale: {bitmap b1} = select the magnification of the image}
 
+	frame $w_.trans_frame
 	if {$itk_option(-show_Zz_buttons)} {
+
 	    # Tk button to zoom in
 	    itk_component add larger {
 		button $w_.larger \
@@ -69,14 +75,16 @@ itcl::class rtd::RtdImageTrans {
 	    } {
 		keep -state -background -foreground
 	    }
+
 	    pack $itk_component(larger) $itk_component(smaller) \
-		-side left -fill x -padx 1m -ipadx 0.5m -ipady 0.5m 
+		 -side left -fill x -padx 0.5m -ipadx 0.5m -ipady 0.5m -in $w_.trans_frame
 
 	    add_short_help $itk_component(larger)  {Zoom larger: {bitmap b1} = zoom in on the image}
 	    add_short_help $itk_component(smaller) {Zoom smaller: {bitmap b1} = zoom out on the image}
 	}
 
 	if {$itk_option(-show_trans)} {
+
 	    # Tk checkbutton to rotate (swap X/Y axis)
 	    itk_component add rotate {
 		checkbutton $w_.rotate \
@@ -110,8 +118,11 @@ itcl::class rtd::RtdImageTrans {
 	    } {
 		keep -state -background -foreground
 	    }
-	    pack $itk_component(rotate) $itk_component(flipx) $itk_component(flipy) \
-		-side left -fill x -padx 1m -ipadx 1m -ipady 1m 
+	    pack $itk_component(rotate) \
+		-side left -fill x -padx 1m -ipadx 1.5m -ipady 0.5m -in $w_.trans_frame
+
+	    pack $itk_component(flipx) $itk_component(flipy) \
+		-side left -fill x -padx 0.5m -ipadx 0.5m -ipady 0.5m -in $w_.trans_frame
 
 	    add_short_help $itk_component(rotate) \
 		{Rotate: {bitmap b1} = rotate the image by exchanging the X and Y axis}
@@ -121,8 +132,14 @@ itcl::class rtd::RtdImageTrans {
 		{Flip Y: {bitmap b1} = flip the image about the Y axis}
 	}
 	
+	if { "$itk_option(-panel_orient)" == "vertical" } {
+	    pack $w_.trans_frame -side top -fill x -pady 0.5m
+	} else {
+	    pack $w_.trans_frame -side left -fill x
+	}
+
 	for {set i $itk_option(-min_scale)} {$i<=-2} {incr i 1} {
-	    $m add -label "1/[expr -$i]x" -command "$itk_option(-image) scale $i $i"
+	    $m add -label "1/[expr {-$i}]x" -command "$itk_option(-image) scale $i $i"
 	}
 	for {set i 1} {$i<=$itk_option(-max_scale)} {incr i} {
 	    $m add -label "  ${i}x" -command "$itk_option(-image) scale $i $i"
@@ -167,7 +184,7 @@ itcl::class rtd::RtdImageTrans {
 	global ::$w_.mag
 	for {set i $itk_option(-min_scale)} {$i<=-2} {incr i 1} {
 	    $m add radiobutton \
-		-label "1/[expr -$i]x" \
+		-label "1/[expr {-$i}]x" \
 		-command "$itk_option(-image) scale $i $i" \
 		-variable $w_.mag
 	}
@@ -200,7 +217,7 @@ itcl::class rtd::RtdImageTrans {
 	if {$xs >= 0} {
 	    $itk_component(choose) config -value [set $w_.mag "  ${xs}x"]
 	} else {
-	    $itk_component(choose) config -value [set $w_.mag "1/[expr -$xs]x"]
+	    $itk_component(choose) config -value [set $w_.mag "1/[expr {-$xs}]x"]
 	}	
     }
 
@@ -249,6 +266,9 @@ itcl::class rtd::RtdImageTrans {
 
     # set the state to normal/disabled to enable/disable editing
     itk_option define -state state State {normal}
+
+    # Panel orient: one of {horizontal vertical} (default: horizontal)
+    itk_option define -panel_orient panel_orient Panel_orient {}
 
 
     # -- protected vars --

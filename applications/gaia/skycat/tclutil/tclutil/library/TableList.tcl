@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: TableList.tcl,v 1.8 1998/10/28 17:46:40 abrighto Exp $"
+# "@(#) $Id: TableList.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # TableList.tcl - A listbox based table widget
 #
@@ -144,7 +144,7 @@ itcl::class util::TableList {
 		error "Unknown column name: '$name'"
 	    }
 	    set col $ord_($name)
-	    lappend order_ [expr $num_cols_-1]
+	    lappend order_ [expr {$num_cols_-1}]
 
 	    set align [$itk_component(config_file) get_option $name Align]
 	    set show [$itk_component(config_file) get_option $name Show]
@@ -256,11 +256,11 @@ itcl::class util::TableList {
 	    set r [lindex $disp_info_ $i]
 	    $listbox_ delete $i
 	    set disp_info_ [lremove $disp_info_ $i]
-	    set j [expr $i+1]
+	    set j [expr {$i+1}]
 	    $listbox_ insert $j $s
 	    set disp_info_ [linsert $disp_info_ $j $r] 
 	}
-	select_rows [expr [lindex $list 0]+1] [expr [lindex $rlist 0]+1]
+	select_rows [expr {[lindex $list 0]+1}] [expr {[lindex $rlist 0]+1}]
     }
 
     
@@ -277,11 +277,11 @@ itcl::class util::TableList {
 	    set r [lindex $disp_info_ $i]
 	    $listbox_ delete $i
 	    set disp_info_ [lremove $disp_info_ $i]
-	    set j [expr $i-1]
+	    set j [expr {$i-1}]
 	    $listbox_ insert $j $s
 	    set disp_info_ [linsert $disp_info_ $j $r] 
 	}
-	select_rows [expr [lindex $list 0]-1] [expr $i-1]
+	select_rows [expr {[lindex $list 0]-1}] [expr {$i-1}]
     }
 
 

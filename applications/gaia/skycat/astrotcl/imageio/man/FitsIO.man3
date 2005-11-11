@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: FitsIO.man3,v 1.5 1998/11/27 13:41:21 abrighto Exp $" 
+# "@(#) $Id: FitsIO.man3,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -26,7 +26,7 @@ public:
     ~FitsIO();
 
     int wcsinit();
-    int nativeByteOrder() const;
+    int usingNetBO() const;
     const char* classname() const;
 
     static FitsIO* read(const char* filename, int memOptions = 0);

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsSkySearch.h,v 1.1 1998/04/02 21:16:54 abrighto Exp $
+ * $Id: TcsSkySearch.h,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
  *
  * TcsSkySearch.h - C++ class to extend the "tcscat" Tcl command
  *                 (class TclTcsCat) with the image plotting capabilities

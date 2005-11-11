@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageZoom.C,v 1.4 1997/04/11 10:50:12 abrighto Exp $"
+ * "@(#) $Id: ImageZoom.C,v 1.4 2005/02/02 01:43:03 brighton Exp $"
  *
  * ImageZoom.C - member routines for class ImageZoom,
  *               implementation of Zoom window for RtdImage
@@ -11,14 +11,14 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  */
-static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.4 1997/04/11 10:50:12 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.4 2005/02/02 01:43:03 brighton Exp $";
 
 
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "define.h"
@@ -47,13 +47,13 @@ static const char* const rcsId="@(#) $Id: ImageZoom.C,v 1.4 1997/04/11 10:50:12 
  */
 ImageZoom::ImageZoom(Tk_Window tkwin, GC gc, int width, int height, 
 		     int zoomFactor, int usingXShm, int verbose)
-: tkwin_(tkwin),
-  gc_(gc),
-  width_(width),
-  height_(height),
-  zoomFactor_(zoomFactor),
-  zoomStep_(width/zoomFactor),
-  status_(TCL_OK)
+    : tkwin_(tkwin),
+      gc_(gc),
+      width_(width),
+      height_(height),
+      zoomFactor_(zoomFactor),
+      zoomStep_(width/zoomFactor),
+      status_(TCL_OK)
 {
     // make a graphics context using XOR to draw a box marking the pointer hotspot
     XGCValues gcValues;
@@ -61,8 +61,8 @@ ImageZoom::ImageZoom(Tk_Window tkwin, GC gc, int width, int height,
     gcValues.graphics_exposures = False;
     Tk_MakeWindowExist(tkwin_);
     rect_gc_ = XCreateGC(Tk_Display(tkwin_), Tk_WindowId(tkwin_),
-			GCFunction|GCGraphicsExposures, 
-			&gcValues);
+			 GCFunction|GCGraphicsExposures, 
+			 &gcValues);
     // create a class object to manage the XImage
     xImage_ = new ImageDisplay(Tk_Display(tkwin_), Tk_Visual(tkwin_), gc, 
 			       Tk_Depth(tkwin_), usingXShm, verbose);

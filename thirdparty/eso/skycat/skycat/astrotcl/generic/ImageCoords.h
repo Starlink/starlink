@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: ImageCoords.h,v 1.2 1998/01/15 22:08:05 abrighto Exp $
+ * $Id: ImageCoords.h,v 1.5 2005/02/02 01:43:04 brighton Exp $
  *
  * ImageCoords.h - class representing image coordinates (x, y)
  *                 (see also class WorldCoords)
@@ -12,11 +12,13 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 97  Created
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
-#include <stdio.h>
-#include <iostream.h>
-#include <math.h>
+using namespace std;
+#include <cstdio>
+#include <iostream>
+#include <cmath>
 
 const double IMAGE_COORD_NULL = HUGE_VAL;	// null value for a double
 

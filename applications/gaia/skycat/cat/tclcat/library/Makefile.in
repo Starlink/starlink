@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.9 1998/10/28 17:37:22 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # Makefile.in
 #
@@ -16,7 +16,7 @@ CAT_DIR      = @CAT_DIR@
 RM           = rm -f
 SHELL        = /bin/sh
 FILES        = *.tcl tclIndex
-ITCL_VERSION = @ITCL_VERSION@
+TCL_VERSION  = @TCL_VERSION@
 TCLUTIL_DIR  = @TCLUTIL_DIR@
 srcdir	     = @srcdir@
 LIBDIR       = @LIBDIR@
@@ -31,7 +31,6 @@ All:
 install-top:
 	test -d $(LIBDIR) || mkdir $(LIBDIR) 
 	test -d $(CAT_DIR) || mkdir $(CAT_DIR) 
-	(cd $(CAT_DIR); rm -rf library; ln -s . library)
 
 install-files: install-top
 	@set -x; for i in $(srcdir)/$(FILES) ; do \
@@ -44,8 +43,8 @@ install: install-files
 clean:
 	$(RM) *\~ "#"*
 
-index tclIndex:
-	itclsh$(ITCL_VERSION) ./mkIndex.tcl
+index tclIndex: FORCE
+	tclsh$(TCL_VERSION) ./mkIndex.tcl
 
 depend:
 
@@ -63,3 +62,6 @@ cleandoc:
 	rm -f ../man/[A-Z]*.mann
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

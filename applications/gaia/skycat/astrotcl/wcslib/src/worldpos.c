@@ -1,6 +1,6 @@
 /*  worldpos.c -- WCS Algorithms from Classic AIPS.
- *  September 30, 1998
- *  Copyright (C) 1994
+ *  October 21, 1999
+ *  Copyright (C) 1994-1999
  *  Associated Universities, Inc. Washington DC, USA.
  *  With code added by Doug Mink, Smithsonian Astrophysical Observatory
  *                 and Allan Brighton and Andreas Wicenec, ESO
@@ -83,8 +83,8 @@
     7) D.Mink changed input to data structure and implemented rotation matrix.
 */
 #include <math.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "wcs.h"
 
 int
@@ -383,7 +383,7 @@ double	*xpix;		/* x pixel number  (RA or long without rotation) */
 double	*ypix;		/* y pixel number  (dec or lat without rotation) */
 {
   double dx, dy, ra0, dec0, ra, dec, coss, sins, dt, da, dd, sint;
-  double l, m, geo1, geo2, geo3, sinr, cosr, tx, x, y, a2, a3, a4;
+  double l, m, geo1, geo2, geo3, sinr, cosr, tx, x, a2, a3, a4;
   double rthea,gamby2,a,b,c,phi,an,rap,v,tthea,co1,co2,co3,co4,ansq; /* COE */
   double cond2r=1.745329252e-2, deps=1.0e-5, twopi=6.28318530717959;
 
@@ -649,4 +649,6 @@ double	*ypix;		/* y pixel number  (dec or lat without rotation) */
  * Jun 25 1998	Fix inverse for CAR projection
  * Aug  5 1998	Allan Brighton: Added COE projection (code from A. Wicenec, ESO)
  * Sep 30 1998	Fix bug in COE inverse code to get sign correct
+ *
+ * Oct 21 1999	Drop unused y from worldpix()
  */

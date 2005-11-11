@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.1 1997/11/28 01:31:27 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $"
 #
 # Component level Makefile
 
@@ -12,3 +12,6 @@ distclean: clean
 	rm -f Makefile */.objs
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

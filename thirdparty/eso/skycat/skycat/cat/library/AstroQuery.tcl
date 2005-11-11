@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroQuery.tcl,v 1.17 1999/03/11 20:59:31 abrighto Exp $
+# @(#) $Id: AstroQuery.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # AstroQuery.tcl - widget for searching astronomical catalogs.
 #
@@ -276,7 +276,7 @@ itcl::class cat::AstroQuery {
 
     protected method add_copyright {} {
 	set s [$astrocat copyright]
-	if {"$s" != ""} {
+	if {"$s" != "" && [winfo exists $search_opts_]} {
 	    blt::table $search_opts_ \
 		[LabelValue $search_opts_.copyright \
 		     -anchor w -relief flat \

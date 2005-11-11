@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ShellCommand.h,v 1.1 1997/11/28 01:38:53 abrighto Exp $" 
+ * "@(#) $Id: ShellCommand.h,v 1.2 2005/02/02 01:43:01 brighton Exp $" 
  *
  * ShellCommand.h - class to exec a shell command and save the status,
  *                  stdout and stderr

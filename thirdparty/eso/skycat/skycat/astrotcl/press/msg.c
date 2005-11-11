@@ -36,6 +36,7 @@
 ************************************************************************
 -*/
 
+#include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #ifdef VMS
@@ -219,14 +220,16 @@ int		num_msgs;
 ************************************************************************
 -*/
 
-void	msg_format( buffer, prefix, num_msgs, msgs, status, args )
-char	*buffer;
-char	*prefix;
-int	num_msgs;
-MSG	*msgs;
-int	status;
-va_list	args;
+void	msg_format(char	*buffer,
+		   char	*prefix,
+		   int	num_msgs,
+		   MSG	*msgs,
+		   int	status,
+		   ...) /* XXX allan: 12.11.03: changed from vararg to stdarg */
 {
+    void	msg_append();
+    static char	*msg_find();
+
     char	*errno_arg;
     char	*format;
     int		i;
@@ -235,6 +238,9 @@ va_list	args;
     char	*t2;
     char	temp_buffer1[MSG_MAX_LEN];
     char	temp_buffer2[MSG_MAX_LEN];
+
+    va_list	args;
+    va_start( args, status ); 
 
     if ( status == MSG_ERRNO )
     {
@@ -271,7 +277,7 @@ va_list	args;
 	    errno = 0;
 	}
 
-#endif VMS
+#endif /* VMS */
 
     }
     else

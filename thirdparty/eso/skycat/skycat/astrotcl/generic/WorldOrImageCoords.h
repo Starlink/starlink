@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: WorldOrImageCoords.h,v 1.1 1997/11/28 01:32:54 abrighto Exp $
+ * $Id: WorldOrImageCoords.h,v 1.3 2005/02/02 01:43:04 brighton Exp $
  *
  * WorldOrImageCoords.h - class representing either world (ra, dec, equinox)
  *                        or image (x, y) coordinates
@@ -15,7 +15,7 @@
  * Allan Brighton  26 Sep 97  Created
  */
 
-#include "WorldCoords.hxx"
+#include "WorldCoords.h"
 #include "ImageCoords.h"
 
 /*
@@ -58,7 +58,7 @@ public:
 	return os;
     }
 
-    // print coords to the given buffer
+    // print coords to the given buffer in the given equinox 
     void print(char* x_buf, char* y_buf, double equinox = 2000., int hmsFlag=1) {
 	if (isWcs_) 
 	    wc_.print(x_buf, y_buf, equinox, hmsFlag);
@@ -66,10 +66,26 @@ public:
 	    ic_.print(x_buf, y_buf);
     }
     
-    // print coords to the given stream
+    // print coords to the given buffer in the given equinox (or system, such as "GALACTIC", "ECLIPTIC")
+    void print(char* x_buf, char* y_buf, const char* equinoxStr, int hmsFlag=1) {
+	if (isWcs_) 
+	    wc_.print(x_buf, y_buf, equinoxStr, hmsFlag);
+	else
+	    ic_.print(x_buf, y_buf);
+    }
+    
+    // print coords to the given stream in the given equinox 
     void print(ostream& os, double equinox = 2000.) {
 	if (isWcs_) 
 	    wc_.print(os, equinox);
+	else
+	    ic_.print(os);
+    }
+
+    // print coords to the given stream in the given equinox (or system, such as "GALACTIC", "ECLIPTIC")
+    void print(ostream& os, const char* equinoxStr) {
+	if (isWcs_) 
+	    wc_.print(os, equinoxStr);
 	else
 	    ic_.print(os);
     }

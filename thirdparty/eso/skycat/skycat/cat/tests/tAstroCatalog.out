@@ -4,8 +4,8 @@ QueryResult
 serv_type: catalog
 long_name: Guide Star Catalog at ESO
 short_name: gsc@eso
-url: http://archive.eso.org/skycat/servers/gsc-server?%ra%dec&obj=%id&r=%r1,%r2&m=%m1,%m2&n=%n&f=8&s=R&F=*
-symbol: {mag gsc_id} {plus yellow 1 0 {$gsc_id} {}} {10 {}}
+url: http://archive.eso.org/skycat/servers/gsc-server?%ra%dec&r=%r1,%r2&%cond&n=%n&f=8&s=R&F=*
+symbol: mag {square {} {} {} {}} {{(25-$mag)/3600.} {deg 2000}}
 search_cols: mag {Brightest (min)} {Faintest (max)}
 # End config entry
 

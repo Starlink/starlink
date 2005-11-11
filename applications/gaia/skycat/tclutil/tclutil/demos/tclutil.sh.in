@@ -2,90 +2,37 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: tclutil.sh.in,v 1.5 1998/07/28 21:24:16 abrighto Exp $" 
+# "@(#) $Id: tclutil.sh.in,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
-# This script is used to start Tcl/Tk applications.
-#
-# To install a Tcl/Tk script, make a soft link to this file
-# in the same directory. This script will determine
-# the name of the Tcl source file to load based on the name
-# of the link and the environment variables.
+# This script is used by the Makefile to create a startup script
+# for Tcl/Tk applications.
 #
 #  who      when     what
 # -------- -------- ------------------
 # abrighto 11/10/95 created 
-# pbiereic 20/01/97 TCL_LIBRARY, TK_LIBRARY, BLT_LIBRARY
-
-# set basic shared library runtime search path (see also below)
-@LD_VARNAME@="@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:@XLIBDIR@:${@LD_VARNAME@}"
+# abrighto 26/11/97 modified to use astrotcl and tclutil pkgs
+# pbiereic 05/08/99 to be used with the appended tcl file (see Makefile)
 
 # when running from the source dir, set different env for local test
 test -f ../demos/tclutil_env.sh && . ../demos/tclutil_env.sh
 
-# During development, set TCLUTIL_LIBRARY to your local tclutil/library
-# directory, otherwise the tcl/tk scripts are taken from the installed
-# versions
-if [ -z "$TCLUTIL_LIBRARY" ]
-then
-  # use the installed Tcl/Tk files and shared library
-  TCLUTIL_LIBRARY=@TCLUTIL_LIBRARY@; export TCLUTIL_LIBRARY
-else
-  # use the local development Tcl/Tk files and shared library
-  @LD_VARNAME@="$TCLUTIL_LIBRARY/../..:${@LD_VARNAME@}"
-fi
+# During development, set TCLUTIL_LIBRARY to your local library path 
+# (see demos/tclutil_env.sh), otherwise the tcl/tk scripts are taken
+# from the installed versions
 
-# SunOS, Solaris, Linux use @LD_VARNAME@,
-# HP uses SHLIB_PATH to search for shared libs
-export @LD_VARNAME@
-
-# name of program to run
-prog=`basename $0`
+# get absolute path from which this script was started from
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
 
 # wish binary to use
-WISH=$TCLUTIL_LIBRARY/../bin/tclutil_wish
-test -f $WISH || WISH=$TCLUTIL_LIBRARY/../../bin/tclutil_wish
-
-# set environment variables for packages
-if [ -d "@TCL_LIBRARY@" ]
-then
-  TCL_LIBRARY=@TCL_LIBRARY@
-  export TCL_LIBRARY
-fi
- 
-if [ -d "@TK_LIBRARY@" ]
-then
-  TK_LIBRARY=@TK_LIBRARY@
-  export TK_LIBRARY
-fi
- 
-if [ -d "@BLT_LIBRARY@" ]
-then
-  BLT_LIBRARY=@BLT_LIBRARY@
-  export BLT_LIBRARY
+if [ -z "$TCLUTIL_LIBRARY" ] ; then
+   WISH=tclutil_wish; L=`dirname $XP`; TCLUTIL_LIBRARY="$L/lib/tclutil" ; export TCLUTIL_LIBRARY
+   else WISH=$TCLUTIL_LIBRARY/../bin/tclutil_wish
 fi
 
-if [ -x @BINDIR@/@XGRABSCBIN@ ]
-then
-  XGRABSCBIN=@BINDIR@/@XGRABSCBIN@
-  export XGRABSCBIN
-elif [ -x $TCLUTIL_LIBRARY/../../@XGRABSCDIR@/@XGRABSCBIN@ ]
-then
-  XGRABSCBIN=$TCLUTIL_LIBRARY/../../@XGRABSCDIR@/@XGRABSCBIN@
-  export XGRABSCBIN
-fi
+# append basic shared library runtime search path to @LD_VARNAME@ (only for users
+# who have not set it properly)
+@LD_VARNAME@="${@LD_VARNAME@}:@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:@XLIBDIR@"
 
-# start an interactive shell
-if [ "$prog" = "tclutil.sh" ]
-then exec $WISH "$@"
-fi
+# start the application 
+exec $WISH "$0" ${1+"$@"}
 
-# determine which tcl file to start
-file=$TCLUTIL_LIBRARY/demos/$prog.tcl
-
-# be careful about passing arguments with embedded spaces
-if [ "$#" = "0" ]
-then
-  exec $WISH $file
-fi
-
-exec $WISH $file "$@"

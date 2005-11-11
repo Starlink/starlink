@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: bitmaps.tcl,v 1.4 1998/03/02 20:29:41 abrighto Exp $"
+# "@(#) $Id: bitmaps.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # script to generate C code declaring X bitmaps so that the (binary) application
 # doesn't have to be delivered with the bitmap files.
@@ -14,7 +14,7 @@
 puts {
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: bitmaps.tcl,v 1.4 1998/03/02 20:29:41 abrighto Exp $"
+ * "@(#) $Id: bitmaps.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
  *
  * Bitmap definitions for Tk
  *

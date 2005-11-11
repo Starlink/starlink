@@ -1,7 +1,7 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: Makefile.in,v 1.2 1998/07/16 16:27:54 abrighto Exp $" 
-# $Id: Makefile.in,v 1.2 1998/07/16 16:27:54 abrighto Exp $
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:01 brighton Exp $" 
+# $Id: Makefile.in,v 1.2 2005/02/02 01:43:01 brighton Exp $
 #
 # ------------------------------------------------------------------------
 # 	Makefile for include dir
@@ -17,4 +17,5 @@ INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@
 SHELL    	= /bin/sh
 
+include @SRC_ROOT@/makefile.mk
 include ../../include.mk

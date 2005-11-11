@@ -4,5 +4,5 @@ b main
 set env RTD_LIBRARY ../library
 set env ASTROTCL_LIBRARY ../../../astrotcl/astrotcl/library
 set env TCLUTIL_LIBRARY ../../../tclutil/tclutil/library
-r rtd.tcl -debug 1 
+r rtd.tcl -debug 1 test.fits
 

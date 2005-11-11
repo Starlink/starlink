@@ -43,17 +43,19 @@ typedef struct rtdShm {
 extern "C" {
 #endif
 
-int rtdShmCreate(int num, rtdShm *shmPtr, int width, int height, int type);
-int rtdShmFill(int index, char *data, rtdShm *shmPtr, int verbose);
-int rtdShmFillFirst(char *data, rtdShm *shmPtr);
-int rtdShmFillNext(int index, char *data, rtdShm *shmPtr);
-int rtdShmStruct(int index, rtdIMAGE_INFO *imageInfo, rtdShm *shmPtr);
-int rtdShmDelete(rtdShm *shmPtr);
-int rtdShmLocked(rtdShm *shmPtr, int index);
-
-void rtdShmServicePacket(rtdIMAGE_INFO *imageInfo);
-void rtdSemDecrement(int semId, int semNum);
-void rtdSemReset(int semId, int semNum);
+    int  rtdShmCreate	(int num, rtdShm *shmPtr, int width, int height, int type);
+    int  rtdShmFill	(int index, char *data, rtdShm *shmPtr, int verbose);
+    int  rtdShmFillFirst	(char *data, rtdShm *shmPtr);
+    int  rtdShmFillNext	(int index, char *data, rtdShm *shmPtr);
+    int  rtdShmStruct	(int index, rtdIMAGE_INFO *imageInfo, rtdShm *shmPtr);
+    int  rtdShmDelete	(rtdShm *shmPtr);
+    int  rtdShmLocked	(rtdShm *shmPtr, int index);
+    int  rtdSemGetVal	(int semId, int semNum);
+    int  rtdSemIncrement	(int semId, int semNum, int increment);
+    void rtdSemDecrement	(int semId, int semNum);
+    void rtdSemReset	(int semId, int semNum);
+    int  rtdSemGetVal	(int semId, int semNum);
+    void rtdShmServicePacket(rtdIMAGE_INFO *imageInfo);
 
 #ifdef __cplusplus
 }

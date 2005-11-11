@@ -1,7 +1,7 @@
 # list.tcl - list utility routines for tcl
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
-# "@(#) $Id: list.tcl,v 1.1 1997/11/28 01:38:00 abrighto Exp $"
+# "@(#) $Id: list.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 
 
 
@@ -36,7 +36,7 @@ proc lremove_item {list item} {
 # Remove the given element from the list and return the new list
 
 proc lremove {list i} {
-    return "[lrange $list 0 [expr $i-1]] [lrange $list [expr $i+1] end]"
+    return "[lrange $list 0 [expr {$i-1}]] [lrange $list [expr {$i+1}] end]"
 }
 
 

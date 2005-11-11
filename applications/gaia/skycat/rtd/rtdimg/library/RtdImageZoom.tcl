@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageZoom.tcl,v 1.11 1998/10/28 17:42:30 abrighto Exp $"
+# "@(#) $Id: RtdImageZoom.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageZoom.tcl - itcl widget managing the RtdImage zoom window
 # 
@@ -125,7 +125,7 @@ itcl::class rtd::RtdImageZoom {
 	{Image Zoom: magnified section of image. {bitmap b1} = toggle on/off}
 
     # X shared memory option
-    itk_option define -usexshm usexshm Usexshm 1
+    itk_option define -usexshm useXshm UseXshm 1
 
     # X synchronisation option
     itk_option define -usexsync useXsync UseXsync 1

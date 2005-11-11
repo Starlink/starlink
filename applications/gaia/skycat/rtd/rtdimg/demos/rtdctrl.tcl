@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: rtdctrl.tcl,v 1.5 1998/10/28 17:41:16 abrighto Exp $" 
+# "@(#) $Id: rtdctrl.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # Start the rtd image server as a standalone program
 #

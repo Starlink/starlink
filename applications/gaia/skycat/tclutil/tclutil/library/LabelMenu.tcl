@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelMenu.tcl,v 1.8 1998/10/28 17:46:39 abrighto Exp $"
+# "@(#) $Id: LabelMenu.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # LabelMenu.tcl - Itcl widget for displaying a label and a menubutton 
 #

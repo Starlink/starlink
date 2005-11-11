@@ -1,5 +1,5 @@
 /*** File libwcs/wcsinit.c
- *** September 29, 1998
+ *** May 9, 2000
  *** By Doug Mink, Harvard-Smithsonian Center for Astrophysics
 
  * Module:	wcsinit.c (World Coordinate Systems)
@@ -8,7 +8,7 @@
  * Subroutine:	wcsninit (hstring,lh) sets a WCS structure from an image header
  * Subroutine:	wcseq (hstring, wcs) set radecsys and equinox from image header
 
- * Copyright:   1998 Smithsonian Astrophysical Observatory
+ * Copyright:   2000 Smithsonian Astrophysical Observatory
  *              You may do anything you like with this file except remove
  *              this copyright.  The Smithsonian Astrophysical Observatory
  *              makes no representations about the suitability of this
@@ -17,8 +17,8 @@
 
  */
 
-#include <string.h>		/* strstr, NULL */
 #include <stdio.h>		/* stderr */
+#include <string.h>		/* strstr, NULL */
 #include <math.h>
 #include "wcs.h"
 #include "fitshead.h"
@@ -29,6 +29,7 @@
 static void wcseq();
 void wcsrotset();
 char wcserrmsg[80];
+extern int dsspos();
 
 /* set up a WCS structure from a FITS image header lhstring bytes long */
 
@@ -52,28 +53,20 @@ char *hstring;	/* character string containing FITS header information
 		   in the format <keyword>= <value> [/ <comment>] */
 {
     struct WorldCoor *wcs;
-    char wcstemp[32];
-    char envar[16];
     char ctype1[32], ctype2[32];
     char *hcoeff;		/* pointer to first coeff's in header */
     char decsign;
     double rah,ram,ras, dsign,decd,decm,decs;
-    double dec_deg,ra_hours, secpix, ra0, ra1, dec0, dec1, radiff;
+    double dec_deg,ra_hours, secpix, ra0, ra1, dec0, dec1;
     double cdelt1, cdelt2, cd[4], pc[16];
     char keyword[16];
-    int ieq, i, j, naxes;
+    int ieq, i, naxes;
     /* int ix1, ix2, iy1, iy2, idx1, idx2, idy1, idy2;
     double dxrefpix, dyrefpix;
     char temp[48];
     char *ic; */
-    char *str;
-    double *pci;
     double mjd;
     double rot;
-    double cra, cdec, xc, yc, xn, yn, xe, ye;
-    double s, srot, crot, sdelt;
-    int off;
-    extern int matinv();
     extern int tnxinit();
     extern int platepos();
 
@@ -90,20 +83,34 @@ char *hstring;	/* character string containing FITS header information
 
     /* Initialize to no CD matrix */
     cdelt1 = 0.0;
+    cdelt2 = 0.0;
     cd[0] = 0.0;
     pc[0] = 0.0;
     wcs->rotmat = 0;
     wcs->rot = 0.0;
 
     /* Header parameters independent of projection */
+    naxes = 0;
     hgeti4 (hstring, "NAXIS", &naxes);
+    if (naxes < 1) {
+	setwcserr ("WCSINIT: No NAXIS keyword");
+	wcsfree (wcs);
+	return (NULL);
+	}
     wcs->naxes = naxes;
     wcs->lin.naxis = naxes;
+    wcs->nxpix = 0;
     hgetr8 (hstring, "NAXIS1", &wcs->nxpix);
+    if (wcs->nxpix < 1) {
+	setwcserr ("WCSINIT: No NAXIS1 keyword");
+	wcsfree (wcs);
+	return (NULL);
+	}
+    wcs->nypix = 0;
     hgetr8 (hstring, "NAXIS2", &wcs->nypix);
     hgets (hstring, "INSTRUME", 16, wcs->instrument);
     hgeti4 (hstring, "DETECTOR", &wcs->detector);
-    wcs->oldwcs = getdefwcs();
+    wcs->wcsproj = getdefwcs();
     for (i = 0; i < 16; i++) wcs->pc[i] = 0.0;
     for (i = 0; i < naxes; i++) wcs->pc[(i*naxes)+i] = 1.0;
 
@@ -112,9 +119,8 @@ char *hstring;	/* character string containing FITS header information
 
 	/* Read second coordinate type */
 	if (!hgets (hstring,"CTYPE2", 16, ctype2)) {
-	    (void)sprintf (wcserrmsg,"WCSINIT: No CTYPE2 -> no WCS\n");
-	    setwcserr (wcserrmsg);
-	    free (wcs);
+	    setwcserr ("WCSINIT: No CTYPE2 -> no WCS");
+	    wcsfree (wcs);
 	    return (NULL);
 	    }
 
@@ -128,7 +134,7 @@ char *hstring;	/* character string containing FITS header information
 
 	/* Set projection type in WCS data structure */
 	if (wcstype (wcs, ctype1, ctype2)) {
-	    free (wcs);
+	    wcsfree (wcs);
 	    return (NULL);
 	    }
 
@@ -181,10 +187,19 @@ char *hstring;	/* character string containing FITS header information
 	wcs->lin.cdelt = wcs->cdelt;
 	wcs->lin.pc = wcs->pc;
 
+	/* Projection constants */
+	wcs->prj.r0 = 0.0;
+	hgetr8 (hstring, "PROJR0", &wcs->prj.r0);
+	for (i = 1; i < 10; i++) {
+	    wcs->prj.p[i] = 0.0;
+	    sprintf (keyword,"PROJP%d",i);
+	    hgetr8 (hstring, keyword, &wcs->prj.p[i]);
+	    }
+
 	/* Use polynomial fit instead of projection, if present */
 	wcs->ncoeff1 = 0;
 	wcs->ncoeff2 = 0;
-	if (!wcs->oldwcs && (hcoeff = ksearch (hstring,"CO1_1")) != NULL) {
+	if (wcs->wcsproj != WCS_OLD && (hcoeff = ksearch (hstring,"CO1_1")) != NULL) {
 	    wcs->prjcode = WCS_PLT;
 	    (void)strcpy (wcs->ptype, "PLATE");
 	    for (i = 0; i < 20; i++) {
@@ -222,6 +237,17 @@ char *hstring;	/* character string containing FITS header information
 		      wcs->crpix[1]+cos(rot), wcs, &ra1, &dec1);
 	    wcs->cdelt[1] = wcsdist (ra0, dec0, ra1, dec1);
 	    wcs->yinc = wcs->cdelt[1];
+
+	    /* Set CD matrix from header */
+	    wcs->cd[0] = 0.;
+	    hgetr8 (hstring,"CD1_1",&wcs->cd[0]);
+	    wcs->cd[1] = 0.;
+	    hgetr8 (hstring,"CD1_2",&wcs->cd[1]);
+	    wcs->cd[2] = 0.;
+	    hgetr8 (hstring,"CD2_1",&wcs->cd[2]);
+	    wcs->cd[3] = wcs->cd[0];
+	    hgetr8 (hstring,"CD2_2",&wcs->cd[3]);
+	    (void) matinv (2, wcs->cd, wcs->dc);
 	    }
 
 	/* Else use CD matrix, if present */
@@ -238,8 +264,49 @@ char *hstring;	/* character string containing FITS header information
 
 	/* Else get scaling from CDELT1 and CDELT2 */
 	else if (hgetr8 (hstring,"CDELT1",&cdelt1) != 0) {
-	    cdelt2 = cdelt1;
 	    hgetr8 (hstring,"CDELT2",&cdelt2);
+
+	    /* If CDELT1 or CDELT2 is 0 or missing */
+	    if (cdelt1 == 0.0 || (wcs->nypix > 1 && cdelt2 == 0.0)) {
+		if (ksearch (hstring,"SECPIX") != NULL ||
+		    ksearch (hstring,"PIXSCALE") != NULL ||
+		    ksearch (hstring,"PIXSCAL1") != NULL ||
+		    ksearch (hstring,"SECPIX1") != NULL) {
+		    secpix = 0.0;
+		    hgetr8 (hstring,"SECPIX",&secpix);
+		    if (secpix == 0.0)
+			hgetr8 (hstring,"PIXSCALE",&secpix);
+		    if (secpix == 0.0) {
+			hgetr8 (hstring,"SECPIX1",&secpix);
+			if (secpix != 0.0) {
+			    if (cdelt1 == 0.0)
+				cdelt1 = -secpix / 3600.0;
+			    if (cdelt2 == 0.0) {
+				hgetr8 (hstring,"SECPIX2",&secpix);
+				cdelt2 = secpix / 3600.0;
+				}
+			    }
+			else {
+			    if (cdelt1 == 0.0) {
+				hgetr8 (hstring,"PIXSCAL1",&secpix);
+				cdelt1 = -secpix / 3600.0;
+				}
+			    if (cdelt2 == 0.0) {
+				hgetr8 (hstring,"PIXSCAL2",&secpix);
+				cdelt2 = secpix / 3600.0;
+				}
+			    }
+			}
+		    else {
+			if (cdelt1 == 0.0)
+			    cdelt1 = -secpix / 3600.0;
+			if (cdelt2 == 0.0)
+			    cdelt2 = secpix / 3600.0;
+			}
+		    }
+		}
+	    if (cdelt2 == 0.0 && wcs->nypix > 1)
+		cdelt2 = -cdelt1;
 	    wcs->cdelt[2] = 1.0;
 	    wcs->cdelt[3] = 1.0;
 
@@ -304,8 +371,7 @@ char *hstring;	/* character string containing FITS header information
 	    wcs->cdelt[1] = 1.0;
 	    wcs->rot = 0.0;
 	    wcs->rotmat = 0;
-	    (void)sprintf (wcserrmsg,"WCSINIT: setting CDELT to 1\n");
-	    setwcserr (wcserrmsg);
+	    setwcserr ("WCSINIT: setting CDELT to 1");
 	    }
 
 	/* Initialize TNX, defaulting to TAN if there is a problem */
@@ -383,7 +449,6 @@ char *hstring;	/* character string containing FITS header information
 	    hgetr8 (hcoeff, keyword, &wcs->y_coeff[i]);
 	    }
 	wcs->wcson = 1;
-	wcs->wcson = 1;
 	(void)strcpy (wcs->c1type, "RA");
 	(void)strcpy (wcs->c2type, "DEC");
 	(void)strcpy (wcs->ptype, "DSS");
@@ -411,24 +476,29 @@ char *hstring;	/* character string containing FITS header information
 	/* Compute image rotation angle */
 	wcs->wcson = 1;
 	wcsrotset (wcs);
+	rot = degrad (wcs->rot);
 
 	/* Compute image scale at center */
 	dsspos (wcs->crpix[0]+cos(rot),
 		wcs->crpix[1]+sin(rot), wcs, &ra1, &dec1);
 	wcs->cdelt[0] = -wcsdist (ra0, dec0, ra1, dec1);
-	wcs->xinc = wcs->cdelt[0];
 	dsspos (wcs->crpix[0]+sin(rot),
 		wcs->crpix[1]+cos(rot), wcs, &ra1, &dec1);
 	wcs->cdelt[1] = wcsdist (ra0, dec0, ra1, dec1);
-	wcs->yinc = wcs->cdelt[1];
+
+	/* Set all other image scale parameters */
+	wcsdeltset (wcs, wcs->cdelt[0], wcs->cdelt[1], wcs->rot);
 	}
 
     /* Approximate world coordinate system if plate scale is known */
     else if (ksearch (hstring,"SECPIX") != NULL ||
+	     ksearch (hstring,"PIXSCALE") != NULL ||
 	     ksearch (hstring,"PIXSCAL1") != NULL ||
 	     ksearch (hstring,"SECPIX1") != NULL) {
 	secpix = 0.0;
 	hgetr8 (hstring,"SECPIX",&secpix);
+	if (secpix == 0.0)
+	    hgetr8 (hstring,"PIXSCALE",&secpix);
 	if (secpix == 0.0) {
 	    hgetr8 (hstring,"SECPIX1",&secpix);
 	    if (secpix != 0.0) {
@@ -508,16 +578,14 @@ char *hstring;	/* character string containing FITS header information
 
 	wcs->crval[0] = 0.0;
 	if (!hgetra (hstring,"RA",&wcs->crval[0])) {
-	    (void)sprintf (wcserrmsg,"WCSINIT: No RA with SECPIX, no WCS\n");
-	    setwcserr (wcserrmsg);
-	    free (wcs);
+	    setwcserr ("WCSINIT: No RA with SECPIX, no WCS");
+	    wcsfree (wcs);
 	    return (NULL);
 	    }
 	wcs->crval[1] = 0.0;
 	if (!hgetdec (hstring,"DEC",&wcs->crval[1])) {
-	    (void)sprintf (wcserrmsg,"WCSINIT No DEC with SECPIX, no WCS\n");
-	    setwcserr (wcserrmsg);
-	    free (wcs);
+	    setwcserr ("WCSINIT No DEC with SECPIX, no WCS");
+	    wcsfree (wcs);
 	    return (NULL);
 	    }
 	wcs->xref = wcs->crval[0];
@@ -541,7 +609,7 @@ char *hstring;	/* character string containing FITS header information
 
 	/* Epoch of image (from observation date, if possible) */
 	if (hgetr8 (hstring, "MJD-OBS", &mjd))
-	    wcs->epoch = 1950.0 + (mjd / 365.22);
+	    wcs->epoch = 1900.0 + (mjd - 15019.81352) / 365.242198781;
 	else if (!hgetdate (hstring,"DATE-OBS",&wcs->epoch)) {
 	    if (!hgetdate (hstring,"DATE",&wcs->epoch)) {
 		if (!hgetr8 (hstring,"EPOCH",&wcs->epoch))
@@ -552,7 +620,8 @@ char *hstring;	/* character string containing FITS header information
 	}
 
     else {
-	free (wcs);
+	setwcserr ("WCSINIT: No image scale");
+	wcsfree (wcs);
 	return (NULL);
 	}
 
@@ -564,9 +633,9 @@ char *hstring;	/* character string containing FITS header information
     wcs->syswcs = wcscsys (wcs->radecsys);
 
     if (wcs->syswcs == WCS_B1950)
-	strcpy (wcs->radecout, "B1950");
+	strcpy (wcs->radecout, "FK4");
     else if (wcs->syswcs == WCS_J2000)
-	strcpy (wcs->radecout, "J2000");
+	strcpy (wcs->radecout, "FK5");
     else
 	strcpy (wcs->radecout, wcs->radecsys);
     wcs->sysout = wcscsys (wcs->radecout);
@@ -651,7 +720,8 @@ struct WorldCoor *wcs;
     if (ieq == 0) {
 	wcs->equinox = 2000.0;
 	ieq = 2000;
-	strcpy (systring,"FK5");
+	if (wcs->c1type[0] == 'R' || wcs->c1type[0] == 'D')
+	    strcpy (systring,"FK5");
 	}
 
     /* Epoch of image (from observation date, if possible) */
@@ -723,4 +793,21 @@ struct WorldCoor *wcs;
  * Sep 14 1998	If B or J present in EQUINOX, use that info to set system
  * Sep 29 1998  Initialize additional WCS commands from the environment
  * Sep 29 1998	Fix bug which read DATE as number rather than formatted date
+ * Dec  2 1998	Read projection constants from header (bug fix)
+ *
+ * Feb  9 1999	Set rotation angle correctly when using DSS projection
+ * Feb 19 1999	Fill in CDELTs from scale keyword if absent or zero
+ * Feb 19 1999	Add PIXSCALE as possible default arcseconds per pixel
+ * Apr  7 1999	Add error checking for NAXIS and NAXIS1 keywords
+ * Apr  7 1999	Do not set systring if epoch is 0 and not RA/Dec
+ * Jul  8 1999	In RADECSYS, use FK5 and FK4 instead of J2000 and B1950
+ * Oct 15 1999	Free wcs using wcsfree()
+ * Oct 21 1999	Remove unused variables; declare dsspos() after lint
+ *
+ * Jan 24 2000	Set CD matrix from header even if using polynomial
+ * Jan 27 2000	Fix MJD to epoch conversion for when MJD-OBS is the only date
+ * Jan 28 2000	Set CD matrix for DSS projection, too
+ * Jan 28 2000	Use wcsproj instead of oldwcs
+ * Feb 29 2000	Compute inverse CD matrix even if polynomial solution
+ * May  9 2000	Add PROJR0 keyword for WCSLIB projections
  */

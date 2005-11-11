@@ -1,6 +1,6 @@
 #!/bin/sh
 # E.S.O. - VLT project 
-# "@(#) $Id: rmlinks,v 1.2 1997/04/11 10:47:22 abrighto Exp $"
+# "@(#) $Id: rmlinks,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # script to remove links before checking in with cmm
 #

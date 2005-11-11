@@ -1,7 +1,3 @@
-#!/bin/sh
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/rtd.sh "$0" "$@"
-
 source test.tcl
 
 set w [RtdImageCtrl .rtd \
@@ -18,7 +14,7 @@ pack $w -fill both -expand 1
 
 update
 
-$w config -file ../images/ngc1275.gzfits
+$w config -file ../images/ngc1275.fits
 
 #after 2000 [code [$w component pan] config -width 200 -height 200]
 #after 4000 [code [$w component zoom] config -width 200 -height 200]

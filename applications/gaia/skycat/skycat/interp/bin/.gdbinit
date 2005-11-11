@@ -7,5 +7,6 @@ set env RTD_LIBRARY ../../../rtd/rtdimg/library
 set env ASTROTCL_LIBRARY ../../../astrotcl/astrotcl/library
 set env TCLUTIL_LIBRARY ../../../tclutil/tclutil/library
 
-r skycat.tcl -debug 1
+set env RTD_CAMERA SCAM_FF
+r skycat.tcl -debug 1 -rtd 1 -panel_orient horizontal 
 

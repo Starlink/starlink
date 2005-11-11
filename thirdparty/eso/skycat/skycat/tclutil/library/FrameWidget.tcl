@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: FrameWidget.tcl,v 1.10 1998/10/30 20:04:07 abrighto Exp $"
+# "@(#) $Id: FrameWidget.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # FrameWidget.tcl - Itk base class for widgets with their own frame
 #
@@ -70,7 +70,7 @@ itcl::class util::FrameWidget {
 
     public method add_short_help {w text} {
 	if {[catch {[winfo toplevel $w_] add_short_help $w $text} msg]} {
-	    puts "$msg"
+	    # puts "$msg"
 	}
     } 
 

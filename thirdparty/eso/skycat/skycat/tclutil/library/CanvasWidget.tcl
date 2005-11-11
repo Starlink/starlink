@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasWidget.tcl,v 1.6 1998/10/28 17:46:36 abrighto Exp $"
+# "@(#) $Id: CanvasWidget.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # CanvasWidget.tcl - Itcl class based on the Tk canvas widget
 # 

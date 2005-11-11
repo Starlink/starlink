@@ -1,6 +1,6 @@
 # E.S.O. - VLT project 
 #
-# "@(#) $Id: ImageIO.man3,v 1.3 1998/03/29 20:26:27 abrighto Exp $" 
+# "@(#) $Id: ImageIO.man3,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
 #
 # This file is processed by the ESO/VLT docDoManPages command to
 # produce a man page in nroff, TeX and MIF formats. 
@@ -41,7 +41,7 @@ public:
     ~ImageIO();
     ImageIO& operator=(const ImageIO&);
 
-    int nativeByteOrder() const;
+    int usingNetBO() const;
 
     int write(const char *filename) const;
 
@@ -145,7 +145,7 @@ ImageIO(const ImageIO&)
 ImageIO& operator=(const ImageIO&)
 	Assignment operator: reference counted.
 
-nativeByteOrder()
+usingNetBO()
 	Return true if the ImageIORep subclass uses native byte
 	ordering.  FITS files and most other image formats are in
 	network byte order, however, the derived class may want to

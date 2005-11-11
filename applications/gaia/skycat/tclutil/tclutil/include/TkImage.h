@@ -3,7 +3,7 @@
 #define _TkImage_H_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: TkImage.h,v 1.4 1998/03/12 20:19:28 abrighto Exp $" 
+ * "@(#) $Id: TkImage.h,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
  *
  * TkImage.h - base class for Tk images implemented in C++.
  * 
@@ -126,6 +126,9 @@ public:
     // delete tcl subcommand 
     // (should probably redefine to use "image delete $image")
     virtual int deleteCmd(int argc, char* argv[]);
+
+    // set options pointer 
+    void setOptionsPtr(char * ptr) {optionsPtr_ = (TkImageOptions *)ptr;}
 };
 
 

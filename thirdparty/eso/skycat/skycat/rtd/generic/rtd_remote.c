@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: rtdRemote.c,v 1.6 1999/03/19 20:09:56 abrighto Exp $"
+ * "@(#) $Id: rtdRemote.c,v 1.3 2005/02/02 01:43:03 brighton Exp $"
  *
  * rtdRemote.c - client library for remote control of an RtdImage
  *               widget, communicates over a socket with a remote
@@ -13,14 +13,15 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/03/96  Created
  * Peter W. Draper 09/02/98  Removed sys_errlist and replaced with strerror.
+ * pbiereic        07/04/04  Fixed: variable argument list
  */
-static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.6 1999/03/19 20:09:56 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: rtdRemote.c,v 1.3 2005/02/02 01:43:03 brighton Exp $";
 
 
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -62,7 +63,7 @@ static rtdRemote info;	/* this struct holds local info */
  * The error message is kept in a local buffer and can be retrieved
  * with rtdRemoteGetError().
  */
-static int error( char *fmt, ... )
+static int error(const char *fmt, ...)
 {
     va_list args;
     char buf[sizeof(info.errmsg)];
@@ -82,21 +83,20 @@ static int error( char *fmt, ... )
 /*
  * report the error, including system error code
  */
-static int sys_error( char *fmt, ... )
+static int sys_error(const char *fmt, ...)
 {
-    char *errstr;
     va_list args;
     char buf[sizeof(info.errmsg)];
+    extern int sys_nerr;
     extern int errno;
 
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
-
-    errstr = strerror(errno);
-    if ( errstr != NULL ) {
+    
+    if (errno >= 0 && errno < sys_nerr) {
 	strcat(buf, ": ");
-	strcat(buf, errstr);
+	strcat(buf, strerror(errno));
     }
 
     strcpy(info.errmsg, buf);
@@ -174,7 +174,8 @@ static int readline(int fd, char* ptr, int maxlen)
 	    *ptr++ = c;
 	    if (c == '\n')
 		break;
-	} else if (rc == 0) {
+	}
+	else if (rc == 0) {
 	    if (n == 1)
 		return(0);	/* EOF, no data read */
 	    else

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: ButtonFrame.tcl,v 1.5 1998/10/28 17:46:35 abrighto Exp $"
+# "@(#) $Id: ButtonFrame.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # ButtonFrame.tcl - Widget displaying a frame with some standard buttons.
 #

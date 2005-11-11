@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageFrame.tcl,v 1.13 1998/10/28 17:42:28 abrighto Exp $"
+# "@(#) $Id: RtdImageFrame.tcl,v 1.3 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageFrame.tcl - itcl widget for displaying a section of an rtdimage 
 # at a given position in a canvas window
@@ -88,8 +88,8 @@ itcl::class rtd::RtdImageFrame {
 	# create a dummy rect to get events for image
 	set rectId_ [$canvas_ create rectangle \
 			 $itk_option(-xoffset) $itk_option(-yoffset) \
-			 [expr $itk_option(-xoffset)+$itk_option(-width)-1] \
-			 [expr $itk_option(-yoffset)+$itk_option(-height)-1] \
+			 [expr {$itk_option(-xoffset)+$itk_option(-width)-1}] \
+			 [expr {$itk_option(-yoffset)+$itk_option(-height)-1}] \
 			 -tags imagerect \
 			 -fill black \
 			 -stipple pat7]
@@ -106,6 +106,8 @@ itcl::class rtd::RtdImageFrame {
 	# handle interaction between zoom window and rapid frame
 	$canvas_ bind $rectId_ <Any-Enter> "+[code $target_image_ view enter $image_]"
 	$canvas_ bind $rectId_ <Any-Leave> "+[code $target_image_ view leave $image_]"
+
+	$image_ config -newimagecmd [code $this notify_cmd resize]
     }
 
 
@@ -142,8 +144,8 @@ itcl::class rtd::RtdImageFrame {
 	    return 0
 	}
 	lassign [$canvas_ bbox $itk_option(-region_id)] x0 y0 x1 y1
-	set w [expr $x1-$x0+1]
-	set h [expr $y1-$y0+1]
+	set w [expr {$x1-$x0+1}]
+	set h [expr {$y1-$y0+1}]
 	$canvas_ coords $imageId_ $x0 $y0
 	$canvas_ coords $rectId_ $x0 $y0 $x1 $y1
 	
@@ -202,7 +204,7 @@ itcl::class rtd::RtdImageFrame {
     itk_option define -subsample subsample Subsample 1
    
     # X shared memory option
-    itk_option define -usexshm usexshm Usexshm 1
+    itk_option define -usexshm useXshm UseXshm 1
 
     # X synchronisation option
     itk_option define -usexsync useXsync UseXsync 1

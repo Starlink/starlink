@@ -1,64 +1,64 @@
-# E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.7 1997/12/04 14:14:46 abrighto Exp $
+#*******************************************************************************
+# E.S.O. - VLT project
 #
-# Makefile.in
-#
-# This file is processed by configure to produce the actual Makefile.
-#
-# who             when       what
-# --------------  ---------  ---------------------------------------------
-# Allan Brighton  04 Oct 95  Created
+# "@(#) $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $"
+
+# ------------------------------------------------------------------------
+# 	Makefile for CAT demo directory
 # ------------------------------------------------------------------------
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-CAT_DIR      = @CAT_DIR@
 BINDIR       = @BINDIR@
+CAT_DIR      = @CAT_DIR@
 RM           = rm -f
 SHELL        = /bin/sh
 
 # starter shell script
-SCRIPTS      = cat.sh
+START_SCRIPT = cat.sh
 
-# symbolic links to install
-TCL_LINKS    = astrocat 
+# local Tcl applications
+TCL_APPS     = astrocat
 
-# other files to install
-FILES        = astrocat.tcl 
+# local Tcl applications to install
+INST_TCL_APPS  = astrocat 
 
-all: tcl_links
+all: tcl_apps
 
-# make links to the startup script for starting the Tcl applications
-tcl_links:
-	@for i in $(TCL_LINKS); do rm -f $$i; ln -s cat.sh $$i; done
-
-All: 
-	cd ..; $(MAKE)
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo "Making $$i" ; \
+	    echo '#!/bin/sh' > $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    echo '# E.S.O. - VLT project' >> $$i; \
+	    echo "# $$i version @CAT_VERSION@" >> $$i; \
+	    echo "# Installation date: `date`" >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $(START_SCRIPT) | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
 
 install-top:
 	@test -d $(BINDIR) || mkdir $(BINDIR) 
-	@test -d $(CAT_DIR) || mkdir $(CAT_DIR) 
+	@test -d $(CAT_DIR) || mkdir $(CAT_DIR)
 	@test -d $(CAT_DIR)/demos || mkdir $(CAT_DIR)/demos
 
 install: install-top
-	@set -x; for i in $(SCRIPTS) ; do \
-	    $(INSTALL_DATA) -m 775 $$i $(CAT_DIR)/demos ; \
-	done 
-	@set -x; for i in $(FILES) ; do \
-	    $(INSTALL_DATA) -m 664 $$i $(CAT_DIR)/demos ; \
-	done 
-	@set -x; for i in $(TCL_LINKS); do \
-	    rm -f $(BINDIR)/$$i $(CAT_DIR)/demos/$$i; \
-	    (cd $(CAT_DIR)/demos; ln -s cat.sh $$i) ; \
-	    (cd $(BINDIR); ln -s ../lib/cat/demos/$$i $$i) ; \
+	@for i in $(INST_TCL_APPS); do \
+	    $(INSTALL_DATA) -m 775 $$i $(BINDIR)/$$i ; \
 	done
 
 clean:
-	$(RM) *\~ "#"* core
+	$(RM) *\~ "#"* core $(TCL_APPS)
 
 depend:
 
 distclean: clean
-	rm -f Makefile cat.sh
+	rm -f Makefile $(START_SCRIPT) cat_env.sh
 
-man:
+include @SRC_ROOT@/makefile.mk
+

@@ -1,6 +1,6 @@
 /* 
  * tkAppInit.C -- 
- * "@(#) $Id: tkAppInit.C,v 1.18 1998/10/28 17:41:03 abrighto Exp $"
+ * "@(#) $Id: tkAppInit.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"
  * ---------------------------------------------------------------------
  * NOTE: This file was modified by adding the rtdimage extension 
  *       as well as the BLT, Itcl and TclX extensions.
@@ -17,28 +17,34 @@
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
 
+/*
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * Allan Brighton  05/10/95  Created
+ * P. Biereichel   12/06/99  Call Tclx_Init after Tcl_Init
+ */
+
 #ifndef lint
 static char sccsid[] = "@(#) tkAppInit.c 1.12 94/12/17 16:30:56";
 #endif /* not lint */
 
 #include <stdlib.h>
-#include <new.h>
 
 
 /* declare command procedures here */
 extern "C" {
 #include "tk.h"
-extern int Blt_Init(Tcl_Interp *interp);
-extern int Itcl_Init(Tcl_Interp *interp);
-extern int Itk_Init(Tcl_Interp *interp);
-extern int Tclx_Init(Tcl_Interp *interp);
+    extern int Blt_Init(Tcl_Interp *interp);
+    extern int Itcl_Init(Tcl_Interp *interp);
+    extern int Itk_Init(Tcl_Interp *interp);
+    extern int Tclx_Init(Tcl_Interp *interp);
 #if SHARED == 0
-extern int Rtd_Init(Tcl_Interp *interp);
-extern int Rtdrecord_Init(Tcl_Interp *interp);
+    extern int Rtd_Init(Tcl_Interp *interp);
+    extern int Rtdrecord_Init(Tcl_Interp *interp);
 #endif
 #ifdef INCLUDE_MULTICAST
-extern int RtdRMPServer_Init(Tcl_Interp *interp);
-extern int RtdRMPClient_Init(Tcl_Interp *interp);
+    extern int RtdRMPServer_Init(Tcl_Interp *interp);
+    extern int RtdRMPClient_Init(Tcl_Interp *interp);
 #endif /* INCLUDE_MULTICAST */
 }
 
@@ -103,13 +109,15 @@ Tcl_AppInit(Tcl_Interp *interp)
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
+    Tclx_Init(interp);
+
     if (Tk_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
     Tcl_StaticPackage(interp, "Tk", Tk_Init, (Tcl_PackageInitProc *) NULL);
 
     if (Itcl_Init(interp) == TCL_ERROR) {
-         // return TCL_ERROR;
+	// return TCL_ERROR;
     }
     Tcl_StaticPackage(interp, "Itcl", Itcl_Init, (Tcl_PackageInitProc *) NULL);
 
@@ -124,7 +132,6 @@ Tcl_AppInit(Tcl_Interp *interp)
     }
 
     /* add tclX commands, but not the whole tclX env */
-    Tclx_Init(interp);
     Tcl_StaticPackage (interp, "Tclx", Tclx_Init, (Tcl_PackageInitProc *) NULL);
 
     // These may be loaded as shared libs at run time or statically now...
@@ -140,12 +147,12 @@ Tcl_AppInit(Tcl_Interp *interp)
 #ifdef INCLUDE_MULTICAST
     /* Initialise the rtdrmpserver type */
     if (RtdRMPServer_Init(interp) == TCL_ERROR) {
-        return TCL_ERROR;
+	return TCL_ERROR;
     }
 
     /* Initialise the rtdrmpclient type */
     if (RtdRMPClient_Init(interp) == TCL_ERROR) {
-        return TCL_ERROR;
+	return TCL_ERROR;
     }
 #endif /* INCLUDE_MULTICAST */
 

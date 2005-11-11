@@ -1,6 +1,6 @@
 Image I/O Library
 -----------------
-"@(#) $Id: README,v 1.3 1999/01/14 16:54:27 abrighto Exp $"
+"@(#) $Id: README,v 1.2 2005/02/02 01:43:04 brighton Exp $"
 
 Note: the plain C sources here were taken from the "cfitsio" package
 (version: cfitsio2027), which was written by William D. Pence

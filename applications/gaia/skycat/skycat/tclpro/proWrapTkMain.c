@@ -169,7 +169,7 @@ Pro_WrapTkMain(argc, argv, appInitProc)
      * and "argv".
      */
 
-    args = Tcl_Merge(argc-1, argv+1);
+    args = Tcl_Merge(argc-1, (const char**)argv+1);
     Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
     ckfree(args);
     sprintf(buf, "%d", argc-1);
@@ -227,7 +227,7 @@ Pro_WrapTkMain(argc, argv, appInitProc)
 	     */
 
 	    Tcl_AddErrorInfo(interp, "");
-	    TkpDisplayWarning(Tcl_GetVar(interp, "errorInfo",
+	    TkpDisplayWarning((char*)Tcl_GetVar(interp, "errorInfo",
 		    TCL_GLOBAL_ONLY), "Error in startup script");
 	    Tcl_DeleteInterp(interp);
 	    Tcl_Exit(1);
@@ -407,7 +407,7 @@ Prompt(interp, partial)
     int code;
     Tcl_Channel outChannel, errChannel;
 
-    promptCmd = Tcl_GetVar(interp,
+    promptCmd = (char*)Tcl_GetVar(interp,
 	partial ? "tcl_prompt2" : "tcl_prompt1", TCL_GLOBAL_ONLY);
     if (promptCmd == NULL) {
 defaultPrompt:

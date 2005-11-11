@@ -1,49 +1,42 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 abrighto Exp $"
+ * "@(#) $Id: Skycat.C,v 1.7 2003/01/20 15:52:21 brighton Exp $"
  *
  * Skycat.C - Initialize Skycat package
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
- * Allan Brighton  21 Nov 97  Created
+ * Allan Brighton  21/11/97  Created
  *
  *                 10/03/98  Added optional args to constructor to allow derived
  *                           class to specify its own configuration options.
+ *
+ *                 21/02/00  Moved HDU command to bass class RtdImage                 
  */
-static const char* const rcsId="@(#) $Id: Skycat.C,v 1.18 1999/03/11 21:01:05 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Skycat.C,v 1.7 2003/01/20 15:52:21 brighton Exp $";
 
-#include "config.h"  //  From skycat util
-
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <stdio.h>
-#include <iostream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include <fstream.h>
+#include <cstring>
+#include <cstdlib>
+#include <csignal>
+#include <cstdio>
+#include <iostream>
+#include <sstream>
+#include <fstream>
 #include <sys/types.h>
-#include <new.h>
+
 #include <unistd.h>
-#include <math.h>
-#include <assert.h>
-#include <tcl.h>
-#include <tk.h>
+#include <cmath>
+#include <cassert>
+#include "config.h"
+#include "tcl.h"
+#include "tk.h"
 #include "error.h"
 #include "define.h"
 #include "util.h"
+#include "config.h"
 #include "SkySearch.h"
 #include "TcsSkySearch.h"
-#include "FitsIO.hxx"
+#include "FitsIO.h"
 #include "Skycat.h"
 
 // generated code for bitmaps used in tcl scripts
@@ -70,7 +63,6 @@ public:
     int min_args;    // minimum number of args
     int max_args;    // maximum number of args
 } subcmds_[] = { 
-    {"hdu",    &Skycat::hduCmd,     0,  6},
     {"symbol", &Skycat::symbolCmd,  9,  13}
 };
 
@@ -86,6 +78,12 @@ static Tk_ImageType skycatImageType = {
     TkImage::DisplayImage,      /* displayProc */
     TkImage::FreeImage,	        /* freeProc */
     TkImage::DeleteImage,	/* deleteProc */
+
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    // XXX RtdImage::Postscript,	/* postscriptProc */
+    (Tk_ImagePostscriptProc *) NULL,    /* postscriptProc */
+#endif
+
     (Tk_ImageType *) NULL	/* nextPtr */
 };
 
@@ -113,10 +111,10 @@ int Skycat_Init(Tcl_Interp* interp)
     }
 
     // install the new, extended astrocat command 
-    Tcl_CreateCommand(interp, "astrocat", SkySearch::astroCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "astrocat", (Tcl_CmdProc*)SkySearch::astroCatCmd, NULL, NULL);
     
     // also extend the tcscat command
-    Tcl_CreateCommand(interp, "tcscat", TcsSkySearch::tcsCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "tcscat", (Tcl_CmdProc*)TcsSkySearch::tcsCatCmd, NULL, NULL);
 
     // define bitmaps used by Tcl library
     defineSkycatBitmaps(interp);
@@ -129,9 +127,9 @@ int Skycat_Init(Tcl_Interp* interp)
     //		1) the variable may already exist
     //		2) env array
     //		3) the compiled in value of SKYCAT_LIBRARY
-    char* libDir = Tcl_GetVar(interp, "skycat_library", TCL_GLOBAL_ONLY);
+    char* libDir = (char*)Tcl_GetVar(interp, "skycat_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
-	libDir = Tcl_GetVar2(interp, "env", "SKYCAT_LIBRARY", TCL_GLOBAL_ONLY);
+	libDir = (char*)Tcl_GetVar2(interp, "env", "SKYCAT_LIBRARY", TCL_GLOBAL_ONLY);
     }
     if (libDir == NULL) {
 	libDir = SKYCAT_LIBRARY;
@@ -171,12 +169,24 @@ int Skycat::CreateImage(
     Tcl_Interp *interp,		// Interpreter for application containing image.
     char *name,			// Name to use for image.
     int argc,			// Number of arguments.
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    Tcl_Obj *CONST objv[],      // Argument objects for options (not including image name or type)
+#else
     char **argv,		// Argument strings for options (not including image name or type)
+#endif
     Tk_ImageType *typePtr,	// Pointer to our type record (not used). 
     Tk_ImageMaster master,	// Token for image, to be used by us in later callbacks.
     ClientData *clientDataPtr)	// Store manager's token (this ptr) for image here
 				// it will be returned in later callbacks.
 {
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    // just generate an argv from the objv argument
+    char* argv[64];  // there shouldn't be more than a few options...
+    for(int i = 0; i < argc; i++)
+	argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
+
     Skycat* im = new Skycat(interp, name, argc, argv, master, skycatImageType.name);
     *clientDataPtr = (ClientData) im;
     return im->status();
@@ -316,7 +326,7 @@ int Skycat::draw_symbol(const char* shape,
  * image at the given canvas coordinates with the given label
  * text, color and canvas tags.
  */
-int Skycat::make_label(ostream& os, const char* label, double x, double y, 
+int Skycat::make_label(std::ostream& os, const char* label, double x, double y, 
 		       const char* tags, const char* color, const char* font)
 {
     os << canvasName_ << " create text "
@@ -325,7 +335,7 @@ int Skycat::make_label(ostream& os, const char* label, double x, double y,
        << "} -anchor sw -fill " << color
        << " -font " << font
        << " -tags " << "{" << tags << "}"
-       << endl;
+       << std::endl;
     
     return TCL_OK;
 }
@@ -353,28 +363,26 @@ int Skycat::draw_circle(double x, double y, const char* xy_units,
     double y1 = y + ry;
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create oval "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
 	   << " -outline " << bg
 	   << " -fill " << bg
 	   << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create oval "
        << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
        << " -outline " << fg
        << " -fill " << bg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
-       << endl;
+       << std::endl;
 
     if (label && strlen(label)) 
 	make_label(os, label, x, y, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -400,28 +408,26 @@ int Skycat::draw_square(double x, double y, const char* xy_units,
     double y1 = y + ry;
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create rect "
 	   << x0-1 << ' ' << y0-1 << ' ' << x1+1 << ' ' << y1+1
 	   << " -outline " << bg
 	   << " -fill " << bg
 	   << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create rect "
        << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
        << " -outline " << fg
        << " -fill " << bg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}"
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, x, y, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -447,36 +453,34 @@ int Skycat::draw_cross(double x, double y, const char* xy_units,
     double y1 = y + ry;
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
 	os << canvasName_ << " create line "
 	   << x1 << ' ' << y0 << ' ' << x0 << ' ' << y1
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create line "
        << x0 << ' ' << y0 << ' ' << x1 << ' ' << y1
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}"
-       << endl;
+       << std::endl;
     os << canvasName_ << " create line "
        << x1 << ' ' << y0 << ' ' << x0 << ' ' << y1
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}"
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, x, y, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -502,28 +506,26 @@ int Skycat::draw_triangle(double x, double y, const char* xy_units,
     double y1 = y + ry;
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y1 << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y1
 	   << " -outline " << bg
 	   << " -fill " << bg
 	   << " -width 2 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create polygon "
        << x0 << ' ' << y1 << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y1
        << " -outline " << fg
        << " -fill " << bg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, x, y, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -549,28 +551,26 @@ int Skycat::draw_diamond(double x, double y, const char* xy_units,
     double y1 = y + ry;
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << x0 << ' ' << y << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y << ' ' << x << ' ' << y1
 	   << " -outline " << bg
 	   << " -fill " << bg
 	   << " -width 2 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create polygon "
        << x0 << ' ' << y << ' ' << x << ' ' << y0 << ' ' << x1 << ' ' << y << ' ' << x << ' ' << y1
        << " -outline " << fg
        << " -fill " << bg
        << " -width 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, x, y, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -701,35 +701,34 @@ int Skycat::draw_plus(double x, double y, const char* xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
 	os << canvasName_ << " create line "
 	   << ex << ' ' << ey << ' ' << wx << ' ' << wy
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create line "
        << nx << ' ' << ny << ' ' << sx << ' ' << sy
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     os << canvasName_ << " create line "
        << ex << ' ' << ey << ' ' << wx << ' ' << wy
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, cx, cy, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -757,8 +756,7 @@ int Skycat::draw_ellipse(double x, double y, const char* xy_units,
     double wy = cy+(cy-ey);
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create polygon "
 	   << nx << ' ' << ny << ' ' << ex << ' ' << ey << ' ' 
@@ -766,7 +764,7 @@ int Skycat::draw_ellipse(double x, double y, const char* xy_units,
 	   << " -outline " << bg
 	   << " -fill " << bg
 	   << " -width 2  -smooth 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create polygon "
        << nx << ' ' << ny << ' ' << ex << ' ' << ey << ' ' 
@@ -774,13 +772,12 @@ int Skycat::draw_ellipse(double x, double y, const char* xy_units,
        << " -outline " << bg
        << " -fill " << fg
        << " -width 1  -smooth 1 -stipple pat7 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, cx, cy, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -802,36 +799,34 @@ int Skycat::draw_compass(double x, double y, const char* xy_units,
     }
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
 	   << " -fill " << bg
 	   << " -width 2 -arrow last -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << ex << ' ' << ey
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create line "
        << cx << ' ' << cy << ' ' << nx << ' ' << ny
        << " -fill " << fg
        << " -width 1 -arrow last -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     os << canvasName_ << " create line "
        << cx << ' ' << cy << ' ' << ex << ' ' << ey
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, cx, cy, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -857,26 +852,24 @@ int Skycat::draw_line(double x, double y, const char* xy_units,
     double sy = cy-(ny-cy);
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << nx << ' ' << ny << ' ' << sx << ' ' << sy
 	   << " -fill " << bg
 	   << " -width 2 -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create line "
        << nx << ' ' << ny << ' ' << sx << ' ' << sy
        << " -fill " << fg
        << " -width 1 -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, cx, cy, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 
@@ -898,26 +891,24 @@ int Skycat::draw_arrow(double x, double y, const char* xy_units,
     }
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
 	os << canvasName_ << " create line "
 	   << cx << ' ' << cy << ' ' << nx << ' ' << ny
 	   << " -fill " << bg
 	   << " -width 2 -arrow last -tags " << "{" << symbol_tags << "}" 
-	   << endl;
+	   << std::endl;
     }
     os << canvasName_ << " create line "
        << cx << ' ' << cy << ' ' << nx << ' ' << ny
        << " -fill " << fg
        << " -width 1 -arrow last -tags " << "{" << symbol_tags << "}" 
-       << endl;
+       << std::endl;
     
     if (label && strlen(label)) 
 	make_label(os, label, cx, cy, label_tags, fg);
     
-    os << ends;
-    return eval(os.str());
+    return eval(os.str().c_str());
 }
 
 /*
@@ -999,641 +990,4 @@ int Skycat::symbolCmd(int argc, char* argv[])
 		       bg, fg, symbol_tags, ratio, angle, label, label_tags);
 }
 
-
-/*
- * Implement the hdu headings subcommand:
- *
- *      <path> hdu headings ?$number?
- *
- * See comments for hduCmd() for details.
- */
-int Skycat::hduCmdHeadings(int argc, char** argv, FitsIO* fits)
-{
-    int hdu = fits->getHDUNum();
-    int saved_hdu = hdu;
-    int numHDUs = fits->getNumHDUs();
-
-    // check for the optional hdu arg, otherwise use current
-    if (argc >= 2 && sscanf(argv[1], "%d", &hdu) == 1) {
-	if (hdu != saved_hdu) {
-	    if (hdu < 1 || hdu > numHDUs)
-		return fmt_error("HDU number %d out of range (max %d)", hdu, numHDUs);
-	    // switch to the given HDU, but restore the original before returning
-	    if (fits->setHDU(hdu) != 0)
-		return TCL_ERROR;
-	}
-    }
-
-    // get the info and catch any errors
-    int status = getHDUHeadings(fits);
-    
-    // restore the original HDU before returning
-    if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
-	status = TCL_ERROR;
-    
-    return status;
-}
-
-
-/*
- * This method is used to implement the "hdu headings" subcommand.
- * It returns the table headings of the current FITS table as a 
- * Tcl list. An error is returned if the current HDU is not a FITS
- * table.
- */
-int Skycat::getHDUHeadings(FitsIO* fits)
-{
-    // return a list of table headings for the current FITS table
-    const char* type = fits->getHDUType();
-    if (!type || *type == 'i')
-	return error("HDU is not a FITS table");
-
-    long nrows = 0;
-    int ncols = 0;
-    if (fits->getTableDims(nrows, ncols) != 0)
-	return TCL_ERROR;
-    reset_result();
-    for(int col = 1; col <= ncols; col++) {
-	char* s = fits->getTableHead(col);
-	if (!s)
-	    return TCL_ERROR;
-	append_element(s);
-    }
-    return TCL_OK;
-}
-
-
-/*
- * Implement the "hdu type" subcommand:
- * 
- *    <path> hdu type ?$number?
- *
- * See comments for hduCmd() for details.
- */
-int Skycat::hduCmdType(int argc, char** argv, FitsIO* fits)
-{
-    int hdu = fits->getHDUNum();
-    int saved_hdu = hdu;
-    int numHDUs = fits->getNumHDUs();
-
-    // check for the optional hdu arg, otherwise use current
-    if (argc >= 2 && sscanf(argv[1], "%d", &hdu) == 1) {
-	if (hdu != saved_hdu) {
-	    if (hdu < 1)
-		return fmt_error("HDU number %d out of range (min 1)", hdu);
-	    if (hdu > numHDUs)
-		return fmt_error("HDU number %d out of range (max %d)", hdu, numHDUs);
-	    // switch to the given HDU, but restore the original before returning
-	    if (fits->setHDU(hdu) != 0)
-		return TCL_ERROR;
-	}
-    }
-
-    const char* type = fits->getHDUType();
-    int status = TCL_OK;
-    if (type)
-	set_result(fits->getHDUType());
-    else 
-	status = TCL_ERROR;
-
-    // restore the original HDU before returning
-    if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
-	status = TCL_ERROR;
-    
-    return status;
-}
-
-
-/*
- * Implement the hdu get subcommand:
- * 
- *    <path> hdu get ?$number? ?$filename? ?$entry?
- *
- * See comments for hduCmd() for details.
- */
-int Skycat::hduCmdGet(int argc, char** argv, FitsIO* fits)
-{
-    int hdu = fits->getHDUNum();
-    int saved_hdu = hdu;
-    int numHDUs = fits->getNumHDUs();
-
-    // check for the optional hdu arg, otherwise use current
-    if (argc >= 2 && sscanf(argv[1], "%d", &hdu) == 1) {
-	argc--;
-	argv++;
-	if (hdu != saved_hdu) {
-	    if (hdu < 1 || hdu > numHDUs)
-		return fmt_error("HDU number %d out of range (max %d)", hdu, numHDUs);
-	    // switch to the given HDU, but restore the original before returning
-	    if (fits->setHDU(hdu) != 0)
-		return TCL_ERROR;
-	}
-    }
-
-    // check for the filename arg
-    char* filename = NULL;
-    if (argc >= 2) 
-	filename = argv[1];
-
-    // check for the entry arg
-    char* entry = NULL;
-    if (argc >= 3) 
-	entry = argv[2];
-
-    // get the info and catch any errors
-    int status = getHDU(fits, filename, entry);
-    
-    // restore the original HDU before returning
-    if (hdu != saved_hdu && fits->setHDU(saved_hdu) != 0)
-	status = TCL_ERROR;
-    
-    return status;
-}
-
-    
-/*
- * This method implements the main body of the hdu get subcommand.
- * If filename arg is not NULL, the contents of the current HDU are
- * written to the file as a local catalog. Otherwise, the contents
- * of the current HDU are returned as a Tcl list or rows. If the 
- * entry arg is not null and a filename was specified, it specifies
- * the catalog config entry for the file's header, in Tcl list format
- * {{key value} {key value} ...}.
- */
-int Skycat::getHDU(FitsIO* fits, const char* filename, const char* entry)
-{
-    const char* type = fits->getHDUType();
-    if (!type || *type == 'i')
-	return error("HDU is not a FITS table");
-
-    long nrows = 0;
-    int ncols = 0;
-    if (fits->getTableDims(nrows, ncols) != 0)
-	return TCL_ERROR;
-
-    if (filename == NULL) {
-	// return the contents of the table as a tcl list of rows
-	reset_result();
-	for(int row = 1; row <= nrows; row++) {
-	    append_result(" {");
-	    for(int col = 1; col <= ncols; col++) {
-		char* s = fits->getTableValue(row, col);
-		if (!s)
-		    return TCL_ERROR;
-		append_element(s);
-	    }
-	    append_result("}");
-	}
-	return TCL_OK;
-    }
-
-    // Otherwise write the contents of the table to a local catalog file
-    ofstream os(filename);
-    if (! os)
-	return sys_error("can't open file: ", filename);
-
-    // output the catalog header
-    os << "QueryResult\n\n";
-
-    // output the catalog config entry, if there is one
-    if (entry != NULL) {
-	os << "# Config entry\n";
-	int nkeys = 0;
-	char** keys = NULL;
-	if (Tcl_SplitList(interp_, (char*)entry, &nkeys, &keys) != TCL_OK)
-	    return TCL_ERROR;
-	for(int i = 0; i < nkeys; i++) {
-	    int n = 0;
-	    char** v = NULL;
-	    if (Tcl_SplitList(interp_, keys[i], &n, &v) != TCL_OK) {
-		free(keys);
-		return TCL_ERROR;
-	    }
-	    if (n != 2) {
-		free(keys);
-		free(v);
-		return fmt_error("Invalid catalog config entry: '%s': Expected {key value}", keys[i]);
-	    }
-	    os << v[0] << ": " << v[1] << endl;
-	    free(v);
-	}
-	free(keys);
-	os << "# End config entry\n\n";
-    }
-	    
-    // output the column headings
-    int col;
-    for(col = 1; col <= ncols; col++) {
-	char* s = fits->getTableHead(col);
-	if (!s)
-	    return TCL_ERROR;
-	os << s;
-	if (col < ncols)
-	    os << '\t';
-    }
-    os << "\n---\n";	// heading separator (dashed line)
-
-    // output the data
-    for(long row = 1; row <= nrows; row++) {
-	for(col = 1; col <= ncols; col++) {
-	    char* s = fits->getTableValue(row, col);
-	    if (!s)
-		return TCL_ERROR;
-	    os << s;
-	    if (col < ncols)
-		os << '\t';
-	}
-	os << endl;
-    }
-    return TCL_OK;
-}
-
-
-/*
- * Implement the HDU create subcommand:
- *
- *   <path> hdu create $type $extname $headings $tform $data
- *
- * see comments for hduCmd() for details.
- */
-int Skycat::hduCmdCreate(int argc, char** argv, FitsIO* fits)
-{
-    if (argc != 6) {
-	return error("hdu create: wrong number of args");
-    }
-    char* type = argv[1];
-    char* extname = argv[2];
-    char* headings = argv[3];
-    char* tform = argv[4];
-    char* data = argv[5];
-
-    // save the current HDU number and restore it later, since creating a
-    // new table sets the HDU to the new table.
-    int hdu = fits->getHDUNum();
-
-    int asciiFlag = (strncmp(type, "ascii", 5) == 0);
-
-    // These arrays hold the Tcl list info for the list arguments.
-    // The memory is allocated and must be deleted before returning.
-    char** colHeadings = NULL;
-    char** formats = NULL;
-    char** dataRows = NULL;
-    char** dataCols = NULL;;
-
-    int status = TCL_OK;
-    while(1) {  // dummy loop used only for error handling
-	// get the headings array and number of columns
-	int numCols = 0;
-	if (Tcl_SplitList(interp_, headings, &numCols, &colHeadings) != TCL_OK) {
-	    status = TCL_ERROR;
-	    break;
-	}
-   
-	// get the column formats array
-	int numFormats = 0;
-	if (Tcl_SplitList(interp_, tform, &numFormats, &formats) != TCL_OK) {
-	    status = TCL_ERROR;
-	    break;
-	}
-
-	if (numFormats != numCols) {
-	    status = error("Wrong number of column formats");
-	    break;
-	}
-
-	// get the table data array and number of rows
-	int numRows = 0;
-	if (Tcl_SplitList(interp_, data, &numRows, &dataRows) != TCL_OK) {
-	    status = TCL_ERROR;
-	    break;
-	}
-    
-	// Create the FITS table
-	if (fits->createTable(extname, numRows, numCols, colHeadings, formats, asciiFlag) != 0) {
-	    status = TCL_ERROR;
-	    break;
-	}
-
-	// insert the data (FITS rows and cols start at 1!)
-	for(int row = 1; row <= numRows; row++) {
-	    int n;
-	    if (Tcl_SplitList(interp_, dataRows[row-1], &n, &dataCols) != TCL_OK) {
-		status = TCL_ERROR;
-		break;
-	    }
-	    if (n != numCols) {
-		status = fmt_error("Wrong number of columns in row %d", row);
-		break;
-	    }
-	    for(int col = 1; col <= numCols; col++) {
-		if (fits->setTableValue(row, col, dataCols[col-1]) != 0) {
-		    status = TCL_ERROR;
-		    break;
-		}
-	    }
-	    if (status != TCL_OK)
-		break;
-	    if (dataCols) {
-		free(dataCols);
-		dataCols = NULL;
-	    }
-	}
-	break;			// once only
-    }
-    
-    // Clean up and return the status
-    if (colHeadings)
-	free(colHeadings);
-    if (formats)
-	free(formats);
-    if (dataRows)
-	free(dataRows);
-    if (dataCols)
-	free(dataCols);
-   
-    // restore the original HDU
-    fits->setHDU(hdu);
-
-    return status;
-}
-
-
-/*
- * Implement the HDU delete subcommand:
- *
- *   <path> hdu delete $number
- *
- * see comments for hduCmd() for details.
- */
-int Skycat::hduCmdDelete(int argc, char** argv, FitsIO* fits)
-{
-    int hdu;
-
-    if (Tcl_GetInt(interp_, argv[1], &hdu) != TCL_OK)
-	return TCL_ERROR;
-
-    int n = fits->getNumHDUs();
-    if (hdu <= 1 || hdu > n)
-	return fmt_error("HDU index %d out of range: must be > 1 and <= %d", hdu, n);
-
-    if (fits->deleteHDU(hdu) != 0)
-	return TCL_ERROR;
-   
-    return TCL_OK;
-}
-
-
-/*
- * Implement the hdu list subcommand:
- *
- *   <path> hdu list
- *
- * see comments for hduCmd() for details.
- */
-int Skycat::hduCmdList(int argc, char** argv, FitsIO* fits)
-{
-    // return a list of HDUs
-    int numHDUs = fits->getNumHDUs();
-    if (numHDUs <= 0)
-	return TCL_OK;	// empty return list
-
-	// save current HDU, then loop through all HDUs to get info
-    int curHDU = fits->getHDUNum();
-    STRSTD::ostrstream os;
-    int status = 0;
-    int count = 0;
-    for (int i = 1; i <= numHDUs; i++) {
-	if (fits->setHDU(i) != 0) {
-	    status++;
-	    break;
-	}
-	const char* type = fits->getHDUType();
-	if (!type) {
-	    status++;
-	    break;
-	}
-
-	// get these keyword values and default to ""
-	char extName[80], naxis[32], naxis1[32], naxis2[32], naxis3[32];
-	char crpix1[32], crpix2[32]; 
-	fits->get("EXTNAME", extName, sizeof(extName));
-	fits->get("NAXIS", naxis, sizeof(naxis));
-	fits->get("NAXIS1", naxis1, sizeof(naxis1));
-	fits->get("NAXIS2", naxis2, sizeof(naxis2));
-	fits->get("NAXIS3", naxis3, sizeof(naxis3));
-	fits->get("CRPIX1", crpix1, sizeof(crpix1));
-	fits->get("CRPIX2", crpix2, sizeof(crpix2));
-
-	os << "{" 
-	   << i 
-	   << " " << type 
-	   << " {" << extName << "}"
-	   << " {" << naxis << "}"
-	   << " {" << naxis1 << "}"
-	   << " {" << naxis2 << "}"
-	   << " {" << naxis3 << "}"
-	   << " {" << crpix1 << "}"
-	   << " {" << crpix2 << "}"
-	   << "} ";
-	count++;
-    }
-    if (count) {
-	if (status == TCL_OK) {
-	    os << ends;
-	    set_result(os.str());
-	}
-	delete[] os.str();
-	fits->setHDU(curHDU);
-    }
-    return status;
-}
-
-
-/*
- * Implement the hdu set subcommand:
- *
- *      <path> hdu set $number
- * or:  <path> hdu $number
- *
- * see comments for hduCmd() for details.
- */
-int Skycat::hduCmdSet(int argc, char** argv, FitsIO* fits)
-{
-    if (strcmp(argv[0], "set") == 0) {
-	argc--;
-	argv++;
-    }
-    if (argc != 1)
-	return error("wrong number of args: expected HDU number");
-	
-    // get a (reference counted) copy of the image
-    ImageIO imio = image_->image();
-
-    int num = 0;
-    if (Tcl_GetInt(interp_, argv[0], &num) != TCL_OK
-	|| fits->setHDU(num) != 0)
-	return TCL_ERROR;
-    
-    const char* hduType = fits->getHDUType();
-    if (!hduType)
-	return TCL_ERROR;
-    
-    if (*hduType != 'i')
-	return TCL_OK;		// FITS table, not image: don't display 
-
-    // save image transformation parameters to restore later
-    ImageDataParams p;
-    image_->saveParams(p);
-
-    // delete old image
-    delete image_; 
-    image_ = NULL;
-    updateViews();
-	
-    // Re-initialize the image from the given HDU
-    ImageData* im = makeImage(imio);
-    if (! im)
-	return TCL_ERROR;
-    image_ = im;
-
-    // The WCS info will be different in this HDU
-    imio.wcsinit();
-
-    // restore transformations
-    image_->restoreParams(p, !autoSetCutLevels_);
-
-    // update the display
-    return initNewImage();
-}
-
-/*
- * This method implements the "hdu" subcommand, to access different
- * FITS HDUs (header data units). Each HDU may be of type "image",
- * "binary" table or "ascii" table.
- *
- *  usage: <path> hdu count
- *  or:    <path> hdu list
- *  or:    <path> hdu listheadings
- *  or:    <path> hdu type ?number?
- *  or:    <path> hdu headings ?$number?
- *  or:    <path> hdu get ?$number? ?$filename? ?$entry?
- *  or:    <path> hdu create $type $extname $headings $tform $data
- *  or:    <path> hdu delete $number
- *  or:    <path> hdu set $number
- *  or:    <path> hdu ?$number?
- *
- * If the "hdu count" subcommand is specified, it returns the number of
- * HDUs in the current image.
- *
- * The "hdu type" subcommand returns the type of the current or given HDU
- * as a string "ascii", "binary" or "image".
- *
- * If the "hdu list" subcommand is specified, it returns a Tcl list of
- * FITS HDU information of the form:
- *
- *   {{number type extname naxis naxis1 naxis2 naxis3 crpix1 crpix2} ...}
- *
- * Where: 
- *
- *   - number is the HDU number
- *   - type is the HDU type: one of "image", "binary table", "ascii table".
- *   - extname is the value of the EXTNAME keyword, if set
- *   - naxis, naxis1, naxis2, naxis3 match the FITS keyword values.
- *
- * The "hdu listheadings" subcommand returns a list of the column names
- * returned by the "hdu list" subcommand. This can be used to set the
- * title of a table listing of the HDUs in a FITS file.
- *
- * The "hdu headings" subcommand returns a list of the column names
- * in the current or given FITS table.
- *
- * The "hdu get" subcommand with no arguments returns the contents of the
- * current ASCII or binary table as a Tcl list (a list of rows, where
- * each row is a list of column values). If the HDU number is given, the
- * contents of the given HDU are returned. If a filename argument is
- * given, the FITS table is written to the given file in the form of a
- * local (tab separated) catalog.  If optional "entry" argument is given,
- * it specifies the catalog config entry as a list of {{keyword value}
- * {keyword value} ...}, as defined in the catalog config file
- * (~/.skycat/skycat.cfg). The entry is written to the header of the
- * local catalog file and is used mainly to specify plot symbol
- * information for the catalog.
- *
- * The "hdu create" command creates a new FITS table in the current image
- * file. $type maye be "ascii" for an ASCII table or "binary" for a
- * binary FITS table. The name of the table is given by extname. The
- * table headings and data correspond to the catalog headings and
- * data. The tform argument is a list of FITS storage formats, one for
- * each column, of the form {16A 2D 12A ...} (similar to FORTRAN formats,
- * see the FITS docs). 
- *
- * The "hdu delete" command deletes the given HDU. The argument is the HDU
- * number. The other HDUs in the file following the deleted one are moved to 
- * fill the gap.
- *
- * If the "hdu" subcommand is specified with no arguments, it returns the
- * current HDU number. If a number argument is given, the current HDU is
- * set to that number.
- *
- * The "hdu set" subcommand sets the current HDU to the given number.
- * The keyword "set" is optional (see below).
- *
- * An optional numerical argument may be passed to the "hdu" subcommand,
- * in which case the "current HDU" is set to the given number.
- */
-int Skycat::hduCmd(int argc, char* argv[])
-{
-    if (!image_)
-	return TCL_OK;
-
-    // HDU operations: make sure it is a FITS file
-    ImageIO imio = image_->image();
-    if (!imio.rep() || strcmp(imio.rep()->classname(), "FitsIO") != 0)
-	return error("The \"hdu\" subcommand is only supported for FITS files");
-    FitsIO* fits = (FitsIO*)imio.rep();
-
-    // <path> hdu  (return the current HDU number)
-    if (argc == 0) 
-	return set_result(fits->getHDUNum());
-
-    // <path> hdu count
-    if (strcmp(argv[0], "count") == 0) 
-	return set_result(fits->getNumHDUs());
-
-    // <path> hdu type ?number?
-    if (strcmp(argv[0], "type") == 0) 
-	return hduCmdType(argc, argv, fits);
-
-    // <path> hdu listheadings
-    // (return a list of table headings matching the "hdu list" output)
-    if (strcmp(argv[0], "listheadings") == 0) 	
-	return set_result("HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3 CRPIX1 CRPIX2");
-
-    // <path> hdu headings ?$number?
-    if (strcmp(argv[0], "headings") == 0) 
-	return hduCmdHeadings(argc, argv, fits);
-
-    // <path> hdu get ?number? ?$filename? ?$entry?"
-    if (strcmp(argv[0], "get") == 0) 
-	return hduCmdGet(argc, argv, fits);
-
-    // <path> hdu create $type $extname $headings $tform $data
-    if (strcmp(argv[0], "create") == 0) 
- 	return hduCmdCreate(argc, argv, fits);
-
-    // <path> hdu delete $number
-    if (strcmp(argv[0], "delete") == 0) 
- 	return hduCmdDelete(argc, argv, fits);
-
-    // <path> hdu list
-    if (strcmp(argv[0], "list") == 0) 	
- 	return hduCmdList(argc, argv, fits);
-
-    // <path> hdu set $number
-    if (strcmp(argv[0], "set") == 0) 	
- 	return hduCmdSet(argc, argv, fits);
-
-    // <path> hdu $number (Set the current HDU)
-    return hduCmdSet(argc, argv, fits);
-}
 

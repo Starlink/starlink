@@ -10,6 +10,7 @@
 /*  Government purposes to publish, distribute, translate, copy, exhibit,  */
 /*  and perform such material.                                             */
 
+#include <stdio.h>
 #include <string.h>
 #include "fitsio2.h"
 /*--------------------------------------------------------------------------*/

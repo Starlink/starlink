@@ -1,21 +1,23 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tHTTP.C,v 1.2 1997/12/02 10:28:42 abrighto Exp $
+ * $Id: tHTTP.C,v 1.4 2005/02/02 01:43:00 brighton Exp $
  *
  * tHTTP.C - test cases for class HTTP
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
 
+using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <assert.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
+#include <string.h>
 #include "error.h"
 #include "HTTP.h"
 

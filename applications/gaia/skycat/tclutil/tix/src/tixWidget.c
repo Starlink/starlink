@@ -10,6 +10,7 @@
  *
  */
 
+#include <tixPort.h>
 #include <tclInt.h>
 #include <tixInt.h>
 #include <tixItcl.h>
@@ -156,7 +157,7 @@ TIX_DEFINE_CMD(Tix_CreateWidgetCmd)
     for (i=0; i<cPtr->nSpecs; i++) {
 	spec = cPtr->specs[i];
 	if (spec->forceCall) {
-	    value = Tcl_GetVar2(interp, widRec, spec->argvName,
+	    value = (char*)Tcl_GetVar2(interp, widRec, spec->argvName,
 		TCL_GLOBAL_ONLY);
 	    if (Tix_CallConfigMethod(interp, cPtr, widRec, spec,
 		    value)!=TCL_OK){
@@ -188,8 +189,8 @@ TIX_DEFINE_CMD(Tix_CreateWidgetCmd)
 	} else {
 	    oldResult = NULL;
 	}
-	oldErrorInfo = Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
-	oldErrorCode = Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
+	oldErrorInfo = (char*)Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
+	oldErrorCode = (char*)Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
 
 	Tcl_ResetResult(interp);
 
@@ -281,7 +282,7 @@ static int ParseOptions(interp, cPtr, widRec, argc, argv)
 	spec = cPtr->specs[i];
 
 	if (!spec->isAlias) {
-	    if ((value=Tk_GetOption(tkwin,spec->dbName,spec->dbClass))==NULL) {
+	    if ((value=(char*)Tk_GetOption(tkwin,spec->dbName,spec->dbClass))==NULL) {
 		value = spec->defValue;
 	    }
 	    if (Tix_ChangeOneOption(interp, cPtr, widRec, spec,

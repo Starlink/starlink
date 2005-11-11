@@ -1,9 +1,7 @@
 /*=============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995,1996 Mark Calabretta
-*   wcstrig function names changed by Doug Mink, SAO, April 15, 1998
-*   cel.h include file added to wcslib.h by Doug Mink, SAO, September 28, 1998
+*   Copyright (C) 1995-1999, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -233,17 +231,11 @@
 *      TSC: tangential spherical cube
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: cel.c,v 1.6 1998/10/01 08:23:58 abrighto Exp $
+*   $Id: cel.c,v 1.2 2005/02/02 01:43:04 brighton Exp $
 *===========================================================================*/
 
-#include <string.h>
+#include <math.h>
 #include "wcslib.h"
-
-int  skycat_npcode = 25;
-char skycat_pcodes[25][4] =
-      {"AZP", "TAN", "SIN", "STG", "ARC", "ZPN", "ZEA", "AIR", "CYP", "CAR",
-       "MER", "CEA", "COP", "COD", "COE", "COO", "BON", "PCO", "GLS", "PAR",
-       "AIT", "MOL", "CSC", "QSC", "TSC"};
 
 /* Map error number to error message for each function. */
 const char *celset_errmsg[] = {
@@ -262,6 +254,12 @@ const char *celrev_errmsg[] = {
    "Invalid coordinate transformation parameters",
    "Invalid projection parameters",
    "Invalid value of (x,y)"};
+
+int  npcode = 25;
+char pcodes[25][4] =
+      {"AZP", "TAN", "SIN", "STG", "ARC", "ZPN", "ZEA", "AIR", "CYP", "CAR",
+       "MER", "CEA", "COP", "COD", "COE", "COO", "BON", "PCO", "GLS", "PAR",
+       "AIT", "MOL", "CSC", "QSC", "TSC"};
  
 
 int celset(pcode, cel, prj)
@@ -408,12 +406,12 @@ struct prjprm *prj;
          cel->ref[2] = (cel->ref[1] < theta0) ? 180.0 : 0.0;
       }
 
-      clat0 = cosdeg(cel->ref[1]);
-      slat0 = sindeg(cel->ref[1]);
-      cphip = cosdeg(cel->ref[2]);
-      sphip = sindeg(cel->ref[2]);
-      cthe0 = cosdeg(theta0);
-      sthe0 = sindeg(theta0);
+      clat0 = cosdeg (cel->ref[1]);
+      slat0 = sindeg (cel->ref[1]);
+      cphip = cosdeg (cel->ref[2]);
+      sphip = sindeg (cel->ref[2]);
+      cthe0 = cosdeg (theta0);
+      sthe0 = sindeg (theta0);
 
       x = cthe0*cphip;
       y = sthe0;
@@ -430,8 +428,8 @@ struct prjprm *prj;
             return 1;
          }
 
-         u = atan2deg(y,x);
-         v = acosdeg(slat0/z);
+         u = atan2deg (y,x);
+         v = acosdeg (slat0/z);
 
          latp1 = u + v;
          if (latp1 > 180.0) {
@@ -466,7 +464,7 @@ struct prjprm *prj;
 
       cel->euler[1] = 90.0 - latp;
 
-      z = cosdeg(latp)*clat0;
+      z = cosdeg (latp)*clat0;
       if (fabs(z) < tol) {
          if (fabs(clat0) < tol) {
             /* Celestial pole at the reference point. */
@@ -482,12 +480,12 @@ struct prjprm *prj;
             cel->euler[1] = 180.0;
          }
       } else {
-         x = (sthe0 - sindeg(latp)*slat0)/z;
+         x = (sthe0 - sindeg (latp)*slat0)/z;
          y =  sphip*cthe0/clat0;
          if (x == 0.0 && y == 0.0) {
             return 1;
          }
-         cel->euler[0] = cel->ref[0] - atan2deg(y,x);
+         cel->euler[0] = cel->ref[0] - atan2deg (y,x);
       }
 
       /* Make euler[0] the same sign as ref[0]. */
@@ -499,8 +497,8 @@ struct prjprm *prj;
    }
 
    cel->euler[2] = cel->ref[2];
-   cel->euler[3] = cosdeg(cel->euler[1]);
-   cel->euler[4] = sindeg(cel->euler[1]);
+   cel->euler[3] = cosdeg (cel->euler[1]);
+   cel->euler[4] = sindeg (cel->euler[1]);
    cel->flag = CELSET;
 
    /* Check for ill-conditioned parameters. */
@@ -568,6 +566,6 @@ double *lng, *lat;
 
    return 0;
 }
-
-/* Sep 28 1998	cel.h is now part of wcslib.h
+/* Dec 20 1999	Doug Mink -Change cosd() and sind() to cosdeg() and sindeg()
+ * Dec 20 1999	Doug Mink -Include wcslib.h, which includes wcsmath.h and cel.h
  */
