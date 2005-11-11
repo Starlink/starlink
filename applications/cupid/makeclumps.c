@@ -320,7 +320,8 @@ void makeclumps() {
    kpg1Fillr( back, nel, ipd2, status );
  
 /* Allocate memory for the output table array */
-   ncol = ( ndim == 1 ) ? 3 : ( (ndim ==2 ) ? 6 : 10 );
+   ncol = ( ( ndim == 1 ) ? CUPID__GCNP1 : ( 
+              (ndim ==2 ) ? CUPID__GCNP2 : CUPID__GCNP3 ) ) - 1;
    tab = astMalloc( sizeof(double)*nclump*ncol );
 
 /* Create a Frame with "ncol" axes describing the table columns. */

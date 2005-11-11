@@ -496,9 +496,10 @@ void clumps() {
 /* Store the configuration in the CUPID extension. */
    cupidStoreConfig( xloc, keymap );
 
-/* Store the clump properties in the CUPID extension. This also annuls the
-   HDS locators stored within "clist". */
-   cupidStoreClumps( xloc, clist, nclump );
+/* Store the clump properties in the CUPID extensionand output catalogue
+   (if needed). This also annuls the HDS locators stored within "clist". */
+   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
+                     "Output from CUPID:CLUMPS" );
 
 /* Tidy up */
 L999:
