@@ -16,6 +16,7 @@
  *                 17 MAr 98  Made WCSRep an abstract class, to allow
  *                            new WCS implementations. The old WCSRep
  *                            class was renamed to SAOWCS.
+ * pbiereic        11/10/99   Added deltset()
  */
 
 
@@ -67,6 +68,9 @@ public:
 		double rotate, 
 		int equinox, double epoch,
 		const char* proj) = 0;
+
+    // set rotation and scaling
+    virtual int deltset(double cdelt1, double cdelt2, double rotation) = 0;
 
     // reset the center of the WCS structure
     virtual int shift(double ra, double dec, double equinox) = 0;
@@ -190,6 +194,11 @@ public:
 		const char* proj) {
 	return rep_->set(ra, dec, secpix, xrefpix, yrefpix, nxpix, nypix, rotate, 
 			 equinox, epoch, proj);
+    }
+
+    // set rotation and scaling
+    int deltset(double cdelt1, double cdelt2, double rotation) {
+        return rep_->deltset(cdelt1, cdelt2, rotation);
     }
 
     // reset the center of the WCS structure

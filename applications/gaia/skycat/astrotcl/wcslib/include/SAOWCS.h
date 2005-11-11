@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: SAOWCS.h,v 1.5 1998/11/16 21:23:02 abrighto Exp $" 
+ * "@(#) $Id: SAOWCS.h,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
  *
  * SAOWCS.h - declarations for class SAOWCS, an implementation class for
  *            class WCS, which is a reference counted class that manages
@@ -20,6 +20,7 @@
  *                 17 Mar 98  Renamed from WSCRep, made WCSRep abstract,
  *                            to allow new implementations based on other
  *                            libraries.
+ * pbiereic        11/10/99   Added deltset()
  */
 
 
@@ -62,8 +63,8 @@ public:
     // return class name as a string
     virtual const char* classname() const {return "SAOWCS";}
 
-    // Return 1 if WCS info is available, else 0 
-    int isWcs() const {return (wcs_ && ::iswcs(wcs_));}
+    // Return 1 if WCS info is available, else 0 ("LINEAR" doesn't count)
+    int isWcs() const {return (wcs_ && ::iswcs(wcs_) && strcmp(equinoxStr_, "LINEAR") != 0);}
 
     // return the world coordinates string for the given ximage coords
     char* pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag = 1) const;
@@ -91,6 +92,9 @@ public:
 
     // reset the center of the WCS structure
     int shift(double ra, double dec, double equinox);
+
+    // set rotation and scaling
+    int deltset(double cdelt1, double cdelt2, double rotation);
 
     // Return the WCS equinox
     double equinox() const {return equinox_;}

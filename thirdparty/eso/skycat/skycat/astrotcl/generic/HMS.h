@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: HMS.h,v 1.1 1997/11/28 01:32:54 abrighto Exp $
+ * $Id: HMS.h,v 1.5 2005/02/02 01:43:04 brighton Exp $
  *
  * HMS.h - class representing a value of the form "hours:min:sec"
  *
@@ -13,10 +13,12 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  27 Sep 95  Created
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
-#include <iostream.h>
-#include <math.h>
+using namespace std;
+#include <iostream>
+#include <cmath>
 
 const double HMS_NULL = HUGE_VAL;	// null value for a double
 
@@ -34,11 +36,11 @@ protected:
     char sign_;			// '+' or '-'
   
 public:
-    // constructor
+    // constructors
     HMS() : hours_(0), min_(0), sec_(0.0), val_(HMS_NULL), show_sign_(0) {}
     HMS(double hours, int min, double sec);
     HMS(double val);
-    HMS(const char* s, int hflag = 0);
+    HMS(const char* s, int hflag = 0, int* dflag = 0);
     
     // return true if this object has the null value
     int isNull() const {return val_ == HMS_NULL;}
