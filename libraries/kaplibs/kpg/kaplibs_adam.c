@@ -137,6 +137,7 @@ void kpg1Gtgrp( const char *param, Grp **igrp, int *size, int *status ){
 
    F77_FREE_CHARACTER(PARAM);
    F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( SIZE, *size );
 
    /* make sure status is imported before we call a C routine
       capable of setting status */
