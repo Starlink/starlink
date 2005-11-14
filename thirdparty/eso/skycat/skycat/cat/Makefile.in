@@ -1,5 +1,5 @@
 # ESO/Archive
-# $Id: Makefile.in,v 1.13 1998/04/07 00:05:13 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
 #
 # Component level Makefile
 
@@ -47,6 +47,7 @@ SHLIB_CFLAGS=@SHLIB_CFLAGS@
 SHLIB_LD=@SHLIB_LD@
 SHLIB_SUFFIX=@SHLIB_SUFFIX@
 SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+NEED_SHLIB_LD_LIBS=@NEED_SHLIB_LD_LIBS@
 DL_LIBS=@DL_LIBS@
 LD_FLAGS=@LD_FLAGS@
 LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
@@ -66,7 +67,7 @@ SHARED  = @SHARED@
 
 # Dependent libraries added to command line to build master shared library,
 # on systems where that is needed. 
-MASTER_DEP_LIBS = $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS)
+MASTER_DEP_LIBS = $(TCLTKLIBS) $(X_LIB) $(EXTRA_LIBS) @LIB_STDCPP@ @LIB_STDCPP@
 
 # ------------------------------------------------------------------------
 
@@ -88,7 +89,7 @@ master_lib:
 	 if test $(SHARED) -eq 1 ; then \
 	   echo "making master $(LIBRARY_sl) shared library" ;\
 	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\
-	   if test "$(SHLIB_LD_LIBS)" = "" ; then \
+	   if test "$(NEED_SHLIB_LD_LIBS)" = "1" ; then \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o ;\
 	   else \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_DEP_LIBS) ;\
@@ -131,7 +132,6 @@ install_master_lib: FORCE
 	   rm -f $(LIBDIR)/$(LIBRARY_sl) ;\
 	   cp $(LIBRARY_sl) $(LIBDIR)/$(LIBRARY_sl) ;\
 	   chmod 555 $(LIBDIR)/$(LIBRARY_sl) ;\
-	   (cd $(LIBDIR)/cat; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
 	fi 
 	cp $(LIBRARY_a) $(LIBDIR)/$(LIBRARY_a) 
 	$(RANLIB) $(LIBDIR)/$(LIBRARY_a)
@@ -140,3 +140,6 @@ install_master_lib: FORCE
 install: install_cat install_master_lib
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

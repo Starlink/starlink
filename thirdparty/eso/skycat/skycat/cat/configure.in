@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.35 1998/10/28 17:36:45 abrighto Exp $
+# $Id: configure.in,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Catalog modules.
@@ -13,6 +13,7 @@
 # Allan Brighton  08/Apr/97  Use rtdConfig.sh to get path and shared lib info
 # Allan Brighton  26/Nov/97  Split rtd into 3 packages (tclutil, astrotcl, rtd)
 #                            and removed dependence of cat on the rtd package. 
+# P.Biereichel    26/06/99  Option --with-vltgnu added
 #
 # -----------------------------------------------------------------------
 
@@ -61,8 +62,19 @@ AC_PROG_CXX
 # these options are ignored for now, since all the config info is taken 
 # from the previously configured tclutil package
 
-AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
-AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
+LIB_STDCPP=""
+VLTGNU=0
+AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
+if test "$VLTGNU" = "1" ; then
+  CC=gcc
+  CXX=gcc
+  LIB_STDCPP="-lstdc++"
+else
+  AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+fi
+
+AC_SUBST(LIB_STDCPP)
+AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
 
 # -----------------------------------------------------------------------
 #
@@ -248,7 +260,6 @@ AC_ARG_WITH(debug, [--with-debug       use debugging flag],
 
 CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
 CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-
 AC_SUBST(CDEBUGFLAGS)
 AC_SUBST(CXXDEBUGFLAGS)
 
@@ -275,7 +286,14 @@ fi
 SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
 
 # Base command to use for combining object files into a shared library:
-SHLIB_LD=$TCLUTIL_SHLIB_LD
+if test "$VLTGNU" = "1" ; then
+        SHLIB_LD="gcc -ansi -shared -fPIC"
+        if test "$OS" = "HP-UX" ; then
+                SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
+        fi
+else
+        SHLIB_LD=$TCLUTIL_SHLIB_LD
+fi
 
 # Suffix to use for the name of a shared library.
 SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
@@ -429,16 +447,18 @@ AC_SUBST(ASTROTCL_BUILD_INCLUDES)
 #--------------------------------------------------------------------
 # Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
-DESTDIR="$prefix"
-BINDIR="$DESTDIR/bin"
-LIBDIR="$DESTDIR/lib"
-INCDIR="$DESTDIR/include/cat"
-MANDIR="$DESTDIR/man"
+INSTALL_TARGET=$prefix
+DESTDIR="\${INSTALL_TARGET}"
+BINDIR="\${INSTALL_TARGET}"/bin
+LIBDIR="\${INSTALL_TARGET}"/lib
+INCDIR="\${INSTALL_TARGET}"/include/cat
+MANDIR="\${INSTALL_TARGET}"/man
 CAT_DIR=$LIBDIR/cat
 CAT_LIBRARY=$CAT_DIR
 CAT_BUILD_LIBRARY=$SRC_ROOT/tclcat/library
 CAT_BUILD_INCLUDES="-I$SRC_ROOT/tclcat/include -I$SRC_ROOT/astrocat/include"
 
+AC_SUBST(INSTALL_TARGET)
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
 AC_SUBST(LIBDIR)
@@ -516,13 +536,17 @@ fi
 echo "
 install catlib binaries in                   => $BINDIR
 install catlib libraries in                  => $LIBDIR
+
+default install dir INSTALL_TARGET           => $INSTALL_TARGET
 "
 
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
+export NO_TCL
 AC_OUTPUT(\
 	Makefile \
+        makefile.mk \
         catConfig.sh \
         \
 	astrocat/Makefile \
@@ -542,11 +566,12 @@ AC_OUTPUT(\
 	tclcat/include/Makefile \
 	tclcat/library/Makefile \
 	tclcat/library/cat_version.tcl \
+	tclcat/test/Makefile \
 	tclcat/demos/Makefile \
 	tclcat/demos/cat.sh \
 	tclcat/demos/cat_env.sh \
 	tclcat/bitmaps/Makefile \
 	tclcat/library/pkgIndex.tcl \
 	tclcat/man/Makefile \
-	, chmod +x tclcat/demos/cat.sh; sh makelinks; make -k depend \
+	, if test "$NO_TCL" = "0" ; then sh makelinks; fi ; make -k depend
 )

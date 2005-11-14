@@ -12,8 +12,6 @@
  */
 static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
-
-
 #include <iostream>
 #include <errno.h>
 #include "error.h"
@@ -21,7 +19,7 @@ static const char* const rcsId="@(#) $Id: astroCatalog.C,v 1.3 2003/01/20 15:52:
 // include the C++ and C interfaces
 #include "AstroCatalog.h"
 extern "C" {
-#include "astroCatalog.h"
+#include "astroCatalog.hxx"
 }
 
 

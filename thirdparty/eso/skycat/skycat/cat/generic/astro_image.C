@@ -19,8 +19,8 @@ static const char* const rcsId="@(#) $Id: astroImage.C,v 1.1.1.1 2002/04/04 20:1
 #include "error.h"
 #include "AstroImage.h"
 extern "C" {
-#include "astroImage.h"
-#include "astroCatalog.h"
+#include "astroImage.hxx"
+#include "astroCatalog.hxx"
 }
 
 

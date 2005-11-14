@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.12 1998/03/25 22:32:47 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
 #
 # Makefile.in
 #
@@ -47,7 +47,7 @@ DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@
 SHELL    	= /bin/sh
 AR       	= ar rc
 RM       	= rm -f
-EXTRA_LIBS      = @LIBS@
+EXTRA_LIBS      = @LIBS@ @LIB_STDCPP@ -lm
 
 all: 
 
@@ -103,5 +103,6 @@ tastroImage: lib main.o tastroImage.o
 
 man:
 
+include @SRC_ROOT@/makefile.mk
 include ../../depend.mk
 

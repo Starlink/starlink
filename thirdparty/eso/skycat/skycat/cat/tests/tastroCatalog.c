@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ ESO Archive 
- * $Id: tastroCatalog.c,v 1.5 1997/02/10 13:25:01 abrighto Exp $
+ * $Id: tastroCatalog.c,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
  *
  * tastroCatalog.C - test cases for C interface to class AstroCatalog
  * 

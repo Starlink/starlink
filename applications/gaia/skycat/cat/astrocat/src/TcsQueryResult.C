@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsQueryResult.C,v 1.11 1997/11/12 21:26:21 abrighto Exp $
+ * $Id: TcsQueryResult.C,v 1.4 2003/01/20 15:52:21 brighton Exp $
  *
  * TcsQueryResult.C - method definitions for class TcsQueryResult
  * 
@@ -10,15 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.11 1997/11/12 21:26:21 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
 
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include "error.h"
 #include "WorldCoords.hxx"
 #include "TcsQueryResult.h"
@@ -29,9 +27,9 @@ static const char* const rcsId="@(#) $Id: TcsQueryResult.C,v 1.11 1997/11/12 21:
  * If maxRows is nonzero, only upto that many rows are taken from buf.
  * (redefined from parent class to add init of objects_ array)
  */
-int TcsQueryResult::init(const char* buf, int maxRows)
+int TcsQueryResult::init(const char* buf, int maxRows, int owner)
 {
-    if (TabTable::init(buf, maxRows) != 0)
+    if (TabTable::init(buf, maxRows, owner) != 0)
 	return ERROR;
     return make_objects();
 }
@@ -43,9 +41,9 @@ int TcsQueryResult::init(const char* buf, int maxRows)
  * If maxRows is nonzero, only upto that many rows are taken from buf.
  * (redefined from parent class to add init of objects_ array)
  */
-int TcsQueryResult::init(int numCols, char** colNames, const char* buf, int maxRows)
+int TcsQueryResult::init(int numCols, char** colNames, const char* buf, int maxRows, int owner)
 {
-    if (TabTable::init(numCols, colNames, buf, maxRows) != 0)
+    if (TabTable::init(numCols, colNames, buf, maxRows, owner) != 0)
 	return ERROR;
     return make_objects();
 }
@@ -286,7 +284,7 @@ int TcsQueryResult::inputColIndex(const char* colName) const
 /*
  * print the given table row to the given stream
  */
-int TcsQueryResult::printRow(ostream& os, int row) const
+int TcsQueryResult::printRow(std::ostream& os, int row) const
 {
     // output the rows
     TcsCatalogObject* obj = getObj(row);
@@ -301,7 +299,7 @@ int TcsQueryResult::printRow(ostream& os, int row) const
  * print the table title (and any other info preceding the column headings)
  * (redefined here from parent class to add TCS column info in table header)
  */
-void TcsQueryResult::printTableTop(ostream& os, const char* title) 
+void TcsQueryResult::printTableTop(std::ostream& os, const char* title) 
 {
     if (! title)
 	title = "TcsQueryResult";

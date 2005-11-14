@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ ESO Archive 
- * $Id: tastroImage.c,v 1.4 1998/09/08 19:42:59 abrighto Exp $
+ * $Id: tastroImage.c,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
  *
  * tastroImage.C - test cases for class C interface to AstroImage classes
  * 

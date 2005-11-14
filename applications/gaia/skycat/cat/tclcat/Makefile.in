@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.12 1998/03/02 20:28:55 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
 #
 # Makefile.in - Makefile
 #
@@ -99,7 +99,6 @@ INSTALL      = @INSTALL@
 RANLIB 	     = @RANLIB@
 SHELL 	     = /bin/sh
 RM 	     = rm -f
-LN 	     = ln -s
 
 # info needed for shared libraries (see configure.in or tclConfig.sh for an explanation)
 SHLIB_CFLAGS=@SHLIB_CFLAGS@
@@ -147,7 +146,6 @@ install-bin:
 	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
 	chmod 0755 $(demo_wish)
 	$(INSTALL) $(demo_wish) $(BINDIR)
-	(cd $(CAT_DIR); $(RM) bin; $(LN) ../../bin .)
 
 install-man: 
 	@(cd man; $(MAKE) install)
@@ -187,3 +185,6 @@ man: FORCE
 	$(CXX) -c $(CC_SWITCHES) $<
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+
