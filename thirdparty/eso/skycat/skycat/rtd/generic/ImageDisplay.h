@@ -3,7 +3,7 @@
 #define _ImageDisplay_H_
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageDisplay.h,v 1.6 1999/03/22 21:41:25 abrighto Exp $" 
+ * "@(#) $Id: ImageDisplay.h,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ImageDisplay.h - class managing XImage to Pixmap display including
  *                  optional X shared memory extension usage
@@ -76,6 +76,9 @@ public:
 	// assert(xImage_ != NULL);
 	XPutPixel(xImage_, x, y, value);
     }
+
+    // flush X output buffer
+    void ImageDisplay::flushX();
 
     // other info
     int width() {return xImage_ ? xImage_->width : 0;}

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.45 1998/07/28 21:23:23 abrighto Exp $
+# $Id: configure.in,v 1.2 2005/02/02 01:43:03 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the RTD modules.
@@ -17,20 +17,11 @@
 # Allan Brighton  24/11/97  split rtd into rtd and tclutil packages, moved
 #                           config.h and generic classes to tclutil pkg.
 #                           Get config info from the tclutilConfig.sh now.
+# P.Biereichel    26/06/99  Option --with-vltgnu added
 #
 # -----------------------------------------------------------------------
 
 AC_INIT(rtdimg/src/RtdImage.C)
-
-# -----------------------------------------------------------------------
-#
-# Set the Rtd version from the VERSION file in this directory
-# (That is the place to set the Rtd version number for a new release)
-#
-# -----------------------------------------------------------------------
-RTD_VERSION=`cat VERSION | sed -e 's/rtd-//'`
-AC_SUBST(RTD_VERSION)
-
 
 # -----------------------------------------------------------------------
 #
@@ -53,18 +44,56 @@ PWD=`pwd`
 SRC_ROOT=$PWD
 AC_SUBST(SRC_ROOT)
 
+# set auxiliary dir for AC_PROG_INSTALL, needed to get the absolute
+# path of install.sh in the Makefiles, unless there is a standard
+# one in $PATH
+AC_CONFIG_AUX_DIR($PWD)
+AC_PROG_INSTALL
+
 # -----------------------------------------------------------------------
 #
 # C compiler and debugging flags
 #
 # -----------------------------------------------------------------------
-AC_PROG_INSTALL
+
 AC_PROG_RANLIB
 AC_PROG_CPP
 AC_PROG_CXX
-    
-AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
-AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
+
+LIB_STDCPP=""
+
+VLTGNU=0
+AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
+if test "$VLTGNU" = "1" ; then
+  CC=gcc
+  CXX=gcc
+  LIB_STDCPP="-lstdc++"
+else
+  AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+fi
+
+PKG="rtd"
+AC_SUBST(PKG)
+
+AC_SUBST(LIB_STDCPP)
+AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
+
+
+# -----------------------------------------------------------------------
+#
+# Set the Rtd version from the VERSION file in this directory
+# (That is the place to set the Rtd version number for a new release)
+#
+# -----------------------------------------------------------------------
+RTD_VERSION=`grep vltsccm Makefile.in | grep 'Id:' | sed -e 's/"//g; s/+//g' | awk '{printf $5}'`
+if test "$RTD_VERSION" = "" ; then
+  RTD_VERSION=`cat VERSION | sed -e 's/rtd-//'`
+  echo "RTD VERSION = $RTD_VERSION"
+else
+  echo "VLT software, Rtd cmm version = $RTD_VERSION"
+fi
+AC_SUBST(RTD_VERSION)
+
 
 # -----------------------------------------------------------------------
 #
@@ -175,7 +204,7 @@ AC_SUBST(DEFS)
 # -----------------------------------------------------------------------
 
 NO_TCL=0
-AC_ARG_WITH(notcl, [--with-notcl         Build a version with no Tcl access], NO_TCL=1)
+AC_ARG_WITH(notcl, [--with-notcl       build a version with no Tcl access], NO_TCL=1)
 AC_SUBST(NO_TCL)
 
 # The list of source dirs depends on whether we have Tcl access or not
@@ -220,7 +249,9 @@ AC_SUBST(CXX_DEPEND_FLAGS)
 # set OS version string
 #
 # -----------------------------------------------------------------------
-OSVERSION="`uname -s`-`uname -r`"
+OS=`uname -s`
+OSVERSION="${OS}-`uname -r`"
+AC_SUBST(OS)
 AC_SUBST(OSVERSION)
 
 # -----------------------------------------------------------------------
@@ -250,7 +281,6 @@ AC_ARG_WITH(debug, [--with-debug       use debugging flag],
 
 CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
 CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-
 AC_SUBST(CDEBUGFLAGS)
 AC_SUBST(CXXDEBUGFLAGS)
 
@@ -276,7 +306,14 @@ fi
 SHLIB_CFLAGS=$TCLUTIL_SHLIB_CFLAGS
 
 # Base command to use for combining object files into a shared library:
-SHLIB_LD=$TCLUTIL_SHLIB_LD
+if test "$VLTGNU" = "1" ; then
+        SHLIB_LD="gcc -ansi -shared -fPIC"
+        if test "$OS" = "HP-UX" ; then
+                SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
+        fi
+else
+	SHLIB_LD=$TCLUTIL_SHLIB_LD
+fi
 
 # Suffix to use for the name of a shared library.
 SHLIB_SUFFIX=$TCLUTIL_SHLIB_SUFFIX
@@ -420,16 +457,18 @@ AC_SUBST(ASTROTCL_BUILD_INCLUDES)
 #--------------------------------------------------------------------
 # Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
-DESTDIR="$prefix"
-BINDIR="$DESTDIR/bin"
-LIBDIR="$DESTDIR/lib"
-INCDIR="$DESTDIR/include/rtd"
-MANDIR="$DESTDIR/man"
+INSTALL_TARGET="$prefix"
+DESTDIR="\${INSTALL_TARGET}"
+BINDIR="\${INSTALL_TARGET}/bin"
+LIBDIR="\${INSTALL_TARGET}/lib"
+INCDIR="\${INSTALL_TARGET}/include/rtd"
+MANDIR="\${INSTALL_TARGET}/man"
 RTD_DIR=$LIBDIR/rtd
 RTD_LIBRARY=$RTD_DIR
 RTD_BUILD_LIBRARY=$SRC_ROOT/rtdimg/library
 RTD_BUILD_INCLUDES="-I$SRC_ROOT/rtdimg/include -I$SRC_ROOT/rtilib/include -I$SRC_ROOT/rtdevt/include"
 
+AC_SUBST(INSTALL_TARGET)
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
 AC_SUBST(LIBDIR)
@@ -507,13 +546,17 @@ fi
 echo "
 install rtd binaries in           => $BINDIR
 install rtd libraries in          => $LIBDIR
-install rtd include files in      => $INCDIR"
+install rtd include files in      => $INCDIR
+
+default install dir INSTALL_TARGET=> $INSTALL_TARGET"
 
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
+export NO_TCL
 AC_OUTPUT(\
 	Makefile \
+	makefile.mk \
         rtdConfig.sh \
         \
 	rtdimg/Makefile \
@@ -548,6 +591,6 @@ AC_OUTPUT(\
 	rtdrmt/test/Makefile \
 	rtdrmt/man/Makefile \
 	\
-	, chmod +x rtdimg/demos/rtd.sh; sh makelinks; make -k depend \
-)
+	, if test "$NO_TCL" = "0" ; then sh makelinks; fi ; make -s -k depend \
+	)
 

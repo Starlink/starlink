@@ -1,30 +1,21 @@
 # ------------------------------------------------------------------------
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.4 1998/03/02 20:29:45 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 #  
 # 	Makefile for RTD colormaps directory
 # ------------------------------------------------------------------------
-
-INSTALL      = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-RTD_DIR      = @RTD_DIR@
-RM           = rm -f
-SHELL        = /bin/sh
 FILES        = *.lasc *.iasc
 TARGET       = ../src/colormaps.C
 srcdir	     = @srcdir@
 
-all: $(TARGET)
 
 # generate a C file inclulding static versions of all of the colormap files
 # in this directory
-$(TARGET): $(FILES) colormaps.tcl
-	tcl colormaps.tcl > $(TARGET)
-
-All: 
-	cd ..; $(MAKE)
+do_all:
+	echo "tclsh$(TCL_VERSION) colormaps.tcl > $(TARGET)"
+	tclsh$(TCL_VERSION) colormaps.tcl > $(TARGET)
 
 install-top:
 	@if test -d $(RTD_DIR)/colormaps ; then \
@@ -34,7 +25,7 @@ install-top:
 	fi
 
 install-files: install-top
-	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	$(AT)for i in $(srcdir)/$(FILES) ; do \
 	    $(INSTALL_DATA) $$i $(RTD_DIR)/colormaps ; \
 	done 
 
@@ -49,16 +40,8 @@ install: install-files
 # Note: the default colormap files are now compiled in to the binary...
 install: install-top
 
-clean:
-	$(RM) *\~ "#"* core
-
-depend:
-
-distclean: clean
-	rm -f Makefile	
-
 vlt-distclean: distclean
-	rm -f *.lasc *.iasc *.prg *.fmt
+	$(RM) *.lasc *.iasc *.prg *.fmt
 
-man:
+include ../../makefile.mk
 

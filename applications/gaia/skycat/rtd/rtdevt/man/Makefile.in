@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.3 1997/04/11 10:47:33 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # Makefile.in
 #
@@ -12,19 +12,10 @@
 # 	Makefile for manual page files
 # ------------------------------------------------------------------------
 
-TOPDIR  	= @DESTDIR@
-MANDIR  	= @MANDIR@
 MAN_SECTIONS    = 1 3
-SHELL    	= /bin/sh
-RM		= rm -rf
+MAN1            = ../src/rtdServer.C
+MAN3            = ../src/rtdImageEvent.c ../src/rtdSem.c
 
-all depend: links
-
-# get man page sources from C sources
-links:
-	-@test -h  rtdCubeDisplay.man1 || ln -s ../src/rtdCubeDisplay.c rtdCubeDisplay.man1
-	-@test -h rtdImageEvent.man3 || ln -s ../src/rtdImageEvent.c rtdImageEvent.man3
-	-@test -h rtdServer.man1 || ln -s ../src/rtdServer.c rtdServer.man1
-
+include ../../makefile.mk
 include ../../man.mk
 

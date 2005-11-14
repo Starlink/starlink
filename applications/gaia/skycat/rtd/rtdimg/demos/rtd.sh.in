@@ -2,101 +2,37 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: rtd.sh.in,v 1.14 1999/03/19 20:09:27 abrighto Exp $" 
+# "@(#) $Id: rtd.sh.in,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
-# This script is used to start Tcl/Tk applications.
-#
-# To install a Tcl/Tk script, make a soft link to this file
-# in the same directory. This script will determine
-# the name of the Tcl source file to load based on the name
-# of the link and the environment variables.
+# This script is used by the Makefile to create a startup script
+# for Tcl/Tk applications.
 #
 #  who      when     what
 # -------- -------- ------------------
 # abrighto 11/10/95 created 
-# pbiereic 20/01/97 TCL_LIBRARY, TK_LIBRARY, BLT_LIBRARY
 # abrighto 26/11/97 modified to use astrotcl and tclutil pkgs
-
-# set basic shared library runtime search path (see also below)
-@LD_VARNAME@="@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:@XLIBDIR@:${@LD_VARNAME@}"
+# pbiereic 05/08/99 to be used with the appended tcl file (see Makefile)
 
 # when running from the source dir, set different env for local test
 test -f ../demos/rtd_env.sh && . ../demos/rtd_env.sh
 
-# During development, set TCLUTIL_LIBRARY to your local tclutil/library
-# directory, otherwise the tcl/tk scripts are taken from the installed
-# versions
-if [ -z "$TCLUTIL_LIBRARY" ]
-then
-  # use the installed Tcl/Tk files and shared library
-  TCLUTIL_LIBRARY=@TCLUTIL_LIBRARY@; export TCLUTIL_LIBRARY
-else
-  # use the local development Tcl/Tk files and shared library
-  @LD_VARNAME@="$TCLUTIL_LIBRARY/../..:${@LD_VARNAME@}"
-fi
+# During development, set TCLUTIL_LIBRARY, ASTROTCL_LIBRARY and
+# RTD_LIBRARY to your local library path (see demos/rtd_env.sh),
+# otherwise the tcl/tk scripts are taken from the installed versions
 
-# During development, set ASTROTCL_LIBRARY to your local astrotcl/astrotcl/library
-# directory, otherwise the tcl/tk scripts are taken from the installed
-# versions
-if [ -z "$ASTROTCL_LIBRARY" ]
-then
-  # use the installed Tcl/Tk files and shared library
-  ASTROTCL_LIBRARY=@ASTROTCL_LIBRARY@; export ASTROTCL_LIBRARY
-else
-  # use the local development Tcl/Tk files and shared library
-  @LD_VARNAME@="$ASTROTCL_LIBRARY/../..:${@LD_VARNAME@}"
-fi
-
-# During development, set RTD_LIBRARY to your local rtd/rtdimg/library
-# directory, otherwise the tcl/tk scripts are taken from the installed
-# versions
-if [ -z "$RTD_LIBRARY" ]
-then
-  # use the installed Tcl/Tk files and shared library
-  RTD_LIBRARY=@RTD_LIBRARY@; export RTD_LIBRARY
-else
-  # use the local development Tcl/Tk files and shared library
-  @LD_VARNAME@="$RTD_LIBRARY/../..:${@LD_VARNAME@}"
-fi
-
-# name of program to run
-prog=`basename $0`
+# get absolute path from which this script was started from
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
 
 # wish binary to use
-WISH=$RTD_LIBRARY/../bin/rtdimage_wish
-test -f $WISH || WISH=$RTD_LIBRARY/../../bin/rtdimage_wish
-
-# set environment variables for packages
-if [ -d "@TCL_LIBRARY@" ]
-then
-  TCL_LIBRARY=@TCL_LIBRARY@
-  export TCL_LIBRARY
-fi
- 
-if [ -d "@TK_LIBRARY@" ]
-then
-  TK_LIBRARY=@TK_LIBRARY@
-  export TK_LIBRARY
-fi
- 
-if [ -d "@BLT_LIBRARY@" ]
-then
-  BLT_LIBRARY=@BLT_LIBRARY@
-  export BLT_LIBRARY
+if [ -z "$RTD_LIBRARY" ] ; then
+   WISH=rtdimage_wish; L=`dirname $XP`; RTD_LIBRARY="$L/lib/rtd" ; export RTD_LIBRARY
+   else WISH=$RTD_LIBRARY/../bin/rtdimage_wish
 fi
 
-# start an interactive shell
-if [ "$prog" = "rtd.sh" ]
-then exec $WISH "$@"
-fi
+# append basic shared library runtime search path to @LD_VARNAME@ (only for users
+# who have not set it properly)
+@LD_VARNAME@="${@LD_VARNAME@}:@LIBDIR@:@TCLTK_ROOT@/lib:@TCLTK_ROOT@/lib/itcl:@XLIBDIR@"
 
-# determine which tcl file to start
-file=$RTD_LIBRARY/demos/$prog.tcl
+# start the application 
+exec $WISH "$0" ${1+"$@"}
 
-# be careful about passing arguments with embedded spaces
-if [ "$#" = "0" ]
-then
-  exec $WISH $file
-fi
-
-exec $WISH $file "$@"

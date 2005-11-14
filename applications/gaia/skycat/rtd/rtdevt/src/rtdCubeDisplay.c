@@ -1,6 +1,6 @@
 /*************************************************************************
 * E.S.O. - VLT project
-* "@(#) $Id: rtdCubeDisplay.c,v 1.7 1998/06/25 08:29:55 abrighto Exp $"
+* "@(#) $Id: rtdCubeDisplay.c,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 *  rtdClient.c
 *
 * who       when      what
@@ -11,7 +11,7 @@
 *             12/09/01 Added UKIRT Quick Look member initialisations, should
 *                      be harmless to other uses.
 */
-static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.7 1998/06/25 08:29:55 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: rtdCubeDisplay.c,v 1.2 2005/02/02 01:43:03 brighton Exp $";
 
 /************************************************************************
 *   NAME
@@ -102,51 +102,51 @@ int readFitsCube(FILE  *fptr,
 
 
     do
-	{
+    {
 	fgets(buffer,sizeof(buffer),fptr);
 	ptr = strtok(buffer,"=");
 	while(*ptr == ' ') ptr++;
 	if (strncmp(ptr,"NAXIS1",6) == 0)
-	    {
+	{
 	    vptr = strtok(NULL,"/");
 	    *width = atoi(vptr);
-	    }
+	}
 	if (strncmp(ptr,"NAXIS2",6) == 0)
-		{
-		vptr = strtok(NULL,"/");
-		*height = atoi(vptr);
-		}
+	{
+	    vptr = strtok(NULL,"/");
+	    *height = atoi(vptr);
+	}
 	if (strncmp(ptr,"NAXIS3",6) == 0)
-		{
-		vptr = strtok(NULL,"/");
-		cnt = atoi(vptr);
-		}
+	{
+	    vptr = strtok(NULL,"/");
+	    cnt = atoi(vptr);
+	}
 	if (strncmp(ptr,"BITPIX",6) == 0)
-		{
-		vptr = strtok(NULL,"/");
-		*type = atoi(vptr);
-		}
+	{
+	    vptr = strtok(NULL,"/");
+	    *type = atoi(vptr);
+	}
 	if (strncmp(ptr,"BZERO",5) == 0)
-		{
-		vptr = strtok(NULL,"/");
-		*bzero = (float)atof(vptr);
-		}
+	{
+	    vptr = strtok(NULL,"/");
+	    *bzero = (float)atof(vptr);
+	}
 	
 	if (strncmp(ptr,"BSCALE",6) == 0)
-		{
-		vptr = strtok(NULL,"/");
-		*bscale = (float)atof(vptr);
-		}
+	{
+	    vptr = strtok(NULL,"/");
+	    *bscale = (float)atof(vptr);
 	}
+    }
     while(strncmp(ptr,"END ",4) !=0);
 
     *fileoffset = ((ftell(fptr)/2880L) + ((ftell(fptr)%2880)?1:0))*2880;
 
     if (!cnt)
-	{
-         printf("Warning: NAXIS3 not specified - hmm I'm not shure this is a cube !\n");
-	 cnt = 1;
-	}
+    {
+	printf("Warning: NAXIS3 not specified - hmm I'm not shure this is a cube !\n");
+	cnt = 1;
+    }
     *count = cnt;
 
     return RTD_OK;
@@ -158,20 +158,7 @@ void cleanup()
     if (verbose) printf("Exiting !\n");
     exit(0); 
 }
-void rtdSleep(rtdIMAGE_EVT_HNDL  *eventHndl,int msec)
-{
-    struct timeval time;
-    fd_set      readMask;
-    FD_ZERO(&readMask);
-    FD_SET(eventHndl->socket, &readMask);
 
-    time.tv_sec = msec/1000;
-    time.tv_usec = (msec%1000)*1000;
-
-    select(32,(fd_set *)&readMask,0, 0, &time);
-
-}
-/*  */
 main(int argc, char *argv[])
 {
     char               c,camera[RTD_NAMELEN],reqName[RTD_NAMELEN],fileName[256];
@@ -196,81 +183,81 @@ main(int argc, char *argv[])
 	char* optopt = argv[optind]; 
 #endif
 	switch(c) 
-	    {
-	    case 'v': verbose++; break;
-	    case 'l': loop++; break;
-	    case 't': timer = atoi(optarg); break;
-	    case 'r': strncpy(reqName,optarg,RTD_NAMELEN); break;
-	    case 'f': strncpy(fileName,optarg,256); break;
-	    case 'c': strncpy(camera,optarg,RTD_NAMELEN); break;
-	    case ':':
-		fprintf(stderr,"Option -%s requires an argument\n",
-			optopt);
-		usage();
-		break;
-	    case '?':
-		fprintf(stderr,"Invalid argument -%s \n",optopt);
-		usage();
-		break;
- 	    }
+	{
+	case 'v': verbose++; break;
+	case 'l': loop++; break;
+	case 't': timer = atoi(optarg); break;
+	case 'r': strncpy(reqName,optarg,RTD_NAMELEN); break;
+	case 'f': strncpy(fileName,optarg,256); break;
+	case 'c': strncpy(camera,optarg,RTD_NAMELEN); break;
+	case ':':
+	    fprintf(stderr,"Option -%s requires an argument\n",
+		    optopt);
+	    usage();
+	    break;
+	case '?':
+	    fprintf(stderr,"Invalid argument -%s \n",optopt);
+	    usage();
+	    break;
+	}
     }
     
     if (strlen(camera) == 0)
-	{
+    {
 	printf("camera name not specified - unable to continue !\n");
 	usage();
-	}
+    }
 
     if (rtdInitImageEvt(camera,&eventHndl,NULL) == RTD_ERROR)
-	{
+    {
 	printf("Could not initialize image event !\nCheck if rtdServer is running !\n");
 	usage();
-	}
+    }
 
     if (strlen(fileName) == 0)
-	{
+    {
 	printf("filename not specified - unable to continue !\n");
 	usage();
-	}
+    }
 	
 
     fptr = fopen(fileName,"r");
     if (fptr == NULL)
-	{
+    {
 	printf("invalid filename specified: %s\n",fileName);
 	usage();
-	}
+    }
     
     if (readFitsCube(fptr,&type,&shmWidth,&shmHeight,&count,
 		     &bscale,&bzero,&fileoffset) == RTD_ERROR)
 
-	{
+    {
 	printf("Error in readFitsCube \n");
 	usage();
-	}
+    }
     
     if (verbose)
 	printf("Filename: %s type:%d width:%d height:%d\n",
 	       fileName,type,shmWidth,shmHeight);
 
     switch (type)
-	{
-	case 8:
-	    shmImageType = BYTE;
-	    typeSize = 1; break;
-	case -16:
-	    shmImageType = USHORT;
-	    typeSize = 2; break;
-	case 16:
-	    shmImageType = SHORT;
-	    typeSize = 2; break;
-	case 32:
-	    shmImageType = INT;
-	    typeSize = 4; break;	
-	case -32:
-	    shmImageType = FLOAT;
-	    typeSize = 4; break;
-	}
+    {
+    case 8:
+	shmImageType = BYTE;
+	typeSize = 1; break;
+    case -16:
+	shmImageType = USHORT;
+	typeSize = 2; break;
+    case 16:
+	shmImageType = SHORT;
+	typeSize = 2; break;
+    case 32:
+	shmImageType = INT;
+	typeSize = 4; break;	
+    case -32:
+	shmImageType = FLOAT;
+	typeSize = 4; break;
+    }
 
     /* remove previous shm area */
     if (shmId) 
@@ -284,75 +271,75 @@ main(int argc, char *argv[])
     
     shmPtr   = (void *)shmat(shmId,NULL,0); 
     if (shmPtr != NULL && shmPtr != (void *)-1)
-	{
+    {
 	/* read though file */
-      do
-	  {
-	  /* set correct file pointer */
-	  rewind(fptr);
-	  fseek(fptr,fileoffset, SEEK_SET);
+	do
+	{
+	    /* set correct file pointer */
+	    rewind(fptr);
+	    fseek(fptr,fileoffset, SEEK_SET);
 	  
-	for (i=0;i<count-1; i++)
+	    for (i=0;i<count-1; i++)
 	    {
-	    fread(shmPtr,1,shmWidth*shmHeight*typeSize,fptr);  
-	    memset(&imageInfo,'\0',sizeof(rtdIMAGE_INFO));
-	    imageInfo.dataType = shmImageType;
-	    imageInfo.shmId = shmId;
-	    imageInfo.xPixels  = shmWidth;
-	    imageInfo.yPixels  = shmHeight;
+		fread(shmPtr,1,shmWidth*shmHeight*typeSize,fptr);  
+		memset(&imageInfo,'\0',sizeof(rtdIMAGE_INFO));
+		imageInfo.dataType = shmImageType;
+		imageInfo.shmId = shmId;
+		imageInfo.xPixels  = shmWidth;
+		imageInfo.yPixels  = shmHeight;
 
-            /* Fill in UKIRT Quick Look members */
-	    imageInfo.reserved[0] = 0;
-	    imageInfo.reserved[1] = 0;
-	    imageInfo.reserved[2] = shmWidth;
-	    imageInfo.reserved[3] = shmHeight;
-	    imageInfo.reserved[4] = 1024;
+                /* Fill in UKIRT Quick Look members */
+	        imageInfo.reserved[0] = 0;
+	        imageInfo.reserved[1] = 0;
+	        imageInfo.reserved[2] = shmWidth;
+	        imageInfo.reserved[3] = shmHeight;
+	        imageInfo.reserved[4] = 1024;
 
-	    if (bscale != 0)
+		if (bscale != 0)
 		{
-		char  *cPtr;
-		float *fPtr;
-		int   *iPtr;
-		short *sPtr;
+		    char  *cPtr;
+		    float *fPtr;
+		    int   *iPtr;
+		    short *sPtr;
 		    switch (shmImageType)
-			{
-			case BYTE:
-			    cPtr = (char *)shmPtr;
-			    for (j=0; j<shmWidth*shmHeight; j++)
-				cPtr[j] = (char)(bzero + bscale*(float)cPtr[j]);
-			    break;
-			case USHORT:
-			case SHORT:
-			    sPtr = (short*)shmPtr;
-			    for (j=0; j<shmWidth*shmHeight; j++)
-				sPtr[j] = (short)(bzero + bscale*(float)sPtr[j]);
-			    break;
-			case INT:
-			    iPtr = (int *)shmPtr;
-			    for (j=0; j<shmWidth*shmHeight; j++)
-				iPtr[j]  = (int)(32000 * (bzero + bscale*(float)iPtr[j]));
-			    break;
-			case FLOAT:
-			    fPtr = (float *)shmPtr;
-			    for (j=0; j<shmWidth*shmHeight; j++)
-				fPtr[j] = (int)(bzero + bscale*(float)fPtr[j]);
-			    break;
-			}
+		    {
+		    case BYTE:
+			cPtr = (char *)shmPtr;
+			for (j=0; j<shmWidth*shmHeight; j++)
+			    cPtr[j] = (char)(bzero + bscale*(float)cPtr[j]);
+			break;
+		    case USHORT:
+		    case SHORT:
+			sPtr = (short*)shmPtr;
+			for (j=0; j<shmWidth*shmHeight; j++)
+			    sPtr[j] = (short)(bzero + bscale*(float)sPtr[j]);
+			break;
+		    case INT:
+			iPtr = (int *)shmPtr;
+			for (j=0; j<shmWidth*shmHeight; j++)
+			    iPtr[j]  = (int)(32000 * (bzero + bscale*(float)iPtr[j]));
+			break;
+		    case FLOAT:
+			fPtr = (float *)shmPtr;
+			for (j=0; j<shmWidth*shmHeight; j++)
+			    fPtr[j] = (int)(bzero + bscale*(float)fPtr[j]);
+			break;
+		    }
 		}
-	    /* udate image event structure */
-	    /* send to server */
-	    if (verbose)
+		/* udate image event structure */
+		/* send to server */
+		if (verbose)
 		{
-		printf("sending image no:%d \r",i);
-		fflush(stdout);
+		    printf("sending image no:%d \r",i);
+		    fflush(stdout);
 		}
-	    rtdSendImageInfo(&eventHndl,&imageInfo,NULL);
-	    rtdSleep(&eventHndl,timer);
+		rtdSendImageInfo(&eventHndl,&imageInfo,NULL);
+		rtdSleep(timer);
 	    }
 	
-	  }
-      while (loop);
 	}
+	while (loop);
+    }
     if (verbose) printf("\n");
     cleanup();
 

@@ -14,10 +14,11 @@
  * D.Hopkinson	   20/02/97  Created
  * D.Hopkinson	   17/04/97  Changed name to RtdRPTool and added
  *			     inheritance from this.
+ * pbiereic        28/05/01  Included Allan's changes for tcl8.3.3
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <sys/shm.h>
 
 #include "TclCommand.h"
@@ -56,7 +57,7 @@ protected:
 
     // Constructor.
     RtdRPTool(Tcl_Interp* interp, char* instname, int argc, char** argv, 
-	Tk_ImageMaster master);
+	      Tk_ImageMaster master);
 
     // Cleanup routine
     void cleanup();
@@ -104,19 +105,25 @@ protected:
 public:
     // Constructor
     RtdRecorder(Tcl_Interp *interp, char *instname, int argc, char **argv,
-	Tk_ImageMaster master);
+		Tk_ImageMaster master);
 
     // Destructor
     ~RtdRecorder() {}		// currently empty
 
     // Action routines defined in the Tk_ImageType structure. Most of these
     // are no-ops.
-    static int CreateImage(Tcl_Interp *, char *, int, char **, 
-	Tk_ImageType *, Tk_ImageMaster, ClientData *);
+    static int CreateImage(Tcl_Interp*, char *name, int argc, 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+                           Tcl_Obj *CONST objv[],
+#else
+                           char **argv,
+#endif
+                           Tk_ImageType*, Tk_ImageMaster, ClientData*);
+
     static ClientData GetImage(Tk_Window, ClientData) {return 0;}
     static void DisplayImage(ClientData, Display*, Drawable,
-	int imageX, int imageY, int width, int height,
-	int drawableX, int drawableY) {}
+			     int imageX, int imageY, int width, int height,
+			     int drawableX, int drawableY) {}
     static void FreeImage(ClientData, Display*) {}
     static void DeleteImage(ClientData) {}
 
@@ -139,7 +146,7 @@ class RtdPlayback : public RtdRPTool {
 
 protected:
     int direction_;		// Flag: true if playing forwards
-     enum playSpeed {
+    enum playSpeed {
 	SPEED_SLOW,
 	SPEED_FAST,
 	SPEED_RT
@@ -165,19 +172,25 @@ protected:
 public:
     // Constructor
     RtdPlayback(Tcl_Interp *interp, char *instname, int argc, char **argv,
-	Tk_ImageMaster master);
+		Tk_ImageMaster master);
 
     // Destructor
     ~RtdPlayback() {}		// currently empty
 
     // Action routines defined in the Tk_ImageType structure. Most of these
     // are no-ops at the moment.
-    static int CreateImage(Tcl_Interp *, char *, int, char **, 
-	Tk_ImageType *, Tk_ImageMaster, ClientData *);
+    static int CreateImage(Tcl_Interp*, char *name, int argc, 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+                           Tcl_Obj *CONST objv[],
+#else
+                           char **argv,
+#endif
+                           Tk_ImageType*, Tk_ImageMaster, ClientData*);
+
     static ClientData GetImage(Tk_Window, ClientData) {return 0;}
     static void DisplayImage(ClientData, Display*, Drawable,
-	int imageX, int imageY, int width, int height,
-	int drawableX, int drawableY) {}
+			     int imageX, int imageY, int width, int height,
+			     int drawableX, int drawableY) {}
     static void FreeImage(ClientData, Display*) {}
     static void DeleteImage(ClientData) {}
 
