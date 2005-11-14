@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SkySearch.tcl,v 1.35 1998/12/14 17:32:08 abrighto Exp $
+# @(#) $Id: SkySearch.tcl,v 1.1.1.1 2002/04/04 20:11:54 brighton Exp $
 #
 # SkySearch.tcl - Widget for searching a catalog and plotting the results
 #                 in the skycat image viewer. 
@@ -495,7 +495,7 @@ itcl::class skycat::SkySearch {
 
 	foreach i [$canvas_ find withtag $tag] {
 	    set width [$canvas_ itemcget $i -width]
-	    $canvas_ itemconfig $i -width [incr width 2]
+	    $canvas_ itemconfig $i -width [expr $width+2]
 	}
 	$canvas_ addtag $w_.selected withtag $tag
 	$canvas_ raise $tag $image_
@@ -507,7 +507,7 @@ itcl::class skycat::SkySearch {
     public method deselect_symbol {tag} {
 	foreach i [$canvas_ find withtag $tag] {
 	    set width [$canvas_ itemcget $i -width]
-	    $canvas_ itemconfig $i -width [incr width -2]
+	    $canvas_ itemconfig $i -width [expr $width-2]
 	}
 	$canvas_ dtag $tag $w_.selected
     }
@@ -628,7 +628,7 @@ itcl::class skycat::SkySearch {
     public proc add_history {skycat filename} {
 	set catalog $history_catalog_
 	set image [$skycat get_image]
-
+	
 	# check if the directory for the catalog exists
 	set dir [file dirname $catalog]
 	if {! [file isdirectory $dir]} {
@@ -637,12 +637,12 @@ itcl::class skycat::SkySearch {
 		return
 	    }
 	}
-
+	
 	# make sure at least an empty catalog exists
 	if {! [file exists $catalog] || [file size $catalog] == 0} {
 	    # If it doesn't exist yet, create an empty catalog file
 	    if {[catch {set fd [::open $catalog w]} msg]} {
-		warning_dialog "can't create image history catalog: %msg"
+		warning_dialog "can't create image history catalog: $msg"
 		return
 	    }
 	    puts $fd "Skycat History Catalog v1.0"
