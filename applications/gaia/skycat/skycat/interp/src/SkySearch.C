@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: SkySearch.C,v 1.5 1998/05/28 13:15:10 abrighto Exp $
+ * $Id: SkySearch.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
  *
  * SkySearch.C - method definitions for class SkySearch
  *
@@ -15,38 +15,24 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  10 Feb 98  Created
  */
-static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.5 1998/05/28 13:15:10 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: SkySearch.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
 
-#include "config.h"  //  From skycat util
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <fstream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
+#include <fstream>
+#include <sstream>
+#include "config.h"
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
 #include "util.h"
 #include "Skycat.h"
 #include "SkySearch.h"
-
-// this is normally defined in tclInt.h, and is used to do variable
-// substitution on a string.
-EXTERN int	Tcl_SubstCmd _ANSI_ARGS_((ClientData clientData,
-		    Tcl_Interp *interp, int argc, char **argv));
 
 /*
  * Extend the existing Tcl command "astrocat" by deriving a C++ subclass
@@ -197,35 +183,30 @@ int SkySearch::plot_symbol(Skycat* image, const char* shape,
     // The list includes tags for identifying the symbol as "cat$id" or
     // all symbols for this instance by the instance name. The row number
     // is coded as row#$rownum. The general tag "objects" is also included.
-    char symbol_tags[1024];
-    STRSTD::ostrstream symbol_os(symbol_tags, sizeof(symbol_tags));
+    std::ostringstream symbol_os;
     symbol_os << "{cat" << id << "} " 
 	      << this->instname() 
 	      << ' ' << this->instname() << ".objects"
 	      << " row#" << rownum
-	      << " objects" 
-	      << ends;
+	      << " objects";
 
     // get the list of tags to use for the label
     // The list includes tags for identifying the label as "label$id" or
     // all labels for this instance by the instance name. The row number
     // is coded as row#$rownum. The general tag "objects" is also included.
-    char label_tags[1024];
-    label_tags[0] = '\0';
+    std::ostringstream label_os;
     if (label && strlen(label)) {
-	STRSTD::ostrstream label_os(label_tags, sizeof(label_tags));
 	label_os 
 	    << "{label" << id << "} " 
 	    << this->instname() 
 	    << ' ' << this->instname() << ".labels"
 	    << " row#" << rownum
-	    << " objects"
-	    << ends;
+	    << " objects";
     }
 
     // draw the symbol and label
     return image->draw_symbol(shape, x, y, xy_units, radius, radius_units, bg, fg, 
-			      symbol_tags, ratio, angle, label, label_tags);
+			      symbol_os.str().c_str(), ratio, angle, label, label_os.str().c_str());
 }
 
 
@@ -318,11 +299,9 @@ int SkySearch::plot_row(Skycat* image, const QueryResult& r,
     char labelVal[256];
     labelVal[0] = '\0';
     if (label && strlen(label)) {
-	// call the C routine for the "subst" commmand directly
-	char* argv[2];
-	argv[0] = "subst";
-	argv[1] = (char*)label;
-	if (Tcl_SubstCmd(NULL, interp_, 2, argv) != TCL_OK)
+	char buf[1024];
+        sprintf(buf, "subst %s", label);
+	if (Tcl_Eval(interp_, buf) != TCL_OK)
 	    return fmt_error("error in plot symbol label: '%s': %s", 
 			     label, interp_->result);
 	if (strlen(interp_->result))
@@ -402,7 +381,7 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 	char* angle = "0";
 	char* label = "";
 	char* cond = "1";
-	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio, 
+	if ((status = parse_symbol(r, nsymb, (char**)symb, shape, fg, bg, ratio, 
 				   angle, label, cond)) != TCL_OK) 
 	    break;
     
@@ -413,10 +392,10 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 	    status = error("invalid symbol expression: ", expr);
 	    break;
 	}
-	char* size = exprList[0];
+	char* size = (char*)exprList[0];
 	char* units = "image";
 	if (nexpr > 1 && strlen(exprList[1]))
-	    units = exprList[1];
+	    units = (char*)exprList[1];
 
 	// for each row in the catalog, eval the expressions and plot the symbols
 	int nrows = r.numRows();
@@ -426,8 +405,8 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 	    if ((status = r.get(rownum, id_col, id)) != 0) 
 		break;
 	    WorldOrImageCoords pos;
-	    if ((status = r.getPos(rownum, pos)) != 0) 
-		break;
+	    if (r.getPos(rownum, pos) != 0) 
+		continue;	// coordinates might be missing - just ignore
 	    double x, y;
 	    char xy_units[32];
 	    if (r.isPix()) {
@@ -445,7 +424,7 @@ int SkySearch::plot_objects(Skycat* image, const QueryResult& r,
 		break;
 	    }
 	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units, 
-				   numCols, colNames, colIndexes, shape, bg, fg, ratio, 
+				   numCols, (char**)colNames, colIndexes, shape, bg, fg, ratio, 
 				   angle, label, cond, size, units)) != TCL_OK) 
 		break;
 	}
@@ -545,9 +524,9 @@ int SkySearch::plot(Skycat* image, const QueryResult& r)
  * If $data is specified, it should be a Tcl list of rows to be plotted, in
  * the format returned by the query command.
  *
- * If $equinox is specified, it is the equinox of the ra and dec columns in
- * the data (the first 3 columns are assumed to be id, ra and dec, unless
- * otherwise defined in the catalog config entry or header).
+ * If $equinox is specified, it is the equinox of the image being displayed.
+ * (The ra,dec columns in the table data are assumed to be J2000 unless 
+ * specified otherwise, with the equinox keyword in the table config entry).
  *
  * If $headings is given, it is used as a Tcl list of column headings.
  * Otherwise the catalog headings are used, if there is a current
@@ -583,7 +562,6 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
     }
 
     char* equinoxStr = NULL;
-    double equinox = 2000.;
     int numCols = 0;;
     char** colNames = NULL;
     int freeColNames = 0;
@@ -591,13 +569,6 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
     // get the equinox, if specified
     if (argc >= 3) {
 	equinoxStr = argv[2];
-	if (strlen(equinoxStr) != 0) {
-	    if (strcmp(equinoxStr, "B1950") == 0)
-		equinox = 1950;
-	    else if (isdigit(*equinoxStr) 
-		     && Tcl_GetDouble(interp_, equinoxStr, &equinox) != TCL_OK)
-		return TCL_ERROR;
-	}
     }
 
     // get the column names
@@ -614,7 +585,7 @@ int SkySearch::imgplotCmd(int argc, char* argv[])
     // get query results from arguments
     QueryResult r;
     r.entry(cat_->entry());
-    int status = getQueryResult(numCols, colNames, argv[1], equinox, r);
+    int status = getQueryResult(numCols, (char**)colNames, argv[1], equinoxStr, r);
     if (status == TCL_OK)
 	status = plot(image, r);
 
