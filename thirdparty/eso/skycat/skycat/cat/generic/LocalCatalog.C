@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: LocalCatalog.C,v 1.9 1999/03/22 21:41:12 abrighto Exp $
+ * $Id: LocalCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * LocalCatalog.C - method definitions for class LocalCatalog
  * 
@@ -10,17 +10,16 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  11 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: LocalCatalog.C,v 1.9 1999/03/22 21:41:12 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: LocalCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include "error.h"
 #include "Mem.h"
 #include "LocalCatalog.h"
