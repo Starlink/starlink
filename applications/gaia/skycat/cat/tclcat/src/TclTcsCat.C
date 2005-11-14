@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclTcsCat.C,v 1.8 1998/07/29 21:15:08 abrighto Exp $
+ * $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
  *
  * TclTcsCat.C - method definitions for class TclTcsCat
  * 
@@ -10,16 +10,16 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.8 1998/07/29 21:15:08 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <strstream>
+#include "config.h"
 #include "TcsCatalog.h"
 #include "TcsLocalCatalog.h"
 #include "TclQueryUtil.h"
@@ -34,7 +34,7 @@ extern "C"
 int TclTcsCat_Init(Tcl_Interp* interp)  
 {
     // install the tcscat command 
-    Tcl_CreateCommand(interp, "tcscat", TclTcsCat::tcsCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "tcscat", (Tcl_CmdProc*)TclTcsCat::tcsCatCmd, NULL, NULL);
     return TCL_OK;
 }
 
@@ -86,12 +86,12 @@ TclTcsCat::~TclTcsCat()
  * (This method is redefined here to do the save in TCS catalog format)
  */
 int TclTcsCat::saveQueryResult(const char* filename, int numCols, char** colNames, 
-			       char* info, int iflag, double equinox)
+			       char* info, int iflag, const char* equinoxStr)
 {
     // create a QueryResult object from the headings and data and 
     // save (or append) it to the file
     TcsQueryResult r;
-    if (getQueryResult(numCols, colNames, info, equinox, r) != TCL_OK)
+    if (getQueryResult(numCols, colNames, info, equinoxStr, r) != TCL_OK)
 	return TCL_ERROR;
 
     int id_col = 0;  // catalog's id column index
@@ -110,14 +110,14 @@ int TclTcsCat::saveQueryResult(const char* filename, int numCols, char** colName
  * (redefined here to use TCS catalog format)
  */
 int TclTcsCat::removeQueryResult(const char* filename, int numCols, char** colNames, 
-				 char* info, double equinox)
+				 char* info, const char* equinoxStr)
 {
     // create a QueryResult object from the headings and data and 
     // remove rows matching it from the file
     TcsQueryResult r;
     // if (cat_)
     //	r.entry(cat_->entry());
-    if (getQueryResult(numCols, colNames, info, equinox, r) != TCL_OK)
+    if (getQueryResult(numCols, colNames, info, equinoxStr, r) != TCL_OK)
 	return TCL_ERROR;
     return r.remove(filename, 0);
 }
@@ -202,7 +202,7 @@ int TclTcsCat::queryCmd(int argc, char* argv[])
     // generate the query from the command args
     AstroQuery q;
     if (genAstroQuery(interp_, argc, argv, q, pos1_, pos2_, 
-		      equinox_, feedback_, cat_->entry()) != TCL_OK)
+		      equinoxStr_, feedback_, cat_->entry()) != TCL_OK)
 	return TCL_ERROR;
     
     // XXX make error msg if -columns was specified ?
