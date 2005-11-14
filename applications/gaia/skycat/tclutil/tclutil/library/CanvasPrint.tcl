@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasPrint.tcl,v 1.8 1999/03/19 20:10:25 abrighto Exp $"
+# "@(#) $Id: CanvasPrint.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # CanvasPrint.tcl - Popup dialog for printing the contents of a Tk canvas
 #
@@ -117,8 +117,8 @@ itcl::class util::CanvasPrint {
 	}
 	
 	lappend cmd \
-	    -width [expr $x1-$x0] \
-	    -height [expr $y1-$y0] \
+	    -width [expr {$x1-$x0}] \
+	    -height [expr {$y1-$y0}] \
 	    -x $x0 \
 	    -y $y0
 
@@ -147,8 +147,8 @@ itcl::class util::CanvasPrint {
     # the text 
 
     protected method add_headers {} {
-	set hy0 [expr $y0-25]
-	set hy1 [expr $y1+25]
+	set hy0 [expr {$y0-25}]
+	set hy1 [expr {$y1+25}]
 	
 	# white background for labels
 	$itk_option(-canvas) create rect $x0 $hy0 $x1 $y0 \
@@ -160,8 +160,8 @@ itcl::class util::CanvasPrint {
 	    -fill white \
 	    -tags print
 
-	set y0 [expr $y0-5]
-	set y1 [expr $y1+5]
+	set y0 [expr {$y0-5}]
+	set y1 [expr {$y1+5}]
 
 	if {"$itk_option(-top_left)" != ""} {
 	    $itk_option(-canvas) create text $x0 $y0 \
