@@ -2,98 +2,51 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.15 1999/03/22 21:42:03 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
 #
 # Makefile.in"
 # 
 # who      when     what
 # -------- -------- ------------------
 # abrighto 11/10/95 created 
+# pbiereic 22/03/99 added BiasData
 #
 # ------------------------------------------------------------------------
 # 	Makefile for RTI image library
 # ------------------------------------------------------------------------
 
-CC           	= @CC@
-CXX           	= @CXX@
-CFLAGS  	= @CXXDEBUGFLAGS@
-TOPDIR      	= @DESTDIR@
-LIBDIR      	= @LIBDIR@
-DEPEND_TARGET	= @DEPEND_TARGET@
+SRCS =	LookupTable.C ImageData.C CompoundImageData.C ByteImageData.C \
+	XImageData.C ShortImageData.C UShortImageData.C LongImageData.C \
+	FloatImageData.C DoubleImageData.C NativeImageData.C BiasData.C \
+	iqefunc.c mrqfit.c indexx.c sort.c gaussj.c covsrt.c \
+	histdist.c histeql.c histlist.c histmap.c histscan.c histzero.c saoutil.c
 
-SRCS 		=  LookupTable.C ImageData.C ByteImageData.C \
-                   XImageData.C ShortImageData.C UShortImageData.C \
-                   LongImageData.C FloatImageData.C DoubleImageData.C \
-                   NativeImageData.C \
-                   iqefunc.c mrqfit.c indexx.c sort.c gaussj.c covsrt.c \
-		   histdist.c histeql.c histlist.c histmap.c histscan.c \
-                   histzero.c saoutil.c
+OBJS =	LookupTable.o ImageData.o CompoundImageData.o ByteImageData.o \
+	XImageData.o ShortImageData.o UShortImageData.o LongImageData.o \
+	FloatImageData.o DoubleImageData.o NativeImageData.o BiasData.o \
+	iqefunc.o mrqfit.o indexx.o sort.o gaussj.o covsrt.o \
+	histdist.o histeql.o histlist.o histmap.o histscan.o histzero.o saoutil.o
 
-OBJS 		=  LookupTable.o ImageData.o ByteImageData.o \
-                   XImageData.o ShortImageData.o UShortImageData.o \
-                   LongImageData.o FloatImageData.o DoubleImageData.o \
-                   NativeImageData.o \
-		   iqefunc.o mrqfit.o indexx.o sort.o gaussj.o covsrt.o \
-		   histdist.o histeql.o histlist.o histmap.o histscan.o histzero.o saoutil.o
-
-libname  	= ../lib/librti.a
-
-# X11 include dir
-X_INCLUDE     	= @XINCSW@
-
-# Take include files from the build dirs, if present
-BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
-		  @ASTROTCL_BUILD_INCLUDES@ 
+libname	= ../lib/librti.a
 
 # note: we only include rtdimg below for error.h
-INCLUDES	= -I../include \
-		  -I../../rtdimg/include \
-		  $(BUILD_INCLUDES) \
-		  -I$(TOPDIR)/include/astrotcl \
-		  -I$(TOPDIR)/include/tclutil \
-		   $(X_INCLUDE)
+INCLUDES =	-I../include \
+		-I../../rtdimg/include \
+		$(BUILD_INCLUDES) \
+		-I$(TOPDIR)/include/astrotcl \
+		-I$(TOPDIR)/include/tclutil \
+		$(X_INCLUDE)
 
-CC_SWITCHES	= @SHLIB_CFLAGS@ $(DEFINES) $(INCLUDES) $(CFLAGS)
-DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
-INSTALL  	= @INSTALL@
-INSTALL_DATA  	= @INSTALL_DATA@
-RANLIB   	= @RANLIB@
-SHELL    	= /bin/sh
-AR       	= ar rc
-RM       	= rm -f
-LD_SHFLG        = @LD_SHFLG@
 
-all: dirs $(libname) 
-
-All:
-	cd ../..; $(MAKE)
-
-# recompile if configure is run, since -D flags might have changed
-$(OBJS): ../../config.status
+do_all: dirs $(libname) 
 
 $(libname): $(OBJS)
 	$(RM) $@
 	$(AR) $@ $(OBJS)
 	$(RANLIB) $@
 
-install: 
-
 dirs:
-	test -d ../lib || mkdir ../lib
+	$(AT)test -d ../lib || mkdir ../lib
 
-clean:
-	$(RM) $(OBJS) $(libname) *\~ "#"*
-
-distclean: clean depclean
-	rm -f Makefile	
-
-.SUFFIXES: .C
-.c.o:
-	$(CC) -c $(CC_SWITCHES) $<
-
-.C.o:
-	$(CXX) -c $(CC_SWITCHES) $<
-
-man:
-
+include ../../makefile.mk
 include ../../depend.mk

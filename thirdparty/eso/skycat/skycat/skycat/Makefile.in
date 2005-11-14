@@ -1,5 +1,5 @@
 # ESO/Archive
-# $Id: Makefile.in,v 1.17 1999/02/04 22:12:29 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
 #
 # Component level Makefile
 
@@ -51,6 +51,7 @@ SHLIB_CFLAGS=@SHLIB_CFLAGS@
 SHLIB_LD=@SHLIB_LD@
 SHLIB_SUFFIX=@SHLIB_SUFFIX@
 SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+NEED_SHLIB_LD_LIBS=@NEED_SHLIB_LD_LIBS@
 DL_LIBS=@DL_LIBS@
 LD_FLAGS=@LD_FLAGS@
 LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
@@ -90,8 +91,9 @@ src: FORCE
 
 # make single binary version
 bin: FORCE
-	test -d "$(SKYCAT_WRAPPER_DIR)" \
-	  && (cd $(SKYCAT_WRAPPER_DIR); echo "$(SKYCAT_WRAPPER_DIR):"; $(MAKE) all)
+	if test -d "$(SKYCAT_WRAPPER_DIR)" ; then \
+	  (cd $(SKYCAT_WRAPPER_DIR); echo "$(SKYCAT_WRAPPER_DIR):"; $(MAKE) all) ; \
+	fi
 
 # generate master library
 master_lib: FORCE
@@ -106,7 +108,7 @@ master_lib: FORCE
 	 if test $(SHARED) -eq 1 ; then \
 	   echo "making master $(LIBRARY_sl) shared library" ;\
 	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\
-	   if test "$(SHLIB_LD_LIBS)" = "" ; then \
+	   if test "$(NEED_SHLIB_LD_LIBS)" = "1" ; then \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o ;\
 	   else \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_DEP_LIBS) ;\

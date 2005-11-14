@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.38 1999/03/16 21:17:31 abrighto Exp $
+# $Id: configure.in,v 1.1.1.1 2002/04/04 20:11:53 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Skycat modules.
@@ -172,12 +172,45 @@ if test "$file" != "" ; then
 	f=`dirname $file`
 	TCLPRO_MACH_DIR=`dirname $f`
 	TCLPRO_DIR=`dirname $TCLPRO_MACH_DIR`
+	TCLPRO_WRAP=$TCLPRO_MACH_DIR/bin/prowrap
+	TCLPRO_INCLUDE="-I$TCLPRO_DIR/include"
+	TCLPRO_LIBDIR=$TCLPRO_MACH_DIR/lib
+	if test -f $TCLPRO_LIBDIR/libtbcload10s.a ; then
+		# TclPro1.2
+		TCLPRO_LIBS="$TCLPRO_LIBDIR/libtbcload10s.a $TCLPRO_LIBDIR/libwrapper10s.a"
+		TCLPRO_TCL_LIB=$TCLPRO_LIBDIR/libtcl8.0.a
+		TCLPRO_TK_LIB=$TCLPRO_LIBDIR/libtk8.0.a
+		TCLPRO_ITCL_LIB="$TCLPRO_LIBDIR/libitcl30s.a $TCLPRO_LIBDIR/libitk30s.a"
+		TCLPRO_TCLX_LIB=$TCLPRO_LIBDIR/libtclx8.0.5.a
+	elif test -f $TCLPRO_LIBDIR/libtbcload13s.a ; then
+		# TclPro1.3
+		TCLPRO_LIBS="$TCLPRO_LIBDIR/libtbcload13s.a $TCLPRO_LIBDIR/libwrapper10s.a"
+		TCLPRO_TCL_LIB=$TCLPRO_LIBDIR/libtcl8.2.a
+		TCLPRO_TK_LIB=$TCLPRO_LIBDIR/libtk8.2.a
+		TCLPRO_ITCL_LIB="$TCLPRO_LIBDIR/libitcl31s.a $TCLPRO_LIBDIR/libitk31s.a"
+		TCLPRO_TCLX_LIB=$TCLPRO_LIBDIR/libtclx8.2.a
+	elif test -f $TCLPRO_LIBDIR/libtbcload1.3.a; then
+		# TclPro1.4
+		TCLPRO_LIBS="$TCLPRO_LIBDIR/libtbcload1.3.a $TCLPRO_LIBDIR/libwrapper1.4.a"
+		TCLPRO_TCL_LIB=$TCLPRO_LIBDIR/libtcl8.3.a
+		TCLPRO_TK_LIB=$TCLPRO_LIBDIR/libtk8.3.a
+		TCLPRO_ITCL_LIB="$TCLPRO_LIBDIR/libitcl3.2.a $TCLPRO_LIBDIR/libitk3.2.a"
+		TCLPRO_TCLX_LIB=$TCLPRO_LIBDIR/libtclx8.3.a
+	fi
 	AC_MSG_RESULT([ yes ])
 else
 	AC_MSG_RESULT([ no ])
 fi
 AC_SUBST(TCLPRO_MACH_DIR)
 AC_SUBST(TCLPRO_DIR)
+AC_SUBST(TCLPRO_WRAP)
+AC_SUBST(TCLPRO_INCLUDE)
+AC_SUBST(TCLPRO_LIBDIR)
+AC_SUBST(TCLPRO_LIBS)
+AC_SUBST(TCLPRO_TCL_LIB)
+AC_SUBST(TCLPRO_TK_LIB)
+AC_SUBST(TCLPRO_ITCL_LIB)
+AC_SUBST(TCLPRO_TCLX_LIB)
 
 # -----------------------------------------------------------------------
 #
@@ -196,7 +229,7 @@ AC_SUBST(CXX_DEPEND_FLAGS)
 # -----------------------------------------------------------------------
 #
 # Try to find the location of the static C++ libraries for g++ or CC and
-# make links in the et dir so that the single binary version will not
+# make links in the tclpro dir so that the single binary version will not
 # be depending on the C++ shared library, which might not always be installed.
 #
 # -----------------------------------------------------------------------
@@ -213,17 +246,15 @@ done
 dirs="`grep -- -L $tmp2` /usr/lib /lib"
 for i in $dirs ; do
 	dir=`echo $i | sed -e 's/-L//'`
-	if test -f $dir/libg++.a ; then
-		(cd et; rm -f libg++.a libstdc++.a; ln -s $dir/libg++.a $dir/libstdc++.a . )
-		(cd tclpro; rm -f libg++.a libstdc++.a; ln -s $dir/libg++.a $dir/libstdc++.a . )
-		AC_MSG_RESULT($dir/libg++.a)
+	if test -f $dir/libstdc++.a ; then
+		(cd tclpro; rm -f libg++.a libstdc++.a; ln -s $dir/libstdc++.a . )
+		AC_MSG_RESULT($dir/libstdc++.a)
 		break
 	fi
 done
 for i in $dirs ; do
 	dir=`echo $i | sed -e 's/-L//'`
 	if test -f $dir/libC.a ; then
-		(cd et; rm -f libC.a; ln -s $dir/libC.a . )
 		(cd tclpro; rm -f libC.a; ln -s $dir/libC.a . )
 		AC_MSG_RESULT($dir/libC.a)
 		break
@@ -324,6 +355,7 @@ AC_SUBST(SHLIB_SUFFIX)
 AC_SUBST(SHLIB_LD_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(LD_FLAGS)
+AC_SUBST(LD_FLAGS_STATIC)
 AC_SUBST(LD_SEARCH_FLAGS)
 
 
@@ -616,9 +648,8 @@ AC_SUBST(SKYCAT_LIB_SPEC_STATIC)
 #--------------------------------------------------------------------
 
 case "$TCL_VERSION" in
-  7.6) SKYCAT_WRAPPER_DIR=et;;
   8.*) if test "$TCLPRO_DIR" != "" ; then SKYCAT_WRAPPER_DIR=tclpro; fi;;
-  *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl 7.6"; exit 1 ;;
+  *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl-8.0"; exit 1 ;;
 esac
 AC_SUBST(SKYCAT_WRAPPER_DIR)
 
@@ -696,7 +727,6 @@ AC_OUTPUT(\
 	interp/bitmaps/Makefile \
 	interp/library/pkgIndex.tcl \
 \
-	et/Makefile \
 	tclpro/Makefile \
 \
 	, chmod +x interp/demos/skycat.sh; sh makelinks; make -k depend \
