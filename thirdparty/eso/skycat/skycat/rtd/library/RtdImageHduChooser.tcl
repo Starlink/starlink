@@ -8,6 +8,7 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  09/11/98   Created
+# Peter W. Draper 08/12/00   Slight corrections for missing CRPIX values.
 # pbiereic        14/08/01   Added default method display_fits_table()
 #                            for binary tables.
 #                            Display HDU images only on request (for
@@ -277,8 +278,12 @@ itcl::class rtd::RtdImageHduChooser {
 		set crpix2 $ext_($i,CRPIX2)
 		set naxis1 $ext_($i,NAXIS1)
 		set naxis2 $ext_($i,NAXIS2)
-		set row [expr {round(($max_crpix2 - $crpix2)/$naxis2)}]
-		set col [expr {round(($max_crpix1 - $crpix1)/$naxis1)}]
+                set row -1
+                set col -1
+                catch {
+   		   set row [expr {round(($max_crpix2 - $crpix2)/$naxis2)}]
+		   set col [expr {round(($max_crpix1 - $crpix1)/$naxis1)}]
+                }
 		if {$row<0 || $col<0 || [info exists check($row,$col)]} {
 		    # put in sequential order
 		    set use_crpix 0
