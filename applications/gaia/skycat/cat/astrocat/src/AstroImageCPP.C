@@ -15,26 +15,16 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
-#include "config.h"  //  From skycat util
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <iostream.h>
-#include <fstream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstdlib>
+#include <cstdio>
 #include <unistd.h>
+#include <cstring>
 #include "error.h"
 #include "Compress.hxx"
 #include "AstroImage.h"
@@ -140,8 +130,7 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
     for (int i = 0; i < 3 && urls[i]; i++) {
 
 	// generate the http url command
-	char url[1024];	
-	STRSTD::ostrstream os(url, sizeof(url));
+	std::ostringstream os;
 
 	// expand the variables in the http server command
 	const char* p = urls[i];
@@ -183,9 +172,8 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
 		os << *p++;
 	    }
 	}
-	os << ends;
 
-	if (getImage(url) == 0)
+	if (getImage(os.str().c_str()) == 0)
 	    return 0;
 
 	// don't go to backup URL if it was a request for authorization
@@ -204,7 +192,7 @@ int AstroImage::getImage(const WorldOrImageCoords& pos, double width, double hei
 int AstroImage::getImage(const char* url)
 {
     // open the tmp file
-    ofstream f(tmpfile_);
+    std::ofstream f(tmpfile_);
     if (!f) {
 	return error("could not open file for writing", tmpfile_);
     }
@@ -222,7 +210,7 @@ int AstroImage::getImage(const char* url)
     // if the Content-type is not recognized...
     if (strncmp(ctype, "image/", 6) != 0) {
 	// check if it might still be a FITS file:
-	ifstream is(tmpfile_);
+	std::ifstream is(tmpfile_);
 	char buf[81];
 	if (is && is.get(buf, 80) && strncmp(buf, "SIMPLE", 6) == 0)
 	    return 0;

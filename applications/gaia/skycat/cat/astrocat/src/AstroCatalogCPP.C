@@ -18,25 +18,15 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
-#include "config.h"  //  From skycat util
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
-#include <iostream.h>
-#include <fstream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <cstring>
 #include "error.h"
 #include "Compress.hxx"
 #include "WorldOrImageCoords.h"
@@ -296,7 +286,7 @@ int AstroCatalog::query(const AstroQuery& q, const char* filename, QueryResult& 
     if (! isCatalog(entry_))
 	return wrongServType(entry_);
 
-    // generate the URL for a standard query in buf (using ostrstream)
+    // generate the URL for a standard query in buf (using ostringstream)
     char* result_buf =  NULL;
     int nlines = 0;
 
@@ -436,7 +426,7 @@ int AstroCatalog::getImage(const char* url)
  *   %x, %y           - image coordinates of center point (for pixel based catalogs)
  *
  *   %w, %h           - width and height of area in arcmin (area query)
- * 
+ *
  *   %ws, %hs         - width and height of area in arcsec (area query)
  *
  *   %r1, %r2         - min and max radius (for circular query)
@@ -463,7 +453,7 @@ int AstroCatalog::genHttpQuery(char* buf, int bufsz, const AstroQuery& q, const 
     if (q.pos().status() != 0)
 	return ERROR;
 
-    STRSTD::ostrstream os(buf, bufsz);
+    std::ostringstream os;
     int i;
     int url_has_id = 0, 
 	url_has_radec = 0, 
@@ -615,7 +605,7 @@ int AstroCatalog::genHttpQuery(char* buf, int bufsz, const AstroQuery& q, const 
 	    os << *url++;
 	}
     }
-    os << ends;
+    strncpy(buf, os.str().c_str(), bufsz);
     
     // report an error if the caller specified an id, but there is none in the URL
     if (strlen(q.id()) && ! url_has_id) 
@@ -922,7 +912,7 @@ int AstroCatalog::getPreview(const char* url, char*& ctype)
     newTempFile();
 
     // open the tmp file
-    ofstream f(tmpfile_);
+    std::ofstream f(tmpfile_);
     if (!f) 
 	return sys_error("could not open file for writing: ", tmpfile_);
 	
@@ -940,7 +930,7 @@ int AstroCatalog::getPreview(const char* url, char*& ctype)
     
     if (strcmp(ctype, "text/html") == 0) {
 	// most likely an HTML formatted server error message
-	ifstream is(tmpfile_);
+	std::ifstream is(tmpfile_);
 	unlink(tmpfile_);
 	return http_.html_error(is);
     }
@@ -1027,8 +1017,7 @@ int AstroCatalog::getPreview(const char* url, char*& ctype)
     }
 
     // correct Content-type after decompression
-    const char *ctemp = (is_image ? "image/x-fits" : "text/x-starbase");
-    ctype = (char *) ctemp;
+    ctype = (char*)(is_image ? "image/x-fits" : "text/x-starbase");
 
     // if we got here, then we have the FITS file, so return the file name
     return 0;
