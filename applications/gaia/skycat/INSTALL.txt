@@ -8,9 +8,7 @@ build any or all of the following packages:
 	astrotcl     - Astronomical Tcl and C++ Utilities
 	rtd          - Real-Time Display 
  	cat          - Catalog library
-	et           - Patched version of Embedded Tk
 	skycat       - The ESO Skycat Tool
-	plugins/gaia - A skycat plugin that adds photometry related features
 
 
 1. Requirements
@@ -23,41 +21,64 @@ For Tcl7.6:
 	BLT2.1     - BLT toolkit, graphs and other widgets 
 	tclX7.6.0  - Extended Tcl
 
-Or for Tcl8.0 (or newer, TclPro also supported):
+Or for Tcl8.0 (TclPro-1.2):
 	Tcl8.0.5   - Tcl Shell  (*** NOTE: bug in init.tcl, see below)
-	Tk8.0.5    - Tk X Toolkit
+	Tk8.0.5    - Tk Toolkit
 	itcl3.0.1  - [Incr Tcl]
 	BLT2.4g    - BLT toolkit, graphs and other widgets 
 	tclX8.0.4  - Extended Tcl
 
-These packages are available from the TCL archives. 
-  See: http://www.tcltk.com/ for Itcl.
-  and  http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
-  and: http://www.scriptics.com/tclpro/ for Tcl8.x, TclPro and the latest releases.
+Or for Tcl8.2 (TclPro-1.3):
+	Tcl8.2.3   - Tcl Shell
+	Tk8.2.3    - Tk Toolkit
+	itcl3.1.0  - [Incr Tcl]
+	BLT2.4o    - BLT toolkit, graphs and other widgets 
+	tclX8.2.0  - Extended Tcl (*** NOTE: see below for possible problems)
 
-------------------------------------------------------------------------
-Note: There is a bug in the tcl8.0.5 init.tcl script (also in
-tclpro-1.2).  See bug# 1481 at www.scriptics.com for a description and
-patch. This bug causes problems generating the tclIndex files for
-Itcl classes. The skycat configure scripts do this automatically, so 
-you will need this patch if you are using tcl-8.0.5.
-------------------------------------------------------------------------
+Or for Tcl8.3 (TclPro-1.4):
+	Tcl8.3.3   - Tcl Shell
+	Tk8.3.3    - Tk Toolkit
+	itcl3.2    - [Incr Tcl]
+	BLT2.4u    - BLT toolkit, graphs and other widgets 
+	tclX8.3    - Extended Tcl
+
+These packages are available from the TCL archives: 
+  http://www.scriptics.com/
+
+Note the former Scriptics (now Ajuba) product TclPro, which is used to
+make the Skycat single binary version, is now free.  See
+http://www.scriptics.com/software/tclpro/ for download information.
 
 You can install the standard Tcl/Tk packages anywhere, however it is
 easiest to install them all in the same directory (using the same
 -prefix argument to configure).
 
-NOTE: If you are building with Scriptics TclPro, you also need a
-"normal" Tcl8.x installation (installed from the source). The Skycat
-configure scripts depend on the $prefix/lib/tclConfig.sh and related
-files being installed.  These files are not currently part of the
-TclPro installation. Also, the names of some of the libraries are
-different in TclPro. Skycat uses the "prowrap" application and the
-Scriptics libraries to build a single binary version for tcl8.x, if
-they are found.
+Special Notes:
+-------------
 
-NOTE: In order to build a "single binary" version of skycat correctly,
-the static ".a" Tcl/Tk libraries must be installed. 
+* There is a bug in the tcl8.0.5 init.tcl script (also in tclpro-1.2).
+  See bug# 1481 at www.scriptics.com for a description and patch. This
+  bug causes problems generating the tclIndex files for Itcl
+  classes. The skycat configure scripts do this automatically, so you
+  will need this patch if you are using tcl-8.0.5.
+
+* I had to fix a few TclX8.2.0 bugs under SuSE Linux-6.3: I had to
+  edit tclxConfig.sh in the install dir and remove extra "-L ", which
+  caused the following library name to be ignored. I also had to edit
+  the source file tclX8.2.0/unix/Common.mk to remove extra reference to
+  -lieee, which caused a linker error under SuSe-Linux-6.3.
+
+* If you are building with Scriptics TclPro, you also need a
+  "normal" Tcl8.x installation (installed from the source). The Skycat
+  configure scripts depend on the $prefix/lib/tclConfig.sh and related
+  files being installed.  These files are not currently part of the
+  TclPro installation. Also, the names of some of the libraries are
+  different in TclPro. Skycat uses the "prowrap" application and the
+  Scriptics libraries to build a single binary version for tcl8.x, if
+  they are found.
+
+* In order to build a "single binary" version of skycat correctly,
+  the static ".a" Tcl/Tk libraries must be installed. 
 
 
 2. Building the Software
@@ -101,7 +122,7 @@ static versions.
 ------------------------------
 
 The top level configure script actually runs "configure" in each of
-the package subdirectories found (tclutil, astrotcl, rtd, cat, et, and
+the package subdirectories found (tclutil, astrotcl, rtd, cat, and
 skycat).  If there are errors, you might try to run configure and make
 manually in a subdirectory. As an alternative to configure, you can
 also use one of the scripts config.debug, config.shared, etc, which do
@@ -114,7 +135,7 @@ information.
 
   On Solaris, make sure the correct C compiler is being used
   (not /usr/ucb/cc). We have tested with Solaris SunPRO CC/cc
-  and gcc (2.7.2.3).
+  and gcc (2.95.3).
 
 - HP-UX message "out of memory"
 

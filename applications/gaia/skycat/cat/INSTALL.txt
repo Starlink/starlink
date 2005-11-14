@@ -13,24 +13,36 @@ For Tcl7.6:
 	BLT2.1     - BLT toolkit, graphs and other widgets 
 	tclX7.6.0  - Extended Tcl
 
-Or for Tcl8.0 (or newer):
-	Tcl8.0.3   - Tcl Shell
-	Tk8.0.3    - Tk X Toolkit
+Or for Tcl8.0 (TclPro-1.2):
+	Tcl8.0.5   - Tcl Shell  (*** NOTE: bug in init.tcl, see below)
+	Tk8.0.5    - Tk Toolkit
 	itcl3.0.1  - [Incr Tcl]
-	BLT2.4f    - BLT toolkit, graphs and other widgets 
-	tclX8.0.3  - Extended Tcl
+	BLT2.4g    - BLT toolkit, graphs and other widgets 
+	tclX8.0.4  - Extended Tcl
 
-These packages are available from the TCL archives. 
-  See: http://www.tcltk.com/ for Itcl.
-  and  http://www.NeoSoft.com/tcl/ for TclX and other contributed Tcl software
-  and: http://www.scriptics.com/tclpro/ for Tcl8.x, TclPro and the latest releases.
+Or for Tcl8.2 (TclPro-1.3):
+	Tcl8.2.3   - Tcl Shell
+	Tk8.2.3    - Tk Toolkit
+	itcl3.1.0  - [Incr Tcl]
+	BLT2.4o    - BLT toolkit, graphs and other widgets 
+	tclX8.2.0  - Extended Tcl (*** NOTE: see below for possible problems)
+
+Or for Tcl8.3 (TclPro-1.4):
+	Tcl8.3.3   - Tcl Shell
+	Tk8.3.3    - Tk Toolkit
+	itcl3.2    - [Incr Tcl]
+	BLT2.4u    - BLT toolkit, graphs and other widgets 
+	tclX8.3    - Extended Tcl
+
+These packages are available from the TCL archives: 
+  http://www.scriptics.com/
 
 You can install the standard Tcl/Tk packages anywhere, however it is
 easiest to install them all in the same directory (using the same
 -prefix argument to configure).
 
-You can also get a copy of the whole Tcl7.6/Tk4.2 source tree, with patches 
-already applied from ftp://ftp.archive.eso.org/pub/skycat/.
+You can also get a copy of the whole Tcl/Tk source tree from 
+ftp://ftp.eso.org/pub/archive/skycat.
 
 In addition, the cat package requires the following packages, which
 should be included in the tarfile:
@@ -78,12 +90,6 @@ if {[catch {package require Cat} msg]} {
 	 puts "error loading Cat package $msg"
 	 exit 1
 }
-
-**********************************************************************
-Note that if you are using g++, you must also have libg++ compiled as
-a shared library for this to work (libg++-2.7.2 also has the 
-"--enable-shared" option).
-**********************************************************************
 
 VLT Make Procedure
 ------------------
