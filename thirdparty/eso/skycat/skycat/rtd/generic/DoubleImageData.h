@@ -14,6 +14,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Peter W. Draper 30/05/01  Created
+ *                 14/11/05  Added bias subtraction members.
  */
 
 #include <sys/types.h>
@@ -33,7 +34,7 @@ private:
     short scaleToShort( double );
 
     // as above, but unsigned
-    ushort convertToUshort( double f ) {
+    inline ushort convertToUshort( double f ) {
 	return ushort( scaleToShort( f ) );
     }
 
@@ -41,13 +42,15 @@ private:
     // Convert the given double image value to byte, scaling to short
     // first and then using the short value as an index in the color
     // lookup table.
-    byte lookup( double f ) {
+    inline byte lookup( double f ) {
         return lookup_[(ushort)scaleToShort(f)];
     }
-    unsigned long llookup( double f ) {
+    inline unsigned long llookup( double f ) {
         return lookup_[(ushort)scaleToShort(f)];
     }
 
+    // return NTOH converted value evtl. subtracted with corresponding bias value
+    double getVal(double* p, int idx);
 
 protected:
     // initialize conversion from base type to short,
@@ -58,6 +61,13 @@ protected:
 
     // sprintf format for image pixel value
     virtual char* getValueFmt() {return "%.2f";}
+
+    int getXsamples(double *rawImage, int idx, int wbox, double *samples);
+    int getBsamples(double *rawImage, int idx, int wbox, double *samples);
+    int getCsamples(double *rawImage, int idx, int wbox, double *samples);
+    double getMedian(double *samples, int n);
+    double getBoxVal(double *rawImage, int idx, int wbox, double *samples, int xs);
+    double getRMS(double *samples, int n);
 
 public:
     // constructor
@@ -81,4 +91,4 @@ public:
 };
 
 
-#endif _DoubleImageData_h_
+#endif
