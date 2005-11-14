@@ -1,14 +1,12 @@
 // -*-c++-*-
-#ifndef _UShortImageData_h_
-#define _UShortImageData_h_
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: UShortImageData.h,v 1.10 1999/03/19 20:10:01 abrighto Exp $" 
+ * "@(#) $Id: UShortImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
  *
  * UShortImageData.h - class definitions for class UShortImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
@@ -16,7 +14,8 @@
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 04/03/98  Added llookup.
  *                 14/07/98  Added check for blanks in lookup.
-*/
+ * P.Biereichel    22/03/99  Added definitions for bias subtraction
+ */
 
 #include "ImageData.h"
 
@@ -30,21 +29,31 @@ private:
     ushort blank_;
 
     // get value as unsigned short (dummy method)
-    ushort convertToUshort(ushort s) {
+    inline ushort convertToUshort(ushort s) {
 	return s;
     }
 
     // return X image pixel value for raw image value
-    byte lookup(ushort s) {
-        if ( !haveBlank_ ) return lookup_[s];
-        if ( s != blank_ ) return lookup_[s];
-        return lookup_[(ushort)LOOKUP_BLANK];
+    inline byte lookup(ushort s) {
+	if ( !haveBlank_ ) return lookup_[s];
+	if ( s != blank_ ) return lookup_[s];
+	return lookup_[(ushort)LOOKUP_BLANK];
     }
-    unsigned long llookup(ushort s) {
-        if ( !haveBlank_ ) return lookup_[s];
-        if ( s != blank_ ) return lookup_[s];
-        return lookup_[(ushort)LOOKUP_BLANK];
+    inline unsigned long llookup(ushort s) {
+	if ( !haveBlank_ ) return lookup_[s];
+	if ( s != blank_ ) return lookup_[s];
+	return lookup_[(ushort)LOOKUP_BLANK];
     }
+
+    // return NTOH converted value evtl. subtracted with corresponding bias value
+    ushort getVal(ushort* p, int idx);
+
+    int getXsamples(ushort *rawImage, int idx, int wbox, ushort *samples);
+    int getBsamples(ushort *rawImage, int idx, int wbox, ushort *samples);
+    int getCsamples(ushort *rawImage, int idx, int wbox, ushort *samples);
+    ushort getMedian(ushort *samples, int n);
+    ushort getBoxVal(ushort *rawImage, int idx, int wbox, ushort *samples, int xs);
+    ushort getRMS(ushort *samples, int n);
 
 protected:
 
@@ -68,6 +77,3 @@ public:
     // include declarations for methods that differ only in raw data type
 #   include "ImageTemplates.h"
 };
-
-
-#endif _UShortImageData_h_

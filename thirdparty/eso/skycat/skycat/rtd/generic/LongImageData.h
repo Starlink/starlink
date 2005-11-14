@@ -1,21 +1,20 @@
 // -*-c++-*-
-#ifndef _LongImageData_h_
-#define _LongImageData_h_
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: LongImageData.h,v 1.12 1999/03/19 20:10:01 abrighto Exp $" 
- * $Id: LongImageData.h,v 1.12 1999/03/19 20:10:01 abrighto Exp $
+ * "@(#) $Id: LongImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
+ * $Id: LongImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $
  *
  * LongImageData.h - class definitions for class LongImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 24/01/97  Added FITS_LONG macro changes
+ * P.Biereichel    22/03/99  Added definitions for bias subtraction
  */
 
 #include <sys/types.h>
@@ -31,10 +30,10 @@
 #define FITS_LONG long
 #endif
 
-
 // This class is used for images where the raw data is made up of ints
 
-class LongImageData : public ImageData {
+class LongImageData : public ImageData 
+{
 private:
     // value of blank pixel, if known (if haveBlankPixel_ is nonzero)
     FITS_LONG blank_;
@@ -48,17 +47,27 @@ private:
     short convertToShort(FITS_LONG);	// convert long to short by adding bias
     short scaleToShort(FITS_LONG);	// as above, but with scaling
 
-    ushort convertToUshort(FITS_LONG l) { // unsigned
+    inline ushort convertToUshort(FITS_LONG l) { // unsigned
 	return ushort(scaled_ ? scaleToShort(l) : convertToShort(l));
     }
 
     // return X image pixel value for raw image value
-    byte lookup(FITS_LONG l) {
+    inline byte lookup(FITS_LONG l) {
 	return lookup_[convertToUshort(l)];
     }
-    unsigned long llookup(FITS_LONG l) {
-        return lookup_[convertToUshort(l)];
+    inline unsigned long llookup(FITS_LONG l) {
+	return lookup_[convertToUshort(l)];
     }
+
+    // return NTOH converted value evtl. subtracted with corresponding bias value
+    FITS_LONG getVal(FITS_LONG* p, int idx);
+
+    int getXsamples(FITS_LONG *rawImage, int idx, int wbox, FITS_LONG *samples);
+    int getBsamples(FITS_LONG *rawImage, int idx, int wbox, FITS_LONG *samples);
+    int getCsamples(FITS_LONG *rawImage, int idx, int wbox, FITS_LONG *samples);
+    FITS_LONG getMedian(FITS_LONG *samples, int n);
+    FITS_LONG getBoxVal(FITS_LONG *rawImage, int idx, int wbox, FITS_LONG *samples, int xs);
+    FITS_LONG getRMS(FITS_LONG *samples, int n);
 
 protected:
 
@@ -84,5 +93,3 @@ public:
 #   include "ImageTemplates.h"
 };
 
-
-#endif _LongImageData_h_

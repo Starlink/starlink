@@ -1,14 +1,12 @@
 // -*-c++-*-
-#ifndef _ShortImageData_h_
-#define _ShortImageData_h_
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ShortImageData.h,v 1.10 1999/03/19 20:10:01 abrighto Exp $" 
+ * "@(#) $Id: ShortImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ShortImageData.h - class definitions for class ShortImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
@@ -18,7 +16,8 @@
  * Allan Brighton  14/12/95  reversed above and fixed the real problem 
  * Peter W. Draper 04/03/98  Added llookup
  *                 14/07/98  Added blank checks in lookup.
-*/
+ * P.Biereichel    22/03/99  Added definitions for bias subtraction
+ */
 
 #include <sys/types.h>
 #include "ImageData.h"
@@ -39,20 +38,29 @@ private:
 
     // return X image pixel value for raw image value
     byte lookup(short s) {
-        if ( !haveBlank_ ) return lookup_[(ushort)s];
-        if ( s != blank_ ) return lookup_[(ushort)s];
-        return lookup_[(ushort)LOOKUP_BLANK];
+	if ( !haveBlank_ ) return lookup_[(ushort)s];
+	if ( s != blank_ ) return lookup_[(ushort)s];
+	return lookup_[(ushort)LOOKUP_BLANK];
     }
     unsigned long llookup(short s) {
-        if ( !haveBlank_ ) return lookup_[(ushort)s];
-        if ( s != blank_ ) return lookup_[(ushort)s];
-        return lookup_[(ushort)LOOKUP_BLANK];
+	if ( !haveBlank_ ) return lookup_[(ushort)s];
+	if ( s != blank_ ) return lookup_[(ushort)s];
+	return lookup_[(ushort)LOOKUP_BLANK];
     }
 
+    // return NTOH converted value evtl. subtracted with corresponding bias value
+    short getVal(short* p, int idx);
+
+    int getXsamples(short *rawImage, int idx, int wbox, short *samples);
+    int getBsamples(short *rawImage, int idx, int wbox, short *samples);
+    int getCsamples(short *rawImage, int idx, int wbox, short *samples);
+    short getMedian(short *samples, int n);
+    short getBoxVal(short *rawImage, int idx, int wbox, short *samples, int xs);
+    short getRMS(short *samples, int n);
 
 protected:
 
-    // initialize conversion from base type to short,
+    // initialize conversion from base type to short
     void initShortConversion();
 
 public:
@@ -72,6 +80,3 @@ public:
     // include declarations for methods that differ only in raw data type
 #   include "ImageTemplates.h"
 };
-
-
-#endif _ShortImageData_h_

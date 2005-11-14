@@ -2,7 +2,7 @@
 /*
  * E.S.O. - VLT project 
  * #
- * # "@(#) $Id: ImageTemplates.h,v 1.11 1998/07/23 23:37:55 abrighto Exp $" 
+ * # "@(#) $Id: ImageTemplates.h,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
  *
  * ImageTemplates.h - template class method definitions for classes derived   
  *                    from class ImageData and defined in ImageTemplates.C
@@ -20,6 +20,18 @@
  * P.Biereichel    30/06/97  Changed parameters in getValues() for pixel table
  * Peter W. Draper 12/07/99  Added getBlank();
  */
+
+#define SAMP_METHOD_MAX              0  /* max value of all pixels in a NxN box (default) */
+#define SAMP_METHOD_MIN              1  /* min value of all pixels in a NxN box */
+#define SAMP_METHOD_MEAN             2  /* mean value of all pixels in a NxN box */
+#define SAMP_METHOD_MEDIAN           3  /* median value of all pixels in a NxN box */
+#define SAMP_METHOD_MAX_CROSS        4  /* max value of pixels on a diagonal cross in a NxN box */
+#define SAMP_METHOD_MIN_CROSS        5  /* min value of pixels on a diagonal cross in a NxN box */
+#define SAMP_METHOD_MEAN_CROSS       6  /* mean value of pixels on a diagonal cross in a NxN box */
+#define SAMP_METHOD_MEDIAN_CROSS     7  /* median value of pixels on a diagonal cross in a NxN box */
+#define SAMP_METHOD_MEDIAN_CHESS     8  /* median value of pixels in a chess-board like box */
+#define SAMP_METHOD_MEDIAN_9         9  /* median value of a 3x3 box */
+#define SAMP_METHOD_RMS              10 /* RMS value of all pixels in a NxN box */
 
 
 protected:
@@ -41,10 +53,10 @@ void getValues(double x, double y, double rx, double ry,
 
 // get array of image pixel values and x,y coords around a point
 void getValues(double x, double y, double rx, double ry,
-	       double* ar, int nrows, int ncols);
+	       double* ar, int nrows, int ncols, int flag = 0);
 
 // get array of image pixel values at a given offset with given dimensions
-void getValues(double x, double y, int w, int h, float* ar);
+void getValues(double x, double y, int w, int h, float* ar, int flag = 0);
 
 // Copy raw image data from this image to the given image data area,
 // starting at the image coordinates (x, y) and with the dimentions (w, h) 

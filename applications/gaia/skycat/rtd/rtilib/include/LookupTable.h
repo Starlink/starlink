@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.h,v 1.6 1999/03/22 21:41:53 abrighto Exp $" 
+ * "@(#) $Id: LookupTable.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
  *
  * LookupTable.h - declarations for class LookupTable, a class for managing
  *                 an image color lookup table used to convert image pixel
@@ -18,9 +18,9 @@
  */
 
 #include <sys/types.h>
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstring>
+#include <cstdlib>
 
 typedef unsigned char byte;
 
@@ -29,8 +29,9 @@ typedef unsigned char byte;
  * This class is used internally for reference counting and subclassing.
  * The public interface is through the LookupTable class.
  */
-class LookupTableRep {
-friend class LookupTable;
+class LookupTableRep 
+{
+    friend class LookupTable;
 protected:
     unsigned long* lookup_;	// lookup table
     int size_;			// size of lookup table
@@ -42,7 +43,7 @@ protected:
     int setLookup(int& imageval, int imagelim, int pixval);
 
 public:
-     // constructor (derived classes call this)
+    // constructor (derived classes call this)
     LookupTableRep(int size);
 
     // destructor
@@ -78,7 +79,8 @@ public:
  * with the above class to make it easier to implement different views of
  * the same image data.
  */
-class LookupTable {
+class LookupTable 
+{
 private:
     LookupTableRep* rep_;		// internal representation for reference counting
 
@@ -136,7 +138,7 @@ public:
 
     // look up and return a value (this should be a fast, inline operation)
     // no check, for speed, not needed if using default lookup size
-    unsigned long operator[](ushort i) {
+    unsigned long operator[](unsigned short i) {
 #ifdef DEBUG
 	assert(rep_ && i<rep_->size_);
 #endif       
