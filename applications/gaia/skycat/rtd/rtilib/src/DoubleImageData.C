@@ -13,13 +13,14 @@
  * Peter W. Draper 30/05/01  Created.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <assert.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cassert>
+#include <cmath>
 #include "DoubleImageData.h"
+#include "define.h"
 
 /* 
  * Convert the given double to short by adding the bias, scaling,
@@ -70,7 +71,8 @@ void DoubleImageData::initShortConversion()
     bias_ = -((lowCut_ + highCut_) * 0.5);
     if( (highCut_ - lowCut_) > 0.0 ) {
 	scale_ = LOOKUP_WIDTH / (highCut_ - lowCut_);
-    } else {
+    } 
+    else {
 	scale_ = 1.0;
     }
 
@@ -88,8 +90,15 @@ void DoubleImageData::initShortConversion()
  */
 #define CLASS_NAME DoubleImageData
 #define DATA_TYPE double
+#ifndef NTOH
+#    define NTOH(x) SWAP_DOUBLE(x)
+#endif
 
 // return true is the value x is a NAN (define to 0 for non-float types)
 #define ISNAN(x) isnan(x)
 
 #include "ImageTemplates.C"
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef NTOH
+#undef ISNAN
