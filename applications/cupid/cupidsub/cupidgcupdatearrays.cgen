@@ -106,7 +106,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    double yy[ 3 ];        /* External coords of current pixel */
    int *plist;            /* Pointer to list holding pixel indices */
    int *pnext;            /* Pointer to next element in plist */
-   int area;              /* Used area of clump in pixels */
+   int area;              /* Total area of clump in pixels */
+   int area_off;          /* Area of clump outside the data array, in pixels */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
@@ -174,6 +175,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    peakok = 0;
    sum = 0.0;
    area = 0;
+   area_off = 0;
    while( more ){
       more = 0;
 
@@ -190,10 +192,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
                if( iedge ) {
                   lbox[ iax ]--;
-                  face_done = ( lbox[ iax ] == 0 );
                } else {
                   ubox[ iax ]++;
-                  face_done = ( ubox[ iax ] > dims[ iax ] );
                }
 
 /* Set up the GRID bounds of the section representing this face. Also set
@@ -213,6 +213,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                }
 
 /* Now loop round all the pixels on the face. */
+               face_done = 0;
                while( !face_done ){
 
 /* Get the corresponding 1-dimensional index into the input array. Also check
@@ -228,39 +229,46 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                      }
                   }         
 
-/* Pass on if the current pixel is not within the bounds of the input
-   array. */
-                  if( ok ) {
+/* Find the Gaussian model value at the current pixel. This excludes any 
+   background level because the background value in "par" was set to zero 
+   before entring this loop. */
+                  m = cupidGCModel( ndim, xx, par, -1, 1, first );
+                  first = 0;
+
+/* If the model value is higher than the supplied limit, indicate that the
+   face needs to be extended further. */
+                  if( m > mlim ) {
+                     extend[ iax ][ iedge ] = 1;
+
+/* Scale the model using the RMS noise so that it has the same normalisation 
+   as the residuals and input data, and then add it to the total clump sum. */
+                     m *= rms;
+                     sum += m;
+
+/* Count the total number of pixels contributing to the peak, and count
+   the number which fall outside the bounds fo the data array. */
                      area++;
+
+/* If this pixel is within the data array, update the residual, model,
+   etc */
+                     if( ok ) {
 
 /* If the supplied residual is bad at this point, we leave it unchanged
    and set the corresponding output pixel (if any) bad. */
-                     if( res && res[ j ] == CGEN_BAD ) {
-                        if( out ) out[ j ] = CGEN_BAD;
+                        if( res && res[ j ] == CGEN_BAD ) {
+                           if( out ) out[ j ] = CGEN_BAD;
 
-/* If the supplied residual is not bad, find the Gaussian model value at
-   the current pixel. This excludes any background level because the
-   background value in "par" was set to zero before entring this loop. */
-                     } else {
-                        m = cupidGCModel( ndim, xx, par, -1, 1, first );
-                        first = 0;
-
-/* If the model value is higher than the supplied limit, indicate that the
-   face needs to be extended further. Indicate that some of the peak at
-   least is above the threshold and on the image. Also indicate that the
-   pixel is within a clumpo in any returned mask. */
-                        if( m > mlim ) {
-                           extend[ iax ][ iedge ] = 1;
+/* Indicate that some of the peak at least is above the threshold and on the 
+   image. Also indicate that the pixel is within a clump in any returned 
+   mask. */
+                        } else {
                            peakok = 1;
                            if( rmask ) rmask[ j ] = 1.0;
 
-/* Scale the model using the RMS noise so that it has the same
-   normalisation as the residuals and input data, and then subtract it
-   from the residuals and add it to the output (if any). */
-                           m *= rms;
+/* Subtract the model value from the residuals and add it to the output (if 
+   any). */
                            if( res ) res[ j ] -= (CGEN_TYPE) m;
                            if( out ) out[ j ] += (CGEN_TYPE) m;
-                           sum += m;
 
 /* Add this model value and its associated pixel indices into the lists */
                            ilist = list_size++;
@@ -272,6 +280,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                               pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
                            }
                         }
+
+/* If this pixel is not within the data array,count the number of
+   off-image pixels encountered. */
+                     } else {
+                        area_off++;
                      }
                   }
 
@@ -292,7 +305,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                      xx[ jax ] += 1.0;
                      yy[ cupidGC.dax[ jax ] ] = xx[ jax ];
                   }
-
                }
             }
          }
@@ -318,6 +330,11 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       msgSeti( "N", area );
       msgOut( "", "   Integrated clump intensity: ^V (in ^N pixels)", status );
 
+      if( area_off ) {
+         msgSeti( "N", area_off );
+         msgOut( "", "   (the clump overlaps the edge of the data array)", status );
+      }
+
       msgSetd( "V", bg*nel );
       msgSeti( "N", nel );
       msgOut( "", "   Integrated background intensity: ^V (in ^N pixels)", status );
@@ -325,13 +342,18 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If required, create an HDS structure holding information about the
    clump. */
-   if( cloc ) {
+   if( cloc && area > area_off ) {
 
+/* Modify the box to exclude the border of bad pixels and limit it to the
+   volume of the data array. */
       for( jax = 0; jax < ndim; jax++ ) {
          lbox[ jax ]++;
          ubox[ jax ]--;
+         if( lbox[ jax ] < 1 ) lbox[ jax ] = 1;
+         if( ubox[ jax ] > dims[ jax ] ) ubox[ jax ] = dims[ jax ];
       }
 
+/* Create the HDS object */
       cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
                      mlist, plist, lbnd, iclump, cupidGC.dax );
    }
