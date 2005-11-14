@@ -1,11 +1,11 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: UShortImageData.C,v 1.7 1998/03/23 00:47:02 abrighto Exp $" 
+ * "@(#) $Id: UShortImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
  *
  * UShortImageData.C - member functions for class UShortImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
@@ -14,12 +14,13 @@
  */
 
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cmath>
 #include "UShortImageData.h"
+#include "define.h"
 
 
 /*
@@ -41,4 +42,10 @@ void UShortImageData::initShortConversion()
  */
 #define CLASS_NAME UShortImageData
 #define DATA_TYPE ushort
+#ifndef NTOH
+#    define NTOH(x) SWAP16(x)
+#endif
 #include "ImageTemplates.C"
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef NTOH

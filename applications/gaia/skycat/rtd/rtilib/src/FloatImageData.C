@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: FloatImageData.C,v 1.9 1999/03/19 20:10:08 abrighto Exp $" 
+ * "@(#) $Id: FloatImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
  *
  * FloatImageData.C - member functions for class FloatImageData
  *
@@ -14,13 +14,14 @@
  * Peter W. Draper 15/03/99  Modified to use LOOKUP_BLANK for blank pixels.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <assert.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cassert>
+#include <cmath>
 #include "FloatImageData.h"
+#include "define.h"
 
 
 /* 
@@ -37,7 +38,7 @@ short FloatImageData::scaleToShort(float d)
     if ( haveBlank_ ) {
         if ( blank_ == d ) {
             return LOOKUP_BLANK;
-        }
+	}
     }
 
     short s;
@@ -71,7 +72,8 @@ void FloatImageData::initShortConversion()
     bias_ = -((lowCut_ + highCut_) * 0.5);
     if( (highCut_ - lowCut_) > 0.0 ) {
 	scale_ = LOOKUP_WIDTH / (highCut_ - lowCut_);
-    } else {
+    } 
+    else {
 	scale_ = 1.0;
     }
 
@@ -89,8 +91,15 @@ void FloatImageData::initShortConversion()
  */
 #define CLASS_NAME FloatImageData
 #define DATA_TYPE float
+#ifndef NTOH
+#    define NTOH(x) SWAP_FLOAT(x)
+#endif
 
 // return true is the value x is a NAN (define to 0 for non-float types)
 #define ISNAN(x) isnan(x)
 
 #include "ImageTemplates.C"
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef NTOH
+#undef ISNAN

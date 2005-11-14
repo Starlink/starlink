@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: LookupTable.C,v 1.10 1999/03/22 21:42:02 abrighto Exp $" 
+ * "@(#) $Id: LookupTable.C,v 1.3 2005/02/02 01:43:02 brighton Exp $" 
  *
  * LookupTable.C - method definitions for class LookupTable, managing image
  *                 pixel lookup tables for converting pixel values to 
@@ -21,11 +21,11 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Aug 96  Created
  */
-static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.10 1999/03/22 21:42:02 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: LookupTable.C,v 1.3 2005/02/02 01:43:02 brighton Exp $";
 
 
-#include <math.h>
-#include <stdlib.h>
+#include <cmath>
+#include <cstdlib>
 #include "define.h"
 #include "error.h"
 #include "LookupTable.h"
@@ -251,7 +251,8 @@ void LookupTableRep::logScale(int lcut, int hcut, int isSigned,
     // base distribution on e**n as n goes from 0 to expo 
     if(expo >= 0 ) {
 	scale = (double)(hcut - lcut + 1) / expm1(expo);
-    } else {
+    }
+    else {
 	// negative exponents allocate more levels toward the high values 
 	scale = (double)(hcut - lcut + 1) / (1.0 - exp(expo));
     }
@@ -260,7 +261,8 @@ void LookupTableRep::logScale(int lcut, int hcut, int isSigned,
 	if (expo > 0) {
 	    imagelim = lcut + (int)
 		((expm1(((double)level / ncolors) * expo) * scale) + 0.5);
-	} else {
+	} 
+	else {
 	    imagelim = lcut + (int)
 		((1.0-exp(((double)level / ncolors) * expo) * scale) + 0.5);
 	}
@@ -304,7 +306,7 @@ void LookupTableRep::sqrtScale(int lcut, int hcut, int isSigned,
 	    ((pow(((double)level / ncolors), expo) * range) + 0.5);
 
 	// limit map range to image values 
-	if( imagelim > hcut )
+	if ( imagelim > hcut )
 	    imagelim = hcut;
 
 	if (setLookup(imageval, imagelim, pixval))

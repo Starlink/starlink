@@ -1,11 +1,11 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: LongImageData.C,v 1.10 1999/03/19 20:10:09 abrighto Exp $" 
+ * "@(#) $Id: LongImageData.C,v 1.4 2005/02/02 01:43:02 brighton Exp $" 
  *
  * LongImageData.C - member functions for class LongImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
@@ -25,15 +25,18 @@
  *                           resolve. The scaled variant works fine.
  *                 14/07/98  Added checks for blanks in convert and
  *                           scale ToShort.
+ * pbiereic        17/02/03  Added 'using namespace std'.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <assert.h>
-#include <math.h>
+using namespace std;
+#include <cstdlib>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cassert>
+#include <cmath>
 #include "LongImageData.h"
+#include "define.h"
 
 
 /* 
@@ -49,9 +52,9 @@ short LongImageData::convertToShort(FITS_LONG l)
     //  pixel values at extremes (these wrap and come out in strange
     //  places).
     if ( haveBlank_ ) {
-        if ( blank_ == l ) {
-            return LOOKUP_BLANK;
-        }
+	if ( blank_ == l ) {
+	    return LOOKUP_BLANK;
+	}
     }
     if (v < LOOKUP_MIN )
 	s = LOOKUP_MIN;
@@ -73,9 +76,9 @@ short LongImageData::scaleToShort(FITS_LONG l)
     //  pixel values at extremes (these wrap and come out in strange
     //  places).
     if ( haveBlank_ ) {
-        if ( blank_ == l ) {
-            return LOOKUP_BLANK;
-        }
+	if ( blank_ == l ) {
+	    return LOOKUP_BLANK;
+	}
     }
 
     short s;
@@ -131,16 +134,16 @@ void LongImageData::initShortConversion()
 // 	    scaledBlankPixelValue_ = convertToShort(blank_);
 //     } 
 //     else {
-	// full-up scaling required. (+/- (tmax-tmin)/2) 
-	// offset values to be zero centered 
-	scale_ = LOOKUP_WIDTH / (highCut_ - lowCut_);
-	dbias_ = -((lowCut_ + highCut_) * 0.5);
-	bias_ = (int)dbias_;
-	scaledLowCut_ = scaleToShort((FITS_LONG)lowCut_);
-	scaledHighCut_ = scaleToShort((FITS_LONG)highCut_);
-	if (haveBlank_)
-	    scaledBlankPixelValue_ = LOOKUP_BLANK;
- //    }
+    // full-up scaling required. (+/- (tmax-tmin)/2) 
+    // offset values to be zero centered 
+    scale_ = LOOKUP_WIDTH / (highCut_ - lowCut_);
+    dbias_ = -((lowCut_ + highCut_) * 0.5);
+    bias_ = (int)dbias_;
+    scaledLowCut_ = scaleToShort((FITS_LONG)lowCut_);
+    scaledHighCut_ = scaleToShort((FITS_LONG)highCut_);
+    if (haveBlank_)
+	scaledBlankPixelValue_ = LOOKUP_BLANK;
+    //    }
     // set int flag for later quick check if scale_ != 1.0
     scaled_ = (scale_ != 1.0);  // Sense inverted - PWD
 }
@@ -153,4 +156,11 @@ void LongImageData::initShortConversion()
  */
 #define CLASS_NAME LongImageData
 #define DATA_TYPE FITS_LONG
+#ifndef NTOH
+#    define NTOH(x) SWAP32(x)
+#endif
 #include "ImageTemplates.C"
+#undef NTOH
+#undef CLASS_NAME
+#undef DATA_TYPE
+#undef NTOH

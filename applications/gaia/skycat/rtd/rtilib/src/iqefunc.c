@@ -1,6 +1,32 @@
-/* @(#)iqefunc.c        10.2 (ES0-DMD) 1/15/96 23:36:16 */
+/*===========================================================================
+  Copyright (C) 1995 European Southern Observatory (ESO)
+ 
+  This program is free software; you can redistribute it and/or 
+  modify it under the terms of the GNU General Public License as 
+  published by the Free Software Foundation; either version 2 of 
+  the License, or (at your option) any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public 
+  License along with this program; if not, write to the Free 
+  Software Foundation, Inc., 675 Massachusetts Ave, Cambridge, 
+  MA 02139, USA.
+ 
+  Correspondence concerning ESO-MIDAS should be addressed as follows:
+	Internet e-mail: midas@eso.org
+	Postal address: European Southern Observatory
+			Data Management Division 
+			Karl-Schwarzschild-Strasse 2
+			D 85748 Garching bei Muenchen 
+			GERMANY
+===========================================================================*/
+
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-.COPYRIGHT  (c)  1995  European Southern Observatory
+.COPYRIGHT  (c)  1996  European Southern Observatory
 .IDENT      iqefunc.c
 .LANGUAGE   C
 .AUTHOR     P.Grosbol,  IPG/ESO
@@ -10,8 +36,13 @@
  iqe, iqebgv, iqemnt, iqesec, iqefit
 .VERSION    1.0  1995-Mar-16 : Creation, PJG
 .VERSION    1.1  1995-Jun-22 : Correct derivatives in 'g2efunc', PJG
+.VERSION    1.2  1996-Dec-03 : Code clean-up, PJG
+
+000427
+
 ------------------------------------------------------------------------*/
 
+#include   <stdlib.h>                 /* Standard ANSI-C library        */
 #include   <math.h>                   /* Mathematical definitions       */
 #include   <stdlib.h>
 
@@ -22,17 +53,17 @@ static double  hsq2 = 0.7071067811865475244;    /* constant 0.5*sqrt(2) */
 
 static     float     *pval;
 static     float    *pwght;
-static     int       mx,mp;
+static     int       mx, mp, winsize;
 static     double     w[9];
 static     double    xi[9];
 static     double    yi[9];
 
  
 /*
-
+
 */
 
-iqe(pfm, pwm, mx, my, parm, sdev)
+int iqe(pfm, pwm, mx, my, parm, sdev)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Estimate parameters for the Image Quality using a small
            frame around the object. The following parameters are
@@ -49,34 +80,39 @@ iqe(pfm, pwm, mx, my, parm, sdev)
            to 'iqebgv', 'iqemnt', 'iqesec' and 'iqefit'.
 .RETURN    status,  0: OK, <0: estimate failed,
 ------------------------------------------------------------------------*/
-float      *pfm;        /* pointer to upper left corner of frame */
-float      *pwm;        /* NULL: ignored        */
-int        mx;          /* no. of pixels in x   */
-int        my;          /* no. of pixels in y   */
+float      *pfm;
+float      *pwm;
+int        mx;
+int        my;
 float      *parm;
 float      *sdev;
 
 {
 int      n, err, nbg;
+int      iqebgv(), iqemnt(), iqesec(), iqefit();
 float    bgv, bgs, s2f, r2d;
 float    ap[6], cv[6], est[6], sec[6];
+
+
 
 s2f = 2.0*sqrt(2.0*log(2.0));               /* Sigma to FWHM constant */
 r2d = 45.0/atan(1.0);                       /* Radian to Degrees      */
 for (n=0; n<7; n++) parm[n] = sdev[n] = 0.0;
 
-if (err=iqebgv(pfm, pwm, mx, my, &bgv, &bgs, &nbg)) return -1;
+winsize = (mx * my) - 1;			/* size of sub window */
+
+if ((err=iqebgv(pfm, pwm, mx, my, &bgv, &bgs, &nbg))) return -1;
 parm[6] = bgv;
 sdev[6] = bgs;
 
-if (err=iqemnt(pfm, pwm, mx, my, bgv, bgs, est)) return -2;
+if ((err=iqemnt(pfm, pwm, mx, my, bgv, bgs, est))) return -2;
 parm[0] = est[1];
 parm[1] = s2f*est[2];
 parm[2] = est[3];
 parm[3] = s2f*est[4];
 parm[5] = est[0];
 
-if (err=iqesec(pfm, pwm, mx, my, bgv, est, sec)) return -3;
+if ((err=iqesec(pfm, pwm, mx, my, bgv, est, sec))) return -3;
 parm[4] = r2d*sec[5];
 
 if ((err=iqefit(pfm, pwm, mx, my, bgv, sec, ap, cv))<0) return -4;
@@ -90,7 +126,7 @@ parm[3] = s2f*ap[4];
 sdev[3] = s2f*cv[4];
 parm[4] = fmod(r2d*ap[5]+180.0, 180.0); 
 sdev[4] = r2d*cv[5];
-if (sdev[4] > 180.) sdev[4] = 180.0;            /* max is: Pi */
+if (sdev[4] > 180.) sdev[4] = 180.0;		/* max is: Pi */
 parm[5] = ap[0]; 
 sdev[5] = cv[0];
 
@@ -98,10 +134,10 @@ return 0;
 }
  
 /*
-
+
 */
 
-iqebgv(pfm, pwm, mx, my, bgm, bgs, nbg)
+int iqebgv(pfm, pwm, mx, my, bgm, bgs, nbg)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Estimate background level for subimage
 .RETURN    status,  0: OK, -1:no buffer space, -2: no points left 
@@ -150,16 +186,16 @@ int        *nbg;
      pf0 = pfs0; pf1 = pfs1; pf2 = pfs2; pf3 = pfs3;
      if (pwm) { pw0 = pws0; pw1 = pws1; pw2 = pws2; pw3 = pws3; }
      for (n=0; n<ns; n++) {
-        *pf++ = *pf0++;
-        *pf++ = *pf1; pf1 += mx;
-        *pf++ = *pf2; pf2 -= mx;
-        *pf++ = *pf3--;
-        if (pwm) {
-           *pw++ = *pw0++;
-           *pw++ = *pw1; pw1 += mx;
-           *pw++ = *pw2; pw2 -= mx;
-           *pw++ = *pw3--;
-         }
+	*pf++ = *pf0++;
+	*pf++ = *pf1; pf1 += mx;
+	*pf++ = *pf2; pf2 -= mx;
+	*pf++ = *pf3--;
+	if (pwm) {
+	   *pw++ = *pw0++;
+	   *pw++ = *pw1; pw1 += mx;
+	   *pw++ = *pw2; pw2 -= mx;
+	   *pw++ = *pw3--;
+	 }
       }
      nt += 4*ns;
      ns -= 2;
@@ -168,10 +204,10 @@ int        *nbg;
      pfs2 -= mx - 1;
      pfs3 -= mx + 1;
      if (pwm) {
-        pws0 += mx + 1;
-        pws1 += mx - 1;
-        pws2 -= mx - 1;
-        pws3 -= mx + 1;
+	pws0 += mx + 1;
+	pws1 += mx - 1;
+	pws2 -= mx - 1;
+	pws3 -= mx + 1;
       }
    }
 
@@ -206,11 +242,11 @@ int        *nbg;
      fks = 5.0 * bs;
      bm = bs = 0.0; mt = 0;
      for (n=0; n<nt; n++, pw++) {
-        val = *pf++;
-        if (0.0<*pw && fabs(val-ba)<fks) {
-           bm += val; bs += val*val; mt++;
-         }
-        else *pw = 0.0;
+	val = *pf++;
+	if (0.0<*pw && fabs(val-ba)<fks) {
+	   bm += val; bs += val*val; mt++;
+	 }
+	else *pw = 0.0;
       }
      if (mt<1) { free (pfb); return -2; }
      ba = bm/mt; bs = bs/mt - ba*ba;
@@ -228,10 +264,10 @@ int        *nbg;
 }
  
 /*
-
+
 */
 
-iqemnt(pfm, pwm, mx, my, bgv, bgs, amm)
+int iqemnt(pfm, pwm, mx, my, bgv, bgs, amm)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Find center of object and do simple moment analysis
 .COMMEMTS  The parameter array 'amm' is as follows:
@@ -250,11 +286,11 @@ float      bgs;
 float      *amm;
 {
 int      n, nx, ny, nt, nxc, nyc, ndx, ndy, ioff;
-int      k, ki, ks, kn;
+int      k, ki, ks, kn, psize;
 int      estm9p();
 float    av, dx, dy;
 float    *pf, *pw;
-double   val, x, y, dv, xc, yc, xm, ym;
+double   val, x, y, dv, xm, ym;
 double   am, ax, ay, axx, ayy, axy;
 
 dv = 5.0*bgs;
@@ -296,7 +332,7 @@ ax = ay = 0.0;
 while (ny--)
    {
    x = 0.0;
-   nx = my;
+   nx = mx;				/* ojo! */
    while (nx--)
       {
       val = *pf++ - bgv;
@@ -323,7 +359,11 @@ x = nxc; y = nyc;
 ioff = nxc+mx*nyc;
 n = (mx<my) ? mx-1 : my-1;
 pf = pfm + ioff;
+psize = pf - pfm;
+if ((psize < 0) || (psize > winsize)) return -99;
+
 if (pwm) pw = pwm + ioff;
+
 if ((!pwm) || (pwm && 0.0<*pw)) 
    {
    val = *pf - bgv;
@@ -354,7 +394,11 @@ while (n--)
       {
       if (ki) x += ks; else y += ks;
       if (x<0.0 || y<0.0 || xm<x || ym<y) break;
+
       pf += ioff;
+      psize = pf - pfm;
+      if ((psize < 0) || (psize > winsize)) break;
+
       if (pwm) pw += ioff;
       val = *pf - bgv;
       if ( (dv<val) && (!pwm || (pwm && 0.0<*pw)) ) 
@@ -368,7 +412,7 @@ while (n--)
          nt++; nx++;
          }
       }
-   if (ki=!ki) { ks = -ks; kn++; }
+   if ((ki=(!ki))) { ks = -ks; kn++; }
    }
 if (am<=0.0) return -1;
 
@@ -389,10 +433,10 @@ return 0;
 }
  
 /*
-
+
 */
 
-estm9p(pfm, pwm, mx, my, nx, ny, rm, dx, dy) 
+int estm9p(pfm, pwm, mx, my, nx, ny, rm, dx, dy) 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Estimate parameters for 3x3 pixel region
 .RETURN    status, 0:OK, -1:out of range, 
@@ -408,13 +452,16 @@ float      *dx;
 float      *dy;
 {
 int      n, nt, ix, iy, idx[9];
-float    a, am, ss;
+float    a, am;
 float    *pfb, *pwb, fb[9], wb[9];
 void     indexx();
+
+
 
 /* check if 3x3 region is fully within frame   */
 
 if (nx<1 || mx<nx-2 || ny<1 || my<ny-2) return -1;
+
 
 /* extract region into local array and generate a rank index for it */
 
@@ -429,8 +476,8 @@ if (pwm)
       ix = 3;
       while (ix--) 
          {
-         *pfb++ = *pfm++;
-         *pwb++ = (pwm) ? *pwm++ : 1.0;
+	 *pfb++ = *pfm++;
+	 *pwb++ = (pwm) ? *pwm++ : 1.0;
          }
       pfm += mx - 3;
       pwm += mx - 3;
@@ -451,6 +498,7 @@ else
    }
 indexx(9, fb, idx);
 
+
 /* omit largest value and estimate mean     */
 
 wb[idx[8]] = 0.0;
@@ -461,6 +509,7 @@ for (n=0; n<9; n++) {
    if (0.0<wb[n]) { am += fb[n]; nt++; }
    }
 *rm = am/nt;;
+
 
 /* calculate mean gradient in X and Y */
 
@@ -483,10 +532,10 @@ return 0;
 }
  
 /*
-
+
 */
 
-iqesec(pfm, pwm, mx, my, bgv, est, sec)
+int iqesec(pfm, pwm, mx, my, bgv, est, sec)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Perform a sector analysis of object. Estimates for center and
            size are given in 'est' which is used for bootstrap.
@@ -505,12 +554,13 @@ float      bgv;
 float      *est;
 float      *sec;
 {
-  int      n, ix, iy, nx, ny, nxs, nys;
-  int      k, ki, ks, kn, nxc, nyc, ioff, idx;
-  int      ns[8];
-  float    *pf, *pw, f;
-  double   x, y, xm, ym, xc, yc, fac, dx, dy;
-  double    r, rl, rh, sb[8], a1r, a1i, a2r, a2i;
+int      n, k, ki, ks, kn, nxc, nyc, ioff, idx;
+int      ns[8], psize;
+float    *pf, *pw, f;
+double   x, y, xm, ym, xc, yc, fac, dx, dy;
+double    r, rl, rh, sb[8], a1r, a1i, a2r, a2i;
+
+
 
 /* initiate basic variables    */
 
@@ -537,19 +587,23 @@ float      *sec;
      k = kn;
      ioff = (ki) ? ks : ks*mx;
      while (k--) {
-        if (ki) x += ks; else y += ks;
-        if (x<0.0 || y<0.0 || xm<x || ym<y) break;
-        pf += ioff; pw += ioff;
-        dx = x - xc; dy = y - yc;
-        r = sqrt(dx*dx + dy*dy);
-        if (rl<r && r<rh) {
-           f = *pf - bgv;
-           idx = ((int) (fac*atan2(y-yc,x-xc)+8.5))%8;
-           sb[idx] += (0.0<f) ? f : 0.0;
-           ns[idx]++;
-         }
+	if (ki) x += ks; else y += ks;
+	if (x<0.0 || y<0.0 || xm<x || ym<y) break;
+
+	pf += ioff; pw += ioff;
+        psize = pf - pfm;
+        if ((psize < 0) || (psize > winsize)) break;
+
+	dx = x - xc; dy = y - yc;
+	r = sqrt(dx*dx + dy*dy);
+	if (rl<r && r<rh) {
+	   f = *pf - bgv;
+	   idx = ((int) (fac*atan2(y-yc,x-xc)+8.5))%8;
+	   sb[idx] += (0.0<f) ? f : 0.0;
+	   ns[idx]++;
+	 }
       }
-     if (ki=!ki) { ks = -ks; kn++; }
+     if ((ki=(!ki))) { ks = -ks; kn++; }
    }
 
 /* normalize the sector array and do explicit FFT for k=1,2  */
@@ -566,16 +620,16 @@ float      *sec;
 
   for (n=0; n<6; n++) sec[n] = est[n];        /* copy estimates over  */
   if (a2r==0.0 && a2i==0.0) return -2;
-  sec[5] = fmod(0.5*atan2(a2i,a2r), 4.0/fac);;
+  sec[5] = fmod(0.5*atan2(a2i,a2r), 4.0/fac);
 
   return 0;
 }
  
 /*
-
+
 */
 
-iqefit(pfm, pwm, mx, my, bgv, est, ap, cm)
+int iqefit(pfm, pwm, mx, my, bgv, est, ap, cm)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Fit 2D Gaussian function to PSF
 .COMMEMTS  The parameter arrays 'est' and 'ap' are as follows
@@ -594,8 +648,9 @@ float      *est;
 float      *ap;
 float      *cm;
 {
-int      n, ix, iy, nx, ny, nxs, nys;
-float    *pfb, *pwb, *pf, *pw;
+int      n, ix, iy, nx, ny, nxs, nys, psize;
+int      g2efit();
+float    *pfb, *pwb, *pf, *pw, *pfmo;
 double   chi;
 
 
@@ -605,6 +660,8 @@ for (n=0; n<6; n++) ap[n] = cm[n] = 0.0;
 
 
 /* allocate buffer for a 4 sigma region around the object */
+
+pfmo = pfm;				/* keep original start of array */
 
 nxs = floor(est[1] - 4.0*est[2]);
 if (nxs<0) nxs = 0;
@@ -620,9 +677,13 @@ if (!pfb) return -10;
 pwb = pfb + nx*ny;
 
 
-/* extrac region from extranal buffer */
+/* extract region from external buffer */
 
 pfm += nxs + mx*nys;
+psize = pfm - pfmo;
+if ((psize < 0) || (psize > winsize)) return -99;
+
+
 pf = pfb; pw = pwb;
 iy = ny;
 if (pwm)
@@ -634,12 +695,18 @@ if (pwm)
       while (ix--)
          {
          *pf++ = *pfm++ - bgv;
+         psize = pfm - pfmo;
+         if (psize > winsize) return -99;
+
          if (0.0<*pwm)
             *pw++ = *pwm++;
          else
             *pw++ = 1.0;
          }
       pfm += mx - nx;
+      psize = pfm - pfmo;
+      if ((psize < 0) || (psize > winsize)) return -99;
+
       pwm += mx - nx;
       }
    }
@@ -651,11 +718,17 @@ else
       while (ix--)
          {
          *pf++ = *pfm++ - bgv;
+         psize = pfm - pfmo;
+         if (psize > winsize) return -99;
+
          *pw++ = 1.0;
          }
       pfm += mx - nx;
+      psize = pfm - pfmo;
+      if ((psize < 0) || (psize > winsize)) return -99;
       }
    }
+
 
 /* initialize parameters for fitting    */
 
@@ -666,9 +739,11 @@ ap[3] = est[3] - nys;
 ap[4] = est[4];
 ap[5] = est[5];
 
+
 /* perform actual 2D Gauss fit on small subimage  */
 
 n = g2efit(pfb, pwb, nx, ny, ap, cm, &chi);
+
 
 /* normalize parameters and uncertainties, and exit   */
 
@@ -680,10 +755,10 @@ return n;
 }
 
 /*
-
+
 */
 
-g2einit(val, wght, nx, ny)
+int g2einit(val, wght, nx, ny)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Initiate gauss fit function, set pointers to data and weights
 .RETURN    status,  0: OK, -1: error - bad pixel no.
@@ -692,8 +767,11 @@ float      *val;
 float      *wght;
 int        nx;
 int        ny;
+
 {
-  double   fh, w1, w2, w3;
+double   fh, w1, w2, w3;
+
+
 
   if (nx<1) {                     /* if NO x-pixel set to NULL          */
      pval  = (float *) 0;
@@ -726,10 +804,10 @@ int        ny;
 }
 
 /*
-
+
 */
 
-g2efunc(idx, val, fval, psig, a, dyda, ma)
+int g2efunc(idx, val, fval, psig, a, dyda, ma)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   evaluate function value for given index
 .RETURN    status,  0: OK, 1: error - bad pixel no.
@@ -743,9 +821,11 @@ float      *dyda;
 int        ma;
 {
   int      n;
-  double   ff, fa, sum, ci, si;
+  double   ff, sum, ci, si;
   double   xc, yc, xx, yy, x, y;
   double   xm5, xp5, ym5, yp5;
+
+
 
   if (idx<0 || mp<=idx) return -1;              /* check index          */
   if (pwght && pwght[idx]<0.0) return 1;        /* check if valid pixel */
@@ -789,10 +869,10 @@ int        ma;
 }
 
 /*
-
+
 */
 
-g2efit(val, wght, nx, ny, ap, cv, pchi)
+int g2efit(val, wght, nx, ny, ap, cv, pchi)
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .PURPOSE   Perform 2D Gauss fit
 .RETURN    status,  no. of iterations, else  -1: error - bad pixel no,
@@ -807,8 +887,11 @@ float      cv[MA];
 double     *pchi;
 {
   int      mt, n, na, ni, lista[MA];
+  int      mrqmin();
   float    apo[MA];
   double   c2, a1, a2, pi, alpha[MA*MA], cvm[MA*MA];
+
+
 
   if (g2einit(val, wght, nx, ny)) return -1;
 
