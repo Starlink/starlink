@@ -12,14 +12,13 @@
  */
 static const char* const rcsId="@(#) $Id: TcsCatalogObject.C,v 1.4 2003/01/20 15:52:21 brighton Exp $";
 
-
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <cstring>
 #include "error.h"
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 #include "TcsCatalogObject.h"
 
 
