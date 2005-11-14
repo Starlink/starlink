@@ -1,10 +1,9 @@
-// -*-c++-*-
 #ifndef _RtdImage_h_
 #define _RtdImage_h_
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: RtdImage.h,v 1.28 1999/03/22 21:41:26 abrighto Exp $"
+ * "@(#) $Id: RtdImage.h,v 1.7 2005/02/02 01:43:03 brighton Exp $"
  *
  * RtdImage.h - class definitions for class RtdImage, a real-time image 
  * display extension for Tk.
@@ -24,27 +23,88 @@
  *                           colors (colorUpdate).
  *                           Made displayImageEvent virtual (need for UKIRT
  *                           quick look updates).
+ * P.Biereichel    22/03/99  Added code for bias subtraction
+ * P.Biereichel    29/06/99  Added HDU includes (copied from skycat)
+ * P.Biereichel    26/05/00  Added options fillWidth / fillHeight
+ * P.Biereichel    01/03/01  Copied the include and definitions from RtdImage.C
+ * P.Biereichel    23/10/02  Made gcc 3.2 happy which complained about RTD_OPTION:
+ *                           (invalid offsetof from non-POD type `class RtdImageOptions'; use 
+ *                           pointer to member instead). POD means "Plain Old Data".
+ * 
  */
 
-#include "TkImage.h"
+#define PANEL_EDITOR_BUG
+#define _HAVE_R6 (XlibSpecificationRelease > 5)
+
+//#define DEBUG
+
+#include <cctype>
+#include <cstdlib>
+#include <csignal>
+#include <cstdio>
+#include <iostream>
+#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/sem.h>
+#include <cstring>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cmath>
+#include <cassert>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+#include "define.h"
+#include "error.h"
+#include "WorldCoords.h"
+#include "ImageColor.h"
+#include "ImageDisplay.h"
 #include "ImageData.h"
+#include "ImageZoom.h"
+#include "FitsIO.h"
+#include "RtdCamera.h"
+#include "RtdRemote.h"
 #include "rtdImageEvent.h"
+#include "BiasData.h"
+#include "ImageData.h"
+#include "RtdPerf.h"
+#include "RtdUtils.h"
+#include "TkImage.h"
 
 // we use pointers to classes of these types below
 class ImageColor;
 class ImageDisplay;
 class ImageData;
+class BiasData;
 class ImageZoom;
 class RtdCamera;
 class RtdRemote;
 class Mem;
 class RtdImage;
+class RtdPerf;
+
+// RtdImage signal handlers
+void RtdImage_cleanup (int);
+
+// cleanup shm routine of Rtd Recorder/Playback tool
+void Mem_RPTcleanup();
+
+// from BLT package (now locally because this routine was deleted with blt2.1)
+extern "C" int Blt_GraphElement(
+    Tcl_Interp *interp,         /* Interpreter of the graph widget */
+    char *pathName,             /* Path name of the graph widget */
+    char *elemName,             /* Name of the element to reset */
+    int numValues,              /* Number of values in array */
+    double *valueArr,           /* Array of x,y coordinate pairs */
+    char *xVector,              /* Name of x array */
+    char *yVector);             /* Name of y array */
 
 /* 
  * image options (used for image configuration)
  */
-class RtdImageOptions : public TkImageOptions {
-public:
+
+typedef struct Rtd_Options {
     int displaymode;		// set mode used to display image: 
 				// 0 ==> XImage is size of image, update whole image to pixmap
 				// 1 ==> XImage is size of window (default mode)
@@ -52,10 +112,15 @@ public:
     int fitWidth;		// fit the image in a window with this width 
     int fitHeight;		// and this height by shrinking the image
 
+    int fillWidth;		// fit the image in a window with this width 
+    int fillHeight;		// and this height by shrinking or expanding the image
+
     int subsample;		// if true, don't count neighboring pixels when shrinking image
+    int sampmethod;		// sampling method
     int usexshm;		// if true, use X shared memory if available. 
     int usexsync;               // if true, use X synchronisation if available. 
     int verbose;		// if true, print program info to stdout 
+    int debug;	  	        // if true, print program info to stdout 
 
     int shm_header;		// if true, keep image FITS headers in shared memory
     int shm_data;		// if true, keep image FITS data in shared memory
@@ -74,24 +139,27 @@ public:
     int fixUpdateRate;          // flag: user has specified a fixed update rate, as below.
     double userUpdateTime;      // the minimum time between updates, as specified
                                 // by the user.
+} Rtd_Options;
+
+
+class RtdImageOptions : public TkImageOptions {
+public:
 
     // constructor
-    RtdImageOptions()
-	: displaymode(1),
-	  fitWidth(0), fitHeight(0),
-	  subsample(0),
-	  usexshm(1),
-          usexsync(1),
-          verbose(0),
-	  shm_header(0),
-	  shm_data(0),
-	  min_colors(30),
-	  max_colors(60),
-	  file(NULL),
-	  name(NULL),
-	  newImageCmd(NULL),
-          fixUpdateRate(0),
-          userUpdateTime(0.) {}
+    RtdImageOptions() {
+	memset(&rtd_options_, '\0', sizeof(Rtd_Options));
+
+	rtd_options_.displaymode=1;
+	rtd_options_.usexshm=1;
+	rtd_options_.usexsync=1;
+	rtd_options_.min_colors=30;
+	rtd_options_.max_colors=60;
+    }
+
+    struct Rtd_Options rtd_options_;
+
+    // Accessors
+    char *get_rtd_options() {return (char *)&rtd_options_;}
 };
 
 
@@ -99,11 +167,14 @@ public:
  * These options are defined here for use in the Tk_ConfigSpec declaration, so that
  * derived classes can more easily add to them. See RtdImage.C for usage.
  */
-#define RTD_OPTION(x) Tk_Offset(RtdImageOptions, x)
+
+#define RTD_OPTION(x) Tk_Offset(Rtd_Options, x)
+
 #define RTD_OPTIONS \
     {TK_CONFIG_BOOLEAN, "-usexshm",     NULL, NULL, "1", RTD_OPTION(usexshm),     0}, \
     {TK_CONFIG_BOOLEAN, "-usexsync",    NULL, NULL, "1", RTD_OPTION(usexsync),    0}, \
     {TK_CONFIG_BOOLEAN, "-verbose",     NULL, NULL, "0", RTD_OPTION(verbose),     0}, \
+    {TK_CONFIG_BOOLEAN, "-debug",       NULL, NULL, "0", RTD_OPTION(debug),       0}, \
     {TK_CONFIG_BOOLEAN, "-shm_header",  NULL, NULL, "0", RTD_OPTION(shm_header),  0}, \
     {TK_CONFIG_BOOLEAN, "-shm_data",    NULL, NULL, "0", RTD_OPTION(shm_data),    0}, \
     {TK_CONFIG_INT,     "-displaymode", NULL, NULL, "1", RTD_OPTION(displaymode), 0}, \
@@ -111,7 +182,10 @@ public:
     {TK_CONFIG_INT,     "-max_colors",  NULL, NULL, "1", RTD_OPTION(max_colors),  0}, \
     {TK_CONFIG_INT,     "-fitwidth",    NULL, NULL, "0", RTD_OPTION(fitWidth),    0}, \
     {TK_CONFIG_INT,     "-fitheight",   NULL, NULL, "0", RTD_OPTION(fitHeight),   0}, \
+    {TK_CONFIG_INT,     "-fillwidth",   NULL, NULL, "0", RTD_OPTION(fillWidth),   0}, \
+    {TK_CONFIG_INT,     "-fillheight",  NULL, NULL, "0", RTD_OPTION(fillHeight),  0}, \
     {TK_CONFIG_BOOLEAN, "-subsample",   NULL, NULL, "1", RTD_OPTION(subsample),   0}, \
+    {TK_CONFIG_INT,     "-sampmethod",  NULL, NULL, "0", RTD_OPTION(sampmethod),  0}, \
     {TK_CONFIG_STRING,  "-file",        NULL, NULL, "",  RTD_OPTION(file),        0}, \
     {TK_CONFIG_STRING,  "-newimagecmd", NULL, NULL, "",  RTD_OPTION(newImageCmd), 0}, \
     {TK_CONFIG_STRING,  "-name",        NULL, NULL, "",  RTD_OPTION(name), 0}
@@ -124,19 +198,33 @@ public:
  * FITS and other images in a Tk canvas window
  */
 class RtdImage : public TkImage {
+
+#include "RtdCmds.icc"          // image subcommand methods
+#include "RtdHDU.icc"           // methods for hduCmd()
+#include "RtdCoords.icc"        // methods for coordinate conversion
+
 protected:
     RtdImageOptions* options_;  // holds image config options
 
     RtdCamera* camera_;		// class managing interface to realtime image events
+    RtdRemote* remote_;		// class managing remote control interface
+
     char* cameraPreCmd_;	// Tcl command to evaluate when image event is received (before display)
     char* cameraPostCmd_;	// Tcl command to evaluate after image event has been processed
+    int imageEvent_;              // image event received from camera
     int frameId_;		// frame Id, for use with rapid frames
 
-    RtdRemote* remote_;		// class managing remote control interface
 
     static ImageColor* colors_; // class for managing colors and colormaps
 
-    ImageData* image_;     	// class object managing the image data 
+    ImageData* image_;     	// class object managing the image data
+
+    RtdDebugLog* dbl_;     	// class object managing the debug log messages
+
+    static BiasData* biasimage_;// class for managing the bias image
+    static RtdPerf* rtdperf_;   // class object for managing the performance test
+
+    char filename_[1024];       // filename or object of master image
 
     ImageZoom* zoomer_;		// class for managing zoom window
     RtdImage* zoomView_;	// rtdimage instance used for "zoomview"
@@ -204,26 +292,6 @@ protected:
     double* pixTab_;		// array of pixel values and X,Y indices
     int pixTabRows_,		// dimensions of pixTab_ (minus 1 for x,y headings)
 	pixTabCols_;
-
-    // The following properties pertain to the interactive performance 
-    // measurement, and are only 'active' when the following flag is set.
-    int intPerfTest_;           // Flag: do interactive performance testing.
-    double GENtime_;            // Time spent on general (C/C++) processing.
-    double TCLtime_;            // Time spent on TCL/TK code interpretation.
-    double Xtime_;              // Time spent on X function calls.
-    double MEMtime_;            // Time spent on memory management.
-    double lastTimeStamp_;      // Timestamp of the last timestamped event.
-    int imageCount_;            // Number of images to average over in ptester
-    double accGENtime_;         // Accumulative versions of the above...
-    double accTCLtime_;
-    double accXtime_;
-    double accMEMtime_;
-    double initTimeStamp_;      // Initial timestamp at start of perf test
-    enum perfTestType {
-        TIME,
-        NORM_TIME,
-        PCT_TIME
-    } perfTestType;
 
     // -- member functions  --
 
@@ -302,18 +370,9 @@ protected:
 
     // these are called indirectly by the Tk imageing routines
     virtual void displayImage( Drawable, int imageX, int imageY, 
-			     int width, int height,
-			     int drawableX, int drawableY);
+			       int width, int height,
+			       int drawableX, int drawableY);
     virtual TkImage* getImage(Tk_Window);
-
-    // these coordinate conversion methods are only needed internally
-    int screenToXImageCoords(double& x, double& y);
-    int xImageToImageCoords(double& x, double& y, int dist_flag);
-    int imageToRawImageCoords(double& x, double& y);
-    void coordsToDist(double& x, double& y);
-    void distToCoords(double& x, double& y);
-    void doTrans(double& x, double& y, int distFlag = 0);
-    void undoTrans(double& x, double& y, int distFlag = 0);
 
     // get fraction of zoomed pixel at point
     void getOffsetInXImage(double px, double py, int& x, int& y);
@@ -321,14 +380,12 @@ protected:
     // propagate color change
     int colorUpdate( int force = 0);
 
-    // Increment a performance test variable.
-    void timeInc(double *);
+    // Set detector parameters
+    void setDetParms(ImageData* image, const rtdIMAGE_INFO&);
 
-    // Reset the performance test data.
-    void resetPerfTest();
-
-    // Set the performance test variables in the form.
-    void setPerfTestVars();    
+    // set or query the filename of the master image
+    void   filename(char *file) {strcpy(filename_, file);}
+    char*  filename() {return filename_;}
 
 public:
     // initialize the image with the command line args
@@ -346,9 +403,20 @@ public:
     // initialize color map and visual
     static int initColors(Tcl_Interp* interp);
 
+    // initialize bias image object
+    static int initBias();
+
+    // initialize performance test object
+    static int initPerf(Tcl_Interp* interp);
+
     // entry point from tcl to create a image
-    static int CreateImage(Tcl_Interp*, char *name, int argc, char **argv, 
-		    Tk_ImageType*, Tk_ImageMaster, ClientData*);
+    static int CreateImage(Tcl_Interp*, char *name, int argc, 
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+                           Tcl_Obj *CONST objv[],
+#else
+                           char **argv,
+#endif
+                           Tk_ImageType*, Tk_ImageMaster, ClientData*);
 
     // event procedure for main image window
     static void eventProc(ClientData clientData, XEvent *eventPtr);
@@ -361,139 +429,33 @@ public:
     
     // utility Tcl command proc to set colormap for popup windows
     static int rtd_set_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv);
-
-    // -- image subcommand methods --
-    
-    int alloccolorsCmd(int argc, char* argv[]);
-    int autocutCmd(int argc, char* argv[]);
-    int bitpixCmd(int argc, char* argv[]);
-    int cameraCmd(int argc, char* argv[]);
-    int clearCmd(int argc, char* argv[]);
-    int cmapCmd(int argc, char* argv[]);
-    int colorrampCmd(int argc, char* argv[]);
-    int colorscaleCmd(int argc, char* argv[]);
-    int convertCmd(int argc, char* argv[]);
-    int cutCmd(int argc, char* argv[]);
-    int dispheightCmd(int argc, char* argv[]);
-    int dispwidthCmd(int argc, char* argv[]);
-    int dumpCmd(int argc, char* argv[]);
-    int fitsCmd(int argc, char* argv[]);
-    int flipCmd(int argc, char* argv[]);
-    int frameidCmd(int argc, char* argv[]);
-    int freqCmd(int argc, char *argv[]);
-    int getCmd(int argc, char* argv[]);
-    int graphdistCmd(int argc, char* argv[]);
-    int heightCmd(int argc, char* argv[]);
-    int isclearCmd(int argc, char* argv[]);
-    int ittCmd(int argc, char* argv[]);
-    int maxCmd(int argc, char* argv[]);
-    int maxFreqCmd(int argc, char* argv[]);
-    int mbandCmd(int argc, char* argv[]);
-    int minCmd(int argc, char* argv[]);
-    int mmapCmd(int argc, char* argv[]);
-    int motioneventCmd(int argc, char* argv[]);
-    int objectCmd(int argc, char* argv[]);
-    int panCmd(int argc, char* argv[]);
-    int perfTestCmd(int argc, char *argv[]);
-    int pixtabCmd(int argc, char* argv[]);
-    int previewCmd(int argc, char* argv[]);
-    int radecboxCmd(int argc, char* argv[]);
-    int remoteCmd(int argc, char* argv[]);
-    int remoteTclCmd(int argc, char* argv[]);
-    int rotateCmd(int argc, char* argv[]);
-    int scaleCmd(int argc, char* argv[]);
-    int shmCmd(int argc, char* argv[]);
-    int spectrumCmd(int argc, char* argv[]);
-    int statisticsCmd(int argc, char* argv[]);
-    int typeCmd(int argc, char* argv[]);
-    int updateCmd(int argc, char* argv[]);
-    int viewCmd(int argc, char* argv[]);
-    int warpCmd(int argc, char* argv[]);
-    int wcssetCmd(int argc, char* argv[]);
-    int wcsshiftCmd(int argc, char* argv[]);
-    int wcscenterCmd(int argc, char* argv[]);
-    int wcsdistCmd(int argc, char* argv[]);
-    int wcsequinoxCmd(int argc, char* argv[]);
-    int wcsheightCmd(int argc, char* argv[]);
-    int wcsradiusCmd(int argc, char* argv[]);
-    int wcswidthCmd(int argc, char* argv[]);
-    int widthCmd(int argc, char* argv[]);
-    int zoomCmd(int argc, char* argv[]);
-    int zoomviewCmd(int argc, char* argv[]);
-
-    // coordinate conversion types
-    enum CoordinateType {
-	CT_NONE = 0, 
-	CT_IMAGE = 'i',
-	CT_CANVAS = 'c',
-	CT_SCREEN = 's',
-	CT_WCS = 'w',
-	CT_DEG = 'd',
-	CT_CHIP = 'C'
-    };
-
-    // return the enum CoordinateType value given the string name
-    CoordinateType getCoordinateType(const char* s);
-
-    // convert coords from string form
-    int convertCoordsStr(int dist_flag, 
-			 const char* inx_buf, const char* iny_buf,
-			 char* outx_buf, char* outy_buf,
-			 double& x, double& y,
-			 const char* in_type, const char* out_type);
-
-    // convert coords from doubles
-    int convertCoords(int dist_flag, double& x, double& y, 
-		      const char* in_type, const char* out_type);
-
-    // convert coords as doubles (for WCS, assumes equinox of image, 
-    // coord type only specifies first letter and no equinox).
-    int convertCoords(int dist_flag, double& x, double& y, 
-		      char in_type, char out_type);
-
-    // Utility method to change the equinox of ra and dec if dist_flag is 0
-    void changeEquinox(int dist_flag, double& ra, double& dec, 
-		       double in_equinox, double out_equinox);
-
-    // utility methods to convert between different coordinate systems
-    int canvasToScreenCoords(double& x, double& y, int dist_flag);
-    int canvasToImageCoords(double& x, double& y, int dist_flag);
-    int canvasToWorldCoords(double& x, double& y, int dist_flag);
-    int screenToCanvasCoords(double& x, double& y, int dist_flag);
-    int screenToImageCoords(double& x, double& y, int dist_flag);
-    int screenToWorldCoords(double& x, double& y, int dist_flag);
-    int imageToCanvasCoords(double& x, double& y, int dist_flag);
-    int imageToScreenCoords(double& x, double& y, int dist_flag);
-    int imageToWorldCoords(double& x, double& y, int dist_flag);
-    int worldToCanvasCoords(double& x, double& y, int dist_flag);
-    int worldToImageCoords(double& x, double& y, int dist_flag);
-    int worldToScreenCoords(double& x, double& y, int dist_flag);
-    int imageToChipCoords(double& x, double& y, int dist_flag);
-    int canvasToChipCoords(double& x, double& y, int dist_flag);
-    int screenToChipCoords(double& x, double& y, int dist_flag);
-    int worldToChipCoords(double& x, double& y, int dist_flag);
-    int chipToImageCoords(double& x, double& y, int dist_flag);
-    int chipToCanvasCoords(double& x, double& y, int dist_flag);
-    int chipToScreenCoords(double& x, double& y, int dist_flag);
-    int chipToWorldCoords(double& x, double& y, int dist_flag);
-
+ 
+    // update idle tasks and performance test variables
+    void RtdImage::updateRequests();   
 
     // read-only access to configuration options
     static ImageColor* colors() {return colors_;}
-    int displaymode() const {return options_->displaymode;}
-    int fitWidth() const {return options_->fitWidth;}
-    int fitHeight() const {return options_->fitHeight;}
-    int subsample() const {return options_->subsample;}
-    char* file() const {return options_->file;}
-    char* newImageCmd() const {return options_->newImageCmd;}
-    char* name() const {return ((options_->name && *options_->name) ? options_->name : instname_);}
-    int usexshm() const {return options_->usexshm;}
-    int usexsync() const {return options_->usexsync;}
-    int shm_header() const {return options_->shm_header;}
-    int shm_data() const {return options_->shm_data;}
-    int min_colors() const {return options_->min_colors;}
-    int max_colors() const {return options_->max_colors;}
-    int verbose() const {return options_->verbose;}
+    static RtdPerf* rtdperf() {return rtdperf_;}
+
+    int displaymode() 	const {return options_->rtd_options_.displaymode;}
+    int fitWidth() 	const {return options_->rtd_options_.fitWidth;}
+    int fitHeight() 	const {return options_->rtd_options_.fitHeight;}
+    int fillWidth() 	const {return options_->rtd_options_.fillWidth;}
+    int fillHeight() 	const {return options_->rtd_options_.fillHeight;}
+    int subsample() 	const {return options_->rtd_options_.subsample;}
+    int sampmethod() 	const {return options_->rtd_options_.sampmethod;}
+    char* file() 	const {return options_->rtd_options_.file;}
+    char* newImageCmd() const {return options_->rtd_options_.newImageCmd;}
+    char* name() 	const {return ((options_->rtd_options_.name && *options_->rtd_options_.name) ? 
+				       options_->rtd_options_.name : instname_);}
+    int usexshm() 	const {return options_->rtd_options_.usexshm;}
+    int usexsync() 	const {return options_->rtd_options_.usexsync;}
+    int shm_header() 	const {return options_->rtd_options_.shm_header;}
+    int shm_data() 	const {return options_->rtd_options_.shm_data;}
+    int min_colors() 	const {return options_->rtd_options_.min_colors;}
+    int max_colors() 	const {return options_->rtd_options_.max_colors;}
+    int verbose() 	const {return options_->rtd_options_.verbose;}
+    int debug() 	const {return options_->rtd_options_.debug;}
 
 
     // -- short cuts --
@@ -511,16 +473,59 @@ public:
     // Return true if no image is loaded.
     int isclear();
 
+    // Return name of instance (= tcl command which corresponds to this image)
+    char* instname() {return instname_;}
+
     // member access
     char* cameraPreCmd() {return cameraPreCmd_;}
     char* cameraPostCmd() {return cameraPostCmd_;}
+
+    // Set state of image event (currently true/false)
+    int   imageEvent(int state) {imageEvent_ = state;}
+
     ImageData* image() {return image_;}
 };
 
-// RtdImage signal handlers
-void RtdImage_cleanup (int);
+/*
+ * derive a Camera subclass that handles the image events
+ * for loading images from shared memory
+ */
+class RtdImageCamera : public RtdCamera {
+    RtdImage* rtdimage_;                // keep this ptr for calling display method 
+public:
+    // constructor
+    RtdImageCamera(RtdImage* rtdimage)
+        : RtdCamera(rtdimage->name(), 
+		    rtdimage->interp(),
+		    rtdimage->verbose(),
+		    rtdimage->debug(), 
+		    rtdimage->instname()), 
+          rtdimage_(rtdimage) {}
 
-// cleanup shm routine of Rtd Recorder/Playback tool
-void Mem_RPTcleanup();
+    // called from the Camera class to display image from shared memory.
+    // pass on the method in RtdImage class
+    int display(const rtdIMAGE_INFO&, const Mem& data);
+};
+
+/*
+ * derive a RtdRemote subclass that handles the remote access to
+ * the widget.
+ *  
+ * This class is a bit different than the above RtdImageCamera class. It
+ * is designed to be of more general use (not just for real-time updates)
+ * and doesn't make use of the rtdServer daemon.
+ */
+class RtdImageRemote : public RtdRemote {
+    RtdImage* rtdimage_;                // keep this ptr for calling display method 
+public:
+    // constructor
+    RtdImageRemote(RtdImage* rtdimage, int port)
+        : RtdRemote(rtdimage->interp(), port, rtdimage->verbose()), 
+          rtdimage_(rtdimage) {}
+    // call an rtdimage command method by name
+    int call(const char* name, int len, int argc, char* argv[]) {
+        return rtdimage_->call(name, len, argc, argv);
+    }
+};
 
 #endif /* _RtdImage_h_ */
