@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePrint.tcl,v 1.15 1998/10/28 17:42:30 abrighto Exp $"
+# "@(#) $Id: RtdImagePrint.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePrint.tcl - popup dialog for printing an RTD image
 #
@@ -202,8 +202,8 @@ itcl::class rtd::RtdImagePrint {
 
 	#  Get the offsets that correct for the apparent shift of the
 	#  image when zoomed.
-	set xoff [expr int([$canvas_ canvasx 0])]
-	set yoff [expr int([$canvas_ canvasy 0])]
+	set xoff [expr {int([$canvas_ canvasx 0])}]
+	set yoff [expr {int([$canvas_ canvasy 0])}]
 	set xoff [max $xoff 0]
 	set yoff [max $yoff 0]
 
@@ -225,8 +225,8 @@ itcl::class rtd::RtdImagePrint {
 		#  Use whole printing surface.
 		set x0 [min 0 [$canvas_ canvasx 0]]
 		set y0 [min 0 [$canvas_ canvasy 0]]
-		set x1 [expr $x0+[winfo width $canvas_]]
-		set y1 [expr $y0+[winfo height $canvas_]]
+		set x1 [expr {$x0+[winfo width $canvas_]}]
+		set y1 [expr {$y0+[winfo height $canvas_]}]
 	    }
 	}
 
@@ -242,8 +242,8 @@ itcl::class rtd::RtdImagePrint {
 
 	#  Set the width, height and corner.
 	lappend cmd \
-	    -width [expr $x1-$x0+1] \
-	    -height [expr $y1-$y0+1] \
+	    -width [expr {$x1-$x0+1}] \
+	    -height [expr {$y1-$y0+1}] \
 	    -x $x0 \
 	    -y $y0
 
@@ -261,7 +261,7 @@ itcl::class rtd::RtdImagePrint {
 
 	#  Shift all canvas items so that they align to the image
 	#  with its origin of 0,0.
-	$canvas_ move all [expr -1.0*$xoff] [expr -1.0*$yoff]
+	$canvas_ move all [expr {-1.0*$xoff}] [expr {-1.0*$yoff}]
 	$canvas_ move $image_ $xoff $yoff
 	$canvas_ move print $xoff $yoff
 
@@ -271,7 +271,7 @@ itcl::class rtd::RtdImagePrint {
 	#  Shift everything back to original position.
 	$canvas_ move all $xoff $yoff
 	$canvas_ move $image_ \
-	    [expr -1.0*$xoff] [expr -1.0*$yoff]
+	    [expr {-1.0*$xoff}] [expr {-1.0*$yoff}]
 
 	#  Remove footer.
 	if {[set $w_.footer]} {
@@ -288,8 +288,8 @@ itcl::class rtd::RtdImagePrint {
     # the text
 
     protected method add_footer {} {
-	set hy0 [expr $y1+25]
-	set hy1 [expr $y1+50]
+	set hy0 [expr {$y1+25}]
+	set hy1 [expr {$y1+50}]
 
 	# white background for labels
 	$canvas_ create rect $x0 $y1 $x1 $hy1 \
@@ -298,9 +298,9 @@ itcl::class rtd::RtdImagePrint {
 	    -tags print
 
 	set hx0 $x0
-	set hy0 [expr $y1+20]
+	set hy0 [expr {$y1+20}]
 	set hx1 $x1
-	set hy1 [expr $y1+40]
+	set hy1 [expr {$y1+40}]
 	
 	if {"$itk_option(-top_left)" != ""} {
 	    $canvas_ create text $hx0 $hy0 \
@@ -334,8 +334,8 @@ itcl::class rtd::RtdImagePrint {
 	}
 
 	# add margin
-	set y1 [expr $y1+50]
-	set x1 [expr $x1+15]
+	set y1 [expr {$y1+50}]
+	set x1 [expr {$x1+15}]
     }
 
 
@@ -363,10 +363,10 @@ itcl::class rtd::RtdImagePrint {
         set ylow  [$canvas_ canvasy 0]
 	set xhigh [$canvas_ canvasx [winfo width $canvas_]]
 	set yhigh [$canvas_ canvasy [winfo height $canvas_]]
-	set xlow [expr round($xlow-1)]
-	set ylow [expr round($ylow-1)]
-	set xhigh [expr round($xhigh+1)]
-	set yhigh [expr round($yhigh+1)]
+	set xlow [expr {round($xlow-1)}]
+	set ylow [expr {round($ylow-1)}]
+	set xhigh [expr {round($xhigh+1)}]
+	set yhigh [expr {round($yhigh+1)}]
 	$canvas_ create rectangle $xlow $ylow $xhigh $yhigh \
 	    -fill white \
 	    -outline white \

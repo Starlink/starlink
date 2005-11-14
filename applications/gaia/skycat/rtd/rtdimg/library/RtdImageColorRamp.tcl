@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageColorRamp.tcl,v 1.13 1999/03/22 21:41:31 abrighto Exp $"
+# "@(#) $Id: RtdImageColorRamp.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageColorRamp.tcl - itcl widget used to display contents of the 
 #                         colormap for an RtdImage in a generated image
@@ -100,7 +100,7 @@ itcl::class rtd::RtdImageColorRamp {
     # position and the position set with mark.
     
     protected method rotate_colors {pos} {
-        set val [expr $pos-$mark_]
+        set val [expr {$pos-$mark_}]
 	$image_ cmap rotate $val
         if { $itk_option(-viewmaster) != {} } {
            $itk_option(-viewmaster) cmap rotate $val
@@ -112,7 +112,7 @@ itcl::class rtd::RtdImageColorRamp {
     # position and the position set with mark.
     
     protected method shift_colors {pos} {
-        set val [expr $pos-$mark_]
+        set val [expr {$pos-$mark_}]
 	$image_ cmap shift $val
         if { $itk_option(-viewmaster) != {} } {
            $itk_option(-viewmaster) cmap shift $val
@@ -123,7 +123,7 @@ itcl::class rtd::RtdImageColorRamp {
     # position and the position set with mark.
     
     protected method scale_itt {pos} {
-        set val [expr $pos-$mark_]
+        set val [expr {$pos-$mark_}]
         $image_ itt scale $val
         if { $itk_option(-viewmaster) != {} } {
            $itk_option(-viewmaster) itt scale $val

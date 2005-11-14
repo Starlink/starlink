@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImageZoomView.tcl,v 1.19 1999/03/15 22:45:16 abrighto Exp $"
+# "@(#) $Id: RtdImageZoomView.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageZoomView.tcl - itcl widget managing the RtdImage zoom window
 #
@@ -164,7 +164,7 @@ itcl::class rtd::RtdImageZoomView {
     public method scale {} {
 	
 	if {$itk_option(-propagate)} {
-	    set f [expr $target_scale_*$itk_option(-factor)]
+	    set f [expr {$target_scale_*$itk_option(-factor)}]
 	} else {
 	    set f [lindex [$image_ scale] 0]
 	    if {"$f" != ""} {
@@ -175,21 +175,21 @@ itcl::class rtd::RtdImageZoomView {
 	    }
 	}
 	
-	if {$target_scale_ <= 1} {
+	if {$f <= 1} {
 	    # box around pixel
-	    set x0  [expr $itk_option(-width)/2.0]
-	    set y0 [expr $itk_option(-height)/2.0]
+	    set x0  [expr {$itk_option(-width)/2.0}]
+	    set y0 [expr {$itk_option(-height)/2.0}]
 	} else {
 	    # box part of pixel
-	    set x0  [expr $itk_option(-width)/2.0-$f/2.0]
-	    set y0 [expr $itk_option(-height)/2.0-$f/2.0]
+	    set x0  [expr {$itk_option(-width)/2.0-$f/2.0}]
+	    set y0 [expr {$itk_option(-height)/2.0-$f/2.0}]
 	}
 
-	set x1  [expr $x0+$f]
-	set y1 [expr $y0+$f]
+	set x1  [expr {$x0+$f}]
+	set y1 [expr {$y0+$f}]
 
 	$canvas_ coords rect1 $x0 $y0 $x1 $y1
-	$canvas_ coords rect2 [expr $x0-1] [expr $y0-1] [expr $x1+1] [expr $y1+1]
+	$canvas_ coords rect2 [expr {$x0-1}] [expr {$y0-1}] [expr {$x1+1}] [expr {$y1+1}]
     }
 
     

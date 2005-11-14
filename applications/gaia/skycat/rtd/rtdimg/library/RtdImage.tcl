@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImage.tcl,v 1.55 1999/03/19 20:09:38 abrighto Exp $"
+# "@(#) $Id: RtdImage.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImage.tcl - itcl widget wrapper for the rtdimage type extension
 #
@@ -17,6 +17,8 @@
 #                           and conflicts between menu traversal and
 #                           mouse cursor warp code (from Peter Draper,
 #                           Starlink).
+# pbiereic        11/10/99  Added 'wm colormapwindows' if private colormaps are used
+# pbiereic        04/11/03  Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
 
 itk::usual RtdImage {}
 
@@ -86,10 +88,9 @@ itcl::class rtd::RtdImage {
 
 	# create the image 
 	# note: create (for now) in global namespace to avoid problems in C++ interface
-	set cmd [list image create rtdimage \
-		     -newimagecmd [code $this new_image_cmd]]
+	set cmd [list image create rtdimage]
 	set image_ [uplevel "#0" $cmd]
-	
+
 	# put the image in the canvas
 	set imageId_ [$canvas_ create image 0 0 \
 			  -image $image_ \
@@ -97,7 +98,12 @@ itcl::class rtd::RtdImage {
 			  -tags $image_]
 
 	bind $canvas_ <Configure> [code $this maybe_center]
-	
+
+        if {[$image_ cmap isprivate]} {
+	    # set the WM_COLORMAP_WINDOWS property
+            wm colormapwindows [winfo toplevel $w_] $canvas_
+        }
+
 	eval itk_initialize $args
     }
 
@@ -111,8 +117,8 @@ itcl::class rtd::RtdImage {
     }
     
     
-    # this method is called from the base class (TopLevelWidget) after all
-    # the options have been evaluated
+    # this method is called from the base class (TopLevelWidget or FrameWidget)
+    # after all the options have been evaluated
 
     protected method init {} {
 	if {$itk_option(-with_warp)} {
@@ -126,6 +132,10 @@ itcl::class rtd::RtdImage {
 	    bind $canvas_ <Enter> "+[code $this focus_ in]" 
 	    bind $canvas_ <Leave> "+[code $this focus_ out]" 
 	}
+	# create a blank image and set default scaling factors
+	if {[$image_ isclear]} { $image_ clear }
+	$image_ scale $xscale_ $yscale_
+	$image_ config -newimagecmd [code $this new_image_cmd]
     }
 
    # Control the focussing of the canvas. Only take focus if the
@@ -188,19 +198,29 @@ itcl::class rtd::RtdImage {
     }
 
 
+    # return name of global variable which contains the statistics
+    # of the pick window. This allows applications to trace on this variable.
+
+    public method get_pickVar {} {
+	if {[winfo exists $w_.pick]} {
+	    return [$w_.pick get_pickVar]
+	}
+	return ""
+    }
+
     # update the allowed interactive drawing area in the canvas
 
     protected method set_drawing_area {} {
 	if {[info exists itk_component(draw)] && ! [$image_ isclear]} {
 	    $image_ convert coords 1 1 image x0 y0 canvas
 	    $image_ convert coords \
-		[expr [$image_ width]-1] \
-		[expr [$image_ height]-1] \
+		[expr {[$image_ width]-1}] \
+		[expr {[$image_ height]-1}] \
 		image x1 y1 canvas
-	    set cx0 [expr int([min $x0 $x1])]
-	    set cy0 [expr int([min $y0 $y1])]
-	    set cx1 [expr int([max $x0 $x1])]
-	    set cy1 [expr int([max $y0 $y1])]
+	    set cx0 [expr {int([min $x0 $x1])}]
+	    set cy0 [expr {int([min $y0 $y1])}]
+	    set cx1 [expr {int([max $x0 $x1])}]
+	    set cy1 [expr {int([max $y0 $y1])}]
 	    $itk_component(draw) configure -bbox "$cx0 $cy0 $cx1 $cy1"
 	}
     }
@@ -260,6 +280,8 @@ itcl::class rtd::RtdImage {
 	}
 
 	save_scroll_pos_
+	set xscale_ $x
+	set yscale_ $y
 
 	# note previous scale and position
 	lassign [$image_ scale] xs ys
@@ -279,16 +301,16 @@ itcl::class rtd::RtdImage {
 
 	# scale the canvas items (need relative floating point factor)
 	if {$xs < 0} {
-	    set xs [expr -1.0/$xs]
-	    set ys [expr -1.0/$ys]
+	    set xs [expr {-1.0/$xs}]
+	    set ys [expr {-1.0/$ys}]
 	} 
 	if {$x < 0} {
-	    set x [expr -1.0/$x]
-	    set y [expr -1.0/$y]
+	    set x [expr {-1.0/$x}]
+	    set y [expr {-1.0/$y}]
 	}
 	# carefull in case scale factor is zero
-	set fx  [expr double($x)/$xs]
-	set fy [expr double($y)/$ys]
+	set fx  [expr {double($x)/$xs}]
+	set fy [expr {double($y)/$ys}]
 	$canvas_ scale all 0 0 $fx $fy
 
 	# set new scrollregion to include all of image
@@ -318,6 +340,8 @@ itcl::class rtd::RtdImage {
     protected method save_scroll_pos_ {} {
 	lassign [$canvas_ xview] xScroll0_ xScroll1_
 	lassign [$canvas_ yview] yScroll0_ yScroll1_
+	# XXX needed for bug in tcl 8.4.3
+	set bug "$xScroll0_ $xScroll1_ $yScroll0_ $yScroll1_"
     }
 
 
@@ -328,8 +352,8 @@ itcl::class rtd::RtdImage {
 	$canvas_ yview moveto $yScroll0_
 	lassign [$canvas_ xview] x0 x1
 	lassign [$canvas_ yview] y0 y1
-	$canvas_ xview moveto [expr $x0-($x1-$xScroll1_)/2.0]
-	$canvas_ yview moveto [expr $y0-($y1-$yScroll1_)/2.0]
+	$canvas_ xview moveto [expr {$x0-($x1-$xScroll1_)/2.0}]
+	$canvas_ yview moveto [expr {$y0-($y1-$yScroll1_)/2.0}]
     }
 
 
@@ -365,9 +389,9 @@ itcl::class rtd::RtdImage {
 	    $image_ flip $xy $bool
 	    if {[info exists itk_component(draw)]} {
 		if {"$xy" == "x"} {
-		    $itk_component(draw) flipx all [expr [$image_ dispwidth]-1]
+		    $itk_component(draw) flipx all [expr {[$image_ dispwidth]-1}]
 		} else {
-		    $itk_component(draw) flipy all [expr [$image_ dispheight]-1]
+		    $itk_component(draw) flipy all [expr {[$image_ dispheight]-1}]
 		}
 	    }
 	    eval "$canvas_ coords $image_ $coords"
@@ -392,11 +416,11 @@ itcl::class rtd::RtdImage {
 	set dh [$image_ dispheight]
 	if {$cw != 1} {
 	    if {$dw < $cw && $dw} {
-		set x [expr (($dw-$cw)/2.0)/$dw]
+		set x [expr {(($dw-$cw)/2.0)/$dw}]
 		$canvas_ xview moveto $x
 	    }
 	    if {$dh < $ch && $dh} {
-		set y [expr (($dh-$ch)/2.0)/$dh]
+		set y [expr {(($dh-$ch)/2.0)/$dh}]
 		$canvas_ yview moveto $y
 	    }
 	} else {
@@ -424,8 +448,8 @@ itcl::class rtd::RtdImage {
 	set cw [winfo width $canvas_]
 	set ch [winfo height $canvas_]
 	if {$cw != 1 && $dw && $dh} {
-	    $canvas_ xview moveto [expr (($dw-$cw)/2.0)/$dw]
-	    $canvas_ yview moveto [expr (($dh-$ch)/2.0)/$dh]
+	    $canvas_ xview moveto [expr {(($dw-$cw)/2.0)/$dw}]
+	    $canvas_ yview moveto [expr {(($dh-$ch)/2.0)/$dh}]
 	} 
     }
 
@@ -469,10 +493,10 @@ itcl::class rtd::RtdImage {
     # and resize the image.
     
     protected method make_rapid_frame {popup region_id x0 y0 x1 y1} {
-	set xoffset [expr int($x0)]
-	set yoffset [expr int($y0)]
-	set width [expr int($x1-$x0+1)]
-	set height [expr int($y1-$y0+1)]
+	set xoffset [expr {int($x0)}]
+	set yoffset [expr {int($y0)}]
+	set width [expr {int($x1-$x0+1)}]
+	set height [expr {int($y1-$y0+1)}]
 
 	if {$popup} {
 	    rtd::RtdImagePopup $w_.rapid \
@@ -485,7 +509,7 @@ itcl::class rtd::RtdImage {
 		-subsample $itk_option(-subsample) \
 		-usexshm $itk_option(-usexshm) \
                 -usexsync $itk_option(-usexsync) \
-		-withdraw [expr !$popup] \
+		-withdraw [expr {!$popup}] \
 		-region_id $region_id \
 		-verbose $itk_option(-verbose) \
 		-shorthelpwin $itk_option(-shorthelpwin) \
@@ -514,9 +538,14 @@ itcl::class rtd::RtdImage {
     
     public method attach_camera {camera} {
 	# these commands are evaluated before/after real-time events
-	set preCmd {}
+	set preCmd [code $this camera_pre_command]
 	set postCmd [code $this camera_post_command]
 
+	if {[catch {$image_ camera attach $camera $preCmd $postCmd} msg]} {
+	    # try again. Maybe rtdServer wasn't started yet.
+	    catch {exec rtdServer &}
+	    after 2000
+	}
 	if {[catch {$image_ camera attach $camera $preCmd $postCmd} msg]} {
 	    error_dialog $msg
 	}
@@ -538,7 +567,12 @@ itcl::class rtd::RtdImage {
     # the camera and before it is displayed.
     # The frameid will be 0 for the main image and non-zero for a rapid frame.
 
-    protected method camera_pre_command {frameid} {
+    public method camera_pre_command {frameid} {
+	if {$frameid != 0} { return }
+
+	if {"$cameraPreCmd_" != ""} {
+	    catch {eval $cameraPreCmd_}
+	}
     }
 
     
@@ -547,21 +581,28 @@ itcl::class rtd::RtdImage {
     # Update the widgets that need to display new values
     # The frameid will be 0 for the main image and non-zero for a rapid frame.
 
-    protected method camera_post_command {frameid} {
-	if {$frameid == 0} {
-	    if {[winfo exists $w_.spectrum]} {
-		$w_.spectrum notify_cmd
-	    } 
-
-	    if {"$preview_var_" != ""} {
-		global ::$preview_var_
-		if {[info exists $preview_var_]} {
-		    set $preview_var_ 0
-		}
+    public method camera_post_command {frameid} {
+	if {$frameid != 0} { return }
+	if {[winfo exists $w_.spectrum]} {
+	    $w_.spectrum notify_cmd
+	} 
+	
+	if {"$preview_var_" != ""} {
+	    global ::$preview_var_
+	    if {[info exists $preview_var_]} {
+		set $preview_var_ 0
 	    }
-	    
-	    # set up world coordinate info, if needed
-	    set_rtd_wcs_info $frameid
+	}
+	# update picked object
+	if {[winfo exists $w_.pick] && $updatePick_ != 0} {
+	    $w_.pick update_now
+	}
+
+	# set up world coordinate info, if needed
+	set_rtd_wcs_info $frameid
+
+	if {"$cameraPostCmd_" != ""} {
+	    catch {eval $cameraPostCmd_}
 	}
     }
 
@@ -731,9 +772,11 @@ itcl::class rtd::RtdImage {
 
 	# can't convert DSS plate cooeficients correctly
 	if {"[$image_ fits get PLTRAH]" != ""} {
-	    warning_dialog "Can't convert DSS plate coefficients. \
-                            Please get the image from the DSS image server." $w_
-	    return
+	    if { ! [confirm_dialog "Can't convert DSS plate coefficients.\
+		    Please get the image from the DSS image server.\n\n\
+		    \tContinue anyway?" $w_] } {
+		return
+	    }
 	}
 
 	# first get the region to save
@@ -765,10 +808,10 @@ itcl::class rtd::RtdImage {
 	    $w_.spectrum quit
 	}
 	rtd::RtdImageSpectrum $w_.spectrum \
-		-x0 [expr int($x0)] \
-		-y0 [expr int($y0)] \
-		-x1 [expr int($x1)] \
-		-y1 [expr int($y1)] \
+	    -x0 [expr {int($x0)}] \
+	    -y0 [expr {int($y0)}] \
+	    -x1 [expr {int($x1)}] \
+	    -y1 [expr {int($y1)}] \
 		-image $this \
 		-transient 1 \
 		-shorthelpwin $itk_option(-shorthelpwin) \
@@ -793,6 +836,7 @@ itcl::class rtd::RtdImage {
     # (for updates, see camera command)
 
     protected method new_image_cmd {} {
+
 	# only runs the first time, if the user chose a different color scale
 	if {"$itk_option(-color_scale)" != "linear"} {
 	    if {[catch {$image_ colorscale $itk_option(-color_scale)} msg]} {
@@ -808,6 +852,10 @@ itcl::class rtd::RtdImage {
 	    $itk_component(draw) clear
 	    set_drawing_area
 	} 
+
+	# update biasimage status
+	$image_ biasimage update
+
 	if {"$itk_option(-newimagecmd)" != ""} {
 	    eval $itk_option(-newimagecmd)
 	}
@@ -846,7 +894,7 @@ itcl::class rtd::RtdImage {
     }
 
     
-    # clear the current image display and remove an windows that
+    # clear the current image display and remove any windows that
     # access it
 
     public method clear {} {
@@ -867,6 +915,9 @@ itcl::class rtd::RtdImage {
 	} 
 	if {[winfo exists $w_.pixtable]} {
 	    destroy $w_.pixtable
+	} 
+	if {[winfo exists $w_.pick]} {
+	    $w_.pick close
 	} 
     }
 
@@ -912,7 +963,7 @@ itcl::class rtd::RtdImage {
     itk_option define -file file File {} {
 	if {"$itk_option(-file)" != ""} {
 	    # this code makes it easier to center the image on startup
-	    if {[winfo width $w_] <= 1} {
+	    if {[winfo width $w_] <= 1 || [$image_ isclear]} {
 		after 0 [code $this load_fits_]
 	    } else {
 		load_fits_
@@ -994,6 +1045,22 @@ itcl::class rtd::RtdImage {
 	}
     }
 
+    # if non-zero, fill image to fit width
+    itk_option define -fillwidth fillWidth FillWidth {0} {
+	if {$itk_option(-fillwidth)} {
+	    config -canvaswidth $itk_option(-fillwidth)
+	    imageconfig_ -fillwidth 
+	}
+    }
+
+    # if non-zero, fill image to fit height
+    itk_option define -fillheight fillHeight FillHeight {0} {
+	if {$itk_option(-fillheight)} {
+	    config -canvasheight $itk_option(-fillheight)
+	    imageconfig_ -fillheight 
+	}
+    }
+
     # flag: if true, print diagnostic messages
     itk_option define -verbose verbose Verbose {0} {
 	imageconfig_ -verbose
@@ -1002,6 +1069,11 @@ itcl::class rtd::RtdImage {
     # flag: if true, use quick and dirty algorithm to shrink images
     itk_option define -subsample subsample Subsample {1} {
  	imageconfig_ -subsample
+    }
+
+    # sampling method to used when option -subsample is 0
+    itk_option define -sampmethod sampmethod Sampmethod {0} {
+ 	imageconfig_ -sampmethod
     }
 
     # flag: if true, display horizontal and vertical scrollbars
@@ -1124,13 +1196,18 @@ itcl::class rtd::RtdImage {
     # short help text
     itk_option define -shelp shelp Shelp "image window" {
 	if {"$itk_option(-shelp)" != ""} {
-	    add_short_help $w_ $itk_option(-shelp)
-	    add_short_help $canvas_ $itk_option(-shelp)
+	    catch {add_short_help $w_ $itk_option(-shelp)} msg
+	    catch {add_short_help $canvas_ $itk_option(-shelp)} msg
 	}
     }
 
     # -orient option for Pick Object window
     itk_option define -pickobjectorient pickObjectOrient PickObjectOrient {vertical}
+
+    # option to update RtdImagePick after a real-time image event
+    itk_option define -updatePick updatePick UpdatePick {1} {
+	set updatePick_ $itk_option(-updatePick)
+    }
 
     # command to eval when a new image is loaded
     itk_option define -newimagecmd newImageCmd NewImageCmd  ""
@@ -1139,10 +1216,34 @@ itcl::class rtd::RtdImage {
     itk_option define -shorthelpwin shortHelpWin ShortHelpWin {}
 
     # debugging flag
-    itk_option define -debug debug Debug 0
+    itk_option define -debug debug Debug {0} {
+	imageconfig_ -debug
+    }
 
     # option to warp the mouse pointer
     itk_option define -with_warp with_warp With_warp 0
+
+    # default scaling factors
+    itk_option define -xscale xscale Xscale {1} {
+	set xscale_ $itk_option(-xscale)
+	if {[winfo width $w_] > 1} {
+	    scale $xscale_ $yscale_
+	}
+    }
+    itk_option define -yscale yscale Yscale {1} {
+	set yscale_ $itk_option(-yscale)
+	if {[winfo width $w_] > 1} {
+	    scale $xscale_ $yscale_
+	}
+    }
+
+    # commands to be evaluated before/after image events
+    itk_option define -cameraPreCmd cameraPreCmd CameraPreCmd {} {
+	set cameraPreCmd_ $itk_option(-cameraPreCmd)
+    }
+    itk_option define -cameraPostCmd cameraPostCmd CameraPostCmd {} {
+	set cameraPostCmd_ $itk_option(-cameraPostCmd)
+    }
 
     # -- protected vars --
 
@@ -1158,9 +1259,6 @@ itcl::class rtd::RtdImage {
     # name of a global variable controlling preview mode
     protected variable preview_var_ {}
 
-    # name of a global variable controlling performance test mode
-    protected variable perftest_var_ {}
-
     # saved x0 relative scrolling position
     protected variable xScroll0_ 0
 
@@ -1173,11 +1271,19 @@ itcl::class rtd::RtdImage {
     # saved y1 relative scrolling position
     protected variable yScroll1_ 0
 
+    # camera pre/post commands
+    protected variable cameraPreCmd_ ""
+    protected variable cameraPostCmd_ ""
+
+    # values for xscale, yscale
+    protected variable xscale_ 1
+    protected variable yscale_ 1
+
+    # update RtdImagePick after a real-time event
+    protected variable updatePick_ 1
+
     # --- common to all instances --
     
     # flag: true if the colormap has been initialized
     common colormap_initialized_ 0
 }
-
-
-

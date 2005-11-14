@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: RtdImageCtrl.tcl,v 1.42 1999/03/19 20:09:39 abrighto Exp $"
+# "@(#) $Id: RtdImageCtrl.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImageCtrl.tcl - Widget combining an RtdImage with a control panel
 #                    zoom and panning windows.
@@ -17,6 +17,12 @@
 #                            (default is the same as before, no change).
 # P.W.Draper      22/01/99   Added -viewmaster option to RtdImageColorRamp
 #                            instance.
+# P.Biereichel    22/03/99   Added handling of bias widget
+# P.Biereichel    29/06/99   Added HDU code (copied from skycat)
+# pbiereic        25/05/00   Added method 'autoscale'
+# pbiereic        16/08/01   Added method 'reopen' to update FITS HDU's
+#                            Adapted for new widget RtdImageFitsHeader for viewing
+#                            FITS HDU headers.
 
 itk::usual RtdImageCtrl {}
 
@@ -41,6 +47,8 @@ itcl::class rtd::RtdImageCtrl {
     constructor {args} {
 	# register with colormap handler window if it is already there (clones)
 	rtd::RtdImageColors::add_image $this
+        # register with bias image handler
+        rtd::RtdImageBias::add_image $this
 
 	# set the colormap on this window to the one used by the rtdimage
 	# and arrange for all other top level windows to use that colormap
@@ -56,6 +64,7 @@ itcl::class rtd::RtdImageCtrl {
     
     destructor {
 	rtd::RtdImageColors::remove_image $this
+        rtd::RtdImageBias::remove_image $this
     }
 
     
@@ -129,7 +138,11 @@ itcl::class rtd::RtdImageCtrl {
 	    itk_component add panel {
 		set panel [frame $w_.panel]
 	    }
-	    pack $panel -side top -fill x -before $w_.imagef
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		pack $panel -side left -fill y -before $w_.imagef
+	    } else {
+		pack $panel -side top -fill x -before $w_.imagef
+	    }
 	}
 	
 	# add the subwindows
@@ -140,37 +153,21 @@ itcl::class rtd::RtdImageCtrl {
     # add the panel subwindows
 
     protected method make_panel_subwindows {panel} {
-	if {$itk_option(-float_panel)} {
-	    switch  -exact -- $itk_option(-panel_layout) {
-		saoimage 
-		- reverse {
-		    make_panel_info $panel
-		    make_pan_window $panel
-		    make_zoom_window $panel
-		}
-		default {
-		    make_panel_info $panel
-		    make_zoom_window $panel
-		    make_pan_window $panel
-		}
+	switch -exact -- $itk_option(-panel_layout) {
+	    saoimage {
+		make_panel_info $panel
+		make_pan_window $panel
+		make_zoom_window $panel
 	    }
-	} else {
-	    switch -exact -- $itk_option(-panel_layout) {
-		saoimage {
-		    make_panel_info $panel
-		    make_pan_window $panel
-		    make_zoom_window $panel
-		}
-		reverse {
-		    make_pan_window $panel
-		    make_panel_info $panel
-		    make_zoom_window $panel
-		}
-		default {
-		    make_zoom_window $panel
-		    make_panel_info $panel
-		    make_pan_window $panel
-		}
+	    reverse {
+		make_pan_window $panel
+		make_panel_info $panel
+		make_zoom_window $panel
+	    }
+	    default {
+		make_zoom_window $panel
+		make_panel_info $panel
+		make_pan_window $panel
 	    }
 	}
     }
@@ -187,25 +184,36 @@ itcl::class rtd::RtdImageCtrl {
 	    rtd::RtdImagePanel $panel.info \
 		-image $this \
 		-state disabled \
+		-panel_orient $itk_option(-panel_orient) \
 		-min_scale $itk_option(-min_scale) \
 		-max_scale $itk_option(-max_scale) \
 		-shorthelpwin $itk_option(-shorthelpwin) \
 		-borderwidth 3 -relief groove
 	}
-	if { $itk_option(-float_panel) } {
-	    set side bottom
+
+	if { "$itk_option(-panel_orient)" == "vertical" } {
+	    pack $itk_component(info) -side top -fill y -expand 1
 	} else {
-	    set side left
+	    pack $itk_component(info) -side left -fill both -expand 1
 	}
-	pack $itk_component(info)  \
-	    -side $side -fill both -expand 1
 	
 	# add an item to control the grid size
 	if {$itk_option(-with_grid)} {
 	    make_grid_item
 	}
+
+	# flash background color of object label for real-time events
+	config -cameraPreCmd "$itk_component(info) flash 1" \
+		-cameraPostCmd "$itk_component(info) flash 0"
     }
 
+    # update camera status display
+
+    public method updateCameraStatus {camera} {
+	if {[info exists itk_component(info)]} {
+	    $itk_component(info) updateCameraStatus $camera [$image_ camera attach]
+	}
+    }
     
     # make the pan window
     
@@ -225,7 +233,11 @@ itcl::class rtd::RtdImageCtrl {
 		    -borderwidth 3 \
 		    -relief groove
 	    }
-	    pack $itk_component(pan) -side left -fill y
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		pack $itk_component(pan) -side top
+	    } else {
+		pack $itk_component(pan) -side left -fill y
+	    }
 	}
     }
 
@@ -271,12 +283,11 @@ itcl::class rtd::RtdImageCtrl {
 		    -relief groove
 	    }
 	}
-	if { $itk_option(-float_panel) } {
-	    set expand 1
+	if { "$itk_option(-panel_orient)" == "vertical" } {
+	    pack $itk_component(zoom) -side top -fill both -expand 0
 	} else {
-	    set expand 0
+	    pack $itk_component(zoom) -side left -fill both -expand 0
 	}
-	pack $itk_component(zoom) -side left -fill both -expand $expand
 
 	# tell the base class to use this zoom window when entered
 	config -zoomwin $itk_component(zoom)
@@ -335,12 +346,16 @@ itcl::class rtd::RtdImageCtrl {
 	    set zoom_state_ [set $panel.zoom.dozoom]
 	    set $panel.zoom.dozoom 0
 	    set w [winfo width $canvas_]
-	    pack forget $itk_component(panel)
+	    pack forget $panel
 	    $canvas_ config -width $w
 	} else {
 	    # show the panel, restore the zoom window
 	    set $panel.zoom.dozoom $zoom_state_
-	    pack $itk_component(panel) -side top -fill x -before $w_.imagef
+	    if { "$itk_option(-panel_orient)" == "vertical" } {
+		pack $panel -side left -fill y -before $w_.imagef
+	    } else {
+		pack $panel -side top -fill x -before $w_.imagef
+	    }
 	}
     }
 
@@ -431,7 +446,12 @@ itcl::class rtd::RtdImageCtrl {
     # (for real-time updates, see camera command)
 
     protected method new_image_cmd {} {
+
 	RtdImage::new_image_cmd
+        
+        # display HDU list, if there are multiple HDUs
+        update_fits_hdus
+
 	if {[info exists itk_component(zoom)]} {
 	    $itk_component(zoom) zoom
 	    $itk_component(zoom) scale
@@ -439,6 +459,7 @@ itcl::class rtd::RtdImageCtrl {
 	if {! [$image_ isclear]} {
 	    $itk_component(info) config -state normal
 	}
+        autoscale
 	$itk_component(info) updateValues
 	if {[winfo exists $w_.cut]} {
 	    $w_.cut update_graph
@@ -460,6 +481,14 @@ itcl::class rtd::RtdImageCtrl {
 	    view_fits_header
 	}
 	
+	if {[winfo exists $w_.fits_hdu_header]} {
+	    if { [$image_ hdu count] < 1 } {
+		destroy $w_.fits_hdu_header
+	    } else {
+		view_fits_hdu_header
+	    }
+	}
+	
 	if {[winfo exists $w_.grid]} {
 	    # update grid, if on
 	    global ::$grid_var_
@@ -477,9 +506,13 @@ itcl::class rtd::RtdImageCtrl {
     # open and load a new FITS image file via file name dialog
     
     public method open {{dir "."} {pattern "*.*fit*"}} {
+	if { "$dir" == "." && "[cget -image_directory]" != "" } {
+	    set dir [cget -image_directory]
+        }
 	set file [filename_dialog $dir $pattern $w_]
 	if {"$file" != ""} {
 	    if {[file isfile $file]} {
+                detach_camera
 		config -file $file
 	    } else {
 		error_dialog "There is no file named '$file'" $w_
@@ -514,6 +547,21 @@ itcl::class rtd::RtdImageCtrl {
 	    $w_.fits_header activate
 	}
     }
+    
+    # view the FITS HDU headers
+
+    public method view_fits_hdu_header {} {
+	if { [$image_ hdu count] < 1 && "[$image_ object]" == "[cget -camera]"} { 
+	    warning_dialog "No FITS header available for real-time images" $w_
+	    return 
+	}
+
+        utilReUseWidget rtd::RtdImageFitsHeader $w_.fits_hdu_header \
+            -image $this \
+            -shorthelpwin $itk_option(-shorthelpwin)
+        update idletasks
+        $w_.fits_hdu_header activate
+    }
 
     
     # pop up a dialog to display/edit the basic world coordinate 
@@ -540,6 +588,7 @@ itcl::class rtd::RtdImageCtrl {
 			 "Projection:"
 			] \
 	    -values [$image_ wcsset] \
+	    -scroll 0 \
 	    -command [code $this set_wcs_info]
     }
 
@@ -589,6 +638,19 @@ itcl::class rtd::RtdImageCtrl {
 	}
     }
     
+
+    # pop up a window to control bias subtraction
+
+    public method set_bias {} {
+        # note that this window must be shared by all instances
+        utilReUseWidget rtd::RtdImageBias .bias \
+            -image $this \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -dsplnr [[winfo toplevel $w_] cget -number] \
+            -command [code $itk_component(info) updateValues]
+        wm transient .bias [winfo toplevel $w_]
+    }
+    
    
     # clear the current image display and remove an windows that
     # access it (extend parent class version)
@@ -616,6 +678,142 @@ itcl::class rtd::RtdImageCtrl {
 	eval $itk_option(-feedback) [list $msg]
     }
 
+    # reopen file and update HDU's
+
+    public method reopen {} {
+        RtdImage::reopen
+        update_fits_hdus
+   }
+    
+    # display a popup window listing the HDUs in the current image, if any
+
+    public method display_fits_hdus {} {
+        if {[catch {set n [$image_ hdu count]}]} {
+            set n 0
+        }
+
+	if {$n <= 1} {
+	    warning_dialog "There are no FITS extensions" $w_
+	    return
+	}
+
+        utilReUseWidget rtd::RtdImageHduChooser $w_.hdu \
+	    -center 0 \
+            -image $this \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -usexshm $itk_option(-usexshm) \
+            -usexsync $itk_option(-usexsync) \
+            -verbose $itk_option(-verbose)
+
+    }
+
+    # Update the popup window listing the HDUs in the current image
+
+    public method update_fits_hdus {} {
+	
+        if {[catch {set n [$image_ hdu count]}]} {
+            set n 0
+        }
+
+        # display and hide window automatically as needed
+        if {[winfo exists $w_.hdu]} {
+            if {$n > 1} {
+                after idle [code $this show_hdu]
+            } else {
+                after idle "destroy $w_.hdu"
+            }
+        } else {
+            # if there is more than one HDU, display the HDU select window
+            if {$n > 1} {
+                display_fits_hdus
+            }
+        }
+    }
+
+    public method show_hdu {} {
+        if {[winfo exists $w_.hdu]} {
+	    $w_.hdu show_hdu_list
+	} else {
+	    display_fits_hdus
+	}
+    }
+    
+    # This method is redefined here to update the scale display when
+    # 'autoscale' is set
+
+    public method maybe_center {} {
+        RtdImage::maybe_center
+        maybe_autoscale
+    }
+    
+    # This method is redefined here to update the scale display when
+    # 'autoscale' is set
+
+    public method rotate {bool} {
+        RtdImage::rotate $bool
+        maybe_autoscale
+    }
+
+    # auto scale image to the max. visible size
+
+    public method autoscale { {variable ""} } {
+        if {"$variable" != ""} {
+            global ::$variable
+            set autoscale_ [set $variable]
+        }
+        if {! [catch {$itk_component(info) component trans} trans]} {
+            if { $autoscale_ } {
+                foreach compo "larger smaller choose" {
+                    catch {$trans component $compo config -state disabled}
+                }
+            } else {
+                $trans config -state normal
+            }
+        }
+        maybe_autoscale
+    }
+
+    # if the image does not fill the visible canvas, scale it
+    #
+    # XXX allan: don't use $image_ config -fillwidth ..., 
+    # need to use RtdImage itcl widget so graphics are updated
+    # to use the new scale.
+    
+    public method maybe_autoscale {} {
+        if { [$image_ isclear] || ! $autoscale_} {
+                $image_ configure -fillwidth 0 -fillheight 0
+        } else {
+            set cw [winfo width $canvas_]
+            set ch [winfo height $canvas_]
+	    if {[$image_ rotate]} {
+		lassign "$cw $ch" ch cw
+	    }
+	    #$image_ configure -fillwidth $cw -fillheight $ch
+	    fill_to_fit $cw $ch
+	    center
+        }
+    }
+
+    # Use this method instead of $image_ configure -fillwidth $cw -fillheight $ch
+    # so that graphics transformations are handled correctly.
+    # The arguments are the dimensions of the image canvas.
+
+    protected method fill_to_fit {cw ch} {
+	set w [$image_ width]
+	set h [$image_ height]
+	if {$w <= 2 || $h <=2} {
+	    return
+	}
+	set factor [expr {min($cw/$w, $ch/$h)}]
+	if {$factor == 0} {
+	    set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
+	    if {$factor >= -1} {
+		set factor 1
+	    }
+	}
+	scale $factor $factor
+    }
+
 
     # -- options --
     
@@ -624,6 +822,9 @@ itcl::class rtd::RtdImageCtrl {
     # "saoimage" puts the info first, followed by pan and zoom,
     # "reverse" reverses the default order, which is {zoom info pan}.
     itk_option define -panel_layout panel_layout Panel_layout {}
+
+    # Panel orient: one of {horizontal vertical} (default: horizontal)
+    itk_option define -panel_orient panel_orient Panel_orient {}
 
     # width of zoom window
     itk_option define -zoom_width zoom_width Zoom_width 152
@@ -687,6 +888,14 @@ itcl::class rtd::RtdImageCtrl {
     #  Floating panel option (for small displays).
     itk_option define -float_panel float_panel Float_Panel 0
 
+    # default scaling factor
+    itk_option define -xscale xscale Xscale 1
+    itk_option define -yscale yscale Yscale 1
+
+    itk_option define -camera camera Camera {}
+
+    # Default directory for loading images
+    itk_option define -image_directory image_directory Image_directory {}
 
     # -- protected vars --
 
@@ -698,4 +907,7 @@ itcl::class rtd::RtdImageCtrl {
 
     # name of trace var for grid
     protected variable grid_var_
+
+    # auto scale image
+    protected variable autoscale_ 0
 }

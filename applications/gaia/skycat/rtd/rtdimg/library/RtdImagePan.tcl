@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePan.tcl,v 1.21 1999/03/19 20:09:39 abrighto Exp $"
+# "@(#) $Id: RtdImagePan.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePan.tcl - itcl widget managing the RtdImage panning window
 # 
@@ -12,6 +12,8 @@
 # Allan Brighton  01 Jun 95  Created
 # Peter W. Draper 15 Feb 01  Changed notify_cmd method to deal with
 #                            very narrow images (spectra).
+# pbiereic        14/12/04   Fixed: Panning while image events are received
+
 itk::usual RtdImagePan {}
 
 # This widget displays a "view" of another RtdImage widget at a
@@ -157,6 +159,18 @@ itcl::class rtd::RtdImagePan {
     # if "changed" is 1, there is a new image with pos. different dimensions.
 
     protected method pan {x1 y1 x2 y2 changed} {
+        if { [info exists coords_] } {
+            if { $x1 == $coords_(pan_x1) && $y1 == $coords_(pan_y1) && \
+                 $x2 == $coords_(pan_x2) && $y2 == $coords_(pan_y2) && \
+                 $panImageWidth_ > 1 } {
+                return
+            }
+        }
+        set coords_(pan_x1) $x1
+        set coords_(pan_y1) $y1
+        set coords_(pan_x2) $x2
+        set coords_(pan_y2) $y2
+
 	if {$changed} {
 	    init_panning
 	} else {
@@ -206,14 +220,14 @@ itcl::class rtd::RtdImagePan {
 	    return
 	}
 
-	set wcsw [expr [$image_ wcswidth]*60]
-	set wcsh [expr [$image_ wcsheight]*60]
+	set wcsw [expr {[$image_ wcswidth]*60}]
+	set wcsh [expr {[$image_ wcsheight]*60}]
 
 	# set size of compass to percent of the image size in arcsecs
-	set size_ [expr [min $wcsw $wcsh]/4]
+	set size_ [expr {[min $wcsw $wcsh]/4}]
 	
 	# size in deg
-	set size_deg [expr $size_/3600.]
+	set size_deg [expr {$size_/3600.}]
 
 	# get image equinox
 	set equinox [$image_ wcsequinox]
@@ -229,14 +243,14 @@ itcl::class rtd::RtdImagePan {
 	} 
 
 	# get end points of compass
-	set ra1 [expr $ra0+$size_deg/cos(($dec0/180.)*$pi_)]
+	set ra1 [expr {$ra0+$size_deg/cos(($dec0/180.)*$pi_)}]
 	if {$ra1 < 0} {
-	    set ra1 [expr 360+$ra1]
+	    set ra1 [expr {360+$ra1}]
 	}
 
-	set dec1 [expr $dec0+$size_deg]
+	set dec1 [expr {$dec0+$size_deg}]
 	if {$dec1 >= 90} {
-	    set dec1 [expr 180-$dec1]
+	    set dec1 [expr {180-$dec1}]
 	} 
 
 	# draw the compass
@@ -260,7 +274,7 @@ itcl::class rtd::RtdImagePan {
 	set f 0.25
 
 	# label "E"
-	$canvas_ create text [expr $cx1+($cx1-$cx0)*$f] [expr $cy1+($cy1-$cy0)*$f] \
+	$canvas_ create text [expr {$cx1+($cx1-$cx0)*$f}] [expr {$cy1+($cy1-$cy0)*$f}] \
 	    -text E \
 	    -anchor c \
 	    -font $compassfont_ \
@@ -268,7 +282,7 @@ itcl::class rtd::RtdImagePan {
 	    -tags {compass objects}
 
 	# label "N"
-	$canvas_ create text [expr $cx2+($cx2-$cx0)*$f] [expr $cy2+($cy2-$cy0)*$f] \
+	$canvas_ create text [expr {$cx2+($cx2-$cx0)*$f}] [expr {$cy2+($cy2-$cy0)*$f}] \
 	    -text N \
 	    -anchor c \
 	    -font $compassfont_ \
@@ -353,5 +367,7 @@ itcl::class rtd::RtdImagePan {
 
     # compass label fonts
     protected variable compassfont_ *-Courier-Bold-R-Normal-*-100-*
-    
+
+    # current pan coords
+    protected variable coords_    
 }

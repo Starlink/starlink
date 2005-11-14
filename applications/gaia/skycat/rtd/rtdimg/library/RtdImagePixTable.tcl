@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: RtdImagePixTable.tcl,v 1.14 1998/10/28 17:42:29 abrighto Exp $"
+# "@(#) $Id: RtdImagePixTable.tcl,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # RtdImagePixTable.tcl - itcl widget for displaying a table of pixel values
 #                        for an RtdImage widget
@@ -110,8 +110,8 @@ itcl::class rtd::RtdImagePixTable {
 	set RtdPixTab(xy) {Y\X}
 	
 	# highlight center pixel and X,Y values
-	set col [expr $ncols/2+1]
-	set row [expr $nrows/2+1]
+	set col [expr {$ncols/2+1}]
+	set row [expr {$nrows/2+1}]
 	$f.p$row,$col config -relief raised -foreground red
 	$f.p0,$col config -relief raised -foreground red
 	$f.p$row,0 config -relief raised -foreground red
