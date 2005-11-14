@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageDisplay.C,v 1.9 1999/03/22 21:41:42 abrighto Exp $"
+ * "@(#) $Id: ImageDisplay.C,v 1.5 2005/02/02 01:43:03 brighton Exp $"
  *
  * ImageDisplay.C - member routines for class ImageDisplay,
  *                  for managing XImage to Pixmap display including
@@ -18,18 +18,21 @@
  *                           shared memory cannot be attached (Solaris
  *                           limit is 6 segments!).
  */
+static const char* const rcsId="@(#) $Id: ImageDisplay.C,v 1.5 2005/02/02 01:43:03 brighton Exp $";
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
-#include <iostream.h>
+// #define DEBUG
+// #define XXXDEBUG
+
+#include <cstdlib>
+#include <cctype>
+#include <cassert>
+#include <iostream>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include "define.h"
 #include "error.h"
-#include "config.h"
 #include "ErrorHandler.h"
 #include "ImageDisplay.h"
 
@@ -55,16 +58,16 @@ extern "C" {
  *   verbose - flag: if true, print diagnostic messages
  */
 ImageDisplay::ImageDisplay(Display *display, Visual *visual, GC gc, 
-			  int depth, int useXShm, int verbose) 
-: xImage_(NULL),
-  display_(display),
-  visual_(visual),
-  gc_(gc),
-  depth_(depth),
-  bytesPerPixel_(depth/8),
-  useXShm_(useXShm),
-  usingXShm_(0),
-  verbose_(verbose)
+			   int depth, int useXShm, int verbose) 
+    : xImage_(NULL),
+      display_(display),
+      visual_(visual),
+      gc_(gc),
+      depth_(depth),
+      bytesPerPixel_(depth/8),
+      useXShm_(useXShm),
+      usingXShm_(0),
+      verbose_(verbose)
 {
     if (depth_ == 24)
 	bytesPerPixel_ = 4;
@@ -99,12 +102,22 @@ void ImageDisplay::destroyXImage()
     }
 }
 
+/* 
+ * flush X output buffer and wait until all requests were processed
+ * by the X server.
+ */
+void ImageDisplay::flushX()
+{
+    if (! xImage_)
+	return;
+    XSync(display_, False);
+}
 
 /* 
  * do an XPutImage or XShmPutImage, depending on the current flags
  */
 void ImageDisplay::put(Drawable d, int src_x, int src_y, int dest_x, int dest_y, 
-		      int width, int height)
+		       int width, int height)
 {
     if (! xImage_)
 	return;
@@ -119,11 +132,10 @@ void ImageDisplay::put(Drawable d, int src_x, int src_y, int dest_x, int dest_y,
     height = min(height, xImage_->height - src_y);
     if (width <= 0 || height <= 0)
 	return;
-
+ 
     if (usingXShm_) {
 	XShmPutImage(display_, d, gc_, xImage_, src_x, src_y, dest_x, dest_y, 
 		     width, height, False /*True = send event*/);
-	XSync(display_, False);
     } 
     else {
 	XPutImage(display_, d, gc_, xImage_, src_x, src_y, dest_x, dest_y, 
@@ -140,6 +152,7 @@ void ImageDisplay::put(Drawable d, int src_x, int src_y, int dest_x, int dest_y,
  */
 int ImageDisplay::updateShm(int width, int height)
 {
+
     // use this to catch X errors
     ErrorHandler errorHandler(display_, verbose_);
 
@@ -217,50 +230,50 @@ int ImageDisplay::updateShm(int width, int height)
  */
 int ImageDisplay::update(int width, int height)
 {
-     if (xImage_) {
-	 // reuse old XImage if it has the same dimensions
-	 if (xImage_->width == width && xImage_->height == height) {
-	     return TCL_OK; 
-	 }
-	 destroyXImage();
-	 xImage_ = NULL;
-     } 
+    if (xImage_) {
+	// reuse old XImage if it has the same dimensions
+	if (xImage_->width == width && xImage_->height == height) {
+	    return TCL_OK; 
+	}
+	destroyXImage();
+	xImage_ = NULL;
+    } 
      
-     if (useXShm_) {
-	 // try to create a shared memory XImage
-	 if (updateShm(width, height) == TCL_OK) {
-	     usingXShm_ = 1;
-	     return TCL_OK;
-	 }
-	 usingXShm_ = 0;
+    if (useXShm_) {
+	// try to create a shared memory XImage
+	if (updateShm(width, height) == TCL_OK) {
+	    usingXShm_ = 1;
+	    return TCL_OK;
+	}
+	usingXShm_ = 0;
 #ifdef DEBUG
-	 if (verbose_)
-	     cout << "Couldn't create X shared memory: reverting to standard X Image\n";
+	if (verbose_)
+	    cout << "Couldn't create X shared memory: reverting to standard X Image\n";
 #endif
-     }
+    }
      
-     // fallback: create a normal XImage
-     xImage_ = XCreateImage(display_, visual_, depth_,
-			    ZPixmap, 0, (char *) NULL, width, height,
-                            BitmapPad(display_), 0); 
+    // fallback: create a normal XImage
+    xImage_ = XCreateImage(display_, visual_, depth_,
+			   ZPixmap, 0, (char *) NULL, width, height,
+			   BitmapPad(display_), 0); 
 
-     // now allocate the image data (which must use the appropriate padding).
-     xImage_->data = (char *)malloc(xImage_->bytes_per_line * height);
-     if (xImage_->data == NULL) {
+    // now allocate the image data (which must use the appropriate padding).
+    xImage_->data = (char *)malloc(xImage_->bytes_per_line * height);
+    if (xImage_->data == NULL) {
 #ifdef DEBUG
-	 if (verbose_) 
-	     cout << "out of memory for XImage\n";
+	if (verbose_) 
+	    cout << "out of memory for XImage\n";
 #endif
 
-         XDestroyImage(xImage_);
-	 return error("not enough memory for an image this size");
-     }
+	XDestroyImage(xImage_);
+	return error("not enough memory for an image this size");
+    }
      
 #ifdef XXXDEBUG
-     if (verbose_)
-	 cout << "Not Sharing memory\n";
+    if (verbose_)
+	cout << "Not Sharing memory\n";
 #endif
-     return TCL_OK;
+    return TCL_OK;
 }
      
 

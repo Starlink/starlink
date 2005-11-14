@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.C,v 1.8 1999/03/22 21:41:42 abrighto Exp $"
+ * "@(#) $Id: ITTInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $"
  *
  * ITTInfo.C - member routines for class ITTInfo
  * 
@@ -11,16 +11,18 @@
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 14/07/98  Modified interpolate to use last value 
  *                           (makes last colour pure).
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.8 1999/03/22 21:41:42 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.5 2005/02/02 01:43:03 brighton Exp $";
 
 
-#include <string.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream.h>
-#include <fstream.h>
+using namespace std;
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "ITTInfo.h"
@@ -173,9 +175,11 @@ void ITTInfo::scale(int amount, XColor* src, XColor* dest, int colorCount)
                 index = 0;
             else if (index > n)
                 index = n;
-        } else if (i < start) {
+	} 
+	else if (i < start) {
             index = 0;
-        } else {
+	} 
+	else {
 	    index = n;
 	}
 	value = (unsigned char)(value_[index]*c);

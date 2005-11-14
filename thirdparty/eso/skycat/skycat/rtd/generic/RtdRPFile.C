@@ -12,33 +12,11 @@
  * P.Biereichel    23/07/97  Bug fixed. Revised
  */
 
+#include <ctime>
 #include "RtdRPFile.h"
 #include <time.h>
 
-/*
- * NULL constructor for RtdRPFile class.
- *
- * Arguments:
- *	None.
- */
-RtdRPFile::RtdRPFile() :
-  status_(TCL_OK),
-  fPtr(NULL),
-  imageCounter_(0),
-  xPixels_(0),
-  yPixels_(0),
-  bytesPerPixel_(0),
-  imageIndex_(0),
-  fileSize_(0.),
-  maxFileSize_(0.),
-  numFileImages_(0),
-  fileFull_(0),
-  timeStamps_(NULL),
-  hasTimeInfo_(0),
-  shmSize_(0)
-{
-    // Put any RtdRPFile initialisation here.
-}
+static int cnt = 0;         // Shared memory counter
 
 /*
  * Constructor for RtdRPFile class. This opens a file for reading or writing.
@@ -135,7 +113,7 @@ void RtdRPFile::cleanup()
  *	None.
  */
 void RtdRPFile::checkSubImage(rtdIMAGE_INFO *imageInfo, int& x, int& y,
-  int& width, int& height)
+			      int& width, int& height)
 {
     // First check the initial coordinates
     if (x < 0) x = 0;
@@ -358,14 +336,14 @@ void RtdRPFile::padFile(FILE* f, int size)
  *	TCL_OK / TCL_ERROR
  */
 int RtdFITSCube::writeFITSHeader(const rtdIMAGE_INFO *imageInfo, int subImage, 
-int width, int height)
+				 int width, int height)
 {
     char  buf[81],		// Temporary buffers
 	buf2[20];
 
     // Get the size of the image segments.
     int dataSize = (subImage ? (width * height * abs(imageInfo->dataType / 8)) :
-      (imageInfo->xPixels * imageInfo->yPixels * abs(imageInfo->dataType / 8)));
+		    (imageInfo->xPixels * imageInfo->yPixels * abs(imageInfo->dataType / 8)));
 
     // Calculate the number of images that there will be in the file.
     numFileImages_ = (int)(maxFileSize_ * 1024. * 1024./ (double)dataSize);
@@ -457,7 +435,7 @@ RtdFITSCube::~RtdFITSCube()
     // Rewind the file pointer to the beginning of the file.
     rewind(fPtr);
 
-    // Loop over the file header, changing fields as detailed in the method 
+// Loop over the file header, changing fields as detailed in the method 
     // header.
     do {
 	fgets(&buffer[0], 81, fPtr);
@@ -470,7 +448,7 @@ RtdFITSCube::~RtdFITSCube()
 	    // Replace this blank field with NAXIS3 count.
 	    fseek(fPtr, filePos, SEEK_SET);
     	    sprintf(buf2, "%-8s= %d", "NAXIS3", 
-		(fileFull_ ? numFileImages_ : imageCounter_));
+		    (fileFull_ ? numFileImages_ : imageCounter_));
 	    sprintf(buffer, "%-80s", buf2);
 	    fputs(buffer, fPtr);
 	    break;
@@ -648,7 +626,7 @@ int RtdFITSCube::open(char *errMsg)
 	        min = timeStamps_[i];
 	        startIndex_ = i;
 	    }
-        }
+	}
     }
     gotoImageIndex(startIndex_);
 
@@ -669,7 +647,7 @@ int RtdFITSCube::open(char *errMsg)
 void RtdFITSCube::gotoImageIndex(int index)
 {
     long int offset = (long)((int)((FITSHeaderSize_ - 1) / FITSBLOCK) + 1) 
-      * FITSBLOCK;
+	* FITSBLOCK;
 
     // Go to the start of the images (after the header).
     fseek(fPtr, offset, SEEK_SET);
@@ -696,7 +674,7 @@ void RtdFITSCube::gotoImageIndex(int index)
  *	TCL_OK / TCL_ERROR
  */
 int RtdFITSCube::addImage(rtdIMAGE_INFO *imageInfo, int subImage, int x0,
-  int y0, int width, int height)
+			  int y0, int width, int height)
 {
     int shmSize;
 
@@ -709,7 +687,7 @@ int RtdFITSCube::addImage(rtdIMAGE_INFO *imageInfo, int subImage, int x0,
 
     // Get a pointer to the start of the shared memory area.
     Mem shmData = Mem(shmSize, imageInfo->shmId, 0, 0, imageInfo->shmNum, 
-	imageInfo->semId);
+		      imageInfo->semId);
     // Check that the memory was attached successfully
     if (shmData.ptr() == NULL)
 	return TCL_ERROR;
@@ -796,7 +774,7 @@ int RtdFITSCube::addImage(rtdIMAGE_INFO *imageInfo, int subImage, int x0,
 		fwrite(srcPtr, width * bpp, 1, fPtr);
 		srcPtr += bpp * (imageInfo->xPixels);
 	    }
-    	}
+	}
 	if (!fileFull_) {
 	    fileSize_ += (bpp * height * width) / (1024. * 1024.);
 	}
@@ -833,7 +811,6 @@ int RtdFITSCube::getNextImage(rtdShm *shmInfo)
     char *tmpBuf;		// Temporary data buffer.
     int retIndex = -1;		// Return index.
     int imageSize;		// Size of image data.
-    static int cnt = 0;         // Shared memory counter
 
     // Calculate the size of the image data.
     imageSize = xPixels_ * yPixels_ * bytesPerPixel_;
@@ -894,7 +871,6 @@ int RtdFITSCube::getPrevImage(rtdShm *shmInfo)
     char *tmpBuf;		// Temporary data buffer.
     int retIndex = -1;		// Return index.
     int imageSize;		// Size of image data.
-    static int cnt = 0;         // Shared memory counter
 
     // Calculate the size of the image data.
     imageSize = xPixels_ * yPixels_ * bytesPerPixel_;

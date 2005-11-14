@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageColor.C,v 1.10 1999/03/22 21:41:42 abrighto Exp $"
+ * "@(#) $Id: ImageColor.C,v 1.4 2005/02/02 01:43:03 brighton Exp $"
  *
  * ImageColor.C - member routines for class ImageColor
  *
@@ -12,12 +12,13 @@
  * Peter W. Draper 05/03/98  Added full support for X visuals in addition
  *                           to pseudocolor (merged my changes from GAIA).
  */
-static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.10 1999/03/22 21:41:42 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.4 2005/02/02 01:43:03 brighton Exp $";
 
 
-#include <string.h>
-#include <math.h>
-#include <iostream.h>
+#include <cstdio>
+#include <cmath>
+#include <iostream>
+#include <cstring>
 #include "ErrorHandler.h"
 #include "ImageColor.h"
 #include "error.h"
@@ -46,34 +47,34 @@ ImageColor::ImageColor(Display* display, Visual* visual,
   status_(0)
 {
 
-  //  Check if the visual we're dealing with is readonly, or if it
-  //  can be modified (XXX need to deal with DirectColor).
-  if ( visual_->c_class == PseudoColor || visual_->c_class == DirectColor ||
-       visual_->c_class == GrayScale ) {
-    readOnly_ = 0;
-  } else {
-    readOnly_ = 1;
+    //  Check if the visual we're dealing with is readonly, or if it
+    //  can be modified (XXX need to deal with DirectColor).
+    if ( visual_->c_class == PseudoColor || visual_->c_class == DirectColor ||
+         visual_->c_class == GrayScale ) {
+        readOnly_ = 0;
+    } else {
+        readOnly_ = 1;
+        
+        //  Assume all colours are available, and use them.
+        cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_)));
+    }
 
-    //  Assume all colours are available, and use them.
-    cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_)));
-  }
+    //  If default visual isn't the same then create a local colormap.
+    //  Note this is a private map, but isn't made available because of
+    //  colour exhaustion.
+    Visual *defvis = DefaultVisual(display_, screen_);
+    if ( defvis->c_class != visual_->c_class ) {
+        colormap_ = XCreateColormap( display_,
+                                     XRootWindow(display_, screen_),
+                                     visual_,
+                                     AllocNone );
+    }
 
-  //  If default visual isn't the same then create a local colormap.
-  //  Note this is a private map, but isn't made available because of
-  //  colour exhaustion.
-  Visual *defvis = DefaultVisual(display_, screen_);
-  if ( defvis->c_class != visual_->c_class ) {
-     colormap_ = XCreateColormap( display_,
-                                  XRootWindow(display_, screen_),
-                                  visual_,
-                                  AllocNone );
-  }
+    //  Initialisations.
+    memset(colorCells_, '\0', sizeof(colorCells_));
+    memset(windowList_, '\0', sizeof(windowList_));
 
-  //  Initialisations.
-  memset(colorCells_, '\0', sizeof(colorCells_));
-  memset(windowList_, '\0', sizeof(windowList_));
-
-  allocate(numColors);
+    allocate(numColors);
 }
 
 
@@ -84,17 +85,18 @@ int ImageColor::numFreeColors()
 {
     ErrorHandler errorHandler(display_); // catch X errors
     if ( ! readOnly_ ) {
-      int i;
-      for (i = MAX_COLOR-1; i > 0; i--) {
-	if (XAllocColorCells(display_, colormap_, False, 0, 0, pixelval_, i) != 0) {
-          XFreeColors(display_, colormap_, pixelval_, i, 0);  // (note: here 0 return means error)
-          return i;
+	int i;
+	for (i = MAX_COLOR-1; i > 0; i--) {
+	    if (XAllocColorCells(display_, colormap_, False, 0, 0, pixelval_, i) != 0) {
+		XFreeColors(display_, colormap_, pixelval_, i, 0);  // (note: here 0 return means error)
+		return i;
+	    }
 	}
-      }
-    } else {
+    } 
+    else {
 
-      //  Readonly so all colors are free.
-      return min(MAX_COLOR,int(pow( 2.0, depth_)));
+	//  Readonly so all colors are free.
+	return min(MAX_COLOR,int(pow( 2.0, depth_)));
     }
     return 0;
 }
@@ -327,7 +329,7 @@ int ImageColor::loadColorMap(ColorMapInfo* m)
 
     // re-install the ITT if necessary
     if (itt_)
-      return loadITT(itt_);
+	return loadITT(itt_);
 
     return storeColors(colorCells_);
 }
@@ -427,7 +429,7 @@ int ImageColor::reset()
 {
     if (!cmap_)
 	return 0;
-   return loadColorMap(cmap_);
+    return loadColorMap(cmap_);
 }
 
 

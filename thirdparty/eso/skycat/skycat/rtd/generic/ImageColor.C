@@ -3,9 +3,9 @@
  * "@(#) $Id: ImageColor.C,v 1.4 2005/02/02 01:43:03 brighton Exp $"
  *
  * ImageColor.C - member routines for class ImageColor
- * 
+ *
  * See the man page for a complete description.
- * 
+ *
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
@@ -29,56 +29,57 @@ static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.4 2005/02/02 01:43:03
  * constructor: passed the X Display handle and the number of
  * colors to allocate initially.
  */
-ImageColor::ImageColor(Display* display, Visual* visual, 
+ImageColor::ImageColor(Display* display, Visual* visual,
                        int depth, int numColors)
-    : display_(display),
-      visual_(visual),
-      screen_(DefaultScreen(display_)),
-      depth_(depth),
-      cmapSize_(XCellsOfScreen(DefaultScreenOfDisplay(display_))),
-      defaultCmap_(DefaultColormap(display_, DefaultScreen(display_))),
-      colormap_(DefaultColormap(display_, DefaultScreen(display_))),
-      colorCount_(0),
-      freeCount_(0),
-      cmap_(NULL),
-      cmaps_(NULL),
-      itt_(NULL),
-      itts_(NULL),
-      status_(0)
+: display_(display),
+  visual_(visual),
+  screen_(DefaultScreen(display_)),
+  depth_(depth),
+  cmapSize_(XCellsOfScreen(DefaultScreenOfDisplay(display_))),
+  defaultCmap_(DefaultColormap(display_, DefaultScreen(display_))),
+  colormap_(DefaultColormap(display_, DefaultScreen(display_))),
+  colorCount_(0),
+  freeCount_(0),
+  cmap_(NULL),
+  cmaps_(NULL),
+  itt_(NULL),
+  itts_(NULL),
+  status_(0)
 {
 
     //  Check if the visual we're dealing with is readonly, or if it
     //  can be modified (XXX need to deal with DirectColor).
     if ( visual_->c_class == PseudoColor || visual_->c_class == DirectColor ||
-	 visual_->c_class == GrayScale ) {
-	readOnly_ = 0;
-    }
-    else {
-	readOnly_ = 1;
-
-	//  Assume all colours are available, and use them.
-	cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_)));
+         visual_->c_class == GrayScale ) {
+        readOnly_ = 0;
+    } else {
+        readOnly_ = 1;
+        
+        //  Assume all colours are available, and use them.
+        cmapSize_ = min(MAX_COLOR,int(pow( 2.0, depth_)));
     }
 
     //  If default visual isn't the same then create a local colormap.
+    //  Note this is a private map, but isn't made available because of
+    //  colour exhaustion.
     Visual *defvis = DefaultVisual(display_, screen_);
     if ( defvis->c_class != visual_->c_class ) {
-	colormap_ = XCreateColormap(display_,
-				    XRootWindow(display_, screen_),
-				    visual_,
-				    AllocNone);
+        colormap_ = XCreateColormap( display_,
+                                     XRootWindow(display_, screen_),
+                                     visual_,
+                                     AllocNone );
     }
 
     //  Initialisations.
     memset(colorCells_, '\0', sizeof(colorCells_));
     memset(windowList_, '\0', sizeof(windowList_));
-  
+
     allocate(numColors);
 }
 
 
-/* 
- * return the number of free color cells available (up to MAX_COLOR) 
+/*
+ * return the number of free color cells available (up to MAX_COLOR)
  */
 int ImageColor::numFreeColors()
 {
@@ -101,7 +102,7 @@ int ImageColor::numFreeColors()
 }
 
 
-/* 
+/*
  * free and then re-allocate at most numColors color cells
  */
 int ImageColor::reallocate(int numColors)
@@ -125,8 +126,8 @@ int ImageColor::reallocate(int numColors)
 
 
 /*
- * If we are using a 8-bit pseudocolor visual, this method allocates at most 
- * numColors read/write color cells in the colormap. 
+ * If we are using a 8-bit pseudocolor visual, this method allocates at most
+ * numColors read/write color cells in the colormap.
  */
 int ImageColor::allocate(int numColors)
 {
@@ -150,8 +151,8 @@ int ImageColor::allocate(int numColors)
     freeCount_ -= colorCount_;
     if (freeCount_ < 0)
 	freeCount_ = 0;
-    
-    if (colorCount_ <= 0) 
+
+    if (colorCount_ <= 0)
 	return error("no more colors available");
 
     if (XAllocColorCells(display_, colormap_, False, 0, 0, pixelval_, colorCount_) == 0) {
@@ -160,7 +161,7 @@ int ImageColor::allocate(int numColors)
 	colorCount_ = 0;
 	return error("error allocating colors for colormap");
     }
-    
+
     for (int i=0; i<colorCount_; i++) {
 	colorCells_[i].pixel = pixelval_[i];
 	colorCells_[i].flags = DoRed | DoGreen | DoBlue;
@@ -176,9 +177,9 @@ int ImageColor::allocate(int numColors)
  * color values in the original default colormap, to avoid color
  * flashing.
  */
-int ImageColor::usePrivateCmap() 
+int ImageColor::usePrivateCmap()
 {
-    if (readOnly_) 
+    if (readOnly_)
 	return 0;
 
     // used to save and restore colormap values
@@ -187,7 +188,7 @@ int ImageColor::usePrivateCmap()
 
     ErrorHandler errorHandler(display_); // catch X errors
 
-    if (colormap_ != defaultCmap_) 
+    if (colormap_ != defaultCmap_)
 	return 0;  // already using a private map
 
     // get a copy of the default colormap so we can restore most of the colors later
@@ -198,7 +199,7 @@ int ImageColor::usePrivateCmap()
     XQueryColors(display_, colormap_, saved_colors, cmapSize_);
     if (errorHandler.errors()) // check for X errors
 	return 1;
-	
+
     if (colorCount_) {
 	// free colors allocated in the default colormap
 	XFreeColors(display_, colormap_, pixelval_, colorCount_, 0);
@@ -208,7 +209,7 @@ int ImageColor::usePrivateCmap()
 				visual_, AllocNone);
     if (errorHandler.errors()) // check for X errors
 	return 1;
-	
+
     // XCreateColormap might return the default colormap again...
     if (colormap_ == defaultCmap_) {
 	return error("error creating private colormap");
@@ -223,7 +224,7 @@ int ImageColor::usePrivateCmap()
     XStoreColors(display_, colormap_, saved_colors, cmapSize_);
     if (errorHandler.errors()) // check for X errors
 	return 1;
-	
+
 #if 0
     // XXX note: this doesn't work well, since duplicate colors in the
     // default colormap that we copied cause XAllocColor to return a
@@ -236,14 +237,14 @@ int ImageColor::usePrivateCmap()
     if (errorHandler.errors()) // check for X errors
 	return ERROR;
 
-    // reserve the first n colors for the GUI components 
+    // reserve the first n colors for the GUI components
     for (i = 0; i < n; i++)
 	if (XAllocColor(display_, colormap_, saved_colors+i) == 0)
 	    return error("error allocating read-only colors");
 #else
     // XXX note: this version works a little bit better, but any new GUI colors
     // allocated using XAllocColor will not be taken from the first n colors,
-    // since they are reserved. There doesn't seem to be anyway to avoid 
+    // since they are reserved. There doesn't seem to be anyway to avoid
     // the color flashing, since even if we don't reserve the first n colors,
     // the pixel values returned from XAllocColor will still be different than
     // those in the original default colormap, due to duplicate pixels: i.e.:
@@ -255,7 +256,7 @@ int ImageColor::usePrivateCmap()
     int n = 128;
     XFreeColors(display_, colormap_, pixelval+n, cmapSize_-n, 0);
 #endif
-    
+
     if (errorHandler.errors()) // check for X errors
 	return 1;
 
@@ -263,19 +264,19 @@ int ImageColor::usePrivateCmap()
 }
 
 
-/* 
+/*
  * If we are using a read-write colormap, store the current colors in it,
  * otherwise allocate read-only colors for the current colors.
  * Returns 0 if all is OK.
  */
-int ImageColor::storeColors(XColor* colors) 
+int ImageColor::storeColors(XColor* colors)
 {
     ErrorHandler errorHandler(display_); // catch X errors
 
     if (readOnly_) {
 	for (int i = 0; i < colorCount_; i++) {
 	    if (!XAllocColor(display_, colormap_, colors+i))
-		return fmt_error("can't allocate %d read-only colors (only %d)", 
+		return fmt_error("can't allocate %d read-only colors (only %d)",
 				 colorCount_, i);
 	    pixelval_[i] = colors[i].pixel;
 	}
@@ -283,7 +284,7 @@ int ImageColor::storeColors(XColor* colors)
     else {
 	XStoreColors(display_, colormap_, colors, colorCount_);
     }
-    
+
     if (errorHandler.errors()) // check for X errors
 	return 1;
 
@@ -291,7 +292,7 @@ int ImageColor::storeColors(XColor* colors)
 }
 
 
-/* 
+/*
  * load a color map from the given file
  * where file contains MAX_COLOR lines of (r g b) values
  */
@@ -305,25 +306,25 @@ int ImageColor::loadColorMap(char* filename)
 }
 
 
-/* 
+/*
  * load or re-load the given color map
  */
 int ImageColor::loadColorMap(ColorMapInfo* m)
 {
     cmap_ = m;
-    
+
     // set the color values from the colormap file, but reserve the
     // first and last colors for special use
     int n1 = colorCount_-1, n2 = colorCount_-2;
-    
+
     // set first color to black
-    colorCells_[0].red = colorCells_[0].green = colorCells_[0].blue = 
+    colorCells_[0].red = colorCells_[0].green = colorCells_[0].blue =
 	XBlackPixelOfScreen(DefaultScreenOfDisplay(display_));
 
     m->interpolate(colorCells_+1, n2);
 
     // set last color default to white
-    colorCells_[n1].red =  colorCells_[n1].green = colorCells_[n1].blue = 
+    colorCells_[n1].red =  colorCells_[n1].green = colorCells_[n1].blue =
 	XWhitePixelOfScreen(DefaultScreenOfDisplay(display_));
 
     // re-install the ITT if necessary
@@ -334,7 +335,7 @@ int ImageColor::loadColorMap(ColorMapInfo* m)
 }
 
 
-/* 
+/*
  * rotate the current colormap/ITT by the given amount
  */
 int ImageColor::rotateColorMap(int amount)
@@ -344,11 +345,11 @@ int ImageColor::rotateColorMap(int amount)
 
     if (!itt_)
 	memcpy(ittCells_, colorCells_, sizeof(ittCells_));
-    
+
     // rotate, but reserve first and last cell
     cmap_->rotate(amount, ittCells_+1, colorCells_+1, colorCount_-2);
 
-    if (itt_) 
+    if (itt_)
 	memcpy(ittCells_, colorCells_, sizeof(ittCells_));
 
     storeColors(colorCells_);
@@ -357,7 +358,7 @@ int ImageColor::rotateColorMap(int amount)
 }
 
 
-/* 
+/*
  * shift the current colormap/ITT by the given amount
  */
 int ImageColor::shiftColorMap(int amount)
@@ -368,14 +369,14 @@ int ImageColor::shiftColorMap(int amount)
     // shift, but reserve first and last cell
     cmap_->shift(amount, colorCells_+1, ittCells_+1, colorCount_-2);
     storeColors(ittCells_);
-    
+
     return 0;
 }
 
 
-/* 
+/*
  * load an intensity transfer table (ITT) from the given file
- * where file contains MAX_COLOR ITT values, one per line 
+ * where file contains MAX_COLOR ITT values, one per line
  */
 int ImageColor::loadITT(char* filename)
 {
@@ -387,14 +388,14 @@ int ImageColor::loadITT(char* filename)
 }
 
 
-/* 
+/*
  * load or re-load an intensity transfer table (ITT)
  */
 int ImageColor::loadITT(ITTInfo* m)
 {
     itt_ = m;
     memcpy(ittCells_, colorCells_, sizeof(ittCells_));
-    
+
     // set the color values based on the itt map, but reserve
     // the first and last colors for special use
     m->interpolate(colorCells_+1, ittCells_+1, colorCount_-2);
@@ -403,14 +404,14 @@ int ImageColor::loadITT(ITTInfo* m)
 }
 
 
-/* 
+/*
  * scale (squeeze or stretch) the current colormap/ITT by the given amount
  */
 int ImageColor::scaleITT(int amount)
 {
     if (!itt_)
 	return 0;
-	
+
     memcpy(ittCells_, colorCells_, sizeof(ittCells_));
 
     // scale, but reserve first and last colors
@@ -425,7 +426,7 @@ int ImageColor::scaleITT(int amount)
  * reset colormap to original state
  */
 int ImageColor::reset()
-{ 
+{
     if (!cmap_)
 	return 0;
     return loadColorMap(cmap_);
@@ -437,7 +438,7 @@ int ImageColor::reset()
  */
 int ImageColor::setColormap(Tk_Window w)
 {
-    if (colormap_ != defaultCmap_) 
+    if (colormap_ != defaultCmap_)
 	Tk_SetWindowColormap(w, colormap_);
     return 0;
 }

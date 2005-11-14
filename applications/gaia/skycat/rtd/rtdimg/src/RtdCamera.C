@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: RtdCamera.C,v 1.15 1998/10/28 17:43:31 abrighto Exp $"
+ * "@(#) $Id: RtdCamera.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"
  *
  * RtdCamera.C - member routines for class RtdCamera,
  *             manages realtime image update for class RtdImage
@@ -11,337 +11,303 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * D.Hopkinson     02/12/96  Added performance test object and timestamp method
- * P.Biereichel    17/06/97  call rtdClose() in case of error
+ * P.Biereichel    17/06/97  Call rtdClose() in case of error
+ * P.Biereichel    10/03/01  Removed check on semId = 0 which is a valid ID.
+ *                           Added constructor argument 'debug'
+ *                           Revised the whole source code, in particular the
+ *                           interface to rtdServer.
+ *                           Removed performance test object (handled by RtdImage())
  */
-static const char* const rcsId="@(#) $Id: RtdCamera.C,v 1.15 1998/10/28 17:43:31 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: RtdCamera.C,v 1.2 2005/02/02 01:43:03 brighton Exp $";
 
-
-
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <sys/types.h>
-#include "error.h"
-#include "define.h"
-#include "config.h"
-#include "Mem.h"
 #include "RtdCamera.h"
-#include "rtdSem.h"
-
-
-// this call changed in tcl8
-#if (TCL_MAJOR_VERSION >= 8)
-#define RTD_TCL_GETFILE_(x) x
-#else
-#define RTD_TCL_GETFILE_(x) Tcl_GetFile((void *)x, TCL_UNIX_FD)
-#endif
-
-
-//#define DEBUG
 
 /*
  * constructor
  */
-RtdCamera::RtdCamera(const char* name, Tcl_Interp* interp, int verbose)
-: name_(strdup(name)),
-  interp_(interp),
-  verbose_(verbose),
-  eventHndl_(NULL),
-  camera_(NULL),
-  perftool_(NULL),
-  imageUTC(0.)
-
+RtdCamera::RtdCamera(const char* name, 
+		     Tcl_Interp* interp,
+		     int verbose, 
+		     int debug, 
+		     char* image) : 
+    name_(strdup(name)),
+    interp_(interp),
+    verbose_(verbose),
+    debug_(debug),
+    image_(image),
+    eventHndl_(NULL),
+    camera_(camBuf_),
+    connected_(0), attached_(0),
+    was_attached_(-1), shmNum_(-1), semId_(-1),
+    dbl_(NULL)
 {
+
+#ifdef DEBUG
+    debug_ = verbose_ = 1;
+#endif
+
+    eventHndl_ = new rtdIMAGE_EVT_HNDL;
+    memset(eventHndl_, '\0', sizeof(rtdIMAGE_EVT_HNDL));
+    camera("");
+    dbl_ = new RtdDebugLog("RtdCamera", (int) (debug_ & verbose_));
+    dbl_->log("Camera object created. RTD client=%s, rtdimage=%s\n", name_, image_);
 }
 
-    
 /*
  * destructor 
  */
 RtdCamera::~RtdCamera()
 {
-    if (attached_)
-	detach();
-    if (name_)
-	free(name_);
+    pause();
+    disconnect();
 }
-
-/*
- * This method is called when there is a message to read
- * from the realtime event server. Read the message and
- * call a virtual method to display the image and evaluate
- * the tcl event script, if there is one.
- */
-int RtdCamera::fileEvent()
-{
-    Mem mem;
-
-    if (!camera_)
-	return error("no camera was started");
-
-    rtdIMAGE_INFO info;
-    if (rtdRecvImageInfo(eventHndl_, &info, verbose_, NULL) != RTD_OK) {
-	stop();
-	return error("error in image event reception");
-    }
-
-    // Get the UTC of the image info.
-    imageUTC = info.timeStamp.tv_sec + 
-        ((double)info.timeStamp.tv_usec / 1000000.);
-    
-    if (perftool_) {
-        perftool_->timeStamp("PKT_RECEIVE");
-    }
-
-    if (perftool_ && info.dataType == RTD_ENDPROC) {
-        /* End of performance test.  Dump data to file. */
-        if (verbose_) {
-            fprintf(stderr, "Performance test ended\n");
-        }
-        if (perftool_->dumpPerformanceData(&info) != TCL_OK) {
-	    return TCL_ERROR;
-        }
-    }
-    else if (perftool_) {
-        perftool_->timeStamp(&info);
-    }
-    
-    if (!attached_)
-	return TCL_OK;		// ignore
-
-    int size = 0;
-    int frameId = info.frameId;
-    int width = info.xPixels;
-    int height = info.yPixels;
-    int type = info.dataType;
-
-    switch(type) {
-    case -8: // note: special non-fits format for a saved XImage
-    case 8:
-    case -16:
-    case 16:
-    case 32:
-    case -32:
-    case -64:
-	size = width * height * (abs(type)/8); // number of bytes
-	break;
-    default:
-	return error("unsupported image type received");
-    }
-
-#ifdef DEBUG
-    if (verbose_) 
-        printf("Image event received: x: %d, y: %d, width: %d, height: %d, shmId: %d shmNum: %d semId: %d\n", info.frameX, info.frameY, width, height, info.shmId, info.shmNum, info.semId);
-#endif
-    
-    if (size <= 0) {
-	return error("illegal parameter in rtdIMAGE_INFO received");
-    }
-
-    // class Mem takes care of pos. reusing previous shared memory areas 
-    // and cleanup. Choose the constructor depending on whether the 
-    // semaphore fields of the image info have been set.
-    if (info.semId > 0) {
-        mem = Mem(size, info.shmId, 0, verbose_, info.shmNum,
-            info.semId);
-    }
-    else {
-        mem = Mem(size, info.shmId, 0, verbose_);
-    }
-    
-    if (mem.status() != 0)
-	return TCL_ERROR;
-
-    // call the virtual method in a derived class to display the image
-#ifdef DEBUG
-    if (verbose_)
-	cout << "BEGIN image display event\n";
-#endif
-
-    // before displaying the image delete the file handler so that no new
-    // image events come in e.g. after camera_pre/post_command
-    Tcl_DeleteFileHandler(RTD_TCL_GETFILE_(eventHndl_->socket));
-    int disperr;
-    disperr = display(info, mem);
-
-    // re-install the file handler
-    Tcl_CreateFileHandler(RTD_TCL_GETFILE_(eventHndl_->socket),
-			  TCL_READABLE, fileEventProc, (ClientData)this);
-    if (disperr)
-	return TCL_ERROR;
-
-#ifdef DEBUG
-    if (verbose_)
-	cout << "END image display event\n";
-#endif
-
-#ifdef HAVE_UNION_SEMUN
-    union semun s; // allan: 11.9.97 - type needed for linux
-    s.val = 0;
-#else
-    void* s = NULL;
-#endif
-    // decrement the semaphore.
-    if (info.semId > 0) {
-	if (semctl(info.semId, info.shmNum, GETVAL, s) > 0) {
-	    rtdSemDecrement(info.semId, info.shmNum);
-	}
-    }
-    
-    return TCL_OK;
-}
-
 
 /*
  * This static method is called when there is a message to read
- * from the realtime event server: pass it on to a member function.
+ * from the rtdServer: pass it on to member function fileEvent()
+ * and update the Tcl global variables
  */
 void RtdCamera::fileEventProc(ClientData clientData, int mask)
 {
     RtdCamera* thisPtr = (RtdCamera*)clientData;
-    if (thisPtr->fileEvent() != TCL_OK) {
-	// Tk_BackgroundError(thisPtr->interp_);
-    }
+    thisPtr->fileEvent();
+    thisPtr->updateGlobals();
 }
 
-
 /*
- * start accepting events from the camera
+ * Read the message from the rtdServer and call a virtual method to
+ * display the image and evaluate the tcl event scripts.
  */
-int RtdCamera::attach(const char* camera) 
+int RtdCamera::fileEvent()
 {
-    if (perftool_) {
-        delete(perftool_);
-        perftool_ = NULL;
+    Mem mem;
+    rtdIMAGE_INFO info;
+    int stat;
+
+    memset(&info, '\0', sizeof(rtdIMAGE_INFO));
+    info.semId = info.shmNum = -1;
+
+    stat = rtdRecvImageInfo(eventHndl_, &info, verbose_, buffer_);
+
+    semId_  = info.semId;
+    shmNum_ = info.shmNum;
+
+    if (stat != RTD_OK || checkType(info.dataType) != RTD_OK || 
+	info.xPixels <=0 || info.yPixels <= 0) {
+	checkStat();
+	return TCL_ERROR;
+    }
+    
+    if ( ! attached()) {
+	semDecr();
+	return TCL_OK;
     }
 
-    if (strcmp(camera, RTD_PERFTEST) == 0) {
-        // create a new performance tester object.
-        perftool_ = new RtdPerformanceTool;
+    /*
+     * class Mem takes care of possible reusing previous shared memory areas 
+     * and cleanup. Choose the constructor depending on whether the 
+     * semaphore fields of the image info have been set.
+     */
+    int bytes = info.xPixels * info.yPixels * (abs(info.dataType) / 8);
+    if (semId_ > 0)
+	mem = Mem(bytes, info.shmId, 0, verbose_, shmNum_, semId_);
+    else
+	mem = Mem(bytes, info.shmId, 0, verbose_);
+    
+    if (mem.status() != 0) {
+	checkStat();
+	return TCL_ERROR;
     }
 
-    if (rtdAttachImageEvt(eventHndl_, (char*)camera, NULL) != RTD_OK) {
-	rtdClose(eventHndl_, NULL);
-	eventHndl_ = NULL;
-	delete eventHndl_;
-	return error("error attaching to camera: ", camera);
-    }
-    attached_ = 1;
+    dbl_->log("image event: Id=%d, x=%d, y=%d, width=%d, height=%d, "
+	      "shmId=%d shmNum=%d semId=%d\n",
+	      info.frameId, info.frameX, info.frameY, info.xPixels, info.yPixels, 
+	      info.shmId, shmNum_, semId_);
 
-    Tcl_CreateFileHandler(RTD_TCL_GETFILE_(eventHndl_->socket),
-			  TCL_READABLE, fileEventProc, (ClientData)this);
-    return TCL_OK;
+    /*
+     * before displaying the image delete the file handler. This blocks
+     * new image events which must not be handled between camera pre/post commands.
+     */
+    fileHandler(0);
+
+    // call the virtual method in a derived class to display the image
+    int disperr = display(info, mem);
+
+    // re-install the file handler
+    fileHandler(1);
+
+    // finally decrement the semaphore
+    semDecr();
+    return disperr;
 }
 
+/*
+ * After failure of an image event decrement the semaphore
+ * and check status of rtdServer
+ */
+void RtdCamera::checkStat()
+{
+    semDecr();
+    rtdServerCheck();
+}
 
 /*
- * stop accepting events from the camera
+ * create/delete the Tcl file handler
  */
-int RtdCamera::detach() 
+void RtdCamera::fileHandler(int create)
 {
-    if (eventHndl_)
+    if (! eventHndl_->socket)
+	return;
+    if (create)
+	Tcl_CreateFileHandler(RTD_TCL_GETFILE_(eventHndl_->socket),
+			      TCL_READABLE, fileEventProc, (ClientData)this);
+    else
 	Tcl_DeleteFileHandler(RTD_TCL_GETFILE_(eventHndl_->socket));
-
-    attached_ = 0;
-    if (perftool_) {
-        delete(perftool_);
-        perftool_ = NULL;
-    }
-
-    if (eventHndl_) {
-	if (rtdDetachImageEvt(eventHndl_, camera_, NULL) != RTD_OK) {
-	    return error("error detaching from camera: ", camera_);
-	}
-    }
-
-    return TCL_OK;
 }
 
-
+/*
+ * check connection to rtdServer
+ */
+void RtdCamera::rtdServerCheck() 
+{
+    if ( ! connected())
+	return;
+    if (rtdServerPing(eventHndl_, buffer_) == RTD_OK)
+	return;
+    disconnect();
+}
 
 /*
  * start accepting images from the named camera.
- * The "name" argument is some string that identifies the caller,
- * such as the image name.
  * "camera" is a string that identifies the camera.
  */
-int RtdCamera::start(const char* camera) 
+int RtdCamera::start(const char* cameraName) 
 {
-    if (camera_) 
-	stop();
+    if (strlen(cameraName) == 0)
+	return error("start needs a camera name");
+    camera(cameraName);  // new camera name
 
-    // check if rtdServer is still alive
-    if (eventHndl_)
-	if (attach(camera) == TCL_OK) {
-	    camera_ = strdup(camera); // remember camera name for later stop
-	    return TCL_OK;
+    dbl_->log("START camera %s\n", cameraName);
+
+    // first we need to check the connection to rtdServer
+    if (connected())
+	rtdServerCheck();
+
+    attached(0);
+    if (! connected()) {
+	dbl_->log("Connecting to %s: RTD name=%s\n", RTD_SERVICE, name_);
+	if (rtdInitImageEvt(name_, eventHndl_, buffer_) != RTD_OK) {
+	    disconnect();
+	    sprintf(buffer_, 
+		    "could not initialize image event: check if %s is running!\n",
+		    RTD_SERVICE);
+	    dbl_->log(buffer_);
+	    return error(buffer_);
 	}
-	    
-    /* register to rtdServer */
-    eventHndl_ = new rtdIMAGE_EVT_HNDL;
-    if (rtdInitImageEvt(name_, eventHndl_, NULL) != RTD_OK) {
-	delete eventHndl_;
-	eventHndl_ = NULL;
-	return error("could not initialize image event: check if rtdServer is running!");
     }
-    if (attach(camera) != TCL_OK) {
-	return TCL_ERROR;
+    connected(1);
+
+    if (rtdAttachImageEvt(eventHndl_, camera(), buffer_) != RTD_OK) {
+	disconnect();
+	sprintf(buffer_, "detach image event: check if %s is running!\n", RTD_SERVICE);
+	dbl_->log("%s\n", buffer_);
+	return error(buffer_);
     }
-    camera_ = strdup(camera); // remember camera name for later stop
+
+    // now we are ready to receive image events
+    attached(1);
+    fileHandler(1);
     return TCL_OK;
 }
 
 
 /* 
- * stop accepting images from the camera
+ * stop accepting images from the camera.
+ * This method is kept for backwards compatability.
  */
 int RtdCamera::stop()
 {
-    if (!camera_)
-	return TCL_OK;
-
-    int status = detach();
-    free(camera_);
-    camera_ = NULL;
-    return status;
+    return pause();
 }
 
-
 /*
- * this is like stop, but keeps the camera around so that you can use
- * "cont" to continue.
+ * pause receiving image events. Tell rtdServer to DETACH.
  */
 int RtdCamera::pause()
 {
-    if (!camera_)
-	return error("can't pause camera: no camera is running");
+    dbl_->log("PAUSE\n");
+    attached(0);
+    if (! connected())
+	return TCL_OK;
+    if (rtdDetachImageEvt(eventHndl_, camera(), buffer_) != RTD_OK)
+	disconnect();
+    return TCL_OK;
+}
 
-    if (detach() != TCL_OK) {
-	return TCL_ERROR;
+/*
+ * continue receiving images from camera after a pause
+ */
+int RtdCamera::cont()
+{
+    dbl_->log("CONTINUE\n");
+    if (! camera())
+	return error("no start command received yet");
+    return start(camera());
+}
+
+/*
+ * break connection to rtdServer
+ */
+void RtdCamera::disconnect()
+{
+    if( ! connected())
+	return;
+    dbl_->log("disconnect\n");
+    semDecr();
+    fileHandler(0);
+    rtdClose(eventHndl_, NULL);
+    eventHndl_->socket = 0;
+    attached(0);
+    connected(0);
+    return;
+}
+
+int RtdCamera::attached() {
+    if (! attached_ || ! connected_ || eventHndl_->socket == 0)
+	return False;
+    return True;
+}
+
+/*
+ * Decrement the semaphore
+ */
+void RtdCamera::semDecr()
+{
+    if (semId_ < 0 || shmNum_ < 0)
+	return;
+    rtdSemDecrement(semId_, shmNum_); // decrement the semaphore
+    dbl_->log("Semaphore decremented, semId=%d, shmNum=%d, val=%d\n",
+	      semId_, shmNum_, rtdSemGetVal(semId_, shmNum_));
+    semId_ = shmNum_ = -1;
+}
+
+/*
+ * update global variables
+ */
+int RtdCamera::updateGlobals()
+{
+    if (was_attached_ != attached()) {
+	was_attached_ = attached();
+	sprintf(buffer_, "%d %s", attached(), camera());
+	Tcl_SetVar2(interp_, image_, "ATTACHED", buffer_, TCL_GLOBAL_ONLY);
     }
     return TCL_OK;
 }
 
-
-/*
- * continue the camera after a pause
- */
-int RtdCamera::cont()
+int RtdCamera::checkType(int type)
 {
-    if (!camera_)
-	return error("can't continue camera: no camera is running");
-    return attach(camera_);
-}
-
-/*
- * add timeStamp in performance tool object.
- */
-void RtdCamera::timeStamp(char *evDesc)
-{
-    if (perftool_) {
-        if (perftool_->active()) {
-            perftool_->timeStamp(evDesc);
-        }
-    }
+    if (type ==  BYTE || type == XIMAGE || type == SHORT || type == USHORT || 
+	type ==  INT  || type == FLOAT  || type ==  DOUBLE)
+	return RTD_OK;
+    return RTD_ERROR;
 }
