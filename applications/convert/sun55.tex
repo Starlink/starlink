@@ -14,7 +14,7 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2003 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {55.19}
@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2003 May 7}
+\newcommand{\stardocdate}      {2005 November 10}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.5}
@@ -71,7 +71,7 @@ procedures for handling NDFs from within IDL.}
 %        Add Copyright statement in LaTeX
 %     {Add further history here}
 %
-% -
+%-
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
@@ -168,7 +168,14 @@ procedures for handling NDFs from within IDL.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -183,7 +190,7 @@ procedures for handling NDFs from within IDL.}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 
 \newcommand{\dqt}[1]{{\texttt{"#1"}}}
 \newcommand{\hash}{\dqt{\#}}
@@ -214,8 +221,9 @@ procedures for handling NDFs from within IDL.}
   \addtolength{\menuwidth}{\menuindent}
   \hspace{\menuindent}\parbox[t]{\menuwidth}{
   \newcommand{\baselinestretch}{0.75}\small
-  #2 \par \vspace{0.6ex}
+  #2 \par \vspace{1.0ex}
   \newcommand{\baselinestretch}{1.0}\normalsize} \\ }
+
 \begin{htmlonly}
 \newcommand{\menuitem}[2]
   {\item [\htmlref{#1}{#1}] #2}
@@ -235,6 +243,20 @@ procedures for handling NDFs from within IDL.}
                                      \setlength{\labelwidth}{0mm}}
                     }{\end{list}}
 
+\begin{htmlonly}
+% an environment for references (for the SST sstdiytopic command).
+   \newenvironment{refs}{\vspace{-4ex} % normally 3ex
+                         \begin{list}{}{\setlength{\topsep}{-2ex}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                       }{\end{list}}
+\end{htmlonly}
+
 % Shorthands for hypertext links.
 % -------------------------------
 \newcommand{\CONVERT}{{\footnotesize CONVERT}}
@@ -243,6 +265,7 @@ procedures for handling NDFs from within IDL.}
 \newcommand{\FIGARO}{{\footnotesize FIGARO}}
 \newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{abstract}}
 \newcommand{\FITSref}{\htmladdnormallink{FITS}{http://fits.gsfc.nasa.gov/}}
+\newcommand{\GIFref}{\htmladdnormallink{GIF}{http://en.wikipedia.org/wiki/GIF}}
 \newcommand{\HDSref}{\xref{HDS}{sun92}{}}
 \newcommand{\ICL}{{\footnotesize ICL}}
 \newcommand{\ICLref}{\xref{\ICL}{sg5}{}}
@@ -252,11 +275,16 @@ procedures for handling NDFs from within IDL.}
 \newcommand{\IRAFref}{\htmladdnormallink{\IRAF}{\IRAFURL}}
 \newcommand{\KAPPA}{{\footnotesize KAPPA}}
 \newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
-\newcommand{\IDLURL}{http://www.rsinc.com/idl/index.cfm}
+\newcommand{\IDLURL}{http://www.rsinc.com/idl/}
 \newcommand{\IDLref}{\htmladdnormallink{IDL}{\IDLURL}}
 \newcommand{\IDLAULURL}{http://idlastro.gsfc.nasa.gov/homepage.html}
-\newcommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}}
+\newcommand{\NDFref}{\xref{NDF}{sun33}{}}
+\newcommand{\Netpbm}{{\footnotesize NETPBM}}
+\newcommand{\Netpbmref}{\htmladdnormallink{\Netpbm}{http://netpbm.sourceforge.net/}}
+\newcommand{\PBMPLUS}{{\footnotesize PBMPLUS}}
+\newcommand{\PBMPLUSref}{\htmladdnormallink{\PBMPLUS}{http://www.acme.com/software/pbmplus/}}
 \newcommand{\SPECDRE}{\xref{{\footnotesize SPECDRE}}{sun140}{}}
+\newcommand{\TIFFref}{\htmladdnormallink{TIFF}{http://en.wikipedia.org/wiki/TIFF}}
 %+
 %  Name:
 %     SST.TEX
@@ -277,12 +305,16 @@ procedures for handling NDFs from within IDL.}
 %     source prior to any statements that make of the sst commands.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
 
 %  History:
 %     10-SEP-1990 (RFWS):
@@ -293,6 +325,10 @@ procedures for handling NDFs from within IDL.}
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -308,12 +344,13 @@ procedures for handling NDFs from within IDL.}
 
 %  Define a \tt font of the required size.
 \latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-\html{\newcommand{\ssttt}{\tt}}
+\html{\newcommand{\ssttt}{\large\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstroutine}[3]{
    \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
@@ -337,11 +374,12 @@ procedures for handling NDFs from within IDL.}
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
+%\newcommand{\sstusage}[1]{\pagebreak[3] \item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
 \newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
 \\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}\texttt{#1}}
+\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -372,7 +410,18 @@ procedures for handling NDFs from within IDL.}
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
+   \goodbreak 
    \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the output results parameters section (for an application).
+\newcommand{\sstresparameters}[1]{
+   \goodbreak 
+   \item[Results Parameters:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
       #1
@@ -381,6 +430,7 @@ procedures for handling NDFs from within IDL.}
 
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
+   \goodbreak
    \item[Examples:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -393,19 +443,18 @@ procedures for handling NDFs from within IDL.}
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{0.5ex}
+\\ #2 \vspace{1.0ex}}
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\pagebreak[3] \item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
-\mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\goodbreak \item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+   \pagebreak[3] \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
 
 %  Format the bugs section.
 \newcommand{\sstbugs}[1]{\item[Bugs:] #1}
@@ -428,8 +477,10 @@ procedures for handling NDFs from within IDL.}
 %  Format a list of items while in paragraph mode, and where there
 %  is a heading, thus the negative vertical space is not needed.
 \newcommand{\ssthitemlist}[1]{
+  \latexonly{
   \mbox{} \\
   \vspace{-3.5ex}
+  }
   \begin{itemize}
      #1
   \end{itemize}
@@ -438,7 +489,7 @@ procedures for handling NDFs from within IDL.}
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
@@ -459,7 +510,7 @@ procedures for handling NDFs from within IDL.}
    }
 
 %  sstusage
-   \newcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[\htmlref{Usage:}{app_usage}]
       \begin{description}
          {\ssttt #1}
       \end{description}
@@ -503,16 +554,24 @@ procedures for handling NDFs from within IDL.}
 
 %  sstparameters
    \newcommand{\sstparameters}[1]{
-      \item[Parameters:] \\
+      \item[\xref{Parameters:}{sun95}{se_param}] \\
       \begin{description}
          #1
       \end{description}
-      \\
+   }
+
+
+%  sstresparameters
+   \newcommand{\sstresparameters}[1]{
+      \item[\\ \xref{Results Parameters:}{sun95}{se_parout}] \\
+      \begin{description}
+         #1
+      \end{description}
    }
 
 %  sstexamples
    \newcommand{\sstexamples}[1]{
-      \item[Examples:] \\
+   \item[\vspace{0.35ex}\htmlref{Examples:\vspace{-0.5ex}}{app_example}]
       \begin{description}
          #1
       \end{description}
@@ -523,29 +582,32 @@ procedures for handling NDFs from within IDL.}
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+   \newcommand{\sstexamplesubsection}[2]{
+   \vspace{-1.0ex} \item[{\ssttt #1}] #2 \vspace{0.2ex}}
 
 %  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+   \newcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
 
 %  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+   \newcommand{\sstdiytopic}[2]{\\ \item[{#1}:]
+      \begin{description}
+         #2
+      \end{description}
+   }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{
-      \item[Implementation Status:] #1
+   \newcommand{\sstimplementationstatus}[1]{\\ \item[Implementation Status:]
+      \begin{description}
+         #1
+      \end{description}
    }
 
 %  sstitemlist
    \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-      \\
-   }
-
-%  ssthitemlist
-   \newcommand{\ssthitemlist}[1]{
       \begin{itemize}
          #1
       \end{itemize}
@@ -783,7 +845,7 @@ starting with an NDF, since many simpler formats have no way of storing
 certain NDF data items, like variance and axis widths.  However, if you
 are dealing with a simple file containing just a data array and linear
 axis centres, then it should be possible to avoid loss of information except
-with GIF and TIFF formats which will reduce the absolute data values to 256
+with \GIFref\ and \TIFFref\ formats which will reduce the absolute data values to 256
 greyscale levels.
 
 {\sl Note -- the input data file is not deleted or altered in any way.}
@@ -827,7 +889,7 @@ Non-Starlink sites must make their own arrangements.
 \subsection[Starting {\small CONVERT} from {\small \bf ICL}]
 {\xlabel{starting_convert_from_icl}
 Starting \BCONVERT\ from ICL}
-To start ICL, type:
+To start \ICLref, type:
 \small
 \begin{verbatim}
      % icl
@@ -1242,8 +1304,9 @@ of it.
 \section[Specifications of {\small \bf CONVERT} Applications]
 {\label{app_full}Specifications of \BCONVERT\ Applications}
 \subsection{\xlabel{explanatory_notes}Explanatory Notes}
-The {\em Parameters\/} section \label{app_parameters} lists the application's
-parameters, with the format:
+
+The {\em Parameters\/} section \label{app_parameters}
+lists the application's parameters, with the format:
 
 \begin{verbatim}
      name  =  type (access)
@@ -1278,12 +1341,13 @@ normally defaulted are indicated by being enclosed in square brackets.
 Keyword ({\it i.e.}\ not positional) parameters are needed where the
 number of parameters are large, and usually occur because they depend on
 the value of another parameter.  An example should clarify.
-\bigskip
+\smallskip
 
-{\ssttt \hspace*{1.0em}
-        ndf2ascii in out [comp] [reclen] noperec=?
-}
-\bigskip
+\begin{verbatim}
+     ndf2ascii in out [comp] [reclen] noperec=?
+\end{verbatim}
+\normalsize
+\smallskip
 
 IN, OUT, COMP, and RECLEN are all positional
 parameters.  Only IN, and OUT would be prompted if not given
@@ -1308,17 +1372,16 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 \normalsize
 
 \newpage
-\latex{\subsection{The Applications}}
 \sstroutine{
    ASCII2NDF
 }{
    Converts a text file to an NDF
 }{
    \sstdescription{
-      This application converts a text file to an NDF.  Only one of
+      This application converts a text file to an \NDFref.  Only one of
       the array components may be created from the input file.
       Preceding the input data there may be an optional header.  This
-      header may be skipped, or may consist of a simple FITS header.
+      header may be skipped, or may consist of a simple \FITSref\ header.
       In the former case the shape of the NDF has be to be supplied.
    }
    \sstusage{
@@ -1326,7 +1389,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"} or \texttt{"Variance"}.  To create a variance or
@@ -1496,7 +1559,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             axes.
             \item BSCALE and BZERO in a FITS extension are ignored.
             \item BLANK is not used to indicate which input array values
-            should be assigned to a standard bad value.
+            should be assigned to a
+            \xref{standard bad value}{sun95}{se_badmasking}.
             \item END indicates the last header record unless it
             terminates a dummy header, and the actual data is in an
             extension.
@@ -1528,7 +1592,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts an Asterix data cube into a standard
-      NDF.  See Section \texttt{"}Notes\texttt{"} (below) for details
+      \NDFref.  See Section \texttt{"}Notes\texttt{"} (below) for details
       of the conversion.
    }
    \sstusage{
@@ -1564,23 +1628,23 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       package (see \xref{SUN/98}{sun98}{}).
       These data are cubes, with two axes
       comprising a regular grid of positions on the sky and the third
-      corresponding to energy or wavelength.  The data are Starlink HDS
-      files which are very similar in format to a standard NDF.  The
+      corresponding to energy or wavelength.  The data are Starlink
+      \HDSref\ files which are very similar in format to a standard NDF.  The
       following points apply.
 
       \sstitemlist{
 
          \sstitem
          The Asterix QUALITY array is non-standard.  There is no QUALITY
-           component in the output NDF.  Instead `bad' or `null' values
-           are used to indicate missing or suspect values.
+         component in the output NDF.  Instead `bad' or `null' values
+         are used to indicate missing or suspect values.
 
          \sstitem
          The VARIANCE component is copied if it is present.
 
          \sstitem
          The non-standard Asterix axis components are replaced with
-           standard ones.
+         standard ones.
 
          \sstitem
          The order of the axes is rearranged.
@@ -1610,7 +1674,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts a direct-access (fixed-length records)
-      unformatted file to an NDF.  It can therefore also process
+      unformatted file to an \NDFref.  It can therefore also process
       unformatted data files generated by C routines.  Only one of the
       array components may be created from the input file.   The shape
       of the NDF has be to be supplied.
@@ -1620,7 +1684,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"}
@@ -1735,8 +1799,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts a Figaro (Version 2) DST file to an NDF
 }{
    \sstdescription{
-      This application converts a Figaro Version-2 DST file to a
-      Version-3 file, {\it i.e.}\ to an NDF.  The rules for converting the
+      This application converts a \Figaroref\ Version-2 DST file to a
+      Version-3 file, {\it i.e.}\ to an \NDFref.  The rules for converting the
       various components of a DST are listed in the \texttt{"}Notes\texttt{"}.  Since
       both are hierarchical formats most files can be be converted with
       little or no information lost.
@@ -1746,7 +1810,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         FORM = LITERAL (Read)
+         FORM = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The storage form of the NDF's data and variance arrays.
          FORM = \texttt{"Simple"} gives the simple form, where the array of data
@@ -1794,7 +1858,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       follows:
       \vspace{-\parskip}
 
-      \scriptsize
+      \latex{\scriptsize}
       \begin{center}
       \begin{tabular}{|lcl|p{43mm}|}
       \hline 
@@ -1852,7 +1916,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       such an axis array, it processes the array using the following
       rules, rather than those given above.
 
-      \scriptsize
+      \latex{\scriptsize}
       \begin{center}
       \begin{tabular}{|lcl|p{48mm}|}
       \hline 
@@ -1879,11 +1943,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \CONVERT: \htmlref{NDF2DST}{NDF2DST}.
    }
    \sstdiytopic{
-   Bad-pixel handling
+   \xref{Bad-pixel handling}{sun95}{se_masking}
    }{
    The QUALITY array is only copied if the bad-pixel flag
-   (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
-   flag set to false (meaning that there are no bad-pixels present)
+   (.Z.FLAGGED) is FALSE or absent.  A simple NDF with the bad-pixel
+   flag set to FALSE (meaning that there are no bad-pixels present)
    is created when .Z.FLAGGED is absent or false and FORM = \texttt{"SIMPLE"}.
    }
    \sstimplementationstatus{
@@ -1898,19 +1962,22 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts FITS files into NDFs
 }{
    \sstdescription{
-      This application converts one or more files in the FITS format
-      into NDFs.  It can process an arbitrary FITS file to produce an
+      This application converts one or more files in the \FITSref\ format
+      into {\NDFref}s.  It can process an arbitrary FITS file to produce an
       NDF, using NDF extensions to store information conveyed in table
       and image components of the FITS file.  While no information is
       lost, in many common cases this would prove inconvenient
       especially as no meaning is attached to the NDF extension
       components.  Therefore, FITS2NDF recognises certain data products
-      (currently IUE Final Archive, INES, ISO, and 2dF), and provides
+      (currently \htmladdnormallink{IUE Final Archive}{http://www.vilspa.esa.es/iue/iuefa.html}, 
+      \htmladdnormallink{INES}{http://ines.laeff.esa.es/}, 
+      \htmladdnormallink{ISO}{http://www.iso.vilspa.esa.es/users/idc/IDC.html},
+      and \htmladdnormallink{2dF}{http://www.aao.gov.au/local/www/2df/}), and provides
       tailored conversions that map the FITS data better on to the NDF
       components.  For instance, a FITS IMAGE extension storing data
       errors will have its data array transferred to the NDF's VARIANCE
       (after being squared).  In addition, FITS2NDF can restore
-      NDFs converted to FITS by the sister task NDF2FITS
+      NDFs converted to FITS by the sister task \htmlref{NDF2FITS}{NDF2FITS}.
 
       A more general facility is also provided to associate specified
       FITS extensions with NDF components by means of entries in a file
@@ -1920,7 +1987,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       them are given in topic 
       \htmlref{\texttt{"}Special Formats\texttt{"}}{special_formats}; 
       the general-case
-      processing rules are described in the \texttt{"}Notes\texttt{"}.
+      processing rules are described in the 
+      \htmlref{\texttt{"}Notes\texttt{"}}{fits2ndf_notes}.
 
       Both NDF and FITS use the term extension, and they mean different
       things.  Thus to avoid confusion in the descriptions below, the term
@@ -1951,7 +2019,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{[FALSE]}
       }
       \sstsubsection{
-         ENCODINGS = LITERAL (Read)
+         ENCODINGS = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          Determines which FITS keywords should be used to define the
          world co-ordinate systems to be stored in the NDF's WCS
@@ -2041,7 +2109,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
         are treated as determined by the PROEXTS parameter (see below).
 
         An EXTABLE file contains records which may be:
-        \ssthitemlist {
+        \sstitemlist {
+        \latex{\vspace*{4.5ex}}
         \sstitem
         `\textbf{component specifier records}', which associate FITS sub-files
         with NDF components.
@@ -2054,13 +2123,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
         }
         Spaces are allowed between elements within records and blank records
         are ignored.
+        \medskip
 
         \textbf{Component specifier records} have the form:
         \begin{quote}
           \texttt{\textit{component}; \textit{sub-file\_specifiers};
           \textit{transformation\_code}}
         \end{quote}
-          Where:
+        where:
            \ssthitemlist{
            \sstitem
            \texttt{\textit{component}} (case-insensitive) specifies the NDF
@@ -2121,6 +2191,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
           sub-file specifier may not span records and only the transformation
           code specified by the last record for the component will be
           effective.
+          \medskip
 
         \textbf{NDFNAMES records} have the format:
           \begin{quote}
@@ -2145,6 +2216,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
            `\texttt{*}',
            in which case the NDF will be created at the top level of the output
            file.
+           \medskip
 
         \textbf{Directive records} have \texttt{\#} in column 1 and will
            generally be treated
@@ -2161,6 +2233,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
         another NDF component but each FITS HDU can only be used once. 
         If sub-file specifiers remain unmatched at the end, a warning
         message is displayed.
+        \bigskip
 
         A simple example of an EXTABLE is:
         \begin{quote} 
@@ -2447,6 +2520,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          EXTABLE-format file \texttt{table1}.
       }
    }
+   \label{fits2ndf_notes}
    \sstnotes{
       Some sources of FITS files that require special conversion
       rules, particularly because they use binary tables, are
@@ -2470,10 +2544,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          BSCALE and BZERO.
          \sstitem
          Any integer array elements with value equal to the FITS
-         keyword BLANK become bad values in the NDF data array.  Likewise
-         any floating-point data set to an IEEE not-a-number value also
-         become bad values in the NDF's data array.  The BAD\_PIXEL flag is
-         set appropriately.
+         keyword BLANK become \xref{bad}{sun95}{se_badmasking} values in
+         the NDF data array.  Likewise any floating-point data set to an
+         IEEE not-a-number value also become bad values in the NDF's data
+         array.  The BAD\_PIXEL flag is set appropriately.
          \sstitem
          NDF quality and variance arrays are not created.
          \sstitem
@@ -2568,7 +2642,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          \bigskip
          \sstitem
-         IUE Final Archive LILO, LIHI, SILO, SIHI
+         \htmladdnormallink{IUE Final Archive}{http://www.vilspa.esa.es/iue/iuefa.html}
+         LILO, LIHI, SILO, SIHI
          \ssthitemlist{
             \sstitem
             This converts an IUE LI or SI product stored as a FITS primary
@@ -2688,7 +2763,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          }
          \bigskip
          \sstitem
-         IUE INES reduced spectra
+         IUE \htmladdnormallink{INES}{http://ines.laeff.esa.es/} reduced spectra
          \ssthitemlist{
             \sstitem
             This generates a single 1-dimensional NDF. 
@@ -2711,7 +2786,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          }
          \bigskip
          \sstitem
-         ISO CAM auto-analysis (CMAP, CMOS)
+         \htmladdnormallink{ISO}{http://www.iso.vilspa.esa.es/users/idc/IDC.html}
+         CAM auto-analysis (CMAP, CMOS)
          \ssthitemlist{
             \sstitem
             The CAM auto-analysis FITS products have a binary table
@@ -2809,7 +2885,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          }
          \bigskip
          \sstitem
-         AAO 2dF
+         AAO \htmladdnormallink{2dF}{http://www.aao.gov.au/local/www/2df/}
          \ssthitemlist{
             \sstitem
             The conversion is restricted to a 2dF archive FITS file
@@ -2825,7 +2901,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \ssthitemlist{
                \sstitem
                The primary data array becomes the NDF's data array.  Any
-               NaN values present become bad values in the NDF.
+               NaN values present become \xref{bad}{sun95}{se_badmasking} values in the NDF.
                \sstitem
                The keywords CRVAL\textit{n}, CDELT\textit{n}, CRPIX\textit{n},
                CTYPE\textit{n}, CUNIT\textit{n} are
@@ -2891,14 +2967,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts a GAlaxy Surface Photometry (GASP)
-      format file into an NDF.
+      format file into an \NDFref.
    }
    \sstusage{
       gasp2ndf in out shape=?
    }
    \sstparameters{
       \sstsubsection{
-         IN = LITERAL (Read)
+         IN = FILENAME (Read)
       }{
          A character string containing the name of GASP file to convert.
          The extension should not be given, since \texttt{".dat"} is assumed.
@@ -2970,9 +3046,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This Bourne-shell script converts a Graphics Interchange Format
-      (GIF) file into an unsigned-byte (256 grey-level) NDF format file.
+      (\GIFref) file into an unsigned-byte (256 grey-level) \NDFref\ format file.
       It handles one- or two-dimensional images.  The script uses
-      various Netpbm utilities to produce a FITS file, flipped top
+      various \Netpbmref\ utilities to produce a FITS file, flipped top
       to bottom, and then \htmlref{FITS2NDF}{FITS2NDF} to produce the final
       NDF. 
       Error messages are converted into Starlink style (preceded by \texttt{!}).
@@ -3023,7 +3099,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             Input image filenames must have the file extension \texttt{.gif}.
 
          \sstitem
-            The Netpbm utilities \texttt{giftopnm}, \texttt{ppmtopgm},
+            The \Netpbm\ utilities \texttt{giftopnm}, \texttt{ppmtopgm},
             \texttt{pnmflip} and \texttt{pnmtofits} must be available on your
             PATH.
       }
@@ -3042,7 +3118,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an IRAF image to an NDF
 }{
    \sstdescription{
-      This application converts an IRAF image to an NDF.  See the 
+      This application converts an \IRAFref\ image to an \NDFref.  See the 
       \texttt{"}Notes\texttt{"} for details of the conversion. 
    }
    \sstusage{
@@ -3096,10 +3172,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstnotes{
       The rules for the conversion are as follows:
-      \ssthitemlist{
+      \sstitemlist{
+         \latex{\vspace{4.5ex}}
 
          \sstitem
-         The NDF is created with bounds determined by any LBOUNDn
+         The NDF is created with bounds determined by any LBOUND$n$
          keywords in the IRAF image header.
 
          \sstitem
@@ -3215,7 +3292,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstitemlist{
 
          \sstitem
-         Bad pixels in the IRAF image are not replaced.
+         \xref{Bad pixels}{sun95}{se_masking} in the IRAF image are not replaced.
 
          \sstitem
          Some of the routines required for accessing the IRAF header
@@ -3263,16 +3340,17 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an IRCAM data file to a series of NDFs
 }{
    \sstdescription{
-      This applications converts an HDS file in the IRCAM format listed
-      in IRCAM User Note 11 to one or more NDFs.  See the 
-      \texttt{"}Notes\texttt{"} for a detailed list of the rules of the conversion.
+      This applications converts an \HDSref\ file in the IRCAM format listed
+      in IRCAM User Note 11 to one or more {\NDFref}s.  See the 
+      \htmlref{\texttt{"}Notes\texttt{"}}{ircam2ndf_notes} for a detailed list
+      of the rules of the conversion.
    }
    \sstusage{
       ircam2ndf in prefix obs [config]
    }
    \sstparameters{
       \sstsubsection{
-         CONFIG = LITERAL (Read)
+         CONFIG = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The choice of data array to place in the NDF.  It can have one
          of the following configuration values:
@@ -3359,6 +3437,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          format conversion applied.
       }
    }
+   \label{ircam2ndf_notes}
    \sstnotes{
       The rules for the conversion of the various components are as
       follows: \vspace*{-\medskipamount}
@@ -3434,10 +3513,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }
    }
    \sstdiytopic{
-      Bad-pixel Handling
+      \xref{Bad-pixel}{sun95}{se_masking} Handling
    }{
       Elements of the data array equal to the IRCAM component
-      .OBS.DATA\_BLANK are replaced by the standard bad value.
+      .OBS.DATA\_BLANK are replaced by the 
+      \xref{standard bad value}{sun95}{se_badmasking}.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -3459,10 +3539,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       Converts FITS magnetic tape files into NDFs.
 }{
    \sstdescription{
-      This application converts files from a FITS tape into NDFs by
+      This application converts files from a \FITSref\ tape into {\NDFref}s by
       using shell commands \textbf{mt} and \textbf{dd} to position the
-      tape and convert the selected tape files into FITS disk files and then using 
-      \htmlref{FITS2NDF}{FITS2NDF} to
+      tape and convert the selected tape files into FITS disk files and 
+      then using \htmlref{FITS2NDF}{FITS2NDF} to
       produce the NDFs.  The intermediate FITS files may be saved.
    }
    \sstusage{
@@ -3470,15 +3550,16 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         BLOCK = \_INTEGER
+         BLOCK = \_INTEGER (Read)
       }{
          The FITS blocking factor, \textit{i.e.}\ the block size on the tape is
-         this value multiplied by the standard FITS block size.
+         this value multiplied by the standard FITS block size.  The
+         suggested default is 10.
       }
       \sstsubsection{
-         IN = Tape device name
+         IN = DEVICE (Read)
       }{
-         The name of a tape device. For correct tape positioning, a no-rewind
+         The name of a tape device.  For correct tape positioning, a no-rewind
          device must be used.  The device name may have file specifiers
          appended, separated by commas and enclosed in \texttt{[]}.  The file specifiers
          indicate which files from the tape are to be processed.
@@ -3488,22 +3569,23 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{[5-]} indicates file 5 to the last file on the tape.
          \texttt{[1,3-5,7-]} indicates files 1,3,4,5, and 7 to the end of the tape.
          If no file specifiers are given, all files on the tape will be
-          processed.
+         processed.
       }
       \sstsubsection{
-         OF = FITS file name
+         OF = LITERAL (Read)
       }{
-         Set this if you want to save the intermediate FITS file(s). If a
+         Name(prefix) of the intermediate FITS file(s) copied from the tape.
+         Only set this if you want to save the intermediate FITS file(s).  If a
          number of files are being produced, the name should contain a \texttt{*},
          which will be replaced by the corresponding FITS tape file number.
          If OF is not specified, \texttt{mtf2ndf*.fits} will be used and deleted.
          (See also \texttt{"}Notes\texttt{"}).
       }
       \sstsubsection{
-         OUT = NDF
+         OUT = NDF (Write)
       }{
-         The name of the NDF(s) to be produced by FITS2NDF. This is passed to
-         FITS2NDF but only a single element string can be specified -- it can
+         The name of the NDF(s) to be produced by FITS2NDF.  This is passed to
+         FITS2NDF but only a single element string can be specified---it can
          contain the matching patterns allowed for FITS2NDF, for example \texttt{"*"}.
       }
       \sstsubsection{
@@ -3531,29 +3613,24 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
    \sstexamples{
       \sstexamplesubsection{
-         \textrm{Note that []* etc must be protected from the shell.}
-      }{
-      }
-      \sstexamplesubsection{
-         mtfits2ndf '/dev/nst0[2]' f256 block=10 fmtcnv=f
+         mtfits2ndf /dev/nst0[2] f256 block=10 fmtcnv=f
       }{
          This converts the second file on the tape on device 
-         \texttt{/dev/nst0} to
-         an NDF called \texttt{f256}. The FITS blocking factor of the tape
-         is 10.
+         \texttt{/dev/nst0} to an NDF called \texttt{f256}.  The FITS
+         blocking factor of the tape is 10.
          As a result of the parameters passed to FITS2NDF, the data type of
          the NDF's data array matches that of the FITS primary data array,
          a FITS extension is created in \texttt{f256}, and FITS sub-files are
          propagated to NDF extensions.
       }
       \sstexamplesubsection{
-         mtfits2ndf /dev/nst0 '*' block=1 of='ral256\_*.fit'
+         mtfits2ndf /dev/nst0 * block=1 of=ral256\_*.fit
       }{
          Will convert each file on the tape on device \texttt{/dev/nst0}
-        (with a blocking factor of 1) to FITS disk files named 
-        \texttt{ral256\_*.fit},
-         where * is replaced by each tape file number. The FITS files will
-         be converted to NDFs named \texttt{ral256\_*} and retained.
+         (with a blocking factor of 1) to FITS disk files named 
+         \texttt{ral256\_*.fit}, where \texttt{*} is replaced by each tape file number.
+         The FITS files will be converted to NDFs named \texttt{ral256\_*} and
+         retained.
       }
       \sstexamplesubsection{
          mtfits2ndf
@@ -3601,7 +3678,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to a text file
 }{
    \sstdescription{
-      This application converts an NDF to a Fortran text file.  Only one of
+      This application converts an \NDFref\ to a Fortran text file.  Only one of
       the array components may be copied to the output file.  Preceding
       the data there is an optional header consisting of either the
       FITS extension with the values of certain keywords replaced by
@@ -3613,7 +3690,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"} or \texttt{"Variance"}. \texttt{["Data"]}
@@ -3784,7 +3861,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
                An extra header record with keyword UNSIGNED and logical
-               value T is added when the array data type is one of the HDS
+               value T is added when the array data type is one of the \HDSref\
                unsigned integer types.  This is done because standard FITS
                does not support unsigned integers, and allows (in conjunction
                with BITPIX) applications reading the unformatted file to
@@ -3813,8 +3890,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          All non-complex numeric data types are supported.
 
          \sstitem
-         The value of bad pixels is not written to a FITS-like header
-         record with keyword BLANK.
+         The value of \xref{bad pixels}{sun95}{se_badmasking} is not written to
+         a FITS-like header record with keyword BLANK.
       }
    }
 }
@@ -3826,7 +3903,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to a direct-access unformatted file
 }{
    \sstdescription{
-      This application converts an NDF to a direct-access unformatted
+      This application converts an \NDFref\ to a direct-access unformatted
       file, which is equivalent to fixed-length records, or a data
       stream suitable for reading by C routines.  Only one of the array
       components may be copied to the output file.
@@ -3836,7 +3913,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"} or \texttt{"Variance"}. \texttt{["Data"]}
@@ -3911,7 +3988,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to a Figaro (Version 2) DST file
 }{
    \sstdescription{
-      This application converts an NDF to a Figaro (Version 2) `DST'
+      This application converts an \NDFref\ to a \Figaroref\ (Version 2) `DST'
       file.  The rules for converting the various components of a DST
       are listed in the \texttt{"}Notes\texttt{"}.  Since both are hierarchical formats
       most files can be be converted with little or no information
@@ -3951,7 +4028,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    \sstnotes{
       The rules for the conversion are as follows:\vspace*{-\medskipamount}
 
-      \scriptsize
+      \latex{\scriptsize}
       \begin{center}
       \begin{tabular}{|lcl|p{57mm}|}
       \hline 
@@ -3964,9 +4041,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       Label            & $\Rightarrow$ & .Z.LABEL & \\
       Variance         & $\Rightarrow$ & .Z.ERRORS & After processing \\
       Quality          & $\Rightarrow$ &  & It is not copied directly
-                         though bad values indicated by QUALITY flags will
-                         be flagged in .Z.DATA in addition to any flagged
-                         values actually in the input main data array.
+                         though \xref{bad values}{sun95}{se_badmasking} indicated by
+                         QUALITY flags will be flagged in .Z.DATA in addition to any
+                         flagged values actually in the input main data array.
                          .Z.FLAGGED is set accordingly. \\ \hline
       \end{tabular}
       \end{center}
@@ -4026,12 +4103,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts NDFs into FITS files
 }{
    \sstdescription{
-      This application converts one or more NDF datasets into
-      FITS-format files.  NDF2FITS stores any variance and quality
+      This application converts one or more \NDFref\ datasets into
+      {\FITSref}-format files.  NDF2FITS stores any variance and quality
       information in IMAGE extensions (`sub-files') within the FITS
       file; and it uses binary tables to hold any NDF-extension data
-      present, except for the FITS-airlock extension, which may be
-      merged into the output FITS file's headers.
+      present, except for the \xref{FITS-airlock extension}{sun95}{se_fitsairlock}, 
+      which may be merged into the output FITS file's headers.
 
       You can select which NDF array components to export to the FITS
       file, and choose the data type of the data and variance arrays.
@@ -4281,8 +4358,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          not support these data types).
 
          \sstitem
-         The FITS keyword BLANK records the bad values for integer
-         output types.  Bad values in floating-point output arrays are
+         The FITS keyword BLANK records the \xref{bad values}{sun95}{se_badmasking}
+         for integer output types.  Bad values in floating-point output arrays are
          denoted by IEEE not-a-number values.
 
          \sstitem
@@ -4296,7 +4373,6 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \sstitem
          Here are details of the processing of standard items from the
          NDF into the FITS header, listed by FITS keyword.
-
          \ssthitemlist{
 
             \sstitem
@@ -4371,12 +4447,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               array's type, but cards with values 1.0 and 0.0 respectively
               are written to reserve places in the header section.  These
               `reservation' cards are for efficiency and they can always
-              be deleted later.  BLANK is set to the Starlink standard bad
-              value corresponding to the type specified by BITPIX, but only
-              for integer types and not for the quality array.  It appears
-              regardless of whether or not there are bad values actually
-              present in the array; this is for the same efficiency reasons
-              as before.  The END card terminates the FITS header.
+              be deleted later.  BLANK is set to the Starlink standard 
+              \xref{bad value}{sun95}{se_badmasking} corresponding to the type
+              specified by BITPIX, but only for integer types and not for the
+              quality array.  It appears regardless of whether or not there are
+              bad values actually present in the array; this is for the same
+              efficiency reasons as before.  The END card terminates the FITS header.
 
            \sstitem
               HISTORY --- HISTORY headers are propagated from the FITS
@@ -4506,7 +4582,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstitemlist{
 
          \sstitem
-         AAO 2dF
+         AAO \htmladdnormallink{2dF}{http://www.aao.gov.au/local/www/2df/}
 
          Standard processing is used except for the 2dF FIBRES extension
          and its constituent structures.  The NDF may be restored from the
@@ -4569,7 +4645,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts a two-dimensional NDF into a GASP image
 }{
    \sstdescription{
-      This application converts a two-dimensional NDF into the GAlaxy
+      This application converts a two-dimensional \NDFref\ into the GAlaxy
       Surface Photometry (GASP) package's format.  See the
       \texttt{"}Notes\texttt{"} for the details of the conversion.
    }
@@ -4586,14 +4662,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
          FILLBAD = \_INTEGER (Read)
       }{
-         The value used to replace bad pixels in the NDF's data array
-         before it is copied to the GASP file.  The value must be in the
-         range of signed words ($-$32768 to 32767).  A null value (\texttt{!})
+         The value used to replace \xref{bad pixels}{sun95}{se_badmasking} in the
+         NDF's data array before it is copied to the GASP file.  The value must be 
+         in the range of signed words ($-$32768 to 32767).  A null value (\texttt{!})
          means no replacements are to be made.  This parameter is
          ignored if there are no bad values.  \texttt{[!]}
       }
       \sstsubsection{
-         OUT = LITERAL (Write)
+         OUT = FILENAME (Write)
       }{
          The name of the output GASP image.  Two files are produced
          with the same name but different extensions.  The \texttt{".dat"} file
@@ -4670,16 +4746,16 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF into a GIF file.
 }{
    \sstdescription{
-      This Bourne-shell script converts an NDF into a 256 grey-level
-      Graphics Interchange Format (GIF) file.  One- or two-dimensional
+      This Bourne-shell script converts an \NDFref\ into a 256 grey-level
+      Graphics Interchange Format (\GIFref) file.  One- or two-dimensional
       images can be handled and various methods of scaling the data are
       provided.  The script uses the \CONVERT\ utility
-      \htmlref{NDF2TIFF}{NDF2TIFF} to produce a TIFF file and then
-      various Netpbm utilities to convert the TIFF file into a GIF file. 
+      \htmlref{NDF2TIFF}{NDF2TIFF} to produce a \TIFFref\ file and then
+      various \Netpbmref\ utilities to convert the TIFF file into a GIF file. 
 
       If the `high' scaling value is less than the `low' value, the output
-      image will be a negative. Bad values are set to 0 for positives and
-      255 for negatives.
+      image will be a negative. \xref{Bad values}{sun95}{se_badmasking} are
+      set to 0 for positives and 255 for negatives.
 
       Error messages are converted into Starlink style (preceded by \texttt{!}).
    }
@@ -4716,6 +4792,51 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
    \begin{description}
       \sstsubsection{
+        HIGH = \_DOUBLE (Read)
+      }{
+        Only required if SCALE is {\texttt{"Scale"}}.
+        The array value that scales to 255 in the TIFF file.
+        All larger array values are set to 255 when HIGH is greater than
+        LOW, otherwise all array values less than HIGH are set to 255.
+        The dynamic default is the maximum data value.  There is an
+        efficiency gain when both LOW and HIGH are given on the
+        command line, because the extreme values need not be computed.
+        The highest data value is suggested in prompts.
+      }
+      \sstsubsection{
+        LOW = \_DOUBLE (Read)
+      }{
+        Only required if SCALE is {\texttt{"Scale"}}.
+        The array value that scales to 0 in the TIFF file.
+        All smaller array values are also set to 0 when LOW is less than
+        HIGH, otherwise all array values greater than LOW are set to 0.
+        The dynamic default is the minimum data value.  There is an
+        efficiency gain when both LOW and HIGH are given on the
+        command line, because the extreme values need not be computed.
+        The lowest data value is suggested in prompts.
+      }
+      \sstsubsection{
+        MSG\_FILTER = LITERAL (Read)
+      }{
+        The output message filtering level, \texttt{QUIET}, \texttt{NORMAL} or
+        \texttt{VERBOSE}. If set to verbose, the scaling limits used will be
+        displayed. \texttt{[NORMAL]}
+      } 
+      \sstsubsection{
+        NUMBIN  =  \_INTEGER (Read)
+      }{
+        Only used if SCALE is {\texttt{"Percentiles"}}.
+        The number of histogram bins used to compute percentiles for
+        scaling. (Percentiles mode) \texttt{[2048]}
+      }
+      \sstsubsection{
+        PERCENTILES( 2 ) = \_REAL (Read)
+      }{
+        Only required if SCALE is {\texttt{"Percentiles"}}.
+        The percentiles that define the scaling limits. For example,
+        {\texttt{[25,75]}} would scale between the quartile values.
+      }
+      \sstsubsection{
          SCALE = LITERAL (Read)
       }{
         The type of scaling to be applied to the array.  The options, which
@@ -4744,51 +4865,6 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{["Range"]}
       }
       \sstsubsection{
-        MSG\_FILTER = LITERAL (Read)
-      }{
-        The output message filtering level, \texttt{QUIET}, \texttt{NORMAL} or
-        \texttt{VERBOSE}. If set to verbose, the scaling limits used will be
-        displayed. \texttt{[NORMAL]}
-      } 
-      \sstsubsection{
-        HIGH = \_DOUBLE (Read)
-      }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 255 in the TIFF file.
-        All larger array values are set to 255 when HIGH is greater than
-        LOW, otherwise all array values less than HIGH are set to 255.
-        The dynamic default is the maximum data value.  There is an
-        efficiency gain when both LOW and HIGH are given on the
-        command line, because the extreme values need not be computed.
-        The highest data value is suggested in prompts.
-      }
-      \sstsubsection{
-        LOW = \_DOUBLE (Read)
-      }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 0 in the TIFF file.
-        All smaller array values are also set to 0 when LOW is less than
-        HIGH, otherwise all array values greater than LOW are set to 0.
-        The dynamic default is the minimum data value.  There is an
-        efficiency gain when both LOW and HIGH are given on the
-        command line, because the extreme values need not be computed.
-        The lowest data value is suggested in prompts.
-      }
-      \sstsubsection{
-        NUMBIN  =  \_INTEGER (Read)
-      }{
-        Only used if SCALE is {\texttt{"Percentiles"}}.
-        The number of histogram bins used to compute percentiles for
-        scaling. (Percentiles mode) \texttt{[2048]}
-      }
-      \sstsubsection{
-        PERCENTILES( 2 ) = \_REAL (Read)
-      }{
-        Only required if SCALE is {\texttt{"Percentiles"}}.
-        The percentiles that define the scaling limits. For example,
-        {\texttt{[25,75]}} would scale between the quartile values.
-      }
-      \sstsubsection{
         SIGMAS( 2 ) = \_REAL (Read)
       }{
         Only required if SCALE is {\texttt{"Sigmas"}}.
@@ -4798,6 +4874,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
         between the mean minus two and the mean plus three standard
         deviations.  {\texttt{[3,-2]}} would give the negative of that.
       }
+   \end{description}
+   \sstresparameters{
       \sstsubsection{
         SCAHIGH = \_DOUBLE (Write)
       }{
@@ -4808,7 +4886,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
         The array value scaled to the minimum colour index for display.
       }
-   \end{description}
+   }
    \sstexamples{
       \sstexamplesubsection{
          ndf2gif old new
@@ -4834,7 +4912,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             absolute data values may be lost.
 
          \sstitem
-            The Netpbm utilities \texttt{tifftopnm} and \texttt{ppmtogif}
+            The \Netpbm\ utilities \texttt{tifftopnm} and \texttt{ppmtogif}
             must be available on your PATH.
       }
    }
@@ -4852,7 +4930,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to an IRAF image
 }{
    \sstdescription{
-      This application converts an NDF to an IRAF image.  See the
+      This application converts an \NDFref\ to an \IRAFref\ image.  See the
       \texttt{"}Notes\texttt{"} for details of the conversion.
    }
    \sstusage{
@@ -4868,16 +4946,16 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
          FILLBAD = \_REAL (Read)
       }{
-         The value used to replace bad pixels in the NDF's data array
-         before it is copied to the IRAF file.  A null value (\texttt{!}) means
-         no replacements are to be made.  This parameter is ignored if
+         The value used to replace \xref{bad pixels}{sun95}{se_badmasking} in the
+         NDF's data array before it is copied to the IRAF file.  A null value
+         (\texttt{!}) means no replacements are to be made.  This parameter is ignored if
          there are no bad values.  \texttt{[0]}
       }
       \sstsubsection{
          OUT = LITERAL (Write)
       }{
          The name of the output IRAF image.  Two files are produced
-         with the same name but different extensions. The \texttt{".pix"} file
+         with the same name but different extensions.  The \texttt{".pix"} file
          contains the data array, and \texttt{".imh"} is the associated header
          file that may contain a copy of the NDF's FITS extension.
          The suggested default is the current value.
@@ -4974,7 +5052,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          array-component name respectively.
 
          \sstitem
-         The BLANK keyword is set to the Starlink standard bad value,
+         The BLANK keyword is set to the Starlink standard
+         \xref{bad value}{sun95}{se_badmasking},
          but only for the \_WORD data type and not for a quality array.  It
          appears regardless of whether or not there are bad values
          actually present in the array.
@@ -5062,11 +5141,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to a PBMPLUS-style PGM-format file.
 }{
    \sstdescription{
-      This application converts an NDF to a PBMPLUS PGM-format file.
+      This application converts an \NDFref\ to a \PBMPLUSref\ PGM-format file.
       The programme first finds the brightest and darkest pixel values 
       in the image.  It then uses these to determine suitable scaling
       factors to convert the image into an 8-bit representation.  These
-      are then output to a simple greyscale PBMPLUS PGM file.
+      are then output to a simple greyscale \PBMPLUS\ PGM file.
    }
    \sstusage{
       ndf2pgm in out
@@ -5106,8 +5185,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       in case someone finds it useful.
    }
    \sstimplementationstatus{
-      Bad values in the data array are replaced with zero in the output
-      PGM file.
+      \xref{Bad values}{sun95}{se_badmasking} in the data array are replaced 
+      with zero in the output PGM file.
    }
 }
 
@@ -5118,7 +5197,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to an 8-bit TIFF-6.0-format file.
 }{
    \sstdescription{
-      This application converts an NDF to a Tag Image File Format (TIFF).
+      This application converts an \NDFref\ to a Tag Image File Format (\TIFFref).
       One- or two-dimensional arrays can be handled and various methods
       of scaling the data are provided.
 
@@ -5129,8 +5208,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       greyscale TIFF-6.0 file.
 
       If the `high' scaling value is less than the `low' value, the output
-      image will be a negative. Bad values are set to 0 for positives and
-      255 for negatives.
+      image will be a negative. \xref{Bad values}{sun95}{se_badmasking} are
+      set to 0 for positives and 255 for negatives.
    }
    \sstusage{
       ndf2tiff in out [scale] $\left\{\begin{tabular}{l}
@@ -5141,11 +5220,49 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
+        HIGH = \_DOUBLE (Read)
+      }{
+        Only required if SCALE is {\texttt{"Scale"}}.
+        The array value that scales to 255 in the TIFF file.
+        All larger array values are set to 255 when HIGH is greater than
+        LOW, otherwise all array values less than HIGH are set to 255.
+        The dynamic default is the maximum data value.  There is an
+        efficiency gain when both LOW and HIGH are given on the
+        command line, because the extreme values need not be computed.
+        The highest data value is suggested in prompts.
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
          The name of the input NDF data structure (without the \texttt{.sdf} 
          extension).  The suggested default is the current NDF if one exists,
          otherwise it is the current value.
+      }
+      \sstsubsection{
+        LOW = \_DOUBLE (Read)
+      }{
+        Only required if SCALE is {\texttt{"Scale"}}.
+        The array value that scales to 0 in the TIFF file.
+        All smaller array values are also set to 0 when LOW is less than
+        HIGH, otherwise all array values greater than LOW are set to 0.
+        The dynamic default is the minimum data value.  There is an
+        efficiency gain when both LOW and HIGH are given on the
+        command line, because the extreme values need not be computed.
+        The lowest data value is suggested in prompts.
+      }
+      \sstsubsection{
+        MSG\_FILTER = LITERAL (Read)
+      }{
+        The output message filtering level, \texttt{QUIET}, \texttt{NORMAL} or
+        \texttt{VERBOSE}. If set to verbose, the scaling limits used will be
+        displayed. \texttt{[NORMAL]}
+      } 
+      \sstsubsection{
+        NUMBIN  =  \_INTEGER (Read)
+      }{
+        Only used if SCALE is {\texttt{"Percentiles"}}.
+        The number of histogram bins used to compute percentiles for
+        scaling. (Percentiles mode) \texttt{[2048]}
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
@@ -5156,7 +5273,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          Any existing file with the same name will be overwritten.
       }
       \sstsubsection{
-         SCALE = LITERAL (Read)
+        PERCENTILES( 2 ) = \_REAL (Read)
+      }{
+        Only required if SCALE is {\texttt{"Percentiles"}}.
+        The percentiles that define the scaling limits. For example,
+        {\texttt{[25,75]}} would scale between the quartile values.
+      }
+      \sstsubsection{
+         SCALE =  \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
         The type of scaling to be applied to the array.
         The options, which may be abbreviated to an unambiguous string
@@ -5184,51 +5308,6 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \texttt{["Range"]}
       }
       \sstsubsection{
-        MSG\_FILTER = LITERAL (Read)
-      }{
-        The output message filtering level, \texttt{QUIET}, \texttt{NORMAL} or
-        \texttt{VERBOSE}. If set to verbose, the scaling limits used will be
-        displayed. \texttt{[NORMAL]}
-      } 
-      \sstsubsection{
-        HIGH = \_DOUBLE (Read)
-      }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 255 in the TIFF file.
-        All larger array values are set to 255 when HIGH is greater than
-        LOW, otherwise all array values less than HIGH are set to 255.
-        The dynamic default is the maximum data value.  There is an
-        efficiency gain when both LOW and HIGH are given on the
-        command line, because the extreme values need not be computed.
-        The highest data value is suggested in prompts.
-      }
-      \sstsubsection{
-        LOW = \_DOUBLE (Read)
-      }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 0 in the TIFF file.
-        All smaller array values are also set to 0 when LOW is less than
-        HIGH, otherwise all array values greater than LOW are set to 0.
-        The dynamic default is the minimum data value.  There is an
-        efficiency gain when both LOW and HIGH are given on the
-        command line, because the extreme values need not be computed.
-        The lowest data value is suggested in prompts.
-      }
-      \sstsubsection{
-        NUMBIN  =  \_INTEGER (Read)
-      }{
-        Only used if SCALE is {\texttt{"Percentiles"}}.
-        The number of histogram bins used to compute percentiles for
-        scaling. (Percentiles mode) \texttt{[2048]}
-      }
-      \sstsubsection{
-        PERCENTILES( 2 ) = \_REAL (Read)
-      }{
-        Only required if SCALE is {\texttt{"Percentiles"}}.
-        The percentiles that define the scaling limits. For example,
-        {\texttt{[25,75]}} would scale between the quartile values.
-      }
-      \sstsubsection{
         SIGMAS( 2 ) = \_REAL (Read)
       }{
         Only required if SCALE is {\texttt{"Sigmas"}}.
@@ -5238,6 +5317,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
         between the mean minus two and the mean plus three standard
         deviations.  {\texttt{[3,-2]}} would give the negative of that.
       }
+   }
+   \sstresparameters{
       \sstsubsection{
         SCAHIGH = \_DOUBLE (Write)
       }{
@@ -5284,19 +5365,19 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    Converts an NDF to a sequential unformatted file
 }{
    \sstdescription{
-      This application converts an NDF to a sequential unformatted
+      This application converts an \NDFref\ to a sequential unformatted
       Fortran file.  Only one of the array components may be copied to
       the output file.  Preceding the data there is an optional header
       consisting of either the FITS extension with the values of
       certain keywords replaced by information derived from the NDF, or
-      a minimal FITS header also derived from the NDF.
+      a minimal \FITSref\ header also derived from the NDF.
    }
    \sstusage{
       ndf2unf in out [comp] [noperec]
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP =  \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"} or \texttt{"Variance"}. \texttt{["Data"]}
@@ -5435,7 +5516,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
                An extra header record with keyword UNSIGNED and logical
-               value T is added when the array data type is one of the HDS
+               value T is added when the array data type is one of the \HDSref\
                unsigned integer types.  This is done because standard FITS
                does not support unsigned integers, and allows (in conjunction
                with BITPIX) applications reading the unformatted file to
@@ -5458,8 +5539,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstitemlist{
 
          \sstitem
-         The value of bad pixels is not written to a FITS-like header
-         record with keyword BLANK.
+         The value of \xref{bad pixels}{sun95}{se_badmasking} is not written to a
+         FITS-like header record with keyword BLANK.
       }
    }
 }
@@ -5472,11 +5553,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts a SPECX map file into a simple data cube
-      formatted  as a standard NDF.  It works on map files in version 4.2
+      formatted  as a standard \NDFref.  It works on map files in version 4.2
       or later of the SPECX format.  It can optionally write a schematic
       of the map grid to a text file.
 
-      In addition, it will also convert an HDS container file containing
+      In addition, it will also convert an \HDSref\ container file containing
       an array of one-dimensional NDFs holding SPECX spectra into a similar
       container file holding individual, scalar NDFs each holding a single
       spectrum from the supplied array.
@@ -5604,9 +5685,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       (DX, see \xref{SUN/203}{sun203}{} and \xref{SC/2}{sc2}{}).  When the 
       output data cube is created
       the columns corresponding to the positions on the sky grid where
-      spectra were not observed are filled with `bad' values (sometimes
+      spectra were not observed are filled with \xref{`bad'
+      values}{sun95}{se_masking} (sometimes
       called `magic' or `null' values), to indicate that valid data are
-      not available at these positions.  The standard Starlink bad value
+      not available at these positions.  The \xref{standard Starlink
+      bad value}{sun95}{se_badmasking}
       is used.  Because of the presence of these bad values the expanded
       cube is usually larger than the original map file.
 
@@ -5639,7 +5722,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       first nine are shown using the digits one to nine.  The remaining
       spectra are shown using an asterisk (\texttt{"*"}).  You specify the name
       of the file to which the schematic is written.
-      Figure~\ref{MAPSCHEMATIC} shows an example of a schematic.
+      \html{The figure below}
+      \latex{Figure~\ref{MAPSCHEMATIC}} shows an example of a schematic.
    }
    \sstdiytopic{
       Auxiliary information
@@ -5701,9 +5785,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This Bourne-shell script converts a 256 grey-level or
-      black-and-white dithered Tag Image File Format (TIFF) into an
-      unsigned-byte NDF file.  It handles one- or two-dimensional
-      images.  The script uses various Netpbm utilities to produce a
+      black-and-white dithered Tag Image File Format (\TIFFref) into an
+      unsigned-byte \NDFref\ file.  It handles one- or two-dimensional
+      images.  The script uses various \Netpbmref\ utilities to produce a
       FITS file, flipped top to bottom, and then
       \htmlref{FITS2NDF}{FITS2NDF} to produce
       the final NDF.  Error messages are converted into Starlink style
@@ -5755,7 +5839,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             Input image file names must have the extension \texttt{.tif}.
 
          \sstitem
-            The Netpbm utilities \texttt{tifftopnm}, \texttt{ppmtopgm},
+            The \Netpbm\ utilities \texttt{tifftopnm}, \texttt{ppmtopgm},
             \texttt{pnmflip} and \texttt{pnmtofits} must be available on your
             PATH.
       }
@@ -5775,10 +5859,10 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts a sequential unformatted Fortran file to
-      an NDF.  Only one of the array components may be created from the
+      an \NDFref.  Only one of the array components may be created from the
       input file.  Preceding the input data there may be an optional
       header.  This header may be skipped, or may consist of a simple
-      FITS header.  In the former case the shape of the NDF has be to
+      \FITSref\ header.  In the former case the shape of the NDF has be to
       be supplied.
    }
    \sstusage{
@@ -5786,7 +5870,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
          The NDF component to be copied.  It may be \texttt{"Data"},
          \texttt{"Quality"} or \texttt{"Variance"}.  To create a variance or
@@ -5965,7 +6049,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             axes.
             \item BSCALE and BZERO in a FITS extension are ignored.
             \item BLANK is not used to indicate which input array values
-            should be assigned to a standard bad value.
+            should be assigned to a \xref{standard bad
+            value}{sun95}{se_badmasking}.
             \item END indicates the last header record unless it
             terminates a dummy header, and the actual data is in an
             extension.
@@ -6015,8 +6100,12 @@ IDL> write_ndf,q,'stars','QUALITY'
 will write the IDL array, \texttt{q}, to the \texttt{QUALITY} component of an 
 existing NDF, \texttt{stars.sdf}.
 
-Both READ\_NDF and WRITE\_NDF can take special action on bad
-values. For a full description of their arguments see Appendix \ref{idl_specs}.
+Both READ\_NDF and WRITE\_NDF can take special action on \xref{bad
+values}{sun95}{se_masking}. For a full description of their arguments see 
+\begin{htmlonly}
+\htmlref{Specifications of \BCONVERT\ IDL Procedure}{idl_specs}.
+\end{htmlonly}
+\latex{Appendix~\ref{idl_specs}.}
 
 Complete structures can be handled by function
 \htmlref{HDS2IDL}{HDS2IDL}
@@ -6049,7 +6138,7 @@ When \CONVERT\ is installed, the converter procedures and routines are
 placed in \texttt{\$CONVERT\_DIR} so, to make them available to IDL,
 that directory must be added to the IDL search paths, \texttt{IDL\_PATH} and
 \texttt{IDL\_DLM\_PATH}. This will be done if the environment variable 
-\texttt{IDL\_PATH} has been set (usually by `sourcing' the 
+IDL\_PATH has been set (usually by `sourcing' the 
 \texttt{idl\_setup} script) when you start the \CONVERT\ package by typing:
 \begin{quote} \begin{verbatim}
 % convert
@@ -6239,7 +6328,8 @@ essential that the whole library should be obtained from the archive.
 }{
    \sstdescription{
       This IDL function will convert a Starlink NDF file of up to seven
-      dimensions to an IDL array of an appropriate type and shape. Bad values
+      dimensions to an IDL array of an appropriate type and shape. 
+      \xref{Bad values}{sun95}{se_badmasking}
       in the NDF may be converted to specific values in the IDL array.
 
       If NDF on-the-fly conversion has been activated, the given filename may
@@ -6365,8 +6455,9 @@ essential that the whole library should be obtained from the archive.
          Bad\_value
       }{
          Optional - A value any occurrence of which in the IDL array is to be
-         replaced by the appropriate PRIMDAT bad value in the NDF component.
-         If no such value is found, the NDF bad pixel flag for the component
+         replaced by the appropriate PRIMDAT \xref{bad
+         value}{sun95}{se_badmasking} in the NDF component.
+         If no such value is found, the NDF bad-pixel flag for the component
          is set FALSE.  The value must be the same type as the array.
       }
    }
@@ -6398,7 +6489,7 @@ essential that the whole library should be obtained from the archive.
       }{
          creates the NDF 'my\_ndf.sdf' with the same dimensions as the IDL
          array 'my\_data', and writes the array to its DATA component (of
-         type \_REAL). No checks on bad values are made.
+         type \_REAL).  No checks on bad values are made.
       }
       \sstexamplesubsection{
          IDL> write\_ndf, my\_data, 'my\_ndf', !values.f\_nan
@@ -6472,8 +6563,7 @@ essential that the whole library should be obtained from the archive.
             \item[]\_UBYTE --$>$  byte
             \item[]\_WORD --$>$  integer
             \item[]\_INTEGER --$>$  longword integer
-            \item[]\_LOGICAL --$>$  longword integer (with name change, see
-below)
+            \item[]\_LOGICAL --$>$  longword integer (with name change, see below)
             \item[]\_CHAR --$>$  string (see below)
             \item[]\_BYTE --$>$  integer (see below)
             \item[]\_UWORD --$>$  longword integer (see below)
@@ -6782,16 +6872,16 @@ description of the CONTAINER parameter of
 \end{itemize}
 
 \section{Release Notes -- V1.4}
-Added application MTFITS2NDF to convert FITS tapes to NDFs.
+Added application \htmlref{MTFITS2NDF}{MTFITS2NDF} to convert FITS tapes to NDFs.
 
 \section{Release Notes -- V1.4-1}
 Updated the IDL converters to work with IDL 5.5. Fix a problem causing a crash
 on Linux and document the fact that the Starlink IDL converters cannot be used
 with the 64-bit Solaris version of IDL.
 
-Corrected an error in the section of this document describing the easy way to
-do IDL/NDF conversions. WRITE\_NDF was described as if it were a function rather
-than a procedure.
+Corrected an error in the section of this document describing the easy
+way to do IDL/NDF conversions.  \htmlref{WRITE\_NDF}{WRITE_NDF} was
+described as if it were a function rather than a procedure.
 
 \section{Release Notes -- V1.4-2}
 Parameter WCSATTRS is added to \htmlref{FITS2NDF}{FITS2NDF}.
