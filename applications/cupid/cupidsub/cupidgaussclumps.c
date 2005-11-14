@@ -147,7 +147,10 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "GAUSSCLUMPS", &gcconfig ) ) gcconfig = astKeyMap( "" );
+   if( !astMapGet0A( config, "GAUSSCLUMPS", &gcconfig ) ) {     
+      gcconfig = astKeyMap( "" );
+      astMapPut0A( config, "GAUSSCLUMPS", gcconfig, "" );
+   }
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array. We use the memory management functions of the 
@@ -293,6 +296,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.weight = astFree( cupidGC.weight );
    cupidGC.res = astFree( cupidGC.res );
    cupidGC.resu = astFree( cupidGC.resu );
+
+   gcconfig =astAnnul( gcconfig );
 
 /* Save the number of clumps found. */
    *nclump = iclump;

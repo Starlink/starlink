@@ -60,37 +60,42 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
    grp = NULL;
    kpg1Kygrp( config, &grp, status );
 
-/* Get the number of values in the group. */
+/* Get the number of values in the group. Pass on if it is zero. */
    grpGrpsz( grp, &n, status );
+   if( n ) {
 
 /* We need to pass a pointer to the "name" variable to grpGet */
-   pname = name;
+      pname = name;
 
 /* Scan the group to find the length of the longest value. */
-   ncmax = 0;
-   for( i = 1; i <= n; i++ ) {
-      grpGet( grp, i, 1, &pname, GRP__SZNAM + 1, status );
-      nc = astChrLen( name );
-      if( nc > ncmax ) ncmax = nc; 
-   }
+      ncmax = 0;
+      for( i = 1; i <= n; i++ ) {
+         grpGet( grp, i, 1, &pname, GRP__SZNAM + 1, status );
+         nc = astChrLen( name );
+         if( nc > ncmax ) ncmax = nc; 
+      }
 
 /* Create a suitable array of character strings in the CUPID extension,
    and get a locator for the whole array. */
-   datNewC( loc, "CONFIG", ncmax + 1, 1, &n, status );
-   datFind( loc, "CONFIG", aloc, status );
+      datNewC( loc, "CONFIG", ncmax + 1, 1, &n, status );
+      datFind( loc, "CONFIG", aloc, status );
 
 /* Store each list item in the new array. */
-   el = 1;
-   for( i = 0; i < n; i++ ) {
-      subs[ 0 ]= i + 1;
-      datCell( aloc, 1, subs, cloc, status );
-      grpGet( grp, subs[ 0 ], 1, &pname, GRP__SZNAM + 1, status );
-      nc = astChrLen( pname );
-      datPutC( cloc, 0, &el, pname, astChrLen( name ), status );
-      datAnnul( cloc, status );
-   }
+      el = 1;
+      for( i = 0; i < n; i++ ) {
+         subs[ 0 ]= i + 1;
+         datCell( aloc, 1, subs, cloc, status );
+         grpGet( grp, subs[ 0 ], 1, &pname, GRP__SZNAM + 1, status );
+         nc = astChrLen( pname );
+         datPutC( cloc, 0, &el, pname, astChrLen( name ), status );
+         datAnnul( cloc, status );
+      }
 
 /* Free resources. */
-   datAnnul( aloc, status );
+      datAnnul( aloc, status );
+   }
+
+/* Delete the group */
+   grpDelet( &grp, status );
 
 }

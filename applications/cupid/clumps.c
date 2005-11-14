@@ -42,8 +42,9 @@ void clumps() {
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters used by the
-*        clump finding algorithms. If a null (!) value is supplied, a set
-*        of default configuration parameter values will be used.
+*        clump finding algorithms. If the string "def" (case-insensitive)
+*        or a null (!) value is supplied, a set of default configuration 
+*        parameter values will be used.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either a "keyword=value" setting, or the name of a text 
@@ -218,7 +219,9 @@ void clumps() {
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
    char *clist;                 /* List of HDS locators for Clump structures */
+   char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
+   char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
@@ -465,10 +468,19 @@ void clumps() {
       if( *status != SAI__OK ) errAnnul( status );
       keymap = astKeyMap( "" );
 
-/* If a group was supplied, create an AST KeyMap holding the value for each 
-   configuration setting, indexed using its name, then delete the GRP group. */
+/* If a group was supplied, see if it consists of the single value "def".
+   If so,create an empty KeyMap. */
    } else {
-      kpg1Kymap( grp, &keymap, status );
+      keymap = NULL;
+      if( size == 1 ) {
+         value = buffer;
+         grpGet( grp, 1, 1, &value, GRP__SZNAM, status );
+         if( astChrMatch( value, "DEF" ) ) keymap = astKeyMap( "" );
+      }
+
+/* Otherwise, create an AST KeyMap holding the value for each configuration 
+   setting, indexed using its name, then delete the GRP group. */
+      if( !keymap ) kpg1Kymap( grp, &keymap, status );
       grpDelet( &grp, status );      
    }
 
