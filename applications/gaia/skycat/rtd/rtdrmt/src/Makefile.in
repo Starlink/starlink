@@ -2,7 +2,7 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.4 1997/11/28 01:35:50 abrighto Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $" 
 #
 # Makefile.in"
 # 
@@ -14,13 +14,6 @@
 # 	Makefile for RTD Remote Access library
 # ------------------------------------------------------------------------
 
-CC           	= @CC@
-CXX           	= @CXX@
-CFLAGS  	= @CDEBUGFLAGS@
-TOPDIR      	= @DESTDIR@
-LIBDIR      	= @LIBDIR@
-DEPEND_TARGET	= @DEPEND_TARGET@
-
 SRCS 		= rtdRemote.c
 OBJS 		= rtdRemote.o
 
@@ -28,44 +21,22 @@ libname  	= ../lib/librtdRemote.a
 
 INCLUDES	= -I../include
 
-CC_SWITCHES	= @SHLIB_CFLAGS@ $(DEFINES) $(INCLUDES) $(CFLAGS)
-DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
-INSTALL  	= @INSTALL@
-INSTALL_DATA  	= @INSTALL_DATA@
-RANLIB   	= @RANLIB@
-SHELL    	= /bin/sh
-AR       	= ar rc
-RM       	= rm -f
-
-all: dirs $(libname)
-
-All:
-	cd ../..; $(MAKE)
+do_all: dirs $(libname)
 
 $(libname): $(OBJS)
 	$(RM) $@
 	$(AR) $@ $(OBJS)
 	$(RANLIB) $@
 
-install: 
-
 dirs:
 	test -d ../lib || mkdir ../lib
 
-clean:
+do_clean:
 	$(RM) $(OBJS) $(libname) *\~ "#"*
 
-distclean: clean depclean
+do_distclean: clean depclean
 	rm -f Makefile	
 
-.SUFFIXES: .C
-.c.o:
-	$(CC) -c $(CC_SWITCHES) $<
-
-.C.o:
-	$(CXX) -c $(CC_SWITCHES) $<
-
-man:
-
+include ../../makefile.mk
 include ../../depend.mk
 

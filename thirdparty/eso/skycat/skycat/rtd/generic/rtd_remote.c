@@ -85,18 +85,19 @@ static int error(const char *fmt, ...)
  */
 static int sys_error(const char *fmt, ...)
 {
+    char *errstr;
     va_list args;
     char buf[sizeof(info.errmsg)];
-    extern int sys_nerr;
     extern int errno;
 
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
     va_end(args);
-    
-    if (errno >= 0 && errno < sys_nerr) {
+
+    errstr = strerror(errno);
+    if ( errstr != NULL ) {
 	strcat(buf, ": ");
-	strcat(buf, strerror(errno));
+	strcat(buf, errstr);
     }
 
     strcpy(info.errmsg, buf);

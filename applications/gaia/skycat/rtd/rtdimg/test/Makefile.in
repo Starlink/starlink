@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# "@(#) $Id: Makefile.in,v 1.11 1998/03/25 22:33:22 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:03 brighton Exp $"
 #
 # Makefile.in
 #
@@ -8,74 +8,74 @@
 # who             when       what
 # --------------  ---------  ---------------------------------------------
 # Allan Brighton  08 Mar 96  Created
-# ------------------------------------------------------------------------
-
-CC           	= @CC@
-CXX           	= @CXX@
-CFLAGS  	= @CXXDEBUGFLAGS@
-TOPDIR      	= @DESTDIR@
-LIBDIR      	= @LIBDIR@
-DEPEND_TARGET	= @DEPEND_TARGET@
-
-# Tclutil library
-TCLUTIL_LIB     = @TCLUTIL_LIB@
-TCLUTIL_LIB_STATIC  = @TCLUTIL_LIB_STATIC@
-
-# Astrotcl library
-ASTROTCL_LIB     = @ASTROTCL_LIB@
-ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
-
+# pbiereic        17/02/03   New tRtd
 # ------------------------------------------------------------------------
 
 SRCS 		=  tRtd.C
 
-OBJS 		=  tRtd.o
+OBJS 		=  tRtd.o tImageEvent.o
 
-PROGS 		=  tRtd
-
-# Take include files from the build dirs, if present
-BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@
+PROGS 		=  tRtd tImageEvent
 
 INCLUDES	= -I../../rtdevt/include \
-		  $(BUILD_INCLUDES) \
-		  -I$(TOPDIR)/include/tclutil
+                  -I../../rtilib/include \
+                  -I../../rtdimg/include \
+                  -I ../../../astrotcl/imageio/include \
+                  $(BUILD_INCLUDES) \
+                  -I$(TOPDIR)/include/tclutil \
+                  -I$(TOPDIR)/include/astrotcl
 
 CC_SWITCHES	= $(DEFINES) $(INCLUDES) $(CFLAGS)
 
 LIBRARIES       = ../../rtdevt/lib/librtdImgEvt.a \
 		  $(TCLUTIL_LIB_STATIC)
+LIB_STDCPP      = @LIB_STDCPP@
 
-DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
-SHELL    	= /bin/sh
-AR       	= ar rc
-RM       	= rm -f
+TCL_APPS        = tRtdImage tRtdImageCut tRtdImagePick tRtdImageCtrl \
+	          tRtdImageGraphics tRtdImageSpectrum Test
 
-all: 
+
+do_all: tRtd tcl_apps
+	@chmod +x ./tRtdEndian.tcl
 
 test: $(PROGS)
 
-All:
-	cd ../..; $(MAKE); $(MAKE)
+# create the startup script for starting the Tcl applications
+tcl_apps:
+	@for i in $(TCL_APPS); do \
+	    rm -f $$i; \
+	    echo '#!/bin/sh' > $$i; \
+	    cat ../demos/rtd.sh | awk '! /^ *#/ { if (length()) { print "#\\"; print }}' >> $$i; \
+	    echo '# --------------------------------------------------' >> $$i; \
+	    cat $$i.tcl | awk '! /^ *#/' >> $$i; \
+	    chmod +x $$i ; \
+	done
 
-install:
+do_install:
+	$(INSTALL) tRtd $(BINDIR)
 
-clean: 
-	$(RM) $(PROGS) $(OBJS) *\~ "#"* *.o
+do_clean: 
+	$(RM) $(PROGS) $(OBJS) $(TCL_APPS)
 
-distclean: clean 
-	rm -f Makefile depclean
+tRtd: $(LIBRARIES) tRtd.o tRtdEvt.o tRtdEvtData.o
+	$(CXX) $(CC_SWITCHES) -o $@ tRtd.o -lm tRtdEvt.o tRtdEvtData.o \
+	../../rtdevt/lib/librtdImgEvt.a ../../../astrotcl/imageio/lib/libimageio.a \
+	../../../tclutil/libtclutil.a ../../../tclutil/util/lib/libutil.a \
+	../../../astrotcl/wcslib/lib/libwcslib.a ../../../astrotcl/compress/lib/libcompress.a \
+	@LIBS@ $(LIB_STDCPP)
 
-tRtd: $(LIBRARIES) tRtd.o 
-	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) @LIBS@ 
-	@echo "*** run $@ manually ***"	
+tImageEvent: $(LIBRARIES) tImageEvent.o 
+	$(CXX) $(CC_SWITCHES) -o $@ $@.o $(LIBRARIES) @LIBS@ $(LIB_STDCPP)
 
-.SUFFIXES: .C
-.c.o:
-	$(CC) -c $(CC_SWITCHES) $<
-
-.C.o:
-	$(CXX) -c $(CC_SWITCHES) $<
-
-man:
-
+include ../../makefile.mk
 include ../../depend.mk
+
+
+
+
+
+
+
+
+
+

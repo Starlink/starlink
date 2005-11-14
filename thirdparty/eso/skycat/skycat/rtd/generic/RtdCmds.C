@@ -14,6 +14,7 @@
 *                        medianFilter(). This gives much better results
 *                        and is also faster.
 * pbiereic     19/03/03  The previous change was undone (on request)
+* Peter W. Draper 14/11/05 Merge my RtdImage changes.
 */
 
 /************************************************************************
@@ -724,7 +725,7 @@ int RtdImage::colorrampCmd(int argc, char* argv[])
 	p[i] = (int)(i * scale);
     }
     for (int j = 0; j < h; j++) {
-	memcpy(p+(j*w), p, w);
+	memmove(p+(j*w), p, w);
     }
     if (image_)
 	delete image_;
@@ -1275,7 +1276,7 @@ int RtdImage::graphdistCmd(int argc, char* argv[])
     else
 	status = error("all image pixels have the same value");
 #ifndef __GNUC__
-    delete xyvalues;
+    delete[] xyvalues;
 #endif
     return status;
 }
@@ -2139,7 +2140,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
 	pixTabCols_ = ncols;
 
 	if (pixTab_)
-	    delete pixTab_;
+	    delete[] pixTab_;
 
 	// generate an array of pixel values with left and right headings
 	// for the x/y coordinates
@@ -2149,7 +2150,7 @@ int RtdImage::pixtabCmd(int argc, char* argv[])
     }
     else if (strcmp(argv[0], "stop") == 0) {
 	if (pixTab_)
-	    delete pixTab_;
+	    delete[] pixTab_;
 	pixTab_ = NULL;
     }
     else {
@@ -2634,7 +2635,7 @@ int RtdImage::spectrumCmd(int argc, char* argv[])
 	delete xyvalues;
 	return TCL_ERROR;
     }
-    delete xyvalues;
+    delete[] xyvalues;
     return set_result(numValues);
 }
 
@@ -2879,6 +2880,8 @@ int RtdImage::typeCmd(int argc, char* argv[])
 	return TCL_OK;
 
     switch (image_->dataType()) {
+    case DOUBLE_IMAGE: 
+	return set_result("double");
     case FLOAT_IMAGE: 
 	return set_result("float");
     case SHORT_IMAGE: 

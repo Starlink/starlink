@@ -1,20 +1,19 @@
 // -*-c++-*-
-#ifndef _FloatImageData_h_
-#define _FloatImageData_h_
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: FloatImageData.h,v 1.10 1999/03/19 20:10:01 abrighto Exp $" 
+ * "@(#) $Id: FloatImageData.h,v 1.3 2005/02/02 01:43:03 brighton Exp $" 
  *
  * FloatImageData.h - class definitions for class FloatImageData
  *
- * See the man page RTI(3) for a complete description of this class
+ * See the man page ImageData(3) for a complete description of this class
  * library.
  * 
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * Peter W. Draper 04/03/98  Added llookup
+ * P.Biereichel    22/03/99  Added definitions for bias subtraction
  */
 
 #include <sys/types.h>
@@ -36,7 +35,7 @@ private:
     short scaleToShort(float);
 
     // as above, but unsigned
-    ushort convertToUshort(float f) {
+    inline ushort convertToUshort(float f) {
 	return ushort(scaleToShort(f));
     }
 
@@ -44,8 +43,11 @@ private:
     // Convert the given float image value to byte, scaling to short
     // first and then using the short value as an index in the color
     // lookup table.
-    byte lookup(float f) {return lookup_[(ushort)scaleToShort(f)];}
-    unsigned long llookup(float f) {return lookup_[(ushort)scaleToShort(f)];}
+    inline byte lookup(float f) {return lookup_[(ushort)scaleToShort(f)];}
+    inline unsigned long llookup(float f) {return lookup_[(ushort)scaleToShort(f)];}
+
+    // return NTOH converted value evtl. subtracted with corresponding bias value
+    float getVal(float* p, int idx);
 
 
 protected:
@@ -57,6 +59,13 @@ protected:
 
     // sprintf format for image pixel value
     virtual char* getValueFmt() {return "%.2f";}
+
+    int getXsamples(float *rawImage, int idx, int wbox, float *samples);
+    int getBsamples(float *rawImage, int idx, int wbox, float *samples);
+    int getCsamples(float *rawImage, int idx, int wbox, float *samples);
+    float getMedian(float *samples, int n);
+    float getBoxVal(float *rawImage, int idx, int wbox, float *samples, int xs);
+    float getRMS(float *samples, int n);
 
 public:
     // constructor
@@ -78,6 +87,3 @@ public:
     // include declarations for methods that differ only in raw data type
 #   include "ImageTemplates.h"
 };
-
-
-#endif _FloatImageData_h_

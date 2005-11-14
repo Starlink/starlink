@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * "@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49 abrighto Exp $"
+ * "@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 brighton Exp $"
  *
  * RtdRemote.C - member routines for class RtdRemote, manages remote access 
  *               to RtdImage (server side, see ../../rtdrmt/... for client access)
@@ -19,13 +19,13 @@
  *                           that size_t or int are used for addrSize (this
  *                           is needed for OSF/1). 
  */
-static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 brighton Exp $";
 
 
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/socket.h>
@@ -39,7 +39,6 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49
 #include <sys/shm.h>
 #include "error.h"
 #include "define.h"
-#include "config.h"
 #ifdef HAVE_SYS_FILIO_H
 #include <sys/filio.h>
 #endif
@@ -130,12 +129,14 @@ static int readline(int fd, char* ptr, int maxlen)
 	    *ptr++ = c;
 	    if (c == '\n')
 		break;
-	} else if (rc == 0) {
+	} 
+	else if (rc == 0) {
 	    if (n == 1)
 		return(0);	// EOF, no data read 
 	    else
 		break;		// EOF, some data was read
-	} else
+	} 
+	else
 	    return(-1);		// error
     }
 
@@ -165,7 +166,7 @@ static int writen(int fd, const char* ptr, unsigned long nbytes)
 }
 
 
-/*
+/* 
  * write the given buffer to the given file followed by a newline
  */
 static int writeline(int fd, char* ptr)
@@ -178,11 +179,11 @@ static int writeline(int fd, char* ptr)
  * constructor
  */
 RtdRemote::RtdRemote(Tcl_Interp* interp, int port, int verbose)
-: status_(0),
-  socket_(-1),
-  interp_(interp),
-  verbose_(verbose),
-  clientPtr_(NULL)
+    : status_(0),
+      socket_(-1),
+      interp_(interp),
+      verbose_(verbose),
+      clientPtr_(NULL)
 {
     // clear out client table 
     memset ((char *)&clients_, 0, sizeof(clients_));
@@ -201,7 +202,7 @@ RtdRemote::RtdRemote(Tcl_Interp* interp, int port, int verbose)
     socket_ = socket (AF_INET, SOCK_STREAM, 0);
     if (socket_ == -1) {
 	status_ = sys_error("socket");
-        return;
+	return;
     }
 
     // Bind the listen address to the socket. 
@@ -227,7 +228,7 @@ RtdRemote::RtdRemote(Tcl_Interp* interp, int port, int verbose)
     // is the currently supported maximum.
     if (listen(socket_, 5) == -1) {
 	status_ = sys_error("listen");
-        return;
+	return;
     }
     Tcl_CreateFileHandler(RTD_TCL_GETFILE_(socket_),
 			  TCL_READABLE, fileEventProc, (ClientData)this);
@@ -251,8 +252,7 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-    socklen_t addrSize = (socklen_t) sizeof(sockaddr_in);
-
+    SOCKLEN_T addrSize = sizeof(sockaddr_in);
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -280,7 +280,7 @@ int RtdRemote::enterClient(int sock)
     for (int i = 0; i < MAX_CLIENTS; i++) {
 	if (clients_[i].socket == 0) {
 	    clients_[i].socket = sock;
-            clients_[i].handle = RTD_TCL_GETFILE_(sock);
+	    clients_[i].handle = RTD_TCL_GETFILE_(sock);
 	    clients_[i].thisPtr = this;
 	    return i;
 	}
@@ -299,7 +299,7 @@ void RtdRemote::removeClient(int sock)
 	    Tcl_DeleteFileHandler(RTD_TCL_GETFILE_(sock));
 
 #if (TCL_MAJOR_VERSION < 8)
-            Tcl_FreeFile( clients_[i].handle );
+	    Tcl_FreeFile( clients_[i].handle );
 #endif
 	    close(sock);
 	    clients_[i].socket = 0;
@@ -333,7 +333,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-        socklen_t addrSize = (socklen_t) sizeof(addr);
+	SOCKLEN_T addrSize = sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
@@ -344,7 +344,7 @@ int RtdRemote::fileEvent()
 		printf("RtdRemote: accept on socket: %d, port:%d\n", sock, addr.sin_port);
 #endif
 	    Tcl_CreateFileHandler(RTD_TCL_GETFILE_(sock),
-		TCL_READABLE, clientEventProc, (ClientData)&clients_[free]);
+				  TCL_READABLE, clientEventProc, (ClientData)&clients_[free]);
 	}
     }
 
@@ -394,16 +394,18 @@ int RtdRemote::evalClientCmd(const char* cmd)
     if (argc <= 0) 
 	return TCL_OK;		// ignore empty command
 
-    char* name = argv[0];	// command name
+    const char* name = argv[0];	// command name
     int len = strlen(name);
     argc--;
-    argv++;
+    char** av = argv + 1;
 
     // call the RtdImage command method
     // argv[0] is the subcommand name, the rest are the arguments
-    if (call(name, len, argc, argv) != TCL_OK)
-	return TCL_ERROR;
-
+    if (call(name, len, argc, av) != TCL_OK) {
+        free(argv);
+        return TCL_ERROR;
+    }
+    free(argv);
     return TCL_OK;
 }
 

@@ -1,345 +1,296 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tRtd.C,v 1.8 1998/07/22 19:57:38 abrighto Exp $
+ * $Id: tRtd.C,v 1.3 2005/02/02 01:43:03 brighton Exp $
  *
  * tRtd.C - test RTD real-time updates by sending image and rapid frame
  *          
  * 
  * who             when       what
  * --------------  --------   ----------------------------------------
- * Allan Brighton  16 Jul 96  Created
- * P.Biereichel    16 Sept 97 Use semaphores for image event synchronization
+ * pbiereic        05/02/03   Complete new version which supports all
+ *                            data types implemented in RTD.
+ */
+
+/************************************************************************
+ *
+ *  DESCRIPTION
+ *    tRtd is used as a "test camera" for testing RTD image events.
+ *    The options for tRtd can be set either via command line options
+ *    or the RTD widget (tRtd.tcl) which is shown when RTD is started with the
+ *    "-debug 1" option.
+ *    tRtd generates image events at a defined speed (option -t). By default,
+ *    it uses semaphore locking to avoid "image jitters" and other (nasty)
+ *    side effects which can be seen when the option "-l 0" is set.
+ *    tRtd generates the images in a sort of "movie" style, i.e. images continuously
+ *    change so that image updates can be seen in the RTD image. A reference
+ *    point at the position REF_PIXEL is generated which is used for analysis.
+ *    Another point moves continuously across the image.
+ *
+ *    All data types which are implemented in RTD are supported (option -D).
+ *    Byte swapped images can be generated with option (-E); this allows to
+ *    test eg. images which were produced on a Linux-PC and which are transferred
+ *    to a HP/Sun machine for display via RTD.
+ *    
+ *    Three different images can be generated with tRtd:
+ *      o a continuously changing image pattern   
+ *      o a Fits image (eg. ngc1275.fits) with a moving area at the star position
+ *        (XS, YS). This image is used for tests with "pick object"
+ *      o a rapid frame. The rapid frame is displayed at a higher frequency
+ *        than the main image (option "-t" value / 5). 
+ *    
+ *
+ * The sequence to generate images is:
+ *   - Attach to rtdServer.
+ *   - Create shared memory area(s).
+ *   - Install signal handlers which cleanup the shared memory area(s).
+ *   - Create an object which handles data of type dataType.
+ *   - Loop start -
+ *   - Generate data for the image.
+ *   - Wait until the next shared memory buffer is unlocked.
+ *   - Copy data to shared memory and lock it.
+ *   - Fill the image event info structure.
+ *   - Fill the image information fields with semaphore/shm info.
+ *   - Send the image information to rtdServer.
+ *   - Delay before next event.
+ *   - Cycle shm index and goto Loop
+ *
+ *
+ * For the implementation tRtd uses classes since there are two image frames
+ * (main and rapid) and the images can be of any data type supported by RTD.
+ * Class tRtdEvt handles one image event cycle and loads Fits images when
+ * required.
+ * Class tRtdEvtData generates the data type specific classes via tRtdEvtTemplate.icc
+ * and creates an data handling object required for the image.
+ * The Template contains the code for all data type dependent classes, oa. byte
+ * swap simulation (native and non-native) for all data types.
+ *
  */
 
 #include <stdio.h>
-#include <iostream.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
-#include "rtdSem.h"
+#include <math.h>
+
 #include "error.h"
-#include "config.h"
-#include "rtdImageEvent.h"
+#include "rtdSem.h"
+
+#include "tRtd.h"
+#include "tRtdEvt.h"
 
 extern char *optarg;
 
-// some protos missing in SunOS
-#ifdef NEED_SOCKET_PROTO
-extern "C" {
-    int select (int width, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, timeval *timeout);
-    void bzero(char *b, int length);
-	   }
-#endif /* NEED_SOCKET_PROTO */
-
-extern "C" {
-    void *shmat(int shmid, void *shmaddr, int shmflg);
-    int shmdt(void *shmaddr);
-	   }
-
 // structures for multibuffering/semaphore convenience routines
-static rtdShm main1, rapid1;
+static rtdShm shmMain;
+static rtdShm shmRapid;
 
-
-
-/*
- * cleanup and exit
- */
-static void cleanup(int i=0)
-{
-    i=1;
-    sleep(1);
-    rtdShmDelete(&main1);
-    rtdShmDelete(&rapid1);
-    exit(1);
-}
-
-/*
- * make error message and exit
- */
-static void errexit(const char* msg1, const char* msg2 = "")
-{
-    cout << msg1 << msg2 << endl;
-    cleanup(1);
-}
-
-/*
- * generate some dummy image data based on the given count
- */
-static void gen_image(char* p, int width, int height, int count)
-{
-    int size = width*height;
-    int k;
-    for (int i = 0; i < width; i++) {
-	for (int j = 0; j < height; j++) {
-	    k = j*width+i;
-	    p[k] = k+count*3;
-	}
-    }
-}
-
-/*
- * lock a shm buffer
- */
-void lockShm(rtdShm *shmPtr, int semNum)
-{
-    struct timeval tm;                      // Timestamp structure for semaphore
-    gettimeofday(&tm, NULL);
-    shmPtr->timestamp[semNum] = tm.tv_sec + (tm.tv_usec / 1000000.);
-    
-    // lock the shm buffer
-    struct sembuf semLock;
-    memset(&semLock, '\0', sizeof(sembuf));
-    semLock.sem_op = 1;                     // Increment [#] by one
-    semLock.sem_flg = 0;
-
-    semLock.sem_num = (unsigned short)semNum;
-    semop(shmPtr->semId, &semLock, 1);
-}
-
-/*
- * fill image event info
- */    
-void fillImageInfo(
-    rtdIMAGE_INFO *imageInfo,
-    int width,
-    int height,
-    int count, 
-    int type,
-    int x,
-    int y,
-    int frameId)
-{
-    imageInfo->dataType = type;
-    imageInfo->frameX   = x;
-    imageInfo->frameY   = y;
-    imageInfo->xPixels  = width;
-    imageInfo->yPixels  = height;
-    imageInfo->frameId  = frameId;
-
-    // add some dummy world coordinates for testing
-    imageInfo->ra       = 49.951;
-    imageInfo->dec      =  41.5117;
-    imageInfo->secpix   = 1.70127;
-    imageInfo->xrefpix  = width/2.0;
-    imageInfo->yrefpix  = height/2.0 ;
-    imageInfo->rotate   = double(count % 360);
-    imageInfo->equinox  = 2000;
-    imageInfo->epoch    = 1957.97;
-    strcpy(imageInfo->proj, "-TAN");
-
-#if 1
-    // add some dummy detector information
-    if (frameId == 0) {
-	imageInfo->startX    = count;
-	imageInfo->startY    = count;
-	imageInfo->binningX  = 2;
-	imageInfo->binningY  = 2;
-	imageInfo->lowCut    = 0;
-	imageInfo->highCut    = 100;
-    }
-#endif
-}
-
-/*
- * pause for the given time
- */
-void rtdSleep(rtdIMAGE_EVT_HNDL& eventHndl, int msec)
-{
-    struct timeval time;
-    fd_set readMask;
-    FD_ZERO(&readMask);
-    FD_SET(eventHndl.socket, &readMask);
-
-    time.tv_sec = msec/1000;
-    time.tv_usec = (msec%1000)*1000;
-
-#ifdef HAVE_SELECT_FD_SET
-    int status = select(32, (fd_set *)&readMask, 0, 0, &time);
-#else
-    int status = select(32, (int *)&readMask, 0, 0, &time);
-#endif
-}
-
-/*
- * Cycle over all the shm buffers, checking to see if they're locked.
- */
-int checkAllLocked(rtdShm *shmPtr, int *semNum, int numShm)
-{
-    int i, j=0;
-    for (i = 0; i < numShm; i++) {
-	j = (*semNum+i) % numShm;
-	if (!rtdShmLocked(shmPtr, j))
-	    break;
-    }
-    if (i == numShm)
-	return 1;
-    *semNum = j;
-    return 0;
-}
-
-/*
- * send an image update for the given shared memory area.
- * The count is used to generate the image.
- */
-static int update(
-    char *frameName,
-    int verbose,
-    rtdIMAGE_EVT_HNDL& eventHndl, 
-    rtdShm *shmPtr,
-    int *semNum,
-    int numShm,
-    int frameId,
-    int x, 
-    int y,
-    int width, 
-    int height, 
-    int *count) 
-{
-    // check if all shm buffers are locked
-    if (checkAllLocked(shmPtr, semNum, numShm))
-	return 1;
-
-    // lock a buffer before writing data
-    lockShm(shmPtr, *semNum);
-
-    // set info in rtdIMAGE_INFO
-    rtdIMAGE_INFO imageInfo;
-    memset(&imageInfo, '\0', sizeof(rtdIMAGE_INFO));
-    fillImageInfo(&imageInfo, width, height, *count, BYTE, x, y, frameId);
-    rtdShmStruct(*semNum, &imageInfo, shmPtr);
-    
-    // attach to shm
-    char *ptr = (char *)shmat(imageInfo.shmId, NULL, 0);
-    if (ptr <= NULL)
-	errexit("Unable to attach to shared memory");
-
-    // generate some bytes
-    gen_image(ptr, width, height, *count);
-
-    // detach from shm
-    shmdt(ptr);
-
-    if (verbose)
-	printf("update #%d %s frame: frameId=%d, %dx%d+%d+%d, buffer %d/%d\n", 
-	       *count, frameName, frameId, width, height, x, y, *semNum+1, numShm);
-
-    (*count)++;
-
-    // send image event to rtdServer
-    if (rtdSendImageInfo(&eventHndl, &imageInfo, NULL) != 0)
-        errexit("error from rtdSendImageInfo");
-    return 1;
-}
+// the "big" data buffer
+static char data[MAX_NX * MAX_NY * 4];
 
 /* 
  * Main:
  */
 main(int argc, char** argv) 
 {
-    rtdIMAGE_EVT_HNDL eventHndl;
+    rtdIMAGE_EVT_HNDL eventHndl;	// image event handle
+    struct opts       opt;		// structure holding the options 
+    tRtdEvt           *mainObj;		// object which handles the main frame
+    tRtdEvt           *rapidObj;	// object which handles the rapid frame
 
-    // current semaphore numbers
-    int semNumMain=0, semNumRapid=0;
+    ZERO(eventHndl);
 
-    // name of camera
-    char* rtd_camera = getenv("RTD_CAMERA");
+    parseInput(argc, argv, &opt);	// parse the user's input
+    if (opt.verbose && ! opt.useFits)	// print arguments
+	usage(&opt);
 
-    // verbose flag: if true, print messages
-    int verbose = 0;
+    set_error_handler(&errprint); 	// error handler (see rtd/tclutil/util/src/error.C)
 
-    // data type
-    int dataType = BYTE;
     
-    // delay between updates
-    int timer = 500;
+    if (rtdInitImageEvt(opt.rtd_camera, &eventHndl, NULL) != 0) {
+	errexit("Could not initialize image event: check if rtdServer is running");
+    }
 
-    // number of shm buffers to use
-    int numShm = 2;
-    
-    // pos, width and height of images
-    int rapid_x = 0, rapid_y = 0;
-    int main_width = 255, main_height = 255;
-    int rapid_width = 50, rapid_height = 50;
+    // clean up shared memory on exit
+    signal(SIGINT,  cleanup);
+    signal(SIGTERM, cleanup);
+    signal(SIGHUP,  cleanup);
 
-    // frame ids 
-    int main_id = 0, rapid_id = 0;
+    // create the object which handles the main image
+    mainObj = new tRtdEvt((char *)"Main", &shmMain, (char *)&data, &opt, 
+			  opt.main_width, opt.main_height, 0);
 
-    char* usage = "usage: tRtd ?-x x -y y -w width -h height -f rapidFrameId -v verbose -c camera -t msecs -b numShmBuffers?";
+    // create the object which handles the rapid frame
+    if (opt.rapid_id != 0 && ! opt.useFits)
+	rapidObj = new tRtdEvt((char *)"Rapid", &shmRapid, (char *)&data, &opt, 
+			       opt.rapid_width, opt.rapid_height, opt.rapid_id);
+
+    // Loop until tRtdEvt gets aborted by the user
+    while ( 1 ) {
+        rtdSleep(opt.delay);
+ 	mainObj->start(&eventHndl);
+
+        if (opt.rapid_id == 0 || opt.useFits)
+            continue;
+	
+        for (int i = 0; i < RAPIDS; i++) {
+	    rapidObj->start(&eventHndl);
+	    rtdSleep(opt.delay / RAPIDS);
+	}
+
+    }  // -- end while( 1 )
+    return 0;
+}
+
+
+/*
+ * cleanup and exit
+ */
+void cleanup(int i)
+{
+    rtdShmDelete(&shmMain);
+    rtdShmDelete(&shmRapid);
+    exit(i);
+}
+
+/*
+ * error message handler
+ */
+void errprint(const char* buf)
+{
+#ifdef DEBUG
+    printf("errprint: %s\n", buf);
+#endif
+}
+
+/*
+ * print error message and exit
+ */
+void errexit(const char* msg1, const char* msg2)
+{
+    printf("%s %s\n", msg1, msg2);
+    cleanup(1);
+}
+
+/*
+ * print usage
+ */
+void usage(opts *opt)
+{
+    printf("tRtdEvt \n"
+	   "\t -v Verbose flag..................(%d)\n"
+	   "\t -c Camera name...................(%s)\n"
+	   "\t -t Update interval in msecs......(%d)\n"
+	   "\t -W Main frame width..............(%d)\n"
+	   "\t -H Main frame height.............(%d)\n"
+	   "\t -w Rapid frame width.............(%d)\n"
+	   "\t -h Rapid frame height............(%d)\n"
+	   "\t -x Rapid frame start x...........(%d)\n"
+	   "\t -y Rapid frame start y...........(%d)\n"
+	   "\t -f Rapid frame Id................(%d)\n"
+	   "\t -l Use semaphore locking.........(%d)\n"
+	   "\t -b # of shared memory buffers....(%d)\n"
+	   "\n"
+	   "\t -I FITS image pathname...........(%s)\n"
+	   "\t -0 FITS image star center x......(%d)\n"
+	   "\t -1 FITS image star center y......(%d)\n"
+	   "\t -2 FITS image star bbox..........(%d)\n"
+	   "\t -3 FITS image star max. jitter...(%d)\n"
+	   "\n"
+	   "\t -E Endian flag...................(%d)\n"
+	   "\t -D Data type (16 short, -16 ushort, 32 int, -32 float, else byte...(%d)\n",
+	   opt->verbose, opt->rtd_camera, opt->delay, opt->main_width, opt->main_height,
+	   opt->rapid_width, opt->rapid_height, opt->rapid_x, opt->rapid_y, opt->rapid_id,
+	   opt->lock, opt->numShm, opt->fitsFile, opt->starx, opt->stary, opt->starbbox, 
+	   opt->starjitter, opt->shmEndian, opt->dataType);
+}
+
+/*
+ * parse input
+ */    
+void parseInput(int argc, char** argv, opts *opt)
+{
+    /*
+     * set defaults
+     */
+    opt->rapid_x = opt->rapid_y = opt->verbose = opt->rapid_id = opt->useFits = 0 ;
+    opt->main_width = opt->main_height = opt->rapid_width = opt->rapid_height = 255;
+    opt->shmEndian = -1;
+    opt->delay = 500;
+    opt->rtd_camera = getenv("RTD_CAMERA");
+    opt->fitsFile = "../images/ngc1275.fits";
+    opt->dataType = 16;
+    opt->lock = 1;
+    opt->numShm = 2;
+    opt->starx = 252; opt->stary = 171; opt->starbbox = 50; opt->starjitter = 3;
+
+
     int c;
-    while ((c = getopt(argc, argv, "x:y:w:h:f:b:v:c:t:l:")) != -1) {
-
-	switch(c) 
-	{
+    while ((c = getopt(argc, argv, "x:y:w:h:W:H:f:v:c:t:b:l:I:E:D:0:1:2:3:")) != -1) {
+	switch(c) {
 	case 'x': 
-	    rapid_x = atoi(optarg);
-	    break;
+	    opt->rapid_x = 	atoi(optarg); break;
 	case 'y': 
-	    rapid_y = atoi(optarg);
-	    break;
+	    opt->rapid_y = 	atoi(optarg); break;
+	case 'W': 
+	    opt->main_width = 	atoi(optarg); break;
+	case 'H': 
+	    opt->main_height = 	atoi(optarg); break;
 	case 'w': 
-	    rapid_width = atoi(optarg);
-	    break;
+	    opt->rapid_width = 	atoi(optarg); break;
 	case 'h': 
-	    rapid_height = atoi(optarg);
-	    break;
+	    opt->rapid_height = atoi(optarg); break;
 	case 'f': 
-	    rapid_id = atoi(optarg);
-	    break;
+	    opt->rapid_id = 	atoi(optarg); break;
 	case 'v': 
-	    verbose = atoi(optarg);
-	    break;
+	    opt->verbose = 	atoi(optarg); break;
 	case 'c': 
-	    rtd_camera = optarg; 
-	    break;
+	    opt->rtd_camera = 	optarg;  break;
 	case 't': 
-	    timer = atoi(optarg);
-	    break;
-        case 'b': 
-            numShm = atoi(optarg);
-            break;
-	case ':':
-	    cout << usage << endl;
-	    exit(0);
-        default:
-	    cout << usage << endl;
-	    exit(0);
+	    opt->delay = 	atoi(optarg); break;
+	case 'b': 
+	    opt->numShm = 	atoi(optarg); break;
+	case 'l': 
+	    opt->lock = 	atoi(optarg); break;
+	case 'I': 
+	    opt->fitsFile = 	optarg; opt->useFits = 1; break;
+	case 'E': 
+	    opt->shmEndian = 	atoi(optarg); break;
+	case 'D': 
+	    opt->dataType = 	atoi(optarg); break;
+	case '0': 
+	    opt->starx = 	atoi(optarg); break;
+	case '1': 
+	    opt->stary = 	atoi(optarg); break;
+	case '2': 
+	    opt->starbbox = 	atoi(optarg); break;
+	case '3': 
+	    opt->starjitter = 	atoi(optarg); break;
+	default:
+	    usage(opt);
+	    exit(1);
 	}
     }
 
-    if (! rtd_camera) 
+    // check arguments
+    int dt = opt->dataType;
+    if (dt != 8 && dt != 16 && dt != -16 && dt != 32 && dt != -32)
+	errexit("wrong data type");
+    if (opt->rapid_x < 0 || opt->rapid_y < 0 || opt->rapid_width < 0 || opt->rapid_height < 0 || 
+	opt->main_width <= 0 || opt->main_height <= 0 || opt->rapid_id < 0 || opt->delay < 0 || 
+	opt->numShm  <= 0)
+	errexit("wrong argument");
+
+    // limit ranges
+    opt->main_width   = min(opt->main_width,   MAX_NX);
+    opt->main_height  = min(opt->main_height,  MAX_NY);
+    opt->rapid_width  = min(opt->rapid_width,  MAX_NX);
+    opt->rapid_height = min(opt->rapid_height, MAX_NY);
+    opt->rapid_x      = min(opt->rapid_x,      MAX_NX);
+    opt->rapid_y      = min(opt->rapid_y,      MAX_NY);
+
+    if (! opt->rtd_camera) 
 	errexit("please use '... -c camera' or 'setenv RTD_CAMERA ...' first");
-    
-    if (rtdInitImageEvt(rtd_camera, &eventHndl, NULL) != 0) 
-	errexit("Could not initialize image event: check if rtdServer is running");
-    
-    // clean up shared memory on exit
-    signal(SIGINT, cleanup);
-    signal(SIGTERM, cleanup);
-    signal(SIGHUP, cleanup);
-
-    // create shared memory areas (main image)
-    if (rtdShmCreate(numShm, &main1, main_width, main_height, dataType) == -1)
-        errexit("error creating shared memory");
-
-    // create shared memory areas (rapid frame)
-    if (rtdShmCreate(numShm, &rapid1, rapid_width, rapid_height, dataType) == -1)
-        errexit("error creating shared memory");
-
-    int countMain = 0, countRapid = 0, status = 0;
-
-    while(1) {
-	if (rapid_id)
-	    status = update("rapid", verbose, eventHndl, &rapid1, &semNumMain, numShm,
-			   rapid_id, 0, 0, rapid_width, rapid_height, &countRapid);	    
-
-	// do main image every 10 times through the loop
-	if (countRapid % 10 == 0)
-	    status = update("main", verbose, eventHndl, &main1, &semNumRapid, numShm,
-			   main_id, 0, 0, main_width, main_height, &countMain);
-	
-	rtdSleep(eventHndl, timer);
-    }
-    return 0;
 }
+
 
