@@ -131,7 +131,7 @@ proc blt::FindElement { graph x y } {
 	-name line.$markerName 
 
     blt::FlashPoint $graph $info(name) $info(index) 10
-    blt::FlashPoint $graph $info(name) [expr $info(index) + 1] 10
+    blt::FlashPoint $graph $info(name) [expr {$info(index) + 1}] 10
 }
 
 proc blt::FlashPoint { graph name index count } {
@@ -167,17 +167,17 @@ proc blt::GetCoords { graph x y index } {
     scan [$graph xaxis limits] "%s %s" xmin xmax
     scan [$graph yaxis limits] "%s %s" ymin ymax
 
-     set padx [expr ($xmax - $xmin) * 0.00]
-     set pady [expr ($ymax - $ymin) * 0.00]
+    set padx [expr {($xmax - $xmin) * 0.00}]
+    set pady [expr {($ymax - $ymin) * 0.00}]
      if { $x > $xmax } { 
- 	set x [expr $xmax + $padx]
+	 set x [expr {$xmax + $padx}]
      } elseif { $x < $xmin } { 
- 	set x [expr $xmin - $padx]
+	 set x [expr {$xmin - $padx}]
      }
      if { $y > $ymax } { 
- 	set y [expr $ymax + $pady]
+	 set y [expr {$ymax + $pady}]
      } elseif { $y < $ymin } { 
- 	set y [expr $ymin - $pady]
+	 set y [expr {$ymin - $pady}]
      }
 
     global zoomInfo
@@ -287,7 +287,7 @@ option add *zoomTitle.coords	  "-Inf Inf"
 
 proc blt::ZoomTitleNext { graph } {
     global zoomInfo
-    set level [expr [llength $zoomInfo($graph,stack)] + 1]
+    set level [expr {[llength $zoomInfo($graph,stack)] + 1}]
     if { [$graph cget -invertxy] } {
 	set coords "-Inf -Inf"
     } else {
@@ -563,7 +563,7 @@ proc BltFlashPoint { graph name index count } {
 	after 200 [list catch [list BltFlashPoint $graph $name $index $count]]
 	update
     } else {
-       eval $graph marker delete [$graph marker names ""bltClosest_*"]
+       eval $graph marker delete [$graph marker names "bltClosest_*"]
     }
 }
 
@@ -687,7 +687,7 @@ proc BltResetZoom { graph } {
 proc BltZoomTitleNext { graph } {
     global bltZoom
 
-    set level [expr [llength $bltZoom($graph,stack)] + 1]
+    set level [expr {[llength $bltZoom($graph,stack)] + 1}]
     set title "Zoom #$level"
     $graph marker create text -name "bltZoom_title" -text $title \
 	    -coords {-Inf Inf} -anchor nw -bg {} 
@@ -1012,7 +1012,7 @@ proc BltResetZoom { graph } {
 proc BltZoomTitleNext { graph } {
     global bltZoom
 
-    set level [expr [llength $bltZoom($graph,stack)] + 1]
+    set level [expr {[llength $bltZoom($graph,stack)] + 1}]
     set title "Zoom #$level"
     $graph marker create text -name "bltZoom_title" -text $title \
 	    -coords {-Inf Inf} -anchor nw -bg {} 
