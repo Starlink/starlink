@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: GraphPrint.tcl,v 1.5 1998/10/28 17:46:37 abrighto Exp $"
+# "@(#) $Id: GraphPrint.tcl,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # GraphPrint.tcl - Print dialog box for printing the contents of a graph
 #
@@ -47,7 +47,7 @@ itcl::class util::GraphPrint {
 		-padx 0 \
 		-pady 0 \
 		-center 1 \
-		-maxpec $fit
+                -maxpec $fit
 
 	set cmd [list $itk_option(-graph) postscript output]
 	puts $fd [eval $cmd]

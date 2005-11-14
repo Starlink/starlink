@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# $Id: Makefile.in,v 1.7 1999/03/18 13:06:53 abrighto Exp $
+# $Id: Makefile.in,v 1.2 2003/01/20 20:47:11 brighton Exp $
 #
 # Makefile.in - Makefile to create the "skycat" binary
 #               (uses Scriptics Tclpro to create one binary with tcl scripts loaded)
@@ -49,16 +49,16 @@ X_LIB        = @XLIBSW@
 # Tclpro runtime library (XXX configure this)
 TCLPRO_DIR   = @TCLPRO_DIR@
 TCLPRO_MACH_DIR  = @TCLPRO_MACH_DIR@
-TCLPRO_LIBDIR= $(TCLPRO_MACH_DIR)/lib
-TCLPRO_LIBS  = $(TCLPRO_LIBDIR)/libtbcload10s.a $(TCLPRO_LIBDIR)/libwrapper10s.a
-TCLPRO_INCLUDE = -I$(TCLPRO_DIR)/include
-TCLPRO_WRAP  = $(TCLPRO_MACH_DIR)/bin/prowrap
+TCLPRO_LIBDIR = @TCLPRO_LIB_DIR@
+TCLPRO_LIBS  = @TCLPRO_LIBS@
+TCLPRO_INCLUDE = @TCLPRO_INCLUDE@
+TCLPRO_WRAP  = @TCLPRO_WRAP@
 
 # static tcl/tk archives: use tclpro, if available
-TCL_LIB      = $(TCLPRO_LIBDIR)/libtcl8.0.a
-TK_LIB       = $(TCLPRO_LIBDIR)/libtk8.0.a
-ITCL_LIB     = $(TCLPRO_LIBDIR)/libitcl30s.a $(TCLPRO_LIBDIR)/libitk30s.a
-TCLX_LIB     = $(TCLPRO_LIBDIR)/libtclx8.0.5.a
+TCL_LIB      = @TCLPRO_TCL_LIB@
+TK_LIB       = @TCLPRO_TK_LIB@
+ITCL_LIB     = @TCLPRO_ITCL_LIB@
+TCLX_LIB     = @TCLPRO_TCLX_LIB@
 BLT_LIB      = @BLT_LIB_SPEC_STATIC@
 
 # config file used to hold arguments to prowrap
@@ -140,6 +140,7 @@ $(PROG): $(WISH_INTERP) $(TCLPRO_CONFIG)
 		`cat $(TCLPRO_CONFIG)`
 
 # build the wish interpreter
+# Note: TODO: Need to add -static-libgcc for gcc-3.2.1 to avoid shared lib dependency
 $(WISH_INTERP): $(OBJECTS) $(TCL_LIBS) $(SKYCAT_LIB) 
 	@echo "linking \"$(WISH_INTERP)\"..."
 	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(OBJECTS) \

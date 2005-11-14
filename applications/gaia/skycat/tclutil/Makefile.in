@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# "@(#) $Id: Makefile.in,v 1.6 1998/04/07 00:05:56 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:02 brighton Exp $"
 #
 # Component level Makefile
 #
@@ -46,6 +46,7 @@ SHLIB_CFLAGS=@SHLIB_CFLAGS@
 SHLIB_LD=@SHLIB_LD@
 SHLIB_SUFFIX=@SHLIB_SUFFIX@
 SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+NEED_SHLIB_LD_LIBS=@NEED_SHLIB_LD_LIBS@
 DL_LIBS=@DL_LIBS@
 LD_FLAGS=@LD_FLAGS@
 LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
@@ -84,7 +85,7 @@ master_lib:
 	   echo "making master $(LIBRARY_sl) lib from $(SUBDIRS)" ;\
 	   test -f ../$(LIBRARY_sl) && chmod 755 ../$(LIBRARY_sl) ;\
 	   rm -f ../$(LIBRARY_sl) ;\
-	   if test "$(SHLIB_LD_LIBS)" = "" ; then \
+	   if test "$(NEED_SHLIB_LD_LIBS)" = "1" ; then \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o ;\
 	   else \
 	       $(SHLIB_LD) -o ../$(LIBRARY_sl) *.o $(MASTER_DEP_LIBS) ;\
@@ -107,6 +108,8 @@ depend man: FORCE
 distclean: clean
 	rm -f config.status config.cache config.log config.h 
 	rm -f Makefile .makelog $(TMPDIR)/*.[ao] install
+	(cd ../tclutil; rm -f $(LIBRARY_sl))
+	rm -fr tmp
 	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
 
 # run install in the subdirs
@@ -122,7 +125,6 @@ install_master_lib: FORCE
 	   rm -f $(LIBDIR)/$(LIBRARY_sl) ;\
 	   cp $(LIBRARY_sl) $(LIBDIR)/$(LIBRARY_sl) ;\
 	   chmod 555 $(LIBDIR)/$(LIBRARY_sl) ;\
-	   (cd $(LIBDIR)/tclutil; rm -f $(LIBRARY_sl); ln -s ../$(LIBRARY_sl) .) ;\
 	fi 
 	cp $(LIBRARY_a) $(LIBDIR)/$(LIBRARY_a) 
 	$(RANLIB) $(LIBDIR)/$(LIBRARY_a)
@@ -131,3 +133,6 @@ install_master_lib: FORCE
 install: install_tclutil install_master_lib
 
 FORCE:
+
+include @SRC_ROOT@/makefile.mk
+

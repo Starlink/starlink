@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.17 1999/03/11 21:50:17 abrighto Exp $
+# $Id: configure.in,v 1.4 2005/02/02 01:43:02 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
@@ -17,9 +17,20 @@
 #                           Note also added AC_PROG_CC, this is
 #                           necessary to avoid cross-compilation
 #                           problems with long determination (Peter W. Draper).
+# P.Biereichel    26/06/99  Option --with-vltgnu added
+# P.Biereichel    03/07/00  Link libdce only on HP-UX 10*
+# Allan Brighton  17/05/01  updated for tcl8.3.3
+# pbiereic        17/02/03  Added tmp=`echo $tmp | awk '{print $1}'` in "makedepend" info
+# pbiereic        27/06/03  Adapted for APR2004 (tcl8.4, itcl3.3)
 # -----------------------------------------------------------------------
 
 AC_INIT(tclutil/src/Tclutil.C)
+
+#--------------------------------------------------------------------
+#	Check for machine byte order and define WORDS_BIGENDIAN
+#--------------------------------------------------------------------
+AC_C_BIGENDIAN
+
 AC_CONFIG_HEADER(util/include/config.h)
 
 # -----------------------------------------------------------------------
@@ -62,7 +73,7 @@ AC_SUBST(SRC_ROOT)
 # -----------------------------------------------------------------------
 
 NO_TCL=0
-AC_ARG_WITH(notcl, [--with-notcl         Build a version with no Tcl access], NO_TCL=1)
+AC_ARG_WITH(notcl, [--with-notcl       build a version with no Tcl access], NO_TCL=1)
 AC_SUBST(NO_TCL)
 
 # The list of source dirs depends on whether we have Tcl access or not
@@ -89,9 +100,22 @@ AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_CPP
 AC_PROG_CXX
-    
-AC_ARG_WITH(gcc, [--with-gcc         use gcc compiler], CC=gcc; CXX=g++)
-AC_ARG_WITH(cc,  [--with-cc          use cc compiler], CC=cc; CXX=CC)
+
+LIB_STDCPP=""
+VLTGNU=0
+AC_ARG_WITH(vltgnu, [--with-vltgnu      use gcc compiler for C and C++], VLTGNU=1)
+if test "$VLTGNU" = "1" ; then
+  CC=gcc
+  CXX=gcc
+  LIB_STDCPP="-lstdc++"
+else
+  AC_ARG_WITH(gcc,  [--with-gcc         use gcc compiler for C and g++ for C++], CC=gcc; CXX=g++)
+fi
+
+AC_SUBST(LIB_STDCPP)
+AC_ARG_WITH(cc,  [--with-cc          use cc  compiler for C and C++], CC=cc; CXX=CC)
+
+
 if test -z "$CC" ; then 
     CC=gcc
 fi
@@ -176,20 +200,59 @@ getConfig() {
 }
 
 if test "$NO_TCL" = "0" ; then
+
   # source the config files
   getConfig tcl
   getConfig tk
-  getConfig itcl
   getConfig tclx
 
   case "$TCL_VERSION" in
 
-  7.6) BLT_VERSION=2.1
-       ITK_VERSION=$ITCL_VERSION ;;
+   7.6) BLT_VERSION=2.1
+        getConfig tclx
+        getConfig itcl
+        ITK_VERSION=$ITCL_VERSION
+        ;;
+  8.0*) BLT_VERSION=2.4
+        getConfig tclx
+        getConfig itcl
+        getConfig itk
+        ;;
+  8.2*) BLT_VERSION=2.4
+        getConfig tclx
+        getConfig itcl
+        getConfig itk
+        ;;
+  8.3*) BLT_VERSION=2.4
+        getConfig tclx
+        ITCL_MAJOR_VERSION=3
+        ITCL_MINOR_VERSION=2
+        ITK_MAJOR_VERSION=$ITCL_MAJOR_VERSION
+        ITCL_VERSION=$ITCL_MAJOR_VERSION.$ITCL_MINOR_VERSION
+        ITK_VERSION=$ITCL_VERSION
+        ITCL_LIB_SPEC=-litcl$ITCL_VERSION
+        ITK_LIB_SPEC=-litk$ITK_VERSION
+        ;;
+  8.4) BLT_VERSION=2.4
+        ITCL_MAJOR_VERSION=3
+        ITCL_MINOR_VERSION=2
+        ITK_MAJOR_VERSION=$ITCL_MAJOR_VERSION
+        ITCL_VERSION=$ITCL_MAJOR_VERSION.$ITCL_MINOR_VERSION
+        ITK_VERSION=$ITCL_VERSION
+        ITCL_LIB_SPEC="-L$TCL_PACKAGE_PATH -litcl$ITCL_VERSION"
+        ITK_LIB_SPEC=-litk$ITK_VERSION ;;
 
-  8.*)  BLT_VERSION=2.4
-	getConfig itk;;
-
+# adapted for APR2004
+  8.4-ESO) BLT_VERSION=2.4
+        getConfig itcl
+        ITCL_MAJOR_VERSION=3
+        ITCL_MINOR_VERSION=2
+        ITK_MAJOR_VERSION=$ITCL_MAJOR_VERSION
+        ITK_VERSION=$ITCL_VERSION
+        ITK_LIB_SPEC=`echo $ITCL_LIB_SPEC | sed -e 's/itcl/itk/g'`
+        TCLX_VERSION=$TCL_VERSION
+        TCLX_LIB_SPEC="-L$TCL_PACKAGE_PATH/tclx$TCL_VERSION -ltclx$TCL_VERSION"
+        ;;
   *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl 7.6"; exit 1 ;;
 
   esac
@@ -221,12 +284,17 @@ fi
 # -----------------------------------------------------------------------
 AC_MSG_CHECKING([C++ include dir for makedepend])
 tmpfile=/tmp/tmp$$.C
-echo '#include <iostream.h>' > $tmpfile
+echo '#include <iostream>' > $tmpfile
 tmp=`$CXX -E $tmpfile 2>&1 | grep '^# 1 .*iostream\.h' | awk '{print $3}' | sed -e 's/\"//g' `
 test "$tmp" = "" && tmp=`$CXX -E $tmpfile 2>&1 | grep '^#.*iostream\.h' | awk '{print $2}' | sed -e 's/\"//g' `
 rm -f $tmpfile
+tmp=`echo $tmp | awk '{print $1}' `
 
-CXX_INCLUDE=-I`dirname $tmp`
+if test -z "$tmp" ; then 
+    CXX_INCLUDE=-I
+else
+    CXX_INCLUDE=-I`dirname $tmp`
+fi
 
 AC_MSG_RESULT($CXX_INCLUDE)
 AC_SUBST(CXX_INCLUDE)
@@ -237,8 +305,9 @@ AC_SUBST(CXX_DEPEND_FLAGS)
 # set OS version string
 #
 # -----------------------------------------------------------------------
-OSVERSION="`uname -s`-`uname -r`"
-OSNAME="`uname -s`"
+OS=`uname -s`
+OSVERSION="${OS}-`uname -r`"
+AC_SUBST(OS)
 AC_SUBST(OSVERSION)
 
 # -----------------------------------------------------------------------
@@ -276,7 +345,6 @@ AC_ARG_WITH(debug, [--with-debug       use debugging flag],
 
 CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
 CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
-
 AC_SUBST(CDEBUGFLAGS)
 AC_SUBST(CXXDEBUGFLAGS)
 
@@ -322,11 +390,18 @@ esac
 AC_SUBST(LD_VARNAME)
 
 # Base command to use for combining object files into a shared library:
-SHLIB_LD=$TCL_SHLIB_LD
+if test "$VLTGNU" = "1" ; then
+	SHLIB_LD="gcc -ansi -shared -fPIC"
+	if test "$OS" = "HP-UX" ; then
+  		SHLIB_LD="$SHLIB_LD -Xlinker -b -Xlinker +s"
+	fi
+else
+	SHLIB_LD=$TCL_SHLIB_LD
 
-# special case for HP: add these options (by request: 17.4.97)
-if test "`uname -s`" = "HP-UX" ; then
-  SHLIB_LD="$SHLIB_LD +s"
+	# special case for HP: add these options (by request: 17.4.97)
+	if test "$OS" = "HP-UX" ; then
+	  SHLIB_LD="$SHLIB_LD +s"
+	fi
 fi
 
 # Suffix to use for the name of a shared library.
@@ -336,6 +411,15 @@ SHLIB_SUFFIX=$TCL_SHLIB_SUFFIX
 # shared libraries) or an empty string.  See Tcl's configure.in for more
 # explanation.
 SHLIB_LD_LIBS=$TCL_SHLIB_LD_LIBS
+
+# seems to be a bug in the tcl8.0.5 configure script for HP
+if test "$OS" = "HP-UX" ; then
+    SHLIB_LD_LIBS='${LIBS}'
+fi
+# set this flag to 1 if dependent libs must be linked to build a shared lib
+if test "$SHLIB_LD_LIBS" != "" ; then
+    NEED_SHLIB_LD_LIBS="1"
+fi
 
 # Library file(s) to include in tclsh and other base applications
 # in order to provide facilities needed by DLOBJ above.
@@ -349,24 +433,35 @@ LD_FLAGS=$TCL_LD_FLAGS
 # run-time dynamic linker where to look for shared libraries such as
 # libtcl.so.  Used when linking applications.  Only works if there
 # is a variable "LIB_RUNTIME_DIR" defined in the Makefile.
-LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
+
+# In tcl8.4 there is a backwards incompatible change in tclConfig.sh
+# which uses TCL_CC_SEARCH_FLAGS and the old TCL_LD_SEARCH_FLAGS is
+# set wrong for HP-UX.
+
+if test "$TCL_CC_SEARCH_FLAGS" != "" ; then
+    LD_SEARCH_FLAGS=$TCL_CC_SEARCH_FLAGS
+else
+    LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
+fi
 
 # special case for HP: add these options (by request: 17.4.97)
-if test "`uname -s`" = "HP-UX" ; then
-  LD_SEARCH_FLAGS=" -Wl,+s $LD_SEARCH_FLAGS"
-fi
+# disabled: 02.07.03
+#if test "`uname -s`" = "HP-UX" ; then
+#  LD_SEARCH_FLAGS=" -Wl,+s $LD_SEARCH_FLAGS"
+#fi
 
 AC_SUBST(SHLIB_CFLAGS)
 AC_SUBST(SHLIB_LD)
 AC_SUBST(SHLIB_SUFFIX)
 AC_SUBST(SHLIB_LD_LIBS)
+AC_SUBST(NEED_SHLIB_LD_LIBS)
 AC_SUBST(DL_LIBS)
 AC_SUBST(LD_FLAGS)
 AC_SUBST(LD_SEARCH_FLAGS)
 
 # This must be defined as a Make variable (See tclConfig.sh) and is a
 # colon separated list of dirs in which to look for shared libs at run time
-LIB_RUNTIME_DIR="$prefix/lib:$prefix/lib/itcl:$TCL_EXEC_PREFIX/lib:$TCL_EXEC_PREFIX/lib/itcl"
+LIB_RUNTIME_DIR="$prefix/lib:$prefix/lib/itcl:$TCL_EXEC_PREFIX/lib:$TCL_EXEC_PREFIX/lib/itcl:$TCL_EXEC_PREFIX/lib/itcl$ITK_VERSION:$TCL_EXEC_PREFIX/lib/itk$ITK_VERSION"
 AC_SUBST(LIB_RUNTIME_DIR)
 
 # -----------------------------------------------------------------------
@@ -378,8 +473,10 @@ echo "checking for X includes and libs..."
 # -I switch(es) to use to make all of the X11 include files accessible:
 XINCSW=$TK_XINCLUDES
 
-# Linker switch(es) to use to link with the X11 library archive.
-XLIBSW="$TK_XLIBSW -lXext"
+if test "$NO_TCL" = "0" ; then
+	# Linker switch(es) to use to link with the X11 library archive.
+	XLIBSW="$TK_XLIBSW -lXext"
+fi
 
 # make sure we can find the X extensions
 if test "$XINCSW" = "# no special path needed" ; then
@@ -412,20 +509,20 @@ if test ! -f $XINCDIR/X11/extensions/XShm.h ; then
   done
 fi
 
-if test "$NO_TCL" = "0" ; then
-  while test ! -f "$XINCDIR/X11/extensions/XShm.h" ; do
-    echo "What topl level include dir contains the X11R5 extension 'X11/extensions/XShm.h' ?"
-    read XINCDIR
-    XINCSW="-I$XINCDIR"
-    if test ! -f "$XINCDIR/X11/extensions/XShm.h" ; then
-      echo "can't find $XINCDIR/X11/extensions/XShm.h"
-    fi
-    if test -d "$XLIBDIR/$i" ; then
-      XLIBDIR=$XLIBDIR/$i
-      XLIBSW="-L$XLIBDIR -lX11 -lXext"
-    fi
-  done
-fi
+#if test "$NO_TCL" = "0" ; then
+#  while test ! -f "$XINCDIR/X11/extensions/XShm.h" ; do
+#    echo "What topl level include dir contains the X11R5 extension 'X11/extensions/XShm.h' ?"
+#    read XINCDIR
+#    XINCSW="-I$XINCDIR"
+#    if test ! -f "$XINCDIR/X11/extensions/XShm.h" ; then
+#      echo "can't find $XINCDIR/X11/extensions/XShm.h"
+#    fi
+#    if test -d "$XLIBDIR/$i" ; then
+#      XLIBDIR=$XLIBDIR/$i
+#      XLIBSW="-L$XLIBDIR -lX11 -lXext"
+#    fi
+#  done
+#fi
 
 AC_SUBST(XINCSW)
 AC_SUBST(XLIBSW)
@@ -444,17 +541,26 @@ if test "$NO_TCL" = "0" ; then
     AC_SUBST(TK_LIB_SPEC)
     AC_SUBST(ITCL_LIB_SPEC)
 
-    # TclX defines the TCLX_LIB_SPEC variable differently when shared libs
-    # are not used. We want to always use "-Ldir -llib" to pick up the
-    # shared lib if it is there.
-    if test "$SHARED" = "1" -a -f "$TCLX_LIB_SPEC" ; then
-       TCLX_LIB_SPEC="-L`dirname $TCLX_LIB_SPEC` -ltclx$TCLX_VERSION"
-    else 
-       if test -f "$TCLX_LIB_SPEC" ; then
-	  # hack... we need the extra -L for -lBLT, since its in the same dir
-	  TCLX_LIB_SPEC="-L`dirname $TCLX_LIB_SPEC` $TCLX_LIB_SPEC"
-       fi
+    # make sure there isn't a missing dir after the -L here
+    if test "$TCLX_LIB_SPEC" = "-L -ltclx$TCLX_VERSION" ; then
+        TCLX_LIB_SPEC="-ltclx$TCLX_VERSION"
+    else
+        # TclX defines the TCLX_LIB_SPEC variable differently when shared libs
+        # are not used. We want to always use "-Ldir -llib" to pick up the
+        # shared lib if it is there.
+        tclxdir=`dirname $TCLX_LIB_SPEC`
+        if test "$tclxdir" != "" ; then
+            if test "$SHARED" = "1" -a -f "$TCLX_LIB_SPEC" ; then
+               TCLX_LIB_SPEC="-L$tclxdir -ltclx$TCLX_VERSION"
+            else 
+               if test -f "$TCLX_LIB_SPEC" ; then
+                   # hack... we need the extra -L for -lBLT, since its in the same dir
+                   TCLX_LIB_SPEC="-L$tclxdir $TCLX_LIB_SPEC"
+               fi
+            fi
+        fi
     fi
+
     AC_SUBST(TCLX_LIB_SPEC)
 
     # -D defines for tcl/tk C sources
@@ -462,7 +568,8 @@ if test "$NO_TCL" = "0" ; then
     AC_SUBST(TCLUTIL_DEFS)
 
     # Note: there was a bug in itk2.2, so the itkConfig.sh file was not installed
-    ITK_LIB_SPEC=`echo $ITCL_LIB_SPEC | sed -e 's/\-litcl/-litk/'`
+    #  XXX was: ITK_LIB_SPEC=`echo $ITCL_LIB_SPEC | sed -e 's/\-litcl/-litk/'`
+    ITK_LIB_SPEC=`echo $ITCL_LIB_SPEC | sed -e 's/itcl/itk/g'`
     AC_SUBST(ITK_LIB_SPEC)
 
     # there is no bltConfig.sh in blt2.1
@@ -533,7 +640,10 @@ AC_CHECK_LIB(Xbsd, main, [LIBS="$LIBS -lXbsd"])
 AC_CHECK_LIB(nsl, main, [LIBS="$LIBS -lnsl"])
 AC_CHECK_LIB(socket, main, [LIBS="$LIBS -lsocket"])
 AC_CHECK_LIB(resolv, main, [LIBS="$LIBS -lresolv"])
-AC_CHECK_LIB(w, main, [LIBS="$LIBS -lw"])
+case "$OSVERSION" in
+ HP-UX-B.10.*) AC_CHECK_LIB(dce, main, [LIBS="$LIBS -ldce"]);;
+esac
+###AC_CHECK_LIB(w, main, [LIBS="$LIBS -lw"])
 AC_CHECK_LIB(dl, main, [LIBS="$LIBS -ldl"])
 LIBS="$LIBS $TCL_LIBS"
 
@@ -624,24 +734,21 @@ AC_LANG_RESTORE
 
 
 #--------------------------------------------------------------------
-#	Check for machine byte order and define WORDS_BIGENDIAN
-#--------------------------------------------------------------------
-AC_C_BIGENDIAN
-
-#--------------------------------------------------------------------
 #	Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
-DESTDIR=$prefix
-BINDIR=$DESTDIR/bin
-LIBDIR=$DESTDIR/lib
-INCDIR=$DESTDIR/include/tclutil
-MANDIR=$DESTDIR/man
+INSTALL_TARGET=$prefix
+DESTDIR="\${INSTALL_TARGET}"
+BINDIR="\${INSTALL_TARGET}"/bin
+LIBDIR="\${INSTALL_TARGET}"/lib
+INCDIR="\${INSTALL_TARGET}"/include/tclutil
+MANDIR="\${INSTALL_TARGET}"/man
 TCLUTIL_DIR=$LIBDIR/tclutil
 TCLUTIL_LIBRARY=$TCLUTIL_DIR
 TCLUTIL_BUILD_LIBRARY=$SRC_ROOT/tclutil/library
 TCLUTIL_BUILD_INCLUDES="-I$SRC_ROOT/util/include -I$SRC_ROOT/tclutil/include -I$SRC_ROOT/tix/unix"
 
 
+AC_SUBST(INSTALL_TARGET)
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
 AC_SUBST(LIBDIR)
@@ -717,13 +824,17 @@ fi
 echo "
 install tclutil binaries in           => $BINDIR
 install tclutil libraries in          => $LIBDIR
-install tclutil include files in      => $INCDIR"
+install tclutil include files in      => $INCDIR
+
+default install dir INSTALL_TARGET    => $INSTALL_TARGET"
 
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
+export NO_TCL
 AC_OUTPUT(\
 	Makefile \
+        makefile.mk \
         tclutilConfig.sh \
         \
 	tclutil/Makefile \
@@ -750,5 +861,5 @@ AC_OUTPUT(\
 	tix/library/Makefile \
 	tix/unix/Makefile \
 	\
-	, chmod +x tclutil/demos/tclutil.sh; sh makelinks; make -k depend
+	, if test "$NO_TCL" = "0" ; then sh makelinks; fi ; make -k depend
 )
