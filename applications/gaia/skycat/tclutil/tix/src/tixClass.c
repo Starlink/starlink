@@ -24,8 +24,8 @@
 
 #include <string.h>
 
-#include <tk.h>
 #include <tixPort.h>
+#include <tk.h>
 #include <tixInt.h>
 #include <tixItcl.h>
 
@@ -307,7 +307,7 @@ TIX_DEFINE_CMD(Tix_ClassCmd)
 	 */
 	Tix_SimpleListAppend(&scPtr->unInitSubCls, (char*)cPtr, 0);
 	Tcl_CreateCommand(interp, cPtr->className,
-		Tix_UninitializedClassCmd, (ClientData)cPtr, NULL);
+		(Tcl_CmdProc*)Tix_UninitializedClassCmd, (ClientData)cPtr, NULL);
 	cPtr->parsePtr = parsePtr;
     }
 
@@ -609,10 +609,10 @@ InitClass(interp, classRec, cPtr, scPtr, parsePtr)
      * Now create the instantiation command.
      */
     if (isWidget) {
-	Tcl_CreateCommand(interp, cPtr->className, Tix_CreateWidgetCmd,
+	Tcl_CreateCommand(interp, cPtr->className, (Tcl_CmdProc*)Tix_CreateWidgetCmd,
 		(ClientData)cPtr, NULL);
     } else {
-	Tcl_CreateCommand(interp, cPtr->className, Tix_CreateInstanceCmd,
+	Tcl_CreateCommand(interp, cPtr->className, (Tcl_CmdProc*)Tix_CreateInstanceCmd,
 		(ClientData)cPtr, NULL);
     }
 
@@ -783,7 +783,7 @@ TIX_DEFINE_CMD(Tix_CreateInstanceCmd)
     Tcl_SetVar2(interp, widRec, "context",   cPtr->className, TCL_GLOBAL_ONLY);
 
     /* This is the command that access the widget */
-    Tcl_CreateCommand(interp, widRec, Tix_InstanceCmd,
+    Tcl_CreateCommand(interp, widRec, (Tcl_CmdProc*)Tix_InstanceCmd,
 	(ClientData)cPtr, NULL);
 
     /* Set up the widget record according to defaults and arguments */
@@ -806,8 +806,7 @@ TIX_DEFINE_CMD(Tix_CreateInstanceCmd)
     for (i=0; i<cPtr->nSpecs; i++) {
 	spec = cPtr->specs[i];
 	if (spec->forceCall) {
-	  value = Tcl_GetVar2(interp, widRec, spec->argvName,
-	      TCL_GLOBAL_ONLY);
+	  value = (char*)Tcl_GetVar2(interp, widRec, spec->argvName, TCL_GLOBAL_ONLY);
 	  if (Tix_CallConfigMethod(interp, cPtr, widRec, spec, value)!=TCL_OK){
 	      code = TCL_ERROR;
 	      goto done;
@@ -911,7 +910,7 @@ TIX_DEFINE_CMD(Tix_InstanceCmd)
 	Tcl_ResetResult(interp);
 	if (argc >= 3) {
 	    sprintf(buff, "w:%s", argv[2]);
-	    swName = Tcl_GetVar2(interp, widRec, buff, TCL_GLOBAL_ONLY);
+	    swName = (char*)Tcl_GetVar2(interp, widRec, buff, TCL_GLOBAL_ONLY);
 
 	    if (swName) {
 		if (argc == 3) {

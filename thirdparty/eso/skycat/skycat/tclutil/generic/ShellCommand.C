@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ShellCommand.C,v 1.3 1998/06/25 08:30:06 abrighto Exp $" 
+ * "@(#) $Id: ShellCommand.C,v 1.5 2005/04/04 19:01:06 brighton Exp $" 
  *
  * ShellCommand.C - methods for class ShellCommand, util class for
  *                  running a shell command and getting the output.
@@ -9,21 +9,22 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  12 Jun 96  Created
+ * pbiereic        17/02/03  Added 'using namespace std'.
  */
-static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.3 1998/06/25 08:30:06 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.5 2005/04/04 19:01:06 brighton Exp $";
 
 
+using namespace std;
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <iostream.h>
-#include <strstream>
+#include <cstdlib>
+#include <cstdio>
+#include <csignal>
+#include <iostream>
+#include <cstring>
 #include "error.h"
 #include "define.h"
 #include "ShellCommand.h"
@@ -100,7 +101,7 @@ ShellCommand::ShellCommand(const char* cmd)
     close(stdout_fds[1]);
     close(stderr_fds[1]);
 
-    if (status_ != 0 && stdErr_) {
+    if (status_ != 0 && stdErr_ && strlen(stdErr_)) {
 	error(stdErr_);
     }
 }

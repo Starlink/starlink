@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.h,v 1.1 1997/11/28 01:38:54 abrighto Exp $" 
+ * "@(#) $Id: util.h,v 1.3 2005/02/02 01:43:01 brighton Exp $" 
  *
  * util.h - utility routines
  * 
@@ -55,4 +55,4 @@ int localSockConnect(int& sock, int port);
 // start listening on the given port (or choose port, if 0)
 int localSockListen(int& sock, int& port);
 
-#endif _util_h_
+#endif /* _util_h_ */

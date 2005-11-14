@@ -1,14 +1,23 @@
+#ifndef _config_H
+#define _config_H
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: config.h.in,v 1.4 1998/11/16 21:27:54 abrighto Exp $" 
+ * "@(#) $Id: config.h.in,v 1.3 2005/02/02 01:43:01 brighton Exp $" 
  *
  * config.h.in - global configuration values, set by configure
  * 
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * pbiereic        17/02/03  Added WORDS_BIGENDIAN (see autoconf: aclang.m4)
+ *                           Added #ifndef _config_H
  *
  */
+
+/* For compatibility between tcl8.4 and previous tcl releases
+ * (problems with CONSTification)
+ */
+#define USE_COMPAT_CONST
 
 
 /* define this if the SHM (shared memory) prototypes are missing 
@@ -77,3 +86,9 @@
  */
 #undef HAVE_STRSTREAM_H
 
+/* 
+ * define if machine has big endian
+ */
+#undef WORDS_BIGENDIAN
+
+#endif /* _config_H */

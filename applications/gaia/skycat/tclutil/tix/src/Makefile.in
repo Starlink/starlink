@@ -1,7 +1,7 @@
 #*******************************************************************************
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.7 1999/03/19 20:10:39 abrighto Exp $"
+# "@(#) $Id: Makefile.in,v 1.3 2005/02/02 01:43:02 brighton Exp $"
 #
 # ------------------------------------------------------------------------
 # 	Makefile
@@ -72,6 +72,7 @@ libname  	= ../lib/libtix.a
 
 # include flags
 INCLUDES	= -I. \
+		  -I../../util/include \
 		  -I../unix \
 		  -I../tcl$(TCL_VERSION)/unix \
 		  -I../tcl$(TCL_VERSION)/generic \
@@ -142,5 +143,6 @@ tags:
 
 man:
 
+include @SRC_ROOT@/makefile.mk
 include ../../depend.mk
 

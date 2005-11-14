@@ -3,7 +3,7 @@
 #define MEM_MAP_H
 /*
  * E.S.O. - VLT project 
- * $Id: Mem_Map.h,v 1.2 1998/02/09 08:03:07 abrighto Exp $
+ * $Id: Mem_Map.h,v 1.2 2005/02/02 01:43:01 brighton Exp $
  *
  * Mem_Map.h - utility class wrapper for mmap(2), Author: Doug Schmidt
  *             (ripped from ACE C++ library for use in OCS by K. Gillies, 

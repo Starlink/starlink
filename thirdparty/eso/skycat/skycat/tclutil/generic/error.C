@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $"
+ * "@(#) $Id: error.C,v 1.7 2005/02/02 01:43:00 brighton Exp $"
  *
  * error.C - error reporting routines
  * 
@@ -15,27 +15,21 @@
  *                           rather than errno and sys_errlist.
  *                 30/04/03  Removed ifdef for errno.h. Needed back
  *                           for RH7.3.
+ * Allan Brighton  01/04/99  Replaced sys_errlist[] with strerror()
+ *                           to get around porting problems
+ *                 20/01/03  Updated for gcc-3.2.1
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: error.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: error.C,v 1.7 2005/02/02 01:43:00 brighton Exp $";
 
-#include "config.h"  //  From skycat util
-
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include <errno.h>
-#include <stdio.h>
+using namespace std;
+#include <cstdarg>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <cerrno>
+#include <cstdio>
+#include <cstring>
 #include "error.h"
 
 // static variable holding text of last error messages
@@ -56,21 +50,20 @@ static void (*msghandler_)(const char*) = NULL;
  */
 int error(const char* msg1, const char* msg2, int code)
 {
-    char buf[sizeof(errmsg_)];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ends;
+    ostringstream os;
+    os << msg1 << msg2;
     
     if (errhandler_)
-	(*errhandler_)(buf);
+	(*errhandler_)(os.str().c_str());
     else
-	print_error(buf);
+	print_error(os.str().c_str());
 
 #ifdef XXXDEBUG
-    cerr << "debug: " << buf << endl;
+    cerr << "debug: " << os.str().c_str() << endl;
 #endif
 
     errno_ = code;
-    strncpy(errmsg_, buf, sizeof(errmsg_)-1);
+    strncpy(errmsg_, os.str().c_str(), sizeof(errmsg_)-1);
     return ERROR;
 }
 
@@ -80,28 +73,26 @@ int error(const char* msg1, const char* msg2, int code)
  */
 int sys_error(const char* msg1, const char* msg2)
 {
-    // PWD: considerable changed...
     char* s = strerror(errno);
 
     if (s == NULL || errno < 0 ) {
 	return error(msg1, msg2);
     }
 
-    char buf[sizeof(errmsg_)];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ": " << s << ends;
+    ostringstream os;
+    os << msg1 << msg2 << ": " << s;
 
     if (errhandler_)
-	(*errhandler_)(buf);
+	(*errhandler_)(os.str().c_str());
     else
-	print_error(buf);
+	print_error(os.str().c_str());
 
 #ifdef XXXDEBUG
-    cerr << "debug: " << buf << endl;
+    cerr << "debug: " << os.str().c_str() << endl;
 #endif
 
     errno_ = errno;
-    strcpy(errmsg_, buf);
+    strncpy(errmsg_, os.str().c_str(), sizeof(errmsg_)-1);
     return ERROR;
 }
 

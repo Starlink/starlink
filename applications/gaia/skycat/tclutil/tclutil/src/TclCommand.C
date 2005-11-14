@@ -1,38 +1,23 @@
 /*
  * TclCommand.C - base class definitions for tcl command classes
- * "@(#) $Id: TclCommand.C,v 1.4 1998/05/27 20:42:15 abrighto Exp $"
+ * "@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02 brighton Exp $"
  * 
  * See the man page for a complete description.
- * -----------------------------------------------------------------------------
- * Copyright 1994 Allan Brighton.
  * 
- * Permission to use, copy, modify, and distribute this software and its
- * documentation for any purpose and without fee is hereby granted,
- * provided that the above copyright notice appear in all copies.  
- * Allan Brighton make no representations about the suitability of this 
- * software for any purpose. It is provided "as is" without express or 
- * implied warranty.
- * -----------------------------------------------------------------------------
+ * who             when      what
+ * --------------  --------  ----------------------------------------
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  *
  */
-static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.4 1998/05/27 20:42:15 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02 brighton Exp $";
 
-#include "config.h"  //  From skycat util
-
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include <errno.h>
+using namespace std;
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <cerrno>
+#include <cstring>
+#include "config.h"
 #include "error.h"
 #include "TclCommand.h"
 
@@ -68,7 +53,7 @@ TclCommand::TclCommand(Tcl_Interp* interp, const char* cmdname, const char* inst
     }
 
     // create the basic tcl command and return its name
-    Tcl_CreateCommand(interp, instname_, TclCommand::tclCmdProc, (ClientData)this, 
+    Tcl_CreateCommand(interp, instname_, (Tcl_CmdProc*)TclCommand::tclCmdProc, (ClientData)this, 
 		      TclCommand::tclDeleteProc);
 
     // The result of the comamnd is its name
@@ -318,12 +303,11 @@ int TclCommand::append_element(const char* s)
 int TclCommand::error(const char* msg1, const char* msg2) 
 {
     // msg1 or msg2 might be the same as interp_->result...
-    char buf[1024];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ends;
+    ostringstream os;
+    os << msg1 << msg2;
 
     Tcl_ResetResult(interp_);
-    Tcl_SetResult(interp_, buf, TCL_VOLATILE);
+    Tcl_SetResult(interp_, (char*)os.str().c_str(), TCL_VOLATILE);
     return TCL_ERROR;
 }
 
@@ -333,11 +317,10 @@ int TclCommand::error(const char* msg1, const char* msg2)
 int TclCommand::more_error(const char* msg1, const char* msg2) 
 {
     // msg1 or msg2 might be the same as interp_->result...
-    char buf[1024];
-    STRSTD::ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ends;
+    ostringstream os;
+    os << msg1 << msg2;
 
-    Tcl_AppendResult(interp_, buf, (char *)NULL);
+    Tcl_AppendResult(interp_, os.str().c_str(), (char *)NULL);
     return TCL_ERROR;
 }
 

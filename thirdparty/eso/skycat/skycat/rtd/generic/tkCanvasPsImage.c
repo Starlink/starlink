@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: tkCanvasPsImage.c,v 1.4 1999/03/22 21:42:24 abrighto Exp $" 
+ * "@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $" 
  *
  * TkCanvasPsImage.C -  Implement Tk postscript output for images
  *
@@ -24,14 +24,18 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  19/06/98  Created
  */
-static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.4 1999/03/22 21:42:24 abrighto Exp $";
+static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.2 2005/02/02 01:43:02 brighton Exp $";
 
 
 #include <stdio.h>
+/*
 #include "tkInt.h"
 #include "tkPort.h"
+*/
 #include "tkCanvas.h"
 
+/* Allan: 5/01: This file is not compatible with tk8.3 */
+#if TCL_MAJOR_VERSION <= 8 && TCL_MINOR_VERSION <= 2
 
 /*
  * Struct used in generating postscript for images.
@@ -398,6 +402,7 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      /*  Determine region of image that needs to be drawn. Only the
          part visible on the display screen is done. */
      Tk_SizeOfImage(imgPtr->image, &width, &height);
+     /* fprintf( stderr, "%d,%d\n", width, height ); */
      screenX1 = canvasPtr->xOrigin + canvasPtr->inset;
      screenY1 = canvasPtr->yOrigin + canvasPtr->inset;
      screenX2 = canvasPtr->xOrigin + Tk_Width(canvasWin) - canvasPtr->inset;
@@ -505,6 +510,7 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
      ckfree((char *) cdata.colors);
      return result;
 }
+#endif /* tcl version check */
 
  
 /*
@@ -529,8 +535,10 @@ ImageToPostscript(interp, canvas, itemPtr, prepass)
 void
 TkCanvasPsImage_Init()
 {
+#if TCL_MAJOR_VERSION <= 8 && TCL_MINOR_VERSION <= 2
     extern Tk_ItemType tkImageType;
     tkImageType.postscriptProc = ImageToPostscript;
+#endif
 }
 
 
@@ -563,3 +571,7 @@ Tk_CanvasWindowCoordsNoClip(canvas, x, y, screenXPtr, screenYPtr)
     }
     *screenYPtr = tmp;
 }
+
+
+
+

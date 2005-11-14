@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: Mem_Map.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $
+ * $Id: Mem_Map.C,v 1.3 2005/02/02 01:43:00 brighton Exp $
  *
  * Mem_Map.C - method definitions for class Mem_Map
  * Author:     Doug Schmidt - ripped from ACE_wrappers by K. Gillies.
@@ -14,16 +14,16 @@
  *                 23 Oct 00 Expanded error messages to be a little
  *                           more informative to an end user.
  */
-static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.4 1999/03/19 20:10:43 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.3 2005/02/02 01:43:00 brighton Exp $";
 
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
+#include <cstring>
 #include "error.h"
 #include "config.h"
 #include "Mem_Map.h"
-#include <stdio.h>
+#include <cstdio>
 #ifdef HAVE_SYS_STATVFS_H
 #ifdef __alpha   // Extern "C" & prototypes missing on OSF/1
 extern "C" {

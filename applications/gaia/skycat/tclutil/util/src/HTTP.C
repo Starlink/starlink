@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HTTP.C,v 1.14 1998/07/20 13:29:44 abrighto Exp $
+ * $Id: HTTP.C,v 1.6 2005/02/02 01:43:00 brighton Exp $
  *
  * HTTP.C - method definitions for class HTTP
  *          (based on code from DSS:HTTP.c by Miguell Albrecht)
@@ -16,27 +16,18 @@
  *                 21 Jan 03  Changed to work with UNIX permissions
  *                            after gcc3 looses a non-standard
  *                            ofstream constructor. 
+ * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: HTTP.C,v 1.14 1998/07/20 13:29:44 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: HTTP.C,v 1.6 2005/02/02 01:43:00 brighton Exp $";
 
-#include "config.h"  //  From skycat util
-
-#include <stdio.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-#include <fstream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
+using namespace std;
+#include <cstdio>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -290,7 +281,7 @@ int HTTP::openCommand(const char* command)
     char cmd[2048];
     char tmpfile[80];
     strcpy(tmpfile, "/tmp/httpXXXXXX"); 
-    mktemp(tmpfile);
+    mkstemp(tmpfile);
     sprintf(cmd, "%s > %s", command, tmpfile);
     if (system(cmd) != 0) {
 	error("error executing command: ", command);
@@ -510,7 +501,7 @@ void HTTP::userAgent(const char* s)
  * the current value of auth_info_. The file has the format:
  * 
  *  server:realm:auth_info
- * 
+* 
  * Where: server is the HTTP server hostname
  *        realm is a string returned from the server (in the auth request)
  *        auth_info is the base64 encoded "username:passwd"
@@ -521,7 +512,7 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
 	authFile(default_auth_file_);
 
     ifstream is(auth_file_);
-    STRSTD::ostrstream os;
+    ostringstream os;
     char newentry[1024];
     sprintf(newentry, "%s:%s:%s", server, realm, auth_info_);
     char buf[1024];
@@ -531,18 +522,16 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
 	    os << buf << endl;
     }
     is.close();
-    os << newentry << endl << ends;
+    os << newentry << endl;
     
     // create the auth file with -rw------- perms
-    ofstream f(auth_file_, ios::out );// PWD: was ", 0600 );" but gcc3 looses
-                                      // permission argument.
+    //ofstream f(auth_file_, ios::out, 0600);
+    ofstream f(auth_file_, ios::out);
+    chmod(auth_file_, 0600);
     if (f) 
 	f << os.str();
     delete os.str();
     f.close();
-    
-    //  Change permissions the UNIX way.
-    chmod( auth_file_, 0600 );
 
     return 0;
 }
@@ -692,7 +681,7 @@ int HTTP::get(const char* url)
     }
 
     // generate the request
-    STRSTD::ostrstream os(req, sizeof(req));
+    ostrstream os;
     os << "GET " << args << " HTTP/1.0" << endl;
 
     // PWD: add the Host: header, this is required by some
@@ -713,8 +702,9 @@ int HTTP::get(const char* url)
 	os << "Authorization: Basic " << auth_info_ << endl;
 
     // add newline after request and null terminate
-    os << endl << ends;
-
+    os << endl;
+    strncpy(req, os.str().c_str(), sizeof(req));
+    
     // send the request
     int n = strlen(req);
     if (writen(req, n) != n) {
@@ -780,7 +770,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
     }
 	
     // read the data into a buffer
-    STRSTD::ostrstream os;
+    ostringstream os;
     char buf[8*1024];
     nlines = 0;
     int n;
@@ -797,8 +787,7 @@ char* HTTP::get(const char* url, int& nlines, int freeFlag)
 	    os.write(buf, n);
 	}
     }
-    os << ends;
-    resultPtr_ = resultBuf_ = os.str();
+    resultPtr_ = resultBuf_ = strdup(os.str().c_str());
 
     // count the lines
     // and remove "end of data" marker 

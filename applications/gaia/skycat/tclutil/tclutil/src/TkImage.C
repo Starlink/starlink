@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: TkImage.C,v 1.6 1999/03/19 20:10:32 abrighto Exp $"
+ * "@(#) $Id: TkImage.C,v 1.6 2005/02/02 01:43:02 brighton Exp $"
  *
  * TkImage.C - base class definitions for Tk images implemented in C++
  * 
@@ -14,16 +14,18 @@
  *                           instead of reference.
  * Peter W. Draper 12/06/98  Removed explicit depth and visual, these 
  *                           are now left at window defaults.
+ * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
  */
-static const char* const rcsId="@(#) $Id: TkImage.C,v 1.6 1999/03/19 20:10:32 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TkImage.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
 
 
 
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <iostream.h>
+using namespace std;
+#include <cstdlib>
+#include <cctype>
+#include <iostream>
 #include <sys/types.h>
+#include <cstring>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include "define.h"
