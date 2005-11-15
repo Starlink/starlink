@@ -530,7 +530,6 @@ int HTTP::addAuthFileEntry(const char* server, const char* realm)
     chmod(auth_file_, 0600);
     if (f) 
 	f << os.str();
-    delete os.str();
     f.close();
 
     return 0;
@@ -681,7 +680,7 @@ int HTTP::get(const char* url)
     }
 
     // generate the request
-    ostrstream os;
+    ostringstream os;
     os << "GET " << args << " HTTP/1.0" << endl;
 
     // PWD: add the Host: header, this is required by some
