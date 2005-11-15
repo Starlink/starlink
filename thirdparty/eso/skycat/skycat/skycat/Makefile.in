@@ -4,7 +4,7 @@
 # Component level Makefile
 
 # source dir used to build single binary
-SKYCAT_WRAPPER_DIR = et
+SKYCAT_WRAPPER_DIR = @SKYCAT_WRAPPER_DIR@
 
 # directories to run make in
 SUBDIRS = interp $(SKYCAT_WRAPPER_DIR)
