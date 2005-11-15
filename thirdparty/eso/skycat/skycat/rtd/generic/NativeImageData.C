@@ -47,7 +47,7 @@
 #undef NTOH
 
 #define NTOH(x) x
-#define DoubleImageData DoubleFloatImageData
+#define DoubleImageData NativeDoubleFloatImageData
 #include "DoubleImageData.C"
 #undef DoubleImageData
 #undef NTOH
