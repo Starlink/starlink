@@ -26,9 +26,7 @@ TCL_FILES = bltCanvEps.pro bltGraph.pro
 TCL_TEST_FILES = built/lib/itclConfig.sh \
  built/lib/tclConfig.sh \
  built/lib/tkConfig.sh \
- built/lib/itkConfig.sh \
  built/lib/tclxConfig.sh  \
- built/lib/tkxConfig.sh \
  built/lib/libBLT.a \
  built/lib/libtkhtml.a
 
