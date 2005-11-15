@@ -24,7 +24,7 @@
 #include <cassert>
 #include <cmath>
 #include "define.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 #include "error.h"
 #include "CompoundImageData.h"
 

@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include "ImageData.h"
 #include "ImageIO.h"
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 
 // max. number of bias frames
 #define MAXBIAS 5

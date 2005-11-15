@@ -11,7 +11,7 @@
  * pbiereic        05/02/03  Created
  */
 
-#include "FitsIO.h"
+#include "FitsIO.hxx"
 #include "rtdSem.h"
 #include "tRtd.h"
 #include "rtdSem.h"
