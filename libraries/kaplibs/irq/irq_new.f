@@ -102,6 +102,13 @@
 
 *.
 
+*  Initialise
+      LOCS( 1 ) = ' '
+      LOCS( 2 ) = ' '
+      LOCS( 3 ) = ' '
+      LOCS( 4 ) = ' '
+      LOCS( 5 ) = ' '
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
