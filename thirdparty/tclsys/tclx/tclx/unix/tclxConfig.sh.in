@@ -1,0 +1,29 @@
+# tclxConfig.sh --
+# 
+# This shell script (for sh) is generated automatically by Tclx's
+# configure script.  It will create shell variables for most of
+# the configuration options discovered by the configure script.
+# This script is intended to be included by the configure scripts
+# for Tclx extensions so that they don't have to figure this all
+# out for themselves.  This file does not duplicate information
+# already provided by tclConfig.sh, so you may need to use that
+# file in addition to this one.
+#
+# The information in this file is specific to a single platform.
+#
+# PWD: Note, just added this to keep Skycat happy.
+
+# Tclx's version number.
+TCLX_VERSION='@PACKAGE_VERSION@'
+
+# String to pass to linker to pick up the Tclx library from its
+# build directory.
+TCLX_BUILD_LIB_SPEC='@TCLX_BUILD_LIB_SPEC@'
+
+# String to pass to linker to pick up the Tclx library from its
+# installed directory.
+TCLX_LIB_SPEC='@TCLX_LIB_SPEC@'
+
+# Location of the top-level source directories from which Tclx
+# was built.  
+TCLX_SRC_DIR='@TCLX_SRC_DIR@'

@@ -353,8 +353,35 @@ TEA_MAKE_LIB
 
 TEA_PROG_TCLSH
 
+
+#--------------------------------------------------------------------
+# These are for tclxConfig.sh
+#--------------------------------------------------------------------
+
+if test "${TEA_PLATFORM}" = "unix" ; then
+
+   # pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
+   eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+   if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+       eval TCLX_LIB_FLAG="-ltclx${PACKAGE_VERSION}${DBGX}"
+   else
+       eval TCLX_LIB_FLAG="-ltclx`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+   fi
+   TCLX_BUILD_LIB_SPEC="-L`pwd` ${TCLX_LIB_FLAG}"
+   TCLX_LIB_SPEC="-L${pkglibdir} ${TCLX_LIB_FLAG}"
+
+   AC_SUBST(TCLX_BUILD_LIB_SPEC)
+   AC_SUBST(TCLX_LIB_SPEC)
+
+   # TCLX_SRC_DIR must be a fully qualified path
+   eval TCLX_SRC_DIR="$srcdir"
+   TCLX_SRC_DIR=`cd "${TCLX_SRC_DIR}"; pwd`
+   AC_SUBST(TCLX_SRC_DIR)
+
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
+   AC_OUTPUT(unix/tclxConfig.sh)
 
+fi
 AC_OUTPUT([Makefile])
