@@ -109,6 +109,8 @@
 *        Make pixel coords the default coord system for the ard file.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     15-NOV-2005 (DSB):
+*        Delete the GRP identifier before returning.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -210,6 +212,9 @@
 
 *  Shutdown PGPLOT and the graphics database.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+
+*  Delete the group.
+      CALL GRP_DELET( IGRP, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
