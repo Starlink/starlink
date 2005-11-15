@@ -97,4 +97,4 @@ protected:
 
 };
 
-#endif _StarFitsIO_h_
+#endif /*_StarFitsIO_h_ */
