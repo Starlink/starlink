@@ -39,6 +39,8 @@
 *  History:
 *     2005-09-27 (AGG):
 *        Initial test version
+*     2005-11-14 (AGG):
+*        Update API to accept a smfData struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,9 +82,7 @@
 #include "f77.h"
 F77_DOUBLE_FUNCTION(sla_airmas)( double * );
 
-void smf_correct_extinction(AstFrameSet *wcs, const dim_t dims[], 
-			    float tau, float *data, int *status) {
-
+void smf_correct_extinction(smfData **data, float tau, int *status) {
 
   /* Local variables */
   double airmass;     /* Airmass */
@@ -94,28 +94,37 @@ void smf_correct_extinction(AstFrameSet *wcs, const dim_t dims[],
   double yin;         /* Y coordinate of input */
   double yout;        /* Y coordinate of output */
   double zd;          /* Zenith distance */
+  double *indata;     /* Pointer to data array */
+
+  smfHead *hdr;
 
   if (*status != SAI__OK) return;
 
+  /* Store header */
+  hdr = (*data)->hdr;
+
+  /* Assign pointer to input data array */
+  indata = ((*data)->pntr)[0]; 
+
   /* Assume 2 dimensions. Start counting at 1 since this is the GRID
      coordinate frame */
-  for (j = 1; j <= dims[1]; j++) {
-    for (i = 1; i <= dims[0]; i++) {
+  for (j = 1; j <= ((*data)->dims)[1]; j++) {
+    for (i = 1; i <= ((*data)->dims)[0]; i++) {
       
-      index = (j-1)*dims[0] + (i-1);
-      if (data[index] != VAL__BADR) {
+      index = (j-1)*((*data)->dims)[0] + (i-1);
+      if (indata[index] != VAL__BADR) {
 
 	xin = (double)i;
 	yin = (double)j;
-	astTran2( wcs, 1, &xin, &yin, 1, &xout, &yout );
+	astTran2( hdr->wcs, 1, &xin, &yin, 1, &xout, &yout );
 
 	zd = M_PI_2 - yout;
 	airmass = F77_CALL(sla_airmas)( &zd );
-	printf( "Airmass: %f\n",airmass);
+	printf( "Zenith distance: %f, Airmass: %f\n",zd, airmass);
 
 	printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
-	       index, data[index], (expf((float)airmass*tau)));
-	data[index] *= expf((float)airmass*tau);
+	       index, indata[index], (exp(airmass*(double)tau)));
+	indata[index] *= exp(airmass*(double)tau);
       }
     }
   }

@@ -67,8 +67,7 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
-void smf_correct_extinction(AstFrameSet *, const dim_t[], 
-			    float, float *, int *);
+void smf_correct_extinction( smfData **, float, int *);
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
