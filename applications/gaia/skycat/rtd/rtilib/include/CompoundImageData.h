@@ -12,6 +12,7 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  14/02/00  Created
+ * Peter W. Draper 15/11/05  Added getBlank() and haveBlank().
  */
 
 #include "ImageData.h"
@@ -34,6 +35,9 @@ protected:
     
     // bounds of the compound image
     double minX_, minY_, maxX_, maxY_;
+
+    // value of blank pixel, if known (if haveBlankPixel_ is nonzero)
+    float blank_;
 
 protected:
 
@@ -175,6 +179,10 @@ public:
     double lowCut() {return images_[0]->scaleValue(lowCut_);}
     double minValue() {return images_[0]->scaleValue(minValue_);}
     double maxValue() {return images_[0]->scaleValue(maxValue_);}
+
+    // return the blank value.
+    int haveBlank() {return haveBlank_;}
+    double getBlank();
 };
 
 

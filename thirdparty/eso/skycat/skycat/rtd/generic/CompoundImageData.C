@@ -913,3 +913,13 @@ ImageData* CompoundImageData::copy()
 {
     return new CompoundImageData(*this);
 }
+
+/*
+ * return a blank pixel value. Assume same for all images and cast to 
+ * safest type (makes this call practically useless).
+ */
+double CompoundImageData::getBlank() 
+{
+    return (double) images_[0]->getBlank();
+}
+
