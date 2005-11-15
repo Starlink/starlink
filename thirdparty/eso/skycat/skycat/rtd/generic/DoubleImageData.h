@@ -1,6 +1,4 @@
 // -*-c++-*-
-#ifndef _DoubleImageData_h_
-#define _DoubleImageData_h_
 /*
  * E.S.O. - VLT project 
  *
@@ -89,6 +87,3 @@ public:
     // include declarations for methods that differ only in raw data type
 #   include "ImageTemplates.h"
 };
-
-
-#endif
