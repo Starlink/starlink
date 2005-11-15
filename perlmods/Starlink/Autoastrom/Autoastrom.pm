@@ -42,6 +42,8 @@ use Astro::FITS::Header;
 use Astro::FITS::Header::NDF;
 use Astro::WaveBand;
 
+use Time::HiRes qw/ time /;
+
 use NDF;
 
 use vars qw/ $VERSION $DEBUG /;
@@ -86,8 +88,9 @@ sub new {
   $auto->keeptemps( 0 ) if ( ! defined( $auto->keeptemps ) );
   $auto->match( 'FINDOFF' ) if ( ! defined( $auto->match ) );
   $auto->maxfit( 6 ) if ( ! defined( $auto->maxfit ) );
-  $auto->maxobj( 500 ) if ( ! defined( $auto->maxobj ) );
-  $auto->max_image_obj( 500 ) if ( ! defined( $auto->max_image_obj ) );
+  $auto->max_obj_query( 500 ) if ( ! defined( $auto->max_obj_query ) );
+  $auto->max_obj_image( 500 ) if ( ! defined( $auto->max_obj_image ) );
+  $auto->max_obj_corr( 500 ) if ( ! defined( $auto->max_obj_corr ) );
   $auto->messages( 1 ) if ( ! defined( $auto->messages ) );
   $auto->obsdata( 'source=USER:AST:FITS,angle=0,scale=1,invert=0' ) if ( ! defined( $auto->obsdata ) );
   $auto->temp( tempdir( CLEANUP => ( ! $auto->keeptemps ) ) ) if ( ! defined( $auto->temp ) );
@@ -467,46 +470,73 @@ sub maxfit {
   return $self->{MAXFIT};
 }
 
-=item B<maxobj>
+=item B<max_obj_corr>
+
+Retrieve or set the maximum number of objects to use for correlation.
+
+  my $max_obj_corr = $auto->max_obj_corr;
+  $auto->max_obj_corr( 50 );
+
+Defaults to 500. Useful for speeding up processing by setting to a
+lower number, or possibly obtaining better matches with larger numbers
+of objects. This puts limits on both the query catalogue and the image
+catalogue when used as input to the correlation routine.
+
+=cut
+
+sub max_obj_corr {
+  my $self = shift;
+  if( @_ ) {
+    my $max_obj_corr = shift;
+    $self->{MAX_OBJ_CORR} = $max_obj_corr;
+  }
+  return $self->{MAX_OBJ_CORR};
+}
+
+=item B<max_obj_image>
+
+Retrieve or set the maximum number of objects to use from the image.
+
+  my $max_obj_image = $self->max_obj_image;
+  $self->max_obj_image( 1000 );
+
+Defaults to 500. Useful for speeding up processing time in
+densely-populated fields.
+
+If this limit is smaller than the number of objects detected in the
+image, then the filtering will be done radially from the image centre,
+i.e. it will use those objects nearer the centre.
+
+=cut
+
+sub max_obj_image {
+  my $self = shift;
+  if( @_ ) {
+    my $max_obj_image = shift;
+    $self->{MAX_OBJ_IMAGE} = $max_obj_image;
+  }
+  return $self->{MAX_OBJ_IMAGE};
+}
+
+=item B<max_obj_query>
 
 Retrieve or set the maximum number of objects to retrieve from the
 catalogue server.
 
-  my $maxobj = $auto->maxobj;
-  $auto->maxobj( 1000 );
+  my $max_obj_query = $auto->max_obj_query;
+  $auto->max_obj_query( 1000 );
 
 Defaults to 500.
 
 =cut
 
-sub maxobj {
+sub max_obj_query {
   my $self = shift;
   if( @_ ) {
-    my $maxobj = shift;
-    $self->{MAXOBJ} = $maxobj;
+    my $max_obj_query = shift;
+    $self->{MAX_OBJ_QUERY} = $max_obj_query;
   }
-  return $self->{MAXOBJ};
-}
-
-=item B<max_image_obj>
-
-Retrieve or set the maximum number of objects to use from the image.
-
-  my $max_image_obj = $self->max_image_obj;
-  $self->max_image_obj( 1000 );
-
-Defaults to 500. Useful for speeding up processing time in
-densely-populated fields.
-
-=cut
-
-sub max_image_obj {
-  my $self = shift;
-  if( @_ ) {
-    my $max_image_obj = shift;
-    $self->{MAX_IMAGE_OBJ} = $max_image_obj;
-  }
-  return $self->{MAX_IMAGE_OBJ};
+  return $self->{MAX_OBJ_QUERY};
 }
 
 =item B<messages>
@@ -910,6 +940,10 @@ sub solve {
 # that returns.
   my $cencoords;
   my $radius;
+  my $xmin;
+  my $xmax;
+  my $ymin;
+  my $ymax;
   my $epoch;
   my $frameset;
 
@@ -950,8 +984,8 @@ sub solve {
 
 # Determine the central coordinates and radius of search from information
 # contained in the frameset and the NDF.
-        ( $cencoords, $radius ) = _determine_search_params( frameset => $frameset,
-                                                            ndf => $self->ndf );
+        ( $cencoords, $radius, $xmin, $xmax, $ymin, $ymax ) = _determine_search_params( frameset => $frameset,
+                                                                            ndf => $self->ndf );
         $epoch = $frameset->GetC("Epoch");
         if( ! defined( $epoch ) ) {
           carp "Epoch not defined in FITS headers. Defaulting to 2000.0";
@@ -977,8 +1011,8 @@ sub solve {
 
 # Determine the central coordinates and radius of search from information
 # contained in the frameset and the NDF.
-        ( $cencoords, $radius ) = _determine_search_params( frameset => $frameset,
-                                                            ndf => $self->ndf );
+        ( $cencoords, $radius, $xmin, $xmax, $ymin, $ymax ) = _determine_search_params( frameset => $frameset,
+                                                                                        ndf => $self->ndf );
 
         $epoch = $frameset->GetC("Epoch");
         if( ! defined( $epoch ) ) {
@@ -1006,8 +1040,8 @@ sub solve {
 
 # Determine the central coordinates and radius of search from information
 # contained in the obsdata information and the NDF.
-      ( $cencoords, $radius ) = _determine_search_params( obsdata => $self->obsdata,
-                                                          ndf => $self->ndf );
+      ( $cencoords, $radius, $xmin, $xmax, $ymin, $ymax ) = _determine_search_params( obsdata => $self->obsdata,
+                                                                                      ndf => $self->ndf );
       $frameset = $self->_create_frameset;
       $epoch = $frameset->GetC("Epoch");
       if( ! defined( $epoch ) ) {
@@ -1023,7 +1057,7 @@ sub solve {
 
 # If we have a user-supplied catalogue, use that. Otherwise, use
 # Starlink::Extractor to extract objects from the NDF.
-
+my $start_extract = time();
   my $ndfcat;
   my $filter;
   if( defined( $self->ccdcatalogue ) ) {
@@ -1041,16 +1075,19 @@ sub solve {
       $self->filter( $filter );
     }
     my $ext = new Starlink::Extractor;
+    $ext->quick( 1 );
     $ext->detect_thresh( $self->detection_threshold );
     $ext->phot_apertures( $self->aperture );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
-                             filter => $filter );
+                             filter => $filter,
+                             quality => 0, );
 
     print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
     print "done.\n" if $self->verbose;
   }
-
+my $elapsed_extract = time() - $start_extract;
+print "Source extraction took $elapsed_extract seconds.\n";
 # We cannot do automated astrometry corrections if we have fewer
 # than 4 objects, so croak if we do.
   if( $ndfcat->sizeof < 4 ) {
@@ -1058,32 +1095,35 @@ sub solve {
   }
 
 # Limit the number of objects in the detected catalogue, if necessary.
+my $filter_ndf_start = time();
   my $filtered_ndfcat = new Astro::Catalog;
-  if( $self->max_image_obj && $ndfcat->sizeof > $self->max_image_obj ) {
+  if( $self->max_obj_corr && $ndfcat->sizeof > $self->max_obj_corr ) {
     my @ndfstars = $ndfcat->stars;
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
-                      map { [ $_, $_->get_flux_quantity(waveband => $filter, type => 'MAG_ISO') ] } @ndfstars;
-    @sortedstars = @sortedstars[0..( $self->max_image_obj - 1 )];
+                      map { [ $_, $_->get_flux_quantity( waveband => $filter, type => 'MAG_ISO' ) ] } @ndfstars;
+    @sortedstars = @sortedstars[0..( $self->max_obj_corr - 1 )];
     $filtered_ndfcat->pushstar( @sortedstars );
   } else {
     $filtered_ndfcat = $ndfcat;
   }
-
+my $filter_ndf_elapsed = time() - $filter_ndf_start;
+print "Filtering NDF catalogue took $filter_ndf_elapsed seconds.\n";
 # Check to see if we have a catalogue to read in instead of querying
 # SkyCat.
   my $querycat;
   if( defined( $self->skycat_catalogue_in ) &&
       -e $self->skycat_catalogue_in ) {
-
+my $start_skycat = time();
 # Read in the catalogue.
     print "Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->verbose;
     $querycat = new Astro::Catalog( Format => 'Cluster',
                                     File => $self->skycat_catalogue_in,
                                   );
-
+my $elapsed_skycat = time() - $start_skycat;
+print "Reading SkyCat catalogue off disk took $elapsed_skycat seconds.\n";
   } else {
-
+my $start_skycat = time();
 # Query the SkyCat catalogue.
     my $racen = $cencoords->ra2000;
     my $deccen = $cencoords->dec2000;
@@ -1110,6 +1150,8 @@ sub solve {
       print "Received " . $querycat->sizeof() . " objects from "
             . $self->catalogue . ".\n";
     }
+my $elapsed_skycat = time() - $start_skycat;
+print "SkyCat catalogue retrieval took $elapsed_skycat seconds.\n";
   }
 
   # Again, croak if we have fewer than 4 objects.
@@ -1128,34 +1170,22 @@ sub solve {
         ( defined( $self->skycat_catalogue_in ) &&
           ( ! -e $self->skycat_catalogue_in ||
             $self->skycat_catalogue_in ne $self->skycat_catalogue_out ) ) ) {
+my $write_start = time();
       $querycat->write_catalog( Format => 'Cluster',
                                 File => $self->skycat_catalogue_out,
                               );
+my $write_elapsed = time() - $write_start;
+print "Writing catalogue to disk took $write_elapsed seconds.\n";
       print "Wrote " . $self->skycat_catalogue_out
             . " to disk, storing SkyCat results.\n" if( $self->verbose );
     }
   }
 
 # Add the NDF's WCS to the retrieved catalogue, allowing us to get
-# X and Y positions for the retrieved objects. Take the top brightest
-# objects from the retrieved catalogue if necessary.
-  my $take_brightest = 0;
-  if( $self->maxobj && $querycat->sizeof > $self->maxobj ) {
-    $take_brightest = 1;
-  }
-
-# Grab the first filter from the first item in the retrieved
-# catalogue. We don't really care all too much about matching filters
-# between the image and the retrieved catalogue so long as objects
-# don't move around. This will allow us to match objects when the
-# filter that the image is in isn't present in the retrieved catalogue
-# (like using 2MASS to calibrate an optical image).
-  my $firstitem = ${$querycat->stars}[0];
-  my @ret_filters = $firstitem->what_filters;
-  my $ret_filter = $ret_filters[0]; #${${$querycat->stars}->[0]->get_filters}->[0];
-  my @filteredstars;
+# X and Y positions for the retrieved objects.
   my $querystars = $querycat->stars;
-
+  my @querystars;
+my $qstar_filter_start = time();
   foreach my $star ( @$querystars ) {
 
     next if ! defined( $star );
@@ -1174,26 +1204,41 @@ sub solve {
     # And update the object's WCS.
     $star->wcs( $frameset );
 
-    my $flux_quantity = $star->get_flux_quantity( waveband => $ret_filter, type => 'MAG' );
+#    if( ( $star->x < $xmax ) &&
+#        ( $star->x > $xmin ) &&
+#        ( $star->y < $ymax ) &&
+#        ( $star->y > $ymin ) ) {
+#      push @querystars, $star;
+#    }
+  }
+my $qstar_filter_middle = time();
+print "Filtering stars to fit on detector took " . ( $qstar_filter_middle - $qstar_filter_start ) . " seconds.\n";
 
-    if( $take_brightest &&
-        defined( $flux_quantity ) &&
-        $flux_quantity =~ /^[\d\.]+/ ) {
-      push @filteredstars, $star;
-    }
-  }
+# Limit the number of stars in the query catalogue for correlation, if
+# necessary. We don't really care which filter we do this in, so take
+# the first filter of the first object in the @querystars list.
+  @querystars = @$querystars;
+  my @queryfilters = $querystars[0]->what_filters;
+  my $queryfilter = $queryfilters[0];
   my $filtered_querycat = new Astro::Catalog;
-  if( $take_brightest ) {
-    @filteredstars = map { $_->[0] }
-                     sort { $a->[1] <=> $b->[1] }
-                     map { [ $_, $_->get_flux_quantity( waveband => $ret_filter, type => 'MAG' ) ] } @filteredstars;
-    my @newstars = @filteredstars[0..( $self->maxobj - 1 )];
-    $filtered_querycat->pushstar( @newstars );
+  if( $self->max_obj_corr && $querycat->sizeof > $self->max_obj_corr ) {
+    my @sortedstars = map { $_->[0] }
+                      sort { $a->[1] <=> $b->[1] }
+                      map { [ $_, $_->get_flux_quantity( waveband => $queryfilter, type => 'MAG' ) ] } @querystars;
+    @sortedstars = @sortedstars[0..( $self->max_obj_corr - 1 )];
+    $filtered_querycat->pushstar( @sortedstars );
   } else {
-    $filtered_querycat = $querycat;
+    $filtered_querycat->pushstar( @querystars );
   }
+my $qstar_filter_elapsed = time() - $qstar_filter_middle;
+print "Sorting and filtering query catalogue took $qstar_filter_elapsed seconds.\n";
+
+  print "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
+  print " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
+  print " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
 
 # Perform the correlation.
+my $corr_start = time();
   my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
                                    catalog2 => $filtered_querycat,
                                    keeptemps => $self->keeptemps,
@@ -1203,7 +1248,8 @@ sub solve {
                                  );
 
   ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
-
+my $corr_elapsed = time() - $corr_start;
+print "Correlation took $corr_elapsed seconds.\n";
 # And yes, croak if the correlation resulted in fewer than 4 matches.
   if( $corrndfcat->sizeof < 4 ) {
     croak "Only " . $corrndfcat->sizeof . " object matched between reference catalogue and extracted catalogue. Cannot perform automated astrometry corrections with so few objects";
@@ -1212,15 +1258,56 @@ sub solve {
 # Merge the two catalogues so that the RA/Dec from 2MASS matches
 # with the x/y from the extracted catalogue. This allows us to
 # perform the astrometric solution.
+my $merge_start = time();
   my $merged = new Astro::Catalog;
   $merged->fieldcentre( Coords => $cencoords );
   my $nobjs = $corrndfcat->sizeof;
+
+  foreach my $item ( @{$corrndfcat->stars} ) {
+    my $id = $item->id;
+
+    my $queryitem = $corrquerycat->popstarbyid( $id );
+    $queryitem = $queryitem->[0];
+
+    next if ! defined( $item );
+    next if ! defined( $queryitem );
+
+    $item->id( $queryitem->id );
+    $item->coords( $queryitem->coords );
+    $item->wcs( $queryitem->wcs );
+
+    my $queryflux = $queryitem->fluxes;
+    my @allfluxes = $queryflux->allfluxes;
+    my $newfluxes = new Astro::Fluxes;
+    foreach my $flux ( @allfluxes ) {
+      my $quantity = $flux->quantity( 'mag' );
+      my $waveband = $flux->waveband;
+      my $type = $flux->type;
+      my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
+      $newfluxes->pushfluxes( $newflux );
+    }
+    $item->fluxes( $newfluxes );
+
+    $merged->pushstar( $item );
+  }
+
+=head1 COMMENT
+
   for( my $i = 1; $i <= $nobjs; $i++ ) {
+#print "####### NEW ITEM ########\n";
+#my $popndf_start = time();
     my $ndfstar = $corrndfcat->popstarbyid( $i );
     $ndfstar = $ndfstar->[0];
+    if( $i == 1 ) {
+      print Dumper $ndfstar;
+    }
+#my $popndf_elapsed = time() - $popndf_start;
+#print "popping NDF star took $popndf_elapsed seconds\n";
+#my $popquery_start = time();
     my $querystar = $corrquerycat->popstarbyid( $i );
     $querystar = $querystar->[0];
-
+#my $popquery_elapsed = time() - $popquery_start;
+#print "popping query star took $popquery_elapsed seconds\n";
 # Skip over if the stars aren't defined.
     next if ( ! defined $ndfstar || ! defined $querystar );
 
@@ -1234,31 +1321,58 @@ sub solve {
 
     # Find the old ID of the NDF star, then take the current query
     # star's magnitudes and stick it into the old NDF star.
+#my $flux_start = time();
     my $ndfcomments = $ndfstar->comment;
     $ndfcomments =~ /^Old ID: (\d+)/;
+#my $comment_elapsed = time() - $flux_start;
+#print "Obtaining comments from NDF star took $comment_elapsed seconds\n";
     my $oldndfid = $1;
+#my $oldndfpop_start = time();
     my $oldndfstar = $ndfcat->popstarbyid( $oldndfid );
     $oldndfstar = $oldndfstar->[0];
+#my $oldndfpop_elapsed = time() - $oldndfpop_start;
+#print "popping old NDF star took $oldndfpop_elapsed seconds\n";
+#my $obtainflux_start = time();
     my $queryflux = $querystar->fluxes;
     my @allfluxes = $queryflux->allfluxes;
     my $newfluxes = new Astro::Fluxes;
+#my $obtainflux_elapsed = time() - $obtainflux_start;
+#print "Obtaining flux measurements took $obtainflux_elapsed seconds\n";
     foreach my $flux ( @allfluxes ) {
+#my $flux_create_start = time();
       my $quantity = $flux->quantity( 'mag' );
       my $waveband = $flux->waveband;
       my $type = $flux->type;
       my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
       $newfluxes->pushfluxes( $newflux );
+#my $flux_create_elapsed = time() - $flux_create_start;
+#print "Time to create new flux and push into fluxes object was $flux_create_elapsed seconds\n";
     }
+#my $pushflux_start = time();
     $oldndfstar->fluxes( $newfluxes );
+#my $pushflux_elapsed = time() - $pushflux_start;
+#print "Adding fluxes to old object took $pushflux_elapsed seconds\n";
+#my $pushobject_start = time();
     $ndfcat->pushstar( $oldndfstar );
+#my $pushobject_elapsed = time() - $pushobject_start;
+#print "Pushing old object back into catalogue took $pushobject_elapsed seconds\n";
+#my $flux_elapsed = time() - $flux_start;
+#print "Dealing with flux took $flux_elapsed seconds\n";
   }
 
+=cut
+
+my $merge_elapsed = time() - $merge_start;
+print "Catalogue merging took $merge_elapsed seconds\n";
 # Output the merged catalogue to disk, if requested.
   if( defined( $self->matchcatalogue ) ) {
     $merged->write_catalog( Format => 'Cluster', File => $self->matchcatalogue );
   }
 
+  print "Input catalogue to astrom has " . $merged->sizeof . " objects\n";
+
 # Solve astrometry.
+my $astrom_start = time();
   my $astrom = new Starlink::Astrom( catalog => $merged,
                                      keepfits => $self->keepfits,
                                      keeptemps => $self->keeptemps,
@@ -1270,7 +1384,8 @@ sub solve {
                                      verbose => $self->verbose );
 
   my $newwcs = $astrom->solve;
-
+my $astrom_elapsed = time() - $astrom_start;
+print "Astrom calculation took $astrom_elapsed seconds.\n";
 # Stick the WCS into the NDF, if requested.
   if( $self->insert ) {
     my $STATUS = &NDF::SAI__OK;
@@ -1305,13 +1420,26 @@ sub solve {
   }
 
 # Modify the RA/Dec for each item.
-  my $items = $ndfcat->stars();
-  my $printed = 0;
-  foreach my $item ( @{$items} ) {
+  foreach my $item ( @{$ndfcat->stars} ) {
     my( $ra, $dec ) = $frameset->Tran2( [$item->x],
                                         [$item->y],
                                         1 );
     my $coords = new Astro::Coords( ra    => $ra->[0],
+                                    dec   => $dec->[0],
+                                    type  => 'J2000',
+                                    units => 'radians',
+                                  );
+    $item->coords( $coords );
+    $item->wcs( $newwcs );
+    $item->preferred_magnitude_type( 'MAG_APER1' );
+  }
+  print "Updated WCS of objects in detected object catalogue.\n" if $self->verbose;
+
+  foreach my $item ( @{$merged->stars} ) {
+    my( $ra, $dec ) = $frameset->Tran2( [$item->x],
+                                        [$item->y],
+                                        1 );
+    my $coords =  new Astro::Coords( ra    => $ra->[0],
                                     dec   => $dec->[0],
                                     type  => 'J2000',
                                     units => 'radians',
@@ -1325,13 +1453,14 @@ sub solve {
   if( defined( $self->detected_catalogue ) ) {
     $ndfcat->write_catalog( Format => 'Cluster',
                             File => $self->detected_catalogue );
+    print "Wrote detected object catalogue to " . $self->detected_catalogue . ".\n" if $self->verbose;
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
   $self->result_catalogue( $ndfcat );
 
 # And return the new catalogue.
-  return $self->result_catalogue;
+  return ( $self->result_catalogue, $merged );
 
 }
 
@@ -1577,7 +1706,9 @@ sub _determine_search_params {
     $radius = $rad_pixels * $obsdata->{SCALE} / 60;
   }
 
-  return ( $cencoords, $radius );
+  $radius /= sqrt(2);
+
+  return ( $cencoords, $radius, $lbnd[0], $ubnd[0], $lbnd[1], $ubnd[1] );
 
 }
 
