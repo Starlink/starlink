@@ -107,7 +107,7 @@
 
 *  Check that the supplied character variables LOCS are long enough to
 *  hold HDS locators.
-      IF( LEN( LOCS( 1 ) ) .NE. DAT__SZLOC ) THEN
+      IF( LEN( LOCS( 1 ) ) .LT. DAT__SZLOC ) THEN
          STATUS = IRQ__LSHRT
          CALL ERR_REP( 'IRQ1_NEW_ERR1',
      :  'IRQ_NEW: Declared length of character variables within LOCS'//

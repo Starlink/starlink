@@ -330,7 +330,7 @@ void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1],
              int *status ){
    DECLARE_INTEGER(INDF);
    DECLARE_CHARACTER_DYN(XNAME);  
-   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC+1,5);  
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( indf, INDF );
