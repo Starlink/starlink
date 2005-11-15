@@ -97,14 +97,18 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
+      INTEGER MXDIM              ! Max no. of axes
+      PARAMETER ( MXDIM = 50 )
+
+*  Local Variables:
       CHARACTER ATTR*10          ! AST attribute name
       CHARACTER BUFFER*80        ! Text buffer
       CHARACTER LAB*50           ! Axis label
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
-      DOUBLE PRECISION C( NDF__MXDIM) ! Buffer for a single position
+      DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
       INTEGER CI                 ! CAT identifier for catalogue
-      INTEGER COLID( 0:NDF__MXDIM )! CAT identifiers for columns
+      INTEGER COLID( 0:MXDIM )   ! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
       INTEGER I                  ! Position index
       INTEGER IAT                ! No. of characters in string
