@@ -170,22 +170,12 @@
 //        Added direct NDF access commands. These are used to access cubes. 
 //-
 
-#include "config.h"  //  From skycat util
+#include <cstring>
+#include <cstdlib>
+#include <csignal>
+#include <iostream>
+#include <cctype>
 
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#ifdef HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
-#include <iostream.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <float.h>
@@ -304,13 +294,16 @@ public:
 //
 //-
 static Tk_ImageType starRtdImageType = {
-    "rtdimage",
-    StarRtdImage::CreateImage,
-    TkImage::GetImage,
-    TkImage::DisplayImage,
-    TkImage::FreeImage,
-    TkImage::DeleteImage,
-    (Tk_ImageType *) NULL       /* nextPtr */
+    "rtdimage",                          /* name */
+    StarRtdImage::CreateImage,           /* createProc */
+    TkImage::GetImage,                   /* getProc */
+    TkImage::DisplayImage,               /* displayProc */
+    TkImage::FreeImage,                  /* freeProc */
+    TkImage::DeleteImage,                /* deleteProc */
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    (Tk_ImagePostscriptProc *) NULL,     /* postscriptProc */
+#endif
+    (Tk_ImageType *) NULL                /* nextPtr */
 };
 
 
@@ -785,7 +778,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
     if ( image_ ) {
 
         //  Create a stream for any messages about the saving process.
-        STRSTD::ostrstream message;
+        ostrstream message;
         if ( origset_ ) {
 
             //  WCS has been modified so we need to store this in the
@@ -3246,7 +3239,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_*4];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_ellipse "
            << cx << " " << cy << " "
@@ -3299,7 +3292,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
     char buf[eval_buf_size_*4];
-    STRSTD::ostrstream os(buf, sizeof(buf));
+    ostrstream os(buf, sizeof(buf));
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_rotbox "
            << cx << " " << cy << " "
@@ -4530,7 +4523,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
 
     //  Loop though all NDFs getting the required information.
-    STRSTD::ostrstream os;
+    ostrstream os;
     for ( int i = 1; i <= numNDFs; i++ ) {
         char name[MAXNDFNAME], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
         ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );
