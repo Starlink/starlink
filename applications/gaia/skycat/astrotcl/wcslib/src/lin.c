@@ -166,6 +166,7 @@ const char *linrev_errmsg[] = {
 #include <malloc.h>
 #else
 #include <stdlib.h>
+#endif
 #else
 #include <malloc.h>
 #endif
