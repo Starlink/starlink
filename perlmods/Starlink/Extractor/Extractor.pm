@@ -59,6 +59,8 @@ use Starlink::AMS::Task;
 use Starlink::EMS qw/ :sai get_facility_error /;
 use Astro::Catalog;
 
+use NDF;
+
 use base qw/Exporter/;
 
 use vars qw/ $VERSION @EXPORT_OK $DEBUG /;
@@ -228,6 +230,9 @@ sub extract {
 
   my %args = @_;
 
+# Set up a new Astro::Catalog object.
+  my $catalog = new Astro::Catalog;
+
 # Deal with arguments.
   if( !defined( $args{'frame'} ) ) {
     croak "Must pass frame name in order to do source extraction";
@@ -240,6 +245,10 @@ sub extract {
   }
   my $ndf = $args{'frame'};
   my $filter = $args{'filter'};
+  my $quality = $args{'quality'};
+  if( ! defined( $quality ) ) {
+    $quality = -1;
+  }
 
 # Try to find the extractor binary. First, check to see if
 # the EXTRACTOR_DIR environment variable has been set.
@@ -265,26 +274,121 @@ sub extract {
 # Write the parameter file.
   $self->_write_param_temp_file;
 
-# Do the extraction.
-  my $ams = new Starlink::AMS::Init(1);
-  if( ! defined $TASK ) {
-    $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
-  }
-  my $STATUS = $TASK->contactw;
-  if( ! $STATUS ) {
-    croak "Could not contact EXTRACTOR monolith";
-  }
-  $STATUS = $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
-  if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
-    ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
-    croak "Error in running EXTRACTOR: $STATUS - $text";
-  }
+# If the user requested a checkerboard pattern, do it now.
+  if( defined( $self->checkerboard ) ) {
 
-# Form a catalogue from Astro::Catalog.
-  my $catalog = new Astro::Catalog( Format => 'SExtractor',
-                                    File => $self->_catalog_file_name,
-                                    ReadOpt => { Filter => $filter },
-                                  );
+    # Get a new temporary file name for the catalog.
+    $self->_catalog_file_name( 1 );
+    $self->catalog_name( $self->_catalog_file_name );
+    $self->_write_config_temp_file;
+
+    my $segments = $self->checkerboard->{SEGMENTS};
+    my $interval = $self->checkerboard->{INTERVAL};
+
+    # Calculate the height and width of the regions. We need to get
+    # the NDF dimensions for this.
+    my $STATUS = 0;
+    err_begin( $STATUS );
+    ndf_begin();
+    ndf_find( &NDF::DAT__ROOT(), $ndf, my $ndf_id, $STATUS );
+    ndf_bound( $ndf_id, 2, my @lbnd, my @ubnd, my $ndim, $STATUS );
+    ndf_annul( $ndf_id, $STATUS );
+    ndf_end( $STATUS );
+    if( $STATUS != &NDF::SAI__OK ) {
+      my ( $oplen, @errs );
+      do {
+        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+        push @errs, $opstr;
+      } until ( $oplen == 1 );
+      err_annul( $STATUS );
+      err_end( $STATUS );
+      croak "Error determining NDF pixel bounds:\n" . join "\n", @errs;
+    }
+    err_end( $STATUS );
+    if( $ndim != 2 ) {
+      croak "Cannot run SExtractor on a non-2D image\n";
+    }
+
+    my $height = int( ( $ubnd[1] - $lbnd[1] ) / $segments );
+    my $width = int( ( $ubnd[0] - $lbnd[0] ) / $segments );
+
+    # Calculate the image regions.
+    my %regions;
+    for my $i ( 1 .. $segments ) {
+      for my $j ( 1 .. $segments ) {
+        $regions{ $segments * ( $j - 1 ) + $i } =
+          { x_start => ( $i - 1 ) * $width + 1,
+            y_start => ( $j - 1 ) * $height + 1,
+            x_end => $i * $width,
+            y_end => $j * $height,
+          };
+      }
+    }
+
+    # Now, start at 1 and increment by $increment until we hit
+    # ($segments**2).
+    for ( my $k = 1; $k < ( $segments**2 ); $k = $k + $interval ) {
+
+      my $ndfregion = '(';
+      $ndfregion .= $regions{$k}->{x_start};
+      $ndfregion .= ":";
+      $ndfregion .= $regions{$k}->{x_end};
+      $ndfregion .= ",";
+      $ndfregion .= $regions{$k}->{y_start};
+      $ndfregion .= ":";
+      $ndfregion .= $regions{$k}->{y_end};
+      $ndfregion .= ")";
+
+      # Do the extraction.
+      my $ams = new Starlink::AMS::Init(1);
+      if( ! defined $TASK ) {
+        $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+      }
+      my $STATUS = $TASK->contactw;
+      if( ! $STATUS ) {
+        croak "Could not contact EXTRACTOR monolith";
+      }
+      $STATUS = $TASK->obeyw("extract", "image=$ndf$ndfregion config=" . $self->_config_file_name );
+      if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+        ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+        croak "Error in running EXTRACTOR: $STATUS - $text";
+      }
+
+      # Form a catalogue from Astro::Catalog.
+      my $newcatalog = new Astro::Catalog( Format => 'SExtractor',
+                                           File => $self->_catalog_file_name,
+                                           ReadOpt => { Filter => $filter },
+                                         );
+
+      # Merge it in with the main catalog;
+      my @newstars = $newcatalog->allstars;
+      $catalog->pushstar( @newstars );
+    }
+
+  } else {
+
+    # Just do the extraction.
+    my $ams = new Starlink::AMS::Init(1);
+    if( ! defined $TASK ) {
+      $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
+    }
+    my $STATUS = $TASK->contactw;
+    if( ! $STATUS ) {
+      croak "Could not contact EXTRACTOR monolith";
+    }
+    $STATUS = $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
+    if( $STATUS != SAI__OK && $STATUS != &Starlink::ADAM::DTASK__ACTCOMPLETE ) {
+      ( my $facility, my $ident, my $text ) = get_facility_error( $STATUS );
+      croak "Error in running EXTRACTOR: $STATUS - $text";
+    }
+
+    # Form a catalogue from Astro::Catalog.
+    $catalog = new Astro::Catalog( Format => 'SExtractor',
+                                   File => $self->_catalog_file_name,
+                                   ReadOpt => { Filter => $filter,
+                                                Quality => $quality },
+                                 );
+  }
 
 # Delete the configuration file.
   $self->_delete_config_temp_file if ! $DEBUG;
@@ -330,6 +434,64 @@ sub defaults {
   if( ! defined( $self->mag_gamma ) ) { $self->mag_gamma( 4.0 ); }
   if( ! defined( $self->filter ) ) { $self->filter( 'N' ); }
   if( ! defined( $self->verbose_type ) ) { $self->verbose_type( 'QUIET' ); }
+  if( ! defined( $self->quick ) ) { $self->quick( 0 ); }
+}
+
+=item B<checkerboard>
+
+If set, divide up the image into a checkerboard pattern and only run
+extraction on a certain spacing of blocks.
+
+  my $checker = $extractor->checkerboard;
+  $extractor->checkerboard( segments => $segments,
+                          interval => $interval );
+
+There are two mandatory named arguments. The first denotes how many segments per side to divide the image up into. The second denotes the frequency of blocks to use.
+
+For example, if segments is set to 8 and interval is set to 2, then
+the image is broken up into 64 blocks (8 segments per side), and every
+other block is used. This is exactly a checkerboard pattern, taking only
+the black squares.
+
+If either segments or interval is 1, the entire image is used.
+
+This method returns a hash reference.
+
+=cut
+
+sub checkerboard {
+  my $self = shift;
+  if( @_ ) {
+    my %args = @_;
+    $self->{CHECKERBOARD} = { SEGMENTS => $args{'segments'},
+                              INTERVAL => $args{'interval'} };
+  }
+  return $self->{CHECKERBOARD};
+}
+
+=item B<quick>
+
+Whether or not to do a quick extraction.
+
+  my $quick = $extractor->quick;
+  $extractor->quick( 1 );
+
+If set to true, then no astrometric or windowing results will be
+calculated. Further, the only photometric results to be calculated
+will be the _ISO and _APER1 parameters. Object morphology results will
+be calculated.
+
+Defaults to false.
+
+=cut
+
+sub quick {
+  my $self = shift;
+  if( @_ ) {
+    my $quick = shift;
+    $self->{QUICK} = $quick;
+  }
+  return $self->{QUICK};
 }
 
 =item B<temp_dir>
@@ -425,15 +587,17 @@ sub _write_param_temp_file {
 
   print $fh "NUMBER\n";
   print $fh "X_IMAGE\n";
+  print $fh "X_PIXEL\n" if defined $self->checkerboard;
   print $fh "ERRX2_IMAGE\n";
-  print $fh "XWIN_IMAGE\n";
-  print $fh "ERRX2WIN_IMAGE\n";
+  print $fh "XWIN_IMAGE\n" if ! $self->quick;
+  print $fh "ERRX2WIN_IMAGE\n" if ! $self->quick;
   print $fh "Y_IMAGE\n";
+  print $fh "Y_PIXEL\n" if defined $self->checkerboard;
   print $fh "ERRY2_IMAGE\n";
-  print $fh "YWIN_IMAGE\n";
-  print $fh "ERRY2WIN_IMAGE\n";
-  print $fh "ALPHA_J2000\n";
-  print $fh "DELTA_J2000\n";
+  print $fh "YWIN_IMAGE\n" if ! $self->quick;
+  print $fh "ERRY2WIN_IMAGE\n" if ! $self->quick;
+  print $fh "ALPHA_J2000\n" if ! $self->quick;
+  print $fh "DELTA_J2000\n" if ! $self->quick;
   print $fh "FLUX_ISO\n";
   print $fh "FLUXERR_ISO\n";
   print $fh "MAG_ISO\n";
@@ -442,31 +606,31 @@ sub _write_param_temp_file {
   print $fh "FLUXERR_APER\n";
   print $fh "MAG_APER\n";
   print $fh "MAGERR_APER\n";
-  print $fh "FLUX_ISOCOR\n";
-  print $fh "FLUXERR_ISOCOR\n";
-  print $fh "MAG_ISOCOR\n";
-  print $fh "MAGERR_ISOCOR\n";
-  print $fh "FLUX_AUTO\n";
-  print $fh "FLUXERR_AUTO\n";
-  print $fh "MAG_AUTO\n";
-  print $fh "MAGERR_AUTO\n";
-  print $fh "FLUX_BEST\n";
-  print $fh "FLUXERR_BEST\n";
-  print $fh "MAG_BEST\n";
-  print $fh "MAGERR_BEST\n";
+  print $fh "FLUX_ISOCOR\n" if ! $self->quick;
+  print $fh "FLUXERR_ISOCOR\n" if ! $self->quick;
+  print $fh "MAG_ISOCOR\n" if ! $self->quick;
+  print $fh "MAGERR_ISOCOR\n" if ! $self->quick;
+  print $fh "FLUX_AUTO\n" if ! $self->quick;
+  print $fh "FLUXERR_AUTO\n" if ! $self->quick;
+  print $fh "MAG_AUTO\n" if ! $self->quick;
+  print $fh "MAGERR_AUTO\n" if ! $self->quick;
+  print $fh "FLUX_BEST\n" if ! $self->quick;
+  print $fh "FLUXERR_BEST\n" if ! $self->quick;
+  print $fh "MAG_BEST\n" if ! $self->quick;
+  print $fh "MAGERR_BEST\n" if ! $self->quick;
   print $fh "ELLIPTICITY\n";
   print $fh "THETA_IMAGE\n";
   print $fh "ERRTHETA_IMAGE\n";
-  print $fh "THETA_SKY\n";
-  print $fh "ERRTHETA_SKY\n";
+  print $fh "THETA_SKY\n" if ! $self->quick;
+  print $fh "ERRTHETA_SKY\n" if ! $self->quick;
   print $fh "A_IMAGE\n";
   print $fh "ERRA_IMAGE\n";
   print $fh "B_IMAGE\n";
   print $fh "ERRB_IMAGE\n";
-  print $fh "A_WORLD\n";
-  print $fh "ERRA_WORLD\n";
-  print $fh "B_WORLD\n";
-  print $fh "ERRB_WORLD\n";
+  print $fh "A_WORLD\n" if ! $self->quick;
+  print $fh "ERRA_WORLD\n" if ! $self->quick;
+  print $fh "B_WORLD\n" if ! $self->quick;
+  print $fh "ERRB_WORLD\n" if ! $self->quick;
   print $fh "ISOAREA_IMAGE\n";
   print $fh "FLAGS\n";
 
@@ -530,6 +694,12 @@ temp_dir method) and the filename "config<n>.sex", where
 
 sub _config_file_name {
   my $self = shift;
+  if( @_ ) {
+    my $new = shift;
+    if( $new == 1 ) {
+      $self->{_CONFIG_FILE_NAME} = undef;
+    }
+  }
   if( ! defined( $self->{_CONFIG_FILE_NAME} ) ) {
     my $tmp = new File::Temp( UNLINK => 0 );
     $self->{_CONFIG_FILE_NAME} = "$tmp";
@@ -576,6 +746,12 @@ temp_dir method) and the filename "extract<n>.cat", where
 
 sub _catalog_file_name {
   my $self = shift;
+  if( @_ ) {
+    my $new = shift;
+    if( $new == 1 ) {
+      $self->{_CATALOG_FILE_NAME} = undef;
+    }
+  }
   if( ! defined( $self->{_CATALOG_FILE_NAME} ) ) {
     my $tmp = new File::Temp( UNLINK => 0 );
     $self->{_CATALOG_FILE_NAME} = "$tmp";
