@@ -93,10 +93,10 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   if ( *status != SAI__OK ) return;
 
   /* Test whether FITS extension is present */
-  ndfXstat( indf, "FITS", hasfits, status);
+  ndfXstat( indf, "FITS", &hasfits, status);
+
   if ( hasfits == 0) {
     if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
       msgOut("smf_fits_rdhead", "Input file does not have a FITS extension", status);
     }
     return;
