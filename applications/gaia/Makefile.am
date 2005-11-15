@@ -79,7 +79,7 @@ $(TCL_FILES) $(TCL_TEST_FILES):
 	export TCL_LIBRARY; unset TCL_LIBRARY;\
 	export TK_LIBRARY; unset TK_LIBRARY;\
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
-	./configure --prefix=$${pwd}/built --disable-shared @X11_INCLUDES@ @X11_LIBRARIES@;\
+	./configure --prefix=$${pwd}/built @X11_INCLUDES@ @X11_LIBRARIES@;\
 	make -e World)
 	for f in $(SCRIPT_PLACES); do \
 	   cp -p $${f} . ;\
@@ -92,13 +92,13 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	(cd ./skycat; \
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL; \
-	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
+	export SKYCAT_WRAPPER_DIR; unset SKYCAT_WRAPPER_DIR; \
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
-	cp -p ./built/bin/rtdClient$(EXEEXT) .
+	cp -p ./built/lib/rtd/demos/rtdClient$(EXEEXT) .
 	cp -p ./built/bin/rtdServer$(EXEEXT) .
-	cp -p ./built/bin/rtdCubeDisplay$(EXEEXT) .
+	cp -p ./built/lib/rtd/demos/rtdCubeDisplay$(EXEEXT) .
 	cp -p ./built/include/rtd/config.h rtdConfig.h
 	cp -p ./built/include/rtd/rtdImageEvent.h .
 	cp -p ./built/lib/librtdImgEvt.a .
