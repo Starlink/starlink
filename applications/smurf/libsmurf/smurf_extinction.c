@@ -105,13 +105,14 @@ void smurf_extinction( int * status ) {
   int nout;                  /* Number of output data points */
   void * outdataArr[1];      /* Pointer to output data */
   float * outdata = NULL;    /* Pointer to actual output data */
-  int outndf = 0;            /* Output NDF identifier */
+  int ondf = 0;              /* Output NDF identifier */
   float tau;                 /* Zenith tau at this wavelength */
   float tauArr[2];           /* Array containing the tau values */
   float taubeg;              /* Tau at start */
   float tauend;              /* Tau at end */
   int ntau;                  /* Number of tau values read from cmd line */
-  AstFrameSet * wcs = NULL;  /* Pointer to frame set */
+  AstFrameSet * iwcs = NULL;  /* Pointer to input frame set */
+  AstFrameSet * owcs = NULL;  /* Pointer to output frame set */
   Grp *igrp = NULL;
   Grp *ogrp = NULL;
   int size;                  /* Number of files in input group */
@@ -119,11 +120,22 @@ void smurf_extinction( int * status ) {
   int i;                     /* Counter, index */
   int outsize;               /* Total number of NDF names in the output group */
 
-  smfDA * da;
-  smfData * data;
-  smfFile * file;
-  smfHead * head;
-  char *pname;
+  smfDA * ida;
+  smfData * idata;
+  smfFile * ifile;
+  smfHead * ihdr;
+  char *ipname;
+
+  smfDA * oda;
+  smfData * odata;
+  smfFile * ofile;
+  smfHead * ohdr;
+  char *opname;
+
+  dim_t index;
+  int j;
+  double *indata2;
+  double *outdata2;
 
   /* Main routine */
 
@@ -138,27 +150,35 @@ void smurf_extinction( int * status ) {
   /* Get output file(s) */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
-
   for (i=1; i<=size; i++) {
 
     /* Q&D open the input file solely to propagate it to the output file */
     /* Copy from smurf_flatfield */
     ndgNdfas( igrp, i, "READ", &indf, status );
-    ndgNdfpr( indf, " ", ogrp, i, &outndf, status );
+    ndgNdfpr( indf, " ", ogrp, i, &ondf, status );
     ndfAnnul( &indf, status);
 
-    /* Open file and store input data in smfData struct */
-    smf_open_file( igrp, i, "READ", &data, status);
+    /* Open input file and store data in smfData struct */
+    smf_open_file( igrp, i, "READ", &idata, status);
 
-    file = data->file;
-    pname = file->name;
-    da = data->da;
+    ifile = idata->file;
+    ipname = ifile->name;
+    ida = idata->da;
+    ihdr = idata->hdr;
+
+    smf_open_file( ogrp, i, "WRITE", &odata, status);
+    
+    ofile = odata->file;
+    opname = ofile->name;
+    oda = odata->da;
+    ohdr = odata->hdr;
+
 
     /* Check if data are flatfielded */
-    if ( da != NULL ) {
+    if ( ida != NULL ) {
       msgOutif(MSG__VERB, " ", "Data require flatfielding", status);
       /* Call flat field routines... */
-
+      /* smf_flatfield(...); */
     } else { 
       msgOutif(MSG__VERB, " ", "Data already flatfielded", status);
     }
@@ -172,7 +192,7 @@ void smurf_extinction( int * status ) {
        tau */
 
     /* Do we have 2-d image data? */
-    if (data->ndims == 2) {
+    if (idata->ndims == 2) {
       /* Yes - ask user for optical depth */
 
       /* Get zenith tau from user */
@@ -206,6 +226,7 @@ void smurf_extinction( int * status ) {
       /*      ndfMap( indf, "DATA", "_REAL", "READ", &indataArr, &nin, status);*/
       /*      ndfMap( outndf, "DATA", "_REAL", "WRITE", &outdataArr, &nout, status );*/
 
+
       if ( *status != SAI__OK ) {
 	if ( nin != nout) {
 	  *status = SAI__ERROR;
@@ -234,11 +255,33 @@ void smurf_extinction( int * status ) {
       }
   
       /* Get the world coordinate information */
-      ndfGtwcs( indf, &wcs, status );
+      /* Not needed now... */
+      /*      ndfGtwcs( indf, &wcs, status );*/
+      /* Copy wcs info to output file */
+      iwcs = ihdr->wcs;
+      ohdr->wcs = iwcs;
+      owcs = ohdr->wcs;
+      
+      indata2 = (idata->pntr)[0];
+      for (j = 1; j <= (idata->dims)[1]; j++) {
+	for (i = 1; i <= (idata->dims)[0]; i++) {
+	  index = (j-1)*(idata->dims)[0] + (i-1);
+	  if (indata2[index] != VAL__BADR) {
+	    printf("Index: %" DIM_T_FMT "  Data: %f\n",
+		   index, indata2[index]);
+	    /*	    outdata2[index] = indata2[index];*/
+	  }
+	}
+      }
+      /* Copy data */
+      (odata->pntr)[0] = outdata2;
+      /*      odata->pntr[0] = ((*idata)->pntr)[0];*/
+
+      /*      astShow(owcs);*/
 
       /* Select the AZEL system */
-      if ( (wcs != NULL) || (*status == SAI__OK) ) 
-	astSetC( wcs, "SYSTEM", "AZEL" );
+      if ( (owcs != NULL) || (*status == SAI__OK) ) 
+	astSetC( iwcs, "SYSTEM", "AZEL" );
 
       if (!astOK) {
 	if (*status == SAI__OK) {
@@ -251,20 +294,20 @@ void smurf_extinction( int * status ) {
 	memmove( outdata, indata, (size_t)(nin*sizeof(indata[0])) );
 
       /* New API for following: pass smfData struct */
-      /*      smf_correct_extinction( data, tau, status);*/
+      smf_correct_extinction( &idata, tau, status);
     
 
-    } else if (data->ndims == 3 ) {
+    } else if (idata->ndims == 3 ) {
 
       /* Loop over number of time slices */
       /* Retrieve the specific timeslice */
 
-      smf_tslice_ast( data, i, status);
+      smf_tslice_ast( idata, i, status);
 
       /* HACK: get it to complain when time-series data are passed */
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
-	msgSeti("ND", data->ndims);
+	msgSeti("ND", idata->ndims);
 	errRep("smurf_extinction", 
 	       "Number of dimensions of input file, ^ND, not yet supported", status);
       }
@@ -272,7 +315,7 @@ void smurf_extinction( int * status ) {
       /* HACK: get it to complain when time-series data are passed */
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
-	msgSeti("ND", data->ndims);
+	msgSeti("ND", idata->ndims);
 	errRep("smurf_extinction", 
 	       "Number of dimensions of input file, ^ND, not yet supported", status);
       }
