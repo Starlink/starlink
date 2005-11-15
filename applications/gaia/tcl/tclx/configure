@@ -13936,33 +13936,31 @@ echo "${ECHO_T}$TCLSH_PROG" >&6
 
 
 #--------------------------------------------------------------------
-# These are for tclxConfig.sh
+# These are for tclxConfig.sh (unix only).
 #--------------------------------------------------------------------
 
-if test "${TEA_PLATFORM}" = "unix" ; then
-
-   # pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
-   eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
-   if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
-       eval TCLX_LIB_FLAG="-ltclx${PACKAGE_VERSION}${DBGX}"
-   else
-       eval TCLX_LIB_FLAG="-ltclx`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
-   fi
-   TCLX_BUILD_LIB_SPEC="-L`pwd` ${TCLX_LIB_FLAG}"
-   TCLX_LIB_SPEC="-L${pkglibdir} ${TCLX_LIB_FLAG}"
+# pkglibdir must be a fully qualified path and (not ${exec_prefix}/lib)
+eval pkglibdir="${libdir}/${PACKAGE_NAME}${PACKAGE_VERSION}"
+if test "${TCL_LIB_VERSIONS_OK}" = "ok"; then
+    eval TCLX_LIB_FLAG="-ltclx${PACKAGE_VERSION}${DBGX}"
+else
+    eval TCLX_LIB_FLAG="-ltclx`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
+fi
+TCLX_BUILD_LIB_SPEC="-L`pwd` ${TCLX_LIB_FLAG}"
+TCLX_LIB_SPEC="-L${pkglibdir} ${TCLX_LIB_FLAG}"
 
 
 
 
-   # TCLX_SRC_DIR must be a fully qualified path
-   eval TCLX_SRC_DIR="$srcdir"
-   TCLX_SRC_DIR=`cd "${TCLX_SRC_DIR}"; pwd`
+# TCLX_SRC_DIR must be a fully qualified path
+eval TCLX_SRC_DIR="$srcdir"
+TCLX_SRC_DIR=`cd "${TCLX_SRC_DIR}"; pwd`
 
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
-             ac_config_files="$ac_config_files unix/tclxConfig.sh"
+          ac_config_files="$ac_config_files unix/tclxConfig.sh"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -14935,8 +14933,6 @@ if test "$no_create" != yes; then
   $ac_cs_success || { (exit 1); exit 1; }
 fi
 
-
-fi
           ac_config_files="$ac_config_files Makefile"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

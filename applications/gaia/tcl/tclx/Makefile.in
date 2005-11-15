@@ -163,7 +163,7 @@ PKG_CFLAGS	= @PKG_CFLAGS@
 
 DEFS		= @DEFS@ $(PKG_CFLAGS)
 
-CONFIG_CLEAN_FILES = Makefile
+CONFIG_CLEAN_FILES = Makefile unix/tclxConfig.sh
 
 CPPFLAGS	= @CPPFLAGS@
 LIBS		= @PKG_LIBS@ @LIBS@
@@ -394,6 +394,7 @@ install-lib-binaries:
 	    echo " Install pkgIndex.tcl $(DESTDIR)$(pkglibdir)"; \
 	    $(INSTALL_DATA) pkgIndex.tcl $(DESTDIR)$(pkglibdir); \
 	fi
+	$(INSTALL_DATA) unix/tclxConfig.sh $(DESTDIR)$(libdir)
 
 #========================================================================
 # Install binary executables (e.g. .exe files and dependent .dll files)
