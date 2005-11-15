@@ -673,7 +673,7 @@ void FitsIO::padFile(FILE* f, int size)
 /* 
  * write a fits file from the data and header, if present
  */
-int FitsIO::write(const char *filename) const
+int FitsIO::write(const char *filename)
 {
      char tmpfilename[1024];
     int istemp = 1;
