@@ -26,6 +26,9 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 *     the goodness of fit between a given Gaussian clump model and the
 *     residual data array, or the rate of change of the modified
 *     chi-squared with respect to one of the model parameters.
+*
+*     The basic chi-squared is normalised by the sum of the weights (not
+*     the number of degrees of freedom as in the Stutzki & Gusten paper).
 
 *  Parameters:
 *     ndim
@@ -93,6 +96,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    double ret;             /* Returned value */
    double rr;              /* A factor for the residual to suppress -ve residuals */
    double t;               /* Temporary storage */
+   double wf;              /* Weight factor */
    double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
    int i;                  /* Parameter index */
@@ -104,7 +108,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    static double v_off;    /* Offset on vel axis from data to model peak */
    static double x0_off;   /* Offset on axis 0 from data to model peak */
    static double x1_off;   /* Offset on axis 1 from data to model peak */
-   static int inv = 0;
 
 /* Initialise */
    ret = VAL__BADD;
@@ -114,10 +117,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 
 /* If neccessary, re-calculate cached intermediate values */
    if( newp ) {
-
-      inv++;
-/*      printf( "cupidGCChiSq invocation %d\n", inv ); */
-
 
 /* The difference between the model peak value and the data peak value. */
       pdiff = par[ 0 ] + par[ 1 ] - cupidGC.ymax;
@@ -155,7 +154,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 
 /* If the changing of the model parameters make little difference to the
    residuals at a given place in the data, then those residuals should be
-   given less wieght since they could dominate the chi-squared value. If
+   given less weight since they could dominate the chi-squared value. If
    the residual at the current pixel has not change by much since the 
    previous call, reduce the weight associated with the pixel. However,
    if the parameter has not change by much then you would not expect the
@@ -164,17 +163,15 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    last call. In order to avoid instability, we only do this modification 
    for a few iterations near the start, and then allow the fitting
    process to complete with fixed weights. */
-/*
-         if( cupidGC.nf > 2 && cupidGC.nf < 10 ) {
+         if( cupidGC.nf > 2 && cupidGC.nf <= 2 + cupidGC.nwf ) {
             if( res != 0.0 && m != 0.0 ) {
                wf = ( res - *pu )/ res;
                wf /= ( m - *pm )/ m;
                wf = fabs( wf );
-               wf = ( wf < 0.1 ) ? 0.1 : ( wf > 1.0 ) ? 1.0 : wf ;
+               wf = ( wf < cupidGC.minwf ) ? cupidGC.minwf : ( wf > cupidGC.maxwf ) ? cupidGC.maxwf : wf ;
                *pw *= wf;
             }
          }
-*/
 
 /* Save the residual and model value at this pixel */
          *pu = res;
@@ -219,10 +216,9 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
          }
       }
 
-/* Divide by the number of degrees of freedom (the sum of the weights
-   minus the number of parameters being fitted). */
-      cupidGC.ndf = wsum - ( ( ndim == 1 ) ? 4 : ( ( ndim == 2 ) ? 7 : 11 ));
-      chisq /= cupidGC.ndf;
+/* Divide by the sum of the weights . */
+      cupidGC.wsum = wsum;
+      chisq /= wsum;
 
 /* Modify this basic chi-squared value as described in the Stutski &
    Gusten paper. */
@@ -298,7 +294,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       }
 
 /* Scale the returned value to relate to a normalised chi-squared. */
-      ret *= -2.0/cupidGC.ndf;
+      ret *= -2.0/cupidGC.wsum;
 
 /* If the parameter for which we are finding the gradient is involved in
    the extra terms added to chi squared by the Stutski & Gusten paper,

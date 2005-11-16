@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "ndf.h"
+#include "ast.h"
 #include "dat_par.h"
 #include "cupid.h"
 #include <stdio.h>
@@ -56,13 +57,13 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
    static int ii = 0;
    static int jj = 0;
    char name[ 100 ];
-
+   FILE *fd;
 
    if( array ) {
 
       for( i = 0; i < cupidGC.ndim; i++ ) {
-         lbnd[ i ] = 1;
-         ubnd[ i ] = dims[ i ];
+         lbnd[ i ] = cupidGC.slbnd[ i ];
+         ubnd[ i ] = dims[ i ] + cupidGC.slbnd[ i ] - 1;
       }
 
       sprintf( name, "array%d", ++ii );
@@ -76,12 +77,30 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 
    } else {
       jj++;
+
+      sprintf( name, "ard%d", jj );
+      fd = fopen( name, "w" );
+      if( jj == 1 ) {
+         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n", 
+                  cupidGC.initpars[2] - 1 + cupidGC.slbnd[ 0 ], 
+                  cupidGC.initpars[4] - 1 + cupidGC.slbnd[ 1 ], 
+                  0.5*cupidGC.initpars[3], 0.5*cupidGC.initpars[5], 
+                  cupidGC.initpars[6]*AST__DR2D );
+      } else {
+         fprintf( fd, "ellipse(%1f,%1f,%1f,%1f,%1f)\n", cupidGC.pars[2], 
+               cupidGC.pars[4], 0.5*cupidGC.pars[3], 0.5*cupidGC.pars[5], 
+               cupidGC.pars[6]*AST__DR2D );
+      }
+      fclose( fd );
+
+
       np = (cupidGC.ndim==1) ? CUPID__GCNP1 : 
            ( (cupidGC.ndim==2) ? CUPID__GCNP2 : CUPID__GCNP3 ); 
 
+
       for( i = 0; i < cupidGC.ndim; i++ ) {
-         lbnd[ i ] = cupidGC.lbnd[ i ];
-         ubnd[ i ] = cupidGC.ubnd[ i ];
+         lbnd[ i ] = cupidGC.lbnd[ i ] - 1 + cupidGC.slbnd[ i ];
+         ubnd[ i ] = cupidGC.ubnd[ i ] - 1 + cupidGC.slbnd[ i ];
       }
 
       sprintf( name, "data%d", jj );
@@ -95,7 +114,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
       ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
-      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.resids[ i ];
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.resids[ i ]/cupidGC.wsum;
       ndfAnnul( &indf, status );
 
       sprintf( name, "wgt%d", jj );

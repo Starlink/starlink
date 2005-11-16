@@ -93,7 +93,10 @@ void makeclumps() {
 *        The NDF to receive the simulated data, including instrumental
 *        blurring and noise.
 *     MODEL = NDF (Write)
-*        The NDF to receive the simulated data, excluding noise.
+*        The NDF to receive the simulated data, excluding noise. A CUPID
+*        extension is added to this NDF, containing information about each 
+*        clump in the same format as produced by the CLUMPS command. This 
+*        includes an NDF holding an of the individual clump.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
 *        There will be one row per clump, and a subset of the following 
@@ -194,6 +197,7 @@ void makeclumps() {
 /* Local Variables: */
    char *clist;                  /* Pointer to list of HDS locators */
    char text[ 8 ];               /* Value of PARDIST parameter */
+   char xloc[ DAT__SZLOC + 1 ];  /* HDS locator for CUPID extension */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
@@ -370,7 +374,7 @@ void makeclumps() {
    this new Clump structure is added into the "clist" ring. */
       cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0,
                             ipd2, 0, NULL, lbnd, 
-                            clist + i*( DAT__SZLOC + 1), i );
+                            clist + i*( DAT__SZLOC + 1), i, 0.0, 1, 0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -386,10 +390,16 @@ void makeclumps() {
       }
    }
 
+/* Create a CUPID extension in the output model NDF.*/
+   ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+
 /* Store the clump properties in the output catalogue. This also annuls the 
    HDS locators stored within "clist". */
-   cupidStoreClumps( "OUTCAT", NULL, clist, nclump, ndim, 
+   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, 
                      "Output from CUPID:MAKECLUMPS" );
+
+/* Relase the extension locator.*/
+   datAnnul( xloc, status );
 
 /* End the NDF context */
    ndfEnd( status );

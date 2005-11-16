@@ -149,7 +149,8 @@ void clumps() {
 *     and the integrated intensity in the supplied data array is less than
 *     or equal to "MinIntegral" times the integrated intensity in the
 *     supplied data array, or when one of the other termination criteria 
-*     is met. [0.01]
+*     is met. If the supplied value is negative, this termination
+*     criterion is not used. [0.01]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
 *     noise are treated as zero. [0.5]
@@ -260,6 +261,8 @@ void clumps() {
    
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
+
+/* astSetWatchId( 4377 );  */
 
 /* Start an AST context */
    astBegin;
@@ -535,6 +538,10 @@ L999:
 
 /* End the AST context */
    astEnd;
+
+printf("\n\n NEED TO REMOVE THE CALL TO astListIssued IN CLUMPS.C\n\n");
+astListIssued( "At end of CLUMPS");
+
 
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */

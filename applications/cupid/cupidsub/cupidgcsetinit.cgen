@@ -20,7 +20,7 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                                     int *dims, int imax, double rms, 
                                     AstKeyMap *config, int iclump, int velax, 
-                                    double *par ){
+                                    double *par, int *slbnd ){
 /*
 *  Name:
 *     cupidGCSetInit<X>
@@ -32,7 +32,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim, 
 *                             int *dims, int imax, double rms, 
 *                             AstKeyMap *config, int iclump, int velax, 
-*                             double *par )
+*                             double *par, int *slbnd )
 
 *  Description:
 *     This functions makes an initial guess at the Gaussian clump
@@ -69,6 +69,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *     par
 *        Pointer to an array holding the initial guesses at the
 *        parameters describing a gaussian clump centred at "imax".
+*     slbnd
+*        Pointer to array holding the lower pixel bounds of the user
+*        supplied NDF.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCSetInit macro 
@@ -96,14 +99,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
    double d;              /* 1D offset from clumpt centre */
-   double f;              /* Factor for scaling weights */
+   double wmax;           /* Largest weight value */
    double fbeam_used;     /* Used value for "fbeam" */
    double fvel_used;      /* Used value for "fvel" */
    double fwhm_obs[ 3 ];  /* Observed FWHM on each pixel axis */
    double off;            /* Base line offset for the data value */
    double sv;             /* Sum of variance reciprocals */
    double v;              /* Variance reciprocal */
-   double wsum;           /* The sum of the weights */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int ax_max[ 3 ];       /* Peak posn on axis 0 */
@@ -130,6 +132,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* Do some initialisation if no clumps have yet been found. */
    if( iclump == 0 ) {
+
+/* Parameters which control the modification of the weights done by 
+   cupidGCChiSq (this modification is meant to give low weights to pixels
+   which do not influence the Gaussian model). */
+      cupidGC.nwf = cupidConfigI( config, "NWF", 10 );
+      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1 );
+      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.0 );
 
 /* See if a value has been supplied for the initial guess at the ratio 
    of the clump size to the beam width. */
@@ -314,6 +323,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    of the array containing the data to be fitted. */
    cupidGC.nel = 1;
    for( i = 0; i < ndim; i++ ) {
+      cupidGC.slbnd[ i ] = slbnd[ i ];
       lbnd[ i ] = ax_max[ i ] - beta*fwhm_obs[ i ];
       ubnd[ i ] = ax_max[ i ] + beta*fwhm_obs[ i ];
 
@@ -350,16 +360,13 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    complete array of the first pixel in the work arrays to be filled. */
    for( iax = 0; iax < ndim; iax++ ) xx[ iax ] = cupidGC.lbnd[ iax ];
 
-/* Initialise the sum of the weights.*/
-   wsum = 0.0;
-
 /* Initialise the number of variance values used, and the sum of the
    variance reciprocals. */
    nv = 0;
    sv = 0;
    
 /* Initialise the largest weight used so far to zero. */
-   f = 0.0;
+   wmax = 0.0;
 
 /* Loop over all pixels in the section to be fitted. */
    for( i = 0; i < cupidGC.nel; i++ ) {
@@ -410,10 +417,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
          }
 
 /* Record the largest weight value. */
-         if( *pw > f ) f = *pw;
-
-/* Increment the sum of the weights.*/
-         wsum += *pw;
+         if( *pw > wmax ) wmax = *pw;
 
       }
 
@@ -434,19 +438,17 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       }
    }
 
-/* Set to zero any weights which are lower than the user supplied lower
-   limit. */
-   pw = cupidGC.weight;
-   for( i = 0; i < cupidGC.nel; i++, pw++ ) {
-      *pw /= f;
-      if( *pw < wmin ) *pw = 0.0;
+/* Normalise the weights to a maximum value of 1.0 and set to zero any weights 
+   which are lower than the user supplied lower limit. */
+   if( wmax > 0.0 ) {
+      pw = cupidGC.weight;
+      for( i = 0; i < cupidGC.nel; i++, pw++ ) {
+         *pw /= wmax;
+         if( *pw < wmin ) *pw = 0.0;
+      }
    }
 
-/* Store the number of degrees of freedom. */  
-   cupidGC.ndf = wsum/f - npar;
-   if( cupidGC.ndf < 2 ) cupidGC.ndf = 2.0;
-
-/* Store the number of invocations oc cupidGCcalcf so far. */  
+/* Store the number of invocations of cupidGCcalcf so far. */  
    cupidGC.nf = -1;
 
 /* Normalise all other data values in the CupidGC structure and in the "par"

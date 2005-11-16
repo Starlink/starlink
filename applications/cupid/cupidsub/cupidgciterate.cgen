@@ -5,8 +5,10 @@
 #include <limits.h>
 #include <math.h>
 
-void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int iclump,
-                      double rms, AstKeyMap *config, int *iter, int ilevel ){
+void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, 
+                                    int iclump, double rms, AstKeyMap *config, 
+                                    double sumbg, int nbg, int niter, int ngood,
+                                    int *iter, int ilevel ){
 /*
 *  Name:
 *     cupidGCIterate<X>
@@ -16,8 +18,10 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 *     pixel with the highest value in the residuals.
 
 *  Synopsis:
-*     void cupidGCIterate<X>( CGEN_TYPE *array, int imax, double sum, int iclump,
-*                           double rms, AstKeyMap *config, int *iter, int ilevel );
+*     void cupidGCIterate<X>( CGEN_TYPE *array, int imax, double sum, 
+*                             int iclump, double rms, AstKeyMap *config, 
+*                             double sumbg, int nbg, int niter, int ngood,
+*                             int *iter, int ilevel )
 
 *  Description:
 *     This functions determines if a gaussian clump should be fitted to the 
@@ -40,6 +44,14 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 *        The RMS noise in the original data array.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
+*     sumbg
+*        Sum of the estimates of the background level in the supplied array.
+*     nbg
+*        The number of estimates summed in "sumbg".
+*     niter
+*        The number of attempted gaussian fits so far.
+*     ngood 
+*        The number of good values in "array".
 *     iter
 *        Address of an int in which to return a flag indicating if
 *        a Gaussian should be fitted to the supplied peak.
@@ -68,8 +80,13 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 */      
 
 /* Local Variables: */
-   static CGEN_TYPE val_thresh;/* Smallest value to be fitted */
-   static double sum_thresh;   /* Target value for the sum of the residuals */
+   double st;           /* Target value for the sum of the total residuals */
+   double vt;           /* Smallest total value to be fitted */
+   double minint;       /* Value of MININTEGRAL configuration parameter */
+
+   static CGEN_TYPE val_thresh;/* Smallest source value to be fitted */
+   static double alpha;        /* Factor for background flux */
+   static double sum_thresh;   /* Target value for the sum of the source residuals */
    static int maxclumps;       /* Maximum number of clumps to be fitted */
 
 /* Initialise. */
@@ -78,20 +95,30 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* If no gaussians have yet been removed from the original data, record
-   the target value for the sum of the residuals at which iteration will
-   stop. This target value is a user-specified fraction of the total data
-   sum in the original data. */
-   if( iclump == 0 ) {
-      sum_thresh = fabs( cupidConfigD( config, "MININTEGRAL", 0.01 )*sum );
-
-/* Also store the smallest peak value to which a gaussian should be
-   fitted. This value is a user-specified multiple of the RMS noise. */
+/* If we do not yet have any estimates of the background level, we
+   iterate unless we have already tried 20 iterations.*/
+   if( nbg == 0 ){
+      *iter = ( niter < 20 );
+      if( ilevel > 2 ) {
+         msgSetd( "SUM", sum );
+         msgOut( "", "   Sum of residuals: ^SUM", status );
+         msgSetd( "AMAX", (double) array[ imax ] );
+         msgOut( "", "   Peak residual: ^AMAX", status );
+      }
+      return;
+   }
+   
+/* If only one background estimate has yet been obtained, record
+   the smallest peak value to which a gaussian should be fitted. This value 
+   is a user-specified multiple of the RMS noise. Also store the maximum 
+   allowed number of clumps to be fitted, and the tagte value for the sum
+   of the residuals (exlcuding the background level). */
+   if( nbg == 1 ) {
       val_thresh = fabs( cupidConfigD( config, "THRESHOLD", 2.0 )*rms );
-
-/* Also store the maximum allowed number of clumps to be fitted. */
       maxclumps = cupidConfigI( config, "MAXCLUMPS", INT_MAX );
-
+      minint = cupidConfigD( config, "MININTEGRAL", 0.01 );
+      alpha = ( 1 - minint );
+      sum_thresh = minint*sum;
    }
 
 /* Cannot iterate if all the residuals are bad. */
@@ -100,24 +127,29 @@ void CGEN_FUNCTION(cupidGCIterate)( CGEN_TYPE *array, int imax, double sum, int 
 /* We finish iterating when the sum of the residuals in the supplied array 
    is less than the target value recorded on the first entry to this
    function. */
+      st = sum_thresh + alpha*ngood*sumbg/nbg;
       if( ilevel > 2 ) {
          msgSetd( "SUM", sum );
-         msgSetd( "TH", sum_thresh );
-         msgOut( "", "   Sum of residuals: ^SUM (target is ^TH)", status );
+         if( alpha <= 1.0 ) {
+            msgSetd( "TH", st );
+            msgOut( "", "   Sum of residuals: ^SUM (target is ^TH)", status );
+         } else {
+            msgOut( "", "   Sum of residuals: ^SUM", status );
+         }         
       }
 
-      if( fabs( sum ) > sum_thresh ) {
+      if( alpha > 1.0 || sum > st ) {
 
 /* We also finish iterating if the peak value is too small. The limit is
    a user-specified multiple of the noise. */
-
+         vt = val_thresh + sumbg/nbg;
          if( ilevel > 2 ) {
             msgSetd( "AMAX", (double) array[ imax ] );
-            msgSetd( "TH", val_thresh );
-            msgOut( "", "   Peak value: ^AMAX (target is ^TH)", status );
+            msgSetd( "TH", vt );
+            msgOut( "", "   Peak residual: ^AMAX (target is ^TH)", status );
          }
 
-         if( fabs( array[ imax ] ) > val_thresh ) {
+         if( array[ imax ] > vt ) {
 
 /* We also finish iterating if we have already fitted the maximum allowed 
    number of clumps. */

@@ -5,7 +5,8 @@
 #include "prm_par.h"
 
 
-void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double *sum ){
+void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, 
+                                    double *sum, int *ngood ){
 /*
 *  Name:
 *     cupidGCFindMax<X>
@@ -15,7 +16,8 @@ void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double
 *     in the supplied array. 
 
 *  Synopsis:
-*     void cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax, double *sum );
+*     void cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax, 
+*                             double *sum, int *ngood );
 
 *  Description:
 *     This functions finds the element with the largest value in the supplied 
@@ -34,6 +36,9 @@ void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double
 *        Pointer to a double in which to return the sum of all the (good) 
 *        data values in the supplied array. A value of zero is returned if 
 *        there are no good values in the supplied array.
+*     ngood
+*        Pointer to an int in which to return the number of good values in 
+*        "array".
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCFindMax macro 
@@ -63,6 +68,7 @@ void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double
 /* Initialise. */
    *sum = 0.0;
    *imax = -1;
+   *ngood = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -72,6 +78,7 @@ void CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax, double
 
 /* Skip bad values. */
       if( array[ i ] != CGEN_BAD ) {
+         (*ngood)++;
 
 /* If this is the first good value,  or if this value is larger than the 
    previous found maximum, record its position. */

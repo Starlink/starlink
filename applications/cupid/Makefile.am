@@ -16,7 +16,7 @@ cupid_mon_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 cupid_mon_LDADD = $(LDADD) cupidsub/libcupidsub.la `$(srcdir)/cupid_link_adam`
-
+cupid_mon_LDFLAGS = -static
 cupid_mon_TASKS = clumps cupidhelp makeclumps
 
 CSRC = 

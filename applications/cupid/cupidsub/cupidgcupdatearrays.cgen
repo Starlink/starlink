@@ -1,6 +1,8 @@
 #include "sae_par.h"
 #include "cupid.h"
 #include "mers.h"
+#include "ast.h"
+#include <math.h>
 
 /* Global Variables: */
 /* ================= */
@@ -14,7 +16,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                                          int *dims, double *par, double rms,
                                          double mlim, int imax, CGEN_TYPE *out,
                                          int ilevel, float *rmask, int *lbnd,
-                                         char *cloc, int iclump ){
+                                         char *cloc, int iclump, 
+                                         double sumbg, int nbg, int diag ){
 
 /*
 *  Name:
@@ -29,10 +32,13 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *                                  int *dims, double *par, double rms,
 *                                  double mlim, int imax, CGEN_TYPE *out,
 *                                  int ilevel, float *rmask, int *lbnd,
-*                                  char *cloc, int iclump )
+*                                  char *cloc, int iclump, 
+*                                  double sumbg, int nbg, int diag )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array.
+*     It does not remove the backgroubd level. It also adds the Gaussian
+*     onto the supplied output array (again exludinf the background level).
 
 *  Parameters:
 *     res
@@ -74,6 +80,12 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        in which case no HDS structure is created.
 *     iclump
 *        Clump index.
+*     sumbg
+*        The sum of the "nbg" background estimates made so far.
+*     nbg
+*        The number of background estimates made so far.
+*     diag
+*        Include extra diagnostic information in output catalogue?
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -97,11 +109,21 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 */      
 
 /* Local Variables: */
+   AstKeyMap *extra;      /* Keymap holding extra diagnostic information */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
+   CGEN_TYPE r;           /* Current residual value */
    double *mlist;         /* Pointer to list holding model valus */
    double bg;             /* Background for model */
+   double d;              /* Displacement from initial peak position */
    double m;              /* Model value */
+   double maxr;           /* Maximum remaining residual value */
+   double meanr;          /* Mean of remaining residual values */
+   double minr;           /* Minimum remaining residual value */
+   double shiftsq;        /* Square of displacement from initial peak position */
+   double sigr;           /* Std dev of remaining residual values */
    double sum;            /* Integrated clump intensity */
+   double sumr2;          /* Sum of squares of remaining residual values */
+   double sumr;           /* Sum of remaining residual values */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int *plist;            /* Pointer to list holding pixel indices */
@@ -111,6 +133,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
+   int i;                 /* Element index */
    int iax;               /* Axis index */
    int iedge;             /* Consider the upper limit on current axis? */
    int ilist;             /* Index into the plist and mlist arrays */
@@ -120,14 +143,26 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    int lface[ 3 ];        /* Lower bounds of face being evaluated */
    int list_size;         /* Number of values stored in plist and mlist */
    int more;              /* Does the evaluation box need to be extended? */
+   int nr;                /* Number of remaining residual values */
    int ok;                /* Is the pixel within the bounds of the NDF? */
    int peakok;            /* Is some of the peak usable? */
    int ubox[ 3 ];         /* Upper bounds of model evaluation box */
    int uface[ 3 ];        /* Upper bounds of face being evaluated */
    size_t psize;          /* Bytes required for one pixel position */
 
+   static double sum0;    /* Sum of original data values */
+
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
+
+/* If diagnostic info is being produced,and we have not yet saved the sum
+   of the residuals, do so now before they are modified. */
+   if( diag && iclump == 1 ) {
+      sum0 = 0.0;
+      for( i = 0; i < nel; i++ ) {
+         if( res[ i ] != CGEN_BAD ) sum0 += res[ i ];
+      }
+   }
 
 /* Note the original value at the initial peak position. */
    r0 = res ? res[ imax ] : 1.0;
@@ -319,11 +354,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;
 
-/* Remove the background level from the residuals and add it to the model. */
-   bg *= rms;
-   if( res ) for( j = 0; j < nel; j++ ) if( res[ j ] != CGEN_BAD ) res[ j ] -= bg;
-   if( out ) for( j = 0; j < nel; j++ ) if( out[ j ] != CGEN_BAD ) out[ j ] += bg;
-
 /* Display info */
    if( ilevel > 3 ) {
       msgSetd( "V", sum );
@@ -334,10 +364,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
          msgSeti( "N", area_off );
          msgOut( "", "   (the clump overlaps the edge of the data array)", status );
       }
-
-      msgSetd( "V", bg*nel );
-      msgSeti( "N", nel );
-      msgOut( "", "   Integrated background intensity: ^V (in ^N pixels)", status );
    }
 
 /* If required, create an HDS structure holding information about the
@@ -353,12 +379,71 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
          if( ubox[ jax ] > dims[ jax ] ) ubox[ jax ] = dims[ jax ];
       }
 
+/* Create extra diagnostic info if required (meant for debugging). */
+      if( diag ) {
+         extra = astKeyMap( "" );
+         astMapPut0D( extra, "CHISQ", cupidGC.chisq, NULL );
+         astMapPut0D( extra, "INITPEAK", cupidGC.initmodel[0]*rms, NULL );
+         astMapPut0D( extra, "INITBACK", cupidGC.initmodel[1]*rms, NULL );
+
+         d = par[ 2 ] - cupidGC.initmodel[ 2 ];
+         shiftsq += d*d;
+
+         astMapPut0D( extra, "INITFWHM1", cupidGC.initmodel[3], NULL );
+         if( ndim > 1 ) {
+            d = par[ 5 ] - cupidGC.initmodel[ 5 ];
+            shiftsq += d*d;
+            astMapPut0D( extra, "INITFWHM2", cupidGC.initmodel[5], NULL );
+            if( ndim > 1 ) {
+               d = par[ 7 ] - cupidGC.initmodel[ 7 ];
+               shiftsq += d*d;
+               astMapPut0D( extra, "INITFWHM3", cupidGC.initmodel[8], NULL );
+            }
+         }
+         astMapPut0D( extra, "SHIFT", sqrt(shiftsq), NULL );
+
+         minr = VAL__MAXD;
+         maxr = -VAL__MAXD;
+         sumr = 0.0;
+         sumr2 = 0.0;
+         nr = 0;
+         for( i = 0; i < nel; i++ ) {
+            if( res[ i ] != CGEN_BAD ) {
+               r = res[ i ];
+               if( r < minr ) minr = r;
+               if( r > maxr ) maxr = r;
+               sumr += r;
+               sumr2 += r*r;
+               nr++;
+            }
+         }
+
+         meanr = sumr/nr;
+         sigr = sqrt( sumr2/nr - meanr*meanr );
+
+         astMapPut0D( extra, "BG", sumbg/nbg, NULL );
+         astMapPut0D( extra, "BGSUM", nr*sumbg/nbg, NULL );
+         astMapPut0D( extra, "GONE", sum0 - sumr, NULL );
+         astMapPut0D( extra, "LEFT", sumr - nr*sumbg/nbg, NULL );
+         astMapPut0D( extra, "MINR", minr, NULL );
+         astMapPut0D( extra, "MAXR", maxr, NULL );
+         astMapPut0D( extra, "SUMR", sumr, NULL );
+         astMapPut0D( extra, "MEANR", meanr, NULL );
+         astMapPut0D( extra, "SIGMAR", sigr, NULL );
+         astMapPut0D( extra, "NR", (double) nr, NULL );
+
+      } else {
+         extra = NULL;
+      }
+
 /* Create the HDS object */
       cupidHdsClump( cloc, sum, par, rms, ndim, lbox, ubox, list_size, 
-                     mlist, plist, lbnd, iclump, cupidGC.dax );
-   }
+                     mlist, plist, lbnd, iclump, cupidGC.dax, extra );
 
 /* Free resources */
+      if( extra ) extra = astAnnul( extra );
+   }
+
    mlist = astFree( mlist );
    plist = astFree( plist );
 

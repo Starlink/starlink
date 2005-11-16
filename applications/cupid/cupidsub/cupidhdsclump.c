@@ -2,6 +2,7 @@
 #include "cupid.h"
 #include "mers.h"
 #include "ndf.h"
+#include "ast.h"
 #include "star/hds.h"
 #include <stdio.h>
 
@@ -9,7 +10,7 @@
 void cupidHdsClump( char *cloc, double sum, double *par, double rms, 
                     int ndim, int *lbox, int *ubox, int list_size, 
                     double *mlist, int *plist, int *lbnd, int iclump,
-                    int *dax ){
+                    int *dax, AstKeyMap *extra ){
 /*
 *  Name:
 *     cupidHdsClump
@@ -21,7 +22,7 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 *     void cupidHdsClump( char *cloc, double sum, double *par, double rms, 
 *                         int ndim, int *lbox, int *ubox, int list_size, 
 *                         double *mlist, int *plist, int *lbnd, int iclump,
-*                         int *dax )
+*                         int *dax, AstKeyMap *extra )
 
 *  Description:
 *     This function creates a temporary HDS object with type and name both 
@@ -85,6 +86,9 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 *        The index of the current clump.
 *     dax
 *        Array holding external axis number indexed by internal axis number.
+*     extra
+*        An AstKeyMap holding extra diagnositic information to add to the
+*        clump structure.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -104,6 +108,7 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
    char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
    char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRADq3" };
 
+   const char *key;             /* KeyMap key name */
    char dloc[ DAT__SZLOC + 1 ]; /* Component locator */
    char name[ DAT__SZNAM + 1 ]; /* New component name */
    double *ipd;                 /* Pointer to Data array */
@@ -115,12 +120,16 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
    int elbox[ 3 ];              /* The lower box limit on each external axis */
    int estep[ 3 ];              /* The step size on each external axis */
    int eub[ 3 ];                /* The upper NDF limit on each external axis */
+   int eubox[ 3 ];              /* The upper box limit on each external axis */
    int i;                       /* Point index */
    int indf;                    /* NDF identifier */
    int iv;                      /* 1D vector index for current data value */
    int j;                       /* Axis index */
    int lb[ 3 ];                 /* Lower pixel index bounds of NDF */
+   int nex;                     /* No. of extra items of information */
+   int ok;                      /* Pixel within clump NDF? */
    int place;                   /* NDF place holder */
+   int pv;                      /* Pixel offset */
    int step[ 3 ];               /* The step size on each internal axis */
    int ub[ 3 ];                 /* Upper pixel index bounds of NDF */
 
@@ -220,10 +229,25 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
       }
    }      
 
+/* Store any extra diagnostic information. */
+   if( extra ) {
+      nex = astMapSize( extra );
+      for( i = 0; i < nex; i++ ) {
+         key = astMapKey( extra, i );
+         if( astMapGet0D( extra, key, &dval ) ) {
+            datNew( cloc, (char *) key, "_DOUBLE", 0, NULL, status );
+            datFind( cloc, (char *) key, dloc, status );
+            datPutD( dloc, 0, NULL, &dval, status );
+            datAnnul( dloc, status );
+         }
+      }
+   }
+
 /* Convert lbox, lb, ub and step from internal axis numbering to external axis
    numbering. */
    for( i = 0; i < ndim; i++ ) {
      elbox[ dax[ i ] ] = lbox[ i ];
+     eubox[ dax[ i ] ] = ubox[ i ];
      elb[ dax[ i ] ] = lb[ i ];
      eub[ dax[ i ] ] = ub[ i ];
      estep[ dax[ i ] ] = step[ i ];
@@ -246,11 +270,17 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 
 /* Find the 1D vector index into the NDF data array corresponding to the
    grid indices (within the user supplied NDF) of the current point.*/
-         iv = *(p++) - elbox[ 0 ];
-         for( j = 1; j < ndim; j++ ) iv += ( *(p++) - elbox[ j ] )*estep[ j ];
-
+         pv = *(p++);
+         iv = pv - elbox[ 0 ];
+         ok = ( pv >= elbox[ 0 ] && pv <= eubox[ 0 ] );
+         for( j = 1; j < ndim; j++ ) {
+            pv = *(p++);
+            iv += ( pv - elbox[ j ] )*estep[ j ];
+            if( pv < elbox[ j ] || pv > eubox[ j ] ) ok = 0;
+         }
+         
 /* Store the value. */
-         ipd[ iv ] = *(m++);
+         if( ok ) ipd[ iv ] = *(m++);
  
       }
    }

@@ -5,7 +5,7 @@
 #include "ast.h"
 #include "star/kaplibs.h"
 
-void cupidClumpCat( const char *param, char *cloc, double *tab, int size, 
+void cupidClumpCat( const char *param, double *tab, int size, 
                     int i, int ndim, const char *ttl ){
 /*
 *  Name:
@@ -27,17 +27,9 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
 *  Parameters:
 *     param
 *        Name of the ADAM parameter to associated with the output
-*        catalogue. If NULL, no catalogue is created but the clump
-*        paramaters supplied in "cloc" are still added to "tab".
-*     cloc
-*        Pointer to an HDS locator for the object holding the clump
-*        parameters. Ignore if NULL.
+*        catalogue. 
 *     tab
-*        Pointer to an array holding clump parameters. If "cloc" is not NULL 
-*        the clump parameters supplied in "cloc" are added to the end of this 
-*        table. The first (fastest moving) axis corresponds to clump
-*        number, and the second axis corresponds to column number within
-*        the catalogue.
+*        Pointer to an array holding clump parameters. 
 *     size
 *        The maximum number of clumps which can be stored in "tab".
 *     i
@@ -201,7 +193,7 @@ void cupidClumpCat( const char *param, char *cloc, double *tab, int size,
       }      
    }
 
-/* If required,write the tableto disk. */
+/* If required, write the table to disk. */
    if( param && *status == SAI__OK ) {
 
 /* Start an AST context. */
