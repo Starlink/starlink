@@ -595,6 +595,10 @@ static void IntraReg( const char *name, int nin, int nout,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
 /* Clean (and validate) the name supplied. */
    clname = CleanName( name, "astIntraReg" );
 
@@ -644,15 +648,7 @@ static void IntraReg( const char *name, int nin, int nout,
    function data to accommodate it. */
       } else {
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
          tran_data = astGrow( tran_data, tran_nfun + 1, sizeof( TranData ) );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
 
 /* Store the information supplied. */
          if ( astOK ) {
@@ -691,6 +687,11 @@ static void IntraReg( const char *name, int nin, int nout,
 /* If an error occurred, free the memory holding the cleaned function
    name. */
    if ( !astOK ) clname = astFree( clname );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
 }
 
 void astIntraReg_( const char *name, int nin, int nout,
