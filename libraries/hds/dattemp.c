@@ -45,7 +45,6 @@ datTemp(char      *type_str,
         "DAT_TEMP: Error creating a temporary HDS object."
 
    struct DSC  type;
-   struct DSC  locator;
 
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -67,14 +66,13 @@ datTemp(char      *type_str,
       return *status;
    hds_gl_status   = DAT__OK;
 
-/* Import type string and export locator string.        */
+/* Import type string */
 
    _strcsimp(&type,type_str);
-   _strflcsexp(&locator,locator_str, DAT__SZLOC);
 
 /* Export locator.      */
 
-   _call(dau_export_loc(&locator, &lcp))
+   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
    data  = &lcp->data;
 
 /* Create a temporary container file if not yet done.   */

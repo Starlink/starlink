@@ -30,8 +30,6 @@ datName(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_NAME: Error enquiring the name of an HDS object."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -43,13 +41,9 @@ datName(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator.     */
-
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-
 /* Import locator.      */
 
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Copy the object name from the LCP.   */
@@ -79,7 +73,6 @@ datType(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_TYPE: Error enquiring the type of an HDS object."
 
-   struct DSC locator;
    struct DSC type;
 
    struct LCP      *lcp;
@@ -95,15 +88,14 @@ datType(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator iand type strings.     */
+/* Import type strings.     */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    type.length = DAT__SZTYP;
-   type.body   = type_str;
+   type.body   = (unsigned char*)type_str;
 
 /* Import locator.      */
 
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
    if ( data->obj.class == DAT__PRIMITIVE )
@@ -197,8 +189,6 @@ datShape(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_SHAPE: Error enquiring the shape of an HDS object."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
    HDS_PTYPE       axis[DAT__MXDIM];
@@ -213,8 +203,7 @@ datShape(char      locator_str[DAT__SZLOC],
 
 /* Import locator string.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Enquire the object shape.    */
@@ -245,8 +234,6 @@ datSize(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_SIZE: Error enquiring the size of an HDS object."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -258,8 +245,7 @@ datSize(char locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return the object size.      */
@@ -284,7 +270,6 @@ datThere(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_THERE: Error enquiring about the existence of an HDS object."
 
-   struct DSC locator;
    struct DSC name;
 
    struct LCP      *lcp;
@@ -306,14 +291,13 @@ datThere(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator and name strings.     */
+/* Import name strings.     */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strcsimp( &name, name_c );
 
 /* Import locator.      */
 
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure
@@ -382,8 +366,6 @@ datStruc(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_STRUC: Error enquiring if an HDS object is a structure."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -393,10 +375,9 @@ datStruc(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.   */
+/* Import locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Set the flag appropriately and return.       */
@@ -420,8 +401,6 @@ datPrim(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_PRIM: Error enquiring if an HDS object is primitive."
 
-  struct DSC locator;
-
   struct LCP      *lcp;
   struct LCP_DATA *data;
 
@@ -430,10 +409,9 @@ datPrim(char locator_str[DAT__SZLOC],
    if (!_ok(*status))
       hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.   */
+/* Import locator */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Set the flag appropriately and return.       */
@@ -457,8 +435,6 @@ datNcomp( char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_NCOMP: Error enquiring the number of components in an HDS structure."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
    unsigned char   *srv;
@@ -472,10 +448,9 @@ datNcomp( char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.   */
+/* Import locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the source locator points to anything other than a single
@@ -520,8 +495,6 @@ datLen(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_LEN: Error enquiring the element length of an HDS primitive."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
    struct PDD       *obj;
@@ -532,10 +505,9 @@ datLen(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.   */
+/* Import locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the object is a structure. */
@@ -568,8 +540,6 @@ datState(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_STATE: Error enquiring the state of an HDS primitive."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
    struct RCL      rcl;
@@ -580,10 +550,9 @@ datState(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.   */
+/* Import locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the object is a structure. */
@@ -608,7 +577,6 @@ datValid(char locator_str[DAT__SZLOC],
          int *valid,
          int *status)
 {
-   struct DSC locator;
    struct LCP *lcp;
 
 /*
@@ -617,16 +585,16 @@ datValid(char locator_str[DAT__SZLOC],
    if ( !_ok( *status ) )
       return *status;
     hds_gl_status = DAT__OK;
-/*
-   Import the locator string.
-*/
-    _strflcsimp( &locator, locator_str, DAT__SZLOC );
+
 /*
    Defer error reporting. Import the locator and set the flag
    appropriately.
 */
    ems_mark_c( );
-   *valid = _ok( dau_import_loc( &locator, &lcp ) ) ? TRUE : FALSE;
+
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   *valid = ( lcp == NULL ? TRUE : FALSE );
+
 /*
    Annul any errors and end the error context.
 */
@@ -655,7 +623,6 @@ datConv(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_CONV: Error determining whether type conversion is possible."
 
-   struct DSC locator;
    struct DSC type;
 
    struct LCP      *lcp;
@@ -669,14 +636,13 @@ datConv(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator and type strings.     */
+/* Import type strings.     */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strcsimp( &type, type_str );
 
 /* Import locator.      */
 
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Ensure that the locator points to a primitive and not a structure.   */

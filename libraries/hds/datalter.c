@@ -30,8 +30,6 @@ datAlter(char      locator_str[DAT__SZLOC],
 #define context_message \
        "DAT_ALTER: Error altering the size of an HDS object."
 
-   struct DSC locator;
- 
    struct LCP       *lcp;
    struct LCP_DATA  *data;
    struct LCP_STATE *state;
@@ -56,8 +54,7 @@ datAlter(char      locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -163,7 +160,6 @@ datReset(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_RESET: Error resetting an HDS object to an undefined state."
 
-   struct DSC      locator;
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -175,8 +171,7 @@ datReset(char locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call(dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* If the container file is not open for read-only access, then clear
@@ -204,7 +199,6 @@ datMould(char       locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MOULD: Error altering the shape of an HDS object."
 
-   struct DSC       locator;
    struct LCP       *lcp;
    struct LCP_DATA  *data;
    struct LCP_STATE *state;
@@ -221,8 +215,7 @@ datMould(char       locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call(dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -310,9 +303,8 @@ datRenam(char locator_str[DAT__SZLOC],
 /* Import locator and name strings.     */
 
    _strcsimp  ( &name, name_str );
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
 
-   _call(dau_import_loc( &locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the container file was opened for read only access.    */
@@ -390,7 +382,6 @@ datRetyp(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_RETYP: Error changing the type of an HDS object."
 
-   struct DSC      locator;
    struct DSC      type;
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -405,14 +396,13 @@ datRetyp(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status     = DAT__OK;
 
-/* Import locator and type strings.     */
+/* Import type strings.     */
 
    _strcsimp  ( &type, type_str );
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* Import locator.      */
 
-   _call(dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the container file was opened for read only access.            */

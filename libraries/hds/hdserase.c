@@ -28,8 +28,6 @@ hdsErase(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_ERASE: Error marking an HDS container file for deletion."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -39,10 +37,9 @@ hdsErase(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator string and locator.       */
+/* Import the locator.       */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.         */
@@ -56,8 +53,7 @@ hdsErase(char locator_str[DAT__SZLOC],
    dat1_annul_lcp( &lcp );
 
 /* Nullify the locator value.                                               */
-   cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator.body,
-             (int) locator.length );
+   strncpy( locator_str, DAT__NOLOC, DAT__SZLOC );
 
 /* Exit the routine.                                                        */
    return hds_gl_status;

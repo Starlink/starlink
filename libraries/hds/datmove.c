@@ -32,8 +32,6 @@ datMove(char locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_MOVE: Error moving an HDS object to a new location."
 
-   struct DSC locator1;
-   struct DSC locator2;
    struct DSC name;
 
    struct LCP       *lcp1;
@@ -65,15 +63,13 @@ datMove(char locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the first and second locator and name strings.        */
+/* Import the name string.        */
 
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsimp( &locator2, locator2_str, DAT__SZLOC );
    _strcsimp( &name, name_str );
 
 /* Import the first locator.    */
 
-   _call( dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1 = &lcp1->data;
    state1 = &data1->state;
 
@@ -89,7 +85,7 @@ datMove(char locator1_str[DAT__SZLOC],
 /* Import the second locator and return if it points to anything other than
    a single structure object.   */
 
-   _call( dau_import_loc( &locator2, &lcp2 ))
+   dat1_import_loc( locator2_str, DAT__SZLOC, &lcp2 );
    data2 = &lcp2->data;
    if (!data2->struc || data2->naxes != 0)
       _call(DAT__OBJIN)
@@ -278,8 +274,7 @@ datMove(char locator1_str[DAT__SZLOC],
 
 /* Annul the source LCP and nullify its locator value before returning.     */
    dat1_annul_lcp( &lcp1 );
-   cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator1.body,
-             (int) locator1.length );
+   strncpy( locator1_str, DAT__NOLOC, DAT__SZLOC );
 
    return hds_gl_status;
 }

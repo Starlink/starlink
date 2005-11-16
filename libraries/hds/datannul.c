@@ -22,7 +22,6 @@ datAnnul(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_ANNUL: Error annulling an HDS locator."
 
-   struct DSC locator;
    struct LCP   *lcp;
 
 /*
@@ -30,13 +29,10 @@ datAnnul(char locator_str[DAT__SZLOC],
 */
    hds_gl_status = *status;
    ems_begin_c( &hds_gl_status );
-/*
-   Import the locator string.
-*/
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* If the locator is valid, then annul the control packet.                  */
-   if ( _ok( dau_import_loc( &locator, &lcp ) ) )
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   if ( lcp != NULL )
    {
       dat1_annul_lcp( &lcp );
    }
@@ -47,7 +43,7 @@ datAnnul(char locator_str[DAT__SZLOC],
 /*   cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator.body,
  *             (int) locator.length );
  */
-     strncpy( (char *) locator.body, DAT__NOLOC,
+     strncpy( locator_str, DAT__NOLOC,
                 DAT__SZLOC );
  
 /*

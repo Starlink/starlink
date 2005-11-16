@@ -67,6 +67,7 @@ datWhere(char locator_str[DAT__SZLOC],
 *  Authors:
 *     WFL: William Lupton (AAO)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -74,6 +75,8 @@ datWhere(char locator_str[DAT__SZLOC],
 *        Original version.
 *     13-AUG-1991 (RFWS):
 *        Added prologue and tidied. Made portable.
+*     15-NOV-2005 (TIMJ):
+*        Use dat1_import_loc
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,7 +88,6 @@ datWhere(char locator_str[DAT__SZLOC],
 /* Local Variables:                                                         */
    INT_BIG objlen;               /* Object length in chars                  */
    INT_BIG objoff;               /* Object offset from start of data        */
-   struct DSC locator;           /* Locator string descriptor               */
    struct LCP *lcp;              /* Pointer to Locator Control Packet       */
    struct LCP_DATA *data=NULL;   /* Pointer to LCP data fields              */
    struct PDD *obj;              /* Pointer to object PDD                   */
@@ -96,11 +98,8 @@ datWhere(char locator_str[DAT__SZLOC],
    if ( !_ok( *status ) ) return *status;
       hds_gl_status = *status;
 
-/* Import the locator string.                                               */
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-
 /* Import the locator and obtain a pointer to the LCP data fields.          */
-   dau_import_loc( &locator, &lcp );
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    if ( _ok( hds_gl_status ) )
    {
       data = &lcp->data;

@@ -74,6 +74,7 @@ datParen(char locator1_str[DAT__SZLOC],
 *     WFL: William Lupton (AAO)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness       (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +93,8 @@ datParen(char locator1_str[DAT__SZLOC],
 *        Change to C interface
 *     19-APR-2004 (BKM):
 *        Revised 64-bit HDS logic.
+*     15-NOV-2005 (TIMJ):
+*        Use dat1_import_loc
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -105,8 +108,6 @@ datParen(char locator1_str[DAT__SZLOC],
    char nambuf[ DAT__SZNAM ];    /* Buffer for parent object name           */
    int i;                        /* Loop counter for CRV                    */
    INT_BIG off=0;                /* Parent structure offset in SRV          */
-   struct DSC locator1;          /* Descriptor for input locator            */
-   struct DSC locator2;          /* Descriptor for output locator           */
    struct HAN hancmp;            /* Handle for Component Record             */
    struct HAN hanpar;            /* Handle for parent object                */
    struct HAN hantop;            /* Handle for parent's parent record       */
@@ -127,10 +128,6 @@ datParen(char locator1_str[DAT__SZLOC],
 
 /*.                                                                         */
 
-/* Import the input locator string and export the output locator string.    */
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsimp( &locator2, locator2_str, DAT__SZLOC );
-
 /* Check the inherited global status.                                       */
    hds_gl_status = *status;
    if ( _ok( hds_gl_status ) )
@@ -138,7 +135,7 @@ datParen(char locator1_str[DAT__SZLOC],
 
 /* Import the input locator and find the associated Locator Control         */
 /* Packet's data fields.                                                    */
-      dau_import_loc( &locator1, &lcp1 );
+      dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
       if ( _ok( hds_gl_status ) )
       {
          data1 = &lcp1->data;
@@ -236,7 +233,7 @@ structure (possible programming error).",
 
 /* Export the output locator and find the data fields in the associated     */
 /* Locator Control Packet.                                                  */
-      dau_export_loc( &locator2, &lcp2 );
+      dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;
@@ -304,7 +301,7 @@ HDS object.",
 /*      cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator2.body,
  *               (int) locator2.length );
  */
-        strncpy( (char *) locator2.body, DAT__NOLOC,
+        strncpy( locator2_str, DAT__NOLOC,
                   DAT__SZLOC );
 
    }

@@ -60,6 +60,7 @@ hdsCopy(char locator_str[DAT__SZLOC],
 *     WFL: William Lupton (AAO)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM: Brian McIlwrath (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,8 @@ hdsCopy(char locator_str[DAT__SZLOC],
 *     16-JAN-2002 (BKM):
 *        Convert from C function with a FORTRAN interface to a C-callable
 *        function with FORTRAN wrapper.
+*     15-NOV-2005 (TIMJ):
+*        Use dat1_import_loc
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,7 +95,6 @@ hdsCopy(char locator_str[DAT__SZLOC],
    char nambuf[ DAT__SZNAM ];        /* Name buffer                         */
    int save_map;              /* Saved mapping flag value                   */
    struct DSC file;           /* Descriptor for file name                   */
-   struct DSC locator;        /* Descriptor for locator                     */
    struct DSC name;           /* Descriptor for component name              */
    struct HAN han1;           /* Handle to input record                     */
    struct HAN han2;           /* Handle to output record                    */
@@ -110,13 +112,12 @@ hdsCopy(char locator_str[DAT__SZLOC],
    if ( !_ok( *status ) ) return *status;
       hds_gl_status = *status;
 
-/* Import the source locator string and the file and name strings.          */
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
+/* Import the file and name strings.          */
    _strcsimp( &file, file_str );
    _strcsimp( &name, name_str );
 
 /* Import the source locator.                                               */
-   dau_import_loc( &locator, &lcp );
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    if ( _ok( hds_gl_status ) )
    {
 

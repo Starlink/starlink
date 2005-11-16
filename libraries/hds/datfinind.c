@@ -25,14 +25,12 @@
 /* DAT_FIND - Find named component */
 /*=================================*/
 int
-datFind( char loc1_str[DAT__SZLOC],
+datFind( char locator1_str[DAT__SZLOC],
          char *name_str,
-         char loc2_str[DAT__SZLOC],
+         char locator2_str[DAT__SZLOC],
          int  *status )
 {
-   struct DSC locator1;
    struct DSC name;
-   struct DSC locator2;
 
    struct LCP      *lcp1;
    struct LCP_DATA *data1=NULL;
@@ -53,11 +51,8 @@ datFind( char loc1_str[DAT__SZLOC],
    int             i;
    char            *name1;
 
-/* Import the source locator and name strings and export the destination    */
-/* locator string.                  */
-   _strflcsimp( &locator1, loc1_str, DAT__SZLOC );
+/* Import the name string */
    _strcsimp(   &name, name_str );
-   _strflcsimp( &locator2, loc2_str, DAT__SZLOC );
 
 /* Check the inherited global status.              */
    hds_gl_status = *status;
@@ -65,7 +60,7 @@ datFind( char loc1_str[DAT__SZLOC],
    {
 
 /* Import the input locator.                       */
-      dau_import_loc( &locator1, &lcp1 );
+      dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
       if ( _ok( hds_gl_status ) )
       {
          data1 = &lcp1->data;
@@ -151,7 +146,7 @@ datFind( char loc1_str[DAT__SZLOC],
       }
 
 /* Export the destination locator and stick a handle on the object record.  */
-      dau_export_loc( &locator2, &lcp2 );
+      dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;
@@ -222,7 +217,7 @@ HDS structure.",
 /* locator.                    */
    if ( !_ok( hds_gl_status ) )
    {
-      strncpy( (char *) locator2.body, DAT__NOLOC,
+      strncpy( locator2_str, DAT__NOLOC,
                 DAT__SZLOC );
    }
 
@@ -254,9 +249,6 @@ datIndex(char locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_INDEX: Error indexing into the component list of an HDS structure."
 
-   struct DSC      locator1;
-   struct DSC      locator2;
-
    struct LCP      *lcp1;
    struct LCP_DATA *data1;
    struct LCP      *lcp2;
@@ -283,15 +275,10 @@ datIndex(char locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status  = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
-
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-/*   _strflcsexp( &locator2, locator2_str, DAT__SZLOC ); */
-   _strflcsimp( &locator2, locator2_str, DAT__SZLOC );
 
 /* Import the source locator.  */
 
-   _call( dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1 = &lcp1->data;
 
 /* Return if the locator points to anything other than a single structure
@@ -338,7 +325,7 @@ datIndex(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and stick a handle on the object record. */
 
-   _call(dau_export_loc(&locator2, &lcp2))
+   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
    data2 = &lcp2->data;
    rec_get_handle( &rid, &han, &data2->han );
    rec_get_rid( &han, &data2->parent );

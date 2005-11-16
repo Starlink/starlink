@@ -34,7 +34,6 @@ hdsNew(char *file_str,
    struct DSC file;
    struct DSC name;
    struct DSC type;
-   struct DSC locator;
 
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -55,16 +54,15 @@ hdsNew(char *file_str,
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import file, name and type strings and export locator string.        */
+/* Import file, name and type strings.        */
 
    _strcsimp( &file, file_str );
    _strcsimp( &name, name_str );
    _strcsimp( &type, type_str );
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* Export the locator.  */
 
-   _call( dau_export_loc( &locator, &lcp ))
+   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
    data = &lcp->data;
 
 /* Set 64-bit file format flag appropriately                            */

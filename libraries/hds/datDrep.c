@@ -115,6 +115,7 @@ datDrep( char locator_str[DAT__SZLOC],
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -122,6 +123,8 @@ datDrep( char locator_str[DAT__SZLOC],
 *        Original version.
 *     26-MAR-2002 (BKM):
 *        Revised to pure C version.
+*     15-NOV-2005 (TIMJ):
+*        Use dat1_import_loc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -133,7 +136,6 @@ datDrep( char locator_str[DAT__SZLOC],
 /* Local Variables:                                                         */
    char *fmt;                 /* Pointer to format text                     */
    char *ord;                 /* Pointer to order text                      */
-   struct DSC locator;        /* Locator descriptor                         */
    struct LCP *lcp;           /* Pointer to Locator Control Packet          */
    struct LCP_DATA *data=NULL;/* Pointer to LCP data fields                 */
    struct PDD *obj;           /* Pointer to object PDD                      */
@@ -144,11 +146,8 @@ datDrep( char locator_str[DAT__SZLOC],
    if ( !_ok( *status ) ) return *status;
       hds_gl_status = *status;
 
-/* Import/export the locator string.                                        */
-    _strflcsimp( &locator, locator_str, DAT__SZLOC );
-
 /* Import the locator and obtain a pointer to the LCP data fields.          */
-   dau_import_loc( &locator, &lcp );
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    if ( _ok( hds_gl_status ) )
    {
       data = &lcp->data;

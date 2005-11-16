@@ -36,7 +36,6 @@ datErase(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_ERASE: Error erasing an HDS structure component."
 
-   struct DSC locator;
    struct DSC name;
 
    struct LCP      *lcp;
@@ -60,14 +59,13 @@ datErase(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator and name strings.     */
+/* Import name string.     */
 
    _strcsimp  ( &name, name_str );
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* Import locator.      */
 
-   _call(dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure

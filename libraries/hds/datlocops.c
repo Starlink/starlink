@@ -33,9 +33,6 @@ datSlice(char     locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_SLICE: Error obtaining a locator to a slice of an HDS array."
 
-   struct DSC locator1;
-   struct DSC locator2;
-
    struct LCP       *lcp1;
    struct LCP_DATA  *data1;
    struct LCP       *lcp2;
@@ -55,15 +52,9 @@ datSlice(char     locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination */
-/* locator string.*/
-
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
-
 /* Import the source locator.   */
 
-   _call(dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1 = &lcp1->data;
 
 /* Get the current object shape and check that the # of dimensions matches
@@ -75,7 +66,7 @@ datSlice(char     locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   _call(dau_export_loc( &locator2, &lcp2 ))
+   dat1_alloc_lcp(DAT__SZLOC, locator2_str, &lcp2 );
    data2 = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -146,10 +137,10 @@ datSlice(char     locator1_str[DAT__SZLOC],
 /*========================*/
 
 int
-datCell( char     loc1_str[DAT__SZLOC],
+datCell( char     locator1_str[DAT__SZLOC],
          int      ndim,
          HDS_PTYPE subs[],
-         char     loc2_str[DAT__SZLOC],
+         char     locator2_str[DAT__SZLOC],
          int      *status)
 {
 #undef context_name
@@ -157,9 +148,6 @@ datCell( char     loc1_str[DAT__SZLOC],
 #define context_name "DAT_CELL_ERR"
 #define context_message\
         "DAT_CELL: Error obtaining a locator to a cell of an HDS array."
-
-   struct DSC locator1;
-   struct DSC locator2;
 
    struct LCP       *lcp1;
    struct LCP_DATA  *data1;
@@ -176,14 +164,9 @@ datCell( char     loc1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator string.*/
-
-   _strflcsimp( &locator1, loc1_str, DAT__SZLOC );
-   _strflcsexp( &locator2, loc2_str, DAT__SZLOC );
-
 /* Import the source locator.   */
 
-   _call(dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -201,7 +184,7 @@ datCell( char     loc1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   _call(dau_export_loc( &locator2, &lcp2 ))
+   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );   
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -257,9 +240,6 @@ datVec(char locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_VEC: Error vectorising an HDS object."
 
-   struct DSC locator1;
-   struct DSC locator2;
-
    struct LCP       *lcp1;
    struct LCP_DATA  *data1;
    struct LCP_STATE *state1;
@@ -274,15 +254,9 @@ datVec(char locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination */
-/* locator string.*/
-
-     _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-     _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
-
 /* Import the source locator.   */
 
-   _call(dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -293,7 +267,7 @@ datVec(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   _call(dau_export_loc( &locator2, &lcp2 ))
+   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -342,9 +316,6 @@ datCoerc(char locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_COERC: Error coercing an HDS object to change its shape."
 
-   struct DSC locator1;
-   struct DSC locator2;
-
    struct LCP       *lcp1;
    struct LCP_DATA  *data1;
    struct LCP       *lcp2;
@@ -361,15 +332,9 @@ datCoerc(char locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination locator       */
-/* string.                                                                   */
-
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
-
 /* Import the source locator.   */
 
-   _call(dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1 = &lcp1->data;
 
 /* Ensure that the requested # dimensions is valid.     */
@@ -387,7 +352,7 @@ datCoerc(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   _call(dau_export_loc( &locator2, &lcp2 ))
+   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -435,9 +400,6 @@ datClone(char locator1_str[DAT__SZLOC],
 #define context_message\
         "DAT_CLONE: Error cloning (duplicating) an HDS locator."
 
-   struct DSC locator1;
-   struct DSC locator2;
-
    struct LCP       *lcp1;
    struct LCP_DATA  *data1;
    struct LCP       *lcp2;
@@ -450,20 +412,14 @@ datClone(char locator1_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the source locator string and export the destination               */
-/* locator string.                                                           */
-
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsexp( &locator2, locator2_str, DAT__SZLOC );
-
 /* Import the source locator.   */
 
-   _call(dau_import_loc( &locator1, &lcp1 ))
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    data1 = &lcp1->data;
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   _call(dau_export_loc( &locator2, &lcp2 ))
+   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;

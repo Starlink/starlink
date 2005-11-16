@@ -31,7 +31,6 @@ hdsLink(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_LINK: Error linking a locator to an HDS group."
 
-   struct DSC               locator;
    struct DSC               group;
 
    struct LCP      *lcp;
@@ -43,14 +42,13 @@ hdsLink(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator and group strings.        */
+/* Import the group string.        */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strcsimp( &group, group_str );
 
 /* Import the locator.  */
 
-   _call(dau_import_loc(&locator, &lcp))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
    
 /* Save the group specification.        */
@@ -150,8 +148,6 @@ hdsGroup(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_GROUP: Error enquiring the group membership of an HDS locator."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -163,13 +159,9 @@ hdsGroup(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status     = DAT__OK;
 
-/* Import the locator string */
-
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-
 /* Import the locator.  */
 
-   _call(dau_import_loc(&locator, &lcp))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Copy the group specification from the LCP.   */

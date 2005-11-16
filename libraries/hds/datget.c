@@ -47,7 +47,6 @@ datGet(char       locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_GET: Error reading value(s) from an HDS primitive object."
 
-   struct DSC locator;
    struct DSC type;
 
    struct LCP       *lcp;
@@ -73,14 +72,13 @@ datGet(char       locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status      = DAT__OK;
 
-/* Import the type and locator strings.  */
+/* Import the type string.  */
 
    _strcsimp  ( &type, type_str );
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* Import the locator.  */
 
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
    state = &data->state;
 

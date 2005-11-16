@@ -37,7 +37,6 @@ datPut( char     locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_PUT: Error writing value(s) to an HDS primitive."
 
-   struct DSC locator;
    struct DSC type;
 
    struct LCP       *lcp;
@@ -62,14 +61,13 @@ datPut( char     locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator and type strings.	*/
+/* Import the type string.	*/
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strcsimp( &type, type_str );
 
 /* Import the locator.	*/
 
-   _call( dau_import_loc( &locator, &lcp ) )
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data  = &lcp->data;
    state = &data->state;
 

@@ -29,8 +29,6 @@ hdsLock(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_LOCK: Error locking an HDS container file."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -40,11 +38,10 @@ hdsLock(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator string and locator.       */
+/* Import the locator.       */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-    _call( dau_import_loc( &locator, &lcp) )
-    data = &lcp->data;
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.     */
 
@@ -73,8 +70,6 @@ hdsFree(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_FREE: Error releasing locks on an HDS container file."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -84,10 +79,9 @@ hdsFree(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator string and locator.       */
+/* Import the locator.       */
 
-   _strflcsimp(&locator,locator_str, DAT__SZLOC );
-   _call( dau_import_loc(&locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.     */

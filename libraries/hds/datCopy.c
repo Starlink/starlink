@@ -67,6 +67,7 @@ datCopy(char locator1_str[DAT__SZLOC],
 *     WFL: William Lupton (AAO)
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,6 +91,8 @@ datCopy(char locator1_str[DAT__SZLOC],
 *        if we change modes.    
 *     14-JUN-2005 (BKM):
 *        Fix copying from 32<>64bit locators
+*     15-NOV-2005 (TIMJ):
+*        Use dat1_import_loc and dat1_alloc_lcp
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -106,8 +109,6 @@ datCopy(char locator1_str[DAT__SZLOC],
    int szcrv;                    /* Size of a CRV element.                  */
    INT_BIG off;                  /* Offset into Structure Record Vector     */
    int save_map;                 /* Saved global mapping flag value         */
-   struct DSC locator1;          /* Locator1 string descriptor              */
-   struct DSC locator2;          /* Locator2 string descriptor              */
    struct DSC name;              /* Output name string descriptor           */
    struct HAN han;               /* Handle for output component record      */
    struct LCP *lcp1;             /* Pointer to locator1 LCP                 */
@@ -129,13 +130,11 @@ datCopy(char locator1_str[DAT__SZLOC],
    if ( !_ok( *status ) ) return *status;
       hds_gl_status = *status;
 
-/* Import the first and second locator and name strings.                    */
-   _strflcsimp( &locator1, locator1_str, DAT__SZLOC );
-   _strflcsimp( &locator2, locator2_str, DAT__SZLOC );
+/* Import name strings. */
    _strcsimp(   &name, name_c );
 
 /* Import the first locator.                                                */
-   dau_import_loc( &locator1, &lcp1 );
+   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
    if ( _ok( hds_gl_status ) )
    {
 
@@ -172,7 +171,7 @@ datCopy(char locator1_str[DAT__SZLOC],
       dat1_pack_crv( &rid1, 0, crv1 );
 
 /* Import the second locator and obtain a pointer to the LCP data fields.   */
-      dau_import_loc( &locator2, &lcp2 );
+      dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;

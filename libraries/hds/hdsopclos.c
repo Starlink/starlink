@@ -32,7 +32,6 @@ hdsOpen(char *file_str,
 
    struct DSC        file;
    struct DSC        mode;
-   struct DSC        locator;
 
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -58,11 +57,10 @@ hdsOpen(char *file_str,
 
     _strcsimp  ( &file, file_str );
     _strcsimp  ( &mode, mode_str );
-    _strflcsimp( &locator, locator_str, DAT__SZLOC );
 
 /* Obtain the locator */
 
-   _call( dau_export_loc( &locator, &lcp) )
+   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
    data = &lcp->data;
 
 /* Validate the access mode and open the file. */
@@ -140,8 +138,6 @@ hdsClose(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_CLOSE: Error closing an HDS container file."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -150,10 +146,8 @@ hdsClose(char locator_str[DAT__SZLOC],
    if(!_ok(*status))
       return *status;
 
-/* Import the locator string and the obtain locator  */
-
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+/* Import the locator */
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object  */
@@ -166,13 +160,11 @@ hdsClose(char locator_str[DAT__SZLOC],
 /* the file, but it reproduces the historical behaviour of this routine,    */
 /* which has always been anomalous in this respect.                         */
    lcp->primary = 1;
-      dat1_annul_lcp( &lcp );
+   dat1_annul_lcp( &lcp );
 
 /* Nullify the locator value.                                               */
-  /*  cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator.body,
-   *          (int) locator.length ); */
-      strncpy( (char *) locator.body, DAT__NOLOC,
-                DAT__SZLOC );
+   strncpy( locator_str, DAT__NOLOC,
+	    DAT__SZLOC );
 
 /* Exit the routine.                                                        */
       return hds_gl_status;

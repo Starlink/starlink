@@ -35,7 +35,6 @@ datMap(char      locator_str[DAT__SZLOC],
         "DAT_MAP: Error mapping an HDS primitive."
 
    GENPTR_POINTER(pntr)
-   struct DSC locator;
    struct DSC type;
    struct DSC  mode;
 
@@ -69,15 +68,14 @@ datMap(char      locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator, type and mode strings.  */
+/* Import the type and mode strings.  */
 
-   _strflcsimp( &locator,locator_str, DAT__SZLOC );
    _strcsimp  ( &type,   type_str );
    _strcsimp  ( &mode,   mode_str );
 
 /* Import the locator.  */
 
-   _call(dau_import_loc(&locator, &lcp))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
    state = &data->state;
 
@@ -381,7 +379,6 @@ datBasic(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_BASIC: Error mapping an HDS primitive as basic machine units."
 
-   struct DSC locator;
    struct DSC mode;
 
    struct LCP       *lcp;
@@ -404,14 +401,13 @@ datBasic(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator and mode strings.  */
+/* Import the mode string.  */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strcsimp( &mode,    mode_c );
 
 /* Import the locator.  */
 
-   _call( dau_import_loc(&locator, &lcp) )
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -504,8 +500,6 @@ datUnmap(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_UNMAP: Error unmapping an HDS primitive."
 
-   struct DSC locator;
-
    struct LCP      *lcp;
    struct LCP_DATA *data;
 
@@ -515,10 +509,9 @@ datUnmap(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import locator string and locator.  */
+/* Import locator.  */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
-   _call( dau_import_loc( &locator, &lcp ))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is associated with a structure.        */

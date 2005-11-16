@@ -31,7 +31,6 @@ hdsTrace(char locator_str[DAT__SZLOC],
 #define context_message\
         "HDS_TRACE: Error tracing the path name of an HDS object."
 
-   struct DSC locator;
    struct DSC path;
    struct DSC file;
 
@@ -68,15 +67,14 @@ hdsTrace(char locator_str[DAT__SZLOC],
       return *status;
    hds_gl_status = DAT__OK;
 
-/* Import the locator string and export the path and file strings.      */
+/* Export the path and file strings.      */
 
-   _strflcsimp( &locator, locator_str, DAT__SZLOC );
    _strflcsimp( &path, path_str, path_length);
    _strflcsimp( &file, file_str, file_length);
 
 /* Import the locator.  */
 
-    _call(dau_import_loc(&locator, &lcp))
+   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
