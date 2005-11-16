@@ -4724,7 +4724,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
 //
 // clip x to withing range x0 .. x1
 //
-void clip(double& x, double x0, double x1)
+static void myClip(double& x, double x0, double x1)
 {
     if (x0 < x1) {
         if (x < x0)
@@ -4800,10 +4800,10 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
            || imageToCanvasCoords(ix1, iy1, 0) != TCL_OK) {
         return TCL_OK;
     }
-    clip(x0, ix0, ix1);
-    clip(x1, ix0, ix1);
-    clip(y0, iy0, iy1);
-    clip(y1, iy0, iy1);
+    myClip(x0, ix0, ix1);
+    myClip(x1, ix0, ix1);
+    myClip(y0, iy0, iy1);
+    myClip(y1, iy0, iy1);
 
     if ( wcsp != (StarWCS *)NULL ) {
         //  Non-celestial coordinates, need to transform without
