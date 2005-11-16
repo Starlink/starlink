@@ -588,6 +588,10 @@ static void IntraReg( const char *name, int nin, int nout,
    int found;                    /* Transformation function found? */
    int ifun;                     /* Loop counter for function information */
    
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -639,7 +643,16 @@ static void IntraReg( const char *name, int nin, int nout,
 /* If this is a new function, extend the array of transformation
    function data to accommodate it. */
       } else {
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
          tran_data = astGrow( tran_data, tran_nfun + 1, sizeof( TranData ) );
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
 
 /* Store the information supplied. */
          if ( astOK ) {
