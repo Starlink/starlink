@@ -539,9 +539,10 @@ L999:
 /* End the AST context */
    astEnd;
 
+/*
 printf("\n\n NEED TO REMOVE THE CALL TO astListIssued IN CLUMPS.C\n\n");
 astListIssued( "At end of CLUMPS");
-
+*/
 
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */
