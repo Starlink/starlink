@@ -56,6 +56,8 @@
 *     8-DEC-1998 (DSB):
 *        Check that there are some points to flush (NPBUF .GT. 0) before
 *        flushing the buffer if N is supplied equal to zero.
+*     16-NOV-2005 (DSB):
+*        Use different arrays for input and output when calling AST_TRANx.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,17 +84,14 @@
 
 *  Local Constants:
       INTEGER MXP
-      PARAMETER ( MXP = 10000 )
+      PARAMETER ( MXP = 5000 )
 
       INTEGER MXL
-      PARAMETER ( MXL = 2000 )
+      PARAMETER ( MXL = 1000 )
 
 *  Local Variables:
-      DOUBLE PRECISION FINISH( 2 )! Current coords at end of geodesic curve
-      DOUBLE PRECISION START( 2 ) ! Current coords at start of geodesic curve
       DOUBLE PRECISION XYDATA( MXP, 2 )! Buffer of input X and Y values
-      DOUBLE PRECISION XX         ! Transformed X value
-      DOUBLE PRECISION YY         ! Transformed Y value
+      DOUBLE PRECISION XYDATP( MXP, 2 )! Buffer of output X and Y values
       INTEGER I                   ! Position index
       INTEGER IP                  ! Index of 1st position in polyline
       INTEGER I0                  ! Index of first good position in polyline
@@ -134,7 +133,7 @@
 *  Transform the buffered positions using the inverse of the Plot to get
 *  positions in Graphics coordinates. 
             CALL AST_TRANN( IPLOT, NPBUF, 2, MXP, XYDATA, .FALSE., 
-     :                      2, MXP, XYDATA, STATUS )
+     :                      2, MXP, XYDATP, STATUS )
 
 *  Initialise the index of the first position in the next polyline.
             IP = 1
@@ -150,8 +149,8 @@
                DO I = IP, IP + NBUF( L ) - 1
 
 *  If the position is good, it can be plotted...
-                  IF( XYDATA( I, 1 ) .NE. AST__BAD .AND.
-     :                XYDATA( I, 2 ) .NE. AST__BAD ) THEN
+                  IF( XYDATP( I, 1 ) .NE. AST__BAD .AND.
+     :                XYDATP( I, 2 ) .NE. AST__BAD ) THEN
 
 *  If the pen is currently up, indicate that it has been put down on the
 *  paper, and initialise the number of good positions stored.
@@ -163,8 +162,8 @@
 *  Increment the number of good positions, and store the single precision 
 *  X and Y values in suitable arrays for passing to PGPLOT.
                      I0 = I0 + 1
-                     XRBUF( I0 ) = REAL( XYDATA( I, 1 ) )
-                     YRBUF( I0 ) = REAL( XYDATA( I, 2 ) )
+                     XRBUF( I0 ) = REAL( XYDATP( I, 1 ) )
+                     YRBUF( I0 ) = REAL( XYDATP( I, 2 ) )
 
 *  If the current position is bad, and the pen was previously down on the
 *  paper, lift the pen up, and draw the currently stored good positions.
