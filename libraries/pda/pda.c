@@ -197,5 +197,41 @@ float pdaRnnor( float mean, float sigma ){
    return F77_CALL(pda_rnnor)( REAL_ARG(&MEAN), REAL_ARG(&SIGMA) );
 }
 
+F77_SUBROUTINE(pda_deflt)( INTEGER(ALG), 
+                           INTEGER_ARRAY(IV), 
+                           INTEGER(LIV),
+                           INTEGER(LV),
+                           DOUBLE_ARRAY(V));
 
+void pdaDeflt( int alg, int *iv, int liv, int lv, double *v){
+   DECLARE_INTEGER(ALG);
+   DECLARE_INTEGER_ARRAY_DYN(IV);
+   DECLARE_INTEGER(LIV);
+   DECLARE_INTEGER(LV);
+   DECLARE_DOUBLE_ARRAY_DYN(V);
+
+   F77_EXPORT_INTEGER( alg, ALG );
+
+   F77_EXPORT_INTEGER( liv, LIV );
+   F77_CREATE_INTEGER_ARRAY( IV, liv );
+   F77_EXPORT_INTEGER_ARRAY( iv, IV, liv );
+
+   F77_EXPORT_INTEGER( lv, LV );
+   F77_CREATE_DOUBLE_ARRAY( V, lv );
+   F77_EXPORT_DOUBLE_ARRAY( v, V, lv );
+
+   F77_CALL(pda_deflt)( INTEGER_ARG(&ALG),
+                        INTEGER_ARRAY_ARG(IV),
+                        INTEGER_ARG(&LIV),
+                        INTEGER_ARG(&LV),
+                        DOUBLE_ARRAY_ARG(V) );
+
+   F77_IMPORT_INTEGER_ARRAY( IV, iv, liv );
+   F77_FREE_INTEGER( IV );
+
+   F77_IMPORT_DOUBLE_ARRAY( V, v, lv );
+   F77_FREE_DOUBLE( V );
+
+   return;
+}
 

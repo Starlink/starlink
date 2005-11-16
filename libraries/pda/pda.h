@@ -33,8 +33,7 @@ void pdaSumsl( int, double *, double *,
                void (*)( int, double *, int *, double * ),
                void (*)( int, double *, int *, double * ),
                int *, int, int, double * );
-
-
+void pdaDeflt( int, int *, int, int, double * );
 float pdaRand();
 float pdaRnnor( float, float );
 
