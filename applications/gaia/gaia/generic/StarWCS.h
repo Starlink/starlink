@@ -160,16 +160,19 @@ public:
   double plaindist( double x0, double y0, double x1, double y1 ) const;
 
   //  Set up an WCS system from the given information about the image
-  int set(double ra, double dec,
-          double secpix,
-          double xrefpix, double yrefpix,
-          int nxpix, int nypix,
-          double rotate,
-          int equinox, double epoch,
-          const char* proj);
+  int set( double ra, double dec,
+           double secpix,
+           double xrefpix, double yrefpix,
+           int nxpix, int nypix,
+           double rotate,
+           int equinox, double epoch,
+           const char* proj );
+
+  //  Set rotation and scaling
+  int deltset( double cdelt1, double cdelt2, double rotation );
 
   //  Reset the center of the WCS structure
-  int shift(double ra, double dec, double equinox);
+  int shift( double ra, double dec, double equinox );
 
   // Return the WCS equinox
   double equinox() const {return equinox_;}

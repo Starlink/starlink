@@ -61,22 +61,13 @@
 
 //-
 
-#include "config.h"  //  From skycat util
+#include <config.h>  //  From skycat util
 
-#include <string.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#ifdef HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
+#include <cstring>
 #include <strstream>
-#define STRSTD std
-#endif
-
-#include <stdlib.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdlib>
+#include <cctype>
+#include <cmath>
 #include "error.h"
 #include "StarWCS.h"
 #include "NDFIO.h"
@@ -243,7 +234,7 @@ int NDFIO::write( const char *pathname )
 //-
 int NDFIO::getFitsHeader(ostream& os) const
 {
-   STRSTD::istrstream is((char*)header_.ptr(), header_.size());
+   istrstream is((char*)header_.ptr(), header_.size());
    char buf[81];
    while(is.read(buf, FITSCARD)) {
       for (int i = 0; i < 79; i++) {

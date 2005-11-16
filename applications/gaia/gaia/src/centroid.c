@@ -59,6 +59,8 @@
  *        Added double precision image support.
  */
 
+#include <config.h> /* From skycat util */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

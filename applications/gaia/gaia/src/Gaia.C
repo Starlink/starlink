@@ -11,10 +11,12 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
-#include <string.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <iostream.h>
+#include <config.h>
+
+#include <cstring>
+#include <cstdlib>
+#include <csignal>
+#include <iostream>
 #include "tcl.h"
 
 extern "C" {
@@ -97,7 +99,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     //		1) the variable may already exist
     //		2) env array
     //		3) the compiled in value of GAIA_LIBRARY
-    char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
+    const char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
 	libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
     }
@@ -138,10 +140,10 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     //  Also do the package provide.
     if ( Tcl_Eval( interp,
                    "global iwidgets_library iwidgets_version\n"
-                   "package require Tcl 8.0\n"
-                   "package require Tk 8.0\n"
-                   "package require Itcl 3.0\n"
-                   "package require Itk 3.0\n"
+                   "package require Tcl 8.4\n"
+                   "package require Tk 8.4\n"
+                   "package require Itcl 3.3\n"
+                   "package require Itk 3.3\n"
                    "namespace eval ::iwidgets {\n"
                    "  namespace export *\n"
                    "  variable library $iwidgets_library\n"

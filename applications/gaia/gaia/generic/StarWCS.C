@@ -59,24 +59,16 @@
 //        Reworked make2D for case when there are more than 2
 //        dimensions. Should work better with NDF sections which have
 //        insignificant dimensions (in the base frame).
+//    16-NOV-2005 (PWD):
+//        Added deltset from 2.7.4.
 //-
 
-#include "config.h"  //  From skycat util
-
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-#include <float.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
-
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
+#include <cfloat>
+#include <iostream>
+#include <sstream>
 #include "error.h"
 #include "StarWCS.h"
 
@@ -1402,7 +1394,19 @@ int StarWCS::shift(double ra, double dec, double equinox)
     // frameset as the current frame? What is is centre in this case
     // (reference pixel? -- actually this is assumed to be the centre
     // of the image.).
-    cerr << "WCS::shift, this function is not implemented -- sorry." << endl;
+    cerr << "WCS::shift, this function is not implemented -- sorry." 
+         << std::endl;
+    return 0;
+}
+
+//+
+//  Set rotation and scaling.
+//
+int StarWCS::deltset( double cdelt1, double cdelt2, double rotation )
+{
+    //  No meaning for AST WCS.
+    cerr << "WCS::deltset, this function is not implemented -- sorry." 
+         << std::endl;
     return 0;
 }
 
@@ -1463,21 +1467,21 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     char card[81];
     char *equinox;
     int nwarns = 0;
-    STRSTD::ostrstream os;
+    std::ostringstream os;
 
     //  Add the encoding message.
     if ( encoding ) {
         os << "Result of attempt to read WCS encoded as: " << encoding
-           << endl;
-        os << endl;
+           << std::endl;
+        os << std::endl;
     }
     if ( failed ) {
-        os << "Failed, look for error messages on the terminal" << endl;
-        os << endl;
+        os << "Failed, look for error messages on the terminal" << std::endl;
+        os << std::endl;
     }
     else if ( fitschan ) {
-        os << "Succeeded" << endl;
-        os << endl;
+        os << "Succeeded" << std::endl;
+        os << std::endl;
 
         //  Construct warning card message like:
         //     ASTWARN = 'The message'
@@ -1494,13 +1498,13 @@ void StarWCS::constructWarning( const char *encoding, int failed,
                 equinoxStr_[0] = '\0';
             }
             nwarns++;
-            os << card << endl;
+            os << card << std::endl;
         }
         astClear( fitschan, "Card" );
     }
     if ( nwarns > 0 || encoding || failed ) {
         os << ends;
-        warnings_ = os.str();
+        warnings_ = (char *)os.str().c_str();
     }
 }
 
@@ -1562,3 +1566,4 @@ char *StarWCS::getDomains()
     }
     return namelist;
 }
+

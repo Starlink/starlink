@@ -35,6 +35,8 @@
  *                                     itemPtr.
  */
 
+#include <config.h> /* From skycat util */
+
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -63,8 +65,6 @@ extern int    TkThickPolyLineToArea _ANSI_ARGS_((double *coordPtr,
                                                  int joinStyle, double *rectPtr));
 extern int    TkPolygonToArea _ANSI_ARGS_((double *polyPtr,
                                            int numPoints, double *rectPtr));
-extern void   panic();
-
 extern void   TkMakeBezierPostscript _ANSI_ARGS_((Tcl_Interp *interp,
                                                   Tk_Canvas canvas, double *pointPtr,
                                                   int numPoints));
@@ -1337,7 +1337,7 @@ ParseArrowShape(clientData, interp, tkwin, value, recordPtr, offset)
     char **argv = NULL;
 
     if (offset != Tk_Offset(SegmentItem, arrowShapeA)) {
-	panic("ParseArrowShape received bogus offset");
+	Tcl_Panic( "ParseArrowShape received bogus offset" );
     }
 
     if (Tcl_SplitList(interp, value, &argc, &argv) != TCL_OK) {

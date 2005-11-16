@@ -52,12 +52,12 @@
 
 //-
 
-#include <error.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <sys/stat.h>
-#include <time.h>
+#include <ctime>
 #include <unistd.h>
+#include "error.h"
 #include "GaiaLocalCatalog.h"
 #include "Mem.h"
 #include "tcl.h"
@@ -356,7 +356,7 @@ time_t GaiaLocalCatalog::modDate( const char *filename )
 {
   struct stat buf;
   if ( stat( filename, &buf ) != 0 ) {
-    return (time_t) NULL;
+    return (time_t) 0;
   }
   return buf.st_mtime;
 }

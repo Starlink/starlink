@@ -28,8 +28,7 @@
 //        Add changes to support a "hdu" command for NDFs.
 //-
 
-#include <stdio.h>
-#include <iostream.h>
+#include <cstdio>
 
 // ALLAN: changed from wcslib.h to avoid name conflicts after upgrade
 // to wcssubs-2.3.
@@ -76,10 +75,6 @@ public:
    //  Read an NDF and return a pointer to an allocated NDFIO object
    //  NULL if an error occurred.
    static NDFIO *read( const char *filename, const char *component );
-   
-   //  Return true if this class uses native byte ordering (The ndf
-   //  library does the swapping already, so return 1 here).
-   int nativeByteOrder() const { return 1; }
    
    //  Return the class name as a string.
    const char* classname() const { return "NDFIO"; }

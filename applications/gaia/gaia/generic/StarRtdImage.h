@@ -60,27 +60,38 @@ extern "C" {
 //
 //  Image options (used for image configuration).
 //
+typedef struct Gaia_Options : public Rtd_Options {
+    char *ast_tag;      // Canvas tag for all ast graphics
+    char *component;    // NDF component to display
+    int plot_wcs;       // Scale and orient plot symbols using WCS system if available
+    int ukirt_ql;       // Whether ukirt quick look stats are enabled.
+} Gaia_Options;
+
 class StarRtdImageOptions : public RtdImageOptions {
   public:
-   char *ast_tag;          // Canvas tag for all ast graphics
-   char *component;        // NDF component to display
-   int plot_wcs;           // Scale and orient plot symbols using WCS
-                           // system if available
-   int ukirt_ql;           // Whether ukirt quick look stats are enabled.
 
-   StarRtdImageOptions()
-       : ast_tag(NULL), component(NULL), plot_wcs(1), ukirt_ql(0)
-       {}
+    struct Gaia_Options gaia_options_;
+
+    StarRtdImageOptions() {
+        gaia_options_.ast_tag = "ast_element";
+        gaia_options_.component= "data";
+        gaia_options_.plot_wcs = 1;
+        gaia_options_.ukirt_ql = 0;
+    }
+
+    // Accessors
+    char *get_gaia_options() {return (char *)&gaia_options_;}
+
 };
 
 //  Define the Tk config options here so that derived classes can add
 //  more options. The definition "inherits" the Rtd options (skycat
 //  does not define any new options) (allan).
-#define GAIA_OPTION(x) Tk_Offset(StarRtdImageOptions, x)
+#define GAIA_OPTION(x) Tk_Offset(Gaia_Options, x)
 #define GAIA_OPTIONS \
-  RTD_OPTIONS, \
-    {TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag), 0}, \
-    {TK_CONFIG_STRING, "-component", NULL, NULL, "data", GAIA_OPTION(component), 0}, \
+    RTD_OPTIONS, \
+    {TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "", GAIA_OPTION(ast_tag), 0}, \
+    {TK_CONFIG_STRING, "-component", NULL, NULL, "", GAIA_OPTION(component), 0}, \
     {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}, \
     {TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0", GAIA_OPTION(ukirt_ql), 0}
 
@@ -98,8 +109,13 @@ class StarRtdImage : public Skycat {
    ~StarRtdImage();
 
    //  Entry point from tcl to create a image.
-   static int CreateImage( Tcl_Interp *, char *, int, char **, Tk_ImageType *,
-                           Tk_ImageMaster, ClientData * );
+    static int CreateImage( Tcl_Interp*, char *name, int argc,
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+                            Tcl_Obj *CONST objv[],
+#else
+                            char **argv,
+#endif
+                            Tk_ImageType*, Tk_ImageMaster, ClientData* );
 
    //  Run a foreign procedure.
    int foreignCmd( int argc, char *argv[] );
@@ -269,7 +285,7 @@ class StarRtdImage : public Skycat {
 
    //  Access to some SLALIB routines.
    int slalibCmd( int argc, char *argv[] );
-   
+
    //  Set the CarLin attribute of FITS channels.
    int astcarlinCmd( int argc, char *argv[] );
 
@@ -303,16 +319,24 @@ class StarRtdImage : public Skycat {
    virtual int loadFile();
 
    //  Return the AST graphics item tag.
-   char *ast_tag() const { return staroptionsPtr_->ast_tag; }
+   char *ast_tag() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.ast_tag;
+   }
 
    //  Return the NDF component displayed.
-   char *component() const { return staroptionsPtr_->component; }
+   char *component() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.component;
+   }
 
    //  Return whether to scale and orient plotting symbols using the WCS
-   int plot_wcs() const { return staroptionsPtr_->plot_wcs; }
+   int plot_wcs() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.plot_wcs;
+   }
 
    //  Return whether UKIRT quick look statistics are available.
-   int ukirt_ql() const { return staroptionsPtr_->ukirt_ql; }
+   int ukirt_ql() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.ukirt_ql;
+   }
 
    //  Test if file extension is known to NDF.
    int isNDFtype( const char *);
@@ -416,7 +440,9 @@ class StarRtdImage : public Skycat {
    int ql_y1;
    int ql_rowcut;
 
-  private:
+   StarRtdImageOptions* gaia_image_options_;
+
+ private:
 
    // Copy constructor -- not defined.
    StarRtdImage( const StarRtdImage&) ;

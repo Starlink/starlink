@@ -38,19 +38,11 @@
  *
  */
 
-#include "config.h"  //  From skycat util
+#include <config.h>  //  From skycat util
 
-#include <stdlib.h>
-#include <iostream.h>
-
-//  strstream will be in std:: namespace in cannot use the .h form.
-#if HAVE_STRSTREAM_H
-#include <strstream.h>
-#define STRSTD
-#else
-#include <strstream>
-#define STRSTD std
-#endif
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
 
 #include "error.h"
 #include "util.h"
@@ -499,13 +491,12 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     
     //  Now construct the list to return.
     if ( ncolumn > 0 ) {
-        STRSTD::ostrstream os;
+        ostringstream os;
         for ( i = 0; i < ncolumn; i++ ) {
             os << sizes[i] << " ";
         }
         os << ends;
-        set_result(os.str());
-        delete os.str();
+        set_result( os.str().c_str() );
         delete [] sizes;
     }
     if ( mainArgc > 0 ) {

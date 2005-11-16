@@ -170,16 +170,20 @@
 //        Added direct NDF access commands. These are used to access cubes. 
 //-
 
+#include <config.h>
+
 #include <cstring>
 #include <cstdlib>
 #include <csignal>
 #include <iostream>
+#include <sstream>
 #include <cctype>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <float.h>
-#include "tcl.h"
+#include <tcl.h>
+#include <tk.h>
 #include "blt.h"
 #include <netinet/in.h>
 
@@ -314,7 +318,7 @@ static Tk_ImageType starRtdImageType = {
 // image "configure" subcommand. (ALLAN)
 //-
 static Tk_ConfigSpec configSpecs_[] = {
-    GAIA_OPTIONS,              // See StarRtdImage.h: defines option list
+    GAIA_OPTIONS,    // See StarRtdImage.h: defines option list
     {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
 };
 
@@ -326,7 +330,7 @@ extern "C" int Blt_GraphElement(
     int numValues,              /* Number of values in array */
     double *valueArr,           /* Array of x,y coordinate pairs */
     char *xVector,              /* Name of x array */
-    char *yVector);             /* Name of y array */
+    char *yVector );            /* Name of y array */
 
 //+
 //  Gaia_Init
@@ -369,8 +373,18 @@ extern "C" int StarRtd_Init( Tcl_Interp *interp )
 //  Return:
 //    TCL status.
 //-
-int StarRtdImage::CreateImage( Tcl_Interp *interp, char *name, int argc,
-                               char *argv[], Tk_ImageType *typePtr,
+int StarRtdImage::CreateImage( Tcl_Interp *interp, 
+                               char *name, 
+                               int argc,
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+                               Tcl_Obj *CONST objv[], // Argument objects for
+                                                      // options (not
+                                                      // including image name
+                                                      // or type) 
+#else
+                               char *argv[],
+#endif 
+                               Tk_ImageType *typePtr,
                                Tk_ImageMaster master,
                                ClientData *clientDataPtr )
 {
@@ -378,15 +392,19 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp, char *name, int argc,
     cout << "Called StarRtdImage::CreateImage" << endl;
 #endif
 
-    //  Create a configuration options structure (this is passed to
-    //  RtdImage and from there to TkImage overriding the options
-    //  defined by RtdImage).
-    StarRtdImageOptions *options = new StarRtdImageOptions();
+#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
+    // just generate an argv from the objv argument
+    char* argv[64];  // there shouldn't be more than a few options...
+    for(int i = 0; i < argc; i++)
+	argv[i] = Tcl_GetString(objv[i]);
+    argv[argc] = NULL;
+#endif
 
     //  Now Create the image.
     StarRtdImage *im = new StarRtdImage( interp, name, argc, argv, master,
                                          starRtdImageType.name,
-                                         configSpecs_, options);
+                                         configSpecs_,
+                                         new StarRtdImageOptions() );
     if (im && im->status() == TCL_OK) {
         *clientDataPtr = (ClientData) im;
         return im->initImage(argc, argv);  // ALLAN: moved here from constructor
@@ -424,7 +442,7 @@ StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
       oldset_(NULL)
 {
 #ifdef _DEBUG_
-    cout << "Created StarRtdImage object " << endl;
+    cout << "Created StarRtdImage object " << std::endl;
 #endif
 
     // Define the TCL interpreter for any AST errors.
@@ -443,7 +461,7 @@ StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
 StarRtdImage::~StarRtdImage()
 {
 #ifdef _DEBUG_
-    cout << "Destroying StarRtdImage object " << endl;
+    cout << "Destroying StarRtdImage object " << std::endl;
 #endif
     // XXX Do not delete this as base classes need the reference.
     // if ( staroptionsPtr_ ) {
@@ -484,7 +502,7 @@ StarRtdImage::~StarRtdImage()
 int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::call (" << name  << ")" << endl;
+    cout << "Called StarRtdImage::call (" << name  << ")" << std::endl;
 #endif
     for ( unsigned int i = 0;
           i < sizeof( subcmds_ ) / sizeof(*subcmds_); i++ ) {
@@ -611,7 +629,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
         imio.wcs( wcs );  // this sets the WCS object to use for this image
     }
 
-    return ImageData::makeImage( name(), imio, verbose() );
+    return ImageData::makeImage( name(), imio, NULL, verbose() );
 }
 
 //+
@@ -620,7 +638,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
 int StarRtdImage::loadFile()
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::loadFile (" << file() << ")" << endl;
+    cout << "Called StarRtdImage::loadFile (" << file() << ")" << std::endl;
 #endif
 
     // Used to save and restore image transformation parameters.
@@ -768,7 +786,7 @@ int StarRtdImage::isCelestial()
 int StarRtdImage::dumpCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::dumpCmd (" << argv[0] << ")" << endl;
+    cout << "Called StarRtdImage::dumpCmd (" << argv[0] << ")" << std::endl;
 #endif
     int native = 1;
     int saved = 1;
@@ -778,7 +796,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
     if ( image_ ) {
 
         //  Create a stream for any messages about the saving process.
-        ostrstream message;
+        ostringstream message;
         if ( origset_ ) {
 
             //  WCS has been modified so we need to store this in the
@@ -888,7 +906,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             nwrite = astWrite( chan, newwcs );
             if ( !astOK || nwrite == 0 ) {
                 message << "WCS: failed to save WCS using the "
-                        << "default encoding: " << default_encoding << endl;
+                        << "default encoding: " << default_encoding << std::endl;
 
                 //  Failed to write WCS using default encoding. Try NATIVE.
                 if ( ! astOK ) astClearStatus;
@@ -897,12 +915,12 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                     nwrite = astWrite( chan, newwcs );
                     if ( astOK && nwrite != 0 ) {
                         message << "WCS: saved WCS as AST native "
-                                << "encoding" << endl;
+                                << "encoding" << std::endl;
                         native = 1;
                         saved = 1;
                     } else {
                         message << "WCS: failed to save WCS "
-                                << "using an AST native encoding" << endl;
+                                << "using an AST native encoding" << std::endl;
                         //  Failed this time too.
                         native = 0;
                         saved = 0;
@@ -915,7 +933,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 
                 //  Write succeeded using default encoding.
                 message << "WCS: saved WCS using default encoding: "
-                        << default_encoding << endl;
+                        << default_encoding << std::endl;
                 saved = 1;
                 if ( strcmp( "NATIVE", default_encoding ) == 0 ) {
                     native = 1;
@@ -942,11 +960,12 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                     if ( astOK && nextra != 0 ) {
                         saved = 1;
                         message << "WCS: saved WCS using additional encoding: "
-                                << argv[1] << endl;
+                                << argv[1] << std::endl;
                     }
                     else {
                         message << "WCS: failed to save WCS using "
-                                << "additional encoding: " << argv[1] << endl;
+                                << "additional encoding: " 
+                                << argv[1] << std::endl;
                     }
                     if ( !astOK ) astClearStatus;
                 }
@@ -982,31 +1001,29 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                                 << "encoding, this will limit its "
                                 << "usefulness to AST compatible programs "
                                 << "(GAIA, KAPPA, EXTRACTOR etc.)"
-                                << endl;
+                                << std::endl;
                         result = TCL_ERROR;
                     }
                     else {
                         //  Just native is fine for NDFs.
                         message << "WCS: your modified WCS was "
-                                << "successfully saved" << endl;
+                                << "successfully saved" << std::endl;
                     }
                 } else if ( !saved ) {
                     message << "WCS: error, failed to save your modified WCS "
-                            << endl;
+                            << std::endl;
                     result = TCL_ERROR;
                 }
                 else {
                     message << "WCS: your modified WCS was "
-                            << "successfully saved" << endl;
+                            << "successfully saved" << std::endl;
                 }
             }
             else {
-                message << "Image saved" << endl;
+                message << "Image saved" << std::endl;
             }
             message << ends;
-            set_result( message.str() );
-            //message.freeze( false );
-            message.rdbuf()->freeze( 0 );
+            set_result( message.str().c_str() );
         }
         return result;
     } else {
@@ -1028,7 +1045,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
 int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::configureImage" << endl;
+    cout << "Called StarRtdImage::configureImage" << std::endl;
 #endif
     if ( TkImage::configureImage( argc, argv, flags ) != TCL_OK ) {
         return TCL_ERROR;
@@ -1104,7 +1121,7 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 int StarRtdImage::foreignCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::foreignCmd" << endl;
+    cout << "Called StarRtdImage::foreignCmd" << std::endl;
 #endif
 
     // Stop if no image loaded.
@@ -1185,7 +1202,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
 int StarRtdImage::originCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::originCmd" << endl;
+    cout << "Called StarRtdImage::originCmd" << std::endl;
 #endif
 
     if (!image_) {
@@ -1222,7 +1239,7 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
 int StarRtdImage::usingxshmCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::usingxshmCmd" << endl;
+    cout << "Called StarRtdImage::usingxshmCmd" << std::endl;
 #endif
 
     if (!image_) {
@@ -1276,7 +1293,7 @@ int StarRtdImage::usingxshmCmd( int argc, char *argv[] )
 int StarRtdImage::plotgridCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::plotgridCmd" << endl;
+    cout << "Called StarRtdImage::plotgridCmd" << std::endl;
 #endif
 
     int inerror = 0;
@@ -1485,7 +1502,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                         if ( !astOK ) {
                             cerr << "plot options: " << string <<
                                 " is not a valid attribute (" <<
-                                astStatus << ")" << endl;
+                                astStatus << ")" << std::endl;
                             failed++;
                             //  Try to succeed by using any acceptable options.
                             astClearStatus;
@@ -1551,7 +1568,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
 int StarRtdImage::astgetCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astgetCmd" << endl;
+    cout << "Called StarRtdImage::astgetCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -1586,7 +1603,7 @@ int StarRtdImage::astgetCmd( int argc, char *argv[] )
 int StarRtdImage::astsetCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astsetCmd" << endl;
+    cout << "Called StarRtdImage::astsetCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -1622,7 +1639,7 @@ int StarRtdImage::astsetCmd( int argc, char *argv[] )
 int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astaddcolourCmd" << endl;
+    cout << "Called StarRtdImage::astaddcolourCmd" << std::endl;
 #endif
 
     //  Extract the index.
@@ -1651,7 +1668,7 @@ int StarRtdImage::astaddcolourCmd( int argc, char *argv[] )
 int StarRtdImage::astfontresizeCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astfontresizeCmd" << endl;
+    cout << "Called StarRtdImage::astfontresizeCmd" << std::endl;
 #endif
     astTk_Init( interp_, canvasName_ );
     int resize = 0;
@@ -1682,7 +1699,7 @@ int StarRtdImage::astfontresizeCmd( int argc, char *argv[] )
 int StarRtdImage::aststoreCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::aststoreCmd" << endl;
+    cout << "Called StarRtdImage::aststoreCmd" << std::endl;
 #endif
 
     //  Extract the identifier of the FITS channel that we are to use.
@@ -1768,7 +1785,7 @@ int StarRtdImage::astresetCmd( int argc, char *argv[] )
 int StarRtdImage::astdeleteCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astdeleteCmd" << endl;
+    cout << "Called StarRtdImage::astdeleteCmd" << std::endl;
 #endif
 
     //  Extract the identifier of the FITS channel that we are to
@@ -1800,7 +1817,7 @@ int StarRtdImage::astdeleteCmd( int argc, char *argv[] )
 int StarRtdImage::astcreateCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astcreateCmd" << endl;
+    cout << "Called StarRtdImage::astcreateCmd" << std::endl;
 #endif
     if (!image_) {
         set_result(0);
@@ -1867,7 +1884,7 @@ void StarRtdImage::initChannel( int slot )
 int StarRtdImage::astreadCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astreadCmd" << endl;
+    cout << "Called StarRtdImage::astreadCmd" << std::endl;
 #endif
 
     //  Extract the identifier of the FITS channel that we are to use.
@@ -1923,7 +1940,7 @@ int StarRtdImage::astreadCmd( int argc, char *argv[] )
 int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astreplaceCmd" << endl;
+    cout << "Called StarRtdImage::astreplaceCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -1975,7 +1992,7 @@ int StarRtdImage::astreplaceCmd( int argc, char *argv[] )
 int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astrestoreCmd" << endl;
+    cout << "Called StarRtdImage::astrestoreCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -2074,7 +2091,7 @@ int StarRtdImage::astrestoreCmd( int argc, char *argv[] )
 int StarRtdImage::astrefineCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astrefineCmd" << endl;
+    cout << "Called StarRtdImage::astrefineCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -2199,7 +2216,7 @@ int StarRtdImage::mapPositions( int iframe, AstFrameSet *fset,
                                 double *ynew, int npoints )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::mapPositions" << endl;
+    cout << "Called StarRtdImage::mapPositions" << std::endl;
 #endif
 
     //  Determine the linear transformation between the data points. if
@@ -2240,7 +2257,7 @@ int StarRtdImage::addLinear( int iframe, AstFrameSet *fset,
                              double *tr, int fittype )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::addLinear" << endl;
+    cout << "Called StarRtdImage::addLinear" << std::endl;
 #endif
 
     //  The offset part is characterised using a WinMap, the other terms
@@ -2360,14 +2377,14 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
 extern "C" {
     static void write_out( const char *card )
     {
-        cout << card << endl;
+        cout << card << std::endl;
     }
 }
 
 int StarRtdImage::astwriteCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astwriteCmd" << endl;
+    cout << "Called StarRtdImage::astwriteCmd" << std::endl;
 #endif
 
     // See if we are to write out the image or local WCS.
@@ -2408,7 +2425,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
                 astFitsChan( NULL, &write_out, "Encoding=%s", argv[1] );
             int nwrite = astWrite( chan, newset_ );
             if ( !astOK || nwrite == 0 ) {
-                cerr << "Failed to write object via FITS channel" << endl;
+                cerr << "Failed to write object via FITS channel" << std::endl;
             }
             chan = (AstFitsChan *) astAnnul( chan );
 
@@ -2416,7 +2433,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
             if ( argc == 3 ) {
                 int slot = 0;
                 if ( Tcl_GetInt( interp_, argv[2], &slot ) != TCL_OK ) {
-                    cout << argv[1] << " is not an integer" << endl;
+                    cout << argv[1] << " is not an integer" << std::endl;
                 } else {
                     slot--;
                     astShow( channels_[slot] ) ;
@@ -2424,7 +2441,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
             }
         }
     } else {
-        cout << "Sorry no FrameSets are available" << endl;
+        cout << "Sorry no FrameSets are available" << std::endl;
     }
     return TCL_OK;
 }
@@ -2440,7 +2457,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
 int StarRtdImage::astcopyCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astcopyCmd" << endl;
+    cout << "Called StarRtdImage::astcopyCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -2498,7 +2515,7 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
 int StarRtdImage::astfixCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astfixCmd" << endl;
+    cout << "Called StarRtdImage::astfixCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -2535,7 +2552,7 @@ int StarRtdImage::astfixCmd( int argc, char *argv[] )
 int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astwcs2pixCmd" << endl;
+    cout << "Called StarRtdImage::astwcs2pixCmd" << std::endl;
 #endif
 
     // Convert input position, which may be in H:M:S format, to
@@ -2586,7 +2603,7 @@ int StarRtdImage::astwcs2pixCmd( int argc, char *argv[] )
 int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astpix2wcsCmd" << endl;
+    cout << "Called StarRtdImage::astpix2wcsCmd" << std::endl;
 #endif
 
     //  Extract the input X and Y positions.
@@ -2643,7 +2660,7 @@ int StarRtdImage::astpix2wcsCmd( int argc, char *argv[] )
 int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astpix2curCmd" << endl;
+    cout << "Called StarRtdImage::astpix2curCmd" << std::endl;
 #endif
 
     //  Extract the input X and Y positions.
@@ -2700,7 +2717,7 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
 int StarRtdImage::astcur2pixCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astcur2pixCmd" << endl;
+    cout << "Called StarRtdImage::astcur2pixCmd" << std::endl;
 #endif
 
     //  Extract the input positions.
@@ -2747,7 +2764,7 @@ void StarRtdImage::decodeLinear( double tr[6], double &xz, double &yz,
                                  double &orient )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::decodeLinear" << endl;
+    cout << "Called StarRtdImage::decodeLinear" << std::endl;
 #endif
     double a = tr[0];
     double b = tr[1];
@@ -2840,7 +2857,7 @@ void StarRtdImage::decodeLinear( double tr[6], double &xz, double &yz,
 int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astbootstatsCmd" << endl;
+    cout << "Called StarRtdImage::astbootstatsCmd" << std::endl;
 #endif
 
     //  Extract the values from the lists.
@@ -3054,7 +3071,7 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astsystemCmd" << endl;
+    cout << "Called StarRtdImage::astsystemCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -3173,7 +3190,7 @@ int StarRtdImage::draw_symbol( const char *shape,
                                const char *label, const char *label_tags)
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::draw_symbol: " << shape << endl;
+    cout << "Called StarRtdImage::draw_symbol: " << shape << std::endl;
 #endif
     static struct SymbolTab {
         // symbol name
@@ -3227,7 +3244,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
                                const char *label_tags)
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::draw_ellipse" << endl;
+    cout << "Called StarRtdImage::draw_ellipse" << std::endl;
 #endif
     double cx, cy, nx, ny, ex, ey;
     if (get_compass(x, y, xy_units, radius, radius_units, ratio, angle,
@@ -3238,8 +3255,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
 
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_*4];
-    ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_ellipse "
            << cx << " " << cy << " "
@@ -3248,7 +3264,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
            << " -outline " << bg
            << " -fill " << bg
            << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
-           << endl;
+           << std::endl;
     }
     os << canvasName_ << " create rtd_ellipse "
        << cx << " " << cy << " "
@@ -3257,15 +3273,13 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
        << " -outline " << bg
        << " -fill " << fg
        << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
-       << endl;
+       << std::endl;
 
     if (label && strlen(label))
         make_label(os, label, cx, cy, label_tags, fg);
 
     os << ends;
-    int result = eval( os.str() );
-    os.rdbuf()->freeze( 0 );
-    //os.freeze( false );
+    int result = eval( os.str().c_str() );
     return result;
 }
 
@@ -3281,7 +3295,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
                               const char *label_tags)
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::draw_rotbox" << endl;
+    cout << "Called StarRtdImage::draw_rotbox" << std::endl;
 #endif
     double cx, cy, nx, ny, ex, ey;
     if (get_compass(x, y, xy_units, radius, radius_units, ratio, angle,
@@ -3291,8 +3305,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
     }
 
     // if using 2 colors, draw 2 symbols, for visibility, one thicker
-    char buf[eval_buf_size_*4];
-    ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
     if (strcmp(fg, bg) != 0) {
         os << canvasName_ << " create rtd_rotbox "
            << cx << " " << cy << " "
@@ -3301,7 +3314,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
            << " -outline " << bg
            << " -fill " << bg
            << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
-           << endl;
+           << std::endl;
     }
     os << canvasName_ << " create rtd_rotbox "
        << cx << " " << cy << " "
@@ -3310,15 +3323,13 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
        << " -outline " << bg
        << " -fill " << fg
        << " -width 1 -stipple pat7 -tags {" << symbol_tags <<  "}"
-       << endl;
+       << std::endl;
 
     if (label && strlen(label))
         make_label(os, label, cx, cy, label_tags, fg);
 
     os << ends;
-    int result = eval( os.str() );
-    os.rdbuf()->freeze( 0 );
-    //os.freeze( false );
+    int result = eval( os.str().c_str() );
     return result;
 }
 
@@ -3337,7 +3348,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
 int StarRtdImage::urlgetCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::urlgetCmd (" << argv[0] << ")" << endl;
+    cout << "Called StarRtdImage::urlgetCmd (" << argv[0] << ")" << std::endl;
 #endif
 
     //  Create a HTTP object to do the transaction.
@@ -3368,7 +3379,7 @@ int StarRtdImage::urlgetCmd( int argc, char *argv[] )
 int StarRtdImage::blankcolorCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::blankcolorCmd (" << argv[0] << ")" << endl;
+    cout << "Called StarRtdImage::blankcolorCmd (" << argv[0] << ")" << std::endl;
 #endif
 
     //  Decode the colour into an XColor structure.
@@ -3429,7 +3440,7 @@ int StarRtdImage::blankcolorCmd( int argc, char *argv[] )
 int StarRtdImage::sliceCmd(int argc, char *argv[])
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::sliceCmd (" << argc << ")" << endl;
+    cout << "Called StarRtdImage::sliceCmd (" << argc << ")" << std::endl;
 #endif
     if (!image_) {
         return TCL_OK;
@@ -3792,7 +3803,7 @@ int StarRtdImage::get_compass( double x, double y, const char* xy_units,
 int StarRtdImage::contourCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::contourCmd" << endl;
+    cout << "Called StarRtdImage::contourCmd" << std::endl;
 #endif
 
     int inerror = 0;
@@ -4060,7 +4071,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::makeGridWCS" << endl;
+    cout << "Called StarRtdImage::makeGridWCS" << std::endl;
 #endif
 
     //  If no image is given then use the default.
@@ -4153,7 +4164,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                                    double region[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::createPlot" << endl;
+    cout << "Called StarRtdImage::createPlot" << std::endl;
 #endif
     //  Define the limits of the canvas plotting "area" in canvas
     //  coordinates and current coordinates (the same positions). Use
@@ -4285,7 +4296,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
 int StarRtdImage::hduCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::hduCmd" << endl;
+    cout << "Called StarRtdImage::hduCmd" << std::endl;
 #endif
     if ( ! image_ ) {
         return TCL_OK;
@@ -4523,7 +4534,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     }
 
     //  Loop though all NDFs getting the required information.
-    ostrstream os;
+    std::ostringstream os;
     for ( int i = 1; i <= numNDFs; i++ ) {
         char name[MAXNDFNAME], naxis1[32], naxis2[32], hasvar[32], hasqual[32];
         ndf->getNDFInfo( i, name, naxis1, naxis2, hasvar, hasqual );
@@ -4537,8 +4548,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
            << "} ";
     }
     os << ends;
-    set_result( os.str() );
-    os.rdbuf()->freeze( 0 );
+    set_result( os.str().c_str() );
     return TCL_OK;
 }
 
@@ -4560,7 +4570,7 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
 int StarRtdImage::colorrampCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::colorrampCmd" << endl;
+    cout << "Called StarRtdImage::colorrampCmd" << std::endl;
 #endif
     if ( argc == 0 ) {
         return RtdImage::colorrampCmd( argc, argv );
@@ -4623,7 +4633,7 @@ int StarRtdImage::colorrampCmd( int argc, char *argv[] )
 int StarRtdImage::percentCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::percentCmd" << endl;
+    cout << "Called StarRtdImage::percentCmd" << std::endl;
 #endif
 
     //  No image, no values.
@@ -4714,7 +4724,7 @@ int StarRtdImage::percentCmd( int argc, char *argv[] )
 //
 // clip x to withing range x0 .. x1
 //
-static void clip(double& x, double x0, double x1)
+void clip(double& x, double x0, double x1)
 {
     if (x0 < x1) {
         if (x < x0)
@@ -4747,7 +4757,7 @@ static void clip(double& x, double x0, double x1)
 int StarRtdImage::gbandCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::gbandCmd" << endl;
+    cout << "Called StarRtdImage::gbandCmd" << std::endl;
 #endif
 
     //  If WCS is available see if it is celestial.
@@ -5147,7 +5157,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
 int StarRtdImage::isNDFtype( const char *type )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::isNDFType" << endl;
+    cout << "Called StarRtdImage::isNDFType" << std::endl;
 #endif
 
     // If the type is already known do things quickly.
@@ -5554,7 +5564,7 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
 int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::asttran2Cmd" << endl;
+    cout << "Called StarRtdImage::asttran2Cmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -5690,7 +5700,7 @@ int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
 int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astwarningsCmd" << endl;
+    cout << "Called StarRtdImage::astwarningsCmd" << std::endl;
 #endif
     if ( image_ ) {
         StarWCS *wcs = getStarWCSPtr( image_ );
@@ -5750,7 +5760,7 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
 int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::xyProfileCmd (" << argc << ")" << endl;
+    cout << "Called StarRtdImage::xyProfileCmd (" << argc << ")" << std::endl;
 #endif
     if ( !image_ ) {
         return TCL_OK;
@@ -5911,26 +5921,11 @@ int StarRtdImage::swapNeeded()
 //-
 int StarRtdImage::swapNeeded( ImageIO imio )
 {
-    int swap = 0;
+    //  Check the ImageIO format. Don't need a swap if the data is already in
+    //  network byte order on a bigendian machine, or vice-versa.
     ImageIO *imptr = &imio;
-
-    //  Check the ImageIO format. If this is "native" then the data is
-    //  in the machine format already (NDF).
-    if ( imptr->nativeByteOrder() ) {
-        swap = 0;
-    } else {
-
-        //  Check byte ordering by looking at a 1, unless we have
-        //  a single byte image.
-        int dsize = abs( imptr->bitpix() ) / 8;
-        FITS_LONG l = 1;
-        if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
-            swap = 0;
-        } else {
-            swap = 1;
-        }
-    }
-    return swap;
+    return ( BIGENDIAN && imptr->usingNetBO() ) ||
+           ( ! BIGENDIAN && ! imptr->usingNetBO() );
 }
 
 //+
@@ -5946,7 +5941,7 @@ int StarRtdImage::swapNeeded( ImageIO imio )
 int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astdomainsCmd" << endl;
+    cout << "Called StarRtdImage::astdomainsCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -5978,7 +5973,7 @@ int StarRtdImage::astdomainsCmd( int argc, char *argv[] )
 int StarRtdImage::astmilliCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astmilliCmd" << endl;
+    cout << "Called StarRtdImage::astmilliCmd" << std::endl;
 #endif
     if (!image_) {
         return error("no image loaded");
@@ -6006,7 +6001,7 @@ int StarRtdImage::astmilliCmd( int argc, char *argv[] )
 int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astcarlinCmd" << endl;
+    cout << "Called StarRtdImage::astcarlinCmd" << std::endl;
 #endif
     if ( *argv[0] == '0' ) {
         StarWCS::setCarLin( 0 );
@@ -6028,7 +6023,7 @@ int StarRtdImage::astcarlinCmd( int argc, char *argv[] )
 int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::astalwaysmergeCmd" << endl;
+    cout << "Called StarRtdImage::astalwaysmergeCmd" << std::endl;
 #endif
     if ( *argv[0] == '0' ) {
         StarFitsIO::setAlwaysMerge( 0 );
@@ -6056,7 +6051,7 @@ int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
 int StarRtdImage::slalibCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::slalibCmd" << endl;
+    cout << "Called StarRtdImage::slalibCmd" << std::endl;
 #endif
 
     //  First argument is name of SLALIB routine.
@@ -6137,7 +6132,7 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
 int StarRtdImage::ndfCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-    cout << "Called StarRtdImage::ndfCmd" << endl;
+    cout << "Called StarRtdImage::ndfCmd" << std::endl;
 #endif
     int result = TCL_OK;
     char *error_mess;

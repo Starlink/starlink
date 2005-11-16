@@ -100,11 +100,10 @@
 //     {enter_changes_here}
 //-
 
-#include <limits.h>
-#include <string.h>
-#include <stdlib.h>
-#include <string.h>
-#include <float.h>
+#include <climits>
+#include <cstring>
+#include <cstdlib>
+#include <cfloat>
 #include "Contour.h"
 extern "C" {
 #include "grf.h"
