@@ -140,6 +140,10 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1 );
       cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.0 );
 
+/* Maximum number of function evaluations to be used when fitting an 
+   individual clump. */
+      cupidGC.maxnf = cupidConfigI( config, "MAXNF", 50 );
+
 /* See if a value has been supplied for the initial guess at the ratio 
    of the clump size to the beam width. */
       fbeam = cupidConfigD( config, "FWHMSTART", VAL__BADD );

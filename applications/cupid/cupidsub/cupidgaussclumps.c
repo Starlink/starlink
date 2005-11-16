@@ -188,6 +188,12 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             msgSetd( "N", rms );
             msgOut( "", "User-supplied RMS noise: ^N", status );
          }
+/* If the user did not supply an RMS value, access it again, this time
+   suppling the default RMS value. This is done to esnure that the
+   default RMS value is stored in the CUPID NDF extension when the
+   program exits. */
+      } else {
+         (void) cupidConfigD( gcconfig, "RMS", rms );
       }
 
       if( ilevel > 2 ) {

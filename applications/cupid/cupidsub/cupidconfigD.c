@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "ast.h"
+#include "prm_par.h"
 #include "cupid.h"
 
 double cupidConfigD( AstKeyMap *config, const char *name, double def ){
@@ -56,9 +57,9 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
    if( !astMapGet0D( config, name, &ret ) ) {
 
 /* If the value was not found in the KeyMap, return the default value and
-   also store it in the KeyMap. */
+   also store it in the KeyMap if it is good. */
       ret = def;
-      astMapPut0D( config, name, def, NULL );
+      if( def != VAL__BADD ) astMapPut0D( config, name, def, NULL );
    }
 
 /* Return the result. */

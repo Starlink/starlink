@@ -368,36 +368,34 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* If required, create an HDS structure holding information about the
    clump. */
-   if( cloc && area > area_off ) {
+   if( cloc ) {
 
-/* Modify the box to exclude the border of bad pixels and limit it to the
-   volume of the data array. */
+/* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {
          lbox[ jax ]++;
          ubox[ jax ]--;
-         if( lbox[ jax ] < 1 ) lbox[ jax ] = 1;
-         if( ubox[ jax ] > dims[ jax ] ) ubox[ jax ] = dims[ jax ];
       }
 
 /* Create extra diagnostic info if required (meant for debugging). */
       if( diag ) {
          extra = astKeyMap( "" );
+         astMapPut0D( extra, "NITFIT", (double) cupidGC.nf, NULL );
          astMapPut0D( extra, "CHISQ", cupidGC.chisq, NULL );
-         astMapPut0D( extra, "INITPEAK", cupidGC.initmodel[0]*rms, NULL );
-         astMapPut0D( extra, "INITBACK", cupidGC.initmodel[1]*rms, NULL );
+         astMapPut0D( extra, "INITPEAK", cupidGC.initpars[0]*rms, NULL );
+         astMapPut0D( extra, "INITBACK", cupidGC.initpars[1]*rms, NULL );
 
-         d = par[ 2 ] - cupidGC.initmodel[ 2 ];
-         shiftsq += d*d;
+         d = par[ 2 ] - cupidGC.initpars[ 2 ];
+         shiftsq = d*d;
 
-         astMapPut0D( extra, "INITFWHM1", cupidGC.initmodel[3], NULL );
+         astMapPut0D( extra, "INITFWHM1", cupidGC.initpars[3], NULL );
          if( ndim > 1 ) {
-            d = par[ 5 ] - cupidGC.initmodel[ 5 ];
+            d = par[ 5 ] - cupidGC.initpars[ 5 ];
             shiftsq += d*d;
-            astMapPut0D( extra, "INITFWHM2", cupidGC.initmodel[5], NULL );
-            if( ndim > 1 ) {
-               d = par[ 7 ] - cupidGC.initmodel[ 7 ];
+            astMapPut0D( extra, "INITFWHM2", cupidGC.initpars[5], NULL );
+            if( ndim > 2 ) {
+               d = par[ 7 ] - cupidGC.initpars[ 7 ];
                shiftsq += d*d;
-               astMapPut0D( extra, "INITFWHM3", cupidGC.initmodel[8], NULL );
+               astMapPut0D( extra, "INITFWHM3", cupidGC.initpars[8], NULL );
             }
          }
          astMapPut0D( extra, "SHIFT", sqrt(shiftsq), NULL );

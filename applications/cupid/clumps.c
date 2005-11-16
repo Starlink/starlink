@@ -151,6 +151,8 @@ void clumps() {
 *     supplied data array, or when one of the other termination criteria 
 *     is met. If the supplied value is negative, this termination
 *     criterion is not used. [0.01]
+*     - GaussClumps.MaxNF: The maximum number of function evaluations
+*     allowed when fitting an individual clump. [50]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
 *     noise are treated as zero. [0.5]
@@ -377,7 +379,7 @@ void clumps() {
 
 /* If there is a variance array, map it and find the global RMS error. */
    ndfState( indf, "VARIANCE", &var, status );
-   if( var && *status == SAI__OK ) {   
+   if( *status == SAI__OK && var ) {   
       ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
       sum = 0.0;
@@ -430,12 +432,6 @@ void clumps() {
       }
    }
 
-/* Delete any existing CUPID extension in the NDF, and then create a new
-   one. */
-   ndfXstat( indf, "CUPID", &there, status );
-   if( there ) ndfXdel( indf, "CUPID", status );
-   ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
-
 /* If required allocate room for a mask holding bad values for points which 
    are not inside any clump. Fill it with bad values. */
    parGet0l( "MASK", &mask, status );
@@ -443,18 +439,8 @@ void clumps() {
       rmask = astMalloc( sizeof( float )*(size_t) el );
       if( rmask ) {
          for( i = 0; i < el; i++ ) rmask[ i ] = VAL__BADR;
-
-/* Delete any existing quality name information from the supplied NDF, and 
-   create a structure to hold new quality name info. */
-         irqDelet( indf, status ); 
-         irqNew( indf, "CUPID", qlocs, status );
-
-/* Add in two quality names; "CLUMP"and "BACKGROUND". */
-         irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
-                   status );
-         irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
-                   status );
       }
+
    } else {
       rmask = NULL;
    }
@@ -502,8 +488,27 @@ void clumps() {
               "implemented.", status );
    }
 
-/* Transfer any pixel mask to the NDF quality array. */
-   if( mask ){
+/* Delete any existing CUPID extension in the NDF, and then create a new
+   one. */
+   ndfXstat( indf, "CUPID", &there, status );
+   if( there ) ndfXdel( indf, "CUPID", status );
+   ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+
+/* If a quality mask is being added to the input NDF... */
+   if( mask ) {
+
+/* Delete any existing quality name information from the supplied NDF, and 
+   create a structure to hold new quality name info. */
+      irqDelet( indf, status ); 
+      irqNew( indf, "CUPID", qlocs, status );
+
+/* Add in two quality names; "CLUMP"and "BACKGROUND". */
+      irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
+                status );
+      irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+                status );
+
+/* Transfer the pixel mask to the NDF quality array. */
       irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
       irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
    }
@@ -532,6 +537,15 @@ L999:
    clumps. The actual locators should already have been freed in
    cupidStoreClumps. */
    clist = astFree( clist );
+
+/* If an error has occurred, delete the QUality component if a mask was
+   being created, and also delete the CUPID extension. */
+   if( *status != SAI__OK ) {
+      errBegin( status );
+      if( mask ) ndfReset( indf, "QUALITY", status );
+      ndfXdel( indf, "CUPID", status );
+      errEnd( status );
+   }
 
 /* End the NDF context */
    ndfEnd( status );

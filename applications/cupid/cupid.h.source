@@ -37,6 +37,7 @@ typedef struct CupidGC  {
    int ndim;               /* Number of pixel axes in the data array */
    int nel;                /* Number of pixels in section being fitted */
    int nf;                 /* The invocation count from calcf */
+   int maxnf;              /* Max invocation count for calcf */
    int nwf;                /* Number of times to modifiy the weight array */
 
    double initpars[ CUPID__GCNP3 ];
