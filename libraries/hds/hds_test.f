@@ -51,11 +51,16 @@
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
       CHARACTER * ( DAT__SZLOC ) LOC2 ! Locator for data array
+      CHARACTER * ( DAT__SZLOC ) LOC3 ! Locator for cell array
       INTEGER DIM( 2 )           ! Data array dimensions
       INTEGER EL                 ! Number of mapped elements
       INTEGER ISUM               ! Sum of array elements
       INTEGER PNTR               ! Pointer to mapped array
       INTEGER EXITSTATUS         ! Exit status to be reported at end
+      INTEGER NCOMP              ! Number of top level HDS components
+      INTEGER CDIM(2)            ! Cell dimensions
+      REAL    ANSWER
+      LOGICAL PRIM
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -78,7 +83,7 @@
       CALL DAT_MAPV( LOC2, '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Initialise the array.
-      CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
+      CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), ANSWER, STATUS )
 
 *  Clean up and close the file.
       CALL DAT_UNMAP( LOC2, STATUS )
@@ -88,8 +93,27 @@
 *  Re-open the file.
       CALL HDS_OPEN( 'hds_test', 'UPDATE', LOC1, STATUS )
 
+*  Count the number of components
+      CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (NCOMP .NE. 1) THEN
+            STATUS = SAI__ERROR
+            CALL EMS_REP( 'HDS_TEST_ERR',
+     :           'HDS_TEST: Failed in NCOMP.',
+     :           STATUS )
+         END IF
+      END IF
+
 *  Find and map the data array.
       CALL DAT_FIND( LOC1, 'DATA_ARRAY', LOC2, STATUS )
+
+      CDIM(1) = 200
+      CDIM(2) = 3
+      CALL DAT_VEC( LOC2, LOC3, STATUS )
+      CALL DAT_SIZE( LOC3, CDIM(2), STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+      CALL DAT_PRIM( LOC2, PRIM, STATUS )
+
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
 
 *  Sum the data elements.
@@ -101,13 +125,14 @@
       CALL HDS_ERASE( LOC1, STATUS )
 
 *  Check if the test ran OK. If so, then report success.
-      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. 20100 ) ) THEN
+      IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. INT(ANSWER) )) THEN
          WRITE( *, * ) '   HDS installation test succeeded.'
          EXITSTATUS = 0
 
 *  Otherwise, report an error.
       ELSE
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
+         PRINT *, 'Sum = ',ISUM, ' expected ',ANSWER
          CALL EMS_REP( 'HDS_TEST_ERR',
      :   'HDS_TEST: HDS installation test failed.', STATUS )
          EXITSTATUS = 1
@@ -118,7 +143,7 @@
 
       END
 
-      SUBROUTINE SETUP( EL, ARRAY, STATUS )
+      SUBROUTINE SETUP( EL, ARRAY, SUM, STATUS )
 *+
 *  Name:
 *     SETUP
@@ -141,6 +166,8 @@
 *        Number of array elements.
 *     ARRAY( EL ) = REAL (Returned)
 *        Array to be initialised.
+*     SUM = REAL (Returned)
+*        Sum of all pixels written to ARRAY
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -169,6 +196,7 @@
 
 *  Arguments Returned:
       REAL ARRAY( * )
+      REAL SUM
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -182,8 +210,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the array.
+      SUM = 0.0
       DO 1 I = 1, EL
          ARRAY( I ) = REAL( I )
+         SUM = SUM + REAL( I )
  1    CONTINUE
 
       END
@@ -250,11 +280,11 @@
 
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
 *  Initialise.
       ISUM = 0
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Sum the array elements.
       DO 1 I = 1, EL
