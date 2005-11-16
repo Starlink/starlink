@@ -36,12 +36,43 @@
 *                            {sigmas=[?,?]
 
 *  Parameters:
+*     HIGH = _DOUBLE (Read)
+*        Only required if SCALE is "scale".
+*        The array value that scales to 255 in the TIFF file.
+*        All larger array values are set to 255 when HIGH is greater than
+*        LOW, otherwise all array values less than HIGH are set to 255.
+*        The dynamic default is the maximum data value.  There is an
+*        efficiency gain when both LOW and HIGH are given on the
+*        command line, because the extreme values need not be computed.
+*        The highest data value is suggested in prompts.
 *     IN = NDF (Read)
 *        Input NDF data structure containing the image to be displayed.
+*     LOW = _DOUBLE (Read)
+*        Only required if SCALE is "scale".
+*        The array value that scales to 0 in the TIFF file.
+*        All smaller array values are also set to 0 when LOW is less than
+*        HIGH, otherwise all array values greater than LOW are set to 0.
+*        The dynamic default is the minimum data value.  There is an
+*        efficiency gain when both LOW and HIGH are given on the
+*        command line, because the extreme values need not be computed.
+*        The lowest data value is suggested in prompts.
+*     MSG_FILTER = The output message filtering level, QUIET, NORMAL or
+*        VERBOSE. If set to verbose, the scaling limits used will be
+*        displayed. [NORMAL]
+*     NUMBIN  =  _INTEGER (Read)
+*        Only used if SCALE is "Percentiles".
+*        The number of histogram bins used to compute percentiles for
+*        scaling. [2048]
 *     OUT = _CHAR (Read)
 *        The name of the TIFF file to be generated.  (A .tif name
 *        extension is added if it is omitted. Any existing file with
 *        the same name will be overwritten.
+*     PERCENTILES( 2 ) = _REAL (Read)
+*        Only required if SCALE is "Percentiles".
+*        The percentiles that define the scaling limits. For example,
+*        [25,75] would scale between the quartile values.
+*     SCAHIGH = _DOUBLE (Write)
+*        The array value scaled to the maximum colour index.
 *     SCALE = LITERAL (Read)
 *        The type of scaling to be applied to the array.  [Range]
 *        The options, which may be abbreviated to an unambiguous string
@@ -59,32 +90,8 @@
 *                          minimum values when prompting.
 *          "Sigmas"      - The image is scaled between two standard-
 *                          deviation limits.  
-*     HIGH = _DOUBLE (Read)
-*        Only required if SCALE is "scale".
-*        The array value that scales to 255 in the TIFF file.
-*        All larger array values are set to 255 when HIGH is greater than
-*        LOW, otherwise all array values less than HIGH are set to 255.
-*        The dynamic default is the maximum data value.  There is an
-*        efficiency gain when both LOW and HIGH are given on the
-*        command line, because the extreme values need not be computed.
-*        The highest data value is suggested in prompts.
-*     LOW = _DOUBLE (Read)
-*        Only required if SCALE is "scale".
-*        The array value that scales to 0 in the TIFF file.
-*        All smaller array values are also set to 0 when LOW is less than
-*        HIGH, otherwise all array values greater than LOW are set to 0.
-*        The dynamic default is the minimum data value.  There is an
-*        efficiency gain when both LOW and HIGH are given on the
-*        command line, because the extreme values need not be computed.
-*        The lowest data value is suggested in prompts.
-*     NUMBIN  =  _INTEGER (Read)
-*        Only used if SCALE is "Percentiles".
-*        The number of histogram bins used to compute percentiles for
-*        scaling. [2048]
-*     PERCENTILES( 2 ) = _REAL (Read)
-*        Only required if SCALE is "Percentiles".
-*        The percentiles that define the scaling limits. For example,
-*        [25,75] would scale between the quartile values.
+*     SCALOW = _DOUBLE (Write)
+*        The array value scaled to the minimum colour index.
 *     SIGMAS( 2 ) = _REAL (Read)
 *        Only required if SCALE is "Sigmas".
 *        The standard-deviation bounds that define the scaling limits.
@@ -92,13 +99,6 @@
 *        a positive value are required.  Thus [-2,3] would scale
 *        between the mean minus two and the mean plus three standard
 *        deviations.  [3,-2] would give the negative of that.
-*     SCAHIGH = _DOUBLE (Write)
-*        The array value scaled to the maximum colour index.
-*     SCALOW = _DOUBLE (Write)
-*        The array value scaled to the minimum colour index.
-*     MSG_FILTER = The output message filtering level, QUIET, NORMAL or
-*        VERBOSE. If set to verbose, the scaling limits used will be
-*        displayed. [NORMAL]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
