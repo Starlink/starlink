@@ -332,6 +332,7 @@ void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1],
    DECLARE_CHARACTER_DYN(XNAME);  
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_INTEGER(STATUS);
+   int i,j;
 
    F77_EXPORT_INTEGER( indf, INDF );
    F77_CREATE_CHARACTER( XNAME, strlen( xname ) );
@@ -345,11 +346,12 @@ void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1],
                       TRAIL_ARG(XNAME)
                       TRAIL_ARG(LOCS) );
 
-   cnfImprt( LOCS[0], DAT__SZLOC, locs[0] );
-   cnfImprt( LOCS[1], DAT__SZLOC, locs[1] );
-   cnfImprt( LOCS[2], DAT__SZLOC, locs[2] );
-   cnfImprt( LOCS[3], DAT__SZLOC, locs[3] );
-   cnfImprt( LOCS[4], DAT__SZLOC, locs[4] );
+   for( j = 0; j < 5; j++ ) {
+      for( i = 0; i < DAT__SZLOC; i++ ) {
+         locs[j][i] = LOCS[j][i];
+      }
+      locs[j][i] = 0;
+   }
 
    F77_FREE_CHARACTER( XNAME );
    F77_IMPORT_INTEGER( STATUS, *status );
