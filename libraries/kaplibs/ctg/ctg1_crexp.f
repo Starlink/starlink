@@ -58,6 +58,8 @@
 *        Expand shell meta-characters in directory path.
 *     2-SEP-2004 (TIMJ):
 *        Replace call to CTG1_WILD with call to ONE_FIND_FILE
+*     16-NOV-2005 (DSB):
+*        Ensure IGRPB and IGRPT are initialised if no basis group is supplied.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -204,6 +206,9 @@
             IGRPB = IGRP0
             IGRPT = GRP__NOID
          END IF
+      ELSE
+         IGRPB = GRP__NOID
+         IGRPT = GRP__NOID
       END IF
 
 *  Call GRP_GRPEX to append catalogue names specified using the supplied 
