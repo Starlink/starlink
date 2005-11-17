@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "cupid.h"
+#include "mers.h"
 #include <math.h>
 
 /* Global Variables: */
@@ -252,6 +253,45 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    if( what < 0 ) {
       ret = chisq;
 
+      if( cupidGC.ilevel > 4 ) {
+         cupidGCDumpF( NULL, 0, NULL ); 
+
+         msgSeti( "NF", cupidGC.nf );
+         msgOut( "", "   Fit attempt ^NF:", status );
+
+         msgSetd( "C", ret );
+         msgOut( "", "      Chi-squared: ^C", status );
+
+         msgSetd( "V", par[ 0 ] );
+         msgOut( "", "      Peak intensity: ^V", status );
+         msgSetd( "V", par[ 1 ] );
+         msgOut( "", "      Constant background: ^V", status );
+         msgSetd( "V", par[ 2 ] );
+         msgOut( "", "      Centre on 1st axis: ^V", status );
+         msgSetd( "V", par[ 3 ] );
+         msgOut( "", "      FWHM on 1st axis: ^V", status );
+   
+         if( ndim > 1 ) {
+            msgSetd( "V", par[ 4 ] );
+            msgOut( "", "      Centre on 2nd axis: ^V", status );
+            msgSetd( "V", par[ 5 ] );
+            msgOut( "", "      FWHM on 2nd axis: ^V", status );
+            msgSetd( "V", par[ 6 ] );
+            msgOut( "", "      Position angle: ^V", status );
+   
+            if( ndim > 2 ) {
+               msgSetd( "V", par[ 7 ] );
+               msgOut( "", "      Centre on vel axis: ^V", status );
+               msgSetd( "V", par[ 8 ] );
+               msgOut( "", "      FWHM on vel axis: ^V", status );
+               msgSetd( "V", par[ 9 ] );
+               msgOut( "", "      Vel gradient on 1st axis: ^V", status );
+               msgSetd( "V", par[ 10 ] );
+               msgOut( "", "      Vel gradient on 2nd axis: ^V", status );
+            }
+         }
+      }
+
 /* If the rate of change of the chi squared with respect to one of the
    model parameters is required, we have more work. */
    } else {
@@ -313,7 +353,6 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
       }
 
    }
-
 
 /* Return the required value */
    return ret;   

@@ -12,33 +12,31 @@
    cupidGaussClumps, and its contents are initialised by this function. */
 extern CupidGC cupidGC;
 
-void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
-                                         int *dims, double *par, double rms,
-                                         double mlim, int imax, CGEN_TYPE *out,
-                                         int ilevel, float *rmask, int *lbnd,
-                                         char *cloc, int iclump, 
-                                         double sumbg, int nbg, int diag ){
+double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
+                                           int *dims, double *par, double rms,
+                                           double mlim, int imax, int ilevel, 
+                                           int *lbnd, char *cloc, int iclump, 
+                                           double sumbg, int nbg, int diag ){
 
 /*
 *  Name:
 *     cupidGCUpdateArrays<X>
 
 *  Purpose:
-*     Remove the fit from the residuals array, and add it onto the total
-*     fit array.
+*     Remove the fit from the residuals array.
 
 *  Synopsis:
-*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
-*                                  int *dims, double *par, double rms,
-*                                  double mlim, int imax, CGEN_TYPE *out,
-*                                  int ilevel, float *rmask, int *lbnd,
-*                                  char *cloc, int iclump, 
-*                                  double sumbg, int nbg, int diag )
+*     double cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
+*                                    int *dims, double *par, double rms,
+*                                    double mlim, int imax, int ilevel, 
+*                                    int *lbnd, char *cloc, int iclump, 
+*                                    double sumbg, int nbg, int diag )
 
 *  Description:
-*     This function removes the supplied Gaussian from the residuals array.
-*     It does not remove the backgroubd level. It also adds the Gaussian
-*     onto the supplied output array (again exludinf the background level).
+*     This function removes the supplied Gaussian from the residuals array
+*     (it does not remove the backgroudd level), and returns the standard
+*     deviation of the resulting residuals. It also creates an HDS structure 
+*     containing a description of the clump.
 
 *  Parameters:
 *     res
@@ -61,16 +59,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *     imax
 *        Index within "res" of highest value (only used if "res" is not
 *        NULL).
-*     out
-*        Pointer to the output array to receive the sum of the Gaussian
-*        models, or NULL if no output is required.
 *     ilevel
 *        Level of information to display on standard output.
-*     rmask
-*        Pointer to a mask array. The elements should be stored in
-*        Fortran order. If this is not NULL, then pixels which fall
-*        within any clump are set to 1.0 (all other pixels are left 
-*        unchanged).
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
@@ -86,6 +76,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        The number of background estimates made so far.
 *     diag
 *        Include extra diagnostic information in output catalogue?
+
+*  Returned Value:
+*     The standard deviation of the modified residuals.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -153,9 +146,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    static double sum0;    /* Sum of original data values */
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return 0.0;
 
-/* If diagnostic info is being produced,and we have not yet saved the sum
+/* If diagnostic info is being produced, and we have not yet saved the sum
    of the residuals, do so now before they are modified. */
    if( diag && iclump == 1 ) {
       sum0 = 0.0;
@@ -197,7 +190,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
       for( iedge = 0; iedge < 2; iedge++ ) extend[ jax ][ iedge ] = 1;
    }
 
-/* Reserve memory for a list of model values and associated pixel indices */
+/* Reserve memory for a list of model values and associated pixel indices.
+   These arrays will be extended as necessary.  */
    mlist = astMalloc( sizeof( double )*cupidGC.nel );
    psize = sizeof( int )*ndim;
    plist = astMalloc( psize*cupidGC.nel );
@@ -280,43 +274,29 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                      m *= rms;
                      sum += m;
 
-/* Count the total number of pixels contributing to the peak, and count
-   the number which fall outside the bounds fo the data array. */
+/* Count the total number of pixels contributing to the peak. */
                      area++;
 
-/* If this pixel is within the data array, update the residual, model,
-   etc */
+/* If this pixel is within the data array, update the residuals array. */
                      if( ok ) {
 
-/* If the supplied residual is bad at this point, we leave it unchanged
-   and set the corresponding output pixel (if any) bad. */
-                        if( res && res[ j ] == CGEN_BAD ) {
-                           if( out ) out[ j ] = CGEN_BAD;
+/* Indicate the peak is usable */
+                        peakok = 1;
 
-/* Indicate that some of the peak at least is above the threshold and on the 
-   image. Also indicate that the pixel is within a clump in any returned 
-   mask. */
-                        } else {
-                           peakok = 1;
-                           if( rmask ) rmask[ j ] = 1.0;
-
-/* Subtract the model value from the residuals and add it to the output (if 
-   any). */
-                           if( res ) res[ j ] -= (CGEN_TYPE) m;
-                           if( out ) out[ j ] += (CGEN_TYPE) m;
+/* Subtract the model value from the residuals (if good). */
+                        if( res && res[ j ] != CGEN_BAD ) res[ j ] -= (CGEN_TYPE) m;
 
 /* Add this model value and its associated pixel indices into the lists */
-                           ilist = list_size++;
-                           mlist = astGrow( mlist, list_size, sizeof( double ) );
-                           plist = astGrow( plist, list_size, psize );
-                           mlist[ ilist ] = m;
-                           pnext = plist + ilist*ndim;
-                           for( jax = 0; jax < ndim; jax ++ ) {
-                              pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
-                           }
+                        ilist = list_size++;
+                        mlist = astGrow( mlist, list_size, sizeof( double ) );
+                        plist = astGrow( plist, list_size, psize );
+                        mlist[ ilist ] = m;
+                        pnext = plist + ilist*ndim;
+                        for( jax = 0; jax < ndim; jax ++ ) {
+                           pnext[ jax ] = (int) ( yy[ jax ] + 0.5 );
                         }
 
-/* If this pixel is not within the data array,count the number of
+/* If this pixel is not within the data array, count the number of
    off-image pixels encountered. */
                      } else {
                         area_off++;
@@ -353,6 +333,33 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;
+
+/* Get the statistics of the modified residuals. */
+   minr = VAL__MAXD;
+   maxr = -VAL__MAXD;
+   sumr = 0.0;
+   sumr2 = 0.0;
+   nr = 0;
+
+   if( res ) {
+      for( i = 0; i < nel; i++ ) {
+         if( res[ i ] != CGEN_BAD ) {
+            r = res[ i ];
+            if( r < minr ) minr = r;
+            if( r > maxr ) maxr = r;
+            sumr += r;
+            sumr2 += r*r;
+            nr++;
+         }
+      }
+   
+      meanr = sumr/nr;
+      sigr = sqrt( sumr2/nr - meanr*meanr );
+
+   } else {
+      meanr = 0.0;
+      sigr = 0.0;
+   }
 
 /* Display info */
    if( ilevel > 3 ) {
@@ -398,27 +405,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
                astMapPut0D( extra, "INITFWHM3", cupidGC.initpars[8], NULL );
             }
          }
+
          astMapPut0D( extra, "SHIFT", sqrt(shiftsq), NULL );
-
-         minr = VAL__MAXD;
-         maxr = -VAL__MAXD;
-         sumr = 0.0;
-         sumr2 = 0.0;
-         nr = 0;
-         for( i = 0; i < nel; i++ ) {
-            if( res[ i ] != CGEN_BAD ) {
-               r = res[ i ];
-               if( r < minr ) minr = r;
-               if( r > maxr ) maxr = r;
-               sumr += r;
-               sumr2 += r*r;
-               nr++;
-            }
-         }
-
-         meanr = sumr/nr;
-         sigr = sqrt( sumr2/nr - meanr*meanr );
-
          astMapPut0D( extra, "BG", sumbg/nbg, NULL );
          astMapPut0D( extra, "BGSUM", nr*sumbg/nbg, NULL );
          astMapPut0D( extra, "GONE", sum0 - sumr, NULL );
@@ -445,7 +433,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    mlist = astFree( mlist );
    plist = astFree( plist );
 
-/*   if( res ) CGEN_FUNCTION(cupidGCDump)( res, ndim, dims );  */
+/* Return the standard deviation of the modified residuals. */
+   return sigr;
 
 }
 

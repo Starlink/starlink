@@ -4,8 +4,8 @@
 #include "ast.h"
 
 void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-                     void *ipd, void *ipv, float *rmask, 
-                     AstKeyMap *config, int velax, int ilevel ){
+                     void *ipd, void *ipv, AstKeyMap *config, int velax, 
+                     int ilevel ){
 /*
 *  Name:
 *     cupidClumpFind
@@ -16,8 +16,8 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 
 *  Synopsis:
 *     void cupidClumpFind( type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, void *ipv, float *rmask, 
-*                          AstKeyMap *config, int velax, int ilevel )
+*                          void *ipd, void *ipv, AstKeyMap *config, 
+*                          int velax, int ilevel )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -48,11 +48,6 @@ void cupidClumpFind( int type, int ndim, int *slbnd, int *subnd,
 *        Pointer to the input Variance array, or NULL if there is no Variance
 *        array. The elements should be stored in Fortran order. The data 
 *        type of this array is given by "itype".
-*     rmask
-*        Pointer to a mask array. The elements should be stored in
-*        Fortran order. If this is not NULL, then pixels which fall
-*        within any clump are set to 1.0 (all other pixels are left 
-*        unchanged).
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax

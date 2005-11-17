@@ -30,7 +30,11 @@ void clumps() {
 *     void clumps();
 
 *  Description:
-*     This application identifies clumps within a 1, 2 or 3 dimensional NDF,
+*     This application identifies clumps within a 1, 2 or 3 dimensional
+*     NDF. An output NDF can be created containing 
+
+It optionally produces 
+*     
 *     storing information about the clumps in the CUPID extension of the
 *     supplied NDF. Optionally, an output catalogue can be created containing 
 *     the clump parameters. The algorithm used to identify the clumps can be 
@@ -66,7 +70,7 @@ void clumps() {
 *        values will be used for any unspecified parameters. [current value]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen. It
-*        should be in the range 0 to 4. A value of zero will suppress all 
+*        should be in the range 0 to 5. A value of zero will suppress all 
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
@@ -108,13 +112,14 @@ void clumps() {
 *        No catalogue will be produced if a null (!) value is supplied [!]
 
 *  Algorithms:
-*     - GaussClumps: Described by Stutski & Gusten (1990, ApJ 356, 513).
-*     This algorithm proceeds by fitting a Gaussian profile to the 
-*     brightest peak in the data. It then subtracts the fit from the data 
-*     and iterates, fitting a new ellipse to the brightest peak in the 
-*     residuals. This continues until the total value in the fitted ellipses 
-*     equals the total value in the original data. Each fitted ellipse is 
-*     taken to be a single clump and is added to the output catalogue. In
+*     - GaussClumps: Based on the algorithm described by Stutski & Gusten 
+*     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
+*     profile to the brightest peak in the data. It then subtracts the fit 
+*     from the data and iterates, fitting a new ellipse to the brightest peak 
+*     in the residuals. This continues until the standard deviation of
+*     the residuals reaches a minimum (note, this is different to the
+*     termination criterion used by Stutski & Gusten). Each fitted ellipse 
+*     is taken to be a single clump and is added to the output catalogue. In
 *     this algorithm, clumps may overlap. Any input variance component is
 *     used to scale the weight associated with each pixel value when
 *     performing the Gaussian fit.
@@ -132,7 +137,8 @@ void clumps() {
 *     values are shown in square brackets:
 *
 *     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
-*     pixels. [3.0]
+*     pixels. The fitted Gaussians are not allowed to be smaller than the
+*     instrument beam. This prevents noise spikes being fitted. [3.0]
 *     - GaussClumps.FwhmStart: An initial guess at the ratio of the typical 
 *     observed clump size to the instrument beam width. This is used to
 *     determine the starting point for the algorithm which finds the best
@@ -143,16 +149,28 @@ void clumps() {
 *     the GaussClumps algorithm. The algorithm will terminate when
 *     "MaxClumps" clumps have been identified, or when one of the other 
 *     termination criteria is met. [unlimited]
-*     - GaussClumps.MinIntegral: Specifies a termination criterion 
-*     for the GaussClumps algorithm. The algorithm will terminate when the 
-*     difference between the integrated intensity of all subtracted clumps 
-*     and the integrated intensity in the supplied data array is less than
-*     or equal to "MinIntegral" times the integrated intensity in the
-*     supplied data array, or when one of the other termination criteria 
-*     is met. If the supplied value is negative, this termination
-*     criterion is not used. [0.01]
-*     - GaussClumps.MaxNF: The maximum number of function evaluations
-*     allowed when fitting an individual clump. [50]
+*     - GaussClumps.NPad: Specifies a termination criterion for the 
+*     GaussClumps algorithm. In general, the standard deviation of the
+*     residuals will drop each time a gausian fit to a clump is removed.
+*     However, this will stop when there are no gaussian clumps left.
+*     After this,  the standard deviation of the residuals will either
+*     remain constant or increase. The iterative fitting of clumps stops
+*     when the minimum standard deviation value is first reached. However, 
+*     to allow for the existence of local minima, a number of extra clumps
+*     will be fitted after a minimum is detected, on the chance that a
+*     lower minimum may be found. If no lower minimum is found, the extra 
+*     clumps are discarded. The NPad value is the number of extra clumps
+*     to fit once a minimum is found in the standard deviation of the 
+*     residuals. If it is zero or negative, clumps continue to be found until 
+*     one of the other termination criteria (such as MaxClumps) is reached. [10]
+*     - GaussClumps.MaxNF: The maximum number of evaluations of the
+*     objective function allowed when fitting an individual clump. Here,
+*     the objective function evaluates the chi-squared between the
+*     current gaussian model and the data being fitted. [50]
+*     - GaussClumps.MaxSkip: The maximum number of consecutive failures 
+*     which are allowed when fitting Guassian. If more than "MaxSkip" 
+*     consecutive attempts to fit a clump fail, the iterative fitting
+*     process is terminated. [10]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
 *     noise are treated as zero. [0.5]
@@ -172,13 +190,9 @@ void clumps() {
 *     encourages the peak position of each fitted gaussian to be close to 
 *     the corresponding peak position in the observed data (see the Stutski 
 *     & Gusten paper). [0.0]
-*     - GaussClumps.Threshold: Specifies a termination criterion for
-*     the GaussClumps algorithm. The algorithm will terminate when the peak
-*     value in the residuals left after subtraction of the fitted clumps 
-*     is less than "Threshold" times the RMS noise in the original data,
-*     or when one of the other termination criteria is met. [2.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
-*     channels. [3.0]
+*     channels. The velocity FWHM of each clump is not allowed to be
+*     smaller than this value. [3.0]
 *     - GaussClumps.VeloStart: An initial guess at the ratio of the typical 
 *     observed clump velocity width to the velocity resolution. This is used to
 *     determine the starting point for the algorithm which finds the best
@@ -233,6 +247,7 @@ void clumps() {
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
+   double bg;                   /* The background level in the data */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
@@ -265,6 +280,10 @@ void clumps() {
    if( *status != SAI__OK ) return;
 
 /* astSetWatchId( 4377 );  */
+
+/* Initialise things to safe values. */
+   rmask = NULL;
+   clist = NULL;
 
 /* Start an AST context */
    astBegin;
@@ -375,7 +394,7 @@ void clumps() {
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
 /* Get the interaction level. */
-   parGdr0i( "ILEVEL", 1, 0, 4, 1, &ilevel, status );
+   parGdr0i( "ILEVEL", 1, 0, 5, 1, &ilevel, status );
 
 /* If there is a variance array, map it and find the global RMS error. */
    ndfState( indf, "VARIANCE", &var, status );
@@ -418,33 +437,6 @@ void clumps() {
    parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
              15,  status );
 
-/* GaussClumps can produce an optional output NDF holding the fitted 
-   Gaussians. See if this is necessary. If not, annull the error. If so,
-   map the data array, filling it with zeros. */
-   ipo = NULL;
-   if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
-      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
-      } else {
-         ndfMap( indf2, "DATA", itype, "WRITE/ZERO", &ipo, &el, status );
-         ndfSbad( 1, indf2, "DATA", status );
-      }
-   }
-
-/* If required allocate room for a mask holding bad values for points which 
-   are not inside any clump. Fill it with bad values. */
-   parGet0l( "MASK", &mask, status );
-   if( mask ) {
-      rmask = astMalloc( sizeof( float )*(size_t) el );
-      if( rmask ) {
-         for( i = 0; i < el; i++ ) rmask[ i ] = VAL__BADR;
-      }
-
-   } else {
-      rmask = NULL;
-   }
-
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
 
@@ -475,11 +467,11 @@ void clumps() {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      clist = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rmask, 
-                                rms, keymap, velax, ilevel, ipo, &nclump ); 
+      clist = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
+                                keymap, velax, ilevel, &nclump, &bg ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
-      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rmask, keymap, 
+      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, keymap, 
                       velax, ilevel ); 
 
    } else if( *status == SAI__OK ) {
@@ -488,50 +480,85 @@ void clumps() {
               "implemented.", status );
    }
 
+/* Skip the rest if no clumps were found. */
+   if( nclump ) {
+
+/* The GaussClumps algorithm can produce an optional output NDF holding the 
+   fitted Gaussians. See if this is necessary. If not, annull the error. If so,
+   map the data array. */
+      ipo = NULL;
+      if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
+         ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
+         if( *status == PAR__NULL ) {
+            errAnnul( status );
+         } else {
+            ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
+            ndfSbad( 1, indf2, "DATA", status );
+         }
+      }
+
+/* If required allocate room for a mask holding bad values for points which 
+   are not inside any clump. */
+      parGet0l( "MASK", &mask, status );
+      if( *status == SAI__OK && mask ) {
+         rmask = astMalloc( sizeof( float )*(size_t) el );
+      } else {
+         mask = 0;
+      }
+
+/* Create any output NDF by summing the contents of the HDS structures 
+   describing the found clumps. This also fills the above mask array if 
+   required. */
+      if( ipo || mask ) {
+         cupidSumClumps( type, nsig, slbnd, subnd, el, clist, nclump, bg, 
+                         rmask, ipo );
+      }
+
 /* Delete any existing CUPID extension in the NDF, and then create a new
    one. */
-   ndfXstat( indf, "CUPID", &there, status );
-   if( there ) ndfXdel( indf, "CUPID", status );
-   ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+      ndfXstat( indf, "CUPID", &there, status );
+      if( there ) ndfXdel( indf, "CUPID", status );
+      ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
 
 /* If a quality mask is being added to the input NDF... */
-   if( mask ) {
+      if( mask ) {
 
 /* Delete any existing quality name information from the supplied NDF, and 
    create a structure to hold new quality name info. */
-      irqDelet( indf, status ); 
-      irqNew( indf, "CUPID", qlocs, status );
+         irqDelet( indf, status ); 
+         irqNew( indf, "CUPID", qlocs, status );
 
 /* Add in two quality names; "CLUMP"and "BACKGROUND". */
-      irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
-                status );
-      irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
-                status );
+         irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
+                   status );
+         irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+                   status );
 
 /* Transfer the pixel mask to the NDF quality array. */
-      irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
-      irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
-   }
+         irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
+         irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+      }
 
 /* Store the configuration in the CUPID extension. */
-   cupidStoreConfig( xloc, keymap );
+      cupidStoreConfig( xloc, keymap );
 
 /* Store the clump properties in the CUPID extensionand output catalogue
    (if needed). This also annuls the HDS locators stored within "clist". */
-   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
-                     "Output from CUPID:CLUMPS" );
+      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
+                        "Output from CUPID:CLUMPS" );
+
+/* Release the quality name information. */
+      if( mask ) {
+         rmask = astFree( rmask );
+         irqRlse( qlocs, status );
+      }
+
+/* Relase the extension locator.*/
+      datAnnul( xloc, status );
+   }
 
 /* Tidy up */
 L999:
-
-/* Release the quality name information. */
-   if( mask ) {
-      rmask = astFree( rmask );
-      irqRlse( qlocs, status );
-   }
-
-/* Relase the extension locator.*/
-   datAnnul( xloc, status );
 
 /* Release the memory containing the list of HDS structures describing the 
    clumps. The actual locators should already have been freed in

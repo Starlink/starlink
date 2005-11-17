@@ -16,9 +16,8 @@ CupidGC cupidGC;
 
 
 char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                        double *ipv, float *rmask, double rms, 
-                        AstKeyMap *config, int velax, int ilevel, void *ipo,
-                        int *nclump ){
+                        double *ipv, double rms, AstKeyMap *config, int velax, 
+                        int ilevel, int *nclump, double *bg ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -29,9 +28,9 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                             void *ipd, double *ipv, float *rmask, 
-*                             double rms, AstKeyMap *config, int velax,
-*                             void *ipo, int *nclump )
+*                             void *ipd, double *ipv, double rms, 
+*                             AstKeyMap *config, int velax, int *nclump,
+*                             double *bg )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -39,10 +38,23 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
 *     profile to the brightest peak in the data. It then subtracts the fit 
 *     from the data and iterates, fitting a new ellipse to the brightest peak 
-*     in the residuals. This continues until the total value in the fitted 
-*     ellipses equals the total value in the original data. Each fitted 
-*     ellipse is taken to be a single clump and is added to the output 
-*     catalogue. In this algorithm, clumps may overlap.
+*     in the residuals. This continues until a termination criterion is
+*     reached. The main termination criterion in this implementation is
+*     not the same as in the Stutski & Gusten paper. They had two main
+*     termination criteria; 1) the total data sum of the fitted gaussians
+*     is close to the total data sum of the original data, and 2) the peak
+*     residual is less than a given multiple of the RMS noise in the data.
+*     However, 1) is very sensitive to errors in the estimation of the 
+*     background level in the data, and 2) may never be achieved because
+*     the expected residuals depend not only on the RMS noise in the data
+*     but also on how accurately gaussian the clumps are, which is not
+*     known. Therefore, this implementation instead terminates when the 
+*     standard deviation of the residuals reaches a minimum.
+*
+*     Two additional termination criteria are used; 1) If there are many
+*     failed attempts to fit a clump to the peak residual or if 2) a
+*     specified maximum number of clumps are found, then the process
+*     termaintes early.
 
 *  Parameters:
 *     type
@@ -64,11 +76,6 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to the input Variance array, or NULL if there is no Variance
 *        array. The elements should be stored in Fortran order. The data 
 *        type of this array is "double".
-*     rmask
-*        Pointer to a mask array. The elements should be stored in
-*        Fortran order. If this is not NULL, then pixels which fall
-*        within any clump are set to 1.0 (all other pixels are left 
-*        unchanged).
 *     rms
 *        The global RMS error in the data array.
 *     config
@@ -78,13 +85,10 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display (in range zero to 3).
-*     ipo
-*        Pointer to the output data array, or NULL. The elements should be 
-*        stored in Fortran order. The data type of this array is given by 
-*        "itype". If supplied, it is assumed that the array has been
-*        initialised to hold zero at every pixel.
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
+*     bg
+*        Pointer to an double to receive the mean background level.
 
 *  Retured Value:
 *     A pointer to a dynamically allocated character string, which should
@@ -99,7 +103,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     implementation of GaussClumps obtained on 27/9/05 from 
 *     ftp.astro.uni-bonn.de/pub/heith/gaussclumps.
 *     - Most of the "cupid..." functions used in this file which start
-*     with a "type" parameter (e.g. cupidFindMax, cupidIterate, etc) are
+*     with a "type" parameter (e.g. cupidFindMax, cupidUpdateArrays, etc) are
 *     actually not functions at all, but macros defined in cupid.h. These
 *     macros are wrappers which invoke a type-specific function (e.g. 
 *     cupidFindMaxD, cupidFindMaxF) appropriate to the specific data type 
@@ -128,14 +132,11 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char *clist;         /* Pointer to list of returned HDS locators */
-   double *outd;        /* Pointer to double output array */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mlim;         /* Truncation level for Gaussians */
-   double sum;          /* Sum of all residuals */
    double sumbg;        /* Sum of background estimates */
    double urms;         /* User-supplied RMS noise level */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
-   float *outf;         /* Pointer to float output array */
    int *dims;           /* Pointer to array of array dimensions */
    int diag;            /* Is extra diagnostic information required? */
    int el;              /* Number of elements in array */
@@ -144,9 +145,15 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int imax;            /* Index of element with largest residual */
    int iter;            /* Continue finding more clumps? */
    int nbg;             /* Number of background estimates summed in sumbg */
-   int ngood;           /* Number of good pixels in residuals array */
    int niter;           /* Iterations performed so far */
    void *res;           /* Pointer to residuals array */
+   int maxclump;        /* Max no. of clumps */
+   int maxskip;         /* Max no. of failed fits between good fits */
+   int nskip;           /* No. of failed fits since last good fit */
+   double resdev;       /* The standard deviation of the residuals */
+   int allbad;          /* Are all the residuals bad? */
+   double resdevmin;    /* The minimum value of "resdev" found so far */
+   int npad;            /* No. of fits to perform after min rmsdev is reached */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;
@@ -160,6 +167,21 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* See if extra diagnostic info is required. */
    diag = cupidConfigI( gcconfig, "DIAG", 0 );
+
+/* Get the maximum allowed number of failed fits between succesful fits. */
+   maxskip = cupidConfigI( gcconfig, "MAXSKIP", 10 );
+
+/* Get the maximum allowed number of failed fits between succesful fits. */
+   maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI );
+
+/* The iterative process ends when the standard deviation of the
+   residuals is minimised. Since the standard deviation may not decrease
+   monotonically, we need to allow for the existence of local minima, and
+   continue past them to find a global minimum. For this reason, a number
+   of extra iterations will be performed after a minimum has been found,  
+   in order to check that a lower minimum does not exist. If no lower 
+   value is found, then the extra fits will be discarded. */
+   npad = cupidConfigI( gcconfig, "NPAD", 10 );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array. We use the memory management functions of the 
@@ -180,6 +202,11 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    res = cupidStore( NULL, ipd, el, type, "cupidGaussClumps" );
    if( res ) {
 
+/* Store the information level in the cupidGC structure, from where it
+   can be accessed from the service routines which evaluate the objective
+   function for the fitting routine. */
+      cupidGC.ilevel = ilevel;
+
 /* Allow the user to override the supplied RMS error value. */
       urms = cupidConfigD( gcconfig, "RMS", VAL__BADD );
       if( urms != VAL__BADD ) {
@@ -188,14 +215,16 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             msgSetd( "N", rms );
             msgOut( "", "User-supplied RMS noise: ^N", status );
          }
+
 /* If the user did not supply an RMS value, access it again, this time
-   suppling the default RMS value. This is done to esnure that the
+   suppling the default RMS value. This is done to ensure that the
    default RMS value is stored in the CUPID NDF extension when the
    program exits. */
       } else {
          (void) cupidConfigD( gcconfig, "RMS", rms );
       }
 
+/* Tell the user what RMS value is being used. */
       if( ilevel > 2 ) {
          msgSetd( "N", rms );
          msgOut( "", "RMS noise level actually used: ^N", status );
@@ -210,6 +239,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5 );
 
 /* Initialise the number of clumps found so far. */
+      *nclump = 0;
       iclump = 0;
       clist = NULL;
 
@@ -218,11 +248,16 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       sumbg = 0.0;
       nbg = 0;
 
+/* Initialise the minimum value found so far for the standard deviation
+   of the residuals. */
+      resdevmin = VAL__MAXD;
+
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
       iter = 1;
       niter = 0;
-      while( iter ) {
+      nskip = 0;
+      while( iter && *status == SAI__OK ) {
 
 /* Report the iteration number to the user if required. */
          ++niter;         
@@ -233,15 +268,18 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
 
 /* Find the 1D vector index of the elements with the largest value in the 
-   residuals array. Also find the total data sum in the residuals array. */
-         cupidGCFindMax( type, res, el, &imax, &sum, &ngood );
+   residuals array. This returns a flag indicating if all residuals are
+   bad. */
+         allbad = cupidGCFindMax( type, res, el, &imax );
 
-/* Determine if a gaussian clump should be fitted to the peak around the 
-   pixel found above. */
-         cupidGCIterate( type, res, imax, sum, iclump, rms, gcconfig,
-                         sumbg, nbg, niter, ngood, &iter, ilevel );
+/* Finish iterating if all the residuals are bad, or if too many iterations 
+   have been performed since the last succesfully fitted clump. */
+         if( allbad || nskip > maxskip ) {
+            iter = 0;
+            *nclump = iclump;
+         }
 
-/* If so, make an initial guess at the Gaussian clump parameters centred
+/* If not, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
          if( iter ) {
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
@@ -252,31 +290,54 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             if( cupidGCFit( type, res, imax, x, &chisq ) ) {
                iclump++;
 
+/* Reset the number of failed fits since the last good fit. */
+               nskip = 0;
+
 /* Increment the sum of the background estimates. */
                sumbg += x[ 1 ]*rms;
                nbg++;
-
-/* Display the clump parameters on the screen if required. */
-               cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel, rms );
 
 /* Extend the returned array of HDS Clump structures to include room for
    the new one. This list is actually a long character string containing
    room for "iclump" HDS locators. */
                clist = astGrow( clist, iclump, DAT__SZLOC + 1 );
 
-/* Remove the fit (excluding the background) from the residuals array, and 
-   add it onto the total fit array. This also updates any output array and 
-   mask, and creates a HDS "Clump" structure containing information about 
-   the clump. An HDS locator for this new Clump structure is added into the 
-   "clist" ring. */
-               cupidGCUpdateArrays( type, res, el, ndim, dims, x, rms,
-                                    mlim, imax, ipo, ilevel, rmask, slbnd,    
-                                    clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
-                                    iclump, sumbg, nbg, diag );
+/* Remove the model fit (excluding the background) from the residuals
+   array. This also creates a HDS "Clump" structure containing information 
+   about the clump. An HDS locator for this new Clump structure is added 
+   into the "clist" ring. The standard deviation of the new residuals is 
+   returned. */
+               resdev = cupidGCUpdateArrays( type, res, el, ndim, dims,
+                                     x, rms, mlim, imax, ilevel, slbnd,    
+                                     clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
+                                     iclump, sumbg, nbg, diag );
+
+/* Display the clump parameters on the screen if required. */
+               cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
+                                 rms, resdev );
+
+/* If the maximum number of clumps have now been found, exit.*/
+               if( iclump == maxclump ) {
+                  iter = 0;
+
+/* If the standard deviation of the residuals is lower than the lowest
+   value found so far, record it. */
+               } else if( resdev < resdevmin ){
+                  resdevmin = resdev;
+                  *nclump = iclump;
+
+/* If the standard deviation of the residuals has not decreased over
+   the recently found clumps, then exit, forgetting all the clumps found
+   since the clump which resulted in the lowest standard devistion for
+   the residuals. */
+               } else if( npad > 0 && iclump - *nclump > npad ){
+                  iter = 0;
+               }
 
 /* Tell the user if no clump could be fitted around the current peak
    pixel value */
             } else if( ilevel > 2 ) {
+               nskip++;
                msgOut( "", "   No clump fitted.", status );
             }
 
@@ -288,36 +349,15 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
    }
 
-/* Tell the user the mean background level, and add this value onto any
-   output array. */
+/* Tell the user the mean background level, and return it. */
    if( nbg > 0 ) {
-      sumbg /= nbg;
-      if( ipo ) {
-         if( type == CUPID__FLOAT ) {
-            outf = (float *) ipo;
-            for( i = 0; i < el; i++ ) outf[ i ] += sumbg;
-         } else {
-            outd = (double *) ipo;
-            for( i = 0; i < el; i++ ) outd[ i ] += sumbg;
-         }
-      }
-
+      *bg = sumbg/nbg;
       if( ilevel > 2 ) {
-         msgSetd( "BG", sumbg );
+         msgSetd( "BG", *bg );
          msgOut( "", "Estimated background level = ^BG", status );
       }
-   }
-
-/* Tell the user how many iterations have been performed (i.e. how many
-   attempts there have been to fit a Gaussian peak). */
-   if( ilevel > 1 ) {
-      if( niter == 1 ){
-         msgOut( "", "No fit attempted", status );
-      } else {
-         msgSeti( "M", niter - 1 - iclump );
-         msgSeti( "N", niter - 1 );
-         msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
-      }
+   } else {
+      *bg = 0.0;
    }
 
 /* Tell the user how many of the iterations resulted in a succesful fit
@@ -328,10 +368,22 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       } else if( iclump == 1 ){
          msgOut( "", "One clump found", status );
       } else {
-         msgSeti( "N", iclump );
+         msgSeti( "N", *nclump );
          msgOut( "", "^N clumps found", status );
       }
       msgBlank( status );
+   }
+
+/* Tell the user how many iterations have been performed (i.e. how many
+   attempts there have been to fit a Gaussian peak). */
+   if( ilevel > 2 ) {
+      if( niter == 1 ){
+         msgOut( "", "No fit attempted", status );
+      } else {
+         msgSeti( "M", niter - iclump - 1 );
+         msgSeti( "N", niter - 1 );
+         msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
+      }
    }
 
 /* Free resources */
@@ -347,9 +399,6 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.resids = astFree( cupidGC.resids );
 
    gcconfig =astAnnul( gcconfig );
-
-/* Save the number of clumps found. */
-   *nclump = iclump;
 
 /* Return the list of clump structure locators. */
    return clist;

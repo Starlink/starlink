@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int *lbnd, int ilevel, double rms ){
+                       int *lbnd, int ilevel, double rms, double resdev ){
 /*
 *  Name:
 *     cupidGCListClump
@@ -13,7 +13,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
-*                            int *lbnd, int ilevel, double rms )
+*                            int *lbnd, int ilevel, double rms, double resdev )
 
 *  Description:
 *     This function adds a clump to the output list. 
@@ -33,7 +33,10 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *     ilevel
 *        The amount of information to display to standard output.
 *     rms
-*        The RMWS noise level.
+*        The RMS noise level.
+*     resdev
+*        The standard deviation of the residuals after subtraction of the
+*        clump.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -66,11 +69,11 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 /* Report information to standard output if requested. */
    if( ilevel > 2 ) {
 
-      msgSetd( "V", chisq );
-      msgOut( "", "   Chi-squared ^V:", status );
-
       msgSeti( "N", iclump );
       msgOut( "", "   Storing clump ^N:", status );
+
+      msgSetd( "V", chisq );
+      msgOut( "", "   Chi-squared: ^V", status );
 
       msgSetd( "V", par[ 0 ]*rms );
       msgOut( "", "      Peak intensity: ^V", status );
@@ -100,6 +103,10 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
             msgOut( "", "      Vel gradient on 2nd axis: ^V", status );
          }
       }
+
+      msgSetd( "R", resdev );
+      msgOut( "", "   Std. devn of residuals: ^R", status );
+
    }
 }
 

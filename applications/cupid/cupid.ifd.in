@@ -22,7 +22,7 @@ package cupid {
             access READ
             vpath DEFAULT
             ppath CURRENT,DEFAULT
-            prompt {Information level (0->4)}
+            prompt {Information level (0->5)}
             default 1
             helpkey *
           }

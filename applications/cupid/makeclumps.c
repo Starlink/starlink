@@ -313,9 +313,6 @@ void makeclumps() {
    peak[ 0 ] /= rms;
    peak[ 1 ] /= rms;
 
-/* Fill the output array with the background value. */
-   kpg1Fillr( back, nel, ipd2, status );
- 
 /* Clump positions are chosen from a uniform distribution. Set up the
    arrays describing the mean value and range on each axis. */
    dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
@@ -373,20 +370,26 @@ void makeclumps() {
    structure containing information about the clump. An HDS locator for 
    this new Clump structure is added into the "clist" ring. */
       cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            ipd2, 0, NULL, lbnd, 
-                            clist + i*( DAT__SZLOC + 1), i, 0.0, 1, 0 );
+                            0, lbnd, clist + i*( DAT__SZLOC + 1), i, 
+                            0.0, 1, 0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
 
    }
 
+/* Create the output data array by summing the contents of the HDS structures 
+   describing the found clumps. */
+   cupidSumClumpsF( ndim, lbnd, ubnd, nel, clist, nclump, back, NULL, ipd2 );
+
 /* Add Gaussian noise to the data. */
-   memcpy( ipd, ipd2,sizeof( float )*nel );
-   if( addnoise ) {
-      d = ipd;
-      for( i = 0; i < nel; i++, d++ ) {
-         *d +=  pdaRnnor( 0.0, rms );
+   if( *status == SAI__OK ) {
+      memcpy( ipd, ipd2,sizeof( float )*nel );
+      if( addnoise ) {
+         d = ipd;
+         for( i = 0; i < nel; i++, d++ ) {
+            *d +=  pdaRnnor( 0.0, rms );
+         }
       }
    }
 

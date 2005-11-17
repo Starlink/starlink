@@ -110,11 +110,18 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
       for( i = 0; i < el; i++ ) data[ i ] = cupidGC.data[ i ];
       ndfAnnul( &indf, status );
    
-      sprintf( name, "res%d", jj );
+      sprintf( name, "sqresw%d", jj );
       ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
       ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
       for( i = 0; i < el; i++ ) data[ i ] = cupidGC.resids[ i ]/cupidGC.wsum;
+      ndfAnnul( &indf, status );
+
+      sprintf( name, "res%d", jj );
+      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfNew( "_DOUBLE", cupidGC.ndim, lbnd, ubnd, &place, &indf, status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &data, &el, status );
+      for( i = 0; i < el; i++ ) data[ i ] = cupidGC.resu[ i ];
       ndfAnnul( &indf, status );
 
       sprintf( name, "wgt%d", jj );
