@@ -166,7 +166,7 @@ It optionally produces
 *     - GaussClumps.MaxNF: The maximum number of evaluations of the
 *     objective function allowed when fitting an individual clump. Here,
 *     the objective function evaluates the chi-squared between the
-*     current gaussian model and the data being fitted. [50]
+*     current gaussian model and the data being fitted. [100]
 *     - GaussClumps.MaxSkip: The maximum number of consecutive failures 
 *     which are allowed when fitting Guassian. If more than "MaxSkip" 
 *     consecutive attempts to fit a clump fail, the iterative fitting
@@ -181,15 +181,15 @@ It optionally produces
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
 *     the corresponding maximum value in the observed data (see the Stutski 
-*     & Gusten paper). [0.0]
+*     & Gusten paper). [1.0]
 *     - GaussClumps.Sa: The Chi-square stiffness parameter "Sa" which 
 *     encourages the peak amplitude of each fitted gaussian to be close to 
 *     the corresponding maximum value in the observed data (see the Stutski 
-*     & Gusten paper). [0.0]
+*     & Gusten paper). [1.0]
 *     - GaussClumps.Sc: The Chi-square stiffness parameter "Sc" which 
 *     encourages the peak position of each fitted gaussian to be close to 
 *     the corresponding peak position in the observed data (see the Stutski 
-*     & Gusten paper). [0.0]
+*     & Gusten paper). [1.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity FWHM of each clump is not allowed to be
 *     smaller than this value. [3.0]

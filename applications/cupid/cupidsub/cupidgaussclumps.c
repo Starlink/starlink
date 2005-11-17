@@ -320,6 +320,11 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                if( iclump == maxclump ) {
                   iter = 0;
 
+/* If we are not using the NPad criterion, ensure all located clumps are
+   retuned in the catalogue. */
+               } else if( npad <= 0 ) {
+                  *nclump = iclump;
+
 /* If the standard deviation of the residuals is lower than the lowest
    value found so far, record it. */
                } else if( resdev < resdevmin ){
@@ -330,7 +335,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    the recently found clumps, then exit, forgetting all the clumps found
    since the clump which resulted in the lowest standard devistion for
    the residuals. */
-               } else if( npad > 0 && iclump - *nclump > npad ){
+               } else if( iclump - *nclump > npad ){
                   iter = 0;
                }
 

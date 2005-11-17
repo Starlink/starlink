@@ -142,7 +142,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 
 /* Maximum number of function evaluations to be used when fitting an 
    individual clump. */
-      cupidGC.maxnf = cupidConfigI( config, "MAXNF", 50 );
+      cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100 );
 
 /* See if a value has been supplied for the initial guess at the ratio 
    of the clump size to the beam width. */
@@ -163,17 +163,17 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Get the Chi-square stiffness parameter "Sa" which encourages the peak
    amplitude of the fitted gaussian close to the maximum value in the
    observed data. */
-      cupidGC.sa = cupidConfigD( config, "SA", 0.0 );
+      cupidGC.sa = cupidConfigD( config, "SA", 1.0 );
 
 /* Get the Chi-square stiffness parameter "S0" which encourages the peak
    amplitude of the fitted gaussian to be below the maximum value in the
    observed data. */
-      cupidGC.s0p1 = cupidConfigD( config, "S0", 0.0 ) + 1;
+      cupidGC.s0p1 = cupidConfigD( config, "S0", 1.0 ) + 1;
 
 /* Get the Chi-square stiffness parameter "Sc" which encourages the peak
    position of the fitted gaussian to be close to the peak position in the
    observed data. */
-      cupidGC.sc4 = 4*cupidConfigD( config, "SC", 0.0 );
+      cupidGC.sc4 = 4*cupidConfigD( config, "SC", 1.0 );
 
 /* The number of dimensions in the data. */
       cupidGC.ndim = ndim;
