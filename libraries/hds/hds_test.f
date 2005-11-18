@@ -70,6 +70,8 @@
 *  Initialise the global status.
       STATUS = SAI__OK
 
+      CALL EMS_BEGIN( STATUS )
+
 *  Make check work for version 4 files.
       CALL HDS_TUNE( '64BIT', 1, STATUS )
 
@@ -137,6 +139,8 @@
      :   'HDS_TEST: HDS installation test failed.', STATUS )
          EXITSTATUS = 1
       END IF
+
+      CALL EMS_END( STATUS )
       
 *   Use non-standard but common exit() intrinsic
       CALL EXIT(EXITSTATUS)
