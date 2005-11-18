@@ -171,7 +171,7 @@ datCopy(char locator1_str[DAT__SZLOC],
       dat1_pack_crv( &rid1, 0, crv1 );
 
 /* Import the second locator and obtain a pointer to the LCP data fields.   */
-      dat1_import_loc( locator2_str, &lcp2 );
+      dat1_import_loc( locator2_str, DAT__SZLOC, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;
