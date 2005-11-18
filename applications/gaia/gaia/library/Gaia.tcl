@@ -1787,7 +1787,7 @@ window gives you access to this."
    itk_option define -filters filters Filters 0
 
    #  Redefine scrollbars to be true.
-   itk_option define -scrollbars scrollbars ScrollBars 1
+   itk_option define -scrollbars scrollbars Scrollbars 1
 
    #  The NDF component to display.
    itk_option define -component component Component data

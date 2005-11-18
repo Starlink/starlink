@@ -870,7 +870,7 @@ itcl::class gaia::GaiaImageCtrl {
          if { [winfo exists $w_.ndfhdu] } {
             after idle [code destroy $w_.ndfhdu]
          }
-         SkyCatCtrl::update_fits_hdus
+         RtdImageCtrl::update_fits_hdus
       } else {
 
          #  Displaying NDF now, if FITS last time remove popup.
