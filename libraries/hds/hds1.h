@@ -93,6 +93,9 @@
 #define HDS__WAIT 0		 /* Wait for locked files?		    */
 #define HDS__64BIT 0		 /* Create new files in 64-bit HDS format?  */
 
+/* Indicate that public include files should use a local search path        */
+#define HDS_INTERNAL_INCLUDES 1
+
 /* Arithmetic data types:						    */
 /* =====================						    */
 

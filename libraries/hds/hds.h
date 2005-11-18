@@ -1,6 +1,12 @@
 #include "dat_par.h"
-#include "hds_types.h"
 
+/* Relative location of type definitions depends on whether we are
+   building the library or using the installed version */
+#if HDS_INTERNAL_INCLUDES
+#  include "hds_types.h"
+#else
+#  include "star/hds_types.h"
+#endif
 
 /*=================================*/
 /* datAlter - Alter size of object */
