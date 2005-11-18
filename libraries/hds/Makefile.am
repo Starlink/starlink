@@ -52,8 +52,8 @@ noinst_MESSAGES = dat_err.h
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # dat_par.h was previously released so must go in the root include dir
-PUBLIC_CINCLUDES = hds.h
-PUBLIC_INCLUDES = DAT_PAR dat_par.h hds_types.h
+PUBLIC_CINCLUDES = hds.h hds_types.h hds_fortran.h
+PUBLIC_INCLUDES = DAT_PAR dat_par.h
 
 PRIVATE_INCLUDES = \
 	CMP_CCT CMP_CONST DAT1_SYS \
@@ -86,14 +86,14 @@ C_ROUTINES = \
 	dat1_pack_srv.c dat1_put_ncomp.c dat1_put_odl.c \
 	dat1_show_ndr.c dat1_unpack_crv.c dat1_unpack_odl.c \
 	dat1_unpack_srv.c dat1_unpack_type.c dat1_impalloc_floc.c \
-        dat1_free_hdsloc.c dat1_import_floc.c dat1_export_floc.c \
+        dat1_free_hdsloc.c dat1_import_floc.c \
 	datClen.c datCopy.c \
 	datDrep.c datErmsg.c datParen.c datPrmry.c datRefct.c \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
 	datput.c dattemp.c daucheck.c daucnv.c daucopy.c dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
-	\
+	datExportFloc.c	\
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
 	hds_run.c hds_start.c hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \

@@ -12,7 +12,7 @@
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
 
-#include "hds.h"
+#include "hds_fortran.h"      /* Fortran import/export */
 
 #define TRUE 1
 #define FALSE 0
@@ -84,7 +84,7 @@ F77_SUBROUTINE(dat_annul)( CHARACTER(locator),
 
 /* Export returned locator */
    
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
 
 }
 
@@ -154,7 +154,7 @@ F77_SUBROUTINE(dat_ccopy)( CHARACTER(locator1),
    datCcopy( &locator1_c, &locator2_c, name_c, &locator3_c, status);
 
 /* Export returned locator    */
-   dat1_export_floc( locator3_c, 1, DAT__SZLOC, locator3, status );
+   datExportFloc( &locator3_c, 1, DAT__SZLOC, locator3, status );
 }
 
 F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
@@ -195,7 +195,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
 #endif
 
 /* Export returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status ); 
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status ); 
 }
 
 F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
@@ -244,7 +244,7 @@ F77_SUBROUTINE(dat_clone)( CHARACTER(locator1),
    datClone( &locator1_c, &locator2_c, status);
 
 /* Export the returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_coerc)( CHARACTER(locator1),
@@ -272,7 +272,7 @@ F77_SUBROUTINE(dat_coerc)( CHARACTER(locator1),
    datCoerc( &locator1_c, *ndim, &locator2_c, status);
 
 /* Export the returned locator                      */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_copy)( CHARACTER(locator1),
@@ -421,7 +421,7 @@ F77_SUBROUTINE(dat_find)( CHARACTER(locator1),
    datFind( &locator1_c, name_c, &locator2_c, status);
 
 /* Export the returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_get)( CHARACTER(locator),
@@ -685,7 +685,7 @@ F77_SUBROUTINE(dat_index)( CHARACTER(locator1),
    datIndex( &locator1_c, *index, &locator2_c, status);
 
 /*Export the returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_len)( CHARACTER(locator),
@@ -1057,7 +1057,7 @@ F77_SUBROUTINE(dat_move)( CHARACTER(locator1),
    datMove( &locator1_c, &locator2_c, name_c, status );
 
 /* Export returned locator - will be now DAT__NOLOC */
-   dat1_export_floc( locator1_c, 1, DAT__SZLOC, locator1, status );
+   datExportFloc( &locator1_c, 1, DAT__SZLOC, locator1, status );
 }
 
 F77_SUBROUTINE(dat_name)( CHARACTER(locator),
@@ -1220,7 +1220,7 @@ F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
    datParen( &locator1_c, &locator2_c, status );
 
 /* Export returned locator to FORTRAN string                 */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_prim)( CHARACTER(locator),
@@ -1288,7 +1288,7 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
    datPrmry( set_c, &locator_c, &primary_c, status );
 
 /* Export returned locator - may be set to DAT__NOLOC */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
 
 /* Set FORTRAN logical return                                */
    if( *set == F77_FALSE )
@@ -1735,7 +1735,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
 #endif
 
 /* Export returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_state)( CHARACTER(locator),
@@ -1834,7 +1834,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
 #endif
 
 /* Export returned locator */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
 }
 
 F77_SUBROUTINE(dat_there)( CHARACTER(locator),
@@ -1972,7 +1972,7 @@ F77_SUBROUTINE(dat_vec)( CHARACTER(locator1),
    datVec( &locator1_c, &locator2_c, status );
 
 /* Export returned locator */
-   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
+   datExportFloc( &locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_where)( CHARACTER(locator),
@@ -2057,7 +2057,7 @@ F77_SUBROUTINE(hds_erase)( CHARACTER(locator),
    hdsErase( &locator_c, status );
 
 /* Export the locator (will be DAT__NOLOC) */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
 
 }
 
@@ -2265,7 +2265,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
 #endif
 
 /* Export returned locator */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
    
 /* Free allocated string memory.                             */
    free( file_c );
@@ -2301,7 +2301,7 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
    hdsOpen( file_c, mode_c, &locator_c, status );
 
 /* Export returned locator */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
    
 /* Free allocated string memory.                             */
    free( file_c );
@@ -2440,7 +2440,7 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
    hdsWild( fspec_c, mode_c, iwld, &locator_c, status );
 
 /* Export returned locator */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
       
 /* Free allocated string memory.                             */
    free( fspec_c );
@@ -2507,5 +2507,5 @@ F77_SUBROUTINE(hds_close)( CHARACTER(locator),
    hdsClose( &locator_c, status );
 
 /* Export nulled locator */
-   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+   datExportFloc( &locator_c, 1, DAT__SZLOC, locator, status );
 }

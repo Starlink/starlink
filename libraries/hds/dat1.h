@@ -332,7 +332,5 @@ if (!_ok(*status))\
       void dat1_impalloc_floc ( char flocator[DAT__SZLOC],
 			      int loc_length, HDSLoc **clocator, 
 			      int * status);
-      void dat1_export_floc ( HDSLoc *clocator, int free, int loc_length,
-			      char flocator[DAT__SZLOC], int * status);
 
 #endif

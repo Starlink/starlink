@@ -17,47 +17,62 @@
 /*
  *+
  *  Name:
- *    dat1_export_floc
+ *    datExportFloc
 
  *  Purpose:
- *    Export a fortran HDS locator buffer from C
+ *    Export from a C HDS Locator to a Fortran HDS locator
+
+ *  Language:
+ *    Starlink ANSI C
 
  *  Invocation:
- *    dat1_export_floc( HDSLoc* clocator, int free, int len, char flocator[DAT__SZLOC], int * status );
+ *    datExportFloc( HDSLoc** clocator, int free, int len, char flocator[DAT__SZLOC], int * status );
 
  *  Description:
  *    This function should be used to populate a Fortran HDS locator buffer
- *    from a C struct.
+ *    (usually a Fortran CHARACTER string of size DAT__SZLOC) from a C HDS
+ *    locator structure.
 
- *  Arguments
-
- *    HDSLoc * clocator = Given
- *       Locator to be exported.
+ *  Arguments:
+ *    HDSLoc ** clocator = Given & Returned
+ *       Pointer to Locator to be exported. If the memory is freed, the
+ *       locator will be set to NULL on return, else it will be untouched.
  *    int free = Given
- *       If true (1) the C locator is freed using dat1_free_hdsloc once the
+ *       If true (1) the C locator is freed once the
  *       Fortran locator is populated. If false, the locator memory is not
  *       touched.
  *    int len = Given
- *       Size of Fortran character buffer. Sanity check.
+ *       Size of Fortran character buffer to recieve the locator. Sanity check.
  *    char flocator[DAT__SZLOC] = Returned
  *       Fortran character string buffer. Should be at least DAT__SZLOC
- *       characters long. If clocator is NULL, fills the buffer with DAT__NOLOC.
+ *       characters long. If clocator is NULL, fills the buffer
+ *       with DAT__NOLOC.
  *    int * status = Given & Returned
  *       Inherited status. If status is bad the Fortran locator will be
  *       filled with DAT__NOLOC. The memory associated with clocator will
- *       be freed if free is true.
+ *       be freed if free is true regardless of status.
 
  *  Authors:
- *    Tim Jenness (JAC, Hawaii)
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
 
  *  History:
  *    16-NOV-2005 (TIMJ):
  *      Initial version
+ *    18-NOV-2005 (TIMJ):
+ *      Make semi public to allow other Fortran wrappers to use this function.
+ *      Rename from dat1_export_floc to datExportFloc
 
  *  Notes:
- *    Fortran locator string must be preallocted. The C locator can be freed
- *    at the discretion of the caller. This simplifies code in the fortran
- *    interface wrapper.
+ *    - Fortran locator string must be preallocted. The C locator can be freed
+ *    at the discretion of the caller. This simplifies code in the Fortran
+ *    interface wrapper. 
+ *    - This routine is intended to be used solely for
+ *    wrapping Fortran layers from C. "Export" means to export a native
+ *    C locator to Fortran.
+ *    - There is no Fortran eqiuvalent to this routine.
+
+ *  See Also:
+ *    datImportFloc
 
  *  Copyright:
  *    Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -85,29 +100,29 @@
  *-
  */
 
-void dat1_export_floc ( HDSLoc *clocator, int free, int loc_length, char flocator[DAT__SZLOC], int * status) {
+void datExportFloc ( HDSLoc **clocator, int free, int loc_length, char flocator[DAT__SZLOC], int * status) {
 
 /* Validate the locator length.                                             */
   if (*status == DAT__OK && loc_length != DAT__SZLOC ) {
     *status = DAT__LOCIN;
     emsSeti( "LEN", loc_length );
     emsSeti( "SZLOC", DAT__SZLOC );
-    emsRep( "DAT1_IMPORT_FLOC", "Locator length is ^LEN not ^SZLOC", status);
+    emsRep( "datExportFloc", "Locator length is ^LEN not ^SZLOC", status);
   };
 
 /* If OK, then extract the information from the locator string (necessary   */
 /* to ensure that data alignment is correct, as the string will normally be */
 /* stored externally in a Fortran CHARACTER variable).                      */
 
-  if ( *status == DAT__OK && clocator != NULL ) {
-    memmove( flocator, clocator, sizeof( struct LOC ) );
+  if ( *status == DAT__OK && *clocator != NULL ) {
+    memmove( flocator, *clocator, sizeof( struct LOC ) );
   } else {
     strncpy( flocator, DAT__NOLOC, DAT__SZLOC );
   }
 
 
   /* Free regardless of status */
-  if (free) dat1_free_hdsloc( &clocator );
+  if (free) dat1_free_hdsloc( clocator );
 
   return;
 }
