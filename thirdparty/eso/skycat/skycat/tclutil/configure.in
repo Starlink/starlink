@@ -739,11 +739,11 @@ AC_LANG_RESTORE
 #	Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
 INSTALL_TARGET=$prefix
-DESTDIR="\${INSTALL_TARGET}"
-BINDIR="\${INSTALL_TARGET}"/bin
-LIBDIR="\${INSTALL_TARGET}"/lib
-INCDIR="\${INSTALL_TARGET}"/include/tclutil
-MANDIR="\${INSTALL_TARGET}"/man
+DESTDIR="${INSTALL_TARGET}"
+BINDIR="${INSTALL_TARGET}"/bin
+LIBDIR="${INSTALL_TARGET}"/lib
+INCDIR="${INSTALL_TARGET}"/include/tclutil
+MANDIR="${INSTALL_TARGET}"/man
 TCLUTIL_DIR=$LIBDIR/tclutil
 TCLUTIL_LIBRARY=$TCLUTIL_DIR
 TCLUTIL_BUILD_LIBRARY=$SRC_ROOT/tclutil/library

@@ -56,14 +56,6 @@ proc main {} {
       }
    }
    
-   #  Add special TclX file.
-   if {[info exists tclx_library] && [file exists $tclx_library/tcl.tlib]} {
-      puts $fd "-dont-strip-tcl \"$tclx_library/tcl.tlib\""
-   } else {
-      puts "$argv0: can't find TclX library files"
-      exit 1
-   }
-   
    #  Add useful bits of non-itk GAIA.
    foreach file "$gaiafiles" {
       puts $fd "-dont-strip-tcl \"$gaia_library/$file\""

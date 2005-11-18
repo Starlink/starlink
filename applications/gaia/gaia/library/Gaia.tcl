@@ -81,6 +81,8 @@
 #        Added cube display toolbox and associated changes.
 #     05-MAY-2005 (PWD):
 #        Added RICE compression changes.
+#     17-NOV-2005 (PWD):
+#        Update to Skycat version 2.7.4.
 #     {enter_changes_here}
 
 #-
@@ -101,10 +103,10 @@ Norman Gray (norman@astro.gla.ac.uk)
 David S. Berry (dsb@ast.man.ac.uk)
 
 GAIA is derived from SkyCat version [skycat_version]
-Copyright (C) 1996-1999 ESO - European Southern Observatory
+Copyright (C) 1996-2001 ESO - European Southern Observatory
 
-Authors:
-Allan Brighton (abrighto@eso.org)
+Authors: 
+Allan Brighton (abrighton@gemini.edu)
 Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
 Daniel Durand (durand@dao.nrc.ca)
@@ -326,7 +328,7 @@ itcl::class gaia::Gaia {
          place $w  -relx 0.5 -rely 0.5 -anchor s
       } else {
          set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
-         rtd_set_cmap $w
+         #DEBUG         rtd_set_cmap $w
          wm title $w "$appname_ loading..."
          wm withdraw $w_
       }
@@ -1555,7 +1557,7 @@ itcl::class gaia::Gaia {
             break;
          }
       }
-      close $fileid
+      ::close $fileid
       if { !$ok } {
          set msg \
 "Your local catalogue configuration file '$config_file'
@@ -1904,7 +1906,7 @@ proc false_tkwait {args} {
 #  that this code is used.
 itcl::body ::cat::AstroCat::new_catalog {name {id ""}
    {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
-   {w ""}} {
+   {w ""} {dirPath ""}} {
    if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w] != 0} {
       return
    }

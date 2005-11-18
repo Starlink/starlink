@@ -170,17 +170,26 @@
 //        Added direct NDF access commands. These are used to access cubes. 
 //-
 
-#include <config.h>
+#include <config.h>   /* Skycat util */
 
-#include <cstring>
+#include <cctype>
 #include <cstdlib>
 #include <csignal>
+#include <cstdio>
 #include <iostream>
 #include <sstream>
-#include <cctype>
-
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sem.h>
+#include <cstring>
+#include <fcntl.h>
+#include <unistd.h>
+#include <cmath>
+#include <cassert>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
 #include <float.h>
 #include <tcl.h>
 #include <tk.h>
@@ -318,19 +327,10 @@ static Tk_ImageType starRtdImageType = {
 // image "configure" subcommand. (ALLAN)
 //-
 static Tk_ConfigSpec configSpecs_[] = {
-    GAIA_OPTIONS,    // See StarRtdImage.h: defines option list
+    RTD_OPTIONS,                       // See RtdImage.h
+    GAIA_OPTIONS,                      // See StarRtdImage.h
     {TK_CONFIG_END, NULL, NULL, NULL, NULL, 0, 0}
 };
-
-// From BLT package (now locally because this routine was deleted with blt2.1).
-extern "C" int Blt_GraphElement(
-    Tcl_Interp *interp,         /* Interpreter of the graph widget */
-    char *pathName,             /* Path name of the graph widget */
-    char *elemName,             /* Name of the element to reset */
-    int numValues,              /* Number of values in array */
-    double *valueArr,           /* Array of x,y coordinate pairs */
-    char *xVector,              /* Name of x array */
-    char *yVector );            /* Name of y array */
 
 //+
 //  Gaia_Init
@@ -434,9 +434,8 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp,
 StarRtdImage::StarRtdImage(Tcl_Interp* interp, const char* instname,
                            int argc, char** argv,
                            Tk_ImageMaster master, const char* imageType,
-                           Tk_ConfigSpec* specs, RtdImageOptions* options)
+                           Tk_ConfigSpec* specs, StarRtdImageOptions* options)
     : Skycat(interp, instname, argc, argv, master, imageType, specs, options),
-      staroptionsPtr_((StarRtdImageOptions*)options),
       origset_(NULL),
       newset_(NULL),
       oldset_(NULL)
@@ -463,11 +462,6 @@ StarRtdImage::~StarRtdImage()
 #ifdef _DEBUG_
     cout << "Destroying StarRtdImage object " << std::endl;
 #endif
-    // XXX Do not delete this as base classes need the reference.
-    // if ( staroptionsPtr_ ) {
-    //    delete staroptionsPtr_;
-    // }
-
     //  Release any local FrameSets.
     if ( newset_ ) {
         newset_ = (AstFrameSet *) astAnnul( newset_ );
@@ -629,7 +623,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
         imio.wcs( wcs );  // this sets the WCS object to use for this image
     }
 
-    return ImageData::makeImage( name(), imio, NULL, verbose() );
+    return ImageData::makeImage( name(), imio, biasimage_->biasInfo(), verbose() );
 }
 
 //+
@@ -1047,57 +1041,101 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::configureImage" << std::endl;
 #endif
-    if ( TkImage::configureImage( argc, argv, flags ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
+    if (TkImage::configureImage(argc, argv, flags) != TCL_OK) 
+	return TCL_ERROR;
+    
     int status = TCL_OK;
     int reset = 0;
 
-    //  Note if we are using X shared memory.
+    // note if we are using X shared memory
     usingXShm_ = haveXShm_ && usexshm();
 
-    //  Find out which options were specified and process them if
-    //  necessary (note: Tk sets a flag in the config entry when the
-    //  option is specified. We use the OFFSET macro defined above as
-    //  an efficient way to compare options).
-    for ( Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++ ) {
-        if ( p->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
+    // find out which options were specified and process them
+    // if necessary (note: Tk sets a flag in the config entry when
+    // the option is specified. We use the OFFSET macro defined above
+    // as an efficient way to compare options)
+    for (Tk_ConfigSpec* p=configSpecs_; p->type != TK_CONFIG_END; p++) {
+	if (p->specFlags & TK_CONFIG_OPTION_SPECIFIED) {
+	    switch(p->offset) {
 
-            switch( p->offset ) {
-            case GAIA_OPTION(usexshm):
-                if (initialized_) {
-                    deleteXImage();
-                    reset++;
-                }
-                break;
+	    case RTD_OPTION(usexshm):
+		if (initialized_) {
+		    deleteXImage();
+		    reset++;
+		}
+		break;
 
-            case GAIA_OPTION(displaymode):
-            case GAIA_OPTION(shm_header):
-            case GAIA_OPTION(shm_data):
-                if (initialized_)
-                    reset++;
-                break;
+#if _HAVE_R6            
+	    case RTD_OPTION(usexsync):
+		if (usingXSync_ && usexsync()) {
+		    /*
+		     * XSyncSetPriority() was commented out since it can block all
+		     * other X-applications when fast image events are received-
+		     */
+		    // XSyncSetPriority(display_, None, 65535);
+		    // fprintf(stderr, "Raising priority of client %s\n", name());
+		}
+		break;
+#endif  // _HAVE_R6
+		
+	    case RTD_OPTION(displaymode):
+	    case RTD_OPTION(shm_header):
+	    case RTD_OPTION(shm_data):
+		if (initialized_) 
+		    reset++;
+		break;
+	    case RTD_OPTION(verbose):
+	    case RTD_OPTION(debug):
+		if (dbl_)
+		    dbl_->setlog ((int)(debug() & verbose()));
+		break;
+	    case RTD_OPTION(fitWidth):
+	    case RTD_OPTION(fitHeight):
+		if (initialized_) {
+		    if (image_ && fitWidth() && fitHeight()) {
+			image_->shrinkToFit(fitWidth(), fitHeight());
+		    }
+		    reset++;
+		}
+		break;
 
-            case GAIA_OPTION(fitWidth):
-            case GAIA_OPTION(fitHeight):
-                if (initialized_) {
-                    if (image_ && fitWidth() && fitHeight()) {
-                        image_->shrinkToFit(fitWidth(), fitHeight());
-                    }
-                    reset++;
-                }
-                break;
+	    case RTD_OPTION(fillWidth):
+	    case RTD_OPTION(fillHeight):
+		if (initialized_) {
+		    if (image_ && fillWidth() && fillHeight()) {
+			image_->fillToFit(fillWidth(), fillHeight());
+		    }
+		    reset++;
+		}
+		break;
 
-            case GAIA_OPTION(file):
-                status = loadFile();
-                break;
-            }
-        }
+	    case RTD_OPTION(file):
+		status = loadFile();
+		break;
+		
+	    case RTD_OPTION(sampmethod):
+		if (initialized_ && image_) {
+		    if (image_->sampmethod() != sampmethod()) {
+			image_->sampmethod(sampmethod());
+			reset++;
+		    }
+		}
+		break;
+
+	    case RTD_OPTION(subsample):
+		if (initialized_ && image_) {
+		    if (image_->subsample() != subsample()) {
+			image_->subsample(subsample());
+			reset++;
+		    }
+		}
+		break;
+	    }
+	}
     }
-
-    if ( reset ) {
-        return resetImage();
-    }
+    
+    if (reset)
+	return resetImage();
     return status;
 }
 

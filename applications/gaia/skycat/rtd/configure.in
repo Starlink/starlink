@@ -458,11 +458,11 @@ AC_SUBST(ASTROTCL_BUILD_INCLUDES)
 # Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
 INSTALL_TARGET="$prefix"
-DESTDIR="\${INSTALL_TARGET}"
-BINDIR="\${INSTALL_TARGET}/bin"
-LIBDIR="\${INSTALL_TARGET}/lib"
-INCDIR="\${INSTALL_TARGET}/include/rtd"
-MANDIR="\${INSTALL_TARGET}/man"
+DESTDIR="${INSTALL_TARGET}"
+BINDIR="${INSTALL_TARGET}/bin"
+LIBDIR="${INSTALL_TARGET}/lib"
+INCDIR="${INSTALL_TARGET}/include/rtd"
+MANDIR="${INSTALL_TARGET}/man"
 RTD_DIR=$LIBDIR/rtd
 RTD_LIBRARY=$RTD_DIR
 RTD_BUILD_LIBRARY=$SRC_ROOT/rtdimg/library

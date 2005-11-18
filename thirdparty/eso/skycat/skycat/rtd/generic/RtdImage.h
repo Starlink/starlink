@@ -143,23 +143,43 @@ typedef struct Rtd_Options {
 
 
 class RtdImageOptions : public TkImageOptions {
-public:
+ public:
 
     // constructor
     RtdImageOptions() {
-	memset(&rtd_options_, '\0', sizeof(Rtd_Options));
-
-	rtd_options_.displaymode=1;
-	rtd_options_.usexshm=1;
-	rtd_options_.usexsync=1;
-	rtd_options_.min_colors=30;
-	rtd_options_.max_colors=60;
+        rtd_options_ = new Rtd_Options;
+        manage = 1;
+        initialise();
+    }
+    RtdImageOptions( Rtd_Options *options ) {
+        rtd_options_ = options;
+        manage = 0;
+        initialise();
     }
 
-    struct Rtd_Options rtd_options_;
+    struct Rtd_Options *rtd_options_;
+    int manage;
 
     // Accessors
-    char *get_rtd_options() {return (char *)&rtd_options_;}
+    virtual char *get_rtd_options() {return (char *)rtd_options_;}
+
+    // destructor
+    ~RtdImageOptions() {
+        if ( manage ) {
+            delete rtd_options_;
+        }
+    }
+
+ private:
+    void initialise() {
+        memset(rtd_options_, '\0', sizeof(Rtd_Options));
+	rtd_options_->displaymode=1;
+	rtd_options_->usexshm=1;
+	rtd_options_->usexsync=1;
+	rtd_options_->min_colors=30;
+	rtd_options_->max_colors=60;
+    }
+
 };
 
 
@@ -437,25 +457,25 @@ public:
     static ImageColor* colors() {return colors_;}
     static RtdPerf* rtdperf() {return rtdperf_;}
 
-    int displaymode() 	const {return options_->rtd_options_.displaymode;}
-    int fitWidth() 	const {return options_->rtd_options_.fitWidth;}
-    int fitHeight() 	const {return options_->rtd_options_.fitHeight;}
-    int fillWidth() 	const {return options_->rtd_options_.fillWidth;}
-    int fillHeight() 	const {return options_->rtd_options_.fillHeight;}
-    int subsample() 	const {return options_->rtd_options_.subsample;}
-    int sampmethod() 	const {return options_->rtd_options_.sampmethod;}
-    char* file() 	const {return options_->rtd_options_.file;}
-    char* newImageCmd() const {return options_->rtd_options_.newImageCmd;}
-    char* name() 	const {return ((options_->rtd_options_.name && *options_->rtd_options_.name) ? 
-				       options_->rtd_options_.name : instname_);}
-    int usexshm() 	const {return options_->rtd_options_.usexshm;}
-    int usexsync() 	const {return options_->rtd_options_.usexsync;}
-    int shm_header() 	const {return options_->rtd_options_.shm_header;}
-    int shm_data() 	const {return options_->rtd_options_.shm_data;}
-    int min_colors() 	const {return options_->rtd_options_.min_colors;}
-    int max_colors() 	const {return options_->rtd_options_.max_colors;}
-    int verbose() 	const {return options_->rtd_options_.verbose;}
-    int debug() 	const {return options_->rtd_options_.debug;}
+    int displaymode() 	const {return options_->rtd_options_->displaymode;}
+    int fitWidth() 	const {return options_->rtd_options_->fitWidth;}
+    int fitHeight() 	const {return options_->rtd_options_->fitHeight;}
+    int fillWidth() 	const {return options_->rtd_options_->fillWidth;}
+    int fillHeight() 	const {return options_->rtd_options_->fillHeight;}
+    int subsample() 	const {return options_->rtd_options_->subsample;}
+    int sampmethod() 	const {return options_->rtd_options_->sampmethod;}
+    char* file() 	const {return options_->rtd_options_->file;}
+    char* newImageCmd() const {return options_->rtd_options_->newImageCmd;}
+    char* name() 	const {return ((options_->rtd_options_->name && *options_->rtd_options_->name) ? 
+				       options_->rtd_options_->name : instname_);}
+    int usexshm() 	const {return options_->rtd_options_->usexshm;}
+    int usexsync() 	const {return options_->rtd_options_->usexsync;}
+    int shm_header() 	const {return options_->rtd_options_->shm_header;}
+    int shm_data() 	const {return options_->rtd_options_->shm_data;}
+    int min_colors() 	const {return options_->rtd_options_->min_colors;}
+    int max_colors() 	const {return options_->rtd_options_->max_colors;}
+    int verbose() 	const {return options_->rtd_options_->verbose;}
+    int debug() 	const {return options_->rtd_options_->debug;}
 
 
     // -- short cuts --

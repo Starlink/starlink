@@ -34,6 +34,7 @@ CFLAGS       = @CXXDEBUGFLAGS@
 TOPDIR	     = @DESTDIR@
 BINDIR       = @BINDIR@
 LIBDIR       = @LIBDIR@
+INSTALL_TARGET = @INSTALL_TARGET@
 
 #  Include directives for Tcl, Tk, and X include files
 TCL_INCLUDE   = @TCLINCSW@

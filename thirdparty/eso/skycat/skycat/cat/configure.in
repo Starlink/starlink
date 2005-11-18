@@ -448,11 +448,11 @@ AC_SUBST(ASTROTCL_BUILD_INCLUDES)
 # Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
 INSTALL_TARGET=$prefix
-DESTDIR="\${INSTALL_TARGET}"
-BINDIR="\${INSTALL_TARGET}"/bin
-LIBDIR="\${INSTALL_TARGET}"/lib
-INCDIR="\${INSTALL_TARGET}"/include/cat
-MANDIR="\${INSTALL_TARGET}"/man
+DESTDIR="${INSTALL_TARGET}"
+BINDIR="${INSTALL_TARGET}"/bin
+LIBDIR="${INSTALL_TARGET}"/lib
+INCDIR="${INSTALL_TARGET}"/include/cat
+MANDIR="${INSTALL_TARGET}"/man
 CAT_DIR=$LIBDIR/cat
 CAT_LIBRARY=$CAT_DIR
 CAT_BUILD_LIBRARY=$SRC_ROOT/tclcat/library

@@ -11,6 +11,7 @@
 
 # run make in these sub directories
 SUBDIRS      = colormaps bitmaps src mktclapp library
+INSTALL_TARGET = @INSTALL_TARGET@
 
 # root of source tree
 SRC_ROOT     = @SRC_ROOT@

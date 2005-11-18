@@ -388,11 +388,11 @@ AC_SUBST(TCLUTIL_BUILD_INCLUDES)
 #	Propagate prefix argument as installation directory.
 #--------------------------------------------------------------------
 INSTALL_TARGET=$prefix
-DESTDIR="\${INSTALL_TARGET}"
-BINDIR="\${INSTALL_TARGET}"/bin
-LIBDIR="\${INSTALL_TARGET}"/lib
-INCDIR="\${INSTALL_TARGET}"/include/astrotcl
-MANDIR="\${INSTALL_TARGET}"/man
+DESTDIR="${INSTALL_TARGET}"
+BINDIR="${INSTALL_TARGET}"/bin
+LIBDIR="${INSTALL_TARGET}"/lib
+INCDIR="${INSTALL_TARGET}"/include/astrotcl
+MANDIR="${INSTALL_TARGET}"/man
 ASTROTCL_DIR=$LIBDIR/astrotcl
 ASTROTCL_LIBRARY=$ASTROTCL_DIR
 ASTROTCL_BUILD_LIBRARY=$SRC_ROOT/astrotcl/library

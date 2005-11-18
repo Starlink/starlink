@@ -84,7 +84,7 @@ Et_AppInit(Tcl_Interp *interp)
   }
 
   //  Add GAIA_LIBRARY to auto_path
-  char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
+  const char* libDir = Tcl_GetVar(interp, "gaia_library", TCL_GLOBAL_ONLY);
   if (libDir == NULL) {
       libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
   }

@@ -2940,12 +2940,12 @@ int RtdImage::maxFreqCmd(int argc, char* argv[])
     // This becomes the maximum update frequency in the main image, unless it
     // is negative, which indicates that the feature should be turned off.
     if (maxFreq < 0.) {
-	options_->rtd_options_.fixUpdateRate = 0;
-	options_->rtd_options_.userUpdateTime = 0.;
+	options_->rtd_options_->fixUpdateRate = 0;
+	options_->rtd_options_->userUpdateTime = 0.;
     }
     else {
-	options_->rtd_options_.fixUpdateRate = 1;
-	options_->rtd_options_.userUpdateTime = 1./maxFreq;
+	options_->rtd_options_->fixUpdateRate = 1;
+	options_->rtd_options_->userUpdateTime = 1./maxFreq;
     }
 
     return TCL_OK;

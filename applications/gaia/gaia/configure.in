@@ -34,6 +34,11 @@ fi
 echo "using prefix = $prefix"
 AC_SUBST(prefix)
 
+
+# Need this for .sh files?
+INSTALL_TARGET=$prefix
+AC_SUBST(INSTALL_TARGET)
+
 # -----------------------------------------------------------------------
 #
 # Set PWD variable (/bin/sh may inherit the wrong value...)
@@ -420,6 +425,16 @@ AC_SUBST(ASTROTCL_LIBRARY)
 AC_SUBST(RTD_LIBRARY)
 AC_SUBST(CAT_LIBRARY)
 AC_SUBST(SKYCAT_LIBRARY)
+
+#  No one seems to record the same information for tclX, Itcl, Itk
+#  & Iwidgets, so guess.
+DESTDIR="$prefix"
+ITCL_LIBRARY="$DESTDIR/lib/itcl$ITCL_VERSION"
+AC_SUBST(ITCL_LIBRARY)
+ITK_LIBRARY="$DESTDIR/lib/itk$ITCL_VERSION"
+AC_SUBST(ITK_LIBRARY)
+TCLX_LIBRARY="$DESTDIR/lib/tclx$TCLX_VERSION"
+AC_SUBST(TCLX_LIBRARY)
 
 IWIDGETS_VERSION="4.0.1"
 IWIDGETS_LIBRARY="$DESTDIR/lib/iwidgets"

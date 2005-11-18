@@ -58,52 +58,61 @@ extern "C" {
 }
 
 //
-//  Image options (used for image configuration).
+//  Image options (used for image configuration). Note inheriting this struct
+//  seems to cause the "invalid access to non-static data member" warning
+//  from g++ (using the plain struct in RTD doesn't do that).
 //
-typedef struct Gaia_Options : public Rtd_Options {
+typedef struct Gaia_Options : Rtd_Options
+{
     char *ast_tag;      // Canvas tag for all ast graphics
     char *component;    // NDF component to display
     int plot_wcs;       // Scale and orient plot symbols using WCS system if available
     int ukirt_ql;       // Whether ukirt quick look stats are enabled.
 } Gaia_Options;
 
-class StarRtdImageOptions : public RtdImageOptions {
+class StarRtdImageOptions : public RtdImageOptions
+{
   public:
 
     struct Gaia_Options gaia_options_;
 
-    StarRtdImageOptions() {
-        gaia_options_.ast_tag = "ast_element";
-        gaia_options_.component= "data";
+    StarRtdImageOptions() :
+        RtdImageOptions( &gaia_options_ )
+    {
+	memset( &gaia_options_, '\0', sizeof( Gaia_Options ) );
+
+        // Repeat RtdImageOptions initialisations. Probably better way to do
+        // this.
+ 	gaia_options_.displaymode = 1;
+ 	gaia_options_.usexshm = 1;
+ 	gaia_options_.usexsync = 1;
+        gaia_options_.min_colors = 30;
+ 	gaia_options_.max_colors = 60;
+
+        gaia_options_.ast_tag = NULL;
+        gaia_options_.component= NULL;
         gaia_options_.plot_wcs = 1;
         gaia_options_.ukirt_ql = 0;
     }
-
-    // Accessors
-    char *get_gaia_options() {return (char *)&gaia_options_;}
-
 };
 
-//  Define the Tk config options here so that derived classes can add
-//  more options. The definition "inherits" the Rtd options (skycat
-//  does not define any new options) (allan).
+//  Define the Tk config options specific to GAIA.
 #define GAIA_OPTION(x) Tk_Offset(Gaia_Options, x)
 #define GAIA_OPTIONS \
-    RTD_OPTIONS, \
-    {TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "", GAIA_OPTION(ast_tag), 0}, \
-    {TK_CONFIG_STRING, "-component", NULL, NULL, "", GAIA_OPTION(component), 0}, \
-    {TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1", GAIA_OPTION(plot_wcs), 0}, \
-    {TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0", GAIA_OPTION(ukirt_ql), 0}
+{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0}, \
+{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0}, \
+{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0}, \
+{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0}
 
-class StarRtdImage : public Skycat {
-
+class StarRtdImage : public Skycat
+{
   public:
 
    //  Constructor
    StarRtdImage( Tcl_Interp *interp, const char *instname, int argc,
                  char **argv, Tk_ImageMaster master, const char *imageType,
                  Tk_ConfigSpec *specs = (Tk_ConfigSpec *)NULL,
-                 RtdImageOptions *options = (RtdImageOptions *)NULL );
+                 StarRtdImageOptions *options = (StarRtdImageOptions *)NULL );
 
    //  Destructor
    ~StarRtdImage();
@@ -297,9 +306,6 @@ class StarRtdImage : public Skycat {
 
  protected:
 
-   //  Pointer to structure that holds the image configuration options.
-   StarRtdImageOptions *staroptionsPtr_;
-
    //  Redefined from parent class to check configuration options.
    virtual int configureImage(int argc, char* argv[], int flags);
 
@@ -439,8 +445,6 @@ class StarRtdImage : public Skycat {
    int ql_x1;
    int ql_y1;
    int ql_rowcut;
-
-   StarRtdImageOptions* gaia_image_options_;
 
  private:
 
