@@ -15,12 +15,14 @@
 #include "dat1.h"                   /* Internal dat_ definitions             */
 #include "dat_err.h"                /* DAT__ error code definitions          */
 
+#include "hds.h"
+
 /*================================*/
 /* DAT_NEW - Create new component */
 /*================================*/                    
 
 int
-datNew( char      locator_str[DAT__SZLOC],
+datNew( HDSLoc    *locator,
         char      *name_str,
         char      *type_str,
         int       ndim,
@@ -67,7 +69,7 @@ datNew( char      locator_str[DAT__SZLOC],
 
 /* Import locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure
@@ -196,15 +198,16 @@ datNew( char      locator_str[DAT__SZLOC],
 /* DAT_NEWC - Create string component */
 /*====================================*/                    
 
+void datCctyp( int size, char type[DAT__SZTYP] );
+
 int
-datNewC(char      locator_str[DAT__SZLOC],
+datNewC(HDSLoc    *locator,
         char      *name_str,
         int       len,
         int       ndim,
         HDS_PTYPE dims[],
         int       *status)
 {
-void datCctyp( int size, char type[DAT__SZTYP] );
 
 /* Local variables */
    char type_str[DAT__SZTYP+1];
@@ -218,7 +221,7 @@ void datCctyp( int size, char type[DAT__SZTYP] );
 /* Construct the type string */
    datCctyp( len, type_str );
 
-   datNew( locator_str, name_str, type_str, ndim, dims, status );
+   datNew( locator, name_str, type_str, ndim, dims, status );
 
    return hds_gl_status;
 }

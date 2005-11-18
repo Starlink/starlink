@@ -19,11 +19,11 @@
 /*=====================================*/
 
 int
-datCcopy(char locator1[DAT__SZLOC],
-         char locator2[DAT__SZLOC],
-         char *name,
-         char locator3[DAT__SZLOC],
-         int  *status )
+datCcopy(HDSLoc *locator1,
+         HDSLoc *locator2,
+         char   *name,
+         HDSLoc **locator3,
+         int    *status )
 {
 /*
  * This is a direct translation into C of the HDS source file dat_ccopy.f

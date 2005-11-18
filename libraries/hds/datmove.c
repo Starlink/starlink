@@ -15,14 +15,16 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* Control Blocks */
 
 /*========================*/
 /* DAT_MOVE - Move object */
 /*========================*/
 int
-datMove(char locator1_str[DAT__SZLOC],
-        char locator2_str[DAT__SZLOC],
+datMove(HDSLoc **locator1,
+        HDSLoc *locator2,
         char *name_str,
         int *status)
 {
@@ -69,7 +71,7 @@ datMove(char locator1_str[DAT__SZLOC],
 
 /* Import the first locator.    */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(*locator1, &lcp1 );
    data1 = &lcp1->data;
    state1 = &data1->state;
 
@@ -85,7 +87,7 @@ datMove(char locator1_str[DAT__SZLOC],
 /* Import the second locator and return if it points to anything other than
    a single structure object.   */
 
-   dat1_import_loc( locator2_str, DAT__SZLOC, &lcp2 );
+   dat1_import_loc(locator2, &lcp2 );
    data2 = &lcp2->data;
    if (!data2->struc || data2->naxes != 0)
       _call(DAT__OBJIN)
@@ -274,7 +276,7 @@ datMove(char locator1_str[DAT__SZLOC],
 
 /* Annul the source LCP and nullify its locator value before returning.     */
    dat1_annul_lcp( &lcp1 );
-   strncpy( locator1_str, DAT__NOLOC, DAT__SZLOC );
+   dat1_free_hdsloc( locator1 );
 
    return hds_gl_status;
 }

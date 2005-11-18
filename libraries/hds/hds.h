@@ -7,7 +7,7 @@
 /*=================================*/
 
 int
-datAlter(char      locator_str[DAT__SZLOC],
+datAlter(HDSLoc    *locator,
          int       ndim,
          hdsdim    dims[],
          int       *status);
@@ -17,40 +17,40 @@ datAlter(char      locator_str[DAT__SZLOC],
 /*==========================*/
 
 int
-datAnnul(char locator_str[DAT__SZLOC],
-         int  *status);
+datAnnul(HDSLoc    **locator,
+         int       *status);
 
 /*==============================================*/
 /* datBasic - Map data (in basic machine units) */
 /*==============================================*/
 
 int
-datBasic(char locator_str[DAT__SZLOC],
-         char *mode_c,
+datBasic(HDSLoc    *locator,
+         char      *mode_c,
          unsigned char **pntr,
-         int *len,
-         int *status);
+         int       *len,
+         int       *status);
 
 /*=====================================*/
 /* datCcopy - copy one structure level */
 /*=====================================*/
 
 int
-datCcopy(char locator1[DAT__SZLOC],
-         char locator2[DAT__SZLOC],
-         char *name,
-         char locator3[DAT__SZLOC],
-         int  *status );
+datCcopy(HDSLoc   *locator1,
+         HDSLoc   *locator2,
+         char     *name,
+         HDSLoc   **locator3,
+         int      *status );
 
 /*===========================================*/
 /* datCell - Locate a "cell" (array element) */
 /*===========================================*/
 
 int
-datCell( char     loc1_str[DAT__SZLOC],
+datCell( HDSLoc   *locator1,
          int      ndim,
          hdsdim   subs[],
-         char     loc2_str[DAT__SZLOC],
+	 HDSLoc   **locator2,
          int      *status);
 
 /*==========================================*/
@@ -58,57 +58,57 @@ datCell( char     loc1_str[DAT__SZLOC],
 /*==========================================*/
 
 int
-datClen( char locator_str[DAT__SZLOC],
-         int *clen,
-         int *status );
+datClen( HDSLoc   *locator,
+         int      *clen,
+         int      *status );
 
 /*===========================*/
 /* datClone - clone locator */
 /*===========================*/
 
 int
-datClone(char locator1_str[DAT__SZLOC],
-         char locator2_str[DAT__SZLOC],
-         int *status);
+datClone(HDSLoc   *locator1,
+	 HDSLoc   **locator2,
+         int      *status);
 
 /*================================*/
 /* datCoerc - coerce object shape */
 /*================================*/
 
 int
-datCoerc(char locator1_str[DAT__SZLOC],
-         int ndim,
-         char locator2_str[DAT__SZLOC],
-         int *status);
+datCoerc(HDSLoc   *locator1,
+         int      ndim,
+	 HDSLoc   **locator2,
+         int      *status);
 
 /*=======================*/
 /* datCopy - copy object */
 /*=======================*/
 
 int
-datCopy(char locator1_str[DAT__SZLOC],
-        char locator2_str[DAT__SZLOC],
-        char *name_c,
-        int  *status );
+datCopy(HDSLoc    *locator1,
+	HDSLoc    *locator2,
+        char      *name_c,
+        int       *status );
 
 /*============================================================*/
 /* datDrep - Obtain primitive data representation information */
 /*============================================================*/
 
 int
-datDrep( char locator_str[DAT__SZLOC],
-         char **format_str,
-         char **order_str,
-         int *status);
+datDrep(HDSLoc    *locator,
+        char      **format_str,
+        char      **order_str,
+        int       *status);
 
 /*========================================*/
 /* datErase - Erase object                */
 /*========================================*/
 
 int
-datErase(char locator_str[DAT__SZLOC],
-         char *name_str,
-         int *status);
+datErase(HDSLoc   *locator,
+         char     *name_str,
+         int      *status);
 
 
 /*===========================================================*/
@@ -116,29 +116,29 @@ datErase(char locator_str[DAT__SZLOC],
 /*===========================================================*/
 
 int
-datErmsg(int  *status,
-         int  *len,
-         char **msg_str);
+datErmsg(int      *status,
+         int      *len,
+         char     **msg_str);
 
 /*================================*/
 /* datFind - Find named component */
 /*================================*/
 
 int
-datFind( char loc1_str[DAT__SZLOC],
-         char *name_str,
-         char loc2_str[DAT__SZLOC],
-         int  *status );
+datFind( HDSLoc   *locator1,
+         char     *name_str,
+	 HDSLoc   **locator2,
+         int      *status );
 
 /*============================*/
 /* datGet - Read primitive(s) */
 /*============================*/
 
 int
-datGet(char       locator_str[DAT__SZLOC],
+datGet(HDSLoc     *locator,
        char       *type_str,
        int        ndim,
-       hdsdim  dims[],
+       hdsdim     dims[],
        unsigned   char *values,
        int        *status);
 
@@ -147,9 +147,9 @@ datGet(char       locator_str[DAT__SZLOC],
 /*===================================*/
 
 int
-datGetC(char      locator_str[DAT__SZLOC],
+datGetC(HDSLoc    *locator,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         char      values[],
         int       char_len,
         int       *status);
@@ -159,9 +159,9 @@ datGetC(char      locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datGetD(char      locator_str[DAT__SZLOC],
+datGetD(HDSLoc    *locator,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         double    values[],
         int       *status);
 
@@ -170,9 +170,9 @@ datGetD(char      locator_str[DAT__SZLOC],
 /*======================================*/
 
 int
-datGetI(char      locator_str[DAT__SZLOC],
+datGetI(HDSLoc    *locator,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         int       values[],
         int       *status);
 
@@ -181,9 +181,9 @@ datGetI(char      locator_str[DAT__SZLOC],
 /*======================================*/
 
 int
-datGetL(char      locator_str[DAT__SZLOC],
+datGetL(HDSLoc    *locator,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         int       values[],
         int       *status);
 
@@ -192,9 +192,9 @@ datGetL(char      locator_str[DAT__SZLOC],
 /*===================================*/
 
 int
-datGetR(char      locator_str[DAT__SZLOC],
+datGetR(HDSLoc    *locator,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         float     values[],
         int       *status);
 
@@ -203,42 +203,42 @@ datGetR(char      locator_str[DAT__SZLOC],
 /*======================================*/
 
 int
-datIndex(char locator1_str[DAT__SZLOC],
-         int index,
-         char locator2_str[DAT__SZLOC],
-         int *status );
+datIndex(HDSLoc   *locator1,
+         int      index,
+         HDSLoc   **locator2,
+         int      *status );
 
 /*===================================*/
 /* datLen - Inquire primitive length */
 /*===================================*/
 
 int
-datLen(char locator_str[DAT__SZLOC],
-       int *len,
-       int *status);
+datLen(HDSLoc     *locator,
+       int        *len,
+       int        *status);
 
 /*===========================*/
 /* datMap - Map primitive(s) */
 /*===========================*/
 
 int
-datMap(char      locator_str[DAT__SZLOC],
-       char      *type_str,
-       char      *mode_str,
-       int       ndim,
-       hdsdim dims[],
+datMap(HDSLoc     *locator,
+       char       *type_str,
+       char       *mode_str,
+       int        ndim,
+       hdsdim     dims[],
        unsigned char **pntr,
-       int       *status);
+       int        *status);
 
 /*==================================*/
 /* datMapC - Map _CHAR primitive(s) */
 /*==================================*/
 
 int
-datMapC(char      locator_str[DAT__SZLOC],
+datMapC(HDSLoc    *locator,
         char      *mode_str,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         unsigned char **pntr,
         int       *status );
 
@@ -247,10 +247,10 @@ datMapC(char      locator_str[DAT__SZLOC],
 /*====================================*/
 
 int
-datMapD(char      locator_str[DAT__SZLOC],
+datMapD(HDSLoc    *locator,
         char      *mode_str,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         double    **pntr,
         int       *status );
 
@@ -259,10 +259,10 @@ datMapD(char      locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datMapI(char      locator_str[DAT__SZLOC],
+datMapI(HDSLoc    *locator,
         char      *mode_str,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         int       **pntr,
         int       *status );
 
@@ -271,7 +271,7 @@ datMapI(char      locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datMapL(char      locator_str[DAT__SZLOC],
+datMapL(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         hdsdim dims[],
@@ -283,7 +283,7 @@ datMapL(char      locator_str[DAT__SZLOC],
 /*==================================*/
 
 int
-datMapR(char      locator_str[DAT__SZLOC],
+datMapR(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         hdsdim dims[],
@@ -295,7 +295,7 @@ datMapR(char      locator_str[DAT__SZLOC],
 /*==================================*/
 
 int
-datMould(char       locator_str[DAT__SZLOC],
+datMould(HDSLoc *locator,
           int       ndim,
           hdsdim dims[],
           int       *status);
@@ -305,8 +305,8 @@ datMould(char       locator_str[DAT__SZLOC],
 /*=======================*/
 
 int
-datMove(char locator1_str[DAT__SZLOC],
-        char locator2_str[DAT__SZLOC],
+datMove(HDSLoc **locator1,
+        HDSLoc *locator2,
         char *name_str,
         int *status);
 
@@ -315,7 +315,7 @@ datMove(char locator1_str[DAT__SZLOC],
 /*===============================*/
 
 int
-datName(char locator_str[DAT__SZLOC],
+datName(HDSLoc *locator,
         char name_str[DAT__SZNAM+1],
         int *status);
 
@@ -324,7 +324,7 @@ datName(char locator_str[DAT__SZLOC],
 /*=========================================*/
 
 int
-datNcomp( char locator_str[DAT__SZLOC],
+datNcomp( HDSLoc *locator,
           int *ncomp,
           int *status);
 
@@ -333,11 +333,11 @@ datNcomp( char locator_str[DAT__SZLOC],
 /*===============================*/
 
 int
-datNew( char      locator_str[DAT__SZLOC],
+datNew( HDSLoc    *locator,
         char      *name_str,
         char      *type_str,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         int       *status);
 
 /*============================================*/
@@ -345,11 +345,11 @@ datNew( char      locator_str[DAT__SZLOC],
 /*============================================*/
 
 int
-datNewC(char      locator_str[DAT__SZLOC],
+datNewC(HDSLoc    *locator,
         char      *name_str,
         int       len,
         int       ndim,
-        hdsdim dims[],
+        hdsdim    dims[],
         int       *status);
 
 /*====================================*/
@@ -357,8 +357,8 @@ datNewC(char      locator_str[DAT__SZLOC],
 /*====================================*/
 
 int
-datParen(char locator1_str[DAT__SZLOC],
-         char locator2_str[DAT__SZLOC],
+datParen(HDSLoc *locator1,
+         HDSLoc **locator2,
          int *status);
 
 /*====================================*/
@@ -366,7 +366,7 @@ datParen(char locator1_str[DAT__SZLOC],
 /*====================================*/
 
 int
-datPrim(char locator_str[DAT__SZLOC],
+datPrim(HDSLoc *locator,
         int *prim,
         int *status);
 
@@ -376,7 +376,7 @@ datPrim(char locator_str[DAT__SZLOC],
 
 int
 datPrmry(int set,
-         char loc[DAT__SZLOC],
+         HDSLoc **locator,
          int *prmry,
          int *status);
 
@@ -385,7 +385,7 @@ datPrmry(int set,
 /*==================================*/
 
 int
-datPutC( char      locator_str[DAT__SZLOC],
+datPutC( HDSLoc *locator,
          int       ndim,
          hdsdim dims[],
          char      *string,
@@ -397,7 +397,7 @@ datPutC( char      locator_str[DAT__SZLOC],
 /*====================================*/
 
 int
-datPutD( char      locator_str[DAT__SZLOC],
+datPutD( HDSLoc *locator,
          int       ndim,
          hdsdim dims[],
          double    *values,
@@ -408,7 +408,7 @@ datPutD( char      locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datPutI( char    locator_str[DAT__SZLOC],
+datPutI( HDSLoc *locator,
          int     ndim,
          hdsdim dims[],
          int     *values,
@@ -419,7 +419,7 @@ datPutI( char    locator_str[DAT__SZLOC],
 /*==================================*/
 
 int
-datPutR( char      locator_str[DAT__SZLOC],
+datPutR( HDSLoc *locator,
          int       ndim,
          hdsdim dims[],
          float     *values,
@@ -430,7 +430,7 @@ datPutR( char      locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datPutL( char      locator_str[DAT__SZLOC],
+datPutL( HDSLoc *locator,
          int       ndim,
          hdsdim dims[],
          int       *values,
@@ -441,7 +441,7 @@ datPutL( char      locator_str[DAT__SZLOC],
 /*==========================*/
 
 int
-datPut( char     locator_str[DAT__SZLOC],
+datPut( HDSLoc *locator,
         char     *type_str,
         int      ndim,
         hdsdim  dims[],
@@ -453,7 +453,7 @@ datPut( char     locator_str[DAT__SZLOC],
 /*===================================================*/
 
 int
-datRefct(char loc[DAT__SZLOC],
+datRefct(HDSLoc *locator,
          int *refct,
          int *status);
 
@@ -462,7 +462,7 @@ datRefct(char loc[DAT__SZLOC],
 /*=============================*/
 
 int
-datRenam(char locator_str[DAT__SZLOC],
+datRenam(HDSLoc *locator,
           char *name_str,
           int  *status);
 
@@ -471,7 +471,7 @@ datRenam(char locator_str[DAT__SZLOC],
 /*================================*/
 
 int 
-datReset(char locator_str[DAT__SZLOC],
+datReset(HDSLoc *locator,
           int *status);
 
 /*================================*/
@@ -479,7 +479,7 @@ datReset(char locator_str[DAT__SZLOC],
 /*================================*/
 
 int
-datRetyp(char locator_str[DAT__SZLOC],
+datRetyp(HDSLoc *locator,
           char *type_str,
           int *status);
 
@@ -488,7 +488,7 @@ datRetyp(char locator_str[DAT__SZLOC],
 /*=================================*/
 
 int
-datShape(char      locator_str[DAT__SZLOC],
+datShape(HDSLoc *locator,
          int       maxdim,
          hdsdim dims[],
          int       *actdim,
@@ -499,7 +499,7 @@ datShape(char      locator_str[DAT__SZLOC],
 /*===============================*/
 
 int
-datSize(char locator_str[DAT__SZLOC],
+datSize(HDSLoc *locator,
         int *size,
         int *status );
 
@@ -508,19 +508,19 @@ datSize(char locator_str[DAT__SZLOC],
 /*================================*/
 
 int
-datSlice(char     locator1_str[DAT__SZLOC],
-         int      ndim,
+datSlice(HDSLoc  *locator1,
+         int     ndim,
          hdsdim  lower[],
          hdsdim  upper[],
-         char     locator2_str[DAT__SZLOC],
-         int      *status );
+         HDSLoc  **locator2,
+         int     *status );
 
 /*=================================*/
 /* datState - Enquire object state */
 /*=================================*/
 
 int   
-datState(char locator_str[DAT__SZLOC],
+datState(HDSLoc *locator,
          int *state,
          int *status);
 
@@ -529,7 +529,7 @@ datState(char locator_str[DAT__SZLOC],
 /*=====================================*/
 
 int
-datStruc(char locator_str[DAT__SZLOC],
+datStruc(HDSLoc *locator,
          int *struc,
          int *status);
 
@@ -540,8 +540,8 @@ datStruc(char locator_str[DAT__SZLOC],
 int
 datTemp(char      *type_str,
         int       ndim,
-        hdsdim dims[],
-        char      locator_str[DAT__SZLOC],
+        hdsdim    dims[],
+        HDSLoc    **locator,
         int       *status);
 
 /*=========================================*/
@@ -549,7 +549,7 @@ datTemp(char      *type_str,
 /*=========================================*/
 
 int
-datThere(char locator_str[DAT__SZLOC],
+datThere(HDSLoc *locator,
          char *name_c,
          int *there,
          int *status);
@@ -559,7 +559,7 @@ datThere(char locator_str[DAT__SZLOC],
 /*===============================*/
 
 int
-datType(char locator_str[DAT__SZLOC],
+datType(HDSLoc *locator,
         char type_str[DAT__SZTYP + 1],
         int *status );
 
@@ -568,7 +568,7 @@ datType(char locator_str[DAT__SZLOC],
 /*=========================*/
 
 int
-datUnmap(char locator_str[DAT__SZLOC],
+datUnmap(HDSLoc *locator,
          int  *status);
 
 /*==================================*/
@@ -576,18 +576,18 @@ datUnmap(char locator_str[DAT__SZLOC],
 /*==================================*/
 
 int
-datValid(char locator_str[DAT__SZLOC],
-         int *valid,
-         int *status);
+datValid(HDSLoc *locator,
+         int    *valid,
+         int    *status);
 
 /*===========================*/
 /* datVec - Vectorise object */
 /*===========================*/
 
 int
-datVec(char locator1_str[DAT__SZLOC],
-       char locator2_str[DAT__SZLOC],
-       int  *status );
+datVec(HDSLoc *locator1,
+       HDSLoc **locator2,
+       int    *status );
 
 /*================================================*/
 /* datWhere - Find primitive position in HDS file */
@@ -600,7 +600,7 @@ datVec(char locator1_str[DAT__SZLOC],
 /*==================================================*/
 
 int
-hdsCopy(char locator_str[DAT__SZLOC],
+hdsCopy(HDSLoc *locator,
         char *file_str,
         char name_str[DAT__SZNAM],
         int *status );
@@ -610,7 +610,7 @@ hdsCopy(char locator_str[DAT__SZLOC],
 /*=================================*/
 
 int
-hdsErase(char locator_str[DAT__SZLOC],
+hdsErase(HDSLoc **locator,
          int *status);
 
 /*===============================================================*/
@@ -634,7 +634,7 @@ hdsFlush( char *group_str,
 /*===============================*/
 
 int
-hdsFree(char locator_str[DAT__SZLOC],
+hdsFree(HDSLoc *locator,
         int *status);
 
 /*==================================*/
@@ -642,7 +642,7 @@ hdsFree(char locator_str[DAT__SZLOC],
 /*==================================*/
 
 int
-hdsGroup(char locator_str[DAT__SZLOC],
+hdsGroup(HDSLoc *locator,
          char group_str[DAT__SZGRP+1],
          int *status);
 
@@ -660,7 +660,7 @@ hdsGtune(char *param_str,
 /*=================================*/
 
 int
-hdsLink(char locator_str[DAT__SZLOC],
+hdsLink(HDSLoc *locator,
         char *group_str,
         int *status);
 
@@ -669,7 +669,7 @@ hdsLink(char locator_str[DAT__SZLOC],
 /*================================*/
 
 int
-hdsLock(char locator_str[DAT__SZLOC],
+hdsLock(HDSLoc *locator,
         int *status);
 
 /*====================================*/
@@ -682,7 +682,7 @@ hdsNew(char *file_str,
        char *type_str,
        int  ndim,
        hdsdim  dims[],
-       char locator_str[DAT__SZLOC],
+       HDSLoc **locator,
        int *status);
 
 /*========================================*/
@@ -692,7 +692,7 @@ hdsNew(char *file_str,
 int
 hdsOpen(char *file_str,
         char *mode_str,
-        char locator_str[DAT__SZLOC],
+        HDSLoc **locator,
         int *status);
 
 /*===============================*/
@@ -723,7 +723,7 @@ hdsStop( int *status);
 /*==============================*/
 
 int
-hdsTrace(char locator_str[DAT__SZLOC],
+hdsTrace(HDSLoc *locator,
          int  *nlev,
          char *path_str,
          char *file_str,
@@ -746,10 +746,10 @@ hdsTune(char *param_str,
 
 int 
 hdsWild(char *fspec,
-            char *mode,
-            int *iwld,
-            char *loc,
-            int *status);
+        char *mode,
+        int *iwld,
+        HDSLoc **loc,
+        int *status);
 
 /*=================================================================*/
 /*  Deprecated routines!                                           */   
@@ -760,7 +760,7 @@ hdsWild(char *fspec,
 /*========================================*/
 
 int
-datConv(char locator_str[DAT__SZLOC],
+datConv(HDSLoc *locator,
         char *type_str,
         int *conv,
         int *status);
@@ -770,5 +770,5 @@ datConv(char locator_str[DAT__SZLOC],
 /*=====================================================*/
 
 int
-hdsClose(char locator_str[DAT__SZLOC],
+hdsClose(HDSLoc **locator,
         int *status);

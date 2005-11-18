@@ -9,6 +9,8 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* F77_INTEGER_FUNCTION(dat_drep) ( struct STR *locator_str,
  *                                  struct STR *format_str,
  *                                  struct STR *order_str,
@@ -18,7 +20,7 @@
  *                                  TRAIL(order_str ) )
  */
 int
-datDrep( char locator_str[DAT__SZLOC],
+datDrep( HDSLoc *locator,
          char **format_str,
          char **order_str,
          int *status)
@@ -125,6 +127,7 @@ datDrep( char locator_str[DAT__SZLOC],
 *        Revised to pure C version.
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
+*        Use HDSLoc in API
 *     {enter_changes_here}
 
 *  Bugs:
@@ -147,7 +150,7 @@ datDrep( char locator_str[DAT__SZLOC],
       hds_gl_status = *status;
 
 /* Import the locator and obtain a pointer to the LCP data fields.          */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+      dat1_import_loc(locator, &lcp );
    if ( _ok( hds_gl_status ) )
    {
       data = &lcp->data;

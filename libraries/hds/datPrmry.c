@@ -9,6 +9,9 @@
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+
+#include "hds.h"
+
 #define TRUE  1
 #define FALSE 0
 
@@ -20,7 +23,7 @@
  */
 int
 datPrmry(int set,
-         char loc[DAT__SZLOC],
+         HDSLoc **locator,
          int *prmry,
          int *status)
 {
@@ -90,6 +93,8 @@ datPrmry(int set,
 *        Original version.
 *     23-APR-2002 (BKM):
 *        Convert to C interface.
+*     15-NOV-2005 (TIMJ):
+*        Use HDSLoc API
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,7 +114,7 @@ datPrmry(int set,
       hds_gl_status = *status;
 
 /* Import the locator.                                                      */
-   dat1_import_loc( loc, DAT__SZLOC, &lcp );
+      dat1_import_loc( *locator, &lcp );
    if ( _ok( hds_gl_status ) )
    {
 
@@ -153,8 +158,7 @@ datPrmry(int set,
                dat1_annul_lcp( &lcp );
 
 /* Nullify the locator value.                                               */
-/*                  cnf_expn( DAT__NOLOC, DAT__SZLOC, LOC, LOC_length );    */
-               strncpy( (char *) loc, DAT__NOLOC, DAT__SZLOC );
+	       dat1_free_hdsloc(locator );
 
             }
          }

@@ -10,12 +10,13 @@
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "hds.h"
 
 int 
 hdsWild(char *fspec,
             char *mode,
             int *iwld,
-            char *loc,
+            HDSLoc **locator,
             int *status)
 {
 /*
@@ -51,7 +52,7 @@ hdsWild(char *fspec,
 *     resources used.
 
 *  Arguments:
-*     fpec = char * (Given)
+*     fspec = char * (Given)
 *        The wild-card file specification identifying the container
 *        files required (a default file type extension of ".sdf" is
 *        assumed, if not specified). The syntax of this specification
@@ -68,10 +69,10 @@ hdsWild(char *fspec,
 *        supplied, then the previous search context will be used and
 *        the next container file appropriate to that context will be
 *        located. In this case, the value of FSPEC is not used.
-*     loc = char * (Returned)
+*     locator = HDSLoc ** (Returned)
 *        A primary locator to the top-level object in the next
 *        container file to satisfy the file specification given in
-*        FSPEC.  A value of DAT__NOLOC will be returned (without error)
+*        FSPEC.  From C a NULL pointer will be returned (without error)
 *        if no further container files remain to be located.
 *     status = int * (Given and Returned)
 *        The global status.
@@ -125,6 +126,8 @@ hdsWild(char *fspec,
 *        container files.
 *     19-MAR-2001 (BKM);
 *        Convert to C interface and remove tabs.
+*     16-NOV-2005 (TIMJ):
+*        Use HDSLoc**
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,7 +196,7 @@ hdsWild(char *fspec,
 /* locator.                                                                 */
             if ( alldone )
             {
-               cnf_expch( DAT__NOLOC, loc, DAT__SZLOC );
+ 	       dat1_free_hdsloc( locator );
 
 /* If this is an initial call of HDS_WILD, then report an error, since      */
 /* there were no accessible files which matched the specification (omit any */
@@ -242,7 +245,7 @@ the specification \'^FSPEC\'.",
                else
                {
                   ems_rlse_c( );
-                  dat1_alloc_lcp( DAT__SZLOC, loc, &lcp );
+                  dat1_alloc_lcp(locator, &lcp );
                   if ( _ok( hds_gl_status ) )
                   {
 
@@ -325,13 +328,13 @@ the specification \'^FSPEC\'.",
 /* contextual error report.                                                 */
       if ( !_ok( hds_gl_status ) )
       {
-         cnf_expch( DAT__NOLOC, loc, DAT__SZLOC );
+ 	 dat1_free_hdsloc( locator );
          ems_rep_c( "HDS_WILD_ERR",
                     "HDS_WILD: Error performing a wild-card search for HDS \
 container files.", &hds_gl_status );
       }
 
 /* Return the current global status value.                                  */
-      *status = (F77_INTEGER_TYPE) hds_gl_status;
+      *status = hds_gl_status;
       return *status;
    }

@@ -11,6 +11,9 @@
 #include "hds2.h"             /* for datWhere                                */
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
+
+#include "hds.h"
+
 #define TRUE 1
 #define FALSE 0
 #define SAI__OK 0
@@ -35,7 +38,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -45,7 +48,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
 
 /* Import the locator string                  */
 
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -53,9 +56,9 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datAlter( locator_c, *ndim, dims64, status );
+   datAlter( &locator_c, *ndim, dims64, status );
 #else
-   datAlter( locator_c, *ndim, dims, status );
+   datAlter( &locator_c, *ndim, dims, status );
 #endif
 }
 
@@ -67,18 +70,22 @@ F77_SUBROUTINE(dat_annul)( CHARACTER(locator),
 /* DAT_ANNUL - Annul locator */
 /*===========================*/
 /* Local variable */
-   char locator_c[DAT__SZLOC];
+   
+   HDSLoc *locator_c = NULL;
 
 /* Enter routine.	*/
 
 /* Import the locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   
+   dat1_impalloc_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datAnnul( locator_c, status);
+   datAnnul( &locator_c, status);
 
 /* Export returned locator */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+
 }
 
 F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
@@ -97,17 +104,17 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
 /* Local variables.     */
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* initialise in case of bad return status */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    
 /* Enter routine.	*/
 
 /* Import the locator and mode strings  */
 
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
    cnfImpn( mode, mode_length, DAT__SZMOD, mode_c);
 
 /* Call pure C routine                                       */
-   datBasic( locator_c, mode_c, &cpntr, len, status);
+   datBasic( &locator_c, mode_c, &cpntr, len, status);
 
 /* Export the C pointer as a FORTRAN pointer */
    *pntr = cnfFptr( cpntr );
@@ -129,9 +136,9 @@ F77_SUBROUTINE(dat_ccopy)( CHARACTER(locator1),
 /*======================================*/
 
 /* Local variables.     */ 
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
-   char locator3_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc locator2_c;
+   HDSLoc *locator3_c = NULL;
    char name_c[DAT__SZNAM+1];
    
 /* Enter routine.	*/
@@ -140,14 +147,14 @@ F77_SUBROUTINE(dat_ccopy)( CHARACTER(locator1),
    cnfImpn( name, name_length, DAT__SZNAM, name_c);
 
 /* Import the input locator strings                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
-   cnfImpch( locator2, DAT__SZLOC, locator2_c);
- 
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
+   dat1_import_floc( locator2, DAT__SZLOC, &locator2_c, status );
+
 /* Call pure C routine                                       */
-   datCcopy( locator1_c, locator2_c, name_c, locator3_c, status);
+   datCcopy( &locator1_c, &locator2_c, name_c, &locator3_c, status);
 
 /* Export returned locator    */
-   cnfExpch( locator3_c, locator3, DAT__SZLOC);
+   dat1_export_floc( locator3_c, 1, DAT__SZLOC, locator3, status );
 }
 
 F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
@@ -164,8 +171,8 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
 /*============================================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG subs64[DAT__MXDIM];
    int i;
@@ -174,7 +181,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -182,13 +189,13 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
       subs64[i] = subs[i];
       
 /* Call pure C routine                                       */
-   datCell( locator1_c, *ndim, subs64, locator2_c, status);
+   datCell( &locator1_c, *ndim, subs64, &locator2_c, status);
 #else
-   datCell( locator1_c, *ndim, subs, locator2_c, status);
+   datCell( &locator1_c, *ndim, subs, &locator2_c, status);
 #endif
 
 /* Export returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC ); 
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status ); 
 }
 
 F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
@@ -202,15 +209,15 @@ F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
 /*===========================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datClen( locator_c, clen, status);
+   datClen( &locator_c, clen, status);
 }
 
 F77_SUBROUTINE(dat_clone)( CHARACTER(locator1),
@@ -225,19 +232,19 @@ F77_SUBROUTINE(dat_clone)( CHARACTER(locator1),
 /*===========================*/
 
 /* Local variables */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 /* Call pure C routine                                       */
-   datClone( locator1_c, locator2_c, status);
+   datClone( &locator1_c, &locator2_c, status);
 
 /* Export the returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_coerc)( CHARACTER(locator1),
@@ -253,19 +260,19 @@ F77_SUBROUTINE(dat_coerc)( CHARACTER(locator1),
 /*=================================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status);
 
 /* Call pure C routine                                       */
-   datCoerc( locator1_c, *ndim, locator2_c, status);
+   datCoerc( &locator1_c, *ndim, &locator2_c, status);
 
 /* Export the returned locator                      */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_copy)( CHARACTER(locator1),
@@ -282,8 +289,8 @@ F77_SUBROUTINE(dat_copy)( CHARACTER(locator1),
 /*========================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc locator2_c;
    char name_c[DAT__SZNAM+1];
    
 /* Enter routine.	*/
@@ -292,11 +299,11 @@ F77_SUBROUTINE(dat_copy)( CHARACTER(locator1),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
 
 /* Import the locator strings                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
-   cnfImpch( locator2, DAT__SZLOC, locator2_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status);
+   dat1_import_floc( locator2, DAT__SZLOC, &locator2_c, status);
 
 /* Call pure C routine                                       */
-   datCopy( locator1_c, locator2_c, name_c, status);
+   datCopy( &locator1_c, &locator2_c, name_c, status);
 }
 
 F77_SUBROUTINE(dat_drep)( CHARACTER(locator),
@@ -313,17 +320,17 @@ F77_SUBROUTINE(dat_drep)( CHARACTER(locator),
 /*=============================================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char *format_c;
    char *order_c;
    
 /* Enter routine.	*/
 
 /* Import the locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                      */
-   datDrep( locator_c, &format_c, &order_c, status);
+   datDrep( &locator_c, &format_c, &order_c, status);
 
 /* Export the returned C strings to the FORTRAN variables    */
 
@@ -347,7 +354,7 @@ F77_SUBROUTINE(dat_erase)( CHARACTER(locator),
 
 /* Local variables.     */
    char name_c[DAT__SZNAM+1];
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    
 /* Enter routine.	*/
 
@@ -355,10 +362,10 @@ F77_SUBROUTINE(dat_erase)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
 
 /* Import the locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datErase( locator_c, name_c, status);
+   datErase( &locator_c, name_c, status);
 }
 
 F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
@@ -398,22 +405,23 @@ F77_SUBROUTINE(dat_find)( CHARACTER(locator1),
 
 /* Local variables.     */
    char name_c[DAT__SZNAM+1];
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
    
+
 /* Enter routine.	*/
 
 /* Import name  string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 /* Call pure C routine                                       */
-   datFind( locator1_c, name_c, locator2_c, status);
+   datFind( &locator1_c, name_c, &locator2_c, status);
 
 /* Export the returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC);
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_get)( CHARACTER(locator),
@@ -432,7 +440,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 /*=============================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char type_c[DAT__SZTYP+1];
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
@@ -456,7 +464,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 
 
 /* Import the locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -464,9 +472,9 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGet( locator_c, type_c, *ndim, dims64, values, status);
+   datGet( &locator_c, type_c, *ndim, dims64, values, status);
 #else
-   datGet( locator_c, type_c, *ndim, dims, values, status);
+   datGet( &locator_c, type_c, *ndim, dims, values, status);
 #endif
 }
 
@@ -485,7 +493,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
 /*====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -494,7 +502,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -502,9 +510,9 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGetC( locator_c, *ndim, dims64, values, values_length, status);
+   datGetC( &locator_c, *ndim, dims64, values, values_length, status);
 #else
-   datGetC( locator_c, *ndim, dims, values, values_length, status);
+   datGetC( &locator_c, *ndim, dims, values, values_length, status);
 #endif
 }
 
@@ -521,7 +529,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -530,7 +538,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -538,9 +546,9 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGetD( locator_c, *ndim, dims64, values, status);
+   datGetD( &locator_c, *ndim, dims64, values, status);
 #else
-   datGetD( locator_c, *ndim, dims, values, status);
+   datGetD( &locator_c, *ndim, dims, values, status);
 #endif
 }
 
@@ -557,7 +565,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
 /*=======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -566,7 +574,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -574,9 +582,9 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGetI( locator_c, *ndim, dims64, values, status);
+   datGetI( &locator_c, *ndim, dims64, values, status);
 #else
-   datGetI( locator_c, *ndim, dims, values, status);
+   datGetI( &locator_c, *ndim, dims, values, status);
 #endif
 }
 
@@ -593,7 +601,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
 /*=======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -602,7 +610,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -610,9 +618,9 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGetL( locator_c, *ndim, dims64, values, status);
+   datGetL( &locator_c, *ndim, dims64, values, status);
 #else
-   datGetL( locator_c, *ndim, dims, values, status);
+   datGetL( &locator_c, *ndim, dims, values, status);
 #endif
 }
 
@@ -629,7 +637,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 /*====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -638,7 +646,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -646,9 +654,9 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGetR( locator_c, *ndim, dims64, values, status);
+   datGetR( &locator_c, *ndim, dims64, values, status);
 #else
-   datGetR( locator_c, *ndim, dims, values, status);
+   datGetR( &locator_c, *ndim, dims, values, status);
 #endif
 }
 
@@ -665,19 +673,19 @@ F77_SUBROUTINE(dat_index)( CHARACTER(locator1),
 /*=======================================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c);
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status);
 
 /* Call pure C routine                                       */
-   datIndex( locator1_c, *index, locator2_c, status);
+   datIndex( &locator1_c, *index, &locator2_c, status);
 
 /*Export the returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_len)( CHARACTER(locator),
@@ -691,15 +699,15 @@ F77_SUBROUTINE(dat_len)( CHARACTER(locator),
 /*====================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datLen( locator_c, len, status );
+   datLen( &locator_c, len, status );
 }
 
 F77_SUBROUTINE(dat_map)( CHARACTER(locator),
@@ -719,7 +727,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
 /*============================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char type_c[DAT__SZTYP+1];
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* initialise in case of bad return status */
@@ -731,7 +739,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import FORTRAN to C strings  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
@@ -743,9 +751,9 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMap( locator_c, type_c, mode_c, *ndim, dims64, &cpntr, status);
+   datMap( &locator_c, type_c, mode_c, *ndim, dims64, &cpntr, status);
 #else
-   datMap( locator_c, type_c, mode_c, *ndim, dims, &cpntr, status);
+   datMap( &locator_c, type_c, mode_c, *ndim, dims, &cpntr, status);
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -767,7 +775,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
 /*===================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
@@ -778,7 +786,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
@@ -789,9 +797,9 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMapC( locator_c, mode_c, *ndim, dims64, &cpntr, status);
+   datMapC( &locator_c, mode_c, *ndim, dims64, &cpntr, status);
 #else
-   datMapC( locator_c, mode_c, *ndim, dims, &cpntr, status);
+   datMapC( &locator_c, mode_c, *ndim, dims, &cpntr, status);
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -813,7 +821,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
 /*=====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    double *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
@@ -824,7 +832,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
@@ -835,9 +843,9 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMapD( locator_c, mode_c, *ndim, dims64, &cpntr, status);
+   datMapD( &locator_c, mode_c, *ndim, dims64, &cpntr, status);
 #else
-   datMapD( locator_c, mode_c, *ndim, dims, &cpntr, status);
+   datMapD( &locator_c, mode_c, *ndim, dims, &cpntr, status);
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -859,7 +867,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
@@ -870,7 +878,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
@@ -881,9 +889,9 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMapI( locator_c, mode_c, *ndim, dims64, &cpntr, status);
+   datMapI( &locator_c, mode_c, *ndim, dims64, &cpntr, status);
 #else
-   datMapI( locator_c, mode_c, *ndim, dims, &cpntr, status);
+   datMapI( &locator_c, mode_c, *ndim, dims, &cpntr, status);
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -905,7 +913,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
@@ -916,7 +924,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
@@ -927,9 +935,9 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMapL( locator_c, mode_c, *ndim, dims64, &cpntr, status);
+   datMapL( &locator_c, mode_c, *ndim, dims64, &cpntr, status);
 #else
-   datMapL( locator_c, mode_c, *ndim, dims, &cpntr, status);
+   datMapL( &locator_c, mode_c, *ndim, dims, &cpntr, status);
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -951,7 +959,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
 /*===================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    float *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
@@ -962,7 +970,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import mode string  */
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
@@ -973,9 +981,9 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMapR( locator_c, mode_c, *ndim, dims64, &cpntr, status );
+   datMapR( &locator_c, mode_c, *ndim, dims64, &cpntr, status );
 #else
-   datMapR( locator_c, mode_c, *ndim, dims, &cpntr, status );
+   datMapR( &locator_c, mode_c, *ndim, dims, &cpntr, status );
 #endif
 
 /* Export the C pointer as a FORTRAN POINTER */
@@ -993,7 +1001,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1002,7 +1010,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1010,9 +1018,9 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datMould( locator_c, *ndim, dims64, status );
+   datMould( &locator_c, *ndim, dims64, status );
 #else
-   datMould( locator_c, *ndim, dims, status );
+   datMould( &locator_c, *ndim, dims, status );
 #endif
 }
 
@@ -1030,26 +1038,26 @@ F77_SUBROUTINE(dat_move)( CHARACTER(locator1),
 /*========================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc *locator1_c = NULL;
+   HDSLoc locator2_c;
    char name_c[DAT__SZNAM+1];
    
 /* Enter routine.	*/
 
 /* Import the first locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c );
+   dat1_impalloc_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 /* Import the second locator string                  */
-   cnfImpch( locator2, DAT__SZLOC, locator2_c );
+   dat1_import_floc( locator2, DAT__SZLOC, &locator2_c, status );
 
 /* Import "name" to C string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
 /* Call pure C routine                                       */
-   datMove( locator1_c, locator2_c, name_c, status );
+   datMove( &locator1_c, &locator2_c, name_c, status );
 
 /* Export returned locator - will be now DAT__NOLOC */
-   cnfExpch( locator1_c, locator1, DAT__SZLOC );
+   dat1_export_floc( locator1_c, 1, DAT__SZLOC, locator1, status );
 }
 
 F77_SUBROUTINE(dat_name)( CHARACTER(locator),
@@ -1064,16 +1072,16 @@ F77_SUBROUTINE(dat_name)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char name_c[DAT__SZNAM+1]; 
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datName( locator_c, name_c, status );
+   datName( &locator_c, name_c, status );
 
 /* Export returned name to FORTRAN string                 */
    cnfExpn( name_c, DAT__SZNAM, name, name_length );
@@ -1090,15 +1098,15 @@ F77_SUBROUTINE(dat_ncomp)( CHARACTER(locator),
 /*==========================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datNcomp( locator_c, ncomp, status );
+   datNcomp( &locator_c, ncomp, status );
 }
 
 F77_SUBROUTINE(dat_new)( CHARACTER(locator),
@@ -1117,7 +1125,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
    char type_c[DAT__SZTYP+1];
 #if HDS_COPY_FORTRAN_DIMS
@@ -1128,7 +1136,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import FORTRAN to C strings  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
@@ -1140,9 +1148,9 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datNew( locator_c, name_c, type_c, *ndim, dims64, status);
+   datNew( &locator_c, name_c, type_c, *ndim, dims64, status);
 #else
-   datNew( locator_c, name_c, type_c, *ndim, dims, status);
+   datNew( &locator_c, name_c, type_c, *ndim, dims, status);
 #endif
 }
 
@@ -1161,7 +1169,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
 /*============================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
@@ -1171,7 +1179,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "name" to C string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
@@ -1182,9 +1190,9 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datNewC( locator_c, name_c, *len, *ndim, dims64, status );
+   datNewC( &locator_c, name_c, *len, *ndim, dims64, status );
 #else
-   datNewC( locator_c, name_c, *len, *ndim, dims, status );
+   datNewC( &locator_c, name_c, *len, *ndim, dims, status );
 #endif
 }
 
@@ -1200,19 +1208,19 @@ F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
 /*=====================================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c );
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 /* Call pure C routine                                       */
-   datParen( locator1_c, locator2_c, status );
+   datParen( &locator1_c, &locator2_c, status );
 
 /* Export returned locator to FORTRAN string                 */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_prim)( CHARACTER(locator),
@@ -1226,16 +1234,16 @@ F77_SUBROUTINE(dat_prim)( CHARACTER(locator),
 /*=====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    int reply_c;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datPrim( locator_c, &reply_c, status );
+   datPrim( &locator_c, &reply_c, status );
 
 /* Set FORTRAN locical return                                */
    if( reply_c )
@@ -1256,8 +1264,9 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
 /*==========================================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
-   int set_c, primary_c;
+   HDSLoc *locator_c = NULL;
+   int set_c;
+   int primary_c;
    
 /* Enter routine.	*/
 
@@ -1267,17 +1276,19 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
          primary_c = TRUE;
       else
          primary_c = FALSE;
-   } else
+   } else {
       set_c = FALSE;
+      primary_c = FALSE;
+   }
 
 /* Import the locator string (given and returned)  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_impalloc_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datPrmry( set_c, locator_c, &primary_c, status );
+   datPrmry( set_c, &locator_c, &primary_c, status );
 
 /* Export returned locator - may be set to DAT__NOLOC */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
 
 /* Set FORTRAN logical return                                */
    if( *set == F77_FALSE )
@@ -1303,7 +1314,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1312,7 +1323,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1320,9 +1331,9 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call C routine                                       */
-   datPutC( locator_c, *ndim, dims64, values, values_length, status);
+   datPutC( &locator_c, *ndim, dims64, values, values_length, status);
 #else
-   datPutC( locator_c, *ndim, dims, values, values_length, status);
+   datPutC( &locator_c, *ndim, dims, values, values_length, status);
 #endif
 
 }
@@ -1340,7 +1351,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
 /*=====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1349,7 +1360,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1357,9 +1368,9 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datPutD( locator_c, *ndim, dims64, values, status );
+   datPutD( &locator_c, *ndim, dims64, values, status );
 #else
-   datPutD( locator_c, *ndim, dims, values, status );
+   datPutD( &locator_c, *ndim, dims, values, status );
 #endif
 }
 
@@ -1376,7 +1387,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1385,7 +1396,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1393,9 +1404,9 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datPutI( locator_c, *ndim, dims64, values, status );
+   datPutI( &locator_c, *ndim, dims64, values, status );
 #else
-   datPutI( locator_c, *ndim, dims, values, status );
+   datPutI( &locator_c, *ndim, dims, values, status );
 #endif
 }
 
@@ -1412,7 +1423,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
 /*===================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1421,7 +1432,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1429,9 +1440,9 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datPutR( locator_c, *ndim, dims64, values, status );
+   datPutR( &locator_c, *ndim, dims64, values, status );
 #else
-   datPutR( locator_c, *ndim, dims, values, status );
+   datPutR( &locator_c, *ndim, dims, values, status );
 #endif
 }
 
@@ -1448,7 +1459,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1457,7 +1468,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1465,9 +1476,9 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datPutL( locator_c, *ndim, dims64, values, status );
+   datPutL( &locator_c, *ndim, dims64, values, status );
 #else
-   datPutL( locator_c, *ndim, dims, values, status );
+   datPutL( &locator_c, *ndim, dims, values, status );
 #endif
 }
 
@@ -1488,8 +1499,9 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
 /*===========================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char type_c[DAT__SZTYP+1];
+   int ischar = 0;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1498,22 +1510,13 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "type" string  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
-   if (strncmp(type,"_CHAR",5) == 0) { 
-     /* Call dat_putc instead as a special case using the argument 
-        that Fortran has pushed onto the end solely for STRINGs */ 
-     F77_CALL(dat_putc)(locator,ndim,dims, 
-                        CHARACTER_ARG(values), status 
-                        TRAIL_ARG(locator) 
-                        TRAIL_ARG(values)); 
-     return; 
-   } 
-
-
+   /* Special case _CHAR since fortran is telling us the length */
+   if (strncmp(type,"_CHAR",5) == 0) ischar = 1;
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1521,9 +1524,17 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   datPut( locator_c, type_c, *ndim, dims64, values, status );
+   if (ischar) {
+     datPutC( &locator_c, *ndim, dims64, values, values_length, status );
+   } else {
+     datPut( &locator_c, type_c, *ndim, dims64, values, status );
+   }
 #else
-   datPut( locator_c, type_c, *ndim, dims, values, status );
+   if (ischar) {
+     datPutC( &locator_c, *ndim, dims, values, values_length, status );
+   } else {
+     datPut( &locator_c, type_c, *ndim, dims, values, status );
+   }
 #endif
 }
 
@@ -1538,15 +1549,15 @@ F77_SUBROUTINE(dat_refct)( CHARACTER(locator),
 /*====================================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datRefct( locator_c, refct, status );
+   datRefct( &locator_c, refct, status );
 }
 
 F77_SUBROUTINE(dat_renam)( CHARACTER(locator),
@@ -1561,19 +1572,19 @@ F77_SUBROUTINE(dat_renam)( CHARACTER(locator),
 /*==============================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char name_c[DAT__SZNAM+1]; 
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "name" to C string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
 /* Call pure C routine                                       */
-   datRenam( locator_c, name_c, status );
+   datRenam( &locator_c, name_c, status );
 }
 
 F77_SUBROUTINE(dat_reset)( CHARACTER(locator),
@@ -1586,15 +1597,15 @@ F77_SUBROUTINE(dat_reset)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datReset( locator_c, status );
+   datReset( &locator_c, status );
 }
 
 F77_SUBROUTINE(dat_retyp)( CHARACTER(locator),
@@ -1609,19 +1620,19 @@ F77_SUBROUTINE(dat_retyp)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char type_c[DAT__SZTYP+1]; 
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "type" to C string  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
 /* Call pure C routine                                       */
-   datRetyp( locator_c, type_c, status);
+   datRetyp( &locator_c, type_c, status);
 }
 
 F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
@@ -1636,7 +1647,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1645,18 +1656,18 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Call pure C routine                                       */
-   datShape( locator_c, *ndimx, dims64, ndim, status );
+   datShape( &locator_c, *ndimx, dims64, ndim, status );
 
    /* Copy the array back to fortran from HDS_PTYPE */
    for( i = 0; i<_min(*ndimx,*ndim); i++)
       dims[i] = dims64[i];
 
 #else
-   datShape( locator_c, *ndimx, dims, ndim, status );
+   datShape( &locator_c, *ndimx, dims, ndim, status );
 #endif
 }
 
@@ -1671,15 +1682,15 @@ F77_SUBROUTINE(dat_size)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datSize( locator_c, size, status );
+   datSize( &locator_c, size, status );
 }
 
 F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
@@ -1697,8 +1708,8 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
 /*=================================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG diml64[DAT__MXDIM];
    INT_BIG dimu64[DAT__MXDIM];
@@ -1708,7 +1719,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c );
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 #if HDS_COPY_FORTRAN_DIMS
 /* Ensure that array subscripts are 64-bits         */
@@ -1718,13 +1729,13 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
    }
 
 /* Call pure C routine                                       */
-   datSlice( locator1_c, *ndim, diml64, dimu64, locator2_c, status );
+   datSlice( &locator1_c, *ndim, diml64, dimu64, &locator2_c, status );
 #else
-   datSlice( locator1_c, *ndim, diml, dimu, locator2_c, status );
+   datSlice( &locator1_c, *ndim, diml, dimu, &locator2_c, status );
 #endif
 
 /* Export returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_state)( CHARACTER(locator),
@@ -1738,16 +1749,16 @@ F77_SUBROUTINE(dat_state)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    int reply_c;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datState( locator_c, &reply_c, status );
+   datState( &locator_c, &reply_c, status );
 
 /* Set FORTRAN locical return                                */
    if( reply_c )
@@ -1767,16 +1778,16 @@ F77_SUBROUTINE(dat_struc)( CHARACTER(locator),
 /*======================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
-   int reply_c;
+   HDSLoc locator_c;
+   int reply_c = 0;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datStruc( locator_c, &reply_c, status );
+   datStruc( &locator_c, &reply_c, status );
 
 /* Set FORTRAN locical return                                */
    if( reply_c )
@@ -1799,7 +1810,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
 /*====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc *locator_c = NULL;
    char type_c[DAT__SZTYP+1];
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
@@ -1817,13 +1828,13 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datTemp( type_c, *ndim, dims64, locator_c, status);
+   datTemp( type_c, *ndim, dims64, &locator_c, status);
 #else
-   datTemp( type_c, *ndim, dims, locator_c, status);
+   datTemp( type_c, *ndim, dims, &locator_c, status);
 #endif
 
 /* Export returned locator */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
 }
 
 F77_SUBROUTINE(dat_there)( CHARACTER(locator),
@@ -1839,20 +1850,20 @@ F77_SUBROUTINE(dat_there)( CHARACTER(locator),
 /*=========================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
-   int reply_c;
+   int reply_c = 0;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "name" string  */
    cnfImpn( name, name_length, DAT__SZNAM,  name_c);
 
 /* Call pure C routine                                       */
-   datThere( locator_c, name_c, &reply_c, status );
+   datThere( &locator_c, name_c, &reply_c, status );
 
 /* Set FORTRAN locical return                                */
    if( reply_c )
@@ -1873,16 +1884,16 @@ F77_SUBROUTINE(dat_type)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char type_c[DAT__SZTYP+1]; 
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datType( locator_c, type_c, status );
+   datType( &locator_c, type_c, status );
 
 /* Export returned type name to FORTRAN                 */
    cnfExpn( type_c, DAT__SZNAM, type, type_length );
@@ -1897,15 +1908,15 @@ F77_SUBROUTINE(dat_unmap)( CHARACTER(locator),
 /*==========================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datUnmap( locator_c, status );
+   datUnmap( &locator_c, status );
 }
 
 F77_SUBROUTINE(dat_valid)( CHARACTER(locator),
@@ -1919,16 +1930,16 @@ F77_SUBROUTINE(dat_valid)( CHARACTER(locator),
 /*===================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
-   int reply_c;
+   HDSLoc locator_c;
+   int reply_c = 0;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datValid( locator_c, &reply_c, status );
+   datValid( &locator_c, &reply_c, status );
 
 /* Set FORTRAN logical return                                */
    if( reply_c )
@@ -1949,19 +1960,19 @@ F77_SUBROUTINE(dat_vec)( CHARACTER(locator1),
 /*============================*/
 
 /* Local variables.     */
-   char locator1_c[DAT__SZLOC];
-   char locator2_c[DAT__SZLOC];
+   HDSLoc locator1_c;
+   HDSLoc *locator2_c = NULL;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator1, DAT__SZLOC, locator1_c );
+   dat1_import_floc( locator1, DAT__SZLOC, &locator1_c, status );
 
 /* Call pure C routine                                       */
-   datVec( locator1_c, locator2_c, status );
+   datVec( &locator1_c, &locator2_c, status );
 
 /* Export returned locator */
-   cnfExpch( locator2_c, locator2, DAT__SZLOC );
+   dat1_export_floc( locator2_c, 1, DAT__SZLOC, locator2, status );
 }
 
 F77_SUBROUTINE(dat_where)( CHARACTER(locator),
@@ -1976,16 +1987,16 @@ F77_SUBROUTINE(dat_where)( CHARACTER(locator),
 /*===============================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    INT_BIG bloc;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c);
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datWhere( locator_c, &bloc, offset, status );
+   datWhere( &locator_c, &bloc, offset, status );
 
    *block = bloc;
 }
@@ -2004,14 +2015,14 @@ F77_SUBROUTINE(hds_copy)( CHARACTER(locator),
 /*===================================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char *file_c;
    char name_c[DAT__SZNAM+1];
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import FILE argument to C string */
    file_c = cnfCreim( file, file_length );
@@ -2020,7 +2031,7 @@ F77_SUBROUTINE(hds_copy)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
 /* Call pure C routine                                       */
-   hdsCopy( locator_c, file_c, name_c, status );
+   hdsCopy( &locator_c, file_c, name_c, status );
 
 /* Free allocated string memory.                             */
    free( file_c );
@@ -2035,15 +2046,19 @@ F77_SUBROUTINE(hds_erase)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc *locator_c = NULL;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_impalloc_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsErase( locator_c, status );
+   hdsErase( &locator_c, status );
+
+/* Export the locator (will be DAT__NOLOC) */
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
+
 }
 
 F77_SUBROUTINE(hds_ewild) ( F77_INTEGER_TYPE *iwld,
@@ -2091,15 +2106,15 @@ F77_SUBROUTINE(hds_free)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsFree( locator_c, status );
+   hdsFree( &locator_c, status );
 }
 
 F77_SUBROUTINE(hds_group)( CHARACTER(locator),
@@ -2114,16 +2129,16 @@ F77_SUBROUTINE(hds_group)( CHARACTER(locator),
 /*===================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char group_c  [DAT__SZGRP+1];;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsGroup( locator_c, group_c, status );
+   hdsGroup( &locator_c, group_c, status );
 
 /* Export returned group name to FORTRAN string                 */
    cnfExpn( group_c, DAT__SZGRP, group, group_length);
@@ -2166,19 +2181,19 @@ F77_SUBROUTINE(hds_link)( CHARACTER(locator),
 /*==================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char group_c[DAT__SZGRP+1];
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import the group name string                  */
    cnfImpn( group, group_length, DAT__SZGRP, group_c );
 
 /* Call pure C routine                                       */
-   hdsLink( locator_c, group_c, status );
+   hdsLink( &locator_c, group_c, status );
 }
 
 F77_SUBROUTINE(hds_lock)( CHARACTER(locator),
@@ -2191,15 +2206,15 @@ F77_SUBROUTINE(hds_lock)( CHARACTER(locator),
 /*================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsLock( locator_c, status );
+   hdsLock( &locator_c, status );
 }
 
 F77_SUBROUTINE(hds_new)( CHARACTER(file),
@@ -2220,7 +2235,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
 /*=====================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc * locator_c = NULL;
    char *file_c;
    char name_c[DAT__SZNAM + 1];
    char type_c[DAT__SZTYP + 1];
@@ -2244,13 +2259,13 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
       dims64[i] = dims[i];
       
 /* Call pure C routine                                       */
-   hdsNew( file_c, name_c, type_c, *ndim, dims64, locator_c, status );
+   hdsNew( file_c, name_c, type_c, *ndim, dims64, &locator_c, status );
 #else
-   hdsNew( file_c, name_c, type_c, *ndim, dims, locator_c, status );
+   hdsNew( file_c, name_c, type_c, *ndim, dims, &locator_c, status );
 #endif
 
 /* Export returned locator */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
    
 /* Free allocated string memory.                             */
    free( file_c );
@@ -2270,7 +2285,7 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
 /*=========================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc * locator_c = NULL;
    char *file_c;
    char mode_c[DAT__SZMOD + 1];
    
@@ -2283,10 +2298,10 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
    cnfImpn( mode, mode_length, DAT__SZMOD, mode_c );
 
 /* Call pure C routine                                       */
-   hdsOpen( file_c, mode_c, locator_c, status );
+   hdsOpen( file_c, mode_c, &locator_c, status );
 
 /* Export returned locator */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
    
 /* Free allocated string memory.                             */
    free( file_c );
@@ -2352,17 +2367,17 @@ F77_SUBROUTINE(hds_trace)( CHARACTER(locator),
 /*===============================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    char path_c[STR_K_LENGTH];
    char file_c[STR_K_LENGTH];
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsTrace( locator_c, nlev, path_c, file_c, status,
+   hdsTrace( &locator_c, nlev, path_c, file_c, status,
             STR_K_LENGTH, STR_K_LENGTH );
 
 /* Export the returned C strings to the FORTRAN variables    */
@@ -2409,7 +2424,7 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
 /*=================================================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc * locator_c = NULL;
    char *fspec_c;
    char *mode_c;
 
@@ -2422,10 +2437,10 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
    mode_c = cnfCreim( mode, mode_length );
 
 /* Call pure C routine  */
-   hdsWild( fspec_c, mode_c, iwld, locator_c, status );
+   hdsWild( fspec_c, mode_c, iwld, &locator_c, status );
 
 /* Export returned locator */
-   cnfExpch( locator_c, locator, DAT__SZLOC );
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
       
 /* Free allocated string memory.                             */
    free( fspec_c );
@@ -2449,20 +2464,20 @@ F77_SUBROUTINE(dat_conv)( CHARACTER(locator),
 /*=========================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
+   HDSLoc locator_c;
    int reply_c;
    char type_c[DAT__SZTYP+1];
    
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_import_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Import "type" to C string  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
 /* Call pure C routine                                       */
-   datConv( locator_c, type_c, &reply_c, status );
+   datConv( &locator_c, type_c, &reply_c, status );
 
 /* Set FORTRAN logical return                                */
    if( reply_c )
@@ -2481,13 +2496,16 @@ F77_SUBROUTINE(hds_close)( CHARACTER(locator),
 /*======================================================*/
 
 /* Local variables.     */
-   char locator_c[DAT__SZLOC];
-   
+   HDSLoc *locator_c = NULL;
+
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   cnfImpch( locator, DAT__SZLOC, locator_c );
+   dat1_impalloc_floc( locator, DAT__SZLOC, &locator_c, status );
 
 /* Call pure C routine                                       */
-   hdsClose( locator_c, status );
+   hdsClose( &locator_c, status );
+
+/* Export nulled locator */
+   dat1_export_floc( locator_c, 1, DAT__SZLOC, locator, status );
 }

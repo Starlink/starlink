@@ -14,12 +14,13 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
 
 /*==================================*/
 /* DAT_ALTER - Alter size of object */
 /*==================================*/
 int
-datAlter(char      locator_str[DAT__SZLOC],
+datAlter(HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          int       *status)
@@ -54,7 +55,7 @@ datAlter(char      locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -151,7 +152,7 @@ datAlter(char      locator_str[DAT__SZLOC],
 /* DAT_RESET - Reset object state*/
 /*===============================*/
 int 
-datReset(char locator_str[DAT__SZLOC],
+datReset( HDSLoc *locator,
           int *status)
 {
 #undef context_name
@@ -171,7 +172,7 @@ datReset(char locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* If the container file is not open for read-only access, then clear
@@ -188,7 +189,7 @@ datReset(char locator_str[DAT__SZLOC],
 /* DAT_MOULD - Alter shape of object */
 /*===================================*/
 int
-datMould(char       locator_str[DAT__SZLOC],
+datMould( HDSLoc    *locator,
           int       ndim,
           HDS_PTYPE dims[],
           int       *status)
@@ -215,7 +216,7 @@ datMould(char       locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -270,7 +271,7 @@ datMould(char       locator_str[DAT__SZLOC],
 /* DAT_RENAM - Rename object */
 /*===========================*/
 int
-datRenam(char locator_str[DAT__SZLOC],
+datRenam(HDSLoc *locator,
           char *name_str,
           int  *status) 
 {
@@ -280,7 +281,6 @@ datRenam(char locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_RENAM: Error changing the name of an HDS object."
 
-   struct DSC      locator;
    struct DSC      name;
    struct LCP      *lcp;
    struct LCP_DATA *data;
@@ -303,7 +303,7 @@ datRenam(char locator_str[DAT__SZLOC],
 /* Import locator and name strings.     */
 
    _strcsimp  ( &name, name_str );
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
 
    data = &lcp->data;
 
@@ -372,7 +372,7 @@ datRenam(char locator_str[DAT__SZLOC],
 /* DAT_RETYP - Retype object */
 /*===========================*/
 int
-datRetyp(char locator_str[DAT__SZLOC],
+datRetyp(HDSLoc *locator,
           char *type_str,
           int *status)
 {
@@ -402,7 +402,7 @@ datRetyp(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the container file was opened for read only access.            */

@@ -14,12 +14,14 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /*================================*/
 /* HDS_LOCK - Lock container file */
 /*================================*/
 
 int
-hdsLock(char locator_str[DAT__SZLOC],
+hdsLock(HDSLoc *locator,
         int *status)
 
 {
@@ -40,7 +42,7 @@ hdsLock(char locator_str[DAT__SZLOC],
 
 /* Import the locator.       */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.     */
@@ -60,7 +62,7 @@ hdsLock(char locator_str[DAT__SZLOC],
 /*================================*/
 
 int
-hdsFree(char locator_str[DAT__SZLOC],
+hdsFree(HDSLoc *locator,
         int *status)
 
 {
@@ -81,7 +83,7 @@ hdsFree(char locator_str[DAT__SZLOC],
 
 /* Import the locator.       */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.     */

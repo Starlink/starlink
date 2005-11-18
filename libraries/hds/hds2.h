@@ -17,7 +17,7 @@
 /*================================================*/
 
 int
-datWhere(char locator_str[DAT__SZLOC],
+datWhere(HDSLoc *locator,
          INT_BIG *block,
          int *offset,
          int *status);

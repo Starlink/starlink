@@ -16,6 +16,8 @@
 #include "dat1.h"                   /* Internal dat_ definitions             */
 #include "dat_err.h"                /* DAT__ error code definitions          */
 
+#include "hds.h"
+
 /* Control Blocks */
 
 /* Function prototype.                                                      */
@@ -24,7 +26,7 @@
 /* DAT_PUT - Write data */
 /*======================*/
 int
-datPut( char     locator_str[DAT__SZLOC],
+datPut( HDSLoc   *locator,
         char     *type_str,
         int      ndim,
         HDS_PTYPE  dims[],
@@ -67,7 +69,7 @@ datPut( char     locator_str[DAT__SZLOC],
 
 /* Import the locator.	*/
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -173,7 +175,7 @@ datPut( char     locator_str[DAT__SZLOC],
 /* DAT_PUTI - Write Integer data */
 /*===============================*/
 int
-datPutI( char    locator_str[DAT__SZLOC],
+datPutI(HDSLoc   *locator,
          int     ndim,
          HDS_PTYPE dims[],
          int     *values,
@@ -185,7 +187,7 @@ datPutI( char    locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_PUTI: Error writing integer values to an HDS primitive."
 
-   datPut(locator_str,
+   datPut(locator,
           "_INTEGER",
           ndim,
           dims, 
@@ -198,7 +200,7 @@ datPutI( char    locator_str[DAT__SZLOC],
 /* DAT_PUTR - Write Real data */
 /*============================*/
 int
-datPutR( char      locator_str[DAT__SZLOC],
+datPutR( HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          float     *values,
@@ -210,7 +212,7 @@ datPutR( char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_PUTR: Error writing real values to an HDS primitive."
 
-     datPut(locator_str,
+  datPut(locator,
           "_REAL",
           ndim,
           dims, 
@@ -223,7 +225,7 @@ datPutR( char      locator_str[DAT__SZLOC],
 /* DAT_PUTD - Write Double precision data */
 /*========================================*/
 int
-datPutD( char      locator_str[DAT__SZLOC],
+datPutD( HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          double    *values,
@@ -235,7 +237,7 @@ datPutD( char      locator_str[DAT__SZLOC],
 #define context_message\
      "DAT_PUTD: Error writing double precision value(s) to an HDS primitive."
 
-   datPut(locator_str,
+   datPut(locator,
           "_DOUBLE",
           ndim,
           dims, 
@@ -248,7 +250,7 @@ datPutD( char      locator_str[DAT__SZLOC],
 /* DAT_PUTL - Write Logical data */
 /*===============================*/
 int
-datPutL( char      locator_str[DAT__SZLOC],
+datPutL( HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          int       *values,
@@ -260,7 +262,7 @@ datPutL( char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_PUTL: Error writing logical values to an HDS primitive."
 
-     datPut(locator_str,
+     datPut(locator,
           "_LOGICAL",
           ndim,
           dims, 
@@ -273,7 +275,7 @@ datPutL( char      locator_str[DAT__SZLOC],
 /* DAT_PUTC - Write Character data */
 /*=================================*/
 int
-datPutC( char      locator_str[DAT__SZLOC],
+datPutC( HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          char      *string,
@@ -301,7 +303,7 @@ char *string1;
       strcpy( stype, "_CHAR" );
       string1 = " ";
    }
-   datPut(locator_str,
+   datPut(locator,
           stype,
           ndim,
           dims, 

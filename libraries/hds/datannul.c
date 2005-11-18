@@ -13,7 +13,7 @@
 /* DAT_ANNUL - Annul locator */
 /*===========================*/
 int
-datAnnul(char locator_str[DAT__SZLOC],
+datAnnul(HDSLoc **locator,
           int *status)
 {
 #undef context_name
@@ -31,7 +31,8 @@ datAnnul(char locator_str[DAT__SZLOC],
    ems_begin_c( &hds_gl_status );
 
 /* If the locator is valid, then annul the control packet.                  */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+
+   dat1_import_loc(*locator, &lcp );
    if ( lcp != NULL )
    {
       dat1_annul_lcp( &lcp );
@@ -40,11 +41,7 @@ datAnnul(char locator_str[DAT__SZLOC],
    Nullify the locator value.
 */
 
-/*   cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator.body,
- *             (int) locator.length );
- */
-     strncpy( locator_str, DAT__NOLOC,
-                DAT__SZLOC );
+   dat1_free_hdsloc(locator );
  
 /*
    If an error occurred, then report a contextual error message.

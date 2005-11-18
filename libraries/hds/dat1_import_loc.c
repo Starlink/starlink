@@ -8,7 +8,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   void dat1_import_loc( const char *loc, const int loc_length,
+   int dat1_import_loc( struct LOC * loc,
                          struct LCP **lcp )
    {
 /*+                                                                         */
@@ -19,17 +19,15 @@
 /*    Validate a locator and find its Locator Control Packet.               */
 
 /* Invocation:                                                              */
-/*    dat1_import_loc( loc, loc_length, lcp )                               */
+/*    dat1_import_loc( loc, lcp )                                           */
 
 /* Description:                                                             */
 /*    This routine validates a locator, as supplied by a caller of HDS, and */
 /*    identifies the Locator Control Packet associated with it.             */
 
 /* Parameters:                                                              */
-/*    const char *loc                                                       */
-/*       Pointer to the locator string.                                     */
-/*    const int loc_length                                                  */
-/*       Number of chars in the locator string.                             */
+/*    struct LOC *loc                                                       */
+/*       Pointer to the locator.                                            */
 /*    struct LCP **lcp                                                      */
 /*       Pointer to a pointer which will be set to point at the Locator     */
 /*       Control Packet associated with the locator supplied (if valid). If */
@@ -37,14 +35,17 @@
 /*       null pointer will be returned in *lcp.                             */
 
 /* Returned Value:                                                          */
-/*    void                                                                  */
+/*    int dat1_import_loc                                                   */
+/*       The global status value current on exit.                           */
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: T.   Jenness      (JAC, Hawaii)                                 */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -54,6 +55,8 @@
 /*       structure.                                                         */
 /*    11-MAY-2004 (BKM):                                                    */
 /*       Change HDS 32/64-bit flag appropriately for locator                */
+/*    15-NOV-2005 (TIMJ):                                                   */
+/*       Change API to use the struct LOC explcitly                         */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -63,7 +66,6 @@
 
 /* Local Variables:                                                         */
       int valid;                 /* Locator valid?                          */
-      struct LOC locdata;        /* Copy of locator data                    */
       struct RCL rcl;            /* Record Control Label                    */
 
 /*.                                                                         */
@@ -76,30 +78,24 @@
 /* not, as no locators will have been issued.                               */
          valid = hds_gl_active;
 
-/* Validate the locator length.                                             */
+/* Validate the locator NULL-ness.                                          */
          if ( valid )
          {
-            valid = ( loc_length == DAT__SZLOC );
+ 	    valid = ( loc != NULL );
          }
 
-/* If OK, then extract the information from the locator string (necessary   */
-/* to ensure that data alignment is correct, as the string will normally be */
-/* stored externally in a Fortran CHARACTER variable).                      */
+/* Validate the locator check field.                                        */
          if ( valid )
          {
-            (void) memcpy( (void *) &locdata, (const void *) loc,
-                           sizeof( struct LOC ) );
-
-/* Validate the locator check field.                                        */
-            valid = ( locdata.check == DAT__LOCCHECK );
+            valid = ( loc->check == DAT__LOCCHECK );
          }
 
 /* If OK, then identify the associated LCP and check that the locator       */
 /* sequence number tallies with the LCP sequence number.                    */
          if ( valid )
          {
-            *lcp = locdata.lcp;
-            valid = ( locdata.seqno == (*lcp)->seqno );
+            *lcp = loc->lcp;
+            valid = ( loc->seqno == (*lcp)->seqno );
          }
 
 /* If OK, then check that the associated LCP is valid.                      */
@@ -136,10 +132,14 @@ longer exists (possible programming error or corrupted HDS container file).",
          if ( !valid && _ok( hds_gl_status ) )
          {
             hds_gl_status = DAT__LOCIN;
-            ems_setc_c( "VALUE", loc, loc_length );
-            ems_seti_c( "LENGTH", loc_length );
+	    if (loc == NULL) {
+	      emsSetc( "VALUE", "NULL" );
+	    } else {
+	      ems_setc_c( "VALUE", (char*)loc, sizeof(struct LOC) );
+	    }
+            ems_seti_c( "LENGTH", sizeof(struct LOC) );
             ems_rep_c( "DAT1_IMPORT_LOC_2",
-                       "HDS locator invalid: value=\'^VALUE\', length=^LENGTH \
+                       "HDS locator invalid for import: value=\'^VALUE\', length=^LENGTH \
 (possible programming error).",
                        &hds_gl_status );
          }
@@ -158,5 +158,5 @@ longer exists (possible programming error or corrupted HDS container file).",
      }
 
 /* Exit the routine.                                                        */
-      return;
+      return hds_gl_status;
    }

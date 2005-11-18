@@ -13,8 +13,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 int
-hdsTrace(char locator_str[DAT__SZLOC],
+hdsTrace(HDSLoc *locator,
          int  *nlev,
          char *path_str,
          char *file_str,
@@ -74,7 +76,7 @@ hdsTrace(char locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -235,8 +237,7 @@ hdsShow(char *topic_str,
    struct LCP      *lcp;
    struct LCP_DATA *data;
    char            name[DAT__SZNAM];
-   struct LOC      loc;
-   struct STR      locator;
+   struct LOC      locator;
    struct STR      path;
    struct STR      file;
    int             nlev;
@@ -247,7 +248,6 @@ hdsShow(char *topic_str,
 /* These buffers are only used when using VMS descriptors. */
 
 #if defined( vms )
-   char            lbuf[DAT__SZLOC];
    char            pbuf[STR_K_LENGTH];
    char            fbuf[STR_K_LENGTH];
 #endif
@@ -264,7 +264,6 @@ hdsShow(char *topic_str,
 
 /* Initialise strings.  */
 
-   _strinit(&locator, DAT__SZLOC, lbuf);
    _strinit(&path, STR_K_LENGTH, pbuf);
    _strinit(&file, STR_K_LENGTH, fbuf);
 
@@ -287,7 +286,7 @@ hdsShow(char *topic_str,
    if (_cheql(4,name, "LOCA"))
    {
       lcp          = dat_ga_wlq;
-      loc.check    = DAT__LOCCHECK;
+      locator.check    = DAT__LOCCHECK;
       for (i=0; i<dat_gl_wlqsize; i++)
       {
          data = &lcp->data;
@@ -295,11 +294,10 @@ hdsShow(char *topic_str,
             lcp               = lcp->flink;
          else
          {
-            loc.lcp   = lcp;
-            loc.seqno = lcp->seqno;
+            locator.lcp   = lcp;
+            locator.seqno = lcp->seqno;
             tracestat = DAT__OK;
-            _chmove(DAT__SZLOC, &loc, locator.body);
-            hdsTrace(locator.body, &nlev, path.body,
+            hdsTrace( &locator, &nlev, path.body,
                      file.body, &tracestat,
                      STR_K_LENGTH, STR_K_LENGTH);
             if (!_ok(tracestat))

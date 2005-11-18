@@ -21,7 +21,9 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
-                                                                            
+           
+#include "hds.h"
+                                                                 
 /* Static variables     */
 
 static struct HAN       temp_handle;/* Handle to temp component list */
@@ -35,7 +37,7 @@ int
 datTemp(char      *type_str,
         int       ndim,
         HDS_PTYPE dims[],
-        char      locator_str[DAT__SZLOC],
+        HDSLoc    **locator,
         int       *status)
 {
 #undef context_name
@@ -72,7 +74,7 @@ datTemp(char      *type_str,
 
 /* Export locator.      */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
+   _call(dat1_alloc_lcp(locator, &lcp ))
    data  = &lcp->data;
 
 /* Create a temporary container file if not yet done.   */

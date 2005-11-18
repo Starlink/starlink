@@ -12,6 +12,8 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* Internal function prototype */
 static int
 dat1_erase_object(int ncomp,
@@ -26,7 +28,7 @@ dat1_erase_object(int ncomp,
 /* DAT_ERASE - Erase object */
 /*==========================*/
 int
-datErase(char locator_str[DAT__SZLOC],
+datErase(HDSLoc *locator,
          char *name_str,
          int *status)
 {
@@ -65,7 +67,7 @@ datErase(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure

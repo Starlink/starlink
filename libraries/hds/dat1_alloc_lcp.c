@@ -3,6 +3,7 @@
 #endif
 
 #include <string.h>
+#include <stdlib.h>
 
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "hds1.h"                /* Global definitions for HDS              */
@@ -10,7 +11,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   void dat1_alloc_lcp( INT loc_len, char *loc, struct LCP **lcp )
+   int dat1_alloc_lcp( struct LOC **loc, struct LCP **lcp )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -20,7 +21,7 @@
 /*    Allocate a Locator Control Packet and initialise a locator.           */
 
 /* Invocation:                                                              */
-/*    dat1_alloc_lcp( loc_len, loc, lcp )                                   */
+/*    dat1_alloc_lcp( loc, lcp )                                            */
 
 /* Description:                                                             */
 /*    This function allocates a new Locator Control Packet (LCP) to control */
@@ -28,13 +29,10 @@
 /*    associating it with the allocated LCP.                                */
 
 /* Parameters:                                                              */
-/*    INT loc_len                                                           */
-/*       Number of characters in the loc array. This is simply used for     */
-/*       validating the size of this array and should be equal to the value */
-/*       of DAT__SZLOC, otherwise this routine will report an error.        */
-/*    char *loc                                                             */
-/*       Pointer to an array of DAT__SZLOC characters which is to be filled */
-/*       with the locator information.                                      */
+/*    struct LOC **loc                                                      */
+/*       Pointer to a pointer to a struct LOC that is to be filled with the */
+/*       locator information. Will be malloced by this routine and freed    */
+/*       with a datAnnul. *loc Must be NULL on entry.                       */
 /*    struct LCP **lcp                                                      */
 /*       Pointer to a pointer which will be set to identify the             */
 /*       newly-allocated LCP. A null pointer will be returned in *lcp if    */
@@ -42,7 +40,9 @@
 /*       should fail for any reason.                                        */
 
 /* Returned Value:                                                          */
-/*    void                                                                  */
+/*    int dat1_alloc_lcp                                                    */
+/*       The global status value current on exit.                           */
+
 
 /* Notes:                                                                   */
 /*    The returned LCP will have its data fields and "primary locator" flag */
@@ -51,14 +51,18 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: T.   Jenness      (JAC, Hawaii)                                 */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
 /*    14-OCT-1992 (RFWS):                                                   */
 /*       Substantially new routine based on old original.                   */
+/*    15-NOV-2005 (TIMJ):                                                   */
+/*       Change API to use the struct LOC explcitly                         */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -67,7 +71,6 @@
 /*-                                                                         */
 
 /* Local Variables:                                                         */
-      struct LOC locinfo;        /* Locator information                     */
 
 /*.                                                                         */
 
@@ -75,18 +78,15 @@
       *lcp = NULL;
 
 /* Check the inherited global status.                                       */
-      if ( !_ok( hds_gl_status ) ) return;
+      if ( !_ok( hds_gl_status ) ) return hds_gl_status;
 
-/* Validate the length of the locator buffer.                               */
-      if ( loc_len != DAT__SZLOC )
-      {
-         hds_gl_status = DAT__LOCIN;
-         ems_seti_c( "LENGTH", loc_len );
-         ems_seti_c( "SZLOC", DAT__SZLOC );
-         ems_rep_c( "DAT1_ALLOC_LCP_1",
-                    "Locator argument has an invalid length of ^LENGTH; it \
-should be of length ^SZLOC (possible programming error).",
-                    &hds_gl_status );
+/* Check that the locator is NULL */
+      if (*loc != NULL ) {
+	hds_gl_status = DAT__LOCIN;
+	emsRep( "DAT1_ALLOC_LCP",
+		"Supplied locator is not a NULL pointer (Possible programming error)",
+		&hds_gl_status);
+		return hds_gl_status;
       }
 
 /* Ensure that HDS has been initialised.                                    */
@@ -118,17 +118,13 @@ should be of length ^SZLOC (possible programming error).",
 
 /* Initialise the locator information, including the locator sequence       */
 /* number which is duplicated in the LCP.                                   */
-         locinfo.check = DAT__LOCCHECK;
-         locinfo.lcp = *lcp;
-         locinfo.seqno = (*lcp)->seqno = ++hds_gl_locseq;
+	 *loc = malloc( sizeof(struct LOC) );
+         (*loc)->check = DAT__LOCCHECK;
+         (*loc)->lcp = *lcp;
+         (*loc)->seqno = (*lcp)->seqno = ++hds_gl_locseq;
 
-/* Copy the locator information into the locator buffer (this is necessary  */
-/* because the buffer may not be correctly aligned to insert the            */
-/* information directly).                                                   */
-         (void) memcpy( (void *) loc, (const void *) &locinfo,
-                        sizeof( struct LOC ) );
       }
 
 /* Exit the routine.                                                        */
-      return;
+      return hds_gl_status;
    }

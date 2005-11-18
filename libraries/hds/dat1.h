@@ -262,7 +262,7 @@ if (!_ok(*status))\
 
 /* Function Prototypes:							    */
 /* ===================							    */
-      void dat1_alloc_lcp( INT loc_len, char *loc, struct LCP **lcp );
+      int dat1_alloc_lcp( struct LOC **loc, struct LCP **lcp );
       void dat1_annul_lcp( struct LCP **lcp );
       void dat1_check_mode( const char *mode, INT mode_len, char *modechar,
 			    INT *status );
@@ -278,12 +278,13 @@ if (!_ok(*status))\
       void dat1_cvt_order( int nval, const struct PDD *imp, struct PDD *exp,
                            int *status );
       void dat1_decoy( long int arg1, void *arg2 );
+      void dat1_free_hdsloc( struct LOC ** loc );
       void dat1_getenv( const char *varname, int def, int *val );
       int dat1_get_ncomp( const struct HAN *han, int *ncomp );
       int dat1_get_odl( const struct HAN *han, struct ODL *odl );
       int dat1_get_off( int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs,
                      UINT_BIG *offset );
-      void dat1_import_loc( const char *loc, const int loc_length,
+      int dat1_import_loc( struct LOC *loc,
                             struct LCP **lcp );
       int dat1_init( void );
       void dat1_init_ndr( int *status );
@@ -324,5 +325,14 @@ if (!_ok(*status))\
       void hds1_exit( void );
       int hds1_get_subs( int ndim, HDS_PTYPE *dims, INT_BIG offset,
                          HDS_PTYPE  *subs );
+
+      void dat1_import_floc ( char flocator[DAT__SZLOC],
+			      int loc_length, HDSLoc *clocator, 
+			      int * status);
+      void dat1_impalloc_floc ( char flocator[DAT__SZLOC],
+			      int loc_length, HDSLoc **clocator, 
+			      int * status);
+      void dat1_export_floc ( HDSLoc *clocator, int free, int loc_length,
+			      char flocator[DAT__SZLOC], int * status);
 
 #endif

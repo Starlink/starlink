@@ -9,8 +9,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"                 /* Public prototype of this routine        */
+
 int
-datClen( char locator_str[DAT__SZLOC],
+datClen( HDSLoc* locator,
          int *clen,
          int *status )
 {
@@ -70,6 +72,7 @@ datClen( char locator_str[DAT__SZLOC],
 *        Pure C version
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
+*        Change API to use HDSLoc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,7 +97,7 @@ datClen( char locator_str[DAT__SZLOC],
    hds_gl_status = *status;
 
 /* Import the locator and obtain a pointer to the LCP data fields.          */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc( locator, &lcp );
    if ( _ok( hds_gl_status ) )
    {
       data = &lcp->data;

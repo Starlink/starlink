@@ -15,6 +15,8 @@
 #include "dat1.h"                  /* Internal dat_ definitions              */
 #include "dat_err.h"               /* DAT__ error code definitions           */
 
+#include "hds.h"
+
 /* Control Blocks */
 
 /* Function prototype.                                                      */
@@ -34,7 +36,7 @@
 /* DAT_GET - Read data */
 /*=====================*/
 int
-datGet(char       locator_str[DAT__SZLOC],
+datGet(HDSLoc     *locator,
        char       *type_str,
        int        ndim,
        HDS_PTYPE  dims[],
@@ -78,7 +80,7 @@ datGet(char       locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
    state = &data->state;
 
@@ -204,7 +206,7 @@ datGet(char       locator_str[DAT__SZLOC],
 /* DAT_GETI - Read Integer data */
 /*==============================*/
 int
-datGetI(char      locator_str[DAT__SZLOC],
+datGetI(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         int       values[],
@@ -216,7 +218,7 @@ datGetI(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_GETI: Error reading integer value(s) from an HDS primitive."
 
-   datGet(locator_str, "_INTEGER", ndim, dims, 
+   datGet(locator, "_INTEGER", ndim, dims, 
                      (unsigned char *)values, status );
 
    return hds_gl_status;
@@ -226,7 +228,7 @@ datGetI(char      locator_str[DAT__SZLOC],
 /* DAT_GETR - Read REAL data */
 /*===========================*/
 int
-datGetR(char      locator_str[DAT__SZLOC],
+datGetR(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         float     values[],
@@ -238,7 +240,7 @@ datGetR(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_GETR: Error reading real value(s) from an HDS primitive."
 
-   datGet(locator_str, "_REAL", ndim, dims,
+   datGet(locator, "_REAL", ndim, dims,
                       (unsigned char *) values, status );
 
    return hds_gl_status;
@@ -248,7 +250,7 @@ datGetR(char      locator_str[DAT__SZLOC],
 /* DAT_GETD - Read DOUBLE PRECISION data */
 /*=======================================*/
 int
-datGetD(char      locator_str[DAT__SZLOC],
+datGetD(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         double    values[],
@@ -260,7 +262,7 @@ datGetD(char      locator_str[DAT__SZLOC],
 #define context_message\
     "DAT_GETD: Error reading double precision value(s) from an HDS primitive."
         
-   datGet(locator_str, "_DOUBLE", ndim, dims,
+   datGet(locator, "_DOUBLE", ndim, dims,
                      (unsigned char *) values, status );
 
    return hds_gl_status;
@@ -270,7 +272,7 @@ datGetD(char      locator_str[DAT__SZLOC],
 /* DAT_GETL - Read LOGICAL data */
 /*==============================*/
 int
-datGetL(char      locator_str[DAT__SZLOC],
+datGetL(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         int       values[],
@@ -282,7 +284,7 @@ datGetL(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_GETL: Error reading logical value(s) from an HDS primitive."
         
-   datGet(locator_str, "_LOGICAL", ndim, dims,
+   datGet(locator, "_LOGICAL", ndim, dims,
                      (unsigned char *) values, status );
 
    return hds_gl_status;
@@ -292,7 +294,7 @@ datGetL(char      locator_str[DAT__SZLOC],
 /* DAT_GETC - Read CHARACTER data */
 /*================================*/
 int
-datGetC(char      locator_str[DAT__SZLOC],
+datGetC(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         char      values[],
@@ -307,7 +309,7 @@ datGetC(char      locator_str[DAT__SZLOC],
    char stype[] = "_CHAR*nnnn";
    sprintf( &stype[6], "%d", char_len ); 
      
-   datGet(locator_str, stype, ndim, dims, (char *) values, status );
+   datGet(locator, stype, ndim, dims, (char *) values, status );
 
    return hds_gl_status;
 }

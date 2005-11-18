@@ -10,8 +10,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 int
-hdsCopy(char locator_str[DAT__SZLOC],
+hdsCopy(HDSLoc *locator,
         char *file_str,
         char name_str[DAT__SZNAM],
         int *status )
@@ -82,6 +84,7 @@ hdsCopy(char locator_str[DAT__SZLOC],
 *        function with FORTRAN wrapper.
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
+*        Use HDSLoc*
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -117,7 +120,7 @@ hdsCopy(char locator_str[DAT__SZLOC],
    _strcsimp( &name, name_str );
 
 /* Import the source locator.                                               */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    if ( _ok( hds_gl_status ) )
    {
 

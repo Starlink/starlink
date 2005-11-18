@@ -18,8 +18,8 @@
  */
  
 int
-datParen(char locator1_str[DAT__SZLOC],
-         char locator2_str[DAT__SZLOC],
+datParen(HDSLoc *locator1,
+         HDSLoc **locator2,
          int *status)
 {
 /*
@@ -95,6 +95,7 @@ datParen(char locator1_str[DAT__SZLOC],
 *        Revised 64-bit HDS logic.
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
+*        Use HDSLoc in API
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -135,7 +136,7 @@ datParen(char locator1_str[DAT__SZLOC],
 
 /* Import the input locator and find the associated Locator Control         */
 /* Packet's data fields.                                                    */
-      dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+      dat1_import_loc( locator1, &lcp1 );
       if ( _ok( hds_gl_status ) )
       {
          data1 = &lcp1->data;
@@ -233,7 +234,7 @@ structure (possible programming error).",
 
 /* Export the output locator and find the data fields in the associated     */
 /* Locator Control Packet.                                                  */
-      dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+      dat1_alloc_lcp( locator2, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;
@@ -298,12 +299,7 @@ HDS object.",
 /* locator.                                                                 */
    if ( !_ok( hds_gl_status ) )
    {
-/*      cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator2.body,
- *               (int) locator2.length );
- */
-        strncpy( locator2_str, DAT__NOLOC,
-                  DAT__SZLOC );
-
+     dat1_free_hdsloc( locator2 );
    }
 
 /* Return the current global status value.                                  */

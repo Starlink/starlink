@@ -9,6 +9,8 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /*=====================================*/
 /* HDS_NEW - Create new container file */
 /*=====================================*/
@@ -19,7 +21,7 @@ hdsNew(char *file_str,
        char *type_str,
        int  ndim,
        HDS_PTYPE  dims[],
-       char locator_str[DAT__SZLOC],
+       HDSLoc **locator,
        int *status)
 {
 
@@ -62,7 +64,7 @@ hdsNew(char *file_str,
 
 /* Export the locator.  */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
+   _call( dat1_alloc_lcp(locator, &lcp ) )
    data = &lcp->data;
 
 /* Set 64-bit file format flag appropriately                            */

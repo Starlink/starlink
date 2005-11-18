@@ -13,6 +13,9 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+
+#include "hds.h"
+
 #define TRUE  1
 #define FALSE 0
 
@@ -20,7 +23,7 @@
 /* DAT_NAME - Object name ? */
 /*==========================*/
 int
-datName(char locator_str[DAT__SZLOC],
+datName(HDSLoc *locator,
         char name_str[DAT__SZNAM+1],
         int *status)
 {
@@ -43,7 +46,7 @@ datName(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Copy the object name from the LCP.   */
@@ -63,7 +66,7 @@ datName(char locator_str[DAT__SZLOC],
 /* DAT_TYPE - Object type ? */
 /*==========================*/
 int
-datType(char locator_str[DAT__SZLOC],
+datType(HDSLoc *locator,
         char type_str[DAT__SZTYP + 1],
         int *status )
 {
@@ -95,7 +98,7 @@ datType(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
    if ( data->obj.class == DAT__PRIMITIVE )
@@ -177,7 +180,7 @@ datType(char locator_str[DAT__SZLOC],
 /* DAT_SHAPE - Object shape ? */
 /*============================*/
 int
-datShape(char      locator_str[DAT__SZLOC],
+datShape(HDSLoc *locator,
          int       maxdim,
          HDS_PTYPE dims[],
          int       *actdim,
@@ -203,7 +206,7 @@ datShape(char      locator_str[DAT__SZLOC],
 
 /* Import locator string.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Enquire the object shape.    */
@@ -224,7 +227,7 @@ datShape(char      locator_str[DAT__SZLOC],
 /* DAT_SIZE - Object size ? */
 /*==========================*/
 int
-datSize(char locator_str[DAT__SZLOC],
+datSize(HDSLoc *locator,
         int *size,
         int *status )
 {
@@ -245,7 +248,7 @@ datSize(char locator_str[DAT__SZLOC],
 
 /* Import locator string and locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Return the object size.      */
@@ -259,7 +262,7 @@ datSize(char locator_str[DAT__SZLOC],
 /* DAT_THERE - Object there ? */
 /*============================*/
 int
-datThere(char locator_str[DAT__SZLOC],
+datThere(HDSLoc *locator,
          char *name_c,
          int *there,
          int *status)
@@ -297,7 +300,7 @@ datThere(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure
@@ -356,7 +359,7 @@ datThere(char locator_str[DAT__SZLOC],
 /* DAT_STRUC - Structure object ? */
 /*================================*/
 int
-datStruc(char locator_str[DAT__SZLOC],
+datStruc(HDSLoc *locator,
          int *struc,
          int *status)
 {
@@ -377,7 +380,7 @@ datStruc(char locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Set the flag appropriately and return.       */
@@ -391,7 +394,7 @@ datStruc(char locator_str[DAT__SZLOC],
 /* DAT_PRIM - Primitive object ? */
 /*===============================*/
 int
-datPrim(char locator_str[DAT__SZLOC],
+datPrim(HDSLoc *locator,
         int *prim,
         int *status)
 {
@@ -406,12 +409,19 @@ datPrim(char locator_str[DAT__SZLOC],
 
 /* Enter routine.       */
 
+  *prim = FALSE; /* force intialisation of return value */
+
+/* Previous version forced internal status to be good even if entry status
+   was bad. This would always result in DAT_PRIM attaching itself to error
+   messages even when it was not really triggering the error state. Change
+   to match other routines */
    if (!_ok(*status))
-      hds_gl_status = DAT__OK;
+      return *status;
+   hds_gl_status = DAT__OK;
 
 /* Import locator */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Set the flag appropriately and return.       */
@@ -425,7 +435,7 @@ datPrim(char locator_str[DAT__SZLOC],
 /* DAT_NCOMP - Number of components ? */
 /*====================================*/
 int
-datNcomp( char locator_str[DAT__SZLOC],
+datNcomp( HDSLoc *locator,
           int *ncomp,
           int *status)
 {
@@ -450,7 +460,7 @@ datNcomp( char locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the source locator points to anything other than a single
@@ -485,7 +495,7 @@ datNcomp( char locator_str[DAT__SZLOC],
 /* DAT_LEN - Primitive length ? */
 /*==============================*/
 int
-datLen(char locator_str[DAT__SZLOC],
+datLen(HDSLoc *locator,
        int *len,
        int *status)
 {
@@ -507,7 +517,7 @@ datLen(char locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the object is a structure. */
@@ -530,7 +540,7 @@ datLen(char locator_str[DAT__SZLOC],
 /* DAT_STATE - Object state ? */
 /*============================*/
 int
-datState(char locator_str[DAT__SZLOC],
+datState(HDSLoc *locator,
          int *state,
          int *status)
 {
@@ -552,7 +562,7 @@ datState(char locator_str[DAT__SZLOC],
 
 /* Import locator.   */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the object is a structure. */
@@ -573,10 +583,11 @@ datState(char locator_str[DAT__SZLOC],
 /* DAT_VALID - Valid locator ? */
 /*=============================*/
 int
-datValid(char locator_str[DAT__SZLOC],
+datValid(HDSLoc *locator,
          int *valid,
          int *status)
 {
+
    struct LCP *lcp;
 
 /*
@@ -592,7 +603,7 @@ datValid(char locator_str[DAT__SZLOC],
 */
    ems_mark_c( );
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    *valid = ( lcp == NULL ? TRUE : FALSE );
 
 /*
@@ -612,7 +623,7 @@ datValid(char locator_str[DAT__SZLOC],
 /* DAT_CONV - Data conversion possible ? */
 /*=======================================*/
 int
-datConv(char locator_str[DAT__SZLOC],
+datConv(HDSLoc *locator,
         char *type_str,
         int *conv,
         int *status)
@@ -642,7 +653,7 @@ datConv(char locator_str[DAT__SZLOC],
 
 /* Import locator.      */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(locator, &lcp ))
    data = &lcp->data;
 
 /* Ensure that the locator points to a primitive and not a structure.   */

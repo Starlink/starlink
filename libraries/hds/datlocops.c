@@ -14,17 +14,19 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* Control Blocks */
 
 /*==========================*/
 /* DAT_SLICE - Locate slice */
 /*==========================*/
 int
-datSlice(char     locator1_str[DAT__SZLOC],
+datSlice(HDSLoc   *locator1,
          int      ndim,
          HDS_PTYPE  lower[],
          HDS_PTYPE  upper[],
-         char     locator2_str[DAT__SZLOC],
+         HDSLoc   **locator2,
          int      *status )
 {
 #undef context_name
@@ -54,7 +56,7 @@ datSlice(char     locator1_str[DAT__SZLOC],
 
 /* Import the source locator.   */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1 = &lcp1->data;
 
 /* Get the current object shape and check that the # of dimensions matches
@@ -66,7 +68,7 @@ datSlice(char     locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   dat1_alloc_lcp(DAT__SZLOC, locator2_str, &lcp2 );
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2 = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -137,10 +139,10 @@ datSlice(char     locator1_str[DAT__SZLOC],
 /*========================*/
 
 int
-datCell( char     locator1_str[DAT__SZLOC],
+datCell( HDSLoc *locator1,
          int      ndim,
          HDS_PTYPE subs[],
-         char     locator2_str[DAT__SZLOC],
+         HDSLoc **locator2,
          int      *status)
 {
 #undef context_name
@@ -166,7 +168,7 @@ datCell( char     locator1_str[DAT__SZLOC],
 
 /* Import the source locator.   */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -184,7 +186,7 @@ datCell( char     locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );   
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -230,8 +232,8 @@ datCell( char     locator1_str[DAT__SZLOC],
 /* DAT_VEC - Vectorise object */
 /*============================*/
 int
-datVec(char locator1_str[DAT__SZLOC],
-       char locator2_str[DAT__SZLOC],
+datVec(HDSLoc *locator1,
+       HDSLoc **locator2,
        int  *status )
 {
 #undef context_name
@@ -256,7 +258,7 @@ datVec(char locator1_str[DAT__SZLOC],
 
 /* Import the source locator.   */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -267,7 +269,7 @@ datVec(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -305,9 +307,9 @@ datVec(char locator1_str[DAT__SZLOC],
 /* DAT_COERC - Coerce object shape */
 /*=================================*/
 int
-datCoerc(char locator1_str[DAT__SZLOC],
+datCoerc(HDSLoc *locator1,
          int ndim,
-         char locator2_str[DAT__SZLOC],
+         HDSLoc **locator2,
          int *status)
 {
 #undef context_name
@@ -334,7 +336,7 @@ datCoerc(char locator1_str[DAT__SZLOC],
 
 /* Import the source locator.   */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1 = &lcp1->data;
 
 /* Ensure that the requested # dimensions is valid.     */
@@ -352,7 +354,7 @@ datCoerc(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;
@@ -390,8 +392,8 @@ datCoerc(char locator1_str[DAT__SZLOC],
 /* DAT_CLONE - Clone locator */
 /*===========================*/
 int
-datClone(char locator1_str[DAT__SZLOC],
-         char locator2_str[DAT__SZLOC],
+datClone(HDSLoc *locator1,
+         HDSLoc **locator2,
          int *status)
 {
 #undef context_name
@@ -414,12 +416,12 @@ datClone(char locator1_str[DAT__SZLOC],
 
 /* Import the source locator.   */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1 = &lcp1->data;
 
 /* Export the destination locator and copy all the LCP data fields.     */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2  = &lcp2->data;
    state2 = &data2->state;
    *data2 = *data1;

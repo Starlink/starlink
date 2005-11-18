@@ -12,6 +12,8 @@
 #include "dat1.h"           /* Internal dat_ definitions                */
 #include "dat_err.h"        /* DAT__ error code definitions             */
 
+#include "hds.h"
+
 /* F77_INTEGER_FUNCTION(dat_find)(struct STR *locator1_str,
  *                              struct STR *name_str,
  *                              struct STR *locator2_str,
@@ -25,9 +27,9 @@
 /* DAT_FIND - Find named component */
 /*=================================*/
 int
-datFind( char locator1_str[DAT__SZLOC],
+datFind( HDSLoc *locator1,
          char *name_str,
-         char locator2_str[DAT__SZLOC],
+         HDSLoc **locator2,
          int  *status )
 {
    struct DSC name;
@@ -60,7 +62,7 @@ datFind( char locator1_str[DAT__SZLOC],
    {
 
 /* Import the input locator.                       */
-      dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+     dat1_import_loc(locator1, &lcp1 );
       if ( _ok( hds_gl_status ) )
       {
          data1 = &lcp1->data;
@@ -146,7 +148,7 @@ datFind( char locator1_str[DAT__SZLOC],
       }
 
 /* Export the destination locator and stick a handle on the object record.  */
-      dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+      dat1_alloc_lcp(locator2, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;
@@ -217,8 +219,7 @@ HDS structure.",
 /* locator.                    */
    if ( !_ok( hds_gl_status ) )
    {
-      strncpy( locator2_str, DAT__NOLOC,
-                DAT__SZLOC );
+     dat1_free_hdsloc( locator2 );
    }
 
 /* Return the current global status value.            */
@@ -238,9 +239,9 @@ HDS structure.",
 /* DAT_INDEX - Index into component list */
 /*=======================================*/
 int
-datIndex(char locator1_str[DAT__SZLOC],
+datIndex(HDSLoc *locator1,
          int index,
-         char locator2_str[DAT__SZLOC],
+         HDSLoc **locator2,
          int *status )
 {
 #undef context_name
@@ -278,7 +279,7 @@ datIndex(char locator1_str[DAT__SZLOC],
 
 /* Import the source locator.  */
 
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    data1 = &lcp1->data;
 
 /* Return if the locator points to anything other than a single structure
@@ -325,7 +326,7 @@ datIndex(char locator1_str[DAT__SZLOC],
 
 /* Export the destination locator and stick a handle on the object record. */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator2_str, &lcp2 );
+   _call(dat1_alloc_lcp(locator2, &lcp2 ))
    data2 = &lcp2->data;
    rec_get_handle( &rid, &han, &data2->han );
    rec_get_rid( &han, &data2->parent );

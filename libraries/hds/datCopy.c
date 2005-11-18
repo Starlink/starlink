@@ -10,6 +10,8 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /* F77_INTEGER_FUNCTION(dat_copy)( struct STR *locator1_str,
  *                                 struct STR *locator2_str,
  *                                 struct STR *name_str,
@@ -20,8 +22,8 @@
  */
 
 int
-datCopy(char locator1_str[DAT__SZLOC],
-        char locator2_str[DAT__SZLOC],
+datCopy(HDSLoc * locator1,
+        HDSLoc * locator2,
         char *name_c,
         int  *status )
 {
@@ -92,7 +94,8 @@ datCopy(char locator1_str[DAT__SZLOC],
 *     14-JUN-2005 (BKM):
 *        Fix copying from 32<>64bit locators
 *     15-NOV-2005 (TIMJ):
-*        Use dat1_import_loc and dat1_alloc_lcp
+*        Use dat1_import_loc
+*        Use HDSLoc in API
 *     {enter_further_changes_here}
 *
 *  Bugs:
@@ -134,7 +137,7 @@ datCopy(char locator1_str[DAT__SZLOC],
    _strcsimp(   &name, name_c );
 
 /* Import the first locator.                                                */
-   dat1_import_loc( locator1_str, DAT__SZLOC, &lcp1 );
+   dat1_import_loc(locator1, &lcp1 );
    if ( _ok( hds_gl_status ) )
    {
 
@@ -171,7 +174,7 @@ datCopy(char locator1_str[DAT__SZLOC],
       dat1_pack_crv( &rid1, 0, crv1 );
 
 /* Import the second locator and obtain a pointer to the LCP data fields.   */
-      dat1_import_loc( locator2_str, DAT__SZLOC, &lcp2 );
+      dat1_import_loc(locator2, &lcp2 );
       if ( _ok( hds_gl_status ) )
       {
          data2 = &lcp2->data;

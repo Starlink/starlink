@@ -21,7 +21,7 @@
 int
 hdsOpen(char *file_str,
         char *mode_str,
-        char locator_str[DAT__SZLOC],
+        HDSLoc **locator,
         int *status)
 {
 #undef context_name
@@ -60,7 +60,7 @@ hdsOpen(char *file_str,
 
 /* Obtain the locator */
 
-   dat1_alloc_lcp( DAT__SZLOC, locator_str, &lcp );
+   _call(dat1_alloc_lcp(locator, &lcp ))
    data = &lcp->data;
 
 /* Validate the access mode and open the file. */
@@ -128,7 +128,7 @@ hdsOpen(char *file_str,
 /* HDS_CLOSE - Close container file */
 /*==================================*/
 int
-hdsClose(char locator_str[DAT__SZLOC],
+hdsClose(HDSLoc **locator,
         int *status)
 
 {
@@ -147,7 +147,7 @@ hdsClose(char locator_str[DAT__SZLOC],
       return *status;
 
 /* Import the locator */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   _call(dat1_import_loc(*locator, &lcp ))
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object  */
@@ -163,8 +163,7 @@ hdsClose(char locator_str[DAT__SZLOC],
    dat1_annul_lcp( &lcp );
 
 /* Nullify the locator value.                                               */
-   strncpy( locator_str, DAT__NOLOC,
-	    DAT__SZLOC );
+   dat1_free_hdsloc(locator );
 
 /* Exit the routine.                                                        */
       return hds_gl_status;

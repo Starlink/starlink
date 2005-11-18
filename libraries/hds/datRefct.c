@@ -11,8 +11,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 int
-datRefct(char loc[DAT__SZLOC],
+datRefct(HDSLoc *loc,
          int *refct,
          int *status)
 {
@@ -80,7 +82,7 @@ datRefct(char loc[DAT__SZLOC],
       hds_gl_status = *status;
 
 /* Import the locator.                                                      */
-   dat1_import_loc( loc, DAT__SZLOC, &lcp );
+      dat1_import_loc(loc, &lcp );
    if ( _ok( hds_gl_status ) )
    {
 

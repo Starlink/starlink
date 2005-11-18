@@ -12,6 +12,8 @@
 #include "dat1.h"     /* Internal dat_ definitions               */
 #include "dat_err.h"  /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 #if defined( vms )
 #include <descrip.h>  /* VMS descriptor definitions              */
 #endif
@@ -20,7 +22,7 @@
 /* DAT_MAP - Map data */
 /*====================*/
 int
-datMap(char      locator_str[DAT__SZLOC],
+datMap(HDSLoc    *locator,
        char      *type_str,
        char      *mode_str,
        int       ndim,
@@ -75,7 +77,7 @@ datMap(char      locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
    state = &data->state;
 
@@ -251,7 +253,7 @@ datMap(char      locator_str[DAT__SZLOC],
 /* DAT_MAPI - Map INTEGER data */
 /*=============================*/
 int
-datMapI(char      locator_str[DAT__SZLOC],
+datMapI(HDSLoc    *locator,
         char      *mode_str,
         int       ndim,
         HDS_PTYPE dims[],
@@ -264,7 +266,7 @@ datMapI(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MAPI: Error mapping an HDS primitive as integer values."
 
-   datMap( locator_str, "_INTEGER", mode_str, ndim, dims,
+   datMap( locator, "_INTEGER", mode_str, ndim, dims,
            (unsigned char **) pntr, status );
 
    return hds_gl_status;
@@ -274,7 +276,7 @@ datMapI(char      locator_str[DAT__SZLOC],
 /* DAT_MAPR - Map REAL data */
 /*=============================*/
 int
-datMapR(char      locator_str[DAT__SZLOC],
+datMapR(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         HDS_PTYPE dims[],
@@ -287,7 +289,7 @@ datMapR(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MAPR: Error mapping an HDS primitive as real values."
 
-   datMap( locator_str, "_REAL", mode_str, ndim, dims,
+   datMap( locator, "_REAL", mode_str, ndim, dims,
            (unsigned char **) pntr, status );
 
    return hds_gl_status;
@@ -297,7 +299,7 @@ datMapR(char      locator_str[DAT__SZLOC],
 /* DAT_MAPD - Map DOUBLE PRECISION data */
 /*======================================*/
 int
-datMapD(char      locator_str[DAT__SZLOC],
+datMapD(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         HDS_PTYPE dims[],
@@ -310,7 +312,7 @@ datMapD(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MAPD: Error mapping an HDS primitive as double precision values."
 
-   datMap( locator_str, "_DOUBLE", mode_str, ndim, dims,
+   datMap( locator, "_DOUBLE", mode_str, ndim, dims,
            (unsigned char **) pntr, status );
 
    return hds_gl_status;
@@ -320,7 +322,7 @@ datMapD(char      locator_str[DAT__SZLOC],
 /* DAT_MAPL - Map LOGICAL data */
 /*=============================*/
 int
-datMapL(char      locator_str[DAT__SZLOC],
+datMapL(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         HDS_PTYPE dims[],
@@ -333,7 +335,7 @@ datMapL(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MAPL: Error mapping an HDS primitive as logical values."
 
-   datMap( locator_str, "_LOGICAL", mode_str, ndim, dims,
+   datMap( locator, "_LOGICAL", mode_str, ndim, dims,
            (unsigned char **) pntr, status );
 
    return hds_gl_status;
@@ -343,7 +345,7 @@ datMapL(char      locator_str[DAT__SZLOC],
 /* DAT_MAPC - Map CHARACTER data */
 /*===============================*/
 int
-datMapC(char      locator_str[DAT__SZLOC],
+datMapC(HDSLoc *locator,
         char      *mode_str,
         int       ndim,
         HDS_PTYPE dims[],
@@ -356,7 +358,7 @@ datMapC(char      locator_str[DAT__SZLOC],
 #define context_message\
         "DAT_MAPC: Error mapping an HDS primitive as character values."
 
-   datMap( locator_str, "_CHAR", mode_str, ndim, dims,
+   datMap( locator, "_CHAR", mode_str, ndim, dims,
            (unsigned char **) pntr, status );
 
    return hds_gl_status;
@@ -367,7 +369,7 @@ datMapC(char      locator_str[DAT__SZLOC],
 /*===============================================*/
 
 int
-datBasic(char locator_str[DAT__SZLOC],
+datBasic(HDSLoc *locator,
          char *mode_c,
          unsigned char **pntr,
          int *len,
@@ -407,7 +409,7 @@ datBasic(char locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data  = &lcp->data;
    state = &data->state;
 
@@ -491,7 +493,7 @@ datBasic(char locator_str[DAT__SZLOC],
 /* DAT_UNMAP - Unmap data */
 /*========================*/
 int
-datUnmap(char locator_str[DAT__SZLOC],
+datUnmap(HDSLoc *locator,
          int  *status)
 {
 #undef context_name
@@ -511,7 +513,7 @@ datUnmap(char locator_str[DAT__SZLOC],
 
 /* Import locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is associated with a structure.        */

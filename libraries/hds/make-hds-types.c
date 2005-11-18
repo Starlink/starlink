@@ -239,6 +239,16 @@ int main (int argc, char ** argv ) {
 	  "#define HDS_INT_BIG_U \"%s\"\n\n",
 	  INT_BIG, UINT_BIG, INT_BIG_S, INT_BIG_U);
 
+  /* Note that we do not make public a true struct LOC since that would require that
+     struct LCP is also made public. We simply create a struct that has the same sized
+     components as an LOC and cast between them internally in HDS */
+
+  fprintf( OutputFile,
+	   "/* Public type for dealing with HDS locators */\n"
+	   "/* The contents of the struct are private to HDS. The only public */\n"
+	   "/* part is the HDSLoc typedef. Never use 'struct LOC' directly.   */\n"
+	   "typedef struct LOC HDSLoc;\n\n");
+
   /* Dimensions */
   fprintf( OutputFile,
 	   "/* Public type for specifying HDS dimensions */\n"

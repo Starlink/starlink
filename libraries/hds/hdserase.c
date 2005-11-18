@@ -13,12 +13,14 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /*==================================*/
 /* HDS_ERASE - Erase container file */
 /*==================================*/
 
 int
-hdsErase(char locator_str[DAT__SZLOC],
+hdsErase(HDSLoc **locator,
          int *status)
 
 {
@@ -39,7 +41,7 @@ hdsErase(char locator_str[DAT__SZLOC],
 
 /* Import the locator.       */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(*locator, &lcp );
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.         */
@@ -53,7 +55,7 @@ hdsErase(char locator_str[DAT__SZLOC],
    dat1_annul_lcp( &lcp );
 
 /* Nullify the locator value.                                               */
-   strncpy( locator_str, DAT__NOLOC, DAT__SZLOC );
+   dat1_free_hdsloc(locator );
 
 /* Exit the routine.                                                        */
    return hds_gl_status;

@@ -10,8 +10,10 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds2.h"
+
 int
-datWhere(char locator_str[DAT__SZLOC],
+datWhere(HDSLoc *locator,
          INT_BIG *block,
          int *offset,
          int *status)
@@ -99,7 +101,7 @@ datWhere(char locator_str[DAT__SZLOC],
       hds_gl_status = *status;
 
 /* Import the locator and obtain a pointer to the LCP data fields.          */
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+      dat1_import_loc(locator, &lcp );
    if ( _ok( hds_gl_status ) )
    {
       data = &lcp->data;

@@ -16,12 +16,14 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+#include "hds.h"
+
 /*==================================*/
 /* HDS_LINK - Link locator to group */
 /*==================================*/
 
 int
-hdsLink(char locator_str[DAT__SZLOC],
+hdsLink(HDSLoc *locator,
         char *group_str,
         int *status)
 {
@@ -48,7 +50,7 @@ hdsLink(char locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc( locator, &lcp );
    data = &lcp->data;
    
 /* Save the group specification.        */
@@ -138,7 +140,7 @@ hdsFlush( char *group_str,
 /*=============================*/
 
 int
-hdsGroup(char locator_str[DAT__SZLOC],
+hdsGroup(HDSLoc *locator,
          char group_str[DAT__SZGRP+1],
          int *status)
 {
@@ -161,7 +163,7 @@ hdsGroup(char locator_str[DAT__SZLOC],
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator_str, DAT__SZLOC, &lcp );
+   dat1_import_loc(locator, &lcp );
    data = &lcp->data;
 
 /* Copy the group specification from the LCP.   */
