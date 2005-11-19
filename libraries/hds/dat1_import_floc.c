@@ -23,7 +23,7 @@
  *    Import a fortran HDS locator buffer into C
 
  *  Invocation:
- *    dat1_import_floc( char flocator[DAT__SZLOC], int len, HDSLoc *clocator, int * status);
+ *    dat1_import_floc( const char flocator[DAT__SZLOC], int len, HDSLoc *clocator, int * status);
 
  *  Description:
  *    This function should be used to convert a Fortran HDS locator 
@@ -83,7 +83,7 @@
  *-
  */
 
-void dat1_import_floc ( char flocator[DAT__SZLOC], int loc_length, HDSLoc * clocator, int * status) {
+void dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc * clocator, int * status) {
 
   if (*status != DAT__OK) return;
 
