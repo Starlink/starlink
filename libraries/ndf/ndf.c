@@ -29,6 +29,8 @@
 *        Incorporated into the NDF_ library.
 *     13-APR-1999 (RFWS):
 *        Removed workaround for CNF problems.
+*     18-NOV-2005 (TIMJ):
+*        HDS Locators should be HDSLoc* not char [DAT__SZLOC]
 *     <{enter_further_changes_here}>
 *-
 */
@@ -44,6 +46,9 @@
 #include "ast.h"                 /* AST world coordinate system handling */
 #include "dat_par.h"             /* Hierarchical Data System (HDS) */
 #include "f77.h"                 /* C<-->Fortran interface macros */
+
+/* HDS Fortran Locator export/import routines */
+#include "star/hds_fortran.h"
 
 /* Internal header files. */
 #include "ndf.h"                 /* NDF_ library public interface */
@@ -1240,7 +1245,7 @@ F77_SUBROUTINE(ndf_find)( CHARACTER(loc),
                           TRAIL(loc)
                           TRAIL(name) );
 
-void ndfFind( const char loc[ DAT__SZLOC ],
+void ndfFind( const HDSLoc *loc,
               const char *name,
               int *indf,
               int *status ) {
@@ -1250,7 +1255,12 @@ DECLARE_CHARACTER_DYN(fname);
 DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fstatus);
 
-   F77_EXPORT_LOCATOR( loc, floc );
+   if ( loc == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, floc );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc, floc, status );
+   }
+   HDS_EXPORT_CLOCATOR( loc, floc, status );
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -1934,7 +1944,7 @@ F77_SUBROUTINE(ndf_loc)( INTEGER(indf),
 
 void ndfLoc( int indf,
              const char *mode,
-             char loc[ DAT__SZLOC ],
+	     HDSLoc **loc,
              int *status ) {
 
 DECLARE_INTEGER(findf);
@@ -1955,8 +1965,8 @@ DECLARE_INTEGER(fstatus);
                       TRAIL_ARG(floc) );
 
    F77_FREE_CHARACTER( fmode );
-   F77_IMPORT_LOCATOR( floc, loc );
    F77_IMPORT_INTEGER( fstatus, *status );
+   HDS_IMPORT_FLOCATOR( floc, loc, status );
 
    return;
 }
@@ -2661,7 +2671,7 @@ F77_SUBROUTINE(ndf_open)( CHARACTER(loc),
                           TRAIL(mode)
                           TRAIL(stat) );
 
-void ndfOpen( const char loc[ DAT__SZLOC ],
+void ndfOpen( const HDSLoc * loc,
               const char *name,
               const char *mode,
               const char *stat,
@@ -2677,7 +2687,11 @@ DECLARE_INTEGER(findf);
 DECLARE_INTEGER(fplace);
 DECLARE_INTEGER(fstatus);
 
-   F77_EXPORT_LOCATOR( loc, floc );
+   if ( loc == NULL ) {
+      F77_EXPORT_LOCATOR( DAT__ROOT, floc );
+   } else {
+      HDS_EXPORT_CLOCATOR( loc, floc, status );
+   }
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
    F77_CREATE_CHARACTER( fmode, strlen( mode ) );
@@ -2715,7 +2729,7 @@ F77_SUBROUTINE(ndf_place)( CHARACTER(loc),
                            TRAIL(loc)
                            TRAIL(name) );
 
-void ndfPlace( const char loc[ DAT__SZLOC ],
+void ndfPlace( const HDSLoc * loc,
                const char *name,
                int *place,
                int *status ) {
@@ -2725,7 +2739,11 @@ DECLARE_CHARACTER_DYN(fname);
 DECLARE_INTEGER(fplace);
 DECLARE_INTEGER(fstatus);
 
-   F77_EXPORT_LOCATOR( loc, floc );
+   if ( loc == NULL ) {
+     F77_EXPORT_LOCATOR( DAT__ROOT, floc );
+   } else {
+     HDS_EXPORT_CLOCATOR( loc, floc, status );
+   }
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -3684,7 +3702,7 @@ F77_SUBROUTINE(ndf_xloc)( INTEGER(indf),
 void ndfXloc( int indf,
               const char *xname,
               const char *mode,
-              char loc[ DAT__SZLOC ],
+	      HDSLoc **loc,
               int *status ) {
 
 DECLARE_INTEGER(findf);
@@ -3711,8 +3729,8 @@ DECLARE_INTEGER(fstatus);
 
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fmode );
-   F77_IMPORT_LOCATOR( floc, loc );
    F77_IMPORT_INTEGER( fstatus, *status );
+   HDS_IMPORT_FLOCATOR( floc, loc, status );
 
    return;
 }
@@ -3768,7 +3786,7 @@ void ndfXnew( int indf,
               const char *type,
               int ndim,
               const int dim[],
-              char loc[ DAT__SZLOC ],
+              HDSLoc **loc,
               int *status ) {
 
 DECLARE_INTEGER(findf);
@@ -3803,8 +3821,8 @@ DECLARE_INTEGER(fstatus);
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( ftype );
    F77_FREE_INTEGER( fdim );
-   F77_IMPORT_LOCATOR( floc, loc );
    F77_IMPORT_INTEGER( fstatus, *status );
+   HDS_IMPORT_FLOCATOR( floc, loc, status );
 
    return;
 }

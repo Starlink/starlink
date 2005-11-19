@@ -1,7 +1,6 @@
 #define _POSIX_SOURCE 1		 /* Declare POSIX source */
 /* External interfaces.                                                     */
 /* --------------------                                                     */
-#include "dat_par.h"             /* Hierarchical data system (HDS)          */
 #include "ems.h"                 /* Error message service (EMS)             */
 #include "ndf.h"                 /* NDF_ library                            */
 #include "sae_par.h"             /* Standard error code definitions         */
@@ -10,7 +9,7 @@
 /* -------------------------                                                */
 #include <stdio.h>
 
-#ifdef FC_MAIN
+#if HAVE_FC_MAIN
 void FC_MAIN () {}
 #endif
 
@@ -63,10 +62,12 @@ int main( int argc, char *argv[] ) {
    status = SAI__OK;
 
 /* Initialise the NDF_ library for use from a C main routine.               */
+   cnfInitRTL( argc, argv );
    ndfInit( argc, argv, &status );
 
+
 /* Create a new file containing an NDF.                                     */
-   ndfOpen( DAT__ROOT, "ndf_test", "write", "new", &indf, &place, &status );
+   ndfOpen( NULL, "ndf_test", "write", "new", &indf, &place, &status );
    ndfNewp( "_integer", 2, dim, &place, &indf, &status );
 
 /* Map the NDF's data array.                                                */
@@ -79,7 +80,7 @@ int main( int argc, char *argv[] ) {
    ndfAnnul( &indf, &status );
 
 /* Re-open the NDF.                                                         */
-   ndfOpen( DAT__ROOT, "ndf_test", "update", "old", &indf, &place, &status );
+   ndfOpen( NULL, "ndf_test", "update", "old", &indf, &place, &status );
 
 /* Map its data array.                                                      */
    ndfMap( indf, "Data", "_integer", "read", &pntr, &el, &status );

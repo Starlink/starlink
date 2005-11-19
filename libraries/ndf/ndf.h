@@ -32,14 +32,16 @@
 /*       Moved error code definitions out into separate file ndf_err.h.     */
 /*    30-SEP-1998 (RFWS)                                                    */
 /*       Added public C interface.                                          */
+/*    18-NOV-2005 (TIMJ):                                                   */
+/*       Use HDSLoc* rather than char [DAT__SZLOC]                          */
 /*    <{enter_further_changes_here}>					    */
 
 /*-									    */
 
 /* External interfaces.                                                     */
 /* ====================                                                     */
-#include "ast.h"                 /* AST world coordinate system handling */
-#include "dat_par.h"             /* Hierarchical data system (HDS)          */
+#include "ast.h"                 /* AST world coordinate system handling    */
+#include "star/hds_types.h"      /* HDS typedefs                            */
 
 /*  Constants.                                                              */
 /*  ==========                                                              */
@@ -323,7 +325,7 @@ void ndfExist( const char *param,
                int *indf,
                int *status );
 
-void ndfFind( const char loc[ DAT__SZLOC ],
+void ndfFind( const HDSLoc * loc,
               const char *name,
               int *indf,
               int *status );
@@ -424,7 +426,7 @@ void ndfIstmp( int indf,
 
 void ndfLoc( int indf,
              const char *mode,
-             char loc[ DAT__SZLOC ],
+             HDSLoc ** loc,
              int *status );
 
 void ndfMap( int indf,
@@ -529,7 +531,7 @@ void ndfNoacc( const char *access,
                int indf,
                int *status );
 
-void ndfOpen( const char loc[ DAT__SZLOC ],
+void ndfOpen( const HDSLoc * loc,
               const char *name,
               const char *mode,
               const char *stat,
@@ -537,7 +539,7 @@ void ndfOpen( const char loc[ DAT__SZLOC ],
               int *place,
               int *status );
 
-void ndfPlace( const char loc[ DAT__SZLOC ],
+void ndfPlace( const HDSLoc * loc,
                const char *name,
                int *place,
                int *status );
@@ -691,7 +693,7 @@ void ndfXiary( int indf,
 void ndfXloc( int indf,
               const char *xname,
               const char *mode,
-              char loc[ DAT__SZLOC ],
+              HDSLoc ** loc,
               int *status );
 
 void ndfXname( int indf,
@@ -705,7 +707,7 @@ void ndfXnew( int indf,
               const char *type,
               int ndim,
               const int dim[],
-              char loc[ DAT__SZLOC ],
+              HDSLoc **loc,
               int *status );
 
 void ndfXnumb( int indf,
