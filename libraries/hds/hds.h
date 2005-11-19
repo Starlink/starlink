@@ -233,7 +233,7 @@ datMap(HDSLoc     *locator,
        char       *mode_str,
        int        ndim,
        hdsdim     dims[],
-       unsigned char **pntr,
+       void       **pntr,
        int        *status);
 
 /*==================================*/
@@ -295,6 +295,20 @@ datMapR(HDSLoc *locator,
         hdsdim dims[],
         float     **pntr,
         int       *status );
+
+
+/*==================================*/
+/* datMapV - Map vectorized primitive(s) */
+/*==================================*/
+
+int
+datMapV(HDSLoc    *locator,
+        char      *type_str,
+        char      *mode_str,
+        void      **pntr,
+        int       *actval,
+        int       *status );
+
         
 /*==================================*/
 /* datMould - Alter shape of object */
