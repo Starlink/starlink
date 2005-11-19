@@ -730,7 +730,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    HDSLoc locator_c;
    char type_c[DAT__SZTYP+1];
    char mode_c[DAT__SZMOD+1];
-   unsigned char *cpntr = NULL; /* initialise in case of bad return status */
+   void *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -1009,7 +1009,7 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
    HDSLoc locator_c;
    char mode_c[DAT__SZMOD+1];
    char type_c[DAT__SZTYP+1];
-   double *cpntr = NULL; /* initialise in case of bad return status */
+   void *cpntr = NULL; /* initialise in case of bad return status */
    
 /* Enter routine.	*/
 
