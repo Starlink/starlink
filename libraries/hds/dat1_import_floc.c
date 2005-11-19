@@ -27,7 +27,8 @@
 
  *  Description:
  *    This function should be used to convert a Fortran HDS locator 
- *    (implemented as a string buffer) to a C locator struct.
+ *    (implemented as a string buffer) to a C locator struct. It is 
+ *     for internal usage by HDS only. The public version is datImportFloc.
 
  *  Arguments
  *    char flocator[DAT__SZLOC] = Given
@@ -52,8 +53,8 @@
  *    Does not check the contents of the locator for validity.
 
  *  See Also:
- *    - dat1_impalloc_floc
- *    - dat1_export_floc
+ *    - datImportFloc
+ *    - datExportFloc
  *    - dat1_free_hdsloc
 
  *  Copyright:

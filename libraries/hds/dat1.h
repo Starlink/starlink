@@ -329,8 +329,5 @@ if (!_ok(*status))\
       void dat1_import_floc ( char flocator[DAT__SZLOC],
 			      int loc_length, HDSLoc *clocator, 
 			      int * status);
-      void dat1_impalloc_floc ( char flocator[DAT__SZLOC],
-			      int loc_length, HDSLoc **clocator, 
-			      int * status);
 
 #endif

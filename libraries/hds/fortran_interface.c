@@ -77,7 +77,7 @@ F77_SUBROUTINE(dat_annul)( CHARACTER(locator),
 
 /* Import the locator string                  */
    
-   dat1_impalloc_floc( locator, locator_length, &locator_c, status );
+   datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
    datAnnul( &locator_c, status);
@@ -1045,7 +1045,7 @@ F77_SUBROUTINE(dat_move)( CHARACTER(locator1),
 /* Enter routine.	*/
 
 /* Import the first locator string                  */
-   dat1_impalloc_floc( locator1, locator1_length, &locator1_c, status );
+   datImportFloc( locator1, locator1_length, &locator1_c, status );
 
 /* Import the second locator string                  */
    dat1_import_floc( locator2, locator2_length, &locator2_c, status );
@@ -1282,7 +1282,7 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
    }
 
 /* Import the locator string (given and returned)  */
-   dat1_impalloc_floc( locator, locator_length, &locator_c, status);
+   datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Call pure C routine                                       */
    datPrmry( set_c, &locator_c, &primary_c, status );
@@ -2051,7 +2051,7 @@ F77_SUBROUTINE(hds_erase)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   dat1_impalloc_floc( locator, locator_length, &locator_c, status );
+   datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
    hdsErase( &locator_c, status );
@@ -2501,7 +2501,7 @@ F77_SUBROUTINE(hds_close)( CHARACTER(locator),
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
-   dat1_impalloc_floc( locator, locator_length, &locator_c, status );
+   datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
    hdsClose( &locator_c, status );

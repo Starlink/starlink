@@ -14,27 +14,31 @@
 #include "hds_types.h"
 #include "dat_err.h"
 
+#include "hds_fortran.h"
+
 /*
  *+
  *  Name:
- *    dat1_import_floc
+ *    datImportFloc
 
  *  Purpose:
- *    Import a fortran HDS locator buffer into C with malloc
+ *    Import a Fortran HDS locator buffer into C with malloc
 
  *  Invocation:
- *    dat1_import_floc( char flocator[DAT__SZLOC], int len, HDSLoc **clocator, int * status);
+ *    datImportFloc( char flocator[DAT__SZLOC], int loc_length, HDSLoc **clocator, int * status);
 
  *  Description:
  *    This function should be used to convert a Fortran HDS locator 
  *    (implemented as a string buffer) to a C locator struct. The C locator
- *    is malloced by this routine.
+ *    is malloced by this routine. The memory will be freed when datAnnul
+ *    is called. This function is also available via the 
+ *    HDS_IMPORT_FLOCATOR macro defined in hds_fortran.h.
 
  *  Arguments
  *    char flocator[DAT__SZLOC] = Given
  *       Fortran character string buffer. Should be at least DAT__SZLOC
  *       characters long.
- *    int len = Given
+ *    int loc_length = Given
  *       Size of Fortran character buffer. Sanity check.
  *    HDSLoc ** clocator = Returned
  *       Fills the HDSLoc struct with the contents of the fortran buffer.
@@ -43,7 +47,7 @@
  *       be NULL on entry. If status is set by this routine, the struct
  *       will not be malloced on return.
  *    int *status = Given and Returned
- *       Inherited status. Returns without action if status is not DAT__OK
+ *       Inherited status. Returns without action if status is not SAI__OK.
 
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
@@ -51,14 +55,17 @@
  *  History:
  *    16-NOV-2005 (TIMJ):
  *      Initial version
+ *    18-NOV-2004 (TIMJ):
+ *      Rename from dat1_import_floc so that it can be made public for
+ *      fortran wrappers.
 
  *  Notes:
- *    Does not check the contents of the locator for validity.
+ *    - Does not check the contents of the locator for validity.
+ *    - The expectation is that this routine is used solely for C
+ *      interfaces to Fortran library routines.
 
  *  See Also:
- *    - dat1_import_floc
- *    - dat1_export_floc
- *    - dat1_free_hdsloc
+ *    - datExportFloc
 
  *  Copyright:
  *    Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -86,14 +93,15 @@
  *-
  */
 
-void dat1_impalloc_floc ( char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
+void datImportFloc ( char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
 
   if (*status != DAT__OK) return;
 
   /* Check that we have a null pointer for HDSLoc */
   if ( *clocator != NULL ) {
     *status = DAT__WEIRD;
-    emsRep( "DAT1_IMPALLOC_FLOC", "Supplied C locator is non-NULL", status);
+    emsRep( "datImportFloc", "datImportFloc: Supplied C locator is non-NULL",
+	    status);
     return;
   }
 
@@ -104,7 +112,8 @@ void dat1_impalloc_floc ( char flocator[DAT__SZLOC], int loc_length, HDSLoc ** c
 
   if (*clocator == NULL ) {
     *status = DAT__NOMEM;
-    emsRep( "DAT1_IMPORT_FLOC", "No memory for C locator struct", status);
+    emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
+	    status);
     return;
   }
 

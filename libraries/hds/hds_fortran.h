@@ -46,5 +46,28 @@
 void datExportFloc ( HDSLoc **clocator, int free, int loc_length, 
 		     char flocator[DAT__SZLOC], int * status);
 
+/* Convert a Fortran locator to a C HDSLoc struct. Memory is allocated
+   by this routine that will be freed when the locator is annulled. */
+
+void datImportFloc( char flocator[DAT__SZLOC], int loc_length, 
+		    HDSLoc **clocator, int * status);
+
+
+/* There are also a drop in replacement for the CNF Locator macros,
+   although inherited status has been added as an argument */
+
+/* Convert a C locator to a Fortran locator
+   Note that we do not free the memory assoicated with the locator
+   and we assume DAT__SZLOC for the Fortran locator */
+
+
+#define HDS_EXPORT_CLOCATOR( cloc, floc, status )	\
+  datExportFloc( &cloc, 0, DAT__SZLOC, floc, status )
+
+/* Convert a Fortran locator to a C locator */
+
+#define HDS_IMPORT_FLOCATOR( floc, cloc, status ) \
+  datImportFloc( floc, DAT__SZLOC, &cloc, status )
+
 #endif /* _INCLUDED */
 

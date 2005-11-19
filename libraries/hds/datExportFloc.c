@@ -14,6 +14,8 @@
 #include "hds_types.h"
 #include "dat_err.h"
 
+#include "hds_fortran.h"
+
 /*
  *+
  *  Name:
@@ -31,7 +33,8 @@
  *  Description:
  *    This function should be used to populate a Fortran HDS locator buffer
  *    (usually a Fortran CHARACTER string of size DAT__SZLOC) from a C HDS
- *    locator structure.
+ *    locator structure. This function is also available in the
+ *    HDS_EXPORT_CLOCATOR macro defined in hds_fortran.h.
 
  *  Arguments:
  *    HDSLoc ** clocator = Given & Returned

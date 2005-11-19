@@ -85,7 +85,7 @@ C_ROUTINES = \
 	dat1_locate_name.c dat1_pack_crv.c dat1_pack_odl.c \
 	dat1_pack_srv.c dat1_put_ncomp.c dat1_put_odl.c \
 	dat1_show_ndr.c dat1_unpack_crv.c dat1_unpack_odl.c \
-	dat1_unpack_srv.c dat1_unpack_type.c dat1_impalloc_floc.c \
+	dat1_unpack_srv.c dat1_unpack_type.c \
         dat1_free_hdsloc.c dat1_import_floc.c \
 	datClen.c datCopy.c \
 	datDrep.c datErmsg.c datParen.c datPrmry.c datRefct.c \
@@ -93,7 +93,7 @@ C_ROUTINES = \
 	datget.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
 	datput.c dattemp.c daucheck.c daucnv.c daucopy.c dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
-	datExportFloc.c	\
+	datExportFloc.c	datImportFloc.c \
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
 	hds_run.c hds_start.c hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
