@@ -27,7 +27,7 @@ datMap(HDSLoc    *locator,
        char      *mode_str,
        int       ndim,
        HDS_PTYPE dims[],
-       unsigned char **pntr,
+       void      **pntr,
        int       *status)
 {
 #undef context_name
@@ -267,7 +267,7 @@ datMapI(HDSLoc    *locator,
         "DAT_MAPI: Error mapping an HDS primitive as integer values."
 
    datMap( locator, "_INTEGER", mode_str, ndim, dims,
-           (unsigned char **) pntr, status );
+           (void**)pntr, status );
 
    return hds_gl_status;
 }
@@ -290,7 +290,7 @@ datMapR(HDSLoc *locator,
         "DAT_MAPR: Error mapping an HDS primitive as real values."
 
    datMap( locator, "_REAL", mode_str, ndim, dims,
-           (unsigned char **) pntr, status );
+           (void**)pntr, status );
 
    return hds_gl_status;
 }
@@ -313,7 +313,7 @@ datMapD(HDSLoc *locator,
         "DAT_MAPD: Error mapping an HDS primitive as double precision values."
 
    datMap( locator, "_DOUBLE", mode_str, ndim, dims,
-           (unsigned char **) pntr, status );
+           (void**)pntr, status );
 
    return hds_gl_status;
 }
@@ -336,7 +336,7 @@ datMapL(HDSLoc *locator,
         "DAT_MAPL: Error mapping an HDS primitive as logical values."
 
    datMap( locator, "_LOGICAL", mode_str, ndim, dims,
-           (unsigned char **) pntr, status );
+           (void**)pntr, status );
 
    return hds_gl_status;
 }
@@ -359,7 +359,7 @@ datMapC(HDSLoc *locator,
         "DAT_MAPC: Error mapping an HDS primitive as character values."
 
    datMap( locator, "_CHAR", mode_str, ndim, dims,
-           (unsigned char **) pntr, status );
+           (void**)pntr, status );
 
    return hds_gl_status;
 }
@@ -372,7 +372,7 @@ int
 datMapV(HDSLoc *locator,
 	char      *type_str,
         char      *mode_str,
-        unsigned char **pntr,
+        void      **pntr,
 	int       *actval,
         int       *status )
 {
@@ -393,7 +393,7 @@ datMapV(HDSLoc *locator,
   datSize( locator, actval, status );
   datShape( locator, DAT__MXDIM, dims, &ndim, status );
   datMap( locator, type_str, mode_str, ndim, dims,
-	  (unsigned char **) pntr, status );
+	  pntr, status );
 
   return hds_gl_status;
 }
