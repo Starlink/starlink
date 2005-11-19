@@ -990,6 +990,43 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
    *pntr = cnfFptr( cpntr );
 }
 
+F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
+			  CHARACTER(type),
+                          CHARACTER(mode),
+                          F77_POINTER_TYPE *pntr,
+			  F77_INTEGER_TYPE *actval,
+                          F77_INTEGER_TYPE *status
+                          TRAIL(locator)
+                          TRAIL(type)
+                          TRAIL(mode) )
+{
+
+/*=====================================*/
+/* DAT_MAPD - Map _DOUBLE primitive(s) */
+/*=====================================*/
+
+/* Local variables.     */
+   HDSLoc locator_c;
+   char mode_c[DAT__SZMOD+1];
+   char type_c[DAT__SZTYP+1];
+   double *cpntr = NULL; /* initialise in case of bad return status */
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import mode and type string  */
+   cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
+   cnfImpn( type, type_length, DAT__SZTYP,  type_c);
+
+   datMapV( &locator_c, type_c, mode_c, &cpntr, actval, status);
+
+/* Export the C pointer as a FORTRAN POINTER */
+   *pntr = cnfFptr( cpntr );
+}
+
+
 F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
                            F77_INTEGER_TYPE *ndim,
                            FORTRAN_INDEX_TYPE dims[],

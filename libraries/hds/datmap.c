@@ -364,6 +364,42 @@ datMapC(HDSLoc *locator,
    return hds_gl_status;
 }
 
+
+/*===============================*/
+/* DAT_MAPV - Map values associated with an object as if vectorized */
+/*===============================*/
+int
+datMapV(HDSLoc *locator,
+	char      *type_str,
+        char      *mode_str,
+        unsigned char **pntr,
+	int       *actval,
+        int       *status )
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_MAPV_ERR"
+#define context_message\
+        "DAT_MAPV: Error mapping an HDS vectorized primitive."
+
+  /* Local variables */
+  hdsdim dims[DAT__MXDIM];
+  int    ndim;
+
+  /* Initialise return values */
+  *pntr = NULL;
+  *actval = 0;
+  
+  datSize( locator, actval, status );
+  datShape( locator, DAT__MXDIM, dims, &ndim, status );
+  datMap( locator, type_str, mode_str, ndim, dims,
+	  (unsigned char **) pntr, status );
+
+  return hds_gl_status;
+}
+
+
+
 /*===============================================*/
 /* DAT_BASIC - Map data (in basic machine units) */
 /*===============================================*/
