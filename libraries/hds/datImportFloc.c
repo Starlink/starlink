@@ -25,7 +25,7 @@
  *    Import a Fortran HDS locator buffer into C with malloc
 
  *  Invocation:
- *    datImportFloc( char flocator[DAT__SZLOC], int loc_length, HDSLoc **clocator, int * status);
+ *    datImportFloc( const char flocator[DAT__SZLOC], int loc_length, HDSLoc **clocator, int * status);
 
  *  Description:
  *    This function should be used to convert a Fortran HDS locator 
@@ -35,7 +35,7 @@
  *    HDS_IMPORT_FLOCATOR macro defined in hds_fortran.h.
 
  *  Arguments
- *    char flocator[DAT__SZLOC] = Given
+ *    const char flocator[DAT__SZLOC] = Given
  *       Fortran character string buffer. Should be at least DAT__SZLOC
  *       characters long.
  *    int loc_length = Given
@@ -93,7 +93,7 @@
  *-
  */
 
-void datImportFloc ( char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
+void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
 
   if (*status != DAT__OK) return;
 
