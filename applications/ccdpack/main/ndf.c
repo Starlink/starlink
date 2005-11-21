@@ -253,6 +253,8 @@
 *        Initial version.
 *     9-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     18-NOV-2005 (TIMJ):
+*        Use official C interface
 *-
 */
 
@@ -273,6 +275,7 @@
 #include "ccdaux.h"
 #include "ast.h"
 #include "cpgplot.h"
+#include "star/hds.h"
 
 /* Unions for use with the Tcl hashes which store calculated percentiles.
    Tcl hash tables use something the size of a pointer for both the key
@@ -436,36 +439,21 @@
 
 /* If it does, then map it. */
                if ( F77_ISTRUE(there) ) {
-                  char loc[ DAT__SZLOC ];
-                  DECLARE_CHARACTER( floc, DAT__SZLOC );
-                  DECLARE_CHARACTER( ftype, DAT__SZTYP );
-                  DECLARE_CHARACTER( faccess, 6 );
-                  F77_POINTER_TYPE ipfits;
 
 /* Get an HDS locator. */
-                  ndfXloc( ndf1->identifier, "FITS", "READ", loc, status );
-                  cnfExpch( loc, floc, floc_length );
-                  cnfExprt( "READ", faccess, faccess_length );
-                  cnfExprt( "_CHAR*80", ftype, ftype_length );
+                  ndfXloc( ndf1->identifier, "FITS", "READ", &ndf1->fits.loc, status );
 
 /* Map the data and store the pointer in the ndf data structure. */
-                  F77_CALL(dat_mapv)( CHARACTER_ARG(floc), 
-                                      CHARACTER_ARG(ftype), 
-                                      CHARACTER_ARG(faccess),
-                                      POINTER_ARG(&ipfits),
-                                      INTEGER_ARG(&ndf1->fits.ncard),
-                                      INTEGER_ARG(status)
-                                      TRAIL_ARG(floc) TRAIL_ARG(ftype) 
-                                      TRAIL_ARG(faccess) );
-
-/* Import the pointer value to C. */
-                  ndf1->fits.data = cnfCptr( ipfits );
+		  
+		  datMapV( ndf1->fits.loc, "_CHAR*80", "READ", (void**)&ndf1->fits.data, 
+			   &ndf1->fits.ncard, status );
                }
 
 /* There was no FITS extension; record this as effectively a mapped FITS
    block of zero length. */
                else {
                   ndf1->fits.ncard = 0;
+		  ndf1->fits.loc = NULL;
                }
 
 /* Record that we have got any FITS headers there are to get. */
@@ -1896,7 +1884,7 @@
       STARCALL( 
 
 /* Open the NDF. */
-         ndfFind( DAT__ROOT, ndfname, &ndf1->identifier, status );
+         ndfFind( NULL, ndfname, &ndf1->identifier, status );
 
 /* Get the bounds of the NDF. */
          ndfBound( ndf1->identifier, NDF__MXDIM, ndf1->lbnd, ndf1->ubnd, 
@@ -1934,10 +1922,7 @@
    problem we just have to annul the error status. */
       errMark();
       if ( ndf1->fits.loaded && ndf1->fits.ncard ) {
-         DECLARE_CHARACTER( locator, DAT__SZLOC );
-         cnfExprt( ndf1->fits.loc, locator, DAT__SZLOC );
-         F77_CALL(dat_annul)( CHARACTER_ARG(locator), INTEGER_ARG(status)
-                              TRAIL_ARG(locator) );
+	datAnnul( &ndf1->fits.loc, status );
       }
       astAnnul( ndf->wcs );
       ndfValid( ndf1->identifier, &valid, status );

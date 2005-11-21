@@ -22,6 +22,8 @@
 *        Initial version.
 *     9-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
+*     18-NOV-2005 (TIMJ):
+*        Use HDSLoc
 *-
 */
 
@@ -30,6 +32,7 @@
 
 #include "ndf.h"
 #include "dat_par.h"
+#include "star/hds_types.h"
 #include "ast.h"
 #include "tcl.h"
 
@@ -58,7 +61,7 @@
          char *data;               /* The text of the FITS headers */
          int loaded;               /* Has the FITS array been loaded? */
          int ncard;                /* Number of FITS cards present */
-         char loc[ DAT__SZLOC ];   /* Locator to NDF .MORE.FITS extension */
+         HDSLoc *loc;              /* Locator to NDF .MORE.FITS extension */
       } fits;                   /* Contents of FITS extension. */
    } Ndf1;
 
