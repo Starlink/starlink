@@ -254,7 +254,7 @@
 *     9-MAR-2001 (MBT):
 *        Upgraded for use with Sets.
 *     18-NOV-2005 (TIMJ):
-*        Use official C interface
+*        Use official HDS C interface
 *-
 */
 
