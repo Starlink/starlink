@@ -1,15 +1,8 @@
 Modified tkCanvLine.c to support coloured arrow heads.
-Patched tclPosixStr.c to work on Redhat 6 (glib 2.1).
 init.tcl and autoload.tcl patched to source non-existence tclIndex
 files (needed for standalone binary to work, open command on builtin
 files doesn't work).
 
 init.tcl {$msg} in unknown changed to {$msg != 0} so string comparison 
 works.
-
-iwidgets3.0.0: updates to notebook.itk, calendar.itk and pane.itk. 
-Several occurances of the bug "set $variable $value".
-
-blt: fudged Darwin support (powerpc-like). If this fails again need
-to re-autoconf the whole release.
 
