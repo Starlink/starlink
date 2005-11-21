@@ -35,7 +35,7 @@ extern "C" {
 
 /* allan: 6.8.96: add defs missing on HP and/or sunos */
 #ifndef MAP_FAILED
-#define MAP_FAILED (void*)-1
+#define MAP_FAILED NULL
 #endif
 
 #ifndef MS_SYNC
@@ -54,7 +54,7 @@ extern int munmap(caddr_t, size_t);
 
 // Default file permissions.
 #define MMAP_DEFAULT_PERMS 0666
-#define MMAP_INVALID_HANDLE -1
+#define MMAP_INVALID_HANDLE 0
 // Default size of mapped page on SunOS, HP and Solaris.
 #define MMAP_PAGE_SIZE 4096
 

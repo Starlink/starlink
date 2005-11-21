@@ -34,7 +34,7 @@ struct MemRep {
     int refcnt;			// count of the number of reference to this memory area
     void* ptr;			// pointer to memory area
     int newmem;               // memory allocated using "new"
-    int shmId;			// shared memory id, or -1 if not shared
+    int shmId;			// shared memory id, or 0 if not shared
     int shmNum;                 // shm buffer number, if multi-buffering
     int semId;                  // Semaphore ID for locking shm
     int options;		// mmap options for read/write access
