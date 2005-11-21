@@ -138,7 +138,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    which do not influence the Gaussian model). */
       cupidGC.nwf = cupidConfigI( config, "NWF", 10 );
       cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1 );
-      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.0 );
+      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 2.0 );
 
 /* Maximum number of function evaluations to be used when fitting an 
    individual clump. */
@@ -321,7 +321,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    }
 
 /* Store the mean of the background estimates, and the peak value. */
-   par[ 1 ] = off/ndim;
+   par[ 1 ] = off/ndim + 0.5*rms;
    par[ 0 ] = cupidGC.ymax - par[ 1 ];
 
 /* Get the pixel bounds (in the arrays GRID coordinate system) of the section 

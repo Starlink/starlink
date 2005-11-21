@@ -145,7 +145,9 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double sum_peak2;    /* Sum of the squares of the values in "peaks" */
    double sum_peak;     /* Sum of the values in "peaks" */
    double sumbg;        /* Sum of background estimates */
+   double swbg;         /* Sum of background estimate weights */
    double urms;         /* User-supplied RMS noise level */
+   double wbg;          /* Background estimate weight */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
@@ -158,7 +160,6 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iter;            /* Continue finding more clumps? */
    int maxclump;        /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
-   int nbg;             /* Number of background estimates summed in sumbg */
    int niter;           /* Iterations performed so far */
    int npad;            /* No. of peaks below threshold for temination */
    int npeak;           /* The number of elements in the "peaks" array. */
@@ -256,7 +257,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Initialise the sum of the background estimates, and the number of such
    estimates summed. */
       sumbg = 0.0;
-      nbg = 0;
+      swbg = 0.0;
 
 /* Indicate that no peaks have been found below the lower threshold for clump 
    peak values. */
@@ -296,6 +297,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    have been performed since the last succesfully fitted clump. */
          if( allbad ) {    
             iter = 0;
+            niter--;
             if( ilevel > 1 ) msgBlank( status );
             if( ilevel > 3 ) {
                msgOut( "", "There are no good pixels left to be fitted.", 
@@ -304,6 +306,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             }
          } else if( nskip > maxskip ){
             iter = 0;
+            niter--;
             if( ilevel > 1 ) msgBlank( status );
             if( ilevel > 3 ) {
                msgSeti( "N", maxskip );
@@ -339,6 +342,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      if( ++ipeak == npeak ) ipeak = 0;
                      sum_peak += new_peak - old_peak;
                      sum_peak2 += new_peak*new_peak - old_peak*old_peak;
+                     if( sum_peak2 < 0.0 ) sum_peak2 = 0.0;
                      mean_peak = sum_peak/npeak;
                      sigma_peak = sqrt( sum_peak2/npeak - mean_peak*mean_peak );
                   }
@@ -349,9 +353,12 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Reset the number of failed fits since the last good fit. */
                   nskip = 0;
 
-/* Increment the sum of the background estimates. */
-                  sumbg += x[ 1 ]*rms;
-                  nbg++;
+/* Increment the sum of the background estimates. Background estimates
+   are weights to give greater weight to estimates formed form larger
+   peaks and from closer fits. */
+                  wbg = ( chisq > 0.0 ) ? x[ 0 ]/chisq : 1.0;
+                  sumbg += x[ 1 ]*wbg*rms;
+                  swbg += wbg;
 
 /* Extend the returned array of HDS Clump structures to include room for
    the new one. This list is actually a long character string containing
@@ -366,7 +373,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
                                        clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
-                                       iclump, sumbg, nbg, diag, mean_peak );
+                                       iclump, sumbg, swbg, diag, mean_peak );
 
 /* Display the clump parameters on the screen if required. */
                   cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
@@ -417,6 +424,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      ((float *)res)[ imax ] = VAL__BADR;
                   }
 
+                  new_peak = 0.5*( new_peak + x[ 0 ] );
+
                   nskip++;
                   if( ilevel > 3 ) msgOut( "", "   Clump rejected due to "
                                            "aberrant peak value.", status );
@@ -438,8 +447,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Tell the user the mean background level, and return it. */
-   if( nbg > 0 ) {
-      *bg = sumbg/nbg;
+   if( swbg > 0 ) {
+      *bg = sumbg/swbg;
       if( ilevel > 2) {
          msgSetd( "BG", *bg );
          msgOut( "", "Estimated background level = ^BG", status );
@@ -467,8 +476,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( niter == 1 ){
          msgOut( "", "No fit attempted", status );
       } else {
-         msgSeti( "M", niter - *nclump - 1 );
-         msgSeti( "N", niter - 1 );
+         msgSeti( "M", niter - *nclump );
+         msgSeti( "N", niter );
          msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
       }
    }

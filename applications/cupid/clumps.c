@@ -12,18 +12,21 @@
 #include <stdio.h>
 
 
+/* If the FPTRAP macros is defined, then the fptrapfunction defined here
+   will be called in order to cause floating point exceptions to be
+   generated when a NaN value is returned from a calculation. This can be
+   useful when debugging since otherwise it can be difficult to determine
+   where the NaN values are coming from. */
 
-
-
-
-#include <fpu_control.h>
-#  if defined(__i386__)
-#    if !defined(_FPU_GETCW)
-#      define _FPU_GETCW(cw) (cw=__getfpucw())
-#    endif
-#    if !defined(_FPU_SETCW)
-#      define _FPU_SETCW(cw) (__setfpucw(cw))
-#    endif
+#if defined(FPTRAP)
+#   include <fpu_control.h>
+#     if defined(__i386__)
+#       if !defined(_FPU_GETCW)
+#         define _FPU_GETCW(cw) (cw=__getfpucw())
+#       endif
+#       if !defined(_FPU_SETCW)
+#         define _FPU_SETCW(cw) (__setfpucw(cw))
+#       endif
 void
 fptrap (int i)
 {
@@ -34,20 +37,7 @@ fptrap (int i)
 }
 
 #  endif 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif
 
 
 void clumps() {
@@ -313,8 +303,9 @@ void clumps() {
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
    
-fptrap(1);
-
+#if defined(FPTRAP)
+   fptrap(1);
+#endif
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -415,7 +406,6 @@ fptrap(1);
          msgOut( "", "WARNING: Cannot identify a velocity axis within the "
                  "supplied NDF. Assuming pixel axis 3 is the velocity axis.", 
                  status );
-         goto L999;
       }
    }         
 

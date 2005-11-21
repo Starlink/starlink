@@ -16,7 +16,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                            int *dims, double *par, double rms,
                                            double mlim, int imax, int ilevel, 
                                            int *lbnd, char *cloc, int iclump, 
-                                           double sumbg, int nbg, int diag, 
+                                           double sumbg, double swbg, int diag,
                                            double mean_peak ){
 
 /*
@@ -31,7 +31,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                    int ndim, int *dims, double *par, 
 *                                    double rms, double mlim, int imax, 
 *                                    int ilevel, int *lbnd, char *cloc, 
-*                                    int iclump, double sumbg, int nbg, 
+*                                    int iclump, double sumbg, double swbg, 
 *                                    int diag, double mean_peak )
 
 *  Description:
@@ -74,9 +74,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     iclump
 *        Clump index.
 *     sumbg
-*        The sum of the "nbg" background estimates made so far.
-*     nbg
-*        The number of background estimates made so far.
+*        The weighted sum of the background estimates made so far.
+*     swbg
+*        The total weight of the background estimates made so far.
 *     diag
 *        Include extra diagnostic information in output catalogue?
 *     mean_peak
@@ -344,7 +344,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    par[ 1 ] = bg;
 
 /* Store the mean background found so far. */
-   bg = ( nbg > 0 ) ? sumbg/nbg : 0.0;
+   bg = ( swbg > 0 ) ? sumbg/swbg : 0.0;
 
 /* Get the statistics of the modified residuals. */
    minr = VAL__MAXD;
@@ -408,8 +408,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {
-         lbox[ jax ]++;
-         ubox[ jax ]--;
+         if( ubox[ jax ] - lbox[ jax ] > 1 ) {
+            lbox[ jax ]++;
+            ubox[ jax ]--;
+         }
       }
 
 /* Create extra diagnostic info if required (meant for debugging). */
