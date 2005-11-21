@@ -604,7 +604,7 @@ datValid(HDSLoc *locator,
    ems_mark_c( );
 
    dat1_import_loc(locator, &lcp );
-   *valid = ( lcp == NULL ? TRUE : FALSE );
+   *valid = ( lcp != NULL ? TRUE : FALSE );
 
 /*
    Annul any errors and end the error context.
