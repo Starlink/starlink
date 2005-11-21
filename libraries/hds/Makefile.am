@@ -46,8 +46,7 @@ hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = CMP_ERR DAT_ERR
-noinst_MESSAGES = dat_err.h
+include_MESSAGES = CMP_ERR DAT_ERR dat_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
