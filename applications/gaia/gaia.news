@@ -1,5 +1,11 @@
 1 Starlink GAIA update
 
+  Release 2.9-4 
+  =============
+
+  The 2MASS catalogue query now includes a minimum radius. Remove any
+  existing $HOME/.skycat/skycat.cfg files to benefit from this change.
+
   Release 2.9-3: 06 October 2005
   ==============================
 
