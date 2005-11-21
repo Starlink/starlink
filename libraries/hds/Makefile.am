@@ -70,7 +70,7 @@ F_ROUTINES = \
 	dat_erdsn.f dat_ertxt.f dat_get0x.f dat_get1x.f dat_getnx.f \
 	dat_getvx.f dat_mapn.f dat_msg.f dat_new0.f \
 	dat_new0c.f dat_new0x.f dat_new1.f dat_new1c.f dat_new1x.f \
-	dat_prec.f dat_put0x.f dat_put1x.f dat_putnx.f \
+	dat_prec.f dat_put1x.f dat_putnx.f \
 	dat_putvx.f dat_rcera.f dat_rcopy.f dat_ref.f dat_tune.f
 
 #  List of Fortran BLOCK DATA routines.
@@ -90,7 +90,8 @@ C_ROUTINES = \
 	datDrep.c datErmsg.c datParen.c datPrmry.c datRefct.c \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
-	datput.c dattemp.c daucheck.c daucnv.c daucopy.c dauflush.c \
+	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
+	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
 	datExportFloc.c	datImportFloc.c \
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \

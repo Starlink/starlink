@@ -468,6 +468,43 @@ datPut( HDSLoc  *locator,
         void    *values,
         int     *status);
 
+/*=======================================*/
+/* datPut0C - Write scalar string value  */
+/*=======================================*/
+
+int
+datPut0C( HDSLoc * loc, char * value, int * status );
+
+/*=======================================*/
+/* datPut0D - Write scalar double value  */
+/*=======================================*/
+
+int
+datPut0D( HDSLoc * loc, double value, int * status );
+
+/*======================================*/
+/* datPut0R - Write scalar float value  */
+/*======================================*/
+
+int
+datPut0R( HDSLoc * loc, float value, int * status );
+
+/*========================================*/
+/* datPut0I - Write scalar integer value  */
+/*========================================*/
+
+int
+datPut0I( HDSLoc * loc, int value, int * status );
+
+/*========================================*/
+/* datPut0L - Write scalar logical value  */
+/*========================================*/
+
+int
+datPut0L( HDSLoc * loc, int value, int * status );
+
+
+
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
 /*===================================================*/
