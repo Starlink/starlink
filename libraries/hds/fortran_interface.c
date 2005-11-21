@@ -442,6 +442,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
    char type_c[DAT__SZTYP+1];
+   int ischar = 0;
 #if HDS_COPY_FORTRAN_DIMS
    INT_BIG dims64[DAT__MXDIM];
    int i;
@@ -452,16 +453,8 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
 /* Import FORTRAN to C string  */
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
-   if (strncmp(type,"_CHAR",5) == 0) {
-     /* Call dat_getC instead as a special case using the argument
-        that Fortran has pushed onto the end solely for STRINGs */
-     F77_CALL(dat_getc)(locator,ndim,dims,
-			CHARACTER_ARG(values), status
-			TRAIL_ARG(locator)
-			TRAIL_ARG(values));
-     return;
-   }
-
+   /* Special case _CHAR since fortran is telling us the length */
+   if (strncmp(type,"_CHAR",5) == 0) ischar = 1;
 
 /* Import the locator string                  */
    dat1_import_floc( locator, locator_length, &locator_c, status);
@@ -472,9 +465,17 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
       dims64[i] = dims[i];
 
 /* Call pure C routine                                       */
-   datGet( &locator_c, type_c, *ndim, dims64, values, status);
+   if (ischar) {
+     datGetC( &locator_c, *ndim, dims64, (char*)values, values_length, status );
+   } else {
+     datGet( &locator_c, type_c, *ndim, dims, values, status);
+   }
 #else
-   datGet( &locator_c, type_c, *ndim, dims, values, status);
+   if (ischar) {
+     datGetC( &locator_c, *ndim, dims, (char*)values, values_length, status );
+   } else {
+     datGet( &locator_c, type_c, *ndim, dims, values, status);
+   }
 #endif
 }
 
@@ -1562,13 +1563,13 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
       
 /* Call pure C routine                                       */
    if (ischar) {
-     datPutC( &locator_c, *ndim, dims64, values, values_length, status );
+     datPutC( &locator_c, *ndim, dims64, (char*)values, values_length, status );
    } else {
      datPut( &locator_c, type_c, *ndim, dims64, values, status );
    }
 #else
    if (ischar) {
-     datPutC( &locator_c, *ndim, dims, values, values_length, status );
+     datPutC( &locator_c, *ndim, dims, (char *)values, values_length, status );
    } else {
      datPut( &locator_c, type_c, *ndim, dims, values, status );
    }

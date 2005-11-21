@@ -40,7 +40,7 @@ datGet(HDSLoc     *locator,
        char       *type_str,
        int        ndim,
        HDS_PTYPE  dims[],
-       unsigned   char *values,
+       void       *values,
        int        *status)
 {
 #undef context_name
@@ -132,7 +132,7 @@ datGet(HDSLoc     *locator,
       _call(DAT__UNSET)
 
 /* Insert a pointer to the data into the PDD.                               */
-   app->body = values;
+   app->body = (unsigned char*)values;
 
 /* Calculate the length (in bytes) of the object data and determine the      */
 /* byte offset into the object record's dynamic domain.          */
@@ -182,7 +182,7 @@ datGet(HDSLoc     *locator,
     {
        if ( _ok( hds_gl_status ) )
        {
-          (void) memcpy( (void *) values, (void *) buf,
+          (void) memcpy( values, buf,
                          (size_t) ( app->length * data->size ) );
        }
        rec_deall_mem( app->length * data->size, (void **) &buf );
@@ -219,7 +219,7 @@ datGetI(HDSLoc    *locator,
         "DAT_GETI: Error reading integer value(s) from an HDS primitive."
 
    datGet(locator, "_INTEGER", ndim, dims, 
-                     (unsigned char *)values, status );
+                     values, status );
 
    return hds_gl_status;
 }
@@ -263,7 +263,7 @@ datGetD(HDSLoc    *locator,
     "DAT_GETD: Error reading double precision value(s) from an HDS primitive."
         
    datGet(locator, "_DOUBLE", ndim, dims,
-                     (unsigned char *) values, status );
+                     values, status );
 
    return hds_gl_status;
 }
@@ -285,7 +285,7 @@ datGetL(HDSLoc    *locator,
         "DAT_GETL: Error reading logical value(s) from an HDS primitive."
         
    datGet(locator, "_LOGICAL", ndim, dims,
-                     (unsigned char *) values, status );
+                     values, status );
 
    return hds_gl_status;
 }
@@ -309,7 +309,7 @@ datGetC(HDSLoc    *locator,
    char stype[] = "_CHAR*nnnn";
    sprintf( &stype[6], "%d", char_len ); 
      
-   datGet(locator, stype, ndim, dims, (char *) values, status );
+   datGet(locator, stype, ndim, dims, values, status );
 
    return hds_gl_status;
 }

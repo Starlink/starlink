@@ -30,7 +30,7 @@ datPut( HDSLoc   *locator,
         char     *type_str,
         int      ndim,
         HDS_PTYPE  dims[],
-        unsigned char *values,
+        void     *values,
         int      *status)
 {
 #undef context_name
@@ -112,7 +112,7 @@ datPut( HDSLoc   *locator,
    _call( dau_match_types( obj, app ) )
 
 /* Insert a pointer to the data into the PDD.                                */
-   app->body = values;
+     app->body = (unsigned char*)values;
 
 /* Calculate the length (in bytes) of the object data and determine the      */
 /* byte offset into the object record's dynamic domain.                      */
@@ -137,7 +137,7 @@ datPut( HDSLoc   *locator,
       rec_alloc_mem( app->length * data->size, (void **) &buf );
       if ( _ok( hds_gl_status ) )
       {
-         (void) memcpy( (void *) buf, (void *) values,
+         (void) memcpy( buf, values,
                         (size_t) ( app->length * data->size ) );
       }
       app->body = buf;
@@ -191,7 +191,7 @@ datPutI(HDSLoc   *locator,
           "_INTEGER",
           ndim,
           dims, 
-          (unsigned char *)values,
+          values,
           status);
    return hds_gl_status;
 }
@@ -216,7 +216,7 @@ datPutR( HDSLoc    *locator,
           "_REAL",
           ndim,
           dims, 
-          (unsigned char *) values,
+          values,
           status);
      return hds_gl_status;
 }
@@ -241,7 +241,7 @@ datPutD( HDSLoc    *locator,
           "_DOUBLE",
           ndim,
           dims, 
-          (unsigned char *)values,
+          values,
           status);
      return hds_gl_status;
 }
@@ -266,7 +266,7 @@ datPutL( HDSLoc    *locator,
           "_LOGICAL",
           ndim,
           dims, 
-          (unsigned char *)values,
+          values,
           status);
      return hds_gl_status;
 }
@@ -307,7 +307,7 @@ char *string1;
           stype,
           ndim,
           dims, 
-          (unsigned char *)string1,
+          string1,
           status);
      return hds_gl_status;
 }

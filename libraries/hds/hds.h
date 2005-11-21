@@ -145,7 +145,7 @@ datGet(HDSLoc     *locator,
        char       *type_str,
        int        ndim,
        hdsdim     dims[],
-       unsigned   char *values,
+       void       *values,
        int        *status);
 
 /*===================================*/
@@ -461,12 +461,12 @@ datPutL( HDSLoc *locator,
 /*==========================*/
 
 int
-datPut( HDSLoc *locator,
-        char     *type_str,
-        int      ndim,
+datPut( HDSLoc  *locator,
+        char    *type_str,
+        int     ndim,
         hdsdim  dims[],
-        unsigned char *values,
-        int      *status);
+        void    *values,
+        int     *status);
 
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
