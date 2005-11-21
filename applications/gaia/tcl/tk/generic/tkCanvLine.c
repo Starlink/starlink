@@ -2455,6 +2455,12 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
     }
 
     Tk_CanvasPsPath(interp, canvas, arrowPtr, PTS_IN_ARROW);
+    
+    /* Modified by P.W. Draper to add colour to arrowheads with stipple */
+    if (Tk_CanvasPsColor(interp, canvas, linePtr->outline.color) != TCL_OK) {
+	return TCL_ERROR;
+    }
+
     if (stipple != None) {
 	Tcl_AppendResult(interp, "clip ", (char *) NULL);
 	if (Tk_CanvasPsStipple(interp, canvas, stipple)
