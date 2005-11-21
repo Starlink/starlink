@@ -11,6 +11,45 @@
 #include <string.h>
 #include <stdio.h>
 
+
+
+
+
+
+#include <fpu_control.h>
+#  if defined(__i386__)
+#    if !defined(_FPU_GETCW)
+#      define _FPU_GETCW(cw) (cw=__getfpucw())
+#    endif
+#    if !defined(_FPU_SETCW)
+#      define _FPU_SETCW(cw) (__setfpucw(cw))
+#    endif
+void
+fptrap (int i)
+{
+    unsigned int cw;
+    _FPU_GETCW(cw);
+    _FPU_SETCW(i==0 ? cw | _FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM :
+                       cw & ~(_FPU_MASK_ZM | _FPU_MASK_IM | _FPU_MASK_OM));
+}
+
+#  endif 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void clumps() {
 /*
 *+
@@ -31,11 +70,7 @@ void clumps() {
 
 *  Description:
 *     This application identifies clumps within a 1, 2 or 3 dimensional
-*     NDF. An output NDF can be created containing 
-
-It optionally produces 
-*     
-*     storing information about the clumps in the CUPID extension of the
+*     NDF, storing information about the clumps in the CUPID extension of the
 *     supplied NDF. Optionally, an output catalogue can be created containing 
 *     the clump parameters. The algorithm used to identify the clumps can be 
 *     chosen from a list of supported algorithms.
@@ -67,10 +102,11 @@ It optionally produces
 *        of the algorithm, followed by a dot, followed by the name of the
 *        parameter to be set. The parameters available for each algorithm
 *        are listed in the "Configuration Parameters" section below. Default 
-*        values will be used for any unspecified parameters. [current value]
+*        values will be used for any unspecified parameters. Unrecognised
+*        options are ignored (that is, no error is reported). [current value]
 *     ILEVEL = _INTEGER (Read)
-*        Controls the amount of information displayed on the screen. It
-*        should be in the range 0 to 5. A value of zero will suppress all 
+*        Controls the amount of diagnostic information reported. It
+*        should be in the range 0 to 6. A value of zero will suppress all 
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
@@ -81,10 +117,10 @@ It optionally produces
 *        CUPID package can be used to display this information in various 
 *        ways.
 *     MASK = _LOGICAL (Read)
-*        If true, then any Quality component in the supplied NDF is
-*        replaced by a mask which indicates if each pixel is inside or
-*        outside a clump. Two quality bits will be used; one is set if
-*        and only if the pixel is contained within one or more clumps,
+*        If true, then a Quality component is added to the supplied NDF
+*        (replacing any existing Quality component) indicating if each pixel 
+*        is inside or outside a clump. Two quality bits will be used; one is 
+*        set if and only if the pixel is contained within one or more clumps,
 *        the other is set if and only if the pixel is not contained within 
 *        any clump. These two quality bits have names associated with
 *        them which can be used with the KAPPA applications SETQUAL, 
@@ -106,7 +142,8 @@ It optionally produces
 *        output NDF will be the same shape and size as the input NDF, and will 
 *        inherit its AXIS, WCS and QUALITY components (plus any extensions). 
 *        The Data array will be filled with the sum of the fitted Gaussian 
-*        models for all the clumps which have been found. [!]
+*        models for all the clumps which have been found, and will include 
+*        the global background level. [!]
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
 *        No catalogue will be produced if a null (!) value is supplied [!]
@@ -116,13 +153,18 @@ It optionally produces
 *     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
 *     profile to the brightest peak in the data. It then subtracts the fit 
 *     from the data and iterates, fitting a new ellipse to the brightest peak 
-*     in the residuals. This continues until the standard deviation of
-*     the residuals reaches a minimum (note, this is different to the
-*     termination criterion used by Stutski & Gusten). Each fitted ellipse 
-*     is taken to be a single clump and is added to the output catalogue. In
-*     this algorithm, clumps may overlap. Any input variance component is
-*     used to scale the weight associated with each pixel value when
-*     performing the Gaussian fit.
+*     in the residuals. This continues until a series of consecutive fits
+*     are made which have peak values below a given multiple of the noise
+*     level. Each fitted ellipse is taken to be a single clump and is added 
+*     to the output catalogue. In this algorithm, clumps may overlap. Any 
+*     input variance component is used to scale the weight associated with 
+*     each pixel value when performing the Gaussian fit.
+*
+*     The most significant configuration parameters for this algorithm
+*     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine
+*     the minimum clump size, and GaussClumps.RMS and GaussClumps.Thresh
+*     which determine the termination criterion.
+
 *     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
 *     algorithm works by first contouring the data at a multiple of the
 *     noise, then searches for peaks of emission which locate the clumps,
@@ -149,20 +191,6 @@ It optionally produces
 *     the GaussClumps algorithm. The algorithm will terminate when
 *     "MaxClumps" clumps have been identified, or when one of the other 
 *     termination criteria is met. [unlimited]
-*     - GaussClumps.NPad: Specifies a termination criterion for the 
-*     GaussClumps algorithm. In general, the standard deviation of the
-*     residuals will drop each time a gausian fit to a clump is removed.
-*     However, this will stop when there are no gaussian clumps left.
-*     After this,  the standard deviation of the residuals will either
-*     remain constant or increase. The iterative fitting of clumps stops
-*     when the minimum standard deviation value is first reached. However, 
-*     to allow for the existence of local minima, a number of extra clumps
-*     will be fitted after a minimum is detected, on the chance that a
-*     lower minimum may be found. If no lower minimum is found, the extra 
-*     clumps are discarded. The NPad value is the number of extra clumps
-*     to fit once a minimum is found in the standard deviation of the 
-*     residuals. If it is zero or negative, clumps continue to be found until 
-*     one of the other termination criteria (such as MaxClumps) is reached. [10]
 *     - GaussClumps.MaxNF: The maximum number of evaluations of the
 *     objective function allowed when fitting an individual clump. Here,
 *     the objective function evaluates the chi-squared between the
@@ -174,10 +202,15 @@ It optionally produces
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
 *     noise are treated as zero. [0.5]
+*     - GaussClumps.NPad: Specifies a termination criterion for the 
+*     GaussClumps algorithm. The algorithm will terminate when "Npad" 
+*     consecutive clumps have been fitted all with peak values less than
+*     the threshold value specified by the "Thresh" parameter. [10]
 *     - GaussClumps.RMS: The RMS noise in the data. The default value is
 *     determined by the Variance component in the input data. If there is
 *     no Variance component, an estimate of the global noise level in the
-*     data is made and used. []
+*     data is made and used. The RMS value determines the termination
+*     criterion (see GaussClumps.Thresh and GaussClumps.NPad). []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
 *     the corresponding maximum value in the observed data (see the Stutski 
@@ -190,15 +223,19 @@ It optionally produces
 *     encourages the peak position of each fitted gaussian to be close to 
 *     the corresponding peak position in the observed data (see the Stutski 
 *     & Gusten paper). [1.0]
+*     - GaussClumps.Thresh: Gives the minimum peak amplitude of clumps to
+*     be fitted by the GaussClumps algorithm (see also GaussClumps.NPad).
+*     The value should be supplied as a multiple of the RMS noise level.
+*     (see GaussClumps.RMS). [20.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity FWHM of each clump is not allowed to be
-*     smaller than this value. [3.0]
+*     smaller than this value. Only used for 3D data. [3.0]
 *     - GaussClumps.VeloStart: An initial guess at the ratio of the typical 
 *     observed clump velocity width to the velocity resolution. This is used to
 *     determine the starting point for the algorithm which finds the best
 *     fitting Gaussian for each clump. If no value is supplied, the
 *     initial guess at the clump velocity width is based on the local profile
-*     around the pixel with peak value. []
+*     around the pixel with peak value. Only used for 3D data. []
 *     - GaussClumps.Wmin: This parameter, together with GaussClumps.Wwidth, 
 *     determines which input data values are used when fitting a Gaussian to 
 *     a given peak in the data array. It specifies the minimum weight
@@ -276,10 +313,11 @@ It optionally produces
    void *ipd;                   /* Pointer to Data array */
    void *ipo;                   /* Pointer to output Data array */
    
+fptrap(1);
+
+
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
-
-/* astSetWatchId( 4377 );  */
 
 /* Initialise things to safe values. */
    rmask = NULL;
@@ -394,7 +432,8 @@ It optionally produces
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
 
 /* Get the interaction level. */
-   parGdr0i( "ILEVEL", 1, 0, 5, 1, &ilevel, status );
+   parGdr0i( "ILEVEL", 1, 0, 6, 1, &ilevel, status );
+   if( ilevel > 0 ) msgBlank( status );
 
 /* If there is a variance array, map it and find the global RMS error. */
    ndfState( indf, "VARIANCE", &var, status );
@@ -412,9 +451,9 @@ It optionally produces
 
       if( n > 0 ) {
          rms = sqrtf( sum/n );
-         if( ilevel > 2 ) {
+         if( ilevel > 1 ) {
             msgSetd( "N", rms );
-            msgOut( "", "RMS noise from Variance component: ^N", status );
+            msgOut( "", "RMS noise estimated from Variance component: ^N", status );
          }
       } else {
          *status = SAI__ERROR;
@@ -427,9 +466,9 @@ It optionally produces
    } else {
       ipv = NULL;
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
-      if( ilevel > 2 ) {
+      if( ilevel > 1 ) {
          msgSetd( "N", rms );
-         msgOut( "", "RMS noise from Data component: ^N", status );
+         msgOut( "", "RMS noise estimated from Data component: ^N", status );
       }
    }
 
@@ -579,11 +618,6 @@ L999:
 
 /* End the AST context */
    astEnd;
-
-/*
-printf("\n\n NEED TO REMOVE THE CALL TO astListIssued IN CLUMPS.C\n\n");
-astListIssued( "At end of CLUMPS");
-*/
 
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */

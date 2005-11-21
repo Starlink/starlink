@@ -13,7 +13,8 @@
 extern CupidGC cupidGC;
 
 
-void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
+void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims,
+                                 char *aname ){
 /*
 *  Name:
 *     cupidGCDump<X>
@@ -22,7 +23,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 *     Dump the contents of the cupidGC structure.
 
 *  Synopsis:
-*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims )
+*     void cupidGCDump<X>( CGEN_TYPE *array, int ndim, int *dims, char *aname )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -36,6 +37,9 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
 *        The number of pixel axes.
 *     dims
 *        Pointer to the size of each pixel axis.
+*     name
+*        Only used if "array" is not NULL. It is a string giving the name
+*        of the NDF to produce.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -54,7 +58,6 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
    CGEN_TYPE *adata;
    int indf, place, i, el, lbnd[3], ubnd[3], np;
    double *data;
-   static int ii = 0;
    static int jj = 0;
    char name[ 100 ];
    FILE *fd;
@@ -66,9 +69,7 @@ void CGEN_FUNCTION(cupidGCDump)( CGEN_TYPE *array, int ndim, int *dims ){
          ubnd[ i ] = dims[ i ] + cupidGC.slbnd[ i ] - 1;
       }
 
-      sprintf( name, "array%d", ++ii );
-      printf("Dumping %s\n", name );
-      ndfOpen( DAT__ROOT, name, "WRITE", "NEW", &indf, &place, status );
+      ndfOpen( DAT__ROOT, aname, "WRITE", "NEW", &indf, &place, status );
       ndfNew( CGEN_HDS_TYPE, ndim, lbnd, ubnd, &place, &indf, status );
       ndfMap( indf, "DATA", CGEN_HDS_TYPE, "WRITE", (void *) &adata, &el, status );
       for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];

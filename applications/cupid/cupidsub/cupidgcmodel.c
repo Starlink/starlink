@@ -220,12 +220,13 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    change of the model value with respect to the required parameter. */
    } else {
 
-/* Handle 1D pronblems */
+/* Handle 1D problems */
       if( ndim == 1 ) {
          if( what == 2 ) {
             demdp = -2*x0_off/dx0_sq;
          } else if( what == 3 ) {
             demdp = x0_off/dx0_sq;
+            demdp = -2*demdp*demdp*par[ 3 ];
          } else {
             demdp = VAL__BADD;
          }

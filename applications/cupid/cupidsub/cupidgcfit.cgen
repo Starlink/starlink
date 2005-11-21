@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "cupid.h"
 #include "star/pda.h"
+#include <math.h>
 
 /* Local constants: */
 #define LV 71+CUPID__GCNP3*(CUPID__GCNP3+15)/2
@@ -68,6 +69,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 *     Non-zero if the fit was succesfully completed.
 
 *  Notes:
+*     - The peak intensity and background offset values returned in "x" 
+*     are in units of the RMS noise within the data.
 *     - This function can be invoked using the generic cupidGCFit macro 
 *     defined in cupid.h. This macro has the same parameter list as 
 *     cupidGCFit<X> except that an extra parameter is added to the start 
@@ -96,6 +99,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    int iv[ LIV ];            /* Flags controlling pdsSumsl */
    double v[ LV ];           /* Work array and control values for pdaSumsl */
 
+
 /* Initialise. */
    ret = 0;
 
@@ -115,6 +119,33 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
       n = CUPID__GCNP3;
    }
 
+/* This block of code is used for testing the calculation of gradients by
+   cupidGCcalg. Uncomment it when debugging gradient mis-calculations. 
+   {  double f;
+      double f0;
+      double g[ CUPID__GCNP3 ];
+      int nf;
+      double dx;
+
+      nf = 1;
+      cupidGCcalcf( n, x, &nf, &f0 );
+      cupidGCcalcg( n, x, &nf, g );
+      
+      for( i = 0; i < n; i++ ) {
+         nf++;
+         dx = 0.000001*x[ i ];
+         if( dx == 0.0 ) dx = 1.0E-6;
+         x[ i ] += dx;
+         cupidGCcalcf( n, x, &nf, &f );
+         printf("Par %d: %g %g %g\n", i, f, f0, dx );
+         printf("        %g %g\n", (f - f0)/dx, g[ i ] );
+         x[ i ] -= dx;
+      }
+      
+      return 0;
+   }
+*/
+
 /* Initialise an array of scale values for each parameter being fitted. */
    for( i = 0; i < n; i++ ) d[ i ] = 1.0;
 
@@ -130,6 +161,14 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
+
+/* Check none of the parameters are Nan */
+   for( i = 0; i < n; i++ ) {
+      if( !finite( x[ i ] ) ) {
+         ret = 0;
+         break;
+      }
+   }
 
 /* Return the final chi-squared value */
    *chisq = v[ 9 ];

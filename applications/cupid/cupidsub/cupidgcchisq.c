@@ -165,7 +165,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    for a few iterations near the start, and then allow the fitting
    process to complete with fixed weights. */
          if( cupidGC.nf > 2 && cupidGC.nf <= 2 + cupidGC.nwf ) {
-            if( res != 0.0 && m != 0.0 ) {
+            if( res != 0.0 && m != 0.0 && m != *pm ) {
                wf = ( res - *pu )/ res;
                wf /= ( m - *pm )/ m;
                wf = fabs( wf );
@@ -253,8 +253,8 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    if( what < 0 ) {
       ret = chisq;
 
-      if( cupidGC.ilevel > 4 ) {
-         cupidGCDumpF( NULL, 0, NULL ); 
+      if( cupidGC.ilevel > 5 ) {
+         cupidGCDumpF( NULL, 0, NULL, NULL ); 
 
          msgSeti( "NF", cupidGC.nf );
          msgOut( "", "   Fit attempt ^NF:", status );

@@ -265,19 +265,20 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                                                 ax_max, cupidGC.dax[ 0 ], 
                                                 rms, &off, cupidGC.x_max );
 
-   fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
-                                                ax_max, cupidGC.dax[ 1 ], 
-                                                rms, &off, cupidGC.x_max + 1 );
-
 /* Store the model centroid on internal axis 0 (i.e. axis 0 as used within
    the fitting algorithm). */
    par[ 2 ] = cupidGC.x_max[ 0 ];
 
-/* Ensure the observed fwhm on both spatial axes are equal to the mean of
-   the values found above. */
-   fwhm_obs[ 0 ] += fwhm_obs[ 1 ];
-   fwhm_obs[ 0 ] *= 0.5;
-   fwhm_obs[ 1 ] = fwhm_obs[ 0 ];
+/* If dealing with 2D data, ensure the observed fwhm on both spatial axes are 
+   equal to the mean of the values found for each individual axis. */
+   if( ndim > 1 ) {
+      fwhm_obs[ 1 ] = CGEN_FUNCTION(cupidGCProfWidth)( array, ndim, dims, imax, 
+                                                ax_max, cupidGC.dax[ 1 ], 
+                                                rms, &off, cupidGC.x_max + 1 );
+      fwhm_obs[ 0 ] += fwhm_obs[ 1 ];
+      fwhm_obs[ 0 ] *= 0.5;
+      fwhm_obs[ 1 ] = fwhm_obs[ 0 ];
+   }
 
 /* If a value for "fbeam" was supplied by the user, use it. Otherwise,
    divide the observed FWHM by the beam FWHM to get a default value for 

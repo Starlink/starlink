@@ -369,9 +369,9 @@ void makeclumps() {
 /* Add the clump into the output array. This also creates an HDS "Clump" 
    structure containing information about the clump. An HDS locator for 
    this new Clump structure is added into the "clist" ring. */
-      cupidGCUpdateArraysF( NULL, nel, ndim, dims, par, rms, trunc, 0,
+      cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
                             0, lbnd, clist + i*( DAT__SZLOC + 1), i, 
-                            0.0, 1, 0 );
+                            0.0, 1, 0, 0.0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];

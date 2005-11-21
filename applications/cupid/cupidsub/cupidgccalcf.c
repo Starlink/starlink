@@ -69,15 +69,11 @@ void cupidGCcalcf( int n, double *x, int *nf, double *f ){
 /* Calculate the chi squared value.*/
    *f = cupidGCChiSq( cupidGC.ndim, x, -1, newx );
 
-
-/*   cupidGCDumpF( NULL, 0, NULL ); */
-
 /* If a bad value was returned, indicate we cannot calculate the value.
    Return zero instead of VAL__BADD to avoid risk of numerical exceptions. */
    if( *f == VAL__BADD ) {
       *nf = 0;
       *f = 0.0;
    }
-
 }
 

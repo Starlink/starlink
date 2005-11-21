@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "cupid.h"
 #include "star/hds.h"
+#include <math.h>
 
 
 /* Global Variables: */
@@ -13,7 +14,6 @@
    cupidGCcalcg called by the PDA minimisation function. The contents of
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
-
 
 char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
                         double *ipv, double rms, AstKeyMap *config, int velax, 
@@ -40,7 +40,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     from the data and iterates, fitting a new ellipse to the brightest peak 
 *     in the residuals. This continues until a termination criterion is
 *     reached. The main termination criterion in this implementation is
-*     not the same as in the Stutski & Gusten paper. They had two main
+*     not quote the same as in the Stutski & Gusten paper. They had two main
 *     termination criteria; 1) the total data sum of the fitted gaussians
 *     is close to the total data sum of the original data, and 2) the peak
 *     residual is less than a given multiple of the RMS noise in the data.
@@ -49,12 +49,13 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the expected residuals depend not only on the RMS noise in the data
 *     but also on how accurately gaussian the clumps are, which is not
 *     known. Therefore, this implementation instead terminates when the 
-*     standard deviation of the residuals reaches a minimum.
+*     peak amplitude of the fitted clumps falls below a given fraction of
+*     the first (i.e. largest) fitted peak.
 *
 *     Two additional termination criteria are used; 1) If there are many
 *     failed attempts to fit a clump to the peak residual or if 2) a
 *     specified maximum number of clumps are found, then the process
-*     termaintes early.
+*     terminates early.
 
 *  Parameters:
 *     type
@@ -132,28 +133,38 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char *clist;         /* Pointer to list of returned HDS locators */
+   double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
+   double mean_peak;    /* The mean of the values within "peaks" */
    double mlim;         /* Truncation level for Gaussians */
+   double new_peak;     /* The value most recently added to "peaks" */
+   double nsig;         /* No.of standard deviations at which to reject peaks */
+   double old_peak;     /* The oldest value within "peaks" */
+   double peak_thresh;  /* The lower threshold for clump peak values */
+   double sigma_peak;   /* The standard deviation of the values within "peaks" */
+   double sum_peak2;    /* Sum of the squares of the values in "peaks" */
+   double sum_peak;     /* Sum of the values in "peaks" */
    double sumbg;        /* Sum of background estimates */
    double urms;         /* User-supplied RMS noise level */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
+   int allbad;          /* Are all the residuals bad? */
    int diag;            /* Is extra diagnostic information required? */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
    int iclump;          /* Number of clumps found so far */
    int imax;            /* Index of element with largest residual */
+   int ipeak;           /* Index within "peaks" at which to store the new peak */
    int iter;            /* Continue finding more clumps? */
-   int nbg;             /* Number of background estimates summed in sumbg */
-   int niter;           /* Iterations performed so far */
-   void *res;           /* Pointer to residuals array */
    int maxclump;        /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
+   int nbg;             /* Number of background estimates summed in sumbg */
+   int niter;           /* Iterations performed so far */
+   int npad;            /* No. of peaks below threshold for temination */
+   int npeak;           /* The number of elements in the "peaks" array. */
    int nskip;           /* No. of failed fits since last good fit */
-   double resdev;       /* The standard deviation of the residuals */
-   int allbad;          /* Are all the residuals bad? */
-   double resdevmin;    /* The minimum value of "resdev" found so far */
-   int npad;            /* No. of fits to perform after min rmsdev is reached */
+   int peaks_below;     /* Count of consecutive peaks below the threshold */
+   void *res;           /* Pointer to residuals array */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return NULL;
@@ -174,13 +185,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the maximum allowed number of failed fits between succesful fits. */
    maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI );
 
-/* The iterative process ends when the standard deviation of the
-   residuals is minimised. Since the standard deviation may not decrease
-   monotonically, we need to allow for the existence of local minima, and
-   continue past them to find a global minimum. For this reason, a number
-   of extra iterations will be performed after a minimum has been found,  
-   in order to check that a lower minimum does not exist. If no lower 
-   value is found, then the extra fits will be discarded. */
+/* The iterative process ends when "npad" consecutive clumps all had peak
+   values below "peak_thresh". */
    npad = cupidConfigI( gcconfig, "NPAD", 10 );
 
 /* Find the size of each dimension of the data array, and the total number
@@ -211,9 +217,9 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       urms = cupidConfigD( gcconfig, "RMS", VAL__BADD );
       if( urms != VAL__BADD ) {
          rms = urms;
-         if( ilevel > 2 ) {
+         if( ilevel > 1 ) {
             msgSetd( "N", rms );
-            msgOut( "", "User-supplied RMS noise: ^N", status );
+            msgOut( "", "User-supplied RMS noise estimate: ^N", status );
          }
 
 /* If the user did not supply an RMS value, access it again, this time
@@ -225,17 +231,21 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Tell the user what RMS value is being used. */
-      if( ilevel > 2 ) {
+      if( ilevel > 1 ) {
          msgSetd( "N", rms );
          msgOut( "", "RMS noise level actually used: ^N", status );
 
-      } else if( ilevel > 1 ) {
+      } else if( ilevel > 0 ) {
          msgSetd( "N", rms );
          msgOut( "", "RMS noise level used: ^N", status );
       }
 
+/* Set the lower threshold for clump peaks to a user-specified multiple
+   of the RMS noise. */
+      peak_thresh = cupidConfigD( gcconfig, "THRESH", 20.0 );
+
 /* Get the lowest value (normalised to the RMS noise level) at which
-   model Gaussian should be evaluated. */
+   model Gaussians should be evaluated. */
       mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5 );
 
 /* Initialise the number of clumps found so far. */
@@ -248,9 +258,19 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       sumbg = 0.0;
       nbg = 0;
 
-/* Initialise the minimum value found so far for the standard deviation
-   of the residuals. */
-      resdevmin = VAL__MAXD;
+/* Indicate that no peaks have been found below the lower threshold for clump 
+   peak values. */
+      peaks_below = 0;
+
+/* Initialise the variables used to keep track of the mean and standard
+   deviation of the most recent "npeak" fitted peak values. */
+      nsig = cupidConfigD( gcconfig, "NSIGMA", 3.0 );
+      npeak = cupidConfigI( gcconfig, "NPEAK", 9 );
+      ipeak = 0;
+      sum_peak = 0.0;
+      sum_peak2 = 0.0;
+      peaks = astMalloc( sizeof( double )*npeak );
+      for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
@@ -261,7 +281,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Report the iteration number to the user if required. */
          ++niter;         
-         if( ilevel > 2 ) {
+         if( ilevel > 3 ) {
             msgBlank( status );
             msgSetd( "N", niter );
             msgOut( "", "Iteration ^N:", status );
@@ -274,9 +294,22 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Finish iterating if all the residuals are bad, or if too many iterations 
    have been performed since the last succesfully fitted clump. */
-         if( allbad || nskip > maxskip ) {
+         if( allbad ) {    
             iter = 0;
-            *nclump = iclump;
+            if( ilevel > 1 ) msgBlank( status );
+            if( ilevel > 3 ) {
+               msgOut( "", "There are no good pixels left to be fitted.", 
+                       status );
+               msgBlank( status );
+            }
+         } else if( nskip > maxskip ){
+            iter = 0;
+            if( ilevel > 1 ) msgBlank( status );
+            if( ilevel > 3 ) {
+               msgSeti( "N", maxskip );
+               msgOut( "", "The previous ^N fits were unusable.", status );
+               msgBlank( status );
+            }
          }
 
 /* If not, make an initial guess at the Gaussian clump parameters centred
@@ -285,69 +318,119 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
                             iclump, velax, x, slbnd );
 
-/* Find the best fitting parameters, starting from the above initial
-   guess. If succesful, increment the number of clumps found. */
+/* Find the best fitting parameters, starting from the above initial guess. 
+   This returns a function value of zero if no fit could be performed. */
             if( cupidGCFit( type, res, imax, x, &chisq ) ) {
-               iclump++;
+
+/* Skip this fit if we have an estimate of the standard deviation of the
+   "npeak" most recent clump peak values, and the peak value of the clump
+   just fitted is a long way (more than NSIGMA standard deviations) from the 
+   peak value of the previously fitted clump. */
+               if( npeak == 0 || iclump < npeak || 
+                   fabs( x[ 0 ] - new_peak ) < nsig*sigma_peak ) {
+
+/* Record the new peak value for use with the next peak, and update the 
+   standard deviation of the "npeak" most recent peaks. These values are
+   stored cyclically in the "peaks" array. */
+                  if( npeak > 0 ) {
+                     new_peak = x[ 0 ];
+                     old_peak = peaks[ ipeak ];
+                     peaks[ ipeak ] = new_peak;
+                     if( ++ipeak == npeak ) ipeak = 0;
+                     sum_peak += new_peak - old_peak;
+                     sum_peak2 += new_peak*new_peak - old_peak*old_peak;
+                     mean_peak = sum_peak/npeak;
+                     sigma_peak = sqrt( sum_peak2/npeak - mean_peak*mean_peak );
+                  }
+
+/* Increment the number of peaks found. */
+                  iclump++;
 
 /* Reset the number of failed fits since the last good fit. */
-               nskip = 0;
+                  nskip = 0;
 
 /* Increment the sum of the background estimates. */
-               sumbg += x[ 1 ]*rms;
-               nbg++;
+                  sumbg += x[ 1 ]*rms;
+                  nbg++;
 
 /* Extend the returned array of HDS Clump structures to include room for
    the new one. This list is actually a long character string containing
    room for "iclump" HDS locators. */
-               clist = astGrow( clist, iclump, DAT__SZLOC + 1 );
+                  clist = astGrow( clist, iclump, DAT__SZLOC + 1 );
 
 /* Remove the model fit (excluding the background) from the residuals
    array. This also creates a HDS "Clump" structure containing information 
    about the clump. An HDS locator for this new Clump structure is added 
    into the "clist" ring. The standard deviation of the new residuals is 
    returned. */
-               resdev = cupidGCUpdateArrays( type, res, el, ndim, dims,
-                                     x, rms, mlim, imax, ilevel, slbnd,    
-                                     clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
-                                     iclump, sumbg, nbg, diag );
+                  cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
+                                       x, rms, mlim, imax, ilevel, slbnd,    
+                                       clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
+                                       iclump, sumbg, nbg, diag, mean_peak );
 
 /* Display the clump parameters on the screen if required. */
-               cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
-                                 rms, resdev );
+                  cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
+                                    rms );
+
+/* If this clump has a peak value which is below the threshold, increment
+   the count of consecutive clumps with peak value below the threshold.
+   Otherwise, reset this count to zero. */
+                  if( x[ 0 ] < peak_thresh ) {
+                     peaks_below++;
+                  } else {
+                     peaks_below = 0;
+                  }
 
 /* If the maximum number of clumps have now been found, exit.*/
-               if( iclump == maxclump ) {
-                  iter = 0;
+                  if( iclump == maxclump ) {
+                     iter = 0;
 
-/* If we are not using the NPad criterion, ensure all located clumps are
-   retuned in the catalogue. */
-               } else if( npad <= 0 ) {
-                  *nclump = iclump;
+                     if( ilevel > 1 ) msgBlank( status );
+                     if( ilevel > 3 ) {
+                        msgSeti( "M", maxclump );
+                        msgOut( "", "The specified maximum number of "
+                                "clumps (^M) have been found.", status );
+                        msgBlank( status );
+                     }
 
-/* If the standard deviation of the residuals is lower than the lowest
-   value found so far, record it. */
-               } else if( resdev < resdevmin ){
-                  resdevmin = resdev;
-                  *nclump = iclump;
+/* If the count of consecutive peaks below the threshold has reached
+   "Npad", terminate. */
+                  } else if( peaks_below == npad ) {
+                     iter = 0;
+ 
+                     if( ilevel > 1 ) msgBlank( status );
+                     if( ilevel > 3 ) {
+                        msgSeti( "N", npad );
+                        msgOut( "", "The previous ^N clumps all had peak "
+                                "values below the threshold.", status );
+                        msgBlank( status );
+                     }
+                  }
 
-/* If the standard deviation of the residuals has not decreased over
-   the recently found clumps, then exit, forgetting all the clumps found
-   since the clump which resulted in the lowest standard devistion for
-   the residuals. */
-               } else if( iclump - *nclump > npad ){
-                  iter = 0;
+/* If the peak value fitted is very different from the previous fitted peak
+   value, set the residuals array element bad in order to prevent the
+   algorithm from trying to fit a peak to the same pixel again. */
+               } else {
+                  if( type == CUPID__DOUBLE ) {
+                     ((double *)res)[ imax ] = VAL__BADD;
+                  } else {
+                     ((float *)res)[ imax ] = VAL__BADR;
+                  }
+
+                  nskip++;
+                  if( ilevel > 3 ) msgOut( "", "   Clump rejected due to "
+                                           "aberrant peak value.", status );
                }
 
 /* Tell the user if no clump could be fitted around the current peak
    pixel value */
-            } else if( ilevel > 2 ) {
+            } else {
                nskip++;
-               msgOut( "", "   No clump fitted.", status );
+               if( ilevel > 3 ) msgOut( "", "   No clump fitted.", status );
             }
 
 /* Tell the user if one of the trmination criteria has ben met. */
-         } else if( ilevel > 2 ) {
+         } else if( ilevel > 3 ) {
             msgOut( "", "   At least one termination criterion has been reached.", status );
             msgBlank( status );
          }
@@ -357,7 +440,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Tell the user the mean background level, and return it. */
    if( nbg > 0 ) {
       *bg = sumbg/nbg;
-      if( ilevel > 2 ) {
+      if( ilevel > 2) {
          msgSetd( "BG", *bg );
          msgOut( "", "Estimated background level = ^BG", status );
       }
@@ -365,35 +448,37 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       *bg = 0.0;
    }
 
-/* Tell the user how many of the iterations resulted in a succesful fit
-   to a peak. */
+/* Tell the user how clumps are being returned. */
+   *nclump = iclump;
    if( ilevel > 0 ) {
-      if( iclump == 0 ) {
+      if( *nclump == 0 ) {
          msgOut( "", "No clumps found", status );
-      } else if( iclump == 1 ){
+      } else if( *nclump == 1 ){
          msgOut( "", "One clump found", status );
       } else {
          msgSeti( "N", *nclump );
          msgOut( "", "^N clumps found", status );
       }
-      msgBlank( status );
    }
 
 /* Tell the user how many iterations have been performed (i.e. how many
    attempts there have been to fit a Gaussian peak). */
-   if( ilevel > 2 ) {
+   if( ilevel > 3 ) {
       if( niter == 1 ){
          msgOut( "", "No fit attempted", status );
       } else {
-         msgSeti( "M", niter - iclump - 1 );
+         msgSeti( "M", niter - *nclump - 1 );
          msgSeti( "N", niter - 1 );
          msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
       }
    }
 
+   if( ilevel > 0 ) msgBlank( status );
+
 /* Free resources */
    res = astFree( res );
    dims = astFree( dims );
+   peaks = astFree( peaks );
 
    cupidGC.data = astFree( cupidGC.data );
    cupidGC.weight = astFree( cupidGC.weight );
@@ -403,7 +488,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.model = astFree( cupidGC.model );
    cupidGC.resids = astFree( cupidGC.resids );
 
-   gcconfig =astAnnul( gcconfig );
+   gcconfig = astAnnul( gcconfig );
 
 /* Return the list of clump structure locators. */
    return clist;

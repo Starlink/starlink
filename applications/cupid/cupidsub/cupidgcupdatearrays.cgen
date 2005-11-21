@@ -12,11 +12,12 @@
    cupidGaussClumps, and its contents are initialised by this function. */
 extern CupidGC cupidGC;
 
-double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
+void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
                                            int *dims, double *par, double rms,
                                            double mlim, int imax, int ilevel, 
                                            int *lbnd, char *cloc, int iclump, 
-                                           double sumbg, int nbg, int diag ){
+                                           double sumbg, int nbg, int diag, 
+                                           double mean_peak ){
 
 /*
 *  Name:
@@ -26,21 +27,23 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *     Remove the fit from the residuals array.
 
 *  Synopsis:
-*     double cupidGCUpdateArrays<X>( CGEN_TYPE *res, int nel, int ndim,
-*                                    int *dims, double *par, double rms,
-*                                    double mlim, int imax, int ilevel, 
-*                                    int *lbnd, char *cloc, int iclump, 
-*                                    double sumbg, int nbg, int diag )
+*     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, 
+*                                    int ndim, int *dims, double *par, 
+*                                    double rms, double mlim, int imax, 
+*                                    int ilevel, int *lbnd, char *cloc, 
+*                                    int iclump, double sumbg, int nbg, 
+*                                    int diag, double mean_peak )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
-*     (it does not remove the backgroudd level), and returns the standard
-*     deviation of the resulting residuals. It also creates an HDS structure 
-*     containing a description of the clump.
+*     (it does not remove the backgroudd level). It also creates an HDS 
+*     structure containing a description of the clump.
 
 *  Parameters:
 *     res
 *        Pointer to the start of the residuals array. May be NULL.
+*     ipd
+*        Pointer to the start of the supplied data array. May be NULL.
 *     nel
 *        The number of elements in the supplied array. 
 *     ndim
@@ -76,9 +79,8 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 *        The number of background estimates made so far.
 *     diag
 *        Include extra diagnostic information in output catalogue?
-
-*  Returned Value:
-*     The standard deviation of the modified residuals.
+*     mean_peak
+*        The mean value of the most recent fitted peak values.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -105,6 +107,7 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    AstKeyMap *extra;      /* Keymap holding extra diagnostic information */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
    CGEN_TYPE r;           /* Current residual value */
+   char name[ 40 ];       /* Buffer for NDF name to receive dumped residuals */
    double *mlist;         /* Pointer to list holding model valus */
    double bg;             /* Background for model */
    double d;              /* Displacement from initial peak position */
@@ -112,11 +115,17 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    double maxr;           /* Maximum remaining residual value */
    double meanr;          /* Mean of remaining residual values */
    double minr;           /* Minimum remaining residual value */
+   double sc1;            /* Sum for numerator of correlation of data and resids */
+   double sc2;            /* Sum for denominator of correlation of data and resids */
+   double sc3;            /* Sum for denominator of correlation of data and resids */
    double shiftsq;        /* Square of displacement from initial peak position */
    double sigr;           /* Std dev of remaining residual values */
    double sum;            /* Integrated clump intensity */
    double sumr2;          /* Sum of squares of remaining residual values */
    double sumr;           /* Sum of remaining residual values */
+   double summ;           /* Sum of model values */
+   double t1;             /* Temporary storage */
+   double t2;             /* Temporary storage */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int *plist;            /* Pointer to list holding pixel indices */
@@ -146,7 +155,7 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
    static double sum0;    /* Sum of original data values */
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return 0.0;
+   if( *status != SAI__OK ) return;
 
 /* If diagnostic info is being produced, and we have not yet saved the sum
    of the residuals, do so now before they are modified. */
@@ -334,14 +343,21 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 /* Re-instate the original backgound value. */
    par[ 1 ] = bg;
 
+/* Store the mean background found so far. */
+   bg = ( nbg > 0 ) ? sumbg/nbg : 0.0;
+
 /* Get the statistics of the modified residuals. */
    minr = VAL__MAXD;
    maxr = -VAL__MAXD;
    sumr = 0.0;
    sumr2 = 0.0;
+   sc1 = 0.0;
+   sc2 = 0.0;
+   sc3 = 0.0;
+   summ = 0.0;
    nr = 0;
 
-   if( res ) {
+   if( res && ipd ) {
       for( i = 0; i < nel; i++ ) {
          if( res[ i ] != CGEN_BAD ) {
             r = res[ i ];
@@ -350,6 +366,13 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
             sumr += r;
             sumr2 += r*r;
             nr++;
+
+            t1 = ipd[ i ] - bg;
+            t2 = ipd[ i ] - r;
+            sc1 += t1*t2;
+            sc2 += t1*t1;
+            sc3 += t2*t2;
+            summ += t2;
          }
       }
    
@@ -371,6 +394,12 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
          msgSeti( "N", area_off );
          msgOut( "", "   (the clump overlaps the edge of the data array)", status );
       }
+   }
+
+/* Dump the residuals to disk if required. */
+   if( ilevel > 4 ) {
+      sprintf( name, "clump_residuals%d", iclump ); 
+      CGEN_FUNCTION(cupidGCDump)( res, ndim, dims, name );   
    }
 
 /* If required, create an HDS structure holding information about the
@@ -407,16 +436,14 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
          }
 
          astMapPut0D( extra, "SHIFT", sqrt(shiftsq), NULL );
-         astMapPut0D( extra, "BG", sumbg/nbg, NULL );
-         astMapPut0D( extra, "BGSUM", nr*sumbg/nbg, NULL );
-         astMapPut0D( extra, "GONE", sum0 - sumr, NULL );
-         astMapPut0D( extra, "LEFT", sumr - nr*sumbg/nbg, NULL );
-         astMapPut0D( extra, "MINR", minr, NULL );
+         astMapPut0D( extra, "BG", bg, NULL );
          astMapPut0D( extra, "MAXR", maxr, NULL );
          astMapPut0D( extra, "SUMR", sumr, NULL );
+         astMapPut0D( extra, "SUMM", summ, NULL );
          astMapPut0D( extra, "MEANR", meanr, NULL );
          astMapPut0D( extra, "SIGMAR", sigr, NULL );
-         astMapPut0D( extra, "NR", (double) nr, NULL );
+         astMapPut0D( extra, "CORR", sc1/sqrt(sc2*sc3), NULL );
+         astMapPut0D( extra, "MEANPEAK", mean_peak, NULL );
 
       } else {
          extra = NULL;
@@ -432,9 +459,6 @@ double CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, int nel, int ndim,
 
    mlist = astFree( mlist );
    plist = astFree( plist );
-
-/* Return the standard deviation of the modified residuals. */
-   return sigr;
 
 }
 

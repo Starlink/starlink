@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
-                       int *lbnd, int ilevel, double rms, double resdev ){
+                       int *lbnd, int ilevel, double rms ){
 /*
 *  Name:
 *     cupidGCListClump
@@ -13,7 +13,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( int iclump, int ndim, double *par, double chisq, 
-*                            int *lbnd, int ilevel, double rms, double resdev )
+*                            int *lbnd, int ilevel, double rms )
 
 *  Description:
 *     This function adds a clump to the output list. 
@@ -34,9 +34,6 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 *        The amount of information to display to standard output.
 *     rms
 *        The RMS noise level.
-*     resdev
-*        The standard deviation of the residuals after subtraction of the
-*        clump.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -67,46 +64,47 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
    }
 
 /* Report information to standard output if requested. */
-   if( ilevel > 2 ) {
-
+   if( ilevel == 2 || ilevel == 3 ) {
+      msgBlank( status );
+      msgSeti( "N", iclump );
+      msgOut( "", "Clump ^N:", status );
+   } else if( ilevel > 3 ) {
       msgSeti( "N", iclump );
       msgOut( "", "   Storing clump ^N:", status );
+   }
 
+   if( ilevel > 2 ) {
       msgSetd( "V", chisq );
       msgOut( "", "   Chi-squared: ^V", status );
 
       msgSetd( "V", par[ 0 ]*rms );
-      msgOut( "", "      Peak intensity: ^V", status );
+      msgOut( "", "   Peak intensity: ^V", status );
       msgSetd( "V", par[ 1 ]*rms );
-      msgOut( "", "      Constant background: ^V", status );
+      msgOut( "", "   Constant background: ^V", status );
       msgSetd( "V", par[ 2 ] + lbnd[ 0 ] - 1.5 );
-      msgOut( "", "      Centre on 1st axis: ^V", status );
+      msgOut( "", "   Centre on 1st axis: ^V", status );
       msgSetd( "V", par[ 3 ] );
-      msgOut( "", "      FWHM on 1st axis: ^V", status );
+      msgOut( "", "   FWHM on 1st axis: ^V", status );
 
       if( ndim > 1 ) {
          msgSetd( "V", par[ 4 ] + lbnd[ 1 ] - 1.5 );
-         msgOut( "", "      Centre on 2nd axis: ^V", status );
+         msgOut( "", "   Centre on 2nd axis: ^V", status );
          msgSetd( "V", par[ 5 ] );
-         msgOut( "", "      FWHM on 2nd axis: ^V", status );
+         msgOut( "", "   FWHM on 2nd axis: ^V", status );
          msgSetd( "V", par[ 6 ] );
-         msgOut( "", "      Position angle: ^V", status );
+         msgOut( "", "   Position angle: ^V", status );
 
          if( ndim > 2 ) {
             msgSetd( "V", par[ 7 ] + lbnd[ 2 ] - 1.5 );
-            msgOut( "", "      Centre on vel axis: ^V", status );
+            msgOut( "", "   Centre on vel axis: ^V", status );
             msgSetd( "V", par[ 8 ] );
-            msgOut( "", "      FWHM on vel axis: ^V", status );
+            msgOut( "", "   FWHM on vel axis: ^V", status );
             msgSetd( "V", par[ 9 ] );
-            msgOut( "", "      Vel gradient on 1st axis: ^V", status );
+            msgOut( "", "   Vel gradient on 1st axis: ^V", status );
             msgSetd( "V", par[ 10 ] );
-            msgOut( "", "      Vel gradient on 2nd axis: ^V", status );
+            msgOut( "", "   Vel gradient on 2nd axis: ^V", status );
          }
       }
-
-      msgSetd( "R", resdev );
-      msgOut( "", "   Std. devn of residuals: ^R", status );
-
    }
 }
 
