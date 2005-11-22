@@ -65,7 +65,7 @@ datCell( HDSLoc   *locator1,
 
 int
 datClen( HDSLoc   *locator,
-         int      *clen,
+         size_t   *clen,
          int      *status );
 
 /*===========================*/
@@ -123,7 +123,7 @@ datErase(HDSLoc   *locator,
 
 int
 datErmsg(int      *status,
-         int      *len,
+         size_t   *len,
          char     **msg_str);
 
 /*================================*/
@@ -157,7 +157,7 @@ datGetC(HDSLoc    *locator,
         int       ndim,
         hdsdim    dims[],
         char      values[],
-        int       char_len,
+        size_t    char_len,
         int       *status);
 
 /*=====================================*/
@@ -205,6 +205,41 @@ datGetR(HDSLoc    *locator,
         int       *status);
 
 /*======================================*/
+/* datGet0C - Read scalar string value  */
+/*======================================*/
+
+int
+datGet0C( HDSLoc * loc, char * value, size_t len, int * status );
+
+/*======================================*/
+/* datPut0D - Read scalar double value  */
+/*======================================*/
+
+int
+datGet0D( HDSLoc * loc, double * value, int * status );
+
+/*=====================================*/
+/* datGet0R - Read scalar float value  */
+/*=====================================*/
+
+int
+datGet0R( HDSLoc * loc, float * value, int * status );
+
+/*=======================================*/
+/* datGet0I - Read scalar integer value  */
+/*=======================================*/
+
+int
+datGet0I( HDSLoc * loc, int * value, int * status );
+
+/*=======================================*/
+/* datGet0L - Read scalar logical value  */
+/*=======================================*/
+
+int
+datGet0L( HDSLoc * loc, int * value, int * status );
+
+/*======================================*/
 /* datIndex - Index into component list */
 /*======================================*/
 
@@ -220,7 +255,7 @@ datIndex(HDSLoc   *locator1,
 
 int
 datLen(HDSLoc     *locator,
-       int        *len,
+       size_t     *len,
        int        *status);
 
 /*===========================*/
@@ -367,7 +402,7 @@ datNew( HDSLoc    *locator,
 int
 datNewC(HDSLoc    *locator,
         char      *name_str,
-        int       len,
+        size_t    len,
         int       ndim,
         hdsdim    dims[],
         int       *status);
@@ -409,7 +444,7 @@ datPutC( HDSLoc *locator,
          int       ndim,
          hdsdim dims[],
          char      *string,
-         int       string_length,
+         size_t    string_length,
          int       *status);
 
 /*====================================*/
@@ -502,8 +537,6 @@ datPut0I( HDSLoc * loc, int value, int * status );
 
 int
 datPut0L( HDSLoc * loc, int value, int * status );
-
-
 
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
@@ -785,8 +818,8 @@ hdsTrace(HDSLoc *locator,
          char *path_str,
          char *file_str,
          int  *status,
-         int  path_length,
-         int  file_length);
+         size_t path_length,
+         size_t file_length);
 
 /*========================================*/
 /* hdsTune - Set HDS tuning parameter     */
