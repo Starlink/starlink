@@ -15,7 +15,7 @@ extern CupidGC cupidGC;
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
                                            int *dims, double *par, double rms,
                                            double mlim, int imax, int ilevel, 
-                                           int *lbnd, char *cloc, int iclump, 
+                                           int *lbnd, HDSLoc **cloc, int iclump, 
                                            double sumbg, double swbg, int diag,
                                            double mean_peak ){
 
@@ -30,7 +30,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, 
 *                                    int ndim, int *dims, double *par, 
 *                                    double rms, double mlim, int imax, 
-*                                    int ilevel, int *lbnd, char *cloc, 
+*                                    int ilevel, int *lbnd, HDSLoc **cloc, 
 *                                    int iclump, double sumbg, double swbg, 
 *                                    int diag, double mean_peak )
 
@@ -68,9 +68,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
 *     cloc
-*        Pointer to a string to recieve an HDS locator for a newly
-*        created structure describing the clump. This pointer may be NULL
-*        in which case no HDS structure is created.
+*        Pointer to a location at which to store a pointer to an HDS locator 
+*        for a newly created structure describing the clump. This pointer may 
+*        be NULL in which case no HDS structure is created.
 *     iclump
 *        Clump index.
 *     sumbg

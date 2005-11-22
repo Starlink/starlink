@@ -6,7 +6,7 @@
 #include "cupid.h"
 #include <string.h>
 
-void cupidStoreConfig( char *loc, AstKeyMap *config ){
+void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 /*
 *  Name:
 *     cupidStoreConfig
@@ -15,7 +15,7 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
 *     Store the configuraton used by CLUMPS in the given CUPID extension.
 
 *  Synopsis:
-*     void cupidStoreConfig( char *loc, AstKeyMap *config )
+*     void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config )
 
 *  Description:
 *     This function extracts each keyword/value pair from the given 
@@ -41,9 +41,9 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
 */      
 
 /* Local Variables: */
-   Grp *grp;              /* Pointer to group */
-   char aloc[ DAT__SZLOC + 1 ];/* HDS locator for entire CONFIG array */
-   char cloc[ DAT__SZLOC + 1 ];/* HDS locator for single cell of ONFIG array */
+   Grp *grp;             /* Pointer to group */
+   HDSLoc *aloc;         /* HDS locator for entire CONFIG array */
+   HDSLoc *cloc;         /* HDS locator for single cell of ONFIG array */
    char name[ GRP__SZNAM + 1 ];/* Value extracted from GRP group */
    char *pname;          /* Pointer to pass to grpGet */
    int el;               /* Index of element to store */
@@ -78,21 +78,22 @@ void cupidStoreConfig( char *loc, AstKeyMap *config ){
 /* Create a suitable array of character strings in the CUPID extension,
    and get a locator for the whole array. */
       datNewC( loc, "CONFIG", ncmax + 1, 1, &n, status );
-      datFind( loc, "CONFIG", aloc, status );
+      aloc = NULL;
+      datFind( loc, "CONFIG", &aloc, status );
 
 /* Store each list item in the new array. */
       el = 1;
       for( i = 0; i < n; i++ ) {
          subs[ 0 ]= i + 1;
-         datCell( aloc, 1, subs, cloc, status );
+         datCell( aloc, 1, subs, &cloc, status );
          grpGet( grp, subs[ 0 ], 1, &pname, GRP__SZNAM + 1, status );
          nc = astChrLen( pname );
          datPutC( cloc, 0, &el, pname, astChrLen( name ), status );
-         datAnnul( cloc, status );
+         datAnnul( &cloc, status );
       }
 
 /* Free resources. */
-      datAnnul( aloc, status );
+      datAnnul( &aloc, status );
    }
 
 /* Delete the group */

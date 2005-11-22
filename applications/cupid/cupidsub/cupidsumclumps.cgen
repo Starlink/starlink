@@ -6,7 +6,7 @@
 
 
 void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel, 
-                                    char *clist, int nclump, double bg, 
+                                    HDSLoc **clist, int nclump, double bg, 
                                     float *rmask, CGEN_TYPE *out ){
 /*
 *  Name:
@@ -18,8 +18,8 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 
 *  Synopsis:
 *     void cupidSumClumps<X>( int ndim, int *lbnd, int *ubnd, int nel, 
-*                             char *clist, int nclump, double bg, float *rmask,
-*                             CGEN_TYPE *out )
+*                             HDSLoc **clist, int nclump, double bg, 
+*                             float *rmask, CGEN_TYPE *out )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
@@ -36,9 +36,8 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 *     nel
 *        Number of pixels in each of "out" and "rmask".
 *     clist
-*        A pointer to a character string containing a list of "nclump"
-*        HDS locators, each occupying ( DAT__SZLOC + 1 ) elements of the
-*        array. These locators will be annulled before returning.
+*        A pointer to an array of "nclump" HDS locators. These locators will 
+*        be annulled before returning.
 *     nclump
 *        The number of locators in "clist".
 *     bg
@@ -77,7 +76,6 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 
 /* Local Variables: */
    CGEN_TYPE *p;        /* Pointer to next element of the "out" array */
-   char *loc;           /* Pointer to HDS locator */
    double *ipd;         /* Pointer to data array in clump NDF */
    double *m;           /* Pointer to next clump data value */
    float *r;            /* Pointer to next element of the "rmask" array */
@@ -118,12 +116,11 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
    }
 
 /* Loop round all clumps. */
-   loc = clist;
    for( j = 0; j < nclump; j++ ) {
 
 /* The component named MODEL contains an NDF holding the clump model values. 
    Get an NDF identifier for it. */
-      ndfOpen( loc, "MODEL", "READ", "OLD", &indf, &place, status );
+      ndfOpen( clist[ j ], "MODEL", "READ", "OLD", &indf, &place, status );
 
 /* Get its bounds and its dimensions. */
       ndfBound( indf, 3, clbnd, cubnd, &cndim, status );
@@ -175,8 +172,6 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );
 
-/* Get the next supplied clump locator. */
-      loc += DAT__SZLOC + 1;
    }
 
 }

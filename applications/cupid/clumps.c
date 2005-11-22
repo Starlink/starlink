@@ -262,15 +262,15 @@ void clumps() {
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
-   char *clist;                 /* List of HDS locators for Clump structures */
+   HDSLoc **clist;              /* List of HDS locators for Clump structures */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
-   char qlocs[ 5 ][ DAT__SZLOC + 1 ]; /* HDS locators for quality name information */
-   char xloc[ DAT__SZLOC + 1 ]; /* HDS locator for CUPID extension */
+   IRQLocs *qlocs;              /* HDS locators for quality name information */
+   HDSLoc *xloc;                /* HDS locator for CUPID extension */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
@@ -313,6 +313,7 @@ void clumps() {
 /* Initialise things to safe values. */
    rmask = NULL;
    clist = NULL;
+   xloc = NULL;
 
 /* Start an AST context */
    astBegin;
@@ -547,7 +548,7 @@ void clumps() {
    one. */
       ndfXstat( indf, "CUPID", &there, status );
       if( there ) ndfXdel( indf, "CUPID", status );
-      ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+      ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* If a quality mask is being added to the input NDF... */
       if( mask ) {
@@ -555,7 +556,7 @@ void clumps() {
 /* Delete any existing quality name information from the supplied NDF, and 
    create a structure to hold new quality name info. */
          irqDelet( indf, status ); 
-         irqNew( indf, "CUPID", qlocs, status );
+         irqNew( indf, "CUPID", &qlocs, status );
 
 /* Add in two quality names; "CLUMP"and "BACKGROUND". */
          irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
@@ -579,11 +580,11 @@ void clumps() {
 /* Release the quality name information. */
       if( mask ) {
          rmask = astFree( rmask );
-         irqRlse( qlocs, status );
+         irqRlse( &qlocs, status );
       }
 
 /* Relase the extension locator.*/
-      datAnnul( xloc, status );
+      datAnnul( &xloc, status );
    }
 
 /* Tidy up */

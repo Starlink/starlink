@@ -195,9 +195,9 @@ void makeclumps() {
 */      
 
 /* Local Variables: */
-   char *clist;                  /* Pointer to list of HDS locators */
+   HDSLoc **clist;               /* Pointer to list of HDS locators */
    char text[ 8 ];               /* Value of PARDIST parameter */
-   char xloc[ DAT__SZLOC + 1 ];  /* HDS locator for CUPID extension */
+   HDSLoc *xloc;                 /* HDS locator for CUPID extension */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
@@ -239,6 +239,9 @@ void makeclumps() {
 
 /* Start an NDF context */
    ndfBegin();
+
+/* INitialise pointers. */
+   xloc = NULL;
 
 /* Get the required axis bounds. */
    parGet1i( "LBND", 3, lbnd, &ndim, status );
@@ -361,17 +364,15 @@ void makeclumps() {
          }
       }
 
-/* Extend the array of HDS Clump structures to include room for the new one. 
-   This list is actually a long character string containing room for "i" 
-   HDS locators. */
-      clist = astGrow( clist, i + 1, DAT__SZLOC + 1 );
+/* Extend the array of HDS Clump structures to include room for the new
+   one. */
+      clist = astGrow( clist, i + 1, sizeof( HDSLoc *) );
 
 /* Add the clump into the output array. This also creates an HDS "Clump" 
    structure containing information about the clump. An HDS locator for 
    this new Clump structure is added into the "clist" ring. */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, clist + i*( DAT__SZLOC + 1), i, 
-                            0.0, 1, 0, 0.0 );
+                            0, lbnd, clist + i, i, 0.0, 1, 0, 0.0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -394,7 +395,7 @@ void makeclumps() {
    }
 
 /* Create a CUPID extension in the output model NDF.*/
-   ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, xloc, status );
+   ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* Store the clump properties in the output catalogue. This also annuls the 
    HDS locators stored within "clist". */
@@ -402,7 +403,7 @@ void makeclumps() {
                      "Output from CUPID:MAKECLUMPS" );
 
 /* Relase the extension locator.*/
-   datAnnul( xloc, status );
+   datAnnul( &xloc, status );
 
 /* End the NDF context */
    ndfEnd( status );

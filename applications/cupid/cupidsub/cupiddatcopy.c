@@ -3,7 +3,7 @@
 #include "mers.h"
 #include "cupid.h"
 
-void cupidDatCopy( char *loc1, char *loc2 ){
+void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
 /*
 *  Name:
 *     cupidDatCopy
@@ -12,7 +12,7 @@ void cupidDatCopy( char *loc1, char *loc2 ){
 *     Copy an HDS structure into a given structure.
 
 *  Synopsis:
-*     void cupidDatCopy( char *loc1, char *loc2 )
+*     void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 )
 
 *  Description:
 *     This function copies the HDS structure located by "loc1" into the HDS
@@ -40,7 +40,7 @@ void cupidDatCopy( char *loc1, char *loc2 ){
 */      
 
 /* Local Variables: */
-   char cloc[ DAT__SZLOC + 1 ]; /* Locator for structure component */
+   HDSLoc *cloc;                /* Locator for structure component */
    char name[ DAT__SZNAM + 1 ]; /* Component name */
    int i;                       /* Index of next component */
    int ncomp;                   /* Number of components in structure */
@@ -70,7 +70,7 @@ void cupidDatCopy( char *loc1, char *loc2 ){
          for( i = 0; i < ncomp; i++ ) {
 
 /* Get a locator for this component. */
-            datIndex( loc1, i + 1, cloc, status );
+            datIndex( loc1, i + 1, &cloc, status );
 
 /* Get the name of the component. */
             datName( cloc, name, status );
@@ -79,7 +79,7 @@ void cupidDatCopy( char *loc1, char *loc2 ){
             datCopy( cloc, loc2, name, status );
 
 /* Annul locators. */
-            datAnnul( cloc, status );
+            datAnnul( &cloc, status );
          }
       }
    }

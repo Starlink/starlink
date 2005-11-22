@@ -15,9 +15,9 @@
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
 
-char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd, 
-                        double *ipv, double rms, AstKeyMap *config, int velax, 
-                        int ilevel, int *nclump, double *bg ){
+HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+                           double *ipv, double rms, AstKeyMap *config, int velax,
+                           int ilevel, int *nclump, double *bg ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -27,10 +27,10 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the GAUSSCLUMPS algorithm.
 
 *  Synopsis:
-*     char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                             void *ipd, double *ipv, double rms, 
-*                             AstKeyMap *config, int velax, int *nclump,
-*                             double *bg )
+*     HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
+*                                void *ipd, double *ipv, double rms, 
+*                                AstKeyMap *config, int velax, int *nclump,
+*                                double *bg )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -92,11 +92,10 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to an double to receive the mean background level.
 
 *  Retured Value:
-*     A pointer to a dynamically allocated character string, which should
+*     A pointer to a dynamically allocated array, which should
 *     be freed using astFree when no longer needed. It will contain a
 *     list of HDS locators. The number of locators in the list is given
-*     by the value returned in "*nclump". Each locator will occupy
-*     (DAT__SZLOC+1) elements of the character array, and will locate a
+*     by the value returned in "*nclump". Each locator will locate a
 *     "Clump" structure describing a single clump.
 
 *  Notes:
@@ -132,7 +131,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
-   char *clist;         /* Pointer to list of returned HDS locators */
+   HDSLoc **clist;      /* Pointer to the array of returned HDS locators */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mean_peak;    /* The mean of the values within "peaks" */
@@ -363,7 +362,7 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Extend the returned array of HDS Clump structures to include room for
    the new one. This list is actually a long character string containing
    room for "iclump" HDS locators. */
-                  clist = astGrow( clist, iclump, DAT__SZLOC + 1 );
+                  clist = astGrow( clist, iclump, sizeof( HDSLoc *) );
 
 /* Remove the model fit (excluding the background) from the residuals
    array. This also creates a HDS "Clump" structure containing information 
@@ -372,8 +371,8 @@ char *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
-                                       clist + ( iclump - 1 )*( DAT__SZLOC + 1 ),
-                                       iclump, sumbg, swbg, diag, mean_peak );
+                                       clist + ( iclump - 1 ), iclump, sumbg, 
+                                       swbg, diag, mean_peak );
 
 /* Display the clump parameters on the screen if required. */
                   cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,

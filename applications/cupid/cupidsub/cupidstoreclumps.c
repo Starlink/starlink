@@ -12,7 +12,7 @@
 /* Local Constants: */
 #define MAXCAT   50   /* Max length of catalogue name */
 
-void cupidStoreClumps( const char *param, char *xloc, char *clist, 
+void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist, 
                        int nclump, int ndim, const char *ttl ){
 /*
 *  Name:
@@ -22,7 +22,7 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
 *     Store properties of all clumps found by the CLUMPS command.
 
 *  Synopsis:
-*     void cupidStoreClumps( const char *param, char *xloc, char *clist, 
+*     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist, 
 *                            int nclump, int ndim, const char *ttl )
 
 *  Description:
@@ -37,9 +37,8 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
 *     xloc
 *        HDS locator for the CUPID extension. May be NULL.
 *     clist
-*        A pointer to a character string containing a list of "nclump"
-*        HDS locators, each occupying ( DAT__SZLOC + 1 ) elements of the
-*        array. These locators will be annulled before returning.
+*        A pointer to an array of "nclump" HDS locators. These locators will 
+*        be annulled before returning.
 *     nclump
 *        The number of locators in "clist".
 *     ndim
@@ -66,11 +65,10 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
    AstFrame *frm2;              /* Frame describing clump centres */
    AstFrameSet *iwcs;           /* FrameSet to be stored in output catalogue */
    AstMapping *map;             /* Mapping from "frm1" to "frm2" */
-   char *loc;                   /* Pointer to start of next locator */
-   char aloc[ DAT__SZLOC + 1 ]; /* Locator for array of Clump structures */
+   HDSLoc *aloc;                /* Locator for array of Clump structures */
    char attr[ 15 ];             /* AST attribute name */
    char cat[ MAXCAT + 1 ];      /* Catalogue name */
-   char cloc[ DAT__SZLOC + 1 ]; /* Locator for array cell */
+   HDSLoc *cloc;                /* Locator for array cell */
    char name[ DAT__SZNAM + 1 ]; /* Component name */
    const char *key;             /* Pointer to entry key */
    double *t;                   /* Pointer to next table value */
@@ -105,7 +103,6 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
 
 /* First we find out how many rows and columns the table needs. Loop
    round every supplied structure. */
-      loc = clist;
       ncol = 0;
       centre1 = -1;
       centre2 = -1;
@@ -113,9 +110,9 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
       for( i = 0; i < nclump; i++ ) {
 
 /* Loop round every component in this clump. */
-         datNcomp( loc, &ncomp, status );
+         datNcomp( clist[ i ], &ncomp, status );
          for( j = 0; j < ncomp; j++ ) {
-            datIndex( loc, j + 1, cloc, status );
+            datIndex( clist[ i ], j + 1, &cloc, status );
 
 /* Pass over non-primitive components. */
             datPrim( cloc, &prim, status );
@@ -140,19 +137,15 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
             }
 
 /* Annul the component locator. */
-            datAnnul( cloc, status );
+            datAnnul( &cloc, status );
 
          }
-
-/* Get the next supplied clump locator. */
-         loc += DAT__SZLOC + 1;
       }
 
 /* Get memory to hold a table of clump parameters. */
       tab = astMalloc( sizeof(double)*nclump*ncol );
 
 /* Loop round all the supplied locators again. */
-      loc = clist;
       for( i = 0; i < nclump && *status == SAI__OK; i++ ) {
 
 /* Loop round every column name */
@@ -166,16 +159,13 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
             t = tab + icol*nclump + i;
 
 /* Get the value for this column for this clump and store in the table. */
-            datFind( loc, (char *) key, cloc, status );
+            datFind( clist[ i ], (char *) key, &cloc, status );
             datGetD( cloc, 0, NULL, t, status );
 
 /* Annul the component locator. */
-            datAnnul( cloc, status );
+            datAnnul( &cloc, status );
 
          }
-
-/* Get the next supplied clump locator. */
-         loc += DAT__SZLOC + 1;
       }
 
 /* Create the catalogue. */
@@ -270,35 +260,27 @@ void cupidStoreClumps( const char *param, char *xloc, char *clist,
 /* Create an array of "nclump" Clump structures in the extension, and get
    a locator to it. */
       datNew( xloc, "CLUMPS", "CLUMP", 1, &nclump, status );
-      datFind( xloc, "CLUMPS", aloc, status );
+      datFind( xloc, "CLUMPS", &aloc, status );
 
 /* Loop round all the supplied locators. */
-      loc = clist;
       for( i = 1; i <= nclump; i++ ) {
 
 /* Get a locator for the cell of the array. */
-         datCell( aloc, 1, &i, cloc, status );
+         datCell( aloc, 1, &i, &cloc, status );
 
 /* Copy the Clump object located by the next element in the "clist" array
    into the current cell. */
-         cupidDatCopy( loc, cloc );
+         cupidDatCopy( clist[ i - 1 ], cloc );
 
 /* Annul the cell locator. */
-         datAnnul( cloc, status );
-
-/* Get a pointer to the next locator. */
-         loc += DAT__SZLOC + 1;
+         datAnnul( &cloc, status );
       }
 
 /* Annul the locator to the array within the extension */   
-      datAnnul( aloc, status );
+      datAnnul( &aloc, status );
    }
 
 /* Loop round all the supplied locators, annulling them. */
-   loc = clist;
-   for( i = 0; i < nclump; i++ ) {
-      datAnnul( loc, status );
-      loc += DAT__SZLOC + 1;
-   }
+   for( i = 0; i < nclump; i++ ) datAnnul( clist + i, status );
 
 }

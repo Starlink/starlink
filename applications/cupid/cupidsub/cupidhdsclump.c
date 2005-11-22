@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 
-void cupidHdsClump( char *cloc, double sum, double *par, double rms, 
+void cupidHdsClump( HDSLoc **cloc, double sum, double *par, double rms, 
                     int ndim, int *lbox, int *ubox, int list_size, 
                     double *mlist, int *plist, int *lbnd, int iclump,
                     int *dax, AstKeyMap *extra ){
@@ -19,7 +19,7 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 *     Create an HDS object containing a description of a single clump.
 
 *  Synopsis:
-*     void cupidHdsClump( char *cloc, double sum, double *par, double rms, 
+*     void cupidHdsClump( HDSLoc **cloc, double sum, double *par, double rms, 
 *                         int ndim, int *lbox, int *ubox, int list_size, 
 *                         double *mlist, int *plist, int *lbnd, int iclump,
 *                         int *dax, AstKeyMap *extra )
@@ -35,8 +35,8 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 
 *  Parameters:
 *     cloc
-*        Pointer to a character string in which to store the HDS locator
-*        for the newly created temporary object.
+*        Pointer to a location at which to store the HDS locator for the 
+*        newly created temporary object.
 *     sum
 *        The integrated intensity in the clump.
 *     par
@@ -109,7 +109,7 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
    char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRADq3" };
 
    const char *key;             /* KeyMap key name */
-   char dloc[ DAT__SZLOC + 1 ]; /* Component locator */
+   HDSLoc *dloc;                /* Component locator */
    char name[ DAT__SZNAM + 1 ]; /* New component name */
    double *ipd;                 /* Pointer to Data array */
    double *m;                   /* Pointer to next data value */
@@ -138,62 +138,64 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 
 /* Create the structure as a temporary HDS object. It will be copied to a
    permanent location before the program exits. */
+   dloc = NULL;
+   *cloc = NULL;
    datTemp( "CLUMP", 0, NULL, cloc, status );
    sprintf( name, "CLUMP%d", iclump );
-   datRenam( cloc, name, status );
+   datRenam( *cloc, name, status );
 
 /* Store the integrated intensity in the clump. */
-   datNew( cloc, "SUM", "_DOUBLE", 0, NULL, status );
-   datFind( cloc, "SUM", dloc, status );
+   datNew( *cloc, "SUM", "_DOUBLE", 0, NULL, status );
+   datFind( *cloc, "SUM", &dloc, status );
    datPutD( dloc, 0, NULL, &sum, status );
-   datAnnul( dloc, status );
+   datAnnul( &dloc, status );
 
 /* Store the parameters of the Gaussian approximation, taking out the
    normalisation by the RMS noise level.*/
-   datNew( cloc, "PEAK", "_DOUBLE", 0, NULL, status );
-   datFind( cloc, "PEAK", dloc, status );
+   datNew( *cloc, "PEAK", "_DOUBLE", 0, NULL, status );
+   datFind( *cloc, "PEAK", &dloc, status );
    dval = rms*par[ 0 ];
    datPutD( dloc, 0, NULL, &dval, status );
-   datAnnul( dloc, status );
+   datAnnul( &dloc, status );
 
-   datNew( cloc, "OFFSET", "_DOUBLE", 0, NULL, status );
-   datFind( cloc, "OFFSET", dloc, status );
+   datNew( *cloc, "OFFSET", "_DOUBLE", 0, NULL, status );
+   datFind( *cloc, "OFFSET", &dloc, status );
    dval = rms*par[ 1 ];
    datPutD( dloc, 0, NULL, &dval, status );
-   datAnnul( dloc, status );
+   datAnnul( &dloc, status );
       
-   datNew( cloc, cen[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
-   datFind( cloc, cen[ dax[ 0 ] ], dloc, status );
+   datNew( *cloc, cen[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+   datFind( *cloc, cen[ dax[ 0 ] ], &dloc, status );
    dval = par[ 2 ] + lbnd[ dax[ 0 ] ] - 1.5;
    datPutD( dloc, 0, NULL, &dval, status );
-   datAnnul( dloc, status );
+   datAnnul( &dloc, status );
       
-   datNew( cloc, fwhm[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
-   datFind( cloc, fwhm[ dax[ 0 ] ], dloc, status );
+   datNew( *cloc, fwhm[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+   datFind( *cloc, fwhm[ dax[ 0 ] ], &dloc, status );
    datPutD( dloc, 0, NULL, par + 3, status );
-   datAnnul( dloc, status );
+   datAnnul( &dloc, status );
 
    lb[ 0 ] = lbox[ 0 ] - 1 + lbnd[ dax[ 0 ] ];
    ub[ 0 ] = ubox[ 0 ] - 1 + lbnd[ dax[ 0 ] ];
    step[ 0 ] = 1;
       
    if( ndim > 1 ) {
-      datNew( cloc, cen[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
-      datFind( cloc, cen[ dax[ 1 ] ], dloc, status );
+      datNew( *cloc, cen[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+      datFind( *cloc, cen[ dax[ 1 ] ], &dloc, status );
       dval = par[ 4 ] + lbnd[ dax[ 1 ] ] - 1.5;
       datPutD( dloc, 0, NULL, &dval, status );
-      datAnnul( dloc, status );
+      datAnnul( &dloc, status );
          
-      datNew( cloc, fwhm[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
-      datFind( cloc, fwhm[ dax[ 1 ] ], dloc, status );
+      datNew( *cloc, fwhm[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+      datFind( *cloc, fwhm[ dax[ 1 ] ], &dloc, status );
       datPutD( dloc, 0, NULL, par + 5, status );
-      datAnnul( dloc, status );
+      datAnnul( &dloc, status );
          
-      datNew( cloc, "ANGLE", "_DOUBLE", 0, NULL, status );
-      datFind( cloc, "ANGLE", dloc, status );
+      datNew( *cloc, "ANGLE", "_DOUBLE", 0, NULL, status );
+      datFind( *cloc, "ANGLE", &dloc, status );
       dval = par[ 6 ]*AST__DR2D;
       datPutD( dloc, 0, NULL,  &dval, status );
-      datAnnul( dloc, status );
+      datAnnul( &dloc, status );
          
       lb[ 1 ] = lbox[ 1 ] - 1 + lbnd[ dax[ 1 ] ];
       ub[ 1 ] = ubox[ 1 ] - 1 + lbnd[ dax[ 1 ] ];
@@ -201,26 +203,26 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 
       if( ndim > 2 ) {
 
-         datNew( cloc, cen[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
-         datFind( cloc, cen[ dax[ 2 ] ], dloc, status );
+         datNew( *cloc, cen[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( *cloc, cen[ dax[ 2 ] ], &dloc, status );
          dval = par[ 7 ] + lbnd[ dax[ 2 ] ] - 1.5;
          datPutD( dloc, 0, NULL, &dval, status );
-         datAnnul( dloc, status );
+         datAnnul( &dloc, status );
             
-         datNew( cloc, fwhm[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
-         datFind( cloc, fwhm[ dax[ 2 ] ], dloc, status );
+         datNew( *cloc, fwhm[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( *cloc, fwhm[ dax[ 2 ] ], &dloc, status );
          datPutD( dloc, 0, NULL, par + 8, status );
-         datAnnul( dloc, status );
+         datAnnul( &dloc, status );
          
-         datNew( cloc, vgrad[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
-         datFind( cloc, vgrad[ dax[ 0 ] ], dloc, status );
+         datNew( *cloc, vgrad[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( *cloc, vgrad[ dax[ 0 ] ], &dloc, status );
          datPutD( dloc, 0, NULL, par + 9, status );
-         datAnnul( dloc, status );
+         datAnnul( &dloc, status );
 
-         datNew( cloc, vgrad[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
-         datFind( cloc, vgrad[ dax[ 1 ] ], dloc, status );
+         datNew( *cloc, vgrad[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( *cloc, vgrad[ dax[ 1 ] ], &dloc, status );
          datPutD( dloc, 0, NULL, par + 10, status );
-         datAnnul( dloc, status );
+         datAnnul( &dloc, status );
 
          lb[ 2 ] = lbox[ 2 ] - 1 + lbnd[ dax[ 2 ]];
          ub[ 2 ] = ubox[ 2 ] - 1 + lbnd[ dax[ 2 ]];
@@ -235,10 +237,10 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
       for( i = 0; i < nex; i++ ) {
          key = astMapKey( extra, i );
          if( astMapGet0D( extra, key, &dval ) ) {
-            datNew( cloc, (char *) key, "_DOUBLE", 0, NULL, status );
-            datFind( cloc, (char *) key, dloc, status );
+            datNew( *cloc, (char *) key, "_DOUBLE", 0, NULL, status );
+            datFind( *cloc, (char *) key, &dloc, status );
             datPutD( dloc, 0, NULL, &dval, status );
-            datAnnul( dloc, status );
+            datAnnul( &dloc, status );
          }
       }
    }
@@ -256,7 +258,7 @@ void cupidHdsClump( char *cloc, double sum, double *par, double rms,
 /* Create an NDF containing the model values calculated above with bad
    values at all other pixels. The size of this NDF is the minimum needed
    to contain the clump. */
-   ndfOpen( cloc, "MODEL", "WRITE", "NEW", &indf, &place, status );
+   ndfOpen( *cloc, "MODEL", "WRITE", "NEW", &indf, &place, status );
    ndfNew( "_DOUBLE", ndim, elb, eub, &place, &indf, status );
 
 /* Map the NDFs Data array, filling it with bad values. */
