@@ -33,12 +33,14 @@
 
 /* Header files. */
 /* ============= */
-#include "f77.h"                 
+#include "f77.h"
+#include "sae_par.h"
+#include "mers.h"
 #include "star/grp.h"
+#include "star/hds_fortran.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
 #include <string.h>
-
 
 /* Wrapper function implementations. */
 /* ================================= */
@@ -300,20 +302,28 @@ F77_SUBROUTINE(irq_rlse)( CHARACTER_ARRAY(LOCS),
                           INTEGER(STATUS)
                           TRAIL(LOCS) );
 
-void irqRlse( char locs[5][DAT__SZLOC+1], int *status ){
+void irqRlse( IRQLocs **locs, int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_INTEGER(STATUS);
 
-   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
-   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
-   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
-   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
-   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+   if( !locs || !*locs ) return;
 
+/* Convert the C HDSLocs to DAT__SZLOC character locators, freeing the
+   memory used to store the HDSLocs. */
+   datExportFloc( &( (*locs)->loc[0] ), 1, DAT__SZLOC, LOCS[0], status );
+   datExportFloc( &( (*locs)->loc[1] ), 1, DAT__SZLOC, LOCS[1], status );
+   datExportFloc( &( (*locs)->loc[2] ), 1, DAT__SZLOC, LOCS[2], status );
+   datExportFloc( &( (*locs)->loc[3] ), 1, DAT__SZLOC, LOCS[3], status );
+   datExportFloc( &( (*locs)->loc[4] ), 1, DAT__SZLOC, LOCS[4], status );
+   free( *locs );
+   *locs = NULL;
+
+/* Free the DAT__SZLOC character locators, etc. */
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_CALL(irq_rlse)( CHARACTER_ARRAY_ARG(LOCS),
                        INTEGER_ARG(&STATUS) 
                        TRAIL_ARG(LOCS) );
+
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -326,13 +336,16 @@ F77_SUBROUTINE(irq_new)( INTEGER(INDF),
                          TRAIL(XNAME)
                          TRAIL(LOCS) );
 
-void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1], 
-             int *status ){
+void irqNew( int indf, const char *xname, IRQLocs **locs, int *status ){
+
    DECLARE_INTEGER(INDF);
    DECLARE_CHARACTER_DYN(XNAME);  
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_INTEGER(STATUS);
-   int i,j;
+   int j;
+
+   if( !locs ) return;
+   *locs= NULL;
 
    F77_EXPORT_INTEGER( indf, INDF );
    F77_CREATE_CHARACTER( XNAME, strlen( xname ) );
@@ -346,15 +359,28 @@ void irqNew( int indf, const char *xname, char locs[5][DAT__SZLOC+1],
                       TRAIL_ARG(XNAME)
                       TRAIL_ARG(LOCS) );
 
-   for( j = 0; j < 5; j++ ) {
-      for( i = 0; i < DAT__SZLOC; i++ ) {
-         locs[j][i] = LOCS[j][i];
-      }
-      locs[j][i] = 0;
-   }
-
    F77_FREE_CHARACTER( XNAME );
    F77_IMPORT_INTEGER( STATUS, *status );
+
+   if( *status == SAI__OK ) {
+      *locs = malloc( sizeof( IRQLocs ) );
+      if( *locs ) {
+         for( j = 0; j < 5; j++ ) (*locs)->loc[j] = NULL;
+         for( j = 0; j < 5; j++ ) {
+            HDS_IMPORT_FLOCATOR( LOCS[j], &((*locs)->loc[j]), status );
+         }
+      } else {
+         F77_CALL(irq_rlse)( CHARACTER_ARRAY_ARG(LOCS),
+                             INTEGER_ARG(&STATUS) 
+                             TRAIL_ARG(LOCS) );
+
+         if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "IRQNEW_ERR", "Cannot allocate memory for a new "
+                    "IRQLocs structure.", status );
+         }
+      }
+   }
 }
 
 /* ------------------------------- */
@@ -368,7 +394,7 @@ F77_SUBROUTINE(irq_addqn)( CHARACTER_ARRAY(LOCS),
                            TRAIL(QNAME)
                            TRAIL(COMMNT) );
 
-void irqAddqn( char locs[5][DAT__SZLOC+1], const char *qname, int deflt,
+void irqAddqn( IRQLocs *locs, const char *qname, int deflt,
                const char *commnt, int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_CHARACTER_DYN(QNAME);  
@@ -376,11 +402,11 @@ void irqAddqn( char locs[5][DAT__SZLOC+1], const char *qname, int deflt,
    DECLARE_CHARACTER_DYN(COMMNT);  
    DECLARE_INTEGER(STATUS);
 
-   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
-   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
-   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
-   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
-   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
    F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
    F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
@@ -398,6 +424,8 @@ void irqAddqn( char locs[5][DAT__SZLOC+1], const char *qname, int deflt,
                         TRAIL_ARG(QNAME) 
                         TRAIL_ARG(COMMNT) );
 
+   F77_FREE_CHARACTER( QNAME );
+   F77_FREE_CHARACTER( COMMNT );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -413,8 +441,9 @@ F77_SUBROUTINE(irq_setqm)( CHARACTER_ARRAY(LOCS),
                            TRAIL(LOCS)
                            TRAIL(QNAME) );
 
-void irqSetqm( char locs[5][DAT__SZLOC+1], int bad, const char *qname, int size,
+void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
                float *mask, int *set, int *status ){
+
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_LOGICAL(BAD);
    DECLARE_CHARACTER_DYN(QNAME);  
@@ -423,11 +452,11 @@ void irqSetqm( char locs[5][DAT__SZLOC+1], int bad, const char *qname, int size,
    DECLARE_INTEGER(SET);
    DECLARE_INTEGER(STATUS);
 
-   cnfExpch( locs[0], LOCS[0], DAT__SZLOC );
-   cnfExpch( locs[1], LOCS[1], DAT__SZLOC );
-   cnfExpch( locs[2], LOCS[2], DAT__SZLOC );
-   cnfExpch( locs[3], LOCS[3], DAT__SZLOC );
-   cnfExpch( locs[4], LOCS[4], DAT__SZLOC );
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
 
    F77_EXPORT_LOGICAL( bad, BAD );
    F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
@@ -447,6 +476,7 @@ void irqSetqm( char locs[5][DAT__SZLOC+1], int bad, const char *qname, int size,
                         TRAIL_ARG(LOCS) 
                         TRAIL_ARG(QNAME) );
 
+   F77_FREE_CHARACTER( QNAME );
    F77_IMPORT_INTEGER( SET, *set );
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_REAL( MASK );

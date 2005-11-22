@@ -33,6 +33,18 @@
 #include "ast.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "star/hds_fortran.h"
+
+
+/* A structure used to pass a group of five HDS locators to and from IRQ
+   functions. */
+
+typedef struct IRQLocs {
+   HDSLoc *loc[ 5 ];
+} IRQLocs;
+
+
+/* Prototypes for public functions */
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Fillr( float, int, float *, int * );
@@ -45,8 +57,8 @@ void kpg1Pseed( int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 
 void irqDelet( int, int * );
-void irqRlse( char [5][DAT__SZLOC+1], int * );
-void irqNew( int, const char *, char [5][DAT__SZLOC+1], int * );
-void irqAddqn( char [5][DAT__SZLOC+1], const char *, int, const char *, int * );
-void irqSetqm( char [5][DAT__SZLOC+1], int, const char *, int, float *, int *, int * );
+void irqRlse( IRQLocs **, int * );
+void irqNew( int, const char *, IRQLocs **, int * );
+void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
+void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 #endif
