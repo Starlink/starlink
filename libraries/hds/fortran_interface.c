@@ -665,6 +665,67 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 #endif
 }
 
+/* ================================== */
+/*  datGet0x                          */
+/* ================================== */
+
+F77_SUBROUTINE(dat_get0c)( CHARACTER(locator),
+			   CHARACTER(value),
+			   INTEGER(status)
+			   TRAIL(locator) 
+			   TRAIL(value) )
+{
+  HDSLoc locator_c;
+  char * value_c;
+  
+  value_c = cnfCreim( value, value_length );
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet0C( &locator_c, value_c, value_length, status );
+  free(value_c);
+}
+
+
+F77_SUBROUTINE(dat_get0d)( CHARACTER(locator),
+			   DOUBLE(value),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet0D( &locator_c, value, status );
+}
+
+F77_SUBROUTINE(dat_get0r)( CHARACTER(locator),
+			   REAL(value),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet0R( &locator_c, value, status );
+}
+
+F77_SUBROUTINE(dat_get0i)( CHARACTER(locator),
+			   INTEGER(value),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet0I( &locator_c, value, status );
+}
+
+F77_SUBROUTINE(dat_get0l)( CHARACTER(locator),
+			   LOGICAL(value),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet0L( &locator_c, value, status );
+}
+
+
 F77_SUBROUTINE(dat_index)( CHARACTER(locator1),
                            F77_INTEGER_TYPE *index,
                            CHARACTER(locator2),
