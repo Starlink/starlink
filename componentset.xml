@@ -2240,7 +2240,7 @@ No longer under active control.
 </component>
 
 <component id="hds" support="S">
-  <version>5.0-1</version>
+  <version>5.0-2</version>
   <path>libraries/hds</path>
   <description>Hierarchical Data System</description>
   <abstract>
@@ -2520,7 +2520,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndf" support="S">
-  <version>1.5-10</version>
+  <version>1.6-1</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
