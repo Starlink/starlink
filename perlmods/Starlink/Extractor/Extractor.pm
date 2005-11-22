@@ -193,9 +193,15 @@ Do the extraction.
 
 The two mandatory named parameters are:
 
-  frame - the NDF to perform the extraction on
+=item frame - The NDF to perform the extraction on.
 
-  filter - an Astro::WaveBand object describing the filter used
+=item filter - An Astro::WaveBand object describing the filter used.
+
+An optional named parameter is:
+
+=item quality - If set, then only items that have this extraction flag
+will be put into the output catalogue. If not set, then every item
+will be used.
 
 This method returns an C<Astro::Catalog> object. Before extraction
 can be done, the EXTRACTOR_DIR environment variable should be set up.
@@ -207,21 +213,10 @@ This method ensures that sensible defaults have been set for some
 of the configuration options. For these defaults, see the C<defaults>
 method.
 
-This method returns an C<Astro::Catalog> object. The magnitudes and
-locations of extracted objects are defined as follows:
-
-  Astro::Catalog::Star                     EXTRACTOR output parameter
-  ID                                       NUMBER
-  ra/dec coords                            ALPHA_J2000/DELTA_J2000
-  magnitude                                MAG_ISOCOR
-  error in magnitude                       MAGERR_ISOCOR
-  x/y position                             X_IMAGE/Y_IMAGE
-  x/y positional errors                    X2_IMAGE/Y2_IMAGE
-  ellipticity                              ELLIPTICITY
-  position_angle_pixel                     THETA_IMAGE
-  position_angle_world                     THETA_J2000
-  major/minor_axis_pixel                   A_IMAGE/B_IMAGE
-  major/minor_axis_world                   A_WORLD/B_WORLD
+This method returns an C<Astro::Catalog> object. See the documentation
+for the C<Astro::Catalog::IO::SExtractor> module for how information
+from the EXTRACTOR catalogue is turned into an C<Astro::Catalog>
+object.
 
 =cut
 
@@ -444,14 +439,16 @@ extraction on a certain spacing of blocks.
 
   my $checker = $extractor->checkerboard;
   $extractor->checkerboard( segments => $segments,
-                          interval => $interval );
+                            interval => $interval );
 
-There are two mandatory named arguments. The first denotes how many segments per side to divide the image up into. The second denotes the frequency of blocks to use.
+There are two mandatory named arguments. The first denotes how many
+segments per side to divide the image up into. The second denotes the
+frequency of blocks to use.
 
 For example, if segments is set to 8 and interval is set to 2, then
 the image is broken up into 64 blocks (8 segments per side), and every
-other block is used. This is exactly a checkerboard pattern, taking only
-the black squares.
+other block is used. This is exactly a checkerboard pattern, taking
+only the black squares.
 
 If either segments or interval is 1, the entire image is used.
 
@@ -1049,6 +1046,8 @@ __PACKAGE__->CreateAccessors( %config_options );
 
 =head1 SEE ALSO
 
+Starlink User Note 226.
+
 =head1 AUTHORS
 
 Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
@@ -1057,8 +1056,6 @@ Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 Copyright (C) 2004-2005 Particle Physics and Astronomy Research
 Council.  All Rights Reserved.
-
-
 
 =cut
 
