@@ -496,7 +496,7 @@ datNcomp( HDSLoc *locator,
 /*==============================*/
 int
 datLen(HDSLoc *locator,
-       int *len,
+       size_t *len,
        int *status)
 {
 #undef context_name
@@ -531,7 +531,7 @@ datLen(HDSLoc *locator,
 
 /* Return the primitive object length.  */
 
-   *len = obj->length;
+   *len = (size_t)obj->length;
 
    return hds_gl_status;
 }

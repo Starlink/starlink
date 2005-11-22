@@ -210,6 +210,7 @@ F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
 
 /* Local variables */
    HDSLoc locator_c;
+   size_t len_c;
 
 /* Enter routine.	*/
 
@@ -217,7 +218,8 @@ F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
    dat1_import_floc( locator, locator_length, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datClen( &locator_c, clen, status);
+   datClen( &locator_c, &len_c, status);
+   *clen = (F77_INTEGER_TYPE)len_c;
 }
 
 F77_SUBROUTINE(dat_clone)( CHARACTER(locator1),
@@ -380,13 +382,15 @@ F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
 
 /* Local variables.     */
    char *msg_c;
-   
+   size_t length_c;
+
 /* Enter routine.	*/
 
 /* Call pure C routine                                       */
-   datErmsg( status, length, &msg_c );
+   datErmsg( status, &length_c, &msg_c );
 
 /* Export the returned C string to FORTRAN variable    */
+   *length = (F77_INTEGER_TYPE)length_c;
    cnfExprt( msg_c, msg, msg_length );
 }
 
@@ -701,6 +705,7 @@ F77_SUBROUTINE(dat_len)( CHARACTER(locator),
 
 /* Local variables */
    HDSLoc locator_c;
+   size_t len_c;
 
 /* Enter routine.	*/
 
@@ -708,7 +713,8 @@ F77_SUBROUTINE(dat_len)( CHARACTER(locator),
    dat1_import_floc( locator, locator_length, &locator_c, status);
 
 /* Call pure C routine                                       */
-   datLen( &locator_c, len, status );
+   datLen( &locator_c, &len_c, status );
+   *len = (F77_INTEGER_TYPE)len_c;
 }
 
 F77_SUBROUTINE(dat_map)( CHARACTER(locator),

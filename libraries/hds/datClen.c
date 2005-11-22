@@ -13,7 +13,7 @@
 
 int
 datClen( HDSLoc* locator,
-         int *clen,
+         size_t *clen,
          int *status )
 {
 /*
@@ -73,6 +73,8 @@ datClen( HDSLoc* locator,
 *     15-NOV-2005 (TIMJ):
 *        Use dat1_import_loc
 *        Change API to use HDSLoc
+*     21-NOV-2005 (TIMJ):
+*        Use size_t for the returned length type
 *     {enter_changes_here}
 
 *  Bugs:
@@ -123,13 +125,13 @@ is not defined (possible programming error).",
 /* the Native Data Representation lookup table.                             */
       if ( obj->dtype != DAT__C )
       {
-         *clen = dat_gl_ndr[ obj->dtype ].txtsize;
+	*clen = (size_t)dat_gl_ndr[ obj->dtype ].txtsize;
       }
 
 /* Otherwise, use the object's length directly.                             */
       else
       {
-         *clen = obj->length;
+	*clen = (size_t)obj->length;
       }
    }
 

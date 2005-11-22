@@ -198,12 +198,12 @@ datNew( HDSLoc    *locator,
 /* DAT_NEWC - Create string component */
 /*====================================*/                    
 
-void datCctyp( int size, char type[DAT__SZTYP] );
+void datCctyp( size_t size, char type[DAT__SZTYP] );
 
 int
 datNewC(HDSLoc    *locator,
         char      *name_str,
-        int       len,
+        size_t    len,
         int       ndim,
         HDS_PTYPE dims[],
         int       *status)
@@ -231,7 +231,7 @@ datNewC(HDSLoc    *locator,
 /*====================================*/                    
 
 void
-datCctyp( int size,
+datCctyp( size_t size,
           char *type )
 {
 /* Local variables */
@@ -240,6 +240,6 @@ datCctyp( int size,
 /* Enter routine   */
 
    strcpy( type, "_CHAR*" );
-   sprintf( str, "%d", size );
+   sprintf( str, "%lu", (unsigned long)size );
    strncat( type, str, 4 );
 }

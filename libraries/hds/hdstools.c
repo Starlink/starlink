@@ -21,8 +21,8 @@ hdsTrace(HDSLoc *locator,
          char *path_str,
          char *file_str,
          int  *status,
-         int  path_length,
-         int  file_length)
+         size_t  path_length,
+         size_t  file_length)
 {                  
 /*==================================*/
 /* HDS_TRACE - Trace path of object */
@@ -71,8 +71,8 @@ hdsTrace(HDSLoc *locator,
 
 /* Export the path and file strings.      */
 
-   _strflcsimp( &path, path_str, path_length);
-   _strflcsimp( &file, file_str, file_length);
+   _strflcsimp( &path, path_str, (int)path_length);
+   _strflcsimp( &file, file_str, (int)file_length);
 
 /* Import the locator.  */
 

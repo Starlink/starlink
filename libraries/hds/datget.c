@@ -298,7 +298,7 @@ datGetC(HDSLoc    *locator,
         int       ndim,
         HDS_PTYPE dims[],
         char      values[],
-        int       char_len,
+        size_t    char_len,
         int       *status) 
 {
 #undef context_name
@@ -307,7 +307,7 @@ datGetC(HDSLoc    *locator,
 #define context_message\
         "DAT_GETC: Error reading character value(s) from an HDS primitive."
    char stype[] = "_CHAR*nnnn";
-   sprintf( &stype[6], "%d", char_len ); 
+   sprintf( &stype[6], "%lu", (unsigned long)char_len ); 
      
    datGet(locator, stype, ndim, dims, values, status );
 

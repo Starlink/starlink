@@ -279,7 +279,7 @@ datPutC( HDSLoc    *locator,
          int       ndim,
          HDS_PTYPE dims[],
          char      *string,
-         int       string_length,
+         size_t    string_length,
          int       *status)
 {
 /* Local variables */
@@ -297,7 +297,7 @@ char *string1;
 /* to make consistent with earlier HDS behaviour!                       */
    char stype[11];
    if( string_length > 0 ) {
-      sprintf( stype, "_CHAR*%d", string_length);
+     sprintf( stype, "_CHAR*%lu", (unsigned long)string_length);
       string1 = string;
    } else {
       strcpy( stype, "_CHAR" );
