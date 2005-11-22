@@ -61,6 +61,9 @@ by this option. [undef]
 =item keeptemps - If set to true, keep all temporary files used
 for processing. This includes all output files. [0]
 
+=item maxcoeff - The maximum coefficient fit to use. If defined, must
+be 4, 6, 7, 8, or 9. [9]
+
 =item obs - A hash containing keys that correspond to the observation
 data keywords as listed in SUN/242: time, obs, met, and col.
 
@@ -181,6 +184,33 @@ sub keeptemps {
   return $self->{KEEPTEMPS};
 }
 
+=item B<maxcoeff>
+
+Retrieve or set the maximum coefficient model to use.
+
+  my $maxcoeff = $auto->maxcoeff;
+  $auto->maxcoeff( 6 );
+
+If defined, must be 4, 6, 7, 8, or 9.
+
+=cut
+
+sub maxcoeff {
+  my $self = shift;
+  if( @_ ) {
+    my $maxcoeff = shift;
+    if( $maxcoeff != 4 &&
+        $maxcoeff != 6 &&
+        $maxcoeff != 7 &&
+        $maxcoeff != 8 &&
+        $maxcoeff != 9 ) {
+      $maxcoeff = undef;
+    }
+    $self->{MAXCOEFF} = $maxcoeff;
+  }
+  return $self->{MAXCOEFF};
+}
+
 =item B<obs>
 
 Retrieve or set observation data.
@@ -285,7 +315,8 @@ the WCS calculated by ASTROM.
 When running this method it attempts to find the astrom.x binary that
 performs the astrometric calculations. It first looks in the location
 specified by the AUTOASTROM_DIR environment variable, then looks in
-/star/bin/autoastrom, then looks in /star/bin. If all three of these
+the Starlink binary files directory pointed to by C<Starlink::Config>,
+both with and without C</autoastrom> appended. If all three of these
 locations fail to have the astrom.x binary, the method will croak with
 an error stating such.
 
@@ -407,9 +438,10 @@ sub solve {
   }
 
   # Right. Now we have all of the output files. We want to read in the
-  # FITS file with the highest number, as that one is the best fit.
-  # Grab all of the FITS files (we know what their base is), and find
-  # the one with the highest number.
+  # FITS file with the highest number that isn't larger than the
+  # requested maximum number of fitted coefficients. Grab all of the
+  # FITS files (we know what their base is), and find the one with the
+  # highest number.
   my $fits_dir = dirname( $output_fitsbase );
   my $fits_base = basename( $output_fitsbase );
   opendir( my $dir_h, $fits_dir ) or croak "Could not open $fits_dir to read in FITS files: $!";
@@ -421,7 +453,21 @@ sub solve {
     croak "ASTROM run resulted in no FITS WCS files";
   }
 
-  my $highest = $fits_files[-1];
+  my $highest_num;
+  my %fits = ( 4 => 0,
+               6 => 1,
+               7 => 2,
+               8 => 3,
+               9 => 4 );
+  foreach my $fit ( sort { $b <=> $a } keys %fits ) {
+    next if $fit > $self->maxcoeff;
+    next if ! defined( $fits_files[$fits{$fit}] );
+    $highest_num = $fits{$fit};
+    print "Using $fit coefficient model\n" if ( $DEBUG || $self->verbose );
+    last;
+  }
+
+  my $highest = $fits_files[$highest_num];
   $highest = File::Spec->catfile( $fits_dir, $highest );
 
   # Create a Starlink::AST::FrameSet object from this FITS file.
