@@ -1587,7 +1587,7 @@ F77_SUBROUTINE(dat_put0c)( CHARACTER(locator),
   
   value_c = cnfCreim( value, value_length );
   dat1_import_floc( locator, locator_length, &locator_c, status );
-  datPut0C( &locator_c, *value, status );
+  datPut0C( &locator_c, value_c, status );
   free(value_c);
 }
 
