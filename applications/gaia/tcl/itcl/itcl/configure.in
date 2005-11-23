@@ -235,6 +235,8 @@ AC_SUBST(itcl_STUB_LIB_SPEC)
 AC_SUBST(itcl_BUILD_STUB_LIB_PATH)
 AC_SUBST(itcl_STUB_LIB_PATH)
 
+AC_SUBST(LD_SEARCH_FLAGS)
+
 # itcl_SRC_DIR must be a fully qualified path
 eval itcl_SRC_DIR="$srcdir"
 itcl_SRC_DIR=`cd "${itcl_SRC_DIR}"; pwd`

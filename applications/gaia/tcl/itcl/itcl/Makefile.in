@@ -58,8 +58,9 @@ PKG_HEADERS	= @PKG_HEADERS@
 PKG_LIB_FILE	= @PKG_LIB_FILE@
 PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
+bin_BINARIES    = itclsh$(EXEEXT)
 lib_BINARIES	= $(PKG_LIB_FILE) $(PKG_STUB_LIB_FILE)
-BINARIES	= $(lib_BINARIES)
+BINARIES	= $(lib_BINARIES) $(app_BINARIES)
 
 SHELL		= @SHELL@
 
@@ -115,6 +116,10 @@ TCL_TOP_DIR_NATIVE = @TCL_TOP_DIR_NATIVE@
 
 # Not used, but retained for reference of what libs Tcl required
 TCL_LIBS	= @TCL_LIBS@
+
+LD_SEARCH_FLAGS = @LD_SEARCH_FLAGS@
+EXEEXT          = @EXEEXT@
+ITCLSH_LIBS     = @TCL_LIB_SPEC@ @LIBS@ @DL_LIBS@ @MATH_LIBS@
 
 #========================================================================
 # TCLLIBPATH seeds the auto_path in Tcl's init.tcl so we can test our
@@ -237,6 +242,10 @@ $(PKG_STUB_LIB_FILE): $(PKG_STUB_OBJECTS)
 	-rm -f $(PKG_STUB_LIB_FILE)
 	${MAKE_STUB_LIB}
 	$(RANLIB_STUB) $(PKG_STUB_LIB_FILE)
+
+itclsh$(EXEEXT): tclAppInit.o $(PKG_OBJECTS)
+	$(CC) $(LDFLAGS) ${CFLAGS} tclAppInit.o $(PKG_OBJECTS) \
+	      $(ITCLSH_LIBS) $(LD_SEARCH_FLAGS) -o itclsh
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
