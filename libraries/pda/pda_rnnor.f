@@ -60,6 +60,8 @@
 *        version of SNORM.
 *     1997 February 26 (DSB)
 *        Remove "      INCLUDE 'SAE_PAR'"
+*     23-NOV-2005 (DSB)
+*        Guard against indexing the D array out of bounds.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -128,6 +130,9 @@
 
 *.
 
+*  Start of a "DO WHILE" loop
+ 10   CONTINUE
+
 *  Obtain a deviate in the range 0 to 1.
       U = PDA_RAND( 0.0 )
 
@@ -139,6 +144,10 @@
       END IF
 
       U = U + U - S
+
+*  Try again if U is zero (a value of zero would produce an infinite loop
+*  below).
+      IF( U .EQ. 0.0 ) GO TO 10
 
 *  Find to which distribution element that corresponds.
       U = 32.0 * U
@@ -153,7 +162,7 @@
 *  Start of a 'DO WHILE' loop (forming cumulative distribution?)
  50      CONTINUE
          U = U + U
-         IF ( U .LT. 1.0 ) THEN
+         IF ( U .LT. 1.0 .AND. I .LE. NCON ) THEN
             AA = AA + D( I )
             I = I + 1
             GO TO 50

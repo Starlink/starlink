@@ -71,7 +71,8 @@ c
          theta = (one - eps) * shs / (shs - ys)
          epsrt = dsqrt(eps)
          cy = theta / (shs * epsrt)
-         cs = (one + (theta-one)/epsrt) / shs
+         cs = (one + (theta-one)/epsrt) 
+         cs = cs / shs
          go to 20
  10   cy = one / (dsqrt(ys) * dsqrt(shs))
       cs = one / shs
