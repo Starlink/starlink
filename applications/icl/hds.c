@@ -31,7 +31,8 @@
  *   21-JUN-1999 (AJC):
  *      Change to new-style ems names emsAnnul etc.
  *      Correct type to ftype in call emsSetc
- *
+ *   22-NOV-2005 (TIMJ):
+ *      Use modern HDS API with HDSLoc*
  ******************************************************************************
  */
 #include <string.h>
@@ -47,6 +48,8 @@
 #include "ems_par.h"
 #include "cnf.h"
 #include "f77.h"
+#include "star/hds.h"
+#include "dat_err.h"
 #include "messys_len.h"
 #include "messys_par.h"
 #include "messys_err.h"
@@ -68,8 +71,8 @@ extern value paren_interpret              ( node *n, int op );  /* expr.c */
  */
 char *hds_path; 
 char *icl_hdscomp;
-DECLARE_CHARACTER(hds_tloc, DAT__SZLOC);
-DECLARE_CHARACTER(hds_vloc, DAT__SZLOC);
+HDSLoc * hds_tloc = NULL;
+HDSLoc * hds_vloc = NULL;
 
 /******************************************************************************
  *
@@ -91,12 +94,8 @@ static int hds_vars_used = 0;
 int
 hds_flush(void)
 {
-    DECLARE_INTEGER(status);
-
-    status = SAI__OK;
-    F77_CALL(hds_free) (CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status)
-	TRAIL_ARG(hds_tloc) );
-
+    int status = SAI__OK;
+    hdsFree( hds_tloc, &status );
     return status;
 }
 
@@ -123,15 +122,11 @@ hds_flush(void)
 static int
 init_hdsfile(void)
 {
-    DECLARE_CHARACTER(tloc, DAT__SZLOC);
-    DECLARE_CHARACTER(fcname, DAT__SZNAM);
-    DECLARE_CHARACTER(fmode, DAT__SZMOD);
-    DECLARE_CHARACTER(fctype, DAT__SZTYP);
-    DECLARE_CHARACTER(ffilename, 64);
-    DECLARE_INTEGER(ndims);
-    DECLARE_INTEGER_ARRAY(dims,1);
-    DECLARE_INTEGER(status);
-    DECLARE_LOGICAL(there);
+    HDSLoc* tloc = NULL;
+    int ndims = 0;
+    hdsdim dims[1];
+    int status;
+    int there;
   
     char *file;
     char ascpid[10];
@@ -161,64 +156,37 @@ init_hdsfile(void)
 
     ndims = 0;
     status = SAI__OK;
-    cnf_exprt(file, ffilename, ffilename_length);
-    cnf_exprt("update", fmode, fmode_length);
-    F77_CALL(hds_open) (CHARACTER_ARG(ffilename), CHARACTER_ARG(fmode),
-	CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status) TRAIL_ARG(ffilename)
-	TRAIL_ARG(fmode) TRAIL_ARG(hds_tloc));
+    hdsOpen(file, "UPDATE", &hds_tloc, &status);
 
-    if (status == HDS_I_FNF) {	/* Need to create a new file */
+    if (status == DAT__FILNF) {	/* Need to create a new file */
         emsAnnul(&status);
-	cnf_exprt("ICLVARS", fcname, fcname_length);
-	cnf_exprt("ICLVARS", fctype, fctype_length);
-	F77_CALL(hds_new) (CHARACTER_ARG(ffilename), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(fctype), INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-	    CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status) TRAIL_ARG(ffilename)
-	    TRAIL_ARG(fcname) TRAIL_ARG(fctype) TRAIL_ARG(hds_tloc) );
+	hdsNew(file, "ICLVARS", "ICLVARS", ndims, dims, &hds_tloc, &status );
     }
     emsRlse();
 /* 
  * Create the top level component from the pid of this incarnation of ICL 
  */
-    cnf_exprt(ascpid,  fcname, fcname_length);
-    cnf_exprt("ICLPID", fctype, fctype_length);
-    F77_CALL(dat_there) (CHARACTER_ARG(hds_tloc), CHARACTER_ARG(fcname),
-	    LOGICAL_ARG(&there), INTEGER_ARG(&status) TRAIL_ARG(hds_tloc)
-	    TRAIL_ARG(fcname) );
+    datThere(hds_tloc, ascpid, &there, &status );
 
-    if( F77_ISFALSE(there) )
-	F77_CALL(dat_new) (CHARACTER_ARG(hds_tloc), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(fctype), INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-	    INTEGER_ARG(&status) TRAIL_ARG(hds_tloc) TRAIL_ARG(fcname)
-	    TRAIL_ARG(fctype));
+    if( !there ) datNew( hds_tloc, ascpid, "ICLPID", ndims, dims, &status );
 
-    F77_CALL(dat_find) (CHARACTER_ARG(hds_tloc),CHARACTER_ARG(fcname), 
-	CHARACTER_ARG(tloc), INTEGER_ARG(&status) TRAIL_ARG(hds_tloc)
-	TRAIL_ARG(fcname) TRAIL_ARG(tloc));
+    datFind( hds_tloc, ascpid, &tloc, &status );
+
 /*
  * Obtain the file locators for the "VARIABLES" component
  */ 
-    cnf_exprt("VARIABLES", fcname, fcname_length);
-    cnf_exprt("VARS", fctype, fctype_length);
-    F77_CALL(dat_there) (CHARACTER_ARG(tloc), CHARACTER_ARG(fcname),
-	    LOGICAL_ARG(&there), INTEGER_ARG(&status) TRAIL_ARG(tloc)
-	    TRAIL_ARG(fcname) );
-    if( F77_ISFALSE(there) )
-	F77_CALL(dat_new) (CHARACTER_ARG(tloc), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(fctype), INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-	    INTEGER_ARG(&status) TRAIL_ARG(tloc) TRAIL_ARG(fcname)
-	    TRAIL_ARG(fctype));
-    F77_CALL(dat_find) (CHARACTER_ARG(tloc),CHARACTER_ARG(fcname), 
-	CHARACTER_ARG(hds_vloc), INTEGER_ARG(&status) TRAIL_ARG(tloc)
-	TRAIL_ARG(fcname) TRAIL_ARG(hds_vloc));
+    datThere( tloc, "VARIABLES", &there, &status );
+
+    if (!there) datNew( tloc, "VARIABLES", "VARS", ndims, dims, &status );
+
+    datFind( tloc, "VARIABLES", &hds_vloc, &status );
+
 /*
  * 'hds_vloc' is the globally accessible locator we will use to read and
  * write variables. Tidy up and return.
  */
-    F77_CALL(dat_annul) (CHARACTER_ARG(tloc), INTEGER_ARG(&status)
-	TRAIL_ARG(tloc) );
-    F77_CALL(hds_free) (CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status)
-	TRAIL_ARG(hds_tloc) );
+    datAnnul( &tloc, &status );
+    hdsFree( hds_tloc, &status );
 
     return status;
 }
@@ -239,25 +207,20 @@ init_hdsfile(void)
 int
 deinit_hdsfile(void)
 {
-    DECLARE_CHARACTER(fcname, DAT__SZNAM);
-    DECLARE_INTEGER(status);
+    int status = SAI__OK;
     char ascpid[10];
    
-    status = SAI__OK;     
-
     if (hds_vars_used) {
-	F77_CALL(dat_annul) (CHARACTER_ARG(hds_vloc), INTEGER_ARG(&status)
-	    TRAIL_ARG(hds_vloc) );
+
+        datAnnul( &hds_vloc, &status );
 
 	sprintf(ascpid,"%d", getpid() );
-        cnf_exprt(ascpid, fcname, fcname_length);
-	F77_CALL(dat_erase) (CHARACTER_ARG(hds_tloc), CHARACTER_ARG(fcname),
-	    INTEGER_ARG(&status) TRAIL_ARG(hds_tloc) TRAIL_ARG(fcname) );
+	datErase( hds_tloc, ascpid, &status );
+	hdsClose( &hds_tloc, &status );
 
-	F77_CALL(hds_close) (CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status)
-	    TRAIL_ARG(hds_tloc) );
     }
-    F77_CALL(hds_stop) (INTEGER_ARG(&status) );
+
+    hdsStop( &status );
 
     return status;
 }
@@ -274,18 +237,14 @@ name_interpret_hds(node *n, int op)
     extern value  name_interpret(node *n, int op);		/* expr.c */
     extern char	  *currentproc(void);				/* main.c */
 
-    DECLARE_CHARACTER(comp_loc, DAT__SZLOC);
-    DECLARE_CHARACTER(fcname,   DAT__SZNAM);
-    DECLARE_CHARACTER(fctype,   DAT__SZTYP);
-    DECLARE_CHARACTER(curtype,  DAT__SZTYP);
-    DECLARE_INTEGER(ndims);
-    DECLARE_INTEGER_ARRAY(dims,1);
-    DECLARE_INTEGER(status);
-    DECLARE_LOGICAL(there);
-    DECLARE_CHARACTER(fcval, 256);
-    DECLARE_DOUBLE(fdval);
-    DECLARE_LOGICAL(flval);
-    DECLARE_INTEGER(fival);
+    int ndims = 0;
+    int status = SAI__OK;
+    hdsdim dims[1];
+    int there;
+
+    HDSLoc *comp_loc = NULL;
+    char ctype[DAT__SZTYP+1];
+    char curtype[DAT__SZTYP+1];
 
     value val;
     char *str;
@@ -318,74 +277,54 @@ name_interpret_hds(node *n, int op)
  */
     switch (val.type) {
       case TYPE_REAL:
-	cnf_exprt("_DOUBLE",   fctype, DAT__SZTYP);
+	strcpy( ctype, "_DOUBLE" );
 	break;
       case TYPE_INTEGER:
-	cnf_exprt("_INTEGER",  fctype, DAT__SZTYP);
+	strcpy( ctype, "_INTEGER" );
 	break;
       case TYPE_LOGICAL:
-	cnf_exprt("_LOGICAL",  fctype, DAT__SZTYP);
+	strcpy( ctype, "_LOGICAL" );
 	break;
       case TYPE_STRING:        
-	cnf_exprt("_CHAR*256", fctype, DAT__SZTYP);
+	strcpy( ctype, "_CHAR*256" );
     }
-    cnf_exprt( (str = string_part(n->val)), fcname, DAT__SZNAM);
+    str = string_part(n->val);
     str = strconcat(icl_hdscomp, str);
-    status = 0;	/* SAI__OK */
-    ndims =  0;
 
-    F77_CALL(dat_there) (CHARACTER_ARG(hds_vloc), CHARACTER_ARG(fcname),
-	LOGICAL_ARG(&there), INTEGER_ARG(&status) TRAIL_ARG(hds_vloc)
-	TRAIL_ARG(fcname) );
+    datThere( hds_vloc, string_part(n->val), &there, &status );
 
-    if ( F77_ISTRUE(there) ) {
-	F77_CALL(dat_find) (CHARACTER_ARG(hds_vloc), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(comp_loc), INTEGER_ARG(&status) TRAIL_ARG(hds_vloc)
-	    TRAIL_ARG(fcname) TRAIL_ARG(comp_loc) );
-	F77_CALL(dat_type)  (CHARACTER_ARG(comp_loc), CHARACTER_ARG(curtype),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) TRAIL_ARG(curtype));
-        if ( memcmp(fctype, curtype, DAT__SZTYP) != 0) {
-	    F77_CALL(dat_annul) (CHARACTER_ARG(comp_loc), INTEGER_ARG(&status)
-		TRAIL_ARG(comp_loc) );
-	    F77_CALL(dat_erase) (CHARACTER_ARG(hds_vloc),
-		CHARACTER_ARG(fcname), INTEGER_ARG(&status)
-		TRAIL_ARG(hds_vloc) TRAIL_ARG(fcname) );
-	    there = F77_FALSE;
-	}
+    if (there) {
+      datFind( hds_vloc, string_part(n->val), &comp_loc, &status );
+      datType( comp_loc, curtype, &status );
+
+      if (strncmp( ctype, curtype, DAT__SZTYP ) != 0 ) {
+	datAnnul( &comp_loc, &status );
+	datErase( hds_vloc, string_part(n->val), &status );
+	there = 0;
+      }
+
     }
-    if ( F77_ISFALSE(there) ) {
-	F77_CALL(dat_new) (CHARACTER_ARG(hds_vloc), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(fctype), INTEGER_ARG(&ndims),
-	    INTEGER_ARRAY_ARG(dims), INTEGER_ARG(&status) TRAIL_ARG(hds_vloc)
-	    TRAIL_ARG(fcname) TRAIL_ARG(fctype));
-	F77_CALL(dat_find) (CHARACTER_ARG(hds_vloc), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(comp_loc), INTEGER_ARG(&status) TRAIL_ARG(hds_vloc)
-	    TRAIL_ARG(fcname) TRAIL_ARG(comp_loc) );
+
+    if (!there) {
+      datNew( hds_vloc, string_part(n->val), ctype, ndims, dims, &status );
+      datFind( hds_vloc, string_part(n->val), &comp_loc, &status );
     }
+
 
     switch (val.type) {
       case TYPE_REAL:
-	fdval = real_part(val);
-	F77_CALL(dat_put0d) (CHARACTER_ARG(comp_loc), DOUBLE_ARG(&fdval),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) );
+	datPut0D( comp_loc, real_part(val), &status );
 	break;
       case TYPE_INTEGER:
-	fival = integer_part(val);
-	F77_CALL(dat_put0i) (CHARACTER_ARG(comp_loc), INTEGER_ARG(&fival),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) );
+	datPut0I( comp_loc, integer_part(val), &status );
 	break;
       case TYPE_LOGICAL:
-	flval = (logical_part(val)? F77_TRUE : F77_FALSE);
-	F77_CALL(dat_put0l) (CHARACTER_ARG(comp_loc), LOGICAL_ARG(&flval),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) );
+	datPut0L( comp_loc, logical_part(val), &status );
 	break;
       case TYPE_STRING:        
-	cnf_exprt(string_part(val), fcval, fcval_length);
-	F77_CALL(dat_put0c) (CHARACTER_ARG(comp_loc), CHARACTER_ARG(fcval),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) TRAIL_ARG(fcval) );
+	datPut0C( comp_loc, string_part(val), &status );
     }
-    F77_CALL(dat_annul) (CHARACTER_ARG(comp_loc), INTEGER_ARG(&status)
-	TRAIL_ARG(comp_loc) );
+    datAnnul( &comp_loc, &status );
 
     return value_string(str);
 }
@@ -401,82 +340,71 @@ reload_vars_hds(void)
 {
     extern node *node_value   (value v );			/* node.c */
 
-    DECLARE_CHARACTER(comp_loc, DAT__SZLOC);
-    DECLARE_CHARACTER(fcname,   DAT__SZNAM);
-    DECLARE_CHARACTER(fctype,   DAT__SZTYP);
-    DECLARE_INTEGER(index);
-    DECLARE_INTEGER(ncomp);
-    DECLARE_INTEGER(status);
-    DECLARE_REAL(rval);
-    DECLARE_INTEGER(ival);
-    DECLARE_LOGICAL(lval);
-    DECLARE_LOGICAL(there);
-    DECLARE_CHARACTER(fcval, 256);
+    HDSLoc * comp_loc;
 
-    value val, val1;
+    float rval;
+    int ival;
+    int lval;
+
+    int status = SAI__OK;
+    int ncomp = 0;
+    int index;
+    char name[DAT__SZNAM+1];
+    char type[DAT__SZTYP+1];
+    char cval[257];
+
+    value val;
     node *node;
-    char cval[257], name[DAT__SZNAM + 1], type[DAT__SZTYP + 1];
-    int cvind;
+    char ctmp[256];
 
-    status = SAI__OK;
-    F77_CALL(dat_ncomp) (CHARACTER_ARG(hds_vloc), INTEGER_ARG(&ncomp),
-	INTEGER_ARG(&status) TRAIL_ARG(hds_vloc) );
+    datNcomp( hds_vloc, &ncomp, &status );
     if (ncomp == 0)
 	return noval;
     index = 1;
     for( ; ncomp != 0; ncomp-- ) {
-	F77_CALL(dat_index) (CHARACTER_ARG(hds_vloc), INTEGER_ARG(&index),
-	    CHARACTER_ARG(comp_loc), INTEGER_ARG(&status) TRAIL_ARG(hds_vloc)
-	    TRAIL_ARG(comp_loc) );
-	F77_CALL(dat_name) (CHARACTER_ARG(comp_loc), CHARACTER_ARG(fcname),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) TRAIL_ARG(fcname) );
-	F77_CALL(dat_type) (CHARACTER_ARG(comp_loc), CHARACTER_ARG(fctype),
-	    INTEGER_ARG(&status) TRAIL_ARG(comp_loc) TRAIL_ARG(fctype) );
+        datIndex( hds_vloc, index, &comp_loc, &status );
+        datName( comp_loc, name, &status );
+        datType( comp_loc, type, &status );
+
 	/*
 	 * Now get the value, in the appropriate type
 	 */
-	cnf_impn(fctype, fctype_length, fctype_length, type);
 	if ( ( !strncmp( type, "_CHAR*", 6 ) ) ||
 	     ( !strcmp( type, "ADAM_PARNAME" ) ) ) {
 
-	    F77_CALL(dat_get0c) (CHARACTER_ARG(comp_loc),
-		CHARACTER_ARG(fcval), INTEGER_ARG(&status)
-		TRAIL_ARG(comp_loc) TRAIL_ARG(fcval));
+	    datGet0C( comp_loc, ctmp, sizeof(ctmp), &status );
+
 	    if ( status == SAI__OK ) {
 	    /* If it is a name,add the @ */
 		if (!strcmp( type, "ADAM_PARNAME" )) {
-		    cval[0] = '@';
-		    cvind = 1;
-		} else {
-		    cvind = 0;                            
-                }
-	        cnf_impn(fcval, fcval_length, fcval_length, cval + cvind );
+		    strcpy( cval, "@" );
+                } else {
+		    strcpy( cval, "" );
+		}
+		strncat( cval, ctmp, 255 );
 	        val = value_string( cval );
 	    }
 
 	} else if ( ( !strcmp( type, "_REAL" ) ) || 
 		    ( !strcmp( type, "_DOUBLE" ) ) ) {
-	    F77_CALL(dat_get0r) (CHARACTER_ARG(comp_loc), REAL_ARG(&rval),
-		INTEGER_ARG(&status) TRAIL_ARG(comp_loc) );
+
+	    datGet0R( comp_loc, &rval, &status );
 	    if ( status == SAI__OK )
 		val = value_real( rval );                    
 
 	} else if  ( !strcmp( type, "_INTEGER" ) ) {
- 	    F77_CALL(dat_get0i) (CHARACTER_ARG(comp_loc),
-		INTEGER_ARG(&ival), INTEGER_ARG(&status)
-		TRAIL_ARG(comp_loc) );
+
+	    datGet0I( comp_loc, &ival, &status );
 	    if ( status == SAI__OK )
 		val = value_integer( ival );                    
 
 	} else if  ( !strcmp( type, "_LOGICAL" ) ) {
-	    F77_CALL(dat_get0l) (CHARACTER_ARG(comp_loc),
-		LOGICAL_ARG(&lval), LOGICAL_ARG(&status)
-		TRAIL_ARG(comp_loc) );
+	    datGet0L( comp_loc, &lval, &status );
 	    if ( status == SAI__OK )
 		val = value_logical( lval );                    
 	} else {
 	    status = SAI__ERROR;
-	    emsSetc( "TYPE", fctype, fctype_length);
+	    emsSetc( "TYPE", type );
 	    emsRep(" ",
 		      "HDS : Non-standard type, ^TYPE", &status);
 	    break;
@@ -486,7 +414,6 @@ reload_vars_hds(void)
  * Store the variable for use by ICL
  * assign_helper copes with variables and parameters.
  */
-	cnf_impn(fcname, fcname_length, fcname_length, name);	
         if (( node = node0( name_interpret, value_string(name)) ) == NODENIL )
             return exception(
                         "SYSERR  memory exhausted in reload_vars_hds");
@@ -496,18 +423,15 @@ reload_vars_hds(void)
 /* 
  * delete the component from HDS
  */
-	F77_CALL(dat_annul) (CHARACTER_ARG(comp_loc), INTEGER_ARG(&status)
-	    TRAIL_ARG(comp_loc) );
-	F77_CALL(dat_erase) (CHARACTER_ARG(hds_vloc), CHARACTER_ARG(fcname),
-	    INTEGER_ARG(&status) TRAIL_ARG(hds_vloc) TRAIL_ARG(fcname) );
+	datAnnul( &comp_loc, &status );
+	datErase( hds_vloc, name, &status );
         }
     } /* for */
 /*
  * Update HDS file on disk
  */
     status = SAI__OK;
-    F77_CALL(hds_free) (CHARACTER_ARG(hds_tloc), INTEGER_ARG(&status)
-	TRAIL_ARG(hds_tloc) );
+    hdsFree( hds_tloc, &status );
 
     return noval;
 }
@@ -525,10 +449,8 @@ reload_vars_hds(void)
  *       The action name
  *    mode = *char (Given)
  *       The mode in which the file is to be opened ( see HDS_OPEN ).
- *    loc = *char  (Given)
+ *    loc = HDSLoc*  (Given)
  *       A locator for the top level of the file
- *    loc_length = int (Given)
- *       Length of loc
  *    status = *int (Given and Returned)
  *       The global status
  *
@@ -544,18 +466,15 @@ reload_vars_hds(void)
  *****************************************************************************
  */
 void openpar( char *taskname, char *actname, char *mode, 
-              char *floc, int floc_length, int *status )
+              HDSLoc **floc, int *status )
 {
-DECLARE_CHARACTER(loc, DAT__SZLOC);
-DECLARE_CHARACTER(factname, MSG_NAME_LEN);
-DECLARE_CHARACTER(ffilename, 200);
-DECLARE_CHARACTER(fmode, DAT__SZMOD);
-DECLARE_CHARACTER(ftype, DAT__SZTYP);
-DECLARE_INTEGER(index);
-DECLARE_LOGICAL(there);
-DECLARE_LOGICAL(true);
-char *filename;
-char type[DAT__SZTYP];
+  HDSLoc * loc;
+  char *filename;
+  char type[DAT__SZTYP+1];
+  int index;
+  int there;
+  int true;
+
 /* 
  * Construct the filename
  */
@@ -567,40 +486,28 @@ char type[DAT__SZTYP];
 /* 
  * Now find the parameter file 
  */
-    cnf_exprt(mode, fmode, fmode_length);
-    cnf_exprt(filename, ffilename, ffilename_length);
-    F77_CALL(hds_open) (CHARACTER_ARG(ffilename), CHARACTER_ARG(fmode),
-	CHARACTER_ARG(loc), INTEGER_ARG(status) TRAIL_ARG(ffilename)
-	TRAIL_ARG(fmode) TRAIL_ARG(loc));
+    hdsOpen(filename, mode, &loc, status );
+    free(filename);
     if (*status == SAI__OK)
     {
     /* Is it a monolith? Look at the first component to see if it has
      * type PROGRAM if so, assume it is a monolith
      */
 	index = 1;
-        F77_CALL(dat_index) (CHARACTER_ARG(loc), INTEGER_ARG(&index),
-	    CHARACTER_ARG(floc), INTEGER_ARG(status) TRAIL_ARG(loc)
-	    TRAIL_ARG(floc));
-	F77_CALL(dat_type)  (CHARACTER_ARG(floc), CHARACTER_ARG(ftype),
-	    INTEGER_ARG(status) TRAIL_ARG(floc) TRAIL_ARG(ftype));
-	F77_CALL(dat_annul) (CHARACTER_ARG(floc), INTEGER_ARG(status)
-	    TRAIL_ARG(floc));
-        cnf_imprt(ftype, ftype_length, type );
+	datIndex( loc, index, floc, status );
+	datType( *floc, type, status );
+	datAnnul( floc, status );
+
 	if (!strncmp(type, "PROGRAM", 7))
 	{
         /* It is a monolith - find action component */
-            cnf_exprt(actname, factname, factname_length);
-	    F77_CALL(dat_there) (CHARACTER_ARG(loc), CHARACTER_ARG(factname), 
-		LOGICAL_ARG(&there), INTEGER_ARG(status) TRAIL_ARG(loc)
-		TRAIL_ARG(factname) );
+	    datThere( loc, actname, &there, status );
             if ( there )
-	       F77_CALL(dat_find) (CHARACTER_ARG(loc), CHARACTER_ARG(factname), 
-		    CHARACTER_ARG(floc), INTEGER_ARG(status) 
-		    TRAIL_ARG(loc) TRAIL_ARG(factname) TRAIL_ARG(floc));
+	      datFind( loc, actname, floc, status );
             else
             {
                 *status = SAI__ERROR;
-                emsSetc( "NAME", actname, factname_length );
+                emsSetc( "NAME", actname );
                 emsRep( " ",
                     "Failed to find parameter file component for action ^NAME", 
                     status );
@@ -611,17 +518,13 @@ char type[DAT__SZTYP];
          *  It is not a monolith - clone the file locator as action locator
          *  and make it primary
          */
-	    F77_CALL(dat_clone) (CHARACTER_ARG(loc), CHARACTER_ARG(floc),
-		INTEGER_ARG(status) TRAIL_ARG(loc) TRAIL_ARG(floc));
+         datClone( loc, floc, status );
+
             
 /* Make floc a primary locator */
-         true = F77_TRUE;
-         F77_CALL(dat_prmry)(LOGICAL_ARG(&true), CHARACTER_ARG(floc),
-                                LOGICAL_ARG(&true), INTEGER_ARG(status)
-                                TRAIL_ARG(floc) );
+ 	 datPrmry( 1, floc, &true, status );
 /* Close the file (It will remain open till floc is annulled) */
-         F77_CALL(dat_annul)(CHARACTER_ARG(loc), INTEGER_ARG(status)
-                             TRAIL_ARG(loc) );
+	 datAnnul( &loc, status );
     }
 /* 
  * Now release the error context
@@ -652,28 +555,20 @@ static value
 proc_getpar( node *n)
 {
     value val;
-    int cvind;
 
-    DECLARE_REAL(rval);
-    DECLARE_INTEGER(ival);
-    DECLARE_LOGICAL(lval);
-    DECLARE_LOGICAL(there);
-    DECLARE_CHARACTER(fparameter, MSG_NAME_LEN);
-    DECLARE_CHARACTER(fcommand, MSG_NAME_LEN);
-    DECLARE_CHARACTER(factname, MSG_NAME_LEN);
-    DECLARE_CHARACTER(fcname, DAT__SZNAM);
-    DECLARE_CHARACTER(ffilename, 200);
-    DECLARE_CHARACTER(fcval, 256);
-    DECLARE_CHARACTER(fmode, DAT__SZMOD);
-    DECLARE_CHARACTER(ftype, DAT__SZTYP);
-    DECLARE_INTEGER(index);
-    DECLARE_INTEGER(status);
-    DECLARE_INTEGER(istat);
-    DECLARE_CHARACTER(loc, DAT__SZLOC);
-    DECLARE_CHARACTER(floc, DAT__SZLOC);
-    DECLARE_CHARACTER(ploc, DAT__SZLOC);
-    DECLARE_CHARACTER(cloc, DAT__SZLOC);
-    char *filename, *command, *parameter, *varname, *taskname, *actname;
+    float rval;
+    int ival;
+    int lval;
+    int there;
+
+    char type[DAT__SZTYP+1];
+    int status = SAI__OK;
+    HDSLoc * floc = NULL;
+    HDSLoc * ploc = NULL;
+    HDSLoc * cloc = NULL;
+
+    char *command, *parameter, *taskname, *actname;
+    char fcval[257];
     char cval[257];
     node *nw, *variable;
 /* 
@@ -737,25 +632,19 @@ proc_getpar( node *n)
 
     status = SAI__OK;
     (void) openpar( taskname, actname, "READ", 
-                    floc, floc_length, &status );
+                    &floc, &status );
 	/* 
          * If all OK, Find parameter component
          */
 	if (status == SAI__OK)
 	{
-	    cnf_exprt(parameter, fparameter, fparameter_length);
-	    F77_CALL(dat_there) (CHARACTER_ARG(floc), CHARACTER_ARG(fparameter), 
-		LOGICAL_ARG(&there), INTEGER_ARG(&status) TRAIL_ARG(floc) 
-		TRAIL_ARG(fparameter) );
+	    datThere( floc, parameter, &there, &status );
             if ( there )
-	        F77_CALL(dat_find) (CHARACTER_ARG(floc),
-		    CHARACTER_ARG(fparameter), CHARACTER_ARG(ploc),
-		    INTEGER_ARG(&status) TRAIL_ARG(floc) TRAIL_ARG(fparameter)
-		    TRAIL_ARG(ploc));
+	      datFind( floc, parameter, &ploc, &status );
             else
             {
                 status = SAI__ERROR;
-                emsSetc( "NAME", parameter, fparameter_length );
+                emsSetc( "NAME", parameter );
                 emsRep( " ",
 		    "GETPAR : Failed to find HDS component for parameter ^name",
                     &status );
@@ -763,74 +652,59 @@ proc_getpar( node *n)
 	    if (status == SAI__OK)
 	    {
             /* Find type of parameter component */
-	        F77_CALL(dat_type) (CHARACTER_ARG(ploc), CHARACTER_ARG(ftype),
-		    INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(ftype));
+	      datType( ploc, type, &status );
             /* 
              * Check if it is a 'name' structure
              */
-	        if ( !strncmp( ftype, "ADAM_PARNAME", 12) )
+	        if ( !strncmp( type, "ADAM_PARNAME", 12) )
                 {
                 /*
 		 * It is a name - find the NAMEPTR component
 		 */
-		    cnf_exprt("NAMEPTR", fcname, fcname_length);
-	            F77_CALL(dat_find) (CHARACTER_ARG(ploc),
-			CHARACTER_ARG(fcname), CHARACTER_ARG(cloc),
-			INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(fcname)
-			TRAIL_ARG(cloc));
+		    datFind( ploc, "NAMEPTR", &cloc, &status );
 	        } else
                 /*
 		 * It is not a 'name' structure - clone the parameter locator
                  */
-	            F77_CALL(dat_clone) (CHARACTER_ARG(ploc),
-			CHARACTER_ARG(cloc), INTEGER_ARG(&status)
-			TRAIL_ARG(ploc) TRAIL_ARG(cloc));
+		    datClone( ploc, &cloc, &status );
             /*
 	     * Now get the value, in the appropriate type
              */
-                if ( ( !strncmp( ftype, "_CHAR*", 6 ) ) ||
-                     ( !strncmp( ftype, "ADAM_PARNAME", 12) ) )
+                if ( ( !strncmp( type, "_CHAR*", 6 ) ) ||
+                     ( !strncmp( type, "ADAM_PARNAME", 12) ) )
                 {
-		    F77_CALL(dat_get0c) (CHARACTER_ARG(cloc),
-			CHARACTER_ARG(fcval), INTEGER_ARG(&status)
-			TRAIL_ARG(cloc) TRAIL_ARG(fcval));
+		  datGet0C( cloc, fcval, sizeof(fcval), &status );
                     if ( status == SAI__OK )                    
                     {
                     /* If it is a name,add the @ */
-                        if (!strncmp( ftype, "ADAM_PARNAME", 12 ))
+                        if (!strncmp( type, "ADAM_PARNAME", 12 ))
                         {
-                            cval[0] = '@';
-                            cvind = 1;
+			  strcpy( cval, "@" );
                         } else
-                            cvind = 0;                            
-		        cnf_impn(fcval, fcval_length, fcval_length,
-                                 cval + cvind );
+			  strcpy( cval, "" );
+
+			strncat( cval, fcval, 256 );
                         val = value_string( cval );
                     }
 
-                } else if ( ( !strncmp( ftype, "_REAL", 5 ) ) || 
-                            ( !strncmp( ftype, "_DOUBLE", 7) ) )
+                } else if ( ( !strncmp( type, "_REAL", 5 ) ) || 
+                            ( !strncmp( type, "_DOUBLE", 7) ) )
                     {
-                    F77_CALL(dat_get0r) (CHARACTER_ARG(cloc), REAL_ARG(&rval),
-			INTEGER_ARG(&status) TRAIL_ARG(cloc) );
+		      datGet0R( cloc, &rval, &status );
                     if ( status == SAI__OK )
-                        val = value_real( rval );                    
+                        val = value_real( rval );
                     else ;
 
-                } else if  ( !strncmp( ftype, "_INTEGER", 8) )
-                    {
-                    F77_CALL(dat_get0i) (CHARACTER_ARG(cloc),
-			INTEGER_ARG(&ival), INTEGER_ARG(&status)
-			TRAIL_ARG(cloc) );
+                } else if  ( !strncmp( type, "_INTEGER", 8) )
+		  {
+		    datGet0I( cloc, &ival, &status );
                     if ( status == SAI__OK )
                         val = value_integer( ival );                    
                     else ;
 
-                } else if  ( !strncmp( ftype, "_LOGICAL", 8) )
+                } else if  ( !strncmp( type, "_LOGICAL", 8) )
                     {
-                    F77_CALL(dat_get0l) (CHARACTER_ARG(cloc),
-			LOGICAL_ARG(&lval), LOGICAL_ARG(&status)
-			TRAIL_ARG(cloc) );
+		      datGet0L( cloc, &lval, &status );
                     if ( status == SAI__OK )
                         val = value_logical( lval );                    
                     else ;
@@ -838,7 +712,7 @@ proc_getpar( node *n)
                 } else
                     {
                     status = SAI__ERROR;
-                    emsSetc( "TYPE", ftype, ftype_length);
+                    emsSetc( "TYPE", type );
                     emsRep(" ",
 			"GETPAR : Non-standard HDS component type, ^TYPE",
 			&status);
@@ -848,20 +722,17 @@ proc_getpar( node *n)
                     assign_helper( variable, val );
 		else ;
 	   /* Annul the parameter bottom component locator */
-		F77_CALL(dat_annul) (CHARACTER_ARG(cloc), INTEGER_ARG(&status)
-		    TRAIL_ARG(cloc));
+		datAnnul( &cloc, &status );
  	   /*
             * Annul the parameter component locator
             */
-  		F77_CALL(dat_annul) (CHARACTER_ARG(ploc), INTEGER_ARG(&status)
-		    TRAIL_ARG(ploc));
+		datAnnul( &ploc, &status );
 
 	    } else ;
 	/*
          * Annul the action component locator - this should close the file.
          */
-	    F77_CALL(dat_annul) (CHARACTER_ARG(floc), INTEGER_ARG(&status)
-		TRAIL_ARG(floc));
+	    datAnnul( &floc, &status );
 
     } else
         emsRep( " ",
@@ -905,14 +776,11 @@ proc_getpar( node *n)
  *
  *****************************************************************************
  */
-void openglobal( char *mode, char *loc, int loc_length, int *status )
+void openglobal( char *mode, HDSLoc **loc, int *status )
 {
-    DECLARE_CHARACTER(ffilename, 200);
-    DECLARE_CHARACTER(fcname, 20);
-    DECLARE_CHARACTER(fmode, DAT__SZMOD);
-    DECLARE_CHARACTER(ftype, DAT__SZTYP);
-    DECLARE_INTEGER(ndims);
-    DECLARE_INTEGER_ARRAY(dims,1);
+
+    int ndims;
+    hdsdim dims[1];
     char *filename;
 /*
  * Set an error reporting context
@@ -923,24 +791,15 @@ void openglobal( char *mode, char *loc, int loc_length, int *status )
  * First, construct filename
  */
     filename = strconcat(hds_path, "GLOBAL");
-    cnf_exprt(filename, ffilename, ffilename_length);
-    free(filename);
-    cnf_exprt(mode, fmode, fmode_length);
-    F77_CALL(hds_open) (CHARACTER_ARG(ffilename), CHARACTER_ARG(fmode),
-	CHARACTER_ARG(loc), INTEGER_ARG(status) TRAIL_ARG(ffilename)
-	TRAIL_ARG(fmode) TRAIL_ARG(loc));
+    hdsOpen( filename, mode, loc, status );
 
-    if ( (*status == HDS_I_FNF) && strcmp( mode, "READ" ) ) {
+    if ( (*status == DAT__FILNF) && strcmp( mode, "READ" ) ) {
     /* Need to create a new file */
         emsAnnul(status);
 	ndims = 0;
-	cnf_exprt("GLOBAL", fcname, fcname_length);
-	cnf_exprt("STRUC" , ftype,  ftype_length);
-	F77_CALL(hds_new) (CHARACTER_ARG(ffilename), CHARACTER_ARG(fcname),
-	    CHARACTER_ARG(ftype), INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-	    CHARACTER_ARG(loc), INTEGER_ARG(status) TRAIL_ARG(ffilename)
-	    TRAIL_ARG(fcname) TRAIL_ARG(ftype) TRAIL_ARG(loc) );
+	hdsNew( filename, "GLOBAL", "STRUC", ndims, dims, loc, status );
     }
+    free(filename);
     emsRlse();
 }
 
@@ -987,37 +846,27 @@ void openglobal( char *mode, char *loc, int loc_length, int *status )
  *
  *****************************************************************************
  */
-void ensure_exists( char *loc, int loc_length,
+void ensure_exists( HDSLoc *loc,
                     char *parameter, char *type, char *btype,
-                    char *ploc, int ploc_length, 
+                    HDSLoc *ploc,
                     int *status )
 {
-DECLARE_CHARACTER(fparameter, MSG_NAME_LEN);
-DECLARE_CHARACTER(fcname, DAT__SZNAM);
-DECLARE_CHARACTER(cloc, DAT__SZLOC);
-DECLARE_CHARACTER(fhdstype, DAT__SZTYP);
-DECLARE_LOGICAL(there);
-DECLARE_INTEGER(ndims);
-DECLARE_INTEGER_ARRAY(dims,1);
+
+HDSLoc * cloc = NULL;
+int ndims;
+hdsdim dims[1];
+int there;
 int new;
 char hdstype[DAT__SZTYP+1];
 
-	cnf_exprt(parameter, fparameter, fparameter_length);
-	F77_CALL(dat_there) (CHARACTER_ARG(loc), CHARACTER_ARG(fparameter), 
-	    LOGICAL_ARG(&there), INTEGER_ARG(status) TRAIL_ARG(loc)
-	    TRAIL_ARG(fparameter) );
+        datThere( loc, parameter, &there, status );
 
 /*  See if we need to create a new component */
-        if ( !(new = F77_ISFALSE(there)) ) {
+	new = ( !there ? 1 : 0 );
+        if ( !new ) {
 /* If there is one, get a locator to it and check it's OK */
-            F77_CALL(dat_find)(CHARACTER_ARG(loc),
-		CHARACTER_ARG(fparameter), CHARACTER_ARG(ploc),
-		INTEGER_ARG(status) TRAIL_ARG(loc)
-		TRAIL_ARG(fparameter) TRAIL_ARG(ploc));
-
-            F77_CALL(dat_type)(CHARACTER_ARG(ploc), CHARACTER_ARG(fhdstype),
-                INTEGER_ARG(status) TRAIL_ARG(ploc) TRAIL_ARG(fhdstype) );
-            cnf_imprt(fhdstype, fhdstype_length, hdstype );
+	  datFind( loc, parameter, &ploc, status );
+	  datType( ploc, hdstype, status );
            
 /* See if the existing component is OK.
  * If type is not "?" check the type against the existing component type
@@ -1030,11 +879,8 @@ char hdstype[DAT__SZTYP+1];
                
 /* If we need a new component, delete the old one */
             if ( new ) {
-               F77_CALL(dat_annul)(CHARACTER_ARG(ploc), 
-                  INTEGER_ARG(status) TRAIL_ARG(ploc) );
-               F77_CALL(dat_erase) (CHARACTER_ARG(loc), 
-                  CHARACTER_ARG(fparameter), INTEGER_ARG(status) 
-                  TRAIL_ARG(loc) TRAIL_ARG(fparameter) );
+	      datAnnul( &ploc, status );
+	      datErase( loc, parameter, status );
             }
          }
 
@@ -1042,7 +888,6 @@ char hdstype[DAT__SZTYP+1];
  * or backup type if type is "?"
  */
          type[0]=='?'?strcpy( hdstype, btype ): strcpy( hdstype, type );
-         cnf_exprt(hdstype, fhdstype, fhdstype_length);
 
 /* Now create a new component of necessary */
         if ( new ) {
@@ -1051,64 +896,39 @@ char hdstype[DAT__SZTYP+1];
            if ( !strcasecmp(hdstype,"ADAM_PARNAME") ) {
       /* It is a name */
       /* Create a NAME parameter component */
-              cnf_exprt( "ADAM_PARNAME", fhdstype, fhdstype_length);
-              F77_CALL(dat_new) (CHARACTER_ARG(loc),
-		CHARACTER_ARG(fparameter), CHARACTER_ARG(fhdstype),
-		INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-		INTEGER_ARG(status) TRAIL_ARG(loc)
-		TRAIL_ARG(fparameter) TRAIL_ARG(fhdstype));
+	     datNew( loc, parameter, "ADAM_PARNAME", ndims, dims, status );
 
       /* and get a locator to it */
-              F77_CALL(dat_find)(CHARACTER_ARG(loc),
-		CHARACTER_ARG(fparameter), CHARACTER_ARG(ploc),
-		INTEGER_ARG(status) TRAIL_ARG(loc)
-		TRAIL_ARG(fparameter) TRAIL_ARG(ploc));
+	     datFind( loc, parameter, &ploc, status );
 
       /* create the NAMEPTR component */
-                cnf_exprt("NAMEPTR", fcname, fcname_length);
-                cnf_exprt("_CHAR*132", fhdstype, fhdstype_length);
-              F77_CALL(dat_new) (CHARACTER_ARG(ploc),
-		CHARACTER_ARG(fcname), CHARACTER_ARG(fhdstype),
-		INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-		INTEGER_ARG(status) TRAIL_ARG(ploc) TRAIL_ARG(fcname)
-		TRAIL_ARG(fhdstype));
+	     datNew( ploc, "NAMEPTR", "_CHAR*132", ndims, dims, status );
 
            } else {
    /* 
     * Not a name - create a component of the required type
     */
-              F77_CALL(dat_new) (CHARACTER_ARG(loc), 
-		CHARACTER_ARG(fparameter), CHARACTER_ARG(fhdstype),
-		INTEGER_ARG(&ndims), INTEGER_ARRAY_ARG(dims),
-		INTEGER_ARG(status) TRAIL_ARG(loc)
-		TRAIL_ARG(fparameter) TRAIL_ARG(fhdstype));
+	     datNew( loc, parameter, hdstype, ndims, dims, status );
 
                 /* Get locator to newly created component */
-  	      F77_CALL(dat_find) (CHARACTER_ARG(loc), 
-                CHARACTER_ARG(fparameter), CHARACTER_ARG(ploc), 
-                INTEGER_ARG(status) TRAIL_ARG(loc)
-	        TRAIL_ARG(fparameter) TRAIL_ARG(ploc));
+	     datFind( loc, parameter, &ploc, status );
+
            }
         }
 
 /* If the component is an ADAM_PARNAME, set the returned locator to
  * the NAMPTR component
  */
-        cnf_exprt("NAMEPTR", fcname, fcname_length);
+
         if ( !strcasecmp( hdstype, "ADAM_PARNAME" ) ) {
-	   F77_CALL(dat_find) (CHARACTER_ARG(ploc), 
-              CHARACTER_ARG(fcname), CHARACTER_ARG(cloc), 
-              INTEGER_ARG(status) TRAIL_ARG(ploc)
-              TRAIL_ARG(fcname) TRAIL_ARG(cloc));
+	  datFind( ploc, "NAMEPTR", &cloc, status );
 
       /* Annul the intermediate locator */
-           F77_CALL(dat_annul)(CHARACTER_ARG(ploc), INTEGER_ARG(status)
-              TRAIL_ARG(ploc) );
+	  datAnnul( &ploc, status );
+
       /* and clone the new one and annul it */
-           F77_CALL(dat_clone)(CHARACTER_ARG(cloc), CHARACTER_ARG(ploc),
-              INTEGER_ARG(status) TRAIL_ARG(cloc) TRAIL_ARG(ploc) );
-           F77_CALL(dat_annul)(CHARACTER_ARG(cloc), INTEGER_ARG(status)
-              TRAIL_ARG(cloc) );
+	  datClone( cloc, &ploc, status );
+	  datAnnul( &cloc, status );
        }
 }
 
@@ -1140,10 +960,11 @@ static value
 proc_setpar(node *n)
 {
     value val;
-    DECLARE_CHARACTER(fvalue, 256);
-    DECLARE_INTEGER(status);
-    DECLARE_CHARACTER(floc, DAT__SZLOC);
-    DECLARE_CHARACTER(ploc, DAT__SZLOC);
+
+    int status = SAI__OK;
+    HDSLoc * floc = NULL;
+    HDSLoc * ploc = NULL;
+
     char *command, *parameter, *taskname, *actname, *value;
     char type[DAT__SZTYP+1];
     int hname;
@@ -1207,7 +1028,7 @@ proc_setpar(node *n)
 /* Now open the parameter file */
     status = SAI__OK;
     (void) openpar( taskname, actname, "UPDATE", 
-                    floc, floc_length, &status );
+                    &floc, &status );
 
 /*
  * If all OK, Find parameter component
@@ -1217,26 +1038,23 @@ proc_setpar(node *n)
         hname?strcpy(type, "ADAM_PARNAME"): strcpy(type, "?");
 
 /*   Ensure a component of the right type exists */
-        (void) ensure_exists( floc, floc_length, parameter, 
-                              type, "_CHAR*132", ploc, ploc_length,
+        (void) ensure_exists( floc, parameter, 
+                              type, "_CHAR*132", ploc,
                               &status );
    /* 
     * Now write the value into the appropriate component 
     *  skipping the first character (@) if hname is 1
     */
-        cnf_exprt( value + hname, fvalue, fvalue_length );
+
    /* Write a normal value */
-	F77_CALL(dat_put0c) (CHARACTER_ARG(ploc), CHARACTER_ARG(fvalue),
-  	         INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(fvalue));
+	datPut0C( ploc, (value + hname ), &status );
 
     /* Annul the parameter component locator */
-        F77_CALL(dat_annul) (CHARACTER_ARG(ploc), INTEGER_ARG(&status)
-                             TRAIL_ARG(ploc));
+	datAnnul( &ploc, &status );
 
     /* Annul the action component locator
      * this should close the file */
-        F77_CALL(dat_annul) (CHARACTER_ARG(floc), INTEGER_ARG(&status)
-               		     TRAIL_ARG(floc));
+	datAnnul( &floc, &status );
 
     } else
         emsRep( " ",
@@ -1270,25 +1088,24 @@ static value
 proc_getglobal( node *n)
 {
     value val;
-    int cvind;
-    DECLARE_REAL(rval);
-    DECLARE_INTEGER(ival);
-    DECLARE_LOGICAL(lval);
-    DECLARE_LOGICAL(there);
-    DECLARE_CHARACTER(fparameter, MSG_NAME_LEN);
-    DECLARE_CHARACTER(fcname, DAT__SZNAM);
-    DECLARE_CHARACTER(ffilename, 200);
-    DECLARE_CHARACTER(fcval, 256);
-    DECLARE_CHARACTER(fmode, DAT__SZMOD);
-    DECLARE_CHARACTER(ftype, DAT__SZTYP);
-    DECLARE_INTEGER(status);
-    DECLARE_INTEGER(istat);
-    DECLARE_CHARACTER(loc, DAT__SZLOC);
-    DECLARE_CHARACTER(ploc, DAT__SZLOC);
-    DECLARE_CHARACTER(cloc, DAT__SZLOC);
-    char *filename, *parameter, *type;
+
+    float rval;
+    int   ival;
+    int   lval;
+
+    char type[DAT__SZTYP+1];
+
+    int there;
+    int istat;
+    int status = SAI__OK;
+    HDSLoc * loc = NULL;
+    HDSLoc * ploc = NULL;
+    HDSLoc * cloc = NULL;
+
+    char *parameter;
     char cval[257];
-    node *nw, *variable;
+    char ctmp[258];
+    node *variable;
 /* 
  * Check number of parameters
  */
@@ -1324,24 +1141,18 @@ proc_getglobal( node *n)
 
 /* Now open the GLOBAL file */
     status = SAI__OK;
-    (void) openglobal( "READ", loc, loc_length, &status );
+    (void) openglobal( "READ", &loc, &status );
 
     if (status == SAI__OK)
     {
 /* If all OK, Find parameter component */
-	cnf_exprt(parameter, fparameter, fparameter_length);
-	F77_CALL(dat_there) (CHARACTER_ARG(loc), CHARACTER_ARG(fparameter), 
-	    LOGICAL_ARG(&there), INTEGER_ARG(&status) TRAIL_ARG(loc)
-	    TRAIL_ARG(fparameter) );
+      datThere( loc, parameter, &there, &status );
         if ( there )
-	    F77_CALL(dat_find) (CHARACTER_ARG(loc), CHARACTER_ARG(fparameter), 
-		CHARACTER_ARG(ploc), INTEGER_ARG(&status) TRAIL_ARG(loc)
-		TRAIL_ARG(fparameter)
-				TRAIL_ARG(ploc));
+	  datFind( loc, parameter, &ploc, &status );
         else
         {
             status = SAI__ERROR;
-            emsSetc( "NAME", parameter, fparameter_length );
+            emsSetc( "NAME", parameter );
             emsRep( " ",
                 "GETGLOBAL : Failed to find HDS component for parameter ^name", 
                 &status );
@@ -1349,69 +1160,58 @@ proc_getglobal( node *n)
 	if (status == SAI__OK)
 	{
         /* Find type of parameter component */
-	    F77_CALL(dat_type) (CHARACTER_ARG(ploc), CHARACTER_ARG(ftype),
-		INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(ftype));
+	  datType( ploc, type, &status );
+
         /*
          * If it is a 'name' type, find the actual name component
          */
-	    if ( !strncmp( ftype, "ADAM_PARNAME", 12) )
+	    if ( !strncmp( type, "ADAM_PARNAME", 12) )
             {
             /* It is a name - find the NAMEPTR component */
-                cnf_exprt("NAMEPTR", fcname, fcname_length);
-	        F77_CALL(dat_find) (CHARACTER_ARG(ploc), CHARACTER_ARG(fcname), 
-		    CHARACTER_ARG(cloc), INTEGER_ARG(&status) TRAIL_ARG(ploc)
-		    TRAIL_ARG(fcname) TRAIL_ARG(cloc));
+	      datFind( ploc, "NAMEPTR", &cloc, &status );
 	    } else
                 /*
                  * It is not a 'name' structure - clone the parameter locator
                  */
-	        F77_CALL(dat_clone) (CHARACTER_ARG(ploc), CHARACTER_ARG(cloc), 
-		    INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(cloc));
+	      datClone(ploc, &cloc, &status );
                    
             if ( status == SAI__OK )
             {
             /* Now get the value, in the appropriate type */
-                if ( ( !strncmp( ftype, "_CHAR*", 6 ) ) ||
-                     ( !strncmp( ftype, "ADAM_PARNAME", 12) ) )
+                if ( ( !strncmp( type, "_CHAR*", 6 ) ) ||
+                     ( !strncmp( type, "ADAM_PARNAME", 12) ) )
                 {
-		    F77_CALL(dat_get0c) (CHARACTER_ARG(cloc),
-			CHARACTER_ARG(fcval), INTEGER_ARG(&status)
-			TRAIL_ARG(cloc) TRAIL_ARG(fcval));
+		  datGet0C( cloc, cval, sizeof(cval), &status );
                     if ( status == SAI__OK )                    
                     {
                     /* If it is a name, add the @ */
-                        if ( !strncmp( ftype, "ADAM_PARNAME", 12) )
+                        if ( !strncmp( type, "ADAM_PARNAME", 12) )
                         {
-                            cval[0] = '@';
-                            cvind = 1;
+			  strcpy( ctmp, "@" );
                         } else
-                            cvind = 0;
-		        cnf_impn(fcval, fcval_length, fcval_length, 
-                                 cval + cvind );
-                        val = value_string( cval );
+			  strcpy( ctmp, "" );
+			strncat( ctmp, cval, 256 );
+                        val = value_string( ctmp );
                     } else ;
 
-                } else if ( ( !strncmp( ftype, "_REAL", 5) ) || 
-                            ( !strncmp( ftype, "_DOUBLE", 7) ) )
+                } else if ( ( !strncmp( type, "_REAL", 5) ) || 
+                            ( !strncmp( type, "_DOUBLE", 7) ) )
                     {
-                    F77_CALL(dat_get0r) (CHARACTER_ARG(cloc), REAL_ARG(&rval),
-			INTEGER_ARG(&status) TRAIL_ARG(cloc) );
+		      datGet0R( cloc, &rval, &status );
                     if ( status == SAI__OK )
                         val = value_real( rval );                    
                     else ;
 
-                } else if  ( !strncmp( ftype, "_INTEGER", 8) )
+                } else if  ( !strncmp( type, "_INTEGER", 8) )
                     {
-                    F77_CALL(dat_get0i) (CHARACTER_ARG(cloc),INTEGER_ARG(&ival),
-			INTEGER_ARG(&status) TRAIL_ARG(cloc) );
+		      datGet0I( cloc, &ival, &status );
                     if ( status == SAI__OK )
                         val = value_integer( ival );                    
                     else ;
 
-                } else if  ( !strncmp( ftype, "_LOGICAL", 8) )
+                } else if  ( !strncmp( type, "_LOGICAL", 8) )
                     {
-                    F77_CALL(dat_get0l) (CHARACTER_ARG(cloc),LOGICAL_ARG(&lval),
-			LOGICAL_ARG(&status) TRAIL_ARG(cloc) );
+		      datGet0L( cloc, &lval, &status );
                     if ( status == SAI__OK )
                         val = value_logical( lval );                    
                     else ;
@@ -1419,7 +1219,7 @@ proc_getglobal( node *n)
                 } else
                     {
                     status = SAI__ERROR;
-                    emsSetc( "TYPE", ftype, ftype_length);
+                    emsSetc( "TYPE", type);
                     emsRep(" ", 
 			"GETGLOBAL : Non-standard HDS component type ^TYPE",
 			&status);
@@ -1430,19 +1230,16 @@ proc_getglobal( node *n)
 		else ;
 
 	   /* Annul the parameter bottom component locator */
-		F77_CALL(dat_annul) (CHARACTER_ARG(cloc), INTEGER_ARG(&status)
-		    TRAIL_ARG(cloc));
+		datAnnul( &cloc, &status );
 	    } else ;
 
  	/* Annul the parameter component locator */
-            F77_CALL(dat_annul) (CHARACTER_ARG(ploc), INTEGER_ARG(&status)
-		TRAIL_ARG(ploc));
+	    datAnnul( &ploc, &status );
 	} else ;
 
     /* close the file - ensuring good status is given */
         istat = SAI__OK;
-	F77_CALL(hds_close) (CHARACTER_ARG(loc), INTEGER_ARG(&istat)
-	    TRAIL_ARG(loc));
+	hdsClose( &loc, &istat );
     } else
         emsRep( " ",
 	    "GETGLOBAL : Failed to open GLOBAL parameter file", &status );
@@ -1483,18 +1280,16 @@ proc_getglobal( node *n)
 static value
 proc_setglobal(node *n)
 {
-    DECLARE_CHARACTER(fvalue, 256);
-    DECLARE_INTEGER(status);
-    DECLARE_INTEGER(istat);
-    DECLARE_CHARACTER(loc, DAT__SZLOC);
-    DECLARE_CHARACTER(ploc, DAT__SZLOC);
-    DECLARE_LOGICAL(there);
+
+    int istat;
+    int status = SAI__OK;
+    HDSLoc *loc = NULL;
+    HDSLoc *ploc = NULL;
     value val;
     int hname;
-    int new;
     char type[DAT__SZTYP];
-    char *vp, *parameter, *value;
-    node *nw;
+    char *parameter, *value;
+
 /*
  * Check number of parameters
  */
@@ -1528,33 +1323,29 @@ proc_setglobal(node *n)
 
 /* Open GLOBAL file */
     status = SAI__OK;
-    openglobal( "UPDATE", loc, loc_length, &status );
+    openglobal( "UPDATE", &loc, &status );
 
 /* If all OK, Find parameter component */
     if (status == SAI__OK) {
 
        hname? strcpy(type, "ADAM_PARNAME"): strcpy(type, "?");
 
-       (void) ensure_exists( loc, loc_length, parameter, 
-                             type, "_CHAR*132", ploc, ploc_length,
+       (void) ensure_exists( loc, parameter, 
+                             type, "_CHAR*132", ploc,
                              &status );
        /* 
         * Now write the value into the appropriate component 
         *  skipping the first character (@) if hname is 1
         */
-        cnf_exprt( value + hname, fvalue, fvalue_length );
             /* Write a normal value */
-        F77_CALL(dat_put0c) (CHARACTER_ARG(ploc), CHARACTER_ARG(fvalue),
-	      INTEGER_ARG(&status) TRAIL_ARG(ploc) TRAIL_ARG(fvalue));
+	datPut0C( ploc, (value+hname), &status );
 
         /* Annul the parameter component locator */
-        F77_CALL(dat_annul) (CHARACTER_ARG(ploc), INTEGER_ARG(&status) 
-          TRAIL_ARG(ploc));
+	datAnnul( &ploc, &status);
 
     /* close the file - ensuring good status is given */
         istat = SAI__OK;
-        F77_CALL(hds_close) (CHARACTER_ARG(loc), INTEGER_ARG(&istat)
-          TRAIL_ARG(loc));
+	hdsClose( &loc, &istat);
 
     } else
         emsRep( " ",
@@ -1594,14 +1385,13 @@ proc_setglobal(node *n)
 static value
 proc_createglobal(node *n)
 {
-    DECLARE_INTEGER(status);
-    DECLARE_INTEGER(istat);
-    DECLARE_CHARACTER(loc, DAT__SZLOC);
-    DECLARE_CHARACTER(ploc, DAT__SZLOC);
+    int istat;
+    int status = SAI__OK;
+    HDSLoc *loc = NULL;
+    HDSLoc *ploc = NULL;
     value val;
-    int hname;
-    char *vp, *filename, *parameter, *type;
-    node *nw;
+    char *parameter, *type;
+
 /*
  * Check number of parameters
  */
@@ -1635,7 +1425,7 @@ proc_createglobal(node *n)
 
 /* Now open the GLOBAL file, creating it if necessary */
     status = SAI__OK;
-    openglobal( "UPDATE", loc, loc_length, &status );
+    openglobal( "UPDATE", &loc, &status );
 
 /* If file opened OK */
     if (status == SAI__OK) {
@@ -1649,18 +1439,15 @@ proc_createglobal(node *n)
              !strcasecmp( type, "_LOGICAL" ) ||
              !strcasecmp( type, "ADAM_PARNAME" ) ) {
 
-            (void) ensure_exists( loc, loc_length, parameter, 
-                                  type, type, ploc, ploc_length,
+            (void) ensure_exists( loc, parameter, 
+                                  type, type, ploc,
                                   &status );
             if ( status == SAI__OK ) {
       /* Reset the component in case it already existed */
-               F77_CALL(dat_reset)( CHARACTER_ARG(ploc), INTEGER_ARG(&status)
-                  TRAIL_ARG(ploc) );
+	      datReset( ploc, &status );
 
       /* Annul the locator */
-               F77_CALL(dat_annul)(CHARACTER_ARG(ploc), INTEGER_ARG(&status)
-                  TRAIL_ARG(ploc) );
-            
+	      datAnnul( &ploc, &status );
             }
 
 	} else {
@@ -1672,8 +1459,7 @@ proc_createglobal(node *n)
 
     /* close the file - ensuring good status is given */
         istat = SAI__OK;
-	F77_CALL(hds_close) (CHARACTER_ARG(loc), INTEGER_ARG(&istat)
-	    TRAIL_ARG(loc));
+	hdsClose( &loc, &istat );
 
     } else
         emsRep( " ",
@@ -1707,7 +1493,6 @@ init_hds(void)
 {
     extern node *node_builtin(value (*fn)() );			 /* node.c   */
 
-    DECLARE_INTEGER(status);
     value val;
 /*
  * Determine the HDS directory
@@ -1717,12 +1502,9 @@ init_hds(void)
     else
 	hds_path = strconcat( getenv("HOME"), "/adam/" );
 /*
- * Start HDS
+ * Start HDS - no longer required
  */
-    status = SAI__OK;
-    F77_CALL(hds_start) (INTEGER_ARG(&status));
-    if (status != SAI__OK)
-	return exception("hds_start failed in init_hds()");
+
 /*
  * Set up symbol table extries for calling the HDS related routines
  */
