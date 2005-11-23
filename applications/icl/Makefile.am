@@ -3,9 +3,11 @@
 bin_PROGRAMS = icl icl_io
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+stariclhelpdir = $(starhelpdir)/icl
+stariclhelp_DATA = $(HELP_SOURCES:.hlp=.shl)
 
 icl_SOURCES = parse.y lex.l $(F_ROUTINES) $(C_ROUTINES)
-icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam` @FCLIBS@
+icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs_link_adam` `cnfrtl_link_adam` @FCLIBS@
 
 #  Make sure we use the C compiler for linking. Using Fortran causes
 #  problems with multiple mains (Tru64 UNIX). Either of the next three 
@@ -82,6 +84,7 @@ PRIVATE_INCLUDES = $(ICL_INCLUDES) \
                    UFACE_CMN
 
 BUILT_SOURCES = $(noinst_MESSAGES)
+HELP_SOURCES = iclhelp.hlp
 
 #  List yacc source
 YACC_SOURCE = parse.y
@@ -98,3 +101,6 @@ dist_starnews_DATA = icl.news
 
 dist_pkgdata_DATA = ICL_CONDITIONS
 
+#  Rule for building the help library from the help source.
+.hlp.shl:
+	@HLIB@ $<
