@@ -31,6 +31,10 @@
  *        Original version
  *     2005-Nov-09 (PWD):
  *        Added fix for Microsoft/MINGW's handling of "long long" printfs.
+ *     2005-Nov-18 (TIMJ):
+ *        Use HDSLoc*
+ *     2005-Nov-22 (TIMJ):
+ *        Add definition of size_t via stddef.h
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -223,6 +227,9 @@ int main (int argc, char ** argv ) {
 "\n\n",
 	  PINCLUDE_FILE, PINCLUDE_FILE, progname, todaysdate(), progname);
 
+  /* System defines */
+  fprintf(POutputFile, "#include <stddef.h>\n\n" );
+  fprintf(OutputFile, "#include <stddef.h>\n\n" );
 
   /* We first need to decide what we are using for a normal hdsint */
 
