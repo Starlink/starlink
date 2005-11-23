@@ -10,14 +10,14 @@
 
 *  Invocation:
 *     Call from C
-*     getcomp(char *object, char *acmode, char *loc, int *status )
+*     getcomp(char *object, char *acmode, HDSLoc **loc, int *status )
 
 *  Arguments:
 *     object = char * (Given)
 *        String giving the object path
 *     acmode = char * (Given)
 *        The access mode required, READ, WRITE or UPDATE
-*     loc = char * (Returned)
+*     loc = HDSLoc ** (Returned)
 *        The locator
 *     status = int * (Given and Returned)
 *        The Starlink global status
@@ -67,22 +67,23 @@
 *     {note_new_bugs_here}
 *-
 */
+#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "sae_par.h"
-#include "hds.h"
+#include "ems.h"
 #define FALSE 0
 #define TRUE 1
 
-int checkarr( char *comp, char name[], int *slice, int *ndims,
-              int starts[], int ends[], int *status );
+#include "hds2idl.h"
 
-void getcomp( char *object, char *acmode, char loc[], int *status ) {
+void getcomp( char *object, const char *acmode, HDSLoc ** loc, int *status ) {
 
 char *saveptr;
 char *tempstr;
 char *comp;
-char tmploc[DAT__SZLOC];
-char botloc[DAT__SZLOC];
+HDSLoc * tmploc = NULL;
+HDSLoc * botloc = NULL;
 char name[DAT__SZNAM+1];
 int file_opened=FALSE;
 int slice;
@@ -90,8 +91,8 @@ int ndims;
 int starts[DAT__MXDIM];
 int ends[DAT__MXDIM];
 int true=TRUE;
-int i;
-int valid;
+
+
    if ( (tempstr = (char *)calloc(strlen(object)+2,sizeof(char))) != NULL ) {
       saveptr = strcpy( tempstr, object );
 /* Only the last component spec can be a slice so set slice false here */
@@ -111,26 +112,26 @@ int valid;
             if (checkarr( comp, name, &slice, &ndims, starts, ends, status )) {
 /* only part of array component required */
                if( file_opened ) {
-                  idlDatFind( loc, name, tmploc, status );
+                  datFind( *loc, name, &tmploc, status );
                } else {
-                  idlHdsOpen( name, acmode, tmploc, status );
+		 hdsOpen( name, (char *)acmode, &tmploc, status );
                }
 
                if ( slice ) {
-                  idlDatSlice( tmploc, ndims, starts, ends, botloc, status );
+                  datSlice( tmploc, ndims, starts, ends, &botloc, status );
                } else {
-                 idlDatCell( tmploc, ndims, starts, botloc, status );
+                  datCell( tmploc, ndims, starts, &botloc, status );
                }
-               idlDatPrmry( TRUE , botloc, &true, status );
-               idlDatAnnul( tmploc, status );
+               datPrmry( TRUE , &botloc, &true, status );
+               datAnnul( &tmploc, status );
 
             } else {
 /* Whole component required */
                if( file_opened ) {
-                  idlDatFind( loc, name, botloc, status );
-                  idlDatPrmry( TRUE , botloc, &true, status );
+                  datFind( *loc, name, &botloc, status );
+                  datPrmry( TRUE , &botloc, &true, status );
                } else {
-                  idlHdsOpen( name, acmode, botloc, status );
+		 hdsOpen( name, (char *)acmode, &botloc, status );
                }
             }
 
@@ -140,11 +141,11 @@ int valid;
             if ( !file_opened ) {
                file_opened = TRUE;                 
             } else {
-               idlDatAnnul( loc, status );
+               datAnnul( loc, status );
             }
-            idlDatClone( botloc, loc, status );
-            idlDatPrmry( TRUE, loc, &true, status );
-            idlDatAnnul( botloc, status );
+            datClone( botloc, loc, status );
+            datPrmry( TRUE, loc, &true, status );
+            datAnnul( &botloc, status );
          }
       }
       free( tempstr );

@@ -89,18 +89,11 @@
 #include <string.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "star/hds.h"
+#include "hds2idl.h"
 
-
-void getcomp( 
-     char *objname, const char *acmode, char objloc[DAT__SZLOC], int *status );
-UCHAR getidltype( const char *hdstype );
-IDL_StructDefPtr idlstructdef( char *sloc, int *status );
-void idlstructfill( char *sloc, IDL_SREF sref, int *status );
-void idlprimfill( 
-     char objloc[DAT__SZLOC], IDL_VPTR var, void *tdata, int *status );
 
 IDL_VPTR hds2idl( int argc, IDL_VPTR argv[] ) {
 /*
@@ -111,7 +104,7 @@ IDL_VPTR var;            /* Variable pointer to IDL object */
 IDL_VARIABLE temp;       /* Temporary storage for primitive scalar variable */
 IDL_StructDefPtr sdef;   /* Structure definition of sub-structure */
 IDL_STRING *objname;     /* Pointer to object name as IDL string */
-char objloc[DAT__SZLOC]; /* Locator of file */
+HDSLoc *objloc = NULL;   /* Locator of file */
 
 int status;             /* Starlink status */
 
@@ -150,10 +143,10 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
       objname = &hds_name->value.str;
 
    /* Open the HDS object */
-      getcomp( IDL_STRING_STR(objname), "READ", objloc, &status );
+      getcomp( IDL_STRING_STR(objname), "READ", &objloc, &status );
 
    /* Check for structure or primitive */
-      idlDatStruc( objloc, &isstruct, &status );
+      datStruc( objloc, &isstruct, &status );
       if (status == SAI__OK) {
          if ( isstruct ) {
          /* Create a structure */
@@ -167,9 +160,9 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
 
          } else {
          /* Object is primitive */
-            idlDatType( objloc, type, &status );
+            datType( objloc, type, &status );
             idltype = getidltype( type );
-            idlDatShape( objloc, DAT__MXDIM, dims, &ndims, &status );
+            datShape( objloc, DAT__MXDIM, dims, &ndims, &status );
             if ( status == SAI__OK ) {
                if (ndims) {
                /* Get dimensions IDL style */
@@ -192,7 +185,7 @@ IDL_LONG one[IDL_MAX_ARRAY_DIM]={1};
          }
 
       /* Annul the object (and close the file) */
-         idlDatAnnul( objloc, &status );
+         datAnnul( &objloc, &status );
       }
    }
 

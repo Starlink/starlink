@@ -10,10 +10,10 @@
 
 *  Invocation:
 *     Call from C
-*     void idlprimfill( char *cloc, IDL_VPTR datav, void *datptr, int *status )
+*     void idlprimfill( HDSLoc*cloc, IDL_VPTR datav, void *datptr, int *status )
 
 *  Arguments:
-*     cloc = char * (Given);
+*     cloc = HDSLoc * (Given);
 *        An HDS locator to the HDS primitive component
 *     datav = IDL_VPTR (Given);
 *        VPTR describing the data (not necessarily containing the data)
@@ -48,6 +48,8 @@
 *  History:
 *      2-MAR-2000 (AJC):
 *        Original version.
+*      22-NOV-2005 (TIMJ):
+*        Use new HDS interface
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -59,18 +61,19 @@
 #include <stdio.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
 #include "ems.h"
+#include "hds2idl.h"
 
-void idlprimfill( char *cloc, IDL_VPTR datav, void *datptr, int *status ) {
+void idlprimfill( HDSLoc *cloc, IDL_VPTR datav, void *datptr, int *status ) {
 
-int i,j;                  /* loop counters */
+int j;                  /* loop counters */
 UCHAR idltype;            /* The IDL type */
 char type[DAT__SZTYP+1];  /* Type in which to to map HDS data */
 int bpix;                 /* Number of bytes/value */
 int defined;              /* If HDS value defined */
 void *cpntr;              /* True C pointer to mapped data */
-int nels;                 /* Number of mapped elements */
+size_t nels;              /* Number of mapped elements */
+int nels_i;
 int nbytes;               /* Number of bytes in array */
 int flen;                 /* length of HDS strings */
 int clen;                 /* length of corresponding C string */
@@ -107,7 +110,7 @@ if ( *status != SAI__OK ) return;
       bpix = 1;
       break;
    case IDL_TYP_STRING:
-      idlDatType( cloc, type, status);
+      datType( cloc, type, status);
       bpix = 1;
       break;
    default:
@@ -121,9 +124,9 @@ if ( *status != SAI__OK ) return;
 
    if ( (*status == SAI__OK ) && bpix ) {
 /* Map the data as if a vector - provided it is defined */
-      idlDatState( cloc, &defined, status );
+      datState( cloc, &defined, status );
       if ( defined ) {
-         idlDatMapv( cloc, type, "READ", &cpntr, &nels, status );
+         datMapV( cloc, type, "READ", &cpntr, &nels, status );
          if ( *status != SAI__OK ) {
             emsRep(" ", "Failed to map HDS component", status );
          } else {
@@ -133,7 +136,8 @@ if ( *status != SAI__OK ) return;
 
 /* Import the Fortran strings to C */
                chars = IDL_GetScratch( &chptr, nels, clen );
-               cnfImprta( cpntr, flen, chars, clen, 1, &nels );
+	       nels_i = (int)nels;
+               cnfImprta( cpntr, flen, chars, clen, 1, &nels_i );
 
 /* set strings to be a pointer to the IDL_STRING structure(s) */
                strings = (IDL_STRING *)datptr;
@@ -171,7 +175,7 @@ if ( *status != SAI__OK ) return;
                   } /* end of case */
                } /* end of if array */
             } /* end if string */
-            idlDatUnmap( cloc, status );
+            datUnmap( cloc, status );
          } /* end of mapped data */
       } /* end of if defined */
    } /* end of bpix non-zero */

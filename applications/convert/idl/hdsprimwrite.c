@@ -10,11 +10,11 @@
 
 *  Invocation:
 *     Call from C
-*     int hdsprimwrite(char *toploc, char *hdstype, int ndims, int *dims,
+*     int hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, int *dims,
 *         void *data, int *status ) {
 
 *  Arguments:
-*     toploc = char * (Given)
+*     toploc = HDSLoc * (Given)
 *        An HDS locator to an HDS component to which the data are to be written
 *     hdstype = char * (Given)
 *        The HDS type to be written
@@ -70,6 +70,8 @@
 *  History:
 *      12-OCT-1999 (AJC):
 *        Original version.
+*      22-NOV-2005 (TIMJ):
+*        Use modern C HDS interface
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,22 +86,26 @@
 #include "hds.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "star/hds.h"
+#include "hds2idl.h"
 
-#define MAXDIMS 7
-#define CHARNIL (char *)0
-
-char **getstringarray( int ndims, int *dims, IDL_STRING *data );
-
-void hdsprimwrite(char *toploc, char *hdstype, int ndims, int *dims,
+void hdsprimwrite(HDSLoc *toploc, char *hdstype, int ndims, int *dims,
                     void *data, int *status ) {
 int clen;       /* length of strings in array */
 char **carray;  /* Pointer to an array of C strings */
 int i;
+ hdsdim hdims[MAXDIMS];
+
    if ( *status != SAI__OK ) return;
+
+   /* Copy dims to HDS type */
+   for (i = 0; i < ndims ; i ++ ) {
+     hdims[i] = dims[i];
+   }
 
    if ( strncmp( hdstype, "_CHAR", 5 ) ) {
       if ( *hdstype == '_' ) {
-         idlDatPut( toploc, hdstype, ndims, dims, data, status );
+         datPut( toploc, hdstype, ndims, dims, data, status );
       } else {
          *status = SAI__ERROR;
          emsSetc( "TYPE", hdstype, EMS__SZTOK );

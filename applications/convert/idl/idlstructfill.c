@@ -10,10 +10,10 @@
 
 *  Invocation:
 *     Call from C
-*     void idlstructfill( char *sloc, IDL_SREF sref, int *status ) {
+*     void idlstructfill( HDSLoc *sloc, IDL_SREF sref, int *status ) {
 
 *  Arguments:
-*     sloc = char * (Given);
+*     sloc = HDSLoc * (Given);
 *        An HDS locator to the structure component of the HDS file.
 *     sref = IDL_SREF (Given);
 *        An IDL structure reference
@@ -53,6 +53,8 @@
 *        Handle _BYTE->integer, _UWORD->long
 *     29-FEB-2000 (AJC):
 *        Handle array of structures at top level
+*     22-NOV-2005 (TIMJ):
+*        Use modern C API
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,16 +66,15 @@
 #include <stdio.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
+#include "hds2idl.h"
+#include "star/hds.h"
 #include "ems.h"
-
-#define MAXDIMS 7
 
 int typecheck( char *hdstype, UCHAR idltype ) {
 return SAI__OK;
 }
 
-void idlstructfill( char *sloc, IDL_SREF sref, int *status ) {
+void idlstructfill( HDSLoc *sloc, IDL_SREF sref, int *status ) {
 int i, j, k;              /* Loop counters */
 int nscomp;               /* Number of structure components */
 int ncomp;                /* Number of hds components */
@@ -82,24 +83,21 @@ int dims[DAT__MXDIM];     /* dimensions */
 char type[DAT__SZTYP+1];  /* type as C string */
 char hdsstructype[DAT__SZTYP+30];
 UCHAR idltype;            /* IDL type code */
-unsigned char *sdata;     /* pointer to structure data */
-unsigned char *sdatac;    /* pointer to component structure data */
+unsigned char *sdata = NULL;     /* pointer to structure data */
+unsigned char *sdatac = NULL;    /* pointer to component structure data */
 IDL_LONG toffset;         /* offset to tag data */
 unsigned char *tdata;     /* pointer to tag data */
 IDL_VPTR datav;           /* pointer to tag data variable */
-IDL_VPTR chptr;           /* Scratch variable pointer */
 
 int bpix;                 /* Number of bytes/pixel */
-IDL_StructDefPtr sdef;    /* pointer to the structure definition */
-IDL_StructDefPtr sdefc;   /* pointer to the structure component definition */
-IDL_STRING *strings;      /* pointer to array of string structures */
-char *chars;              /* pointer to imported characters */
+IDL_StructDefPtr sdef = NULL;  /* pointer to the structure definition */
+IDL_StructDefPtr sdefc = NULL; /* pointer to the structure component definition */
 
-char vloc[DAT__SZLOC];    /* Vector locator */
-char aloc[DAT__SZLOC];    /* Array structure element locator */
-char cloc[DAT__SZLOC];    /* Component locator */
+HDSLoc * vloc = NULL;    /* Vector locator */
+HDSLoc * aloc = NULL;    /* Array structure element locator */
+HDSLoc * cloc = NULL;    /* Component locator */
 
-int nsels;                /* Number of structure elements */
+size_t nsels;                /* Number of structure elements */
 
 IDL_SREF sref2;           /* sub-directory sref */
 IDL_ARRAY arr;            /* subdirectory array structure */
@@ -113,13 +111,13 @@ IDL_ARRAY arr;            /* subdirectory array structure */
    sref2.arr = &arr;
 
 /* Get the HDS structure shape */
-   idlDatShape( sloc, MAXDIMS, dims, &ndims, status );
+   datShape( sloc, MAXDIMS, dims, &ndims, status );
 /* Treat it as a vector of structures */
-   idlDatVec( sloc, vloc, status );
+   datVec( sloc, &vloc, status );
 /* Get its size */
-   idlDatSize( vloc, &nsels, status );
+   datSize( vloc, &nsels, status );
 /* Set the HDS structure type */
-   idlDatType(  sloc, type, status );
+   datType(  sloc, type, status );
 
 /* Get the IDL structure tag info */
    if ((toffset=IDL_StructTagInfoByIndex( sdef, 0, IDL_MSG_RET, &datav ))
@@ -166,12 +164,12 @@ IDL_ARRAY arr;            /* subdirectory array structure */
          nscomp = IDL_StructNumTags( sdefc );
 
 /* Get locator to the corresponding HDS structure array cell */
-         idlDatCell( vloc, 1, &k, aloc, status );
+         datCell( vloc, 1, &k, &aloc, status );
          if ( *status != SAI__OK ) {
             emsRep( " ", 
             "Failed to get locator to structure array element", status );
          } else {
-            idlDatNcomp( aloc, &ncomp, status );
+            datNcomp( aloc, &ncomp, status );
             if ( ncomp + 1 != nscomp ) {
                if ( *status == SAI__OK )
                   *status = SAI__ERROR;
@@ -204,7 +202,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
                      idltype = datav->type;
 
 /* Get locator to i'th component of the HDS structure */
-                     idlDatIndex( aloc, i, cloc, status );
+                     datIndex( aloc, i, &cloc, status );
                      if( *status != SAI__OK ) {         
                         emsRep(" ", "Failed locator to next index", status );
                      } else {
@@ -223,16 +221,16 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 /* It's primitive data */
                            idlprimfill( cloc, datav, tdata, status );                           
                         }
-                        idlDatAnnul( cloc, status );
+                        datAnnul( &cloc, status );
                      } /* end index  got OK */
                   } /* end offset got OK */
                } /* end for each component */
             } /* end of component number agreement OK */
-         idlDatAnnul( aloc, status );
+         datAnnul( &aloc, status );
          } /* end of structure cell got OK */
 /* increment pointer to structure start */
       } /* end of for each structure vector element */
-   idlDatAnnul( vloc, status );
+   datAnnul( &vloc, status );
    } /* end of got tag0 info */
    return;
 

@@ -13,7 +13,7 @@
 *      struct = idlstructarrdef( sloc, name, ndims, dims, status );
 *
 * Arguments:
-*    sloc = *char (Given)
+*    sloc = HDSLoc * (Given)
 *       Locator to the HDS structure
 *
 *    name = char * (Given)
@@ -53,18 +53,20 @@
 * History:
 *     30-NOV-1999 (AJC):
 *       Original version
+*     22-NOV-2005 (TIMJ):
+*       Use modern HDS interface
 *    {enter_further_changes_here}
 *-
 */
 #include <stdio.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
+#include "hds2idl.h"
 
 #define TAG__SZNAM DAT__SZNAM+30
 
 IDL_StructDefPtr idlstructarrdef( 
-   char *sloc, char *name, int ndims, int dims[], int *status ) {
+   HDSLoc *sloc, char *name, int ndims, int dims[], int *status ) {
 
 static char hdsstructype[13] =  "HDSSTRUCTYPE";
 static IDL_STRUCT_TAG_DEF niltagdef={0};
@@ -74,22 +76,21 @@ IDL_VPTR tagvar;
 IDL_VPTR tagnamevar;
 
 int i, j;                 /* Loop counters */
-int nels;                 /* Number of elements */
+size_t nels;                 /* Number of elements */
 char suffix[5]="_";       /* Name suffix component */
 int index[DAT__MXDIM]={0};/* current indices */
 
 char *tagnames;           /* pointer to tagnames */
 char *tagname;            /* pointer within tagnames */
 
-void *s;                  /* pointer to the created structure */
-char vloc[DAT__SZLOC];    /* Vector locator */
-char cloc[DAT__SZLOC];    /* Array cell locator */
-char type[DAT__SZTYP];
+void *s = NULL;          /* pointer to the created structure */
+HDSLoc * vloc = NULL;    /* Vector locator */
+HDSLoc * cloc = NULL;    /* Array cell locator */
 
-   if ( !(*status == SAI__OK) ) return;
+ if ( !(*status == SAI__OK) ) return (NULL);
 
 /* Get memory for tags */
-   idlDatSize ( sloc, &nels, status );
+   datSize ( sloc, &nels, status );
    tags = (IDL_STRUCT_TAG_DEF *)IDL_GetScratch( &tagvar, (IDL_LONG)nels+2,
             (IDL_LONG)sizeof(IDL_STRUCT_TAG_DEF) );
    
@@ -106,12 +107,12 @@ char type[DAT__SZTYP];
    tagname = tagnames;
 
 /* Get the array as a vector */
-   idlDatVec( sloc, vloc, status );
+   datVec( sloc, &vloc, status );
 
 /* Now go through the structure setting up the tags array */
 /* for each element. Each will be a scalar structure      */
    for ( i=1; (*status==SAI__OK) && (i<=nels); i++ ) {
-      idlDatCell( vloc, 1, &i, cloc, status );
+      datCell( vloc, 1, &i, &cloc, status );
 
       if ( *status == SAI__OK ) {
 
@@ -144,11 +145,11 @@ char type[DAT__SZTYP];
          }
       } /* end cell got OK */
 
-      idlDatAnnul( cloc, status );
+      datAnnul( &cloc, status );
 
    } /* end for each element */
 
-   idlDatAnnul( vloc, status );
+   datAnnul( &vloc, status );
 
    if ( *status == SAI__OK ) {
 /* Terminate the tags */

@@ -56,11 +56,14 @@
 
 *  Authors:
 *     AJC: A.J.Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-JUL-1999 (AJC):
 *        Original version.
+*     22-NOV-2005 (TIMJ):
+*        Migrate to new C HDS interface
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,32 +76,11 @@
 #include <string.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
+#include "star/hds.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "hds2idl.h"
 
-char **getstringarray( int ndims, int *dims, IDL_STRING *data );
-void retstringarray( char ** );
-
-void getobjectdetails( IDL_VPTR var, void *data, char **taglist,
-                    char hdstype[], int *numtags, 
-                    int *ndims, int dims[], int *elt_len, int *status );
-
-void hdsstructwrite( char *toploc, 
-                     void *data,
-                     char **taglist,
-                     int numtags,
-                     int ndims, 
-                     int dims[],
-                     IDL_VPTR var, 
-                     int *status );
-
-void hdsprimwrite( char *toploc, 
-                     char *hdstype,  
-                     int ndims, 
-                     int dims[],
-                     void *data,
-                     int *status );
 
 void crehds( int argc, IDL_VPTR argv[] ) {
 /*
@@ -114,9 +96,9 @@ int dims[DAT__MXDIM];
 int status;        /* Starlink status */
 
 int i;                      /* index */
-char toploc[DAT__SZLOC+1];    /* Locator to top object */
-int numtags;                  /* Number of tags = 0 if not a structure */
-char hdstype[DAT__SZTYP+1];   /* corresponding HDS type */
+HDSLoc* toploc = NULL;      /* Locator to top object */
+int numtags;                /* Number of tags = 0 if not a structure */
+char hdstype[DAT__SZTYP+1]; /* corresponding HDS type */
 int fstat;                  /* Final status (before emsEload) */
 int errn=0;                 /* Error sequence number */
 char param[EMS__SZPAR+1];     /* Error message parameter name */
@@ -159,7 +141,7 @@ char defname[12]="IDL2HDS_OUT";
 
       getobjectdetails( var, data, taglist,
          hdstype, &numtags, &ndims, dims, &elt_len, &status );
-      idlHdsNew( hdsname, strucname, hdstype, ndims, dims, toploc, &status );
+      hdsNew( hdsname, strucname, hdstype, ndims, dims, &toploc, &status );
       if ( numtags ) {
 /* is a structure - invoke the structure handler */
          hdsstructwrite( 
@@ -169,7 +151,7 @@ char defname[12]="IDL2HDS_OUT";
          hdsprimwrite( toploc, hdstype, ndims, dims, data, &status );
       }
 
-      idlDatAnnul( toploc, &status );
+      datAnnul( &toploc, &status );
 
    } else {
       status = SAI__ERROR;

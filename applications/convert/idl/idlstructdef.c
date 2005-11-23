@@ -13,7 +13,7 @@
 *      struct = idlstructdef( sloc, status );
 *
 * Arguments:
-*    sloc = *char (Given)
+*    sloc = HDSLoc* (Given)
 *       Locator to the HDS structure
 *
 *    status = *int (Given and Returned)
@@ -64,6 +64,8 @@
 *       Handle _BYTE->integer, _UWORD->long
 *    29-FEB-2000 (AJC):
 *       Handle array of structures at top level
+*    22-NOV-2005 (TIMJ):
+*       Use modern HDS 
 *    {enter_further_changes_here}
 *
 *-
@@ -71,16 +73,14 @@
 #include <stdio.h>
 #include "export.h"
 #include "sae_par.h"
-#include "hds.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "hds2idl.h"
 
 #define TAG__SZNAM DAT__SZNAM+9       /* Max length of tag name */
 
-IDL_StructDefPtr idlstructarrdef( 
-   char *sloc, char *name, int ndims, int dims[], int *status );
 
-IDL_StructDefPtr idlstructdef( char *sloc, int *status ) {
+IDL_StructDefPtr idlstructdef( HDSLoc *sloc, int *status ) {
 
 static char hdsstructype[13] =  "HDSSTRUCTYPE";
 static IDL_STRUCT_TAG_DEF niltagdef={0};
@@ -95,7 +95,7 @@ int i, j;                 /* Loop counters */
 int ncomp;                /* Number of components */
 int prim;                 /* If component is primitive */
 int ndims;                /* Number of dimensions */
-int dims[DAT__MXDIM];     /* dimensions */
+hdsdim dims[DAT__MXDIM];     /* dimensions */
 char type[DAT__SZTYP+1];    /* type as C string */
 char name[DAT__SZNAM+1];    /* name as C string */
 char *tagnames;           /* pointer to tagnames */
@@ -103,24 +103,22 @@ char *tagname;            /* pointer within tagnames */
 IDL_LONG *tagdims;        /* pointer to tagdims */
 IDL_LONG *tagdim;         /* pointer within tagdims */
 
-void *s;                  /* pointer to the created structure */
-char cloc[DAT__SZLOC];    /* Component locator */
+void *s = NULL;          /* pointer to the created structure */
+HDSLoc * cloc = NULL;    /* Component locator */
 
 /* Fortran variables */
 int maxdims=DAT__MXDIM;
 
-UCHAR idltype; /* IDL type of component */
+ if ( !(*status == SAI__OK) ) return (NULL);
 
-if ( !(*status == SAI__OK) ) return;
-
-idlDatShape( sloc, maxdims, dims, &ndims, status );
+datShape( sloc, maxdims, dims, &ndims, status );
 if ( !ndims ) {
-   idlDatNcomp ( sloc, &ncomp, status );
+   datNcomp ( sloc, &ncomp, status );
    tags = (IDL_STRUCT_TAG_DEF *)IDL_GetScratch( &tagvar, (IDL_LONG)ncomp+2,
             (IDL_LONG)sizeof(IDL_STRUCT_TAG_DEF) );
 
 /* Set tag for the HDS type */
-   idlDatType( sloc, type, status );
+   datType( sloc, type, status );
    tags[0].name = hdsstructype;
    tags[0].dims = 0;
    tags[0].type = (void *)IDL_TYP_STRING;
@@ -140,9 +138,9 @@ if ( !ndims ) {
 
 /* Now go through the structure setting up the tags array */
    for ( i=1; (*status==SAI__OK) && (i<=ncomp); i++ ) {
-      idlDatIndex( sloc, i, cloc, status );
-      idlDatName( cloc, name, status );
-      idlDatPrim( cloc, &prim, status );
+      datIndex( sloc, i, &cloc, status );
+      datName( cloc, name, status );
+      datPrim( cloc, &prim, status );
       if ( !prim ) {
 /* It's another structure                                                    */
 /* For IDL arrays of structures each element must have the same structure    */
@@ -156,8 +154,8 @@ if ( !ndims ) {
          tags[i].type = (void*)idlstructdef(cloc, status);
 
       } else {
-         idlDatShape( cloc, maxdims, dims, &ndims, status );
-         idlDatType( cloc, type, status );
+         datShape( cloc, maxdims, dims, &ndims, status );
+         datType( cloc, type, status );
 
          if ( *status == SAI__OK ) {
 
@@ -203,7 +201,7 @@ if ( !ndims ) {
                emsRep( " ", "Illegal type ^TYPE", status );
             }
 
-            idlDatAnnul( cloc, status );
+            datAnnul( &cloc, status );
          } /* endif cloc OK */
 
       } /* end if structure */
@@ -229,7 +227,7 @@ if ( !ndims ) {
 
 } else {
 /* It's an array of structures */
-   idlDatName( sloc, name, status );
+   datName( sloc, name, status );
    s = idlstructarrdef( sloc, name, ndims, dims, status);
 
 }
