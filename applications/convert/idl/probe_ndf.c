@@ -163,7 +163,7 @@ int oplen;              /* Length of error message */
    /*
    ** Open the NDF
    */
-      ndfOpen( DAT__ROOT, ndf_name->s, "READ", "OLD", &ndf, &place, &status );
+      ndfOpen( NULL, ndf_name->s, "READ", "OLD", &ndf, &place, &status );
    /*
    **  Obtain the NDF dimension info
    */

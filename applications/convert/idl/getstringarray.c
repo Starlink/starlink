@@ -85,7 +85,6 @@ char *pstr; /* Pointer to next string in C array */
 */
 void retstringarray( char **carr ) {
 
-int i;
    free( *carr );
    free( carr );
    return;

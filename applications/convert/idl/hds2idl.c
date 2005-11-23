@@ -118,7 +118,6 @@ int fstat;              /* Final status (before emsEload) */
 int isstruct;           /* Whether object is structure */
 void *tdata;            /* Pointer to data area of IDL variable or array */
 
-int errn=0;             /* Error sequence number */
 char param[EMS__SZPAR+1]; /* Error message parameter name */
 int parlen;             /* Length of error message parameter name */
 char opstr[EMS__SZMSG+1]; /* Error message */

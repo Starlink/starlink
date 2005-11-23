@@ -93,8 +93,6 @@ void getobjectdetails( IDL_VPTR var, void *data, char *taglist[],
 UCHAR idltype;     /* Type of variable */
 int i;             /* counter */
 int *vardim;
-IDL_VPTR temp;
-IDL_VPTR tags;
 IDL_VPTR tmpvar;
 IDL_LONG offset;
 char *dimptr;

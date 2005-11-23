@@ -95,12 +95,10 @@ int dims[DAT__MXDIM];
 
 int status;        /* Starlink status */
 
-int i;                      /* index */
 HDSLoc* toploc = NULL;      /* Locator to top object */
 int numtags;                /* Number of tags = 0 if not a structure */
 char hdstype[DAT__SZTYP+1]; /* corresponding HDS type */
 int fstat;                  /* Final status (before emsEload) */
-int errn=0;                 /* Error sequence number */
 char param[EMS__SZPAR+1];     /* Error message parameter name */
 int parlen;                 /* Length of error message parameter name */
 char opstr[EMS__SZMSG+1];     /* Error message */

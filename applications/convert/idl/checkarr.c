@@ -69,6 +69,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sae_par.h"
+#include "ems.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -79,7 +80,6 @@ int i,j;              /* counters */
 int isarr;            /* temp return value */
 int len;              /* length of remainder of index string */
 char *tempstr;        /* temporary malloced string */
-char *saveptr;        /* save next token pointer */
 char *index;          /* pointer to index portion */
 char *comma;          /* pointer to comma within an index spec */
 char *colon;          /* pointer to colon within an index spec */

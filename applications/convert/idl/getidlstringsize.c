@@ -9,7 +9,6 @@
 
 int getidlstringsize( IDL_VPTR var, IDL_STRING *data ) {
 
-IDL_STRING *strings;     /* pointer to array of IDL_STRINGs */
 int maxlen;              /* maximum string length so far */
 int i;                   /* counter */
    if ( var->flags & IDL_V_ARR ) {

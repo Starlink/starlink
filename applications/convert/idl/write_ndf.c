@@ -212,7 +212,7 @@ int oplen;              /* Length of error message */
       /*
       ** Create the NDF
       */
-         ndfOpen( DAT__ROOT, ndf_name->s, "WRITE", "NEW", &ndf, &place, &status );
+         ndfOpen( NULL, ndf_name->s, "WRITE", "NEW", &ndf, &place, &status );
          ndfNew( type->s, n_dims, lbnd, arr_bnds, &place, &ndf, &status );
 
       } else {
@@ -223,7 +223,7 @@ int oplen;              /* Length of error message */
       /*
       ** Open existing NDF
       */
-         ndfOpen( DAT__ROOT, ndf_name->s, "UPDATE", "OLD", &ndf, &place, &status );
+         ndfOpen( NULL, ndf_name->s, "UPDATE", "OLD", &ndf, &place, &status );
       }
        
    /*

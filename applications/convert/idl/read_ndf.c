@@ -124,7 +124,6 @@ void *bad_value;   /* Pointer to the bad value */
 
 int status;        /* Starlink status */
 
-int lbnd[5]={1L,1L,1L,1L,1L}; /* Lower bounds array */
 int ndf;           /* NDF identifier */
 int place;         /* NDF placeholder */
 int npix;          /* Number of pixels */
@@ -175,7 +174,7 @@ int oplen;              /* Length of error message */
    /*
    ** Open the NDF
    */
-      ndfOpen( DAT__ROOT, ndf_name->s, "READ", "OLD", &ndf, &place, &status );
+      ndfOpen( NULL, ndf_name->s, "READ", "OLD", &ndf, &place, &status );
    /*
    **  Obtain mapped access to the array component of the first NDF
    */
@@ -301,8 +300,6 @@ short int *pss, *psd;
 int *pis, *pid;
 float *pfs, *pfd;
 double *pds, *pdd;
-
-int i;   /* array pointer */
 
 /*
 **  Select the correct copying commands according to the IDL type.
