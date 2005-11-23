@@ -1,3 +1,8 @@
+ICL Version 3.1-11
+
+    o Install Help file (again)
+    o Update internal handling of HDS files
+
 ICL Version 3.1-10 is released
 
     o Lots of fixes to enable ICL to build on cygwin and OSX
