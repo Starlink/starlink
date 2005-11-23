@@ -24,7 +24,7 @@ C_ROUTINES = read_ndf.c write_ndf.c probe_ndf.c crehds.c hds2idl.c \
  idlstructdef.c idlstructarrdef.c idlstructfill.c idlprimfill.c \
  hdsstructwrite.c hdsprimwrite.c gethdstype.c getidltype.c \
  getidlstringsize.c getobjectdetails.c getstringarray.c tagstrip.c \
- getcomp.c checkarr.c IDL_Load.c hds.c dat.c
+ getcomp.c checkarr.c IDL_Load.c dat.c
 
 ##  Dummy Fortran routine to make sure we can handle the Fortran in the
 ##  dependency libraries. Removed as got duplicate main reports in OS X.
