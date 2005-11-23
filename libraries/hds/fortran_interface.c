@@ -11,6 +11,7 @@
 #include "hds2.h"             /* for datWhere                                */
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
+#include "ems.h"
 
 #include "hds_fortran.h"      /* Fortran import/export */
 
@@ -2097,11 +2098,28 @@ F77_SUBROUTINE(dat_valid)( CHARACTER(locator),
    
 /* Enter routine.	*/
 
+/* Any errors triggered by this routine should be annulled
+   and simply set "reply" to false intead */
+
+   *reply = F77_FALSE;
+
+   if ( *status != SAI__OK ) return;
+
+   emsMark();
+
 /* Import the input locator string                  */
    dat1_import_floc( locator, locator_length, &locator_c, status);
 
 /* Call pure C routine                                       */
    datValid( &locator_c, &reply_c, status );
+
+/* clear any bad status and set valid to FALSE */
+   if ( *status != SAI__OK ) {
+     reply_c = 0;
+     emsAnnul( status );
+   }
+
+   emsRlse();
 
 /* Set FORTRAN logical return                                */
    if( reply_c )

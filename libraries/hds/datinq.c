@@ -593,6 +593,7 @@ datValid(HDSLoc *locator,
 /*
    Enter routine.
 */
+   *valid = FALSE;
    if ( !_ok( *status ) )
       return *status;
     hds_gl_status = DAT__OK;
