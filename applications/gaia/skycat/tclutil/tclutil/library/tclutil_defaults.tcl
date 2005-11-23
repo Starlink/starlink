@@ -136,14 +136,5 @@ proc util::setXdefaults {} {
 	bind Radiobutton <Return> { tkCheckRadioInvoke %W }
 	bind Checkbutton <Return> { tkCheckRadioInvoke %W }
     }
-
-
-    bind Listbox <1> {+ focus %W }
-    bind Listbox <3> { %W selection clear 0 end }
-    bind Scale <ButtonPress-1> {+ focus %W }
-
-    bind Listbox <1> {+ focus %W }
-    bind Listbox <3> { %W selection clear 0 end }
-    bind Scale <ButtonPress-1> {+ focus %W }
 }
 
