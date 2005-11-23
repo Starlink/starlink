@@ -87,7 +87,7 @@ sub new {
   $auto->insert( 1 ) if ( ! defined( $auto->insert ) );
   $auto->keeptemps( 0 ) if ( ! defined( $auto->keeptemps ) );
   $auto->match( 'FINDOFF' ) if ( ! defined( $auto->match ) );
-  $auto->maxfit( 6 ) if ( ! defined( $auto->maxfit ) );
+  $auto->maxfit( 9 ) if ( ! defined( $auto->maxfit ) );
   $auto->max_obj_query( 500 ) if ( ! defined( $auto->max_obj_query ) );
   $auto->max_obj_image( 500 ) if ( ! defined( $auto->max_obj_image ) );
   $auto->max_obj_corr( 500 ) if ( ! defined( $auto->max_obj_corr ) );
@@ -452,7 +452,7 @@ the astrometric fit.
   my $maxfit = $auto->maxfit;
   $auto->maxfit( 7 );
 
-Allowed values are 6, 7, and 9, and the default is 6.
+Allowed values are 4, 6, 7, 8, and 9, and the default is 9.
 
 =cut
 
@@ -460,10 +460,12 @@ sub maxfit {
   my $self = shift;
   if( @_ ) {
     my $maxfit = shift;
-    if( $maxfit != 6 ||
-        $maxfit != 7 ||
+    if( $maxfit != 4 &&
+        $maxfit != 6 &&
+        $maxfit != 7 &&
+        $maxfit != 8 &&
         $maxfit != 9 ) {
-      $maxfit = 6;
+      $maxfit = 9;
     }
     $self->{MAXFIT} = $maxfit;
   }
@@ -1057,7 +1059,6 @@ sub solve {
 
 # If we have a user-supplied catalogue, use that. Otherwise, use
 # Starlink::Extractor to extract objects from the NDF.
-my $start_extract = time();
   my $ndfcat;
   my $filter;
   if( defined( $self->ccdcatalogue ) ) {
@@ -1086,16 +1087,14 @@ my $start_extract = time();
     print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
     print "done.\n" if $self->verbose;
   }
-my $elapsed_extract = time() - $start_extract;
-print "Source extraction took $elapsed_extract seconds.\n";
+
 # We cannot do automated astrometry corrections if we have fewer
-# than 4 objects, so croak if we do.
-  if( $ndfcat->sizeof < 4 ) {
+# than 2 objects, so croak if we do.
+  if( $ndfcat->sizeof < 2 ) {
     croak "Only detected " . $ndfcat->sizeof . " objects in " . $self->ndf . ". Cannot perform automated astrometry corrections with so few objects";
   }
 
 # Limit the number of objects in the detected catalogue, if necessary.
-my $filter_ndf_start = time();
   my $filtered_ndfcat = new Astro::Catalog;
   if( $self->max_obj_corr && $ndfcat->sizeof > $self->max_obj_corr ) {
     my @ndfstars = $ndfcat->stars;
@@ -1107,23 +1106,21 @@ my $filter_ndf_start = time();
   } else {
     $filtered_ndfcat = $ndfcat;
   }
-my $filter_ndf_elapsed = time() - $filter_ndf_start;
-print "Filtering NDF catalogue took $filter_ndf_elapsed seconds.\n";
+
 # Check to see if we have a catalogue to read in instead of querying
 # SkyCat.
   my $querycat;
   if( defined( $self->skycat_catalogue_in ) &&
       -e $self->skycat_catalogue_in ) {
-my $start_skycat = time();
+
 # Read in the catalogue.
     print "Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->verbose;
     $querycat = new Astro::Catalog( Format => 'Cluster',
                                     File => $self->skycat_catalogue_in,
                                   );
-my $elapsed_skycat = time() - $start_skycat;
-print "Reading SkyCat catalogue off disk took $elapsed_skycat seconds.\n";
+
   } else {
-my $start_skycat = time();
+
 # Query the SkyCat catalogue.
     my $racen = $cencoords->ra2000;
     my $deccen = $cencoords->dec2000;
@@ -1150,12 +1147,10 @@ my $start_skycat = time();
       print "Received " . $querycat->sizeof() . " objects from "
             . $self->catalogue . ".\n";
     }
-my $elapsed_skycat = time() - $start_skycat;
-print "SkyCat catalogue retrieval took $elapsed_skycat seconds.\n";
   }
 
-  # Again, croak if we have fewer than 4 objects.
-  if( $querycat->sizeof < 4 ) {
+  # Again, croak if we have fewer than 2 objects.
+  if( $querycat->sizeof < 2 ) {
     croak "Only retrieved " . $querycat->sizeof . " objects from "
           . $self->catalogue . ". Cannot perform automated astrometry "
           . "corrections with so few objects";
@@ -1170,12 +1165,10 @@ print "SkyCat catalogue retrieval took $elapsed_skycat seconds.\n";
         ( defined( $self->skycat_catalogue_in ) &&
           ( ! -e $self->skycat_catalogue_in ||
             $self->skycat_catalogue_in ne $self->skycat_catalogue_out ) ) ) {
-my $write_start = time();
+
       $querycat->write_catalog( Format => 'Cluster',
                                 File => $self->skycat_catalogue_out,
                               );
-my $write_elapsed = time() - $write_start;
-print "Writing catalogue to disk took $write_elapsed seconds.\n";
       print "Wrote " . $self->skycat_catalogue_out
             . " to disk, storing SkyCat results.\n" if( $self->verbose );
     }
@@ -1185,7 +1178,6 @@ print "Writing catalogue to disk took $write_elapsed seconds.\n";
 # X and Y positions for the retrieved objects.
   my $querystars = $querycat->stars;
   my @querystars;
-my $qstar_filter_start = time();
   foreach my $star ( @$querystars ) {
 
     next if ! defined( $star );
@@ -1204,15 +1196,7 @@ my $qstar_filter_start = time();
     # And update the object's WCS.
     $star->wcs( $frameset );
 
-#    if( ( $star->x < $xmax ) &&
-#        ( $star->x > $xmin ) &&
-#        ( $star->y < $ymax ) &&
-#        ( $star->y > $ymin ) ) {
-#      push @querystars, $star;
-#    }
   }
-my $qstar_filter_middle = time();
-print "Filtering stars to fit on detector took " . ( $qstar_filter_middle - $qstar_filter_start ) . " seconds.\n";
 
 # Limit the number of stars in the query catalogue for correlation, if
 # necessary. We don't really care which filter we do this in, so take
@@ -1230,15 +1214,12 @@ print "Filtering stars to fit on detector took " . ( $qstar_filter_middle - $qst
   } else {
     $filtered_querycat->pushstar( @querystars );
   }
-my $qstar_filter_elapsed = time() - $qstar_filter_middle;
-print "Sorting and filtering query catalogue took $qstar_filter_elapsed seconds.\n";
 
   print "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
   print " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
   print " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
 
 # Perform the correlation.
-my $corr_start = time();
   my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
                                    catalog2 => $filtered_querycat,
                                    keeptemps => $self->keeptemps,
@@ -1248,17 +1229,15 @@ my $corr_start = time();
                                  );
 
   ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
-my $corr_elapsed = time() - $corr_start;
-print "Correlation took $corr_elapsed seconds.\n";
-# And yes, croak if the correlation resulted in fewer than 4 matches.
-  if( $corrndfcat->sizeof < 4 ) {
+
+# And yes, croak if the correlation resulted in fewer than 2 matches.
+  if( $corrndfcat->sizeof < 2 ) {
     croak "Only " . $corrndfcat->sizeof . " object matched between reference catalogue and extracted catalogue. Cannot perform automated astrometry corrections with so few objects";
   }
 
 # Merge the two catalogues so that the RA/Dec from 2MASS matches
 # with the x/y from the extracted catalogue. This allows us to
 # perform the astrometric solution.
-my $merge_start = time();
   my $merged = new Astro::Catalog;
   $merged->fieldcentre( Coords => $cencoords );
   my $nobjs = $corrndfcat->sizeof;
@@ -1291,91 +1270,18 @@ my $merge_start = time();
     $merged->pushstar( $item );
   }
 
-=head1 COMMENT
-
-  for( my $i = 1; $i <= $nobjs; $i++ ) {
-#print "####### NEW ITEM ########\n";
-#my $popndf_start = time();
-    my $ndfstar = $corrndfcat->popstarbyid( $i );
-    $ndfstar = $ndfstar->[0];
-    if( $i == 1 ) {
-      print Dumper $ndfstar;
-    }
-#my $popndf_elapsed = time() - $popndf_start;
-#print "popping NDF star took $popndf_elapsed seconds\n";
-#my $popquery_start = time();
-    my $querystar = $corrquerycat->popstarbyid( $i );
-    $querystar = $querystar->[0];
-#my $popquery_elapsed = time() - $popquery_start;
-#print "popping query star took $popquery_elapsed seconds\n";
-# Skip over if the stars aren't defined.
-    next if ( ! defined $ndfstar || ! defined $querystar );
-
-    my $newstar = new Astro::Catalog::Star( ID => $querystar->id,
-                                            Coords => $querystar->coords,
-                                            X => $ndfstar->x,
-                                            Y => $ndfstar->y,
-                                            WCS => $querystar->wcs,
-                                          );
-    $merged->pushstar( $newstar );
-
-    # Find the old ID of the NDF star, then take the current query
-    # star's magnitudes and stick it into the old NDF star.
-#my $flux_start = time();
-    my $ndfcomments = $ndfstar->comment;
-    $ndfcomments =~ /^Old ID: (\d+)/;
-#my $comment_elapsed = time() - $flux_start;
-#print "Obtaining comments from NDF star took $comment_elapsed seconds\n";
-    my $oldndfid = $1;
-#my $oldndfpop_start = time();
-    my $oldndfstar = $ndfcat->popstarbyid( $oldndfid );
-    $oldndfstar = $oldndfstar->[0];
-#my $oldndfpop_elapsed = time() - $oldndfpop_start;
-#print "popping old NDF star took $oldndfpop_elapsed seconds\n";
-#my $obtainflux_start = time();
-    my $queryflux = $querystar->fluxes;
-    my @allfluxes = $queryflux->allfluxes;
-    my $newfluxes = new Astro::Fluxes;
-#my $obtainflux_elapsed = time() - $obtainflux_start;
-#print "Obtaining flux measurements took $obtainflux_elapsed seconds\n";
-    foreach my $flux ( @allfluxes ) {
-#my $flux_create_start = time();
-      my $quantity = $flux->quantity( 'mag' );
-      my $waveband = $flux->waveband;
-      my $type = $flux->type;
-      my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
-      $newfluxes->pushfluxes( $newflux );
-#my $flux_create_elapsed = time() - $flux_create_start;
-#print "Time to create new flux and push into fluxes object was $flux_create_elapsed seconds\n";
-    }
-#my $pushflux_start = time();
-    $oldndfstar->fluxes( $newfluxes );
-#my $pushflux_elapsed = time() - $pushflux_start;
-#print "Adding fluxes to old object took $pushflux_elapsed seconds\n";
-#my $pushobject_start = time();
-    $ndfcat->pushstar( $oldndfstar );
-#my $pushobject_elapsed = time() - $pushobject_start;
-#print "Pushing old object back into catalogue took $pushobject_elapsed seconds\n";
-#my $flux_elapsed = time() - $flux_start;
-#print "Dealing with flux took $flux_elapsed seconds\n";
-  }
-
-=cut
-
-my $merge_elapsed = time() - $merge_start;
-print "Catalogue merging took $merge_elapsed seconds\n";
 # Output the merged catalogue to disk, if requested.
   if( defined( $self->matchcatalogue ) ) {
     $merged->write_catalog( Format => 'Cluster', File => $self->matchcatalogue );
   }
 
-  print "Input catalogue to astrom has " . $merged->sizeof . " objects\n";
+  print "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
 
 # Solve astrometry.
-my $astrom_start = time();
   my $astrom = new Starlink::Astrom( catalog => $merged,
                                      keepfits => $self->keepfits,
                                      keeptemps => $self->keeptemps,
+                                     maxcoeff => $self->maxfit,
                                      obs => { 'time' => $self->obsdata->{TIME},
                                               'obs' => $self->obsdata->{OBS},
                                               'met' => $self->obsdata->{MET},
@@ -1384,8 +1290,7 @@ my $astrom_start = time();
                                      verbose => $self->verbose );
 
   my $newwcs = $astrom->solve;
-my $astrom_elapsed = time() - $astrom_start;
-print "Astrom calculation took $astrom_elapsed seconds.\n";
+
 # Stick the WCS into the NDF, if requested.
   if( $self->insert ) {
     my $STATUS = &NDF::SAI__OK;
@@ -1705,8 +1610,6 @@ sub _determine_search_params {
 
     $radius = $rad_pixels * $obsdata->{SCALE} / 60;
   }
-
-  $radius /= sqrt(2);
 
   return ( $cencoords, $radius, $lbnd[0], $ubnd[0], $lbnd[1], $ubnd[1] );
 
