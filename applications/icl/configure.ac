@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(icl, 3.1-10, ussc@star.rl.ac.uk)
+AC_INIT(icl, 3.1-11, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -77,6 +77,10 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 # Link against fortran libraries
 AC_FC_LIBRARY_LDFLAGS
+AC_FC_MAIN
+
+dnl    Need "hlib" command to build the help library.
+STAR_CHECK_PROGS(hlib)
 
  
 dnl    Documentation is in the parent directory
