@@ -1,3 +1,4 @@
+*.shl
 *.dvi
 config.h
 config.h.in
