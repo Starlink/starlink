@@ -228,7 +228,7 @@ datShape(HDSLoc *locator,
 /*==========================*/
 int
 datSize(HDSLoc *locator,
-        int *size,
+        size_t *size,
         int *status )
 {
 #undef context_name
@@ -253,7 +253,7 @@ datSize(HDSLoc *locator,
 
 /* Return the object size.      */
 
-   *size         = data->size;
+   *size         = (size_t)data->size;
 
    return hds_gl_status;
 }

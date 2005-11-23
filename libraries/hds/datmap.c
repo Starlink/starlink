@@ -373,7 +373,7 @@ datMapV(HDSLoc *locator,
 	char      *type_str,
         char      *mode_str,
         void      **pntr,
-	int       *actval,
+	size_t    *actval,
         int       *status )
 {
 #undef context_name

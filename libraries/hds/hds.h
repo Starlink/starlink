@@ -341,7 +341,7 @@ datMapV(HDSLoc    *locator,
         char      *type_str,
         char      *mode_str,
         void      **pntr,
-        int       *actval,
+        size_t    *actval,
         int       *status );
 
         
@@ -590,7 +590,7 @@ datShape(HDSLoc *locator,
 
 int
 datSize(HDSLoc *locator,
-        int *size,
+        size_t *size,
         int *status );
 
 /*================================*/
