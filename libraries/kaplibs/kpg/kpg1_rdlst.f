@@ -123,6 +123,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER MXDIM              ! Max number of table columns
+      PARAMETER ( MXDIM = 50 )
+
+*  Local Variables:
       CHARACTER ATTR*10          ! Attribute name
       CHARACTER CNAME*128        ! Catalogue name
       CHARACTER EPOCH*40         ! Epoch string
@@ -131,7 +135,7 @@
       INTEGER CI                 ! Catalogue identifier
       INTEGER DTYPE              ! Data type identifier
       INTEGER FRM                ! Frame pointer
-      INTEGER GAXIS( NDF__MXDIM )! CAT identifiers for axis columns
+      INTEGER GAXIS( MXDIM )     ! CAT identifiers for axis columns
       INTEGER GID                ! CAT identifier for PIDENT column
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER I                  ! Loop count

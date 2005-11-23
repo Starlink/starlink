@@ -203,11 +203,11 @@ void kpg1Wrlst( const char *param, int arrdim, int npos, int nax, double *pos,
                          TRAIL_ARG(PARAM)
                          TRAIL_ARG(TITLE) );
 
+   F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_CHARACTER(PARAM);
    F77_FREE_CHARACTER(TITLE);
    F77_FREE_DOUBLE(POS);
    F77_FREE_INTEGER(IDENTS);
-   F77_IMPORT_INTEGER( STATUS, *status );
 
    return;
 }
