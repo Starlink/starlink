@@ -49,6 +49,10 @@ void cupidDatCopy( HDSLoc *loc1, HDSLoc *loc2 ){
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Initialise all HDS locatorpointers to NULL since HDS now objects if it
+   receives an uninitialised pointer. */
+   cloc = NULL;
+
 /* Report an error is either locator is for a primitive value. */
    datPrim( loc1, &prim, status );
    if( prim ) {

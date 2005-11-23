@@ -363,6 +363,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    the new one. This list is actually a long character string containing
    room for "iclump" HDS locators. */
                   clist = astGrow( clist, iclump, sizeof( HDSLoc *) );
+                  if( clist ) clist[ iclump - 1 ] = NULL;
 
 /* Remove the model fit (excluding the background) from the residuals
    array. This also creates a HDS "Clump" structure containing information 

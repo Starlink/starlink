@@ -56,6 +56,11 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Initialise all HDS locator pointers to NULL since HDS now objects if it
+   receives an uninitialised pointer. */
+   aloc = NULL;
+   cloc = NULL;
+
 /* Create a GRP group containing the required text. */
    grp = NULL;
    kpg1Kygrp( config, &grp, status );
@@ -78,7 +83,6 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 /* Create a suitable array of character strings in the CUPID extension,
    and get a locator for the whole array. */
       datNewC( loc, "CONFIG", ncmax + 1, 1, &n, status );
-      aloc = NULL;
       datFind( loc, "CONFIG", &aloc, status );
 
 /* Store each list item in the new array. */

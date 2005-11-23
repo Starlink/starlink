@@ -347,7 +347,7 @@ void makeclumps() {
 
 /* Determine the parameter values to use for the clump. */
       par[ 0 ] = cupidRanVal( normal, peak );
-      par[ 1 ] = 0.0;
+      par[ 1 ] = back;
       par[ 2 ] = (int) cupidRanVal( 0, pos1 );
       par[ 3 ] = cupidRanVal( normal, fwhm1 );
 

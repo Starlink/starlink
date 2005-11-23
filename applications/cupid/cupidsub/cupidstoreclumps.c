@@ -89,6 +89,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Initialise all HDS locator pointers to NULL since HDS now objects if it
+   receives an uninitialised pointer. */
+   aloc = NULL;
+   cloc = NULL;
+
 /* See if an output catalogue is to be created. If not, annul the null
    parameter error. */
    parGet0c( param, cat, MAXCAT, status );
