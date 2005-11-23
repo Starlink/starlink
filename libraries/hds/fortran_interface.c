@@ -678,11 +678,12 @@ F77_SUBROUTINE(dat_get0c)( CHARACTER(locator),
 {
   HDSLoc locator_c;
   char * value_c;
-  
-  value_c = cnfCreim( value, value_length );
+
+  value_c = cnfCreat( value_length + 1 );
   dat1_import_floc( locator, locator_length, &locator_c, status );
   datGet0C( &locator_c, value_c, value_length, status );
-  free(value_c);
+  cnfExprt( value_c, value, value_length );
+  cnfFree(value_c);
 }
 
 
