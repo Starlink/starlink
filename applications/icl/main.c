@@ -32,6 +32,7 @@
 #include "messys_par.h"
 #include "messys_err.h"
 #include "dtask_err.h"
+#include "f77.h"
 
 extern int uface_interrupt(void);				/* uface.c  */
 
@@ -51,6 +52,15 @@ char *version = "V " PACKAGE_VERSION;
 #else
 char *version = "Version Unknown";
 #endif
+
+/*
+ * Need a dummy main on some fortran compilers
+ */
+
+#if HAVE_FC_MAIN
+void FC_MAIN () {}
+#endif
+
 
 /******************************************************************************
  *
@@ -633,6 +643,13 @@ main(int argc, char *argv[])
 /*
  * Start of main() code
  */
+
+/*
+ * Some fortran is involved
+ */
+
+    cnfInitRTL( argc, argv );
+
     prog_name = argv[0];
 /*
  * The ICL command line must be of the form:
