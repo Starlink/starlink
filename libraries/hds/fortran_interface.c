@@ -1080,6 +1080,7 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    char type_c[DAT__SZTYP+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
+   size_t actval_c;
    
 /* Enter routine.	*/
 
@@ -1090,10 +1091,11 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
-   datMapV( &locator_c, type_c, mode_c, &cpntr, actval, status);
+   datMapV( &locator_c, type_c, mode_c, &cpntr, &actval_c, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
+   *actval = (F77_INTEGER_TYPE) actval_c;
 }
 
 
@@ -1847,6 +1849,7 @@ F77_SUBROUTINE(dat_size)( CHARACTER(locator),
 
 /* Local variables */
    HDSLoc locator_c;
+   size_t size_c;
 
 /* Enter routine.	*/
 
@@ -1854,7 +1857,8 @@ F77_SUBROUTINE(dat_size)( CHARACTER(locator),
    dat1_import_floc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datSize( &locator_c, size, status );
+   datSize( &locator_c, &size_c, status );
+   *size = (F77_INTEGER_TYPE) size_c;
 }
 
 F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
