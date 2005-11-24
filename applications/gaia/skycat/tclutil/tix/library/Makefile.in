@@ -30,7 +30,7 @@ clean:
 
 index tclIndex: FORCE
 	test -x tixindex || chmod +x tixindex
-	tclsh@TCL_VERSION@ ../tools/tixindex *.tcl
+	itclsh@ITCL_VERSION@ ../tools/tixindex *.tcl
 
 depend:
 

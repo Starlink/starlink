@@ -22,7 +22,7 @@ all: $(TARGET)
 # generate a C file that creates all of the bitmap files
 # in this directory and installs them for Tk access by basename
 $(TARGET): $(FILES) bitmaps.tcl
-	tclsh@TCL_VERSION@ bitmaps.tcl > $(TARGET)
+	itclsh@ITCL_VERSION@ bitmaps.tcl > $(TARGET)
 
 All: 
 	cd ..; $(MAKE)

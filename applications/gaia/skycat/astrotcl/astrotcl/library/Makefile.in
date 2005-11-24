@@ -39,7 +39,7 @@ clean:
 	$(RM) *\~ "#"*
 
 index tclIndex: FORCE
-	tclsh$(TCL_VERSION) ./mkIndex.tcl
+	itclsh@ITCL_VERSION@ ./mkIndex.tcl
 
 depend:
 

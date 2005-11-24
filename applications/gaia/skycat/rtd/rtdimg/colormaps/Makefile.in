@@ -14,8 +14,8 @@ srcdir	     = @srcdir@
 # generate a C file inclulding static versions of all of the colormap files
 # in this directory
 do_all:
-	echo "tclsh$(TCL_VERSION) colormaps.tcl > $(TARGET)"
-	tclsh$(TCL_VERSION) colormaps.tcl > $(TARGET)
+	echo "itclsh$(ITCL_VERSION) colormaps.tcl > $(TARGET)"
+	itclsh$(ITCL_VERSION) colormaps.tcl > $(TARGET)
 
 install-top:
 	@if test -d $(RTD_DIR)/colormaps ; then \

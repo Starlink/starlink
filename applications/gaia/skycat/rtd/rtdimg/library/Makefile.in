@@ -26,7 +26,7 @@ do_install: index install-files
 
 .PHONY: index tclIndex
 index tclIndex:
-	tclsh$(TCL_VERSION) ./mkIndex.tcl
+	itclsh$(ITCL_VERSION) ./mkIndex.tcl
 
 # generate man pages for itcl classes
 doc: 

@@ -111,7 +111,7 @@ $(OBJS): ../../config.status
 tixUnixSam.c: tixSamLib.c
 
 tixSamLib.c:
-	tclsh@TCL_VERSION@ ../tools/tclc.tcl \
+	itclsh@ITCL_VERSION@ ../tools/tclc.tcl \
 	  ../library/pref/*.fsc \
 	  ../library/pref/*.csc \
 	  ../library/*.tcl > tixSamLib.c
