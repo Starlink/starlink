@@ -19,6 +19,7 @@
 *                       17/12/98 (PWD):
 *                          Changed to use NDF WCS component for astrometry.
 *	Last modify:	27/11/2003
+*                       23-NOV-2005 (TIMJ): Remove DAT__ROOT
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -46,7 +47,6 @@
 #include	"weight.h"
 
 #include        "sae_par.h"
-#include        "dat_par.h"
 #include        "ndf.h"
 #include        "merswrap.h"
 
@@ -294,7 +294,7 @@ void	readimagehead(picstruct *field)
 
 /* Open the file */
   field->file = 0;
-  ndfOpen( DAT__ROOT, field->filename, "READ", "OLD",
+  ndfOpen( NULL, field->filename, "READ", "OLD",
            &field->ndf, &placehldr, &status );
 
   if (status != SAI__OK)

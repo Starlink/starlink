@@ -20,6 +20,7 @@
 *                          (EB): 2.3
 *	Last modify:	26/11/2003
 *	Last modify:	15/06/2004
+*                       23-NOV-2005 (TIMJ): Remove DAT__ROOT
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -41,7 +42,6 @@
 
 #include        "sae_par.h"
 #include        "ndf.h"
-#include        "dat_par.h"
 
 /********************************* addcheck **********************************/
 /*
@@ -181,7 +181,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
   int          lbnd[2], ubnd[2];
   int          status = SAI__OK;
   
-  ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
+  ndfOpen( NULL, check->filename, "WRITE", "UNKNOWN",
            &check->ndf, &placehldr, &status );
   if ( status != SAI__OK ) 
     error(EXIT_FAILURE, "*Error*: Cannot open for output ", check->filename);
@@ -190,7 +190,7 @@ void	reinitcheck(picstruct *field, checkstruct *check)
 /* Delete an existing file */
      ndfDelet( &check->ndf, &status );
 /* And get a placeholder */
-     ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
+     ndfOpen( NULL, check->filename, "WRITE", "UNKNOWN",
               &check->ndf, &placehldr, &status );
      if ( status != SAI__OK )
         error(EXIT_FAILURE, "*Error*: Deleting existing file ", check->filename);
