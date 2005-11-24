@@ -45,6 +45,14 @@ if test -f @bindir@/convert/convert.sh; then
    export CONVERT_HELP=@starhelpdir@/convert/convert
 fi
 
+#
+#  EXTRACTOR
+
+if test -f @bindir@/extractor/extractor.sh; then
+   export EXTRACTOR_DIR=@bindir@/extractor
+   export EXTRACTOR_HELP=@starhelpdir@/extractor/extractor
+fi
+
 #  Fluxes
 
 if test -f @bindir@/fluxes/fluxes.csh; then
@@ -204,6 +212,23 @@ if test -f @bindir@/dipso/dipsosetup.sh; then
 else
   dipsosetup () { @staretcdir@/notinst dipsosetup; }
   dipso () { @staretcdir@/notinst dipso; }
+fi
+
+
+#
+#   Extractor
+#
+
+if test -f @bindir@/extractor/extractor.sh; then 
+   extractorsetup () { . @bindir@/extractor/extractor.sh; }
+   extractsetup () { . @bindir@/extractor/extractor.sh; }
+   extractor () { . @bindir@/extractor/extractor.sh; }
+   extract () { . @bindir@/extractor/extractor.sh; }
+else
+   extractorsetup () { @staretcdir@/notinst extractorsetup; }
+   extractsetup () { @staretcdir@/notinst extractsetup; }
+   extractor () { @staretcdir@/notinst extractor; }
+   extract () { @staretcdir@/notinst extract; }
 fi
 
 # Fluxes
