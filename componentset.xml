@@ -803,7 +803,7 @@ Traces an HDS file
 </component>
 
 <component id="icl" support="S">
-  <version>3.1-10</version>
+  <version>3.1-11</version>
   <path>applications/icl</path>
   <description>Interactive Command Language</description>
   <abstract><p>ICL shell.
