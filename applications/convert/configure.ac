@@ -45,8 +45,10 @@ STAR_CHECK_PROGS(hlib)
 dnl    Ranlib is needed on OS X so that we can update the static libraries
 dnl    (the archive index is considered out of date if it doesn't match the
 dnl    date of the archive file, so a simple copying invalidates this, this
-dnl    is noted in the OS X ranlib man page as a bug, so may not always be true).
-AC_PROG_RANLIB
+dnl    is noted in the OS X ranlib man page as a bug, so may not always be
+dnl    true). Note AC_PROG_LIBTOOL claims to obsolete:
+dnl AC_PROG_RANLIB
+dnl    so commented out.   
 
 dnl    Documentation.
 STAR_LATEX_DOCUMENTATION([sun55])
