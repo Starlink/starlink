@@ -79,7 +79,7 @@ $(TCL_FILES) $(TCL_TEST_FILES):
 	export TCL_LIBRARY; unset TCL_LIBRARY;\
 	export TK_LIBRARY; unset TK_LIBRARY;\
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
-	./configure --prefix=$${pwd}/built @X11_INCLUDES@ @X11_LIBRARIES@;\
+	./configure --prefix=$${pwd}/built --disable-shared @X11_INCLUDES@ @X11_LIBRARIES@;\
 	make -e World)
 	for f in $(SCRIPT_PLACES); do \
 	   cp -p $${f} . ;\
