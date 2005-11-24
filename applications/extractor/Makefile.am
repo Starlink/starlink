@@ -6,7 +6,7 @@
 ##  for extracting the parts needed and building the EXTRACTOR atask
 ##  and finally installing.
 
-nodist_bin_SCRIPTS = extractor.csh extractor.icl extractor.ifc
+nodist_bin_SCRIPTS = extractor.csh extractor.sh extractor.icl extractor.ifc
 
 bin_MONOLITHS = extractor
 extractor_SOURCES = extract/src/extractor.c
@@ -107,7 +107,8 @@ extractor.ifl: extract/src/extractor.ifl
 MAINTAINERCLEANFILES = extractor.ifl
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = extract sextractor extractor.csh.in extractor.icl.in
+EXTRA_DIST = extract sextractor extractor.csh.in extractor.icl.in \
+	extractor.sh.in
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the CVS trace.
@@ -128,5 +129,10 @@ extractor.csh: extractor.csh.in
 	$(edit) $(srcdir)/extractor.csh.in > extractor.csh.tmp
 	mv extractor.csh.tmp extractor.csh
 
+extractor.sh: extractor.sh.in
+	-rm -f extractor.sh
+	$(edit) $(srcdir)/extractor.sh.in > extractor.sh.tmp
+	mv extractor.sh.tmp extractor.sh
+
 CLEANFILES = extractor.csh version.dat extractor extractor.ifc \
-             extractor.icl
+             extractor.icl extractor.sh

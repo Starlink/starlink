@@ -1,3 +1,5 @@
+*.ifd
+extractor.sh
 *.dvi
 core.*
 version.dat
