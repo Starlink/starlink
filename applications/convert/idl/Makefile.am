@@ -48,7 +48,7 @@ edit = sed \
 
 read_ndf.pro: convert_idl.la read_ndf.pro.in
 	DLNAME="`$(getdlname)`";\
-	rm -f read_ndf.pro.tmp readndf.pro;\
+	rm -f read_ndf.pro.tmp read_ndf.pro;\
 	$(edit) \
 	   $(srcdir)/read_ndf.pro.in >read_ndf.pro.tmp;\
 	mv read_ndf.pro.tmp read_ndf.pro
@@ -67,3 +67,14 @@ MISC_BUILT_FILES = version.dat read_ndf.pro write_ndf.pro
 
 CLEANFILES = $(MISC_BUILT_FILES)
 
+##
+## Post install hooks. Need to make a link to the shareable library into
+## bindir for compatibility with old behaviour and DLM loaded code.
+## 
+install-exec-hook: convert_idl.la
+	DLNAME="`$(getdlname)`" ;\
+	cd $(DESTDIR)/$(bindir) ;\
+	if test -f "$$DLNAME"; then \
+	   rm -f $$DLNAME ;\
+	fi ;\
+	$(LN_S) $(libdir)/$$DLNAME $$DLNAME
