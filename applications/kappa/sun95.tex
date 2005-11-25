@@ -15897,7 +15897,7 @@ XV; PBMPLUS; NETPBM.
       wavelength planes in a three-dimensional RA/DEC/Wavelength cube to produce a
       single two-dimensional RA/DEC image, or collapsing a range of slit positions in
       a two-dimensional slit position/wavelength image to produce a one-dimensional wavelength
-      array
+      array.
    }
    \sstusage{
       collapse in out axis [low] [high] [estimator] [wlim]
@@ -18371,10 +18371,10 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       }{
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          image.  These display co-ordinates in the current \htmlref{co-ordinate Frame}{se:domains}~ 
-         of the supplied NDF - which may be changed using application \htmlref{WCSFRAME}{WCSFRAME}
+         of the supplied NDF, and may be changed using application \htmlref{WCSFRAME}{WCSFRAME}
          (see also parameter USEAXIS).  The width of the margins left for
          the annotation may be controlled using parameter MARGIN.  The
-         appearance of the axes (colours, fonts, \emph{etc.}) can be controlled
+         appearance of the axes (colours, founts, \emph{etc.}) can be controlled
          using the STYLE parameter.  {\tt{[}}current value{\tt{]}}
       }
       \sstsubsection{
@@ -18521,10 +18521,10 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       \sstsubsection{
          KEYPOS = \_REAL (Read)
       }{
-         A value giving the gap between the right hand edge of the display
-         and the left hand edge of the key, given as a fraction of the
+         A value giving the gap between the right-hand edge of the display
+         and the left-hand edge of the key, given as a fraction of the
          width of the current picture.  If a key is produced, then the
-         right hand margin specified by parameter MARGIN is ignored, and
+         right-hand margin specified by parameter MARGIN is ignored, and
          the value supplied for KEYPOS is used instead.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -18555,7 +18555,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          reported).
 
          Axis 1 is always the \emph{data value} axis.  So for instance, to set
-         the label for the data value axis, assign a value to {\tt "Label(1)"}
+         the label for the data-value axis, assign a value to {\tt "Label(1)"}
          in the supplied style.
 
          To get a ramp key (the default), specify {\tt "form=ramp"}.  To
@@ -18609,7 +18609,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          annotations, given as fractions of the corresponding dimension
          of the current picture.  The actual margins used may be increased to
          preserve the aspect ratio of the data.  Four values may be given, in
-         the order - bottom, right, top, left.  If less than four values are
+         the order: bottom, right, top, left.  If fewer than four values are
          given, extra values are used equal to the first supplied value.  If
          these margins are too narrow any axis annotation may be clipped.
          If a null ({\tt{!}}) value is supplied, the value used is (for all edges);
@@ -18638,7 +18638,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
             \sstitem
             {\tt "Percentiles"} --- The image is scaled between the data values
             corresponding to two percentiles.  The scaling values are reported
-            so that the faster Scale mode may be utilised later.
+            so that the faster Scale mode may be used later.
 
             \sstitem
             {\tt "Range"} --- The image is scaled between the minimum and maximum
@@ -18750,7 +18750,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          Frame (in the range 1 to the number of axes in the current Frame), or
          by its symbol string.  A list of acceptable values is displayed if an
          illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the axes
-         with the same indices as the 2 used pixel axes within the NDF
+         with the same indices as the two used pixel axes within the NDF
          are used.  {\tt[!]}
       }
       \sstsubsection{
@@ -25787,8 +25787,8 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       This application creates a plot of array value against position for
       a one-dimensional \NDFref{NDF}.  The vertical axis of the plot represents array
       value, and the horizontal axis represents position.  These can be
-      mapped in various ways onto the screen (\emph{e.g.} linearly, logarithmically);
-      see parameters XMAP and YMAP.
+      mapped in various ways onto the graphics surface (\emph{e.g.} linearly, 
+      logarithmically); see parameters XMAP and YMAP.
 
       The plot may take several different forms such as a {\tt "join-the-dots"}
       plot, a {\tt "staircase"} plot, a {\tt "chain"} plot (see parameter MODE).
@@ -25853,7 +25853,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          ALIGN), and {\tt TRUE} otherwise.  Parameter USEAXIS determines the
          quantity used to annotated the horizontal axis.  The width of the
          margins left for the annotation may be controlled using parameter
-         MARGIN.  The appearance of the axes (colours, fonts, \emph{etc.}) can be
+         MARGIN.  The appearance of the axes (colours, founts, \emph{etc.}) can be
          controlled using the parameter STYLE. {\tt [!]}
       }
       \sstsubsection{
@@ -25877,7 +25877,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          There will be no difference in effect between these two forms of
          alignment unless the rest frequency is different in the two
          spectra.  Likewise, the {\att AlignStdOfRest} attribute of the second
-         spectrum control's the standard of rest in which alignment occurs.
+         spectrum controls the standard of rest in which alignment occurs.
          These attributes (like all other attributes) may be examined and
          modified using \htmlref{WCSATTRIB}{WCSATTRIB}.
       }
@@ -25927,12 +25927,12 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          of the first and last elements in the supplied NDF, whether or not
          these elements are actually visible in the plot.  If USEAXIS is not
          zero (\emph{i.e.} if the horizontal axis is annotated with the value on
-         one of the axes of the NDFs current co-ordinate Frame), then the
+         one of the axes of the NDF's current co-ordinate Frame), then the
          displayed positions correspond to the two ends of the visible
          section of the horizontal axis.  The appearance of the key can be
          controlled using parameter KEYSTYLE.  If a null ({\tt{!}}) value is
          supplied, a key is produced if the current co-ordinate Frame of
-         the supplied NDF has 2 or more axes, but no key is produced if it
+         the supplied NDF has two or more axes, but no key is produced if it
          only has one axis. {\tt [!]}
       }
       \sstsubsection{
@@ -25971,7 +25971,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          separated by commas.  The first sub-string must specify the method
          to use.  If supplied, the other two sub-strings should be numerical
          values as described below (default values will be used if these
-         sub-strings are not supplied).  The following methods are available.
+         sub-strings are not provided).  The following methods are available.
 
          \ssthitemlist{
 
@@ -26000,8 +26000,8 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             for YBOT is set so that the lowest 10\% of the plotted points are
             off the bottom of the plot, and the default for YTOP is set so
             that the highest 1\% of the points are off the top of the plot.
-            If only one value, p1, is supplied, the second value, p2, defaults
-            to (100 - p1).  If no values are supplied, the values default to
+            If only one value, $p1$, is supplied, the second value, $p2$, defaults
+            to $(100 - p1)$.  If no values are supplied, the values default to
             {\tt "5,95"}.
 
             \sstitem
@@ -26012,7 +26012,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             standard deviations, and the default for YTOP is set to the mean
             plus 3 standard deviations.  If only one value is supplied, the
             second value defaults to the supplied value.  If no values are
-            supplied, both default to {\tt "3.0"}.
+            provided, both default to {\tt "3.0"}.
 
          }
          The method name can be abbreviated to a single character, and is
@@ -26023,8 +26023,8 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       }{
          The widths of the margins to leave for axis annotation, given
          as fractions of the corresponding dimension of the current picture.
-         Four values may be given, in the order - bottom, right, top, left.
-         If less than four values are given, extra values are used equal to
+         Four values may be given, in the order: bottom, right, top, left.
+         If fewer than four values are given, extra values are used equal to
          the first supplied value.  If these margins are too narrow any axis
          annotation may be clipped.  If a null ({\tt{!}}) value is supplied, the
          value used is {\tt 0.15} (for all edges) if either annotated axes or a
@@ -26093,11 +26093,11 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
             drawn joining the \textit{x} error limits and the \textit{y} error limits.  The plotting
             attribute \htmlattref{Size(ErrBars)}{Size(element)}~ (see parameter STYLE) can be used to
             control the size of these serifs (the attribute value should be
-            a magnification factor --- 1.0 gives default serifs).
+            a magnification factor; 1.0 gives default serifs).
 
             \sstitem
-            {\tt "Cross"} --- San-serif bars are drawn joining the \textit{x} error limits and
-            the \textit{y} error limits.
+            {\tt "Cross"} --- San-serif bars are drawn joining the \textit{x}0-error limits and
+            the \textit{y}-error limits.
 
             \sstitem
             {\tt "Diamond"} --- Adjacent error limits are joined to form an
@@ -26157,7 +26157,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          Specifies the quantity to be used to annotate the horizontal axis
          of the plot.  The index or label of an axis within the current
          co-ordinate Frame of the NDF should be supplied.  Alternatively,
-         if USEAXIS is given the value zero, then the distance along the
+         if USEAXIS is given the value {\tt{0}} (zero), then the distance along the
          profile from the centre of the first element in the supplied NDF
          will be used to annotate the axis.  This will be measured in the
          current co-ordinate Frame of the NDF.
@@ -26169,8 +26169,8 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          reported if the profile passes through RA=0 because it will
          introduce a non-monotonic jump in axis value (from 0h to 24h, or
          24h to 0h).  If a null ({\tt{!}}) value is supplied, the value used is
-         1 if the current co-ordinate Frame in the NDF is one-dimensional
-         and zero otherwise. {\tt [!]}
+         {\tt{1}} if the current co-ordinate Frame in the NDF is one-dimensional
+         and {\tt{0}} otherwise. {\tt [!]}
       }
       \sstsubsection{
          XLEFT = LITERAL (Read)
@@ -26187,34 +26187,34 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          XMAP = LITERAL (Read)
       }{
          Specifies how the quantity represented by the \textit{x} axis is mapped
-         onto the screen.  The options are:
+         onto the plot.  The options are:
 
          \ssthitemlist{
 
             \sstitem
             {\tt "Pixel"} --- The mapping is such that pixel index within the
-            input NDF increases linearly across the screen.
+            input NDF increases linearly across the plot.
 
             \sstitem
             {\tt "Distance"} --- The mapping is such that distance along the curve
             within the current \htmlref{WCS}{apndf:wcs} Frame of the input NDF increases linearly
-            across the screen.
+            across the plot.
 
             \sstitem
             {\tt "Log"} --- The mapping is such that the logarithm (base 10) of
             the value used to annotate the axis increases linearly across
-            the screen.  An error will be reported if the dynamic range of
+            the plot.  An error will be reported if the dynamic range of
             the axis is less than 100, or if the range specified by XLEFT
             and XRIGHT encompasses the value zero.
 
             \sstitem
             {\tt "Linear"} --- The mapping is such that the value used to annotate
-            the axis increases linearly across the screen.
+            the axis increases linearly across the plot.
 
             \sstitem
             {\tt "Default"} --- One of {\tt "Linear"} or {\tt "log"} is chosen automatically,
-            depending on which one produces a more even spread of values on the
-            screen. 
+            depending on which one produces a more-even spread of values on the
+            plot.
          }
          {\tt ["Default"]}
       }
@@ -26233,7 +26233,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          XSIGMA = LITERAL (Read)
       }{
          If horizontal error bars are produced (see parameter ERRBAR), then
-         XSIGMA gives the number of standard deviations which the error
+         XSIGMA gives the number of standard deviations that the error
          bars are to represent.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -26282,7 +26282,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          YSIGMA = LITERAL (Read)
       }{
          If vertical error bars are produced (see parameter ERRBAR), then
-         YSIGMA gives the number of standard deviations which the error
+         YSIGMA gives the number of standard deviations that the error
          bars are to represent.   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -26349,15 +26349,17 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       \sstexamplesubsection{
          linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=$\wedge$my\_sty
       }{
-         This plots the data values versus position for the dataset called
-         xspec.  Each pixel is plotted as a point surrounded by diamond-shaped
-         error bars.  The error bars are 3 sigma error bars.  The plotting
-         style is read from text file my\_sty.  This could, for instance,
-         contain strings such as; colour(err)=pink, colour(sym)=red,
-         tickall=0, edge(2)=right.  These cause the error bars to be drawn
-         in pink, the points to be drawn in red, tick marks to be restricted
-         to the labelled edges of the plot, and the vertical axis (axis 2)
-         to be annotated on the right hand edge of the plot.
+         This plots the data values versus position for the dataset
+	 called xspec.  Each pixel is plotted as a point surrounded by
+	 diamond-shaped error bars.  The error bars are 3-sigma error
+	 bars.  The plotting style is read from text file {\tt
+	 my\_sty}.  This could, for instance, contain strings such as:
+	 {\tt colour(err)=pink, colour(sym)=red, tickall=0,
+	 edge(2)=right}.  These cause the error bars to be drawn in
+	 pink, the points to be drawn in red, tick marks to be
+	 restricted to the labelled edges of the plot, and the
+	 vertical axis (axis 2) to be annotated on the right-hand edge
+	 of the plot.
       }
       \sstexamplesubsection{
          linplot ndf=spectrum noclear align
@@ -26379,7 +26381,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          some other system (such as wavelength, velocity, energy)
          or has some other units, then the conversion is done automatically.
          Note, a SpecFrame is a specialised class of Frame which knows how to
-         do these conversions - the above command will fail if the current
+         do these conversions; the above command will fail if the current
          co-ordinate Frame in the NDF is a simple Frame (such as the AXIS
          Frame).  A SpecFrame can be created from an AXIS Frame using
          application \htmlref{WCSADD}{WCSADD}.
@@ -26421,8 +26423,8 @@ KAPPA: \htmlref{PROFILE}{PROFILE},
 \xref{FIGARO}{sun86}{}: \xref{ESPLOT}{sun86}{ESPLOT},
 \xref{IPLOTS}{sun86}{IPLOTS},
 \xref{MSPLOT}{sun86}{MSPLOT},
-\xref{SPLOT}{sun86}{SPLOT},
 \xref{SPECGRID}{sun86}{SPECGRID};
+\xref{SPLOT}{sun86}{SPLOT},
 \xref{SPLAT}{sun243}{}.
    }
    \sstimplementationstatus{
