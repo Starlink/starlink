@@ -1233,7 +1233,6 @@ int *status           /* global status (given and returned) */
       {
 	datCell ( fitsloc, 1, &j, &loc2, status );
 	datGet0C ( loc2, headers[j-1], maxlen, status );
-	printf("%d: %s --\n", j, headers[j-1]);
 	datAnnul ( &loc2, status );
       }
    }
