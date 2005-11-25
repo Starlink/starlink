@@ -16,11 +16,11 @@
 *     CALL DISPLAY( STATUS )
 
 *  Description:
-*     This application displays a 1- or 2-dimensional NDF as an image
-*     on the current image-display device.  The minimum and maximum data
-*     values to be displayed can be selected in several ways (see
-*     parameter MODE). Data values outside these limits are displayed
-*     with the colour of the nearest limit.  A key showing the 
+*     This application displays a one- or two-dimensional NDF as an 
+*     image on the current image-display device.  The minimum and 
+*     maximum data values to be displayed can be selected in several 
+*     ways (see parameter MODE).  Data values outside these limits are
+*     displayed with the colour of the nearest limit.  A key showing the
 *     relationship between colour and data value can be displayed (see
 *     parameter KEY).
 *
@@ -524,7 +524,7 @@
 *     1992 March 30 (MJC):
 *        Revised defaulting behaviour of BADCOL and BCOLOUR, and
 *        corrected the notes.  Added an example of their use.  Handles
-*        arbitrary user-defined 2-d sections.
+*        arbitrary user-defined two-dimensional sections.
 *     1992 November 27 (MJC):
 *        Does not use non-monotonic axis centres.
 *     1992 December 17 (MJC):
