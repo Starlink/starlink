@@ -677,11 +677,13 @@ F77_SUBROUTINE(dat_get0c)( CHARACTER(locator),
 			   TRAIL(value) )
 {
   HDSLoc locator_c;
+  int cvalue_length;
   char * value_c;
 
-  value_c = cnfCreat( value_length + 1 );
+  cvalue_length = value_length + 1;
+  value_c = cnfCreat( cvalue_length );
   dat1_import_floc( locator, locator_length, &locator_c, status );
-  datGet0C( &locator_c, value_c, value_length, status );
+  datGet0C( &locator_c, value_c, cvalue_length, status );
   cnfExprt( value_c, value, value_length );
   cnfFree(value_c);
 }

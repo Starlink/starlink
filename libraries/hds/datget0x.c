@@ -11,10 +11,12 @@
 #include "dat_err.h"
 #include "hds.h"
 
+#include "f77.h"       /* For CNF string "import" routine */
+
 /*
  *+
  *  Name:
- *    datPut0X
+ *    datGet0X
 
  *  Purpose:
  *    Get a scalar value from an HDS component
@@ -44,7 +46,8 @@
  *    <type> *value = Returned
  *       Pointer to variable to receive the value. For string
  *       data types the buffer must be preallocated by the caller
- *       and the size of the buffer provided as a 3rd argument.
+ *       and the size of the buffer provided as a 3rd argument. The
+ *       string will be nul-terminated on return.
  *    int * status = Given & Returned
  *       Global inherited status.
 
@@ -66,10 +69,13 @@
  *       Improved prologue layout
  *     21-NOV-2005 (TIMJ):
  *       Rewrite in C
+ *     25-NOV-2005 (TIMJ):
+ *       NUL terminate
 
  *  Notes:
  *    For datGet0C the buffer must be preallocated by the caller
- *    and the size provided as a 3rd argument.
+ *    and the size provided as a 3rd argument. The specified string
+ *    size must allow for the terminating nul.
 
  *  Copyright:
  *    Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -104,7 +110,15 @@ int datGet0C ( HDSLoc * loc, char * value, size_t str_len, int * status ) {
 
   if ( *status != DAT__OK ) return *status;
 
-  datGetC( loc, ndims, dim, value, str_len, status );
+  /* Obtain the unterminated string but pass in a size one less than
+     the allocated size to allow us to terminate */
+  value[0] = '\0';
+  datGetC( loc, ndims, dim, value, str_len-1, status );
+
+  /* Terminate the string but first make sure we fool CNF by forcing
+     a ' ' as the last character in the "fortran" string */
+  value[str_len-1] = ' ';
+  cnfImprt( value, str_len, value );
   return *status;
 }
 
