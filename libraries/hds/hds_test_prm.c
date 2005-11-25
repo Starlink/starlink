@@ -27,7 +27,7 @@
 typedef unsigned char byte;
 const char* tohex(const char*, byte* p);
 
-#if ! FC_MAIN_IS_MAIN
+#if HAVE_FC_MAIN
 void FC_MAIN () { }
 #endif
 
