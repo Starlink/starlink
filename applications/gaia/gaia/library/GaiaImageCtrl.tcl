@@ -151,19 +151,18 @@ itcl::class gaia::GaiaImageCtrl {
          gaia::GaiaImagePanel $panel.info \
             -image $this \
             -state disabled \
+            -panel_orient $itk_option(-panel_orient) \
             -min_scale $itk_option(-min_scale) \
             -max_scale $itk_option(-max_scale) \
             -shorthelpwin $itk_option(-shorthelpwin) \
             -borderwidth 3 -relief groove \
             -ukirt_ql $itk_option(-ukirt_ql)
       }
-      if { $itk_option(-float_panel) } {
-         set side bottom
+      if { "$itk_option(-panel_orient)" == "vertical" } {
+         pack $itk_component(info) -side top -fill both -expand 1
       } else {
-         set side left
+         pack $itk_component(info) -side left -fill both -expand 1
       }
-      pack $itk_component(info)  \
-         -side $side -fill both -expand 1
 
       #  Take opportunity to stop floating panel from being destroyed.
       #  Using {} as command isn't enough.
@@ -965,7 +964,7 @@ itcl::class gaia::GaiaImageCtrl {
    }
 
    #  Commands for callbacks when the file is changed and when a file is
-   #  opened using the file selection dialog. Changes happen whenever 
+   #  opened using the file selection dialog. Changes happen whenever
    #  -file is configured.
    itk_option define -file_change_cmd file_change_cmd File_Change_Cmd {}
    itk_option define -file_open_cmd file_open_cmd File_Open_Cmd {}

@@ -182,6 +182,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,extended_precision) 0
       set values_($this,show_hdu_chooser) 1
       set values_($this,float_panel) 0
+      set values_($this,panel_orient) horizontal
       set values_($this,with_zoom_window) 1
       set values_($this,with_pan_window) 1
       set values_($this,with_colorramp) 1
@@ -203,10 +204,10 @@ itcl::class gaia::GaiaStartup {
    #  save to backing store.
    protected method save_properties_ {} {
       foreach key "extended_precision show_hdu_chooser float_panel \
-                   with_zoom_window with_pan_window with_colorramp \
-                   focus_follows_mouse scrollbars transient_tools \
-                   quiet_exit min_scale max_scale zoom_factor \
-                   default_cut default_cmap default_itt \
+                   panel_orient with_zoom_window with_pan_window \
+                   with_colorramp focus_follows_mouse scrollbars \
+                   transient_tools quiet_exit min_scale max_scale \
+                   zoom_factor default_cut default_cmap default_itt \
                    linear_cartesian always_merge" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
@@ -257,6 +258,20 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(floatpanel) \
          {Create panel area in own window (requires restart)}
       pack $itk_component(floatpanel) -side top -fill x
+
+      # Panel orientation.
+      itk_component add panelorient {
+         LabelMenu $w_.panelorient -text "Panel orientation:" \
+            -labelwidth $lwidth \
+            -variable [scope values_($this,panel_orient)]
+      }
+      foreach value "horizontal vertical" {
+         $itk_component(panelorient) add -label $value \
+            -command [code $this set_value_ panel_orient $value]
+      }
+      add_short_help $itk_component(panelorient) \
+         {Change the orientation of the control panel (requires restart)}
+      pack $itk_component(panelorient) -side top -fill x
 
       # Zoom window
       itk_component add withzoomwindow {

@@ -151,6 +151,7 @@ Options:
  -max_scale <n>           - maximum scale for magnification menu (default: 20).
  -min_scale <n>           - minimum scale for magnification menu (default: -10).
  -panel_layout <layout>   - panel layout, one of: "saoimage", "reverse" or "default" .
+ -panel_orient <orient>   - panel orientation, one of: "horizontal", "vertical"
  -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -port <port>             - listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - use existing skycat process, if available, with Tk send.
@@ -186,6 +187,7 @@ itcl::class gaia::Gaia {
       #  options.
       itk_option remove rtd::Rtd::scrollbars
       itk_option remove rtd::Rtd::panel_layout
+      itk_option remove rtd::Rtd::panel_orient
 
       eval itk_initialize $args
 
@@ -361,6 +363,7 @@ itcl::class gaia::Gaia {
    #  Add help for GAIA and SkyCat.
    public method add_help_menu {} {
       global ::gaia_dir
+      puts "add_help_menu"
       set m [add_help_button index "Help topics index..." \
                 {Display the main help window and index}]
 
@@ -420,6 +423,7 @@ itcl::class gaia::Gaia {
             -grid_command [code $this redraw_specials_] \
             -with_warp 1 \
             -panel_layout $itk_option(-panel_layout) \
+            -panel_orient $itk_option(-panel_orient) \
             -regioncommand [code $this select_region] \
             -component $itk_option(-component) \
             -min_scale $itk_option(-min_scale) \
@@ -1803,6 +1807,9 @@ window gives you access to this."
 
    #  Redefine panel_layout to GAIA default
    itk_option define -panel_layout panel_layout Panel_layout reverse
+
+   #  Redefine panel_orient to GAIA default
+   itk_option define -panel_orient panel_orient Panel_orient horizontal
 
    #  Set focus following policy (can only set once, then stuck with it).
    itk_option define -focus_follows_mouse focus_follows_mouse \
