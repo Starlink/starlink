@@ -167,7 +167,7 @@
 //        Added astalwaysmerge command. Controls whether primary headers are
 //        merged with extension before looking for a WCS.
 //     28-OCT-2004 (PWD):
-//        Added direct NDF access commands. These are used to access cubes. 
+//        Added direct NDF access commands. These are used to access cubes.
 //-
 
 #include <config.h>   /* Skycat util */
@@ -274,6 +274,7 @@ public:
     { "astwarnings",   &StarRtdImage::astwarningsCmd,   0, 0 },
     { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,    2, 2 },
     { "astwrite",      &StarRtdImage::astwriteCmd,      1, 3 },
+    { "biasimage",     &StarRtdImage::biasimageCmd,     0, 3 },
     { "blankcolor",    &StarRtdImage::blankcolorCmd,    1, 1 },
     { "colorramp",     &StarRtdImage::colorrampCmd,     0, 2 },
     { "contour",       &StarRtdImage::contourCmd,       1, 6 },
@@ -297,6 +298,10 @@ public:
     { "usingxshm",     &StarRtdImage::usingxshmCmd,     0, 0 },
     { "xyprofile",     &StarRtdImage::xyProfileCmd,    14, 14}
 };
+
+
+// XXXXXXX new commands needed (overrides) biasimageCmd, infoCmd. What is
+// bltgraphCmd?
 
 //+
 //  starRtdImageType
@@ -373,17 +378,17 @@ extern "C" int StarRtd_Init( Tcl_Interp *interp )
 //  Return:
 //    TCL status.
 //-
-int StarRtdImage::CreateImage( Tcl_Interp *interp, 
-                               char *name, 
+int StarRtdImage::CreateImage( Tcl_Interp *interp,
+                               char *name,
                                int argc,
 #if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
                                Tcl_Obj *CONST objv[], // Argument objects for
                                                       // options (not
                                                       // including image name
-                                                      // or type) 
+                                                      // or type)
 #else
                                char *argv[],
-#endif 
+#endif
                                Tk_ImageType *typePtr,
                                Tk_ImageMaster master,
                                ClientData *clientDataPtr )
@@ -958,7 +963,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                     }
                     else {
                         message << "WCS: failed to save WCS using "
-                                << "additional encoding: " 
+                                << "additional encoding: "
                                 << argv[1] << std::endl;
                     }
                     if ( !astOK ) astClearStatus;
@@ -1041,9 +1046,9 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::configureImage" << std::endl;
 #endif
-    if (TkImage::configureImage(argc, argv, flags) != TCL_OK) 
+    if (TkImage::configureImage(argc, argv, flags) != TCL_OK)
 	return TCL_ERROR;
-    
+
     int status = TCL_OK;
     int reset = 0;
 
@@ -1065,7 +1070,7 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 		}
 		break;
 
-#if _HAVE_R6            
+#if _HAVE_R6
 	    case RTD_OPTION(usexsync):
 		if (usingXSync_ && usexsync()) {
 		    /*
@@ -1077,11 +1082,11 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 		}
 		break;
 #endif  // _HAVE_R6
-		
+
 	    case RTD_OPTION(displaymode):
 	    case RTD_OPTION(shm_header):
 	    case RTD_OPTION(shm_data):
-		if (initialized_) 
+		if (initialized_)
 		    reset++;
 		break;
 	    case RTD_OPTION(verbose):
@@ -1112,7 +1117,7 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 	    case RTD_OPTION(file):
 		status = loadFile();
 		break;
-		
+
 	    case RTD_OPTION(sampmethod):
 		if (initialized_ && image_) {
 		    if (image_->sampmethod() != sampmethod()) {
@@ -1133,7 +1138,7 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 	    }
 	}
     }
-    
+
     if (reset)
 	return resetImage();
     return status;
@@ -1231,7 +1236,7 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
 //       char *argv[]     - The arguments, names of the variables
 //                          to hold origin information. Note there
 //                          can be more than two of these. If more are
-//                          supplied than necessary then the 
+//                          supplied than necessary then the
 //                          extra ones will be set to 1.
 //    Return:
 //       TCL status.
@@ -3436,6 +3441,26 @@ int StarRtdImage::blankcolorCmd( int argc, char *argv[] )
 }
 
 //+
+//   StarRtdImage::biasimage
+//
+//   Purpose:
+//       Configure the bias images.
+//
+//    Notes:
+//       See RtdImage version. Overridden to support NDFs.
+//-
+int StarRtdImage::biasimageCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::biasimageCmd ("<< argv[0] << ")"<< std::endl;
+#endif
+
+    // Do nothing just yet...
+    return TCL_OK;
+}
+
+
+//+
 //   StarRtdImage::sliceCmd
 //
 //   Purpose:
@@ -4407,6 +4432,10 @@ int StarRtdImage::fitsHduCmd( const ImageIO &imio, int argc, char *argv[] )
         return hduCmdDelete( argc, argv, fits );
     }
 
+    // <path> hdu fits ?$number?
+    if (strcmp(argv[0], "fits") == 0)
+        return hduCmdFits(argc, argv, fits);
+
     // <path> hdu list
     if ( strcmp(argv[0], "list" ) == 0 ) {
         int ret = hduCmdList( argc, argv, fits );
@@ -4479,6 +4508,10 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
         return error( "table commands not supported for NDFs" );
     }
 
+    // <path> hdu fits ?$number?
+    if (strcmp(argv[0], "fits") == 0)
+        return ndfCmdFits( argc, argv, ndf );
+
     // <path> hdu list
     if ( strcmp(argv[0], "list" ) == 0 ) {
         return ndfCmdList( argc, argv, ndf );
@@ -4503,7 +4536,6 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
 //-
 int StarRtdImage::ndfCmdSet( int argc, char** argv, NDFIO* ndf )
 {
-
     //  First argument is an optional "set".
     if (strcmp(argv[0], "set") == 0) {
         argc--;
@@ -4553,6 +4585,49 @@ int StarRtdImage::ndfCmdSet( int argc, char** argv, NDFIO* ndf )
 
     //  Update the display.
     return initNewImage();
+}
+
+//+
+//  StarRtdImage::ndfCmdFits
+//
+//  Purpose:
+//     Implements the NDF equivalent of the "hdu fits" command.
+//     This returns the FITS headers.
+//-
+int StarRtdImage::ndfCmdFits( int argc, char** argv, NDFIO* ndf )
+{
+    int hdu = ndf->getNDFNum();
+    int saved_hdu = hdu;
+    int numHDUs = ndf->getNumNDFs();
+    const char *component = ndf->component();
+    int status = TCL_OK;
+
+    // Check for the optional hdu arg, otherwise use current
+    if ( argc >= 2 && sscanf( argv[1], "%d", &hdu ) == 1 ) {
+        if ( hdu != saved_hdu ) {
+            if ( hdu < 1 || hdu > numHDUs ) {
+                return fmt_error( "HDU number %d out of range (max %d)",
+                                  hdu, numHDUs );
+            }
+            // Switch to the given HDU, but restore the original before
+            // returning.
+            if ( ndf->setDisplayable( hdu, "data" ) != 0 ) {
+                return TCL_ERROR;
+            }
+        }
+    }
+
+    // Get the FITS header and return it as the result.
+    ostringstream os;
+    ndf->getFitsHeader( os );
+    set_result( os.str().c_str() );
+
+    // Restore the original HDU before returning
+    if ( hdu != saved_hdu &&
+         ndf->setDisplayable( saved_hdu, component ) != 0 ) {
+        status = TCL_ERROR;
+    }
+    return status;
 }
 
 //+
@@ -5962,8 +6037,11 @@ int StarRtdImage::swapNeeded( ImageIO imio )
     //  Check the ImageIO format. Don't need a swap if the data is already in
     //  network byte order on a bigendian machine, or vice-versa.
     ImageIO *imptr = &imio;
-    return ( BIGENDIAN && imptr->usingNetBO() ) ||
-           ( ! BIGENDIAN && ! imptr->usingNetBO() );
+    int usingNBO = imptr->usingNetBO();
+    if ( BIGENDIAN ) {
+        return ( !usingNBO );
+    }
+    return usingNBO;
 }
 
 //+
