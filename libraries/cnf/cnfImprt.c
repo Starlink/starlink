@@ -1,4 +1,6 @@
 #include "f77.h"                 /* CNF macros and prototypes               */
+#include <stdlib.h>
+#include <string.h>
 
 void cnfImprt( const char *source_f, int source_len, char *dest_c )
 
@@ -18,9 +20,11 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 
 *  Description:
 *     Import a FORTRAN string into a C string, discarding trailing
-*     blanks. The null character is appended to the C string after
-*     the last non-blank character.
-
+*     blanks. The NUL character is appended to the C string after
+*     the last non-blank character. The input string and output string
+*     pointers can point to the same location if the string is to be
+*     modified in place (but care must be taken to allow for the additional
+*     C terminator when allocating memory).
 
 *  Arguments:
 *     const char *source_f (Given)
@@ -28,7 +32,7 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 *     int source_len (Given)
 *        The length of the input FORTRAN string
 *     char *dest_c (Returned via pointer)
-*        A pointer to the output C string
+*        A pointer to the output C string. Can be same as source.
 
 *  Notes:
 *     -  No check is made that there is sufficient space allocated to
@@ -41,6 +45,7 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
 *     AJC: Alan Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +55,8 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
 *        Correct description re trailing blanks
 *     24-SEP-1998 (AJC):
 *        Specify const char * for input strings
+*     25-NOV-2005 (TIMJ):
+*        Allow the strings to be identical
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,9 +82,10 @@ void cnfImprt( const char *source_f, int source_len, char *dest_c )
    dest_c[i+1] = '\0';
 
 /* Copy the characters from the input FORTRAN string to the output C	    */
-/* string.								    */
+/* string if the strings are different.				      	    */
 
-   for(  ; i >= 0 ; i-- )
-      dest_c[i] = source_f[i];
+   if (dest_c != source_f ) {
+     memmove( dest_c, source_f, i+1 );
+   }
 }
 
