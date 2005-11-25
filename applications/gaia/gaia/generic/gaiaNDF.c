@@ -15,7 +15,7 @@
  *      functions that GAIA requires.
  *
  *  Copyright:
- *     Copyright (C) 2000-2001 Central Laboratory of the Research Councils
+ *     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
  *
  *   Authors:
  *      PWD: Peter W. Draper, Starlink - University of Durham
@@ -37,6 +37,8 @@
  *      31-MAY-2001
  *         Made NDF name handling more robust to very long names
  *         (>MAXNDFNAME).
+ *      21-NOV-2005 (PWD):
+ *         Changed to use public HDS C interface.
  *      {enter_changes_here}
  *-
  */
@@ -45,13 +47,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <float.h>
+#include <math.h>
 #include "sae_par.h"
 #include "cnf.h"
 #include "f77.h"
 #include "ems_par.h"
 #include "ems.h"
+#include "star/hds.h"
 #include "dat_par.h"
-#define DAT__OBJIN 147358563  /* Not available in HDS include files */
+#include "dat_err.h"
 #include "ndf.h"
 #include "gaiaNDF.h"
 
@@ -114,32 +118,7 @@ extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId),
                                    POINTER(q) );
 
 /*  Local prototypes */
-static void datAnnul( const char *loc, int *status );
-
-static void hdsOpen( const char *name, const char *mode, char *loc,
-                     int *status );
-
-static void hdsTrace( const char *loc, int *level, char *path,
-                      int path_len, char *file, int file_len,
-                      int *status );
-
-static void datFind( const char *loc1, const char *path, char *loc2,
-                     int *status );
-
-static void datParen( const char *loc1, char *loc2, int *status );
-
-static void datNcomp( const char *loc, int *ncomp, int *status );
-
-static void datIndex( const char *loc1, int index, char *loc2,
-                      int *status );
-
-static void datClone( const char *loc1, char *loc2, int *status );
-
-static void hdsShow( const char *name, int *status );
-
 static char *errMessage( int *status );
-
-static int datValid( const char *loc, int *status );
 
 /*
  *  Name:
@@ -162,7 +141,6 @@ static char *errMessage( int *status )
     int buffer_length = 0;
     int mess_length = 0;
     int param_length = 0;
-    int result_length = 0;
 
     if ( status != SAI__OK ) {
         /* Need to get error message in one pass. Since we don't know how
@@ -690,9 +668,12 @@ static NDFinfo *getNDFInfo( const void *handle, const int index )
  */
 int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 {
-    NDFinfo *head = (NDFinfo *) NULL;
-    NDFinfo *newstate = (NDFinfo *) NULL;
-    NDFinfo *state = (NDFinfo *) NULL;
+    HDSLoc *baseloc = NULL;
+    HDSLoc *newloc = NULL;
+    HDSLoc *tmploc = NULL;
+    NDFinfo *head = NULL;
+    NDFinfo *newstate = NULL;
+    NDFinfo *state = NULL;
     char *emess = NULL;
     char *filename = NULL;
     char *ftype = NULL;
@@ -700,12 +681,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     char *left = NULL;
     char *path = NULL;
     char *right = NULL;
-    char baseloc[DAT__SZLOC];
     char ndffile[MAXNDFNAME];
     char ndfpath[MAXNDFNAME];
-    char newloc[DAT__SZLOC];
     char slice[MAXNDFNAME];
-    char tmploc[DAT__SZLOC];
     int baseid = 0;
     int first;
     int height;
@@ -719,6 +697,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     int same;
     int status = SAI__OK;
     int type;
+    int valid;
     int width;
 
     /*  Mark the error stack */
@@ -746,8 +725,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                   &status );
 
         /*  Get the locator to the NDF and hence to its parent. */
-        ndfLoc( ndfid, "READ", tmploc, &status );
-        datParen( tmploc, baseloc, &status );
+        tmploc = NULL;
+        ndfLoc( ndfid, "READ", &tmploc, &status );
+        datParen( tmploc, &baseloc, &status );
 
         /*  See if the NDF has a slice. If so all components and NDFs in
             this file will also have that slice applied */
@@ -763,7 +743,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
             /*  At top level, so no parent available */
             emsAnnul( &status );
-            datClone( tmploc, baseloc, &status );
+            datClone( tmploc, &baseloc, &status );
         }
         else {
             /*  Some other error occured, just let it go */
@@ -796,14 +776,14 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         }
 
         /*  Attempt to open the file and obtain a base locator. */
-        hdsOpen( filename, "READ", tmploc, &status );
+        hdsOpen( filename, "READ", &tmploc, &status );
 
         /*  Now look for the object specified by the PATH */
         if ( path && status == SAI__OK ) {
-            datFind( tmploc, path, baseloc, &status );
+            datFind( tmploc, path, &baseloc, &status );
         }
         else {
-            datClone( tmploc, baseloc, &status );
+            datClone( tmploc, &baseloc, &status );
         }
 
         /*  If all is well, cancel pending error message (from initial
@@ -824,8 +804,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          */
         slice[0] = '\0';
     }
-    if ( status == SAI__OK && datValid( baseloc, &status ) ) {
-
+    valid = 0;
+    datValid( baseloc, &valid, &status );
+    if ( valid && status == SAI__OK ) {
         /*  Look for additional NDFs at baseloc, ignore tmploc which is
          *  NDF itself (or baseloc). If only one component, must be this NDF.
          */
@@ -835,11 +816,11 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         }
         first = 1;
         for ( i = 1; i <= ncomp; i++ ) {
-            datIndex( baseloc, i, newloc, &status );
+            datIndex( baseloc, i, &newloc, &status );
 
             /*  Get full name of component and see if it is an NDF */
-            hdsTrace( newloc, &level, ndfpath, MAXNDFNAME, ndffile,
-                      MAXNDFNAME, &status );
+            hdsTrace( newloc, &level, ndfpath, ndffile, &status,
+                      MAXNDFNAME, MAXNDFNAME );
 
             ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
             if ( ftype ) *ftype = '\0';
@@ -898,12 +879,12 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
                 free( emess );
                 emess = NULL;
             }
-            datAnnul( newloc, &status );
+            datAnnul( &newloc, &status );
         }
 
         /*  Release locators */
-        datAnnul( baseloc, &status );
-        datAnnul( tmploc, &status );
+        datAnnul( &baseloc, &status );
+        datAnnul( &tmploc, &status );
     }
     else {
 
@@ -1242,416 +1223,6 @@ void *gaiaCloneMNDF( void *handle )
     return newInfo;
 }
 
-/*  ============ */
-/*  HDS wrappers */
-/*  ============ */
-
-/*
- *  Name:
- *     datAnnul
- *
- *  Purpose:
- *     Annul a HDS locator, releasing all associated resources.
- *
- *  Params:
- *    loc = HDS locator to component
- *    status = global status
- */
-extern void F77_EXTERNAL_NAME(dat_annul)( CHARACTER(loc),
-                                          INTEGER(status)
-                                          TRAIL(loc) );
-static void datAnnul( const char *loc, int *status )
-{
-   DECLARE_CHARACTER(floc, DAT__SZLOC);  /* Fortran locator */
-
-   /* Convert the input locator into an F77 character array */
-   F77_EXPORT_LOCATOR( loc, floc );
-   F77_CALL( dat_annul )( CHARACTER_ARG(floc),
-                          INTEGER_ARG(status)
-                          TRAIL_ARG(floc) );
-}
-
-/*
- *  Name:
- *     hdsOpen
- *
- *  Purpose:
- *     Open an HDS container file.
- *
- *  Params:
- *     name = name of container file
- *     mode = access mode
- *     loc = HDS locator to container file
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( hds_open )(
-   CHARACTER( fname ),
-   CHARACTER( fmode ),
-   CHARACTER( floc ),
-   INTEGER( fstatus )
-   TRAIL( fname )
-   TRAIL( fmode )
-   TRAIL( floc ) );
-static void hdsOpen( const char *name, const char *mode, char *loc,
-                     int *status )
-{
-   DECLARE_CHARACTER(floc,DAT__SZLOC);
-   DECLARE_CHARACTER_DYN(fname);
-   DECLARE_CHARACTER_DYN(fmode);
-   DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
-   F77_CREATE_CHARACTER( fmode, strlen( mode ) );
-   F77_EXPORT_CHARACTER( mode, fmode, fmode_length );
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( hds_open )( CHARACTER_ARG( fname ),
-                         CHARACTER_ARG( fmode ),
-                         CHARACTER_ARG( floc ),
-                         INTEGER_ARG( &fstatus )
-                         TRAIL_ARG( fname )
-                         TRAIL_ARG( fmode )
-                         TRAIL_ARG( floc ) );
-
-   F77_FREE_CHARACTER( fmode );
-   F77_FREE_CHARACTER( fname );
-   F77_IMPORT_LOCATOR( floc, loc );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     datFind
- *
- *  Purpose:
- *     Obtain a locator to a named component
- *
- *  Params:
- *     loc1 = structure locator
- *     name = component name
- *     loc2 = component locator
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( dat_find )(
-   CHARACTER( floc1 ),
-   CHARACTER( fname ),
-   CHARACTER( floc2 ),
-   INTEGER( fstatus )
-   TRAIL( floc1 )
-   TRAIL( fname )
-   TRAIL( floc2 ) );
-static void datFind( const char *loc1, const char *name, char *loc2,
-                     int *status )
-{
-   DECLARE_CHARACTER(floc1,DAT__SZLOC);
-   DECLARE_CHARACTER(floc2,DAT__SZLOC);
-   DECLARE_CHARACTER_DYN(fname);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc1, floc1);
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_find )( CHARACTER_ARG( floc1 ),
-                         CHARACTER_ARG( fname ),
-                         CHARACTER_ARG( floc2 ),
-                         INTEGER_ARG( &fstatus )
-                         TRAIL_ARG( floc1 )
-                         TRAIL_ARG( fname )
-                         TRAIL_ARG( floc2 ) );
-
-   F77_FREE_CHARACTER( fname );
-   F77_IMPORT_LOCATOR( floc2, loc2 );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     datParen
- *
- *  Purpose:
- *     Returns locator to the parent structure of an HDS object.
- *
- *  Params:
- *     loc1 = object locator
- *     loc2 = parent structure
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( dat_paren )(
-   CHARACTER( floc1 ),
-   CHARACTER( floc2 ),
-   INTEGER( fstatus )
-   TRAIL( floc1 )
-   TRAIL( floc2 ) );
-static void datParen( const char *loc1, char *loc2, int *status )
-{
-   DECLARE_CHARACTER(floc1,DAT__SZLOC);
-   DECLARE_CHARACTER(floc2,DAT__SZLOC);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc1, floc1);
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_paren )( CHARACTER_ARG( floc1 ),
-                          CHARACTER_ARG( floc2 ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc1 )
-                          TRAIL_ARG( floc2 ) );
-
-   F77_IMPORT_LOCATOR( floc2, loc2 );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     datNcomp
- *
- *  Purpose:
- *     Enquire number of components.
- *
- *  Params:
- *     loc = structure locator
- *     ncomp = number of components
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( dat_ncomp )(
-   CHARACTER( floc ),
-   INTEGER( fncomp ),
-   INTEGER( fstatus )
-   TRAIL( floc ) );
-static void datNcomp( const char *loc, int *ncomp, int *status )
-{
-   DECLARE_CHARACTER(floc,DAT__SZLOC);
-   DECLARE_INTEGER(fncomp);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc, floc);
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_ncomp )( CHARACTER_ARG( floc ),
-                          INTEGER_ARG( &fncomp ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc ) );
-
-   F77_IMPORT_INTEGER( fncomp, *ncomp );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     datIndex
- *
- *  Purpose:
- *     Index into component list
- *
- *  Params:
- *     loc1 = structire locator
- *     index = list position
- *     loc2 = component locator
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( dat_index )(
-   CHARACTER( floc1 ),
-   INTEGER( findex ),
-   CHARACTER( floc2 ),
-   INTEGER( fstatus )
-   TRAIL( floc1 )
-   TRAIL( floc2 ) );
-static void datIndex( const char *loc1, int index, char *loc2,
-                      int *status )
-{
-   DECLARE_CHARACTER(floc1,DAT__SZLOC);
-   DECLARE_CHARACTER(floc2,DAT__SZLOC);
-   DECLARE_INTEGER(findex);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc1, floc1);
-   F77_EXPORT_INTEGER( index, findex );
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_index )( CHARACTER_ARG( floc1 ),
-                          INTEGER_ARG( &findex ),
-                          CHARACTER_ARG( floc2 ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc1 )
-                          TRAIL_ARG( floc2 ) );
-
-   F77_IMPORT_LOCATOR( floc2, loc2 );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     hdsTrace
- *
- *  Purpose:
- *     Trace an object path
- *
- *  Params:
- *     loc = HDS locator to object
- *     level = number of path levels
- *     path = object path with container file
- *     file = container file
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( hds_trace )(
-   CHARACTER( floc ),
-   INTEGER( flevel ),
-   CHARACTER( fpath ),
-   CHARACTER( ffile ),
-   INTEGER( fstatus )
-   TRAIL( floc )
-   TRAIL( fpath )
-   TRAIL( ffile ) );
-static void hdsTrace( const char *loc, int *level, char *path,
-                      int path_len, char *file, int file_len,
-                      int *status )
-{
-   DECLARE_CHARACTER(floc,DAT__SZLOC);
-   DECLARE_CHARACTER_DYN(fpath);
-   DECLARE_CHARACTER_DYN(ffile);
-   DECLARE_INTEGER(flevel);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc, floc);
-   F77_CREATE_CHARACTER( fpath, path_len-1 );
-   F77_CREATE_CHARACTER( ffile, file_len-1 );
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( hds_trace )( CHARACTER_ARG( floc ),
-                          INTEGER_ARG( &flevel ),
-                          CHARACTER_ARG( fpath ),
-                          CHARACTER_ARG( ffile ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc )
-                          TRAIL_ARG( fpath )
-                          TRAIL_ARG( ffile ) );
-
-   F77_IMPORT_CHARACTER( fpath, fpath_length, path );
-   F77_FREE_CHARACTER( fpath );
-   F77_IMPORT_CHARACTER( ffile, ffile_length, file );
-   F77_FREE_CHARACTER( ffile );
-
-   F77_IMPORT_INTEGER( flevel, *level );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-/*
- *  Name:
- *     datClone
- *
- *  Purpose:
- *     Clone a locator.
- *
- *  Params:
- *     loc1 = object locator
- *     loc2 = new object locator
- *     status = global status
- *
- */
-extern void F77_EXTERNAL_NAME( dat_clone )(
-   CHARACTER( floc1 ),
-   CHARACTER( floc2 ),
-   INTEGER( fstatus )
-   TRAIL( floc1 )
-   TRAIL( floc2 ) );
-static void datClone( const char *loc1, char *loc2, int *status )
-{
-   DECLARE_CHARACTER(floc1,DAT__SZLOC);
-   DECLARE_CHARACTER(floc2,DAT__SZLOC);
-   DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_LOCATOR( loc1, floc1);
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_clone )( CHARACTER_ARG( floc1 ),
-                          CHARACTER_ARG( floc2 ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc1 )
-                          TRAIL_ARG( floc2 ) );
-
-   F77_IMPORT_LOCATOR( floc2, loc2 );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return;
-}
-
-extern void F77_EXTERNAL_NAME( hds_show )(
-   CHARACTER( fname ),
-   INTEGER( fstatus )
-   TRAIL( fname ) );
-
-static void hdsShow( const char *name, int *status )
-{
-   DECLARE_CHARACTER_DYN(fname);
-   DECLARE_INTEGER(fstatus);
-
-   F77_CREATE_CHARACTER( fname, strlen( name ) );
-   F77_EXPORT_CHARACTER( name, fname, fname_length );
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( hds_show )( CHARACTER_ARG( fname ),
-                         INTEGER_ARG( &fstatus )
-                         TRAIL_ARG( fname ) );
-
-   F77_FREE_CHARACTER( fname );
-   return;
-}
-
-/*
- *  Name:
- *     datValid
- *
- *  Purpose:
- *     Enquire if a locator is valid.
- *
- *  Params:
- *     loc = structure locator
- *     status = global status
- *
- *  Return:
- *     1 for valid locator, 0 for bad.
- *
- */
-extern void F77_EXTERNAL_NAME( dat_valid )(
-   CHARACTER( floc ),
-   LOGICAL( freply ),
-   INTEGER( fstatus )
-   TRAIL( floc ) );
-static int datValid( const char *loc, int *status )
-{
-   DECLARE_CHARACTER(floc,DAT__SZLOC);
-   DECLARE_LOGICAL(freply);
-   DECLARE_INTEGER(fstatus);
-   int reply;
-
-   F77_EXPORT_LOCATOR( loc, floc);
-   F77_EXPORT_INTEGER( *status, fstatus );
-
-   F77_CALL( dat_valid )( CHARACTER_ARG( floc ),
-                          LOGICAL_ARG( &freply ),
-                          INTEGER_ARG( &fstatus )
-                          TRAIL_ARG( floc ) );
-
-   F77_IMPORT_LOGICAL( freply, reply );
-   F77_IMPORT_INTEGER( fstatus, *status );
-   return reply;
-}
-
-
 /*
  *  =============================================
  *  Straight-forward NDF access, with no 2D bias.
@@ -1669,7 +1240,7 @@ int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
     int status = SAI__OK;
 
     emsMark();
-    ndfOpen( DAT__ROOT, ndfname, "READ", "OLD", ndfid, &place, &status );
+    ndfOpen( NULL, ndfname, "READ", "OLD", ndfid, &place, &status );
     if ( status != SAI__OK ) {
         *error_mess = errMessage( &status );
         ndfid = NDF__NOID;
