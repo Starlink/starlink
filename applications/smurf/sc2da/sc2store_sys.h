@@ -8,6 +8,6 @@
 
 /* HDS locators and pointers for per-frame header items */
 
-static char sc2store_loc[SC2STORE_NUM][DAT__SZLOC];
+static HDSLoc * sc2store_loc[SC2STORE_NUM];
 static void *sc2store_ptr[SC2STORE_NUM];
 

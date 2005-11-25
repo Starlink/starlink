@@ -92,7 +92,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-char headloc[DAT__SZLOC],     /* HDS locator (given) */
+HDSLoc *headloc,     /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
 int *status                   /* global status (given and returned) */
 );
@@ -110,7 +110,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headrmap
 (
-char headloc[DAT__SZLOC],     /* HDS locator (given) */
+HDSLoc *headloc,     /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
 int *status                   /* global status (given and returned) */
 );

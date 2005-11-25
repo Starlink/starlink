@@ -13,14 +13,15 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
-
+#include "dat_par.h"
+#include "ndf.h"
+#include "star/hds.h"
 #include "Dits_Err.h"
 #include "Ers.h"
 
 #include "fitsio.h"
 
 #include "dream_par.h"
-#include "sc2dat.h"
 
 #include "sc2store_par.h"
 #include "sc2store_struct.h"
@@ -31,13 +32,13 @@ static int sc2open = 0;            /* flag for file open */
 
 static int dindf;                  /* NDF identifier for dark SQUID values */
 static char errmess[132];          /* error string */
-static char fdataloc[DAT__SZLOC];  /* HDS locator to FLATDATA structure */
-static char fnameloc[DAT__SZLOC];  /* HDS locator to FLATNAME structure */
-static char fparloc[DAT__SZLOC];   /* HDS locator to FLATPAR structure */
-static char frameloc[DAT__SZLOC];  /* HDS locator to FRAMEDATA structure */
-static char scu2redloc[DAT__SZLOC];  /* HDS locator to SCU2RED structure */
+HDSLoc *fdataloc = NULL;           /* HDS locator to FLATDATA structure */
+HDSLoc *fnameloc = NULL;           /* HDS locator to FLATNAME structure */
+HDSLoc *fparloc = NULL;            /* HDS locator to FLATPAR structure */
+HDSLoc *frameloc = NULL;           /* HDS locator to FRAMEDATA structure */
+HDSLoc *scu2redloc = NULL;         /* HDS locator to SCU2RED structure */
 static int indf;                   /* main NDF identifier */
-static char sc2loc[DAT__SZLOC];    /* HDS locator to SCUBA2 structure */
+HDSLoc *sc2loc = NULL;             /* HDS locator to SCUBA2 structure */
 static int sindf;                  /* NDF identifier for subtraction frame */
 static int findf;                  /* NDF identifier for flat calibration */
 static int zindf;                  /* NDF identifier for compression zero 
@@ -180,7 +181,7 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-   ndfXnew ( indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0, scu2redloc, 
+   ndfXnew ( indf, "SCU2RED", "SCUBA2_MAP_ARR", 0, 0, &scu2redloc, 
      status );
 
    sc2store_errconv ( status );
@@ -241,7 +242,7 @@ int *status              /* global status (given and returned) */
 
 /* Create an HDS container file */
 
-   ndfPlace ( DAT__ROOT, filename, &place, status );
+   ndfPlace ( NULL, filename, &place, status );
 
 /* Create an NDF inside the container */
 
@@ -262,7 +263,7 @@ int *status              /* global status (given and returned) */
 /* Create extension for holding fixed-size data (subtracted constant and
    dark SQUID measurements) for each frame */
 
-   ndfXnew ( indf, "FRAMEDATA", "SCUBA2_FM_PAR", 0, 0, frameloc, status );
+   ndfXnew ( indf, "FRAMEDATA", "SCUBA2_FM_PAR", 0, 0, &frameloc, status );
 
    ubnd[0] = nframes;
    lbnd[0] = 1;
@@ -319,20 +320,20 @@ int *status              /* global status (given and returned) */
 
    ndfMap ( findf, "DATA", "_DOUBLE", "WRITE", (void *)flatcal, &el, 
      status );
-   ndfXnew ( findf, "FLATDATA", "SCUBA2_FD_PAR", 0, 0, fdataloc, status );
+   ndfXnew ( findf, "FLATDATA", "SCUBA2_FD_PAR", 0, 0, &fdataloc, status );
 
 /* Name of flatfield correction technique */
 
-   sc2dat_new ( fdataloc, "FLATNAME", "_CHAR*16", 0, 0, status );
-   sc2dat_find ( fdataloc, "FLATNAME", fnameloc, status );
-   sc2dat_put0c ( fnameloc, flatname, status );
+   datNew ( fdataloc, "FLATNAME", "_CHAR*16", 0, 0, status );
+   datFind ( fdataloc, "FLATNAME", &fnameloc, status );
+   datPut0C ( fnameloc, flatname, status );
 
 /* Parameter matching each flatfield coefficient */
 
-   sc2dat_new ( fdataloc, "FLATPAR", "_DOUBLE", 1, &nflat, status );
-   sc2dat_find ( fdataloc, "FLATPAR", fparloc, status );
+   datNew ( fdataloc, "FLATPAR", "_DOUBLE", 1, &nflat, status );
+   datFind ( fdataloc, "FLATPAR", &fparloc, status );
 
-   sc2dat_map ( fparloc, "_DOUBLE", "WRITE", 1, &nflat, (void *)flatpar, 
+   datMap ( fparloc, "_DOUBLE", "WRITE", 1, &nflat, (void **)flatpar, 
      status );
 
 /* Create storage for Header values for each frame */
@@ -341,7 +342,7 @@ int *status              /* global status (given and returned) */
 
 /* Create the structured extension for each frame */
 
-   ndfXnew ( indf, "SCUBA2", "SCUBA2_RTS_ARR", 1, &(nframes), sc2loc, 
+   ndfXnew ( indf, "SCUBA2", "SCUBA2_RTS_ARR", 1, &(nframes), &sc2loc, 
      status );
 
    if ( StatusOkP(status) )
@@ -471,7 +472,7 @@ int *status          /* global status (given and returned) */
 
 /* Free the locator for the SCUBA2 structure*/
 
-   sc2dat_annul ( sc2loc, &tstatus );
+   datAnnul ( &sc2loc, &tstatus );
 
 /* Release Header values for each frame */
 
@@ -494,16 +495,16 @@ int *status          /* global status (given and returned) */
 
 /* Release flatfield calibration */
 
-   sc2dat_unmap ( fparloc, &tstatus );
-   sc2dat_annul ( fparloc, &tstatus );
-   sc2dat_annul ( fnameloc, &tstatus );
-   sc2dat_annul ( fdataloc, &tstatus );
+   datUnmap ( fparloc, &tstatus );
+   datAnnul ( &fparloc, &tstatus );
+   datAnnul ( &fnameloc, &tstatus );
+   datAnnul ( &fdataloc, &tstatus );
    ndfUnmap ( findf, "DATA", &tstatus );
    ndfAnnul ( &findf, &tstatus );
 
 /* Release FRAMEDATA structure */
 
-   sc2dat_annul ( frameloc, &tstatus );
+   datAnnul ( &frameloc, &tstatus );
 
 /* Unmap the main data array */
 
@@ -535,13 +536,14 @@ int *status        /* global status (given and returned) */
 /*
    History :
     12Aug2004 : original (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
    int dim[2];             /* sizes of dimensions */
    int el;                 /* number of elements mapped */
    int *incomp;            /* pointer to incompressible values */
    int j;                  /* loop counter */
-   char loc2[DAT__SZLOC];  /* HDS locator */
+   HDSLoc* loc2 = NULL;    /* HDS locator */
    int ndim;               /* number of dimensions */
    int ndimx;              /* max number of dimensions */
    int place;              /* NDF placeholder */
@@ -555,8 +557,8 @@ int *status        /* global status (given and returned) */
 /* Get structure for incompressible pixels for n-th frame */
 
    strnum = frame + 1;
-   sc2dat_cell ( sc2loc, 1, &strnum, loc2, status );
-   sc2dat_there ( loc2, "INCOMP", &there, status );
+   datCell ( sc2loc, 1, &strnum, &loc2, status );
+   datThere ( loc2, "INCOMP", &there, status );
    ndimx = 2;
    *npix = 0;
 
@@ -592,7 +594,7 @@ int *status        /* global status (given and returned) */
 
 /* Free the locator for the frame */
 
-      sc2dat_annul ( loc2, status );
+      datAnnul ( &loc2, status );
 
    sc2store_errconv ( status );
 
@@ -675,7 +677,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-char headloc[DAT__SZLOC],     /* HDS locator (given) */
+HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
 int *status                   /* global status (given and returned) */
 )
@@ -686,6 +688,7 @@ int *status                   /* global status (given and returned) */
 
    History :
     18Aug2004 : original (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
    int dim[2];
@@ -700,15 +703,15 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
-      sc2dat_new ( headloc, sc2store_names[j][1], sc2store_names[j][0], 
+      datNew ( headloc, sc2store_names[j][1], sc2store_names[j][0], 
         ndim, dim, status );
       if ( *status != SAI__OK ) break;
-      sc2dat_find ( headloc, sc2store_names[j][1], &(sc2store_loc[j][0]), 
+      datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
         status );
 
       if ( *status != SAI__OK ) break;
-      sc2dat_map ( &(sc2store_loc[j][0]), sc2store_names[j][0], "WRITE", 
-        ndim, dim, &(sc2store_ptr[j]), status );
+      datMap ( sc2store_loc[j], sc2store_names[j][0], "WRITE", 
+		   ndim, dim, &(sc2store_ptr[j]), status );
 
       if ( *status != SAI__OK ) break;
    }
@@ -802,7 +805,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headrmap
 (
-char headloc[DAT__SZLOC],     /* HDS locator (given) */
+HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
 int *status                   /* global status (given and returned) */
 )
@@ -813,6 +816,7 @@ int *status                   /* global status (given and returned) */
 
    History :
     18Aug2004 : original (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
    int dim[2];
@@ -827,11 +831,11 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
-      sc2dat_find ( headloc, sc2store_names[j][1], &(sc2store_loc[j][0]), 
+      datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
         status );
 
       if ( *status != SAI__OK ) break;
-      sc2dat_map ( &(sc2store_loc[j][0]), sc2store_names[j][0], "READ", 
+      datMap ( sc2store_loc[j], sc2store_names[j][0], "READ", 
         ndim, dim, &(sc2store_ptr[j]), status );
 
       if ( *status != SAI__OK ) break;
@@ -859,8 +863,8 @@ int *status                   /* global status (given and returned) */
    for ( j=0; j<SC2STORE_NUM; j++ )
 
    {
-      sc2dat_unmap ( &(sc2store_loc[j][0]), status );
-      sc2dat_annul ( &(sc2store_loc[j][0]), status );
+      datUnmap ( sc2store_loc[j], status );
+      datAnnul ( &(sc2store_loc[j]), status );
    }
 }
 
@@ -897,25 +901,26 @@ int *status        /* global status (given and returned) */
     22Apr2005 : change declaration of fitshd (bdk)
     13Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
     13Jun2005 : allow image to be n-dimensional (BDK)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
 
-   char bz_imloc[DAT__SZLOC];  /* HDS locator */
+   HDSLoc *bz_imloc = NULL;/* HDS locator */
    int bzindf;             /* NDF identifier */
-   double *bzptr;           /* pointer to mapped space for zero points */
+   double *bzptr;          /* pointer to mapped space for zero points */
    int el;                 /* number of elements mapped */
-   char imname[DAT__SZNAM]; /* name of structure for image */
+   char imname[DAT__SZNAM];/* name of structure for image */
    double *imptr;          /* pointer to mapped space for image */
    int j;                  /* loop counter */
    int lbnd[7];            /* lower dimension bounds */
    int ntot;               /* total number of elements */
    int place;              /* NDF placeholder */
-   char seq_loc[DAT__SZLOC];  /* HDS locator */
+   HDSLoc *seq_loc = NULL; /* HDS locator */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
    int ubnd[7];            /* upper dimension bounds */
-   char fitsloc[DAT__SZLOC];  /* HDS locator to FITS headers */
-   char loc2[DAT__SZLOC];     /* HDS locator for FITS */
+   HDSLoc *fitsloc = NULL; /* HDS locator to FITS headers */
+   HDSLoc *loc2 = NULL;    /* HDS locator for FITS */
 
    if ( *status != SAI__OK ) return;
 
@@ -956,13 +961,13 @@ int *status        /* global status (given and returned) */
 
 /* Store start and end sequence numbers in the extension */
 
-   ndfXnew ( uindf, "MAPDATA", "SEQUENCE_RANGE", 0, 0, seq_loc, status );
+   ndfXnew ( uindf, "MAPDATA", "SEQUENCE_RANGE", 0, 0, &seq_loc, status );
    ndfXpt0i ( seqstart, uindf, "MAPDATA", "SEQSTART", status );
    ndfXpt0i ( seqend, uindf, "MAPDATA", "SEQEND", status );
 
 /* Store the bolometer zero points as an NDF in the extension */
 
-   ndfXnew ( uindf, "BZ_IMAGE", "SCUBA2_ZER_ARR", 0, 0, bz_imloc, 
+   ndfXnew ( uindf, "BZ_IMAGE", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, 
      status );
    ndfPlace ( bz_imloc, "ZERO", &place, status );
 
@@ -994,15 +999,15 @@ int *status        /* global status (given and returned) */
 
    if ( nfits > 0 )
    {
-      ndfXnew ( uindf, "FITS", "_CHAR*80", 1, &(nfits), fitsloc, status );
+      ndfXnew ( uindf, "FITS", "_CHAR*80", 1, &(nfits), &fitsloc, status );
 
       for ( j=1; j<=nfits; j++ )
       {
-         sc2dat_cell ( fitsloc, 1, &j, loc2, status );
-         sc2dat_put0c ( loc2, fitshd[j-1], status );
-         sc2dat_annul ( loc2, status );
+         datCell ( fitsloc, 1, &j, &loc2, status );
+         datPut0C ( loc2, fitshd[j-1], status );
+         datAnnul ( &loc2, status );
       }
-      sc2dat_annul ( fitsloc, status );
+      datAnnul ( &fitsloc, status );
    }
 
 /* Unmap the data array */
@@ -1018,8 +1023,8 @@ int *status        /* global status (given and returned) */
 
 /* Free the locators for the frame */
 
-   sc2dat_annul ( seq_loc, status );
-   sc2dat_annul ( bz_imloc, status );
+   datAnnul ( &seq_loc, status );
+   datAnnul ( &bz_imloc, status );
 
 
    sc2store_errconv ( status );
@@ -1043,6 +1048,7 @@ int *status        /* global status (given and returned) */
    History :
     12Aug2004 : original (bdk)
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
 
@@ -1050,7 +1056,7 @@ int *status        /* global status (given and returned) */
    int *incomp;            /* pointer to incompressible values */
    int j;                  /* loop counter */
    int lbnd[3];            /* lower dimension bounds */
-   char loc2[DAT__SZLOC];  /* HDS locator */
+   HDSLoc *loc2 = NULL;    /* HDS locator */
    int place;              /* NDF placeholder */
    int strnum;             /* structure element number */
    int uindf;              /* NDF identifier */
@@ -1062,7 +1068,7 @@ int *status        /* global status (given and returned) */
 /* Get structure for incompressible pixels for n-th frame */
 
    strnum = frame + 1;
-   sc2dat_cell ( sc2loc, 1, &strnum, loc2, status );
+   datCell ( sc2loc, 1, &strnum, &loc2, status );
 
    if ( *status == SAI__OK )
    {
@@ -1097,7 +1103,7 @@ int *status        /* global status (given and returned) */
 
 /* Free the locator for the frame */
 
-      sc2dat_annul ( loc2, status );
+      datAnnul ( &loc2, status );
    }
 
    sc2store_errconv ( status );
@@ -1197,12 +1203,13 @@ int *status           /* global status (given and returned) */
 /*
    History :
     12Aug2004 : original (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
    int dim[1];                /* number of FITS entries */
-   char fitsloc[DAT__SZLOC];  /* HDS locator to FITS headers */
+   HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
    int j;                     /* loop counter */
-   char loc2[DAT__SZLOC];     /* HDS locator */
+   HDSLoc *loc2 = NULL;       /* HDS locator */
    int ndim;                  /* number of dimensions in query */
    int ndimx;                 /* maximum number of dimensions in query */
 
@@ -1211,8 +1218,8 @@ int *status           /* global status (given and returned) */
 /* Locate the FITS headers */
 
    ndimx = 1;
-   ndfXloc ( indf, "FITS", "READ", fitsloc, status );
-   sc2dat_shape ( fitsloc, ndimx, dim, &ndim, status );
+   ndfXloc ( indf, "FITS", "READ", &fitsloc, status );
+   datShape ( fitsloc, ndimx, dim, &ndim, status );
 
    if ( *status == SAI__OK )
    {
@@ -1224,13 +1231,14 @@ int *status           /* global status (given and returned) */
 
       for ( j=1; j<=*nfits; j++ )
       {
-	sc2dat_cell ( fitsloc, 1, &j, loc2, status );
-	sc2dat_get0c ( loc2, maxlen, headers[j-1], status );
-	sc2dat_annul ( loc2, status );
+	datCell ( fitsloc, 1, &j, &loc2, status );
+	datGet0C ( loc2, headers[j-1], maxlen, status );
+	printf("%d: %s --\n", j, headers[j-1]);
+	datAnnul ( &loc2, status );
       }
    }
 
-   sc2dat_annul ( fitsloc, status );
+   datAnnul ( &fitsloc, status );
 
    sc2store_errconv ( status );
 }
@@ -1368,7 +1376,7 @@ int *status              /* global status (given and returned) */
 /* Open an HDS container file */
 
    ndimx = 3;
-   ndfOpen ( DAT__ROOT, filename, "UPDATE", "OLD", &indf, &place, status );
+   ndfOpen ( NULL, filename, "UPDATE", "OLD", &indf, &place, status );
    ndfDim ( indf, ndimx, dim, &ndim, status );
    *colsize = dim[0];
    *rowsize = dim[1];
@@ -1381,7 +1389,7 @@ int *status              /* global status (given and returned) */
 /* Find extension for holding fixed-size data (subtracted constant and
    dark SQUID measurements) for each frame */
 
-   ndfXloc ( indf, "FRAMEDATA", "READ", frameloc, status );
+   ndfXloc ( indf, "FRAMEDATA", "READ", &frameloc, status );
 
 /* map compression zero offset for each frame */
 
@@ -1411,12 +1419,12 @@ int *status              /* global status (given and returned) */
    ndfMap ( findf, "DATA", "_DOUBLE", "UPDATE", (void *)flatcal, &el, 
      status );
 
-   ndfXloc ( findf, "FLATDATA", "READ", fdataloc, status );
-   sc2dat_find ( fdataloc, "FLATNAME", fnameloc, status );
-   sc2dat_get0c ( fnameloc, flatlen, flatname, status );
-   sc2dat_find ( fdataloc, "FLATPAR", fparloc, status );
-   sc2dat_shape ( fparloc, 1, nflat, &nfdim, status );
-   sc2dat_map ( fparloc, "_DOUBLE", "READ", 1, nflat, (void**)flatpar, 
+   ndfXloc ( findf, "FLATDATA", "READ", &fdataloc, status );
+   datFind ( fdataloc, "FLATNAME", &fnameloc, status );
+   datGet0C ( fnameloc, flatname, flatlen, status );
+   datFind ( fdataloc, "FLATPAR", &fparloc, status );
+   datShape ( fparloc, 1, nflat, &nfdim, status );
+   datMap ( fparloc, "_DOUBLE", "READ", 1, nflat, (void**)flatpar, 
      status );
 
 /* storage for Header values for each frame */
@@ -1425,7 +1433,7 @@ int *status              /* global status (given and returned) */
 
 /* structured extension for each frame */
 
-   ndfXloc ( indf, "SCUBA2", "READ", sc2loc, status );
+   ndfXloc ( indf, "SCUBA2", "READ", &sc2loc, status );
 
    sc2store_errconv ( status );
 }
@@ -1543,26 +1551,27 @@ int *status           /* global status (given and returned) */
 /*
    History :
     12Aug2004 : original (bdk)
+    23Nov2005 : Use Official C HDS interface (TIMJ)
 */
 {
-   char fitsloc[DAT__SZLOC];  /* HDS locator to FITS headers */
+   HDSLoc *fitsloc = NULL;    /* HDS locator to FITS headers */
    int j;                     /* loop counter */
-   char loc2[DAT__SZLOC];     /* HDS locator */
+   HDSLoc *loc2 = NULL;       /* HDS locator */
 
 
    if ( *status != SAI__OK ) return;
 
 /* Create and write FITS headers */
 
-   ndfXnew ( indf, "FITS", "_CHAR*80", 1, &(nfits), fitsloc, status );
+   ndfXnew ( indf, "FITS", "_CHAR*80", 1, &(nfits), &fitsloc, status );
 
    for ( j=1; j<=nfits; j++ )
    {
-      sc2dat_cell ( fitsloc, 1, &j, loc2, status );
-      sc2dat_put0c ( loc2, headers[j-1], status );
-      sc2dat_annul ( loc2, status );
+      datCell ( fitsloc, 1, &j, &loc2, status );
+      datPut0C ( loc2, headers[j-1], status );
+      datAnnul ( &loc2, status );
    }
-   sc2dat_annul ( fitsloc, status );
+   datAnnul ( &fitsloc, status );
 
    sc2store_errconv ( status );
 }
