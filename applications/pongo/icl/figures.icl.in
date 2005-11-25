@@ -888,7 +888,7 @@ CCMATH EX='EX/3600.0' EY='EY/3600.0'
 DEGTOR EX
 DEGTOR EY
 VP_BH
-DLIMITS  
+DLIMITS PROJECTION=(PROJ)
 WNAD
 
 {  Draw a box with RA and Dec labels.
@@ -898,7 +898,7 @@ BOX BCNSTZHG BCNSTZDG
 
 {  Plot the star positions.
 LWEIGHT 2
-POINTS SYMBOL=3
+POINTS SYMBOL=3 PROJECTION=(PROJ)
 
 {  And the proper motion vectors.
 VECT ERSCALE=1.0E5
