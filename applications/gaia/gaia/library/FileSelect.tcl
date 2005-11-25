@@ -90,6 +90,8 @@
 #                            space is divided between the directory
 #                            and files views.
 #                 07 Jul 03  Added horizontal scrollbars.
+#                 22 Nov 05  Removed panedwindow as this seems to be stopping
+#                            the delivery of double clicks.
 
 
 itk::usual FileSelect {}
@@ -105,6 +107,7 @@ itcl::class util::FileSelect {
 
     #  create new scrolled text
     constructor {args} {
+
 	eval itk_initialize $args
 
 	#
@@ -138,22 +141,12 @@ itcl::class util::FileSelect {
 	pack $fs(filterf).label -side top -anchor w
         # PWD: modification here, pack to top not bottom.
         pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
-		
-        # PWD: pane holding directory and file views is split.
-        set fs(panef) [iwidgets::panedwindow $f.listf.pane \
-                          -orient vertical\
-                          -width 4i \
-                          -height 2i]
-        $fs(panef) add "LEFT"
-        set xpane [$fs(panef) childsite "LEFT"]
-        $fs(panef) add "RIGHT"
-        set ypane [$fs(panef) childsite "RIGHT"]
 
 	#
 	# Create directory list, scrollbar, and label for the directory 
 	# frame.  Make the list single select.
 	#
-	set fs(dirf) [frame $xpane.dirf]
+	set fs(dirf) [frame $fs(listf).dirf]
 	label $fs(dirf).label -text "$itk_option(-dirlabel)"
 	set fs(dirs) [listbox $fs(dirf).list -relief sunken \
 		-yscrollcommand "$fs(dirf).vscroll set" \
@@ -176,7 +169,7 @@ itcl::class util::FileSelect {
 	# Create file list, scrollbar, and label for the file frame.
 	# Again, make the list single select.
 	#
-        set fs(filef) [frame $ypane.filef]
+        set fs(filef) [frame $fs(listf).filef]
 	label $fs(filef).label -text "$itk_option(-filelabel)"
 	set fs(files) [listbox $fs(filef).list -relief sunken \
 		-yscrollcommand "$fs(filef).vscroll set" \
@@ -186,6 +179,7 @@ itcl::class util::FileSelect {
 
 	scrollbar $fs(filef).vscroll -orient vertical -relief sunken \
 		-command "$fs(filef).list yview"
+
 	scrollbar $fs(filef).hscroll -orient horizontal -relief sunken \
 		-command "$fs(filef).list xview"
 
@@ -198,6 +192,7 @@ itcl::class util::FileSelect {
         # Pack the directory and file lists based on the attributes
 	# for displaying each list.
         #
+        frame $fs(listf).buf -width $_margin -borderwidth 0
 
         if {$itk_option(-dispdir)} {
            pack $fs(dirf) -side left -fill both -expand yes
@@ -205,7 +200,6 @@ itcl::class util::FileSelect {
 	if {$itk_option(-dispfile)} {
            pack $fs(filef) -side right -fill both -expand yes
         }
-        pack $fs(panef) -fill both -expand 1 -padx 1m -pady 1m
 
 	#
 	# Create the label and entry widgets for the selection frame. Turn
@@ -217,7 +211,7 @@ itcl::class util::FileSelect {
 
 	pack $fs(self).label -side top -anchor w
 	pack $fs(self).entry -side bottom -fill x -expand yes -ipady 1m
-		
+	
 	#
 	# Add the separator and create the buttons in the button frame.
 	# Each button is within a frame used to display as default. 
