@@ -304,6 +304,9 @@ class StarRtdImage : public Skycat
    //  Direct NDF access.
    int ndfCmd( int argc, char *argv[] );
 
+   //  Configure the bias images.
+   int biasimageCmd( int argc, char *argv[] );
+
  protected:
 
    //  Redefined from parent class to check configuration options.
@@ -419,6 +422,9 @@ class StarRtdImage : public Skycat
 
    //  Get list of NDF properties.
    int ndfCmdList( int argc, char *argv[], NDFIO *ndf );
+
+   //  Get the FITS headers of the NDF.
+   int ndfCmdFits( int argc, char *argv[], NDFIO *ndf );
 
    //  Change the data of a BLT vector.
    int resetBltVector( const int num, const double *valueArr,
