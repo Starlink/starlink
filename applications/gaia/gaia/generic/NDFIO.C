@@ -16,7 +16,7 @@
 //
 
 //  Copyright:
-//     Copyright (C) 1997 Central Laboratory of the Research Councils
+//     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
 
 //  Authors:
 //     Peter W. Draper (PWD):
@@ -57,14 +57,17 @@
 //     05-SEP-2004 (PWD):
 //        Modify so that all memory is allocated by HDS or CNF so that we can
 //        safely pass this into Fortran, even on 64 bit machines.
+//     22-NOV-2005 (PWD):
+//        Switch to new byte swapping in Skycat 2.7.4.
 //     {enter_changes_here}
 
 //-
 
-#include <config.h>  //  From skycat util
+#include <define.h>  //  From skycat util
 
 #include <cstring>
-#include <strstream>
+#include <ostream>
+#include <sstream>
 #include <cstdlib>
 #include <cctype>
 #include <cmath>
@@ -91,6 +94,9 @@ NDFIO::NDFIO( void *NDFinfo, int curd, const char *component,
 {
    //  Record the component type.
    strncpy( component_, (char *) component, 20 );
+
+   //  We don't byte swap, so usingNetBO_ value only depends on BIGENDIAN.
+   usingNetBO( BIGENDIAN );
 }
 
 //+
@@ -234,22 +240,23 @@ int NDFIO::write( const char *pathname )
 //-
 int NDFIO::getFitsHeader(ostream& os) const
 {
-   istrstream is((char*)header_.ptr(), header_.size());
-   char buf[81];
-   while(is.read(buf, FITSCARD)) {
-      for (int i = 0; i < 79; i++) {
-         if (!isascii(buf[i])) {
-            buf[i] = ' ';
-         }
-      }
-      buf[79] = '\n';
-      os.write(buf, FITSCARD);
-      if (strncmp(buf, "END     ", 8) == 0) {
-         break;
-      }
-   }
-   os << ends;
-   return 0;
+    string istr( (char*)header_.ptr(), header_.length() );
+    istringstream is( istr );
+    char buf[81];
+    while( is.read( buf, FITSCARD ) ) {
+        for ( int i = 0; i < ( FITSCARD - 1 ); i++ ) {
+            if ( ! isascii( buf[i] ) ) {
+                buf[i] = ' ';
+            }
+        }
+        buf[ FITSCARD - 1 ] = '\n';
+        os.write( buf, FITSCARD );
+        if ( strncmp( buf, "END     ", 8 ) == 0 ) {
+            break;
+        }
+    }
+    os << ends;
+    return 0;
 }
 
 //
