@@ -69,7 +69,7 @@ public:
     {"csize",  &GaiaSkySearch::csizeCmd,        1,  1},
     {"entry",  &GaiaSkySearch::entryCmd,        1,  4},
     {"info",   &GaiaSkySearch::infoCmd,         1,  2},
-    {"open",   &GaiaSkySearch::openCmd,         1,  1},
+    {"open",   &GaiaSkySearch::openCmd,         1,  2},
     {"origin", &GaiaSkySearch::originCmd,       0,  2},
     {"save",   &GaiaSkySearch::saveCmd,         1,  5}
 };
@@ -85,62 +85,6 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
         high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
         mid,
         cond;
-    
-    //  XXX g++ bug (egcs 1.0.3a), it seems that using static references
-    //  to members functions doesn't work when these are virtual
-    //  functions inherited from a "public virtual" base class
-    //  (SkySearch inherits TclAstroCat this way). So use this following
-    //  code, which seems to fix things. Recheck when newer version of
-    //  egcs are produced.
-    
-    if ( strcmp( name, "info" ) == 0 ) {
-        if ( check_args( name, argc, 1, 2 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return infoCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "check" ) == 0 ) {
-        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return checkCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "csize" ) == 0 ) {
-        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return csizeCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "entry" ) == 0 ) {
-        if ( check_args( name, argc, 1, 4 ) != TCL_OK ) {
-            return TCL_ERROR;
-         }
-        return entryCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "open" ) == 0 ) {
-        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return openCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "save" ) == 0 ) {
-        if ( check_args( name, argc, 1, 5 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return saveCmd( argc, argv );
-    }
-    
-    if ( strcmp( name, "origin" ) == 0 ) {
-        if ( check_args( name, argc, 0, 2 ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        return originCmd( argc, argv );
-    }
     
     while (low <= high) {
         mid = (low + high) / 2;
