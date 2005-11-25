@@ -340,7 +340,7 @@ reload_vars_hds(void)
 {
     extern node *node_value   (value v );			/* node.c */
 
-    HDSLoc * comp_loc;
+    HDSLoc * comp_loc = NULL;
 
     float rval;
     int ival;
@@ -468,7 +468,7 @@ reload_vars_hds(void)
 void openpar( char *taskname, char *actname, char *mode, 
               HDSLoc **floc, int *status )
 {
-  HDSLoc * loc;
+  HDSLoc * loc = NULL;
   char *filename;
   char type[DAT__SZTYP+1];
   int index;
@@ -812,10 +812,8 @@ void openglobal( char *mode, HDSLoc **loc, int *status )
  *    if necessary.
  *
  * Arguments:
- *    loc = *char  (Given)
+ *    loc = *HDSLoc  (Given)
  *       A locator for the structure in which the named component is to exist
- *    loc_length = int (Given)
- *       Length of loc
  *    parname = *char (Given)
  *       The name of the component which must exist
  *    type = *char (Given)
@@ -823,10 +821,8 @@ void openglobal( char *mode, HDSLoc **loc, int *status )
  *    btype = *char (Given)
  *       The type to be created if type is "?" and the component does not
  *       exist.
- *    ploc = *char (Returned)
+ *    ploc = **HDSLoc (Returned)
  *       A locator for the named component.
- *    ploc_length = int (Given)
- *       Length of ploc
  *    status = *int (Given and Returned)
  *       The global status
  *
@@ -848,7 +844,7 @@ void openglobal( char *mode, HDSLoc **loc, int *status )
  */
 void ensure_exists( HDSLoc *loc,
                     char *parameter, char *type, char *btype,
-                    HDSLoc *ploc,
+                    HDSLoc **ploc,
                     int *status )
 {
 
@@ -865,8 +861,8 @@ char hdstype[DAT__SZTYP+1];
 	new = ( !there ? 1 : 0 );
         if ( !new ) {
 /* If there is one, get a locator to it and check it's OK */
-	  datFind( loc, parameter, &ploc, status );
-	  datType( ploc, hdstype, status );
+	  datFind( loc, parameter, ploc, status );
+	  datType( *ploc, hdstype, status );
            
 /* See if the existing component is OK.
  * If type is not "?" check the type against the existing component type
@@ -879,7 +875,7 @@ char hdstype[DAT__SZTYP+1];
                
 /* If we need a new component, delete the old one */
             if ( new ) {
-	      datAnnul( &ploc, status );
+	      datAnnul( ploc, status );
 	      datErase( loc, parameter, status );
             }
          }
@@ -899,10 +895,10 @@ char hdstype[DAT__SZTYP+1];
 	     datNew( loc, parameter, "ADAM_PARNAME", ndims, dims, status );
 
       /* and get a locator to it */
-	     datFind( loc, parameter, &ploc, status );
+	     datFind( loc, parameter, ploc, status );
 
       /* create the NAMEPTR component */
-	     datNew( ploc, "NAMEPTR", "_CHAR*132", ndims, dims, status );
+	     datNew( *ploc, "NAMEPTR", "_CHAR*132", ndims, dims, status );
 
            } else {
    /* 
@@ -911,7 +907,7 @@ char hdstype[DAT__SZTYP+1];
 	     datNew( loc, parameter, hdstype, ndims, dims, status );
 
                 /* Get locator to newly created component */
-	     datFind( loc, parameter, &ploc, status );
+	     datFind( loc, parameter, ploc, status );
 
            }
         }
@@ -921,13 +917,13 @@ char hdstype[DAT__SZTYP+1];
  */
 
         if ( !strcasecmp( hdstype, "ADAM_PARNAME" ) ) {
-	  datFind( ploc, "NAMEPTR", &cloc, status );
+	  datFind( *ploc, "NAMEPTR", &cloc, status );
 
       /* Annul the intermediate locator */
-	  datAnnul( &ploc, status );
+	  datAnnul( ploc, status );
 
       /* and clone the new one and annul it */
-	  datClone( cloc, &ploc, status );
+	  datClone( cloc, ploc, status );
 	  datAnnul( &cloc, status );
        }
 }
@@ -1039,7 +1035,7 @@ proc_setpar(node *n)
 
 /*   Ensure a component of the right type exists */
         (void) ensure_exists( floc, parameter, 
-                              type, "_CHAR*132", ploc,
+                              type, "_CHAR*132", &ploc,
                               &status );
    /* 
     * Now write the value into the appropriate component 
@@ -1331,7 +1327,7 @@ proc_setglobal(node *n)
        hname? strcpy(type, "ADAM_PARNAME"): strcpy(type, "?");
 
        (void) ensure_exists( loc, parameter, 
-                             type, "_CHAR*132", ploc,
+                             type, "_CHAR*132", &ploc,
                              &status );
        /* 
         * Now write the value into the appropriate component 
@@ -1440,7 +1436,7 @@ proc_createglobal(node *n)
              !strcasecmp( type, "ADAM_PARNAME" ) ) {
 
             (void) ensure_exists( loc, parameter, 
-                                  type, type, ploc,
+                                  type, type, &ploc,
                                   &status );
             if ( status == SAI__OK ) {
       /* Reset the component in case it already existed */

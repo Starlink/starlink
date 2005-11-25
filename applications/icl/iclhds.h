@@ -37,7 +37,7 @@ void openglobal( char *mode, HDSLoc **loc, int *status );
 
 void ensure_exists( HDSLoc *loc,
                     char *parameter, char *type, char *btype,
-                    HDSLoc *ploc,
+                    HDSLoc **ploc,
                     int *status );
 static value proc_setpar( node * );
 static value proc_setglobal( node * );
