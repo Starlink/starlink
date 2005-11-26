@@ -82,7 +82,7 @@ int ndfGtfts( int indf, AstFitsChan ** fchan, int * status ) {
   char   *card;               /* Pointer to start of current card */
   HDSLoc *fitsloc = NULL;     /* FITS HDS Locator in extension */
   hdsdim fitsdim[DAT__MXDIM]; /* Dimensionality of FITS extension */
-  char   *fpntr;              /* Pointer to the mapped FITS header */
+  void   *fpntr = NULL;       /* Pointer to the mapped FITS header */
   int    i;                   /* Loop counter */
   size_t ncards;              /* Number of header cards in extension */
   size_t nchars;              /* Number of characters in extension */
@@ -169,10 +169,12 @@ int ndfGtfts( int indf, AstFitsChan ** fchan, int * status ) {
 
     /* Create a new FitsChan */
     *fchan = astFitsChan( NULL, NULL, "" );
+
+    /* store pointer to start of string in new variable for iteration */
+    card = fpntr;
   
     /* Extract headers 80 characters at a time. No nul-termination
        but astPutFits guarantees to only read 80 characters */
-    card = fpntr;
     for (i = 0; i < ncards; i++ ) {
       astPutFits( *fchan, card, 0 );
       card += SZFITSCARD;
@@ -192,8 +194,6 @@ int ndfGtfts( int indf, AstFitsChan ** fchan, int * status ) {
   /* Clean up */
   datUnmap( fitsloc, status );
   datAnnul( &fitsloc, status );
-
-  printf("Status = %d\n", *status );
 
   /* Report wrapper error message */
   if ( *status != SAI__OK ) {
