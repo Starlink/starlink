@@ -37,12 +37,14 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2005-11-04 (AGG):
+*     2005-11-04 (AGG/TIMJ):
 *        Initial test version
 *     2005-11-09 (AGG):
 *        Add comments and fix error message
 *     2005-11-10 (AGG):
 *        Add test for existence of FITS extension
+*     2005-11-29 (TIMJ):
+*        Use HDSLoc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -81,10 +83,10 @@
 
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
 
-  char fitsloc[DAT__SZLOC]; /* HDS locator for FITS header */
+  HDSLoc *fitsloc = NULL;   /* HDS locator for FITS header */
   int ndim;                 /* Dimensions of FITS header array*/
   int fitsdim[NDF__MXDIM];  /* Number of elements in each dimension */
-  int nfits;                /* Number of FITS records in header */
+  size_t nfits;             /* Number of FITS records in header */
   char *fitsrec = NULL;     /* Pointer to the FITS header array */
   int hasfits;              /* Flag to indicate whether FITS extension exists */
 
@@ -103,7 +105,7 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   }
 
   /* Find the HDS locator to the FITS component */
-  ndfXloc( indf, "FITS", "READ", fitsloc, status);
+  ndfXloc( indf, "FITS", "READ", &fitsloc, status);
 
   /* Determine the dimensionality of the FITS component */
   datShape( fitsloc, NDF__MXDIM, fitsdim, &ndim, status);
@@ -122,8 +124,6 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   /* Get number of FITS header entries: HDS `knows' it's reading
      80-char strings rather than a simple array of characters */
   datSize( fitsloc, &nfits, status );
-
-  printf("nfits = %d \n",nfits);
 
   /* Allocate the memory for the FITS header */
   if ( *status == SAI__OK) {
@@ -148,7 +148,7 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   /* Free up the memory */
   free(fitsrec);
   /* Free up the NDF */
-  datAnnul(fitsloc, status);
+  datAnnul(&fitsloc, status);
 
   printf("fitsrec: %s \n",fitsrec);
 
