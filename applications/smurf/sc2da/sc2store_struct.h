@@ -3,6 +3,8 @@
    History :
     17Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
+    22Nov2005 : Protect against multiple inclusion (timj)
+    28Nov2005 : add typedef for sc2head (timj)
 */
 
 
@@ -55,5 +57,7 @@ struct sc2head
    int wvm_qual;
    float wvm_time;
 };
+
+typedef struct sc2head sc2head;
 
 #endif /* SC2STORE_STRUCT_DEFINED */
