@@ -37,6 +37,8 @@
 *        Initial test version
 *     2005-11-07 (TIMJ):
 *        Fix logic that ditinguishes sc2store from datGetc
+*     2005-11-29 (TIMJ):
+*        Use astPutFits rather than a callback (much easier)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -73,11 +75,6 @@
 #include "mers.h"
 #include <string.h>
 
-int curindex = 0;
-char *card = NULL;
-int step = 0;
-int maxfits;
-
 const char* astsource ( );
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status ) {
@@ -89,6 +86,10 @@ void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *statu
      is to use strlen since we know that all the strings are terminated somewhere.
   */
 
+  char *card = NULL;
+  int i;
+  int step = 0;
+
   len = strlen( headrec );
 
   if ( len <= 81 ) {
@@ -98,30 +99,16 @@ void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *statu
     step = 80;
   }
 
-  card = headrec;
-  maxfits = nfits;
+  /* Create the empty fitschan */
+  *fits = astFitsChan( NULL, NULL, "" );
 
-  *fits = astFitsChan( astsource, NULL, "");
+  /* Fill it */
+  card = headrec;
+  for (i = 0; i < nfits; i++ ) {
+    astPutFits( *fits, card, 0 );
+    card += step;
+  }
 
   return;
 
-}
-
-const char* astsource () {
-
-  char * hdritem = NULL;
-
-  if (curindex == maxfits) {
-    return NULL;
-  }
-
-  hdritem = astMalloc(80+1);
-  if (hdritem == NULL) return NULL;
-
-  strncpy( hdritem, card, 80 );
-  hdritem[80] = '\0';
-  curindex++;
-  card += step;
-  
-  return hdritem;
 }
