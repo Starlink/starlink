@@ -22,8 +22,9 @@
 *        Index corresponding to required file in group
 *     mode = char * (Given)
 *        File access mode
-*     data = smfData * (Returned)
-*        Pointer to smfData struct containing file info and data
+*     data = smfData ** (Returned)
+*        Pointer to pointer smfData struct to be filled with file info and data
+*        Should be freed using smf_close_file.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -166,6 +167,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     /* Set the file entry in the smfData struct */
     (*data)->file = file;
     file->xloc = NULL;
+    file->ndfid = NDF__NOID;
     hdr = malloc( sizeof(smfHead));
     (*data)->hdr = hdr;
     hdr->wcs = NULL;
