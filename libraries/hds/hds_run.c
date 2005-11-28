@@ -6,6 +6,7 @@
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "f77.h"                 /* Fortran interface                       */
 
 /* Note that this routine is obselete and does NOT have a counterpart in    */
 /* C interface to HDS                                                       */
