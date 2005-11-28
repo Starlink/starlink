@@ -60,12 +60,12 @@
 #ifndef SMF_TYP_DEFINED
 #define SMF_TYP_DEFINED
 
+#include "star/hds_types.h"
 #include "sc2da/sc2store_struct.h"
 #include "sc2da/sc2store_par.h"
 #include "ast.h"
 #include "ndf.h"
 #include "star/grp.h"
-#include "star/hds_types.h"
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 
