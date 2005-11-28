@@ -87,7 +87,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
-#include "dat_par.h"
+#include "star/hds_types.h"
 
 /* Data Acquisition Includes */
 #include "sc2da/sc2store_struct.h"
