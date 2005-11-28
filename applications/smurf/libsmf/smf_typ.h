@@ -28,6 +28,8 @@
 *        Initial test version
 *     2005-11-07 (TIMJ):
 *        Document some of the struct items
+*     2005-11-23 (TIMJ):
+*        HDS Locator has changed type
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -63,7 +65,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "star/grp.h"
-#include "dat_par.h"
+#include "star/hds_types.h"
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 
@@ -83,7 +85,7 @@ typedef struct smfFile {
   int isSc2store;           /* True if file opened by sc2store library */
   int isTstream;            /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
-  char xloc[DAT__SZLOC];     /* Locator to .MORE.FRAMEDATA (if applicable) */
+  HDSLoc * xloc;            /* Locator to .MORE.FRAMEDATA (if applicable) */
 } smfFile;
 
 /* Contains header general header information obtained from the file */
