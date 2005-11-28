@@ -86,6 +86,7 @@
 *     MJC: Malcolm J. Currie (JAC)
 *     MT: Mark Taylor (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     BEC: Brad Cavanagh (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -126,6 +127,8 @@
 *        Allow for integer-spaced data.
 *     2002 August 12 (MJC)
 *        Corrections and improvements to the previous enhancement.
+*     2005 November 28 (BEC)
+*        Fix bug possibly related to G95 and upcasting of BYTE to INTEGER.
 *     {enter_further_changes_here}
 
 *-
@@ -173,6 +176,7 @@
 
 *  Local Variables:
       <LTYPE> AVELIM           ! Average of data limits
+      <LTYPE> AVESIZE          ! Average size
       DOUBLE PRECISION BINSIZ  ! Bin width of histogram
       REAL CLIPFR( NLIMIT )    ! Bin contents clipped as fraction
       INTEGER CLIPSU( NLIMIT ) ! Count of bin contents clipped
@@ -429,9 +433,10 @@
             ELSE
                AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
+               AVESIZE = RANGE / AVELIM / VAL__EPS<T> / 2<CONST>
                MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
      :                  MIN( NUM_ITO<T>( VAL__MAXI ),
-     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) ) )
+     :                       AVESIZE ) ) ) )
             END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself
