@@ -110,8 +110,6 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   /* Determine the dimensionality of the FITS component */
   datShape( fitsloc, NDF__MXDIM, fitsdim, &ndim, status);
 
-  printf("ndim = %d \n",ndim);
-
   /*  Check dimensions */
   if (ndim != 1) {
     if ( *status == SAI__OK) {
@@ -149,8 +147,6 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status) {
   free(fitsrec);
   /* Free up the NDF */
   datAnnul(&fitsloc, status);
-
-  printf("fitsrec: %s \n",fitsrec);
 
   return;
 }
