@@ -38,8 +38,12 @@
 *  History:
 *     2005-11-03 (AGG):
 *        Initial test version
-*     2005-110-07 (TIMJ):
+*     2005-11-07 (TIMJ):
 *        Need to cache locator to FRAMEDATA
+*     2005-11-23 (TIMJ):
+*        Use HDSLoc for locator
+*     2005-11-28 (TIMJ):
+*        Malloc sc2head
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,11 +165,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     file = malloc( sizeof(smfFile) );
     /* Set the file entry in the smfData struct */
     (*data)->file = file;
-    strcpy( file->xloc, DAT__NOLOC );
+    file->xloc = NULL;
     hdr = malloc( sizeof(smfHead));
     (*data)->hdr = hdr;
     hdr->wcs = NULL;
-    hdr->sc2head = NULL;
+    hdr->sc2head = malloc( sizeof( sc2head ) );
 
     if (isNDF) {
       /* For an NDF, we don't need to worry about flatfield info etc */
@@ -185,7 +189,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       }
 
       /* Read the FITS headers */
-      smf_fits_rdhead( indf, &fits, status);
+      ndfGtfts( indf, &fits, status );
 
       /* If we don't have a time series, then we can retrieve the stored WCS info */
       if ( !isTseries ) {
@@ -195,7 +199,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 	/* Need to get the location of the extension for sc2head parsing */
 	/* Store the locator in the struct for now in case annulling it annulls
 	   all the children */
-	ndfXloc( indf, "FRAMEDATA", "READ", file->xloc, status );
+	ndfXloc( indf, "FRAMEDATA", "READ", &(file->xloc), status );
 
         /* And need to map the header */
 	sc2store_headrmap( file->xloc, ndfdims[2], status );
