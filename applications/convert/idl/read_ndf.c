@@ -129,8 +129,8 @@ int place;         /* NDF placeholder */
 int npix;          /* Number of pixels */
 void *ptr[3];      /* Pointer to mapped NDF data Fortran style */
 size_t nbytes;     /* Number of bytes in NDF */
-int bpix;          /* Number of bits/pixel */
-int idltype;       /* Pixel type code */
+int bpix=1;        /* Number of bits/pixel */
+int idltype=1;     /* Pixel type code */
 int bad;           /* If bad pixels need handling */
 
 int fstat;              /* Final status (before errLoad) */
