@@ -59,9 +59,11 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "export.h"
 #include "sae_par.h"
 #include "ems.h"
+#include "cnf.h"
 #include "hds2idl.h"
 
 void idlprimfill( HDSLoc *cloc, IDL_VPTR datav, void *datptr, int *status ) {
@@ -74,7 +76,7 @@ int defined;              /* If HDS value defined */
 void *cpntr;              /* True C pointer to mapped data */
 size_t nels;              /* Number of mapped elements */
 int nels_i;
-int nbytes;               /* Number of bytes in array */
+size_t nbytes;            /* Number of bytes in array */
 int flen;                 /* length of HDS strings */
 int clen;                 /* length of corresponding C string */
 char *chars;              /* pointer to imported characters */
@@ -135,8 +137,8 @@ if ( *status != SAI__OK ) return;
                clen = flen + 1;
 
 /* Import the Fortran strings to C */
-               chars = IDL_GetScratch( &chptr, nels, clen );
-	       nels_i = (int)nels;
+               nels_i = (int)nels;
+               chars = IDL_GetScratch( &chptr, nels_i, clen );
                cnfImprta( cpntr, flen, chars, clen, 1, &nels_i );
 
 /* set strings to be a pointer to the IDL_STRING structure(s) */
