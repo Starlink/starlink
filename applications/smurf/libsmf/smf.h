@@ -31,6 +31,8 @@
 *     2005-11-07 (TIMJ):
 *        Alphabetize.
 *        Add smf_tslice_ast, add smf_fits_getI
+*     2005-11-28 (TIMJ):
+*        Add smf_close_file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -66,6 +68,8 @@
 #include "smurf_typ.h"
 #include "star/grp.h"
 #include "smf_typ.h"
+
+void smf_close_file( smfData **, int * );
 
 void smf_correct_extinction( smfData **, float, int *);
 
