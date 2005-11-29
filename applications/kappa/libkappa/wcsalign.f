@@ -435,6 +435,8 @@
 *        Add REBIN parameter.
 *     11-AUG-2005 (DSB):
 *        Add CONSERVE parameter, and Sombrero function methods.
+*     29-NOV-2005 (DSB):
+*        Pass the AUTOBN value to kps1_wala0.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -769,8 +771,9 @@
 
 *  Process this pair of input and output NDFs.
             CALL KPS1_WALA0( NDIMR, INDF1, INDF2, MAP, MAP4, IWCSR, 
-     :                       METHOD_CODE, PARAMS, LBND, UBND, ERRLIM, 
-     :                       MAXPIX, REBIN, CONSRV, WLIM, STATUS )
+     :                       METHOD_CODE, PARAMS, AUTOBN, LBND, UBND, 
+     :                       ERRLIM, MAXPIX, REBIN, CONSRV, WLIM, 
+     :                       STATUS )
 
 *  Report an error if in-situ alignment was requested but the Mapping is
 *  not a shift of origin.

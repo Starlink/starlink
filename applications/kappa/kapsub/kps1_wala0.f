@@ -1,6 +1,6 @@
       SUBROUTINE KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, 
-     :                       METHOD, PARAMS, XY1, XY2, ERRLIM, MAXPIX, 
-     :                       REBIN, CONSRV, WLIM, STATUS )
+     :                       METHOD, PARAMS, AUTOBN, XY1, XY2, ERRLIM, 
+     :                       MAXPIX, REBIN, CONSRV, WLIM, STATUS )
 *+
 *  Name:
 *     KPS1_WALA0
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_WALA0( NDIM2, INDF1, INDF2, MAP, MAP4, IWCSR, METHOD, 
-*                      PARAMS, XY1, XY2, ERRLIM, MAXPIX, REBIN, 
+*                      PARAMS, AUTOBN, XY1, XY2, ERRLIM, MAXPIX, REBIN, 
 *                      CONSRV, WLIM, STATUS )
 
 *  Description:
@@ -51,16 +51,17 @@
 *     PARAMS = DOUBLE PRECISION (Given)
 *        An optional array containing ay additonal parameter values
 *        required by the sub-pixel interpolation scheme.
+*     AUTOBN = LOGICAL (Given)
+*        If .TRUE. then default bounds will be found for the output NDF. 
+*        Otherwise, the bounds supplied in XY1 and XY2 will be used.
 *     XY1( NDIM2 ) = INTEGER (Given)
-*        The indices of the bottom left pixel in the output NDF. If set
-*        to VAL__BADI then default bounds will be found for the output
-*        NDF. The number iof values in the array should equal the number
-*        of pixel axes in the output NDF.
+*        The indices of the bottom left pixel in the output NDF. Ignored if
+*        AUTOBN is .TRUE. The number of values in the array should equal 
+*        the number of pixel axes in the output NDF.
 *     XY2( NDIM2 ) = INTEGER (Given)
-*        The indices of the top right pixel in the output NDF. If set
-*        to VAL__BADI then default bounds will be found for the output
-*        NDF. The number iof values in the array should equal the number
-*        of pixel axes in the output NDF.
+*        The indices of the top right pixel in the output NDF. Ignored if
+*        AUTOBN is .TRUE. The number of values in the array should equal 
+*        the number of pixel axes in the output NDF.
 *     ERRLIM = REAL (Given)
 *        The position accuracy required when re-sampling the input NDF.
 *        Given as a number of pixels.
@@ -102,6 +103,8 @@
 *        Add argument REBIN.
 *     11-AUG-2005 (DSB):
 *        Add argument CONSRV.
+*     29-NOV-2005 (DSB):
+*        Add argument AUTOBN.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -129,6 +132,7 @@
       INTEGER IWCSR
       INTEGER METHOD
       DOUBLE PRECISION PARAMS( 2 )
+      LOGICAL AUTOBN
       INTEGER XY1( NDIM2 )
       INTEGER XY2( NDIM2 )
       REAL ERRLIM
@@ -211,7 +215,7 @@
 
 *  If the user supplied explicitly specified bounds for the output
 *  images, use them. 
-      IF( XY1( 1 ) .NE. VAL__BADI ) THEN
+      IF( .NOT. AUTOBN ) THEN
          DO I = 1, NDIM2
             LBND2( I ) = XY1( I )
             UBND2( I ) = XY2( I )
