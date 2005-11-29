@@ -23,7 +23,7 @@
 /* DAT_NAME - Object name ? */
 /*==========================*/
 int
-datName(HDSLoc *locator,
+datName(const HDSLoc *locator,
         char name_str[DAT__SZNAM+1],
         int *status)
 {
@@ -66,7 +66,7 @@ datName(HDSLoc *locator,
 /* DAT_TYPE - Object type ? */
 /*==========================*/
 int
-datType(HDSLoc *locator,
+datType(const HDSLoc *locator,
         char type_str[DAT__SZTYP + 1],
         int *status )
 {
@@ -180,7 +180,7 @@ datType(HDSLoc *locator,
 /* DAT_SHAPE - Object shape ? */
 /*============================*/
 int
-datShape(HDSLoc *locator,
+datShape(const HDSLoc *locator,
          int       maxdim,
          HDS_PTYPE dims[],
          int       *actdim,
@@ -227,7 +227,7 @@ datShape(HDSLoc *locator,
 /* DAT_SIZE - Object size ? */
 /*==========================*/
 int
-datSize(HDSLoc *locator,
+datSize(const HDSLoc *locator,
         size_t *size,
         int *status )
 {
@@ -262,7 +262,7 @@ datSize(HDSLoc *locator,
 /* DAT_THERE - Object there ? */
 /*============================*/
 int
-datThere(HDSLoc *locator,
+datThere(const HDSLoc *locator,
          char *name_c,
          int *there,
          int *status)
@@ -359,7 +359,7 @@ datThere(HDSLoc *locator,
 /* DAT_STRUC - Structure object ? */
 /*================================*/
 int
-datStruc(HDSLoc *locator,
+datStruc(const HDSLoc *locator,
          int *struc,
          int *status)
 {
@@ -394,7 +394,7 @@ datStruc(HDSLoc *locator,
 /* DAT_PRIM - Primitive object ? */
 /*===============================*/
 int
-datPrim(HDSLoc *locator,
+datPrim(const HDSLoc *locator,
         int *prim,
         int *status)
 {
@@ -435,7 +435,7 @@ datPrim(HDSLoc *locator,
 /* DAT_NCOMP - Number of components ? */
 /*====================================*/
 int
-datNcomp( HDSLoc *locator,
+datNcomp( const HDSLoc *locator,
           int *ncomp,
           int *status)
 {
@@ -495,7 +495,7 @@ datNcomp( HDSLoc *locator,
 /* DAT_LEN - Primitive length ? */
 /*==============================*/
 int
-datLen(HDSLoc *locator,
+datLen(const HDSLoc *locator,
        size_t *len,
        int *status)
 {
@@ -540,7 +540,7 @@ datLen(HDSLoc *locator,
 /* DAT_STATE - Object state ? */
 /*============================*/
 int
-datState(HDSLoc *locator,
+datState(const HDSLoc *locator,
          int *state,
          int *status)
 {
@@ -583,7 +583,7 @@ datState(HDSLoc *locator,
 /* DAT_VALID - Valid locator ? */
 /*=============================*/
 int
-datValid(HDSLoc *locator,
+datValid(const HDSLoc *locator,
          int *valid,
          int *status)
 {
@@ -624,7 +624,7 @@ datValid(HDSLoc *locator,
 /* DAT_CONV - Data conversion possible ? */
 /*=======================================*/
 int
-datConv(HDSLoc *locator,
+datConv(const HDSLoc *locator,
         char *type_str,
         int *conv,
         int *status)
