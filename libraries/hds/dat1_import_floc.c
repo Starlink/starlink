@@ -42,6 +42,9 @@
  *    int *status = Given and Returned
  *       Inherited status. Returns without action if status is not DAT__OK
 
+ *  Returned:
+ *    int status = Inherited status value
+
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
 
@@ -50,7 +53,8 @@
  *      Initial version
 
  *  Notes:
- *    Does not check the contents of the locator for validity.
+ *    Does not check the contents of the locator for validity but does check for
+ *    common Fortran error locators such as DAT__ROOT and DAT__NOLOC.
 
  *  See Also:
  *    - datImportFloc
@@ -83,9 +87,9 @@
  *-
  */
 
-void dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc * clocator, int * status) {
+int dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc * clocator, int * status) {
 
-  if (*status != DAT__OK) return;
+  if (*status != DAT__OK) return *status;
 
 /* Validate the locator length.                                             */
   if (loc_length != DAT__SZLOC ) {
@@ -93,8 +97,22 @@ void dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc 
     emsSeti( "LEN", loc_length );
     emsSeti( "SZLOC", DAT__SZLOC );
     emsRep( "DAT1_IMPORT_FLOC", "Locator length is ^LEN not ^SZLOC", status);
-    return;
+    return *status;
   };
+
+  /* Check obvious error conditions */
+  if (strncmp( DAT__ROOT, flocator, loc_length) == 0 ) {
+    *status = DAT__LOCIN;
+    emsRep( "datImportFloc_ROOT", "Input HDS Locator corresponds to DAT__ROOT but that can only be used from NDF", status );
+    return *status;
+  }
+
+  /* Check obvious error conditions */
+  if (strncmp( DAT__NOLOC, flocator, loc_length) == 0 ) {
+    *status = DAT__LOCIN;
+    emsRep( "datImportFloc_NOLOC", "Input HDS Locator corresponds to DAT__NOLOC but status is good (Possible programming error)", status );
+    return *status;
+  }
 
 /* If OK, then extract the information from the locator string (necessary   */
 /* to ensure that data alignment is correct, as the string will normally be */
@@ -102,5 +120,5 @@ void dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc 
 
   memmove( clocator, flocator, sizeof( struct LOC ) );
 
-  return;
+  return *status;
 }
