@@ -65,6 +65,7 @@
 */
 
 #include "sae_par.h"
+#include "hds1.h"
 #include "hds.h"
 #include <stdlib.h>
 
