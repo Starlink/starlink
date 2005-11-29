@@ -136,14 +136,29 @@
 #define SZCRV (hds_gl_64bit ? DAT__SZCRV : DAT__SZOCRV)
 #define SET_64BIT_MODE(han) (hds_gl_64bit =\
     (rec_ga_fcv[han->slot].hds_version > REC__VERSION3))
+
+/* Check status and return on error after setting error message */
 #define _call(event)\
 {\
 *status = (event);\
 if (!_ok(*status))\
 	{\
         hds_gl_status = *status;\
-        ems_rep_c(context_name,context_message,status);\
+        emsRep(context_name,context_message,status);\
 	return hds_gl_status;\
+        }\
+}
+
+/* Check status and return void after setting error message */
+
+#define _callv(event)\
+{\
+*status = (event);\
+if (!_ok(*status))\
+	{\
+        hds_gl_status = *status;\
+        emsRep(context_name,context_message,status);\
+	return;\
         }\
 }
 
@@ -284,7 +299,7 @@ if (!_ok(*status))\
       int dat1_get_odl( const struct HAN *han, struct ODL *odl );
       int dat1_get_off( int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs,
                      UINT_BIG *offset );
-      int dat1_import_loc( struct LOC *loc,
+      int dat1_import_loc( const struct LOC *loc,
                             struct LCP **lcp );
       int dat1_init( void );
       void dat1_init_ndr( int *status );
@@ -326,7 +341,7 @@ if (!_ok(*status))\
       int hds1_get_subs( int ndim, HDS_PTYPE *dims, INT_BIG offset,
                          HDS_PTYPE  *subs );
 
-      void dat1_import_floc ( const char flocator[DAT__SZLOC],
+      int dat1_import_floc ( const char flocator[DAT__SZLOC],
 			      int loc_length, HDSLoc *clocator, 
 			      int * status);
 
