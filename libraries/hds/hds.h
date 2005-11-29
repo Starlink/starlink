@@ -212,7 +212,7 @@ int
 datGet0C( HDSLoc * loc, char * value, size_t len, int * status );
 
 /*======================================*/
-/* datPut0D - Read scalar double value  */
+/* datGet0D - Read scalar double value  */
 /*======================================*/
 
 int
@@ -254,9 +254,9 @@ datIndex(HDSLoc   *locator1,
 /*===================================*/
 
 int
-datLen(HDSLoc     *locator,
-       size_t     *len,
-       int        *status);
+datLen(const HDSLoc *locator,
+       size_t       *len,
+       int          *status);
 
 /*===========================*/
 /* datMap - Map primitive(s) */
@@ -370,7 +370,7 @@ datMove(HDSLoc **locator1,
 /*===============================*/
 
 int
-datName(HDSLoc *locator,
+datName(const HDSLoc *locator,
         char name_str[DAT__SZNAM+1],
         int *status);
 
@@ -379,7 +379,7 @@ datName(HDSLoc *locator,
 /*=========================================*/
 
 int
-datNcomp( HDSLoc *locator,
+datNcomp( const HDSLoc *locator,
           int *ncomp,
           int *status);
 
@@ -416,12 +416,22 @@ datParen(HDSLoc *locator1,
          HDSLoc **locator2,
          int *status);
 
+
+/*=====================================*/
+/* datPrec - Enquire storage precision */
+/*=====================================*/
+
+int
+datPrec(const HDSLoc *locator,
+        size_t *nbytes,
+        int *status);
+
 /*====================================*/
 /* datPrim - Enquire object primitive */
 /*====================================*/
 
 int
-datPrim(HDSLoc *locator,
+datPrim(const HDSLoc *locator,
         int *prim,
         int *status);
 
@@ -578,7 +588,7 @@ datRetyp(HDSLoc *locator,
 /*=================================*/
 
 int
-datShape(HDSLoc *locator,
+datShape(const HDSLoc *locator,
          int       maxdim,
          hdsdim dims[],
          int       *actdim,
@@ -589,7 +599,7 @@ datShape(HDSLoc *locator,
 /*===============================*/
 
 int
-datSize(HDSLoc *locator,
+datSize(const HDSLoc *locator,
         size_t *size,
         int *status );
 
@@ -610,7 +620,7 @@ datSlice(HDSLoc  *locator1,
 /*=================================*/
 
 int   
-datState(HDSLoc *locator,
+datState(const HDSLoc *locator,
          int *state,
          int *status);
 
@@ -619,7 +629,7 @@ datState(HDSLoc *locator,
 /*=====================================*/
 
 int
-datStruc(HDSLoc *locator,
+datStruc(const HDSLoc *locator,
          int *struc,
          int *status);
 
@@ -639,7 +649,7 @@ datTemp(char      *type_str,
 /*=========================================*/
 
 int
-datThere(HDSLoc *locator,
+datThere(const HDSLoc *locator,
          char *name_c,
          int *there,
          int *status);
@@ -649,7 +659,7 @@ datThere(HDSLoc *locator,
 /*===============================*/
 
 int
-datType(HDSLoc *locator,
+datType(const HDSLoc *locator,
         char type_str[DAT__SZTYP + 1],
         int *status );
 
@@ -666,7 +676,7 @@ datUnmap(HDSLoc *locator,
 /*==================================*/
 
 int
-datValid(HDSLoc *locator,
+datValid(const HDSLoc *locator,
          int    *valid,
          int    *status);
 
@@ -850,7 +860,7 @@ hdsWild(char *fspec,
 /*========================================*/
 
 int
-datConv(HDSLoc *locator,
+datConv(const HDSLoc *locator,
         char *type_str,
         int *conv,
         int *status);
