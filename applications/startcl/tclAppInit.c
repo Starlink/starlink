@@ -13,8 +13,18 @@
  * RCS: @(#) $Id$
  */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #ifdef TCL_XT_TEST
 #include <X11/Intrinsic.h>
+#endif
+
+/* If a Fortran main is defined, provide a dummy entry point to
+   satisfy potential linker problems */
+#if HAVE_FC_MAIN
+void FC_MAIN () {}
 #endif
 
 #include "tcl.h"
@@ -69,6 +79,10 @@ main(argc, argv)
 #ifdef TCL_XT_TEST
     XtToolkitInitialize();
 #endif
+
+    /* Make sure Fortran is ready for us */
+    cnfInitRTL( argc, argv );
+
     Tcl_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }

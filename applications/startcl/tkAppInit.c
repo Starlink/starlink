@@ -13,6 +13,16 @@
  * RCS: @(#) $Id$
  */
 
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+/* If a Fortran main is defined, provide a dummy entry point to
+   satisfy potential linker problems */
+#if HAVE_FC_MAIN
+void FC_MAIN () {}
+#endif
+
 #include "tk.h"
 #include "locale.h"
 
@@ -58,6 +68,10 @@ main(argc, argv)
     int argc;			/* Number of command-line arguments. */
     char **argv;		/* Values of command-line arguments. */
 {
+
+    /* Make sure Fortran is ready for us */
+    cnfInitRTL( argc, argv );
+
     Tk_Main(argc, argv, Tcl_AppInit);
     return 0;			/* Needed only to prevent compiler warning. */
 }
