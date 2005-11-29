@@ -22,6 +22,7 @@
  *                 16/08/00  Added write and mergeHeader members.
  *                 16/02/04  Added alwaysMerge_ member.
  *                 13/06/05  Added setHDU member.
+ *                 28/11/05  Added copy member.
  */
 
 #include "FitsIO.hxx"
@@ -46,6 +47,10 @@ public:
     // Return the class name as a string
     const char* classname() const {return "StarFitsIO";}
     
+    // Return a copy of this object that shares the data, but can have a
+    // different current HDU
+    StarFitsIO* copy();
+
     // Read a FITS file and return a pointer to an allocated StarFitsIO object
     // NULL if an error occurred
     static StarFitsIO* read(const char* filename, int memOptions = 0);
