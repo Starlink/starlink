@@ -122,10 +122,13 @@ itcl::class skycat::SkyCatCtrl {
 	after idle [code $this load_graphics_from_image]
 
 	# delete temp files once they are loaded
-	set filename [$image_ cget -file]
-	if {[string match {/tmp/cat[0-9]*} $filename]} {
-	    catch {file delete $filename}
-	}
+        # PWD: let's not GAIA relies of access to the image for other reasons
+        # (like the various toolboxes and catalogue access). These images
+        # should be deleted by AstroCat.
+	#set filename [$image_ cget -file]
+	#if {[string match {/tmp/cat[0-9]*} $filename]} {
+	#    catch {file delete $filename}
+	#}
     }
 
     
