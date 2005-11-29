@@ -170,7 +170,7 @@
 *        returned.
 *     IPIC( NP ) = INTEGER (Returned)
 *        An array of AGI identifiers corresponding to the extra pictures
-*        requested in ZSIDE and PSIZE. The world coordinate system for each
+*        requested in PSIDE and PSIZE. The world coordinate system for each
 *        picture is inherited from the FRAME picture. The actual size of a 
 *        picture may be less than the requested size if there is insufficient 
 *        room left in the FRAME picture to give it its requested size. 
