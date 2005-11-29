@@ -18,6 +18,8 @@ dnl    Uses C compiler to link against Fortran libraries, so we need
 dnl    this.
 AC_FC_LIBRARY_LDFLAGS
 
+AC_FC_MAIN
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_FUNCS(round)
