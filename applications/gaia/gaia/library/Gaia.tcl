@@ -82,7 +82,8 @@
 #     05-MAY-2005 (PWD):
 #        Added RICE compression changes.
 #     17-NOV-2005 (PWD):
-#        Update to Skycat version 2.7.4.
+#        Update to Skycat version 2.7.4. No longer need to play with tkwait in
+#        noblock_clone.
 #     {enter_changes_here}
 
 #-
@@ -1337,18 +1338,14 @@ itcl::class gaia::Gaia {
 	 }
       }
 
-      #  Start a new clone, block the tkwait if asked.
-      if { ! $block } {
-	 rename ::tkwait ::real_tkwait
-	 rename ::false_tkwait ::tkwait
-      }
-      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage" "$name"
+      #  Start a new clone, do not wait for application to exit, when not
+      #  blocking.
+      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage" \
+         "$name" $block
 
       #  Actually we only arrive here if not blocking, except when
       #  application is exiting, so clone number is wrong.
       if { ! $block } {
-	 rename ::tkwait ::false_tkwait
-	 rename ::real_tkwait ::tkwait
 	 tkwait visibility $name
 	 if { $number != {} } {
 
@@ -1374,7 +1371,7 @@ itcl::class gaia::Gaia {
       replace_image_ $filename
 
       #  And create the new clone.
-      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"]
+      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage" ]
       return $prefix_[expr $clone_cnt_+1]
    }
 
@@ -1901,10 +1898,6 @@ window gives you access to this."
 
    # prefix to use to create new main windows.
    common prefix_ ".gaia"
-}
-
-#  Procedure to stop tkwait from working...
-proc false_tkwait {args} {
 }
 
 #  XXX redefine the body of AstroCat::new_catalog, as this contains a
