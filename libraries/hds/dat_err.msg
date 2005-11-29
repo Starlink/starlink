@@ -30,7 +30,7 @@ FILNF	<File not found>
 FILPR	<File protected>
 INCHK	<Integrity check>
 FATAL	<Fatal internal error>
-WEIRD	<Unkown error>
+WEIRD	<Unknown error>
 EXCPA	<Too many data parameters>
 UNKPA	<Unknown data parameter>
 ISOPN	<Parameter is currently active>
