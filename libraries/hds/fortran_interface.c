@@ -1334,6 +1334,39 @@ F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
 }
 
+F77_SUBROUTINE(dat_prec)( CHARACTER(locator),
+			  INTEGER(nbytes),
+			  INTEGER(status)
+			  TRAIL(locator) )
+
+{
+/*==========================================*/
+/* DAT_PREC - Enquire object primitive size */
+/*==========================================*/
+
+#undef context_name
+#undef context_message
+#define context_name "DAT_PREC_ERR"
+#define context_message\
+        "DAT_PREC: Error enquiring the object primitive size."
+
+/* Local variables.     */
+   HDSLoc locator_c;
+   size_t nbytes_c;
+   
+/* Enter routine.	*/
+   if ( !_ok(*status) ) return;
+
+/* Import the input locator string                  */
+   _callv(dat1_import_floc( locator, locator_length, &locator_c, status ));
+
+/* Call pure C routine */
+   nbytes_c = (size_t)*nbytes;
+   datPrec( &locator_c, &nbytes_c, status );
+   *nbytes = nbytes_c;
+
+}
+
 F77_SUBROUTINE(dat_prim)( CHARACTER(locator),
                           F77_LOGICAL_TYPE *reply,
                           F77_INTEGER_TYPE *status
@@ -2022,7 +2055,7 @@ F77_SUBROUTINE(dat_there)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
-   int reply_c = 0;
+   int reply_c = FALSE;
    
 /* Enter routine.	*/
 
@@ -2101,7 +2134,7 @@ F77_SUBROUTINE(dat_valid)( CHARACTER(locator),
 
 /* Local variables.     */
    HDSLoc locator_c;
-   int reply_c = 0;
+   int reply_c = FALSE;
    
 /* Enter routine.	*/
 
@@ -2122,7 +2155,7 @@ F77_SUBROUTINE(dat_valid)( CHARACTER(locator),
 
 /* clear any bad status and set valid to FALSE */
    if ( *status != SAI__OK ) {
-     reply_c = 0;
+     reply_c = FALSE;
      emsAnnul( status );
    }
 
