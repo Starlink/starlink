@@ -42,6 +42,8 @@
 *        Factor out I/O code to smf_open_file
 *     2005-11-07 (TIMJ):
 *        Replace fits example code with call to smf_fits_getI
+*     2005-11-28 (TIMJ):
+*        Use smf_close_file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -215,6 +217,8 @@ void smurf_flatfield( int *status ) {
     } 
     msgOutif(MSG__VERB," ","Flat field applied", status);
     ndfAnnul( &outndf, status);
+
+    smf_close_file( &data, status );
   }
 
 
