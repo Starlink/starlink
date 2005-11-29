@@ -8,7 +8,7 @@
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int dat1_import_loc( struct LOC * loc,
+   int dat1_import_loc( const struct LOC * loc,
                          struct LCP **lcp )
    {
 /*+                                                                         */
