@@ -40,6 +40,7 @@ F_ROUTINES = dummy.f
 ENTRY_PREFIX=
 
 getdlname = grep 'dlname=' convert_idl.la | sed -e 's:dlname=::' -e s:\'::g
+getshortdlname = grep 'library_names=' convert_idl.la | sed -e s:\'::g | awk '{print $$3}'
 
 edit = sed \
         -e 's,@libdir\@,$(libdir),g' \
@@ -69,10 +70,12 @@ CLEANFILES = $(MISC_BUILT_FILES)
 
 ##
 ## Post install hooks. Need to make a link to the shareable library into
-## bindir for compatibility with old behaviour and DLM loaded code.
+## bindir for compatibility with old behaviour and DLM loaded code. Note
+## DLM does like versioning of the sharable library, so we avoid the 
+## dlname and use the last of library_names.
 ## 
 install-exec-hook: convert_idl.la
-	DLNAME="`$(getdlname)`" ;\
+	DLNAME="`$(getshortdlname)`" ;\
 	cd $(DESTDIR)/$(bindir) ;\
 	if test -f "$$DLNAME"; then \
 	   rm -f $$DLNAME ;\
