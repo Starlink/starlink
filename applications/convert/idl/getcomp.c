@@ -79,27 +79,32 @@
 
 void getcomp( char *object, const char *acmode, HDSLoc ** loc, int *status ) {
 
-char *saveptr;
-char *tempstr;
-char *comp;
-HDSLoc * tmploc = NULL;
 HDSLoc * botloc = NULL;
-char name[DAT__SZNAM+1];
-int file_opened=FALSE;
-int slice;
-int ndims;
-int starts[DAT__MXDIM];
+HDSLoc * tmploc = NULL;
+char *comp;
+char *name = NULL;
+char *saveptr;
+char *tempstr = NULL;
 int ends[DAT__MXDIM];
+int file_opened=FALSE;
+int ndims;
+int slice;
+int starts[DAT__MXDIM];
 int true=TRUE;
 
+   if ( ( (tempstr = (char *)calloc(strlen(object)+2,sizeof(char))) != NULL )
+	&& ( (name = (char *)malloc(strlen(object))) != NULL ) ) {
 
-   if ( (tempstr = (char *)calloc(strlen(object)+2,sizeof(char))) != NULL ) {
       saveptr = strcpy( tempstr, object );
+
 /* Only the last component spec can be a slice so set slice false here */
 /* and test initially and after each but the last                      */
       slice = FALSE;
       while ( ( *status == SAI__OK ) && 
            ( (comp=strtok( saveptr, "." )) != NULL ) ) {
+
+         botloc=NULL;
+         tmploc=NULL;
          saveptr = comp + strlen(comp) + 1;
 /* Check if previous was an array slice form of component spec */
          if ( slice ) {
@@ -149,9 +154,13 @@ int true=TRUE;
          }
       }
       free( tempstr );
+      free( name );
 
    } else {
       *status = SAI__ERROR;
       emsRep(" ", "GETCOMP: failed to malloc space", status );
+      if ( tempstr != NULL ) {
+	free( tempstr );
+      }
    }
 }
