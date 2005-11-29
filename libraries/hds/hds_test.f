@@ -28,6 +28,8 @@
 *        Removed calls to HDS_START and HDS_STOP - no longer needed.
 *     08-NOV-2005 (PWD):
 *        Added call to HDS_TUNE to switch on 64 bit mode.
+*     29-NOV-2005 (TIMJ):
+*        Add test for DAT_PREC and DAT_CCTYP
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -61,6 +63,9 @@
       INTEGER CDIM(2)            ! Cell dimensions
       REAL    ANSWER
       LOGICAL PRIM
+      INTEGER NBYTES
+      INTEGER CSIZE              ! Size to allocate _CHAR field
+      CHARACTER * (DAT__SZTYP) CTYPE ! type field for _CHAR
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -80,6 +85,10 @@
      :              STATUS )
       CALL DAT_NEW( LOC1, 'DATA_ARRAY', '_INTEGER', 2, DIM, STATUS )
 
+      CSIZE = 20
+      CALL DAT_CCTYP( 20, CTYPE )
+      CALL DAT_NEW( LOC1, 'CHARTEST', CTYPE, 0, DIM, STATUS )
+
 *  Find and map the data array.
       CALL DAT_FIND( LOC1, 'DATA_ARRAY', LOC2, STATUS )
       CALL DAT_MAPV( LOC2, '_REAL', 'WRITE', PNTR, EL, STATUS )
@@ -98,7 +107,7 @@
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 1) THEN
+         IF (NCOMP .NE. 2) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
@@ -113,9 +122,36 @@
       CDIM(2) = 3
       CALL DAT_VEC( LOC2, LOC3, STATUS )
       CALL DAT_SIZE( LOC3, CDIM(2), STATUS )
-      CALL DAT_ANNUL( LOC3, STATUS )
-      CALL DAT_PRIM( LOC2, PRIM, STATUS )
 
+      CALL DAT_PREC( LOC3, NBYTES, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         IF ( NBYTES .NE. 4 ) THEN
+            STATUS = SAI__ERROR
+            CALL EMS_SETI( 'N', NBYTES)
+            CALL EMS_REP('HDS_TEST_ERR_PREC', 
+     :           'Precision of _REAL component != 4 (got ^N)', STATUS)
+         END IF
+      END IF
+
+      CALL DAT_ANNUL( LOC3, STATUS )
+
+*  Now look for the string component
+      CALL DAT_FIND( LOC1, 'CHARTEST', LOC3, STATUS ) 
+      CALL DAT_PREC( LOC3, NBYTES, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         IF ( NBYTES .NE. CSIZE ) THEN
+            STATUS = SAI__ERROR
+            CALL EMS_SETI( 'CMP1', CSIZE )
+            CALL EMS_SETI( 'REF', CSIZE )
+            CALL EMS_SETI( 'N', NBYTES )
+            CALL EMS_REP('HDS_TEST_ERR_PREC', 
+     :           'Precision of _CHAR*^CMP1 component != ^REF (got ^N)', 
+     :           STATUS)
+         END IF
+      END IF
+      call DAT_ANNUL( LOC3, STATUS )
+
+      CALL DAT_PRIM( LOC2, PRIM, STATUS )
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
 
 *  Sum the data elements.
