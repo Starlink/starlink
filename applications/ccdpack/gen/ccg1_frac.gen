@@ -172,6 +172,7 @@
 
 *  Local Variables:
       <LTYPE> AVELIM           ! Half the average of data limits
+      <LTYPE> AVEBIN
       DOUBLE PRECISION BINSIZ  ! Bin width of histogram
       DOUBLE PRECISION CLIPFR( NLIMIT ) ! Bin contents clipped as fraction
       INTEGER CLIPSU( NLIMIT ) ! Count of bin contents clipped
@@ -422,9 +423,9 @@
             ELSE
                AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
-               MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
-     :                  MIN( NUM_ITO<T>( VAL__MAXI ),
-     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) ) )
+               AVEBIN = RANGE / AVELIM / VAL__EPS<T> / 2<CONST>
+               MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>(
+     :                  MIN( NUM_ITO<T>( VAL__MAXI ), AVEBIN ) ) ) )
             END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself
