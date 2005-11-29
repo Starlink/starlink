@@ -13,7 +13,7 @@ convert_idl_la_SOURCES = \
  $(PRIVATE_INCLUDES) \
  $(C_ROUTINES)
 
-convert_idl_la_LIBADD = $(LIBADD) `ndf_link`
+convert_idl_la_LIBADD = $(LIBADD) `ndf_link` @FCLIBS@
 
 ## We want to dlopen this library.
 convert_idl_la_LDFLAGS = -module
