@@ -21,6 +21,7 @@
  *                 15/08/00  Made write virtual so it can be overriden.
  * pbiereic        17/02/03  Revised byte-order issues
  * Peter W. Draper 13/06/05  Made setHDU virtual so it can be overriden.
+ *                 28/11/05  Made copy virtual so it can be overridden.
  */
 
 #include <cstdio>
@@ -106,7 +107,7 @@ public:
     ~FitsIO();
 
     // Return a copy of this object that shares the data, but can have a different current HDU
-    FitsIO* copy();
+    virtual FitsIO* copy();
 
     // initialize world coordinates (based on the image header)
     int wcsinit();
