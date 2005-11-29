@@ -361,23 +361,26 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Add help for GAIA and SkyCat.
+   #  Add help for GAIA and SkyCat. Gets called a lot from base classes, so
+   #  make sure done just once.
    public method add_help_menu {} {
-      global ::gaia_dir
-      puts "add_help_menu"
-      set m [add_help_button index "Help topics index..." \
-                {Display the main help window and index}]
+      if { ! $help_menu_done_ } { 
+         set help_menu_done_ 1
+         global ::gaia_dir
+         set m [add_help_button index "Help topics index..." \
+                   {Display the main help window and index}]
 
-      add_menuitem $m command "About ${appname_}..." \
-         {Display a window with information about this GAIA/SkyCat version} \
-         -command [code $itk_component(image) about]
+         add_menuitem $m command "About ${appname_}..." \
+            {Display a window with information about this GAIA/SkyCat version}\
+            -command [code $itk_component(image) about]
 
-      add_menuitem $m command "SkyCat..." \
-         {Display information about SkyCat in netscape (if netscape is available)} \
-         -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
+         add_menuitem $m command "SkyCat..." \
+            {Display information about SkyCat in netscape (if netscape is available)} \
+            -command [code $itk_component(image) send_to_netscape $itk_option(-help_url)]
 
-      add_short_help $itk_component(menubar).help \
-         {Help menu: display information about this application}
+         add_short_help $itk_component(menubar).help \
+            {Help menu: display information about this application}
+      }
    }
 
    #  Create the rtd image widget with the extended RTD functionality
@@ -1890,6 +1893,9 @@ window gives you access to this."
 
    #  The last cube sent for display.
    protected variable lastcube_ {}
+
+   #  Control re-creation of the help menu (gets called from Rtd and SkyCat).
+   protected variable help_menu_done_ 0
 
    # -- Common variables --
 
