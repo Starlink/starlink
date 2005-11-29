@@ -138,6 +138,7 @@ if ( !ndims ) {
 
 /* Now go through the structure setting up the tags array */
    for ( i=1; (*status==SAI__OK) && (i<=ncomp); i++ ) {
+      cloc = NULL;
       datIndex( sloc, i, &cloc, status );
       datName( cloc, name, status );
       datPrim( cloc, &prim, status );

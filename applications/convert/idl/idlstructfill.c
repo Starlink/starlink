@@ -202,6 +202,7 @@ IDL_ARRAY arr;            /* subdirectory array structure */
                      idltype = datav->type;
 
 /* Get locator to i'th component of the HDS structure */
+                     cloc = NULL;
                      datIndex( aloc, i, &cloc, status );
                      if( *status != SAI__OK ) {         
                         emsRep(" ", "Failed locator to next index", status );
