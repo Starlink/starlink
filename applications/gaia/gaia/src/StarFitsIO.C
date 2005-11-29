@@ -114,6 +114,24 @@ StarFitsIO::~StarFitsIO()
     //}
 }
 
+
+/*
+ * Return a copy of this object that shares the data, but can have a different
+ * current HDU . Override FitsIO version so we create StarFitsIO objects.
+ */
+StarFitsIO* StarFitsIO::copy()
+{
+    int status = 0;
+    fitsfile* newFitsio;
+    fits_reopen_file( fitsio_, &newFitsio, &status );
+    if ( status != 0 ) {
+        return NULL;
+    }
+    return new StarFitsIO( width_, height_, bitpix_, bzero_, bscale_, 
+                           header_, data_, newFitsio );
+}
+
+
 /*
  *  Read a FITS file and return an initialized StarFitsIO object for it,
  *  or NULL if there are errors.
