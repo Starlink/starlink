@@ -15,7 +15,8 @@
 *    comp = char * (Given)
 *       The component specifier - can include index or slice info
 *    name = char[] (Returned)
-*       The component name stripped of any index or slice info
+*       The component name stripped of any index or slice info, must
+*       be at least as big as "comp".
 *    slice = int * (Returned)
 *       If the component spec is a slice
 *    ndims = int * (Returned)
