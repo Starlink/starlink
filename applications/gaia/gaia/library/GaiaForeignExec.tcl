@@ -175,7 +175,9 @@ itcl::class gaia::GaiaForeignExec {
       set args [$command_queue_ pop]
       if { $args != {}  } {
 
-         #  Run the jobs with the current arguments.
+         #  Run the jobs with the current arguments. PWD: note that
+         #  gbexec used to use "--" to stop any further arguments from
+         #  being interpreted as options, seems to have broken, so take care.
          set forret_($this) {}
          set forerr_($this) {}
          set forout_($this) {}
@@ -186,7 +188,7 @@ itcl::class gaia::GaiaForeignExec {
                          -output \[scope forout_($this)\] \
                          -onoutput \[code $this inform_\] \
                          -onerror \[code $this error_\] \
-                         -- $application $args"} msg
+                         $application $args"} msg
          if { $msg != {} } {
             error_ "$msg"
          }
