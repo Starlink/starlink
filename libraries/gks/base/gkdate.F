@@ -29,7 +29,9 @@
 *     MONTH  OUT  Month of year (01:12)
 *     IDAY   OUT  Day of month  (01:31)
 *
+#if HAVE_INTRINSIC_IDATE || HAVE_IDATE
       EXTERNAL IDATE
+#endif
       INTEGER IYEAR,MONTH,IDAY
 *
 * LOCALS
