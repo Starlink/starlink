@@ -2,8 +2,7 @@ NDF Library
 -----------
 
 V1.6-1
-   + Add new routine ndfGtfts for reading a FITS extension from an NDF
-   + For the C interface, all routines that used to take or return
+   For the C interface, all routines that used to take or return
    HDS Locators as char buffers of size DAT__SZLOC, have been modified
    to take HDSLoc pointers, matching the new C interface to HDS. All
    existing C programmes that use these routines will need to be modified

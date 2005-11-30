@@ -34,8 +34,6 @@
 /*       Added public C interface.                                          */
 /*    18-NOV-2005 (TIMJ):                                                   */
 /*       Use HDSLoc* rather than char [DAT__SZLOC]                          */
-/*    25-NOV-2005 (TIMJ):                                                   */
-/*       Add ndfGtfts                                                       */
 /*    <{enter_further_changes_here}>					    */
 
 /*-									    */
@@ -342,10 +340,6 @@ void ndfFtype( int indf,
                const char *comp,
                char *ftype,
                int ftype_length,
-               int *status );
-
-int  ndfGtfts( int indf,
-               AstFitsChan **fchan,
                int *status );
 
 void ndfGtune( const char *tpar,
