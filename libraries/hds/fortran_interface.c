@@ -2800,3 +2800,36 @@ F77_SUBROUTINE(dat_tune) ( CHARACTER(name),
    cnfFree( name_c );
 }
 
+F77_SUBROUTINE(dat_rcopy)( CHARACTER(locator1),
+                          CHARACTER(locator2),
+                          CHARACTER(name),
+                          INTEGER(status)
+	                  TRAIL(locator1)
+                          TRAIL(locator2)
+                          TRAIL(name) )
+{
+
+/*===================================*/
+/* DAT_RCOPY - Recursive copy object */
+/*     Obsoleted by DAT_COPY         */
+/*===================================*/
+
+/* Local variables.     */
+   HDSLoc locator1_c;
+   HDSLoc locator2_c;
+   char name_c[DAT__SZNAM+1];
+   
+/* Enter routine.	*/
+   printf("DAT_RCOPY() is deprecated. Please use DAT_ERASE instead\n");
+
+/* Import name string */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c);
+
+/* Import the locator strings                  */
+   dat1_import_floc( locator1, locator1_length, &locator1_c, status);
+   dat1_import_floc( locator2, locator2_length, &locator2_c, status);
+
+/* Call pure C routine                                       */
+   datCopy( &locator1_c, &locator2_c, name_c, status);
+}
+
