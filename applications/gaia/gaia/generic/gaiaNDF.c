@@ -53,8 +53,8 @@
 #include "f77.h"
 #include "ems_par.h"
 #include "ems.h"
+#include "merswrap.h"
 #include "star/hds.h"
-#include "dat_par.h"
 #include "dat_err.h"
 #include "ndf.h"
 #include "gaiaNDF.h"
@@ -299,6 +299,10 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
       dims[0] = (int) lheader / 80;
       F77_CREATE_CHARACTER_ARRAY( fhead, 80, dims[0] );
       cnfExprta( (char *) header, 80, fhead, 80, 1, dims );
+   }
+   else {
+       fhead = NULL;
+       fhead_length = 0;
    }
 
    /* Attempt to open the NDF. */
