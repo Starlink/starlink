@@ -7,6 +7,7 @@ lib_LTLIBRARIES = libkpg.la libkpg_adam.la libkpg_grf.la libkpg_grf_adam.la
 libkpg_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES) \
+	$(include_MESSAGES) \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) \
 	$(C_ROUTINES)
@@ -23,6 +24,7 @@ libkpg_grf_la_SOURCES = \
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+include_MESSAGES = kpg_err.h KPG_ERR
 
 PUBLIC_C_INCLUDES = kaplibs.h
 PUBLIC_F_INCLUDES = CTM_PAR 
@@ -31,9 +33,11 @@ PUBLIC_INCLUDES = $(PUBLIC_C_INCLUDES) $(PUBLIC_F_INCLUDES)
 PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM kaplibs_private.h
 BLOCK_DATA_FILES = ctm_xcols.f
 
+BUILT_SOURCES = $(include_MESSAGES)
+
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
-kpg1_kymp2.c kpg1_kymap.c kaplibs.c
+kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
