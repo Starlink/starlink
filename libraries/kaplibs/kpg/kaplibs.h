@@ -61,4 +61,7 @@ void irqRlse( IRQLocs **, int * );
 void irqNew( int, const char *, IRQLocs **, int * );
 void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
 void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
+
+int kpgGtfts( int indf, AstFitsChan ** fchan, int * status );
+
 #endif
