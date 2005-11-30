@@ -25,6 +25,8 @@ STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
 STAR_CHECK_PROGS( hlib )
 
+STAR_MESSGEN( [ libsmf/smf_err.msg ] )
+
 dnl    External libraries
 LIBS="$LIBS -L/usr/lib64"
 AC_CHECK_LIB( gslcblas, cblas_dsdot )

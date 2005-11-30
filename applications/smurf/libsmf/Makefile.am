@@ -9,3 +9,8 @@ smf_fits_getI.c smf_fits_getD.c \
 smf_tslice_ast.c
 
 noinst_INCLUDES = smf.h smf_typ.h
+
+# fac files must be installed
+noinst_MESSAGES = smf_err.h
+
+BUILT_ROUTINES = smf_err.h
