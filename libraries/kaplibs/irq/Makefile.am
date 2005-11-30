@@ -34,6 +34,8 @@ G_ROUTINES = irq1_sbad1.gen irq_sbad.gen
 
 ADAM_F_ROUTINES = irq_getqx.f
 
+BUILT_SOURCES = $(include_MESSAGES)
+
 #  Run generic to get numeric types.
 GFLAGS = n
 .gen.f:
