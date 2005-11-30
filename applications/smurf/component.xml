@@ -13,7 +13,7 @@ the James Clerk Maxwell Telescope. The tasks allows one to completely
 reduce your SCUBA-2 data.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link>
   </dependencies>
   <developers>
     <person>
