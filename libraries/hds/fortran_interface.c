@@ -401,7 +401,7 @@ F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
 /* Enter routine.	*/
 
 /* Call pure C routine                                       */
-   datErmsg( status, &length_c, &msg_c );
+   datErmsg( *status, &length_c, &msg_c );
 
 /* Export the returned C string to FORTRAN variable    */
    *length = (F77_INTEGER_TYPE)length_c;

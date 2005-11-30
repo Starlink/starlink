@@ -131,7 +131,7 @@ datErase(HDSLoc   *locator,
 /*===========================================================*/
 
 int
-datErmsg(int      *status,
+datErmsg(int      status,
          size_t   *len,
          char     **msg_str);
 

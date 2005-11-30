@@ -20,8 +20,8 @@
  */
  
 int
-datErmsg(int  *status,
-         int  *len,
+datErmsg(int  status,
+         size_t *len,
          char **msg_str)
 {
 /*
@@ -65,10 +65,15 @@ datErmsg(int  *status,
 *     -  No returned error message will contain more significant
 *     characters than the value of the EMS__SZMSG symbolic constant.
 *     This constant is defined in the include file EMS_PAR.
+*     - The C interface stores a pointer to a static buffer in the
+*     return argument. Additional calls to this routine may change
+*     the value so a copy should be taken if a permanent record is
+*     required.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,6 +94,10 @@ datErmsg(int  *status,
 *        Convert to C routine.
 *     22-AUG-2002 (BKM):
 *        Revise C interface and test
+*     29-NOV-2005 (TIMJ):
+*        No reason to pass in a pointer to status.
+*        Initialise trans. Use size_t for len arg.
+*        Use modern ems interface.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,14 +108,14 @@ datErmsg(int  *status,
 
 /* Local Variables:                                                         */
    char sysbuf[ EMS__SZMSG + 1 ];    /* Buffer for system translation       */
-   char *trans;                      /* Pointer to translation text         */
+   char *trans = NULL;               /* Pointer to translation text         */
    int lstat;                        /* Local status variable               */
 
 /*.                                                                         */
 
 /* Test for each DAT__ error code, obtaining a pointer to the textual       */
 /* translation.                                                             */
-   switch ( *status )
+   switch ( status )
    {
       default:
          trans = NULL;
@@ -258,7 +267,7 @@ datErmsg(int  *status,
    if ( trans != NULL )
    {
       *msg_str = trans;
-      *len = strlen( trans );
+      *len = strlen( *msg_str );
    }
 
 /* If the error code is not a DAT__ error code, then use ems_ to translate  */
@@ -267,10 +276,10 @@ datErmsg(int  *status,
    else
    {
       lstat = DAT__OK;
-      ems_mark_c( );
-      ems_syser_c( "MESSAGE", *status );
-      ems_mload_c( " ", "^MESSAGE", sysbuf, len, &lstat );
-      ems_rlse_c( );
+      emsMark( );
+      emsSyser( "MESSAGE", status );
+      emsMload( " ", "^MESSAGE", sysbuf, (int*)len, &lstat );
+      emsRlse( );
       *msg_str = sysbuf;
    }
 
