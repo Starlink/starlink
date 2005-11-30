@@ -183,7 +183,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       ndfState( indf, "VARIANCE", &vexists, status);
 
       /* Map each component as necessary */
-      ndfMap( indf, "DATA", dtype, mode, &outdata, &nout, status );
+      ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
       if (qexists) {
 	ndfMap( indf, "QUALITY", dtype, mode, &outdata[2], &nout, status );
       }
