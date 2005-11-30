@@ -2,18 +2,18 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#      surf_link_adam
+#      smurf_link_adam
 
 #  Purpose:
-#     Generate linker (ld) arguments for linking against SURF.
+#     Generate linker (ld) arguments for linking against SMURF.
 
 #  Type of Module:
 #     Bourne-shell script.
 
 #  Description:
-#     This script lists the linking qualifiers for the non-SURF
-#     libraries used by SURF.  It should be invoked by those building
-#     SURF or other applications which use SURF libraries in order to
+#     This script lists the linking qualifiers for the non-SMURF
+#     libraries used by SMURF.  It should be invoked by those building
+#     SMURF or other applications which use SMURF libraries in order to
 #     generate the correct arguments for the compiler (or ld) command.
 #     The arguments generated are written to the standard output.
 
@@ -29,9 +29,6 @@
 #         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) `surf_libs` \
 #             -L$(STAR_LIB) `./surf_link_adam`
 
-#  Copyright:
-#     Copyright (C) 1995 Rutherford Appleton Laboratory
-
 #  Authors:
 #     TJ:   Tim Jenness (JACH)
 #     MJC:  Malcolm J. Currie (STARLINK)
@@ -40,7 +37,7 @@
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+#     Copyright (C) 1995,1996,1997,1998,1999,2005 Particle Physics and Astronomy
 #     Research Council. All Rights Reserved.
 
 #  History:
@@ -70,6 +67,10 @@
 #        Stop using SGS/GKS
 #     2004 July 27 (TJ)
 #        Use SHL
+#     2005 Sep 27 (TJ):
+#        Copy from surf_link_adam for SMURF usage
+#     2005 Nov 30 (TJ):
+#        Add KAPLIBS
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -81,7 +82,7 @@
       echo `ndf_link_adam` `fio_link_adam` \
            `sla_link_adam` `shl_link_adam` `pda_link_adam` \
            `prm_link_adam` \
-           `grp_link_adam` `ndg_link_adam` \
+           `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
