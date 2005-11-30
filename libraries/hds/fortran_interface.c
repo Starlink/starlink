@@ -2762,3 +2762,41 @@ F77_SUBROUTINE(dat_rcera)( CHARACTER(locator), CHARACTER(cname), INTEGER(status)
    datErase( &locator_c, cname_c, status );
    return;
 }
+
+
+F77_SUBROUTINE(dat_tune) ( CHARACTER(name),
+                           INTEGER(value),
+                           INTEGER(status)
+                           TRAIL(name) )
+{
+/*=========================================*/
+/* DAT_TUNE - Set HDS tuning parameter     */
+/*        Obsoleted by HDS_TUNE            */
+/*=========================================*/
+
+/* Local variables.     */
+   char *name_c;
+ 
+/* Enter routine.       */
+
+   if (*status != SAI__OK ) return;
+
+   printf("DAT_TUNE is obsoleted by HDS_TUNE\n");
+
+/* Import NAME argument to C string */
+
+   name_c = cnfCreim( name, name_length );
+   
+/* Call pure C routine  */
+   if (strncmp(name_c, "NCOMP", 5) == 0 ) {
+      hdsTune( name_c, value, status );
+   } else {
+      emsSetc( "NM", name_c );
+      emsRep("DAT_TUNE_ERR", "Unrecognized tuning parameter (^NM)",
+           status );
+   }
+   
+/* Free allocated string memory.                             */
+   cnfFree( name_c );
+}
+
