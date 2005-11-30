@@ -1,3 +1,6 @@
+KPG_ERR
+kpg_err.h
+fac*_err
 kpg1_fftf.f
 kpg1_rmap.f
 kpg1_sqsu.f
