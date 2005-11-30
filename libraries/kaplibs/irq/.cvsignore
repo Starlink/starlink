@@ -1,3 +1,5 @@
+fac_1507_err
+IRQ_ERR
 *.lo
 *.la
 Makefile
