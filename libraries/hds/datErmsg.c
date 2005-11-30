@@ -110,6 +110,7 @@ datErmsg(int  status,
    char sysbuf[ EMS__SZMSG + 1 ];    /* Buffer for system translation       */
    char *trans = NULL;               /* Pointer to translation text         */
    int lstat;                        /* Local status variable               */
+   int emslen;                       /* Length from EMS                     */
 
 /*.                                                                         */
 
@@ -278,7 +279,8 @@ datErmsg(int  status,
       lstat = DAT__OK;
       emsMark( );
       emsSyser( "MESSAGE", status );
-      emsMload( " ", "^MESSAGE", sysbuf, (int*)len, &lstat );
+      emsMload( " ", "^MESSAGE", sysbuf, &emslen, &lstat );
+      *len = emslen;
       emsRlse( );
       *msg_str = sysbuf;
    }
