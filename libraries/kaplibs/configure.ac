@@ -27,6 +27,10 @@ STAR_DECLARE_DEPENDENCIES(build, [agi ast cat chr cnf fio generic gks gns grp hd
 STAR_DECLARE_DEPENDENCIES(link, [agi ast cat fio grp mag mers ndf ndg pcs pda pgplot prm psx psx snx trn])
 STAR_DECLARE_DEPENDENCIES(sourceset, [htx sst])
 
+dnl    There are numerous messgen files, and all should be listed here, so
+dnl    that they are listed as `predist' files.
+STAR_MESSGEN([ kpg/kpg_err.msg irq/irq_err.msg ])
+
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun238)
