@@ -13,10 +13,10 @@
 *     C function
 
 *  Invocation:
-*     smf_fits_getD( smfHead * hdr, const char * name, double * result, int * status );
+*     smf_fits_getD( const smfHead * hdr, const char * name, double * result, int * status );
 
 *  Arguments:
-*     hdr = smfHdr* (Given)
+*     hdr = const smfHdr* (Given)
 *        Header struct. Assumed to contain a FitsChan in the hdr slot
 *     name = const char * (Given)
 *        Name of the FITS Item to retrieve.
@@ -36,6 +36,8 @@
 *  History:
 *     2005-11-08 (TIMJ):
 *        Initial version.
+*     2005-11-29 (TIMJ):
+*        Indicate consting in prolog
 *     {enter_further_changes_here}
 
 *  Notes:
