@@ -158,6 +158,18 @@ F77_SUBROUTINE(dat_ccopy)( CHARACTER(locator1),
    datExportFloc( &locator3_c, 1, locator3_length, locator3, status );
 }
 
+F77_SUBROUTINE(dat_cctyp)( INTEGER(size), CHARACTER(type)
+                           TRAIL(type) )
+{
+/*============================================*/
+/* DAT_CCTYP - Determine _CHAR*nnnn type      */
+/*============================================*/
+
+  char type_c[DAT__SZTYP+1];
+  datCctyp( *size, type_c );
+  cnfExprt( type_c, type, type_length );
+}
+
 F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
                           F77_INTEGER_TYPE *ndim,
                           FORTRAN_INDEX_TYPE subs[],

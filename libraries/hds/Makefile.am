@@ -66,7 +66,7 @@ F_ROUTINES = \
 	cmp_getnx.f cmp_getvx.f cmp_len.f cmp_mapn.f cmp_mapv.f \
 	cmp_mod.f cmp_modc.f cmp_prim.f cmp_put0x.f cmp_put1x.f \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
-	cmp_type.f cmp_unmap.f dat_cctyp.f dat_erdsc.f \
+	cmp_type.f cmp_unmap.f dat_erdsc.f \
 	dat_erdsn.f dat_ertxt.f dat_get1x.f dat_getnx.f \
 	dat_getvx.f dat_mapn.f dat_msg.f dat_new0.f \
 	dat_new0c.f dat_new0x.f dat_new1.f dat_new1c.f dat_new1x.f \

@@ -198,8 +198,6 @@ datNew( HDSLoc    *locator,
 /* DAT_NEWC - Create string component */
 /*====================================*/                    
 
-void datCctyp( size_t size, char type[DAT__SZTYP] );
-
 int
 datNewC(HDSLoc    *locator,
         char      *name_str,

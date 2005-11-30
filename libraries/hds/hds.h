@@ -48,6 +48,15 @@ datCcopy(HDSLoc   *locator1,
          HDSLoc   **locator3,
          int      *status );
 
+/*=======================================*/
+/* datCctyp - construct _CHAR*nnn string */
+/*=======================================*/
+
+void
+datCctyp( size_t size,
+          char   type[DAT__SZTYP+1] );
+
+
 /*===========================================*/
 /* datCell - Locate a "cell" (array element) */
 /*===========================================*/
