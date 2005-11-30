@@ -84,6 +84,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "sc2da/sc2store.h"
+#include "star/kaplibs.h"
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status) {
 
@@ -191,7 +192,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       }
 
       /* Read the FITS headers */
-      ndfGtfts( indf, &fits, status );
+      kpgGtfts( indf, &fits, status );
 
       /* If we don't have a time series, then we can retrieve the stored WCS info */
       if ( !isTseries ) {
