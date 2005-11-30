@@ -5,7 +5,7 @@
       include 'PRM_PAR'
 
       integer status, m, m2, m3, f, perm(3)
-      double precision at(3)
+      double precision at(3), bt(3)
 
       status = sai__ok
 
@@ -39,11 +39,14 @@
       at( 2 ) = 3.0D4;
       at( 3 ) = 1.0D0;
 
-      call ast_trann( m, 1, 3, 1, at, 1, 3, 1, at, status )
+      call ast_trann( m, 1, 3, 1, at, 1, 3, 1, bt, status )
 
-      if( abs( at(1)-1.14159265D0) .gt. 1.0D-6 ) call stopit(6,status)
-      if( at(2) .ne. 3.0D4 ) call stopit(7,status)
-      if( abs( at(3)-4.14159265D0) .gt. 1.0D-6 ) call stopit(8,status)
+      if( abs( bt(1)-1.14159265D0) .gt. 1.0D-6 ) then
+         write(*,*) bt(1)-1.14159265D0
+         call stopit(6,status)
+      end if
+      if( bt(2) .ne. 3.0D4 ) call stopit(7,status)
+      if( abs( bt(3)-4.14159265D0) .gt. 1.0D-6 ) call stopit(8,status)
 
 
       if( status .eq. sai__ok ) then
