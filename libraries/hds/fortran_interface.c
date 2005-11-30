@@ -408,6 +408,29 @@ F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
    cnfExprt( msg_c, msg, msg_length );
 }
 
+F77_SUBROUTINE(dat_ertxt)( CHARACTER(text),
+                           INTEGER(status)
+                           TRAIL(text) )
+{
+
+/*=====================================================*/
+/* DAT_ERTXT - Report an error including supplied text */
+/*=====================================================*/
+
+/* Local variables.     */
+   char *text_c;
+
+/* Enter routine.	*/
+
+/* Import string */
+   text_c = cnfCreim( text, text_length );
+
+/* Call pure C routine                                       */
+   datErtxt( text_c, status );
+
+   cnfFree( text_c );
+}
+
 F77_SUBROUTINE(dat_find)( CHARACTER(locator1),
                           CHARACTER(name),
                           CHARACTER(locator2),

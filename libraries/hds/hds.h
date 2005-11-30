@@ -135,6 +135,14 @@ datErmsg(int      status,
          size_t   *len,
          char     **msg_str);
 
+/*=================================================*/
+/* datErtxt - Report error including supplied text */
+/*=================================================*/
+
+void
+datErtxt(const char * text,
+         int        * status );
+
 /*================================*/
 /* datFind - Find named component */
 /*================================*/
