@@ -27,7 +27,12 @@
 
 *  Macros:
 *     Public:
-*        None.
+*        AST__UNDEFF
+*           Floating point value marking an undefined keyword value.
+*        AST__UNDEFS
+*           A string used to mark an undefined keyword value.
+*        AST__UNDEFI
+*           Integer value marking an undefined keyword value.
 *
 *     Protected:
 *        AST__NOTYPE
@@ -48,6 +53,8 @@
 *           Integer dentifier for the complex integer FITS data type.
 *        AST__LOGICAL 
 *           Integer dentifier for the logical FITS data type.
+*        AST__UNDEF
+*           Integer dentifier for undefined FITS data type.
 
 *  Feature Test Macros:
 *     astCLASS
@@ -94,6 +101,7 @@
 /* Interface definitions. */
 /* ---------------------- */
 #include "channel.h"             /* I/O channels (parent class) */
+#include "pointset.h"            /* Defines AST__BAD */
 
 /* C header files. */
 /* --------------- */
@@ -103,6 +111,11 @@
 
 /* Macros. */
 /* ------- */
+
+#define AST__UNDEFF  -123456789.0
+#define AST__UNDEFS  "<undefined>"
+#define AST__UNDEFI -123456789
+
 #if defined(astCLASS)            /* Protected */
 #define AST__NOTYPE       -1
 #define AST__COMMENT       0
@@ -113,7 +126,10 @@
 #define AST__COMPLEXI      5
 #define AST__LOGICAL       6
 #define AST__CONTINUE      7
+#define AST__UNDEF         8
 #endif
+
+
 
 /* Type Definitions. */
 /* ================= */
@@ -174,6 +190,7 @@ typedef struct AstFitsChanVtab {
    int (* GetFitsF)( AstFitsChan *, const char *, double * );
    int (* GetFitsI)( AstFitsChan *, const char *, int * );
    int (* GetFitsL)( AstFitsChan *, const char *, int * );
+   int (* GetFitsU)( AstFitsChan *, const char *, int * );
    int (* GetFitsS)( AstFitsChan *, const char *, char ** );
    int (* GetFitsCN)( AstFitsChan *, const char *, char ** );
    int (* FitsGetCom)( AstFitsChan *, const char *, char ** );
@@ -183,6 +200,7 @@ typedef struct AstFitsChanVtab {
    void (* SetFitsF)( AstFitsChan *, const char *, double, const char *, int  );
    void (* SetFitsI)( AstFitsChan *, const char *, int, const char *, int  );
    void (* SetFitsL)( AstFitsChan *, const char *, int, const char *, int  );
+   void (* SetFitsU)( AstFitsChan *, const char *, int, const char *, int  );
    void (* SetFitsS)( AstFitsChan *, const char *, const char *, const char *, int  );
    void (* SetFitsCN)( AstFitsChan *, const char *, const char *, const char *, int  );
    int (* GetCard)( AstFitsChan * );
@@ -281,6 +299,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    void astSetFitsF_( AstFitsChan *, const char *, double, const char *, int  );
    void astSetFitsI_( AstFitsChan *, const char *, int, const char *, int  );
    void astSetFitsL_( AstFitsChan *, const char *, int, const char *, int  );
+   void astSetFitsU_( AstFitsChan *, const char *, int, const char *, int  );
    void astSetFitsS_( AstFitsChan *, const char *, const char *, const char *, int  );
    void astSetFitsCN_( AstFitsChan *, const char *, const char *, const char *, int  );
    int  astGetFitsCF_( AstFitsChan *, const char *, double * );
@@ -288,6 +307,7 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    int  astGetFitsF_( AstFitsChan *, const char *, double * );
    int  astGetFitsI_( AstFitsChan *, const char *, int * );
    int  astGetFitsL_( AstFitsChan *, const char *, int * );
+   int  astGetFitsU_( AstFitsChan *, const char *, int * );
    int  astGetFitsS_( AstFitsChan *, const char *, char ** );
    int  astGetFitsCN_( AstFitsChan *, const char *, char ** );
 
@@ -430,6 +450,9 @@ astINVOKE(V,astSetFitsCF_(astCheckFitsChan(this),name,value,comment,overwrite))
 #define astSetFitsL(this,name,value,comment,overwrite) \
 astINVOKE(V,astSetFitsL_(astCheckFitsChan(this),name,value,comment,overwrite))
 
+#define astSetFitsU(this,name,value,comment,overwrite) \
+astINVOKE(V,astSetFitsU_(astCheckFitsChan(this),name,value,comment,overwrite))
+
 #define astGetFitsCF(this,name,value) \
 astINVOKE(V,astGetFitsCF_(astCheckFitsChan(this),name,value))
 
@@ -444,6 +467,9 @@ astINVOKE(V,astGetFitsI_(astCheckFitsChan(this),name,value))
 
 #define astGetFitsL(this,name,value) \
 astINVOKE(V,astGetFitsL_(astCheckFitsChan(this),name,value))
+
+#define astGetFitsU(this,name,value) \
+astINVOKE(V,astGetFitsU_(astCheckFitsChan(this),name,value))
 
 #define astGetFitsS(this,name,value) \
 astINVOKE(V,astGetFitsS_(astCheckFitsChan(this),name,value))

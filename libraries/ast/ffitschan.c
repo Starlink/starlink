@@ -646,13 +646,14 @@ F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
       if ( astOK && RESULT == F77_TRUE ) { \
          len = (int) strlen( value ); \
          for( i = 0; i < VALUE_length && i < len; i++ ) VALUE[i] = value[i]; \
+      } else { \
+         i = 0; \
       } \
       for( ; i < VALUE_length; i++ ) VALUE[i] = ' '; \
       (void) astFree( (void *) name ); \
    ) \
    return RESULT; \
 }
-
 
 MAKE_AST_GETFITS(s,S,S)
 MAKE_AST_GETFITS(cn,CN,CN)
