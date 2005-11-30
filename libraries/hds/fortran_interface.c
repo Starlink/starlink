@@ -2,6 +2,7 @@
 #  include <config.h>
 #endif
 
+#include <stdio.h>
 #include "f77.h"              /* F77 <-> C interface macros                  */
 #include "cnf.h"              /* F77 <-> C string handling functions         */
 #include "str.h"              /* String constants                            */
@@ -2740,4 +2741,24 @@ F77_SUBROUTINE(hds_close)( CHARACTER(locator),
 
 /* Export nulled locator */
    datExportFloc( &locator_c, 1, locator_length, locator, status );
+}
+
+/*==============================================*/
+/* Obsolete routines that have no C counterpart */
+/*==============================================*/
+
+F77_SUBROUTINE(dat_rcera)( CHARACTER(locator), CHARACTER(cname), INTEGER(status)
+                           TRAIL(locator) TRAIL(cname) )
+{
+/*=============================================*/
+/* DAT_RCERA - recursive erase (use DAT_ERASE) */
+/*=============================================*/ 
+   HDSLoc locator_c;
+   char cname_c[DAT__SZNAM+1];
+
+   printf("DAT_RCERA() is deprecated. Please use DAT_ERASE instead\n");
+   cnfImpn( cname, cname_length, DAT__SZNAM,  cname_c);
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+   datErase( &locator_c, cname_c, status );
+   return;
 }

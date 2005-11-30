@@ -71,7 +71,7 @@ F_ROUTINES = \
 	dat_getvx.f dat_mapn.f dat_msg.f dat_new0.f \
 	dat_new0c.f dat_new0x.f dat_new1.f dat_new1c.f dat_new1x.f \
 	dat_put1x.f dat_putnx.f \
-	dat_putvx.f dat_rcera.f dat_rcopy.f dat_ref.f dat_tune.f
+	dat_putvx.f dat_rcopy.f dat_ref.f dat_tune.f
 
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
