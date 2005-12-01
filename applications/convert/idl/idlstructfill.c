@@ -202,7 +202,6 @@ IDL_ARRAY arr;            /* subdirectory array structure */
                      idltype = datav->type;
 
 /* Get locator to i'th component of the HDS structure */
-                     cloc = NULL;
                      datIndex( aloc, i, &cloc, status );
                      if( *status != SAI__OK ) {         
                         emsRep(" ", "Failed locator to next index", status );
@@ -222,8 +221,8 @@ IDL_ARRAY arr;            /* subdirectory array structure */
 /* It's primitive data */
                            idlprimfill( cloc, datav, tdata, status );                           
                         }
-                        datAnnul( &cloc, status );
                      } /* end index  got OK */
+                     datAnnul( &cloc, status );
                   } /* end offset got OK */
                } /* end for each component */
             } /* end of component number agreement OK */

@@ -138,7 +138,6 @@ if ( !ndims ) {
 
 /* Now go through the structure setting up the tags array */
    for ( i=1; (*status==SAI__OK) && (i<=ncomp); i++ ) {
-      cloc = NULL;
       datIndex( sloc, i, &cloc, status );
       datName( cloc, name, status );
       datPrim( cloc, &prim, status );
@@ -202,10 +201,10 @@ if ( !ndims ) {
                emsRep( " ", "Illegal type ^TYPE", status );
             }
 
-            datAnnul( &cloc, status );
          } /* endif cloc OK */
 
       } /* end if structure */
+      datAnnul( &cloc, status );
 
 /* Set the flags */
       tags[i].flags = (UCHAR)0;
