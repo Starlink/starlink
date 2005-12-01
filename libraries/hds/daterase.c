@@ -67,7 +67,7 @@ datErase(HDSLoc *locator,
 
 /* Import locator.      */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
 
 /* Return if the locator points to anything other than a single structure

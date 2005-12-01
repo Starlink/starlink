@@ -50,7 +50,7 @@ hdsLink(HDSLoc *locator,
 
 /* Import the locator.  */
 
-   dat1_import_loc( locator, &lcp );
+   _call(dat1_import_loc( locator, &lcp ));
    data = &lcp->data;
    
 /* Save the group specification.        */
@@ -163,7 +163,7 @@ hdsGroup(HDSLoc *locator,
 
 /* Import the locator.  */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
 
 /* Copy the group specification from the LCP.   */

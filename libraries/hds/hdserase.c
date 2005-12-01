@@ -41,7 +41,7 @@ hdsErase(HDSLoc **locator,
 
 /* Import the locator.       */
 
-   dat1_import_loc(*locator, &lcp );
+   _call(dat1_import_loc(*locator, &lcp ));
    data = &lcp->data;
 
 /* Return if the locator is not associated with a top-level object.         */

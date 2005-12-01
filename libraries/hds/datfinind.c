@@ -279,7 +279,7 @@ datIndex(HDSLoc *locator1,
 
 /* Import the source locator.  */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1 = &lcp1->data;
 
 /* Return if the locator points to anything other than a single structure

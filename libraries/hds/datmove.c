@@ -71,7 +71,7 @@ datMove(HDSLoc **locator1,
 
 /* Import the first locator.    */
 
-   dat1_import_loc(*locator1, &lcp1 );
+   _call(dat1_import_loc(*locator1, &lcp1 ));
    data1 = &lcp1->data;
    state1 = &data1->state;
 
@@ -87,7 +87,7 @@ datMove(HDSLoc **locator1,
 /* Import the second locator and return if it points to anything other than
    a single structure object.   */
 
-   dat1_import_loc(locator2, &lcp2 );
+   _call(dat1_import_loc(locator2, &lcp2 ));
    data2 = &lcp2->data;
    if (!data2->struc || data2->naxes != 0)
       _call(DAT__OBJIN)

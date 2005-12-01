@@ -77,7 +77,7 @@ datMap(HDSLoc    *locator,
 
 /* Import the locator.  */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
    state = &data->state;
 
@@ -445,7 +445,7 @@ datBasic(HDSLoc *locator,
 
 /* Import the locator.  */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data  = &lcp->data;
    state = &data->state;
 
@@ -549,7 +549,7 @@ datUnmap(HDSLoc *locator,
 
 /* Import locator.  */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
 
 /* Return if the locator is associated with a structure.        */

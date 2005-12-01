@@ -56,7 +56,7 @@ datSlice(HDSLoc   *locator1,
 
 /* Import the source locator.   */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1 = &lcp1->data;
 
 /* Get the current object shape and check that the # of dimensions matches
@@ -168,7 +168,7 @@ datCell( HDSLoc *locator1,
 
 /* Import the source locator.   */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -258,7 +258,7 @@ datVec(HDSLoc *locator1,
 
 /* Import the source locator.   */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1  = &lcp1->data;
    state1 = &data1->state;
 
@@ -336,7 +336,7 @@ datCoerc(HDSLoc *locator1,
 
 /* Import the source locator.   */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1 = &lcp1->data;
 
 /* Ensure that the requested # dimensions is valid.     */
@@ -416,7 +416,7 @@ datClone(HDSLoc *locator1,
 
 /* Import the source locator.   */
 
-   dat1_import_loc(locator1, &lcp1 );
+   _call(dat1_import_loc(locator1, &lcp1 ));
    data1 = &lcp1->data;
 
 /* Export the destination locator and copy all the LCP data fields.     */

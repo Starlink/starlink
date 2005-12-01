@@ -55,7 +55,7 @@ datAlter(HDSLoc    *locator,
 
 /* Import locator.   */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data  = &lcp->data;
    state = &data->state;
 
@@ -172,7 +172,7 @@ datReset( HDSLoc *locator,
 
 /* Import locator string and locator.   */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
 
 /* If the container file is not open for read-only access, then clear
@@ -216,7 +216,7 @@ datMould( HDSLoc    *locator,
 
 /* Import locator string and locator.   */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data  = &lcp->data;
    state = &data->state;
 
@@ -303,7 +303,7 @@ datRenam(HDSLoc *locator,
 /* Import locator and name strings.     */
 
    _strcsimp  ( &name, name_str );
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
 
    data = &lcp->data;
 
@@ -402,7 +402,7 @@ datRetyp(HDSLoc *locator,
 
 /* Import locator.      */
 
-   dat1_import_loc(locator, &lcp );
+   _call(dat1_import_loc(locator, &lcp ));
    data = &lcp->data;
 
 /* Return if the container file was opened for read only access.            */
