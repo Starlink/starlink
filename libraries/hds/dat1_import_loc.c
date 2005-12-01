@@ -2,6 +2,8 @@
 #  include <config.h>
 #endif
 
+#include <stdio.h>
+#include <ctype.h>
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
@@ -57,6 +59,8 @@
 /*       Change HDS 32/64-bit flag appropriately for locator                */
 /*    15-NOV-2005 (TIMJ):                                                   */
 /*       Change API to use the struct LOC explcitly                         */
+/*    30-NOV-2005 (TIMJ):                                                   */
+/*       Try to be a bit cleverer when printing a bad locator               */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -65,8 +69,12 @@
 /*-                                                                         */
 
 /* Local Variables:                                                         */
+      int i;                     /* Loop counter */
       int valid;                 /* Locator valid?                          */
       struct RCL rcl;            /* Record Control Label                    */
+      char strpntr[20];          /* Pointer location of bad loc             */
+      char strloc[DAT__SZLOC+1]; /* Temp buffer for printing locator        */
+      char *ctmp;                /* char pointer to error locator           */
 
 /*.                                                                         */
 
@@ -118,8 +126,8 @@
                     ( rcl.parent.chip != (*lcp)->data.parent.chip ) )
                {
                   hds_gl_status = DAT__INCHK;
-                  ems_setc_c( "NAME", (*lcp)->data.name, DAT__SZNAM );
-                  ems_rep_c( "DAT1_IMPORT_LOC_1",
+                  emsSetnc( "NAME", (*lcp)->data.name, DAT__SZNAM );
+                  emsRep( "DAT1_IMPORT_LOC_1",
                              "Locator refers to an object \'^NAME\' which no \
 longer exists (possible programming error or corrupted HDS container file).",
                              &hds_gl_status );
@@ -135,12 +143,31 @@ longer exists (possible programming error or corrupted HDS container file).",
 	    if (loc == NULL) {
 	      emsSetc( "VALUE", "NULL" );
 	    } else {
-	      ems_setc_c( "VALUE", (char*)loc, sizeof(struct LOC) );
+	      /* extract printable characters */
+	      ctmp = (char *)loc;
+	      for (i = 0; i < sizeof(struct LOC); i++ ) {
+		if (isprint( ctmp[i] ) ) {
+		  strloc[i] = ctmp[i];
+		} else {
+		  /* unprintable */
+		  strloc[i] = '?';
+		}
+	      }
+	      strloc[i] = '\0';
+
+	      /* Limit the token to the first few characters (since
+		 it won't be printable in general */
+	      emsSetnc( "VALUE", strloc, sizeof(struct LOC) );
 	    }
-            ems_seti_c( "LENGTH", sizeof(struct LOC) );
-            ems_rep_c( "DAT1_IMPORT_LOC_2",
-                       "HDS locator invalid for import: value=\'^VALUE\', length=^LENGTH \
-(possible programming error).",
+
+	    /* Store the pointer */
+	    sprintf(strpntr, "%p", loc ); 
+	    emsSetc( "PNTR", strpntr );
+
+            emsSeti( "LENGTH", sizeof(struct LOC) );
+            emsRep( "DAT1_IMPORT_LOC_2",
+                       "HDS locator invalid for import: value=\'^VALUE\', length=^LENGTH, \
+ location=^PNTR (possible programming error).",
                        &hds_gl_status );
          }
       }
