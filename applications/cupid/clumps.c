@@ -310,6 +310,9 @@ void clumps() {
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* astSetWatchId( 2223 ); */
+
+
 /* Initialise things to safe values. */
    rmask = NULL;
    clist = NULL;
@@ -501,9 +504,9 @@ void clumps() {
                                 keymap, velax, ilevel, &nclump, &bg ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
-      cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, keymap, 
-                      velax, ilevel ); 
-
+      clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
+                              keymap, velax, ilevel, &nclump, &bg ); 
+      
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
       errRep( "CLUMPS_ERR1", "Requested Method ^METH has not yet been "
@@ -616,5 +619,10 @@ L999:
       errRep( "CLUMPS_ERR", "CLUMPS: Failed to identify clumps of emission "
               "within a 1, 2 or 3-D NDF.", status );
    }
+
+   astListIssued( "At end of CLUMPS" );
+
+
+
 }
 

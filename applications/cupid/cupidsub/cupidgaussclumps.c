@@ -166,8 +166,12 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    int peaks_below;     /* Count of consecutive peaks below the threshold */
    void *res;           /* Pointer to residuals array */
 
+/* Initialise */
+   clist = NULL;
+   *nclump = 0;
+
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return NULL;
+   if( *status != SAI__OK ) return clist;
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -249,9 +253,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
       mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5 );
 
 /* Initialise the number of clumps found so far. */
-      *nclump = 0;
       iclump = 0;
-      clist = NULL;
 
 /* Initialise the sum of the background estimates, and the number of such
    estimates summed. */

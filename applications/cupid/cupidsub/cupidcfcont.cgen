@@ -1,0 +1,355 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "mers.h"
+#include "ast.h"
+#include <math.h>
+
+/* Local Macros */
+
+
+#define CHECK_NEIGHBOUR \
+\
+/* If the neighbouring pixel is already assigned to a clump, add the \
+   central pixel to the list of pixels which touch that clump (so long as
+   the central pixel has not already been flagged as the neighbour of some
+   other clump), and skip to the next neighbouring pixel. */ \
+         if( ipa[ iel ] != CUPID__CFNULL ) { \
+            if( !isneb && ipa[ iel ] != ps->index ) { \
+               clump_index = ipa[ iel ]; \
+               j = w1[ clump_index ]++; \
+               w2[ clump_index ] = astGrow( w2[ clump_index ], w1[ clump_index ], \
+                                            sizeof( int ) ); \
+               w2[ clump_index ][ j ] = i0; \
+               isneb = 1; \
+            } \
+\
+/* We ignore neighbouring pixels which are bad or are below the contour  \
+   level. */ \
+         } else if( ipd[ iel ] != CGEN_BAD && ipd[ iel ] >= clevel ) { \
+\
+/* Call this function recursively to add the neighbour to the PixelSet. */ \
+            CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip, x, \
+                                        iel, ps, clevel, w1, w2, naxis ); \
+         } 
+
+
+
+#define CHECK_UPNEIGHBOUR(ii) \
+\
+/* Check the upper neighbour is not off the edge of the array. */ \
+      if( x[ ii ] < dims[ ii ] ) { \
+\
+/* Modify the 1D vector index and nD GRID coords to represent the coords \
+   of the upper neighbour on axis "ii". */ \
+         iel += skip[ ii ]; \
+         x[ ii ]++; \
+\
+/* Check the neighbour. */ \
+         CHECK_NEIGHBOUR; \
+\
+/* Revert the 1D vector index and nD GRID coords to the original values. */ \
+         iel -= skip[ ii ]; \
+         x[ ii ]--; \
+      }
+
+
+
+#define CHECK_LONEIGHBOUR(ii) \
+\
+/* Check the lower neighbour is not off the edge of the array. */ \
+      if( x[ ii ] > 1 ) { \
+\
+/* Modify the 1D vector index and nD GRID coords to represent the coords \
+   of the lower neighbour on axis "ii". */ \
+         iel -= skip[ ii ]; \
+         x[ ii ]--; \
+\
+/* Check the neighbour. */ \
+         CHECK_NEIGHBOUR; \
+\
+/* Revert the 1D vector index and nD GRID coords to the original values. */ \
+         iel += skip[ ii ]; \
+         x[ ii ]++; \
+      }
+
+
+#define CHECK_NEIGHBOURS(ii) \
+   CHECK_LONEIGHBOUR(ii); \
+   CHECK_UPNEIGHBOUR(ii);
+
+
+
+
+
+void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
+                                 int *dims, int *skip, int *x, int iel, 
+                                 CupidPixelSet *ps, double clevel, int *w1,
+                                 int **w2, int naxis ){
+/*
+*  Name:
+*     cupidCFCont<X>
+
+*  Purpose:
+*     Identify contiguous regions of pixels at a given contour level.
+
+*  Synopsis:
+*     void cupidCFCont<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
+*                          int *dims, int *skip, int *x, int iel, 
+*                          CupidPixelSet *ps, double clevel, int *w1,
+*                          int **w2, int naxis )
+
+*  Description:
+*     This function identifies a contiguous set of pixels within the
+*     supplied array which are all at or above the given contour level
+*     and have not yet been assigned to any clump. The caller supplies
+*     the index of a single pixel which is known to be part of the contiguous
+*     set. This pixel is marked as being in the set and its immediate 
+*     neighbours are then checked recursively using this function.
+*
+*     A record is kept of any pixels which touch previously assigned
+*     clumps. 
+
+*  Parameters:
+*     ipd
+*        Pointer to the start of the supplied data array. 
+*     ipa
+*        Pointer to the start of the array holding the integer index
+*        (if any) associated with each pixel in the data array. This
+*        array should be the same shape and size as the data array.
+*     nel
+*        The number of elements in the data array. 
+*     ndim
+*        The number of pixel axes in the data array.
+*     dims
+*        The number of pixels on each pixel axis of the data array.
+*     skip
+*        The increment in 1D vector index required to move a distance of 1 
+*        pixel along each axis.
+*     iel
+*        The index of a pixel known to be within the set.
+*     x
+*        An array holding the n-D GRID coords of the array element
+*        specified by "iel".
+*     ps
+*        A pointer to CupidPixelSet structure in which to srtore
+*        information about the identifies contiguous set of pixels.
+*     clevel
+*        The data value at which to scan the supplied data array.
+*     w1
+*        Pointer to an array of ints with one element for every existing 
+*        PixelSet (i.e. the highest index value issued so far, plus 1). 
+*        Element "i" of this array contains the number of pixels within 
+*        the new PixelSet which touch PixelSet "i". 
+*     w2
+*        Pointer to an array with one element for every existing PixelSet 
+*        (i.e. the highest index value issued so far, plus 1). Each
+*        element in the array is a pointer to another int array. The
+*        number of elements in each of these secondary array is given by
+*        the corresponding entry in the "w1" array. If the "w1" array 
+*        contains zero, then the corresponding pointer in "w2" will be
+*        NULL. If a pixel in the new PixelSet touches an existing PixelSet 
+*        which has index "i", then the 1D vector index of the pixel will
+*        be appended to the end of the secondary array stored at index "i"
+*        within the "w2" array.
+*     naxis
+*        Determines which adjoining pixels are considered to be
+*        "neighbours" of the supplied pixel. Should be in the range 1 to
+*        "ndim". Neighbours must be 1 pixel away along no more than "naxis" 
+*        axes.
+
+*  Notes:
+*     - This function can be invoked using the generic cupidCFCont macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidCFCont<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidCFCont... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     25-NOV-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int clump_index;     /* Index of neighbouring clump */
+   int i0;              /* 1D vector index of central pixel */
+   int i;               /* Axis index */
+   int isneb;           /* Is central pixel neighboured by another clump? */
+   int j;               /* Index of last neighbouring pixel */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Assign the required index to the pixel in the index assignment array */
+   ipa[ iel ] = ps->index;   
+
+/* Extend the bounding box to include the pixel */
+   for( i = 0; i < ndim; i++ ) {
+      if( x[ i ] < ps->lbnd[ i ] ) ps->lbnd[ i ] = x[ i ];
+      if( x[ i ] > ps->ubnd[ i ] ) ps->ubnd[ i ] = x[ i ];
+   }
+
+/* If this point is greater than the highest value yet found in the clump, 
+   record it. */
+   if( ipd[ iel ] > ps->vpeak ) {
+      for( i = 0; i < ndim; i++ ) ps->peak[ i ]  = x[ i ];
+      ps->vpeak = ipd[ iel ];
+   }
+
+/* Save the 1D vector index of the point whose neighbours are being tested. */
+   i0 = iel;
+
+/* Indicate that as yet this point has not been found to adjoin any
+   neighbouring PixelSet. */
+   isneb = 0;
+
+/* We now check each immediate neighbour of the supplied pixel. First
+   check the pixels which are 1 pixel away along only one of the three axes.
+   For each axis, extend the PixelSet to include the upper and lower 
+   neighbours on the axis, if appropriate. This uses local macros defined 
+   at the start of this file. */
+   for( i = 0; i < ndim; i++ ) {
+      CHECK_NEIGHBOURS(i);
+   }
+
+/* If required, now check the pixels which are 1 pixel away along two axes. 
+   For a naxis value of 2, "ndim" must be either 2 or 3 (it cannot be 1). */
+   if( naxis >= 2 ) {
+
+/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper 
+   neighbour on axis 0. */
+      if( x[ 0 ] < dims[ 0 ] ) {
+         iel += skip[ 0 ];
+         x[ 0 ]++;
+
+/* Extend the PixelSet to include the neighbours on the 2nd axis. */
+         CHECK_NEIGHBOURS(1);
+
+/* Revert the coords. */
+         iel -= skip[ 0 ];
+         x[ 0 ]--;
+      }
+
+/* Similarly, do the lower neighbour on axis 0. */
+      if( x[ 0 ] > 1 ) {
+         iel -= skip[ 0 ];
+         x[ 0 ]--;
+         CHECK_NEIGHBOURS(1);
+         iel += skip[ 0 ];
+         x[ 0 ]++;
+      }
+
+/* For 3D arrays we need to find the new neighbours along the 3rd axis as
+   well. */
+      if( ndim == 3 ) {
+
+/* If not at the upper edge on the 3rd axis, consider the upper neighbours */
+         if( x[ 2 ] < dims[ 2 ] ) {
+            iel += skip[ 2 ];
+            x[ 2 ]++;
+
+/* Check the upper and lower neighbours on axis 0. */
+            CHECK_NEIGHBOURS(0);
+
+/* Check the upper and lower neighbours on axis 1. */
+            CHECK_NEIGHBOURS(1);
+
+/* Revert the coords on axis 2. */
+            iel -= skip[ 2 ];
+            x[ 2 ]--;
+         }
+
+/* If not at the lower edge on the 3rd axis, consider the lower neighbours */
+         if( x[ 2 ] > 1 ) {
+            iel -= skip[ 2 ];
+            x[ 2 ]--;
+
+            CHECK_NEIGHBOURS(0);
+            CHECK_NEIGHBOURS(1);
+
+            iel += skip[ 2 ];
+            x[ 2 ]++;
+
+         }
+      }
+
+/* If required, now check the pixels which are 1 pixel away along three axes. 
+   For a naxis value of 3, "ndim" must be 3 (it cannot be 1 or 2). */
+      if( naxis == 3 ) {
+
+/* If not at the upper edge on the 3rd axis, consider the upper neighbours */
+         if( x[ 2 ] < dims[ 2 ] ) {
+            iel += skip[ 2 ];
+            x[ 2 ]++;
+
+/* If not at the upper edge on axis 0, get the 1D and nD coords at the upper 
+   neighbour on axis 0. */
+            if( x[ 0 ] < dims[ 0 ] ) {
+               iel += skip[ 0 ];
+               x[ 0 ]++;
+
+/* Extend the PixelSet to include the neighbours on the axis 1. */
+               CHECK_NEIGHBOURS(1);
+
+/* Revert the coords. */
+               iel -= skip[ 0 ];
+               x[ 0 ]--;
+            }
+
+/* Similarly, do the lower neighbour on axis 0. */
+            if( x[ 0 ] > 1 ) {
+               iel -= skip[ 0 ];
+               x[ 0 ]--;
+               CHECK_NEIGHBOURS(1);
+               iel += skip[ 0 ];
+               x[ 0 ]++;
+            }
+
+/* Revert the coords on axis 2. */
+            iel -= skip[ 2 ];
+            x[ 2 ]--;
+         }
+
+/* If not at the lower edge on the 3rd axis, consider the lower neighbours */
+         if( x[ 2 ] > 1 ) {
+            iel -= skip[ 2 ];
+            x[ 2 ]--;
+
+            if( x[ 0 ] < dims[ 0 ] ) {
+               iel += skip[ 0 ];
+               x[ 0 ]++;
+               CHECK_NEIGHBOURS(1);
+               iel -= skip[ 0 ];
+               x[ 0 ]--;
+            }
+
+            if( x[ 0 ] > 1 ) {
+               iel -= skip[ 0 ];
+               x[ 0 ]--;
+               CHECK_NEIGHBOURS(1);
+               iel += skip[ 0 ];
+               x[ 0 ]++;
+            }
+
+            iel += skip[ 2 ];
+            x[ 2 ]++;
+
+         }
+      }
+   }
+}
+
+#undef CHECK_NEIGHBOUR 
+#undef CHECK_UPNEIGHBOUR 
+#undef CHECK_LONEIGHBOUR 
+#undef CHECK_NEIGHBOURS 
+
+
