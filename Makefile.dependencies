@@ -1091,6 +1091,7 @@ $(MANIFESTS)/kaplibs: \
 		$(MANIFESTS)/idi \
 		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
