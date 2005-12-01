@@ -61,6 +61,8 @@
 /*       Change API to use the struct LOC explcitly                         */
 /*    30-NOV-2005 (TIMJ):                                                   */
 /*       Try to be a bit cleverer when printing a bad locator               */
+/*    01-DEC-2005 (TIMJ):                                                   */
+/*       Abandon any attempt to print the contents of the struct            */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -69,12 +71,9 @@
 /*-                                                                         */
 
 /* Local Variables:                                                         */
-      int i;                     /* Loop counter */
       int valid;                 /* Locator valid?                          */
       struct RCL rcl;            /* Record Control Label                    */
       char strpntr[20];          /* Pointer location of bad loc             */
-      char strloc[DAT__SZLOC+1]; /* Temp buffer for printing locator        */
-      char *ctmp;                /* char pointer to error locator           */
 
 /*.                                                                         */
 
@@ -140,34 +139,12 @@ longer exists (possible programming error or corrupted HDS container file).",
          if ( !valid && _ok( hds_gl_status ) )
          {
             hds_gl_status = DAT__LOCIN;
-	    if (loc == NULL) {
-	      emsSetc( "VALUE", "NULL" );
-	    } else {
-	      /* extract printable characters */
-	      ctmp = (char *)loc;
-	      for (i = 0; i < sizeof(struct LOC); i++ ) {
-		if (isprint( ctmp[i] ) ) {
-		  strloc[i] = ctmp[i];
-		} else {
-		  /* unprintable */
-		  strloc[i] = '?';
-		}
-	      }
-	      strloc[i] = '\0';
-
-	      /* Limit the token to the first few characters (since
-		 it won't be printable in general */
-	      emsSetnc( "VALUE", strloc, sizeof(struct LOC) );
-	    }
 
 	    /* Store the pointer */
 	    sprintf(strpntr, "%p", loc ); 
 	    emsSetc( "PNTR", strpntr );
-
-            emsSeti( "LENGTH", sizeof(struct LOC) );
             emsRep( "DAT1_IMPORT_LOC_2",
-                       "HDS locator invalid for import: value=\'^VALUE\', length=^LENGTH, \
- location=^PNTR (possible programming error).",
+		    "HDS locator invalid for import: value==^PNTR (possible programming error).",
                        &hds_gl_status );
          }
       }
