@@ -107,9 +107,9 @@ void smurf_makemap( int *status ) {
   int lbnd_in[2];            /* Lower pixel bounds for input maps */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
-  AstMapping *coordmap1;     /* Mapping bolo->celestial coordinates */
-  AstMapping *coordmap2;     /* Mapping celestial->output map coordinates */
-  AstCmpMap *coordmap;       /* Combination of coordmap1 and coordmap2 */
+  AstMapping *coordmap1=NULL;/* Mapping bolo->celestial coordinates */
+  AstMapping *coordmap2=NULL;/* Mapping celestial->output map coordinates */
+  AstCmpMap *coordmap=NULL;  /* Combination of coordmap1 and coordmap2 */
   int n;                     /* # elements in the output map */
   int ndfdims[NDF__MXDIM];   /* Dimensions of input NDF */
   int ndims;                 /* Number of active dimensions in input */
@@ -128,112 +128,148 @@ void smurf_makemap( int *status ) {
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-  /* Create output ndf */
+  /* Create and map output ndf */
 
-  /*ndgNdfas( igrp, 0, "READ", &indf, status );
-    ndfProp( indf, "HISTORY", "OUT", &ondf, status );
-    ndfAnnul( &indf, status); */
+  /*** KLUDGE *** temporary hard bounds for the output data range */
+  lbnd_out[0] = -256;    
+  lbnd_out[1] = -256;
+  ubnd_out[0] = 255;
+  ubnd_out[1] = 255;
 
-  lbnd_out[0] = 1;    /* dummy bounds for the output data */
-  lbnd_out[1] = 512;
-  ubnd_out[0] = 1;
-  ubnd_out[1] = 512;
-
-  ndfCreat( "OUT", "_REAL", 2, lbnd_out, ubnd_out, &ondf, status );
-  ndfMap( ondf, "DATA", "_REAL", "WRITE", data_index, &n, status);
+  ndfCreat( "OUT", "_DOUBLE", 2, lbnd_out, ubnd_out, &ondf, status );
+  ndfMap( ondf, "DATA", "_DOUBLE", "WRITE", data_index, &n, status);
 
   map = data_index[0];
 
   weights = (double *) malloc( sizeof(double)*512*512 );
 
-  /* First pass loop over all data to calculate output map dimensions */
-
-  /* Second pass loop over all data to identify the extent of the map */
+  /* Loop over all data to identify the extent of the map */
 
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_file( igrp, i, "READ", &data, status);
 
-    file = data->file;
-    pname =  file->name;
-    msgSetc("FILE", pname);
-    /*msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: check map dims from file ^FILE",
-      status);*/
-    msgOut(" ", "SMURF_MAKEMAP: check map dims from file ^FILE", 
-	     status);
+    if( *status == SAI__OK ) {
+      file = data->file;
+      pname =  file->name;
+      msgSetc("FILE", pname);
+      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Processing ^FILE",
+	       status);
     
-    /* Check that the data dimensions are 3 and get # time samples */
-    if( data->ndims != 3 ) {
-      *status = SAI__ERROR;
+      /* Check that the data dimensions are 3 and get # time samples */
+      if( data->ndims != 3 ) {
+	msgSetc("FILE", pname);
+	msgSeti("THEDIMS", data->ndims);
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE data has ^THEDIMS dimensions, should be 3.", 
+	       status);
+      }
+
+      /* Check that the input data type is double precision */
+      if( *status == SAI__OK ) switch( data->dtype ) {
+      case SMF__NULL:
+	msgSetc("FILE", pname);
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE has NULL data type, should be DOUBLE.",
+	       status);
+	break;
+
+      case SMF__INTEGER:
+	msgSetc("FILE", pname);
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE has INTEGER data type, should be DOUBLE.",
+	       status);
+	break;
+
+      case SMF__FLOAT:
+	msgSetc("FILE", pname);
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE has FLOAT data type, should be DOUBLE.",
+	       status);
+	break;
+      
+      default:
+	msgSetc("FILE", pname);
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE has unknown data type, should be DOUBLE.",
+	       status);
+      }
     }
+    else
+      errRep( "smurf_makemap", "Couldn't open input file.", status );
 
     /* Get the astrometry for all the time slices in this data file */
     if( *status == SAI__OK) for( j=0; j<data->dims[2]; j++ ) {
-      /*msgSeti("SLICE", j);
-	msgOut(" ", "time: ^SLICE", status);*/
-
       smf_tslice_ast( data, j, status);
 
-      hdr = data->hdr;
-      sc2hdr = hdr->sc2head;
+      if( *status == SAI__OK ) {
+	hdr = data->hdr;
+	sc2hdr = hdr->sc2head;
 
-      /* Create a mapping for the output map from pixels -> RA, Dec 
-	 using the base coordinates to get the coordinates of the tangent point
-	 Note: Ast assumes angular quantities are in degrees */
+	/* Create a mapping for the output map from pixels -> RA, Dec 
+	   using the base coordinates to get the coordinates of the tangent 
+	   point if it hasn't been done yet.
+	   Note: Ast assumes angular quantities are in degrees */
+	
+	if( coordmap1 == NULL ) { 
+	  fitschan = astFitsChan ( NULL, NULL, "" );
+	  
+	  sc2ast_makefitschan( 256.0, 256.0, 0.001, 0.001, 
+			       sc2hdr->tcs_tr_bc1*57.29577951, 
+			       sc2hdr->tcs_tr_bc2*57.29577951, 
+			       "RA---TAN", "DEC--TAN", 
+			       fitschan, status );
+	  
+	  astClear( fitschan, "Card" );
+	  
+	  outframeset = astRead( fitschan );
+	  
+	  /* Set the System attribute for the SkyFrame in the reference WCS 
+	     FrameSet to ICRS and extract the IRCS->REF_PIXEL mapping. */
+	  astSet( outframeset, "system=icrs" );
+	  
+	  coordmap1 = astGetMapping( outframeset, AST__CURRENT, AST__BASE );
+	}
+	
+	/* Set the System attribute for the SkyFrame in the input WCS FrameSet
+	   to ICRS and extract the IN_PIXEL->IRCS mapping. */
+	astSet( data->hdr->wcs, "system=icrs" );
+	coordmap2 = astGetMapping( data->hdr->wcs, AST__BASE, AST__CURRENT );
 
-      if( (i == 1) && (j == 0) )
-      { 
-	fitschan = astFitsChan ( NULL, NULL, "" );
-   
-	sc2ast_makefitschan( 256.0, 256.0, 0.001, 0.001, 
-			     sc2hdr->tcs_tr_bc1*57.29577951, 
-			     sc2hdr->tcs_tr_bc2*57.29577951, 
-			     "RA---TAN", "DEC--TAN", 
-			     fitschan, status );
+	/* Concatenate the two Mappings to get IN_PIXEL->REF_PIXEL Mapping */
+	coordmap = astCmpMap( coordmap1, coordmap2, 1, "" );
 
-	astClear( fitschan, "Card" );
-
-	outframeset = astRead( fitschan );
-
-	/* Set the System attribute for the SkyFrame in the reference WCS 
-	   FrameSet to ICRS and extract the IRCS->REF_PIXEL mapping. */
-	astSet( outframeset, "system=icrs" );
-
-	coordmap1 = astGetMapping( outframeset, AST__CURRENT, AST__BASE );
-
+	lbnd_in[0] = -(data->dims)[0] / 2;
+	lbnd_in[1] = -(data->dims)[1] / 2;
+	ubnd_in[0] = lbnd_in[0] + (data->dims)[0] - 1;
+	ubnd_in[1] = lbnd_in[1] + (data->dims)[1] - 1;
+	
+	if( data->dtype == SMF__DOUBLE ) {	
+	  astRebinSeqD(coordmap,0,
+		       2,lbnd_in, ubnd_in,(data->pntr)[0], NULL, 
+		       0, NULL, 0, 0, 0, -1,
+		       2,lbnd_out,ubnd_out,
+		       lbnd_in, ubnd_in,
+		       map, NULL, weights);
+	}
+	else {
+	  errRep("smurf_makemap", 
+		 "Can't rebin this time slice because wrong data type.", 
+		 status);
+	  *status = SAI__ERROR;
+	}
       }
-
-      /* Set the System attribute for the SkyFrame in the input WCS FrameSet
-	 to ICRS and extract the IN_PIXEL->IRCS mapping. */
-      astSet( data->hdr->wcs, "system=icrs" );
-      coordmap2 = astGetMapping( data->hdr->wcs, AST__BASE, AST__CURRENT );
-
-      /* Concatenate the two Mappings to get the IN_PIXEL->REF_PIXEL Mapping */
-      coordmap = astCmpMap( coordmap1, coordmap2, 1, "" );
-
-      lbnd_in[0] = 1;
-      lbnd_in[1] = 1;
-      ubnd_in[0] = (data->dims)[0];
-      ubnd_in[1] = (data->dims)[1];
-
-      if( data->dtype == SMF__FLOAT )
-      {	
-	/* msgOut(" ", "SMURF_MAKEMAP: Rebin timeslice", status); */
-	astRebinSeqF(coordmap,0,
-		     2,lbnd_in, ubnd_in,(data->pntr)[0], NULL, 
-		     0, NULL, 0, 0, 0, -1,
-		     2,lbnd_out,ubnd_out,
-		     lbnd_in, ubnd_in,
-		     map, NULL, weights);
-      }
+      
+      /* close data file */
+      smf_close_file( &data, status);
     }
-    
-    /* close data file */
-    smf_close_file( &data, status);
-
-
   }
-
+  
   ndfUnmap( ondf, "DATA", status);
   ndfAnnul( &ondf, status );
   ndfEnd( status );
@@ -242,9 +278,6 @@ void smurf_makemap( int *status ) {
 
   /* Tidy up after ourselves: release resources used by the grp routines  */
   grpDelet( &igrp, status);
-
-
-
 
 }
 
