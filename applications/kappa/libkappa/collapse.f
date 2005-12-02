@@ -183,6 +183,9 @@
 *        unweighted mean estimator "Mean".
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     2-DEC-2005 (DSB):
+*        Move the code for creating the output WCS FrameSet into a KPS
+*        routine.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -227,22 +230,19 @@
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame position
       DOUBLE PRECISION DLBND( NDF__MXDIM )  ! Lower bounds in pixel co-ords
       DOUBLE PRECISION DUBND( NDF__MXDIM )  ! Upper bounds in pixel co-ords
+      DOUBLE PRECISION GRDPOS( NDF__MXDIM ) ! A valid grid Frame position
       DOUBLE PRECISION PIXPOS( NDF__MXDIM ) ! A valid pixel Frame position
       DOUBLE PRECISION PPOS( 2, NDF__MXDIM )! Two pixel Frame positions
       DOUBLE PRECISION PRJ     ! Vector length projected onto a pixel axis
       DOUBLE PRECISION PRJMAX  ! Maximum vector length projected onto an axis
       INTEGER AXES( NDF__MXDIM )! A list of axis indices
-      INTEGER BFRM             ! Original Base Frame pointer
       INTEGER CFRM             ! Original Current Frame pointer
       INTEGER EL1              ! Number of elements in an input mapped array
       INTEGER EL2              ! Number of elements in an output mapped array
       INTEGER I                ! Loop count
       INTEGER IAXIS            ! Index of collapse axis within current Frame
-      INTEGER ICURR            ! Index of current Frame
       INTEGER INDF1            ! Input NDF identifier
       INTEGER INDF2            ! Output NDF identifier
-      INTEGER INEW             ! Index of new Frame
-      INTEGER IOLD             ! Index of old Frame
       INTEGER IPIN( 2 )        ! Pointers to mapped input arrays
       INTEGER IPIX             ! Index of PIXEL Frame within WCS FrameSet
       INTEGER IPOUT( 2 )       ! Pointers to mapped output arrays
@@ -257,20 +257,16 @@
       INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds of the output NDF
       INTEGER MAP              ! PIXEL Frame to Current Frame Mapping pointer
       INTEGER NAXC             ! Original number of current Frame axes
-      INTEGER NBFRM            ! New Base Frame pointer
-      INTEGER NCFRM            ! New Current Frame pointer
-      INTEGER NCOMP              ! No. of components within cell of AXIS array
+      INTEGER NCOMP            ! No. of components within cell of AXIS array
       INTEGER NDIM             ! No. of pixel axes in input NDF
       INTEGER NDIMO            ! No. of pixel axes in output NDF
       INTEGER NVAL             ! Number of values obtained (1)
-      INTEGER PMAP             ! Pointer to PermMap going from old to new Frame
       INTEGER UBND( NDF__MXDIM )! Upper pixel index bounds of the input NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the output NDF
-      LOGICAL GOTAX              ! Does the NDF have an AXIS component?
+      LOGICAL GOTAX            ! Does the NDF have an AXIS component?
       LOGICAL USEALL           ! Use the entire collapse pixel axis?
       LOGICAL VAR              ! Process variances?
       REAL WLIM                ! Value of WLIM parameter
-
 *.
 
 *  Check the global status.
@@ -294,7 +290,6 @@
 *  Extract the current and base Frames, and get the number of axes in the
 *  current Frame, and its title.
       CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-      BFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
       NAXC = AST_GETI( CFRM, 'NAXES', STATUS )
       TTLC = AST_GETC( CFRM, 'TITLE', STATUS )
 
@@ -362,6 +357,11 @@
       END DO
       CALL KPG1_ASGDP( MAP, NDIM, NAXC, DLBND, DUBND, PIXPOS, CURPOS, 
      :                 STATUS )
+
+*  Convert the pixel position into a grid position.
+      DO I = 1, NDIM
+         GRDPOS( I ) = PIXPOS( I ) - LBND( I ) + 1.5
+      END DO 
 
 *  Create two copies of these current Frame co-ordinates.
       DO I = 1, NAXC
@@ -624,45 +624,12 @@
       CALL NDF_MAP( INDF1, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
       CALL NDF_MAP( INDF2, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
 
-*  We now store an appropriate WCS FrameSet in the output NDF. This is a
-*  copy of the input NDFs WCS FrameSet but with the current and Base Frames
-*  modified to remove the collapse axis. Create a new Frame by picking these 
-*  axes from the original Base Frame. A PermMap is also created which goes 
-*  from the original Base Frame to the new Base Frame.
-      NBFRM = AST_PICKAXES( BFRM, NDIMO, AXES, PMAP, STATUS )
+*  We now modify the input NDFs WCS FrameSet by removing the collapsed
+*  axis from the base and current Frames.
+      CALL KPS1_CLPA0( IWCS, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
+     :                 GRDPOS, STATUS )
 
-*  Now add this new Frame into the FrameSet, using the PermMap created
-*  above to connect it to the origial Base Frame. This will make modify
-*  the current Frame, so note the index of the current Frame first, and
-*  re-instate it afterwards, remembering the index of the new Frame.
-      ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
-      CALL AST_ADDFRAME( IWCS, AST__BASE, PMAP, NBFRM, STATUS )       
-      INEW = AST_GETI( IWCS, 'CURRENT', STATUS )
-      CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
-
-*  Make the new Frame the Base Frame and remove the original Base Frame 
-*  since it is no longer needed.
-      IOLD = AST_GETI( IWCS, 'BASE', STATUS )
-      CALL AST_SETI( IWCS, 'BASE', INEW, STATUS )
-      CALL AST_REMOVEFRAME( IWCS, IOLD, STATUS )
-
-*  We now need to modify the current Frame similarly to remove the collapse 
-*  axis.
-      DO I = 1, NAXC - 1
-         IF( I .LT. IAXIS ) THEN
-            AXES( I ) = I
-         ELSE
-            AXES( I ) = I + 1
-         END IF
-      END DO
-
-      NCFRM = AST_PICKAXES( CFRM, NAXC - 1, AXES, PMAP, STATUS )
-
-      IOLD = AST_GETI( IWCS, 'CURRENT', STATUS )
-      CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NCFRM, STATUS )       
-      CALL AST_REMOVEFRAME( IWCS, IOLD, STATUS )
-
-*  Save this WCS Frameet in the output NDF.
+*  Save this modified WCS Frameet in the output NDF.
       CALL NDF_PTWCS( IWCS, INDF2, STATUS )      
 
 *  Get the ESTIMATOR and WLIM parameters.
