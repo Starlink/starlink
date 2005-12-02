@@ -212,7 +212,7 @@
 *  Clean up and erase the container file.
       CALL DAT_UNMAP( LOC2, STATUS )
       CALL DAT_ANNUL( LOC2, STATUS )
-*      CALL HDS_ERASE( LOC1, STATUS )
+      CALL HDS_ERASE( LOC1, STATUS )
 
 *  Check if the test ran OK. If so, then report success.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. INT(ANSWER) )) THEN
