@@ -21,7 +21,7 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astfindframe astpermaxes astpickaxes astsimplify asttrann astmapbox \
  astinvert astspecframe astsetrefpos astgetrefpos astformat asttran1 asttran2 \
  astmathmap astsetactunit astgetactunit astpolymap asttranmap astdsbframe \
- astfluxframe astsfluxframe astpolygon astellipse
+ astfluxframe astsfluxframe astpolygon astellipse astmapsplit
 
 FSRC = \
  atl1_gtgrp.f atl1_rdgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
@@ -95,7 +95,7 @@ astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
 astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
 astshiftmap.ifc astsimplify.ifc astskyframe.ifc astspecframe.ifc \
 asttest.ifc asttran1.ifc asttran2.ifc asttranmap.ifc asttrann.ifc \
-astunitmap.ifc astwinmap.ifc atlhelp.ifc  atools_mon.ifc
+astunitmap.ifc astwinmap.ifc atlhelp.ifc astmapsplit.ifc atools_mon.ifc
 
 IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
 astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
@@ -108,6 +108,6 @@ astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
 astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \
 astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl \
 asttest.ifl asttran1.ifl asttran2.ifl asttranmap.ifl asttrann.ifl \
-astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl
+astmapsplit.ifl astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl
 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)

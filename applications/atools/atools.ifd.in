@@ -4,6 +4,46 @@ package atools {
 
    executable atools_mon {
 
+      action astmapsplit {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter in {
+            position 2
+            type _INTEGER 
+            prompt {The indices of the required inputs}
+            ppath CURRENT 
+            helpkey *
+          }
+
+         parameter map {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the output Mapping}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter out {
+            position 3
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Mapping}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
       action astfluxframe {
 
          helplib {$ATOOLS_HELP}
