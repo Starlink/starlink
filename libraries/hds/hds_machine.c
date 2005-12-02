@@ -64,6 +64,15 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+
+#if HAVE_FC_MAIN
+void FC_MAIN () {}
+#endif
+
 #include "sae_par.h"
 #include "hds1.h"
 #include "hds.h"
