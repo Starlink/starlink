@@ -22,11 +22,11 @@
 /*================================*/                    
 
 int
-datNew( HDSLoc    *locator,
-        char      *name_str,
-        char      *type_str,
+datNew( const HDSLoc    *locator,
+        const char      *name_str,
+        const char      *type_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       *status)
 {
 #undef context_name
@@ -199,11 +199,11 @@ datNew( HDSLoc    *locator,
 /*====================================*/                    
 
 int
-datNewC(HDSLoc    *locator,
-        char      *name_str,
+datNewC(const HDSLoc    *locator,
+        const char      *name_str,
         size_t    len,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       *status)
 {
 
