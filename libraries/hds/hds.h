@@ -125,7 +125,6 @@ datErase(HDSLoc   *locator,
          char     *name_str,
          int      *status);
 
-
 /*===========================================================*/
 /* datErmsg - Translate a status value into an error message */
 /*===========================================================*/
@@ -134,14 +133,6 @@ int
 datErmsg(int      status,
          size_t   *len,
          char     **msg_str);
-
-/*=================================================*/
-/* datErtxt - Report error including supplied text */
-/*=================================================*/
-
-void
-datErtxt(const char * text,
-         int        * status );
 
 /*================================*/
 /* datFind - Find named component */
@@ -840,7 +831,7 @@ hdsStop( int *status);
 /*==============================*/
 
 int
-hdsTrace(HDSLoc *locator,
+hdsTrace(const HDSLoc *locator,
          int  *nlev,
          char *path_str,
          char *file_str,
