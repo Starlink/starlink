@@ -30,6 +30,8 @@
 *        Added call to HDS_TUNE to switch on 64 bit mode.
 *     29-NOV-2005 (TIMJ):
 *        Add test for DAT_PREC and DAT_CCTYP
+*     02-DEC-2005 (TIMJ):
+*        Add test for DAT_MSG
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -50,10 +52,18 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      CHARACTER * ( 32 ) PATH    ! File name
+      PARAMETER ( PATH = '/tmp/hds_test' )
+
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
       CHARACTER * ( DAT__SZLOC ) LOC2 ! Locator for data array
       CHARACTER * ( DAT__SZLOC ) LOC3 ! Locator for cell array
+      CHARACTER * ( DAT__SZLOC ) LOC4 ! Locator for cell array
+      CHARACTER * ( DAT__SZLOC ) LOC5 ! Locator for cell array
+      CHARACTER * ( DAT__SZLOC ) LOC6 ! Locator for cell array
+      CHARACTER * ( DAT__SZLOC ) LOC7 ! Locator for cell array
       INTEGER DIM( 2 )           ! Data array dimensions
       INTEGER EL                 ! Number of mapped elements
       INTEGER ISUM               ! Sum of array elements
@@ -65,6 +75,7 @@
       LOGICAL PRIM
       INTEGER NBYTES
       INTEGER CSIZE              ! Size to allocate _CHAR field
+      INTEGER LSTAT
       CHARACTER * (DAT__SZTYP) CTYPE ! type field for _CHAR
 
 *  Local Data:
@@ -81,7 +92,7 @@
       CALL HDS_TUNE( '64BIT', 1, STATUS )
 
 *  Create a new container file with a data array inside it.
-      CALL HDS_NEW( 'hds_test', 'HDS_TEST', 'NDF', 0, DIM, LOC1,
+      CALL HDS_NEW( PATH, 'HDS_TEST', 'NDF', 0, DIM, LOC1,
      :              STATUS )
       CALL DAT_NEW( LOC1, 'DATA_ARRAY', '_INTEGER', 2, DIM, STATUS )
 
@@ -89,25 +100,40 @@
       CALL DAT_CCTYP( 20, CTYPE )
       CALL DAT_NEW( LOC1, 'CHARTEST', CTYPE, 0, DIM, STATUS )
 
+*  Create a test structure
+      CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
+      CALL DAT_FIND( LOC1, 'TSTRUCT', LOC3, STATUS )
+      CALL DAT_NEW( LOC3, 'ARRAY', '_DOUBLE', 2, DIM, STATUS )
+
+
 *  Find and map the data array.
       CALL DAT_FIND( LOC1, 'DATA_ARRAY', LOC2, STATUS )
       CALL DAT_MAPV( LOC2, '_REAL', 'WRITE', PNTR, EL, STATUS )
 
 *  Initialise the array.
       CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), ANSWER, STATUS )
+      CALL DAT_UNMAP( LOC2, STATUS )
+
+*  And the one in the test struct
+      CALL DAT_FIND( LOC3, 'ARRAY', LOC4, STATUS )
+      CALL DAT_MAPV( LOC4, '_REAL', 'WRITE', PNTR, EL, STATUS )
+      CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), ANSWER, STATUS )
+      CALL DAT_UNMAP( LOC4, STATUS )
+
 
 *  Clean up and close the file.
-      CALL DAT_UNMAP( LOC2, STATUS )
       CALL DAT_ANNUL( LOC2, STATUS )
+      CALL DAT_ANNUL( LOC4, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
       CALL HDS_CLOSE( LOC1, STATUS )
 
 *  Re-open the file.
-      CALL HDS_OPEN( 'hds_test', 'UPDATE', LOC1, STATUS )
+      CALL HDS_OPEN( PATH, 'UPDATE', LOC1, STATUS )
 
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 2) THEN
+         IF (NCOMP .NE. 3) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
@@ -149,7 +175,33 @@
      :           STATUS)
          END IF
       END IF
-      call DAT_ANNUL( LOC3, STATUS )
+
+*  Take a section of LOC2
+      CDIM(1) = 1
+      CDIM(2) = 1
+      CALL DAT_CELL( LOC2, 2, CDIM, LOC4, STATUS )
+
+*  Get a locator to the .TSTRUCT.ARRAY
+      CALL DAT_FIND( LOC1, 'TSTRUCT', LOC5, STATUS )
+      CALL DAT_FIND( LOC5, 'ARRAY', LOC6, STATUS )
+      CDIM(1) = 10
+      CDIM(2) = 3
+      CALL DAT_CELL( LOC6, 2, CDIM, LOC7, STATUS )
+
+      CALL EMS_MARK()
+      CALL DAT_MSG( 'LOCA', LOC3 )
+      CALL DAT_MSG( 'LOCB', LOC4 )
+      CALL DAT_MSG( 'LOCC', LOC7 )
+      LSTAT = SAI__ERROR
+      CALL EMS_REP( 'XXX', 
+     :     'Not an error, test DAT_MSG: ^LOCA and ^LOCB : ^LOCC', LSTAT)
+      CALL EMS_RLSE
+
+      CALL DAT_ANNUL( LOC3, STATUS )
+      CALL DAT_ANNUL( LOC4, STATUS )
+      CALL DAT_ANNUL( LOC5, STATUS )
+      CALL DAT_ANNUL( LOC6, STATUS )
+      CALL DAT_ANNUL( LOC7, STATUS )
 
       CALL DAT_PRIM( LOC2, PRIM, STATUS )
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
@@ -160,7 +212,7 @@
 *  Clean up and erase the container file.
       CALL DAT_UNMAP( LOC2, STATUS )
       CALL DAT_ANNUL( LOC2, STATUS )
-      CALL HDS_ERASE( LOC1, STATUS )
+*      CALL HDS_ERASE( LOC1, STATUS )
 
 *  Check if the test ran OK. If so, then report success.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. INT(ANSWER) )) THEN
