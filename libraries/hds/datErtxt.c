@@ -25,7 +25,10 @@
 *     Where TEXT is specified in the subroutine call and status
 *     is the message text associated with the status value. Normally
 *     called when status is bad. The combined message is stored on
-*     the error stack.
+*     the error stack. This routine is obsolete as  HDS now reports 
+*     its own errors. Any additional error reports from application 
+*     should be made using the ERR_ routines (SUN/104). 
+*     Error reports from system code should use the EMS_ routines
 
 *  Parameters:
 *     text = const char * (Given)
