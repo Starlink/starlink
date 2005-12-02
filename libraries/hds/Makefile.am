@@ -26,7 +26,7 @@ libhds_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 hds_machine_SOURCES = hds_machine.c
-hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
+hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
 
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c

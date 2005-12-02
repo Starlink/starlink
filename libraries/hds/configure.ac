@@ -33,6 +33,9 @@ AC_PROG_LIBTOOL
 #  Test requires fortran link
 AC_FC_MAIN
 
+#  Need Fortran libraries for linking C programs.
+AC_FC_LIBRARY_LDFLAGS
+
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
