@@ -13,6 +13,7 @@
 #include "hds.h"              /* HDS C interface			     */
 #include "dat_par.h"          /* DAT__ constant definitions                  */
 #include "ems.h"
+#include "ems_par.h"
 
 #include "hds_fortran.h"      /* Fortran import/export */
 
@@ -408,28 +409,6 @@ F77_SUBROUTINE(dat_ermsg)( F77_INTEGER_TYPE *status,
    cnfExprt( msg_c, msg, msg_length );
 }
 
-F77_SUBROUTINE(dat_ertxt)( CHARACTER(text),
-                           INTEGER(status)
-                           TRAIL(text) )
-{
-
-/*=====================================================*/
-/* DAT_ERTXT - Report an error including supplied text */
-/*=====================================================*/
-
-/* Local variables.     */
-   char *text_c;
-
-/* Enter routine.	*/
-
-/* Import string */
-   text_c = cnfCreim( text, text_length );
-
-/* Call pure C routine                                       */
-   datErtxt( text_c, status );
-
-   cnfFree( text_c );
-}
 
 F77_SUBROUTINE(dat_find)( CHARACTER(locator1),
                           CHARACTER(name),
@@ -2856,3 +2835,136 @@ F77_SUBROUTINE(dat_rcopy)( CHARACTER(locator1),
    datCopy( &locator1_c, &locator2_c, name_c, status);
 }
 
+
+F77_SUBROUTINE(dat_ertxt)(CHARACTER(text), INTEGER(status) TRAIL(text) )
+{
+/*==================================================*/
+/* DAT_ERTXT - Report Error                         */
+/*     Obsolete as HDS now reports errors using HDS */
+/*==================================================*/
+
+   /* Local Variables: */
+   char *msg;   /* Pointer to static buffer */
+   size_t lmsg;    /* Length of error message */
+   char *text_c; /* Input text */
+
+   text_c = cnfCreim( text, text_length );
+
+   /* Get textual translation of the error code */
+   datErmsg( *status, &lmsg, &msg );
+
+   /*  Mark the EMS error stack to prevent interaction with any message
+    *  tokens already defined and define a token for the text and the error
+    *  message. */
+   emsMark();
+   emsSetc( "TEXT", text );
+   emsSetc( "MSG", msg );
+
+   /*  Report the message and release the error stack. */
+   emsRep( "HDS_ERROR", "^TEXT: ^MSG", status );
+   emsRlse();
+   cnfFree( text_c );
+}
+
+
+F77_SUBROUTINE(dat_erdsc)( CHARACTER(locator), INTEGER(status) TRAIL(locator) )
+{
+/*==================================================*/
+/* DAT_ERDSC - Report Object Error                  */
+/*     Obsolete as HDS now reports errors using HDS */
+/*==================================================*/
+
+/*    Local variables : */
+  HDSLoc locator_c;
+  char file[EMS__SZMSG+1];  /* Container file name */
+  char *msg = NULL;         /* Error message */
+  char name[EMS__SZMSG+1];  /* Object pathname */
+  int  lstat;               /* Local status */
+  size_t lmsg;              /* Length of error message */
+  int  nlev;                /* Number of object levels */
+
+  /*  Mark the EMS error stack to prevent interaction with any message
+      tokens already defined. */
+  emsMark();
+
+  /* Import locator using local status */
+  lstat = SAI__OK;
+  dat1_import_floc( locator, locator_length, &locator_c, &lstat );
+
+  /* obtain the object name. */
+  hdsTrace( &locator_c, &nlev, name, file, &lstat, sizeof(name), sizeof(file) );
+
+  /*  If the name could not be obtained, then annul the error and
+      substitute an appropriate message. */
+  if (lstat != SAI__OK ) {
+    strcpy( name, "<Unknown object>" );
+    emsAnnul( &lstat );
+  }
+
+  /*  Obtain a textual translation of the error code. */
+  datErmsg( *status, &lmsg, &msg );
+
+  /*  Define tokens for the object name and the error message. */
+  emsSetc( "NAME", name );
+  emsSetnc( "MSG", msg, lmsg );
+
+  /*  Report the message and release the error stack. */
+  emsRep( "HDS_ERROR", "^NAME: ^MSG", status );
+  emsRlse();
+
+}
+
+
+F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
+			   INTEGER(status) TRAIL(locator) TRAIL(cmp) )
+{
+/*==================================================*/
+/* DAT_ERDSN - Report component Error               */
+/*     Obsolete as HDS now reports errors using HDS */
+/*==================================================*/
+
+/*    Local variables : */
+  HDSLoc locator_c;
+  char cmp_c[DAT__SZNAM+1];
+  char file[EMS__SZMSG+1];  /* Container file name */
+  char *msg = NULL;         /* Error message */
+  char name[EMS__SZMSG+1];  /* Object pathname */
+  int  lstat;               /* Local status */
+  size_t lmsg;              /* Length of error message */
+  int  nlev;                /* Number of object levels */
+
+  /* Import the component name
+  cnfImpn( cmp, cmp_length, DAT__SZNAM,  cmp_c);
+
+  /*  Mark the EMS error stack to prevent interaction with any message
+      tokens already defined. */
+  emsMark();
+
+  /* Import locator using local status */
+  lstat = SAI__OK;
+  dat1_import_floc( locator, locator_length, &locator_c, &lstat );
+
+  /* obtain the object name. */
+  hdsTrace( &locator_c, &nlev, name, file, &lstat, sizeof(name), sizeof(file) );
+
+  /*  If the name could not be obtained, then annul the error and
+      substitute an appropriate message. */
+  if (lstat != SAI__OK ) {
+    strcpy( name, "<Unknown structure>" );
+    emsAnnul( &lstat );
+  }
+
+  /*  Obtain a textual translation of the error code. */
+  datErmsg( *status, &lmsg, &msg );
+
+  /*  Define tokens for the object name, component name and the error message. */
+  emsSetc( "NAME", name );
+  emsSetnc( "MSG", msg, lmsg );
+  emsSetc("CMP", cmp_c );
+
+  /*  Report the message and release the error stack. */
+  emsRep( "HDS_ERROR", "^NAME.^CMP: ^MSG", status );
+  emsRlse();
+
+
+}
