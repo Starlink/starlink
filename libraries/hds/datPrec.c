@@ -1,6 +1,5 @@
 
 #include "hds1.h"
-#include "sae_par.h"
 #include "hds.h"
 #include "dat_par.h"
 #include <string.h>
@@ -92,12 +91,12 @@ int datPrec( const HDSLoc * loc, size_t *nbytes, int *status ) {
   char type[DAT__SZTYP+1];  /* Actual type of primitive object */
 
   *nbytes = 0;
-  if ( *status != SAI__OK ) return *status;
+  if ( *status != DAT__OK ) return *status;
 
   /* Get object type - assume this has to be nul-terminated */
   datType( loc, type, status );
 
-  if (*status == SAI__OK) {
+  if (*status == DAT__OK) {
     /* Go through type list */
     for (i = 0; lut[i].nbytes != 0 ; i++) {
       if ( strcmp( type, lut[i].type ) == 0 ) {

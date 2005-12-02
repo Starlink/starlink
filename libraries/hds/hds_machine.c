@@ -73,7 +73,6 @@
 void FC_MAIN () {}
 #endif
 
-#include "sae_par.h"
 #include "hds1.h"
 #include "hds.h"
 #include <stdlib.h>
@@ -81,7 +80,7 @@ void FC_MAIN () {}
 int main () {
       
   /*  Local Variables: */
-  int status = SAI__OK;
+  int status = DAT__OK;
 
   /*  Use HDS_SHOW to display information about the native data
    *  representation of the host machine. */
