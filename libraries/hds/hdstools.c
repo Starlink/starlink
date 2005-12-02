@@ -16,7 +16,7 @@
 #include "hds.h"
 
 int
-hdsTrace(HDSLoc *locator,
+hdsTrace(const HDSLoc *locator,
          int  *nlev,
          char *path_str,
          char *file_str,
