@@ -54,7 +54,7 @@
 
 *  Local Constants:
       CHARACTER * ( 32 ) PATH    ! File name
-      PARAMETER ( PATH = '/tmp/hds_test' )
+      PARAMETER ( PATH = 'hds_test' )
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
@@ -190,11 +190,15 @@
 
       CALL EMS_MARK()
       CALL DAT_MSG( 'LOCA', LOC3 )
-      CALL DAT_MSG( 'LOCB', LOC4 )
-      CALL DAT_MSG( 'LOCC', LOC7 )
       LSTAT = SAI__ERROR
       CALL EMS_REP( 'XXX', 
-     :     'Not an error, test DAT_MSG: ^LOCA and ^LOCB : ^LOCC', LSTAT)
+     :     'Not an error, test DAT_MSG: ^LOCA', LSTAT)
+      CALL DAT_MSG( 'LOCB', LOC4 )
+      CALL EMS_REP( 'XXX', 
+     :     'Not an error, test DAT_MSG: ^LOCB', LSTAT)
+      CALL DAT_MSG( 'LOCC', LOC7 )
+      CALL EMS_REP( 'XXX', 
+     :     'Not an error, test DAT_MSG: ^LOCC', LSTAT)
       CALL EMS_RLSE
 
       CALL DAT_ANNUL( LOC3, STATUS )
