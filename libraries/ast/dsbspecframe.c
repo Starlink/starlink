@@ -69,6 +69,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        Set all attributes required to described the RestFreq value
 *        before determining Mapping from RestFreq to ImagFreq in
 *        GetImageFreq.
+*     2-DEC-2005 (DSB):
+*        Change default Domain from SPECTRUM to DSBSPECTRUM 
 *class--
 
 *  Implementation Deficiencies:
@@ -145,6 +147,7 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
+static const char *(* parent_getdomain)( AstFrame * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -170,6 +173,7 @@ static void Dump( AstObject *, AstChannel * );
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void SetAttrib( AstObject *, const char * );
 static void VerifyAttrs( AstDSBSpecFrame *, const char *, const char *, const char * );
+static const char *GetDomain( AstFrame * );
 
 static double GetIF( AstDSBSpecFrame * );
 static int TestIF( AstDSBSpecFrame * );
@@ -402,6 +406,72 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
+}
+
+static const char *GetDomain( AstFrame *this_frame ) {
+/*
+*  Name:
+*     GetDomain
+
+*  Purpose:
+*     Obtain a pointer to the Domain attribute string for a DSBSpecFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dsbspecframe.h"
+*     const char *GetDomain( AstFrame *this )
+
+*  Class Membership:
+*     DSBSpecFrame member function (over-rides the astGetDomain protected
+*     method inherited from the SpecFrame class).
+
+*  Description:
+*    This function returns a pointer to the Domain attribute string
+*    for a DSBSpecFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the DSBSpecFrame.
+
+*  Returned Value:
+*     A pointer to a constant null-terminated string containing the
+*     Domain value.
+
+*  Notes:
+*     - The returned pointer or the string it refers to may become
+*     invalid following further invocation of this function or
+*     modification of the DSBSpecFrame.
+*     - A NULL pointer is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstDSBSpecFrame *this;        /* Pointer to DSBSpecFrame structure */
+   const char *result;           /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SpecFrame structure. */
+   this = (AstSpecFrame *) this_frame;
+
+/* If a Domain attribute string has been set, invoke the parent method
+   to obtain a pointer to it. */
+   if ( astTestDomain( this ) ) {
+      result = (*parent_getdomain)( this_frame );
+
+/* Otherwise, provide a pointer to a suitable default string. */
+   } else {
+      result = "DSBSPECTRUM";
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static double GetImagFreq( AstDSBSpecFrame *this ) {
@@ -649,6 +719,9 @@ void astInitDSBSpecFrameVtab_(  AstDSBSpecFrameVtab *vtab, const char *name ) {
 
    parent_testattrib = object->TestAttrib;
    object->TestAttrib = TestAttrib;
+
+   parent_getdomain = frame->GetDomain;
+   frame->GetDomain = GetDomain;
 
    parent_overlay = frame->Overlay;
    frame->Overlay = Overlay; 

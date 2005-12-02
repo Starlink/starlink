@@ -10748,6 +10748,9 @@ f     used (by AST_FINDFRAME) as a template to match another (target)
 *     SpecFrame
 *        The SpecFrame class re-defines the default Domain value to be
 *        "SPECTRUM".
+*     DSBSpecFrame
+*        The DSBSpecFrame class re-defines the default Domain value to be
+*        "DSBSPECTRUM".
 *     FluxFrame
 *        The FluxFrame class re-defines the default Domain value to be
 *        "FLUX".
