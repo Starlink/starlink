@@ -1186,6 +1186,32 @@ F77_SUBROUTINE(dat_move)( CHARACTER(locator1),
    datExportFloc( &locator1_c, 1, locator1_length, locator1, status );
 }
 
+F77_SUBROUTINE(dat_msg)( CHARACTER(token), CHARACTER(locator)
+			 TRAIL(token) TRAIL(locator) )
+{
+  /*====================================================*/
+  /* DAT_MSG - Associate a locator with a message token */
+  /*====================================================*/
+
+  char token_c[EMS__SZTOK+1];
+  HDSLoc locator_c;
+  int status = SAI__OK;
+
+  /* Import the locator */
+  dat1_import_floc( locator, locator_length, &locator_c, &status );
+  if (status != SAI__OK) {
+    emsAnnul(&status);
+    return;
+  }
+
+  /* Import "token" to C string  */
+  cnfImpn( token, token_length, EMS__SZTOK,  token_c );
+
+  /* Call datMsg itself but only if status is good */
+  datMsg( token_c, &locator_c );
+
+}
+
 F77_SUBROUTINE(dat_name)( CHARACTER(locator),
                           CHARACTER(name),
                           F77_INTEGER_TYPE *status
