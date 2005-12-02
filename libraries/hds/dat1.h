@@ -320,7 +320,7 @@ if (!_ok(*status))\
       int dat1_unpack_type( const char ptype[ DAT__SZTYP ], struct PDD *pdd );
 
       int dau_check_name( struct DSC *name, char *buf );
-      int dau_check_shape( int ndim, HDS_PTYPE *dims, struct ODL *odl );
+      int dau_check_shape( int ndim, const HDS_PTYPE *dims, struct ODL *odl );
       int dau_copy_object( int ncomp, struct HAN *src, unsigned char *src_crv,
                            struct HAN *des, unsigned char *des_crv );
       int dau_defuse_lcp( struct LCP **pntr );

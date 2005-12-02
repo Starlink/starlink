@@ -19,7 +19,7 @@
 /* Control Blocks */
 
 int
-dau_check_shape(int ndim, HDS_PTYPE *dims, struct ODL *odl)
+dau_check_shape(int ndim, const HDS_PTYPE *dims, struct ODL *odl)
 
 /*+
  * DAU_CHECK_SHAPE - Check shape information
