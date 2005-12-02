@@ -122,6 +122,8 @@
 *        current Frame.
 *     30-AUG-2004 (DSB):
 *        Replaced hardwired "3" by "NDIMS" in call to KPG1_ASSIG!
+*     2-DEC-2005 (DSB):
+*        Added INPRM to argument list for KPG1_ASTRM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -472,8 +474,8 @@
 *  ===================================================================
       IF( TRIM ) THEN
          CALL PSX_CALLOC( MXDIM*2, '_DOUBLE', IPWORK, STATUS )
-         CALL KPG1_ASTRM( IWCS, SLBND, SUBND, %VAL( CNF_PVAL(IPWORK) ), 
-     :                    STATUS )
+         CALL KPG1_ASTRM( IWCS, INPRM, SLBND, SUBND, 
+     :                    %VAL( CNF_PVAL(IPWORK) ), STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
       END IF
 

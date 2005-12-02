@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_ASTRM( IWCS, LBND, UBND, WORK, STATUS )
+      SUBROUTINE KPG1_ASTRM( IWCS, DEFAX, LBND, UBND, WORK, STATUS )
 *+
 *  Name:
 *     KPG1_ASTRM
@@ -10,13 +10,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASTRM( INDF, LBND, UBND, WORK, STATUS )
+*     CALL KPG1_ASTRM( IWCS, DEFAX, LBND, UBND, WORK, STATUS )
 
 *  Description:
-*     This routine checks that the current Frame in the supplied FrameSet
-*     has a specified number of axes. If not, a new Frame with the
-*     required number of axes is created and added into the FrameSet and
-*     becomes the new current Frame. 
+*     This routine ensures that the number of axes in the current Frame of 
+*     the supplied FrameSet is the same as the number in the base Frame.
+*     If this is not the case on entry, a new Frame with the required number 
+*     of axes is created and added into the FrameSet and becomes the new 
+*     current Frame. 
 *
 *     If the original current Frame has too few axes, the new Frame is a 
 *     copy of the original current frame with extra simple axes added to 
@@ -59,6 +60,13 @@
 *     IWCS = INTEGER (Given)
 *        The FrameSet to use. A new current Frame may be added to the
 *        FrameSet by this routine.
+*     DEFAX( * ) = INTEGER (Given)
+*        This array should have one element for each axis in the base
+*        Frame of the supplied FrameSet. The i'th value is the index 
+*        within the original current Frame of the axis which is to be
+*        associated with the i'th base Frame axis by default. Only used
+*        if no better defaults can be found by splitting the FrameSet 
+*        Mapping.
 *     LBND( * ) = INTEGER (Given)
 *        The lower pixel bound on each pixel axis. Array length should be
 *        at least equal to the number of base Frame axes in IWCS.
@@ -78,6 +86,8 @@
 *  History:
 *     7-JUL-2005 (DSB):
 *        Original version.
+*     2-DEC-2005 (DSB):
+*        Added DEFAX to argument list.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,6 +106,7 @@
 
 *  Arguments Given:
       INTEGER IWCS
+      INTEGER DEFAX( * )
       INTEGER LBND( * )
       INTEGER UBND( * )
       DOUBLE PRECISION WORK( * )
@@ -162,16 +173,16 @@
 *  Get a pointer to the current Frame.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
 
-*  Determine which current Frame axes are to be retained. The default axes
-*  are those which are fed by the base Frame axes.
+*  Determine which current Frame axes are to be retained. Our first
+*  choice for default axes are those which are fed by the base Frame 
+*  axes. Find these axes now.
          DO I = 1, NDIM
             PIXAXES( I ) = I
          END DO
          CALL AST_MAPSPLIT( BCMAP, NDIM, PIXAXES, CURAXES, MAP1, 
      :                      STATUS )
       
-*  If this could not be done, assume a one-to-one correspondance between
-*  current and base axes.
+*  If this could not be done, use the defaults supplied in DEFAX. 
          IF( MAP1 .NE. AST__NULL ) THEN
             IF( AST_GETI( MAP1, 'Nout', STATUS ) .NE. NDIM ) THEN
                CALL AST_ANNUL( MAP1, STATUS )
@@ -180,7 +191,7 @@
 
          IF( MAP1 .EQ. AST__NULL ) THEN
             DO I = 1, NDIM
-               CURAXES( I ) = I
+               CURAXES( I ) = DEFAX( I )
             END DO
          END IF
 
