@@ -68,8 +68,8 @@ F_ROUTINES = \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
 	dat_get1x.f dat_getnx.f \
-	dat_getvx.f dat_mapn.f dat_new0.f \
-	dat_new0c.f dat_new0x.f dat_new1.f dat_new1c.f dat_new1x.f \
+	dat_getvx.f dat_mapn.f \
+	dat_new1.f dat_new1c.f dat_new1x.f \
 	dat_put1x.f dat_putnx.f \
 	dat_putvx.f dat_ref.f
 
@@ -90,6 +90,7 @@ C_ROUTINES = \
 	datDrep.c datErmsg.c datParen.c datPrec.c datPrmry.c datRefct.c \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datget0x.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
+	datNew0.c \
 	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
 	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \

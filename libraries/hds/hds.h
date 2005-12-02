@@ -404,11 +404,11 @@ datNcomp( const HDSLoc *locator,
 /*===============================*/
 
 int
-datNew( HDSLoc    *locator,
-        char      *name_str,
-        char      *type_str,
+datNew( const HDSLoc    *locator,
+        const char      *name_str,
+        const char      *type_str,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         int       *status);
 
 /*============================================*/
@@ -416,12 +416,69 @@ datNew( HDSLoc    *locator,
 /*============================================*/
 
 int
-datNewC(HDSLoc    *locator,
-        char      *name_str,
+datNewC(const HDSLoc    *locator,
+        const char      *name_str,
         size_t    len,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         int       *status);
+
+/*=======================================*/
+/* datNew0 - Create new scalar component */
+/*=======================================*/
+
+int
+datNew0( const HDSLoc    *locator,
+        const char      *name_str,
+        const char      *type_str,
+        int       *status);
+
+/*===============================================*/
+/* datNew0D - Create new scalar double component */
+/*===============================================*/
+
+int
+datNew0D( const HDSLoc    *locator,
+        const char      *name_str,
+        int       *status);
+
+/*================================================*/
+/* datNew0I - Create new scalar integer component */
+/*================================================*/
+
+int
+datNew0I( const HDSLoc    *locator,
+        const char      *name_str,
+        int       *status);
+
+/*=============================================*/
+/* datNew0R - Create new scalar real component */
+/*=============================================*/
+
+int
+datNew0R( const HDSLoc    *locator,
+        const char      *name_str,
+        int       *status);
+
+/*================================================*/
+/* datNew0L - Create new scalar logical component */
+/*================================================*/
+
+int
+datNew0L( const HDSLoc    *locator,
+        const char      *name_str,
+        int       *status);
+
+/*================================================*/
+/* datNew0L - Create new scalar logical component */
+/*================================================*/
+
+int
+datNew0C( const HDSLoc    *locator,
+	  const char      *name_str,
+	  size_t          len,
+	  int             *status);
+
 
 /*====================================*/
 /* datParen - Locate parent structure */

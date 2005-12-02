@@ -1348,6 +1348,175 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
 #endif
 }
 
+F77_SUBROUTINE(dat_new0)( CHARACTER(locator),
+                          CHARACTER(name),
+			  CHARACTER(type),
+                          INTEGER(status)
+                          TRAIL(locator)
+                          TRAIL(name) 
+			  TRAIL(type) )
+{
+
+/*========================================*/
+/* DAT_NEW0 - Create new scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   char type_c[DAT__SZTYP+1];
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+   cnfImpn( type, type_length, DAT__SZNAM,  type_c );
+
+   datNew0( &locator_c, name_c, type_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new0d)( CHARACTER(locator),
+                          CHARACTER(name),
+                          INTEGER(status)
+                          TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW0D - Create new double scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   datNew0D( &locator_c, name_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new0i)( CHARACTER(locator),
+                          CHARACTER(name),
+                          INTEGER(status)
+                          TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW0I - Create new integer scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   datNew0I( &locator_c, name_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new0r)( CHARACTER(locator),
+                          CHARACTER(name),
+                          INTEGER(status)
+                          TRAIL(locator)
+			  TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW0R - Create new real scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   datNew0R( &locator_c, name_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new0l)( CHARACTER(locator),
+                          CHARACTER(name),
+                          INTEGER(status)
+                          TRAIL(locator)
+			  TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW0L - Create new logical scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   datNew0L( &locator_c, name_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new0c)( CHARACTER(locator),
+                          CHARACTER(name),
+			  INTEGER(len),
+                          INTEGER(status)
+                          TRAIL(locator)
+			  TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW0C - Create new _CHAR scalar component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   datNew0C( &locator_c, name_c, len_c, status );
+
+}
+
 F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
                            CHARACTER(locator2),
                            F77_INTEGER_TYPE *status

@@ -99,6 +99,9 @@
       CSIZE = 20
       CALL DAT_CCTYP( 20, CTYPE )
       CALL DAT_NEW( LOC1, 'CHARTEST', CTYPE, 0, DIM, STATUS )
+      CALL DAT_NEW0( LOC1, 'SCALAR', '_DOUBLE', STATUS )
+      CALL DAT_NEW0L( LOC1, 'SCALARL', STATUS )
+      CALL DAT_NEW0C( LOC1, 'SCALARC', 32, STATUS )
 
 *  Create a test structure
       CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
@@ -133,7 +136,7 @@
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 3) THEN
+         IF (NCOMP .NE. 6) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
@@ -188,18 +191,20 @@
       CDIM(2) = 3
       CALL DAT_CELL( LOC6, 2, CDIM, LOC7, STATUS )
 
-      CALL EMS_MARK()
-      CALL DAT_MSG( 'LOCA', LOC3 )
-      LSTAT = SAI__ERROR
-      CALL EMS_REP( 'XXX', 
-     :     'Not an error, test DAT_MSG: ^LOCA', LSTAT)
-      CALL DAT_MSG( 'LOCB', LOC4 )
-      CALL EMS_REP( 'XXX', 
-     :     'Not an error, test DAT_MSG: ^LOCB', LSTAT)
-      CALL DAT_MSG( 'LOCC', LOC7 )
-      CALL EMS_REP( 'XXX', 
-     :     'Not an error, test DAT_MSG: ^LOCC', LSTAT)
-      CALL EMS_RLSE
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL EMS_MARK()
+         CALL DAT_MSG( 'LOCA', LOC3 )
+         LSTAT = SAI__ERROR
+         CALL EMS_REP( 'XXX', 
+     :        'Not an error, test DAT_MSG: ^LOCA', LSTAT)
+         CALL DAT_MSG( 'LOCB', LOC4 )
+         CALL EMS_REP( 'XXX', 
+     :        'Not an error, test DAT_MSG: ^LOCB', LSTAT)
+         CALL DAT_MSG( 'LOCC', LOC7 )
+         CALL EMS_REP( 'XXX', 
+     :        'Not an error, test DAT_MSG: ^LOCC', LSTAT)
+         CALL EMS_RLSE
+      END IF
 
       CALL DAT_ANNUL( LOC3, STATUS )
       CALL DAT_ANNUL( LOC4, STATUS )
