@@ -30,11 +30,14 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2005-11-28 (TIMJ):
 *        Initial test version
+*     2005-12-02 (EC):
+*        Fixed memory unallocation problems
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,7 +111,11 @@ void smf_close_file( smfData ** data, int * status ) {
       sc2store_free( status );
     } else if ( file->ndfid != NDF__NOID ) {
       /* Annul the NDF and locators (which will unmap things) */
-      if ( file->xloc ) datAnnul( &(file->xloc), status );
+      if ( file->xloc == NULL ) {  /* IS THIS OK? - EC 2/12/2005 */
+	datAnnul( &(file->xloc), status );
+      }
+      sc2store_headunmap( status ); /* IS THIS OK? - EC 2/12/2005 */
+
       ndfAnnul( &(file->ndfid), status );
     } else {
       /* No file so free the data */
@@ -132,6 +139,6 @@ void smf_close_file( smfData ** data, int * status ) {
 
   /* finally free smfData */
   free( *data );
-  data = NULL;
+  *data = NULL;
 
 }
