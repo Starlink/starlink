@@ -2933,7 +2933,7 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
   size_t lmsg;              /* Length of error message */
   int  nlev;                /* Number of object levels */
 
-  /* Import the component name
+  /* Import the component name */
   cnfImpn( cmp, cmp_length, DAT__SZNAM,  cmp_c);
 
   /*  Mark the EMS error stack to prevent interaction with any message
