@@ -34,6 +34,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +46,8 @@
 *        Use HDSLoc for locator
 *     2005-11-28 (TIMJ):
 *        Malloc sc2head
+*     2005-12-01 (EC):
+*        Fixed up error determining data types
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -209,11 +212,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       }
 
       /* Establish the data type */
-      if ( strncmp(dtype, "_DOUBLE", 7 ) ){
+      if ( strncmp(dtype, "_DOUBLE", 7 ) == 0 ){
 	itype = SMF__DOUBLE;
-      } else if ( strncmp(dtype, "_REAL", 5 ) ) {
+      } else if ( strncmp(dtype, "_REAL", 5 ) == 0 ) {
 	itype = SMF__FLOAT;
-      } else if ( strncmp(dtype, "_INTEGER", 8 ) ){
+      } else if ( strncmp(dtype, "_INTEGER", 8 ) == 0 ){
 	itype = SMF__INTEGER;
       } else {
 	if ( *status == SAI__OK) {
@@ -253,7 +256,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
       /* Raw data type is integer */
       itype = SMF__INTEGER;
-      
+
       /* Verify that ndfdims matches row, col, nframes */
       /* Should probably inform user of the filename too */
       if (*status == SAI__OK) {
@@ -281,6 +284,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       file->isSc2store = 1;
     }
     /* Store info in smfData struct */  
+
     (*data)->dtype = itype;
     strncpy(file->name, pname, SMF_PATH_MAX);
     hdr->fitshdr = fits;
@@ -298,5 +302,4 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       ((*data)->dims)[i] = (dim_t)ndfdims[i];
     }
   }
-
 }
