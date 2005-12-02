@@ -373,6 +373,14 @@ datMove(HDSLoc **locator1,
         char *name_str,
         int *status);
 
+/*======================================*/
+/* datMsg - store filename in EMS token */
+/*======================================*/
+
+void
+datMsg( const char * token, 
+        const HDSLoc * loc );
+
 /*===============================*/
 /* datName - Enquire object name */
 /*===============================*/
