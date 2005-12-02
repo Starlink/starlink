@@ -86,7 +86,9 @@ int main( int argc, char *argv[] ) {
    ndfMap( indf, "Data", "_integer", "read", &pntr, &el, &status );
 
 /* Sum the data elements.                                                   */
-   for ( isum = 0, i = 0; i < el; i++ ) isum += ( (int *) pntr )[ i ];
+   if ( status == SAI__OK ) {
+       for ( isum = 0, i = 0; i < el; i++ ) isum += ( (int *) pntr )[ i ];
+   }
 
 /* Clean up, deleting the NDF.                                              */
    ndfDelet( &indf, &status );
