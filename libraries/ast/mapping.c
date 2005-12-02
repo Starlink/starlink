@@ -7284,6 +7284,7 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
    int *result;               /* Pointer to returned array */
    int iin;                   /* Input index */
    int iout;                  /* Output index */
+   int mapnin;                /* Number of Mapping inputs */
    int nout;                  /* No of outputs */
    int ok;                    /* Can the supplied "in" array be used? */
    int perm;                  /* Are the inputs permuted? */
@@ -7295,9 +7296,21 @@ static int *MapSplit( AstMapping *this, int nin, int *in, AstMapping **map ){
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Verify the input axis indices.*/
+   mapnin = astGetNin( this );
+   for( iin = 0; iin < nin; iin++ ){
+      if( in[ iin ] < 0 || in[ iin ] >= mapnin ) {
+         astError( AST__AXIIN, "astMapSplit(%s): One of the supplied Mapping "
+                   "input indices has value %d which is invalid; it should "
+                   "be in the range 1 to %d.", astGetClass( this ), 
+                   in[ iin ] + 1, mapnin );
+         break;
+      }
+   }
+
 /* Since we are dealing with a basic Mapping, we can only create the
    required output Mapping if all inputs are being selected. */
-   if( nin == astGetNin( this ) ) {
+   if( nin == mapnin ) {
 
 /* The inputs may have been selected in a different order to that in
    which they occur in the supplied Mapping. We therefore create a
