@@ -114,8 +114,9 @@
 *  Report an error if the Mapping could not be split. 
       IF( MAP .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'ASTMAPSPLIT_ERR1', 'The supplied Mapping is '//
-     :                 'too complex to be split.', STATUS )
+         CALL ERR_REP( 'ASTMAPSPLIT_ERR1', 'There is no subset of '//
+     :                 'Mapping outputs which depend only on the '//
+     :                 'specified Mapping inputs.', STATUS )
 
 *  Otherwise, display the indices of the output axes. 
       ELSE
