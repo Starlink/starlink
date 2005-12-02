@@ -74,7 +74,9 @@ int main( int argc, char *argv[] ) {
    ndfMap( indf, "Data", "_real", "write", &pntr, &el, &status );
 
 /* Initialise the array.                                                    */
-   for ( i = 0; i < el; i++ ) ( (float *) pntr )[ i ] = (float) ( i + 1 );
+   if ( status == SAI__OK ) {
+      for ( i = 0; i < el; i++ ) ( (float *) pntr )[ i ] = (float) ( i + 1 );
+   }
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
