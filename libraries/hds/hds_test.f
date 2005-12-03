@@ -213,7 +213,15 @@
       CALL DAT_ANNUL( LOC7, STATUS )
 
       CALL DAT_PRIM( LOC2, PRIM, STATUS )
+
+*  Quick check of MAPN
+      CALL DAT_MAPN( LOC2, '_INTEGER', 'READ', 2, PNTR, CDIM, STATUS)
+      CALL DAT_UNMAP( LOC2, STATUS )
+
+*  Now map vectorized
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
+
+
 
 *  Sum the data elements.
       CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )

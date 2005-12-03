@@ -1089,7 +1089,7 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
 {
 
 /*=====================================*/
-/* DAT_MAPD - Map _DOUBLE primitive(s) */
+/* DAT_MAPV - Map vectorized primitive(s) */
 /*=====================================*/
 
 /* Local variables.     */
@@ -1113,6 +1113,57 @@ F77_SUBROUTINE(dat_mapv)( CHARACTER(locator),
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
    *actval = (F77_INTEGER_TYPE) actval_c;
+}
+
+F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
+                         CHARACTER(type),
+                         CHARACTER(mode),
+			 INTEGER(ndim),
+                         F77_POINTER_TYPE *pntr,
+                         FORTRAN_INDEX_TYPE dims[],
+                         F77_INTEGER_TYPE *status
+                         TRAIL(locator)
+                         TRAIL(type)
+                         TRAIL(mode) )
+{
+
+/*============================*/
+/* DAT_MAP - Map primitive(s) */
+/*============================*/
+
+/* Local variables.     */
+   HDSLoc locator_c;
+   char type_c[DAT__SZTYP+1];
+   char mode_c[DAT__SZMOD+1];
+   void *cpntr = NULL; /* initialise in case of bad return status */
+#if HDS_COPY_FORTRAN_DIMS
+   INT_BIG dims64[DAT__MXDIM];
+   int i;
+#endif
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import FORTRAN to C strings  */
+   cnfImpn( type, type_length, DAT__SZTYP,  type_c);
+   cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
+
+#if HDS_COPY_FORTRAN_DIMS
+/* Call pure C routine                                       */
+   datMapN( &locator_c, type_c, mode_c, *ndim, &cpntr, dims64, status);
+
+   /* Copy the array back to fortran from HDS_PTYPE */
+   for( i = 0; i<_min(*ndimx,*ndim); i++)
+      dims[i] = dims64[i];
+
+#else
+   datMapN( &locator_c, type_c, mode_c, *ndim, &cpntr, dims, status);
+#endif
+
+/* Export the C pointer as a FORTRAN POINTER */
+   *pntr = cnfFptr( cpntr );
 }
 
 
