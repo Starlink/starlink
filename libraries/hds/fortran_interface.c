@@ -1568,6 +1568,194 @@ F77_SUBROUTINE(dat_new0c)( CHARACTER(locator),
 
 }
 
+F77_SUBROUTINE(dat_new1)( CHARACTER(locator),
+                          CHARACTER(name),
+			  CHARACTER(type),
+			  INTEGER(len),
+                          INTEGER(status)
+                          TRAIL(locator)
+                          TRAIL(name) 
+			  TRAIL(type) )
+{
+
+/*========================================*/
+/* DAT_NEW1 - Create new vector component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   char type_c[DAT__SZTYP+1];
+   size_t len_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" and "type" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+   cnfImpn( type, type_length, DAT__SZNAM,  type_c );
+
+   len_c = *len;
+   datNew1( &locator_c, name_c, type_c, len_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new1d)( CHARACTER(locator),
+			   CHARACTER(name),
+			   INTEGER(len),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW1D - Create new vector double component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   datNew1D( &locator_c, name_c, len_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new1i)( CHARACTER(locator),
+			   CHARACTER(name),
+			   INTEGER(len),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW1I - Create new vector integer component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   datNew1I( &locator_c, name_c, len_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new1l)( CHARACTER(locator),
+			   CHARACTER(name),
+			   INTEGER(len),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW1L - Create new vector logical component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   datNew1L( &locator_c, name_c, len_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new1r)( CHARACTER(locator),
+			   CHARACTER(name),
+			   INTEGER(len),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW1R - Create new vector double component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   datNew1R( &locator_c, name_c, len_c, status );
+
+}
+
+F77_SUBROUTINE(dat_new1c)( CHARACTER(locator),
+			   CHARACTER(name),
+			   INTEGER(len),
+			   INTEGER(size),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(name) )
+{
+
+/*========================================*/
+/* DAT_NEW1C - Create new vector string component */
+/*========================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char name_c[DAT__SZNAM+1];
+   size_t len_c;
+   size_t size_c;
+   
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+
+/* Import "name" to C string  */
+   cnfImpn( name, name_length, DAT__SZNAM,  name_c );
+
+   len_c = *len;
+   size_c = *size;
+   datNew1C( &locator_c, name_c, len_c, size_c, status );
+
+}
+
+
 F77_SUBROUTINE(dat_paren)( CHARACTER(locator1),
                            CHARACTER(locator2),
                            F77_INTEGER_TYPE *status

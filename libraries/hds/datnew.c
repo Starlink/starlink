@@ -241,3 +241,104 @@ datCctyp( size_t size,
    sprintf( str, "%lu", (unsigned long)size );
    strncat( type, str, 4 );
 }
+
+/*================================================*/
+/* DAT_NEW1 - Create a vector structure component */
+/*================================================*/
+
+int
+datNew1( const HDSLoc * locator,
+	 const char * name,
+	 const char * type,
+	 size_t len,
+	 int * status )
+{
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  dims[0] = (hdsdim)len;
+  datNew( locator, name, type, 1, dims, status );
+  return *status;
+}
+
+/*================================================*/
+/* DAT_NEW1D - Create a vector double component */
+/*================================================*/
+
+int
+datNew1D( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_DOUBLE", len, status );
+  return *status;
+}
+
+/*================================================*/
+/* DAT_NEW1I - Create a vector integer  component */
+/*================================================*/
+
+int
+datNew1I( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_INTEGER", len, status );
+  return *status;
+}
+
+/*================================================*/
+/* DAT_NEW1L - Create a vector logical component */
+/*================================================*/
+
+int
+datNew1L( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_LOGICAL", len, status );
+  return *status;
+}
+
+/*================================================*/
+/* DAT_NEW1R - Create a vector real component */
+/*================================================*/
+
+int
+datNew1R( const HDSLoc * locator,
+	 const char * name,
+	 size_t len,
+	 int * status )
+{
+  if (*status != DAT__OK) return *status;
+  datNew1( locator, name, "_REAL", len, status );
+  return *status;
+}
+
+
+/*================================================*/
+/* DAT_NEW1C - Create a vector CHAR component */
+/*================================================*/
+
+int
+datNew1C( const HDSLoc * locator,
+	  const char * name,
+	  size_t len,
+	  size_t size,
+	  int * status )
+{
+  char type[DAT__SZTYP+1];
+
+  if (*status != DAT__OK) return *status;
+  datCctyp( size, type );
+  datNew1( locator, name, type, len, status );
+  return *status;
+}
+

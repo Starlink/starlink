@@ -493,6 +493,69 @@ datNew0C( const HDSLoc    *locator,
 	  int             *status);
 
 
+
+/*=======================================*/
+/* datNew1 - Create new vector component */
+/*=======================================*/
+
+int
+datNew1( const HDSLoc    *locator,
+	 const char      *name_str,
+	 const char      *type_str,
+	 size_t          len,
+	 int       *status);
+
+/*=======================================*/
+/* datNew1C - Create new vector string  */
+/*=======================================*/
+
+int
+datNew1C( const HDSLoc    *locator,
+	  const char      *name_str,
+	  size_t          len,
+	  size_t          size,
+	  int       *status);
+
+/*=======================================*/
+/* datNew1d - Create new vector double   */
+/*=======================================*/
+
+int
+datNew1D( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
+/*=======================================*/
+/* datNew1I - Create new vector integer  */
+/*=======================================*/
+
+int
+datNew1I( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
+/*=======================================*/
+/* datNew1L - Create new vector logical   */
+/*=======================================*/
+
+int
+datNew1L( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
+/*=======================================*/
+/* datNew1R - Create new vector float   */
+/*=======================================*/
+
+int
+datNew1R( const HDSLoc    *locator,
+	 const char      *name_str,
+	 size_t          len,
+	 int       *status);
+
 /*====================================*/
 /* datParen - Locate parent structure */
 /*====================================*/
