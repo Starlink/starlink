@@ -31,7 +31,7 @@
 *     29-NOV-2005 (TIMJ):
 *        Add test for DAT_PREC and DAT_CCTYP
 *     02-DEC-2005 (TIMJ):
-*        Add test for DAT_MSG
+*        Add test for DAT_MSG / DAT_REF
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,6 +64,7 @@
       CHARACTER * ( DAT__SZLOC ) LOC5 ! Locator for cell array
       CHARACTER * ( DAT__SZLOC ) LOC6 ! Locator for cell array
       CHARACTER * ( DAT__SZLOC ) LOC7 ! Locator for cell array
+      CHARACTER * ( 128 ) REF     ! Reference to HDS object
       INTEGER DIM( 2 )           ! Data array dimensions
       INTEGER EL                 ! Number of mapped elements
       INTEGER ISUM               ! Sum of array elements
@@ -75,6 +76,7 @@
       LOGICAL PRIM
       INTEGER NBYTES
       INTEGER CSIZE              ! Size to allocate _CHAR field
+      INTEGER REFLEN             ! Actual size of REF
       INTEGER LSTAT
       CHARACTER * (DAT__SZTYP) CTYPE ! type field for _CHAR
 
@@ -203,6 +205,21 @@
          CALL DAT_MSG( 'LOCC', LOC7 )
          CALL EMS_REP( 'XXX', 
      :        'Not an error, test DAT_MSG: ^LOCC', LSTAT)
+         CALL EMS_RLSE
+      END IF
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL EMS_MARK
+         LSTAT = SAI__OK
+         CALL DAT_REF( LOC1, REF, REFLEN, LSTAT )
+         PRINT *, 'REF: (',REFLEN,') ', REF(:REFLEN)
+         IF ( LSTAT .EQ. DAT__TRUNC ) CALL EMS_ANNUL(LSTAT)
+         CALL DAT_REF( LOC3, REF, REFLEN, LSTAT )
+         PRINT *, 'REF: (',REFLEN,') ', REF(:REFLEN)
+         IF ( LSTAT .EQ. DAT__TRUNC ) CALL EMS_ANNUL(LSTAT)
+         CALL DAT_REF( LOC7, REF, REFLEN, LSTAT )
+         PRINT *, 'REF: (',REFLEN,') ', REF(:REFLEN)
+         IF ( LSTAT .EQ. DAT__TRUNC ) CALL EMS_ANNUL(LSTAT)
          CALL EMS_RLSE
       END IF
 

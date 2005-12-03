@@ -70,7 +70,7 @@ F_ROUTINES = \
 	dat_get1x.f dat_getnx.f \
 	dat_getvx.f \
 	dat_put1x.f dat_putnx.f \
-	dat_putvx.f dat_ref.f
+	dat_putvx.f
 
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
@@ -85,7 +85,7 @@ C_ROUTINES = \
 	dat1_show_ndr.c dat1_unpack_crv.c dat1_unpack_odl.c \
 	dat1_unpack_srv.c dat1_unpack_type.c \
         dat1_free_hdsloc.c dat1_import_floc.c \
-	datClen.c datCopy.c datMsg.c \
+	datClen.c datCopy.c datMsg.c datRef.c \
 	datDrep.c datErmsg.c datParen.c datPrec.c datPrmry.c datRefct.c \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datget0x.c datinq.c datlocops.c datmap.c datmove.c datnew.c \

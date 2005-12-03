@@ -697,6 +697,13 @@ datPut0I( const HDSLoc * loc, int value, int * status );
 int
 datPut0L( const HDSLoc * loc, int value, int * status );
 
+/*========================================*/
+/* datRef - Enquire object reference name */
+/*========================================*/
+
+int
+datRef( const HDSLoc * loc, char * ref, size_t reflen, int *status );
+
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
 /*===================================================*/

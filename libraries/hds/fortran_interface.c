@@ -14,6 +14,7 @@
 #include "dat_par.h"          /* DAT__ constant definitions                  */
 #include "ems.h"
 #include "ems_par.h"
+#include "dat_err.h"
 
 #include "hds_fortran.h"      /* Fortran import/export */
 
@@ -2187,6 +2188,38 @@ F77_SUBROUTINE(dat_put0l)( CHARACTER(locator),
   datPut0L( &locator_c, *value, status );
 }
 
+
+F77_SUBROUTINE(dat_ref)( CHARACTER(locator),
+			 CHARACTER(ref),
+			 INTEGER(reflen),
+			 INTEGER(status)
+			 TRAIL(locator)
+			 TRAIL(ref) )
+{
+/*============================================*/
+/* DAT_REF - Get reference name of HDS object */
+/*============================================*/
+
+/* Local variables */
+   HDSLoc locator_c;
+   char *ref_c;
+
+/* Enter routine.	*/
+
+/* Import the input locator string                  */
+   dat1_import_floc( locator, locator_length, &locator_c, status );
+   ref_c = cnfCreat( ref_length + 1 );
+   datRef( &locator_c, ref_c, ref_length + 1, status );
+   if (*status == SAI__OK || *status == DAT__TRUNC) {
+     cnfExprt( ref_c, ref, ref_length );
+     /* We know that ref_c can't be longer than ref_length */
+     *reflen = strlen( ref_c );
+   } else {
+     cnfExprt( " ", ref, ref_length);
+     *reflen = 1;
+   }
+   cnfFree( ref_c );
+}
 
 F77_SUBROUTINE(dat_refct)( CHARACTER(locator),
                            F77_INTEGER_TYPE *refct,
