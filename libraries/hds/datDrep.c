@@ -20,7 +20,7 @@
  *                                  TRAIL(order_str ) )
  */
 int
-datDrep( HDSLoc *locator,
+datDrep( const HDSLoc *locator,
          char **format_str,
          char **order_str,
          int *status)

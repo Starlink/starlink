@@ -19,9 +19,9 @@
 /*=====================================*/
 
 int
-datCcopy(HDSLoc *locator1,
-         HDSLoc *locator2,
-         char   *name,
+datCcopy(const HDSLoc *locator1,
+         const HDSLoc *locator2,
+         const char   *name,
          HDSLoc **locator3,
          int    *status )
 {

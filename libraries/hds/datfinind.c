@@ -27,8 +27,8 @@
 /* DAT_FIND - Find named component */
 /*=================================*/
 int
-datFind( HDSLoc *locator1,
-         char *name_str,
+datFind( const HDSLoc *locator1,
+         const char *name_str,
          HDSLoc **locator2,
          int  *status )
 {
@@ -239,7 +239,7 @@ HDS structure.",
 /* DAT_INDEX - Index into component list */
 /*=======================================*/
 int
-datIndex(HDSLoc *locator1,
+datIndex(const HDSLoc *locator1,
          int index,
          HDSLoc **locator2,
          int *status )

@@ -36,10 +36,10 @@
 /* DAT_GET - Read data */
 /*=====================*/
 int
-datGet(HDSLoc     *locator,
-       char       *type_str,
+datGet(const HDSLoc     *locator,
+       const char       *type_str,
        int        ndim,
-       HDS_PTYPE  dims[],
+       const HDS_PTYPE  dims[],
        void       *values,
        int        *status)
 {
@@ -206,9 +206,9 @@ datGet(HDSLoc     *locator,
 /* DAT_GETI - Read Integer data */
 /*==============================*/
 int
-datGetI(HDSLoc    *locator,
+datGetI(const HDSLoc    *locator,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       values[],
         int       *status) 
 {
@@ -228,9 +228,9 @@ datGetI(HDSLoc    *locator,
 /* DAT_GETR - Read REAL data */
 /*===========================*/
 int
-datGetR(HDSLoc    *locator,
+datGetR(const HDSLoc    *locator,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         float     values[],
         int       *status) 
 {
@@ -250,9 +250,9 @@ datGetR(HDSLoc    *locator,
 /* DAT_GETD - Read DOUBLE PRECISION data */
 /*=======================================*/
 int
-datGetD(HDSLoc    *locator,
+datGetD(const HDSLoc    *locator,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         double    values[],
         int       *status) 
 {
@@ -272,9 +272,9 @@ datGetD(HDSLoc    *locator,
 /* DAT_GETL - Read LOGICAL data */
 /*==============================*/
 int
-datGetL(HDSLoc    *locator,
+datGetL(const HDSLoc    *locator,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       values[],
         int       *status) 
 {
@@ -294,9 +294,9 @@ datGetL(HDSLoc    *locator,
 /* DAT_GETC - Read CHARACTER data */
 /*================================*/
 int
-datGetC(HDSLoc    *locator,
+datGetC(const HDSLoc    *locator,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         char      values[],
         size_t    char_len,
         int       *status) 

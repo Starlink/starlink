@@ -13,8 +13,8 @@
 #include "hds.h"
 
 int 
-hdsWild(char *fspec,
-            char *mode,
+hdsWild(const char *fspec,
+        const char *mode,
             int *iwld,
             HDSLoc **locator,
             int *status)

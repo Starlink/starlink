@@ -21,7 +21,7 @@
 /*================================*/
 
 int
-hdsLock(HDSLoc *locator,
+hdsLock(const HDSLoc *locator,
         int *status)
 
 {
@@ -62,7 +62,7 @@ hdsLock(HDSLoc *locator,
 /*================================*/
 
 int
-hdsFree(HDSLoc *locator,
+hdsFree(const HDSLoc *locator,
         int *status)
 
 {

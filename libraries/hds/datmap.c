@@ -22,11 +22,11 @@
 /* DAT_MAP - Map data */
 /*====================*/
 int
-datMap(HDSLoc    *locator,
-       char      *type_str,
-       char      *mode_str,
+datMap(const HDSLoc    *locator,
+       const char      *type_str,
+       const char      *mode_str,
        int       ndim,
-       HDS_PTYPE dims[],
+       const HDS_PTYPE dims[],
        void      **pntr,
        int       *status)
 {
@@ -253,10 +253,10 @@ datMap(HDSLoc    *locator,
 /* DAT_MAPI - Map INTEGER data */
 /*=============================*/
 int
-datMapI(HDSLoc    *locator,
-        char      *mode_str,
+datMapI(const HDSLoc    *locator,
+        const char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       **pntr,
         int       *status )
 {
@@ -276,10 +276,10 @@ datMapI(HDSLoc    *locator,
 /* DAT_MAPR - Map REAL data */
 /*=============================*/
 int
-datMapR(HDSLoc *locator,
-        char      *mode_str,
+datMapR(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         float     **pntr,
         int       *status )
 {
@@ -299,10 +299,10 @@ datMapR(HDSLoc *locator,
 /* DAT_MAPD - Map DOUBLE PRECISION data */
 /*======================================*/
 int
-datMapD(HDSLoc *locator,
-        char      *mode_str,
+datMapD(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         double    **pntr,
         int       *status )
 {
@@ -322,10 +322,10 @@ datMapD(HDSLoc *locator,
 /* DAT_MAPL - Map LOGICAL data */
 /*=============================*/
 int
-datMapL(HDSLoc *locator,
-        char      *mode_str,
+datMapL(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         int       **pntr,
         int       *status )
 {
@@ -345,10 +345,10 @@ datMapL(HDSLoc *locator,
 /* DAT_MAPC - Map CHARACTER data */
 /*===============================*/
 int
-datMapC(HDSLoc *locator,
-        char      *mode_str,
+datMapC(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         unsigned char **pntr,
         int       *status )
 {
@@ -369,9 +369,9 @@ datMapC(HDSLoc *locator,
 /* DAT_MAPV - Map values associated with an object as if vectorized */
 /*===============================*/
 int
-datMapV(HDSLoc *locator,
-	char      *type_str,
-        char      *mode_str,
+datMapV(const HDSLoc *locator,
+	const char      *type_str,
+        const char      *mode_str,
         void      **pntr,
 	size_t    *actval,
         int       *status )
@@ -405,8 +405,8 @@ datMapV(HDSLoc *locator,
 /*===============================================*/
 
 int
-datBasic(HDSLoc *locator,
-         char *mode_c,
+datBasic(const HDSLoc *locator,
+         const char *mode_c,
          unsigned char **pntr,
          int *len,
          int *status)
@@ -529,7 +529,7 @@ datBasic(HDSLoc *locator,
 /* DAT_UNMAP - Unmap data */
 /*========================*/
 int
-datUnmap(HDSLoc *locator,
+datUnmap(const HDSLoc *locator,
          int  *status)
 {
 #undef context_name

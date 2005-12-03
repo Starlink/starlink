@@ -14,7 +14,7 @@
 #include "hds.h"
 
 int
-datRefct(HDSLoc *loc,
+datRefct(const HDSLoc *loc,
          int *refct,
          int *status)
 {

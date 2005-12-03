@@ -22,9 +22,9 @@
  */
 
 int
-datCopy(HDSLoc * locator1,
-        HDSLoc * locator2,
-        char *name_c,
+datCopy(const HDSLoc * locator1,
+        const HDSLoc * locator2,
+        const char *name_c,
         int  *status )
 {
 /*

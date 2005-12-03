@@ -16,11 +16,11 @@
 /*=====================================*/
 
 int
-hdsNew(char *file_str,
-       char *name_str,
-       char *type_str,
+hdsNew(const char *file_str,
+       const char *name_str,
+       const char *type_str,
        int  ndim,
-       HDS_PTYPE  dims[],
+       const HDS_PTYPE  dims[],
        HDSLoc **locator,
        int *status)
 {

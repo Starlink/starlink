@@ -22,10 +22,10 @@
 /* DAT_SLICE - Locate slice */
 /*==========================*/
 int
-datSlice(HDSLoc   *locator1,
+datSlice(const HDSLoc   *locator1,
          int      ndim,
-         HDS_PTYPE  lower[],
-         HDS_PTYPE  upper[],
+         const HDS_PTYPE  lower[],
+         const HDS_PTYPE  upper[],
          HDSLoc   **locator2,
          int      *status )
 {
@@ -139,9 +139,9 @@ datSlice(HDSLoc   *locator1,
 /*========================*/
 
 int
-datCell( HDSLoc *locator1,
+datCell( const HDSLoc *locator1,
          int      ndim,
-         HDS_PTYPE subs[],
+         const HDS_PTYPE subs[],
          HDSLoc **locator2,
          int      *status)
 {
@@ -232,7 +232,7 @@ datCell( HDSLoc *locator1,
 /* DAT_VEC - Vectorise object */
 /*============================*/
 int
-datVec(HDSLoc *locator1,
+datVec(const HDSLoc *locator1,
        HDSLoc **locator2,
        int  *status )
 {
@@ -307,7 +307,7 @@ datVec(HDSLoc *locator1,
 /* DAT_COERC - Coerce object shape */
 /*=================================*/
 int
-datCoerc(HDSLoc *locator1,
+datCoerc(const HDSLoc *locator1,
          int ndim,
          HDSLoc **locator2,
          int *status)
@@ -392,7 +392,7 @@ datCoerc(HDSLoc *locator1,
 /* DAT_CLONE - Clone locator */
 /*===========================*/
 int
-datClone(HDSLoc *locator1,
+datClone(const HDSLoc *locator1,
          HDSLoc **locator2,
          int *status)
 {
@@ -436,7 +436,7 @@ datClone(HDSLoc *locator1,
 }
 
 int
-dat1_get_off(int ndim, HDS_PTYPE *dims, HDS_PTYPE *subs, 
+dat1_get_off(int ndim, const HDS_PTYPE *dims, const HDS_PTYPE *subs, 
              UINT_BIG *offset)
 
 /*+

@@ -13,9 +13,9 @@
 #include "hds.h"
 
 int
-hdsCopy(HDSLoc *locator,
-        char *file_str,
-        char name_str[DAT__SZNAM],
+hdsCopy(const HDSLoc *locator,
+        const char *file_str,
+        const char name_str[DAT__SZNAM],
         int *status )
 {
 /*

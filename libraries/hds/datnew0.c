@@ -140,9 +140,7 @@ int datNew0C( const HDSLoc * locator, const char * name, size_t len, int * statu
   if (*status != DAT__OK) return *status;
 
   datCctyp( len, type );
-  printf("Size: %s and %lu\n", type, len);
   _call(datNew0( locator, name, type, status ));
-
 
   return *status;
 }

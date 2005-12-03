@@ -34,9 +34,9 @@ static int temp_created;
 /*====================================*/
 
 int
-datTemp(char      *type_str,
+datTemp(const char      *type_str,
         int       ndim,
-        HDS_PTYPE dims[],
+        const HDS_PTYPE dims[],
         HDSLoc    **locator,
         int       *status)
 {

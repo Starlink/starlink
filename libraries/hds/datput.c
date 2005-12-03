@@ -26,11 +26,11 @@
 /* DAT_PUT - Write data */
 /*======================*/
 int
-datPut( HDSLoc   *locator,
-        char     *type_str,
+datPut( const HDSLoc   *locator,
+        const char     *type_str,
         int      ndim,
-        HDS_PTYPE  dims[],
-        void     *values,
+        const HDS_PTYPE  dims[],
+        const void     *values,
         int      *status)
 {
 #undef context_name
@@ -175,10 +175,10 @@ datPut( HDSLoc   *locator,
 /* DAT_PUTI - Write Integer data */
 /*===============================*/
 int
-datPutI(HDSLoc   *locator,
+datPutI(const HDSLoc   *locator,
          int     ndim,
-         HDS_PTYPE dims[],
-         int     *values,
+        const HDS_PTYPE dims[],
+        const int     *values,
          int     *status)
 {
 #undef context_name
@@ -200,10 +200,10 @@ datPutI(HDSLoc   *locator,
 /* DAT_PUTR - Write Real data */
 /*============================*/
 int
-datPutR( HDSLoc    *locator,
+datPutR( const HDSLoc    *locator,
          int       ndim,
-         HDS_PTYPE dims[],
-         float     *values,
+         const HDS_PTYPE dims[],
+         const float     *values,
          int       *status)
 {
 #undef context_name
@@ -225,10 +225,10 @@ datPutR( HDSLoc    *locator,
 /* DAT_PUTD - Write Double precision data */
 /*========================================*/
 int
-datPutD( HDSLoc    *locator,
+datPutD( const HDSLoc    *locator,
          int       ndim,
-         HDS_PTYPE dims[],
-         double    *values,
+         const HDS_PTYPE dims[],
+         const double    *values,
          int       *status)
 {
 #undef context_name
@@ -250,10 +250,10 @@ datPutD( HDSLoc    *locator,
 /* DAT_PUTL - Write Logical data */
 /*===============================*/
 int
-datPutL( HDSLoc    *locator,
+datPutL( const HDSLoc    *locator,
          int       ndim,
-         HDS_PTYPE dims[],
-         int       *values,
+         const HDS_PTYPE dims[],
+         const int       *values,
          int       *status)
 {
 #undef context_name
@@ -275,15 +275,16 @@ datPutL( HDSLoc    *locator,
 /* DAT_PUTC - Write Character data */
 /*=================================*/
 int
-datPutC( HDSLoc    *locator,
+datPutC( const HDSLoc    *locator,
          int       ndim,
-         HDS_PTYPE dims[],
-         char      *string,
+         const HDS_PTYPE dims[],
+         const char      *string,
          size_t    string_length,
          int       *status)
 {
 /* Local variables */
-char *string1;
+  char *string1;
+  char stype[DAT__SZTYP+1];
 
 #undef context_name
 #undef context_message
@@ -295,10 +296,9 @@ char *string1;
 /* before calling datPut                                                */
 /* Assume that a zero length string (eg. prefix=\"\") is a single space */
 /* to make consistent with earlier HDS behaviour!                       */
-   char stype[11];
    if( string_length > 0 ) {
-     sprintf( stype, "_CHAR*%lu", (unsigned long)string_length);
-      string1 = string;
+      datCctyp( string_length, stype );
+      string1 = (char*)string;
    } else {
       strcpy( stype, "_CHAR" );
       string1 = " ";

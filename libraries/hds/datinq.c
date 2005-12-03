@@ -263,7 +263,7 @@ datSize(const HDSLoc *locator,
 /*============================*/
 int
 datThere(const HDSLoc *locator,
-         char *name_c,
+         const char *name_c,
          int *there,
          int *status)
 {
@@ -625,7 +625,7 @@ datValid(const HDSLoc *locator,
 /*=======================================*/
 int
 datConv(const HDSLoc *locator,
-        char *type_str,
+        const char *type_str,
         int *conv,
         int *status)
 {

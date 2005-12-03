@@ -12,7 +12,7 @@
 #include "hds.h"                 /* Public prototype of this routine        */
 
 int
-datClen( HDSLoc* locator,
+datClen( const HDSLoc* locator,
          size_t *clen,
          int *status )
 {

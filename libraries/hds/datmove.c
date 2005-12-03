@@ -24,8 +24,8 @@
 /*========================*/
 int
 datMove(HDSLoc **locator1,
-        HDSLoc *locator2,
-        char *name_str,
+        const HDSLoc *locator2,
+        const char *name_str,
         int *status)
 {
 #undef context_name

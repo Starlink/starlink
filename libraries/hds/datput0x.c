@@ -94,7 +94,7 @@
  *-
  */
 
-int datPut0C ( HDSLoc * loc, char * value, int * status ) {
+int datPut0C ( const HDSLoc * loc, const char * value, int * status ) {
 
   int ndims = 0;
   hdsdim dim[] = { 0 };
@@ -105,7 +105,7 @@ int datPut0C ( HDSLoc * loc, char * value, int * status ) {
   return *status;
 }
 
-int datPut0D ( HDSLoc * loc, double value, int * status ) {
+int datPut0D ( const HDSLoc * loc, double value, int * status ) {
 
   int ndims = 0;
   hdsdim dim[] = { 0 };
@@ -116,7 +116,7 @@ int datPut0D ( HDSLoc * loc, double value, int * status ) {
   return *status;
 }
 
-int datPut0R ( HDSLoc * loc, float value, int * status ) {
+int datPut0R ( const HDSLoc * loc, float value, int * status ) {
 
   int ndims = 0;
   hdsdim dim[] = { 0 };
@@ -127,7 +127,7 @@ int datPut0R ( HDSLoc * loc, float value, int * status ) {
   return *status;
 }
 
-int datPut0I ( HDSLoc * loc, int value, int * status ) {
+int datPut0I ( const HDSLoc * loc, int value, int * status ) {
 
   int ndims = 0;
   hdsdim dim[] = { 0 };
@@ -139,7 +139,7 @@ int datPut0I ( HDSLoc * loc, int value, int * status ) {
   return *status;
 }
 
-int datPut0L ( HDSLoc * loc, int value, int * status ) {
+int datPut0L ( const HDSLoc * loc, int value, int * status ) {
 
   int ndims = 0;
   hdsdim dim[] = { 0 };

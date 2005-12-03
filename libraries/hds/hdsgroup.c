@@ -23,8 +23,8 @@
 /*==================================*/
 
 int
-hdsLink(HDSLoc *locator,
-        char *group_str,
+hdsLink(const HDSLoc *locator,
+        const char *group_str,
         int *status)
 {
 #undef context_name
@@ -65,7 +65,7 @@ hdsLink(HDSLoc *locator,
 /*=================================*/
 
 int
-hdsFlush( char *group_str,
+hdsFlush( const char *group_str,
           int *status)
 {
 #undef context_name
@@ -140,7 +140,7 @@ hdsFlush( char *group_str,
 /*=============================*/
 
 int
-hdsGroup(HDSLoc *locator,
+hdsGroup(const HDSLoc *locator,
          char group_str[DAT__SZGRP+1],
          int *status)
 {

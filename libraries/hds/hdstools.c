@@ -219,7 +219,7 @@ hdsTrace(const HDSLoc *locator,
 }
 
 int
-hdsShow(char *topic_str,
+hdsShow(const char *topic_str,
         int  *status)
 {        
 /*===============================*/

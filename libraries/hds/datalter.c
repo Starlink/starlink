@@ -20,9 +20,9 @@
 /* DAT_ALTER - Alter size of object */
 /*==================================*/
 int
-datAlter(HDSLoc    *locator,
+datAlter(const HDSLoc    *locator,
          int       ndim,
-         HDS_PTYPE dims[],
+         const HDS_PTYPE dims[],
          int       *status)
 {
 #undef context_name
@@ -152,7 +152,7 @@ datAlter(HDSLoc    *locator,
 /* DAT_RESET - Reset object state*/
 /*===============================*/
 int 
-datReset( HDSLoc *locator,
+datReset( const HDSLoc *locator,
           int *status)
 {
 #undef context_name
@@ -189,9 +189,9 @@ datReset( HDSLoc *locator,
 /* DAT_MOULD - Alter shape of object */
 /*===================================*/
 int
-datMould( HDSLoc    *locator,
+datMould( const HDSLoc    *locator,
           int       ndim,
-          HDS_PTYPE dims[],
+          const HDS_PTYPE dims[],
           int       *status)
 {
 #undef context_name
@@ -271,9 +271,9 @@ datMould( HDSLoc    *locator,
 /* DAT_RENAM - Rename object */
 /*===========================*/
 int
-datRenam(HDSLoc *locator,
-          char *name_str,
-          int  *status) 
+datRenam(const HDSLoc *locator,
+         const char *name_str,
+         int  *status) 
 {
 #undef context_name
 #undef context_message
@@ -372,9 +372,9 @@ datRenam(HDSLoc *locator,
 /* DAT_RETYP - Retype object */
 /*===========================*/
 int
-datRetyp(HDSLoc *locator,
-          char *type_str,
-          int *status)
+datRetyp(const HDSLoc *locator,
+         const char *type_str,
+	 int *status)
 {
 #undef context_name
 #undef context_message

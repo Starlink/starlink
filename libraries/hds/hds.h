@@ -13,9 +13,9 @@
 /*=================================*/
 
 int
-datAlter(HDSLoc    *locator,
+datAlter(const HDSLoc    *locator,
          int       ndim,
-         hdsdim    dims[],
+         const hdsdim    dims[],
          int       *status);
 
 /*==========================*/
@@ -31,8 +31,8 @@ datAnnul(HDSLoc    **locator,
 /*==============================================*/
 
 int
-datBasic(HDSLoc    *locator,
-         char      *mode_c,
+datBasic(const HDSLoc    *locator,
+         const char      *mode_c,
          unsigned char **pntr,
          int       *len,
          int       *status);
@@ -42,9 +42,9 @@ datBasic(HDSLoc    *locator,
 /*=====================================*/
 
 int
-datCcopy(HDSLoc   *locator1,
-         HDSLoc   *locator2,
-         char     *name,
+datCcopy(const HDSLoc   *locator1,
+         const HDSLoc   *locator2,
+         const char     *name,
          HDSLoc   **locator3,
          int      *status );
 
@@ -62,9 +62,9 @@ datCctyp( size_t size,
 /*===========================================*/
 
 int
-datCell( HDSLoc   *locator1,
+datCell( const HDSLoc   *locator1,
          int      ndim,
-         hdsdim   subs[],
+         const hdsdim   subs[],
 	 HDSLoc   **locator2,
          int      *status);
 
@@ -73,7 +73,7 @@ datCell( HDSLoc   *locator1,
 /*==========================================*/
 
 int
-datClen( HDSLoc   *locator,
+datClen( const HDSLoc   *locator,
          size_t   *clen,
          int      *status );
 
@@ -82,7 +82,7 @@ datClen( HDSLoc   *locator,
 /*===========================*/
 
 int
-datClone(HDSLoc   *locator1,
+datClone(const HDSLoc   *locator1,
 	 HDSLoc   **locator2,
          int      *status);
 
@@ -91,7 +91,7 @@ datClone(HDSLoc   *locator1,
 /*================================*/
 
 int
-datCoerc(HDSLoc   *locator1,
+datCoerc(const HDSLoc   *locator1,
          int      ndim,
 	 HDSLoc   **locator2,
          int      *status);
@@ -101,9 +101,9 @@ datCoerc(HDSLoc   *locator1,
 /*=======================*/
 
 int
-datCopy(HDSLoc    *locator1,
-	HDSLoc    *locator2,
-        char      *name_c,
+datCopy(const HDSLoc    *locator1,
+	const HDSLoc    *locator2,
+        const char      *name_c,
         int       *status );
 
 /*============================================================*/
@@ -111,7 +111,7 @@ datCopy(HDSLoc    *locator1,
 /*============================================================*/
 
 int
-datDrep(HDSLoc    *locator,
+datDrep(const HDSLoc    *locator,
         char      **format_str,
         char      **order_str,
         int       *status);
@@ -121,8 +121,8 @@ datDrep(HDSLoc    *locator,
 /*========================================*/
 
 int
-datErase(HDSLoc   *locator,
-         char     *name_str,
+datErase(const HDSLoc   *locator,
+         const char     *name_str,
          int      *status);
 
 /*===========================================================*/
@@ -139,8 +139,8 @@ datErmsg(int      status,
 /*================================*/
 
 int
-datFind( HDSLoc   *locator1,
-         char     *name_str,
+datFind( const HDSLoc   *locator1,
+         const char     *name_str,
 	 HDSLoc   **locator2,
          int      *status );
 
@@ -149,10 +149,10 @@ datFind( HDSLoc   *locator1,
 /*============================*/
 
 int
-datGet(HDSLoc     *locator,
-       char       *type_str,
+datGet(const HDSLoc     *locator,
+       const char       *type_str,
        int        ndim,
-       hdsdim     dims[],
+       const hdsdim     dims[],
        void       *values,
        int        *status);
 
@@ -161,9 +161,9 @@ datGet(HDSLoc     *locator,
 /*===================================*/
 
 int
-datGetC(HDSLoc    *locator,
-        int       ndim,
-        hdsdim    dims[],
+datGetC(const HDSLoc    *locator,
+        const int       ndim,
+        const hdsdim    dims[],
         char      values[],
         size_t    char_len,
         int       *status);
@@ -173,9 +173,9 @@ datGetC(HDSLoc    *locator,
 /*=====================================*/
 
 int
-datGetD(HDSLoc    *locator,
+datGetD(const HDSLoc    *locator,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         double    values[],
         int       *status);
 
@@ -184,9 +184,9 @@ datGetD(HDSLoc    *locator,
 /*======================================*/
 
 int
-datGetI(HDSLoc    *locator,
+datGetI(const HDSLoc    *locator,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         int       values[],
         int       *status);
 
@@ -195,9 +195,9 @@ datGetI(HDSLoc    *locator,
 /*======================================*/
 
 int
-datGetL(HDSLoc    *locator,
+datGetL(const HDSLoc    *locator,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         int       values[],
         int       *status);
 
@@ -206,9 +206,9 @@ datGetL(HDSLoc    *locator,
 /*===================================*/
 
 int
-datGetR(HDSLoc    *locator,
+datGetR(const HDSLoc    *locator,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         float     values[],
         int       *status);
 
@@ -217,42 +217,42 @@ datGetR(HDSLoc    *locator,
 /*======================================*/
 
 int
-datGet0C( HDSLoc * loc, char * value, size_t len, int * status );
+datGet0C( const HDSLoc * loc, char * value, size_t len, int * status );
 
 /*======================================*/
 /* datGet0D - Read scalar double value  */
 /*======================================*/
 
 int
-datGet0D( HDSLoc * loc, double * value, int * status );
+datGet0D( const HDSLoc * loc, double * value, int * status );
 
 /*=====================================*/
 /* datGet0R - Read scalar float value  */
 /*=====================================*/
 
 int
-datGet0R( HDSLoc * loc, float * value, int * status );
+datGet0R( const HDSLoc * loc, float * value, int * status );
 
 /*=======================================*/
 /* datGet0I - Read scalar integer value  */
 /*=======================================*/
 
 int
-datGet0I( HDSLoc * loc, int * value, int * status );
+datGet0I( const HDSLoc * loc, int * value, int * status );
 
 /*=======================================*/
 /* datGet0L - Read scalar logical value  */
 /*=======================================*/
 
 int
-datGet0L( HDSLoc * loc, int * value, int * status );
+datGet0L( const HDSLoc * loc, int * value, int * status );
 
 /*======================================*/
 /* datIndex - Index into component list */
 /*======================================*/
 
 int
-datIndex(HDSLoc   *locator1,
+datIndex(const HDSLoc   *locator1,
          int      index,
          HDSLoc   **locator2,
          int      *status );
@@ -271,11 +271,11 @@ datLen(const HDSLoc *locator,
 /*===========================*/
 
 int
-datMap(HDSLoc     *locator,
-       char       *type_str,
-       char       *mode_str,
+datMap(const HDSLoc     *locator,
+       const char       *type_str,
+       const char       *mode_str,
        int        ndim,
-       hdsdim     dims[],
+       const hdsdim     dims[],
        void       **pntr,
        int        *status);
 
@@ -284,10 +284,10 @@ datMap(HDSLoc     *locator,
 /*==================================*/
 
 int
-datMapC(HDSLoc    *locator,
-        char      *mode_str,
+datMapC(const HDSLoc    *locator,
+        const char      *mode_str,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         unsigned char **pntr,
         int       *status );
 
@@ -296,10 +296,10 @@ datMapC(HDSLoc    *locator,
 /*====================================*/
 
 int
-datMapD(HDSLoc    *locator,
-        char      *mode_str,
+datMapD(const HDSLoc    *locator,
+        const char      *mode_str,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         double    **pntr,
         int       *status );
 
@@ -308,10 +308,10 @@ datMapD(HDSLoc    *locator,
 /*=====================================*/
 
 int
-datMapI(HDSLoc    *locator,
-        char      *mode_str,
+datMapI(const HDSLoc    *locator,
+        const char      *mode_str,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         int       **pntr,
         int       *status );
 
@@ -320,10 +320,10 @@ datMapI(HDSLoc    *locator,
 /*=====================================*/
 
 int
-datMapL(HDSLoc *locator,
-        char      *mode_str,
+datMapL(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        hdsdim dims[],
+        const hdsdim dims[],
         int       **pntr,
         int       *status );
         
@@ -332,10 +332,10 @@ datMapL(HDSLoc *locator,
 /*==================================*/
 
 int
-datMapR(HDSLoc *locator,
-        char      *mode_str,
+datMapR(const HDSLoc *locator,
+        const char      *mode_str,
         int       ndim,
-        hdsdim dims[],
+        const hdsdim dims[],
         float     **pntr,
         int       *status );
 
@@ -358,9 +358,9 @@ datMapN(const HDSLoc     *locator,
 /*==================================*/
 
 int
-datMapV(HDSLoc    *locator,
-        char      *type_str,
-        char      *mode_str,
+datMapV(const HDSLoc    *locator,
+        const char      *type_str,
+        const char      *mode_str,
         void      **pntr,
         size_t    *actval,
         int       *status );
@@ -371,10 +371,10 @@ datMapV(HDSLoc    *locator,
 /*==================================*/
 
 int
-datMould(HDSLoc *locator,
-          int       ndim,
-          hdsdim dims[],
-          int       *status);
+datMould(const HDSLoc *locator,
+         int       ndim,
+         const hdsdim dims[],
+         int       *status);
 
 /*=======================*/
 /* datMove - Move object */
@@ -382,8 +382,8 @@ datMould(HDSLoc *locator,
 
 int
 datMove(HDSLoc **locator1,
-        HDSLoc *locator2,
-        char *name_str,
+        const HDSLoc *locator2,
+        const char *name_str,
         int *status);
 
 /*======================================*/
@@ -498,7 +498,7 @@ datNew0C( const HDSLoc    *locator,
 /*====================================*/
 
 int
-datParen(HDSLoc *locator1,
+datParen(const HDSLoc *locator1,
          HDSLoc **locator2,
          int *status);
 
@@ -536,10 +536,10 @@ datPrmry(int set,
 /*==================================*/
 
 int
-datPutC( HDSLoc *locator,
+datPutC( const HDSLoc *locator,
          int       ndim,
-         hdsdim dims[],
-         char      *string,
+         const hdsdim dims[],
+         const char      *string,
          size_t    string_length,
          int       *status);
 
@@ -548,10 +548,10 @@ datPutC( HDSLoc *locator,
 /*====================================*/
 
 int
-datPutD( HDSLoc *locator,
+datPutD( const HDSLoc *locator,
          int       ndim,
-         hdsdim dims[],
-         double    *values,
+         const hdsdim dims[],
+         const double    *values,
          int       *status);
 
 /*=====================================*/
@@ -559,10 +559,10 @@ datPutD( HDSLoc *locator,
 /*=====================================*/
 
 int
-datPutI( HDSLoc *locator,
+datPutI( const HDSLoc *locator,
          int     ndim,
-         hdsdim dims[],
-         int     *values,
+         const hdsdim dims[],
+         const int     *values,
          int     *status);
 
 /*==================================*/
@@ -570,10 +570,10 @@ datPutI( HDSLoc *locator,
 /*==================================*/
 
 int
-datPutR( HDSLoc *locator,
+datPutR( const HDSLoc *locator,
          int       ndim,
-         hdsdim dims[],
-         float     *values,
+         const hdsdim dims[],
+         const float     *values,
          int       *status);
 
 /*=====================================*/
@@ -581,10 +581,10 @@ datPutR( HDSLoc *locator,
 /*=====================================*/
 
 int
-datPutL( HDSLoc *locator,
+datPutL( const HDSLoc *locator,
          int       ndim,
-         hdsdim dims[],
-         int       *values,
+         const hdsdim dims[],
+         const int *values,
          int       *status);
 
 /*==========================*/
@@ -592,11 +592,11 @@ datPutL( HDSLoc *locator,
 /*==========================*/
 
 int
-datPut( HDSLoc  *locator,
-        char    *type_str,
+datPut( const HDSLoc  *locator,
+        const char    *type_str,
         int     ndim,
-        hdsdim  dims[],
-        void    *values,
+        const hdsdim  dims[],
+        const void    *values,
         int     *status);
 
 /*=======================================*/
@@ -604,42 +604,42 @@ datPut( HDSLoc  *locator,
 /*=======================================*/
 
 int
-datPut0C( HDSLoc * loc, char * value, int * status );
+datPut0C( const HDSLoc * loc, const char * value, int * status );
 
 /*=======================================*/
 /* datPut0D - Write scalar double value  */
 /*=======================================*/
 
 int
-datPut0D( HDSLoc * loc, double value, int * status );
+datPut0D( const HDSLoc * loc, double value, int * status );
 
 /*======================================*/
 /* datPut0R - Write scalar float value  */
 /*======================================*/
 
 int
-datPut0R( HDSLoc * loc, float value, int * status );
+datPut0R( const HDSLoc * loc, float value, int * status );
 
 /*========================================*/
 /* datPut0I - Write scalar integer value  */
 /*========================================*/
 
 int
-datPut0I( HDSLoc * loc, int value, int * status );
+datPut0I( const HDSLoc * loc, int value, int * status );
 
 /*========================================*/
 /* datPut0L - Write scalar logical value  */
 /*========================================*/
 
 int
-datPut0L( HDSLoc * loc, int value, int * status );
+datPut0L( const HDSLoc * loc, int value, int * status );
 
 /*===================================================*/
 /* datRefct - Enquire container file reference count */
 /*===================================================*/
 
 int
-datRefct(HDSLoc *locator,
+datRefct(const HDSLoc *locator,
          int *refct,
          int *status);
 
@@ -648,16 +648,16 @@ datRefct(HDSLoc *locator,
 /*=============================*/
 
 int
-datRenam(HDSLoc *locator,
-          char *name_str,
-          int  *status);
+datRenam(const HDSLoc *locator,
+         const  char *name_str,
+	 int  *status);
 
 /*================================*/
 /* datReset - Reset object state */
 /*================================*/
 
 int 
-datReset(HDSLoc *locator,
+datReset(const HDSLoc *locator,
           int *status);
 
 /*================================*/
@@ -665,9 +665,9 @@ datReset(HDSLoc *locator,
 /*================================*/
 
 int
-datRetyp(HDSLoc *locator,
-          char *type_str,
-          int *status);
+datRetyp(const HDSLoc *locator,
+         const char *type_str,
+	 int *status);
 
 /*=================================*/
 /* datShape - Enquire object shape */
@@ -694,10 +694,10 @@ datSize(const HDSLoc *locator,
 /*================================*/
 
 int
-datSlice(HDSLoc  *locator1,
+datSlice(const HDSLoc  *locator1,
          int     ndim,
-         hdsdim  lower[],
-         hdsdim  upper[],
+         const hdsdim  lower[],
+         const hdsdim  upper[],
          HDSLoc  **locator2,
          int     *status );
 
@@ -724,9 +724,9 @@ datStruc(const HDSLoc *locator,
 /*===================================*/
 
 int
-datTemp(char      *type_str,
+datTemp(const char      *type_str,
         int       ndim,
-        hdsdim    dims[],
+        const hdsdim    dims[],
         HDSLoc    **locator,
         int       *status);
 
@@ -736,7 +736,7 @@ datTemp(char      *type_str,
 
 int
 datThere(const HDSLoc *locator,
-         char *name_c,
+         const char *name_c,
          int *there,
          int *status);
 
@@ -754,7 +754,7 @@ datType(const HDSLoc *locator,
 /*=========================*/
 
 int
-datUnmap(HDSLoc *locator,
+datUnmap(const HDSLoc *locator,
          int  *status);
 
 /*==================================*/
@@ -771,7 +771,7 @@ datValid(const HDSLoc *locator,
 /*===========================*/
 
 int
-datVec(HDSLoc *locator1,
+datVec(const HDSLoc *locator1,
        HDSLoc **locator2,
        int    *status );
 
@@ -786,9 +786,9 @@ datVec(HDSLoc *locator1,
 /*==================================================*/
 
 int
-hdsCopy(HDSLoc *locator,
-        char *file_str,
-        char name_str[DAT__SZNAM],
+hdsCopy(const HDSLoc *locator,
+        const char *file_str,
+        const char name_str[DAT__SZNAM],
         int *status );
 
 /*=================================*/
@@ -812,7 +812,7 @@ hdsEwild( int *iwld,
 /*=================================*/
 
 int
-hdsFlush( char *group_str,
+hdsFlush( const char *group_str,
           int *status);
 
 /*===============================*/
@@ -820,7 +820,7 @@ hdsFlush( char *group_str,
 /*===============================*/
 
 int
-hdsFree(HDSLoc *locator,
+hdsFree(const HDSLoc *locator,
         int *status);
 
 /*==================================*/
@@ -828,7 +828,7 @@ hdsFree(HDSLoc *locator,
 /*==================================*/
 
 int
-hdsGroup(HDSLoc *locator,
+hdsGroup(const HDSLoc *locator,
          char group_str[DAT__SZGRP+1],
          int *status);
 
@@ -837,7 +837,7 @@ hdsGroup(HDSLoc *locator,
 /*=========================================*/
 
 int
-hdsGtune(char *param_str,
+hdsGtune(const char *param_str,
          int *value,
          int *status);
 
@@ -846,8 +846,8 @@ hdsGtune(char *param_str,
 /*=================================*/
 
 int
-hdsLink(HDSLoc *locator,
-        char *group_str,
+hdsLink(const HDSLoc *locator,
+        const char *group_str,
         int *status);
 
 /*================================*/
@@ -855,7 +855,7 @@ hdsLink(HDSLoc *locator,
 /*================================*/
 
 int
-hdsLock(HDSLoc *locator,
+hdsLock(const HDSLoc *locator,
         int *status);
 
 /*====================================*/
@@ -863,11 +863,11 @@ hdsLock(HDSLoc *locator,
 /*====================================*/
 
 int
-hdsNew(char *file_str,
-       char *name_str,
-       char *type_str,
+hdsNew(const char *file_str,
+       const char *name_str,
+       const char *type_str,
        int  ndim,
-       hdsdim  dims[],
+       const hdsdim  dims[],
        HDSLoc **locator,
        int *status);
 
@@ -876,8 +876,8 @@ hdsNew(char *file_str,
 /*========================================*/
 
 int
-hdsOpen(char *file_str,
-        char *mode_str,
+hdsOpen(const char *file_str,
+        const char *mode_str,
         HDSLoc **locator,
         int *status);
 
@@ -886,7 +886,7 @@ hdsOpen(char *file_str,
 /*===============================*/
 
 int
-hdsShow(char *topic_str,
+hdsShow(const char *topic_str,
         int  *status);
 
 /*===============================================*/
@@ -922,7 +922,7 @@ hdsTrace(const HDSLoc *locator,
 /*========================================*/
 
 int
-hdsTune(char *param_str,
+hdsTune(const char *param_str,
         int  *value,
         int  *status);
 
@@ -931,8 +931,8 @@ hdsTune(char *param_str,
 /*=================================================================*/
 
 int 
-hdsWild(char *fspec,
-        char *mode,
+hdsWild(const char *fspec,
+        const char *mode,
         int *iwld,
         HDSLoc **loc,
         int *status);
@@ -947,7 +947,7 @@ hdsWild(char *fspec,
 
 int
 datConv(const HDSLoc *locator,
-        char *type_str,
+        const char *type_str,
         int *conv,
         int *status);
 

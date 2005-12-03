@@ -28,8 +28,8 @@ dat1_erase_object(int ncomp,
 /* DAT_ERASE - Erase object */
 /*==========================*/
 int
-datErase(HDSLoc *locator,
-         char *name_str,
+datErase(const HDSLoc *locator,
+         const char *name_str,
          int *status)
 {
 #undef context_name
