@@ -340,6 +340,19 @@ datMapR(HDSLoc *locator,
         int       *status );
 
 
+/*========================================*/
+/* datMapN - Map primitive as N-dim array */
+/*========================================*/
+
+int
+datMapN(const HDSLoc     *locator,
+	const char       *type_str,
+        const char       *mode_str,
+	int        ndim,
+	void       **pntr,
+	hdsdim     dims[],
+	int        *status);
+
 /*==================================*/
 /* datMapV - Map vectorized primitive(s) */
 /*==================================*/
