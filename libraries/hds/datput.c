@@ -178,7 +178,7 @@ int
 datPutI(const HDSLoc   *locator,
          int     ndim,
         const HDS_PTYPE dims[],
-        const int     *values,
+        const int     values[],
          int     *status)
 {
 #undef context_name
@@ -203,7 +203,7 @@ int
 datPutR( const HDSLoc    *locator,
          int       ndim,
          const HDS_PTYPE dims[],
-         const float     *values,
+         const float     values[],
          int       *status)
 {
 #undef context_name
@@ -228,7 +228,7 @@ int
 datPutD( const HDSLoc    *locator,
          int       ndim,
          const HDS_PTYPE dims[],
-         const double    *values,
+         const double    values[],
          int       *status)
 {
 #undef context_name
@@ -253,7 +253,7 @@ int
 datPutL( const HDSLoc    *locator,
          int       ndim,
          const HDS_PTYPE dims[],
-         const int       *values,
+         const int       values[],
          int       *status)
 {
 #undef context_name
@@ -278,7 +278,7 @@ int
 datPutC( const HDSLoc    *locator,
          int       ndim,
          const HDS_PTYPE dims[],
-         const char      *string,
+         const char      string[],
          size_t    string_length,
          int       *status)
 {
@@ -310,4 +310,176 @@ datPutC( const HDSLoc    *locator,
           string1,
           status);
      return hds_gl_status;
+}
+
+/*         O N E - D I M           P U T     */
+
+/*=================================*/
+/* DAT_PUT1D - Write 1D double array */
+/*=================================*/
+
+int
+datPut1D( const HDSLoc * locator,
+	  size_t nval,
+	  const double values[],
+	  int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1D_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutD( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
+/*=================================*/
+/* DAT_PUT1I - Write 1D int array */
+/*=================================*/
+
+int
+datPut1I( const HDSLoc * locator,
+	  size_t nval,
+	  const int values[],
+	  int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1I_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutI( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
+/*=================================*/
+/* DAT_PUT1R - Write 1D float array */
+/*=================================*/
+
+int
+datPut1R( const HDSLoc * locator,
+	  size_t nval,
+	  const float values[],
+	  int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1R_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutR( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
+/*=================================*/
+/* DAT_PUT1L - Write 1D logical array */
+/*=================================*/
+
+int
+datPut1L( const HDSLoc * locator,
+	  size_t nval,
+	  const int values[],
+	  int * status ) {
+  size_t size;
+  hdsdim dim[1];
+
+  if ( *status != DAT__OK ) return *status;
+  datSize( locator, &size, status );
+  if ( *status == DAT__OK && size != nval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)nval );
+    emsSeti( "SZ", (int)size );
+    emsRep( "DAT_PUT1L_ERR", "Bounds mismatch: ^IN != ^SZ", status);
+  } else {
+    dim[0] = (hdsdim)size;
+    datPutL( locator, 1, dim, values, status );
+  }
+  return *status;
+}
+
+/*         V E C T O R I Z E D     P U T     */
+
+/*=================================*/
+/* DAT_PUTVD - Write vectorized doubles */
+/*=================================*/
+
+int
+datPutVD( const HDSLoc * locator,
+	  size_t nval,
+	  const double values[],
+	  int *status ) {
+  HDSLoc *vec = NULL;
+  datVec( locator, &vec, status );
+  datPut1D( vec, nval, values, status );
+  datAnnul( &vec, status );
+  return *status;
+}
+
+/*==================================*/
+/* DAT_PUTVI - Write vectorized int */
+/*==================================*/
+
+int
+datPutVI( const HDSLoc * locator,
+	  size_t nval,
+	  const int values[],
+	  int *status ) {
+  HDSLoc *vec = NULL;
+  datVec( locator, &vec, status );
+  datPut1I( vec, nval, values, status );
+  datAnnul( &vec, status );
+  return *status;
+}
+
+/*====================================*/
+/* DAT_PUTVR - Write vectorized float */
+/*====================================*/
+
+int
+datPutVR( const HDSLoc * locator,
+	  size_t nval,
+	  const float values[],
+	  int *status ) {
+  HDSLoc *vec = NULL;
+  datVec( locator, &vec, status );
+  datPut1R( vec, nval, values, status );
+  datAnnul( &vec, status );
+  return *status;
+}
+
+/*=================================*/
+/* DAT_PUTVL - Write vectorized logical */
+/*=================================*/
+
+int
+datPutVL( const HDSLoc * locator,
+	  size_t nval,
+	  const int values[],
+	  int *status ) {
+  HDSLoc *vec = NULL;
+  datVec( locator, &vec, status );
+  datPut1L( vec, nval, values, status );
+  datAnnul( &vec, status );
+  return *status;
 }

@@ -602,7 +602,7 @@ int
 datPutC( const HDSLoc *locator,
          int       ndim,
          const hdsdim dims[],
-         const char      *string,
+         const char      string[],
          size_t    string_length,
          int       *status);
 
@@ -614,7 +614,7 @@ int
 datPutD( const HDSLoc *locator,
          int       ndim,
          const hdsdim dims[],
-         const double    *values,
+         const double    values[],
          int       *status);
 
 /*=====================================*/
@@ -625,7 +625,7 @@ int
 datPutI( const HDSLoc *locator,
          int     ndim,
          const hdsdim dims[],
-         const int     *values,
+         const int     values[],
          int     *status);
 
 /*==================================*/
@@ -636,7 +636,7 @@ int
 datPutR( const HDSLoc *locator,
          int       ndim,
          const hdsdim dims[],
-         const float     *values,
+         const float     values[],
          int       *status);
 
 /*=====================================*/
@@ -647,7 +647,7 @@ int
 datPutL( const HDSLoc *locator,
          int       ndim,
          const hdsdim dims[],
-         const int *values,
+         const int values[],
          int       *status);
 
 /*==========================*/
@@ -696,6 +696,86 @@ datPut0I( const HDSLoc * loc, int value, int * status );
 
 int
 datPut0L( const HDSLoc * loc, int value, int * status );
+
+/*========================================*/
+/* datPut1D - Write 1D double array       */
+/*========================================*/
+
+int
+datPut1D( const HDSLoc * loc, 
+	  size_t nval, 
+	  const double values[],
+	  int * status );
+
+/*========================================*/
+/* datPut1I - Write 1D int array       */
+/*========================================*/
+
+int
+datPut1I( const HDSLoc * loc, 
+	  size_t nval, 
+	  const int values[],
+	  int * status );
+
+/*========================================*/
+/* datPut1R - Write 1D double array       */
+/*========================================*/
+
+int
+datPut1R( const HDSLoc * loc, 
+	  size_t nval, 
+	  const float values[],
+	  int * status );
+
+/*========================================*/
+/* datPut1L - Write 1D Logical/int array       */
+/*========================================*/
+
+int
+datPut1L( const HDSLoc * loc, 
+	  size_t nval, 
+	  const int values[],
+	  int * status );
+
+/*================================================*/
+/* datPutVD - Write vectorized double array       */
+/*================================================*/
+
+int
+datPutVD( const HDSLoc * loc, 
+	  size_t nval, 
+	  const double values[],
+	  int * status );
+
+/*================================================*/
+/* datPutVI - Write vectorized int array       */
+/*================================================*/
+
+int
+datPutVI( const HDSLoc * loc, 
+	  size_t nval, 
+	  const int values[],
+	  int * status );
+
+/*================================================*/
+/* datPutVR - Write vectorized REAL/float array       */
+/*================================================*/
+
+int
+datPutVR( const HDSLoc * loc, 
+	  size_t nval, 
+	  const float values[],
+	  int * status );
+
+/*================================================*/
+/* datPutVL - Write vectorized Logical array       */
+/*================================================*/
+
+int
+datPutVL( const HDSLoc * loc, 
+	  size_t nval, 
+	  const int values[],
+	  int * status );
 
 /*========================================*/
 /* datRef - Enquire object reference name */

@@ -2110,6 +2110,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
    /* Special case _CHAR since fortran is telling us the length */
+   /* This may not be needed if the type string is _CHAR*nnn    */
    if (strncmp(type,"_CHAR",5) == 0) ischar = 1;
 
 #if HDS_COPY_FORTRAN_DIMS
@@ -2130,6 +2131,94 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
      datPut( &locator_c, type_c, *ndim, dims, values, status );
    }
 #endif
+}
+
+F77_SUBROUTINE(dat_put1d)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_DOUBLE_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPut1D( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_put1i)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_INTEGER_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPut1I( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_put1r)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_REAL_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPut1R( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_put1l)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_LOGICAL_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPut1L( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_putvd)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_DOUBLE_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPutVD( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_putvi)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_INTEGER_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPutVI( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_putvr)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_REAL_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPutVR( &locator_c, (size_t)*nval, values, status );
+}
+
+F77_SUBROUTINE(dat_putvl)( CHARACTER(locator),
+			   INTEGER(nval),
+			   F77_LOGICAL_TYPE *values,
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datPutVL( &locator_c, (size_t)*nval, values, status );
 }
 
 F77_SUBROUTINE(dat_put0c)( CHARACTER(locator),

@@ -79,10 +79,13 @@
       INTEGER REFLEN             ! Actual size of REF
       INTEGER LSTAT
       CHARACTER * (DAT__SZTYP) CTYPE ! type field for _CHAR
+      REAL RDIM(5), RDIM_OUT(5)
+      INTEGER ACTVAL
+      INTEGER I
 
 *  Local Data:
       DATA DIM / 10, 20 /
-
+      DATA RDIM / 1.0, 2.0, 3.0, 4.0, 5.0 /
 *.
 
 *  Initialise the global status.
@@ -105,11 +108,17 @@
       CALL DAT_NEW0L( LOC1, 'SCALARL', STATUS )
       CALL DAT_NEW0C( LOC1, 'SCALARC', 32, STATUS )
 
+      CALL DAT_NEW1R( LOC1, 'ONEDR', 5, STATUS )
+
 *  Create a test structure
       CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
       CALL DAT_FIND( LOC1, 'TSTRUCT', LOC3, STATUS )
       CALL DAT_NEW( LOC3, 'ARRAY', '_DOUBLE', 2, DIM, STATUS )
 
+*  Store something in it
+      CALL DAT_FIND( LOC1, 'ONEDR', LOC4, STATUS )
+      CALL DAT_PUT1R( LOC4, 5, RDIM, STATUS )
+      CALL DAT_ANNUL( LOC4, STATUS )
 
 *  Find and map the data array.
       CALL DAT_FIND( LOC1, 'DATA_ARRAY', LOC2, STATUS )
@@ -138,7 +147,7 @@
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 6) THEN
+         IF (NCOMP .NE. 7) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
@@ -223,11 +232,32 @@
          CALL EMS_RLSE
       END IF
 
+*  Clean up
+
       CALL DAT_ANNUL( LOC3, STATUS )
       CALL DAT_ANNUL( LOC4, STATUS )
       CALL DAT_ANNUL( LOC5, STATUS )
       CALL DAT_ANNUL( LOC6, STATUS )
       CALL DAT_ANNUL( LOC7, STATUS )
+
+*  Check DAT_GET1R
+      CALL DAT_FIND( LOC1, 'ONEDR', LOC3, STATUS )
+      CALL DAT_GET1R( LOC3, 5, RDIM_OUT, ACTVAL, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         DO I = 1, 5
+            IF (STATUS .EQ. SAI__OK) THEN
+               IF ( RDIM(I) .NE. RDIM_OUT(I) ) THEN
+                  STATUS = SAI__ERROR
+                  CALL EMS_REP( 'GET',
+     :                 'Did not get what we put in', STATUS)
+               END IF
+            END IF
+         END DO
+      END IF
+
+*  Force primitive
 
       CALL DAT_PRIM( LOC2, PRIM, STATUS )
 
