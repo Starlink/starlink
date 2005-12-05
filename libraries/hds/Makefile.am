@@ -6,8 +6,8 @@ starhelp_DATA = hds_machine.txt
 
 lib_LTLIBRARIES = libhds.la
 
-TESTS = hds_test hds_test_prm
-check_PROGRAMS = hds_test hds_test_prm
+TESTS = hds_test hdsTest hds_test_prm
+check_PROGRAMS = hds_test hdsTest hds_test_prm
 
 libhds_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -39,6 +39,9 @@ dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h
 
 hds_test_SOURCES = hds_test.f
 hds_test_LDADD = libhds.la `ems_link` `chr_link`
+
+hdsTest_SOURCES = hdsTest.c
+hdsTest_LDADD = libhds.la `ems_link` `chr_link` @FCLIBS@
 
 hds_test_prm_SOURCES = hds_test_prm.c
 hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
