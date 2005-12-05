@@ -2,6 +2,7 @@
 #include "hds1.h"
 #include "hds.h"
 #include "dat_err.h"
+#include "ems.h"
 
 /*
 *  Name:
@@ -111,6 +112,9 @@ int datMapN( const HDSLoc* loc, const char * type, const char * mode,
 
   if (actdim != ndim) {
     *status = DAT__DIMIN;
+    emsSeti( "N", ndim );
+    emsSeti( "A", actdim );
+    emsRep( "DAT_MAPN_ERR", "Number of dimensions supplied (^N) does not match actual number of dimensions (^A)", status);
   } else {
     datMap( loc, type, mode, ndim, dims, pntr, status );
   }
