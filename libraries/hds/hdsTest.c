@@ -83,7 +83,7 @@ int main () {
   hdsNew( path, "HDS_TEST", "NDF", 0, dim, &loc1, &status );
 
   /* Some components */
-  datNew1C( loc1, "ONEDCHAR", 2, 5, &status );
+  datNew1C( loc1, "ONEDCHAR", 5, 2, &status );
   
   /* Populate */
   datFind( loc1, "ONEDCHAR", &loc2, &status );
