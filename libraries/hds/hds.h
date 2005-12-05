@@ -697,6 +697,15 @@ datPut0I( const HDSLoc * loc, int value, int * status );
 int
 datPut0L( const HDSLoc * loc, int value, int * status );
 
+/*========================================*/
+/* datPut1C - Write 1D character array       */
+/*========================================*/
+
+int
+datPut1C( const HDSLoc * locator,
+	  size_t nval,
+	  const char *values[],
+	  int * status );
 
 /*========================================*/
 /* datPut1D - Write 1D double array       */
