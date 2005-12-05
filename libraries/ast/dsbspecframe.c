@@ -457,8 +457,8 @@ static const char *GetDomain( AstFrame *this_frame ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Obtain a pointer to the SpecFrame structure. */
-   this = (AstSpecFrame *) this_frame;
+/* Obtain a pointer to the DSBSpecFrame structure. */
+   this = (AstDSBSpecFrame *) this_frame;
 
 /* If a Domain attribute string has been set, invoke the parent method
    to obtain a pointer to it. */
