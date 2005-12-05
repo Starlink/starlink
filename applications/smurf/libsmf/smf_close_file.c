@@ -38,6 +38,8 @@
 *        Initial test version
 *     2005-12-02 (EC):
 *        Fixed memory unallocation problems
+*     2005-12-05 (TIMJ):
+*        Tidy up logic from Ed's patch
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,13 +112,15 @@ void smf_close_file( smfData ** data, int * status ) {
       /* opened by DA library */
       sc2store_free( status );
     } else if ( file->ndfid != NDF__NOID ) {
-      /* Annul the NDF and locators (which will unmap things) */
-      if ( file->xloc == NULL ) {  /* IS THIS OK? - EC 2/12/2005 */
-	datAnnul( &(file->xloc), status );
-      }
-      sc2store_headunmap( status ); /* IS THIS OK? - EC 2/12/2005 */
 
+      /* if this is a time series we need to free
+	 the header structure */
+      if (file->isTstream) sc2store_headunmap( status );
+
+      /* Annul the NDF and locators (which will unmap things) */
+      if ( file->xloc ) datAnnul( &(file->xloc), status );
       ndfAnnul( &(file->ndfid), status );
+
     } else {
       /* No file so free the data */
       freedata = 1;
