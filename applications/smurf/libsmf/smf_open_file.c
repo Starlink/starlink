@@ -48,6 +48,8 @@
 *        Malloc sc2head
 *     2005-12-01 (EC):
 *        Fixed up error determining data types
+*     2005-12-05 (TIMJ):
+*        Store isTstream flag for smf_close_file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -228,6 +230,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       /* Store NDF identifier and set isSc2store to false */
       file->ndfid = indf;
       file->isSc2store = 0;
+      file->isTstream = isTseries;
     } else {
       /* OK, we have raw data. Close the NDF because
 	 sc2store_rdtstream will open it again */
@@ -282,6 +285,9 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
       /* Set flag to indicate data read by sc2store_() */
       file->isSc2store = 1;
+
+      /* and it is a time series */
+      file->isTstream = 1;
     }
     /* Store info in smfData struct */  
 
