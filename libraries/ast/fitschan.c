@@ -646,6 +646,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Make astGetFits<X> public.
 *     30-NOV-2005 (DSB):
 *        - Add support for undefined FITS keyword values.
+*     5-DEC-2005 (DSB):
+*        - Include an IMAGFREQ keyword in the output when writing a 
+*        DSBSpecFrame out using FITS-WCS encoding.
 *class--
 */
 
@@ -27348,6 +27351,14 @@ static int WcsFromStore( AstFitsChan *this, FitsStore *store,
       val = GetItem( &(store->restwav), 0, 0, s, NULL, method, class );
       if( val != AST__BAD ) SetValue( this, FormatKey( "RESTWAV", -1, -1, s ),
                                       &val, AST__FLOAT, "[m] Rest wavelength" );
+
+/* The image frequency corresponding to the rest frequency (only used for
+   double sideband data). This is not part of the FITS-WCS standard but
+   is added for the benefit of JACH. */
+      val = GetItem( &(store->imagfreq), 0, 0, s, NULL, method, class );
+      if( val != AST__BAD ) {
+         SetValue( this, "IMAGFREQ", &val, AST__FLOAT, "[Hz] Image frequency" );
+      }      
 
 /* OBSGEO-X/Y/Z - observers geocentric coords. Note, these always refer
    to the primary axes. */
