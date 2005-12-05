@@ -10,6 +10,7 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "hds.h"
 
 int
 hdsTune(const char *param_str,
@@ -73,6 +74,22 @@ hdsTune(const char *param_str,
 *     04-DEC-2005 (TIMJ):
 *        No reason for input arg to be a pointer.
 *     {enter_further_changes_here}
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Bugs:
 *     {note_any_bugs_here}
