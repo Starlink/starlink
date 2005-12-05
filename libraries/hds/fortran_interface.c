@@ -1726,7 +1726,7 @@ F77_SUBROUTINE(dat_new1r)( CHARACTER(locator),
 F77_SUBROUTINE(dat_new1c)( CHARACTER(locator),
 			   CHARACTER(name),
 			   INTEGER(len),
-			   INTEGER(size),
+			   INTEGER(nelem),
 			   INTEGER(status)
 			   TRAIL(locator)
 			   TRAIL(name) )
@@ -1740,7 +1740,7 @@ F77_SUBROUTINE(dat_new1c)( CHARACTER(locator),
    HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
    size_t len_c;
-   size_t size_c;
+   size_t nelem_c;
    
 /* Enter routine.	*/
 
@@ -1751,8 +1751,8 @@ F77_SUBROUTINE(dat_new1c)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
    len_c = *len;
-   size_c = *size;
-   datNew1C( &locator_c, name_c, len_c, size_c, status );
+   nelem_c = *nelem;
+   datNew1C( &locator_c, name_c, len_c, nelem_c, status );
 
 }
 
@@ -3227,7 +3227,7 @@ F77_SUBROUTINE(hds_tune) ( CHARACTER(param_str),
    param_str_c = cnfCreim( param_str, param_str_length );
    
 /* Call pure C routine  */
-   hdsTune( param_str_c, &value, status );
+   hdsTune( param_str_c, *value, status );
    
 /* Free allocated string memory.                             */
    free( param_str_c );
@@ -3379,7 +3379,7 @@ F77_SUBROUTINE(dat_tune) ( CHARACTER(name),
    
 /* Call pure C routine  */
    if (strncmp(name_c, "NCOMP", 5) == 0 ) {
-      hdsTune( name_c, value, status );
+      hdsTune( name_c, *value, status );
    } else {
       emsSetc( "NM", name_c );
       emsRep("DAT_TUNE_ERR", "Unrecognized tuning parameter (^NM)",
