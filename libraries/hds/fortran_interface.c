@@ -3227,7 +3227,7 @@ F77_SUBROUTINE(hds_tune) ( CHARACTER(param_str),
    param_str_c = cnfCreim( param_str, param_str_length );
    
 /* Call pure C routine  */
-   hdsTune( param_str_c, value, status );
+   hdsTune( param_str_c, &value, status );
    
 /* Free allocated string memory.                             */
    free( param_str_c );

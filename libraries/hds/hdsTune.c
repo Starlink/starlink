@@ -12,8 +12,8 @@
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
 int
-hdsTune(char *param_str,
-        int  *value,
+hdsTune(const char *param_str,
+        int  value,
         int  *status) 
 {
 /*
@@ -45,10 +45,13 @@ hdsTune(char *param_str,
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     BKM:  B.K. McIlwrath    (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +70,8 @@ hdsTune(char *param_str,
 *        Convert to a C function with FORTRAN wrapper.
 *     06-MAY-2004 (BKM)
 *        Add 64BIT tuning parameter.
+*     04-DEC-2005 (TIMJ):
+*        No reason for input arg to be a pointer.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +112,7 @@ hdsTune(char *param_str,
 /* blocks.                                                                  */
       if ( strncmp( name, "INAL", 4 ) == 0 )
       {
-         hds_gl_inalq = *value;
+         hds_gl_inalq = value;
          if ( hds_gl_inalq < 2 ) hds_gl_inalq = 2;
       }
 
@@ -115,13 +120,13 @@ hdsTune(char *param_str,
       else if ( strncmp( name, "MAP", 3 ) == 0 )
       {
 /* Flush all open files if mapping is changed                               */
-          if ( *value != hds_gl_map )
+          if ( value != hds_gl_map )
               for( i=0; i<rec_gl_endslot; i++ )
                   if( rec_ga_fcv[i].open )
                       if ( rec_ga_fcv[i].write != REC__NOIOCHAN )
                           fflush(rec_ga_fcv[i].write);
 
-         switch ( *value )
+         switch ( value )
          {
 
 /* If -1 was specified, set file mapping if it is the best mode for         */
@@ -144,7 +149,7 @@ hdsTune(char *param_str,
 
 /* Convert all other non-zero values to 1.                                  */
             default:
-               hds_gl_map = ( *value != 0 );
+               hds_gl_map = ( value != 0 );
                break;
          }
 
@@ -156,7 +161,7 @@ hdsTune(char *param_str,
 /* the default value (HDS__MAXWPL).                                         */
       else if ( strncmp( name, "MAXW", 4 ) == 0 )
       {
-         hds_gl_maxwpl = *value;
+         hds_gl_maxwpl = value;
          if ( hds_gl_maxwpl < HDS__MAXWPL ) hds_gl_maxwpl = HDS__MAXWPL;
       }
 
@@ -164,7 +169,7 @@ hdsTune(char *param_str,
 /* the default value (HDS__NBLOCKS).                                        */
       else if ( strncmp( name, "NBLO", 4 ) == 0 )
       {
-         hds_gl_nblocks = *value;
+         hds_gl_nblocks = value;
          if ( hds_gl_nblocks < HDS__NBLOCKS ) hds_gl_nblocks = HDS__NBLOCKS;
       }
 
@@ -172,7 +177,7 @@ hdsTune(char *param_str,
 /* one.                                                                     */
       else if ( strncmp( name, "NCOM", 4 ) == 0 )
       {
-         hds_gl_ncomp = *value;
+         hds_gl_ncomp = value;
          if ( hds_gl_ncomp < 1 ) hds_gl_ncomp = 1;
       }
 
@@ -181,7 +186,7 @@ hdsTune(char *param_str,
 /* shell.                                                                   */
       else if ( strncmp( name, "SHEL", 4 ) == 0 )
       {
-         hds_gl_shell = *value;
+         hds_gl_shell = value;
          if ( ( hds_gl_shell < HDS__NOSHELL ) ||
               ( hds_gl_shell > HDS__MXSHELL ) )
          {
@@ -193,7 +198,7 @@ hdsTune(char *param_str,
 /* else implies system wide locking.                                        */
       else if ( strncmp( name, "SYSL", 4 ) == 0 )
       {
-         hds_gl_syslck = *value;
+         hds_gl_syslck = value;
          hds_gl_syslck = ( hds_gl_syslck != 0 );
       }
 
@@ -201,7 +206,7 @@ hdsTune(char *param_str,
 /* wait.                                                                    */
       else if ( strncmp( name, "WAIT", 4 ) == 0 )
       {
-         hds_gl_wait = *value;
+         hds_gl_wait = value;
          hds_gl_wait = ( hds_gl_wait != 0 );
       }
 
@@ -209,7 +214,7 @@ hdsTune(char *param_str,
 /* files. anything else implies yes.                                        */
       else if ( strncmp( name, "64BIT", 5 ) == 0 )
       {
-         hds_gl_c64bit = *value;
+         hds_gl_c64bit = value;
          hds_gl_c64bit = ( hds_gl_c64bit != 0 );
       }
 

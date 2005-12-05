@@ -697,6 +697,7 @@ datPut0I( const HDSLoc * loc, int value, int * status );
 int
 datPut0L( const HDSLoc * loc, int value, int * status );
 
+
 /*========================================*/
 /* datPut1D - Write 1D double array       */
 /*========================================*/
@@ -1073,7 +1074,7 @@ hdsTrace(const HDSLoc *locator,
 
 int
 hdsTune(const char *param_str,
-        int  *value,
+        int  value,
         int  *status);
 
 /*=================================================================*/
