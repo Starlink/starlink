@@ -649,6 +649,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     5-DEC-2005 (DSB):
 *        - Include an IMAGFREQ keyword in the output when writing a 
 *        DSBSpecFrame out using FITS-WCS encoding.
+*        - Correct test for constant values in FitOK.
 *class--
 */
 
@@ -8527,13 +8528,14 @@ static int FitOK( int n, double *act, double *est ) {
       s4 /= s6;
       s5 /= s6;
 
-/* If the actual and estimated values are effectively constant, assume the
-   fit is linear. */
+/* If the actual and estimated values are effectively constant (taken as
+   the standard deviation of the points being less than 1E-7 of the mean
+   value), assume the fit is linear. */
       den1 = ( s4 - s1*s1 );
       den2 = ( s5 - s2*s2 );
       denom = den1*den2;
-      if( fabs( den1 ) <= 1.0E-8*fabs( s1 ) && 
-          fabs( den2 ) <= 1.0E-8*fabs( s2 ) ) {
+      if( fabs( den1 ) <= 1.0E-14*s1*s1 && 
+          fabs( den2 ) <= 1.0E-14*s2*s2 ) {
          ret = 1;
 
 /* Otherwise, check the correlation coefficient between the actual and
