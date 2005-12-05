@@ -2133,6 +2133,38 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
 #endif
 }
 
+F77_SUBROUTINE(dat_put1c)( CHARACTER(locator),
+			   INTEGER(nval),
+			   CHARACTER(values),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(values) )
+{
+  HDSLoc locator_c;
+  hdsdim dims[1];
+  size_t actvals;
+
+  if (*status != SAI__OK) return;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+
+  /* No C equivalent to call directly so we just call datPutC 
+     after some bounds checking */
+  datSize( &locator_c, &actvals, status );
+
+  if ( *status == SAI__OK ) {
+    if (actvals != *nval) {
+      *status = DAT__BOUND;
+      emsSeti( "NV", *nval );
+      emsSeti( "SZ", actvals );
+      emsRep("DAT_PUT1C_ERR", "DAT_PUT1C: Bounds mismatch (^NV != ^SZ)", status );
+    } else {
+      dims[0] = *nval;
+      datPutC( &locator_c, 1, dims, values, values_length, status );
+    }
+  }
+
+}
+
 F77_SUBROUTINE(dat_put1d)( CHARACTER(locator),
 			   INTEGER(nval),
 			   F77_DOUBLE_TYPE *values,

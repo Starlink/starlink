@@ -82,10 +82,12 @@
       REAL RDIM(5), RDIM_OUT(5)
       INTEGER ACTVAL
       INTEGER I
+      CHARACTER * (5) CHARARR(2)
 
 *  Local Data:
       DATA DIM / 10, 20 /
       DATA RDIM / 1.0, 2.0, 3.0, 4.0, 5.0 /
+      DATA CHARARR / 'TEST1', 'TEST2' /
 *.
 
 *  Initialise the global status.
@@ -109,6 +111,7 @@
       CALL DAT_NEW0C( LOC1, 'SCALARC', 32, STATUS )
 
       CALL DAT_NEW1R( LOC1, 'ONEDR', 5, STATUS )
+      CALL DAT_NEW1C( LOC1, 'ONEDCHAR', 2, 5, STATUS )
 
 *  Create a test structure
       CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
@@ -118,6 +121,10 @@
 *  Store something in it
       CALL DAT_FIND( LOC1, 'ONEDR', LOC4, STATUS )
       CALL DAT_PUT1R( LOC4, 5, RDIM, STATUS )
+      CALL DAT_ANNUL( LOC4, STATUS )
+
+      CALL DAT_FIND( LOC1, 'ONEDCHAR', LOC4, STATUS )
+      CALL DAT_PUT1C( LOC4, 2, CHARARR, STATUS )
       CALL DAT_ANNUL( LOC4, STATUS )
 
 *  Find and map the data array.
@@ -147,7 +154,7 @@
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 7) THEN
+         IF (NCOMP .NE. 8) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
