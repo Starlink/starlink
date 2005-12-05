@@ -331,14 +331,14 @@ int
 datNew1C( const HDSLoc * locator,
 	  const char * name,
 	  size_t len,
-	  size_t size,
+	  size_t nelem,
 	  int * status )
 {
   char type[DAT__SZTYP+1];
 
   if (*status != DAT__OK) return *status;
-  datCctyp( size, type );
-  datNew1( locator, name, type, len, status );
+  datCctyp( len, type );
+  datNew1( locator, name, type, nelem, status );
   return *status;
 }
 
