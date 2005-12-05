@@ -513,7 +513,7 @@ int
 datNew1C( const HDSLoc    *locator,
 	  const char      *name_str,
 	  size_t          len,
-	  size_t          size,
+	  size_t          nelem,
 	  int       *status);
 
 /*=======================================*/
