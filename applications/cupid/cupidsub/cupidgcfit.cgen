@@ -173,13 +173,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 /* Return the final chi-squared value */
    *chisq = v[ 9 ];
 
-/* Return the result, setting the specified element of the residuals
-   array bad if no fit was performed. This prevents the any subsequent 
-   attempt to fit a Gaussian to the same peak value.*/
-   if( !ret ) res[ imax ] = CGEN_BAD;
-
-/*   CGEN_FUNCTION(cupidGCDump)( NULL, 0, NULL );   */
-
+/* Return the result */
    return ret;  
 }
 

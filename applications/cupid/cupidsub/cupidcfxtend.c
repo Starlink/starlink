@@ -192,6 +192,10 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
          if( ipa[ iv ] == old_index ) {
             ipa[ iv ] = new_index;
 
+/* Update the populations of the two PixelSets. */
+            (ps2->pop)++;
+            (ps1->pop)--;
+
 /* Calculate the nD GRID coords of this neighbouring pixel and extend the
    bounding box of the destination PixelSet to include it. */
             rem = iv;

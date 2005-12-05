@@ -21,7 +21,8 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 
 *  Parameters:
 *     config
-*        An AST KeyMap holding the configuration parameters.
+*        An AST KeyMap holding the configuration parameters. If NULL is
+*        supplied, the default value is returned without error.
 *     name
 *        The name of the value to extract from the KeyMap.
 *     def
@@ -50,8 +51,8 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 /* Initialise */
    ret = def;
 
-/* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return ret;
+/* Abort if an error has already occurred, or if no KeyMap was supplied. */
+   if( *status != SAI__OK || !config ) return ret;
 
 /* Attempt to extract the named value from the supplied KeyMap. */
    if( !astMapGet0D( config, name, &ret ) ) {

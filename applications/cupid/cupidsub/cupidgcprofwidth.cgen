@@ -105,8 +105,11 @@ double CGEN_FUNCTION(cupidGCProfWidth)( CGEN_TYPE *array, int ndim, int *dims,
    int pel;              /* Index of last profile element to be written to */
    int step;             /* Vector step between adjacent pixels on an axis */
 
+/* Initialise */
+   ret = 10;
+
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return 10;
+   if( *status != SAI__OK ) return ret;
 
 /* Allocate space for the profile making it the largest it could possibly
    need to be. */

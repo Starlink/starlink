@@ -191,6 +191,9 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 /* Assign the required index to the pixel in the index assignment array */
    ipa[ iel ] = ps->index;   
 
+/* Increment the population of the PixelSet.*/
+   (ps->pop)++;
+
 /* Extend the bounding box to include the pixel */
    for( i = 0; i < ndim; i++ ) {
       if( x[ i ] < ps->lbnd[ i ] ) ps->lbnd[ i ] = x[ i ];

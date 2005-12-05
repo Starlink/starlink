@@ -19,7 +19,7 @@ extern CupidGC cupidGC;
 
 void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
                                     int *dims, int imax, double rms, 
-                                    AstKeyMap *config, int iclump, int velax, 
+                                    AstKeyMap *config, int init, int velax, 
                                     double *par, int *slbnd ){
 /*
 *  Name:
@@ -31,7 +31,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *  Synopsis:
 *     void cupidGCSetInit<X>( CGEN_TYPE *array, double *var, int ndim, 
 *                             int *dims, int imax, double rms, 
-*                             AstKeyMap *config, int iclump, int velax, 
+*                             AstKeyMap *config, int init, int velax, 
 *                             double *par, int *slbnd )
 
 *  Description:
@@ -62,8 +62,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 *        The RMS noise level in the array.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
-*     iclump
-*        The number of clumps found so far.
+*     init
+*        Should "first time" initialisation be performed?
 *     velax
 *        The index of the velocity axis. Only used if "ndim" is 3.
 *     par
@@ -130,8 +130,8 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* Do some initialisation if no clumps have yet been found. */
-   if( iclump == 0 ) {
+/* Do some initialisation if required. */
+   if( init ) {
 
 /* Parameters which control the modification of the weights done by 
    cupidGCChiSq (this modification is meant to give low weights to pixels

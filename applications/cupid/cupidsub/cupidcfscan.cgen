@@ -125,6 +125,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    CupidPixelSet **new;  /* Pointer to array of new PixelSet pointers */
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ps;    /* Pointer to new PixelSet */
+   CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
    int **w2;             /* Pointer to array of neighbour lists */
    int *w1;              /* Pointer to array of neighbour population sizes */
    int jindex;           /* Index associated with clump j */
@@ -137,23 +138,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    int nnew;             /* No. of new PixelSets found */
    int rem;              /* Remaining count of pixels */
    int x[3];             /* GRID coords of current pixel */
-   int first;            /* Has contour level been reported? */
 
 /* Initialise */
    ret = clumps;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
-
-/* Inform user of contour level. */
-   if( ilevel > 2 ) {
-      msgBlank( status );
-      msgSetd( "C", clevel );
-      msgOut( "", "Checking contour level ^C:", status );
-      first = 0;
-   }  else {
-      first = 1;
-   }  
 
 /* As yet we have no new PixelSets */
    nnew = 0;
@@ -198,6 +188,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             if( ps && new ) {
                ps->index = (*index)++;
                ps->nnb = 0;
+               ps->pop = 0;
                ps->nb = NULL;
                ps->sznbl = NULL;
                ps->nbl = NULL;
@@ -317,15 +308,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          if( ret ) {
             ret[ *nps - 1 ] = ps;
 
-/* Inform user of contour level. */
-            if( ilevel == 2 && first ) {
-               msgBlank( status );
-               msgSetd( "C", clevel );
-               msgOut( "", "Checking contour level ^C:", status );
-               first = 0;
-            }
-
-            if( ilevel > 1 ) {
+/* Inform user of each new peak */
+            if( ilevel > 3 ) {
                msgSetd( "V", ps->vpeak );
                msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
                for( j = 1; j < ndim; j++ ) {
@@ -333,7 +317,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                   msgSeti( "C", ps->peak[ j ] );
                }
                msgSeti( "I", ps->index );
-               msgOut( "", "   Peak with value ^V found at (^C) index ^I", status );
+               msgSeti( "P", ps->pop );
+               msgOut( "", "   Peak found at (^C): peak ^V, index ^I, "
+                       "population ^P", status );
             }
 
             ps = NULL;
@@ -344,10 +330,19 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* If the new PixelSet touches just one of the existing PixelSets, then 
    it is an extension of that clump. Transfer all the pixels in the new 
-   PixelSet into the supplied clump and release the resources used by the
-   PixelSet structure. */
+   PixelSet into the supplied clump. */
       } else if( ps->nnb == 1 ) {
          cupidCFXfer( ps, ps->nb[ 0 ], ipa, skip );
+
+/* Inform user of how many pixels are now in the clump. */
+         if( ilevel > 3 ) {
+            msgSeti( "I", ps->index );
+            msgSeti( "J", ps->nb[ 0 ]->index );
+            msgSeti( "P", ps->nb[ 0 ]->pop );
+            msgOut( "", "   Area ^I transfered to clump ^J: new clump population ^P", status );
+         }
+
+/* Release the resources used by the PixelSet structure. */
          ps = cupidCFFreePS( ps );
 
 /* If a new PixelSet has been created which touches two or more of the 
@@ -361,8 +356,15 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          while( more ) {
             more = 0;
             for( j = 0; j < ps->nnb; j++ ) {
-               if( cupidCFXtend( ps, ps->nb[ j ], ipa, ndim, 
-                                 dims, skip, naxis ) ) more = 1;
+               ops = ps->nb[ j ];
+               if( cupidCFXtend( ps, ops, ipa, ndim, dims, skip, 
+                                 naxis ) ) more = 1;
+               if( ilevel > 3 && ops ) {
+                  msgSeti( "I", ps->index );
+                  msgSeti( "J", ops->index );
+                  msgSeti( "P", ops->pop );
+                  msgOut( "", "   Clump ^J extended into area ^I: new clump population ^P", status );
+               }
             }
          }
          ps = cupidCFFreePS( ps );

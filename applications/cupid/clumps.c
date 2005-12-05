@@ -310,7 +310,8 @@ void clumps() {
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* astSetWatchId( 2223 ); */
+
+/* astSetWatchId( 2248 );  */
 
 
 /* Initialise things to safe values. */
@@ -505,7 +506,8 @@ void clumps() {
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump, &bg ); 
+                              keymap, velax, ilevel, &nclump ); 
+      bg = 0.0;
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -549,6 +551,7 @@ void clumps() {
 
 /* Delete any existing CUPID extension in the NDF, and then create a new
    one. */
+      there = 0;
       ndfXstat( indf, "CUPID", &there, status );
       if( there ) ndfXdel( indf, "CUPID", status );
       ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );

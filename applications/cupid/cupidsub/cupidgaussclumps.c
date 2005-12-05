@@ -320,7 +320,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    on the current peak. */
          if( iter ) {
             cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
-                            iclump, velax, x, slbnd );
+                            ( niter == 1 ), velax, x, slbnd );
 
 /* Find the best fitting parameters, starting from the above initial guess. 
    This returns a function value of zero if no fit could be performed. */
@@ -438,6 +438,15 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
             } else {
                nskip++;
                if( ilevel > 3 ) msgOut( "", "   No clump fitted.", status );
+
+/* Set the specified element of the residuals array bad if no fit was 
+   performed. This prevents the any subsequent attempt to fit a Gaussian 
+   to the same peak value.*/
+               if( type == CUPID__DOUBLE ) {
+                  ((double *)res)[ imax ] = VAL__BADD;
+               } else {
+                  ((float *)res)[ imax ] = VAL__BADR;
+               }
             }
 
 /* Tell the user if one of the trmination criteria has ben met. */
