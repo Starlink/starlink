@@ -7,3 +7,5 @@
 
 .BASE      100
 FLATN      <Data already flatfielded>
+NOHDR      <No FITS component>
+.END
