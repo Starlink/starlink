@@ -33,6 +33,8 @@
 *        Add smf_tslice_ast, add smf_fits_getI
 *     2005-11-28 (TIMJ):
 *        Add smf_close_file
+*     2005-12-05 (AGG)
+*        Add smf_flatfield and smf_check_flat
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -71,7 +73,7 @@
 
 void smf_close_file( smfData **, int * );
 
-void smf_correct_extinction( smfData **, float, int *);
+void smf_correct_extinction( smfData *, float, int *);
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
@@ -86,5 +88,9 @@ void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
 
 void smf_tslice_ast (smfData * data, int index, int * status );
+
+void smf_flatfield ( smfData *idata, smfData **odata, int *status );
+
+void smf_check_flat ( smfData *data, int *status );
 
 #endif /* SMF_DEFINED */
