@@ -192,7 +192,7 @@
 *  If the output contains no valid data, give a warning message.
       IF( ALLBAD ) THEN
          CALL NDF_MSG( 'NDF', NDFOUT )
-         CALL MSG_OUT( 'QUALTOBAD_MSG1', 'WARNING: ^NDFOUT contains '//
+         CALL MSG_OUT( 'QUALTOBAD_MSG1', 'WARNING: ^NDF contains '//
      :                 'no valid Data values', STATUS )
       END IF
 
