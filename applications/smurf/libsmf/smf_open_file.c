@@ -31,6 +31,9 @@
 *  Description:
 *     This is the main routine to open data files.
 
+*  Notes:
+*     - If a file has no FITS header then status is set to SMF__NOHDR
+
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
@@ -50,6 +53,8 @@
 *        Fixed up error determining data types
 *     2005-12-05 (TIMJ):
 *        Store isTstream flag for smf_close_file
+*     2005-12-05 (AGG):
+*        Add status check on retrieving FITS hdr
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,6 +89,7 @@
 #include "ast.h"
 #include "smf.h"
 #include "smf_typ.h"
+#include "smf_err.h"
 #include "mers.h"
 #include <string.h>
 #include <stdlib.h>
@@ -199,6 +205,16 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
       /* Read the FITS headers */
       kpgGtfts( indf, &fits, status );
 
+      /* Trap status and ignore lack of FITS headers */
+      if ( *status != SAI__OK) {
+	msgOut("smf_open_file", 
+	       "Warning: Data has no FITS header, continuing anyway", status);
+	errAnnul( status );
+	if ( *status == SAI__OK ) {
+	  *status = SMF__NOHDR;
+	}
+      } /* Now what? How do we decide if it's not important? */
+
       /* If we don't have a time series, then we can retrieve the stored WCS info */
       if ( !isTseries ) {
 	ndfGtwcs( indf, &iwcs, status);
@@ -295,8 +311,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     strncpy(file->name, pname, SMF_PATH_MAX);
     hdr->fitshdr = fits;
 
-    /* debug - show FITS info */
-    astShow(fits);
+    /* debug - show FITS info if it is defined */
+    if (fits != NULL) {
+      astShow(fits);
+    }
 
     /* Store the data in the smfData struct */
     for (i=0; i<3; i++) {
