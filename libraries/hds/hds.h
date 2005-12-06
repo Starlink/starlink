@@ -787,6 +787,17 @@ datPutVL( const HDSLoc * loc,
 	  const int values[],
 	  int * status );
 
+/*================================================*/
+/* datPutVC - Write vectorized character array       */
+/*================================================*/
+
+int
+datPutVC( const HDSLoc * locator, 
+	  size_t nval,
+	  const char *values[],
+	  int * status );
+
+
 /*========================================*/
 /* datRef - Enquire object reference name */
 /*========================================*/

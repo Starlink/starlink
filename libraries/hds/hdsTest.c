@@ -87,7 +87,7 @@ int main () {
   
   /* Populate */
   datFind( loc1, "ONEDCHAR", &loc2, &status );
-  datPut1C( loc2, 2, chararr, &status );
+  datPutVC( loc2, 2, chararr, &status );
 
   /* Tidy up and close */
   datAnnul( &loc2, &status );

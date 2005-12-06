@@ -92,7 +92,7 @@ C_ROUTINES = \
 	datDrep.c datErmsg.c datParen.c datPrec.c datPrmry.c datRefct.c \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datget0x.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
-	datnew0.c datMapN.c datPut1C.c \
+	datnew0.c datMapN.c datPut1C.c datPutVC.c \
 	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
 	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
