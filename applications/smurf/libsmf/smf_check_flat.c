@@ -87,7 +87,7 @@ void smf_check_flat ( smfData *data, int *status ) {
   } else {
     /* No raw data struct => data flatfielded */
     msgOutif(MSG__VERB, " ", "Data are already flatfielded", status);
-    *status == SMF__FLATN;
+    *status = SMF__FLATN;
   }
   
   return;
