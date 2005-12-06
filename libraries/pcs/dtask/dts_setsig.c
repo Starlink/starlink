@@ -49,6 +49,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include "f77.h"
 /*
  * DEC Unix has a flags word for FPU control - set by -fpe[0..4] compiler
