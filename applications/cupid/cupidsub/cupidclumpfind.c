@@ -104,6 +104,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
+   int ii;              /* Significant clump index */
    int index;           /* Next PixelSet index to use */
    int list_size;       /* Number of values stored in plist and mlist */
    int naxis;           /* Defines whether two pixels are neighbours or not */
@@ -217,8 +218,8 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Set the contour interval to a user-specified multiple of the RMS noise. */
       cdelta = rms*cupidConfigD( cfconfig, "DELTAT", 2.0 );
 
-/* Set the lowest contour level to be used as a of the RMS noise. This is
-   an increment above the lowest data value int hesupplied array. */
+/* Set the lowest contour level to be used as a multiple of the RMS noise. 
+   This is an increment above the lowest data value in the supplied array. */
       clow = mind + rms*cupidConfigD( cfconfig, "TLOW", 2.0 );
 
 /* Initialise the first contour level. */
@@ -239,9 +240,16 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             msgOut( "", "Contour level ^C:", status );
          }
 
+/* New peaks found at the lowest contour level are ignored as noise, but
+   we allow clumps first found at higher levels to be extended into the
+   lowest contour level. We note the number of clumps which are inherited 
+   from the higher contour level. This causes new clumps found at the 
+   last contour level to be ignored. */
+         *nclump = nps;
+
 /* Scan the data array at a new contour level. This extends clumps found
    at a higher contour level, and adds any new clumps found at this contour
-   level. */
+   level. New clumps are stored at the end of the returned array. */
          clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, &nps,
                                clumps, clevel, &index, naxis, ilevel, slbnd );
       }
@@ -250,35 +258,42 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 1 ) msgBlank( status );
 
 /* Create the list of HDS clump objects to be returned. */
-      clist = astMalloc( sizeof( HDSLoc *)*nps );
+      clist = astMalloc( sizeof( HDSLoc *)*(*nclump) );
       if( clist ) {
-         *nclump = nps;
          mlist = NULL;
          plist = NULL;
 
 /* Loop round each clump */
-         for( i = 0; i < nps; i++ ) {
-            ps = clumps[ i ];
+         i = -1;
+         for( ii = 0; ii < *nclump; ii++ ) {
+            ps = clumps[ ii ];
+
+/* Ignore clumps which contain less than 4 pixels. */
+            if( ps && ps->pop > 4 ) {
+               i++;
 
 /* Tell the user the clump number. */
-            if( ilevel > 2 ) {
-               msgSeti( "I", i + 1 );
-               msgOut( "", "Clump ^I:", status );
-            }
+               if( ilevel > 2 ) {
+                  msgSeti( "I", i + 1 );
+                  msgOut( "", "Clump ^I:", status );
+               }
 
-/* Gather the information describing the clump */
-            if( cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, dims, 
-                              skip, slbnd, ilevel, ps, &sum, par, &list_size,
-                              &mlist, &plist ) ) {
+/* Gather the information describing the clump. This also displays clump
+   information on the screen as required by "ilevel". */
+               cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, dims, 
+                             skip, slbnd, ilevel, ps, &sum, par, &list_size,
+                             &mlist, &plist );
 
 /* Write this information to an HDS Clump structure. */
                cupidHdsClump( clist + i, sum, par, rms, ndim, ps->lbnd, 
                               ps->ubnd, list_size, mlist, plist, slbnd, i + 1, 
                               dax, NULL );
-            } else {
-               clist[ i ] = NULL;
             }
          }
+
+/* Adjust the number of clumps returned to exclude any which contain
+   fewer than 4 pixels. */
+         *nclump = i + 1;
 
 /* Free resources */
          mlist = astFree( mlist );
@@ -287,12 +302,12 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Tell the user how clumps are being returned. */
       if( ilevel > 0 ) {
-         if( nps == 0 ) {
+         if( *nclump == 0 ) {
             msgOut( "", "No clumps found", status );
-         } else if( nps == 1 ){
+         } else if( *nclump == 1 ){
             msgOut( "", "One clump found", status );
          } else {
-            msgSeti( "N", nps );
+            msgSeti( "N", *nclump );
             msgOut( "", "^N clumps found", status );
          }
       }

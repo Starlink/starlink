@@ -60,31 +60,33 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
 */      
 
 /* Local Variables: */
-   AstKeyMap *cols;             /* KeyMap holding column names and numbers */
    AstFrame *frm1;              /* Frame describing clump parameters */
    AstFrame *frm2;              /* Frame describing clump centres */
    AstFrameSet *iwcs;           /* FrameSet to be stored in output catalogue */
+   AstKeyMap *cols;             /* KeyMap holding column names and numbers */
    AstMapping *map;             /* Mapping from "frm1" to "frm2" */
    HDSLoc *aloc;                /* Locator for array of Clump structures */
+   HDSLoc *cloc;                /* Locator for array cell */
    char attr[ 15 ];             /* AST attribute name */
    char cat[ MAXCAT + 1 ];      /* Catalogue name */
-   HDSLoc *cloc;                /* Locator for array cell */
    char name[ DAT__SZNAM + 1 ]; /* Component name */
    const char *key;             /* Pointer to entry key */
    double *t;                   /* Pointer to next table value */
    double *tab;                 /* Pointer to catalogue table */
-   int i;                       /* Index of next locator */
-   int inperm[ 100 ];           /* Input axis permutation array */
-   int j;                       /* Loop index */
-   int ncol;                    /* number of catalogue columns */
-   int ok;                      /* Found columns holding Centre coords? */
-   int outperm[ 3 ];            /* Output axis permutation array */
-   int icol;                    /* Zero based column index */
-   int ncomp;                   /* Number of components in supplied structure */
-   int prim;                    /* Is component primitive? */
    int centre1;                 /* Column number for CENTRE1 */
    int centre2;                 /* Column number for CENTRE2 */
    int centre3;                 /* Column number for CENTRE3 */
+   int i;                       /* Index of next locator */
+   int icol;                    /* Zero based column index */
+   int inon;                    /* Current count of non-nullclumps */
+   int inperm[ 100 ];           /* Input axis permutation array */
+   int j;                       /* Loop index */
+   int ncol;                    /* number of catalogue columns */
+   int ncomp;                   /* Number of components in supplied structure */
+   int nonnull;                 /* Number of non-NULL pointers in clist */
+   int ok;                      /* Found columns holding Centre coords? */
+   int outperm[ 3 ];            /* Output axis permutation array */
+   int prim;                    /* Is component primitive? */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -93,6 +95,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
    receives an uninitialised pointer. */
    aloc = NULL;
    cloc = NULL;
+
+/* Count the number of non-null locators supplied. */
+   nonnull = 0;
+   for( i = 0; i < nclump; i++ ) {
+      if( clist[ i ] ) nonnull++;
+   }
 
 /* See if an output catalogue is to be created. If not, annul the null
    parameter error. */
@@ -113,6 +121,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
       centre2 = -1;
       centre3 = -1;
       for( i = 0; i < nclump; i++ ) {
+         if( !clist[ i ] ) continue;
 
 /* Loop round every component in this clump. */
          datNcomp( clist[ i ], &ncomp, status );
@@ -148,10 +157,13 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
       }
 
 /* Get memory to hold a table of clump parameters. */
-      tab = astMalloc( sizeof(double)*nclump*ncol );
+      tab = astMalloc( sizeof(double)*nonnull*ncol );
 
 /* Loop round all the supplied locators again. */
+      inon = -1;
       for( i = 0; i < nclump && *status == SAI__OK; i++ ) {
+         if( !clist[ i ] ) continue;
+         inon++;
 
 /* Loop round every column name */
          for( j = 0; j < ncol; j++ ) {
@@ -161,7 +173,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
             astMapGet0I( cols, key, &icol );
 
 /* Get the address of the table cell to receive this value. */
-            t = tab + icol*nclump + i;
+            t = tab + icol*nonnull + inon;
 
 /* Get the value for this column for this clump and store in the table. */
             datFind( clist[ i ], (char *) key, &cloc, status );
@@ -202,7 +214,6 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
    parameters, to the "ndim" Frame representing clump centre positions. The
    inverse transformation supplies bad values for the other parameters. */
          for( j = 0; j < ncol; j++ ) inperm[ j ] = 0;
-   
 
          if( centre1 < 0 ){
             ok = 0;
@@ -247,7 +258,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
          astSetI( iwcs, "CURRENT", 1 );
    
 /* Create the output catalogue */
-         kpg1Wrlst( param, nclump, nclump, ncol, tab, AST__BASE, iwcs,
+         kpg1Wrlst( param, nonnull, nonnull, ncol, tab, AST__BASE, iwcs,
                     ttl, 1, NULL, 1, status );
    
 /* End the AST context. */
@@ -262,20 +273,23 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
 /* If required, store information in the NDF extension */
    if( xloc ) {
 
-/* Create an array of "nclump" Clump structures in the extension, and get
+/* Create an array of "nonnull" Clump structures in the extension, and get
    a locator to it. */
-      datNew( xloc, "CLUMPS", "CLUMP", 1, &nclump, status );
+      datNew( xloc, "CLUMPS", "CLUMP", 1, &nonnull, status );
       datFind( xloc, "CLUMPS", &aloc, status );
 
 /* Loop round all the supplied locators. */
-      for( i = 1; i <= nclump; i++ ) {
+      inon = 0;
+      for( i = 0; i < nclump; i++ ) {
+         if( !clist[ i ] ) continue;
+         inon++;
 
 /* Get a locator for the cell of the array. */
-         datCell( aloc, 1, &i, &cloc, status );
+         datCell( aloc, 1, &inon, &cloc, status );
 
 /* Copy the Clump object located by the next element in the "clist" array
    into the current cell. */
-         cupidDatCopy( clist[ i - 1 ], cloc );
+         cupidDatCopy( clist[ i ], cloc );
 
 /* Annul the cell locator. */
          datAnnul( &cloc, status );
@@ -286,6 +300,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
    }
 
 /* Loop round all the supplied locators, annulling them. */
-   for( i = 0; i < nclump; i++ ) datAnnul( clist + i, status );
+   for( i = 0; i < nclump; i++ ) {
+      if( clist[ i ] ) datAnnul( clist + i, status );
+   }
 
 }

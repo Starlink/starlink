@@ -3,6 +3,7 @@
 #include "cupid.h"
 #include "mers.h"
 #include <math.h>
+#include <string.h>
 
 /* Global Variables: */
 /* ================= */
@@ -11,7 +12,7 @@
 extern CupidGC cupidGC;
 
 
-double cupidGCChiSq( int ndim, double *par, int what, int newp ){
+double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 /*
 *  Name:
 *     cupidGCChiSq
@@ -20,7 +21,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 *     The merit function to be minimised by the GaussClumps algorithm.
 
 *  Synopsis:
-*     double cupidGCChiSq( int ndim, double *par, int what, int newp )
+*     double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp )
 
 *  Description:
 *     This function evaluates the modified chi squared used to estimate
@@ -34,7 +35,7 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 *  Parameters:
 *     ndim
 *        The number of axes in the data array being fitted.
-*     par
+*     xpar
 *        Pointer to an array holding the parameters which define the
 *        model to be measured against the data. How many of these are used
 *        depends on the value of "ndim": if "ndim" is 1 only elements 0 to 
@@ -42,30 +43,38 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 *        is 3 all elements are used. All axis values are represented in GRID 
 *        pixels: 
 *
-*           par[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
-*           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
-*           par[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
-*           par[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
-*           par[4]: Model centre on axis 1 ("x2_0" in Stutski & Gusten)
-*           par[5]: Intrinsic FWHM on axis 1 ("D_xi_2" in Stutski & Gusten)
-*           par[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
+*           xpar[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
+*           xpar[1]: Constant intensity offset ("b0" in Stutski & Gusten)
+*           xpar[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
+*           xpar[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
+*           xpar[4]: Model centre on axis 1 ("x2_0" in Stutski & Gusten)
+*           xpar[5]: Intrinsic FWHM on axis 1 ("D_xi_2" in Stutski & Gusten)
+*           xpar[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
 *                   In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
-*           par[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
-*           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
+*           xpar[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
+*           xpar[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski & 
 *                                                     Gusten)
-*           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
+*           xpar[9]: Axis 0 of internal velocity gradient vector ("alpha_0" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
+*           xpar[10]: Axis 1 of internal velocity gradient vector ("alpha_1" 
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
-*     what
+*
+*           NOTE, if the "cupidGC.fixback" value is non-zero, then the
+*           backgound level is not included in the list of free
+*           parameters which are being varied by the fitting algorithm.
+*           In this case, the above list changes: the background level is
+*           moved from element 1 to the end of the list (the actual index 
+*           depends on the value of "ndim"), and the other values are shifted 
+*           down to fill the gap left at element 1.
+*     xwhat
 *        If negative, then the chi-squared value is returned. Otherwise, the 
 *        partial derivative of the chi-squared value with respect to the 
-*        parameter "par[what]" is returned.
+*        parameter "xpar[what]" is returned.
 *     newp
-*        If zero, it is assumed that "par" is the same as on the previous 
+*        If zero, it is assumed that "xpar" is the same as on the previous 
 *        invocation of this function. This causes cached intermediate values 
 *        to be re-used, thus speeding things up. A non-zero value should
-*        be supplied if "par" is not the same as on the previous invocation.
+*        be supplied if "xpar" is not the same as on the previous invocation.
 
 *  Returned Value:
 *     The chi-squared value or gradient.
@@ -98,11 +107,14 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
    double rr;              /* A factor for the residual to suppress -ve residuals */
    double t;               /* Temporary storage */
    double wf;              /* Weight factor */
+   double ypar[ 11 ];      /* "xpar" ordered as if bckgnd is being fitted */
+   double *par;            /* Pointer to parameter array to be used */
    double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
    int i;                  /* Parameter index */
    int iax;                /* Axis index */
    int iel;                /* Index of pixel within section currently being fitted */ 
+   int what;               /* "xwhat" value assuming bckgnd is being fitted */
  
    static double chisq;    /* Total modified chi squared */  
    static double pdiff;    /* Difference between model and data peak values */
@@ -116,8 +128,35 @@ double cupidGCChiSq( int ndim, double *par, int what, int newp ){
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
+/* If the background is not included in the list of free parameters 
+   being varied, then the background value will be at the end of the 
+   supplied "xpar" array. Reorder the supplied parameter values to put 
+   the background value at its usual place (index [1]). This is needed 
+   since all the following code assumes that the background is stored at 
+   index [1]. */
+   if( cupidGC.fixback ) {
+      ypar[ 0 ] = xpar[ 0 ];
+      ypar[ 1 ] = xpar[ cupidGC.npar - 1 ];
+      memcpy( ypar + 2, xpar + 1, sizeof( double )*( cupidGC.npar - 2 ) );
+      par = ypar;
+      what = ( xwhat <= 0 ) ? xwhat : xwhat + 1;
+
+/* If the background is included in the list of free parameters being
+   varied, then just use the parameter values as supplied. */
+   } else {
+      par = xpar;
+      what = xwhat;
+   }
+
 /* If neccessary, re-calculate cached intermediate values */
    if( newp ) {
+
+/* Check the FWHM values are positive. */
+      if( par[ 3 ] <= 0.0 ) return ret;
+      if( ndim > 1 ){
+         if( par[ 5 ] <= 0.0 ) return ret;
+         if( ndim > 2 && par[ 8 ] <= 0.0 ) return ret;
+      }
 
 /* The difference between the model peak value and the data peak value. */
       pdiff = par[ 0 ] + par[ 1 ] - cupidGC.ymax;

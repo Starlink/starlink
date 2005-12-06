@@ -126,14 +126,15 @@ void clumps() {
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
 *     OUT = NDF (Write)
-*        Only used if METHOD is GaussClumps. It is an optional output NDF in 
-*        which to store the sum of all the fitted Gaussian clumps. No output 
-*        NDF will be produced if a null (!) value is supplied. Otherwise, the 
-*        output NDF will be the same shape and size as the input NDF, and will 
-*        inherit its AXIS, WCS and QUALITY components (plus any extensions). 
-*        The Data array will be filled with the sum of the fitted Gaussian 
-*        models for all the clumps which have been found, and will include 
-*        the global background level. [!]
+*        An optional output NDF which has the same shape and size as the
+*        input NDF. The information written to this NDF depends on the value 
+*        of the METHOD parameter. If METHOD is GaussClumps, the output NDF 
+*        receives the sum of all the fitted Gaussian clump models including
+*        the global background level. If METHOD is ClumpFind, each pixel in 
+*        the output is the integer index of clump to which the pixel has been 
+*        assigned. No output NDF will be produced if a null (!) value is 
+*        supplied. Otherwise, the output NDF will inherit the AXIS, WCS and 
+*        QUALITY components (plus any extensions) from the input NDF. [!]
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
 *        No catalogue will be produced if a null (!) value is supplied [!]
@@ -518,17 +519,25 @@ void clumps() {
 /* Skip the rest if no clumps were found. */
    if( nclump ) {
 
-/* The GaussClumps algorithm can produce an optional output NDF holding the 
-   fitted Gaussians. See if this is necessary. If not, annull the error. If so,
+/* See if an output NDF is to be created. If not, annull the error. If so,
    map the data array. */
       ipo = NULL;
-      if( method && !strcmp( method, "GAUSSCLUMPS" ) ) {
-         ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
-         if( *status == PAR__NULL ) {
-            errAnnul( status );
-         } else {
+      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+
+      } else if( method ){
+         if( !strcmp( method, "GAUSSCLUMPS" ) ) {
             ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
             ndfSbad( 1, indf2, "DATA", status );
+
+         } else if( !strcmp( method, "CLUMPFIND" ) ) {
+            ndfStype( "_INTEGER", indf2, "DATA", status );
+            ndfMap( indf2, "DATA", "_INTEGER", "WRITE", &ipo, &el, status );
+            ndfSbad( 1, indf2, "DATA", status );
+
+         } else {
+            ndfDelet( &indf2, status );
          }
       }
 
@@ -546,7 +555,7 @@ void clumps() {
    required. */
       if( ipo || mask ) {
          cupidSumClumps( type, nsig, slbnd, subnd, el, clist, nclump, bg, 
-                         rmask, ipo );
+                         rmask, ipo, method );
       }
 
 /* Delete any existing CUPID extension in the NDF, and then create a new

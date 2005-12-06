@@ -140,6 +140,9 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       cupidGC.minwf = cupidConfigD( config, "MINWF", 0.1 );
       cupidGC.maxwf = cupidConfigD( config, "MAXWF", 2.0 );
 
+/* Indicate background should be included in the fitting process. */
+      cupidGC.fixback = 0;
+
 /* Maximum number of function evaluations to be used when fitting an 
    individual clump. */
       cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100 );
@@ -217,9 +220,11 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       if( wmin < 1.0E-8 ) wmin = 1.0E-8;
       beta = 0.5*wwidth*sqrt( -log( wmin )/ log( 2.0 ) );
 
-/* The number of free parameters in the fit. */
+/* The number of free parameters in the fit (assuming the background
+   level is included in the fitting process - see cupidGC.fitback). */
       npar = ( ndim == 1 ) ? CUPID__GCNP1 : 
              ( (ndim == 2 ) ? CUPID__GCNP2 : CUPID__GCNP3 );
+      cupidGC.npar = npar;
 
 /* initialise pointers to the work arrays. */
       cupidGC.data = NULL;

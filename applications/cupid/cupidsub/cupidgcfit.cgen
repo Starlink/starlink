@@ -96,9 +96,10 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    int n;                    /* Number of free parameters */
    int ret;                  /* Returned value */
    int i;                    /* Loop count */
+   int ip;                   /* Parameter index */
    int iv[ LIV ];            /* Flags controlling pdsSumsl */
    double v[ LV ];           /* Work array and control values for pdaSumsl */
-
+   double bg;                /* The supplied background value */
 
 /* Initialise. */
    ret = 0;
@@ -119,30 +120,45 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
       n = CUPID__GCNP3;
    }
 
+/* If the background level is to remain fixed at its initial value (i.e. be 
+   excluded from the fitting process) move the background level to the end 
+   of the array of parameter values and reduce the number of free parameters 
+   by one. */
+   if( cupidGC.fixback ) {
+      bg = x[ 1 ];
+      for( ip = 2; ip < n; ip++ ) x[ ip - 1 ] = x[ ip ];
+      x[ n - 1 ] = bg;
+      n--;
+   }
+
 /* This block of code is used for testing the calculation of gradients by
-   cupidGCcalg. Uncomment it when debugging gradient mis-calculations. 
+   cupidGCcalg. Uncomment it when debugging gradient mis-calculations.  
    {  double f;
       double f0;
       double g[ CUPID__GCNP3 ];
-      int nf;
+      int nf, nwf;
       double dx;
+
+      nwf = cupidGC.nwf;
+      cupidGC.nwf = 0;
 
       nf = 1;
       cupidGCcalcf( n, x, &nf, &f0 );
       cupidGCcalcg( n, x, &nf, g );
-      
+
       for( i = 0; i < n; i++ ) {
          nf++;
-         dx = 0.000001*x[ i ];
+         dx = 0.0000001*x[ i ];
          if( dx == 0.0 ) dx = 1.0E-6;
          x[ i ] += dx;
          cupidGCcalcf( n, x, &nf, &f );
          printf("Par %d: %g %g %g\n", i, f, f0, dx );
-         printf("        %g %g\n", (f - f0)/dx, g[ i ] );
+         printf("        %g %g\n", (f - f0)/dx, g[ i ] ); 
          x[ i ] -= dx;
       }
       
-      return 0;
+      cupidGC.nwf = nwf;
+       
    }
 */
 
@@ -168,6 +184,13 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
          ret = 0;
          break;
       }
+   }
+
+/* If the background level was kept fixed at its initial value move the 
+   background level back to its original position in "x". */
+   if( cupidGC.fixback ) {
+      for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
+      x[ 1 ] = bg;
    }
 
 /* Return the final chi-squared value */

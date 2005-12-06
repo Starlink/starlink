@@ -37,12 +37,14 @@ typedef struct CupidGC  {
    double x_max[ 3 ];      /* Grid coords of "ymax" value */
    double ymax;            /* Largest data value in section being fitted */
    int dax[ 3 ];           /* External axis no. indexed by algorithm axis no. */
+   int fixback;            /* Is the background to be kept fixed during fit? */
+   int ilevel;             /* Diagnostic information level */
+   int maxnf;              /* Max invocation count for calcf */
    int ndim;               /* Number of pixel axes in the data array */
    int nel;                /* Number of pixels in section being fitted */
    int nf;                 /* The invocation count from calcf */
-   int maxnf;              /* Max invocation count for calcf */
+   int npar;               /* No of free params in fit (inc. background level) */
    int nwf;                /* Number of times to modifiy the weight array */
-   int ilevel;             /* Diagnostic information level */
 
    double initpars[ CUPID__GCNP3 ];
    double pars[ CUPID__GCNP3 ];
@@ -126,6 +128,7 @@ void cupidGCcalcg( int, double *, int *, double * );
 void cupidHdsClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap * );
 void cupidStoreClumps( const char *, HDSLoc *, HDSLoc **, int, int, const char * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
+void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, HDSLoc **, int, double, float *, void *, char * );
 
 void clumps();
 void cupidhelp();

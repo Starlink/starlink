@@ -3,23 +3,28 @@
 #include "cupid.h"
 #include "prm_par.h"
 #include "star/hds.h"
+#include <string.h>
 
+/* Local Constants: */
+#define CLUMPFIND   1
+#define GAUSSCLUMPS 2
+#define UNKNOWN     3
 
-void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel, 
-                                    HDSLoc **clist, int nclump, double bg, 
-                                    float *rmask, CGEN_TYPE *out ){
+void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, 
+                     HDSLoc **clist, int nclump, double bg, 
+                     float *rmask, void *out, char *method ){
 /*
 *  Name:
-*     cupidSumClumps<X>
+*     cupidSumClumps
 
 *  Purpose:
 *     Create an image holding the sum of the supplied clumps, and another
 *     holding a mask.
 
 *  Synopsis:
-*     void cupidSumClumps<X>( int ndim, int *lbnd, int *ubnd, int nel, 
-*                             HDSLoc **clist, int nclump, double bg, 
-*                             float *rmask, CGEN_TYPE *out )
+*     void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, 
+*                          HDSLoc **clist, int nclump, double bg, 
+*                          float *rmask, void *out, char *method )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
@@ -27,6 +32,8 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 *     are inside a clump.
 
 *  Parameters:
+*     dtype
+*        The data type of the input NDF, CUPID__DOUBLE or CUPID__FLOAT.
 *     ndim
 *        The number of pixel axes in the "out" array.
 *     lbnd
@@ -52,14 +59,9 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 *        background given by "bg". The supplied array must be the same size 
 *        as the user supplied NDF and the pixels are assumed to be in 
 *        fortran order. May be NULL.
-
-*  Notes:
-*     - This function can be invoked using the generic cupidSumClumps macro 
-*     defined in cupid.h. This macro has the same parameter list as 
-*     cupidSumClumps<X> except that an extra parameter is added to the start 
-*     of the parameter list indicating the data type of the specific 
-*     cupidSumClumps... function to be invoked. This extra parameter should
-*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+*     method
+*        The name of the algorithm being used (e.g. "CLUMPFIND",
+*        "GAUSSCLUMPS", etc)
 
 *  Authors:
 *     DSB: David S. Berry
@@ -75,10 +77,13 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 */      
 
 /* Local Variables: */
-   CGEN_TYPE *p;        /* Pointer to next element of the "out" array */
    double *ipd;         /* Pointer to data array in clump NDF */
    double *m;           /* Pointer to next clump data value */
+   double *pd;          /* Pointer to next element of the "out" array */
+   float *pf;           /* Pointer to next element of the "out" array */
    float *r;            /* Pointer to next element of the "rmask" array */
+   int *pi;             /* Pointer to next element of the "out" array */
+   int alg;             /* Specifies the algorithm */
    int cdim[ 3 ];       /* Pixel axis dimensions within clump NDF */
    int clbnd[ 3 ];      /* Lower pixel bounds of clump NDF */
    int cndim;           /* Number of pixel axes in clump NDF */
@@ -96,10 +101,32 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Identify the algorithm. */
+   if( !strcmp( method, "CLUMPFIND" ) ) {
+      alg = CLUMPFIND;
+
+   } else if( !strcmp( method, "GAUSSCLUMPS" ) ) {
+      alg = GAUSSCLUMPS;
+
+   } else {
+      alg = UNKNOWN;
+   }
+
 /* If supplied, fill the "out" array with the background value. */
    if( out ) {
-      p = out;
-      for( i = 0; i < nel; i++ ) *(p++) = bg;      
+      if( alg == GAUSSCLUMPS ) {
+         if( dtype == CUPID__DOUBLE ) {
+            pd = (double *) out;
+            for( i = 0; i < nel; i++ ) *(pd++) = bg;      
+         } else {
+            pf = (float *) out;
+            for( i = 0; i < nel; i++ ) *(pf++) = bg;      
+         }
+
+      } else if( alg == CLUMPFIND ) {
+         pi = (int *) out;
+         for( i = 0; i < nel; i++ ) *(pi++) = 0;
+      }
    }
 
 /* If supplied, fill the "rmask" array with bad values. */
@@ -115,8 +142,21 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
       step[ k ] = step[ k - 1 ]*( ubnd[ k - 1 ] - lbnd[ k - 1 ] + 1 );
    }
 
-/* Loop round all clumps. */
+/* Store a pointer of the relevant type to the output array. */
+   if( alg == GAUSSCLUMPS ) {
+      if( dtype == CUPID__DOUBLE ) {
+         pd = (double *) out;
+      } else {
+         pf = (float *) out;
+      }
+
+   } else if( alg == CLUMPFIND ) {
+      pi = (int *) out;
+   }
+
+/* Loop round all non-NULL clumps. */
    for( j = 0; j < nclump; j++ ) {
+      if( !clist[ j ] ) continue;
 
 /* The component named MODEL contains an NDF holding the clump model values. 
    Get an NDF identifier for it. */
@@ -147,8 +187,20 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
             if( *m != VAL__BADD ) {
 
 /* If required, increment the "out" array by the values in the NDFs Data
-   array. */
-               if( out ) out[ ii ] += *m;
+   array, or store the clump index. */
+               if( out ) {
+
+                  if( alg == GAUSSCLUMPS ) {
+                     if( dtype == CUPID__DOUBLE ) {
+                        pd[ ii ] += *m;
+                     } else {
+                        pf[ ii ] += *m;
+                     }
+
+                  } else if( alg == CLUMPFIND ) {
+                     pi[ ii ] = j + 1;
+                  }               
+               }
          
 /* If required, store 1.0 in the "rmask" array. */
                if( rmask ) rmask[ ii ] = 1.0;
@@ -175,4 +227,9 @@ void CGEN_FUNCTION(cupidSumClumps)( int ndim, int *lbnd, int *ubnd, int nel,
    }
 
 }
+
+/* Undefine Local Constants: */
+#undef CLUMPFIND
+#undef GAUSSCLUMPS
+#undef UNKNOWN
 

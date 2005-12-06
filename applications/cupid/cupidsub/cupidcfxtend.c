@@ -158,7 +158,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    nbl = NULL;
    sznbl = 0;
    for( ips = 0; ips < ps1->nnb; ips++ ) {
-      if( ps1->nb && ps1->nb[ ips ]->index == new_index ) {
+      if( ps1->nb && ps1->nb[ ips ] && ps1->nb[ ips ]->index == new_index ) {
 
 /* When found, store a pointer to the array which holds the 1D vector
    indices of the pixels in the source PixelSet which adjoin the

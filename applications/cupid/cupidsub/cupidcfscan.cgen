@@ -134,8 +134,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    int i;                /* Loop count */
    int j;                /* Loop count */
    int k;                /* Loop count */
-   int more;             /* Are then any pixels left to transfer? */
+   int more;             /* Should we continue looping? */
    int nnew;             /* No. of new PixelSets found */
+   int npso;             /* Number of supplied clumps */
    int rem;              /* Remaining count of pixels */
    int x[3];             /* GRID coords of current pixel */
 
@@ -151,6 +152,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Note the next available index value. */
    hindex = *index;   
+
+/* Note the number of supplied clumps. */
+   npso = *nps;
 
 /* Allocate workspace. These are both array with an element for every
    index value used so far. Element "i" of "w1" holds the number of
@@ -230,7 +234,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Count how many of the old PixelSets are neighbours to the new
    PixelSet. */
-               for( j = 0; j < *nps; j++ ) {
+               for( j = 0; j < npso; j++ ) {
                   if( w1[ clumps[ j ]->index ] ) (ps->nnb)++;
                }
 
@@ -248,7 +252,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    round each of the supplied clumps. */
                if( ps->sznbl ) {
                   k = 0;
-                  for( j = 0; j < *nps; j++ ) {
+                  for( j = 0; j < npso; j++ ) {
 
 /* Check to see if this supplied clump is a neighbour of the new clump.
    If it is, its element in the "w1" array will hold the number of pixels
@@ -369,6 +373,25 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          }
          ps = cupidCFFreePS( ps );
       } 
+   }
+
+/* If any new clumps have been added to the returned array, sort them
+   into descending peak value order using a bubblesort algorithm. */
+   if( *nps > npso ) {
+      j = *nps;
+      more = 1;
+      while( more ) {
+         j--;
+         more = 0;
+         for( k = npso; k < j; k++ ) {      
+            if( ret[ k ]->vpeak < ret[ k + 1 ]->vpeak ) {
+               ps = ret[ k ];
+               ret[ k ] = ret[ k + 1 ];
+               ret[ k + 1 ] = ps;
+               more = 1;               
+            }
+         }
+      }
    }
 
 /* Release resources */

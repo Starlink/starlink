@@ -381,7 +381,8 @@ void makeclumps() {
 
 /* Create the output data array by summing the contents of the HDS structures 
    describing the found clumps. */
-   cupidSumClumpsF( ndim, lbnd, ubnd, nel, clist, nclump, back, NULL, ipd2 );
+   cupidSumClumps( CUPID__FLOAT, ndim, lbnd, ubnd, nel, clist, nclump, back, 
+                   NULL, ipd2, "GAUSSCLUMPS" );
 
 /* Add Gaussian noise to the data. */
    if( *status == SAI__OK ) {

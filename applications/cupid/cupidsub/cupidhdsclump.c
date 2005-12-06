@@ -38,7 +38,8 @@ void cupidHdsClump( HDSLoc **cloc, double sum, double *par, double rms,
 *        Pointer to a location at which to store the HDS locator for the 
 *        newly created temporary object.
 *     sum
-*        The integrated intensity in the clump.
+*        The integrated intensity in the clump. Note, unlike par[0] and
+*        par[1], this value should not be normalised to the RMS noise.
 *     par
 *        Pointer to an array holding the parameters of a Gaussian
 *        approximation to the clump. How many of these are used depends on 
