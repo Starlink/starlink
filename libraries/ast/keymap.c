@@ -76,6 +76,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Added more DEBUG blocks
 *     30-SEP-2005 (DSB):
 *        Allow an integer to be read from a formatted floating point value.
+*     6-DEC-2005 (DSB):
+*        Remove astMapGet0C stuff from description of astMapGet1C.
 *class--
 */
 
@@ -2357,11 +2359,6 @@ f     .FALSE.
 c     "nval"
 f     NVAL
 *     will be returned set to 1.
-c     - A string pointer returned by astMapGet0C is guaranteed to remain valid
-c     and the string to which it points will not be over-written for a
-c     total of 50 successive invocations of this function. After this,
-c     the memory containing the string may be re-used, so a copy of
-c     the string should be made if it is needed for longer than this.
 
 c  astMapGet1C:
 c     The "value" buffer supplied to the astMapGet1C function should be a
