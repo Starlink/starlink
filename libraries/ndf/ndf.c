@@ -31,6 +31,8 @@
 *        Removed workaround for CNF problems.
 *     18-NOV-2005 (TIMJ):
 *        HDS Locators should be HDSLoc* not char [DAT__SZLOC]
+*     06-DEC-2005 (TIMJ):
+*        Add descriptive error message when locator import/export error
 *     <{enter_further_changes_here}>
 *-
 */
@@ -46,6 +48,8 @@
 #include "ast.h"                 /* AST world coordinate system handling */
 #include "dat_par.h"             /* Hierarchical Data System (HDS) */
 #include "f77.h"                 /* C<-->Fortran interface macros */
+#include "sae_par.h"             /* SAI__OK */
+#include "ems.h"                 /* ems prototypes */
 
 /* HDS Fortran Locator export/import routines */
 #include "star/hds_fortran.h"
@@ -1258,9 +1262,15 @@ DECLARE_INTEGER(fstatus);
    if ( loc == NULL ) {
       F77_EXPORT_LOCATOR( DAT__ROOT, floc );
    } else {
-      HDS_EXPORT_CLOCATOR( loc, floc, status );
+      if (*status == SAI__OK) {
+	HDS_EXPORT_CLOCATOR( loc, floc, status );
+	if (*status != SAI__OK) {
+	  emsSetc("F",name);
+	  emsRep("ndfFind_err",
+		 "ndfFind: Error opening file ^F", status);
+	}
+      }
    }
-   HDS_EXPORT_CLOCATOR( loc, floc, status );
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
    F77_EXPORT_INTEGER( *status, fstatus );
@@ -1966,7 +1976,17 @@ DECLARE_INTEGER(fstatus);
 
    F77_FREE_CHARACTER( fmode );
    F77_IMPORT_INTEGER( fstatus, *status );
-   HDS_IMPORT_FLOCATOR( floc, loc, status );
+
+   /* Make sure we add our own error message to indicate which
+      NDF function was involved */
+   if (*status == SAI__OK ) {
+     HDS_IMPORT_FLOCATOR( floc, loc, status );
+     if (*status != SAI__OK) {
+       *loc = NULL;
+       emsRep("ndfLoc_err","ndfLoc: Error obtaining HDS locator for an NDF",
+	      status);
+     }
+   }
 
    return;
 }
@@ -2690,8 +2710,16 @@ DECLARE_INTEGER(fstatus);
    if ( loc == NULL ) {
       F77_EXPORT_LOCATOR( DAT__ROOT, floc );
    } else {
-      HDS_EXPORT_CLOCATOR( loc, floc, status );
+      if (*status == SAI__OK) {
+	HDS_EXPORT_CLOCATOR( loc, floc, status );
+	if (*status != SAI__OK) {
+	  emsSetc("F",name);
+	  emsRep("ndfOpen_err",
+		 "ndfOpen: Error opening file ^F", status);
+	}
+      }
    }
+
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
    F77_CREATE_CHARACTER( fmode, strlen( mode ) );
@@ -2742,7 +2770,14 @@ DECLARE_INTEGER(fstatus);
    if ( loc == NULL ) {
      F77_EXPORT_LOCATOR( DAT__ROOT, floc );
    } else {
-     HDS_EXPORT_CLOCATOR( loc, floc, status );
+     if (*status == SAI__OK) {
+       HDS_EXPORT_CLOCATOR( loc, floc, status );
+       if (*status != SAI__OK) {
+	 emsSetc("F",name);
+	 emsRep("ndfPlace_err",
+		"ndfPlace: Error finding placeholder for file ^F", status);
+       }
+     }
    }
    F77_CREATE_CHARACTER( fname, strlen( name ) );
    F77_EXPORT_CHARACTER( name, fname, fname_length );
@@ -3730,7 +3765,19 @@ DECLARE_INTEGER(fstatus);
    F77_FREE_CHARACTER( fxname );
    F77_FREE_CHARACTER( fmode );
    F77_IMPORT_INTEGER( fstatus, *status );
-   HDS_IMPORT_FLOCATOR( floc, loc, status );
+
+   /* Make sure we add our own error message to indicate which
+      NDF function was involved */
+   if (*status == SAI__OK ) {
+     HDS_IMPORT_FLOCATOR( floc, loc, status );
+     if (*status != SAI__OK) {
+       *loc = NULL;
+       emsSetc("EX",xname);
+       emsRep("ndfXloc_err",
+	      "ndfXloc: Error obtaining HDS locator for extension ^EX",
+	      status);
+     }
+   }
 
    return;
 }
@@ -3822,7 +3869,19 @@ DECLARE_INTEGER(fstatus);
    F77_FREE_CHARACTER( ftype );
    F77_FREE_INTEGER( fdim );
    F77_IMPORT_INTEGER( fstatus, *status );
-   HDS_IMPORT_FLOCATOR( floc, loc, status );
+
+   /* Make sure we add our own error message to indicate which
+      NDF function was involved */
+   if (*status == SAI__OK ) {
+     HDS_IMPORT_FLOCATOR( floc, loc, status );
+     if (*status != SAI__OK) {
+       *loc = NULL;
+       emsSetc("EX",xname);
+       emsRep("ndfXnew_err",
+	      "ndfXnew: Error creating new NDF extension ^EX",
+	      status);
+     }
+   }
 
    return;
 }
