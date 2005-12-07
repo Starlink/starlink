@@ -87,6 +87,7 @@
        
 *  Find the temporary object's name.
       STATUS = SAI__OK
+      NAME = ' '
       CALL DAT_NAME( LOC, NAME, STATUS )
 
 *  Find its parent.
