@@ -353,6 +353,46 @@ sub insert {
   return $self->{INSERT};
 }
 
+=item B<iterrms_abs>
+
+Retrieve or set the absolute RMS level to reach in determining the solution during the iterative process.
+
+  my $iterrms_abs = $auto->iterrms_abs;
+  $auto->iterrms_abs( 0.25 );
+
+Values are in arcseconds. If undefined, which is the default, then iterations will continue until the number of iterations reaches the value stored in the maxiter() accessor.
+
+=cut
+
+sub iterrms_abs {
+  my $self = shift;
+  if( @_ ) {
+    my $iterrms_abs = shift;
+    $self->{ITERRMS_ABS} = $iterrms_abs;
+  }
+  return $self->{ITERRMS_ABS};
+}
+
+=item B<iterrms_diff>
+
+Retrieve or set the difference in RMS between iterations to reach in determining the solution during the iterative process.
+
+  my $iterrms_diff = $auto->iterrms_diff;
+  $auto->iterrms_diff( 0.001 );
+
+Values are in arcseconds. If undefined, which is the default, then iterations will continue until the number of iterations reaches the value stored in the maxiter() accessor.
+
+=cut
+
+sub iterrms_diff {
+  my $self = shift;
+  if( @_ ) {
+    my $iterrms_diff = shift;
+    $self->{ITERRMS_DIFF} = $iterrms_diff;
+  }
+  return $self->{ITERRMS_DIFF};
+}
+
 =item B<keepfits>
 
 Whether or not to keep the final astrometric fit as a FITS-WCS file.
@@ -420,28 +460,28 @@ sub match {
   return $self->{MATCH};
 }
 
-=item B<matchcatalogue>
+=item B<match_catalogue>
 
 Retrieve or set a filename that will take the set of positions matched
 by the matching process. The file is formatted like a SExtractor output
 file with five columns: the object number, RA and Dec of the source on
 the sky, and x and y positions of the source on the CCD.
 
-  my $matchcatalogue = $auto->matchcatalogue;
-  $auto->matchcatalogue( 'match.cat' );
+  my $matchcatalogue = $auto->match_catalogue;
+  $auto->match_catalogue( 'match.cat' );
 
 Defaults to undef, meaning that no such file will be written. If defined,
 it will write the catalogue in the current working directory.
 
 =cut
 
-sub matchcatalogue {
+sub match_catalogue {
   my $self = shift;
   if( @_ ) {
     my $matchcatalogue = shift;
-    $self->{MATCHCATALOGUE} = $matchcatalogue;
+    $self->{MATCH_CATALOGUE} = $matchcatalogue;
   }
-  return $self->{MATCHCATALOGUE};
+  return $self->{MATCH_CATALOGUE};
 }
 
 =item B<maxfit>
@@ -472,12 +512,39 @@ sub maxfit {
   return $self->{MAXFIT};
 }
 
-=item B<max_obj_corr>
+=item B<maxiter>
+
+Retrieve or set the maximum number of iterations to perform.
+
+  my $maxiter = $auto->maxiter;
+  $auto->maxiter( 20 );
+
+Defaults to 10. There is an upper limit of 100, and a lower limit of 1.
+
+=cut
+
+sub maxiter {
+  my $self = shift;
+  if( @_ ) {
+    my $maxiter = shift;
+    $self->{MAXITER} = $maxiter;
+  }
+
+  if( $self->{MAXITER} > 100 ) {
+    $self->{MAXITER} = 100;
+  } elsif ( $self->{MAXITER} < 1 ) {
+    $self->{MAXITER} = 1;
+  }
+
+  return $self->{MAXITER};
+}
+
+=item B<maxobj_corr>
 
 Retrieve or set the maximum number of objects to use for correlation.
 
-  my $max_obj_corr = $auto->max_obj_corr;
-  $auto->max_obj_corr( 50 );
+  my $maxobj_corr = $auto->maxobj_corr;
+  $auto->maxobj_corr( 50 );
 
 Defaults to 500. Useful for speeding up processing by setting to a
 lower number, or possibly obtaining better matches with larger numbers
@@ -486,21 +553,21 @@ catalogue when used as input to the correlation routine.
 
 =cut
 
-sub max_obj_corr {
+sub maxobj_corr {
   my $self = shift;
   if( @_ ) {
     my $max_obj_corr = shift;
-    $self->{MAX_OBJ_CORR} = $max_obj_corr;
+    $self->{MAXOBJ_CORR} = $max_obj_corr;
   }
-  return $self->{MAX_OBJ_CORR};
+  return $self->{MAXOBJ_CORR};
 }
 
-=item B<max_obj_image>
+=item B<maxobj_image>
 
 Retrieve or set the maximum number of objects to use from the image.
 
-  my $max_obj_image = $self->max_obj_image;
-  $self->max_obj_image( 1000 );
+  my $maxobj_image = $self->maxobj_image;
+  $self->maxobj_image( 1000 );
 
 Defaults to 500. Useful for speeding up processing time in
 densely-populated fields.
@@ -511,34 +578,34 @@ i.e. it will use those objects nearer the centre.
 
 =cut
 
-sub max_obj_image {
+sub maxobj_image {
   my $self = shift;
   if( @_ ) {
     my $max_obj_image = shift;
-    $self->{MAX_OBJ_IMAGE} = $max_obj_image;
+    $self->{MAXOBJ_IMAGE} = $max_obj_image;
   }
-  return $self->{MAX_OBJ_IMAGE};
+  return $self->{MAXOBJ_IMAGE};
 }
 
-=item B<max_obj_query>
+=item B<maxobj_query>
 
 Retrieve or set the maximum number of objects to retrieve from the
 catalogue server.
 
-  my $max_obj_query = $auto->max_obj_query;
-  $auto->max_obj_query( 1000 );
+  my $max_obj_query = $auto->maxobj_query;
+  $auto->maxobj_query( 1000 );
 
 Defaults to 500.
 
 =cut
 
-sub max_obj_query {
+sub maxobj_query {
   my $self = shift;
   if( @_ ) {
     my $max_obj_query = shift;
-    $self->{MAX_OBJ_QUERY} = $max_obj_query;
+    $self->{MAXOBJ_QUERY} = $max_obj_query;
   }
-  return $self->{MAX_OBJ_QUERY};
+  return $self->{MAXOBJ_QUERY};
 }
 
 =item B<messages>
