@@ -1285,6 +1285,7 @@ F77_SUBROUTINE(dat_name)( CHARACTER(locator),
    dat1_import_floc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
+   name_c[0] = '\0';
    datName( &locator_c, name_c, status );
 
 /* Export returned name to FORTRAN string                 */
