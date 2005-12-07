@@ -425,7 +425,7 @@
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
                AVEBIN = RANGE / AVELIM / VAL__EPS<T> / 2<CONST>
                MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>(
-     :                  MIN( NUM_ITO<T>( VAL__MAXI ), AVEBIN ) ) ) )
+     :            NUM_MIN<T>( NUM_ITO<T>( VAL__MAXI ), AVEBIN ) ) ) )
             END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself

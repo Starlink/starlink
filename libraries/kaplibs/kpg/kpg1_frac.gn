@@ -87,6 +87,7 @@
 *     MT: Mark Taylor (STARLINK)
 *     DSB: David Berry (STARLINK)
 *     BEC: Brad Cavanagh (JAC)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -129,6 +130,8 @@
 *        Corrections and improvements to the previous enhancement.
 *     2005 November 28 (BEC)
 *        Fix bug possibly related to G95 and upcasting of BYTE to INTEGER.
+*     2005 December 7 (PWD):
+*        Change use of MIN to NUM_MIN<T> so that MIN(BYTE,BYTE) works.
 *     {enter_further_changes_here}
 
 *-
@@ -435,8 +438,8 @@
      :                    ABS( DATLIM( 1 ) / 2<CONST> ) )
                AVESIZE = RANGE / AVELIM / VAL__EPS<T> / 2<CONST>
                MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
-     :                  MIN( NUM_ITO<T>( VAL__MAXI ),
-     :                       AVESIZE ) ) ) )
+     :                  NUM_MIN<T>( NUM_ITO<T>( VAL__MAXI ),
+     :                              AVESIZE ) ) ) )
             END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself
