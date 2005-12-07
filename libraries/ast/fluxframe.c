@@ -47,6 +47,8 @@ f     The FluxFrame class does not define any new routines beyond those
 *        Original version.
 *     14-DEC-2004 (DSB):
 *        Added AST__SBRIGHT and AST__SBRIGHTW systems.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 */
 
@@ -3984,6 +3986,7 @@ AstFluxFrame *astLoadFluxFrame_( void *mem, size_t size, AstFluxFrameVtab *vtab,
                new->usedunits[ sys ] = astStore( new->usedunits[ sys ],
                                                  sval, strlen( sval ) + 1 );
             }
+            sval = astFree( sval );
          }
       }
 

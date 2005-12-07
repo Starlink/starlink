@@ -161,6 +161,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        CopyPV rewritten to avoid assumption that the input and output
 *        WcsMaps have the same number of axes and that the lon/lat axes have 
 *        the same indices.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 */
 
@@ -5039,7 +5041,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
 
 /* Local Variables: */
    AstWcsMap *new;              /* Pointer to the new WcsMap */
-   const char *text;            /* Textual form of an integer value */
+   char *text;                  /* Textual form of an integer value */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
    double pv;                   /* Projection parameter */
    int axis;                    /* Axis index */
@@ -5101,6 +5103,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
       } else {
          new->type = AST__WCSBAD;
       }
+      text = astFree( text );
 
 /* WcsAxis(axis). */
 /* -------------- */

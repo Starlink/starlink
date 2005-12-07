@@ -650,6 +650,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Include an IMAGFREQ keyword in the output when writing a 
 *        DSBSpecFrame out using FITS-WCS encoding.
 *        - Correct test for constant values in FitOK.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 */
 
@@ -33287,7 +33289,8 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
    char *text;                  /* Textual version of integer value */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
    double dval[2];              /* Double precision data values */
-   int flags;                    /* Keyword flags */
+   int flags;                   /* Keyword flags */
+   int free_data;               /* Should data memory be freed? */
    int ival[2];                 /* Integer data values */
    int ncard;                   /* No. of FitsCards read so far */
    int type;                    /* Keyword type */
@@ -33354,6 +33357,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
          new->encoding = UNKNOWN_ENCODING;
       }
       if ( TestEncoding( new ) ) SetEncoding( new, new->encoding );
+      text = astFree( text );
 
 /* FitsDigits. */
 /* ----------- */
@@ -33411,6 +33415,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
          } else {
             type = AST__NOTYPE;
          }
+         text = astFree( text );
 
 /* Only proceed if the keyword type was found. */
          if( type != AST__NOTYPE ){
@@ -33421,6 +33426,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 
 /* Get the data value, using the appropriate data type, unless the
    keyword is a comment keyword or is undefined. */
+            free_data = 0;
             if( type == AST__FLOAT ){
                (void) sprintf( buff, "dt%d", ncard );
                dval[ 0 ] = astReadDouble( channel, buff, AST__BAD );
@@ -33429,6 +33435,7 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
             } else if( type == AST__STRING || type == AST__CONTINUE ){
                (void) sprintf( buff, "dt%d", ncard );
                data = (void *) astReadString( channel, buff, "" );
+               free_data = 1;
    
             } else if( type == AST__INT ){
                (void) sprintf( buff, "dt%d", ncard );
@@ -33479,10 +33486,10 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
 /* Append a new card to the output FitsChan. */
             NewCard( new, keynm, type, data, comment, flags );
 
-/* Free the character strings. */
+/* Free the character strings, and data (if required). */
             comment = (char *) astFree( (void *) comment );
             keynm = (char *) astFree( (void *) keynm );
-
+            if( free_data ) data = astFree( data );
          }
 
 /* Move on to the next card. */

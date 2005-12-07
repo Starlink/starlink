@@ -68,6 +68,8 @@ f     The IntraMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitIntraMapVtab
 *        method.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 */
 
@@ -2470,10 +2472,10 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
 
 /* Local Variables: */
    AstIntraMap *new;              /* Pointer to the new IntraMap */
-   const char *author;            /* Pointer to author's name string */
-   const char *contact;           /* Pointer to contact details string */
-   const char *fname;             /* Pointer to transformation function name */
-   const char *purpose;           /* Pointer to purpose comment string */
+   char *author;                  /* Pointer to author's name string */
+   char *contact;                 /* Pointer to contact details string */
+   char *fname;                   /* Pointer to transformation function name */
+   char *purpose;                 /* Pointer to purpose comment string */
    int found;                     /* Function name found? */
    int ifun;                      /* Loop counter for registered functions */
    int nin;                       /* Number of IntraMap input coordinates */
@@ -2606,6 +2608,12 @@ AstIntraMap *astLoadIntraMap_( void *mem, size_t size,
             }
          }
       }
+
+/* Free strings allocated by astReadString. */
+      fname = astFree( fname );
+      purpose = astFree( purpose );
+      author = astFree( author );
+      contact = astFree( contact );
 
 /* If an error occurred, clean up by deleting the new IntraMap. */
       if ( !astOK ) new = astDelete( new );

@@ -66,6 +66,8 @@ c     - AST_XMLWARNINGS: Return warnings from previous read operation
 *        - Added debug conditional code to keep track of memory leaks.
 *        - Fixed bug which prevented more than 1 object being read from
 *        an XmlChan.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 
 * Further STC work:
@@ -14077,7 +14079,7 @@ AstXmlChan *astLoadXmlChan_( void *mem, size_t size,
          new->xmlformat = UNKNOWN_FORMAT;
       }
       if ( TestXmlFormat( new ) ) SetXmlFormat( new, new->xmlformat );
-
+      text = astFree( text );
    }
 
 /* If an error occurred, clean up by deleting the new XmlChan. */

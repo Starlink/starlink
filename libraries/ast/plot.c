@@ -541,6 +541,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Modified AxPlot so that Map1 only normalises if neither axis
 *        is a SkyAxis. Previously it normalised if either axis was not a
 *        SkyAxis.
+*     7-DEC-2005 (DSB):
+*        Free memory allocated by calls to astReadString.
 *class--
 */
 
@@ -27436,6 +27438,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          new->labelling = -9999;
       }
       if ( TestLabelling( new ) ) SetLabelling( new, new->labelling );
+      text = astFree( text );
 
 /* Edge(axis). */
 /* ----------- */
@@ -27451,6 +27454,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
          }
          if ( TestEdge( new, axis ) ) SetEdge( new, axis,
                                                new->edge[ axis ] );
+         text = astFree( text );
       }
 
 /* Now do instance variables which are not attributes. */
