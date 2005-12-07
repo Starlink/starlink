@@ -131,6 +131,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    int *nbl;        /* Pointer to list of neighbouring pixel indices */
    int *new_nbl;    /* Pointer to new list of neighbouring pixel indices */
    int i;           /* Loop count */
+   int ii;          /* Loop count */
    int ips;         /* Index of destination clump within source PixelList */
    int iv;          /* 1D vector index of next neighbouring source pixel */
    int new_index;   /* Index value to assign to the transferred pixels */
@@ -187,8 +188,8 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 /* Change the index value stored in "ipa" for each of the neighbouring
    pixels. */
-      for( i = 0; i < sznbl; i++ ) {
-         iv = nbl[ i ];
+      for( ii = 0; ii < sznbl; ii++ ) {
+         iv = nbl[ ii ];
          if( ipa[ iv ] == old_index ) {
             ipa[ iv ] = new_index;
 

@@ -234,6 +234,13 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                                            x, i, ps, clevel, w1, w2, naxis,
                                            hindex );
 
+/* Tell the user about the new PixelSet. */
+               if( ilevel > 3 ) {
+                  msgSeti( "I", ps->index );
+                  msgSeti( "P", ps->pop );
+                  msgOut( "", "   New PixelSet: index ^I population ^P", status );
+               }
+
 /* Count how many of the old PixelSets are neighbours to the new
    PixelSet. */
                for( j = 0; j < npso; j++ ) {
@@ -347,7 +354,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             msgSeti( "I", ps->index );
             msgSeti( "J", ps->nb[ 0 ]->index );
             msgSeti( "P", ps->nb[ 0 ]->pop );
-            msgOut( "", "   Area ^I transfered to clump ^J: new clump population ^P", status );
+            msgOut( "", "   Index ^I transfered to index ^J: new clump population ^P", status );
             cupidCFDump( ipa, ndim, dims, slbnd );
          }
 
@@ -359,9 +366,11 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    clumps by one pixel on each pass. The pixels in the new PixelSet
    which are encompassed by such a clump extension are move from the new 
    PixelSet to the extended clump. Finally, release the resources used by
-   the PixelSet structure. Note, cupidCFXtend */
+   the PixelSet structure. */
       } else {
          more = 1;
+
+
          while( more ) {
             more = 0;
             for( j = 0; j < ps->nnb; j++ ) {
@@ -372,10 +381,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                   msgSeti( "I", ps->index );
                   msgSeti( "J", ops->index );
                   msgSeti( "P", ops->pop );
-                  msgOut( "", "   Clump ^J extended into area ^I: new clump population ^P", status );
-                  cupidCFDump( ipa, ndim, dims, slbnd );
+                  msgOut( "", "   Index ^J extended into index ^I: new clump population ^P", status );
                }
             }
+
+            if( ilevel > 3 ) cupidCFDump( ipa, ndim, dims, slbnd );
+
          }
          ps = cupidCFFreePS( ps );
       } 

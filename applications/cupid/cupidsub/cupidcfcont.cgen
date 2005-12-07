@@ -186,6 +186,7 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
    int i;               /* Axis index */
    int isneb;           /* Is central pixel neighboured by another clump? */
    int j;               /* Index of last neighbouring pixel */
+   int xx[ 3 ];
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -200,6 +201,7 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
    for( i = 0; i < ndim; i++ ) {
       if( x[ i ] < ps->lbnd[ i ] ) ps->lbnd[ i ] = x[ i ];
       if( x[ i ] > ps->ubnd[ i ] ) ps->ubnd[ i ] = x[ i ];
+      xx[ i ] = x[ i ];
    }
 
 /* If this point is greater than the highest value yet found in the clump, 
