@@ -312,7 +312,7 @@ void clumps() {
    if( *status != SAI__OK ) return;
 
 
-/* astSetWatchId( 2248 );  */
+/* astSetWatchId( 730 );  */
 
 
 /* Initialise things to safe values. */

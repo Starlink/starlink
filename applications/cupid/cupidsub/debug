@@ -3,4 +3,4 @@
 set file = `basename $1 .cgen`
 set file = `basename $file .c`
 cpp -C -P $file.c -I. -I.. -I/stardev/cvs/star/include > aa
-mv aa $file.c
+indent aa -kr -o $file.c

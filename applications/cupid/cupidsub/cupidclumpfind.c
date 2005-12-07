@@ -58,7 +58,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
 *     ilevel
-*        Amount of scren information to display (in range zero to 3).
+*        Amount of screen information to display (in range zero to 6).
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
 
@@ -84,13 +84,12 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *cfconfig; /* Configuration parameters for this algorithm */
-   CupidPixelSet **clumps; /* Pointer to list of PixelSet pointers */
+   CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
    HDSLoc **clist;      /* Pointer to the array of returned HDS locators */
+   double *levels;      /* Pointer to array of contour levels */
    double *mlist;       /* Pointer to list holding model valus */
-   double cdelta;       /* Gap between contours */
    double clevel;       /* Current data level */
-   double clow;         /* Lowest data level to use */
    double dd;           /* Data value */   
    double maxd;         /* Maximum value in data array */
    double mind;         /* Minimum value in data array */
@@ -104,10 +103,12 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
+   int ilev;            /* Contour index */
    int ii;              /* Significant clump index */
    int index;           /* Next PixelSet index to use */
    int list_size;       /* Number of values stored in plist and mlist */
    int naxis;           /* Defines whether two pixels are neighbours or not */
+   int nlevels;         /* Number of values in "levels" */
    int nps;             /* Number of clumps found so far */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -141,7 +142,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    for( i = 0; i < ndim; i++ ) {
       dims[ i ] = subnd[ i ] - slbnd[ i ] + 1;
       el *= dims[ i ];
-      skip[ i ] = ( i == 0 ) ? 1 : skip[ i - 1 ]*dims[ i ];
+      skip[ i ] = ( i == 0 ) ? 1 : skip[ i - 1 ]*dims[ i - 1 ];
    }
    for( ; i < 3; i++ ) {
       dims[ i ] = 1;
@@ -215,24 +216,15 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Set the contour interval to a user-specified multiple of the RMS noise. */
-      cdelta = rms*cupidConfigD( cfconfig, "DELTAT", 2.0 );
-
-/* Set the lowest contour level to be used as a multiple of the RMS noise. 
-   This is an increment above the lowest data value in the supplied array. */
-      clow = mind + rms*cupidConfigD( cfconfig, "TLOW", 2.0 );
-
-/* Initialise the first contour level. */
-      clevel = maxd - cdelta;
+/* Get the contour levels at which to check for clumps. */
+      levels = cupidCFLevels( cfconfig, maxd, mind, rms, &nlevels );
 
 /* Mark start of contour levels. */
       if( ilevel > 1 ) msgBlank( status );
 
 /* Loop round all contour levels. */
-      while( clevel >= clow ) {
-
-/* Decrement the contour level */
-         clevel -= cdelta;
+      for( ilev = 0; ilev < nlevels; ilev++ ) {
+         clevel = levels[ ilev ];
 
 /* Tell the user the current contour level. */
          if( ilevel > 1 ) {
@@ -319,6 +311,8 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          clumps[ i ] = cupidCFFreePS( clumps[ i ] );
       }
       clumps = astFree( clumps );
+      levels = astFree( levels );
+
    }
 
 /* Free resources */

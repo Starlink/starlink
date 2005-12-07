@@ -19,6 +19,7 @@ cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
 cupidgccalcf.c cupidgccalcg.c cupidgcdump.c cupidranval.c \
 cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c cupidhdsclump.c \
 cupidcffreeps.c cupidcfxfer.c cupidcfxtend.c cupidsumclumps.c \
+cupidcflevels.c cupidcfdump.c \
 $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la

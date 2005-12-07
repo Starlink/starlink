@@ -29,7 +29,7 @@
 \
 /* Call this function recursively to add the neighbour to the PixelSet. */ \
             CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip, x, \
-                                        iel, ps, clevel, w1, w2, naxis ); \
+                                        iel, ps, clevel, w1, w2, naxis, hindex ); \
          } 
 
 
@@ -84,7 +84,7 @@
 void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
                                  int *dims, int *skip, int *x, int iel, 
                                  CupidPixelSet *ps, double clevel, int *w1,
-                                 int **w2, int naxis ){
+                                 int **w2, int naxis, int hindex ){
 /*
 *  Name:
 *     cupidCFCont<X>
@@ -96,7 +96,7 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 *     void cupidCFCont<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
 *                          int *dims, int *skip, int *x, int iel, 
 *                          CupidPixelSet *ps, double clevel, int *w1,
-*                          int **w2, int naxis )
+*                          int **w2, int naxis, int hindex )
 
 *  Description:
 *     This function identifies a contiguous set of pixels within the
@@ -136,26 +136,28 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 *     clevel
 *        The data value at which to scan the supplied data array.
 *     w1
-*        Pointer to an array of ints with one element for every existing 
-*        PixelSet (i.e. the highest index value issued so far, plus 1). 
-*        Element "i" of this array contains the number of pixels within 
-*        the new PixelSet which touch PixelSet "i". 
+*        Pointer to an array of "hindex" ints. Element "i" of this array 
+*        contains the number of pixels within the new PixelSet which touch 
+*        PixelSet "i". 
 *     w2
-*        Pointer to an array with one element for every existing PixelSet 
-*        (i.e. the highest index value issued so far, plus 1). Each
-*        element in the array is a pointer to another int array. The
-*        number of elements in each of these secondary array is given by
-*        the corresponding entry in the "w1" array. If the "w1" array 
-*        contains zero, then the corresponding pointer in "w2" will be
-*        NULL. If a pixel in the new PixelSet touches an existing PixelSet 
-*        which has index "i", then the 1D vector index of the pixel will
-*        be appended to the end of the secondary array stored at index "i"
-*        within the "w2" array.
+*        Pointer to an array with "hindex" elements. Each element in the 
+*        array is a pointer to another int array. The number of elements 
+*        in each of these secondary array is given by the corresponding 
+*        entry in the "w1" array. If the "w1" array contains zero, then 
+*        the corresponding pointer in "w2" will be NULL. If a pixel in the 
+*        new PixelSet touches an existing PixelSet which has index "i", 
+*        then the 1D vector index of the pixel will be appended to the 
+*        end of the secondary array stored at index "i" within the "w2" 
+*        array.
 *     naxis
 *        Determines which adjoining pixels are considered to be
 *        "neighbours" of the supplied pixel. Should be in the range 1 to
 *        "ndim". Neighbours must be 1 pixel away along no more than "naxis" 
 *        axes.
+*     hindex
+*        The length of the "w1" and "w2" arrays. Each of these arrays
+*        should have one element for every PixelSet which can be touched
+*        by the supplied PixelSet.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidCFCont macro 

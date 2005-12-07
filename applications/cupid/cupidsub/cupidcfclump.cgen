@@ -227,10 +227,10 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
       }
 
 /* Get the 1D vector index of the peak value in the PixelSet. */
-      imax = ps->peak[ 0 ];
+      imax = ps->peak[ 0 ] - 1;
       if( ndim > 1 ) {
-         imax += ps->peak[ 1 ]*skip[ 1 ];
-         if( ndim > 2 ) imax += ps->peak[ 2 ]*skip[ 2 ];
+         imax += ( ps->peak[ 1 ] - 1 )*skip[ 1 ];
+         if( ndim > 2 ) imax += ( ps->peak[ 2 ] - 1 )*skip[ 2 ];
       }
 
 /* Store the information level in the cupidGC structure, from where it

@@ -159,11 +159,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Allocate workspace. These are both array with an element for every
    index value used so far. Element "i" of "w1" holds the number of
    pixels in the new PixelSet which have been found to touch the existing
-   PointSet with element "i". Element "i" of "w2" holds a pointer to a
+   PointSet with index "i". Element "i" of "w2" holds a pointer to a
    secondary array of ints which stores the 1D vector indices of the
    pixels in the new PixelSet which have been found to touch the existing
-   PointSet with element "i". Thus, element "i" of "w1" gives th elength
-   of the secondary array stored at element "i" of "w2". */
+   PointSet with index "i". Thus, element "i" of "w1" gives the length
+   of the secondary array for which a pointer is stored at element "i" 
+   of "w2". */
    w1 = astMalloc( sizeof( int )*hindex );
    w2 = astMalloc( sizeof( int * )*hindex );
    if( ( w1 && w2 ) || !hindex ) {
@@ -230,7 +231,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    array. As this search through the adjoining pixels is performed, note if 
    any pixel adjoins another existing PixelSet. */
                CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip,
-                                           x, i, ps, clevel, w1, w2, naxis );
+                                           x, i, ps, clevel, w1, w2, naxis,
+                                           hindex );
 
 /* Count how many of the old PixelSets are neighbours to the new
    PixelSet. */
@@ -300,6 +302,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
       }
    }
 
+   if( ilevel > 3 ) cupidCFDump( ipa, ndim, dims, slbnd );
+
 /* Now check each of the new PixelSets created above. */
    for( i = 0; i < nnew; i++ ) {
       ps = new[ i ];
@@ -344,6 +348,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             msgSeti( "J", ps->nb[ 0 ]->index );
             msgSeti( "P", ps->nb[ 0 ]->pop );
             msgOut( "", "   Area ^I transfered to clump ^J: new clump population ^P", status );
+            cupidCFDump( ipa, ndim, dims, slbnd );
          }
 
 /* Release the resources used by the PixelSet structure. */
@@ -368,6 +373,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                   msgSeti( "J", ops->index );
                   msgSeti( "P", ops->pop );
                   msgOut( "", "   Clump ^J extended into area ^I: new clump population ^P", status );
+                  cupidCFDump( ipa, ndim, dims, slbnd );
                }
             }
          }

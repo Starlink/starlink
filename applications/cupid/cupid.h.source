@@ -112,8 +112,9 @@ extern int *cupid_global_status;
 /* Function prototypes */
 /* ------------------  */
 CupidPixelSet *cupidCFFreePS( CupidPixelSet * );
-HDSLoc **cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int *, double * );
 HDSLoc **cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
+HDSLoc **cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int *, double * );
+double *cupidCFLevels( AstKeyMap *, double, double, double, int * );
 double cupidConfigD( AstKeyMap *, const char *, double );
 double cupidGCChiSq( int, double *, int, int );
 double cupidGCModel( int, double *, double *, int, int, int );
@@ -129,6 +130,7 @@ void cupidHdsClump( HDSLoc **, double, double *, double, int, int *, int *, int,
 void cupidStoreClumps( const char *, HDSLoc *, HDSLoc **, int, int, const char * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, HDSLoc **, int, double, float *, void *, char * );
+void cupidCFDump( int *, int, int *, int * );
 
 void clumps();
 void cupidhelp();
