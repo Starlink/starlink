@@ -1,5 +1,5 @@
 #include <config.h>
-#include "shl.h"
+#include "star/shl.h"
 #include <stdlib.h>
 
 #ifdef FC_MAIN
