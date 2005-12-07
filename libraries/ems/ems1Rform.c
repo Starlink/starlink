@@ -13,7 +13,7 @@
 *     ems1Rform( text, maxlen, iposn, string, strlength )
 
 *  Description:
-*     This subroutine is called repeatedly to reformat the given 
+*     This subroutine is called repeatedly to reformat the given
 *     text string to a new width (given by maxlen). The returned line always
 *     has a ragged right margin. The text in the returned string is formatted
 *     to end at a word end. A word in this context is a contiguous
@@ -27,7 +27,7 @@
 *        Maximum width of output string
 *     iposn = int* (Given and Returned)
 *        On entry, this argument specifies the character position in
-*        TEXT from which to start generating the next returned line. 
+*        TEXT from which to start generating the next returned line.
 *        It is given as the number of characters from the first
 *        character in TEXT. If a value less than 1 is used, then 1 will
 *        be used. If a value greater than the declared length of the
@@ -59,6 +59,7 @@
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     RTP: R.T. Platon (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -72,6 +73,10 @@
 *     21-SEP-2001 (AJC):
 *        Handle case of no suitable break on line.
 *        Correct calculation of ilast (-1)
+*      7-DEC-2005 (PWD):
+*        Return blank string and zero IPOSN when the input IPOSN is
+*        greater than the length of STRING (as per description of 
+*        IPOSN in prologue).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -112,7 +117,7 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
 
 /*     Check whether the entire given substring will fit into the
  *     returned string. */
-      if ( ilast > iplen ) {        
+      if ( ilast > iplen ) {
 /*        The given substring can fit into the returned string, assign
  *        the returned string and update the returned pointer. */
          (void)strcpy( string, &text[ istart ] );
@@ -128,7 +133,7 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
 /*        If no space was found output the whole chunk */
          if ( *iposn <= istart ) *iposn = ilast;
 
-/*        Assign the returned string and update the returned string 
+/*        Assign the returned string and update the returned string
  *        length and character pointer. */
          *iposn = *iposn + 1;
          (void)strncpy(
@@ -136,6 +141,12 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
          string[*iposn-istart] = '\0';
          *strlength = *iposn - istart;
       }
+   }
+   else if ( ( iplen > 0 ) && ( *iposn >= iplen ) ) {
+/*     Cannot print beyond end of string, set result to blank and iposn to
+ *     zero as per contract */
+       string = "";
+       *iposn = 0;
    }
 
    return;
