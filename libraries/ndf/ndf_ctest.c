@@ -4,6 +4,7 @@
 #include "ems.h"                 /* Error message service (EMS)             */
 #include "ndf.h"                 /* NDF_ library                            */
 #include "sae_par.h"             /* Standard error code definitions         */
+#include "star/hds.h"            /* datAnnul */
 
 /* Standard C include files.                                                */
 /* -------------------------                                                */
@@ -51,12 +52,15 @@ int main( int argc, char *argv[] ) {
 
 /* Local Variables:                                                         */
    int dim[ 2 ] = { 10, 20 };    /* NDF dimensions                          */
+   int lbnd[ 3 ] = { 1, 1, 1 };
+   int ubnd[ 3 ] = { 10, 20, 30 };
    int el;                       /* Number of mapped elements               */
    int i;                        /* Loop counter for array elements         */
    int indf;                     /* NDF identifier                          */
-   int isum;                     /* Sum of array elements                   */
+   int isum = 0;                 /* Sum of array elements                   */
    int place;                    /* NDF placeholder                         */
    void *pntr;                   /* Pointer to mapped array                 */
+   HDSLoc * xloc = NULL;         /* Locator of extension                    */
 
 /* Initialise the global status.                                            */
    status = SAI__OK;
@@ -65,6 +69,12 @@ int main( int argc, char *argv[] ) {
    cnfInitRTL( argc, argv );
    ndfInit( argc, argv, &status );
 
+   /* Try two different techniques */
+   ndfPlace( NULL, "ndf_ptest", &place, &status );
+   ndfNew( "_REAL", 2, lbnd, ubnd, &place, &indf, &status );
+   ndfMap( indf, "DATA", "_REAL","WRITE", &pntr, &el, &status );
+   ndfUnmap( indf, "DATA", &status);
+   ndfDelet( &indf, &status );
 
 /* Create a new file containing an NDF.                                     */
    ndfOpen( NULL, "ndf_test", "write", "new", &indf, &place, &status );
@@ -77,6 +87,10 @@ int main( int argc, char *argv[] ) {
    if ( status == SAI__OK ) {
       for ( i = 0; i < el; i++ ) ( (float *) pntr )[ i ] = (float) ( i + 1 );
    }
+
+   /* Create an extension */
+   ndfXnew( indf, "TEST", "TESTME", 0, dim, &xloc, &status );
+   datAnnul( &xloc, &status );
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
