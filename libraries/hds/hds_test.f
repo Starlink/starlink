@@ -83,6 +83,7 @@
       INTEGER ACTVAL
       INTEGER I
       CHARACTER * (5) CHARARR(2)
+      DOUBLE PRECISION DTEMP
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -112,6 +113,7 @@
 
       CALL DAT_NEW1R( LOC1, 'ONEDR', 5, STATUS )
       CALL DAT_NEW1C( LOC1, 'ONEDCHAR', 5, 2, STATUS )
+      CALL DAT_NEW0D( LOC1, 'ZERODD', STATUS )
 
 *  Create a test structure
       CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
@@ -125,6 +127,10 @@
 
       CALL DAT_FIND( LOC1, 'ONEDCHAR', LOC4, STATUS )
       CALL DAT_PUTVC( LOC4, 2, CHARARR, STATUS )
+      CALL DAT_ANNUL( LOC4, STATUS )
+
+      CALL DAT_FIND( LOC1, 'ZERODD', LOC4, STATUS )
+      CALL DAT_PUT0D( LOC4, 2.0D0, STATUS )
       CALL DAT_ANNUL( LOC4, STATUS )
 
 *  Find and map the data array.
@@ -154,7 +160,7 @@
 *  Count the number of components
       CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (NCOMP .NE. 8) THEN
+         IF (NCOMP .NE. 9) THEN
             STATUS = SAI__ERROR
             CALL EMS_REP( 'HDS_TEST_ERR',
      :           'HDS_TEST: Failed in NCOMP.',
@@ -262,6 +268,19 @@
                END IF
             END IF
          END DO
+      END IF
+
+*  Check DAT_GET0D
+
+      CALL DAT_FIND( LOC1, 'ZERODD', LOC3, STATUS)
+      CALL DAT_GET0D( LOC3, DTEMP, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( DTEMP .NE. 2.0D0) THEN
+            CALL EMS_REP('GET0D',
+     :           'Did not get expected value from _DOUBLE', STATUS)
+         END IF
       END IF
 
 *  Force primitive
