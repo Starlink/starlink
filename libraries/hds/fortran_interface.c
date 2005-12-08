@@ -1887,7 +1887,7 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
 /* Set FORTRAN logical return                                */
    if( F77_ISFALSE( *set ) )
    {
-      if (primary_c == TRUE )
+      if (primary_c)
          *prmry = F77_TRUE;
       else
          *prmry = F77_FALSE;
