@@ -166,7 +166,7 @@ itcl::class gaia::GaiaNDFCube {
       #  controls. 
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 350 -height 250
+            -angle 0 -tabpos n -width 350 -height 275
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -256,6 +256,50 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(delay) \
          {Delay used during animation in milliseconds}
+
+      #  Looping behaviour.
+      itk_component add loopframe {
+         frame $animationTab.frame
+      }
+      itk_component add looplabel {
+         label $itk_component(loopframe).label \
+            -text "Looping:" \
+            -width 21 \
+            -anchor w
+      }
+      pack $itk_component(looplabel) -side left -fill none
+
+      itk_component add loopoff {
+         radiobutton $itk_component(loopframe).noloop \
+            -text "Off" \
+            -variable [scope loop_] \
+            -value "off"
+      }
+      pack $itk_component(loopoff) -side left -fill none
+      add_short_help $itk_component(loopoff) \
+         {Looping of animation off}
+
+      itk_component add loopon {
+         radiobutton $itk_component(loopframe).loopon \
+            -text "On" \
+            -variable [scope loop_] \
+            -value "on"
+      }
+      pack $itk_component(loopon) -side left -fill none
+      add_short_help $itk_component(loopon) \
+         {Looping on, restarts from beginning when at end}
+
+      itk_component add looprocknroll {
+         radiobutton $itk_component(loopframe).rocknroll \
+            -text "Rock 'n Roll" \
+            -variable [scope loop_] \
+            -value "rocknroll"
+      }
+      pack $itk_component(looprocknroll) -side left -fill none
+      add_short_help $itk_component(looprocknroll) \
+         {Looping on, goes into reverse when at end}
+
+      pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 2m
 
       itk_component add animation {
          frame $animationTab.animation
@@ -533,6 +577,7 @@ itcl::class gaia::GaiaNDFCube {
             set lower_bound_ $upper_bound_
             set upper_bound_ $temp
          }
+         set step_ 1
          set_display_plane_ $lower_bound_
          increment_
       }
@@ -555,11 +600,36 @@ itcl::class gaia::GaiaNDFCube {
    protected method increment_ {} {
       if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
          $itk_component(index) configure -value [expr ${plane_}+1]
-         set_display_plane_ [expr ${plane_}+1]
+         set_display_plane_ [expr ${plane_}+$step_]
          set afterId_ [after $itk_option(-delay) [code $this increment_]]
       } else {
-         #  Off end so stop.
-         stop_
+         #  Off end so stop, or loop back to beginning, or go into reverse
+         #  with rock 'n roll option.
+         #  Check that we have a range, otherwise this will call increment_
+         #  causing an eval depth exception.
+         if { $lower_bound_ == $upper_bound_ } {
+            stop_
+         } else {
+            #  Force temporary halt as visual clue that end has arrived.
+            update idletasks
+            after 500
+            if { $loop_ != "off" } {
+               if { $loop_ != "on" } {
+                  if { $step_ == 1 } { 
+                     set step_ -1
+                     set plane_ [expr $upper_bound_ - 1]
+                  } else {
+                     set step_ 1
+                     set plane_ $lower_bound_
+                  }
+               } else {
+                  set plane_ $lower_bound_
+               }
+               increment_
+            } else {
+               stop_
+            }
+         }
       }
    }
 
@@ -776,6 +846,12 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Task controller for ardspectra
    protected variable ardspectra_ {}
+
+   #  The increment between animations.
+   protected variable step_ 1
+
+   #  How animation loops. Off by default.
+   protected variable loop_ "off"
 
    #  Common variables: (shared by all instances)
    #  -----------------
