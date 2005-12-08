@@ -132,7 +132,8 @@ void clumps() {
 *        receives the sum of all the fitted Gaussian clump models including
 *        the global background level. If METHOD is ClumpFind, each pixel in 
 *        the output is the integer index of clump to which the pixel has been 
-*        assigned. No output NDF will be produced if a null (!) value is 
+*        assigned. Bad values are stored for pixels which are not part of
+*        any clump. No output NDF will be produced if a null (!) value is 
 *        supplied. Otherwise, the output NDF will inherit the AXIS, WCS and 
 *        QUALITY components (plus any extensions) from the input NDF. [!]
 *     OUTCAT = FILENAME (Write)
@@ -632,7 +633,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-   astListIssued( "At end of CLUMPS" );
+/*   astListIssued( "At end of CLUMPS" ); */
 
 
 

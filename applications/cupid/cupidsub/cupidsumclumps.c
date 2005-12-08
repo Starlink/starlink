@@ -125,7 +125,7 @@ void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel,
 
       } else if( alg == CLUMPFIND ) {
          pi = (int *) out;
-         for( i = 0; i < nel; i++ ) *(pi++) = 0;
+         for( i = 0; i < nel; i++ ) *(pi++) = VAL__BADI;
       }
    }
 
