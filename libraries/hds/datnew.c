@@ -233,13 +233,13 @@ datCctyp( size_t size,
           char *type )
 {
 /* Local variables */
-   char str[4];
+   char str[DAT__SZTYP+1];
 
 /* Enter routine   */
 
    strcpy( type, "_CHAR*" );
    sprintf( str, "%lu", (unsigned long)size );
-   strncat( type, str, 4 );
+   strncat( type, str, DAT__SZTYP );
 }
 
 /*================================================*/
