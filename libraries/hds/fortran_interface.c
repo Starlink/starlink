@@ -1864,10 +1864,9 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
    int primary_c;
    
 /* Enter routine.	*/
-
-   if( *set == F77_TRUE ) {
+   if ( F77_ISTRUE( *set ) ) {
       set_c = TRUE;
-      if( *prmry == F77_TRUE )
+      if( F77_ISTRUE( *prmry ) )
          primary_c = TRUE;
       else
          primary_c = FALSE;
