@@ -1885,7 +1885,7 @@ F77_SUBROUTINE(dat_prmry)( F77_LOGICAL_TYPE *set,
    datExportFloc( &locator_c, 1, locator_length, locator, status );
 
 /* Set FORTRAN logical return                                */
-   if( *set == F77_FALSE )
+   if( F77_ISFALSE( *set ) )
    {
       if (primary_c == TRUE )
          *prmry = F77_TRUE;
