@@ -1,4 +1,4 @@
-/* Function: psx_access( name, mode )
+/* Function: psx_access( name, mode, status )
 *+
 *  Name:
 *     PSX_ACCESS

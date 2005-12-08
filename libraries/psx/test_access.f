@@ -1,10 +1,11 @@
-      PROGRAM TEST_REMOVE
+      PROGRAM TEST_ACCESS
 
-* Test the function PSX_REMOVE
+* Test the function PSX_ACCESS
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSX_ERR'
+      INTEGER ERRNO
       INTEGER STATUS
 
       EXTERNAL PSX_ACCESS
@@ -21,21 +22,22 @@
       PRINT *, ' '
 
 *     Look for this source code
-      STATUS = ACCESS( FILE, ' ' )
-      IF ( STATUS .EQ. 0 ) THEN
+      STATUS = SAI__OK
+      ERRNO = PSX_ACCESS( FILE, ' ', STATUS )
+      IF ( ERRNO .EQ. 0 ) THEN
          PRINT *, 'Correctly found source code ',FILE
       ELSE
          PRINT *, 'Error finding source file: ', FILE
-         PRINT *, '-- Got status ', STATUS
+         PRINT *, '-- Got errno ', ERRNO
       END IF
 
 
-      STATUS = ACCESS( FILE, 'r' )
-      IF ( STATUS .EQ. 0 ) THEN
+      ERRNO = PSX_ACCESS( FILE, 'r', STATUS )
+      IF ( ERRNO .EQ. 0 ) THEN
          PRINT *, 'Correctly found readable source code ',FILE
       ELSE
          PRINT *, 'Error finding readable source file: ', FILE
-         PRINT *, '-- Got status ', STATUS
+         PRINT *, '-- Got errno ', ERRNO
       END IF
 
       END
