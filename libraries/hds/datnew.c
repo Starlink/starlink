@@ -239,7 +239,7 @@ datCctyp( size_t size,
 
    strcpy( type, "_CHAR*" );
    sprintf( str, "%lu", (unsigned long)size );
-   strncat( type, str, DAT__SZTYP );
+   strncat( type, str, DAT__SZTYP - strlen(type) );
 }
 
 /*================================================*/
