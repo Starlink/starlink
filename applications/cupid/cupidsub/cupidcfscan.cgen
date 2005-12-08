@@ -5,7 +5,7 @@
 
 CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel, 
                                             int ndim, int dims[3], int skip[3],
-                                            int *nps, CupidPixelSet **clumps, 
+                                            CupidPixelSet **clumps, 
                                             double clevel, int *index,
                                             int naxis, int ilevel, 
                                             int *slbnd ){
@@ -19,7 +19,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *  Synopsis:
 *     CupidPixelSet **cupidCFScan<X>( CGEN_TYPE *ipd, int *ipa, int nel, 
 *                                     int ndim, int dims[3], int skip[3], 
-*                                     int *nps, CupidPixelSet **clumps, 
+*                                     CupidPixelSet **clumps, 
 *                                     double clevel, int *index, int naxis,
 *                                     int ilevel, int *slbnd )
 
@@ -56,24 +56,27 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        the array using a single 1D vector index and using nD coords. This
 *        array should have 3 elements even if "ndim" is less than 3, and
 *        the extra elements should be filled with zero's.
-*     nps
-*        Pointer to an int containing the number of PixelSet pointers in
-*        the "clumps" array. On exit this value is changed to be the
-*        number of PixelSet pointers in the array pointed to by the
-*        returned function value.
 *     clumps
 *        An array of pointers, each locating a PixelSet structure. The
 *        number of pointers in the array is given by the supplied value 
-*        of "*nps". Each PixelSet describes one clump found at a higher
-*        contour level. Ignored (and consequently may be NULL) if "*nps"
-*        is zero.
+*        of "*index". Each PixelSet describes one clump found at a higher
+*        contour level. Ignored (and consequently may be NULL) if "*index"
+*        is zero. The index within this array at which a pointer to a
+*        particular PixelSet is stored should equal the index value
+*        stored within the PixelSet structure (this makes it easy and
+*        fast to get a pointer to aPixelSet with a particular index value).
+*        Elements of the array which are not used should hold NULL.
 *     clevel
 *        The data value at which to scan the supplied data array.
 *     index
 *        Pointer to an int holding the next free pixel index value. The
 *        index value is the value stored in the "ipa" array to identify all
-*        the pixels within a set of contiguous pixels. Updated on exit to
-*        take account of any newly issued index values.
+*        the pixels within a set of contiguous pixels. The same value is
+*        stored within the PixelSet structure describing the set of contiguous
+*        pixels. Updated on exit to take account of any newly issued index 
+*        values. The supplied value also specifies the length of the
+*        supplied "clumps" array, and the returned value specifies the length 
+*        of the array returned as the function value.
 *     naxis
 *        Determines which adjoining pixels are considered to be "neighbours" 
 *        of a specified central pixel. Should be in the range 1 to "ndim". 
@@ -85,17 +88,21 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
+*     
 
 *  Returned Value:
 *     A pointer to a possibly new array in which each element is a 
 *     pointer to a PixelSet structure (this may be the same as the
 *     supplied "clumps" pointer). The number of pointers in the 
-*     array is returned in "*nps". These are the PixelSets defining the
+*     array is returned in "*index". These are the PixelSets defining the
 *     clumps at the given contour level. All the supplied clump pointers
 *     will be present in the returned array, but additional new pointers
 *     may be added to describe new clumps which appear at this contour level.
 *     The original clump PixelSets will usually have been extended to
-*     include the extra pixels found at this contour level.
+*     include the extra pixels found at this contour level. The index within 
+*     this array at which a pointer to a particular PixelSet is stored 
+*     will equal the index value stored within the PixelSet structure.
+*     Elements of the array which are not used are set to NULL.
 
 *  Notes:
 *     - If a new array of PixelSets is created and returned, the original 
@@ -122,21 +129,17 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Local Variables: */
    CGEN_TYPE *pd;        /* Pointer to next data pixel */
-   CupidPixelSet **new;  /* Pointer to array of new PixelSet pointers */
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ps;    /* Pointer to new PixelSet */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
    int **w2;             /* Pointer to array of neighbour lists */
    int *w1;              /* Pointer to array of neighbour population sizes */
-   int jindex;           /* Index associated with clump j */
    int *pa;              /* Pointer to next index value */
    int hindex;           /* Next available index on entry */
    int i;                /* Loop count */
    int j;                /* Loop count */
    int k;                /* Loop count */
    int more;             /* Should we continue looping? */
-   int nnew;             /* No. of new PixelSets found */
-   int npso;             /* Number of supplied clumps */
    int rem;              /* Remaining count of pixels */
    int x[3];             /* GRID coords of current pixel */
 
@@ -146,15 +149,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* As yet we have no new PixelSets */
-   nnew = 0;
-   new = NULL;
-
 /* Note the next available index value. */
    hindex = *index;   
-
-/* Note the number of supplied clumps. */
-   npso = *nps;
 
 /* Allocate workspace. These are both array with an element for every
    index value used so far. Element "i" of "w1" holds the number of
@@ -189,16 +185,16 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    level but which have not yet been assigned to a PixelSet, giving the 
    new PixelSet the next available index value. */
             ps = astMalloc( sizeof( CupidPixelSet ) );
-            new = astGrow( new, ++nnew, sizeof( CupidPixelSet * ) );
-            if( ps && new ) {
-               ps->index = (*index)++;
+            ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
+            if( ret ) {
+               ps->index = (*index) - 1;
                ps->nnb = 0;
                ps->pop = 0;
                ps->nb = NULL;
                ps->sznbl = NULL;
                ps->nbl = NULL;
                ps->vpeak = -DBL_MAX;
-               new[ nnew - 1 ] = ps;
+               ret[ ps->index ] = ps;
    
 /* Get the n-dimensional grid coords of the current pixel. */
                if( ndim > 2 ) {
@@ -241,10 +237,18 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                   msgOut( "", "   New PixelSet: index ^I population ^P", status );
                }
 
-/* Count how many of the old PixelSets are neighbours to the new
-   PixelSet. */
-               for( j = 0; j < npso; j++ ) {
-                  if( w1[ clumps[ j ]->index ] ) (ps->nnb)++;
+/* Count how many of the old PixelSets are neighbours to the new PixelSet. */
+               for( j = 0; j < hindex; j++ ) {
+                  if( w1[ j ] ) {
+                     (ps->nnb)++;
+
+
+if( !ret[ j ] ) {
+   printf("%d %d %d\n", ps->index, j, w1[j] );
+}
+
+
+                  }
                }
 
 /* Allocate memory in the new PixelSet structure for a list holding pointers
@@ -261,23 +265,22 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    round each of the supplied clumps. */
                if( ps->sznbl ) {
                   k = 0;
-                  for( j = 0; j < npso; j++ ) {
+                  for( j = 0; j < hindex; j++ ) {
 
 /* Check to see if this supplied clump is a neighbour of the new clump.
    If it is, its element in the "w1" array will hold the number of pixels
    in the new PixelSet which adjoin it. If this number is zero, none of
    the pixels in the new PixelSet adjoin the supplied clump and so the
    supplied clump is not a neighbour of the new PixelSet. */
-                     jindex = clumps[ j ]->index;
-                     if( w1[ jindex ] ) {
+                     if( w1[ j ] ) {
 
 /* If clump "j" is a neighbour of the new PixelSet store a pointer to
    clump "j" in the new PixelSet structure, and also store a pointer to
    the list which holds the 1D vector indices of the pixels in the new
    PixelSet which adjoin clump "j". */
-                        (ps->nb)[ k ] = clumps[ j ];
-                        (ps->nbl)[ k ] = w2[ jindex ];
-                        (ps->sznbl)[ k ] = w1[ jindex ];
+                        (ps->nb)[ k ] = ret[ j ];
+                        (ps->nbl)[ k ] = w2[ j ];
+                        (ps->sznbl)[ k ] = w1[ j ];
 
 /* Increment the number of clumps which are neighbours to the new
    PixelSet. */
@@ -285,8 +288,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Prepare the "w1" and "w2" arrays for the next pass thorugh this loop by 
    resetting them to hold zero and NULL. */
-                        w1[ jindex ] = 0;
-                        w2[ jindex ] = NULL;
+                        w1[ j ] = 0;
+                        w2[ j ] = NULL;
                      }
                   }
                }
@@ -298,7 +301,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          }
       }
 
-/* Free the work array */
+/* Free the work arrays. */
       w1 = astFree( w1 );
 
       if( w2 ) {
@@ -312,40 +315,29 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    if( ilevel > 3 ) cupidCFDump( ipa, ndim, dims, slbnd );
 
 /* Now check each of the new PixelSets created above. */
-   for( i = 0; i < nnew; i++ ) {
-      ps = new[ i ];
+   for( i = hindex; i < *index; i++ ) {
+      ps = ret[ i ];
 
 /* If the new PixelSet does not touch any of the existing PixelSets (i.e. the 
-   clumps found at higher contour levels), then it is a new clump, so add it
-   to the supplied list of clumps. */
+   clumps found at higher contour levels), then it is a new clump, so
+   tell the user and leave it in the returned list of clumps. */
       if( ps->nnb == 0 ) {
-         ret = astGrow( ret, ++(*nps), sizeof( CupidPixelSet * ) );
-         if( ret ) {
-            ret[ *nps - 1 ] = ps;
-
-/* Inform user of each new peak */
-            if( ilevel > 3 ) {
-               msgSetd( "V", ps->vpeak );
-               msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
-               for( j = 1; j < ndim; j++ ) {
-                  msgSetc( "C", "," );
-                  msgSeti( "C", ps->peak[ j ] );
-               }
-               msgSeti( "I", ps->index );
-               msgSeti( "P", ps->pop );
-               msgOut( "", "   Peak found at (^C): peak ^V, index ^I, "
-                       "population ^P", status );
+         if( ilevel > 3 ) {
+            msgSetd( "V", ps->vpeak );
+            msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
+            for( j = 1; j < ndim; j++ ) {
+               msgSetc( "C", "," );
+               msgSeti( "C", ps->peak[ j ] );
             }
-
-            ps = NULL;
-
-         } else {
-            ps = cupidCFFreePS( ps );
+            msgSeti( "I", ps->index );
+            msgSeti( "P", ps->pop );
+            msgOut( "", "   Peak found at (^C): peak ^V, index ^I, "
+                    "population ^P", status );
          }
 
 /* If the new PixelSet touches just one of the existing PixelSets, then 
    it is an extension of that clump. Transfer all the pixels in the new 
-   PixelSet into the supplied clump. */
+   PixelSet into the existing clump. */
       } else if( ps->nnb == 1 ) {
          cupidCFXfer( ps, ps->nb[ 0 ], ipa, skip );
 
@@ -359,7 +351,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          }
 
 /* Release the resources used by the PixelSet structure. */
-         ps = cupidCFFreePS( ps );
+         ret[ i ] = cupidCFFreePS( ps );
 
 /* If a new PixelSet has been created which touches two or more of the 
    existing PixelSets, then we loop round extending each of the existing 
@@ -369,14 +361,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    the PixelSet structure. */
       } else {
          more = 1;
-
-
          while( more ) {
             more = 0;
             for( j = 0; j < ps->nnb; j++ ) {
                ops = ps->nb[ j ];
                if( cupidCFXtend( ps, ops, ipa, ndim, dims, skip, 
-                                 naxis ) ) more = 1;
+                                 naxis, ret ) ) more = 1;
                if( ilevel > 3 && ops ) {
                   msgSeti( "I", ps->index );
                   msgSeti( "J", ops->index );
@@ -388,31 +378,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             if( ilevel > 3 ) cupidCFDump( ipa, ndim, dims, slbnd );
 
          }
-         ps = cupidCFFreePS( ps );
+         ret[ i ] = cupidCFFreePS( ps );
       } 
    }
-
-/* If any new clumps have been added to the returned array, sort them
-   into descending peak value order using a bubblesort algorithm. */
-   if( *nps > npso ) {
-      j = *nps;
-      more = 1;
-      while( more ) {
-         j--;
-         more = 0;
-         for( k = npso; k < j; k++ ) {      
-            if( ret[ k ]->vpeak < ret[ k + 1 ]->vpeak ) {
-               ps = ret[ k ];
-               ret[ k ] = ret[ k + 1 ];
-               ret[ k + 1 ] = ps;
-               more = 1;               
-            }
-         }
-      }
-   }
-
-/* Release resources */
-   new = astFree( new );
 
 /* Return the expanded list of clumps. */
    return ret;

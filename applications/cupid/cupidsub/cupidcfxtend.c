@@ -7,14 +7,60 @@
 
 #define CHECK_NEIGHBOUR \
 \
-/* If the neighbouring pixel is still part of the source PixelSet add it \
-   to the list of source pixels which adjoin the destination PixelSet. */ \
-         if( ipa[ iv ] == old_index ) { \
+/* If the neighbouring pixel is still part of the source PixelSet and is \
+   not flagged as being a neighbour of some other PixelSet, modify \
+   its index value to show that it is now a neighbour of the destination \
+   PixelSet, and add it to the list of source pixels which adjoin the \
+   destination PixelSet. */ \
+         this_index = ipa[ iv ]; \
+         if( this_index == old_index ) { \
+            ipa[ iv ] = neb_index; \
             nj = new_sznbl++; \
             new_nbl = astGrow( new_nbl, new_sznbl, sizeof( int ) ); \
             if( new_nbl ) new_nbl[ nj ] = iv; \
-         } 
-
+\
+/* If the neighbouring pixel is part of the source PixelSet but is \
+   already marked as being a neighbour of some other PixelSet, then we \
+   need to decide whether to leave it as it is or change it to be a \
+   neighbour of the current destination PixelSet instead. We make this \
+   decision on the basis of the distance to the peaks of the two candidate \
+   destination clumps, marking the pixel as a neighbour of the clump with \
+   the nearer peak. */ \
+         } else if( this_index < 0 && this_index != neb_index ) { \
+            if( cupidMergeSet( this_index ) == old_index ) { \
+               neb2_index = cupidMergeNeb( this_index ); \
+               neb = clumps[ neb2_index ]; \
+\
+               dx = ps2->peak[ 0 ] - x[ 0 ]; \
+               s2a = dx*dx; \
+               if( ndim > 1 ) { \
+                  dx = ps2->peak[ 1 ] - x[ 1 ]; \
+                  s2a += dx*dx; \
+                  if( ndim > 2 ) { \
+                     dx = ps2->peak[ 2 ] - x[ 2 ]; \
+                     s2a += dx*dx; \
+                  } \
+               } \
+\
+               dx = neb->peak[ 0 ] - x[ 0 ]; \
+               s2b = dx*dx; \
+               if( ndim > 1 ) { \
+                  dx = neb->peak[ 1 ] - x[ 1 ]; \
+                  s2b += dx*dx; \
+                  if( ndim > 2 ) { \
+                     dx = neb->peak[ 2 ] - x[ 2 ]; \
+                     s2b += dx*dx; \
+                  } \
+               } \
+\
+               if( s2a < s2b ) { \
+                  ipa[ iv ] = neb_index; \
+                  nj = new_sznbl++; \
+                  new_nbl = astGrow( new_nbl, new_sznbl, sizeof( int ) ); \
+                  if( new_nbl ) new_nbl[ nj ] = iv; \
+               } \
+            } \
+         }
 
 
 #define CHECK_UPNEIGHBOUR(ii) \
@@ -25,12 +71,14 @@
 /* Modify the 1D vector index to represent the upper neighbour on axis \
    "ii". */ \
          iv += skip[ ii ]; \
+         x[ ii ]++; \
 \
 /* Check the neighbour. */ \
          CHECK_NEIGHBOUR; \
 \
 /* Revert the 1D vector index and nD GRID coords to the original values. */ \
          iv -= skip[ ii ]; \
+         x[ ii ]--; \
       }
 
 
@@ -43,12 +91,14 @@
 /* Modify the 1D vector index to represent the lower neighbour on axis \
    "ii". */ \
          iv -= skip[ ii ]; \
+         x[ ii ]--; \
 \
 /* Check the neighbour. */ \
          CHECK_NEIGHBOUR; \
 \
 /* Revert the 1D vector index and nD GRID coords to the original values. */ \
          iv += skip[ ii ]; \
+         x[ ii ]++; \
       }
 
 
@@ -63,7 +113,8 @@
 
 
 int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-                  int ndim, int *dims, int skip[3], int naxis ){
+                  int ndim, int *dims, int skip[3], int naxis,
+                  CupidPixelSet **clumps ){
 /*
 *  Name:
 *     cupidCFXtend
@@ -73,7 +124,8 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 *  Synopsis:
 *     int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-*                       int ndim, int *dims, int skip[3], int naxis )
+*                       int ndim, int *dims, int skip[3], int naxis,
+*                       CupidPixelSet **clumps )
 
 *  Description:
 *     This function extends the destination PixelSet ("ps2") by transfering
@@ -109,6 +161,10 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *        For a pixel to be considered to be a neighbour of another pixel,
 *        the two pixels must be no more than 1 pixel away along no more than 
 *        "naxis" axes.
+*     clumps
+*        Array holding pointers to all previously defined PixelSets, such 
+*        that a pointer to the PixelSet with index value "i" is stored at 
+*        element "i" of the "clumps" array.
 
 *  Returned Value:
 *     Non-zero if any pixels were transferred into the destination
@@ -128,19 +184,26 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 */      
 
 /* Local Variables: */
+   CupidPixelSet *neb;/* Second neighbouring clump */
    int *nbl;        /* Pointer to list of neighbouring pixel indices */
    int *new_nbl;    /* Pointer to new list of neighbouring pixel indices */
+   int dx;          /* Axis increment between pixel and clump peak */
    int i;           /* Loop count */
    int ii;          /* Loop count */
    int ips;         /* Index of destination clump within source PixelList */
    int iv;          /* 1D vector index of next neighbouring source pixel */
+   int neb2_index;  /* Index value for a second neighbouring clump */
+   int neb_index;   /* Index value for edge pixels */
    int new_index;   /* Index value to assign to the transferred pixels */
    int new_sznbl;   /* Number of entries in the "new_nbl" array */
    int nj;          /* Index at which to store new neighbour index */
    int old_index;   /* Original index value of the transferred pixels */
    int rem;         /* Remaining count of pixels */
    int ret;         /* Returned value */
+   int s2a;         /* Squared distance between pixel and destination peak */
+   int s2b;         /* Squared distance between pixel and second peak */
    int sznbl;       /* Number of entries in the "nbl" array */
+   int this_index;  /* Index value of the current neighbour */
    int x[ 3 ];      /* GRID axis values */
    int xx;          /* GRID axis value */
 
@@ -153,6 +216,10 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 /* Get the index value of the destination PixelSet. */
    new_index = ps2->index;
+
+/* Get the index value of source pixels which are neigbours of the
+   destination PixelSet. */
+   neb_index = cupidMergeIndex( old_index, new_index );
 
 /* Search through the list of clumps which adjoin the source PixelSet,
    looking for a clump with the same index as the destination PixelSet. */
@@ -190,7 +257,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    pixels. */
       for( ii = 0; ii < sznbl; ii++ ) {
          iv = nbl[ ii ];
-         if( ipa[ iv ] == old_index ) {
+         if( ipa[ iv ] == neb_index ) {
             ipa[ iv ] = new_index;
 
 /* Update the populations of the two PixelSets. */

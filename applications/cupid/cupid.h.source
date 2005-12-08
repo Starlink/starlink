@@ -59,12 +59,12 @@ typedef struct CupidGC  {
 /* Structure used to describe a set of contiguous pixels */
 typedef struct CupidPixelSet CupidPixelSet;
 struct CupidPixelSet {
-   CupidPixelSet **nb; /* Pointer to array of "nb" neighbouring PixelSets */
-   int **nbl;          /* Pointer to array of "nb" lists of neighbouring pixels */
-   int *sznbl;         /* Pointer to array holding length of each "nb" list */
+   int nnb;            /* No. of neighbouring PixelSets which touch this one */
+   CupidPixelSet **nb; /* Pointer to array of "nnb" neighbouring PixelSets */
+   int **nbl;          /* Pointer to array of "nnb" lists of neighbouring pixels */
+   int *sznbl;         /* Pointer to array holding length of each "nbl" list */
    int index;          /* The index used to identify pixels in the set */
    int lbnd[ 3 ];      /* Lower GRID bounds of the set bounding box */
-   int nnb;            /* No. of neighbouring PixelSets which touch this one */
    int ubnd[ 3 ];      /* Upper GRID bounds of the set bounding box */
    double vpeak;       /* Peak pixel value */
    int peak[ 3 ];      /* Peak pixel GRID coords */
@@ -73,6 +73,23 @@ struct CupidPixelSet {
 
 /* Function macros */
 /* --------------- */
+
+/* A macro which creates a negative pixel assignment index which
+   indicates that the pixel is a member of the PixelSet with index "i"
+   and is also a neighbour to a pixel belonging to the PixelSet with 
+   index "j". The "j" value is moved into the upper bits of the int value. */
+#define cupidMergeIndex( i, j ) \
+   ( -(i) - ( (j) << 13 ) )
+
+/* A macro which takes a merged index produced by cupidMergeIndex and
+   returns the index of the PixelSet to which the pixel belongs. */
+#define cupidMergeSet( i ) \
+   ( ( i >= CUPID__CFNULL ) ? i : ( (-i) & 0x1fff ) )
+
+/* A macro which takes a merged index produced by cupidMergeIndex and
+   returns the index of the neighbouring PixelSet. */
+#define cupidMergeNeb( i ) \
+   ( ( i >= CUPID__CFNULL ) ? CUPID__CFNULL : ( (-i) >> 13 ) )
 
 /* A macro to return the size of a cupid data type. */
 #define cupidSize( type, fun ) \
@@ -119,7 +136,7 @@ double cupidConfigD( AstKeyMap *, const char *, double );
 double cupidGCChiSq( int, double *, int, int );
 double cupidGCModel( int, double *, double *, int, int, int );
 float cupidRanVal( int, float[2] );
-int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int );
+int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
 int cupidConfigI( AstKeyMap *, const char *, int );
 void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3] );
 void cupidDatCopy( HDSLoc *, HDSLoc * );

@@ -10,17 +10,23 @@
 #define CHECK_NEIGHBOUR \
 \
 /* If the neighbouring pixel is already assigned to a clump, add the \
-   central pixel to the list of pixels which touch that clump (so long as
-   the central pixel has not already been flagged as the neighbour of some
-   other clump), and skip to the next neighbouring pixel. */ \
+   central pixel to the list of pixels which touch that clump (so long as \
+   the central pixel has not already been flagged as the neighbour of some \
+   other clump), and skip to the next neighbouring pixel. Also change the \
+   index assigned to the central pixel to indicate both the PixelSet to \
+   which the central pixel belongs and also the neighbouring PixelSet. */ \
          if( ipa[ iel ] != CUPID__CFNULL ) { \
-            if( !isneb && ipa[ iel ] != ps->index ) { \
-               clump_index = ipa[ iel ]; \
-               j = w1[ clump_index ]++; \
-               w2[ clump_index ] = astGrow( w2[ clump_index ], w1[ clump_index ], \
-                                            sizeof( int ) ); \
-               w2[ clump_index ][ j ] = i0; \
-               isneb = 1; \
+            if( !isneb ) { \
+               clump_index = cupidMergeSet( ipa[ iel ] ); \
+               neb_index = cupidMergeNeb( ipa[ iel ] ); \
+               if( clump_index != ps->index ) { \
+                  j = w1[ clump_index ]++; \
+                  w2[ clump_index ] = astGrow( w2[ clump_index ], w1[ clump_index ], \
+                                               sizeof( int ) ); \
+                  w2[ clump_index ][ j ] = i0; \
+                  isneb = 1; \
+                  ipa[ i0 ] = cupidMergeIndex( ps->index, clump_index ); \
+               } \
             } \
 \
 /* We ignore neighbouring pixels which are bad or are below the contour  \
@@ -185,6 +191,7 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
    int i0;              /* 1D vector index of central pixel */
    int i;               /* Axis index */
    int isneb;           /* Is central pixel neighboured by another clump? */
+   int neb_index;       /* Index of neighbouring PixelSet */
    int j;               /* Index of last neighbouring pixel */
    int xx[ 3 ];
 

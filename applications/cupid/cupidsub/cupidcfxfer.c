@@ -85,7 +85,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
 /* Assign the new index to the pixel, if the pixel was originally a
    member of the source PixelSet.  */
-            if( *v == old_index ) *v = new_index;
+            if( cupidMergeSet(*v) == old_index ) *v = new_index;
 
 /* Get the pointer to the next pixel in the source PixelSet bounding box. */
             v++;

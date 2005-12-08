@@ -109,8 +109,10 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int list_size;       /* Number of values stored in plist and mlist */
    int naxis;           /* Defines whether two pixels are neighbours or not */
    int nlevels;         /* Number of values in "levels" */
-   int nps;             /* Number of clumps found so far */
    int skip[3];         /* Pointer to array of axis skips */
+   int j;               /* Loop index */
+   int more;            /* Any remaining unsorted elements/ */
+   int last_index;      /* Index of last clump in 2nd contour level */
 
 /* Initialise */
    clist = NULL;
@@ -161,8 +163,8 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the number of clumps and initialise a pointer to the
    PixelSet structures which describe the clumps. */
-      nps = 0;
-      clumps = NULL;
+      clumps = astMalloc( sizeof( CupidPixelSet *) );
+      if( clumps ) clumps[ 0 ] = NULL;
 
 /* Initialise the index used to identify the next contiguous set of
    pixels found. */
@@ -237,17 +239,46 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    lowest contour level. We note the number of clumps which are inherited 
    from the higher contour level. This causes new clumps found at the 
    last contour level to be ignored. */
-         *nclump = nps;
+         last_index = index;
 
 /* Scan the data array at a new contour level. This extends clumps found
    at a higher contour level, and adds any new clumps found at this contour
    level. New clumps are stored at the end of the returned array. */
-         clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, &nps,
+         clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
                                clumps, clevel, &index, naxis, ilevel, slbnd );
       }
 
 /* Mark end of contour levels. */
       if( ilevel > 1 ) msgBlank( status );
+
+/* Shuffle non-null clump pointers to the start of the "clumps" array,
+   and count them. */
+      j = 0;
+      for( i = 0; i < last_index; i++ ) {
+         if( clumps[ i ] ) {
+            if( j < i ) {
+               clumps[ j ] = clumps[ i ];
+               clumps[ i ] = NULL;
+            }
+            j++;
+         }
+      }
+      *nclump = j;
+
+/* Sort them into descending peak value order using a bubble sort algorithm. */
+      more = 1;
+      while( more ) {
+         j--;
+         more = 0;
+         for( i = 0; i < j; i++ ) {
+            if( clumps[ i ]->vpeak < clumps[ i + 1 ]->vpeak ) {
+               ps = clumps[ i + 1 ];
+               clumps[ i + 1 ] = clumps[ i ];
+               clumps[ i ] = ps;
+               more = 1;
+            }
+         }
+      }
 
 /* Create the list of HDS clump objects to be returned. */
       clist = astMalloc( sizeof( HDSLoc *)*(*nclump) );
@@ -307,8 +338,8 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 0 ) msgBlank( status );
 
 /* Free resources */
-      for( i = 0; i < nps; i++ ) {
-         clumps[ i ] = cupidCFFreePS( clumps[ i ] );
+      for( i = 0; i < index; i++ ) {
+         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ] );
       }
       clumps = astFree( clumps );
       levels = astFree( levels );
