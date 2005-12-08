@@ -157,7 +157,7 @@
 #if HAVE_INTRINSIC_SLEEP
          CALL SLEEP( 1 )
 #else
-# warn "No SLEEP call so crossing fingers"
+         WRITE(*,*) 'No SLEEP call so crossing fingers'
 #endif
   20  CONTINUE
 
