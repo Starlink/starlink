@@ -22,6 +22,8 @@
 #define FALSE 0
 #define SAI__OK 0
 
+/* Start Fortran Interface Wrappers */
+
 F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
                           F77_INTEGER_TYPE *ndim,
                           FORTRAN_INDEX_TYPE dims[],
@@ -744,6 +746,128 @@ F77_SUBROUTINE(dat_get0l)( CHARACTER(locator),
   dat1_import_floc( locator, locator_length, &locator_c, status );
   datGet0L( &locator_c, value, status );
 }
+
+/*=======================================*/
+/* DAT_GET1x - Get 1D array values       */
+/*=======================================*/
+
+F77_SUBROUTINE(dat_get1d)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_DOUBLE_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet1D( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_get1i)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_INTEGER_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet1I( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_get1r)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_REAL_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet1R( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_get1l)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_LOGICAL_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGet1L( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+/*=======================================*/
+/* DAT_GETVx - Get vectorized array values       */
+/*=======================================*/
+
+F77_SUBROUTINE(dat_getvd)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_DOUBLE_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGetVD( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_getvi)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_INTEGER_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGetVI( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_getvr)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_REAL_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGetVR( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+F77_SUBROUTINE(dat_getvl)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   F77_LOGICAL_TYPE *values,
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator) )
+{
+  HDSLoc locator_c;
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+  datGetVL( &locator_c, *maxval, values, &actval_c, status);
+  *actval = actval_c;
+}
+
+
 
 
 F77_SUBROUTINE(dat_index)( CHARACTER(locator1),
