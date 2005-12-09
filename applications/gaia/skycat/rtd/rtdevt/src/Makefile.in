@@ -5,11 +5,11 @@
 # 	Makefile for rtdImgEvt library
 # ------------------------------------------------------------------------
 
-SRCS 		=  rtdClient.c rtdServer.C rtdSERVER.C rtdCLNT.C rtdSem.c rtdImageEvent.c \
+SRCS 		=  rtdClient.c rtdServer.C rtdSERVERCPP.C rtdCLNT.C rtdSem.c rtdImageEvent.c \
 		   rtdCubeDisplay.c rtdLOG.C
 
 OBJS 		=  rtdImageEvent.o rtdSem.o
-RTD_SERVER_OBJS	=  rtdServer.o rtdSERVER.o rtdCLNT.o rtdLOG.o
+RTD_SERVER_OBJS	=  rtdServer.o rtdSERVERCPP.o rtdCLNT.o rtdLOG.o
 
 PROGS           =  ../bin/rtdServer
 DEMOS           =  ../bin/rtdClient ../bin/rtdCubeDisplay

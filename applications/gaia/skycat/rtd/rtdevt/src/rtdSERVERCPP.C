@@ -1,7 +1,7 @@
 /*******************************************************************************
 * E.S.O. - VLT project
 *
-* "@(#) $Id: rtdSERVER.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"
+* "@(#) $Id$"
 *
 * who       when      what
 * --------  --------  ----------------------------------------------
@@ -88,7 +88,7 @@
 
 #include "rtdSERVER.h"
 
-static char *rcsId="@(#) $Id: rtdSERVER.C,v 1.2 2005/02/02 01:43:03 brighton Exp $"; 
+static char *rcsId="@(#) $Id$"; 
 static void *use_rcsId = ((void)&use_rcsId,(void *) &rcsId);
 
 rtdSERVER::rtdSERVER(int verbose, int socketFd, int delay) 
