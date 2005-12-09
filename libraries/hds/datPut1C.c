@@ -114,7 +114,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
     emsSeti( "NV", nval );
     emsSeti( "SZ", actval );
     emsRep( "DAT_PUT1C_ERR",
-	    "Bounds do not match HDS object (^NV != ^SZ)",
+	    "datPut1C: Bounds do not match HDS object (^NV != ^SZ)",
 	    status);
     return *status;
   }
@@ -157,7 +157,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
     if ( *status == DAT__OK && trunc ) {
       *status = DAT__TRUNC;
       emsSeti( "NN", lenstr );
-      emsRep( "DAT_PUT1C_TRN", "Some strings were truncated when stored in _CHAR*^NN array",
+      emsRep( "DAT_PUT1C_TRN", "datPut1C: Some strings were truncated when stored in _CHAR*^NN array",
 	      status );
     }
 
