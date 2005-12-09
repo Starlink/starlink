@@ -7929,7 +7929,7 @@ package kappa {
             position 4
             type LITERAL
             vpath PROMPT
-            ppath CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
             prompt {New value for the section}
             default 0.0
             helpkey *

@@ -45,7 +45,9 @@
 *        value appropriate for the array data type be substituted.
 *        Placing NEWVAL on the command line permits only one section
 *        to be replaced.  If there are multiple replacements, a null
-*        value (!) terminates the loop.
+*        value (!) terminates the loop. If the section being modified
+*        contains only a single pixel, then the original value of that 
+*        pixel is used as the suggested default value. 
 *     OUT = NDF (Write)
 *        Output NDF structure containing the modified version of
 *        the array component.
@@ -114,6 +116,9 @@
 *        Use CNF_PVAL
 *     01-OCT-2004 (PWD):
 *        Moved CNF_PAR into declarations.
+*     9-DEC-2005 (PWD):
+*        Provide current pixel value as dynamic default for NEWVAL if section
+*        contains only 1 pixel.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -147,12 +152,13 @@
       CHARACTER * ( VAL__SZD ) CVALUE ! Replacement value as obtained
       CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
       DOUBLE PRECISION DVALUE    ! Replacement value for d.p. data
-      CHARACTER * ( 4 ) DUMDEF   ! Dummy suggested default
+      CHARACTER * ( 40 ) SUGDEF  ! Suggested default
       INTEGER EL                 ! Number of array elements mapped
       INTEGER IVALUE             ! Replacement value for integer data
       CHARACTER * ( DAT__SZLOC ) LOC ! Locators for the NDF
       LOGICAL LOOP               ! Loop for another section to replace
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
+      INTEGER NCHAR              ! Number of characters written to string
       INTEGER NCSECT             ! Number of characters in section
       INTEGER NDFI               ! Identifier for input NDF
       INTEGER NDFO               ! Identifier for output NDF
@@ -220,7 +226,7 @@
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
 
 *  Obtain a locator to the output NDF.
-      CALL NDF_LOC( NDFO, 'Write', LOC, STATUS )
+      CALL NDF_LOC( NDFO, 'Update', LOC, STATUS )
 
 *  Initialise flag indicating whether or not there are bad values in
 *  the array.  Find out if there are currently no bad values.  If there
@@ -256,7 +262,7 @@
      :                  STATUS )
 
 *  Map the array component of the section.
-         CALL KPG1_MAP( NDFS, MCOMP, TYPE, 'Write', PNTR, EL, STATUS )
+         CALL KPG1_MAP( NDFS, MCOMP, TYPE, 'Update', PNTR, EL, STATUS )
 
 *  Perform the replacements.
 *  =========================
@@ -268,12 +274,21 @@
 
 *  Real
 *  ----
-         DUMDEF = 'Junk'
+         SUGDEF = 'Junk'
          IF ( TYPE .EQ. '_REAL' ) THEN
+
+*  If the section contains only a single pixel, use its value as the
+*  default for the parameter.
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANR( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                          RVALUE, STATUS )
+               WRITE( SUGDEF, '(G13.6)') RVALUE
+               CALL CHR_LDBLK( SUGDEF )
+            END IF
 
 *  Get the replacement value.  The range depends on the processing data
 *  type.  
-            CALL PAR_MIX0R( 'NEWVAL', DUMDEF, VAL__MINR, VAL__MAXR,
+            CALL PAR_MIX0R( 'NEWVAL', SUGDEF, VAL__MINR, VAL__MAXR,
      :                      'Bad', .FALSE., CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -291,7 +306,14 @@
 *  Double precision
 *  ----------------
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL PAR_MIX0D( 'NEWVAL', DUMDEF, VAL__MIND, VAL__MAXD,
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEAND( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                          DVALUE, STATUS )
+               WRITE( SUGDEF, '(G18.11)') RVALUE
+               CALL CHR_LDBLK( SUGDEF )
+            END IF
+
+            CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND, VAL__MAXD,
      :                      'Bad', .FALSE., CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -309,7 +331,13 @@
 *  Integer
 *  -------
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, VAL__MINI, VAL__MAXI,
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                          IVALUE, STATUS )
+               CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
+            END IF
+
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINI, VAL__MAXI,
      :                      'Bad', .FALSE., CVALUE, STATUS )
 
 *  Convert the returned string to a numerical value.
@@ -327,7 +355,13 @@
 *  Byte
 *  ----
          ELSE IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_BTOI( VAL__MINB ), 
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                          BVALUE, STATUS )
+               CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
+            END IF
+
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ), 
      :                      NUM_BTOI( VAL__MAXB ), 'Bad', .FALSE., 
      :                      CVALUE, STATUS )
 
@@ -347,7 +381,13 @@
 *  Unsigned Byte
 *  -------------
          ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_UBTOI( VAL__MINUB ),
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                           BVALUE, STATUS )
+               CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
+            END IF
+
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UBTOI( VAL__MINUB ),
      :                      NUM_UBTOI( VAL__MAXUB ), 'Bad', .FALSE., 
      :                      CVALUE, STATUS )
 
@@ -367,7 +407,13 @@
 *  Word
 *  ----
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_WTOI( VAL__MINW ),
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                          WVALUE, STATUS )
+               CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
+            END IF
+
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_WTOI( VAL__MINW ),
      :                       NUM_WTOI( VAL__MAXW ), 'Bad', .FALSE., 
      :                       CVALUE, STATUS )
 
@@ -387,7 +433,12 @@
 *  Unsigned Word
 *  -------------
          ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-            CALL PAR_MIX0I( 'NEWVAL', DUMDEF, NUM_UWTOI( VAL__MINUW ),
+            IF( EL .EQ. 1 ) THEN
+               CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                           WVALUE, STATUS )
+               CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
+            END IF
+            CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UWTOI( VAL__MINUW ),
      :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE., 
      :                      CVALUE, STATUS )
 
