@@ -1,5 +1,0 @@
-       popd   This  procedure  pops  the top directory entry from
-              the directory stack and make it the current  direc-
-              tory.
-
-              This procedure is provided by Extended Tcl.
