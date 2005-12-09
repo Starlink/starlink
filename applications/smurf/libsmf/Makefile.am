@@ -16,4 +16,4 @@ noinst_INCLUDES = smf.h smf_typ.h
 # fac files must be installed
 noinst_MESSAGES = smf_err.h
 
-BUILT_ROUTINES = smf_err.h
+BUILT_SOURCES = smf_err.h
