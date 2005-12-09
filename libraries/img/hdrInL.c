@@ -113,7 +113,7 @@ void hdrInL( char *param,
   /*  Convert the return values into C logical values */
   if ( *status == SAI__OK ) {
     for ( i = 0; i < nparam; i++ ) {
-      if ( fvalue[i] == F77_FALSE ) { 
+        if ( F77_ISFALSE( fvalue[i] ) ) { 
         value[i] = 0;
       } else {
         value[i] = 1;

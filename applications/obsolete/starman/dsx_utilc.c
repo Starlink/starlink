@@ -271,7 +271,7 @@ char* cc2;
         (void) F77_CALL(get1b) ( CHARACTER_ARG(param_5), LOGICAL_ARG(&b1_5),
                                  LOGICAL_ARG(&b2_5) TRAIL_ARG(param_5) );
 
-        if ( b1_5==F77_TRUE )
+        if ( F77_ISTRUE( b1_5 ) )
            *bout = True;
         else
            *bout = False;

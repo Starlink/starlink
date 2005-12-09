@@ -359,7 +359,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
                 /* Add -d to ls if we are not listing directory contents */
 	      
 	        (void) strcpy( Command, "ls " );
-		if (*LisDir == F77_FALSE) {
+		if ( F77_ISFALSE( *LisDir ) ) {
 		  strcat( Command, "-d " );
 		}
 	        (void) strncat( Command, FileSpec, SpecLength );
