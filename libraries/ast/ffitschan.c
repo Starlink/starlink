@@ -342,7 +342,7 @@ F77_LOGICAL_FUNCTION(ast_findfits)( INTEGER(THIS),
       RESULT = astFindFits( astI2P( *THIS ), name, card, inc ) ?
                F77_TRUE : F77_FALSE;
       i = 0;
-      if ( astOK && RESULT == F77_TRUE ) {
+      if ( astOK && F77_ISTRUE(RESULT) ) {
          len = (int) strlen( card );
          for( i = 0; i < CARD_length && i < len; i++ ) CARD[i] = card[i];
       }
@@ -643,7 +643,7 @@ F77_LOGICAL_FUNCTION(ast_getfits##f)( INTEGER(THIS), \
       name = astString( NAME, NAME_length ); \
       RESULT = astGetFits##X( astI2P( *THIS ), name, &value ) ? \
                F77_TRUE : F77_FALSE; \
-      if ( astOK && RESULT == F77_TRUE ) { \
+      if ( astOK && F77_ISTRUE(RESULT) ) { \
          len = (int) strlen( value ); \
          for( i = 0; i < VALUE_length && i < len; i++ ) VALUE[i] = value[i]; \
       } else { \
