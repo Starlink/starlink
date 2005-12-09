@@ -3522,7 +3522,7 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
     int x0 = int(rx0), y0 = int(ry0), x1 = int(rx1), y1 = int(ry1);
     int w = abs(x1-x0) + 1;
     int h = abs(y1-y0) + 1;
-    int dist = (int)sqrt(w*w + h*h) + 4;
+    int dist = (int)sqrt((double)w*w + (double)h*h) + 4;
 
     double* ivvalues = new double[dist*2];
     double* xyvalues = new double[dist*2];
