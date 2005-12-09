@@ -163,10 +163,10 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(indextype) -side top -fill x
 
       #  Add tab window for choosing either the animation or collapse
-      #  controls. 
+      #  controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab \
-            -angle 0 -tabpos n -width 350 -height 275
+            -angle 0 -tabpos n -width 350 -height 320
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -244,9 +244,9 @@ itcl::class gaia::GaiaNDFCube {
             -value $itk_option(-delay) \
             -labelwidth $lwidth \
             -valuewidth 20 \
-            -from 0 \
-            -to 5000 \
-            -increment 100 \
+            -from 10 \
+            -to 1000 \
+            -increment 10 \
             -resolution 10 \
             -show_arrows 1 \
             -anchor w \
@@ -256,6 +256,26 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(delay) \
          {Delay used during animation in milliseconds}
+
+      #  Step between planes.
+      itk_component add step {
+         LabelEntryScale $animationTab.step \
+            -text {Step:} \
+            -value $itk_option(-step) \
+            -labelwidth $lwidth \
+            -valuewidth 20 \
+            -from 1 \
+            -to 100 \
+            -increment 2 \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_step_]
+      }
+      pack $itk_component(step) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(step) \
+         {Step between frames of animation}
 
       #  Looping behaviour.
       itk_component add loopframe {
@@ -410,7 +430,7 @@ itcl::class gaia::GaiaNDFCube {
       pack $itk_component(collapse) -side top -expand 1 -pady 3 -padx 3
       add_short_help $itk_component(collapse) \
          {Display the combined image collapsed along the range}
-      
+
       #  Close window.
       itk_component add close {
          button $w_.close -text Close \
@@ -483,7 +503,7 @@ itcl::class gaia::GaiaNDFCube {
          set axis_ $value
          set plane_min_ [lindex $bounds_ [expr (${axis_}-1)*2]]
          set plane_max_ [lindex $bounds_ [expr (${axis_}-1)*2+1]]
-         
+
          $itk_component(index) configure -from $plane_min_ -to $plane_max_
 
          $itk_component(lower) configure -from $plane_min_ -to $plane_max_
@@ -506,12 +526,12 @@ itcl::class gaia::GaiaNDFCube {
          set vlu [get_coord_ $plane_ 1]
          set trail [lassign $vlu value]
          $itk_component(indextype) configure -value $trail
-         
+
          set plane_ $plane_min_
          set_display_plane_ [expr (${plane_max_}- ${plane_min_})/2]
       }
    }
-   
+
    #  Set the plane to display and display it.
    protected method set_display_plane_ { newvalue } {
       if { $newvalue != $plane_ && $ndfname_ != {} } {
@@ -522,7 +542,7 @@ itcl::class gaia::GaiaNDFCube {
          } else {
             set plane_ $newvalue
          }
-         
+
          if { $axis_ == 1 } {
             set section "($plane_,,)"
          } elseif { $axis_ == 2 } {
@@ -534,13 +554,13 @@ itcl::class gaia::GaiaNDFCube {
          $itk_component(indexlabel) configure -value [get_coord_ $plane_]
       }
    }
-   
+
    #  Display an NDF.
    protected method display_ {name {istemp 0} } {
       $itk_option(-gaia) open $name
       $itk_option(-gaia) configure -temporary $istemp
    }
-      
+
    #  Set the animation lower bound.
    protected method set_lower_bound_ {bound} {
       set lower_bound_ $bound
@@ -577,7 +597,7 @@ itcl::class gaia::GaiaNDFCube {
             set lower_bound_ $upper_bound_
             set upper_bound_ $temp
          }
-         set step_ 1
+         set step_ $itk_option(-step)
          set_display_plane_ $lower_bound_
          increment_
       }
@@ -596,11 +616,20 @@ itcl::class gaia::GaiaNDFCube {
       configure -delay $delay
    }
 
+   #  Set the animation step.
+   protected method set_step_ {step} {
+      configure -step $step
+   }
+
    #  Increment the displayed section by one.
    protected method increment_ {} {
       if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
          $itk_component(index) configure -value [expr ${plane_}+1]
          set_display_plane_ [expr ${plane_}+$step_]
+         if { $plane_ == $lower_bound_ } {
+            #  At lower edge, running backwards, need to let it step below.
+            set plane_ [expr ${plane_}+$step_]
+         }
          set afterId_ [after $itk_option(-delay) [code $this increment_]]
       } else {
          #  Off end so stop, or loop back to beginning, or go into reverse
@@ -615,15 +644,19 @@ itcl::class gaia::GaiaNDFCube {
             after 500
             if { $loop_ != "off" } {
                if { $loop_ != "on" } {
-                  if { $step_ == 1 } { 
-                     set step_ -1
+                  #  Rock 'n roll, switch direction.
+                  if { $step_ >= 1 } {
+                     # Going up.
                      set plane_ [expr $upper_bound_ - 1]
                   } else {
-                     set step_ 1
+                     # Going down.
                      set plane_ $lower_bound_
                   }
+                  set step_ [expr -1*$step_]
                } else {
                   set plane_ $lower_bound_
+                  #  Increment is always positive, put may be changed on fly.
+                  set step_ [expr abs($step_)]
                }
                increment_
             } else {
@@ -678,7 +711,7 @@ itcl::class gaia::GaiaNDFCube {
                             estimator=$combination_type_ accept"
    }
 
-   #  Display a collapsed image. 
+   #  Display a collapsed image.
    private method collapse_completed_ {} {
       set file {}
       if { ! [file readable $tmpimage_] } {
@@ -696,7 +729,7 @@ itcl::class gaia::GaiaNDFCube {
       blt::busy release $w_
    }
 
-   #  Configure canvas so we get any clicks on the image and can display 
+   #  Configure canvas so we get any clicks on the image and can display
    protected method add_bindings_ {} {
       global env
       if {! [info exists env(SPLAT_DIR)]} {
@@ -753,7 +786,7 @@ itcl::class gaia::GaiaNDFCube {
 
 
       #  XXX Checker code for region spectra.
-#       if { $ardspectra_ == {} } { 
+#       if { $ardspectra_ == {} } {
 #          global gaia_dir
 #          set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
 #       }
@@ -762,7 +795,7 @@ itcl::class gaia::GaiaNDFCube {
 #           in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
 #       $ardspectra_  runwiths \
 #          "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-      
+
 #       catch {
 #          echo "$splat_disp_ runwith GaiaArdSpectrum"
 #          $splat_disp_ runwith "GaiaArdSpectrum"
@@ -792,6 +825,11 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The animation delay (ms).
    itk_option define -delay delay Delay 100
+
+   #  The animation step defined in interface.
+   itk_option define -step step Step 1 {
+      set step_ $itk_option(-step)
+   }
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -831,7 +869,7 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The current NDF identifier.
    protected variable id_ 0
-   
+
    #  Id of the animation thread.
    protected variable afterId_ {}
 
@@ -847,12 +885,12 @@ itcl::class gaia::GaiaNDFCube {
    #  Task controller for ardspectra
    protected variable ardspectra_ {}
 
-   #  The increment between animations.
-   protected variable step_ 1
-
    #  How animation loops. Off by default.
    protected variable loop_ "off"
 
+   #  The current value of step during an animation.
+   protected variable step_ 1
+   
    #  Common variables: (shared by all instances)
    #  -----------------
 
