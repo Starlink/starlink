@@ -15,6 +15,7 @@
  * pbiereic        17/02/03  Added defines for byte swap and SOCKLEN_T
  */
 
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include "config.h"
 
