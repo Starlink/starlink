@@ -307,7 +307,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                                   POINTER_ARG(&fqualPtr),
                                   LOGICAL_ARG(&haveQual));
             qualPtr = (void *)NULL;
-            if ( haveQual == F77_TRUE ) {
+            if ( F77_ISTRUE( haveQual ) ) {
                 F77_IMPORT_POINTER( fqualPtr, qualPtr );
             }
         } else {
@@ -339,7 +339,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                                                      nx, x1, y1, x2, y2 );
 
                 /* Do the same for the quality component if necessary */
-                if ( haveQual == F77_TRUE ) {
+                if ( F77_ISTRUE( haveQual ) ) {
                     undoInfo.qualPtr = copyImagetoWork( BYTE_IMAGE, qualPtr, 0,
                                                         nx, x1, y1, x2, y2 );
                 }
@@ -370,7 +370,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                 F77_EXPORT_POINTER( image, fimage );
 
                 /* Do the same for the quality component if necessary */
-                if ( haveQual == F77_TRUE ) {
+                if ( F77_ISTRUE( haveQual ) ) {
                     qual = copyImagetoWork( BYTE_IMAGE, (void *) qualPtr, 0,
                                             nx, xs1, ys1, xs2, ys2 );
                     F77_EXPORT_POINTER( qual, fqual );
@@ -424,7 +424,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                              info->nx, xs1, ys1, xs2, ys2 );
 
             /* Do the same for the quality component if necessary */
-            if ( haveQual == F77_TRUE ) {
+            if ( F77_ISTRUE( haveQual ) ) {
                 F77_IMPORT_POINTER( fqual, qual );
                 copyWorktoImage( BYTE_IMAGE, (void *)qualPtr, 
                                  (void *) qual, 0, info->nx, 
@@ -475,7 +475,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
             if ( undoInfo.qualPtr != (byte *)NULL ) {
 
                 /* Also restore quality if necessary */
-                if ( haveQual == F77_TRUE ) {
+                if ( F77_ISTRUE( haveQual ) ) {
                     copyWorktoImage( BYTE_IMAGE, (void *)qualPtr,
                                      (void *)undoInfo.qualPtr, 0,
                                      nx, x1, y1, x2, y2 );
