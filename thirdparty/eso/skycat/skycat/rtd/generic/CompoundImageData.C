@@ -50,11 +50,13 @@ CompoundImageData::CompoundImageData(const char* name, const ImageIO& imio,
     images_ = new ImageData*[numImages_];
     minX_ = maxX_ = minY_ = maxY_ = 0.;
 
-    // make sure it is a FITS file
-    if (!imio.rep() || strcmp(imio.rep()->classname(), "FitsIO") != 0) {
-        status_ = error("The \"hdu\" subcommand is only supported for FITS files");
-	return;			// error
-    }
+    // make sure it is a FITS file, why? Stops use with FitsIO sub-classes
+    // so do not do this.
+    //if (!imio.rep() || strcmp(imio.rep()->classname(), "FitsIO") != 0) {
+    //    status_ = error("The \"hdu\" subcommand is only supported for FITS files");
+    //    numImages_ = 0;      // only free images_, not image_[i].
+    //    return;              // error
+    //}
     FitsIO* fits = (FitsIO*)imio.rep();
 
     // create images and note the min/max coordinates
@@ -125,7 +127,7 @@ CompoundImageData::~CompoundImageData() {
     for(int i = 0; i < numImages_; i++) {
 	delete images_[i];
     }
-    delete images_;
+    delete[] images_;
 }
 
 
