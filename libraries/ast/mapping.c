@@ -20764,7 +20764,7 @@ f     AST__NULL
 *     will be returned for 
 c     the "map" pointer.
 f     MAP.
-*- 
+*--
 
 *  Implementation Notes:
 *     - This function implements the astMapSplit method available via the 
