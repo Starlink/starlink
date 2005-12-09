@@ -4447,6 +4447,11 @@ int StarRtdImage::fitsHduCmd( const ImageIO &imio, int argc, char *argv[] )
         return hduCmdSet( argc, argv, fits );
     }
 
+    // <path> hdu display, as one image.
+    if (strcmp( argv[0], "display" ) == 0 ) {
+        return hduCmdDisplay( argc, argv, fits );
+    }
+
     // <path> hdu $number (Set the current HDU)
     return hduCmdSet( argc, argv, fits );
 }
