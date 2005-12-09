@@ -85,7 +85,7 @@ static const char* const rcsId="@(#) $Id: rtdServer.C,v 1.2 2005/02/02 01:43:03 
  */
 #include "rtdSERVER.h"
 
-#define DELAY 5     // default time to sleep before new events are read
+#define RTD_DELAY 5     // default time to sleep before new events are read
 
 typedef void (*MySigFunc)(int);  // prototype cast to keep Sun cc quiet
 
@@ -102,7 +102,7 @@ void usage(void)
 	   "  -v  verbose mode\n"
 	   "  -p  port number, default %d. Set with RTD_SERVER_PORT\n"
 	   "  -t  delay between image events in msec (default %d)\n",
-	   RTD_FALLBACK_PORT, DELAY );
+	   RTD_FALLBACK_PORT, RTD_DELAY );
     exit(1);
 }
 
@@ -126,7 +126,7 @@ main(int argc, char *argv[])
     extern char *optarg;
     extern int  optind;
     int         portNo = 0;
-    int         delay = DELAY;
+    int         delay = RTD_DELAY;
     char        c;
     int         verbose = 0;
 
