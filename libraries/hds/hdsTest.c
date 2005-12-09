@@ -61,6 +61,7 @@ void FC_MAIN () {}
 #include "hds.h"
 #include <stdlib.h>
 #include "ems.h"
+#include "dat_err.h"
 #include <stdio.h>
 
 int main () {
@@ -70,9 +71,13 @@ int main () {
   int status = DAT__OK;
   hdsdim dim[] = { 10, 20 };
   char *chararr[] = { "TEST1", "TEST2" };
+  double darr[] = { 4.5, 2.5 };
+  double retdarr[2];
   HDSLoc * loc1 = NULL;
   HDSLoc * loc2 = NULL;
   HDSLoc * loc3 = NULL;
+  size_t actval;
+  int i;
 
   emsBegin(&status);
 
@@ -84,13 +89,36 @@ int main () {
 
   /* Some components */
   datNew1C( loc1, "ONEDCHAR", 5, 2, &status );
+  datNew1D( loc1, "ONEDD", 2, &status );
   
   /* Populate */
   datFind( loc1, "ONEDCHAR", &loc2, &status );
   datPutVC( loc2, 2, chararr, &status );
+  datAnnul( &loc2, &status );
+
+  datFind( loc1, "ONEDD", &loc2, &status );
+  datPutVD( loc2, 2, darr, &status );
+
+  datGetVD( loc2, 2, retdarr, &actval, &status);
+  if (status == DAT__OK) {
+    if (actval == 2) {
+      for (i = 0; i < 2; i++ ) {
+         if (darr[i] != retdarr[i]) {
+           status = DAT__DIMIN;
+           emsRep( "GETVD","Values from getVD differ", &status);
+           break;
+         }
+      }
+    } else {
+      status = DAT__DIMIN;
+      emsRep( "GETVD","Did not get back as many values as put in", &status);
+    }
+  }
+  datAnnul( &loc2, &status );
+
+
 
   /* Tidy up and close */
-  datAnnul( &loc2, &status );
   hdsErase( &loc1, &status );
 
   if (status == DAT__OK) {

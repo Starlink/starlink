@@ -313,3 +313,202 @@ datGetC(const HDSLoc    *locator,
 
    return hds_gl_status;
 }
+
+/*==========================================================*/
+/*                                                          */
+/*                          GET 1x                          */
+/*                                                          */
+/*==========================================================*/
+
+/*==================================*/
+/* DAT_GET1D - Read 1D Double array */
+/*==================================*/
+
+int
+datGet1D( const HDSLoc * locator,
+	  size_t maxval,
+	  double values[],
+	  size_t *actval,
+	  int * status ) {
+
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  datSize( locator, actval, status );
+
+  if ( *status == DAT__OK && maxval < *actval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)maxval );
+    emsSeti( "SZ", (int)*actval );
+    emsRep( "DAT_GET1D_ERR", "datGet1D: Bounds mismatch: ^IN < ^SZ", status);
+  } else {
+    dims[0] = *actval;
+    datGetD( locator, 1, dims, values, status );
+  }
+  return *status;
+}
+
+/*==================================*/
+/* DAT_GET1I - Read 1D Double array */
+/*==================================*/
+
+int
+datGet1I( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status ) {
+
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  datSize( locator, actval, status );
+
+  if ( *status == DAT__OK && maxval < *actval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)maxval );
+    emsSeti( "SZ", (int)*actval );
+    emsRep( "DAT_GET1I_ERR", "datGet1I: Bounds mismatch: ^IN < ^SZ", status);
+  } else {
+    dims[0] = *actval;
+    datGetI( locator, 1, dims, values, status );
+  }
+  return *status;
+}
+
+/*==================================*/
+/* DAT_GET1R - Read 1D float array */
+/*==================================*/
+
+int
+datGet1R( const HDSLoc * locator,
+	  size_t maxval,
+	  float values[],
+	  size_t *actval,
+	  int * status ) {
+
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  datSize( locator, actval, status );
+
+  if ( *status == DAT__OK && maxval < *actval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)maxval );
+    emsSeti( "SZ", (int)*actval );
+    emsRep( "DAT_GET1R_ERR", "datGet1R: Bounds mismatch: ^IN < ^SZ", status);
+  } else {
+    dims[0] = *actval;
+    datGetR( locator, 1, dims, values, status );
+  }
+  return *status;
+}
+
+/*==================================*/
+/* DAT_GET1L - Read 1D Logical array */
+/*==================================*/
+
+int
+datGet1L( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status ) {
+
+  hdsdim dims[1];
+
+  if (*status != DAT__OK) return *status;
+
+  datSize( locator, actval, status );
+
+  if ( *status == DAT__OK && maxval < *actval ) {
+    *status = DAT__BOUND;
+    emsSeti( "IN", (int)maxval );
+    emsSeti( "SZ", (int)*actval );
+    emsRep( "DAT_GET1L_ERR", "datGet1L: Bounds mismatch: ^IN < ^SZ", status);
+  } else {
+    dims[0] = *actval;
+    datGetL( locator, 1, dims, values, status );
+  }
+  return *status;
+}
+
+/*==========================================================*/
+/*                                                          */
+/*                          GET Vx                          */
+/*                                                          */
+/*==========================================================*/
+
+/*==========================================*/
+/* DAT_GETVD - Read vectorized Double array */
+/*==========================================*/
+
+int
+datGetVD( const HDSLoc * locator,
+	  size_t maxval,
+	  double values[],
+	  size_t *actval,
+	  int * status ) {
+  HDSLoc * vec = NULL;
+  if (*status != DAT__OK) return *status;
+  datVec(locator, &vec, status );
+  datGet1D( vec, maxval, values, actval, status );
+  datAnnul( &vec, status );  
+  return *status;
+}
+/*==========================================*/
+/* DAT_GETVD - Read vectorized Double array */
+/*==========================================*/
+
+int
+datGetVI( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status ) {
+  HDSLoc * vec = NULL;
+  if (*status != DAT__OK) return *status;
+  datVec(locator, &vec, status );
+  datGet1I( vec, maxval, values, actval, status );
+  datAnnul( &vec, status );  
+  return *status;
+}
+
+/*==========================================*/
+/* DAT_GETVR - Read vectorized REAL array */
+/*==========================================*/
+
+int
+datGetVR( const HDSLoc * locator,
+	  size_t maxval,
+	  float values[],
+	  size_t *actval,
+	  int * status ) {
+  HDSLoc * vec = NULL;
+  if (*status != DAT__OK) return *status;
+  datVec(locator, &vec, status );
+  datGet1R( vec, maxval, values, actval, status );
+  datAnnul( &vec, status );  
+  return *status;
+}
+
+/*==========================================*/
+/* DAT_GETVL - Read vectorized Logical array */
+/*==========================================*/
+
+int
+datGetVL( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status ) {
+  HDSLoc * vec = NULL;
+  if (*status != DAT__OK) return *status;
+  datVec(locator, &vec, status );
+  datGet1L( vec, maxval, values, actval, status );
+  datAnnul( &vec, status );  
+  return *status;
+}

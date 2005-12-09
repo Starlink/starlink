@@ -247,6 +247,95 @@ datGet0I( const HDSLoc * loc, int * value, int * status );
 int
 datGet0L( const HDSLoc * loc, int * value, int * status );
 
+/*==================================*/
+/* DAT_GET1D - Read 1D Double array */
+/*==================================*/
+
+int
+datGet1D( const HDSLoc * locator,
+	  size_t maxval,
+	  double values[],
+	  size_t *actval,
+	  int * status );
+
+/*==================================*/
+/* DAT_GET1I - Read 1D Integer array */
+/*==================================*/
+
+int
+datGet1I( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status );
+
+/*==================================*/
+/* DAT_GET1R - Read 1D REAL array */
+/*==================================*/
+
+int
+datGet1R( const HDSLoc * locator,
+	  size_t maxval,
+	  float values[],
+	  size_t *actval,
+	  int * status );
+
+/*==================================*/
+/* DAT_GET1L - Read 1D Logical array */
+/*==================================*/
+
+int
+datGet1L( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status );
+
+/*==========================================*/
+/* DAT_GETVD - Read vectorized Double array */
+/*==========================================*/
+
+int
+datGetVD( const HDSLoc * locator,
+	  size_t maxval,
+	  double values[],
+	  size_t *actval,
+	  int * status );
+
+/*==========================================*/
+/* DAT_GETVI - Read vectorized Integer array */
+/*==========================================*/
+
+int
+datGetVI( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status );
+
+/*==========================================*/
+/* DAT_GETVR - Read vectorized REAL array */
+/*==========================================*/
+
+int
+datGetVR( const HDSLoc * locator,
+	  size_t maxval,
+	  float values[],
+	  size_t *actval,
+	  int * status );
+
+/*==========================================*/
+/* DAT_GETVL - Read vectorized Logical array */
+/*==========================================*/
+
+int
+datGetVL( const HDSLoc * locator,
+	  size_t maxval,
+	  int values[],
+	  size_t *actval,
+	  int * status );
+
+
 /*======================================*/
 /* datIndex - Index into component list */
 /*======================================*/
