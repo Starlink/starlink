@@ -647,7 +647,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="gaia" support="S">
-  <version>2.9-4</version>
+  <version>2.10-0</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
