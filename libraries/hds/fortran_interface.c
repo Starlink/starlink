@@ -3590,7 +3590,7 @@ F77_SUBROUTINE(dat_ertxt)(CHARACTER(text), INTEGER(status) TRAIL(text) )
 {
 /*==================================================*/
 /* DAT_ERTXT - Report Error                         */
-/*     Obsolete as HDS now reports errors using HDS */
+/*     Obsolete as HDS now reports errors using EMS */
 /*==================================================*/
 
    /* Local Variables: */
@@ -3621,7 +3621,7 @@ F77_SUBROUTINE(dat_erdsc)( CHARACTER(locator), INTEGER(status) TRAIL(locator) )
 {
 /*==================================================*/
 /* DAT_ERDSC - Report Object Error                  */
-/*     Obsolete as HDS now reports errors using HDS */
+/*     Obsolete as HDS now reports errors using EMS */
 /*==================================================*/
 
 /*    Local variables : */
@@ -3670,7 +3670,7 @@ F77_SUBROUTINE(dat_erdsn)( CHARACTER(locator), CHARACTER(cmp),
 {
 /*==================================================*/
 /* DAT_ERDSN - Report component Error               */
-/*     Obsolete as HDS now reports errors using HDS */
+/*     Obsolete as HDS now reports errors using EMS */
 /*==================================================*/
 
 /*    Local variables : */
