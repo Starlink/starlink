@@ -70,7 +70,9 @@ int main () {
   const char path[] = "hds_ctest";
   int status = DAT__OK;
   hdsdim dim[] = { 10, 20 };
-  char *chararr[] = { "TEST1", "TEST2" };
+  char *chararr[] = { "TEST1", "TEST2", "Longish String" };
+  char *retchararr[3];
+  char buffer[1024];  /* plenty large enough */
   double darr[] = { 4.5, 2.5 };
   double retdarr[2];
   HDSLoc * loc1 = NULL;
@@ -88,17 +90,39 @@ int main () {
   hdsNew( path, "HDS_TEST", "NDF", 0, dim, &loc1, &status );
 
   /* Some components */
-  datNew1C( loc1, "ONEDCHAR", 5, 2, &status );
+  datNew1C( loc1, "ONEDCHAR", 14, 3, &status );
   datNew1D( loc1, "ONEDD", 2, &status );
   
   /* Populate */
   datFind( loc1, "ONEDCHAR", &loc2, &status );
-  datPutVC( loc2, 2, chararr, &status );
+  datPutVC( loc2, 3, chararr, &status );
+
+  /* Check contents */
+  datGet1C(loc2, 3, 8, buffer, retchararr, &actval, &status);
+  if (status == DAT__OK) {
+    if (actval == 3) {
+      for (i = 0; i < 3; i++ ) {
+	if (strcmp( chararr[i], retchararr[i] ) ) {
+           status = DAT__DIMIN;
+	   emsSetc( "IN", chararr[i]);
+	   emsSetc( "OUT", retchararr[i] );
+           emsRep( "GET1C","Values from Get1C differ (^IN != ^OUT)", &status);
+           break;
+         }
+      }
+    } else {
+      status = DAT__DIMIN;
+      emsRep( "GET1C","Did not get back as many strings as put in", &status);
+    }
+  }
+
   datAnnul( &loc2, &status );
 
+  
   datFind( loc1, "ONEDD", &loc2, &status );
   datPutVD( loc2, 2, darr, &status );
 
+  /* Check contents */
   datGetVD( loc2, 2, retdarr, &actval, &status);
   if (status == DAT__OK) {
     if (actval == 2) {
@@ -115,8 +139,6 @@ int main () {
     }
   }
   datAnnul( &loc2, &status );
-
-
 
   /* Tidy up and close */
   hdsErase( &loc1, &status );
