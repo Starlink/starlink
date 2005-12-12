@@ -35,6 +35,10 @@
 *        Add smf_close_file
 *     2005-12-05 (AGG)
 *        Add smf_flatfield and smf_check_flat
+*     2005-12-06 (AGG)
+*        Add smf_flatten
+*     2005-12-09 (AGG)
+*        Add smf_clone_data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,8 +93,12 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
 void smf_tslice_ast (smfData * data, int index, int * status );
 
-void smf_flatfield ( smfData *idata, smfData **odata, int *status );
+void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
 
-void smf_check_flat ( smfData *data, int *status );
+void smf_check_flat ( const smfData *data, int *status );
+
+void smf_flatten ( smfData *data, int *status );
+
+void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 #endif /* SMF_DEFINED */

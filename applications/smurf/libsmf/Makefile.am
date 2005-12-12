@@ -9,7 +9,9 @@ smf_close_file.c \
 smf_fits_getI.c smf_fits_getD.c \
 smf_tslice_ast.c \
 smf_flatfield.c \
-smf_check_flat.c
+smf_check_flat.c\
+smf_flatten.c \
+smf_clone_data.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
