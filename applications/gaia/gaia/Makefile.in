@@ -60,15 +60,19 @@ X_INCLUDE     = @XINCSW@
 X_LIB        = @XLIBSW@
 EXTRA_LIBS   = @LIBS@
 
+# Tcl libs
+TCLLIBS = @TCLX_LIB_SPEC@ \
+            @ITCL_LIB_SPEC@ \
+            @TCL_LIB_SPEC@
+
 # Tk libs
-TCLTKLIBS = @ITK_LIB_SPEC@ \
+TKLIBS = @ITK_LIB_SPEC@ \
             @TIX_LIB_SPEC@ \
             @TK_LIB_SPEC@ \
             @BLT_LIB_SPEC@ \
-            @TCLX_LIB_SPEC@ \
-            @ITCL_LIB_SPEC@ \
-            @TCL_LIB_SPEC@ \
-	    -ltkhtml	
+            -ltkhtml
+# Tk libs
+TCLTKLIBS = $(TKLIBS) $(TCLLIBS)
 
 # Tclutil library
 TCLUTIL_LIB          = -ltclutil
@@ -174,12 +178,12 @@ $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
-$(DEMO_TCL): normallib tclAppInit.o initFortran.o FORCE
+$(DEMO_TCL): normallib tclAppInit.o initFortran.o src/tclAdam.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
 	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o initFortran.o -o $(DEMO_TCL) \
-	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
+	       $(LD_SEARCH_FLAGS) src/tclAdam.o $(LDFLAG1) \
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) \
-	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)
+	       $(TCLLIBS) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
