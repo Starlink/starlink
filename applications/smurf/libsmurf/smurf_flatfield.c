@@ -90,6 +90,7 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "smurflib.h"
+#include "libsmf/smf_err.h"
 
 #include "sc2da/sc2store_par.h"
 #include "sc2da/sc2store_struct.h"
@@ -122,10 +123,19 @@ void smurf_flatfield( int *status ) {
   smfFile * file;
   smfHead * head;
 
-  void * pntr[3];
+  smfData *fdata = NULL;
+  void *pntr[3];
+  void *ipntr[3];
 
   char *pname;
   int *tstream;           /* pointer to array data */
+
+  smfHead *ohdr;
+  AstFrameSet *outwcs;
+  AstFitsChan *outfits;
+  int npts;
+  int *indata = NULL;
+  int nframes;
 
   /* Main routine */
   ndfBegin();
@@ -148,8 +158,11 @@ void smurf_flatfield( int *status ) {
     ndfAnnul( &indf, status);
 
     smf_open_file( igrp, i, "READ", &data, status);
+    /* Should check status here to make sure that the file was opened OK */
 
     file = data->file;
+    indf = file->ndfid;
+
     pname = file->name;
     msgSetc("FILE", pname);
     msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
@@ -161,62 +174,61 @@ void smurf_flatfield( int *status ) {
       msgOutif(MSG__VERB, " ", "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", status);
     } else { /* What if 10 out of 20 are bad? .... */
       if ( *status == SAI__OK) {
-	*status = SAI__ERROR;
-	errRep( "smurf_flatfield", "Flatfield has already been applied",status);
+	/*        *status = SAI__ERROR;
+		  errRep( "smurf_flatfield", "Flatfield has already been applied",status);*/
       }
     }
 
-
     ndfStype( "_DOUBLE", outndf, "DATA", status);
-
     ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
     ndfDim( outndf, NDF__MXDIM, ndfdims, &ndims, status );
 
     /* Check ndims = 3 */
     if ( *status == SAI__OK ) {
       if ( ndims != 3 ) {
-	msgSeti( "NDIMS", ndims);
-	*status = SAI__ERROR;
-	errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3",status);
+        msgSeti( "NDIMS", ndims);
+        *status = SAI__ERROR;
+        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3",status);
       }
     }
 
-    /* Check nout = nrows * ncols * nframes */
-    if ( *status == SAI__OK ) {
-      if (nout != (data->dims)[0]*(data->dims)[1]*(data->dims)[2]) {
-	msgSeti( "NR", (data->dims)[0]);
-	msgSeti( "NC", (data->dims)[1]);
-	msgSeti( "NF", (data->dims)[2]);
-	msgSeti( "NOUT", nout);
-	*status = SAI__ERROR;
-	errRep( "smurf_flatfield", "Number of input pixels not equal to the number of output pixels (^NR*^NC*^NF != ^NOUT)",status);
-      } else {
-	pntr[0] = (data->pntr)[0];
-	tstream = pntr[0]; /* Input time series data */
-	printf("%p %p %p \n",(data->pntr)[0],(data->pntr)[1],(data->pntr)[2]);
-	for (j=0; j<nout; j++) {
-	  outdata[j] = (double)tstream[j];
-	}
-      }
+
+    smf_flatfield( data, &fdata, status );
+    if (*status == SMF__FLATN) {
+      errAnnul( status );
+      msgOut("smurf_flatfield",
+	     "smurf_flatfield: Data are already flatfielded", status);
     }
 
-    /* Print something interesting from the FITS header */
-    head = data->hdr;
-    smf_fits_getI( head, "SUBSYSNR", &subsysnr, status );
-    msgSeti("FITS",subsysnr);
-    msgOut(" ","SUBSYSNR = ^FITS", status);
+    pntr[0] = (fdata->pntr)[0];
+    outdata = pntr[0];
 
-    /* */
-    if ( *status == SAI__OK) {
-      nboll = (data->dims)[0]*(data->dims)[1];
+    ipntr[0] = (data->pntr)[0];
+    indata = ipntr[0];
 
-      /* Apply the flat field to the data */
-      msgOutif(MSG__VERB," ","Applying flat field ", status);
-      sc2math_flatten( nboll, (data->dims)[2], da->flatname, da->nflat, da->flatcal, 
-		       da->flatpar, outdata, status);
-    } 
-    msgOutif(MSG__VERB," ","Flat field applied", status);
+    /*    npts = (fdata->dims)[0]*(fdata->dims)[1]*(fdata->dims)[2];
+    printf("ndims = %d, nout = %d \n",ndims, nout);
+    printf("output ndims = %d, npts = %d \n",fdata->ndims, npts);*/
+
+    npts = (data->dims)[0]*(data->dims)[1]*(data->dims)[2];
+    printf("input ndims = %d, npts = %d \n",data->ndims, npts);
+    for ( i=0; i<npts; i++) {
+      printf("i = %d, indata = %d, outdata = %g \n",i,indata[i],outdata[i]);
+    }
+    /*    for ( i=0; i<npts; i++) {
+      printf("i = %d, outdata = %g \n",i,outdata[i]);
+      }*/
+
+    ohdr = fdata->hdr;
+    outwcs = ohdr->wcs;
+    outfits = ohdr->fitshdr;
+
+    /*astShow(outfits);*/
     ndfAnnul( &outndf, status);
+
+    /* Check status.... */
+
+    msgOutif(MSG__VERB," ","Flat field applied", status);
 
     smf_close_file( &data, status );
   }
