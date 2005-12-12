@@ -513,7 +513,7 @@ objs: ${OBJS}
 
 
 wish: $(WISH_OBJS) $(TK_LIB_FILE) $(TK_STUB_LIB_FILE) @APP_RSRC_FILE@
-	$(CC) $(LDFLAGS) $(WISH_OBJS) \
+	$(CC) $(LDFLAGS) ${CFLAGS} $(WISH_OBJS) \
 		@TK_BUILD_LIB_SPEC@ \
 		$(WISH_LIBS) $(CC_SEARCH_FLAGS) -o wish
 
