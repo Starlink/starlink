@@ -13,10 +13,10 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_check_flat( smfData *data, int *status );
+*     smf_check_flat( const smfData *data, int *status );
 
 *  Arguments:
-*     data = smfData* (Given)
+*     data = const smfData* (Given)
 *        Pointer to a smfData struct
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -33,6 +33,8 @@
 *  History:
 *     2005-12-05 (AGG):
 *        Initial version.
+*     2005-12-12 (AGG):
+*        Update API prototype to reflect const input struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -72,17 +74,19 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-void smf_check_flat ( smfData *data, int *status ) {
+void smf_check_flat ( const smfData *data, int *status ) {
 
   smfDA * da;
   smf_dtype dtype;
 
   if ( *status != SAI__OK ) return;
 
+  /* Retrieve the smfDa struct */
   da = data->da;
+  dtype = data->dtype;
 
   /* Data need flatfielding if da is defined */
-  if ( da != NULL  ) {
+  if ( da != NULL ) {
     msgOutif(MSG__VERB, " ", "Data need flatfielding", status);
   } else {
     /* No raw data struct => data flatfielded */
@@ -90,5 +94,4 @@ void smf_check_flat ( smfData *data, int *status ) {
     *status = SMF__FLATN;
   }
   
-  return;
 }
