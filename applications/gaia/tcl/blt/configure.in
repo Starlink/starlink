@@ -95,72 +95,76 @@ BLT_ENV_CC=$CC
 #  4. default to cc
 #
 
-AC_MSG_CHECKING([which C compiler])
-if test "x${blt_with_cc}" != "x" ; then 
-  CC=${blt_with_cc}
-  unset ac_cv_prog_CPP
-  unset ac_cv_prog_CC
-elif test "x${BLT_ENV_CC}" != "x" ; then
-  unset ac_cv_prog_CPP
-  unset ac_cv_prog_CC
-elif test "x${blt_cv_prog_cc}" != "x" ; then
-  CC=${blt_cv_prog_cc}
-  unset ac_cv_prog_CC
-else 
-  AC_PROG_CC
-fi
-if test "x${CC}" = "x" ; then
-  CC=cc
-fi
+dnl AC_MSG_CHECKING([which C compiler])
+dnl if test "x${blt_with_cc}" != "x" ; then 
+dnl  CC=${blt_with_cc}
+dnl  unset ac_cv_prog_CPP
+dnl  unset ac_cv_prog_CC
+dnl elif test "x${BLT_ENV_CC}" != "x" ; then
+dnl  unset ac_cv_prog_CPP
+dnl  unset ac_cv_prog_CC
+dnl elif test "x${blt_cv_prog_cc}" != "x" ; then
+dnl  CC=${blt_cv_prog_cc}
+dnl  unset ac_cv_prog_CC
+dnl else 
+dnl  AC_PROG_CC
+dnl fi
+dnl if test "x${CC}" = "x" ; then
+dnl  CC=cc
+dnl fi
 
-case $target in
-  *-*-cygwin*|*-*-mingw*)
-    if test "${blt_enable_cygwin}" = "no" ; then
-      CC="${CC} -mno-cygwin"
-    fi
-    ;;
-esac
+dnl case $target in
+dnl  *-*-cygwin*|*-*-mingw*)
+dnl    if test "${blt_enable_cygwin}" = "no" ; then
+dnl      CC="${CC} -mno-cygwin"
+dnl    fi
+dnl    ;;
+dnl esac
 
-AC_MSG_RESULT([$CC])
+dnl AC_MSG_RESULT([$CC])
 
-unset blt_cv_prog_cc
-AC_CACHE_VAL(blt_cv_prog_cc, blt_cv_prog_cc=$CC)
-AC_SUBST(CC)
+dnl unset blt_cv_prog_cc
+dnl AC_CACHE_VAL(blt_cv_prog_cc, blt_cv_prog_cc=$CC)
+dnl AC_SUBST(CC)
+AC_PROG_CC
+AC_PROG_CPP
+
 AC_PROG_CPP
 if test "x${GCC}" != "x" ; then
   blt_have_gcc="yes"
 else
   AC_MSG_CHECKING([if C compiler is really gcc])
-    AC_EGREP_CPP(_cc_is_gcc_, [
+  AC_EGREP_CPP(_cc_is_gcc_, [
 #ifdef __GNUC__
-    _cc_is_gcc_
+   _cc_is_gcc_
 #endif
 ],      [blt_have_gcc=yes], [blt_have_gcc=no])
   AC_MSG_RESULT([$blt_have_gcc])
 fi
 
-#
-# CFLAGS search order
-#
-#  1. command line (--with-cflags)
-#  2. cached variable ($blt_cv_prog_cflags)
-#  3. set to "-O6" if using gcc ($blt_have_gcc)
-#  4. otherwise, default to "-O"
-#
-AC_MSG_CHECKING([default compiler flags])
-if test  "x${blt_with_cflags}" != "x" ; then 
-  CFLAGS=${blt_with_cflags}
-elif test "x${blt_cv_prog_cflags}" != "x" ; then
-  CFLAGS=${blt_cv_prog_cflags}
-elif test "${blt_have_gcc}" = "yes" ; then
-  CFLAGS=-O6
-else
-  CFLAGS=-O
-fi
-AC_MSG_RESULT([$CFLAGS])
-unset blt_cv_prog_cflags
-AC_CACHE_VAL(blt_cv_prog_cflags, blt_cv_prog_cflags=$CFLAGS)
-AC_SUBST(CFLAGS)
+
+dnl #
+dnl # CFLAGS search order
+dnl #
+dnl #  1. command line (--with-cflags)
+dnl #  2. cached variable ($blt_cv_prog_cflags)
+dnl #  3. set to "-O6" if using gcc ($blt_have_gcc)
+dnl #  4. otherwise, default to "-O"
+dnl #
+dnl AC_MSG_CHECKING([default compiler flags])
+dnl if test  "x${blt_with_cflags}" != "x" ; then 
+dnl  CFLAGS=${blt_with_cflags}
+dnl elif test "x${blt_cv_prog_cflags}" != "x" ; then
+dnl  CFLAGS=${blt_cv_prog_cflags}
+dnl elif test "${blt_have_gcc}" = "yes" ; then
+dnl  CFLAGS=-O6
+dnl else
+dnl  CFLAGS=-O
+dnl fi
+dnl AC_MSG_RESULT([$CFLAGS])
+dnl unset blt_cv_prog_cflags
+dnl AC_CACHE_VAL(blt_cv_prog_cflags, blt_cv_prog_cflags=$CFLAGS)
+dnl AC_SUBST(CFLAGS)
 
 GCCFLAGS=""
 if test "${blt_have_gcc}" = "yes" ; then
@@ -246,8 +250,8 @@ AC_CHECK_HEADERS(stdlib.h unistd.h)
 # Types:	Check for existence of types of size_t and pid_t
 #
 # -----------------------------------------------------------------------
-AC_TYPE_SIZE_T
-AC_TYPE_PID_T
+dnl AC_TYPE_SIZE_T
+dnl AC_TYPE_PID_T
 
 AC_MSG_CHECKING([whether union wait is defined correctly])
 AC_CACHE_VAL(blt_cv_struct_wait_works,
