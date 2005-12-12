@@ -21,11 +21,6 @@
                neb_index = cupidMergeNeb( ipa[ iel ] ); \
                if( clump_index != ps->index ) { \
                   j = w1[ clump_index ]++; \
-\
-if( !clumps[ clump_index ] ) { \
-   printf("BANG||||||||||| %d %d %d %d \n", iel, ipa[iel], clump_index, neb_index ); \
-} \
-\
                   w2[ clump_index ] = astGrow( w2[ clump_index ], w1[ clump_index ], \
                                                sizeof( int ) ); \
                   w2[ clump_index ][ j ] = i0; \

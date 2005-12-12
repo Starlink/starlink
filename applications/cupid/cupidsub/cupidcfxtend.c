@@ -13,13 +13,7 @@
    its index value to show that it is now a neighbour of the destination \
    PixelSet, and add it to the list of source pixels which adjoin the \
    destination PixelSet. */ \
-\
          this_index = ipa[ iv ]; \
-\
-if( iv == 33356 ) { \
-   printf("ipa[33356]=%d being considered\n", ipa[ iv ] ); \
-} \
-\
          if( this_index == old_index ) { \
             ipa[ iv ] = neb_index; \
             nj = new_sznbl++; \
@@ -37,11 +31,6 @@ if( iv == 33356 ) { \
             if( cupidMergeSet( this_index ) == old_index ) { \
                neb2_index = cupidMergeNeb( this_index ); \
                neb = clumps[ neb2_index ]; \
-\
-if( ! neb ) { \
-   printf("XTEND BANG!!!  %d %d %d\n", this_index, neb_index, neb2_index ); \
-} \
-\
                dx = ps2->peak[ 0 ] - x[ 0 ]; \
                s2a = dx*dx; \
                if( ndim > 1 ) { \
@@ -222,6 +211,8 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    ret = 0;
    if( *status != SAI__OK || !ps2 ) return ret;
 
+   naxis = 3;
+
 /* Get the index value of the source PixelSet. */
    old_index = ps1->index;
 
@@ -292,7 +283,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
                xx = rem/skip[ 1 ] + 1;
                if( xx < ps2->lbnd[ 1 ] ) ps2->lbnd[ 1 ] = xx;
                if( xx > ps2->ubnd[ 1 ] ) ps2->ubnd[ 1 ] = xx;
-               rem -= ( xx - 1 )*skip[ 1 ] + 1;
+               rem -= ( xx - 1 )*skip[ 1 ];
                x[ 1 ] = xx;
             } else {
                x[ 1 ] = 1;
