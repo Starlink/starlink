@@ -1054,6 +1054,7 @@ SHLIB_CFLAGS=""
 SHLIB_LIB_SPECS="${JPEG_LIB_SPEC}"
 SHLIB_TCL_ONLY_LIB_SPECS="${TCL_ONLY_LIB_SPECS}"
 SHLIB_TCL_ONLY_LIB_SPECS=""
+save_LDFLAGS="${LDFLAGS}"
 LDFLAGS=""
 LD_RUN_PATH=""
 EXTRA_LIB_SPECS=""
@@ -1337,6 +1338,11 @@ case $target in
     ;;
 
 esac
+
+# LDFLAGS should include environment version if set.
+if test "$save_LDFLAGS" != ""; then
+   LDFLAGS="${LDFLAGS} ${save_LDFLAGS}"
+fi
 
 # If we're running gcc, then set SHLIB_CFLAGS flags for compiling
 # shared libraries for gcc, instead of those of the vendor's
