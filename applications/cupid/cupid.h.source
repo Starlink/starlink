@@ -9,11 +9,12 @@
 #define CUPID__DOUBLE 1
 #define CUPID__FLOAT  2
 
-#define CUPID__GCNP1  4 /* No. of free parameters in a 1D GaussClump clump */
-#define CUPID__GCNP2  7 /* No. of free parameters in a 2D GaussClump clump */
-#define CUPID__GCNP3 11 /* No. of free parameters in a 3D GaussClump clump */
+#define CUPID__GCNP1  4  /* No. of free parameters in a 1D GaussClump clump */
+#define CUPID__GCNP2  7  /* No. of free parameters in a 2D GaussClump clump */
+#define CUPID__GCNP3 11  /* No. of free parameters in a 3D GaussClump clump */
 
 #define CUPID__CFNULL -1 /* Unassigned pixel flag */
+#define CUPID__MAXINDEX 8190   /* Largest usable PixelSet index (must fit in 13 bits) */
 
 /* Type Definitions */
 /* ---------------- */
@@ -128,7 +129,7 @@ extern int *cupid_global_status;
 
 /* Function prototypes */
 /* ------------------  */
-CupidPixelSet *cupidCFFreePS( CupidPixelSet * );
+CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int );
 HDSLoc **cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
 HDSLoc **cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int *, double * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int * );

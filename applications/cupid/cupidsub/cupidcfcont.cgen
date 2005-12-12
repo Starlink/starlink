@@ -21,6 +21,11 @@
                neb_index = cupidMergeNeb( ipa[ iel ] ); \
                if( clump_index != ps->index ) { \
                   j = w1[ clump_index ]++; \
+\
+if( !clumps[ clump_index ] ) { \
+   printf("BANG||||||||||| %d %d %d %d \n", iel, ipa[iel], clump_index, neb_index ); \
+} \
+\
                   w2[ clump_index ] = astGrow( w2[ clump_index ], w1[ clump_index ], \
                                                sizeof( int ) ); \
                   w2[ clump_index ][ j ] = i0; \
@@ -35,7 +40,8 @@
 \
 /* Call this function recursively to add the neighbour to the PixelSet. */ \
             CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip, x, \
-                                        iel, ps, clevel, w1, w2, naxis, hindex ); \
+                                        iel, ps, clevel, w1, w2, naxis, \
+                                        hindex, clumps ); \
          } 
 
 
@@ -90,7 +96,8 @@
 void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
                                  int *dims, int *skip, int *x, int iel, 
                                  CupidPixelSet *ps, double clevel, int *w1,
-                                 int **w2, int naxis, int hindex ){
+                                 int **w2, int naxis, int hindex,
+                                 CupidPixelSet **clumps ){
 /*
 *  Name:
 *     cupidCFCont<X>
@@ -102,7 +109,8 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 *     void cupidCFCont<X>( CGEN_TYPE *ipd, int *ipa, int nel, int ndim, 
 *                          int *dims, int *skip, int *x, int iel, 
 *                          CupidPixelSet *ps, double clevel, int *w1,
-*                          int **w2, int naxis, int hindex )
+*                          int **w2, int naxis, int hindex, 
+*                          CupidPixelSet **clumps )
 
 *  Description:
 *     This function identifies a contiguous set of pixels within the
@@ -193,11 +201,10 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
    int isneb;           /* Is central pixel neighboured by another clump? */
    int neb_index;       /* Index of neighbouring PixelSet */
    int j;               /* Index of last neighbouring pixel */
-   int xx[ 3 ];
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
-
+   
 /* Assign the required index to the pixel in the index assignment array */
    ipa[ iel ] = ps->index;   
 
@@ -208,7 +215,6 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
    for( i = 0; i < ndim; i++ ) {
       if( x[ i ] < ps->lbnd[ i ] ) ps->lbnd[ i ] = x[ i ];
       if( x[ i ] > ps->ubnd[ i ] ) ps->ubnd[ i ] = x[ i ];
-      xx[ i ] = x[ i ];
    }
 
 /* If this point is greater than the highest value yet found in the clump, 

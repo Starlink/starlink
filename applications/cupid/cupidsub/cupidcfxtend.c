@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
+#include <stdio.h>
 
 
 /* Local Macros */
@@ -12,7 +13,13 @@
    its index value to show that it is now a neighbour of the destination \
    PixelSet, and add it to the list of source pixels which adjoin the \
    destination PixelSet. */ \
+\
          this_index = ipa[ iv ]; \
+\
+if( iv == 33356 ) { \
+   printf("ipa[33356]=%d being considered\n", ipa[ iv ] ); \
+} \
+\
          if( this_index == old_index ) { \
             ipa[ iv ] = neb_index; \
             nj = new_sznbl++; \
@@ -30,6 +37,10 @@
             if( cupidMergeSet( this_index ) == old_index ) { \
                neb2_index = cupidMergeNeb( this_index ); \
                neb = clumps[ neb2_index ]; \
+\
+if( ! neb ) { \
+   printf("XTEND BANG!!!  %d %d %d\n", this_index, neb_index, neb2_index ); \
+} \
 \
                dx = ps2->peak[ 0 ] - x[ 0 ]; \
                s2a = dx*dx; \

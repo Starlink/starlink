@@ -339,7 +339,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Free resources */
       for( i = 0; i < index; i++ ) {
-         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ] );
+         if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL, 0 );
       }
       clumps = astFree( clumps );
       levels = astFree( levels );
