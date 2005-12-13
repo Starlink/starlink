@@ -37,6 +37,7 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 
 #include <netdb.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <strings.h>
 #include "error.h"
 #include "define.h"
 #ifdef HAVE_SYS_FILIO_H
