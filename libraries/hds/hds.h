@@ -248,6 +248,19 @@ int
 datGet0L( const HDSLoc * loc, int * value, int * status );
 
 /*==================================*/
+/* DAT_GET1C - Read 1D string array */
+/*==================================*/
+
+int
+datGet1C( const HDSLoc * locator, 
+	  size_t maxval, 
+	  size_t bufsize,
+	  char *buffer,
+	  char *pntrs[],
+	  size_t * actval,
+	  int * status );
+
+/*==================================*/
 /* DAT_GET1D - Read 1D Double array */
 /*==================================*/
 

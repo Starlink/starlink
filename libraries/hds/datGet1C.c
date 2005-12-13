@@ -15,7 +15,7 @@
 *     Get 1-D C string array from object
 
 *  Invocation:
-*     datGet1C( const HDSLoc * locator, size_t maxval, size_t char_len, char *buffer,
+*     datGet1C( const HDSLoc * locator, size_t maxval, size_t bufsize, char *buffer,
 *               char *pntrs[], size_t * actval, int * status );
 
 *  Description :
@@ -32,16 +32,15 @@
 *        data object.
 *     maxval = size_t (Given)
 *        One less than the allocated size of the pntrs array (the routine
-*        will NULL terminate the pointer array).
-*     char_len = size_t (Given)
-*        Maximum length (not including the nul) allowed for any of the maxval strings
-*        expected. This size (in combination with maxval) is used to determine
-*        the amount of space allocated by the caller to receive the strings.
-*        The strings themselves will not need to be restricted to this size
-*        if on average the strings do not exceed this size.
+*        will NULL terminate the pointer array). Status is set to DAT__BOUND
+*        if this value is too small and pntrs[] is non-NULL. Not used if the
+*        pntrs[] array is NULL.
+*     bufsize = size_t (Given)
+*        Number of bytes allocated to the string "buffer" to receive the strings.
+*        Returns a status of DAT__TRUNC if the buffer is not large enough.
 *     buffer = char * (Returned)
 *        Memory allocated to receive the string arrays from this routine.
-*        Should be at least (maxval * (char_len+1) ) characters. Status is set
+*        Should be at least "bufsize" characters. Status is set
 *        to DAT__TRUNC if sufficient room is not available to receive the strings.
 *        The caller should not assume that the strings are stored equally spaced
 *        within this buffer.
@@ -88,6 +87,8 @@
 *        Improved prologue layout
 *     08-DEC-2005 (TIMJ):
 *        Rewrite in C. Make more C-like.
+*     13-DEC-2005 (TIMJ):
+*        Specify bufsize rather than length of individual string.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,12 +118,11 @@
 */
 
 int
-datGet1C( const HDSLoc * locator,  size_t maxval, size_t char_len, char *buffer,
+datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
 	  char *pntrs[], size_t *actval, int * status )
 {
   char * tmpbuf;
   size_t tmpbufsize;
-  size_t bufsize;
   size_t lenstr;
   char * inpos;
   char * outpos;
@@ -131,23 +131,28 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t char_len, char *buffer,
   int n;
   int i;
 
+  /* Initialize return variables in case bad status */
+  *actval = 0;
+  if (pntrs != NULL) pntrs[0] = NULL;
+
+  /* Do nothing if bad status */
   if (*status != DAT__OK) return *status;
 
   /* Verify that we have the correct number of values */
   datSize( locator, actval, status );
 
-  if ( maxval < *actval ) {
-    *status = DAT__BOUND;
-    emsSeti( "NV", maxval );
-    emsSeti( "SZ", *actval );
-    emsRep( "DAT_GET1C_ERR",
-	    "datGet1C: Input array bounds do not match HDS object (^NV < ^SZ)",
-	    status);
-    return *status;
+  /* Error, but only if we are looking in the pntrs[] array */
+  if ( pntrs != NULL ) {
+    if ( maxval < *actval ) {
+      *status = DAT__BOUND;
+      emsSeti( "NV", maxval );
+      emsSeti( "SZ", *actval );
+      emsRep( "DAT_GET1C_ERR",
+	      "datGet1C: Input array bounds do not match HDS object (^NV < ^SZ)",
+	      status);
+      return *status;
+    }
   }
-
-  /* Calculate the size of the supplied buffer */
-  bufsize = maxval * (char_len + 1 );
 
   /* Need to know the actual allocated size of each string */
   /* Note that since we are allocating memory for HDS we do not
@@ -175,7 +180,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t char_len, char *buffer,
     /* Now retrieve the fortran buffer */
     dims[0] = *actval;
     datGetC( locator, 1, dims, tmpbuf, lenstr, status );
-    printf("Status = %d\n",*status);
+
     /* For each string copy and terminate */
     if (*status == DAT__OK) {
       /* Get pointers to the start of the HDS buffer and the user supplied
@@ -188,6 +193,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t char_len, char *buffer,
 	if (*status != DAT__OK) break;
 
 	/* Store the pointer to the start of the nth string */
+
 	if (pntrs != NULL) pntrs[n] = outpos;
 
 	/* Find out how many characters to copy out of the temp buffer */
@@ -219,6 +225,9 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t char_len, char *buffer,
       }
 
     }
+
+    /* Terminate the pointer array */
+    if (pntrs != NULL) pntrs[*actval] = NULL;
 
     /* Free the temporary buffer */
     free( tmpbuf );

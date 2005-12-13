@@ -71,7 +71,7 @@ int main () {
   int status = DAT__OK;
   hdsdim dim[] = { 10, 20 };
   char *chararr[] = { "TEST1", "TEST2", "Longish String" };
-  char *retchararr[3];
+  char *retchararr[4];
   char buffer[1024];  /* plenty large enough */
   double darr[] = { 4.5, 2.5 };
   double retdarr[2];
@@ -98,11 +98,11 @@ int main () {
   datPutVC( loc2, 3, chararr, &status );
 
   /* Check contents */
-  datGet1C(loc2, 3, 8, buffer, retchararr, &actval, &status);
+  datGet1C(loc2, 3, 1024, buffer, retchararr, &actval, &status);
   if (status == DAT__OK) {
     if (actval == 3) {
       for (i = 0; i < 3; i++ ) {
-	if (strcmp( chararr[i], retchararr[i] ) ) {
+	if (strncmp( chararr[i], retchararr[i], strlen(chararr[i]) ) ) {
            status = DAT__DIMIN;
 	   emsSetc( "IN", chararr[i]);
 	   emsSetc( "OUT", retchararr[i] );
@@ -118,7 +118,6 @@ int main () {
 
   datAnnul( &loc2, &status );
 
-  
   datFind( loc1, "ONEDD", &loc2, &status );
   datPutVD( loc2, 2, darr, &status );
 
