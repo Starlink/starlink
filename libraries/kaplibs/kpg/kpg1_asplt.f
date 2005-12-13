@@ -13,11 +13,11 @@
 *     CALL KPG1_ASPLT(  IWCS, BOX, OPTS, IPLOT, STATUS )
 
 *  Description:
-*     This routine create a Plot civering the current PGPLOT viewport.
+*     This routine create a Plot covering the current PGPLOT viewport.
 *     The bounds of the PGPLOT window are changed if necessary to ensure 
 *     that the PGPLOT world co-ordinate system corresponds to milliemtres 
 *     from the bottom left corner of the view surface. This is the
-*     co-ordinate system used in the Base (GRAPHICS) Framre of the returned 
+*     co-ordinate system used in the Base (GRAPHICS) Frame of the returned 
 *     Plot.
 
 *  Arguments:
