@@ -91,7 +91,7 @@ do_all $(demo_wish): lib  $(LOCAL_LIBRARIES) $(OBJECTS) tkAppInit.o
 	@(cd test; $(MAKE))
 
 tkAppInit.o: tkAppInit.C
-	$(CC) -c $(CC_SWITCHES) tkAppInit.C
+	$(CXX) -c $(CC_SWITCHES) tkAppInit.C
 
 # force recompile after configure for ifdefs
 $(OBJECTS): ../config.status
