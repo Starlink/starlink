@@ -2,7 +2,7 @@
      :                       STATUS )
 *+
 *  Name:
-*     KPG1_PLOT
+*     KPG1_PLOTS
 
 *  Purpose:
 *     Save an AST Plot with an AGI DATA picture.
