@@ -28,6 +28,9 @@ DEPEND_FLAGS    = $(CC_SWITCHES)
 
 test: $(PROGS)
 
+do_all:
+do_depend:
+
 lib:
 	@cd ../src; $(MAKE)
 
