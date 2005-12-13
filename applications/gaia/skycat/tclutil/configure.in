@@ -447,12 +447,12 @@ LD_FLAGS=$TCL_LD_FLAGS
 # In tcl8.4 there is a backwards incompatible change in tclConfig.sh
 # which uses TCL_CC_SEARCH_FLAGS and the old TCL_LD_SEARCH_FLAGS is
 # set wrong for HP-UX.
-
-if test "$TCL_CC_SEARCH_FLAGS" != "" ; then
-    LD_SEARCH_FLAGS=$TCL_CC_SEARCH_FLAGS
-else
+# PWD: Solaris + tcl8.4.11 breaks with following so commented out.
+#if test "$TCL_CC_SEARCH_FLAGS" != "" ; then
+#    LD_SEARCH_FLAGS=$TCL_CC_SEARCH_FLAGS
+#else
     LD_SEARCH_FLAGS=$TCL_LD_SEARCH_FLAGS
-fi
+#fi
 
 # special case for HP: add these options (by request: 17.4.97)
 # disabled: 02.07.03
