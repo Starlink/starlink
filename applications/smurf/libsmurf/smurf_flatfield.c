@@ -44,6 +44,9 @@
 *        Replace fits example code with call to smf_fits_getI
 *     2005-11-28 (TIMJ):
 *        Use smf_close_file
+*     2005-12-12 (AGG):
+*        Use smf_flatfield, remove need to include sc2da info, fix
+*        loop counter bug
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,50 +95,29 @@
 #include "smurflib.h"
 #include "libsmf/smf_err.h"
 
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2store_struct.h"
-#include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
-
-
 void smurf_flatfield( int *status ) {
 
-  int flag;                  /* */
-  /*  int fndf; */                 /* Flatfield NDF identifier */
-  int i;                     /* Counter, index */
-  int j;                     /* Counter, index */
-  Grp *igrp = NULL;
-  int ndfdims[NDF__MXDIM];   /* Dimensions of input NDF */
-  int ndims;                 /* Number of active dimensions in input */
-  Grp *ogrp = NULL;
-  int outndf;                  /* Output NDF identifier */
-  int outsize;               /* Total number of NDF names in the output group */
-  int size;                  /* Number of files in input group */
-  int nboll;
-  int nout;
-  double *outdata = NULL;
-  int indf;
-  int rawdata;
-  int subsysnr; /* dummy var to print */
-
-  smfDA * da;
-  smfData * data;
-  smfFile * file;
-  smfHead * head;
-
-  smfData *fdata = NULL;
-  void *pntr[3];
-  void *ipntr[3];
-
-  char *pname;
-  int *tstream;           /* pointer to array data */
-
-  smfHead *ohdr;
-  AstFrameSet *outwcs;
-  AstFitsChan *outfits;
-  int npts;
-  int *indata = NULL;
-  int nframes;
+  smfDA *da;                /* Pointer to da struct containing flatfield info */
+  smfData *data;            /* Pointer to input data struct */
+  smfData *ffdata = NULL;   /* Pointer to output data struct */
+  smfFile *file;            /* Pointer to input file struct */
+  int flag;                 /* */
+  smfHead *head;            /* Pointer to input file header info */
+  int i;                    /* Counter, index */
+  Grp *igrp = NULL;         /* Input group of files */
+  int indf;                 /* NDF identifier for input file */
+  int j;                    /* Counter, index */
+  int nboll;                /* Number of bolometers */
+  int ndfdims[NDF__MXDIM];  /* Dimensions of input NDF */
+  int ndims;                /* Number of active dimensions in input */
+  int nframes;              /* Number of time slices */
+  int nout;                 /* Number of data points in output data file */
+  Grp *ogrp = NULL;         /* Output group of files */
+  double *outdata = NULL;   /* Pointer to output DATA array */
+  int outndf;               /* Output NDF identifier */
+  int outsize;              /* Total number of NDF names in the output group */
+  char *pname;              /* Pointer to input filename */
+  int size;                 /* Number of files in input group */
 
   /* Main routine */
   ndfBegin();
@@ -143,12 +125,8 @@ void smurf_flatfield( int *status ) {
   /* Get input file(s) */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-  /* Read flatfield file */
-  /*  ndfAssoc( "FLAT", "READ", &fndf, status );*/
-
   /* Get output file(s) */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
-
 
   for (i=1; i<=size; i++ ) {
 
@@ -161,12 +139,11 @@ void smurf_flatfield( int *status ) {
     /* Should check status here to make sure that the file was opened OK */
 
     file = data->file;
-    indf = file->ndfid;
-
     pname = file->name;
     msgSetc("FILE", pname);
     msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
 
+    /* Check we have a smfDA struct with flatfield info */
     da = data->da;
     if ( da != NULL ) {
       msgSetc("FLATNAME", da->flatname);
@@ -179,58 +156,56 @@ void smurf_flatfield( int *status ) {
       }
     }
 
+    /* Set parameters of the DATA array in the output file */
     ndfStype( "_DOUBLE", outndf, "DATA", status);
     ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
     ndfDim( outndf, NDF__MXDIM, ndfdims, &ndims, status );
 
-    /* Check ndims = 3 */
+    /* Check ndims = 3 and that output ndims = ndims of input*/
     if ( *status == SAI__OK ) {
       if ( ndims != 3 ) {
         msgSeti( "NDIMS", ndims);
         *status = SAI__ERROR;
-        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3",status);
+        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3", status);
+      } else if ( ndims != data->ndims) {
+        msgSeti( "NDIMS", ndims);
+        msgSeti( "IDIMS", data->ndims);
+        *status = SAI__ERROR;
+        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
       }
     }
 
+    /* We have to store the output DATA pointer in a smfData */
+    ffdata = malloc( sizeof( smfData ) );
+    (ffdata->pntr)[0] = outdata;
+    /* Also set the data type, dimensions and extent in each dimension */
+    ffdata->dtype = SMF__DOUBLE;
+    ffdata->ndims = ndims;
+    for ( j=0; j<ndims; j++ ) {
+      (ffdata->dims)[j] = (data->dims)[j];
+    }
 
-    smf_flatfield( data, &fdata, status );
+    /* For safety define da, hdr and file as a null pointers */
+    ffdata->da = NULL;
+    ffdata->hdr = NULL;
+    ffdata->file = NULL;
+
+    /* Call flatfield routine */
+    smf_flatfield( data, &ffdata, status );
     if (*status == SMF__FLATN) {
       errAnnul( status );
-      msgOut("smurf_flatfield",
+      msgOutif(MSG__VERB, "smurf_flatfield",
 	     "smurf_flatfield: Data are already flatfielded", status);
     }
 
-    pntr[0] = (fdata->pntr)[0];
-    outdata = pntr[0];
-
-    ipntr[0] = (data->pntr)[0];
-    indata = ipntr[0];
-
-    /*    npts = (fdata->dims)[0]*(fdata->dims)[1]*(fdata->dims)[2];
-    printf("ndims = %d, nout = %d \n",ndims, nout);
-    printf("output ndims = %d, npts = %d \n",fdata->ndims, npts);*/
-
-    npts = (data->dims)[0]*(data->dims)[1]*(data->dims)[2];
-    printf("input ndims = %d, npts = %d \n",data->ndims, npts);
-    for ( i=0; i<npts; i++) {
-      printf("i = %d, indata = %d, outdata = %g \n",i,indata[i],outdata[i]);
-    }
-    /*    for ( i=0; i<npts; i++) {
-      printf("i = %d, outdata = %g \n",i,outdata[i]);
-      }*/
-
-    ohdr = fdata->hdr;
-    outwcs = ohdr->wcs;
-    outfits = ohdr->fitshdr;
-
-    /*astShow(outfits);*/
     ndfAnnul( &outndf, status);
 
-    /* Check status.... */
+    /* Should check status.... */
 
     msgOutif(MSG__VERB," ","Flat field applied", status);
 
     smf_close_file( &data, status );
+
   }
 
 
