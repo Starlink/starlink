@@ -174,7 +174,7 @@ main(int argc, char *argv[])
     if (portNo < 0 || delay < 0)
 	usage();
 
-    rtdLOG logs = rtdLOG::rtdLOG(verbose);  // create log object
+    rtdLOG logs = rtdLOG(verbose);  // create log object
 
     if (getenv(RTD_SERVER_PORT) != NULL)
 	portNo = atoi(getenv(RTD_SERVER_PORT));
