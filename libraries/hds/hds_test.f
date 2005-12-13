@@ -82,13 +82,13 @@
       REAL RDIM(5), RDIM_OUT(5)
       INTEGER ACTVAL
       INTEGER I
-      CHARACTER * (5) CHARARR(2)
+      CHARACTER * (10) CHARARR(2), RETCHARARR(2)
       DOUBLE PRECISION DTEMP
 
 *  Local Data:
       DATA DIM / 10, 20 /
       DATA RDIM / 1.0, 2.0, 3.0, 4.0, 5.0 /
-      DATA CHARARR / 'TEST1', 'TEST2' /
+      DATA CHARARR / 'TEST1', 'TES' /
 *.
 
 *  Initialise the global status.
@@ -265,6 +265,23 @@
                   STATUS = SAI__ERROR
                   CALL EMS_REP( 'GET',
      :                 'Did not get what we put in', STATUS)
+               END IF
+            END IF
+         END DO
+      END IF
+
+*  Check DAT_GETVC
+      CALL DAT_FIND( LOC1, 'ONEDCHAR', LOC3, STATUS )
+      CALL DAT_GETVC( LOC3, 5, RETCHARARR, ACTVAL, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         DO I = 1, 2
+            IF (STATUS .EQ. SAI__OK) THEN
+               IF ( RETCHARARR(I) .NE. CHARARR(I) ) THEN
+                  STATUS = SAI__ERROR
+                  CALL EMS_REP( 'GETVC',
+     :                 'Did not get what we put in _CHAR array', STATUS)
                END IF
             END IF
          END DO
