@@ -17,6 +17,7 @@ static const char* const rcsId="@(#) $Id: AstroQuery.C,v 1.2 2003/01/20 15:52:21
 #include <cstdlib>
 #include <cerrno>
 #include <cstring>
+#include <sys/types.h>
 #include "error.h"
 #include "util.h"
 #include "AstroQuery.h"
