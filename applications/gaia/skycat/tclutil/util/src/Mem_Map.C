@@ -20,6 +20,7 @@ static const char* const rcsId="@(#) $Id: Mem_Map.C,v 1.3 2005/02/02 01:43:00 br
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <cstring>
+#include <strings.h>
 #include "error.h"
 #include "config.h"
 #include "Mem_Map.h"

@@ -25,6 +25,7 @@ using namespace std;
 #include <csignal>
 #include <iostream>
 #include <cstring>
+#include <signal.h>
 #include "error.h"
 #include "define.h"
 #include "ShellCommand.h"
