@@ -1,10 +1,21 @@
 #!/bin/sh
-# -*-tcl-*-
-# This script creates a button for each test case...
-#
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/rtd.sh "$0" "$@"
-
+#\
+test -f ../demos/rtd_env.sh && . ../demos/rtd_env.sh
+#\
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
+#\
+if [ -z "$RTD_LIBRARY" ] ; then
+#\
+   WISH=rtdimage_wish; L=`dirname $XP`; RTD_LIBRARY="$L/lib/rtd" ; export RTD_LIBRARY
+#\
+   else WISH=$RTD_LIBRARY/../bin/rtdimage_wish
+#\
+fi
+#\
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/hot/1/pwd/cvs/source/applications/gaia/built/lib:/hot/1/pwd/cvs/source/applications/gaia/built/lib:/hot/1/pwd/cvs/source/applications/gaia/built/lib/itcl:/usr/openwin/lib"
+#\
+exec $WISH "$0" ${1+"$@"}
+# --------------------------------------------------
 set n 0
 foreach testfile [glob t*.tcl] {
     if {"$testfile" != "test.tcl"} {
