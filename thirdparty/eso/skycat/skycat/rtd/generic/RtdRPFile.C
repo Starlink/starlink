@@ -12,9 +12,12 @@
  * P.Biereichel    23/07/97  Bug fixed. Revised
  */
 
-#include <ctime>
-#include "RtdRPFile.h"
+/*#include <ctime>*/
+#include <strings.h>
+#include <sys/types.h>
 #include <time.h>
+#include "RtdRPFile.h"
+
 
 static int cnt = 0;         // Shared memory counter
 
