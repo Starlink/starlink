@@ -9481,7 +9481,7 @@ else
     eval itcl_STUB_LIB_FLAG="-litclstub`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
 fi
 itcl_BUILD_LIB_SPEC="-L`pwd` ${itcl_LIB_FLAG}"
-itcl_LIB_SPEC="-L${pkglibdir} ${itcl_LIB_FLAG}"
+itcl_LIB_SPEC="-L${pkglibdir}/.. ${itcl_LIB_FLAG}"
 
 itcl_BUILD_STUB_LIB_SPEC="-L`pwd` ${itcl_STUB_LIB_FLAG}"
 itcl_STUB_LIB_SPEC="-L${pkglibdir} ${itcl_STUB_LIB_FLAG}"
