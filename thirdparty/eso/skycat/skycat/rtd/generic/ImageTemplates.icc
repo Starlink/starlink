@@ -1106,7 +1106,7 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
 
     // don't subsample: take pixel defined by sampling method
 
-    DATA_TYPE samples[xs * ys];
+    DATA_TYPE *samples = new DATA_TYPE[xs * ys];
     DATA_TYPE vsamp;
     int wbox = xs < ys ? xs : ys;
 
@@ -1120,6 +1120,7 @@ void CLASS_NAME::shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y)
                 xImage_->putpixel(k++, l, llookup(vsamp));
         }
     }
+    delete[] samples;
 }
 
 
