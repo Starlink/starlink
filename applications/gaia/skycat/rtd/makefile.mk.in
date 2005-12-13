@@ -10,7 +10,7 @@
 #
 
 AT			= @
-MAKEFLAGS		= --no-print-directory -s
+MAKEFLAGS		=
 
 # to redefine the installation root directory use 'make INSTALL_TARGET=<dir>'
 # or set the env. variable INSTALL_TARGET before calling 'make'
@@ -116,6 +116,7 @@ DEPEND_FLAGS		= $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
 	$(AT)$(CXX) -c $(CC_SWITCHES) $<
 
 .PHONY: all do_all
+
 all: do_all
 	@echo "`pwd`: . . . 'all' done" 
 
