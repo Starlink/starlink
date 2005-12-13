@@ -13,5 +13,8 @@
 # ------------------------------------------------------------------------
 MAN_SECTIONS =	3
 
+do_all:
+do_depend:
+
 include ../../makefile.mk
 include ../../man.mk

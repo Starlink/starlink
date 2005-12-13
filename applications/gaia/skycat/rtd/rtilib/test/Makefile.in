@@ -30,6 +30,9 @@ LIBRARIES       = ../lib/librti.a \
 
 test: $(PROGS)
 
+do_all:
+do_depend:
+
 lib:
 	@cd ../src; $(MAKE)
 

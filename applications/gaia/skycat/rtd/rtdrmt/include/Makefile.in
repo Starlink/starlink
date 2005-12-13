@@ -8,5 +8,8 @@
 
 SRCS 		=  rtdRemote.h
 
+do_all:
+do_depend:
+
 include ../../makefile.mk
 include ../../include.mk

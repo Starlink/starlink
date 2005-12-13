@@ -11,5 +11,8 @@ SRCS =	LookupTable.h ImageData.h ByteImageData.h XImageData.h ShortImageData.h \
 	UShortImageData.h ImageTemplates.h LongImageData.h  NativeImageData.h \
 	FloatImageData.h BiasData.h
 
+do_all:
+do_depend:
+
 include ../../makefile.mk
 include ../../include.mk
