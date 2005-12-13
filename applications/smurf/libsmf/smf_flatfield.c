@@ -23,7 +23,12 @@
 
 *  Description:
 *     This is a handler routine for determining if the lower-level
-*     FLATFIELD task needs to be run.
+*     FLATFIELD task needs to be run. 
+
+*  Notes:
+*     - If an NDF file is involved then at the very least, the pointer
+*     to the DATA array (pntr[0]) and its type (dtype) must be
+*     defined.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -32,6 +37,9 @@
 *  History:
 *     2005-12-01 (AGG):
 *        Initial test version.
+*     2005-12-12 (AGG):
+*        Add checks on data type and dimensions for the case that the
+*        data need flatfielding and odata exists
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -78,22 +86,25 @@
 
 void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
-  int checkflatstatus = 0;
-  int i;
-  int npts;
-  int j;
-  int nframes;
-  int nboll;                    /* Number of bolometers */
+  int checkflatstatus = 0;    /* Local variable for storing status */
+  int i;                      /* Loop counter */
+  int indims;
+  int j;                      /* Loop counter */
+  int nboll;                  /* Number of bolometers */
+  int ndims;
+  int nframes;                /* Number of time slices */
+  int npts;                   /* Total number of data points */
 
-  smfDA *da;
-  smfFile *file;
-  smfHead *hdr;
+  smfDA *da = NULL;           /* da struct for input data */
+  smfFile *file = NULL;       /* file struct for input data */
+  smfHead *hdr = NULL;        /* hdr struct for input data */
 
-  void *ipntr[3];
-  void *opntr[3];
-  double *indata;
-  double *outdata;
-  int *tstream;
+  void *ipntr[3];             /* Input D, Q and V arrays */
+  void *opntr[3];             /* Output D, Q and V arrays */
+  double *indata;             /* Pointer to input DATA */
+  double *outdata;            /* Pointer to output DATA */
+  int *tstream;               /* Pointer to raw time series data */
+  smf_dtype dtype;            /* Data type */
 
   if ( *status != SAI__OK ) return;
 
@@ -129,34 +140,38 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
     }
 
   } else if ( checkflatstatus == SAI__OK ) { 
-    /* OK data are not flatfielded: create smfData and flatten */
 
-    /* Check *odata */
+    /* OK data are not flatfielded: create smfData based on input and
+       apply flatfield */
+
+    /* Check if *odata exists */
     if ( *odata == NULL) {
 
+      msgOutif(MSG__VERB, "smf_flatfield","Data not FF, no odata", status);
       /* If NULL then we need create odata not associated with a file */
-      /* Allocate space for *odata and all cpts */
+      /* Allocate space for *odata and all necessary cpts */
       *odata = malloc( sizeof( smfData ) );
       hdr = malloc( sizeof( smfHead ) );
+      da = malloc( sizeof( smfDA ) );
+
       /* Copy old hdr into the new hdr */
       memcpy( hdr, idata->hdr, sizeof( smfHead ) );
-      (*odata)->hdr = hdr; /* Store hdr in odata */
-      /* Set data type */
-      (*odata)->dtype = SMF__DOUBLE; 
+      /* Store hdr in odata */
+      (*odata)->hdr = hdr; 
 
       /* Copy flatfield info to output struct */
-      da = malloc( sizeof( smfDA ) );
       memcpy( da, idata->da, sizeof( smfDA ));
       (*odata)->da = da;
 
+      /* Set data type */
+      (*odata)->dtype = SMF__DOUBLE; 
       /* Set ndims and the dims array */
       (*odata)->ndims = idata->ndims; 
       for ( i=0; i<(*odata)->ndims; i++ ) {
 	((*odata)->dims)[i] = (idata->dims)[i];
       }
 
-      /* Check if dtype == SMF__DOUBLE */
-
+      /* Useful numbers... */
       nboll = ((*odata)->dims)[0]*((*odata)->dims)[1];
       nframes = ((*odata)->dims)[2];
       npts = nboll * nframes;
@@ -178,21 +193,78 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       } else {
 	/* Return an error: the output data must be doubles */
 	if ( *status == SAI__OK) {
-	  *status == SAI__ERROR;
-	  errRep( "smf_flatfield", "Output data type not set to double", status);
+	  *status = SAI__ERROR;
+	  errRep( "smf_flatfield", "Output data type not double", status);
 	}
       }
 
+      /* Apply flatfield calibration */
       smf_flatten( *odata, status);
-      msgOut("smf_flatfield","Data not FF, no odata", status);
+
     } else {
 
-      /* Check dimensions and type */
+      /* OK, *odata exists */
+      msgOutif(MSG__VERB, "smf_flatfield","Data not FF, odata exists", status);
 
-      msgOut("smf_flatfield","Data not FF, odata exists", status);
+      /* To proceed we must know that the data type is correct */
+      dtype = (*odata)->dtype;
+      /* And that the input and output dimensions are equal */
+      ndims = (*odata)->ndims; 
+      indims = idata->ndims; 
+
+      if ( dtype != SMF__DOUBLE ) {
+        *status = SAI__ERROR;
+        errRep( "smf_flatfield", "Output data type is not set to _DOUBLE", status);
+      } else if ( ndims != indims ) {
+        msgSeti( "NDIMS", ndims);
+        msgSeti( "IDIMS", indims);
+        *status = SAI__ERROR;
+        errRep( "smf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
+      } else {
+
+	/* All's well so start populating the *odata struct */
+	/* Does the header (hdr) exist? */
+	hdr = (*odata)->hdr;
+	if ( (*odata)->hdr == NULL) {
+	  hdr = malloc( sizeof( smfHead ) );
+	  /* Copy old hdr into the new hdr and store in *odata */
+	  memcpy( hdr, idata->hdr, sizeof( smfHead ) );
+	  (*odata)->hdr = hdr; 
+	}
+
+	/* Does the flatfield (smfDA) struct exist? */
+	da = (*odata)->da;
+	if ( da == NULL ) {
+	  da = malloc( sizeof( smfDA ) );
+	  /* Copy flatfield info into *odata */
+	  memcpy( da, idata->da, sizeof( smfDA ) );
+	  (*odata)->da = da;
+	}
+
+	/* Store pointer to input data */
+	ipntr[0] = (idata->pntr)[0];
+	tstream = ipntr[0];
+
+	/* Store pointer to output data */
+	opntr[0] = ((*odata)->pntr)[0];
+	outdata = opntr[0];
+
+	/* Number of bolometers, number of frames and total npts */
+	nboll = ((*odata)->dims)[0]*((*odata)->dims)[1];
+	nframes = ((*odata)->dims)[2];
+	npts = nboll * nframes;
+
+	/* Input data are ints: must re-cast as double */
+	for (j=0; j<npts; j++) {
+	  outdata[j] = (double)tstream[j];
+	}
+
+	((*odata)->pntr)[0] = opntr[0];
+	/* Apply flatfield calibration */
+	smf_flatten( *odata, status);
+
+      }
     }
-
-
   } else {
     msgOut("smf_flatfield", 
 	   "Hmm status is something other than it should be....", status);
