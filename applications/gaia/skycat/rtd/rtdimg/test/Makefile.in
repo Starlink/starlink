@@ -20,7 +20,7 @@ PROGS 		=  tRtd tImageEvent
 INCLUDES	= -I../../rtdevt/include \
                   -I../../rtilib/include \
                   -I../../rtdimg/include \
-                  -I ../../../astrotcl/imageio/include \
+                  -I../../../astrotcl/imageio/include \
                   $(BUILD_INCLUDES) \
                   -I$(TOPDIR)/include/tclutil \
                   -I$(TOPDIR)/include/astrotcl
