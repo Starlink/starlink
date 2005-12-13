@@ -157,17 +157,22 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Create a panedwindow to display the two graphs.
       itk_component add pane {
-         iwidgets::panedwindow $w_.pane -width 5i -height 6i
+         ::panedwindow $w_.pane -width 5i -height 6i -orient vertical
+      } {
       }
       pack $itk_component(pane) -fill both -expand 1 -padx 1m -pady 1m
-      $itk_component(pane) add "X"
-      set xpane [$itk_component(pane) childsite "X"]
-      $itk_component(pane) add "Y"
-      set ypane [$itk_component(pane) childsite "Y"]
 
+      itk_component add xpane {
+         ::frame $w_.xpane
+      }
+      itk_component add ypane {
+         ::frame $w_.ypane
+      }
+      $itk_component(pane) add $itk_component(xpane) $itk_component(ypane)
+      
       #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
-         blt::graph $xpane.xgraph \
+         blt::graph $itk_component(xpane).xgraph \
             -width 5i \
             -height 3i \
             -borderwidth 3 \
@@ -181,7 +186,7 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Create the Y graph and add it to the lower pane.
       itk_component add ygraph {
-         blt::graph $ypane.ygraph \
+         blt::graph $itk_component(ypane).ygraph \
             -width 3i \
             -height 5i \
             -borderwidth 3 \
@@ -193,9 +198,6 @@ itcl::class gaia::GaiaXYProfile {
       pack $itk_component(ygraph) -fill both -expand 1 -padx 1m -pady 1m
       add_short_help $itk_component(ygraph) \
          {Graph: average values along Y, {bitmap dragb1} = zoom, {bitmap b2} = restore}
-
-      #  Split pane evenly between the two graphs.
-      $itk_component(pane) fraction 50 50
 
       #  Set axes labels.
       $xgraph_ yaxis configure -title {}
