@@ -751,6 +751,36 @@ F77_SUBROUTINE(dat_get0l)( CHARACTER(locator),
 /* DAT_GET1x - Get 1D array values       */
 /*=======================================*/
 
+F77_SUBROUTINE(dat_get1c)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   CHARACTER(values),
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(values) )
+{
+  /* Note that we can not call datGet1C here because that is too C specific.
+     Must instead go directly to datGetC */
+  HDSLoc locator_c;
+  hdsdim dims[1];
+  size_t actval_c = 0;
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+
+  if (*status == SAI__OK) {
+    datSize( &locator_c, &actval_c, status );
+    if (*status == SAI__OK && *maxval < actval_c) {
+      *status = DAT__BOUND;
+      emsSeti( "IN", (int)*maxval );
+      emsSeti( "SZ", (int)actval_c );
+      emsRep( "DAT_GET1C_ERR", "DAT_GET1C: Bounds mismatch: ^IN < ^SZ", status);
+    } else {
+      dims[0] = actval_c;
+      datGetC(&locator_c, 1, dims, values, values_length, status);
+    }
+  }
+  *actval = actval_c;
+}
+
 F77_SUBROUTINE(dat_get1d)( CHARACTER(locator),
 			   INTEGER(maxval),
 			   F77_DOUBLE_TYPE *values,

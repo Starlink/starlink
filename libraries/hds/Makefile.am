@@ -70,7 +70,7 @@ F_ROUTINES = \
 	cmp_mod.f cmp_modc.f cmp_prim.f cmp_put0x.f cmp_put1x.f \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
-	dat_get1x.f dat_getnx.f \
+	dat_getnx.f \
 	dat_getvx.f \
 	dat_putnx.f
 
