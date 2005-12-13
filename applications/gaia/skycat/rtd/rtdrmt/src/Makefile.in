@@ -23,6 +23,8 @@ INCLUDES	= -I../include
 
 do_all: dirs $(libname)
 
+do_install:
+
 $(libname): $(OBJS)
 	$(RM) $@
 	$(AR) $@ $(OBJS)

@@ -37,6 +37,8 @@ vlt-install-files: install-top
 
 install: install-files
 
+do_install:
+
 # Note: the default colormap files are now compiled in to the binary...
 install: install-top
 

@@ -30,6 +30,7 @@ test: $(PROGS)
 
 do_all:
 do_depend:
+do_install:
 
 lib:
 	@cd ../src; $(MAKE)
