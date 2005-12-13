@@ -157,6 +157,7 @@ hdsGroup(const HDSLoc *locator,
 
 /* Enter routine.       */
 
+   group_str[0] = '\0';  /* initialise string regardless of status */
    if (!_ok(*status))
       return *status;
    hds_gl_status     = DAT__OK;

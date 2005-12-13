@@ -40,6 +40,7 @@ datName(const HDSLoc *locator,
 
 /* Enter routine.       */
 
+   name_str[0] = '\0'; /* initialise return string */
    if (!_ok(*status))
       return *status;
    hds_gl_status = DAT__OK;
@@ -87,6 +88,7 @@ datType(const HDSLoc *locator,
 
 /* Enter routine.       */
 
+   type_str[0] = '\0'; /* Initialise return string */
    if (!_ok(*status))
       return *status;
    hds_gl_status = DAT__OK;
