@@ -22,6 +22,11 @@
  * pbiereic        17/02/03  Revised byte-order issues
  * Peter W. Draper 13/06/05  Made setHDU virtual so it can be overriden.
  *                 28/11/05  Made copy virtual so it can be overridden.
+ *                 14/12/05  Moved setHDU and copy to the ImageIORep base
+ *                           class so that CompoundImageData does not
+ *                           need knowledge of this class (so that other
+ *                           ImageIORep implementations can be used in
+ *                           CompoundImages).
  */
 
 #include <cstdio>

@@ -26,8 +26,12 @@
  *                           non-const member can be used within this
  *                           member. 
  *                 30/05/01  Added DOUBLE_IMAGE enumeration.
+ *                           Added copy() and setHDU pure virtual members
+ *                           to support CompoundImageData  not having access
+ *                           to the FitsIO class. The actual effect
+ *                           of the setHDU member is left to the
+ *                           implementation (this switches HDU for FitsIO).
  */
-
 
 #include <iostream>
 #include <cmath>
@@ -159,6 +163,13 @@ public:
     // Return true if no image is loaded (a 2x2 pixel or smaller
     // image is considered blank).
     virtual int isclear() const {return width_ <= 2 && height_ <= 2;}
+
+    // create a copy, as lightweight as possible.
+    virtual ImageIORep *copy() = 0;
+
+    // switch to another component of the implementation.
+    virtual int setHDU(int num) = 0;
+
 };
 
 
