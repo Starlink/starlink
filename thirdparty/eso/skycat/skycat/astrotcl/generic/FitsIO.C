@@ -25,8 +25,8 @@
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 brighton Exp $";
 
+#include "config.h" // tclutil
 
-using namespace std;
 #include <cstdio>
 #include <cstring>
 #include <cctype>
@@ -45,6 +45,8 @@ using namespace std;
 #include "Mem.h"
 #include "FitsIO.hxx"
 #include "define.h"
+
+using namespace std;
 
 // The type "long" may have 64 bits.
 #if LONGSIZE == 64

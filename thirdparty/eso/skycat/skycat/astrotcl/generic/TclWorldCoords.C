@@ -14,8 +14,8 @@
  */
 static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.7 2005/02/02 01:43:04 brighton Exp $";
 
+#include "config.h"  // tclutil
 
-using namespace std;
 #include <cstdio>
 #include <cstring>
 #include <iostream>
@@ -25,6 +25,7 @@ using namespace std;
 #include "WorldCoords.hxx"
 #include "TclWorldCoords.h"
 
+using namespace std;
 
 /* 
  * declare a table of tcl subcommands
