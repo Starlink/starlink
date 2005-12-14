@@ -1,34 +1,37 @@
 #+
 #  Name:
-#     kappa_lutview_style.def
+#     kappa_display_style.def
 
 #  Purpose:
-#     Default style for KAPPA application LUTVIEW.
+#     Default style for KAPPA application DISPLAY.
 
 #  Description:
 #     This file specifies the plotting attributes to be used if the user
 #     does not give alternative values using the STYLE Parameter of 
-#     application LUTVIEW. Axis 1 corresponds to the data value or colour 
-#     index. Axis 2 is the other axis which has no physical significance. 
+#     application DISPLAY.  Axis 1 and 2 are the spatial axes. 
 #     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
 #     files.
 
 #  Notes:
-#     -  Always include attribute axis qualifiers, etc, explcitly in this
+#     -  Always include attribute axis qualifiers, etc, explicitly in this
 #     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
 #     just "textlab=1".
 
 #  Authors:
 #     David S. Berry (STARLINK)
+#     Malcolm J. Currie (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     14-OCT-1999 (DSB):
 #        Original version.
+#     2005 December 13 (MJC):
+#        Replaced the LUTVIEW references with DISPLAY, and corrected
+#        the axis descriptions.
 #-
 
 #  The default title.
-      title=Colour table key
+      title=Image display
 
 #  Do not display the title by default.
       drawtitle=0
