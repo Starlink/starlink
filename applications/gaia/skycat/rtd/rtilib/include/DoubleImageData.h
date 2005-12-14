@@ -75,6 +75,9 @@ public:
 	  bias_(0.0),
           scale_(1.0) {}
 
+    // return class name as a string
+    virtual const char* classname() { return "DoubleImageData"; }
+
     // return the data type of the raw data
     int dataType() {return DOUBLE_IMAGE;}
 

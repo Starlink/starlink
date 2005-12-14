@@ -74,6 +74,9 @@ public:
 	flipY_ = 1;
     }
 
+    // return class name as a string
+    virtual const char* classname() { return "XImageData"; }
+
     // return the data type of the raw data
     int dataType() {return X_IMAGE;}
 

@@ -80,6 +80,9 @@ public:
 	: ImageData(name, imio, verbose), 
 	  blank_(0) {}
 
+    // return class name as a string
+    virtual const char* classname() { return "LongImageData"; }
+
     // return the data type of the raw data
     int dataType() {return LONG_IMAGE;}
 

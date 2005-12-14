@@ -68,6 +68,9 @@ public:
     ShortImageData(const char* name, const ImageIO& imio, int verbose)
 	: ImageData(name, imio, verbose), blank_(0) {}
 
+    // return class name as a string
+    virtual const char* classname() { return "ShortImageData"; }
+
     // return the data type of the raw data
     int dataType() {return SHORT_IMAGE;}
 

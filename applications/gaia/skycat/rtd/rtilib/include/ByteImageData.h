@@ -69,6 +69,9 @@ public:
 	: ImageData(name, imio, verbose, 256 /* use a smaller lookup table */),
 	  blank_(128) { }
 
+    // return class name as a string
+    virtual const char* classname() { return "ByteImageData"; }
+
     // return the data type of the raw data
     int dataType() {return BYTE_IMAGE;}
 

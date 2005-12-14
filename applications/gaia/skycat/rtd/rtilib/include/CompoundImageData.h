@@ -68,6 +68,9 @@ public:
     // destructor
     ~CompoundImageData();
 
+    // return class name as a string
+    virtual const char* classname() { return "CompoundImageData"; }
+
     // return a copy of this object
     ImageData* copy();
 

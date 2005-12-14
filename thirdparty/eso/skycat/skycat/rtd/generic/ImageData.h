@@ -274,6 +274,9 @@ public:
     // destructor
     virtual ~ImageData() {}
 
+    // return class name as a string
+    virtual const char* classname() { return "ImageData"; }
+
     // save image to a file
     int write(const char* filename);
  
