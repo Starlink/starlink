@@ -52,7 +52,6 @@ if test "$prefix" = "NONE" ; then
     #prefix=`(cd ..; pwd)`/install
     prefix=/usr/local
 fi
-echo "using prefix = $prefix"
 AC_SUBST(prefix)
 
 # -----------------------------------------------------------------------
@@ -143,10 +142,8 @@ AC_SUBST(CXX)
 
 #  Alpha requires this define for standard streams.
 AC_CANONICAL_HOST
-echo "host=$host"
 case "$host" in
   alpha*) 
-         echo "define __USE_STD_IOSTREAM"
          if test "$CXX" = "cxx"; then 
             AC_DEFINE(__USE_STD_IOSTREAM, 1, [Use standard streams] )
          fi

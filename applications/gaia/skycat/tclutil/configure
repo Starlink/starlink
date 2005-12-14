@@ -2505,7 +2505,6 @@ if test "$prefix" = "NONE" ; then
     #prefix=`(cd ..; pwd)`/install
     prefix=/usr/local
 fi
-echo "using prefix = $prefix"
 
 
 # -----------------------------------------------------------------------
@@ -4166,10 +4165,8 @@ host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
 host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
-echo "host=$host"
 case "$host" in
   alpha*)
-         echo "define __USE_STD_IOSTREAM"
          if test "$CXX" = "cxx"; then
 
 cat >>confdefs.h <<\_ACEOF
