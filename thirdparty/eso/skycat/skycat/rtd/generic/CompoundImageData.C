@@ -14,6 +14,9 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  14/02/00  Created
+ * Peter W. Draper 14/12/05  Remove local knowledge of FitsIO class so 
+ *                           that other ImageIORep implementations can be
+ *                           used.
  */
 
 
@@ -24,7 +27,7 @@
 #include <cassert>
 #include <cmath>
 #include "define.h"
-#include "FitsIO.hxx"
+#include "ImageIO.h"
 #include "error.h"
 #include "CompoundImageData.h"
 
@@ -35,7 +38,7 @@
  * complete size of all of the images.
  *
  * name   -  the name of the image (for logging/debugging
- * imio   -  the object representing the FITS image file
+ * imio   -  the object representing the image file
  * hduList - the list of image HDU indexes to use
  * numHDUs - the number of image HDU indexes in hduList
  * biasInfo - used when calculating bias info
@@ -50,25 +53,18 @@ CompoundImageData::CompoundImageData(const char* name, const ImageIO& imio,
     images_ = new ImageData*[numImages_];
     minX_ = maxX_ = minY_ = maxY_ = 0.;
 
-    // make sure it is a FITS file, why? Stops use with FitsIO sub-classes
-    // so do not do this.
-    //if (!imio.rep() || strcmp(imio.rep()->classname(), "FitsIO") != 0) {
-    //    status_ = error("The \"hdu\" subcommand is only supported for FITS files");
-    //    numImages_ = 0;      // only free images_, not image_[i].
-    //    return;              // error
-    //}
-    FitsIO* fits = (FitsIO*)imio.rep();
+    ImageIORep* imioRep = (ImageIORep*)imio.rep();
 
     // create images and note the min/max coordinates
     for(int i = 0; i < numImages_; i++) {
 	// need a (reference counted) copy so we can change the current HDU
-	FitsIO* fitsExt = fits->copy();
-	if ((status_ = fitsExt->setHDU(hduList[i])) != 0) {
-	    delete fitsExt;
+	ImageIORep* imioRepExt = imioRep->copy();
+	if ((status_ = imioRepExt->setHDU(hduList[i])) != 0) {
+	    delete imioRepExt;
 	    return;		// error
 	}
 	
-	images_[i] = ImageData::makeImage(name, fitsExt, biasInfo, verbose);
+	images_[i] = ImageData::makeImage(name, imioRepExt, biasInfo, verbose);
 
 	double x0 = -images_[i]->crpix1_,
 	    y0 = -images_[i]->crpix2_,
