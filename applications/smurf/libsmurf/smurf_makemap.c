@@ -67,9 +67,7 @@
 #endif
 
 #include <string.h>
-
-#include "star/ndg.h"
-#include "star/grp.h"
+#include <stdio.h>
 
 #include "smurf_par.h"
 #include "prm_par.h"
@@ -77,6 +75,9 @@
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
+#include "star/hds.h"
+#include "star/ndg.h"
+#include "star/grp.h"
 
 #include "libsmf/smf.h"
 #include "smurflib.h"
@@ -90,37 +91,38 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
+  AstMapping *coordmap1=NULL;/* Mapping bolo->celestial coordinates */
+  AstMapping *coordmap2=NULL;/* Mapping celestial->output map coordinates */
+  AstCmpMap *coordmap=NULL;  /* Combination of coordmap1 and coordmap2 */
   smfData *data=NULL;        /* pointer to SCUBA2 data structure */
   void **data_index;         /* Array of pointers to mapped arrays in ndf */
   smfFile *file=NULL;        /* SCUBA2 data file information */
+  char fitshd[8][81];        /* Strings for each fits channel */
   AstFitsChan *fitschan;     /* Fits channels to construct WCS header */
-  AstFrameSet *outframeset;  /* Frameset for pixel->radec mapping */
+  HDSLoc *fitsloc = NULL;    /* HDS locator to FITS header in output */
+  HDSLoc *fitsloc2 = NULL;   /* Helper locator for writing FITS header */
   int flag;                  /* Flag */
   smfHead *hdr=NULL;         /* Pointer to data header this time slice */
   int i;                     /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  void *indataArr[1];        /* Pointer to input data */
-  float *indata = NULL;      /* Pointer to actual input data */
-  int indf = 0;              /* Input NDF identifier */
-  dim_t indims[3];           /* Copy of the NDF dimensions */
-  int j;                     /* Loop counter */
+  dim_t j;                   /* Loop counter */
   int lbnd_in[2];            /* Lower pixel bounds for input maps */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
-  AstMapping *coordmap1=NULL;/* Mapping bolo->celestial coordinates */
-  AstMapping *coordmap2=NULL;/* Mapping celestial->output map coordinates */
-  AstCmpMap *coordmap=NULL;  /* Combination of coordmap1 and coordmap2 */
   int n;                     /* # elements in the output map */
-  int ndfdims[NDF__MXDIM];   /* Dimensions of input NDF */
   int ndims;                 /* Number of active dimensions in input */
+  int nfits;                 /* # cards in fits header */
   int ondf;                  /* output NDF identifier */
+  AstFrameSet *outframeset;  /* Frameset for pixel->radec mapping */
   char *pname=NULL;          /* Name of currently opened data file */
   struct sc2head *sc2hdr=NULL; /* Pointer to sc2head for this time slice */
   int size;                  /* Number of files in input group */
-  float tau;                 /* tau at this wavelength */
   int ubnd_in[2];            /* Upper pixel bounds for input maps */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   double *weights=NULL;      /* Weights array for output map */
+
+  double i1, i2;
+  double o1, o2;
 
   /* Main routine */
   ndfBegin();
@@ -131,10 +133,10 @@ void smurf_makemap( int *status ) {
   /* Create and map output ndf */
 
   /*** KLUDGE *** temporary hard bounds for the output data range */
-  lbnd_out[0] = -256;    
-  lbnd_out[1] = -256;
-  ubnd_out[0] = 255;
-  ubnd_out[1] = 255;
+  lbnd_out[0] = 0;    /*-512;*/    
+  lbnd_out[1] = 0;    /*-512;*/
+  ubnd_out[0] = 511; /* 511;*/
+  ubnd_out[1] = 511; /* 511;*/
 
   ndfCreat( "OUT", "_DOUBLE", 2, lbnd_out, ubnd_out, &ondf, status );
   ndfMap( ondf, "DATA", "_DOUBLE", "WRITE", data_index, &n, status);
@@ -146,7 +148,9 @@ void smurf_makemap( int *status ) {
   /* Loop over all data to identify the extent of the map */
 
   for(i=1; i<=size; i++ ) {
+    
     /* Read data from the ith input file in the group */
+    
     smf_open_file( igrp, i, "READ", &data, status);
 
     if( *status == SAI__OK ) {
@@ -155,8 +159,8 @@ void smurf_makemap( int *status ) {
       msgSetc("FILE", pname);
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Processing ^FILE",
 	       status);
-    
-      /* Check that the data dimensions are 3 and get # time samples */
+           
+      /* Check that the data dimensions are 3 (for time ordered data) */
       if( data->ndims != 3 ) {
 	msgSetc("FILE", pname);
 	msgSeti("THEDIMS", data->ndims);
@@ -167,7 +171,10 @@ void smurf_makemap( int *status ) {
       }
 
       /* Check that the input data type is double precision */
-      if( *status == SAI__OK ) switch( data->dtype ) {
+
+      if( *status == SAI__OK ) 
+	if( data->dtype != SMF__DOUBLE) 
+	  switch( data->dtype ) {
       case SMF__NULL:
 	msgSetc("FILE", pname);
 	*status = SAI__ERROR;
@@ -204,13 +211,15 @@ void smurf_makemap( int *status ) {
       errRep( "smurf_makemap", "Couldn't open input file.", status );
 
     /* Get the astrometry for all the time slices in this data file */
-    if( *status == SAI__OK) for( j=0; j<data->dims[2]; j++ ) {
+
+    if( *status == SAI__OK) for( j=0; j<(data->dims)[2]; j++ ) {
+	
       smf_tslice_ast( data, j, status);
 
       if( *status == SAI__OK ) {
 	hdr = data->hdr;
 	sc2hdr = hdr->sc2head;
-
+	
 	/* Create a mapping for the output map from pixels -> RA, Dec 
 	   using the base coordinates to get the coordinates of the tangent 
 	   point if it hasn't been done yet.
@@ -219,12 +228,31 @@ void smurf_makemap( int *status ) {
 	if( coordmap1 == NULL ) { 
 	  fitschan = astFitsChan ( NULL, NULL, "" );
 	  
-	  sc2ast_makefitschan( 256.0, 256.0, 0.001, 0.001, 
+	  sprintf( fitshd[0], "CRPIX1  = 256" );
+	  astPutFits( fitschan, fitshd[0], 0 );
+	  sprintf( fitshd[1], "CRPIX2  = 256" );
+	  astPutFits( fitschan, fitshd[1], 0 );
+	  sprintf( fitshd[2], "CD1_1   = 0.003" );
+	  astPutFits( fitschan, fitshd[2], 0 );
+	  sprintf( fitshd[3], "CD2_2   = 0.003" );
+	  astPutFits( fitschan, fitshd[3], 0 );
+	  sprintf( fitshd[4], "CRVAL1  = %e", sc2hdr->tcs_tr_bc1*57.29577951 );
+	  astPutFits( fitschan, fitshd[4], 0 );
+	  sprintf( fitshd[5], "CRVAL2  = %e", sc2hdr->tcs_tr_bc2*57.29577951 );
+	  astPutFits( fitschan, fitshd[5], 0 );
+	  sprintf( fitshd[6], "CTYPE1  = 'RA---TAN'" );
+	  astPutFits( fitschan, fitshd[6], 0 );
+	  sprintf( fitshd[7], "CTYPE2  = 'DEC--TAN'" );
+	  astPutFits( fitschan, fitshd[7], 0 );
+	  
+	  /*
+	  sc2ast_makefitschan( 256.0, 256.0, 0.0003, 0.001, 
 			       sc2hdr->tcs_tr_bc1*57.29577951, 
 			       sc2hdr->tcs_tr_bc2*57.29577951, 
 			       "RA---TAN", "DEC--TAN", 
 			       fitschan, status );
-	  
+	  */
+
 	  astClear( fitschan, "Card" );
 	  
 	  outframeset = astRead( fitschan );
@@ -234,6 +262,8 @@ void smurf_makemap( int *status ) {
 	  astSet( outframeset, "system=icrs" );
 	  
 	  coordmap1 = astGetMapping( outframeset, AST__CURRENT, AST__BASE );
+
+	  /*astShow( coordmap1 );*/
 	}
 	
 	/* Set the System attribute for the SkyFrame in the input WCS FrameSet
@@ -242,42 +272,93 @@ void smurf_makemap( int *status ) {
 	coordmap2 = astGetMapping( data->hdr->wcs, AST__BASE, AST__CURRENT );
 
 	/* Concatenate the two Mappings to get IN_PIXEL->REF_PIXEL Mapping */
-	coordmap = astCmpMap( coordmap1, coordmap2, 1, "" );
+	coordmap = astCmpMap( coordmap2, coordmap1, 1, "" );
 
+	/*
+	  lbnd_in[0] = 0;
+	  lbnd_in[1] = 0;
+	  ubnd_in[0] = (data->dims)[0] - 1;
+	  ubnd_in[1] = (data->dims)[1] - 1;
+	*/
+	
 	lbnd_in[0] = -(data->dims)[0] / 2;
 	lbnd_in[1] = -(data->dims)[1] / 2;
 	ubnd_in[0] = lbnd_in[0] + (data->dims)[0] - 1;
 	ubnd_in[1] = lbnd_in[1] + (data->dims)[1] - 1;
-	
-	if( data->dtype == SMF__DOUBLE ) {	
-	  astRebinSeqD(coordmap,0,
-		       2,lbnd_in, ubnd_in,(data->pntr)[0], NULL, 
-		       0, NULL, 0, 0, 0, -1,
-		       2,lbnd_out,ubnd_out,
-		       lbnd_in, ubnd_in,
-		       map, NULL, weights);
-	}
-	else {
-	  errRep("smurf_makemap", 
-		 "Can't rebin this time slice because wrong data type.", 
-		 status);
-	  *status = SAI__ERROR;
-	}
+	  
+
+	astRebinSeqD(coordmap,0,
+		     2,lbnd_in, ubnd_in,(data->pntr)[0], NULL, 
+		     0, NULL, 0, 0, 0, -1,
+		     2,lbnd_out,ubnd_out,
+		     lbnd_in, ubnd_in,
+		     map, NULL, weights);
+
+	/* Tests for mappings */
+
+	/*
+	  i1=3.665191;  
+	  i2=1.134464;
+	  astTran2( coordmap1, 1, &i1, &i2, 1, &o1, &o2 );
+	  printf("Test xform coord1: in=%e %e  out=%e %e\n",i1,i2,o1,o2);
+	  
+	  i1=0.;        
+	  i2=0.;          
+	  astTran2( coordmap2, 1, &i1, &i2, 1, &o1, &o2 );
+	  printf("Test xform coord2: in=%e %e  out=%e %e\n",i1,i2,o1,o2);
+	  
+	  
+	  i1=0.;        
+	  i2=0.;          
+	  astTran2( coordmap, 1, &i1, &i2, 1, &o1, &o2 );
+	  printf("Test xform coord: in=%e %e  out=%e %e\n",i1,i2,o1,o2);
+	*/
+
+
       }
       
-      /* close data file */
-      smf_close_file( &data, status);
+      /* clean up ast objects */
+      if( coordmap2 != NULL )
+	astAnnul( coordmap2 );
+
+      if( coordmap != NULL )
+	astAnnul( coordmap );
     }
+
+    /* close data file */
+    if( data != NULL )
+      smf_close_file( &data, status);
   }
-  
+
+  /* Create HDS locator to FITS header and write the astrometry */
+
+  nfits = 8;
+
+  ndfXnew ( ondf, "FITS", "_CHAR*80", 1, &nfits, &fitsloc, status );
+
+  if( *status == SAI__OK ) {
+
+    for( j=1; j<=nfits; j++ ) {
+      datCell ( fitsloc, 1, &j, &fitsloc2, status );
+      datPut0C ( fitsloc2, fitshd[j-1], status );
+      datAnnul ( &fitsloc2, status );
+    }
+    datAnnul ( &fitsloc, status );
+  }
+
+  /* clean up */
+  if( coordmap1 != NULL )
+    astAnnul( coordmap1 );
+
   ndfUnmap( ondf, "DATA", status);
   ndfAnnul( &ondf, status );
   ndfEnd( status );
 
-  msgOutif(MSG__VERB," ","Map made", status);
+  msgOutif(MSG__VERB," ","Map written.", status);
 
   /* Tidy up after ourselves: release resources used by the grp routines  */
   grpDelet( &igrp, status);
 
+  free(weights);
 }
 
