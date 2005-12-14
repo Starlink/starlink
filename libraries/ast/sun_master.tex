@@ -2099,8 +2099,8 @@ f+
 
       ...
 
-      XTEXT = AST_FORMAT( WCSINFO, 1, XW )
-      YTEXT = AST_FORMAT( WCSINFO, 2, YW )
+      XTEXT = AST_FORMAT( WCSINFO, 1, XW, STATUS )
+      YTEXT = AST_FORMAT( WCSINFO, 2, YW, STATUS )
 
       WRITE ( *, 199 ) XTEXT, YTEXT
  199  FORMAT( 'Position = ', A, ', ', A )
