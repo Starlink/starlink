@@ -24,7 +24,6 @@
  */
 static const char* const rcsId="@(#) $Id: Mem.C,v 1.4 2005/02/02 01:43:00 brighton Exp $";
 
-using namespace std;
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
@@ -39,6 +38,8 @@ using namespace std;
 #include "util.h"
 #include "Mem.h"
 #include "Mem_Map.h"
+
+using namespace std;
 
 /*
  * NOTE: on Solaris2.5, the default limit is 8 shared memory areas per process:

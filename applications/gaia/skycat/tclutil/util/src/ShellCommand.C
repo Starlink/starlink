@@ -14,7 +14,6 @@
 static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.5 2005/04/04 19:01:06 brighton Exp $";
 
 
-using namespace std;
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
@@ -29,6 +28,8 @@ using namespace std;
 #include "error.h"
 #include "define.h"
 #include "ShellCommand.h"
+
+using namespace std;
 
 
 /*

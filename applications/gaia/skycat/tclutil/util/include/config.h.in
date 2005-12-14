@@ -91,4 +91,9 @@
  */
 #undef WORDS_BIGENDIAN
 
+/*
+ * Define for standard stream on Alphas.
+ */
+#undef __USE_STD_IOSTREAM
+
 #endif /* _config_H */

@@ -11,7 +11,8 @@
  */
 static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.7 2005/02/02 01:43:02 brighton Exp $";
 
-using namespace std;
+#include "config.h" // tclutil
+
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
@@ -21,6 +22,7 @@ using namespace std;
 #include "error.h"
 #include "TclCommand.h"
 
+using namespace std;
 
 // static member: used to generate unique names
 int TclCommand::seq_ = 0;

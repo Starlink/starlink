@@ -12,7 +12,6 @@
  */
 static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
 
-using namespace std;
 #include <cstdlib>
 #include <csignal>
 #include <cstdio>
@@ -26,6 +25,8 @@ using namespace std;
 #include "tcl.h"
 #include "tk.h"
 #include "error.h"
+
+using namespace std;
 
 // generated code for bitmaps used in tcl scripts
 void defineTclutilBitmaps(Tcl_Interp*);

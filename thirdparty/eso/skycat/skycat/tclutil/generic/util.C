@@ -17,7 +17,6 @@
 static const char* const rcsId="@(#) $Id: util.C,v 1.3 2005/02/02 01:43:00 brighton Exp $";
 
 
-using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -38,6 +37,7 @@ using namespace std;
 #include "error.h"
 #include "define.h"
 
+using namespace std;
 
 /*
  * util: make a copy of the given string array in a single buffer

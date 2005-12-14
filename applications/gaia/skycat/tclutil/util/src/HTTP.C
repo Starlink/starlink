@@ -20,7 +20,8 @@
  */
 static const char* const rcsId="@(#) $Id: HTTP.C,v 1.6 2005/02/02 01:43:00 brighton Exp $";
 
-using namespace std;
+#include "config.h" // tclutil
+
 #include <cstdio>
 #include <cctype>
 #include <cstdlib>
@@ -40,6 +41,8 @@ using namespace std;
 #include "util.h"
 #include "base64.h"
 #include "HTTP.h"
+
+using namespace std;
 
 
 #ifdef NEED_SOCKET_PROTO

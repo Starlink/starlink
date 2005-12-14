@@ -22,7 +22,8 @@
  */
 static const char* const rcsId="@(#) $Id: error.C,v 1.7 2005/02/02 01:43:00 brighton Exp $";
 
-using namespace std;
+#include "config.h"  // tclutil
+
 #include <cstdarg>
 #include <cstdlib>
 #include <iostream>
@@ -31,6 +32,9 @@ using namespace std;
 #include <cstdio>
 #include <cstring>
 #include "error.h"
+
+using namespace std;
+
 
 // static variable holding text of last error messages
 static char errmsg_[5*1024];

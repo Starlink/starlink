@@ -15,13 +15,13 @@ static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.5 2005/02/02 01:43:
 
 
 
-using namespace std;
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include "error.h"
 #include "ErrorHandler.h"
 
+using namespace std;
 
 /*
  * install an X error handler

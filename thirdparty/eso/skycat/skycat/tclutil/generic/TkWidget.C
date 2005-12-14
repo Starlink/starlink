@@ -13,9 +13,6 @@
 
 static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.6 2005/02/02 01:43:02 brighton Exp $";
 
-
-
-using namespace std;
 #include <cstdlib>
 #include <cctype>
 #include <iostream>
@@ -23,7 +20,7 @@ using namespace std;
 #include "config.h"
 #include "TkWidget.h"
 
-
+using namespace std;
 
 /*
  * Constructor - create the widget and install the tcl command of the
