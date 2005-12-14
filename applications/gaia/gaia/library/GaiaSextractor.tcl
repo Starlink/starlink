@@ -2272,7 +2272,6 @@ itcl::class gaia::GaiaSextractor {
 
                   #  Generate file names, include MEF extension if given.
                   set hdunum [$itk_option(-rtdimage) hdu]
-                  puts "hdunum = $hdunum"
                   if { $hdunum > 1 } {
                      set fitsname "$diskimage\[$hdunum\]"
                   } else {

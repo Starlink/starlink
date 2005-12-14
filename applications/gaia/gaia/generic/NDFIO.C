@@ -59,6 +59,8 @@
 //        safely pass this into Fortran, even on 64 bit machines.
 //     22-NOV-2005 (PWD):
 //        Switch to new byte swapping in Skycat 2.7.4.
+//     14-DEC-2005 (PWD):
+//        Implemented copy.
 //     {enter_changes_here}
 
 //-
@@ -563,3 +565,15 @@ void NDFIO::setReadonly( int status )
    gaiaSetReadMNDF( NDFinfo_, curd_, status );
 }
 
+//
+//  Create a copy. Wraps a simple NDF clone.
+//
+NDFIO* NDFIO::copy()
+{
+    void *newInfo = gaiaCloneMNDF( NDFinfo_ );
+    int newId = gaiaGetIdMNDF( newInfo, curd_ );
+
+    return new NDFIO( newInfo, curd_, component_, newId, 
+                      width_, height_, bitpix_, bzero_, bscale_, 
+                      header_, data_ );
+}

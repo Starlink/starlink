@@ -26,6 +26,8 @@
 //        Changed constructor to initialize WCS object.
 //     18-JAN-2000 (PWD):
 //        Add changes to support a "hdu" command for NDFs.
+//     14-DEC-2005 (PWD):
+//        Implement copy and setHDU members of ImageIORep.
 //-
 
 #include <cstdio>
@@ -133,6 +135,15 @@ public:
 
    //  Set readonly status of current displayable.
    void setReadonly( int status );
+
+   //  Create a copy.
+   virtual NDFIO* copy();
+
+   //  Switch to the i'th data component.
+   virtual int setHDU(int hdu) { 
+      return ( setDisplayable( hdu, "DATA" ) == 0 ); 
+   }
+
 };
 
 #endif // _NDFIO_h_

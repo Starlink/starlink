@@ -70,6 +70,12 @@ extern "C" {
    /*  Get readonly status of component */
    int gaiaGetReadMNDF( const void *handle, int index );
 
+   /*  Get the NDF identifier */
+   int gaiaGetIdMNDF( const void *handle, int index );
+
+   /* Create a cloned copy */
+   void *gaiaCloneMNDF( const void *handle ); 
+
 /*
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================

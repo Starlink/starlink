@@ -161,6 +161,12 @@ itcl::class gaia::GaiaNDFChooser {
             -text Quality \
             -command [code $this set_ndf_ quality]
       }
+      itk_component add display {
+         button $w_.buttons.display \
+            -text "Display as one image" \
+            -state disabled \
+            -command [code $this display_as_one_image]
+      }
       itk_component add show {
          checkbutton $w_.buttons.show \
             -text "Show NDF images" \
@@ -181,6 +187,7 @@ itcl::class gaia::GaiaNDFChooser {
       pack $itk_component(data) -side left -expand 1
       pack $itk_component(var) -side left -expand 1
       pack $itk_component(qual) -side left -expand 1
+      pack $itk_component(display) -side left -expand 1
       pack $itk_component(show) -side left -fill y -expand 1 
       pack $itk_component(close) -side left -expand 1
       pack $itk_component(buttons) -side top -fill x -expand 1
@@ -304,6 +311,9 @@ itcl::class gaia::GaiaNDFChooser {
       #  Enabled show image buttons, if more than one.
       if { $num_images_ > 1 } {
          $w_.buttons.show config -state normal
+         #if { $use_crpix } {
+         $w_.buttons.display config -state normal
+         #}
       }
 
       # Select the NDF being displayed, if any
@@ -472,6 +482,14 @@ itcl::class gaia::GaiaNDFChooser {
          } else {
             $itk_component(qual) configure -state disabled
          }
+      }
+   }
+
+   # Display all of the image extensions as a single image (combine based 
+   # on CRPIX1 and CRPIX2 keywords).
+   protected method display_as_one_image {} {
+      busy { 
+         $image_ hdu display 
       }
    }
 

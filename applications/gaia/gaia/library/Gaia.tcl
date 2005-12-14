@@ -577,7 +577,8 @@ itcl::class gaia::Gaia {
    #  Add a menubutton with the GAIA options.
    public method add_gaia_menu {} {
 
-      set m [add_menubutton Image-Analysis]
+      set toolmenu_ [add_menubutton Image-Analysis]
+      set m $toolmenu_
       configure_menubutton Image-Analysis -underline 0
       add_short_help $itk_component(menubar).image-analysis \
          {Image analysis menu: do astronomy with image}
@@ -1255,6 +1256,19 @@ itcl::class gaia::Gaia {
             $itk_component(contour) remove_contours
          }
       }
+
+      #  Disable toolbox menus if image is a Compound.
+      if { $toolmenu_ != {} } {
+         set rtdimage [$image_ get_image]
+         set state normal
+         if { [$rtdimage iscompound] } {
+            set state disabled
+         }
+         set end [$toolmenu_ index end]
+         for {set i 0} {$i < $end} {incr i} {
+            catch {$toolmenu_ entryconfigure $i -state $state}
+         }
+      }
    }
 
    #  Make the "Filters" menu.
@@ -1896,6 +1910,9 @@ window gives you access to this."
 
    #  Control re-creation of the help menu (gets called from Rtd and SkyCat).
    protected variable help_menu_done_ 0
+
+   # Name of menu with toolboxes.
+   protected variable toolmenu_ {}
 
    # -- Common variables --
 

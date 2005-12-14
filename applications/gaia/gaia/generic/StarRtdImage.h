@@ -47,6 +47,8 @@
 //       Added astmilliCmd to switch on milli-arcsec resolution.
 //    16-FEB-2004 (PWD):
 //       Added astalwaysmergeCmd.
+//    14-DEC-2005 (PWD):
+//       Added isCompoundCmd.
 //
 //-
 
@@ -274,6 +276,9 @@ class StarRtdImage : public Skycat
    //  "isfits" command.
    int isfitsCmd( int argc, char *argv[] );
 
+   //  "iscompound" command.
+   int isCompoundCmd( int argc, char *argv[] );
+
    //  Readonly command (used to make NDF writeable).
    int readonlyCmd( int argc, char *argv[] );
 
@@ -422,6 +427,9 @@ class StarRtdImage : public Skycat
 
    //  Get list of NDF properties.
    int ndfCmdList( int argc, char *argv[], NDFIO *ndf );
+
+   //  Display NDFs as single image.
+   int ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf );
 
    //  Get the FITS headers of the NDF.
    int ndfCmdFits( int argc, char *argv[], NDFIO *ndf );

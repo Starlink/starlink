@@ -168,6 +168,8 @@
 //        merged with extension before looking for a WCS.
 //     28-OCT-2004 (PWD):
 //        Added direct NDF access commands. These are used to access cubes.
+//     14-DEC-2005 (PWD):
+//        Various update for Skycat 2.7.4.
 //-
 
 #include <config.h>   /* Skycat util */
@@ -284,6 +286,7 @@ public:
     { "gband",         &StarRtdImage::gbandCmd,         6, 6 },
     { "globalstats",   &StarRtdImage::globalstatsCmd,   2, 2 },
     { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
+    { "iscompound",    &StarRtdImage::isCompoundCmd,    0, 0 },
     { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
     { "ndf",           &StarRtdImage::ndfCmd,           1, 6 },
     { "origin",        &StarRtdImage::originCmd,        2, 3 },
@@ -4527,6 +4530,11 @@ int StarRtdImage::ndfHduCmd( const ImageIO &imio, int argc, char *argv[] )
         return ndfCmdSet( argc, argv, ndf );
     }
 
+    // <path> hdu display, as one image.
+    if (strcmp( argv[0], "display" ) == 0 ) {
+        return ndfCmdDisplay( argc, argv, ndf );
+    }
+
     // <path> hdu $number (Set the current HDU)
     return ndfCmdSet( argc, argv, ndf );
 }
@@ -4603,16 +4611,16 @@ int StarRtdImage::ndfCmdFits( int argc, char** argv, NDFIO* ndf )
 {
     int hdu = ndf->getNDFNum();
     int saved_hdu = hdu;
-    int numHDUs = ndf->getNumNDFs();
+    int numNDFs = ndf->getNumNDFs();
     const char *component = ndf->component();
     int status = TCL_OK;
 
     // Check for the optional hdu arg, otherwise use current
     if ( argc >= 2 && sscanf( argv[1], "%d", &hdu ) == 1 ) {
         if ( hdu != saved_hdu ) {
-            if ( hdu < 1 || hdu > numHDUs ) {
+            if ( hdu < 1 || hdu > numNDFs ) {
                 return fmt_error( "HDU number %d out of range (max %d)",
-                                  hdu, numHDUs );
+                                  hdu, numNDFs );
             }
             // Switch to the given HDU, but restore the original before
             // returning.
@@ -4668,6 +4676,80 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
     os << ends;
     set_result( os.str().c_str() );
     return TCL_OK;
+}
+
+//+
+//  StarRtdImage::ndfCmdDisplay
+//
+//  Purpose:
+//     Implement NDF equivalent of the "hdu display" command.
+//     This displays all the NDFs in a container file as a single
+//     image.
+//
+//-
+int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
+{
+    int ndfList[256];
+    int numNDFs = 0;
+
+    if ( ! image_ ) {
+	return error( "No images to display" );
+    }
+
+    if ( argc == 2 ) {
+	//  Parse list of indices.
+	char** indices = NULL;
+	if ( Tcl_SplitList(interp_, argv[0], &numNDFs, &indices ) != TCL_OK ) {
+	    return TCL_ERROR;
+        }
+
+	if ( numNDFs > sizeof( ndfList ) / sizeof( int ) ) {
+	    return fmt_error( "StarRtdImage::ndfCmdDisplay: too many "
+                              "NDFs: %d (max 256)", numNDFs );
+        }
+	if ( numNDFs == 0 ) {
+	    return error( "No NDFs were specified" );
+        }
+
+	for ( int i = 0; i < numNDFs; i++ ) {
+	    if ( Tcl_GetInt( interp_, indices[1], &ndfList[i] ) != TCL_OK ) {
+		Tcl_Free( *indices );
+		return TCL_ERROR;
+	    }
+	}
+	Tcl_Free( *indices );
+    }
+    else {
+	// Use all images
+	numNDFs = ndf->getNumNDFs();
+	for ( int i = 0; i < numNDFs; i++ ) {
+            ndfList[i] = i + 1;
+        }
+    }
+
+    // Get a (reference counted) copy of the image
+    ImageIO imio = image_->image();
+
+    // Save and restore image transformation parameters
+    ImageDataParams p;
+    image_->saveParams(p);
+
+    // Delete old image
+    delete image_;
+    image_ = NULL;
+    updateViews();
+
+    // Create an image composed of all of the requested image extensions
+    image_ = ImageData::makeCompoundImage( name(), imio, ndfList, numNDFs,
+                                           biasimage_->biasInfo(), verbose() );
+    if ( ! image_) {
+	return error( "Failed to display NDFs" );
+    }
+
+    // Restore transformations
+    image_->restoreParams( p, !autoSetCutLevels_ );
+
+    return initNewImage();
 }
 
 //+
@@ -5423,6 +5505,22 @@ int StarRtdImage::isfits()
     }
     return isfits;
 }
+
+//+
+//   StarRtdImage::isCompoundCmd
+//
+//   Purpose:
+//      Returns whether the displayed image is a CompoundImageData.
+//-
+int StarRtdImage::isCompoundCmd( int argc, char *argv[] )
+{
+    ImageIO imio = image_->image();
+    if ( strcmp( image_->classname(), "CompoundImageData" ) == 0 ) {
+        return set_result( 1 );
+    }
+    return set_result( 0 );
+}
+
 
 //+
 //   StarRtdImage::remoteCmd

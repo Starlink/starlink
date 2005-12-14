@@ -990,14 +990,15 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
  *  Purpose:
  *     Get NDF identifier for a particular NDF.
  */
-void gaiaGetIdMNDF( const void *handle, int index, int *ndfid )
+int gaiaGetIdMNDF( const void *handle, int index  )
 {
    NDFinfo *current = NULL;
 
    current = getNDFInfo( handle, index );
    if ( current ) {
-      *ndfid = current->ndfid;
+       return current->ndfid;
    }
+   return NDF__NOID;
 }
 
 /*
@@ -1190,7 +1191,7 @@ void gaiaFreeMNDF( void *handle, int index )
  *     Obviously you should avoid mixed mode access to this file
  *     otherwise treat it as independent (i.e. close it sometime).
  */
-void *gaiaCloneMNDF( void *handle )
+void *gaiaCloneMNDF( const void *handle )
 {
     NDFinfo *current = (NDFinfo *) handle;
     NDFinfo *newInfo = NULL;

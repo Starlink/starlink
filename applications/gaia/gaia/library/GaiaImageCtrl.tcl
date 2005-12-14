@@ -602,7 +602,7 @@ itcl::class gaia::GaiaImageCtrl {
          -command [code $itk_component(info) updateValues]
    }
 
-   #  Clear the current image display and remove an windows that
+   #  Clear the current image display and remove any windows that
    #  access it (extend parent class version to also deal with
    #  temporary images).
    public method clear {} {
