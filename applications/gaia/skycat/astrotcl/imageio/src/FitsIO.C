@@ -366,7 +366,7 @@ fitsfile* FitsIO::openFitsMem(Mem& header)
 {
     // filename for error reporting
     const char* filename = header.filename();
-    int rw_flag;		// true if memory can be written to
+    int rw_flag = 0;		// true if memory can be written to
     if (filename) {
 	rw_flag = ((header.options() & Mem::FILE_RDWR) != 0);
     }
