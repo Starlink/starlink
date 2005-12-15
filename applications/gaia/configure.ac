@@ -34,14 +34,6 @@ STAR_INITIALISE_FORTRAN
 dnl    Sometimes also need to know the name of the Fortran MAIN.
 AC_FC_MAIN
 
-dnl    Define support for large files. We need to get at the 
-dnl    CFLAGS and pass these to the subsystems.
-STAR_LARGEFILE_SUPPORT
-if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
-   CFLAGS="$STAR_LARGEFILE_CFLAGS $CFLAGS"
-   export CFLAGS
-fi
-
 dnl    Check for X libraries. These should be passed on to subdirs.
 AC_PATH_X
 if test "X$x_includes" != "X"; then
@@ -58,14 +50,26 @@ dnl    that do not require special handling throughout the skycat/ and gaia/
 dnl    directories (normally template object files are created in
 dnl    various cxx_repository subdirectories, this way the object files are
 dnl    kept embedded the usual object files, see the cxx man page for details).
-dnl AC_CANONICAL_HOST
 case "$host" in
    alpha*) 
       if test "$CXX" = "cxx"; then 
-          AC_SUBST([DEC_CXX], ["-std gnu -D__USE_STD_IOSTREAM=1"])
+          AC_SUBST([DEC_CXX], [-std gnu -D__USE_STD_IOSTREAM=1])
+
+dnl    cxx doesn't like "-O -g", prefers "-O -g3"
+          if test "$CFLAGS" == "-g"; then
+             CFLAGS = "-g3"
+          fi
       fi
   ;;
 esac
+
+dnl    Define support for large files. We need to get at the 
+dnl    CFLAGS and pass these to the subsystems.
+STAR_LARGEFILE_SUPPORT
+if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
+   CFLAGS="$STAR_LARGEFILE_CFLAGS $CFLAGS"
+   export CFLAGS
+fi
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
