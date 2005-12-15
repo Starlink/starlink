@@ -402,7 +402,7 @@ double	*date;	/* Date as yyyy.mmdd (returned) */
 double	*time;	/* Time as hh.mmssxxxx (returned) */
 
 {
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
@@ -1661,7 +1661,7 @@ long	isec;	/* Seconds past 1970-01-01 */
 
 int
 tsu2tsi (isec)
-long	isec;	/* Seconds past 1970-01-01 */
+time_t	isec;	/* Seconds past 1970-01-01 */
 {
     double date, time;
     struct tm *ts;
@@ -1991,7 +1991,7 @@ double	*date;	/* Date as yyyy.mmdd (returned) */
 double	*time;	/* Time as hh.mmssxxxx (returned) */
 
 {
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
@@ -2048,7 +2048,7 @@ char *
 ut2fd()
 {
     int year, month, day, hour, minute, second;
-    long tsec;
+    time_t tsec;
     struct timeval tp;
     struct timezone tzp;
     struct tm *ts;
