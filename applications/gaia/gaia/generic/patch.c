@@ -180,6 +180,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 #endif
 
     /* Runtime initialisations. */
+    qualPtr = (byte *)NULL:
     opStr = (char *)NULL;
     result = 1;
     scale = 1.0f;
