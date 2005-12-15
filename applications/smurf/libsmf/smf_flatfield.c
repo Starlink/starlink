@@ -13,11 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatfield( smfData *data, int *status );
+*     smf_flatfield( smfData *idata, smfData **odata, int *status );
 
 *  Arguments:
-*     data = smfData* (Given and Returned)
+*     idata = smfData* (Given)
 *        Pointer to a smfData struct
+*     odata = smfData** (Given and Returned)
+*        Pointer to a smfData struct. If *odata is NULL a new smfData*
+*        will be created and stored in this location.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -40,6 +43,8 @@
 *     2005-12-12 (AGG):
 *        Add checks on data type and dimensions for the case that the
 *        data need flatfielding and odata exists
+*     2005-12-14 (AGG):
+*        Now calls smf_clone_data for when the data are already flatfielded
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,6 +84,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "ndf.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -120,23 +126,36 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
     if ( *odata == NULL) {
 
       /* If NULL then we need to clone idata to odata */
-      npts = (idata->dims)[0]*(idata->dims)[1]*(idata->dims)[2];
-      ipntr[0] = (idata->pntr)[0];
-      indata = ipntr[0];
 
-      /*      for ( i=0; i<npts; i++) {
-	printf("i = %d, indata = %g \n",i,indata[i]);
-	}*/
-      /*      *odata = smf_clone_data( idata, status );*/
       smf_clone_data( idata, odata, status );
 
-      msgOut("smf_flatfield","Data FF, no odata", status);
+      msgOutif(MSG__VERB, "smf_flatfield", "Data FF, no odata", status);
 
     } else {
 
       /* Check dimensions and type */
+      dtype = (*odata)->dtype;
+      ndims = (*odata)->ndims;
+      indims = idata->ndims;
 
-      msgOut("smf_flatfield","Data FF, odata exists", status);
+      nboll = ((*odata)->dims)[0]*((*odata)->dims)[1];
+      nframes = ((*odata)->dims)[2];
+      npts = nboll * nframes;
+
+      if ( dtype != SMF__DOUBLE ) {
+        *status = SAI__ERROR;
+        errRep( "smf_flatfield", "Output data type is not set to _DOUBLE", status);
+      } else if ( ndims != indims ) {
+        msgSeti( "NDIMS", ndims);
+        msgSeti( "IDIMS", indims);
+        *status = SAI__ERROR;
+        errRep( "smf_flatfield", 
+		"Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
+      } else {
+
+      }      
+
+      msgOutif(MSG__VERB, "smf_flatfield","Data FF, odata exists", status);
     }
 
   } else if ( checkflatstatus == SAI__OK ) { 
@@ -148,11 +167,13 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
     if ( *odata == NULL) {
 
       msgOutif(MSG__VERB, "smf_flatfield","Data not FF, no odata", status);
-      /* If NULL then we need create odata not associated with a file */
+      /* If NULL then we need create odata not associated with a file
+	 (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
       *odata = malloc( sizeof( smfData ) );
       hdr = malloc( sizeof( smfHead ) );
       da = malloc( sizeof( smfDA ) );
+      file = malloc( sizeof( smfFile ) );
 
       /* Copy old hdr into the new hdr */
       memcpy( hdr, idata->hdr, sizeof( smfHead ) );
@@ -160,8 +181,13 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       (*odata)->hdr = hdr; 
 
       /* Copy flatfield info to output struct */
-      memcpy( da, idata->da, sizeof( smfDA ));
+      memcpy( da, idata->da, sizeof( smfDA ) );
       (*odata)->da = da;
+
+      /* Set the (non) file info */
+      (*odata)->file = file;
+      file->ndfid = NDF__NOID;
+      file->xloc = NULL;
 
       /* Set data type */
       (*odata)->dtype = SMF__DOUBLE; 
@@ -241,6 +267,15 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	  (*odata)->da = da;
 	}
 
+	/* Does the file (smfFile) struct exist? */
+	file = (*odata)->file;
+	if ( file == NULL ) {
+	  file = malloc( sizeof( smfFile ) );
+	  /* Copy file info */
+	  memcpy( file, idata->file, sizeof( smfFile ) );
+	  (*odata)->file = file;
+	}
+
 	/* Store pointer to input data */
 	ipntr[0] = (idata->pntr)[0];
 	tstream = ipntr[0];
@@ -272,3 +307,4 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
   *status = checkflatstatus;
 }
+
