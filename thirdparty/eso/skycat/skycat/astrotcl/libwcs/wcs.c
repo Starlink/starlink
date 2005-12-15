@@ -2160,7 +2160,7 @@ double  *ypos;           /* y (dec) coordinate (deg) */
     double phi, theta;
     const char ctype[4][9];
 
-    memcpy(ctype, wcs->ctype, sizeof(ctype));
+    memcpy((char *)ctype, wcs->ctype, sizeof(ctype));
 
     *xpos = 0.0;
     *ypos = 0.0;
@@ -2203,7 +2203,7 @@ double  *ypix;          /* y pixel number  (dec or lat without rotation) */
     double phi, theta;
     const char ctype[4][9];
 
-    memcpy(ctype, wcs->ctype, sizeof(ctype));
+    memcpy((char *)ctype, wcs->ctype, sizeof(ctype));
 
     *xpix = 0.0;
     *ypix = 0.0;
