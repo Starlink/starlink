@@ -13,7 +13,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatten( .... int *status );
+*     smf_flatten( smfData *data, int *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
@@ -82,16 +82,11 @@
 
 void smf_flatten ( smfData *data, int *status ) {
 
-  double *dataArr = NULL;       /* Pointer to flatfielded data array */
-
-  smfDA * da = NULL;            /* Pointer to struct containing flatfield info */
-  void * pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
-  int nboll;                    /* Number of bolometers */
-  int npts;
-  int i;
-  int j;
-  int nframes;
-  int *tstream;
+  smfDA *da = NULL;            /* Pointer to struct containing flatfield info */
+  double *dataArr = NULL;      /* Pointer to flatfielded data array */
+  int nboll;                   /* Number of bolometers */
+  int nframes;                 /* Number of frames (timeslices) */
+  void *pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
 
   if ( *status != SAI__OK ) return;
 
@@ -120,13 +115,11 @@ void smf_flatten ( smfData *data, int *status ) {
     /* Calculate the number of bolometer and number of frames (timeslices) */
     nboll = (data->dims)[0]*(data->dims)[1];
     nframes = (data->dims)[2];
-    /* Total number of data points */
-    npts = nboll * nframes;
 
     /* Flatfielder */
     sc2math_flatten( nboll, nframes, da->flatname, da->nflat, da->flatcal,
 		     da->flatpar, dataArr, status);
 
   }
-  return;
 }
+
