@@ -30,6 +30,8 @@
 *        Document some of the struct items
 *     2005-11-23 (TIMJ):
 *        HDS Locator has changed type
+*     2005-12-14 (TIMJ):
+*        Add reference counter to smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -75,25 +77,26 @@ typedef enum smf_dtype {
   SMF__NULL,
   SMF__INTEGER,
   SMF__FLOAT,
-  SMF__DOUBLE
+  SMF__DOUBLE,
+  SMF__USHORT,
 } smf_dtype;
 
 /* Global information about the data file itself */
 
 typedef struct smfFile {
-  int ndfid;                /* NDF ID of file if opened by SMURF */
-  int isSc2store;           /* True if file opened by sc2store library */
-  int isTstream;            /* True if file contains time series data */
+  int ndfid;                 /* NDF ID of file if opened by SMURF */
+  int isSc2store;            /* True if file opened by sc2store library */
+  int isTstream;             /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
-  HDSLoc * xloc;            /* Locator to .MORE.FRAMEDATA (if applicable) */
+  HDSLoc * xloc;             /* Locator to .MORE.FRAMEDATA (if applicable) */
 } smfFile;
 
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
   struct sc2head * sc2head; /* Time slice structure for same slice as wcs */
-  AstFrameSet * wcs;       /* Framset for a particular time slice */
-  AstFitsChan * fitshdr;   /* FITS header from the file */
+  AstFrameSet * wcs;        /* Framset for a particular time slice */
+  AstFitsChan * fitshdr;    /* FITS header from the file */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
@@ -113,13 +116,15 @@ typedef struct smfDA {
 */
 
 typedef struct smfData {
-  smfFile * file;         /* File information */
-  smfHead * hdr;          /* Header information */
-  smfDA * da;             /* If sc2store, associated data arrays */
-  smf_dtype dtype;        /* Data type of DATA and VARIANCE arrays */
-  void * pntr[3];         /* Array of pointers to DATA, VARIANCE and QUALITY */
+  smfFile * file;          /* File information */
+  smfHead * hdr;           /* Header information */
+  smfDA * da;              /* If sc2store, associated data arrays */
+  smf_dtype dtype;         /* Data type of DATA and VARIANCE arrays */
+  void * pntr[3];          /* Array of pointers to DATA, VARIANCE and QUALITY */
   dim_t dims[NDF__MXDIM];  /* Dimensions of data array */
-  int ndims;              /* Number of active dimensions in "dims" */
+  int ndims;               /* Number of active dimensions in "dims" */
+  int refcount;            /* Reference count for data object */
 } smfData;
 
 #endif /* SMF_TYP_DEFINED */
+
