@@ -50,11 +50,11 @@ README.
       % setenv STARCONF_DEFAULT_PREFIX   /local-star
 
    or
- 
+
       % export STARCONF_DEFAULT_STARLINK=/local-star  # sh
       % export STARCONF_DEFAULT_PREFIX=/local-star
 
--  Delete any previous Starlink environment variables. 
+-  Delete any previous Starlink environment variables.
 
       % unsetenv INSTALL  # csh
       % unsetenv STARLINK
@@ -65,9 +65,9 @@ README.
       % unset STARLINK
 
    and also make sure that an old-style Starlink system is not in your
-   path (since tools like messgen will get very confused). 
-   
-   You may also run into difficulties if you have previously sourced 
+   path (since tools like messgen will get very confused).
+
+   You may also run into difficulties if you have previously sourced
    the ${STARLINK}/etc/login and ${STARLINK}/etc/cshrc scripts that
    existed from a previous classic mk-build Starlink install, as
    even with $STARLINK removed from your path some applications may
@@ -75,7 +75,7 @@ README.
    is a `new' one, from a previous autoconf install, you will
    probably be fine (although you may need to remove installed
    manifest files).
-   
+
  - Review any other environment variables that might affect the build.
    For example, the variables F77, FC and CC will force the build
    system to use the specified compilers.  In particular, the default
@@ -86,6 +86,13 @@ README.
    force certain compilers to be used, it is probably better to unset
    these variables before building the software.  See './configure
    --help' for a list of `some influential environment variables'.
+
+   At the time of writing (December 2005) it is known that the gfortran
+   compiler will not work. If this is picked up by default on your
+   system you need to re-define FC and F77 to select another compiler.
+   There are encouraging signs this may change, but in the meanwhile the 
+   g95 version is known to work (thanks to Andy Vaught for his help with 
+   this).
 
  - First bootstrap the system.  This builds and installs the
    buildsupport system (the tools in the buildsupport directory, plus
@@ -126,7 +133,7 @@ README.
 
       % ./configure -C   # -C means caching results
       % make world
- 
+
    If you need to give ./configure some help to find include files and
    libraries (for example, you are on a Mac and have installed Fink in
    /sw or OpenDarwin in /opt/local, or are on a Sun and have extra
@@ -140,7 +147,7 @@ README.
  - If you wish to disable the building of shared libraries you should
    use the --disable-shared configure option when you give the
    ./configure command above.
- 
+
       % ./configure -C --disable-shared
 
  - By default, the system will be configured so that all
