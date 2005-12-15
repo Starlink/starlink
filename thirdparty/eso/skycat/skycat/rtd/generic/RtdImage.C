@@ -1249,8 +1249,6 @@ int RtdImage::setScale(int xScale, int yScale)
 
     // also scale any views that don't have a fixed scale
     return updateViews(2);
-
-    return TCL_OK;
 }
 
 
