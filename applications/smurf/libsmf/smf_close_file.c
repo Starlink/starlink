@@ -16,8 +16,9 @@
 *     smf_close_file( smfData **data, int * status );
 
 *  Arguments:
-*     data = smfData * (Returned)
-*        Pointer to smfData struct containing file info and data
+*     data = smfData ** (Returned)
+*        Pointer to Pointer to smfData struct containing file info and data.
+*        Will be NULLed on exit.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -27,6 +28,8 @@
 *     Resources will be freed (or an attempt will be made) even if
 *     status is bad on entry. This means that all pointers should be
 *     initialised to NULL by the caller to protect against bad frees.
+*     Only frees resources if the reference count on entry is 1.
+*     Reference counts are always decremented even if status is bad.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -40,6 +43,8 @@
 *        Fixed memory unallocation problems
 *     2005-12-05 (TIMJ):
 *        Tidy up logic from Ed's patch
+*     2005-12-15 (TIMJ):
+*        Add check for reference count.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,6 +99,11 @@ void smf_close_file( smfData ** data, int * status ) {
     /* null pointer so just return */
     return;
   }
+
+  /* Process reference count */
+  /* Only proceed if the decremented reference count is 0 */
+  (*data)->refcount--;
+  if ((*data)->refcount > 0 ) return;
 
   /* Tidy up the header */
   hdr = (*data)->hdr;
