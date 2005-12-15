@@ -47,6 +47,10 @@
 *     2005-12-12 (AGG):
 *        Use smf_flatfield, remove need to include sc2da info, fix
 *        loop counter bug
+*     2005-12-14 (AGG/TIMJ):
+*        Use smf_open_file on the output data. Note that
+*        smf_close_file has been temporarily commented out until it is
+*        also updated to take account of reference counting.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,6 +113,7 @@ void smurf_flatfield( int *status ) {
   int j;                    /* Counter, index */
   int nboll;                /* Number of bolometers */
   int ndfdims[NDF__MXDIM];  /* Dimensions of input NDF */
+  char ndftype[NDF__SZTYP]; /* Type of data in output data file */
   int ndims;                /* Number of active dimensions in input */
   int nframes;              /* Number of time slices */
   int nout;                 /* Number of data points in output data file */
@@ -148,7 +153,9 @@ void smurf_flatfield( int *status ) {
     if ( da != NULL ) {
       msgSetc("FLATNAME", da->flatname);
       msgSeti("NFRAMES", (data->dims)[2]);
-      msgOutif(MSG__VERB, " ", "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", status);
+      msgOutif(MSG__VERB, " ", 
+	       "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", 
+	       status);
     } else { /* What if 10 out of 20 are bad? .... */
       if ( *status == SAI__OK) {
 	/*        *status = SAI__ERROR;
@@ -159,36 +166,10 @@ void smurf_flatfield( int *status ) {
     /* Set parameters of the DATA array in the output file */
     ndfStype( "_DOUBLE", outndf, "DATA", status);
     ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
-    ndfDim( outndf, NDF__MXDIM, ndfdims, &ndims, status );
 
-    /* Check ndims = 3 and that output ndims = ndims of input*/
-    if ( *status == SAI__OK ) {
-      if ( ndims != 3 ) {
-        msgSeti( "NDIMS", ndims);
-        *status = SAI__ERROR;
-        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to 3", status);
-      } else if ( ndims != data->ndims) {
-        msgSeti( "NDIMS", ndims);
-        msgSeti( "IDIMS", data->ndims);
-        *status = SAI__ERROR;
-        errRep( "smurf_flatfield", "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
-      }
-    }
+    ndfAnnul( &outndf, status);
 
-    /* We have to store the output DATA pointer in a smfData */
-    ffdata = malloc( sizeof( smfData ) );
-    (ffdata->pntr)[0] = outdata;
-    /* Also set the data type, dimensions and extent in each dimension */
-    ffdata->dtype = SMF__DOUBLE;
-    ffdata->ndims = ndims;
-    for ( j=0; j<ndims; j++ ) {
-      (ffdata->dims)[j] = (data->dims)[j];
-    }
-
-    /* For safety define da, hdr and file as a null pointers */
-    ffdata->da = NULL;
-    ffdata->hdr = NULL;
-    ffdata->file = NULL;
+    smf_open_file( ogrp, i, "WRITE", &ffdata, status);
 
     /* Call flatfield routine */
     smf_flatfield( data, &ffdata, status );
@@ -196,18 +177,14 @@ void smurf_flatfield( int *status ) {
       errAnnul( status );
       msgOutif(MSG__VERB, "smurf_flatfield",
 	     "smurf_flatfield: Data are already flatfielded", status);
+    } else {
+      msgOutif(MSG__VERB," ","Flat field applied", status);
     }
 
-    ndfAnnul( &outndf, status);
-
-    /* Should check status.... */
-
-    msgOutif(MSG__VERB," ","Flat field applied", status);
-
-    smf_close_file( &data, status );
+    /*    smf_close_file( &data, status );*/
+    /*smf_close_file( &ffdata, status );*/
 
   }
-
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &igrp, status);
@@ -215,3 +192,4 @@ void smurf_flatfield( int *status ) {
 
   ndfEnd( status );
 }
+
