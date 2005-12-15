@@ -94,6 +94,7 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	export INSTALL; unset INSTALL; \
 	export SKYCAT_WRAPPER_DIR; unset SKYCAT_WRAPPER_DIR; \
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
+	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
 	cp -p ./built/lib/rtd/demos/rtdClient$(EXEEXT) .
@@ -115,6 +116,7 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	FCFLAGS="$(FCFLAGS) $(STAR_FCFLAGS)"; export FCFLAGS;\
 	FC="$(FC)"; export FC;\
+	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
 	./configure --prefix=$${pwd}/built;\
 	make -e all install)
 	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES); do \

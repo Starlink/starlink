@@ -51,6 +51,22 @@ if test "X$x_libraries" != "X"; then
    AC_SUBST([X11_LIBRARIES], [--x-libraries=$x_libraries])
 fi
 
+dnl    The cxx C++ compiler under Tru64 UNIX needs the special environment
+dnl    variable DEC_CXX="-std gnu -D__USE_STD_IOSTREAM=1". These allow 
+dnl    the standard library streams headers to work and to generate templates
+dnl    that do not require special handling throughout the skycat/ and gaia/
+dnl    directories (normally template object files are created in
+dnl    various cxx_repository subdirectories, this way the object files are
+dnl    kept embedded the usual object files, see the cxx man page for details).
+dnl AC_CANONICAL_HOST
+case "$host" in
+   alpha*) 
+      if test "$CXX" = "cxx"; then 
+          AC_SUBST([DEC_CXX], [-std gnu -D__USE_STD_IOSTREAM=1])
+      fi
+  ;;
+esac
+
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
      [ard ast cat cfitsio generic fio img pcs pda sae sla], link)
