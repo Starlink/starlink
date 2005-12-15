@@ -62,7 +62,7 @@ dnl AC_CANONICAL_HOST
 case "$host" in
    alpha*) 
       if test "$CXX" = "cxx"; then 
-          AC_SUBST([DEC_CXX], [-std gnu -D__USE_STD_IOSTREAM=1])
+          AC_SUBST([DEC_CXX], ["-std gnu -D__USE_STD_IOSTREAM=1"])
       fi
   ;;
 esac
