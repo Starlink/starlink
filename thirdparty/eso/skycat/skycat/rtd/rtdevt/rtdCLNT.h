@@ -15,7 +15,9 @@
  *----------------------------------------------------------------------
  */
 
+#ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
+#endif
 
 #include "rtdImageEvent.h"
 #include "rtdSem.h"
@@ -45,52 +47,52 @@ public:
     ~rtdCLNT();
 
     // store/return the name of the requestor
-    char *rtdCLNT::ReqName() { return reqName_; }
-    void  rtdCLNT::ReqName(char *name) { strncpy (reqNameBuf_, name, RTD_NAMELEN); }
+    char *ReqName() { return reqName_; }
+    void  ReqName(char *name) { strncpy (reqNameBuf_, name, RTD_NAMELEN); }
   
     // store/return the name of the camera
-    char *rtdCLNT::CamName() { return camName_; }
-    void  rtdCLNT::CamName(char *name) { strncpy (camNameBuf_, name, RTD_NAMELEN); }
+    char *CamName() { return camName_; }
+    void  CamName(char *name) { strncpy (camNameBuf_, name, RTD_NAMELEN); }
   
     // store/return the name of the socket file descriptor
-    int   rtdCLNT::Socket() { return socket_; }
-    void  rtdCLNT::Socket(int socket) { socket_ = socket; }
+    int   Socket() { return socket_; }
+    void  Socket(int socket) { socket_ = socket; }
   
     // return the semaphore params set by the requestor
-    int   rtdCLNT::semId() { return semId_; }
+    int   semId() { return semId_; }
   
     // return the number of semaphores
-    int   rtdCLNT::shmNum() { return shmNum_; }
+    int   shmNum() { return shmNum_; }
 
     // set the values for semId and shmNum
-    void  rtdCLNT::SetSemPar(int semId, int shmNum);
+    void  SetSemPar(int semId, int shmNum);
    
     // store/return the index
-    int   rtdCLNT::Index() { return index_; }
-    void  rtdCLNT::Index(int index) { index_ = index; }
+    int   Index() { return index_; }
+    void  Index(int index) { index_ = index; }
    
     // store/return the port number
-    int   rtdCLNT::Port() { return port_; }
-    void  rtdCLNT::Port(int port) { port_ = port; }
+    int   Port() { return port_; }
+    void  Port(int port) { port_ = port; }
    
     // store/return the type number
-    int   rtdCLNT::Type() { return type_; }
-    void  rtdCLNT::Type(int type) { type_ = type; }
+    int   Type() { return type_; }
+    void  Type(int type) { type_ = type; }
  
     // clear a buffer
-    void  rtdCLNT::BufClear(char *name) { memset (name, '\0', RTD_NAMELEN); }
+    void  BufClear(char *name) { memset (name, '\0', RTD_NAMELEN); }
   
     // are we attched?
-    int   rtdCLNT::Attached() { return (*reqName_ == '\0' || *camName_ == '\0'); }
+    int   Attached() { return (*reqName_ == '\0' || *camName_ == '\0'); }
 
-    void  rtdCLNT::Attach(char* reqName, char *camName);
-    void  rtdCLNT::Detach();
+    void  Attach(char* reqName, char *camName);
+    void  Detach();
 
-    int   rtdCLNT::Forward(rtdPACKET *rtdPacket);
-    void  rtdCLNT::Cleanup();
-    int   rtdCLNT::Accept(int listenSocket);
-    int   rtdCLNT::AttachedToCamera(char *camera);
-    char *rtdCLNT::TypeName();
+    int   Forward(rtdPACKET *rtdPacket);
+    void  Cleanup();
+    int   Accept(int listenSocket);
+    int   AttachedToCamera(char *camera);
+    char *TypeName();
   
 private:
     char *reqName_;                    // name of requestor

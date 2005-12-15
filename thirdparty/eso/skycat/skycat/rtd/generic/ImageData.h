@@ -357,16 +357,16 @@ public:
     int getSpectrum(double* xyvalues, int x0, int y0, int x1, int y1);
 
     // get meander coords of a horizontal line at position y (index starting at 0)
-    int ImageData::getXline4(int y, int x0, int x1,  double *xyvalues);
+    int getXline4(int y, int x0, int x1,  double *xyvalues);
 
     // same as getXline4 but with specified x ranges (start xr0, delta dxr)
-    int ImageData::getXline4(int y, int x0, int x1,  double *xyvalues, double xr0, double dxr);
+    int getXline4(int y, int x0, int x1,  double *xyvalues, double xr0, double dxr);
 
     // get meander coords of a vertical line at position x (index starting at 0)
-    int ImageData::getYline4(int x, int y0, int y1,  double *xyvalues);
+    int getYline4(int x, int y0, int y1,  double *xyvalues);
 
     // Return the image coords of the visible image area (bounding box)
-    void ImageData::getBbox(double *x0, double *x1, double *y0, double *y1);
+    void getBbox(double *x0, double *x1, double *y0, double *y1);
 
     // get min and max values of an image area
     int getMinMax(double rx0, double ry0, int w, int h, double *minval, double *maxval);

@@ -451,7 +451,7 @@ public:
     static int rtd_set_cmap(ClientData, Tcl_Interp* interp, int argc, char** argv);
  
     // update idle tasks and performance test variables
-    void RtdImage::updateRequests();   
+    void updateRequests();   
 
     // read-only access to configuration options
     static ImageColor* colors() {return colors_;}

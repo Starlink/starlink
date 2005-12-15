@@ -28,11 +28,11 @@ void formatHM(double val, char* buf);
 class RtdDebugLog {
 public:
     
-    RtdDebugLog::RtdDebugLog(char *nam, int debug);
+    RtdDebugLog(char *nam, int debug);
 
-    void RtdDebugLog::log(const char *format, ...);
-    void RtdDebugLog::setlog(int set) {debug_ = set;}
-    int  RtdDebugLog::setlog() {return debug_;}
+    void log(const char *format, ...);
+    void setlog(int set) {debug_ = set;}
+    int  setlog() {return debug_;}
     
 protected:
     char name_[100];  // name of application

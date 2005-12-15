@@ -23,42 +23,42 @@ class RtdPerf {
 
 public:
     // Constructor
-    RtdPerf::RtdPerf(Tcl_Interp* interp);
+    RtdPerf(Tcl_Interp* interp);
 
     // Destructor
-    RtdPerf::~RtdPerf();
+    ~RtdPerf();
 
     // Add delta time to 'timevar'
-    void   RtdPerf::timeInc(double *timevar);
+    void   timeInc(double *timevar);
  
     // Start a new cycle
-    void   RtdPerf::newCycle();
+    void   newCycle();
 
     // End a cycle and set the Tcl global variables
-    void   RtdPerf::endCycle();
+    void   endCycle();
 
     // Reset the time variables and Tcl global variables
-    void   RtdPerf::reset();
+    void   reset();
 
     // Switch performance test on
-    void   RtdPerf::on() {maybeOn_ = 1; on_ = 0;}
-    void   RtdPerf::on(int set) {on_ = set;}
+    void   on() {maybeOn_ = 1; on_ = 0;}
+    void   on(int set) {on_ = set;}
 
     // Switch performance test on
-    void   RtdPerf::off() {maybeOn_ = 0; on_ = 0;}
+    void   off() {maybeOn_ = 0; on_ = 0;}
 
     // Set verbose and debug flag
-    void   RtdPerf::verbose(int set) {verbose_ = set;}
-    void   RtdPerf::debug(int set) {debug_ = set;}
+    void   verbose(int set) {verbose_ = set;}
+    void   debug(int set) {debug_ = set;}
 
     // Set the instance name of the RtdImage (used for global Tcl variables)
-    void   RtdPerf::name(char *nam) {strcpy(name_, nam);}
+    void   name(char *nam) {strcpy(name_, nam);}
 
     // -- short cuts --
 
-    void  RtdPerf::GENtime() {timeInc(&GENtime_);}
-    void  RtdPerf::TCLtime() {timeInc(&TCLtime_);}
-    void  RtdPerf::Xtime() {timeInc(&Xtime_);}
+    void  GENtime() {timeInc(&GENtime_);}
+    void  TCLtime() {timeInc(&TCLtime_);}
+    void  Xtime() {timeInc(&Xtime_);}
 
 protected:
     RtdDebugLog *dbl_;    // debug log object
@@ -84,9 +84,9 @@ protected:
 
     // -- short cuts --
 
-    char* RtdPerf::name() {return(name_);}
-    int   RtdPerf::isOn() {return on_;}
-    int   RtdPerf::maybeOn() {return maybeOn_;}
+    char* name() {return(name_);}
+    int   isOn() {return on_;}
+    int   maybeOn() {return maybeOn_;}
 };
 
 #endif /* _RtdPerf_h_ */

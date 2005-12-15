@@ -24,8 +24,8 @@ public:
     rtdLOG(int);
     ~rtdLOG();
 
-    void  rtdLOG::log(const char *format, ...);
-    int   rtdLOG::Verbose() { return verbose_; }
+    void  log(const char *format, ...);
+    int   Verbose() { return verbose_; }
 
 private:
     int verbose_;

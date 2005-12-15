@@ -49,7 +49,7 @@ class RtdCamera {
 public:
 
     // constructor
-    RtdCamera::RtdCamera(
+    RtdCamera(
 	const char* name,
 	Tcl_Interp*,
 	int verbose,
@@ -57,64 +57,64 @@ public:
 	char* image = "RtdCamera");
     
     // destructor 
-    virtual RtdCamera::~RtdCamera();
+    virtual ~RtdCamera();
 
     // static file handler, called by Tk file handler for realtime image events
-    static void RtdCamera::fileEventProc(ClientData, int mask);
+    static void fileEventProc(ClientData, int mask);
 
     // start/stop/pause or continue accepting images
-    int   RtdCamera::start(const char* cameraName);
-    int   RtdCamera::stop();
-    int   RtdCamera::pause();
-    int   RtdCamera::cont();
+    int start(const char* cameraName);
+    int stop();
+    int pause();
+    int cont();
 
     // return camera name
-    char* RtdCamera::camera() {return camera_;}
+    char* camera() {return camera_;}
 
     // Add timestamp in performance tool.
-    void  RtdCamera::timeStamp(char *evDesc);
+    void timeStamp(char *evDesc);
 
     // update global variables
-    int   RtdCamera::updateGlobals();
+    int updateGlobals();
 
     // check if camera is attached
-    int   RtdCamera::attached();
+    int attached();
 
 protected:
 
     // member called by fileEventProc for image events
-    int   RtdCamera::fileEvent();
+    int fileEvent();
 
     // cleanup image events in the socket queue
-    void  RtdCamera::cleanup();
+    void cleanup();
 
     // called to display new image from shared memory
     // (defined in a derived class)
-    virtual int RtdCamera::display(const rtdIMAGE_INFO&, const Mem& data) = 0;
+    virtual int display(const rtdIMAGE_INFO&, const Mem& data) = 0;
 
     // set camera name
-    void  RtdCamera::camera(const char *camera) {strcpy(camBuf_, camera);}
+    void camera(const char *camera) {strcpy(camBuf_, camera);}
 
     // create/delete the Tcl file handler
-    void  RtdCamera::fileHandler(int create);
+    void fileHandler(int create);
 
     // disconnect from camera
-    void  RtdCamera::disconnect();
+    void disconnect();
 
     // Decrement the semaphore
-    void  RtdCamera::semDecr();
+    void semDecr();
 
     // check if rtdServer is alive
-    void  RtdCamera::rtdServerCheck();
+    void rtdServerCheck();
 
     // check status after image event failure
-    void  RtdCamera::checkStat();
+    void checkStat();
 
     // start accepting events from the camera
-    int   RtdCamera::attach(const char* camera);
+    int attach(const char* camera);
 
     // check image type
-    int   RtdCamera::checkType(int type);
+    int checkType(int type);
 
     Tcl_Interp* interp_;           // Tcl interp (for file events, error handling)
     rtdIMAGE_EVT_HNDL* eventHndl_; // image event handle
@@ -134,9 +134,9 @@ protected:
 
     // -- short cuts --
 
-    int   RtdCamera::connected() {return connected_;}
-    void  RtdCamera::connected(int set) {connected_ = set; }
-    void  RtdCamera::attached(int set) {attached_ = set; }
+    int connected() {return connected_;}
+    void connected(int set) {connected_ = set; }
+    void attached(int set) {attached_ = set; }
 };
 
 #endif /* _RtdCamera_h_ */

@@ -40,15 +40,15 @@ public:
     rtdSERVER(int, int, int);
     ~rtdSERVER();
   
-    int      rtdSERVER::Loop();
+    int      Loop();
   
 protected:
-    rtdCLNT *rtdSERVER::GetCurrClient();
-    void     rtdSERVER::ServImageCmd(rtdPACKET *rtdPacket);
-    void     rtdSERVER::ServStatusCmd(int socket);
-    int      rtdSERVER::IncrSem(rtdPACKET *rtdPacket, int increment);
-    rtdCLNT *rtdSERVER::Accept();
-    void     rtdSERVER::DisconnectClient(rtdCLNT *client);
+    rtdCLNT *GetCurrClient();
+    void     ServImageCmd(rtdPACKET *rtdPacket);
+    void     ServStatusCmd(int socket);
+    int      IncrSem(rtdPACKET *rtdPacket, int increment);
+    rtdCLNT *Accept();
+    void     DisconnectClient(rtdCLNT *client);
 
 private:
     int       socketFd_;           // listen socket

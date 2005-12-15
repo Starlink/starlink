@@ -78,7 +78,7 @@ public:
     }
 
     // flush X output buffer
-    void ImageDisplay::flushX();
+    void flushX();
 
     // other info
     int width() {return xImage_ ? xImage_->width : 0;}
