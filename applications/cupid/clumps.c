@@ -90,10 +90,12 @@ void clumps() {
 *        
 *        where <keyword> has the form "algorithm.param"; that is, the name
 *        of the algorithm, followed by a dot, followed by the name of the
-*        parameter to be set. The parameters available for each algorithm
-*        are listed in the "Configuration Parameters" section below. Default 
-*        values will be used for any unspecified parameters. Unrecognised
-*        options are ignored (that is, no error is reported). [current value]
+*        parameter to be set. If the algorithm name is omitted, the current
+*        algorithm given by parameter METHOD is assumed. The parameters 
+*        available for each algorithm are listed in the "Configuration 
+*        Parameters" sections below. Default values will be used for any 
+*        unspecified parameters. Unrecognised options are ignored (that is, 
+*        no error is reported). [current value]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of diagnostic information reported. It
 *        should be in the range 0 to 6. A value of zero will suppress all 
@@ -163,12 +165,10 @@ void clumps() {
 *     and then follows them down to lower intensities. No a priori clump
 *     profile is assumed. In this algorithm, clumps never overlap.
 
-*  Configuration Parameters:
-*     Each supported algorithm uses several configuration parameters,
-*     values for which can be specified using the CONFIG parameter. These
-*     are listed below. Each parameter is specified by the algorithm
-*     name, followed by a dot, followed by the parameter name. Default
-*     values are shown in square brackets:
+*  GaussClumps Configuration Parameters:
+*     The GaussClumps algorithm uses the following configuration parameters. 
+*     Values for these parameters can be specified using the CONFIG parameter. 
+*     Default values are shown in square brackets:
 *
 *     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
 *     pixels. The fitted Gaussians are not allowed to be smaller than the
@@ -201,7 +201,9 @@ void clumps() {
 *     - GaussClumps.RMS: The RMS noise in the data. The default value is
 *     determined by the Variance component in the input data. If there is
 *     no Variance component, an estimate of the global noise level in the
-*     data is made and used. The RMS value determines the termination
+*     data is made by looking at the differences between neighbouring
+*     pixel values. Any pixel-to-pixel correlation in the noise can result 
+*     in this estimate being too low. The RMS value determines the termination
 *     criterion (see GaussClumps.Thresh and GaussClumps.NPad). []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
@@ -243,6 +245,67 @@ void clumps() {
 *     Gaussian weighting function has the same centre as the initial guess 
 *     Gaussian. [2.0]
 
+*  ClumpFind Configuration Parameters:
+*     The ClumpFind algorithm uses the following configuration parameters. 
+*     Values for these parameters can be specified using the CONFIG parameter. 
+*     Default values are shown in square brackets:
+*
+*     - ClumpFind.DeltaT: The gap between the contour levels. Only accessed 
+*     if no value is supplied for "Level1", in which case the contour levels 
+*     are linearly spaced, starting at a lowest level given by "Tlow" and 
+*     spaced by "DeltaT". Note, small values of DeltaT can result in noise 
+*     spikes being interpreted as real peaks, whilst large values can result 
+*     in some real peaks being missed and merged in with neighbouring peaks. 
+*     The default value of two times the RMS noise level (as specified by
+*     the RMS configuration parameter) is usually considered to be optimal, 
+*     although this obviously depends on the RMS noise level being correct. []
+*     - ClumpFind.Level<n>: The n'th data value at which to contour the
+*     data array (where <n> is an integer). Values should be given for 
+*     "Level1", "Level2", "Level3", etc. Any number of contours can be 
+*     supplied, but there must be no gaps in the progression of values for 
+*     <n>. The values will be sorted into descending order before being 
+*     used. If "Level1" is not supplied, the contour levels are instead 
+*     determined automatically using parameters "Tlow" and "DeltaT". Note 
+*     clumps found at higher contour levels are traced down to the lowest 
+*     supplied contour level, but any new clumps which are initially found 
+*     at the lowest contour level are ignored. That is, clumps must have 
+*     peaks which exceed the second lowest contour level to be included in 
+*     the returned catalogue. []
+*     - ClumpFind.Naxis: Controls the way in which contiguous areas of
+*     pixels are located when contouring the data. When a pixel is found
+*     to be at or above a contour level, the adjacent pixels are also checked.
+*     "Naxis" defines what is meant by an "adjacent" pixel in this sense. 
+*     The supplied value must be at least 1 and must not exceed the number 
+*     of pixel axes in the data. The default value equals the number of
+*     pixel axes in the data. If the data is 3-dimensional, any given pixel 
+*     can be considered to be at the centre of a cube of neighbouring pixels. 
+*     If "Naxis" is 1 only those pixels which are at the centres of the cube 
+*     faces are considered to be adjacent to the central pixel. If "Naxis" 
+*     is 2, pixels which are at the centre of any edge of the cube are also 
+*     considered to be adjacent to the central pixel. If "Naxis" is 3, pixels
+*     which are at the corners of the cube are also considered to be adjacent 
+*     to the central pixel. If the data is 2-dimensional, any given pixel can 
+*     be considered to be at the centre of a square of neighbouring pixels. 
+*     If "Naxis" is 1 only those pixels which are at the centres of the
+*     square edges are considered to be adjacent to the central pixel. If 
+*     "Naxis" is 2, pixels which are at square corners are also considered 
+*     to be adjacent to the central pixel. For one dimensional data, a
+*     value of 1 is always used for "Naxis", and each pixel simply has 2 
+*     adjacent pixels, one on either side. []
+*     - ClumpFind.RMS: The RMS noise in the data. The default value is
+*     determined by the Variance component in the input data. If there is
+*     no Variance component, an estimate of the global noise level in the
+*     data is made by looking at the differences between neighbouring
+*     pixel values. Any pixel-to-pixel correlation in the noise can result 
+*     in this estimate being too low. This can have cause the default
+*     value of DelatT to be to low, resulting in noise spikes being 
+*     interpreted as clumps. []
+*     - ClumpFind.Tlow: The lowest level at which to contour the data
+*     array. Only accessed if no value is supplied for "Level1". See "DeltaT".
+*     The default value is two times the RMS noise level. Note this will
+*     only be appropriate if there is no constant offset in the data
+*     values (i.e. if the background level in the data is zero). []
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -260,19 +323,21 @@ void clumps() {
 
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
-   AstKeyMap *keymap;           /* Pointer to KeyMap holding config settings */
+   AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
+   AstKeyMap *config2;          /* Pointer to KeyMap holding used config settings */
+   AstKeyMap *keymap;           /* Pointer to KeyMap holding all config settings */
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
    HDSLoc **clist;              /* List of HDS locators for Clump structures */
+   HDSLoc *xloc;                /* HDS locator for CUPID extension */
+   IRQLocs *qlocs;              /* HDS locators for quality name information */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
    char buffer[ GRP__SZNAM ];   /* Buffer for GRP element */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char method[ 15 ];           /* Algorithm string supplied by user */
-   IRQLocs *qlocs;              /* HDS locators for quality name information */
-   HDSLoc *xloc;                /* HDS locator for CUPID extension */
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
@@ -313,7 +378,7 @@ void clumps() {
    if( *status != SAI__OK ) return;
 
 
-/* astSetWatchId( 730 );  */
+/*   astSetWatchId( 117755 ); */
 
 
 /* Initialise things to safe values. */
@@ -486,7 +551,7 @@ void clumps() {
       keymap = astKeyMap( "" );
 
 /* If a group was supplied, see if it consists of the single value "def".
-   If so,create an empty KeyMap. */
+   If so, create an empty KeyMap. */
    } else {
       keymap = NULL;
       if( size == 1 ) {
@@ -552,8 +617,8 @@ void clumps() {
       }
 
 /* Create any output NDF by summing the contents of the HDS structures 
-   describing the found clumps. This also fills the above mask array if 
-   required. */
+   describing the found clumps, and then adding on the background level
+   (if any). This also fills the above mask array if required. */
       if( ipo || mask ) {
          cupidSumClumps( type, nsig, slbnd, subnd, el, clist, nclump, bg, 
                          rmask, ipo, method );
@@ -585,8 +650,16 @@ void clumps() {
          irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
       }
 
-/* Store the configuration in the CUPID extension. */
-      cupidStoreConfig( xloc, keymap );
+/* Store the configuration parameters relating to the used algorithm in the 
+   CUPID extension. We put them into a new KeyMap so that the CUPID NDF
+   extension gets names of the form "method.name" rather than just "name". */
+      if( astMapGet0A( keymap, method, &config ) ) {     
+         config2 = astKeyMap( "" );
+         astMapPut0A( config2, method, config, NULL );
+         cupidStoreConfig( xloc, config2 );
+         astAnnul( config2 );
+         astAnnul( config );
+      }
 
 /* Store the clump properties in the CUPID extensionand output catalogue
    (if needed). This also annuls the HDS locators stored within "clist". */
@@ -623,6 +696,8 @@ L999:
 /* End the NDF context */
    ndfEnd( status );
 
+   keymap = astAnnul( keymap );
+
 /* End the AST context */
    astEnd;
 
@@ -633,7 +708,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-/*   astListIssued( "At end of CLUMPS" );  */
+/*   astListIssued( "At end of CLUMPS" );   */
 
 
 

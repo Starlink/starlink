@@ -180,6 +180,13 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
       astMapPut0A( config, "GAUSSCLUMPS", gcconfig, "" );
    }
 
+/* The configuration file can optionally omit the algorithm name. In this
+   case the "config" KeyMap may contain values which should really be in
+   the "gcconfig" KeyMap. Add a copy of the "config" KeyMap into "gcconfig" 
+   so that it can be searched for any value which cannot be found in the
+   "gcconfig" KeyMap. */
+   astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
+
 /* See if extra diagnostic info is required. */
    diag = cupidConfigI( gcconfig, "DIAG", 0 );
 
@@ -494,6 +501,12 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    }
 
    if( ilevel > 0 ) msgBlank( status );
+
+/* Remove the secondary KeyMap added to the KeyMap containing configuration 
+   parameters for this algorithm. This prevents the values in the secondary 
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+   called. */
+   astMapRemove( gcconfig, CUPID__CONFIG );
 
 /* Free resources */
    res = astFree( res );

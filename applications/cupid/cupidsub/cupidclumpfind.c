@@ -128,12 +128,16 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       astMapPut0A( config, "CLUMPFIND", cfconfig, "" );
    }
 
-/* Get the value which defines whether two pixels are neighbours or not. */
-   if( ndim == 1 ) {
-      naxis = cupidConfigI( cfconfig, "NAXIS", 1 );
-   } else {
-      naxis = cupidConfigI( cfconfig, "NAXIS", 2 );
-   }
+/* The configuration file can optionally omit the algorithm name. In this
+   case the "config" KeyMap may contain values which should really be in
+   the "cfconfig" KeyMap. Add a copy of the "config" KeyMap into "cfconfig" 
+   so that it can be searched for any value which cannot be found in the
+   "cfconfig" KeyMap. */
+   astMapPut0A( cfconfig, CUPID__CONFIG, astCopy( config ), NULL );
+
+/* Get the value which defines whether two pixels are neighbours or not.
+   The default value is equalto the number of axes in the data array. */
+   naxis = cupidConfigI( cfconfig, "NAXIS", ndim );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -346,8 +350,15 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
    }
 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration 
+   parameters for this algorithm. This prevents the values in the secondary 
+   KeyMap being written out to the CUPID extension when cupidStoreConfig is 
+   called. */
+   astMapRemove( cfconfig, CUPID__CONFIG );
+
 /* Free resources */
    ipa = astFree( ipa );
+   cfconfig = astAnnul( cfconfig );
 
 /* Return the list of clump structure locators. */
    return clist;

@@ -111,23 +111,34 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    TLOW. */
    } else {
 
-/* Set the contour interval to a user-specified multiple of the RMS noise. */
-      cdelta = rms*cupidConfigD( config, "DELTAT", 2.0 );
+/* Get the contour interval using twice the RMS as the default. */
+      cdelta = cupidConfigD( config, "DELTAT", 2.0*rms );
 
-/* Set the lowest contour level to be used as a multiple of the RMS noise. 
-   This is an increment above the lowest data value in the supplied array. */
-      clow = mind + rms*cupidConfigD( config, "TLOW", 2.0 );
+/* Get the lowest contour level using twice the RMS as the default. */
+      clow = cupidConfigD( config, "TLOW", 2.0*rms );
 
-/* Find the number of contours, and allocate the returned array. */
-      *nlevels = (int) ( ( maxd - clow )/cdelta );
-      ret = astMalloc( sizeof( double )*(*nlevels) );
-      if( ret ) {
-         clevel = maxd;
-         for( i = 0; i < *nlevels; i++ ) {
-            clevel -= cdelta;
-            ret[ i ]= clevel;
-         }
-      } 
+/* Report an error if the lowest contour level is below the minimum value
+   in the data array. */
+      if( clow < mind && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSetd( "TLOW", clow );
+         msgSetd( "MIND", mind );
+         errRep( "CUPIDCFLEVELS_ERR1", "The supplied lowest contour level "
+                 "(Tlow=^TLOW) is below the minimum value in the data "
+                 "array (^MIND).", status );
+
+/* Otherwise, find the number of contours, and allocate the returned array. */
+      } else {
+         *nlevels = (int) ( ( maxd - clow )/cdelta );
+         ret = astMalloc( sizeof( double )*(*nlevels) );
+         if( ret ) {
+            clevel = maxd;
+            for( i = 0; i < *nlevels; i++ ) {
+               clevel -= cdelta;
+               ret[ i ]= clevel;
+            }
+         } 
+      }
    }
 
 /* Return the array of contour levels. */

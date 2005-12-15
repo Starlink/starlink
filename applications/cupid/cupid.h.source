@@ -16,6 +16,9 @@
 #define CUPID__CFNULL -1 /* Unassigned pixel flag */
 #define CUPID__MAXINDEX 8190   /* Largest usable PixelSet index (must fit in 13 bits) */
 
+#define CUPID__CONFIG  "NOALG_CONFIG" /* Key for config params which have no
+                                         algorithm name */
+
 /* Type Definitions */
 /* ---------------- */
 /* A structure holding the global parameters of the GaussClump algorithm 
@@ -134,11 +137,11 @@ HDSLoc **cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKe
 HDSLoc **cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int *, double * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int * );
 double cupidConfigD( AstKeyMap *, const char *, double );
+int cupidConfigI( AstKeyMap *, const char *, int );
 double cupidGCChiSq( int, double *, int, int );
 double cupidGCModel( int, double *, double *, int, int, int );
 float cupidRanVal( int, float[2] );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
-int cupidConfigI( AstKeyMap *, const char *, int );
 void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3] );
 void cupidDatCopy( HDSLoc *, HDSLoc * );
 void cupidGCListClump( int, int, double *, double, int *, int, double );

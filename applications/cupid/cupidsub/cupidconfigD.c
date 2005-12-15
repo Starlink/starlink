@@ -16,8 +16,12 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 
 *  Description:
 *     This function returns a named value from the supplied KeyMap. If
-*     the KeyMap does not contaain the named value, the supplied default 
-*     value is returned, and is also stored in the KeyMap.
+*     the KeyMap does not contain the named value, an attempt is made to
+*     obtain a value from a secondary KeyMap which should be stored
+*     within the supplied KeyMap, using a key equal to the constant
+*     string CUPID__CONFIG. If the secondary KeyMap does not contain a
+*     value, then the supplied default value is returned. In either case,
+*     the returned value is stored in the KeyMap.
 
 *  Parameters:
 *     config
@@ -46,7 +50,8 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 */      
 
 /* Local Variables: */
-   double ret;       /* The returned value */
+   AstObject *sconfig; /* Object pointer obtained from KeyMap */
+   double ret;         /* The returned value */
 
 /* Initialise */
    ret = def;
@@ -57,10 +62,31 @@ double cupidConfigD( AstKeyMap *config, const char *name, double def ){
 /* Attempt to extract the named value from the supplied KeyMap. */
    if( !astMapGet0D( config, name, &ret ) ) {
 
-/* If the value was not found in the KeyMap, return the default value and
-   also store it in the KeyMap if it is good. */
-      ret = def;
-      if( def != VAL__BADD ) astMapPut0D( config, name, def, NULL );
+/* If the value was not found in the KeyMap, see if the KeyMap contains a
+   secondary KeyMap. */
+      if( astMapGet0A( config, CUPID__CONFIG, &sconfig ) ) {
+
+/* If it does, see if the secondary KayMap contains a value for the named
+   entry. If it does, remove the value from the KeyMap so it does not
+   appear in the CUPID NDF extension. */
+         if( astMapGet0D( (AstKeyMap *) sconfig, name, &ret ) ) {
+            astMapRemove(  (AstKeyMap *) sconfig, name );
+
+/* If the value was not found in either KeyMap, return the default value. */
+         } else {
+            ret = def;
+         }
+
+/* Free the pointer to the secondary KeyMap. */
+         sconfig = astAnnul( sconfig );
+
+/* If no secondary KeyMap was found, return the default value. */
+      } else {
+         ret = def;
+      }
+
+/* Store the returned value in the supplied KeyMap if it is good. */
+      if( ret != VAL__BADD ) astMapPut0D( config, name, ret, NULL );
    }
 
 /* Return the result. */
