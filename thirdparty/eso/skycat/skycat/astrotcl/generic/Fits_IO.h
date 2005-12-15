@@ -52,7 +52,7 @@ private:
     // extend the size of the FITS header by one header block 
     int extendHeader();
 
-    static void* FitsIO::reallocFile(void* p, size_t newsize);
+    static void* reallocFile(void* p, size_t newsize);
 
 protected:   
     //  PWD: Move here so that derived classes can manipulate (needed to get
