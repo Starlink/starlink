@@ -831,6 +831,7 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
+      sc2store_loc[j] = NULL; /* First time through we will not be initialized */
       datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
         status );
 
@@ -1697,3 +1698,4 @@ int *status        /* global status (given and returned) */
 
    sc2open = 1; 
 }
+
