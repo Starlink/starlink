@@ -27,6 +27,7 @@
  */
 
 #include <bltInt.h>
+#include <float.h>
 
 #define EXACT 1
 
@@ -260,7 +261,14 @@ DllEntryPoint(hInst, reason, reserved)
 }
 #endif /* WIN32 */
 
+#ifdef DBL_QNAN
 
+static double
+MakeNaN(void)
+{
+    return DBL_QNAN;
+}
+#else 
 #ifdef __BORLANDC__
 static double
 MakeNaN(void)
@@ -292,6 +300,8 @@ MakeNaN(void)
     return 0.0 / 0.0;		/* Generate IEEE 754 Not-A-Number. */
 }
 #endif /* !__BORLANDC__  && !_MSC_VER */
+
+#endif /* DBL_QNAN */
 
 
 /* ARGSUSED */
