@@ -413,6 +413,7 @@ int RtdRecorder::processFileEvent()
     if (fileHandler->fileFull() && !cycleMode_) {
 	stop(0, NULL);
     }
+    return TCL_OK;
 }
 
 /*
