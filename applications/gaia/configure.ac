@@ -53,7 +53,7 @@ dnl    kept embedded the usual object files, see the cxx man page for details).
 case "$host" in
    alpha*) 
       if test "$CXX" = "cxx"; then 
-          AC_SUBST([DEC_CXX], [-std gnu -D__USE_STD_IOSTREAM=1])
+          AC_SUBST([DEC_CXX], ["-std gnu -D__USE_STD_IOSTREAM=1"])
 
 dnl    cxx doesn't like "-O -g", prefers "-O -g3"
           if test "$CFLAGS" == "-g"; then
