@@ -20,6 +20,7 @@
 #include "rtdCLNT.h"  // includes almost all we need
 #include "rtdLOG.h"
 #include <time.h>
+#include <sys/select.h>
 
 // This class is handling semaphores, not rtdCLNT
 
