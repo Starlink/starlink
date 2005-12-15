@@ -140,17 +140,6 @@ fi
 
 AC_SUBST(CXX)
 
-#  Alpha requires this define for standard streams.
-AC_CANONICAL_HOST
-case "$host" in
-  alpha*) 
-         if test "$CXX" = "cxx"; then 
-            AC_DEFINE(__USE_STD_IOSTREAM, 1, [Use standard streams] )
-         fi
-  ;;
-esac
-
-
 # -----------------------------------------------------------------------
 #
 # The environment variable TCLTK_ROOT may be set before running configure
