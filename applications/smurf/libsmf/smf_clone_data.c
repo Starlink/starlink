@@ -31,6 +31,8 @@
 *  History:
 *     2005-12-09 (AGG):
 *        Initial test version.
+*     2005-12-14 (AGG):
+*        Increment the reference counter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -77,15 +79,12 @@
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status ) {
 
-  smfHead *hdr;
-  smfFile *file;
-
-  void *ipntr[3];
-  void *opntr[3];
 
   /* Set the output pointer */
+  *odata = (smfData *)idata;
 
   /* Update the reference counter */
-
+  (*odata)->refcount++;
 
 }
+
