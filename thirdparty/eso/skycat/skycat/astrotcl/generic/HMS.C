@@ -13,6 +13,7 @@
  */
 static const char* const rcsId="@(#) $Id: HMS.C,v 1.4 2005/02/02 01:43:04 brighton Exp $";
 
+#include "config.h" // tclutil
 
 #include <cstdio>
 #include <cstring>

@@ -12,11 +12,15 @@
  */
 static const char* const rcsId="@(#) $Id$";
 
+#include "config.h" // tclutil
+
 
 #include <cstdio>
 #include <cstring>
 #include <cctype>
 #include <cmath>
+#include <iostream>
+#include <sstream>
 #include "error.h"
 #include "wcs.h"
 #include "WorldCoords.hxx"

@@ -16,9 +16,9 @@
  * pbiereic        17/02/03   Added 'using namespace std'. Removed ::std specs.
  */
 
-using namespace std;
 #include <iostream>
 #include <cmath>
+using namespace std;
 
 const double HMS_NULL = HUGE_VAL;	// null value for a double
 
