@@ -71,7 +71,6 @@ F_ROUTINES = \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
 	dat_getnx.f \
-	dat_getvx.f \
 	dat_putnx.f
 
 #  List of Fortran BLOCK DATA routines.

@@ -897,6 +897,42 @@ F77_SUBROUTINE(dat_getvl)( CHARACTER(locator),
   *actval = actval_c;
 }
 
+/* Note that for dat_getvc we call the *Fortran* interface version
+   of dat_get1c since that includes all the correct bounds checking
+   and also deals with a char buffer rather than char ** */
+
+F77_SUBROUTINE(dat_getvc)( CHARACTER(locator),
+			   INTEGER(maxval),
+			   CHARACTER(values),
+			   INTEGER(actval),
+			   INTEGER(status)
+			   TRAIL(locator)
+			   TRAIL(values) )
+{
+  HDSLoc locator_c;
+  HDSLoc *vecloc_c = NULL;
+  char vecloc[DAT__SZLOC];
+  int vecloc_length = DAT__SZLOC;
+
+  if (*status != SAI__OK) return;
+
+  /* Import the fortran locator */
+  dat1_import_floc( locator, locator_length, &locator_c, status );
+
+  /* Vectorize it */
+  datVec( &locator_c, &vecloc_c, status );
+
+  /* Export the new locator back to Fortran style */
+  datExportFloc( &vecloc_c, 0, DAT__SZLOC, vecloc, status );  
+
+  /* Call Fortran dat_put1c since that does all the bounds checking */
+  F77_CALL(dat_get1c)( CHARACTER_ARG(vecloc), INTEGER_ARG(maxval),
+		       CHARACTER_ARG(values), INTEGER_ARG(actval), INTEGER_ARG(status)
+		       TRAIL_ARG(vecloc) TRAIL_ARG(values) );
+
+  /* Now annul the vector locator */
+  datAnnul( &vecloc_c, status );
+}
 
 
 
