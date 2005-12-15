@@ -204,6 +204,7 @@ static int MapLength( AstKeyMap *, const char *);
 static int MapSize( AstKeyMap *);
 static int MapType( AstKeyMap *, const char *);
 static size_t SizeOfEntry( AstMapEntry * );
+static void CheckCircle( AstKeyMap *, AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void CopyTableEntry( AstKeyMap *, AstKeyMap *, int );
 static void Delete( AstObject * );
@@ -275,6 +276,99 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 
 /* Return a NULL pointer. */
    return NULL;
+}
+
+static void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method ) {
+/*
+*  Name:
+*     CheckCircle
+
+*  Purpose:
+*     Check for circular dependencies between KeyMaps.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     void CheckCircle( AstKeyMap *this, AstObject *obj, const char *method )
+
+*  Class Membership:
+*     KeyMap member function.
+
+*  Description:
+*     This function checks that the given AstObject is not a KeyMap which
+*     contains "this". If it is, an error is reported.
+
+*  Parameters:
+*     this
+*        The KeyMap pointer.
+*     obj
+*        Pointer to the AstObject to be inserted into the KeyMap, or NULL.
+*     method
+*        Name of method to include in error messages.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *keymap;       /* The KeyMap being added to "this" */
+   AstObject **vec;         /* Pointer to list of AstObject pointers */
+   const char *key;         /* The i'th key within second KeyMap */
+   int i;                   /* Index of entry within second KeyMap */
+   int j;                   /* Index within the vector of values */
+   int len;                 /* No. of AST pointers stored in the entry */
+   int nkey;                /* No. of entries in the second KeyMap */
+
+/* Check the global error status. */
+   if( !astOK ) return;
+
+/* Return if the AstObject is not a KeyMap. */
+   if( obj && astIsAKeyMap( obj ) ) {
+      keymap = (AstKeyMap *) obj;
+
+/* Loop through all the entries in the KeyMap looking for AstObject
+   entries. */
+      nkey = astMapSize( keymap );
+      for( i = 0; i < nkey && astOK; i++ ) {
+         key = astMapKey( keymap, i );
+         if( astMapType( keymap, key ) == AST__OBJECTTYPE ) {
+
+/* Find the number of AstObject pointers stored in this entry, and
+   allocate memory to store a copy of the every pointer. */
+            len = astMapLength( keymap, key );
+            vec = astMalloc( sizeof( AstObject *) * len );
+            if( vec ) {
+
+/* Extract pointers to the AstObjects at this entry, and loop round them. */
+               astMapGet1A( keymap, key, len, &len, vec );
+               for( j = 0; j < len; j++ ) {
+
+/* If this entry is a KeyMap, we need to check if is the same as "this"
+   or contains "this". */
+                  if( astIsAKeyMap( vec[ j ] ) ) {
+
+/* If it is the same as "this", report an error. */
+                     if( vec[ j ] == (AstObject *) this ) {
+                        astError( AST__KYCIR, "%s(%s): Cannot add a KeyMap "
+                                  "into another KeyMap because the first "
+                                  "KeyMap contains the second KeyMap.",
+                                  method, astGetClass( this ) );
+                        break;
+
+/* Otherwise, see if it contains "this". */
+                     } else {
+                        CheckCircle( this, vec[ j ], method );
+                     }
+                  }
+
+/* Free resources. */
+                  vec[ j ] = astAnnul( vec[ j ] );
+               }
+               vec = astFree( vec );
+            }
+         }
+      }
+   }
 }
 
 static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
@@ -1636,6 +1730,9 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Perform any necessary checks on the supplied value to be stored. */ \
+   CHECK_##X \
+\
 /* Allocate memory for the new MapEntry. */ \
    entry = astMalloc( sizeof( Entry0##X ) ); \
    if( astOK ) { \
@@ -1685,6 +1782,15 @@ static void MapPut0##X( AstKeyMap *this, const char *key, Xtype value, \
    } \
 } 
 
+/* Define macros which perform any necessary checks on the supplied value 
+   to be stored. For Object entries, check that we are not adding a KeyMap 
+   which already contains "this". This avoids circular dependencies.
+   Other types do not need any checks. */ 
+#define CHECK_A CheckCircle( this, value, "astMapPut0A" );
+#define CHECK_I
+#define CHECK_D
+#define CHECK_C
+
 /* Expand the above macro to generate a function for each required
    data type. */
 MAKE_MAPPUT0(I,int,AST__INTTYPE,value)
@@ -1694,6 +1800,10 @@ MAKE_MAPPUT0(A,AstObject *,AST__OBJECTTYPE,(value?astClone(value):NULL))
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT0
+#undef CHECK_A
+#undef CHECK_I
+#undef CHECK_D
+#undef CHECK_C
 
 /*
 *++
@@ -1800,6 +1910,9 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Perform any necessary checks on the supplied value to be stored. */ \
+   CHECK_##X \
+\
 /* Allocate memory for the new MapEntry. */ \
    entry = astMalloc( sizeof( Entry1##X ) ); \
    if( astOK ) { \
@@ -1853,6 +1966,18 @@ static void MapPut1##X( AstKeyMap *this, const char *key, int size, Xtype value[
    } \
 } 
 
+/* Define macros which perform any necessary checks on the supplied values
+   to be stored. For Object entries, check that we are not adding a KeyMap 
+   which already contains "this". This avoids circular dependencies.
+   Other types do not need any checks. */ 
+#define CHECK_A \
+for( i = 0; i < size; i++ ) { \
+   CheckCircle( this, value[ i ], "astMapPut1A" ); \
+}
+#define CHECK_I
+#define CHECK_D
+#define CHECK_C
+
 /* Expand the above macro to generate a function for each required
    data type. */
 MAKE_MAPPUT1(D,double,AST__DOUBLETYPE,value[i])
@@ -1862,6 +1987,10 @@ MAKE_MAPPUT1(A,AstObject *,AST__OBJECTTYPE,(value[i]?astClone(value[i]):NULL))
 
 /* Undefine the macro. */
 #undef MAKE_MAPPUT1
+#undef CHECK_A
+#undef CHECK_I
+#undef CHECK_D
+#undef CHECK_C
 
 void astMapPut1AId_( AstKeyMap *this, const char *key, int size, AstObject *value[],
                      const char *comment ) {

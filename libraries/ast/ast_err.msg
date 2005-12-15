@@ -39,6 +39,7 @@ INHAN           <invalid Handle>
 INNCO           <incompatible numbers of coordinates>
 INTER           <internal programming error>
 INTRD           <incompatible transformation directions>
+KYCIR           <Circular dependency between KeyMaps>
 LDERR           <class loader error>
 LUTII           <invalid lookup table increment>
 LUTIN           <invalid number of lookup table elements>
