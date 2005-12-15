@@ -55,6 +55,8 @@
 *        Store isTstream flag for smf_close_file
 *     2005-12-05 (AGG):
 *        Add status check on retrieving FITS hdr
+*     2005-12-14 (TIMJ):
+*        Now sets a reference counter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,6 +98,7 @@
 #include <stdio.h>
 #include "sc2da/sc2store.h"
 #include "star/kaplibs.h"
+#include "kpg_err.h"
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status) {
 
@@ -150,7 +153,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
   /* Check type of DATA and VARIANCE arrays */
   ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP, status);
-
+  /*  printf("Status after ndfType: %d\n",*status);*/
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
     isNDF = 1;     /* Data have been flat-fielded */
@@ -179,6 +182,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     /* Set the file entry in the smfData struct */
     (*data)->file = file;
     file->xloc = NULL;
+    (*data)->refcount = 1;
     file->ndfid = NDF__NOID;
     hdr = malloc( sizeof(smfHead));
     (*data)->hdr = hdr;
@@ -202,18 +206,18 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 	ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
       }
 
+      /*      printf("after ndfMap: %d\n",*status);*/
+
       /* Read the FITS headers */
       kpgGtfts( indf, &fits, status );
 
-      /* Trap status and ignore lack of FITS headers */
-      if ( *status != SAI__OK) {
+      /* Trap status and ignore lack of FITS headers for now */
+      /*      if ( *status == KPG__NOFTS) {
 	msgOut("smf_open_file", 
 	       "Warning: Data has no FITS header, continuing anyway", status);
 	errAnnul( status );
-	if ( *status == SAI__OK ) {
-	  *status = SMF__NOHDR;
-	}
-      } /* Now what? How do we decide if it's not important? */
+	errRep("smf_open_file", "File has no FITS header", status);
+	} */
 
       /* If we don't have a time series, then we can retrieve the stored WCS info */
       if ( !isTseries ) {
@@ -223,11 +227,14 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 	/* Need to get the location of the extension for sc2head parsing */
 	/* Store the locator in the struct for now in case annulling it annulls
 	   all the children */
+	/*        printf("Status before xloc: %d\n",*status);*/
 	ndfXloc( indf, "FRAMEDATA", "READ", &(file->xloc), status );
-
+	/*        printf("Status after xloc: %d\n", *status);	*/
         /* And need to map the header */
 	sc2store_headrmap( file->xloc, ndfdims[2], status );
       }
+
+      /*      printf("Status from open : %d\n",*status);*/
 
       /* Establish the data type */
       if ( strncmp(dtype, "_DOUBLE", 7 ) == 0 ){
@@ -327,3 +334,4 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     }
   }
 }
+
