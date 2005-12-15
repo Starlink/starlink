@@ -164,9 +164,9 @@ int fileAbsPath(const char* filename, char* path, int pathlen, int& flag)
  * Read "n" bytes from a file descriptor.
  * Use in place of read() when fd is a stream socket.
  */
-size_t readUnbufferedBytes(int fd, char* ptr, size_t nbytes)
+ssize_t readUnbufferedBytes(int fd, char* ptr, size_t nbytes)
 {
-    size_t nleft, nread;
+    ssize_t nleft, nread;
 
     nleft = nbytes;
     while (nleft > 0) {
@@ -196,7 +196,7 @@ size_t readUnbufferedBytes(int fd, char* ptr, size_t nbytes)
 int readUnbufferedLine(int fd, char* ptr, int maxlen)
 {
     int	n;
-    size_t rc;
+    ssize_t rc;
     char	c;
 
     for (n = 1; n < maxlen; n++) {
@@ -229,9 +229,9 @@ int readUnbufferedLine(int fd, char* ptr, int maxlen)
  *
  * Taken from Stevens, "Unix Network Programming".
  */
-size_t writeUnbufferedBytes(int fd, char* ptr, size_t nbytes)
+ssize_t writeUnbufferedBytes(int fd, char* ptr, size_t nbytes)
 {
-    size_t	nleft, nwritten;
+    ssize_t	nleft, nwritten;
 
     nleft = nbytes;
     while (nleft > 0) {
@@ -251,7 +251,7 @@ size_t writeUnbufferedBytes(int fd, char* ptr, size_t nbytes)
 /*
  * write the given buffer to the given fd followed by a newline
  */
-size_t writeUnbufferedLine(int fd, char* ptr)
+ssize_t writeUnbufferedLine(int fd, char* ptr)
 {
     return writeUnbufferedBytes(fd, ptr, strlen(ptr)) 
 	+ writeUnbufferedBytes(fd, "\n", 1);
