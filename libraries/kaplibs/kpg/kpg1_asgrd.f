@@ -92,7 +92,6 @@
       DOUBLE PRECISION VGAP        ! Value for TitleGap
       INTEGER AX                   ! Pointer to an axis of Plot's current Frame
       INTEGER IAT                  ! Used length of TEXT
-      INTEGER ICURR                ! Index of original current frame
       INTEGER IPIC0                ! AGI id for original current picture
       INTEGER IPLOT2               ! Modified Plot
       INTEGER MAP                  ! Pointer to an unused Mapping
@@ -188,7 +187,7 @@
      :                   TEXT, IAT )
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
-         IF( KPG1_GETASTDSB .AND. 
+         IF( KPG1_GETASTDSB() .AND. 
      :       AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
             AEDGE = 'Edge(1)'
             ASB = 'SideBand(1)'
@@ -201,7 +200,7 @@
 
          ELSE
             AX = AST_PICKAXES( IPLOT2, 1, 2, MAP, STATUS )
-            IF( KPG1_GETASTDSB .AND. 
+            IF( KPG1_GETASTDSB() .AND. 
      :          AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
                AEDGE = 'Edge(2)'
                ASB = 'SideBand(2)'
