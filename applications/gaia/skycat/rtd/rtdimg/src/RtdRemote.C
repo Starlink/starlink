@@ -18,6 +18,8 @@
  * Peter W. Draper 11/05/99  Added changes to getsockname calls so
  *                           that size_t or int are used for addrSize (this
  *                           is needed for OSF/1). 
+ *                 16/12/05  Change all SOCKLEN_T use to socklen_t. The logic
+ *                           that guarantees a value is set in define.h.
  */
 static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 brighton Exp $";
 
@@ -46,11 +48,6 @@ static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.6 2005/02/02 01:43:03 
 #include <sys/filio.h>
 #endif
 #include "RtdRemote.h"
-
-// Fudge socklen_t if not defined.
-#ifndef HAVE_SOCKLEN_T
-typedef int socklen_t;
-#endif
 
 // this call changed in tcl8
 #if (TCL_MAJOR_VERSION >= 8)
@@ -255,7 +252,7 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-    SOCKLEN_T addrSize = sizeof(sockaddr_in);
+    socklen_t addrSize = sizeof(sockaddr_in);
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -336,7 +333,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	SOCKLEN_T addrSize = sizeof(addr);
+	socklen_t addrSize = sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");

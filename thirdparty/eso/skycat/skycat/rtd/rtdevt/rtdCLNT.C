@@ -6,6 +6,8 @@
 * who       when      what
 * --------  --------  ----------------------------------------------
 * pbiereic  01/03/01  created 
+* pdraper   16/12/05  change SOCKLEN_T to socklen_t. This typedef
+*                     is guaranteed in define.h
 */
 
 /************************************************************************
@@ -135,7 +137,7 @@ int rtdCLNT::AttachedToCamera(char *camera)
 int rtdCLNT::Accept(int listenSocket) 
 {
     struct sockaddr_in sockAddr;         // used  by accept()
-    SOCKLEN_T addrLen = sizeof(sockAddr);
+    socklen_t addrLen = sizeof(sockAddr);
     int    optval;                       // used by setsockopt()
     int    socket;                       // socket file descriptor
 

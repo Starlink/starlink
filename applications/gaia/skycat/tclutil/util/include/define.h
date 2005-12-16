@@ -13,6 +13,8 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * pbiereic        17/02/03  Added defines for byte swap and SOCKLEN_T
+ * Peter W. Draper 16/12/05  Redo SOCKLEN_T logic. Only set when socklen_t
+ *                           is not defined. Use a typedef.
  */
 
 #include <arpa/inet.h>
@@ -76,13 +78,15 @@ inline float SWAP_LONG(long x) {
     return u.d;
 }
 
-
-#if defined(linux)
-# define SOCKLEN_T	unsigned int
-#elif defined(_XPG4_2)
-# define SOCKLEN_T	size_t
-#else
-# define SOCKLEN_T	int
+/* Make sure we always have a socklen_t type */
+#if ! HAVE_SOCKLEN_T
+#  if defined(linux)
+     typedef unsigned int socklen_t;
+#  elif defined(_XPG4_2)
+     typedef size_t socklen_t;
+#  else
+     typedef int socklen_t;
+#  endif
 #endif
 
 
