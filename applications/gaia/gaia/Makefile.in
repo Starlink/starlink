@@ -68,7 +68,7 @@ TCLLIBS = @TCLX_LIB_SPEC@ \
 # Tk libs
 TKLIBS = @ITK_LIB_SPEC@ \
          @TIX_LIB_SPEC@ \
-         @TK_LIB_SPEC@ \
+         @TCLUTIL_TK_BUILD_LIB_PATH@ \
          @BLT_LIB_SPEC@ \
          -ltkhtml
 # Tk libs

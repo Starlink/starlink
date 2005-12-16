@@ -553,6 +553,8 @@ if test "$NO_TCL" = "0" ; then
     # full library names.
     TCL_BUILD_LIB_PATH=$TCL_EXEC_PREFIX/lib/$TCL_LIB_FILE
     AC_SUBST(TCL_BUILD_LIB_PATH)
+    TK_BUILD_LIB_PATH=$TK_EXEC_PREFIX/lib/$TK_LIB_FILE
+    AC_SUBST(TK_BUILD_LIB_PATH)
 
     # make sure there isn't a missing dir after the -L here
     if test "$TCLX_LIB_SPEC" = "-L -ltclx$TCLX_VERSION" ; then
