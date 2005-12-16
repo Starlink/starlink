@@ -51,6 +51,8 @@
 *     17-AUG-2005 (DSB):
 *        Modified to draw a second grid if the current Frame of the Plot
 *        contains a DSBSpecFrame, showing the other side band.
+*     2-DEC-2005 (DSB):
+*        Correct "Title=0" to "DrawTitle=0".
 *     {enter_changes_here}
 
 *  Bugs:
@@ -170,11 +172,13 @@
          CALL PGBBUF
 
 *  See if the current Frame of the Plot contains a DSBSpecFrame, noting the 
-*  names of the relevant attributes is a DSBSpecFrame is found. If it
-*  does, set the title gap to be equal to twice the textlabelgap.
+*  names of the relevant attributes is a DSBSpecFrame is found. If the
+*  horizontal axis is represented by a DSBSpecFrame, then the title gap
+*  needs to be increased in order to make room for the axis annotation on
+*  the upper edge.
          TEXT = ' '
          IAT = 0
-         CALL CHR_APPND( 'Grid=0,Tickall=0,Title=0,DrawAxes=0,', 
+         CALL CHR_APPND( 'Grid=0,Tickall=0,DrawTitle=0,DrawAxes=0,', 
      :                   TEXT, IAT )
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
