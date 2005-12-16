@@ -56,6 +56,8 @@
 *  History:
 *     15-JUL-1998 (DSB):
 *        Original version.
+*     16-DEC-2005: (DSB):
+*        Added DrawDSB.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -132,6 +134,17 @@
                   CALL GRF_SETTBG( IVAL )
                END IF
 
+            END IF
+
+*  DrawDSB: specifies whether the unselected sideband of a DSBSpecFrame
+*  should be labelled on the unsused axis by applications such as LINPLOT.
+         ELSE IF( CHR_SIMLR( NAME, 'DRAWDSB' ) ) THEN
+
+*  Zero means no, any other integer means yes.
+            ISTAT = STATUS 
+            CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+            IF( ISTAT .EQ. SAI__OK ) THEN
+               CALL KPG1_SETASTDSB( IVAL .NE. 0 )
             END IF
 
 *  If the attribute is not a KAPPA pseudo-attribute, assume it is a

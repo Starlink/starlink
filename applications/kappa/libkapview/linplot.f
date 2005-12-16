@@ -448,10 +448,13 @@
 *        Plots data values versus position for the first 500 elements
 *        of the one-dimensional NDF called spectrum. The output goes to 
 *        a text file which can be printed on a PostScript printer.
-*     linplot ironarc v style="title=Fe Arc variance"
+*     linplot ironarc v style="'title=Fe Arc variance,drawdsb=0'"
 *        Plots variance values versus position for the whole of the 
 *        one-dimensional NDF called ironarc on the current graphics 
-*        device.  The plot has a title of "Fe Arc variance".
+*        device.  The plot has a title of "Fe Arc variance". If the
+*        data is from a dual sideband instrument, the image sideband
+*        would normally be annotated along the top edge of the plot, but 
+*        the inclusion of "drawdsb=0" in the style value prevents this.
 *     linplot prof useaxis=dec xleft="23:30:22" xright="23:30:45"
 *        This plots data values versus declination for those elements of
 *        the one-dimensional NDF called prof with declination value

@@ -53,6 +53,9 @@
 *        contains a DSBSpecFrame, showing the other side band.
 *     2-DEC-2005 (DSB):
 *        Correct "Title=0" to "DrawTitle=0".
+*     16-DEC-2005 (DSB):
+*        Allow user to prevent annotation of unused DSBSpecFrame axis
+*        using the pseudo-attribute "DrawDSB".
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,6 +78,9 @@
 
 *  Status:
       INTEGER STATUS               ! Global status
+
+*  External References:
+      LOGICAL KPG1_GETASTDSB       ! Should both sidebands be annotated?
 
 *  Local Variables:
       CHARACTER AEDGE*8            ! Name of Edge attribute to use
@@ -182,7 +188,8 @@
      :                   TEXT, IAT )
 
          AX = AST_PICKAXES( IPLOT2, 1, 1, MAP, STATUS )
-         IF( AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+         IF( KPG1_GETASTDSB .AND. 
+     :       AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
             AEDGE = 'Edge(1)'
             ASB = 'SideBand(1)'
             AGAP = 'TextLabGap(1)'
@@ -194,7 +201,8 @@
 
          ELSE
             AX = AST_PICKAXES( IPLOT2, 1, 2, MAP, STATUS )
-            IF( AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
+            IF( KPG1_GETASTDSB .AND. 
+     :          AST_ISADSBSPECFRAME( AX, STATUS ) ) THEN
                AEDGE = 'Edge(2)'
                ASB = 'SideBand(2)'
                AGAP = 'TextLabGap(2)'

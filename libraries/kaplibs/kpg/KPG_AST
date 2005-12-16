@@ -28,6 +28,8 @@
 *  History:
 *     16-FEB-1998( DSB):
 *        Original version.
+*     16-DEC-2005 DSB):
+*        Added DRWDSB
 *     {enter_further_changes_here}
 
 *-
@@ -62,12 +64,19 @@
 *  Character to prepend to each line when writing an AST Object to a GRP group.
       CHARACTER ASTGSP*1
 
+*  Should axes drawn round a Plot annotate the unselected sideband of a 
+*  DSBSpecFrame on the unused edge? This is specified by the KAPPA 
+*  "pseudo-attribute" DrawDSB which a user can include in a style file 
+*  as if it were a genuine AST Plot attribute.
+      LOGICAL DRWDSB
+
+
 *  Common Blocks:
 *  =============
 
 *  Non-character data.
       COMMON /KPG_AST1/ ASTLN, ASTPT, ASTGRP, ASTTSZ, ASTING, ASTOUG,
-     :                  ASTNPS
+     :                  ASTNPS, DRWDSB
 
 *  Character data.
       COMMON /KPG_AST2/  ASTLC, ASTGSP

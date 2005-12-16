@@ -3496,6 +3496,7 @@ each.  Full descriptions are included \hyperref{later}{in Section~}{}{se:plottin
 {\att Border}: Draw a border around valid regions of a plot?\\
 {\att Colour(element)}: Colour for a plot element\\
 {\att DrawAxes}: Draw axes?\\
+{\att DrawDSB}: Annotate both sidebands in a dual sideband spectrum?\\
 {\att DrawTitle}: Draw a title?\\
 {\att Edge(axis)}: Which edges to label\\
 {\att Font(element)}: Character font for a plot element\\
@@ -4098,6 +4099,27 @@ It is often useful to specify values for some of the attributes of the current
          \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
          the value of the {\att DrawAxes} attribute is ignored.
       }
+   }
+}
+\sstattribute{
+   DrawDSB
+}{
+   Annotate both sidebands if the spectral axis represents a dual
+   sideband spectrum?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining what to draw for a spectral axis representing a dual
+      sideband spectrum. The sideband selected using the
+      \xref{SideBand}{sun210}{SideBand} attribute will always be
+      annotated on the edge of the Plot selected using the
+      \htmlattref{Edge(axis)}{Edge(axis)} attribute. In addition, if the
+      DrawDSB attribute is non-zero (the default) the other sideband will
+      be annotated on the opposite edge of the Plot. If DrawDSB is zero,
+      then the other sideband will not be annotated.
+   }
+   \sstattributetype{
+      Integer (boolean).
    }
 }
 \sstattribute{

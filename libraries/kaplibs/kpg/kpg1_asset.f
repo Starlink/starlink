@@ -102,6 +102,8 @@
 *        Changed the final default from $KAPPA_DIR/<param>.def to
 *        $KAPPA_DIR/kappa_<param>/def to be consistent with the other
 *        files.
+*     16-DEC-2005 (DSB):
+*        Add initialisation of default value for new pseudo-attribute DrawDSB.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,8 +161,12 @@
       CLASS = AST_GETC( IOBJ, 'CLASS', STATUS )
       IF( STATUS .NE. SAI__OK ) CLASS = 'AST Object'
 
-*  If the Object is a Plot, reset the colour index for text backgrounds to 0.
-      IF( CLASS .EQ. 'Plot' ) CALL GRF_SETTBG( 0 )
+*  If the Object is a Plot, reset KAPPA pseudo-attributes to default
+*  values.
+      IF( CLASS .EQ. 'Plot' ) THEN
+         CALL GRF_SETTBG( 0 )
+         CALL KPG1_SETASTDSB( .TRUE. )
+      END IF
 
 *  Take a copy of the Object, and indicate it has not yet been changed.
       IOBJ2 = AST_COPY( IOBJ, STATUS )
