@@ -311,16 +311,18 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                              skip, slbnd, ilevel, ps, &sum, par, &list_size,
                              &mlist, &plist );
 
+
 /* Write this information to an HDS Clump structure. */
                cupidHdsClump( clist + i, sum, par, rms, ndim, ps->lbnd, 
                               ps->ubnd, list_size, mlist, plist, slbnd, i + 1, 
                               dax, NULL );
+
             }
          }
 
 /* Adjust the number of clumps returned to exclude any which contain
    fewer than 4 pixels. */
-         *nclump = i + 1;
+         *nclump = i + 1; 
 
 /* Free resources */
          mlist = astFree( mlist );

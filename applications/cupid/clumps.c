@@ -696,8 +696,6 @@ L999:
 /* End the NDF context */
    ndfEnd( status );
 
-   keymap = astAnnul( keymap );
-
 /* End the AST context */
    astEnd;
 
@@ -708,9 +706,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-/*   astListIssued( "At end of CLUMPS" );   */
-
-
+/*   astListIssued( "At end of CLUMPS" );    */
 
 }
 

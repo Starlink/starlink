@@ -130,20 +130,22 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Local Variables: */
    CGEN_TYPE *pd;        /* Pointer to next data pixel */
    CupidPixelSet **ret;  /* The returned pointer */
-   CupidPixelSet *ps;    /* Pointer to new PixelSet */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
+   CupidPixelSet *ps;    /* Pointer to new PixelSet */
    int **w2;             /* Pointer to array of neighbour lists */
-   int *w1;              /* Pointer to array of neighbour population sizes */
    int *pa;              /* Pointer to next index value */
+   int *w1;              /* Pointer to array of neighbour population sizes */
+   int dec_index;        /* Decrement last used index? */
    int exceed;           /* Too many pixelsets? */
    int hindex;           /* Next available index on entry */
    int i;                /* Loop count */
    int j;                /* Loop count */
    int k;                /* Loop count */
    int more;             /* Should we continue looping? */
+   int new_clumps;       /* Number of new clumps found at this level */
    int rem;              /* Remaining count of pixels */
+   int total_pop;        /* Number of pixels checked at this level */
    int x[3];             /* GRID coords of current pixel */
-   int dec_index;        /* Decrement last used index? */
 
 /* Initialise */
    ret = clumps;
@@ -326,8 +328,11 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    index is freed, then decrement the last used index in "*index" so that we
    can re-use the index. This keeps the size of the "ret" array down. */
    dec_index = 1;
+   new_clumps = 0;
+   total_pop = 0;
    for( i = *index - 1; i >= hindex; i-- ) {
       ps = ret[ i ];
+      total_pop += ps->pop;
 
 /* If the new PixelSet does not touch any of the existing PixelSets (i.e. the 
    clumps found at higher contour levels), then it is a new clump, so
@@ -346,6 +351,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                     "population ^P", status );
          }
          dec_index = 0;
+         new_clumps++;
 
 /* If the new PixelSet touches just one of the existing PixelSets, then 
    it is an extension of that clump. Transfer all the pixels in the new 
@@ -396,6 +402,16 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          ret[ i ] = cupidCFFreePS( ps, NULL, nel );
          if( dec_index ) (*index)--;
       } 
+   }
+
+/* Issue summary information for this contour level. */
+   if( ilevel > 2 ) {
+      msgSeti( "P", total_pop );
+      msgSetc( "P", (total_pop == 1) ? " pixel" : " pixels" );
+      msgSeti( "N", new_clumps );
+      msgSetc( "N", (new_clumps == 1) ? " new clump" : " new clumps" );
+      msgOut( "", "   ^P checked, ^N found", status );
+      msgBlank( status );
    }
 
 /* Report an error if too many PixelSets have been used. */
