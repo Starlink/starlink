@@ -304,6 +304,20 @@ datGet1L( const HDSLoc * locator,
 	  size_t *actval,
 	  int * status );
 
+/*==================================*/
+/* DAT_GETVC - Read vectorized 1D string array */
+/*==================================*/
+
+int
+datGetVC( const HDSLoc * locator, 
+	  size_t maxval, 
+	  size_t bufsize,
+	  char *buffer,
+	  char *pntrs[],
+	  size_t * actval,
+	  int * status );
+
+
 /*==========================================*/
 /* DAT_GETVD - Read vectorized Double array */
 /*==========================================*/

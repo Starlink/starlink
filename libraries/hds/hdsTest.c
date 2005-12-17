@@ -98,7 +98,7 @@ int main () {
   datPutVC( loc2, 3, chararr, &status );
 
   /* Check contents */
-  datGet1C(loc2, 3, 1024, buffer, retchararr, &actval, &status);
+  datGetVC(loc2, 3, 1024, buffer, retchararr, &actval, &status);
   if (status == DAT__OK) {
     if (actval == 3) {
       for (i = 0; i < 3; i++ ) {
