@@ -10,7 +10,7 @@
 /*
 *+
 *  Name:
-*     datMsg
+*     datRef
 
 *  Purpose:
 *     Obtain a reference for an HDS object.
@@ -19,7 +19,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     datMsg( const HDSLoc * locator, char * ref, size_t reflen, int * status );
+*     datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status);
 *     CALL DAT_REF( LOC, REF, LREF, STATUS )
 
 *  Description:
@@ -35,11 +35,13 @@
 *     loc = const HDSLoc * (Given)
 *        Locator to the HDS object.
 *     ref = char * (Returned)
-*        Pointer to character buffer to receive the reference. It must be preallocated
-*        by the caller. The reference will be truncated to fit if the buffer is not
-*        large enough, and status will be set to DAT__TRUNC.
+*        Pointer to character buffer to receive the reference. It must be 
+*        preallocated by the caller. The reference will be truncated
+*        to fit if the buffer is not large enough, and status will be
+*        set to DAT__TRUNC.
 *     reflen = size_t (Given)
-*        Size of buffer pointed to by ref. Size includes space for trailing nul.
+*        Size of buffer pointed to by ref. Size includes space for
+*        trailing nul.
 *     status = int* (Given and Returned)
 *        Global status
 
