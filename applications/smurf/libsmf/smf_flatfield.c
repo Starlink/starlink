@@ -45,6 +45,8 @@
 *        data need flatfielding and odata exists
 *     2005-12-14 (AGG):
 *        Now calls smf_clone_data for when the data are already flatfielded
+*     2005-12-16 (AGG):
+*        All combinations of flatfield & *odata statuses covered
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,7 +109,6 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
   void *ipntr[3];             /* Input D, Q and V arrays */
   void *opntr[3];             /* Output D, Q and V arrays */
-  double *indata;             /* Pointer to input DATA */
   double *outdata;            /* Pointer to output DATA */
   int *tstream;               /* Pointer to raw time series data */
   smf_dtype dtype;            /* Data type */
@@ -125,14 +126,13 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
     /* check *odata */
     if ( *odata == NULL) {
 
-      /* If NULL then we need to clone idata to odata */
-
-      smf_clone_data( idata, odata, status );
-
       msgOutif(MSG__VERB, "smf_flatfield", "Data FF, no odata", status);
+      /* If NULL then we need to clone idata to odata */
+      smf_clone_data( idata, odata, status );
 
     } else {
 
+      msgOutif(MSG__VERB, "smf_flatfield","Data FF, odata exists", status);
       /* Check dimensions and type */
       dtype = (*odata)->dtype;
       ndims = (*odata)->ndims;
@@ -152,10 +152,44 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
         errRep( "smf_flatfield", 
 		"Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
       } else {
+	/* Check if the data array(s) exist */
+	opntr[0] = ((*odata)->pntr)[0];
+	if (opntr[0] == NULL) {
+	  /* Allocate space for output data, copy over input data */
+	  ipntr[0] = (idata->pntr)[0];
+	  opntr[0] = malloc( npts * sizeof( double ) );
+	  memcpy( opntr[0], ipntr[0], npts*sizeof( double ) );
+	}
+	/* All's well so start populating the rest of the *odata
+	   struct if necessary */
+	/* Does the header (hdr) exist? */
+	hdr = (*odata)->hdr;
+	if ( (*odata)->hdr == NULL) {
+	  hdr = malloc( sizeof( smfHead ) );
+	  /* Copy old hdr into the new hdr and store in *odata */
+	  memcpy( hdr, idata->hdr, sizeof( smfHead ) );
+	  (*odata)->hdr = hdr; 
+	}
 
+	/* Does the flatfield (smfDA) struct exist? */
+	da = (*odata)->da;
+	if ( da == NULL ) {
+	  da = malloc( sizeof( smfDA ) );
+	  /* Copy flatfield info into *odata */
+	  memcpy( da, idata->da, sizeof( smfDA ) );
+	  (*odata)->da = da;
+	}
+
+	/* Does the file (smfFile) struct exist? */
+	file = (*odata)->file;
+	if ( file == NULL ) {
+	  file = malloc( sizeof( smfFile ) );
+	  /* Copy file info */
+	  memcpy( file, idata->file, sizeof( smfFile ) );
+	  (*odata)->file = file;
+	}
       }      
 
-      msgOutif(MSG__VERB, "smf_flatfield","Data FF, odata exists", status);
     }
 
   } else if ( checkflatstatus == SAI__OK ) { 
