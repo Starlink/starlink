@@ -13,7 +13,8 @@ kps1_agndw.f kps1_agnls.f kps1_agnms.f kps1_agnst.f kps1_agnwc.f   \
 kps1_bafid.f kps1_bafir.f kps1_ccmpp.f kps1_ccmqn.f kps1_cenab.f   \
 kps1_cenad.f kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f \
 kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f   \
-kps1_cff2d.f kps1_cff2r.f kps1_clnsr.f kps1_clpa0.f kps1_clpal.f kps1_cnser.f   \
+kps1_cff2d.f kps1_cff2r.f kps1_clipg.f kps1_clipr.f   \
+kps1_clnsr.f kps1_clpa0.f kps1_clpal.f kps1_cnser.f   \
 kps1_cntdr.f kps1_cntgd.f kps1_cntky.f kps1_cntpn.f kps1_cntsc.f   \
 kps1_cntst.f kps1_cnvfp.f kps1_cnvlv.f kps1_cnvrp.f kps1_cpbb.f	   \
 kps1_cpbd.f kps1_cpbi.f kps1_cpbr.f kps1_cpbub.f kps1_cpbuw.f	   \
@@ -54,12 +55,12 @@ kps1_rorbd.f kps1_rorbi.f kps1_rorbr.f kps1_rosiz.f kps1_rprfb.f   \
 kps1_rprfd.f kps1_rprfi.f kps1_rprfr.f kps1_rprfub.f kps1_rprfuw.f \
 kps1_rprfw.f kps1_saxlk.f kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f   \
 kps1_skyfn.f kps1_skyft.f kps1_stqa0.f kps1_stqa1.f  \
-kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f   \
-kps1_supev.f kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f	   \
-kps1_susf.f kps1_suskr.f kps1_trdrd.f kps1_trdri.f kps1_trdrr.f	   \
-kps1_trndd.f kps1_trndi.f kps1_trndr.f kps1_trnvd.f kps1_trnvi.f   \
-kps1_trnvr.f kps1_trop1.f kps1_trop2.f kps1_vecky.f kps1_vecpl.f   \
-kps1_vect.f kps1_wala0.f kps1_wala7.f kps1_wieap.f kps1_wiecp.f kps1_wiecs.f \
+kps1_sucld.f kps1_suclr.f kps1_supeb.f kps1_supei.f kps1_supev.f   \
+kps1_supf.f kps1_suseb.f kps1_susei.f kps1_susev.f kps1_susf.f     \
+kps1_suskr.f kps1_trdrd.f kps1_trdri.f kps1_trdrr.f kps1_trndd.f   \
+kps1_trndi.f kps1_trndr.f kps1_trnvd.f kps1_trnvi.f kps1_trnvr.f   \
+kps1_trop1.f kps1_trop2.f kps1_vecky.f kps1_vecpl.f kps1_vect.f    \
+kps1_wala0.f kps1_wala7.f kps1_wieap.f kps1_wiecp.f kps1_wiecs.f   \
 kps1_wiefl.f kps1_wiefp.f kps1_wieou.f kps1_wiepw.f kps1_zpdec.f   \
 kps1_zprep.f kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f   \
 kps1_zprgub.f kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f med3d.f \
