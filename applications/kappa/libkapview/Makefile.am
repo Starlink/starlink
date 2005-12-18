@@ -4,7 +4,7 @@ noinst_DATA = kapview.hlp
 
 libkapview_la_SOURCES = $(F_ROUTINES)
 
-F_ROUTINES = ardplot.f colcomp.f contour.f cursor.f drawsig.f	      \
+F_ROUTINES = ardplot.f clinplot.f colcomp.f contour.f cursor.f drawsig.f	      \
 drawnorth.f display.f elprof.f gdclear.f gdnames.f gdset.f gdstate.f  \
 linplot.f lutable.f lutsave.f lutview.f lutedit.f mlinplot.f paldef.f \
 palentry.f palread.f palsave.f piccur.f picdef.f picempty.f	      \
