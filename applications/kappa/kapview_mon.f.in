@@ -45,8 +45,8 @@
 *        Added DRAWSIG.  Removed BLINK, IDUNZOOM, IDVISIBLE.  V1.1.
 *        Temporarily removed COLUMNAR and HIDE.
 *     13-MAY-1999 (DSB):
-*        Changed history application name to incorporate the current version
-*        of KAPPA.
+*        Changed history application name to incorporate the current
+*        version of KAPPA.
 *     23-AUG-1999 (DSB):
 *        V0.14 - Added SCATTER.
 *     30-AUG-1999 (DSB):
@@ -55,6 +55,8 @@
 *        Added call to LPG_REPLA.
 *     29-SEP-2005 (DSB):
 *        Added warnings about unannulled GRP identifiers.
+*     2005 November 25 (MJC):
+*        Added CLINPLOT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,9 +104,9 @@
 *  Make CAT run in quiet mode.
       CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
 
-*  Define the current application name for history. The package version
-*  number gets substituted in here when the KAPPA release source tar file 
-*  is contructed.
+*  Define the current application name for history.  The package version
+*  number gets substituted in here when the KAPPA release source tar 
+*  file is contructed.
       CALL NDF_HAPPN( NAME // ' (KAPPA @PACKAGE_VERSION@)', STATUS )
 
 *  See if NDF names should be reported when looping.
@@ -120,7 +122,7 @@
       DELAY = 0.0
       CALL KPG1_ENV0R( 'KAPPA_LOOP_DELAY', DELAY, STATUS )
 
-*  Initialise the common blocks used to control multiple invokation of
+*  Initialise the common blocks used to control multiple invocation of
 *  applications to process lists of NDFs.
       CALL LPG_START( VERB, DELAY, DISAB, STATUS )
 
@@ -128,7 +130,8 @@
       CALL KPG1_ENVDF( 'KAPPA_REPLACE', REPL, STATUS )
       CALL LPG_REPLA( REPL, STATUS )
 
-*  Loop round invoking the task for each set of NDFs specified by the user.
+*  Loop round invoking the task for each set of NDFs specified by the 
+*  user.
       DO WHILE( LPG_AGAIN( STATUS ) )
 
 *  Check the string against valid A-task names---if matched then call
@@ -138,7 +141,12 @@
          IF ( NAME .EQ. 'ARDPLOT' ) THEN
             CALL ARDPLOT ( STATUS )
 
-*  Produces a colour composite imaghe from 1,2 or 3 NDFs.
+*  Draws a grid of line plots for a three-dimensional NDF's values 
+*  against their axis co-ordinates.
+         ELSE IF ( NAME .EQ. 'CLINPLOT' ) THEN
+            CALL CLINPLOT ( STATUS )
+
+*  Produces a colour composite image from 1, 2 or 3 NDFs.
          ELSE IF ( NAME .EQ. 'COLCOMP' ) THEN
             CALL COLCOMP ( STATUS )
 
