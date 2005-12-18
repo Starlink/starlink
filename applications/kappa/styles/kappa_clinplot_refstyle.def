@@ -1,0 +1,65 @@
+#+
+#  Name:
+#     kappa_clinplot_refstyle.def
+
+#  Purpose:
+#     Default style for KAPPA application CLINPLOT's lower-left line plots.
+
+#  Description:
+#     This file specifies the plotting attributes to be used if the user
+#     does not give alternative values using the REFSTYLE Parameter of 
+#     application CLINPLOT.  Axis 1 corresponds to the first spectral axis
+#     of the data cube and the horizontal axis in each line plot.
+#     Axis 2 is the data value.
+#
+#     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
+#     files.
+
+#  Notes:
+#     -  Always include attribute axis qualifiers, etc, explicitly in this
+#     file.  For instance, say "textlab(1)=1" and "textlab(2)=1" instead of
+#     just "textlab=1".
+
+#  Authors:
+#     David S. Berry (STARLINK)
+#     Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2005 December 13 (MJC):
+#        Original version derived from kappa_display_style.def.
+#-
+
+# Include the defaults from KAPPA_STYLE
+      ^$KAPPA_DIR/kappa_style.def
+
+#  Do not display the title by default.
+      drawtitle=0
+
+#  Include numerical labels.
+      numlab(1)=1
+      numlab(2)=1
+            
+#  Set colours for various elements of the plot.
+      colour(border)=blue
+      colour(grid)=green
+      colour(ticks)=green
+      colour(numlab)=cyan
+      colour(axes)=green
+
+#  Set the size of the text to use for numerical and textual axis labels.
+#  These are slightly smaller than the default sizes of 1.0.
+#      size(numlab)=0.6
+#      size(textlab)=0.7
+
+#  Use major tick marks on both axes.
+      majtick(1)=1
+      mintick(1)=0
+      majtick(2)=1
+      mintick(2)=0
+      majticklen=0.035
+      minticklen=0.015
+
+      Edge(1)=bottom
+      Edge(2)=left
+      
