@@ -60,7 +60,7 @@ NDFS = $(LUTS) $(TEST_FILES)
 #  Define the standard colour tables.
 
 LUTS = luts/bgyrw_lut.sdf luts/cont_lut.sdf luts/fc_lut.sdf \
-luts/heat_lut.sdf luts/ikon_lut.sdf luts/warm_lut.sdf	    \
+luts/heat_lut.sdf luts/ikon_lut.sdf luts/warm_lut.sdf       \
 luts/ramps_lut.sdf luts/spectrum_lut.sdf luts/zebra_lut.sdf \
 luts/grey_lut.sdf luts/logo_lut.sdf luts/cold_lut.sdf
 
@@ -69,17 +69,18 @@ luts/grey_lut.sdf luts/logo_lut.sdf luts/cold_lut.sdf
 TEST_FILES = data/ccdframec.sdf data/comwest.sdf data/spectrum.sdf    \
 data/m31.sdf data/iras.sdf data/m31_issa_100.sdf data/m31_issa_60.sdf \
 data/m31_issa_25.sdf data/m31_issa_12.sdf data/m57.sdf data/logo.sdf  \
-data/scupol_i.sdf data/scupol_p.sdf data/scupol_ang.sdf		      \
+data/scupol_i.sdf data/scupol_p.sdf data/scupol_ang.sdf               \
 data/m31_issa_12a.sdf data/cobe.sdf data/scumos.sdf
 
 #  Define the plotting style files.
 
 STYLE_FILES = styles/kappa_style.def styles/kappa_ardplot_style.def   \
-styles/kappa_lutview_style.def styles/kappa_keystyle.def	      \
+styles/kappa_clinplot_lpstyle.def styles/kappa_clinplot_refstyle.def         \
+styles/kappa_lutview_style.def styles/kappa_keystyle.def              \
 styles/kappa_linplot_keystyle.def styles/kappa_vecplot_keystyle.def   \
 styles/kappa_display_keystyle.def styles/sty0 styles/sty1 styles/sty2 \
-styles/sty3 styles/kappa_contour_keystyle.def			      \
-styles/kappa_drawnorth_style.def styles/kappa_linplot_style.def	      \
+styles/sty3 styles/kappa_contour_keystyle.def                         \
+styles/kappa_drawnorth_style.def styles/kappa_linplot_style.def       \
 styles/style.def
 
 #  Define the package demo files for use with stardemo.tcl
@@ -106,8 +107,8 @@ help/picgrid.hlp help/piclast.hlp help/picxy.hlp
 
 KAPPA_TASKS = div pow add aperadd ardgen ardmask block cadd calc      \
 calpol cdiv centroid chpix cmult collapse compadd compave compick     \
-convolve copybad creframe csub errclip expon ffclean fillbad	      \
-fitsurface flip fourier gausmooth glitch globals histat histeq	      \
+convolve copybad creframe csub errclip expon ffclean fillbad          \
+fitsurface flip fourier gausmooth glitch globals histat histeq        \
 histogram interleave laplace kstest logar look lucy manic makesurface \
 maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
@@ -115,11 +116,11 @@ slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
 kaphelp mfittrend
 
-KAPVIEW_TASKS = ardplot colcomp contour cursor drawsig drawnorth       \
-display elprof gdclear gdnames gdset gdstate linplot lutable lutsave   \
-lutview lutedit mlinplot paldef palentry palread palsave piccur picdef \
-picempty picentire picin piclabel piclist picsel pictrans picvis       \
-scatter vecplot
+KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
+drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
+lutsave lutview lutedit mlinplot paldef palentry palread palsave \
+piccur picdef picempty picentire picin piclabel piclist picsel \
+pictrans picvis scatter vecplot
 
 NDFPACK_TASKS = axconv axlabel axunits erase fitsdin fitsexist fitsexp \
 fitsimp fitsin fitslist fitsmod fitstext fitsval hiscom hislist hisset \
@@ -238,7 +239,7 @@ mlinplot.ifc paldef.ifc palentry.ifc palread.ifc \
 palsave.ifc piccur.ifc picdef.ifc picempty.ifc \
 picentire.ifc picin.ifc piclabel.ifc piclist.ifc \
 picsel.ifc pictrans.ifc picvis.ifc scatter.ifc \
-vecplot.ifc ardplot.ifc colcomp.ifc contour.ifc \
+vecplot.ifc ardplot.ifc clinplot.ifc colcomp.ifc contour.ifc \
 cursor.ifc display.ifc drawnorth.ifc drawsig.ifc \
 elprof.ifc gdclear.ifc gdnames.ifc gdset.ifc \
 gdstate.ifc kaphelp.ifc kapversion.ifc listmake.ifc \
@@ -283,7 +284,7 @@ trig.ifl wcsalign.ifl wcsmosaic.ifl wcstran.ifl wiener.ifl \
 zaplin.ifl add.ifl aperadd.ifl ardgen.ifl ardmask.ifl \
 ardplot.ifl axlabel.ifl axunits.ifl block.ifl cadd.ifl \
 calc.ifl calpol.ifl cdiv.ifl centroid.ifl chain.ifl \
-colcomp.ifl contour.ifl cursor.ifl display.ifl \
+clinplot.ifl colcomp.ifl contour.ifl cursor.ifl display.ifl \
 drawnorth.ifl drawsig.ifl elprof.ifl erase.ifl \
 fitsdin.ifl fitsexist.ifl fitsexp.ifl fitsimp.ifl \
 fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl \
