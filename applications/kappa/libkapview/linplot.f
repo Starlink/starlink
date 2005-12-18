@@ -23,13 +23,13 @@
 *     This application creates a plot of array value against position
 *     for a one-dimensional NDF.  The vertical axis of the plot
 *     represents array value, and the horizontal axis represents 
-*     position.  These can be mapped in various ways onto the graphics
-*     surface (e.g. linearly, logarithmically, etc.); see parameters 
+*     position.  These can be mapped in various ways on to the graphics
+*     surface (e.g. linearly, logarithmically); see parameters 
 *     XMAP and YMAP).
 *
 *     The plot may take several different forms such as a
-*     "join-the-dots" plot, a "staircase" plot, a "chain" plot, etc., 
-*     (see parameter MODE).  Errors on both the data values and the data
+*     "join-the-dots" plot, a "staircase" plot, a "chain" plot (see 
+*     parameter MODE).  Errors on both the data values and the data
 *     positions may be represented in several different ways (see 
 *     parameters ERRBAR and SHAPE).  The plotting style (colour, fonts,
 *     text size, etc) may be specified in detail using parameter STYLE.
@@ -355,7 +355,7 @@
 *        should be supplied.  See also parameter ALIGN. [!]
 *     XMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the X axis is mapped
-*        onto the plot.  The options are:
+*        on to the plot.  The options are:
 *
 *        - "Pixel" -- The mapping is such that pixel index within the
 *        input NDF increases linearly across the plot.
@@ -399,12 +399,12 @@
 *        See also parameter ALIGN. [!]
 *     YMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the Y axis is mapped
-*        onto the screen. The options are:
+*        on to the screen.  The options are:
 *
-*        - "Linear" -- The data values are mapped linearly onto the
+*        - "Linear" -- The data values are mapped linearly on to the
 *        screen.
 *
-*        - "Log" -- The data values are logged logarithmically onto the
+*        - "Log" -- The data values are logged logarithmically on to the
 *        screen.  An error will be reported if the dynamic range of
 *        the axis is less than 100, or if the range specified by YTOP 
 *        and YBOT encompasses the value zero.  For this reason, care 
@@ -413,9 +413,9 @@
 *        so far that it encompasses zero. 
 *
 *        - "ValueLog" -- This is similar to "Log" except that, instead 
-*        of mapping the data values logarithmically onto the screen,
+*        of mapping the data values logarithmically on to the screen,
 *        this option maps the log (base 10) of the data values linearly 
-*        onto the screen.  If this option is selected, the values 
+*        on to the screen.  If this option is selected, the values 
 *        supplied for parameters YTOP and YBOT should be values for the 
 *        logarithm of the data value, not the data value itself. 
 *        ["Linear"]
@@ -465,7 +465,7 @@
 *        This plots the data values in the entire one-dimensional NDF
 *        called prof, against the value described by the second axis in
 *        the current co-ordinate Frame of the NDF.  The values
-*        represented by both axes are mapped logarithmically onto the
+*        represented by both axes are mapped logarithmically on to the
 *        screen.  The bottom of the vertical axis corresponds to a data
 *        value of 10.0 and the top corresponds to a data value of
 *        1000.0.
@@ -490,10 +490,10 @@
 *        plots are different.
 *     linplot spectrum system="'system(1)=freq,unit(1)=GHz'"
 *        This example assumes that the current co-ordinate Frame of NDF 
-*        "spectrum" is a SpecFrame.  The horizontal axis (axis "1") is 
+*        spectrum is a SpecFrame.  The horizontal axis (axis "1") is 
 *        labelled with frequency values, in units of GHz.  If the 
 *        SpecFrame represents some other system (such as wavelength, 
-*        velocity, energy, etc.), or has some other units, then the 
+*        velocity, energy), or has some other units, then the 
 *        conversion is done automatically.  Note, a SpecFrame is a 
 *        specialised class of Frame which knows how to do these 
 *        conversions; the above command will fail if the current
@@ -608,8 +608,8 @@
       CHARACTER NDFNAM*255     ! Full NDF specification 
       CHARACTER TEXT*255       ! A general text string
       CHARACTER UNITS*20       ! Units of the data
-      CHARACTER XMAP*8         ! How to map the X axis onto the screen
-      CHARACTER YMAP*8         ! How to map the Y axis onto the screen
+      CHARACTER XMAP*8         ! How to map the X axis on to the screen
+      CHARACTER YMAP*8         ! How to map the Y axis on to the screen
       DOUBLE PRECISION BL( 2 ) ! "W.w. want" X/Y values at bottom-left 
                                ! corner
       DOUBLE PRECISION BLG( 2 )! "Uniform" X/Y values at bottom-left 
@@ -897,7 +897,7 @@
          END IF
       END IF
 
-*  See how the X and Y axes are to be mapped onto the screen.
+*  See how the X and Y axes are to be mapped on to the screen.
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL PAR_CHOIC( 'XMAP', 'Default', 'Default,Linear,Log,Pixel,'//
      :                'Distance', .TRUE., XMAP, STATUS )
@@ -913,7 +913,7 @@
 *  raw (or logged if ymap=ValueLog) data value.  This Frame 
 *  corresponds to "what we want to see" and is given the Domain 
 *  "DATAPLOT".  Frame 2 (the Base Frame) is spanned by the axes which 
-*  are to be mapped linearly or logarithmically onto the graphics
+*  are to be mapped linearly or logarithmically on to the graphics
 *  surface.  Axis 1 will be determined by the setting of parameter XMAP,
 *  and axis 2 by the setting of YMAP.  This Frame corresponds to the 
 *  "uniform" co-ordinate system, and is given the Domain AGI_WORLD.  A
@@ -1578,7 +1578,8 @@
       CALL AST_SETL( IPLOT, 'LOGPLOT(2)', ( YMAP .EQ. 'LOG' ), STATUS )
 
 *  Get the one-dimensional mappings which transform each of the 
-*  GRAPHICS Frame axes onto the corresponding "what we want" Frame axes.
+*  GRAPHICS Frame axes on to the corresponding "what we want" Frame
+*  axes.
       CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
 
 *  Map all the required axis values from "what we want" into GRAPHICS.
