@@ -3224,6 +3224,312 @@ package kappa {
 
       }
 
+      action clinplot {
+         alias {clinp(lot)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter align {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            prompt {Align the horizontal axis with the existing plot?}
+            default !
+            helpkey *
+          }
+
+         parameter axes {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default FALSE
+            prompt {Produce annotated axes around each line plot?}
+            helpkey *
+          }
+
+         parameter centre {
+            type LITERAL
+            prompt {Spatial position at the centre of the image}
+            vpath DEFAULT
+            ppath DYNAMIC CURRENT
+            default !
+            helpkey *
+          }
+
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default TRUE
+          }
+
+         parameter comp {
+            position 2
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            prompt {Component to display}
+            helpkey *
+            default Data
+          }
+
+         parameter device {
+            position 8
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.GRAPHICS_DEVICE
+            prompt {Name of graphics device}
+            helpkey *
+          }
+
+         parameter errbar {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Draw error bars on the graphs?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter extaxes {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Produce exterior annotated axes?}
+            helpkey *
+          }
+
+         parameter fill {
+            type _LOGICAL
+            prompt {Fill the plotting area?}
+            vpath DYNAMIC DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter freq {
+            type _INTEGER
+            prompt {Frequency of plotted error bars}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 1
+          }
+
+         parameter lmode {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Method for determining default y-axis bounds in the line plots}
+            helpkey *
+            default Extended
+          }
+
+         parameter lpmargin {
+            size *
+            type _REAL
+            prompt {Widths of margins around the grid of plots}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter lpstyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the line plots}
+            helpkey *
+            default !
+          }
+
+         parameter margin {
+            size *
+            type _REAL
+            prompt {Widths of margins around spatial axes}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter marker {
+            type _INTEGER
+            prompt {PGPLOT marker type}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 11
+            helpkey *
+          }
+
+         parameter mode {
+            position 3
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Method for displaying the data curve}
+            default Line
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {3-dimensional array to be displayed}
+            helpkey *
+          }
+
+         parameter refaxes {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            prompt {Produce annotated axes around lower-left line plot?}
+            helpkey *
+          }
+
+         parameter refstyle {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the lower-left line plot}
+            helpkey *
+            default !
+          }
+
+         parameter shape {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Method for displaying the errors}
+            helpkey *
+            default Bars
+          }
+
+         parameter style {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath CURRENT DEFAULT
+            prompt {Plotting style for the annotated axes and data curve}
+            helpkey *
+            default !
+          }
+
+         parameter useaxis {
+            type LITERAL
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            prompt {The axis to be annotated}
+            default !
+            helpkey *
+          }
+
+         parameter xleft {
+            position 4
+            type LITERAL
+            prompt {Axis value at left end of horizontal spectral axis}
+            vpath DEFAULT
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+
+         parameter xmagn {
+            type _REAL
+            prompt {Magnification in x spatial co-ordinate about the centre of array}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 1.0
+            helpkey *
+          }
+
+         parameter xmap {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Mapping of x spectral axis onto screen}
+            ppath DEFAULT
+            default Default
+            helpkey *
+         }
+
+         parameter xright {
+            position 5
+            type LITERAL
+            prompt {Axis value at right end of horizontal spectral axis}
+            vpath DEFAULT
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+
+         parameter xsigma {
+            type _REAL
+            prompt {Number of standard deviations for horizontal error bars}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 1.0
+          }
+
+         parameter ybot {
+            position 6
+            type LITERAL
+            prompt {Axis value at bottom of vertical spectral axis}
+            vpath DEFAULT
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+
+         parameter ymagn {
+            type _REAL
+            prompt {Magnification in y spatial co-ordinate about the centre of array}
+            vpath DEFAULT
+            ppath DYNAMIC DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter ymap {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Mapping of y axis on to screen}
+            ppath DEFAULT
+            default Linear
+            helpkey *
+         }
+
+         parameter ysigma {
+            type _REAL
+            prompt {Number of standard deviations for vertical error bars}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+            default 1.0
+          }
+
+         parameter ytop {
+            position 7
+            type LITERAL
+            prompt {Axis value at top of vertical spectral axis}
+            vpath DEFAULT
+            ppath DYNAMIC
+            default !
+            helpkey *
+          }
+
+      }
+
       action colcomp {
 
          alias {colcomp}
