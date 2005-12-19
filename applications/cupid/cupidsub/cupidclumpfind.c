@@ -373,32 +373,34 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             msgOut( "", "^N usable clumps found", status );
          }
 
-         msgSeti( "M", minpix );
-         if( nminpix == 1 ) {
-            msgOut( "", "1 clump rejected because it contains fewer "
-                    "than MinPix (^M) pixels", status );
-         } else if( nminpix > 1 ) {
-            msgSeti( "N", nminpix );
-            msgOut( "", "^N clumps rejected because they contain fewer "
-                    "than MinPix (^M) pixels", status );
-         }
-
-         if( nbad == 1 ) {
-            msgOut( "", "1 clump rejected because it contains 1 or more bad "
-                    "pixels", status );
-         } else if( nbad > 1 ) {
-            msgSeti( "N", nbad );
-            msgOut( "", "^N clumps rejected because they contain 1 or more bad "
-                    "pixels", status );
-         }
-
-         if( nedge == 1 ) {
-            msgOut( "", "1 clump rejected because it touches an edge of "
-                    "the data array", status );
-         } else if( nedge > 1 ) {
-            msgSeti( "N", nedge );
-            msgOut( "", "^N clumps rejected because they touch an edge of "
-                    "the data array", status );
+         if( ilevel > 1 ) {
+            msgSeti( "M", minpix );
+            if( nminpix == 1 ) {
+               msgOut( "", "1 clump rejected because it contains fewer "
+                       "than MinPix (^M) pixels", status );
+            } else if( nminpix > 1 ) {
+               msgSeti( "N", nminpix );
+               msgOut( "", "^N clumps rejected because they contain fewer "
+                       "than MinPix (^M) pixels", status );
+            }
+   
+            if( nbad == 1 ) {
+               msgOut( "", "1 clump rejected because it contains 1 or more bad "
+                       "pixels", status );
+            } else if( nbad > 1 ) {
+               msgSeti( "N", nbad );
+               msgOut( "", "^N clumps rejected because they contain 1 or more bad "
+                       "pixels", status );
+            }
+   
+            if( nedge == 1 ) {
+               msgOut( "", "1 clump rejected because it touches an edge of "
+                       "the data array", status );
+            } else if( nedge > 1 ) {
+               msgSeti( "N", nedge );
+               msgOut( "", "^N clumps rejected because they touch an edge of "
+                       "the data array", status );
+            }
          }
       }
 

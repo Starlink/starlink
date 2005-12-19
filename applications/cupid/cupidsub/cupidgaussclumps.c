@@ -285,6 +285,8 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
       peaks = astMalloc( sizeof( double )*npeak );
       for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
+      if( ilevel > 1 ) msgBlank( status );
+
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
       iter = 1;
@@ -310,7 +312,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
          if( allbad ) {    
             iter = 0;
             niter--;
-            if( ilevel > 1 ) msgBlank( status );
+            if( ilevel > 2 ) msgBlank( status );
             if( ilevel > 3 ) {
                msgOut( "", "There are no good pixels left to be fitted.", 
                        status );
@@ -319,7 +321,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
          } else if( nskip > maxskip ){
             iter = 0;
             niter--;
-            if( ilevel > 1 ) msgBlank( status );
+            if( ilevel > 2 ) msgBlank( status );
             if( ilevel > 3 ) {
                msgSeti( "N", maxskip );
                msgOut( "", "The previous ^N fits were unusable.", status );
@@ -405,7 +407,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
                   if( iclump == maxclump ) {
                      iter = 0;
 
-                     if( ilevel > 1 ) msgBlank( status );
+                     if( ilevel > 2 ) msgBlank( status );
                      if( ilevel > 3 ) {
                         msgSeti( "M", maxclump );
                         msgOut( "", "The specified maximum number of "
@@ -418,7 +420,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
                   } else if( peaks_below == npad ) {
                      iter = 0;
  
-                     if( ilevel > 1 ) msgBlank( status );
+                     if( ilevel > 2 ) msgBlank( status );
                      if( ilevel > 3 ) {
                         msgSeti( "N", npad );
                         msgOut( "", "The previous ^N clumps all had peak "
@@ -482,13 +484,14 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 /* Tell the user how clumps are being returned. */
    *nclump = iclump;
    if( ilevel > 0 ) {
+      if( ilevel > 1 ) msgBlank( status );
       if( *nclump == 0 ) {
-         msgOut( "", "No clumps found", status );
+         msgOut( "", "No usable clumps found", status );
       } else if( *nclump == 1 ){
-         msgOut( "", "One clump found", status );
+         msgOut( "", "One usable clump found", status );
       } else {
          msgSeti( "N", *nclump );
-         msgOut( "", "^N clumps found", status );
+         msgOut( "", "^N usable clumps found", status );
       }
    }
 

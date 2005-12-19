@@ -65,7 +65,7 @@ void cupidGCListClump( int iclump, int ndim, double *par, double chisq,
 
 /* Report information to standard output if requested. */
    if( ilevel == 2 || ilevel == 3 ) {
-      msgBlank( status );
+      if(  ilevel == 3 ) msgBlank( status );
       msgSeti( "N", iclump );
       msgOut( "", "Clump ^N:", status );
    } else if( ilevel > 3 ) {
