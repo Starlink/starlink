@@ -61,6 +61,9 @@
 //        insignificant dimensions (in the base frame).
 //    16-NOV-2005 (PWD):
 //        Added deltset from 2.7.4.
+//    19-DEC-2005 (PWD):
+//        Implemented projection and xRefPix and yRefPix. These are now
+//        used in Skycat.
 //-
 
 #include <cstring>
@@ -130,9 +133,12 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
     ySecPix_(0.0),
     issky_(1),
     warnings_(NULL),
-    extraPrecision_( 0 )
+    extraPrecision_(0),
+    xrefpix_(0.0),
+    yrefpix_(0.0)
 {
     equinoxStr_[0] = '\0';
+    projection_[0] = '\0';
 
     // If any errors from previous states are active then cancel them.
     if ( ! astOK ) astClearStatus;
@@ -203,6 +209,43 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
                 }
             }
 
+            // Record projection from CTYPE1. If not CTYPE1 value then it's
+            // UNKNOWN (probably no WCS or AST native).
+            astClear( fitschan, "Card" );
+            strcpy( projection_, "UNKNOWN" );
+            if ( astFindFits( fitschan, "CTYPE1", card, 1) ) {
+                if ( ( ptr = strstr( card, "RA---" ) ) != (char *)NULL ||
+                     ( ptr = strstr( card, "DEC--" ) ) != (char *)NULL ) {
+                    ptr += 5;
+                    strncpy( projection_, ptr, 3 );
+                    projection_[3] = '\0';
+                }
+            }
+
+            // Record CRPIX1 and CRPIX2. Set to 0.0 if not found.
+            astClear( fitschan, "Card" );
+            xrefpix_ = 0.0;
+            yrefpix_ = 0.0;
+            if ( astFindFits( fitschan, "CRPIX1", card, 1) ) {
+                if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
+                    float value;
+                    sscanf( ++ptr, "%g", &value );
+                    xrefpix_ = (double) value;
+                }
+                if ( astFindFits( fitschan, "CRPIX2", card, 1) ) {
+                    if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
+                        float value;
+                        sscanf( ++ptr, "%g", &value );
+                        yrefpix_ = (double) value;
+                    }
+                }
+            }
+            else {
+                //  Reference pixel is centre of image.
+                xrefpix_ = nxpix_ / 2;
+                yrefpix_ = nypix_ / 2;
+            }
+
             //  CAR projections are sometimes incorrect and what is
             //  required in a linear transformation. This is
             //  controlled by the static member carlin_.
@@ -231,7 +274,7 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
                     astClearStatus;
                     wcs_ = (AstFrameSet *) astAnnul( wcs_ );
                     print_error( "Failed to read a 2D World Coordinate System from FITS headers");
-                } 
+                }
                 else {
                     initCelestial();
                 }
@@ -274,7 +317,7 @@ void StarWCS::initCelestial()
     equinoxStr_[0] = '\0';
     xSecPix_ = 0.0;
     ySecPix_ = 0.0;
-    
+
     //  If celestial need additional information about equinox, which
     //  axes are RA and Dec and the image scales.
     setCelestial();
@@ -310,7 +353,7 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             wcs_ = astcopy;
             error( "Failed to read a 2D World Coordinate System from FITS headers");
             return 0;
-        } 
+        }
         else {
 
             initCelestial();
@@ -318,7 +361,7 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
             // Release the old WCS.
             astcopy = (AstFrameSet *) astAnnul( astcopy );
         }
-    } 
+    }
     else {
 
         //  Not a valid FrameSet
@@ -364,7 +407,7 @@ void StarWCS::setSecPix()
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } 
+    }
     else {
         point1[1] = xout[0];
         point1[0] = yout[0];
@@ -375,7 +418,7 @@ void StarWCS::setSecPix()
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         xSecPix_ = 0.0;
-    } 
+    }
     else {
         xSecPix_ = dist * r2d_ * 3600.0;
     }
@@ -394,7 +437,7 @@ void StarWCS::setSecPix()
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } 
+    }
     else {
         point1[1] = xout[0];
         point1[0] = yout[0];
@@ -405,7 +448,7 @@ void StarWCS::setSecPix()
     if ( ! astOK ) astClearStatus;
     if ( dist == AST__BAD ) {
         ySecPix_ = 0.0;
-    } 
+    }
     else {
         ySecPix_ = dist * r2d_ * 3600.0;
     }
@@ -430,14 +473,14 @@ void StarWCS::setEquinox()
         //  Make sure system should have an equinox associated with it.
         if ( strncmp( "FK", system, 2 ) == 0 ||
              strcmp( "ECLIPTIC", system ) == 0 ) {
-            
+
             //  Get a string version of the equinox to display.
             if ( equinox_ == 2000.0 ) {
                 strcpy( equinoxStr_, "J2000" );
-            } 
+            }
             else if ( equinox_ == 1950.0 ) {
                 strcpy( equinoxStr_, "B1950" );
-            } 
+            }
             else {
                 sprintf( equinoxStr_, "%g %s", equinox_, system );
                 if ( ! astOK ) astClearStatus;
@@ -600,7 +643,7 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
         if ( raIndex_ == 1 ) {
             ra = point[0] * r2d_;
             dec = point[1] * r2d_;
-        } 
+        }
         else {
             dec = point[0] * r2d_;
             ra = point[1] * r2d_;
@@ -626,7 +669,7 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( raIndex_ == 1 ) {
         oldx[0] = ra * d2r_;  // Convert into radians.
         oldy[0] = dec * d2r_;
-    } 
+    }
     else {
         oldy[0] = ra * d2r_;
         oldx[0] = dec * d2r_;
@@ -635,7 +678,7 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coords");
-    } 
+    }
     else {
         x = newx[0];
         y = newy[0];
@@ -658,7 +701,7 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 //  degrees.
 //
 
-int StarWCS::anyWcs2pix( double inx, double iny, int notcelestial, 
+int StarWCS::anyWcs2pix( double inx, double iny, int notcelestial,
                          double &outx, double &outy ) const
 {
     outx = outy = 0.0;
@@ -678,7 +721,7 @@ int StarWCS::anyWcs2pix( double inx, double iny, int notcelestial,
     if ( ! astOK ) {
         astClearStatus;
         return error( "can't convert world coords" );
-    } 
+    }
     else {
         outx = newx[0];
         outy = newy[0];
@@ -727,7 +770,7 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 1.0;
         yin[0] = 0.0;
         yin[1] = 0.0;
-    } 
+    }
     else {
         xin[0] = 0.0;
         xin[1] = 0.0;
@@ -747,7 +790,7 @@ int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
         xin[1] = 0.0;
         yin[0] = 0.0;
         yin[1] = 1.0;
-    } 
+    }
     else {
         xin[0] = 0.0;
         xin[1] = 1.0;
@@ -784,7 +827,7 @@ double StarWCS::dist(double ra0, double dec0, double ra1, double dec1) const
     if ( raIndex_ == 1 ) {
         point1[0] = ra0 * d2r_, point2[0] = ra1 * d2r_;
         point1[1] = dec0 * d2r_, point2[1] = dec1 * d2r_;
-    } 
+    }
     else {
         point1[1] = ra0 * d2r_, point2[1] = ra1 * d2r_;
         point1[0] = dec0 * d2r_, point2[0] = dec1 * d2r_;
@@ -826,7 +869,7 @@ double StarWCS::width() const
         point1[0] = yout[0];
         point2[1] = xout[1];
         point2[0] = yout[1];
-    } 
+    }
     else {
         point1[0] = xout[0];
         point1[1] = yout[0];
@@ -844,7 +887,7 @@ double StarWCS::width() const
     //  estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = xSecPix_ * nxpix_;
-    } 
+    }
     else {
         dist *= 60.0 * r2d_;
     }
@@ -880,7 +923,7 @@ double StarWCS::height() const
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } 
+    }
     else {
         point1[1] = xout[0];
         point1[0] = yout[0];
@@ -897,7 +940,7 @@ double StarWCS::height() const
     //  is same coordinate. If so use arcsec per pixel estimate.
     if ( dist == 0.0 || dist < DBL_EPSILON ) {
         dist = ySecPix_ * nypix_;
-    } 
+    }
     else {
         dist *= 60.0 * r2d_;
     }
@@ -933,7 +976,7 @@ double StarWCS::radius() const
         point1[1] = yout[0];
         point2[0] = xout[1];
         point2[1] = yout[1];
-    } 
+    }
     else {
         point1[1] = xout[0];
         point1[0] = yout[0];
@@ -953,7 +996,7 @@ double StarWCS::radius() const
         dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
                       + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
 
-    } 
+    }
     else {
         dist *= 60.0 * r2d_;
     }
@@ -1011,14 +1054,18 @@ int StarWCS::set( double ra, double dec,
         astPutFits( fitschan, card, 0 );
     }
 
+    //  Don't use the default "UNKNOWN", this is probably just being returned
+    //  from a query.
     char buf[20];
-    sprintf( buf, "RA---%s", proj );
-    ccard( card, "CTYPE1", buf );
-    astPutFits( fitschan, card, 0 );
+    if ( strncmp( proj, "UNKNOWN", 7 ) != 0 ) {
+        sprintf( buf, "RA---%s", proj );
+        ccard( card, "CTYPE1", buf );
+        astPutFits( fitschan, card, 0 );
 
-    sprintf( buf, "DEC--%s", proj );
-    ccard( card, "CTYPE2", buf );
-    astPutFits( fitschan, card, 0 );
+        sprintf( buf, "DEC--%s", proj );
+        ccard( card, "CTYPE2", buf );
+        astPutFits( fitschan, card, 0 );
+    }
 
     dcard( card, "CRVAL1", ra );
     astPutFits( fitschan, card, 0 );
@@ -1047,7 +1094,7 @@ int StarWCS::set( double ra, double dec,
     AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
     if ( fitsset != AST__NULL ) {
         wcs_ = fitsset;
-    } 
+    }
     else {
         if ( ! astOK ) astClearStatus;
         fitschan = (AstFitsChan *) astAnnul( fitschan );
@@ -1096,7 +1143,7 @@ int StarWCS::astSetAttrib( const char *what, const char *value )
     if ( ! wcs_ ) {
         return 0;
     }
-    
+
     //  Check for a change in coordinates, we need to update when that
     //  occurs.
     int oldcurrent = astGetI( wcs_, "Current" );
@@ -1394,7 +1441,7 @@ int StarWCS::shift(double ra, double dec, double equinox)
     // frameset as the current frame? What is is centre in this case
     // (reference pixel? -- actually this is assumed to be the centre
     // of the image.).
-    cerr << "WCS::shift, this function is not implemented -- sorry." 
+    cerr << "WCS::shift, this function is not implemented -- sorry."
          << std::endl;
     return 0;
 }
@@ -1405,7 +1452,7 @@ int StarWCS::shift(double ra, double dec, double equinox)
 int StarWCS::deltset( double cdelt1, double cdelt2, double rotation )
 {
     //  No meaning for AST WCS.
-    cerr << "WCS::deltset, this function is not implemented -- sorry." 
+    cerr << "WCS::deltset, this function is not implemented -- sorry."
          << std::endl;
     return 0;
 }
@@ -1505,7 +1552,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     if ( nwarns > 0 || encoding || failed ) {
         os << ends;
         const char *str = os.str().c_str();
-        
+
         //  os falls out of scope so we need a copy.
         warnings_ = strcpy( new char[ strlen( str ) + 1 ], str );
     }
@@ -1519,7 +1566,7 @@ const char *StarWCS::getWarning()
 {
     if ( warnings_ ) {
         return warnings_;
-    } 
+    }
     else {
         return NULL;
     }
@@ -1569,4 +1616,5 @@ char *StarWCS::getDomains()
     }
     return namelist;
 }
+
 

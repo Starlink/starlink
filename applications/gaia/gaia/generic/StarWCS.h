@@ -58,6 +58,13 @@ protected:
   //  Equinox string: "J2000", "B1950", ...
   char equinoxStr_[32];
 
+  //  Projection, if known.
+  char projection_[10];
+
+  //  Reference pixels (again if known).
+  double xrefpix_;
+  double yrefpix_;
+
   //  Set up object for celestial coordinates.
   void initCelestial();
 
@@ -201,12 +208,13 @@ public:
   int pixWidth() const {return nxpix_;}
   int pixHeight() const {return nypix_;}
 
-  // Return the x,y reference pixel values XXX ?????????
-  double xRefPix() const {return 0.0;}
-  double yRefPix() const {return 0.0;}
+  // Return the x,y reference pixel values, only works for FITS-like headers,
+  // otherwise return central pixel.
+  double xRefPix() const { return xrefpix_; }
+  double yRefPix() const { return yrefpix_; }
 
-  // Return the projection type  XXX ??????????
-  const char* projection() const {return "UNKNOWN";}
+  // Return the projection type, only works for FITS-like headers.
+  const char* projection() const { return projection_; }
 
   // Return a clone of the pointer to the main AstFrameSet.
   AstFrameSet *astWCSClone() const {
