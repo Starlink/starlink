@@ -400,7 +400,7 @@ void makeclumps() {
 
 /* Store the clump properties in the output catalogue. This also annuls the 
    HDS locators stored within "clist". */
-   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, 
+   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, back,
                      "Output from CUPID:MAKECLUMPS" );
 
 /* Relase the extension locator.*/

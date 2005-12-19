@@ -163,7 +163,9 @@ void clumps() {
 *     algorithm works by first contouring the data at a multiple of the
 *     noise, then searches for peaks of emission which locate the clumps,
 *     and then follows them down to lower intensities. No a priori clump
-*     profile is assumed. In this algorithm, clumps never overlap.
+*     profile is assumed. In this algorithm, clumps never overlap. Clumps
+*     which touch an edge of the data array or include any bad pixels are
+*     ignored.
 
 *  GaussClumps Configuration Parameters:
 *     The GaussClumps algorithm uses the following configuration parameters. 
@@ -188,16 +190,16 @@ void clumps() {
 *     the objective function evaluates the chi-squared between the
 *     current gaussian model and the data being fitted. [100]
 *     - GaussClumps.MaxSkip: The maximum number of consecutive failures 
-*     which are allowed when fitting Guassian. If more than "MaxSkip" 
-*     consecutive attempts to fit a clump fail, the iterative fitting
+*     which are allowed when fitting Guassians. If more than "MaxSkip" 
+*     consecutive clumps cannot be fitted, the iterative fitting
 *     process is terminated. [10]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
 *     noise are treated as zero. [0.5]
 *     - GaussClumps.NPad: Specifies a termination criterion for the 
 *     GaussClumps algorithm. The algorithm will terminate when "Npad" 
-*     consecutive clumps have been fitted all with peak values less than
-*     the threshold value specified by the "Thresh" parameter. [10]
+*     consecutive clumps have been fitted all of which have peak values less 
+*     than the threshold value specified by the "Thresh" parameter. [10]
 *     - GaussClumps.RMS: The RMS noise in the data. The default value is
 *     determined by the Variance component in the input data. If there is
 *     no Variance component, an estimate of the global noise level in the
@@ -271,6 +273,10 @@ void clumps() {
 *     at the lowest contour level are ignored. That is, clumps must have 
 *     peaks which exceed the second lowest contour level to be included in 
 *     the returned catalogue. []
+*     - ClumpFind.MinPix: The lowest number of pixel which a clump can
+*     contain. If a candidate clump has fewer than this number of pixels, 
+*     it will be ignored. This prevents noise spikes from being interpreted 
+*     as real clumps. [4]
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.
@@ -302,7 +308,7 @@ void clumps() {
 *     interpreted as clumps. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See "DeltaT".
-*     The default value is two times the RMS noise level. Note this will
+*     The default value is three times the RMS noise level. Note this will
 *     only be appropriate if there is no constant offset in the data
 *     values (i.e. if the background level in the data is zero). []
 
@@ -573,8 +579,7 @@ void clumps() {
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump ); 
-      bg = 0.0;
+                              keymap, velax, ilevel, &nclump, &bg ); 
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -663,7 +668,7 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extensionand output catalogue
    (if needed). This also annuls the HDS locators stored within "clist". */
-      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
+      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, bg,
                         "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */
@@ -706,7 +711,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-/*   astListIssued( "At end of CLUMPS" );    */
+   astListIssued( "At end of CLUMPS" );    
 
 }
 

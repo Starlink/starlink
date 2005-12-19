@@ -453,6 +453,11 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
    }
 
+/* If the source PixelSet touches bad pixels or the edge, then so does
+   the destination PixelSet. */
+   if( ps1->bad ) ps2->bad = 1;
+   if( ps1->edge ) ps2->edge = 1;
+
 /* Return the result. */
    return ret;
 

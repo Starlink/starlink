@@ -29,9 +29,14 @@
                } \
             } \
 \
-/* We ignore neighbouring pixels which are bad or are below the contour  \
+/* If the neighbouring pixel is bad, indicate that the PixelSet touches \
+   an area of bad pixels. */ \
+         } else if( ipd[ iel ] == CGEN_BAD ) { \
+            ps->bad = 1; \
+\
+/* We ignore neighbouring pixels which are below the contour  \
    level. */ \
-         } else if( ipd[ iel ] != CGEN_BAD && ipd[ iel ] >= clevel ) { \
+         } else if( ipd[ iel ] >= clevel ) { \
 \
 /* Call this function recursively to add the neighbour to the PixelSet. */ \
             CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip, x, \
@@ -57,6 +62,11 @@
 /* Revert the 1D vector index and nD GRID coords to the original values. */ \
          iel -= skip[ ii ]; \
          x[ ii ]--; \
+\
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches \
+   an edge. */ \
+      } else { \
+         ps->edge = 1; \
       }
 
 
@@ -77,6 +87,11 @@
 /* Revert the 1D vector index and nD GRID coords to the original values. */ \
          iel += skip[ ii ]; \
          x[ ii ]++; \
+\
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches \
+   an edge. */ \
+      } else { \
+         ps->edge = 1; \
       }
 
 
@@ -251,6 +266,11 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 /* Revert the coords. */
          iel -= skip[ 0 ];
          x[ 0 ]--;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+      } else { 
+         ps->edge = 1; 
       }
 
 /* Similarly, do the lower neighbour on axis 0. */
@@ -260,6 +280,11 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
          CHECK_NEIGHBOURS(1);
          iel += skip[ 0 ];
          x[ 0 ]++;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+      } else { 
+         ps->edge = 1; 
       }
 
 /* For 3D arrays we need to find the new neighbours along the 3rd axis as
@@ -280,6 +305,11 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 /* Revert the coords on axis 2. */
             iel -= skip[ 2 ];
             x[ 2 ]--;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+         } else { 
+            ps->edge = 1; 
          }
 
 /* If not at the lower edge on the 3rd axis, consider the lower neighbours */
@@ -293,6 +323,10 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
             iel += skip[ 2 ];
             x[ 2 ]++;
 
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+         } else { 
+            ps->edge = 1; 
          }
       }
 
@@ -317,6 +351,11 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
 /* Revert the coords. */
                iel -= skip[ 0 ];
                x[ 0 ]--;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+            } else { 
+               ps->edge = 1; 
             }
 
 /* Similarly, do the lower neighbour on axis 0. */
@@ -326,11 +365,21 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
                CHECK_NEIGHBOURS(1);
                iel += skip[ 0 ];
                x[ 0 ]++;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+            } else { 
+               ps->edge = 1; 
             }
 
 /* Revert the coords on axis 2. */
             iel -= skip[ 2 ];
             x[ 2 ]--;
+
+/* If the neighbouring pixel is off the edge, flag that PixelSet touches 
+   an edge. */ 
+         } else { 
+            ps->edge = 1; 
          }
 
 /* If not at the lower edge on the 3rd axis, consider the lower neighbours */
@@ -344,6 +393,8 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
                CHECK_NEIGHBOURS(1);
                iel -= skip[ 0 ];
                x[ 0 ]--;
+            } else { 
+               ps->edge = 1; 
             }
 
             if( x[ 0 ] > 1 ) {
@@ -352,11 +403,15 @@ void CGEN_FUNCTION(cupidCFCont)( CGEN_TYPE *ipd, int *ipa, int nel, int ndim,
                CHECK_NEIGHBOURS(1);
                iel += skip[ 0 ];
                x[ 0 ]++;
+            } else { 
+               ps->edge = 1; 
             }
 
             iel += skip[ 2 ];
             x[ 2 ]++;
 
+         } else { 
+            ps->edge = 1; 
          }
       }
    }

@@ -115,7 +115,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
       cdelta = cupidConfigD( config, "DELTAT", 2.0*rms );
 
 /* Get the lowest contour level using twice the RMS as the default. */
-      clow = cupidConfigD( config, "TLOW", 2.0*rms );
+      clow = cupidConfigD( config, "TLOW", 3.0*rms );
 
 /* Report an error if the lowest contour level is below the minimum value
    in the data array. */
@@ -132,10 +132,10 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
          *nlevels = (int) ( ( maxd - clow )/cdelta );
          ret = astMalloc( sizeof( double )*(*nlevels) );
          if( ret ) {
-            clevel = maxd;
-            for( i = 0; i < *nlevels; i++ ) {
-               clevel -= cdelta;
+            clevel = clow;
+            for( i = *nlevels - 1; i >= 0; i-- ) {
                ret[ i ]= clevel;
+               clevel += cdelta;
             }
          } 
       }

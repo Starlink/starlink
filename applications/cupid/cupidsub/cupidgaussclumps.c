@@ -89,7 +89,11 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
 *     bg
-*        Pointer to an double to receive the mean background level.
+*        Pointer to a double to receive the global background level which
+*        should be added to the sum of the individual clumps to re-create the
+*        input data. For the GaussClumps algorithm, the returned value is
+*        the mean of the bacground value fitted to each clump, with greater 
+*        weight given to larger peaks and to closer fits.
 
 *  Retured Value:
 *     A pointer to a dynamically allocated array, which should
@@ -362,7 +366,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
                   nskip = 0;
 
 /* Increment the sum of the background estimates. Background estimates
-   are weights to give greater weight to estimates formed form larger
+   are weights to give greater weight to estimates formed from larger
    peaks and from closer fits. */
                   wbg = ( chisq > 0.0 ) ? x[ 0 ]/chisq : 1.0;
                   sumbg += x[ 1 ]*wbg*rms;

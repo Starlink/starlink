@@ -8,7 +8,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                                             CupidPixelSet **clumps, 
                                             double clevel, int *index,
                                             int naxis, int ilevel, 
-                                            int *slbnd ){
+                                            int *slbnd, double *maxpd ){
 /*
 *  Name:
 *     cupidCFScan<X>
@@ -21,7 +21,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *                                     int ndim, int dims[3], int skip[3], 
 *                                     CupidPixelSet **clumps, 
 *                                     double clevel, int *index, int naxis,
-*                                     int ilevel, int *slbnd )
+*                                     int ilevel, int *slbnd, double *maxpd )
 
 *  Description:
 *     This function scans the data array for pixels at or above the
@@ -88,7 +88,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
-*     
+*     maxpd
+*        Pointer to a double in which to return the largest data value
+*        which has not yet been incorporated into a clump.
 
 *  Returned Value:
 *     A pointer to a possibly new array in which each element is a 
@@ -156,7 +158,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Note the next available index value. */
    hindex = *index;   
 
-/* Indicate we have not exceeded the maximumnumber of pixelsets. */
+/* Indicate we have not exceeded the maximum number of pixelsets. */
    exceed = 0;
 
 /* Allocate workspace. These are both array with an element for every
@@ -182,10 +184,12 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Scan the data array for pixels which are above (or at) the supplied contour
    level and have not yet been assigned to a PixelSet (i.e. have a null 
    index in the "ipa" array). */
+      *maxpd = VAL__MIND;
       pd = ipd;
       pa = ipa;
       for( i = 0; i < nel; i++, pd++, pa++ ) {
-         if( *pd != CGEN_BAD && *pd >= clevel && *pa == CUPID__CFNULL ) {
+         if( *pd != CGEN_BAD && *pa == CUPID__CFNULL ) {
+            if( *pd >= clevel ) {
 
 /* Break out of hte loop if we are using too many PixelSets. The limit is set
    by the need to be able to pack two indices into a single "int" in
@@ -194,121 +198,130 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    macros cupidMergeSet, cupidMergeNeb and cupidMergeIndex. The lower 13
    bits of a packed "int" hold the index of the PixelSet containing the
    pixel. Therefore, the index of any PixelSet cannot exceed 2^13. */
-            if( *index >= CUPID__MAXINDEX ) {
-               exceed = 1;
-               ps = NULL;
+               if( *index >= CUPID__MAXINDEX ) {
+                  exceed = 1;
+                  ps = NULL;
 
 /* When such a pixel is found, create and initialise a new PixelSet to 
    decribe the contiguous set of adjoining pixels which are above the contour 
    level but which have not yet been assigned to a PixelSet, giving the 
    new PixelSet the next available index value. */
-            } else {
-               ps = astMalloc( sizeof( CupidPixelSet ) );
-               ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
-            }
-
-            if( ret && ps ) {
-               ps->index = (*index) - 1;
-               ps->nnb = 0;
-               ps->pop = 0;
-               ps->nb = NULL;
-               ps->sznbl = NULL;
-               ps->nbl = NULL;
-               ps->vpeak = -DBL_MAX;
-               ret[ ps->index ] = ps;
+               } else {
+                  ps = astMalloc( sizeof( CupidPixelSet ) );
+                  ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
+               }
+   
+               if( ret && ps ) {
+                  ps->index = (*index) - 1;
+                  ps->nnb = 0;
+                  ps->pop = 0;
+                  ps->bad = 0;
+                  ps->edge = 0;
+                  ps->nb = NULL;
+                  ps->sznbl = NULL;
+                  ps->nbl = NULL;
+                  ps->vpeak = -DBL_MAX;
+                  ret[ ps->index ] = ps;
    
 /* Get the n-dimensional grid coords of the current pixel. */
-               if( ndim > 2 ) {
-                  x[ 2 ] = i/skip[ 2 ];
-                  rem = i - x[ 2 ]*skip[ 2 ];
-                  x[ 2 ]++;
-               } else {
-                  x[ 2 ] = 1;
-                  rem = i;
-               }
-            
-               if( ndim > 1 ) {
-                  x[ 1 ] = rem/skip[ 1 ];
-                  x[ 0 ] = rem - x[ 1 ]*skip[ 1 ] + 1;
-                  x[ 1 ]++;
-               } else {
-                  x[ 1 ] = 1;
-                  x[ 0 ] = i + 1;
-               }     
+                  if( ndim > 2 ) {
+                     x[ 2 ] = i/skip[ 2 ];
+                     rem = i - x[ 2 ]*skip[ 2 ];
+                     x[ 2 ]++;
+                  } else {
+                     x[ 2 ] = 1;
+                     rem = i;
+                  }
+               
+                  if( ndim > 1 ) {
+                     x[ 1 ] = rem/skip[ 1 ];
+                     x[ 0 ] = rem - x[ 1 ]*skip[ 1 ] + 1;
+                     x[ 1 ]++;
+                  } else {
+                     x[ 1 ] = 1;
+                     x[ 0 ] = i + 1;
+                  }     
 
 /* Initialise the bounding box for the PixelSet so that it encompasses just 
    this one pixel. */
-               ps->lbnd[ 2 ] = ps->ubnd[ 2 ] = x[ 2 ];
-               ps->lbnd[ 1 ] = ps->ubnd[ 1 ] = x[ 1 ];
-               ps->lbnd[ 0 ] = ps->ubnd[ 0 ] = x[ 0 ];
+                  ps->lbnd[ 2 ] = ps->ubnd[ 2 ] = x[ 2 ];
+                  ps->lbnd[ 1 ] = ps->ubnd[ 1 ] = x[ 1 ];
+                  ps->lbnd[ 0 ] = ps->ubnd[ 0 ] = x[ 0 ];
 
 /* Locate all the adjoining pixels which are at or above the required contour 
    level and have not yet been assigned to a PixelSet. Add them to the
    PixelSet just created and give them the above index value in the "ipa" 
    array. As this search through the adjoining pixels is performed, note if 
    any pixel adjoins another existing PixelSet. */
-               CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip,
-                                           x, i, ps, clevel, w1, w2, naxis,
-                                           hindex, ret );
+                  CGEN_FUNCTION(cupidCFCont)( ipd, ipa, nel, ndim, dims, skip,
+                                              x, i, ps, clevel, w1, w2, naxis,
+                                              hindex, ret );
 
 /* Tell the user about the new PixelSet. */
-               if( ilevel > 3 ) {
-                  msgSeti( "I", ps->index );
-                  msgSeti( "P", ps->pop );
-                  msgOut( "", "   New PixelSet: index ^I population ^P", status );
-               }
+                  if( ilevel > 3 ) {
+                     msgSeti( "I", ps->index );
+                     msgSeti( "P", ps->pop );
+                     msgOut( "", "   New PixelSet: index ^I population ^P", status );
+                  }
 
 /* Count how many of the old PixelSets are neighbours to the new PixelSet. */
-               for( j = 0; j < hindex; j++ ) {
-                  if( w1[ j ] ) (ps->nnb)++;
-               }
+                  for( j = 0; j < hindex; j++ ) {
+                     if( w1[ j ] ) (ps->nnb)++;
+                  }
 
 /* Allocate memory in the new PixelSet structure for a list holding pointers
    to the neighbouring PixelSets. */
-               ps->nb = astMalloc( sizeof( CupidPixelSet *)*ps->nnb );
+                  ps->nb = astMalloc( sizeof( CupidPixelSet *)*ps->nnb );
 
 /* Allocate memory in the new PixelSet structure for a list of pointers
    to arrays that identify the pixels which adjoin each of the neighbouring 
    PixelSets. */
-               ps->nbl = astMalloc( sizeof( int *)*ps->nnb );
-               ps->sznbl = astMalloc( sizeof( int )*ps->nnb );
+                  ps->nbl = astMalloc( sizeof( int *)*ps->nnb );
+                  ps->sznbl = astMalloc( sizeof( int )*ps->nnb );
 
 /* If OK, initialise the number of neighbouring clumps found so far, and loop 
    round each of the supplied clumps. */
-               if( ps->sznbl ) {
-                  k = 0;
-                  for( j = 0; j < hindex; j++ ) {
+                  if( ps->sznbl ) {
+                     k = 0;
+                     for( j = 0; j < hindex; j++ ) {
 
 /* Check to see if this supplied clump is a neighbour of the new clump.
    If it is, its element in the "w1" array will hold the number of pixels
    in the new PixelSet which adjoin it. If this number is zero, none of
    the pixels in the new PixelSet adjoin the supplied clump and so the
    supplied clump is not a neighbour of the new PixelSet. */
-                     if( w1[ j ] ) {
+                        if( w1[ j ] ) {
 
 /* If clump "j" is a neighbour of the new PixelSet store a pointer to
    clump "j" in the new PixelSet structure, and also store a pointer to
    the list which holds the 1D vector indices of the pixels in the new
    PixelSet which adjoin clump "j". */
-                        (ps->nb)[ k ] = ret[ j ];
-                        (ps->nbl)[ k ] = w2[ j ];
-                        (ps->sznbl)[ k ] = w1[ j ];
+                           (ps->nb)[ k ] = ret[ j ];
+                           (ps->nbl)[ k ] = w2[ j ];
+                           (ps->sznbl)[ k ] = w1[ j ];
 
 /* Increment the number of clumps which are neighbours to the new
    PixelSet. */
-                        k++;
+                           k++;
 
 /* Prepare the "w1" and "w2" arrays for the next pass thorugh this loop by 
    resetting them to hold zero and NULL. */
-                        w1[ j ] = 0;
-                        w2[ j ] = NULL;
+                           w1[ j ] = 0;
+                           w2[ j ] = NULL;
+                        }
                      }
                   }
-               }
 
 /* Abort if an error occurred. */
-            } else {
-               break;
+               } else {
+                  break;
+               }
+
+/* If the data value is good, and the pixel has not been assigned to a
+   clump, but the data value is below the current contour level, note the
+   largest data value. */
+            } else if( *pd > *maxpd ) {
+               *maxpd = *pd;
             }
          }
       }

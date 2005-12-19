@@ -105,9 +105,14 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    if( ps1->ubnd[ 1 ] > ps2->ubnd[ 1 ] ) ps2->ubnd[ 1 ] = ps1->ubnd[ 1 ];
    if( ps1->ubnd[ 2 ] > ps2->ubnd[ 2 ] ) ps2->ubnd[ 2 ] = ps1->ubnd[ 2 ];
 
-/* Update the populations of hte two PixelSets. */
+/* Update the populations of the two PixelSets. */
    ps2->pop += ps1->pop;
    ps1->pop = 0;
+
+/* If the source PixelSet touches bad pixels or the edge, then so does
+   the destination PixelSet. */
+   if( ps1->bad ) ps2->bad = 1;
+   if( ps1->edge ) ps2->edge = 1;
 
 }
 

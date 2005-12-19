@@ -13,7 +13,7 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist, 
-                       int nclump, int ndim, const char *ttl ){
+                       int nclump, int ndim, double bg, const char *ttl ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -23,7 +23,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist, 
-*                            int nclump, int ndim, const char *ttl )
+*                            int nclump, int ndim, double bg, const char *ttl )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -43,6 +43,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
 *        The number of locators in "clist".
 *     ndim
 *        The number of pixel axes in the data.
+*     bg
+*        The global background level which should be added to the sum of
+*        all the clumps in order to recreate the input data.
 *     ttl
 *        The title for the output catalogue (if any).
 
@@ -272,6 +275,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc **clist,
  
 /* If required, store information in the NDF extension */
    if( xloc ) {
+
+/* Store the background value. */
+      datNew( xloc, "BACKGROUND", "_DOUBLE", 0, NULL, status );
+      datFind( xloc, "BACKGROUND", &cloc, status );
+      datPutD( cloc, 0, NULL, &bg, status );
+      datAnnul( &cloc, status );
 
 /* Create an array of "nonnull" Clump structures in the extension, and get
    a locator to it. */
