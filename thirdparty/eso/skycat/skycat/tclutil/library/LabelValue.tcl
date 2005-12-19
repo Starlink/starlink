@@ -6,7 +6,9 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 94  Created
-
+# Peter W. Draper 19 Dec 05  Switch to "readonly" state, which better
+#                            matches the original aim to be selectable
+#                            but not editable.
 
 
 itk::usual LabelValue {}
@@ -21,8 +23,10 @@ itcl::class util::LabelValue {
     # constructor: create a new LabelValue widget
 
     constructor {args} {
-	#itk_option remove LabelEntry::state LabelWidget::state
 	eval itk_initialize $args
-	#$itk_component(entry) config -state disabled
+
+        # entry widget that can be selected, but not edited, has same
+        # background colour as normal form
+        $itk_component(entry) config -state readonly -readonlybackground {}
     }
 }
