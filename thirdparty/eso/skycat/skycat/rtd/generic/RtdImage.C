@@ -94,6 +94,8 @@
  *                           long thin images of 2 pixels or less in
  *                           either height or width. A blank image is
  *                           2x2, not nx2 or 2xn.
+ *                 19/12/05  Undo change that removed LockMask in motionNotify.
+ *                           I think that's a handy feature.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.3 2005/02/02 01:43:03 brighton Exp $";
 
@@ -1755,7 +1757,7 @@ void RtdImage::eventProc(ClientData clientData, XEvent* eventPtr)
 void RtdImage::motionNotify(XEvent* eventPtr)
 {
     // (eventuallY) update zoom window, if shift button not pressed
-    if ((eventPtr->xmotion.state & ShiftMask) == 0) {
+    if ((eventPtr->xmotion.state & ( ShiftMask | LockMask ) )  == 0) {
 
 	if (saveMotion_) {
 	    motionX_ = eventPtr->xmotion.x;
