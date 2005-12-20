@@ -7,7 +7,7 @@
 #include "f77.h"
 
 /* Some compilers need a dummy main */
-#ifdef FC_MAIN
+#if HAVE_FC_MAIN
 void FC_MAIN () {}
 #endif
 
