@@ -700,6 +700,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)      
 *     {enter_new_authors_here}
 
 *  History:
@@ -709,6 +710,9 @@
 *        Duplicate the co-ordinate array into KPG1_GRLM2 to match the
 *        number of data elements.  Place annotated axes around the last
 *        _visible_ plot.
+*     2005 December 21 (TIMJ):
+*        Minor tweak in XMAGN determination for g95 (both args to
+*        MAX() must be the same type).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1581,7 +1585,7 @@
       MAXMAG = REAL( DIMS( 1 ) )
       CALL PAR_GDR0R( 'XMAGN', 0.0, 1.0E-6, MAXMAG, .FALSE., XMAGN, 
      :                STATUS )
-      MAXMAG = REAL( MAX( XMAGN, DIMS( 2 ) ) )
+      MAXMAG = MAX( XMAGN, REAL( DIMS( 2 ) ) )
       CALL PAR_GDR0R( 'YMAGN', XMAGN, 1.0E-6, MAXMAG, .TRUE., YMAGN, 
      :                STATUS )
 
