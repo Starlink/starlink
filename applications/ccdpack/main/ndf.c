@@ -441,6 +441,7 @@
                if ( F77_ISTRUE(there) ) {
 
 /* Get an HDS locator. */
+                  ndf1->fits.loc = NULL;
                   ndfXloc( ndf1->identifier, "FITS", "READ", &ndf1->fits.loc, status );
 
 /* Map the data and store the pointer in the ndf data structure. */
