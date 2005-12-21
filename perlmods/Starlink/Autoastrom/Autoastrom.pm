@@ -88,9 +88,9 @@ sub new {
   $auto->keeptemps( 0 ) if ( ! defined( $auto->keeptemps ) );
   $auto->match( 'FINDOFF' ) if ( ! defined( $auto->match ) );
   $auto->maxfit( 9 ) if ( ! defined( $auto->maxfit ) );
-  $auto->max_obj_query( 500 ) if ( ! defined( $auto->max_obj_query ) );
-  $auto->max_obj_image( 500 ) if ( ! defined( $auto->max_obj_image ) );
-  $auto->max_obj_corr( 500 ) if ( ! defined( $auto->max_obj_corr ) );
+  $auto->maxobj_query( 500 ) if ( ! defined( $auto->maxobj_query ) );
+  $auto->maxobj_image( 500 ) if ( ! defined( $auto->maxobj_image ) );
+  $auto->maxobj_corr( 500 ) if ( ! defined( $auto->maxobj_corr ) );
   $auto->messages( 1 ) if ( ! defined( $auto->messages ) );
   $auto->obsdata( 'source=USER:AST:FITS,angle=0,scale=1,invert=0' ) if ( ! defined( $auto->obsdata ) );
   $auto->temp( tempdir( CLEANUP => ( ! $auto->keeptemps ) ) ) if ( ! defined( $auto->temp ) );
@@ -528,6 +528,10 @@ sub maxiter {
   if( @_ ) {
     my $maxiter = shift;
     $self->{MAXITER} = $maxiter;
+  }
+
+  if( ! defined( $self->{MAXITER} ) ) {
+    $self->{MAXITER} = 10;
   }
 
   if( $self->{MAXITER} > 100 ) {
@@ -1163,12 +1167,12 @@ sub solve {
 
 # Limit the number of objects in the detected catalogue, if necessary.
   my $filtered_ndfcat = new Astro::Catalog;
-  if( $self->max_obj_corr && $ndfcat->sizeof > $self->max_obj_corr ) {
+  if( $self->maxobj_corr && $ndfcat->sizeof > $self->maxobj_corr ) {
     my @ndfstars = $ndfcat->stars;
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
                       map { [ $_, $_->get_flux_quantity( waveband => $filter, type => 'MAG_ISO' ) ] } @ndfstars;
-    @sortedstars = @sortedstars[0..( $self->max_obj_corr - 1 )];
+    @sortedstars = @sortedstars[0..( $self->maxobj_corr - 1 )];
     $filtered_ndfcat->pushstar( @sortedstars );
   } else {
     $filtered_ndfcat = $ndfcat;
@@ -1272,11 +1276,11 @@ sub solve {
   my @queryfilters = $querystars[0]->what_filters;
   my $queryfilter = $queryfilters[0];
   my $filtered_querycat = new Astro::Catalog;
-  if( $self->max_obj_corr && $querycat->sizeof > $self->max_obj_corr ) {
+  if( $self->maxobj_corr && $querycat->sizeof > $self->maxobj_corr ) {
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
                       map { [ $_, $_->get_flux_quantity( waveband => $queryfilter, type => 'MAG' ) ] } @querystars;
-    @sortedstars = @sortedstars[0..( $self->max_obj_corr - 1 )];
+    @sortedstars = @sortedstars[0..( $self->maxobj_corr - 1 )];
     $filtered_querycat->pushstar( @sortedstars );
   } else {
     $filtered_querycat->pushstar( @querystars );
@@ -1338,8 +1342,8 @@ sub solve {
   }
 
 # Output the merged catalogue to disk, if requested.
-  if( defined( $self->matchcatalogue ) ) {
-    $merged->write_catalog( Format => 'Cluster', File => $self->matchcatalogue );
+  if( defined( $self->match_catalogue ) ) {
+    $merged->write_catalog( Format => 'Cluster', File => $self->match_catalogue );
   }
 
   print "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
