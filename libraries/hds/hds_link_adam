@@ -26,14 +26,18 @@
 
 #  Copyright:
 #     Copyright (C) 1993 Science & Engineering Research Council
+#     Copyright (C) 2005 Particle Physics and Astronomy Research Council
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     7-JUL-1993 (RFWS):
 #        Original version.
+#     20-DEC-2005 (TIMJ):
+#        HDS is now two libraries
 #     {enter_changes_here}
 
 #  Bugs:
@@ -61,7 +65,7 @@
 #  followed by the list of options for packages on which HDS depends.
 #  Pass the result through an awk script to remove duplicate library
 #  references.
-      echo "${special}" -lhds `chr_link_adam` `ems_link_adam` `cnf_link_adam` \
+      echo "${special}" -lhdsf -lhds `chr_link_adam` `ems_link_adam` `cnf_link_adam` \
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
