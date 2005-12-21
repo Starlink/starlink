@@ -705,6 +705,10 @@
 *  History:
 *     2005 December 15 (MJC):
 *        Original version based upon DISPLAY and LINPLOT.
+*     2005 December 20 (MJC):
+*        Duplicate the co-ordinate array into KPG1_GRLM2 to match the
+*        number of data elements.  Place annotated axes around the last
+*        _visible_ plot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -2730,12 +2734,11 @@
                IF ( VISIBL ) THEN
                   IF ( IPLOTL .NE. -1 ) CALL AST_ANNUL( IPLOTL, STATUS )
                   IPLOTL = IPLOTS
-
-*  Free-up precious AGI resources.
-                  CALL AGI_ANNUL( PICIDG, STATUS )
-
                END IF
             END IF
+
+*  Free-up precious AGI resources.
+            CALL AGI_ANNUL( PICIDG, STATUS )
 
          END DO
       END DO
