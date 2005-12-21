@@ -8,7 +8,8 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-int dat1_init( void );           /* Function prototype                      */
+#include "rec.h"
+#include "dat1.h"                /* Function prototypes                     */
 
 /* Note that this routine is obselete and does NOT have a counterpart in    */
 /* C interface to HDS                                                       */
