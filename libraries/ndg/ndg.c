@@ -19,7 +19,7 @@
 
 *  Authors:
 *     DSB: David S Berry
-*     TIMJ: Tim Jenness
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -27,12 +27,36 @@
 *        Original version.
 *     02-NOV-2005 (TIMJ):
 *        Port from GRP
+*     20-DEC-2005 (TIMJ):
+*        Add ndgAsexp
 *     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 */
 
 /* Header files. */
 /* ============= */
 #include "f77.h" 
+#include "sae_par.h"
 #include "par_par.h"
 #include "star/grp.h"
 #include "ndg.h"
@@ -93,3 +117,40 @@ void ndgNdfpr( int indf1, char * clist, Grp *igrp, int index, int * indf2, int *
 
 }
 
+F77_SUBROUTINE(ndg_asexp)( CHARACTER(GRPEXP), LOGICAL(VERB), INTEGER(IGRP1), INTEGER(IGRP2),
+			   INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(GRPEXP) );
+
+void ndgAsexp( char * grpexp, int verb, Grp *igrp1, Grp ** igrp2, int *size, int * flag, int *status ){
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_INTEGER(STATUS);
+   DECLARE_LOGICAL(VERB);
+   DECLARE_LOGICAL(FLAG);
+   DECLARE_CHARACTER(GRPEXP, GRP__SZNAM);
+
+   /* If *igrp2 is NULL we need to create a new structure */
+   if (*igrp2 == NULL) {
+     *igrp2 = grpInit( status );
+   }
+   IGRP2 = grp1Getid(*igrp2, status );
+   IGRP1 = grp1Getid( igrp1, status );
+   if ( *status != SAI__OK ) return;
+
+   F77_EXPORT_LOGICAL( verb, VERB );
+   F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRP__SZNAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_asexp)( CHARACTER_ARG(GRPEXP), LOGICAL_ARG(&VERB), INTEGER_ARG(&IGRP1),
+                        INTEGER_ARG(&IGRP2),
+                        INTEGER_ARG(&SIZE), LOGICAL_ARG(&FLAG),
+                        INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+
+   F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_LOGICAL( FLAG, *flag );
+   
+   F77_IMPORT_INTEGER( STATUS, *status );
+   grp1Setid( *igrp2, IGRP2, status );
+
+   return;
+}
