@@ -34,7 +34,6 @@ AC_PROG_LIBTOOL
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 AC_C_BIGENDIAN
-AC_FC_LIBRARY_LDFLAGS
 
 dnl    Check for OS features we would like
 AC_FUNC_VFORK
