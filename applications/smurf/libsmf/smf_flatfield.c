@@ -47,6 +47,9 @@
 *        Now calls smf_clone_data for when the data are already flatfielded
 *     2005-12-16 (AGG):
 *        All combinations of flatfield & *odata statuses covered
+*     2005-12-20 (AGG):
+*        Further checks are now carried out to see if the WCS
+*        component contains a sky frame
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -86,6 +89,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "ast.h"
 #include "ndf.h"
 
 #include "smurf_par.h"
@@ -103,9 +107,14 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
   int nframes;                /* Number of time slices */
   int npts;                   /* Total number of data points */
 
+  smfDA *ida = NULL;           /* da struct for input data */
   smfDA *da = NULL;           /* da struct for input data */
   smfFile *file = NULL;       /* file struct for input data */
   smfHead *hdr = NULL;        /* hdr struct for input data */
+
+  AstFrame *skyframe = NULL;
+  AstFrameSet *owcs;
+  smfHead *ihdr = NULL;        /* hdr struct for input data */
 
   void *ipntr[3];             /* Input D, Q and V arrays */
   void *opntr[3];             /* Output D, Q and V arrays */
@@ -118,11 +127,12 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
   smf_check_flat( idata, status );
   /* Store status and annul for messaging system */
   checkflatstatus = *status;
-  errAnnul(status);
+  /*  errAnnul(status);*/
 
   /* Data are flatfielded if status set to SMF__FLATN */
-  if ( checkflatstatus == SMF__FLATN ) {
-
+  /*  if ( checkflatstatus == SMF__FLATN ) {*/
+  if ( *status == SMF__FLATN ) {
+    errAnnul(status);
     /* check *odata */
     if ( *odata == NULL) {
 
@@ -164,16 +174,33 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	   struct if necessary */
 	/* Does the header (hdr) exist? */
 	hdr = (*odata)->hdr;
-	if ( (*odata)->hdr == NULL) {
+	ihdr = idata->hdr;
+	if ( hdr == NULL) {
 	  hdr = malloc( sizeof( smfHead ) );
 	  /* Copy old hdr into the new hdr and store in *odata */
-	  memcpy( hdr, idata->hdr, sizeof( smfHead ) );
+	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
+	} else {
+	  /* Check if we have a sky frame */
+	  owcs = hdr->wcs;
+	  /* astFrinFrame returns AST__NULL if a skyframe is not present */
+	  skyframe = astFindFrame( owcs, astSkyFrame(""), "");
+	  /* If no sky frame, copy the input WCS info using astCopy */
+	  if (skyframe == AST__NULL) {
+	    msgOutif(MSG__VERB, "", 
+		     "Output FrameSet does not have a SKYFRAME; copying from input", 
+		     status);
+	    owcs = astCopy(ihdr->wcs);
+	    hdr->wcs = owcs;
+	  } else {
+	    msgOutif(MSG__VERB, "", "Output FrameSet has a SKYFRAME", status);
+	  }
 	}
 
 	/* Does the flatfield (smfDA) struct exist? */
 	da = (*odata)->da;
-	if ( da == NULL ) {
+	ida = idata->da;
+	if ( da == NULL && ida != NULL ) {
 	  da = malloc( sizeof( smfDA ) );
 	  /* Copy flatfield info into *odata */
 	  memcpy( da, idata->da, sizeof( smfDA ) );
@@ -192,7 +219,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
     }
 
-  } else if ( checkflatstatus == SAI__OK ) { 
+  } else if ( *status == SAI__OK ) { 
 
     /* OK data are not flatfielded: create smfData based on input and
        apply flatfield */
@@ -339,6 +366,6 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	   "Hmm status is something other than it should be....", status);
   }
 
-  *status = checkflatstatus;
+  /*  *status = checkflatstatus;*/
 }
 
