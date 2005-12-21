@@ -4,7 +4,8 @@ dist_bin_SCRIPTS = hds_link hds_link_adam
 noinst_PROGRAMS = hds_machine dat_par_h dat_par_f make-hds-types
 starhelp_DATA = hds_machine.txt
 
-lib_LTLIBRARIES = libhds.la
+# libhdsf is for fortran interface
+lib_LTLIBRARIES = libhds.la libhdsf.la
 
 TESTS = hds_test hdsTest hds_test_prm
 check_PROGRAMS = hds_test hdsTest hds_test_prm
@@ -14,8 +15,11 @@ libhds_la_SOURCES = \
 	$(PUBLIC_CINCLUDES) \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES) \
-	$(C_ROUTINES) \
+	$(C_ROUTINES)
+
+libhdsf_la_SOURCES = \
 	$(F_ROUTINES) \
+	$(F_C_ROUTINES) \
 	$(BLOCK_DATA_FILES)
 
 # Make all library code position independent. This is handy for creating
@@ -26,7 +30,7 @@ libhds_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 hds_machine_SOURCES = hds_machine.c
-hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
+hds_machine_LDADD = libhds.la `ems_link` `cnf_link`
 
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c
@@ -38,13 +42,13 @@ dat_par_h_DEPENDENCIES = hds_types.h hds1_types.h
 dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h
 
 hds_test_SOURCES = hds_test.f
-hds_test_LDADD = libhds.la `ems_link` `chr_link`
+hds_test_LDADD = libhds.la libhdsf.la `ems_link` `chr_link`
 
 hdsTest_SOURCES = hdsTest.c
-hdsTest_LDADD = libhds.la `ems_link` `chr_link` @FCLIBS@
+hdsTest_LDADD = libhds.la `ems_link` `cnf_link`
 
 hds_test_prm_SOURCES = hds_test_prm.c
-hds_test_prm_LDADD = libhds.la `ems_link` `chr_link` `cnf_link` @FCLIBS@
+hds_test_prm_LDADD = libhds.la `ems_link` `cnf_link`
 
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)
@@ -73,6 +77,8 @@ F_ROUTINES = \
 	dat_getnx.f \
 	dat_putnx.f
 
+F_C_ROUTINES = hds_run.c fortran_interface.c
+
 #  List of Fortran BLOCK DATA routines.
 BLOCK_DATA_FILES = cmp_blk.f
 
@@ -96,7 +102,7 @@ C_ROUTINES = \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \
 	datExportFloc.c	datImportFloc.c \
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
-	hds_run.c hds_start.c hdsState.c hdsStop.c hdsTune.c \
+	hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
 	hdsopclos.c hdstools.c  \
 	\
@@ -123,8 +129,9 @@ C_ROUTINES = \
 	rec_release_block.c rec_release_data.c rec_reset_record.c \
 	rec_same_file.c rec_shrink_record.c rec_start.c rec_stop.c \
 	rec_unlock.c rec_where.c rec_wild_file.c \
-	rtl_fixups.c fortran_interface.c \
-        win_fixups.c
+	rtl_fixups.c \
+        win_fixups.c \
+	hds_start.c
 
 dat_par.h: dat_par_h$(EXEEXT)
 	./dat_par_h >dat_par.h

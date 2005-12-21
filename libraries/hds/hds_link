@@ -15,6 +15,9 @@
 #     applications which use HDS in order to generate the correct
 #     arguments for the compiler (or ld) command. The arguments
 #     generated are written to the standard output.
+#
+#     If the Conly argument is specified, only pure C library routines
+#     will be included in the link. No fortran interfaces will be available.
 
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
@@ -24,14 +27,18 @@
 
 #  Copyright:
 #     Copyright (C) 1993 Science & Engineering Research Council
+#     Copyright (C) 2005 Particle Physics and Astronomy Research Council
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
 #     7-JUL-1993 (RFWS):
 #        Original version.
+#     20-DEC-2005 (TIMJ):
+#        Split Fortran library from C library and add "Conly" argument
 #     {enter_changes_here}
 
 #  Bugs:
@@ -40,6 +47,12 @@
 #-
 
 #.
+
+#  Conly handling. cf ems_link
+      flibs=''
+      if test "$1" != "Conly"; then 
+         flibs="-lhdsf `chr_link` `cnf_link`"
+      fi
 
 #  Initialise the special options string.
       special=''
@@ -59,7 +72,9 @@
 #  followed by the list of options for packages on which HDS depends.
 #  Pass the result through an awk script to remove duplicate library
 #  references.
-      echo "${special}" -lhds `chr_link` `ems_link` `cnf_link` \
+#  Note that even though we do not need the fortran interfaces to EMS
+#  in pure C mode, we still need CNF because we use CNF for memory allocation
+      echo "${special}" ${flibs} -lhds `ems_link Conly` `cnf_link` \
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
