@@ -667,7 +667,10 @@
 *     a DATA picture containing just the plot-grid area; and one DATA
 *     pictures for each spatial pixel plotted.  Note, the FRAME picture
 *     is only created if annotated axes have been drawn, or if non-zero
-*     margins were specified using parameter MARGIN. 
+*     margins were specified using parameter MARGIN.  If the last
+*     visible plot is not at the lowest-left spatial pixel, there will
+*     be a duplicate DATA picture for the last visible plot, the
+*     second being enclosed in a FRAME picture.
 *
 *     The world co-ordinates in the first DATA picture will be pixels,
 *     and millimetres from the lower-left of the graphics surface for 
@@ -790,7 +793,6 @@
       INTEGER EL               ! Number of elements in the mapped array
       LOGICAL ERRBAR           ! Display error bars?
       INTEGER FAXES( NDF__MXDIM ) ! Frame axes of split mapping
-      LOGICAL FIRST            ! Processing first line plot?
       INTEGER FREQ             ! Interval between error bars
       LOGICAL FRSTEG           ! Free pointer to x-axis widths in
                                ! GRAPHICS Frame?
@@ -800,6 +802,8 @@
                                ! GRAPHICS Frame?
       LOGICAL FRXBAR           ! Free pointer to x-error-bar limits in 
                                ! "w.w. want"?
+      LOGICAL FRXCEF           ! Free pointer to x centres in "w.w. 
+                               ! want" Frame, duplicated?
       LOGICAL FRXCEG           ! Free pointer to x centres in GRAPHICS
                                ! Frame?
       LOGICAL FRXCEN           ! Free pointer to x centres in "w.w. 
@@ -836,6 +840,8 @@
       INTEGER IPIC             ! Horizontal index of current spectrum
       INTEGER IPLOTI           ! Pointer to AST spatial Plot DATA
                                ! picture
+      INTEGER IPLOTL           ! Previous picture's pointer to AST
+                               ! spectral Plot picture
       INTEGER IPLOTS           ! Pointer to AST spectral Plot picture
       INTEGER IPSTEG           ! Pointer to x-axis widths in GRAPHICS
       INTEGER IPSTEP           ! Pointer to x-axis widths in "w.w. want"
@@ -843,6 +849,9 @@
                                ! GRAPHICS Frame
       INTEGER IPXBAR           ! Pointer to x-error-bar limits in "w.w.
                                ! want"
+      INTEGER IPXCEF           ! Pointer to x centres in "w.w. want" 
+                               ! Frame, duplicated to match the number of
+                               ! data values
       INTEGER IPXCEG           ! Pointer to x centres in GRAPHICS Frame
       INTEGER IPXCEN           ! Pointer to x centres in "w.w. want" 
                                ! Frame
@@ -871,6 +880,8 @@
       REAL LABSIZ              ! Plot Size for axis labels
       LOGICAL LAST             ! Processing last line plot?
       INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the NDF
+      INTEGER LIPIC            ! Horizontal index of last visible plot
+      INTEGER LJPIC            ! Vertical index of last visible plot
       LOGICAL LPAXES           ! Axes in line plots?
       INTEGER LPAXIS           ! Axis index for line plots' abscissae
       INTEGER LPDIM            ! Number of elements in input array along
@@ -902,6 +913,7 @@
       INTEGER NCU              ! Number of characters in the units
       CHARACTER NDFNAM*( 255 ) ! Full NDF specification 
       INTEGER NDIMS            ! Total number of NDF dimensions
+      INTEGER NDUP             ! Number of rows to duplicate
       INTEGER NEL              ! No. of elements returned by KPG1_CPNDD
       LOGICAL NEWPIC           ! Is new Plot aligned with existing DATA
                                ! picture?
@@ -951,6 +963,7 @@
       INTEGER UBND( NDF__MXDIM )! Upper pixel-index bounds of the NDF
       INTEGER UBNDS( NDF__MXDIM ) ! Upper bounds of spectrum
       CHARACTER UNITS * ( 30 ) ! Units of the data
+      LOGICAL VISIBL           ! Data not all bad, hence plot visible?
       INTEGER WDIM( NSPDIM )   ! Dimensions in pixels of PGPLOT window
       INTEGER WILBND( NSPDIM ) ! Lower pixel-index bounds of NDF section
       INTEGER WIUBND( NSPDIM ) ! Upper pixel-index bounds of NDF section
@@ -1014,6 +1027,7 @@
       FRSTEP = .FALSE.
       FRXBAG = .FALSE.
       FRXBAR = .FALSE.
+      FRXCEF = .FALSE.
       FRXCEG = .FALSE.
       FRXCEN = .FALSE.
       FRYBAA = .FALSE.
@@ -2267,11 +2281,21 @@
      :                    'No valid data values found.', STATUS )
          END IF
 
+*  Because the number of elements in the array and the co-ordinates will
+*  generally not be the same---routine KPS1_GRLM2 was written for LINPLOT
+*  where they are the same length---we first have to duplicate the mask.
+*  First obtain some workspace, the duplicate the values.
+         NDUP = EL / AEL
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPXCEF, STATUS )
+
+         CALL KPG1_PXDPD( AEL, %VAL( CNF_PVAL( IPXCEN ) ), NDUP, EL,
+     :                    %VAL( CNF_PVAL( IPXCEF ) ), STATUS )
+
 *  Find suitable default values for YTOP and YBOT.
          BL( 2 ) = VAL__BADD
          TR( 2 ) = VAL__BADD
          CALL KPG1_GRLM2( 'LMODE', EL, %VAL( CNF_PVAL( IPYCEA ) ),
-     :                    %VAL( CNF_PVAL( IPXCEN ) ), YVAR,
+     :                    %VAL( CNF_PVAL( IPXCEF ) ), YVAR,
      :                    %VAL( CNF_PVAL( IPYBAA ) ), BL( 2 ), TR( 2 ),
      :                    STATUS )
 
@@ -2427,11 +2451,14 @@
 *  Loop around the grid of spectra.
 *  ================================
 
-*  Some operations we only wish to do or not do on the first cycle
-*  through the spatial pixels.  Also keep a tally of the spatial
-*  pixels processed. 
-      FIRST = .TRUE.
+*  Want to record the grid indices of the last plotted picture in case
+*  there are regions of bad orr undefined data within the cube.
+      LIPIC = XPIC
+      LJPIC = YPIC
+
+*  Keep a tally of the spatial pixels processed. 
       NPIC = XPIC * YPIC + 1
+      IPLOTL = -1
 
 *  Loop in reverse order such that the last plot is the lower-left.
 *  Derive the `grid' indices of the pictures.
@@ -2453,7 +2480,7 @@
             UBNDS( SPAXIS( 1 ) ) = I
             LBNDS( SPAXIS( 2 ) ) = J
             UBNDS( SPAXIS( 2 ) ) = J
-                                                
+
 *  Retrieve the current spectrum's y centres.  Note that LBND and UBND
 *  include all dimensions, not just the significant ones, hence the
 *  NDF__MXDIM.
@@ -2465,10 +2492,11 @@
 *  Check that there are good values present.  By definition AEL is NEL.
             CALL KPG1_NBADD( AEL, %VAL( CNF_PVAL( IPYCEN ) ), NBAD,
      :                       STATUS )
-            IF ( NBAD .LT. AEL ) THEN
+            VISIBL = NBAD .LT. AEL
+            IF ( VISIBL .OR. ( LAST .AND. RFAXES ) ) THEN
 
 *  If y-axis variance values are required...
-               IF ( YVAR ) THEN
+               IF ( YVAR .AND. VISIBL ) THEN
 
 *  We've already obtained the mapped y error bars for the whole NDF.
 *  Now we need to extract those for the current spatial pixel (i.e. 
@@ -2498,18 +2526,35 @@
 
 *  Obtain the spatial co-ordinates of the current spatial pixel
 *  by transforming from pixel to the current Frame's co-ordinates.
-*  The existing GC( LPAXIS ) is arbitrary, so use the existing value.
 *  IPIC and JPIC refer to the visible section, but the grid co-ordinates
-*  are in turns of the input array bounds.
-               GC( SPAXIS( 1 ) ) = DBLE( I - SLBND( SPAXIS( 1 ) ) + 1 )
-               GC( SPAXIS( 2 ) ) = DBLE( J - SLBND( SPAXIS( 2 ) ) + 1 )
+*  are in terms of the input array bounds.
+               IF ( VISIBL ) THEN
+                  GC( SPAXIS( 1 ) ) = DBLE( I - SLBND( SPAXIS( 1 ) )
+     :                                      + 1 )
+                  GC( SPAXIS( 2 ) ) = DBLE( J - SLBND( SPAXIS( 2 ) ) 
+     :                                      + 1 )
+               ELSE
+
+*  LIPIC and LJPIC refer to the visible section, but the
+*  grid co-ordinates are in terms of the input array bounds.
+                  GC( SPAXIS( 1 ) ) = DBLE( LIPIC - 
+     :                                      SLBND( SPAXIS( 1 ) ) +
+     :                                      LBND( SPAXIS( 1 ) ) )
+                  GC( SPAXIS( 2 ) ) = DBLE( LJPIC -
+     :                                      SLBND( SPAXIS( 2 ) ) +
+     :                                      LBND( SPAXIS( 2 ) ) )
+               END IF
 
                CALL AST_TRANN( IWCSI, 1, NSPDIM, 1, GC, .TRUE., NSPDIM,
      :                         1, CC, STATUS )
 
 *  Convert these co-ordinates to text strings.
-               XCOTXT = AST_FORMAT( IWCS, SPAXIS( 1 ), CC( 1 ), STATUS )
-               YCOTXT = AST_FORMAT( IWCS, SPAXIS( 2 ), CC( 2 ), STATUS )
+               IF ( VISIBL ) THEN
+                  XCOTXT = AST_FORMAT( IWCS, SPAXIS( 1 ), CC( 1 ),
+     :                                 STATUS )
+                  YCOTXT = AST_FORMAT( IWCS, SPAXIS( 2 ), CC( 2 ),
+     :                                 STATUS )
+               END IF
 
 *  Assign the DATA pictures' world co-ordinate limits.
                BOX( 1 ) = BLG( 1 )
@@ -2524,9 +2569,17 @@
 *  to draw, or when there is no room, i.e. it's not the last picture.
 *  Draw an outline.
                COMENT = XCOTXT( :CHR_LEN( XCOTXT ) )//',  '//YCOTXT
-               CALL KPS1_CLIPG( PICIDA, XPIC, YPIC, IPIC, JPIC, LPMARG,
-     :                          BOX, 1, COMENT, LAST .AND. RFAXES, 
-     :                          .TRUE., PICIDG, PICIDF, STATUS )
+               IF ( VISIBL ) THEN
+                  CALL KPS1_CLIPG( PICIDA, XPIC, YPIC, IPIC, JPIC, 
+     :                             LPMARG, BOX, 1, COMENT, 
+     :                             LAST .AND. RFAXES, 
+     :                             .TRUE., PICIDG, PICIDF, STATUS )
+               ELSE
+                  CALL KPS1_CLIPG( PICIDA, XPIC, YPIC, LIPIC, LJPIC, 
+     :                             LPMARG, BOX, 1, COMENT, 
+     :                             LAST .AND. RFAXES, 
+     :                             .TRUE., PICIDG, PICIDF, STATUS )
+               END IF
 
 *  Select the created DATA picture, and set the viewport from it.
                CALL AGI_SELP( PICIDG, STATUS )
@@ -2548,7 +2601,7 @@
 
 *  Set the additional style for plotting in the bottom-left reference
 *  line-plot picture. 
-               IF ( LAST ) THEN
+               IF ( LAST .AND. RFAXES ) THEN
 
 *  The height of the text needs adjustment as the density of the grid
 *  increases.  The density, limits and scaling are something of a guess.
@@ -2588,29 +2641,34 @@
 *  GRAPHICS Frame axes onto the corresponding "what we want" Frame axes.
                CALL KPG1_ASSPL( IPLOTS, 2, AXMAPS, STATUS )
 
+               IF ( VISIBL ) THEN
+
 *  Map all the required axis values from "what we want" into GRAPHICS.
-               CALL AST_TRAN2( IPLOTS, AEL,
-     :                         %VAL( CNF_PVAL( IPXCEN ) ),
-     :                         %VAL( CNF_PVAL( IPYCEN ) ), .FALSE., 
-     :                         %VAL( CNF_PVAL( IPXCEG ) ), 
-     :                         %VAL( CNF_PVAL( IPYCEG ) ), STATUS )
+                  CALL AST_TRAN2( IPLOTS, AEL,
+     :                            %VAL( CNF_PVAL( IPXCEN ) ),
+     :                            %VAL( CNF_PVAL( IPYCEN ) ), .FALSE., 
+     :                            %VAL( CNF_PVAL( IPXCEG ) ), 
+     :                            %VAL( CNF_PVAL( IPYCEG ) ), STATUS )
 
-               IF ( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2 * AEL, 
-     :                                     %VAL( CNF_PVAL( IPXBAR ) ),
-     :                                     .FALSE.,
-     :                                     %VAL( CNF_PVAL( IPXBAG ) ), 
-     :                                     STATUS )
+                  IF ( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2 * AEL, 
+     :                                      %VAL( CNF_PVAL( IPXBAR ) ),
+     :                                      .FALSE.,
+     :                                      %VAL( CNF_PVAL( IPXBAG ) ), 
+     :                                      STATUS )
 
-               IF ( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2 * AEL, 
-     :                                     %VAL( CNF_PVAL( IPYBAA ) ),
-     :                                     .FALSE., 
-     :                                     %VAL( CNF_PVAL( IPYBAG ) ), 
-     :                                     STATUS )
+                  IF ( YVAR ) CALL AST_TRAN1( AXMAPS( 2 ), 2 * AEL, 
+     :                                      %VAL( CNF_PVAL( IPYBAA ) ),
+     :                                      .FALSE., 
+     :                                      %VAL( CNF_PVAL( IPYBAG ) ), 
+     :                                      STATUS )
 
-               IF ( IMODE .EQ. 4 ) THEN
-                  CALL AST_TRAN1( AXMAPS( 1 ), 2 * AEL,
-     :                            %VAL( CNF_PVAL( IPSTEP ) ), .FALSE.,
-     :                            %VAL( CNF_PVAL( IPSTEG ) ), STATUS )
+                  IF ( IMODE .EQ. 4 ) THEN
+                     CALL AST_TRAN1( AXMAPS( 1 ), 2 * AEL,
+     :                               %VAL( CNF_PVAL( IPSTEP ) ),
+     :                               .FALSE.,
+     :                               %VAL( CNF_PVAL( IPSTEG ) ),
+     :                               STATUS )
+                  END IF
                END IF
 
 *  Allow the user to specify the units for either axis.
@@ -2625,36 +2683,60 @@
 *  =================
 
 *  Produce the data plot.
-               CALL KPG1_PLTLN( LPDIM, ILO, IHI,
-     :                          %VAL( CNF_PVAL( IPXCEG ) ),
-     :                          %VAL( CNF_PVAL( IPYCEG ) ),
-     :                          XVAR, YVAR, %VAL( CNF_PVAL( IPXBAG ) ), 
-     :                          %VAL( CNF_PVAL( IPYBAG ) ),
-     :                          %VAL( CNF_PVAL( IPSTEG ) ), 
-     :                          'LPSTYLE', IPLOTS, IMODE, MTYPE,
-     :                          ISHAPE, FREQ, 'KAPPA_CLINPLOT', STATUS )
+               IF ( VISIBL ) THEN
+                  CALL KPG1_PLTLN( LPDIM, ILO, IHI,
+     :                             %VAL( CNF_PVAL( IPXCEG ) ),
+     :                             %VAL( CNF_PVAL( IPYCEG ) ),
+     :                             XVAR, YVAR,
+     :                             %VAL( CNF_PVAL( IPXBAG ) ),
+     :                             %VAL( CNF_PVAL( IPYBAG ) ),
+     :                             %VAL( CNF_PVAL( IPSTEG ) ), 
+     :                             'LPSTYLE', IPLOTS, IMODE, MTYPE,
+     :                             ISHAPE, FREQ, 'KAPPA_CLINPLOT',
+     :                             STATUS )
+
+*  If the plot was fine, record its indices in case its the last visible
+*  plot.
+                   IF ( STATUS .EQ. SAI__OK ) THEN
+                      LIPIC = IPIC
+                      LJPIC = JPIC
+                   END IF
+               END IF
+            END IF
 
 *  Draw the grid if required.  KPG1_ASGRD normally draws two spectral
 *  axes for a DSBSpectrum, one sideband at the foot and the other
 *  sideband at top.  This will cluttered the second unless.  So we use
 *  a KAPPA `pseudo-attribute' to disable the top axis when there
-*  is more than one row in the visible line-plot grid.
+*  is more than one row in the visible line-plot grid, or the last
+*  visible plot lies in the top row.  The later is the case where the
+*  lower-left spatial position only contains bad values and hence is
+*  not plotted, and hence we need to annotate the last visible plot.
+            IF ( ( VISIBL .AND. LPAXES ) .OR. 
+     :           ( RFAXES .AND. LAST ) ) THEN
+
+               IF ( ( VISIBL .AND. YPIC .GT. 1 ) .OR. 
+     :              ( LAST .AND. LJPIC .LT. YPIC ) ) THEN
+                  CALL KPG1_ASSTS( 'DrawDSB=0', .FALSE., .TRUE.,
+     :                             IPLOTS, BADAT, STATUS )
+               END IF
                IF ( LPAXES .OR. ( RFAXES .AND. LAST ) ) THEN
-                  IF ( YPIC .GT. 1 ) THEN
-                     CALL KPG1_ASSTS( 'DrawDSB=0', .FALSE., .TRUE.,
-     :                                IPLOTS, BADAT, STATUS )
-                  END IF
+
+*  Draw the grid/axes.
                   CALL KPG1_ASGRD( IPLOTS, PICIDF, .TRUE., STATUS )
                END IF
 
+*  Free up the previous Plot.
+               IF ( VISIBL ) THEN
+                  IF ( IPLOTL .NE. -1 ) CALL AST_ANNUL( IPLOTL, STATUS )
+                  IPLOTL = IPLOTS
+
 *  Free-up precious AGI resources.
-               CALL AGI_ANNUL( PICIDG, STATUS )
+                  CALL AGI_ANNUL( PICIDG, STATUS )
 
-*  Free up the current Plot.
-               CALL AST_ANNUL( IPLOTS, STATUS )
-
-               FIRST = .FALSE.
+               END IF
             END IF
+
          END DO
       END DO
 
@@ -2668,6 +2750,7 @@
       IF ( FRSTEP ) CALL PSX_FREE( IPSTEP, STATUS )
       IF ( FRXBAG ) CALL PSX_FREE( IPXBAG, STATUS )
       IF ( FRXBAR ) CALL PSX_FREE( IPXBAR, STATUS )
+      IF ( FRXCEF ) CALL PSX_FREE( IPXCEF, STATUS )
       IF ( FRXCEG ) CALL PSX_FREE( IPXCEG, STATUS )
       IF ( FRXCEN ) CALL PSX_FREE( IPXCEN, STATUS )
       IF ( FRYBAA ) CALL PSX_FREE( IPYBAA, STATUS )
