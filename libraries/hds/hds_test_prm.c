@@ -27,10 +27,6 @@
 typedef unsigned char byte;
 const char* tohex(const char*, byte* p);
 
-#if HAVE_FC_MAIN
-void FC_MAIN () { }
-#endif
-
 int main(int argc, char** argv)
 {
     int nerrs = 0;

@@ -24,6 +24,8 @@
 *  History:
 *     04-NOV-2005 (TIMJ):
 *        Original.
+*     20-DEC-2005 (TIMJ):
+*        No longer requires FC_MAIN
 *     {enter_further_changes_here}
 
 *  Licence:
@@ -50,11 +52,6 @@
 
 #if HAVE_CONFIG_H
 # include <config.h>
-#endif
-
-
-#if HAVE_FC_MAIN
-void FC_MAIN () {}
 #endif
 
 #include "hds1.h"

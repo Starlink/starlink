@@ -40,6 +40,8 @@
 *        Changed name.
 *     28-NOV-2005 (TIMJ):
 *        Rewrite in C (from hds_machine.f)
+*     20-DEC-2005 (TIMJ):
+*        No longer requires FC_MAIN
 *     {enter_further_changes_here}
 
 *  Licence:
@@ -66,11 +68,6 @@
 
 #if HAVE_CONFIG_H
 # include <config.h>
-#endif
-
-
-#if HAVE_FC_MAIN
-void FC_MAIN () {}
 #endif
 
 #include "hds1.h"
