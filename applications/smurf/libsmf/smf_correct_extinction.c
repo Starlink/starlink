@@ -36,6 +36,8 @@
 *        Initial test version
 *     2005-11-14 (AGG):
 *        Update API to accept a smfData struct
+*     2005-12-20 (AGG):
+*        Store the current coordinate system on entry and reset on return.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -69,6 +71,8 @@
 #include "smf.h"
 #include "sae_par.h"
 #include "ast.h"
+#include "mers.h"
+#include "msg_par.h"
 #include "prm_par.h"
 #include "smurf_par.h"
 #include "smurf_typ.h"
@@ -93,6 +97,8 @@ void smf_correct_extinction(smfData *data, float tau, int *status) {
   AstFrameSet *wcs;   /* Pointer to AST frameset */
 
   smfHead *hdr;
+  const char *origsystem; /* Character string to store the coordinate
+			     system on entry */
 
   if (*status != SAI__OK) return;
 
@@ -100,11 +106,13 @@ void smf_correct_extinction(smfData *data, float tau, int *status) {
   hdr = data->hdr;
   wcs = hdr->wcs;
 
-  /* Check current frame and store it */
+  /*astShow(wcs);*/
 
+  /* Check current frame and store it */
+  origsystem = astGetC( wcs, "SYSTEM");
 
   /* Select the AZEL system */
-  if ( (wcs != NULL) || (*status == SAI__OK) ) 
+  if (wcs != NULL) 
     astSetC( wcs, "SYSTEM", "AZEL" );
 
   if (!astOK) {
@@ -131,15 +139,15 @@ void smf_correct_extinction(smfData *data, float tau, int *status) {
 
 	zd = M_PI_2 - yout;
 	airmass = F77_CALL(sla_airmas)( &zd );
-	printf( "Zenith distance: %f, Airmass: %f\n",zd, airmass);
-
+	/*	printf( "Zenith distance: %f, Airmass: %f\n",zd, airmass);
 	printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
-	       index, indata[index], (exp(airmass*(double)tau)));
+	index, indata[index], (exp(airmass*(double)tau)));*/
 	indata[index] *= exp(airmass*(double)tau);
       }
     }
   }
 
   /* Restore frame to original */
+  astSetC( wcs, "SYSTEM", origsystem );
 
 }
