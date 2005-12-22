@@ -85,9 +85,11 @@ void smf_correct_extinction(smfData *data, float tau, int *status) {
 
   /* Local variables */
   double airmass;     /* Airmass */
+  dim_t curslice;     /* Index for current time slice */
   dim_t i;            /* Loop counter */
   dim_t index;        /* index into vectorized data array */
   dim_t j;            /* Loop counter */
+  int nslice;         /* Number of points in a time slice */
   double xin;         /* X coordinate of input mapping */
   double xout;        /* X coordinate of output */
   double yin;         /* Y coordinate of input */
@@ -127,10 +129,13 @@ void smf_correct_extinction(smfData *data, float tau, int *status) {
 
   /* Assume 2 dimensions. Start counting at 1 since this is the GRID
      coordinate frame */
+  nslice = (data->dims)[0] * (data->dims)[1];
+  curslice = hdr->curslice;
+  /*  printf(" curslice: %"DIM_T_FMT"\n", curslice);*/
   for (j = 1; j <= (data->dims)[1]; j++) {
     for (i = 1; i <= (data->dims)[0]; i++) {
       
-      index = (j-1)*(data->dims)[0] + (i-1);
+      index = nslice*curslice + (j-1)*(data->dims)[0] + (i-1);
       if (indata[index] != VAL__BADR) {
 
 	xin = (double)i;
