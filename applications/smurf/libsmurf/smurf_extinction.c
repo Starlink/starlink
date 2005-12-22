@@ -103,17 +103,18 @@ void smurf_extinction( int * status ) {
   int nout;                  /* Number of output data points */
   int outndf = 0;              /* Output NDF identifier */
   float tau;                 /* Zenith tau at this wavelength */
-  float tauArr[2];           /* Array containing the tau values */
+  /*float tauArr[2];*/           /* Array containing the tau values */
   float taubeg;              /* Tau at start */
-  float tauend;              /* Tau at end */
-  int ntau;                  /* Number of tau values read from cmd line */
-  AstFrameSet * iwcs = NULL;  /* Pointer to input frame set */
+  /*float tauend;*/              /* Tau at end */
+  /*int ntau;*/                  /* Number of tau values read from cmd line */
+  /*AstFrameSet * iwcs = NULL;*/  /* Pointer to input frame set */
   Grp *igrp = NULL;
   Grp *ogrp = NULL;
   int size;                  /* Number of files in input group */
   int flag;                  /* */
   int i;                     /* Counter, index */
   int outsize;               /* Total number of NDF names in the output group */
+  int nframes;               /* Number of time slices (frames) in file */
 
   /* Unused as yet */
   /*  void * outdataArr[1];     */     /* Pointer to output data */
@@ -126,22 +127,20 @@ void smurf_extinction( int * status ) {
   /* float * indata = NULL;     */     /* Pointer to actual input data */
   /* char datatype[NDF__SZTYP]; */     /* String for input DATA type */
 
-  smfDA *ida = NULL;
   smfData *idata;
+  /*  smfDA *ida = NULL;
   smfFile *ifile;
-  smfHead *ihdr;
-  char *ipname;
+  smfHead *ihdr;*/
+  /*  char *ipname;*/
 
   smfData *odata = NULL;
-  smfFile *ofile;
+  /*  smfFile *ofile;*/
   /*  smfDA * oda;*/
   smfHead *ohdr;
   /*  char *opname;*/
 
-  dim_t index;
+  /*  dim_t index;*/
   int j;
-  double *indata2;
-  double *outdata2;
   double *outdata;
 
   /* Main routine */
@@ -176,7 +175,10 @@ void smurf_extinction( int * status ) {
 
     smf_open_file( ogrp, i, "WRITE", &odata, status);
 
-    ohdr = odata->hdr;
+    ohdr = idata->hdr;
+
+    owcs = ohdr->wcs;
+    /*    astShow(owcs);*/
 
     /* Flatfield if necessary */
     smf_flatfield( idata, &odata, status );
@@ -187,30 +189,22 @@ void smurf_extinction( int * status ) {
 	     status);
     }
 
-    /* If we have 2-D image data then get tau from command line else
-       call smf_tslice_ast (_info?) to populate the sc2head and use WVM
-       tau */
-
     /* Do we have 2-d image data? */
-    if (idata->ndims == 2) {
-      /* Yes - ask user for optical depth */
+    if (odata->ndims == 2) {
+      /* Yes - ask user for ZENITH optical depth */
 
-      /* Get zenith tau from user */
       /* FUTURE: Could use parGdr0r with suggested limits based on
 	 wavelength obtained from header to prevent users entering
 	 unphysical values */
-      /*      parGet1r( "TAU", 2, tauArr, &ntau, status);*/
-      parGet0r( "TAU", &taubeg, status);
+      /*      parGet1r( "ZENTAU", 2, tauArr, &ntau, status);*/
+      parGet0r( "ZENTAU", &taubeg, status);
 
       /* Check number of tau values given */
       tau = taubeg;
     
       /* Check for existence of VARIANCE array */
-
       /* Check for covariance */
       /* smf_find_extension( indf, "COVAR", &cndf, status ); */
-
-      indata2 = (idata->pntr)[0];
 
       nin = (idata->dims)[0] * (idata->dims)[1];
       nout = (odata->dims)[0] * (odata->dims)[1];
@@ -224,33 +218,32 @@ void smurf_extinction( int * status ) {
 	}
       }
 
-      owcs = ohdr->wcs;
-      astShow(owcs);
-
-      /* New API for following: pass smfData struct */
       smf_correct_extinction( odata, tau, status);
     
-    } else if (idata->ndims == 3 ) {
+    } else if (odata->ndims == 3 ) {
 
-      /* Loop over number of time slices */
-      /* Retrieve the specific timeslice */
+      /* Loop over number of time slices/frames */
+      nframes = (odata->dims)[2];
+      for ( j=0; j<nframes; j++) {
+	/* Call tslice_ast to update the WCS info for the particular timeslice */
+	smf_tslice_ast( odata, j, status);
+	ohdr = odata->hdr;
+	ohdr->curslice = j;
+	tau = 0.1;
+	smf_correct_extinction( odata, tau, status );
 
-      smf_tslice_ast( idata, i, status);
-
-      /* HACK: get it to complain when time-series data are passed */
-      if ( *status == SAI__OK) {
-	*status = SAI__ERROR;
-	msgSeti("ND", idata->ndims);
-	errRep("smurf_extinction", 
-	       "Number of dimensions of input file, ^ND, not yet supported", status);
       }
+
+      /* Print something useful */
+
+      
     } else {
-      /* HACK: get it to complain when time-series data are passed */
+      /* Abort with an error if the number of dimensions is not 2 or 3 */
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
 	msgSeti("ND", idata->ndims);
 	errRep("smurf_extinction", 
-	       "Number of dimensions of input file, ^ND, not yet supported", status);
+	       "Number of dimensions of input file, ^ND, should be 2 or 3", status);
       }
     }
 
