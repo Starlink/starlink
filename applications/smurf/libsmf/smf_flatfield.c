@@ -50,6 +50,10 @@
 *     2005-12-20 (AGG):
 *        Further checks are now carried out to see if the WCS
 *        component contains a sky frame
+*     2005-12-21 (AGG):
+*        Now deals with time series data correctly by not attempting
+*        to copy the non-existent WCS info (which is added by
+*        smf_tslice_ast)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,6 +118,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
   AstFrame *skyframe = NULL;
   AstFrameSet *owcs;
+  AstFrameSet *iwcs;
   smfHead *ihdr = NULL;        /* hdr struct for input data */
 
   void *ipntr[3];             /* Input D, Q and V arrays */
@@ -181,21 +186,41 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
 	} else {
-	  /* Check if we have a sky frame */
-	  owcs = hdr->wcs;
-	  /* astFrinFrame returns AST__NULL if a skyframe is not present */
-	  skyframe = astFindFrame( owcs, astSkyFrame(""), "");
-	  /* If no sky frame, copy the input WCS info using astCopy */
-	  if (skyframe == AST__NULL) {
+	  /* OK, we have a header. Do we have WCS? */
+	  iwcs = ihdr->wcs;
+	  /* If INPUT WCS is null then we have time series data and we
+	     can forget about the WCS info for now */
+	  if (iwcs == NULL) {
 	    msgOutif(MSG__VERB, "", 
-		     "Output FrameSet does not have a SKYFRAME; copying from input", 
+		     "Aha, we must have time series data: WCS is created later", 
 		     status);
-	    owcs = astCopy(ihdr->wcs);
-	    hdr->wcs = owcs;
 	  } else {
-	    msgOutif(MSG__VERB, "", "Output FrameSet has a SKYFRAME", status);
+	    owcs = hdr->wcs;
+	    if ( owcs == NULL ) {
+	      msgOutif(MSG__VERB, "", "odata struct has no WCS", status);
+	      /* Copy over WCS from input */
+	      /*	    owcs = malloc( sizeof( AstFrameSet ) );*/
+	      /*	    memcpy( owcs, ihdr->wcs, sizeof(AstFrameSet) );*/
+	      /*	    astShow(iwcs);*/
+	      owcs = astCopy(iwcs);
+	      hdr->wcs = owcs;
+	    }
+	    /* Now check if we have a sky frame */
+	    /* astFindFrame returns AST__NULL if a skyframe is not present */
+	    skyframe = astFindFrame( owcs, astSkyFrame(""), "");
+	    /* If no sky frame, copy the input WCS info using astCopy */
+	    if (skyframe == AST__NULL) {
+	      msgOutif(MSG__VERB, "", 
+		       "Output FrameSet does not have a SKYFRAME; copying from input", 
+		       status);
+	      owcs = astCopy(ihdr->wcs);
+	      hdr->wcs = owcs;
+	    } else {
+	      msgOutif(MSG__VERB, "", "Output FrameSet has a SKYFRAME", status);
+	    }
 	  }
 	}
+
 
 	/* Does the flatfield (smfDA) struct exist? */
 	da = (*odata)->da;
@@ -312,11 +337,46 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	/* All's well so start populating the *odata struct */
 	/* Does the header (hdr) exist? */
 	hdr = (*odata)->hdr;
+	ihdr = idata->hdr;
 	if ( (*odata)->hdr == NULL) {
 	  hdr = malloc( sizeof( smfHead ) );
 	  /* Copy old hdr into the new hdr and store in *odata */
-	  memcpy( hdr, idata->hdr, sizeof( smfHead ) );
+	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
+	} else {
+	  /* OK, we have a header. Do we have WCS? */
+	  iwcs = ihdr->wcs;
+	  /* If INPUT WCS is null then we have time series data and we
+	     can forget about the WCS info for now */
+	  if (iwcs == NULL) {
+	    msgOutif(MSG__VERB, "", 
+		     "Aha, we must have time series data: WCS is created later", 
+		     status);
+	  } else {
+	    owcs = hdr->wcs;
+	    if ( owcs == NULL ) {
+	      msgOutif(MSG__VERB, "", "odata struct has no WCS", status);
+	      /* Copy over WCS from input */
+	      /*	    owcs = malloc( sizeof( AstFrameSet ) );*/
+	      /*	    memcpy( owcs, ihdr->wcs, sizeof(AstFrameSet) );*/
+	      /*	    astShow(iwcs);*/
+	      owcs = astCopy(iwcs);
+	      hdr->wcs = owcs;
+	    }
+	    /* Now check if we have a sky frame */
+	    /* astFindFrame returns AST__NULL if a skyframe is not present */
+	    skyframe = astFindFrame( owcs, astSkyFrame(""), "");
+	    /* If no sky frame, copy the input WCS info using astCopy */
+	    if (skyframe == AST__NULL) {
+	      msgOutif(MSG__VERB, "", 
+		       "Output FrameSet does not have a SKYFRAME; copying from input", 
+		       status);
+	      owcs = astCopy(ihdr->wcs);
+	      hdr->wcs = owcs;
+	    } else {
+	      msgOutif(MSG__VERB, "", "Output FrameSet has a SKYFRAME", status);
+	    }
+	  }
 	}
 
 	/* Does the flatfield (smfDA) struct exist? */
