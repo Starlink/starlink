@@ -4284,6 +4284,12 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
 /* Check the pointers just obtained can be used. */
    if( astOK ){
 
+/* Initialise the edge flags. */
+      edge[ 0 ] = 0;
+      edge[ 1 ] = 0;
+      edge[ 2 ] = 0;
+      edge[ 3 ] = 0;
+
 /* Initialise the flag for every cell to indicate that the good/bad
    boundary does not pass through the cell. */
       for( i = 0; i < size; i++ ) flags[ i ] = 0;
@@ -8266,6 +8272,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 /* Get two PointSets, one holding a grid of 2D graphics coordinates,
    and one holding the corresponding (non-normalized) physical 
    coordinates. */
+   dim = 0;
    *frac = GoodGrid( this, &dim, &pset1, &pset2, method, class );
 
 /* Get pointers to the data values in each PointSet. */
@@ -8885,6 +8892,12 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    the reference position is good, and that the up vector is not zero. */
    if ( !astOK || !text || !text[ 0 ] ||  x == AST__BAD || y == AST__BAD ||
         ( upx == 0.0 && upy == 0.0 ) ) return;
+
+/* Initialise variables to avoid cimpiler warnings. */
+   rx = AST__BAD;
+   ry = AST__BAD;
+   x0 = AST__BAD;
+   y0 = AST__BAD;
 
 /* Get an up vector which refers to the graphics coordinates in their correct 
    senses (the supplied values are reversed if the corresponding axis is 
@@ -18315,6 +18328,8 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    known. */
             dx = AST__BAD;
             dy = AST__BAD;
+            gx = AST__BAD;
+            gy = AST__BAD;
 
 /* Store the gap to put next to the label text. */
             txtgap = astGetNumLabGap( this, axis )*mindim;

@@ -5850,6 +5850,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
       lon = AST__BAD;
       lat = AST__BAD;
       lambda = AST__BAD;
+      phi = AST__BAD;
       for( i = 0; i < nax; i++ ) {
          astPrimaryFrame( frm, i, &pfrm, &paxis );
          dom = astGetDomain( pfrm );

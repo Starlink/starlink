@@ -2184,6 +2184,10 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 /* Check the global error status. */
    if ( !astOK ) return 4;
 
+/* Initialise variables to avoid compiler warnings. */
+   longlo = AST__BAD;
+   longhi = AST__BAD;
+
 /* Store the projection type. */
    type = astGetWcsType( this );
 
