@@ -32,6 +32,8 @@
 *        HDS Locator has changed type
 *     2005-12-14 (TIMJ):
 *        Add reference counter to smfData
+*     2005-12-21 (AGG):
+*        Add index to current timeslice
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,8 +97,9 @@ typedef struct smfFile {
 
 typedef struct smfHead {
   struct sc2head * sc2head; /* Time slice structure for same slice as wcs */
-  AstFrameSet * wcs;        /* Framset for a particular time slice */
+  AstFrameSet * wcs;        /* Frameset for a particular time slice */
   AstFitsChan * fitshdr;    /* FITS header from the file */
+  dim_t curslice;           /* Index corresponding to current timeslice */
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
