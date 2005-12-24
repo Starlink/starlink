@@ -24,6 +24,7 @@
 
 *  Authors:
 *     RLVAD::ACC: A C Charles (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -31,6 +32,8 @@
 *        Original version.
 *     02-MAR-1994 (ACC)
 *        Broke into separate routines for each routine tested.
+*     23-DEC-2005 (TIMJ):
+*        Call TEST_FPARX
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -38,7 +41,7 @@
 
 *  Subprograms called:    
 *     TEST_DELIM, TEST_FANDL, TEST_FIND, TEST_FIWES, TEST_INDEX,
-*     TEST_SKCHR, TEST_TOCHR
+*     TEST_SKCHR, TEST_TOCHR, TEST_FPARX
 *-
 
 *  Type Definitions:
@@ -116,6 +119,14 @@
 
       ISTAT = SAI__OK
       CALL TEST_TOCHR(ISTAT)
+      IF (ISTAT .NE. SAI__OK) THEN
+         STATUS = SAI__ERROR
+      END IF
+
+*    Test CHR_FPARX
+
+      ISTAT = SAI__OK
+      CALL TEST_FPARX(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF

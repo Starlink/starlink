@@ -1,3 +1,6 @@
+CHR Version 2.3
+   Add CHR_FPARX for finding strings in parentheses
+
 CHR Version 2.2-5 is released
    This version has CHR_ETOM and CHR_MTOE converted to C to overcome problems
    introduced by Redhat Linux 7.0

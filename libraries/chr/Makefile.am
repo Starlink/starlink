@@ -37,7 +37,8 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_scomp.f chr_simlr.f chr_size.f  chr_skchr.f chr_sort.f \
         chr_swap.f  chr_term.f  chr_tochr.f chr_trchr.f chr_trunc.f \
         chr_ucase.f chr_upper.f chr_wild.f  chr1_wild1.f chr1_wild2.f \
-        chr1_wild3.f chr1_wild4.f chr1_wild5.f chr1_wild6.f chr1_wild7.f 
+        chr1_wild3.f chr1_wild4.f chr1_wild5.f chr1_wild6.f chr1_wild7.f \
+        chr_fparx.f
 
 C_ROUTINES = chr_etom.c chr_mtoe.c
 
@@ -49,7 +50,7 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_btoi.f  test_clean.f test_copy.f  test_ctoc.f \
         test_ctod.f  test_ctoi.f  test_ctol.f  test_ctor.f  test_dcwrd.f \
         test_delim.f test_dtoan.f test_dtoc.f  test_equal.f test_etom.f \
-        test_fandl.f test_fill.f  test_find.f  test_fiwes.f \
+        test_fandl.f test_fill.f  test_find.f  test_fiwes.f test_fparx.f \
         test_htoi.f  test_iachr.f test_index.f test_inset.f test_isalf.f \
         test_isalm.f test_isdig.f test_isnam.f test_itob.f  test_itoc.f \
         test_itoh.f  test_itoo.f  test_lcase.f test_ldblk.f test_len.f \
