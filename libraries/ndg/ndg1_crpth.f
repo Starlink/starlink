@@ -23,8 +23,30 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1999 CLRC
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -33,6 +55,8 @@
 *     15-MAR-2004 (DSB):
 *        Moved DAT_ANNUL calls inside the IF block to avoid "Locator
 *        invalid" errors.
+*     23-DEC-2005 (TIMJ):
+*        Call DAT_CUT rather than NDG1_HCUT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -170,11 +194,11 @@
                   END IF
 
 *  Does the component exists?
-                  CALL DAT_THERE( XLOC, PATH( N1 : N2 ), THERE, STATUS ) 
+                  CALL DAT_THERE( XLOC, PATH( N1 : N2 ), THERE, STATUS )
 
 *  If not, create it as a scalar structure with type NDG__STRUC.
                   IF( .NOT. THERE ) THEN
-                     CALL DAT_NEW( XLOC, PATH( N1 : N2 ), NDG__STRUC, 0, 
+                     CALL DAT_NEW( XLOC, PATH( N1 : N2 ), NDG__STRUC, 0,
      :                             0, STATUS ) 
                   END IF
 
@@ -193,7 +217,7 @@
 *  cell. An error will be reported if the array is not big enough to
 *  fit the specified cell in. Tough!
                   ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                     CALL NDG1_HCUT( LOC2, PATH( OPPAR : L ), XLOC, 
+                     CALL DAT_CUT( LOC2, PATH( OPPAR : L ), XLOC, 
      :                               STATUS )
                   END IF
 

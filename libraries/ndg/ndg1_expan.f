@@ -68,9 +68,31 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1999 CLRC
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     PWD: Peter W. Draper (STARLINK, Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -93,6 +115,8 @@
 *        Increased the size of all local character strings to
 *        GRP__SZNAM. Previously some (notably BN) where 50 which was
 *        truncating file names.
+*     23-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDG1_HFIND
 *     {enter_further_changes_here}
 
 *-
@@ -438,7 +462,7 @@
 
 *  Attempt to obtain a locator for the object using the remaining text 
 *  from the supplied template as an HDS path.         
-            CALL NDG1_HFIND( LOC, REST, 'READ', LOC2, STATUS )
+            CALL HDS_FIND( LOC, REST, 'READ', LOC2, STATUS )
 
 *  If this failed, it may be because the REST text ended with an NDF slice
 *  specification. If the last non-blank chartacter is a ")", chop of the
@@ -460,7 +484,7 @@
                            PATH = REST( : IAT - 1 )
                         END IF
 
-                        CALL NDG1_HFIND( LOC, PATH, 'READ', LOC2, 
+                        CALL HDS_FIND( LOC, PATH, 'READ', LOC2, 
      :                                   STATUS )
 
                         IF( STATUS .NE. SAI__OK ) THEN
@@ -477,7 +501,7 @@
 
 *  See if it contains any NDFs. If so, the details to the NDFs are stored
 *  in the returned groups.
-               CALL NDG1_SDFEX( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS, 
+               CALL NDG1_SDFEX( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS,
      :                          LOC2, DIR, NAM, TYP, SLICE, FOUND, 
      :                          STATUS )
 
