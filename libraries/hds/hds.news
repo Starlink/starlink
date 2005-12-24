@@ -1,5 +1,15 @@
 HDS Library
 -----------
+
+   Version 5.0
+   ===========
+
+   * Complete rewrite in C to support files larger than 2GB.
+   * First official C interface to HDS.
+   * Now possible to link HDS without requiring a Fortran
+     runtime.
+   * Add HDS_FIND subroutine for obtaining a locator
+     from an HDS path.
    
    Version 4.3-4
    =============
