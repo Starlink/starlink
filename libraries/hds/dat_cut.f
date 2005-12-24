@@ -1,7 +1,7 @@
-      SUBROUTINE DAT1_HCUT( LOC1, STR, LOC2, STATUS )
+      SUBROUTINE DAT_CUT( LOC1, STR, LOC2, STATUS )
 *+
 *  Name:
-*     DAT1_HCUT
+*     DAT_CUT
 
 *  Purpose:
 *     Cut a cell or slice from an HDS object.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DAT1_HCUT( LOC1, STR, LOC2, STATUS )
+*     CALL DAT_CUT( LOC1, STR, LOC2, STATUS )
 
 *  Description:
 *     The routine selects a sub-section of an HDS object, generating a
@@ -158,7 +158,7 @@
          STATUS = NDF__BNDIN
          CALL EMS_SETC( 'SUBSET', STR( F : L ) )
          CALL DAT_MSG( 'OBJECT', LOC1 )
-         CALL EMS_REP( 'DAT1_HCUT_BND1',
+         CALL EMS_REP( 'DAT_CUT_BND1',
      :                 'Invalid subset ''^SUBSET'' specified for ' //
      :                 'the HDS object ^OBJECT -- enclosing ' //
      :                 'parenthesis missing.', STATUS )
@@ -175,7 +175,7 @@
                STATUS = NDF__BNDIN
                CALL EMS_SETC( 'SUBSET', STR( F : L ) )
                CALL DAT_MSG( 'OBJECT', LOC1 )
-               CALL EMS_REP( 'DAT1_HCUT_BND2',
+               CALL EMS_REP( 'DAT_CUT_BND2',
      :                       'Invalid subset ''^SUBSET'' specified ' //
      :                       'for the HDS object ^OBJECT -- this ' //
      :                       'object is scalar.', STATUS )
@@ -193,7 +193,7 @@
 *  If an error occurs, then report contextual information.
                IF ( STATUS .NE. SAI__OK ) THEN
                   CALL DAT_MSG( 'OBJECT', LOC1 )
-                  CALL EMS_REP( 'DAT1_HCUT_BND3',
+                  CALL EMS_REP( 'DAT_CUT_BND3',
      :                          'Unable to select the specified ' //
      :                          'subset of the HDS object ^OBJECT',
      :                          STATUS )

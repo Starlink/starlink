@@ -278,7 +278,7 @@
 *  necessary.
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      IF ( ( LP .LT. RP ) .AND. ( LP .LE. F ) ) THEN
-                        CALL DAT1_HCUT( LOC2, NAME( LP : RP ), LOC,
+                        CALL DAT_CUT( LOC2, NAME( LP : RP ), LOC,
      :                                  STATUS )
                         IF ( LOC1 .EQ. DAT__ROOT ) THEN
                            CALL DAT_PRMRY( .TRUE., LOC, .TRUE., STATUS )
@@ -330,7 +330,7 @@
 *  necessary.
                            IF ( STATUS .EQ. SAI__OK ) THEN
                               IF ( LP .LT. RP ) THEN
-                                 CALL DAT1_HCUT( LOC2, NAME( LP : RP ),
+                                 CALL DAT_CUT( LOC2, NAME( LP : RP ),
      :                                           LOC, STATUS )
                                  IF ( LOC1 .EQ. DAT__ROOT ) THEN
                                     CALL DAT_PRMRY( .TRUE., LOC, .TRUE.,
