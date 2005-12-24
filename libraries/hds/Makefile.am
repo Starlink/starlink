@@ -74,8 +74,10 @@ F_ROUTINES = \
 	cmp_mod.f cmp_modc.f cmp_prim.f cmp_put0x.f cmp_put1x.f \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
-	dat_getnx.f \
-	dat_putnx.f
+	dat_getnx.f dat_putnx.f \
+	dat1_chscn.f dat1_hcut.f dat1_fparx.f dat1_hsplt.f \
+	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
+	hds_find.f
 
 F_C_ROUTINES = hds_run.c fortran_interface.c
 

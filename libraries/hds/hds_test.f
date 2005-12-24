@@ -54,7 +54,8 @@
 
 *  Local Constants:
       CHARACTER * ( 32 ) PATH    ! File name
-      PARAMETER ( PATH = 'hds_test' )
+*  Note that the .sdf is included as a test case
+      PARAMETER ( PATH = 'hds_test.sdf' )
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
@@ -300,6 +301,19 @@
          END IF
       END IF
 
+*  Check ability to locate component from path
+      CALL HDS_FIND( LOC1, 'TSTRUCT.ARRAY(2,2)', 'READ', LOC3, STATUS )
+      CALL DAT_GET0D( LOC3, DTEMP, STATUS )
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( DTEMP .NE. 12.0D0) THEN
+            CALL EMS_REP('GET0D_SLICE',
+     :           'Did not get expected value from TSTRUCT.ARRAY(2,2)',
+     :           STATUS)
+         END IF
+      END IF
+
+
 *  Force primitive
 
       CALL DAT_PRIM( LOC2, PRIM, STATUS )
@@ -310,8 +324,6 @@
 
 *  Now map vectorized
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
-
-
 
 *  Sum the data elements.
       CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
