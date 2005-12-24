@@ -99,11 +99,11 @@
 *        subscripts under error conditions. Removed unnecessary status
 *        checks elsewhere.
 *     15-APR-1994 (RFWS):
-*        Added extra arguments to DAT1_FPARX call.
+*        Added extra arguments to NDF1_FPARX call.
 *     15-FEB-1998 (DSB):
 *        Brought into NDG from NDF.
 *     23-DEC-2005 (TIMJ):
-*        Brought into HDS
+*        Brought into HDS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -235,7 +235,7 @@
                ELSE
                   F = F + I1 - 1
                   L = L + I1 - 1
-                  CALL DAT1_FPARX( NAME( F : L ), '(', ')', LP, RP )
+                  CALL CHR_FPARX( NAME( F : L ), '(', ')', LP, RP )
                   IF ( LP .LT. RP ) THEN
                      LP = LP + F - 1
                      RP = RP + F - 1
