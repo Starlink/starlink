@@ -50,4 +50,5 @@ FILRD	<File read error>
 FILWR	<File write error>
 NOMEM	<Memory allocation error>
 WLDIN	<Wild-card search context invalid>
+NOCMP   <No component name>
 .END

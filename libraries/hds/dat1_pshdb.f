@@ -84,7 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STR
@@ -118,7 +118,7 @@
 
 *  If the attempt fails, then report an error message.
          IF ( STATUS .NE. SAI__OK ) THEN
-            STATUS = NDF__BNDIN
+            STATUS = DAT__DIMIN
             CALL EMS_SETC( 'BADBOUND', STR )
             CALL EMS_REP( 'DAT1_PSHDB_SYN',
      :                    'Invalid dimension bound ''^BADBOUND'' ' //

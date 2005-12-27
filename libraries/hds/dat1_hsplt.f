@@ -102,7 +102,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes      
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes      
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -143,7 +143,7 @@
 
 *  If the name is blank, then report an error.
       IF ( F .GT. L ) THEN
-         STATUS = NDF__NAMIN
+         STATUS = DAT__NAMIN
          CALL EMS_REP( 'DAT1_HSPLT_BLNK',
      :                 'Blank NDF name supplied.',
      :                 STATUS )
@@ -161,7 +161,7 @@
 
 *  If the closing quote is missing, then report an error.
          IF ( IEND .EQ. 0 ) THEN
-            STATUS = NDF__NAMIN
+            STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
             CALL EMS_REP( 'DAT1_HSPLT_QTE',
      :                    'Missing quote in the NDF name ''^NAME''.',
@@ -169,7 +169,7 @@
 
 *  If the quotes are consecutive, then report an error.
          ELSE IF ( IEND .EQ. F + 1 ) THEN
-            STATUS = NDF__NAMIN
+            STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
             CALL EMS_REP( 'DAT1_HSPLT_NON',
      :                    'File name absent in the NDF name ''^NAME''.',
@@ -182,7 +182,7 @@
 
 *  If the file name is blank, then report an error.
             IF ( F1 .GT. F2 ) THEN
-               STATUS = NDF__NAMIN
+               STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
                CALL EMS_REP( 'DAT1_HSPLT_BLQ',
      :                       'Quoted filename is blank in the NDF ' //
@@ -319,7 +319,7 @@
 *  If a '.' occurs in the first character position, then report an
 *  error.
             IF ( IEND .LT. F ) THEN
-               STATUS = NDF__NAMIN
+               STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
                CALL EMS_REP( 'DAT1_HSPLT_MSF',
      :                       'Missing field in the NDF name ''^NAME''.',

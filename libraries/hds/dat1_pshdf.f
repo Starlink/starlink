@@ -122,7 +122,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STR
@@ -174,7 +174,7 @@
 *  report an error if it does not.
                IF ( ( LBND .LT. 1 ) .OR.
      :              ( LBND .GT. DIM ) ) THEN
-                  STATUS = NDF__BNDIN
+                  STATUS = DAT__BOUND
                   CALL EMS_SETI( 'LBND', LBND )
                   CALL EMS_SETI( 'DIM', DIM )
                   CALL EMS_REP( 'DAT1_PSHDF_LBND',
@@ -204,7 +204,7 @@
 *  report an error if it does not.
                IF ( ( UBND .LT. 1 ) .OR.
      :              ( UBND .GT. DIM ) ) THEN
-                  STATUS = NDF__BNDIN
+                  STATUS = DAT__BOUND
                   CALL EMS_SETI( 'UBND', UBND )
                   CALL EMS_SETI( 'DIM', DIM )
                   CALL EMS_REP( 'DAT1_PSHDF_UBND',
@@ -217,7 +217,7 @@
 
 *  If the lower bound exceeds the upper bound, then report an error.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( LBND .GT. UBND ) ) THEN
-         STATUS = NDF__BNDIN
+         STATUS = DAT__BOUND
          CALL EMS_SETI( 'LBND', LBND )
          CALL EMS_SETI( 'UBND', UBND )
          CALL EMS_REP( 'DAT1_PSHDF_ERR',

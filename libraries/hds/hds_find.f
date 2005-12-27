@@ -117,7 +117,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC1
@@ -213,7 +213,7 @@
 *  If the field is missing (two consecutive '.' characters appear or
 *  the string finishes with '.') then report an error.
             IF ( I1 .GT. I2 ) THEN
-               STATUS = NDF__NOCMP
+               STATUS = DAT__NOCMP
                CALL EMS_SETC( 'NAME', NAME )
                CALL EMS_REP( 'HDS_FIND_MSF1',
      :                       'Missing field in HDS component name ' //
@@ -224,7 +224,7 @@
             ELSE
                CALL CHR_FANDL( NAME( I1 : I2 ), F, L )
                IF ( F .GT. L ) THEN
-                  STATUS = NDF__NOCMP
+                  STATUS = DAT__NOCMP
                   CALL EMS_SETC( 'NAME', NAME )
                   CALL EMS_REP( 'HDS_FIND_MSF2',
      :                          'Missing field in HDS component ' //
@@ -247,7 +247,7 @@
 *  name).
                      IF ( ( LP .LE. F ) .AND.
      :                    ( DOTTED .OR. ( NFIELD .NE. 1 ) ) ) THEN
-                        STATUS = NDF__NOCMP
+                        STATUS = DAT__NOCMP
                         CALL EMS_SETC( 'FIELD', NAME( F : L ) )
                         CALL EMS_REP( 'HDS_FIND_MSN',
      :                                'Missing name in HDS ' //
@@ -257,7 +257,7 @@
 *  Check that there are no characters following the closing
 *  parenthesis. Report an error if there are.
                      ELSE IF ( RP .NE. L ) THEN
-                        STATUS = NDF__BNDIN
+                        STATUS = DAT__SUBIN
                         CALL EMS_SETC( 'FIELD', NAME( F : L ) )
                         CALL EMS_REP( 'HDS_FIND_JUNK',
      :                                'Unknown character(s) ' //
@@ -299,7 +299,7 @@
 
 *  Report an error if the component does not exist.
                            IF ( .NOT. THERE ) THEN
-                              STATUS = NDF__CNMIN
+                              STATUS = DAT__NAMIN
                               CALL EMS_SETC( 'NAME', NAME( F : INAME ) )
                               CALL DAT_MSG( 'STRUCT', LOC2 )
                               CALL EMS_REP( 'HDS_FIND_NF',

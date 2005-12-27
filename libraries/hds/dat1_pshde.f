@@ -120,7 +120,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) STR
@@ -181,7 +181,7 @@
 *  exceeds the expected number of dimensions.
          NBND = NBND + 1
          IF ( NBND .GT. NDIM ) THEN
-            STATUS = NDF__BNDIN
+            STATUS = DAT__DIMIN
             CALL EMS_SETC( 'SUBSET', STR )
             CALL EMS_SETI( 'NDIM', NDIM )
             CALL EMS_REP( 'DAT1_PSHDE_XS',
@@ -236,7 +236,7 @@
 *  If the number of dimension bounds obtained is less than expected,
 *  then report an error.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBND .LT. NDIM ) ) THEN
-         STATUS = NDF__BNDIN
+         STATUS = DAT__DIMIN
          CALL EMS_SETC( 'SUBSET', STR )
          CALL EMS_SETI( 'NDIM', NDIM )
          CALL EMS_REP( 'DAT1_PSHDE_NE',

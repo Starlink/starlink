@@ -23,7 +23,8 @@
 *     NAME = CHARACTER * ( * ) (Given)
 *        The name to be checked.
 *     STATUS = INTEGER (Given and Returned)
-*        The global status.
+*        The global status. Set to DAT__NAMIN if the component is not
+*        in standard form.
 
 *  Algorithm:
 *     -  Test if the name is non-standard.
@@ -61,7 +62,7 @@
 *     15-FEB-1998 (DSB):
 *        Brought into NDG from NDF.
 *     23-DEC-2005 (TIMJ):
-*        Brought into HDS
+*        Brought into HDS. Error code now DAT__NAMIN
 *     {enter_changes_here}
 
 *  Bugs:
@@ -75,7 +76,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) NAME
@@ -96,7 +97,7 @@
 *  not.
       IF ( ( CHR_LEN( NAME ) .GT. DAT__SZNAM ) .OR.
      :     ( .NOT. CHR_ISNAM( NAME ) ) ) THEN
-         STATUS = NDF__NSHNM
+         STATUS = DAT__NAMIN
          CALL EMS_SETC( 'NAME', NAME )
          CALL EMS_REP( 'DAT1_CHSCN_NS',
      :                 'Non-standard HDS component name ''^NAME'' ' //

@@ -113,7 +113,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'NDF_ERR'          ! NDF_ error codes
+      INCLUDE 'DAT_ERR'          ! DAT_ error codes
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC1
@@ -155,7 +155,7 @@
 *  an error if it does not.
       ELSE IF ( ( STR( F : F ) .NE. '(' ) .OR.
      :          ( STR( L : L ) .NE. ')' ) ) THEN
-         STATUS = NDF__BNDIN
+         STATUS = DAT__SUBIN
          CALL EMS_SETC( 'SUBSET', STR( F : L ) )
          CALL DAT_MSG( 'OBJECT', LOC1 )
          CALL EMS_REP( 'DAT_CUT_BND1',
@@ -172,7 +172,7 @@
 *  dimension bounds can be applied (a blank dimension bound string has
 *  already been checked for above).
             IF ( NDIM .EQ. 0 ) THEN
-               STATUS = NDF__BNDIN
+               STATUS = DAT__SUBIN
                CALL EMS_SETC( 'SUBSET', STR( F : L ) )
                CALL DAT_MSG( 'OBJECT', LOC1 )
                CALL EMS_REP( 'DAT_CUT_BND2',
