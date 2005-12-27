@@ -75,7 +75,7 @@ F_ROUTINES = \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
 	dat_getnx.f dat_putnx.f \
-	dat_cut.f dat1_hsplt.f \
+	dat_cut.f hds_split.f \
 	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
 	hds_find.f
 

@@ -1,7 +1,7 @@
-      SUBROUTINE DAT1_HSPLT( NAME, F1, F2, P1, P2, STATUS )
+      SUBROUTINE HDS_SPLIT( NAME, F1, F2, P1, P2, STATUS )
 *+
 *  Name:
-*     DAT1_HSPLT
+*     HDS_SPLIT
 
 *  Purpose:
 *     Split an HDS object name into a file name and a path name.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL DAT1_HSPLT( NAME, F1, F2, P1, P2, STATUS )
+*     CALL HDS_SPLIT( NAME, F1, F2, P1, P2, STATUS )
 
 *  Description:
 *     This routine analyses a general HDS object name and locates the
@@ -89,6 +89,9 @@
 *        Brought into NDG from NDF.
 *     23-DEC-2005 (TIMJ):
 *        Brought into HDS
+*     27-DEC-2005 (TIMJ):
+*        Rename as HDS_SPLIT so that it can be part of the public interface
+*        since it is required by NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,7 +147,7 @@
 *  If the name is blank, then report an error.
       IF ( F .GT. L ) THEN
          STATUS = DAT__NAMIN
-         CALL EMS_REP( 'DAT1_HSPLT_BLNK',
+         CALL EMS_REP( 'HDS_SPLIT_BLNK',
      :                 'Blank NDF name supplied.',
      :                 STATUS )
 
@@ -163,7 +166,7 @@
          IF ( IEND .EQ. 0 ) THEN
             STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
-            CALL EMS_REP( 'DAT1_HSPLT_QTE',
+            CALL EMS_REP( 'HDS_SPLIT_QTE',
      :                    'Missing quote in the NDF name ''^NAME''.',
      :                    STATUS )
 
@@ -171,7 +174,7 @@
          ELSE IF ( IEND .EQ. F + 1 ) THEN
             STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
-            CALL EMS_REP( 'DAT1_HSPLT_NON',
+            CALL EMS_REP( 'HDS_SPLIT_NON',
      :                    'File name absent in the NDF name ''^NAME''.',
      :                    STATUS )
 
@@ -184,7 +187,7 @@
             IF ( F1 .GT. F2 ) THEN
                STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
-               CALL EMS_REP( 'DAT1_HSPLT_BLQ',
+               CALL EMS_REP( 'HDS_SPLIT_BLQ',
      :                       'Quoted filename is blank in the NDF ' //
      :                       'name ''^NAME''.',
      :                       STATUS )
@@ -321,7 +324,7 @@
             IF ( IEND .LT. F ) THEN
                STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
-               CALL EMS_REP( 'DAT1_HSPLT_MSF',
+               CALL EMS_REP( 'HDS_SPLIT_MSF',
      :                       'Missing field in the NDF name ''^NAME''.',
      :                       STATUS )
 

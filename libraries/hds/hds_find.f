@@ -159,7 +159,7 @@
 *  complete object name, including a container file name. Split it into
 *  its file name and HDS path fields and open the container file.
       IF ( LOC1 .EQ. DAT__ROOT ) THEN
-         CALL DAT1_HSPLT( NAME, F1, F2, I1, IEND, STATUS )
+         CALL HDS_SPLIT( NAME, F1, F2, I1, IEND, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL HDS_OPEN( NAME( F1 : F2 ), MODE, LOC2, STATUS )
          END IF
