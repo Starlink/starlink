@@ -216,6 +216,32 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status ); 
 }
 
+
+F77_SUBROUTINE(dat_chscn)( CHARACTER(name),
+			   INTEGER(status)
+			   TRAIL(name) )
+{
+/*============================================================*/
+/* DAT_CHSCN - Check and HDS component name for standard form */
+/*============================================================*/
+
+  /* Local variables */
+  char * name_c;
+
+  /* Check status */
+  if (*status != SAI__OK) return;
+
+  /* import name into C */
+  name_c = cnfCreim( name, name_length );
+
+  /* Validate */
+  datChscn( name_c, status );
+
+  /* free allocated memory */
+  cnfFree( name_c );
+}
+
+
 F77_SUBROUTINE(dat_clen)( CHARACTER(locator),
                           F77_INTEGER_TYPE *clen,
                           F77_INTEGER_TYPE *status

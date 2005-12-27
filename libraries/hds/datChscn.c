@@ -1,16 +1,33 @@
-      SUBROUTINE DAT1_CHSCN( NAME, STATUS )
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+/*+DATFININD.C-*/
+
+/*#include "cnf.h"            * F77 <-> C string handling functions      */
+#include "ems.h"            /* EMS error reporting routines             */
+#include "hds1.h"           /* Global definitions for HDS               */
+#include "rec.h"            /* Public rec_ definitions                  */
+#include "str.h"            /* Character string import/export macros    */
+#include "dat1.h"           /* Internal dat_ definitions                */
+#include "dat_err.h"        /* DAT__ error code definitions             */
+
+#include "hds.h"
+
+/*
 *+
 *  Name:
-*     DAT1_CHSCN
+*     datChscn
 
 *  Purpose:
 *     Check an HDS component name for standard form.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL DAT1_CHSCN( NAME, STATUS )
+*     datChscn( name, status );
+*     CALL DAT_CHSCN( NAME, STATUS )
 
 *  Description:
 *     The routine checks that the name of an HDS component has a
@@ -20,15 +37,14 @@
 *     characters (including underscore) only.
 
 *  Arguments:
-*     NAME = CHARACTER * ( * ) (Given)
+*     name = char[] (Given)
 *        The name to be checked.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status. Set to DAT__NAMIN if the component is not
-*        in standard form.
+*     status = int * (Given & Returned)
+*        The global status.
 
 *  Algorithm:
-*     -  Test if the name is non-standard.
-*     -  If so, then set a STATUS value and report an error.
+*     -  Convert name to internal string object
+*     -  Call dau_check_name()
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -62,46 +78,34 @@
 *     15-FEB-1998 (DSB):
 *        Brought into NDG from NDF.
 *     23-DEC-2005 (TIMJ):
-*        Brought into HDS. Error code now DAT__NAMIN
+*        Brought into HDS
+*     27-DEC-2005 (TIMJ):
+*        Rewrite in C using dau_check_name
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
-*-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'          ! DAT_ public constants
-      INCLUDE 'DAT_ERR'          ! DAT_ error codes
+int
+datChscn( const char * name_str, int * status )
+{
+  struct DSC name;
+  char nambuf[DAT__SZNAM+1];
 
-*  Arguments Given:
-      CHARACTER * ( * ) NAME
+/* Import the name string */
+  _strcsimp(   &name, name_str );
 
-*  Status:
-      INTEGER STATUS             ! Global status
+/* Check the inherited global status.              */
+   hds_gl_status = *status;
+   if ( _ok( hds_gl_status ) )
+     {
 
-*  External References:
-      LOGICAL CHR_ISNAM          ! Whether a string is a standard name
-      INTEGER CHR_LEN            ! Significant length of a string
+       /* Validate the component name */
+       dau_check_name( &name, nambuf );
 
-*.
+     }
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Check the name has the standard form. Report an error if it does
-*  not.
-      IF ( ( CHR_LEN( NAME ) .GT. DAT__SZNAM ) .OR.
-     :     ( .NOT. CHR_ISNAM( NAME ) ) ) THEN
-         STATUS = DAT__NAMIN
-         CALL EMS_SETC( 'NAME', NAME )
-         CALL EMS_REP( 'DAT1_CHSCN_NS',
-     :                 'Non-standard HDS component name ''^NAME'' ' //
-     :                 'specified.', STATUS )
-      END IF
-       
-      END
+   return hds_gl_status;
+}

@@ -75,7 +75,7 @@ F_ROUTINES = \
 	cmp_putnx.f cmp_putvx.f cmp_shape.f cmp_size.f cmp_struc.f \
 	cmp_type.f cmp_unmap.f \
 	dat_getnx.f dat_putnx.f \
-	dat1_chscn.f dat_cut.f dat1_hsplt.f \
+	dat_cut.f dat1_hsplt.f \
 	dat1_pshde.f dat1_pshdf.f dat1_pshdb.f \
 	hds_find.f
 
@@ -99,6 +99,7 @@ C_ROUTINES = \
 	datWhere.c datalter.c datannul.c datccopy.c daterase.c datfinind.c \
 	datget.c datget0x.c datinq.c datlocops.c datmap.c datmove.c datnew.c \
 	datnew0.c datMapN.c datPut1C.c datPutVC.c datGet1C.c datGetVC.c \
+	datChscn.c \
 	datput.c datput0x.c dattemp.c daucheck.c daucnv.c daucopy.c \
 	dauflush.c \
 	dauloc.c daumove.c dauscatgath.c daushape.c dautypes.c \

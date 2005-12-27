@@ -292,7 +292,7 @@
 *  If a component name exists, then check it for validity and see if
 *  the required component exists within the current HDS structure.
                      ELSE
-                        CALL DAT1_CHSCN( NAME( F : INAME ), STATUS )
+                        CALL DAT_CHSCN( NAME( F : INAME ), STATUS )
                         CALL DAT_THERE( LOC2, NAME( F : INAME ), THERE,
      :                                  STATUS )
                         IF ( STATUS .EQ. SAI__OK ) THEN

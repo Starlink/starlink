@@ -68,6 +68,14 @@ datCell( const HDSLoc   *locator1,
 	 HDSLoc   **locator2,
          int      *status);
 
+/*=================================================*/
+/* datChscn - validate the supplied component name */
+/*=================================================*/
+
+int
+datChscn( const char * name,
+         int      *status );
+
 /*==========================================*/
 /* datClen - Obtain character string length */
 /*==========================================*/
