@@ -54,10 +54,29 @@
 *     created in its place.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +94,8 @@
 *     29-JUL-1994 (RFWS):
 *        Make an attempt to write to an object which cannot be deleted,
 *        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,7 +202,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'WRITE', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -223,7 +244,7 @@
 *  for it.
                                  IF ( STATUS .EQ. NDF__BNDIN ) THEN
                                     CALL ERR_ANNUL( STATUS )
-                                    CALL NDF1_HFIND( LOC, CMPT, 'WRITE',
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
      :                                               LOC1, STATUS )
 
 *  Note if the component was deleted successfully.
@@ -328,10 +349,29 @@
 *     created in its place.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -349,6 +389,8 @@
 *     29-JUL-1994 (RFWS):
 *        Make an attempt to write to an object which cannot be deleted,
 *        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -455,7 +497,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'WRITE', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -497,7 +539,7 @@
 *  for it.
                                  IF ( STATUS .EQ. NDF__BNDIN ) THEN
                                     CALL ERR_ANNUL( STATUS )
-                                    CALL NDF1_HFIND( LOC, CMPT, 'WRITE',
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
      :                                               LOC1, STATUS )
 
 *  Note if the component was deleted successfully.
@@ -602,10 +644,29 @@
 *     created in its place.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -623,6 +684,8 @@
 *     29-JUL-1994 (RFWS):
 *        Make an attempt to write to an object which cannot be deleted,
 *        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -729,7 +792,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'WRITE', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -771,7 +834,7 @@
 *  for it.
                                  IF ( STATUS .EQ. NDF__BNDIN ) THEN
                                     CALL ERR_ANNUL( STATUS )
-                                    CALL NDF1_HFIND( LOC, CMPT, 'WRITE',
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
      :                                               LOC1, STATUS )
 
 *  Note if the component was deleted successfully.
@@ -876,10 +939,29 @@
 *     created in its place.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -897,6 +979,8 @@
 *     29-JUL-1994 (RFWS):
 *        Make an attempt to write to an object which cannot be deleted,
 *        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1003,7 +1087,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'WRITE', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -1045,7 +1129,7 @@
 *  for it.
                                  IF ( STATUS .EQ. NDF__BNDIN ) THEN
                                     CALL ERR_ANNUL( STATUS )
-                                    CALL NDF1_HFIND( LOC, CMPT, 'WRITE',
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
      :                                               LOC1, STATUS )
 
 *  Note if the component was deleted successfully.
@@ -1150,10 +1234,29 @@
 *     created in its place.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -1171,6 +1274,8 @@
 *     29-JUL-1994 (RFWS):
 *        Make an attempt to write to an object which cannot be deleted,
 *        even if it appears not to have the correct type or shape.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1277,7 +1382,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'WRITE', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'WRITE', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -1319,7 +1424,7 @@
 *  for it.
                                  IF ( STATUS .EQ. NDF__BNDIN ) THEN
                                     CALL ERR_ANNUL( STATUS )
-                                    CALL NDF1_HFIND( LOC, CMPT, 'WRITE',
+                                    CALL HDS_FIND( LOC, CMPT, 'WRITE',
      :                                               LOC1, STATUS )
 
 *  Note if the component was deleted successfully.

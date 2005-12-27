@@ -51,9 +51,28 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +86,9 @@
 *        Removed unnecessary status checks.
 *     12-OCT-1993 (RFWS):
 *        Added extra arguments to NDF1_FSPLT call.
+*     27-DEC-2005 (TIMJ):
+*        Call HDS_SPLIT rather than NDF1_HSPLT.
+*        Call HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -127,7 +149,7 @@
 *  this into its file name and HDS path fields.
       DONE = .FALSE.
       IF ( LOC1 .EQ. DAT__ROOT ) THEN
-         CALL NDF1_HSPLT( NAME, F1, F2, P1, P2, STATUS )
+         CALL HDS_SPLIT( NAME, F1, F2, P1, P2, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If the HDS path is absent, then we must create a new top-level
@@ -197,7 +219,7 @@
 *  resulting locator to be a primary locator if necessary (to hold the
 *  container file open).
          ELSE IF ( DOT .GT. P1 ) THEN
-            CALL NDF1_HFIND( LOC2, NAME( P1 : DOT - 1 ), 'UPDATE', LOC,
+            CALL HDS_FIND( LOC2, NAME( P1 : DOT - 1 ), 'UPDATE', LOC,
      :                       STATUS )
             IF ( LOC1 .EQ. DAT__ROOT ) THEN
                CALL DAT_PRMRY( .TRUE., LOC, .TRUE., STATUS )
@@ -212,7 +234,7 @@
 *  Check that the name of the object to be created is valid and create
 *  the required new object within this structure.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL NDF1_CHSCN( NAME( DOT + 1 : P2 ), STATUS )
+            CALL DAT_CHSCN( NAME( DOT + 1 : P2 ), STATUS )
             CALL DAT_NEW( LOC2, NAME( DOT + 1 : P2 ), TYPE, NDIM, DIM,
      :                    STATUS )
 

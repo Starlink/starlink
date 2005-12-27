@@ -71,10 +71,29 @@
 *     system). This should be rationalised at some point.
 
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1993,1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +101,10 @@
 *        Original version.
 *     9-MAR-1994 (RFWS):
 *        Added NEW argument to indicate if a new object was created.
+*     24-DEC-2005 (TIMJ):
+*        Replace NDF1_HFIND with HDS_FIND
+*     27-DEC-2005 (TIMJ):
+*        Replace call to NDF1_HSPLT with call to HDS_SPLIT
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,7 +156,7 @@
 *  include an HDS container file name. Split it into this file name and
 *  an HDS path specification.
       IF ( LOC .EQ. DAT__ROOT ) THEN
-         CALL NDF1_HSPLT( NAME, F1, F2, P1, P2, STATUS )
+         CALL HDS_SPLIT( NAME, F1, F2, P1, P2, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If the path name does not exist, then the new NDF will be a top
@@ -147,7 +170,7 @@
 *  the object.
             ELSE
                CALL ERR_MARK
-               CALL NDF1_HFIND( LOC, NAME, 'UPDATE', LOCPL, STATUS )
+               CALL HDS_FIND( LOC, NAME, 'UPDATE', LOCPL, STATUS )
 
 *  If no such object was found, then note this fact and annul the
 *  error.
@@ -171,7 +194,7 @@
 *  Otherwise, defer error reporting and attempt to find the object.
          ELSE
             CALL ERR_MARK
-            CALL NDF1_HFIND( LOC, NAME, 'UPDATE', LOCPL, STATUS )
+            CALL HDS_FIND( LOC, NAME, 'UPDATE', LOCPL, STATUS )
 
 *  If the object was not found, then note this fact and annul the
 *  error.

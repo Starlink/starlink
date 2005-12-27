@@ -252,7 +252,6 @@
 *  NDF name into an object name and an (optional) subscript expression.
          ELSE
             IF( INDEX( NAME, '://' ) .GT. 0 ) URL = .TRUE.
-                
             CALL NDF1_NSPLT( NAME, .FALSE., O1, O2, S1, S2, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 

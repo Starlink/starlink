@@ -50,9 +50,28 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Rutherford Appleton Laboratory
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+*    Boston, MA  02111-1307  USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +84,8 @@
 *        Added extra arguments to NDF1_FPARX call.
 *     1-JUL-1997 (RFWS):
 *        Added support for the WCS component.
+*     24-DEC-2005 (TIMJ):
+*        Use CHR_FPARX rather than NDF1_FPARX
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -269,7 +290,7 @@
 *  EXTENSION specification, followed by a parenthesised list of
 *  extension names. Search for a parenthesesed expression.
                ELSE
-                  CALL NDF1_FPARX( STR( F : L ), '(', ')', J1, J2 )
+                  CALL CHR_FPARX( STR( F : L ), '(', ')', J1, J2 )
 
 *  If found, then test the characters lying in front of the opening
 *  parenthesis (if there are any).

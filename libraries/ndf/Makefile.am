@@ -59,7 +59,7 @@ ndf1_awcre.f ndf1_awex.f ndf1_awext.f ndf1_awfrm.f ndf1_awini.f	       \
 ndf1_awix.f ndf1_awmap.f ndf1_awprp.f ndf1_awrst.f ndf1_awsbn.f	       \
 ndf1_awstp.f ndf1_awtyp.f ndf1_awump.f ndf1_axlim.f ndf1_bad.f	       \
 ndf1_bpp.f ndf1_bppx.f ndf1_cbfrm.f ndf1_ccpy.f ndf1_chacc.f	       \
-ndf1_chftp.f ndf1_chhum.f ndf1_chmod.f ndf1_chscn.f ndf1_chxnm.f       \
+ndf1_chftp.f ndf1_chhum.f ndf1_chmod.f ndf1_chxnm.f       \
 ndf1_clfor.f ndf1_cln.f ndf1_cmpbl.f ndf1_cmpfl.f ndf1_cpync.f	       \
 ndf1_crfor.f ndf1_crnbn.f ndf1_cut.f ndf1_cvfor.f ndf1_cvtok.f	       \
 ndf1_cvtx.f ndf1_da.f ndf1_dac.f ndf1_dad.f ndf1_dan.f ndf1_danl.f     \
@@ -68,11 +68,11 @@ ndf1_dd.f ndf1_del.f ndf1_delob.f ndf1_dh.f ndf1_dimp.f ndf1_dlfor.f   \
 ndf1_dmap.f ndf1_dmsg.f ndf1_dnfor.f ndf1_dq.f ndf1_dqanl.f	       \
 ndf1_dump.f ndf1_dv.f ndf1_dvanl.f ndf1_dw.f ndf1_dx.f ndf1_ellip.f    \
 ndf1_expid.f ndf1_exppl.f ndf1_ffs.f ndf1_filex.f ndf1_fmhdt.f	       \
-ndf1_forxt.f ndf1_fparx.f ndf1_fsplt.f ndf1_gadex.f ndf1_gawex.f       \
+ndf1_forxt.f ndf1_fsplt.f ndf1_gadex.f ndf1_gawex.f       \
 ndf1_gtbb.f ndf1_gtenv.f ndf1_gthdt.f ndf1_gtxtn.f ndf1_h2ast.f	       \
-ndf1_hcpy.f ndf1_hcut.f ndf1_hdcre.f ndf1_hderr.f ndf1_hfind.f	       \
+ndf1_hcpy.f ndf1_hdcre.f ndf1_hderr.f       \
 ndf1_hfwrt.f ndf1_hincr.f ndf1_hlerr.f ndf1_hnew.f ndf1_hprp.f	       \
-ndf1_hrst.f ndf1_hscrt.f ndf1_hsplt.f ndf1_htcmp.f ndf1_htop.f	       \
+ndf1_hrst.f ndf1_hscrt.f ndf1_htcmp.f ndf1_htop.f	       \
 ndf1_hunmp.f ndf1_hwdef.f ndf1_hwrt.f ndf1_id2ac.f ndf1_imp.f	       \
 ndf1_impid.f ndf1_imppl.f ndf1_indxp.f ndf1_infcb.f ndf1_inifr.f       \
 ndf1_intcb.f ndf1_len.f ndf1_map.f ndf1_mbad.f ndf1_mbndp.f	       \
@@ -80,7 +80,7 @@ ndf1_mbndt.f ndf1_move.f ndf1_mtyp.f ndf1_mxtyp.f ndf1_ncut.f	       \
 ndf1_nfind.f ndf1_nplac.f ndf1_nsplt.f ndf1_ntfor.f ndf1_nxtsl.f       \
 ndf1_opfor.f ndf1_p2a.f ndf1_plcre.f ndf1_pldcb.f ndf1_plfor.f	       \
 ndf1_prfor.f ndf1_prp.f ndf1_pscpx.f ndf1_psffl.f ndf1_psfmt.f	       \
-ndf1_pshdb.f ndf1_pshde.f ndf1_pshdf.f ndf1_pshdt.f ndf1_psndb.f       \
+ndf1_pshdt.f ndf1_psndb.f       \
 ndf1_psnde.f ndf1_psndf.f ndf1_pstyp.f ndf1_pxlst.f ndf1_qbpp.f	       \
 ndf1_qcre.f ndf1_qfrm.f ndf1_qimp.f ndf1_qityp.f ndf1_qma.f	       \
 ndf1_qmap.f ndf1_qmax.f ndf1_qmlog.f ndf1_qrst.f ndf1_qsta.f	       \

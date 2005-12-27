@@ -54,12 +54,31 @@
 *     this will be indicated by an appended ellipsis, i.e. '...'. No
 *     error will result.
 
-*  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
-*     {enter_new_authors_here}
-
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1990 (RFWS):
@@ -71,6 +90,8 @@
 *     29-JUL-1994 (RFWS):
 *        Changed to handle all data types from a single copy of the
 *        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,7 +194,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'READ', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -284,12 +305,31 @@
 *     this will be indicated by an appended ellipsis, i.e. '...'. No
 *     error will result.
 
-*  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
-*     {enter_new_authors_here}
-
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1990 (RFWS):
@@ -301,6 +341,8 @@
 *     29-JUL-1994 (RFWS):
 *        Changed to handle all data types from a single copy of the
 *        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -403,7 +445,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'READ', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -514,12 +556,31 @@
 *     this will be indicated by an appended ellipsis, i.e. '...'. No
 *     error will result.
 
-*  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
-*     {enter_new_authors_here}
-
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1990 (RFWS):
@@ -531,6 +592,8 @@
 *     29-JUL-1994 (RFWS):
 *        Changed to handle all data types from a single copy of the
 *        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -633,7 +696,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'READ', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -744,12 +807,31 @@
 *     this will be indicated by an appended ellipsis, i.e. '...'. No
 *     error will result.
 
-*  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
-*     {enter_new_authors_here}
-
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1990 (RFWS):
@@ -761,6 +843,8 @@
 *     29-JUL-1994 (RFWS):
 *        Changed to handle all data types from a single copy of the
 *        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -863,7 +947,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'READ', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.
@@ -974,12 +1058,31 @@
 *     this will be indicated by an appended ellipsis, i.e. '...'. No
 *     error will result.
 
-*  Authors:
-*     RFWS: R.F. Warren-Smith (STARLINK)
-*     {enter_new_authors_here}
-
 *  Copyright:
-*     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 1990, 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     30-OCT-1990 (RFWS):
@@ -991,6 +1094,8 @@
 *     29-JUL-1994 (RFWS):
 *        Changed to handle all data types from a single copy of the
 *        source code.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1093,7 +1198,7 @@
                      IF ( STATUS .EQ. SAI__OK ) THEN
                         THERE = .TRUE.
                         CALL ERR_MARK
-                        CALL NDF1_HFIND( LOC, CMPT, 'READ', LOC1,
+                        CALL HDS_FIND( LOC, CMPT, 'READ', LOC1,
      :                                   STATUS )
 
 *  If the component is not present, note this fact and annul the error.

@@ -68,10 +68,29 @@
 *     -  The ARY__NOID constant is defined in the include file ARY_PAR.
 
 *  Copyright:
-*     Copyright (C) 1994 Particle Physics & Astronomy Research Council
+*     Copyright (C) 1991, 1994 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +104,8 @@
 *        Fixed bug: missing argument to ERR_REP.
 *     8-SEP-1994 (RFWS):
 *        Updated prologue.
+*     24-DEC-2005 (TIMJ):
+*        Use HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -192,7 +213,7 @@
      :                              STATUS )
 
 *  Locate the required component within the extension.
-                     CALL NDF1_HFIND( LOC, CMPT, VMODE, LOC1, STATUS )
+                     CALL HDS_FIND( LOC, CMPT, VMODE, LOC1, STATUS )
                      CALL DAT_ANNUL( LOC, STATUS )
 
 *  Import the component into the ARY_ system, obtaining an identifier

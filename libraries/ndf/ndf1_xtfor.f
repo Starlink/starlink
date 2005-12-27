@@ -46,11 +46,31 @@
 *     accessibility of the foreign file or the associated NDF object.
 
 *  Copyright:
-*     Copyright (C) 2000 Central Laboratories of the Research Councils
+*     Copyright (C) 1993, 1994 Science & Engineering Research Council
+*     Copyright (C) 2000 CCLRC
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -76,6 +96,8 @@
 *        Removed code to set message tokens explicitly.
 *     17-JUL-2000 (DSB):
 *        Allow for foreign extension specifiers in FORFIL.
+*     24-DEC-2005 (TIMJ):
+*        USE HDS_FIND rather than NDF1_HFIND
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,7 +177,7 @@
 *  the NDF data object.
       MORE = .FALSE.
       IF ( .NOT. IMP ) THEN
-         CALL NDF1_HFIND( NDFLOC, NDFNAM, 'READ', LOC, STATUS )
+         CALL HDS_FIND( NDFLOC, NDFNAM, 'READ', LOC, STATUS )
 
 *  Mark the error stack and attempt to obtain a (primary) locator to the
 *  NDF's extension (MORE) structure.
