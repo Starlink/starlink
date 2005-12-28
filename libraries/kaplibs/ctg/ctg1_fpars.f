@@ -121,7 +121,7 @@
 
 *  Find the end of the directory path. This is the last "/" in the string.
 *  DIREND will be zero if there is no "/".
-      CALL CTG1_LASTO( SPEC, '/', DIREND )
+      CALL CHR_LASTO( SPEC, '/', DIREND )
 
 *  The first character in the file basename follows the last "/".
       BNBEG = DIREND + 1
