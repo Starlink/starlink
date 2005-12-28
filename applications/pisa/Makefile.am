@@ -43,7 +43,7 @@ SUBSRC = addmod.f func.f analys.f anoise.f checkp.f dchole.f \
          psa1_exss.f psa1_mkhis.f psa1_mnmax.f psa1_ndfin.f pxyget.f \
          pxygt2.f ranorm.f raprof.f rdpifd.f rdpiin.f \
          rdpipd.f rdpipe.f rdpisd.f scllim.f solve.f sorti3.f sortin.f \
-         sortm.f super.f update.f psa1_asfio.f psa1_lasto.f \
+         sortm.f super.f update.f psa1_asfio.f \
          psa1_rminv.f \
          analys4.f overlp4.f psa1_mkhii.f sortm4.f extend4.f \
          phopt24.f psa1_clwo4.f psa1_ndfin4.f super4.f featur4.f \
