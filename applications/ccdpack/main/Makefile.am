@@ -29,7 +29,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adfrm.f ccd1_adkey.f \
  ccd1_gtlig.f ccd1_gtlih.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hchan.f ccd1_hisp.f ccd1_hvcon.f \
  ccd1_hvusr.f ccd1_inply.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
- ccd1_ktidy.f ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
+ ccd1_ktidy.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
  ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f \
  ccd1_lnmap.f ccd1_locs2.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
