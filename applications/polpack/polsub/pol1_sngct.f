@@ -79,14 +79,34 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-APR-1999 (DSB):
-*        Original version.
+*        Original version
+*     27-DEC-2005 (TIMJ):
+*        Use KPG1_NDFNM rather than hand rolled NDF_MSG/CHR_LASTO.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,7 +152,6 @@
 *  Local Variables:
       CHARACTER PATH*255
       INTEGER I
-      INTEGER IAT
       INTEGER LPATH
       INTEGER NGOOD
       INTEGER NREJL
@@ -212,23 +231,14 @@
 
 *  Get the ndf name, and find the end of the directory path (i.e. the
 *  final "\" ).
-         CALL NDF_MSG( 'NDF', INDF )
-         CALL MSG_LOAD( ' ', '^NDF', PATH, LPATH, STATUS )
-         CALL NDG1_LASTO( PATH( : LPATH ), '/', IAT, STATUS )
-
-*  Move on to point to the first character in the NDF base name.
-         IF( STATUS .EQ. SAI__OK ) THEN
-            IAT = IAT + 1
-         ELSE
-            IAT = 1
-         END IF
+         CALL KPG1_NDFNM( INDF, PATH, LPATH, STATUS )
              
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( ILEVEL .GT. 2 ) THEN
             CALL MSG_BLANK( STATUS )
    
-            CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
+            CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGCT_MSG1', '   ''^NDF''', STATUS )
 
@@ -251,7 +261,7 @@
 
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
-            CALL MSG_SETC( 'NDF', PATH( IAT : LPATH ) )
+            CALL MSG_SETC( 'NDF', PATH( : LPATH ) )
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGCT_MSG3', '   WARNING: No usable '//
      :                    'pixels remain in ''^NDF'' after ^ITER '//

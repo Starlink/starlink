@@ -49,10 +49,28 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
- 
+*     Copyright (C) 1997 - 1999 Central Laboratory of the Research Councils
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,6 +85,8 @@
 *     15-FEB-1999 (DSB):
 *        Use HDS component path and slice spec in IMGID (if they are not
 *        blank).
+*     27-DEC-2005 (TIMJ):
+*        Use KPG1_NDFNM rather than hand rolled NDF_MSG/CHR_LASTO.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -102,8 +122,6 @@
       CHARACTER IMGID*256
       CHARACTER NDFNAM*256
       CHARACTER ANLID*30
-      INTEGER FORM                      
-      INTEGER I
       INTEGER IAT
       INTEGER INDX
       INTEGER IWCS
@@ -183,14 +201,7 @@
             CALL DAT_ERASE( LOC, 'IMGID', STATUS )
 
 *  Find the full name of the NDF.
-            CALL NDF_MSG( 'NDF', INDF )
-            CALL MSG_LOAD( ' ', '^NDF', NDFNAM, LC, STATUS ) 
-
-*  Extract the file basename plus HDS component string (if any), and use 
-*  it as the IMGID value.
-            CALL NDG1_LASTO( NDFNAM, '/', IAT, STATUS )
-            IMGID = NDFNAM( IAT + 1 : LC ) 
-            IAT = LC - IAT 
+            CALL KPG1_NDFNM( INDF, NDFNAM, LC, STATUS )
 
 *  Tell the user what is happening.
             IF( .NOT. QUIET ) THEN
@@ -267,14 +278,14 @@
 *  See if there is a CCDPACK extension. If not create one.
          CALL NDF_XSTAT( INDF, 'CCDPACK', THERE, STATUS )       
          IF ( .NOT. THERE ) THEN
-            CALL NDF_XNEW( INDF, 'CCDPACK', 'CCDPACK_EXT', 0, 0, CCDLOC, 
+            CALL NDF_XNEW( INDF, 'CCDPACK', 'CCDPACK_EXT', 0, 0, CCDLOC,
      :                     STATUS ) 
 
 *  Erase any FILTER component in the existing CCDPACK extension.
          ELSE
-            CALL NDF_XLOC( INDF, 'CCDPACK', 'UPDATE', CCDLOC, STATUS ) 
+            CALL NDF_XLOC( INDF, 'CCDPACK', 'UPDATE', CCDLOC, STATUS )
             CALL DAT_THERE( CCDLOC, 'FILTER', THERE, STATUS )
-            IF( THERE ) CALL DAT_ERASE( CCDLOC, 'FILTER', STATUS )         
+            IF( THERE ) CALL DAT_ERASE( CCDLOC, 'FILTER', STATUS )     
          END IF
 
 *  Store the new FILTER value in the CCDPACK extension.
