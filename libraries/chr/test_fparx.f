@@ -4,7 +4,7 @@
 *     TEST_FPARX
 
 *  Purpose:
-*     Test CHR_FANDL.
+*     Test CHR_FPARX.
 
 *  Language:
 *     Starlink Fortran 77
