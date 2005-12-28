@@ -105,7 +105,7 @@
 
 *  Find the end of the directory path. This is the last "/" in the string.
 *  DIREND will be zero if there is no "/".
-      CALL NDG1_LASTO( SPEC, '/', DIREND, STATUS )
+      CALL CHR_LASTO( SPEC, '/', DIREND )
 
 *  The first character in the file basename follows the last "/".
       BNBEG = DIREND + 1
@@ -116,7 +116,7 @@
       SECBEG = 0
       SECEND = -1
       IF( SPEC( LSPEC : LSPEC ) .EQ. ')' ) THEN
-         CALL NDG1_LASTO( SPEC, '(', SECBEG, STATUS )
+         CALL CHR_LASTO( SPEC, '(', SECBEG )
          IF( SECBEG .GT. 0 ) THEN 
             SECEND = LSPEC
             LSPEC = SECBEG - 1
@@ -139,7 +139,7 @@
       ELSE IF( SPEC( LSPEC : LSPEC ) .EQ. ']' ) THEN
 
 *  Find the last "[" in the string. This marks the start of the suffix. 
-         CALL NDG1_LASTO( SPEC, '[', SUFBEG, STATUS )
+         CALL CHR_LASTO( SPEC, '[', SUFBEG )
          IF( SUFBEG .GT. 0 ) THEN 
             SUFEND = LSPEC
             LSPEC = SUFBEG - 1

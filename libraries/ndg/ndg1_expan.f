@@ -473,7 +473,7 @@
                IF( REST .NE. ' ' ) THEN
                   NC = CHR_LEN( REST )
                   IF( REST( NC : NC ) .EQ. ')' ) THEN
-                     CALL NDG1_LASTO( REST( : NC ), '(', IAT, STATUS )
+                     CALL CHR_LASTO( REST( : NC ), '(', IAT )
                      IF( STATUS .EQ. SAI__OK .AND. IAT .GT. 0 ) THEN
 
                         SLICE = REST( IAT : )
