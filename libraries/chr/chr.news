@@ -1,5 +1,6 @@
 CHR Version 2.3
    Add CHR_FPARX for finding strings in parentheses
+   Add CHR_LASTO for finding the last occurrence of a character in a string.
 
 CHR Version 2.2-5 is released
    This version has CHR_ETOM and CHR_MTOE converted to C to overcome problems
