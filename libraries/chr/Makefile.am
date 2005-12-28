@@ -38,7 +38,7 @@ F_ROUTINES = chr_abbrv.f chr_achr.f chr_appnd.f chr_atok.f \
         chr_swap.f  chr_term.f  chr_tochr.f chr_trchr.f chr_trunc.f \
         chr_ucase.f chr_upper.f chr_wild.f  chr1_wild1.f chr1_wild2.f \
         chr1_wild3.f chr1_wild4.f chr1_wild5.f chr1_wild6.f chr1_wild7.f \
-        chr_fparx.f
+        chr_fparx.f chr_lasto.f
 
 C_ROUTINES = chr_etom.c chr_mtoe.c
 
@@ -60,7 +60,7 @@ TEST_ROUTINES = case.f compare.f decode.f edit.f \
         test_rjust.f test_rmblk.f test_rmchr.f test_rtoan.f test_rtoc.f \
         test_scomp.f test_simlr.f test_size.f  test_skchr.f test_sort.f \
         test_swap.f  test_term.f  test_tochr.f test_trchr.f test_trunc.f \
-        test_ucase.f test_upper.f test_wild.f 
+        test_ucase.f test_upper.f test_wild.f  test_lasto.f
 
 TESTS = chr_test
 check_PROGRAMS = chr_test

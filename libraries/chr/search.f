@@ -34,6 +34,8 @@
 *        Broke into separate routines for each routine tested.
 *     23-DEC-2005 (TIMJ):
 *        Call TEST_FPARX
+*     27-DEC-2005 (TIMJ):
+*        Call TEST_LASTO
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -41,7 +43,7 @@
 
 *  Subprograms called:    
 *     TEST_DELIM, TEST_FANDL, TEST_FIND, TEST_FIWES, TEST_INDEX,
-*     TEST_SKCHR, TEST_TOCHR, TEST_FPARX
+*     TEST_SKCHR, TEST_TOCHR, TEST_FPARX, TEST_LASTO
 *-
 
 *  Type Definitions:
@@ -127,6 +129,14 @@
 
       ISTAT = SAI__OK
       CALL TEST_FPARX(ISTAT)
+      IF (ISTAT .NE. SAI__OK) THEN
+         STATUS = SAI__ERROR
+      END IF
+
+*    Test CHR_LASTO
+
+      ISTAT = SAI__OK
+      CALL TEST_LASTO(ISTAT)
       IF (ISTAT .NE. SAI__OK) THEN
          STATUS = SAI__ERROR
       END IF
