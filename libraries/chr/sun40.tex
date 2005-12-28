@@ -4,10 +4,10 @@
 % -----------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun40.5}
-\newcommand{\stardocnumber}    {40.5}
+\newcommand{\stardocsource}    {sun40.6}
+\newcommand{\stardocnumber}    {40.6}
 \newcommand{\stardocauthors}   {A C Charles\\P C T Rees\\A J Chipperfield}
-\newcommand{\stardocdate}      {2 August 1995}
+\newcommand{\stardocdate}      {27 December 250}
 \newcommand{\stardoctitle}     {CHR \\ [1ex]
                                 Character Handling Routines}
 \newcommand{\stardocversion}   {Version 2.0}
@@ -845,6 +845,8 @@ set.
 \item [CHR\_FIND] -- Find the next occurrence of a given substring within a string.
 \item [CHR\_FIWE] -- Find the next end-of-word within a string.
 \item [CHR\_FIWS] -- Find the start of the next word within a string.
+\item [CHR\_FPARX] -- Find a parenthesised expression in a character string.
+\item [CHR\_LASTO] -- Find the last occurrence of character in a string.
 \item [CHR\_SKCHR] -- Skip over all specified characters in a string.
 \item [CHR\_TOCHR] -- Skip to the next specified character in a string.
 \end {description}
@@ -1751,6 +1753,50 @@ set.
    }
 }
 \sstroutine{
+   CHR\_FPARX
+}{
+   Find a parenthesised expression in a character string
+}{
+   \sstdescription{
+      The routine searches the string STR to identify a sub-string
+      containing a parenthesised expression and returns the character
+      positions of the opening and closing parentheses in the F and L
+      arguments. Allowance is made for nested parentheses. If a
+      parenthesised expression was not found, then the returned value
+      of F will be greater than the returned value of L.
+   }
+   \sstinvocation{
+      CALL CHR\_FPARX( STR, OPPAR, CLPAR, F, L )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String to be searched.
+      }
+      \sstsubsection{
+         OPPAR = CHARACTER $*$ ( 1 ) (Given)
+      }{
+         The opening parenthesis character.
+      }
+      \sstsubsection{
+         CLPAR = CHARACTER $*$ ( 1 ) (Given)
+      }{
+         The closing parenthesis character.
+      }
+      \sstsubsection{
+         F = INTEGER (Returned)
+      }{
+         Character position of the opening parenthesis.
+      }
+      \sstsubsection{
+         L = INTEGER (Returned)
+      }{
+         Character position of the closing parenthesis.
+      }
+   }
+}
+\sstroutine{
    CHR\_HTOI
 }{
    Read an INTEGER value from a hexadecimal string
@@ -2135,6 +2181,38 @@ set.
    \sstnotes{
       This subroutine assumes a 32-bit, twos complement representation
       of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_LASTO
+}{
+   Locates the last occurence of CVAL in STRING
+}{
+   \sstdescription{
+      The routine locates the last occurence of the single character
+      CVAL in STRING. If an occurence is not located then IAT is
+      returned as 0.
+   }
+   \sstinvocation{
+      CALL CHR\_LASTO( STRING, CVAL, IAT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String to be searched for occurences of CVAL.
+      }
+      \sstsubsection{
+         CVAL = CHARACTER $*$ ( 1 ) (Given)
+      }{
+         Character whose last occurence is to be located.
+      }
+      \sstsubsection{
+         IAT = INTEGER (Returned)
+      }{
+         Position  within STRING at which last occurence of CVAL is
+         located. Set to 0 if the character is not found.
+      }
    }
 }
 \sstroutine{
