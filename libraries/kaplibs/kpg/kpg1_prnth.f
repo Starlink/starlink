@@ -29,13 +29,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.   
 
+*  Copyright:
+*     Copyright (C) 1998 CLRC
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-MAR-1998 (DSB):
 *        Original version.
+*     27-DEC-2005 (TIMJ):
+*        Call CHR_LASTO rather than KPG1_LASTO.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -77,7 +101,7 @@
 *  Find the last closing parenthesis in the string following the
 *  opening parenthesis.
          CL = 0
-         CALL KPG1_LASTO( STRING( OP + 1 : ), ')', CL, STATUS )
+         CALL CHR_LASTO( STRING( OP + 1 : ), ')', CL)
 
 
 *  If not found, return zero for the index of the opening parenthesis.
@@ -85,7 +109,7 @@
             OP = 0
 
 *  Otherwise, correct the returned index to take account of the starting
-*  index in the call to KPG1_LASTO.
+*  index in the call to CHR_LASTO.
          ELSE
             CL = CL + OP
          END IF
