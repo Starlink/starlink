@@ -326,6 +326,27 @@
 *  Related Applications:
 *     KAPPA: PSF, CURSOR, LISTSHOW, LISTMAKE.
 
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1998-2001 Central Laboratory of 
+*         the Research Councils
+*     Copyright (C) 2004-2005 Particle Physics and Astronomy Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -352,6 +373,8 @@
 *        Added parameters CATFRAME and CATEPOCH.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     27-DEC-2005 (TIMJ):
+*        Use KPG1_NDFNAM
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -383,14 +406,12 @@
       CHARACTER LOCI*(DAT__SZLOC)! Locator for input data structure
       CHARACTER MARK*8          ! Positions to mark
       CHARACTER MODE*10         ! Mode for getting initial co-ords 
-      CHARACTER NDFNAM*100      ! Name of input IMAGE
+      CHARACTER NDFNAM*256      ! Name of input IMAGE
       CHARACTER REFNAM*256      ! Reference name
       CHARACTER TITLE*80        ! Title for output positions list
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       INTEGER CFRM              ! Pointer to the Current Frame of the NDF
       INTEGER DIMS( NDF__MXDIM )! Dimensions of NDF
-      INTEGER DIREND            ! Index of end of directory path
-      INTEGER FD                ! File description of input co-ord list
       INTEGER FDL               ! File description of logfile
       INTEGER FDO               ! File description of output co-ord list
       INTEGER I                 ! Loop counter
@@ -733,12 +754,7 @@
       IF( TITLE .EQ. ' ' ) THEN
 
 *  Get the NDF name in a token and convert it to a string.
-         CALL NDF_MSG( 'NDF', INDF )
-         CALL MSG_LOAD( 'DUMMY', '^NDF', NDFNAM, NCI, STATUS )
-
-*  Find the last "/" marking the end of the directory path.
-         CALL NDG1_LASTO( NDFNAM, '/', DIREND, STATUS )
-         DIREND = DIREND + 1
+         CALL KPG1_NDFNM( INDF, NDFNAM, NCI, STATUS )
 
 *  Construct the new title.
          IF( STATUS .EQ. SAI__OK ) THEN
@@ -746,7 +762,7 @@
             TITLE = ' '
             CALL CHR_APPND( 'Feature positions in ', TITLE, NC )
             NC = NC + 1
-            CALL CHR_APPND( NDFNAM( DIREND:NCI ), TITLE, NC )
+            CALL CHR_APPND( NDFNAM( :NCI ), TITLE, NC )
          END IF
 
       END IF
