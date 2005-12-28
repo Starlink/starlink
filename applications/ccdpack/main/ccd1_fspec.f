@@ -207,7 +207,7 @@
 
 *  Parse input file name into directory, name and type.
 *  Look for directory terminator first -- last '/'
-      CALL CCD1_LASTO( DFSPEC, '/', DIREND, STATUS )
+      CALL CHR_LASTO( DFSPEC, '/', DIREND )
       IF ( DIREND .EQ. 0 ) THEN
 
 *  No directory information just supply a blank.
