@@ -33,13 +33,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Copyright:
+*     Copyright (C) 1999 CLRC
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
-*     DSB: David Berry (STARLINK)
+*     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-SEP-1999 (DSB):
 *        Original version.
+*     27-DEC-2005 (TIMJ):
+*        Call CHR_LASTO rather than private CTG version.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,7 +121,7 @@
 
 *  Find the end of the directory path. This is the last "/" in the string.
 *  DIREND will be zero if there is no "/".
-      CALL CTG1_LASTO( SPEC, '/', DIREND, STATUS )
+      CALL CTG1_LASTO( SPEC, '/', DIREND )
 
 *  The first character in the file basename follows the last "/".
       BNBEG = DIREND + 1
