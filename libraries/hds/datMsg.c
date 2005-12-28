@@ -75,6 +75,8 @@
 *        Changed to call EMS_ routines instead of ERR_ routines.
 *     01-DEC-2005 (TIMJ):
 *        Rewrite in C.
+*     28-DEC-2005 (TIMJ):
+*        Use DAT__FLEXT instead of hard-coded ".sdf"
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,12 +111,6 @@ void datMsg( const char * token, const HDSLoc * loc ) {
   char buff[EMS__SZMSG+1];  /* Buffer */
   char file[EMS__SZMSG+1];  /* Container file name */
   char path[EMS__SZMSG+1];  /* Object path name */
-
-#if defined( vms )
-  char suffix[] = ".SDF";
-#else
-  char suffix[] = ".sdf";
-#endif
 
   char *bra;   /* Position of '(' character */
   char *dot;   /* Position of '.' */
@@ -159,7 +155,7 @@ void datMsg( const char * token, const HDSLoc * loc ) {
 
     odd = 1;
     if ( ncf >= 5 ) {
-      if ( strcmp( &file[ncf-4], suffix ) == 0) {
+      if ( strcmp( &file[ncf-DAT__SZFLX], DAT__FLEXT ) == 0) {
 	odd = 0;
       } else {
 	odd = 1;

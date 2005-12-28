@@ -87,10 +87,28 @@
 
 /* Copyright:								    */
 /*    Copyright (C) 1992 Science & Engineering Research Council		    */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -125,6 +143,8 @@
 /*	 extension to portable version. Added expand parameter.		    */
 /*    6-MAY-2004 (BKM):                                                     */
 /*       Set appropriate FCV bit for 64-bit files                           */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Use DAT__FLEXT rather than hard-coded ".SDF"                       */
 /*    {@enter_further_changes_here@}					    */
 
 /* Bugs:								    */
@@ -228,8 +248,8 @@
       if ( _ok( hds_gl_status ) )
       {
          fab = cc$rms_fab;
-         fab.fab$l_dna = ".SDF";
-         fab.fab$b_dns = 4;
+         fab.fab$l_dna = DAT__FLEXT;
+         fab.fab$b_dns = DAT__SZFLX;
          fab.fab$l_fna = file + start;
          fab.fab$b_fns = file_len - start;
          fab.fab$l_nam = &nam;

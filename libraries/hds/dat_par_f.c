@@ -38,13 +38,38 @@
 /* Copyright:                                                               */
 /*    Copyright (C) 1998 Central Laboratory of the Research Councils        */
 
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
+/*    BKM: Brian McIlwrath (Starlink, RAL)                                  */
+/*    PWD: Peter Draper (University of Durham)                              */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {enter_new_authors_here}                                              */
 
 /* History:                                                                 */
 /*    7-JUL-1993 (RFWS):                                                    */
 /*       Original version.                                                  */
+/*    4-JUN-2004 (BKM):                                                     */
+/*       Reformat prolog.                                                   */
+/*    5-SEP-2005 (PWD):                                                     */
+/*       Use autoconf for feature discovery                                 */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Add DAT__FLEXT and DAT__SZFLX constants                            */
 /*    {enter_changes_here}                                                  */
 
 /* Bugs:                                                                    */
@@ -125,11 +150,20 @@
       INTEGER DAT__SZTYP\n\
       PARAMETER ( DAT__SZTYP = %d )\n\
 \n\
+*  Size of file extension.\n\
+      INTEGER DAT__SZFLX\n\
+      PARAMETER ( DAT__SZFLX = %d )\n\
+\n\
+*  Default file extension for HDS files.\n\
+      CHARACTER * ( DAT__SZFLX ) DAT__FLEXT\n\
+      PARAMETER ( DAT__FLEXT = \'%s\' )\n\
+\n\
 *.\n",
 
 /* Specify the constant values.                                             */
       DAT__MXDIM, DAT__SZLOC, DAT__NOLOC, DAT__NOWLD, DAT__ROOT, DAT__SZGRP,
-      DAT__SZMOD, DAT__SZNAM, DAT__SZTYP );
+		     DAT__SZMOD, DAT__SZNAM, DAT__SZTYP, DAT__SZFLX,
+		     DAT__FLEXT );
 
 /* End of program.                                                          */
       exit( 0 );

@@ -22,6 +22,12 @@
 #define DAT__SZMOD 15		 /* Size of access mode string		    */
 #define DAT__SZNAM 15		 /* Size of object name			    */
 #define DAT__SZTYP 15            /* Size of type string			    */
+#ifdef vms
+#define DAT__FLEXT ".SDF"        /* Default HDS file extension              */
+#else
+#define DAT__FLEXT ".sdf"        /* Default HDS file extension              */
+#endif
+#define DAT__SZFLX 4             /* Length of DAT__FLEXT                    */
 
 /* The following are "private" values. These are only used internally.	    */
 #define DAT__CONTAINER 1	 /* Container record class		    */

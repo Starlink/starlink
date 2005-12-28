@@ -29,6 +29,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 #include "hds1.h"		 /* Global definitions for HDS		    */
 #include "rec.h"		 /* Public rec_ definitions		    */
 #include "rec1.h"		 /* Private rec_ definitions		    */
+#include "dat1.h"                /* Private DAT_ definitions                */
 #include "dat_err.h"		 /* DAT__ error code definitions	    */
 
    void rec1_find_file( const char *fspec, INT fspec_len, pid_t *pid,
@@ -97,9 +98,27 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 
 /* Copyright:								    */
 /*    Copyright (C) 1992 Science & Engineering Research Council		    */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)				    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -107,6 +126,8 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 /*       Original version.						    */
 /*    30-NOV-1992 (RFWS):						    */
 /*	 Added "sh" and "tcsh" shell implementations.			    */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Use DAT__FLEXT rather than hard-coded ".sdf"                       */
 /*    {@enter_changes_here@}						    */
 
 /* Bugs:								    */
@@ -168,7 +189,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 /* Otherwise, if the element has no file extension, then add a default one  */
 /* of ".sdf".								    */
 			                    "if(\"$f:e\" == \"\")then\n"
-				               "set f=\"$f.sdf\"\n"
+				               "set f=\"$f" DAT__FLEXT "\"\n"
 			                    "endif\n"
 			                 "endif\n"
 
@@ -250,7 +271,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 /* ".sdf".								    */
 				                "else"
 				                "{"
-				                    "print $0\".sdf\";"
+				                    "print $0\"" DAT__FLEXT "\";"
 				                "}"
 				             "}"
 /* End of "awk" script.							    */

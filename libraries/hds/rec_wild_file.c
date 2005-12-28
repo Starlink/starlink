@@ -109,9 +109,27 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -119,6 +137,8 @@
 /*       Original version.                                                  */
 /*    9-DEC-1992 (RFWS):                                                    */
 /*       Report an error if the file specification is completely blank.     */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Use DAT__FLEXT rather than hard-coded ".SDF"                       */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -316,7 +336,7 @@ is ^IWLD (possible programming error).",
             def.dsc$w_length = (unsigned short int) 7;
             def.dsc$b_dtype = DSC$K_DTYPE_T;
             def.dsc$b_class = DSC$K_CLASS_S;
-            def.dsc$a_pointer = "*.SDF;0";
+            def.dsc$a_pointer = "*" DAT__FLEXT ";0";
 
 /* Construct a descriptor to place the returned file name into a local      */
 /* buffer.                                                                  */

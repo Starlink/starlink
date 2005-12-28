@@ -37,9 +37,26 @@
 /* Copyright:                                                               */
 /*    Copyright (C) 1998 Central Laroratory of the Research Councils        */
 
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
 /*    PWD: Peter W. Draper (JAC, Durham University)                         */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {enter_new_authors_here}                                              */
 
 /* History:                                                                 */
@@ -50,6 +67,8 @@
 /*    1-SEP-2005 (PWD):                                                     */
 /*       Deal with case when lengths of NOLOC and ROOT are greater than     */
 /*       SZLOC                                                              */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Add DAT__FLEXT and DAT__SZFLX constants                            */
 /*    {enter_changes_here}                                                  */
 
 /* Bugs:                                                                    */
@@ -142,6 +161,12 @@
 #ifdef DAT__SZTYP\n\
 #undef DAT__SZTYP\n\
 #endif\n\
+#ifdef DAT__FLEXT\n\
+#undef DAT__FLEXT\n\
+#endif\n\
+#ifdef DAT__SZFLX\n\
+#undef DAT__SZFLX\n\
+#endif\n\
 \n\
 /* Global Constants: */\n\
 \n\
@@ -154,13 +179,16 @@
 #define DAT__SZMOD %d            /* Size of access mode string */\n\
 #define DAT__SZNAM %d            /* Size of object name */\n\
 #define DAT__SZTYP %d            /* Size of type string */\n\
+#define DAT__SZFLX %d            /* Size of file extension DAT__FLEXT */\n\
+#define DAT__FLEXT \"%s\" /* Default HDS file extension */\n\
 \n\
 /*. */\n\
 #endif\n",
 
 /* Specify the constant values.                                             */
-      DAT__MXDIM, noloc, DAT__NOWLD, root,
-      DAT__SZGRP, DAT__SZLOC, DAT__SZMOD, DAT__SZNAM, DAT__SZTYP );
+		     DAT__MXDIM, noloc, DAT__NOWLD, root,
+		     DAT__SZGRP, DAT__SZLOC, DAT__SZMOD, DAT__SZNAM, DAT__SZTYP,
+		     DAT__SZFLX, DAT__FLEXT);
 
 /* End of program.                                                          */
       exit( 0 );

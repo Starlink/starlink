@@ -29,6 +29,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
 #include "rec1.h"                /* Private rec_ definitions                */
+#include "dat1.h"                /* Private DAT_ definitions                */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
    void rec1_get_path( const char *fname, INT fname_len, char **path,
@@ -83,10 +84,28 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
 /*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -98,6 +117,8 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 /*       Add changes to support MinGW under Windows (no process control,    */
 /*       plus Windows filename conventions), so that we can build           */
 /*       shareable libraries for JNIHDS.                                    */
+/*    28-DEC-2005 (TIMJ):                                                   */
+/*       Use DAT__FLEXT rather than hard-coded ".sdf"                       */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -373,7 +394,8 @@ a shell process - ^MESSAGE",
                             (size_t) lbase );
             if ( !extn )
             {
-               (void) strcpy( (*path) + ( *path_len - 4 ), ".sdf" );
+               (void) strcpy( (*path) + ( *path_len - DAT__SZFLX ),
+			      DAT__FLEXT );
             }
             (*path)[ *path_len ] = '\0';
          }
