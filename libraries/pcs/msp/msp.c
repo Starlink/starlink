@@ -14,16 +14,11 @@
       26Jul 2004: Use plain file instead of FIFO when mknod and mkfifo
                   not available  (PWD)
       29Dec 2005: Fix compiler warnings (TIMJ)
+                  Remove code that sets exit handler (TIMJ)
 */
 
 #if HAVE_CONFIG_H
 #  include <config.h>
-#endif
-
-#if HAVE_ATEXIT
-# define USE_ATEXIT 1
-#elif HAVE_ON_EXIT
-# define USE_ON_EXIT 1
 #endif
 
 #include <sys/time.h>
@@ -891,33 +886,7 @@ int *status              /* global status (given and returned) */
    queue_used[0] = MSP__EXTERNAL;
    *commandq = 0;
 
-/*   declare exit handler */
-
-#if 0
-#if USE_ATEXIT
-   atexit ( msp_exit );		/* ANSI C */
-#elif USE_ON_EXIT
-   on_exit( msp_exit1, NULL);	/* SunOS only */
-#else
-   /* No exit handler */
-#endif
-#endif
 }
-
-
-/*+  MSP_EXIT1 - SunOS exit handler */
-
-#if USE_ON_EXIT
-static void msp_exit1
-( 
- int iarg,		/* exit() value  - not used */
- void * arg,            /* Argument to on_exit - not used */
-)
-{
-  /* Just call the normal exit handler */
-    msp_exit();
-}
-#endif
 
 
 /*+  MSP_EXIT - exit handler */

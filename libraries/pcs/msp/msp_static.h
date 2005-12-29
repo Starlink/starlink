@@ -5,16 +5,6 @@ static void msp_accept
 int *status          /* global status (given and returned) */
 );
 
-/*+  MSP_EXIT1 - SunOS exit handler */
-
-#if USE_ON_EXIT
-static void msp_exit1
-( 
-  int iarg,
-  void * arg
-);
-#endif
-
 /*=  MSP_CHECKSOCK - check a socket number is in use */
 
 void msp_checksock 
