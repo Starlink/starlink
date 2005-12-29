@@ -33,6 +33,8 @@
  *      Modified pwd 6/9/05
  *         Add extra 0's to tparm calls. These are part of the official
  *         prototype.
+ *      Modified timj 29/12/05
+ *         Use DAT__FLEXT rather than hard coded ".sdf"
  *
  * This is the routine used by ADAM tasks to read input in response to
  * parameter prompts when running from the shell.
@@ -79,6 +81,7 @@
 #include <sys/wait.h>
 /* Own include files */
 #include "f77.h"
+#include "dat_par.h"
 
 #define INPUTBUFFERLENGTH 256
 #define INPUTLINELENGTH 256
@@ -760,7 +763,7 @@ int nexts;
                   } else {
 /*        ADAM_EXTN undefined - assume .sdf */
                      nexts = 1;
-                     extns[0] = ".sdf";
+                     extns[0] = DAT__FLEXT;
                   }
 
 /*        Flag end of extns list */
