@@ -120,6 +120,9 @@
 *     27-DEC-2005 (TIMJ):
 *        Let HDS_FIND deal with ".sdf" in the filename and handle the
 *        logic fallout from that.
+*     28-DEC-2005 (TIMJ):
+*        Revamp the HDS/NDF/.sdf logic to put more reliance on HDS_FIND
+*        rather than attempting to deal with special cases here.
 *     {enter_further_changes_here}
 
 *-
@@ -133,6 +136,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'NDG_CONST'        ! NDG private constants.
       INCLUDE 'NDG_ERR'          ! NDG error constants.
+      INCLUDE 'DAT_ERR'          ! HDS error constants
 
 *  Arguments Given:
       CHARACTER TEMPLT*(*)
@@ -162,8 +166,8 @@
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
       CHARACTER FTEMP*(GRP__SZNAM) ! File template
       CHARACTER FXS*(GRP__SZNAM)    ! Foreign extension specifier
+      CHARACTER HDSPATH*(2048)     ! Path to HDS component including file and directory
       CHARACTER LOC*(DAT__SZLOC)   ! Locator for top-level object
-      CHARACTER LOC2*(DAT__SZLOC)  ! Locator for component object
       CHARACTER NAM*(GRP__SZNAM)   ! File base name field
       CHARACTER PATH*(GRP__SZNAM)  ! Data path 
       CHARACTER REST*(GRP__SZNAM)  ! The remaining text after the file spec
@@ -197,6 +201,7 @@
       LOGICAL MORE               ! Loop again?
       LOGICAL OK                 ! Was NDF slice OK?
       LOGICAL PURGE              ! Purge duplicate file names?
+      LOGICAL QUOTE              ! Do we quote the HDS_FIND string?
       LOGICAL USEFXS             ! Use a "[.]" string as a for. ext. spec?
 *.
 
@@ -454,106 +459,81 @@
 *  Split the file spec into directory, basename, suffix and section.
          CALL NDG1_FPARS( SPEC, DIR, NAM, TYP, SEC, STATUS )
 
-*  Attempt to open the file as an HDS container file.
-*  Use HDS_FIND so that we can automatically handle the ".sdf" in the filename
-*  that may appear.
-         CALL HDS_FIND( DAT__ROOT, SPEC, 'READ', LOC, STATUS )
+*  Let HDS do all the heavy lifting. So put "SPEC" and "REST" together
+*  and let HDS_FIND look for the path. If the TYP indicates that this is not
+*  a standard ".sdf" we quote the file path, else we do not include TYP so that
+*  HDS can deal with the fact that it will be present in REST.
+         RPOS = 1
+         HDSPATH = ' '
+         QUOTE = .FALSE.
+         IF (TYP .NE. DAT__FLEXT) QUOTE = .TRUE.
+         IF (QUOTE) CALL CHR_APPND( '"', HDSPATH, RPOS )
+         CALL CHR_APPND( DIR, HDSPATH, RPOS )
+         CALL CHR_APPND( NAM, HDSPATH, RPOS )
+         IF (QUOTE) THEN
+            CALL CHR_APPND( TYP, HDSPATH, RPOS )
+            CALL CHR_APPND( '"', HDSPATH, RPOS )
+         END IF
 
-*  If succesfull, we can look for NDFs
-         IF( STATUS .EQ. SAI__OK ) THEN
+*  Append REST, with the slice to begin with
+         CALL CHR_APPND( REST, HDSPATH, RPOS )
 
-            SLICE = ' '
-            PATH = REST
+*  Now find the locator assuming HDS file (but only if status is good at this point)
+         SLICE = ' '
+         CALL HDS_FIND( DAT__ROOT, HDSPATH, 'READ', LOC, STATUS )
 
-*  We need to follow up looking for components in case a path has
-*  been given, but we only do that if the component path does not 
-*  equal '.sdf' since HDS will have already sorted that out
-            IF ( .NOT. CHR_SIMLR( REST, '.sdf' ) ) THEN
+*  If this worked we look for NDFs...
+*  If this failed with DAT__SUBIN then it may be because of the slice specification
+*  Note that HDS_FIND will only work with a slice into an HDS component but
+*  the NDF section will apply to the components *within* the specified component.
 
-*  Assume for the moment that the entire remaining text is an HDS path,
-*  and there is no NDF slice. Tweak the search if REST starts with .sdf
-*  as that should have been dealt with by the previous call to HDS_FIND
-               IF ( CHR_SIMLR( REST(1:4), '.sdf') ) THEN
+         IF (STATUS .EQ. SAI__OK .OR. STATUS .EQ. DAT__SUBIN ) THEN
 
-*  Need to make sure that the .sdf is not part of, say, .sdfx
-                  IF ( CHR_LEN(REST) .GT. 4) THEN
-                     IF ( REST(5:5) .EQ. '.' 
-     :                    .OR. REST(5:5) .EQ. ' ' ) THEN
-                        RPOS = 5
-                     ELSE
-                        RPOS = 1
-                     END IF
-                  ELSE
-                     RPOS = 5
-                  END IF
-               ELSE
-                  RPOS = 1
-               END IF
-               PATH = REST( RPOS : )
 
-*  Attempt to obtain a locator for the object using the remaining text 
-*  from the supplied template as an HDS path.         
-               CALL HDS_FIND( LOC, REST(RPOS:), 'READ', LOC2, STATUS )
+*  Deal with SUBIN case
+            IF (STATUS .EQ. DAT__SUBIN) THEN
 
-*  If this failed, it may be because the REST text ended with an NDF slice
-*  specification. If the last non-blank chartacter is a ")", chop of the
-*  trailing text in parentheses (the slice spec), and try again.
-               IF( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
+*  Look for a slice if path ends in ')' and try again
+               CALL ERR_ANNUL( STATUS )
 
-                  IF( REST .NE. ' ' ) THEN
-                     NC = CHR_LEN( REST )
-                     IF( REST( NC : NC ) .EQ. ')' ) THEN
-                        CALL CHR_LASTO( REST( RPOS : NC ), '(', IAT )
-                        IF( STATUS .EQ. SAI__OK .AND. IAT .GT. 0 ) THEN
+               IF( REST .NE. ' ' ) THEN
+                  NC = CHR_LEN( HDSPATH )
+                  IF( HDSPATH( NC : NC ) .EQ. ')' ) THEN
+                     CALL CHR_LASTO( HDSPATH( : NC ), '(', IAT )
+                     IF( STATUS .EQ. SAI__OK .AND. IAT .GT. 0 ) THEN
 
-                           SLICE = REST( RPOS + IAT - 1 : )
+                        SLICE = HDSPATH( IAT : )
+                        CALL HDS_FIND( DAT__ROOT, HDSPATH( : IAT - 1 ),
+     :                       'READ', LOC, STATUS )
 
-                           IF( IAT .EQ. 1 ) THEN
-                              PATH = ' '
-                           ELSE 
-                              PATH = REST( RPOS : IAT - 1 )
-                           END IF
-
-                           CALL HDS_FIND( LOC, PATH, 'READ', LOC2, 
-     :                          STATUS )
-
-                           IF( STATUS .NE. SAI__OK ) THEN
-                              CALL ERR_ANNUL( STATUS )
-                           END IF
-
+                        IF (STATUS .NE. SAI__OK) THEN
+                           CALL ERR_ANNUL( STATUS )
                         END IF
+
                      END IF
                   END IF
                END IF
-
-            ELSE
-*  Following code assumes that we have found a locator within the file
-*  so clone the top level (which HDS_FIND would do for you)               
-               CALL DAT_CLONE( LOC, LOC2, STATUS )
 
             END IF
 
 *  If we found an object.
-            IF( LOC2 .NE. DAT__NOLOC ) THEN
+            IF( LOC .NE. DAT__NOLOC ) THEN
 
 *  See if it contains any NDFs. If so, the details to the NDFs are stored
 *  in the returned groups.
                CALL NDG1_SDFEX( IGRP, IGRPD, IGRPB, IGRPT, IGRPH, IGRPS,
-     :                          LOC2, DIR, NAM, TYP, SLICE, FOUND, 
+     :                          LOC, DIR, NAM, TYP, SLICE, FOUND, 
      :                          STATUS )
 
-*  Annul the component locator.
-               CALL DAT_ANNUL( LOC2, STATUS )
             END IF
 
-*  Annul the top-level locator.
+*  Annul the locator.
             CALL DAT_ANNUL( LOC, STATUS )
 
 *  If the file could not be opened as an HDS container file, annul the
 *  error.
          ELSE     
-            IF( CHR_SIMLR(TYP,'.sdf') .AND. VERB ) THEN
+            IF( CHR_SIMLR(TYP, DAT__FLEXT) .AND. VERB ) THEN
                CALL ERR_FLUSH( STATUS )
             ELSE
                CALL ERR_ANNUL( STATUS )
