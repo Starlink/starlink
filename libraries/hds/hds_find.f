@@ -25,7 +25,8 @@
 *     initial locator supplied is simply cloned. If an input locator
 *     value of DAT__ROOT is given, then the NAME argument is assumed to
 *     contain a complete object specification, including a container
-*     file name.
+*     file name. The filename can be specified in " " if a non-standard
+*     file extension is being used.
 
 *  Arguments:
 *     LOC1 = CHARACTER * ( * ) (Given)
