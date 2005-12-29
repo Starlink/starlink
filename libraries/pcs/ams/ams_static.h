@@ -67,10 +67,11 @@ int *status                        /* global status (given and returned) */
 
 /*=  AMS_EXIT1 - SunOS on_exit handler */
 
-#ifdef USE_ON_EXIT
+#if USE_ON_EXIT
 static void ams_exit1
 ( 
-int arg		/* SunOS on_exit argument */
+ int iarg,		/* SunOS on_exit argument */
+ void * arg
 );
 #endif
 

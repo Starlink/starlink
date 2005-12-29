@@ -21,7 +21,20 @@
       Remove diagnostic printfs in ams_raccept and ams_receive: AJC 8/2/96
       Enable initialization without exit handler: DLT 14/9/99
       Fix compiler warnings due to lack of include files: TIMJ 3/9/04
+      Tidy up config ATEXIT logic: TIMJ 29/12/05
 */
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_ATEXIT
+# define USE_ATEXIT 1
+#elif HAVE_ON_EXIT
+# define USE_ON_EXIT 1
+#else
+  Unable to find an exit handler
+#endif
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -547,10 +560,11 @@ int *status                        /* global status (given and returned) */
 
 /*=  AMS_EXIT1 - SunOS on_exit handler */
 
-#ifdef USE_ON_EXIT
+#if USE_ON_EXIT
 static void ams_exit1
 ( 
-int arg		/* SunOS on_exit argument */
+ int iarg,		/* exit() value  - not used */
+ void * arg,            /* Argument to on_exit - not used */
 )
 {
     ams_exit();
@@ -580,7 +594,6 @@ void
 {
    int istat;
    int j;
-   int path;
 
 /* Close path connections */
    for (j = 0; j < MESSYS__MXPATH; j++)
@@ -1139,9 +1152,9 @@ int *status
 /*   Add the ams exit handler to those called when the process exits */
 
       if ( eh ) {
-#ifndef USE_ON_EXIT
+#if USE_ATEXIT
          atexit( ams_exit );		/* ANSI C */
-#else
+#elif USE_ON_EXIT
          on_exit( ams_exit1, 0);	/* SunOS only */
 #endif
       }
