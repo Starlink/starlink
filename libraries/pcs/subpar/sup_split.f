@@ -12,6 +12,7 @@
 
 *  Invocation:
 *     CALL SUBPAR_SPLIT ( NAMESTRING, MAXLEVS, NUMLEVS, COMPONENT,
+*    :      FILENAME, STATUS )    
 
 *  Description:
 *     Split a string specifying an HDS structure into the name of the
@@ -40,10 +41,32 @@
 *     names or logical names to be split off and works for both VMS and
 *     UNIX style names.
 
+*  Copyright:
+*     Copyright (C) 1984-1992 Science & Engineering Research Council
+*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     BMC: B McNally (ROE)
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +92,9 @@
 *        prefix messages with 'SUBPAR:'
 *     10-NOV-1992 (AJC):
 *        Use SUBPAR__NAMIN not DAT__
+*     28-DEC-2005 (TIMJ):
+*        Call HDS_SPLIT so that we can try to deal with filenames and .SDF
+*        extensions all in one place.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -126,6 +152,10 @@
       INTEGER FINISH               ! pointer into NAMESTRING
       INTEGER J                    ! counter for number of levels
       CHARACTER*32 TCOMP           ! temporary string for component
+      INTEGER F1                   ! Start of filename
+      INTEGER F2                   ! End of filename
+      INTEGER P1                   ! Start of component path
+      INTEGER P2                   ! End of component path
 
 
 *.
@@ -140,74 +170,27 @@
          FINISH = 1
          COMPONENT(1) = ' '
 
-*     Strip off the filename. This may be surrounded by double quotes
-         START = INDEX ( NAMESTRING, '"' )
+*      Use HDS to split the string into filename and component path
+         CALL HDS_SPLIT( NAMESTRING(:NAMLEN), F1, F2, P1, P2, STATUS )
+         FILENAME = NAMESTRING(F1:F2)
 
-         IF ( START .NE. 0 ) THEN
-
-*        Extract filename. If a top-level structure name follows the
-*        quoted filename, store it.
-            FINISH = INDEX ( NAMESTRING(START+1:NAMLEN), '"' )
-     :                + START
-            FILENAME = NAMESTRING(START+1:FINISH-1)
-
-*        Skip past any following structure name
-*        copying it to COMPONENT(1) if there is one.
-            IF ( FINISH .EQ. NAMLEN ) THEN
-
-*           There is no following path specification
-               MORE = .FALSE.
-
-            ELSE
-
-*           There is a path specification
-*           Find the first separator if there is one
-               START = INDEX ( NAMESTRING(FINISH:NAMLEN), '.' )
-     :                  + FINISH
-
-               IF ( START .EQ. FINISH ) THEN
-
-*              The whole of the path is a top-level name
-                  COMPONENT(1) = NAMESTRING(FINISH+1:NAMLEN)
-                  MORE = .FALSE.
-
-               ELSE
-
-*              There are sub-components specified
-                  IF ( START .GT. ( FINISH+2 )) THEN
-
-*                 There is a top-level object named
-                     COMPONENT(1) = NAMESTRING(FINISH+1:START-2)
-                  ENDIF
-
-               ENDIF
-
-            ENDIF
-
+*      P1 is now the start of the component specification but we want
+*      START to be the first none '.'
+         IF ( NAMESTRING(P1:P1) .EQ. '.') THEN
+            START = P1 + 1
          ELSE
+            START = P1
+         END IF
 
-*        Filename is not in quotes, so it is terminated by the first
-*        '.' following any directory specification.
-*        There may be ':' terminating a logical or device name
-*        or a ':' in a slice specification.
-            FINISH = INDEX ( NAMESTRING(1:NAMLEN), '(' )
-            IF ( FINISH .EQ. 0 ) THEN
-               FINISH = NAMLEN
-            ENDIF
-            FINISH = MAX ( INDEX(NAMESTRING(1:FINISH),':'), 1 )
-            FINISH = STRING_IANYR ( NAMESTRING(FINISH:NAMLEN), ']>/' )
-     :        + FINISH
-            START = INDEX ( NAMESTRING(FINISH:NAMLEN), '.' ) + FINISH
+*      Indicate that P2 is now the length of the string from HDS viewpoint
+         NAMLEN = P2
 
-
-            IF ( FINISH .EQ. START ) THEN
-               FILENAME = NAMESTRING
-               MORE = .FALSE.
-            ELSE
-               FILENAME = NAMESTRING(1:START-2)
-            ENDIF
-
-         ENDIF
+*      No components if START > P2
+         IF ( START .GT. P2 ) THEN
+            MORE = .FALSE.
+         ELSE
+            MORE = .TRUE.
+         END IF
 
 *      START now points to the first character following the first '.'
 *      after the filename/top-level structre, provided MORE is .TRUE.
@@ -221,7 +204,7 @@
             IF ( FINISH .GT. START ) THEN
                J = J + 1
                COMPONENT(J) = NAMESTRING(START:FINISH-1)
-               START = FINISH + 1
+               START = FINISH + 1               
             ELSE IF ( FINISH .LT. START ) THEN
                J = J + 1
                COMPONENT(J) = NAMESTRING(START:NAMLEN)
@@ -256,9 +239,12 @@
             IF (( COMPONENT(1) .EQ. ' ' ) .OR.
      :          ( COMPONENT(1)(1:1) .EQ. '(' )) THEN
 
+*      Now we are interested in the FILENAME length
+               NAMLEN = F2 - F1 + 1
+
 *           Look first for a logical name terminator
 *           Only look as far as the first '(' - any after that is slice
-*           If none, set START to 1
+*           If none, set START to 1               
                FINISH = INDEX ( FILENAME(1:NAMLEN), '(' )
                IF ( FINISH .EQ. 0 ) FINISH = NAMLEN
                START = MAX ( INDEX ( FILENAME(1:FINISH), ':' ), 1 )
@@ -302,10 +288,6 @@
                COMPONENT(1) = FILENAME(START:FINISH) // TCOMP
 
             ENDIF
-
-*        Remove any slice of cell info from the filename
-            FINISH = INDEX( FILENAME, '(' )
-            IF ( FINISH .NE. 0 ) FILENAME(FINISH:NAMLEN) = ' '
 
             NUMLEVS = J
 
