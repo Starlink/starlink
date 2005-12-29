@@ -42,6 +42,19 @@
 *     attempt to locate the object will fully validate the name.
 *     -  Any blank characters which surround the file or path names
 *     will be excluded from the returned character string positions.
+*     - If the string begins with a quote, it is assumed that the name is
+*     quoted and the component part follows. eg "test.sdfx".MORE will
+*     result in a filename called test.sdfx and a .MORE component.
+*     - If the first component after the root is ".sdf" this will be absorbed
+*     into the filename (which HDS can open without problem) unless there
+*     is a component at the top level of the HDS file called "SDF". If the
+*     file can not be opened by HDS the ".sdf" will be assumed to be part of
+*     the filename. This approach is not full proof since HDS_SPLIT is not
+*     always called with a full path to a valid file. In generaly the best place
+*     for disambiguating would be the caller but this routine is used in places 
+*     other than HDS_FIND so it is better to absorb the overhead. The HDS open
+*     will only occur for the .sdf case. The earlier note comments that some
+*     validation occurs but not all, this is probably at odds with that sentiment.
 
 *  Machine-specific features used:
 *     This routine unavoidably has to make assumptions about the format
@@ -92,6 +105,8 @@
 *     27-DEC-2005 (TIMJ):
 *        Rename as HDS_SPLIT so that it can be part of the public interface
 *        since it is required by NDF.
+*     28-DEC-2005 (TIMJ):
+*        Deal with .sdf in path name.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,20 +136,25 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
+      LOGICAL CHR_SIMLR          ! Compare without case
 
 *  Local Variables:
+      INTEGER DELTA              ! .SDF correction
       CHARACTER * ( 1 ) DUM1     ! Dummy argument
       CHARACTER * ( 1 ) DUM2     ! Dummy argument
       CHARACTER * ( 1 ) DUM3     ! Dummy argument
       CHARACTER * ( 1 ) DUM4     ! Dummy argument
       CHARACTER * ( 30 ) SYSNAM  ! Name of operating system
+      CHARACTER * (DAT__SZLOC) TESTLOC ! Test locator for .sdf disambiguation
       INTEGER F                  ! Position of first non-blank character
       INTEGER I1                 ! First INDEX result
       INTEGER I2                 ! Second INDEX result
       INTEGER IEND               ! Position of end of file name
       INTEGER ISTART             ! Position of start of path name
       INTEGER L                  ! Position of last non-blank character
-
+      INTEGER OFFSET             ! Offset into string
+      LOGICAL THERE              ! Did we have a SDF component?
+      INTEGER LSTAT              ! Local status
 *.
 
 *  Check inherited global status.
@@ -148,7 +168,7 @@
       IF ( F .GT. L ) THEN
          STATUS = DAT__NAMIN
          CALL EMS_REP( 'HDS_SPLIT_BLNK',
-     :                 'Blank NDF name supplied.',
+     :                 'Blank HDS name supplied.',
      :                 STATUS )
 
 *  If the first non-blank character is a quote.
@@ -167,7 +187,7 @@
             STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
             CALL EMS_REP( 'HDS_SPLIT_QTE',
-     :                    'Missing quote in the NDF name ''^NAME''.',
+     :                    'Missing quote in the HDS name ''^NAME''.',
      :                    STATUS )
 
 *  If the quotes are consecutive, then report an error.
@@ -175,7 +195,7 @@
             STATUS = DAT__NAMIN
             CALL EMS_SETC( 'NAME', NAME( F : L ) )
             CALL EMS_REP( 'HDS_SPLIT_NON',
-     :                    'File name absent in the NDF name ''^NAME''.',
+     :                    'File name absent in the HDS name ''^NAME''.',
      :                    STATUS )
 
 *  Otherwise, find the first and last non-blank characters in the
@@ -188,7 +208,7 @@
                STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
                CALL EMS_REP( 'HDS_SPLIT_BLQ',
-     :                       'Quoted filename is blank in the NDF ' //
+     :                       'Quoted filename is blank in the HDS ' //
      :                       'name ''^NAME''.',
      :                       STATUS )
 
@@ -325,7 +345,7 @@
                STATUS = DAT__NAMIN
                CALL EMS_SETC( 'NAME', NAME( F : L ) )
                CALL EMS_REP( 'HDS_SPLIT_MSF',
-     :                       'Missing field in the NDF name ''^NAME''.',
+     :                       'Missing field in the HDS name ''^NAME''.',
      :                       STATUS )
 
 *  Otherwise, note the file name position, omitting any trailing
@@ -333,6 +353,58 @@
             ELSE
                F1 = F
                F2 = F1 + CHR_LEN( NAME( F : IEND ) ) - 1
+            END IF
+
+*  Attempt to remove .sdf from the path and into the filename.
+*  Need to look for 4 characters after the end of the path
+*  The main problem here is that we have to *assume* that there is no SDF component
+*  OR we have to actually look...
+*  Have to watch out for .sdfx components.
+            IF ( IEND + DAT__SZFLX .LE. L .AND. 
+     :           CHR_SIMLR( NAME(F2+1:F2+DAT__SZFLX), DAT__FLEXT )) THEN
+*     Must disambiguate .sdf from .sdfx
+               OFFSET = F2 + DAT__SZFLX + 1
+               DELTA = 0
+               IF ( OFFSET .LT. L ) THEN
+                  IF ( NAME(OFFSET:OFFSET) .EQ. ' '
+     :                 .OR. NAME(OFFSET:OFFSET) .EQ. '.'
+     :                 .OR. NAME(OFFSET:OFFSET) .EQ. '(' ) THEN
+*     Next character is space, . or paren so we are safe calling this .sdf
+                     DELTA = DAT__SZFLX
+                  END IF
+               ELSE
+*     '.sdf' is at end of string so absorb it
+                  DELTA = DAT__SZFLX
+               END IF
+
+*     This is where we can really tell the difference with the .SDF component
+*     vs .sdf file extension if we want to be rock solid. We assume that if the
+*     file can not be opened, that the .sdf is part of the file name.
+*     Move this IF to HDS_FIND if we are uncomfortable with the assumptions here.
+               IF (DELTA .NE. 0) THEN
+                  CALL EMS_MARK()
+                  LSTAT = SAI__OK
+                  CALL HDS_OPEN( NAME(F1:F2), 'READ', TESTLOC, LSTAT )
+                  IF ( LSTAT .EQ. SAI__OK ) THEN
+*     File opened okay, so now disambiguate
+                     CALL DAT_THERE( TESTLOC, DAT__FLEXT(2:DAT__SZFLX),
+     :                    THERE, LSTAT )
+                     IF (THERE) THEN
+                        DELTA = 0 ! it was a component!!
+                     END IF
+                     CALL DAT_ANNUL( TESTLOC, LSTAT )
+                     IF (LSTAT .NE. SAI__OK) CALL EMS_ANNUL( LSTAT )
+                  ELSE
+*     Could not open file (assume that .sdf is part of the filename rather than
+*     a component
+                     CALL EMS_ANNUL( LSTAT )
+                  END IF
+                  CALL EMS_RLSE()
+               END IF
+
+               F2 = F2 + DELTA
+               IEND = IEND + DELTA
+
             END IF
 
 *  If no errors have occurred, then attempt to locate the path name

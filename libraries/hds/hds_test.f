@@ -52,10 +52,18 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN
+
 *  Local Constants:
+
+*  Note that the file extension is included as a test case
       CHARACTER * ( 32 ) PATH    ! File name
-*  Note that the .sdf is included as a test case
-      PARAMETER ( PATH = 'hds_test.sdf' )
+      PARAMETER ( PATH = 'hds_test' // DAT__FLEXT )
+
+*  For testing non-standard extensions
+      CHARACTER * ( 32 ) PATHX    ! Non-standard file name
+      PARAMETER ( PATHX = 'hds_test.sdfxyz' )
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC1 ! Top-level locator
@@ -82,7 +90,7 @@
       CHARACTER * (DAT__SZTYP) CTYPE ! type field for _CHAR
       REAL RDIM(5), RDIM_OUT(5)
       INTEGER ACTVAL
-      INTEGER I
+      INTEGER I, ITEMP
       CHARACTER * (10) CHARARR(2), RETCHARARR(2)
       DOUBLE PRECISION DTEMP
 
@@ -304,7 +312,7 @@
 *  Check ability to locate component from path
       CALL HDS_FIND( LOC1, 'TSTRUCT.ARRAY(2,2)', 'READ', LOC3, STATUS )
       CALL DAT_GET0D( LOC3, DTEMP, STATUS )
-
+      CALL DAT_ANNUL( LOC3, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
          IF ( DTEMP .NE. 12.0D0) THEN
             CALL EMS_REP('GET0D_SLICE',
@@ -312,7 +320,6 @@
      :           STATUS)
          END IF
       END IF
-
 
 *  Force primitive
 
@@ -328,10 +335,114 @@
 *  Sum the data elements.
       CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
 
-*  Clean up and erase the container file.
+*  Clean up
       CALL DAT_UNMAP( LOC2, STATUS )
       CALL DAT_ANNUL( LOC2, STATUS )
+
+*  Try HDS_FIND with a full filename, including the .sdf
+      CALL HDS_FIND( DAT__ROOT, PATH(:CHR_LEN(PATH))//
+     :               '.TSTRUCT.ARRAY(2,2)', 
+     :               'READ', LOC3, STATUS )
+      CALL DAT_GET0D( LOC3, DTEMP, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( DTEMP .NE. 12.0D0) THEN
+            CALL EMS_REP('GET0D_SLICE',
+     :           'Did not get expected value from path.' //
+     :               'TSTRUCT.ARRAY(2,2)',
+     :           STATUS)
+         END IF
+      END IF
+
+*  Now try HDS_FIND without the extension
+      CALL HDS_FIND( DAT__ROOT, PATH(:CHR_LEN(PATH)-DAT__SZFLX)//
+     :               '.TSTRUCT.ARRAY(2,2)', 
+     :               'READ', LOC3, STATUS )
+      CALL DAT_GET0D( LOC3, DTEMP, STATUS )
+      CALL DAT_ANNUL( LOC3, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( DTEMP .NE. 12.0D0) THEN
+            CALL EMS_REP('GET0D_SLICE',
+     :           'Did not get expected value from path.' //
+     :               'TSTRUCT.ARRAY(2,2)',
+     :           STATUS)
+         END IF
+      END IF
+
+*  Erase the container file.
       CALL HDS_ERASE( LOC1, STATUS )
+
+*  Now create a non-standard filename and open it with HDS_FIND
+      CALL HDS_NEW( PATHX, 'HDS_TEST', 'NDF', 0, DIM, LOC1,
+     :              STATUS )
+      CALL DAT_NEW( LOC1, 'TSTRUCT', 'STRUCT', 0, DIM, STATUS )
+      CALL DAT_FIND( LOC1, 'TSTRUCT', LOC2, STATUS )
+      CALL DAT_NEW( LOC2, 'ARRAY', '_DOUBLE', 2, DIM, STATUS )
+      CALL DAT_FIND( LOC2, 'ARRAY', LOC3, STATUS )
+      CALL DAT_MAPV( LOC3, '_REAL', 'WRITE', PNTR, EL, STATUS )
+      CALL SETUP( EL, %VAL( CNF_PVAL( PNTR ) ), ANSWER, STATUS )
+      CALL DAT_UNMAP( LOC3, STATUS )
+
+*  Get a slice and a reference
+      CALL DAT_CUT( LOC3, '(2,2)', LOC4, STATUS )
+      CALL DAT_REF( LOC4, REF, REFLEN, STATUS )
+
+*  Clean up
+      CALL DAT_ANNUL( LOC3, STATUS )
+      CALL DAT_ANNUL( LOC2, STATUS )
+      CALL DAT_ANNUL( LOC1, STATUS )
+
+*  Now open up the data array using the reference from DAT_REF
+      CALL HDS_FIND( DAT__ROOT, REF(:REFLEN), 'READ', LOC1, STATUS)
+      CALL DAT_GET0D( LOC1, DTEMP, STATUS )
+      CALL DAT_ANNUL( LOC1, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( DTEMP .NE. 12.0D0) THEN
+            CALL EMS_SETC( 'P', REF )
+            CALL EMS_REP('GET0D_SLICE',
+     :           'Did not get expected value from path ^P',
+     :           STATUS)
+         END IF
+      END IF
+
+*  Remove file
+      CALL HDS_OPEN( PATHX, 'UPDATE', LOC1, STATUS )      
+      CALL HDS_ERASE( LOC1, STATUS )
+
+*  Now try to con HDS_FIND with a component that actually does include .SDF
+      CALL HDS_NEW( PATH, 'HDS_TEST', 'NDF', 0, DIM, LOC1,
+     :              STATUS )
+      CALL DAT_NEW0I( LOC1, 'SDF', STATUS )
+      CALL DAT_FIND( LOC1, 'SDF', LOC2, STATUS )
+      CALL DAT_PUT0I( LOC2, 22, STATUS )
+      CALL DAT_ANNUL( LOC2, STATUS)
+      CALL HDS_CLOSE( LOC1, STATUS )
+
+      CALL HDS_FIND( DAT__ROOT, PATH, 'READ', LOC1, STATUS )
+      CALL DAT_NAME( LOC1, REF, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF ( REF .NE. 'SDF' ) THEN
+            STATUS = SAI__ERROR
+            CALL EMS_SETC( 'NM', REF )
+            CALL EMS_REP('DAT_NAME_ERR',
+     :           'Name was ^NM rather than "SDF"', STATUS )
+         END IF
+      END IF
+      CALL DAT_GET0I( LOC1, ITEMP, STATUS )
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (ITEMP .NE. 22 ) THEN
+            STATUS = SAI__ERROR
+            CALL EMS_SETI( 'I', ITEMP )
+            CALL EMS_REP( 'DAT_GET0I_ERR',
+     :           'Value was ^I not 22', STATUS)
+         END IF
+      END IF
+
+*  Remove file
+      CALL DAT_ANNUL( LOC1, STATUS )
+      CALL HDS_OPEN( PATH, 'UPDATE', LOC1, STATUS )      
+      CALL HDS_ERASE( LOC1, STATUS )
+
 
 *  Check if the test ran OK. If so, then report success.
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( ISUM .EQ. INT(ANSWER) )) THEN
