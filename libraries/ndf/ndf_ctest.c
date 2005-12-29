@@ -96,7 +96,7 @@ int main( int argc, char *argv[] ) {
    ndfAnnul( &indf, &status );
 
 /* Re-open the NDF.                                                         */
-   ndfOpen( NULL, "ndf_test", "update", "old", &indf, &place, &status );
+   ndfOpen( NULL, "ndf_test.sdf", "update", "old", &indf, &place, &status );
 
 /* Map its data array.                                                      */
    ndfMap( indf, "Data", "_integer", "read", &pntr, &el, &status );
