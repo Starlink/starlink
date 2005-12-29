@@ -6,14 +6,25 @@
       08Jul 1994: default ADAM_USER to ~/adam (AJC)
       15Sep 1995: create ADAM_USER directory if necessary (AJC)
       12Feb 1996: FRIG TO ALLOW ICL TO WORK WITH TASKS LINKED
-                  WITH PREVIOUS VERSION AMS_SYS.H see /*FRIG
+                  WITH PREVIOUS VERSION AMS_SYS.H see *FRIG*
                   where overlong messages may be received (AJC)
       14Sep 1999: Remove (with #if 0) declaration of exit handler.
                   It must now be done at a higher level. (DLT)
       2 Jul 2004: Now use mkfifo if available. Fix bug in mknod call (TIMJ)
       26Jul 2004: Use plain file instead of FIFO when mknod and mkfifo
                   not available  (PWD)
+      29Dec 2005: Fix compiler warnings (TIMJ)
 */
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if HAVE_ATEXIT
+# define USE_ATEXIT 1
+#elif HAVE_ON_EXIT
+# define USE_ON_EXIT 1
+#endif
 
 #include <sys/time.h>
 #include <sys/types.h> 
@@ -381,7 +392,7 @@ int *status          /* global status (given and returned) */
 {
    int j;                              /* loop counter */
    int found;                          /* loop controller */
-   int namelen;                        /* length of client address */
+   socklen_t namelen;                  /* length of client address */
    struct sockaddr_in client_address;  /* incoming connection details */
 
 
@@ -757,11 +768,8 @@ int *status              /* global status (given and returned) */
    int j;                            /* loop counter */
    struct sockaddr_in connect_addr;  /* description of socket for
                                         incoming connection requests */
-   char *tempstr;                    /* temporary pointer */
    char string[80];                  /* error messages */
    int portno;                       /* this task's port number */
-   FILE *fd;                         /* Rendezvous file fd, if used */
-
 
    if ( *status != SAI__OK ) return;
 
@@ -886,10 +894,12 @@ int *status              /* global status (given and returned) */
 /*   declare exit handler */
 
 #if 0
-#ifndef USE_ON_EXIT
+#if USE_ATEXIT
    atexit ( msp_exit );		/* ANSI C */
+#elif USE_ON_EXIT
+   on_exit( msp_exit1, NULL);	/* SunOS only */
 #else
-   on_exit( msp_exit, 0);	/* SunOS only */
+   /* No exit handler */
 #endif
 #endif
 }
@@ -897,12 +907,14 @@ int *status              /* global status (given and returned) */
 
 /*+  MSP_EXIT1 - SunOS exit handler */
 
-#ifdef USE_ON_EXIT
+#if USE_ON_EXIT
 static void msp_exit1
 ( 
-int iarg		/* SunOS on_exit argument - not used */
+ int iarg,		/* exit() value  - not used */
+ void * arg,            /* Argument to on_exit - not used */
 )
 {
+  /* Just call the normal exit handler */
     msp_exit();
 }
 #endif
@@ -1028,7 +1040,7 @@ int *status         /* global status (given and returned) */
    int found;                        /* loop controller */
    int istat;                        /* local status */
    int j;                            /* loop counter */
-   int taskport;                     /* port number of task */
+   int taskport = 0;                 /* port number of task */
    struct hostent hostentstruct;     /* network data structure for this
                                         machine */
    struct hostent *hostentptr;       /* pointer to network data structure
@@ -1136,7 +1148,7 @@ int *status           /* global status (given and returned) */
 */
 
 {
-   int q;                       /* socket number on which data available */
+   int q = 0;                   /* socket number on which data available */
    int nready;                  /* no. of sockets with data available */
    char string[80];             /* error messages */
    struct msp_msg * new_entry;  /* pointer to new queue member */

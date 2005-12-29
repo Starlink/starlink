@@ -7,10 +7,11 @@ int *status          /* global status (given and returned) */
 
 /*+  MSP_EXIT1 - SunOS exit handler */
 
-#ifdef USE_ON_EXIT
+#if USE_ON_EXIT
 static void msp_exit1
 ( 
-int iarg		/* SunOS on_exit argument - not used */
+  int iarg,
+  void * arg
 );
 #endif
 
