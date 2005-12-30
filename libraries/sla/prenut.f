@@ -22,7 +22,7 @@
 *  1)  The epoch and date are TDB (loosely ET).  TT will do, or even
 *      UTC.
 *
-*  2)  The matrix is in the sense   V(true)  =  RMATPN * V(mean)
+*  2)  The matrix is in the sense   V(true) = RMATPN * V(mean)
 *
 *  Last revision:   3 December 2005
 *
