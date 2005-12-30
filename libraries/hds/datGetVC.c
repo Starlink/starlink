@@ -31,8 +31,7 @@
 *        Variable containing a locator associated with a primitive
 *        data object.
 *     maxval = size_t (Given)
-*        One less than the allocated size of the pntrs array (the routine
-*        will NULL terminate the pointer array). Status is set to DAT__BOUND
+*        The allocated size of the pntrs array. Status is set to DAT__BOUND
 *        if this value is too small and pntrs[] is non-NULL. Not used if the
 *        pntrs[] array is NULL.
 *     bufsize = size_t (Given)
@@ -47,7 +46,7 @@
 *     pntrs[] = char * (Returned)
 *        On return will be filled with pointers to the start of each string
 *        in the string array (which will be within "buffer"). Must be allocated
-*        to hold at least (maxval+1) pointers. If this pointer is NULL, the
+*        to hold at least "maxval" pointers. If this pointer is NULL, the
 *        buffer will be populated and each string terminated but the start
 *        positions will not be recorded.
 *     actval = size_t * (Returned)
@@ -90,6 +89,9 @@
 *        Improved prologue layout
 *     16-DEC-2005 (TIMJ):
 *        Rewrite as datGetVC in C (same API as datGet1C)
+*     29-DEC-2005 (TIMJ):
+*        Modify documentation to match change to datGet1C so that pntrs[] is no
+*        longer terminated.
 *     {enter_further_changes_here}
 
 *  Copyright:
