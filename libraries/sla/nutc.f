@@ -32,14 +32,14 @@
 *
 *     Shirai, T. & Fukushima, T., Astron.J. 121, 3270-3283 (2001).
 *
-*     Fukushima, T., 1991, Astron.Astrophys. 244, L11 (1991).
+*     Fukushima, T., Astron.Astrophys. 244, L11 (1991).
 *
 *     Simon, J. L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
 *     Francou, G. & Laskar, J., Astron.Astrophys. 282, 663 (1994).
 *
-*  P.T.Wallace   Starlink   7 October 2001
+*  This revision:   24 November 2005
 *
-*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

@@ -62,6 +62,10 @@
 *     .  More accurate expressions for Pwo have been adopted
 *        (again from Gill 1982).
 *
+*     .  The formula for the water vapour pressure, given the
+*        saturation pressure and the relative humidity, is from
+*        Crane (1976), expression 2.5.5.
+*
 *     .  Provision for radio wavelengths has been added using
 *        expressions devised by A.T.Sinclair, RGO (private
 *        communication 1989).  The refractivity model currently
@@ -116,7 +120,7 @@
 *
 *  Called:  sla_DRANGE, sla__ATMT, sla__ATMS
 *
-*  Last revision:   8 September 2005
+*  Last revision:   5 December 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *

@@ -1,9 +1,19 @@
+#     23-SEP-2005 (PTW):
+#        Suppression of compiler warnings.
+#        Improved sla_UE2PV.
+#        Package version number changed to 2.5-4.
 
-SLALIB_Version_2.5.3                                  Expiry 31 March 2006
+SLALIB_Version_2.5.4
 
-* sla_UE2PV was sometimes behaving erratically with minor changes
-  to the elements. The iterative algorithm has been modified to make it
-  more stable.
+* Changes to sla_EL2UE, sla_FITXY, sla_PV2EL, sla_REFRO, sla_UE2PV and 
+  sla_SVD to avoid warnings if compiled with -Wall and -g -O.
+
+* Changes to sla_UE2PV to improve convergence in high-eccentricity
+  cases.
+
+SLALIB_Version_2.5.3                                  Expiry 30 June 2006
+
+* 2006 January 1 leap second added to sla_DAT.
 
 SLALIB_Version_2.5.2                                  Expiry 31 March 2006
 

@@ -18,9 +18,9 @@
 *  Returned:
 *     V     r(6)   Cartesian position & velocity vector
 *
-*  P.T.Wallace   Starlink   11 September 2005
+*  Last revision:   11 September 2005
 *
-*  Copyright (C) 2005 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

@@ -7,13 +7,11 @@
 *  From a rotation matrix, determine the corresponding axial vector
 *  (single precision)
 *
-*  A rotation matrix describes a rotation about some arbitrary axis.
-*  The axis is called the Euler axis, and the angle through which the
-*  reference frame rotates is called the Euler angle.  The axial
-*  vector returned by this routine has the same direction as the
-*  Euler axis, and its magnitude is the Euler angle in radians.  (The
-*  magnitude and direction can be separated by means of the routine
-*  sla_VN.)
+*  A rotation matrix describes a rotation about some arbitrary axis,
+*  called the Euler axis.  The "axial vector" returned by this routine
+*  has the same direction as the Euler axis, and its magnitude is the
+*  amount of rotation in radians.  (The magnitude and direction can be
+*  separated by means of the routine sla_VN.)
 *
 *  Given:
 *    RMAT   r(3,3)   rotation matrix
@@ -26,9 +24,9 @@
 *
 *  If RMAT is null, so is the result.
 *
-*  P.T.Wallace   Starlink   11 April 1990
+*  Last revision:   26 November 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

@@ -20,7 +20,7 @@
 *     XP     d      polar motion x-coordinate (radians)
 *     YP     d      polar motion y-coordinate (radians)
 *     TDK    d      local ambient temperature (K; std=273.15D0)
-*     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+*     PMB    d      local atmospheric pressure (mb; std=1013.25D0)
 *     RH     d      local relative humidity (in the range 0D0-1D0)
 *     WL     d      effective wavelength (micron, e.g. 0.55D0)
 *     TLR    d      tropospheric lapse rate (K/metre, e.g. 0.0065D0)
@@ -154,7 +154,7 @@
 *
 *  Called:  sla_AOPPA, sla_AOPQK
 *
-*  Last revision:   29 December 2004
+*  Last revision:   2 December 2005
 *
 *  Copyright P.T.Wallace.   All rights reserved.
 *

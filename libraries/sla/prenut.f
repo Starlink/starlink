@@ -19,13 +19,14 @@
 *
 *  Notes:
 *
-*  1)  The epoch and date are TDB (loosely ET).
+*  1)  The epoch and date are TDB (loosely ET).  TT will do, or even
+*      UTC.
 *
 *  2)  The matrix is in the sense   V(true)  =  RMATPN * V(mean)
 *
-*  P.T.Wallace   Starlink   22 January 2005
+*  Last revision:   3 December 2005
 *
-*  Copyright (C) 2000 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

@@ -122,9 +122,9 @@
 *
 *  Reference:  Everhart & Pitkin, Am.J.Phys. 51, 712 (1983).
 *
-*  P.T.Wallace   Starlink   7 September 2005
+*  Last revision:   8 September 2005
 *
-*  Copyright (C) 2005 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify

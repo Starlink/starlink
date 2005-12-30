@@ -70,7 +70,7 @@
 *       lapse rate 0.0065 K/metre
 *       latitude 50 degrees
 *       sea level
-*       pressure 1005 mB
+*       pressure 1005 mb
 *       temperature 280.15 K
 *       humidity 80%
 *       wavelength 5740 Angstroms
@@ -156,7 +156,7 @@
 *
 *     Stone, Ronald C., P.A.S.P. 108 1051-1058, 1996.
 *
-*  Last revision:   26 December 2004
+*  Last revision:   2 December 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *

@@ -36,7 +36,7 @@
 *
 *        height above sea level    2000 m
 *                      latitude    29 deg
-*                      pressure    793 mB
+*                      pressure    793 mb
 *                   temperature    17 degC
 *                      humidity    50%
 *                    lapse rate    0.0065 degC/m
@@ -65,7 +65,7 @@
 *     the B coefficient almost in the same ratio (see R.M.Green,
 *     "Spherical Astronomy", Cambridge University Press, 1985).
 *
-*  Last revision   26 December 2004
+*  Last revision   2 December 2005
 *
 *  Copyright P.T.Wallace.  All rights reserved.
 *

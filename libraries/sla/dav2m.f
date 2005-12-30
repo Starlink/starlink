@@ -7,11 +7,10 @@
 *  Form the rotation matrix corresponding to a given axial vector.
 *  (double precision)
 *
-*  A rotation matrix describes a rotation about some arbitrary axis.
-*  The axis is called the Euler axis, and the angle through which the
-*  reference frame rotates is called the Euler angle.  The axial
-*  vector supplied to this routine has the same direction as the
-*  Euler axis, and its magnitude is the Euler angle in radians.
+*  A rotation matrix describes a rotation about some arbitrary axis,
+*  called the Euler axis.  The "axial vector" supplied to this routine
+*  has the same direction as the Euler axis, and its magnitude is the
+*  amount of rotation in radians.
 *
 *  Given:
 *    AXVEC  d(3)     axial vector (radians)
@@ -24,9 +23,9 @@
 *  The reference frame rotates clockwise as seen looking along
 *  the axial vector from the origin.
 *
-*  P.T.Wallace   Starlink   June 1989
+*  Last revision:   26 November 2005
 *
-*  Copyright (C) 1995 Rutherford Appleton Laboratory
+*  Copyright P.T.Wallace.  All rights reserved.
 *
 *  License:
 *    This program is free software; you can redistribute it and/or modify
@@ -54,7 +53,7 @@
 
 
 
-*  Euler angle - magnitude of axial vector - and functions
+*  Rotation angle - magnitude of axial vector - and functions
       X = AXVEC(1)
       Y = AXVEC(2)
       Z = AXVEC(3)

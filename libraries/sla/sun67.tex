@@ -6,12 +6,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun67.68}
-\newcommand{\stardocnumber}    {67.68}
+\newcommand{\stardocsource}    {sun67.70}
+\newcommand{\stardocnumber}    {67.70}
 \newcommand{\stardocauthors}   {P.\,T.\,Wallace}
-\newcommand{\stardocdate}      {7 April 2005}
+\newcommand{\stardocdate}      {19 December 2005}
 \newcommand{\stardoctitle}     {SLALIB --- Positional Astronomy Library}
-\newcommand{\stardocversion}   {2.5-1}
+\newcommand{\stardocversion}   {2.5-3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 
@@ -1037,7 +1037,8 @@ decode the second angle, \dms{12}{34}{56}{7}.
         efficient to use the sla\_MAPPA routine to compute the
         required parameters once, followed by one call to
         sla\_AMPQK per star.
-  \item The accuracy is sub-milliarcsecond, limited by the
+  \item For EQ=2000D0,
+        the agreement with ICRS sub-mas, limited by the
         precession-nutation model (IAU 1976 precession, Shirai \&
         Fukushima 2001 forced nutation and precession corrections).
   \item The accuracy is further limited by the routine sla\_EVP, called
@@ -1117,7 +1118,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \spec{HM}{D}{observer's height above sea level (metres)} \\
  \spec{XP,YP}{D}{polar motion \xy\ coordinates (radians)} \\
  \spec{TDK}{D}{local ambient temperature (K; std=273.15D0)} \\
- \spec{PMB}{D}{local atmospheric pressure (mB; std=1013.25D0)} \\
+ \spec{PMB}{D}{local atmospheric pressure (mb; std=1013.25D0)} \\
  \spec{RH}{D}{local relative humidity (in the range 0D0\,--\,1D0)} \\
  \spec{WL}{D}{effective wavelength ($\mu{\rm m}$, {\it e.g.}\ 0.55D0)} \\
  \spec{TLR}{D}{tropospheric lapse rate (K per metre,
@@ -1224,7 +1225,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
   \item The height above sea level of the observing station, HM,
         can be obtained from the {\it Astronomical Almanac}\/ (Section J
         in the 1988 edition), or via the routine sla\_OBS.  If P,
-        the pressure in mB, is available, an adequate
+        the pressure in millibars, is available, an adequate
         estimate of HM can be obtained from the following expression:
         \begin{quote}
          {\tt HM=-29.3D0*TSL*LOG(P/1013.25D0)}
@@ -1263,7 +1264,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \spec{HM}{D}{observer's height above sea level (metres)} \\
  \spec{XP,YP}{D}{polar motion \xy\ coordinates (radians)} \\
  \spec{TDK}{D}{local ambient temperature (K; std=273.15D0)} \\
- \spec{PMB}{D}{local atmospheric pressure (mB; std=1013.25D0)} \\
+ \spec{PMB}{D}{local atmospheric pressure (mb; std=1013.25D0)} \\
  \spec{RH}{D}{local relative humidity (in the range 0D0\,--\,1D0)} \\
  \spec{WL}{D}{effective wavelength ($\mu{\rm m}$, {\it e.g.}\ 0.55D0)} \\
  \spec{TLR}{D}{tropospheric lapse rate (K per metre,
@@ -1322,7 +1323,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
   \item The height above sea level of the observing station, HM,
         can be obtained from the {\it Astronomical Almanac}\/ (Section J
         in the 1988 edition), or via the routine sla\_OBS.  If P,
-        the pressure in mB, is available, an adequate
+        the pressure in millibars, is available, an adequate
         estimate of HM can be obtained from the following expression:
         \begin{quote}
          {\tt HM=-29.3D0*TSL*LOG(P/1013.25D0)}
@@ -1384,7 +1385,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \specel{(4)}{magnitude of diurnal aberration vector} \\
  \specel{(5)}{height (metres)} \\
  \specel{(6)}{ambient temperature (K)} \\
- \specel{(7)}{pressure (mB)} \\
+ \specel{(7)}{pressure (mb)} \\
  \specel{(8)}{relative humidity (0\,--\,1)} \\
  \specel{(9)}{wavelength ($\mu{\rm m}$)} \\
  \specel{(10)}{lapse rate (K per metre)} \\
@@ -1490,7 +1491,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
 \args{GIVEN}
 {
  \spec{TDK}{D}{ambient temperature at the observer (K)} \\
- \spec{PMB}{D}{pressure at the observer (mB)} \\
+ \spec{PMB}{D}{pressure at the observer (mb)} \\
  \spec{RH}{D}{relative humidity at the observer (range 0\,--\,1)} \\
  \spec{WL1}{D}{base wavelength ($\mu{\rm m}$)} \\
  \spec{A1}{D}{refraction coefficient A for wavelength WL1 (radians)} \\
@@ -1518,7 +1519,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
    \hspace*{5ex} \begin{tabular}{rcl}
         height above sea level & ~ & 2000\,m \\
                       latitude & ~ & $29^\circ$ \\
-                      pressure & ~ & 793\,mB \\
+                      pressure & ~ & 793\,mb \\
                    temperature & ~ & $290^\circ$\,K \\
                       humidity & ~ & 0.5 (50\%) \\
                     lapse rate & ~ & $0.0065^\circ m^{-1}$ \\
@@ -1563,11 +1564,11 @@ decode the second angle, \dms{12}{34}{56}{7}.
 \notes
 {
  \begin{enumerate}
-  \item A rotation matrix describes a rotation about some arbitrary axis.
-        The axis is called the {\it Euler axis}, and the angle through which the
-        reference frame rotates is called the Euler angle.  The axial
-        vector supplied to this routine has the same direction as the
-        Euler axis, and its magnitude is the Euler angle in radians.
+  \item A rotation matrix describes a rotation about some
+        arbitrary axis, called the Euler axis.  The
+        {\it axial vector} supplied to this routine
+        has the same direction as the Euler axis, and its
+        magnitude is the amount of rotation in radians.
   \item If AXVEC is null, the unit matrix is returned.
   \item The reference frame rotates clockwise as seen looking along
         the axial vector from the origin.
@@ -1703,7 +1704,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
         \begin{itemize}
          \item 00-49, interpreted as 2000\,--\,2049,
          \item 50-99, interpreted as 1950\,--\,1999, and
-         \item other years after -4712 , interpreted literally.
+         \item other years after $-4712$, interpreted literally.
         \end{itemize}
         Use sla\_CLYD for years before 100AD.
   \item The purpose of sla\_CALDJ is to support
@@ -1788,8 +1789,9 @@ decode the second angle, \dms{12}{34}{56}{7}.
   \item The largest useful value for NDP is determined by the size of
         DAYS, the format of REAL floating-point numbers on the target
         machine, and the risk of overflowing IHMSF(4).  On some
-        architectures, for DAYS up to 1.0, the available floating-
-        point precision corresponds roughly to NDP=3.  This is well
+        architectures, for DAYS up to 1.0,
+        the available floating-point
+        precision corresponds roughly to NDP=3.  This is well
         below the ultimate limit of NDP=9 set by the capacity of a
         typical 32-bit IHMSF(4).
   \item The absolute value of DAYS may exceed 1.0.  In cases where it
@@ -1940,8 +1942,9 @@ decode the second angle, \dms{12}{34}{56}{7}.
   \item The largest useful value for NDP is determined by the size of
         ANGLE, the format of REAL floating-point numbers on the target
         machine, and the risk of overflowing IDMSF(4).  On some
-        architectures, for ANGLE up to 2pi, the available floating-
-        point precision corresponds roughly to NDP=3.  This is well
+        architectures, for ANGLE up to 2pi,
+        the available floating-point
+        precision corresponds roughly to NDP=3.  This is well
         below the ultimate limit of NDP=9 set by the capacity of a
         typical 32-bit IDMSF(4).
   \item The absolute value of ANGLE may exceed $2\pi$.  In cases where it
@@ -1974,7 +1977,8 @@ decode the second angle, \dms{12}{34}{56}{7}.
   \item The largest useful value for NDP is determined by the size of
         ANGLE, the format of REAL floating-point numbers on the target
         machine, and the risk of overflowing IHMSF(4).  On some
-        architectures, for ANGLE up to 2pi, the available floating-point
+        architectures, for ANGLE up to 2pi,
+        the available floating-point
         precision corresponds roughly to NDP=3.  This is well below
         the ultimate limit of NDP=9 set by the capacity of a typical
         32-bit IHMSF(4).
@@ -2023,6 +2027,11 @@ decode the second angle, \dms{12}{34}{56}{7}.
 {
  \spec{V}{R(6)}{\xyzxyzd}
 }
+\anote{The spherical coordinates are longitude (+ve anticlockwise
+       looking from the +ve latitude pole) and latitude.  The
+       Cartesian coordinates are right handed, with the {\it x}-axis
+       at zero longitude and latitude, and the {\it z}-axis at the
+       +ve latitude pole.}
 %-----------------------------------------------------------------------
 \routine{SLA\_CTF2D}{Hour,Min,Sec to Days}
 {
@@ -2245,11 +2254,11 @@ decode the second angle, \dms{12}{34}{56}{7}.
 \notes
 {
  \begin{enumerate}
-  \item A rotation matrix describes a rotation about some arbitrary axis.
-        The axis is called the {\it Euler axis}, and the angle through which the
-        reference frame rotates is called the {\it Euler angle}.  The axial
-        vector supplied to this routine has the same direction as the
-        Euler axis, and its magnitude is the Euler angle in radians.
+  \item A rotation matrix describes a rotation about some
+        arbitrary axis, called the Euler axis.  The
+        {\it axial vector} supplied to this routine
+        has the same direction as the Euler axis, and its
+        magnitude is the amount of rotation in radians.
   \item If AXVEC is null, the unit matrix is returned.
   \item The reference frame rotates clockwise as seen looking along
         the axial vector from the origin.
@@ -2580,7 +2589,8 @@ decode the second angle, \dms{12}{34}{56}{7}.
        could be written `zxz' or `313' (or even `ZxZ' or `3xZ').  ORDER
        is terminated by length or by the first unrecognized character.
        Fewer than three rotations are acceptable, in which case the later
-       angle arguments are ignored.  Zero rotations produces a unit RMAT.
+       angle arguments are ignored.  Zero rotations produces
+       the identity RMAT.
  \end{enumerate}
 }
 %-----------------------------------------------------------------------
@@ -2699,7 +2709,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \begin{enumerate}
   \item The sign convention for azimuth is north zero, east $+\pi/2$.
   \item HA is returned in the range $\pm\pi$.  Declination is returned
-        in the range $\pm\pi$.
+        in the range $\pm\pi/2$.
   \item The latitude is (in principle) geodetic.  In critical
         applications, corrections for polar motion should be applied
         (see sla\_POLMO).
@@ -2746,7 +2756,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
         where {\bf a} and {\bf b} are the 3-vectors VA and VB
         respectively, and  {\bf M} is the $3\times3$ matrix DM.
   \item The main function of this routine is apply an inverse
-        rotation;  under these circumstances, ${\bf \rm M}$ is
+        rotation;  under these circumstances, ${\bf M}$ is
         {\it orthogonal}, with its inverse the same as its transpose.
   \item To comply with the ANSI Fortran 77 standard, VA and VB must
         {\bf not} be the same array.  The routine is, in fact, coded
@@ -2802,8 +2812,9 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \spec{ID}{I}{day} \\
  \spec{FD}{D}{fraction of day} \\
  \spec{J}{I}{status:} \\
- \spec{}{}{\hspace{1.5em} 0 = OK} \\
- \spec{}{}{\hspace{0.7em} $-$1 = unacceptable date (before 4701BC March 1)}
+ \spec{}{}{\hspace{1.5em}0~=~OK} \\
+ \spec{}{}{\hspace{0.7em}$-$1~= unacceptable date} \\
+ \spec{}{}{\hspace{0.7em}~~~~~~~~~~~~(before 4701\,BC~March~1)}
 }
 \aref{The algorithm is adapted from Hatcher,
       {\it Q.\,Jl.\,R.\,astr.\,Soc.}\ (1984) {\bf 25}, 53-55.}
@@ -2825,12 +2836,10 @@ decode the second angle, \dms{12}{34}{56}{7}.
 \notes
 {
  \begin{enumerate}
-  \item A rotation matrix describes a rotation about some arbitrary axis.
-        The axis is called the {\it Euler axis}, and the angle through
-        which the reference frame rotates is called the {\it Euler angle}.
-        The {\it axial vector}\/ returned by this routine has the same
-        direction as the Euler axis, and its magnitude is the Euler angle
-        in radians.
+  \item A rotation matrix describes a rotation about some arbitrary axis,
+        called the Euler axis.  The {\it axial vector} returned by
+        this routine has the same direction as the Euler axis, and its
+        magnitude is the amount of rotation in radians.
   \item The magnitude and direction of the axial vector can be separated
         by means of the routine sla\_DVN.
   \item The reference frame rotates clockwise as seen looking along
@@ -4105,7 +4114,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         account cross-terms between the various precession and
         nutation quantities, amounting to about 3~milliarcsec.
         The transition from the old to the new model officially
-        takes place on 1997 February~27.
+        took place on 1997 February~27.
  \end{enumerate}
 }
 \aref{Capitaine, N.\ \& Gontier, A.-M.\ (1993),
@@ -4202,7 +4211,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
          \item Fewer than three rotations are acceptable, in which case
                the later angle arguments are ignored.
         \end{itemize}
-  \item Zero rotations produces a unit RMAT.
+  \item Zero rotations produces the identity RMAT.
  \end{enumerate}
 }
 %-----------------------------------------------------------------------
@@ -4259,7 +4268,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 \routine{SLA\_FITXY}{Fit Linear Model to Two \xy\ Sets}
 {
  \action{Fit a linear model to relate two sets of \xy\ coordinates.}
- \call{CALL sla\_FITXY (ITYPE,NP,XYE,XYM,COEFFS,J)}
+ \call{CALL sla\_FITXY (ITYPE, NP, XYE, XYM, COEFFS, J)}
 }
 \args{GIVEN}
 {
@@ -4404,7 +4413,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
          the routine requires the epoch at which the position in the
          FK4 system was determined.  The method is from appendix~2 of
          reference~1, but using the constants of reference~4.}
- \call{CALL sla\_FK45Z (R1950,D1950,BEPOCH,R2000,D2000)}
+ \call{CALL sla\_FK45Z (R1950, D1950, BEPOCH, R2000, D2000)}
 }
 \args{GIVEN}
 {
@@ -4472,8 +4481,8 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
          constants from Seidelmann~{\it et~al.}\ (reference~3) are
          used canonically.}
  \call{CALL sla\_FK524 (\vtop{
-         \hbox{R2000,D2000,DR2000,DD2000,P2000,V2000,}
-         \hbox{R1950,D1950,DR1950,DD1950,P1950,V1950)}}}
+         \hbox{R2000, D2000, DR2000, DD2000, P2000, V2000,}
+         \hbox{R1950, D1950, DR1950, DD1950, P1950, V1950)}}}
 }
 \args{GIVEN}
 {
@@ -4542,7 +4551,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \action{Transform an FK5 (J2000) position and proper motion
          into the frame of the Hipparcos catalogue.}
- \call{CALL sla\_FK52H (R5,D5,DR5,DD5,RH,DH,DRH,DDH)}
+ \call{CALL sla\_FK52H (R5, D5, DR5, DD5, RH, DH, DRH, DDH)}
 }
 \args{GIVEN}
 {
@@ -4603,7 +4612,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
          FK5 zero proper motion and parallax.
          This routine converts star positions from the new, IAU~1976,
          FK5, Fricke system to the old, Bessel-Newcomb, FK4 system.}
- \call{CALL sla\_FK54Z (R2000,D2000,BEPOCH,R1950,D1950,DR1950,DD1950)}
+ \call{CALL sla\_FK54Z (R2000, D2000, BEPOCH, R1950, D1950, DR1950, DD1950)}
 }
 \args{GIVEN}
 {
@@ -4648,7 +4657,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \action{Transform an FK5 (J2000) star position into the frame of the
          Hipparcos catalogue, assuming zero Hipparcos proper motion.}
- \call{CALL sla\_FK5HZ (R5,D5,EPOCH,RH,DH)}
+ \call{CALL sla\_FK5HZ (R5, D5, EPOCH, RH, DH)}
 }
 \args{GIVEN}
 {
@@ -5030,7 +5039,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \action{Transform a Hipparcos star position and proper motion
          into the FK5 (J2000) frame.}
- \call{CALL sla\_H2FK5 (RH,DH,DRH,DDH,R5,D5,DR5,DD5)}
+ \call{CALL sla\_H2FK5 (RH, DH, DRH, DDH, R5, D5, DR5, DD5)}
 }
 \args{GIVEN}
 {
@@ -5089,7 +5098,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \action{Transform a Hipparcos star position
          into the FK5 (J2000) frame assuming zero Hipparcos proper motion.}
- \call{CALL sla\_HFK5Z (RH,DH,EPOCH,R5,D5,DR5,DD5)}
+ \call{CALL sla\_HFK5Z (RH, DH, EPOCH, R5, D5, DR5, DD5)}
 }
 \args{GIVEN}
 {
@@ -5135,7 +5144,6 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         These orientation and spin components are interpreted as
         {\it axial vectors.}  An axial vector points at the pole of
         the rotation and its length is the amount of rotation in radians.
-        The order of the rotations, which are very small,
   \item It was the intention that Hipparcos should be a close
         approximation to an inertial frame, so that distant objects
         have zero proper motion;  such objects have (in general)
@@ -5337,12 +5345,10 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 \notes
 {
  \begin{enumerate}
-  \item A rotation matrix describes a rotation about some arbitrary axis.
-        The axis is called the {\it Euler axis}, and the angle through
-        which the reference frame rotates is called the {\it Euler angle}.
-        The {\it axial vector}\/ returned by this routine has the same
-        direction as the Euler axis, and its magnitude is the Euler angle
-        in radians.
+  \item A rotation matrix describes a rotation about some arbitrary axis,
+        called the Euler axis.  The {\it axial vector} returned by
+        this routine has the same direction as the Euler axis, and its
+        magnitude is the amount of rotation in radians.
   \item The magnitude and direction of the axial vector can be separated
         by means of the routine sla\_VN.
   \item The reference frame rotates clockwise as seen looking along
@@ -5392,10 +5398,10 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         once and then either the sla\_MAPQK routine (which includes
         parallax and proper motion) or sla\_MAPQKZ (which assumes
         zero parallax and FK5 proper motion).
-  \item The accuracy is limited by imperfections in the IAU 1976
-        and 1980 models for precession and nutation. Corrections
-        are tabulated in IERS Bulletin B and at the present epoch
-        are of order 50~milliarcsecond. An improved precession-nutation model
+  \item The accuracy, starting from ICRS star data,
+        is limited to about 1~mas by the
+        precession-nutation model used, SF2001.
+        A different precession-nutation model
         can be introduced by using sla\_MAPPA and sla\_MAPQK (see
         the previous note) and replacing the precession-nutation
         matrix into the parameter array directly.
@@ -5420,7 +5426,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
          The parameters produced by this routine are required in the
          parallax, light deflection, aberration, and precession-nutation
          parts of the mean/apparent transformations.
-         The reference frames and time scales used are IAU~1976/80.}
+         The reference frames and time scales used are post IAU~1976.}
  \call{CALL sla\_MAPPA (EQ, DATE, AMPRMS)}
 }
 \args{GIVEN}
@@ -5446,17 +5452,18 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
   \item For DATE, the distinction between the required TDB and TT
         is always negligible.  Moreover, for all but the most
         critical applications UTC is adequate.
-  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
-        the mean equinox and equator of epoch EQ.
+  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are
+        (in essence) referred to
+        the mean equinox and equator of epoch EQ.  For
+        EQ=2000D0, they are referred to the ICRS.
   \item The parameters produced by this routine are used by
         sla\_MAPQK, sla\_MAPQKZ and sla\_AMPQK.
-  \item The accuracy is limited by imperfections in the IAU 1976
-        and 1980 models for precession and nutation. Corrections
-        are tabulated in IERS Bulletin B and at the present epoch
-        are of order 50\,mas. An improved precession-nutation model
+  \item The accuracy, starting from ICRS star data,
+        is limited to about 1~mas by the precession-nutation
+        model used, SF2001.  A different precession-nutation model
         can be introduced by first calling the present routine
         and then replacing the precession-nutation
-        matrix into the AMPRMS array directly.
+        matrix in AMPRMS(13-21) directly.
   \item A further limit to the accuracy of routines using the
         parameter array AMPRMS is
         imposed by the routine sla\_EVP, used here to compute the
@@ -5478,7 +5485,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
  \action{Quick mean to apparent place:  transform a star \radec\ from
          mean place to geocentric apparent place, given the
          star-independent parameters.  The reference frames and
-         time scales used are post IAU 1976.}
+         time scales used are post IAU~1976.}
  \call{CALL sla\_MAPQK (RM, DM, PR, PD, PX, RV, AMPRMS, RA, DA)}
 }
 \args{GIVEN}
@@ -5511,8 +5518,10 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         sla\_MAPPA routine.
   \item If the parallax and proper motions are zero the sla\_MAPQKZ
         routine can be used instead.
-  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
-        the mean equinox and equator of epoch EQ.
+  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are
+        (in essence) referred to
+        the mean equinox and equator of epoch EQ.  For
+        EQ=2000D0, they are referred to the ICRS.
   \item Strictly speaking, the routine is not valid for solar-system
         sources, though the error will usually be extremely small.
         However, to prevent gross errors in the case where the
@@ -5568,8 +5577,10 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         calling the sla\_MAPPA routine.
   \item The corresponding routine for the case of non-zero parallax
         and FK5 proper motion is sla\_MAPQK.
-  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to the
-        mean equinox and equator of epoch EQ.
+  \item The vectors AMPRMS(2-4) and AMPRMS(5-7) are
+        (in essence) referred to
+        the mean equinox and equator of epoch EQ.  For
+        EQ=2000D0, they are referred to the ICRS.
   \item Strictly speaking, the routine is not valid for solar-system
         sources, though the error will usually be extremely small.
         However, to prevent gross errors in the case where the
@@ -5686,7 +5697,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 %------------------------------------------------------------------------------
 \routine{SLA\_NUT}{Nutation Matrix}
 {
- \action{Form the matrix of nutation (IAU 1980 theory) for a given date.}
+ \action{Form the matrix of nutation (SF2001 theory) for a given date.}
  \call{CALL sla\_NUT (DATE, RMATN)}
 }
 \args{GIVEN}
@@ -5698,27 +5709,39 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \spec{RMATN}{D(3,3)}{nutation matrix}
 }
-\anote{The matrix is in the sense:
-       \begin{verse}
-        {\bf v}$_{true}$ =  {\bf M}$\cdot${\bf v}$_{mean}$
-       \end{verse}
-       where {\bf v}$_{true}$ is the star vector relative to the
-       true equator and equinox of date, {\bf M} is the
-       $3\times3$ matrix RMATN and
-       {\bf v}$_{mean}$ is the star vector relative to the
-       mean equator and equinox of date.}
+\notes{
+ \begin{enumerate}
+  \item The matrix is in the sense:
+        \begin{verse}
+         ${\bf v}_{true} = {\bf M}\times{\bf v}_{mean}$
+        \end{verse}
+        where ${\bf v}_{true}$ is the star vector relative to the
+        true equator and equinox of date, {\bf M} is the
+        $3\times3$ matrix {\tt rmatn} and
+        ${\bf v}_{mean}$ is the star vector relative to the
+        mean equator and equinox of date.
+  \item The matrix represents forced nutation (but not free core nutation)
+        plus corrections to the IAU~1976 precession model.
+  \item Earth attitude predictions made by combining the present nutation
+        matrix with IAU~1976 precession are accurate to 1~mas (with respect
+        to the ICRS) for a few decades around 2000.
+  \item The distinction between the required TDB and TT is
+        always negligible.  Moreover, for all but the most
+        critical applications UTC is adequate.
+ \end{enumerate}
+}
 \refs
 {
  \begin{enumerate}
-  \item Final report of the IAU Working Group on Nutation,
-        chairman P.K.Seidelmann, 1980.
   \item Kaplan, G.H., 1981.\ {\it USNO circular No.\ 163}, pA3-6.
+  \item Shirai, T. \& Fukushima, T., 2001, Astron.J., {\bf 121},
+        3270-3283.
  \end{enumerate}
 }
 %-----------------------------------------------------------------------
 \routine{SLA\_NUTC}{Nutation Components}
 {
- \action{Nutation (IAU 1980 theory):  longitude \& obliquity
+ \action{Nutation (SF2001 theory):  longitude \& obliquity
          components, and mean obliquity.}
  \call{CALL sla\_NUTC (DATE, DPSI, DEPS, EPS0)}
 }
@@ -5731,6 +5754,63 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 {
  \spec{DPSI,DEPS}{D}{nutation in longitude and obliquity (radians)} \\
  \spec{EPS0}{D}{mean obliquity (radians)}
+}
+\notes
+{
+ \begin{enumerate}
+  \item The routine predicts forced nutation (but not free core nutation)
+        plus corrections to the IAU~1976 precession model.
+  \item Earth attitude predictions made by combining the present nutation
+        model with IAU~1976 precession are accurate to 1~mas (with respect
+        to the ICRS) for a few decades around 2000.
+  \item The slaNutc80 routine is the equivalent of the present routine
+        but using the IAU 1980 nutation theory.  The older theory is less
+        accurate, leading to errors as large as 350~mas over the interval
+        1900-2100, mainly because of the error in the IAU~1976 precession.
+ \end{enumerate}
+}
+\refs
+{
+ \begin{enumerate}
+  \item Shirai, T. \& Fukushima, T., Astron.J.\ 121, 3270-3283 (2001).
+  \item Fukushima, T., Astron.Astrophys.\ 244, L11 (1991).
+  \item Simon, J. L., Bretagnon, P., Chapront, J., Chapront-Touze, M.,
+        Francou, G. \& Laskar, J., Astron.Astrophys.\ 282, 663 (1994).
+ \end{enumerate}
+}
+%-----------------------------------------------------------------------
+\routine{SLA\_NUTC80}{Nutation Components, IAU 1980}
+{
+ \action{Nutation (IAU 1980 theory):  longitude \& obliquity
+         components, and mean obliquity.}
+ \call{CALL sla\_NUTC80 (DATE, DPSI, DEPS, EPS0)}
+}
+\args{GIVEN}
+{
+ \spec{DATE}{D}{TDB (formerly ET) as Modified Julian Date
+                                           (JD$-$2400000.5)}
+}
+\args{RETURNED}
+{
+ \spec{DPSI,DEPS}{D}{nutation in longitude and obliquity (radians)} \\
+ \spec{EPS0}{D}{mean obliquity (radians)}
+}
+\notes
+{
+ \begin{enumerate}
+  \item The IAU 1980 theory used in the present function has
+        errors as large as 350~mas over the interval
+        1900-2100, mainly because of the error in the IAU~1976
+        precession.  For more accurate results, either the corrections
+        published in IERS {\it Bulletin~B}\/
+        must be applied, or the
+        sla\_NUTC function can be used.  The latter is based upon the
+        more recent SF2001 nutation theory and is of better
+        than 1\,mas accuracy.
+  \item The distinction between the required TDB and TT is
+        always negligible.  Moreover, for all but the most
+        critical applications UTC is adequate.
+ \end{enumerate}
 }
 \refs
 {
@@ -5760,7 +5840,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
  \spec{HM}{D}{observer's height above sea level (metres)} \\
  \spec{XP,YP}{D}{polar motion \xy\ coordinates (radians)} \\
  \spec{TDK}{D}{local ambient temperature (K; std=273.15D0)} \\
- \spec{PMB}{D}{local atmospheric pressure (mB; std=1013.25D0)} \\
+ \spec{PMB}{D}{local atmospheric pressure (mb; std=1013.25D0)} \\
  \spec{RH}{D}{local relative humidity (in the range 0D0\,--\,1D0)} \\
  \spec{WL}{D}{effective wavelength ($\mu{\rm m}$, {\it e.g.}\ 0.55D0)} \\
  \spec{TLR}{D}{tropospheric lapse rate (K per metre,
@@ -5865,7 +5945,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
   \item The height above sea level of the observing station, HM,
         can be obtained from the {\it Astronomical Almanac}\/ (Section J
         in the 1988 edition), or via the routine sla\_OBS.  If P,
-        the pressure in mB, is available, an adequate
+        the pressure in mb, is available, an adequate
         estimate of HM can be obtained from the following expression:
         \begin{quote}
          {\tt HM=-29.3D0*TSL*LOG(P/1013.25D0)}
@@ -6468,7 +6548,7 @@ VLT4 \> ESO VLT 8m, UT4
 }
 \args{GIVEN}
 {
- \spec{DATE1}{D}{final epoch (TT MJD) for the updated elements}
+ \spec{DATE}{D}{final epoch (TT MJD) for the updated elements}
 }
 \args{GIVEN and RETURNED}
 {
@@ -6864,7 +6944,7 @@ VLT4 \> ESO VLT 8m, UT4
                Starlink/SLALIB style guidelines.
         \end{itemize}
         None of the above changes affects the result significantly.
-  \item NP\,=\,3 the result is for the Earth-Moon Barycentre.  To
+  \item For NP\,=\,3 the result is for the Earth-Moon Barycentre.  To
         obtain the heliocentric position and velocity of the Earth,
         either use the SLALIB routine sla\_EVP (or sla\_EPV)
         or call sla\_DMOON and
@@ -7400,7 +7480,7 @@ VLT4 \> ESO VLT 8m, UT4
 \notes
 {
  \begin{enumerate}
-  \item The epoch and date are TDB.
+  \item The epoch and date are TDB.  TT (or even UTC) will do.
   \item The matrix is in the sense:
         \begin{verse}
          {\bf v}$_{true}$ =  {\bf M}$\cdot${\bf v}$_{mean}$
@@ -7517,7 +7597,7 @@ VLT4 \> ESO VLT 8m, UT4
         \> ~~~~~3   \> ~~~~~2  \> never happens \\
         \> ~~~~~3   \> ~~~~~3  \> OK: elements are in the requested format
         \end{tabbing}
-  \item The arguments returned for each value of JFORM ({\it cf}\/ Note~5:
+  \item The arguments returned for each value of JFORM ({\it cf.}\/ Note~5:
         JFORM may not be the same as JFORMR) are as follows:
 
         \begin{tabbing}
@@ -7895,7 +7975,7 @@ VLT4 \> ESO VLT 8m, UT4
 {
  \spec{HM}{D}{height of the observer above sea level (metre)} \\
  \spec{TDK}{D}{ambient temperature at the observer K)} \\
- \spec{PMB}{D}{pressure at the observer (mB)} \\
+ \spec{PMB}{D}{pressure at the observer (mb)} \\
  \spec{RH}{D}{relative humidity at the observer (range 0\,--\,1)} \\
  \spec{WL}{D}{effective wavelength of the source ($\mu{\rm m}$)} \\
  \spec{PHI}{D}{latitude of the observer (radian, astronomical)} \\
@@ -7940,7 +8020,7 @@ VLT4 \> ESO VLT 8m, UT4
 \args{GIVEN}
 {
  \spec{TDK}{D}{ambient temperature at the observer (K)} \\
- \spec{PMB}{D}{pressure at the observer (mB)} \\
+ \spec{PMB}{D}{pressure at the observer (mb)} \\
  \spec{RH}{D}{relative humidity at the observer (range 0\,--\,1)} \\
  \spec{WL}{D}{effective wavelength of the source ($\mu{\rm m}$)}
 }
@@ -8002,7 +8082,7 @@ VLT4 \> ESO VLT 8m, UT4
         \item [$\cdot$] lapse rate 6.5 K km$^{-1}$
         \item [$\cdot$] latitude $50^\circ$
         \item [$\cdot$] sea level
-        \item [$\cdot$] pressure 1005\,mB
+        \item [$\cdot$] pressure 1005\,mb
         \item [$\cdot$] temperature $7^\circ$C
         \item [$\cdot$] humidity 80\%
         \item [$\cdot$] wavelength 5740\,\.{A}
@@ -8103,7 +8183,7 @@ VLT4 \> ESO VLT 8m, UT4
  \spec{ZOBS}{D}{observed zenith distance of the source (radians)} \\
  \spec{HM}{D}{height of the observer above sea level (metre)} \\
  \spec{TDK}{D}{ambient temperature at the observer (K)} \\
- \spec{PMB}{D}{pressure at the observer (mB)} \\
+ \spec{PMB}{D}{pressure at the observer (mb)} \\
  \spec{RH}{D}{relative humidity at the observer (range 0\,--\,1)} \\
     \spec{WL}{D}{effective wavelength of the source ($\mu{\rm m}$)} \\
  \spec{PHI}{D}{latitude of the observer (radian, astronomical)} \\
@@ -8130,32 +8210,30 @@ VLT4 \> ESO VLT 8m, UT4
         \& Sinclair (NAO Technical Notes 59 and 63, subsequently adopted
         in the {\it Explanatory Supplement to the Astronomical Almanac,}\/
         1992 -- see section 3.281).
-  \item The code is based on the AREF optical/IR refraction subroutine
-        of C.\,Hohenkerk (HMNAO, September 1984), with extensions to
-        support the radio case.  The modifications to the original HMNAO
-        optical/IR refraction code which affect the results are:
-        \begin{itemize}
-         \item The angle arguments have been changed to radians,
-               any value of ZOBS is allowed (see Note~6, below) and
-               other argument values have been limited to safe values.
-         \item Murray's values for the gas constants have been used
-               ({\it Vectorial Astrometry,}\/ Adam Hilger, 1983).
-         \item A better model for $P_s(T)$ has been adopted (taken from
-               Gill, {\it Atmosphere-Ocean Dynamics,}\/ Academic Press, 1982).
-         \item More accurate expressions for $Pw_o$ have been adopted
-               (again from Gill 1982).
-         \item Provision for radio wavelengths has been added using
-               expressions devised by A.\,T.\,Sinclair, RGO (private
-               communication 1989).  The refractivity model currently
-               used is from J.M.Rueger, {\it Refractive Index Formulae for
-               Electronic Distance Measurement with Radio and Millimetre
-               Waves}, in Unisurv Report S-68 (2002), School of Surveying
-               and Spatial Information Systems, University of New South
-               Wales, Sydney, Australia.
-         \item The optical refractivity for dry air is from Resolution 3 of
-               the International Association of Geodesy adopted at the XXIIth
-               General Assembly in Birmingham, UK, 1999.
-        \end{itemize}
+ \item The code is based on the {\tt AREF}
+       optical/IR refraction subroutine
+       (HMNAO, September 1984, RGO: Hohenkerk 1985),
+       with extensions to
+       support the radio case.  The modifications to the original HMNAO
+       optical/IR refraction code which affect the results are:
+       \begin{itemize}
+        \item The angle arguments have been changed to radians,
+              any value of ZOBS is allowed (see Note~6, below) and
+              other argument values have been limited to safe values.
+        \item Revised values for the gas constants are used, from
+              Murray (1983).
+        \item A better model for $P_s(T)$ has been adopted,
+              from Gill (1982).
+        \item More accurate expressions for $Pw_o$ have been adopted
+              (again from Gill 1982).
+        \item The formula for the water vapour pressure, given the
+              saturation pressure and the relative humidity, is from
+              Crane (1976), expression 2.5.5.
+        \item Provision for radio wavelengths has been added using
+              expressions devised by A.\,T.\,Sinclair, RGO (Sinclair 1989).
+              The refractivity model is from Rueger (2002).
+        \item The optical refractivity for dry air is from IAG (1999).
+       \end{itemize}
   \item The radio refraction is chosen by specifying WL $>100$~$\mu{\rm m}$.
         Because the algorithm takes no account of the ionosphere, the
         accuracy deteriorates at low frequencies, below about 30\,MHz.
@@ -8191,6 +8269,36 @@ VLT4 \> ESO VLT 8m, UT4
         values returned for stratospheric observers, at altitudes up to
         25km, are quite usable.
   \end{enumerate}
+}
+\refs
+{
+ \begin{enumerate}
+  \item Coulsen, I.\ 1995, private communication.
+  \item Crane, R.K., Meeks, M.L.\ (ed), 1976,
+        ``Refraction Effects in the Neutral Atmosphere'',
+        {\it Methods of Experimental Physics: Astrophysics 12B},
+        Academic Press.
+  \item Gill, Adrian E.\ 1982, {\it Atmosphere-Ocean Dynamics},
+        Academic Press.
+  \item Hohenkerk, C.Y.\ 1985, private communication.
+  \item Hohenkerk, C.Y., \& Sinclair, A.T.\ 1985,
+        {\it NAO Technical Note}\/
+        No.~63, Royal Greenwich Observatory.
+  \item International Association of Geodesy,
+        XXIIth General Assembly, Birmingham, UK, 1999,
+        Resolution 3.
+  \item Murray, C.A.\ 1983, {\it Vectorial Astrometry,}
+        Adam Hilger, Bristol.
+  \item Seidelmann,\,P.K.\ {\it et al.}\ 1992,
+        {\it Explanatory Supplement to the
+        Astronomical Almanac}, Chapter 3, University Science Books.
+  \item Rueger, J.M.\ 2002, {\it Refractive Index Formulae for
+        Electronic Distance Measurement with Radio and Millimetre
+        Waves}, in Unisurv Report S-68, School of Surveying
+        and Spatial Information Systems, University of New South
+        Wales, Sydney, Australia.
+  \item Sinclair, A.T.\ 1989, private communication.
+ \end{enumerate}
 }
 %-----------------------------------------------------------------------
 \routine{SLA\_REFV}{Apply Refraction to Vector}
@@ -8376,7 +8484,7 @@ VLT4 \> ESO VLT 8m, UT4
 \args{RETURNED}
 {
  \spec{sla\_RVEROT}{R}{Component of Earth rotation in
-                       direction RA,DA (km~s$^{-1}$)}
+                       direction [RA,DA]~(km~s$^{-1}$)}
 }
 \notes
 {
@@ -8386,7 +8494,7 @@ VLT4 \> ESO VLT 8m, UT4
   \item Accuracy: the simple algorithm used assumes a spherical Earth and
         an observing station at sea level;  for actual observing
         sites, the error is unlikely to be greater than 0.0005~km~s$^{-1}$.
-        For applications requiring greater precision, use the routine
+        For applications requiring greater accuracy, use the routine
         sla\_PVOBS.
  \end{enumerate}
 }
@@ -9173,7 +9281,7 @@ VLT4 \> ESO VLT 8m, UT4
         \> ~~~~~3   \> ~~~~~2  \> never happens \\
         \> ~~~~~3   \> ~~~~~3  \> OK: elements are in the requested format
         \end{tabbing}
-  \item The arguments returned for each value of JFORM ({\it cf}\/ Note~5:
+  \item The arguments returned for each value of JFORM ({\it cf.}\/ Note~5:
         JFORM may not be the same as JFORMR) are as follows:
 
         \begin{tabbing}
@@ -9466,7 +9574,7 @@ VLT4 \> ESO VLT 8m, UT4
 {
  \action{Transform one \xy\ into another using a linear model of the type
          produced by the sla\_FITXY routine.}
- \call{CALL sla\_XY2XY (X1,Y1,COEFFS,X2,Y2)}
+ \call{CALL sla\_XY2XY (X1, Y1, COEFFS, X2, Y2)}
 }
 \args{GIVEN}
 {
@@ -9694,9 +9802,9 @@ declinations {\it etc.}\ in
 the range $0^{\circ}$ to $-1^{\circ}$ mysteriously migrate to
 the range $0^{\circ}$ to $+1^{\circ}$.
 Here is an example (in Fortran) where we wish to
-read two numbers, and integer {\tt IX} and a real, {\tt Y},
-with {\tt X} defaulting to zero and {\tt Y} defaulting to
-{\tt X}:
+read two numbers, an integer {\tt IX} and a real, {\tt Y},
+with {\tt IX} defaulting to zero and {\tt Y} defaulting to
+{\tt IX}:
 \goodbreak
 \begin{verbatim}
             DOUBLE PRECISION Y
@@ -9798,8 +9906,8 @@ between the unit vector and the axis concerned, and the
 {\it x}-, {\it y-} and {\it z-}components are sometimes
 called {\it direction cosines}.
 
-For some applications involving objects
-with the Solar System, unit vectors are inappropriate, and
+For some applications, including those involving objects
+within the Solar System, unit vectors are inappropriate, and
 it is necessary to use vectors scaled in length-units such as
 AU, km {\it etc.}
 In these cases the origin of the coordinate system may not be
@@ -9889,10 +9997,10 @@ through angles {\tt A}, {\tt B} and {\tt C} about the
       *  Create rotation matrix
             CALL sla_EULER('ZYZ',A,B,C,R)
 
-      *  Transform position (P,Q) from spherical to Cartesian
+      *  Transform position (P1,Q1) from spherical to Cartesian
             CALL sla_CS2C(P1,Q1,V1)
 
-      *  Multiply by rotation matrix
+      *  Apply the rotation
             CALL sla_MXV(R,V1,V2)
 
       *  Back to spherical
@@ -9971,7 +10079,7 @@ and
 sla\_CC62S
 convert from $[\theta,\phi,\dot{\theta},\dot{\phi}]$
 to \xyzxyzd\ and back;
-sla\_DCS26
+sla\_DS2C6
 and
 sla\_DC62S
 are double precision equivalents.
@@ -10155,7 +10263,7 @@ affect them.
 \end{tabular}
 \end{center}
 \vspace{-0.5ex}
-\caption{Relationship Between Celestial Coordinates}
+\caption{\bf Relationship Between Celestial Coordinates}
 
 Star positions are published or catalogued using
 one of the mean \radec\ systems shown at
@@ -10194,12 +10302,13 @@ synonymous with J2000 FK5.  See Section 4.14 for further details.}
 This simple picture is unfortunately
 complicated by the difficulty of defining
 a suitable equator and equinox.  One problem is that the
-Sun's apparent motion is not completely regular, due to the
+Sun's apparent diurnal and annual
+motions are not completely regular, due to the
 ellipticity of the Earth's orbit and its continuous disturbance
 by the Moon and planets.  This is dealt with by
 separating the motion into (i)~a smooth and steady {\it mean Sun}\/
 and (ii)~a set of periodic corrections and perturbations; only the former
-is involved in establishing reference frames and time scales.
+is involved in establishing reference systems and time scales.
 A second, far larger problem, is that
 the celestial equator and the ecliptic
 are both moving with respect to the stars.
@@ -10273,8 +10382,8 @@ refinement.  Nutation models in particular have reached a high
 degree of sophistication, taking into account such things as
 the non-rigidity of the Earth and the effects of
 the planets; SLALIB's nutation
-model (IAU~1980) involves 106 terms in each of $\psi$ (longitude)
-and $\epsilon$ (obliquity), some as small as \arcsec{0}{0001}.
+model (SF2001) involves 194 terms in each of $\psi$ (longitude)
+and $\epsilon$ (obliquity), some as small as a few microarcseconds.
 
 \subsubsection{SLALIB support for precession and nutation}
 SLALIB offers a choice of three precession models:
@@ -10322,24 +10431,31 @@ also provided
 suitable for either the old or the new system (but not a
 mixture of the two).
 
-SLALIB provides only one nutation model, the new, IAU~1980 model,
+SLALIB provides two nutation models, the old IAU~1980 model,
 implemented in the routine
-sla\_NUTC.
-This returns the components of nutation
-in longitude and latitude (and also provides the obliquity) from
+slaNutc80, and a much more accurate newer theory, SF2001,
+implemented in the routine
+slaNutc.
+Both return the components of nutation
+in longitude and latitude (and also provide the obliquity) from
 which a nutation matrix can be generated by calling
-sla\_DEULER
+slaDeuler
 (and from which the {\it equation of the equinoxes}, described
 later, can be found).  Alternatively,
-the nutation matrix can be generated in a single call by using
-sla\_NUT.
+the SF2001 nutation matrix can be generated in a single call by using
+slaNut.  The SF2001 nutation theory includes components that correct
+for errors in the IAU~1976 precession and also for the
+$\sim 23\,$mas
+displacement between the mean J2000 and ICRS coordinate systems,
+achieving a final accuracy well under 1\,mas in the present era.
 
 A rotation matrix for applying the entire precession-nutation
 transformation in one go can be generated by calling
 sla\_PRENUT.
 
 \subsection{Mean Places}
-The main effect of the precession-nutation is a steady increase of about
+From a classical standpoint,
+the main effect of the precession-nutation is an increase of about
 \arcseci{50}/year in the ecliptic longitudes of the stars.  It is therefore
 essential, when reporting the position of an astronomical target, to
 qualify the coordinates with a date, or {\it epoch}.
@@ -10351,8 +10467,8 @@ in the International Celestial Reference System.  Such coordinates must
 be labelled simply ``ICRS'', or the specific catalogue can be mentioned,
 such as ``Hipparcos'';  constructions such as ``Hipparcos, J2000'' are
 redundant and misleading.}  For simplicity, only
-the smooth and steady ``general
-precession'' part of the complete precession-nutation effect is
+the smooth and steady ``precession'' part of the
+complete precession-nutation effect is
 included, thereby defining what is called the {\it mean}\/
 equator and equinox for the epoch concerned.  We say a star
 has a mean place of (for example)
@@ -10363,7 +10479,8 @@ which means something different to do with
 proper motion).
 
 \subsection{Epoch}
-The word ``epoch'' just means a moment in time, and can be supplied
+The word ``epoch'' just means a significant
+moment in time, and can be supplied
 in a variety of forms, using different calendar systems and time scales.
 
 For the purpose of specifying the epochs associated with the
@@ -10507,8 +10624,8 @@ the Earth's motion is not displaced.  To receive the light of
 a star, the telescope has to be offset slightly in the direction of
 the Earth's motion.  A familiar analogy is the need to tilt your
 umbrella forward when on the move, to avoid getting wet.  This
-Newtonian model is,
-in fact, highly misleading in the context of light as opposed
+classical model is,
+in fact, misleading in the context of light as opposed
 to rain, but happens to give the same answer as a relativistic
 treatment to first order (better than 1~milliarcsecond).
 
@@ -10568,11 +10685,12 @@ directly by expressing the position and velocity of the source
 in the observer's frame and correcting for light-time alone.
 
 \subsection{Different Sorts of Mean Place}
-A particularly confusing aspect of published mean places is that they
+A confusing aspect of the mean places used in the
+pre-ICRS era is that they
 are sensitive to the precise way they were determined.  A mean
 place is not directly observable, even with fundamental
-instruments such as transit circles, and to produce a mean
-place will involve relying on some existing star catalogue,
+instruments such as transit circles, and to produce one
+will involve relying on some existing star catalogue,
 for example the fundamental catalogues FK4 and FK5,
 and applying given mathematical models of precession, nutation,
 aberration and so on.
@@ -10588,14 +10706,8 @@ arises, and such phrases as ``in the system of
 the FK4'' can legitimately be employed.  However,
 there is no formal link between the
 two concepts -- no ``standard least squares fit'' between
-reality and the inevitably flawed catalogues.\footnote{This was
-true until the inception of the International Celestial Reference
-System, which is based on the idea of axes locked into the
-distant background.  The coordinates
-of the extragalactic sources which realize these
-axes have no individual significance; there is a ``no net rotation''
-condition which has to be satisfied each time any revisions take
-place.}  All such
+reality and the inevitably flawed catalogues.
+All such
 catalogues suffer at some level from systematic, zonal distortions
 of both the star positions and of the proper motions,
 and include measurement errors peculiar to individual
@@ -10633,7 +10745,8 @@ of 1984 as part of a package of resolutions made by the IAU in 1976,
 along with the adoption of J2000 as the reference epoch.  Star
 positions in the newer, FK5, system are free from the E-terms, and
 the system is a much better approximation to an
-inertial frame (about five times better).
+inertial frame -- about five times better (and ICRS is hundreds
+of times better still).
 
 It may occasionally be convenient to specify the FK4 fictitious proper
 motion directly.  In FK4, the centennial proper motion of (for example)
@@ -10659,7 +10772,8 @@ of practical significance to observing astronomers in the present era:
          known or assumed zero.
    \item Old style (FK4) with zero proper motion in FK5,
          and with parallax and radial velocity assumed zero.
-   \item New style (FK5) with proper motion, parallax and
+   \item New style (FK5 or, loosely, ICRS)
+         with proper motion, parallax and
          radial velocity either known or assumed zero.
 \end{itemize}
 The figure outlines the steps required to convert positions in
@@ -10667,7 +10781,7 @@ any of these systems to a J2000 \radec\ for the current
 epoch, as might be required in a telescope-control
 program for example.
 Most of the steps can be carried out by calling a single
-SLALIB routines;  there are other SLALIB routines which
+SLALIB routine;  there are other SLALIB routines which
 offer set-piece end-to-end transformation routines for common cases.
 Note, however, that SLALIB does not set out to provide the capability
 for arbitrary transformations of star-catalogue data
@@ -10679,7 +10793,7 @@ along with the star position itself, the
 focus of SLALIB support.
 
 As an example of using SLALIB to transform mean places, here is
-a program which implements the top-left path of Figure~1.
+Fortran code that implements the top-left path of Figure~1.
 An FK4 \radec\ of arbitrary equinox and epoch and with
 known proper motion and
 parallax is transformed into an FK5 J2000 \radec\ for the current
@@ -10687,7 +10801,7 @@ epoch.  As a test star we will use $\alpha=$\hms{16}{09}{55}{13},
 $\delta=$\dms{-75}{59}{27}{2}, equinox 1900, epoch 1963.087,
 $\mu_\alpha=$\tsec{-0}{0312}$/y$, $\mu_\delta=$\arcsec{+0}{103}$/y$,
 parallax = \arcsec{0}{062}, radial velocity = $-34.22$~km/s.  The
-epoch of observation is 1994.35.
+date of observation is 1994.35.
 \goodbreak
 \begin{verbatim}
             IMPLICIT NONE
@@ -10793,7 +10907,7 @@ sla\_FK54Z,
       different procedures for the polar regions compared with
       elsewhere.  SLALIB ignores this inhomogeneity and always
       applies the standard
-      transformations irrespective of location on the celestial sphere.
+      transformations, irrespective of location on the celestial sphere.
 \end{itemize}
 
 \subsection {Mean Place to Apparent Place}
@@ -10845,7 +10959,6 @@ the decade of closest approach to the Pole:
            :           AS2R=PI/(180D0*3600D0))
             DOUBLE PRECISION RM,DM,PR,PD,DATE,RA,DA
             INTEGER J,IDS,IDE,ID,IYMDF(4),I
-            DOUBLE PRECISION sla_EPJ2D
 
             CALL sla_DTF2R(02,31,49.8131D0,RM,J)
             CALL sla_DAF2R(89,15,50.661D0,DM,J)
@@ -11085,7 +11198,8 @@ sla\_OAPQK.
 ({\it n.b.}\ These routines use accurate but computationally-expensive
 refraction algorithms for zenith distances beyond about $76^\circ$.
 For many purposes, in-line code tailored to the accuracy requirements
-of the application will be preferable, for example ignoring UT1$-$UTC,
+of the application will be preferable, for example ignoring
+polar motion,
 omitting diurnal aberration and using
 sla\_REFZ
 to apply the refraction.)
@@ -11095,7 +11209,7 @@ With effect from the beginning of 1998, the IAU adopted a new
 reference system to replace FK5 J2000.  The new system, called the
 International Celestial Reference System (ICRS), differs profoundly
 from all predecessors in that the link with solar-system dynamics
-was broken;  the ICRS axes are defined in terms of the directions
+was broken;  the ICRS axes are defined in terms of the coordinates
 of a set of extragalactic sources, not in terms of the mean equator and
 equinox at a given reference epoch.  Although the ICRS and FK5 coordinates
 of any given object are almost the same, the orientation of the new frame
@@ -11141,30 +11255,42 @@ Further information on the ICRS can be found in the paper by M.\,Feissel
 and F.\,Mignard, Astron.\,Astrophys. 331, L33-L36 (1988).
 
 \subsection{Time Scales}
-SLALIB provides for conversion between several time scales, and involves
+
+SLALIB provides for transformation between several time scales, and involves
 use of one or two others.  The full list is as follows:
 \begin{itemize}
 \item TAI: International Atomic Time
 \item UTC: Coordinated Universal Time
-\item UT: Universal Time
-\item GMST: Greenwich Mean Sidereal Time
-\item LAST: Local Apparent Sidereal Time
 \item TT: Terrestrial Time
 \item TDB: Barycentric Dynamical Time.
+\item UT: Universal Time
+\item GMST: Greenwich mean sidereal time
+\item GAST (or GST): Greenwich apparent sidereal time.
+\item LAST: local apparent sidereal time
 \end{itemize}
+Strictly speaking, UT and the sidereal times are not {\it times}\/ in
+the physics sense, but {\it angles}\/ that describe Earth rotation.
+
 Three obsolete time scales should be mentioned here to avoid confusion.
 \begin{itemize}
 \item GMT: Greenwich Mean Time -- can mean either UTC or UT.
 \item ET: Ephemeris Time -- more or less the same as either TT or TDB.
 \item TDT: Terrestrial Dynamical Time -- former name of TT.
 \end{itemize}
-Strictly speaking, UT and ST are angles rather than times in
-the physics sense.
+
+time scales that have no SLALIB support at present:
+\begin{itemize}
+\item Any form of local civil time (BST, PDT {\it etc.})
+\item TCG: geocentric coordinate time.
+\item TCB: barycentric coordinate time.
+\end{itemize}
 
 \subsubsection{Atomic Time: TAI}
-{\it International Atomic Time}\/ TAI is a laboratory time scale.  Its
+{\it International Atomic Time,} TAI, is a ``laboratory''
+time scale with no link to astronomical observations
+except in an historical sense.  Its
 unit is the SI second, which is defined in terms of a
-defined number
+specific number
 of wavelengths of the radiation produced by a certain electronic
 transition in the caesium 133 atom.  It
 is realized through a changing
@@ -11175,13 +11301,14 @@ a weighted average of all the clocks involved.
 
 Though TAI shares the same second as the more familiar UTC, the
 two time scales are noticeably separated in epoch because of the
-build-up of leap seconds.  At the time of writing, UTC
-lags about half a minute behind TAI.
+build-up of leap seconds (see the next section).
+At the time of writing, UTC
+lags over half a minute behind TAI.
 
 For any given date, the difference TAI$-$UTC
-can be obtained by calling the SLALIB routine
+can be obtained by calling the SLALIB function
 sla\_DAT.
-Note, however, that an up-to-date copy of the routine must be used if
+Note, however, that an up-to-date copy of the function must be used if
 the most recent leap seconds are required.  For applications
 where this is critical, mechanisms independent of SLALIB
 and under local control must
@@ -11192,37 +11319,71 @@ independent check, for test dates within the range of the
 available version.  Up-to-date information on TAI$-$UTC is available
 from {\tt ftp://maia.usno.navy.mil/ser7/tai-utc.dat}.
 
-\subsubsection{Universal Time: UTC, UT1}
-{\it Coordinated Universal Time}\/ UTC is the basis of civil timekeeping.
+\subsubsection{Universal Time: UT, UTC}
+\label{UTC}
+{\it Universal Time,} UT, or more specifically UT1,
+is in effect mean solar time and is really an expression
+of Earth rotation rather than a measure of time.
+Originally
+defined in terms of a point in the sky called ``the fictitious
+mean Sun'', UT is now defined through its relationship
+with Earth rotation angle
+(formerly sidereal time).
+Because the Earth's rotation rate is slightly irregular and
+gradually decreasing,\footnote{The Earth is slowing
+down because of tidal effects.  The SI
+second reflects the length-of-day in the mid-19th century, when
+the astronomical observations that established modern timekeeping
+were being made.  Since then,
+the average length-of-day has increased by roughly 2~ms.
+Superimposed in this gradual slowdown are
+variations (seasonal and decadal) that are geophysical in origin,
+notably due to large scale movements of water and atmosphere.
+Because of
+conservation of angular momentum, as the Earth's rotation-rate
+decreases, the Moon moves farther away.  In 50 billion years the
+distance of the Moon will be at a maximum, 44\% greater than now, at
+which stage day and month will both equal 47 present days.}
+the UT second is not precisely
+matched to the SI second.  This makes UT itself unsuitable for
+use as a time scale.
+
+That role is instead taken by
+{\it Coordinated Universal Time,} UTC, which is clock-based and
+is the foundation of civil timekeeping.
 Most time zones differ from UTC by an integer number
 of hours, though a few ({\it e.g.}\ parts of Canada and Australia) differ
-by $n+0.5$~hours.  The UTC second is the same as the SI second,
-as for TAI.  In the long term, UTC keeps in step with the
-Sun.  It does so even though the Earth's rotation is slightly
-variable (due to large scale movements of water and atmosphere
-among other things) by occasionally introducing a {\it leap
-second}.
+by $n+0.5$~hours.  Since its introduction, UTC has been kept
+roughly in step with UT by a variety of adjustments that are
+agreed in advance and then carried out in a coordinated manner by
+the timekeeping communities of different countries---hence the
+name.  Though rate
+changes were used in the past, nowadays all such adjustments
+are made by occasionally inserting
+a whole second.  This procedure is called
+a {\it leap second}.  Because the day length is now slightly longer
+than 86400 SI seconds, a leap second amounts to stopping the UTC
+clock for a second to let the Earth catch up.
 
-{\it Universal Time}\/ UT, or more specifically UT1,
-is in effect the mean solar time.  It is continuous
-({\it i.e.}\ there are no leap seconds) but has a variable
-rate because of the Earth's non-uniform rotation period.  It is
-needed for computing the sidereal time, an essential part of
-pointing a telescope at a celestial source.  To obtain UT1, you
+You need UT1 in order to point a telescope or antenna at a
+clestial target.  To obtain it
+starting from UTC, you
 have to look up the value of UT1$-$UTC for the date concerned
-in tables published by the International Earth Rotation
+in tables published by the International Earth Rotation and
+reference frames
 Service;  this quantity, kept in the range
-$\pm$\tsec{0}{9} by means of UTC leap
+$\pm$\tsec{0}{9} by means of leap
 seconds, is then added to the UTC.  The quantity UT1$-$UTC,
-which typically changes by 1 or 2~ms per day,
-can only be obtained by observation, though seasonal trends
-are known and the IERS listings are able to predict some way into
+which typically changes by of order 1~ms per day,
+can be obtained only by observation (VLBI using
+extragalactic radio sources), though seasonal trends
+are well known and the IERS listings are able to predict some way into
 the future with adequate accuracy for pointing telescopes.
 
 UTC leap seconds are introduced as necessary,
 usually at the end of December or June.
-On the average the solar day is slightly longer
-than the nominal 86,400~SI~seconds and so leap seconds are always positive;
+Because on the average the solar day is slightly longer
+than the nominal 86,400~SI~seconds, leap seconds are always positive;
 however, provision exists for negative leap seconds if needed.
 The form of a leap second can be seen from the
 following description of the end of June~1994:
@@ -11236,10 +11397,13 @@ following description of the end of June~1994:
      & July &  1 & 00 00 00 & $+0.782$ & 00 00 00.782 \\
      &      &    & 00 00 01 & $+0.782$ & 00 00 01.782 \\
 \end{tabular}
+\goodbreak
 
 Note that UTC has to be expressed as hours, minutes and
 seconds (or at least in seconds for a given date) if leap seconds
-are to be taken into account.  It is improper to express a UTC as a
+are to be taken into account in the
+correct manner.
+It is improper to express a UTC as a
 Julian Date, for example, because there will be an ambiguity
 during a leap second (in the above example,
 1994~June~30 \hms{23}{59}{60}{0} and
@@ -11247,19 +11411,20 @@ during a leap second (in the above example,
 MJD~49534.00000).  Although in the vast majority of
 cases this won't matter, there are potential problems in
 on-line data acquisition systems and in applications involving
-taking the difference between two times.  Note that although the routines
+taking the difference between two times.  Note that although the functions
 sla\_DAT
 and
 sla\_DTT
 expect UTC in the form of an MJD, the meaning here is really a
-whole-number {\it date}\/ rather than a time.  Though the routines will accept
+whole-number {\it date}\/ rather than a time.
+Though the functions will accept
 a fractional part and will almost always function correctly, on a day
 which ends with a leap
 second incorrect results would be obtained during the leap second
 itself because by then the MJD would have moved into the next day.
 
-\subsubsection{Sidereal Time: GMST, LAST}
-Sidereal Time is the ``time of day'' relative to the
+\subsubsection{Sidereal Time: GMST, LAST {\it etc.}}
+Sidereal time is like the time of day but relative to the
 stars rather than to the Sun.  After
 one sidereal day the stars come back to the same place in the
 sky, apart from sub-arcsecond precession effects.  Because the Earth
@@ -11267,101 +11432,141 @@ rotates faster relative to the stars than to the Sun by one day
 per year, the sidereal second is shorter than the solar
 second; the ratio is about 0.9973.
 
-The {\it Greenwich Mean Sidereal Time}\/ GMST is
+The {\it Greenwich mean sidereal time,} GMST, is
 linked to UT1 by a numerical formula which
-is implemented in the SLALIB routines
+is implemented in the SLALIB functions
 sla\_GMST
 and
 sla\_GMSTA.
-There are, of course, no leap seconds in GMST, but the second
+There are, of course, no leap seconds in GMST, but the sidereal
+second (measured in SI seconds)
 changes in length along with the UT1 second, and also varies
 over long periods of time because of slow changes in the Earth's
 orbit.  This makes sidereal time unsuitable for everything except
 predicting the apparent directions of celestial sources, in other
 words as an angle rather than a time.
 
-The {\it Local Apparent Sidereal Time}\/ LAST is the apparent right
+The {\it local apparent sidereal time,} LAST, is the apparent right
 ascension of the local meridian, from which the hour angle of any
-star can be determined knowing its $\alpha$.  It can be obtained from the
+star can be determined knowing its right
+ascension.  LAST can be obtained from the
 GMST by adding the east longitude (corrected for polar motion
 in precise work) and the {\it equation of the equinoxes}.  The
 latter, already described, is an aspect of the nutation effect
-and can be predicted by calling the SLALIB routine
+and can be predicted by calling the SLALIB function
 sla\_EQEQX
 or, neglecting certain very small terms, by calling
 sla\_NUTC
 and using the expression $\Delta\psi\cos\epsilon$.
 
+GAST, or plain GST, is GMST plus the equation of the equinoxes.
+
 \subsubsection{Dynamical Time: TT, TDB}
-Dynamical time is the independent variable in the theories
+Dynamical time (formerly Ephemeris Time, ET)
+is the independent variable in the theories
 which describe the motions of bodies in the solar system.  When
-you use published formulae which model the position of the
+using published formulae or
+tables that model the position of the
 Earth in its orbit, for example, or look up
 the Moon's position in a precomputed ephemeris, the date and time
-you use must be in terms of one of the dynamical time scales.  It
-is a common but understandable mistake to use UT directly, in which
-case the results will be about 1~minute out (in the present
-era).
+must be in terms of one of the dynamical time scales.  It
+is a common but understandable mistake to use UTC directly, in which
+case the results will be over a minute out (at the time of writing).
 
 It is not hard to see why such time scales are necessary.
 UTC would clearly be unsuitable as the argument of an
 ephemeris because of leap seconds.
 A solar-system ephemeris based on UT1 or sidereal time would somehow
 have to include the unpredictable variations of the Earth's rotation.
-TAI would work, but eventually
-the ephemeris and the ensemble of atomic clocks would drift apart.
+TAI would work, but in principle
+the ephemeris and the ensemble of atomic clocks would
+eventually drift apart.
 In effect, the ephemeris {\it is}\/ a clock, with the bodies of
-the solar system the hands.
+the solar system the hands from which the ephemeris time is read.
 
 Only two of the dynamical time scales are of any great importance to
-observational astronomers, TT and TDB.  (The obsolete
-time scale ET, ephemeris time, was more or less the same as TT.)
+observational astronomers, TT and TDB.
 
-{\it Terrestrial Time}\/ TT is
+{\it Terrestrial Time,} TT, is
 the theoretical time scale of apparent geocentric ephemerides of solar
 system bodies.  It applies to clocks at sea-level, and for practical purposes
 it is tied to
 Atomic Time TAI through the formula TT~$=$~TAI~$+$~\tsec{32}{184}.
 In practice, therefore, the units of TT are ordinary SI seconds, and
 the offset of \tsec{32}{184} with respect to TAI is fixed.
-The SLALIB routine
+The SLALIB function
 sla\_DTT
 returns TT$-$UTC for a given UTC
-({\it n.b.}\  sla\_DTT
+({\it n.b.}~sla\_DTT
 calls
-sla\_DAT,
+sla\_DTT,
 and the latter must be an up-to-date version if recent leap seconds are
 to be taken into account).
 
-{\it Barycentric Dynamical Time}\/ TDB differs from TT by an amount which
-cycles back and forth by between 1 and 2 milliseconds due to
-relativistic effects.  The variation is
-negligible for most purposes, but unless taken into
+{\it Barycentric Dynamical Time,} TDB, is a
+{\it coordinate time,} suitable
+for labelling events that are most simply described in a context
+where the bodies of the solar system
+are absent.  Applications include
+the emission of pulsar radiation and the motions of the
+solar-system bodies themselves.  When the readings of the
+observer's TT clock are labelled using such a
+coordinate time, differences
+are seen because the clock is affected by its
+speed in the barycentric coordinate system
+and the gravitational potential in which it is immersed.  Equivalently,
+observations of pulsars
+expressed in TT would display similar variations (quite
+apart from the familiar light-time effects).
+
+TDB is defined in such a way that it keeps close to TT
+on the average, with the relativistic effects emerging as
+quasi-periodic differences of maximum amplitude rather less
+than 2\,ms.  This is
+negligible for many purposes, so that TT can act as
+a perfectly adequate surrogate for TDB in most cases,
+but unless taken into
 account would swamp
 long-term analysis of pulse arrival times from the
-millisecond pulsars.  It is a consequence of
-the TT clock being on the Earth rather than in empty
-space:  the ellipticity of
-the Earth's orbit means that the TT clock's speed and
+millisecond pulsars.
+
+Most of the variation between TDB and TT comes from the ellipticity of
+the Earth's orbit;  the TT clock's speed and
 gravitational potential vary slightly
 during the course of the year, and as a consequence
 its rate as seen from an outside observer
 varies due to transverse Doppler effect and gravitational
-redshift.  By definition, TDB and TT differ only
-by periodic terms, and the main effect
-is a sinusoidal variation of amplitude \tsec{0}{0017};  the
-largest lunar and planetary terms are nearly two orders of magnitude
-smaller.  The SLALIB routine
-sla\_RCC
-provides a model of
-TDB$-$TT accurate to a few nanoseconds.
-There are other dynamical time scales (TCG and TCB, not supported by
-SLALIB routines at present), which include allowance also
-for the secular terms.
-These time scales gain on TT and TDB by about \tsec{0}{0013}/day.
+redshift.  The main component is a sinusoidal variation of
+amplitude \tsec{0}{0017};  higher harmonics, and terms
+caused by Moon and planets, lie two orders of magnitude below
+this dominant annual term.  Diurnal (topocentric) terms, a
+function of UT, are $2\,\mu$s or less.
 
-For most purposes, the distinction between TT and TDB is
-of no practical importance.  For
+The IAU 1976 resolution defined TDB by
+stipulating that TDB$-$TT consists of periodic terms only.
+This provided
+a good qualitative description, but turned out to
+contain hidden assumptions about the form of the
+solar-system ephemeris and hence lacked dynamical
+rigour.  A later resolution, in 1991, introduced new
+coordinate time scales, TCG and TCB, and identified TDB as a
+linear transformation of one of them (TCB) with a rate
+chosen not to drift from TT on the average.  Unfortunately
+even this improved definition has proved to
+contin ambiguities.  The SLALIB
+sla\_RCC function implements TDB in the way that is
+most consistent with the 1976 definition and
+with existing practice.  It provides a model of
+TDB$-$TT accurate to a few nanoseconds.
+
+Unlike TDB, the IAU 1991 coordinate time scales TCG and TCB
+(not supported by SLALIB functions at present)
+do not have their rates adjusted to track TT and consequently
+gain on TT and TDB, by about
+\tsec{0}{02}/year and \tsec{0}{5}/year respectively.
+
+As already pointed out, the distinction between TT and TDB is
+of no practical importance for most purposes.  For
 example when calling
 sla\_PRENUT
 to generate a precession-nutation matrix, or when calling
@@ -11369,18 +11574,25 @@ sla\_EVP or
 sla\_EPV
 to predict the
 Earth's position and velocity, the time argument is strictly
-TDB, but TT is near enough and will require less computation.
+TDB, but TT is entirely adequate and will require much
+less computation.
 
-Investigations of topocentric solar-system phenomena such as
-occultations and eclipses require solar time as well as dynamical
+The time scale used by the JPL solar-system ephemerides is called
+$T_{eph}$ and is numerically the same as TDB.
+
+Predictions of topocentric solar-system phenomena such as
+occultations and eclipses require solar time UT as well as dynamical
 time.  TT/TDB/ET is all that is required in order to compute the geocentric
 circumstances, but if horizon coordinates or geocentric parallax
 are to be tackled UT is also needed.  A rough estimate
 of $\Delta {\rm T} = {\rm ET} - {\rm UT}$ is
-available via the routine
+available via the function
 sla\_DT.
 For a given epoch ({\it e.g.}\ 1650) this returns an approximation
 to $\Delta {\rm T}$ in seconds.
+
+
+
 
 \subsection{Calendars}
 The ordinary {\it Gregorian Calendar Date},
@@ -11420,7 +11632,7 @@ and
 sla\_DJCAL
 both convert an MJD into calendar year, month, day and fraction of a day;
 the latter performs rounding to a specified precision, important
-to avoid dates like `{\tt 94 04 01.***}' appearing in messages.
+to avoid dates like `{\tt 2005 04 01.***}' appearing in messages.
 Some of SLALIB's low-precision ephemeris routines
 (sla\_EARTH,
 sla\_MOON
@@ -11438,7 +11650,8 @@ sla\_CLYD
 
 \subsection{Geocentric Coordinates}
 The location of the observer on the Earth is significant in a
-number of ways.  The most obvious, of course, is the effect of latitude
+number of ways.  The most obvious, of course, is the effect of
+longitude and latitude
 on the observed \azel\ of a star.  Less obvious is the need to
 allow for geocentric parallax when finding the Moon with a
 telescope (and when doing high-precision work involving the
@@ -11533,7 +11746,8 @@ Sun.  The two routines offer different trade-offs between
 accuracy and execution time.  For most purposes,
 sla\_EVP is adequate:
 maximum velocity error is 0.42~metres per second;  maximum
-heliocentric position error is 1600~km (about \arcseci{2}), with
+heliocentric position error is 1600~km (equivalent to
+about \arcseci{2} at 1~AU), with
 barycentric position errors about 4 times worse.
 The larger and slower
 sla\_EPV
@@ -11682,8 +11896,8 @@ sla\_DMOON, as is demonstrated by the following example:
 The output produced is as follows:
 \goodbreak
 \begin{verbatim}
-       geocentric:  +03 06 55.59 +15 03 39.0
-      topocentric:  +03 09 23.79 +15 40 51.5
+       geocentric:  +03 06 55.55 +15 03 38.8
+      topocentric:  +03 09 23.76 +15 40 51.4
 \end{verbatim}
 \goodbreak
 (An easier but
@@ -11703,7 +11917,7 @@ in 2\,BC, which is a star-of-Bethlehem candidate:
 
             IMPLICIT NONE
 
-            DOUBLE PRECISION SEPMIN,DJD0,FD,DJD,DJDM,DF,PV(6),RMATP(3,3),
+            DOUBLE PRECISION SEPMIN,DJD0,FD,DJD,DJDM,PV(6),RMATP(3,3),
            :                 PVM(6),PVE(6),TL,RV,DV,RJ,DJ,SEP
             INTEGER IHOUR,IMIN,J,I,IHMIN,IMMIN
             DOUBLE PRECISION sla_EPJ,sla_DSEP
@@ -11753,7 +11967,7 @@ in 2\,BC, which is a star-of-Bethlehem candidate:
                      PV(I)=PV(I)-TL*PV(I+3)
                   END DO
 
-      *       To RA,Dec
+      *        To RA,Dec
                   CALL sla_DCC2S(PV,RV,DV)
 
       *        Same for Jupiter
@@ -11796,8 +12010,8 @@ the closest approach in arcseconds) is as follows:
 \end{verbatim}
 \goodbreak
 For comparison, accurate JPL predictions
-give a separation \arcseci{7} less than
-the above estimate, occurring $27^{\rm m}$ earlier
+give a separation \arcseci{8} less than
+the above estimate, occurring $30^{\rm m}$ earlier
 (see {\it Sky and Telescope,}\/ April~1987, p\,357).
 
 The following program demonstrates
@@ -11809,8 +12023,9 @@ sla\_RDPLAN.
             IMPLICIT NONE
             CHARACTER PNAMES(0:9)*7,B*80,S
             INTEGER I,NP,IY,J,IM,ID,IHMSF(4),IDMSF(4)
-            DOUBLE PRECISION R2AS,FD,DJM,ELONG,PHI,RA,DEC,DIAM
-            PARAMETER (R2AS=206264.80625D0)
+            DOUBLE PRECISION D15B2P,R2AS,FD,DJM,ELONG,PHI,RA,DEC,DIAM
+            PARAMETER (D15B2P=2.3873241463784300365D0,
+           :           R2AS=206264.80625D0)
             DATA PNAMES / 'Sun','Mercury','Venus','Moon','Mars','Jupiter',
            :              'Saturn','Uranus','Neptune', 'Pluto' /
 
@@ -11831,14 +12046,14 @@ sla\_RDPLAN.
                   READ (*,'(A)') B
                   I=1
                   CALL sla_DAFIN(B,I,FD,J)
-                  FD=FD*2.3873241463784300365D0
+                  FD=FD*D15B2P
                   CALL sla_CLDJ(IY,IM,ID,DJM,J)
                   DJM=DJM+FD
                   PRINT *,'Longitude? (D,M,S, east +ve)'
                   READ (*,'(A)') B
                   I=1
                   CALL sla_DAFIN(B,I,ELONG,J)
-                  PRINT *,'Latitude? (D,M,S, (geodetic)'
+                  PRINT *,'Latitude? (D,M,S, geodetic)'
                   READ (*,'(A)') B
                   I=1
                   CALL sla_DAFIN(B,I,PHI,J)
@@ -11867,7 +12082,7 @@ sla\_RDPLAN.
             END
 \end{verbatim}
 Entering the following data (for 1927~June~29 at $5^{\rm h}\,25^{\rm m}$~ET
-and the position of Preston, UK.):
+and the position of Preston, UK):
 \begin{verbatim}
       1927 6 29
       5 25
@@ -11880,12 +12095,12 @@ produces the following report:
       Mercury   08 08 58.60  +19 20 57.1     9.3
       Venus     09 38 53.61  +15 35 32.8    22.8
       Moon      06 28 15.95  +23 17 21.3  1902.3
-      Mars      09 06 49.34  +17 52 26.6     4.0
+      Mars      09 06 49.33  +17 52 26.6     4.0
       Jupiter   00 11 12.08  -00 10 57.5    41.1
       Saturn    16 01 43.35  -18 36 55.9    18.2
       Uranus    00 13 33.54  +00 39 36.1     3.5
       Neptune   09 49 35.76  +13 38 40.8     2.2
-      Pluto     07 05 29.51  +21 25 04.2      .1
+      Pluto     07 05 29.51  +21 25 04.2     0.1
 \end{verbatim}
 Inspection of the Sun and Moon data reveals that
 a total solar eclipse is in progress.
@@ -11977,7 +12192,8 @@ xxxxxxx \= xxxx \= \kill
 \> $n$ \> mean motion \\
 \end{tabbing}
 
-The mean motion, $n$, tells sla\_PLANEL the mass of the planet.
+The mean motion, $n$, tells
+sla\_PLANEL the mass of the planet.
 If it is not available, it should be calculated
 from $n^2 a^3 = k^2 (1+m)$, where $k = 0.01720209895$ and
 m is the mass of the planet ($M_\odot = 1$); $a$ is in AU.
@@ -12608,6 +12824,9 @@ works on one sort of machine but not on another.
 \subp{CALL sla\_NUTC (DATE, DPSI, DEPS, EPS0)}
    Longitude and obliquity components of nutation, and
      mean obliquity
+\subp{CALL sla\_NUTC80 (DATE, DPSI, DEPS, EPS0)}
+   Longitude and obliquity components of nutation, and
+     mean obliquity, IAU 1980
 \subp{CALL sla\_PREC (EP0, EP1, RMATP)}
    Precession matrix (IAU)
 \subp{CALL sla\_PRECL (EP0, EP1, RMATP)}
@@ -12696,7 +12915,7 @@ works on one sort of machine but not on another.
      motion, parallax and radial velocity
 \subp{CALL sla\_AMP (RA, DA, DATE, EQ, RM, DM)}
    Geocentric apparent place to mean place
-\subp{CALL sla\_AMPQK (RA, DA, AOPRMS, RM, DM)}
+\subp{CALL sla\_AMPQK (RA, DA, AMPRMS, RM, DM)}
    Apparent to mean using precomputed parameters
 \subp{CALL sla\_AOP (\vtop
                       {\hbox{RAP, DAP, UTC, DUT, ELONGM, PHIM, HM, XP, YP,}
