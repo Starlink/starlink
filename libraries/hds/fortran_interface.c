@@ -517,7 +517,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
    if (ischar) {
      datGetC( &locator_c, *ndim, dims64, (char*)values, values_length, status );
    } else {
-     datGet( &locator_c, type_c, *ndim, dims, values, status);
+     datGet( &locator_c, type_c, *ndim, dims64, values, status);
    }
 #else
    if (ischar) {
@@ -1372,7 +1372,7 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    datMapN( &locator_c, type_c, mode_c, *ndim, &cpntr, dims64, status);
 
    /* Copy the array back to fortran from HDS_PTYPE */
-   for( i = 0; i<_min(*ndimx,*ndim); i++)
+   for( i = 0; i<*ndim; i++)
       dims[i] = dims64[i];
 
 #else
