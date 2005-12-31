@@ -91,7 +91,8 @@ $as_unset ac_cv_sys_largefile_source
 STAR_LARGEFILE_SUPPORT
 
 dnl Calculate sizes and types
-AC_CHECK_TYPE(long long int)
+AC_CHECK_TYPES([long long int,int,long,long long,off_t,int64_t])
+AC_CHECK_TYPES([uint64_t, int32_t, uint32_t])
 
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
