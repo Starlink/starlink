@@ -24,7 +24,9 @@
 #include <sys/time.h>
 #include <sys/types.h> 
 #include <sys/stat.h> 
-#include <sys/socket.h> 
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h> 
+#endif
 #include <netinet/in.h> 
 #include <sys/un.h>
 #include <sys/ioctl.h>
@@ -57,6 +59,10 @@
 
 #define MAXPATH 100
 
+/* Older systems do not declare socklen_t */
+#if !HAVE_SOCKLEN_T
+typedef unsigned int socklen_t;
+#endif
 
 /*   The msp message structure. This is passed between processes and
      also added to a queue at the receiving end. Some of the structure

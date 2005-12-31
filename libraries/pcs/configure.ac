@@ -37,6 +37,10 @@ dnl    Look for the term interface
 dnl    Curses header files are included in the MP_WITH_CURSES macro
 AC_CHECK_HEADERS([cursesX.h term.h ncurses/term.h])
 
+AC_CHECK_HEADERS([sys/socket.h])
+AC_CHECK_TYPES([socklen_t],[],[],[#if HAVE_SYS_SOCKET_H 
+#include <sys/socket.h> 
+#endif])
 
 dnl    We need to find out whether we are looking for libcurses
 dnl    or libncurses. On SUSe libcurses is provided by the termcap
