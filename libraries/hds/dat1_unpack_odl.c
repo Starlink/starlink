@@ -81,7 +81,13 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
 
 /* Loop to unpack the axis sizes, each of which occupies a further 4 or 8   */
 /* chars depending on HDS version                                           */
-#if !defined(HDS_64)
+
+/* Currently assumes signed dims */
+
+#if SIZEOF_HDSDIM == 4
+#if HDSDIM_IS_UNSIGNED
+   Do not know how to pack unsigned hdsdim
+#else
       for ( i = 0, j = 16; i < naxes; i++, j += 4 )
       {
          odl->axis[ i ] = 0;
@@ -90,6 +96,10 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
                                     podl[ j + 1 ] ) << 8 ) |
                                     podl[ j ];
       }
+#endif
+#elif SIZEOF_HDSDIM == 8
+#if HDSDIM_IS_UNSIGNED
+   Do not know how to pack unsigned hdsdim
 #else
       for ( i = 0, j = 16; i < naxes; i++, j += 8 )
       {
@@ -102,6 +112,9 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
                                         podl[ j + 1 ] ) << 8 ) |
                                         podl[ j ];
       }
+#endif
+#else
+       HDS_PTYPE is unknown size (SIZEOF_HDSDIM)
 #endif    
 
 /* Return the current global status value.                                  */

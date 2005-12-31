@@ -104,11 +104,11 @@
 
 /* Historically, internally we call the 32bit int an INT.
    Should make this more namespaced but for now just typedef */
-typedef hds_int32 INT;
+typedef hdsi32_t INT;
 
 /* Historically the 64bit int type was called INT_BIG */
-typedef hds_int64 INT_BIG;
-typedef hds_uint64 UINT_BIG;
+typedef hdsi64_t INT_BIG;
+typedef hdsu64_t UINT_BIG;
 #define INT_BIG_S HDS_INT_BIG_S
 #define INT_BIG_U HDS_INT_BIG_U
 

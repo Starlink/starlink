@@ -91,7 +91,12 @@
 /* Use the standard int64_t if available                                   */
 /* Use 'long' if it is 8 bytes, else use 'long long'                       */
 
-#if SIZEOF_LONG == 8
+#if HAVE_INT64_T && HAVE_UINT64_T
+#define INT_BIG "int64_t"
+#define UINT_BIG "uint64_t"
+#define INT_BIG_S "lld"
+#define INT_BIG_U "llu"
+#elif SIZEOF_LONG == 8
 #define INT_BIG "long int"
 #define UINT_BIG "unsigned long int"
 #define INT_BIG_S "ld"
@@ -229,19 +234,20 @@ int main (int argc, char ** argv ) {
 
   /* System defines */
   fprintf(POutputFile, "#include <stddef.h>\n\n" );
+  fprintf(POutputFile, "#include <stdint.h>\n\n" );
   fprintf(OutputFile, "#include <stddef.h>\n\n" );
 
   /* We first need to decide what we are using for a normal hdsint */
 
   fprintf(POutputFile, "/* Standard HDS integer type. Only used internally */\n");
-  fprintf(POutputFile, "typedef %s hds_int32;\n\n", STD_INT );
+  fprintf(POutputFile, "typedef %s hdsi32_t;\n\n", STD_INT );
 
   /* 64 bit integer type. Also internal for now */
   fprintf(POutputFile, "/* Standard HDS 64 bit integer (internal) */\n");
 
   fprintf(POutputFile,
-	  "typedef %s hds_int64;\n"
-	  "typedef %s hds_uint64;\n"
+	  "typedef %s hdsi64_t;\n"
+	  "typedef %s hdsu64_t;\n"
 	  "#define HDS_INT_BIG_S \"%s\"\n"
 	  "#define HDS_INT_BIG_U \"%s\"\n\n",
 	  INT_BIG, UINT_BIG, INT_BIG_S, INT_BIG_U);
@@ -266,9 +272,10 @@ int main (int argc, char ** argv ) {
   fprintf( POutputFile,
 	   "/* Private types and sizes relating to dimensions */\n"
 	   "typedef %s FORTRAN_INDEX_TYPE;\n"
-	   "#define SIZEOF_HDSDIM %ld\n\n",
+	   "#define SIZEOF_HDSDIM %ld\n"
+	   "#define HDSDIM_IS_UNSIGNED %d\n\n",
 	   FORTRAN_HDS_INDEX_TYPE,
-	   (long)sizeof(DIM_TYPE));
+	   (long)sizeof(DIM_TYPE), DIM_IS_UNSIGNED);
 
 
   /* Need to decide whether fortran dims need to be copied to

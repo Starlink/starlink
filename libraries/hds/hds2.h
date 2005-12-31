@@ -12,7 +12,7 @@
 /* datWhere - Find primitive position in HDS file */
 /*            Currently not part of the public    */
 /*            C API because INT_BIG               */
-/*            (aka hds_int64) is not a public     */
+/*            (aka hdsi64_t) is not a public   */
 /*            type                                */
 /*================================================*/
 
