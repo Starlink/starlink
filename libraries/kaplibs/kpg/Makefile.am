@@ -37,7 +37,7 @@ BUILT_SOURCES = $(include_MESSAGES)
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c kpg1_kygrp.c kpg1_kygp1.c kpg1_kymp1.c \
-kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c kpgPtfts.c
+kpg1_kymp2.c kpg1_kymap.c kaplibs.c kpgGtfts.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
