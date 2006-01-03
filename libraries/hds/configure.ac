@@ -92,11 +92,12 @@ STAR_LARGEFILE_SUPPORT
 
 dnl Calculate sizes and types
 AC_CHECK_TYPES([long long int,int,long,long long,off_t,int64_t])
-AC_CHECK_TYPES([uint64_t, int32_t, uint32_t])
+AC_CHECK_TYPES([uint64_t, int32_t, uint32_t, long double, signed char])
 
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF(long double)
 AC_CHECK_SIZEOF(off_t)
 
 dnl    Declare the build and use dependencies for this package

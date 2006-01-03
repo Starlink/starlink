@@ -53,9 +53,27 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Engineering Research Council  */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -68,6 +86,8 @@
 /*       overflow reported by some compilers when setting up special bit    */
 /*       patterns in signed integer data types. Also added dat1_decoy calls */
 /*       to prevent unwanted compiler optimisation.                         */
+/*    03-JAN-2005 (TIMJ):                                                   */
+/*       Turn on 'long double' code via autoconf tests                      */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -93,7 +113,7 @@
          LDBLTYPE
       };
       union TYP {                /* Union for holding any C arithmetic type */
-#if ( __STDC__ == 1 )
+#if HAVE_SIGNED_CHAR
          signed char scharval;
 #else
          char scharval;
@@ -107,6 +127,9 @@
          unsigned long int ulongval;
          float fltval;
          double dblval;
+#if HAVE_LONG_DOUBLE
+         long double ldblval;
+#endif
       };
 
 /* Local Variables:                                                         */
@@ -120,6 +143,10 @@
       unsigned char VAXF_dig;    /* No. digits for VAXF numbers             */
       unsigned char dbl_dig;     /* No. digits for double numbers           */
       unsigned char dbl_format;  /* Data format code for double values      */
+#if HAVE_LONG_DOUBLE
+      unsigned char ldbl_dig;    /* No. digits for long double numbers      */
+      unsigned char ldbl_format; /* Data format code for long double values */
+#endif
       unsigned char dig_DOUBLE;  /* No. digits for _DOUBLE numbers          */
       unsigned char dig_REAL;    /* No. digits for _REAL numbers            */
       unsigned char flt_dig;     /* No. digits for float numbers            */
@@ -278,7 +305,7 @@
          dbl_dig = DAT__UNKNOWN;
       }
 
-#if ( __STDC__ == 1 ) && defined( _longd )
+#if HAVE_LONG_DOUBLE
 /* Identify the long double format:                                         */
       if ( ( FLT_RADIX == 2 ) &&
            ( LDBL_MANT_DIG == 24 ) &&
@@ -485,6 +512,13 @@ require modification for use on this machine.",\
                   (max) = (dtype) hi.ulongval;\
                   break;\
                }\
+	    default:\
+	      {\
+               *status = DAT__FATAL;\
+               ems_rep_c( "DAT1_INIT_NDR_1b",\
+                          "Fell off end of switch statement unexpectedly when determining integer data type",\
+                          status );\
+	      }\
             }\
          }\
       }
@@ -493,7 +527,7 @@ require modification for use on this machine.",\
 /* appropriate limits. In this case, we also require values for the         */
 /* smallest increment value, the number of decimal digits of precision and  */
 /* the data format code.                                                    */
-#if ( __STDC__ == 1 ) && defined( _longd )
+#if HAVE_LONG_DOUBLE
 #define _limitsf( dtype, min, max, eps, dig, format )\
       {\
          enum TYPID id;          /* Code to identify data type              */\
@@ -583,6 +617,13 @@ may require modification for use on this machine.",\
                   (format) = ldbl_format;\
                   break;\
                }\
+	    default:\
+	      {\
+               *status = DAT__FATAL;\
+               ems_rep_c( "DAT1_INIT_NDR_2b",\
+                          "Fell off end of switch statement unexpectedly when determining float data type",\
+                          status );\
+	      }\
             }\
          }\
       }
@@ -642,6 +683,13 @@ may require modification for use on this machine.",\
                   (format) = dbl_format;\
                   break;\
                }\
+	    default:\
+	      {\
+               *status = DAT__FATAL;\
+               ems_rep_c( "DAT1_INIT_NDR_2b",\
+                          "Fell off end of switch statement unexpectedly when determining float data type",\
+                          status );\
+	      }\
             }\
          }\
       }
@@ -757,7 +805,7 @@ may require modification for use on this machine.",\
          _order( _WORD,    0,    1,   dat_gl_ndr[ DAT__W ].order )
          _order( _UWORD,   0,    1,   dat_gl_ndr[ DAT__UW ].order )
          _order( _INTEGER, 0,    1,   dat_gl_ndr[ DAT__I ].order )
-#if ( __STDC__ == 1 ) && defined( _longd )
+#if HAVE_LONG_DOUBLE
          _order( _REAL,    1.0L, ( 1.0L + eps_REAL ),
                                       dat_gl_ndr[ DAT__R ].order )
          _order( _DOUBLE,  1.0L, ( 1.0L + eps_DOUBLE ),
@@ -849,7 +897,7 @@ may require modification for use on this machine.",\
 /* Define a macro to format the minimum floating point values using a       */
 /* specified number of decimal digits of precision to determine how many    */
 /* characters are required.                                                 */
-#if ( __STDC__ == 1 ) && defined( _longd )
+#if HAVE_LONG_DOUBLE
 #define _txtsizef( min, digits, txtsize )\
       {\
          char buf[ BUFSIZE + 1 ];/* Buffer for formatted value              */\
