@@ -73,7 +73,7 @@ AC_CHECK_FUNCS([getwd getcwd])
 dnl    Look for standard headers rather than assuming availability
 dnl    by operating system
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stddefs.h)
+AC_CHECK_HEADERS(stddef.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS([sys/param.h])
 
