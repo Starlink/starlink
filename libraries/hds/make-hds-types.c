@@ -35,6 +35,11 @@
  *        Use HDSLoc*
  *     2005-Nov-22 (TIMJ):
  *        Add definition of size_t via stddef.h
+ *     2005-Dec-31 (TIMJ):
+ *        Some tidy up of types. Add int64_t checks
+ *     2006-Jan-03 (TIMJ):
+ *        Protect stdint.h inclusion.
+ *        Have CPP define for large hds dim
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -83,8 +88,10 @@
 
 #if ( ( INT_MIN <= -2147483647L ) && ( INT_MAX >= 2147483647L ) )
 # define  STD_INT "int"
+# define  STD_INT_FMT "d"
 #else
 # define  STD_INT "long int"
+# define  STD_INT_FMT "ld"
 #endif
 
 /* Definitions for 64-bits integers                                        */ 
@@ -121,9 +128,16 @@ error unable to find an 8 byte integer type
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
    the fortran type */
-#define DIM_TYPE "int"
-#define DIM_FORMAT "d"
+#define BIGDIM 0   /* set to 1 if testing 64 bit dims */
+#if BIGDIM
+#define DIM_TYPE INT_BIG
+#define DIM_FORMAT INT_BIG_S
 #define DIM_IS_UNSIGNED 0
+#else
+#define DIM_TYPE STD_INT
+#define DIM_FORMAT STD_INT_FMT
+#define DIM_IS_UNSIGNED 0
+#endif
 
 /* Good grief. All I want to do is put quotes around the CNF type
    for printing */
@@ -233,9 +247,14 @@ int main (int argc, char ** argv ) {
 	  PINCLUDE_FILE, PINCLUDE_FILE, progname, todaysdate(), progname);
 
   /* System defines */
+#if HAVE_STDDEF_H
   fprintf(POutputFile, "#include <stddef.h>\n\n" );
-  fprintf(POutputFile, "#include <stdint.h>\n\n" );
   fprintf(OutputFile, "#include <stddef.h>\n\n" );
+#endif
+#if HAVE_STDINT_H
+  fprintf(POutputFile, "#include <stdint.h>\n\n" );
+#endif
+
 
   /* We first need to decide what we are using for a normal hdsint */
 
