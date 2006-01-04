@@ -32,6 +32,8 @@
 *     {enter_new_authors_here}
 
 *  History:
+*     2006-01-04 (EC)
+*        Properly setting rebinflags
 *     2005-12-16 (EC)
 *        Working for simple test case with astRebinSeq 
 *     2005-09-27 (EC)
@@ -119,6 +121,7 @@ void smurf_makemap( int *status ) {
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outframeset;  /* Frameset for pixel->radec mapping */
   char *pname=NULL;          /* Name of currently opened data file */
+  int rebinflags;            /* Control the rebinning procedure */
   struct sc2head *sc2hdr=NULL; /* Pointer to sc2head for this time slice */
   int size;                  /* Number of files in input group */
   int ubnd_in[2];            /* Upper pixel bounds for input maps */
@@ -126,8 +129,7 @@ void smurf_makemap( int *status ) {
   void *variance=NULL;       /* Pointer to the variance map */
   double *weights=NULL;      /* Weights array for output map */
 
-  double *tempbuf;
-
+  /*double *tempbuf;*/
   double i1, i2;
   double o1, o2;
 
@@ -151,7 +153,7 @@ void smurf_makemap( int *status ) {
   ndfMap( ondf, "VARIANCE", "_DOUBLE", "WRITE", data_index, &n, status);
   weights = data_index[0];   /* kludge! */
 
-  weights = (double *) malloc( sizeof(double)*512*512 );
+  /*weights = (double *) malloc( sizeof(double)*512*512 );*/
 
   /* Loop over all data to identify the extent of the map */
 
@@ -298,15 +300,24 @@ void smurf_makemap( int *status ) {
 	ubnd_in[0] = lbnd_in[0] + (data->dims)[0] - 1;
 	ubnd_in[1] = lbnd_in[1] + (data->dims)[1] - 1;
 
+	/* Flags are required to start / end the rebinning operation */
+
+	rebinflags = 0;
+	if( (i == 1) && (j == 0) ) 
+	  rebinflags = rebinflags | AST__REBININIT;
+	if( (i == size) && (j == (data->dims)[2]-1) )
+	  rebinflags = rebinflags | AST__REBINEND;
+
 
 	astRebinSeqD(bolo2map,0,
 		     2,lbnd_in, ubnd_in,
 		     (data->pntr)[0] + j*nbolo*sizeof(double), 
 		     NULL, 
-		     AST__NEAREST, NULL, 0, 0, 0, -1,
+		     AST__NEAREST, NULL, rebinflags, 0, 0, -1,
 		     2,lbnd_out,ubnd_out,
 		     lbnd_in, ubnd_in,
 		     map, NULL, weights);
+
 
 	/*
 	printf("Chunk of bolodata: \n");
@@ -385,6 +396,6 @@ void smurf_makemap( int *status ) {
   /* Tidy up after ourselves: release resources used by the grp routines  */
   grpDelet( &igrp, status);
 
-  free(weights);
+  /*free(weights);*/
 }
 
