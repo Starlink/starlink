@@ -334,7 +334,7 @@
       CALL DAT_MAPV( LOC2, '_INTEGER', 'READ', PNTR, EL, STATUS )
 
 *  Sum the data elements.
-      CALL SUM( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
+      CALL SUMDATA( EL, %VAL( CNF_PVAL( PNTR ) ), ISUM, STATUS )
 
 *  Clean up
       CALL DAT_UNMAP( LOC2, STATUS )
@@ -453,8 +453,9 @@
 
 *  Otherwise, report an error.
       ELSE
+         PRINT *, 'Sum = ',ISUM, ' expected ',ANSWER, 
+     :      ' (status = ', STATUS, ')'
          IF ( STATUS .EQ. SAI__OK ) STATUS = SAI__ERROR
-         PRINT *, 'Sum = ',ISUM, ' expected ',ANSWER
          CALL EMS_REP( 'HDS_TEST_ERR',
      :   'HDS_TEST: HDS installation test failed.', STATUS )
          EXITSTATUS = 1
@@ -542,7 +543,7 @@
 
       END
 
-      SUBROUTINE SUM( EL, ARRAY, ISUM, STATUS )
+      SUBROUTINE SUMDATA( EL, ARRAY, ISUM, STATUS )
 *+
 *  Name:
 *     SUM
@@ -554,7 +555,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SUM( EL, ARRAY, ISUM, STATUS )
+*     CALL SUMDATA( EL, ARRAY, ISUM, STATUS )
 
 *  Description:
 *     Return the sum of the elements of a 1-dimensional array.
