@@ -40,6 +40,8 @@
  *     2006-Jan-03 (TIMJ):
  *        Protect stdint.h inclusion.
  *        Have CPP define for large hds dim
+ *     2006-Jan-04 (PWD):
+ *        Use inttypes.h in preference to stdint.h.
 
  *  Copyright:
  *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -251,8 +253,12 @@ int main (int argc, char ** argv ) {
   fprintf(POutputFile, "#include <stddef.h>\n\n" );
   fprintf(OutputFile, "#include <stddef.h>\n\n" );
 #endif
-#if HAVE_STDINT_H
+#if HAVE_INTTYPES_H
+  fprintf(POutputFile, "#include <inttypes.h>\n\n" );
+#else
+# if HAVE_STDINT_H
   fprintf(POutputFile, "#include <stdint.h>\n\n" );
+# endif
 #endif
 
 
