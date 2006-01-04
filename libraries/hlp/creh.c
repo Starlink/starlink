@@ -155,7 +155,8 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 **  Called:  hlpFopr, hlpHinit, hlpHopenw, hlpHdwrit, hlpLength,
 **           hlpHclose, hlpErrmes, hlpTrim
 **
-**  Last revision:   16 June 2000
+**  Last revision:   16 June 2000 (PTW)
+**                   7 January 2006 (TIMJ)
 **
 **  Copyright 2000 P.T.Wallace.  All rights reserved.
 */
@@ -220,10 +221,15 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
    long nhind, nindex, nhelp, iadr, il;
 
-
-
 /* Initialize the HELP system. */
    hlpHinit ( lib );
+
+/* Initialise some variables */
+   nhind = 0;
+   lastad = 0;
+   levtop = 0;
+   npbl = 0;
+   lastlv = 0;
  
 /* Open the input file for the first pass. */
    if ( hlpFopr ( nametr, source, &fps ) ) goto soperr;

@@ -97,7 +97,8 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 **           hlpComstr, hlpLinout, hlpHreadd, hlpRepsub, hlpHclose,
 **           hlpCopyn
 **
-**  Last revision:   2 January 2004
+**  Last revision:   2 January 2004 (PTW)
+**                   7 January 2006 (TIMJ)
 **
 **  Copyright 2004 P.T.Wallace.  All rights reserved.
 */
@@ -194,6 +195,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 ** Preliminaries
 ** -------------
 */
+
+/* Init variables to prevent compiler warnings */
+   subtop = 0;
 
 /* Extract flags. */
    iactiv = jflags & 1;

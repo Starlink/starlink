@@ -46,6 +46,7 @@ int hlpComstr ( char *fulstr, char *str )
 **  Called:  hlpLength
 **
 **  Last revision:   7 January 1996
+**                   3 January 2006 (TIMJ)
 **
 **  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
@@ -88,7 +89,10 @@ int hlpComstr ( char *fulstr, char *str )
 
 /* str indices defining the beginning and end of the movable substring, */
 /* and their saved values; movbeg=-1 means "no movable substring".      */
-   int movbeg, movend, mb, me;
+   int movbeg = 0;
+   int movend = 0;
+   int mb = 0;
+   int me = 0;
  
 /* Movable substring not yet matched - keep searching fulstr */
    int notfnd;
