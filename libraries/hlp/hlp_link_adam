@@ -1,1 +1,1 @@
-echo -lhlp
+echo -lhlp `cnf_link_adam`

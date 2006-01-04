@@ -4,35 +4,25 @@
 #   H L I B
 #  - - - - -
 #
-#  Translate one or more help libraries from source form to the
+#  Translate one or more HELP libraries from source form to the
 #  direct-access file used by the software.
 #
 #  Command:
 #
-#      hlib  helpfile
+#      hlib  helpfile1 helpfile2...
 #
-#  The help source file called "helpfile" is translated into
+#  A HELP source file called "helpfile" is translated into
 #  the file "helpfile.shl".
 #
-#  !!! WARNING - any files fort.1 and fort.2 are deleted !!!
+#  It is suggested that HELP source file names end with ".hlp".
 #
-#  It is suggested that help source file names end with ".hlp".
-#
-#  Thus the command "hlib *.hlp" will translate all help libraries
+#  Thus the command "hlib *.hlp" will translate all HELP libraries
 #  in the current directory into the form required for use.
 #
-#  P.T.Wallace   Starlink   30 September 1996
+#  Latest revision:   13 January 1996
 #
-foreach file (fort.1 fort.2)
-   if ( -e $file ) then
-      echo "hlib: file $file already exists - cannot proceed"
-      exit 1
-   endif
-end
+#  Copyright P.T.Wallace 1996.  All rights reserved.
+#
 foreach file ($*)
-   cp $file fort.1
-   chmod u+w fort.1
-   crehlp
-   \rm -f fort.1
-   mv fort.2 $file:r.shl
+   crehlp $file $file:r.shl
 end

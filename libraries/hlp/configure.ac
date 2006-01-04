@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(hlp, 3.3-2, ussc@star.rl.ac.uk)
+AC_INIT(hlp, 4.0-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -17,17 +17,20 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
+dnl    Look for a fortran compiler for the test program
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-AC_FC_OPEN_SPECIFIERS(readonly)
 
 AC_CONFIG_HEADERS([config.h])
 
-dnl    This package has no dependencies
+dnl    This package needs CNF for the fortran interface
+STAR_DECLARE_DEPENDENCIES([build], [cnf])
+STAR_DECLARE_DEPENDENCIES([link],  [cnf])
+STAR_DECLARE_DEPENDENCIES([test],  [cnf])
+
 
 STAR_LATEX_DOCUMENTATION(sun124)
 

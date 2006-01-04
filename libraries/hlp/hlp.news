@@ -1,5 +1,11 @@
 1 HLP - Portable help system 
 
+HLP version 4.0-1
+
+*  This is now the C version of HLP donated by Pat Wallace.
+   The code is now GPLed.
+   None of the code from version 3 remains.
+
 HLP version 3.3-6
 
 *  Modified Linux integration to use g77, produce shared library.

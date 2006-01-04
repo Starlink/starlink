@@ -3,66 +3,74 @@
 bin_PROGRAMS = lsthlp crehlp
 dist_bin_SCRIPTS = hlib hlp_link hlp_link_adam
 
+cincludedir = $(includedir)/star
+cinclude_HEADERS = $(PUBLIC_CINCLUDES)
+
 EXTRA_DIST = demo.hlp read.me
 
 TESTS = tsthlp
-check_PROGRAMS = tsthlp
+check_PROGRAMS = tsthlp 
 
-lsthlp_SOURCES = lsthlp.f
-tsthlp_SOURCES = tsthlp.f
-crehlp_SOURCES = crehlp.f
+lsthlp_SOURCES = lsthlp.c
+crehlp_SOURCES = crehlp.c
+
+# Should Test both C and fortran interface
+tsthlp_SOURCES = tsthlp.c
 
 # All programs we build will link against the HLP library
-LDADD = libhlp.la
+LDADD = libhlp.la `cnf_link`
 
 lib_LTLIBRARIES = libhlp.la
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 libhlp_la_SOURCES = \
-	$(F_ROUTINES) \
-	$(FPP_ROUTINES) \
-	$(PRIVATE_INCLUDES)
+	$(C_ROUTINES) \
+	$(PRIVATE_INCLUDES) \
+	$(PUBLIC_CINCLUDES) \
+	$(C_F_ROUTINES)
 
-FPP_ROUTINES = \
-	fopr.F
+C_ROUTINES = \
+	comstr.c \
+	copyn.c \
+	creh.c \
+	dec.c \
+	errmes.c \
+	fopr.c \
+	hchkl.c \
+	hclose.c \
+	hdread.c \
+	hdwrit.c \
+	help.c \
+	hinit.c \
+	hleap.c \
+	hopenr.c \
+	hopenw.c \
+	hreadd.c \
+	hreadx.c \
+	hseekx.c \
+	htellx.c \
+	index.c \
+	insub.c \
+	length.c \
+	linout.c \
+	nametr.c \
+	outsub.c \
+	split.c \
+	trim.c \
+	upcase.c
 
-F_ROUTINES = \
-	comstr.f \
-	creh.f \
-	dec.f \
-	errmes.f \
-	hchkl.f \
-	hclose.f \
-	hdread.f \
-	hdwrit.f \
-	help.f \
-	hinit.f \
-	hleap.f \
-	hopenr.f \
-	hopenw.f \
-	hreadd.f \
-	hreadx.f \
-	hseekx.f \
-	htellx.f \
-	insub.f \
-	length.f \
-	linout.f \
-	nametr.f \
-	outsub.f \
-	repsub.f \
-	split.f \
-	upcase.f
+C_F_ROUTINES = fortran_interface.c
 
-# No public includes
-PRIVATE_INCLUDES = helpic comic
+# public includes
+PUBLIC_CINCLUDES = help.h
+
+# private includes
+PRIVATE_INCLUDES = hlpsys.h help1.h
 
 #  Rule for building the demonstration library.
 demo.shl: demo.hlp crehlp
-	$(LN_S) demo.hlp fort.1
-	./crehlp
-	rm fort.1
-	mv fort.2 demo.shl
+	$(srcdir)/crehlp demo.hlp demo.shl
 
 tsthlp_DEPENDENCIES = demo.shl
 

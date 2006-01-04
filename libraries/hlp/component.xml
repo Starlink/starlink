@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hlp" support="S">
-  <version>3.3-2</version>
+  <version>4.0-1</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>
   <abstract><p>The Starlink HLP system allows an application program
@@ -12,7 +12,7 @@
       library plus utility programs for creating, listing and reading
       help libraries.</p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <build>cnf</build><link>cnf</link><test>cnf</test><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
