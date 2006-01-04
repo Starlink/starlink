@@ -85,6 +85,7 @@
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     DSB: David Berry (UCLan, Starlink)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -107,6 +108,9 @@
 *        since it is required by NDF.
 *     28-DEC-2005 (TIMJ):
 *        Deal with .sdf in path name.
+*     04-JAN-2006 (PWD):
+*        Make local copy of DAT__FLEXT so a subtring can be formed (non-standard
+*        to take a substring of a character constant).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,8 +148,9 @@
       CHARACTER * ( 1 ) DUM2     ! Dummy argument
       CHARACTER * ( 1 ) DUM3     ! Dummy argument
       CHARACTER * ( 1 ) DUM4     ! Dummy argument
+      CHARACTER * ( DAT__SZFLX ) FLEXT ! Local copy of DAT__FLEXT
       CHARACTER * ( 30 ) SYSNAM  ! Name of operating system
-      CHARACTER * (DAT__SZLOC) TESTLOC ! Test locator for .sdf disambiguation
+      CHARACTER * ( DAT__SZLOC ) TESTLOC ! Test locator for .sdf disambiguation
       INTEGER F                  ! Position of first non-blank character
       INTEGER I1                 ! First INDEX result
       INTEGER I2                 ! Second INDEX result
@@ -386,14 +391,16 @@
                   LSTAT = SAI__OK
                   CALL HDS_OPEN( NAME(F1:F2), 'READ', TESTLOC, LSTAT )
                   IF ( LSTAT .EQ. SAI__OK ) THEN
-*     File opened okay, so now disambiguate
-                     CALL DAT_THERE( TESTLOC, DAT__FLEXT(2:DAT__SZFLX),
-     :                    THERE, LSTAT )
-                     IF (THERE) THEN
+*     File opened okay, so now disambiguate (taking substring requires local 
+*     buffer).
+                     FLEXT = DAT__FLEXT
+                     CALL DAT_THERE( TESTLOC, FLEXT( 2 : DAT__SZFLX ),
+     :                               THERE, LSTAT )
+                     IF ( THERE ) THEN
                         DELTA = 0 ! it was a component!!
                      END IF
                      CALL DAT_ANNUL( TESTLOC, LSTAT )
-                     IF (LSTAT .NE. SAI__OK) CALL EMS_ANNUL( LSTAT )
+                     IF ( LSTAT .NE. SAI__OK ) CALL EMS_ANNUL( LSTAT )
                   ELSE
 *     Could not open file (assume that .sdf is part of the filename rather than
 *     a component

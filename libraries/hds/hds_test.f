@@ -73,6 +73,7 @@
       CHARACTER * ( DAT__SZLOC ) LOC5 ! Locator for cell array
       CHARACTER * ( DAT__SZLOC ) LOC6 ! Locator for cell array
       CHARACTER * ( DAT__SZLOC ) LOC7 ! Locator for cell array
+      CHARACTER * ( 32 ) LPATH   ! Local copy of PATH
       CHARACTER * ( 128 ) REF     ! Reference to HDS object
       INTEGER DIM( 2 )           ! Data array dimensions
       INTEGER EL                 ! Number of mapped elements
@@ -340,7 +341,8 @@
       CALL DAT_ANNUL( LOC2, STATUS )
 
 *  Try HDS_FIND with a full filename, including the .sdf
-      CALL HDS_FIND( DAT__ROOT, PATH(:CHR_LEN(PATH))//
+      LPATH = PATH
+      CALL HDS_FIND( DAT__ROOT, LPATH(:CHR_LEN(PATH))//
      :               '.TSTRUCT.ARRAY(2,2)', 
      :               'READ', LOC3, STATUS )
       CALL DAT_GET0D( LOC3, DTEMP, STATUS )
@@ -355,7 +357,7 @@
       END IF
 
 *  Now try HDS_FIND without the extension
-      CALL HDS_FIND( DAT__ROOT, PATH(:CHR_LEN(PATH)-DAT__SZFLX)//
+      CALL HDS_FIND( DAT__ROOT, LPATH(:CHR_LEN(PATH)-DAT__SZFLX)//
      :               '.TSTRUCT.ARRAY(2,2)', 
      :               'READ', LOC3, STATUS )
       CALL DAT_GET0D( LOC3, DTEMP, STATUS )
