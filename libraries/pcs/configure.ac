@@ -38,7 +38,8 @@ dnl    Curses header files are included in the MP_WITH_CURSES macro
 AC_CHECK_HEADERS([cursesX.h term.h ncurses/term.h])
 
 AC_CHECK_HEADERS([sys/socket.h])
-AC_CHECK_TYPES([socklen_t],[],[],[#if HAVE_SYS_SOCKET_H 
+AC_CHECK_TYPES([socklen_t],[],[],[#include <sys/types.h>
+#if HAVE_SYS_SOCKET_H 
 #include <sys/socket.h> 
 #endif])
 
