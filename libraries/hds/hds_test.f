@@ -531,11 +531,13 @@
 
 *.
 
+*  Initialise the answer regardless of status
+      SUM = 0.0
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Initialise the array.
-      SUM = 0.0
       DO 1 I = 1, EL
          ARRAY( I ) = REAL( I )
          SUM = SUM + REAL( I )
