@@ -1,11 +1,21 @@
 #!/bin/sh
-# -*-tcl-*-
-# This script creates a button for each test case...
-#
-# the next line restarts using a special startup script to setup the env \
-exec ../demos/tclutil.sh "$0" "$@"
-
-
+#\
+test -f ../demos/tclutil_env.sh && . ../demos/tclutil_env.sh
+#\
+P=$PWD; DIRN=`dirname $0`; cd $DIRN; XP=`pwd`; cd $P
+#\
+if [ -z "$TCLUTIL_LIBRARY" ] ; then
+#\
+   WISH=tclutil_wish; L=`dirname $XP`; TCLUTIL_LIBRARY="$L/lib/tclutil" ; export TCLUTIL_LIBRARY
+#\
+   else WISH=$TCLUTIL_LIBRARY/../bin/tclutil_wish
+#\
+fi
+#\
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib/itcl:/usr/X11R6/lib64"
+#\
+exec $WISH "$0" ${1+"$@"}
+# --------------------------------------------------
 set n 0
 foreach testfile [lsort [glob t*.tcl]] {
     if {"$testfile" != "test.tcl"} {
@@ -14,7 +24,7 @@ foreach testfile [lsort [glob t*.tcl]] {
 	pack \
 	    [button .b$n \
 		 -text $name \
-		 -command "exec ../demos/tclutil.sh $testfile -geometry +300+300 &"] \
+		 -command "exec ../bin/tclutil_wish $testfile -geometry +300+300 &"] \
 	    -side top -fill x
     }
 }

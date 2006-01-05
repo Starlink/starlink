@@ -94,6 +94,7 @@ proc util::setXdefaults {} {
     option add *ProgressBar.font -Adobe-helvetica-medium-r-normal--14* 
     option add *ProgressBar.width 8 
     option add *ProgressBar.length 6c 
+    option add *ProgressBar.readonlyBackground {}
 
     option add *TableList.relief sunken 
     option add *TableList.borderwidth 3 

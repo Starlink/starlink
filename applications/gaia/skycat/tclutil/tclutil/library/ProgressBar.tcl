@@ -8,6 +8,8 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  23 Jan 96  Created
+# Peter W. Draper 05 Jan 06  Tk now uses "readonly" state (disabled greys out
+#                            text, making it illegible).
 #
 
 itk::usual ProgressBar {}
@@ -26,9 +28,9 @@ itcl::class util::ProgressBar {
 
 	# entry widget used to display the progress message
 	itk_component add entry {
-	    entry $w_.entry -relief flat -state disabled -highlightthickness 0
+	    entry $w_.entry -relief flat -state readonly -highlightthickness 0
 	} {
-	    keep -font
+	    keep -font -background -readonlybackground
 	}
 	pack $itk_component(entry) -side left -fill x -expand 1 -padx 1m
 	    
@@ -120,7 +122,7 @@ itcl::class util::ProgressBar {
 	$itk_component(entry) config -state normal
 	$itk_component(entry) delete 0 end
 	$itk_component(entry) insert 0 $itk_option(-text)
-	$itk_component(entry) config -state disabled
+	$itk_component(entry) config -state readonly
     }
     
     # set the value of the bar between from and to
