@@ -37,9 +37,30 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
 /*    int dat1_unpack_odl                                                   */
 /*       The global status value current on exit.                           */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1991 Science and Engineering Research Council           */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -50,6 +71,8 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
 /*       int.                                                               */
 /*    06-MAY-2004: (BKM)                                                    */
 /*       Modify to cope with either 32 or 64-bit axes dimension addressing  */
+/*    31-DEC-2005 (TIMJ):                                                   */
+/*       Use hds1_types to determine whether we are using 64-bit or not.    */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -82,12 +105,7 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
 /* Loop to unpack the axis sizes, each of which occupies a further 4 or 8   */
 /* chars depending on HDS version                                           */
 
-/* Currently assumes signed dims */
-
 #if SIZEOF_HDSDIM == 4
-#if HDSDIM_IS_UNSIGNED
-   Do not know how to pack unsigned hdsdim
-#else
       for ( i = 0, j = 16; i < naxes; i++, j += 4 )
       {
          odl->axis[ i ] = 0;
@@ -96,11 +114,7 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
                                     podl[ j + 1 ] ) << 8 ) |
                                     podl[ j ];
       }
-#endif
 #elif SIZEOF_HDSDIM == 8
-#if HDSDIM_IS_UNSIGNED
-   Do not know how to pack unsigned hdsdim
-#else
       for ( i = 0, j = 16; i < naxes; i++, j += 8 )
       {
          odl->axis[ i ] = ((((((((((((( podl[ j + 7 ] << 8 ) |
@@ -112,7 +126,6 @@ dat1_unpack_odl( const unsigned char *podl, struct ODL *odl )
                                         podl[ j + 1 ] ) << 8 ) |
                                         podl[ j ];
       }
-#endif
 #else
        HDS_PTYPE is unknown size (SIZEOF_HDSDIM)
 #endif    
