@@ -74,7 +74,7 @@
 #include "hds.h"
 #include <stdlib.h>
 
-int main () {
+int main ( void ) {
       
   /*  Local Variables: */
   int status = DAT__OK;
