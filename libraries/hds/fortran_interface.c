@@ -46,7 +46,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -192,7 +192,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
    HDSLoc locator1_c;
    HDSLoc *locator2_c = NULL;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG subs64[DAT__MXDIM];
+   HDS_PTYPE subs64[DAT__MXDIM];
    int i;
 #endif
 
@@ -493,7 +493,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    int ischar = 0;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -545,7 +545,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -581,7 +581,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -617,7 +617,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -653,7 +653,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -689,7 +689,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1036,7 +1036,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1083,7 +1083,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1129,7 +1129,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    double *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1175,7 +1175,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1221,7 +1221,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    int *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1267,7 +1267,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    float *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1354,7 +1354,7 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1397,7 +1397,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1550,7 +1550,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
    char name_c[DAT__SZNAM+1];
    char type_c[DAT__SZTYP+1];
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -1593,7 +1593,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
    HDSLoc locator_c;
    char name_c[DAT__SZNAM+1];
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2126,7 +2126,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2163,7 +2163,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2199,7 +2199,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2235,7 +2235,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2271,7 +2271,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2313,7 +2313,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    int ischar = 0;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2707,7 +2707,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc locator_c;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2771,8 +2771,8 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
    HDSLoc locator1_c;
    HDSLoc *locator2_c = NULL;
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG diml64[DAT__MXDIM];
-   INT_BIG dimu64[DAT__MXDIM];
+   HDS_PTYPE diml64[DAT__MXDIM];
+   HDS_PTYPE dimu64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2873,7 +2873,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
    HDSLoc *locator_c = NULL;
    char type_c[DAT__SZTYP+1];
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
@@ -2974,6 +2974,9 @@ F77_SUBROUTINE(dat_unmap)( CHARACTER(locator),
 
 /* Import the input locator string                  */
    dat1_import_floc( locator, locator_length, &locator_c, status );
+
+   printf("Got locator_f: %p\n", locator );
+   printf("Got locator_c: %p\n", &locator_c );
 
 /* Call pure C routine                                       */
    datUnmap( &locator_c, status );
@@ -3317,7 +3320,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    char name_c[DAT__SZNAM + 1];
    char type_c[DAT__SZTYP + 1];
 #if HDS_COPY_FORTRAN_DIMS
-   INT_BIG dims64[DAT__MXDIM];
+   HDS_PTYPE dims64[DAT__MXDIM];
    int i;
 #endif
    
