@@ -230,7 +230,10 @@ int main () {
 
   if (status == DAT__OK) {
     if (sumi != (int)sumd) {
-      printf("********** Got sum = %d rather than %d\n", sumi, (int)sumd);
+      status = DAT__FATAL;
+      emsSeti( "I", sumi );
+      emsSeti( "D", (int)sumd );
+      emsRep("SUM","Sum was not correct. Got ^I rather than ^D", &status );
     }
   }
 
