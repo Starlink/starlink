@@ -223,7 +223,16 @@ int main () {
   }
   datAnnul( &loc3, &status );
 
-  datMapV( loc2, "_INTEGER", "WRITE", (void**)&mapi, &nel, &status );
+  datMapV( loc2, "_INTEGER", "READ", (void**)&mapi, &nel, &status );
+  if (status == DAT__OK) {
+    nelt = dim[0] * dim[1];
+    if ( nelt != nel) {
+      status = DAT__FATAL;
+      emsSeti( "NEL", (int)nel );
+      emsSeti( "NORI", (int)nelt );
+      emsRep( "SIZE","Number of elements originally (^NORI) not the same as now (^NEL)", &status);
+    }
+  }
   sumi = 0;
   for (i = 0; i < nel; i++) {
     sumi += mapi[i];
@@ -239,7 +248,7 @@ int main () {
   }
 
   /* Tidy up and close */
-  hdsClose( &loc1, &status );
+  hdsErase( &loc1, &status );
 
   if (status == DAT__OK) {
     printf("HDS C installation test succeeded\n");
