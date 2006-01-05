@@ -14,7 +14,7 @@
 *     to be an exhaustive test of all the API (at least not initially).
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Authors:
@@ -75,11 +75,17 @@ int main () {
   double retdarr[2];
   double *mapd;  /* Mapped _DOUBLE */
   float  *mapf;  /* Mapped _REAL */
+  int *mapi;     /* Mapped _INTEGER */
   HDSLoc * loc1 = NULL;
   HDSLoc * loc2 = NULL;
   HDSLoc * loc3 = NULL;
   size_t actval;
+  size_t nel;
+  size_t nelt;
+  size_t nbytes;
   int i;
+  double sumd;
+  int sumi;
 
   emsBegin(&status);
 
@@ -90,6 +96,7 @@ int main () {
   hdsNew( path, "HDS_TEST", "NDF", 0, dim, &loc1, &status );
 
   /* Some components */
+  datNew( loc1, "DATA_ARRAY", "_INTEGER", 2, dim, &status );
   datNew1C( loc1, "ONEDCHAR", 14, 3, &status );
   datNew1D( loc1, "ONEDD", 2, &status );
   
@@ -168,8 +175,67 @@ int main () {
   /* Annul */
   datAnnul( &loc2, &status );
 
+  /* Find and map DATA_ARRAY */
+  datFind( loc1, "DATA_ARRAY", &loc2, &status );
+  datMapV( loc2, "_REAL", "WRITE", (void**)&mapf, &nel, &status );
+  if (status == DAT__OK) {
+    nelt = dim[0] * dim[1];
+    if ( nelt != nel) {
+      status = DAT__FATAL;
+      emsSeti( "NEL", (int)nel );
+      emsSeti( "NORI", (int)nelt );
+      emsRep( "SIZE","Number of elements originally (^NORI) not the same as now (^NEL)", &status);
+    }
+  }
+  sumd = 0.0;
+  for (i = 0; i < nel; i++) {
+    mapf[i] = (float)i;
+    sumd += (double)i;
+  }
+  datUnmap( loc2, &status );
+  datAnnul( &loc2, &status );
+  hdsClose( &loc1, &status );
+
+  /* Re-open */
+  hdsOpen( path, "UPDATE", &loc1, &status );
+
+  /* Look for the data array and map it */
+  datFind( loc1, "DATA_ARRAY", &loc2, &status );
+  datVec( loc2, &loc3, &status );
+  datSize( loc3, &nelt, &status);
+  if (status == DAT__OK) {
+    if ( nelt != nel) {
+      status = DAT__FATAL;
+      emsSeti( "NEL", (int)nel );
+      emsSeti( "NELT", (int)nelt );
+      emsRep( "SIZE","Number of elements before (^NEL) not the same as now (^NELT)", &status);
+    }
+  }
+
+  datPrec( loc3, &nbytes, &status );
+  if (status == DAT__OK) {
+    if ( nbytes != 4) {
+      status = DAT__FATAL;
+      emsSeti( "NB", nbytes );
+      emsRep( "PREC","Precision for _REAL not 4 bytes but ^NB", &status);
+    }
+  }
+  datAnnul( &loc3, &status );
+
+  datMapV( loc2, "_INTEGER", "WRITE", (void**)&mapi, &nel, &status );
+  sumi = 0;
+  for (i = 0; i < nel; i++) {
+    sumi += mapi[i];
+  }
+
+  if (status == DAT__OK) {
+    if (sumi != (int)sumd) {
+      printf("********** Got sum = %d rather than %d\n", sumi, (int)sumd);
+    }
+  }
+
   /* Tidy up and close */
-  hdsErase( &loc1, &status );
+  hdsClose( &loc1, &status );
 
   if (status == DAT__OK) {
     printf("HDS C installation test succeeded\n");
