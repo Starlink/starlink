@@ -38,7 +38,7 @@
 *        Over-write existing attribute values in the Plot?
 *     IPLOT = INTEGER (Given)
 *        An AST pointer to the Plot to be modified. 
-*     BADAT = LOGICAL (Given)
+*     BADAT = LOGICAL (Returned)
 *        Was the setting string invalid? If so, an appropriate error
 *        message will have been reported (unless REPORT is .FALSE.).
 *     STATUS = INTEGER (Given and Returned)
