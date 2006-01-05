@@ -129,14 +129,17 @@ error unable to find an 8 byte integer type
 
 /* Can not derive the dim size so we just set it */
 /* We also state whether this is unsigned so that we can compare with
-   the fortran type */
+   the fortran type and also define the size. The last bit is a bit of
+   a kluge to prevent sizeof("uint64_t") coming up with  9 */
 #define BIGDIM 0   /* set to 1 if testing 64 bit dims */
 #if BIGDIM
-#define DIM_TYPE INT_BIG
-#define DIM_FORMAT INT_BIG_S
-#define DIM_IS_UNSIGNED 0
+#define DIM_TYPE UINT_BIG
+#define SIZEOF_DIM 8
+#define DIM_FORMAT INT_BIG_U
+#define DIM_IS_UNSIGNED 1
 #else
 #define DIM_TYPE STD_INT
+#define SIZEOF_DIM 4
 #define DIM_FORMAT STD_INT_FMT
 #define DIM_IS_UNSIGNED 0
 #endif
@@ -300,7 +303,7 @@ int main (int argc, char ** argv ) {
 	   "#define SIZEOF_HDSDIM %ld\n"
 	   "#define HDSDIM_IS_UNSIGNED %d\n\n",
 	   FORTRAN_HDS_INDEX_TYPE,
-	   (long)sizeof(DIM_TYPE), DIM_IS_UNSIGNED);
+	   (long)SIZEOF_DIM, DIM_IS_UNSIGNED);
 
 
   /* Need to decide whether fortran dims need to be copied to
