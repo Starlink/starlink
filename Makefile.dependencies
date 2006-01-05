@@ -900,6 +900,7 @@ $(MANIFESTS)/hdstrace: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/hlp: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/star2html
 	cd libraries/hlp \
 	  && $(MAKE_CPT)
@@ -977,6 +978,7 @@ $(MANIFESTS)/info:
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/init: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/hlp
 	cd etc/init \
 	  && $(MAKE_CPT)
