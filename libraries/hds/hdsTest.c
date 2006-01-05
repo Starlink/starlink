@@ -188,8 +188,8 @@ int main () {
     }
   }
   sumd = 0.0;
-  for (i = 0; i < nel; i++) {
-    mapf[i] = (float)i;
+  for (i = 1; i <= nel; i++) {
+    mapf[i-1] = (float)i;
     sumd += (double)i;
   }
   datUnmap( loc2, &status );
@@ -202,13 +202,14 @@ int main () {
   /* Look for the data array and map it */
   datFind( loc1, "DATA_ARRAY", &loc2, &status );
   datVec( loc2, &loc3, &status );
-  datSize( loc3, &nelt, &status);
+  datSize( loc3, &nel, &status);
   if (status == DAT__OK) {
+    nelt = dim[0] * dim[1];
     if ( nelt != nel) {
       status = DAT__FATAL;
       emsSeti( "NEL", (int)nel );
-      emsSeti( "NELT", (int)nelt );
-      emsRep( "SIZE","Number of elements before (^NEL) not the same as now (^NELT)", &status);
+      emsSeti( "NORI", (int)nelt );
+      emsRep( "SIZE","Number of elements before (^NORI) not the same as now (^NEL)", &status);
     }
   }
 
