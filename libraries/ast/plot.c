@@ -8893,11 +8893,11 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    if ( !astOK || !text || !text[ 0 ] ||  x == AST__BAD || y == AST__BAD ||
         ( upx == 0.0 && upy == 0.0 ) ) return;
 
-/* Initialise variables to avoid cimpiler warnings. */
-   rx = AST__BAD;
-   ry = AST__BAD;
-   x0 = AST__BAD;
-   y0 = AST__BAD;
+/* Initialise variables to avoid compiler warnings. */
+   rx = 0.0f;
+   ry = 0.0f;
+   x0 = 0.0f;
+   y0 = 0.0f;
 
 /* Get an up vector which refers to the graphics coordinates in their correct 
    senses (the supplied values are reversed if the corresponding axis is 
