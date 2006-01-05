@@ -67,11 +67,14 @@ int main () {
   const char path[] = "hds_ctest";
   int status = DAT__OK;
   hdsdim dim[] = { 10, 20 };
+  hdsdim dimd[1];
   char *chararr[] = { "TEST1", "TEST2", "Longish String" };
   char *retchararr[4];
   char buffer[1024];  /* plenty large enough */
   double darr[] = { 4.5, 2.5 };
   double retdarr[2];
+  double *mapd;  /* Mapped _DOUBLE */
+  float  *mapf;  /* Mapped _REAL */
   HDSLoc * loc1 = NULL;
   HDSLoc * loc2 = NULL;
   HDSLoc * loc3 = NULL;
@@ -134,6 +137,35 @@ int main () {
       emsRep( "GETVD","Did not get back as many values as put in", &status);
     }
   }
+
+  /* Try mapping - _DOUBLE */
+  dimd[0] = 2;
+  datMapD(loc2, "READ", 1, dimd, &mapd, &status);
+  if (status == DAT__OK) {
+      for (i = 0; i < 2; i++ ) {
+         if (darr[i] != mapd[i]) {
+           status = DAT__DIMIN;
+           emsRep( "MAPD","Values from MapD differ", &status);
+           break;
+         }
+      }
+  }
+  datUnmap(loc2, &status);
+
+  /* Try mapping - _FLOAT */
+  datMapR(loc2, "READ", 1, dimd, &mapf, &status);
+  if (status == DAT__OK) {
+      for (i = 0; i < 2; i++ ) {
+         if ( (float)darr[i] != mapf[i]) {
+           status = DAT__DIMIN;
+           emsRep( "MAPR","Values from MapR differ", &status);
+           break;
+         }
+      }
+  }
+  datUnmap(loc2, &status);
+ 
+  /* Annul */
   datAnnul( &loc2, &status );
 
   /* Tidy up and close */
