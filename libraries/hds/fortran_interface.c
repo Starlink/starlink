@@ -2975,9 +2975,6 @@ F77_SUBROUTINE(dat_unmap)( CHARACTER(locator),
 /* Import the input locator string                  */
    dat1_import_floc( locator, locator_length, &locator_c, status );
 
-   printf("Got locator_f: %p\n", locator );
-   printf("Got locator_c: %p\n", &locator_c );
-
 /* Call pure C routine                                       */
    datUnmap( &locator_c, status );
 }
