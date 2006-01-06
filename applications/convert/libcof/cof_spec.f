@@ -72,7 +72,10 @@
 *     2003 Sep 29 (MJC):
 *        Added support for AAO/UKST 6dF data.
 *     2004 Sep 10 (TIMJ):
-*        Initialise some variables for FITSIO
+*        Initialise some variables for FITSIO.
+*     2006 January  4 (MJC):
+*        Augment AAO instrument names (AAOMEGA and FMOS) that use the
+*        2df data structures.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -253,7 +256,9 @@
      :          TELESC .EQ. 'UKST' ) THEN
          CALL CHR_UCASE( INSTRU )
          IF ( INSPRE .AND. ( INSTRU .EQ. 'CCD_1' .OR.
-     :        INSTRU .EQ. '2DF' .OR. INSTRU .EQ. '6DF' ) ) THEN
+     :        INSTRU .EQ. '2DF' .OR. INSTRU .EQ. '6DF' .OR.
+     :        INSTRU .EQ. 'AAOMEGA-2DF' .OR. INSTRU .EQ. 'FMOS' .OR.
+     :        INSTRU .EQ. 'AAOMEGA-IFU' ) ) THEN
             NAME = 'AAO2DF'
          END IF
 
