@@ -2292,7 +2292,7 @@
 *  Because the number of elements in the array and the co-ordinates will
 *  generally not be the same---routine KPS1_GRLM2 was written for LINPLOT
 *  where they are the same length---we first have to duplicate the mask.
-*  First obtain some workspace, the duplicate the values.
+*  First obtain some workspace, then duplicate the values.
          NDUP = EL / AEL
          CALL PSX_CALLOC( EL, '_DOUBLE', IPXCEF, STATUS )
 
