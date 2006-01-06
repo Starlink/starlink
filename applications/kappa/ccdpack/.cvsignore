@@ -26,4 +26,10 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
+ccg1_ad?.f
+ccg1_mn??.f
+ccg1_mx??.f
+ccg1_rms?.f
+ccg1_sd?.f
+ccg1_sum?.f
 
