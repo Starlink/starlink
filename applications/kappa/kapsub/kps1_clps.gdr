@@ -33,7 +33,8 @@
 *     VAR = LOGICAL (Given)
 *        Process variances?
 *     METH = CHARACTER * ( * ) (Given)
-*        Estimator: 'MEAN', 'WMEAN', 'MODE' or 'MEDIAN'.
+*        Estimator: 'MEAN', 'WMEAN', 'MODE', 'MEDIAN', 'MAX', 'MIN',
+*        'ABSDEV', 'RMS', 'SIGMA', or 'SUM'.
 *     WLIM = REAL (Given)
 *        Fraction of pixels which must be good to create a good output
 *        pixel.
@@ -72,6 +73,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -90,7 +92,17 @@
 *        variances rather than calculating them properly for sample sizes 
 *        larger than 300.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2005 December 22 (MJC):
+*        Add MAX and MIN methods.
+*     2005 December 24 (MJC):
+*        Add ABSDEV method.
+*     2005 December 27 (MJC):
+*        Add SIGMA method.
+*     2005 December 28 (MJC):
+*        Add RMS method.
+*     2005 December 29 (MJC):
+*        Add SUM method.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -177,6 +189,30 @@
 
       ELSE IF( METH .EQ. 'MODE' ) THEN
          IMETH = 5
+
+      ELSE IF( METH .EQ. 'SUM' ) THEN
+         IMETH = 12
+
+      ELSE IF( METH .EQ. 'SIGMA' ) THEN
+         IMETH = 13
+
+      ELSE IF( METH .EQ. 'RMS' ) THEN
+         IMETH = 24
+
+      ELSE IF( METH .EQ. 'ABSDEV' ) THEN
+         IMETH = 25
+
+      ELSE IF( METH .EQ. 'MAX' ) THEN
+         IMETH = 31
+
+      ELSE IF( METH .EQ. 'MIN' ) THEN
+         IMETH = 32
+
+      ELSE IF( METH .EQ. 'COMAX' ) THEN
+         IMETH = 33
+
+      ELSE IF( METH .EQ. 'COMIN' ) THEN
+         IMETH = 34
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -379,9 +415,6 @@
          CALL PSX_FREE( IPVAR, STATUS )
 
       END IF
-
-*  If required, 
-
 
 *  Free the remaining work space.
       CALL PSX_FREE( IPWRK1, STATUS )
