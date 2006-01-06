@@ -27,14 +27,13 @@
 *     The comment for the DATA picture is supplied through argument
 *     COMENT.  An optional outline may be drawn (see argument OUTLIN).
 
-*     If argument MAKFRM is TRUE and both IPIC and JPIC are 1, then a
-*     FRAME picture with a comment set to "REFERENCE" is created first.
-*     It spans from just inside the lower-left corner of the input
-*     picture and just beyond the upper-right corner of the DATA
-*     picture, unless YPIC is 1, where it extends almost to the
-*     top-right of the input picture.  The goal is as to avoid
-*     overprinting of other pictures by a title or top and right axis
-*     annotations.
+*     If argument MAKFRM is TRUE, then a FRAME picture with a comment
+*     set to "REFERENCE" is created first.  It spans from just inside 
+*     the lower-left corner of the input picture and just beyond the
+*     upper-right corner of the DATA picture, unless YPIC is 1, where it
+*     extends almost to the top-right of the input picture.  The goal is
+*     to avoid overprinting of other pictures by a title or top and 
+*     right axis annotations.
 
 *  Arguments:
 *     PICID = INTEGER (Given)
@@ -71,9 +70,10 @@
 *        The comment to store with the DATA picture in the AGI database.
 *     MAKFRM = LOGICAL (Given)
 *        If TRUE, it requests that a FRAME picture enclosing the
-*        lower-left picture and the margins to the lower-left corner of
-*        the input picture PICID.  This will only be attempted when
-*        both IPIC and JPIC are 1.
+*        DATA with a small additional trim to the top and right (to
+*        ensure enclosure), and inclusing the bottom and left margins
+*        at its lower bound.  The FRAME picture is constrained to
+*        lie entirely within the input picture PICID.
 *     OUTLIN = LOGICAL (Given)
 *        Draw an outline
 *     PICIDE = INTEGER (Returned)
@@ -108,6 +108,11 @@
 *        picture.
 *     2005 December 16 (MJC):
 *        Added OUTLIN argument.
+*     2005 December 20 (MJC):
+*        Remove the XPIC=1 and YPIC=1 constraint on making the FRAME.
+*        Set the bounds for the FRAME around the current DATA picture,
+*        and not assume that the DATA picture is at the lower-left of
+*        the grid.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +167,7 @@
       REAL X1, X2                ! X bounds of the new picture in world
                                  ! co-ordinates
       REAL X1E, X2E              ! X bounds of the old picture
+      REAL X1F, Y1F              ! Lower bounds of the FRAME picture
       REAL X2F, Y2F              ! Upper bounds of the FRAME picture
       REAL XORIG                 ! X origin of first picture
       REAL XR                    ! X extent of the old picture
@@ -208,7 +214,7 @@
       SIZE( 1 ) = XR / EXPIC
       SIZE( 2 ) = YR / EYPIC
 
-*  Set the origin of the first picture.
+*  Set the origin of the lower-left picture.
       XORIG = X1E + XR * MARGIN( 4 ) / EXPIC
       YORIG = Y1E + YR * MARGIN( 1 ) / EYPIC
 
@@ -233,16 +239,22 @@
 
 *  Should we make a FRAME picture?  MAKFRM requests that a FRAME should
 *  be created if the DATA picture is the lower-left in the grid.
-      IF ( MAKFRM .AND. IPIC .EQ. 1 .AND. JPIC .EQ. 1 ) THEN
+      IF ( MAKFRM ) THEN
 
-*  Define the upperbounds of the new picture, ensuring that
-*  the created picture does not lie outside the bounds of the
-*  current picture.
-         X2F = MIN( XUPP, XORIG + SIZE( 1 ) ) + TRIM * XR
-         Y2F = MIN( YUPP, YORIG + SIZE( 2 ) ) + TRIM * YR
+*  Define the bounds of the new FRAME picture, ensuring that the created
+*  picture does not lie outside the bounds of the current picture.  Note
+*  that the lower-left picture may may not be visible and another 
+*  picture will have the FRAME for annotations around it.  Hence these 
+*  calculations work from that DATA picture rather than assuming that
+*  the lower-left bound of the input picture with a trim defines the 
+*  same bound of the FRAME.
+         X1F = MAX( X1E + YR * TRIM, X1 - XR * MARGIN( 4 ) / EXPIC )
+         Y1F = MAX( Y1E + YR * TRIM, Y1 - YR * MARGIN( 1 ) / EYPIC )
+         X2F = MIN( XUPP, X2 + TRIM * XR )
+         Y2F = MIN( YUPP, Y2 + TRIM * YR )
 
 *  Create the new viewport.
-         CALL PGVSIZ( X1E, X2F, Y1E, Y2F )
+         CALL PGVSIZ( X1F, X2F, Y1F, Y2F )
 
 *  Set its world co-ordinate bounds.
          CALL KPG1_GDWIN( -1, STATUS )
@@ -250,6 +262,16 @@
 *  Save the viewport as a new FRAME picture.  This is now the current
 *  picture.
          CALL AGP_SVIEW( 'FRAME', 'REFERENCE', PICIDF, STATUS )
+
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL MSG_SETI( 'X', IPIC )
+            CALL MSG_SETI( 'Y', JPIC )
+            CALL ERR_REP( 'ERR_KPS1_CLIPG_DBSP',
+     :        'CLINPLOT: Error while storing the new FRAME picture '/
+     :        /'(^X,^Y) in the graphics database.', STATUS )
+            CALL AGI_SELP( PICID, STATUS )
+         END IF
+
       END IF
 
       IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -289,7 +311,7 @@
          CALL MSG_SETI( 'X', IPIC )
          CALL MSG_SETI( 'Y', JPIC )
          CALL ERR_REP( 'ERR_KPS1_CLIPG_DBSP',
-     :     'CLINPLOT: Error while storing the new picture '/
+     :     'CLINPLOT: Error while storing the new DATA picture '/
      :     /'(^X,^Y) in the graphics database.', STATUS )
          CALL AGI_SELP( PICID, STATUS )
       END IF
