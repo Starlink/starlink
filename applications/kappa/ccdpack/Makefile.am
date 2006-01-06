@@ -2,7 +2,7 @@
 
 noinst_LTLIBRARIES = libccdpack.la
 
-libccdpack_la_SOURCES = $(F_ROUTINES)
+libccdpack_la_SOURCES = $(F_ROUTINES) $(GEN_F_ROUTINES)
 
 
 F_ROUTINES = ccd1_orvar.f ccg1_bmd1d.f ccg1_bmd3d.f ccg1_bmr1r.f \
@@ -21,6 +21,24 @@ ccg1_trm3d.f ccg1_trm3r.f ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f \
 ccg1_wmd3r.f ccg1_wtm2d.f ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f \
 ccg1_wtm4d.f ccg1_wtm4r.f ccg1_umd1d.f ccg1_umr1r.f ccg1_umd3d.f \
 ccg1_umr3r.f
+
+
+# Generic routines.
+GEN_F_ROUTINES = $(CCG_N_GEN:.gen=.f) $(CCG_GN_GEN:.gn=.f)
+
+CCG_GN_GEN = ccg1_mxd1.gn ccg1_mxd3.gn ccg1_mxr1.gn ccg1_mxr3.gn \
+ccg1_mnd1.gn ccg1_mnd3.gn ccg1_mnr1.gn ccg1_mnr3.gn \
+ccg1_ad1.gn ccg1_ad3.gn ccg1_rms1.gn ccg1_rms3.gn ccg1_sd1.gn \
+ccg1_sd3.gn ccg1_sum1.gn ccg1_sum3.gn
+
+SUFFIXES = .gen .gn .f
+
+#  Run generic to get numeric types.
+.gen.f:
+	$(FGENERIC)  -t n $<
+
+.gn.f:
+	$(FGENERIC)  -t n $<
 
 
 PRIVATE_INCLUDES = CCD1_PAR
