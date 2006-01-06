@@ -18,10 +18,11 @@
 #     mtfits2ndf in out block=n [of=fits_file] [<fits2ndf_pars>]
 
 #  ADAM Parameters:
-#     BLOCK = _INTEGER
+#     BLOCK = _INTEGER (Read)
 #        The the FITS blocking factor, i.e. the block size on the tape is
-#        this value multiplied by the standard FITS block size.
-#     IN = Tape device name
+#        this value multiplied by the standard FITS block size.  The
+#        suggested default is 10.
+#     IN = DEVICE (Read)
 #        The name of a tape device.  For correct tape positioning, a no-rewind
 #        device must be used.  The device name may be have a file specifiers
 #        appended, separated by commas and enclosed in [].  The file specifiers
@@ -33,13 +34,14 @@
 #          [1,3-5,7-] indicates files 1,3,4,5, and 7 to the end of the tape.
 #          If no file specifiers are given, all files on the tape will be 
 #          processed.
-#     OF = FITS file name
-#        Set this if you want to save the intermediate FITS file(s). If a
-#        number of files are being produced, the name should contain a *,
+#     OF = LITERAL (Read)
+         Name(prefix) of the intermediate FITS file(s) copied from the tape.
+         Only set this if you want to save the intermediate FITS file(s).  If
+#        a number of files are being produced, the name should contain a *,
 #        which will be replaced by the corresponding FITS tape file number.
 #        If OF is not specified, fitsmtin#.fits will be used and deleted.
 #        (See also Note 1).
-#     OUT = NDF
+#     OUT = NDF (Write)
 #        The name of the NDF(s) to be produced by FITS2NDF.  This is passed to
 #        FITS2NDF but only a single element string can be specified.  It can
 #        contain the matching patterns allowed for FITS2NDF, for example '*'.
@@ -59,14 +61,14 @@
 #  Examples:
 #     Note that []* etc must be protected from the shell
 #
-#     mtfits2ndf '/dev/nst0[2]' f256 block=10 fmtcnv=f
+#     mtfits2ndf /dev/nst0[2] f256 block=10 fmtcnv=f
 #        This converts the second file on the tape on device /dev/nst0 to
 #        an NDF called f256. The FITS blocking factor of the tape is 10.
 #        As a result of the parameters passed to FITS2NDF, the data type of
 #        the NDF's data array matches that of the FITS primary data array,
 #        a FITS extension is created in f256, and FITS sub-files are
 #        propagated to NDF extensions.
-#     mtfits2ndf /dev/nst0 '*' block=1 of='ral256_*.fit'
+#     mtfits2ndf /dev/nst0 * block=1 of=ral256_*.fit
 #        Will convert each file on the tape on device /dev/nst0 (with a
 #        blocking factor of 1) to FITS disk files named ral256_*.fit,
 #        where * is replaced by each tape file number. The FITS files will
@@ -100,19 +102,27 @@
 
 #  Authors:
 #     AJC: Alan J. Chipperfield (Starlink)
+#     MJC: Malcolm J. Currie (Starlink)
 #     {enter_new_authors_here}
 
 #  History:
 #     29-OCT-2001 (AJC):
 #        Original version.
+#     2005 November 10 (MJC):
+#        Use standard parameter-type and access, and non-UNIX-shell
+#        specific examples.  Removed the temporary awk script in two
+#        other exit locations.
 #     {enter_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
 
 #-
-#
-# Set a default varaible values 
+
+# Obtain parameters from the command line.
+# ========================================
+
+# Set default variable values.
    set inf = ""
    set of = ""
    set ibs = ""
@@ -122,22 +132,22 @@
    @ nfiles = 0
 
 # Now search the command line, constructing the parameters for the dd command
-# and the fits2ndf command
+# and the fits2ndf command.
    while ( $#argv > 0 )
-      set arg=`echo "$1" | tr inblockf INBLOCKF`
+      set arg = `echo "$1" | tr inblockf INBLOCKF`
       switch ( "$arg" )
       case IN=*:
-         set inf=`echo "$1" | awk -F= '{print $2}'`
+         set inf = `echo "$1" | awk -F= '{print $2}'`
          breaksw
       case OF=*:
-         set of=`echo "$1" | awk -F= '{print $2}'`
-         set ofdef="false"
+         set of = `echo "$1" | awk -F= '{print $2}'`
+         set ofdef = "false"
          breaksw
       case BLOCK=* :
-         set ibs=`echo "$1" | awk -F= '{print $2*2880}'`
+         set ibs = `echo "$1" | awk -F= '{print $2*2880}'`
          breaksw
       default:
-         set adampars="$adampars $1"
+         set adampars = "$adampars $1"
       endsw
 
 # Break if last argument just done
@@ -147,47 +157,53 @@
 
 # otherwise do next argument
       shift
-
    end
 
-# Now ensure we have required arguments for dd
-# Ensure we have the input tape file
+# Now ensure we have required arguments for dd.
+# =============================================
+
+# Ensure we have the input tape file.
+# -----------------------------------
    if ( "$inf" == "" ) then
 
-# It may have been given as a positional argument (position 1)
-      if ( "$adampars" != "" ) then     
+# It may have been given as a positional argument (position 1).
+      if ( "$adampars" != "" ) then
          cat <<\**** >! awk000f
-            {for (i=1; i<=NF; i++ )
-               {if ( index($i,"=") == 0 )
-                  {print $i;break}
-               }
+            { for (i=1; i<=NF; i++ ) {
+                 if ( index($i, "=") == 0 ) {print $i;break}
+              }
             }
 \****
 
-         set inf=`echo "$adampars" | awk -f awk000f`
+         set inf = `echo "$adampars" | awk -f awk000f`
 
+# Or by keyword.
          if ( "$inf" != "" ) then
             cat <<\**** >! awk000f
-               {done=0;
-                  for (i=1; i<=NF; i++ ) {\
-                     if ( index($i,"=") != 0 ) {\
-                        print $i\
-                     } else {\
-                        if ( done==0 ) {
-                           done = 1 \
-                        } else { \
-                           print $i \
-                        } \
-                     } \
-                  } \
+               { done=0;
+                 for (i=1; i<=NF; i++) {\
+                    if (index($i, "=") != 0) {\
+                       print $i\
+                    } else {\
+                       if ( done == 0 ) {
+                          done = 1 \
+                       } else { \
+                          print $i \
+                       } \
+                    } \
+                 } \
                }
 \****
 
             set adampars=`echo "$adampars" | awk -f awk000f`
-            rm awk000f
+            \rm awk000f
          endif
       endif
 
+# Tape drive
+# ----------
+# Ask for the tape drive if it was not supplied on the command line,
+# mimicking a PAR prompt.
       if ( "$inf" == "" ) then
          printf "IN - Input tape unit > "
          set inf = "$<"
@@ -198,68 +214,80 @@
             end
          endif              
 
-# Check for abort response - we need a fiddle here to prevent inf = ! from
-# causing syntax error
+# Check for abort response; we need a fiddle here to prevent inf = ! from
+# causing syntax error,
          if ( "$inf" == "\!" || "$inf" == "\!\!" ) then
             echo aborting
+            \rm awk000f
             exit 1
          endif
       endif
    endif
 
-# Find the required file position
-# The awks are not as simple as might be because of problms on Solaris
-   set fc=`echo "$inf" | awk -F[ '/\[.*\]/{ split($2,a,"]"); print a[1]}'`
-   set inf=`echo "$inf" | awk -F[ '{print $1}'`
+# Find the required file position.  The awks are not as simple as might
+# be because of problems on Solaris.
+   set fc = `echo "$inf" | awk -F[ '/\[.*\]/{ split($2,a,"]"); print a[1]}'`
+   set inf = `echo "$inf" | awk -F[ '{print $1}'`
 
-# Find the input buffer size
+# Find the input buffer size.
+# ---------------------------
+
+#  Mimic a PAR prompt, but accept is not avaailble.
    if ( "$ibs" == "" ) then
       printf "BLOCK - Input blocking factor /10/ > "
       set block = "$<"
       if ( "$block" == "" ) then
-         set ibs=28800
-# check for abort request
+         set ibs = 28800
+
+# Check for an abort request.
       else if ( "$block" == "\!" || "$block" == "\!\!" ) then
          echo aborting
+         \rm awk000f
          exit 1
-# normal case
+
+# The normal case.
       else
          @ ibs = 2880 * $block
       endif
    endif
 
-# get a list of the required file numbers
+# Get a list of the required file numbers using an awk script.
+# ============================================================
+
+# The N means the last file.
    cat <<\**** >! awk000f
-   {for(i=1;i<=NF;i++)
-      {nf=split($i,b,"-")
-       if(nf>1)
-          {if(b[2]=="")
-              {print b[1] " N"
-               break}
-           else
-              {for(j=b[1];j<=b[2];j++)
-                  {print j}
-              }
-          }
-       else
-          {print b[1]}
-      }
+   { for (i=1; i<=NF; i++) {
+        nf = split($i, b, "-")
+        if (nf > 1) {
+           if (b[2] == "") {
+              print b[1] " N"
+              break
+           } else {
+              for (j=b[1]; j<=b[2]; j++) { print j }
+           }
+        } else { print b[1] }
+     }
    }
 \****
 
    if ( $fc != "" ) then
       set files = `echo "$fc" | awk -F, -f awk000f`
+
+# Process all the FITS files.
    else
       set files = "N"
    endif
 
-# Ensure the tape starts at the beginning 
+# Read the files from the tape.
+# =============================
+
+# Ensure the tape starts at the beginning .
 #   echo "mt -f $inf rewind"
    mt -f $inf rewind || exit 1
 
    set filpos = 1
 
-# Now convert each requested file on the tape
+# Now convert each requested file on the tape.
    set i = 1
    while ( $i <= $#files )
 
@@ -271,36 +299,40 @@
          @ i = $i + 1
       endif      
 
-# Move to required position
-# Files are numbered from 1 relative to where we are on the tape -
-# i.e. [1] means read from where we are; [2] means skip one tapemark before
-# reading etc..
-# The special case [0] means rewind the tape before reading.
+# Move to required position.
+# --------------------------
+# Files are numbered from 1 relative to where we are on the tape, i.e.
+# [1] means read from where we are; [2] means skip one tapemark before
+# reading etc.  The special case [0] means rewind the tape before reading.
       @ nskip = $file - $filpos
       @ filpos = $file + 1
 
       if ( $nskip > 0 ) then
 #         echo "mt -f $inf fsf $nskip"
          mt -f $inf fsf $nskip
+
+# Mimic PCS error message.
          if ( $status ) then
             echo "\!\! Failed to find tape file $file"
             if ( $nfiles ) then
                echo "\!  Processing files already found"
             else
                exit 1
+               \rm awk000f
             endif
             break
          endif
       endif
    
-# Now do the dd command
+# Now do the dd command.
       set ofile = `echo "$of" | sed -e "s/*/$file/"`
       echo "Converting tape file $file to a FITS disk file $ofile"
 #      echo "dd if=$inf of=$ofile ibs=$ibs obs=2880"
-     dd if=$inf of=$ofile ibs=$ibs obs=2880 >& /dev/null
+      dd if=$inf of=$ofile ibs=$ibs obs=2880 >& /dev/null
+
       if ( -z $ofile ) then
-         echo "\!\! Tape file $file was empty - assumed end of tape"
-         rm $ofile
+         echo "\!\! Tape file $file was empty---assumed end of tape."
+         \rm $ofile
          break
       else
          @ nfiles = $nfiles + 1
@@ -308,14 +340,19 @@
       
    end
 
-# Now the FITS2NDF
+# Convert the intermediate FITS file(s) to NDF.
+# =============================================
+
+# Use FITS2NDF to do the hard work, passing it the FITS files and 
+# remaining parameters.
    echo "Converting $of to NDF"
 #   echo fits2ndf "$of" "$adampars"
    $CONVERT_DIR/fits2ndf "$of" "$adampars"
 
-# Now clean up any temporary FITS file
+# Now clean up any temporary FITS file.
    if ( "$ofdef" == "true" ) then
       rm -f mtf2ndf*.fits
    endif
+   \rm awk000f
 
 # End of file
