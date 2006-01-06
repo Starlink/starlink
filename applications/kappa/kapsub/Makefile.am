@@ -103,24 +103,16 @@ SUFFIXES = .gen .gdr .gr .gbdirw .gn .f
 	$(FGENERIC)  -t n $<
 
 .gdr.f:
-	cp $< $(<:.gdr=.gen)
-	$(FGENERIC)  -t dr $(<:.gdr=.gen)
-	rm $(<:.gdr=.gen)
+	$(FGENERIC)  -t dr $<
 
 .gn.f:
-	cp $< $(<:.gn=.gen)
-	$(FGENERIC)  -t n $(<:.gn=.gen)
-	rm $(<:.gn=.gen)
+	$(FGENERIC)  -t n $<
 
 .gr.f:
-	cp $< $(<:.gr=.gen)
-	$(FGENERIC)  -t r $(<:.gr=.gen)
-	rm $(<:.gr=.gen)
+	$(FGENERIC)  -t r $<
 
 .gbdirw.f:
-	cp $< $(<:.gbdirw=.gen)
-	$(FGENERIC)  -t bdirw $(<:.gbdirw=.gen)
-	rm $(<:.gbdirw=.gen)
+	$(FGENERIC)  -t bdirw $<
 
 AM_FCFLAGS = @TCL_CFLAGS@ @TK_CFLAGS@
 
