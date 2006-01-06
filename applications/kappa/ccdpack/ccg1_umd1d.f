@@ -54,6 +54,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +62,8 @@
 *        Original version.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
+*     2005 December 27 (MJC):
+*        Remove unused variables.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,18 +107,15 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
+      INTEGER NGOOD              ! Number of good pixels
       DOUBLE PRECISION SUM1      ! Sum of weights
       DOUBLE PRECISION SUM2      ! Sum of weighted values
-      DOUBLE PRECISION VAL       ! Present data value
-      DOUBLE PRECISION VAR       ! Present weight
-      INTEGER NGOOD              ! Number of good pixels
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
       INCLUDE 'NUM_DEF_CVT'      ! Define functions...
 
 *.
-
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -173,4 +173,5 @@
 
 *  Remove the numerical error handler.
       CALL NUM_REVRT
+
       END
