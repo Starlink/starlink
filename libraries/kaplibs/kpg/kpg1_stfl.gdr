@@ -102,6 +102,8 @@
 *     6-AUG-2004 (DSB):
 *        Re-instated generic source and added argument IWCS. Display WCS
 *        coords instead of AXIS coords. 
+*     6-JAN-2006 (DSB):
+*        Normalise WCS coords before displaying them.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -229,6 +231,7 @@
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
+            CALL AST_NORM( IWCS, POS, STATUS ) 
 
 *  Now create the WCS text string.
             NC2 = 0
@@ -277,6 +280,7 @@
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
+            CALL AST_NORM( IWCS, POS, STATUS ) 
 
 *  Now create the WCS text string.
             NC2 = 0

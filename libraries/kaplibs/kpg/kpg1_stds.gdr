@@ -109,6 +109,8 @@
 *     6-AUG-2004 (DSB):
 *        Re-instated generic source and added argument IWCS. Display WCS
 *        coords instead of AXIS coords. 
+*     6-JAN-2006 (DSB):
+*        Normalise WCS coords before displaying them.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -224,12 +226,13 @@
             CALL MSG_OUT( 'STATS_IMIN',
      :        '            At pixel            : ^IMIN', STATUS )
  
-*  Transform the pixel coords to WCS coords.
+*  Transform the pixel coords to WCS coords, and normalize.
             DO I = 1, NDIM
                POSIN( I ) = DBLE( MINP( I ) ) - 0.5D0
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
+            CALL AST_NORM( IWCS, POS, STATUS ) 
 
 *  Now create the WCS text string.
             NC2 = 0
@@ -273,12 +276,13 @@
             CALL MSG_OUT( 'STATS_IMAX',
      :        '            At pixel            : ^IMAX', STATUS )
  
-*  Transform the pixel coords to WCS coords.
+*  Transform the pixel coords to WCS coords. and normalise them.
             DO I = 1, NDIM
                POSIN( I ) = DBLE( MAXP( I ) ) - 0.5D0
             END DO
             CALL AST_TRANN( MAP, 1, NDIM, 1, POSIN, .TRUE., NWCS, 1,
      :                      POS, STATUS )
+            CALL AST_NORM( IWCS, POS, STATUS ) 
 
 *  Now create the WCS text string.
             NC2 = 0
@@ -358,7 +362,7 @@
       END IF
       CALL MSG_OUT( 'BLANK', ' ', STATUS )
  
-*  Annul the Mapping pointer.
+*  Annul the AST pointers.
       CALL AST_ANNUL( MAP, STATUS )
 
       END
