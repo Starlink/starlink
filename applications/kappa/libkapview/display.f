@@ -33,12 +33,12 @@
 *     the colour table when opened (such as postscript files), this may
 *     be the only way of controlling the colour table.
 *
-*     The image is produced within the current graphics database picture
-*     The co-ordinates at the centre of the image, and the scale of the
-*     image can be controlled using parameters CENTRE, XMAGN and YMAGN.
-*     Only the parts of the image that lie within the current picture
-*     are visible; the rest is clipped.  The image is padded with bad
-*     pixels if necessary.
+*     The image is produced within the current graphics database
+*     picture.  The co-ordinates at the centre of the image, and the
+*     scale of the image can be controlled using parameters CENTRE,
+*     XMAGN and YMAGN.  Only the parts of the image that lie within the
+*     current picture are visible; the rest is clipped.  The image is
+*     padded with bad pixels if necessary.
 
 *  Usage:
 *     display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
@@ -136,7 +136,7 @@
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device used to display the image.
 *        The device must have at least 24 colour indices or greyscale 
-*        intensities. [current image-display device]
+*        intensities. [current graphics device]
 *     FILL = _LOGICAL (Read)
 *        If FILL is set to TRUE, then the image will be "stretched" to 
 *        fill the current picture in both directions.  This can be 
@@ -386,12 +386,12 @@
 
 *  Examples:
 *     display ngc6872 mode=p percentiles=[10,90] noaxes
-*        Displays the NDF called ngc6872 on the current image-display
+*        Displays the NDF called ngc6872 on the current graphics
 *        device.  The scaling is between the 10 and 90 per cent
 *        percentiles of the image. No annotated axes are produced.
 *     display vv256 mode=flash noaxes border
 *             borstyle="colour=blue,style=2"
-*        Displays the NDF called vv256 on the current image-display
+*        Displays the NDF called vv256 on the current graphics
 *        device.  There is no scaling of the data; instead the modulus
 *        of each pixel with respect to the number of colour-table
 *        indices is shown.  No annotated axes are drawn, but a blue 
@@ -400,7 +400,7 @@
 *     display mode=fa axes style="^sty,grid=1" margin=0.2 clear 
 *             out=video \
 *        Displays the current NDF data component with annotated axes
-*        after clearing the current picture on the current image-display
+*        after clearing the current picture on the current graphics
 *        device. The appearance of the axes is specified in the text 
 *        file sty, but this is modified by setting the Grid attribute
 *        to 1 so that a co-ordinate grid is drawn across the plot. The 
@@ -411,7 +411,7 @@
 *     display video noscale \
 *        Displays the data component of the NDF called video (created
 *        in the previous example) without scaling within the current
-*        picture on the current image-display device.
+*        picture on the current graphics device.
 *     display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
 *        Displays the variance component of NDF cgs4a on the xwindows
 *        device, scaling between 1 and 5.2.
