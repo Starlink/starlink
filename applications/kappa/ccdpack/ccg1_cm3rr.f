@@ -1,6 +1,7 @@
-      SUBROUTINE CCG1_CM3RR( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
-     :                         NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-     :                         WRK1, WRK2, NCON, POINT, USED, STATUS )
+      SUBROUTINE CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       RESULT, COIND, WRK1, WRK2, NCON, POINT, 
+     :                       USED, STATUS )
 *+
 *  Name:
 *     CCG1_CM3RR
@@ -13,19 +14,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM3RR( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
-*                        NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-*                        WRK1, WRK2, NCON, POINT, USED, STATUS )
+*     CALL CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
+*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, COIND,
+*                      WRK1, WRK2, NCON, POINT, USED, STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
-*     combining the data. This variant uses a single variance for each
+*     combining the data.  This variant uses a single variance for each
 *     line and and does NOT propagate it.  All work is done in single
 *     precision when possible and double precision when not.  Note that
 *     the output array is in the processing precision.  The array NCON
 *     holds the actual numbers of pixels which were used in deriving
-*     the output value plus any values already present in the array -
-*     thus a cumilative sum of contributing pixel numbers may be kept.
+*     the output value plus any values already present in the array;
+*     thus a cumulative sum of contributing pixel numbers may be kept.
 
 *  Arguments:
 *     STACK( NPIX, NLINES ) = REAL (Given)
@@ -36,19 +37,37 @@
 *        The number of lines of data in the stack.
 *     VARS( NLINES ) = DOUBLE PRECISION (Given)
 *        The variance to to used for each line of data.
+*     COORDS( NLINES ) = REAL (Given)
+*        The axis co-ordinates or widths along the collapse axis.  It
+*        is accessed only for NMETH= 22, 23, 33, 34 where it is
+*        interpreted as co-ordinates; and for NMETH=21, where the array
+*        is used to stored pixel widths.
 *     IMETH = INTEGER (Given)
-*        The method to use in combining the lines. Has a code of 2 to 10.
-*        which represent.
-*        1  = MEAN
-*        2  = WEIGHTED MEAN
-*        3  = MEDIAN
-*        4  = TRIMMED MEAN
-*        5  = MODE
-*        6  = SIGMA CLIPPED MEAN
-*        7  = THRESHOLD EXCLUSION MEAN
-*        8  = MINMAX MEAN
-*        9  = BROADENED MEDIAN
-*        10 = SIGMA CLIPPED MEDIAN
+*        The method to use in combining the lines.  It has a code of 1
+*        to 300 which represent the following statistics.
+*        1  = Mean
+*        2  = Weighted mean
+*        3  = Median
+*        4  = Trimmed mean
+*        5  = Mode
+*        6  = Sigma clipped mean
+*        7  = Threshold exclusion mean
+*        8  = Minmax mean
+*        9  = Broadened median
+*        10 = Sigma clipped median
+*        11 = Fast median
+*        12 = Sum
+*        13 = Standard deviation about the mean
+*        21 = Integrated value (sum of pixel co-ordinate width times value)
+*        22 = Intensity-weighted co-ordinate
+*        23 = Intensity-weighted dispersion of the co-ordinate.
+*        24 = Root mean square
+*        25 = Absolute mean deviation
+*        31 = Maximum
+*        32 = Minimum
+*        33 = Co-ordinate of maximum
+*        34 = Co-ordinate of minimum
+*        300 = Median, but estimating variance from mean variance.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
@@ -65,6 +84,8 @@
 *        The maximum allowed data value ( IMETH = 7 )
 *     RESULT( NPIX ) = REAL (Returned)
 *        The output line of data.
+*     COIND( NPIX ) = INTEGER (Given and Returned)
+*        Workspace to hold co-ordinate indices.
 *     WRK1( NLINES ) = REAL (Given and Returned)
 *        Workspace for calculations.
 *     WRK2( NLINES ) = REAL (Given and Returned)
@@ -75,7 +96,7 @@
 *     POINT( NLINES ) = INTEGER (Given and Returned)
 *        Workspace to hold pointers to the original positions of the
 *        data before extraction and conversion in to the WRK1 array.
-*     USED( NLINES ) =LOGICAL (Given and Returned)
+*     USED( NLINES ) = LOGICAL (Given and Returned)
 *        Workspace used to indicate which values have been used in
 *        estimating a resultant value.
 *     STATUS = INTEGER (Given and Returned)
@@ -92,6 +113,8 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -104,6 +127,21 @@
 *        Added fast median.
 *     9-SEP-2002 (DSB):
 *        Added unweighted mean method.
+*     2005 December 22 (MJC):
+*        Added several translations for new estimators and moments 
+*        (IMETH=12 upwards except 300).
+*     2005 December 24 (MJC):
+*        Added mean absolute deviation.
+*     2005 December 27 (MJC):
+*        Added standard deviation.
+*     2005 December 28 (MJC):
+*        Added root mean square.
+*     2005 December 29 (MJC):
+*        Add summation method.
+*     2006 January 2 (MJC):
+*        Add COORDS argument.
+*     2006 January 5 (MJC):
+*        Add COIND argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,6 +162,7 @@
       INTEGER MINPIX
       REAL STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NLINES )
+      REAL COORDS( NLINES )
       INTEGER NITER
       REAL NSIGMA
       REAL ALPHA
@@ -131,17 +170,21 @@
       REAL RMAX
 
 *  Arguments Given and Returned:
+      INTEGER COIND( NPIX )
+      REAL WRK1( NLINES )
+      REAL WRK2( NLINES )
       DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
-      REAL WRK1( NLINES )
-      REAL WRK2( NLINES )
 
 *  Arguments Returned:
       REAL RESULT( NPIX )
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER NBAD               ! Number of bad values
 
 *.
 
@@ -220,6 +263,64 @@
          CALL CCG1_FMR3R( STACK, NPIX, NLINES, MINPIX, RESULT, 
      :                      WRK1, NCON, POINT, USED, STATUS )
 
+      ELSE IF ( IMETH .EQ. 12 ) THEN
+
+*  Forming sum.
+         CALL CCG1_SUM3R( NPIX, NLINES, STACK, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 13 ) THEN
+
+*  Forming standard deviation.
+         CALL CCG1_SD3R( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+     :                   STATUS )
+
+      ELSE IF ( IMETH .EQ. 24 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG1_RMS3R( NPIX, NLINES, STACK, MINPIX, RESULT,
+     :                    NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 25 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG1_AD3R( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
+     :                   STATUS )
+
+      ELSE IF ( IMETH .EQ. 31 ) THEN
+
+*  Forming array of maxima.
+         CALL CCG1_MXR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                    POINT, WRK1, STATUS )
+
+      ELSE IF ( IMETH .EQ. 32 ) THEN
+
+*  Forming array of minima.
+         CALL CCG1_MNR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                    POINT, WRK1, STATUS )
+
+      ELSE IF ( IMETH .EQ. 33 ) THEN
+
+*  Forming array of maxima and corresponding indices.
+         CALL CCG1_MXR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                    COIND, WRK1, STATUS )
+
+*  Convert the pixel indices of the maxima into co-ordinates stored in
+*  the RESULT array.
+         CALL KPG1_VASVR( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+     :                    STATUS )
+
+      ELSE IF ( IMETH .EQ. 34 ) THEN
+
+*  Forming array of minima and corresponding indices.
+         CALL CCG1_MNR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
+     :                    COIND, WRK1, STATUS )
+
+*  Convert the pixel indices of the minima into co-ordinates stored in
+*  the RESULT array.
+         CALL KPG1_VASVR( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+     :                    STATUS )
+
        ELSE
 
 *  Invalid method report error
@@ -230,4 +331,3 @@
       END IF
 
       END
-* $Id$

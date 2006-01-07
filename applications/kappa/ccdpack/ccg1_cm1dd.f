@@ -1,7 +1,7 @@
-      SUBROUTINE CCG1_CM1DD( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
-     :                         NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-     :                         RESVAR, WRK1, WRK2, PP, COVEC, NMAT,
-     :                         NCON, POINT, USED, STATUS )
+      SUBROUTINE CCG1_CM1DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH, 
+     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+     :                       RESULT, RESVAR, COIND, WRK1, WRK2, PP,
+     :                       COVEC, NMAT, NCON, POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_CM1DD
@@ -14,19 +14,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM1DD( STACK, NPIX, NLINES, VARS, IMETH, MINPIX,
-*                        NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-*                        RESVAR, WRK1, WRK2, PP, COVEC, NMAT, NCON,
-*                        POINT, USED, STATUS )
+*     CALL CCG1_CM1DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
+*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, RESVAR,
+*                      COIND, WRK1, WRK2, PP, COVEC, NMAT, NCON,
+*                      POINT, USED, STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
-*     combining the data. This variant uses a variance array and
-*     propagates them for each input value .  All work is done in
-*     double precision Note that the output arrays are in the
+*     combining the data.  This variant uses a variance array and
+*     propagates them for each input value.  All work is done in
+*     double precision.  Note that the output arrays are in the
 *     processing precision.  The array NCON holds the actual numbers of
 *     pixels which were used in deriving the output value plus any
-*     values already present in the array - thus a cumilative sum of
+*     values already present in the array; thus a cumulative sum of
 *     contributing pixel numbers may be kept.
 
 *  Arguments:
@@ -38,19 +38,36 @@
 *        The number of lines of data in the stack.
 *     VARS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
 *        The data variances.
+*     COORDS( NLINES ) = DOUBLE PRECISION (Given)
+*        The axis co-ordinates or widths along the collapse axis.  It
+*        is accessed only for NMETH= 22, 23, 33, 34 where it is
+*        interpreted as co-ordinates; and for NMETH=21, where the array
+*        is used to stored pixel widths.
 *     IMETH = INTEGER (Given)
-*        The method to use in combining the lines. Has a code of 2 to 10
-*        which represent.
-*        1  = UNWEIGHTED MEAN
-*        2  = WEIGHTED MEAN
-*        3  = MEDIAN
-*        4  = TRIMMED MEAN
-*        5  = MODE
-*        6  = SIGMA CLIPPED MEAN
-*        7  = THRESHOLD EXCLUSION MEAN
-*        8  = MINMAX MEAN
-*        9  = BROADENED MEDIAN
-*        10 = SIGMA CLIPPED MEDIAN
+*        The method to use in combining the lines.  It has a code of 1
+*        to 300 which represent the following statistics.
+*        1  = Mean
+*        2  = Weighted mean
+*        3  = Median
+*        4  = Trimmed mean
+*        5  = Mode
+*        6  = Sigma clipped mean
+*        7  = Threshold exclusion mean
+*        8  = Minmax mean
+*        9  = Broadened median
+*        10 = Sigma clipped median
+*        11 = Fast median
+*        12 = Sum
+*        13 = Standard deviation about the mean
+*        21 = Integrated value (sum of pixel co-ordinate width times value)
+*        22 = Intensity-weighted co-ordinate
+*        23 = Intensity-weighted dispersion of the co-ordinate.
+*        24 = Root mean square
+*        25 = Absolute mean deviation
+*        31 = Maximum
+*        32 = Minimum
+*        33 = Co-ordinate of maximum
+*        34 = Co-ordinate of minimum
 *        300 = Median, but estimating variance from mean variance.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
@@ -58,7 +75,7 @@
 *     NITER = INTEGER (Given)
 *        The maximum number of iterations (IMETH = 5).
 *     NSIGMA = REAL (Given)
-*        The number of sigmas to clip the data at (IMETH = 5, 6 and 10 ).
+*        The number of sigmas to clip the data at (IMETH = 5, 6 and 10).
 *     ALPHA = REAL (Given)
 *        The fraction of data values to remove from data (IMETH = 4).
 *     RMIN = REAL (Given)
@@ -69,6 +86,8 @@
 *        The output line of data.
 *     RESVAR( NPIX ) = DOUBLE PRECISION (Returned)
 *        The output variances.
+*     COIND( NPIX ) = INTEGER (Given and Returned)
+*        Workspace to hold co-ordinate indices.
 *     WRK1( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace for calculations.
 *     WRK2( NLINES ) = DOUBLE PRECISION (Given and Returned)
@@ -76,8 +95,8 @@
 *     PP( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace for order statistics calculations.
 *     COVEC( NMAT, NLINES ) = DOUBLE PRECISION (Given and Returned)
-*        Workspace for storing ordered statistics variace-covariance
-*        matrix. Not used for IMETHs 1, 2 or 300.
+*        Workspace for storing ordered statistics variance-covariance
+*        matrix.  Used for IMETHs 3 to 11.
 *     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        The actual number of contributing pixels from each input line
 *        to the output line.
@@ -115,6 +134,8 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,6 +154,21 @@
 *        Added IMETH 300 to provide a means of estimating the output
 *        variances for large samples, for which the memory requirements
 *        for the COVEC array would be too large.
+*     2005 December 22 (MJC):
+*        Added several translations for new estimators and moments 
+*        (IMETH=12 upwards except 300).
+*     2005 December 24 (MJC):
+*        Added mean absolute deviation.
+*     2005 December 27 (MJC):
+*        Added standard deviation.
+*     2005 December 28 (MJC):
+*        Added root mean square.
+*     2005 December 29 (MJC):
+*        Add summation method.
+*     2006 January 2 (MJC):
+*        Add COORDS argument.
+*     2006 January 5 (MJC):
+*        Add COIND argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -155,6 +191,7 @@
       INTEGER NMAT
       DOUBLE PRECISION STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NPIX, NLINES )
+      DOUBLE PRECISION COORDS( NLINES )
       DOUBLE PRECISION PP( NLINES )
       INTEGER NITER
       REAL NSIGMA
@@ -163,12 +200,13 @@
       REAL RMAX
 
 *  Arguments Given and Returned:
+      INTEGER COIND( NPIX )
+      DOUBLE PRECISION WRK1( NLINES )
+      DOUBLE PRECISION WRK2( NLINES )
       DOUBLE PRECISION COVEC( NMAT, NLINES )
       DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
-      DOUBLE PRECISION WRK1( NLINES )
-      DOUBLE PRECISION WRK2( NLINES )
 
 *  Arguments Returned:
       DOUBLE PRECISION RESULT( NPIX )
@@ -179,6 +217,8 @@
 
 *  Local Variables:
       INTEGER IPW1               ! Work space pointer
+      INTEGER NBAD               ! Number of bad values
+
 *.
 
 *  Check inherited global status.
@@ -188,7 +228,7 @@
 *  for the order statistics of a normal popl with up to NLINE members.
 *  This also sets up the scale factor for converting mean variances to
 *  median variances.
-      IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
+      IF ( IMETH .GE. 3 .AND. IMETH .LE. 11 ) THEN
           CALL PSX_CALLOC( NLINES*NLINES, '_DOUBLE', IPW1, STATUS )
           CALL CCD1_ORVAR( NLINES, NMAT, PP, COVEC, 
      :                     %VAL( CNF_PVAL( IPW1 ) ),
@@ -271,6 +311,65 @@
          CALL CCG1_FMD1D( STACK, NPIX, NLINES, VARS, MINPIX, COVEC,
      :                      NMAT, RESULT, RESVAR, WRK1, WRK2, NCON,
      :                      POINT, USED, STATUS )
+
+      ELSE IF ( IMETH .EQ. 12 ) THEN
+
+*  Forming sum.
+         CALL CCG1_SUM1D( NPIX, NLINES, STACK, VARS, MINPIX,
+     :                    RESULT, RESVAR, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 13 ) THEN
+
+*  Forming standard deviation.
+         CALL CCG1_SD1D( NPIX, NLINES, STACK, MINPIX,
+     :                   RESULT, RESVAR, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 24 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG1_RMS1D( NPIX, NLINES, STACK, MINPIX, RESULT, RESVAR,
+     :                    NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 25 ) THEN
+
+*  Forming mean absolute deviation.
+         CALL CCG1_AD1D( NPIX, NLINES, STACK, MINPIX, RESULT, RESVAR,
+     :                   NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 31 ) THEN
+
+*  Forming array of maxima.
+         CALL CCG1_MXD1D( .TRUE., NPIX, NLINES, STACK, VARS, RESULT,
+     :                     RESVAR, POINT, WRK1, STATUS )
+
+      ELSE IF ( IMETH .EQ. 32 ) THEN
+
+*  Forming array of minima.
+         CALL CCG1_MND1D( .TRUE., NPIX, NLINES, STACK, VARS, RESULT,
+     :                     RESVAR, POINT, WRK1, STATUS )
+
+      ELSE IF ( IMETH .EQ. 33 ) THEN
+
+*  Forming array of maxima and corresponding indices.
+         CALL CCG1_MXD1D( .TRUE., NPIX, NLINES, STACK, VARS, RESULT,
+     :                     RESVAR, COIND, WRK1, STATUS )
+
+*  Convert the pixel indices of the maxima into co-ordinates stored in
+*  the RESULT array.
+         CALL KPG1_VASVD( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+     :                    STATUS )
+
+      ELSE IF ( IMETH .EQ. 34 ) THEN
+
+*  Forming array of minima and corresponding indices.
+         CALL CCG1_MND1D( .TRUE., NPIX, NLINES, STACK, VARS, RESULT,
+     :                     RESVAR, COIND, WRK1, STATUS )
+
+*  Convert the pixel indices of the minima into co-ordinates stored in
+*  the RESULT array.
+         CALL KPG1_VASVD( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+     :                    STATUS )
+
       ELSE
 
 *  Invalid method report error
