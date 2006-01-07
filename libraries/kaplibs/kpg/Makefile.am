@@ -323,6 +323,7 @@ kpg1_trspw.f \
 kpg1_vec2n.f \
 kpg1_verb.f \
 kpg1_wcatw.f \
+kpg1_wcaxc.f \
 kpg1_wrast.f \
 kpg1_wread.f \
 kpg1_wtm3d.f \
