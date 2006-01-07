@@ -222,6 +222,9 @@
 *     2006 January 2 (MJC):
 *        Obtain co-ordinates and pass co-ordinate array for some
 *        estimators.
+*     2006 January  5 (MJC):
+*        Added section headings in comments.  Copied FrameSet for
+*        estimators using co-ordinates to fix bug.
 *     {enter_further_changes}
 
 *  Bugs:
