@@ -54,20 +54,29 @@
 *        current Frame axis will be used.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
-*        can be one of the following options.
-*          "Mean" -- Mean value
-*          "WMean" -- Weighted mean in wich each data value is weighted
-*                     by the reciprocal of the associated variance.  
-*          "Mode" -- Modal value
+*        can be one of the following options.  The first four are
+*        more for general collapsing, and the remainder are for cube
+*        analysis.
+*          "Mean"   -- Mean value
+*          "WMean"  -- Weighted mean in wich each data value is weighted
+*                      by the reciprocal of the associated variance.  
+*          "Mode"   -- Modal value
 *          "Median" -- Median value.  Note that this is extremely memory
 *                      and CPU intensive for large datasets; use with 
 *                      care!  If strange things happen, use "Mean".
+*
 *          "Absdev" -- Mean absolute deviation from the unweighted mean.
-*          "Rms" --  Root mean square
-*          "Sigma" -- Standard deviation about the unweighted mean.
-*          "Sum" -- The total value.
-*          "Max" -- Maximum value.
-*          "Min" -- Minimum value.
+*          "Comax"  -- Co-ordinate of the maximum value.
+*          "Comin"  -- Co-ordinate of the minimum value.
+*          "Integ"  -- Integrated value (sum of the products of the
+*                      value and pixel width in world co-ordinates).
+*          "Iwc"    -- Intensity-weighted co-ordinate.
+*          "Iwd"    -- Intensity-weighted dispersion of the co-ordinate.
+*          "Max"    -- Maximum value.
+*          "Min"    -- Minimum value.
+*          "Rms"    -- Root mean square
+*          "Sigma"  -- Standard deviation about the unweighted mean.
+*          "Sum"    -- The total value.
 *        ["Mean"]
 *     HIGH = LITERAL (Read)
 *        A value for the axis specified by parameter AXIS.  For example,
@@ -208,6 +217,11 @@
 *        Add RMS estimator.
 *     2005 December 29 (MJC):
 *        Add SUM estimator.
+*     2005 December 30 (MJC):
+*        Add INTEG, COMAX, COMIN, IWC, IWD estimators.
+*     2006 January 2 (MJC):
+*        Obtain co-ordinates and pass co-ordinate array for some
+*        estimators.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -219,12 +233,12 @@
       IMPLICIT NONE            ! No default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'       ! Global SSE definitions
-      INCLUDE  'PAR_ERR'       ! Parameter-system errors
-      INCLUDE  'NDF_PAR'       ! NDF_ public constants
-      INCLUDE  'DAT_PAR'       ! HDS public constants
-      INCLUDE  'AST_PAR'       ! AST constants and functions
-      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
+      INCLUDE  'SAE_PAR'         ! Global SSE definitions
+      INCLUDE  'PAR_ERR'         ! Parameter-system errors
+      INCLUDE  'NDF_PAR'         ! NDF_ public constants
+      INCLUDE  'DAT_PAR'         ! HDS public constants
+      INCLUDE  'AST_PAR'         ! AST constants and functions
+      INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -234,10 +248,10 @@
       INTEGER KPG1_CEIL        ! Most negative integer .GE. a given real
 
 *  Local Variables:
-      CHARACTER COMP*13        ! List of components to process
+      CHARACTER COMP*13          ! List of components to process
       CHARACTER DTYPE*( NDF__SZFTP ) ! Numeric type for output arrays
-      CHARACTER ESTIM*6        ! Method to use to estimate collapsed
-                               ! values
+      CHARACTER ESTIM*6          ! Method to use to estimate collapsed
+                                 ! values
       CHARACTER ITYPE*( NDF__SZTYP ) ! Numeric type for processing
       CHARACTER LOC1*(DAT__SZLOC)! Locator to the whole NDF
       CHARACTER LOC2*(DAT__SZLOC)! Locator to NDF AXIS array
@@ -247,11 +261,13 @@
       CHARACTER LOC5*(DAT__SZLOC)! Locator to cell of the old AXIS array
       CHARACTER LOC6*(DAT__SZLOC)! Locator to component of the old cell
       CHARACTER NAME*(DAT__SZNAM)! The component name
-      CHARACTER TTLC*255       ! Title of original current Frame
-      DOUBLE PRECISION AXHIGH  ! High bound of collapse axis in current 
-                               ! Frame
-      DOUBLE PRECISION AXLOW   ! Low bound of collapse axis in current
-                               ! Frame
+      CHARACTER TTLC*255         ! Title of original current Frame
+      CHARACTER UNITS*( 30 )     ! Units of co-ordinates to data 
+      INTEGER AEL                ! Number of collapse axis elements
+      DOUBLE PRECISION AXHIGH    ! High bound of collapse axis in
+                                 ! current Frame
+      DOUBLE PRECISION AXLOW     ! Low bound of collapse axis in current
+                                 ! Frame
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM )! Two current Frame 
                                ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! Valid current Frame 
@@ -276,8 +292,11 @@
       INTEGER I                ! Loop count
       INTEGER IAXIS            ! Index of collapse axis within current
                                ! Frame
+      INTEGER IERR             ! Position of first numerical error
       INTEGER INDF1            ! Input NDF identifier
       INTEGER INDF2            ! Output NDF identifier
+      INTEGER IPAXCO           ! Pointers to mapped d.p. axis array
+      INTEGER IPCO             ! Pointers to mapped axis array
       INTEGER IPIN( 2 )        ! Pointers to mapped input arrays
       INTEGER IPIX             ! Index of PIXEL Frame within WCS 
                                ! FrameSet
@@ -285,6 +304,7 @@
       INTEGER IPW1             ! Pointer to first work array
       INTEGER IPW2             ! Pointer to second work array
       INTEGER IWCS             ! WCS FrameSet pointer
+      INTEGER IWCSO            ! Output NDF's WCS FrameSet pointer
       INTEGER J                ! Loop count
       INTEGER JAXIS            ! Index of collapse axis within PIXEL
                                ! Frame
@@ -299,6 +319,8 @@
       INTEGER NAXC             ! Original number of current Frame axes
       INTEGER NCOMP            ! No. of components within cell of AXIS
                                ! array
+      INTEGER NERR               ! Number of numerical errors
+      INTEGER NCU              ! Number of characters in units
       INTEGER NDIM             ! No. of pixel axes in input NDF
       INTEGER NDIMO            ! No. of pixel axes in output NDF
       INTEGER NVAL             ! Number of values obtained (1)
@@ -314,6 +336,9 @@
 
 *  Check the global status.
       IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain input NDF and some of its AST Frames.
+*  ============================================
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
@@ -364,6 +389,9 @@
      :                 STATUS )
       END IF
 
+*  Select the collapse axis and limits thereon.
+*  ============================================
+ 
 *  Get the index of the current Frame axis defining the collapse 
 *  direction.  Use the last axis as the dynamic default.
       IAXIS = NAXC
@@ -391,6 +419,9 @@
       ELSE
          USEALL = .FALSE.
       END IF
+
+*  Determine whether a WCS axis aligns with to the chosen data axis.
+*  =================================================================
 
 *  Find an arbitrary position within the NDF which has valid current 
 *  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
@@ -436,7 +467,7 @@
      :                STATUS ) 
 
 *  Find the pixel axis with the largest projection of the vector joining
-*  these two pixel positions.  The collapse will occurr along this pixel
+*  these two pixel positions.  The collapse will occur along this pixel
 *  axis.  Report an error if the positions do not have valid pixel
 *  co-ordinates.
       PRJMAX = -1.0
@@ -459,6 +490,9 @@
          END IF
 
       END DO
+
+*  Derive the pixel-index bounds along the collapse axis.
+*  ======================================================
 
 *  Choose the pixel index bounds of the slab to be collapsed on the
 *  collapse pixel axis.  If no axis limits supplied, use the upper and
@@ -500,6 +534,10 @@
       CALL MSG_OUT( 'COLLAPSE_MSG1', '   Collapsing pixel axis ^I '//
      :             'from pixel ^L to pixel ^H inclusive...', STATUS )
       CALL MSG_BLANK( ' ', STATUS )
+      AEL = JHI - JLO + 1
+
+*  Propagate the input to the output NDF and define latter's bounds.
+*  =================================================================
 
 *  Create the output NDF by propagation from the input NDF.  This
 *  results in history, etc., being passed on.  The shape and 
@@ -521,7 +559,7 @@
 
 *  Determine the numeric type to be used for processing the input
 *  data and variance (if any) arrays.  Since the subroutines that
-*  perform the collpase need the data and variance arrays in the same
+*  perform the collapse need the data and variance arrays in the same
 *  data type, the component list is used.  This application supports
 *  single- and double-precision floating-point processing.
       CALL NDF_MTYPE( '_REAL,_DOUBLE', INDF1, INDF2, COMP, ITYPE, DTYPE,
@@ -546,6 +584,9 @@
          UBNDO( I ) = UBND( AXES( I ) )
       END DO
 
+*  Adjust output NDF to its new shape.
+*  ===================================
+
 *  The shape and size of the output NDF created above will be wrong, so
 *  we need to correct it by removing the collapse axis.  This is easy if
 *  it is the final axis (we would just use NDF_SBND with specifying 
@@ -558,7 +599,7 @@
 *         appropriate values.
 *    3) - Restore the saved AXIS structures, permuting them so that they
 *         apply to the correct axis.
-*    4) - Adjust the WCS FrameSet to pick the required axis form the
+*    4) - Adjust the WCS FrameSet to pick the required axis from the
 *         original Base Frame.
 
 *  First see if the AXIS component is defined.
@@ -667,32 +708,82 @@
 
       END IF
 
+*  Alter the WCS FrameSet.
+*  =======================
+
+*  Copy the FrameSet, as we're about to change it, but the original
+*  is sometimes needed.
+      IWCSO = AST_COPY( IWCS, STATUS )
+
+*  We now modify the input NDFs WCS FrameSet by removing the collapsed
+*  axis from the base and current Frames.
+      CALL KPS1_CLPA0( IWCSO, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
+     :                 GRDPOS, STATUS )
+
+*  Save this modified WCS FrameSet in the output NDF.
+      CALL NDF_PTWCS( IWCSO, INDF2, STATUS )      
+
+*  Obtain the remaining parameters.
+*  ================================
+
+*  Get the ESTIMATOR and WLIM parameters.
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean','Mean,WMean,Mode,Median,Max,'/
+     :                /'Min,Comax,Comin,Absdev,RMS,Sigma,Sum,Iwc,Iwd,'/
+     :                /'Integ', .FALSE., ESTIM, STATUS )
+
+      CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
+
+*  Associate AXIS information.
+*  ===========================
+
+*  Obtain co-ordinates along the collapse axis for the following
+*  methods.
+      IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
+     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
+
+*  Create workspace for the AXIS centres.
+         CALL PSX_CALLOC( AEL, '_DOUBLE', IPAXCO, STATUS )
+         CALL PSX_CALLOC( AEL, ITYPE, IPCO, STATUS )
+
+*  Obtain the double-precision axis centres, first trying from the WCS 
+*  or failing that from the AXIS structure.
+         CALL KPG1_WCAXC( INDF1, IWCS, IAXIS, AEL, 
+     :                    %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
+
+*  Copy the centres to the required precision.
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL VEC_DTOR( .TRUE., AEL, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                     STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL VEC_DTOD( .TRUE., AEL, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                     STATUS )
+
+         END IF
+         CALL PSX_FREE( IPAXCO, STATUS )
+
+*  Obtain the collapsed-axis units of the input NDF; these now become
+*  the data units in output NDF.  
+*  Still to do: attempt to access WCS units too.
+         CALL NDF_ACGET( INDF1, 'Units', IAXIS, UNITS, STATUS )
+         CALL NDF_CPUT( UNITS, INDF2, 'Units', STATUS )
+      END IF
+
+*  Map the NDF arrays and workspace required.
+*  ==========================================
+
 *  Map the full input, and output data and (if needed) variance arrays.
       CALL NDF_MAP( INDF1, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
       CALL NDF_MAP( INDF2, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
 
-*  We now modify the input NDFs WCS FrameSet by removing the collapsed
-*  axis from the base and current Frames.
-      CALL KPS1_CLPA0( IWCS, JAXIS, UBND( JAXIS ) - LBND( JAXIS ) + 1, 
-     :                 GRDPOS, STATUS )
-
-*  Save this modified WCS Frameet in the output NDF.
-      CALL NDF_PTWCS( IWCS, INDF2, STATUS )      
-
-*  Get the ESTIMATOR and WLIM parameters.
-      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 
-     :                'Mean,WMean,Mode,Median,Max,Min,'/
-     :                /'Absdev,RMS,Sigma,Sum', 
-     :                .FALSE., ESTIM, STATUS )
-      CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
-
 *  Allocate work space, unles the last axis is being collapsed (in which
 *  case no work space is needed)..
       IF( JAXIS .NE. NDIM ) THEN
-         CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW1, STATUS )
+         CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
          IF( VAR ) THEN
-            CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW2, 
-     :                       STATUS )
+            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
          ELSE
             IPW2 = IPW1
          END IF  
@@ -703,12 +794,15 @@
          IPW2 = IPIN( 1 )
       END IF
 
+*  Collapse.
+*  =========
+
 *  Now do the work, using a routine appropriate to the numeric type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
      :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
-     :                    NDIMO, LBNDO, UBNDO,
+     :                    %VAL( CNF_PVAL( IPCO ) ), NDIMO, LBNDO, UBNDO,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                    %VAL( CNF_PVAL( IPW1 ) ), 
@@ -718,7 +812,7 @@
          CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
      :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
-     :                    NDIMO, LBNDO, UBNDO,
+     :                    %VAL( CNF_PVAL( IPCO ) ), NDIMO, LBNDO, UBNDO,
      :                    %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                    %VAL( CNF_PVAL( IPW1 ) ), 
@@ -735,6 +829,11 @@
       IF( JAXIS .NE. NDIM ) THEN
          CALL PSX_FREE( IPW1, STATUS )
          IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
+      END IF
+
+      IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
+     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
+         CALL PSX_FREE( IPCO, STATUS )
       END IF
 
 *  Come here if something has gone wrong.
