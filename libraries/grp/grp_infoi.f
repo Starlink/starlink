@@ -97,6 +97,10 @@
       INCLUDE 'GRP_COM'          ! GRP common blocks.
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
 *           The index of the last entry in each group.
+*        CMN_CHK( GRP__MAXG ) = INTEGER (Read)
+*           The GRP identifier associated with each group.
+*        CMN_USED( GRP__MAXG ) = LOGICAL (Read)
+*           Whether each slot in the common arrays is currently in use.
 
 *  Arguments Given:
       INTEGER IGRP
@@ -162,14 +166,16 @@
       ELSE IF( LITEM( : 6 ) .EQ. 'ACTIVE' ) THEN
 
 *  For ACTIVE, also display the identifier values.
+         CALL MSG_SETC( 'ID', ' ' )
          VALUE = 0
          DO SLOT = 1, GRP__MAXG
             IF( CMN_USED( SLOT ) ) THEN
                VALUE = VALUE + 1         
+               IF( VALUE .GT. 1 ) CALL MSG_SETC( 'ID', ', ' )
                CALL MSG_SETI( 'ID', CMN_CHK( SLOT ) )
-               CALL MSG_SETC( 'ID', ' ' )
             END IF
          END DO
+
 
          IF( VALUE .GT. 1 ) THEN
             CALL MSG_SETI( 'N', VALUE )
