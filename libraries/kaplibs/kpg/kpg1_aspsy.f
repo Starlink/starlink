@@ -95,32 +95,38 @@
 
 *.
 
-*  Check the inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  If the groups holding names and synonyms have not yet been created,
-*  create them now.
+*  See if the groups holding names and synonyms have been created. Do
+*  this in a new error reporting context since GRP_VALID checks the
+*  inherited status, but we want a usable result even if the inherited
+*  status is set.
+      CALL ERR_BEGIN( STATUS )
       CALL GRP_VALID( ASTING, VALID1, STATUS )
       CALL GRP_VALID( ASTOUG, VALID2, STATUS )
       VALID = ( VALID1 .AND. VALID2 )
+      CALL ERR_END( STATUS )
 
-      IF( .NOT. VALID ) THEN
+*  If we are freeing resources, just delete the groups (if valid) without
+*  checking the inherited status value.
+      IF( SYNON .EQ. ' ' ) THEN
          IF( VALID1 ) CALL GRP_DELET( ASTING, STATUS )
          IF( VALID2 ) CALL GRP_DELET( ASTOUG, STATUS )
-         CALL GRP_NEW( 'AST attribute names', ASTOUG, STATUS ) 
-         CALL GRP_NEW( 'AST attribute syonyms', ASTING, STATUS ) 
-         ASTNPS = 0
-      END IF
-
-*  If required, delete the groups.
-      IF( SYNON .EQ. ' ' ) THEN
-         CALL GRP_DELET( ASTING, STATUS )
-         CALL GRP_DELET( ASTOUG, STATUS )
          ASTNPS = 0
 
-*  Otherwise, add the supplied name and synonym (after stripping spaces
+*  Otherwise, check the inherited global status.
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  If the groups holding names and synonyms have not yet been created,
+*  create them now.
+         IF( .NOT. VALID ) THEN
+            IF( VALID1 ) CALL GRP_DELET( ASTING, STATUS )
+            IF( VALID2 ) CALL GRP_DELET( ASTOUG, STATUS )
+            CALL GRP_NEW( 'AST attribute names', ASTOUG, STATUS ) 
+            CALL GRP_NEW( 'AST attribute syonyms', ASTING, STATUS ) 
+            ASTNPS = 0
+         END IF
+
+*  Add the supplied name and synonym (after stripping spaces
 *  and converting to upper case).
-      ELSE
          TEXT = TRAN
          CALL CHR_UCASE( TEXT )
          CALL CHR_RMBLK( TEXT )
