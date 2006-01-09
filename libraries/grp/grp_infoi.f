@@ -171,8 +171,19 @@
             END IF
          END DO
 
-         CALL MSG_OUT( ' ', 'Currently issued GRP identifiers: ^ID',
-     :                 STATUS ) 
+         IF( VALUE .GT. 1 ) THEN
+            CALL MSG_SETI( 'N', VALUE )
+            CALL MSG_OUT( ' ', 'There are ^N currently active GRP '//
+     :                    'identifiers: ^ID', STATUS ) 
+
+         ELSE IF( VALUE .EQ. 1 ) THEN
+            CALL MSG_OUT( ' ', 'There is 1 currently active GRP '//
+     :                    'identifier: ^ID', STATUS ) 
+
+         ELSE 
+            CALL MSG_OUT( ' ', 'There are no currently active GRP '//
+     :                    'identifiers', STATUS ) 
+         END IF
 
 *  All done, so jump to the end.
          GO TO 999
