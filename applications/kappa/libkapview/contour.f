@@ -1023,9 +1023,6 @@
      :                    'plotting the key.', STATUS )
          END IF
 
-*  Free resources
-         CALL KPG1_ASPSY( ' ', ' ', STATUS )
-
       END IF
 
 *  Report the heights actually used as they are not always clearly
@@ -1037,6 +1034,9 @@
 *  Tidy up.
 *  ========
  999  CONTINUE
+
+*  Free resources used to hold attribute synonyms.
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
 *  Delete any group holding pen definitions.
       IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
