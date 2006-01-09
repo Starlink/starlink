@@ -132,7 +132,8 @@ void clumps() {
 *        input NDF. The information written to this NDF depends on the value 
 *        of the METHOD parameter. If METHOD is GaussClumps, the output NDF 
 *        receives the sum of all the fitted Gaussian clump models including
-*        the global background level. If METHOD is ClumpFind, each pixel in 
+*        a global background level chosen to make the mean output value
+*        equal to the mean input value. If METHOD is ClumpFind, each pixel in 
 *        the output is the integer index of clump to which the pixel has been 
 *        assigned. Bad values are stored for pixels which are not part of
 *        any clump. No output NDF will be produced if a null (!) value is 
@@ -141,6 +142,14 @@ void clumps() {
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
 *        No catalogue will be produced if a null (!) value is supplied [!]
+*     RMS = _DOUBLE (Read)
+*        Specifies a value to use as the global RMS noise level in the 
+*        supplied data array. The suggested defaukt value is the square root 
+*        of the mean of the values in the input NDF's Variance component is 
+*        used. If the NDF has no Variance component, the suggested default 
+*        is based on the differences between neighbouring pixel values. Any 
+*        pixel-to-pixel correlation in the noise can result in this estimate 
+*        being too low. 
 
 *  Algorithms:
 *     - GaussClumps: Based on the algorithm described by Stutski & Gusten 
@@ -156,8 +165,8 @@ void clumps() {
 *
 *     The most significant configuration parameters for this algorithm
 *     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine
-*     the minimum clump size, and GaussClumps.RMS and GaussClumps.Thresh
-*     which determine the termination criterion.
+*     the minimum clump size, and GaussClumps.Thresh which (together with
+*     the ADAM paramater RMS) determine the termination criterion.
 
 *     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
 *     algorithm works by first contouring the data at a multiple of the
@@ -195,18 +204,11 @@ void clumps() {
 *     process is terminated. [10]
 *     - GaussClumps.ModelLim: Determines the value at which each Gaussian
 *     model is truncated to zero. Model values below ModelLim times the RMS
-*     noise are treated as zero. [0.5]
+*     noise are treated as zero. [3.0]
 *     - GaussClumps.NPad: Specifies a termination criterion for the 
 *     GaussClumps algorithm. The algorithm will terminate when "Npad" 
 *     consecutive clumps have been fitted all of which have peak values less 
 *     than the threshold value specified by the "Thresh" parameter. [10]
-*     - GaussClumps.RMS: The RMS noise in the data. The default value is
-*     determined by the Variance component in the input data. If there is
-*     no Variance component, an estimate of the global noise level in the
-*     data is made by looking at the differences between neighbouring
-*     pixel values. Any pixel-to-pixel correlation in the noise can result 
-*     in this estimate being too low. The RMS value determines the termination
-*     criterion (see GaussClumps.Thresh and GaussClumps.NPad). []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
 *     the corresponding maximum value in the observed data (see the Stutski 
@@ -215,6 +217,13 @@ void clumps() {
 *     encourages the peak amplitude of each fitted gaussian to be close to 
 *     the corresponding maximum value in the observed data (see the Stutski 
 *     & Gusten paper). [1.0]
+*     - GaussClumps.Sb: An additional Chi-square stiffness parameter which
+*     encourages the background value to stay close to its initial value.
+*     This stiffness is not present in the Stutzki & Gusten paper but is
+*     added because the background value is usually determined by data
+*     points which have very low weight and is thus poorly constrained. It
+*     would thus be possibly to get erroneous background values without
+*     this extra stiffness. [0.1]
 *     - GaussClumps.Sc: The Chi-square stiffness parameter "Sc" which 
 *     encourages the peak position of each fitted gaussian to be close to 
 *     the corresponding peak position in the observed data (see the Stutski 
@@ -222,7 +231,7 @@ void clumps() {
 *     - GaussClumps.Thresh: Gives the minimum peak amplitude of clumps to
 *     be fitted by the GaussClumps algorithm (see also GaussClumps.NPad).
 *     The value should be supplied as a multiple of the RMS noise level.
-*     (see GaussClumps.RMS). [20.0]
+*     (see ADAM parameter RMS). [20.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity FWHM of each clump is not allowed to be
 *     smaller than this value. Only used for 3D data. [3.0]
@@ -259,7 +268,7 @@ void clumps() {
 *     spikes being interpreted as real peaks, whilst large values can result 
 *     in some real peaks being missed and merged in with neighbouring peaks. 
 *     The default value of two times the RMS noise level (as specified by
-*     the RMS configuration parameter) is usually considered to be optimal, 
+*     the ADAM parameter RMS) is usually considered to be optimal, 
 *     although this obviously depends on the RMS noise level being correct. []
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
@@ -298,19 +307,10 @@ void clumps() {
 *     to be adjacent to the central pixel. For one dimensional data, a
 *     value of 1 is always used for "Naxis", and each pixel simply has 2 
 *     adjacent pixels, one on either side. []
-*     - ClumpFind.RMS: The RMS noise in the data. The default value is
-*     determined by the Variance component in the input data. If there is
-*     no Variance component, an estimate of the global noise level in the
-*     data is made by looking at the differences between neighbouring
-*     pixel values. Any pixel-to-pixel correlation in the noise can result 
-*     in this estimate being too low. This can have cause the default
-*     value of DelatT to be to low, resulting in noise spikes being 
-*     interpreted as clumps. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See "DeltaT".
-*     The default value is three times the RMS noise level. Note this will
-*     only be appropriate if there is no constant offset in the data
-*     values (i.e. if the background level in the data is zero). []
+*     The default value is the minimum input data value plus four times the 
+*     RMS noise level. []
 
 *  Authors:
 *     DSB: David S. Berry
@@ -335,7 +335,7 @@ void clumps() {
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
-   HDSLoc **clist;              /* List of HDS locators for Clump structures */
+   int *clist;                  /* List of NDF identifiers for individual clump */
    HDSLoc *xloc;                /* HDS locator for CUPID extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
    char *value;                 /* Pointer to GRP element buffer */
@@ -347,7 +347,7 @@ void clumps() {
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
-   double bg;                   /* The background level in the data */
+   double bg;                   /* Background level */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
@@ -360,7 +360,7 @@ void clumps() {
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
-   int nclump;                  /* Number of locators in "clist" */
+   int nclump;                  /* Number of elements in "clist" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
@@ -503,7 +503,10 @@ void clumps() {
    parGdr0i( "ILEVEL", 1, 0, 6, 1, &ilevel, status );
    if( ilevel > 0 ) msgBlank( status );
 
-/* If there is a variance array, map it and find the global RMS error. */
+/* Calculate the default RMS value. If the NDF has a Variance component
+   it is the square root of the mean Variance value. Otherwise, it is found
+   by looking at differences between adjacent pixel values in the Data 
+   component. */
    ndfState( indf, "VARIANCE", &var, status );
    if( *status == SAI__OK && var ) {   
       ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
@@ -512,33 +515,29 @@ void clumps() {
       n = 0;
       for( i = 0; i < el; i++ ) {
          if( ipv[ i ] != VAL__BADD ) {
-            sum += ipv[ i ]*ipv[ i ];
+            sum += ipv[ i ];
             n++;
          }
       }
-
+      
       if( n > 0 ) {
          rms = sqrtf( sum/n );
-         if( ilevel > 1 ) {
-            msgSetd( "N", rms );
-            msgOut( "", "RMS noise estimated from Variance component: ^N", status );
-         }
+
       } else {
          *status = SAI__ERROR;
          errRep( "CLUMPS_ERR1", "The supplied data contains insufficient "
-                 "good values to continue.", status );
+                 "good Variance values to continue.", status );
       }         
 
-/* If there is no Variance component, get an estimate of the RMS noise
-   based on the variations of the data values. */
    } else {
       ipv = NULL;
       rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1 );
-      if( ilevel > 1 ) {
-         msgSetd( "N", rms );
-         msgOut( "", "RMS noise estimated from Data component: ^N", status );
-      }
-   }
+   }   
+
+
+/* Get the RMS noise level. */
+   parDef0d( "RMS", rms, status );
+   parGet0d( "RMS", &rms, status );
 
 /* Determine which algorithm to use. */
    parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND", 1, method,
@@ -575,11 +574,11 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       clist = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                                keymap, velax, ilevel, &nclump, &bg ); 
+                                keymap, velax, ilevel, &nclump ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump, &bg ); 
+                              keymap, velax, ilevel, &nclump ); 
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -621,12 +620,12 @@ void clumps() {
          mask = 0;
       }
 
-/* Create any output NDF by summing the contents of the HDS structures 
-   describing the found clumps, and then adding on the background level
-   (if any). This also fills the above mask array if required. */
+/* Create any output NDF by summing the contents of the NDFs describing the 
+   found clumps, and then adding on a background level (for GaussClumps). This 
+   also fills the above mask array if required. */
       if( ipo || mask ) {
-         cupidSumClumps( type, nsig, slbnd, subnd, el, clist, nclump, bg, 
-                         rmask, ipo, method );
+         cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, clist, 
+                         nclump, rmask, ipo, method, &bg );
       }
 
 /* Delete any existing CUPID extension in the NDF, and then create a new
@@ -666,8 +665,8 @@ void clumps() {
          astAnnul( config );
       }
 
-/* Store the clump properties in the CUPID extensionand output catalogue
-   (if needed). This also annuls the HDS locators stored within "clist". */
+/* Store the clump properties in the CUPID extension and output catalogue
+   (if needed). */
       cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, bg,
                         "Output from CUPID:CLUMPS" );
 
@@ -684,12 +683,12 @@ void clumps() {
 /* Tidy up */
 L999:
 
-/* Release the memory containing the list of HDS structures describing the 
-   clumps. The actual locators should already have been freed in
+/* Release the memory containing the list of NDF identifiers describing the 
+   clumps. The actual identifiers should already have been freed in
    cupidStoreClumps. */
    clist = astFree( clist );
 
-/* If an error has occurred, delete the QUality component if a mask was
+/* If an error has occurred, delete the Quality component if a mask was
    being created, and also delete the CUPID extension. */
    if( *status != SAI__OK ) {
       errBegin( status );
@@ -711,7 +710,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-   astListIssued( "At end of CLUMPS" );    
+/*   astListIssued( "At end of CLUMPS" );     */
 
 }
 

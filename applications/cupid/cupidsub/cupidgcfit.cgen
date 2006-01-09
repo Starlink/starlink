@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
+#include "mers.h"
 #include "star/pda.h"
 #include <math.h>
 
@@ -124,8 +125,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
    excluded from the fitting process) move the background level to the end 
    of the array of parameter values and reduce the number of free parameters 
    by one. */
+   bg = x[ 1 ];
    if( cupidGC.fixback ) {
-      bg = x[ 1 ];
       for( ip = 2; ip < n; ip++ ) x[ ip - 1 ] = x[ ip ];
       x[ n - 1 ] = bg;
       n--;
@@ -155,7 +156,10 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
          printf("Par %d: %g %g %g\n", i, f, f0, dx );
          printf("        %g %g\n", (f - f0)/dx, g[ i ] ); 
          x[ i ] -= dx;
+         getchar();
+
       }
+      getchar();
       
       cupidGC.nwf = nwf;
        
@@ -175,14 +179,68 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 /* Call the minimisation function. */
    pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );
 
+/* If false convergence was flagged, try the minimisation again, starting
+   the process using the parameter values found by the first call (except
+   that the original background value is re-instated), but preventing any 
+   changes to the weights this time. */
+   if( iv[ 0 ] == 8 ) {
+      int nwf;
+
+      if( cupidGC.ilevel > 4 ) {
+         msgBlank( status );
+         msgOut( "", "   pdaSumsl reports false convergence. Trying again...", status );
+         msgBlank( status );
+      }
+
+
+      nwf = cupidGC.nwf;
+      cupidGC.nwf = 0;
+      if( !cupidGC.fixback ) x[ 1 ] = bg;
+
+      for( i = 0; i < n; i++ ) d[ i ] = 1.0;
+      iv[ 0 ] = 0;
+      pdaDeflt( 2, iv, LIV, LV, v);
+      iv[ 16 ] = cupidGC.maxnf;
+      pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );
+
+      cupidGC.nwf = nwf;
+
+      if( cupidGC.ilevel > 4 ) {
+         msgBlank( status );
+         msgOut( "", "   Second attempt at minimisation completed.", status );
+         msgBlank( status );
+      }
+
+   }
+
 /* See if convergence was achieved. */
    ret = ( iv[ 0 ] < 7 );
+   if( iv[ 0 ] >= 7 && cupidGC.ilevel > 4 ) {
+      msgSeti( "I", iv[ 0 ] );
+      msgOut( "", "   pdaSumsl returned error code ^I", status );
+   }
 
 /* Check none of the parameters are Nan */
    for( i = 0; i < n; i++ ) {
       if( !finite( x[ i ] ) ) {
          ret = 0;
+         msgOut( "", "   pdaSumsl returned NaN parameters", status );
          break;
+      }
+   }
+
+/* Check the size of the fitted model is significant. */
+   if( cupidGC.fixback ) {
+      if( x[ 2 ] < 0.1 ) ret = 0;
+      if( cupidGC.ndim > 1 ) {
+         if( x[ 4 ] < 0.1 ) ret = 0;
+         if( cupidGC.ndim > 2 ) if( x[ 7 ] < 0.1 ) ret = 0;
+      }
+   } else {
+      if( x[ 3 ] < 0.1 ) ret = 0;
+      if( cupidGC.ndim > 1 ) {
+         if( x[ 5 ] < 0.1 ) ret = 0;
+         if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.1 ) ret = 0;
       }
    }
 

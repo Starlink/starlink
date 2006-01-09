@@ -111,11 +111,16 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    double *par;            /* Pointer to parameter array to be used */
    double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
+   int dbg;                /* Has background changed? */
    int i;                  /* Parameter index */
    int iax;                /* Axis index */
    int iel;                /* Index of pixel within section currently being fitted */ 
    int what;               /* "xwhat" value assuming bckgnd is being fitted */
+   double back_term;       /* chi squared term to stop large shifts in bg level */
+   double gback_term;      /* Gradient term to stop large shifts in bg level */
  
+   static int nwm;         /* Number of times the weights have been modified */
+   static double bg;       /* Last times background value */
    static double chisq;    /* Total modified chi squared */  
    static double pdiff;    /* Difference between model and data peak values */
    static double v_off;    /* Offset on vel axis from data to model peak */
@@ -128,24 +133,42 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
+/* Store diagnostic info */
+   if( cupidGC.nf == 1 ) {
+      for( i = 0; i < 11; i++ ) cupidGC.initpars[ i ] = xpar[ i ];
+      bg = xpar[ 1 ];
+      nwm = 0;
+   } else {
+      for( i = 0; i < 11; i++ ) cupidGC.pars[ i ] = xpar[ i ];
+   }
+
 /* If the background is not included in the list of free parameters 
    being varied, then the background value will be at the end of the 
    supplied "xpar" array. Reorder the supplied parameter values to put 
    the background value at its usual place (index [1]). This is needed 
    since all the following code assumes that the background is stored at 
-   index [1]. */
+   index [1]. Also set up terms to be added to the chi-squared value and 
+   gradient. These cause the returned chi-squared to rise if the background 
+   value wanders far from the initial background value (this is done because 
+   the background level is usually determined by data values with very low 
+   weight and so is not well constrained). */
    if( cupidGC.fixback ) {
       ypar[ 0 ] = xpar[ 0 ];
       ypar[ 1 ] = xpar[ cupidGC.npar - 1 ];
       memcpy( ypar + 2, xpar + 1, sizeof( double )*( cupidGC.npar - 2 ) );
       par = ypar;
       what = ( xwhat <= 0 ) ? xwhat : xwhat + 1;
+      back_term = 0.0;
+      gback_term = 0.0;
 
 /* If the background is included in the list of free parameters being
    varied, then just use the parameter values as supplied. */
    } else {
       par = xpar;
       what = xwhat;
+      back_term = xpar[ 1 ] - cupidGC.initpars[ 1 ];
+      gback_term = 2*cupidGC.sb*back_term;
+      back_term *= cupidGC.sb*back_term;
    }
 
 /* If neccessary, re-calculate cached intermediate values */
@@ -203,15 +226,31 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    last call. In order to avoid instability, we only do this modification 
    for a few iterations near the start, and then allow the fitting
    process to complete with fixed weights. */
-         if( cupidGC.nf > 2 && cupidGC.nf <= 2 + cupidGC.nwf ) {
+         if( !cupidGC.fixback && cupidGC.nf > 2 && nwm <= cupidGC.nwf ) {
             if( res != 0.0 && m != 0.0 && m != *pm ) {
-               wf = ( res - *pu )/ res;
-               wf /= ( m - *pm )/ m;
-               wf = fabs( wf );
-               wf = ( wf < cupidGC.minwf ) ? cupidGC.minwf : ( wf > cupidGC.maxwf ) ? cupidGC.maxwf : wf ;
-               *pw *= wf;
+
+/* Only modify the weights if the background has changed. Without this, 
+   the outlying background regions would be given low weights if the
+   background has not changed, resulting in the background being poorly
+   determined. */
+               if( bg != 0.0 ) {
+                  dbg = ( fabs( ( par[ 1 ] - bg )/bg ) > 0.0001 );
+               } else {
+                  dbg = ( par[ 1 ] != 0.0 );
+               }
+               if( dbg ) {
+                  wf = ( res - *pu )/ res;
+                  wf /= ( m - *pm )/ m;
+                  wf = fabs( wf );
+                  wf = ( wf < cupidGC.minwf ) ? cupidGC.minwf : ( wf > cupidGC.maxwf ) ? cupidGC.maxwf : wf ;
+                  *pw *= wf;
+                  nwm++;
+               }
             }
          }
+
+/* Remeber the background value for next time. */
+         bg = par[ 1 ];
 
 /* Save the residual and model value at this pixel */
          *pu = res;
@@ -224,7 +263,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    implementation of GaussClumps (obtained from 
    ftp.astro.uni-bonn.de/pub/heith/gaussclumps on 27/9/05) upon which this 
    implementation was based. */
-         rr = ( res > 0.0 ) ? 1.0 : cupidGC.s0p1;
+         rr = ( res > 0.0 ) ? 1.0 : cupidGC.s0p1; 
 
 /* Increment the running sum of chi-squared. We save the scaled residuals
    in a work array (pr) so that we do not need to calculate them again if 
@@ -269,19 +308,13 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
                ( x0_off*x0_off + x1_off*x1_off )/cupidGC.beam_sq : 0.0;
          if( ndim == 3 && cupidGC.velres_sq > 0.0 ) t += v_off*v_off/cupidGC.velres_sq;
       }
-      chisq += cupidGC.sa*pdiff*pdiff + cupidGC.sc4*t;
+      chisq += cupidGC.sa*pdiff*pdiff + cupidGC.sc4*t + back_term;
 
-/* Store diagnostic info */
+/* Store more diagnostic info */
       if( cupidGC.nf == 1 ) {
-         for( i = 0; i < 11; i++ ) cupidGC.initpars[ i ] = par[ i ];
-
          pim = cupidGC.initmodel;
          pm = cupidGC.model;
          for( iel = 0; iel < cupidGC.nel; iel++ ) *(pim++) = *(pm++);
-
-      } else {
-         for( i = 0; i < 11; i++ ) cupidGC.pars[ i ] = par[ i ];
-
       }
       cupidGC.chisq = chisq;
 
@@ -378,8 +411,11 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 /* If the parameter for which we are finding the gradient is involved in
    the extra terms added to chi squared by the Stutski & Gusten paper,
    then we have extra terms to add to the gradient found above. */
-      if( what == 0 || what == 1 ) {
+      if( what == 0 ) {
          ret += 2*cupidGC.sa*pdiff;
+
+      } else if( what == 1 ) {
+         ret += 2*cupidGC.sa*pdiff + gback_term;
 
       } else if( what == 2 ) {
          if( cupidGC.beam_sq > 0.0 ) ret += 2*cupidGC.sc4*x0_off/cupidGC.beam_sq;

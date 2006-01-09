@@ -397,8 +397,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
             more = 0;
             for( j = 0; j < ps->nnb; j++ ) {
                ops = ps->nb[ j ];
-               if( cupidCFXtend( ps, ops, ipa, ndim, dims, skip, 
-                                 3, ret ) ) more = 1;
+               if( CGEN_FUNCTION(cupidCFXtend)( ps, ops, ipd, ipa, ndim, dims, 
+                                                skip, 3, ret ) ) more = 1;
                if( ilevel > 3 && ops ) {
                   msgSeti( "I", ps->index );
                   msgSeti( "J", ops->index );

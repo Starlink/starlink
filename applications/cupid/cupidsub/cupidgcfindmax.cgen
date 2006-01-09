@@ -11,11 +11,10 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 *     cupidGCFindMax<X>
 
 *  Purpose:
-*     Find the element with the largest value, and the total data sum,
-*     in the supplied array. 
+*     Find the element with the largest value in the supplied array. 
 
 *  Synopsis:
-*     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax );
+*     int cupidGCFindMax<X>( CGEN_TYPE *array, int nel, int *imax )
 
 *  Description:
 *     This functions finds the element with the largest value in the supplied 
@@ -56,13 +55,13 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 */      
 
 /* Local Variables: */
-   int allbad;          /* Are all the supplied array values bad? */
    int i;               /* Loop count */
+   int ngood;           /* Number of good array values found */
    CGEN_TYPE maxval;    /* Largest value found so far */
 
 /* Initialise. */
    *imax = -1;
-   allbad = 1;
+   ngood = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return 1;
@@ -72,7 +71,7 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
 
 /* Skip bad values. */
       if( array[ i ] != CGEN_BAD ) {
-          allbad = 0;
+          ngood++;
 
 /* If this is the first good value,  or if this value is larger than the 
    previous found maximum, record its position. */
@@ -83,8 +82,8 @@ int CGEN_FUNCTION(cupidGCFindMax)( CGEN_TYPE *array, int nel, int *imax ){
       }
    }
 
-/* Return the result. */
-   return allbad;
+/* Return a flag indicating if all array values are bad. */
+   return ( ngood == 0 );
 
 }
 

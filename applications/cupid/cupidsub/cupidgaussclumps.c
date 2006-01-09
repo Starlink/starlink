@@ -2,8 +2,8 @@
 #include "mers.h"
 #include "prm_par.h"
 #include "ast.h"
+#include "ndf.h"
 #include "cupid.h"
-#include "star/hds.h"
 #include <math.h>
 
 
@@ -15,9 +15,9 @@
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
 
-HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
-                           double *ipv, double rms, AstKeyMap *config, int velax,
-                           int ilevel, int *nclump, double *bg ){
+int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+                       double *ipv, double rms, AstKeyMap *config, int velax,
+                       int ilevel, int *nclump ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -27,10 +27,9 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 *     the GAUSSCLUMPS algorithm.
 
 *  Synopsis:
-*     HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                                void *ipd, double *ipv, double rms, 
-*                                AstKeyMap *config, int velax, int *nclump,
-*                                double *bg )
+*     int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
+*                            void *ipd, double *ipv, double rms, 
+*                            AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -40,7 +39,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 *     from the data and iterates, fitting a new ellipse to the brightest peak 
 *     in the residuals. This continues until a termination criterion is
 *     reached. The main termination criterion in this implementation is
-*     not quote the same as in the Stutski & Gusten paper. They had two main
+*     not quite the same as in the Stutski & Gusten paper. They had two main
 *     termination criteria; 1) the total data sum of the fitted gaussians
 *     is close to the total data sum of the original data, and 2) the peak
 *     residual is less than a given multiple of the RMS noise in the data.
@@ -88,19 +87,16 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 *        Amount of screen information to display (in range zero to 3).
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
-*     bg
-*        Pointer to a double to receive the global background level which
-*        should be added to the sum of the individual clumps to re-create the
-*        input data. For the GaussClumps algorithm, the returned value is
-*        the mean of the bacground value fitted to each clump, with greater 
-*        weight given to larger peaks and to closer fits.
 
 *  Retured Value:
 *     A pointer to a dynamically allocated array, which should
 *     be freed using astFree when no longer needed. It will contain a
-*     list of HDS locators. The number of locators in the list is given
-*     by the value returned in "*nclump". Each locator will locate a
-*     "Clump" structure describing a single clump.
+*     list of NDF identifiers. The number of identifiers in the list is 
+*     given by the value returned in "*nclump". Each NDF will hold the
+*     data values associated with a single clump and will be the smallest 
+*     possible NDF that completely contains the corresponding clump.
+*     Pixels not in the clump will be set bad. The pixel origin is set to
+*     the same value as the supplied NDF.
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -135,7 +131,8 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
-   HDSLoc **clist;      /* Pointer to the array of returned HDS locators */
+   char buf[30];        /* File name buffer */
+   int *clist;          /* Pointer to the array of returned NDF identifiers */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mean_peak;    /* The mean of the values within "peaks" */
@@ -147,10 +144,6 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    double sigma_peak;   /* The standard deviation of the values within "peaks" */
    double sum_peak2;    /* Sum of the squares of the values in "peaks" */
    double sum_peak;     /* Sum of the values in "peaks" */
-   double sumbg;        /* Sum of background estimates */
-   double swbg;         /* Sum of background estimate weights */
-   double urms;         /* User-supplied RMS noise level */
-   double wbg;          /* Background estimate weight */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
    int *dims;           /* Pointer to array of array dimensions */
    int allbad;          /* Are all the residuals bad? */
@@ -176,6 +169,13 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return clist;
+
+/* Say which method is being used. */
+   if( ilevel > 0 ) {
+      msgBlank( status );
+      msgOut( "", "GaussClumps:", status );
+      if( ilevel > 1 ) msgBlank( status );
+   }
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -228,48 +228,16 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
    function for the fitting routine. */
       cupidGC.ilevel = ilevel;
 
-/* Allow the user to override the supplied RMS error value. */
-      urms = cupidConfigD( gcconfig, "RMS", VAL__BADD );
-      if( urms != VAL__BADD ) {
-         rms = urms;
-         if( ilevel > 1 ) {
-            msgSetd( "N", rms );
-            msgOut( "", "User-supplied RMS noise estimate: ^N", status );
-         }
-
-/* If the user did not supply an RMS value, access it again, this time
-   suppling the default RMS value. This is done to ensure that the
-   default RMS value is stored in the CUPID NDF extension when the
-   program exits. */
-      } else {
-         (void) cupidConfigD( gcconfig, "RMS", rms );
-      }
-
-/* Tell the user what RMS value is being used. */
-      if( ilevel > 1 ) {
-         msgSetd( "N", rms );
-         msgOut( "", "RMS noise level actually used: ^N", status );
-
-      } else if( ilevel > 0 ) {
-         msgSetd( "N", rms );
-         msgOut( "", "RMS noise level used: ^N", status );
-      }
-
 /* Set the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
       peak_thresh = cupidConfigD( gcconfig, "THRESH", 20.0 );
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
-      mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5 );
+      mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0 );
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
-
-/* Initialise the sum of the background estimates, and the number of such
-   estimates summed. */
-      sumbg = 0.0;
-      swbg = 0.0;
 
 /* Indicate that no peaks have been found below the lower threshold for clump 
    peak values. */
@@ -284,8 +252,6 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
       sum_peak2 = 0.0;
       peaks = astMalloc( sizeof( double )*npeak );
       for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
-
-      if( ilevel > 1 ) msgBlank( status );
 
 /* Loop round fitting a gaussian to the largest remaining peak in the
    residuals array. */
@@ -303,8 +269,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
          }
 
 /* Find the 1D vector index of the elements with the largest value in the 
-   residuals array. This returns a flag indicating if all residuals are
-   bad. */
+   residuals array. */
          allbad = cupidGCFindMax( type, res, el, &imax );
 
 /* Finish iterating if all the residuals are bad, or if too many iterations 
@@ -342,9 +307,11 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 /* Skip this fit if we have an estimate of the standard deviation of the
    "npeak" most recent clump peak values, and the peak value of the clump
    just fitted is a long way (more than NSIGMA standard deviations) from the 
-   peak value of the previously fitted clump. */
-               if( npeak == 0 || iclump < npeak || 
-                   fabs( x[ 0 ] - new_peak ) < nsig*sigma_peak ) {
+   peak value of the previously fitted clump. Also skip it if the peak
+   value is less than the "mlim" value. */
+               if( ( npeak == 0 || iclump < npeak || 
+                     fabs( x[ 0 ] - new_peak ) < nsig*sigma_peak ) &&
+                    x[ 0 ] > mlim ) {
 
 /* Record the new peak value for use with the next peak, and update the 
    standard deviation of the "npeak" most recent peaks. These values are
@@ -367,28 +334,26 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 /* Reset the number of failed fits since the last good fit. */
                   nskip = 0;
 
-/* Increment the sum of the background estimates. Background estimates
-   are weights to give greater weight to estimates formed from larger
-   peaks and from closer fits. */
-                  wbg = ( chisq > 0.0 ) ? x[ 0 ]/chisq : 1.0;
-                  sumbg += x[ 1 ]*wbg*rms;
-                  swbg += wbg;
-
-/* Extend the returned array of HDS Clump structures to include room for
-   the new one. This list is actually a long character string containing
-   room for "iclump" HDS locators. */
-                  clist = astGrow( clist, iclump, sizeof( HDSLoc *) );
-                  if( clist ) clist[ iclump - 1 ] = NULL;
+/* Extend the returned array of clump NDFs to include room for the new 
+   one. */
+                  clist = astGrow( clist, iclump, sizeof( int ) );
+                  if( clist ) clist[ iclump - 1 ] = NDF__NOID;
 
 /* Remove the model fit (excluding the background) from the residuals
-   array. This also creates a HDS "Clump" structure containing information 
-   about the clump. An HDS locator for this new Clump structure is added 
-   into the "clist" ring. The standard deviation of the new residuals is 
+   array. This also creates an NDF containing the data values associated
+   with the clump. An identifier for this new clump NDF is added into the 
+   "clist" array. The standard deviation of the new residuals is 
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
-                                       clist + ( iclump - 1 ), iclump, sumbg, 
-                                       swbg, diag, mean_peak );
+                                       clist + ( iclump - 1 ), iclump, 
+                                       diag, mean_peak );
+
+/* Dump the modified residuals if required. */
+                  if( ilevel > 5 ) {
+                     sprintf( buf, "residuals%d", iclump );
+                     cupidGCDump( type, res, ndim, dims, buf );
+                  }
 
 /* Display the clump parameters on the screen if required. */
                   cupidGCListClump( iclump, ndim, x, chisq, slbnd, ilevel,
@@ -470,17 +435,6 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
       }
    }
 
-/* Tell the user the mean background level, and return it. */
-   if( swbg > 0 ) {
-      *bg = sumbg/swbg;
-      if( ilevel > 2) {
-         msgSetd( "BG", *bg );
-         msgOut( "", "Estimated background level = ^BG", status );
-      }
-   } else {
-      *bg = 0.0;
-   }
-
 /* Tell the user how clumps are being returned. */
    *nclump = iclump;
    if( ilevel > 0 ) {
@@ -530,7 +484,7 @@ HDSLoc **cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd
 
    gcconfig = astAnnul( gcconfig );
 
-/* Return the list of clump structure locators. */
+/* Return the list of clump NDFs. */
    return clist;
 
 }

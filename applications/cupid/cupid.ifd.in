@@ -79,6 +79,14 @@ package cupid {
             helpkey *
           }
 
+         parameter rms {
+            type _DOUBLE
+            access READ
+            ppath DYNAMIC
+            prompt {RMS noise level}
+            helpkey *
+          }
+
       }
 
       icl {defstring cupidh(elp) !$CUPID_DIR/cupidhelp}

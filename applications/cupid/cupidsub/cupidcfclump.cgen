@@ -3,20 +3,11 @@
 #include "ast.h"
 #include "mers.h"
 
-/* Global Variables: */
-/* ================= */
-/* A structure holding the global parameters of the GaussClump algorithm 
-   used to communicate with the service functions cupidGCcalcf and
-   cupidGCcalcg called by the PDA minimisation function. The contents of
-   this structure are initialised in cupidSetInit. */
-CupidGC cupidGC;
-
 void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa, 
                                  double rms, int velax, int nel, int ndim, 
                                  int dims[3], int skip[3], int *slbnd, 
-                                 int ilevel, CupidPixelSet *ps, double *sum, 
-                                 double *par, int *list_size, double **mlist, 
-                                 int **plist ){
+                                 CupidPixelSet *ps, int *list_size, 
+                                 double **mlist, int **plist ){
 /*
 *  Name:
 *     cupidCFClump<X>
@@ -27,8 +18,7 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *  Synopsis:
 *     void cupidCFClump<X>( CGEN_TYPE *ipd, double *ipv, int *ipa, double rms, 
 *                           int velax, int nel, int ndim, int dims[3], 
-*                           int skip[3], int *slbnd, int ilevel, 
-*                           CupidPixelSet *ps, double *sum, double *par, 
+*                           int skip[3], int *slbnd, CupidPixelSet *ps, 
 *                           int *list_size, double **mlist, int **plist )
 
 *  Description:
@@ -62,45 +52,8 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
-*     ilevel
-*        Diagnostic information level.
 *     ps
 *        Pointer to the PixelSet from which an HDS clump is to be created.
-*     sum
-*        Location at which to return the total data sum in the clump.
-*        This excludes the background level returned in "par[1]". Note,
-*        unlike par[0] and par[1], this value is not normalised to the
-*        RMS noise level.
-*     par
-*        Pointer to an array in which to return the parameters of a Gaussian
-*        approximation to the clump. How many of these are used depends on 
-*        the value of "ndim": if "ndim" is 1 only elements 0 to 3 are used, 
-*        if "ndim" is 2 only elements 0 to 6 are used, if "ndim" is 3 all 
-*        elements are used. All axis values are represented in GRID pixels: 
-*
-*           par[0]: The actual peak intensity of the supplied data (note, 
-*                   NOT the peak of the fitted Gaussian) above the 
-*                   background returned in par[1]. In units of the RMS noise.
-*           par[1]: The background level. This is the minimum data value in 
-*                   the clump, plus the RMS noise (note, NOT the background 
-*                   found by the Gaussian fit). In units of the RMS noise.
-*           par[2]: Grid coord of actual peak value (NOT fitted peak) on axis 0
-*           par[3]: Intrinsic FWHM on axis 0 (in pixels)
-*           par[4]: Grid coord of actual peak value (NOT fitted peak) on axis 1
-*           par[5]: Intrinsic FWHM on axis 1 (in pixels)
-*           par[6]: Spatial orientation angle (in radians, positive from 
-*                   +ve GRID1 axis to +ve GRID2 axis).
-*           par[7]: Grid coord of actual peak value (NOT fitted peak) on axis 2
-*           par[8]: Intrinsic FWHM on velocity axis (in pixels)
-*           par[9]: Axis 0 of internal velocity gradient vector (in velocity
-*                   pixels per spatial pixel).
-*           par[10]: Axis 1 of internal velocity gradient vector (in
-*                   velocity pixels per spatial pixel).
-*
-*        If a gaussian could not be fitted to the peak, elements 3, 5, 6,
-*        8, 9 and 10 are returned holding VAL__BADD. The value stored in
-*        the other elements dpo not depend on the gaussian fit.
-
 *     list_size
 *        A location in which to return the number of pixels described n
 *        the the "mlist" and "plist" arrays.
@@ -139,7 +92,6 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 
 /* Local Variables: */
    double *pm;      /* Pointer to next value in "mlist" */
-   double chisq;    /* Chi squared value for gaussian fit. */
    double d;        /* Pixel value */
    double vmin;     /* Minimum value in the clump */
    int *pp;         /* Pointer to next value in "plist" */
@@ -147,17 +99,13 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
    int bel;         /* No. of elements in PixelSet bounding box */
-   int fitok;       /* Was the Gaussian fit succesful? */
    int i;           /* GRID axis 1 value of next array element */
-   int ip;          /* Parameter index */
-   int imax;        /* 1D vector index of peak pixel value */
    int index;       /* Index value of the supplied PixelSet */
    int j;           /* GRID axis 2 value of next array element */
    int k;           /* GRID axis 3 value of next array element */
 
 /* Initialise */
    *list_size = 0;
-   *sum = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -198,7 +146,7 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
             for( i = ps->lbnd[ 0 ]; i <= ps->ubnd[ 0 ]; i++ ) {
 
 /* If this pixel is in the PixelSet, store its value and grid coords
-   within the returned lists and update the data sum. */
+   within the returned lists. */
                if( *v == index ) {
                   d = ipd[ v - ipa ];
                   *(pm++) = d;
@@ -211,9 +159,6 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
 /* Increment the list size. */
                   (*list_size)++;
 
-/* Increment the total data sum in the clump. */
-                  *sum += d;
-
 /* Update the minimum value in the clump. */
                   if( d < vmin ) vmin = d;
                }
@@ -225,118 +170,6 @@ void CGEN_FUNCTION(cupidCFClump)( CGEN_TYPE *ipd, double *ipv, int *ipa,
          }
          v = v2 + skip[ 2 ];
       }
-
-/* Get the 1D vector index of the peak value in the PixelSet. */
-      imax = ps->peak[ 0 ] - 1;
-      if( ndim > 1 ) {
-         imax += ( ps->peak[ 1 ] - 1 )*skip[ 1 ];
-         if( ndim > 2 ) imax += ( ps->peak[ 2 ] - 1 )*skip[ 2 ];
-      }
-
-/* Store the information level in the cupidGC structure, from where it
-   can be accessed from the service routines which evaluate the objective
-   function for the fitting routine. */
-      cupidGC.ilevel = ilevel;
-
-/* Fit a Gaussian to the data in the clump. First make an initial guess at the 
-   Gaussian clump parameters centred on the current peak. */
-      CGEN_FUNCTION(cupidGCSetInit)( ipd, ipv, ndim, dims, imax, rms,
-                                     NULL, 1, velax, par, slbnd );
-
-/* We want to exclude the background level from the fitting process, so
-   it remains set at the minimum data value in the clump (plus the rms 
-   noise). Set this value in the "par" arraym and set the "fixback" flag
-   which indicates that the background should not be varied whilst
-   performing the fit. Also normalise it to the RMS noise level. */
-      par[ 1 ] = vmin/rms + 1.0;
-      cupidGC.fixback = 1;
-
-/* Find the best fitting parameters, starting from the above initial guess. 
-   This returns a function value of zero if no fit could be performed. If
-   no fit was performed, fill the "par" array with bad values. */
-      fitok = CGEN_FUNCTION(cupidGCFit)( ipd, imax, par, &chisq );
-      if( !fitok ) {
-         for( ip = 0; ip < 11; ip++ ) par[ ip ] = VAL__BADD;
-         par[ 1 ] = vmin/rms + 1.0;
-      }
-
-/* Subtract the background level from the returned data sum. */
-      *sum -= (*list_size)*par[ 1 ]*rms;
-
-/* Store the peak value minus the background level. This is the actual
-   peak value, not the peak of the fitted gaussian. */
-      par[ 0 ] = ps->vpeak/rms - par[ 1 ];
-
-/* Store the grid coords at the peak value. This is the actual peak
-   position, not the position of the peak of the fitted gaussian. */
-      par[ 2 ] = ps->peak[ 0 ];
-      if( ndim > 1 ) {
-         par[ 4 ] = ps->peak[ 1 ];
-         if( ndim > 2 ) par[ 7 ] = ps->peak[ 2 ];
-      }
-
-/* Tell the user clump properties. */
-      if( ilevel > 2 ) {
-         if( fitok ) {
-            msgSetd( "V", chisq );
-            msgOut( "", "   Gaussian Chi-squared: ^V", status );
-         }
-   
-         msgSetd( "P", ps->pop );
-         msgOut( "", "   Population: ^P pixels", status );
-         msgSetd( "V", par[ 0 ] );
-         msgOut( "", "   Peak intensity: ^V", status );
-         msgSetd( "V", par[ 1 ] );
-         msgOut( "", "   Constant background: ^V", status );
-         msgSetd( "V", par[ 2 ] + slbnd[ 0 ] - 1.0 );
-         msgOut( "", "   Centre on 1st axis: ^V", status );
-         
-         if( fitok ) {
-            msgSetd( "V", par[ 3 ] );
-            msgOut( "", "   Gaussian FWHM on 1st axis: ^V", status );
-         }   
-
-         if( ndim > 1 ) {
-            msgSetd( "V", par[ 4 ] + slbnd[ 1 ] - 1.0 );
-            msgOut( "", "   Centre on 2nd axis: ^V", status );
-
-            if( fitok ) {
-               msgSetd( "V", par[ 5 ] );
-               msgOut( "", "   Gaussian FWHM on 2nd axis: ^V", status );
-               msgSetd( "V", par[ 6 ] );
-               msgOut( "", "   Position angle: ^V", status );
-            }   
-
-            if( ndim > 2 ) {
-               msgSetd( "V", par[ 7 ] + slbnd[ 2 ] - 1.0 );
-               msgOut( "", "   Centre on vel axis: ^V", status );
-               if( fitok ) {
-                  msgSetd( "V", par[ 8 ] );
-                  msgOut( "", "   Gaussian FWHM on vel axis: ^V", status );
-                  msgSetd( "V", par[ 9 ] );
-                  msgOut( "", "   Vel gradient on 1st axis: ^V", status );
-                  msgSetd( "V", par[ 10 ] );
-                  msgOut( "", "   Vel gradient on 2nd axis: ^V", status );
-               }
-            }
-         }
-
-         if( !fitok ) {
-            msgOut( "", "   Cannot fit a Gaussian to this peak!", status );
-         }   
-   
-      }
-
-      if( ilevel > 2 ) msgBlank( status );
-
-/* Free resources */
-      cupidGC.data = astFree( cupidGC.data );
-      cupidGC.weight = astFree( cupidGC.weight );
-      cupidGC.res = astFree( cupidGC.res );
-      cupidGC.resu = astFree( cupidGC.resu );
-      cupidGC.initmodel = astFree( cupidGC.initmodel );
-      cupidGC.model = astFree( cupidGC.model );
-      cupidGC.resids = astFree( cupidGC.resids );
    }
 }
 

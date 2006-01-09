@@ -1,8 +1,8 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
-#include "star/kaplibs.h"
 #include "star/hds.h"
+#include "star/kaplibs.h"
 #include "ast.h"
 #include "par.h"
 #include "star/pda.h"
@@ -195,15 +195,14 @@ void makeclumps() {
 */      
 
 /* Local Variables: */
-   HDSLoc **clist;               /* Pointer to list of HDS locators */
-   char text[ 8 ];               /* Value of PARDIST parameter */
    HDSLoc *xloc;                 /* HDS locator for CUPID extension */
+   char text[ 8 ];               /* Value of PARDIST parameter */
+   double back;                  /* Background level */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
    float angle[ 2 ];             /* Values for ANGLE parameter */
-   float back;                   /* Background level */
    float beamfwhm;               /* Value of BEAMFWHM parameter */
    float fwhm1[ 2 ];             /* Values for FWHM1 parameter */
    float fwhm2[ 2 ];             /* Values for FWHM2 parameter */
@@ -218,6 +217,7 @@ void makeclumps() {
    float velfwhm;                /* Value of VELFWHM parameter */
    float vgrad1[ 2 ];            /* Values for VGRAD1 parameter */
    float vgrad2[ 2 ];            /* Values for VGRAD2 parameter */
+   int *clist;                   /* Pointer to list of NDF identifiers */
    int addnoise;                 /* Add Gaussian noise to output array? */
    int dims[ 3 ];                /* Dimensions before axis permutation */
    int i;                        /* Loop count */
@@ -262,7 +262,7 @@ void makeclumps() {
    normal = strcmp( text, "NORMAL" ) ? 0 : 1;
 
    parGet0r( "TRUNC", &trunc, status );
-   parGet0r( "BACK", &back, status );
+   parGet0d( "BACK", &back, status );
    parGet0i( "NCLUMP", &nclump, status );
    parGet0r( "RMS", &rms, status );
 
@@ -364,25 +364,24 @@ void makeclumps() {
          }
       }
 
-/* Extend the array of HDS Clump structures to include room for the new
-   one. */
-      clist = astGrow( clist, i + 1, sizeof( HDSLoc *) );
+/* Extend the array of Clump NDFs to include room for the new one. */
+      clist = astGrow( clist, i + 1, sizeof( int ) );
 
-/* Add the clump into the output array. This also creates an HDS "Clump" 
-   structure containing information about the clump. An HDS locator for 
-   this new Clump structure is added into the "clist" ring. */
+/* Add the clump into the output array. This also creates a "Clump" NDF
+   containing the clump data values. An NDF identifier for this new NDF 
+   is added into the "clist" array. */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, clist + i, i, 0.0, 1, 0, 0.0 );
+                            0, lbnd, clist + i, i, 0, 0.0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
 
    }
 
-/* Create the output data array by summing the contents of the HDS structures 
+/* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
-   cupidSumClumps( CUPID__FLOAT, ndim, lbnd, ubnd, nel, clist, nclump, back, 
-                   NULL, ipd2, "GAUSSCLUMPS" );
+   cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, clist, nclump,
+                   NULL, ipd2, "GAUSSCLUMPS", &back );
 
 /* Add Gaussian noise to the data. */
    if( *status == SAI__OK ) {
@@ -398,8 +397,7 @@ void makeclumps() {
 /* Create a CUPID extension in the output model NDF.*/
    ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
-/* Store the clump properties in the output catalogue. This also annuls the 
-   HDS locators stored within "clist". */
+/* Store the clump properties in the output catalogue. */
    cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, back,
                      "Output from CUPID:MAKECLUMPS" );
 

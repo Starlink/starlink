@@ -112,9 +112,10 @@
 
 
 
-int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-                  int ndim, int *dims, int skip[3], int naxis,
-                  CupidPixelSet **clumps ){
+int CGEN_FUNCTION(cupidCFXtend)( CupidPixelSet *ps1, CupidPixelSet *ps2, 
+                                 CGEN_TYPE *ipd, int *ipa, int ndim, int *dims,
+                                 int skip[3], int naxis, 
+                                 CupidPixelSet **clumps ){
 /*
 *  Name:
 *     cupidCFXtend
@@ -123,9 +124,9 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *     Extend a PixelSet by transfering pixels from a neighbouring PixelSet.
 
 *  Synopsis:
-*     int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
-*                       int ndim, int *dims, int skip[3], int naxis,
-*                       CupidPixelSet **clumps )
+*     int cupidCFXtend<X>( CupidPixelSet *ps1, CupidPixelSet *ps2, 
+*                          CGEN_TYPE *ipd, int *ipa, int ndim, int *dims,
+*                          int skip[3], int naxis, CupidPixelSet **clumps )
 
 *  Description:
 *     This function extends the destination PixelSet ("ps2") by transfering
@@ -140,6 +141,8 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *     ps2
 *        Pointer to the destination PixelSet structure to receive the pixels 
 *        moved from "ps1". May be NULL.
+*     ipd
+*        Pointer to the start of the input data array.
 *     ipa
 *        Pointer to the start of the array holding the integer index
 *        (if any) associated with each pixel in the data array. This
@@ -170,6 +173,14 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 *     Non-zero if any pixels were transferred into the destination
 *     PixelSet. Zero otherwise.
 
+*  Notes:
+*     - This function can be invoked using the generic cupidCFXtend macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidCFXtend<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidCFXtend... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -188,6 +199,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    int *nbl;        /* Pointer to list of neighbouring pixel indices */
    int *new_nbl;    /* Pointer to new list of neighbouring pixel indices */
    int dx;          /* Axis increment between pixel and clump peak */
+   int edge;        /* Is this an edge pixel? */
    int i;           /* Loop count */
    int ii;          /* Loop count */
    int ips;         /* Index of destination clump within source PixelList */
@@ -267,7 +279,10 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
             (ps1->pop)--;
 
 /* Calculate the nD GRID coords of this neighbouring pixel and extend the
-   bounding box of the destination PixelSet to include it. */
+   bounding box of the destination PixelSet to include it. At the
+  same time, set a flag indicating if the neighbouring pixel is an edge
+   pixel. */
+            edge = 0;
             rem = iv;
             if( ndim > 2 ) {
                xx = rem/skip[ 2 ] + 1;
@@ -275,6 +290,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
                if( xx > ps2->ubnd[ 2 ] ) ps2->ubnd[ 2 ] = xx;
                rem -= ( xx - 1 )*skip[ 2 ];
                x[ 2 ] = xx;
+               if( xx <= 1 || xx >= dims[ 2 ] ) edge = 1;
             } else {
                x[ 2 ] = 1;
             }
@@ -285,6 +301,7 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
                if( xx > ps2->ubnd[ 1 ] ) ps2->ubnd[ 1 ] = xx;
                rem -= ( xx - 1 )*skip[ 1 ];
                x[ 1 ] = xx;
+               if( xx <= 1 || xx >= dims[ 1 ] ) edge = 1;
             } else {
                x[ 1 ] = 1;
             }
@@ -293,6 +310,15 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
             if( xx < ps2->lbnd[ 0 ] ) ps2->lbnd[ 0 ] = xx;
             if( xx > ps2->ubnd[ 0 ] ) ps2->ubnd[ 0 ] = xx;
             x[ 0 ] = xx;
+            if( xx <= 1 || xx >= dims[ 0 ] ) edge = 1;
+
+/* If this pixel is an edge pixel, flag that the destination clump
+   touches the edge. */
+            if( edge ) ps2->edge = 1;
+
+/* If this pixel has a bad value, flag that the destination clump
+   includes bad pixels. */
+            if( ipd[ iv ] == CGEN_BAD ) ps2->bad = 1;
 
 /* Now add any neighbours of this pixel which are still in the source
    PixelSet to the list of new clump neighbours. First check the pixels 
@@ -453,10 +479,6 @@ int cupidCFXtend( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 
    }
 
-/* If the source PixelSet touches bad pixels or the edge, then so does
-   the destination PixelSet. */
-   if( ps1->bad ) ps2->bad = 1;
-   if( ps1->edge ) ps2->edge = 1;
 
 /* Return the result. */
    return ret;

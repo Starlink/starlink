@@ -168,6 +168,15 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    observed data. */
       cupidGC.sa = cupidConfigD( config, "SA", 1.0 );
 
+/* Get the Chi-square stiffness parameter "Sb" which encourages the 
+   background value to stay close to its initial value. This is an extra
+   stiffness added by DSB which is not in the Stutzki & Gusten paper. It
+   is used because the background value is usually determined by data
+   points which have very low weight and is thus poorly constrained. It
+   would thus be possibly to get completely erroneous background values  
+   without this extra stiffness. */
+      cupidGC.sb = cupidConfigD( config, "SB", 0.1 );
+
 /* Get the Chi-square stiffness parameter "S0" which encourages the peak
    amplitude of the fitted gaussian to be below the maximum value in the
    observed data. */
@@ -326,7 +335,7 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    }
 
 /* Store the mean of the background estimates, and the peak value. */
-   par[ 1 ] = off/ndim + 0.5*rms;
+   par[ 1 ] = off/ndim;
    par[ 0 ] = cupidGC.ymax - par[ 1 ];
 
 /* Get the pixel bounds (in the arrays GRID coordinate system) of the section 

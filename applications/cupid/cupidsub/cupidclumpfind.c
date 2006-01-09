@@ -3,11 +3,10 @@
 #include "cupid.h"
 #include "ast.h"
 #include "prm_par.h"
-#include "star/hds.h"
 
-HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
-                         double *ipv, double rms, AstKeyMap *config, int velax,
-                         int ilevel, int *nclump, double *bg ){
+int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+                     double *ipv, double rms, AstKeyMap *config, int velax,
+                     int ilevel, int *nclump ){
 /*
 *  Name:
 *     cupidClumpFind
@@ -17,10 +16,9 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the CLUMPFIND algorithm.
 
 *  Synopsis:
-*     HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-*                              void *ipd, double *ipv, double rms, 
-*                              AstKeyMap *config, int velax, int *nclump, 
-*                              double *bg )
+*     int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
+*                          void *ipd, double *ipv, double rms, 
+*                          AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 2 or 3 dimensional data
@@ -62,18 +60,16 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Amount of screen information to display (in range zero to 6).
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
-*     bg
-*        Pointer to a double to receive the global background level which
-*        should be added to the sum of the individual clumps to re-create the
-*        input data. For the ClumpFind algorithm, each clump includes the
-*        entire input data value, and so the returned value is fixed at zero.
 
 *  Retured Value:
 *     A pointer to a dynamically allocated array, which should
 *     be freed using astFree when no longer needed. It will contain a
-*     list of HDS locators. The number of locators in the list is given
-*     by the value returned in "*nclump". Each locator will locate a
-*     "Clump" structure describing a single clump.
+*     list of NDF identifiers. The number of identifiers in the list is 
+*     given by the value returned in "*nclump". Each NDF will hold the
+*     data values associated with a single clump and will be the smallest 
+*     possible NDF that completely contains the corresponding clump.
+*     Pixels not in the clump will be set bad. The pixel origin is set to
+*     the same value as the supplied NDF.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -92,7 +88,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    AstKeyMap *cfconfig; /* Configuration parameters for this algorithm */
    CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
-   HDSLoc **clist;      /* Pointer to the array of returned HDS locators */
+   int *clist;          /* Pointer to the array of returned NDF identifiers */
    double *levels;      /* Pointer to array of contour levels */
    double *mlist;       /* Pointer to list holding model valus */
    double clevel;       /* Current data level */
@@ -100,9 +96,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double maxd;         /* Maximum value in data array */
    double maxrem;       /* Maximum of remaining unassigned pixel values */
    double mind;         /* Minimum value in data array */
-   double par[11];      /* Parameters of Gaussian approximation to clump */
    double sum;          /* Integrated clump intensity */
-   double urms;         /* User-supplied RMS noise level */
    float fd;            /* Data value */   
    int *ipa;            /* Pointer to pixel assignment array */
    int *plist;          /* Pointer to list holding pixel indices */
@@ -127,10 +121,16 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Initialise */
    clist = NULL;
    *nclump = 0;
-   *bg = 0.0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return clist;
+
+/* Say which method is being used. */
+   if( ilevel > 0 ) {
+      msgBlank( status );
+      msgOut( "", "ClumpFind:", status );
+      if( ilevel > 1 ) msgBlank( status );
+   }
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
@@ -185,33 +185,6 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    pixels found. */
       index = 1;
 
-/* Allow the user to override the supplied RMS error value. */
-      urms = cupidConfigD( cfconfig, "RMS", VAL__BADD );
-      if( urms != VAL__BADD ) {
-         rms = urms;
-         if( ilevel > 1 ) {
-            msgSetd( "N", rms );
-            msgOut( "", "User-supplied RMS noise estimate: ^N", status );
-         }
-
-/* If the user did not supply an RMS value, access it again, this time
-   suppling the default RMS value. This is done to ensure that the
-   default RMS value is stored in the CUPID NDF extension when the
-   program exits. */
-      } else {
-         (void) cupidConfigD( cfconfig, "RMS", rms );
-      }
-
-/* Tell the user what RMS value is being used. */
-      if( ilevel > 1 ) {
-         msgSetd( "N", rms );
-         msgOut( "", "RMS noise level actually used: ^N", status );
-
-      } else if( ilevel > 0 ) {
-         msgSetd( "N", rms );
-         msgOut( "", "RMS noise level used: ^N", status );
-      }
-
 /* Find the largest and smallest good data value in the supplied array. */
       mind = VAL__MAXD;
       maxd = VAL__MIND;
@@ -235,9 +208,6 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the contour levels at which to check for clumps. */
       levels = cupidCFLevels( cfconfig, maxd, mind, rms, &nlevels );
-
-/* Mark start of contour levels. */
-      if( ilevel > 1 ) msgBlank( status );
 
 /* Initialise the largest data value in the remaining unassigned pixels. */
       maxrem = maxd;
@@ -300,8 +270,8 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Create the list of HDS clump objects to be returned. */
-      clist = astMalloc( sizeof( HDSLoc *)*(*nclump) );
+/* Create the list of NDFs to be returned. */
+      clist = astMalloc( sizeof( int )*(*nclump) );
       if( clist ) {
          mlist = NULL;
          plist = NULL;
@@ -327,7 +297,7 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                   nbad++;
 
                } else if( ps->edge ){
-                  nedge++;
+                  nedge++; 
 
                } else {
                   i++;
@@ -340,13 +310,12 @@ HDSLoc **cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Gather the information describing the clump. This also displays clump
    information on the screen as required by "ilevel". */
-                  cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, dims, 
-                                skip, slbnd, ilevel, ps, &sum, par, &list_size,
-                                &mlist, &plist );
+                  cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, 
+                                dims, skip, slbnd, ps, &list_size, &mlist, 
+                                &plist );
 
-
-/* Write this information to an HDS Clump structure. */
-                  cupidHdsClump( clist + i, sum, par, rms, ndim, ps->lbnd, 
+/* Write this information to an NDF. */
+                  cupidNdfClump( clist + i, sum, NULL, rms, ndim, ps->lbnd, 
                                  ps->ubnd, list_size, mlist, plist, slbnd, i + 1, 
                                  dax, NULL );
                }

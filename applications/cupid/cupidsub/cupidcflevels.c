@@ -114,8 +114,9 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 /* Get the contour interval using twice the RMS as the default. */
       cdelta = cupidConfigD( config, "DELTAT", 2.0*rms );
 
-/* Get the lowest contour level using twice the RMS as the default. */
-      clow = cupidConfigD( config, "TLOW", 3.0*rms );
+/* Get the lowest contour level using four times the RMS above the minimum
+   data value as the default. */
+      clow = cupidConfigD( config, "TLOW", mind + 4.0*rms );
 
 /* Report an error if the lowest contour level is below the minimum value
    in the data array. */
