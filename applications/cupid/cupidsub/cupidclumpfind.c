@@ -302,12 +302,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                } else {
                   i++;
   
-/* Tell the user the clump number. */
-                  if( ilevel > 2 ) {
-                     msgSeti( "I", i + 1 );
-                     msgOut( "", "Clump ^I:", status );
-                  }
-
 /* Gather the information describing the clump. This also displays clump
    information on the screen as required by "ilevel". */
                   cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, 

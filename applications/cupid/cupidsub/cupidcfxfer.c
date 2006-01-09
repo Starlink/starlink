@@ -114,5 +114,14 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    if( ps1->bad ) ps2->bad = 1;
    if( ps1->edge ) ps2->edge = 1;
 
+/* If the peak value in the source PixelSet is greater than in the
+   destination PixcelSet, use the source peak instead of the original
+   destination peak. */
+   if( ps1->vpeak > ps2->vpeak ) {
+      ps2->vpeak = ps1->vpeak;
+      ps2->peak[ 0 ] = ps1->peak[ 0 ];
+      ps2->peak[ 1 ] = ps1->peak[ 1 ];
+      ps2->peak[ 2 ] = ps1->peak[ 2 ];
+   }
 }
 
