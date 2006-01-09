@@ -56,6 +56,11 @@
 *        NGRP - The number of GRP group identifiers currently in use.
 *        The values of the IGRP and INDEX arguments are ignored. 
 *
+*        ACTIVE - Like "NGRP", except that in addition to returning the
+*        number of GRP group identifiers currently in use, the numerical
+*        identifier values are also listed on standard output (using
+*        MSG_OUT).
+*
 *     VALUE = INTEGER (Returned)
 *        The requested item of information.
 *     STATUS = INTEGER (Given and Returned)
@@ -70,6 +75,8 @@
 *        Original version
 *     29-SEP-2005 (DSB):
 *        Added NGRP item.
+*     9-JAN-2006 (DSB):
+*        Added ACTIVE item.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,15 +145,34 @@
       LITEM = ITEM
       CALL CHR_UCASE( LITEM )
 
-*  The NGRP item is special in that it does not use the supplied GRP
-*  identifier or name index.
+*  The NGRP and ACTIVE items are special in that they do not use the 
+*  supplied GRP identifier or name index, so check for these now, before
+*  we check the validity of the supplied GRP identifier.
       IF( LITEM( : 4 ) .EQ. 'NGRP' ) THEN
 
-*  Count the number of used slots in the common arrays.
+*  For NGRP, just count the number of used slots in the common arrays.
          VALUE = 0
          DO SLOT = 1, GRP__MAXG
             IF( CMN_USED( SLOT ) ) VALUE = VALUE + 1         
          END DO
+
+*  All done, so jump to the end.
+         GO TO 999
+
+      ELSE IF( LITEM( : 6 ) .EQ. 'ACTIVE' ) THEN
+
+*  For ACTIVE, also display the identifier values.
+         VALUE = 0
+         DO SLOT = 1, GRP__MAXG
+            IF( CMN_USED( SLOT ) ) THEN
+               VALUE = VALUE + 1         
+               CALL MSG_SETI( 'ID', CMN_CHK( SLOT ) )
+               CALL MSG_SETC( 'ID', ' ' )
+            END IF
+         END DO
+
+         CALL MSG_OUT( ' ', 'Currently issued GRP identifiers: ^ID',
+     :                 STATUS ) 
 
 *  All done, so jump to the end.
          GO TO 999
