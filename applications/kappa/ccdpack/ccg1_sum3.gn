@@ -124,8 +124,8 @@
 *  Sum the data values.
                SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) )
 
-*  Update the contribution buffer - all values contribute when forming
-*  mean.
+*  Update the contribution buffer; all values contribute when forming
+*  the sum.
                NCON( J ) = NCON( J ) + 1.0D0
             END IF
     5    CONTINUE

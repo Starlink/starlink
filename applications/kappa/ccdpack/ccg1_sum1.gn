@@ -46,7 +46,7 @@
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
-*     STACK, VARNCE, RESULT, and RESVAR arguments supplied to the 
+*     STACK, VARS, RESULT, and RESVAR arguments supplied to the 
 *     routine must have the data type specified.  It is not wise to 
 *     choose an integer type as the chances of overflow are high.
 
@@ -98,7 +98,7 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       INTEGER NGOOD              ! Number of good pixels
-      DOUBLE PRECISION SUM1      ! Sum of weights
+      DOUBLE PRECISION SUM1      ! Sum of variances
       DOUBLE PRECISION SUM2      ! Sum of values
 
 *  Internal References:
@@ -136,8 +136,8 @@
 *  Sum the data values.
                SUM2 = SUM2 + NUM_<T>TOD( STACK( I, J ) )
 
-*  Update the contribution buffer - all values contribute when forming
-*  mean.
+*  Update the contribution buffer; all values contribute when forming
+*  the sum.
                NCON( J ) = NCON( J ) + 1.0D0
             END IF
     5    CONTINUE
