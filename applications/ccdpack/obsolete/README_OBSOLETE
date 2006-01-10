@@ -9,3 +9,12 @@ be of historical use or value at some time in the future.
 
 Mark Taylor
 6-JUL-2004
+
+Most of the files have now been cvs remove'd into the Attic. To
+recover these you'll need to inspect the cvs log output and retrieve
+a specific version (or use the cvsweb interface to show the Attic
+contents).
+
+Peter W. Draper
+
+10-JAN-2006
