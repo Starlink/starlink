@@ -127,6 +127,7 @@ typedef struct smfData {
   dim_t dims[NDF__MXDIM];  /* Dimensions of data array */
   int ndims;               /* Number of active dimensions in "dims" */
   int refcount;            /* Reference count for data object */
+  int virtual;             /* Flag for extracted timeslices */
 } smfData;
 
 #endif /* SMF_TYP_DEFINED */
