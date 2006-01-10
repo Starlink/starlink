@@ -24,6 +24,10 @@ AC_HEADER_STDC
 AC_PATH_XTRA
 AC_PROG_LIBTOOL
 
+dnl    Having no X11 is fatal.
+if test "$no_x" = "yes"; then
+   AC_MSG_ERROR([No X11 development system found. Cannot continue])
+fi
 
 STAR_CNF_COMPATIBLE_SYMBOLS
  
