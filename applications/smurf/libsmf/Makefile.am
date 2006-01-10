@@ -11,7 +11,9 @@ smf_tslice_ast.c \
 smf_flatfield.c \
 smf_check_flat.c\
 smf_flatten.c \
-smf_clone_data.c
+smf_clone_data.c \
+smf_tslice.c \
+smf_insert_tslice.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
