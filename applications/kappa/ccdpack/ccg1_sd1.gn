@@ -33,7 +33,7 @@
 *        output pixel.
 *     RESULT( NPIX ) = <TYPE> (Returned)
 *        The output line of data.
-*     RESVAR( NPIX ) = REAL (Returned)
+*     RESVAR( NPIX ) = <TYPE> (Returned)
 *        The output variances.
 *     NCON( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        The actual number of contributing pixels from each input line
@@ -55,6 +55,8 @@
 *  History:
 *     2005 December 27 (MJC):
 *        Original version.
+*     2006 January 8 (MJC):
+*        Correct variance calculation.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -159,7 +161,7 @@
 *  deviation value of zero.
             VARNCE = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
             IF ( ( NGOOD .EQ. 1 ) .OR. ( VARNCE .LT. 0.0D0 ) ) THEN
-               RESULT( I ) = 0.0D0
+               STDEV = 0.0D0
 
 *  Otherwise, calculate the standard deviation normally.
             ELSE
@@ -172,7 +174,7 @@
                RESVAR( I ) = VAL__BAD<T>
             ELSE
                RESULT( I ) = NUM_DTO<T>( STDEV )
-               RESVAR( I ) = NUM_DTO<T>( STDEV / DBLE( NGOOD ) )
+               RESVAR( I ) = NUM_DTO<T>( STDEV * STDEV / DBLE( NGOOD ) )
             END IF
          ELSE
 
