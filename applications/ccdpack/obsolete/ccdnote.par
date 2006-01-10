@@ -1,3 +1,0 @@
-note,s,a,,,,""
-logfile,s,q,"CCDPACK.LOG",,,"Logfile name [G]"
-logto,s,q,"Both",,,"Write log to (Logfile,Terminal,Neither,Both) [G]"
