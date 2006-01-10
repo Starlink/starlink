@@ -1,7 +1,7 @@
-      SUBROUTINE CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
-     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       RESULT, COIND, WRK1, WRK2, NCON, POINT, 
-     :                       USED, STATUS )
+      SUBROUTINE CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS,
+     :                       IMETH, MINPIX, NITER, NSIGMA, ALPHA, RMIN,
+     :                       RMAX, RESULT, COIND, WRK1, WRK2, NCON,
+     :                       POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_CM3RR
@@ -14,9 +14,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
-*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT, COIND,
-*                      WRK1, WRK2, NCON, POINT, USED, STATUS )
+*     CALL CCG1_CM3RR( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS, IMETH,
+*                      MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
+*                      COIND, WRK1, WRK2, NCON, POINT, USED, STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
@@ -38,10 +38,11 @@
 *     VARS( NLINES ) = DOUBLE PRECISION (Given)
 *        The variance to to used for each line of data.
 *     COORDS( NLINES ) = REAL (Given)
-*        The axis co-ordinates or widths along the collapse axis.  It
-*        is accessed only for NMETH= 22, 23, 33, 34 where it is
-*        interpreted as co-ordinates; and for NMETH=21, where the array
-*        is used to stored pixel widths.
+*        The axis co-ordinates along the collapse axis.  It is accessed
+*        only for IMETH= 22, 23, 33, 34.
+*     WIDTHS( NLINES ) = REAL (Given)
+*        The widths along the collapse axis.  It is accessed only for
+*        IMETH = 21, 22, or 23.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -142,6 +143,8 @@
 *        Add COORDS argument.
 *     2006 January 5 (MJC):
 *        Add COIND argument.
+*     2006 January 6 (MJC):
+*        Add WIDTHS argument and calls for IMETH = 21, 22, 23.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,6 +166,7 @@
       REAL STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NLINES )
       REAL COORDS( NLINES )
+      REAL WIDTHS( NLINES )
       INTEGER NITER
       REAL NSIGMA
       REAL ALPHA
@@ -275,6 +279,24 @@
          CALL CCG1_SD3R( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
      :                   STATUS )
 
+      ELSE IF ( IMETH .EQ. 21 ) THEN
+
+*  Forming integrated value.
+         CALL CCG1_FLX3R( NPIX, NLINES, STACK, WIDTHS, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 22 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG1_IWC3R( NPIX, NLINES, STACK, COORDS, WIDTHS, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 23 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG1_IWD3R( NPIX, NLINES, STACK, COORDS, WIDTHS, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
       ELSE IF ( IMETH .EQ. 24 ) THEN
 
 *  Forming mean absolute deviation.
@@ -291,13 +313,13 @@
 
 *  Forming array of maxima.
          CALL CCG1_MXR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
       ELSE IF ( IMETH .EQ. 32 ) THEN
 
 *  Forming array of minima.
          CALL CCG1_MNR3R( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
       ELSE IF ( IMETH .EQ. 33 ) THEN
 
