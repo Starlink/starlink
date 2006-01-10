@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
-     :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, NDIM2, 
-     :                       LBND2, UBND2, DOUT, VOUT, WORK1, WORK2, 
-     :                       STATUS )
+     :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, WIN,
+     :                       NDIM2, LBND2, UBND2, DOUT, VOUT, WORK1, 
+     *                       WORK2, STATUS )
 *+
 *  Name:
 *     KPS1_CLPS<T>
@@ -15,8 +15,8 @@
 
 *  Invocation:
 *     CALL KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, NDIM1, 
-*                      LBND1, UBND1, DIN, VIN, CIN, NDIM2, LBND2, UBND2,
-*                      DOUT, VOUT, WORK1, WORK2, STATUS )
+*                      LBND1, UBND1, DIN, VIN, CIN, WIN, NDIM2, LBND2,
+*                      UBND2, DOUT, VOUT, WORK1, WORK2, STATUS )
 
 *  Description:
 *     This routine collapses the supplied data and variance arrays
@@ -56,6 +56,11 @@
 *        .TRUE.
 *     CIN( * ) = <TYPE> (Given)
 *        The co-ordinates along the collapse axis, starting at index LO.
+*        It is only accessed if METH is one of 'INTEG', 'IWC', 'IWD',
+*        'COMAX', or 'COMIN'.
+*     WIN( * ) = <TYPE> (Given)
+*        The pixel widths along the collapse axis, starting at index LO.
+*        It is only accessed if METH is one of 'INTEG', 'IWC', or 'IWD'.
 *     NDIM2 = INTEGER (Given)
 *        The number of axes in the output array.
 *     LBND2( NDIM2 ) = INTEGER (Given)
@@ -117,6 +122,8 @@
 *        for COMAX and COMIN.
 *     2005 January 2 (MJC):
 *        Added CIN argument, passed through to main subroutines.
+*     2005 January 6 (MJC):
+*        Added WIN argument, passed through to main subroutines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,6 +154,7 @@
       <TYPE> DIN( * )
       <TYPE> VIN( * )
       <TYPE> CIN( * )
+      <TYPE> WIN( * )
       INTEGER NDIM2
       INTEGER LBND2( NDIM2 )
       INTEGER UBND2( NDIM2 )
@@ -368,7 +376,7 @@
 
 *  First deal with cases where input variances are available.
 *  Output variances are generated based on these input variances.
-      IF( VAR ) THEN
+      IF ( VAR ) THEN
 
 *  If we are using a median estimator, and we are producing output
 *  variances, and the input image is big, we will estimate the variance
@@ -376,23 +384,25 @@
 *  the memory requirements for the covariance array becomes huge for 
 *  large images.  "Median with estimated variances" is treated as a new
 *  IMETH value, 300.
-         IF( IMETH .EQ. 3 .AND. NLIN .GT. 300 ) IMETH = 300
+         IF ( IMETH .EQ. 3 .AND. NLIN .GT. 300 ) IMETH = 300
 
 *  Allocate memory.
          CALL PSX_CALLOC( NLIN, '_DOUBLE', IPPP, STATUS )
          NMAT = NLIN * ( NLIN + 1 ) / 2 
          IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) THEN
-            CALL PSX_CALLOC( NLIN*NMAT, '_DOUBLE', IPCOV, STATUS )
+            CALL PSX_CALLOC( NLIN * NMAT, '_DOUBLE', IPCOV, STATUS )
          ELSE
             IPCOV = IPPP
          END IF
 
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
-         IF( USEWRK ) THEN   
-            CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, CIN, IMETH, 
-     :                           MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+         IF ( USEWRK ) THEN
+            CALL CCG1_CM1<T><T>( WORK1, NEL2, NLIN, WORK2, CIN, WIN, 
+     :                           IMETH, 
+     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
      :                           7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
+     :                           %VAL( CNF_PVAL( IPCOIN ) ), 
      :                           %VAL( CNF_PVAL( IPWRK1 ) ), 
      :                           %VAL( CNF_PVAL( IPWRK2 ) ),
      :                           %VAL( CNF_PVAL( IPPP ) ), 
@@ -404,9 +414,10 @@
 *  If the collapse axis is the last axis, we can use the original input
          ELSE 
             CALL CCG1_CM1<T><T>( DIN( START ), NEL2, NLIN, VIN( START ),
-     :                           CIN, IMETH, 
-     :                           MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
-     :                           7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT, 
+     :                           CIN, WIN, IMETH, 
+     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
+     :                           7, 4.0, 0.0, 0.0, 0.0, DOUT, VOUT,
+     :                           %VAL( CNF_PVAL( IPCOIN ) ), 
      :                           %VAL( CNF_PVAL( IPWRK1 ) ), 
      :                           %VAL( CNF_PVAL( IPWRK2 ) ),
      :                           %VAL( CNF_PVAL( IPPP ) ), 
@@ -417,7 +428,7 @@
          END IF
 
          CALL PSX_FREE( IPPP, STATUS )
-         IF( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) 
+         IF ( IMETH .NE. 1 .AND. IMETH .NE. 2 .AND. IMETH .NE. 300 ) 
      :     CALL PSX_FREE( IPCOV, STATUS )
 
 *  Now deal with cases where input variances are not available.  No
@@ -429,10 +440,11 @@
 
 *  If the axis along which the input array was collapsed was not the
 *  last axis, we need to use the re-ordered data in the work arrays.
-         IF( USEWRK ) THEN   
+         IF ( USEWRK ) THEN   
             CALL CCG1_CM3<T><T>( WORK1, NEL2, NLIN, 
-     :                           %VAL( CNF_PVAL( IPVAR ) ), CIN, IMETH,
-     :                           MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                           %VAL( CNF_PVAL( IPVAR ) ), CIN, WIN,
+     :                           IMETH,
+     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
      :                           7, 4.0, 0.0, 0.0, 0.0,
      :                           DOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
      :                           %VAL( CNF_PVAL( IPWRK1 ) ),
@@ -445,8 +457,9 @@
 *  data.
          ELSE 
             CALL CCG1_CM3<T><T>( DIN( START ), NEL2, NLIN, 
-     :                           %VAL( CNF_PVAL( IPVAR ) ), CIN, IMETH,
-     :                           MAX( 1, NINT( WLIM*REAL( NLIN ) ) ),
+     :                           %VAL( CNF_PVAL( IPVAR ) ), CIN, WIN,
+     :                           IMETH, 
+     :                           MAX( 1, NINT( WLIM * REAL( NLIN ) ) ),
      :                           7, 4.0, 0.0, 0.0, 0.0,
      :                           DOUT, %VAL( CNF_PVAL( IPCOIN ) ), 
      :                           %VAL( CNF_PVAL( IPWRK1 ) ),
