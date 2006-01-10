@@ -27,6 +27,9 @@ stamp-h1
 make.log
 .deps
 ccg1_ad?.f
+ccg1_flx?.f
+ccg1_iwc?.f
+ccg1_iwd?.f
 ccg1_mn??.f
 ccg1_mx??.f
 ccg1_rms?.f
