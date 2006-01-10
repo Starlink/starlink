@@ -101,4 +101,8 @@ void smf_flatten ( smfData *data, int *status );
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
+void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
+
+void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
+
 #endif /* SMF_DEFINED */
