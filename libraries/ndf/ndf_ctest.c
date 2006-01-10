@@ -61,6 +61,7 @@ int main( int argc, char *argv[] ) {
    int place;                    /* NDF placeholder                         */
    void *pntr;                   /* Pointer to mapped array                 */
    HDSLoc * xloc = NULL;         /* Locator of extension                    */
+   int itemp;                    /* Temporary integer */
 
 /* Initialise the global status.                                            */
    status = SAI__OK;
@@ -91,6 +92,8 @@ int main( int argc, char *argv[] ) {
    /* Create an extension */
    ndfXnew( indf, "TEST", "TESTME", 0, dim, &xloc, &status );
    datAnnul( &xloc, &status );
+   ndfXpt0i( 42, indf, "TEST", "INT", &status );
+
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
@@ -104,6 +107,15 @@ int main( int argc, char *argv[] ) {
 /* Sum the data elements.                                                   */
    if ( status == SAI__OK ) {
        for ( isum = 0, i = 0; i < el; i++ ) isum += ( (int *) pntr )[ i ];
+   }
+
+/* Get the value from the extension */
+   ndfXgt0i( indf, "TEST", "INT", &itemp, &status);
+   if ( status == SAI__OK ) {
+      if ( itemp != 42 ) {
+         status = SAI__ERROR;
+         emsRep( "NDF_TEST_ERRx", "NDF_TEST_C: Get integer from extension failed", &status );
+      }
    }
 
 /* Clean up, deleting the NDF.                                              */
