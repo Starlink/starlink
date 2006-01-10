@@ -24,14 +24,18 @@ ccg1_umr3r.f
 
 
 # Generic routines.
-GEN_F_ROUTINES = $(CCG_N_GEN:.gen=.f) $(CCG_GN_GEN:.gn=.f)
+GEN_F_ROUTINES = $(CCG_N_GEN:.gen=.f) $(CCG_GN_GEN:.gn=.f) \
+$(CCG_GDR_GEN:.gdr=.f)
 
 CCG_GN_GEN = ccg1_mxd1.gn ccg1_mxd3.gn ccg1_mxr1.gn ccg1_mxr3.gn \
 ccg1_mnd1.gn ccg1_mnd3.gn ccg1_mnr1.gn ccg1_mnr3.gn \
 ccg1_ad1.gn ccg1_ad3.gn ccg1_rms1.gn ccg1_rms3.gn ccg1_sd1.gn \
 ccg1_sd3.gn ccg1_sum1.gn ccg1_sum3.gn
 
-SUFFIXES = .gen .gn .f
+CCG_GDR_GEN = ccg1_flx1.gdr ccg1_flx3.gdr ccg1_iwc1.gdr ccg1_iwc3.gdr \
+ccg1_iwd1.gdr ccg1_iwd3.gdr
+
+SUFFIXES = .gen .gn .gdr .f
 
 #  Run generic to get numeric types.
 .gen.f:
@@ -40,6 +44,8 @@ SUFFIXES = .gen .gn .f
 .gn.f:
 	$(FGENERIC)  -t n $<
 
+.gdr.f:
+	$(FGENERIC)  -t dr $<
 
 PRIVATE_INCLUDES = CCD1_PAR
 
