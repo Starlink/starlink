@@ -1,7 +1,7 @@
-      SUBROUTINE CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH,
-     :                       MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX,
-     :                       RESULT, WRK1, WRK2, NCON, POINT, USED,
-     :                       STATUS )
+      SUBROUTINE CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS,
+     :                       IMETH, MINPIX, NITER, NSIGMA, ALPHA, RMIN,
+     :                       RMAX, RESULT, COIND, WRK1, WRK2, NCON,
+     :                       POINT, USED, STATUS )
 *+
 *  Name:
 *     CCG1_CM3DD
@@ -14,9 +14,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, IMETH, MINPIX,
-*                      NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
-*                      WRK1, WRK2, NCON, POINT, USED, STATUS )
+*     CALL CCG1_CM3DD( STACK, NPIX, NLINES, VARS, COORDS, WIDTHS, IMETH,
+*                      MINPIX, NITER, NSIGMA, ALPHA, RMIN, RMAX, RESULT,
+*                      COIND, WRK1, WRK2, NCON, POINT, USED, STATUS )
 
 *  Description:
 *     The routine works along each line of the input stack of lines,
@@ -38,10 +38,11 @@
 *     VARS( NLINES ) = DOUBLE PRECISION (Given)
 *        The variance to to used for each line of data.
 *     COORDS( NLINES ) = DOUBLE PRECISION (Given)
-*        The axis co-ordinates or widths along the collapse axis.  It
-*        is accessed only for NMETH= 22, 23, 33, 34 where it is
-*        interpreted as co-ordinates; and for NMETH=21, where the array
-*        is used to stored pixel widths.
+*        The axis co-ordinates along the collapse axis.  It is accessed
+*        only for IMETH= 22, 23, 33, 34.
+*     WIDTHS( NLINES ) = DOUBLE PRECISION (Given)
+*        The widths along the collapse axis.  It is accessed only for
+*        IMETH = 21, 22, or 23.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -83,6 +84,8 @@
 *        The maximum allowed data value ( IMETH = 7 )
 *     RESULT( NPIX ) = DOUBLE PRECISION (Returned)
 *        The output line of data.
+*     COIND( NPIX ) = INTEGER (Given and Returned)
+*        Workspace to hold co-ordinate indices.
 *     WRK1( NLINES ) = DOUBLE PRECISION (Given and Returned)
 *        Workspace for calculations.
 *     WRK2( NLINES ) = DOUBLE PRECISION (Given and Returned)
@@ -137,6 +140,10 @@
 *        Add summation method.
 *     2006 January 2 (MJC):
 *        Add COORDS argument.
+*     2006 January 5 (MJC):
+*        Add COIND argument.
+*     2006 January 6 (MJC):
+*        Add WIDTHS argument and calls for IMETH = 21, 22, 23.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,6 +165,7 @@
       DOUBLE PRECISION STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NLINES )
       DOUBLE PRECISION COORDS( NLINES )
+      DOUBLE PRECISION WIDTHS( NLINES )
       INTEGER NITER
       REAL NSIGMA
       REAL ALPHA
@@ -165,11 +173,12 @@
       REAL RMAX
 
 *  Arguments Given and Returned:
+      INTEGER COIND( NPIX )
+      DOUBLE PRECISION WRK1( NLINES )
+      DOUBLE PRECISION WRK2( NLINES )
       DOUBLE PRECISION NCON( NLINES )
       INTEGER POINT( NLINES )
       LOGICAL USED( NLINES )
-      DOUBLE PRECISION WRK1( NLINES )
-      DOUBLE PRECISION WRK2( NLINES )
 
 *  Arguments Returned:
       DOUBLE PRECISION RESULT( NPIX )
@@ -269,6 +278,24 @@
          CALL CCG1_SD3D( NPIX, NLINES, STACK, MINPIX, RESULT, NCON,
      :                   STATUS )
 
+      ELSE IF ( IMETH .EQ. 21 ) THEN
+
+*  Forming integrated value.
+         CALL CCG1_FLX3D( NPIX, NLINES, STACK, WIDTHS, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 22 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG1_IWC3D( NPIX, NLINES, STACK, COORDS, WIDTHS, MINPIX,
+     :                    RESULT, NCON, STATUS )
+
+      ELSE IF ( IMETH .EQ. 23 ) THEN
+
+*  Forming intensity-weighted co-ordinate dispersion.
+         CALL CCG1_IWD3D( NPIX, NLINES, STACK, COORDS, WIDTHS, 
+     :                    MINPIX, RESULT, NCON, STATUS )
+
       ELSE IF ( IMETH .EQ. 24 ) THEN
 
 *  Forming mean absolute deviation.
@@ -285,34 +312,34 @@
 
 *  Forming array of maxima.
          CALL CCG1_MXD3D( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
       ELSE IF ( IMETH .EQ. 32 ) THEN
 
 *  Forming array of minima.
          CALL CCG1_MND3D( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
       ELSE IF ( IMETH .EQ. 33 ) THEN
 
 *  Forming array of maxima and corresponding indices.
          CALL CCG1_MXD3D( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
 *  Convert the pixel indices of the maxima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVD( NLINES, POINT, NLINES, COORDS, RESULT, NBAD,
+         CALL KPG1_VASVD( NLINES, COIND, NLINES, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE IF ( IMETH .EQ. 34 ) THEN
 
 *  Forming array of minima and corresponding indices.
          CALL CCG1_MND3D( .TRUE., NPIX, NLINES, STACK, RESULT,
-     :                    POINT, WRK1, STATUS )
+     :                    COIND, WRK1, STATUS )
 
 *  Convert the pixel indices of the minima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVD( NLINES, POINT, NLINES, COORDS, RESULT, NBAD,
+         CALL KPG1_VASVD( NLINES, COIND, NLINES, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE
