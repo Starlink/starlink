@@ -1,6 +1,6 @@
 #!perl -w
 
-use Test::More tests => 10;
+use Test::More tests => 9;
 use strict;
 no strict "vars";
 
@@ -26,9 +26,6 @@ die "Couldn't find test file: $file\n" unless (-e "$file.sdf");
 
 ndf_find(&NDF::DAT__ROOT, $file, my $indf, $status);
 is($status, &NDF::SAI__OK, "Check status");
-
-my $wcs = ndfGtwcs( $indf, $status );
-is($status, &NDF::SAI__OK, "Check ndfGtwcs status");
 
 ndf_xloc($indf, 'FITS', 'READ', my $floc, $status);
 is($status, &NDF::SAI__OK, "Check status");
