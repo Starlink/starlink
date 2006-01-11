@@ -253,6 +253,7 @@ sub mem2array ($$$) {
 sub ndfGtwcs {
   require Starlink::AST;
   my $buffer = ndfGtwcs_( $_[0], $_[1]);
+  return undef unless $_[1] == &NDF::SAI__OK;
   my @strings = split(/\n/, $buffer);
   my $chan = new Starlink::AST::Channel( 
 					source => sub { 
