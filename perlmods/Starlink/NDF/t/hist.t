@@ -1,7 +1,6 @@
 #!perl -w
 
-use Test::More tests => 15;
-use File::Copy;
+use Test::More tests => 16;
 use strict;
 
 use_ok( "NDF" );
@@ -15,9 +14,6 @@ use_ok( "NDF" );
 my $oldfile = "test";
 my $file = "twrite";
 
-copy("$oldfile.sdf","$file.sdf");
-
-
 # initialise global status
 my $status = &NDF::SAI__OK;
 
@@ -26,11 +22,14 @@ err_begin($status);
 ndf_begin();
 
 # Open up the test file
-die "Couldn't find test file: $file\n" unless (-e "$file.sdf");
-
+die "Couldn't find test file: $oldfile\n" unless (-e "$oldfile.sdf");
 ndf_happn("Perl test", $status);
+
+# Copy the reference file for testing purposes
+ndf_place( &NDF::DAT__ROOT, $file, my $place, $status );
 is( $status, &NDF::SAI__OK, "check status");
-ndf_open(&NDF::DAT__ROOT,$file,'UPDATE','OLD',my $indf,my $place,$status);
+ndf_find( &NDF::DAT__ROOT, $oldfile, my $oldndf, $status );
+ndf_copy($oldndf, $place, my $indf, $status );
 is( $status, &NDF::SAI__OK, "check status");
 
 ndf_hcre($indf, $status);
@@ -60,14 +59,12 @@ is( $status, &NDF::SAI__OK, "check status");
 ndf_hinfo($indf, 'APPLICATION', $nrec, my $val, $status);
 is( $status, &NDF::SAI__OK, "check status");
 
-
-ndf_annul($indf, $status);
+ndf_delet($indf, $status);
 is( $status, &NDF::SAI__OK, "check status");
+ok( !-e "$file.sdf", "File no longer exists");
+
 ndf_end($status);
 is( $status, &NDF::SAI__OK, "check status");
 err_end($status);
-
-unlink("$file.sdf");
-
 
 is(($nrec-$nnrec),1,"Test hist diff");

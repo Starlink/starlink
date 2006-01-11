@@ -1,9 +1,8 @@
 #!perl -w
 
-use Test::More tests => 22;
+use Test::More tests => 24;
 use warnings;
 use strict;
-use File::Copy;
 
 use_ok( "NDF" );
 
@@ -16,8 +15,6 @@ use_ok( "NDF" );
 my $oldfile = "test";
 my $file = "twrite";
 
-copy( "$oldfile.sdf", "$file.sdf");
-
 # initialise global status
 my $status = &NDF::SAI__OK;
 
@@ -26,10 +23,14 @@ err_begin($status);
 ndf_begin();
 
 # Open up the test file
-die "Couldn't find test file: $file\n" unless (-e "$file.sdf");
+die "Couldn't find test file: $oldfile\n" unless (-e "$oldfile.sdf");
 
-ndf_open(&NDF::DAT__ROOT,$file,'UPDATE','OLD',my $indf,my $place,$status);
-is($status, &NDF::SAI__OK, "Check status");
+# Copy the reference file for testing purposes
+ndf_place( &NDF::DAT__ROOT, $file, my $place, $status );
+is( $status, &NDF::SAI__OK, "check status");
+ndf_find( &NDF::DAT__ROOT, $oldfile, my $oldndf, $status );
+ndf_copy($oldndf, $place, my $indf, $status );
+is( $status, &NDF::SAI__OK, "check status");
 
 # Add an extension
 my @dim = ();
@@ -81,13 +82,13 @@ is($status, &NDF::SAI__OK, "Check status");
 ndf_xdel($indf, 'ARY_TEST', $status);
 is($status, &NDF::SAI__OK, "Check status");
 
-ndf_annul($indf, $status);
-is($status, &NDF::SAI__OK, "Check status");
+ndf_delet($indf, $status);
+is( $status, &NDF::SAI__OK, "check status");
+ok( !-e "$file.sdf", "File no longer exists");
+
 ndf_end($status);
 is($status, &NDF::SAI__OK, "Check status");
 err_end($status);
-
-unlink("$file.sdf") || die "EEK! Couldnt remove file";
 
 is( $cval, $cinval, "Compare CHAR");
 is( $lval, $linval, "Compare LOGICAL");
