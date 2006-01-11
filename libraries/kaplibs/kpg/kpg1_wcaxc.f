@@ -4,8 +4,7 @@
 *     KPG1_WCAXC
 
 *  Purpose:
-*     Obtain AXIS centres from a WCS component FrameSet or AXIS
-*     structure.
+*     Obtain co-ordinates for an axis from a WCS component FrameSet.
 
 *  Language:
 *     Starlink Fortran 77
@@ -14,9 +13,9 @@
 *     CALL KPG1_WCAXC( INDF, FS, AXIS, EL, CENTRE, STATUS )
 
 *  Description:
-*     This routine returns an array of axis centres along a nominated
-*     axis, that are derived from an AXIS Frame in the supplied 
-*     FrameSet, or failing that an NDF AXIS structure.
+*     This routine returns an array of world co-ordinates along a
+*     nominated axis, that are derived from the Current Frame in the
+*     supplied FrameSet.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -40,6 +39,9 @@
 *  History:
 *     2006 January 3 (MJC):
 *        Original version based upon DSB's FTS1_WCSAX.
+*     2006 January 6 (MJC):
+*        Mappings between current and pixel co-ordinates, i.e.
+*        ties to AXIS Frame removed.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -118,19 +120,10 @@
 *  If found, get the index of the PIXEL Frame.
          IPIXEL = AST_GETI( FS, 'CURRENT', STATUS )
 
-*  Search for an AXIS Frame in the FrameSet.  If one is found, it
-*  becomes the current Frame.  If one is not found, just map
-*  the axis structure.
-         IF ( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ), 
-     :                           'AXIS', STATUS ) .NE. AST__NULL ) THEN
+*  Get the mapping from the PIXEL Frame to the Current Frame.
+         MAP1 = AST_GETMAPPING( FS, IPIXEL, ICURR, STATUS )
 
-*  If found, get the index of the AXIS Frame.
-            IAXIS = AST_GETI( FS, 'CURRENT', STATUS )
-
-*  Get the mapping from the PIXEL Frame to the AXIS Frame.
-            MAP1 = AST_GETMAPPING( FS, IPIXEL, IAXIS, STATUS )
-
-*  The AXIS coordinates associated with each axis in an NDF are 
+*  The AXIS co-ordinates associated with each axis in an NDF are 
 *  independent of other axes.  Therefore, each axis can be treated 
 *  separately as one-dimensional co-ordinate system.  We use AST
 *  PermMaps to pick the axis to process.
@@ -140,16 +133,16 @@
 *  axes are presumed to be independent of each other, it does not matter
 *  what values we use so long as the axis being processed is assigned
 *  the value 1.
-            DO IAX = 1, NDIM
-               OUTPRM( IAX ) = 0
-            END DO
-            OUTPRM( AXIS ) = 1
+         DO IAX = 1, NDIM
+            OUTPRM( IAX ) = 0
+         END DO
+         OUTPRM( AXIS ) = 1
 
 *  Process the axis in a separate AST context.
-            CALL AST_BEGIN( STATUS )
+         CALL AST_BEGIN( STATUS )
 
-*  MAP1 goes from n-dimensional PIXEL coords to n-dimensional AXIS 
-*  co-ordinates.  The NDF AXIS structures require each axis to be
+*  MAP1 goes from n-dimensional PIXEL co-ordimnates to n-dimensional 
+*  AXIS co-ordinates.  The NDF AXIS structures require each axis to be
 *  independent of all others, so we can process the required axis 
 *  without worrying about the others.  So we want to modify MAP1 such
 *  that it maps only a single axis.  To do this we add a PermMap to the 
@@ -157,46 +150,36 @@
 *  Create two PermMaps to extract axis AXIS from an n-dimensional Frame;
 *  MAP2 goes from one-dimensional to n-dimensional, MAP3 goes in the
 *  opposite sense.
-            MAP2 = AST_PERMMAP( 1, AXIS, NDIM, OUTPRM, 0.0D0, ' ',
-     :                          STATUS )
-            MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, AXIS, 0.0D0, ' ', 
-     :                          STATUS )
+         MAP2 = AST_PERMMAP( 1, AXIS, NDIM, OUTPRM, 0.0D0, ' ',
+     :                       STATUS )
+         MAP3 = AST_PERMMAP( NDIM, OUTPRM, 1, AXIS, 0.0D0, ' ', 
+     :                       STATUS )
 
 *  Concatenate the Mappings together, to get a mapping between axis
 *  AXIS in the PIXEL Frame to the same axis in the AXIS Frame.
-            MAP4 = AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', STATUS )
-            MAP5 = AST_CMPMAP( MAP4, MAP3, .TRUE., ' ', STATUS )
+         MAP4 = AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', STATUS )
+         MAP5 = AST_CMPMAP( MAP4, MAP3, .TRUE., ' ', STATUS )
 
-*  Map the NDF's Axis Centre array. The NDF library will fill this array
-*  with the pixel coordinates at the centre of each pixel (the default
-*  Axis coordinate system).
-            CALL NDF_AMAP( INDF, 'CENTRE', AXIS, '_DOUBLE', 
-     :                     'READ', IP, EL, STATUS )
+*  Map the NDF's Axis Centre array.  The NDF library will fill this
+*  array with the pixel co-ordinates at the centre of each pixel (the
+*  default Axis co-ordinate system).
+         CALL NDF_AMAP( INDF, 'CENTRE', AXIS, '_DOUBLE', 
+     :                  'READ', IP, EL, STATUS )
 
 *  Check we can safely use %VAL on the pointer returned by NDF_AMAP.
-            IF ( STATUS .EQ. SAI__OK ) THEN                  
+         IF ( STATUS .EQ. SAI__OK ) THEN                  
 
 *  Map these pixel co-ordinates into AXIS co-ordinates.
-               CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), .TRUE.,
-     :                         CENTRE, STATUS )
-            END IF
+             CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), .TRUE.,
+     :                      CENTRE, STATUS )
+      print *, CENTRE
+         END IF
 
 *  Unmap the Axis Centre array.
-            CALL NDF_AUNMP( INDF, 'CENTRE', AXIS, STATUS )
+         CALL NDF_AUNMP( INDF, 'CENTRE', AXIS, STATUS )
 
 *  End the AST context and do the next axis.
-            CALL AST_END( STATUS )
-
-         ELSE
-
-*  Map the NDF's Axis Centre array as there was no AXIS frame in the
-*  WCS FrameSet and copy it to the returned CENTRE array.
-            CALL NDF_AMAP( INDF, 'CENTRE', AXIS, '<HTYPE>', 
-     :                     'READ', IP, EL, STATUS )
-
-            CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( IP ) ),
-     :                     CENTRE, IERR, NERR, STATUS )
-         END IF
+         CALL AST_END( STATUS )
 
       END IF
 
