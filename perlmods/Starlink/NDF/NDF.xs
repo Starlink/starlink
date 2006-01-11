@@ -382,22 +382,18 @@ BOOT:
 locator *
 DAT__ROOT()
  PROTOTYPE:
- PREINIT:
-  char ctemp[] = DAT__ROOT;
  CODE:
   /* DAT__ROOT will be the correct length for the Fortran side */
-  RETVAL = (locator *)ctemp;
+  RETVAL = (locator *)DAT__ROOT;
  OUTPUT:
   RETVAL
  
 locator *
 DAT__NOLOC()
  PROTOTYPE:
- PREINIT:
-  char ctemp[] = DAT__NOLOC;
  CODE:
   /* C Locator will be large enough to hold Fortran version */
-  RETVAL = (locator *)ctemp;
+  RETVAL = (locator *)DAT__NOLOC;
  OUTPUT:
   RETVAL
 
