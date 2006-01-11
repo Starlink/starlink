@@ -22,6 +22,7 @@ copy("$oldfile.sdf","$file.sdf");
 my $status = &NDF::SAI__OK;
 
 # Initialise NDF
+err_begin($status);
 ndf_begin();
 
 # Open up the test file
@@ -64,6 +65,7 @@ ndf_annul($indf, $status);
 is( $status, &NDF::SAI__OK, "check status");
 ndf_end($status);
 is( $status, &NDF::SAI__OK, "check status");
+err_end($status);
 
 unlink("$file.sdf");
 

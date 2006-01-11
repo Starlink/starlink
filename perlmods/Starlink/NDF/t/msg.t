@@ -13,6 +13,8 @@ use_ok( "NDF" );
 my $good = &NDF::SAI__OK;
 my $status = $good;
 
+err_begin($status);
+
 # Make a bell
 msg_bell($status);
 
@@ -94,3 +96,5 @@ foreach my $tok (keys %tokens) {
 msg_tune('SZOUT', 23, $status);
 msg_tune('SZOUT', 0, $status);
 is($status, $good, "Check status");
+
+err_end($status);

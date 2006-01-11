@@ -18,6 +18,7 @@ my $file = "test";
 my $status = &NDF::SAI__OK;
 
 # Initialise NDF
+err_begin($status);
 ndf_begin();
 
 # Open up the test file
@@ -54,6 +55,7 @@ is($value, 4092, "Check value");
 ndf_annul($indf, $status);
 ndf_end($status);
 is($status, &NDF::SAI__OK, "Check status");
+err_end($status);
 
 
 

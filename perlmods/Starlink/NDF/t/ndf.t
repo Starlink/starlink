@@ -19,6 +19,7 @@ my @lbnd = (1,1);
 
 
 # Initialise NDF
+err_begin($status);
 ndf_begin();
 
 # Create a new container file 
@@ -80,3 +81,4 @@ ndf_end($status);
 unlink("ndf_test.sdf");
 
 is( $status, &NDF::SAI__OK, "check status");
+err_end($status);

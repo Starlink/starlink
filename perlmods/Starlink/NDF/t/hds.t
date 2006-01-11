@@ -14,6 +14,7 @@ use_ok( "NDF" );
 
 # initialise global status
 my $status = &NDF::SAI__OK;
+err_begin( $status );
 
 # Initialise the dimension array
 my @dim = (10,20);
@@ -78,3 +79,4 @@ is( $status, &NDF::SAI__OK, "check status");
 hds_erase($loc, $status);
 is( $status, &NDF::SAI__OK, "check status");
 
+err_end($status);
