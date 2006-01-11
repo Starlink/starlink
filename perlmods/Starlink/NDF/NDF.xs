@@ -383,10 +383,10 @@ locator *
 DAT__ROOT()
  PROTOTYPE:
  PREINIT:
-  char ctemp[DAT__SZLOC] = DAT__ROOT;
+  char ctemp[] = DAT__ROOT;
  CODE:
-  RETVAL = (locator *)strdup((char *)ctemp);
-  stringCtof77(RETVAL, DAT__SZLOC);
+  /* DAT__ROOT will be the correct length for the Fortran side */
+  RETVAL = (locator *)ctemp;
  OUTPUT:
   RETVAL
  
@@ -394,10 +394,10 @@ locator *
 DAT__NOLOC()
  PROTOTYPE:
  PREINIT:
-  char ctemp[DAT__SZLOC] = DAT__NOLOC;
+  char ctemp[] = DAT__NOLOC;
  CODE:
-  RETVAL = (locator *)strdup((char *)ctemp);
-  stringCtof77(RETVAL, DAT__SZLOC);
+  /* C Locator will be large enough to hold Fortran version */
+  RETVAL = (locator *)ctemp;
  OUTPUT:
   RETVAL
 
