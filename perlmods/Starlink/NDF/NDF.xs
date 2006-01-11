@@ -79,7 +79,7 @@ extern "C" {
  */
 
 
-/* These come from ndf_par which should have a .h file...*/
+/* These come from ndf.h */
 #ifndef NDF__SZHMX
 #ifdef MSG__SZMSG
 #define NDF__SZHMX   MSG__SZMSG
@@ -107,6 +107,7 @@ void MAIN__ () {
 #include "getarg.c"
 
 
+/* Should use the C interface */
 
 /* Setup typedefs for the C to Fortran conversion */
 /* Protects against 64 bit problems */
@@ -182,149 +183,74 @@ char *name;
 
   case 'E':
 
-    /* err_par.h */
+    /* err_par.h - assume always available */
 
     if (strEQ(name, "EMS__OPTER")) 
-#   ifdef EMS__OPTER
       return ((double)EMS__OPTER);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__NOMSG")) 
-#   ifdef EMS__NOMSG
       return ((double)EMS__NOMSG);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__UNSET")) 
-#   ifdef EMS__UNSET
       return ((double)EMS__UNSET);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__BADOK")) 
-#   ifdef EMS__BADOK
       return ((double)EMS__BADOK);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__NSTER")) 
-#   ifdef EMS__NSTER
       return ((double)EMS__NSTER);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__BDKEY")) 
-#   ifdef EMS__BDKEY
       return ((double)EMS__BDKEY);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__BTUNE")) 
-#   ifdef EMS__BTUNE
       return ((double)EMS__BTUNE);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__NOENV")) 
-#   ifdef EMS__NOENV
       return ((double)EMS__NOENV);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__EROVF")) 
-#   ifdef EMS__EROVF
       return ((double)EMS__EROVF);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "EMS__CXOVF")) 
-#   ifdef EMS__CXOVF
       return ((double)EMS__CXOVF);
-#   else
-      goto not_there;
-#   endif
 
       /*  err_par.h */
 
     if (strEQ(name, "ERR__OPTER"))
-#   ifdef ERR__OPTER
       return ((double)ERR__OPTER);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "ERR__UNSET"))
-#   ifdef ERR__OPTER
       return ((double)ERR__UNSET);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "ERR__BADOK"))
-#   ifdef ERR__OPTER
       return ((double)ERR__BADOK);
-#   else
-      goto not_there;
-#   endif
+
       break;
 
   case 'M':
 
     if (strEQ(name, "MSG__NORM"))
-#   ifdef MSG__NORM
       return ((double)MSG__NORM);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "MSG__QUIET"))
-#   ifdef MSG__QUIET
       return ((double)MSG__QUIET);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "MSG__SZMSG"))
-#   ifdef MSG__SZMSG
       return ((double)MSG__SZMSG);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "MSG__VERB"))
-#   ifdef MSG__VERB
       return ((double)MSG__VERB);
-#   else
-      goto not_there;
-#   endif
 
     break;
 
   case 'N':
 
     if (strEQ(name, "NDF__SZHIS"))
-#   ifdef NDF__SZHIS
       return ((double)NDF__SZHIS);
-#   else
-      goto not_there;
-#   endif
 
     if (strEQ(name, "NDF__SZHMX"))
-#   ifdef NDF__SZHMX
       return ((double)NDF__SZHMX);
-#   else
-      goto not_there;
-#   endif
 
     break;
 
@@ -2143,6 +2069,9 @@ ndfGtwcs_(indf, status)
   AstFrameSet * iwcs;
   AstChannel * chan;
   SV * buffer;
+  int ast_status_val = SAI__OK;
+  int *ast_status;
+  int *old_ast_status;
  CODE:
   /* Read the framset */
   ndfGtwcs(indf, &iwcs, &status);
@@ -2151,12 +2080,21 @@ ndfGtwcs_(indf, status)
   /* It will be mortalized when it is returned */
   buffer = newSVpv("",0);
 
-  /* Create a output channel. Use a thread safe version that 
+  if (status == SAI__OK) {
+    /* Create a output channel. Use a thread safe version that 
       takes the SV as argument */
-  chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer, 
-			astsink,"" );
-  astWrite( chan, iwcs );
-
+    ast_status = &ast_status_val;
+    old_ast_status = astWatch( ast_status );
+    chan = astChannelFor( NULL, NULL, (void (*)( const char * ))buffer, 
+	  		  astsink,"" );
+    astWrite( chan, iwcs );
+    if (!astOK) {
+      status = SAI__ERROR;
+      errRep( "AST_ERR", "Error converting the NDF FrameSet into string form",
+        &status );
+    }
+    astWatch( old_ast_status );
+  }
   RETVAL = buffer;
  OUTPUT:
   RETVAL
@@ -2171,12 +2109,24 @@ ndfPtwcs_(wcsarr, indf, status)
  PREINIT:
   AstChannel * chan;
   AstFrameSet * iwcs;
+  int ast_status_val = SAI__OK;
+  int *ast_status;
+  int *old_ast_status;
  CODE:
   /* Create a output channel. Use a thread safe version that 
       takes the SV as argument */
-  chan = astChannelFor( (const char *(*)())wcsarr, astsource, NULL, NULL, "");
+  ast_status = &ast_status_val;
+  old_ast_status = astWatch( ast_status );
 
+  chan = astChannelFor( (const char *(*)())wcsarr, astsource, NULL, NULL, "");
   iwcs = astRead( chan );
+
+  if (!astOK) {
+    status = SAI__ERROR;
+    errRep( "AST_ERR", "Error converting the supplied FrameSet into internal form",
+      &status );
+  }
+  astWatch( old_ast_status );
   ndfPtwcs(iwcs, indf, &status);
  OUTPUT:
   status
