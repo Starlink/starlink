@@ -83,9 +83,9 @@ void smf_check_flat ( const smfData *data, int *status );
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
-void smf_close_file( smfData **, int * );
+void smf_close_file( smfData **, int *status);
 
-void smf_correct_extinction( smfData *,  int *);
+void smf_correct_extinction( smfData *data, float tau, int *status);
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
