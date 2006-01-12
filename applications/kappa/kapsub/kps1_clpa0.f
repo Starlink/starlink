@@ -241,8 +241,6 @@
             PM1 = AST_PERMMAP( NIN - 1, INPRM, NIN , OUTPRM, 
      :                         BSAMP( NSAMP/2, AXIS ), ' ', STATUS )
 
-            call ast_show( pm1, status )
-
 *  Create a PermMap which transforms positions from the original current 
 *  Frame to the reduced current Frame. The inverse transformation of this 
 *  PermMap supplies a mid-point value for all removed axes.
