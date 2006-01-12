@@ -26,3 +26,5 @@ sun87.toc
 testeph
 runtesteph
 sun87.dvi
+make.log
+make.log.err
