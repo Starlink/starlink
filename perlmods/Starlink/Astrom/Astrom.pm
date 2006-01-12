@@ -10,7 +10,7 @@ application.
   use Starlink::Astrom;
 
   my $astrom = new Starlink::Astrom( catalog => $catalog );
-  my $frameset = $astrom->solve;
+  ( my $frameset, my $result ) = $astrom->solve;
 
 =head1 DESCRIPTION
 
@@ -307,10 +307,11 @@ sub verbose {
 
 Perform astrometry for the supplied catalogue.
 
-  my $frameset = $astrom->solve;
+  ( my $frameset, my $status_arr ) = $astrom->solve;
 
 This method returns a C<Starlink::AST::FrameSet> object that describes
-the WCS calculated by ASTROM.
+the WCS calculated by ASTROM, and a reference to an array of hashes
+containing status information about the various fits.
 
 When running this method it attempts to find the astrom.x binary that
 performs the astrometric calculations. It first looks in the location
@@ -355,7 +356,7 @@ sub solve {
     }
   }
 
-  print "astrom.x binary is in $astrom_bin\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM binary is in $astrom_bin\n" if ( $DEBUG || $self->verbose );
 
   # We need a temporary file for the astrom input file.
   ( undef, my $astrom_input ) = tempfile( DIR => $self->temp );
@@ -481,6 +482,50 @@ sub solve {
     print "FITS-WCS file stored in $fitsfile\n" if ( $DEBUG || $self->verbose );
   }
 
+  # Open the log file, parse it, and return an array of hashes for
+  # status return information.
+  open ( my $fh_summary, "<", $output_log ) or croak "Could not open ASTROM log file $output_log for parsing: $!";
+  my $line;
+  my %results;
+  my @ret;
+  while ( <$fh_summary> ) {
+    my $line = $_;
+    chop $line;
+    ( $line =~ /^FIT/ ) && do {
+      %results = ();
+      $results{STATUS} = 0;
+      next;
+    };
+
+    ( $line =~ /^RESULT +(\S+)\s+(\S+)/ ) && do {
+      $results{$1} = $2;
+      next;
+    };
+
+    ( $line =~ /^STATUS +(\S+)/ ) && do {
+      if( $1 eq 'OK' ) {
+        $results{STATUS} = 1;
+      } elsif( $1 eq 'BAD' ) {
+        $results{STATUS} = 0;
+      } else {
+        print STDERR "ASTROM logfile: unrecognised STATUS\n";
+        $results{STATUS} = 0;
+      }
+      next;
+    };
+
+    ( $line =~ /^ENDFIT/ ) && do {
+      scalar( %results ) || do {
+        print STDERR "ASTROM logfile: no results!\n";
+        next;
+      };
+      my %t = %results;
+      push @ret, \%t;
+      next;
+    };
+  }
+  close $fh_summary or croak "Could not close ASTROM log file $output_log: $!";
+
   # Remove all of the temporary files, unless debugging is turned on or
   # temporary files have been requested to be kept.
   unlink $astrom_input unless ( $DEBUG || $self->keeptemps );
@@ -489,8 +534,8 @@ sub solve {
   unlink $output_log unless ( $DEBUG || $self->keeptemps );
   unlink <$output_fitsbase*> unless ( $DEBUG || $self->keeptemps );
 
-  # And return the Starlink::AST::FrameSet object.
-  return $wcs;
+  # And return the Starlink::AST::FrameSet object and the status array.
+  return $wcs, \@ret;
 }
 
 =back
