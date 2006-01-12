@@ -48,12 +48,15 @@
 *        setting input/output files and stores data in a smfData struct.
 *     2005-12-20 (AGG):
 *        Calls smf_flatfield to automatically flatfield data if necessary.
+*     2005-12-21 (AGG):
+*        Now deals with timeseries data
+*     2006-01-10 (AGG):
+*        Now reads the tau from the header for timeseries data
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -80,10 +83,11 @@
 #include <config.h>
 #endif
 
+/* Standard includes */
 #include <string.h>
 #include <stdio.h>
 
-#include "smurf_par.h"
+/* Starlink includes */
 #include "prm_par.h"
 #include "sae_par.h"
 #include "ast.h"
@@ -92,62 +96,42 @@
 #include "par.h"
 #include "star/ndg.h"
 
+/* SMURF includes */
 #include "libsmf/smf.h"
 #include "smurflib.h"
+#include "smurf_par.h"
+
+/* Simple default string for errRep */
+#define FUNC_NAME "smurf_extinction"
 
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
+  int flag;                  /* Flag for how group is terminated */
+  int i;                     /* Loop counter */
+  smfData *idata;            /* Data struct read from input file */
+  Grp *igrp = NULL;          /* Input group */
   int indf = 0;              /* Input NDF identifier */
+  int j;                     /* Loop counter */
+  int nframes;               /* Number of time slices (frames) in file */
   int nin;                   /* Number of input data points */
   int nout;                  /* Number of output data points */
-  int outndf = 0;              /* Output NDF identifier */
-  float tau;                 /* Zenith tau at this wavelength */
-  /*float tauArr[2];*/           /* Array containing the tau values */
-  float taubeg;              /* Tau at start */
-  /*float tauend;*/              /* Tau at end */
-  /*int ntau;*/                  /* Number of tau values read from cmd line */
-  /*AstFrameSet * iwcs = NULL;*/  /* Pointer to input frame set */
-  Grp *igrp = NULL;
-  Grp *ogrp = NULL;
-  int size;                  /* Number of files in input group */
-  int flag;                  /* */
-  int i;                     /* Counter, index */
+  smfData *odata = NULL;     /* Output data struct */
+  Grp *ogrp = NULL;          /* Output group */
+  smfHead *ohdr;             /* Pointer to header in odata */
+  double *outdata;           /* Pointer to output data array */
   int outsize;               /* Total number of NDF names in the output group */
-  int nframes;               /* Number of time slices (frames) in file */
-
-  /* Unused as yet */
-  /*  void * outdataArr[1];     */     /* Pointer to output data */
-  /* float * outdata = NULL;    */     /* Pointer to actual output data */
-  AstFrameSet *owcs = NULL;     /* Pointer to output frame set */
-  /* int ndfdims[NDF__MXDIM];   */     /* Dimensions of input NDF */
-  /* int ndims;                 */     /* Number of active dimensions in input */
-  /* dim_t indims[2];           */     /* Copy of the NDF dimensions */
-  /* void * indataArr[1];       */     /* Pointer to input data */
-  /* float * indata = NULL;     */     /* Pointer to actual input data */
-  /* char datatype[NDF__SZTYP]; */     /* String for input DATA type */
-
-  smfData *idata;
-  /*  smfDA *ida = NULL;
-  smfFile *ifile;
-  smfHead *ihdr;*/
-  /*  char *ipname;*/
-
-  smfData *odata = NULL;
-  /*  smfFile *ofile;*/
-  /*  smfDA * oda;*/
-  smfHead *ohdr;
-  /*  char *opname;*/
-
-  /*  dim_t index;*/
-  int j;
-  double *outdata;
+  int outndf = 0;            /* Output NDF identifier */
+  AstFrameSet *owcs = NULL;  /* Pointer to output frame set */
+  int size;                  /* Number of files in input group */
+  float tau = 0.0;           /* Zenith tau at this wavelength */
+  smfData *tdata = NULL;     /* Pointer to individual timeslice data struct */
 
   /* Main routine */
 
   ndfBegin();
 
-  /*  msgOut("smurf_extinction","Inside EXTINCTION", status );*/
+  /*  msgOut( FUNC_NAME, "Inside EXTINCTION", status );*/
 
   /* Read the input file */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -158,7 +142,7 @@ void smurf_extinction( int * status ) {
 
   for (i=1; i<=size; i++) {
 
-    /* Can we check at this stage if flatfield has been applied? */
+    /* FUTURE: Can we check at this stage if flatfield has been applied? */
 
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, i, "READ", &indf, status );
@@ -184,10 +168,12 @@ void smurf_extinction( int * status ) {
     smf_flatfield( idata, &odata, status );
 
     if ( *status != SAI__OK ) {
-      errRep("smurf_flatfield",
+      errRep(FUNC_NAME,
 	     "Flatfielding error: status set bad on return from smf_flatfield", 
 	     status);
     }
+
+    /* FUTURE: Remove sky */
 
     /* Do we have 2-d image data? */
     if (odata->ndims == 2) {
@@ -196,12 +182,10 @@ void smurf_extinction( int * status ) {
       /* FUTURE: Could use parGdr0r with suggested limits based on
 	 wavelength obtained from header to prevent users entering
 	 unphysical values */
-      /*      parGet1r( "ZENTAU", 2, tauArr, &ntau, status);*/
-      parGet0r( "ZENTAU", &taubeg, status);
 
-      /* Check number of tau values given */
-      tau = taubeg;
-    
+      /* Ask for tau */
+      parGet0r( "ZENTAU", &tau, status);
+
       /* Check for existence of VARIANCE array */
       /* Check for covariance */
       /* smf_find_extension( indf, "COVAR", &cndf, status ); */
@@ -209,15 +193,17 @@ void smurf_extinction( int * status ) {
       nin = (idata->dims)[0] * (idata->dims)[1];
       nout = (odata->dims)[0] * (odata->dims)[1];
 
+      /* Check input and output arrays are the same size */
       if ( *status != SAI__OK ) {
 	if ( nin != nout) {
 	  *status = SAI__ERROR;
 	  msgSeti( "NIN", nin);
 	  msgSeti( "NOUT", nout);
-	  errRep( "smurf_extinction", "Number of input pixels not equal to the number of output pixels (^NIN != ^NOUT)", status);
+	  errRep( FUNC_NAME, "Number of input pixels not equal to the number of output pixels (^NIN != ^NOUT)", status);
 	}
       }
 
+      /* Call the extinction correction routine */
       smf_correct_extinction( odata, tau, status);
     
     } else if (odata->ndims == 3 ) {
@@ -226,24 +212,20 @@ void smurf_extinction( int * status ) {
       nframes = (odata->dims)[2];
       for ( j=0; j<nframes; j++) {
 	/* Call tslice_ast to update the WCS info for the particular timeslice */
-	smf_tslice_ast( odata, j, status);
-	ohdr = odata->hdr;
-	ohdr->curslice = j;
-	tau = 0.1;
-	smf_correct_extinction( odata, tau, status );
-
+	smf_tslice_ast( odata, j, status );
+	smf_tslice( odata, &tdata, j, status );
+	smf_correct_extinction( tdata, tau, status );
+	smf_insert_tslice( &odata, tdata, j, status );
       }
 
-      /* Print something useful */
-
-      
     } else {
       /* Abort with an error if the number of dimensions is not 2 or 3 */
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;
 	msgSeti("ND", idata->ndims);
-	errRep("smurf_extinction", 
-	       "Number of dimensions of input file, ^ND, should be 2 or 3", status);
+	errRep(FUNC_NAME,
+	       "Number of dimensions of input file, ^ND, should be 2 or 3", 
+	       status);
       }
     }
 
