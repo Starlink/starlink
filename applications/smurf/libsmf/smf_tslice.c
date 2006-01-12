@@ -44,12 +44,9 @@
 *  History:
 *     2005-12-22 (AGG):
 *        Initial version.
+*     2006-01-12 (AGG):
+*        Use sc2store_headget to set the appropriate header.
 *     {enter_further_changes_here}
-
-*  Notes:
-*     The header is assumed to be correct for the given
-*     timeslice. Thus it is up to the user to make sure this is so by
-*     calling smf_tslice_ast before calling this routine.
 
 *  Copyright:
 *     Copyright (C) 2005 University of British Columbia.
@@ -90,28 +87,43 @@
 #include "smf.h"
 #include "smf_typ.h"
 
+/* Data Acquisition Includes */
+#include "sc2da/sc2store_struct.h"
+#include "sc2da/sc2ast.h"
+#include "sc2da/sc2store.h"
+
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice"
 
 void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status ) {
 
-  double *tslicedata;
-  double *indata;
-  int npts;
-  int offset;
-  int i;
-
-  smfHead *hdr;
+  smfHead *hdr;               /* Pointer to header struct for output data */
+  int i;                      /* Loop counter */
+  double *indata;             /* Pointer to input data array */
   void *ipntr[3];             /* Input D, Q and V arrays */
-  void *opntr[3];             /* Output D, Q and V arrays */
+  int npts;                   /* Number of points in a time slice */
+  int offset;                 /* Offset int othe time series for the
+				 start of the current frame */
+  struct sc2head *sc2hdr;     /* Pointer to sc2head data */
+  double *tslicedata;         /* Pointer to output data array */
 
   /* Allocate space for the tdata struct */
   *tdata = malloc( sizeof( smfData ) );
 
   /* Copy the current header */
   hdr = malloc( sizeof( smfHead ) );
+  /* Check we got the memory */
+  if ( hdr == NULL) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to allocate memory for header", status);
+    }
+  }
   memcpy( hdr, idata->hdr, sizeof( smfHead ) );
   (*tdata)->hdr = hdr;
+  sc2hdr = hdr->sc2head;
+  /* Retrieve the header for this time slice */
+  sc2store_headget( index, sc2hdr, status);
 
   /* Set the virtual flag */
   (*tdata)->virtual = 1;
@@ -129,7 +141,13 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   indata = ipntr[0];
 
   tslicedata = malloc( npts * sizeof( double ) );
-  /*  memcpy( tslicedata, ipntr[0], npts*sizeof( double ) );*/
+  /* Check we got the memory */
+  if ( tslicedata == NULL) {
+    if ( *status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to allocate memory for 2-D timeslice", status);
+    }
+  }
   
   for (i=0; i<npts; i++) {
     tslicedata[i] = indata[offset + i];
