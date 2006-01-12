@@ -28,6 +28,7 @@ up_motif.gif
 up_motif_gr.gif
 whiteball.gif
 yellowball.gif
+img*.gif
 *.aux
 *.css
 *.tex
@@ -35,3 +36,6 @@ yellowball.gif
 .*.db
 *.html
 *.log
+.ID_MAP
+.IMG_PARAMS
+.ORIG_MAP
