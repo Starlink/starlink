@@ -37,6 +37,7 @@
 *     DLT: D.L. Terrett (STARLINK)
 *     PCTR: P.C.T. Ress (STARLINK)
 *     ACC:  A.C. Charles (STARLINK)
+*     DSB:  David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Modifications to prologue.
 *     30-MAY-1995 (AJC):
 *        Trap blank string to avoid SunOS crash
+*     12-JAN-2006 (DSB):
+*        Check for INTEGER overflow.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +86,7 @@
 
 *  Local Variables:
       INTEGER IOSTAT             ! I/O status from READ/WRITE
+      INTEGER*8 LVALUE           ! Long value
       INTEGER NCHAR              ! Character count
 
       CHARACTER COUNT * 3        ! Character count
@@ -107,13 +111,21 @@
             STATUS = SAI__ERROR
          ELSE
 
-*        Read the INTEGER value.
+*        Read the value into a long int first to reduce chances of overflow.
             FORMAT = '(BN, I'//COUNT//')'
-            READ( STRING( 1 : NCHAR ), FORMAT , IOSTAT=IOSTAT ) IVALUE
+            READ( STRING( 1 : NCHAR ), FORMAT , IOSTAT=IOSTAT ) LVALUE
 
+*        Check the read operation was succesfull.
             IF ( IOSTAT .NE. 0 ) THEN
                STATUS = SAI__ERROR
+
+*        If it was, convert the long int to a short int and check for overflow
+*        by comparing their values.
+            ELSE
+               IVALUE = LVALUE
+               IF( IVALUE .NE. LVALUE ) STATUS = SAI__ERROR
             END IF
+
          END IF
       END IF
 
