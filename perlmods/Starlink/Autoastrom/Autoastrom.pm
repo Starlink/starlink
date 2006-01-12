@@ -1051,6 +1051,7 @@ sub solve {
 
       my $template = new Starlink::AST::SkyFrame( "System=FK5" );
       $frameset = $wcs->FindFrame( $template, "" );
+
       if( defined( $frameset ) ) {
         print "WCS information from AST.\n" if $self->verbose;
         print STDERR "WCS information from AST.\n" if $self->verbose;
@@ -1146,6 +1147,7 @@ sub solve {
       $filter = new Astro::WaveBand( Filter => $generic_headers{'FILTER'} );
       $self->filter( $filter );
     }
+    $filter = $self->filter;
     my $ext = new Starlink::Extractor;
     $ext->quick( 1 );
     $ext->detect_thresh( $self->detection_threshold );
@@ -1245,161 +1247,195 @@ sub solve {
     }
   }
 
+  my $newwcs; # The final WCS to be inserted into the NDF.
+  my $merged; # Astro::Catalog object holding merged catalogue.
+
+  my $currentiter = 1;
+  my $prev_rms = 0;
+
+# Begin iteration loop.
+  while( $currentiter <= $self->maxiter ) {
+
 # Add the NDF's WCS to the retrieved catalogue, allowing us to get
 # X and Y positions for the retrieved objects.
-  my $querystars = $querycat->stars;
-  my @querystars;
-  foreach my $star ( @$querystars ) {
+    my $querystars = $querycat->stars;
+    my @querystars;
+    foreach my $star ( @$querystars ) {
 
-    next if ! defined( $star );
+      next if ! defined( $star );
 
-    # Hack to get around not being able to write 'undef' values
-    # in Cluster format catalogues. We're making an assumption
-    # here that a star can't be located at (0.000,0.000).
-    if( defined( $star->x ) && $star->x eq "0.000" ) {
-      $star->x( undef );
+      # Update the object's WCS.
+      $star->wcs( $frameset );
     }
-
-    if( defined( $star->y ) && $star->y eq "0.000" ) {
-      $star->y( undef );
-    }
-
-    # And update the object's WCS.
-    $star->wcs( $frameset );
-
-  }
 
 # Limit the number of stars in the query catalogue for correlation, if
 # necessary. We don't really care which filter we do this in, so take
 # the first filter of the first object in the @querystars list.
-  @querystars = @$querystars;
-  my @queryfilters = $querystars[0]->what_filters;
-  my $queryfilter = $queryfilters[0];
-  my $filtered_querycat = new Astro::Catalog;
-  if( $self->maxobj_corr && $querycat->sizeof > $self->maxobj_corr ) {
-    my @sortedstars = map { $_->[0] }
-                      sort { $a->[1] <=> $b->[1] }
-                      map { [ $_, $_->get_flux_quantity( waveband => $queryfilter, type => 'MAG' ) ] } @querystars;
-    @sortedstars = @sortedstars[0..( $self->maxobj_corr - 1 )];
-    $filtered_querycat->pushstar( @sortedstars );
-  } else {
-    $filtered_querycat->pushstar( @querystars );
-  }
+    @querystars = @$querystars;
+    my @queryfilters = $querystars[0]->what_filters;
+    my $queryfilter = $queryfilters[0];
+    my $filtered_querycat = new Astro::Catalog;
+    if( $self->maxobj_corr && $querycat->sizeof > $self->maxobj_corr ) {
+      my @sortedstars = map { $_->[0] }
+                        sort { $a->[1] <=> $b->[1] }
+                        map { [ $_, $_->get_flux_quantity( waveband => $queryfilter, type => 'MAG' ) ] } @querystars;
+      @sortedstars = @sortedstars[0..( $self->maxobj_corr - 1 )];
+      $filtered_querycat->pushstar( @sortedstars );
+    } else {
+      $filtered_querycat->pushstar( @querystars );
+    }
 
-  print "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
-  print " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
-  print " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
+    print "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
+    print " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
+    print " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
 
 # Perform the correlation.
-  my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
-                                   catalog2 => $filtered_querycat,
-                                   keeptemps => $self->keeptemps,
-                                   method => 'FINDOFF',
-                                   temp => $self->temp,
-                                   verbose => $self->verbose,
-                                 );
+    my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
+                                     catalog2 => $filtered_querycat,
+                                     keeptemps => $self->keeptemps,
+                                     method => 'FINDOFF',
+                                     temp => $self->temp,
+                                     verbose => $self->verbose,
+                                   );
 
-  ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
+    ( my $corrndfcat, my $corrquerycat ) = $corr->correlate;
 
 # And yes, croak if the correlation resulted in fewer than 2 matches.
-  if( $corrndfcat->sizeof < 2 ) {
-    croak "Only " . $corrndfcat->sizeof . " object matched between reference catalogue and extracted catalogue. Cannot perform automated astrometry corrections with so few objects";
-  }
+    if( $corrndfcat->sizeof < 2 ) {
+      croak "Only " . $corrndfcat->sizeof . " object matched between reference catalogue and extracted catalogue. Cannot perform automated astrometry corrections with so few objects";
+    }
 
 # Merge the two catalogues so that the RA/Dec from 2MASS matches
 # with the x/y from the extracted catalogue. This allows us to
 # perform the astrometric solution.
-  my $merged = new Astro::Catalog;
-  $merged->fieldcentre( Coords => $cencoords );
-  my $nobjs = $corrndfcat->sizeof;
+    $merged = new Astro::Catalog;
+    $merged->fieldcentre( Coords => $cencoords );
+    my $nobjs = $corrndfcat->sizeof;
 
-  foreach my $item ( @{$corrndfcat->stars} ) {
-    my $id = $item->id;
+    foreach my $item ( @{$corrndfcat->stars} ) {
+      my $id = $item->id;
 
-    my $queryitem = $corrquerycat->popstarbyid( $id );
-    $queryitem = $queryitem->[0];
+      my $queryitem = $corrquerycat->popstarbyid( $id );
+      $queryitem = $queryitem->[0];
 
-    next if ! defined( $item );
-    next if ! defined( $queryitem );
+      next if ! defined( $item );
+      next if ! defined( $queryitem );
 
-    $item->id( $queryitem->id );
-    $item->coords( $queryitem->coords );
-    $item->wcs( $queryitem->wcs );
+      $item->id( $queryitem->id );
+      $item->coords( $queryitem->coords );
+      $item->wcs( $queryitem->wcs );
 
-    my $queryflux = $queryitem->fluxes;
-    my @allfluxes = $queryflux->allfluxes;
-    my $newfluxes = new Astro::Fluxes;
-    foreach my $flux ( @allfluxes ) {
-      my $quantity = $flux->quantity( 'mag' );
-      my $waveband = $flux->waveband;
-      my $type = $flux->type;
-      my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
-      $newfluxes->pushfluxes( $newflux );
+      my $queryflux = $queryitem->fluxes;
+      my @allfluxes = $queryflux->allfluxes;
+      my $newfluxes = new Astro::Fluxes;
+      foreach my $flux ( @allfluxes ) {
+        my $quantity = $flux->quantity( 'mag' );
+        my $waveband = $flux->waveband;
+        my $type = $flux->type;
+        my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
+        $newfluxes->pushfluxes( $newflux );
+      }
+      $item->fluxes( $newfluxes );
+
+      $merged->pushstar( $item );
     }
-    $item->fluxes( $newfluxes );
-
-    $merged->pushstar( $item );
-  }
 
 # Output the merged catalogue to disk, if requested.
-  if( defined( $self->match_catalogue ) ) {
-    $merged->write_catalog( Format => 'Cluster', File => $self->match_catalogue );
-  }
+    if( defined( $self->match_catalogue ) ) {
+      $merged->write_catalog( Format => 'Cluster', File => $self->match_catalogue );
+    }
 
-  print "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
+    print "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
 
 # Solve astrometry.
-  my $astrom = new Starlink::Astrom( catalog => $merged,
-                                     keepfits => $self->keepfits,
-                                     keeptemps => $self->keeptemps,
-                                     maxcoeff => $self->maxfit,
-                                     obs => { 'time' => $self->obsdata->{TIME},
-                                              'obs' => $self->obsdata->{OBS},
-                                              'met' => $self->obsdata->{MET},
-                                              'col' => $self->obsdata->{COL} },
-                                     temp => $self->temp,
-                                     verbose => $self->verbose );
+    my $astrom = new Starlink::Astrom( catalog => $merged,
+                                       keepfits => $self->keepfits,
+                                       keeptemps => $self->keeptemps,
+                                       maxcoeff => $self->maxfit,
+                                       obs => { 'time' => $self->obsdata->{TIME},
+                                                'obs' => $self->obsdata->{OBS},
+                                                'met' => $self->obsdata->{MET},
+                                                'col' => $self->obsdata->{COL} },
+                                       temp => $self->temp,
+                                       verbose => $self->verbose );
 
-  my $newwcs = $astrom->solve;
+    ( $newwcs, my $results ) = $astrom->solve;
+
+# Get the results for the desired fit.
+    my $result;
+    foreach my $res ( @$results ) {
+      if( $res->{nterms} == $self->maxfit ) {
+        $result = $res;
+        last;
+      }
+    }
+
+    my $curr_rms = $result->{rrms};
+    if( $self->verbose ) {
+      print "RMS of current fit: $curr_rms arcseconds.\n";
+      print "Difference to previous RMS: " . abs( $curr_rms - $prev_rms ) . " arcseconds.\n";
+    }
+
+    if( $curr_rms < $self->iterrms_abs ) {
+      if( $self->verbose ) {
+        print "Reached absolute RMS level of " . $self->iterrms_abs . " arcseconds.\n";
+      }
+      last;
+    }
+
+    if( abs( $curr_rms - $prev_rms ) < $self->iterrms_diff ) {
+      if( $self->verbose ) {
+        print "Reached difference RMS level of " . $self->iterrms_diff . " arcseconds.\n";
+      }
+      last;
+    }
+
+    $prev_rms = $curr_rms;
+    $frameset = $newwcs;
+    $currentiter++;
+
+  } # End iteration loop.
+
 
 # Stick the WCS into the NDF, if requested.
-  if( $self->insert ) {
-    my $STATUS = &NDF::SAI__OK;
-    err_begin($STATUS);
-    ndf_begin();
-    ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
-    ndfPtwcs( $newwcs, $ndf_id, $STATUS );
-    ndf_annul( $ndf_id, $STATUS );
+    if( $self->insert ) {
+      my $STATUS = &NDF::SAI__OK;
+      err_begin($STATUS);
+      ndf_begin();
+      ndf_open( &NDF::DAT__ROOT(), $self->ndf, 'UPDATE', 'OLD', my $ndf_id, my $place, $STATUS );
 
-    # extract error messages and annul error status
-    ndf_end($STATUS);
-    if( $STATUS != &NDF::SAI__OK ) {
-      my ( $oplen, @errs );
-      do {
-        err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
-        push @errs, $opstr;
-      } until ( $oplen == 1 );
-      err_annul( $STATUS );
+      ndfPtwcs( $newwcs, $ndf_id, $STATUS );
+      ndf_annul( $ndf_id, $STATUS );
+
+      # extract error messages and annul error status
+      ndf_end($STATUS);
+      if( $STATUS != &NDF::SAI__OK ) {
+        my ( $oplen, @errs );
+        do {
+          err_load( my $param, my $parlen, my $opstr, $oplen, $STATUS );
+          push @errs, $opstr;
+        } until ( $oplen == 1 );
+        err_annul( $STATUS );
+        err_end( $STATUS );
+        croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
+      }
       err_end( $STATUS );
-      croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
+      print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
     }
-    err_end( $STATUS );
-    print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
-  }
 
 # Update the NDF catalogue with the new WCS. First get the FK5
 # frameset for the WCS.
-  my $template = new Starlink::AST::SkyFrame( "System=FK5" );
-  $frameset = $newwcs->FindFrame( $template, "" );
-  if( ! defined( $frameset ) ) {
-    croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
-  }
+    my $template = new Starlink::AST::SkyFrame( "System=FK5" );
+    $frameset = $newwcs->FindFrame( $template, "" );
+    if( ! defined( $frameset ) ) {
+      croak "Could not find FK5 SkyFrame to do X/Y to RA/Dec translation";
+    }
 
 # Modify the RA/Dec for each item.
-  foreach my $item ( @{$ndfcat->stars} ) {
-    my( $ra, $dec ) = $frameset->Tran2( [$item->x],
-                                        [$item->y],
-                                        1 );
+    foreach my $item ( @{$ndfcat->stars} ) {
+      my( $ra, $dec ) = $frameset->Tran2( [$item->x],
+                                          [$item->y],
+                                          1 );
     my $coords = new Astro::Coords( ra    => $ra->[0],
                                     dec   => $dec->[0],
                                     type  => 'J2000',
