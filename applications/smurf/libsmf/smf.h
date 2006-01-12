@@ -39,6 +39,10 @@
 *        Add smf_flatten
 *     2005-12-09 (AGG)
 *        Add smf_clone_data
+*     2006-01-09 (AGG)
+*        Add smf_tslice and smf_insert_tslice
+*     2006-01-10 (AGG)
+*        Add smf_scale_tau and smf_fits_getF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -75,9 +79,13 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
+void smf_check_flat ( const smfData *data, int *status );
+
+void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
+
 void smf_close_file( smfData **, int * );
 
-void smf_correct_extinction( smfData *, float, int *);
+void smf_correct_extinction( smfData *,  int *);
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
@@ -85,24 +93,23 @@ void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *statu
    string is required. If we return a string we have to know who should free it */
 void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, int * status );
 void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, int * status );
+void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, int * status );
 void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], int * status );
 
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
-void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
-
-void smf_tslice_ast (smfData * data, int index, int * status );
-
 void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
-
-void smf_check_flat ( const smfData *data, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 
-void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
+void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
+
+void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
+
+float smf_scale_tau ( const float tauwvm, const int filter, int *status);
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
-void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
+void smf_tslice_ast (smfData * data, int index, int * status );
 
 #endif /* SMF_DEFINED */

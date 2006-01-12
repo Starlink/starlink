@@ -6,14 +6,15 @@ libsmf_la_SOURCES = $(C_ROUTINES)
 C_ROUTINES = smf_correct_extinction.c smf_open_file.c smf_fits_rdhead.c\
 smf_fits_crchan.c \
 smf_close_file.c \
-smf_fits_getI.c smf_fits_getD.c \
+smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c\
 smf_tslice_ast.c \
 smf_flatfield.c \
 smf_check_flat.c\
 smf_flatten.c \
 smf_clone_data.c \
 smf_tslice.c \
-smf_insert_tslice.c
+smf_insert_tslice.c \
+smf_scale_tau.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
