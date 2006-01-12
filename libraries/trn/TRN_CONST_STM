@@ -11,10 +11,15 @@
 *
 *    Authors :
 *     R.F. Warren-Smith
+*     D.S. Berry
 *
 *    History :
 *     6-MAY-1988:  Original version (DUVAD::RFWS)
 *     18-MAY-1988:  Added LDBAD constant (DUVAD::RFWS)
+*     12-JAN-2006:  Changed value of TRN_OP_LDBAD from 35 to 37. 
+*                   Added TRN_OP_EQ, TRN_OP_LE, TRN_OP_GE, TRN_OP_LT,
+*                   TRN_OP_GT, TRN_OP_NE, TRN_OP_NOT, TRN_OP_OR, TRN_OP_AND,
+*                   TRN_OP_QIF, TRN_OP_IDV. (DSB)
 *    endhistory
 *
 
@@ -89,7 +94,18 @@
       INTEGER TRN_OP_SIGN               ! Fortran SIGN function
       INTEGER TRN_OP_ATN2               ! Fortran ATAN2 in radians
       INTEGER TRN_OP_AT2D               ! Fortran ATAN2 in degrees
+      INTEGER TRN_OP_IDV                ! Integer division function
+      INTEGER TRN_OP_QIF                ! If-else function (like C "a?b:c")
       INTEGER TRN_OP_LDBAD              ! Load "bad" value on to stack
+      INTEGER TRN_OP_EQ                 ! .EQ. operator
+      INTEGER TRN_OP_NE                 ! .NE. operator
+      INTEGER TRN_OP_GT                 ! .GT. operator
+      INTEGER TRN_OP_GE                 ! .GE. operator
+      INTEGER TRN_OP_LT                 ! .LT. operator
+      INTEGER TRN_OP_LE                 ! .LE. operator
+      INTEGER TRN_OP_OR                 ! .OR. operator
+      INTEGER TRN_OP_AND                ! .AND. operator
+      INTEGER TRN_OP_NOT                ! .NOT. operator
 
 
 *   Operation code values.
@@ -131,8 +147,18 @@
       PARAMETER ( TRN_OP_SIGN  = 32 )
       PARAMETER ( TRN_OP_ATN2  = 33 )
       PARAMETER ( TRN_OP_AT2D  = 34 )
-      PARAMETER ( TRN_OP_LDBAD = 35 )
-
+      PARAMETER ( TRN_OP_IDV   = 35 )
+      PARAMETER ( TRN_OP_QIF   = 36 )
+      PARAMETER ( TRN_OP_LDBAD = 37 )
+      PARAMETER ( TRN_OP_EQ    = 38 )
+      PARAMETER ( TRN_OP_NE    = 39 )
+      PARAMETER ( TRN_OP_GT    = 40 )
+      PARAMETER ( TRN_OP_GE    = 41 )
+      PARAMETER ( TRN_OP_LT    = 42 )
+      PARAMETER ( TRN_OP_LE    = 43 )
+      PARAMETER ( TRN_OP_OR    = 44 )
+      PARAMETER ( TRN_OP_AND   = 45 )
+      PARAMETER ( TRN_OP_NOT   = 46 )
 
 
 ************************************************************************

@@ -17,12 +17,12 @@
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {61.3}
+\newcommand{\stardocnumber}    {61.4}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith}
-\newcommand{\stardocdate}      {28th April 1998}
+\newcommand{\stardocdate}      {12th January 2006}
 \newcommand{\stardoctitle}     {TRANSFORM \latexhtml{\\[2.5ex]}{\\}
                                 Coordinate Transformation Facility}
-\newcommand{\stardocversion}   {Version 0.9}
+\newcommand{\stardocversion}   {Version 0.9-6}
 \newcommand{\stardocmanual}    {Programmer's Guide and Reference Manual}
 \newcommand{\stardocabstract}  {%
 
@@ -2864,6 +2864,34 @@ number and the equivalent expression `X$*$X' is preferred.
 This deficiency will be removed in future.}
 
 
+\paragraph{Boolean operations.}
+The standard logical/boolean operators .EQ., .NE., .GT., .LT.,
+.GE., .LE., .OR., .AND. and .NOT. are available and their use 
+is identical to Fortran~77, except that there is no distinct logical data
+type. These boolean operators have numerical operands and return numerical 
+values. A numerical value is considered ``true'' if it is non-zero and 
+``false'' if it is zero.\footnote{This is the same convention used in
+the C programming language.} The above operators return a value of 1 for
+``true'' and zero for ``false''.
+
+These operators may also be specified within an expression using the
+equivalent C forms:
+\verb#==#,
+\verb#!=#,
+\verb#>#,
+\verb#<#,
+\verb#>=#,
+\verb#<=#,
+\verb#||#,
+\verb#&&# and
+\verb#!#.
+
+These operators can be used with the built-in function ``QIF''. This
+function has 3 arguments. It returns the value of its second argument if its 
+first argument is non-zero (i.e. ``true''), and returns the value of its 
+third argument otherwise. It can be used like the ``?'' operator in the C
+programming language.
+
 \subsection{\xlabel{builtin_functions}Built-in Functions}
 
 \paragraph{Standard functions.}
@@ -2949,6 +2977,18 @@ None of these functions supports \emph{integer} arithmetic.}
 \label{table:additionalbuiltins}
 \end{table}
 
+In addition, the following non-standard functions are provided:
+
+\begin{description}
+\item[IDV] - Performs integer division.
+It has two arguments. The function value is formed by taking the integer
+part of the two arguments, dividing them, and then returning the integer
+part of the result.
+\item[QIF] - Has three arguments. It returns the value of its second argument 
+if its first argument is non-zero (i.e. ``true''), and returns the value of 
+its third argument otherwise. It can be used like the ``?'' operator in the C
+programming language.
+\end{description}
 
 \newpage
 \section{\xlabel{classification_properties}Classification Properties}

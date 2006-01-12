@@ -11,6 +11,7 @@
 *
 *    Authors :
 *     R.F. Warren-Smith
+*     D.S. Berry
 *
 *    History :
 *     20-MAY-1988:  Original version (DUVAD::RFWS)
@@ -18,6 +19,7 @@
 *                                                          (DUVAD::RFWS)
 *     9-JUN-1988:  Added SYM_UNEXT and SYM_UNOPR arrays to control use
 *                  of unary operators (DUVAD::RFWS)
+*     12-JAN-2006: Increase SYM_MXSYM from 39 to 59 (DSB)
 *    endhistory
 *
 
@@ -35,7 +37,7 @@
 
 *   Highest symbol entry number.
       INTEGER SYM_MXSYM
-      PARAMETER ( SYM_MXSYM = 39 )
+      PARAMETER ( SYM_MXSYM = 59 )
 
 
 *   Maximum length of a symbol name in an expression.

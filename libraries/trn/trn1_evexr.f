@@ -35,12 +35,15 @@
  
 *  Authors:
 *     R.F. Warren-Smith (DUVAD::RFWS)
+*     D.S. Berry (DSB)
 *     {enter_new_authors_here}
  
 *  History:
 *     11-FEB-1988:  Original version (DUVAD::RFWS)
 *     28-MAR-1988:  Improved error handling (DUVAD::RFWS)
 *     16-AUG-1988:  Added "bad value" handling (DUVAD::RFWS)
+*     12-JAN-2006:  Added IDV, QIF and boolean operators. Moved LDBAD 
+*                   from label 35 to 37.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -187,7 +190,8 @@
      :           1,  2,  3,  4,  5,  6,  7,  8,  9, 10,
      :          11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
      :          21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-     :          31, 32, 33, 34, 35 ) ( OPER - TRN_OP_MINOP + 1 )
+     :          31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+     :          41, 42, 43, 44, 45, 46 ) ( OPER - TRN_OP_MINOP + 1 )
  
  
 *   If the operation code was not recognised, report an error.
@@ -498,8 +502,29 @@
         GO TO 100
  
  
-*   TRN_OP_LDBAD - Load "bad" value on to stack.
+*   TRN_OP_IDV - Integer division.
    35   CONTINUE
+        CALL VEC_IDVR( BADL, NDAT, S( 1, TOS - 1 ), S( 1, TOS ),
+     :                  S( 1, TOS - 1 ), IERRL, NERRL, NSTATL )
+        TOS = TOS - 1
+        GO TO 100
+ 
+ 
+*   TRN_OP_QIF - If-then-else function (like the C "a ? b : c" construct).
+   36   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 2 ) .NE. 0 ) THEN
+              S( I, TOS - 2 ) = S( I, TOS - 1 )
+           ELSE
+              S( I, TOS - 2 ) = S( I, TOS )
+           END IF
+        END DO
+        TOS = TOS - 2
+        GO TO 100
+ 
+*   TRN_OP_LDBAD - Load "bad" value on to stack.
+   37   CONTINUE
         TOS = TOS + 1
         DO I = 1, NDAT
           S( I, TOS ) = VAL__BADR
@@ -509,7 +534,125 @@
         NERRL = NDAT - NERR
         GO TO 100
  
+*   TRN_OP_EQ - .EQ. operator
+   38   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .EQ. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
  
+*   TRN_OP_NE - .NE. operator
+   39   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .NE. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_GT - .GT. operator
+   40   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .GT. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_GE - .GE. operator
+   41   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .GE. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_LT - .LT. operator
+   42   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .LT. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_LE - .LE. operator
+   43   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS - 1 ) .LE. S( I, TOS ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_OR - .OR. operator
+   44   CONTINUE
+
+        DO I = 1, NDAT
+           IF( ( S( I, TOS - 1 ) .NE. 0 ) .OR.
+     :         ( S( I, TOS ) .NE. 0 ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_AND - .AND. operator
+   45   CONTINUE
+
+        DO I = 1, NDAT
+           IF( ( S( I, TOS - 1 ) .NE. 0 ) .AND.
+     :         ( S( I, TOS ) .NE. 0 ) ) THEN
+              S( I, TOS - 1 ) = 1
+           ELSE
+              S( I, TOS - 1 ) = 0
+           END IF
+        END DO
+        TOS = TOS - 1
+        GO TO 100
+ 
+*   TRN_OP_NOT - .NOT. operator
+   46   CONTINUE
+
+        DO I = 1, NDAT
+           IF( S( I, TOS ) .NE. 0 ) THEN
+              S( I, TOS ) = 0
+           ELSE
+              S( I, TOS ) = 1
+           END IF
+        END DO
+        GO TO 100
+ 
+
 *   Control passes to here after each operation on the arithmetic stack
 *   is complete.
   100   CONTINUE

@@ -29,10 +29,14 @@
 
 *  Authors:
 *     R.F. Warren-Smith (DUVAD::RFWS)
+*     D.S. Berry (DSB)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-MAY-1988:  Original version (DUVAD::RFWS)
+*     12-JAN-2006:  Added TRN_OP_EQ, TRN_OP_LE, TRN_OP_GE, TRN_OP_LT,
+*                   TRN_OP_GT, TRN_OP_NE, TRN_OP_NOT, TRN_OP_OR, TRN_OP_AND,
+*                   TRN_OP_QIF, TRN_OP_IDV. (DSB)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,12 +134,12 @@
      :     'TANH(  ', 5, 0, 1, 1, 0, 10,  1,  1,  0, 1, TRN_OP_TANH,
      :     'ABS(   ', 4, 0, 1, 1, 0, 10,  1,  1,  0, 1, TRN_OP_ABS /
 
-*   ...entries 31..SYM_MXSYM:
+*   ...entries 31..40:
       DATA ( SYM_NAME( I ), SYM_SIZE( I ), SYM_OPERL( I ),
      :       SYM_OPERR( I ), SYM_UNEXT( I ), SYM_UNOPR( I ),
      :       SYM_LPRI( I ), SYM_RPRI( I ), SYM_DPAR( I ),
      :       SYM_DSTK( I ), SYM_NARGS( I ), SYM_OPCOD( I ),
-     :       I = 31, SYM_MXSYM ) /
+     :       I = 31, 40 ) /
      :     'NINT(  ', 5, 0, 1, 1, 0, 10,  1,  1,   0, 1, TRN_OP_NINT,
      :     'MIN(   ', 4, 0, 1, 1, 0, 10,  1,  1,  -1,-2, TRN_OP_MIN,
      :     'MAX(   ', 4, 0, 1, 1, 0, 10,  1,  1,  -1,-2, TRN_OP_MAX,
@@ -144,7 +148,43 @@
      :     'SIGN(  ', 5, 0, 1, 1, 0, 10,  1,  1,  -1, 2, TRN_OP_SIGN,
      :     'ATAN2( ', 6, 0, 1, 1, 0, 10,  1,  1,  -1, 2, TRN_OP_ATN2,
      :     'ATAN2D(', 7, 0, 1, 1, 0, 10,  1,  1,  -1, 2, TRN_OP_AT2D,
-     :     '<BAD>  ', 5, 0, 0, 0, 0, 10, 10,  0,   1, 0, TRN_OP_LDBAD /
+     :     'IDV(   ', 4, 0, 1, 1, 0, 10,  1,  1,  -1, 2, TRN_OP_IDV,
+     :     'QIF(   ', 4, 0, 1, 1, 0, 10,  1,  1,  -2, 3, TRN_OP_QIF /
+
+*   ...entries 41..50:
+      DATA ( SYM_NAME( I ), SYM_SIZE( I ), SYM_OPERL( I ),
+     :       SYM_OPERR( I ), SYM_UNEXT( I ), SYM_UNOPR( I ),
+     :       SYM_LPRI( I ), SYM_RPRI( I ), SYM_DPAR( I ),
+     :       SYM_DSTK( I ), SYM_NARGS( I ), SYM_OPCOD( I ),
+     :       I = 41, 50 ) /
+     :     '<BAD>  ', 5, 0, 0, 0, 0, 10, 10,  0,   1, 0, TRN_OP_LDBAD,
+     :     '.EQ.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_EQ,
+     :     '.NE.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_NE,
+     :     '.LE.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_LE,
+     :     '.GE.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_GE,
+     :     '.LT.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_LT,
+     :     '.GT.   ', 4, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_GT,
+     :     '.OR.   ', 4, 1, 1, 0, 0,  3,  3,  0, -1, 0, TRN_OP_OR,
+     :     '.AND.  ', 5, 1, 1, 0, 0,  3,  3,  0, -1, 0, TRN_OP_AND,
+     :     '.NOT.  ', 5, 0, 1, 0, 1,  8,  7,  0,  0, 0, TRN_OP_NOT /
+
+*   ...entries 51..SYM_MXSYM:
+      DATA ( SYM_NAME( I ), SYM_SIZE( I ), SYM_OPERL( I ),
+     :       SYM_OPERR( I ), SYM_UNEXT( I ), SYM_UNOPR( I ),
+     :       SYM_LPRI( I ), SYM_RPRI( I ), SYM_DPAR( I ),
+     :       SYM_DSTK( I ), SYM_NARGS( I ), SYM_OPCOD( I ),
+     :       I = 51, SYM_MXSYM ) /
+     :     '==     ', 2, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_EQ,
+     :     '!=     ', 2, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_NE,
+     :     '<=     ', 2, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_LE,
+     :     '>=     ', 2, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_GE,
+     :     '<      ', 1, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_LT,
+     :     '>      ', 1, 1, 1, 0, 0,  4,  4,  0, -1, 0, TRN_OP_GT,
+     :     '||     ', 2, 1, 1, 0, 0,  3,  3,  0, -1, 0, TRN_OP_OR,
+     :     '&&     ', 2, 1, 1, 0, 0,  3,  3,  0, -1, 0, TRN_OP_AND,
+     :     '!      ', 1, 0, 1, 0, 1,  8,  7,  0,  0, 0, TRN_OP_NOT /
+
+
 
 
 *   Initialise variables holding the table entry numbers for the
