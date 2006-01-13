@@ -213,8 +213,8 @@ void clumps() {
 *     noise, then searches for peaks of emission which locate the clumps,
 *     and then follows them down to lower intensities. No a priori clump
 *     profile is assumed. In this algorithm, clumps never overlap. Clumps
-*     which touch an edge of the data array or include any bad pixels are
-*     ignored.
+*     which touch an edge of the data array are not included in the final
+*     list of clumps.
 
 *  GaussClumps Configuration Parameters:
 *     The GaussClumps algorithm uses the following configuration parameters. 
