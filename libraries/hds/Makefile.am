@@ -27,6 +27,8 @@ libhdsf_la_SOURCES = \
 if !NOPIC
 libhds_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libhds_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libhdsf_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
+libhdsf_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 hds_machine_SOURCES = hds_machine.c
