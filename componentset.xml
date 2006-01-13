@@ -3153,7 +3153,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="trn" support="S">
-  <version>0.9-5</version>
+  <version>0.9-6</version>
   <path>libraries/trn</path>
   <description>TRANSFORM - Coordinate Transformation Facility</description>
   <abstract><p> TRANSFORM provides a standard, flexible method for
