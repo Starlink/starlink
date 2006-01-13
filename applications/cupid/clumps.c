@@ -710,7 +710,7 @@ L999:
               "within a 1, 2 or 3-D NDF.", status );
    }
 
-   astListIssued( "At end of CLUMPS" );     
+/*   astListIssued( "At end of CLUMPS" );      */
 
 }
 
