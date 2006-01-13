@@ -1007,7 +1007,7 @@
 
                   CALL AGI_INAME( PNAME, STATUS )
                   IF( PNAME .EQ. 'DATA' ) THEN
-                     IF( NOT .QUIET ) CALL MSG_BLANK( STATUS )
+                     IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
                      CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, 
      :                                STATUS )
 
