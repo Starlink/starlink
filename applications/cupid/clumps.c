@@ -158,7 +158,32 @@ void clumps() {
 *        No catalogue will be produced if a null (!) value is supplied.
 *        The central positons of all clumps in the catalogue fred.FIT can be
 *        overlayed on a displayed image of the input NDF using the command
-*        "listmake fred plot=mark". [!]
+*        "listmake fred plot=mark". The following columns are stored in
+*        the catalogue: 
+*
+*        - PeakX: The PIXEL X coordinates of the clump peak value.
+*        - PeakY: The PIXEL Y coordinates of the clump peak value.
+*        - PeakZ: The PIXEL Z coordinates of the clump peak value.
+*        - CenX: The PIXEL X coordinates of the clump centroid.
+*        - CenY: The PIXEL Y coordinates of the clump centroid.
+*        - CenZ: The PIXEL Z coordinates of the clump centroid.
+*        - SizeX: The size of the clump along the X axis, in pixels.
+*        - SizeY: The size of the clump along the Y axis, in pixels.
+*        - SizeZ: The size of the clump along the Z axis, in pixels.
+*        - Sum: The total data sum in the clump.
+*        - Peak: The peak value in the clump.
+*        - Area: The total number of pixels falling within the clump.
+*
+*        If the data has less than 3 pixel axes, then the columns
+*        describing the missing axes will not be present in the catalogue.
+*
+*        The "size" of the clump on an axis is the RMS deviation of each 
+*        pixel centre from the clump centroid, where each pixel is
+*        weighted by the correspinding pixel data value.
+*
+*        For the GaussClump algorithm, the Sum and Area values refer 
+*        to the part of the Gaussian within the level defined by the
+*        GaussClump.ModelLim configuration parameter. [!]
 *     RMS = _DOUBLE (Read)
 *        Specifies a value to use as the global RMS noise level in the 
 *        supplied data array. The suggested defaukt value is the square root 

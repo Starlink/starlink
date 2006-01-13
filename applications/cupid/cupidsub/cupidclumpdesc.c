@@ -24,7 +24,7 @@ double *cupidClumpDesc( int indf, double *cpars, const char ***names,
 *     order:
 *
 *        0  - (n-1) : The pixel coords of the clump peak value
-*        n  - (2n-1): The pixel indices of the clump centroid
+*        n  - (2n-1): The pixel coords of the clump centroid
 *        2n - (3n-1): The clump size (in pixels) on each pixel axis. This is 
 *                     the standard deviation of the pixel axis value about the 
 *                     centroid position, weighted by the pixel values.
@@ -217,22 +217,22 @@ double *cupidClumpDesc( int indf, double *cpars, const char ***names,
 
 /* Calculate and store the clump parameters */
       if( s != 0 ) {
-         ret[ 0 ] = px;
+         ret[ 0 ] = px - 0.5;
          ret[ ndim ] = sx/s;
 
-         v = sx2/s - ret[ 0 ]*ret[ 0 ];
+         v = sx2/s - ret[ ndim ]*ret[ ndim ];
          ret[ 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
 
          if( ndim > 1 ) {
-            ret[ 1 ] = py;
+            ret[ 1 ] = py - 0.5;
             ret[ 1 + ndim ] = sy/s;
-            v = sy2/s - ret[ 1 ]*ret[ 1 ];
+            v = sy2/s - ret[ 1 + ndim ]*ret[ 1 + ndim ];
             ret[ 1 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
 
             if( ndim > 2 ) {
-               ret[ 2 ] = pz; 
+               ret[ 2 ] = pz - 0.5; 
                ret[ 2 + ndim ] = sz/s;
-               v = sz2/s - ret[ 2 ]*ret[ 2 ];
+               v = sz2/s - ret[ 2 + ndim ]*ret[ 2 + ndim ];
                ret[ 2 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
             }
          }
