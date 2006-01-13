@@ -27,7 +27,8 @@
 *  Arguments:
 *     PNNDF = CHARACTER * ( * ) (Given)
 *        The name of the Starlink parameter to be associated with the
-*        input NDF.
+*        input NDF. May be blank, in which case no attempt will be made
+*        to obtain the NDF form the environment.
 *     MODE = CHARACTER * ( * ) (Given)
 *        Access mode to the NDF required: 'READ' or 'UPDATE'.
 *     GOTNAM = LOGICAL (Given)
@@ -49,6 +50,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -62,6 +64,8 @@
 *     2-JUL-1999 (DSB):
 *        Modified so that an NDF is obtained by association if the
 *        displayed NDF cannot be accessed.
+*     13-JAN-2006 (DSB):
+*        Modified so that the parameter name is ignored if blank.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,13 +125,17 @@
 *  There is a choice from where to obtain the NDF.  In order try the
 *  a) command line, b) graphics database, c) prompting.
 
-*  See if the NDF is pre-supplied on the command line.
-      CALL LPG_STATE( PNNDF, STATE, STATUS )
+*  If a parameter was supplied, see if the NDF is pre-supplied on the 
+*  command line.
+      IF( PNNDF .NE. ' ' ) THEN
+         CALL LPG_STATE( PNNDF, STATE, STATUS )
+      END IF
 
 *  Get an identifier to the input NDF if it has not already been
 *  obtained on the command line, using a supplied reference.  See if the
 *  reference is by locator or name.
-      IF ( STATE .NE. PAR__ACTIVE .AND. GOTNAM ) THEN
+      IF ( (PNNDF .EQ. ' ' .OR. STATE .NE. PAR__ACTIVE ) .AND. 
+     :     GOTNAM ) THEN
 
          CALL DAT_VALID( NAME( :DAT__SZLOC ), VALID, STATUS )
          IF ( VALID ) THEN
@@ -147,14 +155,19 @@
          ELSE 
             CALL ERR_FLUSH( STATUS )
             CALL MSG_BLANK( STATUS )
-            CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
-     :                    'cannot be accessed. Please supply an '//
-     :                    'alternative NDF.', STATUS )
-            CALL LPG_ASSOC( PNNDF, MODE, NDF, STATUS )
+            IF( PNNDF .NE. ' ' ) THEN 
+               CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
+     :                       'cannot be accessed. Please supply an '//
+     :                       'alternative NDF.', STATUS )
+               CALL LPG_ASSOC( PNNDF, MODE, NDF, STATUS )
+            ELSE
+               CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
+     :                       'cannot be accessed.', STATUS )
+            END IF
          END IF
 
 *  Obtain the identifier of the NDF by association.
-      ELSE
+      ELSE IF( PNNDF .NE. ' ' ) THEN
          CALL LPG_ASSOC( PNNDF, MODE, NDF, STATUS )
       END IF
 
