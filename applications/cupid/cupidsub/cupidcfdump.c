@@ -61,7 +61,9 @@ void cupidCFDump( int *array, int ndim, int *dims, int *slbnd ){
    ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );
    ndfNew( "_INTEGER", ndim, lbnd, ubnd, &place, &indf, status );
    ndfMap( indf, "DATA", "_INTEGER", "WRITE", (void *) &adata, &el, status );
-   for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];
+   if( adata ) {
+      for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];
+   }
    ndfAnnul( &indf, status );
 }
 

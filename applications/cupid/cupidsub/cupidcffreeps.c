@@ -16,7 +16,8 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 
 *  Description:
 *     This function releases the resources used by a CupidPixelSet
-*     structure.
+*     structure, returning the PixelSet structure itself to a cache of
+*     unused structures.
 
 *  Parameters:
 *     ps
@@ -54,7 +55,9 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
    if( ipa && *status == SAI__OK ) {
       int n = 0;
       for( i = 0; i < nel; i++ ) {
-         if( cupidMergeSet( ipa[ i ] ) == ps->index ) n++;
+         if( cupidMergeSet( ipa[ i ] ) == ps->index ) {
+            n++;
+         }
       }
 
       if( n ) {
@@ -73,25 +76,28 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
       }
    }
 
-/* Free the array used to hold pointers to neighbouring PixelSets. We do
-   not free the neighbouring PixelSet structures themselves. */
-   ps->nb = astFree( ps->nb );
 
-/* Free the arrays used to hold lists of neighbouring pixels. */
-   if( ps->nbl ) {
-      for( i = 0; i < ps->nnb; i++ ) {
-         ps->nbl[ i ] = astFree( ps->nbl[ i ] );
-      }
-
-/* Free the arrays used to hold pointers to the above lists. */
-      ps->nbl = astFree( ps->nbl );
+/* Free the lists of neighbouring pixel indices. */
+   for( i = 0; i < ps->nnb; i++ ) {
+      ps->nbl[ i ] = astFree( ps->nbl[ i ] );
    }
 
-/* Free the array used to hold the list sizes. */
-   ps->sznbl = astFree( ps->sznbl );
+/* Put all scalar fields back to their initial values in prepreation for
+   the PixelSet pointer being re-issued by cupidMakePS. Dynamic memory
+   referenced by the PixelSet is not freed, so that it can be reused
+   later. */
+   ps->nnb = 0;
+   ps->pop = 0;
+   ps->edge = 0;
+   ps->vpeak = -DBL_MAX;
+   ps->index = CUPID__CFNULL;
 
-/* Free the supplied PixelSet structure. */
-   astFree( ps );
+/* Move the supplied PixelSet structure to the end of the cache so that
+   it can be re-used. */
+   i = cupid_ps_cache_size++;
+   cupid_ps_cache = astGrow( cupid_ps_cache, cupid_ps_cache_size, 
+                             sizeof( CupidPixelSet * ) );
+   cupid_ps_cache[ i ] = ps;
 
 /* Return a NULL pointer. */
    return NULL;

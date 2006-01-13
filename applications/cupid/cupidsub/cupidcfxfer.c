@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
+#include <string.h>
 
 void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa, 
                   int skip[3] ){
@@ -52,17 +53,20 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
 */      
 
 /* Local Variables: */
+   CupidPixelSet *psn; /* Pointer to neighbouring PixelSet */
    int *v1;         /* Pointer to element at start of this row */
    int *v2;         /* Pointer to element at start of this plane */
    int *v;          /* Pointer to next array element */
    int i;           /* GRID axis 1 value of next array element */
    int j;           /* GRID axis 2 value of next array element */
    int k;           /* GRID axis 3 value of next array element */
+   int l;           /* Original number of neighbouring pixels in ps2 */
    int new_index;   /* Index value to assign to the transferred pixels */
    int old_index;   /* Original index value of the transferred pixels */
 
-/* Check inherited status */
-   if( *status != SAI__OK ) return;
+/* Check inherited status. Also return without action if the two
+   PointSets are the same.  */
+   if( *status != SAI__OK || ps1 == ps2 ) return;
 
 /* Get the index value of the source PixelSet. */
    old_index = ps1->index;
@@ -83,9 +87,12 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
          v1 = v;
          for( i = ps1->lbnd[ 0 ]; i <= ps1->ubnd[ 0 ]; i++ ) {
 
-/* Assign the new index to the pixel, if the pixel was originally a
-   member of the source PixelSet.  */
-            if( cupidMergeSet(*v) == old_index ) *v = new_index;
+/* Assign the new index to the pixel, if the pixel was originally a member 
+   of the source PixelSet.  Retain information about any neighbouring 
+   PixelSet. */
+            if( cupidMergeSet(*v) == old_index ) {
+               *v = cupidMergeIndex( new_index, cupidMergeNeb(*v) );
+            }
 
 /* Get the pointer to the next pixel in the source PixelSet bounding box. */
             v++;
@@ -109,9 +116,8 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
    ps2->pop += ps1->pop;
    ps1->pop = 0;
 
-/* If the source PixelSet touches bad pixels or the edge, then so does
-   the destination PixelSet. */
-   if( ps1->bad ) ps2->bad = 1;
+/* If the source PixelSet touches the edge, then so does the destination 
+   PixelSet. */
    if( ps1->edge ) ps2->edge = 1;
 
 /* If the peak value in the source PixelSet is greater than in the
@@ -123,5 +129,52 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
       ps2->peak[ 1 ] = ps1->peak[ 1 ];
       ps2->peak[ 2 ] = ps1->peak[ 2 ];
    }
+
+/* Move information about pixels in the source PixelSet which adjoin
+   other PixelSets from the source PixelSet to the destination PixelSet. 
+   Loop round each of the PixelSets which adjoin the source PixelSet. */
+   for( i = 0; i < ps1->nnb; i++ ) {
+      psn = ps1->nb[ i ];
+   
+/* Does the destination PixelSet also adjoin the same PixelSet? */
+      for( j = 0; j < ps2->nnb; j++ ) {
+         if( ps2->nb[ j ] == psn ) break;
+      }
+
+/* If not, extend the arrays in the destination PixelSet to accomodate a
+   new neighbouring PixelSet, and initialise the new elements. */
+      if( j == ps2->nnb ) {
+         ps2->nnb++;
+         ps2->nb = astGrow( ps2->nb, ps2->nnb, sizeof( CupidPixelSet * ) );
+         ps2->nbl = astGrow( ps2->nbl, ps2->nnb, sizeof( int * ) );
+         ps2->sznbl = astGrow( ps2->sznbl, ps2->nnb, sizeof( int ) );
+         if( ps2->sznbl ) {
+            ps2->nb[ j ] = psn;
+            ps2->nbl[ j ] = NULL;
+            ps2->sznbl[ j ] = 0;
+         }
+      }
+
+/* Extend the array holding the list of indices of the pixels which
+   adjoin the new neighbouring PixelSet. */
+      l = ps2->sznbl[ j ];
+      ps2->sznbl[ j ] += ps1->sznbl[ i ];
+      ps2->nbl[ j ] = astGrow( ps2->nbl[ j ], ps2->sznbl[ j ], sizeof( int ) ); 
+
+/* Copy the indices of the adjoining pixels from ps1 to ps2. */
+      if( ps2->nbl[ j ] ) {
+         memcpy( ps2->nbl[ j ] + l, ps1->nbl[ i ], 
+                 ps1->sznbl[ i ]*sizeof( int ) );
+      }
+
+/* Remove the pixels from the source PixelSet lists. */
+      ps1->sznbl[ i ] = 0;
+      ps1->nbl[ i ] = astFree( ps1->nbl[ i ] );
+      ps1->nb[ i ] = NULL;
+   }
+
+/* indicate the source PixelSet now has no neighbours. */
+   ps1->nnb = 0;
+
 }
 

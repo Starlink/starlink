@@ -14,7 +14,7 @@
 #define CUPID__GCNP3 11  /* No. of free parameters in a 3D GaussClump clump */
 
 #define CUPID__CFNULL -1 /* Unassigned pixel flag */
-#define CUPID__MAXINDEX 8190   /* Largest usable PixelSet index (must fit in 13 bits) */
+#define CUPID__MAXINDEX 16380 /* Largest usable PixelSet index (must fit in 14 bits) */
 
 #define CUPID__CONFIG  "NOALG_CONFIG" /* Key for config params which have no
                                          algorithm name */
@@ -74,7 +74,6 @@ struct CupidPixelSet {
    double vpeak;       /* Peak pixel value */
    int peak[ 3 ];      /* Peak pixel GRID coords */
    int pop;            /* Number of pixels assigned to the pixel set */
-   int bad;            /* Does the PixelSet contain any bad pixels? */
    int edge;           /* Does the PixelSet touch an edge of the data array? */
 };
 
@@ -86,17 +85,17 @@ struct CupidPixelSet {
    and is also a neighbour to a pixel belonging to the PixelSet with 
    index "j". The "j" value is moved into the upper bits of the int value. */
 #define cupidMergeIndex( i, j ) \
-   ( -(i) - ( (j) << 13 ) )
+   ( j == CUPID__CFNULL || j == i ) ? i :( -(i) - ( (j) << 14 ) )
 
 /* A macro which takes a merged index produced by cupidMergeIndex and
    returns the index of the PixelSet to which the pixel belongs. */
 #define cupidMergeSet( i ) \
-   ( ( i >= CUPID__CFNULL ) ? i : ( (-i) & 0x1fff ) )
+   ( ( i >= CUPID__CFNULL ) ? i : ( (-i) & 0x3fff ) )
 
 /* A macro which takes a merged index produced by cupidMergeIndex and
    returns the index of the neighbouring PixelSet. */
 #define cupidMergeNeb( i ) \
-   ( ( i >= CUPID__CFNULL ) ? CUPID__CFNULL : ( (-i) >> 13 ) )
+   ( ( i >= CUPID__CFNULL ) ? CUPID__CFNULL : ( (-i) >> 14 ) )
 
 /* A macro to return the size of a cupid data type. */
 #define cupidSize( type, fun ) \
@@ -112,6 +111,32 @@ struct CupidPixelSet {
        errRep( "CUPIDSIZE_ERR1", fun ": Invalid \"type\" " \
                "value (^TYPE) supplied (CUPID programming error).", \
                status ), 0 : 0 ) ) )
+
+
+
+
+#define cupidTestBnd \
+{int itea, iteax, iteay, iteaz; \
+   itea = -1; \
+   for( iteaz = 1; iteaz <= dims[2]; iteaz++ ) { \
+      for( iteay = 1; iteay <= dims[1]; iteay++ ) { \
+         for( iteax = 1; iteax <= dims[0]; iteax++ ) { \
+            itea++; \
+            if( cupidMergeSet( ipa[ itea ] ) ) == ps->index ) { \
+               if( iteax < ps->lbnd[ 0 ] || iteax > ps->ubnd[ 0 ] ||  \
+                   iteay < ps->lbnd[ 1 ] || iteay > ps->ubnd[ 1 ] ||  \
+                   iteaz < ps->lbnd[ 2 ] || iteaz > ps->ubnd[ 2 ] ) { \
+                  printf("Pixel %d [%d %d %d] has ipa %d but is not in " \
+                         "bounding box (%d:%d,%d:%d)\n", itea, iteax, iteay,  \
+                         iteaz, ipa[itea], ps->lbnd[ 0 ], ps->ubnd[ 0 ], \
+                         ps->lbnd[ 1 ], ps->ubnd[ 1 ]); \
+               } \
+            } \
+         } \
+      } \
+   }
+
+
 
 
 
@@ -133,9 +158,24 @@ struct CupidPixelSet {
 extern int *cupid_global_status;
 #define status cupid_global_status
 
+/* PixelSet cache used by the ClumpFind algorithm. */
+/* ----------------------------------------------- */
+/* Pointer to an array holding a list of PixelSet pointers. The PixelSet
+   structures in this list have been created previously by cupidCFMakePS
+   but have subsequently been freed (using cupidCFFreePS) and are
+   currently not being used for anything, and so can be re-issued by 
+   cupidCFMakePS, thus avoiding the overhead of frequenct memory
+   allocation. */
+extern CupidPixelSet **cupid_ps_cache;
+
+/* This is the length of the cupid_ps_cache array. */
+extern int cupid_ps_cache_size;
+
 /* Function prototypes */
 /* ------------------  */
+CupidPixelSet *cupidCFDeletePS( CupidPixelSet * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int );
+CupidPixelSet *cupidCFMakePS( int );
 int *cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
 int *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int * );
@@ -156,6 +196,9 @@ void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
 void cupidCFDump( int *, int, int *, int * );
 double *cupidClumpDesc( int, double *, const char ***, int * );
+void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet ** );
+void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int, CupidPixelSet * );
+void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int *, int *, int[27], int *, CupidPixelSet ** );
 
 void clumps();
 void cupidhelp();

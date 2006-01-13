@@ -4,8 +4,16 @@
 #include "cupid.h"
 #include <string.h>
 
+/* Declare global variables used throughout cupid */
+/* ---------------------------------------------- */
+
 /* A pointer to the global status variable.*/
 int *cupid_global_status;
+
+/* PixelSet cache used by the ClumpFind algorithm. */
+CupidPixelSet **cupid_ps_cache = NULL;
+int cupid_ps_cache_size = 0;
+
 
 extern F77_SUBROUTINE(task_get_name)( CHARACTER(name), INTEGER(status) TRAIL(name) );
 

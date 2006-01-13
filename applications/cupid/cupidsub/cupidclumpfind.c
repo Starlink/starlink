@@ -112,7 +112,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int minpix;          /* Minimum number of pixels in a clump */
    int more;            /* Any remaining unsorted elements/ */
    int naxis;           /* Defines whether two pixels are neighbours or not */
-   int nbad;            /* Number of clumps with bad pixels */
    int nedge;           /* Number of clumps with edge pixels */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
@@ -282,7 +281,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round each clump */
          i = -1;
          nminpix = 0;
-         nbad = 0;
          nedge = 0;
          for( ii = 0; ii < *nclump; ii++ ) {
             ps = clumps[ ii ];
@@ -292,9 +290,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             if( ps ){
                if( ps->pop < minpix ){
                   nminpix++;
-
-               } else if( ps->bad ){
-                  nbad++;
 
                } else if( ps->edge ){
                   nedge++; 
@@ -347,15 +342,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                        "than MinPix (^M) pixels", status );
             }
    
-            if( nbad == 1 ) {
-               msgOut( "", "1 clump rejected because it contains 1 or more bad "
-                       "pixels", status );
-            } else if( nbad > 1 ) {
-               msgSeti( "N", nbad );
-               msgOut( "", "^N clumps rejected because they contain 1 or more bad "
-                       "pixels", status );
-            }
-   
             if( nedge == 1 ) {
                msgOut( "", "1 clump rejected because it touches an edge of "
                        "the data array", status );
@@ -387,6 +373,12 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Free resources */
    ipa = astFree( ipa );
    cfconfig = astAnnul( cfconfig );
+
+   for( i = 0; i < cupid_ps_cache_size; i++ ) {
+      cupid_ps_cache[ i ] = cupidCFDeletePS( cupid_ps_cache[ i ] );
+   }
+   cupid_ps_cache = astFree( cupid_ps_cache );
+   cupid_ps_cache_size = 0;
 
 /* Return the list of clump structure locators. */
    return clist;

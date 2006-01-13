@@ -223,7 +223,6 @@ int CGEN_FUNCTION(cupidCFXtend)( CupidPixelSet *ps1, CupidPixelSet *ps2,
    ret = 0;
    if( *status != SAI__OK || !ps2 ) return ret;
 
-   naxis = 3;
 
 /* Get the index value of the source PixelSet. */
    old_index = ps1->index;
@@ -280,7 +279,7 @@ int CGEN_FUNCTION(cupidCFXtend)( CupidPixelSet *ps1, CupidPixelSet *ps2,
 
 /* Calculate the nD GRID coords of this neighbouring pixel and extend the
    bounding box of the destination PixelSet to include it. At the
-  same time, set a flag indicating if the neighbouring pixel is an edge
+   same time, set a flag indicating if the neighbouring pixel is an edge
    pixel. */
             edge = 0;
             rem = iv;
@@ -315,10 +314,6 @@ int CGEN_FUNCTION(cupidCFXtend)( CupidPixelSet *ps1, CupidPixelSet *ps2,
 /* If this pixel is an edge pixel, flag that the destination clump
    touches the edge. */
             if( edge ) ps2->edge = 1;
-
-/* If this pixel has a bad value, flag that the destination clump
-   includes bad pixels. */
-            if( ipd[ iv ] == CGEN_BAD ) ps2->bad = 1;
 
 /* Now add any neighbours of this pixel which are still in the source
    PixelSet to the list of new clump neighbours. First check the pixels 
