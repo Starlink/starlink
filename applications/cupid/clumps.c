@@ -155,7 +155,10 @@ void clumps() {
 *        QUALITY components (plus any extensions) from the input NDF. [!]
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
-*        No catalogue will be produced if a null (!) value is supplied [!]
+*        No catalogue will be produced if a null (!) value is supplied.
+*        The central positons of all clumps in the catalogue fred.FIT can be
+*        overlayed on a displayed image of the input NDF using the command
+*        "listmake fred plot=mark". [!]
 *     RMS = _DOUBLE (Read)
 *        Specifies a value to use as the global RMS noise level in the 
 *        supplied data array. The suggested defaukt value is the square root 
