@@ -48,6 +48,10 @@
 *        value (!) terminates the loop. If the section being modified
 *        contains only a single pixel, then the original value of that 
 *        pixel is used as the suggested default value. 
+*     OLDVAL = LITERAL (Write)
+*        If the section being modified contains only a single pixel, then 
+*        the original value of that pixel is written out to this output
+*        parameter.
 *     OUT = NDF (Write)
 *        Output NDF structure containing the modified version of
 *        the array component.
@@ -284,6 +288,7 @@
      :                          RVALUE, STATUS )
                WRITE( SUGDEF, '(G13.6)') RVALUE
                CALL CHR_LDBLK( SUGDEF )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
 *  Get the replacement value.  The range depends on the processing data
@@ -311,6 +316,7 @@
      :                          DVALUE, STATUS )
                WRITE( SUGDEF, '(G18.11)') RVALUE
                CALL CHR_LDBLK( SUGDEF )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
             CALL PAR_MIX0D( 'NEWVAL', SUGDEF, VAL__MIND, VAL__MAXD,
@@ -335,6 +341,7 @@
                CALL KPG1_MEANI( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          IVALUE, STATUS )
                CALL CHR_ITOC( IVALUE, SUGDEF, NCHAR )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, VAL__MINI, VAL__MAXI,
@@ -359,6 +366,7 @@
                CALL KPG1_MEANB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          BVALUE, STATUS )
                CALL CHR_ITOC( NUM_BTOI( BVALUE ), SUGDEF, NCHAR )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_BTOI( VAL__MINB ), 
@@ -385,6 +393,7 @@
                CALL KPG1_MEANUB( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                           BVALUE, STATUS )
                CALL CHR_ITOC( NUM_UBTOI( BVALUE ), SUGDEF, NCHAR )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UBTOI( VAL__MINUB ),
@@ -411,6 +420,7 @@
                CALL KPG1_MEANW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                          WVALUE, STATUS )
                CALL CHR_ITOC( NUM_WTOI( WVALUE ), SUGDEF, NCHAR )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
 
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_WTOI( VAL__MINW ),
@@ -437,6 +447,7 @@
                CALL KPG1_MEANUW( 1, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                           WVALUE, STATUS )
                CALL CHR_ITOC( NUM_UWTOI( WVALUE ), SUGDEF, NCHAR )
+               CALL PAR_PUT0C( 'OLDVAL', SUGDEF, STATUS )
             END IF
             CALL PAR_MIX0I( 'NEWVAL', SUGDEF, NUM_UWTOI( VAL__MINUW ),
      :                      NUM_UWTOI( VAL__MAXUW ), 'Bad', .FALSE., 

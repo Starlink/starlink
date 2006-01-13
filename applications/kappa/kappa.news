@@ -35,6 +35,11 @@
    parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
    artifacts when transforming large images with flux conservation.
 
+   o CURSOR can now display the pixel value at each selected position (if
+   the position falls within the bounds of a displayed NDF). This is
+   controlled via the new parameters SHOWDATA and COMP.
+
+
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 

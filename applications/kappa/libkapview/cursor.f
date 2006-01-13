@@ -26,6 +26,8 @@
 *     PLOT), and can be written to an output positions list so that subsequent
 *     applications can make use of them (see parameter OUTCAT). The format 
 *     of the displayed positions may be controlled using parameter STYLE.
+*     The pixel data value in any associated NDF can also be displayed
+*     (see parameter SHOWDATA).
 *
 *     Positions may be reported in several different co-ordinate Frames
 *     (see parameter FRAME). Optionally, the corresponding pixel 
@@ -74,6 +76,13 @@
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". If TRUE, polygons will be closed by joining 
 *        the first position to the last position. [current value]
+*     COMP = LITERAL (Read)
+*        The NDF array component to be displayed if parameter SHOWDATA is
+*        set TRUE..  It may be "Data", "Quality", "Variance", or "Error" 
+*        (where "Error" is an alternative to "Variance" and causes the 
+*        square root of the variance values to be displayed).  If "Quality" 
+*        is specified, then the quality values are treated as numerical 
+*        values (in the range 0 to 255). ["Data"]
 *     DESCRIBE = _LOGICAL (Read)
 *        If TRUE, a detailed description of the co-ordinate Frame in which 
 *        subsequent positions will be reported is produced each time a 
@@ -248,6 +257,12 @@
 *        parameters and files are still created. The display of informational 
 *        messages describing the use of the cursor is controlled by the 
 *        parameter INFO. [FALSE]
+*     SHOWDATA = _LOGICAL (Read)
+*        If TRUE, the pixel value within the displayed NDF is reported for 
+*        each selected position. This is only possible if the picture
+*        within which position are being selected contains a reference to 
+*        an existing NDF. The NDF array component to be displayed is
+*        selected via parameter COMP. [FALSE]
 *     SHOWPIXEL = _LOGICAL (Read)
 *        If TRUE, the pixel co-ordinates of each selected position are
 *        shown on a separate line, following the co-ordinates requested 
@@ -442,6 +457,8 @@
 *        KPG1_PGCUR argument list changed.
 *     13-DEC-2001 (DSB):
 *        Added parameters CATFRAME and CATEPOCH.
+*     13-JAN-2006 (DSB):
+*        Added parameters SHOWDATA and COMP.
 **     {enter_further_changes_here}
 
 *  Bugs:
@@ -457,6 +474,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'CNF_PAR'          ! CNF constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'PAR_ERR'          ! Parameter-system errors
@@ -486,23 +504,24 @@
 
 *  Local Variables:
       CHARACTER AMES( 3 )*30     ! Informational messages about use of cursor
-      CHARACTER ATTRIB*20        ! Attribute name
+      CHARACTER CNAME*( DAT__SZNAM )! Name of current picture
       CHARACTER COMENT*256       ! Comment for the latest picture
+      CHARACTER COMP*8           ! Component to be displayed
       CHARACTER DOM*20           ! Domain of Current Frame in Plot
       CHARACTER JUST*2           ! Justification for text strings
       CHARACTER KEYS*3           ! Keys which activate each cursor action
       CHARACTER LABEL*( SZNAM )  ! Picture label
       CHARACTER LINE*256         ! Text buffer for screen
       CHARACTER LOGLIN*256       ! Text buffer for log file
+      CHARACTER MCOMP*8          ! Component to be mapped
       CHARACTER MODE*10          ! Mode for selecting pictures
       CHARACTER NAME*( DAT__SZNAM ) ! Name of pictures which can be selected
       CHARACTER PLOT*15          ! Nature of required graphics
       CHARACTER PNAME*( DAT__SZNAM )! Name for the latest picture
       CHARACTER PURP*80          ! Purpose for using cursor
+      CHARACTER REFNAM*256       ! Reference name
       CHARACTER TEXT*80          ! Marker text
-      DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       DOUBLE PRECISION CXY( NDF__MXDIM )! Current Frame position
-      DOUBLE PRECISION FINISH( NDF__MXDIM )! Position at end of polygon edge
       DOUBLE PRECISION GXY( 2 )  ! Graphics position
       DOUBLE PRECISION PXY( NDF__MXDIM )! PIXEL Frame position
       DOUBLE PRECISION START( NDF__MXDIM ) ! Position at start of polygon edge
@@ -512,19 +531,19 @@
       DOUBLE PRECISION YB        ! Cursor Y position in BASE world co-ords
       INTEGER ACT                ! Cursor choice
       INTEGER BMAP               ! GRAPHICS to BASE world co-ords Mapping
-      INTEGER CHAN               ! Pointer to AST channel
+      INTEGER EL                 ! Number of mapped elements
       INTEGER FRM1               ! Pointer to required Frame
       INTEGER FRM2               ! Pointer to required secondary Frame
       INTEGER GRPSIZ             ! No. of elements in a GRP group
-      INTEGER ICOL( NDF__MXDIM ) ! Minimum column no. for start of each field
       INTEGER I                  ! Loop count
       INTEGER IAGDAT             ! Index of AGI_DATA Frame
       INTEGER IAT                ! No. of characters in the string
-      INTEGER ICURR              ! Original Current Frame index
+      INTEGER ICOL( NDF__MXDIM ) ! Minimum column no. for start of each field
       INTEGER IGRP1              ! GRP identifier for group of formatted posns
       INTEGER IGRP2              ! GRP identifier for group of text strings
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER IMODE              ! Mode of operation
+      INTEGER INDF1              ! NDF identifier for associated NDF
       INTEGER IPIC               ! AGI id for current picture
       INTEGER IPIC0              ! Current (input) picture identifier
       INTEGER IPIC1              ! Picture identifier for 1st selected picture
@@ -533,9 +552,9 @@
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Plot for current picture
       INTEGER IPLOTB             ! Plot for BASE picture
-      INTEGER IPLOTP             ! Plot for drawing polygons
       INTEGER JAT                ! No. of characters in the string
       INTEGER JCOL( NDF__MXDIM ) ! Minimum column no. for start of each field
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of the associated NDF
       INTEGER MAP1               ! Pointer to Base->Current Mapping
       INTEGER MAP2               ! Pointer to Base->secondary Frame Mapping
       INTEGER MAXP               ! Max. no. of positions which may be supplied.
@@ -543,7 +562,7 @@
       INTEGER NACT               ! No. of cursor actions 
       INTEGER NAX                ! No. of axes in current position
       INTEGER NAXP               ! No. of axes in polygon Plot
-      INTEGER NOB                ! The number of objects written
+      INTEGER NDIM               ! Number of pixel axes in associated NDF
       INTEGER NOUTAX             ! No. of axes in first selected picture
       INTEGER NOUTIP             ! Pointer to Plot for first selected picture
       INTEGER NOUTPS             ! No. of positons in first selected picture
@@ -551,12 +570,15 @@
       INTEGER NPNT               ! No. of cursor positions supplied 
       INTEGER NSTR               ! No. of marker strings supplied 
       INTEGER OLDCOL             ! Original marker colour index
+      INTEGER PNTR               ! Pointer to the required NDF component
       INTEGER RBMODE             ! PGPLOT rubber band mode
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the associated NDF
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
       LOGICAL FIRST              ! Reading first position in any picture?
       LOGICAL GEO                ! Draw geodesic polygons?
       LOGICAL GOOD               ! Are all axis values good?
+      LOGICAL GOTNAM             ! Reference name obtained for the NDF?
       LOGICAL INFO               ! Display mouse instructions?
       LOGICAL LOOP               ! Continue to get a new cursor position?
       LOGICAL NEWPIC             ! Reading first position in a new picture?
@@ -564,7 +586,9 @@
       LOGICAL PLURAL             ! Use the plural form of a word in a message?
       LOGICAL QUIET              ! Run quietly?
       LOGICAL SAME               ! Is given picture same as current picture?
+      LOGICAL SHDATA             ! Display data values from the associated NDF?
       LOGICAL SHPIX              ! Are additional PIXEL co-ords to be displayed?
+      LOGICAL THERE              ! Is the NDF component in a defined state?
       REAL OLDSIZ                ! Original marker size
       REAL X1                    ! PGPLOT X world coord at bottom left
       REAL X2                    ! PGPLOT X world coord at top right
@@ -614,6 +638,22 @@
 *  See what type of graphics are required. 
       CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
      :                'Vline,Hline,Cross,Text', .TRUE., PLOT, STATUS )
+
+*  See if the NDF pixel value at each selected point is to be displayed.
+      CALL PAR_GET0L( 'SHOWDATA', SHDATA, STATUS )
+
+*  If so, see which array component is to be displayed. Most NDF routines 
+*  with a component argument don't recognise 'ERROR', so we need two 
+*  variables.  Thus convert 'ERROR' into 'VARIANCE' in the variable needed 
+*  for such routines.  The original value is held in a variable with the 
+*  prefix M for mapping, as one of the few routines that does support 
+*  'ERROR' is NDF_MAP.
+      IF( SHDATA ) THEN
+         CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Error,Quality,Variance',
+     :                   .FALSE., COMP, STATUS )
+         MCOMP = COMP
+         IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
+      ENDIF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -720,6 +760,38 @@
          CALL AGI_IBASE( IPIC, STATUS )
          IPLOT = AST_CLONE( IPLOTB, STATUS )
          CALL AGI_SELP( IPIC, STATUS )
+      END IF
+
+*  If the user has requested display of data values, and the current picture 
+*  is a DATA picture, obtain a reference to the NDF, and then an identifier
+*  for the NDF, then map the required array component of the NDF. 
+      INDF1 = NDF__NOID
+      IF( SHDATA ) THEN
+         CALL AGI_INAME( CNAME, STATUS )
+         IF( CNAME .EQ. 'DATA' ) THEN
+            CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, STATUS )
+
+            IF( GOTNAM ) THEN 
+               CALL KPG1_ASREF( ' ', 'READ', GOTNAM, REFNAM, INDF1, 
+     :                          STATUS )
+
+               CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
+               IF ( .NOT. THERE ) THEN
+                  CALL MSG_SETC( 'COMP', MCOMP )
+                  CALL NDF_MSG( 'NDF', INDF1 )
+                  CALL MSG_OUT( 'CURSOR_NOCOMP', 'The ^COMP component'//
+     :                          ' is undefined in the NDF structure '//
+     :                          '^NDF', STATUS )
+                  CALL NDF_ANNUL( INDF1, STATUS )
+               ELSE
+                  CALL NDF_MAP( INDF1, MCOMP, '_DOUBLE', 'READ', PNTR, 
+     :                          EL, STATUS )
+                  CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, 
+     :                            STATUS )
+               END IF
+            END IF
+
+         END IF
       END IF
 
 *  Abort if an error has occurred.
@@ -923,6 +995,47 @@
 *  structure stored with the picture in the database).
                CALL KPG1_GDGET( IPIC, AST__NULL, .TRUE., IPLOT, STATUS )
 
+*  If the user has requested display of data values, and the new picture is a 
+*  DATA picture, obtain a reference to the NDF, and then an identifier
+*  for the NDF, then map the required array component of the NDF. Before
+*  doing any of this, annul the identifier for any previous NDF.
+               IF( SHDATA ) THEN
+
+                  IF( INDF1 .NE. NDF__NOID ) THEN
+                     CALL NDF_ANNUL( INDF1, STATUS )
+                  END IF
+
+                  CALL AGI_INAME( PNAME, STATUS )
+                  IF( PNAME .EQ. 'DATA' ) THEN
+                     IF( NOT .QUIET ) CALL MSG_BLANK( STATUS )
+                     CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, 
+     :                                STATUS )
+
+                     IF( GOTNAM ) THEN 
+                        CALL KPG1_ASREF( ' ', 'READ', GOTNAM, REFNAM, 
+     :                                   INDF1, STATUS )
+
+                        CALL NDF_STATE( INDF1, COMP, THERE, STATUS )
+                        IF ( .NOT. THERE ) THEN
+                           CALL MSG_SETC( 'COMP', MCOMP )
+                           CALL NDF_MSG( 'NDF', INDF1 )
+                           CALL MSG_OUT( 'CURSOR_NOCOMP', 'The ^COMP '//
+     :                                   'component is undefined in '//
+     :                                   'the NDF structure ^NDF', 
+     :                                   STATUS )
+                           CALL NDF_ANNUL( INDF1, STATUS )
+                        ELSE
+                           CALL NDF_MAP( INDF1, MCOMP, '_DOUBLE', 
+     :                                   'READ', PNTR, EL, STATUS )
+                           CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, 
+     :                                     UBND, NDIM, STATUS )
+                        END IF   
+
+                     END IF
+
+                  END IF
+               END IF
+
 *  If the picture has not changed, annul the new picture id.
             ELSE IF( IPIC2 .NE. -1 ) THEN
                CALL AGI_ANNUL( IPIC2, STATUS )
@@ -975,9 +1088,9 @@
                   NAXP = AST_GETI( FRM2, 'NAXES', STATUS )
 
 *  If PIXEL co-ordinates are to be displayed as well as the required
-*  co-ordinate Frame get the simplified Mapping from Base (GRAPHICS) Frame 
-*  to the PIXEL Frame.
-                  IF( SHPIX ) THEN
+*  co-ordinate Frame, or if access to the NDF array component is required,  
+*  get the simplified Mapping from Base (GRAPHICS) Frame to the PIXEL Frame.
+                  IF( SHPIX .OR. SHDATA ) THEN
                      MAP2 = AST_SIMPLIFY( AST_GETMAPPING( IPLOT, 
      :                                                   AST__BASE,
      :                                                   IPIX, STATUS ), 
@@ -1083,6 +1196,33 @@
                CALL CHR_APPND( ')', LINE, IAT )
 
 *  Display the formatted values on the screen if required.
+               IF( .NOT. QUIET ) THEN
+                  CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
+                  CALL MSG_BLANK( STATUS )
+               END IF
+
+*  Append it to the current line in the log file.
+               CALL GRP_GRPSZ( IGRP1, GRPSIZ, STATUS )
+               CALL GRP_GET( IGRP1, GRPSIZ, 1, LOGLIN, STATUS ) 
+               IAT = CHR_LEN( LOGLIN ) + 3
+               CALL CHR_APPND( LINE, LOGLIN, IAT )
+               CALL GRP_PUT( IGRP1, 1, LOGLIN( : IAT ), GRPSIZ, STATUS ) 
+
+            END IF
+
+*  If required, show the NDF pixel value.
+            IF( SHDATA .AND. INDF1 .NE. NDF__NOID ) THEN
+
+*  Map the GRAPHICS position into the PIXEL Frame, and format the
+*  required NDF array value.
+               LINE = ' ('
+               IAT = 2
+               CALL KPS1_CURDV( MAP2, XC, YC, NDIM, LBND, UBND, COMP, 
+     :                          %VAL( CNF_PVAL( PNTR ) ), IAT, LINE, 
+     :                          STATUS )
+               CALL CHR_APPND( ')', LINE, IAT )
+
+*  Display the formatted array value on the screen if required.
                IF( .NOT. QUIET ) THEN
                   CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
                   CALL MSG_BLANK( STATUS )
@@ -1347,6 +1487,9 @@
 *  Shutdown procedure.
 *  ===================
   999 CONTINUE
+
+*  Annul any NDF identifier in use.
+      IF( INDF1 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF1, STATUS )
 
 *  Delete the GRP groups.
       IF( IGRP1 .NE. GRP__NOID ) CALL GRP_DELET( IGRP1, STATUS )

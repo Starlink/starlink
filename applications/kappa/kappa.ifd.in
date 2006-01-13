@@ -8241,6 +8241,14 @@ package kappa {
             helpkey *
           }
 
+         parameter oldval {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default { }
+            helpkey *
+         }
+
          parameter out {
             position 2
             type NDF

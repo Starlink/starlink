@@ -17854,6 +17854,8 @@ KAPPA: \htmlref{ADD}{ADD},
       PLOT), and can be written to an output positions list so that subsequent
       applications can make use of them (see parameter OUTCAT).  The format
       of the displayed positions may be controlled using parameter STYLE.
+      The pixel data value in any associated NDF can also be displayed
+      (see parameter SHOWDATA).
 
       Positions may be reported in several different
       \htmlref{co-ordinate Frames}{se:domains}~ (see parameter FRAME).  Optionally, the corresponding pixel
@@ -17916,6 +17918,17 @@ KAPPA: \htmlref{ADD}{ADD},
          This parameter is only accessed if parameter PLOT is set to
          {\tt "Chain"} or {\tt "Poly"}.  If {\tt TRUE}, polygons will be closed by joining
          the first position to the last position. {\tt [}current value{\tt{]}}
+      }
+
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be displayed.  It may be {\tt "Data"},
+         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where {\tt "Error"} is an
+         alternative to {\tt "Variance"} and causes the square root of the
+         variance values to be displayed).  If
+         {\tt "Quality"} is specified, then the quality values are treated as
+         numerical values (in the range 0 to 255). {\tt ["Data"]}
       }
       \sstsubsection{
          DESCRIBE = \_LOGICAL (Read)
@@ -18154,6 +18167,15 @@ KAPPA: \htmlref{ADD}{ADD},
          parameters and files are still created.  The display of informational
          messages describing the use of the cursor is controlled by the
          parameter INFO. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         SHOWDATA = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the pixel value within the displayed NDF is
+	 reported for each selected position. This is only possible if
+	 the picture within which position are being selected contains a
+	 reference to an existing NDF. The NDF array component to be
+	 displayed is selected via parameter COMP. {\tt [}FALSE{\tt{]}}
       }
       \sstsubsection{
          SHOWPIXEL = \_LOGICAL (Read)
@@ -49467,6 +49489,14 @@ The following new applications have been added:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
+      \begin{itemize}
+         \item CURSOR can now display the pixel value at each selected
+          position (if the position falls within the bounds of a displayed 
+          NDF). This is controlled via the new parameters SHOWDATA and
+          COMP.
+      \end{itemize}
 
    \item [\htmlref{FITSEXIST}{FITSEXIST}] \mbox{}
       \begin{itemize}
