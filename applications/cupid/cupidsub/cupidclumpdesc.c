@@ -23,8 +23,8 @@ double *cupidClumpDesc( int indf, double *cpars, const char ***names,
 *     NDF has "n" pixel axes, the parameters are returned in the following 
 *     order:
 *
-*        0  - (n-1) : The pixel coords of the clump centroid
-*        n  - (2n-1): The pixel indices of the clump peak value
+*        0  - (n-1) : The pixel coords of the clump peak value
+*        n  - (2n-1): The pixel indices of the clump centroid
 *        2n - (3n-1): The clump size (in pixels) on each pixel axis. This is 
 *                     the standard deviation of the pixel axis value about the 
 *                     centroid position, weighted by the pixel values.
@@ -118,18 +118,18 @@ double *cupidClumpDesc( int indf, double *cpars, const char ***names,
       ret = astMalloc( sizeof( double )*( *ncpar ) );
 
 /* Store the parameter names. */ 
-      pnames[ 0 ] = "CenX";
-      pnames[ ndim ] = "PeakX";
+      pnames[ 0 ] = "PeakX";
+      pnames[ ndim ] = "CenX";
       pnames[ 2*ndim ] = "SizeX";
 
       if( ndim > 1 ) {
-         pnames[ 1 ] = "CenY";
-         pnames[ 1 + ndim ] = "PeakY";
+         pnames[ 1 ] = "PeakY";
+         pnames[ 1 + ndim ] = "CenY";
          pnames[ 1 + 2*ndim ] = "SizeY";
 
          if( ndim > 2 ) {
-            pnames[ 2 ] = "CenZ";
-            pnames[ 2 + ndim ] = "PeakZ";
+            pnames[ 2 ] = "PeakZ";
+            pnames[ 2 + ndim ] = "CenZ";
             pnames[ 2 + 2*ndim ] = "SizeZ";
          }
       }
@@ -217,21 +217,21 @@ double *cupidClumpDesc( int indf, double *cpars, const char ***names,
 
 /* Calculate and store the clump parameters */
       if( s != 0 ) {
-         ret[ 0 ] = sx/s;
-         ret[ ndim ] = px;
+         ret[ 0 ] = px;
+         ret[ ndim ] = sx/s;
 
          v = sx2/s - ret[ 0 ]*ret[ 0 ];
          ret[ 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
 
          if( ndim > 1 ) {
-            ret[ 1 ] = sy/s;
-            ret[ 1 + ndim ] = py;
+            ret[ 1 ] = py;
+            ret[ 1 + ndim ] = sy/s;
             v = sy2/s - ret[ 1 ]*ret[ 1 ];
             ret[ 1 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
 
             if( ndim > 2 ) {
-               ret[ 2 ] = sz/s;
-               ret[ 2 + ndim ] = pz;
+               ret[ 2 ] = pz; 
+               ret[ 2 + ndim ] = sz/s;
                v = sz2/s - ret[ 2 ]*ret[ 2 ];
                ret[ 2 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
             }
