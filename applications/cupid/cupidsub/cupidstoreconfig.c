@@ -52,6 +52,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
    int nc;               /* Number of characters in group entry */
    int ncmax;            /* Max number of characters in any group entry */
    int subs[ 1 ];        /* Array containing required cell index */
+   int there;                   /* Does component exist?*/
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -82,6 +83,8 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
 
 /* Create a suitable array of character strings in the CUPID extension,
    and get a locator for the whole array. */
+      datThere( loc, "CONFIG", &there, status );
+      if( there ) datErase( loc, "CONFIG", status );
       datNewC( loc, "CONFIG", ncmax + 1, 1, &n, status );
       datFind( loc, "CONFIG", &aloc, status );
 

@@ -59,11 +59,24 @@ void clumps() {
 *     void clumps();
 
 *  Description:
-*     This application identifies clumps within a 1, 2 or 3 dimensional
-*     NDF, storing information about the clumps in the CUPID extension of the
-*     supplied NDF. Optionally, an output catalogue can be created containing 
-*     the clump parameters. The algorithm used to identify the clumps can be 
-*     chosen from a list of supported algorithms.
+*     This application identifies clumps of emission within a 1, 2 or 3 
+*     dimensional NDF. Information about the clumps is returned in
+*     several different ways:
+*
+*     - A pixel mask identifying pixels as background pixels or clump
+*     pixels can be written to the Quality array of the input NDF (see 
+*     parameter MASK).
+*
+*     - An output catalogue containing clump parameters can be created (see
+*     parameter OUTCAT).
+*
+*     - Information about each clump, including a minimal cut-out image
+*     of the clump and the clump parameters, is written to the CUPID 
+*     extension of the input NDF (see the section "Use of CUPID Extension" 
+*     below). 
+*
+*     The algorithm used to identify the clumps (GaussCLumps, ClumpFind,
+*     etc) can be specified (see parameter METHOD).
 
 *  Usage:
 *     clumps in outcat method mask
@@ -105,9 +118,10 @@ void clumps() {
 *        The 1, 2 or 3 dimensional NDF to be analysed. Information about
 *        the identified clumps and the configuration parameters used will 
 *        be stored in the CUPID extension of the supplied NDF, and so the 
-*        NDF must not be write protected. Other applications within the 
-*        CUPID package can be used to display this information in various 
-*        ways.
+*        NDF must not be write protected. See "Use of CUPID Extension"
+*        below for further details about the information stored in the CUPID
+*        extension. Other applications within the CUPID package can be used 
+*        to display this information in various ways.
 *     MASK = _LOGICAL (Read)
 *        If true, then a Quality component is added to the supplied NDF
 *        (replacing any existing Quality component) indicating if each pixel 
@@ -151,6 +165,30 @@ void clumps() {
 *        pixel-to-pixel correlation in the noise can result in this estimate 
 *        being too low. 
 
+*  Use of CUPID Extension:
+*     This application will create an NDF extension called "CUPID" in the 
+*     input NDF (unless there is already one there), and add the following 
+*     components to it, erasing any of the same name which already exist:
+* 
+*     - CLUMPS: This a an array of CLUMP structures, one for each clump
+*     identified by the selected algorithm. Each such structure contains 
+*     the same clump parameters that are written to the catalogue via
+*     parameter OUTCAT. It also contains a component called MODEL which
+*     is an NDF containing a section of the main input NDF which is just
+*     large enough to encompass the clump. Any pixels within this section 
+*     which are not contained within the clump are set bad. So for instance,
+*     if the input array "fred.sdf" is 2-dimensional, and an image of it has 
+*     been displayed using KAPPA:DISPLAY, then the outline of clump number 9
+*     (say) can be overlayed on the image by doing 
+*
+*     contour noclear "fred.more.cupid.clumps(9).model" mode=good
+*
+*     - CONFIG: Lists the algorithm configuration parameters used to
+*     identify the clumps (see parameter CONFIG).
+*
+*     - QUALITY_NAMES: Defines the textual names used to identify background 
+*     and clump pixels within the Quality mask. See parameter MASK.
+
 *  Algorithms:
 *     - GaussClumps: Based on the algorithm described by Stutski & Gusten 
 *     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
@@ -161,12 +199,11 @@ void clumps() {
 *     level. Each fitted ellipse is taken to be a single clump and is added 
 *     to the output catalogue. In this algorithm, clumps may overlap. Any 
 *     input variance component is used to scale the weight associated with 
-*     each pixel value when performing the Gaussian fit.
-*
-*     The most significant configuration parameters for this algorithm
-*     are: GaussClumps.FwhmBeam and GaussClumps.VeloRes which determine
-*     the minimum clump size, and GaussClumps.Thresh which (together with
-*     the ADAM paramater RMS) determine the termination criterion.
+*     each pixel value when performing the Gaussian fit. The most significant 
+*     configuration parameters for this algorithm are: GaussClumps.FwhmBeam 
+*     and GaussClumps.VeloRes which determine the minimum clump size, and 
+*     GaussClumps.Thresh which (together with the ADAM paramater RMS) 
+*     determine the termination criterion.
 
 *     - ClumpFind: Described by Williams et al (1994, ApJ 428, 693). This 
 *     algorithm works by first contouring the data at a multiple of the
@@ -623,17 +660,18 @@ void clumps() {
 /* Create any output NDF by summing the contents of the NDFs describing the 
    found clumps, and then adding on a background level (for GaussClumps). This 
    also fills the above mask array if required. */
-      if( ipo || mask ) {
-         cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, clist, 
+      cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, clist, 
                          nclump, rmask, ipo, method, &bg );
-      }
 
-/* Delete any existing CUPID extension in the NDF, and then create a new
-   one. */
+/* Create an CUPID extension in the NDF if none already exists, or get a
+   locator for the existing extension otherwise. */
       there = 0;
       ndfXstat( indf, "CUPID", &there, status );
-      if( there ) ndfXdel( indf, "CUPID", status );
-      ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+      if( there ) {
+         ndfXloc( indf, "CUPID", "UPDATE", &xloc, status );  
+      } else {
+         ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+      }
 
 /* If a quality mask is being added to the input NDF... */
       if( mask ) {
@@ -667,7 +705,7 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
-      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, bg,
+      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
                         "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */

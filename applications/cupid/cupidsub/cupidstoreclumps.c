@@ -14,7 +14,7 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist, 
-                       int nclump, int ndim, double bg, const char *ttl ){
+                       int nclump, int ndim, const char *ttl ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -24,7 +24,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist, 
-*                            int nclump, int ndim, double bg, const char *ttl )
+*                            int nclump, int ndim, const char *ttl )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -43,9 +43,6 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 *        The number of identifiers in "clist".
 *     ndim
 *        The number of pixel axes in the data.
-*     bg
-*        The global background level which should be added to the sum of
-*        all the clumps in order to recreate the input data.
 *     ttl
 *        The title for the output catalogue (if any).
 
@@ -83,6 +80,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
    int ncpar;                   /* Number of clump parameters */
    int nrow;                    /* Number of non-NULL NDFs in clist */
    int place;                   /* Place holder for copied NDF */
+   int there;                   /* Does component exist?*/
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
@@ -98,6 +96,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
    of "nrow" Clump structures in the extension, and get a locator to it. */
    if( xloc ) {
       aloc = NULL;
+      datThere( xloc, "CLUMPS", &there, status );
+      if( there ) datErase( xloc, "CLUMPS", status );
       datNew( xloc, "CLUMPS", "CLUMP", 1, &nrow, status );
       datFind( xloc, "CLUMPS", &aloc, status );
    } else {
@@ -220,16 +220,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
       astEnd;
    }
 
-/* If required, store the background value in the NDF extension, and annul 
-   the locator for the array of CLUMP structures. */
-   if( xloc ) {
-      datNew( xloc, "BACKGROUND", "_DOUBLE", 0, NULL, status );
-      datFind( xloc, "BACKGROUND", &cloc, status );
-      datPutD( cloc, 0, NULL, &bg, status );
-      datAnnul( &cloc, status );
-
-      datAnnul( &aloc, status );
-   }
+/* If required, annul the locator for the array of CLUMP structures. */
+   if( aloc ) datAnnul( &aloc, status );
 
 /* Free resources. */
    tab = astFree( tab );

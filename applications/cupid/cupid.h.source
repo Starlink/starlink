@@ -191,7 +191,7 @@ void cupidGCListClump( int, int, double *, double, int *, int, double );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidNdfClump( int *, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap * );
-void cupidStoreClumps( const char *, HDSLoc *, int *, int, int, double, const char * );
+void cupidStoreClumps( const char *, HDSLoc *, int *, int, int, const char * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
 void cupidCFDump( int *, int, int *, int * );

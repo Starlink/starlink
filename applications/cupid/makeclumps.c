@@ -398,7 +398,7 @@ void makeclumps() {
    ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* Store the clump properties in the output catalogue. */
-   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, back,
+   cupidStoreClumps( "OUTCAT", xloc, clist, nclump, ndim, 
                      "Output from CUPID:MAKECLUMPS" );
 
 /* Relase the extension locator.*/
