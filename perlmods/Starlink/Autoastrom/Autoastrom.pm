@@ -93,6 +93,7 @@ sub new {
   $auto->maxobj_corr( 500 ) if ( ! defined( $auto->maxobj_corr ) );
   $auto->messages( 1 ) if ( ! defined( $auto->messages ) );
   $auto->obsdata( 'source=USER:AST:FITS,angle=0,scale=1,invert=0' ) if ( ! defined( $auto->obsdata ) );
+  $auto->starlink_output( 1 ) if ( ! defined( $auto->starlink_output ) );
   $auto->temp( tempdir( CLEANUP => ( ! $auto->keeptemps ) ) ) if ( ! defined( $auto->temp ) );
   $auto->timeout( 180 ) if ( ! defined( $auto->timeout ) );
   $auto->verbose( 1 ) if ( ! defined( $auto->verbose ) );
@@ -754,6 +755,7 @@ sub obsdata {
         } elsif( $value =~ /^[\d\.]+$/ ) {
           $value = new Astro::Coords::Angle::Hour( $value, units => 'hour' );
         } else {
+          print "--E Could not parse $value to form Right Ascension from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse $value to form Right Ascension from obsdata information";
         }
       }
@@ -765,12 +767,14 @@ sub obsdata {
         } elsif( $value =~ /^-?[\d\.]+$/ ) {
           $value = new Astro::Coords::Angle( $value, units => 'hour' );
         } else {
+          print "--E Could not parse $value to form Declination from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse $value to form Declination from obsdata information";
         }
       }
 
       if( $key eq 'ANGLE' ) {
         if( $value !~ /^-?\d+(\.\d*)?$/ ) {
+          print "--W Cannot parse position angle of $value from obsdata information. Setting position angle to 0 degrees.\n" if $self->starlink_output;
           carp "Cannot parse position angle of $value from obsdata information. Setting position angle to 0 degrees";
           $value = 0;
         }
@@ -778,6 +782,7 @@ sub obsdata {
 
       if( $key eq 'SCALE' ) {
         if( $value !~ /^\d+(\.\d*)?$/ ) {
+          print "--W Cannot parse plate scale of $value from obsdata information. Setting plate scale to 1 arcsec/pixel.\n" if $self->starlink_output;
           carp "Cannot parse plate scale of $value from obsdata information. Setting plate scale to 1 arcsec/pixel";
           $value = 1;
         }
@@ -785,6 +790,7 @@ sub obsdata {
 
       if( $key eq 'INVERT' ) {
         if( ( $value != 1 ) && ( $value != 0 ) ) {
+          print "--W Value of invert from obsdata information must be 0 or 1, not $value. Setting invert to 0.\n" if $self->starlink_output;
           carp "Value of invert from obsdata information must be 0 or 1, not $value. Setting invert to 0";
           $value = 0;
         }
@@ -794,6 +800,7 @@ sub obsdata {
         if( $value !~ /^\d+(\.\d+)?$/ &&
             $value !~ /^\d+:\d+$/ &&
             $value !~ /^\d+:\d+:\d+:\d+:\d+(\.\d*)?$/ ) {
+          print "--E Could not parse time of $value from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse time of $value from obsdata information";
         }
         $value =~ s/:/ /g;
@@ -803,18 +810,21 @@ sub obsdata {
         if( $value !~ /^([\w\.])+$/ &&
             $value !~ /^-?\d+:\d+(\.\d*)?:\d+:\d+(\.\d*)?(:\d+(\.\d*)?)?$/ ) {
           # And who says Perl is line noise? :-)
+          print "--E Could not parse observatory code of $value from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse observatory code of $value from obsdata information";
         }
       }
 
       if( $key eq 'MET' ) {
         if( $value !~ /^\d+(\.\d*)?(:\d+(\.\d*)?)?$/ ) {
+          print "--E Could not parse meteorological information of $value from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse meteorological information of $value from obsdata information";
         }
       }
 
       if( $key eq 'COL' ) {
         if( $value !~ /^\d+(\.\d*)?$/ ) {
+          print "--E Could not parse effective colour of $value from obsdata information.\n" if $self->starlink_output;
           croak "Could not parse effective colour of $value from obsdata information";
         }
       }
@@ -872,7 +882,7 @@ sub skycatconfig {
   if( @_ ) {
     my $skycatconfig = shift;
     if( ! -e $skycatconfig ) {
-      croak "Could not find $skycatconfig";
+      croak "Could not find SkyCat config file: $skycatconfig";
     }
     $self->{SKYCATCONFIG} = $skycatconfig;
   }
@@ -921,6 +931,31 @@ sub skycat_catalogue_out {
     $self->{SKYCAT_CATALOGUE_OUT} = $skycat_catalogue_out;
   }
   return $self->{SKYCAT_CATALOGUE_OUT};
+}
+
+=item B<starlink_output>
+
+Whether or not to print output as per the original Starlink AUTOASTROM
+program.
+
+  my $starlink_output = $auto->starlink_output;
+  $self->starlink_output( 0 );
+
+The default is true (1).
+
+Output is displayed to STDOUT. It will be preceded with one of three
+prefixes: --I for informative messages, --W for warnings, and --E for
+fatal errors.
+
+=cut
+
+sub starlink_output {
+  my $self = shift;
+  if( @_ ) {
+    my $out = shift;
+    $self->{STARLINK_OUTPUT} = $out;
+  }
+  return $self->{STARLINK_OUTPUT};
 }
 
 =item B<temp>
@@ -1008,6 +1043,8 @@ sub solve {
     croak "Must supply NDF in order to perform automated astrometry correction";
   }
 
+  print "--I Running AUTOASTROM on " . $self->ndf . ".\n" if $self->starlink_output;
+
 # We need some kind of coordinates to use. Go through the list
 # of sources given in obsdata->{SOURCE} and find the first one
 # that returns.
@@ -1045,6 +1082,7 @@ sub solve {
         } until ( $oplen == 1 );
         err_annul( $STATUS );
         err_end( $STATUS );
+        print "--E Error retrieving WCS from NDF.\n" if $self->starlink_output;
         croak "Error retrieving WCS from NDF:\n" . join "\n", @errs;
       }
       err_end( $STATUS );
@@ -1053,7 +1091,7 @@ sub solve {
       $frameset = $wcs->FindFrame( $template, "" );
 
       if( defined( $frameset ) ) {
-        print "WCS information from AST.\n" if $self->verbose;
+        print "--I WCS information from AST.\n" if $self->starlink_output;
         print STDERR "WCS information from AST.\n" if $self->verbose;
 
 # Determine the central coordinates and radius of search from information
@@ -1062,14 +1100,14 @@ sub solve {
                                                                             ndf => $self->ndf );
         $epoch = $frameset->GetC("Epoch");
         if( ! defined( $epoch ) ) {
-          carp "Epoch not defined in FITS headers. Defaulting to 2000.0";
+          print "--W Epoch not defined in AST FrameSet. Defaulting to 2000.0.\n" if $self->starlink_output;
+          carp "Epoch not defined in AST FrameSet. Defaulting to 2000.0";
           $epoch = "2000.0";
         }
 
         last;
       } else {
-        print STDERR "AST WCS information doesn't have a SKY frame.\n" if $self->verbose;
-        print "AST WCS information doesn't have a SKY frame.\n" if $self->verbose;
+        print "--I AST WCS information doesn't have a SKY frame.\n" if $self->starlink_output;
       }
 
     } elsif( $wcssource =~ /FITS/ ) {
@@ -1080,7 +1118,7 @@ sub solve {
       my $template = new Starlink::AST::SkyFrame( "System=FK5" );
       $frameset = $wcs->FindFrame( $template, "" );
       if( defined( $frameset ) ) {
-        print "Using WCS information from FITS headers.\n" if $self->verbose;
+        print "--I Using WCS information from FITS headers.\n" if $self->starlink_output;
         print STDERR "WCS information from FITS headers.\n" if $self->verbose;
 
 # Determine the central coordinates and radius of search from information
@@ -1090,27 +1128,27 @@ sub solve {
 
         $epoch = $frameset->GetC("Epoch");
         if( ! defined( $epoch ) ) {
-          carp "Epoch not defined in FITS headers. Defaulting to 2000.0";
+          print "--W Epoch not defined in FITS headers. Defaulting to 2000.0.\n" if $self->starlink_output;
           $epoch = "2000.0";
         }
 
         last;
       } else {
-        print "FITS headers have no useable WCS information.\n" if $self->verbose;
+        print "--I FITS headers have no useable WCS information.\n" if $self->starlink_output;
       }
 
     } elsif( $wcssource =~ /USER/ ) {
 
 # We need, at a bare minimum, the RA and Dec.
       if( ! defined( $self->obsdata->{RA} ) ) {
-        print "RA not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->verbose;
+        print "--W RA not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->starlink_output;
         next;
       }
       if( ! defined( $self->obsdata->{DEC} ) ) {
-        print "Dec not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->verbose;
+        print "--W Dec not supplied for USER WCS, not using USER-supplied WCS.\n" if $self->starlink_output;
         next;
       }
-      print "Using WCS information from USER-supplied coordinates\n" if $self->verbose;
+      print "--I Using WCS information from USER-supplied coordinates.\n" if $self->starlink_output;
 
 # Determine the central coordinates and radius of search from information
 # contained in the obsdata information and the NDF.
@@ -1119,6 +1157,7 @@ sub solve {
       $frameset = $self->_create_frameset;
       $epoch = $frameset->GetC("Epoch");
       if( ! defined( $epoch ) ) {
+        print "--W Epoch not defined in user-supplied information. Defaulting to 2000.0.\n" if $self->starlink_output;
         carp "Epoch not defined in user-supplied information. Defaulting to 2000.0";
         $epoch = "2000.0";
       }
@@ -1134,12 +1173,13 @@ sub solve {
   my $ndfcat;
   my $filter;
   if( defined( $self->ccdcatalogue ) ) {
-    print "Using " . $self->ccdcatalogue . " as input catalogue for sources in frame.\n" if $self->verbose;
+    print sprintf("--I Using EXTRACTOR catalogue in %s", $self->ccdcatalogue ) if $self->starlink_output;
     $ndfcat = new Astro::Catalog( Format => 'SExtractor',
                                   File => $self->ccdcatalogue );
     $filter = $self->filter;
   } else {
-    print "Extracting objects in " . $self->ndf . " at 5.0 sigma or higher..." if $self->verbose;
+    print "--I Calling EXTRACTOR.\n" if $self->starlink_output;
+    print STDERR  "Calling EXTRACTOR.\n" if $self->verbose;
     if( ! defined( $self->filter ) ) {
       my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
       tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
@@ -1156,9 +1196,8 @@ sub solve {
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $filter,
                              quality => 0, );
-
-    print "Extracted " . $ndfcat->sizeof . " objects from " . $self->ndf . ".\n" if $self->verbose;
-    print "done.\n" if $self->verbose;
+    print sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof )
+      if $self->starlink_output;
   }
 
 # We cannot do automated astrometry corrections if we have fewer
@@ -1187,7 +1226,7 @@ sub solve {
       -e $self->skycat_catalogue_in ) {
 
 # Read in the catalogue.
-    print "Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->verbose;
+    print "--I Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->starlink_output;
     $querycat = new Astro::Catalog( Format => 'Cluster',
                                     File => $self->skycat_catalogue_in,
                                   );
@@ -1205,6 +1244,10 @@ sub solve {
     $racen =~ s/^\s+//;
     $deccen =~ s/^\s+//;
 
+    print sprintf( "--I Obtaining catalogue from %s.\n",
+                   $self->catalogue )
+      if $self->starlink_output;
+
     my $query = new Astro::Catalog::Query::SkyCat( catalog => $self->catalogue,
                                                    RA => "$racen",
                                                    Dec => "$deccen",
@@ -1215,11 +1258,9 @@ sub solve {
     }
     $querycat = $query->querydb();
 
-    if( $self->verbose ) {
-      print "done.\n";
-      print "Received " . $querycat->sizeof() . " objects from "
-            . $self->catalogue . ".\n";
-    }
+    print sprintf( "--I Obtained catalogue, %d entries, from %s.\n",
+                   $querycat->sizeof, $self->catalogue )
+      if $self->starlink_output;
   }
 
   # Again, croak if we have fewer than 2 objects.
@@ -1256,6 +1297,8 @@ sub solve {
 # Begin iteration loop.
   while( $currentiter <= $self->maxiter ) {
 
+    print "--I Iteration $currentiter...\n" if $self->starlink_output;
+
 # Add the NDF's WCS to the retrieved catalogue, allowing us to get
 # X and Y positions for the retrieved objects.
     my $querystars = $querycat->stars;
@@ -1285,9 +1328,11 @@ sub solve {
       $filtered_querycat->pushstar( @querystars );
     }
 
-    print "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
-    print " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
-    print " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
+    print STDERR "Sizes of catalogues used as input to correlation:\n" if $self->verbose;
+    print STDERR " Image: " . $filtered_ndfcat->sizeof . "\n" if $self->verbose;
+    print STDERR " Query: " . $filtered_querycat->sizeof . "\n" if $self->verbose;
+
+    print "--I Matching position lists...\n" if $self->starlink_output;
 
 # Perform the correlation.
     my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
@@ -1340,12 +1385,26 @@ sub solve {
       $merged->pushstar( $item );
     }
 
+    print "--I Matched " . $merged->sizeof . " objects between catalogues.\n" if $self->starlink_output;
+
 # Output the merged catalogue to disk, if requested.
     if( defined( $self->match_catalogue ) ) {
       $merged->write_catalog( Format => 'Cluster', File => $self->match_catalogue );
+      print "--I Wrote match catalogue to " . $self->match_catalogue . "\n" if $self->starlink_output;
+   }
+
+# If there are fewer than 10 objects in the input catalogue to ASTROM,
+# restrict it to a 6-parameter fit, but only if required.
+    my $prev_maxfit = $self->maxfit;
+    if( $merged->sizeof < 10 && $self->maxfit > 6 ) {
+      print "--W Too few matches (" . $merged->sizeof . "). Restricted to 6-parameter fit.\n" if $self->starlink_output;
+      print STDERR "Too few matches (" . $merged->sizeof . "). Restricted to 6-parameter fit.\n" if $self->verbose;
+      $self->maxfit( 6 );
     }
 
-    print "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
+    print STDERR "Input catalogue to astrom has " . $merged->sizeof . " objects\n" if $self->verbose;
+
+    print "--I Running ASTROM to generate astrometric solution.\n" if $self->starlink_output;
 
 # Solve astrometry.
     my $astrom = new Starlink::Astrom( catalog => $merged,
@@ -1361,31 +1420,56 @@ sub solve {
 
     ( $newwcs, my $results ) = $astrom->solve;
 
+# Set the maxfit back to whatever it was before we went through
+# ASTROM.
+    $self->maxfit( $prev_maxfit );
+
 # Get the results for the desired fit.
     my $result;
     foreach my $res ( @$results ) {
-      if( $res->{nterms} == $self->maxfit ) {
+      if( $res->{STATUS} ) {
         $result = $res;
+      }
+      if( $res->{nterms} == $self->maxfit ) {
         last;
       }
     }
 
     my $curr_rms = $result->{rrms};
-    if( $self->verbose ) {
-      print "RMS of current fit: $curr_rms arcseconds.\n";
-      print "Difference to previous RMS: " . abs( $curr_rms - $prev_rms ) . " arcseconds.\n";
+    if( $self->starlink_output ) {
+      print sprintf( "--I RMS of current fit: %.5f arcseconds.\n",
+                     $curr_rms );
+      print sprintf( "--I Difference to previous RMS: %.5f arcseconds.\n",
+                     abs( $curr_rms - $prev_rms ) );
+    }
+
+    if( $prev_rms != 0 &&
+        $curr_rms > $prev_rms ) {
+
+      if( $self->starlink_output ) {
+        print sprintf( "--I Current RMS of %.5f is greater than previous RMS of %.5f.\n",
+                       $curr_rms,
+                       $prev_rms );
+        print "--I Halting iterations and using previous fit.\n";
+      }
+      $newwcs = $frameset;
+      last;
     }
 
     if( $curr_rms < $self->iterrms_abs ) {
-      if( $self->verbose ) {
-        print "Reached absolute RMS level of " . $self->iterrms_abs . " arcseconds.\n";
+      if( $self->starlink_output ) {
+        print sprintf( "--I Reached absolute RMS level of %.5f arcseconds.\n",
+                       $self->iterrms_abs );
+        print "--I Halting iterations.\n";
       }
       last;
     }
 
     if( abs( $curr_rms - $prev_rms ) < $self->iterrms_diff ) {
-      if( $self->verbose ) {
-        print "Reached difference RMS level of " . $self->iterrms_diff . " arcseconds.\n";
+      if( $self->starlink_output ) {
+        print sprintf( "--I Reached difference RMS level of %.5f arcseconds.\n",
+                       $self->iterrms_diff );
+        print "--I Halting iterations.\n";
       }
       last;
     }
@@ -1420,7 +1504,7 @@ sub solve {
         croak "Error writing new WCS to NDF:\n" . join "\n", @errs;
       }
       err_end( $STATUS );
-      print "WCS updated in " . $self->ndf . "\n" if $self->verbose;
+      print "--I WCS updated in " . $self->ndf . ".\n" if $self->starlink_output;
     }
 
 # Update the NDF catalogue with the new WCS. First get the FK5
@@ -1445,7 +1529,7 @@ sub solve {
     $item->wcs( $newwcs );
     $item->preferred_magnitude_type( 'MAG_APER1' );
   }
-  print "Updated WCS of objects in detected object catalogue.\n" if $self->verbose;
+  print "--I Updated WCS of objects in detected object catalogue.\n" if $self->starlink_output;
 
   foreach my $item ( @{$merged->stars} ) {
     my( $ra, $dec ) = $frameset->Tran2( [$item->x],
@@ -1465,7 +1549,7 @@ sub solve {
   if( defined( $self->detected_catalogue ) ) {
     $ndfcat->write_catalog( Format => 'Cluster',
                             File => $self->detected_catalogue );
-    print "Wrote detected object catalogue to " . $self->detected_catalogue . ".\n" if $self->verbose;
+    print "--I Wrote detected object catalogue to " . $self->detected_catalogue . ".\n" if $self->starlink_output;
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
