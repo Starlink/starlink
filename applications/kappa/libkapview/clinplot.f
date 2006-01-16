@@ -58,12 +58,12 @@
 *     The bounds of the plot on both axes can be specified using
 *     parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
 *     take default values which encompass the entire supplied data set.
-*     The default s for YBOT and YTOP can be selected in several ways
+*     The defaults for YBOT and YTOP can be selected in several ways
 *     including percentiles (see parameter LMODE).
 *
 *     The current picture is usually cleared before plotting the new
 *     picture, but parameter CLEAR can be used to prevent this, allowing
-*     several plots to be "stacked" together.  If a new plot is drawn
+*     several plots to be `stacked' together.  If a new plot is drawn
 *     over an existing plot, then there is an option to allow the new
 *     plot to be aligned with the existing plot (see parameter ALIGN).
 *
@@ -166,12 +166,12 @@
 *        axes (colours, founts, etc.) can be controlled using the 
 *        STYLE parameter.  [TRUE]
 *     FILL = _LOGICAL (Read)
-*        If FILL is set to TRUE, then the image will be "stretched" to 
+*        If FILL is set to TRUE, then the image will be `stretched' to 
 *        fill the current picture in both directions.  This can be 
 *        useful to elongate the spectra to reveal more detail by using
 *        more of the display surface at the cost of different spatial
 *        scales, and when the spatial axes have markedly different
-*        dimensions  The dynamic default is TRUE if either of the
+*        dimensions.  The dynamic default is TRUE if either of the
 *        spatial diensions is one. and FALSE otherwise. []
 *     FREQ = _INTEGER (Read)
 *        The frequency at which error bars are to be plotted.  For
@@ -188,7 +188,7 @@
 *        must specify the method to use.  If supplied, the other two 
 *        sub-strings should be numerical values as described below 
 *        (default values will be used if these sub-strings are not 
-*        provided).  The following methods are available:
+*        provided).  The following methods are available.
 *
 *        - "Range" -- The minimum and maximum data values (including any
 *        error bars) are used as the defaults for YBOT and YTOP.  No
@@ -221,7 +221,7 @@
 *        the specified numbers of standard deviations below and above 
 *        the mean of the data.  For instance, if the value "sig,1.5,3.0"
 *        is supplied, then the default for YBOT is set to the mean of
-*        the data minus 1.5  standard deviations, and the default for
+*        the data minus 1.5 standard deviations, and the default for
 *        YTOP is set to the mean plus 3 standard deviations.  If only
 *        one value is supplied, the second value defaults to the
 *        supplied value.  If no values are provided both default to
@@ -260,9 +260,9 @@
 *           <name>=<value>
 *        
 *        where <name> is the name of a plotting attribute, and <value> 
-*        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes.  All attributes will be
-*        defaulted if a null value (!)---the initial default---is
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will
+*        be defaulted if a null value (!)---the initial default---is
 *        supplied.  See section "Plotting Attributes" in SUN/95 for a
 *        description of the available attributes.  Any unrecognised 
 *        attributes are ignored (no error is reported). 
@@ -442,7 +442,7 @@
 *        PIXEL with application WCSFRAME to present the desired axis
 *        in the line plots.  [!]
 *     XLEFT = LITERAL (Read)
-*        The axis value to place at the left hand end of the horizontal
+*        The axis value to place at the left-hand end of the horizontal
 *        axis of each line plot.  If a null (!) value is supplied, the
 *        value used is the value for the first element in the supplied
 *        NDF (with a margin to include any horizontal error bar).  The
@@ -483,7 +483,7 @@
 *        spread of values on the plot. 
 *        ["Default"]
 *     XRIGHT = LITERAL (Read)
-*        The axis value to place at the right hand end of the horizontal
+*        The axis value to place at the right-hand end of the horizontal
 *        axis of each line plot.  If a null (!) value is supplied, the 
 *        value used is the value for the last element in the supplied
 *        NDF (with a margin to include any horizontal error bar).  The 
@@ -515,23 +515,23 @@
 *        supplied, the value used is the value supplied for XMAGN. [!]
 *     YMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the line plot's y 
-*        axis is mapped onto the screen.  The options are:
+*        axis is mapped on to the screen.  The options are:
 *
-*        - "Linear" -- The data values are mapped linearly onto the
+*        - "Linear" -- The data values are mapped linearly on to the
 *        screen.
 *
-*        - "Log" -- The data values are logged logarithmically onto the
+*        - "Log" -- The data values are logged logarithmically on to the
 *        screen.  An error will be reported if the dynamic range of
 *        the axis is less than 100, or if the range specified by YTOP 
 *        and YBOT encompasses the value zero.  For this reason, care 
 *        should be taken over the choice of value for parameter LMODE,
-*        since some choices could result in the Y range being extended
+*        since some choices could result in the y range being extended
 *        so far that it encompasses zero. 
 *
 *        - "ValueLog" -- This is similar to "Log" except that, instead 
-*        of mapping the data values logarithmically onto the screen,
+*        of mapping the data values logarithmically on to the screen,
 *        this option maps the log (base 10) of the data values linearly 
-*        onto the screen.  If this option is selected, the values 
+*        on to the screen.  If this option is selected, the values 
 *        supplied for parameters YTOP and YBOT should be values for the 
 *        logarithm of the data value, not the data value itself. 
 *        ["Linear"]
@@ -575,7 +575,8 @@
 *     clinplot map(~5,~5,) useaxis=3 noextaxes device=ps_l
 *        As the previous example but now the output goes to a text file 
 *        which can be printed on a PostScript printer.
-*     clinplot nearc v style="title=Ne Arc variance" useaxis=1 refaxes=f
+*     clinplot nearc v style="'title=Ne Arc variance'" useaxis=1 
+*              refaxes=f
 *        Plots variance values versus position along axis 1, for each
 *        spatial pixel in dimensions two and three, for the whole of the
 *        three-dimensional NDF called nearc on the current graphics 
@@ -597,7 +598,7 @@
 *        bottom of each vertical axis corresponds to a data value of
 *        10.0 and each top corresponds to a data value of 1000.0.
 *     clinplot speccube mode=p errbar xsigma=3 ysigma=3 shape=d 
-*             lpstyle=^my_sty 
+*              lpstyle=^my_sty 
 *        This plots the data values versus position at ech spatial
 *        position for the dataset called speccube.  Each spectral pixel
 *        is plotted as a point surrounded by diamond-shaped error bars,
@@ -617,7 +618,7 @@
 *        two plots are different.  The data are drawn in blue, probably
 *        to distinguish it from the previous plot drawn in a different
 *        colour.
-*     clinplot speccube system="'system(1)=freq,unit(1)=GHz'"
+*     clinplot speccube system='system(1)=freq,unit(1)=GHz'
 *        This example assumes that the current co-ordinate Frame of NDF 
 *        speccube is a SpecFrame.  The horizontal axis (axis "1") is 
 *        labelled with frequency values, in units of GHz.  If the 
@@ -680,7 +681,7 @@
 *     pictures is a list of the formatted spatial co-ordinates in the 
 *     current WCS Frame. 
 *
-*     On exit  the current database picture for the chosen device
+*     On exit the current database picture for the chosen device
 *     reverts to the input picture.
 
 *  Related Applications:
@@ -987,7 +988,7 @@
       REAL XLMARG              ! Sum of the inner margins along x-axis
       REAL XMAGN               ! X magnification
       REAL XMARG               ! Sum of the outer margins along x-axis
-      CHARACTER XMAP*( 8 )     ! How to map the x axis onto line plot
+      CHARACTER XMAP*( 8 )     ! How to map the x axis on to line plot
       INTEGER XPIC             ! Number of line plots in x direction
       DOUBLE PRECISION XSMAX   ! Max x after inclusion of axis widths
       DOUBLE PRECISION XSMIN   ! Min x after inclusion of axis widths
@@ -1005,7 +1006,7 @@
       REAL YLMARG              ! Sum of the inner margins along y-axis
       REAL YMAGN               ! Y magnification
       REAL YMARG               ! Sum of the outer margins along y-axis
-      CHARACTER YMAP*( 8 )     ! How to map the y axis onto line plot
+      CHARACTER YMAP*( 8 )     ! How to map the y axis on to line plot
       INTEGER YPIC             ! Number of line plots in y direction
       REAL YSIGMA              ! No. of std. devn's for y error bars
       REAL YTENT               ! Extent in y of the PGPLOT window in 
@@ -1264,7 +1265,7 @@
          END IF
       END IF
 
-*  See how the x and y axes are to be mapped onto the screen.
+*  See how the x and y axes are to be mapped on to the screen.
       CALL PAR_CHOIC( 'XMAP', 'Default', 'Default,Linear,Log,Pixel,'/
      :                /'Distance', .TRUE., XMAP, STATUS )
       CALL PAR_CHOIC( 'YMAP', 'Linear', 'Linear,Log,ValueLog', .TRUE., 
@@ -1278,7 +1279,7 @@
 *  and axis 2 is the raw (or logged if ymap=ValueLog) data value.  This 
 *  Frame corresponds to "what we want to see" and is given the Domain 
 *  "DATAPLOT".  Frame 2 (the Base Frame) is spanned by the axes which 
-*  are to be mapped linearly or logarithmically onto the graphics
+*  are to be mapped linearly or logarithmically on to the graphics
 *  surface.  Axis 1 will be determined by the setting of parameter XMAP,
 *  and axis 2 by the setting of YMAP.  This Frame corresponds to the 
 *  "uniform" co-ordinate system, and is given the Domain AGI_WORLD.  A
@@ -2597,8 +2598,8 @@
 *  (i.e. if the new DATA picture was not aligned with an existing DATA
 *  picture).
                IF ( .NOT. ALIGN ) THEN
-                  CALL KPG1_PLOTN( FSET, 'AGI_WORLD', PICIDG, .TRUE., 
-     :                             IPLOTS, NFRM, STATUS )
+                  CALL KPG1_PLOTN( AST__NULL, 'AGI_WORLD', PICIDG,
+     :                             .TRUE., IPLOTS, NFRM, STATUS )
                END IF
 
 *  Create a Plot covering this viewport.
@@ -2646,7 +2647,8 @@
      :                        STATUS )
 
 *  Get the one-dimensional mappings which transform each of the 
-*  GRAPHICS Frame axes onto the corresponding "what we want" Frame axes.
+*  GRAPHICS Frame axes on to the corresponding "what we want" Frame
+*  axes.
                CALL KPG1_ASSPL( IPLOTS, 2, AXMAPS, STATUS )
 
                IF ( VISIBL ) THEN
