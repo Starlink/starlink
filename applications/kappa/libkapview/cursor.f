@@ -1204,7 +1204,7 @@
 
                IF( SHPIX ) IAT = IAT + 3
 
-               CALL KPS1_CURDV( MAP2, XC, YC, NDIM, LBND, UBND, COMP, 
+               CALL KPS1_CURDV( MAP2, XC, YC, NAXP, LBND, UBND, COMP, 
      :                          %VAL( CNF_PVAL( PNTR ) ), IAT, LINE, 
      :                          STATUS )
 
