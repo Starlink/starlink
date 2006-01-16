@@ -120,14 +120,14 @@
 
 *  If the position is outside the array bounds, say so.
       IF( OUT ) THEN
-         CALL CHR_APPND( 'position is outside the bounds of the NDF',
+         CALL CHR_APPND( '(position is outside the NDF bounds)',
      :                   LINE, IAT )
 
 *  Otherwise, format the data value, preceeding the value with the
 *  component name.
       ELSE
          CALL CHR_APPND( COMP, LINE, IAT )
-         CALL CHR_APPND( ' =', LINE, IAT )
+         CALL CHR_APPND( ' value =', LINE, IAT )
          IAT = IAT + 1
          IF( IN( IV ) .NE. VAL__BADD ) THEN
             CALL CHR_PUTD( IN( IV ), LINE, IAT )
