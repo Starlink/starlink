@@ -1,26 +1,31 @@
 1 KAPPA_Version_1.5
 
-   A new release of KAPPA (v1.5) has been made. The main changes are:
+   A new release of KAPPA (v1.5) has been made.  The main changes are:
 
-   o  A new application called WCSMOSAIC has been added. This command
-   mosaics a group of input NDFs using the associated WCS information to
-   align them.
+   o  A new application called WCSMOSAIC has been added.  This command
+   mosaics a group of input NDFs using the associated WCS information
+   to align them.
 
    o  A new application INTERLEAVE to form a higher-resolution NDF by
    interleaving a set of NDFs of the same dimensionality.
 
-   o  A new application MFITTREND for multiple fitting of trends to individual 
-   data lines of multi-dimensional NDFs has been added. The trends are
-   actually polynomials, which can be restricted to selected coordinate 
-   ranges, making this a useful tool for fitting the continua of independent 
-   spectra stored in data cubes.
+   o  A new application MFITTREND for multiple fitting of trends to 
+   individual data lines of multi-dimensional NDFs has been added.  The
+   trends are actually polynomials, which can be restricted to selected 
+   co-ordinate ranges, making this a useful tool for fitting the 
+   continua of independent spectra stored in data cubes.
 
-   o  FITSEXIST is now a self-contained application.  It needs only read 
-   access to an NDF, unlike the former version that was an alias to
-   FITSMOD.  It should be faster too.
+   o  A new application CLINPLOT draws a spatial grid of line plots for 
+   an axis of a cube NDF.  This is highly relevant to inspection of 
+   spectral-line data cubes.  In addition to the normal spectral axes
+   around a line plot, there may be spatial axes drawn around the grid.
+
+   o  FITSEXIST is now a self-contained application.  It needs only 
+   read access to an NDF, unlike the former version that was an alias
+   to FITSMOD.  It should be faster too.
 
    o  The WCSALIGN and REGRID applications now have options for using a
-   rebinning algorithm rather than a resampling algorithm. Rebinning
+   rebinning algorithm rather than a resampling algorithm.  Rebinning
    produces accurate flux conservation.  See the new REBIN parameter.
 
    o  The WCSALIGN and REGRID applications now have an option to produce
@@ -28,38 +33,43 @@
    algorithm. See the new parameter CONSERVE.
 
    o  The WCSALIGN and REGRID applications now have options to use
-   resampling or rebinning kernels based on a sombrero function 2*J1(x)/x,
-   where J1(x) is the first order Bessel function of the first kind.
+   resampling or rebinning kernels based on a sombrero function 
+   2*J1(x)/x, where J1(x) is the first-order Bessel function of the 
+   first kind.
 
    o  The default values for the TOL parameter for REGRID, and the ACC
    parameter for WCSALIGN, have been reduced to 0.05, in order to reduce
    artifacts when transforming large images with flux conservation.
 
-   o CURSOR can now display the pixel value at each selected position (if
-   the position falls within the bounds of a displayed NDF). This is
-   controlled via the new parameters SHOWDATA and COMP.
+   o  CURSOR can now display the pixel value at each selected position
+   (if the position falls within the bounds of a displayed NDF).  This
+   is controlled via the new parameters SHOWDATA and COMP.
 
+   o  CHPIX has a new output parameter OLDVAL.  If the section being 
+   modified comprises one pixel, OLDVAL stores the original value of 
+   that pixel.
+         
 
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 
-   each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the NDF 
-   within the current WCS Frame are written to the new output parameters 
-   FLBND and FUBND.
+   each WCS Frame if FULLFRAME is set to YES.  Also, the bounds of the 
+   NDF within the current WCS Frame are written to the new output
+   parameters FLBND and FUBND.
 
    o The BLOCK application can now smooth 3-d NDFs, in the sense that it 
    will smooth all the 2-d planes within a 3-d NDF independently, using 
-   the same 2-dimensional box.  The smoothing plane can be parallel to any 
-   face of the cube.
+   the same 2-dimensional box.  The smoothing plane can be parallel to 
+   any face of the cube.
 
 Changes introduced in version 1.4-1
 
    o  The PIXDUPE application now has a facility for applying a mask to 
    each block of output pixels.
 
-   o  The WCSALIGN application now has a facility for aligning the input NDFs
-   in-situ if possible (that is, if the alignment Mapping is a simple shift 
-   of origin). The new parameters are INSITU and ABORT.
+   o  The WCSALIGN application now has a facility for aligning the input
+   NDFs in-situ if possible (that is, if the alignment Mapping is a 
+   simple shift of origin).  The new parameters are INSITU and ABORT.
 
  For complete details of all changes, see the "Release Notes" appendix in
  SUN/95.
