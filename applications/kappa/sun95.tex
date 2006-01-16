@@ -1261,7 +1261,7 @@ have not created any new NDFs within STATS.  Say we don't want to
 smooth that NDF, but the original one.  We just enter the name of the
 NDF at the prompt.  Notice that we don't need the {\tt @}
 prefix, since parameter IN expects a file.  (One occasion where you
-would need it is when the filename is a number, {\it{e.g.}}\ if your
+would need it is when the filename is a number, {\emph{e.g.}}\ if your
 NDF was called 234 you must enter {\tt @234}, otherwise the parameter
 system will think you are giving the integer 234.  Yes \ldots I 
 know \ldots the parameter system is trying to be too clever.)
@@ -2183,7 +2183,7 @@ Some defaults begin with an {\tt @}.
 \normalsize
 These are associated with files (text and \HDSref ) and devices (graphics
 and tape).  If you want to override the default given, you do not have
-to prefix your value with an {\tt @}, {\it{e.g.}}
+to prefix your value with an {\tt @}, {\emph{e.g.}}
 
 \small
 \begin{verbatim}
@@ -2634,7 +2634,7 @@ default values either for every application parameter if the keyword
 appears on the command line, or all subsequent parameters if it is
 supplied to a prompt.  In other words, those parameters which would
 normally be prompted with a value between {\tt / /} delimiters take
-the value between those delimiters, {\it{e.g.}}\ XDIM we saw in
+the value between those delimiters, {\emph{e.g.}}\ XDIM we saw in
 \latexelsehtml{Section~\ref{se:defaults}}{\htmlref{parameter
 defaults}{se:defaults}} would take the value {\tt 64}.  Parameters
 that are normally defaulted behave as usual.  The ACCEPT keyword needs
@@ -2662,7 +2662,7 @@ However, if we run CREFRAME like this:
 it would generate an output image using default values for all the
 parameters except OUT, and write the output to file {\tt stars.sdf}.
 Another point to be wary of is that some applications have loops,
-{\it{e.g.}}\ \htmlref{LOOK}{LOOK},
+{\emph{e.g.}}\ \htmlref{LOOK}{LOOK},
 \htmlref{LUTABLE}{LUTABLE}, and if you use the ACCEPT keyword
 it will only operate the first time the application gets a parameter
 value.
@@ -11811,6 +11811,8 @@ picture.}
  Replaces the values of selected pixels in an NDF.}
 \menuitem{CHAIN}{
  Concatenates a series of vectorized NDFs.}
+\menuitem{CLINPLOT}{
+ Draws a spatial grid of line plots for an axis of a cube NDF.}
 \menuitem{CMULT}{
  Multiplies an NDF by a scalar.}
 \menuitem{COLCOMP}{
@@ -12343,6 +12345,8 @@ functions as follows.
 \begin{description}
 \classitem{ARDPLOT}
  Plots the boundaries of regions described in an \htmlref{ARD file}{se:ardwork}~ over an existing picture.
+\classitem{CLINPLOT}
+ Draws a spatial grid of line plots for an axis of a cube NDF.
 \classitem{CONTOUR}
  Contours a two-dimensional NDF.
 \classitem{DISPLAY}
@@ -15446,7 +15450,9 @@ KAPPA: \htmlref{PASTE}{PASTE},
          value appropriate for the array data type be substituted.
          Placing NEWVAL on the command line permits only one section
          to be replaced.  If there are multiple replacements, a null
-         value ({\tt{!}}) terminates the loop.
+         value ({\tt{!}}) terminates the loop. If the section being 
+         modified contains only a single pixel, then the original value
+         of that pixel is used as the suggested default value. 
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -15469,8 +15475,18 @@ KAPPA: \htmlref{PASTE}{PASTE},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         \htmlref{Title}{apndf:title} for the output NDF structure.  A null value ({\tt{!}})
-         propagates the title from the input NDF to the output NDF. {\tt [!]}
+         \htmlref{Title}{apndf:title} for the output NDF structure.  A null 
+         value ({\tt{!}}) propagates the title from the input NDF to the
+         output NDF. {\tt [!]}
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         OLDVAL = LITERAL (Write)
+      }{
+         If the section being modified contains only a single pixel, then 
+         the original value of that pixel is written out to this output
+         parameter.
       }
    }
    \sstexamples{
@@ -15540,6 +15556,897 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       }
    }
 }
+
+\sstroutine{
+   CLINPLOT
+}{
+   Draws a spatial grid of line plots for an axis of a cube NDF
+}{
+   \sstdescription{
+      This application displays a three-dimensional NDF as a series
+      of line plots of array value against position, arranged on a
+      uniform spatial grid and plotted on the current graphics device.
+      The vertical axis of the plot represents array value, and the
+      horizontal axis represents position along a chosen axis (see
+      parameter USEAXIS).  All the line plots have the same axis limits.
+      The values can be mapped in various ways on to the graphics
+      surface (\emph{e.g.} linearly, logarithmically); see parameters
+      XMAP and YMAP).
+
+      Each line plot is drawn in a box whose location and extent
+      corresponds to a spatial pixel.  It is like a magnified image
+      display, but instead of a pixel being a solid block of colour,
+      a spectrum is plotted.  Thus, for convenience, this documentation
+      sometimes refers to the horizontal axis of the line plots as the
+      spectral axis; while this will often be the case, this application
+      is not restricted to plotting spectra.  Likewise the grid of line
+      plots is also referred to as the image.
+
+      Annotated axes for the spatial co-ordinates may be drawn around
+      the grid of line plots (see parameter EXTAXES).  The appearance of
+      these and the space they occupy may be controlled in detail (see
+      parameters STYLE and MARGIN).
+
+      The image is produced within the current graphics database
+      picture.  The co-ordinates at the centre of the image, and the
+      scale of the image can be controlled using parameters CENTRE,
+      XMAGN and YMAGN.  Only the parts of the image that lie within the
+      current picture are visible; the rest is clipped.
+
+      Each line plot may take several different forms such as a 
+      {\tt "}join-the-dots{\tt "} plot, a {\tt "}staircase{\tt "}
+      plot, a {\tt "}chain{\tt "} plot, (see parameter MODE).  Errors
+      on both the data values and the data positions may be
+      represented in several different ways (see parameters ERRBAR and
+      SHAPE).  The plotting style (colour, founts, text size, etc) may
+      be specified in detail using parameter LPSTYLE.  The lower-left
+      plot has by default annotated axes, whose style is controlled
+      through parameter REFSTYLE.
+
+      The bounds of the plot on both axes can be specified using
+      parameters XLEFT, XRIGHT, YBOT and YTOP.  If not specified they
+      take default values which encompass the entire supplied data set.
+      The defaults for YBOT and YTOP can be selected in several ways
+      including percentiles (see parameter LMODE).
+
+      The current picture is usually cleared before plotting the new
+      picture, but parameter CLEAR can be used to prevent this, allowing
+      several plots to be `stacked' together.  If a new plot is drawn
+      over an existing plot, then there is an option to allow the new
+      plot to be aligned with the existing plot (see parameter ALIGN).
+   }
+   \sstusage{
+      clinplot ndf [comp] [mode] [xleft] [xright] [ybot] [ytop] [device]
+   }
+   \sstparameters{
+      \sstsubsection{
+         ALIGN = \_LOGICAL (Read)
+      }{
+         Controls whether or not the new plot grid should be aligned
+         with an existing grid plot.  If ALIGN is {\tt TRUE}, the $x$-axis
+         values of the new plot will be mapped into the co-ordinate
+         system of the $x$ axis in the existing plot before being used (if
+         this is not possible an error is reported).  In this case, the
+         XLEFT,  XRIGHT, YBOT, and YTOP parameters are ignored and the
+         bounds of the existing plots are used instead.  If ALIGN is
+         {\tt FALSE}, the new $x$-axis values are used without change.  The
+         bounds of each line plot are specified using parameters XLEFT,
+         XRIGHT, YBOT, and YTOP as usual, and these bounds are mapped
+         to the edges of the existing picture.  The ALIGN parameter is
+         only accessed if parameter CLEAR is {\tt FALSE}, and if there is
+         another grid of line plots within the current picture.
+
+         If a null ({\tt{!}}) value is supplied, a value of {\tt TRUE} 
+         will be used if and only if a mapping can be found between the
+         existing and the new plots.  A value of {\tt FALSE} will be used 
+         otherwise. {\tt [!]}
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if labelled and annotated axes are to be drawn
+	 around the line plots.  If a null ({\tt{!}}) value is
+	 supplied, the value used is {\tt FALSE} regardless of whether
+	 the plot is being aligned with an existing plot (see
+	 parameter ALIGN) or not.  In general axes only clutter the
+	 plots, although interior tick marks can help read values.
+	 Annotated axes are normally drawn about the exterior axes of
+	 the lower-left plot through the REFAXES parameter.
+
+         Parameter USEAXIS determines the quantity used to annotate the
+         horizontal axis.  The width of the margins left for the
+         annotation may be controlled using parameter MARGIN.  The
+         appearance of the axes (colours, founts, \emph{etc.}) can be
+         controlled using the parameter LPSTYLE. {\tt [!]}
+      }
+      \sstsubsection{
+         CENTRE = LITERAL (Read)
+      }{
+         The co-ordinates of the data pixel to be placed at the centre
+         of the grid of line plots, in the current co-ordinate Frame of
+         the NDF (supplying a colon {\tt ":"} will display details of the
+         current co-ordinate Frame).  The position should be supplied as
+         a list of formatted axis values separated by spaces or commas.
+         See also parameter USEAXIS.  A null ({\tt{!}}) value causes the
+         centre of the spatial image to be used. {\tt [!]}
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the current picture is cleared before the plot is
+         drawn.  The initial default is {\tt TRUE}.  If CLEAR is 
+         {\tt FALSE} not only is the existing plot retained, but also the
+         previous plot can be used to specify the axis limits (see
+         parameter ALIGN).  Thus you can generate a composite plot within
+         a single set of axes, say using different colours or modes to
+         distinguish the different datasets.
+
+         Note, alignment between the two plots is controlled by the
+	 {\att AlignSystem} attribute of the data being displayed.
+	 For instance, if you have an existing plot showing the
+	 spectra in a cube plotted against radio velocity and you
+	 overlay the spectra from another cube, also in radio velocity
+	 but with a different rest frequency, the appearance of the
+	 final plot will depend on the value of the {\att AlignSystem}
+	 attribute of the second spectrum.  If {\att AlignSystem} is
+	 {\tt "Wavelen"} (this is the default), then the two spectra
+	 will be aligned in wavelength, but if {\att AlignSystem} is
+	 {\tt "vrad"} they will be aligned in radio velocity.  There
+	 will be no difference in effect between these two forms of
+	 alignment unless the rest frequency is different in the two
+	 cubes.  Likewise, the {\att AlignStdOfRest} attribute of the
+	 second cube's spectral axis controls the standard of rest in
+	 which alignment occurs.  These attributes (like all other
+	 attributes) may be examined and modified using WCSATTRIB.
+	 {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF array component to be displayed.  It may be {\tt
+	 "Data"}, {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"}
+	 (where {\tt "Error"} is an alternative to {\tt "Variance"}
+	 and causes the square root of the variance values to be
+	 displayed).  If {\tt "Quality"} is specified, then the
+	 quality values are treated as numerical values (in the range
+	 0 to 255). {\tt ["Data"]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device used to display the cube.
+         {\tt [}current graphics device{\tt{]}}
+      }
+      \sstsubsection{
+         ERRBAR = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if error bars are to be drawn in the line plots.  The
+         error bars can comprise either or both of the data and
+         axis-centre errors, depending on what is available in the
+         supplied dataset.  The parameter SHAPE controls the appearance
+         of the error bars, and XSIGMA and YSIGMA control their lengths.
+         The ERRBAR parameter is ignored unless the parameter COMP is
+         set to {\tt "Data"}.  The initial default is {\tt FALSE}. 
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         EXTAXES = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if labelled and annotated axes are to be drawn
+	 around the spatial grid (\emph{i.e.} external axes).  These
+	 display co-ordinates in the current co-ordinate Frame of the
+	 supplied NDF, and may be changed using application
+	 \htmlref{WCSFRAME}{WCSFRAME} (see also parameter USEAXIS).
+	 The width of the margins left for the annotation may be
+	 controlled using parameter MARGIN.  The appearance of the
+	 axes (colours, founts, \emph{etc.}) can be controlled using
+	 the STYLE parameter.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
+         If FILL is set to {\tt TRUE}, then the image will be `stretched' to 
+         fill the current picture in both directions.  This can be
+         useful to elongate the spectra to reveal more detail by using
+         more of the display surface at the cost of different spatial
+         scales, and when the spatial axes have markedly different
+         dimensions  The dynamic default is {\tt TRUE} if either of the
+         spatial diensions is one. and {\tt FALSE} otherwise. {\tt []}
+      }
+      \sstsubsection{
+         FREQ = \_INTEGER (Read)
+      }{
+         The frequency at which error bars are to be plotted.  For
+         instance, a value of {\tt 2} would mean that alternate points have
+         error bars plotted.  This lets some plots be less cluttered.
+         FREQ must lie in the range 1 to half of the number of points
+         to be plotted.  FREQ is only accessed when parameter ERRBAR is
+         {\tt TRUE}.  [1]
+      }
+      \sstsubsection{
+         LMODE = LITERAL (Read)
+      }{
+         LMODE specifies how the defaults for parameters YBOT and YTOP
+         (the  lower and upper limit of the vertical axis of the plot)
+         should be found.  The supplied string should consist of up to
+         three sub-strings, separated by commas.  The first sub-string
+         must specify the method to use.  If supplied, the other two
+         sub-strings should be numerical values as described below
+         (default values will be used if these sub-strings are not
+         provided).  The following methods are available.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Range"} -- The minimum and maximum data values (including any
+            error bars) are used as the defaults for YBOT and YTOP.  No
+            other sub-strings are needed by this option.
+
+            \sstitem
+            {\tt "Extended"} -- The minimum and maximum data values (including
+            error bars) are extended by percentages of the data range,
+            specified by the second and third sub-strings.  For instance,
+            if the value {\tt "Ex,10,5"} is supplied, then the default for YBOT
+            is set to the minimum data value minus 10\% of the data range,
+            and the default for YTOP is set to the maximum data value plus
+            5\% of the data range.  If only one value is supplied, the
+            second value defaults to the supplied value.  If no values are
+            supplied, both values default to {\tt "2.5"}.  Care should be taken
+            with this mode if YMAP is set to {\tt "Log"} since the extension to
+            the data range caused by this mode may result in the axis
+            encompassing the value zero.
+
+            \sstitem
+            {\tt "Percentile"} -- The default values for YBOT and YTOP are set
+            to  the specified percentiles of the data (excluding error
+            bars).  For  instance, if the value {\tt "Per,10,99"} is supplied,
+            then the default for YBOT is set so that the lowest 10\% of the
+            plotted points are  off the bottom of the plot, and the default
+            for YTOP is set so that the highest 1\% of the points are off
+            the top of the plot.  If only one value, $p1$, is supplied, the
+            second value, $p2$, defaults to $(100 - p1)$.  If no values are
+            supplied, the values default to {\tt "5,95"}.
+
+            \sstitem
+            {\tt "Sigma"} -- The default values for YBOT and YTOP are set to
+            the specified numbers of standard deviations below and above
+            the mean of the data.  For instance, if the value {\tt "sig,1.5,3.0"}
+            is supplied, then the default for YBOT is set to the mean of
+            the data minus 1.5 standard deviations, and the default for
+            YTOP is set to the mean plus 3 standard deviations.  If only
+            one value is supplied, the second value defaults to the
+            supplied value.  If no values are provided both default to
+            {\tt "3.0"}.
+
+         }
+         The method name can be abbreviated to a single character, and
+         is case insensitive.  The initial value is {\tt "Extended"}.
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         LPMARGIN( 4 ) = \_REAL (Read)
+      }{
+         The widths of the margins to leave for axis annotation around
+         the line plots, given as fractions of a single plot for
+         a spatial pixel.  Four values may be given, in the order:
+         bottom, right, top, left.  If fewer than four values are given,
+         extra values are used equal to the first supplied value.  If
+         these margins are too narrow any axis annotation may be
+         clipped.  If a null ({\tt{!}}) value is supplied, the value used is
+         {\tt 0.5} (for all edges) if annotated axes are produced around the
+         grid, {\tt 0.1} if spatial axes are present (parameter AXES), and
+         {\tt 0.0} otherwise.  The initial value is null.  
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         LPSTYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the plotting style to
+         use when drawing the annotated axes, data values, and error
+         markers in the line plots.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be read
+         and interpreted in the same manner.  Attribute settings are
+         applied in the order in which they occur within the list, with
+         later settings overriding any earlier settings given for the
+         same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
+         used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}})---the initial default---is
+         supplied.  See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+
+         The appearance of the data values is controlled by the
+	 attributes {\att Colour(Curves)}, {\att Width(Curves)},
+	 \emph{etc.} (the synonym {\att Lines} may be used in place of
+	 {\att Curves}).  The appearance of markers used if parameter
+	 MODE is set to {\tt "Point"}, {\tt "Mark"} or {\tt "Chain"}
+	 is controlled by {\att Colour(Markers)}, {\att
+	 Width(Markers)}, \emph{etc.} (the synonym {\att Symbols} may
+	 be used in place of {\att Markers}).  The appearance of the
+	 error symbols is controlled using {\att Colour(ErrBars)},
+	 {\att Width(ErrBars)}, \emph{etc.} (see parameter SHAPE).
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MARGIN( 4 ) = \_REAL (Read)
+      }{
+         The widths of the margins to leave around the image for axis
+         annotations, given as fractions of the corresponding dimension
+         of the current picture.  The actual margins used may be
+         increased to preserve the aspect ratio of the data.  Four
+         values may be given, in the order: bottom, right, top, left.
+         If fewer than four values are given, extra values are used
+         equal to the first supplied value.  If these margins are too
+         narrow any axis annotation may be clipped.  If a null ({\tt{!}}) value
+         is supplied, the value used is (for all edges); {\tt 0.15} if
+         annotated axes are being produced; and {\tt 0.0} otherwise.  The
+         initial default is null. {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MARKER = \_INTEGER (Read)
+      }{
+         This parameter is only accessed if parameter MODE is set to
+	 {\tt "Chain"} or {\tt "Mark"}.  It specifies the symbol with
+	 which each position should be marked, and should be given as
+	 an integer PGPLOT marker type.  For instance, {\tt 0} gives a
+	 box, {\tt 1} gives a dot, {\tt 2} gives a cross, {\tt 3}
+	 gives an asterisk, {\tt 7} gives a triangle. The value must
+	 be larger than or equal to $-31$.  The initial default is
+	 {\tt 11}.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         Specifies the way in which data values are represented.  MODE
+         can take the following values:
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Histogram"} -- An histogram of the points is plotted in the
+            style of a {\tt "staircase"} (with vertical lines only joining the $y$
+            values and not extending to the base of the plot).  The
+            vertical lines are placed midway between adjacent $x$ positions.
+
+            \sstitem
+            {\tt "Line"} -- The points are joined by straight lines.
+
+            \sstitem
+            {\tt "Point"} -- A dot is plotted at each point.
+
+            \sstitem
+            {\tt "Mark"} -- Each point is marker with a symbol specified by
+            parameter MARKER.
+
+            \sstitem
+            {\tt "Chain"} -- A combination of {\tt "Line"} and {\tt "Mark"}.
+
+            \sstitem
+            {\tt "Step"} -- Each point is displayed as a horizontal line, whose
+            length is specified by the axis width of the pixel.
+
+         }
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         The input NDF structure containing the data to be displayed.
+         It should have three significant axes, \emph{i.e.} whose dimensions
+         are greater than 1.
+      }
+      \sstsubsection{
+         REFAXES = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if labelled and annotated axes are to be drawn around the
+         bottom-left line plot that acts as a reference.  If AXES is
+         set {\tt TRUE}, a cluttered plot can ensue, especially if the chosen
+         STYLE parameters include axis annotations.  The normal option
+         is to have annotated axes only for the lower-left line plot.
+         This parameter overrides the value of AXES for this special
+         key plot.  If a null ({\tt{!}}) value is supplied, the value used is
+         {\tt FALSE} if the plot is being aligned with an existing plot (see
+         parameter ALIGN), and {\tt TRUE} otherwise.  Parameter USEAXIS
+         determines the quantity used to annotated the horizontal axis.
+         The width of the margins left for the annotation may be
+         controlled using parameter LPMARGIN.  The appearance of the
+         axes (colours, founts, \emph{etc.}) can be controlled using the
+         parameter REFSTYLE. {\tt [!]}
+      }
+      \sstsubsection{
+         REFSTYLE = LITERAL (Read)
+      }{
+         A group of attribute settings describing the plotting style to
+         use when drawing the annotated axes in the bottom-left line
+         plot.  It overrides the values supplied by the STYLE
+         parameter that is applicable to all the line plots.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be read
+         and interpreted in the same manner.  Attribute settings are
+         applied in the order in which they occur within the list, with
+         later settings overriding any earlier settings given for the
+         same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will be
+         used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}})---the initial default---is
+         supplied.  See \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the available attributes.  Any unrecognised
+         attributes are ignored (no error is reported).
+
+         The application adjusts the text heights of the labels and
+         numerical annotations with the density of the plots.  So
+         try the default heights first before attempting any adjustments
+         with the {\att Size(NumLab)} and {\att Size(TextLab)} attributes.
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         SHAPE = LITERAL (Read)
+      }{
+         Specifies the way in which errors are represented.  SHAPE
+         can take the following values:
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Bars"} -- Bars with serifs (\emph{i.e.} cross pieces at each end)
+            are drawn joining the $x$ error limits and the $y$ error limits.
+            The plotting attribute {\att Size(ErrBars)} (see parameter STYLE)
+            can be used to control the size of these serifs (the attribute
+            value should be a magnification factor; {\tt 1.0} gives default
+            serifs).
+
+            \sstitem
+            {\tt "Cross"} -- San-serif bars are drawn joining the $x$-error
+            limits and the $y$-error limits.
+
+            \sstitem
+            {\tt "Diamond"} -- Adjacent error limits are joined to form an
+            error diamond.
+
+         }
+         The length of the error bars can be controlled using parameters
+         XSIGMA and YSIGMA.  The colour, line width and line style used
+         to draw them can be controlled using the plotting attributes
+         {\att Colour(ErrBars)}, {\att Width(ErrBars)} and 
+         {\att Style(ErrBars)} (see parameter STYLE).  SHAPE is only 
+         accessed when parameter ERRBAR is {\tt TRUE}.  The initial value 
+         is {\tt "Bars"}.  {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         STYLE = GROUP (Read)
+      }{
+         A group of attribute settings describing the plotting style to
+         use for the annotated external spatial axes (see parameter
+         EXTAXES).
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such text files
+         should contain further comma-separated lists which will be
+         read and interpreted in the same manner.  Attribute settings
+         are applied in the order in which they occur within the list,
+         with later settings over-riding any earlier settings given for
+         the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$
+         is the value to assign to the attribute.  Default values will
+         be used for any unspecified attributes.  All attributes will be
+         defaulted if a null value ({\tt{!}}) is supplied.  See 
+         \hyperref{Plotting Attributes}{Section~}{}{se:plotting_attr}
+         for a description of the
+         available attributes.  Any unrecognised attributes are ignored
+         (no error is reported). {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         USEAXIS = LITERAL (Read)
+      }{
+         The NDF axis that will appear along the abscissa of the line
+         plots.  This can be specified by its integer index within the
+         current Frame of the NDF (in the range 1 to 3 in the current
+         Frame), or by its symbol string.  A list of acceptable values
+         is displayed if an illegal value is supplied.  If the axes of
+         the current Frame are not parallel to the NDF pixel axes, then
+         the pixel axis which is most nearly parallel to the specified
+         current Frame axis will be used.
+
+         The null ({\tt{!}}) value requests that the spectral axis in a
+         SpecFrame be used.  If there is no SpecFrame present in the
+         NDF, the value {\tt 3} is used.
+
+         The remaining two significant axes are therefore deemed to be
+         spatial, the lower dimension corresponding to the horizontal
+         axis on the exterior spatial axes and the first value for
+         parameter CENTRE.
+
+         In some WCS Frames it may not be possible to display the data,
+         for instance, if you select USEAXIS to be one axis of a SKY
+         Frame.  In such cases switch to a different Frame, such as
+         PIXEL with application WCSFRAME to present the desired axis
+         in the line plots.  {\tt [!]}
+      }
+      \sstsubsection{
+         XLEFT = LITERAL (Read)
+      }{
+         The axis value to place at the left-hand end of the horizontal
+         axis of each line plot.  If a null ({\tt{!}}) value is supplied, the
+         value used is the value for the first element in the supplied
+         NDF (with a margin to include any horizontal error bar).  The
+         value supplied may be greater than or less than the value
+         provided for XRIGHT.  A formatted value for the quantity
+         specified by parameter USEAXIS should be supplied.  See also
+         parameter ALIGN. {\tt [!]}
+      }
+      \sstsubsection{
+         XMAGN = \_REAL (Read)
+      }{
+         The horizontal magnification for the image.  The default
+         value of {\tt 1.0} corresponds to `normal' magnification in which the
+         the image fills the available space in at least one dimension.
+         A value larger than 1.0 makes each data pixel wider.  If this
+         results in the image being wider than the available space then
+         the the image will be clipped to display fewer pixels.  See
+         also parameters YMAGN, CENTRE and FILL. {\tt [1.0]}
+      }
+      \sstsubsection{
+         XMAP = LITERAL (Read)
+      }{
+         Specifies how the quantity represented by the line plot's $x$
+         axis is mapped on to the plot.  The options are:
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Pixel"} -- The mapping is such that pixel index within the
+            input NDF increases linearly across the plot.
+
+            \sstitem
+            {\tt "Distance"} -- The mapping is such that distance along the
+            curve within the current WCS Frame of the input NDF increases
+            linearly across the plot.
+
+            \sstitem
+            {\tt "Log"} -- The mapping is such that the logarithm (base 10) of
+            the value used to annotate the axis increases linearly across
+            the plot.  An error will be reported if the dynamic range of
+            the axis is less than 100, or if the range specified by XLEFT
+            and XRIGHT encompasses the value zero.
+
+            \sstitem
+            {\tt "Linear"} -- The mapping is such that the value used to
+            annotate the axis increases linearly across the plot.
+
+            \sstitem
+            {\tt "Default"} -- One of {\tt "Linear"} or {\tt "log"} is chosen
+            automatically, depending on which one produces a more-even
+            spread of values on the plot.
+            {\tt ["Default"]}
+         }
+      }
+      \sstsubsection{
+         XRIGHT = LITERAL (Read)
+      }{
+         The axis value to place at the right-hand end of the horizontal
+         axis of each line plot.  If a null ({\tt{!}}) value is supplied, the
+         value used is the value for the last element in the supplied
+         NDF (with a margin to include any horizontal error bar).  The
+         value supplied may be greater than or less than the value
+         provided for XLEFT.  A formatted value for the quantity
+         specified by parameter USAXIS should be supplied.  See also
+         parameter ALIGN. {\tt [!]}
+      }
+      \sstsubsection{
+         XSIGMA = LITERAL (Read)
+      }{
+         If horizontal error bars are produced (see parameter ERRBAR),
+         then XSIGMA gives the number of standard deviations that the
+         error bars are to represent.  The initial value is 1.0.
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         YBOT = LITERAL (Read)
+      }{
+         The axis value to place at the bottom end of the vertical
+         axis of each line plot.  If a null ({\tt{!}}) value is supplied, the
+         value used is determined by parameter LMODE.  The value of YBOT
+         may be greater than or less than the value supplied for YTOP.
+         If parameter YMAP is set to {\tt "ValueLog"}, then the supplied value
+         should be the logarithm (base 10) of the bottom data value.
+         See also parameter ALIGN. {\tt [!]}
+      }
+      \sstsubsection{
+         YMAGN = \_REAL (Read)
+      }{
+         The vertical magnification for the image.  The default
+         value of {\tt 1.0} corresponds to `normal' magnification in which the
+         the image fills the available space in at least one dimension.
+         A value larger than 1.0 makes each data pixel taller.  If this
+         results in the image being taller than the available space then
+         the image will be clipped to display fewer pixels.  See also
+         parameters XMAGN, CENTRE and FILL.  If a null ({\tt{!}}) value is
+         supplied, the value used is the value supplied for XMAGN. {\tt [!]}
+      }
+      \sstsubsection{
+         YMAP = LITERAL (Read)
+      }{
+         Specifies how the quantity represented by the line plot's $y$
+         axis is mapped on to the screen.  The options are:
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Linear"} -- The data values are mapped linearly on to the
+            screen.
+
+            \sstitem
+            {\tt "Log"} -- The data values are logged logarithmically on to the
+            screen.  An error will be reported if the dynamic range of
+            the axis is less than 100, or if the range specified by YTOP
+            and YBOT encompasses the value zero.  For this reason, care
+            should be taken over the choice of value for parameter LMODE,
+            since some choices could result in the $y$ range being extended
+            so far that it encompasses zero.
+
+            \sstitem
+            {\tt "ValueLog"} -- This is similar to {\tt "Log"} except that, 
+            instead of mapping the data values logarithmically on to the screen,
+            this option maps the log (base 10) of the data values linearly
+            on to the screen.  If this option is selected, the values
+            supplied for parameters YTOP and YBOT should be values for the
+            logarithm of the data value, not the data value itself.
+            {\tt ["Linear"]}
+         }
+      }
+      \sstsubsection{
+         YSIGMA = LITERAL (Read)
+      }{
+         If vertical error bars are produced (see parameter ERRBAR),
+         then YSIGMA gives the number of standard deviations that the
+         error bars are to represent.  The initial value is {\tt 1.0}.
+         {\tt [}current value{\tt{]}}
+      }
+      \sstsubsection{
+         YTOP = LITERAL (Read)
+      }{
+         The axis value to place at the top end of the vertical axis for
+         each line plot.  If a null ({\tt{!}}) value is supplied, the value
+         used is determined by parameter LMODE.  The value of LTOP may
+         be greater than or less than the value supplied for YBOT.  If
+         parameter YMAP is set to {\tt "ValueLog"}, then the supplied value
+         should be the logarithm (base 10) of the bottom data value.
+         See also parameter ALIGN. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         clinplot cube useaxis=3
+      }{
+         Plots a set of line plots of data values versus position
+         along the third axis for the whole of the three-dimensional
+         NDF called cube on the current graphics device.  Axes are drawn
+         around the grid of plots indicating the spatial positions in
+         the current co-ordinate Frame.  The third axis may not be
+         spectral and the otther two axes need not be spatial.
+      }
+      \sstexamplesubsection{
+         clinplot cube margin=0.1
+      }{
+         As above, but if a search locates a spectral axis in the
+         world co-ordinate system, this is plotted along the horizontal
+         of the line plots, and the other axes are deemed to be spatial.
+         The spectral axis is specified either by a WCS Domain.  Also
+         the margin for the spatial axes is reduced to 0.1 to allow more
+         room for the grid of line plots.
+      }
+      \sstexamplesubsection{
+         clinplot map($\sim$5,$\sim$5,) useaxis=3 noextaxes
+      }{
+         Plots data values versus position for the central 5-by-5 pixel
+         region of the three-dimensional NDF called map on the current
+         graphics device.  No spatial axes are drawn.
+      }
+      \sstexamplesubsection{
+         clinplot map($\sim$5,$\sim$5,) useaxis=3 noextaxes device=ps\_l
+      }{
+         As the previous example but now the output goes to a text file
+         which can be printed on a PostScript printer.
+      }
+      \sstexamplesubsection{
+         clinplot nearc v style="'title=Ne Arc variance'" useaxis=1 refaxes=f
+      }{
+         Plots variance values versus position along axis 1, for each
+         spatial pixel in dimensions two and three, for the whole of the
+         three-dimensional NDF called nearc on the current graphics
+         device.  The plot has a title of {\tt "Ne Arc variance"}.  No
+         annotated axes are drawn around the lower-left line plot.
+      }
+      \sstexamplesubsection{
+         clinplot nebula useaxis=offsetvel xleft=-10 xright=30 lpmargin=0.3
+      }{
+         This plots data values versus radial velocity for those
+         elements of the three-dimensional NDF called nebula with
+         velocity values between $-$10 and 30.  This assumes that the
+         current co-ordinate Frame in the NDF has an axis with symbol
+         {\tt "offsetvel"}.  Set the margins around the grid to be 0.3 of
+         the dimensions of one of the line plots.
+      }
+      \sstexamplesubsection{
+         clinplot ngc3504 useaxis=2 ybot=10 ytop=1000.0 ymap=log xmap=log
+      }{
+         This plots the data values in the entire three-dimensional NDF
+         called ngc3504, against the value described by the second axis
+         in the current co-ordinate Frame of the NDF at each pixel in
+         the first and third axes.  The values represented by both
+         spectral axes are mapped logarithmically on to the screen.  The
+         bottom of each vertical axis corresponds to a data value of
+         10.0 and each top corresponds to a data value of 1000.0.
+      }
+      \sstexamplesubsection{
+         clinplot speccube mode=p errbar xsigma=3 ysigma=3 shape=d lpstyle=$\wedge$my\_sty
+      }{
+         This plots the data values versus position at ech spatial
+         position for the dataset called speccube.  Each spectral pixel
+         is plotted as a point surrounded by diamond-shaped error bars,
+         indicating 3-sigma errors.  The line-plot plotting style is
+         read from text file my\_sty.  This could, for instance, contain
+         strings such as: {\tt colour(err)=pink}, {\tt colour(sym)=red},
+         {\tt tickall=0}.  These cause the error bars to be drawn in pink,
+         the points to be drawn in red, and tick marks to be restricted 
+         to the labelled edges of the plot.
+      }
+      \sstexamplesubsection{
+         clinplot ndf=speccube noclear align lpstyle="colour(curves)=blue"
+      }{
+         Plots data values versus pixel co-ordinate at each spatial
+         position for the whole of the three-dimensional NDF called
+         speccube on the current graphics device.  The plot is drawn
+         over any existing plot and inherits the bounds of the previous
+         plot on all axes.  A warning will be reported if the labels
+         for the line plot horizontal axes or either spatial axis of the
+         two plots are different.  The data are drawn in blue, probably
+         to distinguish it from the previous plot drawn in a different
+         colour.
+      }
+      \sstexamplesubsection{
+         clinplot speccube system='system(1)=freq,unit(1)=GHz"
+      }{
+         This example assumes that the current co-ordinate Frame of NDF
+         speccube is a SpecFrame.  The horizontal axis (axis {\tt "1"}) is
+         labelled with frequency values, in units of GHz.  If the
+         SpecFrame represents some other system (such as wavelength,
+         velocity, or energy), or has some other units, then the
+         conversion is done automatically.  Note, a SpecFrame is a
+         specialised class of Frame which knows how to do these
+         conversions; the above command will fail if the current
+         co-ordinate Frame in the NDF is a simple Frame (such as the
+         AXIS Frame).  A SpecFrame can be created from an AXIS Frame
+         using application WCSADD.
+      }
+      \sstexamplesubsection{
+         clinplot taurus centre="12:23:34 -22:12:23" xmagn=2 accept
+      }{
+         Displays the data values versus spectral position for the NDF
+         called taurus, for spatial pixels centred on the position
+         RA=12:23:34, DEC=-22:12:23.  This assumes that the current
+         co-ordinate Frame in the NDF is an equatorial (RA/DEC) Frame.
+         The image is displayed with a magnification of 2 so that each
+         data pixel appears twice as large (on each axis) as normal.
+         Fewer data pixels may be displayed to ensure the image fits
+         within the available space in the current picture.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For large cubes or spatial sections, the resolution of the
+         graphics device may allow only a fraction of the detail in the
+         data to be plotted.   So only small sections are recommended.
+
+         \sstitem
+         The Title component in the NDF is used as the default title
+         for the exterior annotated axes.  If the NDF does not have a Title
+         component, then the default title is taken from current
+         co-ordinate Frame in the NDF.  This default may be overridden by
+         specifying a value for the {\att Title} attribute using the STYLE
+         parameter.
+
+         \sstitem
+         If all the data values at a spatial position are bad, no line
+         plot is drawn at that location.  Where the combination of CENTRE,
+         XMAGN, and YMAGN parameter values require image padding, a gap
+         will therefore be present in the grid of plots.
+
+         \sstitem
+         Some combinations of CENTRE, XMAGN, YMAGN, and LPMARGIN values
+         will cause the line plots' true spatial positions and extents to
+         appear slightly displaced.  However, the true spatial co-ordinates
+         of a given spectrum always lies within the boundaries of its line
+         plot, and they are recorded in the AGI picture comment.
+
+         \sstitem
+         By default the lower-left plot only has annotated axes at its
+         foot and left side.  Therefore a DSBSPECTRUM 
+         \htmlattref{Domain}{Domain} upper sideband
+         will only be drawn if the visible grid has one row.
+
+         \sstitem
+         The application stores a number of pictures in the graphics
+         database in the following order: a FRAME picture containing the
+         annotated spatial axes and line plot grid and its margins;
+         a DATA picture containing just the plot-grid area; and one DATA
+         pictures for each spatial pixel plotted.  Note, the FRAME picture
+         is only created if annotated axes have been drawn, or if non-zero
+         margins were specified using parameter MARGIN.  If the last
+         visible plot is not at the lowest-left spatial pixel, there will
+         be a duplicate DATA picture for the last visible plot, the
+         second being enclosed in a FRAME picture.
+
+         The world co-ordinates in the first DATA picture will be
+	 pixels, and millimetres from the lower-left of the graphics
+	 surface for the grid DATA pictures.  A reference to the
+	 supplied NDF, together with a copy of the WCS information in
+	 the NDF are stored with every DATA picture.  The comment
+	 associated with each grid DATA pictures is a list of the
+	 formatted spatial co-ordinates in the current WCS Frame.
+
+         On exit  the current database picture for the chosen device
+         reverts to the input picture.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{DISPLAY}{DISLAY},
+      \htmlref{LINPLOT}{LINPLOT},
+      \htmlref{MLINPLOT}{MLINPLOT};
+      \xref{FIGARO}{sun86}{}: \xref{SPECGRID}{sun86}{SPECGRID};
+      \xref{SPLAT}{sun243}{}.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         This application will handle data in all numeric types, though
+         type conversion to integer will occur for unsigned byte and word
+         images.  However, when there is no scaling only integer data will
+         not be type converted, but this is not expensive for the expected
+         byte-type data.
+      }
+   }
+}
+
 \sstroutine{
    CMULT
 }{
@@ -15898,6 +16805,8 @@ XV; PBMPLUS; NETPBM.
       }
    }
 }
+
+\newpage
 \sstroutine{
    COLLAPSE
 }{
@@ -17858,9 +18767,9 @@ KAPPA: \htmlref{ADD}{ADD},
       (see parameter SHOWDATA).
 
       Positions may be reported in several different
-      \htmlref{co-ordinate Frames}{se:domains}~ (see parameter FRAME).  Optionally, the corresponding pixel
-      co-ordinates at each position may also be reported (see parameter
-      SHOWPIXEL).
+      \htmlref{co-ordinate Frames}{se:domains}~ (see parameter FRAME).  Optionally, 
+      the corresponding pixel co-ordinates at each position may also be reported
+      (see parameter SHOWPIXEL).
 
       The picture or pictures within which positions are required can be
       selected in several ways (see parameters MODE and NAME).
@@ -17924,8 +18833,8 @@ KAPPA: \htmlref{ADD}{ADD},
          COMP = LITERAL (Read)
       }{
          The NDF component to be displayed.  It may be {\tt "Data"},
-         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where {\tt "Error"} is an
-         alternative to {\tt "Variance"} and causes the square root of the
+         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where {\tt "Error"} 
+         is an alternative to {\tt "Variance"} and causes the square root of the
          variance values to be displayed).  If
          {\tt "Quality"} is specified, then the quality values are treated as
          numerical values (in the range 0 to 255). {\tt ["Data"]}
@@ -18172,10 +19081,10 @@ KAPPA: \htmlref{ADD}{ADD},
          SHOWDATA = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, the pixel value within the displayed NDF is
-	 reported for each selected position. This is only possible if
+	 reported for each selected position.  This is only possible if
 	 the picture within which position are being selected contains a
-	 reference to an existing NDF. The NDF array component to be
-	 displayed is selected via parameter COMP. {\tt [}FALSE{\tt{]}}
+	 reference to an existing NDF.  The NDF array component to be
+	 displayed is selected via parameter COMP. {\tt [FALSE]}
       }
       \sstsubsection{
          SHOWPIXEL = \_LOGICAL (Read)
@@ -18397,7 +19306,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       the colour table when opened (such as PostScript files), this may
       be the only way of controlling the colour table.
 
-      The image is produced within the \htmlref{current graphics database picture}{se:agitate}
+      The image is produced within the \htmlref{current graphics database picture.}{se:agitate}
       The co-ordinates at the centre of the image, and the scale of the
       image can be controlled using parameters CENTRE, XMAGN and YMAGN.  Only
       the parts of the image that lie within the current picture are visible;
@@ -25918,7 +26827,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          plot will depend on the value of the {\att AlignSystem} attribute of the
          second spectrum.  If {\att AlignSystem} is {\tt "Wavelen"} (this is the default)
          then the two spectra will be aligned in wavelength, but if
-         {\tt AlignSystem} is {\tt "vrad"} they will be aligned in radio velocity.
+         {\att AlignSystem} is {\tt "vrad"} they will be aligned in radio velocity.
          There will be no difference in effect between these two forms of
          alignment unless the rest frequency is different in the two
          spectra.  Likewise, the {\att AlignStdOfRest} attribute of the second
@@ -25955,7 +26864,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          FREQ = \_INTEGER (Read)
       }{
          The frequency at which error bars are to be plotted.  For
-         instance, a value of 2 would mean that alternate points have
+         instance, a value of {\tt 2} would mean that alternate points have
          error bars plotted.  This lets some plots be less cluttered.
          FREQ must lie in the range 1 to half of the number of points
          to be plotted.  FREQ is only accessed when parameter ERRBAR is
@@ -43257,7 +44166,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
    \sstdiytopic{
       Related Applications
    }{
-     KAPPA: \htmlref{WCSFRAME}{WCSFRAME}
+     KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
      \htmlref{REGRID}{REGRID};
      \xref{CCDPACK}{sun139}{}: \xref{TRANNDF}{sun139}{TRANNDF}.
    }
@@ -49470,6 +50379,13 @@ parallel to any face of the cube.
 The following new applications have been added:
 
 \begin{description}
+   \item [\htmlref{CLINPLOT}{CLINPLOT}] \mbox{}
+       Draws a spatial grid of line plots for an axis of a cube NDF.
+       This is particularly relevant to inspection of spectral-line
+       data cubes.  In addition to the normal spectral axes around
+       a line plot, there may be spatial axes drawn around the grid.
+       This application could be considered a hybrid of 
+       \htmlref{DISPLAY}{DISPLAY} and \htmlref{LINPLOT}{LINPLOT}.
    \item [\htmlref{INTERLEAVE}{INTERLEAVE}] \mbox{}
        Forms a higher-resolution NDF by interleaving a set of NDFs of
        the same dimensionality.
@@ -49489,6 +50405,13 @@ The following new applications have been added:
 The following applications have been modified:
 
 \begin{description}
+
+   \item [\htmlref{CHPIX}{CHPIX}] \mbox{}
+      \begin{itemize}
+         \item There is a new output parameter OLDVAL.  If the section
+         being modified comprises one pixel, OLDVAL stores the original
+         value of that pixel.
+      \end{itemize}
 
    \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
       \begin{itemize}
@@ -49742,6 +50665,8 @@ functions as follows.
 \begin{description}
 \classitem{ARDPLOT}
  Plots the boundaries of regions described in an ARD file over an existing picture.
+\classitem{CLINPLOT}
+ Draws a spatial grid of line plots for an axis of a cube NDF.
 \classitem{CONTOUR}
  Contours a two-dimensional NDF.
 \classitem{DISPLAY}
