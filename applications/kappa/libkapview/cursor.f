@@ -653,6 +653,8 @@
      :                   .FALSE., COMP, STATUS )
          MCOMP = COMP
          IF ( COMP .EQ. 'ERROR' ) COMP = 'VARIANCE'
+         CALL CHR_LCASE( COMP( 2 : ) )
+         
       ENDIF
 
 *  Abort if an error has occurred.
@@ -1007,7 +1009,7 @@
 
                   CALL AGI_INAME( PNAME, STATUS )
                   IF( PNAME .EQ. 'DATA' ) THEN
-                     IF( .NOT. QUIET ) CALL MSG_BLANK( STATUS )
+                     IF( .NOT .QUIET ) CALL MSG_BLANK( STATUS )
                      CALL KPG1_AGREF( IPIC, 'READ', GOTNAM, REFNAM, 
      :                                STATUS )
 
@@ -1183,46 +1185,36 @@
 
 *  If required, show the corresponding pixel co-ordinates. Do not display
 *  them if pixel co-ords are already being displayed.
+            LINE = ' ('
+            IAT = 2
             IF( SHPIX .AND. IPIX .NE. AST__NOFRAME .AND.
      :          DOM .NE. 'PIXEL' ) THEN
 
 *  Map the GRAPHICS position into the PIXEL Frame, and format the results 
 *  without axis symbols. Indent by 3 spaces.
-               LINE = ' ('
-               IAT = 2
                CALL KPS1_CURFM( FRM2, MAP2, XC, YC, NAXP, .FALSE., 
      :                          NEWPIC, IAT, LINE, ICOL, PGOOD, PXY, 
      :                          STATUS )
-               CALL CHR_APPND( ')', LINE, IAT )
-
-*  Display the formatted values on the screen if required.
-               IF( .NOT. QUIET ) THEN
-                  CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
-                  CALL MSG_BLANK( STATUS )
-               END IF
-
-*  Append it to the current line in the log file.
-               CALL GRP_GRPSZ( IGRP1, GRPSIZ, STATUS )
-               CALL GRP_GET( IGRP1, GRPSIZ, 1, LOGLIN, STATUS ) 
-               IAT = CHR_LEN( LOGLIN ) + 3
-               CALL CHR_APPND( LINE, LOGLIN, IAT )
-               CALL GRP_PUT( IGRP1, 1, LOGLIN( : IAT ), GRPSIZ, STATUS ) 
-
             END IF
 
-*  If required, show the NDF pixel value.
-            IF( SHDATA .AND. INDF1 .NE. NDF__NOID ) THEN
+*  If required, show the NDF pixel value. Map the GRAPHICS position into the 
+*  PIXEL Frame (if defioned), and format the required NDF array value.
+            IF( SHDATA .AND. INDF1 .NE. NDF__NOID .AND. 
+     :          IPIX .NE. AST__NOFRAME) THEN
 
-*  Map the GRAPHICS position into the PIXEL Frame, and format the
-*  required NDF array value.
-               LINE = ' ('
-               IAT = 2
+               IF( SHPIX ) IAT = IAT + 3
+
                CALL KPS1_CURDV( MAP2, XC, YC, NDIM, LBND, UBND, COMP, 
      :                          %VAL( CNF_PVAL( PNTR ) ), IAT, LINE, 
      :                          STATUS )
+
+            END IF
+             
+*  Write the line to the screen if required.
+            IF( IAT .GT. 2 ) THEN
                CALL CHR_APPND( ')', LINE, IAT )
 
-*  Display the formatted array value on the screen if required.
+*  Display the formatted values on the screen if required.
                IF( .NOT. QUIET ) THEN
                   CALL MSG_OUT( ' ', LINE( : IAT ), STATUS )
                   CALL MSG_BLANK( STATUS )
