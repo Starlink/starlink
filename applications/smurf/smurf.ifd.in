@@ -70,6 +70,16 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	 parameter pixsize {
+	    position 3
+	    type _REAL
+	    vpath {PROMPT }
+	    prompt {Output map pixel size in arcsec}
+	    ppath GLOBAL CURRENT
+	    default 3.0
+	    helpkey *
+	  }
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
