@@ -461,28 +461,28 @@ sub match {
   return $self->{MATCH};
 }
 
-=item B<match_catalogue>
+=item B<matchcatalogue>
 
 Retrieve or set a filename that will take the set of positions matched
 by the matching process. The file is formatted like a SExtractor output
 file with five columns: the object number, RA and Dec of the source on
 the sky, and x and y positions of the source on the CCD.
 
-  my $matchcatalogue = $auto->match_catalogue;
-  $auto->match_catalogue( 'match.cat' );
+  my $matchcatalogue = $auto->matchcatalogue;
+  $auto->matchcatalogue( 'match.cat' );
 
 Defaults to undef, meaning that no such file will be written. If defined,
 it will write the catalogue in the current working directory.
 
 =cut
 
-sub match_catalogue {
+sub matchcatalogue {
   my $self = shift;
   if( @_ ) {
     my $matchcatalogue = shift;
-    $self->{MATCH_CATALOGUE} = $matchcatalogue;
+    $self->{MATCHCATALOGUE} = $matchcatalogue;
   }
-  return $self->{MATCH_CATALOGUE};
+  return $self->{MATCHCATALOGUE};
 }
 
 =item B<maxfit>
@@ -842,23 +842,23 @@ sub obsdata {
   return $self->{OBSDATA};
 }
 
-=item B<result_catalogue>
+=item B<resultcatalogue>
 
 Retrieve the catalogue of detected objects with the updated WCS.
 
-  $result = $auto->result_catalogue;
+  $result = $auto->resultcatalogue;
 
 This method returns an C<Astro::Catalog> object.
 
 =cut
 
-sub result_catalogue {
+sub resultcatalogue {
   my $self = shift;
   if( @_ ) {
     my $result = shift;
-    $self->{RESULT_CATALOGUE} = $result;
+    $self->{RESULTCATALOGUE} = $result;
   }
-  return $self->{RESULT_CATALOGUE};
+  return $self->{RESULTCATALOGUE};
 }
 
 =item B<skycatconfig>
@@ -889,46 +889,46 @@ sub skycatconfig {
   return $self->{SKYCATCONFIG};
 }
 
-=item B<skycat_catalogue_in>
+=item B<skycatcatalogue_in>
 
 Retrieve or set a filename that will be used in place of a SkyCat
 query. The file must be formatted in Cluster format as listed in the
 C<detected_catalogue> method.
 
-  my $skycat_catalogue_in = $auto->skycat_catalogue_in;
-  $auto->skycat_catalogue_in( 'skycat.cat' );
+  my $skycatcatalogue_in = $auto->skycatcatalogue_in;
+  $auto->skycatcatalogue_in( 'skycat.cat' );
 
 If not set, then a network query will be done.
 
 =cut
 
-sub skycat_catalogue_in {
+sub skycatcatalogue_in {
   my $self = shift;
   if( @_ ) {
-    my $skycat_catalogue_in = shift;
-    $self->{SKYCAT_CATALOGUE_IN} = $skycat_catalogue_in;
+    my $skycatcatalogue_in = shift;
+    $self->{SKYCAT_CATALOGUE_IN} = $skycatcatalogue_in;
   }
   return $self->{SKYCAT_CATALOGUE_IN};
 }
 
-=item B<skycat_catalogue_out>
+=item B<skycatcatalogue_out>
 
 Retrieve or set a filename that will take the catalogue as downloaded
 from SkyCat. The file is formatted in Cluster format with the same
 columns as listed in the C<detected_catalogue> method.
 
-  my $skycat_cat_out = $auto->skycat_catalogue_out;
-  $auto->skycat_catalogue_out( 'skycat.out' );
+  my $skycat_cat_out = $auto->skycatcatalogue_out;
+  $auto->skycatcatalogue_out( 'skycat.out' );
 
 If not set, then no catalogue will be written.
 
 =cut
 
-sub skycat_catalogue_out {
+sub skycatcatalogue_out {
   my $self = shift;
   if( @_ ) {
-    my $skycat_catalogue_out = shift;
-    $self->{SKYCAT_CATALOGUE_OUT} = $skycat_catalogue_out;
+    my $skycatcatalogue_out = shift;
+    $self->{SKYCAT_CATALOGUE_OUT} = $skycatcatalogue_out;
   }
   return $self->{SKYCAT_CATALOGUE_OUT};
 }
@@ -1168,33 +1168,49 @@ sub solve {
 
   print sprintf( "Central coordinates: $cencoords\nSearch radius: %.4f arcminutes\n", $radius ) if $self->verbose;
 
+# Do filter handling.
+  if( ! defined( $self->filter ) ) {
+    my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
+    tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
+    my %generic_headers;
+    eval { %generic_headers = translate_from_FITS(\%header_keywords) };
+    if( $@ || ! defined( $generic_headers{'FILTER'} ) ) {
+      if( $self->starlink_output ) {
+        print "--W Could not obtain filter by translating header.\n";
+        print "--W Looking for FILTER header keyword.\n";
+      }
+      if( defined( $header_keywords{'FILTER'} ) ) {
+        $self->filter( new Astro::WaveBand( Filter => $header_keywords{'FILTER'} ) );
+        print "--W Found FILTER header keyword, value is " . $header_keywords{'FILTER'} . ".\n" if $self->starlink_output;
+      } else {
+        if( $self->starlink_output ) {
+          print "--W Could not obtain filter from FILTER header keyword.\n";
+          print "--W Defaulting to J.\n";
+        }
+        $self->filter( new Astro::WaveBand( Filter => 'J' ) );
+      }
+    } else {
+      $self->filter( new Astro::WaveBand( Filter => $generic_headers{'FILTER'} ) );
+    }
+  }
+
 # If we have a user-supplied catalogue, use that. Otherwise, use
 # Starlink::Extractor to extract objects from the NDF.
   my $ndfcat;
-  my $filter;
   if( defined( $self->ccdcatalogue ) ) {
     print sprintf("--I Using EXTRACTOR catalogue in %s", $self->ccdcatalogue ) if $self->starlink_output;
     $ndfcat = new Astro::Catalog( Format => 'SExtractor',
                                   File => $self->ccdcatalogue );
-    $filter = $self->filter;
   } else {
     print "--I Calling EXTRACTOR.\n" if $self->starlink_output;
     print STDERR  "Calling EXTRACTOR.\n" if $self->verbose;
-    if( ! defined( $self->filter ) ) {
-      my $header = new Astro::FITS::Header::NDF( File => $self->ndf );
-      tie my %header_keywords, "Astro::FITS::Header", $header, tiereturnsref => 1;
-      my %generic_headers = translate_from_FITS(\%header_keywords);
-      $filter = new Astro::WaveBand( Filter => $generic_headers{'FILTER'} );
-      $self->filter( $filter );
-    }
-    $filter = $self->filter;
     my $ext = new Starlink::Extractor;
     $ext->quick( 1 );
     $ext->detect_thresh( $self->detection_threshold );
     $ext->phot_apertures( $self->aperture );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
-                             filter => $filter,
+                             filter => $self->filter,
                              quality => 0, );
     print sprintf( "--I Extracted %d objects from NDF.\n", $ndfcat->sizeof )
       if $self->starlink_output;
@@ -1210,6 +1226,7 @@ sub solve {
   my $filtered_ndfcat = new Astro::Catalog;
   if( $self->maxobj_corr && $ndfcat->sizeof > $self->maxobj_corr ) {
     my @ndfstars = $ndfcat->stars;
+    my $filter = $self->filter;
     my @sortedstars = map { $_->[0] }
                       sort { $a->[1] <=> $b->[1] }
                       map { [ $_, $_->get_flux_quantity( waveband => $filter, type => 'MAG_ISO' ) ] } @ndfstars;
@@ -1222,15 +1239,17 @@ sub solve {
 # Check to see if we have a catalogue to read in instead of querying
 # SkyCat.
   my $querycat;
-  if( defined( $self->skycat_catalogue_in ) &&
-      -e $self->skycat_catalogue_in ) {
+  if( defined( $self->skycatcatalogue_in ) &&
+      -e $self->skycatcatalogue_in ) {
 
 # Read in the catalogue.
-    print "--I Using " . $self->skycat_catalogue_in . " as input catalogue for SkyCat.\n" if $self->starlink_output;
+    print "--I Using " . $self->skycatcatalogue_in . " as input catalogue for SkyCat.\n" if $self->starlink_output;
     $querycat = new Astro::Catalog( Format => 'Cluster',
-                                    File => $self->skycat_catalogue_in,
+                                    File => $self->skycatcatalogue_in,
                                   );
-
+    print sprintf( "--I %s read in, %d entries.\n",
+                   $self->skycatcatalogue_in,
+                   $querycat->sizeof );
   } else {
 
 # Query the SkyCat catalogue.
@@ -1274,17 +1293,17 @@ sub solve {
 # either the input SkyCat catalogue isn't defined or it is
 # defined and ( isn't the same as the requested output catalogue
 # or it doesn't exist ).
-  if( defined( $self->skycat_catalogue_out ) ) {
-    if( ! defined( $self->skycat_catalogue_in ) ||
-        ( defined( $self->skycat_catalogue_in ) &&
-          ( ! -e $self->skycat_catalogue_in ||
-            $self->skycat_catalogue_in ne $self->skycat_catalogue_out ) ) ) {
+  if( defined( $self->skycatcatalogue_out ) ) {
+    if( ! defined( $self->skycatcatalogue_in ) ||
+        ( defined( $self->skycatcatalogue_in ) &&
+          ( ! -e $self->skycatcatalogue_in ||
+            $self->skycatcatalogue_in ne $self->skycatcatalogue_out ) ) ) {
 
       $querycat->write_catalog( Format => 'Cluster',
-                                File => $self->skycat_catalogue_out,
+                                File => $self->skycatcatalogue_out,
                               );
-      print "Wrote " . $self->skycat_catalogue_out
-            . " to disk, storing SkyCat results.\n" if( $self->verbose );
+      print "--I Wrote " . $self->skycatcatalogue_out
+            . " to disk, storing SkyCat results.\n" if( $self->starlink_output );
     }
   }
 
@@ -1373,14 +1392,16 @@ sub solve {
       my $queryflux = $queryitem->fluxes;
       my @allfluxes = $queryflux->allfluxes;
       my $newfluxes = new Astro::Fluxes;
+      my $pref_type;
       foreach my $flux ( @allfluxes ) {
         my $quantity = $flux->quantity( 'mag' );
         my $waveband = $flux->waveband;
-        my $type = $flux->type;
-        my $newflux = new Astro::Flux( $quantity, ( $type . "_CATALOG") , $waveband );
+        $pref_type = $flux->type . "_CATALOG";
+        my $newflux = new Astro::Flux( $quantity, $pref_type , $waveband );
         $newfluxes->pushfluxes( $newflux );
       }
       $item->fluxes( $newfluxes );
+      $item->preferred_magnitude_type( $pref_type );
 
       $merged->pushstar( $item );
     }
@@ -1388,9 +1409,9 @@ sub solve {
     print "--I Matched " . $merged->sizeof . " objects between catalogues.\n" if $self->starlink_output;
 
 # Output the merged catalogue to disk, if requested.
-    if( defined( $self->match_catalogue ) ) {
-      $merged->write_catalog( Format => 'Cluster', File => $self->match_catalogue );
-      print "--I Wrote match catalogue to " . $self->match_catalogue . "\n" if $self->starlink_output;
+    if( defined( $self->matchcatalogue ) ) {
+      $merged->write_catalog( Format => 'Cluster', File => $self->matchcatalogue );
+      print "--I Wrote " . $self->matchcatalogue . " to disk, storing matched objects.\n" if $self->starlink_output;
    }
 
 # If there are fewer than 10 objects in the input catalogue to ASTROM,
@@ -1436,7 +1457,9 @@ sub solve {
     }
 
     my $curr_rms = $result->{rrms};
+    my $nterms = $result->{nterms};
     if( $self->starlink_output ) {
+      print "--I ASTROM determined a $nterms-parameter fit.\n";
       print sprintf( "--I RMS of current fit: %.5f arcseconds.\n",
                      $curr_rms );
       print sprintf( "--I Difference to previous RMS: %.5f arcseconds.\n",
@@ -1553,10 +1576,10 @@ sub solve {
   }
 
 # Set the new catalogue to be the 'fitted' catalogue.
-  $self->result_catalogue( $ndfcat );
+  $self->resultcatalogue( $ndfcat );
 
 # And return the new catalogue.
-  return ( $self->result_catalogue, $merged );
+  return ( $self->resultcatalogue, $merged );
 
 }
 
