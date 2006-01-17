@@ -15563,7 +15563,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    Draws a spatial grid of line plots for an axis of a cube NDF
 }{
    \sstdescription{
-      This application displays a three-dimensional NDF as a series
+      This application displays a three-dimensional \NDFref{NDF} as a series
       of line plots of array value against position, arranged on a
       uniform spatial grid and plotted on the current graphics device.
       The vertical axis of the plot represents array value, and the
@@ -15697,7 +15697,8 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
 	 cubes.  Likewise, the {\att AlignStdOfRest} attribute of the
 	 second cube's spectral axis controls the standard of rest in
 	 which alignment occurs.  These attributes (like all other
-	 attributes) may be examined and modified using WCSATTRIB.
+	 attributes) may be examined and modified using 
+         \htmlref{WCSATTRIB}{WCSATTRIB}.
 	 {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -16140,7 +16141,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
             annotate the axis increases linearly across the plot.
 
             \sstitem
-            {\tt "Default"} -- One of {\tt "Linear"} or {\tt "log"} is chosen
+            {\tt "Default"} -- One of {\tt "Linear"} or {\tt "Log"} is chosen
             automatically, depending on which one produces a more-even
             spread of values on the plot.
             {\tt ["Default"]}
@@ -16155,7 +16156,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          NDF (with a margin to include any horizontal error bar).  The
          value supplied may be greater than or less than the value
          provided for XLEFT.  A formatted value for the quantity
-         specified by parameter USAXIS should be supplied.  See also
+         specified by parameter USEAXIS should be supplied.  See also
          parameter ALIGN. {\tt [!]}
       }
       \sstsubsection{
@@ -16311,7 +16312,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          position for the dataset called speccube.  Each spectral pixel
          is plotted as a point surrounded by diamond-shaped error bars,
          indicating 3-sigma errors.  The line-plot plotting style is
-         read from text file my\_sty.  This could, for instance, contain
+         read from text file {\tt my\_sty}.  This could, for instance, contain
          strings such as: {\tt colour(err)=pink}, {\tt colour(sym)=red},
          {\tt tickall=0}.  These cause the error bars to be drawn in pink,
          the points to be drawn in red, and tick marks to be restricted 
@@ -16390,7 +16391,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \sstitem
          By default the lower-left plot only has annotated axes at its
          foot and left side.  Therefore a DSBSPECTRUM 
-         \htmlattref{Domain}{Domain} upper sideband
+         \htmlattref{Domain}{Domain}~ upper sideband
          will only be drawn if the visible grid has one row.
 
          \sstitem
@@ -16420,7 +16421,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: \htmlref{DISPLAY}{DISLAY},
+      KAPPA: \htmlref{DISPLAY}{DISPLAY},
       \htmlref{LINPLOT}{LINPLOT},
       \htmlref{MLINPLOT}{MLINPLOT};
       \xref{FIGARO}{sun86}{}: \xref{SPECGRID}{sun86}{SPECGRID};

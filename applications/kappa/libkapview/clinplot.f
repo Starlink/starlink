@@ -478,7 +478,7 @@
 *        - "Linear" -- The mapping is such that the value used to
 *        annotate the axis increases linearly across the plot.
 *
-*        - "Default" -- One of "Linear" or "log" is chosen
+*        - "Default" -- One of "Linear" or "Log" is chosen
 *        automatically, depending on which one produces a more-even 
 *        spread of values on the plot. 
 *        ["Default"]
@@ -489,7 +489,7 @@
 *        NDF (with a margin to include any horizontal error bar).  The 
 *        value supplied may be greater than or less than the value 
 *        provided for XLEFT.  A formatted value for the quantity
-*        specified by parameter USAXIS should be supplied.  See also
+*        specified by parameter USEAXIS should be supplied.  See also
 *        parameter ALIGN. [!]
 *     XSIGMA = LITERAL (Read)
 *        If horizontal error bars are produced (see parameter ERRBAR), 
