@@ -194,7 +194,7 @@ if test ! -x "${STARLINK}"; then
     read STARLINK
 fi
 AC_MSG_RESULT($STARLINK)
-CFLAGS="-I${STARLINK}/include $CFLAGS"
+CPPFLAGS="-I${STARLINK}/include"
 
 # Display compiler and linker flags
 AC_MSG_RESULT([I will compile using:  $CC $CFLAGS])

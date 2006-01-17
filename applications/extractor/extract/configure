@@ -6610,7 +6610,7 @@ if test ! -x "${STARLINK}"; then
 fi
 echo "$as_me:$LINENO: result: $STARLINK" >&5
 echo "${ECHO_T}$STARLINK" >&6
-CFLAGS="-I${STARLINK}/include $CFLAGS"
+CPPFLAGS="-I${STARLINK}/include"
 
 # Display compiler and linker flags
 echo "$as_me:$LINENO: result: I will compile using:  $CC $CFLAGS" >&5
