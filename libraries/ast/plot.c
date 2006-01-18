@@ -69,6 +69,7 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     In addition to those attributes common to all FrameSets, every
 *     Plot also has the following attributes:
 *
+*     - Abbrev: Abbreviate leading fields?
 *     - Border: Draw a border around valid regions of a Plot?
 *     - Clip: Clip lines and/or markers at the Plot boundary?
 *     - ClipOp: Combine Plot clipping limits using a boolean OR?
@@ -543,6 +544,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        SkyAxis.
 *     7-DEC-2005 (DSB):
 *        Free memory allocated by calls to astReadString.
+*     18-JAN-2006 (DSB)
+*        Add Abbrev attribute.
 *class--
 */
 
@@ -1539,6 +1542,11 @@ static int TestDrawAxes( AstPlot *, int );
 static void ClearDrawAxes( AstPlot *, int );
 static void SetDrawAxes( AstPlot *, int, int );
 
+static int GetAbbrev( AstPlot *, int );
+static int TestAbbrev( AstPlot *, int );
+static void ClearAbbrev( AstPlot *, int );
+static void SetAbbrev( AstPlot *, int, int );
+
 static int GetEscape( AstPlot * );
 static int TestEscape( AstPlot * );
 static void ClearEscape( AstPlot * );
@@ -2325,6 +2333,52 @@ MAKE_CLEAR(DrawAxes,drawaxes,-1,2)
 MAKE_GET(DrawAxes,int,1,( this->drawaxes[axis] == -1 ? 1 : this->drawaxes[axis] ),2)
 MAKE_TEST(DrawAxes,( this->drawaxes[axis] != -1 ),2)
 MAKE_SET(DrawAxes,int,drawaxes,( value ? 1 : 0 ),2)
+
+/* Abbrev */
+/* -------- */
+/*
+*att++
+*  Name:
+*     Abbrev(axis)
+
+*  Purpose:
+*     Abbreviate leading fields within numerical axis labels?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls the appearance of an annotated
+c     coordinate grid (drawn with the astGrid function) by determining
+f     coordinate grid (drawn with the AST_GRID routine) by determining
+*     whether matching leading fields should be removed from adjacent 
+*     numerical axis labels. It takes a separate value for each physical 
+*     axis of a Plot so that, for instance, the setting "Abbrev(2)=0"
+*     specifies that matching leading fields should not be removed on
+*     the second axis.
+*
+*     If the Abbrev value of a Plot is non-zero (the default), then
+*     leading fields will be removed from adjacent axis labels if they
+*     are equal.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*  Notes:
+*     - If no axis is specified, (e.g. "Abbrev" instead of
+*     "Abbrev(2)"), then a "set" or "clear" operation will affect
+*     the attribute value of all the Plot axes, while a "get" or
+*     "test" operation will use just the Abbrev(1) value.
+*att--
+*/
+MAKE_CLEAR(Abbrev,abbrev,-1,2)
+MAKE_GET(Abbrev,int,1,( this->abbrev[axis] == -1 ? 1 : this->abbrev[axis] ),2)
+MAKE_TEST(Abbrev,( this->abbrev[axis] != -1 ),2)
+MAKE_SET(Abbrev,int,abbrev,( value ? 1 : 0 ),2)
 
 /* Escape. */
 /* ------- */
@@ -6249,12 +6303,25 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
       astClearDrawAxes( this, 0 );
       astClearDrawAxes( this, 1 );
 
+/* Abbrev */
+/* ------ */
+   } else if ( !strcmp( attrib, "abbrev" ) ) {
+      astClearAbbrev( this, 0 );
+      astClearAbbrev( this, 1 );
+
 /* DrawAxes(axis). */
 /* --------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearDrawAxes( this, axis - 1 );
+
+/* Abbrev(axis). */
+/* ------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "abbrev(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      astClearAbbrev( this, axis - 1 );
 
 /* Escape. */
 /* ------- */
@@ -13754,6 +13821,26 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* Abbrev. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "abbrev" ) ) {
+      ival = astGetAbbrev( this, 0 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* Abbrev(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "abbrev(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      ival = GetAbbrev( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* LabelUnits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "labelunits" ) ) {
@@ -17148,6 +17235,10 @@ void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
    vtab->SetDrawAxes = SetDrawAxes;
    vtab->GetDrawAxes = GetDrawAxes;
    vtab->TestDrawAxes = TestDrawAxes;
+   vtab->ClearAbbrev = ClearAbbrev;
+   vtab->SetAbbrev = SetAbbrev;
+   vtab->GetAbbrev = GetAbbrev;
+   vtab->TestAbbrev = TestAbbrev;
    vtab->ClearEscape = ClearEscape;
    vtab->SetEscape = SetEscape;
    vtab->GetEscape = GetEscape;
@@ -20296,6 +20387,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    float toly;            /* Min allowed Y interval between labels */
    float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
    float ybn[ 4 ];        /* Y coords at corners of new label's bounding box */
+   int abb;               /* Abbreviate leading fields? */
    int dp;                /* Number of decimal places */
    int found;             /* Non-zero digit found? */
    int hilen;             /* Length of texthi */
@@ -20463,6 +20555,9 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    list[ root ].priority = nzmax + 1;
    list[ root ].saved_prio = nzmax + 1;
 
+/* See if leading fields are to be abbreviated */
+   abb = astGetAbbrev( this, axis );
+
 /* The following process may have removed some labels which define the
    missing fields in neighbouring abbreviated fields, so that the user
    would not be able to tell what value the abbvreviated leading fields
@@ -20538,19 +20633,23 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 /* If only one of these two neighbouring labels was found, we abbreviate the 
    current label by comparing it with the one found neighbouring label. */
                if( !lllo ) {
-                  ll->atext = astAbbrev( frame, axis, fmt, llhi->text, ll->text );
+                  ll->atext = abb ? astAbbrev( frame, axis, fmt, llhi->text, 
+                                               ll->text ) : ll->text;
                   if( !(ll->atext)[0] ) ll->atext = ll->text;
 
                } else if( !llhi ) {
-                  ll->atext = astAbbrev( frame, axis, fmt, lllo->text, ll->text );
+                  ll->atext = abb ? astAbbrev( frame, axis, fmt, lllo->text, 
+                                               ll->text ) : ll->text;
                   if( !(ll->atext)[0] ) ll->atext = ll->text;
 
 /* If two neighbouring labels were found, we abbreviate the current label
    by comparing it with both neighbouring labels, and choosing the shorter
    abbreviation. */
                } else {
-                  textlo = astAbbrev( frame, axis, fmt, lllo->text, ll->text );
-                  texthi = astAbbrev( frame, axis, fmt, llhi->text, ll->text );
+                  textlo = abb ? astAbbrev( frame, axis, fmt, lllo->text, 
+                                            ll->text ) : ll->text;
+                  texthi = abb ? astAbbrev( frame, axis, fmt, llhi->text, 
+                                            ll->text ) : ll->text;
 
                   lolen = strlen( textlo );
                   hilen = strlen( texthi );
@@ -21494,6 +21593,22 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetDrawAxes( this, axis - 1, ival );
 
+/* Abbrev. */
+/* ------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "abbrev= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetAbbrev( this, 0, ival );
+      astSetAbbrev( this, 1, ival );
+
+/* Abbrev(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 2 == astSscanf( setting, "abbrev(%d)= %d %n",
+                              &axis, &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetAbbrev( this, axis - 1, ival );
+
 /* Escape. */
 /* ------- */
    } else if ( nc = 0,
@@ -22300,6 +22415,18 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestDrawAxes( this, axis - 1 );
+
+/* Abbrev. */
+/* --------- */
+   } else if ( !strcmp( attrib, "abbrev" ) ) {
+      result = astTestAbbrev( this, 0 );
+
+/* Abbrev(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( attrib, "abbrev(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestAbbrev( this, axis - 1 );
 
 /* Escape. */
 /* ------- */
@@ -26061,6 +26188,15 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       astWriteInt( channel, buff, set, 0, ival, "Draw axis through ticks?" );
    }
 
+/* Abbrev(axis). */
+/* ------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestAbbrev( this, axis );
+      ival = set ? GetAbbrev( this, axis ) : astGetAbbrev( this, axis );
+      (void) sprintf( buff, "Abbrv%d", axis + 1 );
+      astWriteInt( channel, buff, set, 0, ival, "Abbreviate numerical axis labels?" );
+   }
+
 /* Escape. */
 /* ------- */
    set = TestEscape( this );
@@ -26906,6 +27042,12 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
       new->drawaxes[0] = -1;
       new->drawaxes[1] = -1;
 
+/* Are adjacent numerical axis labels to be abbreviated by removing matching
+   leading fields? Store a value of -1 to indicate that no value has yet been 
+   set. This will cause a default value of 1 (yes) to be used. */
+      new->abbrev[0] = -1;
+      new->abbrev[1] = -1;
+
 /* Are escape sequences within text strings to be interpreted? If not,
    they are printed literally. Store a value of -1 when not set.
    This will cause a default value of 1 (yes) to be used. */
@@ -27260,6 +27402,24 @@ AstPlot *astLoadPlot_( void *mem, size_t size,
             new->drawaxes[ axis ] = astReadInt( channel, buff, -1 );
             if ( TestDrawAxes( new, axis ) ) SetDrawAxes( new, axis,
                                                        new->drawaxes[ axis ] );
+         }
+      }
+
+/* Abbrev. */
+/* ------- */
+      new->abbrev[ 0 ] = astReadInt( channel, "abbrv", -1 );
+
+      if(  new->abbrev[ 0 ] != -1 ) {
+         new->abbrev[ 1 ] = new->abbrev[ 0 ];
+         if ( TestAbbrev( new, 0 ) ) SetAbbrev( new, 0, new->abbrev[ 0 ] );
+         if ( TestAbbrev( new, 1 ) ) SetAbbrev( new, 1, new->abbrev[ 1 ] );
+
+      } else {
+         for( axis = 0; axis < 2; axis++ ){
+            (void) sprintf( buff, "abbrv%d", axis + 1 );
+            new->abbrev[ axis ] = astReadInt( channel, buff, -1 );
+            if ( TestAbbrev( new, axis ) ) SetAbbrev( new, axis,
+                                                       new->abbrev[ axis ] );
          }
       }
 

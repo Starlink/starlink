@@ -716,6 +716,7 @@ typedef struct AstPlot {
    int clipop;
    int colour[ AST__NPID ];
    int drawaxes[ 2 ];
+   int abbrev[ 2 ];
    int escape;
    int drawtitle;
    int edge[ 2 ];
@@ -849,6 +850,10 @@ typedef struct AstPlotVtab {
    int (* TestDrawAxes)( AstPlot *, int );
    void (* SetDrawAxes)( AstPlot *, int, int );
    void (* ClearDrawAxes)( AstPlot *, int );
+   int (* GetAbbrev)( AstPlot *, int );
+   int (* TestAbbrev)( AstPlot *, int );
+   void (* SetAbbrev)( AstPlot *, int, int );
+   void (* ClearAbbrev)( AstPlot *, int );
    int (* GetEscape)( AstPlot * );
    int (* TestEscape)( AstPlot * );
    void (* SetEscape)( AstPlot *, int );
@@ -1062,6 +1067,11 @@ AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
    int astTestDrawAxes_( AstPlot *, int );
    void astSetDrawAxes_( AstPlot *, int, int );
    void astClearDrawAxes_( AstPlot *, int );
+
+   int astGetAbbrev_( AstPlot *, int );
+   int astTestAbbrev_( AstPlot *, int );
+   void astSetAbbrev_( AstPlot *, int, int );
+   void astClearAbbrev_( AstPlot *, int );
 
    int astGetEscape_( AstPlot * );
    int astTestEscape_( AstPlot * );
@@ -1368,6 +1378,15 @@ astINVOKE(V,astGetDrawAxes_(astCheckPlot(this),axis))
 astINVOKE(V,astSetDrawAxes_(astCheckPlot(this),axis,drawaxes))
 #define astTestDrawAxes(this,axis) \
 astINVOKE(V,astTestDrawAxes_(astCheckPlot(this),axis))
+
+#define astClearAbbrev(this,axis) \
+astINVOKE(V,astClearAbbrev_(astCheckPlot(this),axis))
+#define astGetAbbrev(this,axis) \
+astINVOKE(V,astGetAbbrev_(astCheckPlot(this),axis))
+#define astSetAbbrev(this,axis,abbrev) \
+astINVOKE(V,astSetAbbrev_(astCheckPlot(this),axis,abbrev))
+#define astTestAbbrev(this,axis) \
+astINVOKE(V,astTestAbbrev_(astCheckPlot(this),axis))
 
 #define astClearEscape(this) \
 astINVOKE(V,astClearEscape_(astCheckPlot(this)))
