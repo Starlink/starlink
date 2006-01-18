@@ -94,6 +94,7 @@
       <TYPE> TVAL               ! The current data value.
       DOUBLE PRECISION DVAL     ! The current data value.
       INTEGER B                 ! Pixel index of work arrays
+      INTEGER DIMSB ( NDF__MXDIM ) ! Dimensions excluding the axis
       INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
       INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
       INTEGER J                 ! Loop counter
@@ -101,6 +102,7 @@
       INTEGER P                 ! Pixel index of the interleaved array
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides
       INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding the axis
+      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding the axis
 
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
@@ -129,24 +131,26 @@
 
 *  Calculate the strides for each dimension, this time excluding AXIS
 *  so we can step around the workspace final dimension.
-      STRIDA( 1 ) = 1
-      K = 2
-      DO J = 2, NDF__MXDIM
+      K = 1
+      DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
-            STRIDA( K ) = STRIDA( K - 1 ) * DIMS( K - 1 )
+            DIMSB( K ) = DIMS( J )
             K = K + 1
          END IF
       END DO
 
-*  Reorder so workspace has same dimensions as data. Do this by giving
-*  the AXIS dimension size 0.
-      K = NDF__MXDIM - 1
-      DO J = NDF__MXDIM, 1, -1
-         IF ( J .EQ. AXIS ) THEN
-            STRIDA( J ) = 0
+      STRIDB( 1 ) = 1
+      DO J = 2, NDF__MXDIM - 1
+         STRIDB( J ) = STRIDB( J - 1 ) * DIMSB( J - 1 )
+      END DO
+      
+      K = 1
+      DO J = 1, NDF__MXDIM
+         IF ( J .NE. AXIS ) THEN
+            STRIDA( J ) = STRIDB( K ) 
+            K = K + 1
          ELSE
-            STRIDA( J ) = STRIDA( K )
-            K = K - 1
+            STRIDA( J ) = 0
          END IF
       END DO
 
