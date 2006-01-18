@@ -231,9 +231,6 @@ AC_ARG_WITH(debug, [--with-debug       use debugging flag],
 CDEBUGFLAGS="$CDEBUGFLAGS $CFLAGS"
 CXXDEBUGFLAGS="$CXXDEBUGFLAGS $CFLAGS"
 
-AC_SUBST(CDEBUGFLAGS)
-AC_SUBST(CXXDEBUGFLAGS)
-
 # -----------------------------------------------------------------------
 #
 # Check if we are using (and creating) shared libraries 
@@ -485,30 +482,30 @@ case $system in
 	;;
     HP-UX-*)
 	ARCH="hp"
-	CFLAGS="$CFLAGS -Dappendus -DPG_PPU" 
+	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dappendus -DPG_PPU" 
 	LIBPRE="-Wl,"
 	;;
     SunOS-5*)
 	ARCH="solaris"
-	CFLAGS="$CFLAGS -Dsolaris"
+	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dsolaris"
 	;;
     OSF1*)
 	ARCH="alpha"
 	;;
     IRIX*)
 	ARCH="sgi"
-	CFLAGS="$CFLAGS -DHAVE_POSIX_SIGNALS"
+	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -DHAVE_POSIX_SIGNALS"
 	;;
     ULTRIX*)
 	ARCH="dec"
 	;;
     Linux*)
 	ARCH="linux"
-	CFLAGS="$CFLAGS -Dg77Fortran"
+	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dg77Fortran"
 	;;
     CYGWIN*)
 	ARCH="cygwin"
-	CFLAGS="$CFLAGS -Dg77Fortran -DHAVE_POSIX_SIGNALS"
+	CXXDEBUGFLAGS="$CXXDEBUGFLAGS -Dg77Fortran -DHAVE_POSIX_SIGNALS"
 	;;
     *)
 		echo "cfitsio: == Don't know what do do with $system"
@@ -522,17 +519,17 @@ case $CC in
 		AC_SUBST(GCCVERSION)
 		;;
 	cc)
-		echo "cfitsio: Old CFLAGS is $CFLAGS"
-		CFLAGS=`echo $CFLAGS | sed -e "s/-g/-O/"`
+		echo "cfitsio: Old CXXDEBUGFLAGS is $CXXDEBUGFLAGS"
+		CXXDEBUGFLAGS=`echo $CXXDEBUGFLAGS | sed -e "s/-g/-O/"`
 		case $system in
 		    SunOS-5*)
-         		CFLAGS="$CFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
+         		CXXDEBUGFLAGS="$CXXDEBUGFLAGS -DHAVE_ALLOCA_H -DHAVE_POSIX_SIGNALS"
 			;;
 		    *)
 			echo "== No special changes for $system"
 			;;
 		esac
-		echo "New CFLAGS is $CFLAGS"
+		echo "New CXXDEBUGFLAGS is $CXXDEBUGFLAGS"
 		;;
 	*)
 		# Don't do anything now
@@ -543,6 +540,8 @@ esac
 AC_SUBST(ARCH)dnl
 AC_SUBST(CFLAGS)dnl
 AC_SUBST(LIBPRE)dnl
+AC_SUBST(CDEBUGFLAGS)
+AC_SUBST(CXXDEBUGFLAGS)
 
 # ================= test whether we need trigod.c ================
 
