@@ -170,12 +170,7 @@
 *  Calculate the strides for each dimension, this time excluding AXIS
 *  so we can step around the workspace final dimension. WEL is the
 *  total number of workspace elements.
-      IF ( AXIS .NE. 1 ) THEN
-         WEL = DIMS( 1 )
-      ELSE
-         WEL = 1
-      END IF
-
+*  First copy all dimensions, except that for AXIS.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
@@ -183,13 +178,17 @@
             K = K + 1
          END IF
       END DO
+      DIMSB( NDF__MXDIM ) = 0
 
+*  Create strides for this new dimensionality and count workspace elements.
       STRIDB( 1 ) = 1
+      WEL = 1
       DO J = 2, NDF__MXDIM - 1
          STRIDB( J ) = STRIDB( J - 1 ) * DIMSB( J - 1 )
          WEL = WEL * DIMSB( J - 1 )
       END DO
 
+*  Create strides that match those of the full array.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
@@ -240,6 +239,7 @@
 *  Now Loop over all input pixels within the ranges. Note we use a fully
 *  expanded set of dimensions as we need to run over the values in fast
 *  order and maintain an additional stepping over the workspace sums.
+*  (The workspace stepping is done using B and the data array IP7-1).
 
 *  Outer loop is over the bounds along the selected axis.
       DO LB = 1, NRANGE, 2

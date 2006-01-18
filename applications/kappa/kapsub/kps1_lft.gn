@@ -174,12 +174,7 @@
 *  Calculate the strides for each dimension, this time excluding AXIS
 *  so we can step around the workspace final dimension. WEL is the
 *  total number of workspace elements.
-      IF ( AXIS .NE. 1 ) THEN
-         WEL = DIMS( 1 )
-      ELSE
-         WEL = 1
-      END IF
-
+*  First copy all dimensions, except that for AXIS.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
@@ -187,13 +182,17 @@
             K = K + 1
          END IF
       END DO
+      DIMSB( NDF__MXDIM ) = 0
 
+*  Create strides for this new dimensionality and count workspace elements.
       STRIDB( 1 ) = 1
+      WEL = 1
       DO J = 2, NDF__MXDIM - 1
          STRIDB( J ) = STRIDB( J - 1 ) * DIMSB( J - 1 )
          WEL = WEL * DIMSB( J - 1 )
       END DO
 
+*  Create strides that match those of the full array.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
@@ -250,7 +249,6 @@
 
 *  Increment sums for this pixel.
                               TVAL = DATS( IP1 )
-                              PRINT *, IP1, TVAL, B
                               IF ( TVAL .NE. VAL__BAD<T> ) THEN
                                  DVAL = NUM_<T>TOD( TVAL )
                                  IF ( USEVAR ) THEN
@@ -283,7 +281,6 @@
       END DO
 
 *  Solve linear equations and get the polynomial coefficients.
-      PRINT *, 'WEL = ', WEL
       DO J = 1, WEL
          CALL KPS1_LFTSV( ORDER, AS( 1, 1, J ), .TRUE., BS( 1, J ),
      :                    WRK1, WRK2, STATUS )

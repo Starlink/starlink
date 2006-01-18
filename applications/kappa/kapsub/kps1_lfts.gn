@@ -60,12 +60,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
-      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'PRM_PAR'         ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'         ! NDF public constants
 
 *  Arguments Given:
       INTEGER ORDER
@@ -78,14 +78,14 @@
       <TYPE> DATS( * )
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER STATUS            ! Global status
 
 *  External References:
       EXTERNAL NUM_WASOK
-      LOGICAL NUM_WASOK          ! Was numeric operation ok?
+      LOGICAL NUM_WASOK         ! Was numeric operation ok?
 
       EXTERNAL NUM_TRAP
-      INTEGER NUM_TRAP           ! Numerical error handler
+      INTEGER NUM_TRAP          ! Numerical error handler
 
       EXTERNAL KPS1_POLYV
       DOUBLE PRECISION KPS1_POLYV ! Value of polynomial
@@ -94,16 +94,16 @@
       <TYPE> TVAL               ! The current data value.
       DOUBLE PRECISION DVAL     ! The current data value.
       INTEGER B                 ! Pixel index of work arrays
-      INTEGER DIMSB ( NDF__MXDIM ) ! Dimensions excluding the axis
+      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
       INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
       INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
       INTEGER J                 ! Loop counter
       INTEGER K                 ! Loop counter
-      INTEGER P                 ! Pixel index of the interleaved array
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides
       INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding the axis
       INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding the axis
-
+      
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
       EQUIVALENCE( I2, I( 2 ) )
@@ -131,6 +131,7 @@
 
 *  Calculate the strides for each dimension, this time excluding AXIS
 *  so we can step around the workspace final dimension.
+*  First copy all dimensions, except that for AXIS.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
@@ -138,16 +139,19 @@
             K = K + 1
          END IF
       END DO
+      DIMSB( NDF__MXDIM ) = 0
 
+*  Create strides for this new dimensionality.
       STRIDB( 1 ) = 1
       DO J = 2, NDF__MXDIM - 1
          STRIDB( J ) = STRIDB( J - 1 ) * DIMSB( J - 1 )
       END DO
-      
+
+*  Create strides that match those of the full array.
       K = 1
       DO J = 1, NDF__MXDIM
          IF ( J .NE. AXIS ) THEN
-            STRIDA( J ) = STRIDB( K ) 
+            STRIDA( J ) = STRIDB( K )
             K = K + 1
          ELSE
             STRIDA( J ) = 0
@@ -159,59 +163,60 @@
       CALL NUM_HANDL( NUM_TRAP )
       CALL NUM_CLEARERR()
 
-*  Loop over the whole data array.
-      P = 1
+*  Loop over the whole data array. Move around data array using IP1-IP7
+*  and workspace array using B (as in related functions that pick out
+*  ranges of one axis).
       B = 1
       DO I7 = 1, DIMS( 7 )
+         IP7 = ( I7 - 1 ) * STRID( 7 )
          DO I6 = 1, DIMS( 6 )
+            IP6 = IP7 + ( I6 - 1 ) * STRID( 6 )
             DO I5 = 1, DIMS( 5 )
+               IP5 = IP6 + ( I5 - 1 ) * STRID( 5 )
                DO I4 = 1, DIMS( 4 )
+                  IP4 = IP5 + ( I4 - 1 ) * STRID( 4 )
                   DO I3 = 1, DIMS( 3 )
+                     IP3 = IP4 + ( I3 - 1 ) * STRID( 3 )
                      DO I2 = 1, DIMS( 2 )
+                        IP2 = IP3 + ( I2 - 1 ) * STRID( 2 )
                         DO I1 = 1, DIMS( 1 )
+                           IP1 = IP2 + I1
 
 *  Check for BADness and evaluate the polynomial.
-                           TVAL = NUM_<T>TOD( DATS( P ) )
+                           TVAL = NUM_<T>TOD( DATS( IP1 ) )
                            IF ( TVAL .NE. VAL__BAD<T> ) THEN
                               DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
      :                                           DBLE( I( AXIS ) ) )
 
 *  Subtract, or not, from data value.
                               IF ( SUBTRA ) THEN 
-                                 DATS( P ) =  NUM_SUB<T>( TVAL,
-     :                                                    NUM_DTO<T>(DVAL))
+                                 DATS( IP1 ) =  
+     :                               NUM_SUB<T>(TVAL, NUM_DTO<T>(DVAL))
                               ELSE 
-                                 DATS( P ) = NUM_DTO<T>( DVAL )
+                                 DATS( IP1 ) = NUM_DTO<T>( DVAL )
                               END IF
 
 *  Failed conversion from double precision, or subtraction so output is
 *  now BAD.
                               IF ( .NOT. NUM_WASOK() ) THEN
-                                 DATS( P ) = VAL__BAD<T>
+                                 DATS( IP1 ) = VAL__BAD<T>
                                  CALL NUM_CLEARERR()
                               END IF
                            END IF
-
-*  Move to the next output pixel and next coefficients.
-                           P = P + STRID( 1 )
+                           
+*  Move to the next workspace pixel and next coefficients.
                            B = B + STRIDA( 1 )
                         END DO
-                        P = P + STRID( 2 ) - STRID( 1 ) * DIMS( 1 )
                         B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
                      END DO
-                     P = P + STRID( 3 ) - STRID( 2 ) * DIMS( 2 )
                      B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
                   END DO
-                  P = P + STRID( 4 ) - STRID( 3 ) * DIMS( 3 )
                   B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
                END DO
-               P = P + STRID( 5 ) - STRID( 4 ) * DIMS( 4 )
                B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
             END DO
-            P = P + STRID( 6 ) - STRID( 5 ) * DIMS( 5 )
             B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
          END DO
-         P = P + STRID( 7 ) - STRID( 6 ) * DIMS( 6 )
          B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
       END DO
       

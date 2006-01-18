@@ -125,41 +125,7 @@
      :                        STATUS ) 
 
 *  Copy the source array to the destination array.
-               IF( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                           %VAL( CNF_PVAL( IP1 ) ),
-     :                           IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_REAL' ) THEN
-                  CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                           %VAL( CNF_PVAL( IP1 ) ),
-     :                           IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-                  CALL VEC_ITOI( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                           %VAL( CNF_PVAL( IP1 ) ),
-     :                           IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_WORD' ) THEN
-                  CALL VEC_WTOW( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                           %VAL( CNF_PVAL( IP1 ) ),
-     :                           IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_UWORD' ) THEN
-                  CALL VEC_UWTOUW( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ),
-     :                             %VAL( CNF_PVAL( IP1 ) ), 
-     :                             IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_BYTE' ) THEN
-                  CALL VEC_BTOB( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                           %VAL( CNF_PVAL( IP1 ) ),
-     :                           IERR, NERR, STATUS )
-   
-               ELSE IF( TYPE .EQ. '_UBYTE' ) THEN
-                  CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IP2 ) ),
-     :                             %VAL( CNF_PVAL( IP1 ) ), 
-     :                             IERR, NERR, STATUS )
-               END IF
+               CALL KPG1_COPY( TYPE, EL, IP2, IP1, STATUS )
 
             END IF
          END DO
