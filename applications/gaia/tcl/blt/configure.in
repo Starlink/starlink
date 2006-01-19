@@ -1198,7 +1198,7 @@ case $target in
   *-linux*)
     SHLIB_CFLAGS="-fPIC"
     SHLIB_LD="${CC}"
-    SHLIB_LD_FLAGS='-rdynamic -shared -Wl,-E -Wl,-soname,$@'
+    SHLIB_LD_FLAGS='$(CFLAGS) -rdynamic -shared -Wl,-E -Wl,-soname,$@'
     LD_RUN_PATH="-Wl,-rpath,${loader_run_path}"
     
     LDFLAGS=""
@@ -1312,7 +1312,7 @@ case $target in
     SHLIB_CFLAGS="-KPIC"
     if test "${blt_with_gnu_ld}" = "yes" -a "$blt_have_gcc" = "yes" ; then
       SHLIB_LD="gcc"
-      SHLIB_LD_FLAGS='-rdynamic -shared -Wl,-E -Wl,-soname,$@'
+      SHLIB_LD_FLAGS='$(CFLAGS) -rdynamic -shared -Wl,-E -Wl,-soname,$@'
       LD_RUN_PATH="-Wl,-rpath,${loader_run_path}"
     else
       SHLIB_LD="/usr/ccs/bin/ld"
