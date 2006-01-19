@@ -161,6 +161,7 @@ OBJECTS      = tkAppInit.o tclAppInit.o
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 RANLIB       = @RANLIB@
+AR_D         = ar d
 SHELL        = /bin/sh
 RM           = rm -f
 LN           = ln -s
@@ -171,7 +172,8 @@ all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON) $(IMCOPY)
 #  Link wish. 
 $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	@echo "linking \"$(DEMO_WISH)\"..."
-	- @RANLIB@ $(LIBDIR)/libskycat.a
+	- $(AR_D) $(LIBDIR)/libskycat.a slasubs.o
+	- $(RANLIB) $(LIBDIR)/libskycat.a
 	$(LTLINK) $(CC_SWITCHES) tkAppInit.o initFortran.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \

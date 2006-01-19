@@ -129,6 +129,7 @@ SOURCES      = gaia_swish.c gaia_stcl.c gaia_swish.mta gaia_stcl.mta \
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 RANLIB 	     = @RANLIB@
+AR_D         = ar d
 SHELL 	     = /bin/sh
 RM 	     = rm -f
 LN 	     = ln -s
@@ -152,7 +153,8 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 #  Link wish. 
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
-	- @RANLIB@ $(LIBDIR)/libskycat.a
+	- $(AR_D) $(LIBDIR)/libskycat.a slasubs.o
+	- $(RANLIB) $(LIBDIR)/libskycat.a
 	$(LTLINK) $(CC_SWITCHES) tkAppInit.o gaia_swish.o ../initFortran.o \
 	   -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
