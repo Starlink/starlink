@@ -210,7 +210,6 @@
 
 *     Stop looping if we found none
          IF (LP .GT. RP) THEN
-            print *, 'Did not find parens'
             AGAIN = .FALSE.
          ELSE
 *     Found something - look for a '.'
