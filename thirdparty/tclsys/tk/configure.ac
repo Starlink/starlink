@@ -18,14 +18,23 @@ AC_PROG_MAKE_SET
 
 AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
 
+dnl    Check for X libraries. These should be passed on to subdirs.
+AC_PATH_X
+if test "X$x_includes" != "X"; then
+   X11_INCLUDES="--x-includes=$x_includes"
+fi
+if test "X$x_libraries" != "X"; then
+   X11_LIBRARIES="--x-libraries=$x_libraries"
+fi
+
 dnl    To configure Tcl, run ./configure in the `unix' directory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
 dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     cd unix
-    echo ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl
-    ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl
+    echo ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl "$X11_LIBRARIES" "$X11_INCLUDES"
+         ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl "$X11_LIBRARIES" "$X11_INCLUDES"
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([cd unix;
