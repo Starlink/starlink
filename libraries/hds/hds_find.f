@@ -137,6 +137,7 @@
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
       INTEGER DP                 ! Position of '.' in section specification
+      INTEGER EP                 ! End posn for search
       INTEGER F                  ! First non-blank component character
       INTEGER F1                 ! First character in file name
       INTEGER F2                 ! Last character in file name
@@ -148,6 +149,7 @@
       INTEGER LP                 ! Posn. of left parenthesis
       INTEGER NFIELD             ! Number of component name fields
       INTEGER RP                 ! Posn. of right parenthesis
+      INTEGER SP                 ! Start posn for search
       LOGICAL AGAIN              ! Loop to process another field?
       LOGICAL DOTTED             ! Path name begins with a '.'?
       LOGICAL THERE              ! Does required component exist?
@@ -156,6 +158,9 @@
 
 *  Initialise the returned locator.
       LOC2 = DAT__NOLOC
+
+*  Fix warnings
+      DOTTED = .FALSE.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -192,15 +197,20 @@
 
       IF ((STATUS .EQ. SAI__OK) .AND. (I1 .LE. IEND) ) THEN
          AGAIN = .TRUE.
-         LP = I1
-         RP = IEND
+         SP = I1
+         EP = IEND
  2       CONTINUE  ! Start of DO WHILE loop
 
 *     Look for parens
-         CALL CHR_FPARX( NAME( LP : RP ), '(', ')', LP, RP )
+         CALL CHR_FPARX( NAME( SP : EP ), '(', ')', LP, RP )
+
+*     Correct the positions for the offset
+         LP = LP + SP - 1
+         RP = RP + SP - 1
 
 *     Stop looping if we found none
          IF (LP .GT. RP) THEN
+            print *, 'Did not find parens'
             AGAIN = .FALSE.
          ELSE
 *     Found something - look for a '.'
@@ -216,8 +226,9 @@
                AGAIN = .FALSE.
             ELSE
 *     Increment search location
-               LP = LP + 1
-               RP = IEND
+               SP = RP + 1
+               EP = IEND
+               IF ( SP .GE. EP ) AGAIN = .FALSE.
             END IF
 
          END IF
