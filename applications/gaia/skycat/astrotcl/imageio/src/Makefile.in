@@ -2,13 +2,13 @@
 #
 # E.S.O. - VLT project
 #
-# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $" 
+# "@(#) $Id: Makefile.in,v 1.2 2005/02/02 01:43:04 brighton Exp $"
 #
 # Makefile.in"
-# 
+#
 # who      when     what
 # -------- -------- ------------------
-# abrighto 11/10/95 created 
+# abrighto 11/10/95 created
 #
 # ------------------------------------------------------------------------
 # 	Makefile
@@ -16,8 +16,8 @@
 
 CC           	= @CC@
 CXX           	= @CXX@
-CXXDEBUGFLAGS   = @CXXDEBUGFLAGS@
-CFLAGS  	= -I../include @CFLAGS@ $(CXXDEBUGFLAGS)
+CXXDEBUGFLAGS   = -I../include @CXXDEBUGFLAGS@
+CFLAGS  	= @CFLAGS@
 TOPDIR      	= @DESTDIR@
 LIBDIR      	= @LIBDIR@
 DEPEND_TARGET	= @DEPEND_TARGET@
@@ -62,7 +62,7 @@ INCLUDES	= -I../include \
 # these are needed for cfitsio
 DEFINES         = @DEFS@
 
-CC_SWITCHES	= @SHLIB_CFLAGS@ $(DEFINES) $(INCLUDES) $(CFLAGS)
+CC_SWITCHES	= @SHLIB_CFLAGS@ $(DEFINES) $(INCLUDES) $(CFLAGS) $(CXXDEBUGFLAGS)
 DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
 INSTALL  	= @INSTALL@
 INSTALL_DATA  	= @INSTALL_DATA@
@@ -72,7 +72,7 @@ AR       	= ar rc
 RM       	= rm -f
 LD_SHFLG        = @LD_SHFLG@
 
-all: dirs $(libname) 
+all: dirs $(libname)
 
 All:
 	cd ../..; $(MAKE)
@@ -85,7 +85,7 @@ $(libname): $(OBJS)
 	$(AR) $@ $(OBJS)
 	$(RANLIB) $@
 
-install: 
+install:
 
 dirs:
 	test -d ../lib || mkdir ../lib
@@ -94,7 +94,7 @@ clean:
 	$(RM) $(OBJS) $(libname) *\~ "#"*
 
 distclean: clean depclean
-	rm -f Makefile	
+	rm -f Makefile
 
 .SUFFIXES: .C
 .c.o:
