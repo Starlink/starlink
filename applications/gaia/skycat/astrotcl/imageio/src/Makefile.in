@@ -16,7 +16,8 @@
 
 CC           	= @CC@
 CXX           	= @CXX@
-CFLAGS  	= -I../include @CFLAGS@ @CXXDEBUGFLAGS@
+CXXDEBUGFLAGS   = @CXXDEBUGFLAGS@
+CFLAGS  	= -I../include @CFLAGS@ $(CXXDEBUGFLAGS)
 TOPDIR      	= @DESTDIR@
 LIBDIR      	= @LIBDIR@
 DEPEND_TARGET	= @DEPEND_TARGET@
