@@ -55,7 +55,7 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -105,6 +105,9 @@
 *        Brought into NDG from NDF.
 *     23-DEC-2005 (TIMJ):
 *        Brought into HDS.
+*     19-JAN-2006 (TIMJ):
+*        Trap "." in section and trigger correct warning. This was causing
+*        problems with NDF AXIS sections.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -133,6 +136,7 @@
 
 *  Local Variables:
       CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
+      INTEGER DP                 ! Position of '.' in section specification
       INTEGER F                  ! First non-blank component character
       INTEGER F1                 ! First character in file name
       INTEGER F2                 ! Last character in file name
@@ -177,6 +181,48 @@
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( I1 .LE. IEND ) ) THEN
          DOTTED = ( NAME( I1 : I1 ) .EQ. '.' )
          IF ( DOTTED ) I1 = I1 + 1
+      END IF
+
+*  In the following code, we assume that "." is the component separator.
+*  Since we would like to tell the difference between a bad subsection
+*  and any other error, we need to trap the case where the "." lies
+*  inside a section. "." is only allowed within an NDF section and not an
+*  HDS section. Look for matching parens, then look inside for ".". We do this
+*  in a separate loop to overcome the later INDEX on the whole string.
+
+      IF ((STATUS .EQ. SAI__OK) .AND. (I1 .LE. IEND) ) THEN
+         AGAIN = .TRUE.
+         LP = I1
+         RP = IEND
+ 2       CONTINUE  ! Start of DO WHILE loop
+
+*     Look for parens
+         CALL CHR_FPARX( NAME( LP : RP ), '(', ')', LP, RP )
+
+*     Stop looping if we found none
+         IF (LP .GT. RP) THEN
+            AGAIN = .FALSE.
+         ELSE
+*     Found something - look for a '.'
+            DP = INDEX( NAME(LP:RP), '.')
+            IF (DP .NE. 0) THEN
+*     Found a '.' so trigger error condition
+               STATUS = DAT__SUBIN
+               CALL EMS_SETC( 'SECT', NAME(LP:RP))
+               CALL EMS_REP( 'HDS_FIND_DOTSUB',
+     :              'Invalid section specification. "." is not '//
+     :              'allowed in HDS section in ^SECT',
+     :              STATUS)
+               AGAIN = .FALSE.
+            ELSE
+*     Increment search location
+               LP = LP + 1
+               RP = IEND
+            END IF
+
+         END IF
+
+         IF (AGAIN) GO TO 2
       END IF
 
 *  If the HDS path string is still not blank, then loop to extract each
