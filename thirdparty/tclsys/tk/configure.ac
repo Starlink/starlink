@@ -46,8 +46,8 @@ dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     cd unix
-    echo ./configure --prefix=$prefix --cache-file=config.cache "$TCL_CONFIG_DIR" "$X11_LIBRARIES" "$X11_INCLUDES"
-         ./configure --prefix=$prefix --cache-file=config.cache "$TCL_CONFIG_DIR" "$X11_LIBRARIES" "$X11_INCLUDES"
+    echo ./configure --prefix=$prefix --cache-file=config.cache $TCL_CONFIG_DIR $X11_LIBRARIES $X11_INCLUDES
+         ./configure --prefix=$prefix --cache-file=config.cache $TCL_CONFIG_DIR $X11_LIBRARIES $X11_INCLUDES
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([cd unix;
