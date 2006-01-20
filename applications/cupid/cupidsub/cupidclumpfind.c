@@ -12,7 +12,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     cupidClumpFind
 
 *  Purpose:
-*     Identify clumps of emission within a 2 or 3 dimensional NDF using
+*     Identify clumps of emission within a 1, 2 or 3 dimensional NDF using
 *     the CLUMPFIND algorithm.
 
 *  Synopsis:
@@ -21,7 +21,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *                          AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
-*     This function identifies clumps within a 2 or 3 dimensional data
+*     This function identifies clumps within a 1, 2 or 3 dimensional data
 *     array using the CLUMPFIND algorithm, described by Williams et al 
 *     (1994, ApJ 428, 693). This algorithm works by first contouring the 
 *     data at a multiple of the noise, then searches for peaks of emission 
@@ -35,7 +35,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
-*        The number of dimensions in the data array. Must be 2 or 3.
+*        The number of dimensions in the data array. Must be 1, 2 or 3.
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
@@ -57,7 +57,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
 *     ilevel
-*        Amount of screen information to display (in range zero to 6).
+*        Amount of screen information to display.
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
 

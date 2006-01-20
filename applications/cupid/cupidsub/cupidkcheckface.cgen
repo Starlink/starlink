@@ -1,0 +1,238 @@
+#include "sae_par.h"
+#include "cupid.h"
+
+void CGEN_FUNCTION(cupidKCheckFace)( CGEN_TYPE *array, int nel, int axis, 
+                                     int lbnd, int dims[ 3 ], int skip[ 3 ],
+                                     int xvec[ 3 ], double *work1, 
+                                     int *work2, int *mask, int minpix,
+                                     double thresh, double noise, double rms ){
+/*
+*  Name:
+*    cupidKCheckFace<X>
+
+*  Purpose:
+*     Scan the cube for clump edges and peaks using a set of parallel lines 
+*     which start on a given face of the cube.
+
+*  Synopsis:
+*    void cupidKCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
+*                             int dims[ 3 ], int skip[ 3 ], int xvec[ 3 ], 
+*                             double *work1, int *work2, int *mask, int minpix,
+*                             double thresh, double noise, double rms )
+
+*  Description:
+*     This function scans the given data array for clump edges by looking
+*     for peaks along a set of parallel 1D lines of data extracted from the 
+*     data array. Pixels which mark the edges of any peak are set to
+*     CUPID__KEDGE in the returned mask array, and the peaks themselves
+*     are set to CUPID__KPEAK.
+*
+*     A set of parallel lines is formed by stepping through all pixels on 
+*     the face of the data cube specified by "axis" and "lbnd". For each 
+*     such pixel, a line is used which starts at the pixel and extends 
+*     through the data cube in a direction given by "xvec". Lines which
+*     would not intersect the data cube are excluded from the set.
+*
+*     For each such line, peaks in data value along the line are identified, 
+*     starting with the brightest and working down to the limit specified 
+*     by "thresh". The pixels marking the edges of these peaks are set to
+*     CUPID__KEDGE in the "mask" array. The "mask" value at each peak is
+*     incremented by CUPID__KPEAK.
+
+*  Parameters:
+*     array
+*        The array containing the data to be scanned. The elements should
+*        be ordered according to Fortran order (first axis varying most 
+*        rapidly). 
+*     nel 
+*        The number of elements in "array".
+*     axis
+*        The zero based index of the axis which is perpendicular to the
+*        face which defines the start of the scanning lines.
+*     lbnd
+*        If non-zero, the scanning lines start on the face which is at
+*        the lower bound of the specified axis. Otherwise, they start on
+*        the face which is at the upper bound of the specified axis. 
+*     dims
+*        The number of pixels on each pixel axis of the array.
+*     skip
+*        The increment in 1D vector index required to move a distance of 1 
+*        pixel along each axis. This allows conversion between indexing
+*        the array using a single 1D vector index and using nD coords. This
+*        array should have 3 elements even if "ndim" is less than 3, and
+*        the extra elements should be filled with zero's.
+*     xvec
+*        A 3D vector giving the direction of the scanning lines within
+*        the 3D data array. This vector defines the displacement between
+*        samples along the line, in GRID coords. Each of the 3 values
+*        should be -1, 0 or +1, where these numbers are in units of pixels.
+*     work1
+*        A 1D array into which is put the input pixel value at each point
+*        along a 1D line. The number of elements in this array should be 
+*        large enough to accomodate the maximum possible number of elements 
+*        which may need to be stored in it. This should be at least the 
+*        length of the diagonal of the 3D array, in pixels.
+*     work2
+*        A 1D array into which is put the 1D vector index within "array" 
+*        from which the corresponding element in "work1" was copied. This 
+*        array should have the samelength as "work1".
+*     mask
+*        Pointer to the mask array. 
+*     minpix
+*        The minimum number of pixels within a 1D line of data (including the 
+*        edge pixels) which must be spanned by a peak in order for its edges 
+*        to be marked in the returned mask. 
+*     thresh
+*        The smallest significant peak data value. The edges of peaks
+*        which are below this limit are not included in the returned mask.
+*     noise
+*        The data value below which pixels are considered to be in the
+*        noise. A peak is considered to end when the peak value dips
+*        below this value.
+*     rms
+*        The RMS noise in the data
+
+*  Notes:
+*     - This function can be invoked using the generic cupidKCheckFace macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidKCheckFace<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidKCheckFace... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     16-JAN-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int iv0;        /* 1d vector index within "array" at start of line */
+   int x0[ 3 ];    /* GRID coords within "array" at start of line */
+   int x1[ 3 ];    /* Starting values for GRID axes when scanning the face */
+   int x2[ 3 ];    /* Ending values for GRID axes when scanning the face */
+   int inc;        /* Increment in pixels between start of adjacent lines */
+   int ivz;        /* 1d vector index at start of current pixel Z plane */
+   int ivy;        /* 1d vector index at start of current pixel Y plane */
+   int ivx;        /* 1d vector index at start of current pixel X plane */
+   int vskip;      /* 1D vector index increment between pixels on line */
+   int nval;       /* No. of pixel values along the copied line */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Do nothing if the 3D array does not span more than 4 pixels on the
+   axis which is perpendicular to the faces being checked. */
+   if( dims[ axis ] > 4 ) {
+
+/* Do nothing if we are checking the face define by the lower axis bound 
+   but the vector describing the lines direction does not extend to
+   larger axis values (i.e. if the lines start on the lower bound face
+   and then either stay on the face or go to even lower values). */
+      if( !lbnd || xvec[ axis ] > 0 ) {
+
+/* Do nothing if we are checking the face define by the upper axis bound 
+   but the vector describing the lines direction does not extend to
+   smaller axis values (i.e. if the lines start on the upper bound face
+   and then either stay on the face or go to even higher values). */
+         if( lbnd || xvec[ axis ] < 0 ) {
+
+/* If we are checking the face defined by the lower bound of the selected
+   axis, then... */
+            if( lbnd ) {
+      
+/* Initialise the 1D vector index to be the first pixel in the array. */
+               iv0 = 0;
+      
+/* Initialise the 3D GRID indices to be the first pixel in the array. */
+               x1[ 0 ] = 1;
+               x1[ 1 ] = 1;
+               x1[ 2 ] = 1;
+      
+/* Set up the value at which to stop looping on each GRID axis. The axis
+   which is perpendicualr to the face has a fixed value of 1 on the face 
+   and so ensure that the selected axis does not loop by setting its 
+   limiting value to 1 more than the starting value. */
+               x2[ 0 ] = dims[ 0 ] + 1;
+               x2[ 1 ] = dims[ 1 ] + 1;
+               x2[ 2 ] = dims[ 2 ] + 1;
+               x2[ axis ] = 2;
+      
+/* Indicate that the increment between succesive GRID index values is
+   positive. */
+               inc = 1;
+      
+/* If we are checking the face defined by the upper bound of the selected
+   axis, then... */
+            } else {
+      
+/* Initialise the 1D vector index to be the last pixel in the array. */
+               iv0 = nel - 1;
+      
+/* Initialise the 3D GRID indices to be the last pixel in the array. */
+               x1[ 0 ] = dims[ 0 ];
+               x1[ 1 ] = dims[ 1 ];
+               x1[ 2 ] = dims[ 2 ];
+      
+/* Set up the value at which to stop looping on each GRID axis. The axis
+   which is perpendicualr to the face has a fixed value of dims[axis] on the 
+   face and so ensure that the selected axis does not loop by setting its 
+   limiting value to 1 less than the starting value. */
+               x2[ 0 ] = 0;
+               x2[ 1 ] = 0;
+               x2[ 2 ] = 0;
+               x2[ axis ] = dims[ axis ] - 1;
+      
+/* Indicate that the increment between succesive GRID index values is
+   negative. */
+               inc = -1;
+            }
+
+/* Store the increment in 1D vector index between adjacent pixels along
+   the line. */
+            vskip = xvec[ 0 ] * skip[ 0 ] + 
+                    xvec[ 1 ] * skip[ 1 ] +
+                    xvec[ 2 ] * skip[ 2 ];
+
+/* Loop through all pixels in the face, keeping track of both the 3D GRID
+   coords and the 1D vector index. */
+            ivz = iv0;
+            for( x0[ 2 ] = x1[ 2 ]; x0[ 2 ] != x2[ 2 ]; x0[ 2 ] += inc ){
+      
+               ivy = ivz;
+               for( x0[ 1 ] = x1[ 1 ]; x0[ 1 ] != x2[ 1 ]; x0[ 1 ] += inc ){
+      
+                  ivx = ivy;
+                  for( x0[ 0 ] = x1[ 0 ]; x0[ 0 ] != x2[ 0 ]; x0[ 0 ] += inc ){
+      
+/* Extract the data values along the line from the input data array and copy 
+   into the 1D array "work1". The 1D vector indices (within "array") of the 
+   copied pixels are put into "work2". The number of values stored in
+   each of these work arrays is returned. */
+                     nval = CGEN_FUNCTION(cupidKCopyLine)( array, work1, work2,
+                                                 x0, ivx, vskip, xvec, dims );
+
+/* Identify peaks within this line of data, and flag the edges of the
+   peaks within the mask array. */
+                     cupidKEdges( nval, work1, work2, mask, minpix, thresh, 
+                                  noise, rms );
+      
+/* Increment the 1D vector index of the next pixel to check. */
+                     ivx += inc*skip[ 0 ];
+                  }
+                  ivy += inc*skip[ 1 ];  
+               }
+               ivz += inc*skip[ 2 ];  
+            }
+         }   
+      }
+   }
+}
+

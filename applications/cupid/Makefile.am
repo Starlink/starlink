@@ -47,7 +47,7 @@ cupid.h: cupid.h.source make_h
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 prolat= @PROLAT@
 
-sun999.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
+sun255.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
 	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ;\
 	for f in $(cupid_mon_TASKS:=.c); do \

@@ -56,7 +56,7 @@ AC_CONFIG_FILES([make_quickdes], [chmod 755 make_quickdes])
 AC_CONFIG_FILES([make_doc], [chmod 755 make_doc])
 AC_CONFIG_FILES([make_h], [chmod 755 make_h])
 
-STAR_LATEX_DOCUMENTATION(sun999)
+STAR_LATEX_DOCUMENTATION(sun255)
 
 dnl    And the fat lady sings.
 AC_OUTPUT

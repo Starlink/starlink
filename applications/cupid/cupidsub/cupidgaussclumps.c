@@ -23,7 +23,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     cupidGaussClumps
 
 *  Purpose:
-*     Identify clumps of emission within a 2 or 3 dimensional NDF using
+*     Identify clumps of emission within a 1, 2 or 3 dimensional NDF using
 *     the GAUSSCLUMPS algorithm.
 
 *  Synopsis:
@@ -32,7 +32,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *                            AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
-*     This function identifies clumps within a 2 or 3 dimensional data
+*     This function identifies clumps within a 1, 2 or 3 dimensional data
 *     array using the GAUSSCLUMPS algorithm, described by Stutski & Gusten 
 *     (1990, ApJ 356, 513). This algorithm proceeds by fitting a Gaussian 
 *     profile to the brightest peak in the data. It then subtracts the fit 
@@ -62,7 +62,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
 *        cupid.h).
 *     ndim
-*        The number of dimensions in the data array. Must be 2 or 3.
+*        The number of dimensions in the data array. Must be 1, 2 or 3.
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
@@ -84,7 +84,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        The index of the velocity axis in the data array (if any). Only
 *        used if "ndim" is 3. 
 *     ilevel
-*        Amount of screen information to display (in range zero to 3).
+*        Amount of screen information to display.
 *     nclump
 *        Pointer to an int to receive the number of clumps found.
 

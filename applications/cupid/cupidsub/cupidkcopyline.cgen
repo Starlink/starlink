@@ -1,0 +1,128 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "prm_par.h"
+
+int CGEN_FUNCTION(cupidKCopyLine)( CGEN_TYPE *in, double *dout, int *vout, 
+                                   int x0[3], int iv0, int vskip, 
+                                   int xskip[3], int dims[3] ){
+/*
+*  Name:
+*     cupidKCopyLine<X>
+
+*  Purpose:
+*     Copy a line of data, with arbitrary orientation, from a 3D to a 1D
+*     array.
+
+*  Synopsis:
+*     int cupidKCopyLine<X>( CGEN_TYPE *in, double *dout, int *vout, 
+*                            int x0[3], int iv0, int vskip, int xskip[3], 
+*                            int dims[3] )
+
+*  Description:
+*     This functions copies a line of data from the input 3D array into
+*     the output 1D array. The line can be oriented at any angle within
+*     the input array.
+
+*  Parameters:
+*     in
+*        The input 3D data array (trailing degenerate pixel axes may be
+*        used to accomodate 1D and 2D data array).
+*     dout
+*        A 1D array into which is put the input pixel value at each point
+*        along the required 1D line. The number of elements in this array
+*        should be large enough to accomodate the maximum possible number
+*        of elements which may need to be stored in it. This should be at
+*        least the length of the diagonal of the 3D array, in pixels.
+*     vout
+*        A 1D array into which is put the 1D vector index within "in" from
+*        which the corresponding element in "dout" was copied. This array
+*        should have the samelength as "dout".
+*     x0
+*        The 3D GRID indices at the centre of the first pixel in the line to
+*        be copied.
+*     iv0
+*        The 1D vector index within "in" of the pixel specified by "x0".
+*     vskip
+*        The skip in 1D vector index (within "in") between pixels in the line.
+*     xskip
+*        The skips in 3D GRID indices between pixels in the line.
+*     dims
+*        The number of pixels along each of the GRID axes in the 3D array.
+
+*  Returned Value:
+*     The number of values stored in each of "dout" and "vout".
+
+*  Notes:
+*     - This function can be invoked using the generic cupidKCopyLine macro 
+*     defined in cupid.h. This macro has the same parameter list as 
+*     cupidKCopyLine<X> except that an extra parameter is added to the start 
+*     of the parameter list indicating the data type of the specific 
+*     cupidKCopyLine... function to be invoked. This extra parameter should
+*     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     16-JAN-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   int i;                 /* Index into returned arrays */
+   int iv;                /* 1D vector index into supplied array */
+   int x[ 3 ];            /* 3D GRID indices into supplied array */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return 0;
+
+/* Initialise the index of the next element to be written to in the
+   output arrays. */
+   i = 0;
+
+/* Initialise the 1d vector index, and the 3D GRID indices, of the
+   current input pixel. */
+   iv = iv0;
+   x[ 0 ] = x0[ 0 ];
+   x[ 1 ] = x0[ 1 ];
+   x[ 2 ] = x0[ 2 ];
+
+/* Loop until the line goes outside the bounds of the input array. */
+   while( x[ 0 ] >= 1 && x[ 0 ] <= dims[ 0 ] &&
+          x[ 1 ] >= 1 && x[ 1 ] <= dims[ 1 ] &&
+          x[ 2 ] >= 1 && x[ 2 ] <= dims[ 2 ] ){
+
+/* Put the data value at the current input pixel into the returned "dout" 
+   array, checking for bad values (since CGEN_BAD may not be equal to
+   VAL__BADD). */
+      if( in[ iv ] == CGEN_BAD ) {
+         dout[ i ] = VAL__BADD;
+      } else {
+         dout[ i ] = (double) in[ iv ];
+      }
+
+/* Put the 1d vector index of the current input pixel into the returned 
+   "vout" array. */
+      vout[ i ] = iv;
+
+/* Increment the index of the next output element to be written to. */
+      i++;
+
+/* Increment the 1d vector index, and the 3D GRID indicies, of the next
+   input pixel. */
+      iv += vskip;
+      x[ 0 ] += xskip[ 0 ];
+      x[ 1 ] += xskip[ 1 ];
+      x[ 2 ] += xskip[ 2 ];
+   }
+
+/* Returned the used length of the output arrays. */
+   return i;
+
+}
+

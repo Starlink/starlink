@@ -83,7 +83,7 @@ EOF
             $npar = 0;
 
             foreach $par (split( /,/, $args)) {
-               if( $par =~ /^ *(.*?) *(\w+)(\[\d+\])? *$/ ) {
+               if( $par =~ /^ *(.*?) *(\w+)(\[ *\d+ *\])? *$/ ) {
                   $type[ $npar ] = $1.$3;
                   $name[ $npar ] = $2;
                   if( $npar != 0 ) {
