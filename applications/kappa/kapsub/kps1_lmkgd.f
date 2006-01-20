@@ -75,10 +75,6 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      write(*,*) 'LMKGD: NDIM=',NDIM
-      write(*,*) 'DIM: ',DIM(1),',',DIM(2)
-
-
 *  Initialise the indices of the current pixel, and find the total number
 *  of pixels.
       EL = 1
