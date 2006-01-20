@@ -232,6 +232,8 @@
 *        estimators using co-ordinates to fix bug.
 *     2006 January 6 (MJC):
 *        Obtain axis widths for Integ, Iwc, and Iwd options.
+*     2006 January 19 (TIMJ):
+*        Fix segv with Integ units concatenation
 *     {enter_further_changes}
 
 *  Bugs:
@@ -836,11 +838,12 @@
          CALL CHR_PUTC( ')', ATTRIB, NC )
          AUNITS = AST_GETC( IWCS, ATTRIB( :NC ), STATUS )
 
+         UNITS = ' '
          CALL NDF_CGET( INDF1, 'Unit', UNITS, STATUS )
          CALL NDF_CLEN( INDF1, 'Unit', NC, STATUS )
          NC = NC + 1
          UNITS( NC:NC ) = ' '
-         CALL CHR_APPND( AUNITS, UNITS, NC, STATUS )
+         CALL CHR_APPND( AUNITS, UNITS, NC )
 
          CALL NDF_CPUT( UNITS, INDF2, 'Units', STATUS )
       END IF
