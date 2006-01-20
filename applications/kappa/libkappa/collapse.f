@@ -234,6 +234,7 @@
 *        Obtain axis widths for Integ, Iwc, and Iwd options.
 *     2006 January 19 (TIMJ):
 *        Fix segv with Integ units concatenation
+*        Use NDF_AUNMP to free IPWID rather than PSX_FREE
 *     {enter_further_changes}
 
 *  Bugs:
@@ -913,7 +914,7 @@
 
       IF ( ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR.
      :     ESTIM .EQ. 'INTEG' ) THEN
-         CALL PSX_FREE( IPWID, STATUS )
+         CALL NDF_AUNMP( INDF1, 'WIDTH', IAXIS, STATUS )
       END IF
 
 *  Come here if something has gone wrong.
