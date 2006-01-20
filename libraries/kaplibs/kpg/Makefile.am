@@ -269,6 +269,7 @@ kpg1_nag2r.f \
 kpg1_nagtc.f \
 kpg1_naptc.f \
 kpg1_nbadd.f \
+kpg1_nbadr.f \
 kpg1_ndfnm.f \
 kpg1_nmcol.f \
 kpg1_noisb.f \
