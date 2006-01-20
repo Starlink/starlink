@@ -16,15 +16,22 @@ STAR_DECLARE_DEPENDENCIES([build], [tcl])
 dnl    May invoke make recursively from Makefile.am
 AC_PROG_MAKE_SET
 
-AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)], with_tclconfig=${withval})
+AC_ARG_WITH([tcl], [  --with-tcl              directory containing tcl configuration (tclConfig.sh)],
+            [with_tclconfig=yes],[with_tclconfig=no])
+if test "X$with_tcl" != "X"; then
+   TCL_CONFIG_DIR="--with-tcl=$with_tcl"
+   export TCL_CONFIG_DIR
+fi
 
 dnl    Check for X libraries. These should be passed on to subdirs.
 AC_PATH_X
 if test "X$x_includes" != "X"; then
    X11_INCLUDES="--x-includes=$x_includes"
+   export X11_INCLUDES
 fi
 if test "X$x_libraries" != "X"; then
    X11_LIBRARIES="--x-libraries=$x_libraries"
+   export X11_LIBRARIES
 fi
 
 dnl    To configure Tcl, run ./configure in the `unix' directory.
@@ -33,8 +40,8 @@ dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     cd unix
-    echo ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl "$X11_LIBRARIES" "$X11_INCLUDES"
-         ./configure --prefix=$prefix --cache-file=config.cache --with-tcl=$with_tcl "$X11_LIBRARIES" "$X11_INCLUDES"
+    echo ./configure --prefix=$prefix --cache-file=config.cache "$TCL_CONFIG_DIR" "$X11_LIBRARIES" "$X11_INCLUDES"
+         ./configure --prefix=$prefix --cache-file=config.cache "$TCL_CONFIG_DIR" "$X11_LIBRARIES" "$X11_INCLUDES"
 )
 
 STAR_SPECIAL_INSTALL_COMMAND([cd unix;
