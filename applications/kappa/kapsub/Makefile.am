@@ -65,8 +65,7 @@ kps1_wieap.f kps1_wiecp.f kps1_wiecs.f kps1_wiefl.f kps1_wiefp.f \
 kps1_wieou.f kps1_wiepw.f kps1_wmos0.f kps1_zpdec.f kps1_zprep.f \
 kps1_zprgb.f kps1_zprgd.f kps1_zprgi.f kps1_zprgr.f kps1_zprgub.f \
 kps1_zprguw.f kps1_zprgw.f linplt.f listsb.f lsfun1.f med3d.f medwts.f \
-medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f 
-
+medwv.f shifts.f shiftx.f shifty.f statv.f thrsr.f kps1_lmkgd.f
 
 
 
