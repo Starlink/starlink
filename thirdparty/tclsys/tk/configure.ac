@@ -20,19 +20,25 @@ AC_ARG_WITH([tcl], [  --with-tcl              directory containing tcl configura
             [with_tclconfig=yes],[with_tclconfig=no])
 if test "X$with_tcl" != "X"; then
    TCL_CONFIG_DIR="--with-tcl=$with_tcl"
-   export TCL_CONFIG_DIR
+else 
+   TCL_CONFIG_DIR=""
 fi
+export TCL_CONFIG_DIR
 
 dnl    Check for X libraries. These should be passed on to subdirs.
 AC_PATH_X
 if test "X$x_includes" != "X"; then
    X11_INCLUDES="--x-includes=$x_includes"
-   export X11_INCLUDES
+else
+   X11_INCLUDES=""
 fi
+export X11_INCLUDES
 if test "X$x_libraries" != "X"; then
    X11_LIBRARIES="--x-libraries=$x_libraries"
-   export X11_LIBRARIES
+else
+   X11_LIBRARIES=""
 fi
+export X11_LIBRARIES
 
 dnl    To configure Tcl, run ./configure in the `unix' directory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
