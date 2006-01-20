@@ -48,7 +48,13 @@
    o  CHPIX has a new output parameter OLDVAL.  If the section being 
    modified comprises one pixel, OLDVAL stores the original value of 
    that pixel.
-         
+
+   o The MODE parameter now has an option "Good" which is like the
+   existing "Pixel" option in that it creates a list containing pixel
+   centres taken from the supplied NDF, but differs in that it only
+   stored the centres of pixels which have a good value in the NDF Data
+   array (the "Pixel" option stores all pixel centres, whether the pixel
+   values are good or bad).
 
 Changes introduced in version 1.4-2
 

@@ -42,7 +42,7 @@
 *
 *     The positions themselves may be supplied within a text file,
 *     or may be given in response to repeated prompts for a parameter. 
-*     Alternatively, the pixel centres in the NDF supplied for parameter 
+*     Alternatively, pixel centres in the NDF supplied for parameter 
 *     NDF can be used (see parameter MODE). 
 *
 *     The output can be initialised by copying positions from an existing 
@@ -131,8 +131,13 @@
 *        - "File" -- The positions are to be read from a text file
 *        specified using parameter FILE.
 *
+*        - "Good" -- The positions used are the pixel centres in the data 
+*        file specified by parameter NDF. Only the pixels that have good 
+*        values in the Data array of the NDF are used.
+*
 *        - "Pixel" -- The positions used are the pixel centres in the data 
-*        file specified by parameter NDF.
+*        file specified by parameter NDF. All pixel are used, whether the 
+*        pixel values are good or not.
 *
 *        [Interface]
 *     NDF = NDF (READ)
@@ -244,6 +249,8 @@
 *        Added parameters CATFRAME and CATEPOCH.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     20-JAN-2006 (DSB):
+*        Added option "Good" for parameter MODE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -275,12 +282,14 @@
       DOUBLE PRECISION CC( NDF__MXDIM )! Supplied position
       DOUBLE PRECISION POS( MXPOS, NDF__MXDIM )! Positions given using POSITION
       INTEGER DIM( NDF__MXDIM )  ! Dimensions of supplied NDF
+      INTEGER EL                 ! Number of mapped data array elements
       INTEGER FRM                ! Frame in which positions must be supplied
       INTEGER I                  ! Loop count
       INTEGER ICURR0             ! Index of original current Frame
       INTEGER ID0                ! First identifier for supplied positions
       INTEGER IFRM               ! Index of Frame for required positions
       INTEGER INDF               ! Reference NDF identifier
+      INTEGER IPDAT              ! Pointer to NDF data array
       INTEGER IPFIL              ! Pointer to supplied positions
       INTEGER IPID               ! Pointer to output identifiers
       INTEGER IPIDIN             ! Pointer to input identifiers
@@ -293,6 +302,7 @@
       INTEGER MAP                ! Pointer to simplified Base->Current Mapping
       INTEGER NAX                ! No. of axes in required Frame
       INTEGER NAXIN              ! No. of axes in input list Frame
+      INTEGER NBAD               ! No. of bad pixels in the NDF data array
       INTEGER NDIM               ! No. of pixel axes in supplied NDF
       INTEGER NP                 ! Number of supplied positions
       INTEGER NPIN               ! Number of input positions
@@ -319,7 +329,7 @@
       CALL NDF_BEGIN
 
 *  See where the positions are to be obtained from. 
-      CALL PAR_CHOIC( 'MODE', 'Interface', 'Interface,File,Pixel', 
+      CALL PAR_CHOIC( 'MODE', 'Interface', 'Interface,File,Pixel,Good', 
      :                .TRUE., MODE, STATUS )
 
 *  Get a FrameSet defining the available co-ordinate Frames, and identify 
@@ -339,10 +349,11 @@
 *  Ensure the Current Frame in the FrameSet is the Frame in which positions 
 *  must be supplied. Use the Base (GRID) Frame if NDF pixel positions are 
 *  being used, and the original Current Frame otherwise. 
-         IF( MODE .EQ. 'PIXEL' ) CALL AST_SETI( IWCS, 'CURRENT', 
-     :                                          AST_GETI( IWCS, 'BASE',
-     :                                                    STATUS ), 
-     :                                          STATUS )
+         IF( MODE .EQ. 'PIXEL' .OR. MODE. EQ. 'GOOD' ) THEN
+            CALL AST_SETI( IWCS, 'CURRENT', AST_GETI( IWCS, 'BASE',
+     :                                                STATUS ), 
+     :                     STATUS )
+         END IF
 
 *  Get a pointer to the Frame and note the number of axes. 
          FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
@@ -354,11 +365,12 @@
          CALL ERR_ANNUL( STATUS )
 
 *  Report an error if we are using pixel centres.
-         IF( MODE .EQ. 'PIXEL' ) THEN
+         IF( MODE .EQ. 'PIXEL' .OR. MODE .EQ. 'GOOD' ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( 'LISTMAKE_ERR1', 'Parameter %MODE has been '//
-     :                    'set to ''NDF'', but a null value was given'//
-     :                    ' for parameter %NDF.', STATUS )
+     :                    'set to a value which requires an NDF, '//
+     :                    'but a null value was given for parameter '//
+     :                    '%NDF.', STATUS )
          END IF
 
 *  Get the required Frame.
@@ -440,7 +452,7 @@
 *  If succesful, indicate that the IPFIL pointer should be used.
          USEFIL = ( NP .GT. 0 .AND. STATUS .EQ. SAI__OK )
 
-*  If the pixel centres are to be used...
+*  If all the pixel centres are to be used...
       ELSE IF( MODE .EQ. 'PIXEL' ) THEN
 
 *  Get the dimensions and size of the NDF.
@@ -456,6 +468,38 @@
 *  Store the pixel centres in IPFIL.
          CALL KPS1_LMKPC( NDIM, DIM, NP, %VAL( CNF_PVAL( IPFIL ) ), 
      :                    STATUS )
+
+*  Indicate that we should use the IPFIL pointer.
+         USEFIL = .TRUE.
+
+*  If the good pixel centres are to be used...
+      ELSE IF( MODE .EQ. 'GOOD' ) THEN
+
+*  Get the dimensions of the NDF.
+         CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
+
+*  Map the NDF's Data component. 
+         CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPDAT, EL, 
+     :                 STATUS )
+
+*  Count the number of bad values in the data array.
+         CALL KPG1_NBADR( EL, %VAL( CNF_PVAL( IPDAT ) ), NBAD, STATUS )
+
+*  Convert this to the number of good values.
+         NP = EL - NBAD
+
+*  Get workspace to hold the good pixel centres in GRID positions.
+         CALL PSX_CALLOC( NP*NDIM, '_DOUBLE', IPFIL, STATUS )
+
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Store the good pixel centres in IPFIL.
+         CALL KPS1_LMKGD( %VAL( CNF_PVAL( IPDAT ) ), NDIM, DIM, NP, 
+     :                    %VAL( CNF_PVAL( IPFIL ) ), STATUS )
+
+*  Unmap the NDF's Data component. 
+         CALL NDF_UNMAP( INDF, 'DATA', STATUS )
 
 *  Indicate that we should use the IPFIL pointer.
          USEFIL = .TRUE.

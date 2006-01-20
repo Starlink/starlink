@@ -27434,7 +27434,7 @@ plot (10k).
 
       The positions themselves may be supplied within a text file,
       or may be given in response to repeated prompts for a parameter.
-      Alternatively, the pixel centres in the NDF supplied for parameter
+      Alternatively, pixel centres in the NDF supplied for parameter
       NDF can be used (see parameter MODE).
 
       The output can be initialised by copying positions from an existing
@@ -27521,8 +27521,14 @@ plot (10k).
             specified using parameter FILE.
 
             \sstitem
+            {\tt "Good"} --- The positions used are the pixel centres in the data
+            file specified by parameter NDF. Only the pixels that have good 
+            values in the Data array of the NDF are used.
+
+            \sstitem
             {\tt "Pixel"} --- The positions used are the pixel centres in the data
-            file specified by parameter NDF.
+            file specified by parameter NDF. All pixel are used, whether the 
+            pixel values are good or not.
 
          }
          {\tt ["Interface"]}
@@ -50433,6 +50439,17 @@ The following applications have been modified:
       \begin{itemize}
          \item It is now a self-contained application for the reasons
          given in FITSEXIST above.
+      \end{itemize}
+
+   \item [\htmlref{LISTMAKE}{LISTMAKE}] \mbox{}
+      \begin{itemize}
+         \item The MODE parameter now has an option ``Good'' which is
+         like the existing ``Pixel'' option in that it creates a list
+         containing pixel centres taken from the supplied NDF, but
+         differs in that it only stored the centres of pixels which 
+         have a good value in the NDF Data array (the ``Pixel'' option
+         stores all pixel centres, whether the pixel values are good or 
+         bad).
       \end{itemize}
 
    \item [\htmlref{PARGET}{PARGET}] \mbox{}

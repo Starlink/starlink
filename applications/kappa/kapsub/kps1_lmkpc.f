@@ -89,6 +89,7 @@
          DO WHILE( K .LE. NDIM .AND. J( K ) .GT. DIM( K ) ) 
             J( K ) = 1
             K = K + 1
+            J( K ) = J( K ) + 1
          END DO
 
       END DO
