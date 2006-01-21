@@ -236,6 +236,13 @@ if ( -e @bindir@/convert/convert.csh ) then
 endif
 
 #
+#  CUPID
+if ( -e @bindir@/cupid/cupid.csh ) then
+   setenv CUPID_DIR @bindir@/cupid
+   setenv CUPID_HELP @starhelpdir@/cupid/cupid
+endif
+
+#
 #  CURSA
 if ( -e @bindir@/cursa/cursa.csh ) then
    setenv CURSA_DIR @bindir@/cursa

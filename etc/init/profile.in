@@ -45,6 +45,13 @@ if test -f @bindir@/convert/convert.sh; then
    export CONVERT_HELP=@starhelpdir@/convert/convert
 fi
 
+#  CUPID
+
+if test -f @bindir@/cupid/cupid.sh; then
+   export CUPID_DIR=@bindir@/cupid
+   export CUPID_HELP=@starhelpdir@/cupid/cupid
+fi
+
 #
 #  EXTRACTOR
 
@@ -202,6 +209,16 @@ if test -f @bindir@/convert/convert.sh; then
 else
   convert () { @staretcdir@/notinst convert; }
   convertsetup () { @staretcdir@/notinst convert; }
+fi
+
+# CUPID
+
+if test -f @bindir@/cupid/cupid.sh; then
+  cupid () { . $CUPID_DIR/cupid.sh; }
+  cupidsetup () { . $CUPID_DIR/cupid.sh; }
+else
+  cupid () { @staretcdir@/notinst cupid; }
+  cupidsetup () { @staretcdir@/notinst cupid; }
 fi
 
 # DIPSO

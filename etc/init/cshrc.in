@@ -134,6 +134,18 @@ else
 endif
 
 #
+#   Cupid
+#
+
+if ( -e @bindir@/cupid/cupid.csh ) then
+   alias cupid source @bindir@/cupid/cupid.csh
+   alias cupidsetup source @bindir@/cupid/cupid.csh
+else
+   alias cupid '@staretcdir@/notinst cupid'
+   alias cupidsetup '@staretcdir@/notinst cupidsetup'
+endif
+
+#
 #   Cursa
 #
 
