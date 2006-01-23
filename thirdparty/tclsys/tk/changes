@@ -2,7 +2,7 @@ This file summarizes all changes made to Tk since version 1.0 was
 released on March 13, 1991.  Changes that aren't backward compatible
 are marked specially.
 
-RCS: @(#) $Id: changes,v 1.37.2.3 1999/12/10 05:53:24 hobbs Exp $
+RCS: @(#) $Id: changes,v 1.64.2.25 2005/06/24 13:51:39 dgp Exp $
 
 3/16/91 (bug fix) Modified tkWindow.c to remove Tk's Tcl commands from
 the interpreter when the main window is deleted (otherwise there will
@@ -4693,8 +4693,1141 @@ tkPriv(relief) in order to avoid spurious release events (hobbs)
 --- Released 8.2.2, November 04, 1999 --- See ChangeLog for details ---
 
 11/19/99 (bug fix) fixed expression error that could cause
-'malformed bucket chain' error in tkEntry.c.
+'malformed bucket chain' error in tkEntry.c. (hobbs)
 
-11/19/99 (bug fix) fixed Tk_NameOfColor
+11/19/99 (bug fix) fixed Tk_NameOfColor (hobbs)
 
 --- Released 8.2.3, December 16, 1999 --- See ChangeLog for details ---
+
+1999-09-01 (feature enhancement) rewrote runtime libraries to use new
+Tcl functions where appropriate
+
+1999-10-28 (feature enhancement) added Img patch from Jan Nijtmans that
+makes the image command Tcl_Obj-based, adds support for binary -data args,
+adds alpha channel to images, adds GIF write capability (RLE).  Binary
+compatability is maintained, and source level compatibility is retained
+with -DUSE_OLD_IMAGE. (nijtmans)
+
+1999-11-16 (feature enhancement) made listbox Tcl_Obj based, added
+-listvariable option and itemconfigure command to allow coloring
+individual items. (melski)
+
+1999-11-23 (feature enhancement) added TK_OPTION_DONT_SET_DEFAULT as an
+equivalent to TK_CONFIG_DONT_SET_DEFAULT (hobbs)
+
+1999-11-24 (feature enhancement) updated dialogs to use color icons on
+Unix, center properly over -parent. (hipp, hobbs)
+
+1999-12-01 (feature enhancement) added hooks into main() code to support
+"big" shells more easily. (redman)
+
+1999-12-02 (feature enhancement) converted Tk_DestroyCmd, Tk_LowerCmd and
+Tk_RaiseCmd to their ObjCmd equivalent.
+
+1999-12-12 (bug fix) fixed bug in TextSearchCmd for multibyte chars
+
+1999-12-13 (feature enhancement) added support for pointer warping via the
+event -warp option, added some items from Dash patch: canvas widget now
+Tcl_Obj-based, added Tk_CreateSmoothMethod, added support for <Quadruple>
+clicks, entry widget validation routines, new -state hidden in text
+widgets, new -state -active* -disabled* -offset options to canvas items
+(see man page for full docs).  New features include dashed line support on
+the canvas, -elide support for TkMan, postscript printing of images and
+windows from the canvas.  Binary compatibility is maintained with 8.2, and
+source level compatibility is kept by using -DUSE_OLD_CANVAS.
+(hobbs, nijtmans, et al)
+
+1999-12-16 (feature enhancement) added "bitstream cyberbit" to list of
+font fallbacks. (hobbs)
+
+1999-12-16 (feature enhancement) added new 'tk useinputmethods ...' command
+to provide support for disabling/enabling the use of XIM on X.  This was
+previously all done at compile time, and always on.  Now it is turned off
+by default, even when available, and the user must turn it on to use XIM
+(per display).
+	*** POTENTIAL INCOMPATIBILITY ***
+user must add 'tk useinputmethods 1' to retain old style. (hobbs)
+
+1999-12-16 (feature enhancement) added proper support for -initialfile
+to tk_get*File, and made Unix version better match Windows file box
+that it was emulating. (hobbs)
+
+1999-12-16 (bug fix) removed necessity of 'update idle' before 'wm
+deiconify' on Windows. (mao)
+
+1999-12-16 (feature enhancement) added support for Windows system cursors
+to TkGetCursorByName (use -cursor @filename)
+
+1999-12-21 (bug fix) fixed lack of refresh for thin frames (darley)
+
+1999-12-21 (bug fix) fixed panic in Tk_CoordsToWindow to print error
+to stderr instead (for Tix) (hobbs)
+
+1999-12-21 (bug fix) fixed segv with scale widget when using -cursor (hobbs)
+
+--- Released 8.3b1, December 22, 1999 --- See ChangeLog for details ---
+
+2000-01-05 (bug fix) Applied fixes for unprotected arg passing through eval
+and after in Tk runtime code [Bug: 3943] (hobbs)
+
+2000-01-05 (bug fix) Applied fix for i18n problems with Mac clipboard
+[Bug: 3544] (hobbs)
+
+2000-01-05 (feature change) removed the 8.3b1 introduced -state option
+for text tags, and documented -elide (-state hidden == -elide true) (hobbs)
+
+2000-01-12 (bug fix) fix Windows 'wm deiconify' to zoomed state [Bug: 2077]
+and fixed possible flashing of unmapped toplevel in deiconify [Bug: 3338]
+and fixed unwanted mapping of transient window [Bug: 572] (hobbs)
+
+2000-01-12 (feature enhancement) extended 'wm state' to accept a state
+to set for the toplevel, and added support for zoomed (maximized) state
+on Windows (hobbs)
+
+2000-01-12 (bug fix) Applied fix for cursor to not blink when entry or
+text widget was disabled [Bug: 1807] (hobbs)
+
+--- Released 8.3b2, January 13, 2000 --- See ChangeLog for details ---
+
+2000-01-20 (bug fix) fixed interpretation of consecutive ^ characters in
+grid command (melski)
+
+2000-01-20 (bug fix) fixed -select(bg|fg) class names in listbox (hobbs)
+
+2000-01-20 (bug fix) fixed handling of too few coords for line item type in
+canvas (hobbs)
+
+2000-01-20 (bug fix) fixed dialog's association with parent (melski)
+
+2000-01-26 (bug fix) fixed handling of binary data for -data option to
+image create (melski)
+
+2000-01-26 (feature enhancement) improved GIF decoding speed by ~60%
+(melski)
+
+2000-01-26 (feature enhancement) added tk_chooseDirectory implementation
+for Unix and Mac (nelson, melski)
+
+2000-02-01 (bug fix) fixed resolution rounding problem in scale (porter)
+and fixed potential Unix seg fault due to use of ckfree instead of
+Tcl_EventuallyFree (hobbs)
+
+2000-02-01 (bug fix) fixed handling of negative dash values for canvas
+items (nijtmans)
+
+2000-02-01 (bug fix) fixed dialog lockup on Windows where once the native
+dialog disappeared, the parent window could end up locked up (hobbs)
+
+2000-02-03 (bug fix) fixed text dump to use char indices instead of byte
+indices (melski)
+
+2000-02-07 (bug fix) fixed handling of default extension in unix file
+dialogs (dejong)
+
+2000-02-08 (bug fix) corrected windows symbol font use to restrict itself
+to 8-bit chars (kenny)
+
+2000-02-08 (feature enhancement) improved support for moving from the old
+style image C API to the new obj'ified one with new Tk_InitImageArgs
+command and stub'ing of image code.  See docs for how to make the
+transition. (nijtmans)
+
+2000-02-08 (bug fix) fixed incorrect handling of CapsLock on Win9* and the
+use of dead keys on international keyboards (spjuth)
+
+2000-02-10 (bug fix) brought Mac back to building state, added support
+for Appearance Manager (ingham)
+
+2000-02-10 (feature enhancement) added support for buttons 4 && 5 as
+mousewheel style scrolling in listbox and text widget for Unix.
+
+--- Released 8.3.0, February 10, 2000 --- See ChangeLog for details ---
+
+2000-03-02 (bug fix) fixed crash in listbox when cursor was configure and
+then widget was destroyed (hobbs)
+
+2000-03-02 (feature enhancement) added %V substitution to entry widget
+validation to clarify type of validation occuring (hobbs)
+
+2000-03-07 (feature enhancement) added -disabledforeground/-state to labels
+(melski)
+
+2000-03-29 (config enhancement) improved build support for gcc/mingw on
+Windows (nijtmans, hobbs) and added RPM target (melski)
+
+2000-03-24 (bug fixes) numerous corrections for more correct Unix dialog
+behaviors (melski)
+
+2000-03-27 (bug fix) fixed mem leak in wm commands (hu)
+
+2000-03-31 (bug fix) correct initialization of Windows static builds and
+added Unicode aware open/save file dialogs on Windows (hobbs)
+
+2000-03 (bug fix) canvas: corrected support for transparency in dashed
+lines on Windows (nijtmans); added support for postscript generation of
+images on Windows, also fixing transparency printing (biancardi); corrected
+handling of configure options in non-empty canvas (melski)
+
+2000-04-07 (bug fix) correct font name length restriction that prevented
+the use of long named (>16 char) fonts on NT/2000 (hobbs)
+
+2000-04-07 (bug fix) fixed safe Tk to work in base cases (hobbs)
+
+2000-04-10 (bug fix) corrected Alt-Key event generation and handling of
+Alt-sequence Windows special char generation and (Control|Shift|Alt)_L/_R
+determination (melski)
+
+2000-04-10 (bug fix) correctly check state of parent when popping up
+bgerror dialog. (melski)
+
+2000-04-11 (feature enhancement) msgcat now searches up the namespace chain
+for a match instead of just in the local namespace (hershey)
+
+2000-04-12 (bug fix) corrected handling of Windows clipboard to allow for
+use of user-defined types within the Tk app (hobbs)
+
+2000-04-13 (feature enhancement) improved handling of shadow determination
+for 3D borders in very light/dark cases (hipp, melski)
+
+2000-04-13 (bug fix) correctly color separator bg in menus on Windows
+(melski)
+
+2000-04-14 (bug fix) improved handling of scale widget, reduced number of
+redraws (hobbs)
+
+2000-04-17 (feature enhancement) made shift-selection more Windows-like
+(intuitive) in text widget (melski)
+
+2000-04-22 (bug fix) mac bug fixes, nav services handling (ingham)
+
+2000-04 more docs for public APIs (melski)
+
+--- Released 8.3.1, April 26, 2000 --- See ChangeLog for details ---
+2000-04 (doc updates) extended, updated docs (melski)
+
+2000-05-09 (feature change) removed WS_EX_TOOLWINDOW style bit for
+transient windows on Windows platforms, so that transients have
+full-size titlebars (melski)
+
+2000-05-09 (bug fix) fixed calling of takeFocus proc (nemethi)
+
+2000-05-11 (bug fix) corrected handling of 3DBorder, Cursor and Color
+objects on multiple screens (hobbs)
+
+2000-05-12 (feature enhancement) improved support for chars in 0-255
+range for bitmap ANSI fonts (spjuth, hobbs)
+
+2000-05-12 (widget enhancement) added support for -repeatdelay,
+-repeatinterval for command buttons; and -compound (image and text
+simultaneously) for labels, check-, radio-, and command buttons (melski)
+
+2000-05-14 (widget change) added "readonly" state for entries and
+changed behavior of "disabled" entries; added -readonlybackground
+option for entries (melski)
+*** THIS IS A BACKWARDS INCOMPATIBLE BEHAVIOR CHANGE ***
+
+2000-05-15 (feature enhancement) added [image inuse] command (melski)
+
+2000-05-15 (feature enhancement) added -nice option to [bell] command (duncan)
+
+2000-05-17 (widget enhancement) added -overrelief option for
+check/radio/buttons (melski)
+
+2000-05-26 (feature change) added support for new syntax in
+Tk_OptionSpec tables; if the database name for an option contains an
+embedded "." it indicates that the name contains an overriding window
+class specifier in addition to the database name, which allows widgets
+to perform queries for certain options as if they were options for a
+different widget class (melski)
+
+2000-05-28 (new widget) added spinbox widget (hobbs)
+
+2000-05-31 (feature change) replaced bgerror dialog with a new and
+improved one (fellows, melski)
+
+--- Released 8.4a1, June 6, 2000 --- See ChangeLog for details ---
+
+2000-05-15 (bug fix) changed wm deiconify from using idle callback to
+calling restack and focus code immediately. (hobbs)
+
+2000-07 (build cleanup) cleanup of defines in tkConfig.sh, and cleanup
+in make and configure files to better handle .rc files across
+builds. (welch)
+
+2000-07 (build improvements) cleanup of the makefiles and configure scripts
+to correct support for building under gcc for Windows. (dejong)
+
+2000-08 (feature enhancements) for Windows, corrected drawing of separator
+menu entries, disable menu entries and the height for separator
+bars. (melski)
+
+2000-08 (bug fix) fixed calling of takeFocus proc with arg bearing
+functions. (nemethi)
+
+2000-08 (bug fix) For text widgets, added a test for a NULL segment pointer
+when doing backwards searches for "", correct searching over elided chars,
+and corrected search combining -regexp and -nocase. (melski)
+
+2000-08 (bug fix) Corrected code for using 'place', cursors, colors and 3D
+borders on multiple screens simultaneously. (hobbs, hipp)
+
+--- Released 8.3.2, August 9, 2000 --- See ChangeLog for details ---
+
+2000-06-15 (new feature) [tk_getOpenFile ... -multiple] (melski)
+
+2000-06-29 (new feature) localization support in Tk dialogs (duperval,
+melski, et al)
+
+200-07-28 (new feature) -state option for listbox, better native color
+defaults (melski)
+
+2000-08 (feature rewrites) Tcl_Obj'ified clipboard, message, tkwait,
+bindtags, grab. place, selection commands (melski)
+
+2000-08-24 (new feature) More correct GNU configure support (no more
+--enable-gcc) (dejong)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2000-08-29 (bug fix) Corrected Windows menu indicator drawing (oberhumer)
+
+2000-09-01 (bug fix) Added tkPlatDecls.h to default install (melski)
+
+2000-09-17 (new feature) Added TK_OPTION_CUSTOM type, similar to
+TK_CONFIG_CUSTOM (melski)
+
+2000-09-29 (bug fix) Several fixes for multi-display uses of Tk (hipp, hobbs)
+
+2000-10-05 (new feature) Tk_CreateAnonymousWindow API to create anonymous
+Tk windows controllable from C (melski)
+
+2000-10-27 (new default behavior) [tk useinputmethods 1] is the default
+in tk.tcl, for users of XIM and "dead" keys (hobbs)
+
+2000-10-30 Improved support for static builds on Windows (gravereaux)
+
+ * Added support for mingw (gcc on Windows), AIX-5 and Win64 builds
+   (dejong, hobbs)
+
+ * Improved error checking in Windows native dialogs (melski, hobbs)
+
+--- Released 8.4a2, November 3, 2000 --- See ChangeLog for details ---
+
+2001-04-04 (build improvements) redid Mac build structure (steffen)
+Corrected IRIX-5* configure (english).  Added support for AIX-5 (hobbs).
+Added support for Win64 (hobbs).
+
+2001-04-04 (doc fixes) numerous doc corrections and clarifications.
+Update of READMEs.
+
+2001-04-04 (bug fix) corrected reseting of service mode to only occur when
+it was set (hedin, hobbs)
+
+2001-04-02 (bug fix) Improved tests on Windows for correctness.
+Checked for menu deletion before calling associated menu entry command.
+Fixed listbox, canvas and entry destruction to be more aware of current
+widget activity. (hobbs)
+
+2001-03-30 (feature enhancement) added support for changing IME on the fly
+in Windows (2000) (lam)
+(bug fix) handled the error case where a valid-looking but invalid
+identifier could be passed in certain event generate options causing a
+crash (hobbs)
+
+2001-03-29 (bug fix) corrected handling of drag-selection (dejong)
+
+2001-01-02 (feature enhancement) added Windows icon support in wm
+iconbitmap (darley)
+
+2000-10-27 (feature enhancement) made [tk useinputmethods 1] the default
+for Tk (hobbs)
+
+2000-10-18 (bug fix) Corrected rendering of 1-pixel wide stippled lines on
+Windows.  Correct use of active- and disabledwidth values for displaying
+lines.  Enhanced error handling in Windows native dialogs (melski)
+
+2000-09-29 (bug fix) corrected BadMatch errors when using Tk on multiple
+screens (hipp)
+
+2000-08-18 (feature enhancement) Removed redundant call to DitherInstance
+(melski)
+
+--- Released 8.3.3, April 6, 2001 --- See ChangeLog for details ---
+
+2000-11-21 (new feature)[TIP 5] Tk_ClassProcs, Tk_SetClassProcs API (melski)
+
+2000-12-13 (performance enhancement)[403327] Tcl_Objs of type "double"
+are recognized in SetMMFromAny to speed up canvas coord calculations (hobbs)
+
+2001-01-02 (new feature)[TIP 8] [wn iconbitmap -default] on Windows (darley)
+
+2001-02-12 (new feature)[TIP #21] asymmetric padding in the pack and grid
+geometry managers (hipp)
+
+2001-05-21 (new feature)[TIP #11], -compound for [menubutton] widget (helfter)
+
+2001-06-03 (bug fix) corrected support for is10646 fonts on Unix, added a
+ucs-2be encoding (welch)
+
+2001-07-02 (bug fix) allowed tkwin to be Tcl_EventuallyFree'd in
+Tk_DestroyWindow so other widgets could register their use of it.  Updated
+entry and listbox widgets to use this, correcting potential crashes. (hobbs)
+
+2001-08-01 (interface rewrite)[TIP 44] moved all private tk[A-Z]* commands and
+variables into the ::tk:: namespace (porter)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+ * overhaul of configure scripts for cleaner standard support and support
+   of mingw gcc on Windows. (mdejong)
+
+ * improved tests to better handle results on variant systems (hobbs)
+
+ * correct several minor Purify complaints (hobbs)
+
+--- Released 8.4a3, August 6, 2000 --- See ChangeLog for details ---
+
+2001-08-06 (new feature) added GNU (HURD) build support. (brinkman)
+
+2001-08-23 (new feature) added QNX-6 build support. (loverso)
+
+2001-08-24 (bug fix) correct several possible free memory reads and array
+bounds read errors reported by purify. (hobbs)
+
+2001-08-27 (new feature) added call to Tcl_SetMainLoop which enables Tk to
+be loaded interactively into tclsh and have the event loop kick in
+correctly. (hobbs)
+
+2001-08-28 (bug fix) fixed tk_chooseDirectory crash on Win95. (baker)
+
+2001-08-28 (bug fix) removed 2 second 'raise' delay seen by some Unix
+window managers. (hobbs, baker)
+
+2001-09-14 (bug fix) fixed memory leaks that occured if errors were
+thrown while initializing the channel for an image. (darley)
+
+2001-09-20 (new feature) --enable-64bit support was added for HP 11 when
+using the native compiler.
+
+2001-10-03 (new feature) finalized Win64 support with latest RC1 release
+and SDK. (hobbs, stacy)
+
+2001-10-04 (new feature) added enhanced bgerror dialog from Hipp. (hobbs)
+
+2001-10-09 (new feature) added brace/quote matching and file/path/var
+expansion to the Win/Mac console. (hobbs)
+
+2001-10-17 (bug fix) fixed file filtering in the motif file dialog (nelson)
+
+2001-10-17 (bug fix) updated Mac build support. (steffen)
+
+--- Released 8.3.4, October 19, 2001 --- See ChangeLog for details ---
+
+2001-08-14 (bug fix)[450545] Tk's Tcl_ObjTypes now registered (fellows)
+
+2001-08-20 (performance enhancement) internal use of a "window" Tcl_ObjType 
+(fellows)
+
+2001-08-20 (performance enhancement) Obj-ified [grid] and [pack] (spjuth)
+
+2001-09-26 (new feature)[TIP 18] add labels to frames, update geometry
+managers (spjuth)
+
+2001-09-30 (new feature)[TIP 37] [grid {row|column}configure -uniform] (spjuth)
+
+2001-10-12 (new feature)[TIP 63] [$menu add ... -compound] (helfter)
+
+2001-10-18 (build improvement) no more warnings about building with
+thread-enabled Tcl (hobbs)
+
+2001-11-10 (build improvement) new make target 'make gdb' (dejong)
+
+2001-11-12 (new feature)[TIP 26] simple undo/redo in text widget (callewaert)
+
+2001-11-12 (build improvement) revitalized makefile.vc (gravereaux)
+
+2001-11-17 (visual change) default button size on Windows changed to
+conform to Windows style (hobbs)
+	**** POTENTIAL VISUAL INCOMPATABILITY ****
+
+2001-12-03 (new feature)[TIP 74] [wm stackorder] (dejong, steffen)
+
+2001-12 (new feature) more use of Unicode in native widgets on Windows (hobbs)
+
+2001-12-18 (bug fix)[413735] event-click-drag-1.2 test failure (porter)
+
+2001-12-28 (new feature) On Windows, buttons accept negative widths, meaning
+minimum size, enabling native L&F (hobbs)
+
+2002-01 (bug fix) updates for CONST-ification in Tcl API, notably
+Tcl_ParseArgv.  Use -DUSE_NON_CONST to suppress source incompatibility
+	**** POTENTIAL INCOMPATABILITY ****
+
+2002-01-31 (bug fix)[508988] logic error in menu cloning (helfter)
+
+2002-02-01 (new feature)[TIP 14] [$photo transparency] (fellows)
+
+2002-02-01 (bug fix)[511956] C99 spec: avoid 'bool' as a variable name (hobbs)
+
+2002-02-19 (bug fix) updates to image code calls of Tcl_Seek/Tcl_Tell to
+address TIP 72 changes (64-bit) in Tcl (fellows)
+
+2002-02-21 (new widget)[TIP 41] added [panedwindow] (hobbs)
+
+2002-02-22 (new feature)  64-bit support for xlc compiler on AIX-4 (hobbs)
+
+2002-02-25 (bug fix)[503772] blinking cursor fix in [text] (hobbs)
+
+2002-02-25 (bug fix)[503613] [listbox] handling of invalid listvar (hobbs)
+
+2002-02-25 (feature change)[493145] mirror B2 bindings to B3 on Windows (hobbs)
+
+ * (updated demos) many updates to show new features (fellows)
+
+--- Released 8.4a4, March 5, 2002 --- See ChangeLog for details ---
+
+2002-03-20 (feature change)[TIP 27][532644] Constness changes (porter)
+
+2002-03-21 (bug fix)[528441] Change in optimization flags for windows
+(gravereaux)
+
+2002-04-08 (bug fix) MSL stdin/out fixes prevent crash on exit  (steffen)
+
+2002-04-12 (bug fix) Centralized closing of display, mem-leak fixes (hobbs)
+
+2002-04-22 (bug fix)[223739] More robust FP comparisons for odd
+architectures (fellows)
+
+2002-04-22 (bug fix)[541999] Fixed posible overun of 16-bit size limit
+of X windows in drawchars (hobbs,bonfield)
+
+2002-04-22 (bug fix)[541849] ButtonLeave implementation corrected (hobbs)
+
+2002-04-24 (new feature) TCLTK_NO_LIBRARY_TEXT_RESOURCES check added,
+allowing disable of inclusion of tk lib into resources (steffen)
+
+2002-05-07 (bug fix)[553208] Makefile/Win fix (TCLDIR, INSTALLDIR
+forward slash trouble resolved) (gravereaux)
+
+2002-05-20 (bug fix) msgcat added to resources, fixed setup of bindings
+on startup (steffen, porter)
+
+2002-05-21 (bug fix) Build system fix, SC_ENABLE_SHARED before
+SC_CONFIG_CFLAGS for usage for SHARED_BUILD (dejong)
+
+2002-05-26 (bug fix)[548765] Fixed -value "" redraw error for variable
+created by radiobutton (spjuth)
+
+2002-05-27 (feature change) [wm transient .t .t] now raises an error (dejong)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2002-06-10 (new feature)[566605] Utilities for -underline, ampersand magic
+(kovalenko)
+
+2002-06-12 (feature change) A transient toplevel now mirrors state changes
+in the master. (dejong)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2002-06-13 (bug fix) Fixed handling of cursor specs across platforms to
+be consistent. (fellows)
+
+2002-06-14 (new feature) [TIP 98] Enhanced photo compositing (fellows)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2002-06-14 (bug fix) Removed references to matherr (kupries)
+
+2002-06-14 (new feature) [TIP 47] Reorganized Tk to allow usage in writing
+an X wm (english)
+
+2002-06-14 (new feature) [TIP 84] Full motion events upon request (hobbs)
+
+2002-06-17 (new feature) [TIP 82] -offrelief option for check/radiobutton
+(hipp)
+
+2002-06-17 (enhancement) Added msg catalog for UK English. (porter)
+
+2002-06-17 (new feature) [TIP 96] Added caret handling (hobbs)
+
+2002-06-19 (new feature) [TIP 48] Added style engine (bonnet)
+
+2002-06-19 (bug fix)[570902] Reorganized Tk shutdown to work around bugs in
+X (dejong)
+
+2002-06-20 (new feature) [TIP 94] Added -activestyle for [listbox] (hobbs)
+
+2002-06-21 (new feature) [TIP 104] generalized text undo/redo (callewart,
+hobbs)
+
+2002-06-22 (new feature) [TIP 95] Added [wm attributes] command (hobbs)
+
+2002-06-22 (new feature) [TIP 93] enhanced get/delete to accept accept
+multiple range pairs (hobbs)
+
+--- Released 8.4b1, July 5, 2002 --- See ChangeLog for details ---
+
+2002-07-11 (bug fix) some memory allocation failures now result in
+	error messages rather than panic (fellows)
+
+2002-07-15 (platform support) Borland makefile on Windows (gravereaux,giese)
+
+2002-07-16 (bug fix)[220800,581627] icon reading (darley)
+
+2002-07-19 (bug fix) Postscript generation on Win2K (hipp)
+
+2002-07-22 (bug fix)[570764,568278] transient windows (dejong)
+
+2002-07-24 (bug fix)[581560] canvas memory management (hobbs)
+
+2002-07-24 (bug fix)[584691] focus ring on compound button (hobbs)
+
+2002-07-25 (feature enhancement)[564521] Obj-ified [wm] (spjuth)
+
+2002-08-04 (new feature)[589853][TIP 27] Tk interfaces are now fully
+	CONST-ified.  Use the symbols USE_NON_CONST or USE_COMPAT_CONST
+	to select interfaces with fewer changes.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-08-07 (bug fix)[578654] bezier curves on canvas (hobbs)
+
+2002-08-07 (platform support)[468139] native directory browser on Win (hobbs)
+
+2002-08-07 (bug fix)[467524] fixed -from handling for gifs (obermeier)
+
+2002-08-08 (bug fix)[592201] wm transient panic (english,dejong)
+
+Rewrote Tk test suite to use tcltest package.
+
+--- Released 8.4b2, August 9, 2002 --- See ChangeLog for details ---
+
+2002-08-20 (bug fix) tk.h checks for matching tcl.h version (porter)
+
+2002-08-27 (bug fix)[582457] toolbar button bindings (hipp)
+
+2002-08-31 (platform support)[602770] Mac OS X / Aqua port (steffen)
+
+2002-09-02 (bug fix)[565485] button height on windows (hobbs)
+
+2002-09-02 (new feature)[TIP 108] new comand [tk windowingsystem] (steffen)
+
+2002-09-02 (new feature)[TIP 107][601518] [raise] is non-blocking (english)
+
+2002-09-02 (platfrom support) 64-bit compile on HP-11 (martin)
+
+--- Released 8.4.0, September 10, 2002 --- See ChangeLog for details ---
+
+2002-09-15 (bug fix)[570902] Use PEEK_XCLOSEIM to examine the input context
+queue before invoking XCloseIM. Generate an assert if there is an input
+context that has not been freed. (dejong)
+
+2002-09-18 (platform support) Updated support for compiling with Cygwin and
+either mingw or gcc. (khan, howell, dejong)
+
+2002-09-30 (bug fix)[614650] Correct incremental transfers of UTF8_STRING
+selections (fellows)
+
+2002-10-02 (bug fix)[616791, 614474] don't blink the cursor unless it is
+visible. (bonfield)
+
+2002-10-02 (bug fix)[607390, 617446] check if the entry is being deleted
+before handling an associated textvariable. (hobbs)
+
+2002-10-08 (bug fix)[616589] leave the DestroyPanedWindow proc to free the
+pwPtr. (hobbs)
+
+2002-10-08 (bug fix)[588831] Ignore event if we are focusing into a dead
+window (griffin)
+
+2002-10-09 (bug fix)[619544] Only error-out creating an image if we fail to
+allocate a non-empty buffer (fellows)
+
+2002-10-09 (build support) all --enable-symbols to take the enhanced
+options yes|no|mem|all. (hobbs)
+
+2002-10-10 (feature enhancement) added support for generating ps for
+embedded widgets on canvases on Windows (hobbs)
+
+2002-10-10 (bug fix)[621241] The grid size was not updated properly when
+removing a widget from a grid (forssen)
+
+2002-10-16 (bug fix)[616988] macosx fix to accelerators shown in menus
+with non-alphanumeric keys. (darley)
+
+2002-10-15 (platform support) Correct AIX-5 ppc and 4/5 64-bit build flags.
+Correct HP 11 64-bit gcc building. (martin, hobbs)
+
+2002-10-17 (bug fix)[624974] fix arg handling for missing image create
+photo -format or -data options (hobbs)
+
+2002-10-17 (bug fix)[624732] In ControlUtfProc, properly return the number
+of bytes consumed (hobbs)
+
+2002-10-22 (platform support)[624509] On macosx, add embedded framework
+dirs to tcl_pkgPath: @executable_path/../Frameworks and
+@executable_path/../PrivateFrameworks (if they exist), as well as the dirs
+in DYLD_FRAMEWORK_PATH (if set).  Added 'rapp' apple event handler.  Added
+TEXT document type to plist so that files can be dragged onto Wish Shell.
+Added private proc TkMacOSXUseAntialiasedText() to enable/disable quickdraw
+text antialiasing where available, default is enabled.  Added a linked
+boolean ::tk::mac::antialiasedtext with write trace to allow control of
+antialiasing from tcl.  (steffen)
+
+--- Released 8.4.1, October 22, 2002 --- See ChangeLog for details ---
+
+2002-11-07 (bug fix)[635025,532022] Make [place info] complete and bring into
+line with other geometry managers. (spjuth)
+
+2002-11-14 (bug fix)[630533] Handle half-dead windows better. (dejong)
+
+2002-11-19 (bug fix) Better handling of narrow scrollbars on OSX. (ingham)
+
+2002-11-22 (bug fix)[641778] Make the [text see] work when the widget is
+unmapped. (hobbs)
+
+2002-12-01 (bug fix) Stopped [wm withdraw] and [wm transient] from interfering
+with each other. (dejong)
+
+2002-12-06 (bug fix) Improved DLL cleanup on Windows. (hobbs)
+
+2002-12-06 (new feature) New function TkWinSetHINSTANCE() as part of enabling
+dynamic Tk to load resources correctly. (hobbs)
+
+2002-12-13 (bug fix)[616245] Use Tcl*StartupScript*() routines in Tk_Main.
+(porter)
+
+2002-12-27 (bug fix)[578569] Made sure that Tk always knows whether its windows
+are mapped or not. (english)
+
+2003-01-03 (bug fix)[661792] Stopped crash when trying to create a toplevel
+when Tk is dying. (hobbs)
+
+2003-01-08 (bug fix)[663981] Clip long lines so they show correctly even when
+they hit windowing-system limits. (hipp)
+
+2003-01-14 (bug fix)[666346] Stopped selection handling crashes under KDE3.0.
+(english)
+
+2003-01-22 (bug fix)[220891] Image creation cannot trigger Tk's death.
+(fellows)
+
+2003-01-23 (bug fix)[673687] Entry typein works as expected even when the mouse
+button is pressed. (hipp)
+
+2003-01-28 (bug fix)[671330] Stopped segfaults from unsynchonized window
+deletion epochs. (english)
+
+2003-02-08 (bug fix) Make canvas item coordinate list handling consistent to
+stop segfaults.  Cannot now create items without coordinates. (hobbs)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2003-02-10 (bug fix) Better support for themed and animated cursors on OSX.
+(ingham)
+
+2003-02-17 (bug fix) Stopped motion events from morphing into button press
+and motion events. (dejong)
+
+2003-02-18 (bug fix) Removed memory leak in GIF image loader. (fellows)
+
+2003-02-18 (bug fix) Made OSX menus support UTF8 text and icons. (darley)
+
+2003-02-18 (bug fix)[608559] Stop message boxes from getting extremely wide.
+(hobbs)
+
+2003-02-18 (bug fix)[683813] Make focus behaviour of spinboxes more like
+entries. (bron)
+
+2003-02-19 (new demo)[627453] New demo showing off Tk's Unicode font handling.
+(fellows,suchenwirth)
+
+2003-02-19 (bug fix) Bring event handling more into line with the OSX standard.
+Also improves "dead key" handling. (riefenstahl,ingham)
+
+2003-02-20 (bug fix)[618872,689357] Stopped read of freed memory when working
+with large composite fonts. (fellows)
+
+2003-02-20 (bug fix)[689099,tcllib 689258] Improvements to [panedwindow] pane
+size and sash handling. (spjuth,hobbs)
+
+2003-02-20 (bug fix)[624116] Stopped semi-crash in Windows scrollbar handling.
+(hobbs)
+
+2003-02-21 (bug fix)[671122] Stopped panedwindow from crashing when embedded
+in a window with a different visual to the root window. (fellows)
+
+2003-02-21 (bug fix)[617392] Limit the screen-size of [tk_get*File] file type
+selection menu. (fellows)
+
+2003-02-21 (bug fix)[673722] Rework standard dialogs to use [grid]. (fellows)
+
+2003-02-24 (bug fix)[637828] Report that entries can provide the selection,
+even if they're not displaying it. (hobbs)
+
+2003-02-24 (bug fix)[669595] Improved display of indicators in disabled
+checkbuttons and radiobuttons. (hintermayer)
+
+2003-02-24 (bug fix)[632514] Allow listbox 'selection includes' to respond
+positively when disabled.
+
+2003-02-24 (bug fix)[647497] Make Tk pick the first best matching font on
+the font path. (dal zotto)
+	*** POTENTIAL VISUAL INCOMPATIBILITY ***
+
+2003-02-25 (bug fix)[621672] Fixed conversion of apple event parameters
+to posix path names. (steffen,riefenstahl)
+
+2003-02-25 (feature enhancement)[patch 685388] Support simple XOR text drawing
+on Windows. (martin)
+
+2003-02-28 (bug fix)[612110] Make %-substitutions for events only read data out
+of the event structure when that field is valid for that event type. (fellows)
+	*** POTENTIAL INCOMPATIBILITY ***
+
+--- Released 8.4.2, March 3, 2003 --- See ChangeLog for details ---
+
+2003-03-14 (bug fix)[701812] Stop buttons from being very wide when a
+tk_messageBox has a lot of content on Unix
+
+2003-03-18 (bug fix) Fixed crash in [winfo server] on Mac OS X
+
+2003-04-25 (bug fix)[477740] Correct compound button display in the
+disabled state
+
+2003-05-10 (bug fix)[734498] Correct crash when generating postscript for a
+single-line polygon (point) with no color.
+
+2003-05-13 (feature enhancement)[736774] Use new versioned bundle resource
+API to get tk runtime library for TK_VERSION on Mac OS X
+
+2003-05-14 (bug fix)[737790] Updated French message catalog
+
+2003-05-15 (bug fix)[557030] Use gb2312-raw as the alias for gb2312*
+charset fonts.  gb2312.enc was made to be euc-cn for Tcl because that is
+what is most often meant, but X really wants the original (-raw) gb2312
+encoding.
+
+--- Released 8.4.3, May 20, 2003 --- See ChangeLog for details ---
+
+2003-07-07 (bug fix)[749353] Improve deletion of images on exit.
+
+2003-07-15 (bug fix)[465324] Fixed complex bug in menu clone cleanup.
+
+2003-07-15 (bug fix)[755530] Don't test for XCloseIM bug when the XFree86
+version is newer than 4.0 since the layout of the XIM structure has
+changed.
+
+2003-07-16 (bug fix)[748277, 702230, 738143] Numerous panedwindow fixes.
+Ensure that the last pane shrinks instead of being clipped when resized
+below the reqsize.  Ensure that we can share GCs between a panedwindow and
+its sash proxy, even if the panedwindow is in a toplevel with a different
+visual.  Ensure that panedwindows get their geometry right even when their
+children don't know their initial size.  Use widget-specific Priv slots for
+pwAfterId and panecursor items to correctly handle cursor changes with
+adjacant panedwindows.
+
+2003-07-17 (bug fix)[697652] Make sure all options of a frame can be set to
+their default value.
+
+2003-07-17 (bug fix)[404421] Try harder to avoid zero-length mallocs() when
+creating images.
+
+2003-07-17 (feature enhancement) MacOSX build system rewrite.
+
+2003-07-18 (bug fix) Do not make XGetGeometry call that prevents overwidth
+lines drawing on unix as it requires a roundtrip call to the X server for
+every string drawn.  Hard-code max width to 32768 until a beter solution to
+get max width is made.
+
+2003-07-18 (bug fix)[742660] correct XCreateIC call for TK_XIM_SPOT usage
+on unix.
+
+2003-07-18 (bug fix)[420510] Provide consistency between unix and windows
+-cursor option.
+
+2003-07-19 (bug fix)[706765] Correctly handle the -sliderrelief option
+while moving the thumb.
+
+--- Released 8.4.4, July 22, 2003 --- See ChangeLog for details ---
+
+2003-08-13 (bug fix)[787065] Fix Button-2 binding for scale widget.
+
+2003-08-19 (bug fix)[791500] Fix panedwindow refresh glitches for bg.
+
+2003-09-17 (bug fix)[808039] Prevent [image create] from generating an
+image command name that overwrites an existing command.
+
+2003-09-25 (enhancement) Added -compound support for OS X bevel buttons.
+
+2003-10-10 (bug fix) Fix image offset stippling for disabled buttons.
+
+2003-10-22 (enhancement)[827535] Constrain tk_dialog to be sensibly sized and
+placed
+
+2003-10-28 (bug fix) Add 16bpp XGetImage support on Windows
+
+2003-10-29 (enhancement)[795717] Allow some control of foreground and
+background colors on Tk's tk_getOpenFile/tk_chooseDirectory.
+
+2003-11-01 (enhancement)[820519] Updated Dutch (nl) message catalog.
+
+2003-11-10 (enhancement)[826614] Provide more Tk build info in tkConfig.sh.
+
+2003-11-10 (enhancement)[809157] Add alpha blending for images with partial
+transparency on Windows and Unix on 15bpp+ displays.
+
+2003-11-10 (enhancement)[820282] Use the XGCValues.function parameter when
+filling rectangles with XFillRectangles on Windows.
+
+2003-11-11 (enhancement)[840107] Add OS X unicode clipboard support.
+
+2003-11-11 (enhancement)[833819] Improve Tk's
+tk_getOpenFile/tk_chooseDirectory directory glob'ing speed.
+
+2003-11-11 (bug fix)[836483] Fix mem leak in '$listbox itemconfigure'.
+
+2003-11-11 (bug fix)[723856] Correctly handle menu (un)posting on menus
+with spaces in their names.
+
+2003-11-11 (enhancement) Improve AIX-64 build configuration.
+
+2003-11-17 (bug fix) Fix menubutton -compound state disabled drawing.
+
+--- Released 8.4.5, November 20, 2003 --- See ChangeLog for details ---
+
+2003-12-17 (platform support)[842952] Mac OS X: [scrollbar]
+
+2004-02-13 (platform support)[776646] Win: native hand2/fleur cursors
+
+2004-02-03 (enhancement) post menubuttons so they stay on screen.
+
+2004-02-09 (bug fix)[877950] stop crash during intra-image copy/resize
+
+2004-02-10 (enhancement) New msg catalogs for Esperanto and Polish (trzewik)
+
+2004-02-13 (platform support)[478568] Win: bold/italic font handling
+
+2004-02-15 (platform support)[860454] Mac OS X: [event generate]
+
+2004-02-15 (platform support)[840107] Mac OS X: Unicode clipboard (senn)
+
+2004-02-15 (platform support)[517600] Mac OS X: handle FSRef's
+
+2004-02-15 (platform support) Mac OS X: native [tk_messageBox]
+
+2004-02-15 (platform support) Mac OS X: PowerBook keycode 0x34 -> <Return>
+
+2004-02-18 (platform support) Mac OS MouseWheel event handling
+
+2004-02-18 (bug fix)[899246] fix shrinking grid geometry calculations
+
+2004-02-23 (platform support)[809157] Mac OS X: Add alpha blending for
+images with partial transparency.
+
+2004-03-01 (platform support)[218561] Allow 64-bit configure on IRIX64-6.5*
+
+--- Released 8.4.6, March 1, 2004 --- See ChangeLog for details ---
+
+2004-03-17 (platform support) Mac OS X: Grab the Command-H &
+Command-Shift-H keys and use them for Hide and Hide Others before passing
+keystrokes on to the generic keyboard event processing.
+Stop putting a Quit menu item in the File menu. (ingham)
+
+2004-03-26 (enhancement)[540375] Add code to read and write PPM/PGM data
+from strings and/or bytearrays. (fellows)
+
+2004-03-26 (bug fix)[923555] Restored support for the stringWriteProc of
+old photo formats/ (fellows)
+
+2004-03-31 (bug fix)[Bug 220871] Report errors from invoking menu commands
+as background errors on OS X. (ingham)
+
+2004-04-20 (bug fix)[915350, 922336] Do not set min, max size in WM_HINTS
+when we shouldn't and correctly display maximize window button under
+KDE-3.2.1. (english)
+
+2004-05-03 (enhancement)[756952] Place images of compound menu entries in
+indicator space if not a radio of checkbutton on Windows. (eserte)
+
+2004-05-03 (bug fix)[904371] Fix drawing of unicode chars in menu titles.
+(riefenstahl)
+
+2004-05-03 (bug fix)[939389, 822002, 732662] Correctly post internal
+clipboard data to the Windows clipboard on exit. (hobbs)
+
+2004-05-03 (bug fix)[778893, 932155] Make the panedwindow -opaqueresize
+option work as per the docs, and call DragSash to stop sash jump when B1 is
+pressed and released without moving. (hobbs)
+
+2004-05-05 (bug fix)[618872] Fix Tk_MeasureChars and Tk_DrawChars to handle
+reallocation of subfonts when unicode chars require extra fonts.
+(dkf, hobbs)
+
+2004-05-14 (enhancement) reduce Tk tk_messageBox default font size to
+14-point (was 18-point). (fellows)
+
+2004-07-11 (enhancement)[987169] Handle users destroying the dialog
+indirectly. (fellows)
+
+2004-07-14 (bug fix)[894550] Correctly set the cursor to the platform
+cursor on OS X when Tk asks for the "NULL" (empty) cursor.
+
+2004-07-14 (bug fix)[969358] Prevent possible segfault in -maxundo. (jiangwu)
+
+2004-07-19 (bug fix)[874058] improved build configuration on 64-bit systems.
+Corrects Tcl_StatBuf definition issues.  (hobbs)
+
+2004-07-23 (platform support) Mac OS X: Fix several problems with
+Icelandic (and Faroese) keyboards (riefenstahl)
+
+2004-07-24 (platform support) Mac OS X: Complete the implementation of
+the CG version of the X drawing emulation layer. (tittle, ingham)
+
+--- Released 8.4.7, July 26, 2004 --- See ChangeLog for details ---
+
+2004-08-09 (bug fix)[1006286] test wrapping on canvas; Win (dejong)
+
+2004-08-10 (bug fix)[1006686] [wm resizable] Solaris (mcdonald,english)
+
+2004-08-17 (bug fix)[1010938] panedwindow -handlepad GEOMETRY (fellows)
+
+2004-08-19 (bug fix)[611615] file dialog double clicks fell through (hobbs)
+
+2004-09-10 (bug fix)[845189] file dialog state initialization (fellows)
+
+2004-09-10 (bug fix)[1013942] widget demo robust against strict motif (fellows)
+
+2004-09-16 (bug fix)[1028888] [place forget] memory leak (spjuth)
+
+2004-09-16 (bug fix)[607649] font size change: recompute menu geometry (hobbs)
+
+2004-09-17 (new feature)[TIP 222] [wm attributes -alpha] (hobbs)
+
+2004-09-22 (bug fix)[865842] disabled cascade menu arrow draw (dejong)
+
+2004-09-22 (bug fix)[866194] menu accelerator text highlights (dejong)
+
+2004-09-22 (bug fix)[223689] handle color/screen resolution changes (hobbs)
+
+2004-10-05 (new feature)[TIP 159] [wm iconphoto] (hobbs)
+
+2004-10-26 (bug fix)[905830] set IC focus after creation (max)
+
+2004-10-26 (bug fix) shutdown safety corrections for Win (gravereaux)
+
+2004-10-28 (bug fix) HAVE_NO_SEH handler code, Win (dejong)
+
+2004-10-29 (bug fix)[533519] multi-display window placement (thoyts)
+
+2004-11-10 (bug fix)[1055023] compound buttons, MacOSX (kirkham,ingham)
+
+2004-11-11 (bug fix)[1035348] [load]-able Tk on MacOSX/Aqua (steffen)
+
+2004-11-12 (bug fix)[800178] use correct display for [tk scaling] (hobbs)
+
+2004-11-16 (bug fix)[1063675] Italian msg catalog fixes (ugoccioni,welton)
+
+2004-11-17 (bug fix)[1036963] panedwindow: set save_under X attr (hobbs)
+
+2004-11-17 (bug fix)[1004508] console: array keyname expansion (bold,hobbs)
+
+2004-11-17 (bug fix)[1032300] ps generation of unspecified canvas image (hobbs)
+
+2004-11-17 (bug fix)[982248] immediate unmap of hidden canvas windows (hobbs)
+
+2004-11-18 (new feature) configure options --enable-man-suffix (max)
+
+--- Released 8.4.8, November 18, 2004 --- See ChangeLog for details ---
+
+2004-12-01 (bug fix)[979239] Fix clipping of partially transparent images
+on buttons on unix to avoid X error (hobbs, petasis)
+
+2004-12-03 (bug fix)[848161] Fix Tk_PhotoPut(Zoomed)Block overlay
+compositing of partially transparent areas.
+
+--- Released 8.4.9, December 6, 2004 --- See ChangeLog for details ---
+
+2004-12-09 (performance)[1081966] BMP, JPG image load speed (fellows)
+
+2004-12-29 (platform support)[1092952,1091967] MSVC7, gcc OPT compiles (hobbs)
+
+2005-01-11 (bug fix)[1098779] -pady accept all lists (fellows,kirkham)
+
+2005-01-14 (bug fix)[959973] Set _NET_WM_NAME and _NET_WM_ICON_NAME
+(freedesktop.org) in addition to WM_NAME and WM_ICON_NAME (ICCCM).  Allows
+Unicode characters in wm titlebar on X11. (english)
+
+2005-01-14 (bug fix)[742882] division by zero in gridded wm geometry (english)
+
+2005-01-14 (bug fix)[632816] cannot remove transient (english)
+
+2005-01-14 (bug fix)[568861] [wm minsize|maxsize] fix (dejong,english)
+
+2005-01-18 (bug fix) dialog visibility in demos (nash,fellows)
+
+2005-01-28 (platform support)[1021871] Solaris gcc 64-bit support (hobbs)
+
+2005-01-31 (enhancement)[1111213] msg catalog for Spain's Spanish. (poser)
+
+2005-02-10 (platform support) Correct gcc builds for AIX-4+, HP-UX-11 (hobbs)
+
+2005-02-11 (bug fix)[949792] Fix error during panedwindow destroy (hobbs)
+
+2005-02-11 (bug fix)[1105738] Fix [tk_messageBox -parent $nonToplevel]
+segfault (hobbs)
+
+2005-02-11 (bug fix)[1119460] Disabled canvas bmap/bbox segfault (hobbs)
+
+2005-02-22 (bug fix)[1146057] Aqua: [tk_getOpenFile] encoding (steffen)
+
+2005-02-28 (bug fix)[1118340] Fix Mousewheel %A translation (davis,hobbs)
+
+2005-03-10 (bug fix)[1160025] Aqua: offset in mouse coords (davies,ingham)
+
+2005-03-10 (bug fix)[1124237] Aqua: floating window focus (davies,ingham)
+
+2005-03-15 (platform support) OpenBSD ports patch (thoyts)
+
+2005-03-24 (enhancment) Aqua: native L&F for entry and spinbox (ingham)
+
+2005-03-29 (platform support) Allow msys builds without cygwin (hobbs)
+
+2005-04-12 (bug fix)[1122671] font encoding alignment issue (brubaker,hobbs)
+
+2005-04-25 (platform support) Fix builds on Mac OS X 10.1 (steffen)
+
+2005-05-06 (platform support) Added x86_64 Solaris cc and Solaris 10 build
+support (hobbs)
+
+2005-05-10 (bug fix)[1191895] [text] hang on <Control-Key-Up> (vlasov,darley)
+
+2005-05-14 (enhancement)[1202052] Aqua: CFRunLoop notifier allows
+[load]able Tk (steffen)
+
+2005-05-15 (bug fix)[1012852] Aqua: check/radiobutton accelerator (kirkham)
+
+2005-05-15 (bug fix)[1202181] Aqua: scrollbar thumb position (kirkham)
+
+2005-05-15 (bug fix)[1202223] Aqua: [text] window -> scroll lock (kirkham)
+
+2005-05-24 (platform support) Darwin/Aqua builds merged into unix (steffen)
+
+2005-05-27 (behavior change) tk_popup menus now "sticky" (helfter)
+
+2005-05-30 (bug fix)[1161543,1010941,795869,690169] panedwindow
+display/resizing (south)
+
+2005-05-30 (bug fix)[1159367] [menu] creation segfault (schofield,hobbs)
+
+2005-05-31 (bug fix)[1152809] [wm stackorder] panic; multi-DISPLAY (dejong)
+
+Documentation improvements [1087842,1081527,1115907,etc.]
+
+--- Released 8.4.10, June 4, 2005 --- See ChangeLog for details ---
+
+2005-06-03 (bug fix)[1016385] allow [rename console] (fellows)
+
+2005-06-04 (bug fix)[1114977] UID thread-safety in canvas (fellows)
+
+2005-06-20 (bug fix) Eliminate buffer overflow in GIF decoder (fellows)
+
+2005-06-23 (bug fix)[1176610] Aqua: default [entry] borderwidth (steffen)
+
+2005-06-23 (bug fix)[756840] Fix Tk console cleanup on exit/reinit (mistachkin)
+
+--- Released 8.4.11, June 28, 2005 --- See ChangeLog for details ---
