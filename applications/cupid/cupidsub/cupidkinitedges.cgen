@@ -197,6 +197,14 @@ int *CGEN_FUNCTION(cupidKInitEdges)( CGEN_TYPE *array, int nel, int ndim,
                                                         xvec, work1, work2, 
                                                         ret, minpix, thresh, 
                                                         noise, rms );
+
+{ int slbnd[2];
+  slbnd[ 0 ] = 2720;
+  slbnd[ 1 ] = 804;
+  printf("xvec=(%d,%d), axis=%d lbnd=%d\n",xvec[0], xvec[1], axis, lbnd );
+  cupidCFDump( ret, ndim, dims, slbnd );
+}
+
                      }
                   }
                }

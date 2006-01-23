@@ -100,10 +100,7 @@ int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int i;               /* Loop count */
    int minpix;          /* Minimum size of a clump in pixels */
    int skip[3];         /* Pointer to array of axis skips */
-   double dd;           /* Data value */   
    int peakval;         /* Minimum value used to flag peaks */
-   double mind;         /* Minimum value in data array */
-   float fd;            /* Data value */   
 
 /* Initialise */
    clist = NULL;
@@ -150,29 +147,11 @@ int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       skip[ i ] = 0;
    }
 
-/* Find the smallest good data value in the supplied array. */
-   mind = VAL__MAXD;
-   if( type == CUPID__DOUBLE ) {
-      for( i = 0; i < el; i++ ) {
-         dd = ((double *)ipd)[ i ];
-         if( dd != VAL__BADD ) {
-            if( dd < mind ) mind = dd;
-         }
-      }
-   } else {
-      for( i = 0; i < el; i++ ) {
-         fd = ((float *)ipd)[ i ];
-         if( fd != VAL__BADR ) {
-            if( fd < mind ) mind = fd;
-         }
-      }
-   }
-
 /* Get various configuration parameters. */
    minpix = cupidConfigI( kconfig, "MINPIX", 4 );
-   noise = cupidConfigD( kconfig, "NOISE", mind + 5*rms );
+   noise = cupidConfigD( kconfig, "NOISE", 2*rms );
    thresh = cupidConfigD( kconfig, "THRESH", noise + rms );
-   cathresh = pow( 3, ndim );
+   cathresh = pow( 3, ndim ) - 1;
    cathresh = cupidConfigI( kconfig, "CATHRESH", cathresh );
    caiter = cupidConfigI( kconfig, "CAITERATIONS", 1 );
 
@@ -190,6 +169,8 @@ int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    mask = cupidKInitEdges( type, ipd, el, ndim, dims, skip, minpix, thresh, 
                            noise, rms, &peakval );
 
+
+printf("------------------------------------------------------\n");
 cupidCFDump( mask, ndim, dims, slbnd );
 
 /* Dilate the edge regions using a cellular automata. This creates a new

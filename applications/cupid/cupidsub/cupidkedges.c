@@ -198,9 +198,9 @@ void cupidKEdges( int nel, double *dval, int *dpos, int *mask, int minpix,
             } else if( v < minval ) {
                minval = v;
                minpos = i;
-               vlim = v + rms;
+               vlim = v + 2*rms;
 
-/* Otherwise, if this value is more than the RMS noise higher than the 
+/* Otherwise, if this value is more than the 2*RMS noise higher than the 
    lowest value found so far, we assume that the lowest value found so far 
    is the minimum point in the profile. */
             } else if( v > vlim ){
