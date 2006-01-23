@@ -3954,6 +3954,15 @@ package kappa {
             helpkey *
           }
 
+         parameter comp {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            prompt {Array component to display}
+            default Data
+            helpkey *
+          }
+
          parameter describe {
             type _LOGICAL
             prompt {Are co-ordinate Frames to be described?}
@@ -4123,6 +4132,15 @@ package kappa {
          parameter quiet {
             type _LOGICAL
             prompt {Suppress the display of positions on the screen?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
+         parameter showdata {
+            type _LOGICAL
+            prompt {Also report pixel values?}
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
