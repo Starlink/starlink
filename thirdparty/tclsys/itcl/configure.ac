@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(itcl, 3.1.0, ussc@star.rl.ac.uk)
+AC_INIT(itcl, 3.3, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
-AC_CONFIG_SRCDIR([tcl.m4])
+AC_CONFIG_SRCDIR([tclconfig/tcl.m4])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
@@ -30,7 +30,7 @@ AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configurati
 AC_ARG_WITH(tk, [  --with-tk              directory containing tk configuration (tkConfig.sh)], with_tkconfig=${withval})
 
 dnl    Define subdirectories which need to be recursed into
-itcl_subdirs="itcl itk iwidgets2.2.0 iwidgets3.0.0"
+itcl_subdirs="itcl itk iwidgets"
 AC_SUBST(itcl_subdirs)
 
 dnl    To configure iTcl, run ./configure in the subdirectories.
