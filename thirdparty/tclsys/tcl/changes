@@ -1,6 +1,6 @@
 Recent user-visible changes to Tcl:
 
-RCS: @(#) $Id: changes,v 1.50.2.3 1999/12/10 05:52:58 hobbs Exp $
+RCS: @(#) $Id: changes,v 1.79.2.26 2005/06/27 18:20:16 dgp Exp $
 
 1. No more [command1] [command2] construct for grouping multiple
 commands on a single command line.
@@ -1337,7 +1337,7 @@ to platform, which messes up Tcl tests.  Tcl_ErrnoMsg uses the standard
 POSIX messages for all the common signals, and calls strerror for
 signals it doesn't understand.
 
------------------ Released patch 7.5p2, 9/15/95 -----------------------
+----------------- Released patch 7.4p2, 9/15/95 -----------------------
 
 ----------------- Released 7.5a1, 9/15/95 -----------------------
 
@@ -4243,7 +4243,7 @@ was an incompatibility introduced in 8.1 that is being removed.
 (stanton)
 *** POTENTIAL INCOMPATIBILITY with previous beta releases ***
 
-3/26/99 (feature change) --nameble-shared is now the default and build
+3/26/99 (feature change) --enable-shared is now the default and build
 Tcl as a shared library; specify --disable-shared to build a static Tcl
 library and shell.
 *** POTENTIAL INCOMPATIBILITY ***
@@ -4579,7 +4579,7 @@ wish.  The command line was being primed with tclpip82.dll, but it was
 ignored later. 
 
 7/30/99 (bug fix) Added functions to stub table, patch provided by Jan
-Njitmans. [Bug: 2445] (hobbs)
+Nijtmans. [Bug: 2445] (hobbs)
 
 8/1/99  (bug fix) Changed Windows socket driver to terminate threads
 by sending a message to the window rather than calling
@@ -4702,11 +4702,1530 @@ so you can now close a non-blocking channel without waiting.
 11/30/99 (bug work-around) prevented the unloading of DLLs for Unix in
 TclFinalizeLoad.  This stops the seg fault on exit that some users would
 see (ie with oratcl) when using DLLs that do nasty things like register
-atexit handlers.  This feature will change again in a future version to
-requiring the user to specify that the library shouldn't be unloaded, as
-it does leave a resource leak.
+atexit handlers.
 
 12/07/99 (bug fix) fixes for 'expr + {[incr]}' and 'expr + {[error]}'
 cases (different causes).
 
 --- Released 8.2.3, December 16, 1999 --- See ChangeLog for details ---
+
+1999-09-14 (feature enhancement) added -start switch to regexp and regsub.
+
+1999-09-15 (feature enhancement) add 'array unset' command.
+
+1999-09-15 (feature enhancement) rewrote runtime libraries to use new
+string functions
+
+1999-08-18 (feature enhancement) added 'file channels' command, along with
+Tcl_GetChannelNames(Ex) public C APIs.
+
+1999-10-19 (feature enhancement) enhanced tcltest package
+
+1999-09-16 (feature enhancement) added -milliseconds switch to 'clock clicks'
+
+1999-10-28 (feature enhancement) added support for inline 'scan'
+
+1999-10-28 (feature enhancement) added support for touch functionality by
+extendeding 'file atime' and 'file mtime' to take an optional time argument
+
+1999-11-24 (feature enhancement) added 'fconfigure $sock -lasterror'
+command to Windows to query the last error received on a serial socket.
+
+1999-11-30 (bug fix) fixed handling of %Z on NT for timezones that don't
+have DST
+
+1999-12-03 (feature enhancement) improved error message in bad octal cases
+and improper use of comments. (hobbs)
+
+1999-12-07 (bug fix) fixed Tcl_ScanCountedElement to not step
+beyond the end of the counted string
+
+1999-12-09 (feature enhancement) removed all references to 16 bit
+compatibility code for Windows (hobbs)
+
+1999-12-10 (bug fix) removed check for vfork - Tcl now uses only fork in
+exec. (hobbs)
+
+1999-12-10 (optimization) changed Tcl_ConcatObj to return a list
+object when it receives all pure list objects as input (used by 'concat'),
+added optimizations in Tcl_EvalObjEx for pure list case, and optimized
+INST_TRY_CVT_TO_NUMERIC in TclExecuteByteCode for boolean objects.
+(oakley, hobbs)
+
+1999-12-12 (feature enhancement) enhanced glob command with -type, -path,
+-directory and -join switches. (darley, hobbs)
+
+1999-12-21 (bug fix) changed CreateThread to _beginthreadex and
+ExitThread to _endthreadex to prevent 4K mem leak (gravereaux)
+
+1999-12-21 (bug fix) fixed applescript for I18N
+
+1999-12-21 (feature enhancement) added -unique option to lsort (hobbs)
+
+1999-12-21 (bug fix) changed thread ids to longs (for 64bit systems)
+
+--- Released 8.3b1, December 22, 1999 --- See ChangeLog for details ---
+
+2000-01-10 (feature enhancement) clock scan now supports the common
+ISO 8601 date/time formats.  See docs for details. (melski)
+
+2000-01-10 (bug fix) prevented \ooo substitution from accepting
+non-octal digits [Bug: 3975] (hobbs)
+
+2000-01-11 (bug fix) fixed improper handling of DST by clock when
+using relative times (like "1 month" or "tomorrow"). (melski)
+
+2000-01-12 (bug fix) improved build support for Tru64 v5, NetBSD
+and Reliant Unix (hobbs)
+
+2000-01-12 (bug fix) made imported commands also import their
+compile procedure (duffin)
+
+2000-01-12 (bug fix) fixed 'info procs ::namesp::*' behavior to return
+procs in a namespace (dejong)
+
+2000-01-12 (feature enhancement) added support for setting permissions
+symbolicly (like chmod) in [file attributes $file -permissions ...] (schoebel)
+
+2000-01-13 (bug fix) fixed lsort -dictionary problem when sorting
+characters between 'Z' and 'a' (flawed upper/lower comparison logic) (melski)
+
+--- Released 8.3b2, January 13, 2000 --- See ChangeLog for details ---
+
+2000-01-14 (feature enhancement) clock format %Q added, clock scan updated
+
+2000-01-20 (bug fix) corrected complex array elem compiling (Spjuth)
+
+2000-01-20 (bug fix) made [info body] always return a string type arg,
+to prevent possible misuse of bytecodes in the wrong context (hobbs)
+
+2000-01-20 (bug fixes) several fixes to variable handling to prevent
+possible crashes, and further definition of correct behavior (melski)
+
+2000-01-25 (bug fixes) improved QNX, Ultrix and OSF1 (Tru64) config and
+compatibility (edge, furukawa)
+
+2000-01-25 (bug fix) fixed mem leak when calling lsort with a bad -command
+argument (hobbs)
+
+2000-01-27 (feature enhancement) package mechanism overhaul: changed
+behavior of pkg_mkIndex to do -direct by default, added -lazy option.
+Fixed pkg_mkIndex to handle odd proc names and auto_mkIndex to use platform
+independent file paths.  Other fixes for odd package quirks.  Added
+::pkg namespace and ::pkg::create helper function. (melski)
+
+2000-02-01 (bug fix) fixed problem where http POST would send one extra
+newline (vasiljevic)
+
+2000-02-02 (feature enhancement) added docs for new regexp -inline and
+-all switches. (hobbs)
+
+2000-02-08 (bug fix) corrected handling of "next monthname" in clock scan
+(melski)
+
+2000-02-09 (bug fix) restored Mac source to build readiness and prevented
+mac panic from an error when closing an async socket (steffen, ingham)
+
+2000-02-10 (feature enhancement) improved error reporting for failed
+loads on Windows (dejong, hobbs)
+
+--- Released 8.3.0, February 10, 2000 --- See ChangeLog for details ---
+
+2000-03 (bug fixes, feature enhancement) overhaul of http package for
+proper handling of async callbacks (new options), version is now at 2.3
+(tamhankar, welch)
+
+2000-03 (performance enhancement) speedup in Windows filename handling (newman)
+and ==/!= empty string in exprs. (hobbs)
+
+2000-03-27 (bug fix) added uniq'ing test to namespace export list to
+prevent unnecessary mem growth (hobbs)
+
+2000-03-29 (bug fix) fixed mem leak when repeatedly sourcing the same
+bytecompiled (tbc) code repeatedly across different interpreters (hobbs)
+
+2000-03-29 (config enhancement) improved build support for gcc/mingw on
+Windows (nijtmans, hobbs) and added RPM target (melski)
+
+2000-03-31 (bug fix) corrected data encoding problem when using
+"exec << $data" construct (melski)
+
+2000-04 (feature enhancement) overhaul of threading mechanism to better
+support tcl level thread command (new APIs Tcl_ConditionFinalize,
+Tcl_MutexFinalize, Tcl_CreateThread, etc, all docs in Thread.3).
+(kupries, graveraux)
+This enables the tcl level thread extension. (welch)
+
+2000-04-10 (bug fix) fixed infinite loop case in regexp -all (melski)
+
+2000-04-13 (config enhancement) added support for --enable-64bit-vis
+Sparc target. (hobbs)
+
+2000-04-18 (bug fix) moved tclLibraryPath to thread-local storage to fix
+possible race condition on MP machines (hobbs)
+
+2000-04-18 (config enhancement) added MacOS X build target and
+tclLoadDyld.c dl type. (sanchez)
+
+2000-04-23 (bug fix) several Mac socket fixes (ingham)
+
+2000-04-24 (bug fix) fixed hang in threaded Unix case when backgrounded
+exec process was running (dejong)
+
+--- Released 8.3.1, April 26, 2000 --- See ChangeLog for details ---
+
+2000-04-26 (doc fix) updated/added documentation for many API's and
+commands (melski)
+
+2000-05-02 (feature enhancement) added support for joinable threads;
+extended API's for channels to allow channels to move between threads
+(kupries)
+
+2000-05-02 (feature enhancement) changed error return for procedures
+with incorrect args to be like the Tcl_WrongNumArgs API, with a "wrong
+# args: ..." message printed, with an args list (hobbs)
+
+2000-05-08 (feature enhancement) added [array statistics] command
+
+2000-05-08 (performance enhancement) rewrote Tcl_StringCaseMatch
+algorithm for better performance; this affects the [string match]
+command; added "eq" and "ne" operands to expr, for testing
+string equality and inequality (hobbs)
+
+2000-05-09 (feature enhancement) extended [lsearch] to support sorted
+list searches and typed list searches (melski)
+
+2000-05-10 (feature enhancement) added [namespace exists] command
+(darley)
+
+2000-05-18 (build enhancement) added support for mingw compile env and
+cross-compiling (dejong)
+
+2000-05-18 (bug fix) corrected clock grammar to properly handle the
+"ago" keyword when it follows multiple relative unit specifiers
+(melski)
+
+2000-05-22 (compile fix) type cast cleanups (dejong)
+
+2000-05-23 (performance enhancement) added byte-compiled
+implementation of [return] command and [string] command (melski)
+
+2000-05-26 (performance enhancement) extended byte-compiled [string]
+command with support for [string compare/index/match] (hobbs)
+
+2000-05-27 (feature enhancement) added ability to set [info script]
+return value ([info script ?newFileName?]) (welch)
+
+2000-05-31 (feature enhancement) added support for regexp and exact
+pattern matching for [array names] (gazetta)
+
+2000-05-31 (feature enhancement) added -nocomplain and -- flags to
+[unset] to allow for silent unset operation (hobbs)
+
+--- Released 8.4a1, June 6, 2000 --- See ChangeLog for details ---
+
+2000-05-29 (bug fix) corrected resource cleanup in http error cases.
+Improved handling of error cases in http. (tamhankar)
+
+2000-07 (feature rewrite) complete rewrite of the Tcl IO channel subsystem
+to correct problems (hangs, core dumps) with the initial stacked channel
+implementation.  The new system has many more tests for robustness and
+scalability.  There are new C APIs (see Tcl_CreateChannel), but only
+stacked channel drivers are affected (ie: TLS, Trf, iogt).  The iogt
+extension has been added to the core test code to test the system.
+(hobbs, kupries)
+	**** POTENTIAL INCOMPATABILITY ****
+
+2000-07 (build improvements) cleanup of the makefiles and configure scripts
+to correct support for building under gcc for Windows. (dejong)
+
+2000-08-07 (bug fix) corrected sizeof error in Tcl_GetIndexFromObjStruct.
+(perkins)
+
+2000-08-07 (bug fix) correct off-by-one error in HistIndex, which was
+causing [history redo] to start its search at the wrong event index. (melski)
+
+2000-08-07 (bug fix) corrected setlocale calls for XIM support and locale
+issues in startup. (takahashi)
+
+2000-08-07 (bug fix) correct code to handle locale specific return values
+from strftime, if any. (wagner)
+
+2000-08-07 (bug fix) tweaked grammar to properly handle the "ago" keyword
+when it follows multiple relative unit specifiers, as in
+"2 days 2 hours ago". (melski)
+
+2000-08-07 (doc fixes) numerous doc fixes to correct SEE ALSO and NAME
+sections. (english)
+
+2000-08-07 (bug fix) new man pages memory.n, TCL_MEM_DEBUG.3, Init.3 and
+DumpActiveMemory.3. (melski)
+
+--- Released 8.3.2, August 9, 2000 --- See ChangeLog for details ---
+
+2000-06 thru 2000-11 (build improvements) Added support for mingw (gcc on
+Windows), AIX-5 and Win64 builds (dejong, hobbs)
+
+2000-06-23 (feature enhancement) ability to use Tcl_Obj *s as hash keys (duffin)
+
+2000-06-29 (new features) added [mcmax] and [mcmset] and extended [unknown] in
+msgcat package (duperval, krone, nelson)
+=> msgcat 1.1
+
+2000-08 thru 2000-09 added tclPlatDecls.h to default install (melski, hobbs)
+
+2000-08-24 (new feature) Enhanced trace syntax to add:
+	trace {add|remove|list} {variable|command} name ops command
+(darley, melski)
+
+2000-09-06 (cross-platform feature) Set ^Z (\32) as default EOF char. (hobbs)
+
+2000-09-07 partial fix for bug 2460 to prevent exec mem leak on Windows for the
+common case (gravereaux)
+
+2000-09-14 Improved string allocation growth for large strings (hintermayer,
+melski)
+
+2000-09-14 New non-panic'ing mem allocation functions Tcl_AttemptAlloc,
+Tcl_AttemptRealloc, Tcl_AttemptSetObjLength (melski)
+
+2000-09-20 (new features) completely new, enhanced syntax in tcltest package.
+Backwards compatable with tcltest v1. (hom)
+=> tcltest 2.0
+
+2000-09-27 (bug fix) fixed a bug introduced by a partial fix in 8.3.2 that
+didn't set nonBlocking correctly when resetting the flags for the write
+side (mem leak) Correct mem leak in channels when statePtr was released
+(hobbs)
+
+2000-09-29 (bug fix) corrected reporting of space parity on Windows (Eason)
+
+2000-10-06 (bug fix) corrected [file channels] to only return channels in
+the current interpreter (hobbs)
+
+2000-10-20 (performance enhancement) call stat only when necessary in 'glob' to
+speed up command significantly in base cases (hobbs)
+
+2000-10-27 Fixed mem leak in Tcl_CreateChannel. Re-purified core via test
+suites.  (hobbs)
+
+2000-10-30 (new feature) add "ja_JP.eucJP" map to "euc-jp" encoding (takahashi)
+
+2000-11-01 (mem leak) Corrected excessive mem use of info exists on a
+non-existent array element (hobbs)
+
+2000-11-02 (bug fix) Corrected sharing of tclLibraryPath in threaded
+environment (gravereaux)
+
+2000-11-03 (new feature) Tcl_SetMainLoop enables defining an event loop for
+tclsh.  This enables Tk as a truly loadable package. (hobbs)
+
+--- Released 8.4a2, November 3, 2000 --- See ChangeLog for details ---
+
+2000-09-27 (bug fix) fixed a bug introduced by a partial fix in 8.3.2 that
+didn't set nonBlocking correctly when resetting the flags for the write
+side (mem leak) Correct mem leak in channels when statePtr was released
+(hobbs)
+
+2000-09-29 (bug fix) corrected reporting of space parity on Windows (Eason)
+
+2000-10-06 (bug fix) corrected [file channels] to only return channels in
+the current interpreter (hobbs)
+
+2000-10-20 (performance enhancement) call stat only when necessary in 'glob' to
+speed up command significantly in base cases (hobbs)
+
+2000-11-01 (mem leak) Corrected excessive mem use of info exists on a
+non-existent array element (hobbs)
+
+2000-11-02 (bug fix) Corrected sharing of tclLibraryPath in threaded
+environment (gravereaux)
+
+2000-11-23 (mem leak) fixed potential memory leak in error case of lsort
+(fellows)
+
+2000-12-09 (feature enhancement) changed %o and %x to use strtoul instead
+of strtol to correctly preserve scan<>format conversion of large integers
+(hobbs)
+Fixed handling of {!<boolean>} in expressions (hobbs, fellows)
+
+2000-12-14 (feature enhancement) improved (s)rand for 64-bit platforms
+(porter)
+
+2001-01-04 (bug fix) corrected parsing of $tcl_libPath at startup on
+Windows (porter)
+
+2001-01-30 (bug fix) Fixed possible hangs in fcopy. (porter)
+
+2001-02-15 (performance enhancement) improved efficiency of [string split]
+(fellows)
+
+2001-03-13 (bug fix) Correctly possible memory corruption in string map {}
+$str (fellows)
+
+2001-03-29 (bug fix) prevent potential race condition and security leak in
+tmp filename creation on Unix. (max)
+Fixed handling of timeout for threads (corrects excessive CPU usage issue
+for Tk on Unix in threaded Tcl environment). (ruppert)
+
+2001-03-30 (bug fix) corrected Windows memory error on exit (wu)
+Fixed race condition in readability of socket on Windows.
+
+2001-04-03 (doc fixes) numerous doc corrections and clarifications.
+Update of READMEs.
+
+2001-04-04 (build improvements) redid Mac build structure (steffen)
+Corrected IRIX-5* configure (english).  Added support for AIX-5 (hobbs).
+Added support for Win64 (hobbs).
+
+--- Released 8.3.3, April 6, 2001 --- See ChangeLog for details ---
+
+2000-11-23 (new feature)[TIP 7] higher resolution timer on Windows (kenny)
+
+2001-01-18 (new feature) Tcl_InitHashTableEx renamed to Tcl_InitCustomHashTable
+(kupries)
+
+2001-03-30 (new feature)[TIP 10] support for thread-aware/hot channels (kupries)
+
+2001-04-06 (new feature)[219280] auto-loading hidden in ::errorInfo (porter)
+
+2001-04-07 (bug fix)[406709] corrected panic when extra items left on the
+byte compiler execution stack (sofer)
+
+2001-04-09 (bug fix)[219136,232558] improved use of thread-safe functions in
+unix time commands (kenny)
+
+2001-04-24 (new feature)[TIP 27] started CONST-ification of the Tcl APIs (kenny)
+
+2001-05-03 (new feature) [auto_import] now matches patterns like
+[namespace import], not like [string match] (porter)
+        **** POTENTIAL INCOMPATABILITY ****
+
+2001-05-07 (new feature)[416643] distinct srand() seed per interp (sofer)
+
+2001-05-15 (new feature) new Tcl_GetUnicodeFromObj API (hobbs)
+
+2001-05-16 (performance enhancement) byte-compiled versions of [lappend],
+[append] simple cases (hobbs)
+
+2001-05-23 (new feature) added ISO-8859-15 and koi8-u encodings, updated other
+encoding tables based on http://www.unicode.org/Public/MAPPINGS/ (kuhn)
+
+2001-05-27 (new feature) updated to Unicode 3.1.0 data set (still using 16
+bits for Tcl_UniChar though) (hobbs)
+
+2001-05-30 (new feature)[TIP 15] Tcl_GetMathFuncInfo, Tcl_ListMathFuncs,
+Tcl_InfoObjCmd, InfoFunctionsCmd APIs (fellows)
+
+2001-06-08 (bug fix,feature enhancement)[219170,414936] all Tcl_Panic 
+definitions brought into agreement (porter)
+
+2001-06-12 (bug fix)[219232] regexp returned non-matching sub-pairs to have
+index pair {-1 -1} (fellows)
+
+2001-06-27 (bug fix)[217987] corrected backslash substitution of non-ASCII
+characters.  (hobbs, riefenstahl)
+
+2001-06-28 (bug fix)[231259] failure to re-compile after cmd shadowing (sofer)
+
+2001-07-02 (bug fix)[227512] corrected [concat] treatment of UTF-8 strings
+(hobbs, barras)
+
+2001-07-12 (new feature)[TIP 36] Tcl_SubstObj API (fellows)
+
+2001-07-16 (bug fix) corrected thread-enabled pipe closing on Windows
+(hobbs, jsmith)
+
+2001-07-18 (bug fix)[427196] corrected memory overwrite error when buffer size
+of a channel is changed after channel use has already begun (kupries, porter)
+
+2001-07-31 (new feature)[TIP 17] TclFS* APIs provide new virtual file
+system.  This includes the addition of 'file normalize', 'file system',
+'file separator' and 'glob -tails' (darley)
+
+2001-08-06 (bug fix) removed use of tmpnam in TclpCreateTempFile on Unix (lim)
+
+ * improved build support for IRIX, GNU HURD, Mac OS 9 and OS X
+
+ * configure scripts revamped for better support of cygwin and gcc on
+   Windows (mdejong)
+
+ * corrected several minor errors noted by Purify (hobbs)
+
+--- Released 8.4a3, August 6, 2001 --- See ChangeLog for details ---
+
+2001-06-27 (bug fix)[217987] corrected backslash substitution of non-ASCII
+characters.  (hobbs, riefenstahl)
+
+2001-06-28 (bug fix)[231259] failure to re-compile after cmd shadowing (sofer)
+
+2001-07-02 (bug fix)[227512] corrected [concat] treatment of UTF-8 strings
+(hobbs, barras)
+
+2001-07-16 (bug fix) corrected thread-enabled pipe closing on Windows
+(hobbs, jsmith)
+
+2001-07-18 (bug fix)[427196] corrected memory overwrite error when buffer size
+of a channel is changed after channel use has already begun (kupries, porter)
+
+2001-08-06 (bug fix)[442665] corrected object reference counting in [gets]
+(jikamens)
+
+2001-08-06 (new feature) added GNU (HURD) configuration target. (brinkmann)
+
+2001-08-07 (bug fix)[406709] corrected panic when extra items left on the
+byte compiler execution stack (see test foreach-5.5) (sofer, tallneil, jstrot)
+
+2001-08-08 (new features) updated packages msgcat 1.1.1, opt 0.4.3,
+tcltest 1.0.1, dependencies checked (porter)
+
+2001-08-20 (new feature)[452217] http 2.3.2: include port number in Host: header
+to comply with HTTP/1.1 spec (RFC 2068)  (hobbs, tils)
+
+2001-08-23 (new feature) added QNX-6 build support (loverso)
+
+2001-08-23 (bug fix) corrected handling of spaces in path name passed to
+[exec] on Windows (kenpoole)
+
+2001-08-24 (bug fix) corrected [package forget] stopping on non-existent
+package (porter)
+
+2001-08-24 (bug fix) corrected construction of script library search path
+relative to executable (porter)
+
+2001-08-24 (bug fix) [auto_import] now matches patterns like
+[namespace import], not like [string match] (porter)
+        **** POTENTIAL INCOMPATABILITY ****
+
+2001-08-27 (new feature) added Tcl_SetMainLoop() to enable loading Tk as a
+true package (hobbs)
+
+2001-08-30 (bug fix) build support for Crays (andreasen)
+
+2001-09-01 (bug fix) rewrite of Tcl_Async* APIs to better manage thread
+cleanup  (gravereaux)
+
+2001-09-06 (new feature) http 2.4: honor the Content-encoding and charset
+parameters; add -binary switch for forcing the issue (hobbs, saoukhi, orwell)
+=> http 2.4
+
+2001-09-06 (performance enhancement) rewrite of file I/O flush management on
+Windows.  Approximately 100x speedup for some operations. (kupries, traum)
+
+2001-09-10 (bug fix) corrected finalization error in TclInExit (darley)
+
+2001-09-10 (bug fix) protect against alias loops (hobbs)
+
+2001-09-12 (bug fix) added missing #include in tclLoadShl.c (techentin)
+
+2001-09-12 (bug fix) script library path construction on Windows no longer
+uses registry, nor adds the current working directory to the path (porter)
+
+2001-09-12 (bug fix) correct bugs in compatibility strtod() (porter)
+
+2001-09-13 (bug fix) Tcl_UtfPrev now returns the proper location when the
+middle of a UTF-8 byte is passed in (hobbs)
+
+2001-09-19 (bug fix) [format] and [scan] corrected for 64-bit machines (rmax)
+
+2001-09-19 (new feature) --enable-64-bit support for HP-11. (hobbs)
+
+2001-09-19 (new feature) native memory allocator now default on Windows
+(hobbs)
+
+2001-09-20 (new feature) WIN64 support and extra processor definitions
+(hobbs, mstacy)
+
+2001-09-26 (bug fix) corrected potential deadlock in channels that do not
+provide a BlockModeProc (kupries, kogorman)
+
+2001-10-03  (new feature) WIN64 build support (hobbs)
+
+2001-10-03 (bug fix) correction in thread finalization (rbrunner)
+
+2001-10-04 (new feature) updated encodings with latest mappings from
+www.unicode.org (hobbs)
+
+2001-10-11 (bug fix) corrected cleanup of self-referential bytecodes at
+interpreter deletion (sofer, rbrunner)
+
+2001-10-16 (new feature) config support for MacOSX / Darwin (steffen)
+
+2001-10-16 (new feature, Mac) change in binary extension format from MachO
+bundles to standard .dylib dynamic libraries like on other unices.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-10-18 (bug fix) corrected off-by-one-day error in clock scan with
+relative months and years during swing hours. (lavana)
+
+--- Released 8.3.4, October 19, 2001 --- See ChangeLog for details ---
+
+2001-08-21 (bug fix)[219184] overagressive compilation of [catch] (sofer)
+
+2001-08-22 (new feature)[227482] [dde request -binary] (hobbs)
+=> dde 1.2
+
+2001-08-30 (performance enhancement)[456668] fully qualified command names use
+cached Command for all namespaces, avoiding repeated lookups (sofer)
+
+2001-08-31 (performance enhancement) bytecompiled [list] (hobbs)
+
+2001-09-02 (bug fix)[403553] Add -Zl to VC++ compile line for tclStubLib to
+avoid any specific C-runtime library dependence. (gravereaux)
+
+2001-09-05 (new feature) restored support for Borland compiler (gravereaux)
+
+2001-09-05 (new feature)[TIP 49] Tcl_OutputBuffered API (schroedter, fellows)
+
+2001-09-07 (new feature) restored VC++ 5.0 compatibility (gravereaux)
+
+2001-09-10 (performance enhancement)[TIP 53,451441] [proc foo args {}] now
+compiles to 0 bytecodes (sofer)
+
+2001-09-13 (new feature)[TIP 56] Tcl_EvalTokensStandard API (sofer)
+
+2001-09-13 (new feature) Old ChangeLog entries => ChangeLog.1999 (hobbs)
+
+2001-09-17 (new feature) compiling with TCL_COMPILE_DEBUG now required to 
+enable all compile and execution tracing (sofer)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-09-19 (bug fix)[411825] made TclNeedSpace UTF-8 aware (fellows)
+
+2001-09-19 (bug fix)[219166] overagressive compilation of "quoted" bodies of
+[for], [foreach], [if], and [while] (sofer)
+
+2001-09-19 (performance enhancement) bytecompiled [string match] (hobbs)
+
+2001-10-15 (new feature)[TIP 35] serial channel configuration: Win (schroedter)
+
+2001-11-06 (bug fix)[478856] loss of fileevents due to short reads (kupries)
+
+2001-11-06 (new feature) revitalized makefile.vc (gravereaux)
+
+2001-11-07 (new feature) Cygwin gcc support dropped.  Use mingw (dejong)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-11-07 (new feature) Support --include-dir= and --libdir= options to
+configure.  Store in tclConfig.sh as TCL_INCLUDE_SPEC and TCL_LIB_SPEC.
+(dejong)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-11-08 (new feature) Enable --enable-threads on FreeBSD (dejong)
+
+2001-11-08 (new feature) New make target 'make gdb' (dejong)
+
+2001-11-09 (bug fix)[480176] [global] mishandled varnames matching :* (porter)
+
+2001-11-12 (new feature)[TIP 22,33,45] new command [lset],
+[lindex] extended to accept multiple indices. (kenny, hobbs)
+
+2001-11-16 (new feature) new configure option --enable-langinfo=no.
+By default, nl_langinfo() is used on Unix to determine system encoding.
+Tcl's built-in system is used only if that fails, or configured with
+--enable-langinfo=no. (hobbs, wagner)
+
+2001-11-19 (new feature)[TIP 62] A Tcl_VarTraceProc can now return Tcl_Obj *
+or a dynamic string as well as a static string to indicate an error (fellows)
+
+2001-11-19 (new feature)[TIP 73] Tcl_GetTime API (kenny)
+
+2001-11-19 (bug fix)[478847] overflows in [time] of >2**31 microseconds (kenny)
+
+2001-11-29 (performance enhancement) caching scheme added to [binary scan]
+(fellows)
+
+2001-12-05 (new feature) new algorithm for [array get] adds safety when read
+traces modify the array. (sofer)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-12-10 (bug fix)[490514] doc fixes (porter,english)
+
+2001-12-18 (new feature) removed unix/dltest/configure; unix/configure does
+all (dejong)
+
+2001-12-19 (new feature) New make target 'make shell' (dejong)
+
+2001-12-21 (new feature) MaxOSX / Darwin support (steffen)
+
+2001-12-28 (new feature) new command [memory onexit] replaces [checkmem] when
+compiled with TCL_MEM_DEBUG.  Added documentation. (porter)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2001-12-28 (bug fix) proper case in [auto_execok] use of $env(COMPSPEC) (hobbs)
+
+2002-01-05 (feature rewrite) Tcl_Main() rewritten and documentation improved.
+Interactive operation and event loop operation (via Tcl_SetMainLoop) now
+interleave cleanly.  Also more robust against strange happenings. (porter)
+
+2002-01-17 (bug fix)[504642] Tcl_Obj refCounts in [gets] (griffen,kupries)
+
+2002-01-21 (bug fix)[506297] infinite loop writing in iso2022-jap encoding
+(forssen,kupries)
+
+2002-01-24 (HTTP server bug workaround)[504508] leave the default port out
+of the Host: header value
+=> http 2.4.1 (hobbs)
+
+2002-01-25 (new feature)[496733] socket options -eofchar and -translation
+return read-only values (dejong)
+
+2002-01-28 (new feature) Old ChangeLog entries => ChangeLog.20900 (hobbs)
+
+2002-01-28 (performance enhancement) bytecompiled [regexp] for trivial cases
+that amount to string matching.  Also -nocase and --. (hobbs)
+
+2002-02-05 (bug fix) [http::error] called when [::error] intended
+=> http 2.4.2 (porter)
+
+2002-02-05 (bug fix)[465765] avoid zero-byte writes to STREAMs
+(talcott,kupries)
+
+2002-02-06 (performance enhancement) [regsub] special cases that map to
+[string map] detected. (hobbs)
+
+2002-02-06 (bug fix)[495213] [scan] accept 0x as prefix of base 16 value
+(hobbs)
+
+2002-02-10 (new feature)[TIP 32,79] Tcl_CreateObjTrace API (kenny)
+
+2002-02-12 (new feature) partial support for DJGPP Tcl on DOS (gravereaux)
+
+2002-02-14 (mem leak) Fixed leaking an empty Tcl_Obj when [gets $chan]
+errored out. (kupries, sofer)
+
+2002-02-15 (new feature)[TIP 72] support for 64-bit integer values on
+32-bit platforms and ability to work with >2GiB files.  Extends many
+commands.  See ChangeLog and TIP for details.
+	*** POTENTIAL INCOMPATIBILITY ***
+
+2002-02-22 (bug fix)[476537] Fix panic when loading shared library without
+proper use of stubs on platform without backlinking (porter)
+
+2002-02-22 (new feature)  64-bit support for xlc compiler on AIX-4 (hobbs)
+
+2002-02-22 (new feature)[521560] Removed limits on filename length and
+format [source]able through the Safe Base (hobbs)
+
+2002-02-22 (performance enhancement) optimized bytecodes for [if], [for],
+[while] and constant conditions (sofer)
+
+2002-02-22 (new feature)[TIP 76] [regsub] can now return result (fellows)
+
+2002-02-25 (bug fix)[495207] buffer overrun when closing ] left out of
+argument to [subst] (sofer, english)
+
+2002-02-25 (bug fix)[514392] [load] updated for Mac OS X 10.1 (steffen)
+
+2002-02-26 (bug fix) [info hostname] choked on names >31 characters (hobbs)
+
+2002-02-26 (new feature)[TIP 35] serial channel configuration: Unix
+(schroedter, hobbs)
+
+2002-02-25 (bug fix)[483575] [fconfigure ... -error] now no-op on Mac (kupries)
+
+2002-02-28 (performance enhancement)[458872] fully qualified command names use
+cached Command for all namespaces, avoiding repeated lookups (sofer)
+
+ * (new feature)[TIP 27] completed CONST-ification of TCL APIs.
+Added compiler macro USE_NON_CONST to keep using those old API prototypes
+that present irreconcilable source incompatibilities with header files
+of prior Tcl releases.  Others will need to be reconciled.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-03-04 (bug fix)[474358, 218099, 219314, 524674] fixed several problems
+related to the handling of iso2022 text and finalization of escape-based
+encodings. (taguchi, takahashi, hobbs)
+
+--- Released 8.4a4, March 5, 2002 --- See ChangeLog for details ---
+
+2002-03-06 (new feature)[TIP 80] expanded [lsearch] options (wilkason, fellows)
+
+2002-03-07 (new feature)[TIP 87] [interp recursionlimit] (trier)
+
+2002-03-08 (platform feature) mingw 1.1 build favored (dejong)
+
+2002-03-20 (new feature)[TIP 27] CONST-ified variable access functions (porter)
+
+2002-03-24 (bug fix)[511666,511658,523217,530960] expanded
+Tcl_FSMatchInDirectory to handle assorted [glob] bugs in VFS. (darley)
+        *** POTENTIAL INCOMPATIBILITY with prior 8.4a releases ***
+
+2002-03-25 (bug fix)[495726] stopped tcltest disabling of auto-loading (porter)
+
+2002-03-25 (bug fix)[495977] allow \n in test constraints (porter)
+
+2002-03-27 (platform support)[527941,533862] VC/winhelp/W9X (spjuth,
+gravereaux)
+
+2002-03-28 (bug fix)[219181] exception at level 0 issues (sofer)
+
+2002-03-28 (bug fix)[219362] command termination; Tcl_CreateTrace (knoll,sofer)
+
+2002-04-05 (bug fix)[536879] exceptions during variable subst (porter)
+
+2002-04-15 (bug fix)[497446,513983] tcltest syntax errors now raised (porter)
+	***POTENTIAL INCOMPATIBILITY with prior tcltest 2.0.* (8.4aX)***
+
+2002-04-17 (bug fix)[495660] [(save|restore)state] deprecated (porter)
+
+2002-04-17 (bug fix)[526524] escape-based encodings corrected (yamamoto, hobbs)
+
+2002-04-18 (bug fix)[542588] [expr] error msgs improved (ehrens, sofer)
+
+2002-04-18 (bug fix)[545325] [info level $level] now returns [namespace eval]
+as documented (suchenwirth,sofer)
+
+2002-04-19 (bug fix)[544727] export [mcload]; ns context of [mcmax] (porter)
+=> msgcat 1.2.3
+
+2002-04-22 (performance enhancement) threaded memory allocator (AOL, hobbs)
+
+2002-04-24 (new feature) TCLTK_NO_LIBRARY_TEXT_RESOURCES #define disables
+inclusion of tcl library code in resource fork on Mac.  (steffen)
+
+2002-05-21 (platform support) static libs on OSF (dejong)
+
+2002-05-24 (bug fix)[557878] set encoding on listening socket (staplin,
+kupries)
+
+2002-05-24 (new feature)[TIP 91] Tcl_Seek compatibility (fellows)
+
+2002-05-28 (bug fix)[545579] VFS [load] left temp file (darley)
+
+2002-05-28 (bug fix)[559376] plug timezone env leak on Windows (hobbs)
+
+2002-05-29 (performance enhancement) [string compare] optimized (hobbs,fellows)
+
+2002-05-31 (bug fix)[550534] plug interp leak in [pkg_mkIndex] (helmut)
+
+2002-05-31 (dead code)[474335,555635] removed all use of matherr() (english)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-06-04 (new feature)[TIP 85,521362] custom result match in tcltest
+(markus, porter)
+=> tcltest 2.1
+
+2002-06-06 (bug fix)[524352] encoding, threading, and environment issues on
+MacOSX (steffen)
+
+2002-06-06 (bug fix)[512214,558742,512214,461000] lazy initialization of
+tcltest constraints (porter)
+
+2002-06-07 (bug fix)[563122,564595] EOVERFLOW definitions (fellows)
+
+2002-06-11 (bug fix)[567386] [info locals] corrections (sofer)
+
+2002-06-14 (new feature)[TIP 102] [trace list] renamed [trace info] (fellows)
+
+2002-06-17 (new feature)[525522,525525] msgcat support for XPG4 locales;
+examination of LC_ALL, LC_MESSAGES environment variables (haible, porter)
+=> msgcat 1.3
+
+2002-06-17 (new feature)[565088] header files assume modern C compiler by
+default; older compilers may need configuration (english)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-06-17 (bug fix)[554068] [exec] argument quoting on Windows (darley)
+
+2002-06-17 (new feature)[TIP 62,462580] command execution traces (lavana)
+
+2002-06-19 (bug fix)[558324] regexp sets a linked variable (watson)
+
+ * (performance enhancment) optimizations of bytecode execution (sofer)
+
+2002-06-21 (new feature)[TIP 99,562970] new [file link] command (darley)
+
+2002-06-24 (new feature)[TIP 101] new [tcltest::configure] command (porter)
+=> tcltest 2.2
+
+2002-06-25 (new feature) --enable-man-symlinks and --enable-man-compression
+options to configure (max)
+
+2002-06-26 (bug fix)[565880] [clock format] now respects locale (max)
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-07-03 (bug fix)[577015] [catch] catches even compile errors (sofer)
+
+--- Released 8.4b1, July 5, 2002 --- See ChangeLog for details ---
+
+2002-07-08 (bug fix) restored compatibility of [viewFile] in tcltest (porter)
+
+2002-07-11 (bug fix) [file normalize] returns long form on Win 95/98/ME (darley)
+
+2002-07-15 (performance enhancment) variable operations rewritten to store
+	and use cached Var pointers (sofer)
+
+2002-07-22 (bug fix)[218000] Inf and Nan are floating-point values (fellows)
+
+2002-07-23 (platform support)[219220] 64-bit compile on IRIX (dejong)
+
+2002-07-25 (bug fix)[219218] return codes in background errors (english)
+
+2002-07-28 (bug fix)[582522] alias fires exec traces (sofer)
+
+2002-07-29 (bug fix)[578363] regexp (fellows,pvgoran)
+
+2002-07-30 (bug fix)[584603] WriteChars infinite loop non-UTF-8 string (kupries)
+
+2002-08-04 (new feature)[584051,580433,585105,582429][TIP 27] Tcl interfaces 
+	are now fully CONST-ified.  Use the symbols USE_NON_CONST or
+	USE_COMPAT_CONST to select interfaces with fewer changes.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-08-05 (bug fix)[589859] tcltest setup and cleanup scripts skipped when
+	test body is skipped (porter)
+	=> tcltest 2.2
+
+2002-08-07 (bug fix)[587488] mem leak with USE_THREAD_ALLOC (sofer,sass)
+	
+2002-08-07 (feature enhancement)[584794,584650,472576] boolean values
+	are no longer always re-parsed from string. (sofer)
+
+Many internal bugs fixed.
+Considerable cleanup of the test suite.
+
+--- Released 8.4b2, August 9, 2002 --- See ChangeLog for details ---
+
+2002-08-20 (new feature) --enable-memdebug configure option (kupries)
+
+2002-08-23 (bug fix)[597936] mem leak with USE_THREAD_ALLOC (sofer,zoran)
+
+2002-08-26 (bug fix)[599788] segfault in compiler (sofer,wilkason)
+
+2002-08-28 (bug fix)[414910] avoid mem leaks accessing environment variables
+	on Windows (welton,gravereaux)
+
+2002-08-31 (platform support)[TIP 108] Mac OS X port (steffen,ingham)
+
+2002-09-02 (platfrom support) 64-bit compile on HP-11 (martin)
+
+--- Released 8.4.0, September 10, 2002 --- See ChangeLog for details ---
+
+2002-09-18 (platform support) Updated support for compiling with Cygwin and
+either mingw or gcc. (khan, howell, dejong)
+
+2002-09-22 (bug fix)[612786, 611922] Corrected [puts -nonewline] within
+test bodies. Also corrected reporting of body return code.  Updated tcltest
+to v2.2.1.
+
+2002-09-24 (bug fix)[613117] More robust 64-bit wide integer value
+detection (fellows)
+
+2002-09-26 (bug fix) correct overeager optimization of noop proc to handle
+the precompiled case. (sofer, hobbs)
+
+2002-09-26 (bug fix)[615115] removed extraneous spaces in koi8-u.enc that
+confused encoding reader.
+
+2002-09-29 (bug fix)[219355] Added proper exiting conditions using Win32
+console signals.  This handles the existing lack of a Ctrl+C exit to call
+exit handlers when built for thread support.  Also, properly handles exits
+from other conditions such as CTRL_CLOSE_EVENT, CTRL_LOGOFF_EVENT, and
+CTRL_SHUTDOWN_EVENT signals.  In all cases, exit handlers will be called.
+(gravereaux)
+
+2002-09-30 (bug fix) improve the checking for bad regular expressions
+during regexp compilation.  Resultant compiles were correct, but much
+slower than necessary. (hobbs)
+
+2002-10-01 (bug fix) fix precompiled locals to support 8.3 precompiled
+code. (hobbs)
+
+2002-10-09 (bug fix)[620735] Added code to set an exit handler on Windows
+that terminates the thread that calibrates the performance counter, so that
+the thread won't outlive unloading the Tcl DLL. (kenny)
+
+2002-10-09 (build support) all --enable-symbols to take the enhanced
+options yes|no|mem|compile|all. (hobbs)
+
+2002-10-10 (build support) enable USE_THREAD_ALLOC (new threaded allocator)
+by default on Windows. (hobbs, gravereaux)
+
+2002-10-14 (bug fix)[623269] correct possible mem leak in
+Tcl_PutEnv. (brouwers)
+
+2002-10-15 (bug fix)[615043] fix in execution traces with idle tasks
+firing. (lavana)
+
+2002-10-15 (platform support) Correct AIX-5 ppc and 4/5 64-bit build flags.
+Correct HP 11 64-bit gcc building. (martin, hobbs)
+
+2002-10-17 (bug fix)[624755] Fixed code that check for proper # of args to
+[array names] (porter)
+
+2002-10-18 (feature enhancement)[625453] Added support for broadcasting
+changes to the registry Environment on Windows.  Updated registry package
+to v1.1. (hobbs)
+
+2002-10-22 (platform support)[624509] On macosx, add embedded framework
+dirs to tcl_pkgPath: @executable_path/../Frameworks and
+@executable_path/../PrivateFrameworks (if they exist), as well as the dirs
+in DYLD_FRAMEWORK_PATH (if set). (steffen)
+
+--- Released 8.4.1, October 22, 2002 --- See ChangeLog for details ---
+
+2002-10-28 (bug fix)[627660] [package unknown] chaining for platform specifics
+
+2002-10-29 (bug fix)[627546] verbose [load] (dyld) error mesages on MacOSX
+
+2002-11-01 (bug fix) [package provide registry] consistent versions.
+
+2002-11-06 (bug fix)[582039] missing ar program -> configuration error
+
+2002-11-06 (feature enhancement) added new TclInThreadExit function to
+test for thread exit vs whole process exit condition. The TclInExit
+function now correctly returns 1 during Tcl_Finalize processing.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-11-13 (bug fix)[615043] some execution traces were not firing
+
+2002-11-18 (bug fix)[634856] multiple signs no longer accepted as valid integer
+[string is integer ++1] => 0
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2002-11-26 (bug fix)[593810,597924] clean exit of channel worker threads on Win
+
+2002-11-28 (new feature) `make valgrind` target
+
+2002-12-03 (bug fix)[615304] repeated load/unload of Tcl now possible
+
+2002-12-11 (bug fix)[647307] negative return codes now propagated by procs
+
+2002-12-11 (bug fix)[648441] syntax error in [expr 0x] now detected.
+
+2003-01-07 (bug fix)[633204] [catch {return}] => 2 (not 0)
+
+2003-01-09 (bug fix)[634151] [file (a|m)time $nonASCIIpath $time] now works
+
+2003-01-16 (bug fix) dde eval with {} service name does not crash.
+=> dde 1.2.1
+
+2003-01-16 (bug fix)[635200,655645,615043,571385] many command trace fixes
+
+2003-01-31 (bug fix)[675614,678415,676978] tcltest conflicts in cleanup
+and -outfile; also failure in space-containing path; also missing [close]
+=> tcltest 2.2.2
+
+2003-02-01 (bug fix)[670042] corrected [info loaded {}] for static
+packages in multiple interps.
+
+2003-02-01 (bug fix)[675356] [clock clicks {}]; [clock clicks -] - syntax errs
+
+2003-02-01 (bug fix)[656660] MT-safety for [clock format] 
+
+2003-02-03 (bug fix)[651271] command rename traces get fully-qualified names
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2003-02-07 (performance improvement) [glob] on Windows is 2.5 times faster
+
+2003-02-07 (feature change) lack of Cygwin support indicated by config error
+
+2003-02-11 (bug fix)[684744] [info complete] stopped by \x00
+
+2003-02-11 (bug fix)[685445] [glob -types l] missed broken symlinks on Unix
+
+2003-02-11 (bug fix) [lsearch -regexp $a $a] doesn't crash
+
+2003-02-13 (bug fix)[685926] accept non-ASCII7 for tcl_platform(user) on Win
+
+2003-02-15 (bug fix)[673714] stop crash when Tcl_DeleteEvents deletes last
+
+2003-02-15 (bug fix)[681841] parser missed some missing ] syntax errors
+
+2003-02-17 (bug fix)[684756] memory leak during command rename plugged
+
+2003-02-18 (bug fix)[689100] reduced per-thread memory overhead
+
+2003-02-18 (platform support)[651811] use xnet library on HP 11 (64 bit).
+
+2003-02-20 (bug fix)[Patch 689341] correct jis round-trip encoding
+
+2003-02-20 (bug fix)[689835] stop MacOSX hang trying to read a write-only pipe
+
+2003-02-07 (performance improvement) [tclPkgUnknown]: fewer vfs calls
+
+2003-02-18 (platform support) cut and splice procs for file channels on Mac
+
+2003-02-21 (bug fix)[690774] [binary scan] failed on some wide ints
+
+2003-02-22 (bug fix)[571002] plugged data leak during thread exit
+
+2003-02-25 (feature change) [pkg_mkIndex -load]: case-insensitive match
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2003-02-27 (bug fix)[694232] stop [lsearch -start 0 {} x] segfault
+
+--- Released 8.4.2, March 3, 2003 --- See ChangeLog for details ---
+
+2003-03-06 (bug fix)[699042] Correct case-insensitive unicode string
+comparison in Tcl_UniCharNcasecmp
+
+2003-03-11 (bug fix) Corrected loading of tclpip8x.dll on Win9x
+
+2003-03-12 (bug fix)[702383] Corrected parsing of interp create --
+
+2003-03-12 (bug fix)[685106] Correct Tcl_SubstObj handling of \x00 bytes
+
+2003-03-14 (bug fix)[702622 699060] Correct wide int issues in 'format'
+
+2003-03-14 (bug fix)[698146] Remove assumption that file times and longs
+are the same size.
+
+2003-03-18 (bug fix)[697862] Allow Tcl to differentiate between reparse
+points which are symlinks and mounted drives on Windows
+
+2003-03-19 (bug fix)[705406] Bad command count on TCL_OUT_LINE_COMPILE
+
+2003-03-20 (bug fix)[707174] Store pointers to notifier funcs in a struct
+to work around some platform linker issues
+
+2003-03-22 (bug fix)[708218] Load correct (non-)debug dll for dde or
+registry
+
+2003-03-24 (bug fix)[631741 696893] Fixing ObjMakeUpvar's lookup algorithm
+for the created local variable
+
+2003-04-07 (bug fix)[713562] Make sure that tclWideIntType is defined and
+somewhat sensible everywhere
+
+2003-04-07 (bug fix)[711371] Corrected string limits of arguments
+interpolated in error messages for 'if'
+
+2003-04-11 (bug fix)[718878] Corrected inconsistent results of
+[string is integer] observed on systems where sizeof(long) != sizeof(int)
+
+2003-04-12 (bug fix) Substantial changes to the Windows clock synch
+phase-locked loop in a quest for improved loop stability
+
+2003-04-16 [713562] Made changes so that the "wideInt" Tcl_ObjType is
+defined on all platforms, even those where TCL_WIDE_INT_IS_LONG is defined.
+Also made the Tcl_Value struct have a wideValue field on all platforms.
+Potential incompatibility for TCL_WIDE_INT_IS_LONG platforms because that
+struct changes size.
+        *** POTENTIAL INCOMPATIBILITY ***
+
+2003-04-25 (bug fix)[727271] Catch any errors returned by the Windows
+functions handling TLS ASAP instead of waiting to get some mysterious crash
+later on due to bogus pointers.
+
+2003-04-29 (bug fix) Correct 'glob -path {[tcl]} *', where leading
+special character instead lists files in '/'.  Bug only occurs on Windows
+where '\' is also a directory separator.
+
+2003-05-09 (bug fix)[731754] Fixed memory leak in threaded allocator on
+Windows caused by treating cachePtr as a TLS index
+
+2003-05-10 (bug fix)[710642] Ensure cd is thread-safe
+
+2003-05-10 (bug fix)[718002] Correct mem leak on closing a Windows serial
+port
+
+2003-05-10 (bug fix)[714106] Prevent string repeat crash when overflow
+sizes were given (throws error).
+
+2003-05-13 (feature enhancement)[736774] Use new versioned bundle resource
+API to get tcl runtime library for TCL_VERSION on Mac OS X.
+
+2003-05-13 (bug fix)[711232] Worked around the issue of realpath() not
+being thread-safe on Mac OS X by defining NO_REALPATH for threaded builds
+on Mac OS X.
+
+2003-05-14 (bug fix)[557030] Correct handling of the gb2312 encoding by
+making it an alias of the euc-cn encoding and creating a gb2312-raw
+encoding for the original.  Most uses of gb2312 really mean euc-cn.
+
+2003-05-14 (bug fix)[736421] Corrected another putenv() copy behavior
+problem when compiling on Windows and using Microsoft's runtime.
+
+--- Released 8.4.3, May 20, 2003 --- See ChangeLog for details ---
+
+2003-05-23 (bug fix)[726018] reverted internals change to the
+'cmdName' Tcl_ObjType that broke several extensions (TclBlend, e4graph...)
+in the 8.4.3 release.
+
+2003-06-10 (bug fix)[495830] stop eval of bytecode in deleted interp.
+
+2003-06-17 (bug fix) corrections to regexp when matching emtpy string.
+
+2003-06-25 (bug fix)[748957] -*ieee compiler flags for Tru64 builds.
+
+2003-07-11 (bug fix) [pkg_mkIndex] indexes provided packages, not indexed ones.
+
+2003-07-15 (feature enhancement) MacOSX build system rewrite.
+
+2003-07-15 (bug fix)[771613] corrected segfault in [if] (buffer overflow)
+
+2003-07-16 (bug fix)[756791] corrected assumption that Tcl_Free == free
+
+2003-07-16 (feature enhancement) -DTCL_UTF_MAX=6 compile option forces 
+internal UCS-4 representation of Unicode (default is recommended UCS-2).
+
+2003-07-16 (bug fix)[767578] 64-bit corrections in thread notifier.
+
+2003-07-16 (bug fix)[759607] Safe Base tests normalized paths.
+
+2003-07-16 (feature enhancement)[Patch 679315] improved Cygwin path support
+
+2003-07-18 (bug fix)[706359] corrected broken -output option of [tcltest::test]
+=> tcltest 2.4.4
+
+2003-07-18 (bug fix)[753315] MT-safety of VFS records.
+
+2003-07-18 (bug fix)[759888] support for user:pass in URL by [http::geturl]
+=> http 2.4.4
+
+Improved documentation, new tests, and some code cleanup.
+[655300, 720634, 735364, 748700, 756112, 756744, 756951, 758488, 760768,
+763312, 769895, 771539, 771840, 771947, 771949, 772333]
+
+--- Released 8.4.4, July 22, 2003 --- See ChangeLog for details ---
+
+2003-07-23 (bug fix)[775976] fix registry compilation for VC7.
+
+2003-08-05 (enhancement)[781585] Use Tcl_ResetResult in bytecodes to
+prevent potential costly Tcl_Obj duplication.
+
+2003-08-06 (bug fix)[781609] prevent non-Windows platforms from trying to
+use the registry package inside msgcat.
+
+2003-08-27 (bug fix)[411825] Fix TclNeedSpace to handle non-breaking space
+(\u00A0) and backslash escapes correctly.
+
+2003-09-01 (bug fix)[788780] Fix thread-safety issues in filesystem records.
+
+2003-09-19 (bug fix)[804681] Protect ::errorInfo and ::errorCode traces
+from corrupting stack.
+
+2003-09-23 (bug fix)[218871] Fix handling of glob-sensitive chars in
+auto_load and auto_import.
+
+2003-10-03 (bug fix)[811483] Fixed refcount management for command and
+execution traces.
+
+2003-10-04 (bug fix)[789040] Fixed exec command.com error for Win9x.
+
+2003-10-06 (bug fix)[767834, 813273] Fixed volumerelative file
+normalization and 'file join' inconsistencies.
+
+2003-10-08 (bug fix)[769812] Fix Tcl_NumUtfChars string length calculation
+when negative parameter is given.
+
+2003-10-22 (bug fix)[800106] Handle VFS mountpoints inside glob'd dirs.
+
+2003-10-22 (bug fix)[599468] Watch for FD_CLOSE too on Windows when
+asked for writable events by the generic layer.
+
+2003-10-23 (bug fix)[813606] Detect OS X pipes correctly.
+
+2003-11-05 (bug fix)[832657] Allow .. in libpath initialization.
+
+2003-11-11 (bug fix) Improve AIX-64 build configuration.
+
+2003-11-17 (bug fix)[230589, 504785, 505048, 703709, 840258] fixes to
+various odd regexp "can't happen" bugs.
+
+--- Released 8.4.5, November 20, 2003 --- See ChangeLog for details ---
+
+2003-12-02 (bug fix)[851747] object sharing fix in [binary scan]
+
+2003-12-09 (platform support)[852369] update errno usage for recent glibc
+
+2003-12-12 (bug fix)[858937] fix for [file normalize ~nobody] 
+
+2003-12-17 (bug fix)[839519] fixed two memory leaks (vasiljevic)
+
+2004-01-09 (bug fix)[873311] fixed infinite loop in TclFinalizeFilesystem
+
+2004-02-02 (bug fix)[405995] Tcl_Ungets buffer filling fix
+
+2004-02-04 (bug fix)[833910] tcltest command line option parsing error
+=> tcltest 2.4.5
+
+2004-02-04 (bug fix)[833637] code error in tcltest -preservecore operation
+
+2004-02-12 (feature enhancement) update HP-11 build libs setup
+
+2004-02-17 (bug fix)[849514,859251] corrected [file normailze] of $link/.. 
+
+2004-02-17 (bug fix)[772288] Unix std channels forced to exist at startup.
+
+2004-02-17 (new default) tcltest::configure -verbose {body error}
+
+2004-02-19 (bug fix) init.tcl search path with unusual --libdir (samson)
+
+2004-02-25 (bug fix)[554068] stopped broken [exec] quoting of { (gravereaux)
+
+2004-02-25 (bug fix)[888777] plugged memory leak with long host names (cassoff)
+
+2004-03-01 (bug fix)[462580] corrected level interpretation of Tcl_CreateTrace
+
+2004-03-01 (platform support)[218561] Allow 64-bit configure on IRIX64-6.5*
+
+--- Released 8.4.6, March 1, 2004 --- See ChangeLog for details ---
+
+2004-03-08 (bug fix)[910525] [glob -path] in root directory (darley)
+
+2004-03-15 (bug fix)[916795] syntax error -> compiler segfault (sofer,porter)
+
+2004-03-29 (bug fix)[920667] install into any Unicode path on Win (hobbs)
+
+2004-03-31 (bug fix)[811457] support translation to "" (porter)
+2004-03-31 (bug fix)[811461] ignore locales with no "language" part (porter)
+=> msgcat 1.3.2
+
+2004-04-07 (platform support) properly substitute more values in Windows
+tclConfig.sh (hobbs)
+
+2004-04-23 (bug fix)[930851] reset channel EOF when eofchar changes (kupries)
+
+2004-05-03 (bug fix)[947070] stack overflow prevention on Win (kenny)
+
+2004-05-03 (bug fix)[868853] fix leak in [fconfigure $serial -xchar] (cassoff)
+
+2004-04-05 (bug fix)[928353,929892,928808,947440,948177] test fixes: OSX
+(abner)
+
+2004-05-04 (bug fix) crash: [cd] w/ volumerelative $HOME (hobbs)
+
+2004-05-05 (bug fix)[794839] socket connect error -> r/w fileevents
+(gravereaux)
+
+2004-05-14 (bug fix)[940278,922848] [clock] notices $::env(TZ) changes, 
+gmt works on all platforms. (kenny, welton, glessner)
+
+2004-05-18 (bug fix)[500285,500389,852944] [clock %G %V] ISO8601 week numbers
+(kenny)
+
+2004-05-22 (bug fix)[735335,736729] variable name resolution error (sofer)
+
+2004-05-24 (bug fix) support for non-WIDE_INT aware math functions (hobbs)
+
+2004-05-25 (new feature) [http::config -urlencoding] (hobbs)
+=> http 2.5.0
+
+2004-05-26 (bug fix)[960926] file count doubled when -singleproc 1 (porter)
+=> tcltest 2.2.6
+
+2004-05-27 (bug fix)[949905] corrected utf-8 encoding of \u0000 on I/O (max)
+
+2004-06-05 (bug fix)[976722] hi-res clock fixes: Win
+(godfrey, suchenwirth, kenny)
+
+2004-06-10 (bug fix)[932314] bad return values from Tcl_FSChdir() (vasiljevic)
+
+2004-06-14 (bug fix) correct dde hangs w/non-responsive apps (thoyts)
+=> dde 1.2.3
+
+2004-06-21 (platform support) exceptions w/ gcc -O3 on Win (dejong)
+
+2004-06-29 (bug fix)[981733] SafeBase global pollution (fellows)
+
+2004-07-02 (new feature)[TIP 202] pipe redirection 2>@1 (hobbs)
+
+2004-07-03 (bug fix)[908375] round() wide integer support (lavana, sofer)
+
+2004-07-15 (bug fix)[770053] crash in thread finalize of notifier (vasiljevic)
+
+2004-07-15 (bug fix)[990453] plug mutex leaks on reinit
+(mistachkin, vasiljevic)
+
+2004-07-16 (bug fix)[990500] clean exit of notifier thread
+(mistachkin, kupries)
+
+2004-07-19 (bug fix)[987967] improved self-init of mutexes on Win (vasiljevic)
+
+2004-07-19 (bug fix)[874058] improved build configuration on 64-bit systems.
+Corrects Tcl_StatBuf definition issues.  (hobbs)
+
+2004-07-20 (bug fix) pure Darwin/CFLite support (steffen)
+
+2004-07-20 (bug fix)[736426] plug leaky allocator reinit (mistachkin, kenny)
+
+--- Released 8.4.7, July 26, 2004 --- See ChangeLog for details ---
+
+2004-07-28 (bug fix)[999084] no deadlock in re-entrant Tcl_Finalize (porter)
+
+2004-08-10 (bug fix) thread IDs on 64-bit systems (ratcliff,vasiljevic)
+
+2004-08-13 (bug fix) avoid malicious code acceptance by [mclocale] (porter)
+=> msgcat 1.3.3
+
+2004-08-16 (bug fix)[1008314] Tcl_SetVar TCL_LIST_ELEMENT (sofer,porter)
+
+2004-08-19 (bug fix)[1011860] [scan %ld] fix on LP64 (fellows,porter)
+
+2004-08-30 (bug fix) [string map $x $x] crash (fellows)
+
+2004-09-01 (bug fix)[1020445] WIN64 support (hobbs)
+
+2004-09-07 (bug fix)[1016167] [after] overwrites its imports (kenny)
+
+2004-09-08 (bug fix) fixed [clock format 0 -format %k] (kenny)
+
+2004-09-09 (bug fix)[560297] fixed broken [namespace forget] logic (porter)
+
+2004-09-09 (bug fix)[1017299] fixed [namespace import] cycle prevention (porter)
+
+2004-09-10 (performance) $x[set x {}] is now fast [K $x [set x {}]] (sofer)
+
+2004-09-10 (bug fix)[868489] better control over int <-> wideInt (fellows,kenny)
+
+2004-09-10 (bug fix)[1025359] POSIX errorCode from wide seeks (kupries,fellows)
+
+2004-09-18 (bug fix)[868467] fix [expr 5>>32] => 0, not 5 (hintermayer,fellows)
+
+2004-09-23 (bug fix)[1016726] fix `make clean` in static config (leitgeb,dejong)
+
+2004-09-29 (bug fix)[1036649] syntax error in [subst] => buffer overflow (sofer)
+
+2004-09-30 (bug fix)[1038021] save/restore error state: var traces (porter)
+
+2004-10-08 (bug fix)[954263] case insensitive [file exec] for Win (hobbs,darley)
+
+2004-10-14 (performance) [info commands/globals/procs/vars $pattern] faster
+		when $pattern is trivial (fellows)
+
+2004-10-28 (bug fix)[1030548] restore the --enable-symbols --enable-threads
+		build on Win (mistachkin,kenny,kupries)
+
+2004-10-29 (bug fix)[1055673] fix command line syntax error message (porter)
+=> tcltest 2.2.7
+
+2004-10-31 (bug fix)[1057461] fix [info globals ::varName] (fellows)
+
+2004-11-02 (bug fix)[761471] fix [expr {NaN == NaN}] (sofer)
+
+2004-11-02 (bug fix)[1017151] misleading errorInfo after tests (seeger,porter)
+
+2004-11-11 (bug fix)[1034337] recursive file delete, MacOSX (steffen)
+
+2004-11-12 (bug fix)[1004065] stop crash when TCL_UTF_MAX==6 (hobbs,porter)
+
+2004-11-15 (bug fix)[10653678] [trace variable],[trace remove] interop (porter)
+
+2004-11-16 (bug fix)[695441] [tcl_findLibrary] search $::auto_path too (porter)
+
+2004-11-16 (bug fix)[1067709] crash in [fconfigure -ttycontrol] (hobbs)
+
+2004-11-18 (new feature) configure options --enable-man-suffix (max)
+
+Documentation improvements [759545,1058446,1062647,1065732,etc.]
+Test suite expansion [1036649,1001997,etc.]
+
+--- Released 8.4.8, November 18, 2004 --- See ChangeLog for details ---
+
+2004-11-22 (bug fix)[1030465] Improve HAVE_TYPE_OFF64_T check (dejong)
+
+2004-11-23 (bug fix)[1072654] Fixed segfault in info vars trivial
+matching branch (new in 8.4.8) (porter)
+
+2004-11-23 (bug fix)[1043129] Fixed the treatment of backslashes in file
+join on Windows (darley)
+
+2004-11-24 (bug fix)[1001325, 1071701] Fixed readdir_r detection and usage
+(dejong, kenny, porter)
+
+2004-11-24 (bug fix)[1071807] Fixed all uses of 'select' to use standard
+macros rather than older bit-whacking style (kenny)
+
+2004-11-26 (bug fix)[1072136] Remove file normalize on tcl_findLibrary
+search path uniqification added in 8.4.8 (porter)
+
+2004-12-02 (bug fix)[1074671] Ensure tilde paths are not returned specially
+by 'glob' (darley)
+
+--- Released 8.4.9, December 6, 2004 --- See ChangeLog for details ---
+
+2004-12-29 (platform support)[1092952,1091967] MSVC7, gcc OPT compiles (hobbs)
+
+2005-01-05 (bug fix)[1084595] encoding maps for some Chinese locales (fellows)
+
+2005-01-06 (performance)[1020491] [http::mapReply] (fellows)
+=> http 2.5.1
+
+2005-01-25 (bug fix)[1101670] [auto_reset] update for [namespace] (porter)
+
+2005-01-27 (new feature)[TIP 218] Tcl_Channel API update for threads (kupries)
+
+2005-01-27 (bug fix)[1109484] Tcl_Expr* updates for Tcl_WideInt (hobbs)
+
+2005-01-28 (platform support)[1021871] Solaris gcc 64-bit support (hobbs)
+
+2005-02-10 (bug fix)[1119369] Tcl_EvalObjEx: avoid shimmer loss of List intrep
+(sofer,macdonald)
+
+2005-02-10 (platform support) correct gcc builds for AIX-4+, HP-UX-11 (hobbs)
+
+2005-02-24 (bug fix)[1119798] prevent [source $directory] (porter,mpettigr)
+=> tcltest 2.2.8
+
+2005-03-10 (bug fix)[1153871] bad ClientData cast (porter,victorovich)
+
+2005-03-15 (platform support) OpenBSD ports patch (thoyts)
+
+2005-03-15 (platform support)[1163422] time_t wider than long (kenny)
+
+2005-03-18 (bug fix)[1115904] restore recursion limit in direct eval (porter)
+
+2005-03-29 (platform support) allow msys builds without cygwin (hobbs)
+
+2005-04-06 (bug fix)[1178445] fix memory waste at thread exit (vasiljevic)
+
+2005-04-13 (bug fix) min buffer size dropped from 10 to 1 byte (gravereaux)
+
+2005-04-19 (bug fix)[947693] Windows pipes honor -blocking during close
+(gravereaux)  ***POTENTIAL INCOMPATIBILITY***
+async pipes on windows, set -blocking 1 before [close] to receive exit status
+
+2005-04-20 (bug fix)[1090869] Tcl_GetInt accept 0x80000000, 64-bit
+(porter,singh)
+
+2005-04-22 (bug fix)[1187123] [string is boolean] respect EIAS (porter)
+
+2005-04-25 (platform support) builds on Mac OS X 10.1 (steffen)
+
+2005-05-06 (platform support) x86_64 Solarix cc and Solaris 10 builds (hobbs)
+
+2005-05-14 (platform support) Mac OSX: configurable CoreFoundation API
+(steffen)
+
+2005-05-14 (platform support) Mac OSX: use realpath when threadsafe (steffen)
+
+2005-05-20 (bug fix)[1201589] boolean literal prefix in expressions (porter)
+
+2005-05-24 (platform support) Darwin build support merged into unix (steffen)
+
+2005-05-24 (new feature)[1202209] Mac OSX: support [load] of .bundle binaries
+Can support [load] from memory as well (steffen)
+
+2005-05-24 (new feature)[1202178] [time] returns non-integer result (steffen)
+
+2005-05-31 (bug fix)[1082283] Unix: notifier thread now joinable (vasiljevic)
+
+Documentation improvements [1075433,1085127,1117017,1124160,1149605,etc.]
+
+--- Released 8.4.10, June 4, 2005 --- See ChangeLog for details ---
+
+2005-06-06 (bug fix)[1213678] Windows/gcc: crash in stack.test (kenny)
+
+2005-06-07 (bug fix) Unix: --enable-threads compile failure (fellows)
+
+2005-06-18 (bug fix)[1154163] [format %h] on 64-bit OS's (kraft,fellows)
+
+2005-06-21 (bug fix)[1201035,1224585] execution trace crashes (porter)
+
+2005-06-21 (bug fix)[1194458] Windows: [file split] (kenny,porter)
+
+2005-06-22 (bug fix)[1225727] Windows: pipe finalization crash (kenny)
+
+2005-06-22 (bug fix)[1225571] Windows: [file pathtype] buffer overflow (thoyts)
+
+2005-06-22 (bug fix)[1225044] Windows: UMR in pipe close (kenny)
+
+2005-06-23 (bug fix)[1225957] Windows/gcc: crashes in assembler code (kenny)
+
+2005-06-27 (revert)[1101670] [auto_reset] disabled in non-global namespace.
+Restores Tcl 8.4.9 behavior (porter)
+
+--- Released 8.4.11, June 28, 2005 --- See ChangeLog for details ---
