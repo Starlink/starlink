@@ -37,9 +37,15 @@
 *  History:
 *     2006-01-11 (AGG):
 *        Initial version, copy from smf_fits_getD
+*     2006-01-24 (TIMJ):
+*        There is no "float" version of astGetFits, so use astGetFitsD
+*        and cast the result.
 *     {enter_further_changes_here}
 
 *  Notes:
+*     - Only use this function if you really really need a float
+*       rather than a double. Consider using smf_fits_getD and
+*       casting the result to float.
 *     - See also smf_fits_getI, smf_fits_getS and smf_fits_getD
 
 *  Copyright:
@@ -68,9 +74,7 @@
 */
 
 /* Starlink includes */
-#include "ast.h"
 #include "sae_par.h"
-#include "mers.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -80,32 +84,19 @@
 #define FUNC_NAME "smf_fits_getF"
 
 void smf_fits_getF (const smfHead *hdr, const char * name, float * result, int * status ) {
+  double astres;
 
   if (*status != SAI__OK) return;
 
-  if ( hdr == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied hdr is a NULL pointer. Possible programming error.",
-	    status);
-    return;
-  }
+  /* Call smf_fits_getD and cast the result. This is allowed since
+     AST always uses Double precision rather than single precision */
+  smf_fits_getD( hdr, name, &astres, status );
 
-  if ( hdr->fitshdr == NULL ) {
-    * status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "No FitsChan associated with supplied header. Possible programming error.",
-	    status );
-    return;
-  }
-
-  if ( !astGetFitsF( hdr->fitshdr, name, result) ) {
-    if ( *status == SAI__OK) {
-      *status = SAI__ERROR;
-      msgSetc("FITS", name );
-      errRep(FUNC_NAME, "Unable to retrieve item ^FITS from header",
-	     status);
-    }
+  /* Simply cast the result */
+  if (*status == SAI__OK) {
+    *result = (float)astres;
+  } else {
+    *result = 0.0;
   }
 
   return;
