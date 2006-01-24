@@ -509,6 +509,7 @@
 
 *  See if the NDF has a variance component, if so map it in.
       CALL NDF_STATE( INDF, 'VARIANCE', ISVAR, STATUS )
+      IPVAR = 0
       IF ( ISVAR ) THEN
          CALL NDF_MAP( INDF, 'VARIANCE', '_REAL', 'READ', IPVAR, NEL,
      :                 STATUS )
@@ -598,6 +599,7 @@
       ENDIF
 
 *  Now get the ARD description and apply it to some workspace.
+      IPMASK = 0
       IF ( USEMSK ) THEN
          CALL ARD_GROUP( 'MASK', GRP__NOID, ARDGRP, STATUS )
          CALL AIF_TEMP( '_INTEGER', 2, IDIMS, MLOC, STATUS )
