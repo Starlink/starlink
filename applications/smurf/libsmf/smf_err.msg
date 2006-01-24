@@ -8,4 +8,5 @@
 .BASE      100
 FLATN      <Data already flatfielded>
 NOHDR      <No FITS component>
+STRUN      <String truncated>
 .END

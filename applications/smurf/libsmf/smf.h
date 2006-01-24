@@ -43,10 +43,12 @@
 *        Add smf_tslice and smf_insert_tslice
 *     2006-01-10 (AGG)
 *        Add smf_scale_tau and smf_fits_getF
+*     2006-01-24 (TIMJ):
+*        Add smf_fits_getS
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -94,7 +96,7 @@ void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *statu
 void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, int * status );
 void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, int * status );
 void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, int * status );
-void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], int * status );
+void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], size_t len, int * status );
 
 void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
