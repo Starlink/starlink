@@ -1,21 +1,21 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void CGEN_FUNCTION(cupidKCheckFace)( CGEN_TYPE *array, int nel, int axis, 
+void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis, 
                                      int lbnd, int dims[ 3 ], int skip[ 3 ],
                                      int xvec[ 3 ], double *work1, 
                                      int *work2, int *mask, int minpix,
                                      double thresh, double noise, double rms ){
 /*
 *  Name:
-*    cupidKCheckFace<X>
+*    cupidRCheckFace<X>
 
 *  Purpose:
 *     Scan the cube for clump edges and peaks using a set of parallel lines 
 *     which start on a given face of the cube.
 
 *  Synopsis:
-*    void cupidKCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
+*    void cupidRCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
 *                             int dims[ 3 ], int skip[ 3 ], int xvec[ 3 ], 
 *                             double *work1, int *work2, int *mask, int minpix,
 *                             double thresh, double noise, double rms )
@@ -93,11 +93,11 @@ void CGEN_FUNCTION(cupidKCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *        The RMS noise in the data
 
 *  Notes:
-*     - This function can be invoked using the generic cupidKCheckFace macro 
+*     - This function can be invoked using the generic cupidRCheckFace macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidKCheckFace<X> except that an extra parameter is added to the start 
+*     cupidRCheckFace<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidKCheckFace... function to be invoked. This extra parameter should
+*     cupidRCheckFace... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:
@@ -216,12 +216,12 @@ void CGEN_FUNCTION(cupidKCheckFace)( CGEN_TYPE *array, int nel, int axis,
    into the 1D array "work1". The 1D vector indices (within "array") of the 
    copied pixels are put into "work2". The number of values stored in
    each of these work arrays is returned. */
-                     nval = CGEN_FUNCTION(cupidKCopyLine)( array, work1, work2,
+                     nval = CGEN_FUNCTION(cupidRCopyLine)( array, work1, work2,
                                                  x0, ivx, vskip, xvec, dims );
 
 /* Identify peaks within this line of data, and flag the edges of the
    peaks within the mask array. */
-                     cupidKEdges( nval, work1, work2, mask, minpix, thresh, 
+                     cupidREdges( nval, work1, work2, mask, minpix, thresh, 
                                   noise, rms );
       
 /* Increment the 1D vector index of the next pixel to check. */

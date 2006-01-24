@@ -2,19 +2,19 @@
 #include "cupid.h"
 #include <math.h>
 
-int *CGEN_FUNCTION(cupidKInitEdges)( CGEN_TYPE *array, int nel, int ndim,
+int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
                                      int dims[ 3 ], int skip[ 3 ], int minpix, 
                                      double thresh, double noise, double rms, 
                                      int *peakval ){
 /*
 *  Name:
-*     cupidKInitEdges<X>
+*     cupidRInitEdges<X>
 
 *  Purpose:
 *     Create an initial estimate of the position of the clump edges.
 
 *  Synopsis:
-*     int *cupidKInitEdges<X>( CGEN_TYPE *array, int nel, int ndim, 
+*     int *cupidRInitEdges<X>( CGEN_TYPE *array, int nel, int ndim, 
 *                              int dims[ 3 ], int skip[ 3 ], int minpix, 
 *                              double thresh, double noise, double rms,
 *                              int *peakval )
@@ -86,11 +86,11 @@ int *CGEN_FUNCTION(cupidKInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     error occurs.
 
 *  Notes:
-*     - This function can be invoked using the generic cupidKInitEdges macro 
+*     - This function can be invoked using the generic cupidRInitEdges macro 
 *     defined in cupid.h. This macro has the same parameter list as 
-*     cupidKInitEdges<X> except that an extra parameter is added to the start 
+*     cupidRInitEdges<X> except that an extra parameter is added to the start 
 *     of the parameter list indicating the data type of the specific 
-*     cupidKInitEdges... function to be invoked. This extra parameter should
+*     cupidRInitEdges... function to be invoked. This extra parameter should
 *     be an integer and should be one of CUPID__DOUBLE, CUPID__FLOAT, etc.
 
 *  Authors:
@@ -192,19 +192,11 @@ int *CGEN_FUNCTION(cupidKInitEdges)( CGEN_TYPE *array, int nel, int ndim,
    specified by "axis" and "lbnd", and which extend in the direction
    given by "xvec". Edges of any peaks found along these scan lines are
    marked by 1's in the mask array. */
-                        CGEN_FUNCTION(cupidKCheckFace)( array, nel, 
+                        CGEN_FUNCTION(cupidRCheckFace)( array, nel, 
                                                         axis, lbnd, dims, skip,
                                                         xvec, work1, work2, 
                                                         ret, minpix, thresh, 
                                                         noise, rms );
-
-{ int slbnd[2];
-  slbnd[ 0 ] = 2720;
-  slbnd[ 1 ] = 804;
-  printf("xvec=(%d,%d), axis=%d lbnd=%d\n",xvec[0], xvec[1], axis, lbnd );
-  cupidCFDump( ret, ndim, dims, slbnd );
-}
-
                      }
                   }
                }

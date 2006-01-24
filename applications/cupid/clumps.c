@@ -138,7 +138,7 @@ void clumps() {
 *
 *        - GaussClumps
 *        - ClumpFind
-*        - Kimberley
+*        - Reinhold
 *
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
@@ -148,7 +148,7 @@ void clumps() {
 *        of the METHOD parameter. If METHOD is GaussClumps, the output NDF 
 *        receives the sum of all the fitted Gaussian clump models including
 *        a global background level chosen to make the mean output value
-*        equal to the mean input value. If METHOD is ClumpFind or Kimberley, 
+*        equal to the mean input value. If METHOD is ClumpFind or Reinhold, 
 *        each pixel in 
 *        the output is the integer index of clump to which the pixel has been 
 *        assigned. Bad values are stored for pixels which are not part of
@@ -243,7 +243,7 @@ void clumps() {
 *     which touch an edge of the data array are not included in the final
 *     list of clumps.
 
-*     - Kimberley: Based on an algorithm developed by Kim Reinhold at JAC.
+*     - Reinhold: Based on an algorithm developed by Kim Reinhold at JAC.
 
 *  GaussClumps Configuration Parameters:
 *     The GaussClumps algorithm uses the following configuration parameters. 
@@ -381,8 +381,8 @@ void clumps() {
 *     The default value is the minimum input data value plus four times the 
 *     RMS noise level. []
 
-*  Kimberley Configuration Parameters:
-*     The Kimberley algorithm uses the following configuration parameters. 
+*  Reinhold Configuration Parameters:
+*     The Reinhold algorithm uses the following configuration parameters. 
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 
@@ -614,7 +614,7 @@ void clumps() {
    parGet0d( "RMS", &rms, status );
 
 /* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,KIMBERLEY", 1, 
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD", 1, 
              method, 15,  status );
 
 /* Abort if an error has occurred. */
@@ -654,8 +654,8 @@ void clumps() {
       clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
-   } else if( !strcmp( method, "KIMBERLEY" ) ) {
-      clist = cupidKimberley( type, nsig, slbnd, subnd, ipd, ipv, rms,
+   } else if( !strcmp( method, "REINHOLD" ) ) {
+      clist = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
    } else if( *status == SAI__OK ) {
@@ -680,7 +680,7 @@ void clumps() {
             ndfSbad( 1, indf2, "DATA", status );
 
          } else if( !strcmp( method, "CLUMPFIND" ) ||
-                    !strcmp( method, "KIMBERLEY" ) ) {
+                    !strcmp( method, "REINHOLD" ) ) {
             ndfStype( "_INTEGER", indf2, "DATA", status );
             ndfMap( indf2, "DATA", "_INTEGER", "WRITE", &ipo, &el, status );
             ndfSbad( 1, indf2, "DATA", status );

@@ -5,25 +5,25 @@
 #include "prm_par.h"
 #include <math.h>
 
-int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
                      int ilevel, int *nclump ){
 /*
 *  Name:
-*     cupidKimberley
+*     cupidReinhold
 
 *  Purpose:
 *     Identify clumps of emission within a 1, 2 or 3 dimensional NDF using
-*     the KIMBERLEY algorithm.
+*     the REINHOLD algorithm.
 
 *  Synopsis:
-*     int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, 
+*     int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
 *                          void *ipd, double *ipv, double rms, 
 *                          AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
-*     array using the KIMBERLEY algorithm, developed by Kim Reinhold at
+*     array using the REINHOLD algorithm, developed by Kim Reinhold at
 *     JAC. This algorithm identifies the boundaries between clumps by
 *     looking for minima in 1D sections through the data. No a priori clump 
 *     profile is assumed. In this algorithm, clumps never overlap.
@@ -112,16 +112,16 @@ int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Say which method is being used. */
    if( ilevel > 0 ) {
       msgBlank( status );
-      msgOut( "", "Kimberley: (this algorithm is under construction - "
+      msgOut( "", "Reinhold: (this algorithm is under construction - "
               "please do not use)", status );
       if( ilevel > 1 ) msgBlank( status );
    }
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "KIMBERLEY", &kconfig ) ) {     
+   if( !astMapGet0A( config, "REINHOLD", &kconfig ) ) {     
       kconfig = astKeyMap( "" );
-      astMapPut0A( config, "KIMBERLEY", kconfig, "" );
+      astMapPut0A( config, "REINHOLD", kconfig, "" );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
@@ -166,7 +166,7 @@ int *cupidKimberley( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    "*peakval" value. All other pixels are set to some other value (which 
    will usually be CUPID__KBACK but will be something else at positions of 
    peaks which were not peaks in all scan directions). */
-   mask = cupidKInitEdges( type, ipd, el, ndim, dims, skip, minpix, thresh, 
+   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minpix, thresh, 
                            noise, rms, &peakval );
 
 
@@ -176,7 +176,7 @@ cupidCFDump( mask, ndim, dims, slbnd );
 /* Dilate the edge regions using a cellular automata. This creates a new
    mask array in which a pixel is marked as an edge pixel if any of its
    neighbours are marked as edge pixels in the mask array created above. */
-   mask2 = cupidKCA( mask, NULL, el, dims, skip, 1, peakval );
+   mask2 = cupidRCA( mask, NULL, el, dims, skip, 1, peakval );
 
 cupidCFDump( mask2, ndim, dims, slbnd );
 
@@ -188,12 +188,20 @@ cupidCFDump( mask2, ndim, dims, slbnd );
    m1 = mask2;
    m2 = mask;
    for( i = 0; i < caiter; i++ ) {
-      m2 = cupidKCA( m1, m2, el, dims, skip, cathresh, peakval );
+      m2 = cupidRCA( m1, m2, el, dims, skip, cathresh, peakval );
 cupidCFDump( m2, ndim, dims, slbnd );
       m3 = m2;
       m2 = m1;
       m1 = m3;
    }
+
+/* Fill the volume around each peak with integer values which indicate
+   which peak they are close to. All the pixels around one peak form one
+   clump. Each clump initially contains just the peak pixel. All peaks are
+   then simultaneously expanded outwards away from peak, until they meet
+   the surrounding edges. */
+   cupidRFillClumps( m1, el, ndim, skip, dims, peakval );
+cupidCFDump( m1, ndim, dims, slbnd );
 
 
 

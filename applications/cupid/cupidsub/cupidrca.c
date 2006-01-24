@@ -2,17 +2,17 @@
 #include "ast.h"
 #include "cupid.h"
 
-int *cupidKCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
+int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
                int thresh, int peakval ){
 /*
 *  Name:
-*     cupidKCA
+*     cupidRCA
 
 *  Purpose:
 *     Erode or dilate the edge pixels using a cellular automata.
 
 *  Synopsis:
-*     int *cupidKCA( int *in, int *out, int nel, int dims[ 3 ], 
+*     int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], 
 *                    int skip[ 3 ], int thresh, int peakval )
 
 *  Description:

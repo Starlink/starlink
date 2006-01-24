@@ -2,17 +2,17 @@
 #include "prm_par.h"
 #include "cupid.h"
 
-void cupidKEdges( int nel, double *dval, int *dpos, int *mask, int minpix,
+void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
                   double thresh, double noise, double rms ){
 /*
 *  Name:
-*     cupidKEdges
+*     cupidREdges
 
 *  Purpose:
 *     Identify peaks and peak edges in a 1D line of data.
 
 *  Synopsis:
-*     void cupidKEdges( int nel, double *dval, int *dpos, int *mask, 
+*     void cupidREdges( int nel, double *dval, int *dpos, int *mask, 
 *                       int minpix, double thresh, double noise, double rms )
 
 *  Description:
