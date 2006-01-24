@@ -9,4 +9,5 @@
 FLATN      <Data already flatfielded>
 NOHDR      <No FITS component>
 STRUN      <String truncated>
+BDTYP      <Bad data type>
 .END

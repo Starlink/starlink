@@ -89,6 +89,12 @@ void smf_close_file( smfData **, int *status);
 
 void smf_correct_extinction( smfData *data, float tau, int *status);
 
+int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
+		     int *status );
+char * smf_dtype_string( const smfData* data, int * status );
+
+size_t smf_dtype_size( const smfData* data, int * status );
+
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
 /* Do not return the result since we want the interface to remain the same when a
