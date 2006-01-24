@@ -220,6 +220,10 @@
 *
 *          - "Percentiles" -- You specify a series of percentiles.
 *
+*          - "Scale" --  The contour levels are equally spaced between
+*          two pixel values that you specify.  You also supply the
+*          number of contour levels, which must be at least two.
+*
 *        If the contour map is aligned with an existing DATA picture (see
 *        parameter CLEAR), then only part of the supplied NDF may be
 *        displayed. In this case, the choice of contour levels is based 
@@ -506,7 +510,9 @@
 *        Change default Format (to "%g") and Colour (to the colour used
 *        to draw the contour) for the contour indices in the key.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 January 23 (MJC):
+*        Added "Scale" mode.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -798,8 +804,8 @@
       CALL NDF_BAD( INDFS, COMP, .FALSE., BAD, STATUS )
 
 *  Select the method of defining contour heights and evaluate them.
-      CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'STEPCNT',
-     :                 'HEIGHTS', 'PERCENTILES', BAD, EL,
+      CALL KPS1_CNSER( 'MODE', 'NCONT', 'FIRSTCNT', 'LASTCNT', 
+     :                 'STEPCNT', 'HEIGHTS', 'PERCENTILES', BAD, EL,
      :                 %VAL( CNF_PVAL( PNTR ) ), MXCONT, CNTLEV, PERCNT,
      :                 AREA, NCONT, MODE, STATUS )
 
