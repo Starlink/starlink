@@ -25,10 +25,12 @@
 *  History:
 *     2005-09-27 (TIMJ):
 *        Initial test version
+*     2006-01-24 (TIMJ):
+*        Add makemap
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -57,5 +59,6 @@
 
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
+void smurf_makemap( int * );
 
 #endif /* SMURF_LIB_DEFINED */
