@@ -17928,6 +17928,10 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
             \sstitem
               {\tt "Percentiles"} --- You specify a series of percentiles.
 
+            \sstitem
+              {\tt "Scale"} ---  The contour levels are equally spaced between
+              two pixel values that you specify.  You also supply the
+              number of contour levels, which must be at least two.
          }
          If the contour map is aligned with an existing DATA picture (see
          parameter CLEAR), then only part of the supplied NDF may be
@@ -50418,6 +50422,14 @@ The following applications have been modified:
          \item There is a new output parameter OLDVAL.  If the section
          being modified comprises one pixel, OLDVAL stores the original
          value of that pixel.
+      \end{itemize}
+
+   \item [\htmlref{CONTOUR}{CONTOUR}] \mbox{}
+      \begin{itemize}
+         \item Parameter MODE has a new option to calculate contour heights
+          called {\tt "Scale"}.  This sets a specified number of contour 
+          levels to be equally spaced between two pixel values that you 
+          supply.
       \end{itemize}
 
    \item [\htmlref{CURSOR}{CURSOR}] \mbox{}

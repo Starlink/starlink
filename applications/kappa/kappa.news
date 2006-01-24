@@ -49,12 +49,16 @@
    modified comprises one pixel, OLDVAL stores the original value of 
    that pixel.
 
-   o The MODE parameter now has an option "Good" which is like the
-   existing "Pixel" option in that it creates a list containing pixel
-   centres taken from the supplied NDF, but differs in that it only
-   stored the centres of pixels which have a good value in the NDF Data
-   array (the "Pixel" option stores all pixel centres, whether the pixel
-   values are good or bad).
+   o  The MODE parameter in LISTMAKE now has an option "Good" which is 
+   like the existing "Pixel" option in that it creates a list 
+   containing pixel centres taken from the supplied NDF, but differs in
+   that it only stored the centres of pixels which have a good value in 
+   the NDF Data array (the "Pixel" option stores all pixel centres, 
+   whether the pixel values are good or bad).
+
+   o  CONTOUR parameter MODE has a new option to calculate contour 
+   heights called "Scale".  This sets a specified number of contour 
+   levels to be equally spaced between two pixel values that you supply.
 
 Changes introduced in version 1.4-2
 
