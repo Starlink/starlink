@@ -54,6 +54,9 @@
 *     - See also smf_history_check
 *     - An error will occur if the file is opened read-only.
 *     - It is an error to associate HISTORY with raw data files.
+*     - HISTORY is only written to the file when it is closed. Therefore
+*       do not expect to be able to call smf_history_check on the
+*       same file that you just called smf_history_write on.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
