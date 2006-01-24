@@ -3796,6 +3796,14 @@ package kappa {
             helpkey *
           }
 
+         parameter lastcnt {
+            type _REAL
+            prompt {Give the height of the last contour}
+            vpath PROMPT
+            ppath CURRENT DYNAMIC
+            helpkey *
+          }
+
          parameter length {
             size *
             type _REAL
