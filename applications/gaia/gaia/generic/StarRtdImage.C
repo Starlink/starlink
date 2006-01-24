@@ -1259,7 +1259,7 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     char name[10];
     for ( int i = 0; i < argc; i++ ) {
         out_name = argv[i];
-        sprintf( name, "LBOUND%d", i );
+        sprintf( name, "LBOUND%d", i + 1 );
         value = image_->image().get( name );
         if ( ! value ) {
             value = "1";
