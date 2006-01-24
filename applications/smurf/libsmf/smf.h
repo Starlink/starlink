@@ -110,6 +110,8 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 
+int smf_history_check( const smfData* data, const char * appl, int *status);
+
 void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
