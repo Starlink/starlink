@@ -3400,7 +3400,7 @@ GKS (SUN/83) should be used.</p></abstract>
 </component>
 
 <component id="itcl" support="U">
-  <version>3.1.0</version>
+  <version>3.3</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
   <dependencies >
@@ -3420,7 +3420,7 @@ GKS (SUN/83) should be used.</p></abstract>
 </component>
 
 <component id="tcl" support="U">
-  <version>8.2.3</version>
+  <version>8.4.11</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
@@ -3440,7 +3440,7 @@ GKS (SUN/83) should be used.</p></abstract>
 </component>
 
 <component id="tk" support="U">
-  <version>8.2.3</version>
+  <version>8.4.11</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
   <dependencies >
