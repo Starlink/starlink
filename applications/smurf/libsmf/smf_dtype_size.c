@@ -84,6 +84,7 @@
 #define FUNC_NAME "smf_dtype_size"
 
 size_t smf_dtype_size( const smfData* data, int * status ) {
+  int itype;
 
   /* Set a default value */
   size_t retval = 0;
@@ -101,19 +102,24 @@ size_t smf_dtype_size( const smfData* data, int * status ) {
   }
 
   /* now switch on data type */
-  switch( data->dtype ) {
+  itype = data->dtype;
+  switch( itype ) {
   case SMF__INTEGER:
     retval = sizeof(int);
+    break;
   case SMF__FLOAT:
     retval = sizeof(float);
+    break;
   case SMF__DOUBLE:
     retval = sizeof(double);
+    break;
   case SMF__USHORT:
     retval = sizeof(short);
+    break;
   default:
     retval = 0;
     *status = SMF__BDTYP;
-    msgSeti( "TC", data->dtype );
+    msgSeti( "TC", itype );
     errRep(FUNC_NAME, "Unable to determine size of datatype. Data typecode was ^TC", status );
   }
 

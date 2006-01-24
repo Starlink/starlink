@@ -103,14 +103,19 @@ char * smf_dtype_string( const smfData* data, int * status ) {
   switch( data->dtype ) {
   case SMF__NULL:
     retval = NULL;
+    break;
   case SMF__INTEGER:
     retval = "_INTEGER";
+    break;
   case SMF__FLOAT:
     retval = "_REAL";
+    break;
   case SMF__DOUBLE:
     retval = "_DOUBLE";
+    break;
   case SMF__USHORT:
     retval = "_UWORD";
+    break;
   default:
     retval = NULL;
   }
