@@ -31,7 +31,30 @@
 *        Add grpValid, grpNew and grpPut1
 *     09-NOV-2005 (TIMJ):
 *        Fix return value of grp1Getid if input Grp* is NULL
+*     24-NOV-2006 (TIMJ):
+*        Add grpInfoi
 *     {enter_further_changes_here}
+
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 */
 
 /* Header files. */
@@ -281,5 +304,37 @@ void grpPut1( Grp *grp, const char *name, int index, int *status ){
 }
 
 
+F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
+			  INTEGER(INDEX),
+			  CHARACTER(ITEM),
+			  INTEGER(VALUE),
+			  INTEGER(STATUS)
+			  TRAIL(ITEM));
 
+void grpInfoi( Grp *grp, int index, const char * item, int * value, 
+	       int *status) {
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_CHARACTER_DYN(ITEM);
+  DECLARE_INTEGER(STATUS);
+  DECLARE_INTEGER(VALUE);
 
+  IGRP = grp1Getid( grp, status );
+
+  F77_CREATE_CHARACTER( ITEM, strlen(item) );
+  F77_EXPORT_CHARACTER( item, ITEM, ITEM_length );
+  F77_EXPORT_INTEGER( index, INDEX );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(grp_infoi)( INTEGER_ARG( &IGRP ),
+		       INTEGER_ARG( &INDEX ),
+		       CHARACTER_ARG(ITEM),
+		       INTEGER_ARG(&VALUE),
+		       INTEGER_ARG(&STATUS)
+		       TRAIL_ARG(ITEM) );
+
+  F77_FREE_CHARACTER( ITEM );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( VALUE, *value );
+
+}
