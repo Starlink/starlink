@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = libsmurf libsmf
+# Build libsmf before the applications
+SUBDIRS = libsmf libsmurf
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da
