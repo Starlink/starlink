@@ -297,6 +297,10 @@
 *  Check inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initializations when variance isn't used..
+      VSTAR = 0.0
+      VSKY = 0.0
+
 *  Get the sizes of the input groups,
       CALL GRP_GRPSZ( OBJIND, NOBJ, STATUS )
       CALL GRP_GRPSZ( PSFIND, NPSF, STATUS )
