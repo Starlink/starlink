@@ -1,0 +1,15 @@
+
+This is the HDS testsuite as obtained from RFWS (hds_testsuite.tar). 
+This contains a FORTRAN program 'exercise.f', a series of '_input' files to 
+be fed to this program and reference outputs (the _output files) obtained 
+from running these tests on an unknown system (Solaris?).
+
+Note that, when run on Linux, I had to slightly edit 'exercise.f' to remove
+the "CARRIAGECONTROL=LIST" qualifiers on the file OPENs. More importantly
+the fine detail of the "reference output" (spacing, blanks etc.) is machine
+dependent. I found it more valuable to create a statically linked version
+of exercise.f (exerciseo) linked against HDS Version 3 and another (exercise)
+similarly linked against HDS Version 4. The simple script (loop-test.csh)
+runs all the tests and generates differences if there is any regression.
+
+BKM, Starlink, RAL, January 2006.  
