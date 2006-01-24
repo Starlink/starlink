@@ -240,8 +240,9 @@ Cbegin
                if ( n.gt.NDF_LIMIT ) then
                   found = .true.
                   kl = min(45,kl)
+                  call msg_setc('NDF', text(1:kl) )
                   call printo ( 'Cant find NDF parameter to'//
-     +                          ' annul: '//text(1:kl) )
+     +                          ' annul: ^NDF' )
                endif
             endif
          enddo
@@ -1600,8 +1601,9 @@ Cbegin
           iform = '_REAL'
           texte = ' 32-bit reals'
       else
+          call msg_setc( 'WST', text(1:ilen) )
           call printo ( ' ERROR: Programmer error in type in'//
-     +                  ' work space: '//text(1:ilen) )
+     +                  ' work space: ^WST' )
           call printo ( '        Code needs rewriting: Contact'//
      +                 ' person who wrote the program' )
            ierr = 1
@@ -1611,8 +1613,9 @@ Cbegin
       istat = SAI__OK
        
       if ( ilen.gt.WS_NSIZE ) then
+          call msg_setc( 'WST', text(1:ilen) )
           call printo ( ' ERROR: Programmer error in name size'//
-     +                  ' in work space: '//text(1:ilen) )
+     +                  ' in work space: ^WST' )
           call printo ( '        Code needs rewriting: Contact'//
      +                 ' person who wrote the program' )
            ierr = 1
@@ -1621,8 +1624,9 @@ Cbegin
 
       do i = 1, WORK_LIMIT
          if ( WS_NAME(i).eq.text ) then
+          call msg_setc('WS', text(1:ilen) )
             call printo ( ' ERROR: Work space of that name'//
-     +             ' still open: '//text(1:ilen) )
+     +             ' still open: ^WS' )
             ierr = 1
             return
          endif
@@ -1630,8 +1634,9 @@ Cbegin
 
       call find_space ( next )
       if ( next.le.0 ) then
+          call msg_setc('CB', text(1:ilen) )
           call printo ( ' ERROR: No spaces left in ws common'//
-     +                  ' block: '//text(1:ilen) )
+     +                  ' block: ^CB')
           ierr = 1
           return
       else
@@ -1643,8 +1648,8 @@ Cbegin
       endif
 
       if ( istat.ne.SAI__OK ) then
-          call printo ( ' ERROR: Cant open work space because '//
-     +                  text(1:ilen) )
+          call msg_setc( 'WS', text(1:ilen) )
+          call printo ( ' ERROR: Cant open work space because ^WS')
           write ( texta, '(1x,''   Desired work size = ''
      +           ,i7, a20)') n, texte
           call printo ( texta )
@@ -2703,7 +2708,8 @@ Cbegin
 
 CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 C PRINTO -- Write a line out to the CL
-C
+C Uses MSG_OUT and so output tokens can be set immediately prior
+C to calling this routine
 C   alan penny                ral        1990 Jan
 
       subroutine printo ( text )
@@ -2723,7 +2729,9 @@ Cbegin
       istat = SAI__OK
       if ( text(1:1).eq.'0' .or. text(1:1).eq.'1' .or.
      +     text(1:1).eq.'+' ) then
-         call msg_out ( ' ', ' '//text, istat )
+C     prepend a space
+         call msg_setc('TEXT', buffer)
+         call msg_out ( ' ', ' ^TEXT', istat )
       elseif ( text.eq.' ' ) then
          call msg_out ( ' ', '  ', istat )
       else
@@ -3149,8 +3157,8 @@ Cbegin
             else
                if ( n.eq.WORK_LIMIT ) then
                   found = .true.
-                  call printo ( 'Cant find workspace to close - '//
-     +                           text(1:kl) )
+                  call msg_setc( 'WS', text(1:kl) )
+                  call printo ( 'Cant find workspace to close - ^WS')
                endif
             endif
          enddo

@@ -4755,7 +4755,7 @@ Cbegin
       n = n1 + n2							!Total number of points	
 
       if ( n.gt.2000 ) then						!Size check
-         type *,'Mann-Whitney U test failed. Over 2000 points'
+         print *,'Mann-Whitney U test failed. Over 2000 points'
          ierr = 1
          return
       endif
@@ -4862,7 +4862,7 @@ Cbegin
       n = n1 + n2							!Total number of points	
 
       if ( n.gt.2000 ) then						!Size check
-         type *,'Mann-Whitney U test failed. Over 2000 points'
+         print *,'Mann-Whitney U test failed. Over 2000 points'
          ierr = 1
          return
       endif

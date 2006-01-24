@@ -725,15 +725,17 @@ C  alan penny                  ral         1990 jan
 
       integer        mx			!i: Image X size
       integer        my			!i: Image Y size
-      integer*2      im(*)		!i: Image	
+      integer*2      im(2)		!i: Short Image	
+      real           imr                !i: Real image
       character*(*)  type		!i: Image type ("REAL', 'SHORT' )
       integer        kopt		!i: 0=Flash,no type; 1=Flash; 2=Display
+      equivalence (imr, im)
 C--
 Cbegin
 
       
       if ( type.eq.'REAL' ) then
-         call ds_dispr ( im, mx, my, kopt )
+         call ds_dispr ( imr, mx, my, kopt )
       elseif ( type.eq.'SHORT' ) then
          call ds_disps ( im, mx, my, kopt )
       else
