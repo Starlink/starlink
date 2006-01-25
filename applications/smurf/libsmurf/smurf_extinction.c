@@ -54,6 +54,8 @@
 *        Now reads the tau from the header for timeseries data
 *     2006-01-24 (AGG):
 *        Tau is now double, rather than float.
+*     2006-01-25 (AGG):
+*        Mode keyword changed to Method.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -110,7 +112,8 @@
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smurf_extinction"
-#define LEN__MODE 20
+#define TASK_NAME "EXTINCTION"
+#define LEN__METHOD 20
 
 void smurf_extinction( int * status ) {
 
@@ -126,7 +129,7 @@ void smurf_extinction( int * status ) {
   double tau = 0.0;           /* Zenith tau at this wavelength */
   long filter;
 
-  char mode[LEN__MODE];      /* String for optical depth mode */
+  char method[LEN__METHOD];      /* String for optical depth method */
   double deftau = 0.0;       /* Default value for the zenith tau */
 
   /* Main routine */
@@ -142,10 +145,10 @@ void smurf_extinction( int * status ) {
      and output files */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
-  /* Get MODE */
-  parChoic( "MODE", "CSOTAU", 
+  /* Get METHOD */
+  parChoic( "METHOD", "CSOTAU", 
 	    "CSOtau,Filtertau,WVMraw,WVMsmooth,Polynomial,Data", 1,
-	    &mode, LEN__MODE, status);
+	    method, LEN__METHOD, status);
 
   for (i=1; i<=size; i++) {
 
@@ -154,16 +157,16 @@ void smurf_extinction( int * status ) {
 
     if (*status == SMF__FLATN) {
       errAnnul( status );
-      msgOutif(MSG__VERB, "smurf_flatfield",
-	     "smurf_flatfield: Data are already flatfielded", status);
+      msgOutif(MSG__VERB, "",
+	     TASK_NAME ": Data are already flatfielded", status);
     } else if ( *status == SAI__OK) {
       msgOutif(MSG__VERB," ","Flatfield applied", status);
     } else {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */
       msgSeti("I",i);
-      errRep("smurf_flatfield",
-	     "Unable to flatfield data from the ^Ith file", status);
+      errRep("",
+	     "Unable to flatfield data from the ^I th file", status);
     }
 
     /* What next if status is bad? */
@@ -174,9 +177,9 @@ void smurf_extinction( int * status ) {
 
     /* Check (and tell user) if extinction has already been done */
 
-    /* If status is OK, make decisions on mode keywords */
+    /* If status is OK, make decisions on method keywords */
     if ( *status == SAI__OK ) {
-      if ( strncmp( mode, "CSOT", 4 ) == 0 ) {
+      if ( strncmp( method, "CSOT", 4 ) == 0 ) {
 	/* Now ask for desired CSO tau */
 	/* Define the default value first time round */
 	if ( i == 1 ) {
@@ -185,7 +188,7 @@ void smurf_extinction( int * status ) {
 	  parDef0d( "CSOTAU", deftau, status );
 	}
 	parGet0d( "CSOTAU", &tau, status);
-      } else if ( strncmp( mode, "FILT", 4) == 0 ) {
+      } else if ( strncmp( method, "FILT", 4) == 0 ) {
 	/* Now ask for desired Filter-based tau */
 	/* Define the default value first time round */
 	if ( i == 1 ) {
@@ -195,29 +198,29 @@ void smurf_extinction( int * status ) {
 	  parDef0d( "FILTERTAU", deftau, status );
 	}
 	parGet0d( "FILTERTAU", &tau, status );
-      } else if ( strncmp( mode, "WVMR", 4) == 0 ) {
+      } else if ( strncmp( method, "WVMR", 4) == 0 ) {
 	*status = SAI__ERROR;
-	msgSetc("MODE", "WVMR");
-	errRep("", "Sorry, mode, ^MODE, not supported yet", status);
-      } else if ( strncmp( mode, "WVMS", 4) == 0 ) {
+	msgSetc("METHOD", "WVMR");
+	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
+      } else if ( strncmp( method, "WVMS", 4) == 0 ) {
 	*status = SAI__ERROR;
-	msgSetc("MODE", "WVMS");
-	errRep("", "Sorry, mode, ^MODE, not supported yet", status);
-      } else if ( strncmp( mode, "POLY", 4) == 0 ) {
+	msgSetc("METHOD", "WVMS");
+	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
+      } else if ( strncmp( method, "POLY", 4) == 0 ) {
 	*status = SAI__ERROR;
-	msgSetc("MODE", "POLY");
-	errRep("", "Sorry, mode, ^MODE, not supported yet", status);
-      } else if ( strncmp( mode, "DATA", 4) == 0 ) {
+	msgSetc("METHOD", "POLY");
+	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
+      } else if ( strncmp( method, "DATA", 4) == 0 ) {
 	*status = SAI__ERROR;
-	msgSetc("MODE", "DATA");
-	errRep("", "Sorry, mode, ^MODE, not supported yet", status);
+	msgSetc("METHOD", "DATA");
+	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
       } else {
 	*status = SAI__ERROR;
-	errRep("", "Unsupported mode. Possible programming error.", status);
+	errRep("", "Unsupported method. Possible programming error.", status);
       }
     }
     /* Apply extinction correction */
-    smf_correct_extinction( odata, mode, tau, status );
+    smf_correct_extinction( odata, method, tau, status );
 
     /* Free resources for output data */
     smf_close_file( &odata, status );
