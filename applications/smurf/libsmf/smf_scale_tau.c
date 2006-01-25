@@ -41,6 +41,8 @@
 *  History:
 *     2006-01-10 (AGG):
 *        Initial test version
+*     2006-01-24 (AGG):
+*        Change floats to doubles
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -80,13 +82,13 @@
 #include "smurf_par.h"
 #include "smurf_typ.h"
 
-float smf_scale_tau( const float tauwvm, const int filter, int *status ) {
+double smf_scale_tau( const double tauwvm, const int filter, int *status ) {
 
-  float tau;
-  float a = 0;
-  float b = 0;
+  double tau;
+  double a = 0;
+  double b = 0;
 
-  /* Note these are tau_CSO to tau_filter conversions.... */
+  /* Note these are tau_CSO to SCUBA tau_filter conversions.... */
   if ( filter >= 1 && filter <= 4 ) {
     /* Long wave */
     a = 4.02;
