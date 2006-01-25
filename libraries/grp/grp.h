@@ -30,6 +30,29 @@
 *        Use enum for constants rather than #define.
 *        Use an opaque struct for the C interface rather than the bare
 *        int.
+*     24-NOV-2006 (TIMJ):
+*        Add grpInfoi
+
+*  Copyright:
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 */
 
 /* We need CNF to define Fortran */
@@ -70,13 +93,14 @@ typedef struct Grp {
 Grp *grpInit( int * );
 void grpFree( Grp **, int * );
 
+void grpDelet( Grp **, int * );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
-void grpDelet( Grp **, int * );
-void grpValid( Grp *, int *, int * );
+void grpInfoi( Grp *grp, int index, const char * item, int * value, 
+	       int *status);
 Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
-
+void grpValid( Grp *, int *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
