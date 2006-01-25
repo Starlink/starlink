@@ -1465,8 +1465,9 @@ int TclAstroCat::symbolCmd(int argc, char* argv[])
 	if (cat_) 
 	    return appendListVal(cat_->symbol());
     }
-    else if (! cat_)
+    if (! cat_)
 	return error("no catalog is open");
+
     cat_->entry()->symbol(argv[0]);
     return TCL_OK;
 }
