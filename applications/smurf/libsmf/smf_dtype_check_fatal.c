@@ -1,0 +1,118 @@
+/*
+*+
+*  Name:
+*     smf_dtype_check_fatal
+
+*  Purpose:
+*     Verify that a smfData is of the correct data type with status setting
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     smf_dtype_check_fatal( const smfData * data, const char * type,
+*                          smf_dtype itype, int *status );
+
+*  Arguments:
+*     data = const smfData* (Given)
+*        Data struct to check
+*     type = const char* (Given)
+*        Type string for comparison. Should match the NDF type strings
+*        _DOUBLE, _INTEGER, _REAL, _UWORD. Can be NULL pointer if
+*        itype is to be used instead.
+*     itype = smf_dtype (Given)
+*        Numerical constant form of the data type (as defined in
+*        smf_typ.h). eg SMF__INTEGER, SMF__DOUBLE. These types are
+*        used instead of the type string if the string is a NULL
+*        pointer.
+*     status = int* (Given and Returned)
+*        Pointer to global status. Status set to BAD if check fails
+
+*  Description:
+*     This function compares the data type of the struct with a string
+*     form. Sets status to SMF__BDTYP if the check fails.
+
+*  Authors:
+*     Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006-01-25 (TIMJ):
+*        Initial version.
+
+*  Notes:
+*     - See also smf_dtype_check
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
+
+/* System includes */
+#include <string.h>
+
+/* Starlink includes */
+#include "ast.h"
+#include "sae_par.h"
+#include "mers.h"
+
+/* SMURF includes */
+#include "smf.h"
+#include "smf_typ.h"
+#include "smf_err.h"
+
+/* Simple default string for errRep */
+#define FUNC_NAME "smf_dtype_check_fatal"
+
+void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype itype,
+		    int * status ) {
+
+  /* Set a default value */
+  int retval = 0;
+  smfData tmpdata;
+  
+  /* Check entry status */
+  if (*status != SAI__OK) return;
+
+  retval = smf_dtype_check( data, type, itype, status);
+
+  if (!retval) {
+    if ( *status == SAI__OK) {
+      *status = SMF__BDTYP;
+      msgSetc("ACTYP",smf_dtype_string( data, status));
+      if (type != NULL) {
+	msgSetc("TYP",type);
+      } else {
+	/* Con... */
+	tmpdata.dtype = itype;
+	msgSetc("TYP",smf_dtype_string(&tmpdata, status));
+      }
+      errRep(FUNC_NAME, "Data type not as requested. Expected ^TYP, got ^ACTYP", 
+	     status);
+    }
+  }
+
+}
