@@ -89,8 +89,8 @@
 #include "sae_par.h"
 #include "msg_par.h"
 
-#include "smurf_par.h"
 #include "smf.h"
+#include "smurf_par.h"
 #include "libsmurf/smurflib.h"
 #include "smf_err.h"
 #include "sc2da/sc2store.h"
@@ -101,16 +101,19 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   smfFile *file;            /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
-  void *outdata[0];          /* Pointer to array of output mapped  pointers*/
+  void *outdata[1];          /* Pointer to array of output mapped  pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
 
   if ( *status != SAI__OK ) return;
 
+  /* What if ogrp == NULL? for makemap */
+
   /* Open the input file solely to propagate it to the output file */
   ndgNdfas( igrp, index, "READ", &indf, status );
   ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
   ndfAnnul( &indf, status);
+
 
   smf_open_file( igrp, index, "READ", &data, status);
   /* Should check status here to make sure that the file was opened OK */
@@ -131,7 +134,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   /* Set parameters of the DATA array in the output file */
   ndfStype( "_DOUBLE", outndf, "DATA", status);
   /* We need to map this so that the DATA_ARRAY is defined on exit */
-  ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata[0], &nout, status );
+  ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status );
 
   /* Close and reopen output file, populate output struct */
   ndfAnnul( &outndf, status);
