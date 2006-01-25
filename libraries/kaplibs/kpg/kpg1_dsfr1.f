@@ -360,8 +360,8 @@
                END IF
 	       
                CALL MSG_OUT( 'WCS_VELSOR', 
-     :            IND( : NIND )//'Source velocity     : ^V km/s (^SOR)', 
-     :                       STATUS )
+     :            IND( : NIND )//'Source velocity     : ^V km/s '//
+     :            '(^SOR relativistic velocity)', STATUS )
             END IF
 
 * Reference position...
