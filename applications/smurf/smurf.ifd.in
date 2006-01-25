@@ -27,13 +27,26 @@ package @PACKAGE@ {
             helpkey *
           }
 
-	 parameter tau {
+	 parameter method {
 	    position 3
+            type _CHAR
+            prompt {Optical depth method}
+            helpkey *
+         }
+
+	 parameter csotau {
 	    type _REAL
 	    vpath {PROMPT }
-	    prompt {Zenith optical depth at start, end of scan}
+	    prompt {Zenith optical depth at 225 GHz}
 	    ppath GLOBAL CURRENT
-	    default 0.1
+	    helpkey *
+	  }
+
+	 parameter filtertau {
+	    type _REAL
+	    vpath {PROMPT }
+	    prompt {Zenith optical depth for current filter}
+	    ppath GLOBAL CURRENT
 	    helpkey *
 	  }
 
