@@ -13,7 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_file( Grp * ingrp, int index, char * mode, smfData ** data, int *status);
+*     smf_open_file( Grp * ingrp, int index, char * mode, int withHdr,
+*                    smfData ** data, int *status);
 
 *  Arguments:
 *     ingrp = const Grp * (Given)
@@ -22,6 +23,9 @@
 *        Index corresponding to required file in group
 *     mode = char * (Given)
 *        File access mode
+*     withHdr = int (Given)
+*        If true, populate the smfHead component. Otherwise leave null.
+*        Mainly required to work around sc2store problems.
 *     data = smfData ** (Returned)
 *        Pointer to pointer smfData struct to be filled with file info and data
 *        Should be freed using smf_close_file.
@@ -100,7 +104,8 @@
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 
-void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status) {
+void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
+		    smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP];    /* String for DATA type */
   int indf;                  /* NDF identified for input file */
@@ -184,10 +189,15 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
     file->xloc = NULL;
     (*data)->refcount = 1;
     file->ndfid = NDF__NOID;
-    hdr = malloc( sizeof(smfHead));
-    (*data)->hdr = hdr;
-    hdr->wcs = NULL;
-    hdr->sc2head = malloc( sizeof( sc2head ) );
+
+    if (withHdr) {
+      hdr = malloc( sizeof(smfHead));
+      (*data)->hdr = hdr;
+      hdr->wcs = NULL;
+      hdr->sc2head = malloc( sizeof( sc2head ) );
+    } else {
+      (*data)->hdr = NULL;
+    }
 
     if (isNDF) {
       /* For an NDF, we don't need to worry about flatfield info etc */
@@ -208,30 +218,24 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
       /*      printf("after ndfMap: %d\n",*status);*/
 
-      /* Read the FITS headers */
-      kpgGtfts( indf, &fits, status );
+      if (withHdr) {
+	/* Read the FITS headers */
+	kpgGtfts( indf, &fits, status );
 
-      /* Trap status and ignore lack of FITS headers for now */
-      /*      if ( *status == KPG__NOFTS) {
-	msgOut("smf_open_file", 
-	       "Warning: Data has no FITS header, continuing anyway", status);
-	errAnnul( status );
-	errRep("smf_open_file", "File has no FITS header", status);
-	} */
-
-      /* If we don't have a time series, then we can retrieve the stored WCS info */
-      if ( !isTseries ) {
-	ndfGtwcs( indf, &iwcs, status);
-	hdr->wcs = iwcs;
-      } else {
-	/* Need to get the location of the extension for sc2head parsing */
-	/* Store the locator in the struct for now in case annulling it annulls
-	   all the children */
-	/*        printf("Status before xloc: %d\n",*status);*/
-	ndfXloc( indf, "FRAMEDATA", "READ", &(file->xloc), status );
-	/*        printf("Status after xloc: %d\n", *status);	*/
-        /* And need to map the header */
-	sc2store_headrmap( file->xloc, ndfdims[2], status );
+	/* If we don't have a time series, then we can retrieve the stored WCS info */
+	if ( !isTseries ) {
+	  ndfGtwcs( indf, &iwcs, status);
+	  hdr->wcs = iwcs;
+	} else {
+	  /* Need to get the location of the extension for sc2head parsing */
+	  /* Store the locator in the struct for now in case annulling it annulls
+	     all the children */
+	  /*        printf("Status before xloc: %d\n",*status);*/
+	  ndfXloc( indf, "FRAMEDATA", "READ", &(file->xloc), status );
+	  /*        printf("Status after xloc: %d\n", *status);	*/
+	  /* And need to map the header */
+	  sc2store_headrmap( file->xloc, ndfdims[2], status );
+	}
       }
 
       /*      printf("Status from open : %d\n",*status);*/
@@ -316,10 +320,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *st
 
     (*data)->dtype = itype;
     strncpy(file->name, pname, SMF_PATH_MAX);
-    hdr->fitshdr = fits;
+    if (withHdr) hdr->fitshdr = fits;
 
     /* debug - show FITS info if it is defined */
-    if (fits != NULL) {
+    if (withHdr && fits != NULL) {
       astShow(fits);
     }
 

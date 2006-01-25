@@ -124,8 +124,8 @@ void smf_close_file( smfData ** data, int * status ) {
     } else if ( file->ndfid != NDF__NOID ) {
 
       /* if this is a time series we need to free
-	 the header structure */
-      if (file->isTstream) sc2store_headunmap( status );
+	 the header structure if we have a smfHead */
+      if (file->isTstream && hdr != NULL) sc2store_headunmap( status );
 
       /* Annul the NDF and locators (which will unmap things) */
       if ( file->xloc ) datAnnul( &(file->xloc), status );

@@ -130,7 +130,8 @@ void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);
 
-void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
+void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
+		    smfData ** data, int *status);
 double smf_scale_tau ( const double tauwvm, const int filter, int *status);
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );

@@ -119,8 +119,10 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
   ndfAnnul( &indf, status);
 
+  /* Open the input without header information. This is required
+     because sc2store can not open two files at once */
+  smf_open_file( igrp, index, "READ", 0, &data, status);
 
-  smf_open_file( igrp, index, "READ", &data, status);
   /* Should check status here to make sure that the file was opened OK */
   if ( *status != SAI__OK) {
     errRep("", "Unable to open input file", status);
@@ -133,7 +135,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
 
   /* Close and reopen output file, populate output struct */
   ndfAnnul( &outndf, status);
-  smf_open_file( ogrp, index, "WRITE", ffdata, status);
+  smf_open_file( ogrp, index, "WRITE", 1, ffdata, status);
   if ( *status == SAI__ERROR) {
     errRep("", "Unable to open output file", status);
   }
