@@ -29,6 +29,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (TIMJ)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,9 @@
 *     2006-01-25 (AGG):
 *        Code factorization to simplify logic. Also corrects variance
 *        if present.
+*     2006-01-25 (TIMJ):
+*        1-at-a-time astTran2 is not fast. Rewrite to do the astTran2
+*        a frame at a time.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,16 +121,18 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
   double *vardata;          /* Pointer to variance array */
   dim_t index;             /* index into vectorized data array */
   dim_t k;                 /* Loop counter */
-  double xin;              /* X coordinate of input mapping */
-  double xout;             /* X coordinate of output */
-  double yin;              /* Y coordinate of input */
-  double yout;             /* Y coordinate of output */
+  double *xin;              /* X coordinates of input mapping */
+  double *xout;             /* X coordinates of output */
+  double *yin;              /* Y coordinates of input */
+  double *yout;             /* Y coordinates of output */
   double zd;               /* Zenith distance */
+  size_t * indices;
 
   size_t nframes = 0;        /* Number of frames */
   size_t npts;
   double extcorr;
   size_t base;
+  int z;
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -160,11 +166,33 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
   indata = (data->pntr)[0]; 
   vardata = (data->pntr)[1];
   npts = (data->dims)[0] * (data->dims)[1];
+
+  /* It is more efficient to call astTran2 with all the points
+     rather than one point at a time */
+  xin = malloc( npts * sizeof(double) );
+  yin = malloc( npts * sizeof(double) );
+  xout = malloc( npts * sizeof(double) );
+  yout = malloc( npts * sizeof(double) );
+  indices = malloc( npts * sizeof(size_t) );
+
+  /* Assume malloc worked for now */
+  /* Prefill with coordintes */
+  z = 0;
+  for (j = 0; j < (data->dims)[1]; j++) {
+    base = j *(data->dims)[0];
+    for (i = 0; i < (data->dims)[0]; i++) {
+      xin[z] = (double)i + 1.0;
+      yin[z] = (double)j + 1.0;
+      indices[z] = base + i; /* index into data array */
+      z++;
+    }
+  }
+
   /* Loop over number of time slices/frames */
-  for ( j=0; j<nframes; j++) {
+  for ( k=0; k<nframes; k++) {
     /* Call tslice_ast to update the header for the particular
        timeslice */
-    smf_tslice_ast( data, j, status );
+    smf_tslice_ast( data, k, status );
     /*    smf_tslice( data, &tdata, j, status );*/
     /* Retrieve header info */
     hdr = data->hdr;
@@ -181,30 +209,28 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
       }
     }
 
+    /* Transfrom from pixels to AZEL */
+    astTran2(wcs, npts, xin, yin, 1, xout, yout );
+
     /* Loop over data in time slice. Start counting at 1 since this is
        the GRID coordinate frame */
-    base = npts * j;
-    for (j = 1; j <= (data->dims)[1]; j++) {
-      for (i = 1; i <= (data->dims)[0]; i++) {
-	index = base + (j-1)*(data->dims)[0] + (i-1);
-	if (indata[index] != VAL__BADD) {
-	  xin = (double)i;
-	  yin = (double)j;
-	  /* Note this is not the most efficient way to do this */
-	  astTran2( wcs, 1, &xin, &yin, 1, &xout, &yout );
-	  zd = M_PI_2 - yout;
-	  airmass = F77_CALL(sla_airmas)( &zd );
-	  /*	printf( "Zenith distance: %f, Airmass: %f\n",zd, airmass);*/
-	  /*	printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
-	      index, indata[index], (exp(airmass*(double)tau)));*/
-	  extcorr = exp(airmass*tau);
-	  indata[index] *= extcorr;
-	  if (vardata != NULL && vardata[index] != VAL__BADD) {
-	    vardata[index] *= extcorr*extcorr;
-	  }
+    base = npts * k; /* Offset into 3d data array */
+    for (i=0; i < npts; i++ ) {
+      index = indices[i] + base;
+      if (indata[index] != VAL__BADD) {
+	zd = M_PI_2 - yout[indices[i]];
+	airmass = F77_CALL(sla_airmas)( &zd );
+	/*    printf( "Zenith distance: %f, Airmass: %f El: %f\n",zd, airmass);*/
+	/*    printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
+	  index, indata[index], (exp(airmass*(double)tau)));*/
+	extcorr = exp(airmass*tau);
+	indata[index] *= extcorr;
+	if (vardata != NULL && vardata[index] != VAL__BADD) {
+	  vardata[index] *= extcorr*extcorr;
 	}
       }
     }
+
     /* Restore coordinate frame to original */
     if ( *status == SAI__OK) {
       astSetC( wcs, "SYSTEM", origsystem );
@@ -219,6 +245,10 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
 
   }
 
-
+  free(xin);
+  free(yin);
+  free(xout);
+  free(yout);
+  free(indices);
 
 }
