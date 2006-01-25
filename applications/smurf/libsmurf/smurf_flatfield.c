@@ -114,7 +114,6 @@ void smurf_flatfield( int *status ) {
 
   /* Main routine */
   ndfBegin();
-  /*  sc2store_varinit();*/
 
   /* Get input file(s) */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -124,7 +123,6 @@ void smurf_flatfield( int *status ) {
 
   for (i=1; i<=size; i++ ) {
 
-    printf("i = %d %u\n",i,(unsigned int)i);
     /* Call flatfield routine */
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
     /*    smf_open_and_flatfield(igrp, NULL, i, &ffdata, status );*/
