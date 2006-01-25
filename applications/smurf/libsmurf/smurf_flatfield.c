@@ -51,10 +51,12 @@
 *        Use smf_open_file on the output data. Note that
 *        smf_close_file has been temporarily commented out until it is
 *        also updated to take account of reference counting.
+*     2006-01-24 (AGG):
+*        Updated to use new smf_open_and_flatfield routine.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -98,34 +100,21 @@
 #include "libsmf/smf.h"
 #include "smurflib.h"
 #include "libsmf/smf_err.h"
+#include "sc2da/sc2store.h"
 
 void smurf_flatfield( int *status ) {
 
-  smfDA *da;                /* Pointer to da struct containing flatfield info */
-  smfData *data;            /* Pointer to input data struct */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
-  smfFile *file;            /* Pointer to input file struct */
   int flag;                 /* */
-  smfHead *head;            /* Pointer to input file header info */
-  int i;                    /* Counter, index */
+  int i = 0;                    /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
-  int indf;                 /* NDF identifier for input file */
-  int j;                    /* Counter, index */
-  int nboll;                /* Number of bolometers */
-  int ndfdims[NDF__MXDIM];  /* Dimensions of input NDF */
-  char ndftype[NDF__SZTYP]; /* Type of data in output data file */
-  int ndims;                /* Number of active dimensions in input */
-  int nframes;              /* Number of time slices */
-  int nout;                 /* Number of data points in output data file */
   Grp *ogrp = NULL;         /* Output group of files */
-  double *outdata = NULL;   /* Pointer to output DATA array */
-  int outndf;               /* Output NDF identifier */
   int outsize;              /* Total number of NDF names in the output group */
-  char *pname;              /* Pointer to input filename */
   int size;                 /* Number of files in input group */
 
   /* Main routine */
   ndfBegin();
+  /*  sc2store_varinit();*/
 
   /* Get input file(s) */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
@@ -135,55 +124,30 @@ void smurf_flatfield( int *status ) {
 
   for (i=1; i<=size; i++ ) {
 
-    /* Q&D open the input file solely to propagate it to the output file */
-    ndgNdfas( igrp, i, "READ", &indf, status );
-    ndgNdfpr( indf, " ", ogrp, i, &outndf, status );
-    ndfAnnul( &indf, status);
-
-    smf_open_file( igrp, i, "READ", &data, status);
-    /* Should check status here to make sure that the file was opened OK */
-
-    file = data->file;
-    pname = file->name;
-    msgSetc("FILE", pname);
-    msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
-
-    /* Check we have a smfDA struct with flatfield info */
-    da = data->da;
-    if ( da != NULL ) {
-      msgSetc("FLATNAME", da->flatname);
-      msgSeti("NFRAMES", (data->dims)[2]);
-      msgOutif(MSG__VERB, " ", 
-	       "Read ^NFRAMES from time stream, flatfield method ^FLATNAME", 
-	       status);
-    } else { /* What if 10 out of 20 are bad? .... */
-      if ( *status == SAI__OK) {
-	/*        *status = SAI__ERROR;
-		  errRep( "smurf_flatfield", "Flatfield has already been applied",status);*/
-      }
-    }
-
-    /* Set parameters of the DATA array in the output file */
-    ndfStype( "_DOUBLE", outndf, "DATA", status);
-    ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
-
-    ndfAnnul( &outndf, status);
-
-    smf_open_file( ogrp, i, "WRITE", &ffdata, status);
-
+    printf("i = %d %u\n",i,(unsigned int)i);
     /* Call flatfield routine */
-    smf_flatfield( data, &ffdata, status );
+    smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
+    /*    smf_open_and_flatfield(igrp, NULL, i, &ffdata, status );*/
+
+    /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
       errAnnul( status );
       msgOutif(MSG__VERB, "smurf_flatfield",
 	     "smurf_flatfield: Data are already flatfielded", status);
-    } else {
+    } else if ( *status == SAI__OK) {
       msgOutif(MSG__VERB," ","Flat field applied", status);
+      /* Write history entry */
+    } else {
+      /* Tell the user which file it was... */
+      /* Would be user-friendly to trap 1st etc... */
+      errFlush( status );
+      msgSeti("I",i);
+      msgSeti("N",size);
+      errRep("smurf_flatfield",
+	     "Unable to flatfield data from the ^I th of ^N files", status);
     }
-
-    /*    smf_close_file( &data, status );*/
-    /*smf_close_file( &ffdata, status );*/
-
+    /* Free resources for output data */
+    /* smf_close_file( &ffdata, status );*/
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
