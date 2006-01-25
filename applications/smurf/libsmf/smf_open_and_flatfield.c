@@ -46,6 +46,8 @@
 *        smurf_flatfield.
 *     2006-01-24 (TIMJ):
 *        Fix i vs index and calling arguments
+*     2006-01-25 (AGG):
+*        Copies input data to output file when passed flatfielded data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,6 +97,8 @@
 #include "smf_err.h"
 #include "sc2da/sc2store.h"
 
+#define FUNC_NAME "smf_open_and_flatfield"
+
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata, int *status) {
 
   smfData *data;            /* Pointer to input data struct */
@@ -104,6 +108,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   void *outdata[1];          /* Pointer to array of output mapped  pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
+  size_t npts;
 
   if ( *status != SAI__OK ) return;
 
@@ -121,16 +126,6 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     errRep("", "Unable to open input file", status);
   }
 
-  /* Check whether the data are flatfielded */
-  smf_check_flat( data, status);
-
-  if (*status == SAI__OK) {
-    file = data->file;
-    pname = file->name;
-    msgSetc("FILE", pname);
-    msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
-  }
-
   /* Set parameters of the DATA array in the output file */
   ndfStype( "_DOUBLE", outndf, "DATA", status);
   /* We need to map this so that the DATA_ARRAY is defined on exit */
@@ -143,8 +138,27 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     errRep("", "Unable to open output file", status);
   }
 
-  /* Flatfield the data */
-  smf_flatfield( data, ffdata, status );
+  /* Check whether the data are flatfielded */
+  smf_check_flat( data, status);
+
+  if (*status == SAI__OK) {
+    file = data->file;
+    pname = file->name;
+    msgSetc("FILE", pname);
+    msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
+    /* Flatfield the data */
+    smf_flatfield( data, ffdata, status );
+  } else if ( *status == SMF__FLATN ) {
+    errAnnul( status );
+    /* Just copy input to output file */
+    npts = (data->dims)[0] * (data->dims)[1];
+    if ( data->ndims == 3) {
+      npts *= (data->dims)[2];
+    }
+    msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
+    memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
+  }
+
 
   /* Free resources for input data */
   smf_close_file( &data, status );
