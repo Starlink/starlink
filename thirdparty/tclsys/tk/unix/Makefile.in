@@ -134,7 +134,8 @@ CFLAGS			= @CFLAGS_DEFAULT@ @CFLAGS@
 # Flags to pass to the linker
 LDFLAGS_DEBUG		= @LDFLAGS_DEBUG@
 LDFLAGS_OPTIMIZE	= @LDFLAGS_OPTIMIZE@
-LDFLAGS			= @LDFLAGS_DEFAULT@ @LDFLAGS@
+LDFLAGS_DEFAULT		= @LDFLAGS_DEFAULT@
+LDFLAGS                 = $(LDFLAGS_DEFAULT) @LDFLAGS@
 
 # A "-I" switch that can be used when compiling to make all of the
 # X11 include files accessible (the configure script will try to

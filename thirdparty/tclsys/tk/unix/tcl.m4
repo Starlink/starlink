@@ -1187,17 +1187,6 @@ dnl AC_CHECK_TOOL(AR, ar)
 		CFLAGS="$CFLAGS -mieee"
 	    fi
 
-	    # The combo of gcc + glibc has a bug related
-	    # to inlining of functions like strtod(). The
-	    # -fno-builtin flag should address this problem
-	    # but it does not work. The -fno-inline flag
-	    # is kind of overkill but it works.
-	    # Disable inlining only when one of the
-	    # files in compat/*.c is being linked in.
-	    if test x"${LIBOBJS}" != x ; then
-	        CFLAGS="$CFLAGS -fno-inline"
-	    fi
-
 	    # XIM peeking works under XFree86.
 	    AC_DEFINE(PEEK_XCLOSEIM)
 
@@ -1847,7 +1836,7 @@ dnl AC_CHECK_TOOL(AR, ar)
 
     if test "${SHARED_BUILD}" = "1" && test "${SHLIB_SUFFIX}" != "" ; then
         LIB_SUFFIX=${SHARED_LIB_SUFFIX}
-        MAKE_LIB='${SHLIB_LD} -o [$]@ ${OBJS} ${SHLIB_LD_LIBS} ${TCL_SHLIB_LD_EXTRAS} ${TK_SHLIB_LD_EXTRAS} ${LD_SEARCH_FLAGS}'
+        MAKE_LIB='${SHLIB_LD} -o [$]@ ${OBJS} ${LDFLAGS} ${SHLIB_LD_LIBS} ${TCL_SHLIB_LD_EXTRAS} ${TK_SHLIB_LD_EXTRAS} ${LD_SEARCH_FLAGS}'
         INSTALL_LIB='$(INSTALL_LIBRARY) $(LIB_FILE) $(LIB_INSTALL_DIR)/$(LIB_FILE)'
     else
         LIB_SUFFIX=${UNSHARED_LIB_SUFFIX}
