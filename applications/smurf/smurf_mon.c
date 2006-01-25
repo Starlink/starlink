@@ -39,6 +39,9 @@
 *        Initial test version
 *     2005-10-05 (TIMJ):
 *        Register inherited status pointer with AST
+*     2006-01-24 (TIMJ):
+*        Use NDF__SZAPP.
+*        Check for GRP leaks
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,23 +82,27 @@
 #include "mers.h"
 #include "f77.h"
 #include "ndf.h"
+#include "star/grp.h"
 
 #include "libsmurf/smurflib.h"
 
 F77_SUBROUTINE(task_get_name)(char *, int*, int);
-enum { SZAPP = 512 };
 
 void smurf_mon( int * status ) {
 
   /* Local variables */
   char taskname[PAR__SZNAM+1];
-  char appname[SZAPP];
-
+  char appname[NDF__SZAPP+1];
+  int ngrp0;                   /* Number of grp ids at start */
+  int ngrp1;                   /* Number of grp ids at end */
 
   if ( *status != SAI__OK ) return; 
 
   /* Register our status variable with AST */
   astWatch( status );
+
+  /* Get the GRP status for leak checking */
+  grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
 
   /* Find out the task name we were invoked with */
   memset( taskname, ' ', PAR__SZNAM );
@@ -105,7 +112,7 @@ void smurf_mon( int * status ) {
 
   /* Update the application name in the NDF history recording
      to include the version number of the application */
-  snprintf( appname, SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
+  snprintf( appname, NDF__SZAPP, "%-*s (%s V%s)", PAR__SZNAM,
 	    taskname, PACKAGE_UPCASE, PACKAGE_VERSION);
   ndfHappn( appname, status );
   msgIfget("MSG_FILTER", status);
@@ -124,6 +131,28 @@ void smurf_mon( int * status ) {
     msgSetc( "TASK", taskname );
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
+
+  /* Check for GRP leaks Do this in a new error reporting context so
+   * that we get the correct value even if an error has occurred. */
+  errBegin( status );
+  grpInfoi( NULL, 0, "NGRP", &ngrp1, status );
+
+  /* If there are more active groups now than there were on entry,
+   * there must be a problem (GRP identifiers are not being freed
+   * somewhere). So report it. */
+  if (*status == SAI__OK && ngrp1 > ngrp0) {
+    msgBlank( status );
+    msgSetc( "NAME", taskname );
+    msgSeti( "NGRP0", ngrp0 );
+    msgSeti( "NGRP1", ngrp1 );
+    msgOut( "SMURF_NGRP", "WARNING: The number of active "
+	    "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
+	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+	    " error).", status);
+    msgBlank(status);
+  }
+  errEnd( status );
+
 
 }
 
