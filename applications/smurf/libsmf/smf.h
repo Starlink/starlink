@@ -45,6 +45,10 @@
 *        Add smf_scale_tau and smf_fits_getF
 *     2006-01-24 (TIMJ):
 *        Add smf_fits_getS
+*     2006-01-24 (AGG):
+*        Change floats to doubles in smf_correction_extintion, smf_scale_tau
+*     2006-01-25 (AGG):
+*        Add smf_dtype_check_fatal
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,13 +91,19 @@ void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
 
-void smf_correct_extinction( smfData *data, float tau, int *status);
+void smf_correct_extinction( smfData *data, const char *method, double tau, int *status);
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
+
+void smf_dtype_check_fatal( const smfData* data, const char * type, smf_dtype itype,
+		     int *status );
+
 char * smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
+
+/*void smf_extcorr( smfData *data, double tau, int *status);*/
 
 void smf_fits_crchan( int nfits, char * headrec, AstFitsChan ** fits, int *status);
 
@@ -121,8 +131,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index,
 			      smfData **ffdata, int *status);
 
 void smf_open_file( Grp * igrp, int index, char * mode, smfData ** data, int *status);
-
-float smf_scale_tau ( const float tauwvm, const int filter, int *status);
+double smf_scale_tau ( const double tauwvm, const int filter, int *status);
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
