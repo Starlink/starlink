@@ -113,6 +113,8 @@ void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
 }
 
 /* Note that it takes a fortran integer as arg */
+/* Not sure why this can't return GRP__NOID if given a NULL pointer
+   without setting status */
 F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
   if ( *status != SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
   if ( igrp == NULL ) {
@@ -319,7 +321,11 @@ void grpInfoi( Grp *grp, int index, const char * item, int * value,
   DECLARE_INTEGER(STATUS);
   DECLARE_INTEGER(VALUE);
 
-  IGRP = grp1Getid( grp, status );
+  if (grp == NULL ) {
+    IGRP = (F77_INTEGER_TYPE)GRP__NOID;
+  } else {
+    IGRP = grp1Getid( grp, status );
+  }
 
   F77_CREATE_CHARACTER( ITEM, strlen(item) );
   F77_EXPORT_CHARACTER( item, ITEM, ITEM_length );
