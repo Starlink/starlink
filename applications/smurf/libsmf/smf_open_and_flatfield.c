@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_open_and_flatfield( Grp *igrp, Grp *ogrp, int index,
-*                             smfData *data, int *status );
+*                             smfData **data, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -24,7 +24,8 @@
 *     index = int (Given)
 *        Index into the group
 *     data = smfData** (Returned)
-*        Pointer to a smfData struct containing flatfielded data.
+*        Pointer to a pointer to smfData struct containing flatfielded data.
+*        Will be created by this routine, or NULL on error.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -41,12 +42,15 @@
 
 *  History:
 *     2006-01-23 (AGG):
-*        Initial version, stripped out code from old version of smurf_flatfield.
+*        Initial version, stripped out code from old version of 
+*        smurf_flatfield.
+*     2006-01-24 (TIMJ):
+*        Fix i vs index and calling arguments
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -86,29 +90,29 @@
 #include "msg_par.h"
 
 #include "smurf_par.h"
-#include "libsmf/smf.h"
-#include "smurflib.h"
-#include "libsmf/smf_err.h"
+#include "smf.h"
+#include "libsmurf/smurflib.h"
+#include "smf_err.h"
 #include "sc2da/sc2store.h"
 
-void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData *ffdata, int *status) {
+void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata, int *status) {
 
   smfData *data;            /* Pointer to input data struct */
   smfFile *file;            /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
-  double *outdata = NULL;   /* Pointer to output DATA array */
+  void *outdata[0];          /* Pointer to array of output mapped  pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
 
   if ( *status != SAI__OK ) return;
 
   /* Open the input file solely to propagate it to the output file */
-  ndgNdfas( igrp, i, "READ", &indf, status );
-  ndgNdfpr( indf, " ", ogrp, i, &outndf, status );
+  ndgNdfas( igrp, index, "READ", &indf, status );
+  ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
   ndfAnnul( &indf, status);
 
-  smf_open_file( igrp, i, "READ", &data, status);
+  smf_open_file( igrp, index, "READ", &data, status);
   /* Should check status here to make sure that the file was opened OK */
   if ( *status != SAI__OK) {
     errRep("", "Unable to open input file", status);
@@ -126,17 +130,18 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData *ffdata, 
 
   /* Set parameters of the DATA array in the output file */
   ndfStype( "_DOUBLE", outndf, "DATA", status);
-  ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata, &nout, status );
+  /* We need to map this so that the DATA_ARRAY is defined on exit */
+  ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &outdata[0], &nout, status );
 
   /* Close and reopen output file, populate output struct */
   ndfAnnul( &outndf, status);
-  smf_open_file( ogrp, i, "WRITE", &ffdata, status);
+  smf_open_file( ogrp, index, "WRITE", ffdata, status);
   if ( *status == SAI__ERROR) {
     errRep("", "Unable to open output file", status);
   }
 
   /* Flatfield the data */
-  smf_flatfield( data, &ffdata, status );
+  smf_flatfield( data, ffdata, status );
 
   /* Free resources for input data */
   smf_close_file( &data, status );
