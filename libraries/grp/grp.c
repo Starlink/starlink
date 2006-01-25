@@ -33,6 +33,8 @@
 *        Fix return value of grp1Getid if input Grp* is NULL
 *     24-NOV-2006 (TIMJ):
 *        Add grpInfoi
+*     25-NOV-2006 (TIMJ):
+*        GRP identifier should be obtained for grpDelet even if status is bad
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,7 +108,7 @@ void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
   if ( *status != SAI__OK ) return;
   if ( igrp == NULL ) {
     *status = GRP__INTER;
-    errRep( "GRP1_SETID_ERR", "Grp struct pointer was null in setid",
+    errRep( "GRP1_SETID_ERR", "Grp struct pointer was NULL in setid",
 	    status);
   }
   igrp->igrp = IGRP;
@@ -119,7 +121,7 @@ F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
   if ( *status != SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
   if ( igrp == NULL ) {
     *status = GRP__INTER;
-    errRep( "GRP1_GETID_ERR", "Grp struct pointer was null in getid",
+    errRep( "GRP1_GETID_ERR", "Grp struct pointer was NULL in getid",
 	    status);
     return (F77_INTEGER_TYPE) GRP__NOID;
   }
@@ -156,8 +158,14 @@ F77_SUBROUTINE(grp_delet)( INTEGER(IGRP), INTEGER(STATUS) );
 void grpDelet( Grp **igrp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(STATUS);
+   int lstat = SAI__OK;
 
-   IGRP = grp1Getid( *igrp, status );
+   /* Need to get hold of the Id regardless of status */
+   errMark();
+   IGRP = grp1Getid( *igrp, &lstat );
+   if (lstat != SAI__OK) errAnnul( &lstat );
+   errRlse();
+
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_CALL(grp_delet)( INTEGER_ARG(&IGRP),
