@@ -186,7 +186,7 @@ void smurf_makemap( int *status ) {
     
     for(i=1; i<=size; i++ ) {
       /* Read data from the ith input file in the group */      
-      smf_open_file( igrp, i, "READ", &data, status );
+      smf_open_file( igrp, i, "READ", 1, &data, status );
 
       /* flatfield the data */
       /*smf_flatfield( data_raw, &data, status );*/
