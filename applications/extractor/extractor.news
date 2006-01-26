@@ -1,5 +1,17 @@
 1 Update to EXTRACTOR
 
+ Changes in release 2.4.5
+
+    EXTRACTOR has been changed so that it now works on NDFs with higher
+    number of dimensions, provided that only two dimensions are significant.
+    This means it's now possible to run EXTRACTOR on a plane of a cube:
+   
+       extractor cube'(,,1)'
+
+    EXTRACTOR has also been changed to avoid converting all data to single
+    precision reals before they are processed. This makes it much more
+    efficient when accessing integer and double precision data.
+
  Changes in release 2.4.4.
 
     EXTRACTOR has been updated to use SExtractor version 2.4.4. The main
@@ -31,4 +43,4 @@
 
     % showme sun226
 
- Peter W. Draper 10th October 2005 (extractor@star.rl.ac.uk).
+ Peter W. Draper 26th January 2006 (extractor@star.rl.ac.uk).

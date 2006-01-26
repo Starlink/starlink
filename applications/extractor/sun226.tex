@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.10}
+\newcommand{\stardocnumber}    {226.11}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {10th October 2005}
+\newcommand{\stardocdate}      {26th January 2006}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -1098,6 +1098,22 @@ A minor update to \EXTRACTOR\ with the following changes:
  \EXTRACTOR\ has been updated to use \SExtractor\ version 2.4.4. The main
  changes are the introduction of Petrosian magnitudes and windowed
  measurements.
+
+\subsection{Version 2.4.5}
+
+ \EXTRACTOR\ has been changed so that it now works on NDFs with higher
+ number of dimensions, provided that only two dimensions are significant.
+ This means it's now possible to run \EXTRACTOR\ on a plane of a cube:
+ \begin{quote}
+ \begin{verbatim}   
+       extractor cube'(,,1)'
+ \end{verbatim}   
+ \end{quote}
+
+ \EXTRACTOR\ has also been changed to avoid converting all data to single
+ precision reals before they are processed. This makes it much more efficient
+ when accessing integer and double precision data.
+
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\

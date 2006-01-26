@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(extractor, 2.4-4, extractor@star.rl.ac.uk)
+AC_INIT(extractor, 2.4-5, extractor@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -39,7 +39,7 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [ast ndf sae], [link])
+STAR_DECLARE_DEPENDENCIES(build, [ast ndg sae], [link])
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    List the sun/ssn/... numbers which document this package and
