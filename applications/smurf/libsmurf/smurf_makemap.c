@@ -32,15 +32,17 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2006-01-13 (EC)
+*     2006-01-13 (EC):
 *        Automatically determine map size
 *        Use VAL__BADD for pixels with no data in output map
-*     2006-01-04 (EC)
+*     2006-01-04 (EC):
 *        Properly setting rebinflags
-*     2005-12-16 (EC)
+*     2005-12-16 (EC):
 *        Working for simple test case with astRebinSeq 
-*     2005-09-27 (EC)
+*     2005-09-27 (EC):
 *        Clone from smurf_extinction
+*     2006-01-25 (TIMJ):
+*        Replace malloc with smf_malloc.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,9 +179,10 @@ void smurf_makemap( int *status ) {
       map = data_index[0];
       ndfMap( ondf, "VARIANCE", "_DOUBLE", "WRITE", data_index, &n, status);
       variance = data_index[0];
-      weights = (double *) malloc( sizeof(double) *
-				   (ubnd_out[0]-lbnd_out[0]+1) *
-				   (ubnd_out[1]-lbnd_out[1]+1) );
+      /* Allocate memory for weights and initialise to zero */
+      weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
+			    (ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
+			    1, status );
     }
 
     /* Loop over all data to identify the extent of the map */
@@ -422,7 +425,7 @@ void smurf_makemap( int *status ) {
   if( sky2map != NULL )
     astAnnul( sky2map );
 
-  free( weights );
+  smf_free( weights, status );
 
   ndfUnmap( ondf, "DATA", status);
   ndfUnmap( ondf, "VARIANCE", status);
