@@ -11,15 +11,18 @@
 *
 *	Contents:	functions for input of image data.
 *
-*	Last modify:	06/05/99
 *	Last modify:	28/10/98 (AJC)
 *                          In line with V2.0.15
 *                       14/12/98 (PWD):
 *                          Added USHORT and UBYTE support.
 *                       17/12/98 (PWD):
 *                          Changed to use NDF WCS component for astrometry.
-*	Last modify:	27/11/2003
-*                       23-NOV-2005 (TIMJ): Remove DAT__ROOT
+*	                27/11/2003 (EB):
+*                       23-NOV-2005 (TIMJ): 
+*                          Remove DAT__ROOT
+*                       26/01/2006 (PWD): 
+*                          Changed to handle redundant axes in data and native
+*                          data type of NDF.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -55,7 +58,6 @@
 Load a new strip of pixel data into the buffer.
 */
 void	*loadstrip(picstruct *field, picstruct *wfield)
-
   {
    checkstruct	*check;
    int		y, w, flags, interpflag;
@@ -243,9 +245,66 @@ void	readdata(picstruct *field, PIXTYPE *ptr, int size)
   bz = (PIXTYPE)field->bzero;
 
   left = field->nel - field->file;
-  for ( i=0; i< (size < left ? size : left ); i++ ) {
-     *(ptr++) = *((PIXTYPE *)field->map + field->file++)*bs + bz;
-  }
+
+  switch(field->bitpix)
+    {
+    case BP_BYTE:
+        if ( field->bitsgn ) {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((char *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        else {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((BYTE *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        break;
+
+    case BP_SHORT:
+        if ( field->bitsgn ) {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((short *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        else {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((USHORT *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        break;
+
+    case BP_LONG:
+        if ( field->bitsgn ) {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((LONG *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        else {
+            for ( i=0; i< (size < left ? size : left ); i++ ) {
+                *(ptr++) = (PIXTYPE) *(((ULONG *)field->map) + field->file++)*bs+bz;
+            }
+        }
+        break;
+
+    case BP_FLOAT:
+        for ( i=0; i< (size < left ? size : left ); i++ ) {
+            *(ptr++) = (PIXTYPE) *(((float *)field->map) + field->file++)*bs+bz;
+        }
+        break;
+
+    case BP_DOUBLE:
+        for ( i=0; i< (size < left ? size : left ); i++ ) {
+            *(ptr++) = (PIXTYPE) *(((double *)field->map) + field->file++)*bs+bz;
+        }
+        break;
+
+    default:
+        error(EXIT_FAILURE,"*FATAL ERROR*: unknown BITPIX type in ",
+              "readdata()");
+        break;
+    }
+
 
 /* Reset field->file if at end */
 /* This prevents endfield from crashing if field->file is used for NDF */
@@ -291,6 +350,9 @@ void	readimagehead(picstruct *field)
    int          placehldr;
    int          lbnd[NDF__MXDIM];
    int          ubnd[NDF__MXDIM];
+   int          sigaxis[2];
+   int          nsig;
+   int          i;
 
 /* Open the file */
   field->file = 0;
@@ -307,7 +369,7 @@ void	readimagehead(picstruct *field)
 
   field->bitsgn = 1;
   if (!strcmp(type,"_BYTE")) {
-    field->bitpix = BP_BYTE;
+      field->bitpix = BP_BYTE;
   } else if (!strcmp(type,"_UBYTE")) {
     field->bitpix = BP_BYTE;
     field->bitsgn = 0;
@@ -324,15 +386,32 @@ void	readimagehead(picstruct *field)
     field->bitpix = BP_DOUBLE;
   } else error(EXIT_FAILURE, "Sorry, I don't know that kind of data.", "");
 
-/*  field->bytepix = (field->bitpix>0?field->bitpix:-field->bitpix)>>3;*/
-  field->bytepix = 4;
+  field->bytepix = (field->bitpix>0?field->bitpix:-field->bitpix)>>3;
 
   ndfDim( field->ndf, NDF__MXDIM, dims, &ndims, &status );
-  if ( !(ndims==2))
-    error( EXIT_FAILURE, field->filename, " does NOT contain 2D data." );
+  sigaxis[0] = 0;
+  sigaxis[1] = 1;
+  if ( ndims != 2 ) {
+      /* Look for 2D, but with insignificant dimensions */
+      nsig = 0;
+      for( i = 0; i < ndims; i++ ) {
+          if( dims[ i ] > 1 ) {
+              if ( nsig == 0 ) {
+                  sigaxis[0] = i;
+              }
+              else {
+                  sigaxis[1] = i;
+              }
+              nsig++;
+          }
+      }
+      if ( nsig != 2 ) {
+          error( EXIT_FAILURE, field->filename, " does NOT contain 2D data." );
+      }
+  }
 
-  field->width = dims[0];
-  field->height = dims[1];
+  field->width = dims[sigaxis[0]];
+  field->height = dims[sigaxis[1]];
   field->npix = (KINGSIZE_T)field->width*field->height;
 
   field->bscale = 1.0;
@@ -343,8 +422,8 @@ void	readimagehead(picstruct *field)
   ndfCget( field->ndf, "TITLE", field->ident, MAXCHAR, &status );
 
   ndfBound( field->ndf, NDF__MXDIM, lbnd, ubnd, &ndims, &status );
-  field->origin[0] = lbnd[0];
-  field->origin[1] = lbnd[1];
+  field->origin[0] = lbnd[sigaxis[0]];
+  field->origin[1] = lbnd[sigaxis[1]];
 
 /*----------------------------- Astrometry ---------------------------------*/
 /* Presently, astrometry is done only on the measurement and detect images */
@@ -424,13 +503,17 @@ void	readimagehead(picstruct *field)
   /*-------------------------------------------------------------------------*/
 
   /* Map the NDF in the appropriate type */
-    if (field->flags ^ FLAG_FIELD)
-      ndfMap( field->ndf, "DATA", "_REAL", "READ", pntr, &nel, &status );
-    else
-      ndfMap( field->ndf, "DATA", "_REAL", "READ", pntr, &nel, &status );
-    field->map = pntr[0];
-    field->file = 0;
-    field->nel = nel;
+  if (field->flags ^ FLAG_FIELD) {
+      ndfMap( field->ndf, "DATA", type, "READ", pntr, &nel, &status );
+  }
+  else {
+      /* All FLAG images are used with type "unsigned int" */
+      ndfMap( field->ndf, "DATA", "_INTEGER", "READ", pntr, &nel, &status );
+  }
+
+  field->map = pntr[0];
+  field->file = 0;
+  field->nel = nel;
 
   return;
   }
