@@ -121,5 +121,5 @@ void smf_insert_tslice (smfData **idata, smfData *tdata, int index, int *status 
   }
 
   /* Free tdata so we don't leak memory */
-  free (tdata);
+  smf_free (tdata, status);
 }
