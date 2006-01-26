@@ -407,6 +407,7 @@
       INCLUDE 'PRM_PAR'         ! Primitive data constants
       INCLUDE 'GRP_PAR'         ! GRP parameters
       INCLUDE 'CNF_PAR'         ! CNF functions
+      INCLUDE 'NDF_PAR'         ! NDF parameters
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -422,17 +423,20 @@
       INTEGER ARDGRP            ! ARD description identifier (GRP)
       INTEGER FDIN              ! Description file FIO identifier
       INTEGER FDOUT             ! Description file FIO identifier
-      INTEGER IDIMS( 2 )        ! Dimension of input NDF
+      INTEGER I                 ! Loop variable
+      INTEGER IDIM              ! Dimension of an NDF axis
+      INTEGER IDIMS( NDF__MXDIM ) ! Dimension of input NDF
       INTEGER INDF              ! Input NDF identfier
       INTEGER IPIN              ! Pointer to input data
       INTEGER IPMASK            ! Pointer to mask
       INTEGER IPVAR             ! Pointer to input variances
-      INTEGER LBND( 2 )         ! Lower bounds of input NDF
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDE( 2 )        ! Lower bounds of ARD box
       INTEGER LBNDI( 2 )        ! Lower bounds of ARD box
       INTEGER MXITER            ! Maximum centroiding iterations
       INTEGER NDIM              ! Number of dimension of input NDF
       INTEGER NEL               ! Number elements in input NDF
+      INTEGER NSIG              ! Number of significant dimensions
       INTEGER OBJIND            ! GRP identifier (object indices)
       INTEGER OBJINF            ! GRP identifier (object aperture info)
       INTEGER PHOTON            ! Type of noise estimates
@@ -443,7 +447,7 @@
       INTEGER SKYEST            ! Sky estimator
       INTEGER SKYIND            ! GRP identifier (sky-object indices)
       INTEGER SKYINF            ! GRP identifier (sky aperture info)
-      INTEGER UBND( 2 )         ! Upper bounds of input NDF
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDE( 2 )        ! Upper bounds of ARD box
       INTEGER UBNDI( 2 )        ! Upper bounds of ARD box
       LOGICAL CENTRO            ! Whether to centroid positions
@@ -491,20 +495,49 @@
       CALL NDF_BEGIN
       CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )
 
-*  Make sure input NDF is two dimensional.
-      CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
+*  Make sure input NDF is two dimensional. Don't worry about trivial
+*  dimensions and assume the two coordinates apply only to the
+*  significant ones.
+      CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( NDIM .NE. 2 ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'AUTOPHOTOM_DIMS',
-     :                 'Data array is not 2-dimensional',
-     :                 STATUS )
-         GO TO 99
+         NSIG = 0
+         DO 1 I = 1, NDIM
+            IDIM = UBND( I ) - LBND( I ) + 1
+            IF ( IDIM .GT. 1 ) THEN
+               IF ( NSIG .EQ. 0 ) THEN
+                  IDIMS( 1 ) = IDIM
+                  LBND( 1 ) = LBND( I )
+                  UBND( 1 ) = UBND( I )
+               ELSE
+                  IDIMS( 2 ) = IDIM
+                  LBND( 2 ) = LBND( I )
+                  UBND( 2 ) = UBND( I )
+               END IF
+               NSIG = NSIG + 1
+            END IF
+ 1       CONTINUE
+
+         IF ( NSIG .NE. 2 ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'AUTOPHOTOM_DIMS',
+     :                  'Data array is not 2-dimensional',
+     :                  STATUS )
+            GO TO 99
+         ELSE
+
+*  Only two significant dimensions.
+            NDIM = 2
+         END IF
+
+      ELSE
+
+*  Simple 2D NDF.
+         IDIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
+         IDIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
       ENDIF
 
-*  Calculate the dimensions of the NDF and map in its data array.
-      IDIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
-      IDIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
+*  Map in its data array.
       CALL NDF_MAP( INDF, 'DATA', '_REAL', 'READ', IPIN, NEL, STATUS )
 
 *  See if the NDF has a variance component, if so map it in.
@@ -607,7 +640,7 @@
          TRCOEF( 1 ) = VAL__BADR
          REGVAL = 2
          CALL ARD_WORK( ARDGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,
-     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ), 
+     :                  REGVAL, %VAL( CNF_PVAL( IPMASK ) ),
      :                  LBNDI, UBNDI, LBNDE,  UBNDE, STATUS )
       ENDIF
 
@@ -619,10 +652,10 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL PHO1_AUTO( MAGS, OBJIND, OBJINF, SKYIND, SKYINF,
      :                   PSFIND, PSFINF, IDIMS( 1 ), IDIMS( 2 ),
-     :                   LBND, %VAL( CNF_PVAL( IPIN ) ), ISVAR, 
-     :                   %VAL( CNF_PVAL( IPVAR ) ), USEMSK, 
-     :                   %VAL( CNF_PVAL( IPMASK ) ), CENTRO, PADU, 
-     :                   SKYMAG, SKYEST, SKY, SKYSIG, PHOTON, BIASLE, 
+     :                   LBND, %VAL( CNF_PVAL( IPIN ) ), ISVAR,
+     :                   %VAL( CNF_PVAL( IPVAR ) ), USEMSK,
+     :                   %VAL( CNF_PVAL( IPMASK ) ), CENTRO, PADU,
+     :                   SKYMAG, SKYEST, SKY, SKYSIG, PHOTON, BIASLE,
      :                   SATURE, SEARCH, POSTVE, MXSHFT, MXITER, TOLER,
      :                   ETIME, FIXANN, NE, ELLIPS, L, R, YLIST, LYLIST,
      :                   RYLIST, INSL, INSR, POLY, OPTIMA, STATUS )
