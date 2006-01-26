@@ -32,15 +32,15 @@
 *     {enter_new_authors_here}
 
 *  History:
+*     2005-09-27 (EC):
+*        Clone from smurf_extinction
+*     2005-12-16 (EC):
+*        Working for simple test case with astRebinSeq 
+*     2006-01-04 (EC):
+*        Properly setting rebinflags
 *     2006-01-13 (EC):
 *        Automatically determine map size
 *        Use VAL__BADD for pixels with no data in output map
-*     2006-01-04 (EC):
-*        Properly setting rebinflags
-*     2005-12-16 (EC):
-*        Working for simple test case with astRebinSeq 
-*     2005-09-27 (EC):
-*        Clone from smurf_extinction
 *     2006-01-25 (TIMJ):
 *        Replace malloc with smf_malloc.
 *     {enter_further_changes_here}
