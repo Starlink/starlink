@@ -35,12 +35,13 @@
 *        Initial version.
 *     2005-12-12 (AGG):
 *        Update API prototype to reflect const input struct
+*     2006-01-25 (AGG):
+*        Minor change to logic on checking existence of smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -76,22 +77,18 @@
 
 void smf_check_flat ( const smfData *data, int *status ) {
 
-  smfDA * da;
-  smf_dtype dtype;
+  smfDA *da;
 
   if ( *status != SAI__OK ) return;
 
   /* Retrieve the smfDa struct */
   da = data->da;
-  dtype = data->dtype;
 
   /* Data need flatfielding if da is defined */
-  if ( da != NULL ) {
-    msgOutif(MSG__VERB, " ", "Data need flatfielding", status);
-  } else {
+  if ( da == NULL ) {
     /* No raw data struct => data flatfielded */
-    msgOutif(MSG__VERB, " ", "Data are already flatfielded", status);
     *status = SMF__FLATN;
+    errRep(" ", "Data are already flatfielded", status);
   }
   
 }
