@@ -49,6 +49,8 @@
 *        Change floats to doubles in smf_correction_extintion, smf_scale_tau
 *     2006-01-25 (AGG):
 *        Add smf_dtype_check_fatal
+*     2006-01-25 (TIMJ):
+*        Add smf_malloc, smf_free
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,12 +122,16 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
 
 void smf_flatten ( smfData *data, int *status );
 
+void smf_free( void * pntr, int * status );
+
 int smf_history_check( const smfData* data, const char * appl, int *status);
 
 void smf_history_write( const smfData* data, const char * appl, 
 			const char * text, int *status);
 
 void smf_insert_tslice ( smfData **idata, smfData *tdata, int index, int *status );
+
+void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, int * status );
 
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
 			      smfData **ffdata, int *status);

@@ -169,11 +169,11 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
 
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
-  xin = malloc( npts * sizeof(double) );
-  yin = malloc( npts * sizeof(double) );
-  xout = malloc( npts * sizeof(double) );
-  yout = malloc( npts * sizeof(double) );
-  indices = malloc( npts * sizeof(size_t) );
+  xin = smf_malloc( npts, sizeof(double), 0, status );
+  yin = smf_malloc( npts, sizeof(double), 0, status );
+  xout = smf_malloc( npts, sizeof(double), 0, status );
+  yout = smf_malloc( npts, sizeof(double), 0, status );
+  indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
   /* Assume malloc worked for now */
   /* Prefill with coordintes */
@@ -245,10 +245,10 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
 
   }
 
-  free(xin);
-  free(yin);
-  free(xout);
-  free(yout);
-  free(indices);
+  smf_free(xin,status);
+  smf_free(yin,status);
+  smf_free(xout,status);
+  smf_free(yout,status);
+  smf_free(indices,status);
 
 }

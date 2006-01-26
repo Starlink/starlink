@@ -5,6 +5,7 @@ libsmf_la_SOURCES = $(C_ROUTINES)
 
 C_ROUTINES = smf_correct_extinction.c smf_scale_tau.c \
 smf_fits_rdhead.c smf_fits_crchan.c \
+smf_free.c smf_malloc.c \
 smf_open_file.c smf_close_file.c \
 smf_dtype_check.c smf_dtype_string.c smf_dtype_size.c smf_dtype_check_fatal.c \
 smf_fits_getI.c smf_fits_getD.c smf_fits_getF.c smf_fits_getS.c \
