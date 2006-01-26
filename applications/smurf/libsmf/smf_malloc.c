@@ -93,6 +93,21 @@ smf_malloc( size_t nelem, size_t bperel, int zero, int * status ) {
 
   nbytes = nelem * bperel;
 
+  if (nbytes == 0) {
+    *status = SMF__NOMEM;
+    msgSeti( "NEL", nelem );
+    msgSeti( "BP" , bperel );
+    if ( nelem == 0 ) {
+      errRep( FUNC_NAME, "Attempt to allocate zero elements of sisze ^BP bytes "
+	      "(possible programming error)", status);      
+    } else {
+      errRep( FUNC_NAME, "Attempt to allocate ^NEL elements of zero bytes "
+	      "(possible programming error)", status);
+    }
+
+    return NULL;
+  }
+
   retval = astMalloc( nelem * bperel );
 
   if (retval == NULL) {
