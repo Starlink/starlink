@@ -50,7 +50,8 @@
 *     2006-01-25 (AGG):
 *        Add smf_dtype_check_fatal
 *     2006-01-25 (TIMJ):
-*        Add smf_malloc, smf_free
+*        Add smf_malloc, smf_free.
+*        Remove smf_fits_rdhead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,8 +116,6 @@ void smf_fits_getI( const smfHead * hdr, const char * cardname, int * result, in
 void smf_fits_getD( const smfHead * hdr, const char * cardname, double * result, int * status );
 void smf_fits_getF( const smfHead * hdr, const char * cardname, float * result, int * status );
 void smf_fits_getS( const smfHead * hdr, const char * cardname, char result[70], size_t len, int * status );
-
-void smf_fits_rdhead( int indf, AstFitsChan ** fchan, int *status);
 
 void smf_flatfield ( const smfData *idata, smfData **odata, int *status );
 
