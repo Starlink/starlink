@@ -1232,7 +1232,8 @@ int StarRtdImage::foreignCmd( int argc, char *argv[] )
 //   StarRtdImage::originCmd
 //
 //   Purpose:
-//      Returns the NDF origin information.
+//      Returns the effective NDF origin information. The effective origins
+//      are those of the significant dimensions.
 //
 //   Arguments:
 //       int argc         - Number of arguments passed to command.
@@ -1259,7 +1260,7 @@ int StarRtdImage::originCmd( int argc, char *argv[] )
     char name[10];
     for ( int i = 0; i < argc; i++ ) {
         out_name = argv[i];
-        sprintf( name, "LBOUND%d", i + 1 );
+        sprintf( name, "ELBOUND%d", i + 1 );
         value = image_->image().get( name );
         if ( ! value ) {
             value = "1";

@@ -1,4 +1,4 @@
-      SUBROUTINE RTD1_WNDFH( NDF, IPHEAD, NHEAD, AVAIL, BITPIX, 
+      SUBROUTINE RTD1_WNDFH( NDF, IPHEAD, NHEAD, AVAIL, BITPIX,
      :                       CMPTHE, STATUS )
 *+
 *  Name:
@@ -22,7 +22,7 @@
 *     defined.
 
 *     The keywords are:
-*        o  NAXIS, and NAXISn are derived from the dimensions of 
+*        o  NAXIS, and NAXISn are derived from the dimensions of
 *           the NDF data array.
 *        o  For an NDF whose origin is not the default LBOUNDn
 *           cards are written. (These are not part of the standard.)
@@ -33,7 +33,7 @@
 *           structure contains units or a label CUNITn and CTYPEn
 *           keywords are created repsectively.
 *        o  DATE card is written.
-*        o  A BLANK card is written using the standard bad value 
+*        o  A BLANK card is written using the standard bad value
 *           corresponding to the type of the DATA array, but
 *           only if BAD pixels are present.
 *        o  Dummy BSCALE and BZERO cards are written with values 1.0 and
@@ -86,7 +86,7 @@
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE               ! No implicit typing
 
@@ -145,6 +145,7 @@
       INTEGER NCHAR             ! Length of a character string
       INTEGER NDIM              ! Number of dimensions
       INTEGER NELM              ! Number of elements
+      INTEGER NSIG              ! Number of significant dimensions
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
       LOGICAL BAD               ! Data array has BAD pixels
       LOGICAL DEFORG            ! True if NDF pixel origins are all 1
@@ -167,9 +168,6 @@
 *  Inquire the NDF's shape.
 *  ========================
 *
-*  Obtain the NDF dimensions.
-      CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
-
 *  Obtain the NDF bounds.
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
@@ -199,12 +197,37 @@
             KEYWRD = 'LBOUND'//C( 1:NCHAR )
 
 *  Write the actual card.
-            CALL RTD1_WRFTI( KEYWRD, LBND( I ), 
+            CALL RTD1_WRFTI( KEYWRD, LBND( I ),
      :           'Pixel origin along axis '//C, IPHEAD, NHEAD, AVAIL,
      :           STATUS )
          END DO
+
+*  The origins that are actually applicable may differ from these
+*  values, if the NDF isn't 2D. In that case we need to record the
+*  origins of the significant dimensions. Use the "ELBOUND" keyword.
+         IF ( NDIM .GT. 2 ) THEN
+            CALL NDF_DIM( NDF, NDF__MXDIM, DIMS, NDIM, STATUS )
+            NSIG = 0
+            DO I = 1, NDIM
+               IF ( DIMS( I ) .GT. 1 ) THEN
+                  KEYWRD = ' '
+                  IF ( NSIG .EQ. 0 ) THEN
+                     KEYWRD = 'ELBOUND1'
+                     CALL RTD1_WRFTI( KEYWRD, LBND( I ),
+     :                                'Origin along effective axis 1',
+     :                                IPHEAD, NHEAD, AVAIL, STATUS )
+                  ELSE IF ( NSIG .EQ. 1 ) THEN
+                     KEYWRD = 'ELBOUND2'
+                     CALL RTD1_WRFTI( KEYWRD, LBND( I ),
+     :                                'Origin along effective axis 2',
+     :                                IPHEAD, NHEAD, AVAIL, STATUS )
+                  END IF
+                  NSIG = NSIG + 1
+               END IF
+            END DO
+         END IF
       END IF
-         
+
 *  Process the title.
 *  ==================
 *
@@ -232,7 +255,7 @@
 
 *  Process the label.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'LABEL', THERE, STATUS )
 
@@ -249,7 +272,7 @@
 *  Write the LABEL card to the FITS header.  68 is the maximum number of
 *  characters that can be accommodated in a header card.
          CALL RTD1_WRFTC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :        'Label of the primary array', IPHEAD, NHEAD, AVAIL, 
+     :        'Label of the primary array', IPHEAD, NHEAD, AVAIL,
      :        STATUS )
 
 *  Record the fact that the label has been written.
@@ -258,7 +281,7 @@
 
 *  Process the units.
 *  ==================
-*   
+*
 *  Determine whether or not there is a label present in the NDF.
       CALL NDF_STATE( NDF, 'UNITS', THERE, STATUS )
 
@@ -275,7 +298,7 @@
 *  Write the BUNIT card to the FITS header.  68 is the maximum number
 *  of characters that can be accommodated in a header card.
          CALL RTD1_WRFTC( KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :        'Units of the primary array', IPHEAD, NHEAD, AVAIL, 
+     :        'Units of the primary array', IPHEAD, NHEAD, AVAIL,
      :        STATUS )
 
 *  Record the fact that the title has been written.
@@ -286,11 +309,11 @@
 *  ===================================
 
       CALL RTD1_WRFTD( 'BSCALE', 1.0D0,
-     :     'True_value = BSCALE * FITS_value + BZERO', IPHEAD, NHEAD, 
+     :     'True_value = BSCALE * FITS_value + BZERO', IPHEAD, NHEAD,
      :     AVAIL, STATUS )
 
       CALL RTD1_WRFTD( 'BZERO', 0.0D0,
-     :     'True_value = BSCALE * FITS_value + BZERO', IPHEAD, NHEAD, 
+     :     'True_value = BSCALE * FITS_value + BZERO', IPHEAD, NHEAD,
      :     AVAIL, STATUS )
 
       CMPTHE( 1 ) = TITFND
