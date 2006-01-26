@@ -43,6 +43,8 @@
 *        Use VAL__BADD for pixels with no data in output map
 *     2006-01-25 (TIMJ):
 *        Replace malloc with smf_malloc.
+*     2006-01-25 (TIMJ):
+*        sc2head is now embedded in smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -281,7 +283,7 @@ void smurf_makemap( int *status ) {
 	
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;
-	  sc2hdr = hdr->sc2head;
+	  sc2hdr = &(hdr->sc2head);
 	  
 	  /* Get bolo -> sky mapping 
              Set the System attribute for the SkyFrame in input WCS FrameSet
