@@ -57,7 +57,7 @@
 *        if present.
 *     2006-01-25 (TIMJ):
 *        1-at-a-time astTran2 is not fast. Rewrite to do the astTran2
-*        a frame at a time.
+*        a frame at a time. Speed up from 85 seconds to 2 seconds.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -175,7 +175,10 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
   yout = smf_malloc( npts, sizeof(double), 0, status );
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
-  /* Assume malloc worked for now */
+  /* Jump to the cleanup section if status is bad by this point
+     since we need to free memory */
+  if (*status != SAI__OK) goto CLEANUP;
+
   /* Prefill with coordintes */
   z = 0;
   for (j = 0; j < (data->dims)[1]; j++) {
@@ -245,6 +248,7 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
 
   }
 
+ CLEANUP:
   smf_free(xin,status);
   smf_free(yin,status);
   smf_free(xout,status);
