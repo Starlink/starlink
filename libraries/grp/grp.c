@@ -35,6 +35,7 @@
 *        Add grpInfoi
 *     25-NOV-2006 (TIMJ):
 *        GRP identifier should be obtained for grpDelet even if status is bad
+*        Rename grpInfoi to grpInfoI
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -321,7 +322,7 @@ F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
 			  INTEGER(STATUS)
 			  TRAIL(ITEM));
 
-void grpInfoi( Grp *grp, int index, const char * item, int * value, 
+void grpInfoI( Grp *grp, int index, const char * item, int * value, 
 	       int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
