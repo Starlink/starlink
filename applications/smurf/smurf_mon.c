@@ -102,7 +102,7 @@ void smurf_mon( int * status ) {
   astWatch( status );
 
   /* Get the GRP status for leak checking */
-  grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
+  grpInfoI( NULL, 0, "NGRP", &ngrp0, status );
 
   /* Find out the task name we were invoked with */
   memset( taskname, ' ', PAR__SZNAM );
@@ -120,12 +120,10 @@ void smurf_mon( int * status ) {
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
-  }
-  else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
-    smurf_makemap( status );
-  }
-  else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
+  } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {
     smurf_flatfield( status );
+  } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
+    smurf_makemap( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
@@ -135,7 +133,7 @@ void smurf_mon( int * status ) {
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
   errBegin( status );
-  grpInfoi( NULL, 0, "NGRP", &ngrp1, status );
+  grpInfoI( NULL, 0, "NGRP", &ngrp1, status );
 
   /* If there are more active groups now than there were on entry,
    * there must be a problem (GRP identifiers are not being freed
