@@ -323,7 +323,7 @@ hdsShow(const char *topic_str,
 }
 
 int
-hdsInfoI(const char *topic_str, int *result,
+hdsInfoI(const HDSLoc* loc, const char *topic_str, int *result,
         int  *status)
 {        
 /*===============================*/

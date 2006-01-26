@@ -359,7 +359,7 @@
       END IF
 
 *  Try HDS_INFOI
-      CALL HDS_INFOI( 'LOCATORS', I, STATUS )
+      CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', I, STATUS )
       IF ( STATUS .EQ. SAI__OK .AND. I .EQ. 0 ) THEN
          CALL EMS_REP('INFOI',
      :        'INFOI indicates 0 locators', STATUS)
