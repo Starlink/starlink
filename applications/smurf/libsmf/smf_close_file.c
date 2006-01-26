@@ -45,10 +45,12 @@
 *        Tidy up logic from Ed's patch
 *     2005-12-15 (TIMJ):
 *        Add check for reference count.
+*     2006-01-26 (TIMJ):
+*        sc2head is now embedded in the struct
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,7 +113,6 @@ void smf_close_file( smfData ** data, int * status ) {
   hdr = (*data)->hdr;
   if (hdr != NULL) {
     if (hdr->wcs != NULL) astAnnul( hdr->wcs );
-    if (hdr->sc2head != NULL) smf_free( hdr->sc2head, status );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
     smf_free( hdr, status );
   }

@@ -19,8 +19,8 @@
 *     data = smfData* (Given & Returned)
 *        Data structure containing time series data.
 *        The smfHead item in the structure will be updated to receive
-*        the updated FrameSet. In addition, if sc2head is non-null, the
-*        contents of hdr->sc2head will be updated for this time slice.
+*        the updated FrameSet. In addition, the sc2head will be populated
+*        if this is a time series data file.
 *     index = int (Given)
 *        Index into the time series data (the 3rd dimension).
 *        If the data structure does not contain the specified index
@@ -52,14 +52,17 @@
 *     2005-11-08 (TIMJ):
 *        For now simply (inefficiently) create a new frameset each time
 *        round rather than reusing an existing one.
+*     2006-01-26 (TIMJ):
+*        sc2head is now embedded in the struct and is therefore mandatory.
 *     {enter_further_changes_here}
 
 *  Notes:
-*     The API is currently uncertain since it may make more sense to pass in a smfHead
-*     rather than a smfData (assuming the xloc field is moved to smfHead).
+*     The API is currently uncertain since it may make more sense to pass in a
+*     smfHead rather than a smfData (assuming the xloc field is moved to 
+*     smfHead).
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,8 +107,7 @@
 void smf_tslice_ast (smfData * data, int index, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
-  struct sc2head  sc2hdr;    /* Local structure for sc2head data if required */
-  struct sc2head *sc2tmp;    /* Pointer to either sc2hdr or hdr->sc2head */
+  struct sc2head *sc2tmp;    /* Pointer to hdr->sc2head */
   int             subsysnum; /* Subsystem numeric id. 0 - 8 */
 
 
@@ -162,12 +164,8 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
     }
   }
 
-  /* Decide whether we are populating sc2head from the header or a local copy */
-  if (hdr->sc2head != NULL ) {
-    sc2tmp = hdr->sc2head;
-  } else {
-    sc2tmp = &sc2hdr;
-  }
+  /* Get pointer to header struct */
+  sc2tmp = &(hdr->sc2head);
 
   /* Need to get the sub system ID */
   /* If we only have the sub system name we can use an sc2ast routine to convert */

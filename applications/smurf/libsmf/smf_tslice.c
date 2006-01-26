@@ -48,10 +48,12 @@
 *        Use sc2store_headget to set the appropriate header.
 *     2006-01-25 (TIMJ):
 *        Replace malloc with smf_malloc
+*     2006-01-26 (TIMJ):
+*        sc2head is now embedded in smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2005 University of British Columbia &
+*     Copyright (C) 2005-2006 University of British Columbia &
 *     Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -124,7 +126,7 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   }
   memcpy( hdr, idata->hdr, sizeof( smfHead ) );
   (*tdata)->hdr = hdr;
-  sc2hdr = hdr->sc2head;
+  sc2hdr = &(hdr->sc2head);
   /* Retrieve the header for this time slice */
   sc2store_headget( index, sc2hdr, status);
 
