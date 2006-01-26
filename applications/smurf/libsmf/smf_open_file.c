@@ -127,8 +127,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int nout;                  /* Number of output pixels */
   int *tdata;                /* Pointer to raw time series data (DATA cpt) */
 
-  smfFile *file;             /* pointer to smfFile struct */
-  smfHead *hdr;              /* pointer to smfHead struct */
+  smfFile *file = NULL;      /* pointer to smfFile struct */
+  smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
 
   AstFitsChan *fits = NULL;  /* AST FITS channel */
@@ -182,8 +182,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* If all's well, proceed */
   if ( *status == SAI__OK) {
-    *data = malloc( sizeof(smfData) );
-    file = malloc( sizeof(smfFile) );
+    *data = smf_malloc( 1, sizeof(smfData), 0, status );
+    file = smf_malloc( 1, sizeof(smfFile), 0, status );
     /* Set the file entry in the smfData struct */
     (*data)->file = file;
     file->xloc = NULL;
@@ -191,10 +191,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     file->ndfid = NDF__NOID;
 
     if (withHdr) {
-      hdr = malloc( sizeof(smfHead));
+      hdr = smf_malloc( 1, sizeof(smfHead), 0, status );
       (*data)->hdr = hdr;
       hdr->wcs = NULL;
-      hdr->sc2head = malloc( sizeof( sc2head ) );
+      hdr->sc2head = smf_malloc( 1, sizeof( sc2head ), 0, status );
     } else {
       (*data)->hdr = NULL;
     }
@@ -263,7 +263,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	 sc2store_rdtstream will open it again */
       ndfAnnul( &indf, status );
       /* Allocate space for the flatfield info etc */
-      da = malloc( sizeof(smfDA));
+      da = smf_malloc( 1, sizeof(smfDA), 0, status);
       (*data)->da = da;
 
       /* Read time series data from file */

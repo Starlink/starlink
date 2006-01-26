@@ -35,6 +35,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,10 +57,13 @@
 *        smf_tslice_ast)
 *     2006-01-25 (AGG):
 *        Add check on whether input header is null for unflatfielded data
+*     2006-01-25 (TIMJ):
+*        Replace malloc with smf_malloc
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 University of British Columbia.  All
+*     Copyright (C) 2005-2006 University of British Columbia &
+*     Particle Physics and Astronomy Research Council.  All
 *     Rights Reserved.
 
 *  Licence:
@@ -175,7 +179,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	if (opntr[0] == NULL) {
 	  /* Allocate space for output data, copy over input data */
 	  ipntr[0] = (idata->pntr)[0];
-	  opntr[0] = malloc( npts * sizeof( double ) );
+	  opntr[0] = smf_malloc( npts, sizeof( double ), 0, status );
 	  memcpy( opntr[0], ipntr[0], npts*sizeof( double ) );
 	}
 	/* All's well so start populating the rest of the *odata
@@ -184,7 +188,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	hdr = (*odata)->hdr;
 	ihdr = idata->hdr;
 	if ( hdr == NULL) {
-	  hdr = malloc( sizeof( smfHead ) );
+	  hdr = smf_malloc( 1, sizeof( smfHead ), 1, status );
 	  /* Copy old hdr into the new hdr and store in *odata */
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
@@ -202,7 +206,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	    if ( owcs == NULL ) {
 	      msgOutif(MSG__VERB, "", "odata struct has no WCS", status);
 	      /* Copy over WCS from input */
-	      /*	    owcs = malloc( sizeof( AstFrameSet ) );*/
+	      /*	    owcs = smf_malloc( 1,sizeof( AstFrameSet ),0,status );*/
 	      /*	    memcpy( owcs, ihdr->wcs, sizeof(AstFrameSet) );*/
 	      /*	    astShow(iwcs);*/
 	      owcs = astCopy(iwcs);
@@ -229,7 +233,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	da = (*odata)->da;
 	ida = idata->da;
 	if ( da == NULL && ida != NULL ) {
-	  da = malloc( sizeof( smfDA ) );
+	  da = smf_malloc( 1, sizeof( smfDA ), 0, status );
 	  /* Copy flatfield info into *odata */
 	  memcpy( da, idata->da, sizeof( smfDA ) );
 	  (*odata)->da = da;
@@ -238,7 +242,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	/* Does the file (smfFile) struct exist? */
 	file = (*odata)->file;
 	if ( file == NULL ) {
-	  file = malloc( sizeof( smfFile ) );
+	  file = smf_malloc( 1, sizeof( smfFile ), 0, status );
 	  /* Copy file info */
 	  memcpy( file, idata->file, sizeof( smfFile ) );
 	  (*odata)->file = file;
@@ -259,10 +263,10 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       /* If NULL then we need create odata not associated with a file
 	 (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
-      *odata = malloc( sizeof( smfData ) );
-      hdr = malloc( sizeof( smfHead ) );
-      da = malloc( sizeof( smfDA ) );
-      file = malloc( sizeof( smfFile ) );
+      *odata = smf_malloc( 1, sizeof( smfData ), 0, status );
+      hdr = smf_malloc( 1, sizeof( smfHead ), 0, status );
+      da = smf_malloc( 1, sizeof( smfDA ), 0, status );
+      file = smf_malloc( 1, sizeof( smfFile ), 0, status );
 
       /* Copy old hdr into the new hdr */
       memcpy( hdr, idata->hdr, sizeof( smfHead ) );
@@ -297,7 +301,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
       /* Allocate space for output data */
       if ( (*odata)->dtype == SMF__DOUBLE ) {
-	opntr[0] = malloc( npts * sizeof( double ) );
+	opntr[0] = smf_malloc( npts, sizeof( double ), 0, status );
 	outdata = opntr[0];
 	/* Input data are ints: must re-cast as double */
 	for (j=0; j<npts; j++) {
@@ -342,7 +346,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	hdr = (*odata)->hdr;
 	ihdr = idata->hdr;
 	if ( (*odata)->hdr == NULL) {
-	  hdr = malloc( sizeof( smfHead ) );
+	  hdr = smf_malloc( 1, sizeof( smfHead ), 0, status );
 	  /* Copy old hdr into the new hdr and store in *odata */
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
@@ -360,7 +364,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	    if ( owcs == NULL ) {
 	      msgOutif(MSG__VERB, "", "odata struct has no WCS", status);
 	      /* Copy over WCS from input */
-	      /*	    owcs = malloc( sizeof( AstFrameSet ) );*/
+	      /*	    owcs = smf_malloc( 1,sizeof( AstFrameSet ), 0, status );*/
 	      /*	    memcpy( owcs, ihdr->wcs, sizeof(AstFrameSet) );*/
 	      /*	    astShow(iwcs);*/
 	      owcs = astCopy(iwcs);
@@ -385,7 +389,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	/* Does the flatfield (smfDA) struct exist? */
 	da = (*odata)->da;
 	if ( da == NULL ) {
-	  da = malloc( sizeof( smfDA ) );
+	  da = smf_malloc( 1, sizeof( smfDA ), 0, status );
 	  /* Copy flatfield info into *odata */
 	  memcpy( da, idata->da, sizeof( smfDA ) );
 	  (*odata)->da = da;
@@ -394,7 +398,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	/* Does the file (smfFile) struct exist? */
 	file = (*odata)->file;
 	if ( file == NULL ) {
-	  file = malloc( sizeof( smfFile ) );
+	  file = smf_malloc( 1, sizeof( smfFile ), 0, status );
 	  /* Copy file info */
 	  memcpy( file, idata->file, sizeof( smfFile ) );
 	  (*odata)->file = file;

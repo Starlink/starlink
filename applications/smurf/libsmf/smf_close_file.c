@@ -111,9 +111,9 @@ void smf_close_file( smfData ** data, int * status ) {
   hdr = (*data)->hdr;
   if (hdr != NULL) {
     if (hdr->wcs != NULL) astAnnul( hdr->wcs );
-    if (hdr->sc2head != NULL) free( hdr->sc2head );
+    if (hdr->sc2head != NULL) smf_free( hdr->sc2head, status );
     if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
-    free( hdr );
+    smf_free( hdr, status );
   }
 
   /* now file information */
@@ -138,23 +138,23 @@ void smf_close_file( smfData ** data, int * status ) {
       freedata = 1;
     }
 
-    free( file );
+    smf_free( file, status );
   }
 
   /* Now the smfData itself */
-  if ( (*data)->da != NULL ) free( (*data)->da );
+  if ( (*data)->da != NULL ) smf_free( (*data)->da, status );
 
   /* Free the data arrays if they are non-null (they should have been
      freed if they were mapped to a file but not if they were stored
      in a separate action as temp storage */
   if (freedata) {
     for (i = 0; i < 3; i++ ) {
-      if ( ((*data)->pntr)[i] != NULL ) free( ((*data)->pntr)[i] );
+      if ( ((*data)->pntr)[i] != NULL ) smf_free( ((*data)->pntr)[i], status );
     }
   }
 
   /* finally free smfData */
-  free( *data );
+  smf_free( *data, status );
   *data = NULL;
 
 }

@@ -29,7 +29,6 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This function is used to copy the data for specified time slice
 *     from the supplied data structure into a pointer to a 2-D array
 *     containing the bolometer data. The header is set from the input
@@ -39,6 +38,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,10 +46,13 @@
 *        Initial version.
 *     2006-01-12 (AGG):
 *        Use sc2store_headget to set the appropriate header.
+*     2006-01-25 (TIMJ):
+*        Replace malloc with smf_malloc
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 University of British Columbia.
+*     Copyright (C) 2005-2005 University of British Columbia &
+*     Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -108,10 +111,10 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   double *tslicedata;         /* Pointer to output data array */
 
   /* Allocate space for the tdata struct */
-  *tdata = malloc( sizeof( smfData ) );
+  *tdata = smf_malloc( 1, sizeof( smfData ), 0, status );
 
   /* Copy the current header */
-  hdr = malloc( sizeof( smfHead ) );
+  hdr = smf_malloc( 1, sizeof( smfHead ), 0, status );
   /* Check we got the memory */
   if ( hdr == NULL) {
     if ( *status == SAI__OK) {
@@ -140,7 +143,7 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
 
   indata = ipntr[0];
 
-  tslicedata = malloc( npts * sizeof( double ) );
+  tslicedata = smf_malloc( npts, sizeof( double ), 0, status );
   /* Check we got the memory */
   if ( tslicedata == NULL) {
     if ( *status == SAI__OK) {
