@@ -61,10 +61,12 @@
 *        Add status check on retrieving FITS hdr
 *     2005-12-14 (TIMJ):
 *        Now sets a reference counter
+*     2006-01-26 (TIMJ):
+*        Use smf_create_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -103,6 +105,8 @@
 #include "sc2da/sc2store.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
+
+#define FUNC_NAME "smf_open_file"
 
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status) {
@@ -144,6 +148,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int nframes;               /* number of frames */
   int rowsize;               /* number of pixels in row (returned) */
   char *phead = NULL;        /* Pointer to FITS headers */
+  int flags = 0;             /* Flags for smf_create_smfData */
 
   if ( *status != SAI__OK ) return;
 
@@ -180,28 +185,20 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     }
   }
 
+  /* Now we need to create some structures */
+  if (!withHdr) flags |= SMF__NOCREATE_HEAD;
+  if (isNDF)    flags |= SMF__NOCREATE_DA;
+
+  /* Allocate memory for the smfData */
+  *data = smf_create_smfData( flags, status );
+
   /* If all's well, proceed */
   if ( *status == SAI__OK) {
-    *data = smf_malloc( 1, sizeof(smfData), 0, status );
-    file = smf_malloc( 1, sizeof(smfFile), 0, status );
-    /* Set the file entry in the smfData struct */
-    (*data)->file = file;
-    file->xloc = NULL;
-    (*data)->refcount = 1;
-    file->ndfid = NDF__NOID;
 
-    if (withHdr) {
-      hdr = smf_malloc( 1, sizeof(smfHead), 0, status );
-      (*data)->hdr = hdr;
-      hdr->wcs = NULL;
-      hdr->sc2head = smf_malloc( 1, sizeof( sc2head ), 0, status );
-    } else {
-      (*data)->hdr = NULL;
-    }
+    file = (*data)->file;
+    hdr = (*data)->hdr;
 
     if (isNDF) {
-      /* For an NDF, we don't need to worry about flatfield info etc */
-      (*data)->da = NULL;
 
       /* Check if we have Q and V components */
       ndfState( indf, "QUALITY", &qexists, status);
@@ -219,6 +216,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       /*      printf("after ndfMap: %d\n",*status);*/
 
       if (withHdr) {
+
 	/* Read the FITS headers */
 	kpgGtfts( indf, &fits, status );
 
@@ -255,41 +253,43 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	}
       }
       /* Store NDF identifier and set isSc2store to false */
-      file->ndfid = indf;
-      file->isSc2store = 0;
-      file->isTstream = isTseries;
+      if (*status == SAI__OK) {
+	file->ndfid = indf;
+	file->isSc2store = 0;
+	file->isTstream = isTseries;
+      }
     } else {
       /* OK, we have raw data. Close the NDF because
 	 sc2store_rdtstream will open it again */
       ndfAnnul( &indf, status );
-      /* Allocate space for the flatfield info etc */
-      da = smf_malloc( 1, sizeof(smfDA), 0, status);
-      (*data)->da = da;
 
       /* Read time series data from file */
+      da = (*data)->da;
+      if (*status == SAI__OK && da == NULL) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME,"Internal programming error. Status good but no DA struct allocated", status);
+      }
+
       sc2store_rdtstream( pname, SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname, &frhead,
 			  &tdata, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
 			  status);
 
-      /* Should check status here */
-
-      outdata[0] = tdata;
-
-      printf("headrec = %s \n",&(headrec[2][0]));
-
-      phead = &(headrec[0][0]);
-
-      /* Create a FitsChan from te FITS headers */
-      smf_fits_crchan( nfits, phead, &fits, status); 
-
-      /* Raw data type is integer */
-      itype = SMF__INTEGER;
-
-      /* Verify that ndfdims matches row, col, nframes */
-      /* Should probably inform user of the filename too */
       if (*status == SAI__OK) {
+
+	outdata[0] = tdata;
+	printf("headrec = %s \n",&(headrec[2][0]));
+	phead = &(headrec[0][0]);
+
+	/* Create a FitsChan from te FITS headers */
+	smf_fits_crchan( nfits, phead, &fits, status); 
+
+	/* Raw data type is integer */
+	itype = SMF__INTEGER;
+
+	/* Verify that ndfdims matches row, col, nframes */
+	/* Should probably inform user of the filename too */
 	if (ndfdims[0] != colsize) {
 	  msgSeti( "NC", colsize);
 	  msgSeti( "DIMS", ndfdims[0]);
@@ -308,33 +308,35 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  *status = SAI__ERROR;
 	  errRep( "smf_open_file", "Number of input timeslices not equal to the number of output timeslices (^NF != ^DIMS)",status);
 	}
+
+	/* Set flag to indicate data read by sc2store_() */
+	file->isSc2store = 1;
+
+	/* and it is a time series */
+	file->isTstream = 1;
       }
-
-      /* Set flag to indicate data read by sc2store_() */
-      file->isSc2store = 1;
-
-      /* and it is a time series */
-      file->isTstream = 1;
     }
     /* Store info in smfData struct */  
 
-    (*data)->dtype = itype;
-    strncpy(file->name, pname, SMF_PATH_MAX);
-    if (withHdr) hdr->fitshdr = fits;
+    if (*status == SAI__OK) {
+      (*data)->dtype = itype;
+      strncpy(file->name, pname, SMF_PATH_MAX);
+      if (withHdr) hdr->fitshdr = fits;
 
-    /* debug - show FITS info if it is defined */
-    if (withHdr && fits != NULL) {
-      astShow(fits);
-    }
+      /* debug - show FITS info if it is defined */
+      if (withHdr && fits != NULL) {
+	astShow(fits);
+      }
 
-    /* Store the data in the smfData struct */
-    for (i=0; i<3; i++) {
-      ((*data)->pntr)[i] = outdata[i];
-    }
-    /* Store the dimensions and the size of each axis */
-    (*data)->ndims = ndims;
-    for (i=0; i<ndims; i++) {
-      ((*data)->dims)[i] = (dim_t)ndfdims[i];
+      /* Store the data in the smfData struct */
+      for (i=0; i<3; i++) {
+	((*data)->pntr)[i] = outdata[i];
+      }
+      /* Store the dimensions and the size of each axis */
+      (*data)->ndims = ndims;
+      for (i=0; i<ndims; i++) {
+	((*data)->dims)[i] = (dim_t)ndfdims[i];
+      }
     }
   }
 }
