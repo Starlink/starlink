@@ -89,6 +89,8 @@ void smf_close_file( smfData ** data, int * status ) {
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
 
+  if ( *status != SAI__OK) return;
+
   if ( *data == NULL ) {
     if ( *status == SAI__OK ) {
       /* Status is good so we have a problem */
