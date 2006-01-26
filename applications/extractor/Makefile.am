@@ -11,7 +11,7 @@ nodist_bin_SCRIPTS = extractor.csh extractor.sh extractor.icl extractor.ifc
 bin_MONOLITHS = extractor
 extractor_SOURCES = extract/src/extractor.c
 # no variable extractor_TASKS -- extractor is an ATASK
-extractor_LDADD = $(LDADD) libextractor.a libfits.a `ndf_link_adam`
+extractor_LDADD = $(LDADD) libextractor.a libfits.a `ndg_link_adam`
 
 bin_PROGRAMS = sex
 
