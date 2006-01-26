@@ -126,6 +126,7 @@ C_ROUTINES = \
 	\
 	rec_adopt_record.c rec_alloc_mem.c rec_alloc_xmem.c \
 	rec_attach_file.c rec_close_file.c rec_create_record.c \
+	rec_count_files.c \
 	rec_deall_mem.c rec_deall_xmem.c rec_delete_record.c \
 	rec_end_wild.c rec_extend_record.c rec_get_handle.c \
 	rec_get_rcl.c rec_get_rid.c rec_list_files.c \

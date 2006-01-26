@@ -65,6 +65,7 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
 			    char state, char mode, struct RCL *rcl,
 			    struct HAN *han );
       void rec_close_file( const struct HAN *han );
+      int rec_count_files( int * count );
       int rec_create_record( const struct HAN *par, struct RCL *rcl,
 	   		     struct HAN *han );
       int rec_deall_mem( int size, void **pntr );

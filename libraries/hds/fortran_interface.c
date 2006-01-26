@@ -3384,6 +3384,31 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
    free( file_c );
 }
 
+F77_SUBROUTINE(hds_infoi)( CHARACTER(topic),
+			   INTEGER(result),
+                          F77_INTEGER_TYPE *status
+                          TRAIL(topic) )
+{
+
+/*================================*/
+/* HDS_INFOI - Obtain HDS statistics */
+/*================================*/
+
+/* Local variables.     */
+   char *topic_c;
+   
+/* Enter routine.	*/
+
+/* Import TOPIC argument to C string */
+   topic_c = cnfCreim( topic, topic_length );
+
+/* Call pure C routine                                       */
+   hdsInfoI( topic_c, result, status);
+
+/* Free allocated string memory.                             */
+   free( topic_c );
+}
+
 F77_SUBROUTINE(hds_show)( CHARACTER(topic),
                           F77_INTEGER_TYPE *status
                           TRAIL(topic) )

@@ -26,6 +26,8 @@
 *        Original.
 *     20-DEC-2005 (TIMJ):
 *        No longer requires FC_MAIN
+*     25-JAN-2006 (TIMJ):
+*        Add hdsShow/hdsInfoI
 *     {enter_further_changes_here}
 
 *  Licence:
@@ -221,6 +223,13 @@ int main () {
       emsRep( "PREC","Precision for _REAL not 4 bytes but ^NB", &status);
     }
   }
+
+  /* Try hdsShow */
+  hdsShow("LOCATORS", &status);
+  hdsShow("FILES", &status);
+  hdsInfoI("LOCATORS", &i, &status );
+  hdsInfoI("FILES", &i, &status );
+
   datAnnul( &loc3, &status );
 
   datMapV( loc2, "_INTEGER", "READ", (void**)&mapi, &nel, &status );

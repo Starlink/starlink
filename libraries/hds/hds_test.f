@@ -32,6 +32,8 @@
 *        Add test for DAT_PREC and DAT_CCTYP
 *     02-DEC-2005 (TIMJ):
 *        Add test for DAT_MSG / DAT_REF
+*     25-JAN-2006 (TIMJ):
+*        Add test for HDS_INFOI
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -354,6 +356,13 @@
      :               'TSTRUCT.ARRAY(2,2)',
      :           STATUS)
          END IF
+      END IF
+
+*  Try HDS_INFOI
+      CALL HDS_INFOI( 'LOCATORS', I, STATUS )
+      IF ( STATUS .EQ. SAI__OK .AND. I .EQ. 0 ) THEN
+         CALL EMS_REP('INFOI',
+     :        'INFOI indicates 0 locators', STATUS)
       END IF
 
 *  Now try HDS_FIND without the extension

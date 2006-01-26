@@ -1136,6 +1136,15 @@ hdsGtune(const char *param_str,
          int *value,
          int *status);
 
+/*=========================================*/
+/* hdsGtune - Get HDS status integers      */
+/*=========================================*/
+
+int
+hdsInfoI(const char *topic_str,
+	 int *result,
+	 int  *status);
+
 /*=================================*/
 /* hdsLink - Link locator to group */
 /*=================================*/
