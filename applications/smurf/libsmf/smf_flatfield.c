@@ -54,12 +54,13 @@
 *        Now deals with time series data correctly by not attempting
 *        to copy the non-existent WCS info (which is added by
 *        smf_tslice_ast)
+*     2006-01-25 (AGG):
+*        Add check on whether input header is null for unflatfielded data
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 University of British Columbia.  All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -111,7 +112,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
   int nframes;                /* Number of time slices */
   int npts;                   /* Total number of data points */
 
-  smfDA *ida = NULL;           /* da struct for input data */
+  smfDA *ida = NULL;          /* da struct for input data */
   smfDA *da = NULL;           /* da struct for input data */
   smfFile *file = NULL;       /* file struct for input data */
   smfHead *hdr = NULL;        /* hdr struct for input data */
@@ -133,6 +134,8 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
   /* Store status and annul for messaging system */
   checkflatstatus = *status;
   /*  errAnnul(status);*/
+
+  /*  printf("smf_flatfield \n");*/
 
   /* Data are flatfielded if status set to SMF__FLATN */
   /*  if ( checkflatstatus == SMF__FLATN ) {*/
@@ -343,7 +346,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	  /* Copy old hdr into the new hdr and store in *odata */
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 
-	} else {
+	} else if (ihdr != NULL) {
 	  /* OK, we have a header. Do we have WCS? */
 	  iwcs = ihdr->wcs;
 	  /* If INPUT WCS is null then we have time series data and we
