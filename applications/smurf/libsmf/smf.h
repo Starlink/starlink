@@ -96,6 +96,11 @@ void smf_close_file( smfData **, int *status);
 
 void smf_correct_extinction( smfData *data, const char *method, double tau, int *status);
 
+smfData* smf_create_smfData( int flags, int * status );
+smfFile* smf_create_smfFile( int * status );
+smfHead* smf_create_smfHead( int * status );
+smfDA*   smf_create_smfDA( int * status );
+
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
 
