@@ -34,10 +34,13 @@
 *        Add reference counter to smfData
 *     2005-12-21 (AGG):
 *        Add index to current timeslice
+*     2006-01-25 (TIMJ):
+*        - Create SMF__NOCREATE flags
+*        - sc2head is now embedded in the smfHead struct
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -83,6 +86,13 @@ typedef enum smf_dtype {
   SMF__USHORT,
 } smf_dtype;
 
+/* Flags for smf_create_smf* 
+   Must be individual bits in a single integer
+*/
+#define SMF__NOCREATE_DA 1
+#define SMF__NOCREATE_HEAD 2
+#define SMF__NOCREATE_FILE 4
+
 /* Global information about the data file itself */
 
 typedef struct smfFile {
@@ -96,7 +106,7 @@ typedef struct smfFile {
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
-  struct sc2head * sc2head; /* Time slice structure for same slice as wcs */
+  struct sc2head sc2head;   /* Time slice structure for same slice as wcs */
   AstFrameSet * wcs;        /* Frameset for a particular time slice */
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curslice;           /* Index corresponding to current timeslice */
