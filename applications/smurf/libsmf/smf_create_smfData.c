@@ -130,6 +130,7 @@ smf_create_smfData( int flags, int * status ) {
   data->dtype = SMF__NULL; 
   data->refcount = 1;
   data->virtual = 0;
+  data->ndims = 0;
   for (i = 0; i < 3; i++ ) {
     (data->pntr)[i] = NULL;
   }
