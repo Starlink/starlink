@@ -317,7 +317,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
       /* debug - show FITS info if it is defined */
       if (withHdr && fits != NULL) {
-	astShow(fits);
+	/* astShow(fits); */
       }
 
       /* Store the data in the smfData struct */
