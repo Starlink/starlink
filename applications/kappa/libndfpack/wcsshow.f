@@ -121,6 +121,8 @@
 *        Access to KPG_AST restricted to libkpg. Use setter functions.
 *     4-OCT-2004 (TIMJ):
 *        Use kps1_tkast instead of kpg1_tkast.
+*     27-JAN-2006 (DSB):
+*        Delete dangling GRP identifiers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,9 +183,9 @@
          ACCESS = 'UPDATE'
 
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL GRP_DELET( IGRP, STATUS )
          CALL ERR_ANNUL( STATUS )
          ACCESS = 'READ'
-         IGRP = GRP__NOID
       END IF
 
 *  Get the degree of detail required in the output.
