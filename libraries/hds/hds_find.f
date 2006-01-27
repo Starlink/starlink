@@ -110,6 +110,9 @@
 *        problems with NDF AXIS sections.
 *     27-JAN-2006 (DSB):
 *        Check status after calls to DAT_CUT.
+*     27-JAN-2006 (TIMJ):
+*        Do not need to trap status before calling DAT_ANNUL since
+*        DAT_ANNUL was broken.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -344,11 +347,9 @@
                         END IF
 
 *  Annul the object locator and replace it with the subset locator.
-                        IF( STATUS .EQ. SAI__OK ) THEN
-                           CALL DAT_ANNUL( LOC2, STATUS )
-                           LOC2 = LOC
-                           LOC = DAT__NOLOC
-                        END IF
+                        CALL DAT_ANNUL( LOC2, STATUS )
+                        LOC2 = LOC
+                        LOC = DAT__NOLOC
 
 *  If a component name exists, then check it for validity and see if
 *  the required component exists within the current HDS structure.
@@ -399,11 +400,9 @@
                                  END IF
 
 *  Annul the object locator and replace it with the subset locator.
-                                 IF( STATUS .EQ. SAI__OK ) THEN
-                                    CALL DAT_ANNUL( LOC2, STATUS )
-                                    LOC2 = LOC
-                                    LOC = DAT__NOLOC
-                                 END IF
+                                 CALL DAT_ANNUL( LOC2, STATUS )
+                                 LOC2 = LOC
+                                 LOC = DAT__NOLOC
                               END IF
                            END IF
                         END IF
