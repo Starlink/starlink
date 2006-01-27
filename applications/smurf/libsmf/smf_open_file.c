@@ -143,7 +143,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
-  struct sc2head *frhead;    /* structure for headers for a frame */
+  struct sc2head *frhead = NULL;  /* structure for headers for a frame */
   char headrec[80][81];      /* FITS headers */
   int maxfits = 80;          /* maximum number of FITS headers */
   int maxlen = 81;           /* maximum length of a FITS header */
@@ -267,7 +267,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 			  &nframes, &(da->nflat), da->flatname, &frhead,
 			  &tdata, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
 			  status);
-
+      free(frhead);
       if (*status == SAI__OK) {
 
 	outdata[0] = tdata;
