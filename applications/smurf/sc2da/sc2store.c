@@ -3,19 +3,21 @@
    History :
     12Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
+    05Dec2005 : include star/hds_types.h (EC)
+    05Dec2005 : remove star/hds_types.h, star/hds.h and extra ndf.h (bdk)
+    23Jan2006 : replace star/hds.h (bdk)
 */
 
 #include <string.h>
 #include <stdio.h>
 
 #include "sae_par.h"
-#include "val_par.h"
+#include "prm_par.h"
+#include "dat_par.h"
+#include "star/hds.h"
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
-#include "dat_par.h"
-#include "ndf.h"
-#include "star/hds.h"
 #include "Dits_Err.h"
 #include "Ers.h"
 
@@ -27,6 +29,7 @@
 #include "sc2store_struct.h"
 #include "sc2store_sys.h"
 #include "sc2store.h"
+
 
 static int sc2open = 0;            /* flag for file open */
 
@@ -461,6 +464,7 @@ int *status          /* global status (given and returned) */
    History :
     12Aug2004 : original (bdk)
     04Oct2005 : check sc2open flag (bdk)
+    23Jan2006 : annul scu2redloc (bdk)
 */
 
 {
@@ -469,6 +473,13 @@ int *status          /* global status (given and returned) */
    if ( sc2open == 0 ) return;
 
    tstatus = SAI__OK;
+
+/* Free the locator for the SCU2RED structure*/
+
+   if ( scu2redloc != NULL )
+   {
+      datAnnul ( &scu2redloc, &tstatus );
+   }
 
 /* Free the locator for the SCUBA2 structure*/
 
@@ -831,7 +842,6 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
-      sc2store_loc[j] = NULL; /* First time through we will not be initialized */
       datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
         status );
 
@@ -1125,11 +1135,12 @@ double *coptr,     /* coefficients (given) */
 int *status        /* global status (given and returned) */
 )
 /* Method :
-    Create an NDF with image name "SKYFIT", under DA_IMAGE. Store the
+    Create an NDF with image name "SCANFIT", under DA_IMAGE. Store the
     coefficients as the main array in the NDF.
    History :
     25Feb2005 : original (bdk)
     19Jun2005 : use ndfHcre to create history component on all NDFs (bdk)
+    26Jan2006 : change component name to SCANFIT (bdk)
 */
 {
 
@@ -1158,7 +1169,7 @@ int *status        /* global status (given and returned) */
       ubnd[2] = ncoeff;
       lbnd[2] = 1;
 
-      ndfPlace ( scu2redloc, "SKYFIT", &place, status );
+      ndfPlace ( scu2redloc, "SCANFIT", &place, status );
       ndfNew ( "_DOUBLE", 3, lbnd, ubnd, &place, &uindf, status );
       ndfHcre ( uindf, status );
 
@@ -1269,6 +1280,8 @@ int *status              /* global status (given and returned) */
 
    History :
     01Oct2005 : original (bdk)
+    07Dec2005 : set sc2open flag when open is successful (bdk)
+    25Jan2006 : add access argument to sc2store_rdmap (bdk)
 */
 
 {
@@ -1295,8 +1308,8 @@ int *status              /* global status (given and returned) */
 
 /* Map all the data arrays */
 
-   sc2store_rdmap ( filename, flatlen, colsize, rowsize, &nframes, nflat,
-     flatname, &bzero, &data, &dksquid, &stackz, &fcal, &fpar, status );
+   sc2store_rdmap ( filename, "READ", flatlen, colsize, rowsize, &nframes, 
+     nflat, flatname, &bzero, &data, &dksquid, &stackz, &fcal, &fpar, status );
 
    if ( !StatusOkP(status) ) 
    {
@@ -1315,6 +1328,11 @@ int *status              /* global status (given and returned) */
       memcpy ( *flatpar, fpar, (*nflat)*sizeof(double) );
    }
 
+   if ( StatusOkP(status) )
+   {
+      sc2open = 1;
+   }
+
    sc2store_free ( status );
 
 }
@@ -1326,6 +1344,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdmap
 (
 char *filename,          /* name of HDS container file (given) */
+char *access,            /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -1341,6 +1360,8 @@ double **flatpar,        /* pointer to flatfield parameters (returned) */
 int *status              /* global status (given and returned) */
 )
 /*
+   Method :
+    Map an existing SCUBA-2 data file for read access to the raw data
    History :
     12Aug2004 : original (bdk)
     23Mar2005 : swap order of nrow and ncol in NDF (bdk)
@@ -1348,6 +1369,7 @@ int *status              /* global status (given and returned) */
     20May2005 : add flatcal (bdk)
     30Sep2005 : change names to colsize and rowsize, add nflat, flatname,
                 flatpar (bdk)
+    25Jan2006 : add access argument (bdk)
 */
 {
    int dim[3];             /* dimensions */
@@ -1376,7 +1398,7 @@ int *status              /* global status (given and returned) */
 /* Open an HDS container file */
 
    ndimx = 3;
-   ndfOpen ( NULL, filename, "UPDATE", "OLD", &indf, &place, status );
+   ndfOpen ( NULL, filename, access, "OLD", &indf, &place, status );
    ndfDim ( indf, ndimx, dim, &ndim, status );
    *colsize = dim[0];
    *rowsize = dim[1];
@@ -1414,9 +1436,9 @@ int *status              /* global status (given and returned) */
 
 /* FLATCAL flatfield calibration */
 
-   ndfOpen ( frameloc, "FLATCAL", "UPDATE", "OLD", &findf, &place, status );
+   ndfOpen ( frameloc, "FLATCAL", access, "OLD", &findf, &place, status );
 
-   ndfMap ( findf, "DATA", "_DOUBLE", "UPDATE", (void *)flatcal, &el, 
+   ndfMap ( findf, "DATA", "_DOUBLE", access, (void *)flatcal, &el, 
      status );
 
    ndfXloc ( findf, "FLATDATA", "READ", &fdataloc, status );
@@ -1445,6 +1467,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdtstream
 (
 char *filename,          /* name of HDS container file (given) */
+char *access,            /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int maxlen,              /* max length of FITS header (given) */
 int maxfits,             /* max number of FITS headers (given) */
@@ -1465,13 +1488,17 @@ int *status              /* global status (given and returned) */
 
 /* Description :
     Return the time stream data, associated headers and flatfield calibration
-    from an NDF. The file is left open to allow updating.
+    from an NDF. The file is left open to allow updating of associated items 
+    such as the flatfield or other processed data, in which case access 
+    should be specified as "UPDATE".
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
 
    History :
     01Oct2005 : original (bdk)
     04Oct2005 : check if sc2store already has an open file (bdk)
+    08Dec2005 : map space AFTER checking status (bdk)
+    25Jan2006 : add access argument (bdk)
 */
 
 {
@@ -1489,16 +1516,28 @@ int *status              /* global status (given and returned) */
    if ( sc2open != 0 )
    {
       *status = DITS__APP_ERROR;
-      sprintf ( errmess, 
+      sprintf ( errmess,
         "one SCUBA-2 data file already open, can't open %s", filename );
       ErsRep ( 0, status, errmess );
       return;
    }
 
+   if ( ( strcmp ( access, "READ" ) != 0 ) && 
+	( strcmp ( access, "UPDATE" ) != 0 ) )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, 
+        "access mode should be READ or UPDATE, but give as %s", access );
+      ErsRep ( 0, status, errmess );
+      return;
+   }
+   
+   
 /* Map all the data arrays */
 
-   sc2store_rdmap ( filename, flatlen, colsize, rowsize, nframes, nflat,
-     flatname, &bzero, &data, dksquid, &stackz, flatcal, flatpar, status );
+   sc2store_rdmap ( filename, access, flatlen, colsize, rowsize, nframes, 
+    nflat, flatname, &bzero, &data, dksquid, &stackz, flatcal, flatpar, 
+    status );
 
    if ( !StatusOkP(status) ) 
    {
@@ -1508,13 +1547,13 @@ int *status              /* global status (given and returned) */
 
 /* Map space for the decompressed data */
 
-   nbol = (*colsize) * (*rowsize);
-   *outdata = (int *) calloc ( (*nframes)*nbol, sizeof(int) );
-   *frhead = (struct sc2head *) calloc ( (*nframes), 
-     sizeof(struct sc2head) );
-
    if ( StatusOkP(status) ) 
    {
+      nbol = (*colsize) * (*rowsize);
+      *outdata = (int *) calloc ( (*nframes)*nbol, sizeof(int) );
+      *frhead = (struct sc2head *) calloc ( (*nframes), 
+        sizeof(struct sc2head) );
+
       for ( j=0; j<*nframes; j++ )
       {
 
@@ -1609,6 +1648,7 @@ int *status        /* global status (given and returned) */
     History :
      24Sep2005:  original (bdk)
      04Oct2005 : check if sc2store already has an open file (bdk)
+     08Dec2005 : check status after sc2store_cremap (bdk)
 */
 
 {
@@ -1646,50 +1686,55 @@ int *status        /* global status (given and returned) */
 
 /* Use the first frame as the stackzero frame */
 
-   for ( j=0; j<framesize; j++ )
+   if ( StatusOkP(status) )
    {
-      stackz[j] = dbuf[j];
-   }
+
+      for ( j=0; j<framesize; j++ )
+      {
+         stackz[j] = dbuf[j];
+      }
 
 /* Compress one frame at a time */
 
-   for ( j=0; j<numsamples; j++ )
-   {
-      for ( i=0; i<framesize; i++ )
+      for ( j=0; j<numsamples; j++ )
       {
-         digits[i] = dbuf[j*framesize+i];
-      }
+         for ( i=0; i<framesize; i++ )
+         {
+            digits[i] = dbuf[j*framesize+i];
+         }
 
-      sc2store_compress ( framesize, stackz, digits, &(bzero[j]),
-        &(data[j*framesize]), &npix, pixnum, pixval, status );
+         sc2store_compress ( framesize, stackz, digits, &(bzero[j]),
+           &(data[j*framesize]), &npix, pixnum, pixval, status );
 
-      if ( npix > 0 )
-      {
-         sc2store_putincomp ( j, npix, pixnum, pixval, status );
-      }
+         if ( npix > 0 )
+         {
+            sc2store_putincomp ( j, npix, pixnum, pixval, status );
+         }
 
 /* Insert per-frame headers */
 
-      sc2store_headput ( j, head[j], status );
-   }
+         sc2store_headput ( j, head[j], status );
+      }
 
 /* Copy the dark SQUID values */
 
-   for ( j=0; j<numsamples*rowsize; j++ )
-   {
-      dksquid[j] = darksquid[j];
-   }
+      for ( j=0; j<numsamples*rowsize; j++ )
+      {
+         dksquid[j] = darksquid[j];
+      }
 
 /* Copy the flatfield calibration */
 
-   for ( j=0; j<framesize*nflat; j++ )
-   {
-      flatcal[j] = fcal[j];
-   }
+      for ( j=0; j<framesize*nflat; j++ )
+      {
+         flatcal[j] = fcal[j];
+      }
 
-   for ( j=0; j<nflat; j++ )
-   {
-      flatpar[j] = fpar[j];
+      for ( j=0; j<nflat; j++ )
+      {
+         flatpar[j] = fpar[j];
+      }
+
    }
 
 /* Store the FITS headers */
@@ -1698,4 +1743,3 @@ int *status        /* global status (given and returned) */
 
    sc2open = 1; 
 }
-
