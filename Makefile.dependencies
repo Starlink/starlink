@@ -629,10 +629,14 @@ $(MANIFESTS)/extractor: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/grp \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
+		$(MANIFESTS)/one \
+		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
