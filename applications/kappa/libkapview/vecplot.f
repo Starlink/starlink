@@ -319,6 +319,8 @@
 *        picture.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     27-JAN-2006 (DSB):
+*        Ignore blank titles supplied in STYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -643,8 +645,9 @@
 *  Title. If we did it before KPG1_PLOT (i.e. if we set the Title in IWCS)
 *  it may prevent alignment ocurring within KPG1_PLOT since alignment fails 
 *  if the Title of two Frames differ.
-      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
-     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+      TITLE = AST_GETC( IPLOT, 'TITLE', STATUS ) 
+      IF( TITLE .EQ. ' ' .OR. 
+     :    TITLE .EQ. AST_GETC( IWCS, 'TITLE', STATUS ) ) THEN
 
          TITLE = ' '
          CALL NDF_CGET( INDF1, 'TITLE', TITLE, STATUS ) 

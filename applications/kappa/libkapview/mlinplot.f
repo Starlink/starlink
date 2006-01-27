@@ -449,6 +449,8 @@
 *        Use CNF_PVAL
 *     19-NOV-2004 (DSB):
 *        Correct use of CNF_PVAL.
+*     27-JAN-2006 (DSB):
+*        Ignore blank titles supplied in STYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -886,8 +888,9 @@ c         IMODE = 4
 *  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in 
 *  FSET) it may prevent alignment ocurring within KPG1_PLOT since alignment 
 *  fails if the Title of two Frames differ.
-      IF( AST_GETC( FSET, 'TITLE', STATUS ) .EQ. 
-     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+      TITLE = AST_GETC( IPLOT, 'TITLE', STATUS ) 
+      IF( TITLE .EQ. ' ' .OR. 
+     :    TITLE .EQ. AST_GETC( FSET, 'TITLE', STATUS ) ) THEN
 
          TITLE = ' '
          CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS ) 

@@ -714,6 +714,8 @@
 *     2005 December 21 (TIMJ):
 *        Minor tweak in XMAGN determination for g95 (both args to
 *        MAX() must be the same type).
+*     27-JAN-2006 (DSB):
+*        Ignore blank titles supplied in STYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1808,8 +1810,9 @@
 *  of this change to the Title.  If we did it before KPG1_PLOT (i.e. if 
 *  we set the Title in IWCS) it may prevent alignment occurring within 
 *  KPG1_PLOT since alignment fails if the Title of two Frames differ.
-      IF ( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
-     :     AST_GETC( IPLOTI, 'TITLE', STATUS ) ) THEN
+      TITLE = AST_GETC( IPLOTI, 'TITLE', STATUS ) 
+      IF( TITLE .EQ. ' ' .OR. 
+     :    TITLE .EQ. AST_GETC( IWCS, 'TITLE', STATUS ) ) THEN
 
          TITLE = ' '
          CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS ) 
