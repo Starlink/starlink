@@ -52,6 +52,10 @@
 *     2006-01-25 (TIMJ):
 *        Add smf_malloc, smf_free.
 *        Remove smf_fits_rdhead
+*     2006-01-25 (TIMJ):
+*        Add smf_create_*
+*        Add smf_construct_*
+*        Add smf_dtype_tostring
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,6 +105,25 @@ smfFile* smf_create_smfFile( int * status );
 smfHead* smf_create_smfHead( int * status );
 smfDA*   smf_create_smfDA( int * status );
 
+
+smfData *
+smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
+		       smfDA * da, smf_dtype dtype, const void * pntr[3], 
+		       const dim_t dims[], int ndims,
+		       int virtual, int * status );
+smfDA *
+smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
+		     double * flatpar, const char * flatname, int nflat,
+		     int * status );
+smfFile *
+smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
+		      int isTstream, const char * name, HDSLoc* xloc, 
+		      int * status );
+smfHead *
+smf_construct_smfHead( smfHead * tofill, sc2head * sc2head,
+		       AstFrameSet * wcs, AstFitsChan * fitshdr,
+		       dim_t curslice, int * status );
+
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
 
@@ -110,6 +133,9 @@ void smf_dtype_check_fatal( const smfData* data, const char * type, smf_dtype it
 char * smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
+
+smf_dtype
+smf_dtype_tostring( const char * dtype, int * status );
 
 /*void smf_extcorr( smfData *data, double tau, int *status);*/
 
