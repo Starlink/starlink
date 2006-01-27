@@ -807,7 +807,7 @@
     pack .display.xscroll  -side bottom  -fill x
     pack .display.output   -expand y     -fill both
 
-    pack  .display -fill x
+    pack  .display -fill both -expand 1
 
 #
 #  Create the row of buttons for navigating through the catalogue.
@@ -899,9 +899,9 @@
        -yscroll {.messages.yscroll set}
 
     pack .messages.yscroll  -side right   -fill y
-    pack .messages.output   -expand y
+    pack .messages.output   -expand 1 -fill both
 
-    pack .messages  -side left  -fill x
+    pack .messages  -side left  -fill both -expand 1
 
 #
 #  Obtain the required catalogue and attempt to open it.

@@ -3,7 +3,7 @@
 SUBDIRS = libcap
 
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
- catremote UrlReader.class UrlReader.java 
+ catremote UrlReader.class UrlReader.java geturl
 
 nobase_bin_SCRIPTS = xcatviewLib/adamMessageRelay
 
@@ -23,11 +23,7 @@ cursa_TASKS = catchart catchartrn catcoord catcopy catgrid  \
  catgscin catheader catpair catphotomfit catphotomlst catphotomtrn \
  catselect catsort
 
-bin_PROGRAMS = geturl
-
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
-
-geturl_SOURCES = geturl.c
 
 #  List of ancillary data files (all types). These need a home at some point.
 EXAMPLE_FILES = examples/0README.LIS examples/angles.TXT examples/bd.grt \
@@ -84,6 +80,13 @@ xcatview: xcatview.in
 	   $(srcdir)/xcatview.in >xcatview.tmp
 	mv xcatview.tmp xcatview
 
+geturl: geturl.in
+	rm -f geturl.tmp geturl
+	$(edit) \
+	   -e 's,@edited_input\@,geturl: produced from geturl.in by Makefile.am,' \
+	   $(srcdir)/geturl.in >geturl.tmp
+	mv geturl.tmp geturl
+
 xcatviewLib/adamMessageRelay: xcatviewLib/adamMessageRelay.in
 	rm -f xcatviewLib/adamMessageRelay.tmp xcatviewLib/adamMessageRelay
 	$(edit) \
@@ -133,4 +136,4 @@ CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
              catgscin.ifc catheader.ifc catpair.ifc catphotomfit.ifc catphotomlst.ifc \
              catphotomtrn.ifc catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
              catview.ifc xcatviewLib/adamMessageRelay
-          
+

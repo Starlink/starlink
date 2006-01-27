@@ -1,5 +1,25 @@
 1 CURSA
 
+  Version 6.5 of CURSA is now part of the Starlink CVS release.
+
+  This version include a new "geturl" command that understands
+  proxy servers. To define a proxy server set the environment 
+  variable "http_proxy" to something like:  
+ 
+     http://wwwcache.myuni.ac.uk:8080/
+
+  before running geturl, or xcatview.
+
+  CURSA is no longer supported by Starlink so visit the support sites
+
+     http://www.starlink.rl.ac.uk/
+     http://dev.starlink.rl.ac.uk/
+
+  to see how to help support it and download new versions.
+
+  Peter W. Draper 24-JAN-2006.
+
+  ------------------------------------------------------------------------
   Version 6.4 of the CURSA package for manipulating astronomical
   catalogues and tables has recently been released.  This version
   contains no major changes, but rather a number of enhancements and

@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cursa" support="S">
-  <version>6.4-1</version>
+  <version>6.5</version>
   <path>applications/cursa</path>
   <description>CURSA - Catalogue and Table Manipulation Applications</description>
   <abstract><p>

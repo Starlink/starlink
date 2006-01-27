@@ -195,6 +195,8 @@ proc GetConfig { } {
 
      menu .getconfig.opt.quiet.but.menu
 
+     set quietGetConfig "false"
+
      .getconfig.opt.quiet.but.menu  add command \
         -label "Verbose (normal)"  \
         -command {

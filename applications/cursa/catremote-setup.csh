@@ -25,8 +25,7 @@ setenv  CATREM_URLREADER "/home/acd/starbase/cursa/catremote/geturl/geturl"
 #  Specify the configuration file to be used.  The URL given here is the
 #  the CURSA default.
 
-setenv  CATREM_CONFIG  http://www.roe.ac.uk/acdwww/catremote/cursa.cfg
-
+setenv  CATREM_CONFIG "http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg"
 #
 #  Define the maximum number of objects which may be included in the
 #  returned table.

@@ -774,10 +774,17 @@ sub RetrieveTable
 #
 #          Check that the last line contains tabs and characters other
 #          than dashes; if this is the case then there is a reasonable
-#          chance that a genuine table has been returned.
+#          chance that a genuine table has been returned. Can also be an [EOD]
+#          on last line, in that case move back one.
 
             $lastLine = $table[$tableLines-1];
-#            print "lastLine: $lastLine\n";
+#            print "! lastLine: $lastLine\n";
+            if ( $lastLine == "[EOD]" ) {
+              $tableLines--;
+              $lastLine = $table[$tableLines-1];
+            }
+#            print "! lastLine: $lastLine\n";
+
 
             $tabpos = index($lastLine, "\t");
 #            print "tabpos: $tabpos\n";
@@ -1097,7 +1104,7 @@ sub ResolveObjectName
 
          $query =~ s/\s//;
 
-#         print "query: $query after-query \n";
+#         print "!query: $query \n";
 
 #
 #       Attempt to retrieve the table and if ok obtain the coordinates
@@ -1130,8 +1137,9 @@ sub GetObjectCoords
 #
 #    Split the last line in the returned table into its component
 #    fields.
-
+      print "GetObjectCoords tableLines = $tableLines \n";
       $lastLine = $tableLines - 1;
+      print "lastLine = $lastLine ($table[$lastLine]) \n";
       @fields = split(/\t/, $table[$lastLine]);
 
 #

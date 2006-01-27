@@ -1,0 +1,89 @@
+#! @ATCLSH@
+
+#+
+#  Name:
+#     geturl
+#
+#  Purpose:
+#     Retrieve a specified URL and write it to standard output.
+#
+#  Language:
+#     Tcl
+#
+#  Description:
+#     Retrieve the contents of a specified URL and write them to standard
+#     output.
+#
+#  Usage:
+#     geturl url-to-be-retrieved  [show-HTTP-header]
+#
+#  Parameters:
+#     url-to-be-retrieved
+#        The URL whose contents are to be written to standard output.
+#     show-HTTP-header
+#        If any value is given for this optional argument then the
+#        HTTP header at the start of the requested page (which is usually
+#        hidden) is echoed to standard output.
+#
+#  Examples:
+#     geturl http://www.roe.ac.uk/acdwww/cursa/home.html
+#        Retrieve the contents of URL
+#        http://www.roe.ac.uk/acdwww/cursa/home.html.
+#
+#     geturl  http://www.roe.ac.uk/acdwww/cursa/home.html head
+#        Retrieve the contents of URL
+#        http://www.roe.ac.uk/acdwww/cursa/home.html and show the header
+#        (which is usually hidden) at the start of the page.
+#
+#  Notes: 
+#     Proxy server configuration. Uses the standard command-line script
+#     variable "http_proxy" to define a proxy server. Set this when needed.
+#
+#  Authors:
+#     PWD: Peter W. Draper (JAC, Durham University).
+#
+#  History:
+#     24-JAN-2006 (PWD): Original version.
+#-
+
+#  Check the command-line arguments.
+global argc argv
+if { $argc == 1 } {
+   set url [lindex $argv 0]
+} else {
+   puts {usage: geturl url-to-be-retrieved  [show-HTTP-header]}
+   puts {}
+   puts {Proxy server support uses "http_proxy" environment variable}
+   exit 1
+}
+
+#  Heavy lifting by Tcl's HTTP package.
+package require http
+
+#  Proc to get some data.
+proc getPage { url } {
+   set token [::http::geturl $url]
+   set data [::http::data $token]
+   ::http::cleanup $token
+   return $data
+}
+
+#  Proc to set the proxy server.
+proc configProxy { http_proxy } {
+   
+   #  Split http://server:port/ into parts and configure http.
+   if { [regexp {(?:http://)?([[:alnum:].-]+)(?::(\d+))?} $http_proxy -> \
+            proxyHost proxyPort] } {
+      ::http::config -proxyhost $proxyHost -proxyport $proxyPort
+   }
+}
+
+#  Check the proxy server setup.
+global env
+set proxy {}
+if { [info exist env(http_proxy)] } {
+   configProxy $env(http_proxy)
+}
+
+#  Get the page and spit it out.
+puts stdout [getPage $url]

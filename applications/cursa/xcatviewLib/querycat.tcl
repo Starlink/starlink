@@ -31,7 +31,7 @@
 #
 #  Set the remote server to one which includes the catalogue usno@eso.
 
-    set env(CATREM_CONFIG) "http://www.roe.ac.uk/acdwww/catremote/cursa.cfg"
+    set env(CATREM_CONFIG) "http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg"
 
 #
 #  Attempt to execute catremote to submit the query and proceed if ok.

@@ -23,6 +23,8 @@
 #
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
+#     ACD: Clive Davenhall (Starlink, ROE)
+#     PWD: Peter W. Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -51,6 +53,9 @@
 #     31-MAY-2001 (ACD):
 #       Modified to correspond to the new catremote which is a Perl script
 #       rather than a C++ program.
+#     24-JAN-2006 (PWD):
+#       Changed CATREM_CONFIG to point at a RAL machine. Still not ideal, but
+#       works for the present.
 #-
 #
 
@@ -152,7 +157,7 @@ setenv  CATREM_URLREADER @bindir@/geturl
 #  Specify the configuration file to be used.  The URL given here is the
 #  the CURSA default.
 
-setenv  CATREM_CONFIG  http://harris.roe.ac.uk/~acd/catremote/cursa.cfg
+setenv  CATREM_CONFIG  http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg
 
 #
 #  Define the maximum number of objects which may be included in the

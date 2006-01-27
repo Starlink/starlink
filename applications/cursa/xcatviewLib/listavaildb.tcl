@@ -21,7 +21,7 @@
 #
 #  Set the remote server to the default CURSA list.
 
-    set env(CATREM_CONFIG) "http://www.roe.ac.uk/acdwww/catremote/cursa.cfg"
+    set env(CATREM_CONFIG) "http://dev.starlink.ac.uk/~pwd/catremote/cursa.cfg"
 
 #
 #  Attempt to execute catremote to list the databases available and
