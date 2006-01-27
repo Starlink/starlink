@@ -125,7 +125,8 @@ int dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc *
 /* If OK, then extract the information from the locator string (necessary   */
 /* to ensure that data alignment is correct, as the string will normally be */
 /* stored externally in a Fortran CHARACTER variable).                      */
-
+/* We do this copy regardless of status since this is sometimes required
+   and it can't hurt if we have allocated memory                            */
   memmove( clocator, flocator, sizeof( struct LOC ) );
 
   return *status;
