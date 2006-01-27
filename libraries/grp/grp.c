@@ -31,11 +31,14 @@
 *        Add grpValid, grpNew and grpPut1
 *     09-NOV-2005 (TIMJ):
 *        Fix return value of grp1Getid if input Grp* is NULL
-*     24-NOV-2006 (TIMJ):
+*     24-JAN-2006 (TIMJ):
 *        Add grpInfoi
-*     25-NOV-2006 (TIMJ):
+*     25-JAN-2006 (TIMJ):
 *        GRP identifier should be obtained for grpDelet even if status is bad
 *        Rename grpInfoi to grpInfoI
+*     26-JAN-2005 (TIMJ):
+*        grpInfoI back to grpInfoi after populist revolt. (and to be
+*        consistent with other Starlink wrappers).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -322,7 +325,7 @@ F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
 			  INTEGER(STATUS)
 			  TRAIL(ITEM));
 
-void grpInfoI( Grp *grp, int index, const char * item, int * value, 
+void grpInfoi( Grp *grp, int index, const char * item, int * value, 
 	       int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);

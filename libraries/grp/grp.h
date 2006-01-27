@@ -30,8 +30,11 @@
 *        Use enum for constants rather than #define.
 *        Use an opaque struct for the C interface rather than the bare
 *        int.
-*     24-NOV-2006 (TIMJ):
-*        Add grpInfoI
+*     24-JAN-2006 (TIMJ):
+*        Add grpInfoi
+*     26-JAN-2005 (TIMJ):
+*        grpInfoI back to grpInfoi after populist revolt. (and to be
+*        consistent with other Starlink wrappers).
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -96,7 +99,7 @@ void grpFree( Grp **, int * );
 void grpDelet( Grp **, int * );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
-void grpInfoI( Grp *grp, int index, const char * item, int * value, 
+void grpInfoi( Grp *grp, int index, const char * item, int * value, 
 	       int *status);
 Grp *grpNew( const char *, int * );
 void grpPut1( Grp *, const char *, int, int * );
