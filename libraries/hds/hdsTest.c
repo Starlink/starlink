@@ -227,8 +227,8 @@ int main () {
   /* Try hdsShow */
   hdsShow("LOCATORS", &status);
   hdsShow("FILES", &status);
-  hdsInfoI(NULL, "LOCATORS", &i, &status );
-  hdsInfoI(NULL, "FILES", &i, &status );
+  hdsInfoI(NULL, "LOCATORS", "!HDS_TEST.,YYY", &i, &status );
+  hdsInfoI(NULL, "FILES", NULL, &i, &status );
 
   datAnnul( &loc3, &status );
 

@@ -1143,6 +1143,7 @@ hdsGtune(const char *param_str,
 int
 hdsInfoI(const HDSLoc* loc,
 	 const char *topic_str,
+	 const char *extra,
 	 int *result,
 	 int  *status);
 

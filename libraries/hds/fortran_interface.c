@@ -3386,9 +3386,10 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
 
 F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
 			   CHARACTER(topic),
+			   CHARACTER(extra),
 			   INTEGER(result),
 			   F77_INTEGER_TYPE *status
-			   TRAIL(locator) TRAIL(topic) )
+			   TRAIL(locator) TRAIL(topic) TRAIL(extra) )
 {
 
 /*================================*/
@@ -3397,13 +3398,15 @@ F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
 
 /* Local variables.     */
    char *topic_c;
+   char *extra_c;
    HDSLoc locator_c;
    HDSLoc * locp;
 
 /* Enter routine.	*/
 
-/* Import TOPIC argument to C string */
+/* Import TOPIC and EXTRA argument to C string */
    topic_c = cnfCreim( topic, topic_length );
+   extra_c = cnfCreim( extra, extra_length );
 
    /* Import locator - NOLOC is valid but dat1_import_floc
       will get upset with NOLOC */
@@ -3415,10 +3418,11 @@ F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
    }
 
 /* Call pure C routine                                       */
-   hdsInfoI( locp, topic_c, result, status);
+   hdsInfoI( locp, topic_c, extra_c, result, status);
 
 /* Free allocated string memory.                             */
    free( topic_c );
+   free( extra_c );
 }
 
 F77_SUBROUTINE(hds_show)( CHARACTER(topic),
