@@ -42,10 +42,12 @@
 *     2006-01-24 (TIMJ):
 *        Use NDF__SZAPP.
 *        Check for GRP leaks
+*     2006-01-25 (TIMJ):
+*        Check for locator leaks.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -83,6 +85,7 @@
 #include "f77.h"
 #include "ndf.h"
 #include "star/grp.h"
+#include "star/hds.h"
 
 #include "libsmurf/smurflib.h"
 
@@ -93,22 +96,33 @@ void smurf_mon( int * status ) {
   /* Local variables */
   char taskname[PAR__SZNAM+1];
   char appname[NDF__SZAPP+1];
+  char filter[PAR__SZNAM+PAR__SZNAM+1];
   int ngrp0;                   /* Number of grp ids at start */
   int ngrp1;                   /* Number of grp ids at end */
+  int nloc0;                   /* Number of active HDS Locators at start */
+  int nloc1;                   /* Number of active HDS Locators at end */
+  int nfil0;                   /* Number of open HDS files at start */
+  int nfil1;                   /* Number of open HDS files at end */
 
   if ( *status != SAI__OK ) return; 
 
   /* Register our status variable with AST */
   astWatch( status );
 
-  /* Get the GRP status for leak checking */
-  grpInfoI( NULL, 0, "NGRP", &ngrp0, status );
-
   /* Find out the task name we were invoked with */
   memset( taskname, ' ', PAR__SZNAM );
   taskname[PAR__SZNAM] = '\0';
   F77_CALL(task_get_name)(taskname,  status, PAR__SZNAM);
   cnfImprt( taskname, PAR__SZNAM, taskname);
+
+  /* Get the GRP and HDS status for leak checking - need the task name
+    to mask out parameter names. Also need to mask out the monlith name */
+  strcpy(filter, "!SMURF_MON,!");
+  strcat(filter, taskname );
+  grpInfoi( NULL, 0, "NGRP", &ngrp0, status );
+  hdsInfoI( NULL, "LOCATORS", filter, &nloc0, status );
+  hdsInfoI( NULL, "FILES", NULL, &nfil0, status );
+
 
   /* Update the application name in the NDF history recording
      to include the version number of the application */
@@ -133,7 +147,7 @@ void smurf_mon( int * status ) {
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
   errBegin( status );
-  grpInfoI( NULL, 0, "NGRP", &ngrp1, status );
+  grpInfoi( NULL, 0, "NGRP", &ngrp1, status );
 
   /* If there are more active groups now than there were on entry,
    * there must be a problem (GRP identifiers are not being freed
@@ -145,6 +159,50 @@ void smurf_mon( int * status ) {
     msgSeti( "NGRP1", ngrp1 );
     msgOut( "SMURF_NGRP", "WARNING: The number of active "
 	    "GRP identifiers increased from ^NGRP0 to ^NGRP1 "
+	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+	    " error).", status);
+    msgBlank(status);
+  }
+  errEnd( status );
+
+  /* Check for HDS leaks Do this in a new error reporting context so
+   * that we get the correct value even if an error has occurred. */
+  errBegin( status );
+  hdsInfoI( NULL, "LOCATORS", filter, &nloc1, status );
+
+  /* If there are more active locators now than there were on entry,
+   * there must be a problem (HDS locators are not being freed
+   * somewhere). So report it. */
+  if (*status == SAI__OK && nloc1 > nloc0) {
+    msgBlank( status );
+    msgSetc( "NAME", taskname );
+    msgSeti( "NLOC0", nloc0 );
+    msgSeti( "NLOC1", nloc1 );
+    msgOut( "SMURF_NLOC", "WARNING: The number of active "
+	    "HDS Locators increased from ^NLOC0 to ^NLOC1 "
+	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
+	    " error).", status);
+    msgBlank(status);
+    hdsShow("LOCATORS", status);
+    printf("filter - %s\n",filter);
+  }
+  errEnd( status );
+
+  /* Check for HDS leaks Do this in a new error reporting context so
+   * that we get the correct value even if an error has occurred. */
+  errBegin( status );
+  hdsInfoI( NULL, "FILES", NULL, &nfil1, status );
+
+  /* If there are more active files now than there were on entry,
+   * there must be a problem (HDS files are not being closed
+   * somewhere). So report it. */
+  if (*status == SAI__OK && nfil1 > nfil0) {
+    msgBlank( status );
+    msgSetc( "NAME", taskname );
+    msgSeti( "NFIL0", nfil0 );
+    msgSeti( "NFIL1", nfil1 );
+    msgOut( "SMURF_NLOC", "WARNING: The number of active "
+	    "HDS container files increased from ^NFIL0 to ^NFIL1 "
 	    "during execution of ^NAME (" PACKAGE_UPCASE " programming "
 	    " error).", status);
     msgBlank(status);
