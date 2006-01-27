@@ -109,7 +109,7 @@ C_ROUTINES = \
 	hds1_exit.c hdsCopy.c hdsEwild.c hds_globals.c hdsGtune.c \
 	hdsState.c hdsStop.c hdsTune.c \
 	hdsWild.c hdserase.c hdsgroup.c hdslock.c hdsnew.c hdsnull.c \
-	hdsopclos.c hdstools.c  \
+	hdsopclos.c hdstools.c  hdsInfoI.c \
 	\
 	rec1_alloc_frame.c rec1_clear_cbm.c rec1_close_file.c \
 	rec1_close_slot.c rec1_create_file.c rec1_deall_frame.c \
