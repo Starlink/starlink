@@ -376,9 +376,8 @@
 *     -  The Title component in the NDF is used as the default title for 
 *     the annotated axes. If the NDF does not have a Title component, then
 *     the default title is taken from current co-ordinate Frame stored in the
-*     WCS component of the NDF. This
-*     default may be over-ridden by specifying a value for the Title
-*     attribute using the STYLE parameter. 
+*     WCS component of the NDF. This default may be over-ridden by specifying 
+*     a non-blank value for the Title attribute using the STYLE parameter. 
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the 
 *     annotated axes, contours, and key; a KEY picture to store 
@@ -516,7 +515,8 @@
 *     2006 January 23 (MJC):
 *        Added "Scale" mode.
 *     27-JAN-2006 (DSB):
-*        Use a runtime default of ".NOT.CLEAR" for parameter AXIS.
+*        - Use a runtime default of ".NOT.CLEAR" for parameter AXIS.
+*        - Ignore blank titles supplied in STYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -786,8 +786,9 @@
 *  Title. If we did it before KPG1_PLOT (i.e. if we set the Title in IWCS)
 *  it may prevent alignment ocurring within KPG1_PLOT since alignment fails 
 *  if the Title of two Frames differ.
-      IF( AST_GETC( IWCS, 'TITLE', STATUS ) .EQ. 
-     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+      TITLE = AST_GETC( IPLOT, 'TITLE', STATUS ) 
+      IF( TITLE .EQ. ' ' .OR. 
+     :    TITLE .EQ. AST_GETC( IWCS, 'TITLE', STATUS ) ) THEN
 
          TITLE = ' '
          CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS ) 
