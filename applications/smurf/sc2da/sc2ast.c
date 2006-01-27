@@ -55,6 +55,7 @@ int *status             /* global status (given and returned) */
      07Nov2005 : Remove duplicate elevation argument (timj)
                  Remove unused parallactic angle argument (timj)
      08Nov2005 : Use RAD2DEG global rather than 90*PIBY2 (timj)
+     27Jan2006 : Use ErsRep rather than printf (timj)
 */
 
 {
@@ -175,8 +176,9 @@ int *status             /* global status (given and returned) */
 
    /* Check subnum range */
    if ( subnum < 0 || subnum > 7 ) {
-     printf("Sub array number '%d' out of range\n", subnum);
      *status = SAI__ERROR;
+     sprintf(errmess, "Sub array number '%d' out of range\n", subnum);
+     ErsRep(0, status, errmess);
      return;
    }
 
