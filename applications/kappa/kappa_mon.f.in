@@ -35,6 +35,7 @@
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +64,8 @@
 *        Added MFITTRENDS.
 *     29-SEP-2005 (DSB):
 *        Added warnings about unannulled GRP identifiers.
+*     26-JAN-2006 (TIMJ):
+*        Add warnings about locator leaks
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -76,17 +79,23 @@
 *  Global Constants:
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'GRP_PAR'          ! GRP definitions
+      INCLUDE  'DAT_PAR'          ! DAT definitions
 
 *  Status:
       INTEGER  STATUS
 
 *  External References:
       LOGICAL LPG_AGAIN           ! Invoke the application again?
+      INTEGER CHR_LEN             ! Length of string
 
 *  Local Variables:
+      CHARACTER FILTER*(60)       ! HDS_INFOI filter string
       CHARACTER NAME * ( 15 )     ! Task name from the command
+      INTEGER IPOSN               ! Position in string
       INTEGER NGRP0               ! Number of active GRP groups on entry
       INTEGER NGRP1               ! Number of active GRP groups on exit
+      INTEGER NLOC0               ! Number of active locators on entry
+      INTEGER NLOC1               ! Number of active locators on exit
       LOGICAL DISAB               ! Disable looping?
       LOGICAL VERB                ! Run in verbose mode?
       LOGICAL REPL                ! Replace input NDFs?
@@ -102,6 +111,18 @@
 *  Obtain the command from the environment.  This returns uppercase
 *  names.
       CALL TASK_GET_NAME( NAME, STATUS )
+
+*  Need to construct a string to filter out parameter locators
+*  from the list of active locators. Need monolith and taskname
+*  excluded. Also seem to need HDS_SCRATCH excluded.
+      FILTER = '!KAPPA_MON,!HDS_SCRATCH,!'
+      IPOSN = CHR_LEN( FILTER )
+      CALL CHR_APPND(NAME, FILTER, IPOSN)
+
+*  Note the current number of active locators (excluding parameter
+*  system
+      CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
+     :     NLOC0, STATUS )
 
 *  Identify and execute the task.
 *  ==============================
@@ -523,7 +544,30 @@
          CALL MSG_OUT( 'KAPPA_NGRP', 'WARNING: The number of active '//
      :             'GRP identifiers increased from ^NGRP0 to ^NGRP1 '//
      :             'during execution of ^NAME (KAPPA programming '//
-     :             ' error).', STATUS )
+     :             'error).', STATUS )
+         CALL MSG_BLANK( STATUS )
+      END IF
+      CALL ERR_END( STATUS )
+
+*  Note the current number of active locators. Do this in a new
+*  error reporting context so that we get the correct value even if an
+*  error has occurred.
+      CALL ERR_BEGIN( STATUS )
+      CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
+     :     NLOC1, STATUS )
+
+*  If there are more active groups now than there were on entry, there
+*  must be a problem (GRP identifiers are not being freed somewhere). So
+*  report it.
+      IF( STATUS .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL MSG_SETI( 'NLOC0', NLOC0 )
+         CALL MSG_SETI( 'NLOC1', NLOC1 )
+         CALL MSG_OUT( 'KAPPA_NLOC', 'WARNING: The number of active '//
+     :             'HDS locators increased from ^NLOC0 to ^NLOC1 '//
+     :             'during execution of ^NAME (KAPPA programming '//
+     :             'error).', STATUS )
          CALL MSG_BLANK( STATUS )
       END IF
       CALL ERR_END( STATUS )
