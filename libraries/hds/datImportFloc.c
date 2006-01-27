@@ -60,8 +60,13 @@
  *    18-NOV-2004 (TIMJ):
  *      Rename from dat1_import_floc so that it can be made public for
  *      fortran wrappers.
- *    27-JAN-2006 (DSB)
+ *    27-JAN-2006 (DSB):
  *      Attempt to execute even if status is set on entry.
+ *    27-JAN-2006 (TIMJ):
+ *      Slight reworking of DSB's patch, to allow the memory
+ *      to be freed if dat1_import_floc failed to copy anything
+ *      into the empty struct. Otherwise the uninitialised struct
+ *      can cause real problems later on.
 
  *  Notes:
  *    - Does not check the contents of the locator for validity.
@@ -98,7 +103,7 @@
  */
 
 void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
-
+  int lstat;
 
   /* Check that we have a null pointer for HDSLoc */
   if ( *clocator != NULL ) {
@@ -124,8 +129,28 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
     return;
   }
 
-  /* Now import the Fortran locator */
-  dat1_import_floc( flocator, loc_length, *clocator, status);
+  /* Now import the Fortran locator - this will work even if status
+     is bad on entry but it is possible for this routine to set status
+     as well. We need to be able to determine whether the status was 
+     set bad by this routine, since that will result in garbage in the
+     HDS locator. */
+  emsMark();
+  lstat = DAT__OK;
+  dat1_import_floc( flocator, loc_length, *clocator, &lstat);
+  if (lstat != DAT__OK) {
+    /* free the memory and trigger a NULL pointer */
+    dat1_free_hdsloc( clocator );
+
+    /* Annul all this if status was already bad, since we do not
+       want the extra meaningless messages on the stack. If status
+       was good, we retain everything */
+    if (*status == DAT__OK) {
+      *status = lstat;
+    } else {
+      emsAnnul(&lstat);
+    }
+  }
+  emsRlse();
 
   return;
 }
