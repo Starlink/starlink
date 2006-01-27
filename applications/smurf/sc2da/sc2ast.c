@@ -6,7 +6,9 @@
 #include "ast.h"
 #include "ndf.h"
 #include "sc2ast.h"
+#include "Ers.h"
 
+static char errmess[132];              /* For DRAMA error messages */
 
 #define MM2RAD 2.4945e-5               /* scale at array in radians */
 #define MM2DEG 0.001429                /* scale at array in degrees */
@@ -467,6 +469,8 @@ int *status             /* global status (given and returned) */
    History :
      27Apr2005 : original (bdk)
      18May2005 : force initialisation of returned value (timj)
+     27Jan2006 : use strncmp rather than strcmp (timj)
+                 Associate error message with error condition (timj)
 */
 
 {
@@ -476,41 +480,45 @@ int *status             /* global status (given and returned) */
    if ( *status != SAI__OK ) return;
 
 
-   if ( strcmp ( name, "s8a" ) == 0 )
+   if ( strncmp ( name, "s8a", 3 ) == 0 )
    {
       *subnum = 0;
    }
-   else if ( strcmp ( name, "s8b" ) == 0 )
+   else if ( strncmp ( name, "s8b", 3 ) == 0 )
    {
       *subnum = 1;
    }
-   else if ( strcmp ( name, "s8c" ) == 0 )
+   else if ( strncmp ( name, "s8c", 3 ) == 0 )
    {
       *subnum = 2;
    }
-   else if ( strcmp ( name, "s8d" ) == 0 )
+   else if ( strncmp ( name, "s8d", 3 ) == 0 )
    {
       *subnum = 3;
    }
-   else if ( strcmp ( name, "s4a" ) == 0 )
+   else if ( strncmp ( name, "s4a", 3 ) == 0 )
    {
       *subnum = 4;
    }
-   else if ( strcmp ( name, "s4b" ) == 0 )
+   else if ( strncmp ( name, "s4b", 3 ) == 0 )
    {
       *subnum = 5;
    }
-   else if ( strcmp ( name, "s4c" ) == 0 )
+   else if ( strncmp ( name, "s4c", 3 ) == 0 )
    {
       *subnum = 6;
    }
-   else if ( strcmp ( name, "s4d" ) == 0 )
+   else if ( strncmp ( name, "s4d", 3 ) == 0 )
    {
       *subnum = 7;
    }
    else
    {
       *status = SAI__ERROR;
+      sprintf( errmess,
+	       "Error converting subarray name from '%s' to number",
+	       name);
+      ErsRep( 0, status, errmess);
    }
 }
 
