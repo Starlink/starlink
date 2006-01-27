@@ -25,6 +25,7 @@ void FC_MAIN () {}
 
 #include "tk.h"
 #include "locale.h"
+#include "cnf.h"
 
 /*
  * Include files required for the startcl extensions.

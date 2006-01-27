@@ -87,8 +87,8 @@ Tcl_Interp *interp
 /*  Allocate a timer structure */
    timer = (timer_struct*)malloc(sizeof (timer_struct));
 
-   Tcl_CreateCommand ( interp, "nbs", tclnbs_cmd,
-     (ClientData)timer, (Tcl_CmdDeleteProc *)tclnbs_stop );
+   Tcl_CreateCommand ( interp, "nbs", (Tcl_CmdProc *)tclnbs_cmd,
+                       (ClientData)timer, (Tcl_CmdDeleteProc *)tclnbs_stop );
    return TCL_OK;
 }
 

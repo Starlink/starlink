@@ -169,8 +169,10 @@ Tcl_Interp *interp
 /*
  * Create the gwm command for creating gwm widgets.
 */
-   Tcl_CreateCommand(interp, "gwm", GwmCmd, (ClientData)Tk_MainWindow(interp),
-            (void (*)()) NULL);
+   Tcl_CreateCommand(interp, "gwm", 
+                     (Tcl_CmdProc *)GwmCmd, 
+                     (ClientData)Tk_MainWindow(interp),
+                     (void (*)()) NULL);
 
 /*
  * Initialize the tagsOptions structure.
@@ -183,11 +185,11 @@ Tcl_Interp *interp
  * Create the gwm canvas item type.
 */
    itemType.name = gwmName;
-   itemType.itemSize = sizeof(GwmItem);
-   itemType.createProc = tkgwmItemCreate;
+   itemType.itemSize = (int) sizeof(GwmItem);
+   itemType.createProc = (Tk_ItemCreateProc *)tkgwmItemCreate;
    itemType.configSpecs = itemSpecs;
-   itemType.configProc = tkgwmItemConfigure;
-   itemType.coordProc = tkgwmItemCoord;
+   itemType.configProc = (Tk_ItemConfigureProc *) tkgwmItemConfigure;
+   itemType.coordProc = (Tk_ItemCoordProc *)tkgwmItemCoord;
    itemType.deleteProc = tkgwmItemDelete;
    itemType.displayProc = tkgwmItemDisplay;
    itemType.alwaysRedraw = 0;
@@ -236,7 +238,7 @@ GwmCmd(clientData, interp, argc, argv)
     int argc;			/* Number of arguments. */
     char **argv;		/* Argument strings. */
 {
-    Tk_Window main = (Tk_Window) clientData;
+    Tk_Window winMain = (Tk_Window) clientData;
     Gwm *gwmPtr;
     Tk_Window tkwin;
     XGCValues gcvalues;
@@ -253,7 +255,7 @@ GwmCmd(clientData, interp, argc, argv)
 	return TCL_ERROR;
     }
 
-    tkwin = Tk_CreateWindowFromPath(interp, main, argv[1], (char *) NULL);
+    tkwin = Tk_CreateWindowFromPath(interp, winMain, argv[1], (char *) NULL);
     if (tkwin == NULL) {
 	return TCL_ERROR;
     }
@@ -357,7 +359,9 @@ GwmCmd(clientData, interp, argc, argv)
  *  Create the command for this widget.
  */
     gwmPtr->widgetCmd = Tcl_CreateCommand(interp, Tk_PathName(gwmPtr->tkwin), 
-	    GwmWidgetCmd, (ClientData) gwmPtr, (void (*)()) NULL);
+                                          (Tcl_CmdProc *)GwmWidgetCmd, 
+                                          (ClientData) gwmPtr, 
+                                          (void (*)()) NULL);
 
     interp->result = Tk_PathName(gwmPtr->tkwin);
     return TCL_OK;
@@ -688,10 +692,11 @@ GwmConfigure(interp, gwmPtr, argc, argv, flags)
     int i;
     XEvent event;
     int status;
-    char *colname;
+    const char *colname;
 
     if (Tk_ConfigureWidget(interp, gwmPtr->tkwin, configSpecs,
-	    argc, argv, (char *) gwmPtr, flags) != TCL_OK) {
+                           argc, (const char **)argv, 
+                           (char *) gwmPtr, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
 

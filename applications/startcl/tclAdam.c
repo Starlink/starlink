@@ -12,6 +12,7 @@
       14 Sept  1999 Remove redundant Tcladam_Exit function, sort out exit
                     handler problems & enable stubs.
        5 Oct   2000 Retain local copies of the message status hash entries. (DSB)
+      27 Jan   2006 Really remove Tcladam_Exit (PWD).
 */
 #include <stdio.h>
 #include <time.h>
@@ -61,7 +62,6 @@ static int Tcladam_ProcessMessage ( Tcl_Interp *interp, int path, int messid,
     int inmsg_status, int inmsg_context, char *inmsg_name, int inmsg_length, 
     char *inmsg_value);
 static void Tcladam_AppendStatus(Tcl_Interp *interp, int status);
-static void Tcladam_Exit( ClientData clientdata);
 
 /*  Buffer for translating Adam status's into messages */
 
@@ -384,8 +384,10 @@ Tcl_Interp *interp   /* tcl interpreter pointer */
 {
    if ( Tcl_InitStubs( interp, "8.0", 0 ) == NULL ) return TCL_ERROR;
 
-   Tcl_CreateCommand ( interp, "adam_start", Tcladam_Start,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_start", 
+                       (Tcl_CmdProc *)Tcladam_Start,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
    return TCL_OK;
 }
@@ -620,20 +622,11 @@ char *argv[]
 
    if ( argc == 2 )
    {
-#if 0
-      ams_initeh ( argv[1], 0, &status );
-      if ( status == SAI__OK )
-      {
-         tcl_status = TCL_OK;
-         Tcl_CreateExitHandler( Tcladam_Exit, 0 );
-      }
-#else
       ams_init ( argv[1], &status );
       if ( status == SAI__OK )
       {
          tcl_status = TCL_OK;
       }
-#endif
       else
       {
          Tcl_AppendResult ( interp, 
@@ -649,20 +642,30 @@ char *argv[]
       tcl_status = TCL_ERROR;
    }
 
-   Tcl_CreateCommand ( interp, "adam_receive", Tcladam_Receive,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_receive", 
+                       (Tcl_CmdProc *)Tcladam_Receive,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_getreply", Tcladam_Getreply,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_getreply", 
+                       (Tcl_CmdProc *)Tcladam_Getreply,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_reply", Tcladam_Reply,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_reply", 
+                       (Tcl_CmdProc *)Tcladam_Reply,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_send", Tcladam_Send,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_send", 
+                       (Tcl_CmdProc *)Tcladam_Send,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
-   Tcl_CreateCommand ( interp, "adam_path", Tcladam_Path,
-     (ClientData)NULL, (Tcl_CmdDeleteProc *)NULL );
+   Tcl_CreateCommand ( interp, "adam_path", 
+                       (Tcl_CmdProc *)Tcladam_Path,
+                       (ClientData)NULL, 
+                       (Tcl_CmdDeleteProc *)NULL );
 
    Tcl_InitHashTable( &codeTable, TCL_ONE_WORD_KEYS);
 
@@ -868,12 +871,4 @@ int istat                /* Adam status value */
 
    ems1_get_facility_error(istat, &facility, &ident, &text);
    Tcl_AppendResult( interp,  text, (char*)NULL);
-}
-
-static void Tcladam_Exit
-(
-ClientData clientdata
-)
-{
-   ams_exit();
 }

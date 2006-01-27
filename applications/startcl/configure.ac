@@ -1,7 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(startcl, 1.5-5, ussc@star.rl.ac.uk)
+AC_INIT(startcl, 1.5-6, ussc@star.rl.ac.uk)
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -33,7 +33,7 @@ STAR_DECLARE_DEPENDENCIES(configure, [jpeg tcl tk])
 STAR_LATEX_DOCUMENTATION([sun186 sun219])
 
 dnl    Locate the tclsh and wish binaries and associated libraries
-STAR_PATH_TCLTK(8.2,[tk])
+STAR_PATH_TCLTK(8.4,[tk])
 
 dnl    How to link to X.
 AC_PATH_XTRA

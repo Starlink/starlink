@@ -25,7 +25,7 @@ static int GwmCanvCmd(ClientData, Tcl_Interp*, int, char**);
 static void Clear(GwmItem *);
 static void PropChangeHandler(ClientData, XEvent*);
 
-int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr, 
+int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
    int argc, char** argv)
 /*
    Create a gwm canvas item
@@ -51,7 +51,7 @@ int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 */
     if (argc < 2) {
 	Tcl_AppendResult(interp, "wrong # args:  should be \"",
-	    Tk_PathName(Tk_CanvasTkwin(canvas)), 
+	    Tk_PathName(Tk_CanvasTkwin(canvas)),
 	    " create gwm x y ?options?\"", (char *) NULL);
 	return TCL_ERROR;
     }
@@ -65,8 +65,8 @@ int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 	win = Tk_WindowId(Tk_CanvasTkwin(canvas));
     }
     atom = Tk_InternAtom( Tk_CanvasTkwin(canvas), "GWM_name");
-    (void)XGetWindowProperty( display, win, atom, 0, 1, False, XA_STRING, 
-	&actualType, &actualFormat, &nitems, &bytesAfter, 
+    (void)XGetWindowProperty( display, win, atom, 0, 1, False, XA_STRING,
+	&actualType, &actualFormat, &nitems, &bytesAfter,
 	(unsigned char**)(&dummy));
     if (actualType != None)
     {
@@ -104,13 +104,13 @@ int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
    Turn the canvas window into a gwm window.
 */
     status = GWM_MakeIntoWindow(display, win, gwmItemPtr->name,
-        gwmItemPtr->width, gwmItemPtr->height, gwmItemPtr->cols, 
-	gwmItemPtr->mincols, gwmItemPtr->fg->pixel, gwmItemPtr->bg->pixel, 
+        gwmItemPtr->width, gwmItemPtr->height, gwmItemPtr->cols,
+	gwmItemPtr->mincols, gwmItemPtr->fg->pixel, gwmItemPtr->bg->pixel,
 	0, 0);
 #if 0
     status = GWM_MakeIntoWindow(display, win, gwmItemPtr->name,
-        gwmItemPtr->width, gwmItemPtr->height, gwmItemPtr->cols, 
-	gwmItemPtr->mincols, gwmItemPtr->fg->pixel, gwmItemPtr->bg->pixel, 
+        gwmItemPtr->width, gwmItemPtr->height, gwmItemPtr->cols,
+	gwmItemPtr->mincols, gwmItemPtr->fg->pixel, gwmItemPtr->bg->pixel,
 	gwmItemPtr->overlay, gwmItemPtr->ovcolour->pixel);
 #endif
 
@@ -119,13 +119,13 @@ int tkgwmItemCreate(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
         gwmItemPtr->cols = gwmItemPtr->info->ctsize;
 	gcvalues.background = (gwmItemPtr->info->ctable)[0];
 	gcvalues.plane_mask = gwmItemPtr->info->mask;
-        gwmItemPtr->gc = Tk_GetGC( Tk_CanvasTkwin(canvas), 
+        gwmItemPtr->gc = Tk_GetGC( Tk_CanvasTkwin(canvas),
 	    GCBackground | GCPlaneMask, &gcvalues);
 #if 0
 	if (gwmItemPtr->overlay)
 	{
 	    gcvalues.plane_mask = ~(gwmItemPtr->info->mask);
-            gwmItemPtr->ovgc = Tk_GetGC( Tk_CanvasTkwin(canvas), 
+            gwmItemPtr->ovgc = Tk_GetGC( Tk_CanvasTkwin(canvas),
 		GCBackground | GCPlaneMask, &gcvalues);
 	}
 #endif
@@ -156,7 +156,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
     GwmItem* gwmItemPtr = (GwmItem*)itemPtr;
     Tk_Window tkwin;
     Atom atom;
-    char *colour;
+    const char *colour;
     XColor col;
 #if 0
     int i;
@@ -166,7 +166,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
    Parse argv and update the itemSpecs structure
 */
     tkwin = Tk_CanvasTkwin(canvas);
-    if (Tk_ConfigureWidget(interp, tkwin, itemSpecs, argc, argv,
+    if (Tk_ConfigureWidget(interp, tkwin, itemSpecs, argc, (const char **)argv,
             (char *) gwmItemPtr, flags) != TCL_OK) {
         return TCL_ERROR;
     }
@@ -187,7 +187,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 		&col);
 	    colour = Tk_NameOfColor(&col);
 	    atom = Tk_InternAtom( tkwin, "GWM_background");
-	    XChangeProperty( gwmItemPtr->info->display, 
+	    XChangeProperty( gwmItemPtr->info->display,
 		gwmItemPtr->info->win_id, atom, XA_STRING, 8, PropModeReplace,
 		(unsigned char*)colour,  strlen(colour));
 	}
@@ -202,7 +202,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 		&col);
 	    colour = Tk_NameOfColor(&col);
 	    atom = Tk_InternAtom( tkwin, "GWM_foreground");
-	    XChangeProperty( gwmItemPtr->info->display, 
+	    XChangeProperty( gwmItemPtr->info->display,
 		gwmItemPtr->info->win_id, atom, XA_STRING, 8, PropModeReplace,
 		(unsigned char*)colour,  strlen(colour));
 	}
@@ -215,7 +215,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 	    col.blue = gwmItemPtr->ovcolour->blue;
 	    for (i=0; i < gwmItemPtr->info->ctsize; i++)
 	    {
-		col.pixel =  (gwmItemPtr->info->ctable)[i] | 
+		col.pixel =  (gwmItemPtr->info->ctable)[i] |
 		    ~(gwmItemPtr->info->mask);
 		XStoreColor( gwmItemPtr->info->display, gwmItemPtr->info->cmap,
 		    &col);
@@ -224,7 +224,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 	if (itemSpecs[4].specFlags & TK_CONFIG_OPTION_SPECIFIED ||
 	    itemSpecs[5].specFlags & TK_CONFIG_OPTION_SPECIFIED)
 	{
-	    itemPosition(gwmItemPtr, gwmItemPtr->info->x_offset, 
+	    itemPosition(gwmItemPtr, gwmItemPtr->info->x_offset,
 		gwmItemPtr->info->y_offset);
 	}
 #endif
@@ -238,8 +238,12 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 	if ((itemSpecs[2].specFlags & TK_CONFIG_OPTION_SPECIFIED) &&
 	    gwmItemPtr->command != NULL)
 	{
-	    gwmItemPtr->itemCmd = Tcl_CreateCommand(interp, gwmItemPtr->command,
-		GwmCanvCmd, (ClientData)itemPtr,(void (*)()) NULL);
+	    gwmItemPtr->itemCmd =
+                Tcl_CreateCommand(interp,
+                                  (const char *)gwmItemPtr->command,
+                                  (Tcl_CmdProc *)GwmCanvCmd,
+                                  (ClientData)itemPtr,
+                                  (void (*)()) NULL);
 	}
     }
 
@@ -247,7 +251,7 @@ int tkgwmItemConfigure(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
 }
 
 
-int tkgwmItemCoord(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr, 
+int tkgwmItemCoord(Tcl_Interp* interp, Tk_Canvas canvas, Tk_Item* itemPtr,
    int argc, char** argv)
 {
     char c0[TCL_DOUBLE_SPACE], c1[TCL_DOUBLE_SPACE];
@@ -293,7 +297,7 @@ void tkgwmItemDelete(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display)
 /*
    Delete the property change event handler.
 */
-    Tk_DeleteEventHandler(gwmItemPtr->tkwin, PropertyChangeMask, 
+    Tk_DeleteEventHandler(gwmItemPtr->tkwin, PropertyChangeMask,
 	PropChangeHandler, gwmItemPtr);
 
 /*
@@ -325,14 +329,14 @@ void tkgwmItemDelete(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display)
 	    &bytesAfter, &dummy);
 	XFree(dummy);
 
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    gwmItemPtr->info->pix_atom, 0, 1, True, XA_PIXMAP, &actualType, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    gwmItemPtr->info->pix_atom, 0, 1, True, XA_PIXMAP, &actualType,
 	    &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
 	atom = Tk_InternAtom( Tk_CanvasTkwin(canvas), "GWM_colour_table");
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    atom, 0, gwmItemPtr->info->ctsize, True, XA_INTEGER, &actualType, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    atom, 0, gwmItemPtr->info->ctsize, True, XA_INTEGER, &actualType,
 	    &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
@@ -342,23 +346,23 @@ void tkgwmItemDelete(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display)
 	    &bytesAfter, &dummy);
 	XFree(dummy);
 
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    gwmItemPtr->info->xoff_atom, 0, 1, True, XA_INTEGER, &actualType, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    gwmItemPtr->info->xoff_atom, 0, 1, True, XA_INTEGER, &actualType,
 	    &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    gwmItemPtr->info->yoff_atom, 0, 1, True, XA_INTEGER, &actualType, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    gwmItemPtr->info->yoff_atom, 0, 1, True, XA_INTEGER, &actualType,
 	    &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    gwmItemPtr->info->xov_off_atom, 0, 1, True, XA_INTEGER, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    gwmItemPtr->info->xov_off_atom, 0, 1, True, XA_INTEGER,
 	    &actualType, &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
-	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id , 
-	    gwmItemPtr->info->yov_off_atom, 0, 1, True, XA_INTEGER, 
+	(void)XGetWindowProperty( display, gwmItemPtr->info->win_id ,
+	    gwmItemPtr->info->yov_off_atom, 0, 1, True, XA_INTEGER,
 	    &actualType, &actualFormat, &nitems, &bytesAfter, &dummy);
 	XFree(dummy);
 
@@ -397,14 +401,14 @@ void tkgwmItemDelete(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display)
 /*
    Release the colour table entries.
 */
-    if ( gwmItemPtr->info->visclass == GrayScale || 
-	gwmItemPtr->info->visclass == PseudoColor || 
+    if ( gwmItemPtr->info->visclass == GrayScale ||
+	gwmItemPtr->info->visclass == PseudoColor ||
 	gwmItemPtr->info->visclass == DirectColor )
     {
-	XFreeColors( display, gwmItemPtr->info->cmap, 
+	XFreeColors( display, gwmItemPtr->info->cmap,
 	    gwmItemPtr->info->ctable, gwmItemPtr->info->ctsize, 0);
     }
-	
+
 /*
    Free the GCs.
 */
@@ -424,7 +428,7 @@ void tkgwmItemDelete(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display)
 */
     if (gwmItemPtr->command != NULL)
     {
-	Tcl_DeleteCommand(gwmItemPtr->interp, 
+	Tcl_DeleteCommand(gwmItemPtr->interp,
 	    Tcl_GetCommandName(gwmItemPtr->interp, gwmItemPtr->itemCmd));
     }
 
@@ -446,25 +450,25 @@ void tkgwmItemDisplay(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display,
     short drawableY;
 
 /*
-   Calculate the position (in canvas coordinates) and size of the area 
+   Calculate the position (in canvas coordinates) and size of the area
    that needs to be re-drawn.
 */
-    if ( x > gwmItemPtr->info->x_offset ) 
+    if ( x > gwmItemPtr->info->x_offset )
 	redrawX = x;
     else
 	redrawX = gwmItemPtr->info->x_offset;
-    if ( y > gwmItemPtr->info->y_offset ) 
+    if ( y > gwmItemPtr->info->y_offset )
 	redrawY = y;
     else
 	redrawY = gwmItemPtr->info->y_offset;
     if ( x + width > gwmItemPtr->info->x_offset + gwmItemPtr->info->pix_width )
-	redrawWidth = gwmItemPtr->info->x_offset + 
+	redrawWidth = gwmItemPtr->info->x_offset +
 	    gwmItemPtr->info->pix_width - redrawX;
     else
 	redrawWidth = x + width - redrawX;
-    if ( y + height > gwmItemPtr->info->y_offset + 
+    if ( y + height > gwmItemPtr->info->y_offset +
 	    gwmItemPtr->info->pix_height )
-	redrawHeight = gwmItemPtr->info->y_offset + 
+	redrawHeight = gwmItemPtr->info->y_offset +
 	    gwmItemPtr->info->pix_height - redrawY;
     else
 	redrawHeight = y + height - redrawY;
@@ -473,14 +477,14 @@ void tkgwmItemDisplay(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display,
    Convert the canvas coordinates to coordinates in the destination
    drawable.
 */
-    Tk_CanvasDrawableCoords(canvas, (double)redrawX, (double)redrawY, 
+    Tk_CanvasDrawableCoords(canvas, (double)redrawX, (double)redrawY,
 	 &drawableX, &drawableY);
 
 /*
    Copy the relevant area of the pixmap.
 */
-     XCopyArea( display, gwmItemPtr->info->pix_id, dst, 
-	gwmItemPtr->gc, redrawX - gwmItemPtr->info->x_offset, 
+     XCopyArea( display, gwmItemPtr->info->pix_id, dst,
+	gwmItemPtr->gc, redrawX - gwmItemPtr->info->x_offset,
 	redrawY - gwmItemPtr->info->y_offset, redrawWidth, redrawHeight,
 	drawableX, drawableY);
 
@@ -490,30 +494,30 @@ void tkgwmItemDisplay(Tk_Canvas canvas, Tk_Item* itemPtr, Display* display,
 #if 0
     if (gwmItemPtr->overlay)
     {
-	if ( x > gwmItemPtr->info->x_ov_offset ) 
+	if ( x > gwmItemPtr->info->x_ov_offset )
 	    redrawX = x;
 	else
 	    redrawX = gwmItemPtr->info->x_ov_offset;
-	if ( y > gwmItemPtr->info->y_ov_offset ) 
+	if ( y > gwmItemPtr->info->y_ov_offset )
 	    redrawY = y;
 	else
 	    redrawY = gwmItemPtr->info->y_ov_offset;
-	if ( x + width > gwmItemPtr->info->x_ov_offset + 
+	if ( x + width > gwmItemPtr->info->x_ov_offset +
 	        gwmItemPtr->info->pix_width )
-	    redrawWidth = gwmItemPtr->info->x_ov_offset + 
+	    redrawWidth = gwmItemPtr->info->x_ov_offset +
 		gwmItemPtr->info->pix_width - redrawX;
 	else
 	    redrawWidth = x + width - redrawX;
-	if ( y + height > gwmItemPtr->info->y_ov_offset + 
+	if ( y + height > gwmItemPtr->info->y_ov_offset +
 	 	gwmItemPtr->info->pix_height )
-	    redrawHeight = gwmItemPtr->info->y_ov_offset + 
+	    redrawHeight = gwmItemPtr->info->y_ov_offset +
 		gwmItemPtr->info->pix_height - redrawY;
 	else
 	    redrawHeight = y + height - redrawY;
-	Tk_CanvasDrawableCoords(canvas, (double)redrawX, (double)redrawY, 
+	Tk_CanvasDrawableCoords(canvas, (double)redrawX, (double)redrawY,
 	    &drawableX, &drawableY);
-	XCopyArea( display, gwmItemPtr->info->pix_id, dst, 
-	    gwmItemPtr->ovgc, redrawX - gwmItemPtr->info->x_ov_offset, 
+	XCopyArea( display, gwmItemPtr->info->pix_id, dst,
+	    gwmItemPtr->ovgc, redrawX - gwmItemPtr->info->x_ov_offset,
 	    redrawY - gwmItemPtr->info->y_ov_offset, redrawWidth, redrawHeight,
 	    drawableX, drawableY);
     }
@@ -537,7 +541,7 @@ double tkgwmItemPoint(Tk_Canvas canvas, Tk_Item* itemPtr, double* pointPtr)
     {
 	if ( pointPtr[1] < y1 )
 	{
-	    return sqrt( (x1 - pointPtr[0])*(x1 - pointPtr[0]) + 
+	    return sqrt( (x1 - pointPtr[0])*(x1 - pointPtr[0]) +
 		(y1 - pointPtr[1])*(y1 - pointPtr[1]) );
 	}
 	else if ( pointPtr[1] <= y2)
@@ -569,7 +573,7 @@ double tkgwmItemPoint(Tk_Canvas canvas, Tk_Item* itemPtr, double* pointPtr)
     {
 	if ( pointPtr[1] < y1 )
 	{
-	    return sqrt( (pointPtr[0] - x2)*(pointPtr[0] - x2) + 
+	    return sqrt( (pointPtr[0] - x2)*(pointPtr[0] - x2) +
 		(y1 - pointPtr[1])*(y1 - pointPtr[1]) );
 	}
 	else if ( pointPtr[1] <= y2)
@@ -593,9 +597,9 @@ int tkgwmItemArea(Tk_Canvas canvas, Tk_Item* itemPtr, double* rectPtr)
 /*
    Test the given area and the gwm items bounding box for overlap.
 */
-    if ( rectPtr[0] >= (double)gwmItemPtr->header.x1 && 
+    if ( rectPtr[0] >= (double)gwmItemPtr->header.x1 &&
          rectPtr[0] < (double)gwmItemPtr->header.x2 &&
-         rectPtr[1] >= (double)gwmItemPtr->header.y1 && 
+         rectPtr[1] >= (double)gwmItemPtr->header.y1 &&
          rectPtr[1] < (double)gwmItemPtr->header.y2 )
     {
 	overlap1 = 1;
@@ -603,10 +607,10 @@ int tkgwmItemArea(Tk_Canvas canvas, Tk_Item* itemPtr, double* rectPtr)
     else
     {
         overlap1 = 0;
-    } 
-    if ( rectPtr[2] >= (double)gwmItemPtr->header.x1 && 
+    }
+    if ( rectPtr[2] >= (double)gwmItemPtr->header.x1 &&
          rectPtr[2] < (double)gwmItemPtr->header.x2 &&
-         rectPtr[3] >= (double)gwmItemPtr->header.y1 && 
+         rectPtr[3] >= (double)gwmItemPtr->header.y1 &&
          rectPtr[3] < (double)gwmItemPtr->header.y2 )
     {
 	overlap2 = 1;
@@ -614,7 +618,7 @@ int tkgwmItemArea(Tk_Canvas canvas, Tk_Item* itemPtr, double* rectPtr)
     else
     {
         overlap2 = 0;
-    } 
+    }
     if ( overlap1 && overlap2)
     {
 	return 1;
@@ -712,12 +716,12 @@ static void itemPosition(GwmItem* itemPtr, double X,
    Update the gwm window scroll properties.
 */
     local_offset = (long)itemPtr->info->x_offset;
-    XChangeProperty( itemPtr->info->display, itemPtr->info->win_id, 
-	itemPtr->info->xoff_atom, XA_INTEGER, 32, PropModeReplace, 
+    XChangeProperty( itemPtr->info->display, itemPtr->info->win_id,
+	itemPtr->info->xoff_atom, XA_INTEGER, 32, PropModeReplace,
 	(unsigned char*)(&local_offset), 1 );
     local_offset = (long)itemPtr->info->y_offset;
-    XChangeProperty( itemPtr->info->display, itemPtr->info->win_id, 
-	itemPtr->info->yoff_atom, XA_INTEGER, 32, PropModeReplace, 
+    XChangeProperty( itemPtr->info->display, itemPtr->info->win_id,
+	itemPtr->info->yoff_atom, XA_INTEGER, 32, PropModeReplace,
 	(unsigned char*)(&local_offset), 1 );
 
 #if 0
@@ -725,11 +729,11 @@ static void itemPosition(GwmItem* itemPtr, double X,
     {
 	local_offset = (long)itemPtr->info->x_ov_offset;
 	XChangeProperty( itemPtr->info->display, itemPtr->info->win_id,
-	    itemPtr->info->xov_off_atom, XA_INTEGER, 32, PropModeReplace, 
+	    itemPtr->info->xov_off_atom, XA_INTEGER, 32, PropModeReplace,
 	    (unsigned char*)(&local_offset), 1 );
 	local_offset = (long)itemPtr->info->y_ov_offset;
-	XChangeProperty( itemPtr->info->display, itemPtr->info->win_id, 
-	    itemPtr->info->yov_off_atom, XA_INTEGER, 32, PropModeReplace, 
+	XChangeProperty( itemPtr->info->display, itemPtr->info->win_id,
+	    itemPtr->info->yov_off_atom, XA_INTEGER, 32, PropModeReplace,
 	    (unsigned char*)(&local_offset), 1 );
     }
 #endif
@@ -789,17 +793,17 @@ GwmCanvCmd(clientData, interp, argc, argv)
  */
     	if ((c == 'c') && (strncmp(argv[2], "colour", length) == 0)) {
 	    if (Tcl_GetInt(interp, argv[3], &ctentry) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			"invalid colour table entry specification \"", argv[3],
 			"\"", (char *) NULL);
 		goto error;
 	    }
 	    if ( ctentry < 0 || ctentry >= (int)gwmItemPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 #if 0
 	    if ( ctentry < -1 || ctentry >= (int)gwmItemPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 #endif
 		goto error;
@@ -809,16 +813,16 @@ GwmCanvCmd(clientData, interp, argc, argv)
 #if 0
 	    } else {
 		if (gwmItemPtr->overlay) {
-		    color.pixel = gwmItemPtr->info->ctable[0] | 
+		    color.pixel = gwmItemPtr->info->ctable[0] |
 			~gwmItemPtr->info->mask;
 		} else {
-		    Tcl_AppendResult(interp, "widget \"", argv[0], 
+		    Tcl_AppendResult(interp, "widget \"", argv[0],
 			"\" does not have an overlay", (char *) NULL);
 	    	    goto error;
 		}
 #endif
 	    }
-	    XQueryColor( gwmItemPtr->info->display, gwmItemPtr->info->cmap, 
+	    XQueryColor( gwmItemPtr->info->display, gwmItemPtr->info->cmap,
 		&color);
 	    Tcl_AppendResult(interp, Tk_NameOfColor(&color), (char *) NULL);
 
@@ -861,29 +865,29 @@ GwmCanvCmd(clientData, interp, argc, argv)
  */
     	if ((c == 'c') && (strncmp(argv[2], "colour", length) == 0)) {
 	    if (Tcl_GetInt(interp, argv[3], &ctentry) != TCL_OK) {
-		Tcl_AppendResult(interp, 
+		Tcl_AppendResult(interp,
 			"invalid colour table entry specification \"", argv[3],
 			"\"", (char *) NULL);
 		goto error;
 	    }
-	    if ( gwmItemPtr->info->visclass != PseudoColor && 
+	    if ( gwmItemPtr->info->visclass != PseudoColor &&
 		gwmItemPtr->info->visclass != DirectColor &&
 		gwmItemPtr->info->visclass != GrayScale ) {
-		Tcl_AppendResult(interp, "colour table is read only", 
+		Tcl_AppendResult(interp, "colour table is read only",
 			(char *) NULL);
 		goto error;
 	    }
 	    if ( ctentry < 0 || ctentry >= (int)gwmItemPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 #if 0
 	    if ( ctentry < -1 || ctentry >= (int)gwmItemPtr->info->ctsize ) {
-		Tcl_AppendResult(interp, "colour table entry \"",  argv[3], 
+		Tcl_AppendResult(interp, "colour table entry \"",  argv[3],
 			"\" out of range", (char *) NULL);
 #endif
 		goto error;
 	    }
-	    if ( !XParseColor( gwmItemPtr->info->display, 
+	    if ( !XParseColor( gwmItemPtr->info->display,
 		    gwmItemPtr->info->cmap, argv[4], &color) ) {
 		Tcl_AppendResult(interp, "invalid colour \"",  argv[4], "\"",
 			(char *) NULL);
@@ -898,13 +902,13 @@ GwmCanvCmd(clientData, interp, argc, argv)
 #if 0
 		if (gwmItemPtr->overlay) {
 	    	    for ( i = 0; i < gwmItemPtr->info->ctsize; i++ ) {
-		    	color.pixel = (gwmItemPtr->info->ctable)[i] | 
+		    	color.pixel = (gwmItemPtr->info->ctable)[i] |
 			    ~gwmItemPtr->info->mask;
-		        XStoreColor( gwmItemPtr->info->display, 
+		        XStoreColor( gwmItemPtr->info->display,
 			gwmItemPtr->info->cmap, &color);
 		    }
 		} else {
-		    Tcl_AppendResult(interp, "widget \"", argv[0], 
+		    Tcl_AppendResult(interp, "widget \"", argv[0],
 			"\" does not have an overlay", (char *) NULL);
 		    goto error;
 	    	}
@@ -924,7 +928,7 @@ GwmCanvCmd(clientData, interp, argc, argv)
  */
     } else {
 	Tcl_AppendResult(interp, "bad option \"", argv[1],
-		"\":  must be configure, clear, get, ovclear, print or set", 
+		"\":  must be configure, clear, get, ovclear, print or set",
 		(char *) NULL);
 	goto error;
     }
@@ -982,14 +986,14 @@ static void Clear(GwmItem *gwmItemPtr)
 /*
 **  Erase the contents of the pixmap
 */
-    XFillRectangle( gwmItemPtr->info->display, gwmItemPtr->info->pix_id, gc, 
+    XFillRectangle( gwmItemPtr->info->display, gwmItemPtr->info->pix_id, gc,
 	0, 0, gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height);
 
 /*
 **  Erase the area of the window occupied by the pixmap
 */
-    XFillRectangle( gwmItemPtr->info->display, gwmItemPtr->info->win_id, gc, 
-	gwmItemPtr->info->x_offset, gwmItemPtr->info->y_offset, 
+    XFillRectangle( gwmItemPtr->info->display, gwmItemPtr->info->win_id, gc,
+	gwmItemPtr->info->x_offset, gwmItemPtr->info->y_offset,
 	gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height);
 
 /*
@@ -1011,7 +1015,6 @@ static void
     unsigned long nitems, bytes_after;
     Pixmap *local_pix_id;
     long *plocal_offset;
-    long local_offset;
     int x, y;
     unsigned int border, depth;
     Window root;
@@ -1023,10 +1026,10 @@ static void
 */
     if ( event->xproperty.state == PropertyDelete) return;
 
-/*   
+/*
   Update the window info structure with the new value of the
   property that has change.
-*/   
+*/
     if ( event->xproperty.atom == gwmItemPtr->info->pix_atom )
     {
 	status = XGetWindowProperty( gwmItemPtr->info->display,
@@ -1043,7 +1046,7 @@ static void
   header.
 */
 	    XGetGeometry( gwmItemPtr->info->display, gwmItemPtr->info->pix_id,
-		&root, &x, &y, &(gwmItemPtr->info->pix_width), 
+		&root, &x, &y, &(gwmItemPtr->info->pix_width),
 		&(gwmItemPtr->info->pix_height), &border, &depth);
 	    gwmItemPtr->width = gwmItemPtr->info->pix_width;
 	    gwmItemPtr->height = gwmItemPtr->info->pix_height;
@@ -1112,9 +1115,9 @@ static void
 */
     gwmItemPtr->header.x1 = gwmItemPtr->info->x_offset;
     gwmItemPtr->header.y1 = gwmItemPtr->info->y_offset;
-    gwmItemPtr->header.x2 = gwmItemPtr->info->x_offset + 
+    gwmItemPtr->header.x2 = gwmItemPtr->info->x_offset +
 	gwmItemPtr->info->pix_width;
-    gwmItemPtr->header.y2 = gwmItemPtr->info->y_offset + 
+    gwmItemPtr->header.y2 = gwmItemPtr->info->y_offset +
 	gwmItemPtr->info->pix_height;
 #if 0
     if (gwmItemPtr->xovoffset > 0)
@@ -1168,7 +1171,7 @@ int tkgwmItemPostScript(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 /*
     Fill out the visual info structure
 */
-        XGetWindowAttributes( gwmItemPtr->info->display, 
+        XGetWindowAttributes( gwmItemPtr->info->display,
                 Tk_WindowId(gwmItemPtr->tkwin), &winatt);
         vinfo_template.visualid = XVisualIDFromVisual( winatt.visual );
         vinfo = XGetVisualInfo( gwmItemPtr->info->display, VisualIDMask,
@@ -1222,28 +1225,28 @@ int tkgwmItemPostScript(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 /*
    Undecomposed colour model - get colours for all possible pixel values.
 */
-       nc =  DisplayCells( gwmItemPtr->info->display,  
+       nc =  DisplayCells( gwmItemPtr->info->display,
 	   DefaultScreen( gwmItemPtr->info->display ) );
        ct = (XColor*)malloc( sizeof(XColor) * nc );
        for ( i = 0; i < nc; i++ ) ct[i].pixel = i;
-       XQueryColors( gwmItemPtr->info->display, gwmItemPtr->info->cmap, ct, 
+       XQueryColors( gwmItemPtr->info->display, gwmItemPtr->info->cmap, ct,
           nc );
     }
 
 /*
   Get a copy of the pixmap.
 */
-    image = XGetImage( gwmItemPtr->info->display, gwmItemPtr->info->pix_id, 
-	0, 0, gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height, 
+    image = XGetImage( gwmItemPtr->info->display, gwmItemPtr->info->pix_id,
+	0, 0, gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height,
 	AllPlanes, XYPixmap);
 
 
 /*
   See if display has colour or not.
 */
-    if ( gwmItemPtr->info->visclass == StaticColor || 
-	gwmItemPtr->info->visclass == TrueColor || 
-	gwmItemPtr->info->visclass == PseudoColor || 
+    if ( gwmItemPtr->info->visclass == StaticColor ||
+	gwmItemPtr->info->visclass == TrueColor ||
+	gwmItemPtr->info->visclass == PseudoColor ||
 	gwmItemPtr->info->visclass == DirectColor )
     {
         colour = 1;
@@ -1265,11 +1268,11 @@ int tkgwmItemPostScript(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 /*
   Write colorimage command.
 */
-    sprintf(buffer, "%d %d 8 [ 1 0 0 1 %d %d]", 
-	gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height, 
-	-gwmItemPtr->header.x1, gwmItemPtr->header.y1); 
+    sprintf(buffer, "%d %d 8 [ 1 0 0 1 %d %d]",
+	gwmItemPtr->info->pix_width, gwmItemPtr->info->pix_height,
+	-gwmItemPtr->header.x1, gwmItemPtr->header.y1);
     Tcl_AppendResult(interp, buffer, (char*) NULL);
-    sprintf(buffer, 
+    sprintf(buffer,
 	"{currentfile %d string readhexstring pop}false %d colorimage\n",
 	gwmItemPtr->info->pix_width, colour ? 3 : 1);
     Tcl_AppendResult(interp, buffer, (char*) NULL);
@@ -1277,7 +1280,7 @@ int tkgwmItemPostScript(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 /*
   Write image data.
 */
-    for (j = gwmItemPtr->info->pix_height - 1; j >= 0; j--) 
+    for (j = gwmItemPtr->info->pix_height - 1; j >= 0; j--)
     {
 
 /*
@@ -1305,7 +1308,7 @@ int tkgwmItemPostScript(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                        "0123456789ABCDEF"[(ctb[bpix].blue >> 12) & 0xf];
                    linebuf[k++] =
                        "0123456789ABCDEF"[(ctb[bpix].blue >> 8) & 0xf];
- 
+
                 } else {
                    linebuf[k++] =
                        "0123456789ABCDEF"[(ct[pix].red >> 12) & 0xf];

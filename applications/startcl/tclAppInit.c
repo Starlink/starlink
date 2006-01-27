@@ -28,6 +28,7 @@ void FC_MAIN () {}
 #endif
 
 #include "tcl.h"
+#include "cnf.h"
 
 /*
  * Include files needed for the startcl extensions.
