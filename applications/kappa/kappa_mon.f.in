@@ -556,8 +556,8 @@
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
      :     NLOC1, STATUS )
 
-*  If there are more active groups now than there were on entry, there
-*  must be a problem (GRP identifiers are not being freed somewhere). So
+*  If there are more active locators now than there were on entry, there
+*  must be a problem (HDS locators are not being freed somewhere). So
 *  report it.
       IF( STATUS .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
          CALL MSG_BLANK( STATUS )
