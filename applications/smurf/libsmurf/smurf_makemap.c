@@ -167,6 +167,7 @@ void smurf_makemap( int *status ) {
 
   for( pass=0; pass<=1; pass++ ) {
 
+    
     if( pass == 0 ) {
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Pass 1 determine map bounds",
 	       status);
@@ -197,13 +198,17 @@ void smurf_makemap( int *status ) {
       /*smf_flatfield( data_raw, &data, status );*/
 
       /* Kludge to regrid only a single time slice */
-      /*(data->dims)[2] = 1;*/
+      /*(data->dims)[2] = 2;*/
 
       if( *status == SAI__OK ) {
 	file = data->file;
 	pname =  file->name;
 	msgSetc("FILE", pname);
-	msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Processing ^FILE",
+	msgSeti("THISFILE", i);
+	msgSeti("NUMFILES", size);
+	msgSeti("PASS", pass);
+	msgOutif(MSG__VERB, " ", 
+		 "SMURF_MAKEMAP: Pass ^PASS Processing ^THISFILE/^NUMFILES ^FILE",
 		 status);
 	
 	/* Check that the data dimensions are 3 (for time ordered data) */
@@ -278,9 +283,8 @@ void smurf_makemap( int *status ) {
 
       /* Get the astrometry for all the time slices in this data file */      
       if( *status == SAI__OK) for( j=0; j<(data->dims)[2]; j++ ) {
-	
 	smf_tslice_ast( data, j, status);
-	
+
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;
 	  sc2hdr = &(hdr->sc2head);
@@ -302,6 +306,7 @@ void smurf_makemap( int *status ) {
 	    
 	    sprintf( fitshd[0], "CRPIX1  = 256" );
 	    astPutFits( fitschan, fitshd[0], 0 );
+
 	    sprintf( fitshd[1], "CRPIX2  = 256" );
 	    astPutFits( fitschan, fitshd[1], 0 );
 	    sprintf( fitshd[2], "CD1_1   = %e", pixsize/3600. );
@@ -380,11 +385,15 @@ void smurf_makemap( int *status ) {
 	}
 	
 	/* clean up ast objects */
-	if( bolo2sky != NULL )
+	if( bolo2sky != NULL ) {
 	  astAnnul( bolo2sky );
+	  bolo2sky = NULL;
+	}
 	
-	if( bolo2map != NULL )
+	if( bolo2map != NULL ) {
 	  astAnnul( bolo2map );
+	  bolo2map = NULL;
+	}
       }
 
       /* close data files */
