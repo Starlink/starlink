@@ -135,7 +135,7 @@ char * smf_dtype_string( const smfData* data, int * status );
 size_t smf_dtype_size( const smfData* data, int * status );
 
 smf_dtype
-smf_dtype_tostring( const char * dtype, int * status );
+smf_dtype_fromstring( const char * dtype, int * status );
 
 /*void smf_extcorr( smfData *data, double tau, int *status);*/
 
