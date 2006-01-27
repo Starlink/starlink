@@ -133,6 +133,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
    char            *comps[MAXCOMP]; 
    size_t          len;
    int             match;
+   int             exclude;
    int             atstart;
    int             tracestat;
    int             nlev;
@@ -258,21 +259,26 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 	       /* Good trace - now compare and contrast */
 	       /* we can match on more than one item */
 	       match = 0;
+	       exclude = 0;
 	       for (j=0; j<ncomp; j++) {
 		 /* matching or anti-matching? */
 		 if ( *(comps[j]) == '!' ) {
 		   /* do not forget to start one character in for the ! */
 		   if (strncmp(path.body, (comps[j])+1,
 			       strlen(comps[j])-1) != 0) {
-		     match = 1;
+		     /* Should be exempt */
+		     exclude = 1;
 		   }
 		 } else {
 		   if (strncmp(path.body, comps[j], strlen(comps[j])) == 0) {
+		     /* Should be included */
 		     match = 1;
 		   }
 		 }
 	       }
-	       if (match) (*result)++;
+	       /* increment if we either matched something
+		  or was not excluded */
+	       if (match || !exclude ) (*result)++;
 	     }
 	   } else {
 	     /* quick version */
