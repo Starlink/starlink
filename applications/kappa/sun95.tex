@@ -17703,7 +17703,9 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          {\tt TRUE} if labelled and annotated axes are to be drawn around the
          contour map, showing the current co-ordinate Frame of the
          supplied NDF.  The appearance of the axes can be controlled using
-         the STYLE parameter. {\tt [TRUE]}
+         the STYLE parameter. If a null ({\tt{!}}) value is supplied, then axes
+         will be drawn unless the CLEAR parameter indicates that the graphics
+         device is not being cleared. {\tt [!]}
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -50430,6 +50432,10 @@ The following applications have been modified:
           called {\tt "Scale"}.  This sets a specified number of contour 
           levels to be equally spaced between two pixel values that you 
           supply.
+         \item Parameter AXIS now defaults to null ({\tt{!}}), causing
+          axes to be drawn if and only if the graphics device is cleared 
+          before the contours are plotted, as controlled by the parameter
+          CLEAR.
       \end{itemize}
 
    \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
