@@ -47,6 +47,8 @@
 *        Add check for reference count.
 *     2006-01-26 (TIMJ):
 *        sc2head is now embedded in the struct
+*     2006-01-26 (TIMJ):
+*        Free the data array from sc2store
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,6 +126,11 @@ void smf_close_file( smfData ** data, int * status ) {
     if ( file->isSc2store ) {
       /* opened by DA library */
       sc2store_free( status );
+
+      /* We also need to free the data array - but we can not use smf_free
+         since sc2store uses malloc */
+      free( ((*data)->pntr)[0]);
+      ((*data)->pntr)[0] = NULL;
     } else if ( file->ndfid != NDF__NOID ) {
 
       /* if this is a time series we need to free
