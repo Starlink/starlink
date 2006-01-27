@@ -18,7 +18,6 @@
 #include "tclAdam.h"
 #include "tkGwm.h"
 #include <stdlib.h>
-/* #include "blt.h" */
 #ifdef HAVE_ITCL
 #  include "itk.h"
 #endif /* HAVE_ITCL */
@@ -26,7 +25,7 @@
 #include "tclndf.h"
 
 /* include tclInt.h for access to namespace API */
-#include "tclInt.h"
+/*#include "tclInt.h"*/
 
 /*
  * The following variable is a special hack that is needed in order for
