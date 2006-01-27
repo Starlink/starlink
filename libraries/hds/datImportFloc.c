@@ -47,10 +47,12 @@
  *       be NULL on entry. If status is set by this routine, the struct
  *       will not be malloced on return.
  *    int *status = Given and Returned
- *       Inherited status. Returns without action if status is not SAI__OK.
+ *       Inherited status. Attempts to excecute even if status is not SAI__OK
+ *       on entry.
 
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
+ *    David Berry (JAC, Preston)
 
  *  History:
  *    16-NOV-2005 (TIMJ):
@@ -58,6 +60,8 @@
  *    18-NOV-2004 (TIMJ):
  *      Rename from dat1_import_floc so that it can be made public for
  *      fortran wrappers.
+ *    27-JAN-2006 (DSB)
+ *      Attempt to execute even if status is set on entry.
 
  *  Notes:
  *    - Does not check the contents of the locator for validity.
@@ -95,13 +99,14 @@
 
 void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** clocator, int * status) {
 
-  if (*status != DAT__OK) return;
 
   /* Check that we have a null pointer for HDSLoc */
   if ( *clocator != NULL ) {
-    *status = DAT__WEIRD;
-    emsRep( "datImportFloc", "datImportFloc: Supplied C locator is non-NULL",
-	    status);
+    if( *status == DAT__OK ) {
+       *status = DAT__WEIRD;
+       emsRep( "datImportFloc", "datImportFloc: Supplied C locator is non-NULL",
+      	       status);
+    }
     return;
   }
 
@@ -111,19 +116,16 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
   *clocator = malloc( sizeof( struct LOC ) );
 
   if (*clocator == NULL ) {
-    *status = DAT__NOMEM;
-    emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
-	    status);
+    if( *status == DAT__OK ) {
+       *status = DAT__NOMEM;
+       emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
+ 	       status);
+    }
     return;
   }
 
   /* Now import the Fortran locator */
   dat1_import_floc( flocator, loc_length, *clocator, status);
-
-  /* Clean up on error */
-  if ( *status != DAT__OK ) {
-    dat1_free_hdsloc( clocator );
-  }
 
   return;
 }

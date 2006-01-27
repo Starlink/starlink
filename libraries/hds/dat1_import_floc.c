@@ -40,17 +40,21 @@
  *       Fills the HDSLoc struct with the contents of the fortran buffer.
  *       The C struct will not be malloced by this routine.
  *    int *status = Given and Returned
- *       Inherited status. Returns without action if status is not DAT__OK
+ *       Inherited status. Attempts to execute even if status is not DAT__OK
+ *       on entry.
 
  *  Returned:
  *    int status = Inherited status value
 
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
+ *    David Berry (JAC, Preston)
 
  *  History:
  *    16-NOV-2005 (TIMJ):
  *      Initial version
+ *    27-JAN-2006 (DSB)
+ *      Attempt to execute even if status is set on entry.
 
  *  Notes:
  *    Does not check the contents of the locator for validity but does check for
@@ -89,28 +93,32 @@
 
 int dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc * clocator, int * status) {
 
-  if (*status != DAT__OK) return *status;
-
 /* Validate the locator length.                                             */
   if (loc_length != DAT__SZLOC ) {
-    *status = DAT__LOCIN;
-    emsSeti( "LEN", loc_length );
-    emsSeti( "SZLOC", DAT__SZLOC );
-    emsRep( "DAT1_IMPORT_FLOC", "Locator length is ^LEN not ^SZLOC", status);
+    if (*status == DAT__OK ) {
+       *status = DAT__LOCIN;
+       emsSeti( "LEN", loc_length );
+       emsSeti( "SZLOC", DAT__SZLOC );
+       emsRep( "DAT1_IMPORT_FLOC", "Locator length is ^LEN not ^SZLOC", status);
+    }
     return *status;
   };
 
   /* Check obvious error conditions */
-  if (strncmp( DAT__ROOT, flocator, loc_length) == 0 ) {
-    *status = DAT__LOCIN;
-    emsRep( "datImportFloc_ROOT", "Input HDS Locator corresponds to DAT__ROOT but that can only be used from NDF", status );
+  if (strncmp( DAT__ROOT, flocator, loc_length) == 0 ){
+    if( *status == DAT__OK ) {
+       *status = DAT__LOCIN;
+       emsRep( "datImportFloc_ROOT", "Input HDS Locator corresponds to DAT__ROOT but that can only be used from NDF", status );
+    }
     return *status;
   }
 
   /* Check obvious error conditions */
-  if (strncmp( DAT__NOLOC, flocator, loc_length) == 0 ) {
-    *status = DAT__LOCIN;
-    emsRep( "datImportFloc_NOLOC", "Input HDS Locator corresponds to DAT__NOLOC but status is good (Possible programming error)", status );
+  if (strncmp( DAT__NOLOC, flocator, loc_length) == 0 ){
+    if( *status == DAT__OK ) {
+       *status = DAT__LOCIN;
+       emsRep( "datImportFloc_NOLOC", "Input HDS Locator corresponds to DAT__NOLOC but status is good (Possible programming error)", status );
+    }
     return *status;
   }
 
