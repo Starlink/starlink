@@ -57,8 +57,10 @@
 *        Added warnings about unannulled GRP identifiers.
 *     2005 April 15 (MJC):
 *        Added FITSVAL, now a separate A-task.
-*     26-JAN-2006 (TIMJ):
+*     26-JAN-2006 (DSB):
 *        Add warnings about locator leaks
+*     27-JAN-2006 (TIMJ):
+*        Need to exclude GLOBAL from leak check.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -111,7 +113,7 @@
 *  Need to construct a string to filter out parameter locators
 *  from the list of active locators. Need monolith and taskname
 *  excluded. Also seem to need HDS_SCRATCH excluded.
-      FILTER = '!NDFPACK_MON,!HDS_SCRATCH,!'
+      FILTER = '!NDFPACK_MON,!HDS_SCRATCH,!GLOBAL,!'
       IPOSN = CHR_LEN( FILTER )
       CALL CHR_APPND(NAME, FILTER, IPOSN)
 
