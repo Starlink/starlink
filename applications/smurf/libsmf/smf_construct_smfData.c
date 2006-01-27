@@ -15,7 +15,7 @@
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file, 
 *                      smfHead * hdr, 
-*		       smfDA * da, smf_dtype dtype, const void * pntr[3], 
+*		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 *		       const dim_t dims[], int ndims,
 *		       int virtual, int * status );
 
@@ -117,7 +117,7 @@
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, const void * pntr[3], 
+		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 		       const dim_t dims[], int ndims,
 		       int virtual, int * status ) {
 
