@@ -700,6 +700,8 @@ int *status                   /* global status (given and returned) */
    History :
     18Aug2004 : original (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
+    27Jan2006 : Kluge initialising of sc2store_loc[] array 
+                Risks, overwriting a valid locator (TIMJ)
 */
 {
    int dim[2];
@@ -714,6 +716,8 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
+     /* Should really initialise outside this routine */
+      sc2store_loc[j] = NULL;
       datNew ( headloc, sc2store_names[j][1], sc2store_names[j][0], 
         ndim, dim, status );
       if ( *status != SAI__OK ) break;
@@ -828,6 +832,8 @@ int *status                   /* global status (given and returned) */
    History :
     18Aug2004 : original (bdk)
     23Nov2005 : Use Official C HDS interface (TIMJ)
+    27Jan2006 : Kluge initialising of sc2store_loc[] array 
+                Risks, overwriting a valid locator (TIMJ)
 */
 {
    int dim[2];
@@ -842,6 +848,8 @@ int *status                   /* global status (given and returned) */
 
    for ( j=0; j<SC2STORE_NUM; j++ )
    {
+     /* Should really initialise outside this routine */
+      sc2store_loc[j] = NULL;
       datFind ( headloc, sc2store_names[j][1], &(sc2store_loc[j]), 
         status );
 
