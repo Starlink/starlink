@@ -44,6 +44,8 @@
 *        Indicate consting in prolog
 *     2006-01-24 (TIMJ):
 *        Create string version from Double.
+*     2006-01-26 (TIMJ):
+*        Fix silly string copy bug.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -97,7 +99,7 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
   char * astres; /* Pointer to AST static buffer */
 
   /* Set a default value */
-  result = "";
+  result[0] = '\0';
   
   /* Check entry status */
   if (*status != SAI__OK) return;
@@ -130,7 +132,7 @@ void smf_fits_getS (const smfHead *hdr, const char * name, char * result,
   /* if status is good, copy the result into the output buffer */
   if (*status == SAI__OK) {
     strncpy( result, astres, len - 1 );
-    result[len] = '\0'; /* terminate */
+    result[len-1] = '\0'; /* terminate */
     if ( len <= strlen(astres) ) {
       *status = SMF__STRUN;
       msgSetc("FITS", name);
