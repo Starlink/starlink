@@ -194,6 +194,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdmap
 (
 char *filename,          /* name of HDS container file (given) */
+char *access,            /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int *colsize,            /* number of pixels in column (returned) */
 int *rowsize,            /* number of pixels in row (returned) */
@@ -214,6 +215,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdtstream
 (
 char *filename,          /* name of HDS container file (given) */
+char *access,            /* "READ" or "UPDATE" access (given) */
 int flatlen,             /* length of space for flatfield name (given) */
 int maxlen,              /* max length of FITS header (given) */
 int maxfits,             /* max number of FITS headers (given) */
