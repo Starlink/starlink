@@ -31,7 +31,7 @@ STAR_CHECK_PROGS(fgeneric)
  
 
 dnl    Look for tcl/tk system
-STAR_PATH_TCLTK(8.2, [tk])
+STAR_PATH_TCLTK(8.4, [tk])
 AC_CHECK_HEADERS([tcl.h tk.h])
 
 dnl KAPPA source files depend on include files from the following components 
