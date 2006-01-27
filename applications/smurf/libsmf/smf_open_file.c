@@ -63,6 +63,9 @@
 *        Now sets a reference counter
 *     2006-01-26 (TIMJ):
 *        Use smf_create_smfData
+*        Use smf_dtype_fromstring
+*     2006-01-27 (TIMJ):
+*        Open raw data read only
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,7 +166,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   /* Check type of DATA and VARIANCE arrays */
   ndfType( indf, "DATA,VARIANCE", dtype, NDF__SZTYP, status);
-  /*  printf("Status after ndfType: %d\n",*status);*/
+  /* printf("Status after ndfType: %d\n",*status);*/
   /* Check dimensionality: 2D is a .In image, 3D is a time series */
   if (ndims == 2) {
     isNDF = 1;     /* Data have been flat-fielded */
@@ -239,19 +242,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       /*      printf("Status from open : %d\n",*status);*/
 
       /* Establish the data type */
-      if ( strncmp(dtype, "_DOUBLE", 7 ) == 0 ){
-	itype = SMF__DOUBLE;
-      } else if ( strncmp(dtype, "_REAL", 5 ) == 0 ) {
-	itype = SMF__FLOAT;
-      } else if ( strncmp(dtype, "_INTEGER", 8 ) == 0 ){
-	itype = SMF__INTEGER;
-      } else {
-	if ( *status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  msgSetc( "TYP", dtype);
-	  errRep( "smf_open_file", "Type, '^TYP', is not supported",status);
-	}
-      }
+      itype = smf_dtype_fromstring( dtype, status );
+
       /* Store NDF identifier and set isSc2store to false */
       if (*status == SAI__OK) {
 	file->ndfid = indf;
@@ -270,7 +262,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	errRep(FUNC_NAME,"Internal programming error. Status good but no DA struct allocated", status);
       }
 
-      sc2store_rdtstream( pname, SC2STORE_FLATLEN, maxlen, maxfits, 
+      sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
 			  &nframes, &(da->nflat), da->flatname, &frhead,
 			  &tdata, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
