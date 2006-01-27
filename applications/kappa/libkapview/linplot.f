@@ -568,6 +568,8 @@
 *        Report an error if any non-monotonic AXIS structures are found.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     27-JAN-2006 (DSB):
+*        Ignore blank titles supplied in STYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1625,8 +1627,9 @@
 *  If the user did not specify a Plot title (as indicated by the Plot
 *  title being the same as the FSET title), make the NDF Title the
 *  default Title for the Plot. 
-      IF( AST_GETC( FSET, 'TITLE', STATUS ) .EQ. 
-     :    AST_GETC( IPLOT, 'TITLE', STATUS ) ) THEN
+      TEXT = AST_GETC( IPLOT, 'TITLE', STATUS ) 
+      IF( TEXT .EQ. ' ' .OR. 
+     :    TEXT .EQ. AST_GETC( FSET, 'TITLE', STATUS ) ) THEN
 
          TEXT = ' '
          CALL NDF_CGET( INDF, 'TITLE', TEXT, STATUS ) 
