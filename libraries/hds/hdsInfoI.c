@@ -265,7 +265,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 		 if ( *(comps[j]) == '!' ) {
 		   /* do not forget to start one character in for the ! */
 		   if (strncmp(path.body, (comps[j])+1,
-			       strlen(comps[j])-1) != 0) {
+			       strlen(comps[j])-1) == 0) {
 		     /* Should be exempt */
 		     exclude = 1;
 		   }
