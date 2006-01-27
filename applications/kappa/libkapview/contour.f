@@ -55,7 +55,9 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        contour map, showing the current co-ordinate Frame of the
 *        supplied NDF. The appearance of the axes can be controlled using
-*        the STYLE parameter. [TRUE]
+*        the STYLE parameter. If a null (!) value is supplied, then axes
+*        will be drawn unless the CLEAR parameter indicates that the graphics
+*        device is not being cleared. [!]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared before displaying
 *        the contour map. If you want the contour map to be drawn over
@@ -510,9 +512,11 @@
 *        Change default Format (to "%g") and Colour (to the colour used
 *        to draw the contour) for the contour indices in the key.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL.
+*        Use CNF_PVAL
 *     2006 January 23 (MJC):
 *        Added "Scale" mode.
+*     27-JAN-2006 (DSB):
+*        Use a runtime default of ".NOT.CLEAR" for parameter AXIS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -596,6 +600,7 @@
       LOGICAL ALIGN            ! DATA picture aligned with a previous picture?
       LOGICAL AXES             ! Annotated axes are to be drawn?
       LOGICAL BAD              ! Bad pixels are present in the image?
+      LOGICAL CLEAR            ! Clear screen before plotting?
       LOGICAL CNTUSD( MXCONT ) ! Contour plotted at height in CNTLEV?
       LOGICAL FAST             ! Draw contours quickly?
       LOGICAL KEY              ! Key of the contour heights to be produced?
@@ -668,8 +673,16 @@
 *  =================================
       CALL PAR_GET0L( 'STATS', STATS, STATUS )
       CALL PAR_GET0L( 'KEY', KEY, STATUS )
-      CALL PAR_GET0L( 'AXES', AXES, STATUS )
       CALL PAR_GET0L( 'FAST', FAST, STATUS )
+      CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
+
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL PAR_GET0L( 'AXES', AXES, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            AXES = CLEAR
+         END IF
+      END IF
 
 *  Start the graphics system.
 *  ==========================

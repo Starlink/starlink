@@ -3681,7 +3681,7 @@ package kappa {
             prompt {Are annotated axes to be drawn?}
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            default TRUE
+            default !
             helpkey *
           }
 
