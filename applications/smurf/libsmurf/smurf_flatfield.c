@@ -53,6 +53,8 @@
 *        also updated to take account of reference counting.
 *     2006-01-24 (AGG):
 *        Updated to use new smf_open_and_flatfield routine.
+*     2006-01-27 (TIMJ):
+*        Can now smf_close_file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,7 +147,7 @@ void smurf_flatfield( int *status ) {
 	     "Unable to flatfield data from the ^I th of ^N files", status);
     }
     /* Free resources for output data */
-    /* smf_close_file( &ffdata, status );*/
+    smf_close_file( &ffdata, status );
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
