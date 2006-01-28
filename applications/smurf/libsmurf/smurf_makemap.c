@@ -45,6 +45,9 @@
 *        Replace malloc with smf_malloc.
 *     2006-01-25 (TIMJ):
 *        sc2head is now embedded in smfHead.
+*     2006-01-27 (TIMJ):
+*        - Try to jump out of loop if status bad.
+*        - sc2head is now a pointer again
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -167,7 +170,6 @@ void smurf_makemap( int *status ) {
 
   for( pass=0; pass<=1; pass++ ) {
 
-    
     if( pass == 0 ) {
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Pass 1 determine map bounds",
 	       status);
@@ -263,6 +265,8 @@ void smurf_makemap( int *status ) {
       }
       else
 	errRep( "smurf_makemap", "Couldn't open input file.", status );
+
+      if (*status != SAI__OK) goto CLEANUP;
   
       /* Calculate bounds in the input array */
       lbnd_in[0] = 0;
@@ -285,9 +289,11 @@ void smurf_makemap( int *status ) {
       if( *status == SAI__OK) for( j=0; j<(data->dims)[2]; j++ ) {
 	smf_tslice_ast( data, j, status);
 
+	if (*status != SAI__OK) goto CLEANUP;
+	
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;
-	  sc2hdr = &(hdr->sc2head);
+	  sc2hdr = hdr->sc2head;
 	  
 	  /* Get bolo -> sky mapping 
              Set the System attribute for the SkyFrame in input WCS FrameSet
@@ -336,7 +342,7 @@ void smurf_makemap( int *status ) {
 	  }
 	  
 	  /* Concatenate the two Mappings to get IN_PIXEL->REF_PIXEL Mapping */
-	  bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );	  
+	  bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
 
 	  /* On the first pass check corner pixels in the array for their
              projected extent on the sky to set the pixel bounds */
@@ -432,6 +438,7 @@ void smurf_makemap( int *status ) {
     }
   }
 
+ CLEANUP:
   /* clean up */
   if( sky2map != NULL )
     astAnnul( sky2map );
