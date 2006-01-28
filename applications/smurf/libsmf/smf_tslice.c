@@ -50,6 +50,8 @@
 *        Replace malloc with smf_malloc
 *     2006-01-26 (TIMJ):
 *        sc2head is now embedded in smfHead
+*     2006-01-27 (TIMJ):
+*        sc2head is a pointer again!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,7 +128,7 @@ void smf_tslice (const smfData *idata, smfData **tdata, int index, int *status )
   }
   memcpy( hdr, idata->hdr, sizeof( smfHead ) );
   (*tdata)->hdr = hdr;
-  sc2hdr = &(hdr->sc2head);
+  sc2hdr = hdr->sc2head;
   /* Retrieve the header for this time slice */
   sc2store_headget( index, sc2hdr, status);
 

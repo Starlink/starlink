@@ -47,8 +47,11 @@
 *        Add check for reference count.
 *     2006-01-26 (TIMJ):
 *        sc2head is now embedded in the struct
-*     2006-01-26 (TIMJ):
-*        Free the data array from sc2store
+*     2006-01-27 (TIMJ):
+*        - Free the data array from sc2store
+*        - Free new allsc2heads component, not sc2head
+*        - Free flatfield information if isSc2store
+*        - respect new isCloned flag in smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,6 +95,7 @@ void smf_close_file( smfData ** data, int * status ) {
   int       i;            /* loop counter */
   smfFile * file;         /* pointer to smfFile in smfData */
   int       freedata = 0; /* should the data arrays be freed? */
+  int       isSc2store = 0; /* is this sc2Store data */
 
   if ( *status != SAI__OK) return;
 
@@ -110,35 +114,23 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Only proceed if the decremented reference count is 0 */
   (*data)->refcount--;
   if ((*data)->refcount > 0 ) return;
-
-  /* Tidy up the header */
+  
+  /* Get the header, since we need it for the file checking */
   hdr = (*data)->hdr;
-  if (hdr != NULL) {
-    if (hdr->wcs != NULL) astAnnul( hdr->wcs );
-    if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
-    smf_free( hdr, status );
-  }
 
   /* now file information */
   file = (*data)->file;
   if (file != NULL) {
 
     if ( file->isSc2store ) {
-      /* opened by DA library */
-      sc2store_free( status );
+      /* Nothing to free here but we do need to free the data array
+	 using free() not smf_free [since sc2store uses native malloc]
+	 and also free the hdr->allsc2heads */
+      isSc2store = 1;
 
-      /* We also need to free the data array - but we can not use smf_free
-         since sc2store uses malloc */
-      free( ((*data)->pntr)[0]);
-      ((*data)->pntr)[0] = NULL;
     } else if ( file->ndfid != NDF__NOID ) {
 
-      /* if this is a time series we need to free
-	 the header structure if we have a smfHead */
-      if (file->isTstream && hdr != NULL) sc2store_headunmap( status );
-
-      /* Annul the NDF and locators (which will unmap things) */
-      if ( file->xloc ) datAnnul( &(file->xloc), status );
+      /* Annul the NDF (which will unmap things) */
       ndfAnnul( &(file->ndfid), status );
 
     } else {
@@ -149,7 +141,22 @@ void smf_close_file( smfData ** data, int * status ) {
     smf_free( file, status );
   }
 
-  /* Now the smfData itself */
+  /* Tidy up the header */
+  if (hdr != NULL) {
+    if (hdr->wcs != NULL) astAnnul( hdr->wcs );
+    if (hdr->fitshdr != NULL) astAnnul( hdr->fitshdr );
+    if (hdr->allsc2heads != NULL && !hdr->isCloned) {
+      if (isSc2store) {
+	/* make sure we use free() */
+	free(hdr->allsc2heads);
+      } else {
+	smf_free(hdr->allsc2heads, status);
+      }
+    }
+    smf_free( hdr, status );
+  }
+
+  /* Now the smfDA itself */
   if ( (*data)->da != NULL ) smf_free( (*data)->da, status );
 
   /* Free the data arrays if they are non-null (they should have been
@@ -159,6 +166,9 @@ void smf_close_file( smfData ** data, int * status ) {
     for (i = 0; i < 3; i++ ) {
       if ( ((*data)->pntr)[i] != NULL ) smf_free( ((*data)->pntr)[i], status );
     }
+  } else if (isSc2store) {
+    /* just the data array */
+    free( ((*data)->pntr)[0] );
   }
 
   /* finally free smfData */

@@ -13,25 +13,26 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_construct_smfHead( smfHead * tofill, sc2head * sc2head,
+*     pntr = smf_construct_smfHead( smfHead * tofill,
 *              AstFrameSet * wcs, AstFitsChan * fitshdr,
+*	       struct sc2head * allsc2heads,
 *              dim_t curslice, int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
 *        If non-NULL, this is the smfHead that is populated by the remaining
 *        arguments. If NULL, the smfHead is malloced.
-*     sc2head = sc2head* (Given)
-*        Pointer to a struct sc2head. The contents of this structure
-*        will be copied by this routine into the target structure. If NULL,
-*        the struct contents are not modified.
 *     wcs = AstFrameSet * (Given)
 *        Frameset for the world coordinates. The pointer is copied,
 *        not the contents.
 *     fitshdr = AstFitsChan * (Given)
 *        FITS header. The pointer is copied, not the contents.
+*     allsc2heads = sc2head* (Given)
+*        Pointer to array of time series information for all time slices.
+*        Should be at least "curslice" in size.
 *     curslice = dim_t (Given)
-*        Current time index corresponding to the associated WCS.
+*        Current time index corresponding to the associated WCS. sc2head
+*        will be set to this location.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -48,8 +49,11 @@
 *     - AST objects are neither cloned not copied by this routine.
 *       Use astCopy or astClone when calling if reference counts
 *       should be incremented.
-*     - Anomalously, the sc2head contents are copied. This is because
-*       the struct is embedded in a smfHead.
+*     - sc2head is set to point into allsc2heads[curslice]
+*     - allsc2heads is not copied. In general the time series information
+*       can be copied between headers without being modified. If this
+*       memory should be freed by smf_close_file, set the isCloned flag
+*       to false.
 *     - Free this memory using smf_close_file, via a smfData structure.
 *     - Can be freed with a smf_free if header resources are freed first.
 
@@ -60,6 +64,9 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-27 (TIMJ):
+*        Replace sc2head with allsc2heads. sc2head now indexed
+*        into allsc2heads.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,8 +111,9 @@
 #define FUNC_NAME "smf_construct_smfHead"
 
 smfHead *
-smf_construct_smfHead( smfHead * tofill, sc2head * sc2head,
+smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
+		       struct sc2head * allsc2heads,
 		       dim_t curslice, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
@@ -121,9 +129,9 @@ smf_construct_smfHead( smfHead * tofill, sc2head * sc2head,
     hdr->wcs = wcs;
     hdr->fitshdr = fitshdr;
     hdr->curslice = curslice;
-    if ( sc2head != NULL ) {
-      memcpy( &(hdr->sc2head), sc2head, sizeof(sc2head) );
-    }
+    hdr->allsc2heads = allsc2heads;
+    hdr->sc2head = &(allsc2heads[curslice]);
+    hdr->isCloned = 1;
   }
 
   return hdr;

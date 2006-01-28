@@ -38,6 +38,9 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-27 (TIMJ):
+*        sc2head now pointer. Add allsc2heads as pointer.
+*        initialise isCloned
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,7 +103,8 @@ smf_create_smfHead( int * status ) {
   hdr->wcs = NULL;
   hdr->fitshdr = NULL;
   hdr->curslice = 0;
-  memset( &(hdr->sc2head), 0, sizeof(sc2head) );
-  printf("Inside smfHead: %p\n", hdr);
+  hdr->sc2head = NULL;
+  hdr->allsc2heads = NULL;
+  hdr->isCloned = 0;
   return hdr;
 }

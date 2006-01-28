@@ -57,6 +57,8 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-26 (TIMJ):
+*        No longer have dksquid.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,7 +103,7 @@
 #define FUNC_NAME "smf_construct_smfDA"
 
 smfDA *
-smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
+smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
 		     int * status ) {
 
@@ -115,7 +117,6 @@ smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
   }
 
   if (*status == SAI__OK) {
-    da->dksquid = dksquid;
     da->flatcal = flatcal;
     da->flatpar = flatpar;
     if (flatname != NULL) {

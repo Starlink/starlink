@@ -30,9 +30,6 @@
 *        True if ths file is time series data.
 *     name = const char * (Given)
 *        File name. Can be NULL. Contents are copied.
-*     xloc = HDSLoc* (Given)
-*        HDS Locator of the time series extensions. The pointer is simply
-*        stored. No attempt is made to clone the locator.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -63,6 +60,8 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-27 (TIMJ):
+*        No longer have smfFile.xloc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,7 +107,7 @@
 
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
-		      int isTstream, const char * name, HDSLoc* xloc, 
+		      int isTstream, const char * name,
 		      int * status ) {
 
   smfFile * file;
@@ -131,7 +130,6 @@ smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
     } else {
       (file->name)[0] = '\0';
     }
-    file->xloc = xloc;
   }
   return file;
 }

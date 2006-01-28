@@ -56,6 +56,9 @@
 *        Add smf_create_*
 *        Add smf_construct_*
 *        Add smf_dtype_tostring
+*     2006-01-27 (TIMJ):
+*        Change API for smf_construct_smfFile, smf_construct_smfDA
+*        and smf_construct_smfHead.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,16 +115,17 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
 		       const dim_t dims[], int ndims,
 		       int virtual, int * status );
 smfDA *
-smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
+smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
 		     int * status );
 smfFile *
 smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
-		      int isTstream, const char * name, HDSLoc* xloc, 
+		      int isTstream, const char * name,
 		      int * status );
 smfHead *
-smf_construct_smfHead( smfHead * tofill, sc2head * sc2head,
+smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
+		       struct sc2head * allsc2heads,
 		       dim_t curslice, int * status );
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,

@@ -65,7 +65,11 @@
 *        Use smf_create_smfData
 *        Use smf_dtype_fromstring
 *     2006-01-27 (TIMJ):
-*        Open raw data read only
+*        - Open raw data read only
+*        - Read in full time series headers into smfHead during sc2store
+*        - Copy flatfield information into struct and close raw file
+*        - read all time series headers into struct even when not sc2store
+*        - No longer need to store xloc locator
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,10 +144,16 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
   AstFitsChan *fits = NULL;  /* AST FITS channel */
   AstFrameSet *iwcs = NULL;  /* AST frame set    */
+  HDSLoc * xloc = NULL;      /* Locator to time series headers */
+
+  /* Flatfield parameters */
+  double * flatcal = NULL;
+  double * flatpar = NULL;
+  int * dksquid = NULL;
+  sc2head *sc2tmp = NULL;
 
   /* Pasted from readsc2ndf */
   int colsize;               /* number of pixels in column */
-  struct sc2head *frhead = NULL;  /* structure for headers for a frame */
   char headrec[80][81];      /* FITS headers */
   int maxfits = 80;          /* maximum number of FITS headers */
   int maxlen = 81;           /* maximum length of a FITS header */
@@ -229,13 +239,23 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  hdr->wcs = iwcs;
 	} else {
 	  /* Need to get the location of the extension for sc2head parsing */
-	  /* Store the locator in the struct for now in case annulling it annulls
-	     all the children */
-	  /*        printf("Status before xloc: %d\n",*status);*/
-	  ndfXloc( indf, "FRAMEDATA", "READ", &(file->xloc), status );
-	  /*        printf("Status after xloc: %d\n", *status);	*/
+	  ndfXloc( indf, "FRAMEDATA", "READ", &xloc, status );
 	  /* And need to map the header */
-	  sc2store_headrmap( file->xloc, ndfdims[2], status );
+	  sc2store_headrmap( xloc, ndfdims[2], status );
+
+	  /* Malloc some memory to hold all the time series data */
+	  hdr->allsc2heads = smf_malloc( ndfdims[2], sizeof(sc2head),
+					 1, status );
+	  /* Loop over each element, reading in the information */
+	  sc2tmp = hdr->allsc2heads;
+	  for (i=0; i<ndfdims[2]; i++) {
+	    sc2store_headget(i, &(sc2tmp[i]), status);
+	  }
+	  /* Unmap the headers */
+	  sc2store_headunmap( status );
+
+	  /* Annul the locator */
+	  datAnnul( &xloc, status );
 	}
       }
 
@@ -262,17 +282,49 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	errRep(FUNC_NAME,"Internal programming error. Status good but no DA struct allocated", status);
       }
 
+      /* decide if we are storing header information */
+      if (withHdr) {
+	sc2tmp = hdr->allsc2heads;
+      } else {
+	sc2tmp = NULL;
+      }
+
+      /* Read time series data from file */
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen, maxfits, 
 			  &nfits, headrec, &colsize, &rowsize, 
-			  &nframes, &(da->nflat), da->flatname, &frhead,
-			  &tdata, &(da->dksquid), &(da->flatcal), &(da->flatpar), 
+			  &nframes, &(da->nflat), da->flatname,
+			  &sc2tmp, &tdata, &dksquid, 
+			  &flatcal, &flatpar, 
 			  status);
-      free(frhead);
+
       if (*status == SAI__OK) {
 
+	/* Free header info if no longer needed */
+	if (!withHdr && sc2tmp != NULL) {
+	  /* can not ues smf_free */
+	  free( sc2tmp );
+	  sc2tmp = NULL;
+	}
+
+	/* Tdata is malloced by rdtstream for our use */
 	outdata[0] = tdata;
 	printf("headrec = %s \n",&(headrec[2][0]));
 	phead = &(headrec[0][0]);
+
+	/* Malloc local copies of the flatfield information.
+	   This allows us to close the file immediately so that
+	   we do not need to worry about sc2store only allowing
+	   a single file at a time */
+	da->flatcal = smf_malloc( colsize * rowsize * da->nflat, 
+				  sizeof(double), 0, status );
+	da->flatpar = smf_malloc( da->nflat, sizeof(double), 0, status );
+
+	/* Now copy across from the mapped version */
+	if (da->flatcal != NULL) memcpy(da->flatcal, flatcal,
+					sizeof(double)*colsize*
+					rowsize* da->nflat);
+	if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
+					sizeof(double)* da->nflat);
 
 	/* Create a FitsChan from te FITS headers */
 	smf_fits_crchan( nfits, phead, &fits, status); 
@@ -307,6 +359,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* and it is a time series */
 	file->isTstream = 1;
       }
+
+      /* Close the file */
+      sc2store_free( status );
+
     }
     /* Store info in smfData struct */  
 

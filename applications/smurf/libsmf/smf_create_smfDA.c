@@ -40,6 +40,8 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-27 (TIMJ):
+*        Remove dksquid entry for now
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,12 +101,10 @@ smf_create_smfDA( int * status ) {
   }
 
   /* Initialise smfDA */
-  da->dksquid = NULL;
   da->flatcal = NULL;
   da->flatpar = NULL;
   (da->flatname)[0] = '\0';
   da->nflat = 0;
 
-  printf("Inside smfDA: %p\n", da);
   return da;
 }

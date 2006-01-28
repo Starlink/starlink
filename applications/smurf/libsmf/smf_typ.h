@@ -37,6 +37,12 @@
 *     2006-01-25 (TIMJ):
 *        - Create SMF__NOCREATE flags
 *        - sc2head is now embedded in the smfHead struct
+*     2006-01-27 (TIMJ):
+*        - Add allsc2heads to header
+*        - sc2head now a pointer into allsc2heads
+*        - remove dksquid from DA until it is needed
+*        - smfFile.xloc no longer needed
+*        - Add smfHead.isCloned
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,16 +106,18 @@ typedef struct smfFile {
   int isSc2store;            /* True if file opened by sc2store library */
   int isTstream;             /* True if file contains time series data */
   char name[SMF_PATH_MAX+1]; /* Name of file */
-  HDSLoc * xloc;             /* Locator to .MORE.FRAMEDATA (if applicable) */
 } smfFile;
 
 /* Contains header general header information obtained from the file */
 
 typedef struct smfHead {
-  struct sc2head sc2head;   /* Time slice structure for same slice as wcs */
+  sc2head *sc2head;         /* Pointer to current sc2head */
   AstFrameSet * wcs;        /* Frameset for a particular time slice */
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curslice;           /* Index corresponding to current timeslice */
+  int isCloned;            /* If false, allsc2heads is owned by this
+                              struct, if true it should not be freed */
+  sc2head *allsc2heads;    /* Array of sc2heads for every time slice */ 
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
@@ -117,7 +125,6 @@ typedef struct smfHead {
 */
 
 typedef struct smfDA {
-  int *dksquid;           /* pointer to dark SQUID data */
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */

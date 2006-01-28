@@ -59,6 +59,9 @@
 *        Add check on whether input header is null for unflatfielded data
 *     2006-01-25 (TIMJ):
 *        Replace malloc with smf_malloc
+*     2006-01-27 (TIMJ):
+*        - No longer have xloc member in smfFile
+*        - use smf_create_smfHead rather than smf_malloc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -280,7 +283,6 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       /* Set the (non) file info */
       (*odata)->file = file;
       file->ndfid = NDF__NOID;
-      file->xloc = NULL;
 
       /* Set data type */
       (*odata)->dtype = SMF__DOUBLE; 
@@ -346,7 +348,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	hdr = (*odata)->hdr;
 	ihdr = idata->hdr;
 	if ( (*odata)->hdr == NULL) {
-	  hdr = smf_malloc( 1, sizeof( smfHead ), 0, status );
+	  hdr = smf_create_smfHead( status );
 	  /* Copy old hdr into the new hdr and store in *odata */
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
 	  (*odata)->hdr = hdr; 

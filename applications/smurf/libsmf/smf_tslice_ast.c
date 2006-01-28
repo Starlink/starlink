@@ -55,6 +55,9 @@
 *     2006-01-26 (TIMJ):
 *        sc2head is now embedded in the struct and is therefore mandatory.
 *        Use SUBARRAY string rather than SUBSYSNR
+*     2006-01-27 (TIMJ):
+*        No longer use sc2store. Now index directly into pre-read time
+*        series headers.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -108,7 +111,7 @@
 void smf_tslice_ast (smfData * data, int index, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
-  struct sc2head *sc2tmp;    /* Pointer to hdr->sc2head */
+  sc2head *       sc2tmp;    /* Local pointer to sc2head */
   int             subsysnum; /* Subsystem numeric id. 0 - 8 */
   char subarray[81];         /* Subarray name */
 
@@ -165,9 +168,6 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
     }
   }
 
-  /* Get pointer to header struct */
-  sc2tmp = &(hdr->sc2head);
-
   /* Need to get the sub system ID */
   /* If we only have the sub system name we can use an sc2ast routine to convert */
   smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
@@ -175,8 +175,9 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
   /* Convert to a number */
   sc2ast_name2num( subarray, &subsysnum, status);
 
-  /* Get the sc2head structure for this time slice */
-  sc2store_headget( index, sc2tmp, status );
+  /* Simply assign sc2head to the correct slice of allsc2heads */
+  sc2tmp = &((hdr->allsc2heads)[index]);
+  hdr->sc2head = sc2tmp;
 
   /* See if we have a WCS or not */
   if (hdr->wcs == NULL ) {

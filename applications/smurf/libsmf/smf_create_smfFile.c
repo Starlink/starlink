@@ -38,6 +38,8 @@
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version.
+*     2006-01-27 (TIMJ):
+*        No longer have xloc member
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,7 +103,5 @@ smf_create_smfFile( int * status ) {
   file->isSc2store = 0;
   file->isTstream = 0;
   (file->name)[0] = '\0';
-  file->xloc = NULL;
-  printf("Inside smfFile: %p\n", file);
   return file;
 }
