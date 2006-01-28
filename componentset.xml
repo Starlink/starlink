@@ -202,7 +202,7 @@ emission within 2- or 3- dimensional data arrays.
 </component>
 
 <component id="cursa" support="S">
-  <version>6.4-1</version>
+  <version>6.5</version>
   <path>applications/cursa</path>
   <description>CURSA - Catalogue and Table Manipulation Applications</description>
   <abstract><p>
@@ -1473,7 +1473,7 @@ UNIX).
 </component>
 
 <component id="startcl" support="S">
-  <version>1.5-5</version>
+  <version>1.5-6</version>
   <path>applications/startcl</path>
   <description>Starlink extensions to Tcl &amp; Tk</description>
   <abstract>
