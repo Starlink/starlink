@@ -268,6 +268,8 @@ TCL_BUILDTIME_LIBRARY	= @TCL_SRC_DIR@/library
 CC			= @CC@
 #CC			= purify -best-effort @CC@ -DPURIFY
 
+LN_S                    = @LN_S@
+
 # Flags to be passed to installManPage to control whether the manpages
 # should be compressed and linked with softlinks
 MAN_FLAGS               = @MAN_FLAGS@
@@ -626,7 +628,8 @@ install-binaries: binaries
 			$(LIB_INSTALL_DIR)/$(TCL_EXP_FILE); \
 	    fi
 	@echo "Installing tclsh as $(BIN_INSTALL_DIR)/tclsh$(VERSION)"
-	@$(INSTALL_PROGRAM) tclsh $(BIN_INSTALL_DIR)/tclsh$(VERSION)
+	@$(INSTALL_PROGRAM) tclsh $(BIN_INSTALL_DIR)/tclsh$(VERSION)$(EXEEXT)
+	@cd $(BIN_INSTALL_DIR); rm -f tclsh$(EXEEXT); $(LN_S) tclsh$(VERSION)$(EXEEXT) tclsh$(EXEEXT)
 	@echo "Installing tclConfig.sh to $(LIB_INSTALL_DIR)/"
 	@$(INSTALL_DATA) tclConfig.sh $(LIB_INSTALL_DIR)/tclConfig.sh
 	@if test "$(STUB_LIB_FILE)" != "" ; then \
