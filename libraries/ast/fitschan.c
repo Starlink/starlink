@@ -652,6 +652,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Correct test for constant values in FitOK.
 *     7-DEC-2005 (DSB):
 *        Free memory allocated by calls to astReadString.
+*     30-JAN-2006 (DSB):
+*        Modify astSplit so that it does no read the supplied card beyond 
+*        column 80.
 *class--
 */
 
@@ -24100,8 +24103,8 @@ int astSplit_( const char *card, char **name, char **value,
    is not allowed to be more than the length of a FITS header card.
    Trailing white space and non-printing characters such as new-line are 
    ignored. */
-   nc = ChrLen( card );
-   if( nc > FITSCARDLEN ) nc = FITSCARDLEN;
+   nc = 0;
+   while( nc < FITSCARDLEN && card[ nc ] ) nc++;
 
 /* Allocate memory for a copy of the keyword name plus a terminating 
    null character. */
