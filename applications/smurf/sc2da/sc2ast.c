@@ -73,6 +73,7 @@ int *status             /* global status (given and returned) */
                  Remove unused parallactic angle argument (timj)
      08Nov2005 : Use RAD2DEG global rather than 90*PIBY2 (timj)
      27Jan2006 : Use ErsRep rather than printf (timj)
+     28Jan2006 : Annul all the mappings/frames to fix terrible leak (timj)
 */
 
 {
@@ -188,7 +189,7 @@ int *status             /* global status (given and returned) */
 
    static double cassrot[4];
 
-
+   *fset = AST__NULL;
    if ( *status != SAI__OK ) return;
 
    /* Check subnum range */
@@ -208,6 +209,7 @@ int *status             /* global status (given and returned) */
    and the mappings between them are created */
 
    frameset = astFrameSet ( gridframe, "" );
+   astAnnul(gridframe);
 
 /* The GRID domain locates the [0][0] pixel at coordinates (1,1). SHift
    these so that the [0][0] pixel is at the origin of a coordinate system */
@@ -217,6 +219,8 @@ int *status             /* global status (given and returned) */
    zshiftmap = astShiftMap ( 2, zshift, "" );
    zpixelframe = astFrame ( 2, "Domain=ZPIXEL" );
    astAddFrame ( frameset, AST__CURRENT, zshiftmap, zpixelframe );
+   astAnnul(zshiftmap);
+   astAnnul(zpixelframe);
 
 /* The mapping from pixel numbers to millimetres is a simple scaling,
    because the pixel separation is the same in both coordinates and is
@@ -225,6 +229,8 @@ int *status             /* global status (given and returned) */
    zoommap = astZoomMap ( 2, PIX2MM, "" );
    mmframe = astFrame ( 2, "Domain=ARRAYMM" );
    astAddFrame ( frameset, AST__CURRENT, zoommap, mmframe );
+   astAnnul(zoommap);
+   astAnnul(mmframe);
 
 /* The mmframe now has to be rotated through an angle approximating
    a multiple of 90 degrees */
@@ -237,6 +243,8 @@ int *status             /* global status (given and returned) */
    rotmap = astMatrixMap ( 2, 2, 0, rot, "" );
    rotframe = astFrame ( 2, "Domain=ARRAYROT" );
    astAddFrame ( frameset, AST__CURRENT, rotmap, rotframe );
+   astAnnul(rotmap);
+   astAnnul(rotframe);
 
 /* The Y coordinate now has to be reversed */
 
@@ -247,6 +255,8 @@ int *status             /* global status (given and returned) */
    revmap = astMatrixMap ( 2, 2, 0, rev, "" );
    revframe = astFrame ( 2, "Domain=ARRAYREV" );
    astAddFrame ( frameset, AST__CURRENT, revmap, revframe );
+   astAnnul(revmap);
+   astAnnul(revframe);
 
 /* For each 450/850 subarray, a frame is created in FRAME450/FRAME850
    coordinates, which are coordinates in millimetres with origin at the
@@ -259,6 +269,8 @@ int *status             /* global status (given and returned) */
    shiftmap = astShiftMap ( 2, shift, "" );
    focusframe = astFrame ( 2, "Domain=ARRAYFOCUS" );
    astAddFrame ( frameset, AST__CURRENT, shiftmap, focusframe );
+   astAnnul(focusframe);
+   astAnnul(shiftmap);
 
 /* The final step into Frame850 coordinates is only needed for the 450
    subarrays. */
@@ -272,6 +284,8 @@ int *status             /* global status (given and returned) */
    astSet ( frame850,
      "Title=FRAME850,Label(1)=NORTH,Unit(1)=mm,Label(2)=UP,Unit(2)=mm" );
    astAddFrame ( frameset, AST__CURRENT, flipmap, frame850 );
+   astAnnul(flipmap);
+   astAnnul(frame850);
 
 /* Correct for polynomial distortion */
 
@@ -280,6 +294,8 @@ int *status             /* global status (given and returned) */
    astSet ( nasmythframe,
      "Title=NASMYTH,Label(1)=NORTH,Unit(1)=mm,Label(2)=UP,Unit(2)=mm" );
    astAddFrame ( frameset, AST__CURRENT, polymap, nasmythframe );
+   astAnnul(polymap);
+   astAnnul(nasmythframe);
 
 /* Rotate into Cassegrain coordinates, "el" is telescope elevation. */
 
@@ -291,12 +307,16 @@ int *status             /* global status (given and returned) */
    cassframe = astFrame ( 2, 
      "Domain=CASS,Label(1)=Az,Unit(1)=mm,Label(2)=El,Unit(2)=mm" );
    astAddFrame ( frameset, AST__CURRENT, cassmap, cassframe );
+   astAnnul(cassmap);
+   astAnnul(cassframe);
 
 /* Convert units from mm to degrees, MM2DEG is the effective plate scale. */
 
    radmap = astZoomMap ( 2, MM2DEG, "" );
    cassdegframe = astFrame ( 2, "Domain=CASSDEG" );
    astAddFrame ( frameset, AST__CURRENT, radmap, cassdegframe );
+   astAnnul(radmap);
+   astAnnul(cassdegframe);
 
 /* Create a celestial to tangent plane mapping via a FITS description. First 
    create the FitsChan, then store the required FITS WCS header cards in
@@ -310,11 +330,13 @@ int *status             /* global status (given and returned) */
    astClear ( fitschan, "Card" );
 
    fitsframeset = astRead ( fitschan );
+   astAnnul( fitschan );
 
 /* Extract the mapping going from tangent plane to spherical (Az,El) from
    the FrameSet returned by the above call to astRead. */
 
    azelmap = astGetMapping ( fitsframeset, AST__BASE, AST__CURRENT );
+   astAnnul(fitsframeset);
 
 /* Create a SkyFrame describing (Az,El) and add it into the FrameSet
    using the above Mapping to connect it to the Cartesian Cassegrain
@@ -327,8 +349,11 @@ int *status             /* global status (given and returned) */
    astSetC( skyframe, "ObsLat", JCMT_LAT );   
    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, tai + 32.184/SPD );
    astAddFrame ( frameset, AST__CURRENT, azelmap, skyframe );
+   astAnnul(skyframe);
+   astAnnul(azelmap);
 
    *fset = frameset;
+
 }
 
 
