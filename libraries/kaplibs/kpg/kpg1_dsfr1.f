@@ -45,6 +45,9 @@
 *     14-SEP-2005 (DSB):
 *        - Modify logic for choosing whether to display the observers position.
 *        - Include the SkyFrame reference position in the report, if used.
+*     30-JAN-2006 (DSB):
+*        - Display source velocity in the current velocity system, if
+*        possible.
 *     {enter_changes_here}
 
 *  Bugs:
