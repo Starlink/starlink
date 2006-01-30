@@ -100,7 +100,7 @@ kpg1_hcon.gdr kpg1_prow.gdr kpg1_gaus.gdr kpg1_chev.gdr kpg1_mthe.gdr \
 kpg1_dwso.gdr kpg1_fftf.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir kpg1_sqsu.gdir kpg1_prsa.gdir \
-kpg1_chel.gdir
+kpg1_chel.gdir kpg1_figr.gdir
 
 KPG_GRAPHIC_DR_GEN = kpg1_litr.gdr kpg1_lltr.gdr
 
@@ -325,6 +325,7 @@ kpg1_vec2n.f \
 kpg1_verb.f \
 kpg1_wcatw.f \
 kpg1_wcaxc.f \
+kpg1_wcfax.f \
 kpg1_wrast.f \
 kpg1_wread.f \
 kpg1_wtm3d.f \
