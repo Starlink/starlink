@@ -76,9 +76,10 @@
       DOUBLE PRECISION SLA_EPB2D
 
 *  Local Variables :
-      CHARACTER IND*80           ! Indentation string 
       CHARACTER FRMDMN*80        ! Frame domain
       CHARACTER FRMTTL*80        ! Frame title
+      CHARACTER IND*80           ! Indentation string 
+      CHARACTER LABEL*20         ! A description of the spectral coord system
       CHARACTER MONTH( 12 )*3    ! Month names
       CHARACTER POSBUF*80        ! Buffer for position
       CHARACTER PRJ*50           ! Sky projection
@@ -91,6 +92,10 @@
       DOUBLE PRECISION FD        ! Fraction of day (+ve)
       DOUBLE PRECISION IFF       ! Intermediate frequency
       DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
+      DOUBLE PRECISION SRCVEL    ! Source velocity 
+      DOUBLE PRECISION TMP       ! Temporary storage
+      INTEGER FRM2               ! Modified copy of supplied Frame
+      INTEGER FS                 ! FrameSet connecting original and modified Frames
       INTEGER IAT                ! Current length of a string
       INTEGER ID                 ! Day of month
       INTEGER IHMSF( 4 )         ! Hours, mins, secs, fraction of sec
@@ -265,30 +270,31 @@
 *  System...
             SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
             IF( SYS .EQ. 'FREQ' ) THEN
-               CALL MSG_SETC( 'SYS', 'Frequency' )
+               LABEL = 'Frequency'
             ELSE IF( SYS .EQ. 'ENER' ) THEN
-               CALL MSG_SETC( 'SYS', 'Energy' )
+               LABEL = 'Energy'
             ELSE IF( SYS .EQ. 'WAVN' ) THEN
-               CALL MSG_SETC( 'SYS', 'Wave number' )
+               LABEL = 'Wave number'
             ELSE IF( SYS .EQ. 'WAVE' ) THEN
-               CALL MSG_SETC( 'SYS', 'Wavelength' )
+               LABEL = 'Wavelength'
             ELSE IF( SYS .EQ. 'AWAV' ) THEN
-               CALL MSG_SETC( 'SYS', 'Wavelength (in air)' )
+               LABEL = 'Wavelength (in air)'
             ELSE IF( SYS .EQ. 'VRAD' ) THEN
-               CALL MSG_SETC( 'SYS', 'Radio velocity' )
+               LABEL = 'Radio velocity'
             ELSE IF( SYS .EQ. 'VOPT' ) THEN
-               CALL MSG_SETC( 'SYS', 'Optical velocity' )
+               LABEL = 'Optical velocity'
             ELSE IF( SYS .EQ. 'ZOPT' ) THEN
-               CALL MSG_SETC( 'SYS', 'Redshift' )
+               LABEL = 'Redshift'
             ELSE IF( SYS .EQ. 'BETA' ) THEN
-               CALL MSG_SETC( 'SYS', 'Beta factor' )
+               LABEL = 'Beta factor'
             ELSE IF( SYS .EQ. 'VELO' ) THEN
-               CALL MSG_SETC( 'SYS', 'Relativistic velocity' )
+               LABEL = 'Relativistic velocity'
             ELSE
-               CALL MSG_SETC( 'SYS', SYS )
+               LABEL = SYS
             END IF
    
             CALL MSG_SETC( 'SYS', ' (' )
+            CALL MSG_SETC( 'SYS', LABEL )
             CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', STATUS ) ) 
             CALL MSG_SETC( 'SYS', ')' )
             CALL MSG_OUT( 'WCS_SYS', 
@@ -337,8 +343,30 @@
 *  Display source velocity if it is set, or if StdOfRest == source.
             IF( SOR .EQ. 'SOURCE' .OR.
      :          AST_TEST( FRM, 'SourceVel', STATUS ) ) THEN
-               CALL MSG_SETR( 'V', AST_GETR( FRM, 'SourceVel', 
-     :                                       STATUS ) )
+
+*  Get the source velocity as an apparent radial velocity (also known as
+*  a "relativistic velocity").
+               SRCVEL = AST_GETD( FRM, 'SourceVel', STATUS ) 
+
+*  If the SpecFrame's System is a velocity we transform the source
+*  velocity to that system. If not, we display it as as.
+               IF( SYS .EQ. 'VOPT' .OR. SYS .EQ. 'VRAD' .OR.
+     :             SYS .EQ. 'ZOPT' ) THEN
+
+                  FRM2 = AST_COPY( FRM, STATUS )
+                  CALL AST_SETC( FRM2, 'System', SYS, STATUS )
+                  FS = AST_CONVERT( FRM, FRM2, ' ', STATUS )
+                  CALL AST_TRAN1( FS, 1, SRCVEL, .TRUE., TMP, STATUS )
+                  SRCVEL = TMP
+
+                  CALL CHR_LCASE( LABEL )
+               ELSE
+                  LABEL = 'apparent radial velocity'
+               END IF
+               CALL MSG_SETC( 'LABEL', LABEL )
+
+*  Display the value
+               CALL MSG_SETR( 'V', REAL( SRCVEL ) )
 
                SOR = AST_GETC( FRM, 'SOURCEVRF', STATUS )
                IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
@@ -361,7 +389,7 @@
 	       
                CALL MSG_OUT( 'WCS_VELSOR', 
      :            IND( : NIND )//'Source velocity     : ^V km/s '//
-     :            '(^SOR relativistic velocity)', STATUS )
+     :            '(^SOR ^LABEL)', STATUS )
             END IF
 
 * Reference position...
