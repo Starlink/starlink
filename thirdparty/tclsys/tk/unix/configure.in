@@ -59,6 +59,8 @@ fi
 
 AC_PROG_CC
 
+AC_PROG_LN_S
+
 AC_HAVE_HEADERS([unistd.h limits.h])
 
 #------------------------------------------------------------------------
