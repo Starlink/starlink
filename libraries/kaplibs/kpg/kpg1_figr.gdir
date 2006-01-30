@@ -1,0 +1,115 @@
+      SUBROUTINE KPG1_FIGR<T>( NDIM, DIMS, EL, ARRAY, STATUS )
+*+
+*  Name:
+*     KPG1_FIGRx
+
+*  Purpose:
+*     Sets each element in a N-dimensional array to its grid 
+*     co-ordinate.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPG1_FIGRx( NDIMS, DIMS, EL, ARRAY, STATUS )
+
+*  Description:
+*     This routine sets each pixel in an n-dimensional array to its grid
+*     co-ordinate.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        Number of array dimensions.
+*     DIMS( NDIM ) = INTEGER (Given)
+*        Array of dimension sizes for each array dimension.
+*     EL = INTEGER (Given)
+*        First dimension of the array of grid co-ordinates.  It must be at
+*        least the total number of elements, i.e. the product of the DIMS
+*        dimensions.
+*     ARRAY( EL, NDIM ) = ? (Returned)
+*        The array containing the grid co-ordinates of each element
+*        given by the supplied dimensions.  The values are stored such
+*        that the first co-ordinate for all pixels is then followed
+*        by second co-ordinate for all pixels and so on.
+*     STATUS = INTEGER (Given & Returned)
+*        Global status value
+
+*  Notes:
+*     -  There is a routine for double precision, real, and integer:
+*     replace "x" in the routine name by D, R, or I as appropriate.  The
+*     ARRAY argument must have the data type specified.
+*     -  The maximum number of dimensions which can be handled by this
+*     routine is equal to the symbolic constant NDF__MXDIM.
+*     -  The ordering of the ARRAY elements is counterintuitive, but 
+*     that's what AST_TRANN uses.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     2006 January 25 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE             ! No default typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+
+*  Arguments Given:
+      INTEGER NDIM
+      INTEGER DIMS( NDIM )
+      INTEGER EL
+
+*  Arguments Returned:
+      <TYPE> ARRAY( EL, NDIM )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter for dimensions
+      INTEGER IVEC               ! Variable for address calculation
+      INTEGER J                  ! Loop counter for pixel indices
+      INTEGER NEL                ! Number of positions to fill.
+      INTEGER STRIDE( NDF__MXDIM ) ! Stride of each dimension
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Loop to find the stride for each dimension of the N-dimensional
+*  array.
+      STRIDE( 1 ) = 1
+      NEL = 1
+      DO 1 I = 1, NDIM - 1
+         STRIDE( I + 1 ) = STRIDE( I ) * ( DIMS( I ) )
+         NEL = NEL * DIMS( I )
+    1 CONTINUE
+      NEL = NEL * DIMS( NDIM )
+
+*  Loop through all the vectorised indices.
+      DO 3 J = 1, NEL
+
+*  Calculate the zero-based index in each dimension, updating IVEC as
+*  the calculation proceeds.
+         IVEC = J - 1
+         DO 2 I = NDIM, 1, -1
+            ARRAY( J, I ) = IVEC / STRIDE( I )
+            IVEC = IVEC - ARRAY( J, I ) * STRIDE( I )
+
+*  Add the lower bound of the N-dimensional array to each result.
+            ARRAY( J, I ) = ARRAY( J, I ) + 1
+   2     CONTINUE
+   3  CONTINUE
+
+      END
