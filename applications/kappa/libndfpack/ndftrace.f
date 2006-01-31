@@ -256,6 +256,9 @@
 *        Added FLBND and FUBND.
 *     21-MAR-2005 (DSB):
 *        Added FLABEL and FUNIT.
+*     31-JAN-2006 (TIMJ):
+*        Extension type (XTYPE) must be declared as DAT__SZTYP and not
+*        NDF__SZTYP (NDF__SZTYP is for a numeric type of an NDF)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -309,7 +312,7 @@
       CHARACTER * ( NDF__SZHUM ) HMODE ! History update mode
       CHARACTER * ( NDF__SZTYP ) ATYPE ! Type for axis extent value
       CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
-      CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
+      CHARACTER * ( DAT__SZTYP ) XTYPE( MXEXTN ) ! Extension name
       CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
       DOUBLE PRECISION AEND( NDF__MXDIM )  ! End of NDF extent along an axis
       DOUBLE PRECISION ASTART( NDF__MXDIM )! Start of NDF extent along an axis
