@@ -232,9 +232,14 @@
 *        estimators using co-ordinates to fix bug.
 *     2006 January 6 (MJC):
 *        Obtain axis widths for Integ, Iwc, and Iwd options.
-*     2006 January 19 (TIMJ):
-*        Fix segv with Integ units concatenation
-*        Use NDF_AUNMP to free IPWID rather than PSX_FREE
+*     2006 January 8 (MJC):
+*        Initialise UNITS for NDF_CGET call for INTEG estimator.
+*     2006 January 20 (MJC):
+*        Remove STATUS from a CHR_APPND, and tidy the widths correctly.
+*     2006 January 27 (MJC):
+*        For Integ estimator obtain co-ordinates and create workspace 
+*        for widths instead of using AXIS-component widths.  Initialise
+*        variance pointers.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -320,7 +325,8 @@
       INTEGER IPOUT( 2 )         ! Pointers to mapped output arrays
       INTEGER IPW1               ! Pointer to first work array
       INTEGER IPW2               ! Pointer to second work array
-      INTEGER IPWID              ! Pointers to mapped width array
+      INTEGER IPW3               ! Pointer to third work array
+      INTEGER IPWID              ! Pointers to mapped width work array
       INTEGER IWCS               ! WCS FrameSet pointer
       INTEGER IWCSO              ! Output NDF's WCS FrameSet pointer
       INTEGER J                  ! Loop count
@@ -757,10 +763,14 @@
 *  Map the full input, and output data and (if needed) variance arrays.
       CALL NDF_MAP( INDF1, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
       CALL NDF_MAP( INDF2, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
+      IF ( .NOT. VAR ) THEN
+         IPIN( 2 ) = IPIN( 1 )
+         IPOUT( 2 ) = IPOUT( 1 )
+      END IF
 
-*  Allocate work space, unles the last axis is being collapsed (in which
-*  case no work space is needed)..
-      IF( JAXIS .NE. NDIM ) THEN
+*  Allocate work space, unless the last axis is being collapsed (in
+*  which case no work space is needed).
+      IF ( JAXIS .NE. NDIM ) THEN
          CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
          IF( VAR ) THEN
             CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
@@ -774,31 +784,38 @@
          IPW2 = IPIN( 1 )
       END IF
 
-*  Associate AXIS-centre information.
+*  Associate co-ordinate information.
 *  ==================================
 
 *  Obtain co-ordinates along the collapse axis for the following
 *  methods.
       IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
-     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
+     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR. 
+     :     ESTIM .EQ. 'INTEG' ) THEN
 
-*  Create workspace for the AXIS centres.
-         CALL PSX_CALLOC( AEL, '_DOUBLE', IPAXCO, STATUS )
-         CALL PSX_CALLOC( AEL, ITYPE, IPCO, STATUS )
+*  Create workspace for the co-ordinates in the correct data type.
+         CALL PSX_CALLOC( NDIM * EL1, '_DOUBLE', IPAXCO, STATUS )
+         CALL PSX_CALLOC( NDIM * EL1, ITYPE, IPCO, STATUS )
 
-*  Obtain the double-precision axis centres, first trying from the WCS 
-*  or failing that from the AXIS structure.
-         CALL KPG1_WCAXC( INDF1, IWCS, IAXIS, AEL, 
+*  Allocate work space, unless the last axis is being collapsed (in 
+*  which case no work space is needed).
+         IF ( JAXIS .NE. NDIM ) THEN
+            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
+         END IF  
+
+*  Obtain the double-precision co-ordinate centres in the current 
+*  Frame.
+         CALL KPG1_WCFAX( INDF1, IWCS, IAXIS, EL1, 
      :                    %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
 
 *  Copy the centres to the required precision.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL VEC_DTOR( .TRUE., AEL, %VAL( CNF_PVAL( IPAXCO ) ),
+            CALL VEC_DTOR( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
      :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
      :                     STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .TRUE., AEL, %VAL( CNF_PVAL( IPAXCO ) ),
+            CALL VEC_DTOD( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
      :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
      :                     STATUS )
 
@@ -808,6 +825,7 @@
 *  Store safe pointer value if axis centres are not needed.
       ELSE
          IPCO = IPIN( 1 )
+         IPW3 = IPIN( 1 )
       END IF
 
 *  Redefine the data units.
@@ -854,14 +872,11 @@
 
 *  Obtain AXIS widths along the collapse axis for the following
 *  methods.
-      IF ( ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR.
-     :     ESTIM .EQ. 'INTEG' ) THEN
-
-*  Map the NDF's Axis Centre array. The NDF library will fill this array
-*  with the pixel co-ordinates at the centre of each pixel (the default
-*  Axis co-ordinate system).
-         CALL NDF_AMAP( INDF1, 'WIDTH', IAXIS, ITYPE, 'READ', IPWID,
-     :                  AEL, STATUS )
+      IF ( ESTIM .EQ. 'INTEG' ) THEN
+         
+*  Allocate work space for thw widths to be derived from the
+*  co-ordinates.  This assumes full filling of pixels.
+         CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPWID, STATUS )
 
 *  Store safe pointer value if widths are not needed.
       ELSE
@@ -881,7 +896,8 @@
      :                    UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                    %VAL( CNF_PVAL( IPW1 ) ), 
-     :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+     :                    %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
@@ -892,7 +908,8 @@
      :                    UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                    %VAL( CNF_PVAL( IPW1 ) ), 
-     :                    %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+     :                    %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
@@ -910,11 +927,12 @@
       IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
      :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
          CALL PSX_FREE( IPCO, STATUS )
+         IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
       END IF
-
-      IF ( ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR.
-     :     ESTIM .EQ. 'INTEG' ) THEN
-         CALL NDF_AUNMP( INDF1, 'WIDTH', IAXIS, STATUS )
+         
+      IF ( ESTIM .EQ. 'INTEG' ) THEN
+         CALL PSX_FREE( IPWID, STATUS )
+         IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
       END IF
 
 *  Come here if something has gone wrong.
