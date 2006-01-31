@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
      :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, WIN,
      :                       NDIM2, LBND2, UBND2, DOUT, VOUT, WORK1, 
-     *                       WORK2, STATUS )
+     *                       WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     KPS1_CLPS<T>
@@ -16,7 +16,7 @@
 *  Invocation:
 *     CALL KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, NDIM1, 
 *                      LBND1, UBND1, DIN, VIN, CIN, WIN, NDIM2, LBND2,
-*                      UBND2, DOUT, VOUT, WORK1, WORK2, STATUS )
+*                      UBND2, DOUT, VOUT, WORK1, WORK2, WORK3, STATUS )
 
 *  Description:
 *     This routine collapses the supplied data and variance arrays
@@ -55,12 +55,12 @@
 *        The input variance values.  It is only accessed if VAR is
 *        .TRUE.
 *     CIN( * ) = <TYPE> (Given)
-*        The co-ordinates along the collapse axis, starting at index LO.
-*        It is only accessed if METH is one of 'INTEG', 'IWC', 'IWD',
-*        'COMAX', or 'COMIN'.
+*        The co-ordinates along the collapse axis, starting at index LO,
+*        for each pixel.  It is only accessed if METH is one of 'INTEG',
+*        'IWC', 'IWD', 'COMAX', or 'COMIN'.
 *     WIN( * ) = <TYPE> (Given)
 *        The pixel widths along the collapse axis, starting at index LO.
-*        It is only accessed if METH is one of 'INTEG', 'IWC', or 'IWD'.
+*        It is only accessed if METH is 'INTEG'
 *     NDIM2 = INTEGER (Given)
 *        The number of axes in the output array.
 *     LBND2( NDIM2 ) = INTEGER (Given)
@@ -79,6 +79,10 @@
 *        Work array.  The second axis should have at least (HI-LO+1)
 *        elements.  It is only accessed if VAR is .TRUE., and AXIS is
 *        not equal to NDIM1.
+*     WORK3( NEL2, * ) = <TYPE> (Returned)
+*        Work array.  The second axis should have at least (HI-LO+1)
+*        elements.  It is only accessed if METH is one of 'INTEG',
+*        'IWC', 'IWD', 'COMAX', 'COMIN'; and AXIS is not equal to NDIM1.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -124,6 +128,9 @@
 *        Added CIN argument, passed through to main subroutines.
 *     2005 January 6 (MJC):
 *        Added WIN argument, passed through to main subroutines.
+*     2005 January 27 (MJC):
+*        Added WORK3 argument, and use to permute width or co-ordinate
+*        array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,6 +171,7 @@
       <TYPE> VOUT( * )
       <TYPE> WORK1( NEL2, * )
       <TYPE> WORK2( NEL2, * )
+      <TYPE> WORK3( NEL2, * )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -194,6 +202,9 @@
       INTEGER POS2( NDF__MXDIM ) ! Output pixel indices 
       INTEGER START              ! The first input element to use
       INTEGER STEP1              ! Vector step between collapsed pixels
+      LOGICAL USECO              ! Method uses the co-ordinate array?
+      LOGICAL USEIND             ! Method uses the co-ordinate array?
+      LOGICAL USEWID             ! Method uses the width array?
       LOGICAL USEWRK             ! Use the work arrays?
 
 *.
@@ -256,10 +267,16 @@
          GO TO 999
       END IF
 
+*  Decide whether indices, co-ordinates, and widths array is used.
+      USEIND = IMETH .EQ. 33 .OR. IMETH .EQ. 34
+      USECO = IMETH .EQ. 22 .OR. IMETH .EQ. 23 .OR. IMETH .EQ. 33 .OR.
+     :        IMETH .EQ. 34
+      USEWID = IMETH .EQ. 21
+     
 *  Find the size of each dimension in the output array. Also initialize 
 *  the pixel indices of the current output pixel to be the first pixel.
       DO IAX2 = 1, NDIM2
-         DIM2( IAX2 ) = UBND2( IAX2 ) - LBND2( IAX2 ) +1
+         DIM2( IAX2 ) = UBND2( IAX2 ) - LBND2( IAX2 ) + 1
          POS2( IAX2 ) = LBND2( IAX2 )
       END DO
 
@@ -271,7 +288,7 @@
 *  Note the step between adjacent pixels along the collapse axis.
       STEP1 = 1
       DO IAX1 = 1, AXIS - 1
-         STEP1 = STEP1*DIM1( IAX1 )
+         STEP1 = STEP1 * DIM1( IAX1 )
       END DO
 
 *  If we are collapsing along the last axis, we do not need to
@@ -318,9 +335,12 @@
             DO J = LO, HI
                K = K + 1
 
-*  Store this pixel value in a work array.
+*  Store this pixel value in a work array.  Likewise for variance and
+*  co-ordinates or widths.
                WORK1( IEL2, K ) = DIN( IEL1 )
-               IF( VAR ) WORK2( IEL2, K ) = VIN( IEL1 )
+               IF ( VAR ) WORK2( IEL2, K ) = VIN( IEL1 )
+               IF ( USECO ) WORK3( IEL2, K ) = CIN( IEL1 )
+               IF ( USEWID ) WORK3( IEL2, K ) = WIN( IEL1 )
 
 *  Move on to the next input pixel.
                IEL1 = IEL1 + STEP1
@@ -363,8 +383,7 @@
 
 *  Get workspace if co-ordinates are to be derived, otherwise
 *  use a valid pointer.
-      IF ( ( IMETH .GE. 21 .AND. IMETH .LE. 23 ) .OR.
-     :     IMETH .EQ. 33 .OR. IMETH .EQ. 34 ) THEN
+      IF ( USEIND ) THEN
          CALL PSX_CALLOC( NEL2, '_INTEGER', IPCOIN, STATUS )
       ELSE
          IPCOIN = IPPNT
@@ -480,8 +499,7 @@
       CALL PSX_FREE( IPPNT, STATUS )
       CALL PSX_FREE( IPUSED, STATUS )
 
-      IF ( ( IMETH .GE. 21 .AND. IMETH .LE. 23 ) .OR.
-     :     IMETH .EQ. 33 .OR. IMETH .EQ. 34 ) THEN
+      IF ( USEIND ) THEN
          CALL PSX_FREE( IPCOIN, STATUS )
       END IF
 
