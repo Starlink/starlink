@@ -416,8 +416,8 @@
 *  valid frames and checking if they are not already dark corrected.
 *  Do not check masters, bias, dark frames and frames with dark exposure
 *  times of zero.
+      DODARK = .FALSE.
       IF ( HVDARK .OR. MKDARK ) THEN
-         DODARK = .FALSE.
          DO 15 I = 1, NNDF
             IF ( VALID( I ) .AND. .NOT. DARKCR( I ) ) THEN
                IF ( FTYPES( 1, I )( 1 : 6 ) .NE. 'MASTER' ) THEN
@@ -437,8 +437,8 @@
 *  valid frames and checking if they are not already corrected.
 *  Do not check masters, bias, dark, flash frames and frames with
 *  pre-flash exposure times of zero.
+      DOFLAS = .FALSE.
       IF ( HVFLAS .OR. MKFLAS ) THEN
-         DOFLAS = .FALSE.
          DO 18 I = 1, NNDF
             IF ( VALID( I ) .AND. .NOT. FLASCR( I ) ) THEN
                IF ( FTYPES( 1, I )( 1:6 ) .NE. 'MASTER' ) THEN
