@@ -68,6 +68,9 @@
 *        Add warnings about locator leaks
 *     27-JAN-2006 (TIMJ):
 *        Need to exclude GLOBAL from leak check.
+*     31-JAN-2006 (TIMJ):
+*        Use ERR_MARK/RLSE and annul status if HDS_INFOI fails for any
+*        reason.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +97,7 @@
       CHARACTER FILTER*(60)       ! HDS_INFOI filter string
       CHARACTER NAME * ( 15 )     ! Task name from the command
       INTEGER IPOSN               ! Position in string
+      INTEGER LSTAT               ! Local status
       INTEGER NGRP0               ! Number of active GRP groups on entry
       INTEGER NGRP1               ! Number of active GRP groups on exit
       INTEGER NLOC0               ! Number of active locators on entry
@@ -554,25 +558,28 @@
 *  Note the current number of active locators. Do this in a new
 *  error reporting context so that we get the correct value even if an
 *  error has occurred.
-      CALL ERR_BEGIN( STATUS )
+      CALL ERR_MARK
+      LSTAT = SAI__OK
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
-     :     NLOC1, STATUS )
+     :     NLOC1, LSTAT )
 
 *  If there are more active locators now than there were on entry, there
 *  must be a problem (HDS locators are not being freed somewhere). So
 *  report it.
-      IF( STATUS .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
-         CALL MSG_BLANK( STATUS )
+      IF( LSTAT .EQ. SAI__OK .AND. NLOC1 .GT. NLOC0 ) THEN
+         CALL MSG_BLANK( LSTAT )
          CALL MSG_SETC( 'NAME', NAME )
          CALL MSG_SETI( 'NLOC0', NLOC0 )
          CALL MSG_SETI( 'NLOC1', NLOC1 )
          CALL MSG_OUT( 'KAPPA_NLOC', 'WARNING: The number of active '//
      :             'HDS locators increased from ^NLOC0 to ^NLOC1 '//
      :             'during execution of ^NAME (KAPPA programming '//
-     :             'error).', STATUS )
-         CALL MSG_BLANK( STATUS )
+     :             'error).', LSTAT )
+         CALL MSG_BLANK( LSTAT )
       END IF
-      CALL ERR_END( STATUS )
+      IF (LSTAT .NE. SAI__OK) CALL ERR_ANNUL( LSTAT )
+
+      CALL ERR_RLSE
 
 *  End and return.
 
