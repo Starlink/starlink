@@ -125,7 +125,7 @@ all: all-recursive
 world: $(ALL_TARGETS)
 	- test -f $(prefix)/bin/hlink \
 	  && test -d $(prefix)/docs \
-	  && $(prefix)/bin/hlink $(prefix)/docs
+	  && $(prefix)/bin/hlink $(prefix)/docs $(prefix)/help
 	rm -f world-stamp
 	date >world-stamp
 
