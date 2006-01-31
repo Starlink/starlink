@@ -39,12 +39,12 @@
 *        The number of lines of data in the stack.
 *     VARS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
 *        The data variances.
-*     COORDS( NLINES ) = DOUBLE PRECISION (Given)
-*        The axis co-ordinates along the collapse axis.  It is accessed
-*        only for IMETH= 22, 23, 33, 34.
-*     WIDTHS( NLINES ) = DOUBLE PRECISION (Given)
-*        The widths along the collapse axis.  It is accessed only for
-*        IMETH = 21, 22, or 23.
+*     COORDS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
+*        The co-ordinates along the collapse axis for each pixel.
+*        It is accessed only for IMETH = 22, 23, 33, 34.
+*     WIDTHS( NPIX, NLINES ) = DOUBLE PRECISION (Given)
+*        The widths along the collapse axis for each pixel.  It is
+*        accessed only for IMETH = 21., 22, or 23.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -173,6 +173,13 @@
 *        Add COIND argument.
 *     2006 January 6 (MJC):
 *        Add WIDTHS argument and calls for IMETH = 21, 22, 23.
+*     2006 January 26 (MJC):
+*        Made COORDS and WIDTHS per pixel.  Change calls to
+*        reflect new APIs for CCG1_IWC1 and CCG1_IWD1.
+*     2006 January 27 (MJC):
+*        Use CCG1_I2WC instead of KPG1_VASV to cope with the
+*        two-dimensional co-ordinate array.  Derive the widths for
+*        IMETH = 21 from the co-ordinates.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,8 +202,8 @@
       INTEGER NMAT
       DOUBLE PRECISION STACK( NPIX, NLINES )
       DOUBLE PRECISION VARS( NPIX, NLINES )
-      DOUBLE PRECISION COORDS( NLINES )
-      DOUBLE PRECISION WIDTHS( NLINES )
+      DOUBLE PRECISION COORDS( NPIX, NLINES )
+      DOUBLE PRECISION WIDTHS( NPIX, NLINES )
       DOUBLE PRECISION PP( NLINES )
       INTEGER NITER
       REAL NSIGMA
@@ -331,6 +338,10 @@
 
       ELSE IF ( IMETH .EQ. 21 ) THEN
 
+*  Create the widths from the co-ordinates assuming that there are
+*  gaps.
+         CALL CCG1_WCWID( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+
 *  Forming integrated value.
          CALL CCG1_FLX1D( NPIX, NLINES, STACK, VARS, WIDTHS, MINPIX,
      :                    RESULT, RESVAR, NCON, STATUS )
@@ -379,7 +390,7 @@
 
 *  Convert the pixel indices of the maxima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVD( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+         CALL CCG1_I2WCD( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE IF ( IMETH .EQ. 34 ) THEN
@@ -390,7 +401,7 @@
 
 *  Convert the pixel indices of the minima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVD( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+         CALL CCG1_I2WCD( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE

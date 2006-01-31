@@ -39,12 +39,12 @@
 *        The number of lines of data in the stack.
 *     VARS( NPIX, NLINES ) = REAL (Given)
 *        The data variances.
-*     COORDS( NLINES ) = REAL (Given)
-*        The axis co-ordinates along the collapse axis.  It is accessed
-*        only for IMETH= 22, 23, 33, 34.
-*     WIDTHS( NLINES ) = REAL (Given)
-*        The widths along the collapse axis.  It is accessed only for
-*        IMETH = 21, 22, or 23.
+*     COORDS( NPIX, NLINES ) = REAL (Given)
+*        The co-ordinates along the collapse axis for each pixel.
+*        It is accessed only for IMETH = 22, 23, 33, 34.
+*     WIDTHS( NPIX, NLINES ) = REAL (Given)
+*        The widths along the collapse axis for each pixel.  It is
+*        accessed only for IMETH = 21.
 *     IMETH = INTEGER (Given)
 *        The method to use in combining the lines.  It has a code of 1
 *        to 300 which represent the following statistics.
@@ -105,7 +105,7 @@
 *     POINT( NLINES ) = INTEGER (Given and Returned)
 *        Workspace to hold pointers to the original positions of the
 *        data before extraction and conversion in to the WRK1 array.
-*     USED( NLINES ) =LOGICAL (Given and Returned)
+*     USED( NLINES ) = LOGICAL (Given and Returned)
 *        Workspace used to indicate which values have been used in
 *        estimating a resultant value.
 *     STATUS = INTEGER (Given and Returned)
@@ -173,6 +173,13 @@
 *        Add COIND argument.
 *     2006 January 6 (MJC):
 *        Add WIDTHS argument and calls for IMETH = 21, 22, 23.
+*     2006 January 26 (MJC):
+*        Made COORDS and WIDTHS per pixel.  Change calls to
+*        reflect new APIs for CCG1_IWC1 and CCG1_IWD1.
+*     2006 January 27 (MJC):
+*        Use CCG1_I2WC instead of KPG1_VASV to cope with the
+*        two-dimensional co-ordinate array.  Derive the widths for
+*        IMETH = 21 from the co-ordinates.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -195,8 +202,8 @@
       INTEGER NMAT
       REAL STACK( NPIX, NLINES )
       REAL VARS( NPIX, NLINES )
-      REAL COORDS( NLINES )
-      REAL WIDTHS( NLINES )
+      REAL COORDS( NPIX, NLINES )
+      REAL WIDTHS( NPIX, NLINES )
       DOUBLE PRECISION PP( NLINES )
       INTEGER NITER
       REAL NSIGMA
@@ -331,6 +338,10 @@
 
       ELSE IF ( IMETH .EQ. 21 ) THEN
 
+*  Create the widths from the co-ordinates assuming that there are
+*  gaps.
+         CALL CCG1_WCWIR( NPIX, NLINES, COORDS, WIDTHS, STATUS )
+
 *  Forming integrated value.
          CALL CCG1_FLX1R( NPIX, NLINES, STACK, VARS, WIDTHS, MINPIX,
      :                    RESULT, RESVAR, NCON, STATUS )
@@ -338,13 +349,13 @@
       ELSE IF ( IMETH .EQ. 22 ) THEN
 
 *  Forming intensity-weighted co-ordinate dispersion.
-         CALL CCG1_IWC1R( NPIX, NLINES, STACK, VARS, COORDS, WIDTHS,
+         CALL CCG1_IWC1R( NPIX, NLINES, STACK, VARS, COORDS,
      :                    MINPIX, RESULT, RESVAR, NCON, STATUS )
 
       ELSE IF ( IMETH .EQ. 23 ) THEN
 
 *  Forming intensity-weighted co-ordinate dispersion.
-         CALL CCG1_IWD1R( NPIX, NLINES, STACK, COORDS, WIDTHS, MINPIX,
+         CALL CCG1_IWD1R( NPIX, NLINES, STACK, VARS, COORDS, MINPIX,
      :                    RESULT, RESVAR, NCON, STATUS )
 
       ELSE IF ( IMETH .EQ. 24 ) THEN
@@ -379,7 +390,7 @@
 
 *  Convert the pixel indices of the maxima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVR( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+         CALL CCG1_I2WCR( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE IF ( IMETH .EQ. 34 ) THEN
@@ -390,7 +401,7 @@
 
 *  Convert the pixel indices of the minima into co-ordinates stored in
 *  the RESULT array.
-         CALL KPG1_VASVR( NPIX, COIND, NLINES, COORDS, RESULT, NBAD,
+         CALL CCG1_I2WCR( NPIX, NLINES, COIND, COORDS, RESULT, NBAD,
      :                    STATUS )
 
       ELSE
