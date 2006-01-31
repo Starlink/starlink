@@ -678,6 +678,7 @@ static int DefaultMaxAxes( AstFrame * );
 static int DefaultMinAxes( AstFrame * );
 static int Equal( AstObject *, AstObject * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
+static int GetIsSimple( AstMapping * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
@@ -4519,6 +4520,37 @@ static AstAxis *GetAxis( AstFrame *this, int axis ) {
 *att--
 */
 
+static int GetIsSimple( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsSimple
+
+*  Purpose:
+*     Return the value of the IsSimple attribute for a Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsSimple( AstMapping *this )
+
+*  Class Membership:
+*     Frame member function (over-rides the protected astGetIsSimple
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsSimple attribute for a
+*     Frame, which is always zero because Frames are not immutable (unlike
+*     non-Frame Mappings).
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*/
+   return 0;
+}
+
 static int GetNaxes( AstFrame *this ) {
 /*
 *+
@@ -4946,6 +4978,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    new member functions implemented here. */
    mapping = (AstMappingVtab *) vtab;
 
+   mapping->GetIsSimple = GetIsSimple;
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;
    mapping->ReportPoints = ReportPoints;

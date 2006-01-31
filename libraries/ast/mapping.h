@@ -69,6 +69,9 @@
 *        not inherited when a Mapping is copied (its value is
 *        initially undefined, and therefore defaults to zero, in any
 *        copy).
+*     IsSimple (boolean)
+*        A read-only attribute indicating if the Mapping has been
+*        simpified.
 *     TranForward (integer)
 *        A read-only boolean value (0 or 1) which indicates whether a
 *        Mapping is able to transform coordinates in the "forward"
@@ -130,6 +133,8 @@
 *           Clear the Report attribute value for a Mapping.
 *        astGetInvert
 *           Get the Invert attribute value for a Mapping.
+*        astGetIsSimple
+*           Get the IsSimple attribute.
 *        astGetNin
 *           Get the number of input coordinates for a Mapping.
 *        astGetNout
@@ -273,6 +278,8 @@
 *        Added method astRebin
 *     1-SEP-2005 (DSB):
 *        Added method astRebinSeq
+*     31-JAN-2006 (DSB):
+*        Added IsSimple attribute.
 *--
 */
 
@@ -340,6 +347,7 @@ typedef struct AstMapping {
 
 /* Attributes specific to objects in this class. */
    int invert;                   /* Mapping inverted? */
+   int issimple;                 /* Has Mapping been simplified? */
    int nin;                      /* Number of input coordinates */
    int nout;                     /* Number of output coordinates */
    int report;                   /* Report when converting coordinates? */
@@ -371,6 +379,7 @@ typedef struct AstMappingVtab {
    AstPointSet *(* Transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
    double (* Rate)( AstMapping *, double *, int, int );
    int (* GetInvert)( AstMapping * );
+   int (* GetIsSimple)( AstMapping * );
    int (* GetNin)( AstMapping * );
    int (* GetNout)( AstMapping * );
    int (* GetReport)( AstMapping * );
@@ -484,6 +493,7 @@ void astMapSplitId_( AstMapping *, int, int *, int *, AstMapping ** );
 int astRateState_( int );
 AstPointSet *astTransform_( AstMapping *, AstPointSet *, int, AstPointSet * );
 int astGetInvert_( AstMapping * );
+int astGetIsSimple_( AstMapping * );
 int astGetNin_( AstMapping * );
 int astGetNout_( AstMapping * );
 int astGetReport_( AstMapping * );
@@ -621,6 +631,8 @@ astINVOKE(V,astClearInvert_(astCheckMapping(this)))
 astINVOKE(V,astClearReport_(astCheckMapping(this)))
 #define astGetInvert(this) \
 astINVOKE(V,astGetInvert_(astCheckMapping(this)))
+#define astGetIsSimple(this) \
+astINVOKE(V,astGetIsSimple_(astCheckMapping(this)))
 #define astGetNin(this) \
 astINVOKE(V,astGetNin_(astCheckMapping(this)))
 #define astGetNout(this) \

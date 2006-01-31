@@ -159,6 +159,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added astRebinSeq.
 *     9-SEP-2005 (DSB):
 *        Corrected axis indices returned by public interface for astMapSplit.
+*     31-JAN-2006 (DSB):
+*        Added IsSimple attribute.
 *class--
 */
 
@@ -305,6 +307,7 @@ static double UphillSimplex( const MapData *, double, int, const double [], doub
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int Equal( AstObject *, AstObject * );
 static int GetInvert( AstMapping * );
+static int GetIsSimple( AstMapping * );
 static int GetNin( AstMapping * );
 static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
@@ -491,6 +494,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    error. */
    } else if ( !strcmp( attrib, "nin" ) ||
                !strcmp( attrib, "nout" ) ||
+               !strcmp( attrib, "issimple" ) ||
                !strcmp( attrib, "tranforward" ) ||
                !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
@@ -1435,6 +1439,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstMapping *this;             /* Pointer to the Mapping structure */
    const char *result;           /* Pointer value to return */
    int invert;                   /* Invert attribute value */
+   int issimple;                 /* IsSimple attribute value */
    int nin;                      /* Nin attribute value */
    int nout;                     /* Nout attribute value */
    int report;                   /* Report attribute value */
@@ -1462,6 +1467,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       invert = astGetInvert( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", invert );
+         result = buff;
+      }
+
+/* IsSimple. */
+/* --------- */
+   } else if ( !strcmp( attrib, "issimple" ) ) {
+      issimple = astGetIsSimple( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", issimple );
          result = buff;
       }
 
@@ -2421,6 +2435,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->ClearReport = ClearReport;
    vtab->Decompose = Decompose;
    vtab->GetInvert = GetInvert;
+   vtab->GetIsSimple = GetIsSimple;
    vtab->GetNin = GetNin;
    vtab->GetNout = GetNout;
    vtab->GetReport = GetReport;
@@ -14613,6 +14628,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    if a read-only attribute has been specified. */
    } else if ( MATCH( "nin" ) ||
         MATCH( "nout" ) ||
+        MATCH( "issimple" ) ||
         MATCH( "tranforward" ) ||
         MATCH( "traninverse" ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
@@ -17644,6 +17660,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    read-only attributes of this class. If it does, then return
    zero. */
    } else if ( !strcmp( attrib, "nin" ) ||
+        !strcmp( attrib, "issimple" ) ||
         !strcmp( attrib, "nout" ) ||
         !strcmp( attrib, "tranforward" ) ||
         !strcmp( attrib, "traninverse" ) ) {
@@ -19239,6 +19256,49 @@ astMAKE_TEST(Mapping,Invert,( this->invert != -INT_MAX ))
 /*
 *att++
 *  Name:
+*     IsSimple
+
+*  Purpose:
+*     Has the Mapping been simplified?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean), read-only.
+
+*  Description:
+*     This attribute indicates whether a Mapping has been simplified
+*     by the 
+c     astSimplify
+f     AST_SIMPLIFY
+*     method. If the IsSimple value is non-zero, then the Mapping has
+*     been simplified and so there is nothing to be gained by simplifying
+*     it again. Indeed, the
+c     astSimplify
+f     AST_SIMPLIFY
+*     method will immediately return the Mapping unchanged if the IsSimple 
+*     attribute indicates that the Mapping has already been simplified.
+
+*  Applicability:
+*     Mapping
+*        All Mappings have this attribute.
+*     Frame
+*        All classes of Frame return zero for the IsSimple attribute.
+*        This is because changes can be made to a Frame which affect the
+*        Mapping represented by the Frame, and so there can be no
+*        guarantee that the Mapping may not need re-simplifying. Most
+*        non-Frame Mappings, on the other hand, are immutable and so when
+*        they are simplified it is certain that they weill remain in a
+*        simple state.
+
+*att--
+*/
+astMAKE_GET(Mapping,IsSimple,int,0,this->issimple)
+
+/*
+*att++
+*  Name:
 *     Nin
 
 *  Purpose:
@@ -19642,6 +19702,13 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    astWriteInt( channel, "Nout", set, 0, ival,
                 "Number of output coordinates" );
 
+/* IsSimple. */
+/* --------- */
+   ival = astGetIsSimple( this );
+   astWriteInt( channel, "IsSimp", ival, 0, ival,
+                ival ? "Mapping has been simplified" : 
+                       "Mapping has not been simplified" );
+
 /* Invert. */
 /* ------- */
    set = TestInvert( this );
@@ -19831,6 +19898,7 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
 /* Initialise other attributes to their undefined values. */
       new->invert = -INT_MAX;
       new->report = -INT_MAX;
+      new->issimple = 0;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -19977,6 +20045,10 @@ AstMapping *astLoadMapping_( void *mem, size_t size,
 /* ------- */
       new->invert = astReadInt( channel, "invert", -INT_MAX );
       if ( TestInvert( new ) ) SetInvert( new, new->invert );
+
+/* IsSimple. */
+/* --------- */
+      new->issimple = astReadInt( channel, "issimp", 0 );
 
 /* TranForward. */
 /* ------------ */
@@ -20180,8 +20252,15 @@ double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
    }   
 }
 AstMapping *astSimplify_( AstMapping *this ) {
+   AstMapping *result;
    if ( !astOK ) return NULL;
-   return (**astMEMBER(this,Mapping,Simplify))( this );
+   if( !astGetIsSimple( this ) ) { /* Only simplify if not already done */
+      result = (**astMEMBER(this,Mapping,Simplify))( this );
+      result->issimple = 1;        /* Indicate simplification has been done */
+   } else {
+      result = astClone( this );
+   }
+   return result;
 }
 AstPointSet *astTransform_( AstMapping *this, AstPointSet *in,
                             int forward, AstPointSet *out ) {
