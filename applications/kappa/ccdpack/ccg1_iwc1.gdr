@@ -1,4 +1,4 @@
-      SUBROUTINE CCG1_IWC1<T>( NPIX, NLINES, STACK, VARS, COORDS, WIDTHS,
+      SUBROUTINE CCG1_IWC1<T>( NPIX, NLINES, STACK, VARS, COORDS,
      :                         MINPIX, RESULT, RESVAR, NCON, STATUS )
 *+
 *  Name:
@@ -11,17 +11,18 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCG1_IWC1x( NPIX, NLINES, STACK, VARS, COORDS, WIDTHS, MINPIX,
+*     CALL CCG1_IWC1x( NPIX, NLINES, STACK, VARS, COORDS, MINPIX,
 *                      RESULT, RESVAR, NCON, STATUS )
 
 *  Description:
 *     This routine accepts an array consisting of a series of
-*     (vectorised) lines of data.  It forms the sum of the data values 
-*     multiplied by its co-ordinate lines normalised by the sum of the
-*     product of data value and pixel width.  The output weighted
+*     (vectorised) lines of data and their co-ordinates.  For each
+*     pixel the subroutine forms a weighted mean co-ordinate and 
+*     variance along a line of data.  The weights are the product of
+*     the data values and their inverse variance.  The output weighted
 *     co-ordinates are returned in the array RESULT.  The output
-*     variances are estimated from the VARS values and are returned in
-*     RESVAR; this assumes no errors in the co-ordinates and widths.
+*     weighted variances are returned in RESVAR; this assumes no
+*     errors in the co-ordinates.
 
 *  Arguments:
 *     NPIX = INTEGER (Given)
@@ -32,10 +33,8 @@
 *        The array of lines which are to be combined into a single line.
 *     VARS( NPIX, NLINES ) = <TYPE> (Given)
 *        The data variances.
-*     COORDS( NLINES ) = <TYPE> (Given)
+*     COORDS( NPIX, NLINES ) = <TYPE> (Given)
 *        The world co-ordinates.
-*     WIDTHS( NLINES ) = <TYPE> (Given)
-*        The pixel widths in world co-ordinates.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
 *        output pixel.
@@ -52,8 +51,8 @@
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D or R as appropriate.  The STACK, VARS,
-*     RESULT, and RESVAR arguments supplied to the routine must have the
-*     data type specified.
+*     COORDS, RESULT, and RESVAR arguments supplied to the routine must
+*     have the data type specified.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -62,7 +61,13 @@
 *  History:
 *     2006 January 6 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2006 January 26 (MJC):
+*        Added a dimension to COORDS to provide a co-ordinate for each 
+*        pixel.  This avoids the assumption of a constant AXIS-like
+*        array applicable to output pixels.  Remove the WIDTHS now that
+*        the AIPS++ definition is agreed to be wrong.  Incorporate the
+*        inverse data variance in the weights.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -82,8 +87,7 @@
       INTEGER MINPIX
       <TYPE> STACK( NPIX, NLINES )
       <TYPE> VARS( NPIX, NLINES )
-      <TYPE> COORDS( NLINES )
-      <TYPE> WIDTHS( NLINES )
+      <TYPE> COORDS( NPIX, NLINES )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION NCON( NLINES )
@@ -105,18 +109,16 @@
       DOUBLE PRECISION COORD     ! A co-ordinate
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
-      DOUBLE PRECISION M0        ! M0 moment (integrated value i.e.
-                                 ! sum of value-width product)
       DOUBLE PRECISION M1        ! M1 moment (intensity weighted
                                  ! co-ordinate)
       INTEGER NGOOD              ! Number of good pixels
-      DOUBLE PRECISION SUMCV     ! Sum of co-ordinate-variance product
-      DOUBLE PRECISION SUMVC     ! Sum of value-co-ordinate product
-                                 ! (numerator)
-      DOUBLE PRECISION SUMWV     ! Sum of width-variance product
+      DOUBLE PRECISION SUM       ! Sum of weighted co-ordinates
+      DOUBLE PRECISION SUMSQ     ! Sum of squared weighted co-ordinates
+      DOUBLE PRECISION SUMW      ! Sum of weights
       DOUBLE PRECISION VAL       ! Present data value
       DOUBLE PRECISION VAR       ! A variance value
-      DOUBLE PRECISION WIDTH     ! A pixel width
+      DOUBLE PRECISION VARNCE    ! Almost variance
+      DOUBLE PRECISION WEIGHT    ! Weight from intensity and variance
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -133,44 +135,37 @@
       DO 1 I = 1, NPIX
 
 *  Loop over for all possible output pixels.
-         SUMVC = 0.0D0
-         M0 = 0.0D0
-         SUMCV = 0.0D0
-         SUMWV = 0.0D0
+         SUM = 0.0D0
+         SUMSQ = 0.0D0
+         SUMW = 0.0D0
          NGOOD = 0
          CALL NUM_CLEARERR()
 
 *  Loop over all possible contributing pixels forming the required 
 *  sums.
          DO 5 J = 1, NLINES
-            IF ( STACK( I, J ) .NE. VAL__BAD<T> .AND.
-     :            VARS( I, J ) .NE. VAL__BAD<T> .AND.
-     :             COORDS( J ) .NE. VAL__BAD<T> .AND.
-     :             WIDTHS( J ) .NE. VAL__BAD<T> ) THEN
+            IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :             VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :           COORDS( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Conversion increment good value counter.
                NGOOD = NGOOD + 1
 
-*  Convert input type to double precision before forming sums should be
-*  no numeric errors on this attempt.
+*  Convert input type to double precision before forming sums.  There
+*  should be no numeric errors on this attempt.
                VAL = NUM_<T>TOD( STACK( I, J ) )
                VAR = NUM_<T>TOD( VARS( I, J ) )
-               COORD = NUM_<T>TOD( COORDS( J ) )
-               WIDTH = NUM_<T>TOD( WIDTHS( J ) )
+               COORD = NUM_<T>TOD( COORDS( I, J ) )
+               WEIGHT = VAL / VAR
 
-*  Sum the variance-width product forming the variance of the flux
-*  for the line.
-               SUMWV = SUMWV + VAR * WIDTH
+*  Sum the intensity weights of the flux for the line.
+               SUMW = SUMW + WEIGHT
 
-*  Sum the variance-co-ordinate product.
-               SUMCV = SUMCV + VAR * COORD
+*  Sum the weighted square of the value-co-ordinate product.
+               SUMSQ = SUMSQ + COORD * COORD * WEIGHT
 
-*  Sum the data value-width product forming a flux for the line.
-               M0 = M0 + VAL * WIDTH
-
-*  Sum the data value-co-ordinate product for the intensity-weighted
-*  representative co-ordinate of the line.
-               SUMVC = SUMVC + VAL * COORD
+*  Sum the weighted moment.
+               SUM = SUM + COORD * WEIGHT
 
 *  Update the contribution buffer; all values contribute when forming
 *  the intensity-weighted co-ordinate.
@@ -178,13 +173,18 @@
             END IF
     5    CONTINUE
 
-*  If there are sufficient good pixels, output the result.  Add the
-*  relative errors in quadrature, normalised by the result.
-         IF ( NGOOD .GE. MINPIX .AND. ABS( M0 ) .GT. VAL__SMLD ) THEN
-            M1 = NUM_DTO<T>( SUMVC / M0 )
+*  If there are sufficient good pixels, derive the weighted mean and
+*  variance.
+         IF ( NGOOD .GE. MINPIX .AND. ABS( SUMW ) .GT. VAL__SMLD ) THEN
+            M1 = NUM_DTO<T>( SUM / SUMW )
             RESULT( I ) = M1
-            RESVAR( I ) = NUM_DTO<T>( M1 * M1 * ( SUMCV / M0 * M0 + 
-     :                                SUMWV / SUMCV * SUMCV ) )
+            VARNCE = ( SUMSQ - M1 * M1 * DBLE( NGOOD ) ) / SUMW
+            IF ( VARNCE .GT. 0.0D0 ) THEN
+               RESVAR( I ) = NUM_DTO<T>( SQRT( VARNCE / 
+     :                                   DBLE( NGOOD - 1 ) ) )
+            ELSE
+               RESULT( I ) = VAL__BAD<T>
+            END IF
 
 *  Trap numeric errors.
             IF ( .NOT. NUM_WASOK() ) THEN
