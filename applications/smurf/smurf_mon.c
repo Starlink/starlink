@@ -44,6 +44,8 @@
 *        Check for GRP leaks
 *     2006-01-25 (TIMJ):
 *        Check for locator leaks.
+*     2006-01-30 (TIMJ):
+*        Use astBegin/astEnd
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,6 +133,9 @@ void smurf_mon( int * status ) {
   ndfHappn( appname, status );
   msgIfget("MSG_FILTER", status);
 
+  /* Initialise AST */
+  astBegin;
+
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
@@ -143,6 +148,9 @@ void smurf_mon( int * status ) {
     msgSetc( "TASK", taskname );
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
+
+  /* Free AST objects */
+  astEnd;
 
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
