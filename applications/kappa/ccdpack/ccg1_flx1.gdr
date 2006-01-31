@@ -31,7 +31,7 @@
 *        The array of lines which are to be combined into a single line.
 *     VARS( NPIX, NLINES ) = <TYPE> (Given)
 *        The data variances.
-*     WIDTHS( NLINES ) = <TYPE> (Given)
+*     WIDTHS( NPIX, NLINES ) = <TYPE> (Given)
 *        The pixel widths in world co-ordinates.
 *     MINPIX = INTEGER (Given)
 *        The minimum number of pixels required to contribute to an
@@ -59,7 +59,11 @@
 *  History:
 *     2006 January 6 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2006 January 26 (MJC):
+*        Added a dimension to WIDTHS to provide a width for each pixel.
+*        This avoids the assumption of a constant AXIS-like array
+*        applicable to output pixels.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -79,7 +83,7 @@
       INTEGER MINPIX
       <TYPE> STACK( NPIX, NLINES )
       <TYPE> VARS( NPIX, NLINES )
-      <TYPE> WIDTHS( NLINES )
+      <TYPE> WIDTHS( NPIX, NLINES )
 
 *  Arguments Given and Returned:
       DOUBLE PRECISION NCON( NLINES )
@@ -128,14 +132,14 @@
 *  Loop over all possible contributing pixels forming the required 
 *  sums.
          DO 5 J = 1, NLINES
-            IF( STACK( I, J ) .NE. VAL__BAD<T> .AND.
-     :           VARS( I, J ) .NE. VAL__BAD<T> .AND.
-     :            WIDTHS( J ) .NE. VAL__BAD<T> ) THEN
+            IF (  STACK( I, J ) .NE. VAL__BAD<T> .AND.
+     :             VARS( I, J ) .NE. VAL__BAD<T> .AND.
+     :           WIDTHS( I, J ) .NE. VAL__BAD<T> ) THEN
 
 *  Conversion increment good value counter.
                NGOOD = NGOOD + 1
 
-               WIDTH = NUM_<T>TOD( WIDTHS( J ) )
+               WIDTH = NUM_<T>TOD( WIDTHS( I, J ) )
 
 *  Sum the varaince-width product forming the variance of the flux
 *  for the line.
