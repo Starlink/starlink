@@ -33,7 +33,7 @@ ccg1_ad1.gn ccg1_ad3.gn ccg1_rms1.gn ccg1_rms3.gn ccg1_sd1.gn \
 ccg1_sd3.gn ccg1_sum1.gn ccg1_sum3.gn
 
 CCG_GDR_GEN = ccg1_flx1.gdr ccg1_flx3.gdr ccg1_iwc1.gdr ccg1_iwc3.gdr \
-ccg1_iwd1.gdr ccg1_iwd3.gdr
+ccg1_iwd1.gdr ccg1_iwd3.gdr ccg1_i2wc.gdr ccg1_wcwi.gdr
 
 SUFFIXES = .gen .gn .gdr .f
 
