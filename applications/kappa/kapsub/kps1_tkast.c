@@ -8,16 +8,6 @@
 #include <tcl.h>
 #include <tk.h>
 
-/*
- * The following variable is a special hack that is needed in order for
- * Sun shared libraries to be used for Tcl.
- */
-
-#ifdef NEED_MATHERR
-extern int matherr();
-int *tclDummyMathPtr = (int *) matherr;
-#endif
-
 static FILE *fd = NULL;
 
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),

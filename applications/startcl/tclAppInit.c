@@ -36,15 +36,6 @@ void FC_MAIN () {}
 #include "tclAdam.h"
 #include "tclNbs.h"
 
-/*
- * The following variable is a special hack that is needed in order for
- * Sun shared libraries to be used for Tcl.
- */
-
-extern int matherr();
-int *tclDummyMathPtr = (int *) matherr;
-
-
 #ifdef TCL_TEST
 EXTERN int		Procbodytest_Init _ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN int		Procbodytest_SafeInit _ANSI_ARGS_((Tcl_Interp *interp));
