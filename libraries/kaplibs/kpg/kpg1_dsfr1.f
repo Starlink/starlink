@@ -82,7 +82,7 @@
       CHARACTER FRMDMN*80        ! Frame domain
       CHARACTER FRMTTL*80        ! Frame title
       CHARACTER IND*80           ! Indentation string 
-      CHARACTER LABEL*20         ! A description of the spectral coord system
+      CHARACTER LABEL*40         ! A description of the spectral coord system
       CHARACTER MONTH( 12 )*3    ! Month names
       CHARACTER POSBUF*80        ! Buffer for position
       CHARACTER PRJ*50           ! Sky projection
@@ -132,7 +132,8 @@
 
 *  Display the title (upto 45 characters), and domain. 
       CALL MSG_SETC( 'TTL', FRMTTL( : 45 - NIND ) )
-      IF( CHR_LEN( FRMTTL ) .GT. 45 ) CALL MSG_SETC( 'TTL', '...' )
+      IF( CHR_LEN( FRMTTL ) .GT. 45 - NIND ) CALL MSG_SETC( 'TTL', 
+     :                                                      '...' )
 
       CALL MSG_OUT( 'WCS_TITLE', 
      :              IND( : NIND )//'Frame title         : "^TTL"', 
@@ -291,13 +292,13 @@
             ELSE IF( SYS .EQ. 'BETA' ) THEN
                LABEL = 'Beta factor'
             ELSE IF( SYS .EQ. 'VELO' ) THEN
-               LABEL = 'Relativistic velocity'
+               LABEL = 'Apparent radial velocity'
             ELSE
                LABEL = SYS
             END IF
    
-            CALL MSG_SETC( 'SYS', ' (' )
             CALL MSG_SETC( 'SYS', LABEL )
+            CALL MSG_SETC( 'SYS', ' (' )
             CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', STATUS ) ) 
             CALL MSG_SETC( 'SYS', ')' )
             CALL MSG_OUT( 'WCS_SYS', 
@@ -357,8 +358,8 @@
      :             SYS .EQ. 'ZOPT' ) THEN
 
                   FRM2 = AST_COPY( FRM, STATUS )
-                  CALL AST_SETC( FRM2, 'System', SYS, STATUS )
-                  FS = AST_CONVERT( FRM, FRM2, ' ', STATUS )
+                  CALL AST_SETC( FRM2, 'System', 'VELO', STATUS )
+                  FS = AST_CONVERT( FRM2, FRM, ' ', STATUS )
                   CALL AST_TRAN1( FS, 1, SRCVEL, .TRUE., TMP, STATUS )
                   SRCVEL = TMP
 
