@@ -107,6 +107,7 @@ AST_SHOW:
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
           Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
           MapA = 	# First component Mapping
              Begin WinMap 	# Map one window on to another
@@ -295,6 +296,7 @@ ENDAST_F= 'SkyFrame'           / End of object definition
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
 NIN_A   =                    2 / Number of input coordinates                    
+ISSIMP_A=                    1 / Mapping has been simplified                    
 ISA_C   = 'Mapping '           / Mapping between coordinate systems             
 MAPA_A  = '        '           / First component Mapping                        
 BEGAST_I= 'WinMap  '           / Map one window on to another                   
@@ -6272,6 +6274,7 @@ AST_SHOW:
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
           Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
           MapA = 	# First component Mapping
              Begin WinMap 	# Map one window on to another
@@ -6594,6 +6597,7 @@ ENDAST_F= 'SkyFrame'           / End of object definition
 MAP2_A  = '        '           / Mapping between nodes 1 and 2                  
 BEGAST_H= 'CmpMap  '           / Compound Mapping                               
 NIN_A   =                    2 / Number of input coordinates                    
+ISSIMP_A=                    1 / Mapping has been simplified                    
 ISA_C   = 'Mapping '           / Mapping between coordinate systems             
 MAPA_A  = '        '           / First component Mapping                        
 BEGAST_I= 'WinMap  '           / Map one window on to another                   

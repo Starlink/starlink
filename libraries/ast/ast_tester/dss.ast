@@ -64,6 +64,7 @@
     Map2 = 	# Mapping between nodes 1 and 2
        Begin CmpMap 	# Compound Mapping
           Nin = 2 	# Number of input coordinates
+          IsSimp = 1 	# Mapping has been simplified
        IsA Mapping 	# Mapping between coordinate systems
           MapA = 	# First component Mapping
              Begin WinMap 	# Map one window on to another
