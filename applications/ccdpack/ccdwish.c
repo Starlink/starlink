@@ -44,10 +44,13 @@
 
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
+*     PDRAPER: Peter W. Draper (STARLINK)
 
 *  History:
 *     10-OCT-2000 (MBT):
 *        Initial version.
+*     1-FEB-2006 (PDRAPER):
+*        Removed the use of CCDPACK_DIR as home for Tcl/Tk/Itcl.
 *-
 */
 
@@ -116,7 +119,6 @@ extern F77_SUBROUTINE(ccd1_getarg)
 */
       int ifd;                       /* File descriptor of downward pipe */
       int ofd;                       /* File descriptor of upward pipe */
-      char *ccddir;                  /* CCDPACK_DIR value */
 
       int my_argc;                   /* Number of arguments */
       char **my_argv;                /* Vector of arguments, [0..my_argc-1] */
@@ -152,16 +154,6 @@ extern F77_SUBROUTINE(ccd1_getarg)
       my_argv[my_argc] = 0;     /* terminate argv list conventionally */
 
       
-/* Set the TCL library environment variables to the same value as CCDPACK_DIR.
-   This will cause the autoloader to look there for various library files. */
-      ccddir = getenv( "CCDPACK_DIR" );
-      if ( ccddir != NULL ) {
-         ccdSetenv( "TCL_LIBRARY", ccddir, 1 );
-         ccdSetenv( "TK_LIBRARY", ccddir, 1 );
-         ccdSetenv( "ITCL_LIBRARY", ccddir, 1 );
-         ccdSetenv( "ITK_LIBRARY", ccddir, 1 );
-      }
-
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
    signal an error and bail out. */
