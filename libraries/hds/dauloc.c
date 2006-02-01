@@ -21,6 +21,21 @@
 /* Literals */
 
 #define DAT_K_CLUSTER   17              /* FLQ cluster size (packets)   */
+#define NBINS_INC       20              /* number of bins to resize     */
+
+/* These file globals are used to track all the blocks malloced by this
+   routine. They are tracked so that they can be freed at shutdown
+   (via dau_free_flq) to prevent distracting valgrind warnings */
+
+/* Array of malloced pointers */
+struct LCP **malloced = NULL;
+unsigned int npntrs = 0;
+unsigned int totpntrs = 0;
+
+/* internal prototypes */
+int dau1_store_flq_malloc( struct LCP * );
+
+/* functions */
 
 int
 dau_defuse_lcp(pntr)
@@ -119,7 +134,10 @@ int              i;
 
 _invoke( rec_alloc_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
                         (void **) &lcp ) );
- dat_ga_flq_malloced = lcp; /* Will leak if we are called more than once */
+
+ /* Need to store the pointer in the global array */
+ _invoke(dau1_store_flq_malloc( lcp ));
+
 (void) memset( (void *) lcp, 0,
                (size_t) ( DAT_K_CLUSTER * sizeof( struct LCP ) ) );
 
@@ -142,10 +160,53 @@ dau_free_flq( void ) {
    * may have been reorganized such that it no longer includes an
    * element at the start of the malloced memory.
    */
+  unsigned int i;
 
   /* Nothing to free */
-  if ( dat_ga_flq_malloced == NULL ) return DAT__OK;
-  _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
-			 (void **)&dat_ga_flq_malloced ));
+  if ( malloced == NULL ) return DAT__OK;
+
+  /* Free all the chunks */
+  for (i = 0; i < npntrs; i++) {
+    _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
+			   (void **)&malloced[i] ));
+  }
+  
+  /* and the container */
+  _invoke(rec_deall_mem( totpntrs * sizeof(struct LCP*),
+			 (void **)&malloced));
   return hds_gl_status;
+}
+
+
+int
+dau1_store_flq_malloc( struct LCP * lcp ) {
+  struct LCP** new;
+
+  if ( malloced == NULL ) {
+    /* get some memory */
+    malloced = malloc( NBINS_INC * sizeof(struct LCP*) );
+    if (malloced == NULL) {
+      /* ignore for now since this is not a real leak */
+      return DAT__OK;
+    }
+    totpntrs += NBINS_INC;
+
+  } else if ( totpntrs == npntrs ) {
+    /* Need to realloc some space */
+    new = realloc( malloced, totpntrs + NBINS_INC );
+    if (new == NULL) {
+      /* just ignore and leak a bit - do not need to free the 
+	 old memory, since it can still contain useful information */
+      return DAT__OK;
+    }
+    malloced = new;
+    totpntrs += NBINS_INC;
+
+  }
+
+  /* Have some memory, so store the pointer */
+  malloced[npntrs] = lcp;
+  npntrs++;
+
+  return DAT__OK;
 }
