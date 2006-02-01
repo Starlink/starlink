@@ -39,9 +39,27 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -55,6 +73,8 @@
 /*    25-NOV-1992 (RFWS):                                                   */
 /*       Changed to deallocate the File Control Vector and to return a void */
 /*       value.                                                             */
+/*    31-JAN-2006 (TIMJ):                                                   */
+/*        Free memory associated with the Block Control Packets             */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -65,6 +85,7 @@
 /* Local Variables:                                                         */
       INT slot;                  /* Loop counter for File Control Vector    */
       struct WLD *context;       /* Pointer to wild-card search context     */
+      struct BCP *bcp;
 
 /*.                                                                         */
 
@@ -91,6 +112,17 @@
             context = rec_gl_wldque;
             rec_end_wild( &context );
          }
+
+	 /* Deallocate the memory associated with the free page list */
+	 /* The malloced memory area is at the start of the linked list
+	    so work backwards until we get to the start */
+	 bcp = rec_ga_fpl;
+	 while ( bcp->blink != NULL && bcp->blink < bcp ) {
+	   bcp = bcp->blink;
+	 }
+	 printf("Deallocating BCP = %p\n",bcp);
+	 rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
+			(void **)&bcp ); 
 
 /* Note that the rec_ facility is no longer active.                         */
          rec_gl_active = 0;
