@@ -120,7 +120,6 @@
 	 while ( bcp->blink != NULL && bcp->blink < bcp ) {
 	   bcp = bcp->blink;
 	 }
-	 printf("Deallocating BCP = %p\n",bcp);
 	 rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
 			(void **)&bcp ); 
 
