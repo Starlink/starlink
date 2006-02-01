@@ -51,6 +51,8 @@
 *  History:
 *     13-JAN-2006 (DSB):
 *        Original version.
+*     1-FEB-2006 (DSB):
+*        Correct conversion of pixels coords to pixel indices.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,7 +111,9 @@
       OUT = .FALSE.
 
       DO I = 1, NDIM
-         IX = INT( CXY( I ) ) + 1
+         IX = INT( CXY( I ) ) 
+         IF( CXY( I ) .GE. 0 ) IX = IX + 1
+         
          IF( IX .LT. LBND( I ) .OR. IX .GT. UBND( I ) ) THEN
             OUT = .TRUE.
          ELSE
