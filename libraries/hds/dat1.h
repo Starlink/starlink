@@ -278,6 +278,7 @@ if (!_ok(*status))\
 /* ==================							    */
       extern struct LCP *dat_ga_wlq; /*	Working Locator Queue		    */
       extern struct LCP *dat_ga_flq; /*	Free Locator Queue		    */
+extern struct LCP *dat_ga_flq_malloced; /* pointer to start of malloced area */
       extern int dat_gl_wlqsize; /* Working Locator Queue size		    */
       extern struct NDR dat_gl_ndr[ DAT__MXPRM ]; /* Native data rep.	    */
 

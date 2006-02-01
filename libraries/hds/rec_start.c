@@ -33,9 +33,27 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -48,6 +66,8 @@
 /*    25-NOV-1992 (RFWS):                                                   */
 /*       Changed to handle new expandable File Control Vector and to return */
 /*       a void value.                                                      */
+/*    31-JAN-2006 (TIMJ):                                                   */
+/*        Store pointer to malloced BCP                                     */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -93,6 +113,7 @@
          {
             (void) memset( (void *) bcp, 0,
                            (size_t) hds_gl_maxwpl * sizeof( struct BCP ) );
+	    rec_ga_fpl_malloced = bcp;
 
 /* Fill the Free Page List.                                                 */
             for ( i = 0; i < hds_gl_maxwpl; i++ )

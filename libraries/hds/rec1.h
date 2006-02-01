@@ -144,6 +144,8 @@
       extern struct FCV *rec_ga_fcv; /*	File control vector		    */
       extern struct WLD *rec_gl_wldque; /* Wild-card search context queue   */
 
+extern struct BCP *rec_ga_fpl_malloced; /* memory address of malloced FPL */
+
 /* Function Prototypes:							    */
 /* ===================							    */
       int rec1_alloc_frame( int slot, INT_BIG size, INT_BIG *bloc );

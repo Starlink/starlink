@@ -114,14 +114,12 @@
          }
 
 	 /* Deallocate the memory associated with the free page list */
-	 /* The malloced memory area is at the start of the linked list
-	    so work backwards until we get to the start */
-	 bcp = rec_ga_fpl;
-	 while ( bcp->blink != NULL && bcp->blink < bcp ) {
-	   bcp = bcp->blink;
-	 }
-	 rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
-			(void **)&bcp ); 
+	 /* The malloced memory area may not even be reachable in the 
+	    linked list so we obtain the pointer from the global that exists
+	    for exactly this purpose */
+	 if (rec_ga_fpl_malloced != NULL)
+	   rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
+			  (void **)&rec_ga_fpl_malloced ); 
 
 /* Note that the rec_ facility is no longer active.                         */
          rec_gl_active = 0;

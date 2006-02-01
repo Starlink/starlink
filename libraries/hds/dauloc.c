@@ -119,6 +119,7 @@ int              i;
 
 _invoke( rec_alloc_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
                         (void **) &lcp ) );
+ dat_ga_flq_malloced = lcp; /* Will leak if we are called more than once */
 (void) memset( (void *) lcp, 0,
                (size_t) ( DAT_K_CLUSTER * sizeof( struct LCP ) ) );
 
@@ -137,18 +138,14 @@ dau_free_flq( void ) {
   /*
    * Free memory associated with the Free Locator Queue.
    * Should only be called from hdsStop during shutdown.
+   * Relies on a global variable since the dat_ga_flq linked list
+   * may have been reorganized such that it no longer includes an
+   * element at the start of the malloced memory.
    */
-  struct LCP *lcp;
 
   /* Nothing to free */
-  if ( dat_ga_flq == NULL ) return DAT__OK;
-
-  /* Work backwards through the queue until we get to the start */
-  lcp = dat_ga_flq;
-  while (lcp->blink != NULL && lcp->blink < lcp ) {
-    lcp = lcp->blink;
-  }
+  if ( dat_ga_flq_malloced == NULL ) return DAT__OK;
   _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
-			 (void **)&lcp ));
+			 (void **)&dat_ga_flq_malloced ));
   return hds_gl_status;
 }

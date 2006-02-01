@@ -41,3 +41,8 @@
        struct BCP *rec_ga_wpl;   /* Working Page List                       */
        struct FCV *rec_ga_fcv = NULL; /* File control vector                */
        struct WLD *rec_gl_wldque = NULL; /* Wild card search context queue  */
+
+       /* Memory malloced for start of Free Page List */
+       struct BCP *rec_ga_fpl_malloced = NULL;
+       /* Memory malloced for start of free locator queue */
+       struct LCP *dat_ga_flq_malloced = NULL;

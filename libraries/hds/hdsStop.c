@@ -103,8 +103,8 @@ hdsStop( int *status)
       }
 
 /* Free memory associated with Locator Control Queue                        */
-/*      dau_free_flq( );
- */
+      dau_free_flq( );
+
 /* Close down the rec_ facility.                                            */
       rec_stop( );
 
