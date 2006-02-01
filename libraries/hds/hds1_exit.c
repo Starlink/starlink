@@ -38,9 +38,27 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -48,6 +66,8 @@
 /*       Original version.                                                  */
 /*    25-SEP-1992 (RFWS):                                                   */
 /*       Revised method of traversing working locator queue.                */
+/*    01-FEB-2006 (TIMJ):                                                   */
+/*       Call hdsStop rather than duplicating code                          */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -57,38 +77,12 @@
 
 /* Local Variables:                                                         */
       struct LCP *lcp;           /* Pointer to Locator Control Packet       */
+      int status = DAT__OK;      /* Local status for hdsStop                */
 
 /*.                                                                         */
 
-/* Initialise the global status.                                            */
-      hds_gl_status = DAT__OK;
-
-/* Check that HDS is active. There is nothing to do if it is not.           */
-      if ( hds_gl_active )
-      {
-
-/* Defuse all the Locator Control Packets.                                  */
-         while ( dat_ga_wlq != NULL )
-         {
-            lcp = dat_ga_wlq;
-            dau_defuse_lcp( &lcp );
-         }
-
-/* Close down the rec_ facility.                                            */
-         rec_stop( );
-
-/* Note that HDS is no longer active.                                       */
-         hds_gl_active = 0;
-
-/* If an error occurred, then report contextual information.                */
-         if ( !_ok( hds_gl_status ) )
-         {
-            ems_rep_c( "HDS1_EXIT_ERR",
-                       "HDS1_EXIT: Error deactivating the Hierarchical Data \
-System (HDS).",
-            &hds_gl_status );
-         }
-      }
+/* Close down everything                                                    */
+      hdsStop( &status );
 
 /* Exit the routine.                                                        */
       return;
