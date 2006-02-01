@@ -131,3 +131,24 @@ for (i=1; i<=DAT_K_CLUSTER; i++)
         }
 return hds_gl_status;
 }
+
+int
+dau_free_flq( void ) {
+  /*
+   * Free memory associated with the Free Locator Queue.
+   * Should only be called from hdsStop during shutdown.
+   */
+  struct LCP *lcp;
+
+  /* Nothing to free */
+  if ( dat_ga_flq == NULL ) return DAT__OK;
+
+  /* Work backwards through the queue until we get to the start */
+  lcp = dat_ga_flq;
+  while (lcp->blink != NULL && lcp->blink < lcp ) {
+    lcp = lcp->blink;
+  }
+  _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
+			 (void **)&lcp ));
+  return hds_gl_status;
+}

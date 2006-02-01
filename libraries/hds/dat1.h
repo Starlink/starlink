@@ -331,6 +331,7 @@ if (!_ok(*status))\
                            struct HAN *des, unsigned char *des_crv );
       int dau_defuse_lcp( struct LCP **pntr );
       int dau_export_loc( struct DSC *locator, struct LCP **pntr );
+      int dau_free_flq( void );
       int dau_flush_data( struct LCP_DATA *data );
       int dau_gather_data( int bad, struct LCP_DATA *data, int *nbad );
       int dau_get_shape( struct LCP_DATA *data, int *naxes, HDS_PTYPE *axis );
