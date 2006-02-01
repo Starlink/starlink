@@ -4,8 +4,8 @@
 #     CCDSaveImportTable 
 
 #  Purpose:
-#     Saves an import table described in two listboxes
-#     (CCDCreateImportTable). 
+#     Saves an import table described in two listboxes managed by the
+#     CCDCreateImportTable interface. 
 
 #  Type of Module:
 #     Tcl/Tk procedure
@@ -65,16 +65,16 @@
          puts $fileid "#"
 
 #  Now add the contents, first any values from the fitsbox.
-         set entries [ $fitsbox size]
+         set entries [$fitsbox size]
          for { set i 0 } { $i < $entries } { incr i } {
-            set newline [ $fitsbox get $i ]
+            set newline [$fitsbox get $i]
             puts $fileid "$newline"
          }
 
 #  Values from the extenbox.
-         set entries [ $extenbox size]
+         set entries [$extenbox size]
          for { set i 0 } { $i < $entries } { incr i } {
-            set newline [ $extenbox get $i ]
+            set newline [$extenbox get $i]
             puts $fileid "$newline"
          }
 

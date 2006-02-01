@@ -56,6 +56,8 @@ proc CCDSetGenGlobals { Topwin args } {
 #        Upgraded for Tcl8.
 #     22-JUN-2001 (MBT):
 #        Added USESET parameter.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -98,63 +100,63 @@ proc CCDSetGenGlobals { Topwin args } {
 
 #  Top-level widget.
    CCDCcdWidget Top top \
-      Ccd_toplevel $Topwin -title "General reduction parameters"
+      Ccd::toplevel $Topwin -title "General reduction parameters"
 
 #  Menubar.
-   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+   CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Frame for containing all entries.
    CCDTkWidget Frame frame frame $top.center
 
 #  Radioarray for KEEPLOG value.
    CCDCcdWidget Keeplog keeplog \
-      Ccd_radioarray $Frame.keeplog \
+      Ccd::radioarray $Frame.keeplog \
                    -label "Keep application log:" \
                    -variable CCDglobalpars(LOGTO)
 
 #  Labelled entry for LOGFILE value.
    CCDCcdWidget Logfile logfile \
-      Ccd_labent $Frame.logfile \
+      Ccd::labent $Frame.logfile \
                    -text "Name of logfile:" \
                    -textvariable CCDglobalpars(LOGFILE)
 
 #  Radioarray for USESET value.
    CCDCcdWidget Useset useset \
-      Ccd_radioarray $Frame.useset \
+      Ccd::radioarray $Frame.useset \
                  -label "Images are grouped into Sets:" \
                  -variable CCDglobalpars(USESET) \
                  -standard 1 -adampars 1
 
 #  Radioarray for SATURATE value.
    CCDCcdWidget Satur satur \
-      Ccd_radioarray $Frame.saturate \
+      Ccd::radioarray $Frame.saturate \
                  -label "Look for saturated pixels:" \
                  -variable CCDglobalpars(SATURATE) \
                  -standard 1 -adampars 1
 
 #  Radioarray for SETSAT value.
    CCDCcdWidget Setset setsat \
-      Ccd_radioarray $Frame.setsat\
+      Ccd::radioarray $Frame.setsat\
                   -label "Flag saturated pixels using BAD value:" \
                   -variable CCDglobalpars(SETSAT) \
                   -standard 1 -adampars 1
 
 #  Radioarray for GENVAR value.
    CCDCcdWidget Genvar genvar \
-      Ccd_radioarray $Frame.genvar \
+      Ccd::radioarray $Frame.genvar \
                   -label "Generate data errors:" \
                   -variable CCDglobalpars(GENVAR) \
                   -standard 1 -adampars 1
 
 #  Radioarray for PRESERVE value.
    CCDCcdWidget Preserve preserve \
-      Ccd_radioarray $Frame.preserve \
+      Ccd::radioarray $Frame.preserve \
                     -label "Preserve data types:" \
                     -variable CCDglobalpars(PRESERVE) \
                     -standard 1 -adampars 1
 
 #  Add choice bar for getting out etc.
-   CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+   CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 0
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Widget configuration.

@@ -40,10 +40,13 @@
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     PDRAPER: Peter W. Draper (STARLINK)
 
 #  History:
 #     14-JUN-2001 (MBT):
 #        Original version.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 
 #-
 
@@ -66,11 +69,11 @@
 #  Widget creation.
 #------------------------------------------------------------------------------
 #  Create top-level object.
-      CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Group NDFs by Set"
+      CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Group NDFs by Set"
       wm withdraw $top
 
 #  Add a standard menu bar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menu
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menu
 
 #  Create frame for central part.
       CCDTkWidget Centre centre frame $top.centre
@@ -80,23 +83,23 @@
 
 #  Create listbox for unSetted NDFs.
       CCDCcdWidget Unsetbox unsetbox \
-         Ccd_scrollbox $Fileboxes.unset -label "All NDFs" -singleselect 0
+         Ccd::scrollbox $Fileboxes.unset -label "All NDFs" -singleselect 0
 
 #  Create frame for Setted NDFs.
       CCDCcdWidget Setbox setbox \
-         Ccd_scrollbox $Fileboxes.set -label "NDFs in Sets" -singleselect 0
+         Ccd::scrollbox $Fileboxes.set -label "NDFs in Sets" -singleselect 0
 
 #  Create panel for buttons controlling manual transfer between listboxes.
       CCDCcdWidget Transfer transfer \
-         Ccd_choice $Fileboxes.transfer -standard 0 -stack vertical
+         Ccd::choice $Fileboxes.transfer -standard 0 -stack vertical
 
 #  Create panel for automatic Setting method buttons.
       CCDCcdWidget Autoset autoset \
-         Ccd_choice $Centre.autoset -standard 0 
+         Ccd::choice $Centre.autoset -standard 0 
 
 #  Create panel for widget control.
       CCDCcdWidget Control control \
-         Ccd_choice $Top.control -standard 0
+         Ccd::choice $Top.control -standard 0
 
 #------------------------------------------------------------------------------
 #  Pack widgets.

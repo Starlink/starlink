@@ -1,8 +1,6 @@
-   itcl_class Ccd_option {
-
 #+
 #  Name:
-#     Ccd_option
+#     Ccd::option
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -21,7 +19,7 @@
 
 #  Invocations:
 #
-#        Ccd_option window [-option value]...
+#        Ccd::option window [-option value]...
 #
 #     This command create an instance of an option entry widget and
 #     returns a command "window" for manipulating it via the methods
@@ -66,7 +64,7 @@
 #	 position.
 
 #  Inheritance:
-#     This class inherits Ccd_labent and its methods and configuration
+#     This class inherits Ccd::labent and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -93,12 +91,17 @@
 #        via the constrain option.
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::option {
+
+
 #  Inheritances:
-      inherit Ccd_labent
+      inherit Ccd::labent
 
 #.
 
@@ -106,7 +109,7 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Add a menubutton for displaying the options and bitmap.
          CCDTkWidget Mb mb menubutton $oldthis.mb \
@@ -118,6 +121,7 @@
          CCDTkWidget Menu menu menu $mb.m -tearoff 0
 
 #  Configuration only allows label on left.
+         eval configure $args
          configure -placelabel $placelabel
          configure -constrain $constrain
 
@@ -171,11 +175,11 @@
 #  Configuration options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Set the placement of the label using the internal method of
-#  Ccd_labent which controls this. Should always be on the left.
-      public placelabel left {
-         if $exists {
+#  Ccd::labent which controls this. Should always be on the left.
+      public variable placelabel left {
+         if { $exists } {
             set placelabel left
-            configure -Ccd_labent::placelabel $placelabel
+            configure -Ccd::labent::placelabel $placelabel
 	 }
       }
 
@@ -183,7 +187,7 @@
 #  Set the default binding for posting the menu. Note unbind B1-Leave
 #  as autoscan is started and doesn't stop for some reason (probably
 #  because the cancel scan binding is broken by binding <1> with break).
-      public constrain 0 {
+      public variable constrain 0 {
          if { $constrain } {
             bind entry <B1-Leave> {break}
             bind entry <1> "$this postmenu %X %Y;break"
@@ -198,10 +202,10 @@
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      protected Mb
-      protected mb ""
-      protected Menu
-      protected menu ""
+      protected variable Mb
+      protected variable mb ""
+      protected variable Menu
+      protected variable menu ""
 
 #  End of class defintion.
    }

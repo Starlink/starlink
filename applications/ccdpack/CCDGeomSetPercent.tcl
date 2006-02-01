@@ -30,6 +30,8 @@ proc CCDGeomSetPercent { Top args } {
 #     	 Original version.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -51,7 +53,7 @@ proc CCDGeomSetPercent { Top args } {
 #  Widget creation.
 #-----------------------------------------------------------------------------
    CCDCcdWidget Topwin topwin \
-      Ccd_toplevel $Top -title "Select display percentiles"
+      Ccd::toplevel $Top -title "Select display percentiles"
    CCDTkWidget Label label \
       label $topwin.label -text "Select display percentiles"
    CCDTkWidget Sep sep frame $topwin.sep -height 3
@@ -61,7 +63,7 @@ proc CCDGeomSetPercent { Top args } {
    CCDTkWidget High high \
       scale $topwin.high -from 0 -to 100 -label Upper -showvalue 1 \
              -variable PERCENTILES(high) -orient hori -resolution 0.25
-   CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
+   CCDCcdWidget Choice choice Ccd::choice $Topwin.choice
 	      
 #-----------------------------------------------------------------------------
 #  Extra configuration.

@@ -12,7 +12,7 @@
 #  Description:
 #     This function creates a Tk widget and sets variables giving the
 #     pathname of the window and the command name of the widget.  The 
-#     purpose of this is so that widgets and Ccd_* widget-type-things
+#     purpose of this is so that widgets and Ccd::* widget-type-things
 #     can be manipulated using the same form of command, without having
 #     to remember which is being manipulated.  This whole approach is
 #     messy, and forced by the necessity of converting a lot of Itcl2/Tcl7
@@ -34,10 +34,13 @@
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     PDRAPER: Peter W. Draper (STARLINK)
 
 #  History:
 #     1-APR-2000 (MBT):
 #        Original version.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 
 #-
       upvar $cmdvar cmd

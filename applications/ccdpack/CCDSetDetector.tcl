@@ -42,6 +42,8 @@
 #        Modified width of toplevel window.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -59,11 +61,11 @@
 
 #  Top-level widget.
       CCDCcdWidget Top top \
-         Ccd_toplevel $Topwin -title "Choose known detector setup"
+         Ccd::toplevel $Topwin -title "Choose known detector setup"
       wm geometry $top 50x10
 
 #  Menubar
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Descriptive label.
       CCDTkWidget Label label \
@@ -73,13 +75,13 @@
 
 #  Multitem for names and descriptions.
       CCDCcdWidget Box box \
-         Ccd_multitem $Top.box -nboxes 2 -singleselect 1 -seealltext 0
+         Ccd::multitem $Top.box -nboxes 2 -singleselect 1 -seealltext 0
 
 #  Labelled entry for name of selected file.
-      CCDCcdWidget Name name Ccd_labent $Top.labent -text {File:}
+      CCDCcdWidget Name name Ccd::labent $Top.labent -text {File:}
 
 #  Choice bar for control.
-      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 1
+      CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 1
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.

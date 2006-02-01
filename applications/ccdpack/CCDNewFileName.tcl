@@ -47,6 +47,9 @@
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Modified the arguments of CCDGetFileName.
+#     1-JAN-2006 (PDRAPER):
+#        Fixed entry widget width to 20 characters.
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -63,17 +66,18 @@
 #  Widget creation.
 #----------------------------------------------------------------------------
 #  Top-level window for form.
-      CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$title"
+      CCDCcdWidget Top top Ccd::toplevel $Topwin -title "$title"
 
 #  Menubar. This will allow selection from existing files and supply
 #  help.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Labelled entry widget for getting name of file.
-      CCDCcdWidget Name name Ccd_labent $Top.labent -text {Filename:}
+      CCDCcdWidget Name name Ccd::labent $Top.labent \
+         -text {Filename:} -width 30
 
 #  Choice bar for control.
-      CCDCcdWidget Choice choice Ccd_choice $Top.choice
+      CCDCcdWidget Choice choice Ccd::choice $Top.choice
 
 #----------------------------------------------------------------------------
 #  Widget configuration.

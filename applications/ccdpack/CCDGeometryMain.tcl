@@ -18,11 +18,10 @@
 #     wish CCDGeometryMain
 
 #  Notes:
-#     This interface requires that the extensions [incr Tcl] version
-#     1.5, BLT 1.8 and TclADAM (pre-release) are available (built into
-#     the wish executable that invokes this file) as well as Tcl7.4p2
-#     and Tk4.0p2. It is not known to work with any other combinations
-#     and will not work with earlier versions of Tcl and Tk.
+
+#     This interface requires that the extensions [incr Tcl], BLT
+#     and TclADAM are available (built into the wish executable that invokes
+#     this file) as well as Tcl and Tk.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -36,6 +35,9 @@
 #        Fixed to use globals keyed by Set Index if required.
 #     22-JUL-2003 (MBT):
 #        Added option to use Mozilla.
+#     1-JAN-2006 (PDRAPER):
+#        Fixed problems with default file filters being shown as blank.
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -83,7 +85,7 @@
       set CCDbrowser $env(HTX_BROWSER)
    } else {
       set CCDbrowser {}
-      foreach browser {netscape Netscape Mosaic mosaic mozilla Mozilla} {
+      foreach browser {netscape Netscape mozilla Mozilla firefox Firefox} {
          foreach directory [split $env(PATH) ":" ] {
             if { [ file executable ${directory}/${browser} ] } {
                set CCDbrowser $browser
@@ -107,8 +109,9 @@
 #  used as part of the file filtering mechanisms (note this isn't 
 #  therefore set by any values in .ccdpack, it's important that
 #  the conversion filters are actually setup).
-   set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
+   set CCDimagefilters "*.sdf"
    if { [info exists env(NDF_FORMATS_IN)] } { 
+      set CCDimagefilters {{NDF(.sdf) *.sdf}}
       set new_types [split $env(NDF_FORMATS_IN) ","]
       foreach pair $new_types { 
          regexp {([^\(]*).([^\)]*)} $pair dummy name type
@@ -124,6 +127,8 @@
    global GWMDEVICE
    set GWMDEVICE "CCDgeometry"
 
+#  No set prefixes.
+   set CCDgloprefix {}
 
 #------------------------------------------------------------------------------
 

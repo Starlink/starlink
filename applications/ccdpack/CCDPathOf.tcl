@@ -11,13 +11,13 @@
 
 #  Description:
 #     Given a command name which may refer either to a genuine Tk widget
-#     or a Ccd_* widget-like thing, this command returns the pathname
+#     or a Ccd::* widget-like thing, this command returns the pathname
 #     of the corresponding window.  This may or may not be the same as
 #     the command name.  See also CCDTkWidget and CCDCcdWidget.
 
 #  Arguments:
 #     cmd = string
-#        The command name of a Tk widget or Ccd_* widget-like thing.
+#        The command name of a Tk widget or Ccd::* widget-like thing.
 
 #  Return Value:
 #     The pathname of the window corresponding to the command.

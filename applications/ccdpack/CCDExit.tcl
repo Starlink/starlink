@@ -34,6 +34,8 @@ proc CCDExit {} {
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Extracted window centring to external routine CCDCentreWindow.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -47,7 +49,7 @@ proc CCDExit {} {
    if { [winfo exists $main] } { 
 
 #  Widget creation.
-      CCDCcdWidget Top top Ccd_toplevel .exit -title "Exit from $MAIN(name)"
+      CCDCcdWidget Top top Ccd::toplevel .exit -title "Exit from $MAIN(name)"
       CCDTkWidget Line1 line1 frame $top.f1 -height 3
       CCDTkWidget Message message \
          label $top.message \
@@ -55,7 +57,7 @@ proc CCDExit {} {
                       -borderwidth 3 -padx 10 -pady 10
       CCDTkWidget Bitmap bitmap label $top.bitmap -bitmap questhead
       CCDTkWidget Line2 line2 frame $top.f2 -height 3
-      CCDCcdWidget Choice choice Ccd_choice $Top.button -standard 0
+      CCDCcdWidget Choice choice Ccd::choice $Top.button -standard 0
                
 #  Configure widgets.
       $Choice addbutton Yes "$Top kill $Top;$Main kill $Main; destroy ."

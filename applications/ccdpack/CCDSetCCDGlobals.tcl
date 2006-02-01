@@ -68,6 +68,8 @@
 #        Upgraded for Tcl8.
 #     22-JUN-2001 (MBT):
 #        Upgraded for Sets.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -104,10 +106,10 @@
 
 #  Top-level widget.
       CCDCcdWidget Top top \
-         Ccd_toplevel $Topwin -title "CCD characteristic parameters"
+         Ccd::toplevel $Topwin -title "CCD characteristic parameters"
 
 #  Menubar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Frame for containing the parameter regions.
       CCDTkWidget Frame frame frame $top.center
@@ -117,7 +119,7 @@
 #  create a dummy frame here which will have no effect.
       if { $useset } {
          CCDCcdWidget Setswitch setswitch \
-            Ccd_reveal $Frame.switch \
+            Ccd::reveal $Frame.switch \
                        -placebar top -stack array -columns 4 -in $Frame.switch
          set setindices $CCDsetindices
       } else {
@@ -145,62 +147,62 @@
 
 #  Labelled entry for EXTENT value.
          CCDCcdWidget Extent($sindex) extent($sindex) \
-            Ccd_labent $Panel($sindex).extent$sindex \
+            Ccd::labent $Panel($sindex).extent$sindex \
                      -text "Extent of useful detector area:" \
                      -textvariable CCDglobalpars(${prefix}EXTENT)
 
 #  Radioarray for DIRECTION value.
          CCDCcdWidget Direct($sindex) direct($sindex) \
-            Ccd_radioarray $Panel($sindex).direction$sindex \
+            Ccd::radioarray $Panel($sindex).direction$sindex \
                      -label "Readout direction:" \
                      -variable CCDglobalpars(${prefix}DIRECTION)
 
 #  Labelled entry for BOUNDS value.
          CCDCcdWidget Bounds($sindex) bounds($sindex) \
-            Ccd_labent $Panel($sindex).bounds$sindex \
+            Ccd::labent $Panel($sindex).bounds$sindex \
                         -text "Bounds of bias strips (1 or 2 pairs):" \
                         -textvariable CCDglobalpars(${prefix}BOUNDS)
 
 #  Labelled entry for ADC value.
          CCDCcdWidget Adc($sindex) adc($sindex) \
-            Ccd_labent $Panel($sindex).adc$sindex \
+            Ccd::labent $Panel($sindex).adc$sindex \
                      -text "Analogue-to-digital conversion factor:" \
                      -textvariable CCDglobalpars(${prefix}ADC)
 
 #  Labelled entry for RNOISE value.
          CCDCcdWidget Rnoise($sindex) rnoise($sindex) \
-            Ccd_labent $Panel($sindex).rnoise$sindex \
+            Ccd::labent $Panel($sindex).rnoise$sindex \
                         -text "Readout noise (ADUs):" \
                         -textvariable CCDglobalpars(${prefix}RNOISE)
 
 #  Labelled entry for MASK value.
          CCDCcdWidget Mask($sindex) mask($sindex) \
-            Ccd_labent $Panel($sindex).mask$sindex \
+            Ccd::labent $Panel($sindex).mask$sindex \
                       -text "Defect mask:" \
                       -textvariable CCDglobalpars(${prefix}MASK)
 
 #  Labelled entry for DEFERRED value.
          CCDCcdWidget Deferred($sindex) deferred($sindex) \
-            Ccd_labent $Panel($sindex).deferred$sindex \
+            Ccd::labent $Panel($sindex).deferred$sindex \
                           -text "Deferred charge (usually zero):" \
                           -textvariable CCDglobalpars(${prefix}DEFERRED)
 
 #  Labelled entry for SATURATION value.
          CCDCcdWidget Satur($sindex) satur($sindex) \
-            Ccd_labent $Panel($sindex).saturation$sindex \
+            Ccd::labent $Panel($sindex).saturation$sindex \
                        -text "Saturated pixel value (ADUs):" \
                        -textvariable CCDglobalpars(${prefix}SATURATION)
 
 #  Labelled entry for bias level.
          CCDCcdWidget Zero($sindex) zero($sindex) \
-            Ccd_labent $Panel($sindex).bias$sindex \
+            Ccd::labent $Panel($sindex).bias$sindex \
                       -text "Bias level (ADUs):" \
                       -textvariable CCDglobalpars(${prefix}ZERO)
       }
 
 #  Choice bar for OK etc.
       CCDCcdWidget Choice choice \
-         Ccd_choice $Top.choice \
+         Ccd::choice $Top.choice \
                     -standard 0
 
 #------------------------------------------------------------------------------

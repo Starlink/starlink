@@ -26,7 +26,7 @@ proc CCDGeomDrawCommand { Top Canvas } {
 #       Name of the current top-level widget. This will be held
 #       when drawing is taking place.
 #     Canvas = window (read)
-#       Name of the Ccd_gwm canvas in use.
+#       Name of the Ccd::gwm canvas in use.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -43,6 +43,8 @@ proc CCDGeomDrawCommand { Top Canvas } {
 #        KAPPA drawing axes.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-

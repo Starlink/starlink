@@ -1,8 +1,6 @@
-   itcl_class Ccd_toplevel {
-
 #+
 #  Name:
-#     Ccd_toplevel
+#     Ccd::toplevel
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -24,7 +22,7 @@
 
 #  Invocations:
 #
-#        Ccd_toplevel window [-option value]...
+#        Ccd::toplevel window [-option value]...
 #
 #     This command create an instance of a Ccd-toplevel object and
 #     returns a command "window" for manipulating it via the methods
@@ -64,7 +62,7 @@
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "Ccd_toplevel" widget with a default configuration,
+#	 creates the "Ccd::toplevel" widget with a default configuration,
 #	 except when overridden by command line options.
 #     destructor
 #        Destroys the "class" instance, invoked by the "delete" method.
@@ -92,7 +90,7 @@
 #        label an xlabel within it (without the xref_ part).
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -118,12 +116,16 @@
 #        managers performance.
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PWD):
+#        Updated for itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::toplevel {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit ::Ccd::base
 
 #.
 
@@ -131,7 +133,7 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Make a suggestion to the window manager about the positioning of
 #  this window. Use a cascade approach, that slightly offsets to the
@@ -154,6 +156,7 @@
          if { $opt != {} } { set CCDbitmap $opt }
 
 #  Set default configurations.
+         eval configure $args
          configure -CCDbitmap          $CCDbitmap
          configure -title              $title
          configure -width              $width
@@ -183,7 +186,7 @@
 
 #  Release any widgets made busy by this.
          busy forget 0
-         if $exists {
+         if { $exists } {
             set parent [winfo parent $oldthis]
             incr xinc($parent) -25
             incr yinc($parent) -25
@@ -199,14 +202,14 @@
                   set twidgets($i) ""
                   if { $i != [expr $tcount -1] } {
                      set newcount 0
-                     for { set j 0 } { $j < $tcount } { incr j } { 
-                        if { $twidgets($j) != "" } { 
+                     for { set j 0 } { $j < $tcount } { incr j } {
+                        if { $twidgets($j) != "" } {
                            incr newcount
                            set twidgets($newcount) $twidgets($j)
-                        } 
+                        }
                      }
                      set tcount $newcount
-                  } else { 
+                  } else {
                      incr tcount -1
                   }
                }
@@ -215,7 +218,7 @@
             set tcount 0
          }
       }
-      
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Methods.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -223,7 +226,7 @@
 #  Method to set all toplevel widgets busy, except possibly the current one.
 #  Windows which are already busy are not modified, unless the request
 #  is from the window that made the window busy.
-      method busy { option self } {
+      public method busy { option self } {
          if { ! $self } {
             set also $oldthis
 	 } else {
@@ -269,9 +272,9 @@
       }
 
 #  Set the default help for the window.
-      method sethelp { docname label } {
+      public method sethelp { docname label } {
          if $exists {
-            Ccd_base::sethelp $Oldthis $docname $label
+            Ccd::base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -280,8 +283,8 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Set the bitmap.
 
-      public CCDbitmap ccdbitmap {
-         if $exists {
+      public variable CCDbitmap ccdbitmap {
+         if { $exists } {
             if { $CCDbitmap == "ccdbitmap" } {
 
 #  Standard bitma, so use standard routine.
@@ -295,23 +298,23 @@
       }
 
 #  Set the title in top-level title bar.
-      public title {} {
-         if $exists {
+      public variable title {} {
+         if { $exists } {
             wm title $oldthis "$title"
          }
       }
 
-      public width {} {
+      public variable width {} {
          if { $width != "" } {
-            if $exists {
+            if { $exists } {
                $Oldthis configure -width $width
             }
          }
       }
 
-      public height {} {
+      public variable height {} {
          if { $height != "" } {
-            if $exists {
+            if { $exists } {
                $Oldthis configure -height $height
             }
          }
@@ -319,7 +322,7 @@
 
 #  If the window is "stacked" then it is a transient of its parent.
 #  Do not make the main window (.topwin) a transient.
-      public stacked 1 { 
+      public variable stacked 1 {
          if { $exists && $stacked } {
             if { $Oldthis != ".topwin" } {
                wm transient $oldthis [winfo parent $oldthis]

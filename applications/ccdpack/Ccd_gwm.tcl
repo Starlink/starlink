@@ -1,8 +1,6 @@
-   itcl_class Ccd_gwm {
-
 #+
 #  Name:
-#     Ccd_gwm
+#     Ccd::gwm
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -21,7 +19,7 @@
 
 #  Invocations:
 #
-#        Ccd_gwm window [-option value]...
+#        Ccd::gwm window [-option value]...
 #
 #     This command create an instance of a "scrollable gwm widget" and
 #     returns a command "window" for manipulating it via the methods and
@@ -110,7 +108,7 @@
 #        description
 
 #  Inheritance:
-#     This class inherits "Ccd_base" and its methods and configuration
+#     This class inherits "Ccd::base" and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -123,12 +121,16 @@
 #     	 Original version.
 #     12-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::gwm {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -136,12 +138,12 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
+
+         eval configure $args
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Create the canvas widget to hold the gwm widget.
          CCDTkWidget Canvas canvas \
             canvas $oldthis.canvas -takefocus true -borderwidth 0
@@ -153,9 +155,9 @@
                          -colours $colours -mincolours $mincolours}] } {
 
 #  Failed to create Gwm widget.
-	       destroy $canvas
-               $this delete
-	       return
+            destroy $canvas
+            $this delete
+            return
          }
 
 #  Default height and width of the canvas are the same as the gwm widget.
@@ -163,7 +165,9 @@
          configure -height $height
 
 #  Configure scrollbars.
-         configure -scrollbarplaces $scrollbarplaces
+         if { [lsearch $args {-scrollbarplaces}] == -1 } {
+            configure -scrollbarplaces $scrollbarplaces
+         }
          _scrollregion {}
 
 #  Add bindings to control scroll & drag.
@@ -176,7 +180,6 @@
 
 #  Binding to catch and update from reconfiguration.
          ::bind $canvas <Configure> "$Oldthis _reconfigure %w %h"
-
       }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -185,7 +188,7 @@
 
 #  Access to canvas methods.
       method do { args } {
-         if $exists {
+         if { $exists } {
             eval $Canvas $args
          }
       }
@@ -206,8 +209,8 @@
 
 #  Set the help to show for the whole canvas.
       method sethelp { docname label } { 
-         if $exists {
-            Ccd_base::sethelp $Oldthis $docname $label
+         if { $exists } {
+            Ccd::base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -216,7 +219,7 @@
 #  them to the used region so that all is displayed. Note scrollregion
 #  is the actual size of the canvas.
       method _scrollregion {bounds} {
-         if $exists {
+         if { $exists } {
             if { $bounds == "" } {
                update idletasks
                set bounds [eval $Canvas bbox $tags]
@@ -298,26 +301,26 @@
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Name of gwm widget (xwindows, xwindows2 etc.)
-      public gwmname xwindows {
+      public variable gwmname xwindows {
       }
 
 #  Control whether redraw command is attempted.
-      public redraw 0 {}
+      public variable redraw 0 {}
 
 #  Set the draw command.
-      public drawcommand "" {}
+      public variable drawcommand "" {}
 
 #  Size of the scrollregion. Note this does not change the size of the Gwm
 #  widget and is really just a way of getting at the true size.
-      public scrollregion "" {
+      public variable scrollregion "" {
          _scrollregion $scrollregion
       }
 
 #  Width and height of the displayed part of the canvas. Note its
 #  actual size is set by the scrollregion configuration option. The default
 #  display size is the same as that of the GWM widget.
-      public width {} {
-         if $exists {
+      public variable width {} {
+         if { $exists } {
             if { $width != "" } {
                $Canvas configure -width $width
             }
@@ -327,8 +330,8 @@
             }
          }
       }
-      public height {} {
-         if $exists {
+      public variable height {} {
+         if { $exists } {
             if { $height != "" } {
                $Canvas configure -height $height
             } else {
@@ -339,10 +342,10 @@
       }
 
 #  Tags for the Gwm widget.
-      public tags Gwm {}
+      public variable tags Gwm {}
 
 #  Create the scrollbars and put into the correct position.
-      public scrollbarplaces { right bottom } {
+      public variable scrollbarplaces { right bottom } {
          foreach side $scrollbarplaces {
             if { ! [ regexp (left|right|top|bottom) $side ] } {
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
@@ -351,9 +354,10 @@
 
 #  Only proceed if the object exists (this means that constructor has
 #  been invoked).
-         if $exists {
+         if { $exists && ! $havegwm } {
+            set havegwm 1
 
-#  Unpack the canvas widet, as needs to be packed last.
+#  Unpack the canvas widget, as needs to be packed last.
             pack forget $canvas
 
 #  Delete all existing scrollbars and padding frames.
@@ -417,10 +421,10 @@
 
 
 #  Number of colours. Changing this has no effect until a resize.
-      public colours 64 { }
+      public variable colours 64 { }
       
 #  Minimum number of colours. KAPPA needs 34!
-      public mincolours 34 { }
+      public variable mincolours 34 { }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Common and protected variables.  Common are visible to all instances
@@ -429,19 +433,21 @@
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  State of the autoscan.
-   protected state
+   protected variable state
 
 #  Names of widgets.
-   protected Canvas
-   protected canvas ""
-   protected Pad
-   protected pad ""
-   protected Hscroll
-   protected hscroll ""
-   protected Vscroll
-   protected vscroll ""
-   protected Bit
-   protected bit ""
+   protected variable Canvas
+   protected variable canvas ""
+   protected variable Pad
+   protected variable pad ""
+   protected variable Hscroll
+   protected variable hscroll ""
+   protected variable Vscroll
+   protected variable vscroll ""
+   protected variable Bit
+   protected variable bit ""
+
+   protected variable havegwm 0
 
 #  End of class defintion.
    }

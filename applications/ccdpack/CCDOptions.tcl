@@ -13,13 +13,13 @@
 
 #  Description:
 #     This file sets up the options for controlling the default look of
-#     a CCDPACK Tcl/Tk application. This sets the colour scheme, default
+#     a CCDPACK Tcl/Tk application. This sets things like the default
 #     padding and reliefs of the various widgets. To override these
 #     values use explicit widget commands or set using X defaults or
 #     enter suitable commands in a $HOME/.ccdpack file.
 #
-#     The colour scheme is a sort-of Motif look, unless overriden by
-#     the colour_scheme preference.
+#     The colour scheme is the default widget one, but this may be changed
+#     using the CCDprefs(scheme_colour) value.
 #
 #     The priority of the options is set up userDefault, should
 #     really be startupFile to allow .Xdefaults to override, but these
@@ -47,6 +47,9 @@
 #        Removed strict Motif directive.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     31-JAN-2006 (PDRAPER):
+#        Finally removed all colour defaults. Standard set are no 
+#        longer bisque, so may as well use them.
 #     {enter_further_changes_here}
 #-
 
@@ -77,32 +80,6 @@
          }
       }
 
-#  Set the default colour schemes. This differs for colour and
-#  greyscale devices (assumes monochrome look after themselves).
-      if { [ winfo depth . ] > 7 } {
-         set CCDprefs(bg)           lightgray
-         set CCDprefs(fg)           black
-         set CCDprefs(dark_bg)      gray
-         set CCDprefs(active_bg)    $CCDprefs(dark_bg)
-         set CCDprefs(active_fg)    $CCDprefs(fg)
-         set CCDprefs(disabled_fg)  gray55
-         set CCDprefs(select_fg)    black
-         set CCDprefs(select1_bg)   lightblue2
-         set CCDprefs(select2_bg)   lightblue1
-         set CCDprefs(selector)     yellow
-      } else {
-         set CCDprefs(bg)           lightgray
-         set CCDprefs(fg)           black
-         set CCDprefs(dark_bg)      gray
-         set CCDprefs(active_bg)    gray
-         set CCDprefs(active_fg)    $CCDprefs(fg)
-         set CCDprefs(disabled_fg)  gray55
-         set CCDprefs(select_fg)    white
-         set CCDprefs(select1_bg)   black
-         set CCDprefs(select2_bg)   black
-         set CCDprefs(selector)     black
-      }
-
 #  Miscellaneous defaults.
       set CCDprefs(anchor)           c
       set CCDprefs(border)           2
@@ -117,31 +94,6 @@
 #  Are we to override the colours defaults?
       if { [info exists CCDprefs(scheme_colour)] } {
          tk_setPalette $CCDprefs(scheme_colour)
-         global tkPalette
-         set CCDprefs(dark_bg) $tkPalette(background)
-         set CCDprefs(select2_bg) $tkPalette(selectBackground)
-      } else {
-         tk_setPalette \
-            activeBackground           $CCDprefs(active_bg) \
-            activeForeground           $CCDprefs(active_fg) \
-            background                 $CCDprefs(bg) \
-            disabledForeground         $CCDprefs(disabled_fg) \
-            foreground                 $CCDprefs(fg) \
-            highlightBackground        $CCDprefs(bg) \
-            selectBackground           $CCDprefs(select1_bg) \
-            selectColor                $CCDprefs(selector) \
-            selectForeground           $CCDprefs(select_fg) \
-            troughColor                $CCDprefs(bg) \
-            Listbox.background         $CCDprefs(dark_bg) \
-            Scale.activeForeground     $CCDprefs(bg) \
-            Scale.troughColor          $CCDprefs(select2_bg) \
-            Scrollbar.activeForeground $CCDprefs(bg) \
-            Scrollbar.background       $CCDprefs(dark_bg) \
-            Scrollbar.foreground       $CCDprefs(bg) \
-            Text.background            $CCDprefs(dark_bg) \
-            highlightColor             $CCDprefs(fg) \
-            Entry.insertBackground     black \
-            Entry.foreground           black 
       }
 
 #  Set default fonts using the point size.
@@ -204,8 +156,8 @@
       option add *Listbox.selectBorderWidth  $CCDprefs(border)           $prior
       option add *Listbox.takeFocus     {}                               $prior
 
-#  Ccd_tables:
-      option add *Ccd_table.relief      sunken                           $prior
+#  Ccd::tables:
+      option add *Ccd*table.relief      sunken                           $prior
 
 #  Menus:
       option add *Menu*font             $CCDprefs(menu_font)             $prior

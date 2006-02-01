@@ -33,6 +33,8 @@ proc CCDGetColour { Topwin element } {
 #     	 Original version.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -42,10 +44,13 @@ proc CCDGetColour { Topwin element } {
    global RGB
 
 #.
+   set known_databases "/usr/lib/X11/rgb.txt /usr/openwin/lib/X11/rgb.txt \
+/usr/X11R6/lib/X11/rgb.txt"
+
 
 #  Get a known rgb file.
    set rgbfile ""
-   foreach oneof {/usr/lib/X11/rgb.txt /usr/openwin/lib/X11/rgb.txt} {
+   foreach oneof $known_databases {
       if { [file readable $oneof] } {
          set rgbfile $oneof
          break
@@ -65,9 +70,9 @@ proc CCDGetColour { Topwin element } {
 #-----------------------------------------------------------------------------
 #  Widget creation.
 #-----------------------------------------------------------------------------
-   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Choose a colour"
+   CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Choose a colour"
    if { $uselist } {
-      CCDCcdWidget List list Ccd_scrollbox $Top.list -label "Colour list:"
+      CCDCcdWidget List list Ccd::scrollbox $Top.list -label "Colour list:"
    }
    CCDTkWidget Frame1 frame1 frame $top.frame1 -borderwidth 0
    CCDTkWidget Rslide rslide \
@@ -79,7 +84,7 @@ proc CCDGetColour { Topwin element } {
    CCDTkWidget Bslide bslide \
       scale $frame1.blue -label "Blue" -showvalue 0 \
                   -to 65535 -orient horizontal -variable RGB(blue)
-   CCDCcdWidget Choice choice Ccd_choice $Top.choice
+   CCDCcdWidget Choice choice Ccd::choice $Top.choice
    CCDTkWidget Frame2 frame $top.frame2 -borderwidth 0
    CCDTkWidget Thislabel thislabel \
       label $frame2.label -text "Colour:              "

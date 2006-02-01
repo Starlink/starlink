@@ -1,8 +1,6 @@
-   itcl_class Ccd_table {
-
 #+
 #  Name:
-#     Ccd_table
+#     Ccd::table
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -25,7 +23,7 @@
 
 #  Invocations:
 #
-#        Ccd_table window [-option value]...
+#        Ccd::table window [-option value]...
 #
 #     This command creates an instance of a "table" and returns a
 #     command "window" for manipulating it via the methods and
@@ -92,10 +90,10 @@
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#        creates the "Ccd_table" widget with a default configuration,
+#        creates the "Ccd::table" widget with a default configuration,
 #        except when overridden by command line options.
 #     destructor
-#        Destroys the "Ccd_table" instance, invoked by the "delete" method.
+#        Destroys the "Ccd::table" instance, invoked by the "delete" method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
 #        is given then the current value of any known option is returned
@@ -209,7 +207,7 @@
 #    This probably isn't the best implementation for very large tables.
 
 #  Inheritance:
-#     This class inherits "Ccd_base" and its methods and configuration
+#     This class inherits "Ccd::base" and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -222,12 +220,16 @@
 #        Original version.
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::table {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -235,12 +237,10 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Create the canvas widget to hold the frames. Stop it from taking
 #  the focus and confine the scrollable region.
          CCDTkWidget Canvas canvas \
@@ -259,15 +259,9 @@
          destroy $oldthis.e
          destroy $oldthis.f
 
-#  Set the selection/unselected colours. Use global array rather than
-#  query options database as want this to look a bit like a listbox,
-#  not a table.
-         global CCDprefs
-         set notselect $CCDprefs(dark_bg)
-         set select $CCDprefs(select2_bg)
-
 #  Set default configurations. Note scrollbars etc. created as part of
 #  scrollbar placement. Rows as part of column creation.
+         eval configure $args
          configure -scrollbarplaces $scrollbarplaces
          configure -columns         $columns
 
@@ -643,7 +637,7 @@
 #  Set the context help for this widget (as a whole).
       method sethelp { docname label } { 
          if $exists { 
-            Ccd_base::sethelp $Oldthis $docname $label
+            Ccd::base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -914,8 +908,8 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Number of rows of table that actually exist.
-      public rows 0 {
-         if $exists {
+      public variable rows 0 {
+         if { $exists } {
             for { set j 0 } { $j < $columns } { incr j } {
                if { $havrows($j) < $rows } {
                   for { set i $havrows($j) } { $i < $rows } { incr i } {
@@ -964,11 +958,11 @@
       }
 
 #  If any of the entries have been modified (i.e. keypress of unknown nature).
-      public modified 0 {}
+      public variable modified 0 {}
 
 #  Number of columns that exist in widget.
-      public columns 1 {
-         if $exists {
+      public variable columns 1 {
+         if { $exists } {
             if { $havcols < $columns } {
 
 #  Need more columns, so create the frame/label pairs. Once created
@@ -1013,15 +1007,15 @@
 
 #  Width and height of the displayed part of the canvas. Note its
 #  actual size is set by the scrollregion configuration option.
-      public width {} {
-         if $exists {
+      public variable width {} {
+         if { $exists } {
             if { $width != "" } {
                $Canvas configure -width $width
             }
          }
       }
-      public height {} {
-         if $exists {
+      public variable height {} {
+         if { $exists } {
             if { $height != "" } {
                $Canvas configure -height $height
             }
@@ -1029,10 +1023,10 @@
       }
 
 #  Selection method available.
-      public singleselect 1 {}
+      public variable singleselect 1 {}
 
 #  Create the scrollbars and put into the correct position.
-      public scrollbarplaces { right bottom } {
+      public variable scrollbarplaces { right bottom } {
          foreach side $scrollbarplaces {
             if { ! [ regexp (left|right|top|bottom) $side ] } {
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
@@ -1041,7 +1035,7 @@
 
 #  Only proceed if the object exists (this means that constructor has
 #  been invoked).
-         if $exists {
+         if { $exists } {
 
 
 #  Unpack the canvas widet, as needs to be packed last.
@@ -1111,13 +1105,13 @@
       }
 
 #  Pad value, not set unless asked for.
-      public padvalue {} {
+      public variable padvalue {} {
          set pvalue $padvalue
       }
 
 #  Whether any text is flushed right (so that the end of the insertion can 
 #  be viewed or not).
-      public flushright 1 {}
+      public variable flushright 1 {}
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Common and protected variables.  Common are visible to all instances
@@ -1125,53 +1119,53 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Names of widgets.
-      protected Canvas
-      protected canvas ""
-      protected Frames
-      protected Framelabels
-      protected Entries
-      protected Hscroll
-      protected hscroll ""
-      protected Vscroll
-      protected vscroll ""
-      protected Bit
-      protected bit ""
-      protected Pad
-      protected pad ""
+      protected variable Canvas
+      protected variable canvas ""
+      protected variable Frames
+      protected variable Framelabels
+      protected variable Entries
+      protected variable Hscroll
+      protected variable hscroll ""
+      protected variable Vscroll
+      protected variable vscroll ""
+      protected variable Bit
+      protected variable bit ""
+      protected variable Pad
+      protected variable pad ""
 
 #  Number of rows and columns already created. Notes havrows is an
 #  array index by column number as the creation of rows and columns
 #  happen in separate parts (so a column can be created and is later
 #  filled with rows, possibly at different times to the other columns
 #  and rows).
-      protected havrows
-      protected havcols 0
+      protected variable havrows
+      protected variable havcols 0
 
 #  Width of column (pixels).
-      protected xoff 0
-      protected columnwidth 0
-      protected mincolumnwidth 5
+      protected variable xoff 0
+      protected variable columnwidth 0
+      protected variable mincolumnwidth 5
 
 #  Name of any canvas tags.
-      protected tags ""
+      protected variable tags ""
 
 #  Background colour for deselected cells.
-      protected notselect lightgrey
+      protected variable notselect lightgrey
 
 #  Background colour for selected cells.
-      protected select lightblue2
+      protected variable select lightblue2
 
 #  Selection control
-      protected state
-      protected anchor 0
-      protected active 0
+      protected variable state
+      protected variable anchor 0
+      protected variable active 0
 
 #  Height of an entry widget.
-      protected eheight
+      protected variable eheight
 
 #  Pad value for inserting into row or column when not enough values
 #  are given.
-      protected pvalue
+      protected variable pvalue
 
 #  End of class defintion.
    }

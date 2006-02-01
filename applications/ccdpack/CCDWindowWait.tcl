@@ -35,6 +35,8 @@
 #        defining own.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed for itcl3.3.
 #     {enter_changes_here}
 
 #-
@@ -49,7 +51,7 @@
 
 #  Make all other windows use the "busy" cursor if using mega-widgets.
 #  These are released automatically when $w is destroyed.
-      if { [ winfo class $w ] == "Ccd_toplevel" } { 
+      if { [catch { $W isa Ccd::toplevel }] == 0 } {
          $W busy hold 0
       }
 

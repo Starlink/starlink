@@ -1,8 +1,6 @@
-   itcl_class Ccd_reveal {
-
 #+
 #  Name:
-#     Ccd_reveal
+#     Ccd::reveal
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -46,9 +44,9 @@
 
 #  Invocations:
 #
-#        Ccd_reveal window [-option value]...
+#        Ccd::reveal window [-option value]...
 #
-#     This command creates an instance of a "Ccd_reveal" and returns a
+#     This command creates an instance of a "Ccd::reveal" and returns a
 #     command "window" for manipulating it via the methods and
 #     configuration options described below. Configuration options may
 #     be appended to the command.
@@ -72,7 +70,7 @@
 #
 #        -stack (horizontal|vertical|array)
 #
-#     Controls how the array of buttons are displayed (See Ccd_radioarray).
+#     Controls how the array of buttons are displayed (See Ccd::radioarray).
 #
 #         -columns columns
 #
@@ -80,7 +78,7 @@
 #
 #         -label "string"
 #
-#     String for labelling the radiobuttons (See Ccd_radioarray).
+#     String for labelling the radiobuttons (See Ccd::radioarray).
 #
 #          -in window
 #
@@ -93,10 +91,10 @@
 #  Methods:
 #     constructor [-option value]...
 #        This method is invoked automatically by the class command and
-#	 creates the "Ccd_reveal" widget with a default configuration,
+#	 creates the "Ccd::reveal" widget with a default configuration,
 #	 except when overridden by command line options.
 #     destructor
-#        Destroys the "Ccd_reveal" instance, invoked by the "delete"
+#        Destroys the "Ccd::reveal" instance, invoked by the "delete"
 #        method.
 #     configure [-option value]...
 #        Activates the configuration options. If no configuration value
@@ -117,7 +115,7 @@
 
 
 #  Inheritance:
-#     This class inherits "Ccd_base" and its methods and configuration
+#     This class inherits "Ccd::base" and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -130,12 +128,16 @@
 #     	 Original version.
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::reveal {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -143,16 +145,15 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a base frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Create the radioarray bar for the containing the buttons.
-         CCDCcdWidget Bar bar Ccd_radioarray $oldthis.bar
+         CCDCcdWidget Bar bar Ccd::radioarray $oldthis.bar
 
 #  Set default configurations.
+         eval configure $args
          configure -placebar          $placebar
          configure -columns           $columns
          configure -stack             $stack
@@ -242,8 +243,8 @@
 #  Configuration options:
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Where to place the array of radio buttons.
-      public placebar {top} {
-         if $exists {
+      public variable placebar {top} {
+         if { $exists } {
             if { $Packed != "" } {
                set Window $Packed
                set Packed ""
@@ -262,28 +263,28 @@
       }
 
 #  Label for the radiobuttons.
-      public label {} {
-         if $exists {
+      public variable label {} {
+         if { $exists } {
             $Bar configure -label $label
          }
       }
 
 #  Stack method for the radiobuttons.
-      public stack {array} {
-         if $exists {
+      public variable stack {array} {
+         if { $exists } {
             $Bar configure -stack $stack
          }
       }
 
 #  Number of columns used when stacking in an array.
-      public columns 5 {
-         if $exists {
+      public variable columns 5 {
+         if { $exists } {
             $Bar configure -columns $columns
          }
       }
 
 #  Window to parent the windows that are controlled.
-      public in {} {
+      public variable in {} {
          if { $in == "" } {
             set in $Oldthis
          }
@@ -295,14 +296,14 @@
 #  anywhere in the scope of this class and in derived classes).
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Names of widgets.
-      protected Bar
-      protected bar ""
+      protected variable Bar
+      protected variable bar ""
 
 #  Name of currently packed window.
-      protected Packed ""
+      protected variable Packed ""
 
 #  Name of last window
-      protected Lastwin ""
+      protected variable Lastwin ""
 
 #  End of class defintion.
    }

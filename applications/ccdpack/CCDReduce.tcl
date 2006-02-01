@@ -36,6 +36,8 @@ proc CCDReduce { Topwin } {
 #        Re-coded to new style.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -93,32 +95,32 @@ proc CCDReduce { Topwin } {
 #----------------------------------------------------------------------------
 
 #  Top-level widget.
-   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Perform Reduction"
+   CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Perform Reduction"
 
 #  Menubar.
-   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar 
+   CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar 
 
 #  Radioarray for getting the debiassing type.
    CCDCcdWidget Debiastype debiastype \
-      Ccd_radioarray $Top.debiastype \
+      Ccd::radioarray $Top.debiastype \
                       -label "Debias using:" \
                       -variable CCDglobalpars(DEBIASTYPE)
 
 #  Radioarray for the interpolation method. Only used if the
 #  debiassing type is "interpolation".
    CCDCcdWidget Interp interp \
-      Ccd_radioarray $Top.interp \
+      Ccd::radioarray $Top.interp \
                   -label "Interpolation method:" \
                   -variable CCDglobalpars(INTERPTYPE)
    
 #  Radioarray for deciding the type of disk space savings we want.
    CCDCcdWidget Spacesave spacesave \
-      Ccd_radioarray $Top.spacesave \
+      Ccd::radioarray $Top.spacesave \
                      -label "Save how much disk space:" \
                      -variable CCDglobalpars(SPACESAVE)
 
 #  Choice bar for controlling interface.
-   CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+   CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.

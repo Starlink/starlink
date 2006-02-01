@@ -1,8 +1,6 @@
-   itcl_class Ccd_radioarray {
-
 #+
 #  Name:
-#     Ccd_radioarray
+#     Ccd::radioarray
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -20,7 +18,7 @@
 
 #  Invocations:
 #
-#        Ccd_radioarray window [-option value]...
+#        Ccd::radioarray window [-option value]...
 #
 #     This command create an instance of a radioarray and returns a
 #     command "window" for manipulating it via the methods and
@@ -109,6 +107,8 @@
 #        Reconfigures the named button to show the given text. The
 #        name used to refer to this button (in other methods) remains
 #        unchanged (i.e. that used in the original addbutton).
+#     resetvalue name value
+#        Reconfigures the named button to return the given value when active. 
 #     state name button_state
 #        Set the state of the named button. "button_state" should be one
 #        of normal active or disabled. The name may be "all" in which
@@ -124,7 +124,7 @@
 #        displayed.
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -146,12 +146,16 @@
 #        Added resettext method.
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
 
+   itcl::class Ccd::radioarray {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -159,13 +163,12 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Set default configurations.
+         eval configure $args
          configure -minwidth          $minwidth
          configure -maxwidth          $maxwidth
          configure -label             $label
@@ -202,8 +205,6 @@
                   -variable $variable \
                   -value $value
          } else {
-
-#  Descend into "quoting hell".
             CCDTkWidget Button button \
                radiobutton $oldthis.button$nbutton \
                   -text "$name" \
@@ -250,6 +251,13 @@
                }
             }
             $Buttons($name) configure -text "$text"
+         }
+      }
+
+#  Method to change the value associated with a button.
+      method resetvalue {name value} {
+         if { [ info exists Buttons($name) ] } {
+            $Buttons($name) configure -value "$value"
          }
       }
 
@@ -350,12 +358,12 @@
 #  Request to bind all elements to help.
          if { $nbutton > 0 } {
             foreach Button $Buttonlist {
-               Ccd_base::sethelp $Button $docname $label
+               Ccd::base::sethelp $Button $docname $label
             }
          }
-         Ccd_base::sethelp $Oldthis $docname $label
+         Ccd::base::sethelp $Oldthis $docname $label
          if { [winfo exists $labelwidget ] } {
-            Ccd_base::sethelp $Labelwidget $docname $label
+            Ccd::base::sethelp $Labelwidget $docname $label
          }
       }
 
@@ -363,23 +371,34 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Add the standard buttons to choice bar.
-      public standard 0 {
-         if $exists {
+      public variable standard 0 {
+         if { $exists } {
             if { $standard } {
-               if $adampars { 
-                  addbutton true TRUE
-                  addbutton false FALSE
-               } else { 
-                  addbutton true 1
-                  addbutton false 0
+               if { ! $havetruefalse } {
+                  if { $adampars } {
+                     addbutton true TRUE
+                     addbutton false FALSE
+                  } else { 
+                     addbutton true 1
+                     addbutton false 0
+                  }
+                  set havetruefalse 1
+               } else {
+                  if { $adampars } {
+                     resetvalue true TRUE
+                     resetvalue false FALSE
+                  } else { 
+                     resetvalue true 1
+                     resetvalue false 0
+                  }
                }
             }
          }
       }
 
 #  Order for packing buttons. Can horizontal or vertical.
-      public stack vertical {
-         if $exists {
+      public variable stack vertical {
+         if { $exists } {
             if { $stack == "array" } {
                configure -columns $columns
             } else {
@@ -389,10 +408,10 @@
       }
 
 #  Number of columns to use if stack is array.
-      public columns 5 {
-         if $exists {
-            if { $availcols > $columns } {
-               for { set i $availcols } { $i > $columns } { incr i -1 } {
+      public variable columns 5 {
+         if { $exists } {
+            if { $availcols >= $columns } {
+               for { set i [expr $availcols -1] } { $i > $columns } { incr i -1 } {
                   set frame [CCDPathOf $Frames($i)]
                   destroy $frame
                }
@@ -408,12 +427,17 @@
       }
 
 #  Add a label to the radioarray.
-      public label {} {
-         if $exists  {
+      public variable label {} {
+         if { $exists } {
             if { $label != {} } {
-               CCDTkWidget Labelwidget labelwidget \
-                  label $oldthis.label -text "$label"
-	       pack $labelwidget -side left -anchor w
+               if { $havelabel } {
+                  $labelwidget configure -text "$label"
+               } else {
+                  CCDTkWidget Labelwidget labelwidget \
+                     label $oldthis.label -text "$label"
+                  pack $labelwidget -side left -anchor w
+                  set havelabel 1
+               }
                _repack
             } else {
                if { [ winfo exists $labelwidget ] } {
@@ -424,8 +448,8 @@
       }
 
 #  Set the global variable associated with all buttons.
-      public variable { $oldthis } {
-         if $exists {
+      public variable variable { $oldthis } {
+         if { $exists } {
             if { $nbutton > 0 } {
                foreach Button $Buttonlist {
                   $Button configure -variable $variable
@@ -435,15 +459,15 @@
       }
 
 #  Control the minimum width of buttons.
-      public minwidth 12 {
+      public variable minwidth 12 {
          set buttonwidth $minwidth
       }
 
 #  Control the maximum width of buttons
-      public maxwidth 0 {}
+      public variable maxwidth 0 {}
 
 #  Are we dealing with booleans that need ADAM parameter awareness?
-      public adampars 0 {}
+      public variable adampars 0 {}
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Common and protected variables.  Common are visible to all instances
@@ -451,20 +475,23 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar and their names.
-      protected nbutton 0
-      protected Buttons
-      protected Buttonlist ""
-      protected Frames
-      protected Labelwidget
-      protected labelwidget ""
+      protected variable nbutton 0
+      protected variable Buttons
+      protected variable Buttonlist ""
+      protected variable Frames
+      protected variable Labelwidget
+      protected variable labelwidget ""
+
+      protected variable havelabel 0
+      protected variable havetruefalse 0
 
 #  The widths of the buttons. The actual width is never less than this
 #  and all buttons are the same width.
-      protected buttonwidth
-      protected resize 0
+      protected variable buttonwidth 4
+      protected variable resize 0
 
 #  Number of columns in use.
-      protected availcols 0
+      protected variable availcols 0
 
 #  End of class defintion.
    }

@@ -1,8 +1,6 @@
-   itcl_class Ccd_checkarray {
-
 #+
 #  Name:
-#     Ccd_checkarray
+#     Ccd::checkarray
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -19,7 +17,7 @@
 
 #  Invocations:
 #
-#        Ccd_checkarray window [-option value]...
+#        Ccd::checkarray window [-option value]...
 #
 #     This command create an instance of a checkarray and returns a
 #     command "window" for manipulating it via the methods and
@@ -93,7 +91,7 @@
 #        widget at that time.
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -115,12 +113,16 @@
 #        longer needed.
 #     12-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
 
+   itcl::class Ccd::checkarray {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -128,13 +130,12 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Set default configurations.
+         eval configure $args
          configure -label             $label
          configure -stack             $stack
       }
@@ -285,17 +286,17 @@
 #  Request to bind all elements to this help.
 	    if { $nbutton > 0 } { 
                foreach oneof [ array names Buttons ] {
-		  Ccd_base::sethelp \
+		  Ccd::base::sethelp \
 		     $Buttons($oneof) $docname $label
 	       }
 	    }
-	    Ccd_base::sethelp $Oldthis $docname $label
+	    Ccd::base::sethelp $Oldthis $docname $label
             if { [ winfo exists $labelwidget ] } {
-	       Ccd_base::sethelp $Labelwidget $docname $label
+	       Ccd::base::sethelp $Labelwidget $docname $label
             }
 	 } else {
 	    if { [ info exists Buttons($name) ] } {
-	       Ccd_base::sethelp $Buttons($name) $docname $label
+	       Ccd::base::sethelp $Buttons($name) $docname $label
 	    }
 	 }
       }
@@ -304,23 +305,28 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Order for packing buttons. Can horizontal or vertical.
-      public stack vertical {
-         if $exists {
+      public variable stack vertical {
+         if { $exists } {
             _repack
          }
       }
 
 #  Add a label to the checkarray.
-      public label {} {
-         if $exists {
+      public variable label {} {
+         if { $exists } {
             if { $label != {} } {
-               CCDTkWidget Labelwidget labelwidget \
-                  label $oldthis.label -text "$label"
-               if { $stack == "vertical" } {
-                  pack $labelwidget -side left -anchor w
+               if { $havelabel } {
+                  $labelwidget configure -text "$label"
                } else {
-                  pack $labelwidget -side top -anchor w
-	       }
+                  CCDTkWidget Labelwidget labelwidget \
+                     label $oldthis.label -text "$label"
+                  if { $stack == "vertical" } {
+                     pack $labelwidget -side left -anchor w
+                  } else {
+                     pack $labelwidget -side top -anchor w
+                  }
+                  set havelabel 1
+               }
                _repack
             } else {
                if { [ winfo exists $labelwidget ] } {
@@ -336,18 +342,19 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Number of buttons in the menubar and their names.
-      protected nbutton 0
-      protected Buttons
-      protected Buttonlist
+      protected variable nbutton 0
+      protected variable Buttons
+      protected variable Buttonlist
 
 #  Widget for label.
-      protected Labelwidget
-      protected labelwidget ""
+      protected variable Labelwidget
+      protected variable labelwidget ""
+      protected variable havelabel 0
 
 #  The widths of the buttons. The actual width is never less than this
 #  and all buttons are the same width.
-      protected buttonwidth 12
-      protected resize 0
+      protected variable buttonwidth 12
+      protected variable resize 0
 
 #  End of class definition.
    }

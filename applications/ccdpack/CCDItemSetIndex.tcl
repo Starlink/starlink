@@ -8,7 +8,7 @@
 
 #  Description:
 #     This routine operates on one entry in the setted or unsetted NDFs 
-#     Ccd_scrollbox widget; it reads the name and its annotation and
+#     Ccd::scrollbox widget; it reads the name and its annotation and
 #     optionally writes a new annotation.
 #
 #     The annotation can assume one of three values: it may be the 
@@ -21,7 +21,7 @@
 
 #  Arguments:
 #     Listbox = string
-#        Command name of the Ccd_scrollbox widget listing the NDFs.
+#        Command name of the Ccd::scrollbox widget listing the NDFs.
 #     index = string
 #        The index within Listbox of the item to be modified.
 #     value = string

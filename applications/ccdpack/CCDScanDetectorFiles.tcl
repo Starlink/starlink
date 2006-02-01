@@ -20,7 +20,7 @@
 #     others are assumed to be import control tables.
 #
 #     After the type of the file is determined its name is entered
-#     into a Ccd_multitem whose name is $Box together with the
+#     into a Ccd::multitem whose name is $Box together with the
 #     description "No description available (type)" if the first line
 #     of the file is just an empty comment, otherwise the first line is
 #     shown as a description (again with the type appended in ()). The
@@ -28,15 +28,11 @@
 
 #  Arguments:
 #     Box = window (read)
-#       Name of a size 2 Ccd_multitem. The name of any files located
+#       Name of a size 2 Ccd::multitem. The name of any files located
 #       together with a description are entered into this.
 
 #  Returns:
 #     False if no files are located.
-
-#  Notes:
-#     UNIX specifics here. Uses awk, head and /dev/null and UNIX
-#     filenames.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -45,6 +41,8 @@
 #  History:
 #     14-SEP-1995 (PDRAPER):
 #     	 Original version.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-

@@ -29,6 +29,8 @@ proc CCDExtractFitsFromNDF { Top From To } {
 #     	 Original version.
 #     3-AUG-2000 (MBT):
 #        Added extraction of [X1:X2,Y1,Y2] type headers.
+#     01-FEB-2006 (PDRAPER):
+#        Return rimmed keywords to avoid {KEYWORD } issues.
 #     {enter_changes_here}
 
 #-
@@ -62,7 +64,7 @@ proc CCDExtractFitsFromNDF { Top From To } {
 
 #  Not blank matches the above rules to enter into the listbox.
                if { "$key" != "        " } {
-                  $To insert end "$key"
+                  $To insert end [string trim $key]
 
 #  If the value contains a string of the form '[X1:X2,Y1:Y2]' then add
 #  items to address each of these values.

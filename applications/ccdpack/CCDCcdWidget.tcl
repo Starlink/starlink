@@ -7,13 +7,13 @@
 #     Tcl/Tk commands
 
 #  Purpose:
-#     Creates a new Ccd_* widget-type thing.
+#     Creates a new Ccd::* widget-type thing.
 
 #  Description:
 #     This function creates a CCDPACK superwidget and sets variables 
 #     giving the pathname of the window and the command name of the widget.
 #     These variables will not have the same value.  The purpose of this 
-#     is so that genuine Tk widgets and Ccd_* widget-type-things
+#     is so that genuine Tk widgets and Ccd::* widget-type-things
 #     can be manipulated using the same form of command, without having
 #     to remember which is being manipulated.  This whole approach is
 #     messy, and forced by the necessity of converting a lot of Itcl2/Tcl7
@@ -27,7 +27,7 @@
 #        Name of the variable in the calling context which is to be filled 
 #        with the pathname of the window.
 #     objtype = string
-#        The Ccd_* superwidget type which is to be created.
+#        The Ccd::* superwidget type which is to be created.
 #     objname = string
 #        The pathname of the superwidget to be created.
 #     args = strings

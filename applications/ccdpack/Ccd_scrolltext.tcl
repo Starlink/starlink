@@ -1,8 +1,6 @@
-   itcl_class Ccd_scrolltext {
-
 #+
 #  Name:
-#     Ccd_scrolltext
+#     Ccd::scrolltext
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -19,7 +17,7 @@
 
 #  Invocations:
 #
-#        Ccd_scrolltext window [-option value]...
+#        Ccd::scrolltext window [-option value]...
 #
 #     This command create an instance of a scrolltext and returns a
 #     command "window" for manipulating it via the methods and
@@ -93,7 +91,7 @@
 #        Returns the name of the scrollbars.
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -111,25 +109,26 @@
 #        Added option for horizontal scrollbar (Tk 4 enhancement).
 #     15-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
+   itcl::class Ccd::scrolltext {
 
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_scrolltext class and
+#  Construction creates a instance of the Ccd::scrolltext class and
 #  configures it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Create text widget.
          CCDTkWidget Text text text $oldthis.text
 
@@ -150,6 +149,7 @@
          if { $scr != {} } { set scrollbarplace $scr }
 
 #  Set default configurations. Scrollbar placements also packs the widgets.
+         eval configure $args
          configure -height          $height
          configure -width           $width
          configure -label           $label
@@ -366,7 +366,7 @@
 #  Configuration options:
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Insert and pack the required scrollbars. Remove existing scrollbars first.
-      public scrollbarplaces { right bottom } {
+      public variable scrollbarplaces { right bottom } {
          foreach side $scrollbarplaces {
             if { ! [ regexp (left|right|top|bottom) $side ] } { 
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
@@ -375,15 +375,15 @@
 
 #  Only proceed if the object exists (this means that constructor has
 #  been invoked).
-         if $exists { 
+         if { $exists } { 
             _repack $scrollbarplaces
          }
       }
 
 #  If a label has been requested then add one.
-      public label {} {
+      public variable label {} {
          if { $label != {} } {
-            if $exists {
+            if { $exists } {
                CCDTkWidget Labelwidget labelwidget \
                   label $oldthis.label -text "$label"
                pack $labelwidget -side top -anchor w
@@ -401,22 +401,22 @@
 
 #  Is the selection exportable? If not may have more than one selection
 #  (one for each instance), otherwise the selection is the X11 one.
-      public exportselect 1 {
+      public variable exportselect 1 {
          if { [ winfo exists $text ] } {
             $Text configure -exportselection $exportselect
          }
       }
 
 #  Height of text widget.
-      public height 20 {
-         if $exists {
+      public variable height 20 {
+         if { $exists } {
             $Text configure -width $width -height $height
          }
       }
 
 #  Width of text widget.
-      public width 80 {
-         if $exists {
+      public variable width 80 {
+         if { $exists } {
             $Text configure -width $width -height $height
          }
       }
@@ -425,17 +425,16 @@
 #  Protected variables: visible to only this instance.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Names of widgets
-      protected Text
-      protected text ""
-      protected Labelwidget
-      protected labelwidget ""
-      protected Frames
-      protected Scrolls
+      protected variable Text
+      protected variable text ""
+      protected variable Labelwidget
+      protected variable labelwidget ""
+      protected variable Frames
+      protected variable Scrolls
 
-      protected lastupdate 0
+      protected variable lastupdate 0
 
 #  End of class defintion.
    }
-
 
 # $Id$

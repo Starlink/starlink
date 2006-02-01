@@ -14,7 +14,7 @@
 #     bindings (such as F1 and Help keypresses). It uses the position
 #     information associated with the binding to findout the name of
 #     the widget that the mouse pointer is over. It then traverses the
-#     tree of widgets until it encounters a widget with class Ccd_
+#     tree of widgets until it encounters a widget with class Ccd::
 #     (this is the prefix given to all Meta widget classes). It then
 #     queries this Meta-widget for the name of the document and label
 #     to use as help. It passes these to the appropriate procedures
@@ -24,10 +24,10 @@
 #  Arguments:
 #     X = number (read)
 #        X position of the mouse pointer when help event occurred
-#        (the binding %X value). 
+#        (the binding %X value).
 #     Y = number (read)
 #        Y position of the mouse pointer when help event occurred
-#        (the binding %Y value). 
+#        (the binding %Y value).
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -39,6 +39,8 @@
 #     	 Original version.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names.
 #     {enter_further_changes_here}
 
 #-
@@ -51,32 +53,40 @@
       set seehelp 1
       set eventwindow [winfo containing $X $Y]
       set Eventwindow [CCDCmdOf $eventwindow]
-      if { "$eventwindow" != "" } { 
+      if { "$eventwindow" != "" } {
 
 #  Traverse widget tree until we meet a Meta-widget.
 	 set window $eventwindow
-         while { ! [string match Ccd_* [winfo class $window] ] } {
+         set Window $Eventwindow
+         set ok 1
+         while { $ok } {
+            if { [catch { $Window isa Ccd::base }] == 0 } {
+               #  Meta-widget.
+               break
+            }
             set window [winfo parent $window]
-            if { "$window" == "" } { 
+            set Window [CCDCmdOf $window]
+
+            #  End of tree.
+            if { "$window" == "" } {
                set seehelp 0
                break
             }
 	 }
-	 if { $seehelp } { 
+	 if { $seehelp } {
 
 #  Now query Meta-widget about any help it might have.
-            set Window [CCDCmdOf $window]
             set doclabel [$Window showhelp $Eventwindow]
 	    if { "$doclabel" == "" } {
                set seehelp 0
-            } else { 
+            } else {
 
 #  Expand docname and label into full name.
                set fullname [CCDLocateHelpFile \
 				[lindex $doclabel 0 ] \
 				[lindex $doclabel 1 ] ]
-               if { "$fullname" == "" } { 
-                  set seehelp 0 
+               if { "$fullname" == "" } {
+                  set seehelp 0
                } else {
 
 #  Ask for the help to be displayed.

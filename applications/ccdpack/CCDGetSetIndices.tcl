@@ -38,10 +38,13 @@
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     PDRAPER: Peter W. Draper (STARLINK)
 
 #  History:
 #     21-JUN-2001 (MBT):
 #        Original version.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 
 #-
 
@@ -62,7 +65,7 @@
       if { $force || ! $CCDsetindicesvalid } {
 
 #  Create the widget components.
-         CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Size of each Set"
+         CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Size of each Set"
          CCDTkWidget Frame frame frame $top.center
          CCDTkWidget Value value scale $frame.slider \
             -variable setsize \
@@ -72,8 +75,8 @@
             -showvalue 1 \
             -tickinterval 1 \
             -length 256
-         CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
-         CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 1
+         CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
+         CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 1
 
 #  Configure the choice buttons.
          $Choice addcommand OK "

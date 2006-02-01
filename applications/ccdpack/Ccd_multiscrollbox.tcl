@@ -1,7 +1,6 @@
-   itcl_class Ccd_multiscrollbox {
 #+
 #  Name:
-#     Ccd_multiscrollbox
+#     Ccd::multiscrollbox
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -19,7 +18,7 @@
 
 #  Invocations:
 #
-#        Ccd_multiscrollbox window [-option value]...
+#        Ccd::multiscrollbox window [-option value]...
 #
 #     This command create an instance of a multiscrollbox and returns a
 #     command "window" for manipulating it via the methods and
@@ -106,12 +105,12 @@
 #	 "all" in which case the binding is applied to all the listboxes
 #	 in the scrollboxes.
 #     wconfig listno option widget value
-#        Invokes the Ccd_base wconfig method for the named widget.
+#        Invokes the Ccd::base wconfig method for the named widget.
 #	 "listno" may be "all" in which case all widgets of that name
 #	 in the scrollboxes are configured. Widget is the name of the
 #	 basic widget (one of list, scrolltop, scrollright, scrollleft,
 #	 scrollbottom for the constituents of the scrollbox, see
-#	 Ccd_scrollbox).
+#	 Ccd::scrollbox).
 #     number
 #        Returns the current number of scrollboxes being used.
 #     select listno args
@@ -141,7 +140,7 @@
 #        Set the label of the listbox listno to text.
 
 #  Inheritance:
-#     This class inherits Ccd_scrollbox and its methods and configuration
+#     This class inherits Ccd::scrollbox and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 
@@ -165,22 +164,26 @@
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Fixed a bug from Tcl8 upgrade.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
 
+   itcl::class Ccd::multiscrollbox {
+
 #  Inheritances:
-#      inherit Ccd_scrollbox
-      inherit Ccd_base
+      inherit Ccd::base
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_multiscrollbox class and
+#  Construction creates a instance of the Ccd::multiscrollbox class and
 #  configures it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Configure the required boxes
+         eval configure $args
          configure -nboxes $nboxes
          configure -stack  $stack
          configure -scrollbarplaces $scrollbarplaces
@@ -192,7 +195,7 @@
 #  Destructor.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Note need to delete scrollboxes as these are not removed by Tk and
-#  as of itcl2.0, are no longer available in the namespace for Ccd_base.tcl.
+#  as of itcl2.0, are no longer available in the namespace for Ccd::base.
       destructor {
          for { set i $haveboxes; incr i } { $i <= $nboxes } { incr i } {
             $Lists($i) delete
@@ -213,7 +216,7 @@
 
 #  Get the length of the text and reset the preferred width of the
 #  listbox, if this is now larger.
-		  set curwidth [$Lists($listno) info public width -value]
+		  set curwidth [$Lists($listno) cget -width]
 		  set newwidth [string length $text]
 		  if { $newwidth > $curwidth } {
 		     $Lists($listno) configure -width $newwidth
@@ -413,11 +416,11 @@
 #  Public variables:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Number of boxes in multiscroll widget.
-      public nboxes 2 {
-         if $exists {
+      public variable nboxes 2 {
+         if { $exists } {
             if { $haveboxes < $nboxes } {
                for { set i $haveboxes; incr i } { $i <= $nboxes } { incr i } {
-                  CCDCcdWidget Lists($i) lists($i) Ccd_scrollbox $oldthis.list$i
+                  CCDCcdWidget Lists($i) lists($i) Ccd::scrollbox $oldthis.list$i
                   set widgetnames($Oldthis:list$i) $Lists($i)
                }
             } else {
@@ -437,15 +440,15 @@
       }
 
 #  Scrollbar placements. This applies globally.
-      public scrollbarplaces "right bottom" {
-         if $exists {
+      public variable scrollbarplaces "right bottom" {
+         if { $exists } {
             scrollbarplaces all $scrollbarplaces
          }
       }
 
 #  Stacking public.
-      public stack horizontal {
-         if $exists {
+      public variable stack horizontal {
+         if { $exists } {
             switch $stack {
                horizontal { set side left }
                vertical   { set side top }
@@ -462,8 +465,8 @@
       }
 
 #  Can more than one entry be selected at a time from the listboxes?
-      public singleselect 0 {
-         if $exists {
+      public variable singleselect 0 {
+         if { $exists } {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
                $Lists($i) configure -singleselect $singleselect
             }
@@ -472,8 +475,8 @@
 
 #  Is the selection exportable? If not may have more than one selection
 #  (one for each instance), otherwise the selection is the X11 one.
-      public exportselect 1 {
-         if $exists {
+      public variable exportselect 1 {
+         if { $exists } {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
                $Lists($i) configure -exportselect $exportselect
             }
@@ -481,7 +484,7 @@
       }
 
 #  Are the boxes to be reconfigured to fit the text?
-      public seealltext 1 {}
+      public variable seealltext 1 {}
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Common and protected variables.  Common are visible to all instances
@@ -492,12 +495,12 @@
 #     "packedboxes"  Shows if the scrollboxes have been packed or not. If they
 #                    have a call to change the number of scrollboxes also
 #                    restacks them.
-      protected haveboxes 0
-      protected packedboxes 0
+      protected variable haveboxes 0
+      protected variable packedboxes 0
 
 #  Names of widgets.
-      protected Lists
-      protected lists
+      protected variable Lists
+      protected variable lists
 
 #  End of class definition.
    }

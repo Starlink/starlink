@@ -1,8 +1,6 @@
-   itcl_class Ccd_base {
-
 #+
 #  Name:
-#     Ccd_base
+#     Ccd::base
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -13,17 +11,14 @@
 #  Description:
 #     This routine defines a series of basic methods and configurations
 #     which apply to all compound widgets. It should consequently be
-#     inherited by all classes which construct compound widgets. The
-#     Ccd_base::constructor command should be used first if a frame
-#     widget is required for containing the compound construct.
+#     inherited by all classes which construct compound widgets.
 
 #  Invocations:
 #
-#        Ccd_base name
+#        Ccd::base name
 #
 #     This form of the command creates a frame widget. This form should
-#     not normally be used directly. The Ccd_base::constructor command
-#     should be used to create a base frame widget for compounds.
+#     not normally be used directly.
 #
 #        name configure -configuration_options value
 #
@@ -33,7 +28,7 @@
 #        name method arguments
 #
 #     Performs the given method on this object.  Note that 'name' is
-#     the name/command for this Ccd_base object, and not the pathname
+#     the name/command for this Ccd::base object, and not the pathname
 #     of the widget itself.  The pathname may be obtained by using the
 #     'pathname' method.
 
@@ -65,26 +60,12 @@
 #        Initiates the default configuration options.
 #
 #        This method is invoked automatically for all classes that
-#        inherit from this class (this happens after the constructor
-#        method of the inheriting class unless the constructor of this
-#        class is invoked explicitly). If this command is not invoked
-#        explicitly (creating a base frame for containing the other
-#        widgets), then the compound will require that a frame with the
-#        object class is created. See the contructor of this class for
-#        how to do this.
+#        inherit from this class (this happens before the constructor
+#        method of the inheriting class).
 #
 #     destructor
 #        Destroys the base widget and removes the command associated
 #        with it from the global scope. Invoked by the "delete" method.
-#
-#     configure [-option value]...
-#        Activates the configuration options. If no configuration value
-#        is given then the current value of any known option is returned
-#        in a form similar (but not identical too) the Tk widget
-#        command of the same form (see _report).
-#
-#     cget option
-#        Returns the current value of a configuration option.
 #
 #     wconfig -option sub-widget value
 #        This method is designed to allow access to the primitive widget
@@ -115,11 +96,6 @@
 #        arguments to this are all the possible names of the item to be
 #        queried. This method is only really intended for use by classes
 #        (hence the "_" in name).
-#
-#     _report
-#        This method queries the class about all it public variables
-#        (the configuration options) and reports their values in a form
-#        similar to the Tk "widget configure" command.
 #
 #     bind sub-widget event proc
 #        This method allows the binding of events in sub-widgets. It
@@ -191,14 +167,20 @@
 #        Removed keyboard traversal. This is now controlled by Tk.
 #     30-JUN-1995 (PDRAPER):
 #        Reorganised the sub-widget registration and made destruction
-#        via the kill method a instance responsibility (for speed).
+#        via the kill method an instance responsibility (for speed).
 #     10-MAY-2000 (MBT):
 #        Modified for Tcl/Tk8.  The object command can no longer be the
 #        same as the widget pathname, so change the latter and make it
 #        available via a new method.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax. Removed configure, config, _report
+#        and cget methods.
 #     {enter_further_changes_here}
 
 #-
+
+   itcl::class Ccd::base {
+
 
 #  Inherits nothing (base superclass)
 
@@ -208,23 +190,23 @@
 #  Construction perform initialisation of the fundermental configuration
 #  options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Construct a pathname for the frame/toplevel widget.  This cannot be
 #  identical with the name of this object, because widget names install
 #  themselves in the global namespace.
 #  This variable is called 'oldthis' for historical reasons.
          set Oldthis [CCDNameTail $this]
-         regsub {^\.} $Oldthis .- oldthis
+         regsub {^\.} $Oldthis {.-} oldthis
 
 #  Create a frame widget for containing the derived widget. This must
 #  have the same class as the object.
          if { ! [ winfo exists $oldthis ] } {
             set class [CCDNameTail [info class]]
-            if { $class == "Ccd_toplevel" } {
-               toplevel  $oldthis  -class $class
+            if { $class == "toplevel" } {
+               toplevel $oldthis -class $class
             } else {
-               frame  $oldthis     -class $class
+               frame $oldthis -class $class
             }
          }
          set exists 1
@@ -242,6 +224,7 @@
          if { $opt != {} } { set takefocus $opt }
 
 #  Configuration options.
+         eval configure $args
          configure -borderwidth     $borderwidth
          configure -relief          $relief
          configure -background      $background
@@ -256,7 +239,7 @@
 #  Destructor "method delete". Deletes the object.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       destructor  {
-         if $exists {
+         if { $exists } {
             destroy $oldthis
             set exists 0
          }
@@ -265,19 +248,6 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Methods.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Configuration method to change public attributes (inherited by all
-#  widgets).
-      method config { args } { eval $oldthis configure $args }
-      method configure { config } {
-         if { $config == {} } {
-            _report
-         } else {
-
-#  Convert first word into lower case to catch all similar occurences of
-#  the configuration option.
-            set config [lreplace $config 0 0 [string tolower [lindex $config 0]]]
-         }
-      }
 
 #  Method for configuring constituent widgets. The known widgets and
 #  their commands are stored in the common variables widgetnames.
@@ -326,7 +296,7 @@
 #  Method for adding a binding to a widget. Actual binding occurs at global
 #  scope.
       method bind { basewidget event proc } {
-         if $exists {
+         if { $exists } {
 
 #  Check for known sub-widgets.
             if { [info exists widgetnames($Oldthis:$basewidget)] } {
@@ -341,35 +311,9 @@
          }
       }
 
-#  Method for reporting configuration.
-      method _report {} {
-         set variables [ $oldthis info public ]
-         set sendlist ""
-         foreach oneof $variables {
-            set current [ $oldthis info public $oneof -value ]
-            set init    [ $oldthis info public $oneof -init ]
-            set first [string first :: $oneof]
-            incr first +2
-            set option [string range $oneof $first end]
-            lappend sendlist "-$option $oneof $oneof $init $current "
-         }
-         return $sendlist
-      }
-
-#  Method for returning the value of a configuration option.
-      method cget { var } {
-         if { $var != "" } {
-            regsub {\-} $var "" clean
-            set value [ $this info public $clean -value ]
-            return $value
-         } else {
-            error "wrong \#args: should be $this cget option"
-         }
-      }
-
 #  Set the focus into a widget.
       method focus { args } {
-         if $exists {
+         if { $exists } {
 
 #  Window name if last element of args (which may also contain the
 #  "default" and "none" qualifiers).
@@ -483,22 +427,22 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Width of the widget border.
-      public borderwidth 2 {
-         if $exists {
+      public variable borderwidth 2 {
+         if { $exists } {
             $oldthis configure -borderwidth $borderwidth
          }
       }
 
 #  Relief of border.
-      public relief flat {
-         if $exists {
+      public variable relief flat {
+         if { $exists } {
             $oldthis configure -relief $relief
          }
       }
 
 #  Colour of background.
-      public background {} {
-         if $exists {
+      public variable background {} {
+         if { $exists } {
             if { $background != {} } {
                $oldthis configure -background $background
             }
@@ -506,8 +450,8 @@
       }
 
 #  Should widget take the focus?
-      public takefocus 0 {
-         if $exists {
+      public variable takefocus 0 {
+         if { $exists } {
             if { $takefocus != {} } {
                $oldthis configure -takefocus $takefocus
             }
@@ -519,7 +463,7 @@
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      protected exists 0
+      protected variable exists 0
 
 #  Set common widget list for dealing with configure and binding
 #  requests for constituent widgets. These should be set in the classes
@@ -537,8 +481,8 @@
       common helpinfo
 
 #  Old name of widget (pre itcl2.0).
-      protected Oldthis
-      protected oldthis
+      protected variable Oldthis
+      protected variable oldthis
 
 #  End of class definition.
    }

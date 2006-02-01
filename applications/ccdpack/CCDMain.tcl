@@ -17,11 +17,9 @@
 #     source CCDMain.tcl
 
 #  Notes:
-#     This interface requires that the extensions [incr Tcl] version
-#     2.2, BLT 2.1 and TclADAM are available (built into the wish
-#     executable that invokes this file). It is not known to work with
-#     any other combinations and will not work with earlier versions
-#     of Tcl and Tk or [incr Tcl].
+#     This interface requires that the extensions [incr Tcl], BLT and 
+#     TclADAM are available (built into the wish executable that invokes 
+#     this file). 
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -46,6 +44,10 @@
 #        Upgraded for use with Sets.
 #     22-JUL-2003 (MBT):
 #        Added option to use Mozilla.
+#     01-FEB-2006 (PDRAPER):
+#        Removed Mosaic browser and added firefox. Fixed problems
+#        with default file filters. Changed to use new meta-widget names
+#        (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -100,11 +102,11 @@
 #  Set the help browser. This is either set by the HTX_BROWSER variable,
 #  or by checking that a known one exists on the PATH. This will
 #  be overidden by a ~/.ccdpack assignment.
-   if { [info exists env(HTX_BROWSER)] } { 
+   if { [info exists env(HTX_BROWSER)] } {
       set CCDbrowser $env(HTX_BROWSER)
    } else {
       set CCDbrowser {}
-      foreach browser {netscape Netscape Mosaic mosaic mozilla Mozilla} {
+      foreach browser {netscape Netscape mozilla Mozilla firefox Firefox} {
          foreach directory [split $env(PATH) ":" ] {
             if { [ file executable ${directory}/${browser} ] } {
                set CCDbrowser $browser
@@ -126,7 +128,7 @@
       destroy .
    }
 
-#  Set any parameters defaults (before reading state etc.). This also 
+#  Set any parameters defaults (before reading state etc.). This also
 #  starts up the CCDPACK monolith (hence adamtask stuff before it).
    CCDInitialize
 
@@ -137,26 +139,27 @@
 #  at an appropriate point.
    source $CCDdir/CCDOptions.tcl
 
-#  Find and store all the NDF foreign formats being used. These are 
-#  used as part of the file filtering mechanisms (note this isn't 
+#  Find and store all the NDF foreign formats being used. These are
+#  used as part of the file filtering mechanisms (note this isn't
 #  therefore set by any values in .ccdpack, it's important that
 #  the conversion filters are actually setup).
-   set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
-   if { [info exists env(NDF_FORMATS_IN)] } { 
+   set CCDimagefilters {*}
+   if { [info exists env(NDF_FORMATS_IN)] } {
+      set CCDimagefilters {{NDF(.sdf) *.sdf}}
       set new_types [split $env(NDF_FORMATS_IN) ","]
-      foreach pair $new_types { 
+      foreach pair $new_types {
          regexp {([^\(]*).([^\)]*)} $pair dummy name type
-         if { $name != "NDF" } { 
+         if { $name != "NDF" } {
             lappend CCDimagefilters [list $name\(${type}\) *${type}]
          }
       }
    }
 
-#  Set the directories to search for CCD setups and import control tables 
+#  Set the directories to search for CCD setups and import control tables
 #  (do this after reading ~/.ccdpack).
-   if { ! [info exists CCDdetectorcache] } { 
+   if { ! [info exists CCDdetectorcache] } {
       set CCDdetectorcache "$CCDdir"
-   } else { 
+   } else {
       if { ! [ string match "$CCDdir" $CCDdetectorcache] } {
          append CCDdetectorcache "$CCDdir "
       }
@@ -176,14 +179,14 @@
 #-----------------------------------------------------------------------------
 
 #  Create top-level widget for main window.
-   CCDCcdWidget Top top Ccd_toplevel .topwin -title {CCDPACK reduction GUI}
+   CCDCcdWidget Top top Ccd::toplevel .topwin -title {CCDPACK reduction GUI}
 
 #  Record this for use everywhere.
    set MAIN(window) $Top
    set MAIN(name) XREDUCE
 
 #  Menubar
-   CCDCcdWidget Menubar menubar Ccd_helpmenubar $Top.menubar
+   CCDCcdWidget Menubar menubar Ccd::helpmenubar $Top.menubar
 
 #  Frame to contain description and bitmaps.
    CCDTkWidget Separate1 separate1 frame $top.s1 -height 3
@@ -205,7 +208,7 @@
 #  Configuration of package and CCD characteristics.
    CCDTkWidget Separate2 separate2 frame $top.s2 -height 3
    CCDCcdWidget Config config \
-      Ccd_choice $Top.configure \
+      Ccd::choice $Top.configure \
                   -standard false \
                   -label "\nConfiguration\n" \
                   -stack horizontal \
@@ -215,7 +218,7 @@
 #  NDF import (FITS and by hand).
    CCDTkWidget Separate3 separate3 frame $top.s3 -height 3
    CCDCcdWidget Import import \
-      Ccd_choice $Top.imprt \
+      Ccd::choice $Top.imprt \
                   -standard false \
                   -label "\nData Import\n" \
                   -stack horizontal \
@@ -225,7 +228,7 @@
 #  Set grouping.
    CCDTkWidget Separate4 separate4 frame $top.s4 -height 3
    CCDCcdWidget Sethead sethead \
-      Ccd_choice $Top.sets \
+      Ccd::choice $Top.sets \
                   -standard false \
                   -label "\nGroup by Set\n" \
                   -stack horizontal \
@@ -235,7 +238,7 @@
 #  Create & Run reduction script.
    CCDTkWidget Separate5 separate5 frame $top.s5 -height 3
    CCDCcdWidget Run run \
-      Ccd_choice $Top.run \
+      Ccd::choice $Top.run \
                -standard false \
                -label "\nReduction\n" \
                -stack horizontal \
@@ -244,10 +247,10 @@
 
 #  Scrollbox for showing names (and types?) of current NDFs.
    CCDCcdWidget Names names \
-      Ccd_scrollbox $Top.names -label "\nKnown Data Files\n" -anchor c
+      Ccd::scrollbox $Top.names -label "\nKnown Data Files\n" -anchor c
 
 #  Exit and Update NDF listbox.
-   CCDCcdWidget Control control Ccd_choice $Top.control -standard false
+   CCDCcdWidget Control control Ccd::choice $Top.control -standard false
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.
@@ -295,7 +298,7 @@
       }
       \$Next state all normal
    "
-    
+
 #  Button for organising NDFs into types etc. "by hand".
    $Import addbutton {Manual Organization} \
       "CCDNDFOrganize $Top.doimport $nextstage"
@@ -311,7 +314,7 @@
    $Import state all disabled
 
 #  Button for generic Set grouping.
-   $Sethead addbutton {Add Set headers} \
+   $Sethead addbutton {Add Set Headers} \
       "CCDAddSetHeaders $Top.setgrp $Run state all normal"
 
 #  Button for skipping this section.
@@ -322,7 +325,7 @@
 
 #  Button for creating and running reduction script.
    $Run addbutton {Setup and Run} \
-      "if { \[CCDCheckReduce $Top\] } { 
+      "if { \[CCDCheckReduce $Top\] } {
           CCDReduce $Top.doreduce
        }
       "

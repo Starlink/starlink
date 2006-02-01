@@ -75,6 +75,9 @@
 #     25-JUN-2001 (MBT):
 #        Added image parameter, and made it keep track of what NDF is in
 #        what container file with CCDndfcontainers global.
+#     1-JAN-2006 (PDRAPER):
+#        Fixed problems handling the default file filter.
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -93,14 +96,14 @@
 #  Widget creation.
 #----------------------------------------------------------------------------
 #  Create the top-level widget.
-      CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$title"
+      CCDCcdWidget Top top Ccd::toplevel $Topwin -title "$title"
 
 #  Menubar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 #  Labelled entry widget for current directory name.
       CCDCcdWidget Directory directory \
-         Ccd_labent $Top.direct -text {Directory:}
+         Ccd::labent $Top.direct -text {Directory:}
 
 #  Labelled entry widget for the file filter. If CCDimportfilter
 #  is a list of length greater than 1 then need an option widget.
@@ -109,26 +112,26 @@
       }
       if { [llength $CCDimportfilter] > 1 } { 
          CCDCcdWidget Filefilter filefilter \
-            Ccd_option $Top.filter -text "File Filter:"
+            Ccd::option $Top.filter -text "File Filter:"
       } else {
          CCDCcdWidget Filefilter filefilter \
-            Ccd_labent $Top.filter -text "File Filter:"
+            Ccd::labent $Top.filter -text "File Filter:"
       }
 
 #  Scrollbox for directory names.
-      CCDCcdWidget Directbox directbox Ccd_scrollbox $Top.directbox
+      CCDCcdWidget Directbox directbox Ccd::scrollbox $Top.directbox
 
 #  Scrollbox for names in current directory.
-      CCDCcdWidget Filebox filebox Ccd_scrollbox $Top.filebox
+      CCDCcdWidget Filebox filebox Ccd::scrollbox $Top.filebox
 
 #  Labelled entry widget for name of selected file.
       CCDCcdWidget Selected selected \
-         Ccd_labent $Top.select \
+         Ccd::labent $Top.select \
                        -text "Name of selected file:" \
                        -placelabel top
 
 #  Choice bar for control of form.
-      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+      CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.
@@ -299,7 +302,11 @@
       $Directory insert 0 $CCDcurrentdirectory
 
 #  Invoke the filter button to get first setup.
-      $Filefilter insert 0 [lindex [lindex $CCDimportfilter 0] 1]
+      if { [llength $CCDimportfilter] > 1 } { 
+         $Filefilter insert 0 [lindex [lindex $CCDimportfilter 0] 1]
+      } else {
+         $Filefilter insert 0 "$CCDimportfilter"
+      }
       $Choice invoke Filter
 
 #  Wait for an file name to be given or not as the case maybe.

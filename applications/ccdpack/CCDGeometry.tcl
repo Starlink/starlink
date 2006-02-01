@@ -47,6 +47,8 @@ proc CCDGeometry { Top {surekill 1} } {
 #        Upgraded for Tcl8.
 #     4-JUL-2001 (MBT):
 #        Upgraded for Sets (now only DISPLAYs one NDF from an NDG list).
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -88,12 +90,12 @@ proc CCDGeometry { Top {surekill 1} } {
 
 #  Top level.
    CCDCcdWidget Topwin topwin \
-      Ccd_toplevel $Top -title "Determine CCD Geometry"
+      Ccd::toplevel $Top -title "Determine CCD Geometry"
    wm withdraw $topwin
 
 #  Canvas for putting gwm item into add a graphic redrawn context.
    CCDCcdWidget Canvas canvas \
-      Ccd_gwm $Topwin.canvas -tags Gwm -redraw 0 -gwmname $GWMDEVICE \
+      Ccd::gwm $Topwin.canvas -tags Gwm -redraw 0 -gwmname $GWMDEVICE \
                   -drawcommand "CCDGeomDrawCommand $Topwin $Topwin.canvas"
    if { ! [winfo exists $canvas] } { 
 
@@ -105,26 +107,26 @@ colours (by closing any colour hogging applications) then try again."
    }
 
 #  Help menubar.
-   CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
+   CCDCcdWidget Menu menu Ccd::helpmenubar $Topwin.menubar
 
 #  Display name of NDF that is being shown.
    CCDCcdWidget Label label \
-      Ccd_labent $Topwin.label -textvariable NDF -text "Current image:"
+      Ccd::labent $Topwin.label -textvariable NDF -text "Current image:"
 
 #  Action to define bias strip1, strip2 or extent.
    CCDCcdWidget Action action \
-      Ccd_radioarray $Topwin.action \
+      Ccd::radioarray $Topwin.action \
                   -label "Define:" -stack horizontal -variable ITEM
 
 #  Options of various kinds.
-   CCDCcdWidget Options options Ccd_choice $Topwin.options -standard false
+   CCDCcdWidget Options options Ccd::choice $Topwin.options -standard false
 
 #  Create rules
    CCDTkWidget Rule1 rule1 frame $topwin.rule1 -height 3
    CCDTkWidget Rule2 rule2 frame $topwin.rule2 -height 3
 
 #  And get out choices.
-   CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
+   CCDCcdWidget Choice choice Ccd::choice $Topwin.choice
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.

@@ -1,5 +1,8 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.0-20 updates the Tcl/Tk/Itcl core used by CCDPACK. Extensive
+  changes to the xreduce command.
+
   Release v4.0-19 is a bugfix update of CCDPACK.
 
   Changes since v4.0-14

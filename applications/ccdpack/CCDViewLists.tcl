@@ -39,6 +39,8 @@
 #        Converted to new style.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #  Bugs:
@@ -55,13 +57,13 @@
 #  Widget creation
 #-----------------------------------------------------------------------------
 #  Top-level widget to contain the list.
-         CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$description"
+         CCDCcdWidget Top top Ccd::toplevel $Topwin -title "$description"
 
 #  Scrollable listbox for the contents.
-         CCDCcdWidget Box box Ccd_scrollbox $Top.scrollbox
+         CCDCcdWidget Box box Ccd::scrollbox $Top.scrollbox
 
 #  Choice bar for window control
-         CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+         CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 0
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.

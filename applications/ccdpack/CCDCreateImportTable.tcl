@@ -153,16 +153,20 @@
 #     11-MAY-1995 (PDRAPER):
 #        Updated to Tk4.0.
 #     19-MAY-1995 (PDRAPER):
-#        Removed reference to internal method of Ccd_multiitem..
+#        Removed reference to internal method of Ccd::multiitem..
 #     22-AUG-1995 (PDRAPER):
 #        Converted to use new coding style and Table widgets.
 #     2-FEB-1996 (PDRAPER):
-#        Added fixed for -modified beig passed to Fitsfunc instead
+#        Added fixed for -modified being passed to Fitsfunc instead
 #        of Fitstable when import table read in.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Modified the arguments of CCDGetFileName.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g). Remove
+#        confusing/unused CCDndfimportfilter and switch to correct
+#        CCDimportfilter.
 #     {enter_changes_here}
 
 #-
@@ -193,11 +197,11 @@
 #--------------------------------------------------------------------------
 #  Top-level window for this form.
       CCDCcdWidget Topwin topwin \
-         Ccd_toplevel $Top -title "Create Import Table"
+         Ccd::toplevel $Top -title "Create Import Table"
       wm withdraw $topwin
 
 #  Menubar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Topwin.menubar
 
 #  Main frame for containing FITS item stuff.
       CCDTkWidget Frametop frametop frame $topwin.fits
@@ -207,7 +211,7 @@
 
 #  Labelled entry for reference NDF name.
       CCDCcdWidget Refndf refndf \
-         Ccd_labent $Lefttop.refndf -text "Reference frame:" -placelabel left
+         Ccd::labent $Lefttop.refndf -text "Reference frame:" -placelabel left
 
 #  Create scrollbox for names extracted from NDF FITS structure. This
 #  has a button above it which filters the output from a list of the
@@ -215,30 +219,30 @@
 #  items found therein. Make sure that only a single selection is
 #  possible in listbox.
       CCDCcdWidget Fitsbox fitsbox \
-         Ccd_scrollbox $Lefttop.fitsbox -singleselect true
+         Ccd::scrollbox $Lefttop.fitsbox -singleselect true
       CCDCcdWidget Fitsextract fitsextract \
-         Ccd_choice $Lefttop.extract -standard 0
+         Ccd::choice $Lefttop.extract -standard 0
 
 #  Right frame for fits extension items (and types).
       CCDTkWidget Righttop righttop frame $frametop.right
 
 #  Labelled entry for fits ITEM name.
       CCDCcdWidget Fitsname fitsname \
-         Ccd_labent $Righttop.name -text "FITS item:"
+         Ccd::labent $Righttop.name -text "FITS item:"
 
 #  Option widget with a pop-up menu in the entry window and a
 #  menubutton which will show the possible options for the HDS-type.
       CCDCcdWidget Fitstype fitstype \
-         Ccd_option $Righttop.type -text "HDS type:" -constrain 1
+         Ccd::option $Righttop.type -text "HDS type:" -constrain 1
 
 #  Choice buttons for adding the HDS item and type, removing the current
 #  selection and sorting/making unique (by item name).
       CCDCcdWidget Fitschoice fitschoice \
-         Ccd_choice $Righttop.choice -standard 0
+         Ccd::choice $Righttop.choice -standard 0
 
 #  Table for showing the selected and typed FITS items.
       CCDCcdWidget Fitstable fitstable \
-         Ccd_table $Righttop.table -columns 2 -flushright 0
+         Ccd::table $Righttop.table -columns 2 -flushright 0
 
 #  Frame for containing the CCDPACK extension item and FITS functions
 #  region.
@@ -247,7 +251,7 @@
 #  Frame for list of all known CCDPACK extension items. Make listbox
 #  have only one active selection at a time.
       CCDCcdWidget Knownbox knownbox \
-         Ccd_scrollbox $Framebot.known -singleselect true \
+         Ccd::scrollbox $Framebot.known -singleselect true \
                                         -label "Known extension items:"
 
 #  Frame for right side of lower box. This contains the selected
@@ -257,23 +261,23 @@
 
 #  Labelled entry box for the extension item name.
       CCDCcdWidget Extname extname \
-         Ccd_labent $Rightbot.name -text "Extension item:"
+         Ccd::labent $Rightbot.name -text "Extension item:"
 
 #  Labelled entry box for the FITS function.
       CCDCcdWidget Fitsfunc fitsfunc \
-         Ccd_labent $Rightbot.func -text "FITS function:"
+         Ccd::labent $Rightbot.func -text "FITS function:"
 
 #  Choice bar buttons for adding the extension item, type and function,
 #  for removing the current selection and for sorting/making unique.
       CCDCcdWidget Extchoice extchoice \
-         Ccd_choice $Rightbot.choice -standard 0
+         Ccd::choice $Rightbot.choice -standard 0
 
 #  Table for the extension transformations.
       CCDCcdWidget Transtable transtable \
-         Ccd_table $Rightbot.table -columns 2 -flushright 0
+         Ccd::table $Rightbot.table -columns 2 -flushright 0
 
 #  Choice widget for OK and Cancel buttons.
-      CCDCcdWidget Choice choice Ccd_choice $Topwin.bot
+      CCDCcdWidget Choice choice Ccd::choice $Topwin.bot
 
 #--------------------------------------------------------------------------
 #  Widget configuration.
@@ -291,8 +295,9 @@
       $Menu addcommand Options {Select reference frame...} \
          "global CCDimportexists
           global CCDimportfile
-	  global CCDndfimportfilter
-          set CCDndfimportfilter \"*.sdf\"
+	  global CCDimportfilter
+          global CCDimagefilters
+          set CCDimportfilter \$CCDimagefilters
           if \[info exists CCDimportfile\] {
              set importfile \$CCDimportfile
           } else {

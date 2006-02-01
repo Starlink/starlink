@@ -1,8 +1,6 @@
-   itcl_class Ccd_menubar {
-
 #+
 #  Name:
-#     Ccd_menubar
+#     Ccd::menubar
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -19,7 +17,7 @@
 
 #  Invocations:
 #
-#        Ccd_menubar window [-option value]...
+#        Ccd::menubar window [-option value]...
 #
 #     This command create an instance of a menubar and returns a
 #     command "window" for manipulating it via the methods and
@@ -101,7 +99,7 @@
 #        the document is associated with the whole of the menubar.
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -123,20 +121,24 @@
 #        Added addseparator method.
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated fot itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
 
+   itcl::class Ccd::menubar {
+
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_menubar class and
+#  Construction creates a instance of the Ccd::menubar class and
 #  configures it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame so that real menu options are not confused by
 #  tk_ procedures with those of this class instance.
@@ -153,6 +155,7 @@
          if { $opt != {} } { set background $opt }
 
 #  And set default configurations.
+         eval configure $args
          configure -relief          $relief
          configure -borderwidth     $borderwidth
          configure -background      $background
@@ -165,8 +168,6 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Methods.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Configuration method to change public attributes.
-#      method configure { config } { }
 
 #  Add a menubutton to menubar. Buttons are named using a incremented
 #  integer (since we can not have uppercase in window names we cannot
@@ -284,10 +285,10 @@
 #  Method for assigning context help.
       method sethelp { name docname label} {
          if { "$name" == "all" } {
-            Ccd_base::sethelp $Oldthis $docname $label
+            Ccd::base::sethelp $Oldthis $docname $label
          } else {
             if { [ info exists Buttons($name) ] } {
-               Ccd_base::sethelp $Buttons($name) $docname $label
+               Ccd::base::sethelp $Buttons($name) $docname $label
             } else {
                error "No menubutton of name \"$name\""
             }
@@ -298,28 +299,28 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  The menubar relief.
-      public relief raised {
+      public variable relief raised {
          if { [ winfo exists $menubar ] } {
             $Menubar configure -relief $relief
 	 }
       }
 
 #  Its borderwidth.
-      public borderwidth 2 {
+      public variable borderwidth 2 {
          if { [ winfo exists $menubar ] } {
             $Menubar configure -borderwidth $borderwidth
 	 }
       }
 
 #  Its background colour
-      public background {} {
+      public variable background {} {
          if { [ winfo exists $menubar ] } {
             $Menubar configure -background $background
 	 }
       }
 
 #  Whether the standard menubar should be created.
-      public standard 1 {
+      public variable standard 1 {
          if { ! [catch {winfo exists $menubar}] } {
             if { $standard } {
                addbutton File 0
@@ -335,15 +336,15 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar.
-      protected nbutton 0
-      protected Buttons
-      protected Buttonmenus
-      protected Buttonlist
-      protected Helpbutton
+      protected variable nbutton 0
+      protected variable Buttons
+      protected variable Buttonmenus
+      protected variable Buttonlist
+      protected variable Helpbutton
 
 #  Names of widgets.
-      protected Menubar
-      protected menubar ""
+      protected variable Menubar
+      protected variable menubar ""
 
 #  End of class defintion.
    }

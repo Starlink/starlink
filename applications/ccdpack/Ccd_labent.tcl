@@ -1,7 +1,6 @@
-   itcl_class Ccd_labent {
 #+
 #  Name:
-#     Ccd_labent
+#     Ccd::labent
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -15,7 +14,7 @@
 
 #  Invocations:
 #
-#        Ccd_labent window 
+#        Ccd::labent window 
 #
 #     Returns a command "window" which is available in the global scope.
 #     This may be optionally followed by any of the configuration
@@ -91,7 +90,7 @@
 #     This widget inherits methods and configuration options from the
 #     following superclasses.
 #
-#        Ccd_base
+#        Ccd::base
 #
 #     These should be consulted for the methods and options which they
 #     supply.
@@ -113,18 +112,22 @@
 #        Added -state configuration option.
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated for itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::labent {
+
 #  Inheritance:
-      inherit Ccd_base
+      inherit Ccd::base
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Construct the widget from the basic components.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Now add the label and entry widgets
          CCDTkWidget Labelwidget labelwidget label $oldthis.label
@@ -137,6 +140,7 @@
          if { $opt != {} } { set placelabel $opt }
 
 #  Set default configurations.
+         eval configure $args
          configure -placelabel $placelabel
          configure -text $text
          configure -textvariable $textvariable
@@ -168,23 +172,23 @@
 
 #  Method for assigning context help.
       method sethelp {docname label} {
-	 Ccd_base::sethelp $Oldthis $docname $label
-	 Ccd_base::sethelp $Entrywidget $docname $label
-         Ccd_base::sethelp $Labelwidget $docname $label
+	 Ccd::base::sethelp $Oldthis $docname $label
+	 Ccd::base::sethelp $Entrywidget $docname $label
+         Ccd::base::sethelp $Labelwidget $docname $label
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      public text "label" {
-         if $exists {
+      public variable text "label" {
+         if { $exists } {
             $Labelwidget configure -text $text
 	 }
       }
 
 #  Configure label and entry relative positions.
-      public placelabel left {
-         if $exists {
+      public variable placelabel left {
+         if { $exists } {
             if { [ regexp (left|right|top|bottom) $placelabel] } {
 
 #  Unpack the widgets in preparation for re-packing.
@@ -203,8 +207,8 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       }
 
 #  Define a textvariable to hold the contents of the entry widget.
-      public textvariable {} {
-         if $exists {
+      public variable textvariable {} {
+         if { $exists } {
             if { $textvariable != {} } {
                $Entrywidget configure -textvariable $textvariable
             } else {
@@ -214,8 +218,8 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       }
 
 #  Width of the entry widget. Returns current width if no value.
-      public width {} {
-         if $exists {
+      public variable width {} {
+         if { $exists } {
             if { $width != {} } { 
                $Entrywidget configure -width $width 
             } else {
@@ -226,8 +230,8 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       }
 
 #  Set state of entry widget.
-      public state normal {
-         if $exists  { 
+      public variable state normal {
+         if { $exists } { 
             $Entrywidget configure -state $state
          }
       }
@@ -237,10 +241,10 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      protected Labelwidget
-      protected labelwidget ""
-      protected Entrywidget
-      protected entrywidget ""
+      protected variable Labelwidget
+      protected variable labelwidget ""
+      protected variable Entrywidget
+      protected variable entrywidget ""
   
 #  End of class definition.
    }

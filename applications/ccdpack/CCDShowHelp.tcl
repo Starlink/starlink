@@ -37,9 +37,11 @@
 #     17-APR-1997 (PDRAPER):
 #        Modified to show a message when an existing browser is
 #        found (which is not started here). This is meant to 
-#        drawn the users attention in case the browser is iconified.
+#        draw the users attention when the browser is iconified.
 #     22-JUL-2003 (MBT):
 #        Added the ability to use Mozilla.
+#     31-JAN-2006 (PDRAPER):
+#        Added firefox (another mozilla/netscape variant).
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -89,17 +91,17 @@
             }
 	 }
 
-	 [Nn]etscape|[Mm]ozilla {
+         [Nn]etscape|[Mm]ozilla|[Ff]irefox {
 	       
-#  Use Mozilla. This uses the NCAPIs methods as of netscape 1.1b1.
+#  Use Mozilla/variant. This uses the NCAPIs methods as of netscape 1.1b1.
 #  Attempt to make browser goto the required page. If this fails then the 
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
-	    if { [catch {exec $CCDbrowser -remote openURL(file://localhost/$filename)}] } {
+	    if { [catch {exec $CCDbrowser -noraise -remote openURL(file://localhost/$filename)}] } {
 	       set netscapepid 0
 	    }
             if { $netscapepid == 0 } { 
-               set netscapepid [exec $CCDbrowser $filename &]
+               set netscapepid [exec $CCDbrowser file://localhost/$filename &]
                CCDIssueInfo "Starting up $CCDbrowser"
                set showhelp_started 1
 	    } else {

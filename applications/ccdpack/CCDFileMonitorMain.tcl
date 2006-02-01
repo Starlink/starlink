@@ -19,9 +19,8 @@
 
 #  Notes:
 #     This interface requires that the extensions [incr Tcl], BLT and
-#     TclADAM are availabel (built into the wish executable that 
-#     invokes this file).  It is tested with Tcl/Tk8.0, and [incr Tcl] 
-#     3.0.
+#     TclADAM are available (built into the wish executable that 
+#     invokes this file).  
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -35,6 +34,8 @@
 #        Upgraded for Tcl8.
 #     22-JUL-2003 (MBT):
 #        Added option to use Mozilla.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -118,24 +119,24 @@
 
 #  Create top-level widget for main window.
    CCDCcdWidget Top top \
-      Ccd_toplevel .topwin -title "CCDPACK File contents monitor"
+      Ccd::toplevel .topwin -title "CCDPACK File contents monitor"
 
 #  Record this for use everywhere.
    set MAIN(window) $Top
    set MAIN(name) FILEMONITOR
 
 #  Menubar
-   CCDCcdWidget Menubar menubar Ccd_helpmenubar $Top.menubar -standard 0
+   CCDCcdWidget Menubar menubar Ccd::helpmenubar $Top.menubar -standard 0
 
 #  Textual message.
    CCDTkWidget Label label \
       label $top.label -anchor center -text "Monitoring file '$file'"
 
 #  Text area for displaying contents.
-   CCDCcdWidget Contents contents Ccd_scrolltext $Top.text
+   CCDCcdWidget Contents contents Ccd::scrolltext $Top.text
 
 #  Exit button
-   CCDCcdWidget Control control Ccd_choice $Top.control -standard false
+   CCDCcdWidget Control control Ccd::choice $Top.control -standard false
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.

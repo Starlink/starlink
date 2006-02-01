@@ -32,6 +32,8 @@
 #     	 Original version.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -59,13 +61,13 @@
       set Thiswin $Topwin.view$Viewcount
       incr Viewcount
       CCDCcdWidget Thisw thisw \
-         Ccd_toplevel $Thiswin -title "Contents of file $file"
+         Ccd::toplevel $Thiswin -title "Contents of file $file"
 
 #  Text widget
-      CCDCcdWidget Text text Ccd_scrolltext $Thisw.text
+      CCDCcdWidget Text text Ccd::scrolltext $Thisw.text
 
 #  Choice bar to remove window.
-      CCDCcdWidget Choice choice Ccd_choice $Thisw.choice -standard 0
+      CCDCcdWidget Choice choice Ccd::choice $Thisw.choice -standard 0
 
 #-----------------------------------------------------------------------------
 #  Widget configuration

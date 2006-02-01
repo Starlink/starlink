@@ -119,6 +119,8 @@
 #     3-JUL-2001 (MBT):
 #        Fixed some bugs from last change, farmed out window centring,
 #        made task invocation get written out to log window.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-
@@ -170,17 +172,17 @@ this interface (probably programming error)."
 
 #  Top level widget.
             CCDCcdWidget Otop otop \
-               Ccd_toplevel $Otopwin -title "Output from applications"
+               Ccd::toplevel $Otopwin -title "Output from applications"
 
 #  Menubar.
             CCDCcdWidget Menubar menubar \
-               Ccd_helpmenubar $Otop.menubar
+               Ccd::helpmenubar $Otop.menubar
 
 #  Scrolled text widget for the output.
-            CCDCcdWidget Output output Ccd_scrolltext $Otop.output
+            CCDCcdWidget Output output Ccd::scrolltext $Otop.output
 
 #  Choice bar to get rid of the top-level.
-            CCDCcdWidget Choice choice Ccd_choice $Otop.choice -standard 0
+            CCDCcdWidget Choice choice Ccd::choice $Otop.choice -standard 0
 
 #  Add an option to switch off future task output.
             $Menubar addcheckbutton Options \
@@ -205,7 +207,7 @@ this interface (probably programming error)."
       if { $wait == 1 || $wait == 2 } {
 
 #  Use an information window about status.
-         CCDCcdWidget Itop itop Ccd_toplevel $Itopwin -title {Information...}
+         CCDCcdWidget Itop itop Ccd::toplevel $Itopwin -title {Information...}
          wm withdraw $itop
          CCDTkWidget Frame1 frame1 frame $itop.frame1
          CCDTkWidget Frame2 frame2 frame $itop.frame2

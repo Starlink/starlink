@@ -7,19 +7,19 @@
 #     Tcl/Tk procedure.
 
 #  Purpose:
-#     Updates a named button of a Ccd_reveal widget to reflect the count
+#     Updates a named button of a Ccd::reveal widget to reflect the count
 #     of entries in a listbox-like widget.
 
 #  Description:
 #     This routine is for updating the text description of one of a set
-#     of buttons created by the Ccd_reveal widget. The text is updated to 
+#     of buttons created by the Ccd::reveal widget. The text is updated to 
 #     show a count of the number of entries in the associated window 
 #     (which should be a listbox-like widget, such as a scrollbox or 
 #     table). This is used by the CCDNDFDoImport procedure.
 
 #  Arguments:
 #     Reveal = window (read)
-#       The name of the Ccd_reveal widget whose button labels are to be 
+#       The name of the Ccd::reveal widget whose button labels are to be 
 #       changed to reflect the contents of an associated listbox-like 
 #       widget.
 #     name = string (read)
@@ -38,6 +38,8 @@
 #     	 Original version.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_further_changes_here}
 
 #-

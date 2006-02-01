@@ -1,8 +1,6 @@
-   itcl_class Ccd_helpmenubar {
-
 #+
 #  Name:
-#     Ccd_menubarhelp
+#     Ccd::menubarhelp
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -11,13 +9,13 @@
 #     Defines the "class of menubar with Help".
 
 #  Description:
-#     This class is an extension of Ccd_menubar that also performs the
+#     This class is an extension of Ccd::menubar that also performs the
 #     standard configuration of the Help system. It is NOT a general
 #     widget as it contains CCDPACK specific information.
 
 #  Invocations:
 #
-#        Ccd_menubarhelp window [-option value]...
+#        Ccd::menubarhelp window [-option value]...
 #
 #     This command create an instance of a menubar with help and returns a
 #     command "window" for manipulating it via the methods and
@@ -34,7 +32,7 @@
 #     Performs the given method on this widget.
 
 #  Configuration options:
-#     See Ccd_menubar.
+#     See Ccd::menubar.
 
 #  Methods:
 #     constructor [-option value]...
@@ -60,7 +58,7 @@
 #        "$name".
 
 #  Inheritance:
-#     This class inherits Ccd_menubar and its methods and configuration
+#     This class inherits Ccd::menubar and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -76,21 +74,29 @@
 #        longer needed.
 #     12-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
 
+   itcl::class Ccd::helpmenubar {
+
 #  Inheritances:
-      inherit Ccd_menubar
+      inherit Ccd::menubar
 
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_menubarhelp class and
+#  Construction creates a instance of the Ccd::menubarhelp class and
 #  configure it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
-#         previous Ccd_menubar::constructor
+      constructor { args } {
+         if { $args != {} } {
+            eval Ccd::menubar::constructor $args
+         }
+      } {
+         eval configure $args
 
 #  Add standard help commands.
 	 if { ! $standard } {
@@ -126,7 +132,7 @@
       method sethelpitem {name docname label} {
          if { [ info exists Buttons(Help) ] } {
             set menulabel $Buttonmenus(Help)$name
-            Ccd_base::sethelp $menulabel $docname $label
+            Ccd::base::sethelp $menulabel $docname $label
 	 }
       }
 

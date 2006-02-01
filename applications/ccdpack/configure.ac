@@ -1,4 +1,4 @@
-AC_INIT(ccdpack, 4.0-19, ccdpack@starlink.ac.uk)
+AC_INIT(ccdpack, 4.0-20, ccdpack@starlink.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR(ccdexercise)
@@ -77,7 +77,7 @@ STAR_DECLARE_DEPENDENCIES([build], [ard ast chr cnf fio generic grp hds idi ifd 
 STAR_DECLARE_DEPENDENCIES([build], [agi graphpar img pda ref shl sla startcl],[link])
 STAR_DECLARE_DEPENDENCIES(configure, [itcl tcl tk])
 
-STAR_LATEX_DOCUMENTATION(sun139)
+STAR_LATEX_DOCUMENTATION([sun139])
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([Makefile component.xml ccdpack.ifd CCD1_PAR

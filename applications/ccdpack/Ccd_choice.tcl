@@ -1,8 +1,6 @@
-   itcl_class Ccd_choice {
-
 #+
 #  Name:
-#     Ccd_choice
+#     Ccd::choice
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -21,7 +19,7 @@
 
 #  Invocations:
 #
-#        Ccd_choice window [-option value]...
+#        Ccd::choice window [-option value]...
 #
 #     This command creates an instance of a choice bar and returns a
 #     command "window" for manipulating it via the methods and
@@ -105,7 +103,7 @@
 
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -131,12 +129,15 @@
 #        Added focus method.
 #     12-MAY-2000 (MBT):
 #        Upgraded to Tcl8.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_changes_here}
 
 #-
+   itcl::class Ccd::choice {
 
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
@@ -144,13 +145,12 @@
 #  Construction creates a instance of the class and configures it with
 #  the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a frame widget. This must have the same name as the class
 #  command.
-         Ccd_base::constructor
-
 #  Set default configurations.
+         eval configure $args
          configure -standard          $standard
          configure -label             $label
          configure -maxwidth          $maxwidth
@@ -181,8 +181,6 @@
                button $oldthis.button$nbutton \
                       -text "$name" -width $buttonwidth
          } else {
-
-#  Descend into "quoting hell".
             CCDTkWidget Button button \
                button $oldthis.button$nbutton \
                       -text "$name" -width $buttonwidth \
@@ -274,13 +272,13 @@
 #  Request to bind all elements to this help.
             if { $nbutton > 0 } {
                foreach oneof [ array names Buttons ] {
-                  Ccd_base::sethelp $Buttons($oneof) $docname $label
+                  Ccd::base::sethelp $Buttons($oneof) $docname $label
                }
             }
-            Ccd_base::sethelp $Oldthis $docname $label
+            Ccd::base::sethelp $Oldthis $docname $label
          } else {
             if { [ info exists Buttons($name) ] } {
-               Ccd_base::sethelp $Buttons($name) $docname $label
+               Ccd::base::sethelp $Buttons($name) $docname $label
             }
          }
       }
@@ -304,25 +302,26 @@
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Add the standard buttons to choice bar.
-      public standard 1 {
-         if $exists {
-            if { $standard } {
+      public variable standard 1 {
+         if { $exists } {
+            if { $standard && ! $havestandard } {
                addbutton OK
                addbutton Cancel
+               set havestandard 1
             }
          }
       }
 
 #  Order for packing buttons. Can horizontal or vertical.
-      public stack horizontal {
-         if $exists {
+      public variable stack horizontal {
+         if { $exists } {
             _repack
          }
       }
 
 #  Optional label.
-      public label "" {
-         if $exists {
+      public variable label "" {
+         if { $exists } {
             if { $label != "" } {
                if { $havelabel } {
                   $Labelwidget configure -text "$label"
@@ -344,8 +343,8 @@
       }
 
 #  Width of label.
-      public width 0 {
-         if $exists {
+      public variable width 0 {
+         if { $exists } {
             if { $label != "" } {
                $Labelwidget configure -width $width
             }
@@ -353,7 +352,7 @@
       }
 
 #  Width of all buttons.
-      public buttonwidth 7 {
+      public variable buttonwidth 7 {
          if { $buttonwidth > $maxwidth && $maxwidth != 0 } {
             set buttonwidth $maxwidth
          }
@@ -361,7 +360,7 @@
       }
 
 #  Maximum width of buttons
-      public maxwidth 0 {}
+      public variable maxwidth 0 {}
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Common and protected variables.  Common are visible to all instances
@@ -369,19 +368,22 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar and their names.
-      protected nbutton 0
-      protected Buttons
-      protected Buttonlist
+      protected variable nbutton 0
+      protected variable Buttons
+      protected variable Buttonlist
 
 #  Notice if buttons need resizing.
-      protected resize 0
+      protected variable resize 0
 
 #  Presence of label.
-      protected havelabel 0
+      protected variable havelabel 0
+
+#  Presence of standard buttons.
+      protected variable havestandard 0
 
 #  Name of label widget.
-      protected Labelwidget
-      protected labelwidget ""
+      protected variable Labelwidget
+      protected variable labelwidget ""
 
 #  End of class defintion.
    }

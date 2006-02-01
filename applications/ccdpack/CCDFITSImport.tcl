@@ -46,6 +46,9 @@
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Modified the arguments of CCDGetFileName.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
+#        Fixed problem with use of default file filter.
 #     {enter_changes_here}
 
 #-
@@ -56,7 +59,6 @@
       global CCDimportfiles
       global CCDimportexists
       global CCDimporttable
-      global CCDndfimportfilter
       global CCDimagefilters
       global CCDcurrentdirectory
 #.
@@ -67,15 +69,15 @@
 
 #  Top-level widget for this form.
       CCDCcdWidget Topwin topwin \
-         Ccd_toplevel $Top -title "Import FITS information into NDFs"
+         Ccd::toplevel $Top -title "Import FITS information into NDFs"
 
 #  Menubar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Topwin.menubar
 
 #  Labelled entry for name of import table.
       CCDTkWidget Frame0 frame0 frame $topwin.frame0
       CCDCcdWidget Table table \
-         Ccd_labent $Frame0.table -text "Import Control Table:" \
+         Ccd::labent $Frame0.table -text "Import Control Table:" \
                      -textvariable CCDimporttable
 
 #  Frames for containing the current directory and file filters and the
@@ -85,43 +87,43 @@
 
 #  Labelled entry for current directory.
       CCDCcdWidget Directory directory \
-         Ccd_labent $Frame11.direct -text Directory:
+         Ccd::labent $Frame11.direct -text Directory:
 
 #  Labelled entry for file filter
       if { [llength $CCDimagefilters] > 1 } { 
          CCDCcdWidget Filefilter filefilter \
-            Ccd_option $Frame11.filter -text "File Filter:"
+            Ccd::option $Frame11.filter -text "File Filter:"
       } else {
          CCDCcdWidget Filefilter filefilter \
-            Ccd_labent $Frame11.filter -text "File Filter:"
+            Ccd::labent $Frame11.filter -text "File Filter:"
       }
 
 #  List of directories scrollbox.
       CCDCcdWidget Directbox directbox \
-         Ccd_scrollbox $Frame1.directbox \
+         Ccd::scrollbox $Frame1.directbox \
                         -singleselect 1 -label Directories: \
                         -exportselect 0
 
 #  List of files in current directory scrollbox.
       CCDCcdWidget Filebox filebox \
-         Ccd_scrollbox $Frame1.filebox \
+         Ccd::scrollbox $Frame1.filebox \
                       -label "Images in directory:" -singleselect 0 \
                       -exportselect 0
 
 #  Selected files scrollbox.
       CCDTkWidget Frame2 frame2 frame $topwin.frame2
       CCDCcdWidget Selectbox selectbox \
-         Ccd_scrollbox $Frame2.selectbox \
+         Ccd::scrollbox $Frame2.selectbox \
                         -label "Images selected:" -singleselect 0 \
                         -exportselect 0
 
 #  Options for adding and removing entries from the list of selected names.
       CCDCcdWidget Options options \
-         Ccd_choice $Frame1.options -standard 0 -stack vertical
+         Ccd::choice $Frame1.options -standard 0 -stack vertical
 
 
 #  Add choice bar for control (OK, Cancel etc.).
-      CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
+      CCDCcdWidget Choice choice Ccd::choice $Topwin.choice
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.
@@ -354,7 +356,11 @@
       }
 
 #  Invoke the filter button to get first setup.
-      $Filefilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
+      if { [llength $CCDimagefilters] > 1 } { 
+         $Filefilter insert 0 [lindex [lindex $CCDimagefilters 0] 1]
+      } else {
+         $Filefilter insert 0 "$CCDimagefilters"
+      }
       $Choice invoke Filter
 
 #  Wait for interaction to end.

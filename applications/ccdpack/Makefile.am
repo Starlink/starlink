@@ -4,7 +4,7 @@
 ccdsupportdir = $(bindir)
 
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
-                  $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) $(TCL_INDEX)
+                  $(TCL_SUPPORT_NOEXE) $(ITCL_SCR) $(TCL_INDEX)
 
 dist_bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
@@ -89,7 +89,7 @@ IRAF_STARTUP_SCRIPT = ccdpack.cl
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
 #  installed in the $(INSTALL_BIN) directory with execute permission
-#  set. 
+#  set.
 
 PUBLIC_SCR = $(SHELL_SCR) $(ICL_SCR) $(CONFIG_SCR) \
              $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT)
@@ -99,7 +99,7 @@ SHELL_SCR = ccdfork ccdexercise wcsexercise setexercise \
  ccdexecute ccdwww geometry ccdpack_ex1.csh ccdpack_ex2.csh \
  ccdpack_ex3.csh ccdpack_ex4.csh ccdpack_ex5.csh ccdpack_ex6.csh \
  ccdpack_ex7.csh ccdpack_ex8.csh glitch2ard filemonitor irg_wild \
- ccdimp.csh ccdexp.csh 
+ ccdimp.csh ccdexp.csh
 
 ICL_SCR = ccdexercise.icl ccdfork.icl
 
@@ -158,49 +158,14 @@ TCL_INDEX = tclIndex
 
 TCL_SUPPORT_BIN = atclsh$(EXEEXT)
 
-TCL_SUPPORT_TCL = auto.tcl history.tcl init.tcl package.tcl parray.tcl \
- safe.tcl word.tcl
-
-TCL_SUPPORT_TK = bgerror.tcl button.tcl clrpick.tcl comdlg.tcl console.tcl \
- dialog.tcl entry.tcl focus.tcl listbox.tcl menu.tcl msgbox.tcl \
- obsolete.tcl optMenu.tcl palette.tcl safetk.tcl scale.tcl scrlbar.tcl \
- tearoff.tcl text.tcl tk.tcl tkfbox.tcl xmfbox.tcl
-
 TCL_SUPPORT_STARTCL = adamtask.tcl colourDialog.tcl dialogShow.tcl \
  dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl printDialog.tcl
 
 TCL_SUPPORT_MSGRLY = adamMessageRelay
 
-TCL_SUPPORT_ITCL = itcl.tcl
-
-TCL_SUPPORT_ITK = Archetype.itk Toplevel.itk Widget.itk itk.tcl
-
-TCL_SUPPORT_IWIDGETS = buttonbox.itk calendar.itk canvasprintbox.itk \
- canvasprintdialog.itk checkbox.itk colors.itcl combobox.itk dateentry.itk \
- datefield.itk dialog.itk dialogshell.itk disjointlistbox.itk \
- entryfield.itk extfileselectionbox.itk extfileselectiondialog.itk \
- feedback.itk fileselectionbox.itk fileselectiondialog.itk finddialog.itk \
- hierarchy.itk hyperhelp.itk labeledframe.itk labeledwidget.itk \
- mainwindow.itk menubar.itk messagebox.itk messagedialog.itk notebook.itk \
- optionmenu.itk pane.itk panedwindow.itk promptdialog.itk pushbutton.itk \
- radiobox.itk regexpfield.itk roman.itcl scopedobject.itcl \
- scrolledcanvas.itk scrolledframe.itk scrolledhtml.itk scrolledlistbox.itk \
- scrolledtext.itk scrolledwidget.itk selectionbox.itk selectiondialog.itk \
- shell.itk spindate.itk spinint.itk spinner.itk spintime.itk \
- tabnotebook.itk tabset.itk timeentry.itk timefield.itk toolbar.itk \
- unknownimage.gif watch.itk
-
 TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
 
-TCL_SUPPORT_NOEXE = $(TCL_SCR) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
- $(TCL_SUPPORT_STARTCL) 
-
-if HAVE_ITCL
-   ITCL_SUPPORT_NOEXE = $(ITCL_SCR) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
-                        $(TCL_SUPPORT_IWIDGETS)
-else
-   ITCL_SUPPORT_NOEXE =
-endif
+TCL_SUPPORT_NOEXE = $(TCL_SUPPORT_STARTCL)
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
@@ -211,9 +176,7 @@ IFD_FILES = ccdpack.ifd $(REDTASKS:=.ifd) $(REGTASKS:=.ifd) \
             $(RESTASKS:=.ifd) $(SCRTASKS:=.ifd) \
             ccdhelp.ifd
 
-
 #  Rules.
-
 
 ccdpack.shl: ccdpack.hlp
 	$(HLIB) ccdpack.hlp
@@ -237,29 +200,19 @@ STAR_BIN = $(STARLINK)/bin
 
 $(TCL_SUPPORT_BIN):
 	cp $(STAR_BIN)/$@ $@
-$(TCL_SUPPORT_TCL):
-	cp $(STAR_LIB)/tcl$(TCL_VERSION)/$@ $@
-$(TCL_SUPPORT_TK):
-	cp $(STAR_LIB)/tk$(TCL_VERSION)/$@ $@
 $(TCL_SUPPORT_STARTCL):
 	cp $(STAR_LIB)/startcl/$@ $@
-$(TCL_SUPPORT_ITCL):
-	cp $(STAR_LIB)/itcl$(ITCL_VERSION)/$@ $@
-$(TCL_SUPPORT_ITK):
-	cp $(STAR_LIB)/itk$(ITCL_VERSION)/$@ $@
-$(TCL_SUPPORT_IWIDGETS):
-	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERSION)/scripts/$@ $@
 
 ## TCL_INDEX rule: although it can in principle be generated automatically
 ## from other source files as in this rule, TCL_INDEX is in fact checked
-## in as source code to the repository.  This is because building it only 
+## in as source code to the repository.  This is because building it only
 ## works when the DISPLAY environment variable points to a working X server,
 ## which will not be the case in a headless environment.  If it looks like
 ## the contents of TCL_INDEX are wrong, delete the file, re-make it, and
 ## (if that fixes the problem) check the new file in.  This should only
 ## be necessary if Tcl or perhaps CCDPACK's use of it changes in some
 ## relevant way.
-## 
+##
 ## Old dependency line:
 ##    $(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) \
 ##                  ccdwish
@@ -279,7 +232,10 @@ $(TCL_SUPPORT_MSGRLY): Makefile
 	chmod +x $(TCL_SUPPORT_MSGRLY).tmp
 	mv $(TCL_SUPPORT_MSGRLY).tmp $(TCL_SUPPORT_MSGRLY)
 
-BUILT_SOURCES = ccdhelp.ifl USER_ERR
+## Sources that need to be built, but are not mentioned elsewhere.
+## Force the creation of the on-line hypertext help, which relies on the
+## various rules added to create the main SUN.
+BUILT_SOURCES = ccdhelp.ifl USER_ERR ccdpack.htx_tar
 
 PRIVATE_INCLUDES = CCD1_CACM CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
                    CCD1_MOSCM CCD1_MOSPR CCD1_PAR.in CCD1_TMPCM
@@ -288,7 +244,7 @@ LINKSCRIPTS = ccdpack_link ccdpack_link_adam pgp_ccdpack_link pgp_ccdpack_link_a
 
 
 EXTRA_DIST = $(SHELL_SCR) $(IFD_FILES) $(PRIVATE_INCLUDES) $(ccdsupport_DATA) \
-             $(LINKSCRIPTS) ccdpack.hlp
+             $(LINKSCRIPTS) ccdpack.hlp ccdpack.htx_tar
 
 MISC_BUILT_FILES = adamMessageRelay version.dat ccdhelp ccdpack_scr \
 ccdpack_res ccdpack_reg ccdpack_red ccdpack.csh \
@@ -307,7 +263,29 @@ flatcor.ifc makebias.ifc makecal.ifc makeflat.ifc \
 ccdhelp.ifc ccdpack_scr.ifc ccdpack_res.ifc ccdpack_reg.ifc \
 ccdpack_red.ifc
 
-CLEANFILES = $(IFL_FILES) $(MISC_BUILT_FILES) $(IFC_BUILT_FILES) 
+CLEANFILES = $(IFL_FILES) $(MISC_BUILT_FILES) $(IFC_BUILT_FILES)
 
 SUBDIRS = tasks gen help main
 
+##  Post-installation tasks. We need to install the ccdpack.htx_tar
+##  contents into the help directory (not the package specific starhelpdir).
+##  Re-use the boiler plate from the SUN installation section.
+install-exec-local:
+	f="$(srcdir)/ccdpack.htx_tar";\
+	d="$(DESTDIR)/$(prefix)/help";\
+	if test -n "$(PAX)"; then \
+	  if $(MANIFEST); then \
+	    $(PAX) -f $$f | \
+	      sed 's+^+MANIFEST:$$d/+'; \
+	  fi; \
+	  cat $$f | (cd $$d; $(PAX) -r); \
+	elif test -n "$(TAR)"; then \
+	  if $(MANIFEST); then \
+	    cat $$f | (cd $$d; $(TAR) xBpvf -) | sed 's+^+MANIFEST:$$d/+'; \
+	  else \
+	    cat $$f | (cd $$d; $(TAR) xBpf -); \
+	  fi; \
+	else \
+	   echo "Neither tar nor pax!!!" >&2; \
+	   exit 1; \
+	fi

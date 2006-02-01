@@ -38,10 +38,13 @@
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
+#     PDRAPER: Peter W. Draper (STARLINK)
 
 #  History:
 #     18-JUN-2001 (MBT):
 #        Original version.
+#     01-FEB-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #-
 
 #  Global variables.
@@ -112,7 +115,7 @@
          }
 
 #  Construct a widget to show progress.
-         CCDCcdWidget Waiter waiter Ccd_toplevel $Top.waiter -title Working...
+         CCDCcdWidget Waiter waiter Ccd::toplevel $Top.waiter -title Working...
          wm withdraw $waiter
          CCDTkWidget Frame1 frame1 frame $waiter.f1
          CCDTkWidget Frame2 frame2 frame $waiter.f2

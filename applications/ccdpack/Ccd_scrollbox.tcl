@@ -1,8 +1,6 @@
-   itcl_class Ccd_scrollbox {
-
 #+
 #  Name:
-#     Ccd_scrollbox
+#     Ccd::scrollbox
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -20,7 +18,7 @@
 
 #  Invocations:
 #
-#        Ccd_scrollbox window [-option value]...
+#        Ccd::scrollbox window [-option value]...
 #
 #     This command create an instance of a scrollbox and returns a
 #     command "window" for manipulating it via the methods and
@@ -129,7 +127,7 @@
 #        right is visible.
 
 #  Inheritance:
-#     This class inherits Ccd_base and its methods and configuration
+#     This class inherits Ccd::base and its methods and configuration
 #     options, which are not directly occluded by those specified here.
 
 #  Authors:
@@ -151,20 +149,24 @@
 #        Upgraded for Tcl8.
 #     5-JUL-2001 (MBT):
 #        Added hmoveto and vmoveto methods.
+#     27-JAN-2006 (PDRAPER):
+#        Update for itcl::class syntax.
 #     {enter_further_changes_here}
 
 #-
+   itcl::class Ccd::scrollbox {
+
 
 #  Inheritances:
-      inherit Ccd_base
+      inherit Ccd::base
 
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_scrollbox class and
+#  Construction creates a instance of the Ccd::scrollbox class and
 #  configures it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create listbox.
          CCDTkWidget List list listbox $oldthis.list
@@ -188,6 +190,7 @@
          if { $sin != {} } { set singleselect $sin }
 
 #  Set default configurations.
+         eval configure $args
          configure -height          $height
          configure -width           $width
          configure -anchor          $anchor
@@ -233,7 +236,7 @@
 
 #  Method for assigning context help to all the elements of the object.
       method sethelp {docname label} {
-         if $exists {
+         if { $exists } {
 
 #  Rather than work out which configuration setting we're using, just
 #  extract all the possible widget names and check that they exist.
@@ -241,7 +244,7 @@
                set Name $widgetnames($oneof)
                set name [CCDPathOf $Name]
                if [winfo exists $name] {
-                  Ccd_base::sethelp $Name $docname $label
+                  Ccd::base::sethelp $Name $docname $label
                }
             }
          }
@@ -449,7 +452,7 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Insert and pack the required scrollbars. Remove any existing
 #  scrollbars first.
-      public scrollbarplaces { right bottom } {
+      public variable scrollbarplaces { right bottom } {
          foreach side $scrollbarplaces {
             if { ! [ regexp (left|right|top|bottom) $side ] } {
                error "Unknown scrollbar placement \"$side\", should be top bottom left or right"
@@ -458,18 +461,22 @@
 
 #  Only proceed if the object exists (this means that constructor has
 #  been invoked).
-         if $exists {
+         if { $exists } {
             _repack $scrollbarplaces
          }
       }
 
 #  If a label has been requested then add one.
-      public label {} {
+      public variable label {} {
          if { $label != {} } {
-            if $exists {
-               CCDTkWidget Labelwidget labelwidget \
-                  label $oldthis.label -text "$label"
-               pack $labelwidget -side top -anchor $anchor
+            if { $exists } {
+               if { ![winfo exists $labelwidget] } {
+                  CCDTkWidget Labelwidget labelwidget \
+                     label $oldthis.label -text "$label"
+                  pack $labelwidget -side top -anchor $anchor
+               } else {
+                  $labelwidget configure -text "$label"
+               }
                set widgetnames($Oldthis:label) $Labelwidget
                set widgetfocus($Oldthis:label) $Labelwidget
                _repack $scrollbarplaces
@@ -487,13 +494,13 @@
       }
 
 #  Set anchor position of the label.
-      public anchor w {
+      public variable anchor w {
          configure -label $label
       }
 
 #  Can more than one entry be selected at a time?
-      public singleselect 1 {
-         if $exists {
+      public variable singleselect 1 {
+         if { $exists } {
             if { $singleselect } {
                $List configure -selectmode browse
             } else {
@@ -504,22 +511,22 @@
 
 #  Is the selection exportable? If not may have more than one selection
 #  (one for each instance), otherwise the selection is the X11 one.
-      public exportselect 1 {
-         if $exists {
+      public variable exportselect 1 {
+         if { $exists } {
             $List configure -exportselection $exportselect
          }
       }
 
 #  Height of listbox.
-      public height 10 {
-         if $exists {
+      public variable height 10 {
+         if { $exists } {
             $List configure -height $height
          }
       }
 
 #  Width of listbox.
-      public width 20 {
-         if $exists {
+      public variable width 20 {
+         if { $exists } {
             $List configure -width $width
          }
       }
@@ -530,12 +537,12 @@
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Names of widgets
-      protected List
-      protected list ""
-      protected Scrolls
-      protected Frames
-      protected Labelwidget
-      protected labelwidget ""
+      protected variable List
+      protected variable list ""
+      protected variable Scrolls
+      protected variable Frames
+      protected variable Labelwidget
+      protected variable labelwidget ""
      
 
 #  End of class defintion.

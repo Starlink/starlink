@@ -43,6 +43,8 @@
 #        Converted to coding style.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
    
 #-
@@ -57,80 +59,80 @@
    
 #  Create a top-level window.
       CCDCcdWidget Top top \
-         Ccd_toplevel $Topwin -title "Reduce additional parameters"
+         Ccd::toplevel $Topwin -title "Reduce additional parameters"
 
 #  Add a menubar.
-      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
+      CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menubar
 
 
 #  Intermediary frame extensions. Extension to debiassed NDF names.
       CCDCcdWidget Debext debext \
-         Ccd_labent $Top.debext \
+         Ccd::labent $Top.debext \
                      -text "Extension of debiassed frames:" \
                      -textvariable CCDglobalpars(DEBIASEXT)
 
 #  Extension to dark corrected NDF names.
       CCDCcdWidget Darkext darkext \
-         Ccd_labent $Top.darkext \
+         Ccd::labent $Top.darkext \
                       -text "Extension of dark corrected frames:" \
                       -textvariable CCDglobalpars(DARKEXT)
 
 #  Extension to flash corrected NDF names.
       CCDCcdWidget Flashext flashext \
-         Ccd_labent $Top.flashext \
+         Ccd::labent $Top.flashext \
                        -text "Extension of flash corrected frames:" \
                        -textvariable CCDglobalpars(FLASHEXT)
 
 #  Extension to flatfielded NDF names.
       CCDCcdWidget Flatext flatext \
-         Ccd_labent $Top.flatext \
+         Ccd::labent $Top.flatext \
                       -text "Extension of flatfielded frames:" \
                       -textvariable CCDglobalpars(FLATEXT)
 
 #  Names of the master NDFs: Bias.
       CCDCcdWidget Masterbias masterbias \
-         Ccd_labent $Top.masterbias \
+         Ccd::labent $Top.masterbias \
                          -text "Name of master bias:" \
                          -textvariable CCDglobalpars(MASTERBIAS)
 
 #  Dark
       CCDCcdWidget Masterdark masterdark \
-         Ccd_labent $Top.masterdark \
+         Ccd::labent $Top.masterdark \
                          -text "Name of master dark:" \
                          -textvariable CCDglobalpars(MASTERDARK)
 
 #  Flash.
       CCDCcdWidget Masterflash masterflash \
-         Ccd_labent $Top.masterflash \
+         Ccd::labent $Top.masterflash \
                           -text "Name of master flash:" \
                           -textvariable CCDglobalpars(MASTERFLASH)
 
 #  Flat prefix.
       CCDCcdWidget Masterflat masterflat \
-         Ccd_labent $Top.masterflat \
+         Ccd::labent $Top.masterflat \
                          -text "Prefix name for master flatfields:" \
                          -textvariable CCDglobalpars(MASTERFLAT)
 
 #  Get the name of the script.
       CCDCcdWidget Scriptname scriptname \
-         Ccd_labent $Top.scriptname \
+         Ccd::labent $Top.scriptname \
                          -text "Name of script:" \
                          -textvariable CCDglobalpars(SCRIPTNAME)
 
 #  Get the type of script.
       CCDCcdWidget Scripttype scripttype \
-         Ccd_radioarray $Top.scripttype \
+         Ccd::radioarray $Top.scripttype \
                          -label "Script type:" \
                          -variable CCDglobalpars(SCRIPTTYPE)
 
 #  Get the name of the logfile for the reduce job.
       CCDCcdWidget Exelogfile exelogfile \
-         Ccd_labent $Top.exelogfile \
+         Ccd::labent $Top.exelogfile \
                          -text "Name of log file for background job:" \
                          -textvariable CCDglobalpars(EXELOGFILE)
 
 #  Add choice bar for getting out.
-      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+      CCDCcdWidget Choice choice Ccd::choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.

@@ -1,7 +1,6 @@
-itcl_class Ccd_multitem {
 #+
 #  Name:
-#     Ccd_multitem
+#     Ccd::multitem
 
 #  Type of Module:
 #     [incr Tcl] class
@@ -22,7 +21,7 @@ itcl_class Ccd_multitem {
 
 #  Invocations:
 #
-#        Ccd_multitem window [-option value]...
+#        Ccd::multitem window [-option value]...
 #
 #     This command create an instance of a "multiscrollbox" and returns
 #     a command "window" for manipulating it via the methods and
@@ -103,7 +102,7 @@ itcl_class Ccd_multitem {
 #        Listboxes.
 
 #  Inheritance:
-#     This class inherits Ccd_multiscrollbox and its methods and
+#     This class inherits Ccd::multiscrollbox and its methods and
 #     configuration options, which are not directly occluded by those
 #     specified here.
 
@@ -130,25 +129,30 @@ itcl_class Ccd_multitem {
 #        Upgraded for Tcl8.
 #     3-JUL-2001 (MBT):
 #        Fixed a bug from Tcl8 upgrade.
+#     27-JAN-2006 (PDRAPER):
+#        Updated to itcl::class syntax.
 #     {enter_changes_here}
 
 #-
 
+   itcl::class Ccd::multitem {
+
 #  Inheritances:
-      inherit Ccd_multiscrollbox
+      inherit Ccd::multiscrollbox
 #.
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#  Construction creates a instance of the Ccd_multiscrollbox class and
+#  Construction creates a instance of the Ccd::multiscrollbox class and
 #  configures it with the default and command-line options.
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      constructor { config } {
+      constructor { args } {
 
 #  Create a multiscrollbox with the desired number of elements. The
 #  scrollplaces for the scrollboxes can only be top or bottom for this
 #  construct. We will manage the last scrollbar (which can be left or
 #  right) at this level.
-         configure -Ccd_multiscrollbox::nboxes $nboxes
+         eval configure $args
+         configure -Ccd::multiscrollbox::nboxes $nboxes
          configure -scrollbarplaces $scrollbarplaces
          configure -exportselect $exportselect
          configure -singleselect $singleselect
@@ -243,7 +247,7 @@ itcl_class Ccd_multitem {
          if { [ llength $args ] == $nboxes } {
             set i 1
             foreach item $args {
-               Ccd_multiscrollbox::insert $i $index $item
+               Ccd::multiscrollbox::insert $i $index $item
                incr i
             }
          } else {
@@ -253,43 +257,43 @@ itcl_class Ccd_multitem {
 
 #  Get a set of data values from the scrollboxes.
       method get { index } {
-         return [Ccd_multiscrollbox::get all $index]
+         return [Ccd::multiscrollbox::get all $index]
       }
 
 #  Get the indices of any items selected in the listboxes. These should
 #  be the same across all listboxes so use number 1 for reference.
       method curselection {} {
-         return [Ccd_multiscrollbox::curselection 1]
+         return [Ccd::multiscrollbox::curselection 1]
       }
 
 #  Select a set of items. Just uses "all" of multiscrollbox method.
       method select { args } {
-         eval Ccd_multiscrollbox::select all $args
+         eval Ccd::multiscrollbox::select all $args
       }
 
 #  Clear a set of data values.
       method clear { args } {
-         eval Ccd_multiscrollbox::clear all $args
+         eval Ccd::multiscrollbox::clear all $args
       }
 
 #  Bind all the listboxes to the same event.
       method bind { args } {
-         eval Ccd_multiscrollbox::bind all $args
+         eval Ccd::multiscrollbox::bind all $args
       }
 
 #  Size of the scrollboxes (all the same).
       method size {} {
-         return [Ccd_multiscrollbox::size 1]
+         return [Ccd::multiscrollbox::size 1]
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Configuration options:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Set the Scrollbarplaces. Must keep these correct for this object, as
-#  we do not use the usual Ccd_multiscrollbox methods and need to
+#  we do not use the usual Ccd::multiscrollbox methods and need to
 #  completely manage these at this level.
-      public scrollbarplaces "bottom right" {
-         if $exists {
+      public variable scrollbarplaces "bottom right" {
+         if { $exists } {
 
 #  Decide which places we can accomodate.
             set hand {}
@@ -307,13 +311,13 @@ itcl_class Ccd_multitem {
 #  vertical scrollbar to control all listboxes. If the stacking is
 #  vertical then need scrollbars all round.
             if { $stack == "horizontal" } {
-               if { $side != {} } { Ccd_multiscrollbox::scrollbarplaces all $side }
+               if { $side != {} } { Ccd::multiscrollbox::scrollbarplaces all $side }
                if { $side != {} || $hand != {} } {
-                  Ccd_multiscrollbox::scrollbarplaces $index "$hand $side"
+                  Ccd::multiscrollbox::scrollbarplaces $index "$hand $side"
                }
             } else {
                if { $side != {} || $hand != {} } {
-                  Ccd_multiscrollbox::scrollbarplaces all "$hand $side"
+                  Ccd::multiscrollbox::scrollbarplaces all "$hand $side"
                }
             }
 
@@ -335,20 +339,20 @@ itcl_class Ccd_multitem {
                }
 
 #  Now add enhanced bindings as well.
-               bind <1>  "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <1>  "$Oldthis _managelists %W [list $Scrollbar] \
                                 [list $Listnames] listbox y"
-               bind <B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
                                        [list $Listnames] listbox y"
-               bind <Shift-1>   "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <Shift-1>   "$Oldthis _managelists %W [list $Scrollbar] \
                                        [list $Listnames] listbox y"
-               bind <Shift-B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <Shift-B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
                                              [list $Listnames] listbox y"
-               bind <Any-Up> "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <Any-Up> "$Oldthis _managelists %W [list $Scrollbar] \
                                     [list $Listnames] listbox y"
-               bind <Any-Down> "$Oldthis _managelists %W [list $Scrollbar] \
+               ::bind <Any-Down> "$Oldthis _managelists %W [list $Scrollbar] \
                                       [list $Listnames] listbox y"
 #  Clear selections.
-               bind <3>       "$Oldthis select clear 0 end"
+               ::bind <3>       "$Oldthis select clear 0 end"
 
 #  Need to reorder the bindtags to make Class bindings work before
 #  these ones (Class bindings do scroll & selections, need to happen
@@ -364,10 +368,10 @@ itcl_class Ccd_multitem {
 
 #  Create a series of new boxes. Old boxes must be cleared as item lists
 #  should always have the same number of elements.
-      public nboxes 2 {
-         if $exists {
+      public variable nboxes 2 {
+         if { $exists } {
             clear 0 end
-            configure -Ccd_multiscrollbox::nboxes $nboxes
+            configure -Ccd::multiscrollbox::nboxes $nboxes
             configure -scrollbarplaces $scrollbarplaces
 
 #  Listboxes do not export selection as we want to have a selection
@@ -378,16 +382,16 @@ itcl_class Ccd_multitem {
       }
 
 #  Exportselection needs a default of false for this class.
-      public exportselect 0 {
-         if $exists {
-            configure -Ccd_multiscrollbox::exportselect $exportselect
+      public variable exportselect 0 {
+         if { $exists } {
+            configure -Ccd::multiscrollbox::exportselect $exportselect
          }
       }
 
 #  Set label of a scrollbox.
       method label { listno text } {
          if { $listno <= $haveboxes } {
-            Ccd_multiscrollbox::label $listno $text
+            Ccd::multiscrollbox::label $listno $text
 
 #  Now need to restablish the scrollbar commands (these are destroyed by a 
 #  repack).

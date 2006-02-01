@@ -86,6 +86,8 @@ proc CCDNDFOrganize { Topwin args } {
 #        flatfields (IR usage).
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     1-JAN-2006 (PDRAPER):
+#        Changed to use new meta-widget names (s/Ccd_/Ccd::/g).
 #     {enter_changes_here}
 
 #-
@@ -158,35 +160,35 @@ proc CCDNDFOrganize { Topwin args } {
 #  Create widgets and associate any help.
 #------------------------------------------------------------------------------
 #  Create top-level object.
-   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Organize NDFs"
+   CCDCcdWidget Top top Ccd::toplevel $Topwin -title "Organize NDFs"
    wm withdraw $top
 
 #  Add standard menubar.
-   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menu -standard 0
+   CCDCcdWidget Menu menu Ccd::helpmenubar $Top.menu -standard 0
 
 #  Create frame for central part.
    CCDTkWidget Centre centre frame $top.centre
 
 #  Array of checkbuttons for indicating frames types.
    CCDCcdWidget Frames frames \
-      Ccd_checkarray $centre.ftypes -label "Frame types present:"
+      Ccd::checkarray $centre.ftypes -label "Frame types present:"
 
 #  Boolean for indicating more than one filter.
    CCDCcdWidget Filter filter \
-      Ccd_radioarray $Centre.filter \
+      Ccd::radioarray $Centre.filter \
                   -standard 1 \
                   -label "Data have same filter type:" \
                   -variable CCDsame(filter)
 
 #  Names of filters if used.
    CCDCcdWidget Filternames filternames \
-      Ccd_labent $Centre.filters \
+      Ccd::labent $Centre.filters \
                        -text "Filter names:" \
                        -textvariable CCDfilternames
 
 #  Boolean for use targets as flatfields (uses adam TRUE and FALSE).
    CCDCcdWidget Irflats irflats \
-      Ccd_radioarray $Centre.irflats \
+      Ccd::radioarray $Centre.irflats \
                    -standard 1 \
                    -adampars 1 \
                    -label "Use targets as possible flatfields:" \
@@ -194,7 +196,7 @@ proc CCDNDFOrganize { Topwin args } {
 
 #  Boolean for master bias state (zeroed or not).
    CCDCcdWidget Mbiasstate mbiasstate \
-      Ccd_radioarray $Centre.mbiasstate \
+      Ccd::radioarray $Centre.mbiasstate \
                    -standard 1 \
                    -adampars 1 \
                    -label "Master bias has mean of zero:" \
@@ -202,20 +204,20 @@ proc CCDNDFOrganize { Topwin args } {
 
 #  Boolean for dark times same.
    CCDCcdWidget Darks darks \
-      Ccd_radioarray $Centre.darkexpose \
+      Ccd::radioarray $Centre.darkexpose \
                  -standard 1 \
                  -label "Dark times are all the same:" \
                  -variable CCDsame(darks)
 
 #  Boolean for flash times same.
    CCDCcdWidget Flashes flashes \
-      Ccd_radioarray $Centre.flashexpose \
+      Ccd::radioarray $Centre.flashexpose \
                    -standard 1 \
                    -label "Flash times are all the same:" \
                    -variable CCDsame(flashes)
 
 #  Choice for final action.
-   CCDCcdWidget Choice choice Ccd_choice $Top.choice
+   CCDCcdWidget Choice choice Ccd::choice $Top.choice
 
 #------------------------------------------------------------------------------
 #  Configure widgets.
