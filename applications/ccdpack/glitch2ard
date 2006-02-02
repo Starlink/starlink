@@ -1,6 +1,6 @@
 #! /bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
-TCL_LIBRARY=$CCDPACK_DIR;TK_LIBRARY=$CCDPACK_DIR;export TCL_LIBRARY;export TK_LIBRARY;exec $CCDPACK_DIR/atclsh $0 ${1+"$@"}
+exec $CCDPACK_DIR/atclsh $0 ${1+"$@"}
 #
 #  Read a GLITCH file and convert it into an ARD file.
 #

@@ -46,14 +46,6 @@ if test "$CCDPACK_DIR" = ""; then
   exit 1
 fi
 
-#  Standalone TCL initialisations (necessary while CCDPACK distributes
-#  ccdwish binaries).
-
-TCL_LIBRARY=$CCDPACK_DIR
-TK_LIBRARY=$CCDPACK_DIR
-export TCL_LIBRARY
-export TK_LIBRARY
-
 #  Notes:
 #     The ${1+"$@"} passes on any command line arguments? Perhaps $0
 #     is also required?
