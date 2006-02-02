@@ -75,9 +75,31 @@
 *     parameter values is quite straightforward.  It does not operate
 *     with monolith parameter files.
 
+*  Copyright:
+*     Copyright (C) 1995 Science & Engineering Research Council
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +116,8 @@
 *        full path, such that an array index can be appended to
 *        access a single element of an array of parameter values.
 *        Increase the maximum path length.
+*     2-FEB-2006 (TIMJ):
+*        Use HDS_FIND rather than attempting to kluge DAT_ASSOC
 *    {enter_any_changes_here}
 
 *  Bugs:
@@ -147,7 +171,6 @@
       INTEGER SIZE               ! Number of elements in object
       CHARACTER * ( DAT__SZLOC ) SLICE ! Locator to an element of the
                                  ! object
-      LOGICAL THERE              ! Object present?
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type of the object
       INTEGER WIDTH              ! Width of the screen in characters
   
@@ -155,6 +178,9 @@
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Variable initialising
+      LOC = DAT__NOLOC
 
 *  Translate the environment variable/logical name for ADAM_USER.
       CALL PSX_GETENV( 'ADAM_USER', PATH, STATUS )
@@ -197,17 +223,8 @@
          FILE = PATH
          CALL CHR_APPND( '.'//PARNAM, PATH, NC )
 
-*  DAT_ASSOC copes with the full path to the object, unlike HDS_OPEN. 
-*  So use an internal parameter to store the object name, then get
-*  DAT_ASSOC to access it.  Surely there is a better way, like an
-*  inverse of HDS_TRACE.
-         CALL AIF_PTFNM( 'OBJECT', PATH, STATUS )
-
-*  Obtain a locator to the file.
-         CALL HDS_OPEN( FILE, 'READ', LOC, STATUS )
-
-*  Obtain a locator to the object.
-         CALL DAT_ASSOC( 'OBJECT', 'READ', LOCO, STATUS )
+*  Use HDS_FIND to open the file and the corresponding object path
+         CALL HDS_FIND(DAT__ROOT, PATH, 'READ', LOCO, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'PAR', PARNAM )
             CALL MSG_SETC( 'PATH', FILE )
@@ -217,6 +234,7 @@
          END IF
 
 *  Find out if the object is primitive.
+         PRIM = .FALSE.
          CALL DAT_PRIM( LOCO, PRIM, STATUS )
 
          IF ( .NOT. PRIM ) THEN
@@ -224,6 +242,7 @@
 *  This may be acceptable if it is an ASSOCked parameter.  These are
 *  structures of type ADAM_PARNAM.
             CALL DAT_ANNUL( LOCO, STATUS )
+            CALL HDS_OPEN( FILE, 'READ', LOC, STATUS )
             CALL DAT_FIND( LOC, PARNAM, LOCS, STATUS )
             CALL DAT_TYPE( LOCS, TYPE, STATUS )
 
@@ -319,9 +338,9 @@
             CALL DAT_ANNUL( LOCV, STATUS )
          END IF
 
-*  Tidy the object and file locators.
+*  Tidy the HDS locator and close the file (if opened)
          CALL DAT_ANNUL( LOCO, STATUS )
-         CALL DAT_ANNUL( LOC, STATUS )
+         IF ( LOC .NE. DAT__NOLOC) CALL DAT_ANNUL( LOC, STATUS )
 
       END IF
 
