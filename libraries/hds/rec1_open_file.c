@@ -146,6 +146,8 @@
 /*       Added the expand parameter.                                        */
 /*    28-DEC-2005 (TIMJ):                                                   */
 /*       Use DAT__FLEXT rather than hard-coded ".SDF"                       */
+/*    02-FEB-2006 (TIMJ):                                                   */
+/*       Free malloced memory if the slot is reused.                        */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -473,7 +475,9 @@
 
 /* If an error occurred, then deallocate any memory allocated for the File  */
 /* Name String and File ID.                                                 */
-      if ( !_ok( hds_gl_status ) )
+/* Also free the memory if we are reusing a slot (since the name is already */
+/* stored and the copy is not used.                                         */
+      if ( !_ok( hds_gl_status ) || !*newslot )
       {
          rec_deall_mem( lfns + 1, (void **) &fns );
          rec_deall_mem( sizeof( struct FID ), (void **) &fid );
