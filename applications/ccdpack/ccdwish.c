@@ -54,6 +54,8 @@
 *-
 */
 
+#include <config.h>   /* Local version */
+
 #include <stdio.h>
 #include <signal.h>
 #include <string.h>
@@ -119,7 +121,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
 */
       int ifd;                       /* File descriptor of downward pipe */
       int ofd;                       /* File descriptor of upward pipe */
-
+      char *ccddir;                  /* CCDPACK_DIR value */
       int my_argc;                   /* Number of arguments */
       char **my_argv;                /* Vector of arguments, [0..my_argc-1] */
       int last_arg;                  /* Index of the last arg, = my_argc-1  */
@@ -151,9 +153,9 @@ extern F77_SUBROUTINE(ccd1_getarg)
           }
           cnfImprt( argstr, MAX_ARG_LEN, my_argv[k] );
       }
-      my_argv[my_argc] = 0;     /* terminate argv list conventionally */
+      my_argv[my_argc] = 0;     /* terminate argv list conventionally */  
 
-      
+
 /* Check whether there are flags.  The only valid flag is '-pipes ifd ofd'.
    If we have something which looks like a flag but is not of this form,
    signal an error and bail out. */
@@ -241,6 +243,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
       Tcl_Interp *interp;
       char *c;
       char *initfile = "ccdwishrc";
+      const char *ccdDir;
       int len;
       int tclrtn;
       int *sp;
@@ -265,6 +268,24 @@ extern F77_SUBROUTINE(ccd1_getarg)
          fprintf( stderr, "Error while sourcing %s:\n%s\n", initfile,
                           Tcl_GetStringResult( interp ) );
       }
+
+/* Make sure CCDPACK_DIR is on auto_path, so we can pick up scripts 
+ * using autoloading, allow override of ccdpack_dir and use a baked
+ * in version as fallback. */
+    ccdDir = Tcl_GetVar( interp, "ccdpack_dir", TCL_GLOBAL_ONLY );
+    if ( ccdDir == NULL ) {
+        ccdDir = Tcl_GetVar2( interp, "env", "CCDPACK_DIR", 
+                              TCL_GLOBAL_ONLY );
+    }
+    if ( ccdDir == NULL ) {
+        ccdDir = CCDPACK_DIR;
+    }
+    sprintf( buffer, "set auto_path [linsert $auto_path 0 %s]", ccdDir );
+    if ( Tcl_Eval( interp, buffer ) != TCL_OK ) {
+        fprintf( stderr, "Application initialization failed: %s\n",
+                 Tcl_GetStringResult( interp ) );
+        return;
+    }
 
 /* Create an asynchronous event handler which can be used for handling
    signals. */
