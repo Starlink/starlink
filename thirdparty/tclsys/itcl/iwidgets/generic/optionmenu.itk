@@ -373,7 +373,12 @@ itcl::body iwidgets::Optionmenu::get {{first "current"} {last ""}} {
         return $_currentItem
     }
 
-    set first [index $first]
+    if {"end" == $first} {
+       set first $_numitems
+    } else {
+       set first [index $first]
+    }
+
     if {"" == $last} {
         return [$itk_component(popupMenu) entrycget $first -label]
     }
