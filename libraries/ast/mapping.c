@@ -161,6 +161,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Corrected axis indices returned by public interface for astMapSplit.
 *     31-JAN-2006 (DSB):
 *        Added IsSimple attribute.
+*     2-FEB-2006 (DSB):
+*        Corrections to prologue of astLinearApprox.
 *class--
 */
 
@@ -6006,7 +6008,7 @@ f     TOL = DOUBLE PRECISION (Given)
 *        by more than this amount at any point which is tested, then no fit
 *        coefficients will be returned.
 c     fit
-f     FIT( * ) = DOUBLE PRECISION (Given)
+f     FIT( * ) = DOUBLE PRECISION (Returned)
 c        Pointer to an array of doubles 
 f        An array
 *        in which to return the co-efficients of the linear
@@ -6017,14 +6019,14 @@ f        An array
 *        and 3 outputs the linear approximation to the forward transformation 
 *        is:
 *
-c           X_out = result[0] + result[3]*X_in + result[4]*Y_in 
-f           X_out = result(1) + result(4)*X_in + result(5)*Y_in 
+c           X_out = fit[0] + fit[3]*X_in + fit[4]*Y_in 
+f           X_out = fit(1) + fit(4)*X_in + fit(5)*Y_in 
 *
-c           Y_out = result[1] + result[5]*X_in + result[6]*Y_in 
-f           Y_out = result(2) + result(6)*X_in + result(7)*Y_in 
+c           Y_out = fit[1] + fit[5]*X_in + fit[6]*Y_in 
+f           Y_out = fit(2) + fit(6)*X_in + fit(7)*Y_in 
 *
-c           Z_out = result[2] + result[7]*X_in + result[8]*Y_in
-f           Z_out = result(3) + result(8)*X_in + result(9)*Y_in
+c           Z_out = fit[2] + fit[7]*X_in + fit[8]*Y_in
+f           Z_out = fit(3) + fit(8)*X_in + fit(9)*Y_in
 *
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
