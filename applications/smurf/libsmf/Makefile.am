@@ -18,7 +18,8 @@ smf_clone_data.c \
 smf_create_smfData.c smf_create_smfFile.c smf_create_smfHead.c \
 smf_create_smfDA.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
-smf_construct_smfData.c
+smf_construct_smfData.c \
+smf_mapbounds.c \ smf_rebinmap.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

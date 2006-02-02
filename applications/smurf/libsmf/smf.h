@@ -21,6 +21,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +60,9 @@
 *     2006-01-27 (TIMJ):
 *        Change API for smf_construct_smfFile, smf_construct_smfDA
 *        and smf_construct_smfHead.
+*     2006-02-02 (EC):
+*        Add smf_mapbounds
+*        Add smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,5 +181,13 @@ double smf_scale_tau ( const double tauwvm, const int filter, int *status);
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
 void smf_tslice_ast (smfData * data, int index, int * status );
+
+void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
+		    double lat_0, int flag, double pixsize, int *lbnd_out, 
+		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+
+void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
+                   int *lbnd_out, int *ubnd_out, double *map, double *variance,
+		   double *weights, int *status );
 
 #endif /* SMF_DEFINED */
