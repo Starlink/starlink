@@ -65,7 +65,7 @@ high-level interface to the AST library.
 </component>
 
 <component id="ccdpack" support="S">
-  <version>4.0-19</version>
+  <version>4.0-20</version>
   <path>applications/ccdpack</path>
   <description>CCD data reduction package</description>
   <abstract>
