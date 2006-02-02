@@ -4,7 +4,7 @@
 ccdsupportdir = $(bindir)
 
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
-                  $(TCL_SUPPORT_NOEXE) $(ITCL_SCR) $(TCL_INDEX)
+                  $(TCL_SUPPORT_NOEXE) $(TCL_SCR) $(ITCL_SCR) $(TCL_INDEX)
 
 dist_bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
