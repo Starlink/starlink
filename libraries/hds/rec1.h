@@ -178,6 +178,7 @@ extern struct BCP *rec_ga_fpl_malloced; /* memory address of malloced FPL */
 			  INT *path_len );
       void rec1_getcwd( char **cwd, INT *lcwd );
 #endif
+      int rec1_getcwd_free( void );
       int rec1_locate_hcb( int slot, char mode, struct HCB **hcb );
       int rec1_lock_slot( int slot );
       int rec1_map_frame( int slot, INT_BIG bloc, INT_BIG length,

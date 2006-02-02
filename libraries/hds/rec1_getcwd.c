@@ -48,6 +48,17 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
+/* File globals - declare them outside the function so that we can
+   clean up the malloc for valgrind on exit. */
+#if USE_GETWD
+      static char wd[ MAXPATHLEN ]; /* Static buffer for path name          */
+
+#else                            /* getcwd local variables:                 */
+      static INT mxwd;           /* Amount of space allocated               */
+      static char *wd = NULL;    /* Pointer to working directory string.    */
+#endif
+
+
    void rec1_getcwd( char **cwd, INT *lcwd )
    {
 /*+                                                                         */
@@ -88,6 +99,27 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 /*   allocation in the standard POSIX getcwd function.                      */
 /*   -  This routine is not implemented on VMS systems.                     */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2005-2006 Particle Physics and Astronomy Research       */
+/*                 Council. All Rights Reserved.                            */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
@@ -98,6 +130,8 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 /*       Original version.                                                  */
 /*    06-SEP-2005 (TIMJ):                                                   */
 /*       Use autoconf to determine getwd availability                       */
+/*    01-FEB-2006 (TIMJ):                                                   */
+/*       Add rec1_getcwd_free                                               */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -115,13 +149,6 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
 #endif
 
 /* Local Variables:                                                         */
-#if USE_GETWD
-      static char wd[ MAXPATHLEN ]; /* Static buffer for path name          */
-
-#else                            /* getcwd local variables:                 */
-      static INT mxwd;           /* Amount of space allocated               */
-      static char *wd = NULL;    /* Pointer to working directory string.    */
-#endif
 
 /* External references:                                                     */
 #if USE_GETWD && !HAVE_DECL_GETWD
@@ -204,3 +231,17 @@ working directory - ^MESSAGE",
       return;
    }
 #endif
+
+/* simple routine called from rec_stop to free up the memory that may
+   have been malloced by rec1_getcwd */
+int
+rec1_getcwd_free( void ) {
+  /* GETWD uses a static buffer which we should not free */
+#if ! USE_GETWD
+  if (wd != NULL) {
+    rec_deall_mem(mxwd*sizeof(char), (void**)&wd);
+    if (!_ok(hds_gl_status)) return hds_gl_status;
+  }
+#endif
+  return DAT__OK;
+}

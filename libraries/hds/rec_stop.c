@@ -75,6 +75,8 @@
 /*       value.                                                             */
 /*    31-JAN-2006 (TIMJ):                                                   */
 /*        Free memory associated with the Block Control Packets             */
+/*    01-FEB-2006 (TIMJ):                                                   */
+/*        Free memory allocated by rec1_getcwd                              */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -120,6 +122,9 @@
 	 if (rec_ga_fpl_malloced != NULL)
 	   rec_deall_mem( hds_gl_maxwpl * sizeof( struct BCP ),
 			  (void **)&rec_ga_fpl_malloced ); 
+
+	 /* Free the getcwd buffer */
+	 rec1_getcwd_free( );
 
 /* Note that the rec_ facility is no longer active.                         */
          rec_gl_active = 0;
