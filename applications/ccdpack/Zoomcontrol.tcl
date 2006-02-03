@@ -75,8 +75,8 @@
          pack $itk_component(zoomout) \
               $itk_component(zoom) \
               $itk_component(zoomin) \
-              -side left -fill y
-         pack $itk_component(control)
+              -side left -fill x -expand 1
+         pack $itk_component(control) -fill both -expand 1
          set omenu $itk_component(zoom)
          configure -balloonstr {Image magnification}
          eval itk_initialize $args

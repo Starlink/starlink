@@ -1,4 +1,4 @@
-   class Wcsframecontrol {
+   itcl::class Wcsframecontrol {
 #+
 #  Name:
 #     Wcsframecontrol
@@ -48,8 +48,8 @@
                -command [ code $this setvalue ]
          }
          set omenu $itk_component(wcsframe)
-         pack $omenu
-         pack $itk_component(control)
+         pack $omenu -fill x -expand 1
+         pack $itk_component(control) -fill both -expand 1
          configure -balloonstr "World Coordinate System frame"
          eval itk_initialize $args
       }
@@ -119,7 +119,6 @@
 ########################################################################
 
       private variable omenu             ;# Path name of the optionmenu widget
-      private variable omenubut          ;# Path name of menubutton component
       private variable hasvalid 0        ;# Do we have a valid ndf/ndfset?
 
    }

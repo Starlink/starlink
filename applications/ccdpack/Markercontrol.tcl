@@ -109,8 +109,8 @@
          set tagname "_tag_$this:"
 
 #  Pack the component widgets.
-         pack $markerstyle -side left -padx 2 -fill both -expand 1
-         pack $itk_component(control)
+         pack $markerstyle -side left -fill both -expand 1
+         pack $itk_component(control) -fill both -expand 1
 
 #  Do configuration.  This is a somewhat messy business because this
 #  Control widget contains a couple of other Control widgets; normally
@@ -284,7 +284,7 @@
 #-----------------------------------------------------------------------
          if { $shownumcontrol } {
             pack $markernum -after $markerstyle \
-                            -side left -padx 2 -fill both -expand 1
+                            -side left -fill both -expand 1
          } else {
             pack forget $markernum
          }
@@ -295,7 +295,7 @@
       public variable uselabels 1 {
 #-----------------------------------------------------------------------
          if { $uselabels } {
-            pack $markernum -after $markerstyle -side left -fill y
+            pack $markernum -after $markerstyle -side left -fill both -expand 1
          } else {
             pack forget $markernum
          }

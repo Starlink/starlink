@@ -1,4 +1,4 @@
-   class Stylecontrol {
+   itcl::class Stylecontrol {
 #+
 #  Name:
 #     Stylecontrol
@@ -64,7 +64,7 @@
                -menu $itk_component(control).style.menu \
                -text "Grid"
          }
-         pack $itk_component(style)
+         pack $itk_component(style) -fill both -expand 1
          set menubutton $itk_component(style)
          itk_component add menu {
             menu $menubutton.menu
@@ -89,7 +89,7 @@
                -command [ code $this setval ]
             incr i
          }
-         pack $itk_component(control)
+         pack $itk_component(control) -fill both -expand 1
          configure -balloonstr "Axis plotting style"
          eval itk_initialize $args
          setval

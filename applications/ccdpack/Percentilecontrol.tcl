@@ -56,8 +56,8 @@
          set omenu $itk_component(percentile)
          set omenubut [ $omenu component menuBtn ]
          $omenubut configure -textvariable ""
-         pack $omenu
-         pack $itk_component(control)
+         pack $omenu -fill both -expand 1
+         pack $itk_component(control) -fill both -expand 1
          configure -balloonstr "Brightest/darkest image pixel cutoff"
          eval itk_initialize $args
       }

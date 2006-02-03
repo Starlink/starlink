@@ -62,8 +62,8 @@
                -wrap false \
                -textvariable [ scope value ]
          }
-         pack $itk_component(marknum) -side left
-         pack $itk_component(control) -side left -fill y
+         pack $itk_component(marknum) -side left -fill both -expand 1
+         pack $itk_component(control) -side left -fill both -expand 1
          configure -balloonstr {Index of next plotted marker}
          eval itk_initialize $args
          clear

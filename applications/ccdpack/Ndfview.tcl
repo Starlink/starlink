@@ -1,4 +1,4 @@
-   class Ndfview {
+   itcl::class Ndfview {
 #+
 #  Name:
 #     Ndfview
@@ -208,14 +208,14 @@
       set row2 $itk_component(row2)
       lower $row1 
       lower $row2
-      pack $row1 $row2 -side top -expand 1 -fill x
+      pack $row1 $row2 -side top -expand 1 -fill both
       foreach grp { zoom cutoff markers } {
          set win [ groupwin $grp ]
-         pack $win -in $row1 -side left -fill x -expand 1
+         pack $win -in $row1 -side left -fill both -expand 1
       }
       foreach grp { style action } {
          set win [ groupwin $grp ]
-         pack $win -in $row2 -side left -fill x -expand 1
+         pack $win -in $row2 -side left -fill both -expand 1
       }
 
 #  Set component aliases.

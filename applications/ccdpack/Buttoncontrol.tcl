@@ -57,8 +57,8 @@
             button $itk_component(control).button \
                -relief raised
          }
-         pack $itk_component(button)
-         pack $itk_component(control)
+         pack $itk_component(button) -fill y -expand 1
+         pack $itk_component(control) -fill both -expand 1
          configure -balloonstr {Press me}
          eval itk_initialize $args
       }

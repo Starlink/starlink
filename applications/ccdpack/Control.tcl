@@ -1,4 +1,4 @@
-   class Control {
+   itcl::class Control {
 #+
 #  Name:
 #     Control
@@ -89,6 +89,10 @@
 ########################################################################
       constructor { args } {
 
+         #  Override padding options of toolbar, these are set to 5!
+         option add *Toolbar*padX 1 userDefault
+         option add *Toolbar*padY 1 userDefault
+
          itk_component add toolbar {
             iwidgets::toolbar $itk_interior.tbar
          } {
@@ -96,9 +100,8 @@
             ignore -selectborderwidth  ;# Don't know why I need this, but I do.
          }
          set childsite [ $itk_component(toolbar) add frame onlytool ]
-         set tool $childsite
          set control $itk_component(toolbar)
-         pack $control -side left -fill y -expand 1
+         pack $control -side left -fill both -expand 1
 
          eval itk_initialize $args
       }
@@ -161,7 +164,7 @@
          if { $hidden && ! [ catch { pack info $control } ] } {
             pack forget $control
          } elseif { ! $hidden && [ catch { pack info $control } ] } {
-            pack $control
+            pack $control -side left -fill both -expand 1
          }
       }
 

@@ -50,8 +50,8 @@
                -variable [ scope checkval ] \
                -command [ code "$this setvalue" ]
          }
-         pack $itk_component(checkbutton) -side left -fill y -expand 1
-         pack $itk_component(control) -side left -fill y -expand 1
+         pack $itk_component(checkbutton) -side left -fill both -expand 1
+         pack $itk_component(control) -side left -fill both -expand 1
          configure -balloonstr {Toggle me}
          eval itk_initialize $args
       }

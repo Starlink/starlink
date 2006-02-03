@@ -76,9 +76,9 @@
          }
 
 #  Pack the control.
-         pack $itk_component(shower)
-         pack $itk_component(markstyle)
-         pack $itk_component(control)
+         pack $itk_component(shower) -fill both -expand 1
+         pack $itk_component(markstyle) -fill both -expand 1
+         pack $itk_component(control) -fill both -expand 1
 
 #  Construct the dialog which selects the marker shape.
          set attmenus {colour size thickness shape}
@@ -149,7 +149,7 @@
          }
          itk_component add scratchcanvas {
             canvas $itk_component(scratchholder).canv \
-               -height 40 \
+               -height 24 \
                -width 50
          }
          pack $itk_component(scratchholder) -side top -anchor c

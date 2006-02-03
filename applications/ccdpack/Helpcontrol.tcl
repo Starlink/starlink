@@ -1,4 +1,4 @@
-   class Helpcontrol {
+   itcl::class Helpcontrol {
 #+
 #  Name:
 #     Helpcontrol
@@ -76,8 +76,8 @@
             usual
             ignore -text
          }
-         pack $itk_component(button)
-         pack $itk_component(control)
+         pack $itk_component(button) -fill y -expand 1
+         pack $itk_component(control) -fill both -expand 1
          configure -balloonstr {Display help text}
          eval itk_initialize $args
       }
