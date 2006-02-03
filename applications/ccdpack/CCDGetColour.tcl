@@ -85,7 +85,7 @@ proc CCDGetColour { Topwin element } {
       scale $frame1.blue -label "Blue" -showvalue 0 \
                   -to 65535 -orient horizontal -variable RGB(blue)
    CCDCcdWidget Choice choice Ccd::choice $Top.choice
-   CCDTkWidget Frame2 frame $top.frame2 -borderwidth 0
+   CCDTkWidget Frame2 frame2 frame $top.frame2 -borderwidth 0
    CCDTkWidget Thislabel thislabel \
       label $frame2.label -text "Colour:              "
    CCDTkWidget Thiscolour thiscolour frame $frame2.colour
