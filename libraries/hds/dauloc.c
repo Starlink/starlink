@@ -135,8 +135,8 @@ int              i;
 _invoke( rec_alloc_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
                         (void **) &lcp ) );
 
- /* Need to store the pointer in the global array */
- _invoke(dau1_store_flq_malloc( lcp ));
+/* Need to store the pointer in the global array */
+_invoke(dau1_store_flq_malloc( lcp ));
 
 (void) memset( (void *) lcp, 0,
                (size_t) ( DAT_K_CLUSTER * sizeof( struct LCP ) ) );
@@ -167,8 +167,8 @@ dau_free_flq( void ) {
 
   /* Free all the chunks */
   for (i = 0; i < npntrs; i++) {
-    _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
-			   (void **)&malloced[i] ));
+     _invoke(rec_deall_mem( DAT_K_CLUSTER * sizeof( struct LCP ),
+ 			   (void **)&malloced[i] ));
   }
   
   /* and the container */
@@ -193,7 +193,7 @@ dau1_store_flq_malloc( struct LCP * lcp ) {
 
   } else if ( totpntrs == npntrs ) {
     /* Need to realloc some space */
-    new = realloc( malloced, totpntrs + NBINS_INC );
+      new = realloc( malloced, (totpntrs + NBINS_INC) * sizeof(struct LCP*));
     if (new == NULL) {
       /* just ignore and leak a bit - do not need to free the 
 	 old memory, since it can still contain useful information */
