@@ -104,6 +104,12 @@ Tcl_AppInit(interp)
     if (Itk_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
+
+    /* Look for Iwidgets, no Init procedure so try to "require" it */
+    if (Tcl_Eval( interp, "package require Iwidgets 4.0.1" ) == TCL_ERROR) {
+        return TCL_ERROR;
+    }
+
 #endif /* HAVE_ITCL */
     if (Tcladam_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
