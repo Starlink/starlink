@@ -63,6 +63,8 @@
 *     2006-02-02 (EC):
 *        Add smf_mapbounds
 *        Add smf_rebinmap
+*     2006-02-03 (AGG):
+*        Change API for smf_scale_tau, smf_correct_extinction
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,13 +107,15 @@ void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
 
-void smf_correct_extinction( smfData *data, const char *method, double tau, int *status);
+void smf_correct_extinction( smfData *data, const char *method, const int quick, double tau, int *status);
 
 smfData* smf_create_smfData( int flags, int * status );
-smfFile* smf_create_smfFile( int * status );
-smfHead* smf_create_smfHead( int * status );
-smfDA*   smf_create_smfDA( int * status );
 
+smfFile* smf_create_smfFile( int * status );
+
+smfHead* smf_create_smfHead( int * status );
+
+smfDA*   smf_create_smfDA( int * status );
 
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
@@ -176,7 +180,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index,
 
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status);
-double smf_scale_tau ( const double tauwvm, const int filter, int *status);
+double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
