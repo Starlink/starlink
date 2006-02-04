@@ -56,6 +56,8 @@
 *        Tau is now double, rather than float.
 *     2006-01-25 (AGG):
 *        Mode keyword changed to Method.
+*     2006-02-03 (AGG):
+*        Filter now a string
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -126,11 +128,12 @@ void smurf_extinction( int * status ) {
   smfHead *ohdr;             /* Pointer to header in odata */
   int outsize;               /* Total number of NDF names in the output group */
   int size;                  /* Number of files in input group */
-  double tau = 0.0;           /* Zenith tau at this wavelength */
-  long filter;
+  double tau = 0.0;          /* Zenith tau at this wavelength */
+  char filter[81];           /* Name of filter */
 
-  char method[LEN__METHOD];      /* String for optical depth method */
+  char method[LEN__METHOD];  /* String for optical depth method */
   double deftau = 0.0;       /* Default value for the zenith tau */
+  int quick;
 
   /* Main routine */
 
@@ -147,8 +150,11 @@ void smurf_extinction( int * status ) {
 
   /* Get METHOD */
   parChoic( "METHOD", "CSOTAU", 
-	    "CSOtau,Filtertau,WVMraw,WVMsmooth,Polynomial,Data", 1,
+	    "CSOtau, Filtertau, WVMraw, WVMsmooth, Polynomial, Data.", 1,
 	    method, LEN__METHOD, status);
+
+  /* Get QUICK flag */
+  parGet0l( "QUICK", &quick, status);
 
   for (i=1; i<=size; i++) {
 
@@ -165,8 +171,7 @@ void smurf_extinction( int * status ) {
       /* Tell the user which file it was... */
       /* Would be user-friendly to trap 1st etc... */
       msgSeti("I",i);
-      errRep("",
-	     "Unable to flatfield data from the ^I th file", status);
+      errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
     }
 
     /* What next if status is bad? */
@@ -193,6 +198,7 @@ void smurf_extinction( int * status ) {
 	/* Define the default value first time round */
 	if ( i == 1 ) {
 	  ohdr = odata->hdr;
+	  smf_fits_getS( ohdr, "FILTER", filter, 81, status);
 	  smf_fits_getD( ohdr, "MEANWVM", &deftau, status );
 	  deftau = smf_scale_tau( deftau, filter, status );
 	  parDef0d( "FILTERTAU", deftau, status );
@@ -220,10 +226,10 @@ void smurf_extinction( int * status ) {
       }
     }
     /* Apply extinction correction */
-    smf_correct_extinction( odata, method, tau, status );
+    smf_correct_extinction( odata, method, quick, tau, status );
 
     /* Free resources for output data */
-    smf_close_file( &odata, status );
+    /*smf_close_file( &odata, status );*/
   }
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &igrp, status);
