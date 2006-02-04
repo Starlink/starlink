@@ -34,6 +34,15 @@ package @PACKAGE@ {
             helpkey *
          }
 
+	 parameter quick {
+	    type _LOGICAL
+	    vpath {PROMPT }
+	    prompt {Apply the optical depth in quick fashion?}
+	    ppath GLOBAL CURRENT
+	    default FALSE
+	    helpkey *
+	  }
+
 	 parameter csotau {
 	    type _REAL
 	    vpath {PROMPT }
