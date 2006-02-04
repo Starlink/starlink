@@ -58,6 +58,8 @@
 *     2006-01-25 (TIMJ):
 *        1-at-a-time astTran2 is not fast. Rewrite to do the astTran2
 *        a frame at a time. Speed up from 85 seconds to 2 seconds.
+*     2006-02-03 (AGG):
+*        Add the quick flag. Not pretty but it gives a factor of 2 speed up
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,7 +109,7 @@ F77_DOUBLE_FUNCTION(sla_airmas)( double * );
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-void smf_correct_extinction(smfData *data, const char *method, double tau, int *status) {
+void smf_correct_extinction(smfData *data, const char *method, const int quick, double tau, int *status) {
 
   /* Local variables */
   smfHead *hdr;            /* Pointer to full header struct */
@@ -161,6 +163,9 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
   if ( *status != SAI__OK) return;
 
+  /* Check desired optical depth method */
+
+
   /* Assign pointer to input data array */
   /* of course, check status on return... */
   indata = (data->pntr)[0]; 
@@ -169,23 +174,27 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
 
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
-  xin = smf_malloc( npts, sizeof(double), 0, status );
-  yin = smf_malloc( npts, sizeof(double), 0, status );
-  xout = smf_malloc( npts, sizeof(double), 0, status );
-  yout = smf_malloc( npts, sizeof(double), 0, status );
+  if (!quick) {
+    xin = smf_malloc( npts, sizeof(double), 0, status );
+    yin = smf_malloc( npts, sizeof(double), 0, status );
+    xout = smf_malloc( npts, sizeof(double), 0, status );
+    yout = smf_malloc( npts, sizeof(double), 0, status );
+  }
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
   if (*status != SAI__OK) goto CLEANUP;
 
-  /* Prefill with coordintes */
+  /* Prefill with coordinates */
   z = 0;
   for (j = 0; j < (data->dims)[1]; j++) {
     base = j *(data->dims)[0];
     for (i = 0; i < (data->dims)[0]; i++) {
-      xin[z] = (double)i + 1.0;
-      yin[z] = (double)j + 1.0;
+      if (!quick) {
+	xin[z] = (double)i + 1.0;
+	yin[z] = (double)j + 1.0;
+      }
       indices[z] = base + i; /* index into data array */
       z++;
     }
@@ -213,24 +222,33 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
     }
 
     /* Transfrom from pixels to AZEL */
-    astTran2(wcs, npts, xin, yin, 1, xout, yout );
-
+    if (!quick) {
+      astTran2(wcs, npts, xin, yin, 1, xout, yout );
+    }
+    /* If we're using the QUICK application method, we assume a single
+       airmass and tau for the whole array */
     /* Loop over data in time slice. Start counting at 1 since this is
        the GRID coordinate frame */
     base = npts * k; /* Offset into 3d data array */
+    if (quick) {
+      airmass = hdr->sc2head->tcs_airmass;
+      extcorr = exp(airmass*tau);
+    }
     for (i=0; i < npts; i++ ) {
       index = indices[i] + base;
       if (indata[index] != VAL__BADD) {
-	zd = M_PI_2 - yout[indices[i]];
-	airmass = F77_CALL(sla_airmas)( &zd );
-	/*    printf( "Zenith distance: %f, Airmass: %f El: %f\n",zd, airmass);*/
-	/*    printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
-	  index, indata[index], (exp(airmass*(double)tau)));*/
-	extcorr = exp(airmass*tau);
+	if (!quick) {
+	  zd = M_PI_2 - yout[indices[i]];
+	  airmass = F77_CALL(sla_airmas)( &zd );
+	  extcorr = exp(airmass*tau);
+	}
 	indata[index] *= extcorr;
 	if (vardata != NULL && vardata[index] != VAL__BADD) {
 	  vardata[index] *= extcorr*extcorr;
 	}
+	/*    printf( "Zenith distance: %f, Airmass: %f El: %f\n",zd, airmass);*/
+	/*    printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
+	      index, indata[index], (exp(airmass*tau)));*/
       }
     }
 
@@ -249,10 +267,11 @@ void smf_correct_extinction(smfData *data, const char *method, double tau, int *
   }
 
  CLEANUP:
-  smf_free(xin,status);
-  smf_free(yin,status);
-  smf_free(xout,status);
-  smf_free(yout,status);
+  if (!quick) {
+    smf_free(xin,status);
+    smf_free(yin,status);
+    smf_free(xout,status);
+    smf_free(yout,status);
+  }
   smf_free(indices,status);
-
 }
