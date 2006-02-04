@@ -109,7 +109,7 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   struct sc2head *sc2hdr=NULL;  /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
-  char *system;                 /* System */
+  const char *system;           /* System */
   char wcssystem[81];           /* String containing system attribute */
 
   /* Main routine */
