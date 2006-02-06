@@ -2,8 +2,7 @@
 
 SUBDIRS = kapsub ccdpack atools libndfpack libkapview libkappa
 
-
-dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES)
+dist_bin_SCRIPTS = $(PUBLICSCRIPTS) $(DYNSCRIPTS) $(STYLE_FILES) $(DEMO_FILES)
 
 nodist_bin_SCRIPTS = $(NODIST_PUBLICSCRIPTS)
 
@@ -150,8 +149,8 @@ AWKSCRIPTS = nfi.awk
 ICL_FILES = colstar.icl fancylook.icl flatfield.icl kappa_proc.icl \
 multistat.icl unsharpmask.icl
 
-TCL_FILES = tkast.tcl dialog.tcl adamtask.tcl adamMessageRelay \
-stardemo.tcl stardemo_procs.tcl pazo.csh lutedit.tcl
+TCL_FILES = tkast.tcl dialog.tcl stardemo.tcl stardemo_procs.tcl \
+pazo.csh lutedit.tcl
 
 #  Define the set of all interface files.
 
