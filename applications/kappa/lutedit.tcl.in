@@ -6302,19 +6302,14 @@ proc WaitFor {name args} {
       set INITLUT ""
    }
 
-# Define Startcl procedures (this must be done after the ADAM_USER
-# directory has been set up).
-   set env(ADAM_MESSAGE_RELAY) $KAPPA_DIR/adamMessageRelay
-   source $KAPPA_DIR/adamtask.tcl
-
-# The adamtask.tcl file creates a binding which causes the application to
-# terminate whenever any window is destroyed. Do away with it.
-   bind . <Destroy> ""
-
 # Load the required ADAM monoliths. 
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa $KAPPA_DIR/kappa_mon
    LoadTask ndfpack $KAPPA_DIR/ndfpack_mon
+
+# The adamtask.tcl file creates a binding which causes the application to
+# terminate whenever any window is destroyed. Do away with it.
+   bind . <Destroy> ""
 
 # Create a style file defining the style for the histogram in the GWM
 # canvas.

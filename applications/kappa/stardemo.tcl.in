@@ -304,19 +304,15 @@
       set OLDKAPPA {}
    }
 
-# Define Startcl procedures (this must be done after the ADAM_USER
-# directory has been set up).
-   set env(ADAM_MESSAGE_RELAY) $STARDEMO_DIR/adamMessageRelay
-   source $STARDEMO_DIR/adamtask.tcl
-
-# The adamtask.tcl file creates a binding which causes the application to
-# terminate whenever any window is destroyed. Do away with it.
-   bind . <Destroy> ""
-
 # Load the required ADAM monoliths. 
    LoadTask kapview  $KAPPA_DIR/kapview_mon
    LoadTask kappa    $KAPPA_DIR/kappa_mon
    LoadTask ndfpack  $KAPPA_DIR/ndfpack_mon
+
+# Now that the adamtask.tcl file has been loaded remove the binding that
+# causes the application to exit whenever a main window is destroyed.
+   bind . <Destroy> ""
+
 
 # >>>>>>>>>>>>>>>>>  SET UP THE SCREEN LAYOUT <<<<<<<<<<<<<<<<<<<<
 

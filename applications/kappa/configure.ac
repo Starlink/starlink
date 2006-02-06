@@ -58,7 +58,6 @@ AC_CONFIG_FILES([Makefile component.xml
     ccdpack/Makefile  libkappa/Makefile  libndfpack/Makefile])
 AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
-AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
 AC_CONFIG_FILES(stardemo.tcl,     [chmod +x stardemo.tcl])
 
 AC_OUTPUT
