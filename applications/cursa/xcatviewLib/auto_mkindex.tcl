@@ -40,4 +40,3 @@ auto_mkindex /home/acd/starbase/cursa/xcatview/lib \
   GetHist.tcl       \
   GetHistOver.tcl   \
   adamtask.tcl      \
-  adamMessageRelay

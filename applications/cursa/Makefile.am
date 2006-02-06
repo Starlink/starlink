@@ -5,8 +5,6 @@ SUBDIRS = libcap
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh catcdsin \
  catremote UrlReader.class UrlReader.java geturl
 
-nobase_bin_SCRIPTS = xcatviewLib/adamMessageRelay
-
 dist_noinst_SCRIPTS = cursa_link_adam
 
 LOCAL_LINK = libcap/libcap.la `$(srcdir)/cursa_link_adam`
@@ -40,10 +38,13 @@ cursasupportdir = $(bindir)
 cursasupport_DATA = data/cursa_output.lis data/catselect.script \
  data/catpair.script data/catview.script data/5828.gsc data/targets.TXT
 
+##  BUILT files not named anywhere else.
+BUILT_SOURCES = xcatviewLib/xcatview.tcl
+
 ##  Scripts for xcatview
 
 xcatviewsupportdir = $(bindir)/xcatviewLib
-xcatviewsupport_DATA = \
+xcatviewsupport_DATA = xcatviewLib/xcatview.tcl \
  xcatviewLib/Action.tcl xcatviewLib/GetFile.tcl \
  xcatviewLib/GetScatterOver.tcl xcatviewLib/Error.tcl \
  xcatviewLib/GetFormat.tcl xcatviewLib/GetSelection.tcl \
@@ -59,8 +60,6 @@ xcatviewsupport_DATA = \
  xcatviewLib/GetExprn.tcl xcatviewLib/GetScatter.tcl \
  xcatviewLib/RemoteQuery.tcl xcatviewLib/RemoteUrl.tcl \
  xcatviewLib/adamtask.tcl xcatviewLib/tclIndex
-
-
 
 
 ##  Edit scripts during make to have the correct paths.
@@ -87,13 +86,12 @@ geturl: geturl.in
 	   $(srcdir)/geturl.in >geturl.tmp
 	mv geturl.tmp geturl
 
-xcatviewLib/adamMessageRelay: xcatviewLib/adamMessageRelay.in
-	rm -f xcatviewLib/adamMessageRelay.tmp xcatviewLib/adamMessageRelay
+xcatviewLib/xcatview.tcl: xcatviewLib/xcatview.tcl.in
+	rm -f xcatviewLib/xcatview.tcl.tmp xcatviewLib/xcatview.tcl
 	$(edit) \
-	   -e 's,@edited_input\@,adamMessageRelay: produced from catviewLib/adamMessageRelay.in by Makefile.am,' \
-	   $(srcdir)/xcatviewLib/adamMessageRelay.in >xcatviewLib/adamMessageRelay.tmp
-	mv xcatviewLib/adamMessageRelay.tmp xcatviewLib/adamMessageRelay
-	chmod 755 xcatviewLib/adamMessageRelay
+	   -e 's,@edited_input\@,xcatview.tcl: produced from catviewLib/xcatview.tcl.in by Makefile.am,' \
+	   $(srcdir)/xcatviewLib/xcatview.tcl.in >xcatviewLib/xcatview.tcl.tmp
+	mv xcatviewLib/xcatview.tcl.tmp xcatviewLib/xcatview.tcl
 
 catcdsin: catcdsin.in
 	rm -f catcdsin.tmp catcdsin
@@ -127,13 +125,13 @@ dist_starnews_DATA = cursa.news
 
 dist_pkgdata_DATA = CURSA_CONDITIONS $(EXAMPLE_FILES)
 
-EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in catremote.in \
-             UrlReader.class UrlReader.java $(xcatviewsupport_DATA) \
-             xcatviewLib/adamMessageRelay.in $(cursasupport_DATA)
+EXTRA_DIST = xcatview.in cursa_test.csh.in cursa.csh.in catcdsin.in \
+             catremote.in UrlReader.class UrlReader.java \
+             $(xcatviewsupport_DATA) $(cursasupport_DATA)
 
 CLEANFILES = version.dat catremote catcdsin cursa.csh cursa_test.csh xcatview \
              catchart.ifc catchartrn.ifc catcoord.ifc catcopy.ifc catgrid.ifc \
              catgscin.ifc catheader.ifc catpair.ifc catphotomfit.ifc catphotomlst.ifc \
              catphotomtrn.ifc catselect.ifc catsort.ifc cursa catview cursa.ifc cursa.ifl \
-             catview.ifc xcatviewLib/adamMessageRelay
+             catview.ifc
 
