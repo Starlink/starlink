@@ -5,7 +5,7 @@
 int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
                                      int dims[ 3 ], int skip[ 3 ], int minpix, 
                                      double thresh, double noise, double rms, 
-                                     int *peakval ){
+                                     double flatslope, int *peakval ){
 /*
 *  Name:
 *     cupidRInitEdges<X>
@@ -17,7 +17,7 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *     int *cupidRInitEdges<X>( CGEN_TYPE *array, int nel, int ndim, 
 *                              int dims[ 3 ], int skip[ 3 ], int minpix, 
 *                              double thresh, double noise, double rms,
-*                              int *peakval )
+*                              double flatslope, int *peakval )
 
 *  Description:
 *     This function creates a mask array which has the same shape and
@@ -70,6 +70,9 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 *        with a value larger than "*peakval" since it is possible for a
 *        given peak to be scanned twice if it lies at the joint between two 
 *        cube faces.
+*     flatslope
+*        The minimum significant slope along a peak, in units of change
+*        in data value per pixel.
 
 *  Returned Value:
 *     A pointer to a dynamically allocated array holding the returned mask.
@@ -121,6 +124,7 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
    int ylo;        /* Lowest value for axis 2 comp of line vector */
    int zhi;        /* Highest value for axis 3 comp of line vector */
    int zlo;        /* Lowest value for axis 3 comp of line vector */
+   int nl;         /* Number of lines scanned. */
 
 /* Initialise */
    ret = NULL;
@@ -147,26 +151,23 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Set up the loop limits for the axes which may not be present (axes 2
    and 3). */
-
       ivlim = 1;
+      ylo = 0;
+      yhi = 0;
+      zlo = 0;
+      zhi = 0;
 
-      if( ndim == 3 ) {
-         ivlim = 13;
-         zlo = -1;
-         zhi = 1;
-      } else {
-         zlo = 0;
-         zhi = 0;
-      } 
-
-      if( ndim == 2 ) {
+      if( ndim > 1 ){
          ivlim = 4;
          ylo = -1;
          yhi = 1;
-      } else {
-         ylo = 0;
-         yhi = 0;
-      } 
+
+         if( ndim > 2 ) {
+            ivlim = 13;
+            zlo = -1;
+            zhi = 1;
+         } 
+      }
 
 /* Consider all possible scan line directions. We only need to check the
    first half of these directions since the others will be parallel (e.g. 
@@ -182,7 +183,7 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
 /* Consider lines starting on faces which are perpendicular to each pixel 
    axis in turn. */
                   for( axis = 0; axis < 3; axis++ ) {
-      
+
 /* First scan the data cube using lines which originate on the face
    corresponding to the upper axis limit, then consider those which 
    originate on the face corresponding to the lower axis limit. */
@@ -192,11 +193,11 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
    specified by "axis" and "lbnd", and which extend in the direction
    given by "xvec". Edges of any peaks found along these scan lines are
    marked by 1's in the mask array. */
-                        CGEN_FUNCTION(cupidRCheckFace)( array, nel, 
-                                                        axis, lbnd, dims, skip,
+                        nl = CGEN_FUNCTION(cupidRCheckFace)( array, nel, 
+                                                         axis, lbnd, dims, skip,
                                                         xvec, work1, work2, 
                                                         ret, minpix, thresh, 
-                                                        noise, rms );
+                                                        noise, rms, flatslope );
                      }
                   }
                }
@@ -210,7 +211,6 @@ int *CGEN_FUNCTION(cupidRInitEdges)( CGEN_TYPE *array, int nel, int ndim,
    diagonally, a peak which lies on the diagonal of the image may be scanned 
    by lines originating from both faces on either sideof the diagonal. */
       *peakval = CUPID__KBACK + ivlim*CUPID__KPEAK;
-
    }
 
 /* Free work arrays. */

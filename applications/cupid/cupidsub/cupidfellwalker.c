@@ -2,32 +2,48 @@
 #include "mers.h"
 #include "cupid.h"
 #include "ast.h"
-#include "prm_par.h"
 #include "ndf.h"
+#include "prm_par.h"
 #include <math.h>
 
-int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
-                     double *ipv, double rms, AstKeyMap *config, int velax,
-                     int ilevel, int *nclump ){
+int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+                      double *ipv, double rms, AstKeyMap *config, int velax,
+                      int ilevel, int *nclump ){
 /*
 *  Name:
-*     cupidReinhold
+*     cupidFellWalker
 
 *  Purpose:
 *     Identify clumps of emission within a 1, 2 or 3 dimensional NDF using
-*     the REINHOLD algorithm.
+*     the FELLWALKER algorithm.
 
 *  Synopsis:
-*     int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, double *ipv, double rms, 
-*                          AstKeyMap *config, int velax, int *nclump )
+*     int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
+*                           void *ipd, double *ipv, double rms, 
+*                           AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
-*     array using the REINHOLD algorithm, developed by Kim Reinhold at
-*     JAC. This algorithm identifies the boundaries between clumps by
-*     looking for minima in 1D sections through the data. No a priori clump 
-*     profile is assumed. In this algorithm, clumps never overlap.
+*     array using the FELLWALKER algorithm. This algorithm loops over
+*     every data pixel above the threshold which has not already been
+*     assigned to a clump. For each such pixel, a route to the nearest
+*     peak in the data value is found by moving from pixel to pixel along
+*     the line of greatest gradient. When this route arrives at a peak, all
+*     pixels within some small neighbourhood are checked to see if there
+*     is a higher data value. If there is, the route recommences from the
+*     highest pixel in the neighbourhood, again moving up the line of
+*     greatest gradient. When a peak is reached which is the highest data
+*     value within its neighbourhood, a check is made to see if this peak
+*     pixel has already been assigned to a clump. If it has, then all
+*     pixels which were traversed in following the route to this peak are 
+*     assigned to the same clump. If the peak has not yet been assigned to a
+*     clump, then it, and all the traversed pixels, are assigned to a new
+*     clump. If the route commences with a low gradient section (average
+*     gradient lower than a given value) then the initial section of the
+*     route (up to the point where the gradient exceeds the low gradient 
+*     limit) is not assigned to the clump, but is instead given a special
+*     value which prevents the pixels being re-used as the start point
+*     for a new "walk".
 
 *  Parameters:
 *     type
@@ -85,31 +101,19 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */      
 
 /* Local Variables: */
-   AstKeyMap *rconfig;  /* Configuration parameters for this algorithm */
-   double cathresh;     /* Threshold for second cellular automata */
-   double noise;        /* Noise level */
-   double flatslope;    /* Minimum significant slope at edge of a peak */
-   double thresh;       /* Minimum peak value to be considered */
+   AstKeyMap *hwconfig; /* Configuration parameters for this algorithm */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
    int *clist;          /* Pointer to the array of returned NDF identifiers */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
-   int *m1;             /* Pointer to mask array */
-   int *m2;             /* Pointer to mask array */
-   int *m3;             /* Pointer to mask array */
-   int *mask2;          /* Pointer to array marking out edge pixels */
-   int *mask;           /* Pointer to array marking out edge pixels */
-   int *pa;             /* Pointer to next element in the pixel assignment array */
-   int caiter;          /* The number of CA iterations to perform */
+   int *ipa;            /* Pointer to clump assignment array */
+   int *pa;             /* Pointer to next element of the ipa array */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
-   int fixiter;         /* The number of CA iterations to perform */
    int i;               /* Loop count */
    int ix;              /* Grid index on 1st axis */
    int iy;              /* Grid index on 2nd axis */
    int iz;              /* Grid index on 3rd axis */
    int maxid;           /* Largest id for any peak (smallest is zero) */
-   int minpix;          /* Minimum size of a clump in pixels */
-   int peakval;         /* Minimum value used to flag peaks */
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
@@ -122,22 +126,23 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Say which method is being used. */
    if( ilevel > 0 ) {
       msgBlank( status );
-      msgOut( "", "Reinhold:", status );
+      msgOut( "", "FellWalker:", status );
+      if( ilevel > 1 ) msgBlank( status );
    }
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "REINHOLD", &rconfig ) ) {     
-      rconfig = astKeyMap( "" );
-      astMapPut0A( config, "REINHOLD", rconfig, "" );
+   if( !astMapGet0A( config, "FELLWALKER", &hwconfig ) ) {     
+      hwconfig = astKeyMap( "" );
+      astMapPut0A( config, "FELLWALKER", hwconfig, "" );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "rconfig" KeyMap. Add a copy of the "config" KeyMap into "rconfig" 
+   the "hwconfig" KeyMap. Add a copy of the "config" KeyMap into "hwconfig" 
    so that it can be searched for any value which cannot be found in the
-   "rconfig" KeyMap. */
-   astMapPut0A( rconfig, CUPID__CONFIG, astCopy( config ), NULL );
+   "hwconfig" KeyMap. */
+   astMapPut0A( hwconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -155,60 +160,13 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       skip[ i ] = 0;
    }
 
-/* Get various configuration parameters. */
-   minpix = cupidConfigI( rconfig, "MINPIX", 4 );
-   noise = cupidConfigD( rconfig, "NOISE", 2*rms );
-   thresh = cupidConfigD( rconfig, "THRESH", noise + rms );
-   flatslope = cupidConfigD( rconfig, "FLATSLOPE", 0.5*rms );
-   cathresh = pow( 3, ndim ) - 1.0;
-   cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh );
-   caiter = cupidConfigI( rconfig, "CAITERATIONS", 1 );
-   fixiter = cupidConfigI( rconfig, "FIXCLUMPSITERATIONS", 1 );
+/* Assign work array to hold the clump assignments. */
+   ipa = astMalloc( sizeof( int )*el );
 
-/* Convert CATHRESH from a number of pixels to a fraction. */
-   cathresh = cathresh/pow( 3, ndim );
-   if( cathresh > 0.98 ) cathresh = 0.98;
-   if( cathresh < 0 ) cathresh = 0.0;
-   cathresh += 0.01;
-
-/* Get a mask which is the same size and shape as the data array and which 
-   holds CUPID__KEDGE at every pixel thought to be on the edge of a clump. 
-   This is done by scanning the data cube using sets of parallel lines in
-   different directions. Peaks are searched for in each line, and then the 
-   edges found by following the curve down from each peak until the
-   gradient becomes zero or positive, or until the data value drops below a
-   threshold value. Pixels which correspond to peaks in the data cube
-   are flagged with the value greater than or equal to the returned 
-   "*peakval" value. All other pixels are set to some other value (which 
-   will usually be CUPID__KBACK but will be something else at positions of 
-   peaks which were not peaks in all scan directions). */
-   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minpix, thresh, 
-                           noise, rms, flatslope, &peakval );
-
-/* Dilate the edge regions using a cellular automata. This creates a new
-   mask array in which a pixel is marked as an edge pixel if any of its
-   neighbours are marked as edge pixels in the mask array created above. */
-   mask2 = cupidRCA( mask, NULL, el, dims, skip, 0.0, peakval, CUPID__KEDGE, 
-                     CUPID__KBACK, 0 );
-
-/* Erode the edge regions using a second cellular automata. This over-writes
-   the original mask array so that a pixel is marked as an edge pixel if a
-   fraction greater than "cathresh" of neighbouring pixels are marked as edge 
-   pixels in "mask2". We loop doing this "CAiteration" times. */
-   m1 = mask;
-   m2 = mask2;
-   for( i = 0; i < caiter; i++ ) {
-      m1 = cupidRCA( m2, m1, el, dims, skip, cathresh, peakval, CUPID__KEDGE, 
-                     CUPID__KBACK, 0 );
-      m3 = m1;
-      m1 = m2;
-      m2 = m3;
-   }
-
-/* Fill the volume around each peak with integer values which indicate
-   which peak they are close to. All the pixels around one peak form one
-   clump. */
-   maxid = cupidRFillClumps( m2, m1, el, ndim, skip, dims, peakval );
+/* Assign every data pixel to a clump and stores the clumps index in the
+   corresponding pixel in "ipa". */
+   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, hwconfig,
+                        ipa );
 
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
@@ -219,22 +177,11 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       goto L10;
    }
 
-/* Smooth the boundaries between the clumps. This cellular automata replaces 
-   each output pixel by the most commonly occuring value within a 3x3x3 
-   cube of input pixels centred on the output pixel. Put the smoothed
-   results back into the supplied "m1" array. */
-   for( i = 0; i < fixiter; i++ ) {
-      m2 = cupidRCA2( m1, m2, el, dims, skip );
-      m3 = m2;
-      m2 = m1;
-      m1 = m3;
-   }
-
 /* Allocate the maximum amount of memory needed to hold the returned NDF 
    identifiers. Some of the original clump identifiers may no longer be
-   in use since the cleaning up of the clumps performed above may have
-   removed some clumps altogether. Therefore the number of returned NDFs
-   may be less than "maxid". */
+   in use since the cleaning up of the clumps may have removed some clumps 
+   altogether. Therefore the number of returned NDFs may be less than 
+   "maxid". */
    clist = astMalloc( sizeof( int )*( maxid + 1 ) );
 
 /* Determine the bounding box of every clump. First allocate memory to
@@ -256,7 +203,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Loop round every pixel in the final pixel assignment array. */
-      pa = m1;
+      pa = ipa;
       for( iz = 1; iz <= dims[ 2 ]; iz++ ){
          for( iy = 1; iy <= dims[ 1 ]; iy++ ){
             for( ix = 1; ix <= dims[ 0 ]; ix++, pa++ ){
@@ -296,10 +243,10 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    them. */
       for( i = 0; i <= maxid; i++ ) {
          if( clist[ i ] ) {
-            clist[ (*nclump)++ ] = cupidNdfClump( type, ipd, m1, el, ndim, 
-                                                dims, skip, slbnd, i, 
-                                                clbnd + 3*i, cubnd + 3*i, 
-                                                NULL );
+            clist[ (*nclump)++ ] = cupidNdfClump( type, ipd, ipa, el, ndim, 
+                                                  dims, skip, slbnd, i, 
+                                                  clbnd + 3*i, cubnd + 3*i, 
+                                                  NULL );
          }
       }
 
@@ -329,12 +276,11 @@ L10:;
    parameters for this algorithm. This prevents the values in the secondary 
    KeyMap being written out to the CUPID extension when cupidStoreConfig is 
    called. */
-   astMapRemove( rconfig, CUPID__CONFIG );
+   astMapRemove( hwconfig, CUPID__CONFIG );
 
 /* Free resources */
-   rconfig = astAnnul( rconfig );
-   mask = astFree( mask );
-   mask2 = astFree( mask2 );
+   hwconfig = astAnnul( hwconfig );
+   ipa = astFree( ipa );
 
 /* Return the list of clump structure locators. */
    return clist;

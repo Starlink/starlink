@@ -2,8 +2,13 @@
 #include "prm_par.h"
 #include "cupid.h"
 
+/* Local Constants: */
+/* =============== */
+/* The number of pixels used to estimate the gradient.· */
+#define GRADSTEP 3
+
 void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
-                  double thresh, double noise, double rms ){
+                  double thresh, double noise, double rms, double flatslope ){
 /*
 *  Name:
 *     cupidREdges
@@ -13,7 +18,8 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 
 *  Synopsis:
 *     void cupidREdges( int nel, double *dval, int *dpos, int *mask, 
-*                       int minpix, double thresh, double noise, double rms )
+*                       int minpix, double thresh, double noise, double rms,
+*                       double flatslope )
 
 *  Description:
 *     This function finds the highest data value in the supplied 1D line 
@@ -44,14 +50,17 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 *        be spanned by a peak in order for its edges to be marked in the 
 *        returned mask. 
 *     thresh
-*        The smallest significant peak data value. The edges of peaks
-*        which are below this limit are not included in the returned mask.
+*        The smallest significant peak height. The edges of peaks which are 
+*        below this limit are not included in the returned mask.
 *     noise
-*        The data value below which pixels are considered to be in the
-*        noise. A peak is considered to end when the peak value dips
-*        below this value.
+*        Defines the data value below which pixels are considered to be in 
+*        the noise. A peak is considered to end when the peak value dips
+*        below the "noise" value.
 *     rms
 *        The RMS noise in the data
+*     flatslope
+*        The minimum significant slope along a peak, in units of change
+*        in data value per pixel.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -68,20 +77,33 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 
 /* Local Variables: */
    double *pd;        /* Pointer to next data value */
+   double deltav;     /* Minimum significant change in data value */
    double maxval;     /* Maximum data value found so far */
    double minval;     /* Minimum data value found so far */
    double v;          /* Current data value */
    double vlast;      /* Previous data value */
    double vlim;       /* Data value marking start of a rise in data value */
    int *pp;           /* Pointer to next vector index value */
+   int hminpix;       /* Min. No. of pixels required on each side of peak */
+   int hslok;         /* Significant slope found on upper slope? */
    int i;             /* Index within "dlow" */
    int ilo;           /* Index within "dlow" of lower edge */
    int iup;           /* Index within "dlow" of upper edge */
+   int lo_ok;         /* Was "ilo" found before the start of the line? */
+   int lslok;         /* Significant slope found on lower slope? */
    int maxpos;        /* Index within "dlow" of maximum data value */
    int minpos;        /* Index within "dlow" of minimum data value */
-
+   int up_ok;         /* Was "iup" found before the end of the line? */
+ 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
+
+/* Initialise the change in data value which is considered to be
+   significant. */
+   deltav = GRADSTEP*flatslope;
+
+/* Note half the minimum peak ewidth. */
+   hminpix = minpix/2;
 
 /* Enter a loop in which we look for a new peak in the 1D data line. */
    while( 1 ) {
@@ -106,22 +128,33 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
       }      
 
 /* We have finished if there are no good pixels left or if the highest
-   pixel value is below the threshold. */
-      if( maxval < thresh ) break;
+   pixel value is below the noise level. */
+      if( maxval < noise ) break;
+
+/* Indicate we have not yet found any section of the curve which has a
+   slope greater than flatslope. */
+      hslok = 0;
 
 /* Initialise the lowest value found so far in the peaks profile. */
-      minval = maxval;
+      minval = maxval - deltav;
       minpos = maxpos;
+      vlast = VAL__MIND;
+      vlim = VAL__MAXD;
 
 /* Loop round extending the peak to larger radii until the first significant 
    minimum is found in the line of data. "i" is left holding the index of
    the first pixel which is not included in the current peak. */
+      up_ok = 0;
       i = maxpos + 1;
       while( i < nel ) {
 
 /* If this pixel has been included in an adjacent peak, we have reached
    the edge of the current peak. */
-         if( dpos[ i ] == -1 ) break;
+         if( dpos[ i ] == -1 ) {
+            i++;
+            up_ok = 1;
+            break;
+         }
 
 /* Get the pixel value. */
          v = dval[ i ];
@@ -130,14 +163,16 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
          if( v != VAL__BADD ) {
 
 /* If both this pixel value and the previous pixel value are below the 
-   supplied noise threshold, assume we have reached the noise background. */
+   noise threshold, assume we have reached the noise background. */
             if( v < noise && vlast < noise ) {
+               up_ok = 1;
                break;
               
-/* Otherwise, if this value is lower than the previous lowest value, 
-   remember it. */
+/* Otherwise, if this value is lower by a significant amount than the 
+   previous lowest value, remember it. */
             } else if( v < minval ) {
-               minval = v;
+               hslok = hslok || ( minval + deltav - v )/( i - minpos ) > flatslope;
+               minval = v - deltav;
                minpos = i;
                vlim = v + 2*rms;
 
@@ -146,12 +181,15 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    is the minimum point in the profile. */
             } else if( v > vlim ){
                i = minpos + 1;
+               up_ok = 1;
                break;
 
-/* Otherwise, if the lowest pixel has not changed for the past 3 pixels, 
-   assume we have reached the flat bit of the profile. */
-            } else if( i - minpos > 3 ) {
+/* Otherwise, if the lowest pixel has not changed for the past GRADSTEP 
+   pixels, assume we have reached the flat bit of the profile, so long as
+   we have also had a steep bit. */
+            } else if( i - minpos > GRADSTEP && hslok ) {
                i = minpos + 1;
+               up_ok = 1;
                break;
             }
 
@@ -164,39 +202,53 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
          i++;
       }
 
-/* Store the index of the upper edge pixel. */
+/* Store the index of the upper edge pixel. Note if no upper edge was
+   found within the line. */
       iup = i - 1;
+
+/* Indicate we have not yet found any section of the curve which has a
+   slope greater than flatslope. */
+      lslok = 0;
 
 /* We now search for the lower edge pixel. Initialise the lowest value found 
    so far in the peaks profile. */
-      minval = maxval;
+      minval = maxval - deltav;
       minpos = maxpos;
+      vlast = VAL__MIND;
+      vlim = VAL__MAXD;
 
 /* Loop round extending the peak to smaller radii until the first significant 
    minimum is found in the line of data. "i" is left holding the index of
    the first pixel which is not included in the current peak. */
+      lo_ok = 0;
       i = maxpos - 1;
       while( i >= 0  ) {
 
 /* If this pixel has been included in an adjacent peak, we have reached
    the edge of the current peak. */
-         if( dpos[ i ] == -1 ) break;
+         if( dpos[ i ] == -1 ) {
+            i--;
+            lo_ok = 1;
+            break;
+         }
 
 /* Get the pixel value. */
          v = dval[ i ];
-
+         
 /* Ignore bad pixels */
          if( v != VAL__BADD ) {
 
 /* If both this pixel value and the previous pixel value are below the 
-   supplied noise threshold, assume we have reached the noise background. */
+   noise threshold, assume we have reached the noise background. */
             if( v < noise && vlast < noise ) {
+               lo_ok = 1;
                break;
               
-/* Otherwise, if this value is lower than the previous lowest value, 
-   remember it. */
+/* Otherwise, if this value is lower by a significant amount than the previous 
+   lowest value, remember it. */
             } else if( v < minval ) {
-               minval = v;
+               lslok = lslok || ( minval + deltav - v )/( minpos - i ) > flatslope;
+               minval = v - deltav;
                minpos = i;
                vlim = v + 2*rms;
 
@@ -205,12 +257,15 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    is the minimum point in the profile. */
             } else if( v > vlim ){
                i = minpos - 1;
+               lo_ok = 1;
                break;
 
-/* Otherwise, if the lowest pixel has not changed for the past 3 pixels, 
-   assume we have reached the flat bit of the profile. */
-            } else if( minpos - i > 3 ) {
+/* Otherwise, if the lowest pixel has not changed for the past GRADSTEP
+   pixels, assume we have reached the flat bit of the profile, so long as
+   we have also had a steep bit. */
+            } else if( minpos - i > GRADSTEP && lslok ) {
                i = minpos - 1;
+               lo_ok = 1;
                break;
             }
 
@@ -227,21 +282,24 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
       ilo = i + 1;
 
 /* Flag the relevant mask pixels as edge pixels, if they span sufficient
-   pixels. */
-      if( iup - ilo + 1 > minpix ) {
+   pixels, and do not cross an edge of the data. */
+      if( iup - maxpos > hminpix && maxpos - ilo > hminpix && 
+          up_ok && lo_ok ) {
          mask[ dpos[ ilo ] ] = CUPID__KEDGE;
          mask[ dpos[ iup ] ] = CUPID__KEDGE;
 
-/* If the peak position has not previously been flagged as an edge,
+/* If a sufficiently high gradient was achieved on either side of the peak,
+   and if the peak position has not previously been flagged as an edge,
    increment the mask value by CUPID__KPEAK. */
-         if( mask[ dpos[ maxpos ] ] != CUPID__KEDGE ) {
+         if( hslok && lslok && mask[ dpos[ maxpos ] ] != CUPID__KEDGE &&
+             maxval >= thresh ) {
+
             mask[ dpos[ maxpos ] ] += CUPID__KPEAK;
          }
       }
 
 /* Indicate that the intervening pixels have been allocated to a peak. */
       for( i = ilo; i <= iup; i++ ) dpos[ i ] = -1;
-         
    }
 }
 

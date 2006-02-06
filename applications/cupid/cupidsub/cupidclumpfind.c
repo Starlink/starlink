@@ -96,11 +96,9 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double maxd;         /* Maximum value in data array */
    double maxrem;       /* Maximum of remaining unassigned pixel values */
    double mind;         /* Minimum value in data array */
-   double sum;          /* Integrated clump intensity */
    float fd;            /* Data value */   
    int *ipa;            /* Pointer to pixel assignment array */
    int *plist;          /* Pointer to list holding pixel indices */
-   int dax[] = {0, 1, 2};/* Axis permutation array */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
@@ -108,7 +106,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int ilev;            /* Contour index */
    int index;           /* Next PixelSet index to use */
    int j;               /* Loop index */
-   int list_size;       /* Number of values stored in plist and mlist */
    int minpix;          /* Minimum number of pixels in a clump */
    int more;            /* Any remaining unsorted elements/ */
    int naxis;           /* Defines whether two pixels are neighbours or not */
@@ -294,19 +291,11 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                } else if( ps->edge ){
                   nedge++; 
 
+/* Otherwise, create an NDF describing the clump. */
                } else {
-                  i++;
-  
-/* Gather the information describing the clump. This also displays clump
-   information on the screen as required by "ilevel". */
-                  cupidCFClump( type, ipd, ipv, ipa, rms, velax, el, ndim, 
-                                dims, skip, slbnd, ps, &list_size, &mlist, 
-                                &plist );
-
-/* Write this information to an NDF. */
-                  cupidNdfClump( clist + i, sum, NULL, rms, ndim, ps->lbnd, 
-                                 ps->ubnd, list_size, mlist, plist, slbnd, i + 1, 
-                                 dax, NULL );
+                  clist[ ++i ] = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
+                                              skip, slbnd, ps->index, ps->lbnd,
+                                              ps->ubnd, NULL );
                }
             }
          }

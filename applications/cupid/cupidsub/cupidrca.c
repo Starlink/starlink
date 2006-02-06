@@ -3,35 +3,34 @@
 #include "cupid.h"
 
 int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
-               int thresh, int peakval ){
+               double thresh, int magic, int on, int off, int centre ){
 /*
 *  Name:
 *     cupidRCA
 
 *  Purpose:
-*     Erode or dilate the edge pixels using a cellular automata.
+*     Erode or dilate areas within an array using a cellular automata.
 
 *  Synopsis:
-*     int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], 
-*                    int skip[ 3 ], int thresh, int peakval )
+*     int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
+*                    double thresh, int magic, int on, int off, int centre )
 
 *  Description:
-*     This function contracts (erodes) or expands (dilates0 the edge pixels 
-*     marked in the supplied input mask array using a cellular automata, 
-*     and returns the result in an output array of the same shape and size
-*     as the input array.
+*     This function contracts (erodes) or expands (dilates) the pixels
+*     which are marked as "on" in the supplied input array using a cellular 
+*     automata, and returns the result in an output array of the same shape 
+*     and size as the input array.
 *
-*     Each output pixel value is created in turn as follows: a 3x3x3 cube 
-*     (or a 3x3 square for 2D arrays) is defined within the input array which 
-*     is centred on the position of the current output pixel. The number of 
-*     pixels within this input cube which are flagged as edge pixels is then 
-*     counted. If this number is larger than or equal to "thresh" then the 
-*     output pixel value is set to CUPID__KEDGE, otherwise it is set to 
-*     CUPID__KBACK.
-*
-*     Note that any input pixel values which are larger than or equal to 
-*     "peakval" are copied to the output unchanged, no matter how many
-*     neighbouring edge pixels they have.
+*     Each output pixel value is created in turn as follows: If the
+*     corresponding input value has value equal to or greater than "magic",
+*     then the output pixel is set equal to "magic". Otherwise, a 
+*     3x3x3 cube (or a 3x3 square for 2D arrays) is defined within the input 
+*     array which is centred on the position of the current output pixel. The 
+*     fraction of pixels within this input cube which are flagged as "on" is 
+*     then counted. If this fraction is larger than "thresh" then the output 
+*     pixel value is set to "on", otherwise it is set to "off". Optionally, 
+*     an additional requirement for an output pixel to be set on is that
+*     the corresponding input pixel must be on.
 
 *  Parameters:
 *     in
@@ -40,7 +39,7 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *        The output mask array. If this is NULL a new array will be
 *        dynamically allocated.
 *     nel
-*        The number of elements in the "dval" and "dpos" arrays.
+*        The number of elements in the "in" array.
 *     dims
 *        The number of pixels along each pixel axis of the arrays.
 *     skip
@@ -48,9 +47,18 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
 *        pixel along each axis. This allows conversion between indexing
 *        the array using a single 1D vector index and using nD coords. 
 *     thresh
-*        The minimum number of pixels required for an output edge pixel.
-*     peakval
-*        The minimum value used to flag peak pixels within "in" and "out".
+*        The maximum fraction of input edge pixels which does not produce an 
+*        output "on" pixel.
+*     magic
+*        The minimum value which should be copied unchanged from "in" to "out".
+*     on
+*        The value used to represent "on" pixels in input and output arrays.
+*     off
+*        The value used to represent "off" pixels in the output array (any 
+*        value not equal to "on" is treated as off in the input array).
+*     centre
+*        If non-zero, then no output pixel will be set on if the
+*        corresponding input pixel is not on.
 
 *  Returned Value:
 *     A pointer to the output array. This will be equal to "out" if "out"
@@ -85,6 +93,7 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
    int oy;             /* Output pixel GRID index on axis 2 */
    int oz;             /* Output pixel GRID index on axis 3 */
    int sum;            /* No. of edge neighbours */
+   int tot;            /* Total no. of neighbours */
 
 /* Initialise */
    ret = out;
@@ -112,14 +121,24 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
          for( oy = 1; oy <= dims[ 1 ]; oy++ ) {
             for( ox = 1; ox <= dims[ 0 ]; ox++, iv++ ) {
 
-/* If the corresponding input pixel is a peak, so is the output pixel. */
-               if( in[ iv ] >= peakval ){
-                  *(pout++) = peakval;
+/* If the corresponding input pixel is equal to or greater than the magic
+   value, copy it to the output. */
+               if( in[ iv ] >= magic ){
+                  *(pout++) = magic;
+
+/* If the corresponding input pixel is off, then the output must also be
+   off if "centre" is true. */
+               } else if( centre && in[ iv ] != on ){
+                  *(pout++) = off;
 
 /* Otherwise, loop round all input pixels in the neighbourhood of the current 
    output pixel, this is a cube of 3x3x3 input pixels, centred on the current
-   output pixel. Count how many of these input pixels are set to 1. */
+   output pixel. Count how many of these input pixels are set to "on". If
+   the current output pixel is close to an edge of the array, there will be
+   fewer than 3x3x3 pixels in the cube. Count the total number of pixels
+   in the cube. */
                } else {
+                  tot = 0;
                   sum = 0;
                   pinz = pin0 + iv;
                   for( iz = oz - 1; iz <= oz + 1; iz++ ) {
@@ -130,7 +149,8 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
                               pin = piny;
                               for( ix = ox - 1; ix <= ox + 1; ix++ ) {
                                  if( ix >= 1 && ix <= dims[ 0 ] ) {
-                                    if( *pin == CUPID__KEDGE ) sum++;
+                                    tot++;
+                                    if( *pin == on ) sum++;
                                  }
                                  pin++;
                               }
@@ -141,9 +161,9 @@ int *cupidRCA( int *in, int *out, int nel, int dims[ 3 ], int skip[ 3 ],
                      pinz = pinz + skip[ 2 ];
                   }
    
-/* If the number of neighbouring edge pixel is "thresh" or more, set the
-   output pixel as an edge pixel. Move on to the next output pixel. */
-                  *(pout++) = ( sum >= thresh ) ? CUPID__KEDGE : CUPID__KBACK;
+/* If the fraction of neighbouring on pixels is more than "thresh", set the
+   output pixel on. Otherwise set it off. Move on to the next output pixel. */
+                  *(pout++) = ( ( (float) sum )/( (float) tot ) > thresh ) ? on : off;
                }
             }
          }

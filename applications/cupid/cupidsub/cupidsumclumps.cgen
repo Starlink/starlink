@@ -8,7 +8,8 @@
 /* Local Constants: */
 #define CLUMPFIND   1
 #define GAUSSCLUMPS 2
-#define UNKNOWN     3
+#define REINHOLD    3
+#define FELLWALKER  4
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
                                     int *lbnd, int *ubnd, int nel, int *clist, 
@@ -132,8 +133,18 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    } else if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       alg = GAUSSCLUMPS;
 
+   } else if( !strcmp( method, "REINHOLD" ) ) {
+      alg = REINHOLD;
+
+   } else if( !strcmp( method, "FELLWALKER" ) ) {
+      alg = FELLWALKER;
+
    } else {
-      alg = UNKNOWN;
+      *status = SAI__ERROR;
+      msgSetc( "ALG", method );
+      errRep( " ", "CupidSumClumps: Unknown algorithm \"^ALG\" (internal "
+              "CUPID programming error).", status );
+      return;
    }
 
 /* If supplied, initialise the "out" array to hold zero or bad values. */
@@ -142,7 +153,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
          pd = (CGEN_TYPE *) out;
          for( i = 0; i < nel; i++ ) *(pd++) = 0.0;
 
-      } else if( alg == CLUMPFIND ) {
+      } else {
          pi = (int *) out;
          for( i = 0; i < nel; i++ ) *(pi++) = VAL__BADI;
       }
@@ -165,7 +176,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    if( alg == GAUSSCLUMPS ) {
       pd = (CGEN_TYPE *) out;
 
-   } else if( alg == CLUMPFIND ) {
+   } else {
       pi = (int *) out;
    }
 
@@ -207,8 +218,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
                   if( alg == GAUSSCLUMPS ) {
                      pd[ ii ] += *m;
 
-/* For ClumpFind, store the clump index. */
-                  } else if( alg == CLUMPFIND ) {
+/* For ClumpFind, etc, store the clump index. */
+                  } else {
                      pi[ ii ] = j + 1;
                   }               
                }
@@ -236,7 +247,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
       }
    }
 
-/* The GaussClumps algorithm requires a conmstant background to be added
+/* The GaussClumps algorithm requires a constant background to be added
    to the output model. This is chosen so that the mean of the good model
    values equals the mean of the corresponding input values. */
    if( alg == GAUSSCLUMPS && out ) {
@@ -276,5 +287,6 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 /* Undefine Local Constants: */
 #undef CLUMPFIND
 #undef GAUSSCLUMPS
-#undef UNKNOWN
+#undef REINHOLD
+#undef FELLWALKER
 

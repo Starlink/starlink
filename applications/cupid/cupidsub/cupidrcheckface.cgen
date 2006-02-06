@@ -1,11 +1,12 @@
 #include "sae_par.h"
 #include "cupid.h"
 
-void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis, 
+int CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis, 
                                      int lbnd, int dims[ 3 ], int skip[ 3 ],
                                      int xvec[ 3 ], double *work1, 
                                      int *work2, int *mask, int minpix,
-                                     double thresh, double noise, double rms ){
+                                     double thresh, double noise, 
+                                     double rms, double flatslope ){
 /*
 *  Name:
 *    cupidRCheckFace<X>
@@ -15,10 +16,11 @@ void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *     which start on a given face of the cube.
 
 *  Synopsis:
-*    void cupidRCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
+*    int cupidRCheckFace<X>( CGEN_TYPE *array, int nel, int axis, int lbnd,
 *                             int dims[ 3 ], int skip[ 3 ], int xvec[ 3 ], 
 *                             double *work1, int *work2, int *mask, int minpix,
-*                             double thresh, double noise, double rms )
+*                             double thresh, double noise, double rms, 
+*                             double flatslope )
 
 *  Description:
 *     This function scans the given data array for clump edges by looking
@@ -91,6 +93,12 @@ void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 *        below this value.
 *     rms
 *        The RMS noise in the data
+*     flatslope
+*        The minimum significant slope along a peak, in units of change
+*        in data value per pixel.
+
+*  Returned Value:
+*     The number of lines actually scanned.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidRCheckFace macro 
@@ -124,9 +132,13 @@ void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
    int ivx;        /* 1d vector index at start of current pixel X plane */
    int vskip;      /* 1D vector index increment between pixels on line */
    int nval;       /* No. of pixel values along the copied line */
+   int ret;        /* Number of lines scanned */
+
+/* Initialise */
+   ret = 0;
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return;
+   if( *status != SAI__OK ) return ret;
 
 /* Do nothing if the 3D array does not span more than 4 pixels on the
    axis which is perpendicular to the faces being checked. */
@@ -222,7 +234,10 @@ void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
 /* Identify peaks within this line of data, and flag the edges of the
    peaks within the mask array. */
                      cupidREdges( nval, work1, work2, mask, minpix, thresh, 
-                                  noise, rms );
+                                  noise, rms, flatslope );
+
+/* Increment the number of lines scanned. */
+                     ret++;
       
 /* Increment the 1D vector index of the next pixel to check. */
                      ivx += inc*skip[ 0 ];
@@ -234,5 +249,9 @@ void CGEN_FUNCTION(cupidRCheckFace)( CGEN_TYPE *array, int nel, int axis,
          }   
       }
    }
+
+/* Return the number of lines canned. */
+   return ret;
+
 }
 

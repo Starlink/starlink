@@ -50,6 +50,8 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 /* Local Variables: */
    int i;              /* Index of neighbouring PixelSet */
 
+   if( !ps ) return NULL;
+
 /* If required, check that no pixels are still assigned to the PixelSet
    which is being freed. */
    if( ipa && *status == SAI__OK ) {

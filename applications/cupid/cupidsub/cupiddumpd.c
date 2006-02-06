@@ -6,16 +6,16 @@
 #include "cupid.h"
 #include <stdio.h>
 
-void cupidCFDump( int *array, int ndim, int *dims, int *slbnd ){
+void cupidDumpD( double *array, int ndim, int *dims, int *slbnd ){
 /*
 *  Name:
-*     cupidCFDump
+*     cupidDumpD
 
 *  Purpose:
-*     Dump a ClumpFind pixel assignment array.
+*     Dump a double array.
 
 *  Synopsis:
-*     void cupidCFDump( int *array, int ndim, int *dims, int *slbnd )
+*     void cupidDumpD( double *array, int ndim, int *dims, int *slbnd )
 
 *  Description:
 *     This function is a diagnostic function which dumps the supplied
@@ -45,7 +45,7 @@ void cupidCFDump( int *array, int ndim, int *dims, int *slbnd ){
 */      
 
 /* Local Variables: */
-   int *adata;
+   double *adata;
    int indf, place, i, el, lbnd[3], ubnd[3];
    static int jj = 0;
    char name[ 100 ];
@@ -56,11 +56,11 @@ void cupidCFDump( int *array, int ndim, int *dims, int *slbnd ){
    }
 
    jj++;
-   sprintf( name, "ipa%d", jj );
-   printf("   Dumping %s\n", name );
+   sprintf( name, "ddata%d", jj );
+   printf("   DumpDng %s\n", name );
    ndfOpen( NULL, name, "WRITE", "NEW", &indf, &place, status );
-   ndfNew( "_INTEGER", ndim, lbnd, ubnd, &place, &indf, status );
-   ndfMap( indf, "DATA", "_INTEGER", "WRITE", (void *) &adata, &el, status );
+   ndfNew( "_DOUBLE", ndim, lbnd, ubnd, &place, &indf, status );
+   ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void *) &adata, &el, status );
    if( adata ) {
       for( i = 0; i < el; i++ ) adata[ i ] = array[ i ];
    }

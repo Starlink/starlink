@@ -5,7 +5,8 @@ CGENERIC_ROUTINES = cupidgcfindmax.cgen cupidrms.cgen \
 cupidgcsetinit.cgen cupidgcupdatearrays.cgen cupidgcfit.cgen \
 cupidgcprofwidth.cgen cupidgcdump.cgen cupidsumclumps.cgen \
 cupidcfscan.cgen cupidcfclump.cgen cupidcfxtend.cgen \
-cupidrcheckface.cgen cupidrcopyline.cgen cupidrinitedges.cgen
+cupidrcheckface.cgen cupidrcopyline.cgen cupidrinitedges.cgen \
+cupidfwmain.cgen cupidndfclump.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -17,12 +18,13 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 # generic .cgen files.
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
 cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
-cupidgccalcf.c cupidgccalcg.c cupidgcdump.c cupidranval.c \
-cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c cupidndfclump.c \
+cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c \
+cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \
 cupidcfdeleteps.c cupidcffreeps.c cupidcfxfer.c cupidcfaddpixel.c \
-cupidcflevels.c cupidcfdump.c cupidclumpdesc.c cupidcfnebs.c \
+cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c \
 cupidcfmakeps.c cupidreinhold.c cupidredges.c cupidrca.c \
-cupidrdrip.c cupidrfillclumps.c $(BUILT_C_ROUTINES)
+cupidrfillline.c cupidrfillclumps.c cupidrca2.c cupidfellwalker.c \
+cupidgcndfclump.c $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la
 

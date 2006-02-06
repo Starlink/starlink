@@ -79,6 +79,16 @@ package cupid {
             helpkey *
           }
 
+         parameter repconf {
+            type _LOGICAL
+            access READ
+            vpath CURRENT,DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Report supplied configuration?}
+            default TRUE
+            helpkey *
+          }
+
          parameter rms {
             type _DOUBLE
             access READ

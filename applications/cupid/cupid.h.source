@@ -1,3 +1,4 @@
+
 #if !defined( CUPID_INCLUDED )   /* Include this file only once */
 #define CUPID_INCLUDED
 
@@ -67,10 +68,9 @@ typedef struct CupidGC  {
 
 /* Structure used to describe a set of contiguous pixels in the ClumpFind
    algorithm. */
-typedef struct CupidPixelSet CupidPixelSet;
-struct CupidPixelSet {
+typedef struct CupidPixelSet {
    int nnb;            /* No. of neighbouring PixelSets which touch this one */
-   CupidPixelSet **nb; /* Pointer to array of "nnb" neighbouring PixelSets */
+   struct CupidPixelSet **nb; /* Pointer to array of "nnb" neighbouring PixelSets */
    int **nbl;          /* Pointer to array of "nnb" lists of neighbouring pixels */
    int *sznbl;         /* Pointer to array holding length of each "nbl" list */
    int index;          /* The index used to identify pixels in the set */
@@ -80,19 +80,8 @@ struct CupidPixelSet {
    int peak[ 3 ];      /* Peak pixel GRID coords */
    int pop;            /* Number of pixels assigned to the pixel set */
    int edge;           /* Does the PixelSet touch an edge of the data array? */
-};
+} CupidPixelSet;
 
-/* Structure used to describe a clump in the Reinhold algorithm.*/
-typedef struct CupidRClump CupidRClump;
-struct CupidRClump {
-   int index;          /* Unique index value used to identify the clump */
-   int surface_len;    /* Length of the "surface" array */
-   int *surface;       /* 1D indices of pixels in current surface layer */
-   int next_surface_index; /* Index of next element to use from "surface" */
-   int new_surface_len;/* Length of the "new_surface" array */
-   int *new_surface;   /*  1D indices of pixels in next surface layer */
-   int nblock;         /* Number of pixels blocked by edges or other clumps */
-};
 
 /* Function macros */
 /* --------------- */
@@ -193,34 +182,37 @@ extern int cupid_ps_cache_size;
 CupidPixelSet *cupidCFDeletePS( CupidPixelSet * );
 CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, int );
 CupidPixelSet *cupidCFMakePS( int );
-int *cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
-int *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
-int *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int * );
+double *cupidClumpDesc( int, double *, const char ***, int * );
 double cupidConfigD( AstKeyMap *, const char *, double );
-int cupidConfigI( AstKeyMap *, const char *, int );
 double cupidGCChiSq( int, double *, int, int );
 double cupidGCModel( int, double *, double *, int, int, int );
 float cupidRanVal( int, float[2] );
+int *cupidClumpFind( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
+int *cupidGaussClumps( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
+int *cupidRCA( int *, int *, int, int[ 3 ], int[ 3 ], double, int, int, int, int );
+int *cupidRCA2( int *, int *, int, int[ 3 ], int[ 3 ] );
+int *cupidReinhold( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
+int *cupidFellWalker( int, int, int *, int *, void *, double *, double, AstKeyMap *, int, int, int * );
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
+int cupidConfigI( AstKeyMap *, const char *, int );
+void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int, CupidPixelSet * );
+void cupidDumpI( int *, int, int *, int * );
+void cupidDumpD( double *, int, int *, int * );
+void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet ** );
+void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int *, int *, int[27], int *, CupidPixelSet ** );
 void cupidCFXfer( CupidPixelSet *, CupidPixelSet *, int *, int[3] );
 void cupidDatCopy( HDSLoc *, HDSLoc * );
 void cupidGCListClump( int, int, double *, double, int *, int, double );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
-void cupidNdfClump( int *, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap * );
+void cupidGCNdfClump( int *, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap * );
+void cupidREdges( int, double *, int *, int *, int, double, double, double, double );
+int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int );
 void cupidStoreClumps( const char *, HDSLoc *, int *, int, int, const char * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
-void cupidCFDump( int *, int, int *, int * );
-double *cupidClumpDesc( int, double *, const char ***, int * );
-void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet ** );
-void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int, CupidPixelSet * );
-void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int *, int *, int[27], int *, CupidPixelSet ** );
-void cupidREdges( int, double *, int *, int *, int, double, double, double );
-int *cupidRCA( int *, int *, int, int[ 3 ], int[ 3 ], int, int );
-int cupidRDrip( int, CupidRClump *, int *, int[ 3 ] );
-void cupidRFillClumps( int *, int, int, int[ 3 ], int[ 3 ], int );
+void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, int, int, int, int *[3] );
 
 void clumps();
 void cupidhelp();

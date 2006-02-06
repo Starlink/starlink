@@ -1,0 +1,302 @@
+#include "sae_par.h"
+#include "cupid.h"
+#include "mers.h"
+#include "ndf.h"
+#include "ast.h"
+#include "star/hds.h"
+#include <stdio.h>
+
+
+void cupidGCNdfClump( int *cndf, double sum, double *par, double rms, 
+                    int ndim, int *lbox, int *ubox, int list_size, 
+                    double *mlist, int *plist, int *lbnd, int iclump,
+                    int *dax, AstKeyMap *extra ){
+/*
+*  Name:
+*     cupidGCNdfClump
+
+*  Purpose:
+*     Create an NDF containing a description of a single clump.
+
+*  Synopsis:
+*     void cupidGCNdfClump( int *cndf, double sum, double *par, double rms, 
+*                         int ndim, int *lbox, int *ubox, int list_size, 
+*                         double *mlist, int *plist, int *lbnd, int iclump,
+*                         int *dax, AstKeyMap *extra )
+
+*  Description:
+*     This function creates a temporary NDF and stores the integrated 
+*     intensity of the clump in its Data component. The bounds of the NDF 
+*     will be the smallest possible which still encompass the clump. In 
+*     addition, if required it will create a Cupid extension in the NDF 
+*     containing
+*
+*     - The parameters of a Gaussian approximation to the clump (if supplied).
+*     - Any supplied extra information.
+
+*  Parameters:
+*     cndf
+*        Pointer to an int in which to put the identifier for the newly 
+*        created temporary NDF.
+*     sum
+*        The integrated intensity in the clump. Note, unlike par[0] and
+*        par[1], this value should not be normalised to the RMS noise.
+*     par
+*        Pointer to an array holding the parameters of a Gaussian
+*        approximation to the clump, or NULL. How many of these are used 
+*        depends on the value of "ndim": if "ndim" is 1 only elements 0 to 
+*        3 are used, if "ndim" is 2 only elements 0 to 6 are used, if "ndim" 
+*        is 3 all elements are used. All axis values are represented in GRID 
+*        pixels: 
+*
+*           par[0]: Peak intensity of clump (in units of the RMS noise level).
+*           par[1]: Constant intensity offset (in units of the RMS noise level).
+*           par[2]: Model centre on internal axis 0 (in pixels)
+*           par[3]: Intrinsic FWHM on axis 0 (in pixels)
+*           par[4]: Model centre on internal axis 1 (in pixels)
+*           par[5]: Intrinsic FWHM on axis 1 (in pixels)
+*           par[6]: Spatial orientation angle (in radians, positive from 
+*                   +ve GRID1 axis to +ve GRID2 axis).
+*           par[7]: Model centre on internal axis 3 (velocity) (in pixels)
+*           par[8]: Intrinsic FWHM on velocity axis (in pixels)
+*           par[9]: Axis 0 of internal velocity gradient vector (in velocity
+*                   pixels per spatial pixel).
+*           par[10]: Axis 1 of internal velocity gradient vector (in
+*                   velocity pixels per spatial pixel).
+*     rms
+*        The RMS noise level.
+*     ndim
+*        The number of pixel axes in the array.
+*     lbox
+*        The lower grid index bounds of the area containing the clump
+*        (using internal axis numbering).
+*     ubox
+*        The upper grid index bounds of the area containing the clump
+*        (using internal axis numbering).
+*     list_size
+*        The number of values supplied in mlist and plist.
+*     mlist
+*        An array of "list_size" elements containing the clump values at
+*        each pixel.
+*     plist
+*        An array of "ndim*list_size" elements in which each group of
+*        "ndim" adjacent values forms the grid indices of the corresponding 
+*        value in "mlist". This uses external axis ordering.
+*     lbnd
+*        Pointer to array holding the pixel indices of the first pixel in
+*        the user-supplied NDF (using external axis numbering).
+*     iclump
+*        The index of the current clump.
+*     dax
+*        Array holding external axis number indexed by internal axis number.
+*     extra
+*        An AstKeyMap holding extra diagnositic information to add to the
+*        clump structure.
+
+*  Authors:
+*     DSB: David S. Berry
+*     {enter_new_authors_here}
+
+*  History:
+*     10-NOV-2005 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+*/      
+
+/* Local Variables: */
+   char *cen[] = { "CENTRE1", "CENTRE2", "CENTRE3" };
+   char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
+   char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRAD3" };
+
+   HDSLoc *dloc;                /* Component locator */
+   HDSLoc *xloc;                /* Extension locator */
+   const char *key;             /* KeyMap key name */
+   double *ipd;                 /* Pointer to Data array */
+   double *m;                   /* Pointer to next data value */
+   double dval;                 /* Double value to store */
+   int *p;                      /* Pointer to next grid axis value */
+   int el;                      /* Number of elements mapped */
+   int elb[ 3 ];                /* The lower NDF limit on each external axis */
+   int elbox[ 3 ];              /* The lower box limit on each external axis */
+   int estep[ 3 ];              /* The step size on each external axis */
+   int eub[ 3 ];                /* The upper NDF limit on each external axis */
+   int eubox[ 3 ];              /* The upper box limit on each external axis */
+   int i;                       /* Point index */
+   int iv;                      /* 1D vector index for current data value */
+   int j;                       /* Axis index */
+   int lb[ 3 ];                 /* Lower pixel index bounds of NDF */
+   int nex;                     /* No. of extra items of information */
+   int ok;                      /* Pixel within clump NDF? */
+   int place;                   /* NDF place holder */
+   int pv;                      /* Pixel offset */
+   int step[ 3 ];               /* The step size on each internal axis */
+   int ub[ 3 ];                 /* Upper pixel index bounds of NDF */
+
+/* Abort if an error has already occurred. */
+   if( *status != SAI__OK ) return;
+
+/* Find the pixel index bounds of the NDF and the step between adjacent
+   pixels on each axis. */
+   lb[ 0 ] = lbox[ 0 ] - 1 + lbnd[ dax[ 0 ] ];
+   ub[ 0 ] = ubox[ 0 ] - 1 + lbnd[ dax[ 0 ] ];
+   step[ 0 ] = 1;
+
+   for( i = 1; i < ndim; i++ ) {
+      lb[ i ] = lbox[ i ] - 1 + lbnd[ dax[ i ] ];
+      ub[ i ] = ubox[ i ] - 1 + lbnd[ dax[ i ] ];
+      step[ i ] = ( ub[ i - 1 ] - lb[ i - 1 ] + 1 )*step[ i - 1 ];
+   }
+
+/* Convert lbox, lb, ub and step from internal axis numbering to external axis
+   numbering. */
+   for( i = 0; i < ndim; i++ ) {
+     elbox[ dax[ i ] ] = lbox[ i ];
+     eubox[ dax[ i ] ] = ubox[ i ];
+     elb[ dax[ i ] ] = lb[ i ];
+     eub[ dax[ i ] ] = ub[ i ];
+     estep[ dax[ i ] ] = step[ i ];
+   }      
+
+/* Create a place holder for a temporary NDF. The NDF will be copied to a 
+   permanent location before the program exits. */
+   ndfTemp( &place, status );
+
+/* Create the NDF to receive the clump values. The size of this NDF is the 
+   minimum needed to contain the clump. */
+   ndfNew( "_DOUBLE", ndim, elb, eub, &place, cndf, status );
+
+/* Map the NDFs Data array, filling it with bad values. */
+   ndfMap( *cndf, "DATA", "_DOUBLE", "WRITE/BAD", (void *) &ipd, &el, status );
+   if( ipd ) {
+
+/* Store every supplied model value in the NDF data array. */
+      m = mlist;
+      p = plist;
+      for( i = 0; i < list_size; i++ ) {
+
+/* Find the 1D vector index into the NDF data array corresponding to the
+   grid indices (within the user supplied NDF) of the current point.*/
+         pv = *(p++);
+         iv = pv - elbox[ 0 ];
+         ok = ( pv >= elbox[ 0 ] && pv <= eubox[ 0 ] );
+         for( j = 1; j < ndim; j++ ) {
+            pv = *(p++);
+            iv += ( pv - elbox[ j ] )*estep[ j ];
+            if( pv < elbox[ j ] || pv > eubox[ j ] ) ok = 0;
+         }
+         
+/* Store the value. */
+         if( ok ) ipd[ iv ] = *(m++);
+      }
+
+/* Unmap the NDFs Data array. */
+      ndfUnmap( *cndf, "DATA", status );
+   }
+
+/* If required, create a Cupid extension in the NDF. */
+   if( par || extra ) {
+      xloc = NULL;  
+      ndfXnew( *cndf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+
+/* First do Gaussian parameters. */
+      if( par ) {
+
+/* Store the integrated intensity in the clump. */
+         dloc = NULL;  
+         datNew( xloc, "SUM", "_DOUBLE", 0, NULL, status );
+         datFind( xloc, "SUM", &dloc, status );
+         datPutD( dloc, 0, NULL, &sum, status );
+         datAnnul( &dloc, status );
+
+/* Store the parameters of the Gaussian approximation, taking out the
+   normalisation by the RMS noise level.*/
+         datNew( xloc, "PEAK", "_DOUBLE", 0, NULL, status );
+         datFind( xloc, "PEAK", &dloc, status );
+         dval = rms*par[ 0 ];
+         datPutD( dloc, 0, NULL, &dval, status );
+         datAnnul( &dloc, status );
+
+         datNew( xloc, "OFFSET", "_DOUBLE", 0, NULL, status );
+         datFind( xloc, "OFFSET", &dloc, status );
+         dval = rms*par[ 1 ];
+         datPutD( dloc, 0, NULL, &dval, status );
+         datAnnul( &dloc, status );
+            
+         datNew( xloc, cen[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( xloc, cen[ dax[ 0 ] ], &dloc, status );
+         dval = par[ 2 ] + lbnd[ dax[ 0 ] ] - 1.5;
+         datPutD( dloc, 0, NULL, &dval, status );
+         datAnnul( &dloc, status );
+            
+         datNew( xloc, fwhm[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+         datFind( xloc, fwhm[ dax[ 0 ] ], &dloc, status );
+         datPutD( dloc, 0, NULL, par + 3, status );
+         datAnnul( &dloc, status );
+      
+         if( ndim > 1 ) {
+            datNew( xloc, cen[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+            datFind( xloc, cen[ dax[ 1 ] ], &dloc, status );
+            dval = par[ 4 ] + lbnd[ dax[ 1 ] ] - 1.5;
+            datPutD( dloc, 0, NULL, &dval, status );
+            datAnnul( &dloc, status );
+               
+            datNew( xloc, fwhm[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+            datFind( xloc, fwhm[ dax[ 1 ] ], &dloc, status );
+            datPutD( dloc, 0, NULL, par + 5, status );
+            datAnnul( &dloc, status );
+               
+            datNew( xloc, "ANGLE", "_DOUBLE", 0, NULL, status );
+            datFind( xloc, "ANGLE", &dloc, status );
+            dval = par[ 6 ]*AST__DR2D;
+            datPutD( dloc, 0, NULL,  &dval, status );
+            datAnnul( &dloc, status );
+               
+            if( ndim > 2 ) {
+      
+               datNew( xloc, cen[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
+               datFind( xloc, cen[ dax[ 2 ] ], &dloc, status );
+               dval = par[ 7 ] + lbnd[ dax[ 2 ] ] - 1.5;
+               datPutD( dloc, 0, NULL, &dval, status );
+               datAnnul( &dloc, status );
+                  
+               datNew( xloc, fwhm[ dax[ 2 ] ], "_DOUBLE", 0, NULL, status );
+               datFind( xloc, fwhm[ dax[ 2 ] ], &dloc, status );
+               datPutD( dloc, 0, NULL, par + 8, status );
+               datAnnul( &dloc, status );
+               
+               datNew( xloc, vgrad[ dax[ 0 ] ], "_DOUBLE", 0, NULL, status );
+               datFind( xloc, vgrad[ dax[ 0 ] ], &dloc, status );
+               datPutD( dloc, 0, NULL, par + 9, status );
+               datAnnul( &dloc, status );
+      
+               datNew( xloc, vgrad[ dax[ 1 ] ], "_DOUBLE", 0, NULL, status );
+               datFind( xloc, vgrad[ dax[ 1 ] ], &dloc, status );
+               datPutD( dloc, 0, NULL, par + 10, status );
+               datAnnul( &dloc, status );
+      
+            }
+         }      
+      }
+      
+/* Now store any extra diagnostic information. */
+      if( extra ) {
+         nex = astMapSize( extra );
+         for( i = 0; i < nex; i++ ) {
+            key = astMapKey( extra, i );
+            if( astMapGet0D( extra, key, &dval ) ) {
+               datNew( xloc, (char *) key, "_DOUBLE", 0, NULL, status );
+               datFind( xloc, (char *) key, &dloc, status );
+               datPutD( dloc, 0, NULL, &dval, status );
+               datAnnul( &dloc, status );
+            }
+         }
+      }
+
+/* Release the extension locator. */
+      datAnnul( &xloc, status );
+   }
+}
+

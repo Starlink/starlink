@@ -139,6 +139,7 @@ void clumps() {
 *        - GaussClumps
 *        - ClumpFind
 *        - Reinhold
+*        - FellWalker
 *
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
@@ -148,8 +149,8 @@ void clumps() {
 *        of the METHOD parameter. If METHOD is GaussClumps, the output NDF 
 *        receives the sum of all the fitted Gaussian clump models including
 *        a global background level chosen to make the mean output value
-*        equal to the mean input value. If METHOD is ClumpFind or Reinhold, 
-*        each pixel in 
+*        equal to the mean input value. If METHOD is ClumpFind, FellWalker or 
+*        Reinhold, each pixel in 
 *        the output is the integer index of clump to which the pixel has been 
 *        assigned. Bad values are stored for pixels which are not part of
 *        any clump. No output NDF will be produced if a null (!) value is 
@@ -157,11 +158,8 @@ void clumps() {
 *        QUALITY components (plus any extensions) from the input NDF. [!]
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
-*        No catalogue will be produced if a null (!) value is supplied.
-*        The central positons of all clumps in the catalogue fred.FIT can be
-*        overlayed on a displayed image of the input NDF using the command
-*        "listmake fred plot=mark". The following columns are stored in
-*        the catalogue: 
+*        No catalogue will be produced if a null (!) value is supplied. The
+*        following columns are stored in the catalogue: 
 *
 *        - PeakX: The PIXEL X coordinates of the clump peak value.
 *        - PeakY: The PIXEL Y coordinates of the clump peak value.
@@ -185,7 +183,18 @@ void clumps() {
 *
 *        For the GaussClump algorithm, the Sum and Area values refer 
 *        to the part of the Gaussian within the level defined by the
-*        GaussClump.ModelLim configuration parameter. [!]
+*        GaussClump.ModelLim configuration parameter.
+*
+*        The KAPPA command "listshow" can be used to draw markers at the 
+*        central positions of the clumps described in a catalogue. For
+*        instance, the command "listshow fred plot=mark" will draw
+*        markers identifying the positions of the clumps described in 
+*        file fred.FIT, overlaying the markers on top of the currently
+*        displayed image. [!]
+*     REPCONF = _LOGICAL (Read)
+*        If a TRUE value is supplied, then the configuration parameters
+*        supplied by the CONFIG parameter will be listed to standard 
+*        output. [current value]
 *     RMS = _DOUBLE (Read)
 *        Specifies a value to use as the global RMS noise level in the 
 *        supplied data array. The suggested defaukt value is the square root 
@@ -244,6 +253,24 @@ void clumps() {
 *     list of clumps.
 
 *     - Reinhold: Based on an algorithm developed by Kim Reinhold at JAC.
+*     See SUN/255 for more information on this algorithm. The edges of the 
+*     clumps are first found by searching for peaks within a set of 1D 
+*     profiles running through the data, and then following the wings of 
+*     each peak down to the noise level or to a local minimum. A mask is 
+*     thus produced in which the edges of the clumps are marked. These edges 
+*     however tend to be quite noisey, and so need to be cleaned up before 
+*     further use. This is done using a pair of cellular automata which 
+*     first dilate the edge regions and then erode them. The volume between 
+*     the edges are then filled with an index value associated with the 
+*     peak position. Another cellular automata is used to removed noise 
+*     from the filled clumps.
+*
+*     - FellWalker: Based on an algorithm which walks up hill along the
+*     line of greatest gradient until a significant peak is reached. It then
+*     assigns all pixels visited along the route to the clump associated
+*     with the peak. Such a walk is performed for every pixel in the data
+*     array which is above a specified background level. See SUN/255 for more 
+*     information on this algorithm. 
 
 *  GaussClumps Configuration Parameters:
 *     The GaussClumps algorithm uses the following configuration parameters. 
@@ -385,6 +412,56 @@ void clumps() {
 *     The Reinhold algorithm uses the following configuration parameters. 
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
+*
+*     - Reinhold.MinPix: The minimum number of pixels spanned by a peak
+*     along any one dimension in order for the peak to be considered
+*     significant. If a peak is spanned by fewer than this number of pixels 
+*     on any axis, then it is ignored. [4]
+*     - Reinhold.Noise: Defines the data value below which pixels are 
+*     considered to be in the noise. A peak is considered to end when the 
+*     peak value dips below the "noise" value. [2*RMS]
+*     - Reinhold.Thresh: The smallest significant peak height. Peaks which 
+*     have a maximum data value less than this value are ignored. ["noise"+RMS]
+*     - Reinhold.FlatSlope: A peak is considered to end when the slope of a
+*     profile through the peak drops below this value. The value should be 
+*     given as a change in data value between adjacent pixels. [0.5*RMS]
+*     - Reinhold.CAThresh: Controls the operation of the cellular automata 
+*     which is used to erode the (previously dilated) edges regions prior to 
+*     filling them with clump indicies. If the number of edge pixels in
+*     the 3x3x3 pixel cube (or 2x2 pixel square for 2D data) surrounding 
+*     any pixel is greater than CAThresh, then the central pixel is
+*     considered to be an edge pixel. Otherwise it is not considered to be 
+*     an edge pixel. The default value is one less than the total number
+*     of pixels in the square or cube (i.e. 8 for 2D data and 26 for 3D 
+*     data). []
+*     - Reinhold.CAIterations: This gives the number of times to apply
+*     the cellular automata which is used to erode the edges regions prior
+*     to filling them with clump indicies. [1]
+*     - Reinhold.FixClumpsIterations: This gives the number of times to
+*     apply the cellular automata which cleans up the filled clumps. This
+*     cellular automata replaces each output pixel by the most commonly 
+*     occuring value within a 3x3x3 cube (or 2x2 square for 2D data) of input 
+*     pixels centred on the output pixel. [1]
+
+*  FellWalker Configuration Parameters:
+*     The FellWalker algorithm uses the following configuration parameters. 
+*     Values for these parameters can be specified using the CONFIG parameter. 
+*     Default values are shown in square brackets:
+*
+*     - FellWalker.Noise: Defines the data value below which pixels are 
+*     considered to be in the noise. No walk will start from a pixel with 
+*     data value less than this value. [2*RMS]
+*     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
+*     local maximum which is checked for higher pixel values. The
+*     neighbourhood checked is  square or cube with side equal to twice the
+*     supplied value, in pixels. [4]
+*     - FellWalker.FlatSlope: Any initial section to a walk which has an
+*     average gradient (measured over 4 steps) less than this value will not 
+*     be included in the clump. [2.0*RMS]
+*     - FellWalker.CleanIter: This gives the number of times to apply the 
+*     cellular automata which cleans up the filled clumps. This cellular 
+*     automata replaces each clump index by the most commonly occuring 
+*     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [3]
 
 *  Authors:
 *     DSB: David S. Berry
@@ -425,6 +502,7 @@ void clumps() {
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
+   int defcon;                  /* Defaults being used?*/
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
@@ -438,6 +516,7 @@ void clumps() {
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
+   int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
    int size;                    /* Size of the "grp" group */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
@@ -614,8 +693,8 @@ void clumps() {
    parGet0d( "RMS", &rms, status );
 
 /* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD", 1, 
-             method, 15,  status );
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
+             "FELLWALKER", 1, method, 15,  status );
 
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
@@ -628,22 +707,47 @@ void clumps() {
    if( *status == PAR__NULL || size == 0 ) {
       if( *status != SAI__OK ) errAnnul( status );
       keymap = astKeyMap( "" );
+      defcon = 1;
 
 /* If a group was supplied, see if it consists of the single value "def".
    If so, create an empty KeyMap. */
    } else {
+      defcon = 0;
       keymap = NULL;
       if( size == 1 ) {
          value = buffer;
          grpGet( grp, 1, 1, &value, GRP__SZNAM, status );
-         if( astChrMatch( value, "DEF" ) ) keymap = astKeyMap( "" );
+         if( astChrMatch( value, "DEF" ) ) {
+            keymap = astKeyMap( "" );
+            defcon = 1;
+         }
       }
 
 /* Otherwise, create an AST KeyMap holding the value for each configuration 
-   setting, indexed using its name, then delete the GRP group. */
+   setting, indexed using its name, display the config file if needed. */
       if( !keymap ) kpg1Kymap( grp, &keymap, status );
-      grpDelet( &grp, status );      
    }
+
+/* Report the configuration (if any). */
+   parGet0l( "REPCONF", &repconf, status );
+   if( repconf ) {
+      msgBlank( status );
+      msgOut( "", "Current configuration:", status );
+      if( defcon ) {
+         msgOut( "", "   (defaults)", status );
+      } else { 
+         value = buffer;
+         for( i = 1; i <= size; i++ ) {
+            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
+            msgSetc( "V", value );
+            msgOut( "", "   ^V", status );
+         }
+         msgBlank( status );
+      }
+   }
+
+/* Delete the group, if any. */
+   if( grp ) grpDelet( &grp, status );      
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
@@ -656,6 +760,10 @@ void clumps() {
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       clist = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
+                              keymap, velax, ilevel, &nclump ); 
+      
+   } else if( !strcmp( method, "FELLWALKER" ) ) {
+      clist = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
    } else if( *status == SAI__OK ) {
@@ -680,7 +788,8 @@ void clumps() {
             ndfSbad( 1, indf2, "DATA", status );
 
          } else if( !strcmp( method, "CLUMPFIND" ) ||
-                    !strcmp( method, "REINHOLD" ) ) {
+                    !strcmp( method, "REINHOLD" ) ||
+                    !strcmp( method, "FELLWALKER" ) ) {
             ndfStype( "_INTEGER", indf2, "DATA", status );
             ndfMap( indf2, "DATA", "_INTEGER", "WRITE", &ipo, &el, status );
             ndfSbad( 1, indf2, "DATA", status );

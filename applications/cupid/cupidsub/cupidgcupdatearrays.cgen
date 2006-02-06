@@ -414,9 +414,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       }
 
 /* Create the NDF. */
-      cupidNdfClump( cndf, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
-                     list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
-                     extra );
+      cupidGCNdfClump( cndf, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
+                       list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
+                       extra );
 
 /* Free resources */
       if( extra ) extra = astAnnul( extra );
