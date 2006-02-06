@@ -23,7 +23,7 @@ PUBLIC_INCLUDES = tclAdam.h tkGwm.h tkNbs.h tclNbs.h
 ##  which form part of the package and are required in order to build
 ##  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = tkGwm_sys.h gwm_sys.h
+PRIVATE_INCLUDES = tkGwm_sys.h gwm_sys.h tclAdamInit.h
 
 ##  C routines required for building the package.  This is just a list of
 ##  all the C source files.
@@ -37,7 +37,7 @@ NBS_ROUTINES = tclNbs.c
 
 ##  List of tk library files.
 
-LIBRARY_FILES = adamtask.tcl colourDialog.tcl dialogShow.tcl \
+LIBRARY_FILES = init.tcl adamtask.tcl colourDialog.tcl dialogShow.tcl \
                 dialogStart.tcl gwmWithScroll.tcl printDialog.tcl \
                 jpegDialog.tcl
 

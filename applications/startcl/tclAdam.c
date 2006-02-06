@@ -4,6 +4,7 @@
      Authors :
       B.D.Kelly (ROE)
       D.L.Terrett (RAL)
+      P.W.Draper (JAC, Durham University)
 
      History :
       16 March 1995 First stable version.
@@ -13,6 +14,8 @@
                     handler problems & enable stubs.
        5 Oct   2000 Retain local copies of the message status hash entries. (DSB)
       27 Jan   2006 Really remove Tcladam_Exit (PWD).
+       6 Feb   2006 Add location of init.tcl script as part of package
+                    start up. Also defines startcl_library as side-effect.
 */
 #include <stdio.h>
 #include <time.h>
@@ -39,6 +42,8 @@
 #include "ams.h"
 
 #include "tclAdam.h"
+
+#include "tclAdamInit.h"
 
 /*
     Prototypes for static functions defined in this file.
@@ -388,6 +393,10 @@ Tcl_Interp *interp   /* tcl interpreter pointer */
                        (Tcl_CmdProc *)Tcladam_Start,
                        (ClientData)NULL, 
                        (Tcl_CmdDeleteProc *)NULL );
+
+
+   /* Locate the init.tcl script and arrange for scripts be autoloaded */
+   Tcl_Eval( interp, initScript );
 
    return TCL_OK;
 }
