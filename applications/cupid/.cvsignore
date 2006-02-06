@@ -11,8 +11,8 @@ version.dat
 *.ifc
 *.ifl
 starconf.status
-sun999.ps
-sun999.dvi
+sun255.ps
+sun255.dvi
 *.lo
 *.la
 Makefile
@@ -36,4 +36,10 @@ starconf.status.local
 stamp-h1
 make.log
 .deps
-
+cupid.h
+make_doc
+make_h
+make_quickdes
+make_history_help
+history.help
+sun255.tex
