@@ -3,10 +3,9 @@
 
 ccdsupportdir = $(bindir)
 
-ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
-                  $(TCL_SUPPORT_NOEXE) $(TCL_SCR) $(ITCL_SCR) $(TCL_INDEX)
+ccdsupport_DATA = $(DATA_FILES) ccdpack.shl $(TCL_SCR) $(ITCL_SCR) $(TCL_INDEX)
 
-dist_bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
+dist_bin_SCRIPTS = $(PUBLIC_SCR)
 
 bin_PROGRAMS = ccdwish
 
@@ -156,17 +155,6 @@ ITCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
 
 TCL_INDEX = tclIndex
 
-TCL_SUPPORT_BIN = atclsh$(EXEEXT)
-
-TCL_SUPPORT_STARTCL = adamtask.tcl colourDialog.tcl dialogShow.tcl \
- dialogStart.tcl gwmWithScroll.tcl jpegDialog.tcl printDialog.tcl
-
-TCL_SUPPORT_MSGRLY = adamMessageRelay
-
-TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
-
-TCL_SUPPORT_NOEXE = $(TCL_SUPPORT_STARTCL)
-
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
  c1.xbm c2.xbm c3.xbm c4.xbm c5.xbm c6.xbm c7.xbm c8.xbm \
  arrow_left.xbm arrow_right.xbm \
@@ -198,11 +186,6 @@ IFL_FILES = $(REDTASKS:=.ifl) $(REGTASKS:=.ifl) $(RESTASKS:=.ifl) \
 STAR_LIB = $(STARLINK)/lib
 STAR_BIN = $(STARLINK)/bin
 
-$(TCL_SUPPORT_BIN):
-	cp $(STAR_BIN)/$@ $@
-$(TCL_SUPPORT_STARTCL):
-	cp $(STAR_LIB)/startcl/$@ $@
-
 ## TCL_INDEX rule: although it can in principle be generated automatically
 ## from other source files as in this rule, TCL_INDEX is in fact checked
 ## in as source code to the repository.  This is because building it only
@@ -213,24 +196,9 @@ $(TCL_SUPPORT_STARTCL):
 ## be necessary if Tcl or perhaps CCDPACK's use of it changes in some
 ## relevant way.
 ##
-## Old dependency line:
-##    $(TCL_INDEX): $(TCL_SCR) $(TCL_SUPPORT_NOEXE) $(ITCL_SUPPORT_NOEXE) \
-##                  ccdwish
 $(TCL_INDEX):
 	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
         $(srcdir)/ccdwish mkindex.tcl
-
-## Arrange to edit the installation binary directory into script files
-## which need it.  This cannot be done by autoconf because it needs to
-## be changable at make time - see the autoconf manual section on
-## Installation Directory Variables.
-
-$(TCL_SUPPORT_MSGRLY): Makefile
-	rm -f $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_MSGRLY).tmp
-	sed -e '1s%.*%#!$(bindir)/atclsh%' $(STAR_LIB)/startcl/$@ \
-               >$(TCL_SUPPORT_MSGRLY).tmp
-	chmod +x $(TCL_SUPPORT_MSGRLY).tmp
-	mv $(TCL_SUPPORT_MSGRLY).tmp $(TCL_SUPPORT_MSGRLY)
 
 ## Sources that need to be built, but are not mentioned elsewhere.
 ## Force the creation of the on-line hypertext help, which relies on the
@@ -246,7 +214,7 @@ LINKSCRIPTS = ccdpack_link ccdpack_link_adam pgp_ccdpack_link pgp_ccdpack_link_a
 EXTRA_DIST = $(SHELL_SCR) $(IFD_FILES) $(PRIVATE_INCLUDES) $(ccdsupport_DATA) \
              $(LINKSCRIPTS) ccdpack.hlp ccdpack.htx_tar
 
-MISC_BUILT_FILES = adamMessageRelay version.dat ccdhelp ccdpack_scr \
+MISC_BUILT_FILES = version.dat ccdhelp ccdpack_scr \
 ccdpack_res ccdpack_reg ccdpack_red ccdpack.csh \
 ccdpack.icl ccdpack.sh
 
@@ -269,7 +237,8 @@ SUBDIRS = tasks gen help main
 
 ##  Post-installation tasks. We need to install the ccdpack.htx_tar
 ##  contents into the help directory (not the package specific starhelpdir).
-##  Re-use the boiler plate from the SUN installation section.
+##  Re-use the boiler plate from the SUN installation section in the full
+##  Makefile. 
 install-exec-local:
 	f="$(srcdir)/ccdpack.htx_tar";\
 	d="$(DESTDIR)/$(prefix)/help";\

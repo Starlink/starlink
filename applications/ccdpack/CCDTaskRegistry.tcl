@@ -85,21 +85,6 @@ proc CCDTaskRegistry { } {
 #.
 
 #-----------------------------------------------------------------------------
-#  Initialise the adamtask interface.
-#  Happens via autoload at moment.
-#-----------------------------------------------------------------------------
-#    source $CCDdir/adamtask.tcl
-#
-#  Use this code when release is available and can use the necessary
-#  CCDPACK extensions (dynamic loading?). Otherwise CCDPACK keeps its
-#  own copies of the tcl ADAM code.
-#   if { [info exists env(TCLADAM_DIR)] } {
-#      source $env(TCLADAM_DIR)/tk/adam/adamtask.tcl
-#   } else {
-#      source /star/lib/tk/adam/adamtask.tcl
-#   }
-
-#-----------------------------------------------------------------------------
 #  Name the available applications.
 #-----------------------------------------------------------------------------
 

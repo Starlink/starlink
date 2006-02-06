@@ -1,6 +1,6 @@
 #! /bin/sh
 # The next line is executed by /bin/sh, but not Tcl \
-exec $CCDPACK_DIR/atclsh $0 ${1+"$@"}
+exec atclsh $0 ${1+"$@"}
 #
 #  Read a GLITCH file and convert it into an ARD file.
 #
