@@ -406,11 +406,12 @@
 *        and 0.1 for the fifth.
 
 *  Notes:
-*     -  The Title component in the NDF is used as the default title for 
-*     the annotated axes. If the NDF does not have a Title component, then
-*     the default title is taken from current co-ordinate Frame in the NDF. 
-*     This default may be over-ridden by specifying a value for the Title
-*     attribute using the STYLE parameter. 
+*     -  If no Title is specified via the STYLE parameter, then the Title
+*     component in the NDF is used as the default title for the annotated 
+*     axes. If the NDF does not have a Title component, then the default 
+*     title is taken from current co-ordinate Frame in the NDF. If this
+*     has not been set explicitly, then the name of the NDF is used as the
+*     default title.
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the 
 *     annotated axes, data plot, and optional key; a KEY picture to store 
@@ -451,6 +452,8 @@
 *        Correct use of CNF_PVAL.
 *     27-JAN-2006 (DSB):
 *        Ignore blank titles supplied in STYLE.
+*     6-FEB-2006 (DSB):
+*        Use KPG1_ASTTL to get the title.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -882,25 +885,8 @@ c         IMODE = 4
      :                   IPLOT, NFRM, ALIGN, STATUS )
       END IF
 
-*  If the user did not specify a Plot title (as indicated by the Plot title
-*  being the same as the FrameSet title), make the NDF Title the default 
-*  Title for the Plot. We have to be careful about the timing of this change 
-*  to the Title. If we did it before KPG1_PLOT (i.e. if we set the Title in 
-*  FSET) it may prevent alignment ocurring within KPG1_PLOT since alignment 
-*  fails if the Title of two Frames differ.
-      TITLE = AST_GETC( IPLOT, 'TITLE', STATUS ) 
-      IF( TITLE .EQ. ' ' .OR. 
-     :    TITLE .EQ. AST_GETC( FSET, 'TITLE', STATUS ) ) THEN
-
-         TITLE = ' '
-         CALL NDF_CGET( INDF, 'TITLE', TITLE, STATUS ) 
-
-         IF( TITLE .NE. ' ' ) THEN
-            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
-     :                     STATUS )
-         END IF
-
-      END IF
+*  Ensure the Title attribute of the Plot has a useful value.
+      CALL KPG1_ASTTL( IPLOT, IWCS, INDF, STATUS )
 
 *  Produce the plot.
 *  =================

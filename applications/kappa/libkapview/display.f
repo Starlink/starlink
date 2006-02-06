@@ -439,12 +439,12 @@
 *     the image display.  Note that the default values for parameters
 *     LOW and HIGH are the minimum and maximum values in the compressed
 *     floating-point data.
-*     -  The Title component in the NDF is used as the default title 
-*     for the annotated axes.  If the NDF does not have a Title 
-*     component, then the default title is taken from current 
-*     co-ordinate Frame in the NDF.  This default may be overridden by 
-*     specifying a non-blank value for the Title attribute using the STYLE
-*     parameter. 
+*     -  If no Title is specified via the STYLE parameter, then the Title
+*     component in the NDF is used as the default title for the annotated 
+*     axes. If the NDF does not have a Title component, then the default 
+*     title is taken from current co-ordinate Frame in the NDF. If this
+*     has not been set explicitly, then the name of the NDF is used as the
+*     default title.
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the 
 *     annotated axes, the image area, and the border; a DATA picture 
@@ -552,6 +552,8 @@
 *        Use CNF_PVAL
 *     27-JAN-2006 (DSB):
 *        Ignore blank titles supplied in STYLE.
+*     6-FEB-2006 (DSB):
+*        Use KPG1_ASTTL to get the title.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1087,25 +1089,8 @@
      :                   STATUS )
       END IF
 
-*  If the user did not specify a Plot title (as indicated by the Plot 
-*  title being the same as the WCS title), make the NDF Title the
-*  default Title for the Plot.  We have to be careful about the timing 
-*  of this change to the Title.  If we did it before KPG1_PLOT (i.e. if 
-*  we set the Title in IWCS) it may prevent alignment ocurring within 
-*  KPG1_PLOT since alignment fails if the Title of two Frames differ.
-      TITLE = AST_GETC( IPLOT, 'TITLE', STATUS ) 
-      IF( TITLE .EQ. ' ' .OR. 
-     :    TITLE .EQ. AST_GETC( IWCS, 'TITLE', STATUS ) ) THEN
-
-         TITLE = ' '
-         CALL NDF_CGET( INDF1, 'TITLE', TITLE, STATUS ) 
-
-         IF( TITLE .NE. ' ' ) THEN
-            CALL AST_SETC( IPLOT, 'TITLE', TITLE( : CHR_LEN( TITLE ) ), 
-     :                     STATUS )
-         END IF
-
-      END IF
+*  Ensure the Title attribute of the Plot has a useful value.
+      CALL KPG1_ASTTL( IPLOT, IWCS, INDF1, STATUS )
 
 *  Check whether chosen device is an 'image display' with a suitable
 *  minimum number of colour indices, and obtain the number of colour 
