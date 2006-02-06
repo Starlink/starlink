@@ -349,6 +349,7 @@
 *  error reporting context so that we get the correct value even if an
 *  error has occurred.
       CALL ERR_MARK
+      LSTAT = SAI__OK
       CALL HDS_INFOI( DAT__NOLOC, 'LOCATORS', FILTER,
      :     NLOC1, LSTAT )
 
