@@ -89,9 +89,9 @@ proc adamtask.init {} {
 # Get the name of the message relay script. This is either the value of
 # the environment variable ADAM_MESSAGE_RELAY or the file "adamMessageRelay"
 # stored in the same directory as this file (adamtask.tcl).
-    global env
+    global startcl_library
     if {[catch {set env(ADAM_MESSAGE_RELAY)} relayName] != 0} {
-	set relayName [file dirname [info script]]/adamMessageRelay
+	set relayName $startcl_library/adamMessageRelay
     }
 
 # Create the message relay process. 
