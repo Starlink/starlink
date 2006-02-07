@@ -15,8 +15,10 @@
        5 Oct   2000 Retain local copies of the message status hash entries. (DSB)
       27 Jan   2006 Really remove Tcladam_Exit (PWD).
        6 Feb   2006 Add location of init.tcl script as part of package
-                    start up. Also defines startcl_library as side-effect.
+                    start up. Also defines startcl_library.
 */
+#include "config.h"                   /* Local version */
+
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
@@ -377,16 +379,18 @@ char *argv[]
 
 /*+   TCLADAM_INIT - initialise tcladam */
 
-int Tcladam_Init
-(
+int Tcladam_Init (
 Tcl_Interp *interp   /* tcl interpreter pointer */
 )
 
 /*   Method :
       Initialise stubs interface and adam_start command.
+      Define the builtin variable startcl_library and locate the init script.
 */
 
 {
+   int result;
+   const char *libDir;
    if ( Tcl_InitStubs( interp, "8.0", 0 ) == NULL ) return TCL_ERROR;
 
    Tcl_CreateCommand ( interp, "adam_start", 
@@ -394,11 +398,25 @@ Tcl_Interp *interp   /* tcl interpreter pointer */
                        (ClientData)NULL, 
                        (Tcl_CmdDeleteProc *)NULL );
 
+   /* The startcl_library path can be found in several places.  Here is the
+    * order in which the are searched.
+    *          1) the variable may already exist
+    *          2) env array
+    *          3) the compiled in value of STARTCL_LIBRARY
+    */
+   libDir = Tcl_GetVar(interp, "startcl_library", TCL_GLOBAL_ONLY);
+   if (libDir == NULL) {
+       libDir = Tcl_GetVar2(interp, "env", "STARTCL_LIBRARY", TCL_GLOBAL_ONLY);
+   }
+   if (libDir == NULL) {
+       libDir = STARTCL_LIBRARY;
+   }
+   Tcl_SetVar(interp, "startcl_library", libDir, TCL_GLOBAL_ONLY);
 
    /* Locate the init.tcl script and arrange for scripts be autoloaded */
-   Tcl_Eval( interp, initScript );
+   result = Tcl_Eval( interp, initScript );
 
-   return TCL_OK;
+   return result;
 }
 
 

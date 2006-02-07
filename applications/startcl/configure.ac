@@ -38,6 +38,10 @@ STAR_PATH_TCLTK(8.4,[tk])
 dnl    How to link to X.
 AC_PATH_XTRA
 
+# Define STARTCL_LIBRARY as a macro for baking into local binaries.
+STARTCL_LIBRARY=\"${prefix}/lib/startcl\"
+AC_DEFINE_UNQUOTED(STARTCL_LIBRARY, $STARTCL_LIBRARY, [Compile time library directory])
+
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile component.xml])
 
