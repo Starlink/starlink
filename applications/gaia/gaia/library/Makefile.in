@@ -44,12 +44,12 @@ FILES        = \
  GaiaPolUSelOpt.tcl GaiaPolCat.tcl GaiaPolDisp.tcl \
  GaiaPolObject.tcl GaiaPolData.tcl GaiaPolarimetry.tcl \
  GaiaProperties.tcl GaiaStartup.tcl \
- adamtask.tcl gaiaMain.tcl gaia_defaults.tcl gaia_util.tcl \
+ gaiaMain.tcl gaia_defaults.tcl gaia_util.tcl \
  gaia_version.tcl graphics_features.tcl \
  skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs wcs2pix gaia2astrom.tcl \
- adamtask.tcl .gaFilters gaiacut zoomcutandflip
+ .gaFilters gaiacut zoomcutandflip
 
-PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
+PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh \
                displaycat tabbedgaia.sh
 
 all:

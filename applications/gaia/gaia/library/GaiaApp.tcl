@@ -104,7 +104,8 @@
 #     This widget inherits no other classes.
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
@@ -121,6 +122,8 @@
 #        Added public method getparam. 
 #     9-MAR-2001 (PWD):
 #        Renamed GaiaApp from GaiaPolApp (and StarApp before that).
+#     7-FEB-2006 (PWD):
+#        Removed adamtask from GAIA. Now uses StarTcl version.
 #     {enter_further_changes_here}
 
 #-
@@ -137,13 +140,6 @@ itcl::class gaia::GaiaApp {
    #  Constructor:
    #  ------------
    constructor  {args} {
-
-      #  Initialise the adamtask interface. Note "adamtask.init" is
-      #  autoloaded, so must be on auto_path somewhere.
-      if { ! $adamtask_initialised_ } {
-         adamtask.init
-         set adamtask_initialised_ 1
-      }
 
       #  Create the command queue.
       set command_queue_ [gaia::Queue \#auto]
@@ -324,7 +320,7 @@ itcl::class gaia::GaiaApp {
          #  of the monolith, so append a unique integer to the monolith
          #  filename (no directory or file type).
          set taskname "[file rootname [file tail $monolith_]][incr monocount_]"
-         adamtask $taskname $monolith_
+         ::adamtask $taskname $monolith_
          set count 0
          while { [$taskname path] == 0 } {
             after 250
@@ -489,9 +485,6 @@ itcl::class gaia::GaiaApp {
 
    #  Count for monoliths started.
    common monocount_ 0
-
-   #  Status of adamtask software.
-   common adamtask_initialised_ 0
 
 #  End of class definition.
 }

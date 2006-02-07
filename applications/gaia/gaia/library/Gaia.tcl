@@ -1689,10 +1689,6 @@ window gives you access to this."
       lappend argv $file_types
       incr argc 2
 
-      # need this for library/GaiaApp.tcl  to find adamtask.tcl
-      if {! [info exists env(TCLADAM_DIR)]} {
-         set env(TCLADAM_DIR) $gaia_dir/demos
-      }
       # XXX should use ~/adam/gaia-[pid] here, but not sure about cleanup...
       if {! [info exists env(ADAM_USER)]} {
          set env(ADAM_USER) $env(HOME)/adam/gaia
