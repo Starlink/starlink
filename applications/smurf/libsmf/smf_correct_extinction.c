@@ -60,6 +60,8 @@
 *        a frame at a time. Speed up from 85 seconds to 2 seconds.
 *     2006-02-03 (AGG):
 *        Add the quick flag. Not pretty but it gives a factor of 2 speed up
+*     2006-02-07 (AGG):
+*        Can now use the WVMRAW mode for getting the optical depth
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -89,6 +91,7 @@
 
 /* Standard includes */
 #include <stdio.h>
+#include <string.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -115,26 +118,29 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   smfHead *hdr;            /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
   dim_t j;                 /* Loop counter */
-  const char *origsystem;  /* Character string to store the coordinate
+  const char *origsystem = '\0';  /* Character string to store the coordinate
 			      system on entry */
-  AstFrameSet *wcs;        /* Pointer to AST WCS frameset */
+  AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   double airmass;          /* Airmass */
   double *indata;          /* Pointer to data array */
-  double *vardata;          /* Pointer to variance array */
+  double *vardata;         /* Pointer to variance array */
   dim_t index;             /* index into vectorized data array */
   dim_t k;                 /* Loop counter */
-  double *xin;              /* X coordinates of input mapping */
-  double *xout;             /* X coordinates of output */
-  double *yin;              /* Y coordinates of input */
-  double *yout;             /* Y coordinates of output */
+  double *xin = NULL;      /* X coordinates of input mapping */
+  double *xout = NULL;     /* X coordinates of output */
+  double *yin = NULL;      /* Y coordinates of input */
+  double *yout = NULL;     /* Y coordinates of output */
   double zd;               /* Zenith distance */
   size_t * indices;
 
-  size_t nframes = 0;        /* Number of frames */
-  size_t npts;
-  double extcorr;
-  size_t base;
-  int z;
+  size_t nframes = 0;      /* Number of frames */
+  size_t npts;             /* Number of data points */
+  double extcorr = 1.0;    /* Extinction correction factor */
+  size_t base;             /* ?? */
+  int z;                   /* ?? */
+
+  int wvmr = 0;            /* Flag to denote whether the WVMRAW method
+			      is to be used */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -154,7 +160,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
       *status = SAI__ERROR;
       msgSeti("ND", data->ndims);
       errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND; should be either 2 or 3",
+	     "Number of dimensions of input file is ^ND: should be either 2 or 3",
 	     status);
     }
   }
@@ -164,6 +170,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   if ( *status != SAI__OK) return;
 
   /* Check desired optical depth method */
+
+  if ( strncmp( method, "WVMR", 4) == 0 ) {
+    wvmr = 1;
+  }
 
 
   /* Assign pointer to input data array */
@@ -208,21 +218,26 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
     /*    smf_tslice( data, &tdata, j, status );*/
     /* Retrieve header info */
     hdr = data->hdr;
-    wcs = hdr->wcs;
-    /* Check current frame and store it */
-    origsystem = astGetC( wcs, "SYSTEM");
-    /* Select the AZEL system */
-    if (wcs != NULL) 
-      astSetC( wcs, "SYSTEM", "AZEL" );
-    if (!astOK) {
-      if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Error from AST", status);
-      }
+    if (wvmr) {
+      /* This shouldn't have to be called every time, only when it's
+	 changed */
+      tau = smf_calc_wvm( hdr, status );
+      /* Check status and/or value of tau */
     }
-
-    /* Transfrom from pixels to AZEL */
     if (!quick) {
+      wcs = hdr->wcs;
+      /* Check current frame and store it */
+      origsystem = astGetC( wcs, "SYSTEM");
+      /* Select the AZEL system */
+      if (wcs != NULL) 
+	astSetC( wcs, "SYSTEM", "AZEL" );
+      if (!astOK) {
+	if (*status == SAI__OK) {
+	  *status = SAI__ERROR;
+	  errRep( FUNC_NAME, "Error from AST", status);
+	}
+      }
+      /* Transfrom from pixels to AZEL */
       astTran2(wcs, npts, xin, yin, 1, xout, yout );
     }
     /* If we're using the QUICK application method, we assume a single
@@ -252,18 +267,19 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
       }
     }
 
-    /* Restore coordinate frame to original */
-    if ( *status == SAI__OK) {
-      astSetC( wcs, "SYSTEM", origsystem );
-      /* Check AST status */
-      if (!astOK) {
-	if (*status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Error from AST", status);
+    if (!quick) {
+      /* Restore coordinate frame to original */
+      if ( *status == SAI__OK) {
+	astSetC( wcs, "SYSTEM", origsystem );
+	/* Check AST status */
+	if (!astOK) {
+	  if (*status == SAI__OK) {
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, "Error from AST", status);
+	  }
 	}
       }
     }
-
   }
 
  CLEANUP:

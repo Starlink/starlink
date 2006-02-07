@@ -205,9 +205,10 @@ void smurf_extinction( int * status ) {
 	}
 	parGet0d( "FILTERTAU", &tau, status );
       } else if ( strncmp( method, "WVMR", 4) == 0 ) {
-	*status = SAI__ERROR;
+	/*	*status = SAI__ERROR;
 	msgSetc("METHOD", "WVMR");
-	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
+	errRep("", "Sorry, method, ^METHOD, not supported yet", status);*/
+	msgOutif(MSG__VERB, TASK_NAME, "Using Raw WVM data", status);
       } else if ( strncmp( method, "WVMS", 4) == 0 ) {
 	*status = SAI__ERROR;
 	msgSetc("METHOD", "WVMS");
