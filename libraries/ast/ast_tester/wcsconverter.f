@@ -26,7 +26,7 @@
       INCLUDE 'AST_PAR'
       EXTERNAL SOURCE, SINK
 
-      INTEGER STATUS, FC, OBJECT, IARGC, CHAN, CHR_LEN
+      INTEGER STATUS, FC, OBJECT, IARGC, CHAN, CHR_LEN, OC
       CHARACTER FILE*80, OFILE*80, LINE*255, TEXT*80, ENCODING*50
       CHARACTER ATTRS*200
       LOGICAL CDM
@@ -38,6 +38,18 @@
          WRITE(*,*) 'Usage: wcsconverter <in file> <encoding> '//
      :              '<out file> <attrs>'
          RETURN
+      END IF
+
+*
+*  Use object caching to minimise allocation of new memory
+*
+      OC = AST_TUNE( 'ObjectCaching', 1, STATUS )
+      IF( OC .NE. 0 ) THEN
+         WRITE(*,'(A,I2)') 'Default ObjectCaching VALUE is ',OC
+      END IF
+
+      IF( AST_TUNE( 'ObjectCaching', AST__TUNULL, STATUS ) .NE. 1 ) THEN
+         WRITE(*,'(A,I2)') 'Set ObjectCaching VALUE is ',OC
       END IF
 
 * 

@@ -93,6 +93,8 @@
 *           Display a textual representation of an Object on standard output.
 *        astTest
 *           Test if an attribute value is set for an Object.
+*        astTune
+*           Get or set the value of a global AST tuning parameter.
 *
 *     Protected:
 *        astAnnulId
@@ -268,6 +270,8 @@
 *        Added astEscapes function.
 *     11-MAR-2005 (DSB):
 *        Added UseDefs attribute.
+*     7-FEB-2006 (DSB):
+*        Added astTune function.
 *--
 */
 
@@ -290,6 +294,8 @@
 
 /* Macros. */
 /* ======= */
+#define AST__TUNULL -99999
+
 /*
 *+
 *  Name:
@@ -1180,6 +1186,8 @@ typedef struct AstObjectVtab {
    int ncopy;                    /* Number of copy constructors */
    int ndump;                    /* Number of dump functions */
    int nobject;                  /* Number of active objects in the class */
+   int nfree;                    /* No. of entries in "free_list" */
+   AstObject **free_list;        /* List of pointers for freed Objects */
 } AstObjectVtab;
 #endif
 
@@ -1231,6 +1239,7 @@ AstObject *astMakePointer_( AstObject * );
 int astP2I_( AstObject * );
 int astVersion_( void );
 int astEscapes_( int );
+int astTune_( const char *, int );
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
@@ -1332,6 +1341,7 @@ astINVOKE(O,astLoadObject_(mem,size,vtab,name,astCheckChannel(channel)))
 
 #define astVersion astVersion_()
 #define astEscapes(int) astEscapes_(int)
+#define astTune(name,val) astTune_(name,val)
 #define astI2P(integer) ((void *)astI2P_(integer))
 #define astMakeId(pointer) ((void *)astMakeId_((AstObject *)(pointer)))
 #define astMakePointer(id) ((void *)astMakePointer_((AstObject *)(id)))

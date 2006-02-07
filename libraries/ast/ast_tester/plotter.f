@@ -27,7 +27,7 @@
       IMPLICIT NONE
       INCLUDE 'AST_PAR'
 
-      INTEGER STATUS, FC, FS, NAXIS1, NAXIS2, PL, PGBEG, IARGC
+      INTEGER STATUS, FC, FS, NAXIS1, NAXIS2, PL, PGBEG, IARGC, OC
       CHARACTER FILE*80, CARD*80, DEVN*80, PSFILE*80, ATTR*80, TEXT*80
       REAL GBOX(4), RANGE, DELTA, ASP
       DOUBLE PRECISION PBOX(4)
@@ -39,6 +39,18 @@
          WRITE(*,*) 'Usage: plotter <file file> <attrs> <fattrs> '//
      :              '<ps file> [<xlo> <ylo> <xhi> <yhi>]'
          RETURN
+      END IF
+
+*
+*  Use object caching to minimise allocation of new memory
+*
+      OC = AST_TUNE( 'ObjectCaching', 1, STATUS )
+      IF( OC .NE. 0 ) THEN
+         WRITE(*,'(A,I2)') 'Default ObjectCaching VALUE is ',OC
+      END IF
+
+      IF( AST_TUNE( 'ObjectCaching', AST__TUNULL, STATUS ) .NE. 1 ) THEN
+         WRITE(*,'(A,I2)') 'Set ObjectCaching VALUE is ',OC
       END IF
 
 * 

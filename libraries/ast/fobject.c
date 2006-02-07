@@ -33,6 +33,7 @@
 *     AST_VERSION 
 *     AST_LISTISSUED   (only if macro DEBUG is defined)
 *     AST_SETWATCHID   (only if macro DEBUG is defined)
+*     AST_TUNE
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -57,6 +58,8 @@
 *     27-JAN-2005 (DSB):
 *        Added AST_LISTISSUED and AST_SETWATCHID so that DEBUG facilities
 *        can be used from fortran.
+*     7-FEB-2006 (DSB):
+*        Added AST_TUNE.
 *-
 */
 
@@ -416,6 +419,25 @@ F77_SUBROUTINE(ast_listissued)( CHARACTER(TEXT)
 F77_SUBROUTINE(ast_setwatchid)( INTEGER(ID) ) {
    GENPTR_INTEGER(ID)
    astSetWatchId( *ID );
+}
+
+
+F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
+                                INTEGER(VALUE),
+                                INTEGER(STATUS) 
+                                TRAIL(NAME) ) {
+   GENPTR_INTEGER(VALUE)
+   GENPTR_CHARACTER(NAME)
+   F77_INTEGER_TYPE(RESULT);
+   char *name;
+
+   astAt( "AST_TUNE", NULL, 0 );
+   astWatchSTATUS(
+      name = astString( NAME, NAME_length );
+      RESULT = astTune( name, *VALUE );
+      name = astFree( name );
+   )
+   return RESULT;
 }
 
 

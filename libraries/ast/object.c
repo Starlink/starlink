@@ -50,6 +50,7 @@ c     - astSet<X>: Set an attribute value for an Object
 c     - astShow: Display a textual representation of an Object on standard
 c     output
 c     - astTest: Test if an attribute value is set for an Object
+c     - astTune: Set or get an AST tuning parameter
 c     - astVersion: Return the verson of the AST library being used.
 f     - AST_ANNUL: Annul a pointer to an Object
 f     - AST_BEGIN: Begin a new AST context
@@ -68,6 +69,7 @@ f     - AST_SET<X>: Set an attribute value for an Object
 f     - AST_SHOW: Display a textual representation of an Object on standard
 f     output
 f     - AST_TEST: Test if an attribute value is set for an Object
+f     - AST_TUNE: Set or get an AST tuning parameter
 f     - AST_VERSION: Return the verson of the AST library being used.
 
 *  Copyright:
@@ -177,12 +179,29 @@ static AstObjectVtab class_vtab; /* Virtual function table */
    Plot class). */
 static int retain_esc = 0;
 
+/* A flag which indicates what should happen when an AST Object is
+   deleted. If this flag is non-zero, the memory used by the Object is
+   not freed, but a pointer to it is placed on the end of a list of free 
+   memory chunk pointers so that the memory can be re-used if necessary
+   avoiding the need to re-allocate memory with malloc (which is slow). 
+   A separate list of free memory chunks is kept for each class because 
+   each class object will require chunks of a different size. Pointers 
+   to these lists are stored in the virtual function table associated 
+   with each class. All memory on these lists is freed when object
+   caching is switched off via the astTune function. */
+static int object_caching = 0;
+
+/* A list of pointers to all the known class virtual function tables. */
+static int nvtab = 0;
+static AstObjectVtab **known_vtabs = NULL;
+
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static const char *Get( AstObject *, const char * );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetID( AstObject * );
 static const char *GetIdent( AstObject * );
+static int Equal( AstObject *, AstObject * );
 static int TestAttrib( AstObject *, const char * );
 static int TestID( AstObject * );
 static int TestIdent( AstObject * );
@@ -191,7 +210,7 @@ static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearID( AstObject * );
 static void ClearIdent( AstObject * );
-static int Equal( AstObject *, AstObject * );
+static void EmptyObjectCache();
 static void SetAttrib( AstObject *, const char * );
 static void SetID( AstObject *, const char * );
 static void SetIdent( AstObject *, const char * );
@@ -738,6 +757,7 @@ f     value
    AstObjectVtab *vtab;          /* Pointer to virtual function table */
    int dynamic;                  /* Was memory allocated dynamically? */
    int i;                        /* Loop counter for destructors */
+   int ifree;                    /* Index of next slot on free list */
    size_t size;                  /* Object size */
 
 /* Check the pointer to ensure it identifies a valid Object (this
@@ -767,8 +787,20 @@ f     value
    any of its values after deletion). */
    (void) memset( this, 0, size );
 
-/* If necessary, free the Object's memory. */
-   if ( dynamic ) (void) astFree( this );
+/* If necessary, free the Object's memory. If object caching is switched
+   on, the memory is not in fact freed; it is merely placed onto the end 
+   of the list of free memory blocks included in the virtual function table 
+   of the AST class concerned. */
+   if ( dynamic ) {
+      if( object_caching ) {
+         ifree = (vtab->nfree)++;
+         vtab->free_list = astGrow( vtab->free_list, vtab->nfree, 
+                                    sizeof(AstObject *) );
+         if( vtab->free_list ) vtab->free_list[ ifree ] = this;
+      } else {
+         (void) astFree( this );
+      }
+   }
 
 /* Decrement the count of active Objects. */
    vtab->nobject--;
@@ -907,6 +939,54 @@ static void Dump( AstObject *this, AstChannel *channel ) {
 /* Terminate the output from the final dump function with an "End"
    item to match the initial "Begin" item. */
    astWriteEnd( channel, astGetClass( this ) );
+}
+
+static void EmptyObjectCache(){
+/*
+*  Name:
+*     EmptyObjectCache
+
+*  Purpose:
+*     Free all memory blocks currently on the free list of any class.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "object.h"
+*     EmptyObjectCache()
+
+*  Class Membership:
+*     Object member function.
+
+*  Description:
+*     This function empties the cache of Object memory by freeing all
+*     memory blocks on the free_list of all classes.
+
+*  Notes:
+*     -  This function attempts to execute even if an error has occurred.
+*/
+
+/* Local Variables: */
+   int iblock;           /* Index of next entry in free list */
+   int itab;             /* Index of next virtual function table */
+   AstObjectVtab *vtab;  /* Pointer to next virtual function table */
+
+/* Loop round all the virtual function tables which are known about. */
+   for( itab = 0; itab < nvtab; itab++ ) {
+      vtab = known_vtabs[ itab ];
+
+/* Free all memory blocks stored on the free list for this class. */
+      for( iblock = 0; iblock < vtab->nfree; iblock++ ) {
+         (vtab->free_list)[ iblock ] = astFree( (vtab->free_list)[ iblock ] );
+      }
+
+/* Free the memory used to hold the free list, and indicate it has zero
+   length. */
+      vtab->free_list = astFree( vtab->free_list );
+      vtab->nfree = 0;
+   }
+
 }
 
 static int Equal( AstObject *this, AstObject *that ){
@@ -2490,6 +2570,95 @@ static int TestAttrib( AstObject *this, const char *attrib ) {
    return result;
 }
 
+int astTune_( const char *name, int value ) {
+/*
+*++
+*  Name:
+c     astTune
+f     AST_TUNE
+
+*  Purpose:
+*     Set or get an AST global tuning parameter.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "object.h"
+c     int astTune( const char *name, int value )
+f     RESULT = AST_TUNE( NAME, VALUE, STATUS )
+
+*  Class Membership:
+*     Object function.
+
+*  Description:
+*     This function returns the current value of an AST global tuning 
+*     parameter, optionally storing a new value for the parameter.
+
+*  Parameters:
+c     name
+f     NAME = CHARACTER * ( * ) (Given)
+*        The name of the tuning parameter (case-insensitive).
+c     value
+f     VALUE = INTEGER (Given)
+*        The new value for the tuning parameter. If this is AST__TUNULL,
+*        the existing current value will be retained.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astTune()
+f     AST_TUNE = INTEGER
+c        The original value of the tuning parameter. A default value will
+*        be returned if no value has been set for the parameter.
+
+*  Tuning Parameters:
+*     - ObjectCaching: A boolean flag which indicates what should happen 
+*     to the memory occupied by an AST Object when the Object is deleted 
+*     (i.e. when its reference count falls to zero or it is deleted using 
+c     astDelete). 
+f     AST_DELETE).
+*     If this zero, the memory is simply freed using the systems "free" 
+*     function. If its non-zero, the memory is not freed. Instead a pointer 
+*     to it is stored in a pool of such pointers, all of which refer to 
+*     allocated but currently unused blocks of memory. This allows AST to
+*     speed up subsequent Object creation by re-using previously
+*     allocated memory blocks rather than allocating new memory using the
+*     systems malloc function. The default value for this parameter is
+*     zero. Setting it to a non-zero value will result in Object memory
+*     being cached in future. Setting it back to zero causes any memory
+*     blocks currently in the pool to be freed. 
+
+*  Notes:
+c     - This function attempts to execute even if the AST error
+c     status is set
+f     - This routine attempts to execute even if STATUS is set to an
+f     error value
+*     on entry, although no further error report will be
+*     made if it subsequently fails under these circumstances.
+*--
+*/
+
+   int result = AST__TUNULL;
+
+   if( name ) {
+
+      if( astChrMatch( name, "ObjectCaching" ) ) {
+         result = object_caching;
+         if( value != AST__TUNULL ) {
+            object_caching = value;
+            if( !object_caching ) EmptyObjectCache();
+         }
+         
+      } else if( astOK ) {
+         astError( AST__TUNAM, "astTune: Unknown AST tuning parameter "
+                   "specified \"%s\".", name );
+      }
+   }
+
+   return result;
+}
+
 static void VSet( AstObject *this, const char *settings, va_list args ) {
 /*
 *+
@@ -3163,6 +3332,11 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   int ivtab;              /* Index of next entry in known_vtabs */
+
+#ifdef DEBUG
+   int pm;     /* See astSetPermMem in memory.c */
+#endif
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -3209,6 +3383,31 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->dump = NULL;
    vtab->dump_class = NULL;
    vtab->dump_comment = NULL;
+
+/* The virtual function table for each class contains a list of pointers
+   to memory blocks which have previously been used to store an Object of
+   the same class, but which have since been deleted using astDelete.
+   These memory blocks are free to be re-used when a new Object of the
+   same class is initialised. This saves on the overheads associated with
+   continuously allocating small blocks of memory using malloc. */
+   vtab->nfree = 0;
+   vtab->free_list = NULL;
+
+
+#ifdef DEBUG
+   pm = astSetPermMem( 1 );
+#endif
+
+/* Add the supplied virtual function table pointer to the end of the list
+   of known vtabs. */
+   ivtab = nvtab++;
+   known_vtabs = astGrow( known_vtabs, nvtab, sizeof( AstObjectVtab *) );
+   if( known_vtabs ) known_vtabs[ ivtab ] = vtab;
+
+#ifdef DEBUG
+   astSetPermMem( pm );
+#endif
+
 }
 
 AstObject *astInitObject_( void *mem, size_t size, int init,
@@ -3286,9 +3485,29 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 /* Check the global error status. */
    if ( !astOK ) return new;
 
-/* Determine if memory must be allocated dynamically. If so, allocate it. */
+/* Determine if memory must be allocated dynamically. If so, use the last
+   block of memory in the list of previously allocated but currently
+   unused blocks identified by the vtab "free_list" array, reducing the 
+   length of the free list by one, and nullifying the entry in the list 
+   for safety. If the list is originally empty, allocate memory for a new 
+   object using astMalloc. */
    dynamic = ( mem == NULL );
-   if ( dynamic ) mem = astMalloc( size );
+   if ( dynamic ) {
+      if( object_caching && vtab->nfree > 0 ) {
+         mem = vtab->free_list[ --(vtab->nfree) ];
+         vtab->free_list[ vtab->nfree ] = NULL;
+
+         if( astSizeOf( mem ) != size ) {
+            astError( AST__INTER, "astInitObject(%s): Free block has size "
+                      "%d but the %s requires %d bytes (internal AST "
+                      "programming error).", vtab->class, astSizeOf( mem ),
+                       vtab->class, size );
+         }
+         
+      } else {
+         mem = astMalloc( size );
+      }
+   }      
 
 /* Obtain a pointer to the new Object. */
    if ( astOK ) {

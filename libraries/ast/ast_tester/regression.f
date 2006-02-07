@@ -77,7 +77,7 @@
 *  Local Variables:
       CHARACTER ATTRS( NFITS_TESTS )*255 ! Plot attributes for each FITS test
       CHARACTER CARDS*(7*80)             ! Used fot testing ast_putcards
-      INTEGER FC, FS, PLOT, I, J
+      INTEGER FC, FS, PLOT, I, J, OC
 
       REAL GBOX( 4 )              ! Area of graphics coords to use
       DOUBLE PRECISION BBOX( 4, NFITS_TESTS ) ! Base Frame area to be
@@ -115,6 +115,16 @@
 
 *  Initialize inherited global status.
       STATUS = SAI__OK 
+
+*  Use object caching to minimise allocation of new memory
+      OC = AST_TUNE( 'ObjectCaching', 1, STATUS )
+      IF( OC .NE. 0 ) THEN
+         WRITE(*,'(A,I2)') 'Default ObjectCaching VALUE is ',OC
+      END IF
+
+      IF( AST_TUNE( 'ObjectCaching', AST__TUNULL, STATUS ) .NE. 1 ) THEN
+         WRITE(*,'(A,I2)') 'Set ObjectCaching VALUE is ',OC
+      END IF
 
 *  Display the AST version number.
       VERS = AST_VERSION()
