@@ -13,13 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_scale_tau( double tauwvm, int filter, int *status) {
+*     smf_scale_tau( double tauwvm, char *filter, int *status) {
 
 *  Arguments:
 *     tauwvm = double (Given)
 *        WVM tau
-*     filter = int (Given)
-*        SUBSYSNR keyword from FITS header (temporary)
+*     filter = char* (Given)
+*        FILTER keyword from FITS header
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -30,9 +30,6 @@
 *     the 225 GHz zenith optical depth. 
 
 *  Notes:
-*     At the moment it uses the SUBSYSNR FITS header keyword to
-*     determine the appropriate wavelength. In the future this will be
-*     changed to the SUBARRY string.
 
 *  Authors:
 *     Andy Gibb (UBC)
