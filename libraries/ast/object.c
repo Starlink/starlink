@@ -2618,8 +2618,8 @@ c        The original value of the tuning parameter. A default value will
 *     (i.e. when its reference count falls to zero or it is deleted using 
 c     astDelete). 
 f     AST_DELETE).
-*     If this zero, the memory is simply freed using the systems "free" 
-*     function. If its non-zero, the memory is not freed. Instead a pointer 
+*     If this is zero, the memory is simply freed using the systems "free" 
+*     function. If it is non-zero, the memory is not freed. Instead a pointer 
 *     to it is stored in a pool of such pointers, all of which refer to 
 *     allocated but currently unused blocks of memory. This allows AST to
 *     speed up subsequent Object creation by re-using previously
