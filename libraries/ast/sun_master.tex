@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {9th September 2005}
+\newcommand{\stardocdate}      {7th February 2006}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21022,12 +21022,10 @@ AST\_RESAMPLE<X>/astResample<X> methods.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V4.1}
+\subsection{Changes Introduced in V4.1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V4.0 and V4.1 (the
-current version):
+The following describes the most significant changes which 
+occurred in the AST library between versions V4.0 and V4.1:
 
 \begin{enumerate}
 
@@ -21077,6 +21075,29 @@ Mapping.
 to represent offsets from some origin position, you must now set the
 SkyRefIs attribute explicitly to either ``Pole'' or ``Origin'', in
 addition to assigning the required origin position to the SkyRef attribute.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V4.2}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V4.1 and V4.2 (the
+current version):
+
+\begin{enumerate}
+
+\item A new function 
+c+
+astTune 
+c-
+f+
+AST\_TUNE
+f-
+has been added which can be used to get and set global AST tuning
+parameters. At the moment there is only one such parameter, called
+``ObjectCaching'', which causes AST to save unused Object memory in a
+pool for later use rather than freeing it.
 
 \end{enumerate}
 
