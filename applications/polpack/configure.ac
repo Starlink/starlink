@@ -44,6 +44,5 @@ AC_CONFIG_FILES([Makefile component.xml polpack_mon.f polpack.ifd
     ccdpack/Makefile polsub/Makefile polsub/pol1_ptvrc.f polsub/pol1_ptvrs.f])
 AC_CONFIG_FILES(polpack_link_adam, [chmod +x polpack_link_adam])
 AC_CONFIG_FILES(Polka.tcl, [chmod +x Polka.tcl])
-AC_CONFIG_FILES(adamMessageRelay, [chmod +x adamMessageRelay])
 
 AC_OUTPUT
