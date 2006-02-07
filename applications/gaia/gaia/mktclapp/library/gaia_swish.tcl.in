@@ -29,6 +29,7 @@ proc main {} {
    set iwidgets_library @IWIDGETS_LIBRARY@
    set iscripts_library @IWIDGETS_LIBRARY@/scripts
    set tclx_library     @TCLX_LIBRARY@
+   set startcl_library  @STARTCL_LIBRARY@
    
    set srcdirs [list \
                    $tcl_library \
@@ -43,6 +44,7 @@ proc main {} {
                    $rtd_library \
                    $cat_library \
                    $skycat_library \
+                   $startcl_library \
                    $gaia_library]
    
    #  Set location of startup script.

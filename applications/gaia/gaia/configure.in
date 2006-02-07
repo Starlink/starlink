@@ -690,6 +690,7 @@ LIBDIR="$DESTDIR/lib"
 GAIA_DIR="$LIBDIR/gaia"
 GAIA_LIBRARY="$GAIA_DIR"
 GAIA_BUILD_LIBRARY="$SRC_ROOT/library"
+STARTCL_LIBRARY="$STARLINK/lib/startcl"
 
 AC_SUBST(DESTDIR)
 AC_SUBST(BINDIR)
@@ -697,6 +698,7 @@ AC_SUBST(LIBDIR)
 AC_SUBST(GAIA_DIR)
 AC_SUBST(GAIA_LIBRARY)
 AC_SUBST(GAIA_BUILD_LIBRARY)
+AC_SUBST(STARTCL_LIBRARY)
 
 #--------------------------------------------------------------------
 #	Print out some of the more important settings
