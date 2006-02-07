@@ -415,8 +415,7 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(combination) \
          {Method to use when combining data, use median with care}
 
-      foreach {sname lname} \
-         {Mean Mean WMean {Weighted Mean} Mode Mode Median Median} {
+      foreach {sname lname} $estimators_ {
             $itk_component(combination) add \
                -label $lname \
                -value $sname \
@@ -890,9 +889,28 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The current value of step during an animation.
    protected variable step_ 1
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  All the known collapse estimators, short and long descriptions.
+
+   common estimators_ {
+      Mean Mean
+      WMean {Weighted Mean}
+      Mode Mode
+      Median Median
+      Absdev {Mean absolute deviation}
+      Comax {Co-ordinate of the maximum value}
+      Comin {Co-ordinate of the minimum value}
+      Integ {Integrated value}
+      Iwc {Intensity-weighted co-ordinate}
+      Iwd {Intensity-weighted dispersion}
+      Max Maximum
+      Min Minimum
+      Rms RMS
+      Sigma {Standard deviation}
+      Sum Sum}
 
    #  The temporary image count.
    common count_ 0
