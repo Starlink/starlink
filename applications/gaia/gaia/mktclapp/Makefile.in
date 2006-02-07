@@ -108,7 +108,9 @@ COMPIFL  = @STARLINK@/bin/compifl
 #  default AST libraries for errors and graphics.
 AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf -fsla` `sla_link`
 AST_LIBS_NOGRF = -L$(STAR_LIB) `ast_link -myerr -fsla` `sla_link`
-ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` `ams_link_adam` `ndf_link`  -lpda
+STARTCL_OBJECT = $(STAR_LIB)/tclAdam.o
+ADAM_LIBS = -L$(STAR_LIB) `ard_link` `fio_link` $(STARTCL_OBJECT) \
+            `ams_link_adam` `ndf_link`  -lpda
 
 #  Name of single binaries
 TKPROG = bin/gaia_swish
@@ -162,11 +164,11 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
-$(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o ../src/tclAdam.o FORCE
+$(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
 	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o ../initFortran.o \
 	       -o $(TCLPROG)  \
-	       $(LD_SEARCH_FLAGS) ../src/tclAdam.o \
+	       $(LD_SEARCH_FLAGS) \
 	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(TCLLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)
 
