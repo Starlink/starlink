@@ -73,11 +73,12 @@ fi
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, 
-     [ard ast cat cfitsio generic fio img pcs pda sae sla], link)
+     [ard ast cat cfitsio generic fio img pcs pda sae startcl sla], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need to add AUTOASTROM to this when available.
-STAR_DECLARE_DEPENDENCIES(use, [convert esp extractor kappa photom polpack])
+STAR_DECLARE_DEPENDENCIES(use, 
+      [convert esp extractor kappa photom polpack startcl])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
