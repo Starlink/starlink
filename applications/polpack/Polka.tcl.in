@@ -1,4 +1,6 @@
-#!@AWISH@
+#!/bin/sh    
+# The next line is executed by /bin/sh, but not Tcl \
+exec @AWISH@ $0 ${1+"$@"}
 #+
 #  Name:
 #     Polka.tcl
@@ -369,15 +371,6 @@
       set OLDCCDPACK {}
    }
 
-# Define Startcl procedures (this must be done after the ADAM_USER
-# directory has been set up).
-   source $POLPACK_DIR/adamtask.tcl
-
-# The adamtask.tcl file creates a binding which causes the application to
-# terminate whenever a window is destroyed. This is a pain because it
-# causes the polka A-task to die in an uncontrolled manner! Do away with it.
-   bind . <Destroy> ""
-
 # Save the current value of environment variable NDF_FORMATS_OUT (if any),
 # and ensure that NDF applications will create output NDFs, by default, rather 
 # than any other data format. This is done here so that the tasks about to be 
@@ -394,6 +387,11 @@
    LoadTask kaprh    $KAPRH_DIR/kaprh_mon
    LoadTask ccdpack  $CCDPACK_DIR/ccdpack_reg
    LoadTask polpack  $POLPACK_DIR/polpack_mon
+
+# The adamtask procedures create a binding which causes the application to
+# terminate whenever a window is destroyed. This is a pain because it
+# causes the polka A-task to die in an uncontrolled manner! Do away with it.
+   bind . <Destroy> ""
 
 # Re-instate the original value of environment variable NDF_FORMATS_OUT 
 # (if any).
