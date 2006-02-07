@@ -1,4 +1,4 @@
-   class Ndfchoose {
+   itcl::class Ndfchoose {
 #+
 #  Name:
 #     Ndfchoose
@@ -762,7 +762,6 @@
          if { [ array names itk_component info$index ] != "" } {
             if { $noted($index,showfits) != $showfits } {
                destroy $itk_component(info$index)
-               unset itk_component(info$index)
             }
          }
 
