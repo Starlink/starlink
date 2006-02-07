@@ -181,7 +181,6 @@ int astMapLength_( AstKeyMap *, const char * );
 int astMapLenC_( AstKeyMap *, const char * );
 int astMapSize_( AstKeyMap * );
 int astMapType_( AstKeyMap *, const char * );
-int astMapType_( AstKeyMap *, const char * );
 void astMapPut0A_( AstKeyMap *, const char *, AstObject *, const char * );
 void astMapPut0C_( AstKeyMap *, const char *, const char *, const char * );
 void astMapPut0D_( AstKeyMap *, const char *, double, const char * );
