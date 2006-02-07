@@ -101,6 +101,8 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 
+double smf_calc_wvm( const smfHead *hdr, int *status );
+
 void smf_check_flat ( const smfData *data, int *status );
 
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
