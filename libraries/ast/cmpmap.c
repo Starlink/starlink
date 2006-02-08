@@ -81,6 +81,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     20-APR-2005 (DSB):
 *        Modify MapMerge so that it will attempt to merge the first
 *        and second CmpMaps in a list of series CmpMaps.
+*     8-FEB-2006 (DSB):
+*        Corrected logic within MapMerge for cases where a PermMap is
+*        followed by a parallel CmpMap.
 *class--
 */
 
@@ -102,6 +105,7 @@ f     The CmpMap class does not define any new routines beyond those
 #include "mapping.h"             /* Coordinate Mappings (parent class) */
 #include "channel.h"             /* I/O channels */
 #include "permmap.h"             /* Coordinate permutation Mappings */
+#include "unitmap.h"             /* Unit transformations */
 #include "cmpmap.h"              /* Interface definition for this class */
 #include "frameset.h"            /* Interface definition for FrameSets */
 
@@ -834,20 +838,32 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Local Variables: */
    AstCmpMap *cmpmap1;           /* Pointer to first CmpMap */
    AstCmpMap *cmpmap2;           /* Pointer to second CmpMap */
+   AstCmpMap *new_cm;            /* Pointer to new CmpMap */
    AstMapping *map;              /* Pointer to nominated CmpMap */
    AstMapping *new1;             /* Pointer to new CmpMap */
    AstMapping *new2;             /* Pointer to new CmpMap */
    AstMapping *new;              /* Pointer to replacement Mapping */
    AstMapping *simp1;            /* Pointer to simplified Mapping */
    AstMapping *simp2;            /* Pointer to simplified Mapping */
-   AstPermMap *permmap1;         /* Pointer to first PermMap */
    AstPermMap *new_pm;           /* Pointer to new PermMap */
-   AstCmpMap *new_cm;            /* Pointer to new CmpMap */
+   AstPermMap *permmap1;         /* Pointer to first PermMap */
+   AstUnitMap *unit;             /* UnitMap that feeds const PermMap i/p's */
    const char *class;            /* Pointer to Mapping class string */
+   double *conperm;              /* Pointer to PermMap constants array */
+   double *const_new;            /* Pointer to new PermMap constants array */
+   double *p;                    /* Pointer to PermMap input position */
+   double *q;                    /* Pointer to PermMap output position */
+   double *qa;                   /* Pointer to 1st component output position */
+   double *qb;                   /* Pointer to 2nd component output position */
    int *inperm;                  /* Pointer to copy of PermMap inperm array */
+   int *inperm_new;              /* Pointer to new PermMap inperm array */
    int *outperm;                 /* Pointer to copy of PermMap outperm array */
+   int *outperm_new;             /* Pointer to new PermMap outperm array */
+   int aconstants;               /* Are all 1st component outputs constant? */
+   int bconstants;               /* Are all 2nd component outputs constant? */
    int canswap;                  /* Can nominated Mapping swap with lower neighbour? */
    int i;                        /* Coordinate index */
+   int iconid;                   /* Constant identifier in supplied PermMap */
    int imap1;                    /* Index of first Mapping */
    int imap2;                    /* Index of second Mapping */
    int imap;                     /* Loop counter for Mappings */
@@ -864,25 +880,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int nin2b;                    /* No. input coordinates for sub-Mapping */
    int nout1a;                   /* No. output coordinates for sub-Mapping */
    int nout1b;                   /* No. output coordinates for sub-Mapping */
+   int nout2a;                   /* No. of outputs for 1st component Mapping */
+   int nout2b;                   /* No. of outputs for 2nd component Mapping */
+   int npin;                     /* No. of inputs for original PermMap */
+   int npin_new;                 /* No. of inputs for new PermMap */
+   int npout;                    /* No. of outputs for original PermMap */
+   int npout_new;                /* No. of outputs for new PermMap */
+   int nunit;                    /* No. of PermMap i/p's fed by UnitMap */
+   int oconid;                   /* Constant identifier in returned PermMap */
    int result;                   /* Result value to return */
    int set;                      /* Invert attribute set? */
    int simpler;                  /* Simplification possible? */
-
-   int npout;                    /* No. of outputs for original PermMap */
-   int npin;                     /* No. of inputs for original PermMap */
-   int nout2a;                   /* No. of outputs for 1st component Mapping */
-   int nout2b;                   /* No. of outputs for 2nd component Mapping */
-   int aconstants;               /* Are all 1st component outputs constant? */
-   int bconstants;               /* Are all 2nd component outputs constant? */
-   double *p;                    /* Pointer to PermMap input position */
-   double *q;                    /* Pointer to PermMap output position */
-   double *qa;                   /* Pointer to 1st component output position */
-   double *qb;                   /* Pointer to 2nd component output position */
-   int npin_new;                 /* No. of inputs for new PermMap */
-   int npout_new;                /* No. of outputs for new PermMap */
-   int *inperm_new;              /* Pointer to new PermMap inperm array */
-   int *outperm_new;             /* Pointer to new PermMap outperm array */
-   double *const_new;            /* Pointer to new PermMap constants array */
 
 /* Initialise.*/
    result = -1;
@@ -1204,9 +1212,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          nout2a = astGetNout( cmpmap2->map1 );
          nout2b = astGetNout( cmpmap2->map2 );
 
-/* Get the input and output axis permutation arrays from the PermMap */
+/* Get the input and output axis permutation arrays and the constants
+   array from the PermMap */
          inperm =astGetInPerm( permmap1 );
          outperm =astGetOutPerm( permmap1 );
+         conperm = astGetConstants( permmap1 );
 
 /* In order to swap the Mappings, the PermMap outputs which feed the
    inputs of the first component of the parallel CmpMap must be copied
@@ -1287,16 +1297,30 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                q = astFree( q );
             }
 
-/* Determine the number of inputs and outputs for the resulting PermMap
-   and allocate memory for their permutation arrays. */
-            npin_new = 0;
-            if( !aconstants ) npin_new += nout2a;
-            if( !bconstants ) npin_new += nout2b;
+/* If necessary, create a UnitMap to replace a Mapping which has constant
+   outputs. The number of axes for the UnitMap is chosen to give the
+   correct total number of inputs for the final parallel CmpMap. At the
+   same time determine the number of inputs needed by the final PermMap. */
+            if( aconstants ) {
+               nunit = npin - nin2b;
+               npin_new = nout2b + nunit;
+            } else if( bconstants ) {
+               nunit = npin - nin2a;
+               npin_new = nout2a + nunit;
+            } else {
+               nunit = 0;
+               npin_new = nout2a + nout2b;
+            }
+            unit = nunit ? astUnitMap( nunit, "" ) : NULL;
+
+/* Determine the number of outputs for the final PermMap and allocate memory 
+   for its permutation arrays. */
             npout_new = nout2a + nout2b;
             outperm_new = astMalloc( sizeof( int )*(size_t) npout_new );
             inperm_new = astMalloc( sizeof( int )*(size_t) npin_new );
-            const_new = astMalloc( sizeof( double )*(size_t) npout_new );
+            const_new = astMalloc( sizeof( double )*(size_t) ( npout_new + npin_new ) );
             if( astOK ) {
+               oconid = 0;
 
 /* First assign permutations for the second component Mapping, if used. */
                if( !bconstants ) {
@@ -1307,10 +1331,29 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Otherwise, store constants */
                } else {
-                  for( i = 0, j = npout_new - nout2b; i < nout2b; i++,j++ ) {
-                     outperm_new[ j ] = -( i + 1 );
-                     const_new[ i ] = qb[ i ];
+
+                  for( i = 0; i < nunit; i++ ){
+                     iconid = inperm[ i ];
+                     if( iconid >= npout ) {
+                        inperm_new[ i ] = npout_new;
+
+                     } else if( iconid >= 0 ) {
+                        astError( AST__INTER, "astMapMerge(CmpMap): Swapped PermMap "
+                                  "input is not constant (internal AST programming "
+                                  "error)." );
+                        break;
+
+                     } else {
+                        inperm_new[ i ] = --oconid;
+                        const_new[ -( oconid + 1 ) ] = conperm[ -( iconid + 1 ) ];
+                     }                      
                   }
+
+                  for( i = 0, j = npout_new - nout2b; i < nout2b; i++,j++ ) {
+                     outperm_new[ j ] = --oconid;
+                     const_new[ -( oconid + 1 ) ] = qb[ i ];
+                  }
+
                }
 
 /* Now assign permutations for the first component Mapping, if used. */
@@ -1322,10 +1365,29 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Otherwise, store constants */
                } else {
-                  for( i = 0; i < nout2a; i++ ) {
-                     outperm_new[ i ] = -( i + 1 );
-                     const_new[ i ] = qa[ i ];
+
+                  for( i = nout2b; i < npin_new; i++ ){
+                     iconid = inperm[ i - nout2b + nin2b ];
+                     if( iconid >= npout ) {
+                        inperm_new[ i ] = npout_new;
+
+                     } else if( iconid >= 0 ) {
+                        astError( AST__INTER, "astMapMerge(CmpMap): Swapped PermMap "
+                                  "input is not constant (internal AST programming "
+                                  "error)." );
+                        break;
+
+                     } else {
+                        inperm_new[ i ] = --oconid;
+                        const_new[ -( oconid + 1 ) ] = conperm[ -( iconid + 1 ) ];
+                     }                      
                   }
+
+                  for( i = 0; i < nout2a; i++ ) {
+                     outperm_new[ i ] = --oconid;
+                     const_new[ -( oconid + 1 ) ] = qa[ i ];
+                  }
+
                }
 
 /* Create the new PermMap */
@@ -1334,10 +1396,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Create the new CmpMap.*/
                if( aconstants ) {
-                  new_cm = astCopy( cmpmap2->map2 );
+                  new_cm = astCmpMap( cmpmap2->map2, unit, 0, "" );
 
                } else if( bconstants ) {
-                  new_cm = astCopy( cmpmap2->map1 );
+                  new_cm = astCmpMap( unit, cmpmap2->map1, 0, "" );
 
                } else{
                   new_cm = astCmpMap( cmpmap2->map2, cmpmap2->map1, 0, "" );
@@ -1346,6 +1408,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             }
 
 /* Free Memory. */
+            if( unit ) unit = astAnnul( unit );
             outperm_new = astFree( outperm_new );
             inperm_new = astFree( inperm_new );
             const_new = astFree( const_new );
@@ -1361,9 +1424,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          }
 
 /* Release the arrays holding the input and output permutation arrays
-   copied from the PermMap. */
+   and constants copied from the PermMap. */
          inperm = astFree( inperm );
          outperm = astFree( outperm );
+         conperm = astFree( conperm );
 
 /* Re-instate the original values of the Invert attributes of both
    Mappings. */
