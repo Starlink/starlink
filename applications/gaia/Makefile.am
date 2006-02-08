@@ -48,17 +48,20 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 ##  On-line help.
 starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
-##  Root of the local Tcl installation.
+##  Root of the local Tcl installation. This must be the Starlink tclsys,
+##  as that contains some minor changes that support the creation of the
+##  single binary.
 TCL_PREFIX = @TCL_PREFIX@
 
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the
-## build. This could all be pre-configured too...
+## build. Note skycat must be built and installed locally before GAIA
+## can be configured, so configure and build stages must be done here.
 
 ##  Build Skycat component.
 $(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
-	- mkdir -p ./built ;\
+	- mkdir -p ./built
 	pwd=`pwd`;\
 	(cd ./skycat; \
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
@@ -78,7 +81,7 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
 
 ##  Build GAIA component.
 $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
-	- mkdir -p ./built ;\
+	- mkdir -p ./built
 	pwd=`pwd`;\
 	(cd ./gaia; \
 	sed -e s#@PKG_VERS@#$(PACKAGE_VERSION)# VERSION.in >$ VERSION ;\
