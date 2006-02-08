@@ -618,7 +618,7 @@ dnl  and Fink on OSX
         res="$res TCL_VERSION=\"$TCL_VERSION\";"
 
         # Export the TCL_PREFIX value.
-        res=$res TCL_PREFIX=\"$TCL_PREFIX\";"
+        res="$res TCL_PREFIX=\"$TCL_PREFIX\";"
 
         # These envs include $TCL_DBGX -- expand this out.
         eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
