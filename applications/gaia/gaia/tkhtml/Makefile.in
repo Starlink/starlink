@@ -1,0 +1,70 @@
+CC = @CC@
+CFLAGS = @CFLAGS@
+INCLUDES = -I. @TCLINCSW@
+CC_SWITCHES = $(CFLAGS) $(INCLUDES)
+RANLIB = @RANLIB@
+INSTALL = @INSTALL@
+PREFIX = @prefix@
+LIBDIR = ../lib
+
+all:	libtkhtml.a
+
+htmlcmd.o:	htmlcmd.c htmlcmd.h
+	$(CC) $(CC_SWITCHES)  -o htmlcmd.o -c htmlcmd.c
+
+htmldraw.o:	htmldraw.c htmldraw.h
+	$(CC) $(CC_SWITCHES)  -o htmldraw.o -c htmldraw.c
+
+htmlform.o:	htmlform.c htmlform.h
+	$(CC) $(CC_SWITCHES)  -o htmlform.o -c htmlform.c
+
+htmlimage.o:	htmlimage.c htmlimage.h
+	$(CC) $(CC_SWITCHES)  -o htmlimage.o -c htmlimage.c
+
+htmlindex.o:	htmlindex.c htmlindex.h
+	$(CC) $(CC_SWITCHES)  -o htmlindex.o -c htmlindex.c
+
+htmllayout.o:	htmllayout.c htmllayout.h
+	$(CC) $(CC_SWITCHES)  -o htmllayout.o -c htmllayout.c
+
+htmlparse.o:	htmlparse.c htmlparse.h
+	$(CC) $(CC_SWITCHES)  -o htmlparse.o -c htmlparse.c
+
+htmlsizer.o:	htmlsizer.c htmlsizer.h
+	$(CC) $(CC_SWITCHES)  -o htmlsizer.o -c htmlsizer.c
+
+htmltable.o:	htmltable.c htmltable.h
+	$(CC) $(CC_SWITCHES)  -o htmltable.o -c htmltable.c
+
+htmltest.o:	htmltest.c htmltest.h
+	$(CC) $(CC_SWITCHES)  -o htmltest.o -c htmltest.c
+
+htmlurl.o:	htmlurl.c htmlurl.h
+	$(CC) $(CC_SWITCHES)  -o htmlurl.o -c htmlurl.c
+
+htmlwidget.o:	htmlwidget.c htmlwidget.h
+	$(CC) $(CC_SWITCHES)  -o htmlwidget.o -c htmlwidget.c
+
+htmltokens.o:	htmltokens.c htmltokens.h
+	$(CC) $(CC_SWITCHES)  -o htmltokens.o -c htmltokens.c
+
+libtkhtml.a:	htmlcmd.o htmldraw.o htmlform.o htmlimage.o htmlindex.o htmllayout.o htmlparse.o htmlsizer.o htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o
+	ar cr libtkhtml.a htmlcmd.o htmldraw.o htmlform.o htmlimage.o htmlindex.o htmllayout.o htmlparse.o htmlsizer.o htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o
+	$(RANLIB) libtkhtml.a
+
+install-lib: libtkhtml.a
+	if test ! -d $(LIBDIR); then mkdir -p $(LIBDIR); fi
+	$(INSTALL) libtkhtml.a $(LIBDIR)
+
+clean:	
+	- rm -f htmltokens.o htmlcmd.o htmldraw.o htmlform.o htmlimage.o \
+	htmlindex.o htmllayout.o htmlparse.o htmlsizer.o \
+	htmltable.o htmltest.o htmlurl.o htmlwidget.o htmltokens.o \
+	libtkhtml.a
+
+
+
+distclean: clean
+	- rm config.status config.cache config.log Makefile
+
+install: install-lib
