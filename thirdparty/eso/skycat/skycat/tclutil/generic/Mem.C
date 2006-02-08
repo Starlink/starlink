@@ -1,5 +1,3 @@
-totally bogus mistake"
-
 /*
  * E.S.O. - VLT project / ESO Archive
  *
