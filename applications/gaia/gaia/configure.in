@@ -720,6 +720,7 @@ AC_OUTPUT(Makefile \
         library/Makefile \
         library/gaia_version.tcl \
         src/Makefile \
+        tkhtml/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaia_swish.tcl \
         mktclapp/library/gaia_stcl.tcl \

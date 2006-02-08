@@ -8,8 +8,7 @@
 ##  All scripts and programs are built elsewhere, so we do not need to
 ##  associate these with sources, so installation as scripts of various kinds
 ##  will do.
-dist_bin_SCRIPTS = $(TCL_FILES) $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) \
- $(GAIA_IFC_FILES)
+dist_bin_SCRIPTS = $(SCRIPTS_GAIA) $(GAIA_LIB_FILES) $(GAIA_IFC_FILES)
 
 ##  None distributed versions (binaries).
 bin_SCRIPTS = $(SKYCAT_FILES) $(GAIA_BIN_FILES)
@@ -18,9 +17,6 @@ bin_SCRIPTS = $(SKYCAT_FILES) $(GAIA_BIN_FILES)
 SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
 
 ## Things we need to create from the various sub-components.
-
-## Define files that Tcl directory build produces.
-TCL_TEST_FILES = built/lib/libtkhtml.a
 
 ## Binaries used for real time display.
 SKYCAT_FILES = rtdServer$(EXEEXT) rtdClient$(EXEEXT) rtdCubeDisplay$(EXEEXT)
@@ -58,22 +54,10 @@ TCL_PREFIX = @TCL_PREFIX@
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the
-## build. Could look at pre-configuring when Tcl packages are gone.
-
-##  Build Tcl component.
-$(TCL_TEST_FILES):
-	- mkdir -p ./built ;\
-	pwd=`pwd`;\
-	(cd ./tcl; \
-	export INSTALL; unset INSTALL;\
-	export TCL_LIBRARY; unset TCL_LIBRARY;\
-	export TK_LIBRARY; unset TK_LIBRARY;\
-	CFLAGS="$(CFLAGS)"; export CFLAGS;\
-	./configure --prefix=$${pwd}/built --with-tcl=$(TCL_PREFIX) --disable-shared;\
-	make -e World)
+## build. This could all be pre-configured too...
 
 ##  Build Skycat component.
-$(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
+$(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./skycat; \
@@ -128,7 +112,7 @@ distclean-local:
 	- (cd gaia; make distclean )
 
 ## Clean up extra generated files (ones in built should be already gone).
-MAINTAINERCLEANFILES = $(TCL_FILES) $(SKYCAT_FILES) $(GAIA_FILES)
+MAINTAINERCLEANFILES = $(SKYCAT_FILES) $(GAIA_FILES)
 
 ##  Need all the source code in the sub-directories.
 EXTRA_DIST = gaia skycat tcl gaia.news sun214fig.ps gaia.htx

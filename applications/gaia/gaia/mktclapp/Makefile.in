@@ -55,7 +55,7 @@ TKLIBS = @ITK_LIB_SPEC@ \
          @TIX_LIB_SPEC@ \
          @TCLUTIL_TK_BUILD_LIB_PATH@ \
          @BLT_LIB_SPEC@ \
-         -ltkhtml
+         ../lib/libtkhtml.a
 
 #  Tcl/Tk libs
 TCLTKLIBS = $(TCLLIBS) $(TKLIBS)

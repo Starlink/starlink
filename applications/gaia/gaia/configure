@@ -3754,7 +3754,7 @@ Iwidgets library files  => $IWIDGETS_LIBRARY
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
-                                                                                          ac_config_files="$ac_config_files Makefile library/Makefile library/gaia_version.tcl src/Makefile mktclapp/Makefile mktclapp/library/gaia_swish.tcl mktclapp/library/gaia_stcl.tcl colormaps/Makefile bitmaps/Makefile"
+                                                                                                    ac_config_files="$ac_config_files Makefile library/Makefile library/gaia_version.tcl src/Makefile tkhtml/Makefile mktclapp/Makefile mktclapp/library/gaia_swish.tcl mktclapp/library/gaia_stcl.tcl colormaps/Makefile bitmaps/Makefile"
           ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4314,6 +4314,7 @@ do
   "library/Makefile" ) CONFIG_FILES="$CONFIG_FILES library/Makefile" ;;
   "library/gaia_version.tcl" ) CONFIG_FILES="$CONFIG_FILES library/gaia_version.tcl" ;;
   "src/Makefile" ) CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+  "tkhtml/Makefile" ) CONFIG_FILES="$CONFIG_FILES tkhtml/Makefile" ;;
   "mktclapp/Makefile" ) CONFIG_FILES="$CONFIG_FILES mktclapp/Makefile" ;;
   "mktclapp/library/gaia_swish.tcl" ) CONFIG_FILES="$CONFIG_FILES mktclapp/library/gaia_swish.tcl" ;;
   "mktclapp/library/gaia_stcl.tcl" ) CONFIG_FILES="$CONFIG_FILES mktclapp/library/gaia_stcl.tcl" ;;
