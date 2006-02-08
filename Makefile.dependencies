@@ -764,6 +764,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starx
 	cd applications/gaia \
 	  && $(MAKE_CPT)
