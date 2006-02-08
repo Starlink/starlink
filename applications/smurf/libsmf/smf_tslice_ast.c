@@ -179,7 +179,7 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   sc2tmp = &((hdr->allsc2heads)[index]);
   hdr->sc2head = sc2tmp;
 
-  /* */
+  /* Create and store FrameSet only if the WCS info is wanted */
   if (needwcs) {
 
     /* Need to get the subarray name */

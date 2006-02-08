@@ -61,7 +61,9 @@
 *     2006-02-03 (AGG):
 *        Add the quick flag. Not pretty but it gives a factor of 2 speed up
 *     2006-02-07 (AGG):
-*        Can now use the WVMRAW mode for getting the optical depth
+*        Can now use the WVMRAW mode for getting the optical
+*        depth. Also calculate the filter tau from the CSO tau in the
+*        CSOTAU method
 *     {enter_further_changes_here}
 
 *  Copyright:

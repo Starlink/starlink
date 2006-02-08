@@ -58,6 +58,8 @@
 *        Mode keyword changed to Method.
 *     2006-02-03 (AGG):
 *        Filter now a string
+*     2006-02-07 (AGG):
+*        Can now use the WVMRAW method for getting tau
 *     {enter_further_changes_here}
 
 *  Notes:
