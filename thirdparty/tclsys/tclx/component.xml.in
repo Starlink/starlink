@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@" support="U">
   <version>@PACKAGE_VERSION@</version>
-  <path>thirdparty/tclsys/blt</path>
+  <path>thirdparty/tclsys/tclx</path>
   <description>TclX</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
