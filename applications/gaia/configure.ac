@@ -34,14 +34,9 @@ STAR_INITIALISE_FORTRAN
 dnl    Sometimes also need to know the name of the Fortran MAIN.
 AC_FC_MAIN
 
-dnl    Check for X libraries. These should be passed on to subdirs.
-AC_PATH_X
-if test "X$x_includes" != "X"; then
-   AC_SUBST([X11_INCLUDES], [--x-includes=$x_includes])
-fi
-if test "X$x_libraries" != "X"; then
-   AC_SUBST([X11_LIBRARIES], [--x-libraries=$x_libraries])
-fi
+dnl    Look for a Tcl installation. Prefer the Starlink one as we require
+dnl    itcl, tclx and BLT, but they are not supported by this command.
+STAR_PATH_TCLTK(8.4, [tk])
 
 dnl    The cxx C++ compiler under Tru64 UNIX needs the special environment
 dnl    variable DEC_CXX="-std gnu -D__USE_STD_IOSTREAM=1". These allow 
@@ -72,8 +67,8 @@ if test "X$STAR_LARGEFILE_CFLAGS" != "X"; then
 fi
 
 dnl    Declare dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, 
-     [ard ast cat cfitsio generic fio img pcs pda sae startcl sla], link)
+STAR_DECLARE_DEPENDENCIES(build, [ard ast blt cat cfitsio generic dnl
+fio img pcs pda sae startcl sla tcl tclx tk], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need to add AUTOASTROM to this when available.

@@ -1,23 +1,9 @@
-dnl	This file is an input file used by the GNU "autoconf" program to
-dnl	generate the file "configure", which is run during [incr Tcl]
-dnl installation to configure the system for the local environment.
+dnl Configuration file for extra Tcl packages that GAIA depends on.
+dnl In longer term move this into "gaia" directory.
 
-AC_INIT(itcl/itcl/generic/itcl.h)
-# RCS: $Id$
-
+AC_INIT(tcl)
 AC_CONFIG_AUX_DIR(config)
 AC_PREREQ(2.0)
-
-# -----------------------------------------------------------------------
-#
-#   Set up a new default --prefix.  If a previous installation of
-#   [incr Tcl] can be found searching $PATH use that directory.
-#
-# -----------------------------------------------------------------------
-
 AC_PREFIX_DEFAULT(/usr/local)
-AC_PREFIX_PROGRAM(itclsh)
-
-AC_CONFIG_SUBDIRS(tcl/unix tk/unix itcl itcl/iwidgets tclx blt tkhtml)
-
+AC_CONFIG_SUBDIRS(tkhtml)
 AC_OUTPUT(Makefile)

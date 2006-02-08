@@ -19,16 +19,8 @@ SCRIPTS_GAIA = gaia.csh gaiadisp.csh tabbedgaia.csh .gaFilters
 
 ## Things we need to create from the various sub-components.
 
-## Components of Tcl that are not built into the single binary, plus files
-## that represent proper completion of each tcl component.
-TCL_FILES = bltCanvEps.pro bltGraph.pro
-
-TCL_TEST_FILES = built/lib/itclConfig.sh \
- built/lib/tclConfig.sh \
- built/lib/tkConfig.sh \
- built/lib/tclxConfig.sh  \
- built/lib/libBLT.a \
- built/lib/libtkhtml.a
+## Define files that Tcl directory build produces.
+TCL_TEST_FILES = built/lib/libtkhtml.a
 
 ## Binaries used for real time display.
 SKYCAT_FILES = rtdServer$(EXEEXT) rtdClient$(EXEEXT) rtdCubeDisplay$(EXEEXT)
@@ -38,8 +30,7 @@ SKYCAT_TEST_FILES = built/lib/skycatConfig.sh
 ## Files needed from gaia/library.
 GAIA_LIB_FILES =  \
  skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
- gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip \
- tabbedgaia.sh
+ gaiaremote.sh displaycat gaiacut zoomcutandflip tabbedgaia.sh
 
 ## Files needed from gaia/bin.
 GAIA_BIN_FILES = \
@@ -50,7 +41,7 @@ GAIA_IFC_FILES = gaiaMon.ifc ardstat.ifc autocrop.ifc cat2tab.ifc tab2cat.ifc \
 
 GAIA_FILES = $(GAIA_LIB_FILES) $(GAIA_BIN_FILES) $(GAIA_IFC_FILES)
 
-BUILT_SOURCES = $(TCL_FILE) $(SKYCAT_FILES) $(GAIA_FILES)
+BUILT_SOURCES = $(SKYCAT_FILES) $(GAIA_FILES)
 
 ##  Tasks present in the gaiaMon binary.
 GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
@@ -61,17 +52,16 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 ##  On-line help.
 starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
+##  Root of the local Tcl installation.
+TCL_PREFIX = @TCL_PREFIX@
+
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
 ## makefiles in the sub-directories and return to this level to complete the
-## build. Note these cannot be pre-configured as Tcl needs to be built first.
-
-##  Places to get Tcl components.
-SCRIPT_PLACES = \
-        ./built/lib/blt2.4/*.pro
+## build. Could look at pre-configuring when Tcl packages are gone.
 
 ##  Build Tcl component.
-$(TCL_FILES) $(TCL_TEST_FILES):
+$(TCL_TEST_FILES):
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./tcl; \
@@ -79,11 +69,8 @@ $(TCL_FILES) $(TCL_TEST_FILES):
 	export TCL_LIBRARY; unset TCL_LIBRARY;\
 	export TK_LIBRARY; unset TK_LIBRARY;\
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
-	./configure --prefix=$${pwd}/built --disable-shared @X11_INCLUDES@ @X11_LIBRARIES@;\
+	./configure --prefix=$${pwd}/built --with-tcl=$(TCL_PREFIX) --disable-shared;\
 	make -e World)
-	for f in $(SCRIPT_PLACES); do \
-	   cp -p $${f} . ;\
-	done
 
 ##  Build Skycat component.
 $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
@@ -93,6 +80,7 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES): $(TCL_FILES) $(TCL_TEST_FILES)
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL; \
 	export SKYCAT_WRAPPER_DIR; unset SKYCAT_WRAPPER_DIR; \
+	export TCLTK_ROOT; TCLTK_ROOT=$(TCL_PREFIX); \
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
 	./configure --prefix=$${pwd}/built;\

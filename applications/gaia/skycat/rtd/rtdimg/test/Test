@@ -12,7 +12,7 @@ if [ -z "$RTD_LIBRARY" ] ; then
 #\
 fi
 #\
-LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib:/loc/pwda/pdraper/starlink_cvs/source/applications/gaia/built/lib/itcl:/usr/X11R6/lib64"
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/home/pdraper/starlink_cvs/source/applications/gaia/built/lib:/home/pdraper/starlink_cvs/star/lib:/home/pdraper/starlink_cvs/star/lib/itcl:/usr/X11R6/lib"
 #\
 exec $WISH "$0" ${1+"$@"}
 # --------------------------------------------------

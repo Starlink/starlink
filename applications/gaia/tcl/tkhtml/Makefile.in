@@ -53,7 +53,7 @@ libtkhtml.a:	htmlcmd.o htmldraw.o htmlform.o htmlimage.o htmlindex.o htmllayout.
 	$(RANLIB) libtkhtml.a
 
 install-lib: libtkhtml.a
-	if test ! -d $(LIBDIR); then mkdir $(LIBDIR); fi
+	if test ! -d $(LIBDIR); then mkdir -p $(LIBDIR); fi
 	$(INSTALL) libtkhtml.a $(LIBDIR)
 
 clean:	
