@@ -229,7 +229,7 @@ gaiaMon.ifc: $(IFL_FILES)
 	echo "ENDMONOLITH" >> gaiaMon.ifl
 
 normallib: FORCE
-	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE)) done
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE)) || exit 1; done
 
 install-top:
 	@if test -d $(TOPDIR); then : ; else mkdir $(TOPDIR); fi
