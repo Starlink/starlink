@@ -175,6 +175,12 @@ $(MANIFESTS)/automake: \
 	    fi \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/blt: \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/tclsys/blt \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/cat: \
 		$(MANIFESTS)/ast \
 		$(MANIFESTS)/chr \
@@ -742,6 +748,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/blt \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
@@ -765,7 +772,10 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/sla \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/startcl \
-		$(MANIFESTS)/starx
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tclx \
+		$(MANIFESTS)/tk
 	cd applications/gaia \
 	  && $(MAKE_CPT)
 
@@ -1776,6 +1786,12 @@ $(MANIFESTS)/sun248: \
 $(MANIFESTS)/tcl:
 	cd thirdparty/tclsys/tcl \
 	  && $(CONFIG_CPT) \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/tclx: \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd thirdparty/tclsys/tclx \
 	  && $(MAKE_CPT)
 
 # Component tk is a configure dependency, so is configurable in place.

@@ -22,6 +22,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/ast \
 	$(MANIFESTS)/astrom \
 	$(MANIFESTS)/atools \
+	$(MANIFESTS)/blt \
 	$(MANIFESTS)/cat \
 	$(MANIFESTS)/ccdpack \
 	$(MANIFESTS)/chr \
@@ -91,6 +92,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/spt \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/tcl \
+	$(MANIFESTS)/tclx \
 	$(MANIFESTS)/tk \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/xdisplay

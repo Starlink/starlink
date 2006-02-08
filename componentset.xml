@@ -659,7 +659,7 @@ calibration and modification, grid overlays, blink comparison, defect patching
 and the ability to query on-line (WWW) catalogues.
 </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>ard</build><build option='link'>ast</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>startcl</build><build option='link'>sla</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>ard</build><build option='link'>ast</build><build option='link'>blt</build><build option='link'>cat</build><build option='link'>cfitsio</build><build option='link'>generic</build><build option='link'>fio</build><build option='link'>img</build><build option='link'>pcs</build><build option='link'>pda</build><build option='link'>sae</build><build option='link'>startcl</build><build option='link'>sla</build><build option='link'>tcl</build><build option='link'>tclx</build><build option='link'>tk</build><sourceset>star2html</sourceset><use>convert</use><use>esp</use><use>extractor</use><use>kappa</use><use>photom</use><use>polpack</use><use>startcl</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -3399,6 +3399,24 @@ GKS (SUN/83) should be used.</p></abstract>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="blt" support="U">
+  <version>2.4z</version>
+  <path>thirdparty/tclsys/blt</path>
+  <description>BLT</description>
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="itcl" support="U">
   <version>3.3</version>
   <path>thirdparty/tclsys/itcl</path>
@@ -3433,6 +3451,24 @@ GKS (SUN/83) should be used.</p></abstract>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="tclx" support="U">
+  <version>8.4.0</version>
+  <path>thirdparty/tclsys/tclx</path>
+  <description>TclX</description>
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
