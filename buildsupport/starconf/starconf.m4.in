@@ -495,13 +495,12 @@ void func_two_() { return; }
 # STAR_PATH_TCLTK([minversion=0], [options=''])
 # ---------------------------------------------
 #
-# Finds a tclsh and wish, and the associated libraries.  Sets output
-# variable TCL_CFLAGS to the C compiler flags necessary to compile
-# with Tcl, TCL_LIBS to the required library flags, and TCLSH to the
-# full path of the tclsh executable; if Tk is requested, it similarly
-# sets TK_CFLAGS, TK_LIBS and WISH.  Define the cpp variable
-# TCL_MISSING to 1 if Tcl is not available.  Similar to macro
-# AC_PATH_XTRA.
+# Finds a tclsh and wish, and the associated libraries.  Sets output variable
+# TCL_CFLAGS to the C compiler flags necessary to compile with Tcl, TCL_LIBS
+# to the required library flags, and TCLSH to the full path of the tclsh
+# executable and TCL_PREFIX to the installation root; if Tk is requested, it
+# similarly sets TK_CFLAGS, TK_LIBS and WISH.  Define the cpp variable
+# TCL_MISSING to 1 if Tcl is not available.  Similar to macro AC_PATH_XTRA.
 #
 # If argument MINVERSION is present, it specifies the minimum Tcl/Tk
 # version number required.
@@ -617,6 +616,9 @@ dnl  and Fink on OSX
 
         # Make the TCL version number available.
         res="$res TCL_VERSION=\"$TCL_VERSION\";"
+
+        # Export the TCL_PREFIX value.
+        res=$res TCL_PREFIX=\"$TCL_PREFIX\";"
 
         # These envs include $TCL_DBGX -- expand this out.
         eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
