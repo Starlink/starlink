@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_tslice_ast( smfData * data, int index, int * status);
+*     smf_tslice_ast( smfData * data, int index, int needwcs, int * status);
 
 *  Arguments:
 *     data = smfData* (Given & Returned)
@@ -25,19 +25,24 @@
 *        Index into the time series data (the 3rd dimension).
 *        If the data structure does not contain the specified index
 *        a bad error is reported. Ignored for 2D data.
+*     needwcs = int (Given)
+*        Flag to indicate whether or not a WCS frameset is desired
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This function is used to create an AST FrameSet for the specified
-*     time slice from the supplied data structure. It only creates a new
-*     frameset if required, else the supplied frameset is modified for
-*     efficiency. The FrameSet is stored in the "hdr" component of the
-*     supplied data structure.
+*     This function is used to create an AST FrameSet for the
+*     specified time slice from the supplied data structure. It only
+*     creates a new frameset if required, else the supplied frameset
+*     is modified for efficiency. The FrameSet is stored in the "hdr"
+*     component of the supplied data structure. The caller has the
+*     option of specifying that they do not need a frameset at all,
+*     such as in the case of QUICK LOOK processing.
 *
 *     For 2D data files the routine returns without modification of
-*     the "data" structure if the header struct already contains a framset.
-*     Bad status is set if a 2D data struct does not contain a framset already.
+*     the "data" structure if the header struct already contains a
+*     frameset.  Bad status is set if a 2D data struct does not
+*     contain a frameset already.
 *
 *     The frameset will be freed automatically when the data struct is
 *     annulled.
@@ -58,6 +63,8 @@
 *     2006-01-27 (TIMJ):
 *        No longer use sc2store. Now index directly into pre-read time
 *        series headers.
+*     2006-02-08 (AGG):
+*        Add needwcs flag to API.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -108,7 +115,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_tslice_ast"
 
-void smf_tslice_ast (smfData * data, int index, int * status ) {
+void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
   smfHead *       hdr;       /* Local copy of the header structure */
   sc2head *       sc2tmp;    /* Local pointer to sc2head */
@@ -168,31 +175,33 @@ void smf_tslice_ast (smfData * data, int index, int * status ) {
     }
   }
 
-  /* Need to get the sub system ID */
-  /* If we only have the sub system name we can use an sc2ast routine to convert */
-  smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
-
-  /* Convert to a number */
-  sc2ast_name2num( subarray, &subsysnum, status);
-
   /* Simply assign sc2head to the correct slice of allsc2heads */
   sc2tmp = &((hdr->allsc2heads)[index]);
   hdr->sc2head = sc2tmp;
 
-  /* See if we have a WCS or not */
-  if (hdr->wcs == NULL ) {
-    /* Must create one */
-    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-		      sc2tmp->rts_end, &(hdr->wcs), status );
-  } else {
-    /* Ideally we want to modify in place to reduce malloc/free */
-    /* For now take the inefficient and simpler approach */
-    astAnnul( hdr->wcs );
-    sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-		      sc2tmp->rts_end, &(hdr->wcs), status );
+  /* */
+  if (needwcs) {
+
+    /* Need to get the subarray name */
+    smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+
+    /* Convert to a number */
+    sc2ast_name2num( subarray, &subsysnum, status);
+
+    /* See if we have a WCS or not */
+    if (hdr->wcs == NULL ) {
+      /* Must create one */
+      sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
+			sc2tmp->rts_end, &(hdr->wcs), status );
+    } else {
+      /* Ideally we want to modify in place to reduce malloc/free */
+      /* For now take the inefficient and simpler approach */
+      astAnnul( hdr->wcs );
+      sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
+			sc2tmp->rts_end, &(hdr->wcs), status );
+    }
+
+    /* astShow( hdr->wcs ); */
   }
-
-  /* astShow( hdr->wcs ); */
-
   return;
 }
