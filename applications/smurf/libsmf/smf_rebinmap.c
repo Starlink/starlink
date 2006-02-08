@@ -169,7 +169,7 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
       /* Loop over all time slices in the data */      
       for( j=0; j<(data->dims)[2]; j++ ) {
 	
-	smf_tslice_ast( data, j, status);
+	smf_tslice_ast( data, j, 1, status);
 	
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;

@@ -173,7 +173,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
       
       for( j=0; j<(data->dims)[2]; j++ ) {
 	
-	smf_tslice_ast( data, j, status);
+	smf_tslice_ast( data, j, 1, status);
 	
 	if( *status == SAI__OK ) {
 	  hdr = data->hdr;

@@ -139,6 +139,11 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   size_t base;             /* ?? */
   int z;                   /* ?? */
 
+  char filter[81];         /* Name of filter */
+
+  double newt_12;
+  double oldt_12 = 0.0;
+  size_t newtau = 0;
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
 			      is to be used */
 
@@ -170,11 +175,16 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   if ( *status != SAI__OK) return;
 
   /* Check desired optical depth method */
-
   if ( strncmp( method, "WVMR", 4) == 0 ) {
     wvmr = 1;
   }
 
+  /* If we have a CSO Tau then convert it to the current filter */
+  if ( strncmp( method, "CSOT", 4) == 0 ) {
+    hdr = data->hdr;
+    smf_fits_getS( hdr, "FILTER", filter, 81, status);
+    tau = smf_scale_tau( tau, filter, status);
+  }
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
@@ -213,16 +223,33 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
   /* Loop over number of time slices/frames */
   for ( k=0; k<nframes; k++) {
     /* Call tslice_ast to update the header for the particular
-       timeslice */
-    smf_tslice_ast( data, k, status );
-    /*    smf_tslice( data, &tdata, j, status );*/
+       timeslice. If we're in QUICK mode then we don't need the WCS */
+    if (quick) {
+      smf_tslice_ast( data, k, 0, status );
+    } else {
+      smf_tslice_ast( data, k, 1, status );
+    }
     /* Retrieve header info */
     hdr = data->hdr;
+    /* See if we have a new WVM value */
     if (wvmr) {
-      /* This shouldn't have to be called every time, only when it's
-	 changed */
-      tau = smf_calc_wvm( hdr, status );
+      newt_12 = hdr->sc2head->wvm_t12;
+      if (newt_12 != oldt_12) {
+	newtau = 1;
+	oldt_12 = newt_12;
+      } else {
+	newtau = 0;
+      }
+      /* KLUDGE!!! until simulator writes unchanging values for 1.2 s */
+      if ( k%240 == 0 || quick == 0) {
+	newtau = 1;
+      } else {
+	newtau = 0;
+      }
+      if (newtau) {
+	tau = smf_calc_wvm( hdr, status );
       /* Check status and/or value of tau */
+      }
     }
     if (!quick) {
       wcs = hdr->wcs;
