@@ -402,6 +402,7 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
    return RESULT;
 }
 
+
 #ifdef DEBUG
 
 F77_SUBROUTINE(ast_listissued)( CHARACTER(TEXT)
@@ -422,6 +423,9 @@ F77_SUBROUTINE(ast_setwatchid)( INTEGER(ID) ) {
 }
 
 
+#endif
+
+
 F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
                                 INTEGER(VALUE),
                                 INTEGER(STATUS) 
@@ -440,9 +444,6 @@ F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
    return RESULT;
 }
 
-
-
-#endif
 
 
 
