@@ -20256,9 +20256,9 @@ double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
 AstMapping *astSimplify_( AstMapping *this ) {
    AstMapping *result;
    if ( !astOK ) return NULL;
-   if( !astGetIsSimple( this ) ) { /* Only simplify if not already done */
+   if( !astGetIsSimple( this ) ) {      /* Only simplify if not already done */
       result = (**astMEMBER(this,Mapping,Simplify))( this );
-      result->issimple = 1;        /* Indicate simplification has been done */
+      if( result ) result->issimple = 1;/* Indicate simplification has been done */
    } else {
       result = astClone( this );
    }
