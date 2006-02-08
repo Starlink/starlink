@@ -63,12 +63,12 @@ EXTRA_LIBS   = @LIBS@
 # Tcl libs
 TCLLIBS = @TCLX_LIB_SPEC@ \
           @ITCL_LIB_SPEC@ \
-          @TCLUTIL_TCL_BUILD_LIB_PATH@ 
+          @TCL_LIB_SPEC@ 
 
 # Tk libs
 TKLIBS = @ITK_LIB_SPEC@ \
          @TIX_LIB_SPEC@ \
-         @TCLUTIL_TK_BUILD_LIB_PATH@ \
+         @TK_LIB_SPEC@ \
          @BLT_LIB_SPEC@ \
          tkhtml/libtkhtml.a
 # Tk libs

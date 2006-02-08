@@ -121,8 +121,8 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     Tcl_SetVar2(interp, "env", "GAIA_VERSION", GAIA_VERSION, TCL_GLOBAL_ONLY);
 
     //  Do the Iwidgets initialisation, needed for single binary as
-    //  Iwidgets doesn't have a builtin init function (so the script
-    //  method of doing the init gets confused).
+    //  Iwidgets doesn't have a builtin C init function (so the script
+    //  method for doing the init gets confused).
     libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
         libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
@@ -134,32 +134,30 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     Tcl_SetVar(interp, "iwidgets_library", libDir, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "iwidgets_version", IWIDGETS_VERSION, TCL_GLOBAL_ONLY);
     sprintf(cmd, "lappend auto_path %s", libDir);
-    if (Tcl_Eval(interp, cmd) != TCL_OK)
+    if (Tcl_Eval(interp, cmd) != TCL_OK) {
         return TCL_ERROR;
+    }
     
-    //  Also do the package provide.
+    //  Also do the package requires.
     if ( Tcl_Eval( interp,
-                   "global iwidgets_library iwidgets_version\n"
                    "package require Tcl 8.4\n"
                    "package require Tk 8.4\n"
                    "package require Itcl 3.3\n"
                    "package require Itk 3.3\n"
                    "namespace eval ::iwidgets {\n"
-                   "  namespace export *\n"
-                   "  variable library $iwidgets_library\n"
-                   "  variable version $iwidgets_version\n"
+                   "   namespace export *\n"
                    "}\n"
-                   "lappend auto_path \"${iwidgets_library}/scripts\"\n"
-                   "package provide Iwidgets $iwidgets_version\n"
+                   "lappend auto_path $iwidgets_library  "
+                   "  [file join $iwidgets_library generic] " 
+                   "  [file join $iwidgets_library scripts] \n"
         ) != TCL_OK ) {
         return TCL_ERROR;
     }
     
-    //  Set up the namespaces used by the itcl/itk classes.
+    //  Set up the namespaces used by the itcl/itk classes in GAIA.
     if (Tcl_Eval(interp,
 		 "namespace eval gaia {namespace export *}\n"
 		 "namespace import -force gaia::*\n"
-//		 "namespace import -force iwidgets::*\n"
         ) != TCL_OK) {
         return TCL_ERROR;
     }

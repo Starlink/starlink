@@ -52,7 +52,7 @@ proc main {} {
    
    #  Binary is standalone (only during testing). Stops sourcing of 
    #  external files otherwise.
-   #  puts $fd "-standalone"
+   # puts $fd "-standalone"
    
    #  Set location of Tcl and Tk.
    puts $fd "-tcl-library \"$tcl_library\""
