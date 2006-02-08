@@ -1,9 +1,0 @@
-dnl Configuration file for extra Tcl packages that GAIA depends on.
-dnl In longer term move this into "gaia" directory.
-
-AC_INIT(tcl)
-AC_CONFIG_AUX_DIR(config)
-AC_PREREQ(2.0)
-AC_PREFIX_DEFAULT(/usr/local)
-AC_CONFIG_SUBDIRS(tkhtml)
-AC_OUTPUT(Makefile)
