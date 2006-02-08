@@ -6,7 +6,10 @@
 SUBDIRS = src include test man
 
 
-do_all do_install do_clean do_depend do_man:
+do_all:
+	$(AT)for i in $(SUBDIRS); do (cd $$i; $(MAKE) $@) || exit 1; done
+
+do_install do_clean do_depend do_man:
 	$(AT)for i in $(SUBDIRS); do (cd $$i; $(MAKE) $@) done
 
 include ../makefile.mk

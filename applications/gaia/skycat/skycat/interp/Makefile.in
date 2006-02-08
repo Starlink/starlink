@@ -134,7 +134,7 @@ $(TCL_INTERP): lib tclAppInit.o FORCE
 		$(LOCAL_LIBRARIES) $(LD_SEARCH_FLAGS) $(TCLLIBS) $(EXTRA_LIBS)
 
 $(SKYCAT_LIB) lib: FORCE
-	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)); done
+	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)) || exit 1; done
 
 # force recompile after configure for ifdefs
 $(OBJECTS): ../config.status

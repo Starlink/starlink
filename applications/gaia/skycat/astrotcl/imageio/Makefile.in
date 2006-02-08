@@ -5,7 +5,10 @@
 
 SUBDIRS = src include man test
 
-all install clean depend man: FORCE
+all: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) || exit 1; done
+
+install clean depend man: FORCE
 	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE) $@) done
 
 distclean: clean

@@ -132,7 +132,7 @@ all $(demo_wish): lib $(LOCAL_LIBRARIES) $(OBJECTS)
 	@(cd demos; $(MAKE))
 
 $(TCLCAT_LIBRARY) lib: FORCE
-	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)); done
+	@set -x; for i in $(SUBDIRS); do (cd $$i; $(MAKE)) || exit 1; done
 
 # force recompile after configure for ifdefs
 tkAppInit.o: ../config.status

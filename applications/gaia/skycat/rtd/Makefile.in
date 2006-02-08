@@ -65,7 +65,7 @@ do_all: sub master_lib
 
 # make all in subdirs
 sub:
-	$(AT)for i in $(ALLDIRS); do (cd $$i; $(MAKE) all) done
+	$(AT)for i in $(ALLDIRS); do (cd $$i; $(MAKE) all) || exit 1; done
 
 # generate master library 
 # (make .a archive and shared library, if configure --enable-shared was specified) 

@@ -138,7 +138,7 @@ all $(demo_wish): lib  $(LOCAL_LIBRARIES) $(OBJECTS)
 tkAppInit.o: ../config.status
 
 $(TCLUTIL_LIBRARY) lib: FORCE
-	@set -x; for i in bitmaps src demos; do (cd $$i; $(MAKE)); done
+	@set -x; for i in bitmaps src demos; do (cd $$i; $(MAKE)) || exit 1; done
 
 install-top:
 	@test -d $(TOPDIR) || mkdir $(TOPDIR)

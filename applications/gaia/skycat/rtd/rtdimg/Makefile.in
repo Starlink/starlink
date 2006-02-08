@@ -97,7 +97,7 @@ tkAppInit.o: tkAppInit.C
 $(OBJECTS): ../config.status
 
 $(RTDIMAGE_LIBRARY) lib:
-	$(AT)for i in bitmaps colormaps src demos; do (cd $$i; $(MAKE)); done
+	$(AT)for i in bitmaps colormaps src demos; do (cd $$i; $(MAKE)) || exit 1; done
 
 install-top:
 	@test -d $(TOPDIR) || mkdir $(TOPDIR)
