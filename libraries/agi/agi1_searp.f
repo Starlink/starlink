@@ -57,6 +57,8 @@
 *     Jul 2005  Stop nasty jump "GOTO 10" into IF/ELSE/ENDIF block.
 *               Compilers rightly stop accepting this.
 *     Feb 2006  Initialise FOUND to avoid valgrind complaining
+*               Initialise TPNAME to blank to avoid valgrind complaining
+*               and use CHR_LEN for robustness.
 
 *    endhistory
 *
@@ -115,6 +117,9 @@
 *    Global variables :
       INCLUDE 'agi_cache'
 
+*    External References :
+      INTEGER CHR_LEN
+
 *    Local variables :
       LOGICAL EMPTY, FOUND, GOTONE, PFOUND, WKSHUT, YESNO
       LOGICAL NASTY
@@ -133,17 +138,13 @@
 
 *   Copy the name string to a local variable
 *   Convert the name to uppercase and remove leading blanks
+         TPNAME = ' '
          TPNAME = PNAME
          CALL CHR_LDBLK( TPNAME )
          CALL CHR_UCASE( TPNAME )
 
-*   Find out the length of the name string
-         CLEN = LEN( TPNAME )
-
-*   Test for an empty name string
-         DO WHILE ( TPNAME( CLEN : CLEN ) .EQ. ' ' )
-            CLEN = CLEN - 1
-         ENDDO
+*   Find out the length of the modified name string
+         CLEN = CHR_LEN( TPNAME )
 
          IF ( CLEN .LT. 1 ) THEN
             EMPTY = .TRUE.
