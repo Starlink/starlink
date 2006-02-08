@@ -186,7 +186,7 @@ double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
-void smf_tslice_ast (smfData * data, int index, int * status );
+void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
