@@ -1,8 +1,0 @@
-Modified tkCanvLine.c to support coloured arrow heads.
-init.tcl and autoload.tcl patched to source non-existence tclIndex
-files (needed for standalone binary to work, open command on builtin
-files doesn't work).
-
-init.tcl {$msg} in unknown changed to {$msg != 0} so string comparison 
-works.
-
