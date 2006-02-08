@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="blt" support="U">
+  <version>2.4z</version>
+  <path>thirdparty/tclsys/blt</path>
+  <description>BLT</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    <build>tcl</build><build>tk</build>
+  </dependencies>
+  <developers>
+    <!-- BLT is maintained by George Howlett, but we take the call first-->
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
