@@ -459,6 +459,8 @@
 *        Added parameters CATFRAME and CATEPOCH.
 *     13-JAN-2006 (DSB):
 *        Added parameters SHOWDATA and COMP.
+*     7-FEB-2006 (DSB):
+*        Correct KPS1_CURDV to use only significant pixel axes
 **     {enter_further_changes_here}
 
 *  Bugs:
@@ -572,6 +574,9 @@
       INTEGER OLDCOL             ! Original marker colour index
       INTEGER PNTR               ! Pointer to the required NDF component
       INTEGER RBMODE             ! PGPLOT rubber band mode
+      INTEGER SIGDIM             ! No. of significant axes in NDF 
+      INTEGER SLBND( NDF__MXDIM )! Significant lower bounds of the associated NDF
+      INTEGER SUBND( NDF__MXDIM )! Significant uper bounds of the associated NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of the associated NDF
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
@@ -785,11 +790,23 @@
      :                          ' is undefined in the NDF structure '//
      :                          '^NDF', STATUS )
                   CALL NDF_ANNUL( INDF1, STATUS )
+
                ELSE
                   CALL NDF_MAP( INDF1, MCOMP, '_DOUBLE', 'READ', PNTR, 
      :                          EL, STATUS )
                   CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, UBND, NDIM, 
      :                            STATUS )
+
+*  Remove insginficant axes from the bounds.
+                  SIGDIM = 0
+                  DO I = 1, NDIM
+                     IF( UBND( I ) .GT. LBND( I ) ) THEN
+                        SIGDIM = SIGDIM + 1
+                        SLBND( SIGDIM ) = LBND( I )
+                        SUBND( SIGDIM ) = UBND( I )
+                     END IF
+                  END DO
+
                END IF
             END IF
 
@@ -1026,15 +1043,25 @@
      :                                   'the NDF structure ^NDF', 
      :                                   STATUS )
                            CALL NDF_ANNUL( INDF1, STATUS )
+
                         ELSE
                            CALL NDF_MAP( INDF1, MCOMP, '_DOUBLE', 
      :                                   'READ', PNTR, EL, STATUS )
                            CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND, 
      :                                     UBND, NDIM, STATUS )
+
+*  Remove insginficant axes from the bounds.
+                           SIGDIM = 0
+                           DO I = 1, NDIM
+                              IF( UBND( I ) .GT. LBND( I ) ) THEN
+                                 SIGDIM = SIGDIM + 1
+                                 SLBND( SIGDIM ) = LBND( I )
+                                 SUBND( SIGDIM ) = UBND( I )
+                              END IF
+                           END DO
+
                         END IF   
-
                      END IF
-
                   END IF
                END IF
 
@@ -1204,7 +1231,7 @@
 
                IF( SHPIX ) IAT = IAT + 3
 
-               CALL KPS1_CURDV( MAP2, XC, YC, NAXP, LBND, UBND, COMP, 
+               CALL KPS1_CURDV( MAP2, XC, YC, NAXP, SLBND, SUBND, COMP, 
      :                          %VAL( CNF_PVAL( PNTR ) ), IAT, LINE, 
      :                          STATUS )
 
