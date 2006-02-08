@@ -45,6 +45,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +55,8 @@
 *        Obtains a name or a locator.  The LOC argument and
 *        documentation renamed to NAME to reflect that.  Altered to
 *        modern-style commenting.
+*     8-FEB-2006 (DSB):
+*        Initialise LOC before calling AGI_GTREF to avoid valgrind reports.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,6 +100,7 @@
 
 *  Get the locator to, or the name (with length of no more than
 *  DAT__SZLOC) of, the NDF associated with the DATA picture.
+      LOC = DAT__NOLOC
       CALL AGI_GTREF( PICID, ACCESS, LOC, STATUS )
 
 *  The string was truncated implying the reference object is a name,
