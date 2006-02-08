@@ -122,7 +122,7 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
 
   tau = smf_scale_tau( tau225, filter, status);
 
-  printf("tau = %g\n",tau);
+  /*  printf("tau = %g\n",tau);*/
 
   return tau;
 }
