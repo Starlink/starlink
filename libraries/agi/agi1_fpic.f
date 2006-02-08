@@ -21,9 +21,11 @@
 *
 *    Authors :
 *     Nick Eaton  ( DUVAD::NE )
+*     David Berry
 *
 *    History :
 *     July 1988
+*     Feb 2006: Initialise the returned value of FOUND before checking status
 *    endhistory
 *
 *    Type Definitions :
@@ -56,6 +58,7 @@
       INTEGER SIZE
 *-
 
+      FOUND = .FALSE.
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *   Get the number of current cells

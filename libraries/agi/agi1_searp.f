@@ -44,6 +44,7 @@
 *    Authors :
 *     Nick Eaton  ( DUVAD::NE )
 *     Peter W. Draper ( DUVAD::PWD )
+*     David S. Berry (dsb@ast.man.ac,uk)
 *
 *    History :
 *     Jul 1988
@@ -55,6 +56,8 @@
 *     Jan 1993  Initialise header block if necessary
 *     Jul 2005  Stop nasty jump "GOTO 10" into IF/ELSE/ENDIF block.
 *               Compilers rightly stop accepting this.
+*     Feb 2006  Initialise FOUND to avoid valgrind complaining
+
 *    endhistory
 *
 *    Type Definitions :
@@ -124,6 +127,9 @@
 *-
 
       IF ( STATUS .EQ. SAI__OK ) THEN
+
+*   Indicate we have not yet found anything.
+         FOUND = .FALSE.
 
 *   Copy the name string to a local variable
 *   Convert the name to uppercase and remove leading blanks
