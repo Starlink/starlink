@@ -341,7 +341,9 @@ class Ccdtop {
                bind $itk_interior <Configure> [ code set hadconfig 1 ]
             }
          } else {
-            $waitwin configure -text "$msg..."
+            if { [winfo exists $waitwin] } {
+               $waitwin configure -text "$msg..."
+            }
          }
       }
 
@@ -351,7 +353,9 @@ class Ccdtop {
 #-----------------------------------------------------------------------
          if { [ incr waitlevel -1 ] == 0 } {
             update idletasks
-            destroy $waitwin
+            if { [winfo exists $waitwin] } {
+               catch { destroy $waitwin }
+            }
             if { $configact != "" } {
                bind $itk_interior <Configure> $configact
                if { $hadconfig } {

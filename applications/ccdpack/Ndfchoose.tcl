@@ -386,7 +386,7 @@
          eval itk_initialize $args
 
 #  Set a binding to handle window resize events.
-         bind $itk_interior <Configure> [ code $this winch ]
+         bind $itk_interior <Configure> [ code $this winch %W ]
       }
 
 
@@ -995,24 +995,32 @@
 
 
 #-----------------------------------------------------------------------
-      private method winch { } {
+      private method winch { W } {
 #-----------------------------------------------------------------------
 #  This method is called if the toplevel window receives a configure
 #  event, which will happen, for instance, if it is resized.
-         update idletasks
+         if { $W != $itk_interior } {
+            return
+         }
+         if { $resizer_ != {} } {
+            after cancel $resizer_
+         }
          set xinc [ expr ( [ winfo width $itk_interior ] - \
-                           [ winfo reqwidth $itk_interior ] ) / 2 ]
+                              [ winfo reqwidth $itk_interior ] ) / 2 ]
          set yinc [ expr [ winfo height $itk_interior ] - \
-                         [ winfo reqheight $itk_interior ] ]
+                       [ winfo reqheight $itk_interior ] ]
          if { $xinc != 0 || $yinc != 0 } {
-            waitpush "Resizing chooser window"
-            configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
-                                       [ expr [ lindex $viewport 1 ] + $yinc ] ]
-            update idletasks
-            waitpop
+            set resizer_ [after 100 \
+                             [code $this incrementviewport_ $xinc $yinc]]
          }
       }
 
+      protected variable resizer_ {}
+      private method incrementviewport_ {xinc yinc} {
+         configure -viewport [ list [ expr [ lindex $viewport 0 ] + $xinc ] \
+                                  [ expr [ lindex $viewport 1 ] + $yinc ] ]
+         update
+      }
 
 #-----------------------------------------------------------------------
       private method fitsselect { } {
