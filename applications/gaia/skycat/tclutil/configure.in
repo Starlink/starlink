@@ -185,14 +185,13 @@ getConfig() {
       break
     fi
   done
-  while test -z "$TCL_CONFIG_DIR" ; do
-    echo "What directory contains ${name} ?"
-    read TCL_CONFIG_DIR
-    if test ! -r $TCL_CONFIG_DIR/${name} ; then
-      echo "can't read $TCL_CONFIG_DIR/${name}"
-      TCL_CONFIG_DIR=""
-    fi
-  done
+
+  #  If failed, just give in.
+  if test -z "$TCL_CONFIG_DIR" ; then
+     echo "Failed to locate config script: ${name}"
+     echo "Check definition of TCLTK_ROOT ($TCLTK_ROOT)"
+     exit 1
+  fi
     
   # source the Tcl config file
   . $TCL_CONFIG_DIR/${name}
