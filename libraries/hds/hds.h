@@ -1,3 +1,7 @@
+/* Protect against multiple inclusion */
+#ifndef STAR_HDS_H_INCLUDED
+#define STAR_HDS_H_INCLUDED
+
 #include "dat_par.h"
 
 /* Relative location of type definitions depends on whether we are
@@ -1264,3 +1268,6 @@ datConv(const HDSLoc *locator,
 int
 hdsClose(HDSLoc **locator,
         int *status);
+
+/* STAR_HDS_H_INCLUDED */
+#endif
