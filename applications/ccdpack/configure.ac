@@ -18,12 +18,14 @@ STAR_MESSGEN(user_err.msg)
 TCL_VERSION=8.4
 ITCL_VERSION=3.3
 IWIDGETS_VERSION=4.0.1
+BLT_VERSION=24
 
 AC_PATH_XTRA
 
 AC_SUBST(TCL_VERSION)
 AC_SUBST(ITCL_VERSION)
 AC_SUBST(IWIDGETS_VERSION)
+AC_SUBST(BLT_VERSION)
 
 # Define CCDPACK_DIR as a macro for baking into ccdwish.
 CCDPACK_DIR=\"${prefix}/bin/ccdpack\"
@@ -52,6 +54,7 @@ LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
 
 AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
 AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
+AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,,[-lBLT$BLT_VERSION])
 
 dnl   Check for fpu_control.h, this isn't available for all  
 dnl   GCC implementations 
@@ -72,13 +75,13 @@ AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 
 LDFLAGS=$my_save_LDFLAGS
 
-# Note that the starlink Tcl, Tk and ITcl are required, since we need
+# Note that the starlink Tcl, Tk, ITcl and BLT are required, since we need
 # some somewhat-private include files.  I'm not sure how respectable
 # this is, but it seems unavoidable for what we want to do (for instance,
 # itcl uses the same ones).
 # Dependencies must be on one line
-STAR_DECLARE_DEPENDENCIES([build], [ard ast chr cnf fio generic grp hds idi ifd itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
-STAR_DECLARE_DEPENDENCIES([build], [agi graphpar img pda ref shl sla startcl],[link])
+STAR_DECLARE_DEPENDENCIES([build], [ard ast blt chr cnf fio generic grp hds idi ifd itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
+STAR_DECLARE_DEPENDENCIES([build], [agi blt graphpar img pda ref shl sla startcl],[link])
 STAR_DECLARE_DEPENDENCIES(configure, [itcl tcl tk])
 
 STAR_LATEX_DOCUMENTATION([sun139])
