@@ -366,7 +366,7 @@ else
     eval TCLX_LIB_FLAG="-ltclx`echo ${PACKAGE_VERSION} | tr -d .`${DBGX}"
 fi
 TCLX_BUILD_LIB_SPEC="-L`pwd` ${TCLX_LIB_FLAG}"
-TCLX_LIB_SPEC="-L${pkglibdir} ${TCLX_LIB_FLAG}"
+TCLX_LIB_SPEC="-L${pkglibdir}/.. ${TCLX_LIB_FLAG}"
 
 AC_SUBST(TCLX_BUILD_LIB_SPEC)
 AC_SUBST(TCLX_LIB_SPEC)
