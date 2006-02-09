@@ -207,6 +207,7 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/blt \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
