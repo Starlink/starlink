@@ -70,8 +70,8 @@ $(SKYCAT_FILES) $(SKYCAT_TEST_FILES):
 	export TCLTK_ROOT; TCLTK_ROOT=$(TCL_PREFIX); \
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
 	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
-	./configure --prefix=$${pwd}/built;\
-	make -e all install)
+	./configure --prefix=$${pwd}/built || exit 1;\
+	make -e all install || exit 1 )
 	cp -p ./built/lib/rtd/demos/rtdClient$(EXEEXT) .
 	cp -p ./built/bin/rtdServer$(EXEEXT) .
 	cp -p ./built/lib/rtd/demos/rtdCubeDisplay$(EXEEXT) .
@@ -92,8 +92,8 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	FCFLAGS="$(FCFLAGS) $(STAR_FCFLAGS)"; export FCFLAGS;\
 	FC="$(FC)"; export FC;\
 	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
-	./configure --prefix=$${pwd}/built;\
-	make -e all install)
+	./configure --prefix=$${pwd}/built || exit 1;\
+	make -e all install || exit 1 )
 	for f in $(GAIA_BIN_FILES) $(GAIA_IFC_FILES); do \
 	  cp -p built/bin/$${f} . ;\
 	done
