@@ -5963,7 +5963,7 @@ f     AST_LINEARAPPROX
 *     Public virtual function.
 
 *  Synopsis:
-*     #include "mapping.h"
+c     #include "mapping.h"
 c     int astLinearApprox( AstMapping *this, const double *lbnd, 
 c                          const double *ubnd, double tol, double *fit )
 f     RESULT = AST_LINEARAPPROX( THIS, LBND, UBND, TOL, FIT, STATUS )
