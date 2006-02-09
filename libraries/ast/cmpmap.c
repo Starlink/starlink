@@ -1396,10 +1396,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Create the new CmpMap.*/
                if( aconstants ) {
-                  new_cm = astCmpMap( cmpmap2->map2, unit, 0, "" );
+                  if( unit ) {
+                     new_cm = astCmpMap( cmpmap2->map2, unit, 0, "" );
+                  } else {
+                     new_cm = astCopy( cmpmap2->map2 );
+                  }
 
                } else if( bconstants ) {
-                  new_cm = astCmpMap( unit, cmpmap2->map1, 0, "" );
+                  if( unit ) {
+                     new_cm = astCmpMap( unit, cmpmap2->map1, 0, "" );
+                  } else {
+                     new_cm = astCopy( cmpmap2->map1 );
+                  }
 
                } else{
                   new_cm = astCmpMap( cmpmap2->map2, cmpmap2->map1, 0, "" );
