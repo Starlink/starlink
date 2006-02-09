@@ -13,22 +13,22 @@
 *     CALL KPG1_PGOPN( PNAME, MODE, IPIC, STATUS )
 
 *  Description:
-*     This routine opens the graphics data abse and actiavtes a PGPLOT
-*     workstation selected using the specified parameter. Ther user's
-*     pallette and colour table is then re-instated, over-riding the 
+*     This routine opens the graphics database and activates a PGPLOT
+*     workstation selected using the specified parameter. The user's
+*     palette and colour table is then re-instated, over-riding the 
 *     those established by PGPLOT. 
 *
 *     The device should normally be shut down using KPG1_PGCLS.
 
 *  Arguments:
 *     PNAME = CHARACTER * ( * ) (Given)
-*        The nameof the parameter to use.
+*        The name of the parameter to use.
 *     MODE = CHARACTER * ( * ) (Given)
 *        The AGI access mode; "WRITE" or "UPDATE". Write causes the 
 *        current picture to be cleared (the contents of the database are
 *        unaffected).
 *     IPIC = INTEGER (Returned)
-*        AN AGI identifier for the current picture.
+*        An AGI identifier for the current picture.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -40,7 +40,7 @@
 *     1-OCT-1999 (DSB):
 *        Original version.
 *     10-DEC_2002 (DSB):
-*        Re-clear the screen after loading the user's pallette if MODE=W.
+*        Re-clear the screen after loading the user's palette if MODE=W.
 *     18-MAR-2003 (DSB):
 *        Check STATUS before calling PGPLOT routines ("CALL PG...") .
 *     12-OCT-2004 (DSB):
@@ -101,14 +101,14 @@
       IF( STATUS .EQ. SAI__OK ) CALL PGQCR( 0, ROLD, GOLD, BOLD )
 
 *  PGPLOT resets the colour table each time it is opened. So re-instate
-*  the user's pallette and LUT by loading them from previously saved files 
+*  the user's palette and LUT by loading them from previously saved files 
 *  (see KPG1_PLSAV and KPG1_LTSAV).
       CALL KPG1_PLLOD( STATUS )
       CALL KPG1_LTLOD( STATUS )
 
 *  If the device was cleared on opening (within AGI_ASSOC), it will have 
 *  been cleared using the default background colour provided by PGPLOT.
-*  We have now loaded a potentially different user pallette, which may
+*  We have now loaded a potentially different user palette, which may
 *  have a different background colour, so clear the screen again if the
 *  backgrond colour has changed.
       IF( STATUS .EQ. SAI__OK .AND. 
