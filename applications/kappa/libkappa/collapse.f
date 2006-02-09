@@ -240,6 +240,8 @@
 *        For Integ estimator obtain co-ordinates and create workspace 
 *        for widths instead of using AXIS-component widths.  Initialise
 *        variance pointers.
+*     9-FEB-2006 (DSB):
+*        Report an error if the selected WCS axis has a constant value.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -444,8 +446,9 @@
          USEALL = .FALSE.
       END IF
 
-*  Determine whether a WCS axis aligns with to the chosen data axis.
-*  =================================================================
+*  Determine which pixel axis is most nearly aligned with the selected WCS 
+*  axis.
+*  =====================================================================
 
 *  Find an arbitrary position within the NDF which has valid current 
 *  Frame co-ordinates. Both pixel and current Frame co-ordinates for 
@@ -514,6 +517,20 @@
          END IF
 
       END DO
+
+*  Report an error if the selected WCS axis is independent of pixel
+*  position.
+      IF( PRJMAX .EQ. 0.0 ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'I', IAXIS )   
+            CALL ERR_REP( 'COLLAPSE_ERR3B', 'The specified WCS axis '//
+     :                    '(axis ^I) has a constant value over the '//
+     :                    'whole NDF and so cannot be collapsed.',
+     :                    STATUS )
+         END IF
+         GO TO 999
+      END IF
 
 *  Derive the pixel-index bounds along the collapse axis.
 *  ======================================================
