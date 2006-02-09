@@ -9,7 +9,7 @@
 
 # source files
 SRCS =	RtdImage.C RtdCmds.C ImageZoom.C RtdCamera.C RtdRemote.C ImageDisplay.C \
-	ImageColor.C ColorMapInfo.C ITTInfo.C rtd_bitmaps.C colormaps.C \
+	ImageColor.C ColorMapInfo.C ITTInfo.C rtd_bitmaps.C \
 	RtdRPTool.C RtdRPFile.C RtdPerf.C RtdUtils.C RtdHDU.C RtdCoords.C
 
 # object files
