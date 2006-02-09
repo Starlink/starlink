@@ -4408,7 +4408,7 @@ fi
 
 # Library file(s) to include in tclsh and other base applications
 # in order to provide facilities needed by DLOBJ above.
-DL_LIBS=$TCL_DL_LIBS $TCL_LIBS
+DL_LIBS="$TCL_DL_LIBS $TCL_LIBS"
 
 # Flags to pass to the compiler when linking object files into
 # an executable tclsh or tcltest binary.
@@ -4539,7 +4539,7 @@ if test "$NO_TCL" = "0" ; then
         # TclX defines the TCLX_LIB_SPEC variable differently when shared libs
         # are not used. We want to always use "-Ldir -llib" to pick up the
         # shared lib if it is there.
-        tclxdir=`dirname $TCLX_LIB_SPEC`
+        tclxdir=`dirname "$TCLX_LIB_SPEC"`
         if test "$tclxdir" != "" ; then
             if test "$SHARED" = "1" -a -f "$TCLX_LIB_SPEC" ; then
                TCLX_LIB_SPEC="-L$tclxdir -ltclx$TCLX_VERSION"
