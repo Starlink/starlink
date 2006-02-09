@@ -48,6 +48,8 @@
 *        picture rather than the whole device if mode is WRITE.
 *     6-JAN-2005 (DSB):
 *        Check STATUS before calling PGQCR.
+*     9-FEB-2006 (DSB):
+*        Start an initial AGI BEGIN/END block prior to calling AGI_ASSOC.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,10 +85,15 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Start an initial AGI context. This allows the corresponding AST_END to
+*  annul the identifier returned by the following call to AGI_ASSOC.
+      CALL AGI_BEGIN
+
 *  Associate the parameter with a workstation and current picture.
       CALL AGI_ASSOC( PNAME, MODE, IPIC, STATUS )
 
-*  Start a new AGI context.
+*  Start a new AGI context. This allow the corresponding call to AGI_END
+*  to reinstate the original current picture automatically.
       CALL AGI_BEGIN
 
 *  Activate PGPLOT and create a viewport.
