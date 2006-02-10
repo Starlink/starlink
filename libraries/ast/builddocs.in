@@ -63,6 +63,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/ratemap.c \
             ${srcdir}/region.c \
             ${srcdir}/shiftmap.c \
+            ${srcdir}/sphmap.c \
             ${srcdir}/skyaxis.c \
             ${srcdir}/skyframe.c \
             ${srcdir}/slamap.c \
