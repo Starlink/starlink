@@ -17,6 +17,8 @@ EXTRA_DIST = cshrc.in notinst not_installed icl_login_sys.icl login.in adam_pack
 ## Since these ones haven't been modified by autoconf, we take the 
 ## opportunity to do any non-make-sensitive substitutions here as well.
 
+LD_LIB_PATH = @LD_LIB_PATH@
+
 edit = sed -e 's%@bindir\@%$(bindir)%g' \
            -e 's%@staretcdir\@%$(staretcdir)%g' \
            -e 's%@starhelpdir\@%$(starhelpdir)%g' \
@@ -28,7 +30,8 @@ edit = sed -e 's%@bindir\@%$(bindir)%g' \
            -e 's%@mandir\@%$(mandir)%g' \
            -e 's%@starjavadir\@%$(exec_prefix)/starjava%g' \
            -e 's%@exec_prefix\@%$(exec_prefix)%g' \
-           -e 's%@build\@%$(build)%g'
+           -e 's%@build\@%$(build)%g' \
+           -e 's%@LD_LIB_PATH\@%$(LD_LIB_PATH)%g'
 
 login:  Makefile $(srcdir)/login.in
 	rm -f login login.tmp
