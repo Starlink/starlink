@@ -175,10 +175,12 @@ $(MANIFESTS)/automake: \
 	    fi \
 	  && $(MAKE_CPT)
 
+# Component blt is a configure dependency, so is configurable in place.
 $(MANIFESTS)/blt: \
 		$(MANIFESTS)/tcl \
 		$(MANIFESTS)/tk
 	cd thirdparty/tclsys/blt \
+	  && $(CONFIG_CPT) \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/cat: \
@@ -200,7 +202,7 @@ $(MANIFESTS)/cat: \
 	cd libraries/cat \
 	  && $(MAKE_CPT)
 
-# Component ccdpack has configure dependencies on { itcl tcl tk },
+# Component ccdpack has configure dependencies on { blt itcl tcl tk },
 # which must be built before this component is configured.
 $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/agi \
@@ -1944,6 +1946,7 @@ clean-buildsupport:
 # Configuration dependencies
 # Run 'make configure-deps' to make these components before ./configure
 configure-deps: \
+		$(MANIFESTS)/blt \
 		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/jpeg \
 		$(MANIFESTS)/tcl \
