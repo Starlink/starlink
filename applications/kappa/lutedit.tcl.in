@@ -1,4 +1,6 @@
-#!@AWISH@
+#!/bin/sh    
+# The next line is executed by /bin/sh, but not Tcl \
+exec @AWISH@ $0 ${1+"$@"}
 #+
 #  Name:
 #     LutEdit.tcl
