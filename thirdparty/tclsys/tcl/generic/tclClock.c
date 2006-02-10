@@ -18,6 +18,11 @@
 #include "tclInt.h"
 #include "tclPort.h"
 
+/* this autoconf test fails under Cygwin, so fudge it*/
+#if __CYGWIN__
+#define HAVE_TM_ZONE 1
+#endif
+
 /*
  * The date parsing stuff uses lexx and has tons o statics.
  */
