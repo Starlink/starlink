@@ -1512,6 +1512,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    if test $tcl_cv_ld_search_paths_first = yes; then
 	        LDFLAGS="$LDFLAGS -Wl,-search_paths_first"
 	    fi
+	    LDFLAGS="$LDFLAGS -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    LD_SEARCH_FLAGS=""
 	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
 	    ;;

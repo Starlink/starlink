@@ -8875,7 +8875,7 @@ rm -f conftest*
 	    SHLIB_SUFFIX=".dylib"
 	    DL_OBJS="tclLoadDyld.o"
 	    DL_LIBS=""
-	    LDFLAGS="$LDFLAGS -prebind -Wl,-search_paths_first"
+	    LDFLAGS="$LDFLAGS -prebind -Wl,-search_paths_first -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    LD_SEARCH_FLAGS=""
 	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
 	    CFLAGS_OPTIMIZE="-Os"
