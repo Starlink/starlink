@@ -709,7 +709,7 @@
 %-
 %  History:
 %    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
-%		 words containing special characters and in teletype fonts.
+%                      words containing special characters and in teletype fonts.
 %    27-Feb-89 - AJC - Redefine \manroutine
 %                      Added \manheadstyle
 %                      Switch order of argument descriptors
@@ -4058,7 +4058,7 @@ It is often useful to specify values for some of the attributes of the current
          \sstitem
 
          If no graphical element is specified, (\emph{e.g.} {\att Colour} instead
-	 of {\att Colour(title)}), then all graphical elements are affected.
+         of {\att Colour(title)}), then all graphical elements are affected.
 
       }
    }
@@ -4179,12 +4179,11 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          In some circumstances, numerical labels will be drawn along
-	 internal grid lines instead of at the edges of the plotting
-	 area (see the \htmlattref{Labelling}{Labelling}~ attribute). 
-	 In this case, the {\att Edge} attribute only affects the
-	 placement of the descriptive labels (these are drawn at the
-	 edges of the plotting area, rather than along the axis
-	 lines).
+         internal grid lines instead of at the edges of the plotting
+         area (see the \htmlattref{Labelling}{Labelling}~ attribute). 
+         In this case, the {\att Edge} attribute only affects the
+         placement of the descriptive labels (these are drawn at the
+         edges of the plotting area, rather than along the axis lines).
       }
    }
 }
@@ -4223,7 +4222,7 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          If no graphical element is specified, (\emph{e.g.} {\att Font} instead
-	 of {\att Font(title)}), then all graphical elements are affected.
+         of {\att Font(title)}), then all graphical elements are affected.
       }
    }
 }
@@ -4627,7 +4626,7 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          If no graphical element is specified, (\emph{e.g.} {\att Size} instead
-	 of {\att Size(title)}), then all graphical elements are affected.
+         of {\att Size(title)}), then all graphical elements are affected.
       }
    }
 }
@@ -4668,7 +4667,7 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          If no graphical element is specified, (\emph{e.g.} {\att Style} instead
-	 of {\att Style(border)}), then all graphical elements are affected.
+         of {\att Style(border)}), then all graphical elements are affected.
       }
    }
 }
@@ -4884,7 +4883,7 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          If no graphical element is specified, (\emph{e.g.} {\att Width} instead
-	 of {\att Width(title)}), then all graphical elements are affected.
+         of {\att Width(title)}), then all graphical elements are affected.
 
       }
    }
@@ -6805,7 +6804,7 @@ profiles as before:
    % profile iras incat=prfpos out=iras_prof
 \end{verbatim}
 \normalsize
-	
+
 We now create a FRAME picture occupying the remaining area at the bottom 
 right corner of the page, and display the two profiles in it.  We use
 line style to differentiate the two curves, instead of colour as we
@@ -7893,9 +7892,9 @@ attribute of the sky Frame, we could say:
          relates to motion (or apparent motion) of the source, from the
          superficially similar \htmlattref{Equinox}{Equinox}~ value.  The 
          latter is used to qualify a co-ordinate system which is
-	 itself in motion in a (notionally) predictable way as a
-	 result of being referred to a slowly moving reference plane
-	 (\emph{e.g.} the equator).
+         itself in motion in a (notionally) predictable way as a
+         result of being referred to a slowly moving reference plane
+         (\emph{e.g.} the equator).
 
          \sstitem
          See the description of the \htmlattref{System}{System}~ attribute 
@@ -8005,9 +8004,9 @@ attribute of the sky Frame, we could say:
          (based on solar system reference planes which are in motion),
          from the superficially similar {\att Epoch} value. 
          The latter is used to qualify co-ordinate systems where the
-	 positions of sources change with time (or appear to do so)
-	 for a variety of other reasons, such as aberration of light
-	 caused by the observer's motion, \emph{etc.}
+         positions of sources change with time (or appear to do so)
+         for a variety of other reasons, such as aberration of light
+         caused by the observer's motion, \emph{etc.}
 
          \sstitem
          See the description of the \htmlattref{System}{System}~ attribute 
@@ -8134,21 +8133,20 @@ attribute of the sky Frame, we could say:
          wcsattrib my\_data set format(1) \%10.5G
       }{
          This sets the {\att Format} attribute for axis 1 in the current
-	 co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
-	 are formated as floating point values using a minimum field
-	 width of ten characters, and displaying five significant figures.  An
-	 exponent is used if necessary.
+         co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
+         are formatted as floating point values using a minimum field
+         width of ten characters, and displaying five significant figures.  An
+         exponent is used if necessary.
       }
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
          This sets the {\att Format} attribute for axis 2 in the current
-	 co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis 
-         values
-	 are formated as separate degrees, minutes and seconds field,
-	 separated by blanks.  The seconds field has two decimal places.
-	 This assumes the current co-ordinate Frame in the NDF is a
-	 celestial co-ordinate Frame (\emph{i.e.} a SkyFrame).
+         co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis 
+         values are formated as separate degrees, minutes and seconds field,
+         separated by blanks.  The seconds field has two decimal places.
+         This assumes the current co-ordinate Frame in the NDF is a
+         celestial co-ordinate Frame (\emph{i.e.} a SkyFrame).
       }
    }
    \sstnotes{
@@ -8609,7 +8607,7 @@ attribute of the sky Frame, we could say:
 
             \sstitem
             {\tt "FK4"}: The old FK4 (barycentric) equatorial
-	    co-ordinate system, which should be qualified by an
+            co-ordinate system, which should be qualified by an
             \htmlattref{Equinox}{Equinox}~ value.  The underlying
             model on which this is based is non-inertial and rotates slowly
             with time, so for accurate work FK4 co-ordinate systems should
@@ -8709,10 +8707,10 @@ attribute of the sky Frame, we could say:
 
          }
          The default value for the \htmlattref{Unit}{Unit(axis)}~ attribute
-	 for each system is shown in parentheses.  Note, changes to
-	 the Unit attribute for a SpecFrame will result in the Mapping
-	 from pixel to spectral co-ordinates being modified in order
-	 to reflect the change in units.
+         for each system is shown in parentheses.  Note, changes to
+         the Unit attribute for a SpecFrame will result in the Mapping
+         from pixel to spectral co-ordinates being modified in order
+         to reflect the change in units.
       }
    }
 }
@@ -15645,13 +15643,13 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          AXES = \_LOGICAL (Read)
       }{
          {\tt TRUE} if labelled and annotated axes are to be drawn
-	 around the line plots.  If a null ({\tt{!}}) value is
-	 supplied, the value used is {\tt FALSE} regardless of whether
-	 the plot is being aligned with an existing plot (see
-	 parameter ALIGN) or not.  In general axes only clutter the
-	 plots, although interior tick marks can help read values.
-	 Annotated axes are normally drawn about the exterior axes of
-	 the lower-left plot through the REFAXES parameter.
+         around the line plots.  If a null ({\tt{!}}) value is
+         supplied, the value used is {\tt FALSE} regardless of whether
+         the plot is being aligned with an existing plot (see
+         parameter ALIGN) or not.  In general axes only clutter the
+         plots, although interior tick marks can help read values.
+         Annotated axes are normally drawn about the exterior axes of
+         the lower-left plot through the REFAXES parameter.
 
          Parameter USEAXIS determines the quantity used to annotate the
          horizontal axis.  The width of the margins left for the
@@ -15682,35 +15680,35 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          distinguish the different datasets.
 
          Note, alignment between the two plots is controlled by the
-	 {\att AlignSystem} attribute of the data being displayed.
-	 For instance, if you have an existing plot showing the
-	 spectra in a cube plotted against radio velocity and you
-	 overlay the spectra from another cube, also in radio velocity
-	 but with a different rest frequency, the appearance of the
-	 final plot will depend on the value of the {\att AlignSystem}
-	 attribute of the second spectrum.  If {\att AlignSystem} is
-	 {\tt "Wavelen"} (this is the default), then the two spectra
-	 will be aligned in wavelength, but if {\att AlignSystem} is
-	 {\tt "vrad"} they will be aligned in radio velocity.  There
-	 will be no difference in effect between these two forms of
-	 alignment unless the rest frequency is different in the two
-	 cubes.  Likewise, the {\att AlignStdOfRest} attribute of the
-	 second cube's spectral axis controls the standard of rest in
-	 which alignment occurs.  These attributes (like all other
-	 attributes) may be examined and modified using 
+         {\att AlignSystem} attribute of the data being displayed.
+         For instance, if you have an existing plot showing the
+         spectra in a cube plotted against radio velocity and you
+         overlay the spectra from another cube, also in radio velocity
+         but with a different rest frequency, the appearance of the
+         final plot will depend on the value of the {\att AlignSystem}
+         attribute of the second spectrum.  If {\att AlignSystem} is
+         {\tt "Wavelen"} (this is the default), then the two spectra
+         will be aligned in wavelength, but if {\att AlignSystem} is
+         {\tt "vrad"} they will be aligned in radio velocity.  There
+         will be no difference in effect between these two forms of
+         alignment unless the rest frequency is different in the two
+         cubes.  Likewise, the {\att AlignStdOfRest} attribute of the
+         second cube's spectral axis controls the standard of rest in
+         which alignment occurs.  These attributes (like all other
+         attributes) may be examined and modified using 
          \htmlref{WCSATTRIB}{WCSATTRIB}.
-	 {\tt [}current value{\tt{]}}
+         {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          COMP = LITERAL (Read)
       }{
          The NDF array component to be displayed.  It may be {\tt
-	 "Data"}, {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"}
-	 (where {\tt "Error"} is an alternative to {\tt "Variance"}
-	 and causes the square root of the variance values to be
-	 displayed).  If {\tt "Quality"} is specified, then the
-	 quality values are treated as numerical values (in the range
-	 0 to 255). {\tt ["Data"]}
+         "Data"}, {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"}
+         (where {\tt "Error"} is an alternative to {\tt "Variance"}
+         and causes the square root of the variance values to be
+         displayed).  If {\tt "Quality"} is specified, then the
+         quality values are treated as numerical values (in the range
+         0 to 255). {\tt ["Data"]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)
@@ -15734,14 +15732,14 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          EXTAXES = \_LOGICAL (Read)
       }{
          {\tt TRUE} if labelled and annotated axes are to be drawn
-	 around the spatial grid (\emph{i.e.} external axes).  These
-	 display co-ordinates in the current co-ordinate Frame of the
-	 supplied NDF, and may be changed using application
-	 \htmlref{WCSFRAME}{WCSFRAME} (see also parameter USEAXIS).
-	 The width of the margins left for the annotation may be
-	 controlled using parameter MARGIN.  The appearance of the
-	 axes (colours, founts, \emph{etc.}) can be controlled using
-	 the STYLE parameter.  {\tt [TRUE]}
+         around the spatial grid (\emph{i.e.} external axes).  These
+         display co-ordinates in the current co-ordinate Frame of the
+         supplied NDF, and may be changed using application
+         \htmlref{WCSFRAME}{WCSFRAME} (see also parameter USEAXIS).
+         The width of the margins left for the annotation may be
+         controlled using parameter MARGIN.  The appearance of the
+         axes (colours, founts, \emph{etc.}) can be controlled using
+         the STYLE parameter.  {\tt [TRUE]}
       }
       \sstsubsection{
          FILL = \_LOGICAL (Read)
@@ -15868,15 +15866,15 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          attributes are ignored (no error is reported).
 
          The appearance of the data values is controlled by the
-	 attributes {\att Colour(Curves)}, {\att Width(Curves)},
-	 \emph{etc.} (the synonym {\att Lines} may be used in place of
-	 {\att Curves}).  The appearance of markers used if parameter
-	 MODE is set to {\tt "Point"}, {\tt "Mark"} or {\tt "Chain"}
-	 is controlled by {\att Colour(Markers)}, {\att
-	 Width(Markers)}, \emph{etc.} (the synonym {\att Symbols} may
-	 be used in place of {\att Markers}).  The appearance of the
-	 error symbols is controlled using {\att Colour(ErrBars)},
-	 {\att Width(ErrBars)}, \emph{etc.} (see parameter SHAPE).
+         attributes {\att Colour(Curves)}, {\att Width(Curves)},
+         \emph{etc.} (the synonym {\att Lines} may be used in place of
+         {\att Curves}).  The appearance of markers used if parameter
+         MODE is set to {\tt "Point"}, {\tt "Mark"} or {\tt "Chain"}
+         is controlled by {\att Colour(Markers)}, {\att
+         Width(Markers)}, \emph{etc.} (the synonym {\att Symbols} may
+         be used in place of {\att Markers}).  The appearance of the
+         error symbols is controlled using {\att Colour(ErrBars)},
+         {\att Width(ErrBars)}, \emph{etc.} (see parameter SHAPE).
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -15898,13 +15896,13 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          MARKER = \_INTEGER (Read)
       }{
          This parameter is only accessed if parameter MODE is set to
-	 {\tt "Chain"} or {\tt "Mark"}.  It specifies the symbol with
-	 which each position should be marked, and should be given as
-	 an integer PGPLOT marker type.  For instance, {\tt 0} gives a
-	 box, {\tt 1} gives a dot, {\tt 2} gives a cross, {\tt 3}
-	 gives an asterisk, {\tt 7} gives a triangle. The value must
-	 be larger than or equal to $-31$.  The initial default is
-	 {\tt 11}.  {\tt [}current value{\tt{]}}
+         {\tt "Chain"} or {\tt "Mark"}.  It specifies the symbol with
+         which each position should be marked, and should be given as
+         an integer PGPLOT marker type.  For instance, {\tt 0} gives a
+         box, {\tt 1} gives a dot, {\tt 2} gives a cross, {\tt 3}
+         gives an asterisk, {\tt 7} gives a triangle. The value must
+         be larger than or equal to $-31$.  The initial default is
+         {\tt 11}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          MODE = LITERAL (Read)
@@ -16368,12 +16366,14 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          data to be plotted.   So only small sections are recommended.
 
          \sstitem
-         The Title component in the NDF is used as the default title
-         for the exterior annotated axes.  If the NDF does not have a Title
-         component, then the default title is taken from current
-         co-ordinate Frame in the NDF.  This default may be overridden by
-         specifying a value for the {\att Title} attribute using the STYLE
-         parameter.
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in the NDF is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in the NDF, unless this attribute has not
+         been set explicitly, whereupon the name of the NDF is used as
+         the default title.
 
          \sstitem
          If all the data values at a spatial position are bad, no line
@@ -16407,12 +16407,12 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          second being enclosed in a FRAME picture.
 
          The world co-ordinates in the first DATA picture will be
-	 pixels, and millimetres from the lower-left of the graphics
-	 surface for the grid DATA pictures.  A reference to the
-	 supplied NDF, together with a copy of the WCS information in
-	 the NDF are stored with every DATA picture.  The comment
-	 associated with each grid DATA pictures is a list of the
-	 formatted spatial co-ordinates in the current WCS Frame.
+         pixels, and millimetres from the lower-left of the graphics
+         surface for the grid DATA pictures.  A reference to the
+         supplied NDF, together with a copy of the WCS information in
+         the NDF are stored with every DATA picture.  The comment
+         associated with each grid DATA pictures is a list of the
+         formatted spatial co-ordinates in the current WCS Frame.
 
          On exit  the current database picture for the chosen device
          reverts to the input picture.
@@ -16970,24 +16970,24 @@ XV; PBMPLUS; NETPBM.
 
          \sstitem
          The collapse is always performed along one of the pixel axes,
-	 even if the current Frame in the input NDF is not the PIXEL
-	 Frame. Special care should be taken if the current Frame axes
-	 are not parallel to the pixel axes.  The algorithm used to
-	 choose the pixel axis and the range of values to collapse
-	 along this pixel axis proceeds as follows.
+         even if the current Frame in the input NDF is not the PIXEL
+         Frame. Special care should be taken if the current Frame axes
+         are not parallel to the pixel axes.  The algorithm used to
+         choose the pixel axis and the range of values to collapse
+         along this pixel axis proceeds as follows.
 
          The current Frame co-ordinates of the central pixel in the
-	 input NDF are determined (or some other point if the
-	 co-ordinates of the central pixel are undefined).  Two
-	 current Frame positions are then generated by substituting in
-	 turn into this central position each of the HIGH and LOW
-	 values for the current Frame axis specified by parameter
-	 AXIS.  These two current Frame positions are transformed into
-	 pixel co-ordinates, and the projections of the vector joining
-	 these two pixel positions onto the pixel axes are found.  The
-	 pixel axis with the largest projection is selected as the
-	 collapse axis, and the two end points of the projection
-	 define the range of axis values to collapse.
+         input NDF are determined (or some other point if the
+         co-ordinates of the central pixel are undefined).  Two
+         current Frame positions are then generated by substituting in
+         turn into this central position each of the HIGH and LOW
+         values for the current Frame axis specified by parameter
+         AXIS.  These two current Frame positions are transformed into
+         pixel co-ordinates, and the projections of the vector joining
+         these two pixel positions onto the pixel axes are found.  The
+         pixel axis with the largest projection is selected as the
+         collapse axis, and the two end points of the projection
+         define the range of axis values to collapse.
       }
    }
    \sstdiytopic{
@@ -17830,27 +17830,27 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          reported).
 
          The heading in the key can be changed by setting a value for
-	 the Title attribute (the supplied heading is split into lines
-	 of no more than 17 characters).  The appearance of the
-	 heading is controlled by attributes
-	 \htmlattref{Colour(Title)}{Colour(element)},
-	 \htmlattref{Font(Title)}{Font(element)}, \emph{etc}.  The
-	 appearance of the contour indices is controlled by attributes
-	 \htmlattref{Colour(TextLab)}{Colour(element)},
-	 \htmlattref{Font(TextLab)}{Font(element)}, \emph{etc.} (the
-	 synonym {\att Index} can be used in place of
-	 \htmlattref{TextLab}{TextLab(axis)}). The appearance of the
-	 contour values is controlled by attributes {\att
-	 Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the
-	 synonym {\att Value} can be used in place of 
+         the Title attribute (the supplied heading is split into lines
+         of no more than 17 characters).  The appearance of the
+         heading is controlled by attributes
+         \htmlattref{Colour(Title)}{Colour(element)},
+         \htmlattref{Font(Title)}{Font(element)}, \emph{etc}.  The
+         appearance of the contour indices is controlled by attributes
+         \htmlattref{Colour(TextLab)}{Colour(element)},
+         \htmlattref{Font(TextLab)}{Font(element)}, \emph{etc.} (the
+         synonym {\att Index} can be used in place of
+         \htmlattref{TextLab}{TextLab(axis)}). The appearance of the
+         contour values is controlled by attributes {\att
+         Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the
+         synonym {\att Value} can be used in place of 
          \htmlattref{NumLab}{NumLab(axis)}).
-	 Contour indices are formatted using attributes
-	 \htmlattref{Format(1)}{Format(axis)},
-	 \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc.} (the
-	 synonym {\att Index} can be used in place of value 1).
-	 Contour values are formatted using attributes {\att
-	 Format(2)}, \emph{etc.} (the synonym {\att Value} can be used
-	 in place of the value 2). {\tt [}current value{\tt{]}}
+         Contour indices are formatted using attributes
+         \htmlattref{Format(1)}{Format(axis)},
+         \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc.} (the
+         synonym {\att Index} can be used in place of value 1).
+         Contour values are formatted using attributes {\att
+         Format(2)}, \emph{etc.} (the synonym {\att Value} can be used
+         in place of the value 2). {\tt [}current value{\tt{]}}
 
       }
       \sstsubsection{
@@ -18150,13 +18150,15 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
    \sstnotes{
       \sstitemlist{
 
-         \sstitem
-         The Title component in the NDF is used as the default title for
-         the annotated axes.  If the NDF does not have a Title component, then
-         the default title is taken from current co-ordinate Frame stored in the
-         \htmlref{WCS}{apndf:wcs} component of the NDF.  This
-         default may be overridden by specifying a value for the \htmlattref{Title}{plotel:Title}~
-         attribute using the STYLE parameter.
+         \sstitem 
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in the NDF is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in the NDF, unless this attribute has not
+         been set explicitly, whereupon the name of the NDF is used as
+         the default title.
 
          \sstitem
          The application stores a number of pictures in the graphics
@@ -19088,10 +19090,10 @@ KAPPA: \htmlref{ADD}{ADD},
          SHOWDATA = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, the pixel value within the displayed NDF is
-	 reported for each selected position.  This is only possible if
-	 the picture within which position are being selected contains a
-	 reference to an existing NDF.  The NDF array component to be
-	 displayed is selected via parameter COMP. {\tt [FALSE]}
+         reported for each selected position.  This is only possible if
+         the picture within which position are being selected contains a
+         reference to an existing NDF.  The NDF array component to be
+         displayed is selected via parameter COMP. {\tt [FALSE]}
       }
       \sstsubsection{
          SHOWPIXEL = \_LOGICAL (Read)
@@ -19834,11 +19836,14 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          data.
 
          \sstitem
-         The Title component in the NDF is used as the default title for
-         the annotated axes.  If the NDF does not have a Title component, then
-         the default title is taken from current co-ordinate Frame in the NDF.  This
-         default may be overridden by specifying a value for the 
-         \htmlattref{Title}{plotel:Title}~ attribute using the STYLE parameter.
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in the NDF is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in the NDF, unless this attribute has not
+         been set explicitly, whereupon the name of the NDF is used as
+         the default title.
 
          \sstitem
          The application stores a number of pictures in the graphics
@@ -21600,39 +21605,39 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          \sstitem
             {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}
             CRPIX\textit{i}, CD\textit{i\_j}, and is the system commonly
-	    used by IRAF.  It is described in the document ``World
-	    Coordinate Systems Representations Within the FITS Format''
-	    by R.J.~Hanisch and D.G.~Wells, 1988, available by ftp from
-	    fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
+            used by IRAF.  It is described in the document ``World
+            Coordinate Systems Representations Within the FITS Format''
+            by R.J.~Hanisch and D.G.~Wells, 1988, available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
 
          \sstitem
             {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
             encoding scheme described in the paper ``Representation of
-	    celestial coordinates in FITS'' \newline
+            celestial coordinates in FITS'' \newline
             (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
             {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). \newline
 
             It is very similar to FITS-IRAF but supports a wider range of
-	    projections and co-ordinate systems.  Once the standard has
-	    been agreed, this encoding should be understood by any
-	    FITS-WCS compliant software and it is likely to be adopted
-	    widely for FITS data in future.
+            projections and co-ordinate systems.  Once the standard has
+            been agreed, this encoding should be understood by any
+            FITS-WCS compliant software and it is likely to be adopted
+            widely for FITS data in future.
 
          \sstitem
             {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
             CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc}, 
             as in a previous (now superseded) draft of the above
-	    FITS world co-ordinate system paper by E.W.~Greisen and
-	    M.~Calabretta.
+            FITS world co-ordinate system paper by E.W.~Greisen and
+            M.~Calabretta.
 
          \sstitem
             {\tt "FITS-AIPS"} --- This uses conventions described in the 
             document ``Non-linear Coordinate Systems in AIPS'' by Eric W.
-	    Greisen (revised 9th September, 1994), available by ftp from
-	    fits.cv.nrao.edu {\tt /fits/documents/wcs/aips27.ps.Z}.  It is
-	    currently employed by the AIPS data analysis facility, so its
-	    use will facilitate data exchange with AIPS.  This encoding
-	    uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
+            Greisen (revised 9th September, 1994), available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/aips27.ps.Z}.  It is
+            currently employed by the AIPS data analysis facility, so its
+            use will facilitate data exchange with AIPS.  This encoding
+            uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
             axis rotation and scaling.
 
          \sstitem
@@ -21649,22 +21654,22 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          }
 
          A comma-separated list of up to six values may be supplied, in
-	 which case the value actually used is in the first in the list
-	 for which corresponding keywords can be found in the FITS
-	 header.
+         which case the value actually used is in the first in the list
+         for which corresponding keywords can be found in the FITS
+         header.
 
          A FITS header may contain keywords from more than one of these
-	 encodings, in which case it is possible for the encodings to be
-	 inconsistent with each other.  This may happen for instance if
-	 an application modifies the keyword associated with one encoding
-	 but fails to make equivalent modifications to the others.  If a
-	 null parameter value ({\tt{!}}) is supplied for ENCODINGS, then an
-	 attempt is made to determine the most reliable encoding to use
-	 as follows.  If both native and non-native encodings are
-	 available, then the first non-native encoding to be found which
-	 is inconsistent with the native encoding is used.  If all
-	 encodings are consistent, then the native encoding is used (if
-	 present). {\tt [!]}
+         encodings, in which case it is possible for the encodings to be
+         inconsistent with each other.  This may happen for instance if
+         an application modifies the keyword associated with one encoding
+         but fails to make equivalent modifications to the others.  If a
+         null parameter value ({\tt{!}}) is supplied for ENCODINGS, then an
+         attempt is made to determine the most reliable encoding to use
+         as follows.  If both native and non-native encodings are
+         available, then the first non-native encoding to be found which
+         is inconsistent with the native encoding is used.  If all
+         encodings are consistent, then the native encoding is used (if
+         present). {\tt [!]}
      }
       \sstsubsection{
          FILES() = LITERAL (Read)
@@ -22464,39 +22469,39 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          \sstitem
             {\tt "FITS-IRAF"} --- This uses keywords CRVAL\textit{i}
             CRPIX\textit{i}, CD\textit{i\_j}, and is the system commonly
-	    used by IRAF.  It is described in the document ``World
-	    Coordinate Systems Representations Within the FITS Format''
-	    by R.J.~Hanisch and D.G.~Wells, 1988, available by ftp from
-	    fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
+            used by IRAF.  It is described in the document ``World
+            Coordinate Systems Representations Within the FITS Format''
+            by R.J.~Hanisch and D.G.~Wells, 1988, available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/wcs88.ps.Z}.
 
          \sstitem
             {\tt "FITS-WCS"} --- This is the proposed FITS standard WCS 
             encoding scheme described in the paper ``Representation of
-	    celestial coordinates in FITS'' \newline
+            celestial coordinates in FITS'' \newline
             (\htmladdnormallink{{\tt{http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}}}
             {http://www.cv.nrao.edu/fits/documents/wcs/wcs.html}). \newline
 
             It is very similar to FITS-IRAF but supports a wider range of
-	    projections and co-ordinate systems.  Once the standard has
-	    been agreed, this encoding should be understood by any
-	    FITS-WCS compliant software and it is likely to be adopted
-	    widely for FITS data in future.
+            projections and co-ordinate systems.  Once the standard has
+            been agreed, this encoding should be understood by any
+            FITS-WCS compliant software and it is likely to be adopted
+            widely for FITS data in future.
 
          \sstitem
             {\tt "FITS-PC"} --- This uses keywords CRVAL\textit{i}, 
             CDELT\textit{i}, CRPIX\textit{i}, PC\textit{iiijjj}, \emph{etc}, 
             as in a previous (now superceded) draft of the above
-	    FITS world co-ordinate system paper by E.W.~Greisen and
-	    M.~Calabretta.
+            FITS world co-ordinate system paper by E.W.~Greisen and
+            M.~Calabretta.
 
          \sstitem
             {\tt "FITS-AIPS"} --- This uses conventions described in the 
             document ``Non-linear Coordinate Systems in AIPS'' by Eric W.
-	    Greisen (revised 9th September, 1994), available by ftp from
-	    fits.cv.nrao.edu {\tt /fits/documents/wcs/aips27.ps.Z}.  It is
-	    currently employed by the AIPS data analysis facility, so its
-	    use will facilitate data exchange with AIPS.  This encoding
-	    uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
+            Greisen (revised 9th September, 1994), available by ftp from
+            fits.cv.nrao.edu {\tt /fits/documents/wcs/aips27.ps.Z}.  It is
+            currently employed by the AIPS data analysis facility, so its
+            use will facilitate data exchange with AIPS.  This encoding
+            uses CROTA\textit{i} and CDELT\textit{i} keywords to describe 
             axis rotation and scaling.
 
          \sstitem
@@ -22513,22 +22518,22 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          }
 
          A comma-separated list of up to six values may be supplied, in
-	 which case the value actually used is in the first in the list
-	 for which corresponding keywords can be found in the FITS
-	 header.
+         which case the value actually used is in the first in the list
+         for which corresponding keywords can be found in the FITS
+         header.
 
          A FITS header may contain keywords from more than one of these
-	 encodings, in which case it is possible for the encodings to be
-	 inconsistent with each other.  This may happen for instance if
-	 an application modifies the keyword associated with one encoding
-	 but fails to make equivalent modifications to the others.  If a
-	 null parameter value ({\tt{!}}) is supplied for ENCODINGS, then an
-	 attempt is made to determine the most reliable encoding to use
-	 as follows.  If both native and non-native encodings are
-	 available, then the first non-native encoding to be found which
-	 is inconsistent with the native encoding is used.  If all
-	 encodings are consistent, then the native encoding is used (if
-	 present). {\tt [!]}
+         encodings, in which case it is possible for the encodings to be
+         inconsistent with each other.  This may happen for instance if
+         an application modifies the keyword associated with one encoding
+         but fails to make equivalent modifications to the others.  If a
+         null parameter value ({\tt{!}}) is supplied for ENCODINGS, then an
+         attempt is made to determine the most reliable encoding to use
+         as follows.  If both native and non-native encodings are
+         available, then the first non-native encoding to be found which
+         is inconsistent with the native encoding is used.  If all
+         encodings are consistent, then the native encoding is used (if
+         present). {\tt [!]}
       }
       \sstsubsection{
          FILES() = \_CHAR (Read)
@@ -23693,15 +23698,15 @@ KAPPA: \htmlref{MAKESURFACE}{MAKESURFACE},
       }{
 
          The name of an existing keyword in the FITS extension whose
-	 value is to be reported.  A name may be compound to handle
-	 hierarchical keywords, and it has the form
-	 keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
-	 keywords per \FITSref\ ~card is 20.  Each keyword must be no
-	 longer than 8 characters, and be a valid FITS keyword
-	 comprising only alphanumeric characters, hyphen, and
-	 underscore.  Any lowercase letters are converted to uppercase
-	 and blanks are removed before comparison with the existing
-	 keywords.
+         value is to be reported.  A name may be compound to handle
+         hierarchical keywords, and it has the form
+         keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
+         keywords per \FITSref\ ~card is 20.  Each keyword must be no
+         longer than 8 characters, and be a valid FITS keyword
+         comprising only alphanumeric characters, hyphen, and
+         underscore.  Any lowercase letters are converted to uppercase
+         and blanks are removed before comparison with the existing
+         keywords.
 
          KEYWORD may have an occurrence specified in brackets {\tt []}
          following the name.  This enables the values to be obtained
@@ -25750,10 +25755,10 @@ scaling limits are used for both images.
          If {\tt TRUE} the current picture is cleared before the plot is
          drawn.  If CLEAR is {\tt FALSE} not only is the existing plot
          retained, but also an attempt is made to align the new
-	 picture with the existing picture.  Thus you can generate a
-	 composite plot within a single set of axes, say using
-	 different colours or modes to distinguish data from different
-	 datasets.  {\tt [TRUE]}
+         picture with the existing picture.  Thus you can generate a
+         composite plot within a single set of axes, say using
+         different colours or modes to distinguish data from different
+         datasets.  {\tt [TRUE]}
       }
       \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -27311,16 +27316,16 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          linplot xspec mode=p errbar xsigma=3 ysigma=3 shape=d style=$\wedge$my\_sty
       }{
          This plots the data values versus position for the dataset
-	 called xspec.  Each pixel is plotted as a point surrounded by
-	 diamond-shaped error bars.  The error bars are 3-sigma error
-	 bars.  The plotting style is read from text file {\tt
-	 my\_sty}.  This could, for instance, contain strings such as:
-	 {\tt colour(err)=pink, colour(sym)=red, tickall=0,
-	 edge(2)=right}.  These cause the error bars to be drawn in
-	 pink, the points to be drawn in red, tick marks to be
-	 restricted to the labelled edges of the plot, and the
-	 vertical axis (axis 2) to be annotated on the right-hand edge
-	 of the plot.
+         called xspec.  Each pixel is plotted as a point surrounded by
+         diamond-shaped error bars.  The error bars are 3-sigma error
+         bars.  The plotting style is read from text file {\tt
+         my\_sty}.  This could, for instance, contain strings such as:
+         {\tt colour(err)=pink, colour(sym)=red, tickall=0,
+         edge(2)=right}.  These cause the error bars to be drawn in
+         pink, the points to be drawn in red, tick marks to be
+         restricted to the labelled edges of the plot, and the
+         vertical axis (axis 2) to be annotated on the right-hand edge
+         of the plot.
       }
       \sstexamplesubsection{
          linplot ndf=spectrum noclear align
@@ -27352,11 +27357,14 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
       \sstitemlist{
 
          \sstitem
-         The Title component in the NDF is used as the default title for
-         the annotated axes.  If the NDF does not have a Title component, then
-         the default title is taken from current co-ordinate Frame in the NDF.
-         This default may be overridden by specifying a value for the Title
-         attribute using the STYLE parameter.
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in the NDF is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in the NDF, unless this attribute has not
+         been set explicitly, whereupon the name of the NDF is used as
+         the default title.
 
          \sstitem
          Default axis errors and widths are used, if none are present in
@@ -28799,7 +28807,7 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          where the sum is taken over the entire input array (excluding
          the margins used to pad the input array), \textit{n} is the number of
          values summed, $d$ is the observed data value, $s$ is the simulated
-	 data value based on the current version of the restored array,
+         data value based on the current version of the restored array,
          $\sigma^{2}$ is the variance of the error associated with $d$, 
          and $CHIFAC$ is the value of parameter CHIFAC.  Using 0 for CHIFAC 
          results in the standard expression for $\chi^{2}$.  However, the
@@ -29208,10 +29216,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          \sstitem
          The effects of this command will only be immediately apparent
-	 when run on X windows which have 256 colours (or other similar
-	 pseudocolour devices).  On other devices (for instance, X windows
-	 with more than 256 colours) the effects will only become
-	 apparent when subsequent graphics applications are run.
+         when run on X windows which have 256 colours (or other similar
+         pseudocolour devices).  On other devices (for instance, X windows
+         with more than 256 colours) the effects will only become
+         apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -31764,18 +31772,18 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
 
          \sstitem
          This routine correctly processes the
-	 \htmlref{AXIS}{apndf:axis}, DATA,
-	 \htmlref{QUALITY}{apndf:quality},
-	 \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title},
-	 \htmlref{UNITS}{apndf:units},
-	 \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs},
-	 and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
-	 data structure and propagates all
-	 \htmlref{extensions}{apndf:extensions}.
+         \htmlref{AXIS}{apndf:axis}, DATA,
+         \htmlref{QUALITY}{apndf:quality},
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title},
+         \htmlref{UNITS}{apndf:units},
+         \htmlref{HISTORY}{apndf:history}, \htmlref{WCS}{apndf:wcs},
+         and \htmlref{VARIANCE}{apndf:variance}~ components of an NDF
+         data structure and propagates all
+         \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic
-	 \htmlref{quality masking}{se:qualitymask} are supported.
+         \htmlref{quality masking}{se:qualitymask} are supported.
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can
@@ -32326,11 +32334,14 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstitemlist{
 
          \sstitem
-         The Title component in the NDF is used as the default title for
-         the annotated axes.  If the NDF does not have a Title component, then
-         the default title is taken from current co-ordinate Frame in the NDF.
-         This default may be overridden by specifying a value for the Title
-         attribute using the STYLE parameter.
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in the NDF is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in the NDF, unless this attribute has not
+         been set explicitly, whereupon the name of the NDF is used as
+         the default title.
 
          \sstitem
          The application stores a number of pictures in the graphics
@@ -34190,10 +34201,10 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK}.
 
          \sstitem
          The effects of this command will only be immediately apparent
-	 when run on X windows which have 256 colours (or other similar
-	 pseudocolour devices).  On other devices (for instance, X windows
-	 with more than 256 colours) the effects will only become
-	 apparent when subsequent graphics applications are run.
+         when run on X windows which have 256 colours (or other similar
+         pseudocolour devices).  On other devices (for instance, X windows
+         with more than 256 colours) the effects will only become
+         apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -34279,10 +34290,10 @@ KAPPA: \htmlref{PALENTRY}{PALENTRY},
 
          \sstitem
          The effects of this command will only be immediately apparent
-	 when run on X windows which have 256 colours (or other similar
-	 pseudocolour devices).  On other devices (for instance, X windows
-	 with more than 256 colours) the effects will only become
-	 apparent when subsequent graphics applications are run.
+         when run on X windows which have 256 colours (or other similar
+         pseudocolour devices).  On other devices (for instance, X windows
+         with more than 256 colours) the effects will only become
+         apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -34349,10 +34360,10 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
 
          \sstitem
          The effects of this command will only be immediately apparent
-	 when run on X windows which have 256 colours (or other similar
-	 pseudocolour devices).  On other devices (for instance, X windows
-	 with more than 256 colours) the effects will only become
-	 apparent when subsequent graphics applications are run.
+         when run on X windows which have 256 colours (or other similar
+         pseudocolour devices).  On other devices (for instance, X windows
+         with more than 256 colours) the effects will only become
+         apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -34752,14 +34763,14 @@ KAPPA: \htmlref{PALDEF}{PALDEF},
       \sstitemlist{
          \sstitem
          If any WCS co-ordinate Frame has more axes then the number of
-	 pixel axes in the NDF, then the high numbered surplus axes in
-	 the WCS Frame are left unchanged.
+         pixel axes in the NDF, then the high numbered surplus axes in
+         the WCS Frame are left unchanged.
 
          \sstitem
          If any WCS co-ordinate Frame has fewer axes then the number of
-	 pixel axes in the NDF, then the Frame is left unchanged if the
-	 specified permutation would change any of the high numbered
-	 surplus pixel axes.  A warning message is issued if this occurs.
+         pixel axes in the NDF, then the Frame is left unchanged if the
+         specified permutation would change any of the high numbered
+         surplus pixel axes.  A warning message is issued if this occurs.
       }
    }
    \sstdiytopic{
@@ -36968,16 +36979,16 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{
          The NDF containing the fitted point-spread function evaluated
          at each pixel.  If null, {\tt{!}}, is entered no output NDF will
-	 be created.  The dimensions of the array are controlled by
-	 parameter CUT.  The pixel origin is chosen to align the model PSF
-	 with the first fitted star in pixel co-ordinates, thus allowing
-	 the NDF holding the model PSF to be compared directly with the
-	 input NDF.  A \htmlref{WCS}{apndf:wcs} component is stored in the output NDF holding a
-	 copy of the input WCS component.  An additional Frame with Domain
-	 name OFFSET is added, and is made the current Frame.  This Frame
-	 measures the distance from the PSF centre in the units in which
-	 the FWHM is reported.  These changes allows the NDF holding the
-	 model PSF to be compared directly with the input NDF. {\tt [!]}
+         be created.  The dimensions of the array are controlled by
+         parameter CUT.  The pixel origin is chosen to align the model PSF
+         with the first fitted star in pixel co-ordinates, thus allowing
+         the NDF holding the model PSF to be compared directly with the
+         input NDF.  A \htmlref{WCS}{apndf:wcs} component is stored in the output NDF holding a
+         copy of the input WCS component.  An additional Frame with Domain
+         name OFFSET is added, and is made the current Frame.  This Frame
+         measures the distance from the PSF centre in the units in which
+         the FWHM is reported.  These changes allows the NDF holding the
+         model PSF to be compared directly with the input NDF. {\tt [!]}
       }
       \sstsubsection{
          POSCOLS = \_INTEGER (Read)
@@ -43066,23 +43077,23 @@ KAPPA: \htmlref{ADD}{ADD},
          \htmlattref{Font(Strings)}{Font(element)}; the 
          synonym {\att Text} can be used in place of {\att Strings}).  Note, the 
          \htmlattref{Size}{Size(element)}~ attribute specifies the size of key
-	 text relative to the size of the numerical labels on the vector-map
-	 axes.  Thus a value of {\tt 2.0} for {\att Size} will result in text which is
-	 twice the size of the numerical axis labels. The appearance of the
-	 example vector is controlled using {\att Curve} attributes
-	 (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym {\att Vector} can be
-	 used in place of {\att Curves}).  The numerical scale value is
-	 formatted as an axis 1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
-	  \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym {\att Scale} can be used in
-	 place of the value 1).  The length of the example vector is formatted
-	 as an axis 2 value (using attribute {\att Format(2)}, \emph{etc}; the
-	 synonym {\att Vector} can be used in place of the value 2).  The
-	 vertical space between lines in the key can be controlled using
-	 attribute \htmlattref{TextLabGap}{TextLabGap(axis)}.  A value of {\tt 1.0} is used if no
-	 value is set for this attribute, and produces default vertical
-	 spacing. Values larger than 1.0 increase the vertical space, and
-	 values less than 1.0 decrease the vertical space. {\tt [}current
-	 value{\tt{]}}
+         text relative to the size of the numerical labels on the vector-map
+         axes.  Thus a value of {\tt 2.0} for {\att Size} will result in text which is
+         twice the size of the numerical axis labels. The appearance of the
+         example vector is controlled using {\att Curve} attributes
+         (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym {\att Vector} can be
+         used in place of {\att Curves}).  The numerical scale value is
+         formatted as an axis 1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
+          \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym {\att Scale} can be used in
+         place of the value 1).  The length of the example vector is formatted
+         as an axis 2 value (using attribute {\att Format(2)}, \emph{etc}; the
+         synonym {\att Vector} can be used in place of the value 2).  The
+         vertical space between lines in the key can be controlled using
+         attribute \htmlattref{TextLabGap}{TextLabGap(axis)}.  A value of {\tt 1.0} is used if no
+         value is set for this attribute, and produces default vertical
+         spacing. Values larger than 1.0 increase the vertical space, and
+         values less than 1.0 decrease the vertical space. {\tt [}current
+         value{\tt{]}}
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -43221,12 +43232,14 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstitemlist{
 
          \sstitem
-         The \htmlref{Title}{apndf:title}~ component in NDF1 is used as the
-         default title for the annotated axes.  If the NDF does not have a
-         Title component, then the default title is taken from current 
-         co-ordinate Frame stored in the \htmlref{WCS}{apndf:wcs} component 
-         of the NDF.  This default may be overridden by specifying
-         a value for the \htmlattref{Title}{plotel:Title}~ attribute using the STYLE parameter.
+         If no \htmlattref{Title}{plotel:Title}~ is specified via the
+         STYLE parameter, then the \htmlref{TITLE}{apndf:title}
+         component in NDF1 is used as the default title for the
+         annotated axes.  Should the NDF not have a TITLE component,
+         then the default title is instead taken from current
+         co-ordinate Frame in NDF1, unless this attribute has not
+         been set explicitly, whereupon the name of NDF1 is used as
+         the default title.
 
          \sstitem
          The application stores a number of pictures in the 
@@ -43597,14 +43610,14 @@ plot (7k).
          attrs="'system=wave,unit=Angstrom'"
       }{
          This example assumes the NDF called speca has an Axis
-	 structure describing wavelength in Angstroms.  It adds a
-	 corresponding \xref{SpecFrame}{sun210}{SpecFrame}~ into the
-	 WCS component of the NDF.  The SpecFrame is connected to the
-	 Frame describing the NDF Axis structure using a unit Mapping.
-	 Subsequently, \htmlref{WCSATTRIB}{WCSATTRIB} can be used to
-	 modify the SpecFrame so that it describes the spectral-axis
-	 value in some other system (frequency, velocities of various
-	 forms, energy, wave number, \emph{etc.}).
+         structure describing wavelength in Angstroms.  It adds a
+         corresponding \xref{SpecFrame}{sun210}{SpecFrame}~ into the
+         WCS component of the NDF.  The SpecFrame is connected to the
+         Frame describing the NDF Axis structure using a unit Mapping.
+         Subsequently, \htmlref{WCSATTRIB}{WCSATTRIB} can be used to
+         modify the SpecFrame so that it describes the spectral-axis
+         value in some other system (frequency, velocities of various
+         forms, energy, wave number, \emph{etc.}).
       }
       \sstexamplesubsection{
          wcsadd ngc5128 pixel old\_pixel unit
@@ -43987,13 +44000,13 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          SombCos and Gauss methods.
 
          PARAMS(1) is required by all the above schemes. It is used to
-	 specify how many pixels are to contribute to the interpolated
-	 result on either side of the interpolation or binning point
-	 in each dimension.  Typically, a value of {\tt 2} is
-	 appropriate and the minimum allowed value is {\tt 1}
-	 (\emph{i.e.} one pixel on each side).  A value of zero or
-	 fewer indicates that a suitable number of pixels should be
-	 calculated automatically. {\tt [0]}
+         specify how many pixels are to contribute to the interpolated
+         result on either side of the interpolation or binning point
+         in each dimension.  Typically, a value of {\tt 2} is
+         appropriate and the minimum allowed value is {\tt 1}
+         (\emph{i.e.} one pixel on each side).  A value of zero or
+         fewer indicates that a suitable number of pixels should be
+         calculated automatically. {\tt [0]}
 
          PARAMS(2) is required only by the Gauss, SombCos, SincSinc,
          SincCos, and SincGauss schemes.  For the SombCos, SincSinc and
@@ -48697,24 +48710,24 @@ The following applications have been modified:
          \begin{itemize}
 
             \item Positions can now be read from and written to position
-	    list catalogues such as created by CURSOR and LISTMAKE.
+            list catalogues such as created by CURSOR and LISTMAKE.
 
             \item All positions, both given by the user and returned by
-	    the program, now refer to the Current Frame of the NDF.
+            the program, now refer to the Current Frame of the NDF.
 
             \item Either the initial or final positions may now be marked
-	    on the screen (see parameter MARK).
+            on the screen (see parameter MARK).
 
             \item There is now much greater control over the appearance
-	    of any annotation draw over the screen.  This is provided
-	    through the PLOTSTYLE parameter which allow plotting
-	    attributes to be set.
+            of any annotation draw over the screen.  This is provided
+            through the PLOTSTYLE parameter which allow plotting
+            attributes to be set.
 
             \item The error on the final position is now returned in
-	    parameters XERR and YERR.
+            parameters XERR and YERR.
 
             \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
                \begin{description}
                   \item[COSYS] -- Use application WCSFRAME to set the required
@@ -48722,43 +48735,43 @@ The following applications have been modified:
                \end{description}
 
             \item The following new parameters have been added: DESCRIBE,
-	    ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, \htmlref{TITLE}{apndf:title},
-	    XERR, YERR.
+            ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, \htmlref{TITLE}{apndf:title},
+            XERR, YERR.
 
             \item The following parameters have been modified:
                \begin{description}
 
                   \item[CENTRE] -- This is now a string parameter in
-		  which is returned the formatted co-ordinates of the
-		  last centroid position, in the current Frame of the
-		  NDF.
+                  which is returned the formatted co-ordinates of the
+                  last centroid position, in the current Frame of the
+                  NDF.
 
                   \item[INIT] -- This is now a string parameter which
-		  should be given the co-ordinates of the initial guess
-		  in the Current Frame of the NDF.
+                  should be given the co-ordinates of the initial guess
+                  in the Current Frame of the NDF.
 
                   \item[MARK] -- Now indicates whether the initial or
-		  final positions should be marked on the screen.
+                  final positions should be marked on the screen.
 
                   \item[MODE] -- Now accepts the extra value "Catalogue".
 
                   \item[XCEN,YCEN] -- These are now string parameters
-		  which return the formatted \textit{x} and \textit{y} co-ordinates of the
-		  last centroid position, in the current Frame of the
-		  NDF.
+                  which return the formatted \textit{x} and \textit{y} co-ordinates of the
+                  last centroid position, in the current Frame of the
+                  NDF.
 
                \end{description}
          \end{itemize}
 
       \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
          A bug has been fixed which could produce incorrect WCS
-	 co-ordinates in the output NDF if the lower bounds of the input
-	 NDF were not (1,~1).
+         co-ordinates in the output NDF if the lower bounds of the input
+         NDF were not (1,~1).
 
       \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
          A bug has been fixed which could produce incorrect WCS
-	 co-ordinates in the output NDF if the lower bounds of the input
-	 NDF were not (1,~1).
+         co-ordinates in the output NDF if the lower bounds of the input
+         NDF were not (1,~1).
 
       \item [\xref{CONTOVER}{sun239}{CONTOVER}] \mbox{}
          CONTOVER has been scheduled for withdrawl at the next release of
@@ -48882,15 +48895,15 @@ The following applications have been modified:
          \begin{itemize}
 
             \item The annotation placed around the colour ramp can now be
-	    controlled in much greater detail using the new STYLE
-	    parameter.
+            controlled in much greater detail using the new STYLE
+            parameter.
 
             \item If MODE={\tt "XY"}, the bounds of the area occupied by the colour 
             ramp and annotation can be specified in a variety of co-ordinate
             systems (specified by the new parameter FRAME).
 
             \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
                \begin{description}
 
@@ -48927,42 +48940,42 @@ The following applications have been modified:
          \begin{itemize}
 
             \item The appearance of the annotated axes can now be
-	    controlled in much greater detail using the new STYLE
-	    parameter.
+            controlled in much greater detail using the new STYLE
+            parameter.
 
             \item The horizontal axis may now be annotated with values
-	    from one of the axes in the Current co-ordinate Frame of the
-	    NDF (see new parameter USEAXIS).
+            from one of the axes in the Current co-ordinate Frame of the
+            NDF (see new parameter USEAXIS).
 
             \item The appearance of the data curves (colour, line style,
-	    line width, \emph{etc.}) can now be specified individually using the
-	    new PENS and MODE parameters.
+            line width, \emph{etc.}) can now be specified individually using the
+            new PENS and MODE parameters.
 
             \item Vertical error bars can now be displayed if the
-	    supplied NDF has a Variance component (see new parameter
-	    ERRBAR).
+            supplied NDF has a Variance component (see new parameter
+            ERRBAR).
 
             \item If the display is not cleared (using parameter CLEAR),
-	    then an attempt is made to align the new plot with any
-	    existing plot.
+            then an attempt is made to align the new plot with any
+            existing plot.
 
             \item The vertical and horizontal position of the key can now
-	    be controlled using new parameter KEYPOS, and its appearance
-	    can be controlled using new parameter KEYSTYLE.
+            be controlled using new parameter KEYPOS, and its appearance
+            can be controlled using new parameter KEYSTYLE.
 
             \item The strings which which to label the data curves can
             now be given explicitly using new parameter LABELS. 
 
             \item Whether or not vertical offset markers are drawn for
-	    each curve is now controlled by the new parameter ZMARK.
+            each curve is now controlled by the new parameter ZMARK.
 
             \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
                \begin{description}
 
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-		  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
                   \item[FONT] -- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
 
@@ -48981,7 +48994,7 @@ The following applications have been modified:
                   \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
                   \item[PXSIZE] -- Create the picture first using PICDEF,
-		  the required picture size using the SIZE.
+                  the required picture size using the SIZE.
 
                   \item[PYSIZE] -- See PXSIZE.
 
@@ -48989,7 +49002,7 @@ The following applications have been modified:
                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
 
                   \item[XLOG] -- Logarithmic \textit{x} axes are not currently
-		  supported.
+                  supported.
 
                   \item[YLIMIT] -- Use new parameters YBOT and YTOP.
 
@@ -49096,20 +49109,20 @@ The following applications have been modified:
                \end{itemize}
 
             \item The appearance of the annotated axes can now be
-	    controlled in much greater detail using the new STYLE
-	    parameter.
+            controlled in much greater detail using the new STYLE
+            parameter.
 
             \item If the display is not cleared (using parameter CLEAR),
-	    then an attempt is made to align the new plot with any
-	    existing plot.
+            then an attempt is made to align the new plot with any
+            existing plot.
 
             \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
                \begin{description}
 
                   \item[ABSLAB] -- Use the STYLE parameter to specify a
-		  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
 
                   \item[COSYS] -- Use application WCSFRAME to set the required
                                   co-ordinate Frame first.
@@ -49126,7 +49139,7 @@ The following applications have been modified:
                   \item[PLTITL] -- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
 
                   \item[PXSIZE] -- Create the picture first using PICDEF,
-		  the required picture size using the SIZE.
+                  the required picture size using the SIZE.
 
                   \item[PYSIZE] -- See PXSIZE.
 
@@ -49149,18 +49162,18 @@ The following applications have been modified:
 
                   \item[OUT] -- The pixel origin is no longer [1,1].
                   Instead, the pixel bounds are chosen to align the model
-		  PSF with the first fitted star in pixel co-ordinates.
-		  As a consequence, the PSF centre may not be exactly at
-		  the centre of the output image (it will, however, still
-		  be within one pixel of the centre).  A WCS component is
-		  stored in the output NDF holding a copy of the input
-		  WCS component.  An additional Frame with Domain name
-		  OFFSET is added, and is made the current Frame.  This
-		  Frame measures the distance from the PSF centre in the
-		  units in which the FWHM is reported.  These changes
-		  allows the model PSF to be aligned with the input NDF
-		  for comparison purposes, using WCSALIGN, CONTOUR,
-   		  \emph{etc}.  Also, the output NDF is now created with
+                  PSF with the first fitted star in pixel co-ordinates.
+                  As a consequence, the PSF centre may not be exactly at
+                  the centre of the output image (it will, however, still
+                  be within one pixel of the centre).  A WCS component is
+                  stored in the output NDF holding a copy of the input
+                  WCS component.  An additional Frame with Domain name
+                  OFFSET is added, and is made the current Frame.  This
+                  Frame measures the distance from the PSF centre in the
+                  units in which the FWHM is reported.  These changes
+                  allows the model PSF to be aligned with the input NDF
+                  for comparison purposes, using WCSALIGN, CONTOUR,
+                     \emph{etc}.  Also, the output NDF is now created with
                   the same type as the input NDF.
 
                \end{description}
@@ -49411,21 +49424,20 @@ The following applications have been modified:
          picture is now writen to an output parameter.
 
          \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
             \begin{description}
                \item[NCX1, NCX2, etc.] -- Set FRAME={\tt "BASEPIC"} and use X1, 
-                               X2, \emph{etc.}, remembering that NCX1
-				  \emph{etc.} referred to a Frame in
-				  which the longer axis had unit length,
-				  where-as the \emph{shorter} axis has unit
-				  length in the BASEPIC Frame .
+                   X2, \emph{etc.}, remembering that NCX1 \emph{etc.} 
+                   referred to a Frame in which the longer axis had 
+                   unit length, where-as the \emph{shorter} axis has 
+                   unit length in the BASEPIC Frame .
                \item[WCX1, WCX2, etc.] -- Set FRAME=! and use X1, X2,
-                               \emph{etc.}
+                   \emph{etc.}
             \end{description}
 
          \item The following new parameters have been added: DESCRIBE,
-	    EPOCH, FRAME, STYLE.
+            EPOCH, FRAME, STYLE.
 
       \end{itemize}
 
@@ -49452,7 +49464,7 @@ The following applications have been modified:
             necessarily be pixel co-ordinates.
 
             \item Pixel positions can now be supplied in a positions list
-	    catalogue such as created by CURSOR, LISTMAKE, \emph{etc}.
+            catalogue such as created by CURSOR, LISTMAKE, \emph{etc}.
 
             \item The WHERE parameter has been renamed as MODE, and the 
             FILENAME parameter has been renamed as INFILE.
@@ -49525,7 +49537,7 @@ The following applications have been modified:
          parameter.
 
          \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
             \begin{description}
                \item[AXES] -- Use new parameter USEAXIS.  Note, if the
@@ -49595,7 +49607,7 @@ The following applications have been modified:
          parameter.
 
          \item The following parameters have been removed
-	    (alternatives to using these old parameters are indicated):
+            (alternatives to using these old parameters are indicated):
 
             \begin{description}
                \item[COSYS] -- Use application WCSFRAME to set the required 
@@ -49682,9 +49694,9 @@ The following applications have been modified:
    \item [\htmlref{WCSATTRIB}{WCSATTRIB}] \mbox{} 
       \begin{itemize} 
          \item WCSATTRIB now reports an error if an attempt is made to
-	       change attribute values in any of the Frames which are
-	       managed internally by the NDF library (that is, Frames
-	       with Domains PIXEL, AXIS and GRID).  The exception to this
+               change attribute values in any of the Frames which are
+               managed internally by the NDF library (that is, Frames
+               with Domains PIXEL, AXIS and GRID).  The exception to this
                is that the \htmlattref{Domain}{Domain}~ attribute itself may 
                be changed, thereby adding a new Frame to the WCS component.
       \end{itemize}
@@ -49752,10 +49764,10 @@ The following applications have been modified:
          \item The PALNUM and POICOL parameters have been removed.  Use the
          new STYLE parameter instead.
          \item Three new options have been added for parameter OPTION:
-	 {\tt "Undo"} removes the changes in the list of regions produced by
-	 the previous command; {\tt "Draw"} draw the outline of the union of
-	 a specified selection of regions; `style' allows the plotting
-	 style to be changed.
+         {\tt "Undo"} removes the changes in the list of regions produced by
+         the previous command; {\tt "Draw"} draw the outline of the union of
+         a specified selection of regions; `style' allows the plotting
+         style to be changed.
       \end{itemize}
 
    \item [\htmlref{ARDMASK}{ARDMASK}] \mbox{}
@@ -49981,7 +49993,7 @@ device is (0,~0) at the bottom left corner and (1,~1) at the top right
 corner.  The name ``NDC'' can now be used with applications such as 
 \htmlref{GDSTATE}{GDSTATE}.
 
-\item Applicatons which read positions lists from catalogue files can now
+\item Applications which read positions lists from catalogue files can now
 read lists from catalogues which do not contain a WCS FrameSet.  If no WCS
 FrameSet is found, then a search is made for columns called ``RA'' and
 ``DEC''.  If these columns are found, they are used (is possible), and
@@ -50296,17 +50308,17 @@ The following applications have been modified:
       \begin{itemize}
          \item When using the median estimator, output variances can now 
                be produced for any size of input image.  Previously
-	       COLLAPSE crashed if the median estimator was used to
-	       process large input images containing variance
-	       information.  This was due to the excesive memory
-	       requirements needed to store the order statistics
-	       variance-covariance array.  Now, if each output value
-	       combines more than 300 input values, the output variance
-	       is estimated as $\pi/2$ times the variance on the weighted
-	       mean of the input values.  If each output value combines
-	       less than 300 input values, the output variance is
-	       calculated as before using the order statistics
-	       variance-covariance array.
+               COLLAPSE crashed if the median estimator was used to
+               process large input images containing variance
+               information.  This was due to the excesive memory
+               requirements needed to store the order statistics
+               variance-covariance array.  Now, if each output value
+               combines more than 300 input values, the output variance
+               is estimated as $\pi/2$ times the variance on the weighted
+               mean of the input values.  If each output value combines
+               less than 300 input values, the output variance is
+               calculated as before using the order statistics
+               variance-covariance array.
       \end{itemize}
 
    \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
@@ -50481,10 +50493,10 @@ The following applications have been modified:
       \begin{itemize}
          \item A list of the input NDFs may now be given as a group
          through parameter IN, permitting indirection through a text
-	 file.  The first NDF is the base, and subsequent NDFs are
-	 pasted in the order supplied.  The former method, where IN
-	 solely defines the base NDF and the pasted NDFs are specified
-	 through parameters P1 to P25, is still available. 
+         file.  The first NDF is the base, and subsequent NDFs are
+         pasted in the order supplied.  The former method, where IN
+         solely defines the base NDF and the pasted NDFs are specified
+         through parameters P1 to P25, is still available. 
       \end{itemize}
 
    \item [\htmlref{REGRID}{REGRID} and \htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
