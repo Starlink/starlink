@@ -82,7 +82,7 @@ LDFLAGS=$my_save_LDFLAGS
 # Dependencies must be on one line
 STAR_DECLARE_DEPENDENCIES([build], [ard ast blt chr cnf fio generic grp hds idi ifd itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
 STAR_DECLARE_DEPENDENCIES([build], [agi blt graphpar img pda ref shl sla startcl],[link])
-STAR_DECLARE_DEPENDENCIES(configure, [itcl tcl tk])
+STAR_DECLARE_DEPENDENCIES(configure, [itcl tcl tk blt])
 
 STAR_LATEX_DOCUMENTATION([sun139])
 
