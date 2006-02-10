@@ -718,6 +718,12 @@
 *        Ignore blank titles supplied in STYLE.
 *     6-FEB-2006 (DSB):
 *        Use KPG1_ASTTL to get the title.
+*     2006 February 9 (MJC):
+*        Call KPG1_PXDPD with newish extra arguments.  Compare chosen
+*        CENTRE with its dynamic default, and revert to supplied bounds
+*        (as opposed to those derived from the transformed CENTRE
+*        co-ordinates) to avoid rounding losing a row/and or a line
+*        from the plot.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -788,7 +794,7 @@
                                ! corner
       DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
       INTEGER BUBND( NDIM + 1 ) ! Upper bounds of the error-bar array
-      DOUBLE PRECISION CC( NSPDIM ) ! Current Frame co-ords at image 
+      DOUBLE PRECISION CC( NSPDIM ) ! Current-Frame co-ords at image 
                                ! centre
       INTEGER CFRM             ! Original current-Frame pointer
       INTEGER CFRMI            ! Image current-Frame pointer
@@ -796,8 +802,13 @@
       LOGICAL CLEAR            ! Clear plotting surface?
       CHARACTER COMENT*( 42 )  ! Picture comment (42=2+XCOTXT+YCOTXT)
       CHARACTER COMP*( 8 )     ! Component to be displayed
+      LOGICAL DEFGRD           ! Use default GRID co-ordinates?
       REAL DEFMAR              ! Default MARGIN value
       LOGICAL DEVCAN           ! Cancel DEVICE parameter?
+      DOUBLE PRECISION DCC( NSPDIM ) ! Default current-Frame co-ords at
+                               ! image centre
+      DOUBLE PRECISION DGC( NDIM ) ! Default GRID co-ords at image 
+                               ! centre
       INTEGER DIMS( NDIM )     ! Dimensions of input array
       CHARACTER* ( 9 ) DOMAIN  ! Domain element
       INTEGER DPFS             ! FrameSet connecting old and new 
@@ -1626,16 +1637,16 @@
       XTENT = REAL( DIMS( SPAXIS( 1 ) ) ) * XWMAG
       YTENT = REAL( DIMS( SPAXIS( 2 ) ) ) * YWMAG
 
-*  Get the GRID co-ordinates at the centre of the supplied NDF.  GRID
-*  co-ordinates are (1.0,1.0) at the centre of the first pixel.
-      GC( SPAXIS( 1 ) ) = ( 1.0D0 + DBLE( DIMS( SPAXIS( 1 ) ) ) ) / 
-     :                    2.0D0
-      GC( SPAXIS( 2 ) ) = ( 1.0D0 + DBLE( DIMS( SPAXIS( 2 ) ) ) ) /
-     :                    2.0D0
-      GC( LPAXIS ) = ( 1.0D0 + DBLE( DIMS( LPAXIS ) ) ) / 2.0D0
+*  Set the default GRID co-ordinates at the centre of the supplied NDF. 
+*  GRID co-ordinates are (1.0,1.0) at the centre of the first pixel.
+      DGC( SPAXIS( 1 ) ) = ( 1.0D0 + DBLE( DIMS( SPAXIS( 1 ) ) ) ) / 
+     :                     2.0D0
+      DGC( SPAXIS( 2 ) ) = ( 1.0D0 + DBLE( DIMS( SPAXIS( 2 ) ) ) ) /
+     :                     2.0D0
+      DGC( LPAXIS ) = ( 1.0D0 + DBLE( DIMS( LPAXIS ) ) ) / 2.0D0
 
 *  Convert these into the Current Frame of the NDF. 
-      CALL AST_TRANN( IWCSI, 1, NSPDIM, 1, GC, .TRUE., NSPDIM,
+      CALL AST_TRANN( IWCSI, 1, NSPDIM, 1, DGC, .TRUE., NSPDIM,
      :                1, CC, STATUS )
 
 *  Try to convert these back to grid.  The current Frame is not suitable
@@ -1669,6 +1680,11 @@
      :       CC( SPAXIS( 2 ) ) .NE. AST__BAD ) .OR.
      :     STATE .EQ. PAR__ACTIVE ) THEN
 
+* Record the dynamic-default centre co-ordinates.
+         DO I = 1, NSPDIM
+            DCC( I ) = CC( I )
+         END DO
+
 *  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
 *  centre of the picture using parameter CENTRE.  Use the Current Frame 
 *  co-ordinates at the centre of the image as the dynamic default (they 
@@ -1677,6 +1693,31 @@
 *  GRID Frame in our case) of the supplied FrameSet.  These GRID 
 *  co-ordinates are returned in GC.
          CALL KPG1_GTPOS( 'CENTRE', IWCSI, .TRUE., CC, GC, STATUS )
+
+*  When the default values are accepted the user wants the region 
+*  given by the supplied bounds to be plotted.  The transformations
+*  can lead to slight rounding errors that can eventually lead to a 
+*  row and/or a column from not being displayed.  So we test the
+*  returned centre co-ordinates against the default values.  If these
+*  are the same we adopt the original grid centres, not those
+*  computed from the mappings to and from the current co-ordinates.
+*  The rounding appears to be typically around dex(-14), so use a
+*  conservative limit.  We seek whole spatial pixels, so even
+*  VAL__EPSR defines a reasonable check.
+         DEFGRD = .FALSE.
+
+         DO I = 1, NSPDIM
+            DEFGRD = DEFGRD .OR. 
+     :               ABS( DCC( I ) - CC( I ) ) .LE. DBLE( VAL__EPSR )
+         END DO
+
+* Revert to the original GRID centres corresponding to the supplied
+* bounds.
+         IF ( DEFGRD ) THEN
+            DO I = 1, NSPDIM
+               GC( I ) = DGC( I )
+            END DO
+         END IF
       END IF
 
 *  Find the corresponding upper and lower bounds in GRID co-ordinates.
@@ -1694,7 +1735,7 @@
 *  Find the pixel index bounds of the NDF section.  Now we only want
 *  whole pixels, so the floor and ceilings are switched from their
 *  normal inclusive sense.  However, this can lead to inverted bounds;
-*  abort in this case of excesive magnification.
+*  abort in this case of excessive magnification.
       WILBND( 1 ) = KPG1_CEIL( PCLBND( 1 ) ) + 1
       WIUBND( 1 ) = KPG1_FLOOR( PCUBND( 1 ) )
       WILBND( 2 ) = KPG1_CEIL( PCLBND( 2 ) ) + 1
@@ -2285,7 +2326,8 @@
          NDUP = EL / AEL
          CALL PSX_CALLOC( EL, '_DOUBLE', IPXCEF, STATUS )
 
-         CALL KPG1_PXDPD( AEL, %VAL( CNF_PVAL( IPXCEN ) ), NDUP, EL,
+         CALL KPG1_PXDPD( AEL, %VAL( CNF_PVAL( IPXCEN ) ), NDUP, 
+     :                    .FALSE., EL, %VAL( CNF_PVAL( IPXCEF ) ),
      :                    %VAL( CNF_PVAL( IPXCEF ) ), STATUS )
 
 *  Find suitable default values for YTOP and YBOT.
