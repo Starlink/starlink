@@ -67,6 +67,8 @@
 *        array applicable to output pixels.  Remove the WIDTHS now that
 *        the AIPS++ definition is agreed to be wrong.  Incorporate the
 *        inverse data variance in the weights.
+*     2006 February 9 (MJC):
+*        Correct normalisation of the returned variances.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -180,8 +182,8 @@
             RESULT( I ) = M1
             VARNCE = ( SUMSQ - M1 * M1 * DBLE( NGOOD ) ) / SUMW
             IF ( VARNCE .GT. 0.0D0 ) THEN
-               RESVAR( I ) = NUM_DTO<T>( SQRT( VARNCE / 
-     :                                   DBLE( NGOOD - 1 ) ) )
+               RESVAR( I ) = NUM_DTO<T>( VARNCE * DBLE( NGOOD ) / 
+     :                                   DBLE( NGOOD - 1 ) )
             ELSE
                RESULT( I ) = VAL__BAD<T>
             END IF
