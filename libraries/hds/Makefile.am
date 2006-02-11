@@ -44,7 +44,7 @@ dat_par_h_DEPENDENCIES = hds_types.h hds1_types.h
 dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h
 
 hds_test_SOURCES = hds_test.f
-hds_test_LDADD = libhds.la libhdsf.la `ems_link` `chr_link`
+hds_test_LDADD = libhdsf.la libhds.la `ems_link` `chr_link`
 
 hdsTest_SOURCES = hdsTest.c
 hdsTest_LDADD = libhds.la `ems_link` `cnf_link`
