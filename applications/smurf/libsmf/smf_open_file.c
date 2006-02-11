@@ -118,13 +118,13 @@
 void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status) {
 
-  char dtype[NDF__SZTYP];    /* String for DATA type */
+  char dtype[NDF__SZTYP+1];    /* String for DATA type */
   int indf;                  /* NDF identified for input file */
   int ndfdims[NDF__MXDIM];   /* Array containing size of each axis of array */
   int ndims;                 /* Number of dimensions in data */
   int qexists;               /* Boolean flag for presence of QUALITY component */
   int vexists;               /* Boolean flag for presence of VARIANCE component */
-  char filename[GRP__SZNAM]; /* Input filename, derived from GRP */
+  char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
   char *pname;               /* Pointer to input filename */
   void *outdata[] = { NULL, NULL, NULL }; /* Array of pointers to
 					     output data components:
