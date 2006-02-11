@@ -212,7 +212,13 @@ datMove(HDSLoc **locator1,
 
 /* Component list now empty ?   */
 
-   if (ncomp == 0)
+   if (ncomp < 0) {
+     *status = DAT__INCHK;
+     hds_gl_status = *status;
+     emsRep(context_name, context_message " Negative component count.",
+	    status );
+   } 
+   else if (ncomp == 0)
    {
 /*    If it is, then first delete the component record, stick a handle on
       the parent structure record and read its control label.   */
