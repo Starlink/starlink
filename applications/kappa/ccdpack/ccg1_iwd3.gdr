@@ -61,6 +61,8 @@
 *        pixel.  This avoids the assumption of a constant AXIS-like
 *        array applicable to output pixels.  Remove the WIDTHS now that
 *        the AIPS++ definition is agreed to be wrong.
+*     2006 February 9 (MJC):
+*        Correct normalisation of the RESULT array.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -143,13 +145,17 @@
 *  Convert input type to double precision before forming sums. There
 *  There should be no numeric errors on this attempt.
                WEIGHT = NUM_<T>TOD( STACK( I, J ) )
+               COORD = NUM_<T>TOD( COORDS( I, J ) )
 
 *  Sum the weights.
                SUMW = SUMW + WEIGHT
 
 *  Sum the data value-co-ordinate product for the intensity-weighted
 *  representative co-ordinate of the line.
-               SUM = SUM + WEIGHT * NUM_<T>TOD( COORDS( I, J ) )
+               SUM = SUM + COORD * WEIGHT
+
+*  Sum the weighted square of the co-ordinates.
+               SUMSQ = SUMSQ + COORD * COORD * WEIGHT
 
 *  Update the contribution buffer; all values contribute when forming
 *  the intensity-weighted co-ordinate.
@@ -157,13 +163,14 @@
             END IF
     5    CONTINUE
 
-*  If there are sufficient good pixels, output the result.  Add the
-*  relative errors in quadrature, normalised by the result.
+*  If there are sufficient good pixels and weight, form the mean
+*  and variance.
          IF ( NGOOD .GE. MINPIX .AND. ABS( SUMW ) .GT. VAL__SMLD ) THEN
             M1 = NUM_DTO<T>( SUM / SUMW )
             VARNCE = ( SUMSQ - M1 * M1 * DBLE( NGOOD ) ) / SUMW
+
             IF ( VARNCE .GT. 0.0D0 ) THEN
-               RESULT( I ) = NUM_DTO<T>( SQRT( VARNCE / 
+               RESULT( I ) = NUM_DTO<T>( SQRT( VARNCE * DBLE( NGOOD ) / 
      :                                   DBLE( NGOOD - 1 ) ) )
             ELSE
                RESULT( I ) = VAL__BAD<T>
