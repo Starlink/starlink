@@ -6,6 +6,7 @@ int subnum,             /* subarray number, 0-7 (given) */
 double az,              /* Azimuth in radians (given) */
 double el,              /* Elevation in radians (given) */
 double tai,             /* TAI (supplied as an MJD) */
+int extra_frames,       /* Add intermediate Frames to returned FrameSet? */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -62,4 +63,17 @@ AstFrameSet *frameset,  /* 2-D frameset (given) */
 AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
+
+
+/*+ sc2ast_maketanmap - create a Mapping representing a tangent plane 
+                        projection */
+
+AstMapping *sc2ast_maketanmap
+(
+double lon,               /* Celestial longitude at ref point (rads) */
+double lat,               /* Celestial latitude at ref point (rads) */
+AstMapping *cache[ 2 ],   /* Cached Mappings (supply as NULL on 1st call) */
+int *status               /* global status (given and returned) */
+);
+
 

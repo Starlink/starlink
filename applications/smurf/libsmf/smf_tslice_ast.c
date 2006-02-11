@@ -49,6 +49,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -65,6 +66,8 @@
 *        series headers.
 *     2006-02-08 (AGG):
 *        Add needwcs flag to API.
+*     2006-02-11 (AGG):
+*        Add "extra_frames" parameter to sc2ast_createwcs calls.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -192,13 +195,13 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     if (hdr->wcs == NULL ) {
       /* Must create one */
       sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-			sc2tmp->rts_end, &(hdr->wcs), status );
+			sc2tmp->rts_end, 0, &(hdr->wcs), status );
     } else {
       /* Ideally we want to modify in place to reduce malloc/free */
       /* For now take the inefficient and simpler approach */
       astAnnul( hdr->wcs );
       sc2ast_createwcs( subsysnum, sc2tmp->tcs_az_ac1, sc2tmp->tcs_az_ac2,
-			sc2tmp->rts_end, &(hdr->wcs), status );
+			sc2tmp->rts_end, 0, &(hdr->wcs), status );
     }
 
     /* astShow( hdr->wcs ); */
