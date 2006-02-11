@@ -68,7 +68,9 @@
 *        the AIPS++ definition is agreed to be wrong.  Incorporate the
 *        inverse data variance in the weights through the new VARS
 *        argument.
-*     {enter_changes_here}
+*     2006 February 9 (MJC):
+*        Correct normalisation of the RESULT array.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -173,14 +175,14 @@
             END IF
     5    CONTINUE
 
-*  If there are sufficient good pixels, output the result.  Add the
-*  relative errors in quadrature, normalised by the result.
-*  If there are sufficient good pixels, derive the weighted mean.
+*  If there are sufficient good pixels and weight, form the mean
+*  and variance.
          IF ( NGOOD .GE. MINPIX .AND. ABS( SUMW ) .GT. VAL__SMLD ) THEN
             M1 = NUM_DTO<T>( SUM / SUMW )
             VARNCE = ( SUMSQ - M1 * M1 * DBLE( NGOOD ) ) / SUMW
+
             IF ( VARNCE .GT. 0.0D0 ) THEN
-               RESULT( I ) = NUM_DTO<T>( SQRT( VARNCE / 
+               RESULT( I ) = NUM_DTO<T>( SQRT( VARNCE * DBLE( NGOOD ) / 
      :                                   DBLE( NGOOD - 1 ) ) )
             ELSE
                RESULT( I ) = VAL__BAD<T>
