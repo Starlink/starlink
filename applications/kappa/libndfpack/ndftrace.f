@@ -34,12 +34,13 @@
 *     -  attributes of the main data array and any other array
 *     components present (including the type and storage form and an
 *     indication of whether `bad' pixels may be present);
-*     -  attributes of the current co-ordinate Frame in the WCS component 
-*     (title, domain, and ,optionally, axis labels and axis units, plus the 
-*     system epoch and projection for sky co-ordinate Frames). In addition 
-*     the bounding box of the NDF within the Frame is displayed.
-*     -  optionally, attributes of all other co-ordinate Frames in the WCS
-*     component.
+*     -  attributes of the current co-ordinate Frame in the WCS 
+*     component (title, domain, and, optionally, axis labels and axis 
+*     units, plus the system epoch and projection for sky co-ordinate 
+*     Frames).  In addition the bounding box of the NDF within the Frame
+*     is displayed.
+*     -  optionally, attributes of all other co-ordinate Frames in the
+*     WCS component.
 *     -  a list of any NDF extensions present, together with their data
 *     types; and
 *     -  history information (creation and last-updated dates, the
@@ -101,33 +102,35 @@
 *        NEXTN is positive.
 *     FDIM( ) = _INTEGER (Write)
 *        The numbers of axes in each co-ordinate Frame stored in the WCS
-*        component of the NDF. The elements in this parameter correspond to 
-*        those in the FDOMAIN and FTITLE parameters. The number of elements 
-*        in each of these parameters is given by NFRAME.
+*        component of the NDF.  The elements in this parameter 
+*        correspond to those in the FDOMAIN and FTITLE parameters.  The
+*        number of elements in each of these parameters is given by
+*        NFRAME.
 *     FDOMAIN( ) = LITERAL (Write)
-*        The domain of each co-ordinate Frame stored in the WCS component 
-*        of the NDF. The elements in this parameter correspond to 
-*        those in the FDIM and FTITLE parameters. The number of elements 
-*        in each of these parameters is given by NFRAME.
+*        The domain of each co-ordinate Frame stored in the WCS
+*        component of the NDF.  The elements in this parameter
+*        correspond to those in the FDIM and FTITLE parameters.  The 
+*        number of elements in each of these parameters is given by
+*        NFRAME.
 *     FLABEL( ) = LITERAL (Write)
 *        The axis labels from the current WCS Frame of the NDF.  
 *     FLBND( ) = _DOUBLE (Write)
 *        The lower bounds of the bounding box enclosing the NDF in the
-*        current WCS Frame. The number of elements in this parameter is
-*        equal to the number of axes in the current WCS Frame (see FDIM).
-*        Celestial axis values will be in units of radians.
+*        current WCS Frame.  The number of elements in this parameter is
+*        equal to the number of axes in the current WCS Frame (see 
+*        FDIM).  Celestial axis values will be in units of radians.
 *     FUBND( ) = _DOUBLE (Write)
 *        The upper bounds of the bounding box enclosing the NDF in the
-*        current WCS Frame. The number of elements in this parameter is
-*        equal to the number of axes in the current WCS Frame (see FDIM).
-*        Celestial axis values will be in units of radians.
+*        current WCS Frame.  The number of elements in this parameter is
+*        equal to the number of axes in the current WCS Frame (see 
+*        FDIM).  Celestial axis values will be in units of radians.
 *     FORM = LITERAL (Write)
 *        The storage form of the NDF's data array.
 *     FTITLE( ) = LITERAL (Write)
-*        The title of each co-ordinate Frame stored in the WCS component of
-*        the NDF. The elements in this parameter correspond to those in the 
-*        FDOMAIN and FDIM parameters. The number of elements in each 
-*        of these parameters is given by NFRAME.
+*        The title of each co-ordinate Frame stored in the WCS component
+*        of the NDF.  The elements in this parameter correspond to those
+*        in the FDOMAIN and FDIM parameters.  The number of elements in
+*        each of these parameters is given by NFRAME.
 *     FULLAXIS = _LOGICAL (Read)
 *        If the NDF being examined has an axis co-ordinate system
 *        defined, then by default only the label, units and extent of
@@ -137,13 +140,14 @@
 *     FULLFRAME = _LOGICAL (Read)
 *        If a FALSE value is given for this parameter then only the
 *        Title and Domain attributes plus the axis labels and units are 
-*        displayed for a co-ordinate Frame. Otherwise, a more complete 
-*        description is given, including the bounds of the NDF within the
-*        Frame. [FALSE]
+*        displayed for a co-ordinate Frame.  Otherwise, a more complete 
+*        description is given, including the bounds of the NDF within
+*        the Frame. [FALSE]
 *     FULLWCS = _LOGICAL (Read)
-*        If a TRUE value is given for this parameter then all co-ordinate 
-*        Frames in the WCS component of the NDF are displayed. Otherwise, 
-*        only the current co-ordinate Frame is displayed. [FALSE]
+*        If a TRUE value is given for this parameter then all
+*        co-ordinate Frames in the WCS component of the NDF are
+*        displayed.  Otherwise, only the current co-ordinate Frame is 
+*        displayed. [FALSE]
 *     FUNIT( ) = LITERAL (Write)
 *        The axis units from the current WCS Frame of the NDF.  
 *     HISTORY = _LOGICAL (Write)
@@ -159,8 +163,8 @@
 *     NEXTN = _INTEGER (Write)
 *        The number of extensions in the NDF.
 *     NFRAME = _INTEGER (Write)
-*        The number of WCS Frames described by parameters FDIM, FDOMAIN and 
-*        FTITLE. Set to zero if WCS is FALSE. 
+*        The number of WCS Frames described by parameters FDIM, FDOMAIN
+*        and FTITLE.  Set to zero if WCS is FALSE. 
 *     QUALITY = _LOGICAL (Write)
 *        Whether or not the NDF contains a QUALITY array.
 *     QUIET = _LOGICAL (Read)
@@ -185,11 +189,11 @@
 *        This is only written when FULLAXIS is TRUE and AXIS is TRUE.
 
 *  Notes:
-*     -  If the WCS component of the NDF is undefined, then an attempt is
-*     made to find WCS information from two other sources: firstly, an 
-*     IRAS90 astrometry structure, and secondly, the FITS extension. If 
+*     -  If the WCS component of the NDF is undefined, then an attempt 
+*     is made to find WCS information from two other sources: first, an 
+*     IRAS90 astrometry structure, and second, the FITS extension.  If 
 *     either of these sources yield usable WCS information, then it is
-*     displayed in the same way as the NDF WCS component. Other KAPPA
+*     displayed in the same way as the NDF WCS component.  Other KAPPA
 *     applications will use this WCS information as if it were stored in
 *     the WCS component.
 
@@ -250,15 +254,17 @@
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR out of executable code.
 *     16-MAR-2005 (DSB):
-*        Only write AXIS-related output parameters if the NDF has an AXIS
-*        structure.
+*        Only write AXIS-related output parameters if the NDF has an 
+*        AXIS structure.
 *     17-MAR-2005 (DSB):
 *        Added FLBND and FUBND.
 *     21-MAR-2005 (DSB):
 *        Added FLABEL and FUNIT.
 *     31-JAN-2006 (TIMJ):
 *        Extension type (XTYPE) must be declared as DAT__SZTYP and not
-*        NDF__SZTYP (NDF__SZTYP is for a numeric type of an NDF)
+*        NDF__SZTYP (NDF__SZTYP is for a numeric type of an NDF).
+*     2006 February 10 (MJC)
+*        Wrap lines at 72.  English spelling.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -303,26 +309,32 @@
       CHARACTER * ( 80 ) WCSTTL( MXFRM )  ! Frame titles
       CHARACTER * ( DAT__SZLOC ) XLOC ! Extension locator
       CHARACTER * ( DAT__SZTYP ) TYPE ! Data type
-      CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text buffer for shape information
-      CHARACTER * ( NDF__SZFRM ) CFORM( NDF__MXDIM ) ! Type for axis centres 
+      CHARACTER * ( NDF__MXDIM * ( 2 * VAL__SZI + 3 ) - 2 ) BUF ! Text 
+                                 ! buffer for shape information
+      CHARACTER * ( NDF__SZFRM ) CFORM( NDF__MXDIM ) ! Type for axis 
+                                 ! centres 
       CHARACTER * ( NDF__SZFRM ) FORM ! Storage form
       CHARACTER * ( NDF__SZFTP ) FTYPE ! Full data type
       CHARACTER * ( NDF__SZHDT ) CREAT ! History component creation date
       CHARACTER * ( NDF__SZHDT ) DATE ! Date of last history update
       CHARACTER * ( NDF__SZHUM ) HMODE ! History update mode
       CHARACTER * ( NDF__SZTYP ) ATYPE ! Type for axis extent value
-      CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
+      CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis 
+                                 ! centres 
       CHARACTER * ( DAT__SZTYP ) XTYPE( MXEXTN ) ! Extension name
       CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
-      DOUBLE PRECISION AEND( NDF__MXDIM )  ! End of NDF extent along an axis
-      DOUBLE PRECISION ASTART( NDF__MXDIM )! Start of NDF extent along an axis
-      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
+      DOUBLE PRECISION AEND( NDF__MXDIM )  ! End of NDF extent along an
+                                 ! axis
+      DOUBLE PRECISION ASTART( NDF__MXDIM )! Start of NDF extent along 
+                                 ! an axis
+      DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first
+                                 ! pixel
       DOUBLE PRECISION LBIN( NDF__MXDIM )  ! Lower GRID bounds
       DOUBLE PRECISION LBOUT( NDF__MXDIM ) ! Lower WCS bounds
       DOUBLE PRECISION UBIN( NDF__MXDIM )  ! Upper GRID bounds
       DOUBLE PRECISION UBOUT( NDF__MXDIM ) ! Upper WCS bounds
-      DOUBLE PRECISION XL( NDF__MXDIM )    ! GRID position at lower limit
-      DOUBLE PRECISION XU( NDF__MXDIM )    ! GRID position at upper limit
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! GRID position at lower limit
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! GRID position at upper limit
       INTEGER AXPNTR( 1 )        ! Pointer to axis centres
       INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
@@ -332,14 +344,16 @@
       INTEGER I                  ! Loop counter for dimensions
       INTEGER IAT                ! Used length of string
       INTEGER IAXIS              ! Loop counter for axes
-      INTEGER ICURR              ! Index of Current Frame in WCS FrameSet
+      INTEGER ICURR              ! Index of Current Frame in WCS 
+                                 ! FrameSet
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER IEXTN              ! Extension index
       INTEGER IFRAME             ! Frame index
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
-      INTEGER MAP                ! AST Mapping from GRID to current WCS Frame
+      INTEGER MAP                ! AST Mapping from GRID to current WCS 
+                                 ! Frame
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
       INTEGER NDIM               ! Number of dimensions
@@ -351,17 +365,18 @@
       INTEGER SIZE               ! Total number of pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds
       INTEGER WCSNAX( MXFRM )    ! Frame dimensionalities
-      LOGICAL AVAR( NDF__MXDIM ) ! Whether NDF axis-variance components are defined
+      LOGICAL AVAR( NDF__MXDIM ) ! NDF axis-variance components defined?
       LOGICAL BAD                ! Bad pixel flag
       LOGICAL FULLAX             ! Display full axis information?
-      LOGICAL FULLFR             ! Display more details for each WCS Frame 
+      LOGICAL FULLFR             ! Display more details for each WCS 
+                                 ! Frame?
       LOGICAL FULLWC             ! Display full WCS information?
       LOGICAL MONOTO( NDF__MXDIM ) ! Axis monotonic flags
       LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
       LOGICAL QUIET              ! Do not report the trace?
       LOGICAL REPORT             ! Report the trace?
-      LOGICAL THERE              ! Whether NDF component is defined
-      LOGICAL WIDTH( NDF__MXDIM ) ! Whether NDF axis-width components are defined
+      LOGICAL THERE              ! NDF component is defined?
+      LOGICAL WIDTH( NDF__MXDIM ) ! NDF axis-width components defined?
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
@@ -669,8 +684,8 @@
 
 *  Axis Width Array:
 *  =================
-*  See whether the axis width array is defined. If so, then obtain its
-*  attributes.
+*  See whether or not the axis width array is defined.  If it is, then 
+*  obtain its attributes.
                CALL NDF_ASTAT( INDF, 'Width', IAXIS, WIDTH( IAXIS ),
      :                         STATUS )
                IF ( THERE ) THEN
@@ -908,9 +923,9 @@
 
 *  WCS component:
 *  ==============
-*  Get an AST pointer for the FrameSet defining the NDF's World Coordinate
-*  Systems. Store the number of coordinate systems ("Frames") described
-*  by the FrameSet. 
+*  Get an AST pointer for the FrameSet defining the NDF's World 
+*  Co-ordinate Systems.  Store the number of co-ordinate systems
+*  ("Frames") described by the FrameSet. 
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
       NFRAME = AST_GETI( IWCS, 'NFRAME', STATUS )
 
@@ -932,45 +947,46 @@
          IF ( REPORT ) THEN
             CALL MSG_BLANK( STATUS )
 
-            CALL MSG_OUT( 'WCS_HEADER', '   World Coordinate '//
+            CALL MSG_OUT( 'WCS_HEADER', '   World Co-ordinate '//
      :                    'Systems:', STATUS )
 
             CALL MSG_SETI( 'NF', NFRAME )
 
             IF( FULLWC ) THEN
                CALL MSG_OUT( 'WCS_NFRM',
-     :                 '      Number of coordinate Frames      : ^NF',
+     :                 '      Number of co-ordinate Frames      : ^NF',
      :                       STATUS )
-               CALL MSG_SETI( 'CURR', ICURR )
+               CALL MSG_SETI( 'CUR', ICURR )
                CALL MSG_OUT( 'WCS_CURRENT',
-     :                 '      Index of current coordinate Frame: ^CURR',
+     :                 '      Index of current co-ordinate Frame: ^CUR',
      :                       STATUS )
                CALL MSG_BLANK( STATUS )
 
             ELSE
                CALL MSG_OUT( 'WCS_NFRM',
-     :                 '      Number of coordinate Frames: ^NF',
+     :                 '      Number of co-ordinate Frames: ^NF',
      :                       STATUS )
                CALL MSG_BLANK( STATUS )
                CALL MSG_SETI( 'N', ICURR )
                CALL MSG_OUT( 'WCS_CURRENT',
-     :                 '      Current coordinate Frame (Frame ^N):', 
-     :                        STATUS )
+     :                 '      Current co-ordinate Frame (Frame ^N):', 
+     :                       STATUS )
             END IF
 
          END IF
 
-*  Store the GRID coordinates of the centre of the first pixel. This is
-*  defined to be (1.0,1.0,...). This position will be mapped into each of the
-*  other Frame, to find the coordinates of the first pixel. Also store
-*  the lower and upper bounds of the NDF in GRID coords.
+*  Store the GRID co-ordinates of the centre of the first pixel.  This
+*  is defined to be (1.0,1.0,...).  This position will be mapped into 
+*  each of the other Frames, to find the co-ordinates of the first 
+*  pixel.  Also store the lower and upper bounds of the NDF in GRID 
+*  co-ordinates.
          DO 301 IAXIS = 1, NDIM
             GFIRST( 1, IAXIS ) = 1.0D0
             LBIN( IAXIS ) = 0.5D0
             UBIN( IAXIS ) = DBLE( DIM( IAXIS ) ) + 0.5D0
  301     CONTINUE
 
-*  Loop round each coordinate system.
+*  Loop round each co-ordinate system.
          DO 304 IFRAME = 1, NFRAME
 
 *  Make this Frame the current Frame
@@ -984,8 +1000,8 @@
 *  Remove any PGPLOT escape sequences from the title.
             CALL KPG1_PGESC( FRMTTL, STATUS )
 
-*  Put the title, domain and dimensionality in the arrays to be stored in 
-*  the output parameters if there is room. 
+*  Put the title, domain and dimensionality in the arrays to be stored 
+*  in the output parameters if there is room. 
             IF( NFRM .LT. MXFRM ) THEN               
                NFRM = NFRM + 1
                WCSTTL( NFRM ) = FRMTTL
@@ -994,7 +1010,7 @@
             END IF
 
 *  If this is the current Frame, or if we are reporting full information
-*  on all Frames, Get the bounds of the NDF in this Frame.
+*  on all Frames, get the bounds of the NDF in this Frame.
             IF( IFRAME .EQ. ICURR .OR. ( REPORT .AND. FULLFR ) ) THEN
                MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, 
      :                              STATUS )
@@ -1009,8 +1025,8 @@
                CALL AST_NORM( IWCS, LBOUT, STATUS )
                CALL AST_NORM( IWCS, UBOUT, STATUS )
 
-*  If this is the current Frame, write the bounds units and labels to the 
-*  output parameters.
+*  If this is the current Frame, write the bounds units and labels to 
+*  the output parameters.
                IF( IFRAME .EQ. ICURR ) THEN 
                   CALL PAR_PUT1D( 'FLBND', FRMNAX, LBOUT, STATUS )
                   CALL PAR_PUT1D( 'FUBND', FRMNAX, UBOUT, STATUS )
@@ -1036,8 +1052,8 @@
                END IF
             END IF
 
-*  The rest we only do if we are reporting information on the screen. Only
-*  display the Current Frame if parameter FULLWCS is FALSE.
+*  The rest we only do if we are reporting information on the screen. 
+*  Only display the Current Frame if parameter FULLWCS is FALSE.
             IF ( REPORT .AND. ( FULLWC .OR. IFRAME .EQ. ICURR ) ) THEN
 
 *  Display the Frame index.
