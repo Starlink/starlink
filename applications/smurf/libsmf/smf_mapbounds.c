@@ -49,11 +49,16 @@
 *     of the map.
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-02-02 (EC):
 *        Initial version.
+*     2006-02-13 (TIMJ):
+*        Use astSetC rather than astSet
+*        Avoid an additional dereference
+*        Use sc2ast_makefitschan
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -94,6 +99,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "sc2da/sc2ast.h"
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
@@ -124,9 +130,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   if (*status != SAI__OK) return;
 
   *outframeset = NULL;
-
-  /* String for setting the system attribute */
-  sprintf(wcssystem,"system=%s",system);
 
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
@@ -182,8 +185,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	  /* Get bolo -> sky mapping 
 	     Set the System attribute for the SkyFframe in input WCS 
 	     FrameSet and extract the IN_PIXEL->Sky mapping. */	  
-
-	  astSet( data->hdr->wcs, wcssystem );
+	  astSetC( hdr->wcs, "SYSTEM", system );
 	  bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
 				    AST__CURRENT );
 	  
@@ -198,33 +200,15 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	    }
 
 	    fitschan = astFitsChan ( NULL, NULL, "" );
-	    
-	    sprintf( fitshd[0], "CRPIX1  = 256" );
-	    astPutFits( fitschan, fitshd[0], 0 );
-	    sprintf( fitshd[1], "CRPIX2  = 256" );
-	    astPutFits( fitschan, fitshd[1], 0 );
-	    sprintf( fitshd[2], "CD1_1   = %e", -pixsize/3600. );
-	    astPutFits( fitschan, fitshd[2], 0 );
-	    sprintf( fitshd[3], "CD2_2   = %e", pixsize/3600. );
-	    astPutFits( fitschan, fitshd[3], 0 );
-	    sprintf( fitshd[4], "CRVAL1  = %e", 
-		     lon_0*57.29577951 );
-	    astPutFits( fitschan, fitshd[4], 0 );
-	    sprintf( fitshd[5], "CRVAL2  = %e", 
-		     lat_0*57.29577951 );
-	    astPutFits( fitschan, fitshd[5], 0 );
-	    sprintf( fitshd[6], "CTYPE1  = 'RA---TAN'" );
-	    astPutFits( fitschan, fitshd[6], 0 );
-	    sprintf( fitshd[7], "CTYPE2  = 'DEC--TAN'" );
-	    astPutFits( fitschan, fitshd[7], 0 );
-	    
+	    sc2ast_makefitschan( 256.0, 256.0, (-pixsize/3600), (pixsize/3600),
+				 (lon_0*57.29577951), (lat_0*57.29577951),
+				 "RA---TAN", "DEC--TAN", fitschan, status );
 	    astClear( fitschan, "Card" );
-	    
 	    *outframeset = astRead( fitschan );
 	    
 	    /* Extract the Sky->REF_PIXEL mapping. */
 
-	    astSet( *outframeset, wcssystem );
+	    astSetC( *outframeset, "SYSTEM", system );
 	    sky2map = astGetMapping( *outframeset, AST__CURRENT, 
 				     AST__BASE );
 	  }
@@ -255,15 +239,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	  }
 
 	  /* clean up ast objects */
-	  if( bolo2sky != NULL ) {
-	    astAnnul( bolo2sky );
-	    bolo2sky = NULL;
-	  }
-	  
-	  if( bolo2map != NULL ) {
-	    astAnnul( bolo2map );
-	    bolo2map = NULL;
-	  }
+	  bolo2sky = astAnnul( bolo2sky );
+	  bolo2map = astAnnul( bolo2map );
+
 	}
 
 	/* Break out of loop over time slices if bad status */
@@ -285,14 +263,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   /* Clean Up */
  
  CLEANUP:
-  if( sky2map != NULL )
-    astAnnul( sky2map );
-    
-  if( bolo2sky != NULL ) 
-    astAnnul( bolo2sky );
-	  
-  if( bolo2map != NULL )
-    astAnnul( bolo2map );
+  if (sky2map) sky2map  = astAnnul( sky2map );
+  if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
+  if (bolo2map) bolo2map = astAnnul( bolo2map );
 
   if( data != NULL )
     smf_close_file( &data, status);
