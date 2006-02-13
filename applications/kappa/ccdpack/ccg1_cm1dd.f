@@ -349,7 +349,7 @@
       ELSE IF ( IMETH .EQ. 22 ) THEN
 
 *  Forming intensity-weighted co-ordinate dispersion.
-         CALL CCG1_IWC1D( NPIX, NLINES, STACK, VARS, COORDS, WIDTHS,
+         CALL CCG1_IWC1D( NPIX, NLINES, STACK, VARS, COORDS,
      :                    MINPIX, RESULT, RESVAR, NCON, STATUS )
 
       ELSE IF ( IMETH .EQ. 23 ) THEN
