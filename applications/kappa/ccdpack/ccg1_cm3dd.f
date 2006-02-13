@@ -149,7 +149,10 @@
 *        Use CCG1_I2WC instead of KPG1_VASV to cope with the
 *        two-dimensional co-ordinate array.  Derive the widths for
 *        IMETH = 21 from the co-ordinates.
-*     {enter_further_changes_here}
+*     2006 February 10 (MJC):
+*        Fixed reverse-editing bug where STACK was removed instead
+*        of VARS from CCG1_SUM3D call (SUM method).
+*    {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -274,7 +277,7 @@
       ELSE IF ( IMETH .EQ. 12 ) THEN
 
 *  Forming sum.
-         CALL CCG1_SUM3D( NPIX, NLINES, VARS, MINPIX,
+         CALL CCG1_SUM3D( NPIX, NLINES, STACK, MINPIX,
      :                    RESULT, NCON, STATUS )
 
       ELSE IF ( IMETH .EQ. 13 ) THEN
