@@ -131,6 +131,8 @@
 *     2005 January 27 (MJC):
 *        Added WORK3 argument, and use to permute width or co-ordinate
 *        array.
+*     2006 February 10 (MJC):
+*        Obtain the pixel-index workspace for methods 31 and 32.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +205,7 @@
       INTEGER START              ! The first input element to use
       INTEGER STEP1              ! Vector step between collapsed pixels
       LOGICAL USECO              ! Method uses the co-ordinate array?
-      LOGICAL USEIND             ! Method uses the co-ordinate array?
+      LOGICAL USEIND             ! Method uses the pixel-index array?
       LOGICAL USEWID             ! Method uses the width array?
       LOGICAL USEWRK             ! Use the work arrays?
 
@@ -268,7 +270,7 @@
       END IF
 
 *  Decide whether indices, co-ordinates, and widths array is used.
-      USEIND = IMETH .EQ. 33 .OR. IMETH .EQ. 34
+      USEIND = IMETH .GE. 31 .AND. IMETH .LE. 34
       USECO = IMETH .EQ. 22 .OR. IMETH .EQ. 23 .OR. IMETH .EQ. 33 .OR.
      :        IMETH .EQ. 34
       USEWID = IMETH .EQ. 21
