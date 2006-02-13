@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#if ! __MINGW32__ && ! __CYGWIN__
+#if ! __MINGW32__
 
 /* Not used */
 void win_get_inodes( const char *fns, ino_t *st_ino, dev_t *st_rdev ){}
