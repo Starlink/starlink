@@ -43,11 +43,15 @@
 *     
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-02-02 (EC):
 *        Initial version.
+*     2006-02-13 (TIMJ):
+*        Use astSetC rather than astSet
+*        Avoid an additional dereference
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -97,6 +101,7 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   /* Local Variables */
   AstMapping *bolo2sky=NULL;    /* Mapping bolo->celestial coordinates */
   AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
+  double  *boldata;             /* Pointer to bolometer data */
   smfData *data=NULL;           /* pointer to  SCUBA2 data struct */
   smfFile *file=NULL;           /* SCUBA2 data file information */
   smfHead *hdr=NULL;            /* Pointer to data header this time slice */
@@ -110,16 +115,12 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
   const char *system;           /* System */
-  char wcssystem[81];           /* String containing system attribute */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* Get the system from the outframeset */
   system = astGetC( outframeset, "system" );
-
-  /* String for setting the system attribute */
-  sprintf(wcssystem,"system=%s",system);
 
   for(i=1; i<=size; i++ ) {
     /* Read data from the ith input file in the group */      
@@ -186,7 +187,7 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
 	     Set the System attribute for the SkyFframe in input WCS 
 	     FrameSet and extract the IN_PIXEL->Sky mapping. */	  
 
-	  astSet( data->hdr->wcs, wcssystem );
+	  astSetC( hdr->wcs, "SYSTEM", system );
 	  bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
 				    AST__CURRENT );
 	  
@@ -196,7 +197,7 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
 	  
 	  if( sky2map == NULL ) { 
 	    /* Extract the Sky->REF_PIXEL mapping. */
-	    astSet( outframeset, wcssystem );
+	    astSetC( outframeset, "SYSTEM", system );
 	    sky2map = astGetMapping( outframeset, AST__CURRENT, 
 				     AST__BASE );
 	  }
@@ -213,26 +214,21 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
 	  if( (i == size) && (j == (data->dims)[2]-1) ) /* Flags end rebin */
 	    rebinflags = rebinflags | AST__REBINEND;
 	  
-	  astRebinSeqD(bolo2map,0,
+	  boldata = (data->pntr)[0];
+	  astRebinSeqD(bolo2map,0.0,
 		       2,lbnd_in, ubnd_in,
-		       (data->pntr)[0] + j*nbolo*sizeof(double), 
+		       &(boldata[j*nbolo]),
 		       NULL, 
-		       AST__NEAREST, NULL, rebinflags, 0, 0, VAL__BADD,
+		       AST__NEAREST, NULL, rebinflags, 0.1, 1000000, VAL__BADD,
 		       2,lbnd_out,ubnd_out,
 		       lbnd_in, ubnd_in,
 		       map, variance, weights);
 	  
 
 	  /* clean up ast objects */
-	  if( bolo2sky != NULL ) {
-	    astAnnul( bolo2sky );
-	    bolo2sky = NULL;
-	  }
-	  
-	  if( bolo2map != NULL ) {
-	    astAnnul( bolo2map );
-	    bolo2map = NULL;
-	  }
+	  bolo2sky = astAnnul( bolo2sky );
+	  bolo2map = astAnnul( bolo2map );
+
 	}
 
 	/* Break out of loop over time slices if bad status */
@@ -254,14 +250,9 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   /* Clean Up */
  
  CLEANUP:
-  if( sky2map != NULL )
-    astAnnul( sky2map );
-    
-  if( bolo2sky != NULL ) 
-    astAnnul( bolo2sky );
-	  
-  if( bolo2map != NULL )
-    astAnnul( bolo2map );
+  if (sky2map) sky2map  = astAnnul( sky2map );
+  if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
+  if (bolo2map) bolo2map = astAnnul( bolo2map );
 
   if( data != NULL )
     smf_close_file( &data, status);
