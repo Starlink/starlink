@@ -26,6 +26,6 @@ F77_SUBROUTINE(ems_rep) ( CHARACTER(err), CHARACTER(text), INTEGER(status)
 
    emsRep( cerr, ctext, status);
 
-   free( ctext );
+   cnfFree( ctext );
    return;
 }
