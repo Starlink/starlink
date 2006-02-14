@@ -546,6 +546,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        Free memory allocated by calls to astReadString.
 *     18-JAN-2006 (DSB)
 *        Add Abbrev attribute.
+*     14-FEB-2006 (DSB)
+*        Correct EdgeLabels to use gap size rather than EQUAL macro when
+*        comparing label values.
 *class--
 */
 
@@ -1371,6 +1374,7 @@ typedef struct TickInfo{
    double *length;           /* Length on other axis of each curve section */
    int nsect;                /* No. of sections in curve */
    char *fmt;                /* Pointer to format string used to create labels */
+   double gap;               /* The gap between major ticks */
 } TickInfo;
 
 /* Module Variables. */
@@ -10190,8 +10194,8 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    that we have found another usable label. */
                labfound = 0;
                for( ii = 0; ii < naxlab-1; ii++ ) { 
-                  if( EQUAL( (info->ticks)[ tick ],
-                             (labellist + ii)->val ) ) {
+                  if( fabs( (info->ticks)[ tick ] - 
+                            (labellist + ii)->val ) < 0.2*info->gap ) {
                      labfound = 1;
                      break;
                   }
@@ -23909,6 +23913,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
          ret->start = NULL;
          ret->length = NULL;
          ret->nsect = 0;
+         ret->gap = used_gap;
       } 
 
 /* If no suitable labels were found report an error. */
