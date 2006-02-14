@@ -47,7 +47,8 @@ f     The TranMap class does not define any new routines beyond those
 *     19-JAN-2005 (DSB):
 *        Fix memory leak.
 *     14-FEB-2006 (DSB):
-*        Over-ride the astDecompose method.
+*        - Over-ride the astDecompose method.
+*        - Fix bug in MapSplit related to use of invert flags.
 *class--
 */
 
@@ -743,9 +744,9 @@ static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map )
          iinv = this->invert2;
       } else {
          imap = this->map1;
-         iinv = this->invert1;
+         iinv = !( this->invert1 );
          fmap = this->map2;
-         finv = this->invert2;
+         finv = !( this->invert2 );
       }
 
 /* Temporarily set the Invert flag of both Mappings back to their
