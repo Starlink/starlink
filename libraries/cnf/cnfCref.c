@@ -30,7 +30,7 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 *  Returned Value:
 *     F77_CHARACTER_ARG_TYPE *cnfCreat
 *        A pointer to the storage that has been allocated by this routine.
-*        It should be freed after use using "free" (not cnfFree).
+*        It should be freed after use using "cnfFree" (not "free").
 
 *  Notes:
 *     -  The pointer may not point directly at the string of characters.

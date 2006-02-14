@@ -31,7 +31,7 @@ F77_LOGICAL_TYPE *cnfCrela( int ndims, const int *dims )
 *  Returned Value:
 *     F77_LOGICAL_TYPE *cnfCrefa
 *        A pointer to the storage that has been allocated by this routine.
-*        It should be freed after use using "free" (not cnfFree).
+*        It should be freed after use using "cnfFree" (not "free").
 
 *  Notes:
 *     -  If the routine could not create the space, then it returns a

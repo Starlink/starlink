@@ -28,7 +28,7 @@ char *cnfCreat( int length )
 *  Returned Value:
 *     char *cnfCreat
 *        A pointer to the storage that has been allocated by this routine.
-*        It should be freed after use using "free" (not cnfFree).
+*        It should be freed after use using "cnfFree" (not "free")
 
 *  Notes:
 *     -  If the argument is given as N then there is room to store N-1
