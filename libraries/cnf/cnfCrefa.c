@@ -35,7 +35,6 @@ F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims )
 *  Returned Value:
 *     F77_CHARACTER_ARG_TYPE *cnfCrefa
 *        A pointer to the storage that has been allocated by this routine.
-*        It should be freed after use using "cnfFree" (not "free").
 
 *  Notes:
 *     -  The pointer may not point directly at the string of characters.
@@ -43,6 +42,7 @@ F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims )
 *        macro to a Fortran routine.
 *     -  If the routine could not create the space, then it returns a
 *        null pointer.
+*     -  It should be freed after use using "cnfFreef" (not "free").
 
 *  Copyright:
 *     Copyright (C) 1996 CCLRC

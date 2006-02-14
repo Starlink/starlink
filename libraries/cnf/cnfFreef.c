@@ -9,7 +9,7 @@ void cnfFreef( F77_CHARACTER_ARG_TYPE *temp )
 *     cnfFreef
 
 *  Purpose:
-*     Return temporary space allocated by cnfCref
+*     Return temporary space allocated by cnfCref or cnfCrefa
 
 *  Language:
 *     ANSI C
@@ -19,8 +19,9 @@ void cnfFreef( F77_CHARACTER_ARG_TYPE *temp )
 
 *  Description:
 *     Return temporary storage space that was allocated by a previous
-*     call to cnfCref. A special routine must be used in case the Fortran
-*     string is handled via a descriptor which is pointed to by "temp".
+*     call to cnfCref or cnfCrefa. A special routine must be used in
+*     case the Fortran string is handled via a descriptor which is pointed
+*     to by "temp".
 
 *  Arguments:
 *     F77_CHARACTER_ARG_TYPE *temp (Given)
