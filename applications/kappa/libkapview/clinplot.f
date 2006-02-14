@@ -2633,7 +2633,7 @@
                END IF
 
 *  Create a Plot covering this viewport.
-*               CALL KPG1_ASPLT( FSET, BOX, ' ', IPLOTS, STATUS )
+               CALL KPG1_ASPLT( FSET, BOX, ' ', IPLOTS, STATUS )
 
 *  Save the index of its current Frame.
                ICURR0 = AST_GETI( IPLOTS, 'CURRENT', STATUS )
