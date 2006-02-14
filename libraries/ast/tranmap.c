@@ -1150,9 +1150,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Obtain a pointer to the TranMap structure. */
    this = (AstTranMap *) this_object;
 
-printf("this %p this->map1 %p\n", this, this->map1 );
-
-
 /* Write out values representing the instance variables for the TranMap
    class.  Accompany these with appropriate comment strings, possibly
    depending on the values being written.*/
