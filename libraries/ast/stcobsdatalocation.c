@@ -56,6 +56,8 @@ f     The StcObsDataLocation class does not define any new routines beyond those
 *  History:
 *     25-APR-2005 (DSB):
 *        Original version.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -97,6 +99,9 @@ f     The StcObsDataLocation class does not define any new routines beyond those
 static AstStcObsDataLocationVtab class_vtab;  /* Virtual function table */
 static int class_init = 0;         /* Virtual function table initialised? */
 
+/* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -111,8 +116,70 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void StcSetObs( AstStcObsDataLocation *, AstPointList * );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "stcobsdatalocation.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     StcObsDataLocation member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied StcObsDataLocation,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the StcObsDataLocation.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstStcObsDataLocation *this;         /* Pointer to StcObsDataLocation structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the StcObsDataLocation structure. */
+   this = (AstStcObsDataLocation *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astGetObjSize( this->obs );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 
 void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const char *name ) {
 /*
@@ -152,6 +219,7 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 
 /* Local Variables: */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstStcVtab *stc;        /* Pointer to Stc component of Vtab */
 
 /* Check the local error status. */
@@ -174,7 +242,10 @@ void astInitStcObsDataLocationVtab_(  AstStcObsDataLocationVtab *vtab, const cha
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    stc = (AstStcVtab *) vtab;
 
 /* Store replacement pointers for methods which will be over-ridden by

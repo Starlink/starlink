@@ -52,6 +52,8 @@ f     - AST_GETSTCNCOORD: Returns the number of AstroCoords elements in an Stc
 *  History:
 *     23-NOV-2004 (DSB):
 *        Original version.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -102,6 +104,7 @@ static AstStcVtab class_vtab;    /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *(* parent_getuncfrm)( AstRegion *, int );
@@ -152,6 +155,7 @@ static const char *regcom[ NREG ] = { "AstroCoords error region",
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int GetObjSize( AstObject * );
 static AstRegion *GetUncFrm( AstRegion *, int );
 static int Equal( AstObject *, AstObject * );
 static int GetBounded( AstRegion * );
@@ -642,6 +646,75 @@ MAKE_TEST(Negated)
 
 
 
+
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "stc.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     Stc member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Stc,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Stc.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstStc *this;         /* Pointer to Stc structure */
+   int result;           /* Result value to return */
+   int i;                /* AstroCoords index */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Stc structure. */
+   this = (AstStc *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astGetObjSize( this->region );
+
+   if( this->coord ) {
+      for( i = 0; i < this->ncoord; i++ ) {
+         result += astGetObjSize( this->coord[ i ] );
+      }
+      result += astSizeOf( this->coord );
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
@@ -1443,6 +1516,8 @@ void astInitStcVtab_(  AstStcVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    region = (AstRegionVtab *) vtab;
 
    parent_clearattrib = object->ClearAttrib;

@@ -163,6 +163,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        the same indices.
 *     7-DEC-2005 (DSB):
 *        Free memory allocated by calls to astReadString.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -604,6 +606,7 @@ static AstWcsMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -655,6 +658,7 @@ AstWcsMap *astWcsMapId_( int, int, int, int, const char *options, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static int GetObjSize( AstObject * );
 static double GetPV( AstWcsMap *, int, int );
 static int TestPV( AstWcsMap *, int, int );
 static void ClearPV( AstWcsMap *, int, int );
@@ -1334,6 +1338,75 @@ static void FreePV( AstWcsMap *this ) {
 
 }   
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     WcsMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied WcsMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the WcsMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWcsMap *this;         /* Pointer to WcsMap structure */
+   int result;              /* Result value to return */
+   int i;                   /* Axis index */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the WcsMap structure. */
+   this = (AstWcsMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+      
+   result += astSizeOf( this->np );
+   if( this->p ){
+      for( i = 0; i < astGetNin( this ); i++ ){
+         result += astSizeOf( (void *) this->p[ i ] );
+      }
+      result += astSizeOf( this->p );
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1911,6 +1984,8 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

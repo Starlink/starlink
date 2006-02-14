@@ -122,6 +122,8 @@ f     The CmpFrame class does not define any new routines beyond those
 *     12-AUG-2005 (DSB):
 *        Override astSetObsLat/Lon and astClearObslat/Lon by implementations 
 *        which propagate the changed value to the component Frames.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -513,6 +515,7 @@ static AstCmpFrameVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static AstSystemType (* parent_getsystem)( AstFrame * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
@@ -552,6 +555,7 @@ AstCmpFrame *astCmpFrameId_( void *, void *, const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static int GetObjSize( AstObject * );
 static AstAxis *GetAxis( AstFrame *, int );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
@@ -1979,6 +1983,70 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied CmpFrame,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;         /* Pointer to CmpFrame structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astGetObjSize( this->frame1 );
+   result += astGetObjSize( this->frame2 );
+   result += astSizeOf( this->perm );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static AstSystemType GetAlignSystem( AstFrame *this_frame ) {
 /*
 *  Name:
@@ -3312,6 +3380,8 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    mapping = (AstMappingVtab *) vtab;
 
    parent_clearattrib = object->ClearAttrib;

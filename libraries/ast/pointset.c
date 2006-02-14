@@ -39,6 +39,8 @@
 *        - Add protected PointAccuracy attribute.
 *     7-JAN-2005 (DSB):
 *        Added astAppendPoints.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 */
 
 /* Module Macros. */
@@ -440,6 +442,7 @@ static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
 static int (* parent_equal)( AstObject *, AstObject * );
+static int (* parent_getobjsize)( AstObject * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -455,6 +458,8 @@ static double **GetPoints( AstPointSet * );
 static int Equal( AstObject *, AstObject * );
 static int GetNcoord( const AstPointSet * );
 static int GetNpoint( const AstPointSet * );
+static int GetObjSize( AstObject * );
+static int GetObjSize( AstObject * );
 static int TestAttrib( AstObject *, const char * );
 static AstPointSet *AppendPoints( AstPointSet *, AstPointSet * );
 static void ClearAttrib( AstObject *, const char * );
@@ -1034,6 +1039,70 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "pointset.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     PointSet member function (over-rides the astGetObjSize protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied PointSet,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *this;         /* Pointer to PointSet structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the PointSet structure. */
+   this = (AstPointSet *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astSizeOf( this->ptr );
+   result += astSizeOf( this->values );
+   result += astSizeOf( this->acc );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetNcoord( const AstPointSet *this ) {
 /*
 *+
@@ -1322,6 +1391,8 @@ void astInitPointSetVtab_(  AstPointSetVtab *vtab, const char *name ) {
    object->TestAttrib = TestAttrib;
    parent_equal = object->Equal;
    object->Equal = Equal;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );

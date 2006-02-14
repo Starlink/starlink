@@ -78,6 +78,8 @@ f     - AST_GETREFPOS: Get reference position in any celestial system
 *        backward compatibility the public attribute accessors and the 
 *        astLoadSpecFrame functions still recogonise GeoLon and GeoLat,
 *        but use the ObsLat/ObsLon attributes internally.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -162,6 +164,7 @@ static AstSkyFrame *skyframe;
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
 static AstSystemType (* parent_getsystem)( AstFrame * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
@@ -186,6 +189,7 @@ static void (* parent_clearunit)( AstFrame *, int );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstStdOfRestType StdOfRestCode( const char * );
+static int GetObjSize( AstObject * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
@@ -803,6 +807,73 @@ static int EqualSor( AstSpecFrame *this, AstSpecFrame *that ) {
    }
 
 /* Return the result */
+   return result;
+}
+
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     SpecFrame member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied SpecFrame,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the SpecFrame.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSpecFrame *this;         /* Pointer to SpecFrame structure */
+   int result;                /* Result value to return */
+   int i;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the SpecFrame structure. */
+   this = (AstSpecFrame *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   if( this->usedunits ) {
+      for( i = 0; i < this->nuunits; i++ ) {
+         result += astSizeOf( this->usedunits[ i ] );
+      }
+      result += astSizeOf( this->usedunits );
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
    return result;
 }
 
@@ -1885,6 +1956,8 @@ void astInitSpecFrameVtab_(  AstSpecFrameVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

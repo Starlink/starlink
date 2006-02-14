@@ -49,6 +49,8 @@ f     The Prism class does not define any new routines beyond those
 *     11-MAY-2005 (DSB):
 *        Overlap modified to allow testing of overlap between prisms and
 *        intervals.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -107,6 +109,7 @@ static AstPrismVtab class_vtab; /* Virtual function table */
 static int class_init = 0;          /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *(* parent_getuncfrm)( AstRegion *, int );
 static void (* parent_clearunc)( AstRegion * );
@@ -136,6 +139,7 @@ static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstRegion *EquivPrism( AstPrism *, AstRegion * );
+static int GetObjSize( AstObject * );
 static AstRegion *GetUncFrm( AstRegion *, int );
 static double *RegCentre( AstRegion *this, double *, double **, int, int );
 static double GetFillFactor( AstRegion * );
@@ -670,6 +674,68 @@ MAKE_CLEAR(Closed,closed)
 /* Undefine the macro. */
 #undef MAKE_CLEAR
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "prism.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     Prism member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Prism,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Prism.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPrism *this;         /* Pointer to Prism structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Prism structure. */
+   this = (AstPrism *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astGetObjSize( this->region1 );
+   result += astGetObjSize( this->region2 );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetBounded( AstRegion *this_region ) {
 /*
 *  Name:
@@ -1090,6 +1156,8 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    region = (AstRegionVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
 

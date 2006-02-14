@@ -62,6 +62,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *     15-MAR-2005 (DSB):
 *        - Avoid exponents in log format labels which are close to zero but 
 *        not quite zero.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -110,6 +112,7 @@ static AstAxisVtab class_vtab;   /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
@@ -137,6 +140,7 @@ AstAxis *astAxisId_( const char *, ... );
 /* ======================================== */
 static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
 static const char *AxisFormat( AstAxis *, double );
+static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
@@ -1247,6 +1251,71 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    }
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     Axis member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Axis,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstAxis *this;             /* Pointer to Axis structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Axis structure. */
+   this = (AstAxis *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astSizeOf( this->label );
+   result += astSizeOf( this->format );
+   result += astSizeOf( this->symbol );
+   result += astSizeOf( this->unit );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -1494,6 +1563,8 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    object = (AstObjectVtab *) vtab;
 
    parent_clearattrib = object->ClearAttrib;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    object->ClearAttrib = ClearAttrib;
    parent_getattrib = object->GetAttrib;
    object->GetAttrib = GetAttrib;

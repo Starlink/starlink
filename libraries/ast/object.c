@@ -24,8 +24,9 @@
 *
 *     - Class: Object class name
 *     - ID: Object identification string
-*     - Ident: Permanent Object identification string.
+*     - Ident: Permanent Object identification string
 *     - Nobject: Number of Objects in class
+*     - ObjSize: The in-memory size of the Object in bytes
 *     - RefCount: Count of active Object pointers
 *     - UseDefs: Allow use of default values for Object attributes?
 
@@ -128,6 +129,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Correct use of ->ident pointers, and added further DEBUG blocks.
 *     11-MAR-2005 (DSB):
 *        Added attribute UseDefs.
+*     14-FEB-2006 (DSB):
+*        Added attribute ObjSize.
 *class--
 */
 
@@ -216,6 +219,8 @@ static void SetID( AstObject *, const char * );
 static void SetIdent( AstObject *, const char * );
 static void Show( AstObject * );
 static void VSet( AstObject *, const char *, va_list );
+
+static int GetObjSize( AstObject * );
 
 static int GetUseDefs( AstObject * );
 static int TestUseDefs( AstObject * );
@@ -484,6 +489,7 @@ static void ClearAttrib( AstObject *this, const char *attrib ) {
    attributes of this class. If it does, then report an error. */
    } else if ( !strcmp( attrib, "class" ) ||
                !strcmp( attrib, "nobject" ) ||
+               !strcmp( attrib, "objsize" ) ||
                !strcmp( attrib, "refcount" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
                 "value for a %s.", attrib, astGetClass( this ) );
@@ -1208,6 +1214,7 @@ static const char *GetAttrib( AstObject *this, const char *attrib ) {
 /* Local Variables: */
    const char *result;           /* Pointer value to return */
    int nobject;                  /* Nobject attribute value */
+   int objsize;                  /* ObjSize attribute value */
    int ref_count;                /* RefCount attribute value */
    int usedefs;                  /* UseDefs attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
@@ -1253,6 +1260,15 @@ static const char *GetAttrib( AstObject *this, const char *attrib ) {
       nobject = astGetNobject( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", nobject );
+         result = buff;
+      }
+
+/* ObjSize */
+/* ------- */
+   } else if ( !strcmp( attrib, "objsize" ) ) {
+      objsize = astGetObjSize( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", objsize );
          result = buff;
       }
 
@@ -1385,6 +1401,49 @@ int astGetNobject_( const AstObject *this ) {
 
 /* Return the active object count. */
    return this->vtab->nobject;
+}
+
+static int GetObjSize( AstObject *this ) {
+/*
+*+
+*  Name:
+*     astGetObjSize
+
+*  Purpose:
+*     Determine the in-memory size of the Object.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "object.h"
+*     int astGetObjSize( AstObject *this )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function returns the in-memory size of an Object.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Return the number of Frame axes. */
+   return this->size;
 }
 
 int astGetRefCount_( const AstObject *this ) {
@@ -1921,6 +1980,7 @@ static void SetAttrib( AstObject *this, const char *setting ) {
 
    } else if ( MATCH( "class" ) ||
                MATCH( "nobject" ) ||
+               MATCH( "objsize" ) ||
                MATCH( "refcount" ) ) {
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.",
                 setting, astGetClass( this ) );
@@ -2557,6 +2617,7 @@ static int TestAttrib( AstObject *this, const char *attrib ) {
    attributes of this class. If it does, then return zero. */
    } else if ( !strcmp( attrib, "class" ) ||
                !strcmp( attrib, "nobject" ) ||
+               !strcmp( attrib, "objsize" ) ||
                !strcmp( attrib, "refcount" ) ) {
       result = 0;
 
@@ -3114,6 +3175,31 @@ astMAKE_TEST(Object,UseDefs,(this->usedefs!=INT_MAX))
 /*
 *att++
 *  Name:
+*     ObjSize
+
+*  Purpose:
+*     The in-memory size of the Object.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer, read-only.
+
+*  Description:
+*     This attribute gives the total number of bytes of memory used by
+*     the Object. This includes any Objects which are encapsulated within
+*     the supplied Object.
+
+*  Applicability:
+*     Object
+*        All Objects have this attribute.
+*att--
+*/
+
+/*
+*att++
+*  Name:
 *     RefCount
 
 *  Purpose:
@@ -3360,6 +3446,8 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->TestID = TestID;
    vtab->TestIdent = TestIdent;
    vtab->VSet = VSet;
+
+   vtab->GetObjSize = GetObjSize;
 
    vtab->TestUseDefs = TestUseDefs;
    vtab->SetUseDefs = SetUseDefs;
@@ -3739,6 +3827,10 @@ int astTestAttrib_( AstObject *this, const char *attrib ) {
 void astVSet_( AstObject *this, const char *settings, va_list args ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Object,VSet))( this, settings, args );
+}
+int astGetObjSize_( AstObject *this ) {
+   if ( !astOK || !this ) return 0;
+   return (**astMEMBER(this,Object,GetObjSize))( this );
 }
 
 /* External interface. */

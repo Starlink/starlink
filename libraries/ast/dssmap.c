@@ -74,6 +74,8 @@ f     The DssMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitDssMapVtab
 *        method.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -128,6 +130,7 @@ static AstDssMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 
 /* External Interface Function Prototypes. */
@@ -148,8 +151,71 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "dssmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     DssMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied DssMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the DssMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstDssMap *this;         /* Pointer to DssMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the DssMap structure. */
+   this = (AstDssMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astSizeOf( this->wcs );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 
 static struct WorldCoor *BuildWcs( AstFitsChan *fits, const char *method,
                                    const char *class ) {
@@ -579,6 +645,8 @@ void astInitDssMapVtab_(  AstDssMapVtab *vtab, const char *name ) {
    object = (AstObjectVtab *) vtab;
 
    parent_transform = mapping->Transform;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    mapping->Transform = Transform;
 
 /* Store replacement pointers for methods which will be over-ridden by

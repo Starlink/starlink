@@ -655,6 +655,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     30-JAN-2006 (DSB):
 *        Modify astSplit so that it does no read the supplied card beyond 
 *        column 80.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -932,6 +934,7 @@ static const char *type_names[] = {"comment", "integer", "floating point",
                                    "continuation string", "undefined" };
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_getfull)( AstChannel * );
 static int (* parent_getskip)( AstChannel * );
@@ -987,6 +990,7 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static void ClearCard( AstFitsChan * );
+static int GetObjSize( AstObject * );
 static int GetCard( AstFitsChan * );
 static int TestCard( AstFitsChan * );
 static void SetCard( AstFitsChan *, int );
@@ -9593,6 +9597,79 @@ static void Geod( double pos[3], double *phi, double *h, double *lambda ){
    }
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     FitsChan member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied FitsChan,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFitsChan *this;         /* Pointer to FitsChan structure */
+   FitsCard *card;            /* Pointer to next FitsCard */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the FitsChan structure. */
+   this = (AstFitsChan *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astSizeOf( this->warnings );
+   result += astSizeOf( this->keyseq );
+
+   card = (FitsCard *) ( this->head );
+   while( card ) {
+      result += astSizeOf( card );
+      result += card->size;
+      result += astSizeOf( card->comment );
+      card = GetLink( card, NEXT, "astGetObjSize", "FitsChan" );
+      if( (void *) card == this->head ) break;
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetCDMatrix( AstFitsChan *this ){
 /*
 *  Name:
@@ -14468,6 +14545,8 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    channel = (AstChannelVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

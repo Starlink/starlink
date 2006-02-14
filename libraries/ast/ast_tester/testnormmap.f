@@ -12,6 +12,11 @@
       f = ast_cmpframe( ast_specframe( ' ', status ),
      :                  ast_skyframe( ' ', status ), ' ', status )          
 
+      if( ast_geti( f, 'ObjSize', status ) .ne. 552 ) then
+         call stopit( 0, status )
+      end if
+
+
       perm( 1 )  = 3
       perm( 2 )  = 1
       perm( 3 )  = 2

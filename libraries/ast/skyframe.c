@@ -138,6 +138,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        from the original System to the default System.
 *     19-SEP-2005 (DSB):
 *        Changed default for SkyRefIs from ORIGIN to IGNORED.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -584,6 +586,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are used or extended by this
    class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstSystemType (* parent_getsystem)( AstFrame * );
 static void (* parent_clearsystem)( AstFrame * );
 static void (* parent_setsystem)( AstFrame *, AstSystemType );
@@ -624,6 +627,7 @@ static double piby2;
 /* ======================================== */
 static AstMapping *OffsetMap( AstSkyFrame * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
+static int GetObjSize( AstObject * );
 static AstSystemType GetAlignSystem( AstFrame * );
 static AstSystemType GetSystem( AstFrame * );
 static void ClearSystem( AstFrame * );
@@ -1439,6 +1443,67 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    if ( !astOK ) result = 0.0;
 
 /* Return the result. */
+   return result;
+}
+
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied SkyFrame,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyFrame *this;         /* Pointer to SkyFrame structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astSizeOf( this->projection );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
    return result;
 }
 
@@ -3398,6 +3463,8 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    frame = (AstFrameVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

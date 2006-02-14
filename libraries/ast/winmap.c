@@ -81,6 +81,8 @@ f     The WinMap class does not define any new routines beyond those
 *     7-SEP-2005 (DSB):
 *        Take account of the Invert flag when using the soom factor from
 *        a ZoomMap.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -130,6 +132,7 @@ static AstWinMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -151,6 +154,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * )
 static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
 static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
 static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int );
+static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static double Rate( AstMapping *, double *, int, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
@@ -414,6 +418,68 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     WinMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied WinMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *this;         /* Pointer to WinMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the WinMap structure. */
+   this = (AstWinMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astSizeOf( this->a );
+   result += astSizeOf( this->b );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -551,6 +617,8 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

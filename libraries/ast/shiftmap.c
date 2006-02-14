@@ -35,6 +35,8 @@ f     The ShiftMap class does not define any new routines beyond those
 *  History:
 *     15-AUG-2003 (DSB):
 *        Original version.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -83,6 +85,7 @@ static AstShiftMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;         /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -100,6 +103,7 @@ AstShiftMap *astShiftMapId_( int, const double [], const char *, ... );
 /* ======================================== */
 
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static double Rate( AstMapping *, double *, int, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -170,6 +174,67 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    parent method for further interpretation. */
    (*parent_clearattrib)( this_object, attrib );
 
+}
+
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "shiftmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     ShiftMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied ShiftMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the ShiftMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstShiftMap *this;         /* Pointer to ShiftMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the ShiftMap structure. */
+   this = (AstShiftMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astSizeOf( this->shift );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -308,6 +373,8 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

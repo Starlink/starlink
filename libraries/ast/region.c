@@ -131,6 +131,8 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *        Override astNormBox method.
 *     12-AUG-2005 (DSB):
 *        Override ObsLat and ObsLon accessor methods.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 
 *  Implementation Notes:
@@ -735,6 +737,7 @@ static AstRegionVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static int (* parent_getnaxes)( AstFrame * );
 static int (* parent_getusedefs)( AstObject * );
 
@@ -754,6 +757,7 @@ static int MaskUI( AstRegion *, AstMapping *, int, int, const int[], const int[]
 static int MaskUL( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned long int[], unsigned long int );
 static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[], unsigned short int[], unsigned short int );
 
+static int GetObjSize( AstObject * );
 static AstAxis *GetAxis( AstFrame *, int );
 static AstFrame *GetRegionFrame( AstRegion * );
 static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping ** );
@@ -2526,6 +2530,72 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     Region member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Region,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstRegion *this;         /* Pointer to Region structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Region structure. */
+   this = (AstRegion *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astGetObjSize( this->frameset );
+   result += astGetObjSize( this->points );
+   result += astGetObjSize( this->basemesh );
+   result += astGetObjSize( this->basegrid );
+   result += astGetObjSize( this->unc );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -3868,6 +3938,8 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    functions implemented here. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    frame = (AstFrameVtab *) vtab;
 
    parent_getnaxes = frame->GetNaxes;

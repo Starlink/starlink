@@ -48,6 +48,8 @@ f     The RateMap class does not define any new routines beyond those
 *  History:
 *     10-FEB-2004 (DSB):
 *        Original version.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -89,6 +91,7 @@ static AstRateMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
 
@@ -108,8 +111,70 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "ratemap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     RateMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied RateMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the RateMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstRateMap *this;         /* Pointer to RateMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the RateMap structure. */
+   this = (AstRateMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astGetObjSize( this->map );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name ) {
 /*
 *+
@@ -147,6 +212,7 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -171,7 +237,10 @@ void astInitRateMapVtab_(  AstRateMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;

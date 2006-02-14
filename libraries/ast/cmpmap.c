@@ -84,6 +84,8 @@ f     The CmpMap class does not define any new routines beyond those
 *     8-FEB-2006 (DSB):
 *        Corrected logic within MapMerge for cases where a PermMap is
 *        followed by a parallel CmpMap.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -128,6 +130,7 @@ static AstCmpMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int *(* parent_mapsplit)( AstMapping *, int, int *, AstMapping ** );
@@ -155,8 +158,72 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     CmpMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied CmpMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpMap *this;         /* Pointer to CmpMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the CmpMap structure. */
+   this = (AstCmpMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astGetObjSize( this->map1 );
+   result += astGetObjSize( this->map2 );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static AstMapping *CombineMaps( AstMapping *mapping1, int invert1,
                                 AstMapping *mapping2, int invert2,
                                 int series ) {
@@ -457,6 +524,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 
 /* Local Variables: */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -480,7 +548,10 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_maplist = mapping->MapList;
    mapping->MapList = MapList;

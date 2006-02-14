@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {7th February 2006}
+\newcommand{\stardocdate}      {14th February 2006}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21086,6 +21086,13 @@ occurred in the AST library between versions V4.1 and V4.2 (the
 current version):
 
 \begin{enumerate}
+
+\item A new read-only attribute called ObjSize has been added to the base
+Object Class. This gives the number of bytes of memory occupied by the
+Object. Note, this is the size of the internal in-memory representation of 
+the Object, not the size of the textual representation produced by
+writing the Object out through a Channel.
+
 
 \item A new function 
 c+

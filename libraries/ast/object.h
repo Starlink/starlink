@@ -54,6 +54,8 @@
 *        intended for debugging, as it can be used to show whether
 *        Objects which should have been deleted have, in fact, been
 *        deleted.
+*     ObjSize (int)
+*        The in-memory size of the Object in bytes.
 *     RefCount (integer)
 *        This is a read-only Attribute which gives the "reference
 *        count" (the number of active pointers) associated with an
@@ -272,6 +274,8 @@
 *        Added UseDefs attribute.
 *     7-FEB-2006 (DSB):
 *        Added astTune function.
+*     14-FEB-2006 (DSB):
+*        Added ObjSize attribute.
 *--
 */
 
@@ -1171,6 +1175,8 @@ typedef struct AstObjectVtab {
    void (* Show)( AstObject * );
    void (* VSet)( AstObject *, const char *, va_list );
 
+   int (* GetObjSize)( AstObject * );
+
    int (* TestUseDefs)( AstObject * );
    int (* GetUseDefs)( AstObject * );
    void (* SetUseDefs)( AstObject *, int );
@@ -1273,6 +1279,8 @@ void astSetL_( AstObject *, const char *, long );
 void astShow_( AstObject * );
 
 #if defined(astCLASS)            /* Protected */
+
+int astGetObjSize_( AstObject * );
 
 int astTestUseDefs_( AstObject * );
 int astGetUseDefs_( AstObject * );
@@ -1403,6 +1411,8 @@ astINVOKE(V,astShow_(astCheckObject(this)))
 astINVOKE(V,astTest_(astCheckObject(this),attrib))
 
 #if defined(astCLASS)            /* Protected */
+
+#define astGetObjSize(this) astINVOKE(V,astGetObjSize_(astCheckObject(this)))
 
 #define astClearUseDefs(this) astINVOKE(V,astClearUseDefs_(astCheckObject(this)))
 #define astTestUseDefs(this) astINVOKE(V,astTestUseDefs_(astCheckObject(this)))

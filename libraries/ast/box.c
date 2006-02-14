@@ -42,6 +42,8 @@ f     The Box class does not define any new routines beyond those
 *  History:
 *     22-MAR-2004 (DSB):
 *        Original version.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -91,6 +93,7 @@ static AstBoxVtab class_vtab;    /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
 static void (* parent_setnegated)( AstRegion *, int );
@@ -126,14 +129,81 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static void ResetCache( AstRegion *this );
 static void SetClosed( AstRegion *, int );
 static void SetNegated( AstRegion *, int );
-static void SetUnc( AstRegion *, AstRegion * );
 static void SetRegFS( AstRegion *, AstFrame * );
-static void ResetCache( AstRegion *this );
+static void SetUnc( AstRegion *, AstRegion * );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     Box member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied Box,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the Box.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstBox *this;         /* Pointer to Box structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the Box structure. */
+   this = (AstBox *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   result += astSizeOf( this->extent );  
+   result += astSizeOf( this->shextent );
+   result += astSizeOf( this->centre );  
+   result += astSizeOf( this->lo );      
+   result += astSizeOf( this->hi );      
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 
 static void ClearClosed( AstRegion *this ){
 /*
@@ -261,6 +331,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 /* Local Variables: */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -282,7 +353,10 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    region = (AstRegionVtab *) vtab;
 
    parent_transform = mapping->Transform;

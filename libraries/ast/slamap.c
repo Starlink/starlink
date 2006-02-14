@@ -78,6 +78,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Added J2000H and HJ2000 conversion functions.
 *     15-AUG-2005 (DSB):
 *        - Added H2E and E2H conversion functions.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -173,6 +175,7 @@ static AstSlaMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 
 /* External Interface Function Prototypes. */
@@ -203,8 +206,76 @@ static void Gsec( double, double[3][3], double[3] );
 static void STPConv( double, int, int, int, double[3], double *[3], int, double[3], double *[3] );
 static void J2000H( int, int, double *, double * );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "slamap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     SlaMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied SlaMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the SlaMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSlaMap *this;         /* Pointer to SlaMap structure */
+   int result;              /* Result value to return */
+   int cvt;                 /* Loop counter for coordinate conversions */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the SlaMap structure. */
+   this = (AstSlaMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
+      result += astSizeOf( this->cvtargs[ cvt ] );
+   }
+
+   result += astSizeOf( this->cvtargs );
+   result += astSizeOf( this->cvttype );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 /*
 *  Name:
@@ -2036,6 +2107,7 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -2059,7 +2131,10 @@ void astInitSlaMapVtab_(  AstSlaMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;

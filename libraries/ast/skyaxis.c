@@ -81,6 +81,8 @@ f     only within textual output (e.g. from AST_WRITE).
 *     18-MAR-2005 (DSB):
 *        Invoke methods inherited from parent Axis class if the format
 *        string starts with a '%' character.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -123,6 +125,7 @@ static AstSkyAxisVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static const char *(* parent_getaxislabel)( AstAxis * );
 static const char *(* parent_getaxissymbol)( AstAxis * );
@@ -167,6 +170,7 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 /* ======================================== */
 static const char *AxisAbbrev( AstAxis *, const char *, const char *, const char * );
 static const char *AxisFormat( AstAxis *, double );
+static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
@@ -2126,6 +2130,67 @@ static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 #undef BUFF_LEN
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied SkyAxis,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyAxis.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSkyAxis *this;         /* Pointer to SkyAxis structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the SkyAxis structure. */
+   this = (AstSkyAxis *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+   result += astSizeOf( this->skyformat );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -2869,6 +2934,8 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    axis = (AstAxisVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;

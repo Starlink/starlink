@@ -78,6 +78,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *        Allow an integer to be read from a formatted floating point value.
 *     6-DEC-2005 (DSB):
 *        Remove astMapGet0C stuff from description of astMapGet1C.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -171,6 +173,7 @@ static AstKeyMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -185,6 +188,7 @@ static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry * );
 static AstMapEntry *CopyMapEntry( AstMapEntry * );
 static AstMapEntry *FreeMapEntry( AstMapEntry * );
 static AstMapEntry *SearchTableEntry( AstKeyMap *, int, const char * );
+static int GetObjSize( AstObject * );
 static const char *GetKey( AstKeyMap *, int index );
 static const char *MapKey( AstKeyMap *, int index );
 static int ConvertValue( void *, int, void *, int );
@@ -1177,6 +1181,127 @@ static void FreeTableEntry( AstKeyMap *this, int itab ){
    }
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "keymap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     KeyMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied KeyMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the KeyMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstKeyMap *this;       /* Pointer to KeyMap structure */
+   AstMapEntry *next;     /* Pointer the next MapEntry */
+   AstObject **alist;     /* Pointer to list of AST object pointers */
+   AstObject *obj;        /* Pointer to AST object */
+   const char **slist;    /* Pointer to list of text pointers */
+   int i;                 /* Loop count */
+   int itab;              /* Table entry index */
+   int nel;               /* No. of values in entry vector (0 => scalar) */
+   int result;            /* Result value to return */
+   int type;              /* Entry data type */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the KeyMap structure. */
+   this = (AstKeyMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   for( itab = 0; itab < AST__MAPSIZE; itab++ ) {
+      next = this->table[ itab ];
+      while( next ) {
+         nel = next->nel;
+         type = next->type;
+
+         if( type == AST__STRINGTYPE ) {
+
+            if( nel == 0 ) {
+               result += astSizeOf( ( void *) ( (Entry0C *) next )->value );
+
+            } else {
+               slist = ( (Entry1C *) next )->value;
+               if( slist ) {
+                  for( i = 0; i < nel; i++ ) result += astSizeOf( (void *) slist[ i ] );
+                  result += astSizeOf( (void *) slist );
+               }
+            }
+
+         } else if( type == AST__OBJECTTYPE ) {
+            if( nel == 0 ) {
+               obj = ( (Entry0A *) next )->value;
+               result += astGetObjSize( obj );
+            } else {
+               alist = ( (Entry1A *) next )->value;
+               if( alist ) {
+                  for( i = 0; i < nel; i++ ) {
+                     result += astGetObjSize( alist[ i ] );
+                  }
+                  result += astSizeOf( alist );
+               }
+            }
+
+         } else if( type == AST__INTTYPE ) {
+            if( nel > 0 ) result += astSizeOf( ( (Entry1I *) next )->value );
+
+         } else if( type == AST__DOUBLETYPE ) {
+            if( nel > 0 ) result += astSizeOf( ( (Entry1D *) next )->value );
+
+         } else {
+            astError( AST__INTER, "astGetObjSize(KeyMap): Illegal map entry data "
+                      "type %d encountered (internal AST programming error).",
+                      type );
+         }
+
+         result += astSizeOf( (void *) next->key );
+         result += astSizeOf( (void *) next->comment );
+         result += astSizeOf( next );
+
+         next = next->next;
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetKey( AstKeyMap *this, int index ) {
 /*
 *  Name:
@@ -1361,6 +1486,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -1405,9 +1531,12 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
 /* Declare the destructor, copy constructor and dump function. */
    astSetDelete( vtab, Delete );

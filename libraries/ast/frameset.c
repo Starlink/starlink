@@ -194,6 +194,8 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *        Override astNormBox method.
 *     12-AUG-2005 (DSB):
 *        Override ObsLat and ObsLon accessor methods.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -722,12 +724,14 @@ static const char *integrity_method = ""; /* Name of method being used */
 static int integrity_lost = 0;   /* Current Frame modified? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static void (* parent_clear)( AstObject *, const char * );
 static int (* parent_getusedefs)( AstObject * );
 static void (* parent_vset)( AstObject *, const char *, va_list );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static int GetObjSize( AstObject * );
 static AstAxis *GetAxis( AstFrame *, int );
 static AstFrame *GetFrame( AstFrameSet *, int );
 static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping ** );
@@ -3287,6 +3291,82 @@ static double Gap( AstFrame *this_frame, int axis, double gap, int *ntick ) {
    return result;
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied FrameSet,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the FrameSet.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrameSet *this;         /* Pointer to FrameSet structure */
+   int result;                /* Result value to return */
+   int iframe;                /* Loop counter for Frames */
+   int inode;                 /* Loop counter for nodes */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the FrameSet structure. */
+   this = (AstFrameSet *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   for ( iframe = 0; iframe < this->nframe; iframe++ ) {
+      result += astGetObjSize( this->frame[ iframe ] );
+   }
+
+   for ( inode = 0; inode < this->nnode - 1; inode++ ) {
+      result += astGetObjSize( this->map[ inode ] );
+   }
+
+   result += astGetObjSize( this->frame );
+   result += astGetObjSize( this->node );
+   result += astGetObjSize( this->map );
+   result += astGetObjSize( this->link );
+   result += astGetObjSize( this->invert );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -4544,6 +4624,8 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    object = (AstObjectVtab *) vtab;
 
    parent_clear = object->Clear;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
    object->Clear = Clear;
 
    parent_vset = object->VSet;

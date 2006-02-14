@@ -73,6 +73,8 @@ f     - AST_SPECADD: Add a spectral coordinate conversion to an SpecMap
 *        - Improve FRTOAW accuracy by iterating.
 *        - Changed Refrac to use algorithm given in FITS-WCS paper 3
 *        version dated 21/9/03.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -174,6 +176,7 @@ static AstSpecMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double (* parent_rate)( AstMapping *, double *, int, int );
 
@@ -224,8 +227,77 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void SpecAdd( AstSpecMap *, const char *, const double[] );
 
+static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     SpecMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied SpecMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the SpecMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSpecMap *this;         /* Pointer to SpecMap structure */
+   int result;               /* Result value to return */
+   int cvt;                  /* Loop counter for coordinate conversions */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the SpecMap structure. */
+   this = (AstSpecMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
+      result += astSizeOf( this->cvtargs[ cvt ] );
+   }
+
+   result += astSizeOf( this->cvtargs );
+   result += astSizeOf( this->cvttype );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static void AddSpecCvt( AstSpecMap *this, int cvttype, const double *args ) {
 /*
 *  Name:
@@ -1600,6 +1672,7 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -1623,7 +1696,10 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;

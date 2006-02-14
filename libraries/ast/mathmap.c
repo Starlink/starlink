@@ -59,6 +59,8 @@ f     The MathMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitMathMapVtab
 *        method.
+*     14-FEB-2006 (DSB):
+*        Override astGetObjSize.
 *class--
 */
 
@@ -112,6 +114,31 @@ f     The MathMap class does not define any new routines beyond those
       (array_name) = astFree( (array_name) ); \
    }
 
+/* SizeOf pointer array. */
+/* --------------------- */
+/* This macro increments "result" by the number of bytes allocated for an 
+   array of pointers, each of whose elements may point at a further 
+   dynamically allocated array (which is also to be included). It also 
+   allows for the possibility of any of the pointers being NULL. */
+#define SIZEOF_POINTER_ARRAY(array_name,array_size) \
+\
+/* Check that the main array pointer is not NULL. */ \
+   if ( (array_name) ) { \
+\
+/* If OK, loop to measure each of the sub-arrays. */ \
+      int array_index_; \
+      for ( array_index_ = 0; array_index_ < (array_size); array_index_++ ) { \
+\
+/* Check that each sub-array pointer is not NULL before measuring it. */ \
+         if ( (array_name)[ array_index_ ] ) { \
+            result += astSizeOf( (array_name)[ array_index_ ] ); \
+         } \
+      } \
+\
+/* Include the main pointer array. */ \
+      result += astSizeOf( (array_name) ); \
+   }
+
 /* Header files. */
 /* ============= */
 /* Interface definitions. */
@@ -153,6 +180,7 @@ static AstMathMapVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
+static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
@@ -453,6 +481,7 @@ AstMathMap *astMathMapId_( int, int, int, const char *[], int, const char *[], c
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static double Gauss( Rcontext * );
 static double LogGamma( double );
@@ -3074,6 +3103,73 @@ static double Gauss( Rcontext *context ) {
    return x;
 }
 
+static int GetObjSize( AstObject *this_object ) {
+/*
+*  Name:
+*     GetObjSize
+
+*  Purpose:
+*     Return the in-memory size of an Object.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mathmap.h"
+*     int GetObjSize( AstObject *this ) 
+
+*  Class Membership:
+*     MathMap member function (over-rides the astGetObjSize protected
+*     method inherited from the parent class).
+
+*  Description:
+*     This function returns the in-memory size of the supplied MathMap,
+*     in bytes.
+
+*  Parameters:
+*     this
+*        Pointer to the MathMap.
+
+*  Returned Value:
+*     The Object size, in bytes.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstMathMap *this;         /* Pointer to MathMap structure */
+   int result;                /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointers to the MathMap structure. */
+   this = (AstMathMap *) this_object;
+
+/* Invoke the GetObjSize method inherited from the parent class, and then
+   add on any components of the class structure defined by thsi class
+   which are stored in dynamically allocated memory. */
+   result = (*parent_getobjsize)( this_object );
+
+   SIZEOF_POINTER_ARRAY( this->fwdfun, this->nfwd )
+   SIZEOF_POINTER_ARRAY( this->invfun, this->ninv )
+   SIZEOF_POINTER_ARRAY( this->fwdcode, this->nfwd )
+   SIZEOF_POINTER_ARRAY( this->invcode, this->ninv )
+   SIZEOF_POINTER_ARRAY( this->fwdcon, this->nfwd )
+   SIZEOF_POINTER_ARRAY( this->invcon, this->ninv )
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -3258,6 +3354,8 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
    replace them with pointers to the new member functions. */
    object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+   parent_getobjsize = object->GetObjSize;
+   object->GetObjSize = GetObjSize;
 
    parent_clearattrib = object->ClearAttrib;
    object->ClearAttrib = ClearAttrib;
