@@ -26,6 +26,6 @@ F77_SUBROUTINE(ems_expnd) ( CHARACTER(text), CHARACTER(opstr),
    emsExpnd( ctext, str, opstr_length, oplen, status );
 
    cnfExprt( str, opstr, opstr_length );
-   free( ctext );
-   free( str );
+   cnfFree( ctext );
+   cnfFree( str );
 }

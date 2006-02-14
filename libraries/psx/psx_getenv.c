@@ -64,6 +64,9 @@
 *     19-SEP-2005 (TIMJ):
 *        Should use 'free' not 'cnfFree' when freeing string returned
 *        by cnfCreim.
+*     13-FEB-2006 (TIMJ):
+*        Use cnfFree again since this is easier to control when changing
+*        malloc library.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -82,7 +85,6 @@
 #include "psx_err.h"		 /* PSX error values			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
 #include "sae_par.h"		 /* ADAM constants			    */
-
 
 F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
                             CHARACTER(trans),
@@ -139,7 +141,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 
 /* Free the temporary space.						    */
 
-      free( temp_name );
+      cnfFree( temp_name );
 
    }
 
@@ -163,7 +165,7 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
       strcat( errmsg_p, "\"" );
       psx1_rep_c( "PSX_GETENV_NOENV", errmsg_p, status );
       free( errmsg_p );
-      free( temp_name );
+      cnfFree( temp_name );
    }
 
 

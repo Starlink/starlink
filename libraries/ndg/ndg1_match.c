@@ -45,6 +45,10 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
 *        - First version.
 *     20-SEP-2005 (TIMJ):
 *        Update cnf usage. Use free not cnfFree to free temp storage.
+*     13-FEB-2006 (TIMJ):
+*        Use cnfFree again since this is easier to control when changing
+*        malloc library.
+
 */
    GENPTR_CHARACTER(template) 
    GENPTR_CHARACTER(test) 
@@ -76,8 +80,8 @@ F77_LOGICAL_FUNCTION(ndg1_match)( CHARACTER(template), CHARACTER(test),
    }
 
 /* Free the memory used to hold local copies of the supplied strings */
-   free( tmplt );
-   free( tst );
+   cnfFree( tmplt );
+   cnfFree( tst );
 
 /* Return the answer */
    return match;

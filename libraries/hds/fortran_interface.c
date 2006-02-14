@@ -2519,7 +2519,7 @@ F77_SUBROUTINE(dat_put0c)( CHARACTER(locator),
   value_c = cnfCreim( value, value_length );
   dat1_import_floc( locator, locator_length, &locator_c, status );
   datPut0C( &locator_c, value_c, status );
-  free(value_c);
+  cnfFree(value_c);
 }
 
 
@@ -3111,7 +3111,7 @@ F77_SUBROUTINE(hds_copy)( CHARACTER(locator),
    hdsCopy( &locator_c, file_c, name_c, status );
 
 /* Free allocated string memory.                             */
-   free( file_c );
+   cnfFree( file_c );
 }
 
 F77_SUBROUTINE(hds_erase)( CHARACTER(locator),
@@ -3243,7 +3243,7 @@ F77_SUBROUTINE(hds_gtune) ( CHARACTER(param_str),
    hdsGtune( param_str_c, value, status );
 
 /* Free allocated string memory.                             */
-   free( param_str_c );
+   cnfFree( param_str_c );
 }
 
 F77_SUBROUTINE(hds_link)( CHARACTER(locator),
@@ -3345,7 +3345,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    datExportFloc( &locator_c, 1, locator_length, locator, status );
    
 /* Free allocated string memory.                             */
-   free( file_c );
+   cnfFree( file_c );
 }
 
 F77_SUBROUTINE(hds_open)( CHARACTER(file),
@@ -3381,7 +3381,7 @@ F77_SUBROUTINE(hds_open)( CHARACTER(file),
    datExportFloc( &locator_c, 1, locator_length, locator, status );
    
 /* Free allocated string memory.                             */
-   free( file_c );
+   cnfFree( file_c );
 }
 
 F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
@@ -3421,8 +3421,8 @@ F77_SUBROUTINE(hds_infoi)( CHARACTER(locator),
    hdsInfoI( locp, topic_c, extra_c, result, status);
 
 /* Free allocated string memory.                             */
-   free( topic_c );
-   free( extra_c );
+   cnfFree( topic_c );
+   cnfFree( extra_c );
 }
 
 F77_SUBROUTINE(hds_show)( CHARACTER(topic),
@@ -3446,7 +3446,7 @@ F77_SUBROUTINE(hds_show)( CHARACTER(topic),
    hdsShow( topic_c, status);
 
 /* Free allocated string memory.                             */
-   free( topic_c );
+   cnfFree( topic_c );
 }
 
 F77_SUBROUTINE(hds_state) (int *state,
@@ -3525,7 +3525,7 @@ F77_SUBROUTINE(hds_tune) ( CHARACTER(param_str),
    hdsTune( param_str_c, *value, status );
    
 /* Free allocated string memory.                             */
-   free( param_str_c );
+   cnfFree( param_str_c );
 }
 
 F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
@@ -3561,8 +3561,8 @@ F77_SUBROUTINE(hds_wild) ( CHARACTER(fspec),
    datExportFloc( &locator_c, 1, locator_length, locator, status );
       
 /* Free allocated string memory.                             */
-   free( fspec_c );
-   free( mode_c );
+   cnfFree( fspec_c );
+   cnfFree( mode_c );
 }
 
 /*=================================================================*/

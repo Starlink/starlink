@@ -48,6 +48,10 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 *         Include failed command in error message.
 *      29-SEP-2004 (TIMJ):
 *         Free C string after use
+*     13-FEB-2006 (TIMJ):
+*        Use cnfFree since this is easier to control when changing
+*        malloc library.
+
 *
 */
 {
@@ -67,7 +71,7 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 	     status );
    }
    ret = system( cmd );
-   free( cmd );
+   cnfFree( cmd );
    if ( ret != 0 ) {
       *status = ONE__EXECERROR;
       emsSetc( "COMND", cmd );

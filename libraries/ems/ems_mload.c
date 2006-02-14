@@ -30,6 +30,6 @@ F77_SUBROUTINE(ems_mload) ( CHARACTER(msg), CHARACTER(text), CHARACTER(opstr),
    emsMload( msg, ctext, str, oplen, status );
 
    cnfExprt( str, opstr, opstr_length );
-   free( ctext );
-   free( str );
+   cnfFree( ctext );
+   cnfFree( str );
 }

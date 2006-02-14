@@ -213,7 +213,7 @@ F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
 /* Return.
  */
    abort:
-   if ( cfile ) free( cfile );
+   if ( cfile ) cnfFree( cfile );
    return;
 }
 
@@ -398,7 +398,7 @@ F77_SUBROUTINE(gsd_find)( INTEGER(fd), CHARACTER(name), INTEGER(number),
 /* Return.
  */
    abort:
-   if ( cname ) free( cname );
+   if ( cname ) cnfFree( cname );
    return;
 }
 

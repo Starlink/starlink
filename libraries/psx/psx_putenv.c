@@ -50,6 +50,9 @@
 *    20-SEP-2005 (TIMJ):
 *      Use free rather than cnfFree when using cnfCreim.
 *      Fix potential memory leak.
+*     13-FEB-2006 (TIMJ):
+*        Use cnfFree again since this is easier to control when changing
+*        malloc library.
 
 *  Notes:
 *    Uses the setenv() function where available. If setenv()
@@ -151,9 +154,9 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
 
   /* Free temp storage */
    if (temp_name != NULL)
-     free( temp_name );
+     cnfFree( temp_name );
    if (temp_value != NULL)
-     free( temp_value );
+     cnfFree( temp_value );
 
    if( *status != SAI__OK ) {
       strcpy( errmsg, "Error setting environment variable " );

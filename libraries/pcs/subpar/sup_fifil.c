@@ -59,6 +59,9 @@
 *        Free C-from-Fortran strings
 *     20-SEP-2005 (TIMJ):
 *        Update CNF usage. Fix cnfFree vs free usage
+*     13-FEB-2006 (TIMJ):
+*        Use cnfFree again since this is easier to control when changing
+*        malloc library.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -308,11 +311,11 @@ struct stat statb;
       
 /* Free the imported C strings etc. - works OK even if they weren't allocated
 */
-   free( path_c );  
-   free( name_c );   
-   free( ext_c ); 
+   cnfFree( path_c );  
+   cnfFree( name_c );   
+   cnfFree( ext_c ); 
    free( tmpext ); 
-   free( acc_c );
+   cnfFree( acc_c );
  
    return;
    }
