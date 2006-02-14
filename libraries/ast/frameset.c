@@ -8687,6 +8687,7 @@ static void VSet( AstObject *this_object, const char *settings,
    AstFrame *save_frame;         /* Saved pointer to integrity Frame */
    AstFrameSet *this;            /* Pointer to FrameSet structure */
    const char *save_method;      /* Saved pointer to method name */
+   int len;                      /* Length of settings string */
    int ok;                       /* Status OK? */
    int save_lost;                /* Saved integrity modified flag */
    char buff[ 255 ];             /* Buffer for expanded settings string */
@@ -8694,49 +8695,55 @@ static void VSet( AstObject *this_object, const char *settings,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Obtain the length of the "settings" string and test it is not
+   zero. If it is, there is nothing more to do. */
+   len = (int) strlen( settings );
+   if ( len != 0 ) {
+
 /* Obtain a pointer to the FrameSet structure. */
-   this = (AstFrameSet *) this_object;
+      this = (AstFrameSet *) this_object;
 
 /* This function may be invoked recursively (because astConvert,
    below, constructs a FrameSet and may require that its attributes be
    set). To allow this, we first save any existing FrameSet integrity
    information in local variables. */
-   save_frame = integrity_frame;
-   save_lost = integrity_lost;
-   save_method = integrity_method;
+      save_frame = integrity_frame;
+      save_lost = integrity_lost;
+      save_method = integrity_method;
 
 /* Set the name of the method being used (for use in error
    messages). */
-   integrity_method = "astSet";
+      integrity_method = "astSet";
 
 /* Record the initial integrity state of the FrameSet. */
-   RecordIntegrity( this );
+      RecordIntegrity( this );
 
 /* Invoke the parent astVSet method to set the FrameSet's attribute
    values and note if this succeeds. */
-   (*parent_vset)( this_object, settings, args );
-   ok = astOK;
+      (*parent_vset)( this_object, settings, args );
+      ok = astOK;
 
 /* Restore the FrameSet's integrity. */
-   RestoreIntegrity( this );
+      RestoreIntegrity( this );
 
 /* If integrity could not be restored, then add contextual error
    information. */
-   if ( !astOK && ok ) {
+      if ( !astOK && ok ) {
 
 /* Use "vsprintf" to substitute values for any format specifiers in
    the "settings" string, writing the resulting string into the buffer. */
-      vsprintf( buff, settings, args );
+         vsprintf( buff, settings, args );
 
 /* Display the message. */
-      astError( astStatus, "Unable to accommodate the attribute setting "
-                            "\"%s\".", buff );
-   }
+         astError( astStatus, "Unable to accommodate the attribute setting "
+                               "\"%s\".", buff );
+      }
 
 /* Restore any saved FrameSet integrity information. */
-   integrity_frame = save_frame;
-   integrity_lost = save_lost;
-   integrity_method = save_method;
+      integrity_frame = save_frame;
+      integrity_lost = save_lost;
+      integrity_method = save_method;
+   }
 }
 
 /* FrameSet Attributes. */
