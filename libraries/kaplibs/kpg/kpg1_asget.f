@@ -124,6 +124,10 @@
 *        Replaced hardwired "3" by "NDIMS" in call to KPG1_ASSIG!
 *     2-DEC-2005 (DSB):
 *        Added INPRM to argument list for KPG1_ASTRM.
+*     14-FEB-2006 (DSB):
+*        Ensure INPRM is initialised even if NDIM is equal to NBAX. Lack
+*        of initialisation caused KPG1_ASTRM to crash in the case where 
+*        NDIM and NBAX are equal.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -223,13 +227,15 @@
       CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *  Return the bounds of the chosen pixel axes. Also find the largest
-*  choisen pixel dimension.
+*  chosen pixel dimension, and ininitialise the base Frame axis
+*  permutation array (INPRM). 
       MXDIM = 0
       DO I = 1, NDIM
          SLBND( I ) = LBND( SDIM( I ) )
          SUBND( I ) = UBND( SDIM( I ) )
          DIM = SUBND( I ) - SLBND( I ) + 1
          IF( DIM .GT. MXDIM ) MXDIM = DIM
+         INPRM( I ) = I
       END DO
          
 *  Get a pointer to the WCS FrameSet.
