@@ -46,6 +46,8 @@ f     The TranMap class does not define any new routines beyond those
 *        Original version.
 *     19-JAN-2005 (DSB):
 *        Fix memory leak.
+*     14-FEB-2006 (DSB):
+*        Over-ride the astDecompose method.
 *class--
 */
 
@@ -80,6 +82,7 @@ f     The TranMap class does not define any new routines beyond those
 #include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 /* Module Variables. */
 /* ================= */
@@ -108,9 +111,95 @@ static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
+static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 
 /* Member functions. */
 /* ================= */
+static void Decompose( AstMapping *this_mapping, AstMapping **map1, 
+                       AstMapping **map2, int *series, int *invert1, 
+                       int *invert2 ) {
+/*
+*
+*  Name:
+*     Decompose
+
+*  Purpose:
+*     Decompose a Mapping into two component Mappings.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "tranmap.h"
+*     void Decompose( AstMapping *this, AstMapping **map1, 
+*                     AstMapping **map2, int *series,
+*                     int *invert1, int *invert2 )
+
+*  Class Membership:
+*     TranMap member function (over-rides the protected astDecompose
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns pointers to the two Mappings encapsulated by
+*     a TranMap.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+*     map1
+*        Address of a location to receive a pointer to first component
+*        Mapping (the forward Mapping).
+*     map2
+*        Address of a location to receive a pointer to second component
+*        Mapping (the inverse Mapping). 
+*     series
+*        Address of a location to receive a value indicating if the
+*        component Mappings are applied in series or parallel. A non-zero
+*        value means that the supplied Mapping is equivalent to applying map1 
+*        followed by map2 in series. A zero value means that the supplied
+*        Mapping is equivalent to applying map1 to the lower numbered axes
+*        and map2 to the higher numbered axes, in parallel. Zero is
+*        returned for a TranMap.
+*     invert1
+*        The value of the Invert attribute to be used with map1. 
+*     invert2
+*        The value of the Invert attribute to be used with map2. 
+
+*  Notes:
+*     - Any changes made to the component Mappings using the returned
+*     pointers will be reflected in the supplied Mapping.
+
+*-
+*/
+
+
+/* Local Variables: */
+   AstTranMap *this;             /* Pointer to TranMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the TranMap structure. */
+   this = (AstTranMap *) this_mapping;
+
+/* If the TranMap has been inverted, return the Mappings in reverse
+   order with inverted Invert falgs. */
+   if( astGetInvert( this ) ) {
+      if( map1 ) *map1 = astClone( this->map2 );
+      if( map2 ) *map2 = astClone( this->map1 );
+      if( invert1 ) *invert1 = this->invert2 ? 0 : 1;
+      if( invert2 ) *invert2 = this->invert1 ? 0 : 1;
+
+/* If the TranMap has not been inverted, return the Mappings in their
+   original order with their original Invert flags. */
+   } else {
+      if( map1 ) *map1 = astClone( this->map1 );
+      if( map2 ) *map2 = astClone( this->map2 );
+      if( invert1 ) *invert1 = this->invert1;
+      if( invert2 ) *invert2 = this->invert2;
+   }
+}
+
 void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name ) {
 /*
 *+
@@ -182,6 +271,7 @@ void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   mapping->Decompose = Decompose;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
 
@@ -1058,6 +1148,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Obtain a pointer to the TranMap structure. */
    this = (AstTranMap *) this_object;
+
+printf("this %p this->map1 %p\n", this, this->map1 );
+
 
 /* Write out values representing the instance variables for the TranMap
    class.  Accompany these with appropriate comment strings, possibly

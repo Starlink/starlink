@@ -20399,6 +20399,21 @@ f        If the supplied Mapping is a CmpMap, then MAP1 and MAP2 will be
 *        attributes when the CmpMap was first created). These are the
 c        Invert values which are returned in invert1 and invert2.
 f        Invert values which are returned in INVERT1 and INVERT2.
+*     TranMap
+c        If the supplied Mapping is a TranMap, then map1 and map2 will be
+f        If the supplied Mapping is a TranMap, then MAP1 and MAP2 will be
+*        returned holding pointers to the forward and inverse Mappings 
+*        represented by the TranMap (zero will be returned for
+c        series).
+f        SERIES).
+*        Note, changing the Invert attribute of 
+*        either of the component Mappings using the returned pointers will 
+*        have no effect on the supplied TranMap. This is because the TranMap 
+*        remembers and uses the original settings of the Invert attributes 
+*        (that is, the values of the Invert attributes when the TranMap was 
+*        first created). These are the
+c        Invert values which are returned in invert1 and invert2.
+f        Invert values which are returned in INVERT1 and INVERT2.
 *     Mapping
 c        For any class of Mapping other than a CmpMap, map1 will be
 c        returned holding a clone of the supplied Mapping pointer, and map2
