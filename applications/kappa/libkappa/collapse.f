@@ -246,6 +246,9 @@
 *     2006 February 10 (MJC):
 *        Update the units for Iwc and Iwd estimators, as the incorrect
 *        published formulae for these were dimensionless.
+*     2006 February 13 (MJC):
+*        Allow for very large datsets by blocking into manageable
+*        sections.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -272,6 +275,10 @@
                                  ! real
       INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
                                  ! real
+
+*  Local Constants:
+      INTEGER MAXPIX 
+      PARAMETER ( MAXPIX = 8388608 ) ! Guestimate a size: 8 mega
 
 *  Local Variables:
       CHARACTER AUNITS*( 30 )    ! Units of co-ordinates 
@@ -313,6 +320,7 @@
                                  ! an axis
       INTEGER AXES( NDF__MXDIM ) ! A list of axis indices
       INTEGER CFRM               ! Original Current Frame pointer
+      INTEGER D                  ! A dimension size
       INTEGER EL1                ! Number of elements in an input mapped
                                  ! array
       INTEGER EL2                ! Number of elements in an output
@@ -320,6 +328,10 @@
       INTEGER I                  ! Loop count
       INTEGER IAXIS              ! Index of collapse axis within current
                                  ! Frame
+      INTEGER IBL                ! Identifier for input-NDF block
+      INTEGER IBLOCK             ! Loop counter for the NDF blocks
+      INTEGER IBLSIZ( NDF__MXDIM ) ! Input-NDF sizes for processing 
+                                 ! large datasets in blocks
       INTEGER IERR               ! Position of first numerical error
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Output NDF identifier
@@ -344,9 +356,12 @@
                                  ! NDF
       INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds of the
                                  ! output NDF
+      INTEGER MAXSIZ             ! Maximum size of block along current
+                                 ! dimension
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
       INTEGER NAXC               ! Original number of current Frame axes
+      INTEGER NBLOCK             ! Number of NDF blocks
       INTEGER NCOMP              ! No. of components within cell of AXIS
                                  ! array
       INTEGER NERR               ! Number of numerical errors
@@ -354,11 +369,15 @@
       INTEGER NDIM               ! No. of pixel axes in input NDF
       INTEGER NDIMO              ! No. of pixel axes in output NDF
       INTEGER NVAL               ! Number of values obtained (1)
+      INTEGER OBL                ! Identifier for output-NDF block
+      INTEGER OBLSIZ( NDF__MXDIM ) ! Output-NDF sizes for processing 
+                                 ! large datasets in blocks
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds of the input
                                  ! NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the 
                                  ! output NDF
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
+      LOGICAL LOOP               ! Continue to loop through dimensions?
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
       LOGICAL VAR                ! Process variances?
       REAL WLIM                  ! Value of WLIM parameter
@@ -778,78 +797,6 @@
 
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
-*  Map the NDF arrays and workspace required.
-*  ==========================================
-
-*  Map the full input, and output data and (if needed) variance arrays.
-      CALL NDF_MAP( INDF1, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
-      CALL NDF_MAP( INDF2, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
-      IF ( .NOT. VAR ) THEN
-         IPIN( 2 ) = IPIN( 1 )
-         IPOUT( 2 ) = IPOUT( 1 )
-      END IF
-
-*  Allocate work space, unless the last axis is being collapsed (in
-*  which case no work space is needed).
-      IF ( JAXIS .NE. NDIM ) THEN
-         CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
-         IF( VAR ) THEN
-            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
-         ELSE
-            IPW2 = IPW1
-         END IF  
-
-*  Store safe pointer values if no work space is needed.
-      ELSE
-         IPW1 = IPIN( 1 )
-         IPW2 = IPIN( 1 )
-      END IF
-
-*  Associate co-ordinate information.
-*  ==================================
-
-*  Obtain co-ordinates along the collapse axis for the following
-*  methods.
-      IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
-     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR. 
-     :     ESTIM .EQ. 'INTEG' ) THEN
-
-*  Create workspace for the co-ordinates along a single WCS axis
-*  in the correct data type.
-         CALL PSX_CALLOC( EL1, '_DOUBLE', IPAXCO, STATUS )
-         CALL PSX_CALLOC( EL1, ITYPE, IPCO, STATUS )
-
-*  Allocate work space, unless the last pixel axis is being collapsed 
-*  (in which case no work space is needed).
-         IF ( JAXIS .NE. NDIM ) THEN
-            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
-         END IF
-
-*  Obtain the double-precision co-ordinate centres along the collapse
-*  axis in the current Frame.
-         CALL KPG1_WCFAX( INDF1, IWCS, IAXIS, EL1, 
-     :                    %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
-
-*  Copy the centres to the required precision.
-         IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL VEC_DTOR( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
-     :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                     STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL VEC_DTOD( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
-     :                     %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
-     :                     STATUS )
-
-         END IF
-         CALL PSX_FREE( IPAXCO, STATUS )
-
-*  Store safe pointer value if axis centres are not needed.
-      ELSE
-         IPCO = IPIN( 1 )
-         IPW3 = IPIN( 1 )
-      END IF
-
 *  Redefine the data units.
 *  ========================
       IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
@@ -885,73 +832,195 @@
          CALL NDF_CPUT( UNITS, INDF2, 'Units', STATUS )
       END IF
 
+*  Process in blocks.
+*  ==================
+
+*  For large datasets, there may be insufficient memory.  Therefore
+*  we form blocks to process, one at a time.  For this by definition
+*  we need the ciollapse-axis pixels to always be present in full for
+*  each pixel along the other pixel axes.  If this leaves room for a
+*  full span of a dimension that becomes the block size along that
+*  axis.  Partial fills take the remaining maximum size and subsequent
+*  dimensions' block sizes are unity.
+      IBLSIZ( IAXIS ) = AEL
+      OBLSIZ( IAXIS ) = 1
+      MAXSIZ = MAX( 1, MAXPIX / AEL )
+      LOOP = .TRUE.
+      DO I = 1, NDIM
+         IF ( I .NE. IAXIS ) THEN
+            IF ( LOOP ) THEN
+               D = UBND( I ) - LBND( I ) + 1
+               IF ( MAXSIZ .GE. D ) THEN
+                  IBLSIZ( I ) = D
+                  OBLSIZ( I ) = IBLSIZ( I )
+                  MAXSIZ = MAXSIZ / D
+               ELSE
+                  IBLSIZ( I ) = MAXSIZ
+                  OBLSIZ( I ) = IBLSIZ( I )
+                  LOOP = .FALSE.
+               END IF
+            ELSE
+               IBLSIZ( I ) = 1
+               OBLSIZ( I ) = 1
+            END IF
+         END IF
+      END DO
+
+*  Determine the number of blocks.
+      CALL NDF_NBLOC( INDF1, NDIM, IBLSIZ, NBLOCK, STATUS )
+
+*  Loop through each block.  Start a new NDF context.
+      DO IBLOCK = 1, NBLOCK
+         CALL NDF_BEGIN
+         CALL NDF_BLOCK( INDF1, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
+         CALL NDF_BLOCK( INDF2, NDIM, OBLSIZ, IBLOCK, OBL, STATUS ) 
+
+*  Map the NDF arrays and workspace required.
+*  ==========================================
+
+*  Map the full input, and output data and (if needed) variance arrays.
+         CALL NDF_MAP( IBL, COMP, ITYPE, 'READ', IPIN, EL1, STATUS )
+         CALL NDF_MAP( OBL, COMP, ITYPE, 'WRITE', IPOUT, EL2, STATUS )
+
+         IF ( .NOT. VAR ) THEN
+            IPIN( 2 ) = IPIN( 1 )
+            IPOUT( 2 ) = IPOUT( 1 )
+         END IF
+
+*  Allocate work space, unless the last axis is being collapsed (in
+*  which case no work space is needed).
+         IF( JAXIS .NE. NDIM ) THEN
+            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
+            IF( VAR ) THEN
+               CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
+            ELSE
+               IPW2 = IPW1
+            END IF  
+
+*  Store safe pointer values if no work space is needed.
+         ELSE
+            IPW1 = IPIN( 1 )
+           IPW2 = IPIN( 1 )
+         END IF
+
+*  Associate co-ordinate information.
+*  ==================================
+
+*  Obtain co-ordinates along the collapse axis for the following
+*  methods.
+         IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
+     :        ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' .OR. 
+     :        ESTIM .EQ. 'INTEG' ) THEN
+
+*  Create workspace for the co-ordinates along a single WCS axis
+*  in the correct data type.
+            CALL PSX_CALLOC( EL1, '_DOUBLE', IPAXCO, STATUS )
+            CALL PSX_CALLOC( EL1, ITYPE, IPCO, STATUS )
+
+*  Allocate work space, unless the last pixel axis is being collapsed 
+*  (in which case no work space is needed).
+            IF ( JAXIS .NE. NDIM ) THEN
+               CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
+            END IF
+
+*  Obtain the double-precision co-ordinate centres along the collapse
+*  axis in the current Frame.
+            CALL KPG1_WCFAX( IBL, IWCS, IAXIS, EL1, 
+     :                       %VAL( CNF_PVAL( IPAXCO ) ), STATUS )
+
+*  Copy the centres to the required precision.
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL VEC_DTOR( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                        %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                        STATUS )
+
+            ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+               CALL VEC_DTOD( .TRUE., EL1, %VAL( CNF_PVAL( IPAXCO ) ),
+     :                        %VAL( CNF_PVAL( IPCO ) ), IERR, NERR,
+     :                        STATUS )
+
+            END IF
+            CALL PSX_FREE( IPAXCO, STATUS )
+
+*  Store safe pointer value if axis centres are not needed.
+         ELSE
+            IPCO = IPIN( 1 )
+            IPW3 = IPIN( 1 )
+         END IF
+
 *  Associate AXIS-width information.
 *  =================================
 
 *  Obtain AXIS widths along the collapse axis for the following
 *  methods.
-      IF ( ESTIM .EQ. 'INTEG' ) THEN
+         IF ( ESTIM .EQ. 'INTEG' ) THEN
          
 *  Allocate work space for thw widths to be derived from the
 *  co-ordinates.  This assumes full filling of pixels.
-         CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPWID, STATUS )
+            CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPWID, STATUS )
 
 *  Store safe pointer value if widths are not needed.
-      ELSE
-         IPWID = IPIN( 1 )
-      END IF
+         ELSE
+            IPWID = IPIN( 1 )
+         END IF
 
 *  Collapse.
 *  =========
 
 *  Now do the work, using a routine appropriate to the numeric type.
-      IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
-     :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
-     :                    %VAL( CNF_PVAL( IPCO ) ),
-     :                    %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
-     :                    UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
-     :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                    %VAL( CNF_PVAL( IPW1 ) ), 
-     :                    %VAL( CNF_PVAL( IPW2 ) ), 
-     :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
+         IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
+     :                       NDIM, LBND, UBND, 
+     :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( IPCO ) ),
+     :                       %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
+     :                       UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPW2 ) ), 
+     :                       %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2, NDIM, 
-     :                    LBND, UBND, %VAL( CNF_PVAL( IPIN( 1 ) ) ),
-     :                    %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
-     :                    %VAL( CNF_PVAL( IPCO ) ),
-     :                    %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
-     :                    UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
-     :                    %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
-     :                    %VAL( CNF_PVAL( IPW1 ) ), 
-     :                    %VAL( CNF_PVAL( IPW2 ) ), 
-     :                    %VAL( CNF_PVAL( IPW3 ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
+     :                       NDIM, LBND, UBND, 
+     :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
+     :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
+     :                       %VAL( CNF_PVAL( IPCO ) ),
+     :                       %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
+     :                       UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
+     :                       %VAL( CNF_PVAL( IPW1 ) ), 
+     :                       %VAL( CNF_PVAL( IPW2 ) ), 
+     :                       %VAL( CNF_PVAL( IPW3 ) ), STATUS )
 
-      ELSE IF( STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETC( 'T', ITYPE )
-         CALL ERR_REP( 'COLLAPSE_ERR5', 'COLLAPSE: Unsupported data '//
-     :                 'type ^T (programming error).', STATUS )
-      END IF
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'T', ITYPE )
+            CALL ERR_REP( 'COLLAPSE_ERR5', 'COLLAPSE: Unsupported '//
+     :                    'data type ^T (programming error).', STATUS )
+         END IF
 
 *  Free the work space.
-      IF( JAXIS .NE. NDIM ) THEN
-         CALL PSX_FREE( IPW1, STATUS )
-         IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
-      END IF
+         IF ( JAXIS .NE. NDIM ) THEN
+            CALL PSX_FREE( IPW1, STATUS )
+            IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
+         END IF
 
-      IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
-     :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
-         CALL PSX_FREE( IPCO, STATUS )
-         IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
-      END IF
+         IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
+     :        ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
+             CALL PSX_FREE( IPCO, STATUS )
+             IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
+         END IF
          
-      IF ( ESTIM .EQ. 'INTEG' ) THEN
-         CALL PSX_FREE( IPWID, STATUS )
-         IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
-      END IF
+         IF ( ESTIM .EQ. 'INTEG' ) THEN
+            CALL PSX_FREE( IPWID, STATUS )
+            IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
+         END IF
+
+*   Close NDF context.
+         CALL NDF_END( STATUS )
+      END DO
 
 *  Come here if something has gone wrong.
   999 CONTINUE
