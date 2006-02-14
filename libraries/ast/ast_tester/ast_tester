@@ -126,13 +126,14 @@ foreach n (*.head)
    plotter $n "$attr1" "$attr2" a.ps $box
 
    if( -e $STARLINK/bin/psmerge ) then
+echo "psmerge"
       $STARLINK/bin/psmerge -t300x300 -r90 a.ps > $psfile
    else
       cp a.ps $psfile
    endif
 
    if( $1 != "-nd" ) then
-      gv $psfile -landscape -scale 2
+      gv $psfile 
    endif
 
 end
