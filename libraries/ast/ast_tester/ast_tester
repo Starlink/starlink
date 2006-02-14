@@ -126,7 +126,6 @@ foreach n (*.head)
    plotter $n "$attr1" "$attr2" a.ps $box
 
    if( -e $STARLINK/bin/psmerge ) then
-echo "psmerge"
       $STARLINK/bin/psmerge -t300x300 -r90 a.ps > $psfile
    else
       cp a.ps $psfile
