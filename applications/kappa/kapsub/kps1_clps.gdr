@@ -133,6 +133,8 @@
 *        array.
 *     2006 February 10 (MJC):
 *        Obtain the pixel-index workspace for methods 31 and 32.
+*     2006 February 13 (MJC):
+*        Better initialisation of START to avoid valgrind warning.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -298,6 +300,7 @@
 *  combination routines used at the end of this routine can access them
 *  in "natural" order.
       USEWRK = ( AXIS .NE. NDIM1 ) 
+      START = 1
       IF( .NOT. USEWRK ) THEN
 
 *  Note the index of the first element of the first plane to be included
