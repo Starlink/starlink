@@ -2,7 +2,7 @@
 
 @SET_MAKE@
 
-RECURSIVE_TARGETS = all clean
+RECURSIVE_TARGETS = all clean distclean
 
 $(RECURSIVE_TARGETS):
 	( cd tclx; $(MAKE) $@; )
