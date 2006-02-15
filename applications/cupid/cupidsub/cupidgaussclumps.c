@@ -5,6 +5,7 @@
 #include "ndf.h"
 #include "cupid.h"
 #include <math.h>
+#include <stdio.h>
 
 
 /* Global Variables: */

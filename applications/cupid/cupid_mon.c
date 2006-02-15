@@ -64,6 +64,7 @@ void cupid_mon( int *adam_status ) {
    DECLARE_INTEGER(fstatus);      /* Fortran status variable */
    DECLARE_CHARACTER_DYN(fname);  /* Fortran character variable to hold name */
    char name[16];                 /* C character variable to hold name */
+   int ast_caching;               /* Initial value of AST ObjectCaching tuning parameter */
 
 /* Check the inherited status. */
    if( *adam_status != SAI__OK ) return;
@@ -84,6 +85,18 @@ void cupid_mon( int *adam_status ) {
 
 /* Make AST use the same variable for its inherited status. */
    astWatch( adam_status );
+
+/* Tell AST to re-cycle memory used to store AST Objects, When an AST 
+   Object is deleted, the memory used by it will be put into a pool of
+   allocated but currently unused memory, from where it can be reclaimed
+   when another AST Object needs to be created. */
+   ast_caching = astTune( "ObjectCaching", 1 );
+
+/* Tell AST to re-cycle memory used to store AST Objects, When an AST 
+   Object is deleted, the memory used by it will be put into a pool of
+   allocated but currently unused memory, from where it can be reclaimed
+   when another AST Object needs to be created. */
+   astTune( "ObjectCaching", 1 );
 
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. Since these functions do not have an expliciti
@@ -116,8 +129,15 @@ void cupid_mon( int *adam_status ) {
       errRep( "CUPID_MON_NOCOM", "CUPID: No such command ^CMD.", adam_status );
    }
 
+/* Re-instate the original value of the AST ObjectCaching tuning
+   parameter. */
+   astTune( "ObjectCaching", ast_caching );
+
 /* Make AST use its own internal variable for its inherited status. */
    astWatch( NULL );
+
+/*   astListIssued( "At end of CUPID_MON" );       */
+
 
 }
 

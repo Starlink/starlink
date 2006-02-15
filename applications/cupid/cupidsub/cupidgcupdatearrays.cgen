@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include <math.h>
+#include <stdio.h>
 
 /* Global Variables: */
 /* ================= */

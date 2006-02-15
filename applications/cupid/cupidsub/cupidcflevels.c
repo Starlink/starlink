@@ -3,6 +3,7 @@
 #include "cupid.h"
 #include "ast.h"
 #include "prm_par.h"
+#include <stdio.h>
 
 double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                        double rms, int *nlevels ){
