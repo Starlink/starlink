@@ -191,4 +191,4 @@ if( $ok == 1 ) then
    echo ""
 endif
 
-rm -f regression plotter wcsconverter testxmlchan 
+# rm -f regression plotter wcsconverter testxmlchan 

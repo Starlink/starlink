@@ -3829,8 +3829,25 @@ void astVSet_( AstObject *this, const char *settings, va_list args ) {
    (**astMEMBER(this,Object,VSet))( this, settings, args );
 }
 int astGetObjSize_( AstObject *this ) {
+   static int ind = 0;
+   int i, ret;
+
    if ( !astOK || !this ) return 0;
-   return (**astMEMBER(this,Object,GetObjSize))( this );
+
+   for( i = 0; i < ind; i++ ) printf(" ");
+   printf( "Begin %s\n", this->vtab->class ); 
+
+   ind += 3;
+   ret = (**astMEMBER(this,Object,GetObjSize))( this );
+   ind -= 3;
+
+   for( i = 0; i < ind; i++ ) printf(" ");
+   printf( "End %s (%d)\n", this->vtab->class, ret ); 
+
+   return ret;
+
+
+
 }
 
 /* External interface. */

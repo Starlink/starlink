@@ -64,8 +64,8 @@ struct AstPrjPrm {
    int    flag;
    double phi0, theta0;
    double r0;
-   double p[WCSLIB_MXPAR];
-   double p2[WCSLIB_MXPAR];
+   double *p;
+   double *p2;
    double w[20];
    int    n;
    int (*astPRJfwd)(const double, const double,

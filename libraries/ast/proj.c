@@ -55,6 +55,9 @@
 *        avoid "use of uninitialised variable" messages from compilers which 
 *        are not clever enough to work out that the uninitialised variable is 
 *        not in fact ever used. 
+*     -  Use dynamic rather than static memory for the parameter arrays in 
+*        the AstPrjPrm structure.Override astGetObjSize. This is to
+*        reduce the in-memory size of a WcsMap.
 
 *=============================================================================
 *
@@ -198,12 +201,9 @@
 *         scaling parameter.  If this is zero, it will be reset to the default
 *         value of 180/pi (the value for FITS WCS).
 *
-*      double p[WCSLIB_MXPAR]
-*         The first WCSLIB_MXPAR elements contain projection parameters which 
-*         correspond to the PROJPn keywords in FITS, so p[0] is PROJP0, and 
-*         p[29] is PROJP29.  Many projections use p[1] (PROJP1) and some also 
-*         use p[2] (PROJP2).  ZPN is the only projection which uses any of the 
-*         others.
+*      double p[]
+*         Contains the projection parameters associated with the
+*         longitude axis.
 *
 *   The remaining members of the AstPrjPrm struct are maintained by the
 *   initialization routines and should not be modified.  This is done for the
@@ -269,6 +269,7 @@
 #include <stdlib.h>
 #include "wcsmath.h"
 #include "wcstrig.h"
+#include "memory.h"
 #include "proj.h"
 
 /* Following variables are not needed in AST and are commented out to
@@ -1298,7 +1299,7 @@ int astZPNset(prj)
 struct AstPrjPrm *prj;
 
 {
-   int   i, j, k;
+   int   i, j, k, plen;
    double d, d1, d2, r, zd, zd1, zd2;
    const double tol = 1.0e-13;
 
@@ -1310,7 +1311,8 @@ struct AstPrjPrm *prj;
    if (prj->r0 == 0.0) prj->r0 = R2D;
 
    /* Find the highest non-zero coefficient. */
-   for (k = WCSLIB_MXPAR-1; k >= 0 && prj->p[k] == 0.0; k--);
+   plen = astSizeOf( prj->p )/sizeof( double );
+   for (k = plen-1; k >= 0 && prj->p[k] == 0.0; k--);
    if (k < 0) return 1;
 
    prj->n = k;
