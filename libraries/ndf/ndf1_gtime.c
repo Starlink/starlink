@@ -51,14 +51,34 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-SEP-1993 (RFWS):
 *        Original version.
+*     15-FEB-2006 (TIMJ):
+*        Use correct tm_year logic.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -134,18 +154,8 @@ necessary (in routine NDF1_GTIME).", STATUS );
       {
          local = localtime( (const time_t *) &timer );
 
-/* Return the year number, adding the century (this is OK for the next 100  */
-/* years).								    */
-         if ( local->tm_year >= 93 )
-	 {
-            YMDHM[ 0 ] = (F77_INTEGER_TYPE) ( local->tm_year + 1900 );
-	 }
-         else
-	 {
-            YMDHM[ 0 ] = (F77_INTEGER_TYPE) ( local->tm_year + 2000 );
-	 }
-
 /* Return the other integer fields, making the month number start at one.   */
+	 YMDHM[ 0 ] = (F77_INTEGER_TYPE) ( local->tm_year + 1900 );
          YMDHM[ 1 ] = (F77_INTEGER_TYPE) ( local->tm_mon + 1 );
          YMDHM[ 2 ] = (F77_INTEGER_TYPE) ( local->tm_mday );
 	 YMDHM[ 3 ] = (F77_INTEGER_TYPE) ( local->tm_hour );
