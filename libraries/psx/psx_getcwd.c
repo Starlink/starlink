@@ -10,7 +10,7 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     CALL PSX_GETWCD( CWD, STATUS )
+*     CALL PSX_GETCWD( CWD, STATUS )
 
 *  Description:
 *     Provides a Fortran interface to obtain the current working directory.
