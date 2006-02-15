@@ -308,7 +308,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS PKG_SOURCES PKG_OBJECTS TCL_TOP_DIR_NATIVE TCL_GENERIC_DIR_NATIVE TCL_UNIX_DIR_NATIVE TCL_WIN_DIR_NATIVE TCL_BMAP_DIR_NATIVE TCL_TOOL_DIR_NATIVE TCL_PLATFORM_DIR_NATIVE TCL_INCLUDES CLEANFILES TCL_THREADS SHARED_BUILD AR TCLSH_PROG CELIB_DIR LIBOBJS DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT NROFF COL BUILDHELP HELP_DIR MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLX_BUILD_LIB_SPEC TCLX_LIB_SPEC TCLX_SRC_DIR'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CYGPATH EXEEXT PKG_LIB_FILE PKG_STUB_LIB_FILE PKG_STUB_SOURCES PKG_STUB_OBJECTS PKG_TCL_SOURCES PKG_HEADERS PKG_INCLUDES PKG_LIBS PKG_CFLAGS TCL_VERSION TCL_BIN_DIR TCL_SRC_DIR TCL_LIB_FILE TCL_LIB_FLAG TCL_LIB_SPEC TCL_STUB_LIB_FILE TCL_STUB_LIB_FLAG TCL_STUB_LIB_SPEC TCL_LIBS TCL_DEFS TCL_EXTRA_CFLAGS TCL_LD_FLAGS TCL_SHLIB_LD_LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC OBJEXT CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA SET_MAKE RANLIB ac_ct_RANLIB EGREP MATH_LIBS PKG_SOURCES PKG_OBJECTS TCL_INCLUDES CLEANFILES TCL_THREADS SHARED_BUILD AR TCLSH_PROG CELIB_DIR LIBOBJS DL_LIBS CFLAGS_DEBUG CFLAGS_OPTIMIZE CFLAGS_WARNING STLIB_LD SHLIB_LD SHLIB_CFLAGS SHLIB_LD_LIBS LDFLAGS_DEBUG LDFLAGS_OPTIMIZE LD_LIBRARY_PATH_VAR TCL_DBGX CFLAGS_DEFAULT LDFLAGS_DEFAULT NROFF COL BUILDHELP HELP_DIR MAKE_LIB MAKE_SHARED_LIB MAKE_STATIC_LIB MAKE_STUB_LIB RANLIB_STUB TCLX_BUILD_LIB_SPEC TCLX_LIB_SPEC TCLX_SRC_DIR'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -853,6 +853,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-tcl              directory containing tcl configuration (tclConfig.sh)
+  --with-tclinclude       directory containing the public Tcl header files
   --with-celib=DIR        use Windows/CE support library from DIR
   --with-help              directory containing generated help files
 
@@ -6210,52 +6211,90 @@ echo "$as_me: error: could not find tcl source file '${srcdir}/$i'" >&2;}
 # This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
 #--------------------------------------------------------------------
 
-#TEA_PUBLIC_TCL_HEADERS
 
-    echo "$as_me:$LINENO: checking for Tcl private include files" >&5
-echo $ECHO_N "checking for Tcl private include files... $ECHO_C" >&6
+    echo "$as_me:$LINENO: checking for Tcl public headers" >&5
+echo $ECHO_N "checking for Tcl public headers... $ECHO_C" >&6
 
-    TCL_SRC_DIR_NATIVE=`${CYGPATH} ${TCL_SRC_DIR}`
-    TCL_TOP_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}\"
-    TCL_GENERIC_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/generic\"
-    TCL_UNIX_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/unix\"
-    TCL_WIN_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/win\"
-    TCL_BMAP_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/bitmaps\"
-    TCL_TOOL_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/tools\"
-    TCL_COMPAT_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/compat\"
 
-    if test "${TEA_PLATFORM}" = "windows"; then
-	TCL_PLATFORM_DIR_NATIVE=${TCL_WIN_DIR_NATIVE}
+# Check whether --with-tclinclude or --without-tclinclude was given.
+if test "${with_tclinclude+set}" = set; then
+  withval="$with_tclinclude"
+  with_tclinclude=${withval}
+fi;
+
+    if test "${ac_cv_c_tclh+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+	# Use the value from --with-tclinclude, if it was given
+
+	if test x"${with_tclinclude}" != x ; then
+	    if test -f "${with_tclinclude}/tcl.h" ; then
+		ac_cv_c_tclh=${with_tclinclude}
+	    else
+		{ { echo "$as_me:$LINENO: error: ${with_tclinclude} directory does not contain tcl.h" >&5
+echo "$as_me: error: ${with_tclinclude} directory does not contain tcl.h" >&2;}
+   { (exit 1); exit 1; }; }
+	    fi
+	else
+            # If Tcl was built as a framework, attempt to use
+            # the framework's Headers directory
+            case ${TCL_DEFS} in
+                *TCL_FRAMEWORK*)
+                    list="`ls -d ${TCL_BIN_DIR}/Headers 2>/dev/null`"
+                    ;;
+                *)
+                    list=""
+                    ;;
+            esac
+	    # Check order: pkg --prefix location, Tcl's --prefix location,
+	    # directory of tclConfig.sh, and Tcl source directory.
+	    # Looking in the source dir is not ideal, but OK.
+
+	    eval "temp_includedir=${includedir}"
+	    list="$list \
+		`ls -d ${temp_includedir}        2>/dev/null` \
+		`ls -d ${TCL_PREFIX}/include     2>/dev/null` \
+		`ls -d ${TCL_BIN_DIR}/../include 2>/dev/null` \
+		`ls -d ${TCL_SRC_DIR}/generic    2>/dev/null`"
+	    if test "${TEA_PLATFORM}" != "windows" -o "$GCC" = "yes"; then
+		list="$list /usr/local/include /usr/include"
+		if test x"${TCL_INCLUDE_SPEC}" != x ; then
+		    d=`echo "${TCL_INCLUDE_SPEC}" | sed -e 's/^-I//'`
+		    list="$list `ls -d ${d} 2>/dev/null`"
+		fi
+	    fi
+	    for i in $list ; do
+		if test -f "$i/tcl.h" ; then
+		    ac_cv_c_tclh=$i
+		    break
+		fi
+	    done
+	fi
+
+fi
+
+
+    # Print a message based on how we determined the include path
+
+    if test x"${ac_cv_c_tclh}" = x ; then
+	{ { echo "$as_me:$LINENO: error: tcl.h not found.  Please specify its location with --with-tclinclude" >&5
+echo "$as_me: error: tcl.h not found.  Please specify its location with --with-tclinclude" >&2;}
+   { (exit 1); exit 1; }; }
     else
-	TCL_PLATFORM_DIR_NATIVE=${TCL_UNIX_DIR_NATIVE}
-    fi
-    # We want to ensure these are substituted so as not to require
-    # any *_NATIVE vars be defined in the Makefile
-    TCL_INCLUDES="-I${TCL_GENERIC_DIR_NATIVE} -I${TCL_PLATFORM_DIR_NATIVE}"
-    if test "${TEA_WINDOWINGSYSTEM}" = "aqua"; then
-        # If Tcl was built as a framework, attempt to use
-        # the framework's Headers and PrivateHeaders directories
-        case ${TCL_DEFS} in
-	    *TCL_FRAMEWORK*)
-	        if test -d "${TCL_BIN_DIR}/Headers" -a -d "${TCL_BIN_DIR}/PrivateHeaders"; then
-	        TCL_INCLUDES="-I\"${TCL_BIN_DIR}/Headers\" -I\"${TCL_BIN_DIR}/PrivateHeaders\" ${TCL_INCLUDES}"; else
-	        TCL_INCLUDES="${TCL_INCLUDES} ${TCL_INCLUDE_SPEC} `echo "${TCL_INCLUDE_SPEC}" | sed -e 's/Headers/PrivateHeaders/'`"; fi
-	        ;;
-	esac
+	echo "$as_me:$LINENO: result: ${ac_cv_c_tclh}" >&5
+echo "${ECHO_T}${ac_cv_c_tclh}" >&6
     fi
 
+    # Convert to a native path and substitute into the output files.
+
+    INCLUDE_DIR_NATIVE=`${CYGPATH} ${ac_cv_c_tclh}`
+
+    TCL_INCLUDES=-I\"${INCLUDE_DIR_NATIVE}\"
 
 
 
-
-
-
-
-
-
-    echo "$as_me:$LINENO: result: Using srcdir found in tclConfig.sh: ${TCL_SRC_DIR}" >&5
-echo "${ECHO_T}Using srcdir found in tclConfig.sh: ${TCL_SRC_DIR}" >&6
-
+#TEA_PRIVATE_TCL_HEADERS
 
 #--------------------------------------------------------------------
 # __CHANGE__
@@ -14625,13 +14664,6 @@ s,@EGREP@,$EGREP,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@PKG_SOURCES@,$PKG_SOURCES,;t t
 s,@PKG_OBJECTS@,$PKG_OBJECTS,;t t
-s,@TCL_TOP_DIR_NATIVE@,$TCL_TOP_DIR_NATIVE,;t t
-s,@TCL_GENERIC_DIR_NATIVE@,$TCL_GENERIC_DIR_NATIVE,;t t
-s,@TCL_UNIX_DIR_NATIVE@,$TCL_UNIX_DIR_NATIVE,;t t
-s,@TCL_WIN_DIR_NATIVE@,$TCL_WIN_DIR_NATIVE,;t t
-s,@TCL_BMAP_DIR_NATIVE@,$TCL_BMAP_DIR_NATIVE,;t t
-s,@TCL_TOOL_DIR_NATIVE@,$TCL_TOOL_DIR_NATIVE,;t t
-s,@TCL_PLATFORM_DIR_NATIVE@,$TCL_PLATFORM_DIR_NATIVE,;t t
 s,@TCL_INCLUDES@,$TCL_INCLUDES,;t t
 s,@CLEANFILES@,$CLEANFILES,;t t
 s,@TCL_THREADS@,$TCL_THREADS,;t t
@@ -15599,13 +15631,6 @@ s,@EGREP@,$EGREP,;t t
 s,@MATH_LIBS@,$MATH_LIBS,;t t
 s,@PKG_SOURCES@,$PKG_SOURCES,;t t
 s,@PKG_OBJECTS@,$PKG_OBJECTS,;t t
-s,@TCL_TOP_DIR_NATIVE@,$TCL_TOP_DIR_NATIVE,;t t
-s,@TCL_GENERIC_DIR_NATIVE@,$TCL_GENERIC_DIR_NATIVE,;t t
-s,@TCL_UNIX_DIR_NATIVE@,$TCL_UNIX_DIR_NATIVE,;t t
-s,@TCL_WIN_DIR_NATIVE@,$TCL_WIN_DIR_NATIVE,;t t
-s,@TCL_BMAP_DIR_NATIVE@,$TCL_BMAP_DIR_NATIVE,;t t
-s,@TCL_TOOL_DIR_NATIVE@,$TCL_TOOL_DIR_NATIVE,;t t
-s,@TCL_PLATFORM_DIR_NATIVE@,$TCL_PLATFORM_DIR_NATIVE,;t t
 s,@TCL_INCLUDES@,$TCL_INCLUDES,;t t
 s,@CLEANFILES@,$CLEANFILES,;t t
 s,@TCL_THREADS@,$TCL_THREADS,;t t
