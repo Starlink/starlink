@@ -115,9 +115,11 @@ Tcl_AppInit(interp)
         return TCL_ERROR;
     }
 
+#if HAVE_BLT
     if (Blt_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
     }
+#endif
 
     if (Tkgwm_Init(interp) == TCL_ERROR) {
         return TCL_ERROR;
@@ -130,7 +132,15 @@ Tcl_AppInit(interp)
     Tcl_StaticPackage(interp, "Itk", Itk_Init, (Tcl_PackageInitProc *) NULL);
 #endif /* HAVE_ITCL */
     Tcl_StaticPackage(interp, "Tcladam", Tcladam_Init, (Tcl_PackageInitProc *) NULL);
+#if HAVE_BLT
     Tcl_StaticPackage(interp, "Blt", Blt_Init, (Tcl_PackageInitProc *) NULL);
+#else 
+/* Only one routine in BLT is actually used (blt::busy), replace with a dummy */
+    if ( Tcl_Eval( interp, "namespace eval blt { proc busy { args } { } }" )
+         == TCL_ERROR ) {
+        return TCL_ERROR;
+    }
+#endif /* HAVE_BLT */
     Tcl_StaticPackage(interp, "Tkgwm", Tkgwm_Init, (Tcl_PackageInitProc *) NULL);
     Tcl_StaticPackage(interp, "Ndf", Ndf_Init, (Tcl_PackageInitProc *) NULL);
 
