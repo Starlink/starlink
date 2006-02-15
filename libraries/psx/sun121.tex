@@ -968,6 +968,8 @@ PSX\_\_ERRNO & System error during POSIX call
             {Get the username}
 \noteroutine{PSX\_FREE}{PSX_FREE}{( PNTR, STATUS )}
             {Free virtual memory }
+\noteroutine{PSX\_GETCWD}{PSX_GETCWD}{( CWD, STATUS )}
+            {Get the current working directory}
 \noteroutine{PSX\_GETEGID}{PSX_GETEGID}{( GID, STATUS )}
             {Gets the effective group ID}
 \noteroutine{PSX\_GETENV}{PSX_GETENV}{( NAME, TRANS, STATUS )}
@@ -1055,6 +1057,8 @@ PSX\_\_ERRNO & System error during POSIX call
 \begin{description}
 \noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
             {Check file accessibility}
+\noteroutine{PSX\_GETCWD}{PSX_GETCWD}{( CWD, STATUS )}
+            {Get the current working directory}
 \noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
             {Remove a file or empty directory}
 \noteroutine{PSX\_RENAME}{PSX_RENAME}{( INFIL, OUTFIL, STATUS )}
@@ -1589,6 +1593,50 @@ PSX\_\_ERRNO & System error during POSIX call
       Copyright
    }{
       Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETCWD
+}{
+   Rename a file
+}{
+   \sstdescription{
+      Provides a Fortran interface to obtain the current working directory.
+      Some Fortran implementations provide a GETCWD builtin but this is provided
+      for compatibility.
+   }
+   \sstinvocation{
+      CALL PSX\_GETWCD( CWD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CWD = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         On exit contains the name of the current directory. Status will be set to
+         PSX\_\_TRUNC if the string is too short to hold the directory.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      Internally, may use getwd or getcwd.
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX Standard ISO/IEC 9945-1:1990
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) Particle Physics and Astronomy Research Council 2006
    }
 }
 \sstroutine{

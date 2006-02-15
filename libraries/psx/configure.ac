@@ -38,6 +38,7 @@ AC_CHECK_FUNCS([ctime ctime_r])
 AC_CHECK_FUNCS([gmtime gmtime_r])
 AC_CHECK_FUNCS([localtime localtime_r])
 AC_CHECK_FUNCS([asctime asctime_r])
+AC_CHECK_FUNCS([getwd getcwd])
 
 dnl    On Solaris ctime_r and asctime_r have three arguments (or two if 
 dnl    _POSIX_PTHREAD_SEMANTICS is defined, but let's avoid that). This

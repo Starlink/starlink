@@ -19,6 +19,7 @@ test_rand
 test_term
 test_time
 test_uname
+test_getcwd
 *.lo
 *.la
 Makefile

@@ -2,6 +2,7 @@
                                                           Expires: **.**.**
 v0.5-2:
      Added PSX_RENAME
+     Added PSX_GETCWD
 
 v0.5:
      New autoconf-based build system
