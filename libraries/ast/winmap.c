@@ -470,8 +470,8 @@ static int GetObjSize( AstObject *this_object ) {
    add on any components of the class structure defined by thsi class
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
-   result += astSizeOf( this->a );
-   result += astSizeOf( this->b );
+   result += astTSizeOf( this->a );
+   result += astTSizeOf( this->b );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

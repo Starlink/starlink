@@ -1136,11 +1136,11 @@ typedef struct AstObject {
    unsigned long check;          /* Check value to identify Objects */
    size_t size;                  /* Amount of memory used by Object */
    struct AstObjectVtab *vtab;   /* Pointer to virtual function table */
-   int dynamic;                  /* Memory allocated dynamically? */
+   char dynamic;                 /* Memory allocated dynamically? */
    int ref_count;                /* Number of active pointers to the Object */
    char *id;                     /* Pointer to ID string */
    char *ident;                  /* Pointer to Ident string */
-   int usedefs;                  /* Use default attribute values? */
+   char usedefs;                 /* Use default attribute values? */
 } AstObject;
 
 /* Virtual function table. */

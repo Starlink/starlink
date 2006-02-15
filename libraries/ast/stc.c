@@ -706,7 +706,7 @@ static int GetObjSize( AstObject *this_object ) {
       for( i = 0; i < this->ncoord; i++ ) {
          result += astGetObjSize( this->coord[ i ] );
       }
-      result += astSizeOf( this->coord );
+      result += astTSizeOf( this->coord );
    }
 
 /* If an error occurred, clear the result value. */

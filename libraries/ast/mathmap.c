@@ -131,12 +131,12 @@ f     The MathMap class does not define any new routines beyond those
 \
 /* Check that each sub-array pointer is not NULL before measuring it. */ \
          if ( (array_name)[ array_index_ ] ) { \
-            result += astSizeOf( (array_name)[ array_index_ ] ); \
+            result += astTSizeOf( (array_name)[ array_index_ ] ); \
          } \
       } \
 \
 /* Include the main pointer array. */ \
-      result += astSizeOf( (array_name) ); \
+      result += astTSizeOf( (array_name) ); \
    }
 
 /* Header files. */

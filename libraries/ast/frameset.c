@@ -3354,11 +3354,11 @@ static int GetObjSize( AstObject *this_object ) {
       result += astGetObjSize( this->map[ inode ] );
    }
 
-   result += astGetObjSize( this->frame );
-   result += astGetObjSize( this->node );
-   result += astGetObjSize( this->map );
-   result += astGetObjSize( this->link );
-   result += astGetObjSize( this->invert );
+   result += astTSizeOf( this->frame );
+   result += astTSizeOf( this->node );
+   result += astTSizeOf( this->map );
+   result += astTSizeOf( this->link );
+   result += astTSizeOf( this->invert );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

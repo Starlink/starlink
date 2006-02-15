@@ -3137,10 +3137,10 @@ f     AST_TEST
 *        Epoch, DSBCentre, IF.
 *att--
 */
-astMAKE_CLEAR(Object,UseDefs,usedefs,INT_MAX)
-astMAKE_GET(Object,UseDefs,int,1,((this->usedefs!=INT_MAX)?this->usedefs:1))
+astMAKE_CLEAR(Object,UseDefs,usedefs,CHAR_MAX)
+astMAKE_GET(Object,UseDefs,int,1,((this->usedefs!=CHAR_MAX)?this->usedefs:1))
 astMAKE_SET(Object,UseDefs,int,usedefs,(this->usedefs=(value)?1:0))
-astMAKE_TEST(Object,UseDefs,(this->usedefs!=INT_MAX))
+astMAKE_TEST(Object,UseDefs,(this->usedefs!=CHAR_MAX))
 
 /*
 *att++
@@ -3637,7 +3637,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
          new->ident = NULL;
 
 /* Use default values for unspecified attributes. */
-         new->usedefs = INT_MAX;
+         new->usedefs = CHAR_MAX;
 
 /* Increment the count of active Objects in the virtual function table. */
          new->vtab->nobject++;
@@ -3763,7 +3763,7 @@ AstObject *astLoadObject_( void *mem, size_t size,
    initialise the appropriate instance variable(s) for this class. */
       new->id = astReadString( channel, "id", NULL );
       new->ident = astReadString( channel, "ident", NULL );
-      new->usedefs = astReadInt( channel, "usedfs", INT_MAX );
+      new->usedefs = astReadInt( channel, "usedfs", CHAR_MAX );
 
 /* We simply read the values for the read-only attributes (just in
    case they've been un-commented in the external representation) and
@@ -3829,25 +3829,8 @@ void astVSet_( AstObject *this, const char *settings, va_list args ) {
    (**astMEMBER(this,Object,VSet))( this, settings, args );
 }
 int astGetObjSize_( AstObject *this ) {
-   static int ind = 0;
-   int i, ret;
-
    if ( !astOK || !this ) return 0;
-
-   for( i = 0; i < ind; i++ ) printf(" ");
-   printf( "Begin %s\n", this->vtab->class ); 
-
-   ind += 3;
-   ret = (**astMEMBER(this,Object,GetObjSize))( this );
-   ind -= 3;
-
-   for( i = 0; i < ind; i++ ) printf(" ");
-   printf( "End %s (%d)\n", this->vtab->class, ret ); 
-
-   return ret;
-
-
-
+   return (**astMEMBER(this,Object,GetObjSize))( this );
 }
 
 /* External interface. */

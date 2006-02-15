@@ -1251,13 +1251,13 @@ static int GetObjSize( AstObject *this_object ) {
          if( type == AST__STRINGTYPE ) {
 
             if( nel == 0 ) {
-               result += astSizeOf( ( void *) ( (Entry0C *) next )->value );
+               result += astTSizeOf( ( void *) ( (Entry0C *) next )->value );
 
             } else {
                slist = ( (Entry1C *) next )->value;
                if( slist ) {
-                  for( i = 0; i < nel; i++ ) result += astSizeOf( (void *) slist[ i ] );
-                  result += astSizeOf( (void *) slist );
+                  for( i = 0; i < nel; i++ ) result += astTSizeOf( (void *) slist[ i ] );
+                  result += astTSizeOf( (void *) slist );
                }
             }
 
@@ -1271,15 +1271,15 @@ static int GetObjSize( AstObject *this_object ) {
                   for( i = 0; i < nel; i++ ) {
                      result += astGetObjSize( alist[ i ] );
                   }
-                  result += astSizeOf( alist );
+                  result += astTSizeOf( alist );
                }
             }
 
          } else if( type == AST__INTTYPE ) {
-            if( nel > 0 ) result += astSizeOf( ( (Entry1I *) next )->value );
+            if( nel > 0 ) result += astTSizeOf( ( (Entry1I *) next )->value );
 
          } else if( type == AST__DOUBLETYPE ) {
-            if( nel > 0 ) result += astSizeOf( ( (Entry1D *) next )->value );
+            if( nel > 0 ) result += astTSizeOf( ( (Entry1D *) next )->value );
 
          } else {
             astError( AST__INTER, "astGetObjSize(KeyMap): Illegal map entry data "
@@ -1287,9 +1287,9 @@ static int GetObjSize( AstObject *this_object ) {
                       type );
          }
 
-         result += astSizeOf( (void *) next->key );
-         result += astSizeOf( (void *) next->comment );
-         result += astSizeOf( next );
+         result += astTSizeOf( (void *) next->key );
+         result += astTSizeOf( (void *) next->comment );
+         result += astTSizeOf( next );
 
          next = next->next;
       }

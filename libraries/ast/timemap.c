@@ -244,11 +244,11 @@ static int GetObjSize( AstObject *this_object ) {
    result = (*parent_getobjsize)( this_object );
 
    for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
-      result += astSizeOf( this->cvtargs[ cvt ] );
+      result += astTSizeOf( this->cvtargs[ cvt ] );
    }
 
-   result += astSizeOf( this->cvtargs );
-   result += astSizeOf( this->cvttype );
+   result += astTSizeOf( this->cvtargs );
+   result += astTSizeOf( this->cvttype );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

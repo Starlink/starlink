@@ -346,13 +346,13 @@ typedef struct AstMapping {
    AstObject object;             /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   int invert;                   /* Mapping inverted? */
-   int issimple;                 /* Has Mapping been simplified? */
-   int nin;                      /* Number of input coordinates */
-   int nout;                     /* Number of output coordinates */
-   int report;                   /* Report when converting coordinates? */
-   int tran_forward;             /* Forward transformation defined? */
-   int tran_inverse;             /* Inverse transformation defined? */
+   char invert;                   /* Mapping inverted? */
+   char issimple;                 /* Has Mapping been simplified? */
+   int nin;                       /* Number of input coordinates */
+   int nout;                      /* Number of output coordinates */
+   char report;                   /* Report when converting coordinates? */
+   char tran_forward;             /* Forward transformation defined? */
+   char tran_inverse;             /* Inverse transformation defined? */
 } AstMapping;
 
 /* Virtual function table. */

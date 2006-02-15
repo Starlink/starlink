@@ -704,9 +704,9 @@ static int GetObjSize( AstObject *this_object ) {
 
    if( this && this->usedunits ) {
       for( i = 0; i < this->nuunits; i++ ) {
-         result += astSizeOf( this->usedunits[ i ] );
+         result += astTSizeOf( this->usedunits[ i ] );
       }
-      result += astSizeOf( this->usedunits );
+      result += astTSizeOf( this->usedunits );
    }
 
    result += astGetObjSize( this->specframe );

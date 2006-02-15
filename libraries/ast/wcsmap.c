@@ -1405,16 +1405,16 @@ static int GetObjSize( AstObject *this_object ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
       
-   result += astSizeOf( this->np );
+   result += astTSizeOf( this->np );
    if( this->p ){
       for( i = 0; i < astGetNin( this ); i++ ){
-         result += astSizeOf( (void *) this->p[ i ] );
+         result += astTSizeOf( (void *) this->p[ i ] );
       }
-      result += astSizeOf( this->p );
+      result += astTSizeOf( this->p );
    }
 
-   result += astSizeOf( this->params.p );
-   result += astSizeOf( this->params.p2 );
+   result += astTSizeOf( this->params.p );
+   result += astTSizeOf( this->params.p2 );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

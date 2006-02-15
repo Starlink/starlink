@@ -865,9 +865,9 @@ static int GetObjSize( AstObject *this_object ) {
    result = (*parent_getobjsize)( this_object );
    if( this->usedunits ) {
       for( i = 0; i < this->nuunits; i++ ) {
-         result += astSizeOf( this->usedunits[ i ] );
+         result += astTSizeOf( this->usedunits[ i ] );
       }
-      result += astSizeOf( this->usedunits );
+      result += astTSizeOf( this->usedunits );
    }
 
 /* If an error occurred, clear the result value. */

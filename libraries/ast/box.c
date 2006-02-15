@@ -191,11 +191,11 @@ static int GetObjSize( AstObject *this_object ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
 
-   result += astSizeOf( this->extent );  
-   result += astSizeOf( this->shextent );
-   result += astSizeOf( this->centre );  
-   result += astSizeOf( this->lo );      
-   result += astSizeOf( this->hi );      
+   result += astTSizeOf( this->extent );  
+   result += astTSizeOf( this->shextent );
+   result += astTSizeOf( this->centre );  
+   result += astTSizeOf( this->lo );      
+   result += astTSizeOf( this->hi );      
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

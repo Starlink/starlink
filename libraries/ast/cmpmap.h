@@ -144,11 +144,11 @@ typedef struct AstCmpMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   AstMapping *map1;             /* Pointer to first Mapping */
-   AstMapping *map2;             /* Pointer to second Mapping */
-   int invert1;                  /* Inversion flag for first Mapping */
-   int invert2;                  /* Inversion flag for second Mapping */
-   int series;                   /* Connect in series (else in parallel)? */
+   AstMapping *map1;              /* Pointer to first Mapping */
+   AstMapping *map2;              /* Pointer to second Mapping */
+   char invert1;                  /* Inversion flag for first Mapping */
+   char invert2;                  /* Inversion flag for second Mapping */
+   char series;                   /* Connect in series (else in parallel)? */
 } AstCmpMap;
 
 /* Virtual function table. */

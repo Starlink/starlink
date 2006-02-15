@@ -9651,14 +9651,14 @@ static int GetObjSize( AstObject *this_object ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
 
-   result += astSizeOf( this->warnings );
-   result += astSizeOf( this->keyseq );
+   result += astTSizeOf( this->warnings );
+   result += astTSizeOf( this->keyseq );
 
    card = (FitsCard *) ( this->head );
    while( card ) {
-      result += astSizeOf( card );
+      result += astTSizeOf( card );
       result += card->size;
-      result += astSizeOf( card->comment );
+      result += astTSizeOf( card->comment );
       card = GetLink( card, NEXT, "astGetObjSize", "FitsChan" );
       if( (void *) card == this->head ) break;
    }

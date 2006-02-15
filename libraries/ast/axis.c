@@ -1304,10 +1304,10 @@ static int GetObjSize( AstObject *this_object ) {
    which are stored in dynamically allocated memory. */
    result = (*parent_getobjsize)( this_object );
 
-   result += astSizeOf( this->label );
-   result += astSizeOf( this->format );
-   result += astSizeOf( this->symbol );
-   result += astSizeOf( this->unit );
+   result += astTSizeOf( this->label );
+   result += astTSizeOf( this->format );
+   result += astTSizeOf( this->symbol );
+   result += astTSizeOf( this->unit );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;

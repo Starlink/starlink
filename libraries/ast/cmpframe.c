@@ -2038,7 +2038,7 @@ static int GetObjSize( AstObject *this_object ) {
 
    result += astGetObjSize( this->frame1 );
    result += astGetObjSize( this->frame2 );
-   result += astSizeOf( this->perm );
+   result += astTSizeOf( this->perm );
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
