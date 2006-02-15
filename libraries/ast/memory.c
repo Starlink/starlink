@@ -1025,6 +1025,65 @@ size_t astSizeOf_( const void *ptr ) {
    return size;
 }
 
+size_t astTSizeOf_( const void *ptr ) {
+/*
+*+
+*  Name:
+*     astTSizeOf
+
+*  Purpose:
+*     Determine the total size of a dynamically allocated region of memory.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     size_t astTSizeOf( const void *ptr )
+
+*  Description:
+*     This function returns the size of a region of dynamically
+*     allocated memory, including the extra memory used to store 
+*     the header information for the memory block (size and magic number).
+
+*  Parameters:
+*     ptr
+*        Pointer to dynamically allocated memory (or NULL if the size
+*        of the allocated memory was zero).
+
+*  Returned Value:
+*     The allocated size. This will be zero if a NULL pointer was
+*     supplied (no error will result).
+
+*  Notes:
+*     - A value of zero is returned if this function is invoked with
+*     the global error status set, or if it fails for any reason.
+*     - This function is documented as protected because it should not
+*     be invoked by external code. However, it is available via the
+*     external C interface so that it may be used when writing (e.g.)
+*     foreign language or graphics interfaces.
+*-
+*/
+
+/* Local Variables: */
+   size_t size;                  /* Memory size */
+
+/* Check the global error status. */
+   if ( !astOK ) return (size_t) 0;
+
+/* Initialise. */
+   size = (size_t) 0;
+
+/* Check if a non-NULL valid pointer has been given. If so, extract
+   the memory size from the header which precedes it. */
+   if ( ptr && IsDynamic( ptr ) ) {
+      size = sizeof( Memory ) + ( ( (Memory *) ptr ) - 1 )->size;
+   }
+
+/* Return the result. */
+   return size;
+}
+
 void *astStore_( void *ptr, const void *data, size_t size ) {
 /*
 *+

@@ -49,6 +49,8 @@
 *        astSscanf
 *           Like sscanf, but fixes certain platform-specific bugs in the
 *           native sscanf implementation.
+*        astTSizeOf
+*           Determine the total size of a dynamically allocated region of memory.
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -98,6 +100,7 @@ char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
 int astSscanf_( const char *str, const char *format, ...);
 size_t astSizeOf_( const void * );
+size_t astTSizeOf_( const void * );
 void *astFree_( void * );
 void *astGrow_( void *, int, size_t );
 void *astMalloc_( size_t );
@@ -132,6 +135,7 @@ void *astFindIdPtr_( int );
 #define astMalloc(size) astMalloc_(size)
 #define astRealloc(ptr,size) astRealloc_(ptr,size)
 #define astSizeOf(ptr) astSizeOf_(ptr)
+#define astTSizeOf(ptr) astTSizeOf_(ptr)
 #define astStore(ptr,data,size) astStore_(ptr,data,size)
 #define astAppendString(ptr,len,text) astAppendString_(ptr,len,text)
 #define astString(chars,nchars) astString_(chars,nchars)
