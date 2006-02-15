@@ -131,11 +131,11 @@ AC_SUBST(CLEANFILES)
 # of private headers
 #--------------------------------------------------------------------
 
-#TEA_PUBLIC_TCL_HEADERS
-TEA_PRIVATE_TCL_HEADERS
+TEA_PUBLIC_TCL_HEADERS
+#TEA_PRIVATE_TCL_HEADERS
 
-#TEA_PUBLIC_TK_HEADERS
-TEA_PRIVATE_TK_HEADERS
+TEA_PUBLIC_TK_HEADERS
+#TEA_PRIVATE_TK_HEADERS
 
 #--------------------------------------------------------------------
 # For Unix/Tk builds, make sure that the X libraries/headers are found.

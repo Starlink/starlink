@@ -125,8 +125,8 @@ AC_SUBST(CLEANFILES)
 # of private headers
 #--------------------------------------------------------------------
 
-#TEA_PUBLIC_TCL_HEADERS
-TEA_PRIVATE_TCL_HEADERS
+TEA_PUBLIC_TCL_HEADERS
+#TEA_PRIVATE_TCL_HEADERS
 
 #--------------------------------------------------------------------
 # We need to enable the threading macros found in tcl.h and tclInt.h.
