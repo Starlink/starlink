@@ -112,6 +112,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *     7-SEP-2005 (DSB):
 *        Take account of the Invert flag when using the zoom factor from
 *        a ZoomMap.
+*     14-FEB-2006 (DSB):
+*        Correct row/col confusion in CompressMatrix.
 *class--
 */
 
@@ -612,11 +614,11 @@ static void CompressMatrix( AstMatrixMap *this ){
 /* Store a pointer to the next matrix element. */
          a = this->f_matrix;
   
-/* Loop through all the columns in the forward matrix array. */
-         for( j = 0; j < ncol; j++ ) {
+/* Loop through all the rows in the forward matrix array. */
+         for( k = 0; k < nrow; k++ ) {
 
 /* Loop through all the elements in this column. */
-            for( k = 0; k < nrow; k++, a++ ) {
+            for( j = 0; j < ncol; j++, a++ ) {
 
 /* If this element is bad, use full form. */
                if( *a == AST__BAD ) {
