@@ -2,7 +2,7 @@
 
 @SET_MAKE@
 
-RECURSIVE_TARGETS = all clean
+RECURSIVE_TARGETS = all clean distclean
 
 $(RECURSIVE_TARGETS):
 	for d in @itcl_subdirs@; \
