@@ -47,6 +47,7 @@ C_ROUTINES = \
 	psx_rand.c \
 	psx_realloc.c \
 	psx_remove.c \
+        psx_rename.c \
 	psx_srand.c \
 	psx_time.c \
 	psx_ttyname.c \

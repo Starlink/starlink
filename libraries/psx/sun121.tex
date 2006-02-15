@@ -14,7 +14,7 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils, 2006 Particle Physics and Astronomy Research Council}
 
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {121.5}
@@ -1003,6 +1003,8 @@ PSX\_\_ERRNO & System error during POSIX call
             {Change the size of an allocated region of virtual memory}
 \noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
             {Remove a file or empty directory}
+\noteroutine{PSX\_RENAME}{PSX_RENAME}{( INFIL, OUTFIL, STATUS )}
+            {Rename a file}
 \noteroutine{PSX\_SRAND}{PSX_SRAND}{( SEED, STATUS )}
             {Set the seed for the random number generator}
 \noteroutine{PSX\_TIME}{PSX_TIME}{( NTICKS, STATUS )}
@@ -1055,6 +1057,8 @@ PSX\_\_ERRNO & System error during POSIX call
             {Check file accessibility}
 \noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
             {Remove a file or empty directory}
+\noteroutine{PSX\_RENAME}{PSX_RENAME}{( INFIL, OUTFIL, STATUS )}
+            {Rename a file}
 \end{description}
 
 \subsection{\xlabel{language_specific_services_for_c_fortran_versions}Language Specific Services for C (FORTRAN versions)}
@@ -1157,7 +1161,7 @@ PSX\_\_ERRNO & System error during POSIX call
    \sstdiytopic{
       Copyright
    }{
-      Copyright (C) 1995 CCLRC,
+      Copyright (C) 1995 Council for the Central Laboratory of the Resarch Councils,
       Copyright (C) 2005 Particle Physics and Astronomy Research Council
    }
    \sstimplementationstatus{
@@ -2661,6 +2665,54 @@ PSX\_\_ERRNO & System error during POSIX call
       Copyright (C) 1999-2004 CLRC
    }
 }
+\sstroutine{
+   PSX\_RENAME
+}{
+   Rename a file
+}{
+   \sstdescription{
+      Provides a Fortran interface to rename files. The file with the
+      name specified by the first argument is renamed to the second
+      name.
+   }
+   \sstinvocation{
+      CALL PSX\_RENAME( INFIL, OUTFIL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INFIL = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the file to rename
+      }
+      \sstsubsection{
+         OUTFIL = CHARACTER$*$($*$) (Given)
+      }{
+         The new name of the file
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX Standard
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) University of Birmingham, 1995
+      Copyright (C) Council for the Central Laboratory of the Research Councils 2001
+      Copyright (C) Particle Physics and Astronomy Research Council 2006
+   }
+}
+
 \sstroutine{
    PSX\_SRAND
 }{

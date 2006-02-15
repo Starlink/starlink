@@ -1,5 +1,8 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5-2:
+     Added PSX_RENAME
+
 v0.5:
      New autoconf-based build system
      Added PSX_REMOVE
