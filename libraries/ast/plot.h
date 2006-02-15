@@ -621,12 +621,12 @@ struct AstPlot;
 /* ---------------------------- */
 /* A general interface into which actual Grf functions should be cast 
    before being passed as an argument to astGrfSet. */
-typedef void (* AstGrfFun)();              
+typedef void (* AstGrfFun)( void );              
 
 /* Interfaces for specific Grf funstions implemented in C (other languages
    may have different interfaces). */
 typedef int (* AstGAttrFun)( int, double, double *, int );
-typedef int (* AstGFlushFun)();
+typedef int (* AstGFlushFun)( void );
 typedef int (* AstGLineFun)( int, const float *, const float * );
 typedef int (* AstGMarkFun)( int, const float *, const float *, int );
 typedef int (* AstGTextFun)( const char *, float, float, const char *, float, float );
@@ -637,7 +637,7 @@ typedef int (* AstGQchFun)( float *, float * );
 
 /* A general interface into which Grf Wrapper functions should be cast 
    before being passed as an argument to astGrfWrapper. */
-typedef void (* AstGrfWrap)();              
+typedef void (* AstGrfWrap)( void );              
 
 /* Interfaces for the wrapper functions which wrap specific Grf funstions. */
 typedef int (* AstGAttrWrap)( struct AstPlot *, int, double, double *, int );
