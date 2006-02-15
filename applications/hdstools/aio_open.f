@@ -41,6 +41,7 @@
 *      6 Dec 01 : Correct getting unused filename for PRINTER
 *                 Use MSG_OUTIF (AJC)
 *     12 Oct 04 : Use PSX_REMOVE rather than UTIL_DELETE
+*     15 Feb 06 : Use PSX_RENAME rather than UTIL_RENAME
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -338,7 +339,7 @@
           END IF
 
 *        Rename old file
-          CALL UTIL_RENAME( LFILE(:FLEN), LFILE(:FLEN+1), STATUS )
+          CALL PSX_RENAME( LFILE(:FLEN), LFILE(:FLEN+1), STATUS )
 
         END IF
 

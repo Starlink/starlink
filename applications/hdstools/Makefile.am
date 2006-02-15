@@ -34,7 +34,7 @@ FSRC = aio_assoco.f aio_blnk.f aio_cancl.f aio_close.f aio_ctoc.f \
          str_obval.f str_parse.f
 
 CSRC = aio_appfco_c.c aio_crefco_c.c aio_frefco_c.c \
-         util_rename_c.c util_spool_c.c
+         util_spool_c.c
 
 
 BLOCK_DATA_FILES = aio_blk.f

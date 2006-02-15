@@ -12,7 +12,7 @@ to edit and display HDS objects. The tools originated in the ASTERIX
 package but have now been modified to run as normal Starlink tasks.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><build>shl</build><build>ifd</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><build>hds</build><build>fio</build><build>mers</build><build>par</build><build>prm</build><build>sae</build><build>shl</build><build>ifd</build><build>psx</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
