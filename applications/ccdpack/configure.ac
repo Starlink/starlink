@@ -54,7 +54,6 @@ LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
 
 AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
 AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
-AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,,[-lBLT$BLT_VERSION])
 
 dnl   Check for fpu_control.h, this isn't available for all  
 dnl   GCC implementations 
@@ -72,6 +71,18 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
+
+have_blt=1
+AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLT$BLT_VERSION])
+AC_MSG_CHECKING([whether to use BLT])
+if test -n "$have_blt"
+then
+    AC_MSG_RESULT(yes)
+    AC_DEFINE(HAVE_BLT, 1, [Is BLT present?])
+else
+    AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(HAVE_BLT, [test -n "$have_blt"])
 
 LDFLAGS=$my_save_LDFLAGS
 
