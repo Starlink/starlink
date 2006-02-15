@@ -29,6 +29,7 @@ C_ROUTINES = \
 	psx_access.c \
 	psx_asctime.c \
 	psx_calloc.c \
+	psx_chdir.c \
 	psx_ctime.c \
 	psx_cuserid.c \
 	psx_free.c \
@@ -60,11 +61,11 @@ BUILT_SOURCES = $(noinst_MESSAGES) $(include_MESSAGES)
 
 TESTS = psx_test test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
-	test_remove test_access test_getcwd
+	test_remove test_access test_getcwd test_chdir
 
 check_PROGRAMS = psx_test test_alloc test_cuserid test_getenv test_getpid \
 	test_getuid test_putenv test_rand test_term test_time test_uname \
-	test_remove test_access test_getcwd
+	test_remove test_access test_getcwd test_chdir
 
 psx_test_SOURCES = psx_test.f
 psx_test_LDADD = libpsx.la `ems_link` `cnf_link`
@@ -107,6 +108,10 @@ test_access_LDADD = libpsx.la `ems_link` `cnf_link`
 
 test_getcwd_SOURCES = test_getcwd.f
 test_getcwd_LDADD = libpsx.la `ems_link` `cnf_link`
+
+test_chdir_SOURCES = test_chdir.f
+test_chdir_LDADD = libpsx.la `ems_link` `cnf_link`
+
 
 dist_starnews_DATA = psx.news
 

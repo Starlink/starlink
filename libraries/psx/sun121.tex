@@ -962,6 +962,8 @@ PSX\_\_ERRNO & System error during POSIX call
             {Convert a time structure to a character string}
 \noteroutine{PSX\_CALLOC}{PSX_CALLOC}{( NMEMB, TYPE, PNTR, STATUS )}
             {Allocate space for several objects of specified type}
+\noteroutine{PSX\_CHDIR}{PSX_CHDIR}{( DIR, STATUS )}
+            {Change working directory}
 \noteroutine{PSX\_CTIME}{PSX_CTIME}{( NTICKS, STRING, STATUS )}
             {Convert the calendar time to a character string}
 \noteroutine{PSX\_CUSERID}{PSX_CUSERID}{( USER, STATUS )}
@@ -1057,6 +1059,8 @@ PSX\_\_ERRNO & System error during POSIX call
 \begin{description}
 \noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
             {Check file accessibility}
+\noteroutine{PSX\_CHDIR}{PSX_CHDIR}{( DIR, STATUS )}
+            {Change working directory}
 \noteroutine{PSX\_GETCWD}{PSX_GETCWD}{( CWD, STATUS )}
             {Get the current working directory}
 \noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
@@ -1388,6 +1392,46 @@ PSX\_\_ERRNO & System error during POSIX call
       Copyright (C) 1991 Science \& Engineering Research Council
    }
 }
+\sstroutine{
+   PSX\_CHDIR
+}{
+   Change current working directory
+}{
+   \sstdescription{
+      Provides a Fortran interface to change working directory.
+   }
+   \sstinvocation{
+      CALL PSX\_CHDIR( DIR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DIR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         On exit contains the name of the current directory. Status will be set to
+         PSX\_\_ERRNO on error.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given \& Returned)
+      }{
+         The global status. No action takes place if status is bad on entry.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX Standard IEEE Std 1003.1-1988
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) Particle Physics and Astronomy Research Council 2006
+   }
+}
+
 \sstroutine{
    PSX\_CTIME
 }{
