@@ -73,14 +73,18 @@ fi
 AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 
 have_blt=1
+my_save_LIBS="$LIBS"
+LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
 AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLT$BLT_VERSION])
 AC_MSG_CHECKING([whether to use BLT])
 if test -n "$have_blt"
 then
     AC_MSG_RESULT(yes)
     AC_DEFINE(HAVE_BLT, 1, [Is BLT present?])
+    LIBS="$my_save_LIBS -lBLT$BLT_VERSION"
 else
     AC_MSG_RESULT(no)
+    LIBS="$my_save_LIBS"
 fi
 AM_CONDITIONAL(HAVE_BLT, [test -n "$have_blt"])
 
