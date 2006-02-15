@@ -249,6 +249,8 @@
 *     2006 February 13 (MJC):
 *        Allow for very large datsets by blocking into manageable
 *        sections.
+*     2006 February 14 (MJC):
+*        Correct calculation of the blocked bounds for the output NDF.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -837,32 +839,34 @@
 
 *  For large datasets, there may be insufficient memory.  Therefore
 *  we form blocks to process, one at a time.  For this by definition
-*  we need the ciollapse-axis pixels to always be present in full for
+*  we need the collapse-axis pixels to always be present in full for
 *  each pixel along the other pixel axes.  If this leaves room for a
 *  full span of a dimension that becomes the block size along that
 *  axis.  Partial fills take the remaining maximum size and subsequent
 *  dimensions' block sizes are unity.
       IBLSIZ( IAXIS ) = AEL
-      OBLSIZ( IAXIS ) = 1
       MAXSIZ = MAX( 1, MAXPIX / AEL )
       LOOP = .TRUE.
+      J = 0
       DO I = 1, NDIM
          IF ( I .NE. IAXIS ) THEN
             IF ( LOOP ) THEN
                D = UBND( I ) - LBND( I ) + 1
                IF ( MAXSIZ .GE. D ) THEN
                   IBLSIZ( I ) = D
-                  OBLSIZ( I ) = IBLSIZ( I )
                   MAXSIZ = MAXSIZ / D
                ELSE
                   IBLSIZ( I ) = MAXSIZ
-                  OBLSIZ( I ) = IBLSIZ( I )
                   LOOP = .FALSE.
                END IF
             ELSE
                IBLSIZ( I ) = 1
-               OBLSIZ( I ) = 1
             END IF
+
+*  Copy the output NDF block sizes in sequence omitting the
+*  collapse axis.
+            J = J + 1
+            OBLSIZ( J ) = IBLSIZ( I )
          END IF
       END DO
 
@@ -873,7 +877,7 @@
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
          CALL NDF_BLOCK( INDF1, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
-         CALL NDF_BLOCK( INDF2, NDIM, OBLSIZ, IBLOCK, OBL, STATUS ) 
+         CALL NDF_BLOCK( INDF2, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS ) 
 
 *  Map the NDF arrays and workspace required.
 *  ==========================================
