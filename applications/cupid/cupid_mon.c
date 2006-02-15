@@ -92,12 +92,6 @@ void cupid_mon( int *adam_status ) {
    when another AST Object needs to be created. */
    ast_caching = astTune( "ObjectCaching", 1 );
 
-/* Tell AST to re-cycle memory used to store AST Objects, When an AST 
-   Object is deleted, the memory used by it will be put into a pool of
-   allocated but currently unused memory, from where it can be reclaimed
-   when another AST Object needs to be created. */
-   astTune( "ObjectCaching", 1 );
-
 /* Check the string against valid A-task names---if matched then call
    the relevant A-task. Since these functions do not have an expliciti
    "status" parameter, they cannot be built as stand-alone atasks using
