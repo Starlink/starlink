@@ -30,7 +30,7 @@
 
 *  Copyright:
 *     Copyright (C) University of Birmingham, 1995
-*     Copyright (C) CCLRC 2001
+*     Copyright (C) Council for the Central Laboratory of the Research Councils 2001
 *     Copyright (C) Particle Physics and Astronomy Research Council 2006
 
 *  Authors:
@@ -63,7 +63,9 @@
 *      5-Dec-2001 (AJC):
 *        New form of EMS and CNF routine name
 *     14-FEB-2006 (TIMJ):
-*        Integrate into PSX
+*        Integrate into PSX.
+*     15-FEB-2006 (TIMJ):
+*        Set status to PSX__ERRNO rather than generic SAI__ERROR.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,6 +81,7 @@
 #include "f77.h"
 #include "cnf.h"
 #include "ems.h"          /* Error handling */
+#include "psx_err.h"
 #include <stdio.h>
 #include <errno.h>
 
@@ -103,7 +106,9 @@ F77_SUBROUTINE(psx_rename)( CHARACTER(infil), CHARACTER(outfil),
   GENPTR_INTEGER(status)
 
   char          *instr, *outstr;	/* CNF temporary strings */
+#if defined(VAX)
   int  		lstat;			/* Status from system routine */
+#endif
 
 /* Check inherited global stratus on entry */
   if ( *status != SAI__OK )
@@ -127,7 +132,7 @@ F77_SUBROUTINE(psx_rename)( CHARACTER(infil), CHARACTER(outfil),
 /* Status renaming file */
   if ( rename(instr,outstr) ) {
     emsSyser( "REASON", errno );
-    *status = SAI__ERROR;
+    *status = PSX__ERRNO;
     }
 
   if ( instr )				/* Free temporary strings */
