@@ -5,6 +5,7 @@
 #include "sae_par.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 
 F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 /*
@@ -51,7 +52,8 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 *     13-FEB-2006 (TIMJ):
 *        Use cnfFree since this is easier to control when changing
 *        malloc library.
-
+*     15-FEB-2006 (TIMJ):
+*        Be more explicit about failure modes.
 *
 */
 {
@@ -66,17 +68,32 @@ F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
    cmd = cnfCreim( command, command_length ); /* Import the FORTRAN string. */
    if (cmd == NULL) {
      *status = ONE__MALLOCERR;
-     emsRep( "ONE_EXECERR", 
+     emsRep( "ONE_EXEC_ERR0", 
 	     "Error allocating temp memory whilst executing command.", 
 	     status );
    }
    ret = system( cmd );
    cnfFree( cmd );
+
    if ( ret != 0 ) {
       *status = ONE__EXECERROR;
       emsSetc( "COMND", cmd );
-      (void) emsRep( "ONE_EXECERR", "Error executing command '^COMND'", 
-	status );
+      if ( ret == -1 ) {
+	emsSyser( "MESSAGE", errno );
+	emsRep( "ONE_EXEC_ERR1",
+		"Unable to create a child process to execute an external command - ^MESSAGE", status );
+
+      } else if ( WIFEXITED( ret ) && ( WEXITSTATUS( ret ) == 127 ) ) {
+
+	emsSeti( "STS", ret );
+	emsRep( "ONE_EXEC_ERR2",
+		"Command '^COMND' could not execute. Call returned error status ^STS", status);
+
+      } else {
+	emsSeti( "STS", ret );
+	emsRep( "ONE_EXEC_ERR3", "Command '^COMND' returned an error status of ^STS", 
+		status );
+      }
    }
    return;
 }
