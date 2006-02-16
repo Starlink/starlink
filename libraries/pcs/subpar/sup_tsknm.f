@@ -61,6 +61,8 @@
 *        To remove these portability concerns, now call PSX_ACCESS
 *        rather than the ACCESS intrinsic. A version was present in
 *        pcs/misc/access.c but it was not being used on all compilers.
+*     15-FEB-2006 (TIMJ):
+*        Change calling scheme for PSX_ACCESS
 *     {enter_changes_here}
 
 *  Bugs:
@@ -89,8 +91,6 @@
       INTEGER CHR_LEN            ! Used lenth of string
       EXTERNAL STRING_IANYR
       INTEGER STRING_IANYR       ! Index search backwards
-      EXTERNAL PSX_ACCESS
-      INTEGER PSX_ACCESS         ! File access
 
 *  Local Variables:
       CHARACTER*(256) ARGV0      ! Argument 0 of command
@@ -101,6 +101,9 @@
       INTEGER STNM               ! Start of file name in description
       INTEGER ENDNM              ! End of file name in description
       INTEGER IND                ! Index for FIFIL
+      INTEGER REASON             ! Reason for ACCESS failure
+      LOGICAL ACCIFL             ! IFL file accessible
+      LOGICAL ACCIFC             ! IFC file accessible
 *.
 
 *  Check inherited global status.
@@ -172,25 +175,35 @@
 
 *           First annul the error messages from _FIFIL
                CALL EMS_ANNUL ( STATUS )
-               IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifc',
-     :                          'r', STATUS) .EQ. 0 ) THEN
+               CALL PSX_ACCESS( EXENAM(1:ENDNM)//'.ifc',
+     :              'R', ACCIFC, REASON, STATUS )
+
+               IF ( ACCIFC ) THEN
+
 *              An IFC is found
                   IFC = .TRUE.
                   IFNAM = EXENAM(1:ENDNM)//'.ifc'
 
-               ELSE IF ( PSX_ACCESS( EXENAM(1:ENDNM)//'.ifl',
-     :                   'r', STATUS) .EQ. 0 ) THEN
-*              An IFL is found
-                  IFC = .FALSE.
-                  IFNAM = EXENAM(1:ENDNM)//'.ifl'
+               ELSE 
 
-               ELSE
-*              No interface module found
-                  STATUS = SUBPAR__IFNF
-                  CALL EMS_SETC( 'TSKNAM', TSKNAM )
-                  CALL EMS_REP( 'SUP_TSKNM1',
-     :            'Interface file for ^TSKNAM not found', STATUS )
+                  CALL PSX_ACCESS( EXENAM(1:ENDNM)//'.ifl',
+     :                 'R', ACCIFL, REASON, STATUS )
 
+                  IF ( ACCIFL ) THEN
+
+*     An IFL is found
+                     IFC = .FALSE.
+                     IFNAM = EXENAM(1:ENDNM)//'.ifl'
+
+                  ELSE
+*     No interface module found
+                     STATUS = SUBPAR__IFNF
+                     CALL EMS_SETC( 'TSKNAM', TSKNAM )
+                     CALL EMS_REP( 'SUP_TSKNM1',
+     :                    'Interface file for ^TSKNAM not found', 
+     :                    STATUS )
+
+                  END IF
                ENDIF
 
             ELSE
