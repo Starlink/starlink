@@ -22,9 +22,9 @@
  *-----------------------------------------------------------------------------
  */
 
-#ifndef NO_SELECT
-
 #include "tclExtdInt.h"
+
+#ifndef NO_SELECT
 
 /*
  * A few systems (A/UX 2.0) have select but no macros, define em in this case.
