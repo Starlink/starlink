@@ -51,6 +51,8 @@
 *        Modified astRealloc to clarify the nature of the returned pointer 
 *        (which is not a "Memory *"). Also correct issuing and deissuing
 *        of pointers in DEBUG code within astRealloc.
+*     16-FEB-2006 (DSB):
+*        Convert Magic from a function to a macro for extra speed.
 */
 
 /* Module Macros. */
@@ -62,6 +64,54 @@
 
 /* The maximum number of fields within a format string allowed by astSscanf. */
 #define VMAXFLD 20
+
+/* Function Macros. */
+/* =============== */
+/* These are defined as macros rather than functions to avoid the
+   overhead of a function call since they are called extremely frequently. */
+
+/*
+*  Name:
+*     Magic
+
+*  Purpose:
+*     Generate a "magic number".
+
+*  Type:
+*     Private macro.
+
+*  Synopsis:
+*     #include "memory.h"
+*     unsigned long Magic( void *ptr, size_t size )
+
+*  Description:
+*     This macro generates a "magic number" which is a function of
+*     a memory address and an object size. This number may be stored
+*     in a region of dynamically allocated memory to allow it to be
+*     recognised as dynamically allocated by other routines, and also
+*     to provide security against memory leaks, etc.
+
+*  Parameters:
+*     ptr
+*        The memory pointer.
+*     size
+*        The object size.
+
+*  Returned Value:
+*     The function returns the magic number.
+
+*  Notes:
+*     This function does not perform error checking.
+*/
+
+/* Form the bit-wise exclusive OR between the memory address and the
+   object size, then add 1 and invert the bits. Return the result as
+   an unsigned long integer. */
+#define Magic(ptr,size) \
+   ( ~( ( ( (unsigned long) ptr ) ^ ( (unsigned long) size ) ) + \
+             ( (unsigned long) 1 ) ) )
+
+
 
 /* Include files. */
 /* ============== */
@@ -116,7 +166,6 @@ static void (*memcheckfun)( void * );
 /* Prototypes for Private Functions. */
 /* ================================= */
 static int IsDynamic( const void *ptr );
-static unsigned long Magic( void *ptr, size_t size );
 
 #ifdef DEBUG
 static void Issue( Memory *new );
@@ -703,48 +752,6 @@ static int IsDynamic( const void *ptr ) {
 
 /* Return the result. */
    return dynamic;
-}
-
-static unsigned long Magic( void *ptr, size_t size ) {
-/*
-*  Name:
-*     Magic
-
-*  Purpose:
-*     Generate a "magic number".
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     unsigned long Magic( void *ptr, size_t size )
-
-*  Description:
-*     This function generates a "magic number" which is a function of
-*     a memory address and an object size. This number may be stored
-*     in a region of dynamically allocated memory to allow it to be
-*     recognised as dynamically allocated by other routines, and also
-*     to provide security against memory leaks, etc.
-
-*  Parameters:
-*     ptr
-*        The memory pointer.
-*     size
-*        The object size.
-
-*  Returned Value:
-*     The function returns the magic number.
-
-*  Notes:
-*     This function does not perform error checking.
-*/
-
-/* Form the bit-wise exclusive OR between the memory address and the
-   object size, then add 1 and invert the bits. Return the result as
-   an unsigned long integer. */
-   return ~( ( ( (unsigned long) ptr ) ^ ( (unsigned long) size ) ) +
-             ( (unsigned long) 1 ) );
 }
 
 void *astMalloc_( size_t size ) {
