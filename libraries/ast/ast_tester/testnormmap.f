@@ -12,7 +12,7 @@
       f = ast_cmpframe( ast_specframe( ' ', status ),
      :                  ast_skyframe( ' ', status ), ' ', status )          
 
-      if( ast_geti( f, 'ObjSize', status ) .ne. 552 ) then
+      if( ast_geti( f, 'ObjSize', status ) .ne. 524 ) then
          call stopit( 0, status )
       end if
 
