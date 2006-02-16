@@ -1490,7 +1490,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	Darwin-*)
 	    CFLAGS_OPTIMIZE="-Os"
 	    SHLIB_CFLAGS="-fno-common"
-	    SHLIB_LD="cc -dynamiclib \${LDFLAGS}"
+	    SHLIB_LD="cc -dynamiclib \${LDFLAGS} -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    AC_CACHE_CHECK([if ld accepts -single_module flag], tcl_cv_ld_single_module, [
 	        hold_ldflags=$LDFLAGS
 	        LDFLAGS="$LDFLAGS -dynamiclib -Wl,-single_module"
@@ -1512,7 +1512,6 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    if test $tcl_cv_ld_search_paths_first = yes; then
 	        LDFLAGS="$LDFLAGS -Wl,-search_paths_first"
 	    fi
-	    LDFLAGS="$LDFLAGS -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    LD_SEARCH_FLAGS=""
 	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
 	    ;;

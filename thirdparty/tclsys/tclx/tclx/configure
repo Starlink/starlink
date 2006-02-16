@@ -8632,7 +8632,7 @@ rm -f conftest*
 	Darwin-*)
 	    CFLAGS_OPTIMIZE="-Os"
 	    SHLIB_CFLAGS="-fno-common"
-	    SHLIB_LD="cc -dynamiclib \${LDFLAGS}"
+	    SHLIB_LD="cc -dynamiclib \${LDFLAGS} -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    echo "$as_me:$LINENO: checking if ld accepts -single_module flag" >&5
 echo $ECHO_N "checking if ld accepts -single_module flag... $ECHO_C" >&6
 if test "${tcl_cv_ld_single_module+set}" = set; then
@@ -8760,7 +8760,6 @@ echo "${ECHO_T}$tcl_cv_ld_search_paths_first" >&6
 	    if test $tcl_cv_ld_search_paths_first = yes; then
 	        LDFLAGS="$LDFLAGS -Wl,-search_paths_first"
 	    fi
-	    LDFLAGS="$LDFLAGS -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    LD_SEARCH_FLAGS=""
 	    LD_LIBRARY_PATH_VAR="DYLD_LIBRARY_PATH"
 	    ;;
