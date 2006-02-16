@@ -1,4 +1,4 @@
-/* Function: psx_access( name, mode, status )
+/*
 *+
 *  Name:
 *     PSX_ACCESS
@@ -10,7 +10,7 @@
 *     ANSI C
 
 *  Invocation:
-*     I = ACCESS( NAME, MODE, STATUS )
+*     CALL PSX_ACCESS( NAME, MODE, ACCESSIBLE, REASON, STATUS )
 
 *  Description:
 *     Provides a FORTRAN interface to the C library function access() to
@@ -22,12 +22,14 @@
 *     MODE = CHARACTER*(*) (Given)
 *        The access mode - either a ' ' (space) to merely check
 *        for file existence or one or more of the letters R,W,X.
+*     ACCESSIBLE = LOGICAL (Returned)
+*        .TRUE. if the access mode is allowed. .FALSE. otherwise.
+*     REASON = INTEGER (Returned)
+*        Error code (errno) describing the reason. Can be passed to EMS_SYSER
+*        for translation if required. Will be zero if ACCESSIBLE is true or
+*        if status was set.
 *     STATUS = INTEGER (Given & Returned)
 *        Inherited status.
-
-*  Function value:
-*     PSX_ACCESS = INTEGER
-*        Zero if the routine has succeeded. Otherwise the value of errno.
 
 *  References:
 *     - POSIX Standard ISO/IEC 9945-1:1990
@@ -35,6 +37,22 @@
 *  Copyright:
 *     Copyright (C) 1995 CCLRC
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
 
 *  Notes:
 *     Some FORTRAN compilers have an ACCESS intrinsic, but not all.
@@ -52,10 +70,10 @@
 *        Move from pcs/misc to the PSX library because the g95
 *        gets confused if you declare an INTRINSIC as EXTERNAL
 *        and gfortran does not (yet) include the ACCESS intrinsic.
+*     15-FEB-2006 (TIMJ):
+*        Make more PSX-like in its calling style.
+*        Use CNF.
 *     {enter_changes_her}
-
-*  Implementation Status:
-*     Has not been converted to use CNF.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -68,6 +86,8 @@
 #endif
 
 #include "f77.h"
+#include "ems.h"
+#include "psx1.h"
 
 #if HAVE_UNISTD_H
 # include <unistd.h>
@@ -82,41 +102,39 @@
 /* Starlink status */
 #include "sae_par.h"
 
-F77_INTEGER_FUNCTION(psx_access) ( CHARACTER(fname), CHARACTER(mode),
-                                   INTEGER(status)
-                                   TRAIL(fname) TRAIL(mode) )
+F77_SUBROUTINE(psx_access) ( CHARACTER(fname), CHARACTER(mode),
+			     LOGICAL(accessible), INTEGER(reason), INTEGER(status)
+			     TRAIL(fname) TRAIL(mode) )
 {
     GENPTR_CHARACTER(fname)
     GENPTR_CHARACTER(mode)
     GENPTR_INTEGER(status)
     char *tmpstr;
-    int imode, npos, mpos, rval;
+    int imode, mpos, rval;
 
     /* Status check */
-    if ( *status != SAI__OK ) return -1;
+    *accessible = F77_FALSE;
+    *reason = 0;
+    if ( *status != SAI__OK ) return;
 
 /* Check arguments */
 
-    if( fname_length == 0 || mode_length == 0)
-	return EINVAL;
+    if( fname_length == 0 || mode_length == 0) {
+      *status = SAI__ERROR;
+      psx1_rep_c("PSX_ACCESS_ERR1", "PSX_ACCESS: Zero length string supplied",
+		 status);
+      return;
+    }
 
-/* Find the end of the file name and turn this into a zero terminated C
- * string
- */
-    if((tmpstr = (char *) malloc(fname_length+1)) == NULL)
-	return errno;
-    strncpy(tmpstr, fname, fname_length);
-    for(npos=0; npos<fname_length; npos++)
-	if(*(tmpstr+npos) == ' ')
-	    break;
-    *(tmpstr+npos) = '\0';
+    /* Import strings */
+    tmpstr = cnfCreim( fname, fname_length );
 
-/* Process mode argument */
+    /* Process mode argument */
 
-    if(*(mode) == ' ')
-	imode = F_OK;
-    else {
-	imode = 0;
+    if(*(mode) == ' ') {
+      imode = F_OK;
+    } else {
+        imode = 0;
 	for(mpos=0; mpos<mode_length; mpos++)
 	    if(*(mode+mpos) == ' ')
 		break;
@@ -135,8 +153,13 @@ F77_INTEGER_FUNCTION(psx_access) ( CHARACTER(fname), CHARACTER(mode),
 		    imode |= X_OK;
 		    break;
 		  default:
-		    free(tmpstr);
-		    return EINVAL;
+		    cnfFree(tmpstr);
+		    *status = SAI__ERROR;
+		    emsSetnc("MODE",mode, mode_length);
+		    psx1_rep_c("PSX_ACCESS_ERR2",
+			       "Invalid access mode string ^MODE. Can only contain R, W or X",
+			       status);
+		    return;
 		}
     }
 
@@ -149,9 +172,14 @@ F77_INTEGER_FUNCTION(psx_access) ( CHARACTER(fname), CHARACTER(mode),
 	       status);
 # endif
 
-    free(tmpstr);
+    if ( rval == 0 ) {
+      *accessible = F77_TRUE;
+    } else {
+      *reason = errno;
+      *accessible = F77_FALSE;
+    }
 
-    return rval;
+    cnfFree(tmpstr);
 
 }
 

@@ -5,39 +5,45 @@
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSX_ERR'
-      INTEGER ERRNO
       INTEGER STATUS
-
-      EXTERNAL PSX_ACCESS
-      INTEGER PSX_ACCESS
 
 * Local Variables:
       CHARACTER *(32) FILE
+      LOGICAL ACCESS
+      INTEGER REASON
 
 *.
       FILE = 'test_access.f'
 
       PRINT *, ' '
-      PRINT *, ' --  Program PSX_ACCESS, function PSX_ACCESS  -- '
+      PRINT *, ' --  Program TEST_ACCESS, function PSX_ACCESS  -- '
       PRINT *, ' '
 
 *     Look for this source code
       STATUS = SAI__OK
-      ERRNO = PSX_ACCESS( FILE, ' ', STATUS )
-      IF ( ERRNO .EQ. 0 ) THEN
+      CALL PSX_ACCESS( FILE, ' ', ACCESS, REASON, STATUS )
+      IF ( ACCESS ) THEN
          PRINT *, 'Correctly found source code ',FILE
       ELSE
          PRINT *, 'Error finding source file: ', FILE
-         PRINT *, '-- Got errno ', ERRNO
+         PRINT *, 'Reason = ', REASON
       END IF
 
 
-      ERRNO = PSX_ACCESS( FILE, 'r', STATUS )
-      IF ( ERRNO .EQ. 0 ) THEN
+      CALL PSX_ACCESS( FILE, 'R', ACCESS, REASON, STATUS )
+      IF ( ACCESS ) THEN
          PRINT *, 'Correctly found readable source code ',FILE
       ELSE
          PRINT *, 'Error finding readable source file: ', FILE
-         PRINT *, '-- Got errno ', ERRNO
+         PRINT *, 'Reason = ', REASON
+      END IF
+
+
+      CALL PSX_ACCESS( FILE, 'X', ACCESS, REASON, STATUS )
+      IF ( .NOT. ACCESS ) THEN
+         PRINT *, 'Correctly did not find executable source code ',FILE
+      ELSE
+         PRINT *, 'Error! Found executable source file: ', FILE
       END IF
 
       END
