@@ -1419,7 +1419,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 	    ;;
 	Darwin-*)
 	    SHLIB_CFLAGS="-fno-common"
-	    SHLIB_LD="cc -dynamiclib \${LDFLAGS}"
+	    SHLIB_LD="cc -dynamiclib \${LDFLAGS} -install_name \${LIB_RUNTIME_DIR}/\${PKG_LIB_FILE}"
 	    SHLIB_LD_LIBS='${LIBS}'
 	    SHLIB_SUFFIX=".dylib"
 	    DL_OBJS="tclLoadDyld.o"
