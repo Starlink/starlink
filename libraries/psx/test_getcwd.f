@@ -1,6 +1,6 @@
       PROGRAM TEST_GETCWD
 
-* Test the function PSX_ACCESS
+* Test the function PSX_GETCWD
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
