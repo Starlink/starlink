@@ -163,6 +163,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Added IsSimple attribute.
 *     2-FEB-2006 (DSB):
 *        Corrections to prologue of astLinearApprox.
+*     16-FEB-2006 (DSB):
+*        Some speed optimisations to rebinning code.
 *class--
 */
 
@@ -9483,7 +9485,9 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    double **ptr_out;             /* Pointer to output PointSet coordinates */
    double *accum;                /* Pointer to array of accumulated sums */
    double x1;                    /* Interim x coordinate value */
+   double xx1;                   /* Initial x coordinate value */
    double y1;                    /* Interim y coordinate value */
+   double yy1;                   /* Initial y coordinate value */
    int *dim;                     /* Pointer to array of output pixel indices */
    int *offset;                  /* Pointer to array of output pixel offsets */
    int *stride;                  /* Pointer to array of output grid strides */
@@ -9498,6 +9502,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    int neighb;                   /* Number of neighbouring pixels */
    int npoint;                   /* Number of output points (pixels) */
    int off1;                     /* Interim pixel offset into output array */
+   int off2;                     /* Interim pixel offset into output array */
    int off;                      /* Final pixel offset into output array */
    int point;                    /* Counter for output points (pixels ) */
    int s;                        /* Temporary variable for strides */
@@ -9563,12 +9568,13 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    coordinates into the output grid's coordinate system using the
    linear fit supplied. Store the results in the PointSet created
    above. */
-               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
-                  ptr_out[ 0 ][ point ] = zero[ 0 ] + grad[ 0 ] * (double) ix;
+               off = lbnd[ 0 ] - lbnd_in[ 0 ];
+               xx1 = zero[ 0 ] + grad[ 0 ] * (double) lbnd[ 0 ];
 
-/* Calculate the offset of each pixel within the input array. */
-                  offset[ point ] = ix - lbnd_in[ 0 ];
-                  point++;
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_out[ 0 ][ point ] = xx1;
+                  xx1 += grad[ 0 ];
+                  offset[ point++ ] = off++;
                }
 
 /* Handle the 2-dimensional case optimally. */
@@ -9578,23 +9584,30 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 /* Loop through the range of y coordinates in the input grid and
    calculate interim values of the output coordinates using the linear
    fit supplied. */
+               x1 = zero[ 0 ] + grad[ 1 ] * (double) ( lbnd[ 1 ] - 1 );
+               y1 = zero[ 1 ] + grad[ 3 ] * (double) ( lbnd[ 1 ] - 1 );
+               off1 = stride[ 1 ] * ( lbnd[ 1 ] - lbnd_in[ 1 ] - 1 ) - lbnd_in[ 0 ];
                for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
-                  x1 = zero[ 0 ] + grad[ 1 ] * (double) iy;
-                  y1 = zero[ 1 ] + grad[ 3 ] * (double) iy;
+                  x1 += grad[ 1 ];
+                  y1 += grad[ 3 ];
 
 /* Also calculate an interim pixel offset into the input array. */
-                  off1 = stride[ 1 ] * ( iy - lbnd_in[ 1 ] ) - lbnd_in[ 0 ];
+                  off1 += stride[ 1 ];
 
 /* Now loop through the range of input x coordinates and calculate
    the final values of the input coordinates, storing the results in
    the PointSet created above. */
+                  xx1 = x1 + grad[ 0 ] * (double) lbnd[ 0 ];
+                  yy1 = y1 + grad[ 2 ] * (double) lbnd[ 0 ];
+                  off = off1 + lbnd[ 0 ];
                   for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
-                     ptr_out[ 0 ][ point ] = x1 + grad[ 0 ] * (double) ix;
-                     ptr_out[ 1 ][ point ] = y1 + grad[ 2 ] * (double) ix;
+                     ptr_out[ 0 ][ point ] = xx1;
+                     xx1 += grad[ 0 ];
+                     ptr_out[ 1 ][ point ] = yy1;
+                     yy1 += grad[ 2 ];
 
 /* Also calculate final pixel offsets into the input array. */
-                     offset[ point ] = off1 + ix;
-                     point++;
+                     offset[ point++ ] = off++;
                   }
                }
 
@@ -9722,10 +9735,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    pixel offset into the input array. */
                for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
                   ptr_in[ 0 ][ point ] = (double) ix;
-                  offset[ point ] = ix - lbnd_in[ 0 ];
-
-/* Increment the count of input pixels. */
-                  point++;
+                  offset[ point++ ] = ix - lbnd_in[ 0 ];
                }
 
 /* Handle the 2-dimensional case optimally. */
@@ -9734,19 +9744,19 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Loop through the required range of input y coordinates,
    calculating an interim pixel offset into the input array. */
+               off1 = stride[ 1 ] * ( lbnd[ 1 ] - lbnd_in[ 1 ] - 1 ) 
+                      - lbnd_in[ 0 ];
                for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
-                  off1 = stride[ 1 ] * ( iy - lbnd_in[ 1 ] ) - lbnd_in[ 0 ];
+                  off1 += stride[ 1 ];
 
 /* Loop through the required range of input x coordinates, assigning
    the coordinate values to the PointSet created above. Also store a
    final pixel offset into the input array. */
+                  off2 = off1 + lbnd[ 0 ];
                   for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
                      ptr_in[ 0 ][ point ] = (double) ix;
                      ptr_in[ 1 ][ point ] = (double) iy;
-                     offset[ point ] = off1 + ix;
-
-/* Increment the count of input pixels. */
-                     point++;
+                     offset[ point++ ] = off2++;
                   }
                }
 
@@ -16845,14 +16855,15 @@ static void SpreadLinear##X( int ndim_out, \
 \
 /* Obtain the x coordinate of the current point and test if it lies \
    outside the output grid. Also test if it is bad. */ \
-      x = coords[ 0 ][ point ]; \
-      bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
+      y = coords[ 1 ][ point ]; \
+      bad = ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
       if ( !bad ) { \
 \
 /* Similarly obtain and test the y coordinate. */ \
-         y = coords[ 1 ][ point ]; \
-         bad = ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+         x = coords[ 0 ][ point ]; \
+         bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
          if ( !bad ) { \
+\
 \
 /* If OK, obtain the indices along the output grid x dimension of the \
    two adjacent pixels which recieve contributions from the input pixel. \
@@ -17253,6 +17264,7 @@ static void SpreadNearest##X( int ndim_out, \
    int ix;                       /* Number of pixels offset in x direction */ \
    int ixn;                      /* Number of pixels offset (n-d) */ \
    int iy;                       /* Number of pixels offset in y direction */ \
+   int iys;                      /* Total stride in y direction */ \
    int off_in;                   /* Pixel offset into input array */ \
    int off_out;                  /* Pixel offset into output array */ \
    int point;                    /* Loop counter for output points */ \
@@ -17461,18 +17473,18 @@ static void SpreadNearest##X( int ndim_out, \
                   bad = 0; \
                } \
 \
+/* Obtain the output y coordinate corresponding to the centre of the \
+   current input pixel and test if it lies outside the output grid, or \
+   is bad. */ \
+               y = coords[ 1 ][ point ]; \
+               bad = bad || ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+               if ( !bad ) { \
+\
 /* Obtain the output x coordinate corresponding to the centre of the \
    current input pixel and test if it lies outside the output grid, or \
    is bad. */ \
-               x = coords[ 0 ][ point ]; \
-               bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
-               if ( !bad ) { \
-\
-/* Similarly obtain the output y coordinate corresponding to the centre of the \
-   current input pixel and test if it lies outside the output grid, or \
-   is bad. */ \
-                  y = coords[ 1 ][ point ]; \
-                  bad = bad || ( y < ymin ) || ( y >= ymax ) || ( y == AST__BAD ); \
+                  x = coords[ 0 ][ point ]; \
+                  bad = bad || ( x < xmin ) || ( x >= xmax ) || ( x == AST__BAD ); \
                   if ( !bad ) { \
 \
 /* Obtain the offsets along each output grid dimension of the output \ 
@@ -17502,8 +17514,6 @@ static void SpreadNearest##X( int ndim_out, \
                   } \
                } \
             }
-
-
 
 
 
