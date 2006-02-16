@@ -77,6 +77,10 @@
 *        Modified astAssert so that it does nothing if the AST error
 *        status is already set, and also so that does nothing unless 
 *        the DEBUG macro is defined.
+*     16-FEB-2006 (DSB):
+*        Improve efficiency by replacing the astOK_ function with a macro
+*        which tests the value of status variable. The pointer which points
+*        to the status variable are now global rather than static. 
 *-
 */
 
@@ -91,11 +95,16 @@
 #define AST__FAC (1521)
 #endif
 
+/* Externally declared variables */
+/* ============================= */
+/* This is the variable which holds a pointer to the status value. It is
+   declared in error.c */
+extern int *starlink_ast_status_ptr;
+
 /* Function prototypes. */
 /* ==================== */
 /* Prototypes for the functions provided by this module. */
 int *astWatch_( int * );
-int astOK_( void );
 int astStatus_( void );
 void astClearStatus_( void );
 void astSetStatus_( int );
@@ -125,7 +134,7 @@ int astReporting_( int );
 /* These wrap up the functions defined by this module to make them
    easier to use. */
 #define astClearStatus astClearStatus_()
-#define astOK astOK_()
+#define astOK (*starlink_ast_status_ptr==0)
 #define astSetStatus(status) astSetStatus_(status)
 #define astStatus astStatus_()
 #define astWatch(status_address) astWatch_(status_address)

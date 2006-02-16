@@ -45,6 +45,10 @@
 *     30-MAR-2005 (DSB):
 *        Added facility to report deferred messages when reporting is
 *        switched back on.
+*     16-FEB-2006 (DSB):
+*        Improve efficiency by replacing the astOK_ function with a macro
+*        which tests the value of status variable. The pointer which points 
+*        to the AST status variable are now global rather than static. 
 */
 
 /* Define the astCLASS macro (even although this is not a class
@@ -73,7 +77,7 @@
 /* ================= */
 /* Status variable. */
 static int internal_status = 0;  /* Internal error status */
-static int *status_ptr = &internal_status; /* Pointer to status variable */
+int *starlink_ast_status_ptr = &internal_status; /* Pointer to status variable */
 
 /* Reporting flag: delivery of message is supressed if zero. */
 static int reporting = 1;         
@@ -313,7 +317,6 @@ void astError_( int status, const char *fmt, ... ) {
 #undef BUFF_LEN
 }
 
-int astOK_( void ) {
 /*
 c++
 *  Name:
@@ -348,9 +351,6 @@ c++
 c--
 */
 
-/* Test the error status value and return the required result. */
-   return ( *status_ptr == 0 );
-}
 
 int astReporting_( int report ) {
 /*
@@ -439,7 +439,7 @@ c--
 */
 
 /* Set the error status value. */
-   *status_ptr = status;
+   *starlink_ast_status_ptr = status;
 }
 
 int astStatus_( void ) {
@@ -474,7 +474,7 @@ c--
 */
 
 /* Return the error status value. */
-   return *status_ptr;
+   return *starlink_ast_status_ptr;
 }
 
 int *astWatch_( int *status_address ) {
@@ -533,10 +533,10 @@ c--
    int *result;                  /* Value to be returned */
 
 /* Save the old status variable address. */
-   result = status_ptr;
+   result = starlink_ast_status_ptr;
 
 /* Replace it with the new one. */
-   status_ptr = status_address ? status_address : &internal_status;
+   starlink_ast_status_ptr = status_address ? status_address : &internal_status;
 
 /* Return the old address. */
    return result;
