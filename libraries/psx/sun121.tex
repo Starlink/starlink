@@ -956,7 +956,7 @@ PSX\_\_ERRNO & System error during POSIX call
 % List of routines:
 % =================
 \begin{description}
-\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
+\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, ACCESSIBLE, REASON, STATUS )}
             {Check file accessibility}
 \noteroutine{PSX\_ASCTIME}{PSX_ASCTIME}{( TSTRCT, STRING, STATUS )}
             {Convert a time structure to a character string}
@@ -1057,7 +1057,7 @@ PSX\_\_ERRNO & System error during POSIX call
 
 \subsection{\xlabel{file_system_support}File System Support}
 \begin{description}
-\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, STATUS )}
+\noteroutine{PSX\_ACCESS}{PSX_ACCESS}{( NAME, MODE, ACCESSIBLE, REASON, STATUS )}
             {Check file accessibility}
 \noteroutine{PSX\_CHDIR}{PSX_CHDIR}{( DIR, STATUS )}
             {Change working directory}
@@ -1126,7 +1126,7 @@ PSX\_\_ERRNO & System error during POSIX call
       determine the existence of a file for a specified type of access.
    }
    \sstinvocation{
-      I = ACCESS( NAME, MODE, STATUS )
+      CALL PSX\_ACCESS( NAME, MODE, ACCESSIBLE, REASON, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -1141,6 +1141,18 @@ PSX\_\_ERRNO & System error during POSIX call
          for file existence or one or more of the letters R,W,X.
       }
       \sstsubsection{
+         ACCESSIBLE = LOGICAL (Returned)
+      }{
+       .TRUE. if the access mode is allowed. .FALSE. otherwise.
+      }
+      \sstsubsection{
+         REASON = INTEGER (Returned)
+      }{
+         Error code (errno) describing the reason for failure. Can be passed
+         to EMS\_SYSER for translation if required. Will be zero if ACCESSIBLE
+         is true or if status was set.
+      }
+      \sstsubsection{
          STATUS = INTEGER (Given \& Returned)
       }{
          Inherited status.
@@ -1149,13 +1161,6 @@ PSX\_\_ERRNO & System error during POSIX call
    \sstnotes{
       Some FORTRAN compilers have an ACCESS intrinsic, but not all.
       This PSX routine is provided for portability.
-   }
-   \sstdiytopic{
-      Function value
-   }{
-        PSX\_ACCESS = INTEGER
-
-       Zero if the routine has succeeded. Otherwise the value of errno.
    }
    \sstdiytopic{
       References
@@ -1171,9 +1176,6 @@ PSX\_\_ERRNO & System error during POSIX call
    }{
       Copyright (C) 1995 Council for the Central Laboratory of the Resarch Councils,
       Copyright (C) 2005 Particle Physics and Astronomy Research Council
-   }
-   \sstimplementationstatus{
-      Has not been converted to use CNF.
    }
 }
 
