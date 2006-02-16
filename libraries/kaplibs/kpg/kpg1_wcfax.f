@@ -1,10 +1,11 @@
       SUBROUTINE KPG1_WCFAX( INDF, FS, AXIS, EL, CENTRE, STATUS )
 *+
 *  Name:
-*     KPG1_WCAXC
+*     KPG1_WCFAX
 
 *  Purpose:
-*     Fills co-ordinates for an axis from a WCS component FrameSet.
+*     Obtains the co-ordinate of an axis in the current WCS Frame at
+*     every pixel centre in an NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,9 +14,9 @@
 *     CALL KPG1_WCFAX( INDF, FS, AXIS, EL, CENTRE, STATUS )
 
 *  Description:
-*     This routine returns an array of world co-ordinates along a
-*     nominated axis for all elements of an NDF.  The co-ordinates are
-*     derived from the Current Frame in the supplied FrameSet. 
+*     This routine returns the world co-ordinate along a nominated WCS
+*     axis for each pixel centre of the supplied NDF.  The co-ordinates 
+*     are defined within the current Frame in the supplied FrameSet. 
 
 *  Arguments:
 *     INDF = INTEGER (Given)
@@ -23,12 +24,13 @@
 *     FS = INTEGER (Given)
 *        An AST pointer for a FrameSet.
 *     AXIS = INTEGER (Given)
-*        The number of the axis whose co-ordinates are to be
+*        The number of the WCS axis whose co-ordinates are to be
 *        returned.
-*     EL = INTEGER (Returned)
+*     EL = INTEGER (Given)
 *        The number of elements in the co-ordinate array.
 *     CENTRE( EL ) = DOUBLE PRECISION (Returned)
-*        The axis centres.
+*        The current-Frame co-ordinate along the nominated WCS axis
+*         at each pixel centre.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -40,7 +42,17 @@
 *  History:
 *     2006 January 25 (MJC):
 *        Original version based upon DSB's FTS1_WCSAX.
-*     {enter_changes_here}
+*     2006 February 2 (MJC):
+*        Some tidying after switch from AXIS Frame to current Frame for
+*        output co-ordinates.
+*     2006 February 10 (MJC):
+*        Further tidying.  Checked for a 1-1 mapping to avoid n-D to
+*        1-D transformation, preferring to obain just one vector and
+*        duplicating it.
+*     2006 February 15 (MJC):
+*        Set expansion factors to 1 for unused duimensions up to
+*        NDF__MXDIM.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -60,9 +72,9 @@
       INTEGER INDF
       INTEGER FS
       INTEGER AXIS
+      INTEGER EL
 
 *  Arguments Returned:
-      INTEGER EL
       DOUBLE PRECISION CENTRE( EL )
 
 *  Status:
@@ -70,6 +82,8 @@
 
 *  Local Variables:
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of the NDF
+      INTEGER EXPAND( NDF__MXDIM ) ! Expansion factors for 1-to-1
+                                 ! mapping
       INTEGER IAX                ! Axes loop counter
       INTEGER ICURR              ! Index of Current Frame 
       INTEGER IERR               ! Position of first numerical error
@@ -78,81 +92,120 @@
       INTEGER IPCOUT             ! Pointer to mapped current-Frame
                                  ! co-ordinates
       INTEGER MAP1               ! n-D GRID to n-D Current mapping
+      INTEGER MAP1T1             ! 1-D GRID to 1-D Current mapping
       INTEGER MAP2               ! n-D to 1-D mapping
       INTEGER MAP3               ! n-D GRID to 1-D Current mapping
+      INTEGER MASK               ! Dummy
+      INTEGER NAX                ! Number of WCS axes
       INTEGER NDIM               ! Number of dimensions
       INTEGER NERR               ! Number of numerical errors
-      INTEGER OUTPRM( NDF__MXDIM ) ! Indices of corresponding axes
+      INTEGER OUT( NDF__MXDIM )  ! Index of output Mapping
+      INTEGER PERM( NDF__MXDIM ) ! Indices to select 1-D
+      INTEGER VDIMS( NDF__MXDIM ) ! Dimensions of the vector
 
 *.
-
-      EL = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Validate the axis.
-      CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
-      IF ( AXIS .LT. 1 .OR. AXIS .GT. NDIM ) THEN
+*  Validate the axis.  The supplied axis index refers to the current
+*  Frame of the supplied frameSet, and so must be in the range 1 to
+*  the number of axes in the current frame.  Note that this may not be
+*  the same as the number of pixel axes in the NDF.
+      NAX = AST_GETI( FS, 'Naxes', STATUS )
+      IF ( AXIS .LT. 1 .OR. AXIS .GT. NAX ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF )
          CALL MSG_SETI( 'AX', AXIS )
-         CALL MSG_SETI( 'N', NDIM )
+         CALL MSG_SETI( 'N', NAX )
          CALL ERR_REP( 'KPG1_WCFAX',
      :     'The chosen axis ^AX is not valid for ^NDF, which has ^N '/
-     :     /'dimensions (probable programming error).', STATUS )
+     :     /'WCS axes (probable programming error).', STATUS )
          GOTO 999
       END IF
 
-*  Find the number of elements in the NDF.
-      EL = 1
-      DO IAX = 1, NDIM
-         EL = EL * DIMS( IAX )
-      END DO
-
-*  This is a brute-force method, as it may demand considerable memory
-*  and ignores insignificant dimensions.
-
-*  Obtain workspace to hold the input GRID co-ordinates.
-      CALL PSX_CALLOC( EL * NDIM, '_DOUBLE', IPCOIN, STATUS )
-
-*  Check we can safely use %VAL on the pointer returned by NDF_AMAP.
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*  Fill the input co-ordinate array
-      CALL KPG1_FIGRD( NDIM, DIMS, EL, %VAL( CNF_PVAL( IPCOIN ) ),
-     :                 STATUS )
+*  Obtain the NDF dimensions.
+      CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
 
 *  Save the index of the original current Frame in the FrameSet, so 
 *  that it can be re-instated later.
       ICURR = AST_GETI( FS, 'CURRENT', STATUS )
 
+*  Get the index of the GRID Frame.
+      IGRID = AST_GETI( FS, 'BASE', STATUS )
+
+*  Process the WCS axis in a separate AST context.
+      CALL AST_BEGIN( STATUS )
+
 *  We wish to map from the GRID Frame to the current Frame.  Thus
-*  we can substitute the FramSet for the mapping.
-
-*  Search for a GRID Frame in the FrameSet.  If one is found, it
-*  becomes the current Frame. If one is not found, do nothing.
-      IF ( AST_FINDFRAME( FS, AST_FRAME( NDIM, ' ', STATUS ), 
-     :                    'GRID', STATUS ) .NE. AST__NULL ) THEN
-
-*  If found, get the index of the GRID Frame.
-         IGRID = AST_GETI( FS, 'CURRENT', STATUS )
+*  we can substitute the FrameSet for the mapping.
 
 *  Get the mapping from the GRID Frame to the Current Frame.
-         MAP1 = AST_GETMAPPING( FS, IGRID, ICURR, STATUS )
+      MAP1 = AST_GETMAPPING( FS, IGRID, ICURR, STATUS )
+
+*  See if the mapping can be split, such that it only depends
+*  one input, that along the chosen WCS axis.
+      CALL AST_MAPSPLIT( MAP1, 1, AXIS, OUT, MAP1T1, STATUS )
+      IF ( MAP1T1 .NE. AST__NULL ) THEN 
+
+*  Obtain workspace to hold the input GRID co-ordinates.
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPCOIN, STATUS )
+
+*  Obtain workspace to hold the output current-Frame co-ordinates.
+         CALL PSX_CALLOC( EL, '_DOUBLE', IPCOUT, STATUS )
+
+*  Check we can safely use %VAL on the pointer returned by PSX_CALLOC.
+         IF ( STATUS .NE. SAI__OK ) GOTO 990
+
+*  Fill the input array with GRID co-ordinates.
+         CALL KPG1_ELNMD( 1, DIMS( AXIS ), DIMS( AXIS ), 
+     :                    %VAL( CNF_PVAL( IPCOIN ) ), STATUS )
+
+*  Transform the vector to current-Frame co-ordinates.
+         CALL AST_TRAN1( MAP1T1, DIMS( AXIS ), 
+     :                   %VAL( CNF_PVAL( IPCOIN ) ), .TRUE.,
+     :                   %VAL( CNF_PVAL( IPCOUT ) ), STATUS )
+
+*  Duplicate this for all elements along the other pixel axes
+*  to fill the CENTRE array.  There is no expansion along the 
+*  chosen pixel axis.
+         DO IAX = 1, NDF__MXDIM
+            EXPAND( IAX ) = DIMS( IAX )
+         END DO
+         EXPAND( AXIS ) = 1
+
+*  Specify the dimension along which the vector resides, and
+*  the output dimensions.
+         DO IAX = 1, NDF__MXDIM
+            VDIMS( IAX ) = 1
+         END DO
+         VDIMS( AXIS ) = DIMS( AXIS )
+         CALL KPG1_PXDPD( VDIMS, %VAL( CNF_PVAL( IPCOUT ) ), EXPAND,
+     :                    .FALSE., MASK, DIMS, CENTRE, STATUS )
+
+*  This is a brute-force method, as it may demand considerable memory
+*  and ignores insignificant dimensions.
+      ELSE
+
+*  Obtain workspace to hold the input GRID co-ordinates.
+         CALL PSX_CALLOC( EL * NDIM, '_DOUBLE', IPCOIN, STATUS )
+
+*  Check we can safely use %VAL on the pointer returned by PSX_CALLOC.
+         IF ( STATUS .NE. SAI__OK ) GOTO 990
+
+*  Fill the input array with GRID co-ordinates.
+         CALL KPG1_FIGRD( NDIM, DIMS, EL, %VAL( CNF_PVAL( IPCOIN ) ),
+     :                    STATUS )
 
 *  Initialise the indices of the axes in the one-dimensional Frame
 *  corresponding to each axis in the n-dimensional Frame.  Since the
 *  axes are presumed to be independent of each other, it does not matter
 *  what values we use so long as the axis being processed is assigned
 *  the value 1.  We use AST PermMaps to pick the axis to process.
-         DO IAX = 1, NDIM
-            OUTPRM( IAX ) = 0
+         DO IAX = 1, NAX
+            PERM( IAX ) = 0
          END DO
-         OUTPRM( AXIS ) = 1
-
-*  Process the axis in a separate AST context.
-         CALL AST_BEGIN( STATUS )
+         PERM( AXIS ) = 1
 
 *  MAP1 goes from n-dimensional GRID co-ordinates to n-dimensional 
 *  current co-ordinates.  We need a mapping that transforms
@@ -162,8 +215,7 @@
 *  and output of MAP1, that selects only the required axis.  Create a 
 *  PermMaps to extract axis AXIS from an n-dimensional Frame; MAP2 goes
 *  from n-dimensional to one-dimensional.
-         MAP2 = AST_PERMMAP( NDIM, OUTPRM, 1, AXIS, 0.0D0, ' ', 
-     :                       STATUS )
+         MAP2 = AST_PERMMAP( NDIM, PERM, 1, AXIS, 0.0D0, ' ', STATUS )
 
 *  Concatenate the Mappings together, to get a mapping between axis
 *  AXIS in the GRID Frame to the same axis in the current Frame.
@@ -173,19 +225,12 @@
 *  each pixel of the NDF.
          CALL AST_TRANN( MAP3, EL, NDIM, EL, %VAL( CNF_PVAL( IPCOIN ) ),
      :                   .TRUE., 1, EL, CENTRE, STATUS )
-
-*  End the AST context and do the next axis.
-         CALL AST_END( STATUS )
-
-*  There should always be a GRID Frame, but just in case something odd
-*  has been done to the NDF, copy the grid co-ordinates to the output
-*  array.  A case could be made for looking or an AXIS or PIXEL, however,
-*  for now the aim is to avoid messy crashes.
-      ELSE
-         CALL VEC_DTOD( .TRUE., EL, %VAL( CNF_PVAL( IPCOIN ) ),
-     :                  CENTRE, IERR, NERR, STATUS )
-
       END IF
+
+  990 CONTINUE
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  Re-instate the original current Frame.
       CALL AST_SETI( FS, 'CURRENT', ICURR, STATUS )
