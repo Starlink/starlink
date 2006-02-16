@@ -21,6 +21,7 @@ test_time
 test_uname
 test_getcwd
 test_chdir
+test_access
 *.lo
 *.la
 Makefile
