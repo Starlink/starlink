@@ -3499,6 +3499,7 @@ each.  Full descriptions are included \hyperref{later}{in Section~}{}{se:plottin
 {\att DrawDSB}: Annotate both sidebands in a dual sideband spectrum?\\
 {\att DrawTitle}: Draw a title?\\
 {\att Edge(axis)}: Which edges to label\\
+{\att FileInTitle}: Include the NDF name as a second line in the title?\\
 {\att Font(element)}: Character font for a plot element\\
 {\att Gap(axis)}: Interval between major axis values\\
 {\att Grid}: Draw grid lines?\\
@@ -4185,6 +4186,23 @@ It is often useful to specify values for some of the attributes of the current
          placement of the descriptive labels (these are drawn at the
          edges of the plotting area, rather than along the axis lines).
       }
+   }
+}
+\sstattribute{
+   FileInTitle
+}{
+   Include the NDF name as a seocnd line in the title?
+}{
+   \sstdescription{
+      This attribute controls the appearance of annotated axes by
+      determining whether or not the title at the top of the plot will
+      include a second line giving the NDF name. The default value of
+      zero results in the title containing only the text given by the
+      Title attribute. A non-zero value will result in a second line
+      containing the NDF name being added to the title.
+   }
+   \sstattributetype{
+      Integer (boolean).
    }
 }
 \sstattribute{
@@ -50399,6 +50417,16 @@ parallel to any face of the cube.
 \end{itemize}
 
 \section{\xlabel{se_changes}Release Notes---V1.5\label{se:changes}}
+
+\subsection{New Attributes}
+The following new attributes have been added to the list of attributes
+which can be specified via a STYLE parameter:
+\begin{description}
+   \item [\htmlref{FileInTitle}{FileInTitle}] \mbox{}
+       If set to a non-zero value, the title specified by the Title
+       attribute will be augmented with the name of the NDF being 
+       displayed, formatted so that the NDF name appears on a second line.
+\end{description}
 
 \subsection{New Commands}
 The following new applications have been added:
