@@ -549,6 +549,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *     14-FEB-2006 (DSB)
 *        Correct EdgeLabels to use gap size rather than EQUAL macro when
 *        comparing label values.
+*     17-FEB-2006 (DSB)
+*        Added escape sequences "%h+" and "%g+".
 *class--
 */
 
@@ -2478,6 +2480,10 @@ f     See also the AST_ESCAPES function.
 *                 digits "..." give the new Style value.
 *
 *       %t+     - Reset the Style attribute to its "normal" value.
+*
+*       %h+     - Remember the current horizontal position (see "%g+")
+*
+*       %g+     - Go to the horizontal position of the previous "%h+" (if any).
 *
 *       %-      - Push the current graphics attribute values onto the top of 
 *                 the stack (see "%+").
@@ -8933,6 +8939,8 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    float dy;
    float dx;
    float height;
+   float hmx;
+   float hmy;
    float ly;
    float lx;
    float rx;
@@ -9014,6 +9022,11 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    sequences. */
    grfcap = GCap( this, GRF__ESC, esc );
 
+/* Forget the horizontal position remembered by any "%h+" escape sequences 
+   from any previous string. */
+   this->hmarkx = FLT_MAX;
+   this->hmarky = FLT_MAX;
+
 /* If escape sequences are being interpreted and the string contains some
    escape sequences, but the grf module cannot interpret escape sequences,
    split the supplied text up into sub-strings delimited by escape sequences 
@@ -9094,8 +9107,18 @@ static void DrawText( AstPlot *this, int ink, int esc, const char *text,
    bottom of the bounding box and the baseline (the drop). We do this
    by calling this function recursively, using "BL" justification to
    avoid infinite recursion. */
+
+/* Forget the horizontal position remembered by any "%h+" escape sequences 
+   from any previous string. Save and re-instate the position of the
+   horizontal mark since the call to DrawText may change it. */
+               hmx = this->hmarkx;
+               hmy = this->hmarky;
+
                DrawText( this, 0, esc, a, cx, cy, "BL", upx, upy, txbn, tybn, 
                          &tdrop, method, class );
+
+               this->hmarkx = hmx;
+               this->hmarky = hmy;
 
                dx = txbn[ 0 ] - txbn[ 3 ];
                dy = tybn[ 0 ] - tybn[ 3 ];
@@ -11120,6 +11143,10 @@ int astFindEscape_( const char *text, int *type, int *value, int *nc ){
 *
 *       %t+     - Reset the Style attribute to its "normal" value.
 *
+*       %h+     - Remember the current horizontal position (see "%g+")
+*
+*       %g+     - Go to the horizontal position of the previous "%h+" (if any).
+*
 *       %-      - Push the current graphics attribute values onto the top of 
 *                 the stack (see "%+").
 *
@@ -11186,6 +11213,12 @@ int astFindEscape_( const char *text, int *type, int *value, int *nc ){
 
       } else if( *a == 'c') {
          *type = GRF__ESCOL;
+
+      } else if( *a == 'g') {
+         *type = GRF__ESG;
+
+      } else if( *a == 'h') {
+         *type = GRF__ESH;
 
       } else if( *a == 't') {
          *type = GRF__ESSTY;
@@ -17561,6 +17594,7 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
 
 /* Local Variables: */
    float new_rise;
+   float t1, t2;
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -17602,6 +17636,20 @@ static void InterpEscape( AstPlot *this, int type, double value, float *x,
    } else if( type == GRF__ESBAC ) {
       *x -= 0.01*rx*value;
       *y -= 0.01*ry*value;
+
+/* Remember the current horizontal position. */
+   } else if( type == GRF__ESH ) {
+      this->hmarkx = *x;
+      this->hmarky = *y;
+
+/* Go to the previously stored horizontal position. */
+   } else if( type == GRF__ESG ) {
+      if( this->hmarkx != FLT_MAX && this->hmarky != FLT_MAX ) {
+         t1 = ( *x - this->hmarkx )*rx + ( *y - this->hmarky )*ry;
+         t2 = rx*rx + ry*ry;
+         *x -= rx*t1/t2;
+         *y -= ry*t1/t2;
+      }
 
 /* Type GRF__ESSIZ: Change the text size. */
    } else if( type == GRF__ESSIZ ) {

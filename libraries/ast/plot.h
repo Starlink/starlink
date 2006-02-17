@@ -761,6 +761,8 @@ typedef struct AstPlot {
    int grfnstack;
    AstGat **gat;
    int ngat;
+   float hmarkx;
+   float hmarky;
 
 } AstPlot;
 

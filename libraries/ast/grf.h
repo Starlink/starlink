@@ -33,6 +33,8 @@
 *        Original version.
 *     25-OCT-1996 (DSB):
 *        Primatives macros defined, extra parameter added to astGAttr.
+*     17-FEB-2006 (DSB):
+*        Added GRF__ESH and GRF__ESG.
 *-
 */
 
@@ -71,6 +73,8 @@
 #define GRF__ESSTY 10
 #define GRF__ESPOP 11
 #define GRF__ESPSH 12
+#define GRF__ESH   13
+#define GRF__ESG   14
 
 /* Function prototypes. */
 /* ==================== */
