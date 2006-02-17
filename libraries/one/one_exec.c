@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/wait.h>            /* WIFEXITED, WEXITSTATUS macros           */
 
 F77_SUBROUTINE(one_exec)( CHARACTER(command), INTEGER(status) TRAIL(command) )
 /*
