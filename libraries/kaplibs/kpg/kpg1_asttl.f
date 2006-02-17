@@ -78,7 +78,7 @@
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Esnure graphical escape sequences are not removed from the strings
+*  Ensure graphical escape sequences are not removed from the strings
 *  returned by AST_GETC.
       OLDESC = AST_ESCAPES( 1, STATUS )
 
