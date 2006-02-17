@@ -68,11 +68,15 @@
 
 *  External References:
       INTEGER CHR_LEN            ! Used length of a string
+      LOGICAL KPG1_GETASTFIT     ! Include NDF path in title?
 
 *  Local Variables:
       CHARACTER TTL*80           ! Title string
+      CHARACTER PTH*150          ! NDF path
+      CHARACTER NEWTTL*255       ! Title string including NDF path
       INTEGER TTLLEN             ! Used length of TTL
       INTEGER OLDESC             ! What to do about escape sequences
+      LOGICAL PATH               ! Is the NDF path being used as the title?
 *.
 
 *  Check the inherited status. 
@@ -81,6 +85,9 @@
 *  Ensure graphical escape sequences are not removed from the strings
 *  returned by AST_GETC.
       OLDESC = AST_ESCAPES( 1, STATUS )
+
+*  Indicate the NDF path has not been used as the Title. 
+      PATH = .FALSE.
 
 *  First priority is given to values explicitly supplied by the user via
 *  the application's STYLE parameter. If such a value was supplied it
@@ -114,6 +121,7 @@
 *  of the title string.
          IF( TTL .EQ. ' ' ) THEN
             CALL KPG1_NDFNM( INDF, TTL, TTLLEN, STATUS )
+            PATH = .TRUE.
          ELSE
             TTLLEN = CHR_LEN( TTL )
          END IF
@@ -121,6 +129,34 @@
 *  Set the Plot Title.
          CALL AST_SETC( IPLOT, 'TITLE', TTL( : TTLLEN ), STATUS )
 
+      END IF
+
+*  If the NDF path has not been used as the title, see if the NDF path
+*  should be added to the title. The user can control this by including 
+*  the kappa pseudo-attribute FileInTitle within the value supplied for 
+*  STYLE.
+      IF( .NOT. PATH ) THEN
+         IF( KPG1_GETASTFIT() ) THEN
+
+*  Get the NDF path.
+            CALL KPG1_NDFNM( INDF, PTH, TTLLEN, STATUS )
+
+*  Construct a new title which includes the original title and the NDF
+*  path, with suitable AST graphical escape sequences to ensure the 
+*  NDF path comes out as a second line in the title, left justified with
+*  the first line.
+            NEWTTL = '%h+'
+            TTLLEN = 3
+            CALL CHR_APPND( TTL, NEWTTL, TTLLEN )
+            CALL CHR_APPND( '%v100+%g+%s70+[', NEWTTL, TTLLEN )
+            TTLLEN = TTLLEN + 1
+            CALL CHR_APPND( PTH, NEWTTL, TTLLEN )
+            CALL CHR_APPND( ' ]%s+', NEWTTL, TTLLEN )
+
+*  Set the NEW Plot Title.
+            CALL AST_SETC( IPLOT, 'TITLE', NEWTTL( : TTLLEN ), STATUS )
+
+         END IF
       END IF
 
 *  Reinstate the original behaviour of AST with regard to graphical escape 

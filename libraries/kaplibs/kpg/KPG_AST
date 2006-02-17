@@ -30,6 +30,8 @@
 *        Original version.
 *     16-DEC-2005 DSB):
 *        Added DRWDSB
+*     17-FEB-2006 DSB):
+*        Added ASTFIT.
 *     {enter_further_changes_here}
 
 *-
@@ -70,13 +72,18 @@
 *  as if it were a genuine AST Plot attribute.
       LOGICAL DRWDSB
 
+*  Should the path to the NDF be included in the Title drawn by graphics 
+*  applications such as DISPLAY, LINPLOT, etc? This is specified by the KAPPA 
+*  "pseudo-attribute" FileInTitle which a user can include in a style file 
+*  as if it were a genuine AST Plot attribute.
+      LOGICAL ASTFIT
 
 *  Common Blocks:
 *  =============
 
 *  Non-character data.
       COMMON /KPG_AST1/ ASTLN, ASTPT, ASTGRP, ASTTSZ, ASTING, ASTOUG,
-     :                  ASTNPS, DRWDSB
+     :                  ASTNPS, DRWDSB, ASTFIT
 
 *  Character data.
       COMMON /KPG_AST2/  ASTLC, ASTGSP

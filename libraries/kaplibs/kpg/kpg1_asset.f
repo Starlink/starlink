@@ -104,6 +104,9 @@
 *        files.
 *     16-DEC-2005 (DSB):
 *        Add initialisation of default value for new pseudo-attribute DrawDSB.
+*     17-FEB-2006 (DSB):
+*        Add initialisation of default value for new pseudo-attribute
+*        FileInTitle.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -166,6 +169,7 @@
       IF( CLASS .EQ. 'Plot' ) THEN
          CALL GRF_SETTBG( 0 )
          CALL KPG1_SETASTDSB( .TRUE. )
+         CALL KPG1_SETASTFIT( .FALSE. )
       END IF
 
 *  Take a copy of the Object, and indicate it has not yet been changed.

@@ -147,6 +147,17 @@
                CALL KPG1_SETASTDSB( IVAL .NE. 0 )
             END IF
 
+*  FileInTitle: specifies whether the NDF path should be included in the
+*  Title, formatted on a second line using AST graphical escape sequences.
+         ELSE IF( CHR_SIMLR( NAME, 'FileInTitle' ) ) THEN
+
+*  Zero means no, any other integer means yes.
+            ISTAT = STATUS 
+            CALL CHR_CTOI( VALUE, IVAL, ISTAT )
+            IF( ISTAT .EQ. SAI__OK ) THEN
+               CALL KPG1_SETASTFIT( IVAL .NE. 0 )
+            END IF
+
 *  If the attribute is not a KAPPA pseudo-attribute, assume it is a
 *  genuine AST attribute.
          ELSE

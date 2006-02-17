@@ -22,10 +22,12 @@
 *       KPG1_SETASTGRP( GRP ) - Set the ASTGRP identifier
 *       KPG1_SETASTGSP( CHAR ) - Set ASTGSP character
 *       KPG1_SETASTDSB( DRDSB ) - Set DRWDSB flag
+*       KPG1_SETASTFIT( FIT ) - Set FIT flag
 *       KPG1_GETASTNPS()
 *       KPG1_GETASTING()
 *       KPG1_GETASTOUG()
 *       KPG1_GETASTDSB() 
+*       KPG1_GETASTFIT() 
 
 *  Notes:
 *     Since the routines are only 3 lines long, they are all in 
@@ -42,11 +44,22 @@
 *        Original version. Add enough for NDFPACK:WCSSHOW
 *     14-SEP-2005 (TIMJ):
 *        Add 3 new get accessors
-*     16-DEC-2005 (TIMJ):
+*     16-DEC-2005 (DSB):
 *        Added DRWDSB.
+*     16-DEC-2005 (DSB):
+*        Added FIT (FileInTitle).
 *     {enter_further_changes_here}
 
 *-
+
+      SUBROUTINE KPG1_SETASTFIT( FIT )
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+      LOGICAL FIT
+
+      ASTFIT = FIT
+      END
 
       SUBROUTINE KPG1_SETASTDSB( DRDSB )
       IMPLICIT NONE
@@ -90,6 +103,14 @@
       INCLUDE 'KPG_AST'
 
       KPG1_GETASTDSB = DRWDSB
+      END
+
+      LOGICAL FUNCTION KPG1_GETASTFIT ()
+      IMPLICIT NONE
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'KPG_AST'
+
+      KPG1_GETASTFIT = ASTFIT
       END
 
       INTEGER FUNCTION KPG1_GETASTNPS ()
