@@ -586,14 +586,17 @@ fi
 #  Note we now use the newer "FCFLAGS" from the environment in preference to
 #  "FFLAGS".
 AC_MSG_CHECKING([Fortran flags])
-FFLAGS=${FCFLAGS:--O}
+FCFLAGS=${FCFLAGS:--O}
 if test -z "${FCFLAGS}"; then
    if test "${FC}" = "g77"; then
-      FFLAGS="$FFLAGS -fno-second-underscore"
+      FCFLAGS="$FCFLAGS -fno-second-underscore"
    fi
 fi
-AC_MSG_RESULT($FFLAGS)
-AC_SUBST(FFLAGS)
+AC_MSG_RESULT($FCFLAGS)
+AC_SUBST(FCFLAGS)
+
+#  These are the Starlink extras, standard include directories etc.
+AC_SUBST(STAR_FCFLAGS)
 
 #  How to link files.
 AC_PROG_LN_S()

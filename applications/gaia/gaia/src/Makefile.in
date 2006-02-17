@@ -18,7 +18,8 @@ DEPEND_TARGET	= @DEPEND_TARGET@
 
 FC              = @FC@
 GC              = @STARLINK@/bin/generic
-FFLAGS          = @FFLAGS@
+FCFLAGS         = @FCFLAGS@
+STAR_FCFLAGS    = @STAR_FCFLAGS@
 STAR_INC        = @STARLINK@/include
 LINK            = @LINK@
 # ------------------------------------------------------------------------
@@ -38,7 +39,8 @@ CPPSRCS =  \
 CSRCS =  \
  ast_tclerr.c patch.c gaiaNDF.c writeslice.c centroid.c rotated.c \
  rtdRotBoxEllipse.c rtdDtrn.c rtdSegment.c grf_tkcan.c \
- rtdMark.c rtdWord.c rtdPolyline.c dencode.c slasubs.c
+ rtdMark.c rtdWord.c rtdPolyline.c dencode.c slasubs.c \
+ gaiaSpectralPlot.c
 
 FSRCS =  \
  ardstat.f asc2tab.f autocrop.f cat2tab.f gai1_bswapb.f gai1_bswapd.f \
@@ -151,23 +153,23 @@ tags:
 	$(CXX) -c $(CC_SWITCHES) $<
 
 .f.o:
-	$(FC) -c $(FFLAGS) $<
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $<
 
 .gen.o:
 	$(GC) -t n $<
-	$(FC) -c $(FFLAGS) $(<:.gen=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gen=.f)
 	rm -f $(<:.gen=.f)
 
 .gsc.o:
 	$(LINK) $< $(<:.gsc=.gen)
 	$(GC) -t rlidc $(<:.gsc=.gen)
-	$(FC) -c $(FFLAGS) $(<:.gsc=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsc=.f)
 	rm -f $(<:.gsc=.f) $(<:.gsc=.gen)
 
 .gsn.o:
 	$(LINK) $< $(<:.gsn=.gen)
 	$(GC) -t rlid $(<:.gsn=.gen)
-	$(FC) -c $(FFLAGS) $(<:.gsn=.f)
+	$(FC) -c $(FCFLAGS) $(STAR_FCFLAGS) $(<:.gsn=.f)
 	rm -f $(<:.gsn=.f) $(<:.gsn=.gen)
 
 man:

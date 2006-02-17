@@ -31,7 +31,8 @@ LTLINK       = $(LIBTOOL) --mode=link $(CXX) $(CFLAGS)
 
 # Fortran and atask linker command
 FC           = @FC@
-FFLAGS       = @FFLAGS@
+FCFLAGS      = @FCFLAGS@
+STAR_FCFLAGS = @STAR_FCFLAGS@
 ALINK        = @ALINK@
 LINK         = @LINK@
 
