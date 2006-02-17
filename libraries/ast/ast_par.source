@@ -57,6 +57,8 @@
 *        Added TimeMap and TimeFrame.
 *     1-SEP-2005 (DSB):
 *        Added AST__REBININIT and AST__REBINNORM.
+*     17-FEB-2006 (DSB):
+*        Added AST_ESCAPES.
 *-
 
 *  Length of character string returned by a character function.
@@ -244,6 +246,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_PLOT
       LOGICAL AST_BORDER
       LOGICAL AST_ISAPLOT
+      INTEGER AST_ESCAPES
 
 *  SkyFrame class.
       INTEGER AST_SKYFRAME
