@@ -42,6 +42,8 @@
 *  History:
 *     6-FEB-2006 (DSB):
 *        Original version.
+*     17-FEB-2006 (DSB):
+*        Ensure AST graphical escape sequences are retained in the Title.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,11 +72,15 @@
 *  Local Variables:
       CHARACTER TTL*80           ! Title string
       INTEGER TTLLEN             ! Used length of TTL
-
+      INTEGER OLDESC             ! What to do about escape sequences
 *.
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Esnure graphical escape sequences are not removed from the strings
+*  returned by AST_GETC.
+      OLDESC = AST_ESCAPES( 1, STATUS )
 
 *  First priority is given to values explicitly supplied by the user via
 *  the application's STYLE parameter. If such a value was supplied it
@@ -116,5 +122,9 @@
          CALL AST_SETC( IPLOT, 'TITLE', TTL( : TTLLEN ), STATUS )
 
       END IF
+
+*  Reinstate the original behaviour of AST with regard to graphical escape 
+*  sequences in the strings returned by AST_GETC.
+      OLDESC = AST_ESCAPES( OLDESC, STATUS )
 
       END 
