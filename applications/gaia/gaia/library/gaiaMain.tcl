@@ -122,14 +122,14 @@ foreach prop [$props get_named_keys Gaia] {
 #  Extract the known file types and set these up as defaults. These
 #  are entered as if command-line arguments so that they propagate
 #  to clone windows. Exclude GIF and TIFF as these always disappoint.
-set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} {FITS(fits) *.fits}}
+set file_types {{any *} {NDF(.sdf) *.sdf} {FIT(.fit) *.fit} \
+{FITS(.fits) *.fits} {FITS(.fts) *.fts}}
 if { [info exists env(NDF_FORMATS_IN)] } {
    set new_types [split $env(NDF_FORMATS_IN) ","]
    foreach pair $new_types {
       regexp {([^\(]*).([^\)]*)} $pair dummy name type
-      if { $name != "NDF" && $type != ".fits" && 
-           $type != ".fit" && $name != "GIF" &&
-           $name != "TIFF" } {
+      if { $name != "NDF" && $type != ".fits" && $type != ".fit" && 
+           $type != ".fts" && $name != "GIF" && $name != "TIFF" } {
          lappend file_types [list $name\($type\) *${type}]
       }
    }

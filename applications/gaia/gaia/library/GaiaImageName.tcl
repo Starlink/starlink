@@ -332,6 +332,7 @@ itcl::class gaia::GaiaImageName {
    #  description.
    protected method check_type_ {} {
       if { [string match ".fit*" $type_] ||
+	   [string match ".fts*" $type_] ||
 	   [string match ".FIT*" $type_] ||
 	   [string match ".sdf" $type_] } {
 	 return 1

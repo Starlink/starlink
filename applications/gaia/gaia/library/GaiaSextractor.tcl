@@ -2354,7 +2354,7 @@ itcl::class gaia::GaiaSextractor {
    protected method native_ok_ {} {
       set ext [string tolower [$namer_ type]]
       set hdunum [$itk_option(-rtdimage) hdu]
-      if { ( $ext == ".fit" || $ext == ".fits" ) && $hdunum > 0 } {
+      if { ( $ext == ".fit" || $ext == ".fits" || $ext == ".fts" ) && $hdunum > 0 } {
          return 1
       } else {
          return 0

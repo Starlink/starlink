@@ -543,11 +543,12 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
     ImageIO imio;
 
     //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
-    //  for a compressed FITS file.
+    //  for a compressed FITS file, or "fts*"
     char* p = (char *) strchr( filename, '.' );
     int isfits = 1;
-    if ( p && ! strstr( p, ".fit" ) ) {
+    if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL ) {
         isfits = 0;
+        cout << "Not a FITS file" << endl;
     }
 
     if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
@@ -5287,7 +5288,8 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
 
         //  Could be FITS file. No funny possibilities for these names.
         char* p = strchr( *fullname, '.' );
-        if ( p && strstr( p, ".fit" ) != (char *) NULL ) {
+        if ( p && ( strstr( p, ".fit" ) != NULL || 
+                    strstr( p, ".fts" ) != NULL ) ) {
 
             //  Is a FITS name, does file exist? If not assume might
             //  be NDF component and pass on. Note a slice is valid,
