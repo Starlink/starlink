@@ -89,7 +89,8 @@ $(GAIA_FILES): $(SKYCAT_FILES) $(SKYCAT_TEST_FILES)
 	export INSTALL; unset INSTALL;\
 	STARLINK="$(STARLINK)"; export STARLINK;\
 	CFLAGS="$(CFLAGS)"; export CFLAGS;\
-	FCFLAGS="$(FCFLAGS) $(STAR_FCFLAGS)"; export FCFLAGS;\
+	FCFLAGS="$(FCFLAGS)"; export FCFLAGS;\
+	STAR_FCFLAGS="$(STAR_FCFLAGS)"; export STAR_FCFLAGS;\
 	FC="$(FC)"; export FC;\
 	DEC_CXX="@DEC_CXX@"; export DEC_CXX;\
 	./configure --prefix=$${pwd}/built || exit 1;\
