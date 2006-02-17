@@ -32,6 +32,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     David Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Check for locator leaks.
 *     2006-01-30 (TIMJ):
 *        Use astBegin/astEnd
+*     2006-02-17 (DSB):
+*        Switch on AST object caching.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,6 +108,7 @@ void smurf_mon( int * status ) {
   int nloc1;                   /* Number of active HDS Locators at end */
   int nfil0;                   /* Number of open HDS files at start */
   int nfil1;                   /* Number of open HDS files at end */
+  int object_caching;          /* Is AST current caching unused Object memory? */
 
   if ( *status != SAI__OK ) return; 
 
@@ -134,6 +138,7 @@ void smurf_mon( int * status ) {
   msgIfget("MSG_FILTER", status);
 
   /* Initialise AST */
+  object_caching = astTune( "ObjectCaching", 1 );
   astBegin;
 
   /* Call the subroutine associated with the requested task */
@@ -151,6 +156,7 @@ void smurf_mon( int * status ) {
 
   /* Free AST objects */
   astEnd;
+  astTune( "ObjectCaching", object_caching );
 
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
