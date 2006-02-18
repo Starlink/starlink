@@ -20,7 +20,7 @@ smf_create_smfDA.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c \
 smf_mapbounds.c \ smf_rebinmap.c \
-smf_calc_wvm.c
+smf_calc_wvm.c smf_subtract_poly.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 

@@ -196,4 +196,6 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status );
 
+void smf_subtract_poly( smfData **data, int *status );
+
 #endif /* SMF_DEFINED */
