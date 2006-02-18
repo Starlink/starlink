@@ -91,6 +91,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sla \
 	$(MANIFESTS)/spt \
 	$(MANIFESTS)/sst \
+	$(MANIFESTS)/starmem \
 	$(MANIFESTS)/tcl \
 	$(MANIFESTS)/tclx \
 	$(MANIFESTS)/tk \
