@@ -43,6 +43,8 @@
 *        - remove dksquid from DA until it is needed
 *        - smfFile.xloc no longer needed
 *        - Add smfHead.isCloned
+*     2006-02-17 (AGG):
+*        Add ncoeff and poly for scanfit polynomial coefficients
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,6 +147,8 @@ typedef struct smfData {
   int ndims;               /* Number of active dimensions in "dims" */
   int refcount;            /* Reference count for data object */
   int virtual;             /* Flag for extracted timeslices */
+  double *poly;            /* Polynomial scan fits */
+  int ncoeff;              /* Number of coefficients in polynomial */
 } smfData;
 
 #endif /* SMF_TYP_DEFINED */
