@@ -64,6 +64,8 @@
 *        Can now use the WVMRAW mode for getting the optical
 *        depth. Also calculate the filter tau from the CSO tau in the
 *        CSOTAU method
+*     2006-02-17 (AGG):
+*        Store and monitor all three WVM temperatures
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,9 +145,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 
   char filter[81];         /* Name of filter */
 
-  double newt_12;
-  double oldt_12 = 0.0;
-  size_t newtau = 0;
+  double newtwvm[3];       /* Array of WVM temperatures */
+  double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
+  size_t newtau = 0;       /* Flag to denote whether to calculate a
+			      new tau from the WVM data */
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
 			      is to be used */
 
@@ -235,10 +238,19 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
     hdr = data->hdr;
     /* See if we have a new WVM value */
     if (wvmr) {
-      newt_12 = hdr->sc2head->wvm_t12;
-      if (newt_12 != oldt_12) {
+      newtwvm[0] = hdr->sc2head->wvm_t12;
+      newtwvm[1] = hdr->sc2head->wvm_t42;
+      newtwvm[2] = hdr->sc2head->wvm_t78;
+      /* Hves any of the temperatures changed? */
+      if (newtwvm[0] != oldtwvm[0]) {
 	newtau = 1;
-	oldt_12 = newt_12;
+	oldtwvm[0] = newtwvm[0];
+      } else if (newtwvm[1] != oldtwvm[1]) {
+	newtau = 1;
+	oldtwvm[1] = newtwvm[1];
+      } else if (newtwvm[2] != oldtwvm[2]) {
+	newtau = 1;
+	oldtwvm[2] = newtwvm[2];
       } else {
 	newtau = 0;
       }
