@@ -45,11 +45,14 @@
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version
+*     2006-02-17 (AGG):
+*        Add scanfit polynomial initialization
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,6 +134,8 @@ smf_create_smfData( int flags, int * status ) {
   data->refcount = 1;
   data->virtual = 0;
   data->ndims = 0;
+  data->ncoeff = 0;
+  data->poly = NULL;
   for (i = 0; i < 3; i++ ) {
     (data->pntr)[i] = NULL;
   }
