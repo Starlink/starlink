@@ -23,7 +23,12 @@
 *     This is the main routine implementing the MAKEMAP task.
 
 *  ADAM Parameters:
-
+*     IN = NDF (Read)
+*          Input file(s)
+*     PIXSIZE = REAL (Read)
+*          Pixel size in output image, in arcsec
+*     OUT = NDF (Write)
+*          Output file
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)

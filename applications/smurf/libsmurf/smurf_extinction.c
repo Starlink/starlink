@@ -23,7 +23,21 @@
 *     This is the main routine implementing the EXTINCTION task.
 
 *  ADAM Parameters:
-
+*     IN = NDF (Read)
+*          Input file(s)
+*     METHOD = CHAR (Read)
+*          Optical depth method. Valid methods are WVMRAW, CSOTAU,
+*          FILTERTAU.
+*     QUICK = LOGICAL (Read)
+*          Flag for applying the Quick method
+*     CSOTAU = REAL (Read)
+*          Value of the 225 GHz zenith optical depth. Only used if
+*          METHOD = CSOTAU
+*     FILTERTAU = REAL (Read)
+*          Value of the zenith optical depth for the current
+*          wavelength. Only used if METHOD = FILTERTAU
+*     OUT = NDF (Write)
+*          Output file(s)
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
