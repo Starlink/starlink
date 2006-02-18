@@ -20,6 +20,7 @@
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -27,12 +28,13 @@
 *        Initial test version
 *     2006-01-24 (TIMJ):
 *        Add makemap
+*     2006-02-16 (AGG):
+*        Add remsky
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council, University of British Columbia.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -60,5 +62,6 @@
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_makemap( int * );
+void smurf_remsky( int * );
 
 #endif /* SMURF_LIB_DEFINED */

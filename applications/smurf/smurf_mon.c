@@ -33,6 +33,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, UCLan)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,8 @@
 *        Use astBegin/astEnd
 *     2006-02-17 (DSB):
 *        Switch on AST object caching.
+*     2006-02-17 (AGG):
+*        Add remsky
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +94,7 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "star/hds.h"
+#include "ast.h"
 
 #include "libsmurf/smurflib.h"
 
@@ -148,6 +152,8 @@ void smurf_mon( int * status ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
     smurf_makemap( status );
+  } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
+    smurf_remsky( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

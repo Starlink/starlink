@@ -12,7 +12,7 @@ bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap
+smurf_mon_TASKS = extinction flatfield makemap remsky
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c
@@ -27,7 +27,7 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsmf/libsmf.la \
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
 
 # IFL files
-IFL_FILES = $(surf_mon_TASKS:=.ifl) smurf_mon.ifl
+IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
 
 BUILT_SOURCES = $(DYNSCRIPTS) $(IFL_FILES)
 
