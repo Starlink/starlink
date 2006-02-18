@@ -70,6 +70,8 @@
 *        - Copy flatfield information into struct and close raw file
 *        - read all time series headers into struct even when not sc2store
 *        - No longer need to store xloc locator
+*     2006-02-17 (AGG):
+*        Add reading of SCANFIT coefficients
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,6 +126,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int ndims;                 /* Number of dimensions in data */
   int qexists;               /* Boolean flag for presence of QUALITY component */
   int vexists;               /* Boolean flag for presence of VARIANCE component */
+  int pexists;               /* Boolean flag for presence of SCU2RED component */
   char filename[GRP__SZNAM+1]; /* Input filename, derived from GRP */
   char *pname;               /* Pointer to input filename */
   void *outdata[] = { NULL, NULL, NULL }; /* Array of pointers to
@@ -162,6 +165,16 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int rowsize;               /* number of pixels in row (returned) */
   char *phead = NULL;        /* Pointer to FITS headers */
   int flags = 0;             /* Flags for smf_create_smfData */
+
+  HDSLoc *ploc = NULL;       /* Locator for SCANFIT coeffs */
+  int pndf;                  /* NDF identifier for SCU2RED */
+  int place;                 /* NDf placeholder for SCANFIT extension */
+  int npoly;                 /* Number of points in polynomial coefficient array */
+  double *poly;              /* Pointer to array of polynomial coefficients */
+  double *opoly;
+  int npdims;
+  int pdims[NDF__MXDIM];
+  int imax;
 
   if ( *status != SAI__OK ) return;
 
@@ -210,6 +223,45 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
     file = (*data)->file;
     hdr = (*data)->hdr;
+
+    /* If we have timeseries data then look for and read polynomial
+       scan fit coefficients. */
+    if ( isTseries ) {
+      ndfXstat( indf, "SCU2RED", &pexists, status );
+      if ( pexists) {
+	ndfXloc( indf, "SCU2RED", "READ", &ploc, status );
+	if ( ploc == NULL ) {
+	  if ( *status == SAI__OK) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, "Unable to obtain an HDS locator to the SCU2RED extension, despite its existence", status);
+	  }
+	}
+	ndfOpen( ploc, "SCANFIT", "READ", "OLD", &pndf, &place, status );
+	/* Check status here in case not able to open NDF */
+	if ( pndf == NDF__NOID ) {
+	  if ( *status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep(FUNC_NAME, " Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
+	  }
+	}
+
+	/* Read and store the polynomial coefficients */
+	ndfMap( pndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
+	ndfDim( pndf, NDF__MXDIM, pdims, &npdims, status );
+	imax = pdims[0] * pdims[1];
+	(*data)->ncoeff = pdims[2];
+	/* Allocate memory for poly coeffs & copy over */
+	opoly = smf_malloc( npoly, sizeof( double ), 0, status);
+	memcpy( opoly, poly, npoly*sizeof( double ) );
+	(*data)->poly = opoly;
+
+	/* Release these resources immediately as they're not needed */
+	ndfAnnul( &pndf, status );
+	datAnnul( &ploc, status );
+      } else {
+	msgOut(FUNC_NAME, "Warning: no SCU2RED extension. Continuing anyway.", status);
+      }
+    }
 
     if (isNDF) {
 
@@ -308,7 +360,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* Tdata is malloced by rdtstream for our use */
 	outdata[0] = tdata;
-	printf("headrec = %s \n",&(headrec[2][0]));
+	/*	printf("headrec = %s \n",&(headrec[2][0]));*/
 	phead = &(headrec[0][0]);
 
 	/* Malloc local copies of the flatfield information.
