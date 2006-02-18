@@ -1,0 +1,86 @@
+#if !defined ( STAR_MEM_INCLUDED )   /* Include file only once */
+#define STAR_MEM_INCLUDED
+
+/*
+*  Name:
+*     star/mem.h
+
+*  Purpose:
+*     Starlink memory management wrapper routines
+
+*  Description:
+*     This include file declares the public interface to the
+*     starmem library.
+
+*  Authors:
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     08-FEB-2006 (TIMJ):
+*        Original version.
+
+*  Copyright:
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     MA 02111-1307, USA
+
+*/
+
+/* Private init routine called by starMemInit macro */
+void starMemInitPrivate( int gc_initialized );
+
+/* Initialisation routine. Required to be called from the main
+   program (not library). Must be called before any malloc routine
+   if the garbage collector is required. This is a #define not a function
+   and contains (optionally) the GC_INIT call. We provide a starMemInit()
+   function in a .o file (not part of the library) for systems that
+   need to link from Fortran.
+ */
+
+/* HAVE_GC_H is substituted below at configure time */
+#undef HAVE_GC_H
+#if HAVE_GC_H
+#include <gc.h>
+#endif
+
+/* We always call GC_INIT if it is defined, even if we have
+   disabled Garbage Collection. This is because this include file
+   can not know whether GC is required.
+*/
+
+#ifdef GC_INIT
+#define MYINIT() GC_INIT()
+#define starMemInit() { MYINIT(); starMemInitPrivate(1); }
+#else
+#define starMemInit() { starMemInitPrivate(0); }
+#endif
+
+
+/* Standard system replacements for malloc/free */
+
+
+int    starMemIsInitialised( void );
+void * starMalloc( size_t size );
+void * starMallocAtomic( size_t size );
+void * starCalloc( size_t count, size_t size );
+void * starRealloc( void * ptr, size_t size );
+void   starFree( void * ptr );
+void   starFreeForce( void * ptr );
+
+/* STAR_MEM1_INCLUDED */
+#endif
