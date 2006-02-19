@@ -1755,6 +1755,12 @@ $(MANIFESTS)/starconf: \
 	    fi \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/starmem: \
+		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/star2html
+	cd libraries/starmem \
+	  && $(MAKE_CPT)
+
 # Component startcl has configure dependencies on { jpeg tcl tk },
 # which must be built before this component is configured.
 $(MANIFESTS)/startcl: \
@@ -1920,6 +1926,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sla \
 	$(MANIFESTS)/sst \
 	$(MANIFESTS)/star2html \
+	$(MANIFESTS)/starmem \
 	$(MANIFESTS)/startcl \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/xdisplay

@@ -3152,6 +3152,25 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
+<component id="starmem" support="S">
+  <version>0.1-1</version>
+  <path>libraries/starmem</path>
+  <description>Starlink Memory Management Library</description>
+  <abstract>
+	<p>C Memory management wrapper routines.</p>
+  </abstract>
+  <dependencies >
+    <sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
 <component id="trn" support="S">
   <version>0.9-6</version>
   <path>libraries/trn</path>
