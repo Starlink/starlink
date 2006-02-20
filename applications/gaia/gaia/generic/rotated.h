@@ -39,10 +39,14 @@
 /* this shoulf be C++ compliant, thanks to 
      vlp@latina.inesc.pt (Vasco Lopes Paulo) */
 
-#if defined(__cplusplus) || defined(c_plusplus)
-#define EXTERN extern "C"
+#ifdef EXTERN
+#undef EXTERN
+#endif
+
+#ifdef __cplusplus
+#   define EXTERN extern "C"
 #else
-#define EXTERN extern
+#   define EXTERN extern
 #endif
 
 EXTERN double   XRotVersion(char*, int);
