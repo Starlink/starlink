@@ -548,7 +548,6 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
     int isfits = 1;
     if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL ) {
         isfits = 0;
-        cout << "Not a FITS file" << endl;
     }
 
     if ( ( !isfits && isNDFtype( type ) ) || slice || path ) {
