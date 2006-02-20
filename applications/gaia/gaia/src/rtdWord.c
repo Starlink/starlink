@@ -1,7 +1,8 @@
 /*
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
- * Copyright (c) 1997-1998 Central Laboratory of the Research Councils
+ * Copyright (c) 1997-2005 Central Laboratory of the Research Councils
+ * Copyright (c) 2006      Particle Physics and Astronomy Research Council
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -110,46 +111,39 @@ static Tk_ConfigSpec configSpecs[] = {
  * Prototypes for procedures defined in this file:
  */
 
-static void             ComputeWordBbox _ANSI_ARGS_((Tk_Canvas canvas,
-                            WordItem *wordPtr));
+static void ComputeWordBbox( Tk_Canvas canvas, WordItem *wordPtr );
 
-static int              ConfigureWord _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, Tk_Item *itemPtr, int argc,
-                            char **argv, int flags));
+static int ConfigureWord( Tcl_Interp *interp, Tk_Canvas canvas,
+                          Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[],
+                          int flags );
 
-static int              CreateWord _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, struct Tk_Item *itemPtr,
-                            int argc, char **argv));
+static int CreateWord( Tcl_Interp *interp, Tk_Canvas canvas,
+                       struct Tk_Item *itemPtr, int objc,
+                       Tcl_Obj *CONST objv[] );
 
-static void             DeleteWord _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, Display *display));
+static void DeleteWord( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display );
 
-static void             ScaleWord _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, double originX, double originY,
-                            double scaleX, double scaleY));
+static void ScaleWord( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
+                       double originY, double scaleX, double scaleY );
 
-static int              WordCoords _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, Tk_Item *itemPtr,
-                            int argc, char **argv));
+static int WordCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+                       int objc, Tcl_Obj *CONST objv[] );
 
-static void             DisplayWord _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, Display *display, Drawable dst,
-                            int x, int y, int width, int height));
+static void DisplayWord( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+                         Drawable dst, int x, int y, int width, int height );
 
-static int              WordToArea _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, double *areaPtr));
+static int WordToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr );
 
-static double           WordToPoint _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, double *pointPtr));
+static double WordToPoint( Tk_Canvas canvas, Tk_Item *itemPtr,
+                           double *pointPtr );
 
-static int              WordToPostscript _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, Tk_Item *itemPtr, int prepass));
+static int WordToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
+                             Tk_Item *itemPtr, int prepass );
 
-static void             TranslateWord _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, double deltaX, double deltaY));
+static void TranslateWord( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
+                           double deltaY );
 
-static void             LineToPostscript _ANSI_ARGS_((Tcl_Interp *interp,
-                            char *string, int numChars));
+static void LineToPostscript( Tcl_Interp *interp, char *string, int numChars );
 
 /*
  * The structure below defines the word item type, by means of
@@ -165,7 +159,7 @@ static Tk_ItemType rtdWordType = {
     WordCoords,                    /* coordProc      */
     DeleteWord,                    /* deleteProc     */
     DisplayWord,                   /* displayProc    */
-    0,                             /* alwaysRedraw   */
+    TK_CONFIG_OBJS,                /* alwaysRedraw & flags  */
     WordToPoint,                   /* pointProc      */
     WordToArea,                    /* areaProc       */
     WordToPostscript,              /* postscriptProc */
@@ -182,10 +176,9 @@ static Tk_ItemType rtdWordType = {
 
 /*  Definitions of escape hatch function for real bounding box of the
     last string drawn. */
-void RtdWordLastBBox _ANSI_ARGS_(( double *xb, double *yp ));
+void RtdWordLastBBox( double *xb, double *yp );
 static XPoint LastBBox[4];
 
-
 /*
  *--------------------------------------------------------------
  * Word_Init --
@@ -195,12 +188,12 @@ static XPoint LastBBox[4];
   *--------------------------------------------------------------
  *
  */
-int Word_Init() {
-    Tk_CreateItemType(&rtdWordType);
+int Word_Init()
+{
+    Tk_CreateItemType( &rtdWordType );
     return TCL_OK;
 }
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -219,18 +212,11 @@ int Word_Init() {
  *
  *--------------------------------------------------------------
  */
-
-static int
-CreateWord(interp, canvas, itemPtr, argc, argv)
-     Tcl_Interp *interp;                 /* For error reporting. */
-     Tk_Canvas canvas;                   /* Canvas to hold new item. */
-     Tk_Item *itemPtr;                   /* Record to hold new item;  header
-                                          * has been initialized by caller. */
-     int argc;                           /* Number of arguments in argv. */
-     char **argv;                        /* Arguments describing item. */
+static int CreateWord( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+                       int objc, Tcl_Obj *CONST objv[] )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
-    if (argc < 2) {
+    if ( objc < 2 ) {
         Tcl_AppendResult(interp, "wrong # args:  should be \"",
                          Tk_PathName(Tk_CanvasTkwin(canvas)), "\" create ",
                          itemPtr->typePtr->name, " xcenter ycenter ?options?",
@@ -258,21 +244,24 @@ CreateWord(interp, canvas, itemPtr, argc, argv)
     /*
      * Process the arguments to fill in the item record.
      */
-    if ((Tk_CanvasGetCoord(interp, canvas, argv[0], &wordPtr->x) != TCL_OK) ||
-        (Tk_CanvasGetCoord(interp, canvas, argv[1], &wordPtr->y) != TCL_OK) ){
+    if ( ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[0], &wordPtr->x )
+           != TCL_OK ) ||
+         ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[1], &wordPtr->y )
+           != TCL_OK) )
+    {
         return TCL_ERROR;
     }
 
     /*  And configure using any options */
-    if (ConfigureWord(interp, canvas, itemPtr, argc-2, argv+2, 0) != TCL_OK) {
-        DeleteWord(canvas, itemPtr, Tk_Display(Tk_CanvasTkwin(canvas)));
+    if ( ConfigureWord( interp, canvas, itemPtr, objc-2, objv+2, 0 )
+         != TCL_OK )
+    {
+        DeleteWord( canvas, itemPtr, Tk_Display( Tk_CanvasTkwin( canvas ) ) );
         return TCL_ERROR;
     }
     return TCL_OK;
 }
 
-
-
 /*
  *--------------------------------------------------------------
  *
@@ -290,42 +279,37 @@ CreateWord(interp, canvas, itemPtr, argc, argv)
  *--------------------------------------------------------------
  */
 
-static int
-WordCoords(interp, canvas, itemPtr, argc, argv)
-     Tcl_Interp *interp;                 /* Used for error reporting. */
-     Tk_Canvas canvas;                   /* Canvas containing item. */
-     Tk_Item *itemPtr;                   /* Item whose coordinates are to be
-                                          * read or modified. */
-     int argc;                           /* Number of coordinates supplied in
-                                          * argv. */
-     char **argv;                        /* Array of values to use */
+static int WordCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+                       int objc, Tcl_Obj *CONST objv[] )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
     char x[TCL_DOUBLE_SPACE], y[TCL_DOUBLE_SPACE];
 
-    if (argc == 0) {
-        Tcl_PrintDouble(interp, wordPtr->x, x);
+    if ( objc == 0 ) {
+        Tcl_PrintDouble( interp, wordPtr->x, x );
 
-        Tcl_PrintDouble(interp, wordPtr->y, y);
-        Tcl_AppendResult(interp, x, " ", y, " ", (char *) NULL);
-    } else if (argc == 2) {
-        if ((Tk_CanvasGetCoord(interp, canvas, argv[0], &wordPtr->x) !=
-             TCL_OK) ||
-            (Tk_CanvasGetCoord(interp, canvas, argv[1], &wordPtr->y) !=
-             TCL_OK)) {
+        Tcl_PrintDouble( interp, wordPtr->y, y );
+        Tcl_AppendResult( interp, x, " ", y, " ", (char *) NULL );
+    }
+    else if ( objc == 2 ) {
+        if ( ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[0], &wordPtr->x )
+               != TCL_OK ) ||
+             ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[1], &wordPtr->y )
+               != TCL_OK ) )
+        {
             return TCL_ERROR;
         }
-        ComputeWordBbox(canvas, wordPtr);
-    } else {
-        sprintf(interp->result,
-                "wrong # coordinates:  expected 0 or 2, got %d", argc);
+        ComputeWordBbox( canvas, wordPtr );
+    }
+    else {
+        sprintf( interp->result,
+                 "wrong # coordinates:  expected 0 or 2, got %d", objc );
         return TCL_ERROR;
     }
     return TCL_OK;
 }
 
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -345,14 +329,9 @@ WordCoords(interp, canvas, itemPtr, argc, argv)
  *--------------------------------------------------------------
  */
 
-static int
-ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
-     Tcl_Interp *interp;           /* Used for error reporting. */
-     Tk_Canvas canvas;             /* Canvas containing itemPtr. */
-     Tk_Item *itemPtr;             /* Rectangle item to reconfigure. */
-     int argc;                     /* Number of elements in argv.  */
-     char **argv;                  /* Arguments describing things to configure. */
-     int flags;                    /* Flags to pass to Tk_ConfigureWidget. */
+static int ConfigureWord( Tcl_Interp *interp, Tk_Canvas canvas,
+                          Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[],
+                          int flags )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
     XGCValues gcValues;
@@ -360,9 +339,12 @@ ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
     unsigned long mask;
     Tk_Window tkwin;
 
-    tkwin = Tk_CanvasTkwin(canvas);
-    if (Tk_ConfigureWidget(interp, tkwin, configSpecs, argc, argv,
-                           (char *) wordPtr, flags) != TCL_OK) {
+    tkwin = Tk_CanvasTkwin( canvas );
+    if ( Tk_ConfigureWidget( interp, tkwin, configSpecs, objc, 
+                             (CONST char **) objv, (char *) wordPtr, 
+                             flags|TK_CONFIG_OBJS )
+         != TCL_OK )
+    {
         return TCL_ERROR;
     }
 
@@ -371,30 +353,31 @@ ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
      * graphics contexts.
      */
     if ( wordPtr->word != NULL ) {
-        wordPtr->numChar = strlen(wordPtr->word);
-    } else {
+        wordPtr->numChar = strlen( wordPtr->word );
+    }
+    else {
         wordPtr->numChar = 0;
     }
     newGC = None;
-    if ((wordPtr->color != NULL) && (wordPtr->fontPtr != NULL)) {
+    if ( ( wordPtr->color != NULL ) && ( wordPtr->fontPtr != NULL ) ) {
         gcValues.foreground = wordPtr->color->pixel;
         gcValues.font = Tk_FontId(wordPtr->fontPtr);
 
         mask = GCForeground|GCFont;
-        if (wordPtr->stipple != None) {
+        if ( wordPtr->stipple != None ) {
             gcValues.stipple = wordPtr->stipple;
             gcValues.fill_style = FillStippled;
             mask |= GCForeground|GCStipple|GCFillStyle;
         }
-        newGC = Tk_GetGC(tkwin, mask, &gcValues);
+        newGC = Tk_GetGC( tkwin, mask, &gcValues );
     }
-    if (wordPtr->GC != None) {
-        Tk_FreeGC(Tk_Display(tkwin), wordPtr->GC);
+    if ( wordPtr->GC != None ) {
+        Tk_FreeGC( Tk_Display( tkwin ), wordPtr->GC );
     }
     wordPtr->GC = newGC;
 
     /* Convert Tk anchor into local version. */
-    switch (wordPtr->tkanchor) {
+    switch ( wordPtr->tkanchor ) {
         case TK_ANCHOR_NW:     wordPtr->anchor = BRIGHT;   break;
         case TK_ANCHOR_N:      wordPtr->anchor = BCENTRE;  break;
         case TK_ANCHOR_NE:     wordPtr->anchor = BLEFT;    break;
@@ -406,12 +389,11 @@ ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
         case TK_ANCHOR_CENTER: wordPtr->anchor = MCENTRE;  break;
     }
 
-    ComputeWordBbox(canvas, wordPtr);
+    ComputeWordBbox( canvas, wordPtr );
     return TCL_OK;
 }
 
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -430,36 +412,30 @@ ConfigureWord(interp, canvas, itemPtr, argc, argv, flags)
  */
 
 static void
-DeleteWord(canvas, itemPtr, display)
-     Tk_Canvas canvas;                   /* Info about overall widget. */
-     Tk_Item *itemPtr;                   /* Item that is being deleted. */
-     Display *display;                   /* Display containing window for
-                                          * canvas. */
+DeleteWord( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
 
-    if (wordPtr->word != NULL) {
-        ckfree(wordPtr->word);
+    if ( wordPtr->word != NULL ) {
+        ckfree( wordPtr->word );
     }
-    if (wordPtr->fontPtr != NULL) {
+    if ( wordPtr->fontPtr != NULL ) {
         /* Release font structure? Not sure that this a good idea when
          * dealing with the xvertext cache -- so don't, but do for tcl8,
-         * causes abort() if not done!*/
-        Tk_FreeFont(wordPtr->fontPtr);
+         * as causes abort() if not done!*/
+        Tk_FreeFont( wordPtr->fontPtr );
     }
-    if (wordPtr->color != NULL) {
-        Tk_FreeColor(wordPtr->color);
+    if ( wordPtr->color != NULL ) {
+        Tk_FreeColor( wordPtr->color );
     }
-    if (wordPtr->stipple != None) {
-        Tk_FreeBitmap(display, wordPtr->stipple);
+    if ( wordPtr->stipple != None ) {
+        Tk_FreeBitmap( display, wordPtr->stipple );
     }
-    if (wordPtr->GC != None) {
-        Tk_FreeGC(display, wordPtr->GC);
+    if ( wordPtr->GC != None ) {
+        Tk_FreeGC( display, wordPtr->GC );
     }
-
 }
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -477,13 +453,7 @@ DeleteWord(canvas, itemPtr, display)
  *
  *--------------------------------------------------------------
  */
-
-/* ARGSUSED */
-static void
-ComputeWordBbox(canvas, wordPtr)
-     Tk_Canvas canvas;                   /* Canvas that contains item. */
-     WordItem *wordPtr;                  /* Item whose bbox is to be
-                                          * recomputed. */
+static void ComputeWordBbox( Tk_Canvas canvas, WordItem *wordPtr )
 {
     XPoint *bbox = NULL;
     XFontStruct *fontStruct = NULL;
@@ -496,13 +466,13 @@ ComputeWordBbox(canvas, wordPtr)
                                  Tk_FontId( wordPtr->fontPtr ) );
 
         if ( fontStruct != NULL ) {
-            bbox = XRotTextExtents(Tk_Display(Tk_CanvasTkwin(canvas)),
-                                   fontStruct,
-                                   wordPtr->angle,
-                                   (int) wordPtr->x,
-                                   (int) wordPtr->y,
-                                   wordPtr->word,
-                                   wordPtr->anchor);
+            bbox = XRotTextExtents( Tk_Display( Tk_CanvasTkwin( canvas ) ),
+                                    fontStruct,
+                                    wordPtr->angle,
+                                    (int) wordPtr->x,
+                                    (int) wordPtr->y,
+                                    wordPtr->word,
+                                    wordPtr->anchor);
             XFreeFontInfo( NULL, fontStruct, 1 );
 
             if ( bbox != NULL ) {
@@ -512,19 +482,19 @@ ComputeWordBbox(canvas, wordPtr)
                 x2 = MAX( bbox[0].x, bbox[1].x );
                 x2 = MAX( x2, bbox[2].x );
                 x2 = MAX( x2, bbox[3].x );
-                
+
                 y1 = MIN( bbox[0].y, bbox[1].y );
                 y1 = MIN( y1, bbox[2].y );
                 y1 = MIN( y1, bbox[3].y );
                 y2 = MAX( bbox[0].y, bbox[1].y );
                 y2 = MAX( y2, bbox[2].y );
                 y2 = MAX( y2, bbox[3].y );
-                
+
                 wordPtr->header.x1 = x1;
                 wordPtr->header.y1 = y1;
                 wordPtr->header.x2 = x2;
                 wordPtr->header.y2 = y2;
-                
+
                 /*  Transfer this bounding box into local static space for
                     recovery as a true bounding box, not just an axis aligned
                     region. */
@@ -536,7 +506,7 @@ ComputeWordBbox(canvas, wordPtr)
                 LastBBox[2].y = bbox[2].y;
                 LastBBox[3].x = bbox[3].x;
                 LastBBox[3].y = bbox[3].y;
-                
+
                 free( (void *)bbox );
             }
         }
@@ -544,7 +514,6 @@ ComputeWordBbox(canvas, wordPtr)
 }
 
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -561,22 +530,15 @@ ComputeWordBbox(canvas, wordPtr)
  *
  *--------------------------------------------------------------
  */
-
-static void
-DisplayWord(canvas, itemPtr, display, drawable, x, y, width, height)
-     Tk_Canvas canvas;                   /* Canvas that contains item. */
-     Tk_Item *itemPtr;                   /* Item to be displayed. */
-     Display *display;                   /* Display on which to draw item. */
-     Drawable drawable;                  /* Pixmap or window in which to draw
-                                          * item. */
-     int x, y, width, height;            /* Describes region of canvas that
-                                          * must be redisplayed (not used). */
+static void DisplayWord( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+                         Drawable drawable, int x, int y, int width, 
+                         int height )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
     short drawableX, drawableY;
     XFontStruct *fontStruct = NULL;
 
-    if (wordPtr->GC == None || wordPtr->word == NULL ) {
+    if ( wordPtr->GC == None || wordPtr->word == NULL ) {
         return;
     }
 
@@ -586,13 +548,13 @@ DisplayWord(canvas, itemPtr, display, drawable, x, y, width, height)
      * read-only.
      */
 
-    if (wordPtr->stipple != None) {
-        Tk_CanvasSetStippleOrigin(canvas, wordPtr->GC);
+    if ( wordPtr->stipple != None ) {
+        Tk_CanvasSetStippleOrigin( canvas, wordPtr->GC );
     }
 
     /* Transform coordinates into drawable from canvas */
-    Tk_CanvasDrawableCoords(canvas, (double) wordPtr->x,
-                            (double) wordPtr->y, &drawableX, &drawableY);
+    Tk_CanvasDrawableCoords( canvas, (double) wordPtr->x, (double) wordPtr->y,
+                             &drawableX, &drawableY );
 
     /* Set the magnification factor */
     XRotSetMagnification( wordPtr->scale );
@@ -613,13 +575,11 @@ DisplayWord(canvas, itemPtr, display, drawable, x, y, width, height)
         XFreeFontInfo( NULL, fontStruct, 1 );
     }
 
-    if (wordPtr->stipple != None) {
-        XSetTSOrigin(display, wordPtr->GC, 0, 0);
+    if ( wordPtr->stipple != None ) {
+        XSetTSOrigin( display, wordPtr->GC, 0, 0 );
     }
 }
 
-
-
 /*
  *--------------------------------------------------------------
  *
@@ -638,12 +598,8 @@ DisplayWord(canvas, itemPtr, display, drawable, x, y, width, height)
  *
  *--------------------------------------------------------------
  */
-
-static double
-WordToPoint(canvas, itemPtr, pointPtr)
-     Tk_Canvas canvas;             /* Canvas containing item. */
-     Tk_Item *itemPtr;             /* Item to check against point. */
-     double *pointPtr;             /* Pointer to x and y coordinates. */
+static double WordToPoint( Tk_Canvas canvas, Tk_Item *itemPtr,
+                           double *pointPtr )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
     double xDiff, yDiff;
@@ -652,11 +608,11 @@ WordToPoint(canvas, itemPtr, pointPtr)
      * If the point is inside the word's bounding box, then can
      * return immediately.
      */
-
-    if ((pointPtr[0] >= wordPtr->header.x1)
-        && (pointPtr[0] <= wordPtr->header.x2)
-        && (pointPtr[1] >= wordPtr->header.y1)
-        && (pointPtr[1] <= wordPtr->header.y2)) {
+    if ( ( pointPtr[0] >= wordPtr->header.x1 ) &&
+         ( pointPtr[0] <= wordPtr->header.x2 ) &&
+         ( pointPtr[1] >= wordPtr->header.y1 ) &&
+         ( pointPtr[1] <= wordPtr->header.y2 ) )
+    {
         return 0.0;
     }
 
@@ -664,27 +620,28 @@ WordToPoint(canvas, itemPtr, pointPtr)
      * Point is outside word's bounding box; compute distance to nearest
      * side.
      */
-
-    if (pointPtr[0] < wordPtr->header.x1) {
+    if ( pointPtr[0] < wordPtr->header.x1 ) {
         xDiff = wordPtr->header.x1 - pointPtr[0];
-    } else if (pointPtr[0] > wordPtr->header.x2)  {
+    }
+    else if ( pointPtr[0] > wordPtr->header.x2 )  {
         xDiff = pointPtr[0] - wordPtr->header.x2;
-    } else {
+    }
+    else {
         xDiff = 0.0;
     }
 
-    if (pointPtr[1] < wordPtr->header.y1) {
+    if ( pointPtr[1] < wordPtr->header.y1 ) {
         yDiff = wordPtr->header.y1 - pointPtr[1];
-    } else if (pointPtr[1] > wordPtr->header.y2)  {
+    }
+    else if ( pointPtr[1] > wordPtr->header.y2 )  {
         yDiff = pointPtr[1] - wordPtr->header.y2;
-    } else {
+    }
+    else {
         yDiff = 0.0;
     }
-    return sqrt(xDiff*xDiff+yDiff*yDiff);
+    return sqrt( ( xDiff * xDiff ) + ( yDiff * yDiff ) );
 }
 
-
-
 /*
  *--------------------------------------------------------------
  *
@@ -704,42 +661,35 @@ WordToPoint(canvas, itemPtr, pointPtr)
  *
  *--------------------------------------------------------------
  */
-
-static int
-WordToArea(canvas, itemPtr, areaPtr)
-     Tk_Canvas canvas;             /* Canvas containing item. */
-     Tk_Item *itemPtr;             /* Item to check against oval. */
-     double *areaPtr;              /* Pointer to array of four coordinates
-                                    * (x1, y1, x2, y2) describing rectangular
-                                    * area.  */
+static int WordToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
 
-    if ((areaPtr[2] > wordPtr->header.x1) &&
-        (areaPtr[0] < wordPtr->header.x2) &&
-        (areaPtr[3] > wordPtr->header.y1) &&
-        (areaPtr[1] < wordPtr->header.y2)) {
+    if ( ( areaPtr[2] > wordPtr->header.x1 ) &&
+         ( areaPtr[0] < wordPtr->header.x2 ) &&
+         ( areaPtr[3] > wordPtr->header.y1 ) &&
+         ( areaPtr[1] < wordPtr->header.y2 ) )
+    {
         return 1;
     }
-    if ((areaPtr[0] > wordPtr->header.x1) &&
-        (areaPtr[1] > wordPtr->header.y1) &&
-        (areaPtr[0] < wordPtr->header.x2) &&
-        (areaPtr[1] < wordPtr->header.y2) ) {
+    if ( ( areaPtr[0] > wordPtr->header.x1 ) &&
+         ( areaPtr[1] > wordPtr->header.y1 ) &&
+         ( areaPtr[0] < wordPtr->header.x2 ) &&
+         ( areaPtr[1] < wordPtr->header.y2 ) )
+    {
         return 0;
-
     }
-    if ((areaPtr[2] > wordPtr->header.x1) &&
-        (areaPtr[3] > wordPtr->header.y1) &&
-        (areaPtr[2] < wordPtr->header.x2) &&
-        (areaPtr[3] < wordPtr->header.y2) ) {
+    if ( ( areaPtr[2] > wordPtr->header.x1 ) &&
+         ( areaPtr[3] > wordPtr->header.y1 ) &&
+         ( areaPtr[2] < wordPtr->header.x2 ) &&
+         ( areaPtr[3] < wordPtr->header.y2 ) )
+    {
         return 0;
 
     }
     return -1;
-
 }
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -761,32 +711,24 @@ WordToArea(canvas, itemPtr, areaPtr)
  *
  *--------------------------------------------------------------
  */
-
-static void
-ScaleWord(canvas, itemPtr, originX, originY, scaleX, scaleY)
-     Tk_Canvas canvas;                     /* Canvas containing rectangle. */
-     Tk_Item *itemPtr;                     /* Rectangle to be scaled. */
-     double originX, originY;              /* Origin about which to scale rect. */
-     double scaleX;                        /* Amount to scale in X direction. */
-     double scaleY;                        /* Amount to scale in Y direction. */
+static void ScaleWord( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
+                       double originY, double scaleX, double scaleY )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
 
     /* Scale all coordinates and set their related values */
-
-    wordPtr->x = originX + scaleX*(wordPtr->x - originX);
-    wordPtr->y = originY + scaleY*(wordPtr->y - originY);
+    wordPtr->x = originX + scaleX * ( wordPtr->x - originX );
+    wordPtr->y = originY + scaleY * ( wordPtr->y - originY );
 
     if ( wordPtr->resize ) {
         /*  If required also rescale the actual font. Otherwise just the
             position is rescaled. */
         wordPtr->scale *= scaleX;
     }
-    ComputeWordBbox(canvas, wordPtr);
+    ComputeWordBbox( canvas, wordPtr );
     return;
 }
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -803,22 +745,17 @@ ScaleWord(canvas, itemPtr, originX, originY, scaleX, scaleY)
  *
  *--------------------------------------------------------------
  */
-static void
-TranslateWord(canvas, itemPtr, deltaX, deltaY)
-     Tk_Canvas canvas;                     /* Canvas containing item. */
-     Tk_Item *itemPtr;                     /* Item that is being moved. */
-     double deltaX, deltaY;                /* Amount by which item is to be
-                                            * moved. */
+static void TranslateWord( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
+                           double deltaY )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
 
     wordPtr->x += deltaX;
     wordPtr->y += deltaY;
-    ComputeWordBbox(canvas, wordPtr);
+    ComputeWordBbox( canvas, wordPtr );
 }
 
 
-
 /*
  *--------------------------------------------------------------
  *
@@ -839,56 +776,47 @@ TranslateWord(canvas, itemPtr, deltaX, deltaY)
  *
  *--------------------------------------------------------------
  */
-
-static int
-WordToPostscript(interp, canvas, itemPtr, prepass)
-     Tcl_Interp *interp;                 /* Leave Postscript or error message
-                                          * here. */
-     Tk_Canvas canvas;                   /* Information about overall canvas. */
-     Tk_Item *itemPtr;                   /* Item for which Postscript is
-                                          * wanted. */
-     int prepass;                        /* 1 means this is a prepass to
-                                          * collect font information;  0 means
-                                          * final Postscript is being created.*/
+static int WordToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
+                             Tk_Item *itemPtr, int prepass )
 {
     WordItem *wordPtr = (WordItem *) itemPtr;
     char buffer[500];
     double mag = 1.0;
     double xoffset = 0.0, yoffset = 0.0;
 
-    if (wordPtr->color == NULL) {
+    if ( wordPtr->color == NULL ) {
         return TCL_OK;
     }
 
-    if (Tk_CanvasPsFont(interp, canvas, wordPtr->fontPtr) != TCL_OK) {
+    if ( Tk_CanvasPsFont( interp, canvas, wordPtr->fontPtr ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
-    if (Tk_CanvasPsColor(interp, canvas, wordPtr->color) != TCL_OK) {
+    if ( Tk_CanvasPsColor( interp, canvas, wordPtr->color ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
     /*  Add the stipple text command if needed. */
-    if (wordPtr->stipple != None) {
-        Tcl_AppendResult(interp, "/StippleText {\n    ",
-                         (char *) NULL);
-        Tk_CanvasPsStipple(interp, canvas, wordPtr->stipple);
-        Tcl_AppendResult(interp, "} bind def\n", (char *) NULL);
+    if ( wordPtr->stipple != None ) {
+        Tcl_AppendResult( interp, "/StippleText {\n    ",
+                          (char *) NULL );
+        Tk_CanvasPsStipple( interp, canvas, wordPtr->stipple );
+        Tcl_AppendResult( interp, "} bind def\n", (char *) NULL );
     }
 
     /*  Get the width and height of the word on paper. */
-    sprintf(buffer, "0 0 moveto " );
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
-    LineToPostscript(interp, wordPtr->word, wordPtr->numChar);
-    sprintf(buffer, " false charpath\npathbbox /height exch def /width"
-            " exch def pop pop newpath\n ");
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
+    sprintf( buffer, "0 0 moveto " );
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
+    LineToPostscript( interp, wordPtr->word, wordPtr->numChar );
+    sprintf( buffer, " false charpath\npathbbox /height exch def /width"
+             " exch def pop pop newpath\n ");
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
 
     /*  Now change to the new coordinate system about which we scale
      *  and rotate. */
-    sprintf(buffer, "%.15g %.15g translate \n", wordPtr->x,
-            Tk_CanvasPsY(canvas, wordPtr->y));
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
+    sprintf( buffer, "%.15g %.15g translate \n", wordPtr->x,
+             Tk_CanvasPsY( canvas, wordPtr->y ) );
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
 
     /*
      * Add the rotation and scale, then adjust the position to the correct
@@ -896,13 +824,13 @@ WordToPostscript(interp, canvas, itemPtr, prepass)
      * points conversion factor (the whole canvas has this scale applied at
      * the start, note mag is X points/PS point).
      */
-    mag = WidthOfScreen(Tk_Screen(Tk_CanvasTkwin(canvas)));
+    mag = WidthOfScreen( Tk_Screen( Tk_CanvasTkwin( canvas ) ) );
     mag /= (72.0/25.4)*WidthMMOfScreen(Tk_Screen(Tk_CanvasTkwin(canvas)));
 
-    sprintf(buffer, "%.15g %.15g scale %.15g rotate \n",
-            wordPtr->scale*mag, wordPtr->scale*mag, wordPtr->angle);
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
-    switch (wordPtr->tkanchor) {
+    sprintf( buffer, "%.15g %.15g scale %.15g rotate \n",
+             wordPtr->scale*mag, wordPtr->scale*mag, wordPtr->angle );
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
+    switch ( wordPtr->tkanchor ) {
         case TK_ANCHOR_NW:     xoffset = -1.0; yoffset = 0.5;   break;
         case TK_ANCHOR_N:      xoffset = -0.5; yoffset = 0.5;   break;
         case TK_ANCHOR_NE:     xoffset = 0.0;  yoffset = 0.5;   break;
@@ -913,17 +841,18 @@ WordToPostscript(interp, canvas, itemPtr, prepass)
         case TK_ANCHOR_W:      xoffset = -1.0; yoffset = -0.25; break;
         case TK_ANCHOR_CENTER: xoffset = -0.5; yoffset = -0.25; break;
     }
-    sprintf(buffer, "width %f mul height %f mul moveto \n",
-            xoffset, yoffset );
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
+    sprintf( buffer, "width %f mul height %f mul moveto \n",
+             xoffset, yoffset );
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
 
     /*  Finally add the text to draw. */
-    LineToPostscript(interp, wordPtr->word, wordPtr->numChar);
-    if (wordPtr->stipple != None) {
-        Tcl_AppendResult(interp, " true charpath clip StippleText\n",
-                         (char *) NULL );
-    } else {
-        Tcl_AppendResult(interp, " show\n", (char *) NULL );
+    LineToPostscript( interp, wordPtr->word, wordPtr->numChar );
+    if ( wordPtr->stipple != None ) {
+        Tcl_AppendResult( interp, " true charpath clip StippleText\n",
+                          (char *) NULL );
+    }
+    else {
+        Tcl_AppendResult( interp, " show\n", (char *) NULL );
     }
     return TCL_OK;
 }
@@ -946,12 +875,7 @@ WordToPostscript(interp, canvas, itemPtr, prepass)
  *
  *--------------------------------------------------------------
  */
-
-static void
-LineToPostscript(interp, string, numChars)
-     Tcl_Interp *interp;         /* Interp whose result is to be appended to. */
-     char *string;               /* String to Postscript-ify. */
-     int numChars;               /* Number of characters in the string. */
+static void LineToPostscript( Tcl_Interp *interp, char *string, int numChars )
 {
 #define BUFFER_SIZE 100
     char buffer[BUFFER_SIZE+5];
@@ -961,29 +885,30 @@ LineToPostscript(interp, string, numChars)
     used = 1;
     for ( ; numChars > 0; string++, numChars--) {
         c = (*string) & 0xff;
-        if ((c == '(') || (c == ')') || (c == '\\') || (c < 0x20)
-            || (c >= 0x7f)) {
+        if ( ( c == '(') || ( c == ')' ) || ( c == '\\' ) || ( c < 0x20 )
+             || ( c >= 0x7f ) ) {
             /*
              * Tricky point:  the "03" is necessary in the sprintf below,
              * so that a full three digits of octal are always generated.
              * Without the "03", a number following this sequence could
              * be interpreted by Postscript as part of this sequence.
              */
-            sprintf(buffer+used, "\\%03o", c);
-            used += strlen(buffer+used);
-        } else {
+            sprintf( buffer+used, "\\%03o", c );
+            used += strlen( buffer + used );
+        }
+        else {
             buffer[used] = c;
             used++;
         }
-        if (used >= BUFFER_SIZE) {
+        if ( used >= BUFFER_SIZE ) {
             buffer[used] = 0;
-            Tcl_AppendResult(interp, buffer, (char *) NULL);
+            Tcl_AppendResult( interp, buffer, (char *) NULL );
             used = 0;
         }
     }
     buffer[used] = ')';
     buffer[used+1] = 0;
-    Tcl_AppendResult(interp, buffer, (char *) NULL);
+    Tcl_AppendResult( interp, buffer, (char *) NULL );
 }
 
 /*
@@ -994,13 +919,12 @@ LineToPostscript(interp, string, numChars)
  *    Returns the complete bounding box of the last text item whose
  *    canvas bounding box was requested.
  *
+ *      - xb, X corners of the string bounding box
+ *      - yb, Y corners of the string bounding box
+ *
  *--------------------------------------------------------------
  */
-
-void
-RtdWordLastBBox (xb, yb)
-     double *xb;                /* X corners of the string bounding box */
-     double *yb;                /* Y corners of the string bounding box */
+void RtdWordLastBBox( double *xb, double *yb )
 {
     /* The last call to WordBBox should have updated the contents of
      * the static space LastBBox, we just need to return it. */

@@ -27,6 +27,7 @@ extern "C" {
     int Segment_Init();
     int Polyline_Init();
     int RotBox_Init();
+    int SpectralPlot_Init();
     int Tcladam_Init(Tcl_Interp *interp);
     int GaiaCat_Init(Tcl_Interp *interp);
 }
@@ -82,6 +83,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     /*  Add rtd_polyline for drawing many polyline at speed */
     if (Polyline_Init() != TCL_OK) {
 	return TCL_ERROR;
+    }
+
+    /* Add spectral_plot for interactive spectral drawing */
+    if (SpectralPlot_Init() != TCL_OK) {
+        return TCL_ERROR;
     }
 
     /* Add Starlink task control commands*/
