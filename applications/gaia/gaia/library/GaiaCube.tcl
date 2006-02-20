@@ -556,8 +556,10 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Display an NDF.
    protected method display_ {name {istemp 0} } {
+      $itk_option(-gaia) configure -check_for_cubes 0
       $itk_option(-gaia) open $name
       $itk_option(-gaia) configure -temporary $istemp
+      $itk_option(-gaia) configure -check_for_cubes $check_for_cubes_
    }
 
    #  Set the animation lower bound.
@@ -811,7 +813,9 @@ itcl::class gaia::GaiaNDFCube {
    }
 
    #  Name of the Gaia instance we're controlling.
-   itk_option define -gaia gaia Gaia {}
+   itk_option define -gaia gaia Gaia {} {
+      set check_for_cubes_ [$itk_option(-gaia) cget -check_for_cubes]
+   }
 
    #  The canvas. Used for displaying spectra.
    itk_option define -canvas canvas Canvas {}
@@ -889,6 +893,9 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The current value of step during an animation.
    protected variable step_ 1
+
+   #  Check for cubes setting of GAIA.
+   protected variable check_for_cubes_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------

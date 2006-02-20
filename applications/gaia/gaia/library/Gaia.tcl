@@ -390,8 +390,7 @@ itcl::class gaia::Gaia {
       itk_component add image {
          GaiaImageCtrl $image_ \
             -file $itk_option(-file) \
-            -file_change_cmd [code $this configure -file] \
-            -file_open_cmd [code $this file_loaded_] \
+            -file_change_cmd [code $this file_loaded_] \
             -file_types $itk_option(-file_types) \
             -usexshm $itk_option(-usexshm) \
             -verbose $itk_option(-verbose) \
@@ -1145,8 +1144,6 @@ itcl::class gaia::Gaia {
    }
 
    #  Notification that a file has been loaded into the GaiaImageCtrl.
-   #  Not for trivial or non-UI changes (i.e. only respond to changes 
-   #  from the command-line or the open-file dialog of GaiaImageCtrl).
    protected method file_loaded_ { {filename {}} } {
       if { $filename != {} } {
          configure -file $filename
@@ -1157,14 +1154,6 @@ itcl::class gaia::Gaia {
       if { ! $itk_option(-check_for_cubes) } {
          return
       }
-
-      #  Do not re-display or check a cube that has already been passed 
-      #  on (there is feedback as the cube tool displays a cube, which 
-      #  re-calls this method).
-      if { $itk_option(-file) == $lastcube_ } {
-         return
-      }
-      set lastcube_ $itk_option(-file)
 
       #  See if this is a cube, if so offer to load it using the cube
       #  browser. Cheat bigtime by looking for a NAXIS3 card. This should work
@@ -1900,9 +1889,6 @@ window gives you access to this."
 
    #  The text catalogue importer dialog.
    protected variable importer_ .importer
-
-   #  The last cube sent for display.
-   protected variable lastcube_ {}
 
    #  Control re-creation of the help menu (gets called from Rtd and SkyCat).
    protected variable help_menu_done_ 0

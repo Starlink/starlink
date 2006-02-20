@@ -504,11 +504,6 @@ itcl::class gaia::GaiaImageCtrl {
 	 $namer_ configure -imagename $file
          configure -hdu [$namer_ fitshdunum]
          configure -file [$namer_ fullname 0]
-
-         #  Notify that an image has been opened to any listeners.
-         if { $itk_option(-file_open_cmd) != {} } {
-            eval $itk_option(-file_open_cmd) [list $itk_option(-file)]
-         }
       }
    }
 
@@ -963,11 +958,9 @@ itcl::class gaia::GaiaImageCtrl {
       set $itk_option(-temporary) 0
    }
 
-   #  Commands for callbacks when the file is changed and when a file is
-   #  opened using the file selection dialog. Changes happen whenever
+   #  Commands for callbacks when the file is changed. Changes happen whenever
    #  -file is configured.
    itk_option define -file_change_cmd file_change_cmd File_Change_Cmd {}
-   itk_option define -file_open_cmd file_open_cmd File_Open_Cmd {}
 
    #  Is image temporary. If set after image is displayed/configured
    #  then the associated file will be deleted when replaced or when this
