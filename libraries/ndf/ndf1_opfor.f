@@ -94,6 +94,9 @@
 *     7-OCT-2004 (AJC):
 *        Stylistic corrections to Alan's changes prior to inclusion in
 *        CVS repository.
+*     21-FEB-2006 (DSB):
+*        Changed length of FEXT from 6 to 20 since 6 is not enough for
+*        extensions such as ".sdf.gz" (which is 7 characters long).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -181,7 +184,7 @@
       CHARACTER * ( NDF__SZFIL ) FORFIL ! Foreign file name
       CHARACTER * ( NDF__SZMOD ) VMODE  ! Validated access mode string
       CHARACTER * ( NDF__SZREF ) NDFNAM ! Name of associated native NDF
-      CHARACTER * 6              FEXT   ! Foreign filename extension
+      CHARACTER * 20 FEXT        ! Foreign filename extension
       INTEGER D1                 ! First character of directory field
       INTEGER D2                 ! Last character of directory field
       INTEGER F1                 ! First character of file extension
