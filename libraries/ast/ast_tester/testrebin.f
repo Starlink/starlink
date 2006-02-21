@@ -41,6 +41,7 @@ c      call ast_listissued( 'testrebin' )
       include 'SAE_PAR'
       include 'AST_PAR'
       include 'PRM_PAR'
+      include 'CNF_PAR'
 
       integer m, lbnd_in(10), ubnd_in(10), ipin, ipin_var, 
      :        lbnd_out(10), ubnd_out(10), lbnd(10), ubnd(10), ipout,
@@ -110,27 +111,30 @@ c      call ast_listissued( 'testrebin' )
 *  supplied data type.
             if( types(i) .eq. '_REAL' ) then
                call ast_rebinr( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( ipin ), %val( ipin_var ), spreads(j), params, 
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
+     :              spreads(j), params, 
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADR,
      :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( ipout ), %val( ipout_var ), 
-     :              status )
+     :              lbnd, ubnd, %val( cnf_pval( ipout )), 
+     :              %val( cnf_pval( ipout_var )), status )
   
             else if( types(i) .eq. '_DOUBLE' ) then
                call ast_rebind( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( ipin ), %val( ipin_var ), spreads(j), params, 
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
+     :              spreads(j), params, 
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADD,
      :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( ipout ), %val( ipout_var ),
-     :              status )
+     :              lbnd, ubnd, %val( cnf_pval( ipout ) ), 
+     :              %val( cnf_pval( ipout_var )), status )
   
             else if( types(i) .eq. '_INTEGER' ) then
                call ast_rebini( m, 0.0D0, nin, lbnd_in, ubnd_in, 
-     :              %val( ipin ), %val( ipin_var ), spreads(j), params, 
+     :              %val( cnf_pval( ipin )), %val( cnf_pval(ipin_var )), 
+     :              spreads(j), params, 
      :              AST__USEBAD+AST__USEVAR, tol, 100, VAL__BADI,
      :              nout, lbnd_out, ubnd_out, 
-     :              lbnd, ubnd, %val( ipout ), %val( ipout_var ),
-     :              status )
+     :              lbnd, ubnd, %val( cnf_pval( ipout )), 
+     :              %val( cnf_pval( ipout_var )), status )
 
             else if( status .eq. sai__ok ) then
                status = SAI__ERROR
@@ -181,10 +185,11 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'PRM_PAR'
       DOUBLE PRECISION A, B
       IF( A .NE. 0.0D0 .AND. B .NE. 0.0D0 ) THEN
-         EQUALD = ( ABS( A - B ) .LE. 50.0*ABS( A + B )*VAL__EPSD )
+         EQUALD = ( ABS( A - B ) .LE. 1.0E9*ABS( A + B )*VAL__EPSD )
       ELSE
          EQUALD = ( ABS( A + B ) .LE. 1.0D-11 )
       END IF
+
       END
 
       LOGICAL FUNCTION MYEQUALD( A, B )
@@ -234,6 +239,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -247,21 +253,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST7R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST7R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST7D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST7D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST7I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST7I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -285,6 +291,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'NUM_DEC'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEF'
 
       INTEGER DO, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
@@ -402,6 +409,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -519,6 +527,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'AST_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
@@ -643,6 +652,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -656,21 +666,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST8R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST8R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST8D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST8D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST8I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST8I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -693,6 +703,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -844,6 +855,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -995,6 +1007,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1151,6 +1164,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -1164,21 +1178,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST9R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST9R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST9D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST9D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST9I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST9I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -1201,6 +1215,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1380,6 +1395,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1559,6 +1575,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1743,6 +1760,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -1756,21 +1774,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST1R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST1R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST1D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST1D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST1I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST1I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -1793,6 +1811,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1891,6 +1910,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -1989,6 +2009,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2092,6 +2113,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -2105,21 +2127,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST2R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST2R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST2D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST2D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST2I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST2I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -2142,6 +2164,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2253,6 +2276,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2364,6 +2388,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2480,6 +2505,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -2493,21 +2519,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST3R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST3R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST3D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST3D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST3I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST3I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -2530,6 +2556,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2662,6 +2689,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2794,6 +2822,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -2931,6 +2960,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -2944,21 +2974,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST4R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST4R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST4D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST4D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST4I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST4I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -2981,6 +3011,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3077,6 +3108,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3173,6 +3205,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3274,6 +3307,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -3287,21 +3321,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST5R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST5R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST5D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST5D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST5I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST5I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -3324,6 +3358,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3445,6 +3480,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3566,6 +3602,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3692,6 +3729,7 @@ c      call ast_listissued( 'testrebin' )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
 
       INTEGER M, LBND_IN(*), UBND_IN(*), LBND_OUT(*), UBND_OUT(*), 
      :        LBND(*), UBND(*), IPIN, IPIN_VAR, IPOUT, IPOUT_VAR,
@@ -3705,21 +3743,21 @@ c      call ast_listissued( 'testrebin' )
 
 *  Fill the input data and variance arrays if required.
       IF( TYPE .EQ. '_REAL' ) THEN
-         CALL TEST6R( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST6R( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL TEST6D( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST6D( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( TYPE .EQ. '_INTEGER' ) THEN
-         CALL TEST6I( DO, LBND_IN, UBND_IN, %VAL( IPIN ), 
-     :                %VAL( IPIN_VAR ), LBND_OUT, UBND_OUT, 
-     :                %VAL( IPOUT ), %VAL( IPOUT_VAR ), 
+         CALL TEST6I( DO, LBND_IN, UBND_IN, %VAL(CNF_PVAL(IPIN)), 
+     :                %VAL(CNF_PVAL(IPIN_VAR)), LBND_OUT, UBND_OUT, 
+     :                %VAL(CNF_PVAL(IPOUT)),%VAL(CNF_PVAL(IPOUT_VAR)), 
      :                LBND, UBND, M, PARAMS, TOL, J, STATUS ) 
 
       ELSE IF( STATUS .EQ. SAI__OK ) then
@@ -3742,6 +3780,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -3875,6 +3914,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
@@ -4008,6 +4048,7 @@ c      call ast_listissued( 'testrebin' )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'AST_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'NUM_DEC'
       INCLUDE 'NUM_DEF'
 
