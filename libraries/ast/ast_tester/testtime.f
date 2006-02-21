@@ -335,7 +335,7 @@ c
       ctl = ast_currenttime( tf, status ) + 1.0D0/(86400.0D0*365.25D0)
       do while( ast_currenttime( tf, status ) .lt. ctl )
          n = n + 1
-         if( n .gt. 20000 ) then
+         if( n .gt. 2000000 ) then
             call stopit( status, 'error 15' )
             return
          end if
@@ -355,7 +355,7 @@ c
       do while( ast_currenttime( tf, status ) .lt. 
      :          1.0D0/(86400.0D0*364.25D0) )
          n = n + 1
-         if( n .gt. 20000 ) then
+         if( n .gt. 2000000 ) then
             call stopit( status, 'error 16' )
             return
          end if
