@@ -245,7 +245,12 @@
 
          DO J = 1, NLAT
             LV = AST_GETL( PLOT, LAT(J), STATUS )
-   	    WRITE(*,'(A,I1)') ' '//LAT(J)//': ',LV
+            IF( LV ) THEN
+               IV = 1
+            ELSE
+               IV = 0
+            END IF
+   	    WRITE(*,'(A,I1)') ' '//LAT(J)//': ',IV
          END DO
 
          DO J = 1, NDAT
