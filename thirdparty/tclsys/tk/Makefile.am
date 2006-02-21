@@ -4,7 +4,7 @@
 RECURSIVE_TARGETS = all clean
 
 $(RECURSIVE_TARGETS):
-	cd unix; $(MAKE) CFLAGS="$(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(CFLAGS)" $@
+	cd unix; $(MAKE) $@
 
 dist_pkgdata_DATA = license.terms ChangeLog changes
 
