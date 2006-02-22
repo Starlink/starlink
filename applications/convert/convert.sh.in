@@ -55,7 +55,10 @@
 #     2004 March 12 (MJC):
 #        Add FITS(.fits) to NDF_FORMATS_OUT.
 #     2005 August 21 (TIMJ):
-#        Create from .csh version
+#        Create from .csh version.
+#     2006 February 17 (MJC):
+#        Add FITSGZ with three allowed file extensions.  Use distinct
+#        name for GZIP temporary file.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -156,7 +159,7 @@ con_ndf2unf    () { $CONVERT_DIR/ndf2unf ${1+"$@"}; }
 #  ===============================================================
 
 #  Define input and output formats recognised.
-#  ==========================================
+#  ===========================================
 
 #  Formats recognised when accessing pre-existing datasets.  There are
 #  numerous products in FITS each uses a different file extension.
@@ -181,9 +184,12 @@ $NDF_FORMATS_IN',FITS(.mxlo),FITS(.mxhi),FITS(.rilo),FITS(.rihi),FITS(.vdlo)'
 export NDF_FORMATS_IN=\
 $NDF_FORMATS_IN',FITS(.vdhi),STREAM(.str)'
 
+export NDF_FORMATS_IN=\
+$NDF_FORMATS_IN',FITSGZ(.fit.gz),FITSGZ(.fits.gz),FITSGZ(.fts.gz)'
+
 #  Formats recognised when creating new datasets.
 export NDF_FORMATS_OUT=\
-'.,FITS(.fit),,FITS(.fits),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
+'.,FITS(.fit),FITS(.fits),FIGARO(.dst),IRAF(.imh),STREAM(.das),UNFORMATTED(.unf)'
 
 export NDF_FORMATS_OUT=\
 $NDF_FORMATS_OUT',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
@@ -191,10 +197,13 @@ $NDF_FORMATS_OUT',UNF0(.dat),ASCII(.asc),TEXT(.txt),GIF(.gif),TIFF(.tif)'
 export NDF_FORMATS_OUT=\
 $NDF_FORMATS_OUT',GASP(.hdr),COMPRESSED(.sdf.Z),GZIP(.sdf.gz)'
 
-#  Define format conversion commands.
-#  =================================
+export NDF_FORMATS_OUT=\
+$NDF_FORMATS_OUT',FITSGZ(.fts.gz),FITSGZ(.fits.gz)'
 
-#  FITS conversions.
+#  Define format conversion commands.
+#  ==================================
+
+#  FITS conversions
 #  ----------------
 #  Because NDF2FITS uses HDS_WILD which will only accept container files 
 #  as input, NDF_TEMP_FITS must specify an alternative to the default
@@ -213,7 +222,7 @@ export NDF_TO_FITS=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  FIGARO conversions.
+#  FIGARO conversions
 #  ------------------
 export NDF_FROM_FIGARO=\
 '$CONVERT_DIR/convertndf from \
@@ -223,7 +232,7 @@ export NDF_TO_FIGARO=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  IRAF conversions:
+#  IRAF conversions
 #  ----------------
 export NDF_FROM_IRAF=\
 '$CONVERT_DIR/convertndf from \
@@ -238,7 +247,7 @@ export NDF_TO_IRAF=\
 export NDF_DEL_IRAF=\
 'f='\'^dir^name\'';touch "$f.imh" "$f.pix";rm "$f.imh" "$f.pix"'
 
-#  GASP conversions:
+#  GASP conversions
 #  ----------------
 export NDF_FROM_GASP=\
 '$CONVERT_DIR/convertndf from \
@@ -253,7 +262,7 @@ export NDF_TO_GASP=\
 export NDF_DEL_GASP=\
 'f='\'^dir^name\'';touch "$f.hdr" "$f.dat";rm "$f.hdr" "$f.dat"'
 
-#  UNFORMATTED conversions (with FITS headers).
+#  UNFORMATTED conversions (with FITS headers)
 #  -------------------------------------------
 export NDF_FROM_UNFORMATTED=\
 '$CONVERT_DIR/convertndf from \
@@ -263,7 +272,7 @@ export NDF_TO_UNFORMATTED=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  UNF0 conversions (no FITS headers).
+#  UNF0 conversions (no FITS headers)
 #  ----------------------------------
 export NDF_FROM_UNF0=\
 '$CONVERT_DIR/convertndf from \
@@ -283,7 +292,7 @@ export NDF_TO_STREAM=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  ASCII conversions (with FITS headers).
+#  ASCII conversions (with FITS headers)
 #  -------------------------------------
 export NDF_FROM_ASCII=\
 '$CONVERT_DIR/convertndf from \
@@ -293,7 +302,7 @@ export NDF_TO_ASCII=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  TEXT conversions (like ASCII but without FITS headers).
+#  TEXT conversions (like ASCII but without FITS headers)
 #  ------------------------------------------------------
 export NDF_FROM_TEXT=\
 '$CONVERT_DIR/convertndf from \
@@ -303,8 +312,8 @@ export NDF_TO_TEXT=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  GIF conversions.
-#  ----------------
+#  GIF conversions
+#  ---------------
 export NDF_FROM_GIF=\
 '$CONVERT_DIR/convertndf from \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
@@ -313,8 +322,8 @@ export NDF_TO_GIF=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  TIFF conversions.
-#  -----------------
+#  TIFF conversions
+#  ----------------
 export NDF_FROM_TIFF=\
 '$CONVERT_DIR/convertndf from \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
@@ -323,7 +332,7 @@ export NDF_TO_TIFF=\
 '$CONVERT_DIR/convertndf to \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
-#  COMPRESSED conversions.
+#  COMPRESSED conversions
 #  ----------------------
 #  N.B. These commands sometimes return an error status to the calling
 #  process, even when they appear to have worked OK. It's not clear why.
@@ -341,8 +350,8 @@ else
    export NDF_TEMP_COMPRESSED='temp_Z_^name'
 fi
  
-#  GZIP compression conversions.
-#  -----------------------------
+#  GZIP compression conversions
+#  ----------------------------
 export NDF_FROM_GZIP=\
 '$CONVERT_DIR/convertndf from \
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
@@ -352,18 +361,34 @@ export NDF_TO_GZIP=\
 '\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
 
 if test -z $HDS_SCRATCH; then
-   export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_Z_^name"
+   export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_gz_^name"
 else
-   export NDF_TEMP_GZIP='temp_Z_^name'
+   export NDF_TEMP_GZIP='temp_gz_^name'
 fi
- 
+
+#  FITSGZ FITS compression conversions
+#  -----------------------------------
+export NDF_FROM_FITSGZ=\
+'$CONVERT_DIR/convertndf from \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+export NDF_TO_FITSGZ=\
+'$CONVERT_DIR/convertndf to \
+'\'^fmt\'' '\'^dir\'' '\'^name\'' '\'^type\'' '\'^fxs\'' '\'^ndf\'
+
+if test -z $HDS_SCRATCH; then
+   export NDF_TEMP_GZIP="$HDS_SCRATCH/temp_fgz_^name"
+else
+   export NDF_TEMP_GZIP='temp_fgz_^name'
+fi
+
 #  DEBUG
 #  -----
 #  Switch off display all conversion operations for debugging.
 export NDF_SHCVT=0
 
-#  Set up IDL_PATH and IDL_DLM_PATH if IDL is activated
-#  ----------------------------------------------------
+#  Set up IDL_PATH and IDL_DLM_PATH if IDL is activated.
+#  -----------------------------------------------------
 if test -z $IDL_PATH; then
    export IDL_PATH=${IDL_PATH}:$CONVERT_DIR
    if test -z $IDL_DLM_PATH ; then
