@@ -69,8 +69,11 @@
 #     1997 August 4 (MJC):
 #        Added proexts=t to NDF2FITS command.
 #     2000 July 7 (AJC):
-#        Added fxs argument to handle FITS extensions
-#        Use null if $6 is "^<fxs>" - permits to work with old NDF
+#        Added fxs argument to handle FITS extensions.
+#        Use null if $6 is "^<fxs>" - permits to work with old NDF.
+#     2006 February 17 (MJC):
+#        Added FITSGZ.  Corrected a couple of error messages and fixed
+#        bugs where the wrongly named err log files were used.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -88,7 +91,7 @@ unset ICL_TASK_NAME
 case $2 in
 
 FITS)
-#  FITS conversions.
+#  FITS conversions
 #  ----------------
    case $1 in
    from)
@@ -112,7 +115,7 @@ FITS)
    ;;
 
 FIGARO)
-#  FIGARO conversions.
+#  FIGARO conversions
 #  ------------------
    case $1 in
    from)
@@ -133,7 +136,7 @@ FIGARO)
    ;;
 
 IRAF)
-#  IRAF conversions:
+#  IRAF conversions
 #  ----------------
    case $1 in
    from)
@@ -154,7 +157,7 @@ IRAF)
    ;;
 
 GASP)
-#  GASP conversions:
+#  GASP conversions
 #  ----------------
    case $1 in
    from)
@@ -175,7 +178,7 @@ GASP)
    ;;
 
 UNFORMATTED)
-#  UNFORMATTED conversions (with FITS headers). 
+#  UNFORMATTED conversions (with FITS headers)
 #  ------------------------------------------- 
    case $1 in
    from)
@@ -197,7 +200,7 @@ UNFORMATTED)
    ;;
 
 UNF0) 
-#  UNF0 conversions (no FITS headers). 
+#  UNF0 conversions (no FITS headers)
 #  ---------------------------------- 
    case $1 in
    from)
@@ -229,7 +232,7 @@ UNF0)
    ;;
 
 ASCII) 
-#  ASCII conversions (with FITS headers). 
+#  ASCII conversions (with FITS headers)
 #  ------------------------------------- 
    case $1 in
    from)
@@ -251,7 +254,7 @@ ASCII)
    ;;
 
 TEXT) 
-#  TEXT conversions (like ASCII but without FITS headers). 
+#  TEXT conversions (like ASCII but without FITS headers)
 #  ------------------------------------------------------ 
    case $1 in
    from)
@@ -281,10 +284,10 @@ TEXT)
       ;; 
    esac
    ;;
-      
+  
 GIF)
-#  GIF conversions.
-#  -----------------
+#  GIF conversions
+#  ---------------
    case $1 in
    from)
       appl=GIF2NDF
@@ -304,8 +307,8 @@ GIF)
    ;;
 
 STREAM)
-#  STREAM (direct-access) conversions. 
-#  ----------------------------------- 
+#  STREAM (direct-access) conversions
+#  ---------------------------------- 
    case $1 in
    from)
       appl=DA2NDF
@@ -337,8 +340,8 @@ STREAM)
 
       
 TIFF)
-#  TIFF conversions.
-#  -----------------
+#  TIFF conversions
+#  ----------------
    case $1 in
    from)
       appl=TIFF2NDF
@@ -358,7 +361,7 @@ TIFF)
    ;;
 
 COMPRESSED) 
-#  COMPRESSED conversions. 
+#  COMPRESSED conversions 
 #  ---------------------- 
 #  N.B. These commands sometimes return an error status to the calling 
 #  process, even when they appear to have worked OK.  It's not clear why. 
@@ -367,7 +370,7 @@ COMPRESSED)
       appl=uncompress
       uncompress -c -f $3$4$5 >$7.sdf 2>Z_err_$4.lis || \
        (echo ""
-        echo "!! ** Error converting NDF from $2 format using $appl"
+        echo "!! ** Error converting to NDF from $2 format using $appl"
         sed 's/^/!  /' Z_err_$4.lis
         echo "!  ** Returning to main application"
         echo ""
@@ -380,28 +383,7 @@ COMPRESSED)
       appl=compress
       compress -c -f $7.sdf >$3$4$5 || \
        (echo ""
-        echo "!! ** Error converting NDF from $2 format using $appl"
-        sed 's/^/!  /' Z_err_$4.lis
-        echo "!  ** Returning to main application"
-        echo ""
-        rm -f Z_err_reports.lis $7.sdf
-        exit 1
-       )
-      rm -f Z_err_reports.lis
-
-      ;;
-   esac
-   ;;
-
-GZIP) 
-#  GZIP'ed conversions. 
-#  -------------------- 
-   case $1 in
-   from)
-      appl=gunzip
-      gunzip -c -f $3$4$5 >$7.sdf 2>Z_err_$4.lis || \
-       (echo ""
-        echo "!! ** Error converting NDF from $2 format using $appl"
+        echo "!! ** Error converting NDF to $2 format using $appl"
         sed 's/^/!  /' Z_err_$4.lis
         echo "!  ** Returning to main application"
         echo ""
@@ -409,21 +391,95 @@ GZIP)
         exit 1
        )
       rm -f Z_err_$4.lis
+
+      ;;
+   esac
+   ;;
+
+GZIP) 
+#  GZIP'ed conversions
+#  -------------------
+   case $1 in
+   from)
+      appl=gunzip
+      gunzip -c -f $3$4$5 >$7.sdf 2>gz_err_$4.lis || \
+       (echo ""
+        echo "!! ** Error converting from $2 format to NDF using $appl"
+        sed 's/^/!  /' gz_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f gz_err_$4.lis $7.sdf
+        exit 1
+       )
+      rm -f gz_err_$4.lis
       ;;
    to)
       appl=gzip
       gzip -c -f $7.sdf >$3$4$5 || \
        (echo ""
-        echo "!! ** Error converting NDF from $2 format using $appl"
-        sed 's/^/!  /' Z_err_$4.lis
+        echo "!! ** Error converting NDF to $2 format using $appl"
+        sed 's/^/!  /' gz_err_$4.lis
         echo "!  ** Returning to main application"
         echo ""
-        rm -f Z_err_reports.lis $7.sdf
+        rm -f gz_err_$4.lis $7.sdf
         exit 1
        )
-      rm -f Z_err_reports.lis
+      rm -f gz_err_$4.lis
 
       ;;
    esac
    ;;
+
+FITSGZ)
+#  GZIP'ed FITS conversions
+#  ------------------------
+   case $1 in
+   from)
+      appl=gunzip
+      gunzip -c -f $3$4$5 >$7.fits 2>fgz_err_$4.lis || \
+       (echo ""
+        echo "!! ** Error converting $2 format to FITS file using $appl"
+        sed 's/^/!  /' fgz_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f fgz_err_$4.lis $7.fits
+        exit 1
+       )
+      rm -f fgz_err_$4.lis
+
+      fxs=`echo $6 | sed 's/\^<fxs>//'`
+      appl2=FITS2NDF
+      $CONVERT_DIR/fits2ndf in=\'$7.fits$fxs\' out=$7 fmtcnv=T \
+      $NDF_FROM_FITS_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl and $appl2"
+      rm -f $7.fits
+      ;;
+   to)
+      rm -f $3$4.fits
+      appl=NDF2FITS
+      $CONVERT_DIR/ndf2fits in=$7 out=$7.fits bitpix=-1 proexts=t \
+      $NDF_TO_FITS_PARS \
+      </dev/null 2>&1 | \
+      sed 's/^\!\!/\! /' | \
+      awk -f $CONVERT_DIR/convertawk fmt="from NDF to $2 using $appl and $appl2"
+
+      appl2=gzip
+      gzip -c -f $7.fits >$3$4$5 || \
+       (echo ""
+        echo "!! ** Error converting FITS file to $2 format using $appl2"
+        sed 's/^/!  /' fgz_err_$4.lis
+        echo "!  ** Returning to main application"
+        echo ""
+        rm -f fgz_err_$4.lis $7.fits
+        exit 1
+       )
+      rm -f fgz_err_$4.lis $7.fits
+
+      ;;
+   esac
+   ;;
+
 esac
+
