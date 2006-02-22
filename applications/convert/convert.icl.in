@@ -48,10 +48,14 @@
 {     1998 January 13 (AJC):
 {        Added AST2NDF and SPECX2NDF
 {     1999 September 30 (AJC):
-{        CONVERT now monolithic
+{        CONVERT now monolithic.
 {     2000 July 18 (AJC):
-{        Add ^fxs to convertndf calss
-{        Added FITS synonyms to NDF_FORMATS_IN
+{        Add ^fxs to convertndf class.
+{        Added FITS synonyms to NDF_FORMATS_IN.
+{     2006 February 17 (MJC):
+{        Add FITS(.fits) to NDF_FORMATS_OUT.  Add FITSGZ with three
+{        allowed file extensions.  Use distinct name for GZIP temporary 
+{        file.  Replace pwd directories with tokens.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -65,9 +69,9 @@ hidden proc check_setup
 if getenv("CONVERT_DIR") = ""
    print "You have not define the environment variable CONVERT_DIR."
    print "You should do this by sourcing the Starlink initialisation scripts:"
-   print "   /loc/pwdc/pdraper/starlink_cvs/build/etc/login"
+   print "   @STARLINK@/etc/login"
    print "and"
-   print "   /loc/pwdc/pdraper/starlink_cvs/build/etc/cshrc"
+   print "   @STARLINK@/etc/cshrc"
    signal ADAMERR "No CONVERT_DIR"
 endif
 endproc
@@ -213,11 +217,16 @@ FITS(.mxhi),~
 FITS(.rilo),~
 FITS(.rihi),~
 FITS(.vdlo),~
-FITS(.vdhi)')
+FITS(.vdhi),' ~
+& ~
+'FITSGZ(.fit.gz),~
+FITSGZ(.fits.gz),~
+FITSGZ(.fts.gz)')
 
 {  Formats recognised when creating new datasets.
 setenv NDF_FORMATS_OUT ~
 '.,FITS(.fit),~
+FITS(.fits),~
 FIGARO(.dst),~
 IRAF(.imh),~
 STREAM(.das),~
@@ -229,7 +238,9 @@ GIF(.gif),~
 TIFF(.tif),~
 GASP(.hdr),~
 COMPRESSED(.sdf.Z),~
-GZIP(.sdf.gz)'
+GZIP(.sdf.gz),~
+FITSGZ(.fts.gz),~
+FITSGZ(.fits.gz)'
 
 {  Define format-conversion commands.
 {  ==================================
@@ -319,8 +330,8 @@ setenv NDF_TO_UNF0 ~
 '$CONVERT_DIR/convertndf to ~
 ''^fmt'' ''^dir'' ''^name'' ''^type'' ''^fxs'' ''^ndf'''
 
-{  STREAM (direct-access) conversions
-{  ----------------------------------
+{  STREAM (direct-access) conversions:
+{  -----------------------------------
 setenv NDF_FROM_STREAM ~
 '$CONVERT_DIR/convertndf from ~
 ''^fmt'' ''^dir'' ''^name'' ''^type'' ''^fxs'' ''^ndf'''
@@ -405,12 +416,31 @@ setenv NDF_TO_GZIP ~
 
 hidden proc converttemp3
 if getenv("HDS_SCRATCH") <> ""
-   setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_Z_^name"
+   setenv NDF_TEMP_GZIP "$HDS_SCRATCH/temp_gz_^name"
 else
-   setenv NDF_TEMP_GZIP 'temp_Z_^name'
+   setenv NDF_TEMP_GZIP 'temp_gz_^name'
 endif
 endproc
 converttemp3
+
+{  FITSGZ FITS compression conversions:
+{  ------------------------------------
+setenv NDF_FROM_FITSGZ ~
+'$CONVERT_DIR/convertndf from ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^fxs'' ''^ndf'''
+
+setenv NDF_TO_FITSGZ ~
+'$CONVERT_DIR/convertndf to ~
+''^fmt'' ''^dir'' ''^name'' ''^type'' ''^fxs'' ''^ndf'''
+
+hidden proc converttemp4
+if getenv("HDS_SCRATCH") <> ""
+   setenv NDF_TEMP_FITSGZ "$HDS_SCRATCH/temp_fgz_^name"
+else
+   setenv NDF_TEMP_FITSGZ 'temp_fgz_^name'
+endif
+endproc
+converttemp4
 
 {  DEBUG
 {  -----
