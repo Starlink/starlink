@@ -41,6 +41,8 @@
 *        Added astAppendPoints.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     22-FEB-2006 (DSB):
+*        Avoid allocating memory for "acc" unless needed.
 */
 
 /* Module Macros. */
@@ -118,7 +120,7 @@ static void Clear##attr( AstPointSet *this, int axis ) { \
                 axis + 1, this->ncoord ); \
 \
 /* Assign the "clear" value. */ \
-   } else { \
+   } else if( this->component ){ \
       this->component[ axis ] = (assign); \
    } \
 } \
@@ -244,7 +246,7 @@ type astGet##attr##_( AstPointSet *this, int axis ) { \
 
 *  Synopsis:
 *     #include "pointset.h"
-*     MAKE_SET(attr,type,component,assign)
+*     MAKE_SET(attr,type,component,assign,null)
 
 *  Class Membership:
 *     Defined by the PointSet class.
@@ -275,6 +277,8 @@ type astGet##attr##_( AstPointSet *this, int axis ) { \
 *      assign
 *         An expression that evaluates to the value to be assigned to the
 *         component.
+*      null
+*         The value to initialise newly created array elements to.
 
 *  Notes:
 *     -  To avoid problems with some compilers, you should not leave any white
@@ -283,11 +287,12 @@ type astGet##attr##_( AstPointSet *this, int axis ) { \
 */
 
 /* Define the macro. */
-#define MAKE_SET(attr,type,component,assign) \
+#define MAKE_SET(attr,type,component,assign,null) \
 \
 /* Private member function. */ \
 /* ------------------------ */ \
 static void Set##attr( AstPointSet *this, int axis, type value ) { \
+   int i; \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -301,6 +306,12 @@ static void Set##attr( AstPointSet *this, int axis, type value ) { \
 \
 /* Store the new value in the structure component. */ \
    } else { \
+      if( !this->component ){ \
+         this->component = astMalloc( this->ncoord*sizeof( type ) ); \
+         for( i = 0; i < this->ncoord; i++ ) { \
+            this->component[ i ] = null; \
+         } \
+      } \
       this->component[ axis ] = (assign); \
    } \
 } \
@@ -565,7 +576,9 @@ static AstPointSet *AppendPoints( AstPointSet *this, AstPointSet *that ) {
          }
 
 /* Copy any axis accuracies from "this". */
-         result->acc = astStore( NULL, this->acc, sizeof( double )*(size_t) ncoord );
+         result->acc = this->acc ? 
+                  astStore( NULL, this->acc, sizeof( double )*(size_t) ncoord )
+                  : NULL;
       }
    }
 
@@ -1952,9 +1965,9 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 *att-
 */
 MAKE_CLEAR(PointAccuracy,acc,AST__BAD)
-MAKE_GET(PointAccuracy,double,AST__BAD,this->acc[axis])
-MAKE_SET(PointAccuracy,double,acc,((value!=AST__BAD)?fabs(value):AST__BAD))
-MAKE_TEST(PointAccuracy,(this->acc[axis]!=AST__BAD))
+MAKE_GET(PointAccuracy,double,AST__BAD,this->acc?this->acc[axis]:AST__BAD)
+MAKE_SET(PointAccuracy,double,acc,((value!=AST__BAD)?fabs(value):AST__BAD),AST__BAD)
+MAKE_TEST(PointAccuracy,(this->acc?this->acc[axis]!=AST__BAD:0))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -2006,9 +2019,12 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    the output PointSet. */
    out->ptr = NULL;
    out->values = NULL;
+   out->acc = NULL;
  
 /* Copy axis accuracies. */
-   out->acc = astStore( NULL, in->acc, sizeof( double )*(size_t) in->ncoord );
+   if( in->acc ){
+      out->acc = astStore( NULL, in->acc, sizeof( double )*(size_t) in->ncoord );
+   }
 
 /* If the input PointSet is associated with coordinate values, we must
    allocate memory in the output PointSet to hold a copy of them. */
@@ -2459,7 +2475,6 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstPointSet *new;             /* Pointer to new PointSet */
-   int i;                        /* Axis index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -2497,10 +2512,7 @@ AstPointSet *astInitPointSet_( void *mem, size_t size, int init,
    values array. */
       new->ptr = NULL;
       new->values = NULL;
-      new->acc = astMalloc( sizeof( double )*(size_t) ncoord );
-      if( astOK ) {
-         for( i = 0; i < ncoord; i++ ) (new->acc)[ i ] = AST__BAD;
-      }
+      new->acc = NULL;
 
 /* If an error occurred, clean up by deleting the new object. */
       if ( !astOK ) new = astDelete( new );
@@ -2587,6 +2599,7 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 /* Local Variables: */
    AstPointSet *new;             /* Pointer to the new PointSet */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
+   double acc;                   /* Accuracy value */
    int coord;                    /* Loop counter for coordinates */
    int empty;                    /* PointSet empty? */
    int i;                        /* Counter for coordinate values */
@@ -2652,12 +2665,17 @@ AstPointSet *astLoadPointSet_( void *mem, size_t size,
 
 /* Axis Acuracies. */
 /* --------------- */
-      new->acc = astMalloc( sizeof( double )*(size_t) new->ncoord );
-      if( astOK ) {
-         for ( coord = 0; coord < new->ncoord; coord++ ) {
-            (void) sprintf( key, "acc%d", coord + 1 );
-            new->acc[ coord ] = astReadDouble( channel, key, AST__BAD );
+      new->acc = NULL;
+      for ( coord = 0; coord < new->ncoord; coord++ ) {
+         (void) sprintf( key, "acc%d", coord + 1 );
+         acc = astReadDouble( channel, key, AST__BAD );
+         if( !new->acc && acc != AST__BAD ) {
+            new->acc = astMalloc( sizeof( double )*(size_t) new->ncoord );
+            if( new->acc ) {
+               for( i = 0; i < coord - 1; i++ ) new->acc[ i ] = AST__BAD;
+            }
          }
+         if( new->acc ) new->acc[ coord ] = acc;
       }
 
 /* Coordinate data. */
