@@ -73,7 +73,8 @@
 #        Use null if $6 is "^<fxs>" - permits to work with old NDF.
 #     2006 February 17 (MJC):
 #        Added FITSGZ.  Corrected a couple of error messages and fixed
-#        bugs where the wrongly named err log files were used.
+#        bugs where the wrongly named err log files were used.  Made
+#        the log file names for GZIP different from COMPRESS.
 #     {enter_further_changes_here}
 #
 #  Bugs:
