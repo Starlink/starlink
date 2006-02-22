@@ -53,6 +53,8 @@
 *        of pointers in DEBUG code within astRealloc.
 *     16-FEB-2006 (DSB):
 *        Convert Magic from a function to a macro for extra speed.
+*     21-FEB-2006 (DSB):
+*        Convert IsDynamic from a function to a macro for extra speed.
 */
 
 /* Module Macros. */
@@ -72,7 +74,94 @@
 
 /*
 *  Name:
-*     Magic
+*     IS_DYNAMIC
+
+*  Purpose:
+*     Test whether a memory region has been dynamically allocated.
+
+*  Type:
+*     Private macro
+
+*  Synopsis:
+*     #include "memory.h"
+*     IS_DYNAMIC( ptr, dynamic )
+
+*  Description:
+*     This macro takes a pointer to a region of memory and tests if
+*     the memory has previously been dynamically allocated using other
+*     functions from this module. It does this by checking for the
+*     presence of a "magic" number in the header which precedes the
+*     allocated memory. If the magic number is not present (or the
+*     pointer is invalid for any other reason), an error is reported
+*     and the global error status is set.
+*
+*     The result of the test is written to the variable specified by "res".
+
+*  Parameters:
+*     ptr
+*        Pointer to the start (as known to the external user) of the
+*        dynamically allocated memory.
+*     dynamic
+*        Name of an "int" variable to recieve the result of the test.
+*        If the memory was allocated dynamically, a value of 1 is
+*        stored in this variable.  Otherwise, zero is stored and an error 
+*        results.
+
+*  Notes:
+*     - A NULL pointer value produces an error report from this
+*     function, although other functions may wish to regard a NULL
+*     pointer as valid.
+*     - This function attempts to execute even if the global error
+*     status is set, although no further error report will be made if
+*     the memory is not dynamically allocated under these
+*     circumstances.
+*     - The test performed by this function is not 100% secure as the
+*     "magic" value could occur by accident (although this is
+*     unlikely). It is mainly intended to provide security against
+*     programming errors, including accidental corruption of the
+*     memory header and attempts to allocate the same region of memory
+*     more than once.
+*/
+
+#define IS_DYNAMIC(ptr,dynamic) \
+\
+/* Initialise. */ \
+   dynamic = 0; \
+\
+/* Check that a NULL pointer has not been supplied and report an error \
+   if it has (but not if the global status is already set). */ \
+   if ( !ptr ) { \
+      if ( astOK ) { \
+         astError( AST__PTRIN, "Invalid NULL pointer (address %p).", ptr ); \
+      } \
+\
+/* If OK, derive a pointer to the memory header that precedes the \
+   allocated region of memory. */ \
+   } else { \
+      Memory *isdynmem;                /* Pointer to memory header */ \
+      isdynmem = ( (Memory *) ptr ) - 1; \
+\
+/* Check if the "magic number" in the header is valid and report an \
+   error if it is not (but not if the global status is already \
+   set). */ \
+      if ( isdynmem->magic != MAGIC( isdynmem, isdynmem->size ) ) { \
+         if ( astOK ) { \
+            astError( AST__PTRIN, \
+                      "Invalid pointer or corrupted memory at address %p.", \
+                      ptr ); \
+         } \
+\
+/* Note if the magic number is OK. */ \
+      } else { \
+         dynamic = 1; \
+      } \
+   } 
+
+
+
+/*
+*  Name:
+*     MAGIC
 
 *  Purpose:
 *     Generate a "magic number".
@@ -82,7 +171,7 @@
 
 *  Synopsis:
 *     #include "memory.h"
-*     unsigned long Magic( void *ptr, size_t size )
+*     unsigned long MAGIC( void *ptr, size_t size )
 
 *  Description:
 *     This macro generates a "magic number" which is a function of
@@ -107,7 +196,7 @@
 /* Form the bit-wise exclusive OR between the memory address and the
    object size, then add 1 and invert the bits. Return the result as
    an unsigned long integer. */
-#define Magic(ptr,size) \
+#define MAGIC(ptr,size) \
    ( ~( ( ( (unsigned long) ptr ) ^ ( (unsigned long) size ) ) + \
              ( (unsigned long) 1 ) ) )
 
@@ -542,11 +631,17 @@ void *astFree_( void *ptr ) {
 
 /* Local Variables: */
    Memory *mem;                  /* Pointer to memory header */
+   int isdynamic;                /* Is the memory dynamically allocated? */
 
 /* If the incoming pointer is NULL, do nothing. Otherwise, check if it
    points at dynamically allocated memory (IsDynamic sets the global
    error status if it does not). */
-   if ( ptr && IsDynamic( ptr ) ) {
+   if( ptr ) {
+      IS_DYNAMIC( ptr, isdynamic );
+   } else {
+      isdynamic = 0;
+   }
+   if ( isdynamic ) {
 
 /* If OK, obtain a pointer to the memory header and clear the "magic
    number" and size values it contains. This helps prevent accidental
@@ -625,6 +720,7 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 */
 
 /* Local Variables: */
+   int isdynamic;                /* Is the memory dynamically allocated? */
    Memory *mem;                  /* Pointer to memory header */
    size_t newsize;               /* New size to allocate */
    void *new;                    /* Result pointer */
@@ -645,20 +741,23 @@ void *astGrow_( void *ptr, int n, size_t size ) {
 
 /* Otherwise, check that the incoming pointer identifies previously
    allocated memory. */
-   } else if ( IsDynamic( ptr ) ) {
+   } else {
+      IS_DYNAMIC( ptr, isdynamic );
+      if ( isdynamic ) {
 
 /* Obtain a pointer to the memory header and check if the new size
    exceeds that already allocated. */
-      mem = ( (Memory *) ptr ) - 1;
-      if ( mem->size < size ) {
+         mem = ( (Memory *) ptr ) - 1;
+         if ( mem->size < size ) {
 
 /* If so, calculate a possible new size by doubling the old
    size. Increase this further if necessary. */
-         newsize = mem->size * ( (size_t) 2 );
-         if ( size > newsize ) newsize = size;
+            newsize = mem->size * ( (size_t) 2 );
+            if ( size > newsize ) newsize = size;
 
 /* Re-allocate the memory. */
-         new = astRealloc( ptr, newsize );
+            new = astRealloc( ptr, newsize );
+         }
       }
    }
 
@@ -737,7 +836,7 @@ static int IsDynamic( const void *ptr ) {
 /* Check if the "magic number" in the header is valid and report an
    error if it is not (but not if the global status is already
    set). */
-      if ( mem->magic != Magic( mem, mem->size ) ) {
+      if ( mem->magic != MAGIC( mem, mem->size ) ) {
          if ( astOK ) {
             astError( AST__PTRIN,
                       "Invalid pointer or corrupted memory at address %p.",
@@ -828,7 +927,7 @@ void *astMalloc_( size_t size ) {
 /* If successful, set the "magic number" in the header and also store
    the size. */
       } else {
-         mem->magic = Magic( mem, size );
+         mem->magic = MAGIC( mem, size );
          mem->size = size;
 
 #ifdef DEBUG
@@ -904,6 +1003,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 */
 
 /* Local Variables: */
+   int isdynamic;                /* Was memory allocated dynamically? */
    void *result;                 /* Returned pointer */
    Memory *mem;                  /* Pointer to memory header */
 
@@ -921,50 +1021,53 @@ void *astRealloc_( void *ptr, size_t size ) {
 /* Otherwise, check that the pointer supplied points at memory
    allocated by a function in this module (IsDynamic sets the global
    error status if it does not). */
-   } else if ( IsDynamic( ptr ) ) {
+   } else {
+      IS_DYNAMIC( ptr, isdynamic );
+      if ( isdynamic ) {
 
 /* Check that a negative size has not been given and report an error
    if necessary. */
-      if ( size < (size_t) 0 ) {
-         astError( AST__MEMIN,
-            "Invalid attempt to reallocate a block of memory to %ld bytes.",
-                   (long) size );
+         if ( size < (size_t) 0 ) {
+            astError( AST__MEMIN,
+               "Invalid attempt to reallocate a block of memory to %ld bytes.",
+                      (long) size );
 
 /* If OK, obtain a pointer to the memory header. */
-      } else {
-         mem = ( (Memory *) ptr ) - 1;
+         } else {
+            mem = ( (Memory *) ptr ) - 1;
 
 /* If the new size is zero, free the old memory and set a NULL return
    pointer value. */
-         if ( size == (size_t) 0 ) {
-            astFree( ptr );
-            result = NULL;
+            if ( size == (size_t) 0 ) {
+               astFree( ptr );
+               result = NULL;
 
 /* Otherwise, reallocate the memory. */
-         } else {
+            } else {
 
 #ifdef DEBUG
             DeIssue( mem );
 #endif
-            mem = realloc( mem, sizeof( Memory ) + size );
+               mem = realloc( mem, sizeof( Memory ) + size );
 
 /* If this failed, report an error and return the original pointer
    value. */
-            if ( !mem ) {
-               astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
-               astError( AST__NOMEM, "Failed to reallocate a block of "
-                         "memory to %ld bytes.", (long) size );
-
+               if ( !mem ) {
+                  astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
+                  astError( AST__NOMEM, "Failed to reallocate a block of "
+                            "memory to %ld bytes.", (long) size );
+   
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
    be used by the caller. */
-            } else {
-               mem->magic = Magic( mem, size );
-               mem->size = size;
+               } else {
+                  mem->magic = MAGIC( mem, size );
+                  mem->size = size;
 #ifdef DEBUG
                Issue( mem );
 #endif
-               result = mem + 1;
+                  result = mem + 1;
+               }
             }
          }
       }
@@ -1014,6 +1117,7 @@ size_t astSizeOf_( const void *ptr ) {
 */
 
 /* Local Variables: */
+   int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
 /* Check the global error status. */
@@ -1024,8 +1128,9 @@ size_t astSizeOf_( const void *ptr ) {
 
 /* Check if a non-NULL valid pointer has been given. If so, extract
    the memory size from the header which precedes it. */
-   if ( ptr && IsDynamic( ptr ) ) {
-      size = ( ( (Memory *) ptr ) - 1 )->size;
+   if ( ptr ){
+      IS_DYNAMIC( ptr, isdynamic );
+      if( isdynamic ) size = ( ( (Memory *) ptr ) - 1 )->size;
    }
 
 /* Return the result. */
@@ -1073,6 +1178,7 @@ size_t astTSizeOf_( const void *ptr ) {
 */
 
 /* Local Variables: */
+   int isdynamic;                /* Was the memory allocated dynamically? */
    size_t size;                  /* Memory size */
 
 /* Check the global error status. */
@@ -1083,8 +1189,9 @@ size_t astTSizeOf_( const void *ptr ) {
 
 /* Check if a non-NULL valid pointer has been given. If so, extract
    the memory size from the header which precedes it. */
-   if ( ptr && IsDynamic( ptr ) ) {
-      size = sizeof( Memory ) + ( ( (Memory *) ptr ) - 1 )->size;
+   if ( ptr ){
+      IS_DYNAMIC( ptr, isdynamic );
+      if( isdynamic ) size = sizeof( Memory ) + ( ( (Memory *) ptr ) - 1 )->size;
    }
 
 /* Return the result. */
@@ -1150,6 +1257,7 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
 */
 
 /* Local Variables: */
+   int valid;                    /* Is the memory pointer usable? */
    void *new;                    /* Pointer to returned memory */
 
 /* Check the global error status. */
@@ -1167,13 +1275,19 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
 /* In other cases, we do not want to preserve any memory
    contents. Check if the incoming memory pointer is valid (IsDynamic
    sets the global error status if it is not). */
-   } else if ( !ptr || ( IsDynamic( ptr ) ) ) {
+   } else {
+      if ( !ptr ){
+         valid = 1;
+      } else {
+         IS_DYNAMIC( ptr, valid );
+      }
+      if( valid ) {
 
 /* Allocate the new memory. If successful, free the old memory (if
    necessary) and copy the data into it. */
-      new = astMalloc( size );
-      if ( astOK ) {
-         if ( ptr ) ptr = astFree( ptr );
+         new = astMalloc( size );
+         if ( astOK ) {
+            if ( ptr ) ptr = astFree( ptr );
 
 #ifdef AST_DYNREAD_CHECK
 
@@ -1194,12 +1308,13 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
    }
 #endif
 
-         (void) memcpy( new, data, size );
+            (void) memcpy( new, data, size );
 
 /* If memory allocation failed, do not free the old memory but return
    a pointer to it. */
-      } else {
-         new = ptr;
+         } else {
+            new = ptr;
+         }
       }
    }
 
