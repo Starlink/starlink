@@ -76,6 +76,8 @@
 *        Simplified prologue.
 *     2-DEC-2004 (DSB):
 *        Added System "J2000"
+*     22-FEB-2006 (DSB):
+*        Added Local Apparent Sidereal Time to the SkyFrame structure.
 *-
 */
 
@@ -127,6 +129,8 @@ typedef struct AstSkyFrame {
    int skyrefis;                 /* Nature of offset coord system */
    double skyref[ 2 ];           /* Origin or pole of offset coord system */
    double skyrefp[ 2 ];          /* Point on primary meridian of offset coord system */
+   double last;                  /* Local Apparent Sidereal Time */
+   double eplast;                /* Epoch used to calculate "last" */
 } AstSkyFrame;
 
 /* Virtual function table. */
