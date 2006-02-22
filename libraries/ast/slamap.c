@@ -80,6 +80,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Added H2E and E2H conversion functions.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     22-FEB-2006 (DSB):
+*        Cache results returned by slaMappa in order to increase speed.
 *class--
 */
 
@@ -178,6 +180,12 @@ static int class_init = 0;       /* Virtual function table initialised? */
 static int (* parent_getobjsize)( AstObject * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 
+/* A cache used to store the most recent results from slaMappa in order
+   to avoid continuously recalculating the same values. */
+static double eq_cache = AST__BAD;
+static double ep_cache = AST__BAD;
+static double amprms_cache[ 21 ];
+
 /* External Interface Function Prototypes. */
 /* ======================================= */
 /* The following functions have public prototypes only (i.e. no
@@ -264,9 +272,11 @@ static int GetObjSize( AstObject *this_object ) {
    result = (*parent_getobjsize)( this_object );
    for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
       result += astTSizeOf( this->cvtargs[ cvt ] );
+      result += astTSizeOf( this->cvtextra[ cvt ] );
    }
 
    result += astTSizeOf( this->cvtargs );
+   result += astTSizeOf( this->cvtextra );
    result += astTSizeOf( this->cvttype );
 
 /* If an error occurred, clear the result value. */
@@ -443,12 +453,15 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
                                        sizeof( int ) );
       this->cvtargs = (double **) astGrow( this->cvtargs, ncvt + 1,
                                            sizeof( double * ) );
+      this->cvtextra = (double **) astGrow( this->cvtextra, ncvt + 1,
+                                           sizeof( double * ) );
 
 /* If OK, allocate memory and store a copy of the argument list,
    putting a pointer to the copy into the SlaMap. */
       if ( astOK ) {
          this->cvtargs[ ncvt ] = astStore( NULL, args,
                                            sizeof( double ) * (size_t) nargs );
+         this->cvtextra[ ncvt ] = NULL;
       }
 
 /* Store the conversion type and increment the conversion count. */
@@ -2374,6 +2387,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Loop through each transformation step in the SlaMap. */
          for ( icvt = icvt1; icvt != icvt2; icvt += inc ) {
 
+/* For simplicity, free any extra information stored with the conversion 
+   step (it will be recreated as and when necessary). */
+            slamap->cvtextra[ icvt ] = astFree( slamap->cvtextra[ icvt ] );
+
 /* Store the transformation type code and use "CvtString" to determine
    the associated number of arguments. Then store these arguments. */
             cvttype[ nstep ] = slamap->cvttype[ icvt ];
@@ -3127,6 +3144,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double **ptr_out;             /* Pointer to output coordinate data */
    double *alpha;                /* Pointer to longitude array */
    double *args;                 /* Pointer to argument list for conversion */
+   double *extra;                /* Pointer to intermediate values */
    double *delta;                /* Pointer to latitude array */
    double *p[3];                 /* Pointers to arrays to be transformed */
    double *obs;                  /* Pointer to array holding observers position */
@@ -3191,6 +3209,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    pointer to the argument list for the current conversion. */
       for ( cvt = start; cvt != end; cvt += inc ) {
          args = map->cvtargs[ cvt ];
+         extra = map->cvtextra[ cvt ];
 
 /* Define a local macro as a shorthand to apply the code given as "function"
    (the macro argument) to each element of the (alpha,delta) arrays in turn.
@@ -3334,18 +3353,31 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    parameter array. Than apply this to each point in turn. */
 	    case AST__SLA_AMP:
                {
-                  double amprms[ 21 ];
-                  slaMappa( args[ 1 ], args[ 0 ], amprms );
+
+                  if( !extra ) {
+
+                     if( args[ 1 ] != eq_cache ||
+                         args[ 0 ] != ep_cache ) {
+                        eq_cache = args[ 1 ];
+                        ep_cache = args[ 0 ];
+                        slaMappa( eq_cache, ep_cache, amprms_cache );
+                     }                        
+
+                     extra = astStore( NULL, amprms_cache,
+                                       sizeof( double )*21 );
+                     map->cvtextra[ cvt ] = extra;
+                  }
+
                   if ( forward ) {
                      TRAN_ARRAY(slaAmpqk( alpha[ point ], delta[ point ],
-                                          amprms,
+                                          extra,
                                           alpha + point, delta + point );)
 
 /* The inverse uses the same parameter array but converts from mean place
    to geocentric apparent. */
                   } else {
                      TRAN_ARRAY(slaMapqkz( alpha[ point ], delta[ point ],
-                                           amprms,
+                                           extra,
                                            alpha + point, delta + point );)
 		  }
                }
@@ -3357,15 +3389,27 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transposed. */
 	    case AST__SLA_MAP:
                {
-                  double amprms[ 21 ];
-                  slaMappa( args[ 0 ], args[ 1 ], amprms );
+                  if( !extra ) {
+
+                     if( args[ 0 ] != eq_cache ||
+                         args[ 1 ] != ep_cache ) {
+                        eq_cache = args[ 0 ];
+                        ep_cache = args[ 1 ];
+                        slaMappa( eq_cache, ep_cache, amprms_cache );
+                     }                        
+
+                     extra = astStore( NULL, amprms_cache,
+                                       sizeof( double )*21 );
+                     map->cvtextra[ cvt ] = extra;
+                  }
+
                   if ( forward ) {
                      TRAN_ARRAY(slaMapqkz( alpha[ point ], delta[ point ],
-                                           amprms,
+                                           extra, 
                                            alpha + point, delta + point );)
                   } else {
                      TRAN_ARRAY(slaAmpqk( alpha[ point ], delta[ point ],
-                                          amprms,
+                                          extra, 
                                           alpha + point, delta + point );)
 		  }
                }
@@ -3772,10 +3816,14 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 /* For safety, first clear any references to the input memory from the output
    SlaMap. */
    out->cvtargs = NULL;
+   out->cvtextra = NULL;
    out->cvttype = NULL;
 
 /* Allocate memory for the output array of argument list pointers. */
    out->cvtargs = astMalloc( sizeof( double * ) * (size_t) in->ncvt );
+
+/* Allocate memory for the output array of extra (intermediate) values. */
+   out->cvtextra = astMalloc( sizeof( double * ) * (size_t) in->ncvt );
 
 /* If necessary, allocate memory and make a copy of the input array of sky
    coordinate conversion codes. */
@@ -3790,6 +3838,8 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
       for ( cvt = 0; cvt < in->ncvt; cvt++ ) {
          out->cvtargs[ cvt ] = astStore( NULL, in->cvtargs[ cvt ],
                                          astSizeOf( in->cvtargs[ cvt ] ) );
+         out->cvtextra[ cvt ] = astStore( NULL, in->cvtextra[ cvt ],
+                                         astSizeOf( in->cvtextra[ cvt ] ) );
       }
 
 /* If an error occurred while copying the argument lists, loop through the
@@ -3805,6 +3855,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 /* If an error occurred, free all other memory allocated above. */
    if ( !astOK ) {
       out->cvtargs = astFree( out->cvtargs );
+      out->cvtextra = astFree( out->cvtextra );
       out->cvttype = astFree( out->cvttype );
    }
 }
@@ -3851,11 +3902,13 @@ static void Delete( AstObject *obj ) {
    conversion. */
    for ( cvt = 0; cvt < this->ncvt; cvt++ ) {
       this->cvtargs[ cvt ] = astFree( this->cvtargs[ cvt ] );
+      this->cvtextra[ cvt ] = astFree( this->cvtextra[ cvt ] );
    }
 
 /* Free the memory holding the array of conversion types and the array of
    argument list pointers. */
    this->cvtargs = astFree( this->cvtargs );
+   this->cvtextra = astFree( this->cvtextra );
    this->cvttype = astFree( this->cvttype );
 }
 
@@ -4265,6 +4318,7 @@ AstSlaMap *astInitSlaMap_( void *mem, size_t size, int init,
    SlaMap simply implements a unit mapping. */
       new->ncvt = 0;
       new->cvtargs = NULL;
+      new->cvtextra = NULL;
       new->cvttype = NULL;
 
 /* If an error occurred, clean up by deleting the new object. */
@@ -4416,16 +4470,19 @@ AstSlaMap *astLoadSlaMap_( void *mem, size_t size,
       if ( new->ncvt < 0 ) new->ncvt = 0;
       new->cvttype = astMalloc( sizeof( int ) * (size_t) new->ncvt );
       new->cvtargs = astMalloc( sizeof( double * ) * (size_t) new->ncvt );
+      new->cvtextra = astMalloc( sizeof( double * ) * (size_t) new->ncvt );
 
 /* If an error occurred, ensure that all allocated memory is freed. */
       if ( !astOK ) {
          new->cvttype = astFree( new->cvttype );
          new->cvtargs = astFree( new->cvtargs );
+         new->cvtextra = astFree( new->cvtextra );
 
 /* Otherwise, initialise the argument pointer array. */
       } else {
          for ( icvt = 0; icvt < new->ncvt; icvt++ ) {
             new->cvtargs[ icvt ] = NULL;
+            new->cvtextra[ icvt ] = NULL;
          }
 
 /* Read in data for each conversion step... */

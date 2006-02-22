@@ -105,6 +105,8 @@
 *        Added astSTPConv, astSTPConv1, and STP coordinate system macros.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitSlaMapVtab method.
+*     22-FEB-2006 (DSB):
+*        Added cvtextra to the AstSlaMap structure.
 *-
 */
 
@@ -163,6 +165,7 @@ typedef struct AstSlaMap {
 /* Attributes specific to objects in this class. */
    int *cvttype;                 /* Pointer to array of conversion types */
    double **cvtargs;             /* Pointer to argument list pointer array */
+   double **cvtextra;            /* Pointer to intermediate values pointer array */
    int ncvt;                     /* Number of conversions to perform */
 } AstSlaMap;
 
