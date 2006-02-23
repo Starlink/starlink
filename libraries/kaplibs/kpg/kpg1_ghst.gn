@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_GHST<T> ( BAD, DIM, ARRAY, NUMBIN,
+      SUBROUTINE KPG1_GHST<T> ( BAD, DIM, ARRAY, NUMBIN, CUMUL,
      :                         VALMAX, VALMIN, HIST, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPG1_GHSTx( BAD, DIM, ARRAY, NUMBIN, VALMAX, VALMIN, HIST,
+*     CALL KPG1_GHSTx( BAD, DIM, ARRAY, NUMBIN, CUMUL, VALMAX, VALMIN, HIST,
 *    :                 STATUS )
 
 *  Description:
@@ -30,6 +30,8 @@
 *        Number of bins used in the histogram.  For integer data types
 *        this should result in a bin width of at least one unit.  So for
 *        example, byte data should never have more than 256 bins.
+*     CUMUL = LOGICAL (Given)
+*        Is a cumulative histogram required?
 *     VALMAX = ? (Given)
 *        Maximum data value included in the array.
 *     VALMIN = ? (Given)
@@ -53,6 +55,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -66,6 +69,8 @@
 *        Better check that the bin width is valid.
 *     1996 July 3 (MJC):
 *        Made to cope with unsigned integer types.
+*     23-FEB-2006 (DSB):
+*        Added argument CUMUL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +88,7 @@
 *  Arguments Given:
       INTEGER DIM
       INTEGER NUMBIN
-
+      LOGICAL CUMUL
       LOGICAL BAD
 
       <TYPE> ARRAY( DIM )
@@ -269,6 +274,13 @@
 *  End of main bad-pixels-present check
          END IF
 
+      END IF
+
+*  If required, convert to a cumulative histogam.
+      IF( CUMUL ) THEN
+         DO  K = 2, NUMBIN
+            HIST( K ) = HIST( K ) + HIST( K - 1 )
+         END DO
       END IF
 
  999  CONTINUE
