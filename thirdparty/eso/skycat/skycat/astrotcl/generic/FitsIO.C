@@ -39,7 +39,7 @@ static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.5 2005/02/02 01:43:04 bri
 #include <ctime>
 #include "util.h"
 #include "error.h"
-#include "fitsio.h"
+#include "fitsio2.h"
 #include "SAOWCS.h"
 #include "Compress.hxx"
 #include "Mem.h"

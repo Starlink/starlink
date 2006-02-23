@@ -23,9 +23,10 @@ static const char* const rcsId="@(#) $Id: ImageIO.C,v 1.3 2005/02/02 01:43:04 br
 #endif
 #include <cmath>
 #include <cstdlib>
+#include "config.h"
 #include "error.h"
 #include "ImageIO.h"
-#include "config.h"
+#include "fitsio2.h"
 
 // The type "long" may have 64 bits.
 #if LONGSIZE == 64
