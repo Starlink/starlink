@@ -98,8 +98,8 @@
 
 F77_SUBROUTINE(psx_getcwd)( CHARACTER(CWD), INTEGER(STATUS) TRAIL(CWD) )
 {
-  GENPTR_CHARACTER(CWD);
-  GENPTR_INTEGER(STATUS);
+  GENPTR_CHARACTER(CWD)
+  GENPTR_INTEGER(STATUS)
 
   int  err;        /* Local copy of errno */
   char * result;   /* Result of getcwd/getwd */

@@ -71,8 +71,8 @@
 F77_SUBROUTINE(psx_chdir)( CHARACTER(DIR), INTEGER(STATUS) TRAIL(DIR))
 {
 
-  GENPTR_CHARACTER(DIR);
-  GENPTR_INTEGER(STATUS);
+  GENPTR_CHARACTER(DIR)
+  GENPTR_INTEGER(STATUS)
   int err;             /* Local errno */
   char * dir_c;        /* Local copy of the string in C format */
   int lstat;           /* Status from chdir */
