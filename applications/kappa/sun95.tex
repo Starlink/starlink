@@ -25791,6 +25791,11 @@ scaling limits are used for both images.
          255).  {\tt ["Data"]}
       }
       \sstsubsection{
+         CUMUL = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} then a cumulative histogram is reported. {\tt [FALSE]}
+      }
+      \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The graphics workstation on which to produce the plot.  If it
@@ -50497,6 +50502,12 @@ The following applications have been modified:
       \begin{itemize}
          \item It is now a self-contained application for the reasons
          given in FITSEXIST above.
+      \end{itemize}
+
+   \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
+      \begin{itemize}
+         \item A new parameter called CUMUL has been added. Setting CUMUL
+         to TRUE will result in a cumulative histogram being produced.
       \end{itemize}
 
    \item [\htmlref{LISTMAKE}{LISTMAKE}] \mbox{}

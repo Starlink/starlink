@@ -24,6 +24,9 @@
    read access to an NDF, unlike the former version that was an alias
    to FITSMOD.  It should be faster too.
 
+   o A new parameter called CUMUL has been added to HISTOGRAM. Setting 
+   CUMUL to TRUE will result in a cumulative histogram being produced.
+
    o  The WCSALIGN and REGRID applications now have options for using a
    rebinning algorithm rather than a resampling algorithm.  Rebinning
    produces accurate flux conservation.  See the new REBIN parameter.
