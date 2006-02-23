@@ -82,12 +82,12 @@
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
 
-#elif defined(__x86_64)
+#elif defined(__x86_64) || defined(__x86_64__)
 
 /*  AMD64 */
 #define MACHINE IBMPC
 #define BYTESWAPPED TRUE
-#if defined(__LP64)
+#if defined(_LP64) || defined(__LP64__)
 #define LONGSIZE 64
 #endif
 
