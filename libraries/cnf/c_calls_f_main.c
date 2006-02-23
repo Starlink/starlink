@@ -66,6 +66,9 @@ int main()
 
    printf( "--> This is a test of C calling FORTRAN\n" );
 
+   /* Initialise fortran run time library */
+   cnfInitRTL( 0, NULL );  
+
 /* Test the passing of int arguments */
    for( j=0 ; j<ni ; j++ )
       ia[j] = j+1;
