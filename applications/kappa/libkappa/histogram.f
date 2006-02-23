@@ -50,6 +50,8 @@
 *        statistics).  If "Quality" is specified, then the quality
 *        values are treated as numerical values (in the range 0 to
 *        255).  ["Data"]
+*     CUMUL = _LOGICAL (Read)
+*        Should a cumulative histogram be reported? [FALSE]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If it
 *        is null (!), no plot will be made.  [Current graphics device]
@@ -271,6 +273,8 @@
 *        Moved CNF_PAR into declarations.
 *     15-APR-2005 (PWD):
 *        Parameterise use of backslash to improve portability.
+*     23-FEB-2006 (DSB):
+*        Added parameter CUMUL. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -314,6 +318,7 @@
       REAL BINWID                ! Histogram bin width
       CHARACTER * ( SZBUF ) BUFFER ! Text buffer
       CHARACTER * ( 8 ) COMP     ! Name of array component to analyse
+      LOGICAL CUMUL              ! Produce cumulative histogram?
       DOUBLE PRECISION DDUMMY    ! Dummy for swapping the data range
       DOUBLE PRECISION DRANGE( 2 ) ! Data range of the histogram
       INTEGER EL                 ! Number of array elements mapped
@@ -446,6 +451,9 @@
 *  Obtain the other parameters of the histogram.
 *  =============================================
 
+*  See if a cumulative histogram is required.
+      CALL PAR_GET0L( 'CUMUL', CUMUL, STATUS )
+
 *  Get the number of histogram bins to be used, within a sensible
 *  range.
       CALL PAR_GDR0I( 'NUMBIN', 20, 2, MAXBIN, .TRUE., NUMBIN, STATUS )
@@ -522,7 +530,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NUMBIN,
+     :                    NUMBIN, CUMUL,
      :                    NUM_DTOB( DRANGE( 2 ) ),
      :                    NUM_DTOB( DRANGE( 1 ) ), 
      :                    %VAL( CNF_PVAL( HPNTR ) ),
@@ -544,7 +552,7 @@
  
 *  Compute the histogram.
          CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NUMBIN,
+     :                    NUMBIN, CUMUL,
      :                    DRANGE( 2 ), DRANGE( 1 ), 
      :                    %VAL( CNF_PVAL( HPNTR ) ),
      :                    STATUS )
@@ -565,7 +573,7 @@
  
 *  Compute the histogram.
          CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NUMBIN,
+     :                    NUMBIN, CUMUL,
      :                    NUM_DTOI( DRANGE( 2 ) ),
      :                    NUM_DTOI( DRANGE( 1 ) ), 
      :                    %VAL( CNF_PVAL( HPNTR ) ),
@@ -587,7 +595,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NUMBIN,
+     :                    NUMBIN, CUMUL,
      :                    REAL( DRANGE( 2 ) ), REAL( DRANGE( 1 ) ),
      :                    %VAL( CNF_PVAL( HPNTR ) ), STATUS )
 
@@ -607,7 +615,7 @@
  
 *  Compute the histogram.
          CALL KPG1_GHSTUB( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                     NUMBIN,
+     :                     NUMBIN, CUMUL,
      :                     NUM_DTOUB( DRANGE( 2 ) ),
      :                     NUM_DTOUB( DRANGE( 1 ) ), 
      :                     %VAL( CNF_PVAL( HPNTR ) ),
@@ -629,7 +637,7 @@
 
 *  Compute the histogram.
          CALL KPG1_GHSTUW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                     NUMBIN,
+     :                     NUMBIN, CUMUL,
      :                     NUM_DTOUW( DRANGE( 2 ) ),
      :                     NUM_DTOUW( DRANGE( 1 ) ), 
      :                     %VAL( CNF_PVAL( HPNTR ) ),
@@ -651,7 +659,7 @@
  
 *  Compute the histogram.
          CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    NUMBIN,
+     :                    NUMBIN, CUMUL,
      :                    NUM_DTOW( DRANGE( 2 ) ),
      :                    NUM_DTOW( DRANGE( 1 ) ), 
      :                    %VAL( CNF_PVAL( HPNTR ) ),

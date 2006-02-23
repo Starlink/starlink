@@ -10192,6 +10192,14 @@ package kappa {
             helpkey *
           }
 
+         parameter cumul {
+            type _LOGICAL
+            vpath DEFAULT
+            prompt {Produce a cumulative histogram?}
+            helpkey *
+            default FALSE
+          }
+
          parameter device {
             ptype DEVICE
             vpath GLOBAL PROMPT
