@@ -107,6 +107,8 @@
 *        Tidy refs to CNF routines
 *     6-DEC-2004 (TIMJ):
 *        Report allocation failure as unsigned int
+*     23-FEB-2006 (TIMJ):
+*        Fix sprintf warning by casting size_t to unsigned long.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -228,8 +230,8 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
       sprintf( errbuf, 
-         "Failed to allocate space with realloc. %u bytes requested",
-         csize );
+         "Failed to allocate space with realloc. %lu bytes requested",
+	       (unsigned long) csize );
       psx1_rep_c( "PSX_REALLOC_NOALL", errbuf, status );
    }
 
