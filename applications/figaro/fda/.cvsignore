@@ -10,6 +10,7 @@ ssn*.log
 *.htx
 *.htx_tar
 autom4te.cache
+bootstrap.tmp
 componentinfo.dtd
 config.log
 config.status
