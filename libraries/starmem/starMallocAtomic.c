@@ -80,19 +80,37 @@ void * starMallocAtomic( size_t size ) {
   void * tmp;
   static const size_t THRESHOLD = 1024 * 100; /* Bytes */
 
+  switch ( STARMEM_MALLOC ) {
+
+  case STARMEM__SYSTEM:
+    tmp = malloc( size );
+    break;
+
+  case STARMEM__DL:
+    tmp = dlmalloc( size );
+    break;
+
+  case STARMEM__GC:
 #if HAVE_GC_H
-  if (STARMEM_USE_GC) {
     if ( size < THRESHOLD ) {
       tmp = GC_MALLOC_ATOMIC( size );
-      /*   printf("Malloced %ld bytes: %p (atomic)\n", size, tmp);*/
     } else {
       tmp = GC_MALLOC_ATOMIC_IGNORE_OFF_PAGE( size );
     }
-    return tmp;
-    /*    return GC_MALLOC_ATOMIC( size );*/
+#else
+    starMemFatalGC;
+#endif
+    break;
+
+  default:
+    starMemFatalNone;
   }
+
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf(__FILE__": Allocated %lu bytes into pointer %p\n",
+	   (unsigned long)size, tmp );
 #endif
 
-  /* No GC so use system */
-  return malloc( size );
+  return tmp;
 }

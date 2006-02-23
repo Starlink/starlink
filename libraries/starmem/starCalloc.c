@@ -72,14 +72,37 @@
 */
 
 void * starCalloc( size_t nmemb, size_t size ) {
+  void * tmp = NULL;
 
+  switch (STARMEM_MALLOC) {
+
+  case STARMEM__SYSTEM:
+    tmp = calloc( nmemb, size );
+    break;
+
+  case STARMEM__DL:
+    tmp = dlcalloc( nmemb, size );
+    break;
+
+  case STARMEM__GC:
 #if HAVE_GC_H
-  if (STARMEM_USE_GC) {
     /* Call normal malloc since we know the GC initialises memory */
-    return GC_MALLOC( nmemb * size );
+    tmp = GC_MALLOC( nmemb * size );
+#else
+    starMemFatalGC;
+#endif
+    break;
+
+  default:
+    starMemFatalNone;
+
   }
+
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf(__FILE__": Allocated %lu elements of size %lu bytes into pointer %p\n",
+	   (unsigned long)nmemb, (unsigned long)size, tmp );
 #endif
 
-  /* No GC so use system */
-  return calloc( nmemb, size );
+  return tmp;
 }

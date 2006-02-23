@@ -30,7 +30,8 @@
 *     controls whether or not garbage collection is available. If it
 *     is not called, garbage collection is disabled (mainly because
 *     the GC initialize routine must be called for the GC to work
-*     portably). GC can be disabled using the STARMEM_MALLOC environment
+*     portably). The particular malloc implementation is set by this
+*     routine GC from the STARMEM_MALLOC environment
 *     variable. See NOTES for more information on this variable.
 
 *  Parameters:
@@ -44,12 +45,16 @@
 *  History:
 *     08-FEB-2006 (TIMJ):
 *        Original version.
+*     23-FEB-2006 (TIMJ):
+*        Add DL
 
 *  Notes:
 *     - This function is private and should only be called from the
 *       starMemInit macro.
 *     - The STARMEM_MALLOC environment variable can be used to control
 *       the malloc behaviour. It can have the following values:
+*       DL: Use Doug Lea's malloc (dlmalloc).
+*           http://g.oswego.edu/dl/html/malloc.html
 *       GC: Garbage Collection must be used. An error occurs if that is
 *           not available. Since EMS is unavailable, the error will
 *           be printed to stderr and the system will fallback to SYSTEM.
@@ -58,6 +63,13 @@
 *       If the variable is unset, GC is used if available else SYSTEM is
 *       used.
 *     - Returns without action if the function has already been called.
+*     - From testing, the DL malloc is the fastest. The GC malloc is
+*       generally slower and also has real problems if used for large
+*       repetitive mallocs (where large can be of order 30 kB). This makes
+*       it unsuitable for general starlink applications but can be useful
+*       for smaller applications.
+*     - Currently, the SYSTEM malloc is the default if STARMEM_MALLOC
+*       environment variable is not defined.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -88,52 +100,70 @@ starMemInitPrivate( int gc_initialised ) {
   /* return immediately if we have been initialised already */
   if ( STARMEM_INITIALISED ) return;
 
+#if STARMEM_DEBUG
+  /* see if STARMEM_DEBUG is defined */
+  if ( getenv( "STARMEM_PRINT_MALLOC" ) ) {
+    STARMEM_PRINT_MALLOC = 1;
+  }
+#endif
+
+
   /* Read the STARMEM_MALLOC environment variable */
   starenv = getenv( "STARMEM_MALLOC" );
 
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf("Attempting to use malloc '%s'\n", starenv);
+#endif
+
+  /* Indicate that we are initialised and default to "SYSTEM" malloc */
+  STARMEM_MALLOC = STARMEM__SYSTEM;
+  STARMEM_INITIALISED = 1;
+
   if (starenv == NULL) {
     /* default behaviour */
-#if HAVE_GC_H
-    if (gc_initialised) {
-      STARMEM_USE_GC = 1;
-    } else {
-      /* did not initialise GC so use SYSTEM */
-      STARMEM_USE_GC = 0;
-    }
-#else
-    STARMEM_USE_GC = 0;
-#endif
-    STARMEM_INITIALISED = 1;
-  } else if (strncmp(starenv, "SYSTEM", 6) == 0) {
+#if STARMEM_DEBUG
+    if (STARMEM_PRINT_MALLOC)
+      printf("Default behaviour for malloc\n");
+#endif    
+    return;
+  } else if (strncmp(starenv, "SYS", 3) == 0) {
     /* use system version */
-    STARMEM_USE_GC = 0;
-    STARMEM_INITIALISED = 0;
+    STARMEM_MALLOC = STARMEM__SYSTEM;
+
+  } else if (strncmp(starenv, "DL", 2) == 0) {
+    /* use system version */
+    STARMEM_MALLOC = STARMEM__DL;
 
   } else if (strncmp(starenv, "GC", 2) == 0 ) {
     /* Garbage Collector mandatory */
 #if HAVE_GC_H    
     if (gc_initialised) {
-      STARMEM_USE_GC = 1;
-      STARMEM_INITIALISED = 1;
+      STARMEM_MALLOC = STARMEM__GC;
     } else {
       fprintf(stderr, "Garbage collection requested but GC has not been initialised in main program. Please call starMemInit()\n");
-      STARMEM_INITIALISED = 1;
-      STARMEM_USE_GC = 0;
     }
 #endif
 
-    if (!STARMEM_INITIALISED) {
+    if (STARMEM_MALLOC != STARMEM__GC) {
       /* we have not got GC but we needed it - we can not use ems */
       fprintf(stderr, "Garbage Collection requested but Garbage Collection not available. Falling back to system malloc");
-      STARMEM_USE_GC = 0;
-      STARMEM_INITIALISED = 1;
+      STARMEM_MALLOC = STARMEM__SYSTEM;
+
     }
 
   } else {
     /* unknown option */
     fprintf(stderr, "Unknown malloc method requested ('%s'). Using system malloc.\n", starenv);
-    STARMEM_USE_GC = 0;
-    STARMEM_INITIALISED = 1;
+    STARMEM_MALLOC = STARMEM__SYSTEM;
+
   }
 
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf("Selected malloc %d\n", STARMEM_MALLOC );
+#endif
+
+
+  return;
 }

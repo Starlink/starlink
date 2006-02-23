@@ -80,18 +80,36 @@
 void * starRealloc( void * ptr, size_t size ) {
   void * tmp = NULL;
 
+  switch ( STARMEM_MALLOC ) {
+
+  case STARMEM__SYSTEM:
+    tmp = realloc( ptr, size );
+    break;
+
+  case STARMEM__DL:
+    tmp = dlrealloc( ptr, size );
+    break;
+    
+  case STARMEM__GC:
 #if HAVE_GC_H
-  if (STARMEM_USE_GC) {
     if (ptr == NULL) {
       tmp = starMalloc( size );
     } else {
       tmp = GC_REALLOC( ptr, size );
     }
-    /*    printf("Realloc %ld bytes for pointer %p into %p\n",size,ptr,tmp);*/
-    return tmp;
+#else
+    starMemFatalGC;
+#endif
+    break;
+
+  default:
+    starMemFatalNone;
   }
+
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf(__FILE__": Realloc %lu bytes from pointer %p to pointer %p\n", size, ptr, tmp );
 #endif
 
-  /* No GC so use system */
-  return realloc( ptr, size );
+  return tmp;
 }

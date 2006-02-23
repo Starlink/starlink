@@ -19,10 +19,10 @@ PUBLIC_C_FILES = starMalloc.c starMallocAtomic.c starMemInitPrivate.c \
 starFree.c starFreeForce.c starRealloc.c starCalloc.c \
 starMemIsInitialised.c
 
-PRIVATE_C_FILES = mem1_globals.c
+PRIVATE_C_FILES = mem1_globals.c dlmalloc.c
 
 PUBLIC_CINCLUDES = mem.h
-PRIVATE_INCLUDES = mem1.h
+PRIVATE_INCLUDES = mem1.h dlmalloc.h
 
 TESTS = memtest
 

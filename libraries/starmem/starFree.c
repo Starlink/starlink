@@ -38,7 +38,7 @@
 *        Original version.
 
 *  Notes:
-*     - Depending on garbage collector in use, the memory may not be
+*     - Depending on malloc scheme in use, the memory may not be
 *       freed immediately.
 *     - Use starFreeForce if the memory really must be freed now.
 *     - This memory should have been allocated by starMalloc or related
@@ -68,13 +68,28 @@
 
 void starFree( void * ptr ) {
 
-#if HAVE_GC_H
-  if (STARMEM_USE_GC) {
-    return;
-  }
+#if STARMEM_DEBUG
+  if (STARMEM_PRINT_MALLOC)
+    printf(__FILE__": Free pointer %p\n", ptr );
 #endif
 
-  /* No GC so use system */
-  free( ptr );
+  switch ( STARMEM_MALLOC ) {
+    
+  case STARMEM__SYSTEM:
+    free( ptr );
+    break;
+
+  case STARMEM__DL:
+    dlfree( ptr );
+    break;
+
+  case STARMEM__GC:
+    /* Nothing to do if garbage collector selected */
+    break;
+
+  default:
+    starMemFatalNone;
+  }
+
   return;
 }

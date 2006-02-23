@@ -60,7 +60,7 @@ void starMemInitPrivate( int gc_initialized );
 
 /* We always call GC_INIT if it is defined, even if we have
    disabled Garbage Collection. This is because this include file
-   can not know whether GC is required.
+   can not know whether GC is required and it never hurts.
 */
 
 #ifdef GC_INIT

@@ -41,9 +41,42 @@
 
 */
 
+/* Internal system header files */
+#include <stdio.h>
+
+/* If debugging set to true. Debugging messages controlled by STARMEM_PRINT_MALLOC
+   environment variable if this is true. Will cause overhead. */
+#define STARMEM_DEBUG 0
+
+/* Prototypes for the Doug Lea Malloc implementation - DLMALLOC */
+#define USE_DL_PREFIX
+#include "dlmalloc.h"
+
+/* Define the allowed malloc types */
+
+typedef enum STARMEM_MALLOCS {
+  STARMEM__NULL,
+  STARMEM__SYSTEM,
+  STARMEM__DL,
+  STARMEM__GC,
+} STARMEM_MALLOCS;
+
 /* State variables - set in mem1_globals.c */
-extern int STARMEM_USE_GC;
+extern STARMEM_MALLOCS STARMEM_MALLOC;
 extern int STARMEM_INITIALISED;
+
+#if STARMEM_DEBUG
+/* Display debug messages */
+extern int STARMEM_PRINT_MALLOC;
+#endif
+
+
+/* Macro to simplify fatal abort */
+#define starMemFatal( text ) fprintf(stderr, "starMem: Fatal error in " __FILE__ ": " text "\n"); abort()
+
+#define starMemFatalGC starMemFatal( "GC requested but not available" )
+
+#define starMemFatalNone starMemFatal( "Unable to determine malloc scheme.")
 
 /* STAR_MEM1_INCLUDED */
 #endif

@@ -1,0 +1,23 @@
+STARMEM - malloc wrapper
+
+This library provides a wrapper for the standard malloc implementation and enables
+the user to switch malloc schemes at runtime by setting the STARMEM_MALLOC environment
+variable.
+
+Allowed values for this variable are:
+
+  SYSTEM   - standard system malloc/free (default)
+  DL       - Doug Lea's malloc/free (fast)
+  GC       - Hans-Boehm Garbage Collection (slow)
+
+Release notes:
+
+Version 0.2
+
+  * Add Doug Lea's malloc
+  * Internal rewrite to support 3rd malloc option
+  * Add STARMEM_DEBUG option
+
+Version 0.1 
+
+  * Initial release. Support SYSTEM and GC

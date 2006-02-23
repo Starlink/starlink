@@ -39,9 +39,13 @@
 
 #include "mem1.h"
 
-/* Indicates whether we are using the garbage collector */
-int STARMEM_USE_GC = 0;
+/* Controls which malloc implementation we are using */
+STARMEM_MALLOCS STARMEM_MALLOC = STARMEM__SYSTEM;
 
 /* Has starMemInit been called yet? */
 int STARMEM_INITIALISED = 0;
 
+#if STARMEM_DEBUG
+/* Display debug messages */
+int STARMEM_PRINT_MALLOC = 0;
+#endif
