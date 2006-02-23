@@ -59,6 +59,10 @@
 *        Use astSetC rather than astSet
 *        Avoid an additional dereference
 *        Use sc2ast_makefitschan
+*     2006-02-23 (EC):
+*        Fixed bug in frameset generation - tangent point in pixel coordinates
+*        was not getting set properly.
+
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -200,7 +204,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 	    }
 
 	    fitschan = astFitsChan ( NULL, NULL, "" );
-	    sc2ast_makefitschan( 256.0, 256.0, (-pixsize/3600), (pixsize/3600),
+	    sc2ast_makefitschan( 0, 0, (-pixsize/3600), (pixsize/3600),
 				 (lon_0*57.29577951), (lat_0*57.29577951),
 				 "RA---TAN", "DEC--TAN", fitschan, status );
 	    astClear( fitschan, "Card" );
@@ -260,12 +264,36 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
     if (*status != SAI__OK) goto CLEANUP;
   }
 
+  /* Re-create the output frameset so that the CRPIX for the WCS are
+     the location of the tangent point in pixel coordinates */
+
+  if (*outframeset) *outframeset = astAnnul( *outframeset );
+  if (fitschan) fitschan = astAnnul( fitschan );  
+
+
+  fitschan = astFitsChan ( NULL, NULL, "" );
+  sc2ast_makefitschan( -lbnd_out[0], -lbnd_out[1], 
+		       (-pixsize/3600), (pixsize/3600),
+		       (lon_0*57.29577951), (lat_0*57.29577951),
+		       "RA---TAN", "DEC--TAN", fitschan, status );
+  astClear( fitschan, "Card" );
+  *outframeset = astRead( fitschan );
+  astSetC( *outframeset, "SYSTEM", system );
+  
+  /* Change the pixel bounds to be consistent with the new CRPIX */
+  ubnd_out[0] -= lbnd_out[0];
+  lbnd_out[0] = 0;
+
+  ubnd_out[1] -= lbnd_out[1];
+  lbnd_out[1] = 0;
+
   /* Clean Up */
  
  CLEANUP:
   if (sky2map) sky2map  = astAnnul( sky2map );
   if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
+  if (fitschan) fitschan = astAnnul( fitschan );
 
   if( data != NULL )
     smf_close_file( &data, status);
