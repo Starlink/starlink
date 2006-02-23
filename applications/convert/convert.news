@@ -1,3 +1,8 @@
+1 CONVERT_Version_1.5-6
+
+ FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
+ files.  The recognised extensions are fits.gz, fit.gz, and fts.gz.
+ 
 1 CONVERT_Version_1.5-5
 
  Added FITS-AIPS++ and FITS-CLASS encodings to FITS2NDF and NDF2FITS.
@@ -6,11 +11,13 @@
  is clear that the type given should also be of the input data, not 
  just the output NDF.
 
- SPECX2NDF now creates NDF files using the new double sideband specframe.
- See the AST documentation for more details on double sideband spectra.
+ SPECX2NDF now creates NDF files using the new double-sideband 
+ specframe.  See the AST documentation for more details on 
+ double-sideband spectra. 
 
 1 CONVERT_Version_1.5-4
- Added IRAF compatibility libs for Linux systems. Convert should now
+
+ Added IRAF compatibility libs for Linux systems.  CONVERT should now
  build on any ix86 Linux platform. 
 
 
