@@ -57,8 +57,8 @@ inline float SWAP_FLOAT(float x) {
 }
 
 inline float SWAP_DOUBLE(double x) {
-    union {double d; unsigned long l[2];} u;
-    unsigned long tmp;
+    union {double d; unsigned int l[2];} u;
+    unsigned int tmp;
 
     u.d = x;
     tmp = u.l[0];
@@ -68,8 +68,8 @@ inline float SWAP_DOUBLE(double x) {
 }
 
 inline float SWAP_LONG(long x) {
-    union {long d; unsigned long l[2];} u;
-    unsigned long tmp;
+    union {long d; unsigned int l[2];} u;
+    unsigned int tmp;
 
     u.d = x;
     tmp = u.l[0];
