@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2005 November 10}
+\newcommand{\stardocdate}      {2005 February 21}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5}
+\newcommand{\stardocversion}   {Version 1.5-6}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -6923,5 +6923,28 @@ preserved where values have not changed significantly.
 
 The references to the old VMS-only tasks have been removed from the
 documentation because the residual VMS service no longer exists.
+
+\section{Release Notes -- V1.5-4}
+ Added IRAF compatibility libs for Linux systems.  CONVERT should now
+ build on any ix86 Linux platform. 
+
+\section{Release Notes -- V1.5-5}
+
+Added FITS-AIPS$++$ and FITS-CLASS encodings to 
+\htmlref{FITS2NDF}{FITS2NDF} and \htmlref{NDF2FITS}{NDF2FITS}.
+
+Clarified the description of \htmlref{UNF2NDF}{UNF2NDF} parameter TYPE
+so that it is clear that the type given should also be of the input
+data, not just the output NDF.
+
+\htmlref{SPECX2NDF}{SPECX2NDF} now creates NDF files using the new
+double-sideband specframe. See the AST documentation for more details
+on double-sideband spectra.
+
+\section{Release Notes -- V1.5-6}
+
+FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
+files.  The recognised extensions are {\tt fits.gz}, {\tt fit.gz}, and
+{\tt fts.gz}.
 
 \end{document}
