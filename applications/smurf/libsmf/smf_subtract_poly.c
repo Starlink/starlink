@@ -81,7 +81,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData **data, int *status) {
+void smf_subtract_poly(smfData *data, int *status) {
 
   /* Local variables */
   int i;                      /* Bolometer index loop counter */
@@ -99,20 +99,24 @@ void smf_subtract_poly(smfData **data, int *status) {
   /* Check status */
   if (*status != SAI__OK) return;
 
-  /* Data array */
-  outdata = ((*data)->pntr)[0];
+  /*  if ( smf_history_check( *data, FUNC_NAME, status) ) return;*/
 
-  ncoeff = (*data)->ncoeff;
-  poly = (*data)->poly;
+  /* Retrieve polynomial data */
+  ncoeff = data->ncoeff;
+  poly = data->poly;
 
+  /* Check they're non NULL */
   if ( (ncoeff == 0)  || (poly == NULL) ) {
     msgOutif(MSG__VERB, FUNC_NAME, "No polynomial coefficients present", status);
     return;
   }
 
+  /* Data array */
+  outdata = (data->pntr)[0];
+
   /* Calculate the number of bolometers and retrieve number of coefficients */
-  nbol = ((*data)->dims)[0] * ((*data)->dims)[1];
-  nframes = ((*data)->dims)[2];
+  nbol = (data->dims)[0] * (data->dims)[1];
+  nframes = (data->dims)[2];
   
   /* Loop over the number of bolometers */
   for (i=0; i<nbol; i++) {
@@ -132,6 +136,8 @@ void smf_subtract_poly(smfData **data, int *status) {
 
   }
   /* Store polynomial-subtracted data */
-  ((*data)->pntr)[0] = outdata;
+  (data->pntr)[0] = outdata;
+
+  smf_history_write( data, FUNC_NAME, "Lots of nonsense", status);
 
 }
