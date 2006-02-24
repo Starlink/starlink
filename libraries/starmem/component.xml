@@ -3,14 +3,14 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="starmem" support="S">
-  <version>0.1-1</version>
+  <version>0.2-1</version>
   <path>libraries/starmem</path>
   <description>Starlink Memory Management Library</description>
   <abstract>
 	<p>C Memory management wrapper routines.</p>
   </abstract>
   <dependencies >
-    <sourceset>messgen</sourceset>
+    
   </dependencies>
   <developers>
     <person>

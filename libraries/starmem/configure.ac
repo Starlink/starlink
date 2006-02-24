@@ -39,11 +39,6 @@ dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 dnl    STAR_LATEX_DOCUMENTATION(sun)
 
-dnl    There are two .msg files in this directory, so we need to specify
-dnl    the names of them explicitly, rather than them being defaulted from
-dnl    the package name.
-STAR_MESSGEN([mem_err.msg])
-
 AM_CONFIG_HEADER(config.h mem.h)
 
 dnl    If you wish to configure extra files, you can add them to this
