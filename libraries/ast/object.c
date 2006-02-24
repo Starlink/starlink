@@ -131,6 +131,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added attribute UseDefs.
 *     14-FEB-2006 (DSB):
 *        Added attribute ObjSize.
+*     23-FEB-2006 (DSB):
+*        Added MemoryCaching tuning parameter.
 *class--
 */
 
@@ -2688,7 +2690,16 @@ f     AST_DELETE).
 *     systems malloc function. The default value for this parameter is
 *     zero. Setting it to a non-zero value will result in Object memory
 *     being cached in future. Setting it back to zero causes any memory
-*     blocks currently in the pool to be freed. 
+*     blocks currently in the pool to be freed. Note, this tuning parameter 
+*     only controls the caching of memory used to store AST Objects. To 
+*     cache other memory blocks allocated by AST, use MemoryCaching.
+*     - MemoryCaching: A boolean flag similar to ObjectCaching except
+*     that it controls caching of all memory blocks allocated by AST
+*     (whether for internal or external use), not just memory used to
+*     store AST Objects. Note, if MemoryCaching is switched on,
+*     ObjectCaching should not normally also be switched on since the
+*     memory used to store Objects will be cached as a result of switching
+*     MemoryCaching on.
 
 *  Notes:
 c     - This function attempts to execute even if the AST error
@@ -2710,6 +2721,9 @@ f     error value
             object_caching = value;
             if( !object_caching ) EmptyObjectCache();
          }
+         
+      } else if( astChrMatch( name, "MemoryCaching" ) ) {
+         result = astMemCaching( value );
          
       } else if( astOK ) {
          astError( AST__TUNAM, "astTune: Unknown AST tuning parameter "

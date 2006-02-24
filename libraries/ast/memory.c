@@ -55,6 +55,9 @@
 *        Convert Magic from a function to a macro for extra speed.
 *     21-FEB-2006 (DSB):
 *        Convert IsDynamic from a function to a macro for extra speed.
+*     23-FEB-2006 (DSB):
+*        Added the caching system for allocated but unused memory blocks,
+*        controlled by AST tuning parameter MemoryCaching.
 */
 
 /* Module Macros. */
@@ -66,6 +69,12 @@
 
 /* The maximum number of fields within a format string allowed by astSscanf. */
 #define VMAXFLD 20
+
+/* Define the largest size of a cached memory block in bytes. This does
+   not include the size of the Memory header. This does not need to be
+   too big because the vast majority of memory blocks allocated by AST are
+   less than a few hundred bytes. */
+#define MXCSIZE 300
 
 /* Function Macros. */
 /* =============== */
@@ -230,6 +239,7 @@
    can be recognised, together with the allocated size. It also
    ensures correct alignment. */
 typedef struct Memory {
+   struct Memory *next;
    unsigned long magic;
    size_t size;
 
@@ -252,9 +262,28 @@ static int memcheckid = -1;
 static void (*memcheckfun)( void * );
 #endif
 
+/* A cache of allocated but currently unused memory block. This cache is
+   maintained in order to avoid the overhead of continual calls to malloc to
+   allocate small blocks of memory. The vast majority of memory blocks
+   allocated by AST are under 200 bytes in size. Each element in this array 
+   stores a pointer to the header for a free (i.e. allocated but currently 
+   unused) memory block. The size of the memory block (not including the 
+   Memory header) will equal the index at which the pointer is stored within 
+   "cache". Each free memory block contains (in its Memory header) a pointer 
+   to the header for another free memory block of the same size (or a NULL 
+   pointer if there are no other free memory blocks of the same size). */
+static Memory *cache[ MXCSIZE + 1 ];
+
+/* Has the "cache" array been initialised? */
+static int cache_init = 0;
+
+/* Should the cache be used? */
+static int use_cache = 0;
+
 /* Prototypes for Private Functions. */
 /* ================================= */
-static int IsDynamic( const void *ptr );
+
+/* void astCacheCheck( void ); */
 
 #ifdef DEBUG
 static void Issue( Memory *new );
@@ -632,6 +661,7 @@ void *astFree_( void *ptr ) {
 /* Local Variables: */
    Memory *mem;                  /* Pointer to memory header */
    int isdynamic;                /* Is the memory dynamically allocated? */
+   size_t size;                  /* The usable size of the memory block */
 
 /* If the incoming pointer is NULL, do nothing. Otherwise, check if it
    points at dynamically allocated memory (IsDynamic sets the global
@@ -643,21 +673,31 @@ void *astFree_( void *ptr ) {
    }
    if ( isdynamic ) {
 
-/* If OK, obtain a pointer to the memory header and clear the "magic
-   number" and size values it contains. This helps prevent accidental
-   re-use of the memory. */
+/* If OK, obtain a pointer to the memory header. */
       mem = ( (Memory *) ptr ) - 1;
-      mem->magic = (unsigned long) 0;
-      mem->size = (size_t) 0;
+
+/* If the memory block is small enough, and the cache is being used, put it 
+   into the cache rather than freeing it, so that it can be reused. */
+      size = mem->size;
+      if( use_cache && size <= MXCSIZE ) {
+         mem->next = cache[ size ];
+         cache[ size ] = mem;
+
+/* Simply free other memory blocks, clearing the "magic number" and size 
+   values it contains. This helps prevent accidental re-use of the memory. */
+      } else {
+         mem->magic = (unsigned long) 0;
+         mem->size = (size_t) 0;
 
 #ifdef DEBUG
-      DeIssue( mem );
-      mem->id = -99;
-      mem->perm = perm_mem;
+         DeIssue( mem );
+         mem->id = -99;
+         mem->perm = perm_mem;
 #endif
 
 /* Free the allocated memory. */
-      free( mem );
+         free( mem );
+      }
    }
 
 /* Always return a NULL pointer. */
@@ -765,94 +805,6 @@ void *astGrow_( void *ptr, int n, size_t size ) {
    return new;
 }
 
-static int IsDynamic( const void *ptr ) {
-/*
-*  Name:
-*     IsDynamic
-
-*  Purpose:
-*     Test whether a memory region has been dynamically allocated.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     int IsDynamic( const void *ptr )
-
-*  Description:
-*     This function takes a pointer to a region of memory and tests if
-*     the memory has previously been dynamically allocated using other
-*     functions from this module. It does this by checking for the
-*     presence of a "magic" number in the header which precedes the
-*     allocated memory. If the magic number is not present (or the
-*     pointer is invalid for any other reason), an error is reported
-*     and the global error status is set.
-
-*  Parameters:
-*     ptr
-*        Pointer to the start (as known to the external user) of the
-*        dynamically allocated memory.
-
-*  Returned Value:
-*     If the memory was allocated dynamically, a value of 1 is
-*     returned.  Otherwise, zero is returned and an error results.
-
-*  Notes:
-*     - A NULL pointer value produces an error report from this
-*     function, although other functions may wish to regard a NULL
-*     pointer as valid.
-*     - This function attempts to execute even if the global error
-*     status is set, although no further error report will be made if
-*     the memory is not dynamically allocated under these
-*     circumstances.
-*     - The test performed by this function is not 100% secure as the
-*     "magic" value could occur by accident (although this is
-*     unlikely). It is mainly intended to provide security against
-*     programming errors, including accidental corruption of the
-*     memory header and attempts to allocate the same region of memory
-*     more than once.
-*/
-
-/* Local Variables: */
-   Memory *mem;                  /* Pointer to memory header */
-   int dynamic;                  /* Dynamically allocated? */
-
-/* Initialise. */
-   dynamic = 0;
-
-/* Check that a NULL pointer has not been supplied and report an error
-   if it has (but not if the global status is already set). */
-   if ( !ptr ) {
-      if ( astOK ) {
-         astError( AST__PTRIN, "Invalid NULL pointer (address %p).", ptr );
-      }
-
-/* If OK, derive a pointer to the memory header that precedes the
-   allocated region of memory. */
-   } else {
-      mem = ( (Memory *) ptr ) - 1;
-
-/* Check if the "magic number" in the header is valid and report an
-   error if it is not (but not if the global status is already
-   set). */
-      if ( mem->magic != MAGIC( mem, mem->size ) ) {
-         if ( astOK ) {
-            astError( AST__PTRIN,
-                      "Invalid pointer or corrupted memory at address %p.",
-                      ptr );
-         }
-
-/* Note if the magic number is OK. */
-      } else {
-         dynamic = 1;
-      }
-   }
-
-/* Return the result. */
-   return dynamic;
-}
-
 void *astMalloc_( size_t size ) {
 /*
 *+
@@ -912,38 +864,128 @@ void *astMalloc_( size_t size ) {
                 "Invalid attempt to allocate %ld bytes of memory.",
                 (long) size );
 
-/* Otherwise, if the size is greater than zero, attempt to use malloc
-   to allocate the memory, including space for the header
-   structure. */
+/* Otherwise, if the size is greater than zero, either get a previously
+   allocated memory block from the cache, or attempt to use malloc
+   to allocate the memory, including space for the header structure. */
    } else if ( size != (size_t ) 0 ) {
-      mem = malloc( sizeof( Memory ) + size );
+
+/* If the cache is being used and a cached memory block of the required size 
+   is available, remove it from the cache array and use it. */
+      mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
+      if( use_cache && mem ) {
+         cache[ size ] = mem->next;
+         mem->next = NULL;
+
+/* Increment the memory pointer to the start of the region of
+   allocated memory to be used by the caller. */
+         mem++;
+
+/* Otherwise, allocate a new memory block using "malloc". */
+      } else {      
+         mem = malloc( sizeof( Memory ) + size );
 
 /* Report an error if malloc failed. */
-      if ( !mem ) {
-         astError( AST__NOMEM, "malloc: %s", strerror( errno ) );
-         astError( AST__NOMEM, "Failed to allocate %ld bytes of memory.",
-                   (long) size );
+         if ( !mem ) {
+            astError( AST__NOMEM, "malloc: %s", strerror( errno ) );
+            astError( AST__NOMEM, "Failed to allocate %ld bytes of memory.",
+                      (long) size );
 
 /* If successful, set the "magic number" in the header and also store
    the size. */
-      } else {
-         mem->magic = MAGIC( mem, size );
-         mem->size = size;
+         } else {
+            mem->magic = MAGIC( mem, size );
+            mem->size = size;
+            mem->next = NULL;
 
 #ifdef DEBUG
-         mem->id = ++next_id;
-         mem->perm = perm_mem;
-         Issue( mem );
+            mem->id = ++next_id;
+            mem->perm = perm_mem;
+            Issue( mem );
 #endif
-
+         
 /* Increment the memory pointer to the start of the region of
    allocated memory to be used by the caller.*/
-         mem++;
+            mem++;
+         }
       }
    }
 
 /* Return the result. */
    return mem;
+}
+
+int astMemCaching_( int newval ){
+/*
+*+
+*  Name:
+*     astMemCaching
+
+*  Purpose:
+*     Controls whether allocated but unused memory is cached in this module.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astMemCaching( int newval )
+
+*  Description:
+*     This function sets a flag indicating if allocated but unused memory
+*     should be cached or not. It also returns the original value of the
+*     flag.
+*
+*     If caching is switched on or off as a result of this call, then the
+*     current contents of the cache are discarded.
+
+*  Parameters:
+*     newval
+*        The new value for the MemoryCaching tuning parameter (see
+*        astTune in objectc.c). If AST__TUNULL is supplied, the current
+*        value is left unchanged.
+
+*  Returned Value:
+*     The original value of the MemoryCaching tuning parameter.
+
+*-
+*/
+
+/* Local Variables: */
+   int i;
+   int result;
+   Memory *mem;
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Store the original value of the tuning parameter. */
+   result = use_cache;
+   
+/* If a new value is to be set. */
+   if( newval != AST__TUNULL ) {
+
+/* If the cache has been initialised, empty it. */
+      if( cache_init ) {
+         for( i = 0; i <= MXCSIZE; i++ ) {
+            while( cache[ i ] ) {
+               mem = cache[ i ];
+               cache[ i ] = mem->next;
+               free( mem );
+            }
+         }
+
+/* Otherwise, initialise it. */
+      } else {
+         for( i = 0; i <= MXCSIZE; i++ ) cache[ i ] = NULL;
+      }
+
+/* Store the new value. */
+      use_cache = newval;
+
+   }
+
+/* Return the original value. */
+   return result;
 }
 
 void *astRealloc_( void *ptr, size_t size ) {
@@ -1048,25 +1090,51 @@ void *astRealloc_( void *ptr, size_t size ) {
 #ifdef DEBUG
             DeIssue( mem );
 #endif
+
+
+/* If the cache is being used, for small memory blocks, do the equivalent of 
+
                mem = realloc( mem, sizeof( Memory ) + size );
+
+   using astMalloc, astFree and memcpy explicitly in order to ensure
+   that the memory blocks are cached. */
+               if( use_cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
+                  result = astMalloc( size );
+                  if( result ) { 
+                     if( mem->size < size ) {
+                        memcpy( result, ptr, mem->size );
+                     } else {
+                        memcpy( result, ptr, size );
+                     }
+                     astFree( ptr );
+
+                  } else {
+                     result = ptr;
+                  }
+
+/* For other memory blocks simply use realloc. */
+               } else {
+                  mem = realloc( mem, sizeof( Memory ) + size );
 
 /* If this failed, report an error and return the original pointer
    value. */
-               if ( !mem ) {
-                  astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
-                  astError( AST__NOMEM, "Failed to reallocate a block of "
-                            "memory to %ld bytes.", (long) size );
+                  if ( !mem ) {
+                     astError( AST__NOMEM, "realloc: %s", strerror( errno ) );
+                     astError( AST__NOMEM, "Failed to reallocate a block of "
+                               "memory to %ld bytes.", (long) size );
    
 /* If successful, set the new "magic" value and size in the memory
    header and obtain a pointer to the start of the region of memory to
    be used by the caller. */
-               } else {
-                  mem->magic = MAGIC( mem, size );
-                  mem->size = size;
+                  } else {
+                     mem->magic = MAGIC( mem, size );
+                     mem->size = size;
+                     mem->next = NULL;
 #ifdef DEBUG
-               Issue( mem );
+                     Issue( mem );
 #endif
-                  result = mem + 1;
+                     result = mem + 1;
+                  }
                }
             }
          }
@@ -1288,26 +1356,6 @@ void *astStore_( void *ptr, const void *data, size_t size ) {
          new = astMalloc( size );
          if ( astOK ) {
             if ( ptr ) ptr = astFree( ptr );
-
-#ifdef AST_DYNREAD_CHECK
-
-/* Check we are not reading from beyond the end of a dynamically
-   allocated memory block. This can cause access violations on some
-   systems (e.g. cygwin). */
-
-   int rep = astReporting( 0 );
-   int dyn = IsDynamic( data );
-   astReporting( rep );
-   if( astStatus == AST__PTRIN ) astClearStatus;
-   if( dyn ) {
-      if( size > astSizeOf( data ) ) {
-         astError( AST__INTER, "astStore: Size of copy (%d) exceeds size "
-                   "of source (%d) (internal AST programming error).", size, 
-                   astSizeOf( data ) );
-      }
-   }
-#endif
-
             (void) memcpy( new, data, size );
 
 /* If memory allocation failed, do not free the old memory but return
@@ -2119,20 +2167,12 @@ int astGetMemId_( void *ptr ){
    Memory *mem;                  /* Pointer to memory header */
    int result;                   /* The returned identifier value */
 
-/* Initialise */
    result = -1;
-
-/* If the incoming pointer is NULL, do nothing. Otherwise, check if it
-   points at dynamically allocated memory (IsDynamic sets the global
-   error status if it does not). */
-   if ( ptr && IsDynamic( ptr ) ) {
-
-/* If OK, obtain a pointer to the memory header and return the identifier. */
+   if ( ptr ) {
       mem = ( (Memory *) ptr ) - 1;
       result = mem->id;
    }
 
-/* Return the result. */
    return result;
 }
 
@@ -2267,3 +2307,36 @@ void IdAlarm( const char *verb ){
 
 #endif
 
+/*
+
+For debugging cache problems...
+
+void astCacheCheck( void ){
+   int size, pop, any;
+   Memory *mem;
+
+   any = 0;
+   for( size = 0; size <= MXCSIZE; size++ ) {
+      pop = 0;
+      mem = cache[ size ];
+      while( mem ) {
+         pop++;
+         mem = mem->next;
+
+         if( mem && mem->size != size ) {
+            printf("Block of size %d stored at cache[%d]\n", (int) mem->size,
+                   (int) size );
+         }
+      }
+      if( pop ) {
+         printf( "%d:%d ", size, pop );
+         any = 1;
+      }
+   }
+   if( !any ) {
+      printf("Cache empty\n");
+   } else {
+      printf("\n");
+   }
+}
+*/

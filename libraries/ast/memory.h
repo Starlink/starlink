@@ -79,6 +79,8 @@
 *        Added astChrLen and astSscanf.
 *     15-NOV-2002 (DSB):
 *        Added astChrMatch astChrMatchN.
+*     23-FEB-2006 (DSB):
+*        Added astMemCaching and AST__TUNULL.
 *-
 */
 
@@ -88,11 +90,16 @@
 /* --------------- */
 #include <stddef.h>
 
+/* Macros. */
+/* ======= */
+#define AST__TUNULL -99999
+
 /* Function prototypes. */
 /* ==================== */
 #if defined(astCLASS) || 1       /* Nominally protected, but available for */
                                  /* use in developing (e.g.) foreign */
                                  /* language or graphics interfaces. */
+int astMemCaching_( int );
 char **astChrSplit_( const char *, int * );
 int astChrMatch_( const char *, const char * );
 int astChrMatchN_( const char *, const char *, size_t );
@@ -133,6 +140,7 @@ void *astFindIdPtr_( int );
 #define astFree(ptr) astFree_(ptr)
 #define astGrow(ptr,n,size) astGrow_(ptr,n,size)
 #define astMalloc(size) astMalloc_(size)
+#define astMemCaching(flag) astMemCaching_(flag)
 #define astRealloc(ptr,size) astRealloc_(ptr,size)
 #define astSizeOf(ptr) astSizeOf_(ptr)
 #define astTSizeOf(ptr) astTSizeOf_(ptr)

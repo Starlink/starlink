@@ -276,6 +276,8 @@
 *        Added astTune function.
 *     14-FEB-2006 (DSB):
 *        Added ObjSize attribute.
+*     23-FEB-2006 (DSB):
+*        Moved AST__TUNULL from this file to memory.h.
 *--
 */
 
@@ -298,7 +300,6 @@
 
 /* Macros. */
 /* ======= */
-#define AST__TUNULL -99999
 
 /*
 *+
