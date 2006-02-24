@@ -65,6 +65,10 @@
 *        Add smf_rebinmap
 *     2006-02-03 (AGG):
 *        Change API for smf_scale_tau, smf_correct_extinction
+*     2006-02-17 (AGG):
+*        Add smf_subtract_poly
+*     2006-02-24 (AGG):
+*        Add smf_subtract_plane
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,6 +188,10 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 		    smfData ** data, int *status);
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
+void smf_subtract_plane( smfData *data, const char *fittype, int *status);
+
+void smf_subtract_poly( smfData *data, int *status );
+
 void smf_tslice ( const smfData *idata, smfData **tdata, int index, int *status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
@@ -195,7 +203,5 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status );
-
-void smf_subtract_poly( smfData **data, int *status );
 
 #endif /* SMF_DEFINED */
