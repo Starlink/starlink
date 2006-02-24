@@ -109,6 +109,7 @@
 *        Report allocation failure as unsigned int
 *     23-FEB-2006 (TIMJ):
 *        Fix sprintf warning by casting size_t to unsigned long.
+*        Use cnfRealloc (which is most of the old psx_realloc)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -144,10 +145,8 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
 /* Local Variables:							    */
 
    char errbuf[100];		 /* Buffer for error message		    */
-   int reg;                      /* Registration error status               */
    size_t csize;                 /* Required memory size                    */
    void *cpntr;                  /* C version of input pointer              */
-   void *p;                      /* Temporary pointer value                 */
    void *temp;			 /* Temporary return value from malloc 	    */
 
 /* Check inherited global status.					    */
@@ -161,60 +160,11 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
    csize = (size_t) *size;
 
 /* Re-allocate the space.		                                    */
-
-   temp = realloc( cpntr, csize );
-
-/* If a pointer to new memory was returned, then un-register the old        */
-/* pointer (if not NULL).                                                   */
-
-   if ( ( temp != cpntr ) && ( cpntr != NULL ) ) cnfUregp( cpntr );
-
-/* If a pointer to new memory was returned, attempt to register the new     */
-/* pointer (if not NULL).                                                   */
-       
-   if ( ( temp != cpntr ) && ( temp != NULL ) )
-   {
-      reg = cnfRegp( temp );
-
-/* If it could not be registered, then attempt to allocate some new memory  */
-/* with a registered pointer associated with it.                            */
-
-      if ( !reg )
-      {
-         p = cnfMalloc( csize );
-
-/* If successful, transfer the data to the new (registered) memory and free */
-/* the memory which could not be registered.                                */
-
-         if ( p )
-         {
-            (void) memcpy( p, temp, csize );
-            free( temp );
-            temp = p;
-         }
-         else
-
-/* If no registered memory was available, free the unregistered memory and  */
-/* set the returned pointer to NULL.                                        */
-         {
-            free( temp );
-            temp = NULL;
-         }
-      }
-
-/* If an error occurred during pointer registration, free the unregistered  */
-/* memory and set the returned pointer to NULL.                             */
-
-      else if ( reg < 0 )
-      {
-         free( temp );
-         temp = NULL;
-      }
-   }
+   temp = cnfRealloc( cpntr, csize );
 
 /* Check that the space was allocated.					    */
 
-   if( temp != 0 )
+   if( temp != NULL )
 
 /* Copy the pointer to the allocated storage space to the subroutine	    */
 /* argument, converting to a Fortran pointer.				    */
@@ -227,6 +177,8 @@ F77_SUBROUTINE(psx_realloc)( INTEGER(size), POINTER(pntr), INTEGER(status) )
 /* Set STATUS to an error code and report the error.			    */
 
    {
+      /* Free the memory that we had already got */
+      cnfFree( pntr );
       *pntr = (F77_POINTER_TYPE)0;
       *status = PSX__NOALL;
       sprintf( errbuf, 
