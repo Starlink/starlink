@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(cnf, 4.1-2, ussc@star.rl.ac.uk)
+AC_INIT(cnf, 4.2-1, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -38,6 +38,11 @@ dnl   Need to know the size of a pointer for CNF_PVAL
 dnl   (see CNF_PAR.F and Makefile.am)
 AC_CHECK_SIZEOF(void*)
 AC_CHECK_SIZEOF(uint32_t)
+
+dnl   Declare dependencies
+STAR_DECLARE_DEPENDENCIES([build], [starmem])
+STAR_DECLARE_DEPENDENCIES([link],  [starmem])
+
 
 dnl   This package has no dependencies
 

@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 char *cnfCreib( const char *source_f, int source_len )
@@ -71,7 +71,7 @@ char *cnfCreib( const char *source_f, int source_len )
 
 /* Allocate the temporary space.						    */
 
-   ptr = (char *)malloc( (size_t)( source_len + 1 ) );
+   ptr = (char *)starMallocAtomic( (size_t)( source_len + 1 ) );
 
 /* Check for malloc returning a null pointer. If it does not, copy the	    */
 /* input string to the temporary storage.				    */

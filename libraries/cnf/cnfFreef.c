@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 void cnfFreef( F77_CHARACTER_ARG_TYPE *temp )
@@ -52,6 +52,6 @@ void cnfFreef( F77_CHARACTER_ARG_TYPE *temp )
 *...........................................................................*/
 
 {
-   free( (void *)temp );
+   starFree( (void *)temp );
 }
 

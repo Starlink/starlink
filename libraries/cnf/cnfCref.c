@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 F77_CHARACTER_ARG_TYPE *cnfCref( int length )
@@ -67,7 +67,7 @@ F77_CHARACTER_ARG_TYPE *cnfCref( int length )
 
 /* Allocate the space.							    */
 
-   ptr = (F77_CHARACTER_ARG_TYPE *)malloc( (size_t)( length?length:1 ) );
+   ptr = (F77_CHARACTER_ARG_TYPE *)starMallocAtomic( (size_t)( length?length:1 ) );
 
 /* Check for malloc returning a null value. If it does not, set the string  */
 /* to the null character.						    */

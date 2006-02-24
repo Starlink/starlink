@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 F77_LOGICAL_TYPE *cnfCrela( int ndims, const int *dims )
@@ -68,7 +68,7 @@ F77_LOGICAL_TYPE *cnfCrela( int ndims, const int *dims )
    for ( i=0; i<ndims; i++ ) size *= *(dims+i);
 
 /* Allocate the space and return a pointer to it			    */
-   return (F77_LOGICAL_TYPE *)malloc( (size_t)( size ) );
+   return (F77_LOGICAL_TYPE *)starMallocAtomic( (size_t)( size ) );
 
 }
 

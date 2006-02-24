@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cnf" support="S">
-  <version>4.1-2</version>
+  <version>4.2-1</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -14,7 +14,7 @@
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <build>starmem</build><link>starmem</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

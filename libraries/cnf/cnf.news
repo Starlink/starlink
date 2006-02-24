@@ -1,5 +1,11 @@
 1 CNF_update
 
+ CNF Version 4.2 is released.
+
+ o Now uses the starmem library for memory allocation.
+ o Add cnfRealloc routine (like realloc but guarantees the pointer
+   is registered)
+
  CNF Version 4.1 is released.
 
  A new Fortran routine is available, CNF_PREG, that can be used

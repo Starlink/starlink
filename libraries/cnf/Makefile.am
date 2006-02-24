@@ -63,16 +63,16 @@ TESTS = cnf_test f_calls_c c_calls_f c_calls_f_args
 check_PROGRAMS = cnf_test f_calls_c c_calls_f c_calls_f_args
 
 cnf_test_SOURCES = cnf_test.c
-cnf_test_LDADD = libcnf.la
+cnf_test_LDADD = libcnf.la `starmem_link`
 
 f_calls_c_SOURCES = f_calls_c_main.f f_calls_c_sub.c
-f_calls_c_LDADD = libcnf.la
+f_calls_c_LDADD = libcnf.la `starmem_link`
 
 c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f
-c_calls_f_LDADD = libcnf.la libcnfrtl.la @FCLIBS@
+c_calls_f_LDADD = libcnf.la libcnfrtl.la @FCLIBS@ `starmem_link`
 
 c_calls_f_args_SOURCES = c_calls_f_args.c f_receive_args.f
-c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@
+c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@ `starmem_link`
 
 dist_starnews_DATA = cnf.news
 

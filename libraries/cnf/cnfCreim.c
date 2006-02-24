@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 
 char *cnfCreim( const char *source_f, int source_len )
@@ -77,7 +77,7 @@ char *cnfCreim( const char *source_f, int source_len )
 
 /* Allocate enough space for a copy of the input string.		    */
 
-   ptr = (char *)malloc( (size_t)( i + 2 ) );
+   ptr = (char *)starMallocAtomic( (size_t)( i + 2 ) );
 
 /* If the space was allocated successfully, copy the input FORTRAN string   */
 /* to it.								    */

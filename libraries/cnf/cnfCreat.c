@@ -1,4 +1,4 @@
-#include <stdlib.h>		 /* Standard C run-time library		    */
+#include "star/mem.h"            /* Starlink malloc routines */
 #include "f77.h"                 /* CNF macros and prototypes               */
 char *cnfCreat( int length )
 
@@ -63,7 +63,7 @@ char *cnfCreat( int length )
 
 /* Allocate the space.							    */
 
-   ptr = (char *)malloc( (size_t)( length ) );
+   ptr = (char *)starMallocAtomic( (size_t)( length ) );
 
 /* Check for malloc returning a null value. If it does not, set the string  */
 /* to the null character.						    */
