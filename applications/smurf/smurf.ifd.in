@@ -172,6 +172,14 @@ package @PACKAGE@ {
             helpkey *
           }
 
+	 parameter fit {
+	    type _CHAR
+	    vpath {PROMPT }
+	    prompt {Remove mean, slope or plane?}
+	    ppath GLOBAL CURRENT
+	    helpkey *
+	  }
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
