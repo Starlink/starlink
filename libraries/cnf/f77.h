@@ -193,6 +193,7 @@
 #define CNF_MACROS
 
 #include <stdlib.h>
+#include "star/mem.h"
 /*  This initial sections defines values for all macros. These are the	    */
 /*  values that are generally appropriate to an ANSI C compiler on Unix.    */
 /*  For macros that have different values on other systems, the macros	    */
