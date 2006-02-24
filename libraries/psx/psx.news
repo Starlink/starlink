@@ -1,8 +1,12 @@
 1 PSX - POSIX interface routines
                                                           Expires: **.**.**
+v0.5-3:
+     Use starMem library for malloc/free
+
 v0.5-2:
      Added PSX_RENAME
      Added PSX_GETCWD
+     Added PSX_CHDIR
 
 v0.5:
      New autoconf-based build system

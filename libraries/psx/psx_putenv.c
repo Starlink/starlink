@@ -53,6 +53,8 @@
 *     13-FEB-2006 (TIMJ):
 *        Use cnfFree again since this is easier to control when changing
 *        malloc library.
+*     23-FEB-2006 (TIMJ):
+*        Use starMalloc
 
 *  Notes:
 *    Uses the setenv() function where available. If setenv()
@@ -76,7 +78,8 @@
 #include "sae_par.h"   /* SSE Constants */
 #include "f77.h"       /* CNF macros and prototypes */
 #include "psx_err.h"   /* PSX errors */
-#include "psx1.h"	     /* Internal PSX routines		    */
+#include "psx1.h"      /* Internal PSX routines */
+#include "star/mem.h"  /* Starlink memory routines */
 
 F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
 			    CHARACTER(value),
@@ -123,7 +126,7 @@ F77_SUBROUTINE(psx_putenv)( CHARACTER(name),
      whilst the variable is required */
   /* Include space for equals sign and trailing null */
   /* Assumes a character is one byte */
-      envstr = malloc( strlen(temp_name) + strlen(temp_value) + 2);
+      envstr = starMalloc( strlen(temp_name) + strlen(temp_value) + 2);
  
   /* Copy in the string */
       strcpy( envstr, temp_name );

@@ -67,6 +67,8 @@
 *     13-FEB-2006 (TIMJ):
 *        Use cnfFree again since this is easier to control when changing
 *        malloc library.
+*     23-FEB-2006 (TIMJ):
+*        Use starMalloc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -85,6 +87,7 @@
 #include "psx_err.h"		 /* PSX error values			    */
 #include "psx1.h"		 /* Internal PSX routines		    */
 #include "sae_par.h"		 /* ADAM constants			    */
+#include "star/mem.h"            /* Starlink memory routines                */
 
 F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
                             CHARACTER(trans),
@@ -158,13 +161,13 @@ F77_SUBROUTINE(psx_getenv)( CHARACTER(name),
 /* of the message, the name of the environment variable, two quotes and the */
 /* trailing null .							    */
 
-      errmsg_p = malloc( strlen( errmsg1 ) + strlen( temp_name ) + 3 );
+      errmsg_p = starMalloc( strlen( errmsg1 ) + strlen( temp_name ) + 3 );
       strcpy( errmsg_p, errmsg1 );
       strcat( errmsg_p, "\"" );
       strcat( errmsg_p, temp_name );
       strcat( errmsg_p, "\"" );
       psx1_rep_c( "PSX_GETENV_NOENV", errmsg_p, status );
-      free( errmsg_p );
+      starFree( errmsg_p );
       cnfFree( temp_name );
    }
 

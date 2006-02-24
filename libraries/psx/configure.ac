@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(psx, 0.5-2, ussc@star.rl.ac.uk)
+AC_INIT(psx, 0.5-3, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -75,7 +75,7 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES([build], [cnf ems sae])
+STAR_DECLARE_DEPENDENCIES([build], [cnf ems sae starmem])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun121)

@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="psx" support="U">
-  <version>0.5-2</version>
+  <version>0.5-3</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
    <abstract><p>PSX is a FORTRAN subroutine library that allows
@@ -12,7 +12,7 @@
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
   <dependencies >
-    <build>cnf</build><build>ems</build><build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ems</build><build>sae</build><build>starmem</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

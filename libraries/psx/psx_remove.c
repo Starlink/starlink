@@ -5,6 +5,7 @@
 #include "psx1.h"
 #include "ems.h"
 #include <errno.h>
+#include "star/mem.h"
 
 F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status) 
 			    TRAIL(pathname) ){
@@ -59,6 +60,8 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
 *        Original version (LPG/CTG).
 *     3-OCT-2004 (TIMJ):
 *        PSX-ify. Status is now set on error.
+*     23-FEB-2006 (TIMJ):
+*        Use starMalloc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,7 +80,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
    if( *status != SAI__OK ) return;
 
 /* Allocate memory to store a null-terminated copy of the file name. */
-   file = (char *) malloc( pathname_length + 1 );
+   file = (char *) starMalloc( pathname_length + 1 );
    if ( file ) {
 
 /* Copy the blank padded fortran file name to a null terminated C string. */
@@ -97,7 +100,7 @@ F77_SUBROUTINE(psx_remove)( CHARACTER(pathname), INTEGER(status)
       }
 
 /* Free the memory. */
-      free( file );
+      cnfFree( file );
    } else {
      *status = PSX__NOMEM;
      psx1_rep_c("PSX_REMOVE_ERR2",
