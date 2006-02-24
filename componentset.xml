@@ -3153,7 +3153,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="starmem" support="S">
-  <version>0.1-1</version>
+  <version>0.2-1</version>
   <path>libraries/starmem</path>
   <description>Starlink Memory Management Library</description>
   <abstract>
