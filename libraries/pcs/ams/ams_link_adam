@@ -31,6 +31,7 @@
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
+#     PWD: Peter W. Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -40,6 +41,8 @@
 #        Added new awk script to permit larger numbers of libraries.
 #     22-JUN-1995 (BLY):
 #        Generic version.
+#     24-FEB-2006 (PWD):
+#        Use cnf_link_adam to pick up all dependencies.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -47,7 +50,7 @@
 
 #-
 
-   echo -lams_adam -lmsp -lsock -latimer -lcnf \
+   echo -lams_adam -lmsp -lsock -latimer `cnf_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
