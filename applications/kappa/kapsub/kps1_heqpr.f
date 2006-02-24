@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_HEQPR( BAD, EL, ARRAY, RSHADE, MAXV, MINV, NINTS,
-     :                         PENS, X, Y, CUMUL, HIST, STATUS )
+     :                         PENS, X, Y, CUMUL, STATUS )
 *+
 *  Name:
 *     KPS1_HEQPx
@@ -12,7 +12,7 @@
  
 *  Invocation:
 *     CALL KPS1_HEQPx( BAD, EL, ARRAY, RSHADE, MAXV, MINV, NINTS, PENS,
-*                      X, Y, CUMUL, HIST, STATUS )
+*                      X, Y, CUMUL, STATUS )
  
 *  Description:
 *     An histogram of the array is produced, and is used to assign
@@ -57,8 +57,6 @@
 *        chart.
 *     CUMUL( 0:NINTS-1 ) = INTEGER (Returned)
 *        Work array for the discrete cumulative-frequency chart.
-*     HIST( 0:NINTS-1 ) = INTEGER (Returned)
-*        Work array for the histogram.
 *     STATUS = INTEGER (Given and Returned)
 *        Global status parameter.
  
@@ -121,6 +119,9 @@
 *        Made generic and renamed from HSTEQP with a revised calling
 *        sequence.  Processes a vector.  Add BAD argument.  Used
 *        modern-style commenting and prologue.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .TRUEE. to KPG1_GHSTx call
+*        and thus eliminate the HIST array argument.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -149,7 +150,6 @@
       DOUBLE PRECISION X( 0:NINTS-1 )
       DOUBLE PRECISION Y( 0:NINTS-1 )
       INTEGER CUMUL( 0:NINTS-1 )
-      INTEGER HIST( 0:NINTS-1 )
  
 *  Status:
       INTEGER STATUS             ! Global status
@@ -210,19 +210,12 @@
  
 *  Clear the histogram array.
       DO I = 0, NINTS-1, 1
-         HIST( I ) = 0
+         CUMUL( I ) = 0
       END DO
  
-*  Create the histogram.
-      CALL KPG1_GHSTR( BAD, EL, ARRAY, NINTS, MAXV, MINV, HIST,
-     :                 STATUS )
- 
-*  Create the cumulative frequency chart.
-      CUMUL( 0 ) = HIST( 0 )
- 
-      DO  I = 1, NINTS-1, 1
-         CUMUL( I ) = CUMUL( I-1 ) + HIST( I )
-      END DO
+*  Create the cumulative histogram.
+      CALL KPG1_GHSTR( BAD, EL, ARRAY, NINTS, .TRUE., MAXV, MINV,
+     :                 CUMUL( 0 ), STATUS )
  
 *  Set up data for least-squares fit.
       DO  I = 0, NINTS-1, 1
