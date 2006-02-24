@@ -48,10 +48,12 @@
 /* ============= */
 /* C run-time library header files. */
 #include <limits.h>              /* Implementation-defined limits */
-#include <stdlib.h>              /* Utility functions */
 #include <stdio.h>               /* for debugging */
+#include <stdlib.h>
+#include <string.h>
 
 /* User header files. */
+#include "star/mem.h"            /* Starlink malloc wrappers */
 #include "f77.h"                 /* F77 <--> C interface macros */
 
 /* Static variables for this module. */
@@ -64,13 +66,13 @@ static const unsigned long int mask =
    ~( ~0UL << ( sizeof( F77_POINTER_TYPE ) * CHAR_BIT - 1) << 1 );
 
 /* Number of entries for which space is allocated in pointer list. */
-static int pointer_max = 0;
+static unsigned int pointer_max = 0;
 
 /* Number of entries so far used in pointer list. */
-static int pointer_count = 0;
+static unsigned int pointer_count = 0;
 
 /* Number of registered pointers. */
-static int registered_pointers = 0;
+static unsigned int registered_pointers = 0;
    
 /* Pointer to list of C pointers. */
 static void **pointer_list = NULL;
@@ -80,11 +82,13 @@ static size_t *offset_list = NULL;
 
 /* Function prototypes. */
 /* ==================== */
+
 static int Register( void * );
 static size_t Unregister( void * );
 static void *Malloc( size_t, int );
 void *F77_EXTERNAL_NAME(cnf_pval)( POINTER(FPTR) );
 F77_POINTER_FUNCTION(cnf_preg)( void **(cptr), LOGICAL(isnew) );
+F77_SUBROUTINE(cnf_unregp)( POINTER(FPTR) );
 
 /* Define how to convert a C pointer to a fortran INTEGER. This does
    not have to be reversible */
@@ -183,7 +187,7 @@ void *cnfCptr( F77_POINTER_TYPE fpointer ) {
 */
 
 /* Local Variables: */
-   int i;                        /* Loop counter for searching pointer list */
+   unsigned int i;               /* Loop counter for searching pointer list */
    void *result = NULL;          /* Result value to return */
 
 /* Search the pointer list for an entry whose Fortran pointer matches
@@ -238,7 +242,7 @@ F77_POINTER_TYPE cnfFptr( void *cpointer ) {
 */
 
 /* Local Variables: */
-   int i;                        /* Loop counter for searching pointer list */
+   unsigned int i;                /* Loop counter for searching pointer list */
    F77_POINTER_TYPE result = (F77_POINTER_TYPE) 0; /* Result to return */
 
 /* Do not bother translating if we have a null pointer */
@@ -298,7 +302,7 @@ void cnfFree( void *pointer ) {
    pointer = (void *) ( (char *) pointer - Unregister( pointer ) );
 
 /* Free the allocated memory. */
-   free( pointer );
+   starFree( pointer );
 }
 
 static void *Malloc( size_t size, int zero ) {
@@ -356,8 +360,8 @@ static void *Malloc( size_t size, int zero ) {
 /* Attempt to allocate the required amount of memory, plus an extra
    amount to permit the returned pointer to be offset from the start
    of the allocated memory if necessary. */
-      mem = zero ? calloc( (size_t) 1, size + offset ) :
-                   malloc( size + offset );
+      mem = zero ? starCalloc( (size_t) 1, size + offset ) :
+                   starMalloc( size + offset );
 
 /* Quit if the memory could not be allocated. */
       if ( !mem ) {
@@ -375,7 +379,7 @@ static void *Malloc( size_t size, int zero ) {
 
 /* If it cannot, then free the allocated memory and increment the
    offset, so that a new pointer value will be produced next time. */
-            free( mem );
+            starFree( mem );
             offset += offset_step;
 
 /* If the pointer was successfully registered, then store the offset
@@ -387,7 +391,7 @@ static void *Malloc( size_t size, int zero ) {
 /* If an error occurred during registration, then free the allocated
    memory and quit. */
          } else {
-            free( mem );
+            starFree( mem );
             result = NULL;
             break;
          }
@@ -437,6 +441,106 @@ void *cnfMalloc( size_t size ) {
 
 /* Allocate the required memory without initialisation. */
    return Malloc( size, 0 );
+}
+
+void *cnfRealloc( void * pntr, size_t size ) {
+/*
+*+
+*  Name:
+*     cnfMalloc
+
+*  Purpose:
+*     Re-Allocate space that may be accessed from C and Fortran.
+
+*  Invocation:
+*     cpointer = cnfMalloc( size );
+
+*  Description:
+*     This function allocates space in the same way as the standard C
+*     remalloc() function, except that the pointer to the space
+*     reallocated is automatically registered (using cnfRegp) for use
+*     from both C and Fortran. This means that the returned pointer
+*     may subsequently be converted into a Fortran pointer of type
+*     F77_POINTER_TYPE (using cnfFptr), and back into a C pointer
+*     (using cnfCptr). The contents of the space may therefore be
+*     accessed from both languages.
+
+*  Arguments:
+*     void * pntr (Given)
+*        Pointer to be re-allocated. Must have been malloced by cnfMalloc.
+*        If new memory is allocated by this routine, this pointer will no
+*        longer be valid. If the resize fails this pointer will still be valid.
+*        This conforms to the standard ANSI C behaviour of realloc.
+*     size_t size (Given)
+*        The size of the required space.
+
+*  Returned Value:
+*     void *cnfRealloc
+*        A registered pointer to the re-allocated space, or NULL if the
+*        space could not be allocated. If NULL, "pntr" is not changed or freed.
+
+*  Notes:
+*     - The re-allocated space should be freed using cnfFree when no
+*     longer required.
+*-
+*/
+
+  int    reg;  /* Error status from pointer registration */
+  void * p;    /* Temp pointer */
+  void * temp; /* Local copy of pointer from realloc */
+
+  /* Try to resize */
+  temp = starRealloc( pntr, size );
+
+/* If a pointer to new memory was returned, then un-register the old        */
+/* pointer (if not NULL).                                                   */
+
+   if ( ( temp != pntr ) && ( pntr != NULL ) ) cnfUregp( pntr );
+
+/* If a pointer to new memory was returned, attempt to register the new     */
+/* pointer (if not NULL).                                                   */
+       
+   if ( ( temp != pntr ) && ( temp != NULL ) )
+   {
+      reg = cnfRegp( temp );
+
+/* If it could not be registered, then attempt to allocate some new memory  */
+/* with a registered pointer associated with it.                            */
+
+      if ( !reg )
+      {
+         p = cnfMalloc( size );
+
+/* If successful, transfer the data to the new (registered) memory and free */
+/* the memory which could not be registered.                                */
+
+         if ( p )
+         {
+            memcpy( p, temp, size );
+            starFree( temp );
+            temp = p;
+         }
+         else
+
+/* If no registered memory was available, free the unregistered memory and  */
+/* set the returned pointer to NULL.                                        */
+         {
+            starFree( temp );
+            temp = NULL;
+         }
+      }
+
+/* If an error occurred during pointer registration, free the unregistered  */
+/* memory and set the returned pointer to NULL.                             */
+
+      else if ( reg < 0 )
+      {
+         starFree( temp );
+         temp = NULL;
+      }
+   }
+
+   return temp;
 }
 
 void *F77_EXTERNAL_NAME(cnf_pval)( POINTER(FPTR) ) {
@@ -648,7 +752,7 @@ static int Register( void *ptr ) {
    const size_t init_size = (size_t) 64; /* Initial pointer list size */
 
 /* Local Variables: */
-   int i;                        /* Loop counter for searching list */
+   unsigned int i;               /* Loop counter for searching list */
    int result = 0;               /* Result value to return */
    int unique = 1;               /* Fortran pointer is unique? */
    int vacant = 0;               /* Location of first vacant list element */
@@ -696,7 +800,7 @@ static int Register( void *ptr ) {
 
 /* Re-allocate the space for the pointer list, checking for memory
    allocation errors. */
-               if ( ( tmp = realloc( pointer_list, sizeof( void * ) *
+               if ( ( tmp = starRealloc( pointer_list, sizeof( void * ) *
                                                    (size_t) pointer_max ) ) ) {
                   pointer_list = tmp;
                } else {
@@ -704,7 +808,7 @@ static int Register( void *ptr ) {
                }
 
 /* Similarly, re-allocate memory for the list of pointer offsets. */
-               if ( ( tmp = realloc( offset_list, sizeof( size_t ) *
+               if ( ( tmp = starRealloc( offset_list, sizeof( size_t ) *
                                                   (size_t) pointer_max ) ) ) {
                   offset_list = tmp;
                } else {
@@ -824,7 +928,7 @@ static size_t Unregister( void *ptr ) {
 */
 
 /* Local Variables: */
-   int i;                        /* Loop counter for searching pointer list */
+   unsigned int i;               /* Loop counter for searching pointer list */
    size_t result = (size_t) 0;   /* Result value to return */
 
 /* Search the pointer list for an entry whose C pointer matches the
@@ -843,8 +947,8 @@ static size_t Unregister( void *ptr ) {
          if ( !--registered_pointers ) {
             pointer_max = 0;
             pointer_count = 0;
-            free( pointer_list ); pointer_list = NULL;
-            free( offset_list ); offset_list = NULL;
+            starFree( pointer_list ); pointer_list = NULL;
+            starFree( offset_list ); offset_list = NULL;
          }
          break;
       }
