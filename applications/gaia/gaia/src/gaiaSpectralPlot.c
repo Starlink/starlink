@@ -611,9 +611,7 @@ static void ComputeSPBbox( Tk_Canvas canvas, SPItem *spPtr )
 {
     /*  Ask AST about the Plot dimensions, use graphics bbox etc. */
 }
-
-
-
+   
 /*
  *--------------------------------------------------------------
  *
@@ -628,8 +626,8 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
                               char *widgRec, int offset )
 {
     AstFrameSet **ptr;
-    *ptr = (AstFrameSet *)(widgRec + offset);
     long longResult;
+    *ptr = (AstFrameSet *)(widgRec + offset);
 
     if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
         return TCL_ERROR;
