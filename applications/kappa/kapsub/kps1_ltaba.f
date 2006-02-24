@@ -36,6 +36,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,7 +45,10 @@
 *        greyscale colour tables do not have a hint of colour about them due 
 *        to different resolutions on the three primarty colours.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
+*        Also remove fourth workspace for the revised KPS1_HEQPx API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -178,7 +182,6 @@
       INTEGER WPNTR1             ! Pointer to a work array
       INTEGER WPNTR2             ! Pointer to a work array
       INTEGER WPNTR3             ! Pointer to a work array
-      INTEGER WPNTR4             ! Pointer to a work array
 
 *  Local Data:
       DATA COLSET/0.0, 0.0, 0.5,
@@ -451,13 +454,15 @@
 *  percentile routine.
             IF( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST, 
+     :                          STATUS )
                DMAXV = DBLE( RMAXV )
                DMINV = DBLE( RMINV )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., DMAXV, DMINV, HIST,
+     :                          STATUS )
             END IF
 
 *  Estimate the values at the percentiles.
@@ -479,7 +484,6 @@
             CALL PSX_CALLOC( ANINTS, '_DOUBLE', WPNTR1, STATUS )
             CALL PSX_CALLOC( ANINTS, '_DOUBLE', WPNTR2, STATUS )
             CALL PSX_CALLOC( ANINTS, '_INTEGER', WPNTR3, STATUS )
-            CALL PSX_CALLOC( ANINTS, '_INTEGER', WPNTR4, STATUS )
 
 *  Perform the histogram equalisation.
 *  ===================================
@@ -493,8 +497,7 @@
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
      :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
      :                          %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                          %VAL( CNF_PVAL( WPNTR3 ) ), 
-     :                          %VAL( CNF_PVAL( WPNTR4 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_HEQPD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
@@ -503,8 +506,7 @@
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
      :                          %VAL( CNF_PVAL( WPNTR1 ) ), 
      :                          %VAL( CNF_PVAL( WPNTR2 ) ),
-     :                          %VAL( CNF_PVAL( WPNTR3 ) ), 
-     :                          %VAL( CNF_PVAL( WPNTR4 ) ), STATUS )
+     :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
             END IF
 
             IF( STATUS .NE. SAI__OK ) THEN
@@ -526,7 +528,6 @@
             CALL PSX_FREE( WPNTR1, STATUS )
             CALL PSX_FREE( WPNTR2, STATUS )
             CALL PSX_FREE( WPNTR3, STATUS )
-            CALL PSX_FREE( WPNTR4, STATUS )
          END IF
 
 *  End of the section to define the colour mapping.
