@@ -41,6 +41,9 @@
 
 */
 
+/* Make sure we have standard definitions such as size_t */
+#include <stdlib.h>
+
 /* Private init routine called by starMemInit macro */
 void starMemInitPrivate( int gc_initialized );
 
