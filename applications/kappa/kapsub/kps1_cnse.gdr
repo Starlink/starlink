@@ -124,6 +124,8 @@
 *        Added methods 'Bounds' and 'Good'. Added argument MODE.
 *     2006 January 23 (MJC):
 *        Added 'Scale' method.  Added argument PNEND.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 *     
 
@@ -275,8 +277,8 @@
      :                            MINVAL, MAXPOS, MINPOS, STATUS )
 
 *  Generate an histogram of the required array.
-               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, MAXVAL,
-     :                            MINVAL, HISTOG, STATUS )
+               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, .FALSE.,
+     :                            MAXVAL, MINVAL, HISTOG, STATUS )
 
 *  Find the pixel values corresponding to the areas.
                CALL KPG1_HSTF<T>( NUMBIN, HISTOG, MAXVAL, MINVAL,
@@ -356,8 +358,8 @@
             ELSE
 
 *  Form histogram.
-               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, MAXVAL, MINVAL,
-     :                            HISTOG, STATUS )
+               CALL KPG1_GHST<T>( BAD, EL, ARRAY, NUMBIN, .FALSE.,
+     :                            MAXVAL, MINVAL, HISTOG, STATUS )
 
                IF ( MODE( 1:2 ) .EQ. 'PE' ) THEN
 

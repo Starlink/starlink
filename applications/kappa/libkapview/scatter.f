@@ -192,6 +192,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -204,7 +205,9 @@
 *        Ensure that none of the compression factors are bigger than the 
 *        number of pixels on the corresponding axis.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -443,7 +446,7 @@
 
 *  Generate the histogram between those bounds.
       CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP1 ) ), 
-     :                 NUMBIN, RMAXV, RMINV,
+     :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
 
 *  Estimate the values at the percentiles.
@@ -462,7 +465,7 @@
      :                 NINVAL, RMAXV, RMINV,
      :                 MAXPOS, MINPOS, STATUS )
       CALL KPG1_GHSTR( .TRUE., NEL, %VAL( CNF_PVAL( IP2 ) ), 
-     :                 NUMBIN, RMAXV, RMINV,
+     :                 NUMBIN, .FALSE., RMAXV, RMINV,
      :                 HIST, STATUS )
       CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2, PERC2, PERV2, 
      :                 STATUS )

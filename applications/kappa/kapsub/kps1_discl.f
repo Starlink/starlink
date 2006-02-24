@@ -95,6 +95,8 @@
 *        Use CNF_PVAL
 *     2004 September 30 (PWD):
 *        Move CNF_PAR include into declarations.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *     {enter_further_changes_here}
 
 *-
@@ -757,7 +759,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST, 
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, NPRCTL,
@@ -800,7 +803,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, DMAXV, DMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., DMAXV, DMINV, HIST, 
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, SNGL( DMAXV ),
@@ -844,7 +848,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTI( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, IMAXV, IMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., IMAXV, IMINV, HIST, 
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, REAL( IMAXV ),
@@ -888,7 +893,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTW( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, WMAXV, WMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., WMAXV, WMINV, HIST, 
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, NUM_WTOR( WMAXV ),
@@ -932,7 +938,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTB( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          NUMBIN, BMAXV, BMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., BMAXV, BMINV, HIST,
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, NUM_BTOR( BMAXV ),
