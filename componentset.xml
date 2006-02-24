@@ -1949,7 +1949,7 @@ No longer under active control.
 </component>
 
 <component id="cnf" support="S">
-  <version>4.1-2</version>
+  <version>4.2-1</version>
   <path>libraries/cnf</path>
   <description>Mixed Language Programming -- FORTRAN and C</description>
   <abstract><p>The CNF package comprises two sets of software which
@@ -1960,7 +1960,7 @@ No longer under active control.
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies >
-    <sourceset>star2html</sourceset>
+    <build>starmem</build><link>starmem</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -1991,7 +1991,7 @@ No longer under active control.
 </component>
 
 <component id="ems" support="S">
-  <version>2.0-7</version>
+  <version>2.0-8</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
   <abstract><p>The purpose of EMS is to provide facilities for
@@ -2002,7 +2002,7 @@ No longer under active control.
       message output or access to the parameter and data
       systems).</p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>starmem</build><link>cnf</link><link>starmem</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -2942,7 +2942,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="psx" support="U">
-  <version>0.5-2</version>
+  <version>0.5-3</version>
   <path>libraries/psx</path>
   <description>POSIX interface routines</description>
    <abstract><p>PSX is a FORTRAN subroutine library that allows
@@ -2951,7 +2951,7 @@ Ultrix and for SunOS and may still work for them.
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
   <dependencies >
-    <build>cnf</build><build>ems</build><build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>ems</build><build>sae</build><build>starmem</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -3160,7 +3160,7 @@ Ultrix and for SunOS and may still work for them.
 	<p>C Memory management wrapper routines.</p>
   </abstract>
   <dependencies >
-    <sourceset>messgen</sourceset>
+    
   </dependencies>
   <developers>
     <person>
