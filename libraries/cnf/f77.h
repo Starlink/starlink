@@ -176,6 +176,10 @@
 *        Correct F77_EXPORT_UWORD_ARRAY
 *      25-AUG-2005 (TIMJ):
 *        Add cnfInitRTL
+*      23-FEB-2006 (TIMJ):
+*        Add cnfRealloc
+*        Use starMalloc rather than malloc in F77_CREATE_POINTER_ARRAY
+*        (since it needs to match what goes on in cnfFree)
 *     {enter_further_changes_here}
 *        
 
@@ -484,7 +488,7 @@
 #define F77_CREATE_WORD_ARRAY(X,N)
 #define F77_CREATE_UWORD_ARRAY(X,N)
 #define F77_CREATE_POINTER_ARRAY(X,N)\
-        X=(F77_POINTER_TYPE *) malloc(N*sizeof(F77_POINTER_TYPE))
+        X=(F77_POINTER_TYPE *) starMalloc(N*sizeof(F77_POINTER_TYPE))
 
 /* Associate Fortran arrays with C arrays                             */
 /* These macros ensure that there is space somewhere for the Fortran  */
