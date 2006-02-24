@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="ems" support="S">
-  <version>2.0-7</version>
+  <version>2.0-8</version>
   <path>libraries/ems</path>
   <description>EMS -- Error Message Service</description>
   <abstract><p>The purpose of EMS is to provide facilities for
@@ -14,7 +14,7 @@
       message output or access to the parameter and data
       systems).</p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>starmem</build><link>cnf</link><link>starmem</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

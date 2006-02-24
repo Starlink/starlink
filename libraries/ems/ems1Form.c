@@ -41,6 +41,7 @@
 *     AJC: Alan Chipperfield (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     RTP: R.T. Platon (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *        Remove 'param' argument
 *     13-AUG-2001 (AJC):
 *        #include stdlib.h and ems1.h 
+*      23-FEB-2006 (TIMJ):
+*        Use starMem
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,6 +73,7 @@
 #include "ems_par.h"                 /* EMS_ public constants */
 #include "ems_sys.h"                 /* EMS_ private constants */
 #include "ems_msgtb.h"               /* Error message table */
+#include "star/mem.h"
 
 void ems1Form( const char *text, const int maxlen,
                Logical clean, char *opstr, int *oplen, int *status ) {
@@ -102,7 +106,7 @@ void ems1Form( const char *text, const int maxlen,
    if ( texlen > 0 ) {
 
 /*  Use a temporary text buffer which can be modified */
-      texbuf = (char *)malloc(texlen+1);
+      texbuf = starMalloc(texlen+1);
       strcpy( texbuf, text );
 
 /*     Initialise the text pointers and local status. */
@@ -203,7 +207,7 @@ void ems1Form( const char *text, const int maxlen,
             lstpos = curpos;
          }
       }
-      free( texbuf );
+      starFree( texbuf );
    }
 
 /*  Get the length of the string and, if CLEAN is TRUE, ensure the returned

@@ -31,6 +31,7 @@
  *  Authors:
  *     BKM: B.K. McIlwrath (STARLINK)
  *     AJC: A.J.Chipperfield (STARLINK)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -56,6 +57,8 @@
  *        Use changed name of ems1Starf
  *     21-MAR-2001 (AJC):
  *        Addition of trailing blanks not required now ems1Fcerr called from C.
+ *     23-FEB-2006 (TIMJ):
+ *       Use starMem
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -68,6 +71,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "sae_par.h"
+#include "star/mem.h"
 #include "ems.h"
 #include "ems_par.h"
 
@@ -219,7 +223,7 @@ char **error_text	/* message text (returned) */
         }
 	if (fp != NULL) {		/* Cache facility code and filename */
 	    facilities[cur_fac].fac_code = fac_code;
-	    facilities[cur_fac].file = (char *) malloc(strlen(foundfile) + 1);
+	    facilities[cur_fac].file = (char*)starMalloc(strlen(foundfile) + 1);
 	    strcpy(facilities[cur_fac].file, foundfile);
 	    cur_fac++;
 	}

@@ -61,6 +61,7 @@
 
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,8 @@
 *        Remove removal of ..
 *      1-JUN-1999 (AJC):
 *        Rename C interface to ems1Starf
+*      23-FEB-2006 (TIMJ):
+*        Use starMem
 *     {enter_changes_here}
 
 *  Bugs:
@@ -84,6 +87,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include "star/mem.h"
 
 /****************************************************************************
  *
@@ -144,14 +149,14 @@ int ems1Starf( char *envar, char *relpath, char *acmode,
 /* Env variable is defined. If it's blank, initialize tmppth to space;
  * otherwise copy its value int tmppth.
  */
-         tmppath = (char *) malloc(3);
+         tmppath = (char *) starMalloc(3);
          (void) strcpy( tmppath, " :" );
       } else {
-         tmppath = (char *) malloc(strlen(s) + 1);
+         tmppath = (char *) starMalloc(strlen(s) + 1);
          (void) strcpy(tmppath, s);
       }
    } else {
-         tmppath = (char *) malloc(3);
+         tmppath = (char *) starMalloc(3);
          (void) strcpy( tmppath, " :" );
    }
 
@@ -203,7 +208,7 @@ int ems1Starf( char *envar, char *relpath, char *acmode,
       }
    }
 
-   free(tmppath);
+   starFree(tmppath);
 
    if ( !notfound ) {
       *pathlen = strlen(pathname) - 1;
@@ -251,7 +256,7 @@ static char *ems1_creim( char *source_f, int source_len )
 
 /* Allocate enough space for a copy of the input string.		    */
 
-   ptr = (char *)malloc( (size_t)( i + 2 ) );
+   ptr = (char *)starMalloc( (size_t)( i + 2 ) );
 
 /* If the space was allocated successfully, copy the input FORTRAN string   */
 /* to it.								    */
@@ -302,8 +307,8 @@ char *pfn;
 /* Add trailing blank spaces for FORTRAN compatibility. */
    for ( index = strlen( filename ); index < filename_len; index++ ) {
          filename[index] = ' ';
-   }         
-   free( envar_c );
-   free( relpath_c );
-   free( acmode_c );
+   }
+   starFree( envar_c );
+   starFree( relpath_c );
+   starFree( acmode_c );
 }
