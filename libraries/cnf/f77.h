@@ -972,6 +972,7 @@ void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
 int cnfLenc( const char *source_c );
 int cnfLenf( const char *source_f, int source_len );
 void *cnfMalloc( size_t );
+void *cnfRealloc( void *, size_t );
 int cnfRegp( void * );
 void cnfUregp( void * );
 #endif
