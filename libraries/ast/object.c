@@ -2694,12 +2694,9 @@ f     AST_DELETE).
 *     only controls the caching of memory used to store AST Objects. To 
 *     cache other memory blocks allocated by AST, use MemoryCaching.
 *     - MemoryCaching: A boolean flag similar to ObjectCaching except
-*     that it controls caching of all memory blocks allocated by AST
-*     (whether for internal or external use), not just memory used to
-*     store AST Objects. Note, if MemoryCaching is switched on,
-*     ObjectCaching should not normally also be switched on since the
-*     memory used to store Objects will be cached as a result of switching
-*     MemoryCaching on.
+*     that it controls caching of all memory blocks of less than 300 bytes
+*     allocated by AST (whether for internal or external use), not just 
+*     memory used to store AST Objects. 
 
 *  Notes:
 c     - This function attempts to execute even if the AST error
