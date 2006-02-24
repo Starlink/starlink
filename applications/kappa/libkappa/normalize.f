@@ -302,7 +302,9 @@
 *     15-AUG-2001 (DSB):
 *        Changed default for MINPIX to [2].
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -462,7 +464,7 @@
 
 *  Generate the histogram of the section of IN2.
       CALL KPG1_GHSTR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 
-     :                 HISIZE,
+     :                 HISIZE, .FALSE.,
      :                 MAX2, MIN2, %VAL( CNF_PVAL( PNTW0 ) ), STATUS )
 
 *  Find the data values in IN2 which correspond to the required

@@ -222,6 +222,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -229,6 +230,8 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -520,7 +523,8 @@
 
 *  Generate the histogram between those bounds.
                CALL KPG1_GHSTR( BAD, EL, %VAL( CNF_PVAL( IPIN( I ) ) ),
-     :                          NUMBIN, RMAXV, RMINV, HIST, STATUS )
+     :                          NUMBIN, .FALSE., RMAXV, RMINV, HIST,
+     :                          STATUS )
 
 *  Estimate the values at the percentiles.
                CALL KPG1_HSTFR( NUMBIN, HIST, RMAXV, RMINV, 2,
