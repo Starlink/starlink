@@ -52,6 +52,8 @@
 *        Switch on AST object caching.
 *     2006-02-17 (AGG):
 *        Add remsky
+*     2006-02-24 (DSB):
+*        Switch on AST memory caching (instead of Object caching).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,7 +114,7 @@ void smurf_mon( int * status ) {
   int nloc1;                   /* Number of active HDS Locators at end */
   int nfil0;                   /* Number of open HDS files at start */
   int nfil1;                   /* Number of open HDS files at end */
-  int object_caching;          /* Is AST current caching unused Object memory? */
+  int memory_caching;          /* Is AST current caching unused memory? */
 
   if ( *status != SAI__OK ) return; 
 
@@ -142,7 +144,7 @@ void smurf_mon( int * status ) {
   msgIfget("MSG_FILTER", status);
 
   /* Initialise AST */
-  object_caching = astTune( "ObjectCaching", 1 );
+  memory_caching = astTune( "MemoryCaching", 1 ); 
   astBegin;
 
   /* Call the subroutine associated with the requested task */
@@ -160,9 +162,9 @@ void smurf_mon( int * status ) {
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
 
-  /* Free AST objects */
+  /* Free AST resources */
   astEnd;
-  astTune( "ObjectCaching", object_caching );
+  astTune( "MemoryCaching", memory_caching );
 
   /* Check for GRP leaks Do this in a new error reporting context so
    * that we get the correct value even if an error has occurred. */
