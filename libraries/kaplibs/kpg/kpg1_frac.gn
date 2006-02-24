@@ -132,6 +132,8 @@
 *        Fix bug possibly related to G95 and upcasting of BYTE to INTEGER.
 *     2005 December 7 (PWD):
 *        Change use of MIN to NUM_MIN<T> so that MIN(BYTE,BYTE) works.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *-
@@ -451,8 +453,8 @@
 
 *  Generate the histogram between the current data bounds.  Do not
 *  recompute if already known.
-            CALL KPG1_GHST<T>( BAD, EL, ARRAY, CLNBIN, DATLIM( 2 ), 
-     :                         DATLIM( 1 ), HIST, STATUS )
+            CALL KPG1_GHST<T>( BAD, EL, ARRAY, CLNBIN, .FALSE.,
+     :                         DATLIM( 2 ), DATLIM( 1 ), HIST, STATUS )
          ELSE
             FINDHI = .TRUE.
          END IF

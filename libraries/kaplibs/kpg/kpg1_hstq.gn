@@ -73,6 +73,8 @@
 *     1995 February 21 (MJC):
 *        Used modern subroutine prefixes, standardised comment
 *        alignment, and sorted the variables.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,8 +131,8 @@
       BAD2 = BAD .OR. ( NINVAL .EQ. 0 )
 
 *  Generate the histogram between those bounds.
-      CALL KPG1_GHST<T>( BAD2, EL, INARR, NUMBIN, MAXMUM, MINMUM,
-     :                   OLDHST, STATUS )
+      CALL KPG1_GHST<T>( BAD2, EL, INARR, NUMBIN, .FALSE., MAXMUM, 
+     :                   MINMUM, OLDHST, STATUS )
 
 *  Initialise the cumulative-probability variable.
       CUMPRB = 0.0

@@ -6,7 +6,7 @@
 *     KPG1_LUTKY
 
 *  Purpose:
-*     Draw a key showing a colour table.
+*     Draws a key showing a colour table.
 
 *  Language:
 *     Starlink Fortran 77
@@ -79,6 +79,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,7 +88,9 @@
 *     23-OCT-2001 (DSB):
 *        Added histogram and graph forms for key.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -330,7 +333,7 @@
          CALL PSX_CALLOC( NPEN, '_INTEGER', IPHIST, STATUS )
 
 *  Produce the histogram.
-         CALL KPG1_GHSTI( .FALSE., NEL, COLDAT, NPEN, UP, LP, 
+         CALL KPG1_GHSTI( .FALSE., NEL, COLDAT, NPEN, .FALSE., UP, LP, 
      :                    %VAL( CNF_PVAL( IPHIST ) ), STATUS )
 
 *  Find the maximum and minimum count in any bin.

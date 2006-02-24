@@ -89,13 +89,16 @@
 *  Authors:
 *     DSB: D.S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC; Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-SEP-1999 (DSB):
 *        Original version.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 February 24 (MJC):
+*        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,7 +291,7 @@
 *  has been counted so it might be possible to save future processing.
             CALL KPG1_GHSTD( ( NINVAL .EQ. 0 ), N, 
      :                       %VAL( CNF_PVAL( IPW1 ) ), HISTSZ,
-     :                       DMAX, DMIN, HIST, STATUS )
+     :                       .FALSE., DMAX, DMIN, HIST, STATUS )
 
 *  Estimate the values at the percentiles. On exit, the values in FRAC
 *  are re-arranged into ascending order.
