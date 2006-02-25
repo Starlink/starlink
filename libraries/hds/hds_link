@@ -29,6 +29,21 @@
 #     Copyright (C) 1993 Science & Engineering Research Council
 #     Copyright (C) 2005 Particle Physics and Astronomy Research Council
 
+#   Licence:
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -39,6 +54,8 @@
 #        Original version.
 #     20-DEC-2005 (TIMJ):
 #        Split Fortran library from C library and add "Conly" argument
+#     24-FEB-2006 (TIMJ):
+#        Need starmem
 #     {enter_changes_here}
 
 #  Bugs:
@@ -51,7 +68,7 @@
 #  Conly handling. cf ems_link
       flibs=''
       if test "$1" != "Conly"; then 
-         flibs="-lhdsf `chr_link` `cnf_link`"
+         flibs="-lhdsf `chr_link` `cnf_link` `starmem_link`"
       fi
 
 #  Initialise the special options string.
@@ -74,7 +91,7 @@
 #  references.
 #  Note that even though we do not need the fortran interfaces to EMS
 #  in pure C mode, we still need CNF because we use CNF for memory allocation
-      echo "${special}" ${flibs} -lhds `ems_link Conly` `cnf_link` \
+      echo "${special}" ${flibs} -lhds `ems_link Conly` `cnf_link` `starmem_link`\
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.

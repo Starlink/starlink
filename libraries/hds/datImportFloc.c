@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "ems.h"
+#include "star/mem.h"
 
 #include "hds1.h"
 #include "rec.h"
@@ -67,6 +68,8 @@
  *      to be freed if dat1_import_floc failed to copy anything
  *      into the empty struct. Otherwise the uninitialised struct
  *      can cause real problems later on.
+ *    23-FEB-2006 (TIMJ):
+ *      Use starmem
 
  *  Notes:
  *    - Does not check the contents of the locator for validity.
@@ -77,7 +80,7 @@
  *    - datExportFloc
 
  *  Copyright:
- *    Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+ *    Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
  *  Licence:
@@ -118,7 +121,7 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
   /* See if we need to allocate memory for the locator struct */
   /* Allocate some memory to hold the C structure */
 
-  *clocator = malloc( sizeof( struct LOC ) );
+  *clocator = starMalloc( sizeof( struct LOC ) );
 
   if (*clocator == NULL ) {
     if( *status == DAT__OK ) {

@@ -5,6 +5,7 @@
 #include "hds1.h"
 #include "hds.h"
 #include "ems.h"
+#include "star/mem.h"
 
 /*
 *+
@@ -63,10 +64,12 @@
 *        Improved prologue layout
 *     03-DEC-2005 (TIMJ):
 *        Rewrite in C
+*     23-FEB-2006 (TIMJ):
+*        Use starmem
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -126,7 +129,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
 
     /* Get some memory and copy in the individual strings */
     bufsize = nval * lenstr;
-    buffer = malloc( bufsize + 1);
+    buffer = starMalloc( bufsize + 1);
     bufpos = buffer;
 
     for (i = 0; i < nval; i++ ) {
@@ -151,7 +154,7 @@ datPut1C( const HDSLoc * locator, size_t nval, const char *values[], int * statu
     datPutC( locator, 1, dims, buffer, lenstr, status );
 
     /* Tidy up */
-    free( buffer );
+    starFree( buffer );
 
     /* if we were truncated at all, let the user know */
     if ( *status == DAT__OK && trunc ) {

@@ -12,6 +12,7 @@
 #include <stsdef.h>              /* System status codes (VMS)               */
 #endif
 
+#include "star/mem.h"
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "ems_par.h"
 #include "hds1.h"                /* Global definitions for HDS              */
@@ -45,8 +46,29 @@
 /*    int rec_alloc_mem                                                     */
 /*       The global status value current on exit.                           */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1991 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -55,6 +77,8 @@
 /*    13-DEC-1991 (RFWS):                                                   */
 /*       Changed VMS implementation to manage address space more            */
 /*       effectively.                                                       */
+/*    23-FEB-2006 (TIMJ):                                                   */
+/*       use starmem                                                        */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -120,7 +144,7 @@
 
 /* Allocate the required memory using malloc.                               */
       {
-         *pntr = malloc( (size_t) size );
+         *pntr = starMalloc( (size_t) size );
 
 /* If allocation failed, then report an error.                              */
          if ( *pntr == NULL )

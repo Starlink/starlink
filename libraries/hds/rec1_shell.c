@@ -27,6 +27,7 @@ void rec1_shell( void ){};       /* This routine not used on VMS and        */
 
 /* Other include files:                                                     */
 /* ===================                                                      */
+#include "star/mem.h"
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "ems_par.h"             /* EMS__ public constants                  */
 #include "hds1.h"                /* Global definitions for HDS              */
@@ -98,9 +99,27 @@ extern char **environ;           /* Pointer to environment array            */
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -119,6 +138,8 @@ extern char **environ;           /* Pointer to environment array            */
 /*    9-MAY-1997 (RFWS):                                                    */
 /*       Define a new PATH environment variable before running the POSIX.2  */
 /*       shell.                                                             */
+/*    23-FEB-2006 (TIMJ):                                                   */
+/*       use starmem                                                        */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -300,7 +321,7 @@ extern char **environ;           /* Pointer to environment array            */
 /* Attempt to allocate a new array of environment pointers. Include an      */
 /* extra element if no PATH assignment currently exists (which is           */
 /* unlikely).                                                               */
-                  new_environ = (char **) malloc( sizeof( char * ) *
+                  new_environ = (char **) starMalloc( sizeof( char * ) *
                                 (size_t) ( n + 1 + ( ipath == -1 ) ) );
 
 /* Attempt to allocate memory to hold a new assignment string for the PATH  */
@@ -311,7 +332,7 @@ extern char **environ;           /* Pointer to environment array            */
                   {
                      lpath_new += lpath_old - (size_t) 4;
                   }
-                  new_path = (char *) malloc( lpath_new + (size_t) 1 );
+                  new_path = (char *) starMalloc( lpath_new + (size_t) 1 );
 
 /* Check for success.                                                       */
                   if ( ( new_environ != NULL ) && ( new_path != NULL ) )
@@ -389,8 +410,8 @@ extern char **environ;           /* Pointer to environment array            */
 /* effect if "vfork" wasn't used).                                         */
 #if defined( _POSIX2_VERSION )
          environ = old_environ;
-         free( (void *) new_environ );
-         free( (void *) new_path );
+         starFree( (void *) new_environ );
+         starFree( (void *) new_path );
 #endif
       }
 

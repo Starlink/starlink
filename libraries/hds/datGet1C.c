@@ -5,6 +5,7 @@
 #include "hds1.h"
 #include "hds.h"
 #include "ems.h"
+#include "star/mem.h"
 
 /*
 *+
@@ -90,10 +91,12 @@
 *        Specify bufsize rather than length of individual string.
 *     29-DEC-2005 (TIMJ):
 *        No longer terminate pntrs[]
+*     23-FEB-2006 (TIMJ):
+*        Use starmem
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -167,7 +170,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
     tmpbufsize = *actval * lenstr;
 
     /* We need to get some memory to receive the Fortran buffer */
-    tmpbuf = malloc( tmpbufsize );
+    tmpbuf = starMalloc( tmpbufsize );
 
     /* need to be careful */
     if ( tmpbuf == NULL ) {
@@ -228,7 +231,7 @@ datGet1C( const HDSLoc * locator,  size_t maxval, size_t bufsize, char *buffer,
     }
 
     /* Free the temporary buffer */
-    free( tmpbuf );
+    starFree( tmpbuf );
       
   }
 

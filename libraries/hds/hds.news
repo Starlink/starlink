@@ -11,7 +11,8 @@ HDS Library
    * Add datChscn for validating component names
    * Add HDS_SPLIT for splitting an HDS path into a filename and components
      (used by HDS_FIND but also useful for libraries based on HDS).
-   
+   * Now uses the starmem library for memory allocation.
+
    Version 4.3-4
    =============
 

@@ -32,7 +32,7 @@ libhdsf_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 hds_machine_SOURCES = hds_machine.c
-hds_machine_LDADD = libhds.la `ems_link` `cnf_link`
+hds_machine_LDADD = libhds.la `ems_link` `cnf_link` `starmem_link`
 
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c
@@ -44,13 +44,13 @@ dat_par_h_DEPENDENCIES = hds_types.h hds1_types.h
 dat_par_f_DEPENDENCIES = hds_types.h hds1_types.h
 
 hds_test_SOURCES = hds_test.f
-hds_test_LDADD = libhdsf.la libhds.la `ems_link` `chr_link`
+hds_test_LDADD = libhdsf.la libhds.la `ems_link` `chr_link` `cnf_link`
 
 hdsTest_SOURCES = hdsTest.c
-hdsTest_LDADD = libhds.la `ems_link` `cnf_link`
+hdsTest_LDADD = libhds.la `ems_link` `cnf_link` `cnf_link`
 
 hds_test_prm_SOURCES = hds_test_prm.c
-hds_test_prm_LDADD = libhds.la `ems_link` `cnf_link`
+hds_test_prm_LDADD = libhds.la `ems_link` `cnf_link` `cnf_link`
 
 cincludedir = $(includedir)/star
 cinclude_HEADERS = $(PUBLIC_CINCLUDES)

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "star/mem.h"
 #include "ems.h"                 /* EMS error reporting routines            */
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
@@ -51,7 +52,7 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
-/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+/*    Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
@@ -63,6 +64,8 @@
 /*       Substantially new routine based on old original.                   */
 /*    15-NOV-2005 (TIMJ):                                                   */
 /*       Change API to use the struct LOC explcitly                         */
+/*    23-FEB-2006 (TIMJ):                                                   */
+/*       use rec_alloc_mem                                                  */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -118,11 +121,11 @@
 
 /* Initialise the locator information, including the locator sequence       */
 /* number which is duplicated in the LCP.                                   */
-	 *loc = malloc( sizeof(struct LOC) );
-         (*loc)->check = DAT__LOCCHECK;
-         (*loc)->lcp = *lcp;
-         (*loc)->seqno = (*lcp)->seqno = ++hds_gl_locseq;
-
+	 if (rec_alloc_mem( sizeof(struct LOC), (void**)loc ) == DAT__OK) {
+	   (*loc)->check = DAT__LOCCHECK;
+	   (*loc)->lcp = *lcp;
+	   (*loc)->seqno = (*lcp)->seqno = ++hds_gl_locseq;
+	 }
       }
 
 /* Exit the routine.                                                        */

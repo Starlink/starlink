@@ -26,7 +26,22 @@
 
 #  Copyright:
 #     Copyright (C) 1993 Science & Engineering Research Council
-#     Copyright (C) 2005 Particle Physics and Astronomy Research Council
+#     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council
+
+#   Licence:
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 2 of the License, or
+#     (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be useful, but
+#     WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 #  Authors:
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -38,6 +53,8 @@
 #        Original version.
 #     20-DEC-2005 (TIMJ):
 #        HDS is now two libraries
+#     24-FEB-2006 (TIMJ):
+#        Need starmem
 #     {enter_changes_here}
 
 #  Bugs:
@@ -65,7 +82,7 @@
 #  followed by the list of options for packages on which HDS depends.
 #  Pass the result through an awk script to remove duplicate library
 #  references.
-      echo "${special}" -lhdsf -lhds `chr_link_adam` `ems_link_adam` `cnf_link_adam` \
+      echo "${special}" -lhdsf -lhds `chr_link_adam` `ems_link_adam` `cnf_link_adam` `starmem_link` \
            | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
 
 #  End of script.
