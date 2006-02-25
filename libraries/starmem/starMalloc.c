@@ -42,6 +42,10 @@
 *  History:
 *     09-FEB-2006 (TIMJ):
 *        Original version.
+*     23-FEB-2006 (TIMJ):
+*        Use switch to select malloc
+*     25-FEB-2006 (TIMJ):
+*        Force initialisation first time through.
 
 *  Notes:
 *     - The Garbage Collector malloc is only available if starMemInit() has
@@ -79,6 +83,14 @@ void * starMalloc( size_t size ) {
   void * tmp;
   static const size_t THRESHOLD = 1024 * 100; /* Bytes */
 
+  /* Force initialisation - only needed when allocating not freeing
+     since free is too late. Note that we have clearly not run any
+     initialisation macros at this point so pass in false. If this
+     is overhead is too high, remove it and force a call to
+     starMemInit */
+  if ( ! STARMEM_INITIALISED ) starMemInitPrivate(0);
+  
+  /* Decide which to use */
   switch ( STARMEM_MALLOC ) {
 
   case STARMEM__SYSTEM:
