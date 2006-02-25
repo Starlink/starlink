@@ -85,7 +85,7 @@ void * starCalloc( size_t nmemb, size_t size ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_GC_H
+#if HAVE_LIBGC
     /* Call normal malloc since we know the GC initialises memory */
     tmp = GC_MALLOC( nmemb * size );
 #else

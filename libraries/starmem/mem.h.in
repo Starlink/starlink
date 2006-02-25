@@ -55,8 +55,10 @@ void starMemInitPrivate( int gc_initialized );
    need to link from Fortran.
  */
 
-/* HAVE_GC_H is substituted below at configure time */
+/* HAVE_GC_H and HAVE_LIBGC are substituted below at configure time */
+#undef HAVE_LIBGC
 #undef HAVE_GC_H
+
 #if HAVE_GC_H
 #include <gc.h>
 #endif
@@ -66,7 +68,7 @@ void starMemInitPrivate( int gc_initialized );
    can not know whether GC is required and it never hurts.
 */
 
-#ifdef GC_INIT
+#if HAVE_LIBGC && defined( GC_INIT )
 #define MYINIT() GC_INIT()
 #define starMemInit() { MYINIT(); starMemInitPrivate(1); }
 #else

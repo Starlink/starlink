@@ -91,7 +91,7 @@ void * starRealloc( void * ptr, size_t size ) {
     break;
     
   case STARMEM__GC:
-#if HAVE_GC_H
+#if HAVE_LIBGC
     if (ptr == NULL) {
       tmp = starMalloc( size );
     } else {

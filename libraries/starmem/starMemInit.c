@@ -89,7 +89,7 @@ starMemInitFort() {
   /* return immediately if we have been initialised already */
   if ( starMemIsInitialised() ) return;
 
-#if HAVE_GC_H
+#if HAVE_LIBGC
   GC_INIT();
   starMemInitPrivate( 1 );
 #else

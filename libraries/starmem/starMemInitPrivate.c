@@ -137,7 +137,7 @@ starMemInitPrivate( int gc_initialised ) {
 
   } else if (strncmp(starenv, "GC", 2) == 0 ) {
     /* Garbage Collector mandatory */
-#if HAVE_GC_H    
+#if HAVE_LIBGC    
     if (gc_initialised) {
       STARMEM_MALLOC = STARMEM__GC;
     } else {

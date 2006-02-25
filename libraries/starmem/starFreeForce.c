@@ -85,7 +85,7 @@ void starFreeForce( void * ptr ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_GC_H
+#if HAVE_LIBGC
     GC_FREE( ptr );
 #else
     starMemFatalGC;

@@ -91,7 +91,7 @@ void * starMallocAtomic( size_t size ) {
     break;
 
   case STARMEM__GC:
-#if HAVE_GC_H
+#if HAVE_LIBGC
     if ( size < THRESHOLD ) {
       tmp = GC_MALLOC_ATOMIC( size );
     } else {
