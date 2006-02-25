@@ -300,28 +300,18 @@ echorun autoreconf --install --symlink
     exit 1
 }
 
-# autoreconf does _not_ add an install-sh link, because there's no
-# Makefile.am in this directory, so it thinks we don't need one.  We
+# autoreconf/automake does _not_ add an install-sh link, because there's no
+# Makefile.am in this directory, so automake thinks we don't need one.  We
 # do, however, because the child directories have Makefile.am's, and
-# want to refer to one here.  So copy the link that autoreconf _did_
-# put into the buildsupport directory.  Use a variety of options to
-# copy the link rather than its destination.  The options are
-# '--no-dereference' (GNU cp: doesn't support correct -P yet), 
-# '-R -P' (POSIX), '-R' (BSD?: doesn't have -P, though -R does the
-# harmlessly wrong thing on SunOS) and '' (fallback: does copy of link
-# target).  If truth be told, this is barely worth the trouble.
+# want to refer to one here.  So copy the link that automake _did_
+# put into the buildsupport directory.
 get_install_sh=buildsupport/install-sh
 test -f $get_install_sh || {
     echo "Ooops: ./bootstrap can't find $get_install_sh" >&2
     exit 1
 }
-for o in --no-dereference '-R -P' -R ''
-do
-    if cp $o $get_install_sh . 2>/dev/null; then
-        echo cp $o $get_install_sh .
-        break
-    fi
-done
+echo cp $get_install_sh .
+cp $get_install_sh .
 
 # The default prefix in this configure file MUST be consistent with
 # that in starconf.  The configure.ac has the default prefix set to
@@ -330,9 +320,14 @@ done
 # you regenerate ./configure and run it, you get an error, and have to
 # do this sed'ding by hand.
 #
+# The correct value is the value of 'starconf --show STARCONF_DEFAULT_PREFIX'.
+# This should be the same as the value of $STARCONF_DEFAULT_PREFIX with
+# which the tree was bootstrapped.  If it's not, then you've been a bit
+# too clever for your own good.  'rm -R' is your friend.
+#
 # This is rather ugly, but it's a problem only when someone does
 # auto(re)conf in the top-level directory other than by running
-# ./bootstrap, and they presumaby know what they're doing.
+# ./bootstrap, and they presumably know what they're doing.
 if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
     def=`starconf --show STARCONF_DEFAULT_PREFIX`
     test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
