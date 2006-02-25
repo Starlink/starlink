@@ -66,6 +66,10 @@ done
 # Echo a command then run it, terminating the script if the command fails
 echorun() { echo $*; eval $* || exit 1; }
 
+# Add an exit/interrupt trap to remove temporary and generated files
+removefiles=""
+trap '{ for f in $removefiles dummy; do rm -f "$f"; done; }' 0 HUP INT QUIT TERM
+
 # Starconf uses the value of STARCONF_DEFAULT_{PREFIX,STARLINK}
 # during its configuration.  We set these here, unless they're set
 # in the environment.  Starconf's configure.ac sets these anyway, and
@@ -192,6 +196,7 @@ test -d $STARCONF_DEFAULT_PREFIX/bin || \
 # We make a temporary makefile from Makefile.in.  This can be used,
 # unconfigured, below.
 tempmakefile=Makefile.tmp
+removefiles="$removefiles $tempmakefile"
 rm -f $tempmakefile
 sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 
@@ -255,7 +260,7 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
         buildsupport
 
 ) || { echo "Failed to make buildsupport">&2; exit 1; }
-rm -f $tempmakefile
+# rm -f $tempmakefile # removed by exit trap
 
 
 if $buildsupportonly; then
@@ -263,6 +268,22 @@ if $buildsupportonly; then
 fi
 
 
+
+# Substitute the correct prefix in to a temporary configure.ac file.
+#
+# The default prefix in the ./configure script MUST be consistent with
+# that in starconf, which has it set to $STARCONF_DEFAULT_PREFIX.
+# File configure.ac.in has the default prefix set to %%PREFIX%%,
+# which is not a directory.
+#   1. substitute %%PREFIX%% with the correct value, to create
+#      configure.ac from configure.ac.in;
+#   2. bootstrap each of the AC_CONFIG_SUBDIRS in configure.ac;
+#   3. then use autoreconf to generate ./configure from configure.ac.
+# To discourage folk from running auto(re)conf by hand, we make sure
+# that configure.ac does not normally exist.
+rm -f configure.ac
+removefiles="$removefiles configure.ac temp-file"
+echorun "sed -e 's,%%PREFIX%%,$STARCONF_DEFAULT_PREFIX,' configure.ac.in >temp-file && mv -f temp-file configure.ac"
 
 # Bootstrap any child directories (before running autoreconf).  Each
 # bootstrap file potentially calls autoreconf, and this can take a
@@ -312,27 +333,6 @@ test -f $get_install_sh || {
 }
 echo cp $get_install_sh .
 cp $get_install_sh .
-
-# The default prefix in this configure file MUST be consistent with
-# that in starconf.  The configure.ac has the default prefix set to
-# %%PREFIX%%, which is not a directory; therefore we must substitute
-# this to the correct value after ./configure has been generated.  If
-# you regenerate ./configure and run it, you get an error, and have to
-# do this sed'ding by hand.
-#
-# The correct value is the value of 'starconf --show STARCONF_DEFAULT_PREFIX'.
-# This should be the same as the value of $STARCONF_DEFAULT_PREFIX with
-# which the tree was bootstrapped.  If it's not, then you've been a bit
-# too clever for your own good.  'rm -R' is your friend.
-#
-# This is rather ugly, but it's a problem only when someone does
-# auto(re)conf in the top-level directory other than by running
-# ./bootstrap, and they presumably know what they're doing.
-if grep '%%PREFIX%%' configure >/dev/null 2>&1; then
-    def=`starconf --show STARCONF_DEFAULT_PREFIX`
-    test -n "$def" || { echo "Eeeek! Can't get default prefix!"; exit 1; }
-    echorun "sed -e s,%%PREFIX%%,$def, configure >configure.tmp && mv configure.tmp configure && chmod +x configure"
-fi
 
 # Run configure WITHOUT RECURSION to create a basic Makefile which
 # will allow us to invoke 'make configure-deps'.  NOTE: This option isn't

@@ -37,6 +37,11 @@ things, then you should refer to Starlink document SSN/78, which also
 contains some FAQs.  Details of this document are at the end of this
 README.
 
+This procedure will not build the Starlink _Java_ applications.  They
+are built separately, using the procedure described in
+java/source/README.  You do not need to build any of the Starlink
+classic applications to build the Java ones.
+
  - Specify where you want the installed files to end up (_PREFIX) and
    where you want the build to find any previously installed Starlink
    tree (_STARLINK).  If there is no previously existing tree, then
@@ -103,8 +108,8 @@ README.
    shipped with the OS, or installed by you, will _not_ work.  These
    applications will be installed into
    $STARCONF_DEFAULT_PREFIX/buildsupport, so you should add
-   $STARCONF_DEFAULT_PREFIX/buildsupport/bin to your path at this
-   point, BEFORE you run the ./bootstrap script.  In order for the
+   $STARCONF_DEFAULT_PREFIX/buildsupport/bin to the front of your path
+   at this point, BEFORE you run the ./bootstrap script.  In order for the
    `make' below to work, you also need to add the default bin
    directory to your path, so you should do that now.
 
@@ -119,7 +124,9 @@ README.
       % ./bootstrap
 
    This step takes a long while; it can be an hour on a moderately
-   fast system.
+   fast system.  Note that, although an important part of the
+   ./bootstrap script is running autoreconf in the top-level
+   directory, you should not run autoreconf yourself in this directory.
 
  - There are a _few_ components which have to be built and installed
    before the main tree is configured.  You will have been advised of
@@ -205,8 +212,9 @@ specific component, the instructions are slightly different.
    had been updated).  Any required updating is generally handled
    automatically by makefile rules, but if you wish to guarantee that
    everything is up to date, then you can give the command
-   `autoreconf'.  This does no harm in any case, since it does
-   nothing if it is not required.
+   `autoreconf'.  This does no harm in any case, since it does nothing
+   if it is not required.  As noted above, the exception to this is
+   that you should not run autoreconf in the top-level directory.
 
 
 Updating the source set

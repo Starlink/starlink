@@ -1,4 +1,6 @@
-dnl    Process this file with autoconf to produce a configure script
+dnl    DO NOT process this file with autoconf to produce a configure script.
+dnl    Instead, process it with ./bootstrap, which does substitutions
+dnl    on it to generate an appropriate configure.ac.
 
 dnl    This `package name' is a dummy
 AC_INIT(startree, 1.0, ussc@star.rl.ac.uk)
@@ -7,16 +9,15 @@ AC_PREREQ(2.50)
 AC_CONFIG_SRCDIR(Makefile.dependencies)
 
 dnl    The default prefix is NOT set in this file, but must be
-dnl    configured into this file by the ./bootstrap script, which gets
-dnl    the correct value for this by running `starconf --show
-dnl    STARCONF_DEFAULT_PREFIX', and sed'ding the result into the
-dnl    ./configure script which autoconf generates.
+dnl    edited into this file by the ./bootstrap script, which gets
+dnl    the correct value for this from the value of $STARCONF_DEFAULT_PREFIX
+dnl    (which should be the same as 'starconf --show STARCONF_DEFAULT_PREFIX').
 AC_PREFIX_DEFAULT(%%PREFIX%%)
 if test $ac_default_prefix = %%'PREFIX'%%; then
-    echo "You have run recently autoconf in the top-level build directory."
-    echo "This won't work: either run ./bootstrap instead,"
-    echo "or search for %%"PREFIX"%% in ./bootstrap to see how to"
-    echo "fix this up."
+    echo 'You have run recently autoconf in the top-level build directory.'
+    echo 'This will not work: either run ./bootstrap instead,'
+    echo 'or search for %%'PREFIX'%% in ./bootstrap to see how to'
+    echo 'fix this up.'
     exit 1
 fi
 
