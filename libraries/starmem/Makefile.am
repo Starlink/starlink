@@ -9,7 +9,7 @@ lib_LTLIBRARIES = libstarmem.la
 libstarmem_la_SOURCES = $(PRIVATE_C_FILES) $(PUBLIC_C_FILES)
 
 # We need to install starMemInit.c as a starMemInit.o for Fortran interface
-starMemInit.o: starMemInit.c
+starMemInit.o: starMemInit.c mem.h
 install-exec-local: starMemInit.o
 	$(mkdir_p) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) starMemInit.o $(DESTDIR)$(libdir)
