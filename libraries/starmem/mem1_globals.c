@@ -14,6 +14,10 @@
 *  History:
 *     08-FEB-2006 (TIMJ):
 *        Original version.
+*     23-FEB-2006 (TIMJ):
+*        Add STARMEM_PRINT_MALLOC
+*     25-FEB-2006 (TIMJ):
+*        Add STARMEM_PRINT_INFO
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -49,3 +53,6 @@ int STARMEM_INITIALISED = 0;
 /* Display debug messages */
 int STARMEM_PRINT_MALLOC = 0;
 #endif
+
+/* Display scarc informational messages */
+int STARMEM_PRINT_INFO = 0;

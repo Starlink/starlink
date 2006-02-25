@@ -70,9 +70,11 @@ extern int STARMEM_INITIALISED;
 extern int STARMEM_PRINT_MALLOC;
 #endif
 
+/* Display scarce information messages */
+extern int STARMEM_PRINT_INFO;
 
 /* Macro to simplify fatal abort */
-#define starMemFatal( text ) fprintf(stderr, "starMem: Fatal error in " __FILE__ ": " text "\n"); abort()
+#define starMemFatal( text ) fprintf(stderr, "starMem: Fatal error in " __FILE__ ": " text "\n"); abort();
 
 #define starMemFatalGC starMemFatal( "GC requested but not available" )
 

@@ -47,6 +47,8 @@
 *        Original version.
 *     23-FEB-2006 (TIMJ):
 *        Add DL
+*     25-FEB-2006 (TIMJ):
+*        Add STARMEM_PRINT_INFO
 
 *  Notes:
 *     - This function is private and should only be called from the
@@ -70,6 +72,8 @@
 *       for smaller applications.
 *     - Currently, the SYSTEM malloc is the default if STARMEM_MALLOC
 *       environment variable is not defined.
+*     - If the STARMEM_PRINT_INFO environment variable is defined
+*       the selected malloc will be printed to stdout.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -101,20 +105,22 @@ starMemInitPrivate( int gc_initialised ) {
   if ( STARMEM_INITIALISED ) return;
 
 #if STARMEM_DEBUG
-  /* see if STARMEM_DEBUG is defined */
+  /* see if STARMEM_PRINT_MALLOC is defined */
   if ( getenv( "STARMEM_PRINT_MALLOC" ) ) {
     STARMEM_PRINT_MALLOC = 1;
   }
 #endif
 
+  /* See if STARMEM_PRINT_INFO is defined */
+  if ( getenv( "STARMEM_PRINT_INFO" ) ) {
+    STARMEM_PRINT_INFO = 1;
+  }
 
   /* Read the STARMEM_MALLOC environment variable */
   starenv = getenv( "STARMEM_MALLOC" );
 
-#if STARMEM_DEBUG
-  if (STARMEM_PRINT_MALLOC)
+  if (STARMEM_PRINT_INFO)
     printf("Attempting to use malloc '%s'\n", starenv);
-#endif
 
   /* Indicate that we are initialised and default to "SYSTEM" malloc */
   STARMEM_MALLOC = STARMEM__SYSTEM;
@@ -122,10 +128,9 @@ starMemInitPrivate( int gc_initialised ) {
 
   if (starenv == NULL) {
     /* default behaviour */
-#if STARMEM_DEBUG
-    if (STARMEM_PRINT_MALLOC)
+    if (STARMEM_PRINT_INFO)
       printf("Default behaviour for malloc\n");
-#endif    
+
     return;
   } else if (strncmp(starenv, "SYS", 3) == 0) {
     /* use system version */
@@ -159,11 +164,8 @@ starMemInitPrivate( int gc_initialised ) {
 
   }
 
-#if STARMEM_DEBUG
-  if (STARMEM_PRINT_MALLOC)
+  if (STARMEM_PRINT_INFO)
     printf("Selected malloc %d\n", STARMEM_MALLOC );
-#endif
-
 
   return;
 }
