@@ -12,6 +12,13 @@ dnl    the correct value for this by running `starconf --show
 dnl    STARCONF_DEFAULT_PREFIX', and sed'ding the result into the
 dnl    ./configure script which autoconf generates.
 AC_PREFIX_DEFAULT(%%PREFIX%%)
+if test $ac_default_prefix = %%'PREFIX'%%; then
+    echo "You have run recently autoconf in the top-level build directory."
+    echo "This won't work: either run ./bootstrap instead,"
+    echo "or search for %%"PREFIX"%% in ./bootstrap to see how to"
+    echo "fix this up."
+    exit 1
+fi
 
 dnl    If no java can be found, set this to the magic (and obviously failed)
 dnl    value NOJAVA.  This is tested for in Makefile.in
