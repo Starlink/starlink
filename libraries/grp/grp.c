@@ -41,6 +41,8 @@
 *        consistent with other Starlink wrappers).
 *     24-FEB-2006 (TIMJ):
 *        Add grpInfoc
+*     26-FEB-2006 (TIMJ):
+*        Add grpGrpex
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -123,7 +125,7 @@ void grp1Setid ( Grp *igrp, F77_INTEGER_TYPE IGRP, int * status ) {
 /* Note that it takes a fortran integer as arg */
 /* Not sure why this can't return GRP__NOID if given a NULL pointer
    without setting status */
-F77_INTEGER_TYPE grp1Getid ( Grp *igrp, int * status ) {
+F77_INTEGER_TYPE grp1Getid ( const Grp *igrp, int * status ) {
   if ( *status != SAI__OK ) return (F77_INTEGER_TYPE) GRP__NOID;
   if ( igrp == NULL ) {
     *status = GRP__INTER;
@@ -400,3 +402,47 @@ void grpInfoc( Grp *grp, int index, const char * item, char * value,
 
 }
 
+F77_SUBROUTINE(grp_grpex)( CHARACTER(grpexp), INTEGER(igrp1),
+                                  INTEGER(igrp2), INTEGER(size),
+                                  INTEGER(added), LOGICAL(flag),
+                                  INTEGER(status) TRAIL(grpexp) );
+
+void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
+               size_t* size, size_t *added, int * flag, int * status ) {
+
+  DECLARE_INTEGER(IGRP1);
+  DECLARE_INTEGER(IGRP2);
+  DECLARE_CHARACTER_DYN(GRPEXP);
+  DECLARE_INTEGER(SIZE);
+  DECLARE_INTEGER(ADDED);
+  DECLARE_LOGICAL(FLAG);
+  DECLARE_INTEGER(STATUS);
+
+  if (igrp1 == NULL ) {
+    IGRP1 = (F77_INTEGER_TYPE)GRP__NOID;
+  } else {
+    IGRP1 = grp1Getid( igrp1, status );
+  }
+  if (igrp2 == NULL ) {
+    IGRP2 = (F77_INTEGER_TYPE)GRP__NOID;
+  } else {
+    IGRP2 = grp1Getid( igrp2, status );
+  }
+
+  F77_CREATE_CHARACTER( GRPEXP, strlen(grpexp) );
+  F77_EXPORT_CHARACTER( grpexp, GRPEXP, GRPEXP_length );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  
+  F77_CALL(grp_grpex)( CHARACTER_ARG(GRPEXP), INTEGER_ARG(&IGRP1),
+                       INTEGER_ARG(&IGRP2), INTEGER_ARG(&SIZE),
+                       INTEGER_ARG(&ADDED), LOGICAL_ARG(&FLAG),
+                       INTEGER_ARG(&STATUS) TRAIL_ARG(GRPEXP) );
+
+  F77_FREE_CHARACTER( GRPEXP );
+  F77_IMPORT_INTEGER( STATUS, *status );
+  F77_IMPORT_INTEGER( SIZE, *size );
+  F77_IMPORT_INTEGER( ADDED, *added );
+  F77_IMPORT_LOGICAL( FLAG, *flag );
+
+}

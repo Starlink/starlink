@@ -37,6 +37,8 @@
 *        consistent with other Starlink wrappers).
 *     24-FEB-2006 (TIMJ):
 *        Add grpInfoc
+*      26-FEB-2006 (TIMJ):
+*        Add grpGrpex
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -102,6 +104,8 @@ Grp *grpInit( int * );
 void grpFree( Grp **, int * );
 
 void grpDelet( Grp **, int * );
+void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
+               size_t* size, size_t *added, int * flag, int * status );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
 void grpInfoc( Grp *, int , const char *, char *, size_t, int * );
@@ -114,7 +118,7 @@ void grpValid( Grp *, int *, int * );
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
 void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
-F77_INTEGER_TYPE grp1Getid( Grp *, int * );
+F77_INTEGER_TYPE grp1Getid( const Grp *, int * );
 
 
 
