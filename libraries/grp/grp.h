@@ -35,6 +35,8 @@
 *     26-JAN-2005 (TIMJ):
 *        grpInfoI back to grpInfoi after populist revolt. (and to be
 *        consistent with other Starlink wrappers).
+*     24-FEB-2006 (TIMJ):
+*        Add grpInfoc
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -61,6 +63,9 @@
 /* We need CNF to define Fortran */
 
 #include <f77.h>
+
+/* size_t */
+#include <stddef.h>
 
 /* Public Constants */
 /* ---------------- */
@@ -99,6 +104,7 @@ void grpFree( Grp **, int * );
 void grpDelet( Grp **, int * );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
+void grpInfoc( Grp *, int , const char *, char *, size_t, int * );
 void grpInfoi( Grp *grp, int index, const char * item, int * value, 
 	       int *status);
 Grp *grpNew( const char *, int * );

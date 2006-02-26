@@ -36,9 +36,11 @@
 *     25-JAN-2006 (TIMJ):
 *        GRP identifier should be obtained for grpDelet even if status is bad
 *        Rename grpInfoi to grpInfoI
-*     26-JAN-2005 (TIMJ):
+*     26-JAN-2006 (TIMJ):
 *        grpInfoI back to grpInfoi after populist revolt. (and to be
 *        consistent with other Starlink wrappers).
+*     24-FEB-2006 (TIMJ):
+*        Add grpInfoc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -356,3 +358,45 @@ void grpInfoi( Grp *grp, int index, const char * item, int * value,
   F77_IMPORT_INTEGER( VALUE, *value );
 
 }
+
+F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
+                                  CHARACTER(item), CHARACTER(value),
+                                  INTEGER(status) TRAIL(item) TRAIL(value) );
+
+void grpInfoc( Grp *grp, int index, const char * item, char * value, 
+	       size_t value_len, int *status) {
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_CHARACTER_DYN(ITEM);
+  DECLARE_INTEGER(STATUS);
+  DECLARE_CHARACTER_DYN(VALUE);
+
+  if (grp == NULL ) {
+    IGRP = (F77_INTEGER_TYPE)GRP__NOID;
+  } else {
+    IGRP = grp1Getid( grp, status );
+  }
+
+  F77_CREATE_CHARACTER( ITEM, strlen(item) );
+  F77_EXPORT_CHARACTER( item, ITEM, ITEM_length );
+  F77_EXPORT_INTEGER( index, INDEX );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  /* Create the fortran string one smaller than
+     the C string so that we can take into account the nul */
+  F77_CREATE_CHARACTER( VALUE, value_len - 1 );
+
+  F77_CALL(grp_infoc)( INTEGER_ARG( &IGRP ),
+		       INTEGER_ARG( &INDEX ),
+		       CHARACTER_ARG(ITEM),
+		       CHARACTER_ARG(VALUE),
+		       INTEGER_ARG(&STATUS)
+		       TRAIL_ARG(ITEM) TRAIL_ARG(VALUE) );
+
+  F77_FREE_CHARACTER( ITEM );
+  F77_IMPORT_CHARACTER( VALUE, value_len, value );
+  F77_FREE_CHARACTER( VALUE );
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+}
+
