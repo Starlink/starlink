@@ -66,6 +66,11 @@
 #include "grf.h"                 /* GRF Interface to this module */
 #include "grf_tkcan.h"           /* Local interface to this module */
 
+/* Local includes. */
+/* --------------- */
+#include "rtdCanvas.h"           /* Public interface to local rtd canvas
+                                  * items */
+
 /* Standard include files.*/
 /* ----------------------- */
 #include <string.h>
@@ -101,13 +106,6 @@ static int textBBox( double x, double y, const char *text,
                      float *yb );
 
 static int textAnchor( const char *just, char *anchor );
-
-void RtdWordLastBBox( double *xb, double *yp );
-void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
-                          const double *x, const double *y,
-                          int numPoints );
-void RtdSetLineCoords( Tcl_Interp *interp, const double *x, const double *y,
-                       int numPoints );
 
 /* Static variables. */
 /* ================= */
