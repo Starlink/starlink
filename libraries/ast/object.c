@@ -133,6 +133,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added attribute ObjSize.
 *     23-FEB-2006 (DSB):
 *        Added MemoryCaching tuning parameter.
+*     27-FEB-2006 (DSB):
+*        Include Objects returned by astCopy in the ObjectCaching system.
 *class--
 */
 
@@ -634,6 +636,7 @@ f     function is invoked with STATUS set to an error value, or if it
 
 /* Local Variables: */
    AstObject *new;               /* Pointer to new object */
+   AstObjectVtab *vtab;          /* Pointer to object vtab */
    int i;                        /* Loop counter for copy constructors */
 
 /* Initiallise. */
@@ -642,9 +645,17 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Check the global error status. */
    if ( !astOK ) return new;
 
-/* Allocate memory for the output Object, using the size of the input
-   object. */
-   new = astMalloc( this->size );
+/* Re-use cached memory, or allocate new memory using the size of the input 
+   object, to store the output Object. */
+
+   vtab = this->vtab;
+   if( object_caching && vtab->nfree > 0 ) {
+      new = vtab->free_list[ --(vtab->nfree) ];
+      vtab->free_list[ vtab->nfree ] = NULL;
+   } else {
+      new = astMalloc( this->size );
+   }
+
    if ( astOK ) {
 
 /* Perform an initial byte-by-byte copy of the entire object
@@ -3602,7 +3613,6 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
                       "programming error).", vtab->class, astSizeOf( mem ),
                        vtab->class, size );
          }
-         
       } else {
          mem = astMalloc( size );
       }
