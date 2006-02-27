@@ -53,14 +53,13 @@ typedef struct SPItem  {
     double x, y;                /* Coordinates of item reference point */
     double width;               /* Width of item when not filling */
     double height;              /* Height of item when not filling */
-    double scale;               /* Scale factor of item */
     int fill;                   /* Whether to fill canvas with item */
-    Tk_Anchor tkanchor;         /* Where to anchor item relative to (x,y). */
     Tcl_Interp *interp;         /* The Tcl interpreter */
     double xmin;                /* Minimum physical X coordinate for plot */
     double xmax;                /* Maximum physical X coordinate for plot */
     double ymin;                /* Minimum physical Y coordinate for plot */
     double ymax;                /* Maximum physical Y coordinate for plot */
+    double border;              /* Percentage border around edges */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
@@ -84,84 +83,71 @@ static Tk_CustomOption framesetOption = {
 /* Configuration options */
 static Tk_ConfigSpec configSpecs[] = {
 
-  {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
-   "east", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
+     (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
 
-  {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
-   (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
+    {TK_CONFIG_DOUBLE, "-x", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL,
-   "1.0", Tk_Offset(SPItem, scale), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_DOUBLE, "-width", (char *) NULL, (char *) NULL,
-   "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-width", (char *) NULL, (char *) NULL,
+     "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
-   "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
+     "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_BOOLEAN, "-fill", (char *) NULL, (char *) NULL,
-   "1", Tk_Offset(SPItem, fill), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-border", (char *) NULL, (char *) NULL,
+     "10.0", Tk_Offset(SPItem, border), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_STRING, "-astoptions", (char *) NULL, (char *) NULL,
-   "Grid=1,DrawAxes=1", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_BOOLEAN, "-fill", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, fill), TK_CONFIG_DONT_SET_DEFAULT},
 
-  {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
-   "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_STRING, "-astoptions", (char *) NULL, (char *) NULL,
+     "", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
 
-  {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
-   "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
+     "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
 
-  {TK_CONFIG_CUSTOM, "-frameset", (char *) NULL, (char *) NULL,
-   (char *) NULL, Tk_Offset(SPItem, framesets), TK_CONFIG_NULL_OK,
-   &framesetOption},
+    {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
+     "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
 
-  {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
-   (char *) NULL, 0, 0}
+    {TK_CONFIG_CUSTOM, "-frameset", (char *) NULL, (char *) NULL,
+     (char *) NULL, Tk_Offset(SPItem, framesets), TK_CONFIG_NULL_OK,
+     &framesetOption},
+
+    {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
+     (char *) NULL, 0, 0}
 };
 
 /*
  * Prototypes for procedures defined in this file:
  */
-static int ReadDataList( Tcl_Interp *interp, SPItem *spPtr,
-                         Tcl_Obj *CONST dataValues );
-
-static void ComputeSPBbox( Tk_Canvas canvas, SPItem *spPtr );
-
-static int ConfigureSP( Tcl_Interp *interp, Tk_Canvas canvas,
-                        Tk_Item *itemPtr, int objc,
-                        Tcl_Obj *CONST objv[], int flags );
-
-static int CreateSP( Tcl_Interp *interp, Tk_Canvas canvas,
-                     struct Tk_Item *itemPtr, int objc,
-                     Tcl_Obj *CONST objv[] );
-
-static void DeleteSP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display );
-
-static void ScaleSP( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
-                     double originY, double scaleX, double scaleY );
-
-static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
-                     int objc, Tcl_Obj *CONST objv[] );
-
-static void DisplaySP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
-                       Drawable dst, int x, int y, int width, int height );
-
-static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr );
-
+static int    SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas, 
+                           Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[], 
+                           int flags );
+static int    SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+                        int objc, Tcl_Obj *CONST objv[] );
+static int    SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, struct
+                        Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[] );
+static void   SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display );
+static void   SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+                         Drawable dst, int x, int y, int width, int height );
+static int    SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr );
 static double SPToPoint( Tk_Canvas canvas, Tk_Item *itemPtr,
                          double *pointPtr );
+static int    SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
+                              Tk_Item *itemPtr, int prepass );
+static void   SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
+                       double originY, double scaleX, double scaleY );
+static void   SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
+                           double deltaY );
 
-static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
-                           Tk_Item *itemPtr, int prepass );
-
-static void TranslateSP( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
-                         double deltaY );
-
-static void ClearSPSubItems( Tk_Canvas canvas, SPItem *spPtr );
-
-static void GenerateSPPlotFrameSet( SPItem *spPtr );
-
-static void MakeSPSpectral( SPItem *spPtr );
+static void ClearSubItems( Tk_Canvas canvas, SPItem *spPtr );
+static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr );
+static void GeneratePlotFrameSet( SPItem *spPtr );
+static void MakeSpectral( SPItem *spPtr );
 
 /*
  * The structure below defines the item type, by means of procedures that can
@@ -170,18 +156,18 @@ static void MakeSPSpectral( SPItem *spPtr );
 static Tk_ItemType spectralPlotType = {
     "spectral_plot",               /* name           */
     sizeof(SPItem),                /* itemSize       */
-    CreateSP,                      /* createProc     */
+    SPCreate,                      /* createProc     */
     configSpecs,                   /* configSpecs    */
-    ConfigureSP,                   /* configureProc  */
+    SPConfigure,                   /* configureProc  */
     SPCoords,                      /* coordProc      */
-    DeleteSP,                      /* deleteProc     */
-    DisplaySP,                     /* displayProc    */
+    SPDelete,                      /* deleteProc     */
+    SPDisplay,                     /* displayProc    */
     TK_CONFIG_OBJS,                /* flags          */
     SPToPoint,                     /* pointProc      */
     SPToArea,                      /* areaProc       */
     SPToPostscript,                /* postscriptProc */
-    ScaleSP,                       /* scaleProc      */
-    TranslateSP,                   /* translateProc  */
+    SPScale,                       /* scaleProc      */
+    SPTranslate,                   /* translateProc  */
     (Tk_ItemIndexProc *) NULL,     /* indexProc      */
     (Tk_ItemCursorProc *) NULL,    /* cursorProc     */
     (Tk_ItemSelectionProc *) NULL, /* selectionProc  */
@@ -203,7 +189,7 @@ int SpectralPlot_Init()
 }
 
 /**
- * CreateSP --
+ * SPCreate --
  *
  *      This procedure is invoked to create a spectral plot item.
  *
@@ -216,20 +202,19 @@ int SpectralPlot_Init()
  * Side effects:
  *      A canvas item is created.
  */
-static int CreateSP( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                      int objc, Tcl_Obj *CONST objv[] )
 {
-    long longResult;
     SPItem *spPtr = (SPItem *) itemPtr;
-
-    fprintf( stderr, "CreateSP() \n" );
-
-    if ( objc < 4 ) {
+    int i;
+#if DEBUG
+    fprintf( stderr, "SPCreate() \n" );
+#endif
+    if ( objc < 2 ) {
         Tcl_AppendResult( interp, "wrong # args:  should be \"",
                           Tk_PathName( Tk_CanvasTkwin( canvas ) ),
                           "\" create ", itemPtr->typePtr->name,
-                          " x y {data1 data2 ...} frameset_item "
-                          "?options?", (char *) NULL );
+                          "v1 v2 v3 ... ?options?", (char *) NULL );
         return TCL_ERROR;
     }
 
@@ -242,7 +227,6 @@ static int CreateSP( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->numPoints = 0;
     spPtr->framesets[0] = NULL;
     spPtr->framesets[1] = NULL;
-    spPtr->options = "Grid=1,DrawAxes=1";
     spPtr->dataunits = NULL;
     spPtr->datalabel = NULL;
     spPtr->fill = 1;
@@ -250,39 +234,47 @@ static int CreateSP( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->y = 0.0;
     spPtr->width = 100.0;
     spPtr->height = 100.0;
-    spPtr->scale = 1.0;
-    spPtr->tkanchor = TK_ANCHOR_CENTER;
     spPtr->interp = interp;
+    spPtr->border = 10.0;
+    spPtr->options = NULL;
 
     /* Create a unique tag for AST graphic elements */
     sprintf( spPtr->utag, "gaiaSpectralPlot%d", tagCounter++ );
 
     /*
-     * Process the arguments to fill in the item record.
+     * Count the number of values and then parse them into a point
+     * array.  Leading arguments are assumed to be points if they
+     * start with a digit or a minus sign followed by a digit.
      */
-    if ( (Tk_CanvasGetCoordFromObj( interp, canvas, objv[0], &spPtr->x )
-          != TCL_OK) ||
-         (Tk_CanvasGetCoordFromObj( interp, canvas, objv[1], &spPtr->y )
-          != TCL_OK) ) {
+    for ( i = 0; i < objc; i++ ) {
+        char *arg = Tcl_GetString( objv[i] );
+        if ( ( arg[0] == '-' ) && ( arg[1] >= 'a' ) && ( arg[1] <= 'z' ) ) {
+            break;
+        }
+    }
+    if ( i && SPCoords( interp, canvas, itemPtr, i, objv ) != TCL_OK ) {
+        SPDelete( canvas, itemPtr, Tk_Display( Tk_CanvasTkwin( canvas ) ) );
         return TCL_ERROR;
     }
 
-    /* Convert data values into doubles */
-    if ( ReadDataList( interp, spPtr, objv[2] ) != TCL_OK ) {
+    /* And configure using any options */
+    if ( SPConfigure( interp, canvas, itemPtr, objc-i, objv+i, 0 ) != TCL_OK ){
+        SPDelete( canvas, itemPtr, Tk_Display( Tk_CanvasTkwin( canvas ) ) );
         return TCL_ERROR;
     }
 
-    /* Access the AstFrameSet, this is a pointer reference */
-    if ( Tcl_ExprLongObj( interp, objv[3], &longResult ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-    spPtr->framesets[0] = (AstFrameSet *) longResult;
-    spPtr->framesets[1] = NULL;
-
-    /*  And configure using any options */
-    if ( ConfigureSP( interp, canvas, itemPtr, objc-4, objv+4, 0 ) != TCL_OK ){
-        DeleteSP( canvas, itemPtr, Tk_Display( Tk_CanvasTkwin( canvas ) ) );
-        return TCL_ERROR;
+    /* Use default unit frameset when no other available */
+    if ( spPtr->framesets[0] == NULL ) {
+        AstFrame *f1, *f2;
+        AstUnitMap *map;
+        astBegin;
+        f1 = astFrame( 1, "" );
+        f2 = astFrame( 1, "" );
+        map = astUnitMap( 1, "" );
+        spPtr->framesets[0] = astFrameSet( f1, "" );
+        astAddFrame( spPtr->framesets[0], AST__BASE, map, f2 );
+        astExport( spPtr->framesets[0] );
+        astEnd;
     }
 
     /* Initialise the GRF interface, XXX are there any issues with interp
@@ -293,50 +285,10 @@ static int CreateSP( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 }
 
 /**
- * ReadDataList --
- *
- *    Read a list of spectral data value from a list.
- *
- *    Also sets the minimum and maximum data values in spPtr.
- */
-static int ReadDataList( Tcl_Interp *interp, SPItem *spPtr,
-                         Tcl_Obj *CONST dataValues )
-{
-    Tcl_Obj *arg = NULL;
-    int nargs = 0;
-    int i = 0;
-
-    if ( Tcl_ListObjLength( interp, dataValues, &nargs ) != TCL_OK ) {
-        return TCL_ERROR;
-    }
-
-    spPtr->ymax = -DBL_MAX;
-    spPtr->ymin =  DBL_MAX;
-
-    spPtr->dataPtr = (double *) ckalloc( sizeof(double) * nargs );
-    spPtr->numPoints = nargs;
-    for ( i = 0; i < nargs; i++ ) {
-        Tcl_ListObjIndex( interp, dataValues, i, &arg );
-        if (Tcl_GetDoubleFromObj(interp, arg, &spPtr->dataPtr[i]) != TCL_OK) {
-            ckfree( (char *) spPtr->dataPtr );
-            spPtr->numPoints = 0;
-            sprintf( interp->result, "%s is not a number: "
-                     "failed accessing list of data values",
-                     Tcl_GetString( arg ) );
-            return TCL_ERROR;
-        }
-        spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-        spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
-    }
-    return TCL_OK;
-}
-
-/**
  * SPCoords --
  *
  *   This procedure is invoked to process the "coords" widget command.
- *   This just sets the x and y values that determine the item reference
- *   point.
+ *   This reads an list of doubles that are the spectral coordinates. 
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -348,34 +300,54 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                      int objc, Tcl_Obj *CONST objv[] )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-    char x[TCL_DOUBLE_SPACE], y[TCL_DOUBLE_SPACE];
-
+    int i;
+#if DEBUG
     fprintf( stderr, "SPCoords() \n" );
-
-    if ( objc == 0 ) {
-        Tcl_PrintDouble( interp, spPtr->x, x );
-        Tcl_PrintDouble( interp, spPtr->y, y );
-        Tcl_AppendResult( interp, x, " ", y, " ", (char *) NULL );
-    }
-    else if ( objc == 2 ) {
-        if ( ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[0], &spPtr->x )
-               != TCL_OK ) ||
-             ( Tk_CanvasGetCoordFromObj( interp, canvas, objv[1], &spPtr->y )
-               != TCL_OK ) ) {
-            return TCL_ERROR;
-        }
-        ComputeSPBbox( canvas, spPtr );
+#endif
+    if (objc == 0) {
+	/*
+	 * Print the data values.
+	 */
+	Tcl_Obj *subobj, *obj = Tcl_NewObj();
+	for ( i = 0; i < spPtr->numPoints; i++ ) {
+	    subobj = Tcl_NewDoubleObj( spPtr->dataPtr[i] );
+	    Tcl_ListObjAppendElement( interp, obj, subobj );
+	}
+	Tcl_SetObjResult( interp, obj );
+	return TCL_OK;
     }
     else {
-        sprintf( interp->result,
-                 "wrong # coordinates:  expected 0 or 2, got %d", objc );
-        return TCL_ERROR;
+	spPtr->numPoints = objc;
+        if ( spPtr->dataPtr != NULL ) {
+            ckfree( (char *) spPtr->dataPtr );
+            spPtr->dataPtr = NULL;
+        }
+        
+        /* Regenerate associated coordinates? */
+        if ( spPtr-> framesets[1] != NULL ) {
+            astAnnul( spPtr->framesets[1] );
+            spPtr->framesets[1] = NULL;
+        }
+
+        spPtr->dataPtr = (double *) ckalloc( sizeof(double)*spPtr->numPoints );
+
+        spPtr->ymax = -DBL_MAX;
+        spPtr->ymin =  DBL_MAX;
+
+	for ( i = 0; i < objc; i++ ) {
+	    if ( Tcl_GetDoubleFromObj( interp, objv[i], &spPtr->dataPtr[i] ) 
+                 != TCL_OK ) {
+		return TCL_ERROR;
+	    }
+            spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+            spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+        }
     }
     return TCL_OK;
 }
 
 /**
- * ConfigureSP --
+ * SPConfigure --
  *
  *      This procedure is invoked to configure the item.
  *
@@ -386,15 +358,15 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  * Side effects:
  *      Configuration information may be set for itemPtr.
  */
-static int ConfigureSP( Tcl_Interp *interp, Tk_Canvas canvas,
+static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
                         Tk_Item *itemPtr, int objc,
                         Tcl_Obj *CONST objv[], int flags )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
-
-    fprintf( stderr, "ConfigureSP() \n" );
-
+#if DEBUG
+    fprintf( stderr, "SPConfigure() \n" );
+#endif
     tkwin = Tk_CanvasTkwin( canvas );
     /* Note using Tcl_Obj calls so need TK_CONFIG_OBJS flags. */
     if ( Tk_ConfigureWidget( interp, tkwin, configSpecs, objc,
@@ -403,12 +375,12 @@ static int ConfigureSP( Tcl_Interp *interp, Tk_Canvas canvas,
          != TCL_OK ) {
         return TCL_ERROR;
     }
-    ComputeSPBbox( canvas, spPtr );
+    ComputeBBox( canvas, spPtr );
     return TCL_OK;
 }
 
 /**
- * DeleteSP --
+ * SPDelete --
  *
  *      This procedure is called to clean up the data structure
  *      associated with an item.
@@ -419,12 +391,12 @@ static int ConfigureSP( Tcl_Interp *interp, Tk_Canvas canvas,
  * Side effects:
  *      Resources associated with itemPtr are released.
  */
-static void DeleteSP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
+static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-
-    fprintf( stderr, "DeleteSP() \n" );
-
+#if DEBUG
+    fprintf( stderr, "SPDelete() \n" );
+#endif
     if ( spPtr->dataPtr != NULL) {
         ckfree( (char *) spPtr->dataPtr );
     }
@@ -434,11 +406,11 @@ static void DeleteSP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
     spPtr->numPoints = 0;
 
     /* Delete the actual graphics */
-    ClearSPSubItems( canvas, spPtr );
+    ClearSubItems( canvas, spPtr );
 }
 
 /**
- * DisplaySP --
+ * SPDisplay --
  *
  *      This procedure is invoked to draw an item in a given drawable.
  *
@@ -448,25 +420,26 @@ static void DeleteSP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
  * Side effects:
  *      ItemPtr is drawn in drawable...
  */
-static void DisplaySP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        Drawable drawable, int x, int y, int width,
                        int height )
 {
+    AstPlot *plot;
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
-    int i;
     char *tags;
+    double basebox[4];
     float graphbox[4];
+    int i;
+    int iheight;
+    int iwidth;
     int ixo;
     int iyo;
-    int iwidth;
-    int iheight;
-    int iborder;
-    double basebox[4];
-    AstPlot *plot;
-
-    fprintf( stderr, "DisplaySP() \n" );
-
+    int xborder;
+    int yborder;
+#if DEBUG
+    fprintf( stderr, "SPDisplay() \n" );
+#endif
     if ( spPtr->dataPtr == NULL ) {
         return;
     }
@@ -475,10 +448,13 @@ static void DisplaySP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         return;
     }
 
-    /* Generate the Plot frameset, if required (will be redone each time the 
+    /* Bounding box defines drawing region, so update continually. */
+    ComputeBBox( canvas, spPtr );
+
+    /* Generate the Plot frameset, if required (will be redone each time the
      *  frameset changes). This also creates a new coordPtr array. */
     if ( spPtr->framesets[1] == NULL ) {
-        GenerateSPPlotFrameSet( spPtr );
+        GeneratePlotFrameSet( spPtr );
     }
 
     /* Set the tag used by the canvas items we create, need to be under the
@@ -486,39 +462,42 @@ static void DisplaySP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     astTk_Tag( spPtr->utag );
 
     /* Clear existing items */
-    ClearSPSubItems( canvas, spPtr );
+    ClearSubItems( canvas, spPtr );
 
-    /* Set the draw area to the size of canvas, minus a 10% border */
-    tkwin = Tk_CanvasTkwin( canvas );
+    /* Set the draw area to the size of the bounding box */
+    if ( spPtr->fill ) {
 
-    ixo = Tk_X( tkwin );
-    iyo = Tk_Y( tkwin );
-    iwidth = Tk_Width( tkwin );
-    iheight = Tk_Height( tkwin );
-    iborder = ( width / 10 );
+        /* Need a gap around the edges */
+        ixo = spPtr->header.x1;
+        iyo = spPtr->header.y1;
+        iwidth = spPtr->header.x2 - spPtr->header.x1;
+        iheight = spPtr->header.y2 - spPtr->header.y1;
+        xborder = (int) ( iwidth * spPtr->border ) / 100.0;
+        yborder = (int) ( iheight * spPtr->border ) / 100.0;
 
-    ixo += iborder;
-    iyo += iborder;
-    iwidth -= ( 2 * iborder );
-    iheight -= ( 2 * iborder );
+        graphbox[0] = ixo + xborder;
+        graphbox[1] = iyo + iheight - yborder;
+        graphbox[2] = ixo + iwidth - xborder;
+        graphbox[3] = iyo + yborder;
+    }
+    else {
+        graphbox[0] = spPtr->header.x1;
+        graphbox[1] = spPtr->header.y2;
+        graphbox[2] = spPtr->header.x2;
+        graphbox[3] = spPtr->header.y1;
+    }
 
-    graphbox[0] = graphbox[2] = ixo;
-    graphbox[1] = graphbox[3] = iyo;
-    graphbox[2] += iwidth;
-    graphbox[1] += iheight;
-
-    /* Set the limits of the drawing region in physical coordinates, AST__BASE
-     * of the plot frameset. */
+    /* Set the limits of the drawing region in physical coordinates */
     basebox[0] = spPtr->xmin;
     basebox[1] = spPtr->ymin;
-    basebox[2] = spPtr->xmin;
+    basebox[2] = spPtr->xmax;
     basebox[3] = spPtr->ymax;
-
+#if DEBUG
     fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
              basebox[2], basebox[3] );
     fprintf( stderr, "graphbox: %f,%f,%f,%f\n", graphbox[0], graphbox[1],
              graphbox[2], graphbox[3] );
-
+#endif
     /* Create the AstPlot */
     plot = astPlot( spPtr->framesets[1], graphbox, basebox, spPtr->options );
 
@@ -526,7 +505,19 @@ static void DisplaySP( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     astGrid( plot );
 
     /* Finally the spectrum */
-    
+    {
+        double *in = malloc( spPtr->numPoints * 2 * sizeof( double ) );
+        double *ptr = in;
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            *ptr++ = spPtr->coordPtr[i];
+        }
+        for ( i = 0; i < spPtr->numPoints; i++ ) {
+            *ptr++ = spPtr->dataPtr[i];
+        }
+        astTk_LineType( 0, 0 );
+        astPolyCurve( plot, spPtr->numPoints, 2, spPtr->numPoints, in );
+        astTk_LineType( 1, 0 );
+    }
 
     if ( !astOK ) {
         astClearStatus;
@@ -556,9 +547,9 @@ static double SPToPoint( Tk_Canvas canvas, Tk_Item *itemPtr,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     double xDiff, yDiff;
-
+#if DEBUG
     fprintf( stderr, "SPToPoint() \n" );
-
+#endif
     /*
      * If the point is inside the bounding box of the plot, then we can
      * return immediately.
@@ -614,9 +605,9 @@ static double SPToPoint( Tk_Canvas canvas, Tk_Item *itemPtr,
 static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-
+#if DEBUG
     fprintf( stderr, "SPToArea() \n" );
-
+#endif
     if ( ( areaPtr[2] > spPtr->header.x1 ) &&
          ( areaPtr[0] < spPtr->header.x2 ) &&
          ( areaPtr[3] > spPtr->header.y1 ) &&
@@ -641,7 +632,7 @@ static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
 }
 
 /**
- * ScaleSP --
+ * SPScale --
  *
  *      This procedure is invoked to scale an item.
  *
@@ -650,32 +641,29 @@ static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
  *
  * Side effects:
  *      The item referred to by itemPtr is rescaled
- *      so that the following transformation is applied to all
- *      point coordinates:
  *              x' = originX + scaleX*(x-originX)
  *              y' = originY + scaleY*(y-originY)
- *
  *      This just moves the origin wrt to the scale.
  */
-static void ScaleSP( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
+static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
                      double originY, double scaleX, double scaleY )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-
-    fprintf( stderr, "ScaleSP() \n" );
-
+#if DEBUG
+    fprintf( stderr, "SPScale() \n" );
+#endif
     /* Scale all coordinates and set their related values */
     spPtr->x = originX + scaleX * ( spPtr->x - originX );
     spPtr->y = originY + scaleY * ( spPtr->y - originY );
     spPtr->width *= scaleX;
     spPtr->height *= scaleY;
 
-    ComputeSPBbox( canvas, spPtr );
+    ComputeBBox( canvas, spPtr );
     return;
 }
 
 /**
- * TranslateSP --
+ * SPTranslate --
  *
  *      This procedure is called to move an item by a given amount.
  *
@@ -686,13 +674,13 @@ static void ScaleSP( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
  *      The position of the item is offset by (xDelta, yDelta), and
  *      the bounding box is updated in the generic part of the item structure.
  */
-static void TranslateSP( Tk_Canvas canvas, Tk_Item *itemPtr,
+static void SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr,
                          double deltaX,  double deltaY )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     spPtr->x += deltaX;
     spPtr->y += deltaY;
-    ComputeSPBbox( canvas, spPtr );
+    ComputeBBox( canvas, spPtr );
 }
 
 /**
@@ -713,7 +701,7 @@ static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 }
 
 /**
- * ComputeSPBbox --
+ * ComputeBBox --
  *
  *      This procedure is invoked to compute the bounding box of
  *      all the pixels that may be drawn.
@@ -725,11 +713,13 @@ static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
  *      The fields x1, y1, x2, and y2 are updated in the header
  *      for itemPtr.
  */
-static void ComputeSPBbox( Tk_Canvas canvas, SPItem *spPtr )
+static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr )
 {
     Tk_Window tkwin;
     tkwin = Tk_CanvasTkwin( canvas );
-
+#if DEBUG
+    fprintf( stderr, "ComputeSPBox: %d\n", spPtr->fill );
+#endif
     if ( spPtr->fill ) {
         /*  The whole canvas. */
         spPtr->header.x1 = spPtr->header.x2 = Tk_X( tkwin );
@@ -738,11 +728,17 @@ static void ComputeSPBbox( Tk_Canvas canvas, SPItem *spPtr )
         spPtr->header.y2 += Tk_Height( tkwin );
     }
     else {
+        /*  Just the requested size and position */
         spPtr->header.x1 = spPtr->header.x2 = spPtr->x;
         spPtr->header.y1 = spPtr->header.y2 = spPtr->y;
         spPtr->header.x2 += spPtr->width;
         spPtr->header.y2 += spPtr->height;
     }
+
+#if DEBUG
+    fprintf( stderr, "%d,%d,%d,%d \n", spPtr->header.x1, spPtr->header.y1,
+             spPtr->header.x2, spPtr->header.y2 );
+#endif
 }
 
 /**
@@ -786,13 +782,14 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
     return p;
 }
 
+
 /**
- * ClearSPSubItems --
+ * ClearSubItems --
  *
  *     Clear any items we've already drawn (before refresh or when we're being
  *     deleted).
  */
-static void ClearSPSubItems( Tk_Canvas canvas, SPItem *spPtr )
+static void ClearSubItems( Tk_Canvas canvas, SPItem *spPtr )
 {
     /* Don't worry about errors, shouldn't be fatal, but cannot do this
      * if the whole canvas is being destroyed, so check for a NULL window. */
@@ -804,18 +801,18 @@ static void ClearSPSubItems( Tk_Canvas canvas, SPItem *spPtr )
 }
 
 /**
- * GenerateSPPlotFrameSet --
+ * GeneratePlotFrameSet --
  *
  *     Generate a FrameSet suitable for drawing a 2D data plot using our data
  *     values and 1D frameset. Also creates the coordinate positions array.
  */
-static void GenerateSPPlotFrameSet( SPItem *spPtr )
+static void GeneratePlotFrameSet( SPItem *spPtr )
 {
     int i;
     double *tmpPtr;
 
     /* Create the spectral FrameSet */
-    MakeSPSpectral( spPtr );
+    MakeSpectral( spPtr );
 
     /* Get the centres of the pixel positions in current coordinates (so we
      * can eventually go from current coordinates through to graphics
@@ -829,7 +826,7 @@ static void GenerateSPPlotFrameSet( SPItem *spPtr )
     for ( i = 0; i < spPtr->numPoints; i++ ) {
         tmpPtr[i] = (double) i + 1;
     }
-    astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1, 
+    astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
 
     /* Set the axis range. */
@@ -840,15 +837,15 @@ static void GenerateSPPlotFrameSet( SPItem *spPtr )
         spPtr->xmax = MAX( spPtr->xmax, spPtr->coordPtr[i] );
     }
 }
- 
+
 
 /**
- * MakeSPSpectral --
+ * MakeSpectral --
  *
  *     Generate a FrameSet suitable for drawing a 2D data plot using our data
  *     values and 1D frameset.
  */
-static void MakeSPSpectral( SPItem *spPtr )
+static void MakeSpectral( SPItem *spPtr )
 {
     AstFrame *cfrm;
     AstFrame *f1;
@@ -864,19 +861,19 @@ static void MakeSPSpectral( SPItem *spPtr )
     int iaxes[2];
 
     astBegin;
-    
+
     /* -------------------------------------------------------------
      * Create a mapping to transform from GRID positions to spectral
      * coordinates and data values.
      * -------------------------------------------------------------
      */
-    
+
     /* Get a simplified mapping from the base to current frames. This will
      * be used to transform from GRID coordinates to spectral
      * coordinates. */
     map = astGetMapping( spPtr->framesets[0], AST__BASE, AST__CURRENT );
     smap = astSimplify( map );
-    
+
     /* Save a pointer to the current frame. */
     cfrm = astGetFrame( spPtr->framesets[0], AST__CURRENT );
 
@@ -913,7 +910,7 @@ static void MakeSPSpectral( SPItem *spPtr )
      * Create the coordinate data frame.
      * ---------------------------------
      */
-    
+
     /* Use first axis from the current frame as the spectral axis. */
     iaxes[0] = 1;
     f1 = astPickAxes( spPtr->framesets[0], 1, iaxes, NULL );
@@ -924,6 +921,7 @@ static void MakeSPSpectral( SPItem *spPtr )
      * a SpecFrame. Note that SpecFrames are not that useful as we don't use a
      * reference spectrum (so no alignments are used in this item).
      */
+    f2 = NULL;
     if ( havespecframe && spPtr->dataunits != NULL && astOK ) {
         f2 = (AstFrame *) astFluxFrame( AST__BAD, NULL, "" );
         astSetC( f2, "unit(1)", spPtr->dataunits );
@@ -946,12 +944,12 @@ static void MakeSPSpectral( SPItem *spPtr )
         havefluxframe = 0;
         f2 = astFrame( 1, "" );
     }
-    
+
     /* Create the full frame using the spectral frame and flux frame. */
     if ( havespecframe && havefluxframe ) {
-        frm2 = (AstFrame *) astSpecFluxFrame( (AstSpecFrame *) f1, 
+        frm2 = (AstFrame *) astSpecFluxFrame( (AstSpecFrame *) f1,
                                               (AstFluxFrame *) f2, "" );
-    } 
+    }
     else {
         frm2 = (AstFrame *) astCmpFrame( f1, f2, "" );
     }
@@ -996,3 +994,4 @@ static void MakeSPSpectral( SPItem *spPtr )
     }
     astEnd;
 }
+
