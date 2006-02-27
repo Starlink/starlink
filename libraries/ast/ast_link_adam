@@ -194,6 +194,14 @@
 
 #--
 
+#  This function searches the directory path specified in PATH, looking for
+#  an executable file which is not a directory. If found, it echos the full
+#  file name to standard output. Otherwise, it outputs nothing.
+      find() { IFS=':'; for d in $PATH; do f="${d:=.}/${1}"
+                  test -x "${f}" -a ! -d "${f}" && echo "${f}" && break
+               done;
+             }
+
 #  Initialise linking options.
       err=''
       grf=''
@@ -340,6 +348,10 @@
 #  Link with the maths library.
 #  ----------------------------
       args="${args} -lm"
+
+#  Link with the starmem library, if available.
+#  --------------------------------------------
+      args="${args} `\`find starmem_link\``"
 
 #  Pass the resulting argument list through an awk script which eliminates
 #  all except the last reference to each library.

@@ -383,6 +383,10 @@
 #  ----------------------------
       args="${args} -lm"
 
+#  Link with the starmem library, if available. 
+#  --------------------------------------------
+      args="${args} `\`find starmem_link\``"
+
 #  Resolve Fortran 77 references.
 #  ------------------------------
 #  If libraries written in Fortran are being linked against, then include

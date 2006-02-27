@@ -20,6 +20,15 @@ AC_CONFIG_SRCDIR([ast_link.in])
 #   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+#   See if the --with-starmem option has been provided. This sets the
+#   preprocesor macro HAVE_STAR_MEM_H. 
+AC_ARG_WITH(
+      [starmem],
+      AC_HELP_STRING([--with-starmem],
+                     [use starmem library for memory management]),
+      AC_DEFINE([HAVE_STAR_MEM_H],[1],[Use the starmem library for memory management]),
+)
+
 #   Checks for programs
 AC_PROG_CC
 AC_PROG_CPP

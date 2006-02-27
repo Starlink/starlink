@@ -60,6 +60,30 @@
 *        controlled by AST tuning parameter MemoryCaching.
 */
 
+/* Include files. */
+/* ============== */
+/* Interface definitions. */
+/* ---------------------- */
+#include "error.h"               /* Error reporting facilities */
+#include "memory.h"              /* Interface to this module */
+
+/* Error code definitions. */
+/* ----------------------- */
+#include "ast_err.h"             /* AST error codes */
+
+/* C header files. */
+/* --------------- */
+#include <ctype.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Module Macros. */
 /* ============== */
 /* Define the astCLASS macro (even although this is not a class
@@ -75,6 +99,21 @@
    too big because the vast majority of memory blocks allocated by AST are
    less than a few hundred bytes. */
 #define MXCSIZE 300
+
+/* Select the appropriate memory management functions. These will be the
+   system's malloc, free and realloc unless AST was configured with the
+   "--with-starmem" option, in which case they will be the starmem
+   malloc, free and realloc. */
+#ifdef HAVE_STAR_MEM_H
+#  include <star/mem.h>
+#  define MALLOC starMalloc
+#  define FREE starFree
+#  define REALLOC starRealloc
+#else
+#  define MALLOC malloc
+#  define FREE free
+#  define REALLOC realloc
+#endif
 
 /* Function Macros. */
 /* =============== */
@@ -210,26 +249,6 @@
              ( (unsigned long) 1 ) ) )
 
 
-
-/* Include files. */
-/* ============== */
-/* Interface definitions. */
-/* ---------------------- */
-#include "error.h"               /* Error reporting facilities */
-#include "memory.h"              /* Interface to this module */
-
-/* Error code definitions. */
-/* ----------------------- */
-#include "ast_err.h"             /* AST error codes */
-
-/* C header files. */
-/* --------------- */
-#include <ctype.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
 
 /* Module Type Definitions. */
 /* ======================== */
@@ -696,7 +715,7 @@ void *astFree_( void *ptr ) {
 #endif
 
 /* Free the allocated memory. */
-         free( mem );
+         FREE( mem );
       }
    }
 
@@ -882,7 +901,7 @@ void *astMalloc_( size_t size ) {
 
 /* Otherwise, allocate a new memory block using "malloc". */
       } else {      
-         mem = malloc( sizeof( Memory ) + size );
+         mem = MALLOC( sizeof( Memory ) + size );
 
 /* Report an error if malloc failed. */
          if ( !mem ) {
@@ -970,7 +989,7 @@ int astMemCaching_( int newval ){
             while( cache[ i ] ) {
                mem = cache[ i ];
                cache[ i ] = mem->next;
-               free( mem );
+               FREE( mem );
             }
          }
 
@@ -1094,7 +1113,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* If the cache is being used, for small memory blocks, do the equivalent of 
 
-               mem = realloc( mem, sizeof( Memory ) + size );
+               mem = REALLOC( mem, sizeof( Memory ) + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
@@ -1114,7 +1133,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* For other memory blocks simply use realloc. */
                } else {
-                  mem = realloc( mem, sizeof( Memory ) + size );
+                  mem = REALLOC( mem, sizeof( Memory ) + size );
 
 /* If this failed, report an error and return the original pointer
    value. */
@@ -1923,11 +1942,11 @@ static void Issue( Memory *new ) {
          siz_issued *= 2;
          if( siz_issued < 100 ) siz_issued = 100;
          new_size = siz_issued * sizeof( Memory * );
-         new_issued = malloc( new_size );
+         new_issued = MALLOC( new_size );
          if( new_issued ) {
             if( issued ) {
                memcpy( new_issued, issued, old_size );
-               free( issued );
+               FREE( issued );
             }
             issued = new_issued;
          } else {
