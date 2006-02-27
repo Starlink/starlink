@@ -27,7 +27,7 @@
 *     gasp2ndf in out shape=?
 
 *  ADAM Parameters:
-*     IN = LITERAL (Read)
+*     IN = FILENAME (Read)
 *        A character string containing the name of GASP file to convert.
 *        The extension should not be given, since ".dat" is assumed.
 *     OUT = NDF (Write)

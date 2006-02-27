@@ -37,7 +37,7 @@
 *        range of signed words (-32768 to 32767).  A null value (!)
 *        means no replacements are to be made.  This parameter is
 *        ignored if there are no bad values.  [!]
-*     OUT = LITERAL (Write)
+*     OUT = FILENAME (Write)
 *        The name of the output GASP image.  Two files are produced
 *        with the same name but different extensions.  The ".dat" file
 *        contains the data array, and ".hdr" is the associated header
