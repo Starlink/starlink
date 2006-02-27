@@ -32,6 +32,7 @@
 #include <tk.h>
 #include <ast.h>
 #include <grf_tkcan.h>
+#include <rtdCanvas.h>
 
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
@@ -42,24 +43,27 @@
  */
 typedef struct SPItem  {
     Tk_Item header;             /* Mandatory Tk header information */
-    double *dataPtr;            /* Data values */
-    double *coordPtr;           /* Coordinates for each data value */
-    int numPoints;              /* Number of data values */
     AstFrameSet *framesets[2];  /* The FrameSets associated with item */
-    char *dataunits;            /* The data units */
+    AstPlot *plot;              /* The AstPlot for drawing regions */
+    Tk_Item *polyline;          /* rtdPolyline item context */
+    Tcl_Interp *interp;         /* The Tcl interpreter */
     char *datalabel;            /* The data units label */
+    char *dataunits;            /* The data units */
     char *options;              /* AST options used when drawing item */
     char utag[22];              /* Unique tag for AST graphics we create */
-    double x, y;                /* Coordinates of item reference point */
-    double width;               /* Width of item when not filling */
-    double height;              /* Height of item when not filling */
-    int fill;                   /* Whether to fill canvas with item */
-    Tcl_Interp *interp;         /* The Tcl interpreter */
-    double xmin;                /* Minimum physical X coordinate for plot */
-    double xmax;                /* Maximum physical X coordinate for plot */
-    double ymin;                /* Minimum physical Y coordinate for plot */
-    double ymax;                /* Maximum physical Y coordinate for plot */
+    double *coordPtr;           /* Coordinates for each data value */
+    double *dataPtr;            /* Data values */
     double border;              /* Percentage border around edges */
+    double height;              /* Height of item when not filling */
+    double width;               /* Width of item when not filling */
+    double x, y;                /* Coordinates of item reference point */
+    double xmax;                /* Maximum physical X coordinate for plot */
+    double xmin;                /* Minimum physical X coordinate for plot */
+    double ymax;                /* Maximum physical Y coordinate for plot */
+    double ymin;                /* Minimum physical Y coordinate for plot */
+    int fill;                   /* Whether to fill canvas with item */
+    int numPoints;              /* Number of data values */
+    int showgrid;               /* Whether to show the grid */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
@@ -104,6 +108,9 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_BOOLEAN, "-fill", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, fill), TK_CONFIG_DONT_SET_DEFAULT},
 
+    {TK_CONFIG_BOOLEAN, "-showgrid", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, showgrid), TK_CONFIG_DONT_SET_DEFAULT},
+
     {TK_CONFIG_STRING, "-astoptions", (char *) NULL, (char *) NULL,
      "", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
 
@@ -124,8 +131,8 @@ static Tk_ConfigSpec configSpecs[] = {
 /*
  * Prototypes for procedures defined in this file:
  */
-static int    SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas, 
-                           Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[], 
+static int    SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
+                           Tk_Item *itemPtr, int objc, Tcl_Obj *CONST objv[],
                            int flags );
 static int    SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                         int objc, Tcl_Obj *CONST objv[] );
@@ -237,6 +244,8 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->interp = interp;
     spPtr->border = 10.0;
     spPtr->options = NULL;
+    spPtr->plot = NULL;
+    spPtr->polyline = NULL;
 
     /* Create a unique tag for AST graphic elements */
     sprintf( spPtr->utag, "gaiaSpectralPlot%d", tagCounter++ );
@@ -277,8 +286,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         astEnd;
     }
 
-    /* Initialise the GRF interface, XXX are there any issues with interp
-     * persistence? */
+    /* Initialise the GRF interface. */
     astTk_Init( interp, Tk_PathName( Tk_CanvasTkwin( canvas ) ) );
 
     return TCL_OK;
@@ -288,7 +296,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  * SPCoords --
  *
  *   This procedure is invoked to process the "coords" widget command.
- *   This reads an list of doubles that are the spectral coordinates. 
+ *   This reads an list of doubles that are the spectral coordinates.
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -322,12 +330,12 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             ckfree( (char *) spPtr->dataPtr );
             spPtr->dataPtr = NULL;
         }
-        
-        /* Regenerate associated coordinates? */
-        if ( spPtr-> framesets[1] != NULL ) {
-            astAnnul( spPtr->framesets[1] );
-            spPtr->framesets[1] = NULL;
-        }
+
+        /* XXXX Regenerate associated coordinates? */
+        //if ( spPtr-> framesets[1] != NULL ) {
+        //            astAnnul( spPtr->framesets[1] );
+        //            spPtr->framesets[1] = NULL;
+        //        }
 
         spPtr->dataPtr = (double *) ckalloc( sizeof(double)*spPtr->numPoints );
 
@@ -335,7 +343,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->ymin =  DBL_MAX;
 
 	for ( i = 0; i < objc; i++ ) {
-	    if ( Tcl_GetDoubleFromObj( interp, objv[i], &spPtr->dataPtr[i] ) 
+	    if ( Tcl_GetDoubleFromObj( interp, objv[i], &spPtr->dataPtr[i] )
                  != TCL_OK ) {
 		return TCL_ERROR;
 	    }
@@ -424,7 +432,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        Drawable drawable, int x, int y, int width,
                        int height )
 {
-    AstPlot *plot;
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
     char *tags;
@@ -437,6 +444,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     int iyo;
     int xborder;
     int yborder;
+
 #if DEBUG
     fprintf( stderr, "SPDisplay() \n" );
 #endif
@@ -451,12 +459,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     /* Bounding box defines drawing region, so update continually. */
     ComputeBBox( canvas, spPtr );
 
-    /* Generate the Plot frameset, if required (will be redone each time the
-     *  frameset changes). This also creates a new coordPtr array. */
-    if ( spPtr->framesets[1] == NULL ) {
-        GeneratePlotFrameSet( spPtr );
-    }
-
     /* Set the tag used by the canvas items we create, need to be under the
        control of this item, so use a unique value */
     astTk_Tag( spPtr->utag );
@@ -464,47 +466,60 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     /* Clear existing items */
     ClearSubItems( canvas, spPtr );
 
-    /* Set the draw area to the size of the bounding box */
-    if ( spPtr->fill ) {
+    /* Generate the Plot frameset, if required (will be redone each time the
+     *  frameset changes). This also creates a new coordPtr array. */
+    if ( spPtr->framesets[1] == NULL ) {
 
-        /* Need a gap around the edges */
-        ixo = spPtr->header.x1;
-        iyo = spPtr->header.y1;
-        iwidth = spPtr->header.x2 - spPtr->header.x1;
-        iheight = spPtr->header.y2 - spPtr->header.y1;
-        xborder = (int) ( iwidth * spPtr->border ) / 100.0;
-        yborder = (int) ( iheight * spPtr->border ) / 100.0;
+        fprintf( stderr, "Regenerating plot\n" );
 
-        graphbox[0] = ixo + xborder;
-        graphbox[1] = iyo + iheight - yborder;
-        graphbox[2] = ixo + iwidth - xborder;
-        graphbox[3] = iyo + yborder;
-    }
-    else {
-        graphbox[0] = spPtr->header.x1;
-        graphbox[1] = spPtr->header.y2;
-        graphbox[2] = spPtr->header.x2;
-        graphbox[3] = spPtr->header.y1;
-    }
+        GeneratePlotFrameSet( spPtr );
 
-    /* Set the limits of the drawing region in physical coordinates */
-    basebox[0] = spPtr->xmin;
-    basebox[1] = spPtr->ymin;
-    basebox[2] = spPtr->xmax;
-    basebox[3] = spPtr->ymax;
+        /* Set the draw area to the size of the bounding box */
+        if ( spPtr->fill ) {
+            
+            /* Need a gap around the edges */
+            ixo = spPtr->header.x1;
+            iyo = spPtr->header.y1;
+            iwidth = spPtr->header.x2 - spPtr->header.x1;
+            iheight = spPtr->header.y2 - spPtr->header.y1;
+            xborder = (int) ( iwidth * spPtr->border ) / 100.0;
+            yborder = (int) ( iheight * spPtr->border ) / 100.0;
+
+            graphbox[0] = ixo + xborder;
+            graphbox[1] = iyo + iheight - yborder;
+            graphbox[2] = ixo + iwidth - xborder;
+            graphbox[3] = iyo + yborder;
+        }
+        else {
+            graphbox[0] = spPtr->header.x1;
+            graphbox[1] = spPtr->header.y2;
+            graphbox[2] = spPtr->header.x2;
+            graphbox[3] = spPtr->header.y1;
+        }
+
+        /* Set the limits of the drawing region in physical coordinates */
+        basebox[0] = spPtr->xmin;
+        basebox[1] = spPtr->ymin;
+        basebox[2] = spPtr->xmax;
+        basebox[3] = spPtr->ymax;
+
 #if DEBUG
-    fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
-             basebox[2], basebox[3] );
-    fprintf( stderr, "graphbox: %f,%f,%f,%f\n", graphbox[0], graphbox[1],
-             graphbox[2], graphbox[3] );
+        fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
+                 basebox[2], basebox[3] );
+        fprintf( stderr, "graphbox: %f,%f,%f,%f\n", graphbox[0], graphbox[1],
+                 graphbox[2], graphbox[3] );
 #endif
-    /* Create the AstPlot */
-    plot = astPlot( spPtr->framesets[1], graphbox, basebox, spPtr->options );
+        spPtr->plot = astPlot( spPtr->framesets[1], graphbox, basebox,
+                               spPtr->options );
 
-    /* And plot the grid axes */
-    astGrid( plot );
+        /* And plot the grid axes */
+        if ( spPtr->showgrid ) { 
+            astGrid( spPtr->plot );
+        }
+    }
 
-    /* Finally the spectrum */
+    /* Finally the spectrum, for speed we use direct control of a
+     * rtd_polyline instance.  */
     {
         double *in = malloc( spPtr->numPoints * 2 * sizeof( double ) );
         double *ptr = in;
@@ -515,7 +530,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
             *ptr++ = spPtr->dataPtr[i];
         }
         astTk_LineType( 0, 0 );
-        astPolyCurve( plot, spPtr->numPoints, 2, spPtr->numPoints, in );
+        astPolyCurve( spPtr->plot, spPtr->numPoints, 2, spPtr->numPoints, in );
         astTk_LineType( 1, 0 );
     }
 

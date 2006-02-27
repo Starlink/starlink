@@ -41,8 +41,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <math.h>
-#include "tcl.h"
-#include "tk.h"
+#include <tcl.h>
+#include <tk.h>
+#include <rtdCanvas.h>
 
 #define UCHAR(c) ((unsigned char) (c))
 
@@ -173,10 +174,10 @@ static void		TranslateLine _ANSI_ARGS_((Tk_Canvas canvas,
  * values in CreateLine.
  */
 
-static Tk_CustomOption arrowShapeOption = {ParseArrowShape,
-	PrintArrowShape, (ClientData) NULL};
-static Tk_CustomOption tagsOption = {Tk_CanvasTagsParseProc,
-    Tk_CanvasTagsPrintProc, (ClientData) NULL
+static Tk_CustomOption arrowShapeOption = {
+    ParseArrowShape, PrintArrowShape, (ClientData) NULL};
+static Tk_CustomOption tagsOption = {
+    Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
 };
 
 static Tk_ConfigSpec configSpecs[] = {
@@ -475,8 +476,8 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
       if ( adding ) {
         numPoints += linePtr->numPoints;
         linePtr->coordPtr = (double *)
-          ckrealloc( linePtr->coordPtr,
-                     (unsigned) (sizeof(double) * numPoints * 2 ));
+            ckrealloc( (char *)linePtr->coordPtr,
+                       (unsigned) (sizeof(double) * numPoints * 2 ));
 
         for (i = argcLocal-1, j = (numPoints * 2)-1;
              i >= 0;
@@ -1796,7 +1797,8 @@ void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
     /*  Append coordinates to existing ones. */
     npoints = numPoints + linePtr->numPoints;
     linePtr->coordPtr = (double *) 
-      ckrealloc( linePtr->coordPtr, (unsigned)(sizeof(double) * npoints * 2 ));
+        ckrealloc( (char *)linePtr->coordPtr, 
+                   (unsigned)(sizeof(double) * npoints * 2 ));
 
     fflush( stdout );
     for ( i =  linePtr->numPoints * 2, j = 0; j < numPoints; j++, i+=2 ) {

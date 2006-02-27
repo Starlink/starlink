@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <tk.h>
+#include <rtdCanvas.h>
 
 /*  Tk internal functions -- XXX may need changing in future releases */
 extern void   TkIncludePoint _ANSI_ARGS_((Tk_Item *itemPtr, double *pointPtr));
@@ -193,8 +194,8 @@ static Tk_ConfigSpec configSpecs[] = {
  */
 
 Tk_ItemType tkPolyLineType = {
-    "rtd_polyline",                             /* name */
-    sizeof(PolyLineItem),                       /* itemSize */
+    "rtd_polyline",                     /* name */
+    sizeof(PolyLineItem),               /* itemSize */
     CreateLine,                         /* createProc */
     configSpecs,                        /* configSpecs */
     ConfigureLine,                      /* configureProc */
@@ -257,6 +258,43 @@ int Polyline_Init()
 
 /*
  *--------------------------------------------------------------
+ * RtdLineCreate --
+ *
+ *    Create an "instance" for indirect use.
+ * 
+ *    Returns a Tk_Item pointer, which can then be used in 
+ *    conjunction with another item that is directly managed
+ *    by a canvas. All arguments except itemPtr are as passed to the
+ *    CreateLine function.
+ *
+ *--------------------------------------------------------------
+ *
+ */
+int RtdLineCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr, 
+                   int objc, Tcl_Obj *CONST objv[] )
+{
+    *itemPtr = ckalloc( sizeof(PolyLineItem) );
+    return CreateLine( interp, canvas, *itemPtr, objc, objv );
+}
+
+/*
+ *--------------------------------------------------------------
+ * RtdLineDelete --
+ *
+ *    Delete an "instance" created for indirect use.
+ *
+ *--------------------------------------------------------------
+ */
+int RtdLineDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
+{
+    DeleteLine( canvas, itemPtr, display );
+    if ( itemPtr != NULL ) {
+        ckfree( itemPtr );
+    }
+}
+
+/*
+ *--------------------------------------------------------------
  *
  * CreateLine --
  *
@@ -274,7 +312,6 @@ int Polyline_Init()
  *
  *--------------------------------------------------------------
  */
-
 static int CreateLine( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                        int objc, Tcl_Obj *CONST objv[] )
 {
@@ -590,7 +627,6 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *--------------------------------------------------------------
  */
-
 static void
 DeleteLine(Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 {
@@ -1615,7 +1651,7 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 /*
  *--------------------------------------------------------------
  *
- * RtdSetLineCoords --
+ * RtdSetLastLineCoords --
  *
  *      This procedure is called to reset the item coordinates,
  *      without the need to parse a string.
@@ -1632,12 +1668,34 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
  *
  *--------------------------------------------------------------
  */
-
-void RtdSetLineCoords( Tcl_Interp *interp, const double *x, const double *y,
-                       int numPoints )
+void RtdSetLastLineCoords( Tcl_Interp *interp, const double *x, 
+                           const double *y, int numPoints )
 {
-    PolyLineItem *linePtr = lastItem_;
-    Tk_Canvas canvas = lastCanvas_;
+    RtdQuickSetLineCoords( interp, lastCanvas_, lastItem_, x, y, numPoints );
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * RtdQuickSetLineCoords --
+ *
+ *      This procedure is called to reset the item coordinates,
+ *      without the need to parse a string.
+ *
+ * Side effects:
+ *      The coordinates for the given item will be changed.
+ *
+ * Notes:
+ *      Version of RtdSetLineCoords, if you have the item and canvas
+ *      (see Polyline_Create()).
+ *
+ *--------------------------------------------------------------
+ */
+void RtdQuickSetLineCoords( Tcl_Interp *interp, Tk_Canvas canvas, 
+                            Tk_Item *itemPtr, const double *x, 
+                            const double *y, int numPoints )
+{
+    PolyLineItem *linePtr = (PolyLineItem *)itemPtr;
     int i, j;
     
     if ( linePtr->numPoints != numPoints ) {
