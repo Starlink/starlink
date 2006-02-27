@@ -396,10 +396,14 @@ void grpInfoc( Grp *grp, int index, const char * item, char * value,
 		       TRAIL_ARG(ITEM) TRAIL_ARG(VALUE) );
 
   F77_FREE_CHARACTER( ITEM );
-  F77_IMPORT_CHARACTER( VALUE, value_len, value );
+  F77_IMPORT_CHARACTER( VALUE, VALUE_length, value );
   F77_FREE_CHARACTER( VALUE );
   F77_IMPORT_INTEGER( STATUS, *status );
 
+  if (*status != SAI__OK) {
+    /* terminate on bad status */
+    value[0] = '\0';
+  }
 }
 
 F77_SUBROUTINE(grp_grpex)( CHARACTER(grpexp), INTEGER(igrp1),
@@ -408,7 +412,7 @@ F77_SUBROUTINE(grp_grpex)( CHARACTER(grpexp), INTEGER(igrp1),
                                   INTEGER(status) TRAIL(grpexp) );
 
 void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
-               size_t* size, size_t *added, int * flag, int * status ) {
+               int* size, int *added, int * flag, int * status ) {
 
   DECLARE_INTEGER(IGRP1);
   DECLARE_INTEGER(IGRP2);

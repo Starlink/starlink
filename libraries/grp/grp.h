@@ -105,7 +105,7 @@ void grpFree( Grp **, int * );
 
 void grpDelet( Grp **, int * );
 void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
-               size_t* size, size_t *added, int * flag, int * status );
+               int* size, int *added, int * flag, int * status );
 void grpGrpsz( Grp *, int *, int * );
 void grpGet( Grp *, int, int, char *const *, int, int * );
 void grpInfoc( Grp *, int , const char *, char *, size_t, int * );
