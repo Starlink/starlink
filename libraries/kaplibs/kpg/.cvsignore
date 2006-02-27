@@ -8,6 +8,7 @@ kpg1_stor.f
 kpg1_unz2.f
 kpg1_wmod.f
 kpg1_xyzw.f
+kpg1_figr.f
 kpg1_ghst.f
 kpg1_hcon.f
 kpg1_hmlt.f
@@ -86,7 +87,7 @@ kpg1_stds.f
 kpg1_stfl.f
 kpg1_thrs.f
 kpg1_trig.f
-*.lo
+ *.lo
 *.la
 Makefile
 Makefile.in
