@@ -89,20 +89,21 @@ enum { GRP__SZTYP  = 80 };
 /* Max. length of a file name. */
 enum { GRP__SZFNM  = 256 };
 
+/* Max. number of groups which can be used simultaneously. */
+enum { GRP__MAXG  = 500 };
+
 /* Type definitions for GRP C interface */
 /* ------------------------------------ */
 
 /* The contents of this struct are not public */
 typedef struct Grp {
    F77_INTEGER_TYPE igrp; /* Currently refers to the Fortran GRP ID */  
+   int slot;              /* The slot number associated with the GRP ID */  
 } Grp;
 
 
 /* Public function prototypes */
 /* -------------------------- */
-Grp *grpInit( int * );
-void grpFree( Grp **, int * );
-
 void grpDelet( Grp **, int * );
 void grpGrpex( const char * grpexp, const Grp * igrp1, Grp * igrp2,
                int* size, int *added, int * flag, int * status );
@@ -117,8 +118,9 @@ void grpValid( Grp *, int *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
-void grp1Setid( Grp *, F77_INTEGER_TYPE, int *);
-F77_INTEGER_TYPE grp1Getid( const Grp *, int * );
+const Grp *grpFree( const Grp *, int * );
+const Grp *grpF2C( F77_INTEGER_TYPE, int * );
+F77_INTEGER_TYPE grpC2F( const Grp *, int * );
 
 
 
