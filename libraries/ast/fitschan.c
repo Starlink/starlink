@@ -657,6 +657,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        column 80.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     28-FEB-2006 (DSB):
+*        Correct documentation typo ("NCards" -> "Ncard").
 *class--
 */
 
@@ -31173,7 +31175,7 @@ c     this attribute (using astClear) effectively "rewinds" the
 f     this attribute (using AST_CLEAR) effectively "rewinds" the
 *     FitsChan, so that the first card is accessed next.  If Card is
 *     set to a value which exceeds the total number of cards in the
-*     FitsChan (as given by its Ncards attribute), it is regarded as
+*     FitsChan (as given by its Ncard attribute), it is regarded as
 *     pointing at the "end-of-file". In this case, the value returned
 *     in response to an enquiry is always one more than the number of
 *     cards in the FitsChan.
