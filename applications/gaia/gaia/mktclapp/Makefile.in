@@ -159,9 +159,9 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o ../initFortran.o FORCE
 	- $(RANLIB) $(LIBDIR)/libskycat.a
 	$(LTLINK) $(CC_SWITCHES) tkAppInit.o gaia_swish.o ../initFortran.o \
 	   -o $(TKPROG)  \
-	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
+	   $(LDFLAG1) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
-	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
+	   $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o FORCE
@@ -169,7 +169,7 @@ $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o ../initFortran.o FORCE
 	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o ../initFortran.o \
 	       -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) \
-	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(TCLLIBS) \
+	       $(LDFLAG1) $(ADAM_LIBS) $(AST_LIBS_NOGRF) $(TCLLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)
 
 # initFortran lives in the parent directory

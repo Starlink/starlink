@@ -178,21 +178,21 @@ $(DEMO_WISH): normallib tkAppInit.o initFortran.o FORCE
 	- $(AR_D) $(LIBDIR)/libskycat.a slasubs.o
 	- $(RANLIB) $(LIBDIR)/libskycat.a
 	$(LTLINK) $(CC_SWITCHES) tkAppInit.o initFortran.o -o $(DEMO_WISH)  \
-	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
+	       $(LDFLAG1) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
-	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
+	       $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(DEMO_TCL): normallib tclAppInit.o initFortran.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
 	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o initFortran.o -o $(DEMO_TCL) \
 	       $(LD_SEARCH_FLAGS) $(LDFLAG1) \
-	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) \
+	       $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) \
 	       $(TCLLIBS) $(LDFLAG2) $(EXTRA_LIBS)
 
 $(GAIAMON): normallib gaiaMon.c gaiaMon.ifc
 	echo "linking \"$(GAIAMON)\"..."
-	$(ALINK) gaiaMon.c -I$(STAR_INC) $(LOCAL_LIBRARY) $(ADDLIBS) \
+	$(ALINK) gaiaMon.c -I$(STAR_INC) $(LOCAL_LIBRARY) \
 	   -L$(STAR_LIB) $(LD_SEARCH_FLAGS) \
 	   `fio_link_adam` `ard_link_adam` `ndf_link_adam` `cat_link_adam`
 	if test -f $(GAIAMON); then \
