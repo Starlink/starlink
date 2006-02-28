@@ -67,8 +67,6 @@
 #include "sae_par.h"
 #include "cnf.h"
 
-#include <config.h>
-
 #define BUFLENG 4096
 
 /* Global variables. */
