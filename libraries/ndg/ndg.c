@@ -18,7 +18,7 @@
 *     not already included.
 
 *  Authors:
-*     DSB: David S Berry
+*     DSB: David S Berry (JAC, UCLan)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
@@ -29,6 +29,8 @@
 *        Port from GRP
 *     20-DEC-2005 (TIMJ):
 *        Add ndgAsexp
+*     28-FEB-2006 (DSB):
+*        Use grpC2F and grpF2C.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,7 +76,7 @@ void ndgNdfas( Grp *igrp, int index, char * mode, int * indf, int * status ) {
    DECLARE_INTEGER(INDF);
    DECLARE_INTEGER(STATUS);
 
-   IGRP = grp1Getid( igrp, status );
+   IGRP = grpC2F( igrp, status );
    F77_EXPORT_INTEGER(index, INDEX );
    F77_EXPORT_CHARACTER( mode, MODE, 10 );
    F77_EXPORT_INTEGER( *status, STATUS );
@@ -102,7 +104,7 @@ void ndgNdfpr( int indf1, char * clist, Grp *igrp, int index, int * indf2, int *
   DECLARE_INTEGER(STATUS);
 
   F77_EXPORT_INTEGER(indf1, INDF1);
-  IGRP = grp1Getid( igrp, status );
+  IGRP = grpC2F( igrp, status );
   F77_EXPORT_CHARACTER( clist, CLIST, 128);
   F77_EXPORT_INTEGER(index, INDEX);
   F77_EXPORT_INTEGER(*status, STATUS);
@@ -129,12 +131,8 @@ void ndgAsexp( char * grpexp, int verb, Grp *igrp1, Grp ** igrp2, int *size, int
    DECLARE_LOGICAL(FLAG);
    DECLARE_CHARACTER(GRPEXP, GRP__SZNAM);
 
-   /* If *igrp2 is NULL we need to create a new structure */
-   if (*igrp2 == NULL) {
-     *igrp2 = grpInit( status );
-   }
-   IGRP2 = grp1Getid(*igrp2, status );
-   IGRP1 = grp1Getid( igrp1, status );
+   IGRP2 = grpC2F( *igrp2, status );
+   IGRP1 = grpC2F( igrp1, status );
    if ( *status != SAI__OK ) return;
 
    F77_EXPORT_LOGICAL( verb, VERB );
@@ -150,7 +148,7 @@ void ndgAsexp( char * grpexp, int verb, Grp *igrp1, Grp ** igrp2, int *size, int
    F77_IMPORT_LOGICAL( FLAG, *flag );
    
    F77_IMPORT_INTEGER( STATUS, *status );
-   grp1Setid( *igrp2, IGRP2, status );
+   *igrp2 = (Grp *) grpF2C( IGRP2, status );
 
    return;
 }

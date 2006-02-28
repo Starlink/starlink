@@ -27,6 +27,8 @@
 *        Original version.
 *     02-NOV-2005 (TIMJ):
 *        Port from GRP
+*     28-FEB-2006 (DSB):
+*        Use grpF2C and grpC2F.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,11 +76,7 @@ void ndgAssoc( char * param, int verb, Grp ** igrp, int *size, int * flag, int *
    DECLARE_LOGICAL(FLAG);
    DECLARE_CHARACTER(PARAM, PAR__SZNAM);
 
-   /* If *igrp is NULL we need to create a new structure */
-   if (*igrp == NULL) {
-     *igrp = grpInit( status );
-   }
-   IGRP = grp1Getid(*igrp, status );
+   IGRP = grpC2F(*igrp, status );
    if ( *status != SAI__OK ) return;
 
    F77_EXPORT_LOGICAL( verb, VERB );
@@ -93,7 +91,7 @@ void ndgAssoc( char * param, int verb, Grp ** igrp, int *size, int * flag, int *
    F77_IMPORT_INTEGER( SIZE, *size );
    F77_IMPORT_LOGICAL( FLAG, *flag );
    F77_IMPORT_INTEGER( STATUS, *status );
-   grp1Setid( *igrp, IGRP, status );
+   *igrp = (Grp *) grpF2C( IGRP, status );
 
    return;
 }
@@ -110,12 +108,8 @@ void ndgCreat( char * param, Grp *igrp0, Grp ** igrp, int *size, int * flag, int
    DECLARE_LOGICAL(FLAG);
    DECLARE_CHARACTER(PARAM, PAR__SZNAM);
 
-   /* If *igrp is NULL we need to create a new structure */
-   if (*igrp == NULL) {
-     *igrp = grpInit( status );
-   }
-   IGRP = grp1Getid(*igrp, status );
-   IGRP0 = grp1Getid( igrp0, status );
+   IGRP = grpC2F( *igrp, status );
+   IGRP0 = grpC2F( igrp0, status );
    if ( *status != SAI__OK ) return;
 
    F77_EXPORT_CHARACTER( param, PARAM, PAR__SZNAM );
@@ -130,7 +124,7 @@ void ndgCreat( char * param, Grp *igrp0, Grp ** igrp, int *size, int * flag, int
    F77_IMPORT_LOGICAL( FLAG, *flag );
    
    F77_IMPORT_INTEGER( STATUS, *status );
-   grp1Setid( *igrp, IGRP, status );
+   *igrp = (Grp *) grpF2C( IGRP, status );
 
    return;
 }

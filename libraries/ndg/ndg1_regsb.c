@@ -45,6 +45,8 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 *        Use C API for Grp. Use MERS for error handling.
 *        Free Grp resources. Use fdopen rather than fopen to open the temp
 *        file. Safer than removing a file and re-opening it.
+*     28-FEB-2006 (DSB):
+*        Use grpF2C.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,34 +62,31 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 
 #define BUFLEN 256
 
-   int added;
-   int flag;
+   FILE *fd = NULL;
+   Grp *igrp0;
+   Grp *igrp;
+   char *script;
    char buf[BUFLEN];
    char infile_name[255];
-   char outfile_name[255];
    char name[GRP__SZNAM+1];
-   char *script;
+   char outfile_name[255];
+   int added;
+   int flag;
    int i;
    int ifd = 0;
-   int ofd = 0;
    int istat;
+   int ofd = 0;
    int size;
-   FILE *fd = NULL;
 
-   Grp * igrp = NULL;
-   Grp * igrp0 = NULL;
-
-   /* initialise return value */
+/* initialise return value */
    *SIZE = 0;
 
 /* Check the global status. */
    if( *STATUS != SAI__OK ) return;
 
-/* Generate C Grp identifiers */
-   igrp = grpInit( STATUS );
-   grp1Setid( igrp, *IGRP, STATUS );
-   igrp0 = grpInit( STATUS );
-   grp1Setid( igrp0, *IGRP0, STATUS );
+/* Get C Grp pointers for the supplied Fortran identifiers */
+   igrp = (Grp *) grpF2C( *IGRP, STATUS );
+   igrp0 = (Grp *) grpF2C( *IGRP0, STATUS );
 
 /* Get an input and output file handle */
    strcpy( infile_name, "regsb_inXXXXXX" );
@@ -228,11 +227,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
    }
 
  CLEANUP:
-   /* Free memory associated with the C version of the Group */
-   if (igrp != NULL) grpFree( &igrp, STATUS );
-   if (igrp0 != NULL) grpFree( &igrp0, STATUS );
-
-   /* Remove files without checking return value */
+/* Remove files without checking return value */
    remove( outfile_name );
    remove( infile_name );
 }
