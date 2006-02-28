@@ -135,6 +135,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Added MemoryCaching tuning parameter.
 *     27-FEB-2006 (DSB):
 *        Include Objects returned by astCopy in the ObjectCaching system.
+*     28-FEB-2006 (DSB):
+*        Use astOK to protect against errors within astGrow.
 *class--
 */
 
@@ -815,7 +817,7 @@ f     value
          ifree = (vtab->nfree)++;
          vtab->free_list = astGrow( vtab->free_list, vtab->nfree, 
                                     sizeof(AstObject *) );
-         if( vtab->free_list ) vtab->free_list[ ifree ] = this;
+         if( astOK && vtab->free_list ) vtab->free_list[ ifree ] = this;
       } else {
          (void) astFree( this );
       }
@@ -3512,7 +3514,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    of known vtabs. */
    ivtab = nvtab++;
    known_vtabs = astGrow( known_vtabs, nvtab, sizeof( AstObjectVtab *) );
-   if( known_vtabs ) known_vtabs[ ivtab ] = vtab;
+   if( astOK && known_vtabs ) known_vtabs[ ivtab ] = vtab;
 
 #ifdef DEBUG
    astSetPermMem( pm );
