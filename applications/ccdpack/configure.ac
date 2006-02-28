@@ -53,7 +53,7 @@ if test "${TCL_PREFIX}" != ""; then
    if test -n "$have_itcl"; then
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_ITCL, 1, [Is incr Tcl present?])
-      ITCL_LIBS="-litcl$ITCL_VERSION -litk$ITCL_VERSION"
+      ITCL_LIBS="-litk$ITCL_VERSION -litcl$ITCL_VERSION"
       AC_SUBST(ITCL_LIBS)
    else
       AC_MSG_RESULT(no)
