@@ -34,66 +34,52 @@ AC_DEFINE_UNQUOTED(CCDPACK_DIR, $CCDPACK_DIR, [Compile time CCDPACK_DIR])
 LD_LIBRARY_PATH="${STARLINK}/lib:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
-# Check availability of Tcl and Tk.  This is declared as a build dependency,
-# but we'll get along without it if it's not there because it couldn't
-# be built.
-#
-# Note: we are checking whether a library has been installed amongst
-# the Starlink libraries, rather than whether it is present elsewhere
-# in the system.  This requires us to temporarily include that
-# location in the LDFLAGS prior to the tests below (and the final
-# argument of AC_CHECK_LIB is for -l options, not -L options).
-# Although the link command which ends up in the Makefile
-# automatically includes this extra path, it's not included in the
-# link commands used by the AC_CHECK_LIB tests here.  STAR_LDFLAGS is
-# not a documented feature of the system, but this whole
-# is-it-or-isn't-it Tcl game is getting a bit like a hack already, so
-# a little more won't hurt.
-my_save_LDFLAGS=$LDFLAGS
-LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
-
-AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
-AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
-
 dnl   Check for fpu_control.h, this isn't available for all  
 dnl   GCC implementations 
 AC_CHECK_HEADERS([fpu_control.h])
 
-have_itcl=1
-AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[-ltcl$TCL_VERSION])
-AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-ltk$TCL_VERSION -ltcl$TCL_VERSION])
-AC_MSG_CHECKING([whether to use incr tcl])
-if test -n "$have_itcl"
-then
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_ITCL, 1, [Is incr Tcl present?])
-else
-    AC_MSG_RESULT(no)
+# Check availability of Tcl/Tk and friends.  Note that the Starlink Tcl, Tk,
+# ITcl and BLT are required, since we need some somewhat-private include
+# files. If no Starlink versions are located, we do without ITcl and BLT.
+STAR_PATH_TCLTK($TCL_VERSION, [tk])
+if test "${TCL_PREFIX}" != ""; then
+   my_save_LDFLAGS=$LDFLAGS
+   LDFLAGS="$STAR_LDFLAGS $LDFLAGS"
+   have_itcl=1
+   my_save_LIBS="$LIBS"
+   AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[$TCL_LIBS])
+   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[$TK_LIBS $TCL_LIBS])
+   AC_MSG_CHECKING([whether to use incr tcl])
+   if test -n "$have_itcl"; then
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_ITCL, 1, [Is incr Tcl present?])
+      ITCL_LIBS="-litcl$ITCL_VERSION -litk$ITCL_VERSION"
+      AC_SUBST(ITCL_LIBS)
+   else
+      AC_MSG_RESULT(no)
+   fi
+   LIBS="$my_save_LIBS"
+   AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
+
+   have_blt=1
+   my_save_LIBS="$LIBS"
+   LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
+   AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLT$BLT_VERSION $TK_LIBS $TCL_LIBS])
+   AC_MSG_CHECKING([whether to use BLT])
+   if test -n "$have_blt"; then
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_BLT, 1, [Is BLT present?])
+      BLT_LIBS="-lBLT$BLT_VERSION"
+      AC_SUBST(BLT_LIBS)
+   else
+      AC_MSG_RESULT(no)
+   fi
+   LIBS="$my_save_LIBS"
+   AM_CONDITIONAL(HAVE_BLT, [test -n "$have_blt"])
+
+   LDFLAGS=$my_save_LDFLAGS
 fi
-AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 
-have_blt=1
-my_save_LIBS="$LIBS"
-LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
-AC_CHECK_LIB(BLT$BLT_VERSION,Blt_Init,,[unset have_blt],[-lBLT$BLT_VERSION])
-AC_MSG_CHECKING([whether to use BLT])
-if test -n "$have_blt"
-then
-    AC_MSG_RESULT(yes)
-    AC_DEFINE(HAVE_BLT, 1, [Is BLT present?])
-    LIBS="$my_save_LIBS -lBLT$BLT_VERSION"
-else
-    AC_MSG_RESULT(no)
-    LIBS="$my_save_LIBS"
-fi
-AM_CONDITIONAL(HAVE_BLT, [test -n "$have_blt"])
-
-LDFLAGS=$my_save_LDFLAGS
-
-# Note that the starlink Tcl, Tk, ITcl and BLT are required, since we need
-# some somewhat-private include files.  I'm not sure how respectable
-# this is, but it seems unavoidable for what we want to do (for instance,
-# itcl uses the same ones).
 # Dependencies must be on one line
 STAR_DECLARE_DEPENDENCIES([build], [ard ast blt chr cnf fio generic grp hds idi ifd itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
 STAR_DECLARE_DEPENDENCIES([build], [agi blt graphpar img pda ref shl sla startcl],[link])

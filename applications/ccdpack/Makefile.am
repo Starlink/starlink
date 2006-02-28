@@ -22,10 +22,13 @@ STARTCL_OBJ = $(STARLINK)/lib/tkGwm.o $(STARLINK)/lib/tkGwmCanv.o \
               $(STARLINK)/lib/tkGwmPrint.o $(STARLINK)/lib/tclAdam.o
 
 ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
-                `$(srcdir)/pgp_ccdpack_link` -ljpeg @FCLIBS@
+                `$(srcdir)/pgp_ccdpack_link` @BLT_LIBS@ @ITCL_LIBS@ \
+                @TCL_LIBS@ @TK_LIBS@ \
+                @X_LIBS@ @X_EXTRA_LIBS@ @X_PRE_LIBS@ -lX11 \
+                -ljpeg @FCLIBS@
 
 # Need to add X11 after -ltk and -litk on Cygwin (no shareable libraries).
-LIBS = @LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @X_PRE_LIBS@ -lX11
+# LIBS = @LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @X_PRE_LIBS@ -lX11
 
 bin_MONOLITHS = ccdpack_red ccdpack_reg ccdpack_res ccdpack_scr \
                 ccdhelp
