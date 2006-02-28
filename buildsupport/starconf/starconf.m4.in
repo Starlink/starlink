@@ -1297,17 +1297,17 @@ fi
 # is not optional (docs say that heap initialisation relies on the startup
 # call).
 #
-# Use simple test for g95 as compiler name for now, but there is surely a
-# better way to do that (testing the --version output). This whole area
-# probably needs rethinking as g95 also has a g95_runtime_stop() function,
-# that should be called. 
+# The test for g95 relies on the output from `g95 --version' containing the
+# string "G95". When gfortran is supported a similar test will be required.
+# Note that this whole area probably needs rethinking as g95 also has a
+# g95_runtime_stop() function, that should be called.
 #
 AC_DEFUN([STAR_INITIALISE_FORTRAN],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
        [star_cv_initialise_fortran],
        [AC_REQUIRE([AC_PROG_FC])
-        if test "$ac_cv_fc_compiler_gnu" = yes; then
-            if test "$FC" = "g95"; then
+       if test "$ac_cv_fc_compiler_gnu" = yes; then
+            if "$FC" --version 2>&1 < /dev/null | grep 'G95' > /dev/null; then
                 star_cv_initialise_fortran=g95-start
             else
                 star_cv_initialise_fortran=g77-setarg
