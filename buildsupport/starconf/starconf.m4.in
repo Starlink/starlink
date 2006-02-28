@@ -498,9 +498,11 @@ void func_two_() { return; }
 # Finds a tclsh and wish, and the associated libraries.  Sets output variable
 # TCL_CFLAGS to the C compiler flags necessary to compile with Tcl, TCL_LIBS
 # to the required library flags, and TCLSH to the full path of the tclsh
-# executable and TCL_PREFIX to the installation root; if Tk is requested, it
-# similarly sets TK_CFLAGS, TK_LIBS and WISH.  Define the cpp variable
-# TCL_MISSING to 1 if Tcl is not available.  Similar to macro AC_PATH_XTRA.
+# executable, TCL_PREFIX to the installation root and TCL_LD_SEARCH_FLAGS
+# to the default search path for loading the shareable library; if Tk is  
+# requested, it similarly sets TK_CFLAGS, TK_LIBS and WISH.  Define the 
+# cpp variable TCL_MISSING to 1 if Tcl is not available.  Similar to 
+# macro AC_PATH_XTRA.
 #
 # If argument MINVERSION is present, it specifies the minimum Tcl/Tk
 # version number required.
@@ -620,6 +622,11 @@ dnl  and Fink on OSX
         # Export the TCL_PREFIX value.
         res="$res TCL_PREFIX=\"$TCL_PREFIX\";"
 
+        # Export the TCL_LD_SEARCH_FLAGS value (need LIB_RUNTIME_DIR
+        # which is part of the symbol).
+        res="$res LIB_RUNTIME_DIR=\"$TCL_PREFIX/lib\";"
+        res="$res TCL_LD_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\";"
+
         # These envs include $TCL_DBGX -- expand this out.
         eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
         res="$res TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\";"
@@ -686,6 +693,7 @@ dnl  and Fink on OSX
 
     AC_SUBST(TCL_PREFIX)
 
+    AC_SUBST(TCL_LD_SEARCH_FLAGS)
     AC_SUBST(TCL_CFLAGS)
     AC_SUBST(TCL_LIBS)
     AC_SUBST(TCLSH)

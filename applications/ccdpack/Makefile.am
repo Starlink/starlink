@@ -23,7 +23,7 @@ STARTCL_OBJ = $(STARLINK)/lib/tkGwm.o $(STARLINK)/lib/tkGwmCanv.o \
 
 ccdwish_LDADD = $(LDADD) $(CCDPACK_LIBS) $(STARTCL_OBJ) \
                 `$(srcdir)/pgp_ccdpack_link` @BLT_LIBS@ @ITCL_LIBS@ \
-                @TCL_LIBS@ @TK_LIBS@ \
+                @TCL_LD_SEARCH_FLAGS@ @TCL_LIBS@ @TK_LIBS@ \
                 @X_LIBS@ @X_EXTRA_LIBS@ @X_PRE_LIBS@ -lX11 \
                 -ljpeg @FCLIBS@
 
