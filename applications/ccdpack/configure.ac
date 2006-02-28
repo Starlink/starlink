@@ -48,7 +48,7 @@ if test "${TCL_PREFIX}" != ""; then
    have_itcl=1
    my_save_LIBS="$LIBS"
    AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[$TCL_LIBS])
-   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[$TK_LIBS $TCL_LIBS])
+   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub3.3 $TK_LIBS $TCL_LIBS])
    AC_MSG_CHECKING([whether to use incr tcl])
    if test -n "$have_itcl"; then
       AC_MSG_RESULT(yes)
