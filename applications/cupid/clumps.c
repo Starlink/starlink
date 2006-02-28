@@ -541,6 +541,7 @@ void clumps() {
 
 
 /* Initialise things to safe values. */
+   mask = 0;
    rmask = NULL;
    clist = NULL;
    xloc = NULL;
