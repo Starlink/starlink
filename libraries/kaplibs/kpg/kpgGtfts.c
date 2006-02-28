@@ -103,7 +103,6 @@ int kpgGtfts( int indf, AstFitsChan ** fchan, int * status ) {
   int    i;                   /* Loop counter */
   size_t ncards;              /* Number of header cards in extension */
   size_t nchars;              /* Number of characters in extension */
-  size_t nmapcards;           /* Number of cards mapped */
   int    ndim;                /* Number of dimensions in FITS array */
   int    *oldstat;            /* Current status watched by AST */
   int    there = 0;           /* Is FITS extension there? */

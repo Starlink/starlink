@@ -111,7 +111,7 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
 F77_SUBROUTINE(kpg1_gtgrp)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(SIZE),
                             INTEGER(STATUS) TRAIL(PARAM) );
 
-void kpg1Gtgrp( const char *param, Grp **igrp, int *size, int *status ){
+void kpg1Gtgrp( const char *param, Grp **grp, int *size, int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
@@ -119,11 +119,7 @@ void kpg1Gtgrp( const char *param, Grp **igrp, int *size, int *status ){
 
    F77_CREATE_CHARACTER(PARAM,strlen( param ));
 
-   /* if *igrp is null we are creating the group from scratch */
-   if (*igrp == NULL) {
-     *igrp = grpInit( status );
-   }
-   IGRP = grp1Getid( *igrp, status );
+   IGRP = grpC2F( *grp, status );
    if ( *status != SAI__OK ) return;
 
    F77_EXPORT_CHARACTER(param,PARAM,PARAM_length);
@@ -141,7 +137,7 @@ void kpg1Gtgrp( const char *param, Grp **igrp, int *size, int *status ){
 
    /* make sure status is imported before we call a C routine
       capable of setting status */
-   grp1Setid( *igrp, IGRP, status );
+   *grp = (Grp *) grpF2C( IGRP, status );
 
    return;
 }

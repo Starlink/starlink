@@ -83,16 +83,15 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
    GENPTR_INTEGER(KEYMAP)
    GENPTR_INTEGER(STATUS)
 
-   Grp igrp;
+   Grp *grp;
    AstKeyMap *keymap;
    int cstatus;
 
    F77_IMPORT_INTEGER( *STATUS, cstatus );
 
-   /* Copy grp id into blank Grp struct */
-   grp1Setid( &igrp, *IGRP, &cstatus );
+   grp = (Grp *) grpF2C( *IGRP, &cstatus );
 
-   kpg1Kymp1( &igrp, &keymap, &cstatus );
+   kpg1Kymp1( grp, &keymap, &cstatus );
 
    F77_EXPORT_INTEGER( astP2I( keymap ), *KEYMAP );
    F77_EXPORT_INTEGER( cstatus, *STATUS );
