@@ -125,9 +125,6 @@ static int              CreateLine _ANSI_ARGS_((Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[]));
 static void             DeleteLine _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, Display *display));
-static void             DisplayLine _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, Display *display, Drawable dst,
-                            int x, int y, int width, int height));
 static int              LineCoords _ANSI_ARGS_((Tcl_Interp *interp,
                             Tk_Canvas canvas, Tk_Item *itemPtr,
                             int objc, Tcl_Obj *CONST objv[]));
@@ -201,7 +198,7 @@ Tk_ItemType tkPolyLineType = {
     ConfigureLine,                      /* configureProc */
     LineCoords,                         /* coordProc */
     DeleteLine,                         /* deleteProc */
-    DisplayLine,                        /* displayProc */
+    RtdLineDisplay,                     /* displayProc */
     TK_CONFIG_OBJS,                     /* alwaysRedraw & flags */
     LineToPoint,                        /* pointProc */
     LineToArea,                         /* areaProc */
@@ -273,7 +270,7 @@ int Polyline_Init()
 int RtdLineCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr, 
                    int objc, Tcl_Obj *CONST objv[] )
 {
-    *itemPtr = ckalloc( sizeof(PolyLineItem) );
+    *itemPtr = (Tk_Item *) ckalloc( sizeof(PolyLineItem) );
     return CreateLine( interp, canvas, *itemPtr, objc, objv );
 }
 
@@ -289,7 +286,7 @@ int RtdLineDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 {
     DeleteLine( canvas, itemPtr, display );
     if ( itemPtr != NULL ) {
-        ckfree( itemPtr );
+        ckfree( (char *) itemPtr );
     }
 }
 
@@ -760,7 +757,7 @@ ComputeLineBbox(Tk_Canvas canvas, PolyLineItem *linePtr)
 /*
  *--------------------------------------------------------------
  *
- * DisplayLine --
+ * RtdLineDisplay --
  *
  *      This procedure is invoked to draw a line item in a given
  *      drawable.
@@ -775,9 +772,9 @@ ComputeLineBbox(Tk_Canvas canvas, PolyLineItem *linePtr)
  *--------------------------------------------------------------
  */
 
-static void
-DisplayLine( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
-             Drawable drawable, int x, int y, int width, int height )
+EXTERN void
+RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+                Drawable drawable, int x, int y, int width, int height )
 {
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
     XPoint staticPoints[MAX_STATIC_POINTS];
@@ -1651,7 +1648,7 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 /*
  *--------------------------------------------------------------
  *
- * RtdSetLastLineCoords --
+ * RtdLineSetLastCoords --
  *
  *      This procedure is called to reset the item coordinates,
  *      without the need to parse a string.
@@ -1668,10 +1665,11 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
  *
  *--------------------------------------------------------------
  */
-void RtdSetLastLineCoords( Tcl_Interp *interp, const double *x, 
+void RtdLineSetLastCoords( Tcl_Interp *interp, const double *x, 
                            const double *y, int numPoints )
 {
-    RtdQuickSetLineCoords( interp, lastCanvas_, lastItem_, x, y, numPoints );
+    RtdLineQuickSetCoords( interp, lastCanvas_, (Tk_Item *) lastItem_, 
+                           x, y, numPoints );
 }
 
 /*
@@ -1686,12 +1684,12 @@ void RtdSetLastLineCoords( Tcl_Interp *interp, const double *x,
  *      The coordinates for the given item will be changed.
  *
  * Notes:
- *      Version of RtdSetLineCoords, if you have the item and canvas
- *      (see Polyline_Create()).
+ *      Version of RtdLineSetLastCoords, if you have the item 
+ *      and canvas (see Polyline_Create()).
  *
  *--------------------------------------------------------------
  */
-void RtdQuickSetLineCoords( Tcl_Interp *interp, Tk_Canvas canvas, 
+void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas, 
                             Tk_Item *itemPtr, const double *x, 
                             const double *y, int numPoints )
 {
@@ -1733,4 +1731,24 @@ void RtdQuickSetLineCoords( Tcl_Interp *interp, Tk_Canvas canvas,
     Tk_CanvasEventuallyRedraw( canvas, 
                                linePtr->header.x1, linePtr->header.y1, 
                                linePtr->header.x2, linePtr->header.y2 );
+}
+
+//  Quick configuration routines.
+
+EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr, 
+                              XColor *colour )
+{
+    PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
+    linePtr->fg = colour; 
+    XSetForeground( display, linePtr->gc, linePtr->fg->pixel );
+}
+
+EXTERN void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width )
+{
+    PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
+    XGCValues gcValues;
+
+    linePtr->width = width;
+    XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid, 
+                        linePtr->capStyle,linePtr->joinStyle);
 }

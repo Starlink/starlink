@@ -674,7 +674,7 @@ int astGLine( int n, const float *x, const float *y ) {
                 /*  Now send coordinates (which may be a very long
                     list making it worth avoiding the conversion to a
                     string and back again) */
-                RtdSetLastLineCoords( Interp, xlines, ylines, n );
+                RtdLineSetLastCoords( Interp, xlines, ylines, n );
             }
             free( xlines );
             free( ylines );
