@@ -29,6 +29,16 @@ AC_ARG_WITH(
       AC_DEFINE([HAVE_STAR_MEM_H],[1],[Use the starmem library for memory management]),
 )
 
+#   See if the --with-memdebug option has been provided. This sets the
+#   preprocesor macro MEM_DEBUG which enables facilities used to track
+#   down memory leaks, etc.
+AC_ARG_WITH(
+      [memdebug],
+      AC_HELP_STRING([--with-memdebug],
+                     [enable AST memory leak debugging functions]),
+      AC_DEFINE([MEM_DEBUG],[1],[enable AST memory leak debugging functions in memory.c]),
+)
+
 #   Checks for programs
 AC_PROG_CC
 AC_PROG_CPP
