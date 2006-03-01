@@ -17264,7 +17264,6 @@ static void SpreadNearest##X( int ndim_out, \
    int ix;                       /* Number of pixels offset in x direction */ \
    int ixn;                      /* Number of pixels offset (n-d) */ \
    int iy;                       /* Number of pixels offset in y direction */ \
-   int iys;                      /* Total stride in y direction */ \
    int off_in;                   /* Pixel offset into input array */ \
    int off_out;                  /* Pixel offset into output array */ \
    int point;                    /* Loop counter for output points */ \
