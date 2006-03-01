@@ -73,12 +73,12 @@ atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
 #  Note C_FC_FCLINK_MAGIC needed under OS X to work around restFP.
 atclsh_LDADD = libtclAdam.la `nbs_link` `ams_link_adam` `ems_link_adam` \
 			`cnfrtl_link` \
-      @TCL_LIBS@ @FCLIBS@ @C_FC_FCLINK_MAGIC@
+      @TCL_LD_SEARCH_FLAGS@ @TCL_LIBS@ @FCLIBS@ @C_FC_FCLINK_MAGIC@
 
 awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
 awish_LDADD = libtclAdam.la libtkGwm.la `nbs_link` `chr_link_adam` \
         `gwm_link_adam` `ems_link_adam` `ams_link_adam` `cnfrtl_link` \
-	@TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
+	@TCL_LD_SEARCH_FLAGS@ @TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
         `starX_link`
 
 # For some reason starX_link is different to the other _link scripts. 
