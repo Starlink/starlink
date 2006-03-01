@@ -93,6 +93,7 @@ int *status             /* global status (given and returned) */
                  Cache the FrameSets returned for each subnum
                  Do away with the facility for including intermediate
                     Frames (dsb)
+     1Mar2006  : Check for (subnum==-1) before checking inherited status (dsb)
 */
 
 {
@@ -211,12 +212,14 @@ int *status             /* global status (given and returned) */
    longitude,latitude Mapping. */
    static AstMapping *azel_cache[ 2 ] = { NULL, NULL };
 
-/* Initialise the returned pointer and check the inherited status */
-   *fset = AST__NULL;
-   if ( *status != SAI__OK ) return;
+
+
+
 
 /* Check the sub-array number. If it is -1, free the cached AST objects and 
-   return. Otherwise, report an error if the value is illegal. */
+   return. Otherwise, report an error if the value is illegal. We do
+   this before checking the inherited status so that the memory is freed
+   even if an error has occurred. */
    if( subnum == -1 ) {
 
       for( subnum = 0; subnum < 8; subnum++ ) {
@@ -241,6 +244,12 @@ int *status             /* global status (given and returned) */
      return;
 
    }
+
+
+
+/* Now initialise the returned pointer and check the inherited status */
+   *fset = AST__NULL;
+   if ( *status != SAI__OK ) return;
 
 /* Start an AST context. This means we do not need to worry about
    annulling AST objects. Note, there should be no "return" statements
