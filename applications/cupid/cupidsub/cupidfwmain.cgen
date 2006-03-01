@@ -110,12 +110,18 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int clump_index;/* Index of the peak to which the walk ascends */
    int got_flat;   /* Has the length of the initial flat section been found? */
    int iflat;      /* Index of next element in "flat" to be written or read */
+   int iix;        /* GRID index on 1st axis at central pixel */
+   int iiy;        /* GRID index on 2nd axis at central pixel */
+   int iiz;        /* GRID index on 3rd axis at central pixel */
    int istep;      /* Index within "route" array */
    int iter;       /* Iteration count */
    int iv;         /* 1D Vector index of current central pixel. */
-   int ix;         /* GRID index on 1st axis at central pixel */
-   int iy;         /* GRID index on 2nd axis at central pixel */
-   int iz;         /* GRID index on 3rd axis at central pixel */
+   int ix;         /* GRID index on 1st axis at starting pixel */
+   int ixoff;      /* Offset in GRID index on 1st axis */
+   int iy;         /* GRID index on 2nd axis at starting pixel */
+   int iyoff;      /* Offset in GRID index on 2nd axis */
+   int iz;         /* GRID index on 3rd axis at starting pixel */
+   int izoff;      /* Offset in GRID index on 3rd axis */
    int jvx;        /* Vector index at start of z plane */
    int jvy;        /* Vector index at start of y column */
    int jvz;        /* Vector index at start of x row */
@@ -130,6 +136,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int jzlo;       /* Lowest value for axis 1 within extended neighbourhood */
    int maxjump;    /* Longest jump to a higher neighbouring pixel */
    int nflat;      /* Number of starting pixels in "route" which are flat */
+   int nix;        /* GRID index on 1st axis at central pixel */
+   int niy;        /* GRID index on 2nd axis at central pixel */
+   int niz;        /* GRID index on 3rd axis at central pixel */
    int nsx;        /* Longest jump between peaks in the x direction */
    int nsy;        /* Longest jump between peaks in the y direction */
    int nsz;        /* Longest jump between peaks in the z direction */
@@ -231,8 +240,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                   clump_index = -1;
 
 /* Save the vector index of this pixel. This is modified as we walk up hill,
-   so that it always refers to the current position of the "walker". */
+   so that it always refers to the current position of the "walker". The
+   variables iix, iiy and iiz are likewise modified to represent the grid
+   coords of the pixel with vector index "iv". */
                   iv = pa - work;
+                  iix = ix;
+                  iiy = iy;
+                  iiz = iz;
 
 /* We now start walking away from this pixel up hill (up the steepest 
    gradient). We store the vector index of all pixels visited on this walk 
@@ -295,6 +309,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Check the 3x3x3 cube of neighbouring pixels, and determine the one
    with the highest gradient. */
+                     ixoff = iix - 1;
+                     iyoff = iiy - ylim/2;
+                     izoff = iiz - zlim/2;
+                    
                      jvz = iv - skip0;
                      for( jz = 0; jz < zlim; jz++ ) {
                         jvy = jvz;
@@ -305,12 +323,17 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* Ignore unusable pixels (which includes edge pixels), but not pixels which 
    have already been assigned to another clump. Also skip the central pixel 
    (for which nzero is 3). Find the gradient to this neighbour. If it is the 
-   largest found so far, record it. */
+   largest found so far, record its vector index and GRID coords. */
                               if( work[ jvx ] >= 0 && nzero < 3 ) {
                                  g = ( (double) array[ jvx ] - h )/dist[ nzero ];
                                  if( g > maxg ) {
                                     maxg = g;
                                     nv = jvx;
+
+                                    nix = ixoff + jx;
+                                    niy = iyoff + jy;
+                                    niz = izoff + jz;
+
                                  }
                               }
 
@@ -353,12 +376,12 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    edge of the image, due to the fact that the neighbourhood is larger 
    than 3x3x3. */
                      if( maxg <= 0 ) {
-                        jzlo = iz - nsz;
-                        jzhi = iz + nsz;
-                        jylo = iy - nsy;
-                        jyhi = iy + nsy;
-                        jxlo = ix - nsx;
-                        jxhi = ix + nsx;
+                        jzlo = iiz - nsz;
+                        jzhi = iiz + nsz;
+                        jylo = iiy - nsy;
+                        jyhi = iiy + nsy;
+                        jxlo = iix - nsx;
+                        jxhi = iix + nsx;
 
                         h = VAL__MIND;
                         jvz = iv - skip1;
@@ -381,6 +404,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                                              if( (double) array[ jvx ] > h ) {
                                                 h = (double) array[ jvx ];
                                                 nv = jvx;
+                                                iix = jx;
+                                                iiy = jy;
+                                                iiz = jz;
                                              }
                                           }
                                        }
@@ -394,6 +420,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                            }
                            jvz += skip[ 2 ];
                         }
+
+                     } else{
+                        iix = nix;
+                        iiy = niy;
+                        iiz = niz;
                      }
 
 /* If the central pixel is the highest pixel in the more extended
