@@ -786,6 +786,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/img \
+		$(MANIFESTS)/itcl \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/par \

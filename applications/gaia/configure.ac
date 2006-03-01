@@ -68,7 +68,7 @@ fi
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ard ast blt cat cfitsio generic dnl
-fio img pcs pda sae startcl sla tcl tclx tk], link)
+fio img itcl pcs pda sae startcl sla tcl tclx tk], link)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    Need to add AUTOASTROM to this when available.
