@@ -67,6 +67,10 @@
 #include "error.h"               /* Error reporting facilities */
 #include "memory.h"              /* Interface to this module */
 
+#ifdef MEM_DEBUG
+#include "object.h"              /* For astMakePointer */
+#endif
+
 /* Error code definitions. */
 /* ----------------------- */
 #include "ast_err.h"             /* AST error codes */
@@ -2022,13 +2026,13 @@ int astMemoryID_( void *ptr ){
 *     int astMemoryID( void *ptr )
 
 *  Description:
-*     This function returns the integer identiier associated with the
+*     This function returns the integer identifier associated with the
 *     given memory block, which should have been allocated using one of
 *     the AST memory management function defined in this module.
 
 *  Parameters:
 *     ptr
-*        Pointer to the memory block.
+*        Pointer to the memory block, or a public pointer to an AST Object.
 
 *  Returned Value:
 *     The integer identifier for the supplied memory block.
@@ -2041,11 +2045,34 @@ int astMemoryID_( void *ptr ){
 /* Local Variables: */
    Memory *mem;                  /* Pointer to memory header */
    int result;                   /* The returned identifier value */
+   int status;                   /* Local status */
+   int rep;                      /* Original value of error reporting flag */
 
    result = -1;
    if ( ptr ) {
-      mem = ( (Memory *) ptr ) - 1;
-      result = mem->id;
+
+      status = astStatus;
+      astSetStatus( 0 );
+      rep = astReporting( 0 );
+
+/* If the supplied pointer is an Object handle, get the corresponding
+   pointer. This will set status if the pointer is not for an Object
+   (i.e. is a direct pointer to a memory block allocated by asyMalloc).
+   Therefore temporarily switch off error reporting so that we can test
+   for this. */
+      mem = ( (Memory *) astMakePointer( (AstObject *) ptr ) ) - 1;
+
+      if( !astOK ) {
+         mem = ( (Memory *) ptr ) - 1;
+         astClearStatus;
+      }
+
+      astReporting( rep );
+      astSetStatus( status );
+      
+/* Return the id */
+      if( mem ) result = mem->id;
+
    }
 
    return result;
@@ -2077,7 +2104,8 @@ void *astMemoryPtr_( int id ){
 
 *  Returned Value:
 *     The pointer to the memory block. NULL is returned if no active memory 
-*     with the given ID can be found.
+*     with the given ID can be found. Note, this is always a genuine C
+*     pointer (even for public Object pointers).
 
 *-
 */
