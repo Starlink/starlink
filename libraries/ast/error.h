@@ -81,6 +81,8 @@
 *        Improve efficiency by replacing the astOK_ function with a macro
 *        which tests the value of status variable. The pointer which points
 *        to the status variable are now global rather than static. 
+*     1-MAR-2006 (DSB):
+*        Remove astAssert.
 *-
 */
 
@@ -116,18 +118,6 @@ void astAt_( const char *, const char *, int, int );
 void astError_( int, const char *, ... );
 int astReporting_( int );
 #endif
-
-#ifdef DEBUG
-#define astAssert(assertion,rval)                                       \
-    if ( astOK && ! (assertion) ) {                                     \
-        astAt(__func__, __FILE__, __LINE__);                            \
-        astError(AST__ASSERTION, "Assertion <" #assertion "> failed");  \
-        return rval;                                                    \
-    }
-#else
-#define astAssert(assertion,rval)                                       
-#endif
-
 
 /* Function interfaces. */
 /* ==================== */
