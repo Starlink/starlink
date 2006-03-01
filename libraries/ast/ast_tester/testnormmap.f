@@ -7,6 +7,9 @@
       integer status, m, m2, m3, f, perm(3)
       double precision at(3), bt(3)
 
+      call ast_begin( status )
+
+
       status = sai__ok
 
       f = ast_cmpframe( ast_specframe( ' ', status ),
@@ -35,9 +38,9 @@
 
 
 
-      at( 1 ) = 2.0D0;
-      at( 2 ) = 3.0D4;
-      at( 3 ) = 1.0D0;
+      at( 1 ) = 2.0D0
+      at( 2 ) = 3.0D4
+      at( 3 ) = 1.0D0
 
       call ast_trann( m, 1, 3, 1, at, 1, 3, 1, bt, status )
 
@@ -48,6 +51,10 @@
       if( bt(2) .ne. 3.0D4 ) call stopit(7,status)
       if( abs( bt(3)-4.14159265D0) .gt. 1.0D-6 ) call stopit(8,status)
 
+
+      call ast_end( status )
+
+      call ast_flushmemory( 1 )
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All NormMap tests passed'

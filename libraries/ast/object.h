@@ -283,6 +283,10 @@
 
 /* Include files. */
 /* ============== */
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -294,7 +298,7 @@
 #if defined(astCLASS)
 #include <stdarg.h>
 #endif
-#if defined(DEBUG)
+#if defined(MEM_DEBUG)
 #include <stdio.h>
 #endif
 
@@ -507,7 +511,7 @@ astINVOKE(V,astIsA##class##_((const Ast##class *)astEnsurePointer_(this)))
 *-
 */
 
-#ifndef DEBUG
+#ifndef MEM_DEBUG
 
 /* Define the macro. */
 #define astMAKE_CHECK(class) \
@@ -560,10 +564,10 @@ Ast##class *astCheck##class##_( Ast##class *this ) { \
 \
    } else { \
 \
-/* See if the memory block is being watched. If so, the astIdAlarm \
-   function will be called.*/ \
+/* Call the astMemoryUse function to report it if the memory block is \
+   being watched. */ \
       sprintf( buf, "checked (refcnt: %d)", astGetRefCount_( (AstObject *) this ) ); \
-      astIdHandler( this, buf ); \
+      astMemoryUse( this, buf ); \
    } \
 \
 /* Return the pointer value supplied. */ \

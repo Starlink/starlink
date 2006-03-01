@@ -75,20 +75,22 @@ f     - AST_CURRENTTIME: Return the current system time
 *     DSB: David Berry (Starlink)
 
 *  History:
-*    XX-Aug-2003 (NG):
-*       Original version, drawing heavily on specframe.c.
-*    20-MAY-2005 (NG):
-*       Merged into main AST system.
-*    25-MAY-2005 (DSB):
-*       Extensive modifications to add extra timescales, unit support,
-*       support for relative times, etc, and to make it more like the
-*       other AST Frame classes.
+*     XX-Aug-2003 (NG):
+*        Original version, drawing heavily on specframe.c.
+*     20-MAY-2005 (NG):
+*        Merged into main AST system.
+*     25-MAY-2005 (DSB):
+*        Extensive modifications to add extra timescales, unit support,
+*        support for relative times, etc, and to make it more like the
+*        other AST Frame classes.
 *     12-AUG-2005 (DSB):
-*        - Remove ClockLon and ClockLat attributes. Use the new ObsLon and
+*        Remove ClockLon and ClockLat attributes. Use the new ObsLon and
 *        ObsLat attributes in the parent Frame class instead. Note, for
 *        backward compatibility the public attribute accessors and the 
 *        astLoadTimeFrame functions still recogonise ClockLon and ClockLat,
 *        but use the ObsLat/ObsLon attributes internally.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *class--
 */
 
@@ -2488,10 +2490,6 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name ) {
    AstFrameVtab *frame;          /* Pointer to Frame component of Vtab */
    AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the local error status. */
    if ( !astOK ) return;
 
@@ -2619,17 +2617,9 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name ) {
 
 /* Create an FK5 J2000 SkyFrame which will be used for formatting and 
    unformatting sky positions, etc. */
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+   astBeginPM;
    skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
-
-
+   astEndPM;
 }
 
 static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1, 

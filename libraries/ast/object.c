@@ -137,6 +137,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *        Include Objects returned by astCopy in the ObjectCaching system.
 *     28-FEB-2006 (DSB):
 *        Use astOK to protect against errors within astGrow.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *class--
 */
 
@@ -149,6 +151,12 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 
 /* Include files. */
 /* ============== */
+
+/* Configuration information */
+/* ------------------------ */
+#include "version.h"             /* Version numbers */
+#include <config.h>
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -157,10 +165,6 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include "object.h"              /* Interface definition for this class */
 #include "plot.h"                /* Plot class (for astStripEscapes) */
 
-/* Configuration information */
-/* ------------------------ */
-#include "version.h"             /* Version numbers */
- 
 /* Error code definitions. */
 /* ----------------------- */
 #include "ast_err.h"             /* AST error codes */
@@ -304,12 +308,12 @@ f     error value
    generates an error if it doesn't). */
    if ( !astIsAObject( this ) ) return NULL;
 
-#ifdef DEBUG
+#ifdef MEM_DEBUG
    {   int rc;
        char buf[100];
        rc = this->ref_count;
        sprintf(buf,"annulled (refcnt: %d -> %d)", rc, rc-1 );
-       astIdHandler( this, buf );   
+       astMemoryUse( this, buf );   
    }
 #endif
 
@@ -566,12 +570,12 @@ f     function is invoked with STATUS set to an error value, or if it
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
-#ifdef DEBUG
+#ifdef MEM_DEBUG
    {   int rc;
        char buf[100];
        rc = this->ref_count;
        sprintf(buf,"cloned (refcnt: %d -> %d)", rc, rc+1 );
-       astIdHandler( this, buf );   
+       astMemoryUse( this, buf );   
    }
 #endif
 
@@ -1674,10 +1678,6 @@ const char *astGetC_( AstObject *this, const char *attrib ) {
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Initialise. */
    result = NULL;
 
@@ -1703,14 +1703,10 @@ const char *astGetC_( AstObject *this, const char *attrib ) {
    one.) */
    if ( astOK ) {
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+      astBeginPM;
       strings[ istr ] = astStore( strings[ istr ], value,
                                   strlen( value ) + (size_t) 1 );
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+      astEndPM;
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to
@@ -2063,16 +2059,13 @@ void astSetCopy_( AstObjectVtab *vtab,
 *-
 */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
 
 /* Check the global status. */
    if ( !astOK ) return;
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+/* Indicate that subsequent memory allocations may never be freed (other
+   than by any AST exit handler). */
+   astBeginPM;
 
 /* Expand the array of copy constructor pointers in the virtual function table
    (if necessary) to accommodate the new one. */
@@ -2085,9 +2078,9 @@ void astSetCopy_( AstObjectVtab *vtab,
       vtab->copy[ vtab->ncopy++ ] = copy;
    }
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+/* Mark the end of the section in which memory allocations may never be freed 
+   (other than by any AST exit handler). */
+   astEndPM;
 
 }
 
@@ -2140,16 +2133,13 @@ void astSetDelete_( AstObjectVtab *vtab, void (* delete)( AstObject * ) ) {
 *-
 */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
 
 /* Check the global status. */
    if ( !astOK ) return;
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+/* Indicate that subsequent memory allocations may never be freed (other
+   than by any AST exit handler). */
+   astBeginPM;
 
 /* Expand the array of destructor pointers in the virtual function table (if
    necessary) to accommodate the new one. */
@@ -2162,9 +2152,9 @@ void astSetDelete_( AstObjectVtab *vtab, void (* delete)( AstObject * ) ) {
       vtab->delete[ vtab->ndelete++ ] = delete;
    }
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+/* Mark the end of the section in which memory allocations may never be freed 
+   (other than by any AST exit handler). */
+   astEndPM;
 
 }
 
@@ -2225,16 +2215,12 @@ void astSetDump_( AstObjectVtab *vtab,
 *-
 */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the global error status. */
    if ( !astOK ) return;
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+/* Indicate that subsequent memory allocations may never be freed (other
+   than by any AST exit handler). */
+   astBeginPM;
 
 /* Expand the arrays of pointers to dump functions and related data in
    the virtual function table (if necessary) to accommodate the new
@@ -2255,10 +2241,9 @@ void astSetDump_( AstObjectVtab *vtab,
       vtab->ndump++;
    }
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
-
+/* Mark the end of the section in which memory allocations may never be 
+   freed (other than by any AST exit handler). */
+   astEndPM;
 }
 
 /*
@@ -3444,10 +3429,6 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
 /* Local Variables: */
    int ivtab;              /* Index of next entry in known_vtabs */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the local error status. */
    if ( !astOK ) return;
 
@@ -3505,20 +3486,15 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->nfree = 0;
    vtab->free_list = NULL;
 
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
 /* Add the supplied virtual function table pointer to the end of the list
    of known vtabs. */
    ivtab = nvtab++;
-   known_vtabs = astGrow( known_vtabs, nvtab, sizeof( AstObjectVtab *) );
-   if( astOK && known_vtabs ) known_vtabs[ ivtab ] = vtab;
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+   astBeginPM;
+   known_vtabs = astGrow( known_vtabs, nvtab, sizeof( AstObjectVtab *) );
+   astEndPM;
+
+   if( astOK && known_vtabs ) known_vtabs[ ivtab ] = vtab;
 
 }
 
@@ -4258,8 +4234,10 @@ f     depth.
    level. This array contains integer offsets into the "handles" array
    to identify the handle which is at the head of the list of active
    handles for each context level. */
+   astBeginPM;
    active_handles = astGrow( active_handles, context_level + 2,
                              sizeof( int ) );
+   astEndPM;
 
 /* Initialise the array element for the new context level to indicate
    an empty Handle list. */
@@ -4845,10 +4823,6 @@ static void InitContext( void ) {
 *     - This function does nothing after the first successful invocation.
 */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -4857,15 +4831,9 @@ static void InitContext( void ) {
 
 /* Allocate and initialise the "active_handles" array. */
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+      astBeginPM;
       active_handles = astMalloc( sizeof( int ) );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+      astEndPM;
 
       if ( astOK ) active_handles[ 0 ] = -1;
    }
@@ -4989,10 +4957,6 @@ AstObject *astMakeId_( AstObject *this ) {
    AstObject *id;                /* ID value to return */
    int ihandle;                  /* Handle offset */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Initialise. */
    id = astI2P( 0 );
    ihandle = 0;
@@ -5014,15 +4978,9 @@ AstObject *astMakeId_( AstObject *this ) {
    and using the offset of the new element. */
          } else {
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+            astBeginPM;
             handles = astGrow( handles, nhandles + 1, sizeof( Handle ) );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+            astEndPM;
 
             if ( astOK ) ihandle = nhandles++;
          }

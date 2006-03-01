@@ -19,7 +19,7 @@
       call tester( test6, status )
 
       call ast_end( status )
-c      call ast_listissued( 'testrebin' )
+      call ast_flushmemory( 1 )
 
 
       if( status .eq. sai__ok ) then

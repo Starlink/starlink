@@ -86,6 +86,10 @@
 
 /* Include files. */
 /* ============== */
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* C header files. */
 /* --------------- */
 #include <stddef.h>
@@ -116,14 +120,16 @@ void *astStore_( void *, const void *, size_t );
 size_t astChrLen_( const char * );
 char *astAppendString_( char *, int *, const char * );
 
-#ifdef DEBUG
-void astListIssued_( const char *label );
-void astIdHandler_( void *, const char * );
-void astSetWatchId_( int id );
-int astSetPermMem_( int perm );
-int astGetMemId_( void * );
-void astMemCheckId_( int, void (*)( void *ptr ) );
-void *astFindIdPtr_( int );
+#ifdef MEM_DEBUG
+void astActiveMemory_( const char * );
+void astWatchMemory_( int );
+void astFlushMemory_( int );
+int astMemoryID_( void * );
+void *astMemoryPtr_( int );
+void astMemoryAlarm_( const char * );
+void astMemoryUse_( void *, const char * );
+void astBeginPM_( void );
+void astEndPM_( void );
 #endif
 
 #endif
@@ -153,14 +159,30 @@ void *astFindIdPtr_( int );
 #define astChrSplit(str,n) astChrSplit_(str,n)
 #endif
 
-#ifdef DEBUG
-#define astListIssued(label) astListIssued_(label)
-#define astSetWatchId(id) astSetWatchId_(id)
-#define astIdHandler(mem,text) astIdHandler_(mem,text)
-#define astSetPermMem(perm) astSetPermMem_(perm)
-#define astGetMemId(ptr) astGetMemId_(ptr)
-#define astFindIdPtr(id) astFindIdPtr_(id)
-#define astMemCheckId(id,fun) astMemCheckId_(id,fun)
-#endif
+/* Functions used for debugging memory leaks, etc */
+#ifdef MEM_DEBUG
 
+#define astActiveMemory(label) astActiveMemory_(label)
+#define astWatchMemory(id) astWatchMemory_(id)
+#define astFlushMemory(leak) astFlushMemory_(leak)
+#define astBeginPM astBeginPM_()
+#define astEndPM astEndPM_()
+#define astMemoryID(ptr) astMemoryID_(ptr)
+#define astMemoryPtr(id) astMemoryPtr_(id)
+#define astMemoryAlarm(text) astMemoryAlarm_(text)
+#define astMemoryUse(ptr,text) astMemoryUse_(ptr,text)
+
+#else
+
+#define astActiveMemory(label) 
+#define astWatchMemory(id)
+#define astFlushMemory(leak) 
+#define astBeginPM 
+#define astEndPM
+#define astMemoryID(ptr) 0
+#define astMemoryPtr(id) NULL
+#define astMemoryAlarm(text)
+#define astMemoryUse(ptr,text) 
+
+#endif
 #endif

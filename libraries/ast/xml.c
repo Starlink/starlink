@@ -38,6 +38,8 @@
 *        - Modify astXmlDelete so that it can succesfully annul objects
 *        which have no parent.
 *        - Include extra info in some error messages.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 */
 
 
@@ -469,16 +471,15 @@ static void AddObjectToList( AstXmlObject *obj ){
 *     this
 *        A pointer to a new XmlObject.
 */
-   int pm;     /* See astSetPermMem in memory.c */
 
 /* Return if the pointer is NULL or if an error has occurred. */
    if( !astOK || !obj ) return;
 
 /* Increment the number of objects in the list and increase the size of
    the list. */
-   pm = astSetPermMem( 1 );
+   astBeginPM;
    existing_objects = astGrow( existing_objects, ++nobj, sizeof( AstXmlObject *) );
-   astSetPermMem( pm );
+   astEndPM;
 
 /* Add the new pointer to the end of the list. */
    existing_objects[ nobj - 1 ] = obj;

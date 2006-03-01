@@ -53,6 +53,8 @@
 *        sensitive checking failsto produce a match to a multiplier/unit
 *        symbol combination. If this still produces no match, do a case
 *        insensitive match for multiplier/unit label.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 */
 
 /* Module Macros. */
@@ -3047,20 +3049,15 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
 /* Local Variables: */
    KnownUnit *result;
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the global error status. */
    if( !astOK ) return;
 
+/* Indicate that subsequent memory allocations may never be freed (other
+   than by any AST exit handler). */
+   astBeginPM;
+
 /* Allocate memory for the structure, and check the returned pointer can
    be used safely. */
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
    result = astMalloc( sizeof( KnownUnit ) );
    if( astOK ) {
 
@@ -3087,9 +3084,9 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
       result->use = NULL; 
    }
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+/* Mark the end of the section in which memory allocations may never be  
+   freed (other than by any AST exit handler). */
+   astEndPM;
 
 /* If an error has occurred, free any returned structure. */
    if( !astOK ) {

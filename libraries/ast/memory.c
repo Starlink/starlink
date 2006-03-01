@@ -100,6 +100,9 @@
    less than a few hundred bytes. */
 #define MXCSIZE 300
 
+/* The maximum number of nested astBeginPM/astEndPM contexts. */
+#define PM_STACK_MAXSIZE 20
+
 /* Select the appropriate memory management functions. These will be the
    system's malloc, free and realloc unless AST was configured with the
    "--with-starmem" option, in which case they will be the starmem
@@ -262,7 +265,8 @@ typedef struct Memory {
    unsigned long magic;
    size_t size;
 
-#ifdef DEBUG
+#ifdef MEM_DEBUG
+   struct Memory *prev; /* Pointer to the previous linked Memory structure */
    int id;      /* A unique identifier for every allocated memory chunk */
    int perm;    /* Is this chunk part of an acceptable once-off "memory leak"? */
 #endif
@@ -271,14 +275,34 @@ typedef struct Memory {
 
 /* Module Variables. */
 /* ================= */
-#ifdef DEBUG
-static Memory **issued = NULL;
-static int siz_issued = 0;
-static int next_id = -1;
-static int watch_id = -1;
-static int perm_mem = 0;
-static int memcheckid = -1;
-static void (*memcheckfun)( void * );
+
+/* Extra stuff for debugging of memory management (tracking of leaks
+   etc). */
+#ifdef MEM_DEBUG
+
+/* The identifier for the memory block which is to be tracked. */
+static int Watched_ID = -1;
+
+/* The next integer to use to identify an active memory block pointer. */
+static int Next_ID = -1;
+
+/* Indicates if future memory allocations are permanent (i.e. will not
+   usually be freed explicitly by AST). */
+static int Perm_Mem = 0;
+
+/* A "first in, last out" stack of Perm_Mem values used by nested 
+   astBeginPM/astEndPM contexts. */
+static int PM_Stack[ PM_STACK_MAXSIZE ];
+
+/* The number of values currently in the PM_Stack array. */
+static int PM_Stack_Size = 0;
+
+/* A pointer to a double linked list holding pointers to currently active 
+   memory blocks (i.e. memory blocks for which a pointer has been issued
+   but not yet freed). This does not include the memory blocks in the
+   Cache array (these are not considered to be active). */
+static Memory *Active_List = NULL;
+
 #endif
 
 /* A cache of allocated but currently unused memory block. This cache is
@@ -302,12 +326,9 @@ static int use_cache = 0;
 /* Prototypes for Private Functions. */
 /* ================================= */
 
-/* void astCacheCheck( void ); */
-
-#ifdef DEBUG
-static void Issue( Memory *new );
-static void DeIssue( Memory *old );
-void IdAlarm( const char * );
+#ifdef MEM_DEBUG
+static void Issue( Memory * );
+static void DeIssue( Memory * );
 #endif
 
 /* Function implementations. */
@@ -400,6 +421,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2 ) {
 /* Return the result pointer. */
    return result;
 }
+
 
 int astChrMatch_( const char *str1, const char *str2 ) {
 /*
@@ -695,6 +717,10 @@ void *astFree_( void *ptr ) {
 /* If OK, obtain a pointer to the memory header. */
       mem = ( (Memory *) ptr ) - 1;
 
+#ifdef MEM_DEBUG
+      DeIssue( mem );
+#endif
+
 /* If the memory block is small enough, and the cache is being used, put it 
    into the cache rather than freeing it, so that it can be reused. */
       size = mem->size;
@@ -707,12 +733,6 @@ void *astFree_( void *ptr ) {
       } else {
          mem->magic = (unsigned long) 0;
          mem->size = (size_t) 0;
-
-#ifdef DEBUG
-         DeIssue( mem );
-         mem->id = -99;
-         mem->perm = perm_mem;
-#endif
 
 /* Free the allocated memory. */
          FREE( mem );
@@ -895,10 +915,6 @@ void *astMalloc_( size_t size ) {
          cache[ size ] = mem->next;
          mem->next = NULL;
 
-/* Increment the memory pointer to the start of the region of
-   allocated memory to be used by the caller. */
-         mem++;
-
 /* Otherwise, allocate a new memory block using "malloc". */
       } else {      
          mem = MALLOC( sizeof( Memory ) + size );
@@ -916,17 +932,16 @@ void *astMalloc_( size_t size ) {
             mem->size = size;
             mem->next = NULL;
 
-#ifdef DEBUG
-            mem->id = ++next_id;
-            mem->perm = perm_mem;
-            Issue( mem );
-#endif
-         
-/* Increment the memory pointer to the start of the region of
-   allocated memory to be used by the caller.*/
-            mem++;
          }
       }
+
+#ifdef MEM_DEBUG
+      Issue( mem );
+#endif
+
+/* Increment the memory pointer to the start of the region of
+   allocated memory to be used by the caller.*/
+      mem++;
    }
 
 /* Return the result. */
@@ -1106,14 +1121,9 @@ void *astRealloc_( void *ptr, size_t size ) {
 /* Otherwise, reallocate the memory. */
             } else {
 
-#ifdef DEBUG
-            DeIssue( mem );
-#endif
-
-
 /* If the cache is being used, for small memory blocks, do the equivalent of 
 
-               mem = REALLOC( mem, sizeof( Memory ) + size );
+               mem = realloc( mem, sizeof( Memory ) + size );
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
@@ -1133,6 +1143,11 @@ void *astRealloc_( void *ptr, size_t size ) {
 
 /* For other memory blocks simply use realloc. */
                } else {
+
+#ifdef MEM_DEBUG
+                  DeIssue( mem );
+#endif
+
                   mem = REALLOC( mem, sizeof( Memory ) + size );
 
 /* If this failed, report an error and return the original pointer
@@ -1149,7 +1164,7 @@ void *astRealloc_( void *ptr, size_t size ) {
                      mem->magic = MAGIC( mem, size );
                      mem->size = size;
                      mem->next = NULL;
-#ifdef DEBUG
+#ifdef MEM_DEBUG
                      Issue( mem );
 #endif
                      result = mem + 1;
@@ -1895,143 +1910,32 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 
 }
 
-#ifdef DEBUG
 
-static void Issue( Memory *new ) {
-/*
-*  Name:
-*     Issue
+/* The remaining functions are used only when memory debugging is
+   switched on via the MEM_DEBUG macro. They can be used for locating
+   memory leaks, etc. */
+#ifdef MEM_DEBUG
 
-*  Purpose:
-*     Note that a dynamic memory address has been issued.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     void Issue( Memory *new )
-
-*  Description:
-*     This function stores a copy of the supplied pointer in a static 
-*     array, so that checks on memory leakage can be performed.
-
-*  Parameters:
-*     new
-*        The memory pointer.
-*/
-
-/* Local Variables: */
-   size_t old_size;
-   size_t new_size;
-   Memory **new_issued;
-
-/* Check inherited status */
-   if( !astOK ) return;
-
-/* Invoke astIdHandler which checks if this is the memory chunk which is 
-   being watched for. By setting a debugger breakpoint on IdAlarm, you can 
-   identify the moment when a chunk known to be part of a leak is first 
-   issued. */
-   astIdHandler( new+1, "issued" );
-
-/* If OK, extend the list and add in the new address. */
-   if( astOK ) {
-      if( siz_issued - new->id < 5 ) {
-         old_size = siz_issued * sizeof( Memory * );
-         siz_issued *= 2;
-         if( siz_issued < 100 ) siz_issued = 100;
-         new_size = siz_issued * sizeof( Memory * );
-         new_issued = MALLOC( new_size );
-         if( new_issued ) {
-            if( issued ) {
-               memcpy( new_issued, issued, old_size );
-               FREE( issued );
-            }
-            issued = new_issued;
-         } else {
-            astError( AST__INTER, "Issue(memory): Failed to allocat %d "
-                      "bytes of memory.", new_size );
-         }
-      }
-      if( astOK ) issued[ new->id ] = new;
-   }
-}
-
-static void DeIssue( Memory *old ) {
-/*
-*  Name:
-*     Issue
-
-*  Purpose:
-*     Note that a dynamic memory address has been freed.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     void DeIssue( Memory *old )
-
-*  Description:
-*     This function removes the supplied pointer from a static array,
-*     so that checks on memory leakage can be performed. AN error is
-*     reported if the supplied pointer has not previously been issued.
-
-*  Parameters:
-*     old
-*        The memory pointer.
-
-*  Notes:
-*     - This function attempts to execute even if an error has occurred.
-
-*/
-
-/* Local Variables: */
-   int ok;
-
-/* Check a pointer was supplied. */
-   if( !old ) return;
-
-   astIdHandler( old + 1, "deissued" );
-
-/* The id stored in the supplied Memory structure is the index into the
-   "issued" array at which the pointer is stored. Check that this is the
-   case. */
-   ok = ( issued[ old->id ] == old );
-
-/* If Ok, set the entry NULL. */
-   if( ok ) {
-      issued[ old->id ] = NULL;
-
-/* If not found, report an error. */
-   } else if( astOK ) {
-      astError( AST__INTER, "DeIssue(memory): The memory address %p "
-                "(id %d) was not issued by AST or has already been "
-                "deissued (internal AST programming error).", old, old->id );
-   }
-}
-
-
-void astListIssued_( const char *label ) {
+void astActiveMemory_( const char *label ) {
 /*
 *+
 *  Name:
-*     astListIssued
+*     astActiveMemory
 
 *  Purpose:
-*     Display a list of the currently issued memory structures.
+*     Display a list of any currently active AST memory pointers.
 
 *  Type:
 *     Protected function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     astListIssued( const char *label )
+*     astActiveMemory( const char *label )
 
 *  Description:
 *     This function displays a list of the identifiers for all currently
-*     issued AST memory chunks. The list is written to standard output.
+*     active AST memory chunks. The list is written to standard output
+*     using "printf", preceeded by the supplied text.
 
 *  Parameters:
 *     label
@@ -2040,120 +1944,72 @@ void astListIssued_( const char *label ) {
 
 *  Notes:
 *     - This function attempts to execute even if an error has occurred.
+*     - Memory blocks which are not usually freed are not reported. Such
+*     blocks are typically used by AST to hold internal state information.
+*     They can be freed explicitly by calling astFlushMemory.
 *-
 */
 
-   int i;
-   int first;
-   Memory *list;
-
-   list = ( (Memory *) issued ) - 1;
+   Memory *next;
 
    if( label ) printf("%s: ", label );
-   first = 1;
-
-   for( i = 0; i <= next_id; i++ ) {
-      if( issued[ i ] && !issued[ i ]->perm && issued[ i ]->id == i ) {
-         if( first ) {
-            printf("Currently issued AST memory chunks:\n");
-            first = 0;
-         }
-         printf( "%d ", issued[ i ]->id );
-      }
-   }      
-
-   if( first ) {
-      printf("There are currently no issued AST memory chunks.");
+   next = Active_List;
+   if( next ) {
+      while( next ) {
+         if( !next->perm ) printf( "%d ", next->id );
+         next = next->next;
+      } 
+   } else {
+      printf("There are currently no active AST memory blocks.");
    }
    printf("\n");
 
 }
 
-void astSetWatchId_( int id ) {
+void astWatchMemory_( int id ) {
 /*
 *+
 *  Name:
-*     astSetWatchId
+*     astWatchMemory
 
 *  Purpose:
-*     Indicate IdAlarm is to be invoked when a specified chunk is issued.
+*     Indicate uses of the memory block with the specified identifier
+*     should be reported.
 
 *  Type:
 *     Protected function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     astSetWatchId( int id )
+*     astWatchMemory( int id )
 
 *  Description:
-*     This function forces IdAlarm to be invoked when a
-*     specified memory chunk is issued. By setting a debugger breakpoint 
-*     on IdAlarm the moment at which the specified memory chunk is
-*     issued can be trapped, and the cause of the memory allocation 
-*     determined by examining the call stack.
+*     This function forces astMemoryAlarm to be invoked when key
+*     operations are performed on a specified memory block. These key
+*     operations include; allocation, freeing, copying and cloning of 
+*     Objects, etc. 
+*  
+*     astMemoryAlarm reports a message when called identifying the memory
+*     block and the action performed on it. When using a debugger, these
+*     events can be trapped and investigated by setting a debugger 
+*     breakpoint in astMemoryAlarm_.
 
 *  Parameters:
 *     id
-*        The identifier of the chunk which is to be weatched for.
+*        The identifier of the memory block which is to be watched.
 
 *  Notes:
 *     - This function attempts to execute even if an error has occurred.
 *-
 */
-   watch_id = id;
+   Watched_ID = id;
 }
 
-int astSetPermMem_( int perm ){
+int astMemoryID_( void *ptr ){
 /*
 *+
 *  Name:
-*     astSetPermMem
-
-*  Purpose:
-*     Indicate subsequent chunks are part of an acceptable memory leak.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     int astSetPermMem( int perm )
-
-*  Description:
-*     This function returns the current setting of the "perm" flag, and
-*     then stores the supplied value as the new value.
-*
-*     If the "perm" flag is set non-zero, then subsequently allocated 
-*     memory chunks are not added to the list of allocated memory chunks
-*     and so do not appear when astListIssued is called. The "perm" flag
-*     shoul dbe set non-zero before making any memory allocation which
-*     forms part of an acceptable once-off "memory leak". For instance,
-*     the memory used to hold pointers to destructors, dump functions and 
-*     copy constructors within the Object virtual function table is never
-*     released and forms part of an acceptable once-off memory leak.
-
-*  Parameters:
-*     perm
-*        The new value for the "perm" flag.
-
-*  Returned Value:
-*     The original value of the "perm" flag.
-
-*  Notes:
-*     - This function attempts to execute even if an error has occurred.
-*-
-*/
-   int old_perm;
-   old_perm = perm_mem;
-   perm_mem = perm;
-   return old_perm;
-}
-
-int astGetMemId_( void *ptr ){
-/*
-*+
-*  Name:
-*     astGetMemId
+*     astMemoryID
 
 *  Purpose:
 *     Return the unique identifier associated with a given memory block.
@@ -2163,7 +2019,7 @@ int astGetMemId_( void *ptr ){
 
 *  Synopsis:
 *     #include "memory.h"
-*     int astGetMemId( void *ptr )
+*     int astMemoryID( void *ptr )
 
 *  Description:
 *     This function returns the integer identiier associated with the
@@ -2195,51 +2051,11 @@ int astGetMemId_( void *ptr ){
    return result;
 }
 
-void astMemCheckId_( int id, void (*fun)( void *ptr ) ){
+void *astMemoryPtr_( int id ){
 /*
 *+
 *  Name:
-*     astMemCheckId
-
-*  Purpose:
-*     Cause a function to be executed at frequent intervals.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     void astMemCheckId( int id, void (*fun)( void * ) ){
-
-*  Description:
-*     This function causes the supplied "fun" function to be invoked when
-*     ever a AST memory management function is invoked (actually when the 
-*     Magic function is invoked), so long as the given memory block idenifier
-*     is current active. Each time the function is invoked, it is passed a 
-*     pointer to the memory block with the supplied identifier.
-*
-*     Note, if the memory pointer passed to the supplied function is a
-*     pointer to an AST object, the object may be in an incomplete state
-*     of construction and consequently may not be usable.
-
-*  Parameters:
-*     id
-*        The identifier for the memory block to be passed to the function.
-*     fun
-*        The function to call.
-
-*-
-*/
-
-   memcheckfun = fun;
-   memcheckid = id;
-}
-
-void *astFindIdPtr_( int id ){
-/*
-*+
-*  Name:
-*     astFindIdPtr
+*     astMemoryPtr
 
 *  Purpose:
 *     Return a pointer to the memory block with a given identifier.
@@ -2249,7 +2065,7 @@ void *astFindIdPtr_( int id ){
 
 *  Synopsis:
 *     #include "memory.h"
-*     void *astFindIdPtr( int id )
+*     void *astMemoryPtr( int id )
 
 *  Description:
 *     This function returns a pointer to the memory block with a given
@@ -2257,105 +2073,338 @@ void *astFindIdPtr_( int id ){
 
 *  Parameters:
 *     id
-*        The identifier.
+*        The identifier for an active memory block.
 
 *  Returned Value:
-*     The pointer to the memory block.
+*     The pointer to the memory block. NULL is returned if no active memory 
+*     with the given ID can be found.
 
 *-
 */
-   return ( issued[ id ] + 1 );
+   Memory *next;
+   void *ret;
+
+   ret = NULL;
+   next = Active_List;
+   while( next ) {
+      if( next->id == id ) {
+         ret = next + 1;
+         break;
+      }
+   }
+
+   return ret;
 }
 
-void astIdHandler_( void *new, const char *verb ){
-/*
-*+
-*  Name:
-*     astIdHandler
-
-*  Purpose:
-*     Called to check if a watched memory ID is issued.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "memory.h"
-*     void astIdHandler( void *new, const char *verb )
-
-*  Description:
-*     This function checks if the supplied pointer is being watched, and
-*     calls IdAlarm if it is. See astSetWatchId.
-
-*  Parameters:
-*     new
-*        The memory pointer being issued.
-*     verb
-*        Text to include in message.
-*-
-*/
-   if( new && (((Memory *)new)-1)->id == watch_id ) IdAlarm( verb );
-}
-
-void IdAlarm( const char *verb ){
+void astMemoryAlarm_( const char *verb ){
 /*
 *  Name:
-*     IdHandler
+*     astMemoryAlarm
 
 *  Purpose:
-*     Called when a watched memory ID is issued.
+*     Called when a watched memory ID is used.
 
 *  Type:
 *     Private function.
 
 *  Synopsis:
 *     #include "memory.h"
-*     void IdAlarm( const char *verb )
+*     void astMemoryAlarm( const char *verb )
 
 *  Description:
-*     This function is called when a watched memory ID is issued. See
-*     astSetWatchId.
+*     This function is called when a watched memory ID is used. See
+*     astWatchMemory.
 
 *  Parameters:
 *     verb
 *        Text to include in message.
 */
 
-   printf( "IdAlarm(memory): The id %d has been %s.\n", watch_id, verb );
+   printf( "astMemoryAlarm: Memory id %d has been %s.\n", Watched_ID, verb );
 }
+
+void astMemoryUse_( void *ptr, const char *verb ){
+/*
+*+
+*  Name:
+*     astMemoryUse
+
+*  Purpose:
+*     Called to report the use of a memory block pointer.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void astMemoryUse( void *ptr, const char *verb )
+
+*  Description:
+*     If the supplied memory block is being watched, astMemoryAlarm is
+*     called to report the use of the pointer. The reported text includes
+*     the supplied "verb". A memory block can be watched by calling 
+*     astWatchMemory.
+
+*  Parameters:
+*     ptr
+*        A pointer to the memory block being used. The pointer must have
+*        been returned by one of the AST memory management functions (e.g. 
+*        astMalloc, astRealloc, etc).
+*     verb
+*        A verb indicating what is being done to the pointer.
+*-
+*/
+   if( ptr && (((Memory *)ptr)-1)->id == Watched_ID ) astMemoryAlarm( verb );
+}
+
+void astBeginPM_( void ) {
+/*
+*+
+*  Name:
+*     astBeginPM
+
+*  Purpose:
+*     Start a block of permanent memory allocations.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astBeginPM
+
+*  Description:
+*     This function indicates that all memory allocations made by calls 
+*     to other functions in this module (e.g. astMalloc), up to the
+*     astEndPM call which matches the astBeginPM call,  will not usually 
+*     be freed explicitly. Matching astBeginPM/astEndPM calls should be
+*     used to enclose all code which allocates memory which is never
+*     freed explitly by AST. Such memory allocations may be freed if
+*     required, using the astFlushMemory function (but note this should 
+*     only be done once all use of AST by an application has finished).
+*
+*     Matching pairs of astBeginPM/astEndPM calls can be nested up to a
+*     maximum depth of 20.
+
+*-
+*/
+
+/* The global Perm_Mem flag indicates whether or not subsequent memory 
+   management functions in this module should store pointers to allocated 
+   blocks in the PM_List array. Push the current value of this flag
+   onto a stack, and set the value to 1. */
+   if( PM_Stack_Size >= PM_STACK_MAXSIZE ){
+      if( astOK ) {
+         astError( AST__INTER, "astBeginPM: Maximum stack size has been "
+                   "exceeded (internal AST programming error)." );
+      } 
+
+   } else {
+      PM_Stack[ PM_Stack_Size++ ] = Perm_Mem;
+      Perm_Mem = 1;
+   }
+}
+
+void astEndPM_( void ) {
+/*
+*+
+*  Name:
+*     astEndPM
+
+*  Purpose:
+*     End a block of permanent memory allocations.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astEndPM
+
+*  Description:
+*     This function indicates the end of the block of permanent memory 
+*     allocations started by the matching call to astBeginPM. See
+*     astBeginPM for further details.
+
+*-
+*/
+
+/* The global Perm_Mem flag indicates whether or not subsequent memory 
+   management functions in this module should store pointers to allocated 
+   blocks in the PM_List array. Pop the value from the top of this stack. */
+   if( PM_Stack_Size == 0 ){
+      if( astOK ) {
+         astError( AST__INTER, "astEndPM: astEndPM called without "
+                   "matching astBeginPM (internal AST programming error)." );
+      } 
+
+   } else {
+      Perm_Mem = PM_Stack[ --PM_Stack_Size ];
+   }
+}
+
+void astFlushMemory_( int leak ) {
+/*
+*+
+*  Name:
+*     astFlushMemory
+
+*  Purpose:
+*     Free all permanent and cached memory blocks.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     astFlushMemory( int leak );
+
+*  Description:
+*     This function should only be called once all use of AST by an 
+*     application has finished. It frees any allocated but currently 
+*     unused memory (stored in an internal cache of unused memory 
+*     pointers), together with any memory used permanently to store 
+*     internal AST state information.
+*
+*     It is not normally necessary to call this function since the memory
+*     will be freed anyway by the operating system when the application 
+*     terminates. However, it can be called if required in order to 
+*     stop memory management tools such as valgrind from reporting that
+*     the memory has not been freed at the end of an application.
+*
+*     In addition, if "leak" is non-zero this function will also report
+*     an error if any active AST memory pointers remain which have not 
+*     been freed (other than pointers for the cached and permanent 
+*     memory described above). Leakage of active memory blocks can be
+*     investigated using astActiveMemory and astWatchMemory.
+
+*  Parameters:
+*     leak
+*        Should an error be reported if any non-permanent memory blocks
+*        are found to be active?
+
+*-
+*/
+
+/* Local Variables: */
+   Memory *next;
+   int nact;
+
+/* Empty the cache. */
+   astMemCaching( astMemCaching( AST__TUNULL ) );
+
+/* Free all permanent memory, counting the number of non-permanent
+   pointers still on the active list. */
+   nact = 0;
+   next = Active_List;
+   while( Active_List ) {
+      next = Active_List->next;
+      if( !Active_List->perm ) nact++;
+      FREE( Active_List );
+      Active_List = next;
+   } 
+
+/* Report an error if any active pointers remained. */
+   if( nact && leak ){
+      astError( AST__INTER, "astFlushMemory: %d AST memory blocks have not "
+                "been released (programming error).", nact );
+   }
+
+}
+
+static void Issue( Memory *mem ) {
+/*
+*  Name:
+*     Issue
+
+*  Purpose:
+*     Indicate that a pointer to a memory block has been issued.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void Issue( Memeory *mem );
+
+*  Description:
+*     Initialises the extra debug items in the Memory header, and adds the
+*     Memory structure to the list of active memory blocks.
+
+*  Parameters:
+*     mem
+*        Pointer to the Memory structure.
+*/
+
+/* Return if no pointer was supplied. */
+   if( !mem ) return;
+
+/* Store a unique identifier for this pointer. A new identifier is used
+   each time the pointer becomes active (i.e. each time it is remove from
+   the cache or malloced). */
+   mem->id = ++Next_ID;
+
+/* Indicate if this is a permanent memory block (i.e. it will usually not
+   be freed by AST). */
+   mem->perm = Perm_Mem;
+
+/* Add it to the double linked list of active pointers. */
+   mem->next = Active_List;
+   mem->prev = NULL;
+   if( Active_List ) Active_List->prev = mem;
+   Active_List = mem;
+
+/* Report that the pointer is being issued. */
+   astMemoryUse( mem + 1, "issued" );
+
+}
+
+static void DeIssue( Memory *mem ) {
+/*
+*  Name:
+*     DeIssue
+
+*  Purpose:
+*     Indicate that a pointer to a memory block has been freed.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     void DeIssue( Memeory *mem );
+
+*  Description:
+*     Initialises the extra debug items in the Memory header, and adds the
+*     Memory structure to the list of active memory blocks.
+
+*  Parameters:
+*     mem
+*        Pointer to the Memory structure.
+*/
+
+/* Local Variables: */
+   Memory *next;
+   Memory *prev;
+
+/* Return if no pointer was supplied. */
+   if( !mem ) return;
+
+/* Report that the pointer is being freed. */
+   astMemoryUse( mem + 1, "freed" );
+
+/* Remove the block from the double linked list of active pointers. */
+   next = mem->next;
+   prev = mem->prev;
+   if( prev ) prev->next = next;
+   if( next ) next->prev = prev;
+   if( mem == Active_List ) Active_List = next;
+
+/* Clear the identifier for safety in case of accidental re-use. */
+   mem->id = -1;
+}
+
 
 #endif
 
-/*
 
-For debugging cache problems...
-
-void astCacheCheck( void ){
-   int size, pop, any;
-   Memory *mem;
-
-   any = 0;
-   for( size = 0; size <= MXCSIZE; size++ ) {
-      pop = 0;
-      mem = cache[ size ];
-      while( mem ) {
-         pop++;
-         mem = mem->next;
-
-         if( mem && mem->size != size ) {
-            printf("Block of size %d stored at cache[%d]\n", (int) mem->size,
-                   (int) size );
-         }
-      }
-      if( pop ) {
-         printf( "%d:%d ", size, pop );
-         any = 1;
-      }
-   }
-   if( !any ) {
-      printf("Cache empty\n");
-   } else {
-      printf("\n");
-   }
-}
-*/

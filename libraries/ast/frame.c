@@ -198,6 +198,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Added documentation for the TimeFrame class.
 *     12-AUG-2005 (DSB):
 *        Added ObsLat and ObsLon attributes.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *class--
 */
 
@@ -3996,12 +3998,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int used;                     /* Could the setting string be used? */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
-
-
 /* Initialise. */
    result = NULL;
 
@@ -4247,16 +4243,9 @@ L1:
 /* If not already created, create an FK5 J2000 SkyFrame which will be used 
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
-            skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+            astBeginPM;
+            skyframe = astSkyFrame("system=FK5,equinox=J2000" );
+            astEndPM;
          }
 
 /* Display absolute value preceeded by "N" or "S" as appropriate. */
@@ -4280,16 +4269,9 @@ L1:
 /* If not already created, create an FK5 J2000 SkyFrame which will be used 
    for formatting and unformatting ObsLon and ObsLat values. */
          if( !skyframe ) {
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+            astBeginPM;
             skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+            astEndPM;
          }
 
 /* Temporarily make the SkyFrame use degrees for longitude axis. */
@@ -7928,10 +7910,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int unit;                     /* Offset of axis Unit string */
    int used;                     /* Could the setting string be used? */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-  
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -8171,16 +8149,9 @@ L1:
 /* If not already created, create an FK5 J2000 SkyFrame which will be used 
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+         astBeginPM;
          skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+         astEndPM;
       }
 
 /* Convert the string to a radians value before use. */
@@ -8218,16 +8189,9 @@ L1:
 /* If not already created, create an FK5 J2000 SkyFrame which will be used 
    for formatting and unformatting ObsLon and ObsLat values. */
       if( !skyframe ) {
-
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
-
+         astBeginPM;
          skyframe = astSkyFrame( "system=FK5,equinox=J2000" );
-
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+         astEndPM;
       }
 
 /* Convert the string to a radians value before use (temporarily make the 
@@ -12973,10 +12937,6 @@ f     reason.
    static int init = 0;          /* "strings" array initialised? */
    static int istr = 0;          /* Offset of next string in "strings" */
 
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Initialise. */
    result = NULL;
 
@@ -13002,14 +12962,10 @@ f     reason.
    element, so the earlier string is effectively replaced by the new
    one.) */
    if ( astOK ) {
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+      astBeginPM;
       strings[ istr ] = astStore( strings[ istr ], fvalue,
                                   strlen( fvalue ) + (size_t) 1 );
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+      astEndPM;
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to

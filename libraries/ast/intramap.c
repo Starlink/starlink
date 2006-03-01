@@ -72,6 +72,8 @@ f     The IntraMap class does not define any new routines beyond those
 *        Free memory allocated by calls to astReadString.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *class--
 */
 
@@ -657,16 +659,12 @@ static void IntraReg( const char *name, int nin, int nout,
    int found;                    /* Transformation function found? */
    int ifun;                     /* Loop counter for function information */
    
-#ifdef DEBUG
-   int pm;     /* See astSetPermMem in memory.c */
-#endif
-
 /* Check the global error status. */
    if ( !astOK ) return;
 
-#ifdef DEBUG
-   pm = astSetPermMem( 1 );
-#endif
+/* Indicate that subsequent memory allocations may never be freed (other
+   than by any AST exit handler). */
+   astBeginPM;
 
 /* Clean (and validate) the name supplied. */
    clname = CleanName( name, "astIntraReg" );
@@ -757,9 +755,9 @@ static void IntraReg( const char *name, int nin, int nout,
    name. */
    if ( !astOK ) clname = astFree( clname );
 
-#ifdef DEBUG
-   astSetPermMem( pm );
-#endif
+/* Mark the end of the section in which memory allocations may never be  
+   freed (other than by any AST exit handler). */
+   astEndPM;
 
 }
 

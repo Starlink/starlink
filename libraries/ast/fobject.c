@@ -60,6 +60,8 @@
 *        can be used from fortran.
 *     7-FEB-2006 (DSB):
 *        Added AST_TUNE.
+*     1-MAR-2006 (DSB):
+*        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
 *-
 */
 
@@ -71,6 +73,13 @@
 
 /* Header files. */
 /* ============= */
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
+/* AST headers */
+/* ----------- */
 #include "f77.h"                 /* FORTRAN <-> C interface macros (SUN/209) */
 #include "c2f77.h"               /* F77 <-> C support functions/macros */
 #include "error.h"               /* Error reporting facilities */
@@ -403,25 +412,44 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
 }
 
 
-#ifdef DEBUG
+#ifdef MEM_DEBUG
 
-F77_SUBROUTINE(ast_listissued)( CHARACTER(TEXT)
-                                TRAIL(TEXT) ) {
+F77_SUBROUTINE(ast_activememory)( CHARACTER(TEXT)
+                                  TRAIL(TEXT) ) {
    GENPTR_CHARACTER(TEXT)
    char *text;
 
-   astSetPermMem( 1 );
+   astBeginPM;
    text = astString( TEXT, TEXT_length );
-   astSetPermMem( 0 );
-   astListIssued( text );
+   astEndPM;
+   astActiveMemory( text );
    astFree( text );
 }
 
-F77_SUBROUTINE(ast_setwatchid)( INTEGER(ID) ) {
+F77_SUBROUTINE(ast_watchmemory)( INTEGER(ID) ) {
    GENPTR_INTEGER(ID)
-   astSetWatchId( *ID );
+   astWatchMemory( *ID );
 }
 
+F77_SUBROUTINE(ast_flushmemory)( INTEGER(LEAK) ) {
+   GENPTR_INTEGER(LEAK)
+   astFlushMemory( *LEAK );
+}
+
+#else
+
+F77_SUBROUTINE(ast_activememory)( CHARACTER(TEXT)
+                                  TRAIL(TEXT) ) {
+   GENPTR_CHARACTER(TEXT)
+}
+
+F77_SUBROUTINE(ast_watchmemory)( INTEGER(ID) ) {
+   GENPTR_INTEGER(ID)
+}
+
+F77_SUBROUTINE(ast_flushmemory)( INTEGER(LEAK) ) {
+   GENPTR_INTEGER(LEAK)
+}
 
 #endif
 
