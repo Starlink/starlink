@@ -81,6 +81,9 @@
 *        Added astChrMatch astChrMatchN.
 *     23-FEB-2006 (DSB):
 *        Added astMemCaching and AST__TUNULL.
+*     2-MAR-2006 (DSB):
+*        Only use astSscanf if the system on which AST was configured
+*        showed the bug on OSX reported by Bill Joye.
 *-
 */
 
@@ -156,7 +159,11 @@ void astEndPM_( void );
 #define astString(chars,nchars) astString_(chars,nchars)
 #define astStringArray(chars,nel,len) astStringArray_(chars,nel,len)
 #define astChrLen(string) astChrLen_(string)
+#ifdef OSX_SCANF_BUG
 #define astSscanf astSscanf_
+#else
+#define astSscanf sscanf
+#endif
 #define astChrSplit(str,n) astChrSplit_(str,n)
 #endif
 
