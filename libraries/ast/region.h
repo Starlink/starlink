@@ -39,6 +39,8 @@
 *  History:
 *     5-DEC-2003 (DSB):
 *        Original version.
+*     2-MAR-2006 (DSB):
+*        Changed AST_LONG_DOUBLE to HAVE_LONG_DOUBLE.
 *-
 */
 
@@ -127,7 +129,7 @@ typedef struct AstRegionVtab {
    void (* SetRegFS)( AstRegion *, AstFrame * );
    double *(* RegCentre)( AstRegion *, double *, double **, int, int );
 
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    int (* MaskLD)( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double );
 #endif
    int (* MaskB)( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
@@ -202,7 +204,7 @@ AstFrame *astGetRegionFrame_( AstRegion * );
 int astOverlap_( AstRegion *, AstRegion * );
 void astNegate_( AstRegion * );
 
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 int astMaskLD_( AstRegion *, AstMapping *, int, int, const int[], const int[], long double [], long double );
 #endif
 int astMaskB_( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
@@ -328,7 +330,7 @@ astINVOKE(V,astNegate_(astCheckRegion(this)))
 #define astOverlap(this,that) \
 astINVOKE(V,astOverlap_(astCheckRegion(this),astCheckRegion(that)))
 
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define astMaskLD(this,map,inside,ndim,lbnd,ubnd,in,val) \
 astINVOKE(V,astMaskLD_(astCheckRegion(this),(map?astCheckMapping(map):NULL),inside,ndim,lbnd,ubnd,in,val))
 #endif

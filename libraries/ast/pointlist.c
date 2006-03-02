@@ -101,7 +101,7 @@ AstPointList *astPointListId_( void *, int, int, int, const double *, void *, co
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double );
 #endif
 static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
@@ -258,7 +258,7 @@ void astInitPointListVtab_(  AstPointListVtab *vtab, const char *name ) {
    region->MaskUI = MaskUI;
    region->MaskUL = MaskUL;
    region->MaskUS = MaskUS;
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    region->MaskLD = MaskLD;
 #endif
 
@@ -561,7 +561,7 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_MASK(LD,long double)
 #endif
 MAKE_MASK(D,double)

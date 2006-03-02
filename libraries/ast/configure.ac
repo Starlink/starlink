@@ -48,6 +48,9 @@ AC_PROG_LN_S
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
+#  See if we have long doubles (used by the Mapping and Region classes)
+AC_CHECK_TYPES([long double])
+
 #   ast_link needs to be able to link against the Fortran runtime if
 #   necessary
 AC_FC_LIBRARY_LDFLAGS

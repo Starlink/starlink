@@ -133,6 +133,8 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *        Override ObsLat and ObsLon accessor methods.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     2-MAR-2006 (DSB):
+*        Changed AST_LONG_DOUBLE to HAVE_LONG_DOUBLE.
 *class--
 
 *  Implementation Notes:
@@ -743,7 +745,7 @@ static int (* parent_getusedefs)( AstObject * );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 static int MaskLD( AstRegion *, AstMapping *, int, int, const int[], const int ubnd[], long double [], long double );
 #endif
 static int MaskB( AstRegion *, AstMapping *, int, int, const int[], const int[], signed char[], signed char );
@@ -3929,7 +3931,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->MaskUI = MaskUI;
    vtab->MaskUL = MaskUL;
    vtab->MaskUS = MaskUS;
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    vtab->MaskLD = MaskLD;
 #endif
 
@@ -4980,7 +4982,7 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_MASK(LD,long double)
 #endif
 MAKE_MASK(D,double)
@@ -11039,7 +11041,7 @@ int astMask##X##_( AstRegion *this, AstMapping *map, int inside, int ndim, \
    return (**astMEMBER(this,Region,Mask##X))( this, map, inside, ndim, lbnd, \
                                               ubnd, in, val ); \
 }
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_MASK_(LD,long double)
 #endif
 MAKE_MASK_(D,double)

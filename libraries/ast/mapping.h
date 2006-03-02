@@ -280,11 +280,18 @@
 *        Added method astRebinSeq
 *     31-JAN-2006 (DSB):
 *        Added IsSimple attribute.
+*     2-MAR-2006 (DSB):
+*        Use HAVE_LONG_DOUBLE in place of AST_LONG_DOUBLE
 *--
 */
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results */
+/* --------------------- */
+#include "config.h"
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "object.h"              /* Base Object class */
@@ -369,10 +376,10 @@ typedef struct AstMappingVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    int (* ResampleLD)( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(void), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
    void (* RebinLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
-   void (* RebinSeqLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double weights );
+   void (* RebinSeqLD)( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [] );
 #endif
 
    AstMapping *(* Simplify)( AstMapping * );
@@ -447,10 +454,10 @@ AstMapping *astLoadMapping_( void *, size_t, AstMappingVtab *,
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 int astResampleLD_( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(void), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 void astRebinLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
-void astRebinSeqLD_( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double []void astRebinLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
+void astRebinSeqLD_( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [] );
 #endif
 
 AstMapping *astSimplify_( AstMapping * );
@@ -548,7 +555,7 @@ astINVOKE(O,astLoadMapping_(mem,size,vtab,name,astCheckChannel(channel)))
 /* Here we make use of astCheckMapping (et al.) to validate Mapping
    pointers before use. This provides a contextual error report if a
    pointer to the wrong sort of object is supplied. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define astResampleLD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleLD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var))
 #define astRebinLD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \

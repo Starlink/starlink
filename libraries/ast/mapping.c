@@ -165,6 +165,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Corrections to prologue of astLinearApprox.
 *     16-FEB-2006 (DSB):
 *        Some speed optimisations to rebinning code.
+*     2-MAR-2006 (DSB):
+*        Use HAVE_LONG_DOUBLE in place of AST_LONG_DOUBLE
 *class--
 */
 
@@ -177,6 +179,11 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results  */
+/* ---------------------- */
+#include "config.h" 
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -207,7 +214,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 /* ======================== */
 /* Enum to represent the data type when resampling a grid of data. */
 typedef enum DataType {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    TYPE_LD,
 #endif
    TYPE_D,
@@ -278,17 +285,17 @@ static int rate_disabled = 0;
 
 /* Prototypes for private member functions. */
 /* ======================================== */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 static void InterpolateBlockAverageLD( int, const int[], const int[], const long double [], const long double [], int, const int[], const double *const[], const double[], int, long double, long double *, long double *, int * ); 
 static int InterpolateKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, long double *, long double * );
 static int InterpolateLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
 static int InterpolateNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, long double *, long double * );
-static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, double, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, int, long double *, long double *, double *);
-static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, double, const double *const *, int, long double, int, long double *, long double *, double *);
-static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, int, long double *, long double *, double *);
+static void SpreadKernel1LD( AstMapping *, int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, long double, int, long double *, long double *, double *);
+static void SpreadLinearLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *);
+static void SpreadNearestLD( int, const int *, const int *, const long double *, const long double *, int, const int *, const double *const *, int, long double, int, long double *, long double *, double *);
 static int ResampleLD( AstMapping *, int, const int [], const int [], const long double [], const long double [], int, void (*)(), const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
 static void RebinLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [] );
-static void RebinSeqLD( AstMapping *, double, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [] );
+static void RebinSeqLD( AstMapping *, double, int, const int [], const int [], const long double [], const long double [], int, const double [], int, double, int, long double, int, const int [], const int [], const int [], const int [], long double [], long double [], double [] );
 static void ConserveFluxLD( double, int, const int *, long double, long double *, long double * );
 #endif
 
@@ -669,7 +676,7 @@ static void ConserveFlux##X( double factor, int npoint, const int *offset, \
 
 /* Expand the macro above to generate a function for each required 
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_CONSERVEFLUX(LD,long double)
 #endif
 MAKE_CONSERVEFLUX(D,double)
@@ -2430,7 +2437,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
    vtab->ResampleLD = ResampleLD;
    vtab->RebinLD = RebinLD;
    vtab->RebinSeqLD = RebinSeqLD;
@@ -3427,7 +3434,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    
 /* If <X> is a floating point type, the limits are not actually used,
    but must be present to permit error-free compilation. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define HI_LD ( 0.0L )
 #define LO_LD ( 0.0L )
 #endif
@@ -3436,7 +3443,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 #define HI_F ( 0.0f )
 #define LO_F ( 0.0f )
 
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define HI_L   ( 0.5L + (long double) LONG_MAX )
 #define LO_L  ( -0.5L + (long double) LONG_MIN )
 #define HI_UL  ( 0.5L + (long double) ULONG_MAX )
@@ -3467,7 +3474,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_KERNEL1(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_KERNEL1(L,long int,0,long double,1)
 #else
@@ -3486,7 +3493,7 @@ MAKE_INTERPOLATE_KERNEL1(B,signed char,0,float,1)
 
 /* Expand the main macro above to generate a function for each
    required unsigned data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_KERNEL1(UL,unsigned long int,0,long double,0)
 #else
 MAKE_INTERPOLATE_KERNEL1(UL,unsigned long int,0,double,0)
@@ -3497,7 +3504,7 @@ MAKE_INTERPOLATE_KERNEL1(UB,unsigned char,0,float,0)
 
 /* Undefine the macros used above. */
 #undef CHECK_FOR_NEGATIVE_VARIANCE
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #undef HI_LD
 #undef LO_LD
 #endif
@@ -4322,7 +4329,7 @@ static int InterpolateLinear##X( int ndim_in, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_LINEAR(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_LINEAR(L,long int,0,long double,1)
 #else
@@ -4341,7 +4348,7 @@ MAKE_INTERPOLATE_LINEAR(B,signed char,0,float,1)
 
 /* Expand the main macro above to generate a function for each
    required unsigned data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_LINEAR(UL,unsigned long int,0,long double,0)
 #else
 MAKE_INTERPOLATE_LINEAR(UL,unsigned long int,0,double,0)
@@ -4841,7 +4848,7 @@ static int InterpolateNearest##X( int ndim_in, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_NEAREST(LD,long double,1)
 #endif
 MAKE_INTERPOLATE_NEAREST(D,double,1)
@@ -5607,7 +5614,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 
 /* If <X> is a floating point type, the limits are not actually used,
    but must be present to permit error-free compilation. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define HI_LD ( 0.0L )
 #define LO_LD ( 0.0L )
 #endif
@@ -5616,7 +5623,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 #define HI_F ( 0.0f )
 #define LO_F ( 0.0f )
 
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #define HI_L   ( 0.5L + (long double) LONG_MAX )
 #define LO_L  ( -0.5L + (long double) LONG_MIN )
 #define HI_UL  ( 0.5L + (long double) ULONG_MAX )
@@ -5647,7 +5654,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_BLOCKAVE(LD,long double,1,long double,1)
 MAKE_INTERPOLATE_BLOCKAVE(L,long int,0,long double,1)
 #else
@@ -5666,7 +5673,7 @@ MAKE_INTERPOLATE_BLOCKAVE(B,signed char,0,float,1)
 
 /* Expand the main macro above to generate a function for each
    required unsigned data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,long double,0)
 #else
 MAKE_INTERPOLATE_BLOCKAVE(UL,unsigned long int,0,double,0)
@@ -5677,7 +5684,7 @@ MAKE_INTERPOLATE_BLOCKAVE(UB,unsigned char,0,float,0)
 
 /* Undefine the macros used above. */
 #undef CHECK_FOR_NEGATIVE_VARIANCE
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 #undef HI_LD
 #undef LO_LD
 #endif
@@ -8868,7 +8875,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBIN(LD,long double,0)
 #endif
 MAKE_REBIN(D,double,0)
@@ -9863,7 +9870,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
        
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_NEAREST(LD,long double)
 #endif
                CASE_NEAREST(D,double)
@@ -9904,7 +9911,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_LINEAR(LD,long double)
 #endif
                CASE_LINEAR(D,double)
@@ -10100,7 +10107,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_KERNEL1(LD,long double)
 #endif
                CASE_KERNEL1(D,double)
@@ -10135,7 +10142,7 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                                  
 /* Use the above macro to report an appropriate error message. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_ERROR(LD)
 #endif
                CASE_ERROR(D)
@@ -10929,7 +10936,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBINSEQ(LD,long double,0)
 #endif
 MAKE_REBINSEQ(D,double,0)  
@@ -12704,7 +12711,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_RESAMPLE(LD,long double)
 #endif
 MAKE_RESAMPLE(D,double)
@@ -13764,7 +13771,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
        
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_NEAREST(LD,long double)
 #endif
                CASE_NEAREST(D,double)
@@ -13804,7 +13811,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_LINEAR(LD,long double)
 #endif
                CASE_LINEAR(D,double)
@@ -13990,7 +13997,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the appropriate function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_KERNEL1(LD,long double)
 #endif
                CASE_KERNEL1(D,double)
@@ -14075,7 +14082,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 
 /* Use the above macro to invoke the function. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_GINTERP(LD,long double)
 #endif
                CASE_GINTERP(D,double)
@@ -14109,7 +14116,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                  
 /* Use the above macro to report an appropriate error message. */
             switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
                CASE_ERROR(LD)
 #endif
                CASE_ERROR(D)
@@ -14146,7 +14153,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
        
 /* Use the above macro to invoke the appropriate function. */
       switch ( type ) {
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
          CASE_CONSERVE(LD,long double)
 #endif
          CASE_CONSERVE(D,double)
@@ -16399,7 +16406,7 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_SPREAD_KERNEL1(LD,long double,0)
 #endif     
 MAKE_SPREAD_KERNEL1(D,double,0) 
@@ -17076,7 +17083,7 @@ static void SpreadLinear##X( int ndim_out, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_SPREAD_LINEAR(LD,long double,0)
 #endif     
 MAKE_SPREAD_LINEAR(D,double,0)
@@ -17584,7 +17591,7 @@ static void SpreadNearest##X( int ndim_out, \
 
 /* Expand the main macro above to generate a function for each
    required signed data type. */
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_SPREAD_NEAREST(LD,long double,0)
 #endif
 
@@ -20171,7 +20178,7 @@ int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                                                    lbnd, ubnd, \
                                                    out, out_var ); \
 }
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_RESAMPLE_(LD,long double)
 #endif
 MAKE_RESAMPLE_(D,double)
@@ -20206,7 +20213,7 @@ void astRebin##X##_( AstMapping *this, double wlim, int ndim_in, const int *lbnd
                                          lbnd, ubnd, \
                                          out, out_var ); \
 }
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBIN_(LD,long double)
 #endif
 MAKE_REBIN_(D,double)
@@ -20234,7 +20241,7 @@ void astRebinSeq##X##_( AstMapping *this, double wlim, int ndim_in, const int *l
                                          lbnd, ubnd, \
                                          out, out_var, weights ); \
 }
-#if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
 MAKE_REBINSEQ_(LD,long double)
 #endif
 MAKE_REBINSEQ_(D,double)
