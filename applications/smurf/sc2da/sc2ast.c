@@ -94,6 +94,7 @@ int *status             /* global status (given and returned) */
                  Do away with the facility for including intermediate
                     Frames (dsb)
      1Mar2006  : Check for (subnum==-1) before checking inherited status (dsb)
+     2Mar2006  : const constant arrays (timj)
 */
 
 {
@@ -109,10 +110,10 @@ int *status             /* global status (given and returned) */
    AstShiftMap *zshiftmap;
 
    double a;                       /* subarray angle */
-   double rotangle[8] =
+   const double rotangle[8] =
       { 0.0, PIBY2, 2*PIBY2, 3*PIBY2, 0.0, PIBY2, 2*PIBY2, 3*PIBY2 };
    double rot[4];
-   double reverse[8] =
+   const double reverse[8] =
       { -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0 };
    double rev[4];
    double shift[2];
@@ -121,12 +122,12 @@ int *status             /* global status (given and returned) */
 /* xoff and yoff are the distance in pixel units from the tracking centre
    to the [0][0] pixel in a subarray */
 
-   double xoff[8] =
+   const double xoff[8] =
       { -41.5,  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5 };
-   double yoff[8] =
+   const double yoff[8] =
       {  33.5,  41.5, -33.5, -41.5,  33.5,  41.5, -33.5, -41.5 };
 
-   double flip[8] =
+   const double flip[8] =
       { 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, -1.0, -1.0 };
 
 
@@ -150,7 +151,7 @@ int *status             /* global status (given and returned) */
  */
 
 /* Forward coefficients are from FRAME850 to Nasmyth */
-   double coeff_f[] = 
+   const double coeff_f[] = 
                { 
 /* x-coordinate */
                0.30037,     1.0, 0.0, 0.0,
@@ -172,7 +173,7 @@ int *status             /* global status (given and returned) */
 
 /* Inverse coefficients are from Nasmyth to FRAME850 */
 
-   double coeff_i[] = 
+   const double coeff_i[] = 
                { 
 /* X-coordinate */
                -0.30461,    1.0, 0.0, 0.0,
