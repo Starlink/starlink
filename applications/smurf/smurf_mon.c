@@ -54,6 +54,8 @@
 *        Add remsky
 *     2006-02-24 (DSB):
 *        Switch on AST memory caching (instead of Object caching).
+*     2006-03-02 (TIMJ):
+*        Clear out sc2ast cache
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,10 +99,15 @@
 #include "star/grp.h"
 #include "star/hds.h"
 #include "ast.h"
+#include "sc2da/sc2ast.h"
 
 #include "libsmurf/smurflib.h"
 
+/* internal protoypes */
 F77_SUBROUTINE(task_get_name)(char *, int*, int);
+void smurf_mon (int * );
+
+/* Main monolith routine */
 
 void smurf_mon( int * status ) {
 
@@ -161,6 +168,9 @@ void smurf_mon( int * status ) {
     msgSetc( "TASK", taskname );
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
+
+  /* Clear the sc2ast cache */
+  sc2ast_createwcs(-1, 0.0, 0.0, 0.0, 0, NULL,status);
 
   /* Free AST resources */
   astEnd;
@@ -231,6 +241,10 @@ void smurf_mon( int * status ) {
   }
   errEnd( status );
 
+  /* Comment out during active usage since it is an unnecessary
+     overhead to free all the AST internal structures each time
+     we are called from the pipeline as a monolith */
+  astFlushMemory( 1 );
 
 }
 
