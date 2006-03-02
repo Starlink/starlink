@@ -71,6 +71,32 @@ STAR_DECLARE_DEPENDENCIES(build, sla)
 #   Declare the message file.  
 STAR_MESSGEN(ast_err.msg)
 
+#   Test for a bug in sscanf on some platforms (e.g. OSX) reported by
+#   Bill Joye. 
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+  char foo[] = " name 1111.1 ";
+
+  char bar[8];
+  float ff;
+  int nc;
+  int r;
+
+  nc = 0;
+  r = sscanf(foo, " %s %f %n", bar, &ff, &nc);
+  exit( ( nc != 13 ) ? 0 : 1 );
+}
+
+]])],[
+   AC_DEFINE([OSX_SCANF_BUG],[1],[The sscanf shows the OSX bug reported by Bill Joye])
+],,[
+   AC_DEFINE([OSX_SCANF_BUG],[1],[The sscanf may have the OSX bug reported by Bill Joye])
+])
+
 #   Declare the documentation.  We need to do complicated things to
 #   satisfy these targets, so give a non-null value
 #   for the second argument, to suppress automatic generation of
