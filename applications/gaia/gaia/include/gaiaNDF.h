@@ -1,6 +1,11 @@
+#ifndef _GAIANDF_INCLUDED_
+#define _GAIANDF_INCLUDED_
+ 
 /*
  *  External prototypes for gaiaNDF.c.
  */
+
+#include <ast.h>
 
 /*  Maximum character length of NDF filename or HDS path */
 #define MAXNDFNAME 256
@@ -79,7 +84,8 @@ extern "C" {
 /*
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================
- *  These are only used to query NDF bounds, so that we can section up cubes.
+ *  These are only used to query NDF bounds, so that we can section up cubes,
+ *  plus some toys for playing around (see gaiaNDFTcl.c).
  */
 
     /* Open an NDF and return the identifier */
@@ -97,6 +103,15 @@ extern "C" {
                               int ncoords, int trailed, char **coord,
                               char **error_mess );
 
+    /* Map in an array component */
+    int gaiaSimpleMapNDF( int ndfid, char *type, const char* component, 
+                          void **data, int *el, char **error_mess );
+
+    /* Get the NDF WCS component as an AST frameset */
+    int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess );
+
 #ifdef __cplusplus
 }
+#endif
+
 #endif
