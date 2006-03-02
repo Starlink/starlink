@@ -34,6 +34,8 @@
 #     10-JAN-2005 (DSB):
 #        Added second argument (mode) to the mkdir invocation which creates 
 #        the temporary directory.
+#     2-MAR-2006 (DSB):
+#        Check for "config.h" as well as <config.h>
 #-
 
 ( $#ARGV >= 0 ) || Usage();
@@ -217,7 +219,8 @@ sub protect_copy_file {
 #  of the header file being included.
 line: while ( <INCLUDE> ) {
 #  Omit any config.h includes, and note that we saw this
-      if (/^\s*\#\s*include\s+<config.h>/) {
+      if (/^\s*\#\s*include\s+<config.h>/ ||
+          /^\s*\#\s*include\s+"config.h"/) {
           $need_config_h = 1;
           next line;
       }
