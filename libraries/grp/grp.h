@@ -95,12 +95,12 @@ enum { GRP__MAXG  = 500 };
 /* Type definitions for GRP C interface */
 /* ------------------------------------ */
 
-/* The contents of this struct are not public */
-typedef struct Grp {
-   F77_INTEGER_TYPE igrp; /* Currently refers to the Fortran GRP ID */  
-   int slot;              /* The slot number associated with the GRP ID */  
-} Grp;
-
+/* The contents of the Grp struct are hidden in grp1.h in order to
+   make it difficult for application code to use the structure. Here we
+  just provide a forward reference to the structure. */
+#ifndef grpINTERNAL
+typedef struct Grp Grp;
+#endif
 
 /* Public function prototypes */
 /* -------------------------- */
@@ -118,9 +118,9 @@ void grpValid( Grp *, int *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
-const Grp *grpFree( const Grp *, int * );
-const Grp *grpF2C( F77_INTEGER_TYPE, int * );
-F77_INTEGER_TYPE grpC2F( const Grp *, int * );
+Grp *grpFree( Grp *, int * );
+Grp *grpF2C( F77_INTEGER_TYPE, int * );
+F77_INTEGER_TYPE grpC2F( Grp *, int * );
 
 
 

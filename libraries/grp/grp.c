@@ -77,7 +77,7 @@
 /* Header files. */
 /* ============= */
 #include "f77.h"                 
-#include "grp.h"
+#include "grp1.h"
 #include "grp_err.h"
 #include "sae_par.h"
 #include "merswrap.h"
@@ -113,13 +113,13 @@ static int Grp_Init = 0;
 /* Free the Grp structure used to hold the Fortran ID of a group, and 
    return NULL. */
 /* ------------------------------------------------------------------- */
-const Grp *grpFree ( const Grp *grp, int *status ) {
+Grp *grpFree ( Grp *grp, int *status ) {
    int slot;
    if( grp ) {
       slot = grpSlot( grp->igrp, status );
       if( slot >= 0 ) Grp_Pointers[ slot ] = NULL;
-      memset( (Grp *) grp, 0, sizeof( Grp ) );
-      starFree( (Grp *) grp );
+      memset( grp, 0, sizeof( Grp ) );
+      starFree( grp );
    }
    return NULL;
 }
@@ -130,7 +130,7 @@ const Grp *grpFree ( const Grp *grp, int *status ) {
    creating a new structure if necessary. Note that it takes a fortran 
    integer as arg */
 /* ------------------------------------------------------------------- */
-const Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
+Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
    Grp *ret;
    int slot;
 
@@ -160,7 +160,7 @@ const Grp *grpF2C( F77_INTEGER_TYPE IGRP, int * status ) {
 
 /* Return the Fortran ID value for a given Grp structure. */
 /* ------------------------------------------------------------------- */
-F77_INTEGER_TYPE grpC2F( const Grp *grp, int *status ){
+F77_INTEGER_TYPE grpC2F( Grp *grp, int *status ){
    F77_INTEGER_TYPE ret;
    int slot;
 
@@ -244,7 +244,7 @@ void grpDelet( Grp **grp, int *status ){
    DECLARE_INTEGER(STATUS);
 
    IGRP = grpC2F( *grp, status );
-   *grp = (Grp *) grpFree( *grp, status );
+   *grp = grpFree( *grp, status );
 
    F77_EXPORT_INTEGER( *status, STATUS );
 
@@ -349,7 +349,7 @@ Grp *grpNew( const char *type, int *status ){
    F77_FREE_CHARACTER( TYPE );
    F77_IMPORT_INTEGER( STATUS, *status );
 
-   ret = (Grp *) grpF2C( IGRP, status );
+   ret = grpF2C( IGRP, status );
 
    return ret;
 }
