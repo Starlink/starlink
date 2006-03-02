@@ -30,6 +30,7 @@ extern "C" {
     int SpectralPlot_Init();
     int Tcladam_Init(Tcl_Interp *interp);
     int GaiaCat_Init(Tcl_Interp *interp);
+    int Ndf_Init(Tcl_Interp *interp);
 }
 
 //  Generated code for bitmaps used in tcl scripts.
@@ -98,6 +99,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     //  Add GaiaCat command.
     if (GaiaCat_Init(interp) != TCL_OK) {
       return TCL_ERROR;
+    }
+
+    //  SWIG NDF interface.
+    if ( Ndf_Init(interp) != TCL_OK ) {
+        return TCL_ERROR;
     }
 
     // The gaia_library path can be found in several places.  Here is the order

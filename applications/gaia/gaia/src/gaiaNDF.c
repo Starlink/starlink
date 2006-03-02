@@ -506,7 +506,7 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
  *      made instead.
  */
 int gaiaMapComponent( int ndfid, void **data, const char* component,
-                char **error_mess )
+                      char **error_mess )
 {
    char dtype[NDF__SZTYP+1];
    int el;
@@ -1252,6 +1252,7 @@ int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
         emsRlse();
         return 1;
     }
+    emsRlse();
     return 0;
 }
 
@@ -1265,6 +1266,54 @@ int gaiaSimpleCloseNDF( int *ndfid )
     ndfAnnul( ndfid, &status );
     emsRlse();
     return 0;
+}
+
+/**
+ * Map an NDF component with a given data type. Returns data and number of
+ * elements.
+ */
+int gaiaSimpleMapNDF( int ndfid, char *type, const char* component, 
+                      void **data, int *el, char **error_mess )
+{
+   int status = SAI__OK;
+   void *ptr[1];
+
+   /* Do the mapping */
+   emsMark();
+   ndfMap( ndfid, component, type, "READ", ptr, el, &status );
+   *data = ptr[0];
+
+   /* If an error occurred return an error message */
+   if ( status != SAI__OK ) {
+       *error_mess = errMessage( &status );
+       ndfid = NDF__NOID;
+       emsRlse();
+       return 1;
+   }
+   emsRlse();
+   return 0;
+}
+
+/**
+ * Get the AST frameset that defines the NDF WCS. Returns the address of the
+ * frameset.
+ */
+int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
+{
+   int status = SAI__OK;
+
+   emsMark();
+   ndfGtwcs( ndfid, iwcs, &status );
+
+   /* If an error occurred return an error message */
+   if ( status != SAI__OK ) {
+       *error_mess = errMessage( &status );
+       *iwcs = (AstFrameSet *) NULL;
+       emsRlse();
+       return 1;
+   }
+   emsRlse();
+   return 0;
 }
 
 /**

@@ -56,17 +56,16 @@ typedef struct SPItem  {
     char utag[22];              /* Unique tag for AST graphics we create */
     double *coordPtr;           /* Coordinates for each data value */
     double *dataPtr;            /* Data values */
+    int dataPtrDisp;            /* Dispostion of dataPtr, 0 for don't free */
     double *tmpPtr[2];          /* Temporary arrays for transformed
                                  *  coordinates etc. */
-    double border;              /* Percentage border around edges */
-    double height;              /* Height of item when not filling */
-    double width;               /* Width of item when not filling */
+    double height;              /* Height of item */
+    double width;               /* Width of item */
     double x, y;                /* Coordinates of item reference point */
     double xmax;                /* Maximum physical X coordinate for plot */
     double xmin;                /* Minimum physical X coordinate for plot */
     double ymax;                /* Maximum physical Y coordinate for plot */
     double ymin;                /* Minimum physical Y coordinate for plot */
-    int fillwhole;              /* Whether to use whole canvas for item */
     int numPoints;              /* Number of data values */
     int showgrid;               /* Whether to show the grid */
     int linewidth;              /* Width of polyline */
@@ -108,12 +107,6 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
      "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_DOUBLE, "-border", (char *) NULL, (char *) NULL,
-     "10.0", Tk_Offset(SPItem, border), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_BOOLEAN, "-fillwhole", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, fillwhole), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_BOOLEAN, "-showgrid", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, showgrid), TK_CONFIG_DONT_SET_DEFAULT},
@@ -244,6 +237,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
      * up after errors during the the remainder of this procedure.
      */
     spPtr->dataPtr = NULL;
+    spPtr->dataPtrDisp = 1;
     spPtr->coordPtr = NULL;
     spPtr->tmpPtr[0] = NULL;
     spPtr->tmpPtr[1] = NULL;
@@ -252,13 +246,11 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->framesets[1] = NULL;
     spPtr->dataunits = NULL;
     spPtr->datalabel = NULL;
-    spPtr->fillwhole = 1;
     spPtr->x = 0.0;
     spPtr->y = 0.0;
     spPtr->width = 100.0;
     spPtr->height = 100.0;
     spPtr->interp = interp;
-    spPtr->border = 10.0;
     spPtr->options = NULL;
     spPtr->plot = NULL;
     spPtr->newplot = 1;
@@ -335,7 +327,11 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  * SPCoords --
  *
  *   This procedure is invoked to process the "coords" widget command.
- *   This reads an list of doubles that are the spectral coordinates.
+ *   This reads an list of doubles that are the spectral coordinates,
+ *   or accepts a pointer to a list of already available doubles.
+ *   In the latter case you should use the format:
+ *
+ *      <canvas> coords <item> "pointer" memory_address number_of_elements
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -348,9 +344,13 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     int i;
+    int nel;
+    long adr;
+
 #if DEBUG
     fprintf( stderr, "SPCoords() \n" );
 #endif
+
     if ( objc == 0 ) {
 	/*
 	 * Print the data values.
@@ -364,34 +364,63 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 	return TCL_OK;
     }
     else {
+        /* Could be a list of doubles or a memory address. */
+        nel = objc;
+        adr = 0L;
+        if ( strcmp( Tcl_GetString( objv[0] ), "pointer" ) == 0 ) {
+            if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ||
+                 Tcl_GetIntFromObj( interp, objv[2], &nel ) != TCL_OK ) {
+                Tcl_AppendResult( interp, "Failed to read data pointer",
+                                  (char *) NULL );
+                return TCL_ERROR;
+            }
+        }
+
         /* Re-create various workspaces, if needed */
-        if ( spPtr->dataPtr != NULL && objc > spPtr->numPoints ) {
-            ckfree( (char *) spPtr->dataPtr );
+        if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
+            if ( spPtr->dataPtrDisp ) {
+                ckfree( (char *) spPtr->dataPtr );
+            }
             ckfree( (char *) spPtr->coordPtr );
             ckfree( (char *) spPtr->tmpPtr[0] );
             ckfree( (char *) spPtr->tmpPtr[1] );
             spPtr->dataPtr = NULL;
         }
         if ( spPtr->dataPtr == NULL ) {
-            i = sizeof( double ) * objc;
-            spPtr->dataPtr = (double *) ckalloc( i );
+            i = sizeof( double ) * nel;
+            if ( adr == 0 ) {
+                spPtr->dataPtr = (double *) ckalloc( i );
+                spPtr->dataPtrDisp = 1;
+            }
             spPtr->coordPtr = (double *)ckalloc( i );
             spPtr->tmpPtr[0] = (double *) ckalloc( i );
             spPtr->tmpPtr[1] = (double *) ckalloc( i );
         }
-        spPtr->numPoints = objc;
+        spPtr->numPoints = nel;
 
         /* Read in data and work out limits */
         spPtr->ymax = -DBL_MAX;
         spPtr->ymin =  DBL_MAX;
 
-	for ( i = 0; i < objc; i++ ) {
-	    if ( Tcl_GetDoubleFromObj( interp, objv[i], &spPtr->dataPtr[i] )
-                 != TCL_OK ) {
-		return TCL_ERROR;
-	    }
-            spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-            spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+        if ( adr == 0 ) {
+            /* Read doubles as strings */
+            for ( i = 0; i < nel; i++ ) {
+                if ( Tcl_GetDoubleFromObj( interp, objv[i], 
+                                           &spPtr->dataPtr[i] ) != TCL_OK ) {
+                    return TCL_ERROR;
+                }
+                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+            }
+        }
+        else {
+            /* Given memory address */
+            spPtr->dataPtr = (double *) adr;
+            spPtr->dataPtrDisp = 0;
+            for ( i = 0; i < nel; i++ ) {
+                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+            }
         }
 
     }
@@ -432,11 +461,11 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
     }
 
     /* Check if any options that require the plot to be regenerated
-     * were set. */ 
+     * were set. */
     for ( specPtr = configSpecs; specPtr->type != TK_CONFIG_END; specPtr++ ) {
         if ( specPtr->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
             /* All will do for now! */
-            
+
             fprintf( stderr, "Plot regeneration requested (configure)\n" );
             spPtr->newplot = 1;
             break;
@@ -464,10 +493,10 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 #if DEBUG
     fprintf( stderr, "SPDelete() \n" );
 #endif
-    if ( spPtr->dataPtr != NULL) {
+    if ( spPtr->dataPtr != NULL && spPtr->dataPtrDisp ) {
         ckfree( (char *) spPtr->dataPtr );
     }
-    if ( spPtr->coordPtr != NULL) {
+    if ( spPtr->coordPtr != NULL ) {
         ckfree( (char *) spPtr->coordPtr );
     }
     if ( spPtr->tmpPtr[0] != NULL ) {
@@ -511,8 +540,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     int iwidth;
     int ixo;
     int iyo;
-    int xborder;
-    int yborder;
 
 #if DEBUG
     fprintf( stderr, "SPDisplay() \n" );
@@ -523,12 +550,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     }
     if ( spPtr->framesets[0] == NULL ) {
         return;
-    }
-
-    /* When fill whole canvas the bounding box changes size with the canvas,
-     * so we need to continually check it */
-    if ( spPtr->fillwhole ) {
-        ComputeBBox( canvas, spPtr );
     }
 
     /* Generate the Plot frameset, if required */
@@ -544,28 +565,11 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         }
         GeneratePlotFrameSet( spPtr );
 
-        /* Set the draw area to the size of the bounding box */
-        if ( spPtr->fillwhole ) {
-
-            /* Need a gap around the edges */
-            ixo = spPtr->header.x1;
-            iyo = spPtr->header.y1;
-            iwidth = spPtr->header.x2 - spPtr->header.x1;
-            iheight = spPtr->header.y2 - spPtr->header.y1;
-            xborder = (int) ( iwidth * spPtr->border ) / 100.0;
-            yborder = (int) ( iheight * spPtr->border ) / 100.0;
-
-            graphbox[0] = ixo + xborder;
-            graphbox[1] = iyo + iheight - yborder;
-            graphbox[2] = ixo + iwidth - xborder;
-            graphbox[3] = iyo + yborder;
-        }
-        else {
-            graphbox[0] = spPtr->header.x1;
-            graphbox[1] = spPtr->header.y2;
-            graphbox[2] = spPtr->header.x2;
-            graphbox[3] = spPtr->header.y1;
-        }
+        /* Graphics limits are bounding box */
+        graphbox[0] = spPtr->header.x1;
+        graphbox[1] = spPtr->header.y2;
+        graphbox[2] = spPtr->header.x2;
+        graphbox[3] = spPtr->header.y1;
 
         /* Set the limits of the drawing region in physical coordinates */
         basebox[0] = spPtr->xmin;
@@ -809,22 +813,12 @@ static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr )
     Tk_Window tkwin;
     tkwin = Tk_CanvasTkwin( canvas );
 #if DEBUG
-    fprintf( stderr, "ComputeBBox: %d\n", spPtr->fillwhole );
+    fprintf( stderr, "ComputeBBox: %d\n" );
 #endif
-    if ( spPtr->fillwhole ) {
-        /*  The whole canvas. */
-        spPtr->header.x1 = spPtr->header.x2 = Tk_X( tkwin );
-        spPtr->header.y1 = spPtr->header.y2 = Tk_Y( tkwin );
-        spPtr->header.x2 += Tk_Width( tkwin );
-        spPtr->header.y2 += Tk_Height( tkwin );
-    }
-    else {
-        /*  Just the requested size and position */
-        spPtr->header.x1 = spPtr->header.x2 = spPtr->x;
-        spPtr->header.y1 = spPtr->header.y2 = spPtr->y;
-        spPtr->header.x2 += spPtr->width;
-        spPtr->header.y2 += spPtr->height;
-    }
+    spPtr->header.x1 = spPtr->header.x2 = spPtr->x;
+    spPtr->header.y1 = spPtr->header.y2 = spPtr->y;
+    spPtr->header.x2 += spPtr->width;
+    spPtr->header.y2 += spPtr->height;
 
 #if DEBUG
     fprintf( stderr, "\t %d,%d,%d,%d \n", spPtr->header.x1, spPtr->header.y1,
