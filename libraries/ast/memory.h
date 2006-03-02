@@ -124,6 +124,7 @@ char *astAppendString_( char *, int *, const char * );
 void astActiveMemory_( const char * );
 void astWatchMemory_( int );
 void astFlushMemory_( int );
+int astMemoryTune_( const char *, int );
 int astMemoryID_( void * );
 void *astMemoryPtr_( int );
 void astMemoryAlarm_( const char * );
@@ -163,6 +164,7 @@ void astEndPM_( void );
 #ifdef MEM_DEBUG
 
 #define astActiveMemory(label) astActiveMemory_(label)
+#define astMemoryTune(name,value) astMemoryTune_(name,value)
 #define astWatchMemory(id) astWatchMemory_(id)
 #define astFlushMemory(leak) astFlushMemory_(leak)
 #define astBeginPM astBeginPM_()
@@ -175,6 +177,7 @@ void astEndPM_( void );
 #else
 
 #define astActiveMemory(label) 
+#define astMemoryTune(name,value)
 #define astWatchMemory(id)
 #define astFlushMemory(leak) 
 #define astBeginPM 

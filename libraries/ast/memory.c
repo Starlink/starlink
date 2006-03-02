@@ -58,6 +58,11 @@
 *     23-FEB-2006 (DSB):
 *        Added the caching system for allocated but unused memory blocks,
 *        controlled by AST tuning parameter MemoryCaching.
+*     2-MAR-2006 (DSB):
+*        Added astFlushMemory, and renamed the memory debugging functions.
+*        These are now conditionally compiled if the MEM_DEBUG macros is 
+*        defined (set by configuring AST with the --with-memdebug option).
+*        Also modified them to take into account MemoryCaching.
 */
 
 /* Include files. */
@@ -120,6 +125,12 @@
 #  define MALLOC malloc
 #  define FREE free
 #  define REALLOC realloc
+#endif
+
+
+#ifdef MEM_DEBUG
+#define ISSUED "issued"
+#define FREED "freed"
 #endif
 
 /* Function Macros. */
@@ -307,6 +318,17 @@ static int PM_Stack_Size = 0;
    Cache array (these are not considered to be active). */
 static Memory *Active_List = NULL;
 
+/* Should a new ID be issued each time a cached memory block is returned
+   by astMalloc? Otherwise, the same ID value is used throughtout the
+   life of a memory block. */
+static int Keep_ID = 0;
+
+/* Suppress all memory use reports except for issuing and freeing? */
+static int Quiet_Use = 0;
+
+/* Report the ID of every cached block when the cache is emptied? */
+static int List_Cache = 0;
+
 #endif
 
 /* A cache of allocated but currently unused memory block. This cache is
@@ -319,13 +341,13 @@ static Memory *Active_List = NULL;
    "cache". Each free memory block contains (in its Memory header) a pointer 
    to the header for another free memory block of the same size (or a NULL 
    pointer if there are no other free memory blocks of the same size). */
-static Memory *cache[ MXCSIZE + 1 ];
+static Memory *Cache[ MXCSIZE + 1 ];
 
 /* Has the "cache" array been initialised? */
-static int cache_init = 0;
+static int Cache_Init = 0;
 
 /* Should the cache be used? */
-static int use_cache = 0;
+static int Use_Cache = 0;
 
 /* Prototypes for Private Functions. */
 /* ================================= */
@@ -728,9 +750,9 @@ void *astFree_( void *ptr ) {
 /* If the memory block is small enough, and the cache is being used, put it 
    into the cache rather than freeing it, so that it can be reused. */
       size = mem->size;
-      if( use_cache && size <= MXCSIZE ) {
-         mem->next = cache[ size ];
-         cache[ size ] = mem;
+      if( Use_Cache && size <= MXCSIZE ) {
+         mem->next = Cache[ size ];
+         Cache[ size ] = mem;
 
 /* Simply free other memory blocks, clearing the "magic number" and size 
    values it contains. This helps prevent accidental re-use of the memory. */
@@ -914,9 +936,9 @@ void *astMalloc_( size_t size ) {
 
 /* If the cache is being used and a cached memory block of the required size 
    is available, remove it from the cache array and use it. */
-      mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
-      if( use_cache && mem ) {
-         cache[ size ] = mem->next;
+      mem = ( size <= MXCSIZE ) ? Cache[ size ] : NULL;
+      if( Use_Cache && mem ) {
+         Cache[ size ] = mem->next;
          mem->next = NULL;
 
 /* Otherwise, allocate a new memory block using "malloc". */
@@ -935,6 +957,10 @@ void *astMalloc_( size_t size ) {
             mem->magic = MAGIC( mem, size );
             mem->size = size;
             mem->next = NULL;
+
+#ifdef MEM_DEBUG
+            mem->id = -1;
+#endif
 
          }
       }
@@ -990,6 +1016,8 @@ int astMemCaching_( int newval ){
 
 /* Local Variables: */
    int i;
+   int id_list_size;
+   int *id_list;
    int result;
    Memory *mem;
 
@@ -997,28 +1025,101 @@ int astMemCaching_( int newval ){
    if ( !astOK ) return 0;
 
 /* Store the original value of the tuning parameter. */
-   result = use_cache;
+   result = Use_Cache;
    
 /* If a new value is to be set. */
    if( newval != AST__TUNULL ) {
 
 /* If the cache has been initialised, empty it. */
-      if( cache_init ) {
+      if( Cache_Init ) {
+
+/* If we are listing the ID of every memory block in the cache, count the
+   number of blocks in the cache and then allocate an array to store the ID
+   values in. This is done so that we can sort them before displaying them. */
+#ifdef MEM_DEBUG
+         if( List_Cache ) {
+            Memory *next;
+
+            id_list_size = 0;
+            for( i = 0; i <= MXCSIZE; i++ ) {
+               next = Cache[ i ];
+               while( next ) {
+                  id_list_size++;
+                  next = next->next;
+               }
+            }
+
+            id_list = MALLOC( sizeof(int)*id_list_size );
+            if( !id_list ) {
+               astError( AST__INTER, "astMemCaching: Cannot allocate %d "
+                         "bytes of memory", sizeof(int)*id_list_size );
+            }            
+
+            id_list_size = 0;
+
+         } else {
+            id_list = NULL;
+         }
+#endif
+
          for( i = 0; i <= MXCSIZE; i++ ) {
-            while( cache[ i ] ) {
-               mem = cache[ i ];
-               cache[ i ] = mem->next;
+            while( Cache[ i ] ) {
+               mem = Cache[ i ];
+               Cache[ i ] = mem->next;
+
+#ifdef MEM_DEBUG
+               if( id_list ) {
+                  id_list[ id_list_size++ ] = mem->id;
+               }
+#endif
+
                FREE( mem );
             }
          }
 
-/* Otherwise, initialise it. */
+/* If we are displaying the IDs of memory blocks still in the cache, sort 
+   them using a bubblesort algorithm, then display them. */
+#ifdef MEM_DEBUG
+         if( id_list ) {
+
+            if( id_list_size == 0 ) {
+               printf( "Emptying the AST memory cache - (the cache is "
+                       "already empty)\n" );
+
+            } else {
+               int sorted, j, t;
+
+               sorted = 0;
+               for( j = id_list_size - 2; !sorted && j >= 0; j-- ) {
+                  sorted = 1;
+                  for( i = 0; i <= j; i++ ) {
+                     if( id_list[ i ] > id_list[ i + 1 ] ) {
+                        sorted = 0;
+                        t = id_list[ i ];
+                        id_list[ i ] = id_list[ i + 1 ];
+                        id_list[ i + 1 ] = t;
+                     } 
+                  }
+               }
+
+               printf( "Emptying the AST memory cache - freeing the "
+                       "following memory blocks: ");
+               for( i = 0; i < id_list_size; i++ ) printf( "%d ", id_list[ i ] );
+               printf( "\n" );
+
+            }
+         }
+#endif
+
+/* Otherwise, initialise the cache array to hold a NULL pointer at every
+   element. */
       } else {
-         for( i = 0; i <= MXCSIZE; i++ ) cache[ i ] = NULL;
+         for( i = 0; i <= MXCSIZE; i++ ) Cache[ i ] = NULL;
+         Cache_Init = 1;
       }
 
 /* Store the new value. */
-      use_cache = newval;
+      Use_Cache = newval;
 
    }
 
@@ -1131,7 +1232,7 @@ void *astRealloc_( void *ptr, size_t size ) {
 
    using astMalloc, astFree and memcpy explicitly in order to ensure
    that the memory blocks are cached. */
-               if( use_cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
+               if( Use_Cache && mem->size <= MXCSIZE && size <= MXCSIZE ) {
                   result = astMalloc( size );
                   if( result ) { 
                      if( mem->size < size ) {
@@ -1169,6 +1270,7 @@ void *astRealloc_( void *ptr, size_t size ) {
                      mem->size = size;
                      mem->next = NULL;
 #ifdef MEM_DEBUG
+                     mem->id = -1;
                      Issue( mem );
 #endif
                      result = mem + 1;
@@ -2182,7 +2284,89 @@ void astMemoryUse_( void *ptr, const char *verb ){
 *        A verb indicating what is being done to the pointer.
 *-
 */
-   if( ptr && (((Memory *)ptr)-1)->id == Watched_ID ) astMemoryAlarm( verb );
+   if( ptr && (((Memory *)ptr)-1)->id == Watched_ID ) {
+      if( !Quiet_Use || !strcmp( verb, ISSUED ) || 
+                        !strcmp( verb, FREED ) ) {
+         astMemoryAlarm( verb );
+      }
+   }
+}
+
+int astMemoryTune_( const char *name, int value ){
+/*
+*+
+*  Name:
+*     astMemoryTune
+
+*  Purpose:
+*     Set a tuning parameter for the memory debugging functions.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astMemoryTune( const char *name, int value )
+
+*  Description:
+*     There are a few tuning parameters which control the behaviour of
+*     the memory debugging functions. This function allows these tuning
+*     parameters to be queried or set.
+
+*  Parameters:
+*     name
+*        The name of the tuning parameter to query or set. Valid names are:
+*
+*        "Keep_ID": A boolean flag indicating if a new ID should be issued 
+*        for a cached memory block each time it is returned by astMalloc? 
+*        Otherwise, the same ID value is used throughtout the life of a 
+*        memory block. Default is zero (false).
+*
+*        "List_Cache": A boolean flag which if non-zero (true) causes the
+*        ID of every memory block in the cache to be reported when the
+*        cache is emptied by astFlushMemory.
+*
+*        "Quiet_Use": A boolean flag controlling the number of reports issued 
+*        when a memory block is being watched (see astWatchMemory). If
+*        non-zero (true), then the only events which are reported are the
+*        issuing of a memory block pointer by astMalloc or astRealloc,and
+*        the freeing (or caching) of a memory block by astFree. If Quiet_Use
+*        is zero (the default), then additional reports are made for
+*        memory blocks used to hold AST Objects whenever the Object is
+*        copied, cloned, or checked.
+*     value
+*        The new value for the tuning parameter. If AST__TUNULL is
+*        supplied, the original value is left unchanged.
+
+*  Returned Value:
+*     The original value of the tuning parameter.
+
+*-
+*/
+
+   int result = AST__TUNULL;
+
+   if( name ) {
+
+      if( astChrMatch( name, "Keep_ID" ) ) {
+         result = Keep_ID;
+         if( value != AST__TUNULL ) Keep_ID = value;
+         
+      } else if( astChrMatch( name, "Quiet_Use" ) ) {
+         result = Quiet_Use;
+         if( value != AST__TUNULL ) Quiet_Use = value;
+         
+      } else if( astChrMatch( name, "List_Cache" ) ) {
+         result = List_Cache;
+         if( value != AST__TUNULL ) List_Cache = value;
+         
+      } else if( astOK ) {
+         astError( AST__TUNAM, "astMemoryTune: Unknown AST memory tuning " 
+                   "parameter specified \"%s\".", name );
+      }
+   }
+
+   return result;
 }
 
 void astBeginPM_( void ) {
@@ -2367,10 +2551,10 @@ static void Issue( Memory *mem ) {
 /* Return if no pointer was supplied. */
    if( !mem ) return;
 
-/* Store a unique identifier for this pointer. A new identifier is used
-   each time the pointer becomes active (i.e. each time it is remove from
-   the cache or malloced). */
-   mem->id = ++Next_ID;
+/* Store a unique identifier for this pointer. Unless global Keep_ID is
+   non-zero, a new identifier is used each time the pointer becomes active 
+   (i.e. each time it is remove from the cache or malloced). */
+   if( !Keep_ID || mem->id < 0 ) mem->id = ++Next_ID;
 
 /* Indicate if this is a permanent memory block (i.e. it will usually not
    be freed by AST). */
@@ -2383,7 +2567,7 @@ static void Issue( Memory *mem ) {
    Active_List = mem;
 
 /* Report that the pointer is being issued. */
-   astMemoryUse( mem + 1, "issued" );
+   astMemoryUse( mem + 1, ISSUED );
 
 }
 
@@ -2419,7 +2603,7 @@ static void DeIssue( Memory *mem ) {
    if( !mem ) return;
 
 /* Report that the pointer is being freed. */
-   astMemoryUse( mem + 1, "freed" );
+   astMemoryUse( mem + 1, FREED );
 
 /* Remove the block from the double linked list of active pointers. */
    next = mem->next;
@@ -2428,8 +2612,6 @@ static void DeIssue( Memory *mem ) {
    if( next ) next->prev = prev;
    if( mem == Active_List ) Active_List = next;
 
-/* Clear the identifier for safety in case of accidental re-use. */
-   mem->id = -1;
 }
 
 
