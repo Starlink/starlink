@@ -56,7 +56,10 @@ for my $i ( 0 .. $#headers ) {
   # Create a fitschan, read an object from it and dump the object
   # to standard output. The object should be a frameset if all is OK
   my $fc = new Starlink::AST::FitsChan( 
-		           source => sub { shift(@{$headers[$i]});},
+		           source => sub { my $line = shift(@{$headers[$i]});
+					   chomp($line) if $line;
+					   $line;
+					 },
 			   sink => \&reg_sink,
 				      );
   my $fs = $fc->Read();
