@@ -54,6 +54,8 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 *        Specify const char * for input strings
 *     19-SEP-2005 (TIMJ):
 *        Use strncpy and memset
+*     03-MAR-2006 (TIMJ):
+*        Use memcpy
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,15 +73,23 @@ void cnfExprt( const char *source_c, char *dest_f, int dest_len )
 
 /* Copy the characters of the input C string to the output FORTRAN string,  */
 /* taking care not to go beyond the end of the FORTRAN string.		    */
+/* And fill the rest of the output FORTRAN string with blanks.		    */
 
+/* First see how long the string actually is                                */
    clen = strlen( source_c );
-   if (dest_f != source_c)
-     strncpy( dest_f, source_c, dest_len );
 
-/* Fill the rest of the output FORTRAN string with blanks.		    */
+/* Now decide whether to copy everything and pad, or truncate               */
+/* Deliberately duplicate the memmove to minimize if-checks                 */
+/* Do not do the memmove if the string pointers are identical               */
 
-   if (clen < dest_len) {
+   if (clen < (size_t)dest_len) {
+     /* Need to pad. So first copy in the correct number of characters. */
+     if (dest_f != source_c) memcpy( dest_f, source_c, clen);
      ncpy = dest_len - clen;
+     /* then set remainder to space */
      memset( &dest_f[clen], ' ', ncpy );
+   } else {
+     /* Fill the output (truncating) */
+     if (dest_f != source_c) memcpy(dest_f, source_c, (size_t)dest_len);
    }
 }
