@@ -5,14 +5,14 @@
  *  External prototypes for gaiaNDF.c.
  */
 
-#include <ast.h>
-
 /*  Maximum character length of NDF filename or HDS path */
 #define MAXNDFNAME 256
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <ast.h>
 
 /*  Simple NDF interface */
 /*  ==================== */
