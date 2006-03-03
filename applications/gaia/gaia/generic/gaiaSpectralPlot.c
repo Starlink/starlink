@@ -67,7 +67,7 @@ typedef struct SPItem  {
     double ymax;                /* Maximum physical Y coordinate for plot */
     double ymin;                /* Minimum physical Y coordinate for plot */
     int numPoints;              /* Number of data values */
-    int showgrid;               /* Whether to show the grid */
+    int showaxes;               /* Whether to show the grid */
     int linewidth;              /* Width of polyline */
     XColor *linecolour;         /* Foreground color for polyline */
 } SPItem;
@@ -108,8 +108,8 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
      "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
 
-    {TK_CONFIG_BOOLEAN, "-showgrid", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, showgrid), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_BOOLEAN, "-showaxes", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_STRING, "-gridoptions", (char *) NULL, (char *) NULL,
      "", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
@@ -405,7 +405,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         if ( adr == 0 ) {
             /* Read doubles as strings */
             for ( i = 0; i < nel; i++ ) {
-                if ( Tcl_GetDoubleFromObj( interp, objv[i], 
+                if ( Tcl_GetDoubleFromObj( interp, objv[i],
                                            &spPtr->dataPtr[i] ) != TCL_OK ) {
                     return TCL_ERROR;
                 }
@@ -534,6 +534,10 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     Tk_Window tkwin;
     char *tags;
     double basebox[4];
+    double xin[2];
+    double xout[2];
+    double yin[2];
+    double yout[2];
     float graphbox[4];
     int i;
     int iheight;
@@ -558,7 +562,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 #if DEBUG
         fprintf( stderr, "Regenerating plot\n" );
 #endif
-        fprintf( stderr, "Regenerating plot\n" );
 
         if ( spPtr->framesets[1] != NULL ) {
             astAnnul( spPtr->framesets[1] );
@@ -571,11 +574,22 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         graphbox[2] = spPtr->header.x2;
         graphbox[3] = spPtr->header.y1;
 
-        /* Set the limits of the drawing region in physical coordinates */
-        basebox[0] = spPtr->xmin;
-        basebox[1] = spPtr->ymin;
-        basebox[2] = spPtr->xmax;
-        basebox[3] = spPtr->ymax;
+        /* Set the limits of the drawing region in physical coordinates. Note
+         * these are in the BASE frame of the frameset, not CURRENT
+         * coordinates */
+        xin[0] = spPtr->xmin;
+        xin[1] = spPtr->xmax;
+        yin[0] = spPtr->ymin;
+        yin[1] = spPtr->ymax;
+#if DEBUG
+        fprintf( stderr, "xmin etc: %f,%f,%f,%f\n", spPtr->xmin, spPtr->ymin,
+                 spPtr->xmax, spPtr->ymax );
+#endif
+        astTran2( spPtr->framesets[1], 2, xin, yin, 0, xout, yout );
+        basebox[0] = xout[0];
+        basebox[1] = yout[0];
+        basebox[2] = xout[1];
+        basebox[3] = yout[1];
 
 #if DEBUG
         fprintf( stderr, "basebox: %f,%f,%f,%f\n", basebox[0], basebox[1],
@@ -588,7 +602,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
-        if ( spPtr->showgrid ) {
+        if ( spPtr->showaxes ) {
             astTk_Tag( spPtr->utag );        /* Unique tag for grid items */
             ClearSubItems( canvas, spPtr );  /* Remove last grid */
             astGrid( spPtr->plot );          /* Draw grid */
@@ -607,6 +621,12 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         RtdLineQuickSetCoords( spPtr->interp, canvas, spPtr->polyline,
                                spPtr->tmpPtr[0], spPtr->tmpPtr[1],
                                spPtr->numPoints );
+
+        //astShow( spPtr->plot );
+
+        //for ( i = 0; i < spPtr->numPoints; i++ ) {
+        //    printf( "%f,%f\n", spPtr->tmpPtr[0][i], spPtr->tmpPtr[1][i] );
+        //}
 
         RtdLineSetColour( display, spPtr->polyline, spPtr->linecolour );
         RtdLineSetWidth( display, spPtr->polyline, spPtr->linewidth );
@@ -630,7 +650,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
  *
  * Results:
  *      The return value is 0 if the point whose x and y coordinates
- *      are coordPtr[0] and coordPtr[1] is inside the plot.  If the
+ *      are pointPtr[0] and pointPtr[1] is inside the plot.  If the
  *      point isn't inside the plot then the return value is the
  *      distance from the point to the item.
  *
@@ -836,14 +856,14 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
                               char *widgRec, int offset )
 {
     long longResult;
-    AstFrameSet ***ptr;
-    ptr = (AstFrameSet ***)( widgRec + offset );
+    AstFrameSet **ptr;
+    ptr = (AstFrameSet **)( widgRec + offset );
 
     if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    *ptr[0] = (AstFrameSet *) longResult;
-    *ptr[1] = (AstFrameSet *) NULL;
+    ptr[0] = (AstFrameSet *) longResult;
+    ptr[1] = (AstFrameSet *) NULL;
     return TCL_OK;
 }
 
