@@ -106,7 +106,6 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 /*    RFWS: R.F. Warren-Smith (STARLINK, RAL)                               */
 /*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
 /*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
-/*    DSB: David Berry (JAC, UCLan)                                         */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -120,8 +119,6 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 /*       shareable libraries for JNIHDS.                                    */
 /*    28-DEC-2005 (TIMJ):                                                   */
 /*       Use DAT__FLEXT rather than hard-coded ".sdf"                       */
-/*    3-MAR-2006 (DSB):                                                     */
-/*       Include space in the list of non-special file name characters.     */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -219,10 +216,6 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
 /* no action on these.                                                      */
                case '_':
                case '-':
-                  break;
-
-/* We also treat space as a portable file name characters. */
-               case ' ':
                   break;
 
 /* If any other characters which are not in the POSIX.1 portable filename   */
