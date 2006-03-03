@@ -71,8 +71,9 @@ STAR_DECLARE_DEPENDENCIES(build, sla)
 #   Declare the message file.  
 STAR_MESSGEN(ast_err.msg)
 
-#   Test for a bug in sscanf on some platforms (e.g. OSX) reported by
+#   Test for non-ANSI behaviour in sscanf on some platforms, reported by
 #   Bill Joye. 
+AC_MSG_CHECKING([whether the sscanf function is ANSI-compatible])
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 
 #include <stdio.h>
@@ -92,9 +93,9 @@ int main() {
 }
 
 ]])],[
-   AC_DEFINE([OSX_SCANF_BUG],[1],[The sscanf shows the OSX bug reported by Bill Joye])
-],,[
-   AC_DEFINE([OSX_SCANF_BUG],[1],[The sscanf may have the OSX bug reported by Bill Joye])
+   AC_MSG_RESULT([no]);AC_DEFINE([HAVE_NONANSI_SSCANF],[1],[The sscanf shows the non-ANSI behaviour reported by Bill Joye])
+],[AC_MSG_RESULT([yes])],[
+   AC_DEFINE([HAVE_NONANSI_SSCANF],[1],[The sscanf may show the non-ANSI behaviour reported by Bill Joye])
 ])
 
 #   Declare the documentation.  We need to do complicated things to
