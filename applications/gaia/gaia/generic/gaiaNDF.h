@@ -110,6 +110,10 @@ extern "C" {
     /* Get the NDF WCS component as an AST frameset */
     int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess );
 
+    /* Get a frameset for a specified axis */
+    int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs, 
+                              char **error_mess );
+
 #ifdef __cplusplus
 }
 #endif
