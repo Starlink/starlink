@@ -214,6 +214,6 @@ void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
 void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, int, int, int, int *[3] );
 
-void clumps();
-void cupidhelp();
-void makeclumps();
+void clumps( void );
+void cupidhelp( void );
+void makeclumps( void );
