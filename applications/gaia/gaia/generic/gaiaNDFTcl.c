@@ -160,37 +160,58 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Return the address of the NDF WCS component. This is an AST FrameSet.
+ * 
+ * Can return a WCS for a specific axis using option second argument.
  */
 static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
 {
+    AstFrameSet *iwcs;
     Tcl_Obj *resultObj;
     char *error_mess;
+    int axis;
     int indf;
     int result;
-    AstFrameSet *iwcs;
 
-    /* Check arguments, only allow one, the ndf identifier */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, objc, objv, "ndf_identifier" );
+    /* Check arguments, only allow one or two, the ndf identifier and an axis
+     * number */
+    if ( objc != 2 && objc != 3 ) {
+        Tcl_WrongNumArgs( interp, objc, objv, "ndf_identifier [axis]" );
         return TCL_ERROR;
     }
 
     /* Get the identifier */
     resultObj = Tcl_GetObjResult( interp );
-    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) == TCL_OK ) {
-        result = gaiaSimpleWCSNDF( indf, &iwcs, &error_mess );
-        if ( result == TCL_OK ) {
-            Tcl_SetLongObj( resultObj, (long) iwcs );
-        }
-        else {
-            Tcl_SetStringObj( resultObj, error_mess, -1 );
-            free( error_mess );
+    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) != TCL_OK ) {
+        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
+        return TCL_ERROR;
+    }
+
+    /* Get the axis */
+    axis = -1;
+    if ( objc == 3 ) {
+        if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
+            Tcl_SetStringObj( resultObj, "not an integer" , -1 );
+            return TCL_ERROR;
         }
     }
+
+    if ( axis == -1 ) {
+        /* Full WCS */
+        result = gaiaSimpleWCSNDF( indf, &iwcs, &error_mess );
+    }
     else {
-        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
-        result = TCL_ERROR;
+        /* WCS for one axis */
+        result = gaiaSimpleAxisWCSNDF( indf, axis, &iwcs, &error_mess );
+    }
+
+    /* Export the WCS as a long containing the address */
+    if ( result == TCL_OK ) {
+        Tcl_SetLongObj( resultObj, (long) iwcs );
+    }
+    else {
+        Tcl_SetStringObj( resultObj, error_mess, -1 );
+        free( error_mess );
     }
     return result;
 }

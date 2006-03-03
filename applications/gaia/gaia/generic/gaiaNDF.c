@@ -1272,7 +1272,7 @@ int gaiaSimpleCloseNDF( int *ndfid )
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
-int gaiaSimpleMapNDF( int ndfid, char *type, const char* component, 
+int gaiaSimpleMapNDF( int ndfid, char *type, const char* component,
                       void **data, int *el, char **error_mess )
 {
    int status = SAI__OK;
@@ -1317,9 +1317,78 @@ int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
 }
 
 /**
+ * Get an AST frameset that describes the coordinates of a given axis.
+ * Axes are in the AST sense, i.e. start at 1.
+ */
+int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs,
+                          char **error_mess )
+{
+   AstFrame *tmpframe;
+   AstFrameSet *fullwcs;
+   AstMapping *joined;
+   int iaxes[1];
+   int nin;
+   int nout;
+   int status = SAI__OK;
+
+   astBegin;
+   if ( gaiaSimpleWCSNDF( ndfid, &fullwcs, error_mess ) == 1 ) {
+       astEnd;
+       return 1;
+   }
+
+   /* Determine the current number of input and output axes and
+    * take a copy of the full frameset. */
+   nin = astGetI( fullwcs, "Nin" );
+   nout = astGetI( fullwcs, "Nout" );
+   *iwcs = astCopy( fullwcs );
+
+   /* The requested axis must be valid, if not we adopt the
+    * default of axis 1. */
+   iaxes[0] = axis;
+   if ( iaxes[0] > nin ) {
+       iaxes[0] = 1;
+   }
+   else if ( iaxes[0] < 1 ) {
+       iaxes[0] = 1;
+   }
+
+   /* If base frame has more than one axis then select the given
+    * one.  This is easy, just pick a frame with the appropriate
+    * axes and put it back, note that we have to pick the current
+    * frame, so swap things around a little. */
+   if ( nin != 1 ) {
+       astInvert( *iwcs );
+       joined = NULL;
+       tmpframe = astPickAxes( *iwcs, 1, iaxes, &joined );
+       astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
+       astInvert( *iwcs );
+   }
+
+   /* Select an axis in the current frame and tack this onto the
+    * end. Same procedure as above, just no inversion. */
+   if ( nout != 1 ) {
+       joined = NULL;
+       tmpframe = astPickAxes( *iwcs, 1, iaxes, &joined );
+       astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
+   }
+
+   /* Export the WCS and report if any errors occurred. */
+   astExport( *iwcs );
+   astEnd;
+   if ( ! astOK ) {
+       *error_mess = strdup( "Failed to extract AST frameset for an axis" );
+       astClearStatus;
+       return 1;
+   }
+   return 0;
+}
+
+
+/**
  * Query the bounds of an NDF.
  */
-int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
+int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
                            int *ndim, char **error_mess )
 {
     int status = SAI__OK;
@@ -1337,7 +1406,7 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
 
 /**
  * Query the equivalent world coordinate of a pixel coordinate along the
- * given axis. 
+ * given axis.
  *
  * Returns a formatted value pointed at by *coord that has the value (trailed
  * by the axis units and label if requested). The position along the axis is
@@ -1348,7 +1417,7 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
  * the NDF axes and the world coordinates may not be straight-forward. Note
  * that the value returned by the coord argument should be immediately copied.
  */
-int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed, 
+int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
                           int ncoords, char **coord, char **error_mess )
 {
     AstFrameSet *frameSet = NULL;
@@ -1425,7 +1494,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     if ( ! astOK ) {
         astClearStatus;
         *coord = NULL;
-        *error_mess = 
+        *error_mess =
             strdup( "Failed to convert pixel index to world coordinate" );
         astSetI( frameSet, "Base", base );
         frameSet = (AstFrameSet *) astAnnul( frameSet );
