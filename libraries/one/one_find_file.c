@@ -285,6 +285,7 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    int i;                /* Loop couint */
    const char *f;        /* Pointer to next FileSpec character */
    char *c;              /* Pointer to next Command character */
+   int got_nonspace;     /* Has a non-blank character been found yet? */
    int nspace;           /* Number of embedded spaces in the FileSpec */   
 
    /*  Start off by checking for good status  */
@@ -376,11 +377,17 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 		}
       
                 /* Append the file spec to the command, putting an escape
-                   character in front of every embedded space. 
+                   character in front of every embedded space. Ignore leading
+                   white space.
                 */
                 f = FileSpec;
+                got_nonspace = 0;
                 for( i = 0; i < SpecLength; i++ ) {
-                   if( *f == ' ' ) *(c++) = '\\';
+                   if( *f == ' ' ) {
+                      if( got_nonspace ) *(c++) = '\\';
+                   } else {
+                      got_nonspace = 1;
+                   }
                    *(c++) = *(f++);
                 }                
                 *(c++) = '\0';
