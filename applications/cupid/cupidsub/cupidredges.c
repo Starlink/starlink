@@ -102,7 +102,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
    significant. */
    deltav = GRADSTEP*flatslope;
 
-/* Note half the minimum peak ewidth. */
+/* Note half the minimum peak width. */
    hminpix = minpix/2;
 
 /* Enter a loop in which we look for a new peak in the 1D data line. */
@@ -151,7 +151,6 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 /* If this pixel has been included in an adjacent peak, we have reached
    the edge of the current peak. */
          if( dpos[ i ] == -1 ) {
-            i++;
             up_ok = 1;
             break;
          }
@@ -176,7 +175,7 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
                minpos = i;
                vlim = v + 2*rms;
 
-/* Otherwise, if this value is more than the 2*RMS noise higher than the 
+/* Otherwise, if this value is more than 2*RMS noise higher than the 
    lowest value found so far, we assume that the lowest value found so far 
    is the minimum point in the profile. */
             } else if( v > vlim ){
@@ -186,7 +185,8 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 
 /* Otherwise, if the lowest pixel has not changed for the past GRADSTEP 
    pixels, assume we have reached the flat bit of the profile, so long as
-   we have also had a steep bit. */
+   we have also had a steep bit (i.e. distinguish between the flat bit at 
+   the top of a peak and the flat background surrounding the peak). */
             } else if( i - minpos > GRADSTEP && hslok ) {
                i = minpos + 1;
                up_ok = 1;
@@ -227,7 +227,6 @@ void cupidREdges( int nel, double *dval, int *dpos, int *mask, int minpix,
 /* If this pixel has been included in an adjacent peak, we have reached
    the edge of the current peak. */
          if( dpos[ i ] == -1 ) {
-            i--;
             lo_ok = 1;
             break;
          }
