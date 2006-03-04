@@ -271,12 +271,12 @@
             if ( !( systat & STS$M_SUCCESS ) )
             {
                hds_gl_status = DAT__FILMP;
-               ems_seti_c( "START", bloc );
-	       ems_seti_c( "END", bloc + nbloc - 1 );
-	       ems_setc_c( "ACCESS", &mode, 1 );
+               emsSeti( "START", bloc );
+	       emsSeti( "END", bloc + nbloc - 1 );
+	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_MAP_FRAME_1",
+               emsRep( "REC1_MAP_FRAME_1",
 	                  "Error mapping blocks ^START:^END for \'^ACCESS\' \
 access in file ^FILE - ^MESSAGE.",
                           &hds_gl_status );
@@ -311,12 +311,12 @@ access in file ^FILE - ^MESSAGE.",
             {
 	       ems_mark_c( );
                hds_gl_status = DAT__FILMP;
-               ems_seti_c( "START", bloc );
-	       ems_seti_c( "END", bloc + nbloc - 1 );
-	       ems_setc_c( "ACCESS", &mode, 1 );
+               emsSeti( "START", bloc );
+	       emsSeti( "END", bloc + nbloc - 1 );
+	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_MAP_FRAME_2",
+               emsRep( "REC1_MAP_FRAME_2",
 	                  "Error mapping blocks ^START:^END for \'^ACCESS\' \
 access in file ^FILE - ^MESSAGE.",
                           &hds_gl_status );
@@ -353,12 +353,12 @@ access in file ^FILE - ^MESSAGE.",
                   if ( !( systat & STS$M_SUCCESS ) )
                   {
                      hds_gl_status = DAT__FILMP;
-                     ems_seti_c( "START", bloc );
-	             ems_seti_c( "END", bloc + nbloc - 1 );
-	             ems_setc_c( "ACCESS", &mode, 1 );
+                     emsSeti( "START", bloc );
+	             emsSeti( "END", bloc + nbloc - 1 );
+	             emsSetnc( "ACCESS", &mode, 1 );
 	             rec1_fmsg( "FILE", slot );
                      ems_syser_c( "MESSAGE", systat );
-                     ems_rep_c( "REC1_MAP_FRAME_3",
+                     emsRep( "REC1_MAP_FRAME_3",
 	                        "Error mapping blocks ^START:^END for \
 \'^ACCESS\' access in file ^FILE - ^MESSAGE.",
                                 &hds_gl_status );
@@ -403,7 +403,7 @@ access in file ^FILE - ^MESSAGE.",
                      hds_gl_status = DAT__NOMEM;
 	             rec1_fmsg( "FILE", slot );
                      ems_syser_c( "MESSAGE", systat );
-                     ems_rep_c( "REC1_MAP_FRAME_4",
+                     emsRep( "REC1_MAP_FRAME_4",
 	                        "Unable to allocate a \"guard\" page to \
 protect address space while mapping the file ^FILE - ^MESSAGE.",
                                 &hds_gl_status );
@@ -554,9 +554,9 @@ protect address space while mapping the file ^FILE - ^MESSAGE.",
 	 if ( fd == -1 )
 	 {
 	    hds_gl_status = DAT__FILMP;
-	    ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
 	    rec1_fmsg( "FILE", slot );
-	    ems_rep_c( "REC1_MAP_FRAME_5",
+	    emsRep( "REC1_MAP_FRAME_5",
                        "Unable to obtain a file descriptor for mapping the \
 file ^FILE - ^MESSAGE",
 	               &hds_gl_status );
@@ -579,12 +579,12 @@ file ^FILE - ^MESSAGE",
                if ( start == (unsigned char *) -1 )
                {
                   hds_gl_status = DAT__FILMP;
-                  ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
-                  ems_seti_c( "FIRST", offs + 1 );
-                  ems_seti_c( "LAST", offs + length );
-                  ems_setc_c( "ACCESS", &mode, 1 );
+                  emsSyser( "MESSAGE", errno );
+                  dat1emsSetBigi( "FIRST", offs + 1 );
+                  dat1emsSetBigi( "LAST", offs + length );
+                  emsSetnc( "ACCESS", &mode, 1 );
                   rec1_fmsg( "FILE", slot );
-                  ems_rep_c( "REC1_MAP_FRAME_6",
+                  emsRep( "REC1_MAP_FRAME_6",
                              "Error mapping bytes ^FIRST:^LAST for "
                              "\'^ACCESS\' access in file ^FILE - ^MESSAGE",
                              &hds_gl_status );
@@ -611,9 +611,9 @@ file ^FILE - ^MESSAGE",
                      if ( munmap( start, len ) )
                      {
                         hds_gl_status = DAT__FILMP;
-                        ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+                        emsSyser( "MESSAGE", errno );
                         rec1_fmsg( "FILE", slot );
-                        ems_rep_c( "REC1_MAP_FRAME_7",
+                        emsRep( "REC1_MAP_FRAME_7",
                                    "Error unmapping data in the file ^FILE - "
                                    "^MESSAGE", &hds_gl_status );
                         break;
@@ -627,9 +627,9 @@ file ^FILE - ^MESSAGE",
                   else if ( !reg )
                   {
                      hds_gl_status = DAT__FILMP;
-                     ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+                     emsSyser( "MESSAGE", errno );
                      rec1_fmsg( "FILE", slot );
-                     ems_rep_c( "REC1_MAP_FRAME_8",
+                     emsRep( "REC1_MAP_FRAME_8",
                                 "Error registering a pointer for mapped data "
                                 "in the file ^FILE - ^MESSAGE",
                                 &hds_gl_status );
@@ -677,9 +677,9 @@ file ^FILE - ^MESSAGE",
 
 /* Seek to this file offset and read the values into the allocated memory.  */
 #if HAVE_FSEEKO
-	       if ( (readok = !fseeko( iochan, offs, SEEK_SET )) );
+	       if ( (readok = !fseeko( iochan, offs, SEEK_SET )) )
 #else
-	       if ( (readok = !fseek( iochan, offs, SEEK_SET )) );
+	       if ( (readok = !fseek( iochan, offs, SEEK_SET )) )
 #endif
                {
                   fread( (void *) *pntr, 1, length, iochan );
@@ -699,11 +699,11 @@ file ^FILE - ^MESSAGE",
 	       if ( !readok )
 	       {
 	          hds_gl_status = DAT__FILRD;
-	          ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
-	          ems_seti_c( "FIRST", offs + 1 );
-	          ems_seti_c( "LAST", offs + length );
+                  emsSyser( "MESSAGE", errno );
+	          dat1emsSetBigi( "FIRST", offs + 1 );
+	          dat1emsSetBigi( "LAST", offs + length );
 	          rec1_fmsg( "FILE", slot );
-	          ems_rep_c( "REC1_MAP_FRAME_10",
+	          emsRep( "REC1_MAP_FRAME_10",
 		             "Error reading bytes ^FIRST:^LAST from file \
 ^FILE - ^MESSAGE",
 			     &hds_gl_status );
