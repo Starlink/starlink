@@ -102,7 +102,7 @@ void rec1_get_fid( void ){};     /* This routine is not used on VMS systems */
          hds_gl_status = DAT__FILNF;
          emsSyser( "MESSAGE", errno );
          emsSetnc( "FILE", fns, EMS__SZMSG );
-         ems_rep_c( "REC1_GET_FID_1",
+         emsRep( "REC1_GET_FID_1",
                     "Error accessing file \'^FILE\' - ^MESSAGE",
                     &hds_gl_status );
       }
@@ -136,7 +136,7 @@ void rec1_get_fid( void ){};     /* This routine is not used on VMS systems */
          hds_gl_status = DAT__FILIN;
          emsSetnc( "FILE", fns, EMS__SZTOK );
          emsSetnc( "MESSAGE", msg, EMS__SZTOK );
-         ems_rep_c( "REC1_GET_FID_2",
+         emsRep( "REC1_GET_FID_2",
                     "Error accessing file ^FILE - ^MESSAGE.",
                     &hds_gl_status );
       }

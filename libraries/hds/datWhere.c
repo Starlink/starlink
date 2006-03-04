@@ -110,7 +110,7 @@ datWhere(HDSLoc *locator,
       if ( data->struc )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "DAT_WHERE_1",
+         emsRep( "DAT_WHERE_1",
                     "Object is not primitive; position in container file \
 is not defined (possible programming error).",
                     &hds_gl_status );
@@ -132,7 +132,7 @@ is not defined (possible programming error).",
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "DAT_WHERE_ERR",
+      emsRep( "DAT_WHERE_ERR",
                  "DAT_WHERE: Error finding the position of primitive data \
 in an HDS container file.",
                  &hds_gl_status );

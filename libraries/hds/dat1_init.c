@@ -112,7 +112,7 @@
                {
                   hds_gl_status = DAT__FATAL;
                   emsSyser( "MESSAGE", errno );
-                  ems_rep_c( "DAT1_INIT_1",
+                  emsRep( "DAT1_INIT_1",
                              "Error establishing an exit handler for HDS - \
 ^MESSAGE",
                              &hds_gl_status );

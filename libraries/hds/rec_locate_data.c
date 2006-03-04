@@ -121,7 +121,7 @@
             hds_gl_status = DAT__INCHK;
             ems_seti_c( "DLEN", rcl.dlen );
             rec1_fmsg( "FILE", han->slot );
-            ems_rep_c( "REC_LOCATE_DATA_1",
+            emsRep( "REC_LOCATE_DATA_1",
                        "Requested data extends beyond the end of the record; \
 record length is ^DLEN bytes (possible corrupt HDS container file ^FILE).",
                        &hds_gl_status );
@@ -136,7 +136,7 @@ record length is ^DLEN bytes (possible corrupt HDS container file ^FILE).",
          if ( modify && rcl.modify )
          {
             hds_gl_status = DAT__ACCON;
-            ems_rep_c( "REC_LOCATE_DATA_2",
+            emsRep( "REC_LOCATE_DATA_2",
                        "Attempt to modify an object which is already being \
 modified (possible programming error).",
                        &hds_gl_status );

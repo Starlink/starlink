@@ -240,7 +240,7 @@ hdsTune(const char *param_str,
       {
          hds_gl_status = DAT__NAMIN;
          emsSetnc( "PARAM", (char *) param.body, param.length );
-         ems_rep_c( "HDS_TUNE_1",
+         emsRep( "HDS_TUNE_1",
                     "Unknown tuning parameter name \'^PARAM\' specified \
 (possible programming error).",
                     &hds_gl_status );
@@ -250,7 +250,7 @@ hdsTune(const char *param_str,
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "HDS_TUNE_ERR",
+      emsRep( "HDS_TUNE_ERR",
                  "HDS_TUNE: Error setting a new value for an HDS tuning \
 parameter.",
                  &hds_gl_status );

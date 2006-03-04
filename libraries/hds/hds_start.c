@@ -73,7 +73,7 @@ F77_SUBROUTINE(hds_start)( F77_INTEGER_TYPE(*status) )
 /* If an error occurred, then report contextual information */
       if ( !_ok( hds_gl_status ) )
       {
-         ems_rep_c( "HDS_START_ERR",
+         emsRep( "HDS_START_ERR",
                     "HDS_START: Error activating the Hierarchical Data System \
                      (HDS).",&hds_gl_status );
       }

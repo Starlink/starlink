@@ -114,7 +114,7 @@ hdsStop( int *status)
 /* If an error occurred, then report contextual information.                */
       if ( !_ok( hds_gl_status ) )
       {
-         ems_rep_c( "HDS_STOP_ERR",
+         emsRep( "HDS_STOP_ERR",
                     "HDS_STOP: Error deactivating the Hierarchical Data \
 System (HDS).",
                     &hds_gl_status );

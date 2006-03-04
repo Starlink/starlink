@@ -78,7 +78,7 @@ F77_SUBROUTINE(hds_run)( SUBROUTINE(subroutine),
 /* If an error occurred, then report contextual information.  */
       if ( !_ok( *status ) )
       {
-         ems_rep_c( "HDS_RUN_ERR",
+         emsRep( "HDS_RUN_ERR",
                    "HDS_RUN: Error running an HDS application subroutine.",
                     status );
       }

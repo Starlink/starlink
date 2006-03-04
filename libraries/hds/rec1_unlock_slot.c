@@ -199,7 +199,7 @@
             hds_gl_status = DAT__FILWR;
             rec1_fmsg( "FILE", slot );
             emsSyser( "MESSAGE", errno );
-            ems_rep_c( "REC1_UNLOCK_SLOT_1",
+            emsRep( "REC1_UNLOCK_SLOT_1",
                        "Unable to flush written data to the file ^FILE - \
 ^MESSAGE",
                        &hds_gl_status );
@@ -233,7 +233,7 @@
                hds_gl_status = DAT__FILCK;
                rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_UNLOCK_SLOT_2",
+               emsRep( "REC1_UNLOCK_SLOT_2",
                           "Unable to unlock the file ^FILE - ^MESSAGE.",
                           &hds_gl_status );
             }
@@ -257,7 +257,7 @@
                hds_gl_status = DAT__FILCK;
                emsSyser( "MESSAGE", errno );
                rec1_fmsg( "FILE", slot );
-               ems_rep_c( "REC1_UNLOCK_SLOT_3",
+               emsRep( "REC1_UNLOCK_SLOT_3",
                           "Unable to obtain a file descriptor for unlocking \
 the file ^FILE - ^MESSAGE",
                           &hds_gl_status );
@@ -269,7 +269,7 @@ the file ^FILE - ^MESSAGE",
                hds_gl_status = DAT__FILCK;
                emsSyser( "MESSAGE", errno );
                rec1_fmsg( "FILE", slot );
-               ems_rep_c( "REC1_UNLOCK_SLOT_4",
+               emsRep( "REC1_UNLOCK_SLOT_4",
                           "Unable to unlock the file ^FILE - ^MESSAGE",
                           &hds_gl_status );
             }

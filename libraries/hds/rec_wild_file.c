@@ -249,7 +249,7 @@
          {
             hds_gl_status = DAT__WLDIN;
             ems_seti_c( "IWLD", (INT) *context );
-            ems_rep_c( "REC_WILD_FILE_1",
+            emsRep( "REC_WILD_FILE_1",
                        "Wild-card search context identifier is invalid; value \
 is ^IWLD (possible programming error).",
                        &hds_gl_status );
@@ -278,7 +278,7 @@ is ^IWLD (possible programming error).",
          if ( start == fspec_len )
          {
             hds_gl_status = DAT__FILNF;
-            ems_rep_c( "REC_WILD_FILE_2",
+            emsRep( "REC_WILD_FILE_2",
                        "Invalid blank file specification given.",
                        &hds_gl_status );
          }
@@ -408,7 +408,7 @@ is ^IWLD (possible programming error).",
                   {
                      hds_gl_status = DAT__FILNF;
                      emsSetnc( "FSPEC", fspec + start, fspec_len - start );
-                     ems_rep_c( "REC_WILD_FILE_3",
+                     emsRep( "REC_WILD_FILE_3",
                                 "No files found matching the file \
 specification \'^FSPEC\'.",
                                 &hds_gl_status );
@@ -422,7 +422,7 @@ specification \'^FSPEC\'.",
                   hds_gl_status = DAT__FILNF;
                   emsSetnc( "FSPEC", fspec + start, fspec_len - start );
                   ems_syser_c( "MESSAGE", systat );
-                  ems_rep_c( "REC_WILD_FILE_4",
+                  emsRep( "REC_WILD_FILE_4",
                              "Error searching for files matching the file \
 specification \'^FSPEC\' - ^MESSAGE.",
                              &hds_gl_status );
@@ -438,7 +438,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
             {
                hds_gl_status = DAT__FATAL;
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC_WILD_FILE_5",
+               emsRep( "REC_WILD_FILE_5",
                           "Error ending a VMS wild-card file search context - \
 ^MESSAGE (internal programming error).",
                           &hds_gl_status );
@@ -480,7 +480,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
                      {
                         hds_gl_status = DAT__FATAL;
                         emsSyser( "MESSAGE", errno );
-                        ems_rep_c( "REC_WILD_FILE_6",
+                        emsRep( "REC_WILD_FILE_6",
                                    "Error reading file names from stream \
 connected to shell process - ^MESSAGE",
                                    &hds_gl_status );
@@ -539,7 +539,7 @@ connected to shell process - ^MESSAGE",
                            hds_gl_status = DAT__FILNF;
                            emsSetnc( "FSPEC", fspec + start,
                                        fspec_len - start );
-                           ems_rep_c( "REC_WILD_FILE_7",
+                           emsRep( "REC_WILD_FILE_7",
                                       "No files found matching the file \
 specification \'^FSPEC\'.",
                                       &hds_gl_status );
@@ -628,7 +628,7 @@ specification \'^FSPEC\'.",
                {
                   hds_gl_status = DAT__FATAL;
                   emsSyser( "MESSAGE", errno );
-                  ems_rep_c( "REC_WILD_FILE_8",
+                  emsRep( "REC_WILD_FILE_8",
                              "Error closing stream used to read file names \
 from a shell process - ^MESSAGE",
                              &hds_gl_status );

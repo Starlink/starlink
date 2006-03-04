@@ -171,7 +171,7 @@
          ems_seti_c( "SIZE", size * REC__SZBLK );
          ems_syser_c( "MESSAGE", systat );
          ems_seti_c( "STV", fab.fab$l_stv );
-         ems_rep_c( "REC1_EXTEND_FILE_1",
+         emsRep( "REC1_EXTEND_FILE_1",
                     "Unable to open the file ^FILE for extension to a size of \
 ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
                     &hds_gl_status );
@@ -201,7 +201,7 @@
             ems_seti_c( "SIZE", size * REC__SZBLK );
             ems_syser_c( "MESSAGE", systat );
             ems_seti_c( "STV", fab.fab$l_stv );
-            ems_rep_c( "REC1_EXTEND_FILE_2",
+            emsRep( "REC1_EXTEND_FILE_2",
                        "Unable to extend the file ^FILE to a size of ^BLOCKS \
 blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
                        &hds_gl_status );
@@ -238,7 +238,7 @@ blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
             ems_seti_c( "SIZE", size * REC__SZBLK );
             ems_syser_c( "MESSAGE", systat );
             ems_seti_c( "STV", rab.rab$l_stv );
-            ems_rep_c( "REC1_EXTEND_FILE_3",
+            emsRep( "REC1_EXTEND_FILE_3",
                        "Unable to attach a record stream to the file ^FILE to \
 adjust the EOF position after extending to a size of ^BLOCKS blocks (^SIZE \
 bytes) - ^MESSAGE (RAB status = ^STV).",
@@ -259,7 +259,7 @@ bytes) - ^MESSAGE (RAB status = ^STV).",
             ems_seti_c( "SIZE", size * REC__SZBLK );
             ems_syser_c( "MESSAGE", systat );
             ems_seti_c( "STV", rab.rab$l_stv );
-            ems_rep_c( "REC1_EXTEND_FILE_4",
+            emsRep( "REC1_EXTEND_FILE_4",
                        "Failed to write to the file ^FILE to adjust the EOF \
 position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
 (RAB status = ^STV).",
@@ -287,7 +287,7 @@ position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
             ems_seti_c( "SIZE", size * REC__SZBLK );
             ems_syser_c( "MESSAGE", systat );
             ems_seti_c( "STV", fab.fab$l_stv );
-            ems_rep_c( "REC1_EXTEND_FILE_5",
+            emsRep( "REC1_EXTEND_FILE_5",
                        "Failed to close the file ^FILE after adjusting the EOF \
 to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
                        &hds_gl_status );
@@ -364,7 +364,7 @@ to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
          rec1_fmsg( "FILE", slot );
          ems_seti_c( "BLOCKS", size );
          ems_seti_c( "SIZE", size * REC__SZBLK );
-         ems_rep_c( "REC1_EXTEND_FILE_6",
+         emsRep( "REC1_EXTEND_FILE_6",
                     "Unable to extend the file ^FILE to a size of ^BLOCKS \
 blocks (^SIZE bytes) - ^MESSAGE",
                     &hds_gl_status );

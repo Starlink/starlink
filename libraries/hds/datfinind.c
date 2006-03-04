@@ -72,7 +72,7 @@ datFind( const HDSLoc *locator1,
          if ( ( !data1->struc ) || ( data1->naxes != 0 ) )
          {
             hds_gl_status = DAT__OBJIN;
-           ems_rep_c( "DAT_FIND_1",
+           emsRep( "DAT_FIND_1",
                       "Input object is not a scalar structure.",
                       &hds_gl_status );
          }
@@ -97,7 +97,7 @@ datFind( const HDSLoc *locator1,
             {
                hds_gl_status = DAT__OBJNF;
                emsSetnc( "NAME", nambuf, DAT__SZNAM );
-               ems_rep_c( "DAT_FIND_2",
+               emsRep( "DAT_FIND_2",
                           "Object \'^NAME\' not found.",
                           &hds_gl_status );
             }
@@ -140,7 +140,7 @@ datFind( const HDSLoc *locator1,
             {
                hds_gl_status = DAT__OBJNF;
                emsSetnc( "NAME", nambuf, DAT__SZNAM );
-               ems_rep_c( "DAT_FIND_3",
+               emsRep( "DAT_FIND_3",
                           "Object \'^NAME\' not found.",
                           &hds_gl_status );
             }
@@ -208,7 +208,7 @@ datFind( const HDSLoc *locator1,
 /* If an error occurred, then report contextual information.        */
       if ( !_ok( hds_gl_status ) )
       {
-         ems_rep_c( "DAT_FIND_ERR",
+         emsRep( "DAT_FIND_ERR",
                     "DAT_FIND: Error finding a named component in an \
 HDS structure.",
                     &hds_gl_status );

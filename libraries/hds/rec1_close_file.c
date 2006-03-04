@@ -136,7 +136,7 @@ int fsync ( int );
             rec1_fmsg( "FILE", slot );
             ems_seti_c( "IOCHAN", iochan );
             ems_syser_c( "MESSAGE", systat );
-            ems_rep_c( "REC1_CLOSE_FILE_1",
+            emsRep( "REC1_CLOSE_FILE_1",
                        "Unable to close file ^FILE on I/O channel ^IOCHAN - \
 ^MESSAGE.",
                        &hds_gl_status );
@@ -166,7 +166,7 @@ int fsync ( int );
             hds_gl_status = DAT__FILCL;
             emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
-            ems_rep_c( "REC1_CLOSE_FILE_2",
+            emsRep( "REC1_CLOSE_FILE_2",
                        "Unable to close file ^FILE - ^MESSAGE",
                        &hds_gl_status );
          }

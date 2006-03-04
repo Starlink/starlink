@@ -293,7 +293,7 @@ void rec1_find_file( void ){};	 /* This routine not used on VMS systems */
 	 {
 	    hds_gl_status = DAT__FATAL;
 	    ems_seti_c( "SHELL", hds_gl_shell );
-	    ems_rep_c( "REC_FIND_FILE_1",
+	    emsRep( "REC_FIND_FILE_1",
 	               "Invalid UNIX shell (no. ^SHELL) specified; this shell \
 is not properly supported within HDS (internal programming error).",
 		       &hds_gl_status );
@@ -309,7 +309,7 @@ is not properly supported within HDS (internal programming error).",
 	    {
 	       hds_gl_status = DAT__FATAL;
                emsSyser( "MESSAGE", errno );
-	       ems_rep_c( "REC_FIND_FILE_2",
+	       emsRep( "REC_FIND_FILE_2",
 	                  "Error sending commands to a shell process to \
 perform a wild-card file search - ^MESSAGE",
 		          &hds_gl_status );
@@ -324,7 +324,7 @@ perform a wild-card file search - ^MESSAGE",
 	 {
 	    hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
-	    ems_rep_c( "REC_FIND_FILE_3",
+	    emsRep( "REC_FIND_FILE_3",
 	               "Error closing stream used for sending commands to a \
 shell process - ^MESSAGE",
 		       &hds_gl_status );

@@ -145,7 +145,7 @@
             hds_gl_status = DAT__FILCK;
             rec1_fmsg( "FILE", slot );
             ems_syser_c( "MESSAGE", systat );
-            ems_rep_c( "REC1_LOCK_SLOT_1",
+            emsRep( "REC1_LOCK_SLOT_1",
                        "Unable to lock the file ^FILE for exclusive write \
 access - ^MESSAGE.",
                        &hds_gl_status );
@@ -177,7 +177,7 @@ access - ^MESSAGE.",
             hds_gl_status = DAT__FILCK;
             emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
-            ems_rep_c( "REC1_LOCK_SLOT_2",
+            emsRep( "REC1_LOCK_SLOT_2",
                        "Unable to obtain a file descriptor for locking the \
 file ^FILE - ^MESSAGE",
                        &hds_gl_status );
@@ -190,7 +190,7 @@ file ^FILE - ^MESSAGE",
             hds_gl_status = DAT__FILCK;
             emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
-            ems_rep_c( "REC1_LOCK_SLOT_3",
+            emsRep( "REC1_LOCK_SLOT_3",
                        "Unable to lock the file ^FILE for exclusive write \
 access - ^MESSAGE",
                        &hds_gl_status );

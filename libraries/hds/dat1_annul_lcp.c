@@ -79,7 +79,7 @@
       if ( *lcp == NULL )
       {
          hds_gl_status = DAT__FATAL;
-         ems_rep_c( "DAT1_ANNUL_LCP_1",
+         emsRep( "DAT1_ANNUL_LCP_1",
                     "Routine DAT1_ANNUL_LCP called with an invalid null LCP \
 pointer (internal programming error).",
                     &hds_gl_status );

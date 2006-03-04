@@ -213,7 +213,7 @@
                hds_gl_status = DAT__FILMP;
 	       rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_UNMAP_FRAME_1",
+               emsRep( "REC1_UNMAP_FRAME_1",
 	                  "Error unmapping blocks in the file ^FILE - \
 ^MESSAGE.",
                           &hds_gl_status );
@@ -333,7 +333,7 @@
 	       hds_gl_status = DAT__FILMP;
 	       emsSyser( "MESSAGE", errno );
 	       rec1_fmsg( "FILE", slot );
-	       ems_rep_c( "REC1_UNMAP_FRAME_2",
+	       emsRep( "REC1_UNMAP_FRAME_2",
 	                  "Error unmapping data in the file ^FILE - ^MESSAGE",
 		          &hds_gl_status );
 	    }
@@ -382,7 +382,7 @@
 	          ems_seti_c( "FIRST", offs + 1 );
 	          ems_seti_c( "LAST", offs + length );
 	          rec1_fmsg( "FILE", slot );
-	          ems_rep_c( "REC1_UNMAP_FRAME_3",
+	          emsRep( "REC1_UNMAP_FRAME_3",
 	                     "Error writing bytes ^FIRST:^LAST to file ^FILE - \
 ^MESSAGE",
 		             &hds_gl_status );

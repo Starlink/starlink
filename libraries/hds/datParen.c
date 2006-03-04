@@ -145,7 +145,7 @@ datParen(HDSLoc *locator1,
          if ( data1->level == 0 )
          {
             hds_gl_status = DAT__OBJIN;
-            ems_rep_c( "DAT_PAREN_1",
+            emsRep( "DAT_PAREN_1",
                        "Object is a top-level object and has no parent \
 structure (possible programming error).",
                        &hds_gl_status );
@@ -288,7 +288,7 @@ structure (possible programming error).",
 /* If an error occurred, then report contextual information.                */
       if ( !_ok( hds_gl_status ) )
       {
-         ems_rep_c( "DAT_PAREN_ERR",
+         emsRep( "DAT_PAREN_ERR",
                     "DAT_PAREN: Error locating the parent structure of an \
 HDS object.",
                     &hds_gl_status );

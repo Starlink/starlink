@@ -151,7 +151,7 @@ datCopy(const HDSLoc * locator1,
       if ( state1->slice )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "DAT_COPY_1",
+         emsRep( "DAT_COPY_1",
                     "Input object is an array slice and cannot be copied \
 (possible programming error).",
                     &hds_gl_status );
@@ -159,7 +159,7 @@ datCopy(const HDSLoc * locator1,
       else if ( state1->cell )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "DAT_COPY_2",
+         emsRep( "DAT_COPY_2",
                     "Input object is an array cell and cannot be copied \
 (possible programming error).",
                     &hds_gl_status );
@@ -185,7 +185,7 @@ datCopy(const HDSLoc * locator1,
          if ( !data2->struc )
          {
             hds_gl_status = DAT__OBJIN;
-            ems_rep_c( "DAT_COPY_3",
+            emsRep( "DAT_COPY_3",
                        "Output object is not a structure (possible \
 programming error).",
                        &hds_gl_status );
@@ -193,7 +193,7 @@ programming error).",
          else if ( data2->naxes != 0 )
          {
             hds_gl_status = DAT__OBJIN;
-            ems_rep_c( "DAT_COPY_4",
+            emsRep( "DAT_COPY_4",
                        "Output object is not scalar (possible programming \
 error).",
                        &hds_gl_status );
@@ -301,7 +301,7 @@ error).",
             {
                hds_gl_status = DAT__COMEX;
                emsSetnc( "NAME", (char *) name.body, name.length );
-               ems_rep_c( "DAT_COPY_5",
+               emsRep( "DAT_COPY_5",
                           "A component called \'^NAME\' already exists in \
 the output structure (possible programming error).",
                           &hds_gl_status );
@@ -340,7 +340,7 @@ the output structure (possible programming error).",
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "DAT_COPY_ERR",
+      emsRep( "DAT_COPY_ERR",
                  "DAT_COPY: Error copying an HDS object to a new structure \
 component.",
                  &hds_gl_status );

@@ -116,7 +116,7 @@
       {
          *status = DAT__MODIN;
          emsSetnc( "MODE", mode, mode_len );
-         ems_rep_c( "DAT1_CHECK_MODE_1",
+         emsRep( "DAT1_CHECK_MODE_1",
                     "Invalid access mode \'^MODE\' specified (possible \
 programming error).", status);
       }

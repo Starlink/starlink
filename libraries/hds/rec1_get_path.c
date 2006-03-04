@@ -188,7 +188,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
       if ( start == fname_len )
       {
          hds_gl_status = DAT__FILNF;
-         ems_rep_c( "REC_GET_PATH_1",
+         emsRep( "REC_GET_PATH_1",
                     "Invalid blank file name given.",
                     &hds_gl_status );
       }
@@ -286,7 +286,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
                {
                   hds_gl_status = DAT__FATAL;
                   emsSyser( "MESSAGE", errno );
-                  ems_rep_c( "REC_GET_PATH_2",
+                  emsRep( "REC_GET_PATH_2",
                              "Error reading file names from stream attached \
 to shell process - ^MESSAGE",
                              &hds_gl_status );
@@ -325,7 +325,7 @@ to shell process - ^MESSAGE",
             {
                hds_gl_status = DAT__FILNF;
                emsSetnc( "FILE", fname + start, fname_len - start );
-               ems_rep_c( "REC_GET_PATH_3",
+               emsRep( "REC_GET_PATH_3",
                           "No files found matching the file specification \
 \'^FILE\'.",
                           &hds_gl_status );
@@ -339,7 +339,7 @@ to shell process - ^MESSAGE",
             {
                hds_gl_status = DAT__FATAL;
                emsSyser( "MESSAGE", errno );
-               ems_rep_c( "REC_GET_PATH_4",
+               emsRep( "REC_GET_PATH_4",
                           "Error closing stream used to read file names from \
 a shell process - ^MESSAGE",
                           &hds_gl_status );

@@ -48,7 +48,7 @@ datAnnul(HDSLoc **locator,
 */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( context_name, context_message, &hds_gl_status );
+      emsRep( context_name, context_message, &hds_gl_status );
    }
 /*
    End the error context and return the final status.

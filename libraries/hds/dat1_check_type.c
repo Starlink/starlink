@@ -102,7 +102,7 @@
                hds_gl_status = DAT__TYPIN;
                emsSetnc( "TYPE", txt, type->length );
                ems_seti_c( "SZTYP", DAT__SZTYP );
-               ems_rep_c( "DAU_CHECK_TYPE_1",
+               emsRep( "DAU_CHECK_TYPE_1",
                           "Invalid type string \'^TYPE\' specified; more than \
 ^SZTYP characters long (possible programming error).",
                           &hds_gl_status );
@@ -116,7 +116,7 @@
                emsSetnc( "TYPE", txt, type->length );
                ems_seti_c( "CODE", (int) txt[ i ] );
                ems_seti_c( "POSN", i + 1 );
-               ems_rep_c( "DAU_CHECK_TYPE_2",
+               emsRep( "DAU_CHECK_TYPE_2",
                           "Invalid type string \'^TYPE\' specified; contains \
 illegal character (code=^CODE decimal) at position ^POSN (possible \
 programming error).",
@@ -131,7 +131,7 @@ programming error).",
             {
                hds_gl_status = DAT__TYPIN;
                emsSetnc( "TYPE", txt, type->length );
-               ems_rep_c( "DAU_CHECK_TYPE_3",
+               emsRep( "DAU_CHECK_TYPE_3",
                           "Invalid type string \'^TYPE\' specified; the \'*\' \
 character is not permitted in user-defined HDS types (possible programming \
 error).",
@@ -240,7 +240,7 @@ error).",
                {
                   hds_gl_status = DAT__TYPIN;
                   emsSetnc( "TYPE", txt, type->length );
-                  ems_rep_c( "DAT1_CHECK_TYPE_5",
+                  emsRep( "DAT1_CHECK_TYPE_5",
                              "Invalid length encountered in the character \
 type specification \'^TYPE\'; should be \'_CHAR*n\' (possible programming \
 error).",
@@ -262,7 +262,7 @@ error).",
                      hds_gl_status = DAT__TYPIN;
                      emsSetnc( "TYPE", txt, type->length );
                      ems_seti_c( "MXCHR", DAT__MXCHR );
-                     ems_rep_c( "DAT1_CHECK_TYPE_5",
+                     emsRep( "DAT1_CHECK_TYPE_5",
                                 "Invalid length encountered in the character \
 type specification \'^TYPE\'; should be in the range 1 to ^MXCHR (possible \
 programming error).",
@@ -277,7 +277,7 @@ programming error).",
             {
                hds_gl_status = DAT__TYPIN;
                emsSetnc( "TYPE", txt, type->length );
-               ems_rep_c( "DAT1_CHECK_TYPE_6",
+               emsRep( "DAT1_CHECK_TYPE_6",
                           "Invalid primitive data type \'^TYPE\' specified \
 (possible programming error).",
                           &hds_gl_status );

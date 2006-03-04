@@ -100,7 +100,7 @@
             hds_gl_status = DAT__INCHK;
             ems_seti_c( "DLEN", rcl.dlen );
             rec1_fmsg( "FILE", han->slot );
-            ems_rep_c( "REC_WHERE_1",
+            emsRep( "REC_WHERE_1",
                        "Requested data extends beyond the end of the record; \
 record length is ^DLEN bytes (possible corrupt HDS container file ^FILE).",
                        &hds_gl_status );

@@ -235,7 +235,7 @@
          hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
          emsSetnc( "FILE", file + start, file_len - start );
          ems_syser_c( "MESSAGE", systat );
-         ems_rep_c( "REC1_OPEN_FILE_1",
+         emsRep( "REC1_OPEN_FILE_1",
                     "Error in file name \'^FILE\' - ^MESSAGE.",
                     &hds_gl_status );
       }
@@ -249,7 +249,7 @@
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
             emsSetnc( "FILE", esabuf, nam.nam$b_esl );
             ems_syser_c( "MESSAGE", systat );
-            ems_rep_c( "REC1_OPEN_FILE_2",
+            emsRep( "REC1_OPEN_FILE_2",
                        "Error searching for file ^FILE - ^MESSAGE.",
                        &hds_gl_status );
          }
@@ -390,7 +390,7 @@
                emsSetnc( "ACCESS", ( mode == 'R' ) ?
                                      "reading" : "writing", EMS__SZTOK );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_OPEN_FILE_3",
+               emsRep( "REC1_OPEN_FILE_3",
                           "Unable to open file ^FILE for ^ACCESS - ^MESSAGE.",
                           &hds_gl_status );
             }
@@ -434,7 +434,7 @@
                emsSetnc( "FILE", fns, EMS__SZTOK );
                emsSetnc( "ACCESS", ( mode == 'R' ) ? "read" : "read/write",
                            EMS__SZTOK );
-               ems_rep_c( "REC1_OPEN_FILE_4",
+               emsRep( "REC1_OPEN_FILE_4",
                           "Error opening file ^FILE for ^ACCESS access - \
 ^MESSAGE",
                           &hds_gl_status );

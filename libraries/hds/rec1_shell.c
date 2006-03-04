@@ -195,7 +195,7 @@ extern char **environ;           /* Pointer to environment array            */
          pipein[ 0 ] = pipein[ 1 ] = -1;
          hds_gl_status = DAT__FATAL;
          emsSyser( "MESSAGE", errno );
-         ems_rep_c( "REC1_SHELL_1",
+         emsRep( "REC1_SHELL_1",
                     "Error creating a pipe for sending commands to a shell "
                     "process - ^MESSAGE", &hds_gl_status );
       }
@@ -209,7 +209,7 @@ extern char **environ;           /* Pointer to environment array            */
             pipeout[ 0 ] = pipeout[ 1 ] = -1;
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
-            ems_rep_c( "REC1_SHELL_2",
+            emsRep( "REC1_SHELL_2",
                        "Error creating a pipe for receiving output from a "
                        "shell process - ^MESSAGE", &hds_gl_status );
          }
@@ -235,7 +235,7 @@ extern char **environ;           /* Pointer to environment array            */
          {
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
-            ems_rep_c( "REC1_SHELL_3",
+            emsRep( "REC1_SHELL_3",
                        "Error creating a child process to execute a shell - "
                        "^MESSAGE", &hds_gl_status );
          }
@@ -423,7 +423,7 @@ extern char **environ;           /* Pointer to environment array            */
       {
          hds_gl_status = DAT__FATAL;
          emsSyser( "MESSAGE", errno );
-         ems_rep_c( "REC1_SHELL_4",
+         emsRep( "REC1_SHELL_4",
                     "Error closing (unused) reading end of input pipe "
                     "after creating a shell process - ^MESSAGE",
                     &hds_gl_status );
@@ -436,7 +436,7 @@ extern char **environ;           /* Pointer to environment array            */
       {
          hds_gl_status = DAT__FATAL;
          emsSyser( "MESSAGE", errno );
-         ems_rep_c( "REC1_SHELL_5",
+         emsRep( "REC1_SHELL_5",
                     "Error closing (unused) writing end of output pipe "
                     "after creating a shell process - ^MESSAGE",
                     &hds_gl_status );
@@ -452,7 +452,7 @@ extern char **environ;           /* Pointer to environment array            */
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
             ems_seti_c( "FD", (INT) pipein[ 1 ] );
-            ems_rep_c( "REC1_SHELL_6",
+            emsRep( "REC1_SHELL_6",
                        "Error associating a stream with file descriptor ^FD "
                        "for writing to a shell prrocess - ^MESSAGE",
                        &hds_gl_status );
@@ -468,7 +468,7 @@ extern char **environ;           /* Pointer to environment array            */
             hds_gl_status = DAT__FATAL;
             emsSyser( "MESSAGE", errno );
             ems_seti_c( "FD", (INT) pipeout[ 0 ] );
-            ems_rep_c( "REC1_SHELL_7",
+            emsRep( "REC1_SHELL_7",
                        "Error associating a stream with file descriptor ^FD "
                        "for reading from a shell prrocess - ^MESSAGE",
                        &hds_gl_status );

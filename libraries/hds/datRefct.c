@@ -98,7 +98,7 @@ datRefct(const HDSLoc *loc,
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "DAT_REFCT_ERR",
+      emsRep( "DAT_REFCT_ERR",
                  "DAT_REFCT: Error enquiring the reference count for a \
 container file.",
                  &hds_gl_status );

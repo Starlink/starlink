@@ -420,7 +420,7 @@ datRetyp(const HDSLoc *locator,
    {
       hds_gl_status = DAT__TYPIN;
       emsSetnc( "TYPE", (char *) type.body, type.length );
-      ems_rep_c( "DAT_RETYP",
+      emsRep( "DAT_RETYP",
                  "Invalid new data type \'^TYPE\' specified; conversion \
 between structured and primitive types is not allowed (possible programming \
 error).",
@@ -434,7 +434,7 @@ error).",
    {
       hds_gl_status = DAT__TYPIN;
       emsSetnc( "TYPE", (char *) type.body, type.length );
-      ems_rep_c( "DAT_RETYP",
+      emsRep( "DAT_RETYP",
                  "Invalid new data type \'^TYPE\' specified; implies a \
 change in object size (possible programming error).",
                  &hds_gl_status );
@@ -458,7 +458,7 @@ change in object size (possible programming error).",
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "DAT_RETYP_ERR",
+      emsRep( "DAT_RETYP_ERR",
                  "DAT_RETYP: Error changing the type of an HDS object.",
                  &hds_gl_status );
    }

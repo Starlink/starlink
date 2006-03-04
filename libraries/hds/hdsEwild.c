@@ -87,7 +87,7 @@ hdsEwild( int *iwld,
 /* If an error occurred, then report a contextual error message.            */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "HDS_EWILD_ERR",
+      emsRep( "HDS_EWILD_ERR",
                  "HDS_EWILD: Error ending a wild-card search for HDS \
 container files.",
                  &hds_gl_status );

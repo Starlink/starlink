@@ -96,7 +96,7 @@
       {
          hds_gl_status = DAT__WLDIN;
          ems_seti_c( "IWLD", (INT) *context );
-         ems_rep_c( "REC_END_WILD_1",
+         emsRep( "REC_END_WILD_1",
                     "Wild-card search context identifier is invalid; value \
 is ^IWLD (possible programming error).",
                     &hds_gl_status );

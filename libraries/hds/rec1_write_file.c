@@ -126,7 +126,7 @@
          ems_seti_c( "FIRST", bloc );
          ems_seti_c( "LAST", bloc + size - 1 );
          ems_seti_c( "SLOT", slot );
-         ems_rep_c( "REC1_WRITE_FILE_1",
+         emsRep( "REC1_WRITE_FILE_1",
                     "Unable to write blocks ^FIRST:^LAST to file on HDS \
 internal slot ^SLOT; container file is not open (internal programming error).",
                     &hds_gl_status );
@@ -166,7 +166,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
                ems_seti_c( "LAST", bloc0 + size0 - 1 );
                rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_WRITE_FILE_1",
+               emsRep( "REC1_WRITE_FILE_1",
                           "Unable to write blocks ^FIRST:^LAST to file ^FILE - \
 ^MESSAGE.",
                           &hds_gl_status );
@@ -210,7 +210,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
             ems_seti_c( "FIRST", ( bloc - 1 ) * REC__SZBLK + 1 );
             ems_seti_c( "LAST", ( bloc + size - 1 ) * REC__SZBLK );
             rec1_fmsg( "FILE", slot );
-            ems_rep_c( "REC1_WRITE_FILE_2",
+            emsRep( "REC1_WRITE_FILE_2",
                        "Unable to write bytes ^FIRST:^LAST to the file ^FILE - \
 ^MESSAGE",
                        &hds_gl_status );

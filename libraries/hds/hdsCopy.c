@@ -133,7 +133,7 @@ hdsCopy(const HDSLoc *locator,
       if ( state->slice )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "HDS_COPY_1",
+         emsRep( "HDS_COPY_1",
                     "Input object is an array slice and cannot be copied \
 (possible programming error).",
                     &hds_gl_status );
@@ -141,7 +141,7 @@ hdsCopy(const HDSLoc *locator,
       else if ( state->cell )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "HDS_COPY_2",
+         emsRep( "HDS_COPY_2",
                     "Input object is an array cell and cannot be copied \
 (possible programming error).",
                     &hds_gl_status );
@@ -201,7 +201,7 @@ hdsCopy(const HDSLoc *locator,
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "HDS_COPY_ERR",
+      emsRep( "HDS_COPY_ERR",
                  "HDS_COPY: Error copying an HDS object to a new container \
 file.",
                  &hds_gl_status );

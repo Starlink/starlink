@@ -446,7 +446,7 @@
             else\
             {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_1",\
+               emsRep( "DAT1_INIT_NDR_1",\
                           "Unable to identify an integer data type; HDS may \
 require modification for use on this machine.",\
                           status );\
@@ -515,7 +515,7 @@ require modification for use on this machine.",\
 	    default:\
 	      {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_1b",\
+               emsRep( "DAT1_INIT_NDR_1b",\
                           "Fell off end of switch statement unexpectedly when determining integer data type",\
                           status );\
 	      }\
@@ -569,7 +569,7 @@ require modification for use on this machine.",\
             else\
             {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_2",\
+               emsRep( "DAT1_INIT_NDR_2",\
                           "Unable to identify a floating-point data type; HDS \
 may require modification for use on this machine.",\
                           status );\
@@ -620,7 +620,7 @@ may require modification for use on this machine.",\
 	    default:\
 	      {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_2b",\
+               emsRep( "DAT1_INIT_NDR_2b",\
                           "Fell off end of switch statement unexpectedly when determining float data type",\
                           status );\
 	      }\
@@ -654,7 +654,7 @@ may require modification for use on this machine.",\
             else\
             {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_3",\
+               emsRep( "DAT1_INIT_NDR_3",\
                           "Unable to identify a floating-point data type; HDS \
 may require modification for use on this machine.",\
                           status );\
@@ -686,7 +686,7 @@ may require modification for use on this machine.",\
 	    default:\
 	      {\
                *status = DAT__FATAL;\
-               ems_rep_c( "DAT1_INIT_NDR_2b",\
+               emsRep( "DAT1_INIT_NDR_2b",\
                           "Fell off end of switch statement unexpectedly when determining float data type",\
                           status );\
 	      }\
@@ -1151,7 +1151,7 @@ may require modification for use on this machine.",\
             {
                *status = DAT__FATAL;
                emsSetnc( "TYPE", dat_gl_ndr[ i ].name, EMS__SZTOK );
-               ems_rep_c( "DAT1_INIT_NDR_4",
+               emsRep( "DAT1_INIT_NDR_4",
                           "Unable to identify the native machine format used \
 for the ^TYPE data type; HDS may require modification for use on this machine.",
                           status );

@@ -213,7 +213,7 @@ hdsWild(const char *fspec,
                                         ( mode_c == 'U' ? "update" :
                                                         "write" ) ),
                               EMS__SZTOK );
-                  ems_rep_c( "HDS_WILD_1",
+                  emsRep( "HDS_WILD_1",
                              "No ^ACCESS-accessible HDS files found matching \
 the specification \'^FSPEC\'.",
                              &hds_gl_status );
@@ -329,7 +329,7 @@ the specification \'^FSPEC\'.",
       if ( !_ok( hds_gl_status ) )
       {
  	 dat1_free_hdsloc( locator );
-         ems_rep_c( "HDS_WILD_ERR",
+         emsRep( "HDS_WILD_ERR",
                     "HDS_WILD: Error performing a wild-card search for HDS \
 container files.", &hds_gl_status );
       }

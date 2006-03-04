@@ -160,7 +160,7 @@
       if ( imp->dtype != exp->dtype )
       {
          *status = DAT__FATAL;
-         ems_rep_c( "DAT1_CVT_FORMAT_1",
+         emsRep( "DAT1_CVT_FORMAT_1",
                     "Routine DAT1_CVT_FORMAT called with non-matching \
 primitive data types (internal programming error).",
                     status );
@@ -295,7 +295,7 @@ primitive data types (internal programming error).",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_2",
+                     emsRep( "DAT1_CVT_FORMAT_2",
                                 "Attempt to convert VAX/VMS single \
 precision (F) floating point to unknown format; DTYPE code=^DTYPE (internal \
 programming error).",
@@ -364,7 +364,7 @@ programming error).",
                               if ( _ok( *status ) )
                               {
                                  *status = DAT__CONER;
-                                 ems_rep_c( "DAT1_CVT_FORMAT_3",
+                                 emsRep( "DAT1_CVT_FORMAT_3",
                                             "Overflow occurred while \
 converting an IEEE single precision number to VAX F floating point format.",
                                             status );
@@ -457,7 +457,7 @@ converting an IEEE single precision number to VAX F floating point format.",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_4",
+                     emsRep( "DAT1_CVT_FORMAT_4",
                                 "Attempt to convert IEEE single \
 precision floating point to unknown format; DTYPE code=^DTYPE (internal \
 programming error).",
@@ -603,7 +603,7 @@ programming error).",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_5",
+                     emsRep( "DAT1_CVT_FORMAT_5",
                                 "Attempt to convert VAX/VMS double \
 precision (D) floating point to unknown format; DTYPE code=^DTYPE (internal \
 programming error).",
@@ -686,7 +686,7 @@ programming error).",
                               if ( _ok( *status ) )
                               {
                                  *status = DAT__CONER;
-                                 ems_rep_c( "DAT1_CVT_FORMAT_6",
+                                 emsRep( "DAT1_CVT_FORMAT_6",
                                             "Overflow occurred while \
 converting an IEEE double precision number to VAX D floating point format.",
                                             status );
@@ -774,7 +774,7 @@ converting an IEEE double precision number to VAX D floating point format.",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_7",
+                     emsRep( "DAT1_CVT_FORMAT_7",
                                 "Attempt to convert IEEE double \
 precision floating point to unknown format; DTYPE code=^DTYPE (internal \
 programming error).",
@@ -846,7 +846,7 @@ programming error).",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_8",
+                     emsRep( "DAT1_CVT_FORMAT_8",
                                 "Attempt to convert BIT0 format logical values \
 to unknown format; DTYPE code=^DTYPE (internal programming error).",
                                 status );
@@ -911,7 +911,7 @@ to unknown format; DTYPE code=^DTYPE (internal programming error).",
                   {
                      *status = DAT__FATAL;
                      ems_seti_c( "DTYPE", exp->format );
-                     ems_rep_c( "DAT1_CVT_FORMAT_9",
+                     emsRep( "DAT1_CVT_FORMAT_9",
                                 "Attempt to convert NZ format logical values \
 to unknown format; DTYPE code=^DTYPE (internal programming error).",
                                 status );
@@ -926,7 +926,7 @@ to unknown format; DTYPE code=^DTYPE (internal programming error).",
             {
                *status = DAT__FATAL;
                ems_seti_c( "DTYPE", imp->format );
-               ems_rep_c( "DAT1_CVT_FORMAT_10",
+               emsRep( "DAT1_CVT_FORMAT_10",
                           "Attempt to convert from unknown number format; \
 DTYPE code=^DTYPE (internal programming error).",
                           status );

@@ -88,7 +88,7 @@ dau_flush_data(struct LCP_DATA *data)
          if ( hds_gl_status == DAT__CONER )
          {
             ems_seti_c( "NBAD", nbad );
-            ems_rep_c( "DAU_FLUSH_1",
+            emsRep( "DAU_FLUSH_1",
                        "A total of ^NBAD data conversion error(s) occurred.",
                        &hds_gl_status );
          }
@@ -112,7 +112,7 @@ dau_flush_data(struct LCP_DATA *data)
          if ( hds_gl_status == DAT__CONER )
          {
             ems_seti_c( "NBAD", nbad );
-            ems_rep_c( "DAU_FLUSH_2",
+            emsRep( "DAU_FLUSH_2",
                        "A total of ^NBAD data conversion error(s) occurred.",
                        &hds_gl_status );
          }

@@ -206,7 +206,7 @@
                      {
                          hds_gl_status = DAT__FILIN;
                          rec1_fmsg( "FILE", slot );
-                         ems_rep_c( "REC_ATTACH_FILE_1",
+                         emsRep( "REC_ATTACH_FILE_1",
                                     "The file ^FILE is not a valid HDS container \
 file.",
                                     &hds_gl_status );
@@ -222,7 +222,7 @@ file.",
                          rec1_fmsg( "FILE", slot );
                          ems_seti_c( "VFILE", hcb->version );
                          ems_seti_c( "VSOFT", REC__VERSION4 );
-                         ems_rep_c( "REC_ATTACH_FILE_2",
+                         emsRep( "REC_ATTACH_FILE_2",
                                     "HDS file format version mismatch in file ^FILE \
 - file version=^VFILE, software version=^VSOFT (possible re-link needed).",
                                     &hds_gl_status );

@@ -159,7 +159,7 @@ datDrep( const HDSLoc *locator,
       if ( data->struc )
       {
          hds_gl_status = DAT__OBJIN;
-         ems_rep_c( "DAT_DREP_1",
+         emsRep( "DAT_DREP_1",
                     "Object is not primitive; its data representation \
 is not defined (possible programming error).",
                     &hds_gl_status );
@@ -242,7 +242,7 @@ is not defined (possible programming error).",
 /* If an error occurred, then report contextual information.                */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_rep_c( "DAT_DREP_ERR",
+      emsRep( "DAT_DREP_ERR",
                  "DAT_DREP: Error obtaining data representation information \
 for an HDS primitive.",
                  &hds_gl_status );

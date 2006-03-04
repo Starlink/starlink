@@ -108,7 +108,7 @@
          ems_seti_c( "FIRST", bloc );
          ems_seti_c( "LAST", bloc + size - 1 );
          ems_seti_c( "SLOT", slot );
-         ems_rep_c( "REC1_READ_FILE_1",
+         emsRep( "REC1_READ_FILE_1",
                     "Unable to read blocks ^FIRST:^LAST from file on HDS \
 internal slot ^SLOT; container file is not open (internal programming error).",
                     &hds_gl_status );
@@ -153,7 +153,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
                ems_seti_c( "LAST", bloc0 + size0 - 1 );
                rec1_fmsg( "FILE", slot );
                ems_syser_c( "MESSAGE", systat );
-               ems_rep_c( "REC1_READ_FILE_2",
+               emsRep( "REC1_READ_FILE_2",
                "Unable to read blocks ^FIRST:^LAST from file ^FILE - ^MESSAGE.",
                           &hds_gl_status );
             }
@@ -198,7 +198,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
             ems_seti_c( "FIRST", bloc );
             ems_seti_c( "LAST", bloc + size - 1 );
             rec1_fmsg( "FILE", slot );
-            ems_rep_c( "REC1_READ_FILE_3",
+            emsRep( "REC1_READ_FILE_3",
                        "Unable to read blocks ^FIRST:^LAST from file ^FILE - \
 ^MESSAGE.",
                        &hds_gl_status );

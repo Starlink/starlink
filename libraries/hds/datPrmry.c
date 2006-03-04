@@ -170,7 +170,7 @@ datPrmry(int set,
    {
       emsSetnc( "DOING", set ? "setting" : "enquiring",
                   EMS__SZTOK );
-      ems_rep_c( "DAT_PRMRY_ERR",
+      emsRep( "DAT_PRMRY_ERR",
                  "DAT_PRMRY: Error ^DOING primary locator status.",
                  &hds_gl_status );
    }

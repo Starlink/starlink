@@ -112,7 +112,7 @@ dau_check_name(struct DSC *name,char *buf)
          hds_gl_status = DAT__NAMIN;
          emsSetnc( "NAME", txt, (int) len );
          ems_seti_c( "SZNAM", DAT__SZNAM );
-         ems_rep_c( "DAU_CHECK_NAME_1",
+         emsRep( "DAU_CHECK_NAME_1",
                     "Invalid name string \'^NAME\' specified; more than \
 ^SZNAM characters long (possible programming error).",
                     &hds_gl_status );
@@ -127,7 +127,7 @@ dau_check_name(struct DSC *name,char *buf)
          emsSetnc( "NAME", txt, (int) len );
          ems_seti_c( "CODE", (int) txt[ i ] );
          ems_seti_c( "POSN", i + 1 );
-         ems_rep_c( "DAU_CHECK_NAME_2",
+         emsRep( "DAU_CHECK_NAME_2",
                     "Invalid name string \'^NAME\' specified; contains \
 illegal character (code=^CODE decimal) at position ^POSN (possible \
 programming error).",
@@ -144,7 +144,7 @@ programming error).",
    if (n == 0)
    {
       hds_gl_status = DAT__NAMIN;
-      ems_rep_c( "DAU_CHECK_NAME_3",
+      emsRep( "DAU_CHECK_NAME_3",
                  "Invalid blank name string specified (possible programming \
 error).",
                  &hds_gl_status );
