@@ -250,9 +250,6 @@ typedef hdsdim HDS_PTYPE;
 /* Fixups for various machine deficiencies:				    */
 /* =======================================				    */
 
-#if !HAVE_STRERROR
-      char *strerror( int );
-#endif
 #if !HAVE_ATEXIT
       int atexit( void (*fcn)( void ) );
 #endif

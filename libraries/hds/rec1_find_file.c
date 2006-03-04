@@ -308,7 +308,7 @@ is not properly supported within HDS (internal programming error).",
 	    if ( ferror( str[ 1 ] ) )
 	    {
 	       hds_gl_status = DAT__FATAL;
-               ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+               emsSyser( "MESSAGE", errno );
 	       ems_rep_c( "REC_FIND_FILE_2",
 	                  "Error sending commands to a shell process to \
 perform a wild-card file search - ^MESSAGE",
@@ -323,7 +323,7 @@ perform a wild-card file search - ^MESSAGE",
          if ( fclose( str[ 1 ] ) != 0 )
 	 {
 	    hds_gl_status = DAT__FATAL;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+            emsSyser( "MESSAGE", errno );
 	    ems_rep_c( "REC_FIND_FILE_3",
 	               "Error closing stream used for sending commands to a \
 shell process - ^MESSAGE",

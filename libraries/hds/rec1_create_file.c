@@ -460,7 +460,7 @@ name cannot be used to create a new container file.",
 	    }
 
 /* Report the error.							    */
-	    ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+	    emsSyser( "MESSAGE", errno );
 	    ems_setc_c( "FILE", fns, EMS__SZTOK );
 	    ems_rep_c( "REC1_CREATE_FILE_5",
 	               "Unable to create file ^FILE - ^MESSAGE",

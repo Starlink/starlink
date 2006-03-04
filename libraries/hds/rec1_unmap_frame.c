@@ -331,7 +331,7 @@
                  ( munmap( addr, len ) != 0 ) )
 	    {
 	       hds_gl_status = DAT__FILMP;
-	       ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+	       emsSyser( "MESSAGE", errno );
 	       rec1_fmsg( "FILE", slot );
 	       ems_rep_c( "REC1_UNMAP_FRAME_2",
 	                  "Error unmapping data in the file ^FILE - ^MESSAGE",
@@ -378,7 +378,7 @@
 	       if ( !writeok )
 	       {
 	          hds_gl_status = DAT__FILWR;
-	          ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+	          emsSyser( "MESSAGE", errno );
 	          ems_seti_c( "FIRST", offs + 1 );
 	          ems_seti_c( "LAST", offs + length );
 	          rec1_fmsg( "FILE", slot );

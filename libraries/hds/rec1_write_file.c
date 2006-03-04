@@ -206,7 +206,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
          if ( !writeok )
          {
             hds_gl_status = DAT__FILWR;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
             ems_seti_c( "FIRST", ( bloc - 1 ) * REC__SZBLK + 1 );
             ems_seti_c( "LAST", ( bloc + size - 1 ) * REC__SZBLK );
             rec1_fmsg( "FILE", slot );

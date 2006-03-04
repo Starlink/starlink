@@ -285,7 +285,7 @@ void rec1_get_path( void ){};    /* This routine not used on VMS systems    */
                if ( ferror( stream ) )
                {
                   hds_gl_status = DAT__FATAL;
-                  ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+                  emsSyser( "MESSAGE", errno );
                   ems_rep_c( "REC_GET_PATH_2",
                              "Error reading file names from stream attached \
 to shell process - ^MESSAGE",
@@ -338,7 +338,7 @@ to shell process - ^MESSAGE",
             if ( fclose ( stream ) != 0 )
             {
                hds_gl_status = DAT__FATAL;
-               ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+               emsSyser( "MESSAGE", errno );
                ems_rep_c( "REC_GET_PATH_4",
                           "Error closing stream used to read file names from \
 a shell process - ^MESSAGE",

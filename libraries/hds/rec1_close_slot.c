@@ -94,7 +94,7 @@
                if ( remove( rec_ga_fcv[ slot ].name ) )
                {
                   hds_gl_status = DAT__FILND;
-                  ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+                  emsSyser( "MESSAGE", errno );
                   rec1_fmsg( "FILE", slot );
                   ems_rep_c( "REC1_CLOSE_SLOT_1",
                              "Error deleting the file ^FILE - ^MESSAGE",

@@ -479,7 +479,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
                      if ( ferror( stream ) )
                      {
                         hds_gl_status = DAT__FATAL;
-                        ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+                        emsSyser( "MESSAGE", errno );
                         ems_rep_c( "REC_WILD_FILE_6",
                                    "Error reading file names from stream \
 connected to shell process - ^MESSAGE",
@@ -627,7 +627,7 @@ specification \'^FSPEC\'.",
                if ( fclose ( stream ) != 0 )
                {
                   hds_gl_status = DAT__FATAL;
-                  ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+                  emsSyser( "MESSAGE", errno );
                   ems_rep_c( "REC_WILD_FILE_8",
                              "Error closing stream used to read file names \
 from a shell process - ^MESSAGE",

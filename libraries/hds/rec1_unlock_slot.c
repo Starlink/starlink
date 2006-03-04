@@ -198,7 +198,7 @@
          {
             hds_gl_status = DAT__FILWR;
             rec1_fmsg( "FILE", slot );
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
             ems_rep_c( "REC1_UNLOCK_SLOT_1",
                        "Unable to flush written data to the file ^FILE - \
 ^MESSAGE",
@@ -255,7 +255,7 @@
             if ( fd == -1 )
             {
                hds_gl_status = DAT__FILCK;
-               ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+               emsSyser( "MESSAGE", errno );
                rec1_fmsg( "FILE", slot );
                ems_rep_c( "REC1_UNLOCK_SLOT_3",
                           "Unable to obtain a file descriptor for unlocking \
@@ -267,7 +267,7 @@ the file ^FILE - ^MESSAGE",
             else if ( fcntl( fd, F_SETLK, &lockbuf ) == -1 )
             {
                hds_gl_status = DAT__FILCK;
-               ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+               emsSyser( "MESSAGE", errno );
                rec1_fmsg( "FILE", slot );
                ems_rep_c( "REC1_UNLOCK_SLOT_4",
                           "Unable to unlock the file ^FILE - ^MESSAGE",

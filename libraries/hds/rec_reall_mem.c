@@ -91,7 +91,7 @@
       if ( newptr == NULL )
       {
          hds_gl_status = DAT__NOMEM;
-         ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+         emsSyser( "MESSAGE", errno );
          ems_seti_c( "NBYTES", size );
          ems_rep_c( "REC_REALL_MEM_1",
                     "Unable to obtain a block of ^NBYTES bytes of memory - \

@@ -111,7 +111,7 @@
                else
                {
                   hds_gl_status = DAT__FATAL;
-                  ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+                  emsSyser( "MESSAGE", errno );
                   ems_rep_c( "DAT1_INIT_1",
                              "Error establishing an exit handler for HDS - \
 ^MESSAGE",

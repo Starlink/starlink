@@ -212,7 +212,7 @@ working directory - ^MESSAGE",
          else
          {
             hds_gl_status = DAT__FATAL;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+            emsSyser( "MESSAGE", errno );
             ems_rep_c( "REC1_GETCWD_2",
                        "Unable to determine a path name for the current \
 working directory - ^MESSAGE",

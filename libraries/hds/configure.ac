@@ -66,7 +66,6 @@ dnl    RTL "fixups"
 AC_CHECK_FUNCS(atexit)
 AC_CHECK_FUNCS(on_exit)
 AC_CHECK_FUNCS(memmove)
-AC_CHECK_FUNCS(strerror)
 
 AC_CHECK_FUNCS([getwd getcwd])
 

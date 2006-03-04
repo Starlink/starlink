@@ -175,7 +175,7 @@ access - ^MESSAGE.",
          if ( fd == -1 )
          {
             hds_gl_status = DAT__FILCK;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
             ems_rep_c( "REC1_LOCK_SLOT_2",
                        "Unable to obtain a file descriptor for locking the \
@@ -188,7 +188,7 @@ file ^FILE - ^MESSAGE",
                           &lockbuf ) == -1 )
          {
             hds_gl_status = DAT__FILCK;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
             ems_rep_c( "REC1_LOCK_SLOT_3",
                        "Unable to lock the file ^FILE for exclusive write \

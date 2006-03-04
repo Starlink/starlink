@@ -360,7 +360,7 @@ to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
       if ( !doneok )
       {
          hds_gl_status = DAT__FILNX;
-         ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZTOK );
+         emsSyser( "MESSAGE", errno );
          rec1_fmsg( "FILE", slot );
          ems_seti_c( "BLOCKS", size );
          ems_seti_c( "SIZE", size * REC__SZBLK );

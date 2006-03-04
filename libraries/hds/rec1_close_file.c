@@ -164,7 +164,7 @@ int fsync ( int );
          if ( fclose( iochan ) )
          {
             hds_gl_status = DAT__FILCL;
-            ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+            emsSyser( "MESSAGE", errno );
             rec1_fmsg( "FILE", slot );
             ems_rep_c( "REC1_CLOSE_FILE_2",
                        "Unable to close file ^FILE - ^MESSAGE",

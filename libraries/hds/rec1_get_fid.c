@@ -100,7 +100,7 @@ void rec1_get_fid( void ){};     /* This routine is not used on VMS systems */
       if ( stat( fns, &statbuf ) )
       {
          hds_gl_status = DAT__FILNF;
-         ems_setc_c( "MESSAGE", strerror( errno ), EMS__SZMSG );
+         emsSyser( "MESSAGE", errno );
          ems_setc_c( "FILE", fns, EMS__SZMSG );
          ems_rep_c( "REC1_GET_FID_1",
                     "Error accessing file \'^FILE\' - ^MESSAGE",
