@@ -242,6 +242,11 @@ typedef hdsdim HDS_PTYPE;
       extern int hds_gl_c64bit;  /* Create 64-bit (HDS V4) new files?       */
       extern int hds_gl_longints;/* Default all INTEGERs to 64-bits?        */
 
+/* EMS wrapper routines:                                                    */
+/* =======================================				    */
+
+      void dat1emsSetBigi( const char * token, INT_BIG value );
+
 /* Fixups for various machine deficiencies:				    */
 /* =======================================				    */
 
