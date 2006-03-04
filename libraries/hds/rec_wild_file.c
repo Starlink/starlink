@@ -407,7 +407,7 @@ is ^IWLD (possible programming error).",
                   if ( nfile <= 0 )
                   {
                      hds_gl_status = DAT__FILNF;
-                     ems_setc_c( "FSPEC", fspec + start, fspec_len - start );
+                     emsSetnc( "FSPEC", fspec + start, fspec_len - start );
                      ems_rep_c( "REC_WILD_FILE_3",
                                 "No files found matching the file \
 specification \'^FSPEC\'.",
@@ -420,7 +420,7 @@ specification \'^FSPEC\'.",
                else
                {
                   hds_gl_status = DAT__FILNF;
-                  ems_setc_c( "FSPEC", fspec + start, fspec_len - start );
+                  emsSetnc( "FSPEC", fspec + start, fspec_len - start );
                   ems_syser_c( "MESSAGE", systat );
                   ems_rep_c( "REC_WILD_FILE_4",
                              "Error searching for files matching the file \
@@ -537,7 +537,7 @@ connected to shell process - ^MESSAGE",
                         if ( nfile <= 0 )
                         {
                            hds_gl_status = DAT__FILNF;
-                           ems_setc_c( "FSPEC", fspec + start,
+                           emsSetnc( "FSPEC", fspec + start,
                                        fspec_len - start );
                            ems_rep_c( "REC_WILD_FILE_7",
                                       "No files found matching the file \

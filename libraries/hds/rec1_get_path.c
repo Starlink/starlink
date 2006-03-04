@@ -324,7 +324,7 @@ to shell process - ^MESSAGE",
             if ( lbase == 0 )
             {
                hds_gl_status = DAT__FILNF;
-               ems_setc_c( "FILE", fname + start, fname_len - start );
+               emsSetnc( "FILE", fname + start, fname_len - start );
                ems_rep_c( "REC_GET_PATH_3",
                           "No files found matching the file specification \
 \'^FILE\'.",

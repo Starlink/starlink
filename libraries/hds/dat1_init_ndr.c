@@ -1150,7 +1150,7 @@ may require modification for use on this machine.",\
             if ( dat_gl_ndr[ i ].format == DAT__UNKNOWN )
             {
                *status = DAT__FATAL;
-               ems_setc_c( "TYPE", dat_gl_ndr[ i ].name, EMS__SZTOK );
+               emsSetnc( "TYPE", dat_gl_ndr[ i ].name, EMS__SZTOK );
                ems_rep_c( "DAT1_INIT_NDR_4",
                           "Unable to identify the native machine format used \
 for the ^TYPE data type; HDS may require modification for use on this machine.",

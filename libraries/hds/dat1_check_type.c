@@ -100,7 +100,7 @@
             if ( n >= DAT__SZTYP )
             {
                hds_gl_status = DAT__TYPIN;
-               ems_setc_c( "TYPE", txt, type->length );
+               emsSetnc( "TYPE", txt, type->length );
                ems_seti_c( "SZTYP", DAT__SZTYP );
                ems_rep_c( "DAU_CHECK_TYPE_1",
                           "Invalid type string \'^TYPE\' specified; more than \
@@ -113,7 +113,7 @@
             else if ( !isprint( txt[ i ] ) )
             {
                hds_gl_status = DAT__TYPIN;
-               ems_setc_c( "TYPE", txt, type->length );
+               emsSetnc( "TYPE", txt, type->length );
                ems_seti_c( "CODE", (int) txt[ i ] );
                ems_seti_c( "POSN", i + 1 );
                ems_rep_c( "DAU_CHECK_TYPE_2",
@@ -130,7 +130,7 @@ programming error).",
                       ( ( n == 0 ) || ( ptype[ 0 ] != '_' ) ) )
             {
                hds_gl_status = DAT__TYPIN;
-               ems_setc_c( "TYPE", txt, type->length );
+               emsSetnc( "TYPE", txt, type->length );
                ems_rep_c( "DAU_CHECK_TYPE_3",
                           "Invalid type string \'^TYPE\' specified; the \'*\' \
 character is not permitted in user-defined HDS types (possible programming \
@@ -239,7 +239,7 @@ error).",
                else if ( ptype[ 5 ] != '*' )
                {
                   hds_gl_status = DAT__TYPIN;
-                  ems_setc_c( "TYPE", txt, type->length );
+                  emsSetnc( "TYPE", txt, type->length );
                   ems_rep_c( "DAT1_CHECK_TYPE_5",
                              "Invalid length encountered in the character \
 type specification \'^TYPE\'; should be \'_CHAR*n\' (possible programming \
@@ -260,7 +260,7 @@ error).",
                   if ( !lenok )
                   {
                      hds_gl_status = DAT__TYPIN;
-                     ems_setc_c( "TYPE", txt, type->length );
+                     emsSetnc( "TYPE", txt, type->length );
                      ems_seti_c( "MXCHR", DAT__MXCHR );
                      ems_rep_c( "DAT1_CHECK_TYPE_5",
                                 "Invalid length encountered in the character \
@@ -276,7 +276,7 @@ programming error).",
             else
             {
                hds_gl_status = DAT__TYPIN;
-               ems_setc_c( "TYPE", txt, type->length );
+               emsSetnc( "TYPE", txt, type->length );
                ems_rep_c( "DAT1_CHECK_TYPE_6",
                           "Invalid primitive data type \'^TYPE\' specified \
 (possible programming error).",

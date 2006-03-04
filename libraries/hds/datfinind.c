@@ -96,7 +96,7 @@ datFind( const HDSLoc *locator1,
             if ( ( rid.bloc == 0 ) && ( rid.chip == 0 ) )
             {
                hds_gl_status = DAT__OBJNF;
-               ems_setc_c( "NAME", nambuf, DAT__SZNAM );
+               emsSetnc( "NAME", nambuf, DAT__SZNAM );
                ems_rep_c( "DAT_FIND_2",
                           "Object \'^NAME\' not found.",
                           &hds_gl_status );
@@ -139,7 +139,7 @@ datFind( const HDSLoc *locator1,
             if ( ( rid.bloc == 0 ) && ( rid.chip == 0 ) )
             {
                hds_gl_status = DAT__OBJNF;
-               ems_setc_c( "NAME", nambuf, DAT__SZNAM );
+               emsSetnc( "NAME", nambuf, DAT__SZNAM );
                ems_rep_c( "DAT_FIND_3",
                           "Object \'^NAME\' not found.",
                           &hds_gl_status );

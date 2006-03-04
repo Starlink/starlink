@@ -174,7 +174,7 @@ void rec1_getcwd( void ){};      /* This routine is not used on VMS systems */
       if ( getwd( wd ) == (char *) 0 )
       {
          hds_gl_status = DAT__FATAL;
-         ems_setc_c( "MESSAGE", wd, EMS__SZTOK );
+         emsSetnc( "MESSAGE", wd, EMS__SZTOK );
          ems_rep_c( "REC1_GETCWD_1",
                     "Unable to determine a path name for the current \
 working directory - ^MESSAGE",

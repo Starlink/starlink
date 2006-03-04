@@ -270,7 +270,7 @@
          if ( !( systat & STS$M_SUCCESS ) )
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
-            ems_setc_c( "FILE", file + start, file_len - start );
+            emsSetnc( "FILE", file + start, file_len - start );
             ems_syser_c( "MESSAGE", systat );
             ems_rep_c( "REC1_CREATE_FILE_1",
                        "Unable to parse file name \'^FILE\' - ^MESSAGE.",
@@ -285,7 +285,7 @@
          if ( !( systat & STS$M_SUCCESS) )
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILCR;
-            ems_setc_c( "FILE", esabuf, nam.nam$b_esl );
+            emsSetnc( "FILE", esabuf, nam.nam$b_esl );
             ems_syser_c( "MESSAGE", systat );
             ems_rep_c( "REC1_CREATE_FILE_2",
                        "Unable to create file ^FILE - ^MESSAGE.",
@@ -320,7 +320,7 @@
          if ( !( systat & STS$M_SUCCESS ) )
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILWR;
-            ems_setc_c( "FILE", rsabuf, nam.nam$b_rsl );
+            emsSetnc( "FILE", rsabuf, nam.nam$b_rsl );
             ems_syser_c( "MESSAGE", systat );
             ems_rep_c( "REC1_CREATE_FILE_3",
                        "Unable to update end-of-file block for file ^FILE - \
@@ -342,7 +342,7 @@
          if ( !( systat & STS$M_SUCCESS ) )
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
-            ems_setc_c( "FILE", rsabuf, nam.nam$b_rsl );
+            emsSetnc( "FILE", rsabuf, nam.nam$b_rsl );
             ems_syser_c( "MESSAGE", systat );
             ems_rep_c( "REC1_CREATE_FILE_4",
                        "Unable to open file ^FILE for writing - ^MESSAGE.",
@@ -422,7 +422,7 @@
 		    ( statbuf.st_dev == rec_ga_fcv[ i ].fid->st_dev ) )
                {
 		  hds_gl_status = DAT__FILIN;
-	          ems_setc_c( "FILE", fns, EMS__SZTOK );
+	          emsSetnc( "FILE", fns, EMS__SZTOK );
 	          ems_rep_c( "REC1_CREATE_FILE_4",
 	                     "The file ^FILE is already in use by HDS; this \
 name cannot be used to create a new container file.",
@@ -461,7 +461,7 @@ name cannot be used to create a new container file.",
 
 /* Report the error.							    */
 	    emsSyser( "MESSAGE", errno );
-	    ems_setc_c( "FILE", fns, EMS__SZTOK );
+	    emsSetnc( "FILE", fns, EMS__SZTOK );
 	    ems_rep_c( "REC1_CREATE_FILE_5",
 	               "Unable to create file ^FILE - ^MESSAGE",
 		       &hds_gl_status );

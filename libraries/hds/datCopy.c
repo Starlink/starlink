@@ -300,7 +300,7 @@ error).",
             if ( ( rid.bloc != 0 ) || ( rid.chip != 0 ) )
             {
                hds_gl_status = DAT__COMEX;
-               ems_setc_c( "NAME", (char *) name.body, name.length );
+               emsSetnc( "NAME", (char *) name.body, name.length );
                ems_rep_c( "DAT_COPY_5",
                           "A component called \'^NAME\' already exists in \
 the output structure (possible programming error).",

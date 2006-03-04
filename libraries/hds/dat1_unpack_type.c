@@ -187,7 +187,7 @@
                if ( !lenok )
                {
                   hds_gl_status = DAT__TYPIN;
-                  ems_setc_c( "TYPE", ptype, DAT__SZTYP );
+                  emsSetnc( "TYPE", ptype, DAT__SZTYP );
                   ems_seti_c( "MXCHR", DAT__MXCHR );
                   ems_rep_c( "DAT1_UNPACK_TYPE_1",
                              "Invalid length encountered in the character \
@@ -207,7 +207,7 @@ type specification \'^TYPE\'; this should be in the range 1 to ^MXCHR \
          else
          {
             hds_gl_status = DAT__TYPIN;
-            ems_setc_c( "TYPE", ptype, DAT__SZTYP );
+            emsSetnc( "TYPE", ptype, DAT__SZTYP );
             ems_rep_c( "DAT1_UNPACK_TYPE_2",
                        "Unrecognised HDS data type \'^TYPE\' encountered \
 (possible corrupt container file or internal programming error).",

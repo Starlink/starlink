@@ -110,7 +110,7 @@ dau_check_name(struct DSC *name,char *buf)
       else if (n >= DAT__SZNAM)
       {
          hds_gl_status = DAT__NAMIN;
-         ems_setc_c( "NAME", txt, (int) len );
+         emsSetnc( "NAME", txt, (int) len );
          ems_seti_c( "SZNAM", DAT__SZNAM );
          ems_rep_c( "DAU_CHECK_NAME_1",
                     "Invalid name string \'^NAME\' specified; more than \
@@ -124,7 +124,7 @@ dau_check_name(struct DSC *name,char *buf)
       else if (!isprint(txt[i]))
       {
          hds_gl_status = DAT__NAMIN;
-         ems_setc_c( "NAME", txt, (int) len );
+         emsSetnc( "NAME", txt, (int) len );
          ems_seti_c( "CODE", (int) txt[ i ] );
          ems_seti_c( "POSN", i + 1 );
          ems_rep_c( "DAU_CHECK_NAME_2",

@@ -419,7 +419,7 @@ datRetyp(const HDSLoc *locator,
         ( data->obj.class == DAT__STRUCTURE ) )
    {
       hds_gl_status = DAT__TYPIN;
-      ems_setc_c( "TYPE", (char *) type.body, type.length );
+      emsSetnc( "TYPE", (char *) type.body, type.length );
       ems_rep_c( "DAT_RETYP",
                  "Invalid new data type \'^TYPE\' specified; conversion \
 between structured and primitive types is not allowed (possible programming \
@@ -433,7 +433,7 @@ error).",
    else if ( pdd.length != data->obj.length )
    {
       hds_gl_status = DAT__TYPIN;
-      ems_setc_c( "TYPE", (char *) type.body, type.length );
+      emsSetnc( "TYPE", (char *) type.body, type.length );
       ems_rep_c( "DAT_RETYP",
                  "Invalid new data type \'^TYPE\' specified; implies a \
 change in object size (possible programming error).",

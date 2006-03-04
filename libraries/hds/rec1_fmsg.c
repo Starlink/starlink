@@ -53,5 +53,5 @@
 /*.                                                                         */
 
 /* Assign the name to the message token.                                    */
-      ems_setc_c( token, rec_ga_fcv[ slot ].name, EMS__SZTOK );
+      emsSetnc( token, rec_ga_fcv[ slot ].name, EMS__SZTOK );
    }

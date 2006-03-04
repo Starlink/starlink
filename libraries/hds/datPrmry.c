@@ -168,7 +168,7 @@ datPrmry(int set,
 /* If an error occurred, then report appropriate contextual information.    */
    if ( !_ok( hds_gl_status ) )
    {
-      ems_setc_c( "DOING", set ? "setting" : "enquiring",
+      emsSetnc( "DOING", set ? "setting" : "enquiring",
                   EMS__SZTOK );
       ems_rep_c( "DAT_PRMRY_ERR",
                  "DAT_PRMRY: Error ^DOING primary locator status.",

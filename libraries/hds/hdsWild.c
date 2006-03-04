@@ -208,8 +208,8 @@ hdsWild(const char *fspec,
                   {
                      if ( !isspace( fspec[ start ] ) ) break;
                   }
-                  ems_setc_c( "FSPEC", fspec + start, strlen(fspec) - start );
-                  ems_setc_c( "ACCESS", ( mode_c == 'R' ? "read" :
+                  emsSetnc( "FSPEC", fspec + start, strlen(fspec) - start );
+                  emsSetnc( "ACCESS", ( mode_c == 'R' ? "read" :
                                         ( mode_c == 'U' ? "update" :
                                                         "write" ) ),
                               EMS__SZTOK );

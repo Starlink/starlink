@@ -115,7 +115,7 @@
       if ( !ok )
       {
          *status = DAT__MODIN;
-         ems_setc_c( "MODE", mode, mode_len );
+         emsSetnc( "MODE", mode, mode_len );
          ems_rep_c( "DAT1_CHECK_MODE_1",
                     "Invalid access mode \'^MODE\' specified (possible \
 programming error).", status);
