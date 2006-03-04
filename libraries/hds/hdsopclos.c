@@ -13,14 +13,15 @@
 #include "str.h"              /* Character string import/export macros   */
 #include "dat1.h"             /* Internal dat_ definitions               */
 #include "dat_err.h"          /* DAT__ error code definitions            */
+#include "hds.h"              /* Public prototypes                       */
 
 /*=========================================*/
 /* HDS_OPEN - Open existing container file */
 /*=========================================*/
 
 int
-hdsOpen(char *file_str,
-        char *mode_str,
+hdsOpen(const char *file_str,
+        const char *mode_str,
         HDSLoc **locator,
         int *status)
 {
