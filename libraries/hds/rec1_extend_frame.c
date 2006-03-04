@@ -192,18 +192,18 @@
             {
 
 /* Map both old and new frames.                                             */
-               rec1_map_frame( slot, oldbloc, size * REC__SZBLK, 0, 'R',
+	      rec1_map_frame( slot, oldbloc, size * REC__SZBLK, (INT_BIG)0, 'R',
                                &oldpdb );
-               rec1_map_frame( slot, newbloc, size * REC__SZBLK, 0, 'W',
+	      rec1_map_frame( slot, newbloc, size * REC__SZBLK, (INT_BIG)0, 'W',
                                &newpdb );
 
 /* If both frames cannot be concurrently mapped, then de-allocate the new   */
 /* frame.                                                                   */
                if ( !_ok( hds_gl_status ) )
                {
-                  rec1_unmap_frame( slot, oldbloc, size * REC__SZBLK, 0, 'R',
+		 rec1_unmap_frame( slot, oldbloc, size * REC__SZBLK, (INT_BIG)0, 'R',
                                     &oldpdb );
-                  rec1_unmap_frame( slot, newbloc, size * REC__SZBLK, 0, 'W',
+		 rec1_unmap_frame( slot, newbloc, size * REC__SZBLK, (INT_BIG)0, 'W',
                                     &newpdb );
                   rec1_deall_frame( slot, size, newbloc );
                }
@@ -213,9 +213,9 @@
                else
                {
                   _chmove( size * REC__SZBLK, oldpdb, newpdb );
-                  rec1_unmap_frame( slot, oldbloc, size * REC__SZBLK, 0, 'R',
+                  rec1_unmap_frame( slot, oldbloc, size * REC__SZBLK, (INT_BIG)0, 'R',
                                     &oldpdb );
-                  rec1_unmap_frame( slot, newbloc, size * REC__SZBLK, 0, 'W',
+                  rec1_unmap_frame( slot, newbloc, size * REC__SZBLK, (INT_BIG)0, 'W',
                                     &newpdb );
                   rec1_deall_frame( slot, size, oldbloc );
                   *bloc = newbloc;
