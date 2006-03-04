@@ -8,6 +8,7 @@
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
+#include "hds.h"
 
    void hds1_exit( void )
    {
@@ -76,7 +77,6 @@
 /*-                                                                         */
 
 /* Local Variables:                                                         */
-      struct LCP *lcp;           /* Pointer to Locator Control Packet       */
       int status = DAT__OK;      /* Local status for hdsStop                */
 
 /*.                                                                         */

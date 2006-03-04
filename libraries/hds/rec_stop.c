@@ -87,7 +87,6 @@
 /* Local Variables:                                                         */
       INT slot;                  /* Loop counter for File Control Vector    */
       struct WLD *context;       /* Pointer to wild-card search context     */
-      struct BCP *bcp;
 
 /*.                                                                         */
 
