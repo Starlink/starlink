@@ -99,6 +99,7 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(long long)
 AC_CHECK_SIZEOF(long double)
 AC_CHECK_SIZEOF(off_t)
+AC_CHECK_SIZEOF(size_t)
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae chr cnf ems starmem])
