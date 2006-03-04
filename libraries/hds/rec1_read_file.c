@@ -152,7 +152,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
                ems_seti_c( "FIRST", bloc0 );
                ems_seti_c( "LAST", bloc0 + size0 - 1 );
                rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_READ_FILE_2",
                "Unable to read blocks ^FIRST:^LAST from file ^FILE - ^MESSAGE.",
                           &hds_gl_status );

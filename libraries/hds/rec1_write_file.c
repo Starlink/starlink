@@ -165,7 +165,7 @@ internal slot ^SLOT; container file is not open (internal programming error).",
                ems_seti_c( "FIRST", bloc0 );
                ems_seti_c( "LAST", bloc0 + size0 - 1 );
                rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_WRITE_FILE_1",
                           "Unable to write blocks ^FIRST:^LAST to file ^FILE - \
 ^MESSAGE.",

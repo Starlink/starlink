@@ -129,7 +129,7 @@
             ems_begin_c( &hds_gl_status );
             hds_gl_status = DAT__NOMEM;
             ems_seti_c( "NBYTES", size );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC_DEALL_MEM_1",
                        "Unable to release a block of ^NBYTES bytes of memory - \
 ^MESSAGE",

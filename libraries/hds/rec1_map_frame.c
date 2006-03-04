@@ -275,7 +275,7 @@
 	       emsSeti( "END", bloc + nbloc - 1 );
 	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_MAP_FRAME_1",
 	                  "Error mapping blocks ^START:^END for \'^ACCESS\' \
 access in file ^FILE - ^MESSAGE.",
@@ -315,7 +315,7 @@ access in file ^FILE - ^MESSAGE.",
 	       emsSeti( "END", bloc + nbloc - 1 );
 	       emsSetnc( "ACCESS", &mode, 1 );
 	       rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_MAP_FRAME_2",
 	                  "Error mapping blocks ^START:^END for \'^ACCESS\' \
 access in file ^FILE - ^MESSAGE.",
@@ -357,7 +357,7 @@ access in file ^FILE - ^MESSAGE.",
 	             emsSeti( "END", bloc + nbloc - 1 );
 	             emsSetnc( "ACCESS", &mode, 1 );
 	             rec1_fmsg( "FILE", slot );
-                     ems_syser_c( "MESSAGE", systat );
+                     emsSyser( "MESSAGE", systat );
                      emsRep( "REC1_MAP_FRAME_3",
 	                        "Error mapping blocks ^START:^END for \
 \'^ACCESS\' access in file ^FILE - ^MESSAGE.",
@@ -402,7 +402,7 @@ access in file ^FILE - ^MESSAGE.",
 	          {
                      hds_gl_status = DAT__NOMEM;
 	             rec1_fmsg( "FILE", slot );
-                     ems_syser_c( "MESSAGE", systat );
+                     emsSyser( "MESSAGE", systat );
                      emsRep( "REC1_MAP_FRAME_4",
 	                        "Unable to allocate a \"guard\" page to \
 protect address space while mapping the file ^FILE - ^MESSAGE.",

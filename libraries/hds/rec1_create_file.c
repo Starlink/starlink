@@ -271,7 +271,7 @@
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
             emsSetnc( "FILE", file + start, file_len - start );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC1_CREATE_FILE_1",
                        "Unable to parse file name \'^FILE\' - ^MESSAGE.",
                        &hds_gl_status );
@@ -286,7 +286,7 @@
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILCR;
             emsSetnc( "FILE", esabuf, nam.nam$b_esl );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC1_CREATE_FILE_2",
                        "Unable to create file ^FILE - ^MESSAGE.",
                        &hds_gl_status );
@@ -321,7 +321,7 @@
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILWR;
             emsSetnc( "FILE", rsabuf, nam.nam$b_rsl );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC1_CREATE_FILE_3",
                        "Unable to update end-of-file block for file ^FILE - \
 ^MESSAGE.",
@@ -343,7 +343,7 @@
          {
             hds_gl_status = ( systat == RMS$_PRV ) ? DAT__FILPR : DAT__FILNF;
             emsSetnc( "FILE", rsabuf, nam.nam$b_rsl );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC1_CREATE_FILE_4",
                        "Unable to open file ^FILE for writing - ^MESSAGE.",
                        &hds_gl_status );

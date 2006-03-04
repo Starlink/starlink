@@ -212,7 +212,7 @@
             {
                hds_gl_status = DAT__FILMP;
 	       rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_UNMAP_FRAME_1",
 	                  "Error unmapping blocks in the file ^FILE - \
 ^MESSAGE.",

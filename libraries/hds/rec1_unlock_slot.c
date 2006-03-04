@@ -232,7 +232,7 @@
             {
                hds_gl_status = DAT__FILCK;
                rec1_fmsg( "FILE", slot );
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC1_UNLOCK_SLOT_2",
                           "Unable to unlock the file ^FILE - ^MESSAGE.",
                           &hds_gl_status );

@@ -169,7 +169,7 @@
          rec1_fmsg( "FILE", slot );
          ems_seti_c( "BLOCKS", size );
          ems_seti_c( "SIZE", size * REC__SZBLK );
-         ems_syser_c( "MESSAGE", systat );
+         emsSyser( "MESSAGE", systat );
          ems_seti_c( "STV", fab.fab$l_stv );
          emsRep( "REC1_EXTEND_FILE_1",
                     "Unable to open the file ^FILE for extension to a size of \
@@ -199,7 +199,7 @@
             rec1_fmsg( "FILE", slot );
             ems_seti_c( "BLOCKS", size );
             ems_seti_c( "SIZE", size * REC__SZBLK );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             ems_seti_c( "STV", fab.fab$l_stv );
             emsRep( "REC1_EXTEND_FILE_2",
                        "Unable to extend the file ^FILE to a size of ^BLOCKS \
@@ -236,7 +236,7 @@ blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
             rec1_fmsg( "FILE", slot );
             ems_seti_c( "BLOCKS", size );
             ems_seti_c( "SIZE", size * REC__SZBLK );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             ems_seti_c( "STV", rab.rab$l_stv );
             emsRep( "REC1_EXTEND_FILE_3",
                        "Unable to attach a record stream to the file ^FILE to \
@@ -257,7 +257,7 @@ bytes) - ^MESSAGE (RAB status = ^STV).",
             rec1_fmsg( "FILE", slot );
             ems_seti_c( "BLOCKS", size );
             ems_seti_c( "SIZE", size * REC__SZBLK );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             ems_seti_c( "STV", rab.rab$l_stv );
             emsRep( "REC1_EXTEND_FILE_4",
                        "Failed to write to the file ^FILE to adjust the EOF \
@@ -285,7 +285,7 @@ position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
             rec1_fmsg( "FILE", slot );
             ems_seti_c( "BLOCKS", size );
             ems_seti_c( "SIZE", size * REC__SZBLK );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             ems_seti_c( "STV", fab.fab$l_stv );
             emsRep( "REC1_EXTEND_FILE_5",
                        "Failed to close the file ^FILE after adjusting the EOF \

@@ -421,7 +421,7 @@ specification \'^FSPEC\'.",
                {
                   hds_gl_status = DAT__FILNF;
                   emsSetnc( "FSPEC", fspec + start, fspec_len - start );
-                  ems_syser_c( "MESSAGE", systat );
+                  emsSyser( "MESSAGE", systat );
                   emsRep( "REC_WILD_FILE_4",
                              "Error searching for files matching the file \
 specification \'^FSPEC\' - ^MESSAGE.",
@@ -437,7 +437,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
             if ( !( systat & STS$M_SUCCESS ) )
             {
                hds_gl_status = DAT__FATAL;
-               ems_syser_c( "MESSAGE", systat );
+               emsSyser( "MESSAGE", systat );
                emsRep( "REC_WILD_FILE_5",
                           "Error ending a VMS wild-card file search context - \
 ^MESSAGE (internal programming error).",

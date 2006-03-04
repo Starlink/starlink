@@ -144,7 +144,7 @@
          {
             hds_gl_status = DAT__FILCK;
             rec1_fmsg( "FILE", slot );
-            ems_syser_c( "MESSAGE", systat );
+            emsSyser( "MESSAGE", systat );
             emsRep( "REC1_LOCK_SLOT_1",
                        "Unable to lock the file ^FILE for exclusive write \
 access - ^MESSAGE.",
