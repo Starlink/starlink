@@ -139,6 +139,8 @@
 /*       Report an error if the file specification is completely blank.     */
 /*    28-DEC-2005 (TIMJ):                                                   */
 /*       Use DAT__FLEXT rather than hard-coded ".SDF"                       */
+/*     4-MAR-2006 (TIMJ):                                                   */
+/*       Use emsSetp to create pointer value error token                    */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -248,7 +250,7 @@
          if ( !valid )
          {
             hds_gl_status = DAT__WLDIN;
-            ems_seti_c( "IWLD", (INT) *context );
+            emsSetp( "IWLD", *context );
             emsRep( "REC_WILD_FILE_1",
                        "Wild-card search context identifier is invalid; value \
 is ^IWLD (possible programming error).",
