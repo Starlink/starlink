@@ -1,0 +1,10 @@
+
+2.1
+
+  * Add emsSetu - unsigned int
+  * Add emsSetp - pointer location
+  * Add emsSeti64 - 64 bit integer
+
+2.0-8
+
+  * Autoconf EMS

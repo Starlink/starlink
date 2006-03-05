@@ -16,6 +16,7 @@
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J.Chipperfield (STARLINK)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -42,6 +43,8 @@
  *        #define EMS__VERSN
  *     20-SEP-2001 (AJC):
  *        Added emsSetnc and point ems_setc_c at it
+ *      3-MAR-2006 (TIMJ):
+ *        Add emsSetu / emsSetp / emsSeti64
  *     {enter_changes_here}
 
  *  Bugs:
@@ -51,6 +54,11 @@
 
 #ifndef EMS_DEFINED
 #define EMS_DEFINED
+
+/* ANSI types */
+#include <stddef.h>
+#include <inttypes.h>
+
 
 /* EMS Major Version */
 #define EMS__VERSN 2
@@ -112,11 +120,20 @@ void emsSetd( const char *token,
 void emsSeti( const char *token,  
                  int ivalue );
 
+void emsSeti64( const char *token,  
+                 int64_t ivalue );
+
 void emsSetl( const char *token,  
                  int lvalue );
 
 void emsSetr( const char *token,  
                  float rvalue );
+
+void emsSetp( const char *token,  
+                 void * pvalue );
+
+void emsSetu( const char *token,  
+                 unsigned int ivalue );
 
 void emsStat( int *status );      
 
