@@ -64,10 +64,28 @@
 
 /* Copyright:                                                               */
 /*    Copyright (C) 1992 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
 
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -104,6 +122,8 @@
 /*       Removed use of ftruncate.                                          */
 /*    22-JUN-2000 (BKM):                                                    */
 /*       Revise for extended format (64-bit) HDS files.                     */
+/*     4-MAR-2006 (TIMJ):                                                   */
+/*       Fix empty-if error. Use dat1emsSetBigi.                            */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -167,10 +187,10 @@
       {
          hds_gl_status = DAT__FILNX;
          rec1_fmsg( "FILE", slot );
-         ems_seti_c( "BLOCKS", size );
-         ems_seti_c( "SIZE", size * REC__SZBLK );
+         emsSeti( "BLOCKS", size );
+         emsSeti( "SIZE", size * REC__SZBLK );
          emsSyser( "MESSAGE", systat );
-         ems_seti_c( "STV", fab.fab$l_stv );
+         emsSeti( "STV", fab.fab$l_stv );
          emsRep( "REC1_EXTEND_FILE_1",
                     "Unable to open the file ^FILE for extension to a size of \
 ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
@@ -197,10 +217,10 @@
          {
             hds_gl_status = DAT__FILNX;
             rec1_fmsg( "FILE", slot );
-            ems_seti_c( "BLOCKS", size );
-            ems_seti_c( "SIZE", size * REC__SZBLK );
+            emsSeti( "BLOCKS", size );
+            emsSeti( "SIZE", size * REC__SZBLK );
             emsSyser( "MESSAGE", systat );
-            ems_seti_c( "STV", fab.fab$l_stv );
+            emsSeti( "STV", fab.fab$l_stv );
             emsRep( "REC1_EXTEND_FILE_2",
                        "Unable to extend the file ^FILE to a size of ^BLOCKS \
 blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
@@ -234,10 +254,10 @@ blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
          {
             hds_gl_status = DAT__FILNX;
             rec1_fmsg( "FILE", slot );
-            ems_seti_c( "BLOCKS", size );
-            ems_seti_c( "SIZE", size * REC__SZBLK );
+            emsSeti( "BLOCKS", size );
+            emsSeti( "SIZE", size * REC__SZBLK );
             emsSyser( "MESSAGE", systat );
-            ems_seti_c( "STV", rab.rab$l_stv );
+            emsSeti( "STV", rab.rab$l_stv );
             emsRep( "REC1_EXTEND_FILE_3",
                        "Unable to attach a record stream to the file ^FILE to \
 adjust the EOF position after extending to a size of ^BLOCKS blocks (^SIZE \
@@ -255,10 +275,10 @@ bytes) - ^MESSAGE (RAB status = ^STV).",
          {
             hds_gl_status = DAT__FILNX;
             rec1_fmsg( "FILE", slot );
-            ems_seti_c( "BLOCKS", size );
-            ems_seti_c( "SIZE", size * REC__SZBLK );
+            emsSeti( "BLOCKS", size );
+            emsSeti( "SIZE", size * REC__SZBLK );
             emsSyser( "MESSAGE", systat );
-            ems_seti_c( "STV", rab.rab$l_stv );
+            emsSeti( "STV", rab.rab$l_stv );
             emsRep( "REC1_EXTEND_FILE_4",
                        "Failed to write to the file ^FILE to adjust the EOF \
 position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
@@ -283,10 +303,10 @@ position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
          {
             hds_gl_status = DAT__FILNX;
             rec1_fmsg( "FILE", slot );
-            ems_seti_c( "BLOCKS", size );
-            ems_seti_c( "SIZE", size * REC__SZBLK );
+            emsSeti( "BLOCKS", size );
+            emsSeti( "SIZE", size * REC__SZBLK );
             emsSyser( "MESSAGE", systat );
-            ems_seti_c( "STV", fab.fab$l_stv );
+            emsSeti( "STV", fab.fab$l_stv );
             emsRep( "REC1_EXTEND_FILE_5",
                        "Failed to close the file ^FILE after adjusting the EOF \
 to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
@@ -303,9 +323,9 @@ to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
 /* (extended) file. Attempt to read it.                                     */
       iochan = rec_ga_fcv[ slot ].write;
 #if HAVE_FSEEKO
-      if ( (doneok = !fseeko( iochan, size * REC__SZBLK - 1, SEEK_SET )) );
+      if ( (doneok = !fseeko( iochan, size * REC__SZBLK - 1, SEEK_SET )) )
 #else
-      if ( (doneok = !fseek( iochan, size * REC__SZBLK - 1, SEEK_SET )) );
+      if ( (doneok = !fseek( iochan, size * REC__SZBLK - 1, SEEK_SET )) )
 #endif
       {
          fread( charbuf, 1, 1, iochan );
@@ -325,9 +345,9 @@ to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
          {
             clearerr( iochan );
 #if HAVE_FSEEKO
-            if ( (doneok = !fseeko( iochan, size * REC__SZBLK - 1, SEEK_SET )));
+            if ( (doneok = !fseeko( iochan, size * REC__SZBLK - 1, SEEK_SET )))
 #else
-            if ( (doneok = !fseek( iochan, size * REC__SZBLK - 1, SEEK_SET )));
+            if ( (doneok = !fseek( iochan, size * REC__SZBLK - 1, SEEK_SET )))
 #endif
             {
                charbuf[ 0 ] = '\0';
@@ -362,8 +382,8 @@ to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
          hds_gl_status = DAT__FILNX;
          emsSyser( "MESSAGE", errno );
          rec1_fmsg( "FILE", slot );
-         ems_seti_c( "BLOCKS", size );
-         ems_seti_c( "SIZE", size * REC__SZBLK );
+         dat1emsSetBigi( "BLOCKS", size );
+         dat1emsSetBigi( "SIZE", size * REC__SZBLK );
          emsRep( "REC1_EXTEND_FILE_6",
                     "Unable to extend the file ^FILE to a size of ^BLOCKS \
 blocks (^SIZE bytes) - ^MESSAGE",
