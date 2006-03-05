@@ -74,15 +74,7 @@
 #include "star/mem.h"
 #include "ems.h"
 #include "ems_par.h"
-
-/* Facility system interface function declaration */
-void ems1_get_facility_error
-( 
-unsigned int errcode,	/* error code in messgen format (given) */
-char **facility_name,	/* facility name (returned) */
-char **error_ident,	/* message identifier (returned) */
-char **error_text	/* message text (returned */
-);
+#include "ems1.h"
 
 /*  Function Definition: */
 void ems1Fcerr( char *errstr, int *errnum_p ) {
