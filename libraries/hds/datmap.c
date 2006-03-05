@@ -232,8 +232,7 @@ datMap(const HDSLoc    *locator,
    }
 #endif
 
-/* Return a Fortran pointer to the object data. */
-/*   *pntr = cnf_fptr( retpntr ); */
+/* copy pointer to user */
    *pntr = retpntr;
 
 /* If conversion errors occurred, then report contextual information.        */
@@ -515,9 +514,7 @@ datBasic(const HDSLoc *locator,
    *len    = objlen;
    state->mapped = ( retpntr != NULL );
 
-/* Return a Fortran pointer to the object data. */
-/*   *pntr = cnf_fptr( retpntr ); */
-
+/* Copy c pointer to user */
     *pntr = retpntr;
 
    _call(hds_gl_status)

@@ -113,9 +113,9 @@
       else
 #endif
 
-/* Release the memory previously allocated by cnf_malloc.                   */
+/* Release the memory previously allocated by cnfMalloc.                   */
       {
-         cnf_free( *pntr );
+         cnfFree( *pntr );
       }
 
 /* Return a null pointer.                                                   */

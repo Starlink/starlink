@@ -146,7 +146,7 @@
       int flags;		 /* Mapping flags			    */
       int pagesize;		 /* System page size			    */
       int prot;			 /* Mapping protection mask		    */
-      int reg;                   /* Returned value from cnf_regp            */
+      int reg;                   /* Returned value from cnfRegp            */
       off_t off;		 /* File offset rounded to page size	    */
       size_t len;		 /* No. bytes to map			    */
       unsigned char *start;      /* Address returned by mmap                */
@@ -599,7 +599,7 @@ file ^FILE - ^MESSAGE",
 
 /* Attempt to register the resulting pointer so it may be exported and used */
 /* from both C and Fortran.                                                 */
-                  reg = cnf_regp( *pntr );
+                  reg = cnfRegp( *pntr );
 
 /* If registration failed because the pointer is not unique when converted  */
 /* into Fortran format, then unmap the file and generate a suggested        */

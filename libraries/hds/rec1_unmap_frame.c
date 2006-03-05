@@ -340,7 +340,7 @@
 
 /* Unregister the pointer to the exportable mapped memory and reset the     */
 /* pointer value.                                                           */
-            cnf_uregp( *pntr );
+            cnfUregp( *pntr );
             *pntr = NULL;
 	 }
 	 else

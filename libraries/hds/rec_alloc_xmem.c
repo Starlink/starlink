@@ -120,9 +120,9 @@
       else
 #endif
 
-/* Allocate the required memory using cnf_malloc, so that it is exportable. */
+/* Allocate the required memory using cnfMalloc, so that it is exportable. */
       {
-         *pntr = cnf_malloc( (size_t) size );
+         *pntr = cnfMalloc( (size_t) size );
 
 /* If allocation failed, then report an error.                              */
          if ( *pntr == NULL )
