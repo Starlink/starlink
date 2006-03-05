@@ -21,8 +21,8 @@ F77_SUBROUTINE(ems_eload) ( CHARACTER(param), INTEGER(parlen), CHARACTER(opstr),
    char str2[EMS__SZMSG+1];
 
    emsEload(str1, parlen, str2, oplen, status);
-   cnf_exprt( str1, param, param_length );
-   cnf_exprt( str2, opstr, opstr_length );
+   cnfExprt( str1, param, param_length );
+   cnfExprt( str2, opstr, opstr_length );
 
    return;
 }
