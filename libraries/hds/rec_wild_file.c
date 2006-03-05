@@ -432,7 +432,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
 /* End the LIB$FIND_FILE search context, checking for any errors. Perform   */
 /* this in a new error reporting environment, since we may be cleaning up   */
 /* after a previous error.                                                  */
-            ems_begin_c( &hds_gl_status );
+            emsBegin( &hds_gl_status );
             systat = LIB$FIND_FILE_END( &ictx );
             if ( !( systat & STS$M_SUCCESS ) )
             {
@@ -443,7 +443,7 @@ specification \'^FSPEC\' - ^MESSAGE.",
 ^MESSAGE (internal programming error).",
                           &hds_gl_status );
             }
-            ems_end_c( &hds_gl_status );
+            emsEnd( &hds_gl_status );
 
 /* Portable version:                                                        */
 /* ================                                                         */
@@ -623,7 +623,7 @@ specification \'^FSPEC\'.",
 /* Close the stream connected to the shell process and check for errors. Do */
 /* this inside a new error reporting environment, since we may be cleaning  */
 /* up after a previous error.                                               */
-               ems_begin_c( &hds_gl_status );
+               emsBegin( &hds_gl_status );
                if ( fclose ( stream ) != 0 )
                {
                   hds_gl_status = DAT__FATAL;
@@ -633,7 +633,7 @@ specification \'^FSPEC\'.",
 from a shell process - ^MESSAGE",
                              &hds_gl_status );
                }
-               ems_end_c( &hds_gl_status );
+               emsEnd( &hds_gl_status );
 
 /* Kill the shell process (just to be sure) and wait for it to terminate.   */
 #if HAVE_SYS_WAIT_H

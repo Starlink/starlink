@@ -190,7 +190,7 @@
       {
 
 /* Start a new error reporting environment.				    */
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
 
 /* VMS version:								    */
 /* ===========								    */
@@ -395,7 +395,7 @@
 #endif
 
 /* End the error reporting environment.					    */
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
 
 /* Return the global status value.					    */

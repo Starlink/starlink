@@ -72,7 +72,7 @@
 /*.                                                                         */
 
 /* Begin a new error reporting context.                                     */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
 
 /* Check that the LCP pointer supplied is not null. Report an error if it   */
 /* is.                                                                      */
@@ -145,6 +145,6 @@ pointer (internal programming error).",
       *lcp = NULL;
 
 /* End the error reporting context and exit the routine.                    */
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
       return;
    }

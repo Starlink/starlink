@@ -55,7 +55,7 @@ dau_flush_data(struct LCP_DATA *data)
       return hds_gl_status;
 
 /* Begin a new error reporting context.                                     */
-   ems_begin_c( &hds_gl_status );
+   emsBegin( &hds_gl_status );
 
 /* Set the global file mapping flag to the value used when the data were    */
 /* originally mapped.                                                       */
@@ -141,7 +141,7 @@ dau_flush_data(struct LCP_DATA *data)
    hds_gl_map = mapsave;
 
 /* End the error reporting context.                                         */
-   ems_end_c( &hds_gl_status );
+   emsEnd( &hds_gl_status );
 
    return hds_gl_status;
 }

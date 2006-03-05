@@ -275,7 +275,7 @@ position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
 /* cleaning up after a previous error.                                      */
       if ( opened )
       {
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
          systat = SYS$CLOSE( &fab );
 
 /* Check for errors.                                                        */
@@ -292,7 +292,7 @@ position after extending to a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE \
 to give a size of ^BLOCKS blocks (^SIZE bytes) - ^MESSAGE (FAB status = ^STV).",
                        &hds_gl_status );
          }
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
 
 /* Portable version:                                                        */

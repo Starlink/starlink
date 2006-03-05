@@ -101,7 +101,7 @@ struct LCP_DATA  *data;
       {
 
 /* Begin a new error reporting context.                                     */
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
 
 /* Obtain a pointer to the LCP data fields.                                 */
          lcp = *pntr;
@@ -124,7 +124,7 @@ struct LCP_DATA  *data;
 
 /* End the error reporting context and return the current global status     */
 /* value.                                                                   */
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
       return hds_gl_status;
    }

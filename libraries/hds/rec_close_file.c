@@ -65,12 +65,12 @@
 /*.                                                                         */
 
 /* Begin a new error reporting context.                                     */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
 
 /* Close the File Control Vector slot.                                      */
       rec1_close_slot( han->slot );
 
 /* End the error reporting context and return.                              */
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
       return;
    }

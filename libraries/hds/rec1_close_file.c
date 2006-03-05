@@ -112,7 +112,7 @@ int fsync ( int );
 /*.                                                                         */
 
 /* Begin a new error reporting context.                                     */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
 
 /* Obtain the I/O channel (or stream) to be closed.                         */
       iochan = ( mode == 'R' ) ? rec_ga_fcv[ slot ].read :
@@ -189,6 +189,6 @@ int fsync ( int );
 
 /* End the error reporting context and return the current global status     */
 /* value.                                                                   */
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
       return hds_gl_status;
    }

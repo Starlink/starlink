@@ -102,7 +102,7 @@
       {
 
 /* Begin a new error reporting context.                                     */
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
 
 /* See if the data segment was modified.                                    */
          modify = ( mode != 'R' );
@@ -164,7 +164,7 @@
          *pntr = NULL;
 
 /* End the error reporting context.                                         */
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
 
 /* Return the global status value.                                          */

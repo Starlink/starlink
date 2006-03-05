@@ -288,9 +288,9 @@ access in file ^FILE - ^MESSAGE.",
 	       {
                   systat = SYS$DELTVA( actrng, 0, 0 );
 	       }
-	       ems_begin_c( &hds_gl_status );
+	       emsBegin( &hds_gl_status );
 	       rec1_put_addr( start, end, &hds_gl_status );
-	       ems_end_c( &hds_gl_status );
+	       emsEnd( &hds_gl_status );
             }
 	 }
 

@@ -319,7 +319,7 @@ perform a wild-card file search - ^MESSAGE",
 /* Close the input stream to the shell process and check for errors. Do	    */
 /* this inside a new error reporting environment in case we are cleaning up */
 /* after a previous error.						    */
-	 ems_begin_c( &hds_gl_status );
+	 emsBegin( &hds_gl_status );
          if ( fclose( str[ 1 ] ) != 0 )
 	 {
 	    hds_gl_status = DAT__FATAL;
@@ -329,7 +329,7 @@ perform a wild-card file search - ^MESSAGE",
 shell process - ^MESSAGE",
 		       &hds_gl_status );
 	 }
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
 
 /* If there was no error, then return the output stream for the shell	    */
 /* process, from which the list of files can be read.			    */

@@ -75,7 +75,7 @@
 /*.                                                                         */
 
 /* Begin a new error reporting context.                                     */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
 
 /* Report an error if the frame size is invalid.                            */
       if ( size <= 0 )
@@ -175,6 +175,6 @@ argument of ^BLOC (internal programming error).",
 
 /* End the error reporting environment and return the current global status */
 /* value.                                                                   */
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
       return hds_gl_status;
    }

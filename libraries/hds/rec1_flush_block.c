@@ -67,7 +67,7 @@
       {
 
 /* Begin a new error reporting context.                                     */
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
 
 /* Write the block back to the container file and reset the modified block  */
 /* flag.                                                                    */
@@ -78,7 +78,7 @@
          }
 
 /* End the error reporting context.                                         */
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
 
 /* Return the global status value.                                          */

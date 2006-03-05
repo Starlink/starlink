@@ -96,7 +96,7 @@
       {
 
 /* Begin a new error reporting context.                                     */
-         ems_begin_c( &hds_gl_status );
+         emsBegin( &hds_gl_status );
 
 /* Shut down all the open slots in the File Control Vector. Then deallocate */
 /* the FCV itself.                                                          */
@@ -129,7 +129,7 @@
          rec_gl_active = 0;
 
 /* End the error reporting context.                                         */
-         ems_end_c( &hds_gl_status );
+         emsEnd( &hds_gl_status );
       }
 
 /* Exit the routine.                                                        */

@@ -418,7 +418,7 @@ extern char **environ;           /* Pointer to environment array            */
 /* Close the reading end of the input pipe (this is not required). Check    */
 /* for errors. Perform this operation inside a separate error reporting     */
 /* environment, since we may be cleaning up after a previous error.         */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
       if ( close( pipein[ 0 ] ) != 0 )
       {
          hds_gl_status = DAT__FATAL;
@@ -428,10 +428,10 @@ extern char **environ;           /* Pointer to environment array            */
                     "after creating a shell process - ^MESSAGE",
                     &hds_gl_status );
       }
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
 
 /* Similarly close the writing end of the output pipe.                      */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
       if ( close( pipeout[ 1 ] ) != 0 )
       {
          hds_gl_status = DAT__FATAL;
@@ -441,7 +441,7 @@ extern char **environ;           /* Pointer to environment array            */
                     "after creating a shell process - ^MESSAGE",
                     &hds_gl_status );
       }
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
 
 /* Open a file stream on the input pipe.                                    */
       if ( _ok( hds_gl_status ) )

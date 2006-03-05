@@ -334,7 +334,7 @@ to shell process - ^MESSAGE",
 /* Close the stream and check for errors.  Do this inside a new error       */
 /* reporting environment, since we may be cleaning up after a previous      */
 /* error.                                                                   */
-            ems_begin_c( &hds_gl_status );
+            emsBegin( &hds_gl_status );
             if ( fclose ( stream ) != 0 )
             {
                hds_gl_status = DAT__FATAL;
@@ -344,7 +344,7 @@ to shell process - ^MESSAGE",
 a shell process - ^MESSAGE",
                           &hds_gl_status );
             }
-            ems_end_c( &hds_gl_status );
+            emsEnd( &hds_gl_status );
 
 /* Kill the shell process (just to be sure).                                */
 #if HAVE_SYS_WAIT_H

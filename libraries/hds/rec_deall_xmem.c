@@ -98,14 +98,14 @@
 /* inside a new error reporting environment.                                */
          if ( !( systat & STS$M_SUCCESS ) )
          {
-            ems_begin_c( &hds_gl_status );
+            emsBegin( &hds_gl_status );
             hds_gl_status = DAT__NOMEM;
             ems_seti_c( "NBYTES", size );
             emsSyser( "MESSAGE", systat );
             emsRep( "REC_DEALL_XMEM_1",
                        "Unable to release a block of ^NBYTES bytes of memory "
                        "- ^MESSAGE", &hds_gl_status );
-            ems_end_c( &hds_gl_status );
+            emsEnd( &hds_gl_status );
          }
       }
 

@@ -65,7 +65,7 @@
 /*.                                                                         */
 
 /* Begin a new error reporting environment.                                 */
-      ems_begin_c( &hds_gl_status );
+      emsBegin( &hds_gl_status );
 
 /* Loop to validate the wild-card search context by comparing it with each  */
 /* context currently on the wild-card context queue. Omit this stage if the */
@@ -128,6 +128,6 @@ is ^IWLD (possible programming error).",
       *context = NULL;
 
 /* End the error reporting environment and exit the routine.                */
-      ems_end_c( &hds_gl_status );
+      emsEnd( &hds_gl_status );
       return;
    }

@@ -88,7 +88,7 @@ hdsStop( int *status)
 /*.                                                                         */
 
 /* Begin a new error reporting context.                                     */
-   ems_begin_c( status );
+   emsBegin( status );
    hds_gl_status = *status;
 
 /* Check that HDS is active. There is nothing to do if it is not.           */
@@ -123,7 +123,7 @@ System (HDS).",
 
 /* End the error reporting context.                                         */
    *status = hds_gl_status;
-   ems_end_c( status );
+   emsEnd( status );
 
 /* Exit the routine.                                                        */
    return *status;
