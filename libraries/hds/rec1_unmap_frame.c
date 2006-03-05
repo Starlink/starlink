@@ -93,9 +93,30 @@
 /*    rec1_map_frame was made. This is to ensure that the same method of    */
 /*    frame access (I/O or file mapping) is used in both cases.		    */
 
+/*  Copyright:                                                              */
+/*    Copyright (C) 1991 Science and Engineering Research Council.          */
+/*    Copyright (C) 2005 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
 /*    PWD: Peter W. Draper (STARLINK, Durham University)                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
@@ -379,8 +400,8 @@
 	       {
 	          hds_gl_status = DAT__FILWR;
 	          emsSyser( "MESSAGE", errno );
-	          ems_seti_c( "FIRST", offs + 1 );
-	          ems_seti_c( "LAST", offs + length );
+	          dat1emsSetBigi( "FIRST", offs + 1 );
+	          dat1emsSetBigi( "LAST", offs + length );
 	          rec1_fmsg( "FILE", slot );
 	          emsRep( "REC1_UNMAP_FRAME_3",
 	                     "Error writing bytes ^FIRST:^LAST to file ^FILE - \
