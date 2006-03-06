@@ -69,7 +69,6 @@
 *      RTP: Roy Platon (STARLINK)
 *      NG: Norman Gray (Starlink)
 *      TJ: Tim Jenness (JAC, Hawaii)
-*      DSB: David Berry (JAC, UCLan)
 *
 *  Bugs:
 *      This routine does not provide all the facilities offered by the
@@ -171,8 +170,6 @@
 *      19-SEP-2005 (TJ):
 *         Removed unused defines for isspace and memcpy.
 *         Use cnfExprt rather than hand-rolled padding of strings
-*      3-MAR-2006 (DSB):
-*         Modified to allow file names to contain embedded spaces.
 *.
 *-
  */
@@ -282,11 +279,6 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
    int NullFd;           /* File descriptor for the null device */
    char *PointFSpec;     /* Local copy of FileSpec          */
    int STATUS;           /* Local fork STATUS */
-   int i;                /* Loop couint */
-   const char *f;        /* Pointer to next FileSpec character */
-   char *c;              /* Pointer to next Command character */
-   int got_nonspace;     /* Has a non-blank character been found yet? */
-   int nspace;           /* Number of embedded spaces in the FileSpec */   
 
    /*  Start off by checking for good status  */
 
@@ -337,61 +329,8 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 	    emsRep("one_find_file","Error from pipe",Status);
          } else {
 
-            /* Exclude any trailing spaces from the length of FileSpec. */
-
-            f = FileSpec + SpecLength - 1;
-            while( *f == ' ' && f >= FileSpec ) {
-               f--;
-            }
-            SpecLength = f - FileSpec + 1;
-
-            /* Count the number of embedded spaces in the FileSpec. */
-
-            nspace = 0;
-            f = FileSpec;
-            for( i = 0; i < SpecLength; i++ ) {
-               if( *(f++) == ' ' ) nspace++;
-            }
-
-            /* Allocate enough room for the eventual ls command string,
-             * including room for an escape character for every embedded 
-             * space. 
-             */
-
-            Command = (char *) malloc( SpecLength + 10 + nspace );
-            if( Command ) {
-
-                /* Copy the filespec from the PointFSpec pointer that we 
-                 * have been passed, remembering that this is a string from 
-                 * a Fortran program, and so is blank padded rather than 
-                 * null terminated (SpecLength is the length of FileSpec, 
-                 * excluding trailing blanks).
-                 */
-   
-                /* Add -d to ls if we are not listing directory contents */
-	        (void) strcpy( Command, "ls " );
-                c = Command + 3;
-		if ( F77_ISFALSE( *LisDir ) ) {
-		  strcpy( c, "-d " );
-                  c += 3;
-		}
-      
-                /* Append the file spec to the command, putting an escape
-                   character in front of every embedded space. Ignore leading
-                   white space.
-                */
-                f = FileSpec;
-                got_nonspace = 0;
-                for( i = 0; i < SpecLength; i++ ) {
-                   if( *f == ' ' ) {
-                      if( got_nonspace ) *(c++) = '\\';
-                   } else {
-                      got_nonspace = 1;
-                   }
-                   *(c++) = *(f++);
-                }                
-                *(c++) = '\0';
-             }
+            /* Allocate enough room for the eventual ls command string */
+            Command = (char *) malloc( SpecLength + 10 );
 
             /*  Fdptr[0] can now be used as the reading end of the pipe,
              *  and Fdptr[1] as the writing end.  Having that, we now
@@ -408,7 +347,22 @@ F77_INTEGER_FUNCTION(one_find_file)( CHARACTER(FileSpec), LOGICAL(LisDir),
 
             } else if (STATUS == 0) {
 
-               /*  This is the child process in which we will exec `ls'.  */
+                /*  This is the child process in which we will exec
+                 *  `ls'.  Copy the filespec from the PointFSpec
+                 *  pointer that we have been passed, remembering that
+                 *  this is a string from a Fortran program, and so is
+                 *  blank padded rather than null terminated.
+                 */
+
+                /* SpecLength is the total length of FileSpec,
+                   including trailing blanks */
+                /* Add -d to ls if we are not listing directory contents */
+	      
+	        (void) strcpy( Command, "ls " );
+		if ( F77_ISFALSE( *LisDir ) ) {
+		  strcat( Command, "-d " );
+		}
+	        (void) strncat( Command, FileSpec, SpecLength );
 
                /*  Now we arrange things so that the 'ls' command will
                 *  send its output back down our pipe.  We want to redirect
