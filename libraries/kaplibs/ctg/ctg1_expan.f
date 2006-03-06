@@ -68,6 +68,9 @@
 *     12-APR-2000 (DSB):
 *        Corrected code which chooses whether to pruge duplicate file
 *        names.
+*     6-MAR-2006 (DSB):
+*        Escape any spaces in the supplied template before using
+*        ONE_FIND_FILE.
 *     {enter_further_changes_here}
 
 *-
@@ -108,6 +111,7 @@
       CHARACTER SEARCH*1024        ! The total search string
       CHARACTER SPEC*(GRP__SZNAM)  ! The file spec of the matching file
       CHARACTER SUF*20             ! File suffix
+      CHARACTER TMPLT2*(GRP__SZNAM)! Template with escaped spaces
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
       INTEGER CI                 ! CAT identifier
       INTEGER F                  ! Index of first non-blank character
@@ -120,6 +124,7 @@
       INTEGER IGRPD              ! Group holding directory fields
       INTEGER IGRPH              ! Group holding FITS extension fields
       INTEGER IGRPT              ! Group holding file type fields
+      INTEGER J                  ! Loop count
       INTEGER L                  ! Index of last non-blank character
       INTEGER NMATCH             ! No. of matching file types
       INTEGER SIZE0              ! Size of original group
@@ -193,10 +198,22 @@
 *  Indicate that duplicate file names should not be purged.
          PURGE = .FALSE.
 
-*  Otherwise, split the template into directory, basename, suffix and
-*  FITS extension. 
+*  Otherwise, we escape any embedded spaces in the template so that the 
+*  shell script used by one_find_file will interpret the spaces as part
+*  of the file path.
       ELSE
-        CALL CTG1_FPARS( TEMPLT, DIR, BN, SUF, EXT, STATUS )
+         J = 1
+         DO I = F, L
+            IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
+               TMPLT2( J : J ) = '\'
+               J = J + 1
+            END IF
+            TMPLT2( J : J ) = TEMPLT( I : I )
+            J = J + 1
+         END DO
+
+*  Split the template into directory, basename, suffix and section.
+         CALL CTG1_FPARS( TMPLT2, DIR, BN, SUF, EXT, STATUS )
 
 *  From now on, if no suffix was given, use ".*" so that we pick up files 
 *  with any of the known catalogue formats. But indicate that duplicate 

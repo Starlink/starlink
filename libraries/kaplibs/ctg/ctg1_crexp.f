@@ -60,6 +60,9 @@
 *        Replace call to CTG1_WILD with call to ONE_FIND_FILE
 *     16-NOV-2005 (DSB):
 *        Ensure IGRPB and IGRPT are initialised if no basis group is supplied.
+*     6-MAR-2006 (DSB):
+*        Escape any spaces in the supplied filename template before using
+*        ONE_FIND_FILE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,20 +112,25 @@
       CHARACTER DIR*(GRP__SZNAM)   ! Directory path 
       CHARACTER DIR1*(GRP__SZFNM)  ! Supplied directory path 
       CHARACTER DIR2*(GRP__SZFNM)  ! Expanded directory path 
+      CHARACTER EXT1*50            ! Supplied catalogue section (ignored)
       CHARACTER FMTOUT*(CTG__SZFMT)! List of output catalogue formats
       CHARACTER NAME*(GRP__SZNAM)  ! Current name
-      CHARACTER EXT1*50            ! Supplied catalogue section (ignored)
       CHARACTER SUF1*100           ! Supplied file suffix
+      CHARACTER TMPLT2*(GRP__SZNAM)! Template with escaped spaces
       CHARACTER TYP*(GRP__SZNAM)   ! File type 
       CHARACTER TYPS( MXTYP )*(SZTYP)! Known foreign file types
       INTEGER ADDED              ! No. of names added to the group
+      INTEGER F                  ! Index of first non-blank character
       INTEGER I                  ! Loop count
+      INTEGER II                 ! Loop count
       INTEGER IAT                ! Index of last non-blank character
       INTEGER IAT2               ! Index of last non-blank character
       INTEGER ICONTX             ! Context for CTG1_wild
       INTEGER IGRPB              ! Group of file base names
       INTEGER IGRPD              ! Group of directories
       INTEGER IGRPT              ! Group of file types
+      INTEGER J                  ! Loop count
+      INTEGER L                  ! Index of last non-blank character
       INTEGER MODIND             ! Index of basis spec
       INTEGER NTYP               ! No. of known foreign data formats
       INTEGER SIZE0              ! Size of group on entry.
@@ -222,9 +230,24 @@
 *  Get the next new name added to the output group.
          CALL GRP_GET( IGRP, I, 1, NAME, STATUS )
 
+*  Find the first and last non-blank characters in the template.
+         CALL CHR_FANDL( NAME, F, L )
+
+*  We escape any embedded spaces in the template so that the shell script 
+*  used by one_find_file will interpret the spaces as part of the file path.
+         J = 1
+         DO II = F, L
+            IF( NAME( II : II ) .EQ. ' ' ) THEN
+               TMPLT2( J : J ) = '\'
+               J = J + 1
+            END IF
+            TMPLT2( J : J ) = NAME( II : II )
+            J = J + 1
+         END DO
+
 *  Split this up into directory, basename, suffix and FITS extension (not
 *  used).
-         CALL CTG1_FPARS( NAME, DIR1, BN1, SUF1, EXT1, STATUS )
+         CALL CTG1_FPARS( TMPLT2, DIR1, BN1, SUF1, EXT1, STATUS )
 
 *  If a directory spec was included, expand it to remove any shell
 *  meta-characters.
