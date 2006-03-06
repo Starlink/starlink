@@ -7,7 +7,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                                             int ndim, int dims[3], int skip[3],
                                             CupidPixelSet **clumps, 
                                             double clevel, int *index,
-                                            int naxis, int ilevel, 
+                                            int naxis, int ilevel, int newok,
                                             int *slbnd, double *maxpd ){
 /*
 *  Name:
@@ -21,7 +21,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *                                     int ndim, int dims[3], int skip[3], 
 *                                     CupidPixelSet **clumps, 
 *                                     double clevel, int *index, int naxis,
-*                                     int ilevel, int *slbnd, double *maxpd )
+*                                     int ilevel, int newok, int *slbnd, 
+*                                     double *maxpd )
 
 *  Description:
 *     This function scans the data array for pixels at or above the
@@ -86,6 +87,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        "naxis" axes.
 *     ilevel
 *        Diagnostic information level.
+*     newok
+*        Can new clumps be started at this contour level?
 *     slbnd
 *        Pointer to an array holding the lower pixel index bound of the
 *        data array on each axis.
@@ -210,8 +213,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    save a pointer to the adjoining PixelSet. */
                      psn = ( il2 != CUPID__CFNULL ) ? ret[ il2 ] : NULL;
 
-/* If none of the neighbours of this pixel are assigned to a PixelSet
-   which was identified at this contour level, then start a new PixelSet. */
+/* If none of the neighbours of this pixel are assigned to a PixelSet which 
+   was identified at this contour level, then start a new PixelSet.*/
                      if( n1 == 0 ) {
 
 /* Find the index value to use. We re-use indices for any PixelSets which
@@ -220,38 +223,43 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    index value. */
                         while( *index > hindex && !ret[ *index - 1 ] ) (*index)--;
 
-/* Abort if we are using too many PixelSets. The limit is set by the need 
-   to be able to pack two indices into a single "int" in order to store the 
-   actual PixelSet index plus a neighbouring PixelSet index in a single
-   "int". The packing and unpacking are handled by macros cupidMergeSet, 
-   cupidMergeNeb and cupidMergeIndex. The lower 14 bits of a packed "int" 
-   hold the index of the PixelSet containing the pixel. Therefore, the index 
-   of any PixelSet cannot exceed 2^14. */
-                        if( *index >= CUPID__MAXINDEX ) {
+/* If "newok" indicates that we cannot start any new clumps at this
+   contour level, then we ignore this pixel unless it adjoins a PixelSet
+   defined at a higher contour level. */
+                        if( newok || psn ) {
 
-                           for( ii = 0; ii < *index; ii++ ) {
-                              ret[ ii ] = cupidCFFreePS( ret[ ii ], NULL, nel );
-                           }
-
-                           *status = SAI__ERROR;
-                           errRep( "CUPIDCFSCAN_ERR1", "Too many contiguous pixel "
-                                   "sets needed. Try using larger contour intervals "
-                                   "or a higher minimum contour level.", status );
-                           goto L999;
+/* Issue a warning and leave the loop if we are using too many PixelSets. The 
+   limit is set by the need to be able to pack two indices into a single "int" 
+   in order to store the actual PixelSet index plus a neighbouring PixelSet 
+   index in a single "int". The packing and unpacking are handled by macros 
+   cupidMergeSet, cupidMergeNeb and cupidMergeIndex. The lower 14 bits of a 
+   packed "int" hold the index of the PixelSet containing the pixel. Therefore,
+   the index of any PixelSet cannot exceed 2^14. */
+                           if( *index >= CUPID__MAXINDEX ) {
+                              msgBlank( status );
+                              msgOut( "", "WARNING: Too many contiguous pixel "
+                                      "sets needed. Pixels at lower contour "
+                                      "levels may have been ignored. Try using "
+                                      "larger contour intervals, a higher "
+                                      "minimum contour level or a smaller image.",
+                                      status );
+                              msgBlank( status );
+                              goto L10;
 
 /* Otherwise, allocate memory for a new PixelSet structure and initialise
    it. Also, put the new PixelSet pointer into the relevant element of the
    returned array, extending the array if necessary. */
-                        } else {
-                           ps = cupidCFMakePS( *index );
-                           ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
-   
-                           if( ret && ps ) {
-                              ret[ ps->index ] = ps;
+                           } else {
+                              ps = cupidCFMakePS( *index );
+                              ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
+      
+                              if( ret && ps ) {
+                                 ret[ ps->index ] = ps;
    
 /* Add the current pixel to this new PixelSet. */
-                              cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, 
-                                               edge, psn );
+                                 cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, 
+                                                  edge, psn );
+                              }
                            }
                         }
 
@@ -289,6 +297,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
          }
       }
    }
+
+L10:
 
 /* Now check each of the new PixelSets created above. If the last used
    index is freed, then decrement the last used index in "*index" so that we
@@ -384,8 +394,6 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
       msgOut( "", "   ^P checked, ^N found", status );
       msgBlank( status );
    }
-
-L999:
 
 /* Return the expanded list of clumps. */
    return ret;

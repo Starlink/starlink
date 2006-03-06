@@ -112,12 +112,9 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
    TLOW. */
    } else {
 
-/* Get the contour interval using twice the RMS as the default. */
-      cdelta = cupidConfigD( config, "DELTAT", 2.0*rms );
-
 /* Get the lowest contour level using four times the RMS above the minimum
    data value as the default. */
-      clow = cupidConfigD( config, "TLOW", mind + 4.0*rms );
+      clow = cupidConfigD( config, "TLOW", mind + 10.0*rms );
 
 /* Report an error if the lowest contour level is below the minimum value
    in the data array. */
@@ -129,9 +126,20 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                  "(Tlow=^TLOW) is below the minimum value in the data "
                  "array (^MIND).", status );
 
-/* Otherwise, find the number of contours, and allocate the returned array. */
+/* Otherwise, find the TDELTA value which would give 100 contours. */
       } else {
+         cdelta = ( maxd - clow )/100 ;
+
+/* If this is less than 2*RMS we use 2*RMS as the default. */
+         if( cdelta < 2.0*rms ) cdelta = 2.0*rms; 
+
+/* Get the contour interval using the above default. */
+         cdelta = cupidConfigD( config, "DELTAT", cdelta );
+
+/* Find the number of levels needed for this deltat. */
          *nlevels = (int) ( ( maxd - clow )/cdelta );
+
+/* Allocate the array and fill it with the appropriate contour levels. */
          ret = astMalloc( sizeof( double )*(*nlevels) );
          if( ret ) {
             clevel = clow;
