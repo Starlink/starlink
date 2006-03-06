@@ -520,6 +520,7 @@
       INTEGER NVEC               ! No. of vectors in catalogue
       LOGICAL ALIGN              ! Was DATA pic aligned with an old DATA pic?
       LOGICAL AXES               ! Annotated axes to be drawn?
+      LOGICAL CLRKEY             ! Clear the key background?
       LOGICAL GOTZ               ! Was a Z column supplied?
       LOGICAL HINIT              ! Initialise histogram?
       LOGICAL KEY                ! A key to vector scale to be plotted?
@@ -1082,6 +1083,7 @@
 *  a Frame (eg ICAT) in the returned Plot, you add the returned value of 
 *  NFRM onto its index in IWCS.  The PGPLOT viewport is set up so that it
 *  corresponds to the DATA picture.
+      CLRKEY = .FALSE.
       IF( KEY ) THEN
 
 *  Get the position required for the key. The margin between DATA and KEY 
@@ -1091,6 +1093,7 @@
             MARGIN( 2 ) = KEYPOS( 1 )
          ELSE
             MARGIN( 2 ) = KEYPOS( 1 ) - KW
+            CLRKEY = .TRUE.
          END IF
 
 *  Start up the graphics system, creating a KEY picture.
@@ -1291,6 +1294,10 @@
             CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
             KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
 
+*  Drop it a little if the key is being drawn over the vector map (so
+*  that it does not obscure the top axis).
+            IF( CLRKEY ) KEYOFF = 0.99*KEYOFF
+
 *  If the horizontal positions was given using parameter KEYPOS, just 
 *  activate the KEY picture. This returns a pointer to an AST Plot which
 *  can be used to draw in the KEY picture.
@@ -1322,7 +1329,8 @@
 
 *  Now produce the key.
          CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, KEYOFF,
-     :                    ABS( TYPDAT ), UNITS1, JUST, HGT, STATUS )
+     :                    ABS( TYPDAT ), UNITS1, JUST, HGT, CLRKEY,
+     :                    STATUS )
 
       END IF
 

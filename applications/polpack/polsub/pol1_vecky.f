@@ -1,5 +1,6 @@
       SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, 
-     :                       KDATA, UNITS, JUST, HGTFAC, STATUS )
+     :                       KDATA, UNITS, JUST, HGTFAC, CLRKEY, 
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_VECKY
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS, 
-*                      JUST, HGTFAC, STATUS )
+*                      JUST, HGTFAC, CLRKEY, STATUS )
 
 *  Description:
 *     The key consists of a text string describing the scale in terms
@@ -57,6 +58,11 @@
 *     HGTFAC = REAL (Given)
 *        The PGPLOT text height scaling factor corresponding to an keystyle
 *        Size attribute value of 1.0.
+*     CLRKEY = LOGICAL (Given)
+*        If .TRUE., then the key is being drawn on top of the vector map.
+*        This causes the background behind the key to be cleared before
+*        drawing the key, and the key vector is drawn in the centre of
+*        the key rather than at the left edge.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -86,6 +92,9 @@
 *     11-AUG-2000 (DSB):
 *        Modified to allow suppression or replacement of key title text
 *        using the Title attribute of the supplied Plot.
+*     6-MAR-2006 (DSB):
+*        Clear the background before drawing the key (useful if the key
+*        is drawn over the vector map). Added argument CLRKEY.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +119,7 @@
       CHARACTER * ( * ) UNITS
       CHARACTER * ( * ) JUST
       REAL HGTFAC
+      LOGICAL CLRKEY
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -134,7 +144,11 @@
       CHARACTER KEYTXT*80        ! Text describing the key vector
       CHARACTER VSCTXT*80        ! Title text 
       DOUBLE PRECISION ATTS( 20 )! Saved graphics attribute values
+      INTEGER CI                 ! Original colour index
+      INTEGER CI1                ! Lowest available colour index
+      INTEGER CI2                ! Highest available colour index
       INTEGER CUNITS             ! Number of characters in units
+      INTEGER FS                 ! Original fill style
       INTEGER FS0                ! Fill-area Style attribute on entry
       INTEGER KEYNC              ! Significant length of KEYTXT
       INTEGER MAXNC              ! Length of longest line of text
@@ -149,11 +163,13 @@
       REAL KEYDAT                ! Data value for key vector
       REAL KEYLEN                ! Vector length in centimetres
       REAL RADIUS                ! Used radius of the circle
+      REAL TY                    ! Y value at top of key
       REAL X1                    ! Lower x bound of key picture
       REAL X2                    ! Upper x bound of key picture
       REAL XCH                   ! Height of text with vertical baseline
       REAL XL                    ! X co-ordinate of left of text
       REAL XM                    ! X extent of key picture, in metres
+      REAL XV                    ! X centre of vector 
       REAL Y1                    ! Lower y bound of key picture
       REAL Y2                    ! Upper y bound of key picture
       REAL YC                    ! Y coord. of centre of key object
@@ -302,7 +318,52 @@
 *  Get the PGPLOT character height being used in world coordinates.
       CALL PGQCS( 4, XCH, HGT )
 
-*  Set the Y world co-ordinate at the top of the key.
+*  Note the Y value at the top of the key.
+      YC = Y1 + KEYOFF*( Y2 - Y1 ) 
+      TY = YC 
+
+*  Find the Y value at the bottom of the key.
+      YC = YC - GAP * 3.0 * HGT
+
+      IF( DRTTL ) THEN 
+
+         IF( DRTOP ) THEN
+            YC = YC - GAP * 2.0 * HGT
+         END IF
+
+         YC = YC - GAP * 2.0 * HGT
+
+      END IF
+
+*  See if we can write in the background colour on the current device.
+      CALL PGQCOL( CI1, CI2 ) 
+
+*  If we can, clear the area covered by the key,but only if the key is
+*  being drawn over the top of the vector map.
+      IF( CLRKEY .AND. CI1 .EQ. 0 ) THEN
+
+*  Save the current fill area attributes.
+         CALL PGQFS( FS )
+         CALL PGQCI( CI )
+
+*  Set "solid fill in background colour (pen 0)".
+         CALL PGSFS( 1 )
+         CALL PGSCI( 0 )
+
+*  Draw a filled rectangle covering the key (slightly extended at top,
+*  bottom and left).
+         TY = TY + 0.05 * ( TY - YC )
+         IF( TY .GT. 0.99*Y2 ) TY = 0.99*Y2
+         YC = YC - 0.1 * ( TY - YC )
+         CALL PGRECT( X1 - 0.05 * ( X2 - X1 ), X2, TY , YC )
+
+*  Re-instate the original attributes.
+         CALL PGSFS( FS )
+         CALL PGSCI( CI )
+
+      END IF
+
+*  Set the Y world co-ordinate back to the top of the key.
       YC = Y1 + KEYOFF*( Y2 - Y1 ) 
 
 *  Produce text describing the vector scale in words.  Left justify.
@@ -333,31 +394,36 @@
       CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTS, STATUS )
 
 *  Define the y position of the vector, and the radius of the circle
-*  indiciating the justification.  Draw the vector justified to the
-*  left, but allowing room for the circle when the justification is
-*  left justified too.
+*  indicating the justification.  Usually draw the vector justified to 
+*  the left, but allowing room for the circle when the justification is
+*  left justified too. Draw the vector centre justified if the key is
+*  drawn on top of the vector map. 
       YC = YC - GAP * HGT
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
-      IF ( JUST .EQ. 'START' ) THEN
-         CALL POL1_VECT( XL + 0.5 * KEYLEN + RADIUS, YC, 'CENTRE',
-     :                   KEYLEN, -90.0 * DTOR, AHSIZE, STATUS )
+      IF( CLRKEY ) THEN
+         XV = 0.5*( X1 + X2 )
+      ELSE IF ( JUST .EQ. 'START' ) THEN
+         XV = XL + 0.5 * KEYLEN + RADIUS
       ELSE
-         CALL POL1_VECT( XL + 0.5 * KEYLEN, YC, 'CENTRE', KEYLEN,
-     :                   -90.0 * DTOR, AHSIZE, STATUS )
+         XV = XL + 0.5 * KEYLEN
       END IF
+
+      CALL POL1_VECT( XV, YC, 'CENTRE', KEYLEN, -90.0 * DTOR, AHSIZE, 
+     :                STATUS )
 
 *  Draw a hollow circle to mark the vector reference position.
       CALL PGQFS( FS0 )
       CALL PGSFS( 2 )
       IF ( JUST .EQ. 'CENTRE' ) THEN
-         CALL PGCIRC( XL + 0.5 * KEYLEN, YC, RADIUS )
+         CALL PGCIRC( XV, YC, RADIUS )
 
       ELSE IF ( JUST .EQ. 'START' ) THEN
-         CALL PGCIRC( XL + RADIUS, YC, RADIUS )
+         CALL PGCIRC( XV - 0.5 * KEYLEN, YC, RADIUS )
 
       ELSE
-         CALL PGCIRC( XL + 1.0 * KEYLEN, YC, RADIUS )
+         CALL PGCIRC( XV + 0.5 * KEYLEN, YC, RADIUS )
+
       END IF
       CALL PGSFS( FS0 )
 
@@ -367,7 +433,12 @@
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTS, STATUS )
 
 *  Plot the text below the vector.
-      CALL PGTEXT( XL, YC - GAP * 2.0 * HGT, KEYTXT( : KEYNC ) )
+      IF( CLRKEY ) THEN 
+         CALL PGTEXT( XV - 0.3*HGT*KEYNC, YC - GAP * 2.0 * HGT, 
+     :                KEYTXT( : KEYNC ) )
+      ELSE
+         CALL PGTEXT( XL, YC - GAP * 2.0 * HGT, KEYTXT( : KEYNC ) )
+      END IF
 
 *  Revert to the previous PGPOLOT attribute settings.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTS, STATUS )
