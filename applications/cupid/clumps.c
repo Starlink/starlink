@@ -365,7 +365,10 @@ void clumps() {
 *     in some real peaks being missed and merged in with neighbouring peaks. 
 *     The default value of two times the RMS noise level (as specified by
 *     the ADAM parameter RMS) is usually considered to be optimal, 
-*     although this obviously depends on the RMS noise level being correct. []
+*     although this obviously depends on the RMS noise level being correct. 
+*     If the default value of twice the RMS would produce more than 100 
+*     contours, the default value is increased so that it would produce 100 
+*     contours. []
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 
@@ -405,8 +408,8 @@ void clumps() {
 *     adjacent pixels, one on either side. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See "DeltaT".
-*     The default value is the minimum input data value plus four times the 
-*     RMS noise level. []
+*     The default value is the minimum input data value (excluding
+*     abberant points) plus ten times the RMS noise level. []
 
 *  Reinhold Configuration Parameters:
 *     The Reinhold algorithm uses the following configuration parameters. 
@@ -502,7 +505,6 @@ void clumps() {
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
-   int defcon;                  /* Defaults being used?*/
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
    int i;                       /* Loop count */
@@ -708,43 +710,22 @@ void clumps() {
    if( *status == PAR__NULL || size == 0 ) {
       if( *status != SAI__OK ) errAnnul( status );
       keymap = astKeyMap( "" );
-      defcon = 1;
 
 /* If a group was supplied, see if it consists of the single value "def".
    If so, create an empty KeyMap. */
    } else {
-      defcon = 0;
       keymap = NULL;
       if( size == 1 ) {
          value = buffer;
          grpGet( grp, 1, 1, &value, GRP__SZNAM, status );
          if( astChrMatch( value, "DEF" ) ) {
             keymap = astKeyMap( "" );
-            defcon = 1;
          }
       }
 
 /* Otherwise, create an AST KeyMap holding the value for each configuration 
    setting, indexed using its name, display the config file if needed. */
       if( !keymap ) kpg1Kymap( grp, &keymap, status );
-   }
-
-/* Report the configuration (if any). */
-   parGet0l( "REPCONF", &repconf, status );
-   if( repconf ) {
-      msgBlank( status );
-      msgOut( "", "Current configuration:", status );
-      if( defcon ) {
-         msgOut( "", "   (defaults)", status );
-      } else { 
-         value = buffer;
-         for( i = 1; i <= size; i++ ) {
-            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
-            msgSetc( "V", value );
-            msgOut( "", "   ^V", status );
-         }
-         msgBlank( status );
-      }
    }
 
 /* Delete the group, if any. */
@@ -772,6 +753,31 @@ void clumps() {
       errRep( "CLUMPS_ERR1", "Requested Method ^METH has not yet been "
               "implemented.", status );
    }
+
+/* Report the configuration (if any). */
+   errBegin( status );
+   parGet0l( "REPCONF", &repconf, status );
+   if( repconf ) {
+
+/* Create a GRP group containing the required text. */
+      grp = NULL;
+      kpg1Kygrp( keymap, &grp, status );
+      grpGrpsz( grp, &size, status );
+
+      msgBlank( status );
+      msgOut( "", "Current configuration:", status );
+      value = buffer;
+      for( i = 1; i <= size; i++ ) {
+         grpGet( grp, i, 1, &value, GRP__SZNAM, status );
+         msgSetc( "V", value );
+         msgOut( "", "   ^V", status );
+      }
+      msgBlank( status );
+
+      if( grp ) grpDelet( &grp, status );      
+
+   }    
+   errEnd( status );
 
 /* Skip the rest if no clumps were found. */
    if( nclump ) {
