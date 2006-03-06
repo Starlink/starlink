@@ -123,6 +123,9 @@
 *     28-DEC-2005 (TIMJ):
 *        Revamp the HDS/NDF/.sdf logic to put more reliance on HDS_FIND
 *        rather than attempting to deal with special cases here.
+*     6-MAR-2006 (DSB):
+*        Escape any spaces in the supplied template before using
+*        ONE_FIND_FILE.
 *     {enter_further_changes_here}
 
 *-
@@ -178,6 +181,7 @@
       CHARACTER STORED*(GRP__SZNAM)! Text to store in the supplied group
       CHARACTER SUF*(GRP__SZNAM)   ! File suffix
       CHARACTER SUFF*(GRP__SZNAM)  ! Modified file suffix
+      CHARACTER TMPLT2*(GRP__SZNAM)! File basename
       CHARACTER TYP*(GRP__SZNAM)   ! File type field
       INTEGER F                  ! Index of first non-blank character
       INTEGER G2SIZ              ! Size of IGRP2 group
@@ -192,6 +196,7 @@
       INTEGER IGRPH              ! Group holding data path fields
       INTEGER IGRPS              ! Group holding NDF slice fields
       INTEGER IGRPT              ! Group holding file type fields
+      INTEGER J                  ! Loop count
       INTEGER L                  ! Index of last non-blank character
       INTEGER NC                 ! No. of characters in string
       INTEGER NMATCH             ! No. of matching file types
@@ -277,10 +282,22 @@
 *  Indicate that duplicate file names should not be purged.
          PURGE = .FALSE.
 
-*  Otherwise, split the template into directory, basename, suffix and
-*  section.
+*  Otherwise, we escape any embedded spaces in the template so that the 
+*  shell script used by one_find_file will interpret the spaces as part
+*  of the file path.
       ELSE
-         CALL NDG1_FPARS( TEMPLT, DIR, BN, SUF, SEC, STATUS )
+         J = 1
+         DO I = F, L
+            IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
+               TMPLT2( J : J ) = '\'
+               J = J + 1
+            END IF
+            TMPLT2( J : J ) = TEMPLT( I : I )
+            J = J + 1
+         END DO
+
+*  Split the template into directory, basename, suffix and section.
+         CALL NDG1_FPARS( TMPLT2, DIR, BN, SUF, SEC, STATUS )
 
 *  Take copies of the file base name and suffix so that the originals 
 *  are not changed by the following code.
