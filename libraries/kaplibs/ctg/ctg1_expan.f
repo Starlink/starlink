@@ -213,7 +213,7 @@
          END DO
 
 *  Split the template into directory, basename, suffix and section.
-         CALL CTG1_FPARS( TMPLT2, DIR, BN, SUF, EXT, STATUS )
+         CALL CTG1_FPARS( TMPLT2( : J - 1 ), DIR, BN, SUF, EXT, STATUS )
 
 *  From now on, if no suffix was given, use ".*" so that we pick up files 
 *  with any of the known catalogue formats. But indicate that duplicate 

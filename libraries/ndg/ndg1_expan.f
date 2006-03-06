@@ -286,6 +286,7 @@
 *  shell script used by one_find_file will interpret the spaces as part
 *  of the file path.
       ELSE
+         TMPLT2 = ' '
          J = 1
          DO I = F, L
             IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
@@ -297,7 +298,7 @@
          END DO
 
 *  Split the template into directory, basename, suffix and section.
-         CALL NDG1_FPARS( TMPLT2, DIR, BN, SUF, SEC, STATUS )
+         CALL NDG1_FPARS( TMPLT2 ( : J ), DIR, BN, SUF, SEC, STATUS )
 
 *  Take copies of the file base name and suffix so that the originals 
 *  are not changed by the following code.

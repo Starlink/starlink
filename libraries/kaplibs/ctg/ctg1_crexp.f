@@ -235,6 +235,7 @@
 
 *  We escape any embedded spaces in the template so that the shell script 
 *  used by one_find_file will interpret the spaces as part of the file path.
+         TMPLT2 = ' '
          J = 1
          DO II = F, L
             IF( NAME( II : II ) .EQ. ' ' ) THEN
@@ -247,7 +248,8 @@
 
 *  Split this up into directory, basename, suffix and FITS extension (not
 *  used).
-         CALL CTG1_FPARS( TMPLT2, DIR1, BN1, SUF1, EXT1, STATUS )
+         CALL CTG1_FPARS( TMPLT2( : J - 1 ), DIR1, BN1, SUF1, EXT1, 
+     :                    STATUS )
 
 *  If a directory spec was included, expand it to remove any shell
 *  meta-characters.
