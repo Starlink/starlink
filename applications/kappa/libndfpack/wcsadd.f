@@ -343,6 +343,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -365,7 +366,9 @@
 *        existing Frame (as in the case where a SpecFrame is being
 *        created on the basis of an AXIS Frame). As it was, the existing
 *        AXIS Frame was always described by default SpecFrame, with
-*       default attributes.
+*        default attributes.
+*     2006 March 3 (MJC):
+*        Created tokens for an error message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -805,6 +808,8 @@
      :       AST_GETI( MAP, 'NOUT', STATUS ) .AND. 
      :       STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
+            CALL MSG_SETI( 'NOUT', AST_GETI( MAP, 'NOUT', STATUS ) )
+            CALL MSG_SETI( 'NAX', AST_GETI( MAP, 'NAXES', STATUS ) )
             CALL ERR_REP( 'WCSMAP_ERR3', 'Mapping has ^NOUT outputs '//
      :                    'but new Frame has ^NAX axes. These number '//
      :                    'should be equal.', STATUS )
