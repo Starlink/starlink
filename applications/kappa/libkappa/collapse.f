@@ -251,6 +251,10 @@
 *        sections.
 *     2006 February 14 (MJC):
 *        Correct calculation of the blocked bounds for the output NDF.
+*     2006 March 3 (MJC):
+*        Correct the bounds for blocking.  Use an NDF section to define
+*        the number of blocks when the compression is derived from only
+*        part of the collapse axis.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -337,6 +341,7 @@
       INTEGER IERR               ! Position of first numerical error
       INTEGER INDF1              ! Input NDF identifier
       INTEGER INDF2              ! Output NDF identifier
+      INTEGER INDFS              ! Input NDF-seciton identifier
       INTEGER IPAXCO             ! Pointers to mapped d.p. axis array
       INTEGER IPCO               ! Pointers to mapped co-ordinate array
       INTEGER IPIN( 2 )          ! Pointers to mapped input arrays
@@ -358,6 +363,8 @@
                                  ! NDF
       INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds of the
                                  ! output NDF
+      INTEGER LBNDS( NDF__MXDIM ) ! Lower pixel index bounds of the
+                                 ! section of the input NDF
       INTEGER MAXSIZ             ! Maximum size of block along current
                                  ! dimension
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
@@ -378,6 +385,8 @@
                                  ! NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds of the 
                                  ! output NDF
+      INTEGER UBNDS( NDF__MXDIM ) ! Upper pixel index bounds of the
+                                 ! section of the input NDF
       LOGICAL GOTAX              ! Does the NDF have an AXIS component?
       LOGICAL LOOP               ! Continue to loop through dimensions?
       LOGICAL USEALL             ! Use the entire collapse pixel axis?
@@ -870,13 +879,31 @@
          END IF
       END DO
 
+*  If the LOW and HIGH limits have reduced the collapsed section from
+*  the whole collapsed dimension, then we cannot use the original input
+*  NDF to derive the number of blocks.  Instead we create a subsection
+*  spanning the actual collapse limits, as if the user had supplied
+*  this section with the input NDF.
+      DO I = 1, NDIM
+         LBNDS( I ) = LBND( I )
+         UBNDS( I ) = UBND( I )
+      END DO
+      LBNDS( JAXIS ) = JLO
+      UBNDS( JAXIS ) = JHI
+      IF ( USEALL ) THEN
+         INDFS = INDF1
+      ELSE
+         CALL NDF_SECT( INDF1, NDIM, LBNDS, UBNDS, INDFS, STATUS )
+      END IF
+
 *  Determine the number of blocks.
-      CALL NDF_NBLOC( INDF1, NDIM, IBLSIZ, NBLOCK, STATUS )
+      CALL NDF_NBLOC( INDFS, NDIM, IBLSIZ, NBLOCK, STATUS )
+
 
 *  Loop through each block.  Start a new NDF context.
       DO IBLOCK = 1, NBLOCK
          CALL NDF_BEGIN
-         CALL NDF_BLOCK( INDF1, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
+         CALL NDF_BLOCK( INDFS, NDIM, IBLSIZ, IBLOCK, IBL, STATUS ) 
          CALL NDF_BLOCK( INDF2, NDIMO, OBLSIZ, IBLOCK, OBL, STATUS ) 
 
 *  Map the NDF arrays and workspace required.
@@ -974,7 +1001,7 @@
 *  Now do the work, using a routine appropriate to the numeric type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPS1_CLPSR( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
-     :                       NDIM, LBND, UBND, 
+     :                       NDIM, LBNDS, UBNDS, 
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
@@ -987,7 +1014,7 @@
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPS1_CLPSD( JAXIS, JLO, JHI, VAR, ESTIM, WLIM, EL2,
-     :                       NDIM, LBND, UBND, 
+     :                       NDIM, LBNDS, UBNDS, 
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
