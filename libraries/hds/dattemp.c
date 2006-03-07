@@ -58,6 +58,7 @@ datTemp(const char      *type_str,
    int             ncomp;
    int             i;
    int             clash;
+   int             tmp_save;
    char            *name1;
    struct RID      rid1;
    char buf[ DAT__SZNAM + 1 ];      /* Buffer for formatting object name     */
@@ -81,8 +82,19 @@ datTemp(const char      *type_str,
 
    if ( !temp_created )
    {
+/* This is a sticking plaster - fix!!!!!!!!!!!!!!!!!!! bkm 20060306 */
+      if( rec_gl_endslot > 1) {
+         hds_gl_64bit = rec_ga_fcv[rec_gl_endslot-1].hds_version >
+                        REC__VERSION3;
+         tmp_save = hds_gl_c64bit;
+         hds_gl_c64bit = hds_gl_64bit;
+      } else {
+         hds_gl_64bit = hds_gl_c64bit;
+         tmp_save = hds_gl_c64bit;
+      }
       _call( dat1_make_scratch( ) )
       temp_created = 1;
+      hds_gl_c64bit = tmp_save;
    }
    else
    {
@@ -262,7 +274,7 @@ dat1_make_scratch(void)
 
  
 /* Set 64-bit file format flag appropriately                            */
-   hds_gl_64bit = hds_gl_c64bit;
+/*   hds_gl_64bit = hds_gl_c64bit; */
      
    rcl.dlen  = SZCRV;
    

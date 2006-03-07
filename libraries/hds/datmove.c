@@ -11,6 +11,7 @@
 
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
+#include "rec1.h"                /* Pricate rec_ definitions                */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
@@ -92,6 +93,20 @@ datMove(HDSLoc **locator1,
    if (!data2->struc || data2->naxes != 0)
       _call(DAT__OBJIN)
 
+/* Check that lcp1 and lcp2 refer to the same HDS version files */
+/* TO BE FIXED - bkm - 20030306                                 */
+
+/* Set operating 64-bit mode to that of lcp2 */
+   hds_gl_64bit =  (rec_ga_fcv[(&data2->han)->slot].hds_version > REC__VERSION3); 
+   if(rec_ga_fcv[(&data2->han)->slot].hds_version !=
+     rec_ga_fcv[(&data1->han)->slot].hds_version) {
+     *status = DAT__INCHK;
+     hds_gl_status = *status;
+     emsRep(context_name, context_message " HDS error - cannot cope with "
+            "record move between different HDS version files",
+	    status );
+    }
+     
 /* Validate the object's new name.      */
 
    _call( dau_check_name( &name, nambuf ))
