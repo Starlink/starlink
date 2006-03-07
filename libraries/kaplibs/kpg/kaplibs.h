@@ -28,6 +28,8 @@
 *        Original version.
 *     03-NOV-2005 (TIMJ):
 *        GRP interface now uses struct
+*     7-MAR-2006 (DSB):
+*        Added KPG1_RGNDF and KPG1_WGNDF.
 */
 
 #include "ast.h"
@@ -54,6 +56,8 @@ void kpg1Kygrp( AstKeyMap *, Grp **, int * );
 void kpg1Kymap( Grp *, AstKeyMap **, int * );
 void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
 void kpg1Pseed( int * );
+void kpg1Rgndf( const char *, int, int, const char *, Grp **, int *, int * );
+void kpg1Wgndf( const char *, Grp *, int, int, const char *, Grp **, int *, int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 
 void irqDelet( int, int * );
@@ -62,6 +66,6 @@ void irqNew( int, const char *, IRQLocs **, int * );
 void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
 void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 
-int kpgGtfts( int indf, AstFitsChan ** fchan, int * status );
+int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 
 #endif
