@@ -72,6 +72,8 @@
 *        - No longer need to store xloc locator
 *     2006-02-17 (AGG):
 *        Add reading of SCANFIT coefficients
+*     2006-03-03 (AGG):
+*        Return a NULL pointer if the group us undefined
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,12 +173,17 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
   int place;                 /* NDf placeholder for SCANFIT extension */
   int npoly;                 /* Number of points in polynomial coefficient array */
   double *poly;              /* Pointer to array of polynomial coefficients */
-  double *opoly;
-  int npdims;
-  int pdims[NDF__MXDIM];
-  int imax;
+  double *opoly;             /* Pointer to store in output struct */
+  int npdims;                /* Number of dimensions in the polynomial array */
+  int pdims[NDF__MXDIM];     /* Size of each dimension */
 
   if ( *status != SAI__OK ) return;
+
+  /* Return a null pointer to the smfData if the input grp is null */
+  if ( igrp == NULL ) {
+    *data = NULL;
+    return;
+  }
 
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
@@ -248,7 +255,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	/* Read and store the polynomial coefficients */
 	ndfMap( pndf, "DATA", "_DOUBLE", "READ", &poly, &npoly, status );
 	ndfDim( pndf, NDF__MXDIM, pdims, &npdims, status );
-	imax = pdims[0] * pdims[1];
 	(*data)->ncoeff = pdims[2];
 	/* Allocate memory for poly coeffs & copy over */
 	opoly = smf_malloc( npoly, sizeof( double ), 0, status);
