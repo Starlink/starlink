@@ -46,6 +46,8 @@
 *  History:
 *     2006-02-24 (AGG):
 *        Initial test version
+*     2006-03-07 (AGG):
+*        Use GSL for linear regression
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -76,6 +78,9 @@
 /* Standard includes */
 #include <stdio.h>
 #include <string.h>
+/* GSL includes */
+#include <gsl/gsl_fit.h>
+#include <gsl/gsl_multifit.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -112,22 +117,20 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   double *xout = NULL;     /* X coordinates of output */
   double *yin = NULL;      /* Y coordinates of input */
   double *yout = NULL;     /* Y coordinates of output */
-  size_t * indices;
+  double *psky = NULL;     /* Sky power array */
+  double *weight = NULL;   /* Weights array */
+  size_t *indices;
 
   size_t nframes = 0;      /* Number of frames */
   size_t npts;             /* Number of data points */
   size_t base;             /* ?? */
   int z;                   /* ?? */
-  double sky = 0;          /* Sky power */
+  double sky = 0;          /* Sky power to be subtracted */
   double sky0 = 0;         /* Sky power fit - intercept */
   double dsky = 1;         /* Sky power fit - gradient */
   double elev;             /* Elevation (radians) */
-  double sumy;             /* Variables for the linear regression fit */
-  double sumx;             /* Variables for the linear regression fit */
-  double sumx2;            /* Variables for the linear regression fit */
-  double sumxy;            /* Variables for the linear regression fit */
-  size_t ndatpts;          /* Variables for the linear regression fit */
-  double invdet;           /* Variables for the linear regression fit */
+  double cov[3];           /* Covariance matrix, cov00, cov01 & cov11 */
+  double chisq;            /* Chi-squared from the linear regression fit */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -165,6 +168,9 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   xout = smf_malloc( npts, sizeof(double), 0, status );
   yout = smf_malloc( npts, sizeof(double), 0, status );
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
+  /* Also allocate space for sky power and weights arrays */
+  psky = smf_malloc( npts, sizeof(double), 0, status );
+  weight = smf_malloc( npts, sizeof(double), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
@@ -221,28 +227,28 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       sky /= npts;
     } else if ( strncmp( fittype, "SLOP", 4 ) == 0 ) {
 
-      /* Fit straight line to elevation/sky brightness data */
-      ndatpts = 0;
-      sumx = 0;
-      sumx2 = 0;
-      sumxy = 0;
-      sumy = 0;
+      /* Fit straight line to elevation/sky brightness data.
+	 Note: in this calculation, the X array is the elevation, yout
+	 and the Y array is the sky brightness, psky.
+	 First, fill the psky and weights arrays */
       for ( i=0; i<npts; i++) {
 	index = indices[i] + base;
-	/*	elevarray[i] = yout[indices[i]];
-	  pskyarray[i] = indata[index];*/
 	if (indata[index] != VAL__BADD) {
-	  sumx += yout[indices[i]];
-	  sumy += indata[index];
-	  sumxy += yout[indices[i]] * indata[index];
-	  sumx2 += yout[indices[i]] * yout[indices[i]];
-	  ndatpts++;
+	  psky[i] = indata[index];
+	  weight[i] = 1;
+	} else {
+	  weight[i] = 0;
 	}
       }
-      invdet = 1.0 / ( ndatpts*sumx2 - (sumx*sumx) );
-      sky0 = invdet * (sumx2*sumy - sumx*sumxy);
-      dsky = invdet * (ndatpts*sumxy - sumx*sumy);
-      
+
+      /* Carry out linear regression fit */
+      gsl_fit_wlinear( yout, 1, weight, 1, psky, 1, npts, 
+		      &sky0, &dsky, &cov[0], &cov[1], &cov[2], &chisq );
+      /* Goodness-of-fit data for debugging... */
+      /* Todo... */
+
+      /* Other debugging info: check sign of gradient... */
+
     } else if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
       *status = SAI__ERROR;
       msgSetc("F", fittype);
