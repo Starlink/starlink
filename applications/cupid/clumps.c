@@ -61,8 +61,9 @@ void clumps() {
 
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
-*     dimensional NDF. Information about the clumps is returned in
-*     several different ways:
+*     dimensional NDF. It is assumed that any background has already been
+*     removed form the data array. Information about the clumps is returned 
+*     in several different ways:
 *
 *     - A pixel mask identifying pixels as background pixels or clump
 *     pixels can be written to the Quality array of the input NDF (see 
@@ -408,9 +409,8 @@ void clumps() {
 *     value of 1 is always used for "Naxis", and each pixel simply has 2 
 *     adjacent pixels, one on either side. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
-*     array. Only accessed if no value is supplied for "Level1". See "DeltaT".
-*     The default value is the minimum input data value (excluding
-*     abberant points) plus ten times the RMS noise level. []
+*     array. Only accessed if no value is supplied for "Level1". See also
+*     "DeltaT". [2*RMS]
 
 *  Reinhold Configuration Parameters:
 *     The Reinhold algorithm uses the following configuration parameters. 
@@ -428,7 +428,7 @@ void clumps() {
 *     have a maximum data value less than this value are ignored. ["noise"+RMS]
 *     - Reinhold.FlatSlope: A peak is considered to end when the slope of a
 *     profile through the peak drops below this value. The value should be 
-*     given as a change in data value between adjacent pixels. [0.5*RMS]
+*     given as a change in data value between adjacent pixels. [1.0*RMS]
 *     - Reinhold.CAThresh: Controls the operation of the cellular automata 
 *     which is used to erode the (previously dilated) edges regions prior to 
 *     filling them with clump indicies. If the number of edge pixels in
@@ -461,7 +461,7 @@ void clumps() {
 *     supplied value, in pixels. [4]
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
-*     be included in the clump. [2.0*RMS]
+*     be included in the clump. [1.0*RMS]
 *     - FellWalker.CleanIter: This gives the number of times to apply the 
 *     cellular automata which cleans up the filled clumps. This cellular 
 *     automata replaces each clump index by the most commonly occuring 
