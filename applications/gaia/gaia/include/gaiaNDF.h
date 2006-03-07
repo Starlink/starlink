@@ -94,6 +94,14 @@ extern "C" {
     /* Close an NDF */
     int gaiaSimpleCloseNDF( int *ndfid );
 
+    /* Get the data type of a component */
+    int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type, 
+                           int type_length, char **error_mess );
+
+    /* Get the value of a character component */
+    int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value, 
+                           int value_length, char **error_mess );
+
     /* Query the pixel bounds of an opened NDF */
     int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
                                int *ndim, char **error_mess );
