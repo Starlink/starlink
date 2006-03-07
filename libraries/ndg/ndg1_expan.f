@@ -126,6 +126,8 @@
 *     6-MAR-2006 (DSB):
 *        Escape any spaces in the supplied template before using
 *        ONE_FIND_FILE.
+*     7-MAR-2006 (DSB):
+*        Turn off interpretation of shell metacharacters within HDS_FIND.
 *     {enter_further_changes_here}
 
 *-
@@ -201,6 +203,7 @@
       INTEGER NC                 ! No. of characters in string
       INTEGER NMATCH             ! No. of matching file types
       INTEGER RPOS               ! Offset position in REST() for .sdf
+      INTEGER SHELL              ! Origonal value of HDS SHELL tuning param
       INTEGER SIZE0              ! Size of original group
       INTEGER SLEN               ! Length of total search string
       LOGICAL MORE               ! Loop again?
@@ -460,11 +463,22 @@
      :                 '''^T''.', STATUS )
       END IF
 
+*  Get the original value of the HDS "SHELL" tuning parameter. 
+      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Begin a new error context.
       CALL ERR_BEGIN( STATUS )
+
+*  Set the HDS "SHELL" tuning parameters to stop HDS trying to interpret 
+*  shell metacharacters within the filename. We can do this because any 
+*  shell metacharacters will already have been interpreted within
+*  NDG1_APPEN. The benefit of setting SHELL thus is that HDS mis-interprets 
+*  spaces within file names, resulting in HDS_FIND reporting an error if
+*  the file spec ontains any spaces.
+      CALL HDS_TUNE( 'SHELL', -1, STATUS )
 
 *  Check each one.
       DO I = 1, NMATCH
@@ -630,6 +644,11 @@
 
 *  End the error context started before the loop.
       CALL ERR_END( STATUS )         
+
+*  Return to the old HDS SHELL tuning setting.
+      CALL ERR_BEGIN( STATUS )
+      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )
+      CALL ERR_END( STATUS )
 
 *  Purge the returned groups of matching files (i.e. file with the same
 *  directory and basename but differing file types).

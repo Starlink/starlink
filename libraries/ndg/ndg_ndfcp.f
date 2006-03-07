@@ -21,9 +21,8 @@
 *  Arguments:
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for a group holding the names of NDFs. This
-*        will often be creted using NDG_ASSOC, but groups created "by 
-*        hand" using GRP directly (i.e. without the supplemental groups
-*        created by NDG_ASSOC) can also be used.
+*        will often be creted using NDG_CREAT, but groups created "by 
+*        hand" using GRP directly can also be used.
 *     INDEX = INTEGER (Given)
 *        The index within the group at which the name of the NDF to be
 *        created is stored.
@@ -47,6 +46,8 @@
 *  History:
 *     24-AUG-1999 (DSB):
 *        Original version.
+*     7-MAR-2006 (DSB):
+*        Switch off interpretation of shell metacharacters by HDS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,7 +80,9 @@
 
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)! NDF file name (without file type).
+      CHARACTER ENAME*(GRP__SZNAM)! Expanded NDF file name
       INTEGER PLACE              ! NDF placeholder.
+      INTEGER SHELL              ! Original value of HDS SHELL tuning param
 *.
 
 *  Set an initial value for the INDF argument.
@@ -101,11 +104,23 @@
          GO TO 999
       END IF
 
+*  Expand any shell metacharacters in it. Having done this we can safely
+*  switch off HDS metacharacter interpretation, since HDS has problems
+*  with spaces in file names.
+      CALL ONE_SHELL_ECHO( NAME, ENAME, STATUS )      
+      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
+      CALL HDS_TUNE( 'SHELL', -1, STATUS )         
+      
 *  Create the NDF place holder.
-      CALL NDG1_OPEN( NAME, PLACE, STATUS )
+      CALL NDG1_OPEN( ENAME, PLACE, STATUS )
 
 *  Create the NDF.
       CALL NDF_NEWP( FTYPE, NDIM, UBND, PLACE, INDF, STATUS)
+
+*  Re-instate the original HDS SHELL value.
+      CALL ERR_BEGIN( STATUS )
+      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )         
+      CALL ERR_END( STATUS )
 
 *  If an error occured, add context information.
  999  CONTINUE

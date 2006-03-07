@@ -49,6 +49,9 @@
 *        Original version.
 *     29-AUG-1997 (DSB):
 *        Updated to work with automatic NDF data conversion.
+*     7-MAR-2006 (DSB):
+*        Switch of HDS shell metacharacter expansion if possible in order
+*        to allow correct interpretation of spaces within file names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,7 +82,9 @@
 
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)! NDF file specification
+      INTEGER IGRPD              ! Group ID for supplemental info
       INTEGER PLACE              ! Dummy NDF place holder
+      INTEGER SHELL              ! Original value of HDS SHELL tuning param
 *.
 
 *  Set an initial value for the INDF argument.
@@ -101,8 +106,38 @@
          GO TO 999
       END IF
 
+*  See if the supplied group was created by NDG. This will be the case if
+*  the group has associated supplemental information stored in "slave" 
+*  groups.
+      CALL GRP_OWN( IGRP, IGRPD, STATUS )
+      IF( IGRPD .NE. GRP__NOID ) THEN
+
+*  If the supplied group was created by NDG, then we assume that the file
+*  specs it contains have no shell metacharacters in them. We can assume
+*  this because any shell metacharacters supplied by the user will have been
+*  interpreted as part of the process of checking the existence and
+*  nature of the requested files. Since the file specs have no shell
+*  metacharacters, it is safe for us to turn of expansion of shell
+*  metacharacters within HDS, via the HDS "SHELL" tuning parameter. This
+*  has the benefit that spaces within file names will be interpreted
+*  correctly by HDS. First get the original value of the SHELL tuning
+*  parameter and then set it to -1 to indicate that no expansion of
+*  shell metacharacters should be performed by HDS. 
+         CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
+         CALL HDS_TUNE( 'SHELL', -1, STATUS )         
+      ELSE
+         SHELL = -1         
+      END IF
+
 *  Open the NDF.
       CALL NDF_OPEN( DAT__ROOT, NAME, MODE, 'OLD', INDF, PLACE, STATUS )
+
+*  Re-instate the original value of the HDS SHELL tuning parameter.
+      IF( SHELL .NE. -1 ) THEN
+         CALL ERR_BEGIN( STATUS )
+         CALL HDS_TUNE( 'SHELL', SHELL, STATUS )         
+         CALL ERR_END( STATUS )
+      END IF
 
 *  If an error occured, add context information.
  999  CONTINUE

@@ -50,6 +50,8 @@
 *        Original version.
 *     29-AUG-1997 (DSB):
 *        Modified to use automatica NDF data conversion.
+*     7-MAR-2006 (DSB):
+*        Switch off interpretation of shell metacharacters by HDS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,7 +85,9 @@
 
 *  Local Variables:
       CHARACTER NAME*(GRP__SZNAM)! NDF file name (without file type).
+      CHARACTER ENAME*(GRP__SZNAM)! Expanded NDF file name
       INTEGER PLACE              ! NDF placeholder.
+      INTEGER SHELL              ! Original value of HDS SHELL tuning param
 *.
 
 *  Set an initial value for the INDF argument.
@@ -105,11 +109,23 @@
          GO TO 999
       END IF
 
+*  Expand any shell metacharacters in it. Having done this we can safely
+*  switch off HDS metacharacter interpretation, since HDS has problems
+*  with spaces in file names.
+      CALL ONE_SHELL_ECHO( NAME, ENAME, STATUS )      
+      CALL HDS_GTUNE( 'SHELL', SHELL, STATUS )         
+      CALL HDS_TUNE( 'SHELL', -1, STATUS )         
+      
 *  Create the NDF place holder.
-      CALL NDG1_OPEN( NAME, PLACE, STATUS )
+      CALL NDG1_OPEN( ENAME, PLACE, STATUS )
 
 *  Create the NDF.
       CALL NDF_NEW( FTYPE, NDIM, LBND, UBND, PLACE, INDF, STATUS)
+
+*  Re-instate the original HDS SHELL value.
+      CALL ERR_BEGIN( STATUS )
+      CALL HDS_TUNE( 'SHELL', SHELL, STATUS )         
+      CALL ERR_END( STATUS )
 
 *  If an error occured, add context information.
  999  CONTINUE
