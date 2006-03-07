@@ -372,7 +372,7 @@ int gaiaFreeNDF( int ndfid )
 
 /*
  *   Name:
- *      gaiaCopyNDF
+ *      gaiaCopyComponent
  *
  *   Purpose:
  *      Copy an NDF data component into an array of previously
@@ -1266,6 +1266,48 @@ int gaiaSimpleCloseNDF( int *ndfid )
     ndfAnnul( ndfid, &status );
     emsRlse();
     return 0;
+}
+
+/**
+ * Query the data type of a component.
+ */
+int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type, 
+                       int type_length, char **error_mess )
+{
+   int status = SAI__OK;
+
+   emsMark();
+   ndfType( ndfid, component, type, type_length, &status );
+
+   /* If an error occurred return an error message */
+   if ( status != SAI__OK ) {
+       *error_mess = errMessage( &status );
+       emsRlse();
+       return 1;
+   }
+   emsRlse();
+   return 0;
+}
+
+/**
+ * Query a character component (label, units, title). 
+ */
+int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value, 
+                       int value_length, char **error_mess )
+{
+   int status = SAI__OK;
+
+   emsMark();
+   ndfCget( ndfid, component, value, value_length, &status );
+
+   /* If an error occurred return an error message */
+   if ( status != SAI__OK ) {
+       *error_mess = errMessage( &status );
+       emsRlse();
+       return 1;
+   }
+   emsRlse();
+   return 0;
 }
 
 /**
