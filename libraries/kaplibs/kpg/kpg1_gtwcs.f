@@ -54,6 +54,10 @@
 *     2005 September 12 (TIMJ):
 *        Now use KPG1_ASRGN rather than KPG1_ASREG to avoid
 *        dependency on graphics system.
+*     7-MAR-2006 (DSB):
+*        Create a new temporary NDF (without mapping any array
+*        components) rather than taking a copy of the supplied NDF, since
+*        the supplied NDF may be very large.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,6 +74,7 @@
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PSX_ERR'          ! PSX ERROR constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -90,22 +95,25 @@
 
 *  Local Variables:
       CHARACTER ASNAME*(DAT__SZNAM)! Name of IRA structure
-      CHARACTER XNAME*(DAT__SZNAM) ! Name of extension containing IRA structure
       CHARACTER ENCODS( MAXCOD )*( CODLEN )! Preferred AST encodings
       CHARACTER ENV*255          ! Value of KAPPA_ENCODINGS env. variable
       CHARACTER LOC*(DAT__SZLOC) ! Locator to FITS entension or IRA structure
       CHARACTER XLOC*(DAT__SZLOC) ! Locator to IRAS90 extension
+      CHARACTER XNAME*(DAT__SZNAM) ! Name of extension containing IRA structure
       INTEGER ADDED              ! No. of elements added to the group
       INTEGER IDA                ! IRA identifier for IRAS90 astrometry info
-      INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
-      INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
       INTEGER IGRP               ! GRP identifier for a group
       INTEGER INDFC              ! Identifier for NDF to get new WCS component
       INTEGER IPIX               ! Index of PIXEL Frame in IWCS
+      INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
+      INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds of supplied NDF
       INTEGER NCARD              ! No. of header cards in the FITS extension
+      INTEGER NDIM               ! No of pixel axes in supplied NDF
       INTEGER NENCOD             ! No. of prefered AST encodings supplied
       INTEGER PLACE              ! Place holder for temporary NDF
       INTEGER PNTR               ! Pointer to mapped array of FITS headers
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of supplied NDF
       LOGICAL FLAG               ! Was group expression flagged? (NO)
       LOGICAL THERE              ! Does object exist?
       LOGICAL VERB               ! Give verbose warnings about bad IRAS90/FITS?
@@ -247,10 +255,15 @@
             IF( WRACC ) THEN
                INDFC = INDF
 
-*  Otherwise, create a temporary copy of the NDF.
+*  Otherwise, create a temporary NDF with the same shape and size as the
+*  supplied NDF. Note, we never map any of the array components of this
+*  NDF which means that its size will be small.
             ELSE
                CALL NDF_TEMP( PLACE, STATUS )
-               CALL NDF_COPY( INDF, PLACE, INDFC, STATUS )               
+               CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, 
+     :                         STATUS )
+               CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC, 
+     :                       STATUS )
             END IF
 
 *  Check the pointer can be used.
