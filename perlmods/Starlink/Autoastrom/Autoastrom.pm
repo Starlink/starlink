@@ -1208,6 +1208,8 @@ sub solve {
     $ext->quick( 1 );
     $ext->detect_thresh( $self->detection_threshold );
     $ext->phot_apertures( $self->aperture );
+    $ext->messages( $self->messages );
+    $ext->timeout( $self->timeout );
 
     $ndfcat = $ext->extract( frame => $self->ndf,
                              filter => $self->filter,
@@ -1357,6 +1359,7 @@ sub solve {
     my $corr = new Astro::Correlate( catalog1 => $filtered_ndfcat,
                                      catalog2 => $filtered_querycat,
                                      keeptemps => $self->keeptemps,
+                                     messages => $self->messages,
                                      method => 'FINDOFF',
                                      temp => $self->temp,
                                      verbose => $self->verbose,
@@ -1440,6 +1443,11 @@ sub solve {
                                        verbose => $self->verbose );
 
     ( $newwcs, my $results ) = $astrom->solve;
+
+    if( defined( $self->keepfits ) && $self->starlink_output ) {
+      print sprintf( "--I Wrote %s to disk, keeping FITS headers.\n",
+                     $self->keepfits );
+    }
 
 # Set the maxfit back to whatever it was before we went through
 # ASTROM.
