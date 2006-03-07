@@ -38,6 +38,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *        Fix i vs index and calling arguments
 *     2006-01-25 (AGG):
 *        Copies input data to output file when passed flatfielded data
+*     2006-03-03 (AGG):
+*        Trap the case that ogrp is NULL
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -105,49 +108,53 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   smfFile *file;            /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
-  void *outdata[1];          /* Pointer to array of output mapped  pointers*/
+  void *outdata[1];         /* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
-  size_t npts;
+  size_t npts;              /* Number of data points */
 
   if ( *status != SAI__OK ) return;
 
   /* What if ogrp == NULL? for makemap */
 
-  /* Open the input file solely to propagate it to the output file */
-  ndgNdfas( igrp, index, "READ", &indf, status );
-  ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
-  ndfAnnul( &indf, status);
+  if ( ogrp != NULL ) {
+    /* Open the input file solely to propagate it to the output file */
+    ndgNdfas( igrp, index, "READ", &indf, status );
+    ndgNdfpr( indf, " ", ogrp, index, &outndf, status );
+    ndfAnnul( &indf, status);
+
+    /* Set parameters of the DATA array in the output file */
+    ndfStype( "_DOUBLE", outndf, "DATA", status);
+    /* We need to map this so that the DATA_ARRAY is defined on exit */
+    ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status );
+
+    /* Close output file */
+    ndfAnnul( &outndf, status);
+  }
 
   /* Open the input without header information. This is required
      because sc2store can not open two files at once */
   smf_open_file( igrp, index, "READ", 0, &data, status);
-
-  /* Should check status here to make sure that the file was opened OK */
   if ( *status != SAI__OK) {
     errRep("", "Unable to open input file", status);
   }
-
-  /* Set parameters of the DATA array in the output file */
-  ndfStype( "_DOUBLE", outndf, "DATA", status);
-  /* We need to map this so that the DATA_ARRAY is defined on exit */
-  ndfMap( outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status );
-
-  /* Close and reopen output file, populate output struct */
-  ndfAnnul( &outndf, status);
+  /* Open the output file for write. If the output grp is NULL then
+     ffdata is returned NULL */
   smf_open_file( ogrp, index, "WRITE", 1, ffdata, status);
   if ( *status == SAI__ERROR) {
     errRep("", "Unable to open output file", status);
   }
 
-  /* Check whether the data are flatfielded */
+  /* Check whether the input data are flatfielded */
   smf_check_flat( data, status);
 
   if (*status == SAI__OK) {
     file = data->file;
-    pname = file->name;
-    msgSetc("FILE", pname);
-    msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
+    if ( file != NULL ) {
+      pname = file->name;
+      msgSetc("FILE", pname);
+      msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
+    }
     /* Flatfield the data */
     smf_flatfield( data, ffdata, status );
   } else if ( *status == SMF__FLATN ) {
@@ -160,7 +167,6 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
     memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
   }
-
 
   /* Free resources for input data */
   smf_close_file( &data, status );
