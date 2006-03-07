@@ -108,7 +108,8 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iy;              /* Grid index on 2nd axis */
    int iz;              /* Grid index on 3rd axis */
    int maxid;           /* Largest id for any peak (smallest is zero) */
-   int minpix;          /* Minimum size of a clump in pixels */
+   int minlen;          /* Minimum size of a clump in pixels along one dimension*/
+   int minpix;          /* Minimum total size of a clump in pixels */
    int peakval;         /* Minimum value used to flag peaks */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -156,7 +157,8 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Get various configuration parameters. */
-   minpix = cupidConfigI( rconfig, "MINPIX", 4 );
+   minlen = cupidConfigI( rconfig, "MINLEN", 4 );
+   minpix = cupidConfigI( rconfig, "MINPIX", 16 );
    noise = cupidConfigD( rconfig, "NOISE", 2*rms );
    thresh = cupidConfigD( rconfig, "THRESH", noise + rms );
    flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms );
@@ -182,7 +184,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    "*peakval" value. All other pixels are set to some other value (which 
    will usually be CUPID__KBACK but will be something else at positions of 
    peaks which were not peaks in all scan directions). */
-   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minpix, thresh, 
+   mask = cupidRInitEdges( type, ipd, el, ndim, dims, skip, minlen, thresh, 
                            noise, rms, flatslope, &peakval );
 
 /* Dilate the edge regions using a cellular automata. This creates a new
@@ -244,8 +246,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( cubnd ) {
 
 /* Initialise a list to hold zero for every clump id. These values are
-   used as flags to indicate whether the clump id is associated with a clump
-   which is still present in the pixel assignment array. This uses the
+   used to count the number fo pixels remaining in each clump. This uses the
    returned array as temporarily used as work space. */
       for( i = 0; i <= maxid; i++ ) clist[ i ] = 0;
 
@@ -264,9 +265,8 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Skip pixels which are not in any clump. */
                if( *pa >= 0 ) {
 
-/* Store a flag indicating that this id is associated with a non-empty
-   remaining clump. */
-                  clist[ *pa ] = 1;
+/* Increment the number of pixels in this clump. */
+                  ++( clist[ *pa ] );
 
 /* Get the index within the clbnd and cubnd arrays of the current bounds
    on the x axis for this clump. */
@@ -292,14 +292,14 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Loop round creating an NDF descring each remaining clump, counting
-   them. */
+/* Loop round creating an NDF describing each clump with more than "minpix"
+   pixels, counting them. */
       for( i = 0; i <= maxid; i++ ) {
-         if( clist[ i ] ) {
+         if( clist[ i ] > minpix ) {
             clist[ (*nclump)++ ] = cupidNdfClump( type, ipd, m1, el, ndim, 
-                                                dims, skip, slbnd, i, 
-                                                clbnd + 3*i, cubnd + 3*i, 
-                                                NULL );
+                                                  dims, skip, slbnd, i, 
+                                                  clbnd + 3*i, cubnd + 3*i, 
+                                                  NULL );
          }
       }
 

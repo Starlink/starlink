@@ -386,7 +386,7 @@ void clumps() {
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
-*     as real clumps. [4]
+*     as real clumps. [16]
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.
@@ -417,10 +417,14 @@ void clumps() {
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
-*     - Reinhold.MinPix: The minimum number of pixels spanned by a peak
+*     - Reinhold.MinLen: The minimum number of pixels spanned by a peak
 *     along any one dimension in order for the peak to be considered
 *     significant. If a peak is spanned by fewer than this number of pixels 
 *     on any axis, then it is ignored. [4]
+*     - Reinhold.MinPix: The lowest number of pixel which a clump can
+*     contain. If a candidate clump has fewer than this number of pixels, 
+*     it will be ignored. This prevents noise spikes from being interpreted 
+*     as real clumps. [16]
 *     - Reinhold.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. A peak is considered to end when the 
 *     peak value dips below the "noise" value. [2*RMS]
@@ -452,20 +456,24 @@ void clumps() {
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
-*     - FellWalker.Noise: Defines the data value below which pixels are 
-*     considered to be in the noise. No walk will start from a pixel with 
-*     data value less than this value. [2*RMS]
-*     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
-*     local maximum which is checked for higher pixel values. The
-*     neighbourhood checked is  square or cube with side equal to twice the
-*     supplied value, in pixels. [4]
-*     - FellWalker.FlatSlope: Any initial section to a walk which has an
-*     average gradient (measured over 4 steps) less than this value will not 
-*     be included in the clump. [1.0*RMS]
 *     - FellWalker.CleanIter: This gives the number of times to apply the 
 *     cellular automata which cleans up the filled clumps. This cellular 
 *     automata replaces each clump index by the most commonly occuring 
 *     value within a 3x3x3 cube (or 2x2 square for 2D data) of neighbours. [3]
+*     - FellWalker.FlatSlope: Any initial section to a walk which has an
+*     average gradient (measured over 4 steps) less than this value will not 
+*     be included in the clump. [1.0*RMS]
+*     - FellWalker.MinPix: The lowest number of pixel which a clump can
+*     contain. If a candidate clump has fewer than this number of pixels, 
+*     it will be ignored. This prevents noise spikes from being interpreted 
+*     as real clumps. [4]
+*     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
+*     local maximum which is checked for higher pixel values. The
+*     neighbourhood checked is  square or cube with side equal to twice the
+*     supplied value, in pixels. [4]
+*     - FellWalker.Noise: Defines the data value below which pixels are 
+*     considered to be in the noise. No walk will start from a pixel with 
+*     data value less than this value. [2*RMS]
 
 *  Authors:
 *     DSB: David S. Berry

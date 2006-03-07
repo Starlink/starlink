@@ -101,7 +101,7 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */      
 
 /* Local Variables: */
-   AstKeyMap *hwconfig; /* Configuration parameters for this algorithm */
+   AstKeyMap *fwconfig; /* Configuration parameters for this algorithm */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
    int *clist;          /* Pointer to the array of returned NDF identifiers */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
@@ -114,6 +114,7 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iy;              /* Grid index on 2nd axis */
    int iz;              /* Grid index on 3rd axis */
    int maxid;           /* Largest id for any peak (smallest is zero) */
+   int minpix;          /* Minimum total size of a clump in pixels */
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
@@ -132,17 +133,17 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the AST KeyMap holding the configuration parameters for this
    algorithm. */
-   if( !astMapGet0A( config, "FELLWALKER", &hwconfig ) ) {     
-      hwconfig = astKeyMap( "" );
-      astMapPut0A( config, "FELLWALKER", hwconfig, "" );
+   if( !astMapGet0A( config, "FELLWALKER", &fwconfig ) ) {     
+      fwconfig = astKeyMap( "" );
+      astMapPut0A( config, "FELLWALKER", fwconfig, "" );
    }
 
 /* The configuration file can optionally omit the algorithm name. In this
    case the "config" KeyMap may contain values which should really be in
-   the "hwconfig" KeyMap. Add a copy of the "config" KeyMap into "hwconfig" 
+   the "fwconfig" KeyMap. Add a copy of the "config" KeyMap into "fwconfig" 
    so that it can be searched for any value which cannot be found in the
-   "hwconfig" KeyMap. */
-   astMapPut0A( hwconfig, CUPID__CONFIG, astCopy( config ), NULL );
+   "fwconfig" KeyMap. */
+   astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -165,7 +166,7 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
-   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, hwconfig,
+   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, rms, fwconfig,
                         ipa );
 
 /* Abort if no clumps found. */
@@ -190,9 +191,11 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cubnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
    if( cubnd ) {
 
+/* Get the minimum allowed number of pixels in a clump. */
+      minpix = cupidConfigI( fwconfig, "MINPIX", 16 );
+
 /* Initialise a list to hold zero for every clump id. These values are
-   used as flags to indicate whether the clump id is associated with a clump
-   which is still present in the pixel assignment array. This uses the
+   used to count the number fo pixels remaining in each clump. This uses the
    returned array as temporarily used as work space. */
       for( i = 0; i <= maxid; i++ ) clist[ i ] = 0;
 
@@ -211,9 +214,8 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Skip pixels which are not in any clump. */
                if( *pa >= 0 ) {
 
-/* Store a flag indicating that this id is associated with a non-empty
-   remaining clump. */
-                  clist[ *pa ] = 1;
+/* Increment the number of pixels in this clump. */
+                  ++( clist[ *pa ] );
 
 /* Get the index within the clbnd and cubnd arrays of the current bounds
    on the x axis for this clump. */
@@ -239,10 +241,10 @@ int *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Loop round creating an NDF descring each remaining clump, counting
-   them. */
+/* Loop round creating an NDF describing each clump with more than "minpix"
+   pixels, counting them. */
       for( i = 0; i <= maxid; i++ ) {
-         if( clist[ i ] ) {
+         if( clist[ i ] > minpix ) {
             clist[ (*nclump)++ ] = cupidNdfClump( type, ipd, ipa, el, ndim, 
                                                   dims, skip, slbnd, i, 
                                                   clbnd + 3*i, cubnd + 3*i, 
@@ -276,10 +278,10 @@ L10:;
    parameters for this algorithm. This prevents the values in the secondary 
    KeyMap being written out to the CUPID extension when cupidStoreConfig is 
    called. */
-   astMapRemove( hwconfig, CUPID__CONFIG );
+   astMapRemove( fwconfig, CUPID__CONFIG );
 
 /* Free resources */
-   hwconfig = astAnnul( hwconfig );
+   fwconfig = astAnnul( fwconfig );
    ipa = astFree( ipa );
 
 /* Return the list of clump structure locators. */

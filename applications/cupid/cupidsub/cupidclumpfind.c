@@ -276,7 +276,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          plist = NULL;
 
 /* Get the minimum number of pixels allowed in a clump.*/
-         minpix = cupidConfigI( cfconfig, "MINPIX", 4 );
+         minpix = cupidConfigI( cfconfig, "MINPIX", 16 );
 
 /* Loop round each clump */
          i = -1;
