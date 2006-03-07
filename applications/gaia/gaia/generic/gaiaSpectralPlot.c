@@ -12,6 +12,7 @@
  *     system (wavelength, frequency, velocity etc.) and an optional set of
  *     data units.
  *
+ *
  * Copyright (c) 2006 Particle Physics and Astronomy Research Council
  *
  *  Authors:
@@ -33,11 +34,16 @@
 #include <ast.h>
 #include <grf_tkcan.h>
 #include <rtdCanvas.h>
+#include <prm_par.h>
 
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
 
 #define DEBUG 0
+
+/* HDS data types */
+enum { HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, HDS_REAL,
+       HDS_DOUBLE };
 
 /*
  * Define a structure for containing all the necessary information
@@ -56,11 +62,13 @@ typedef struct SPItem  {
     char utag[22];              /* Unique tag for AST graphics we create */
     double *coordPtr;           /* Coordinates for each data value */
     double *dataPtr;            /* Data values */
-    int dataPtrDisp;            /* Dispostion of dataPtr, 0 for don't free */
+    double badvalue;            /* The value to replace AST__BAD with */
     double *tmpPtr[2];          /* Temporary arrays for transformed
                                  *  coordinates etc. */
     double height;              /* Height of item */
     double width;               /* Width of item */
+    double border;              /* Fraction border for plot axes, only used
+                                   when autoscaling using scale command */
     double x, y;                /* Coordinates of item reference point */
     double xmax;                /* Maximum physical X coordinate for plot */
     double xmin;                /* Minimum physical X coordinate for plot */
@@ -119,6 +127,9 @@ static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
      "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+
+    {TK_CONFIG_DOUBLE, "-badvalue", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_CUSTOM, "-frameset", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(SPItem, framesets), TK_CONFIG_NULL_OK,
@@ -237,7 +248,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
      * up after errors during the the remainder of this procedure.
      */
     spPtr->dataPtr = NULL;
-    spPtr->dataPtrDisp = 1;
+    spPtr->badvalue = 0.0;
     spPtr->coordPtr = NULL;
     spPtr->tmpPtr[0] = NULL;
     spPtr->tmpPtr[1] = NULL;
@@ -250,6 +261,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->y = 0.0;
     spPtr->width = 100.0;
     spPtr->height = 100.0;
+    spPtr->border = 0.05;
     spPtr->interp = interp;
     spPtr->options = NULL;
     spPtr->plot = NULL;
@@ -328,10 +340,12 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *   This procedure is invoked to process the "coords" widget command.
  *   This reads an list of doubles that are the spectral coordinates,
- *   or accepts a pointer to a list of already available doubles.
+ *   or accepts a pointer to a list of already available values in one of the
+ *   HDS types (_BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL _DOUBLE).
  *   In the latter case you should use the format:
  *
- *      <canvas> coords <item> "pointer" memory_address number_of_elements
+ *      <canvas> coords <item> \
+ *         "pointer" memory_address number_of_elements hds_type
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
@@ -343,8 +357,11 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                      int objc, Tcl_Obj *CONST objv[] )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
+    char *typePtr;
+    double *dataPtr;
     int i;
     int nel;
+    int type;
     long adr;
 
 #if DEBUG
@@ -368,9 +385,42 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         nel = objc;
         adr = 0L;
         if ( strcmp( Tcl_GetString( objv[0] ), "pointer" ) == 0 ) {
+            
+            /*  Memory address, sort this out. */
             if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ||
                  Tcl_GetIntFromObj( interp, objv[2], &nel ) != TCL_OK ) {
                 Tcl_AppendResult( interp, "Failed to read data pointer",
+                                  (char *) NULL );
+                return TCL_ERROR;
+            }
+
+            /*  Convert HDS type into local type. */
+            typePtr = Tcl_GetString( objv[3] );
+            type = HDS_DOUBLE;
+            if ( typePtr[0] == '_' ) {
+                if ( typePtr[1] == 'u' || typePtr[1] == 'U' ) {
+                    if ( typePtr[2] == 'b' || typePtr[2] == 'B' ) {
+                        type = HDS_UBYTE;
+                    }
+                    else {
+                        type = HDS_UWORD;
+                    }
+                }
+                else if ( typePtr[1] == 'b' || typePtr[1] == 'B' ) {
+                    type = HDS_BYTE;
+                }
+                else if ( typePtr[1] == 'w' || typePtr[1] == 'W' ) {
+                    type = HDS_WORD;
+                }
+                else if ( typePtr[1] == 'i' || typePtr[1] == 'I' ) {
+                    type = HDS_INTEGER;
+                }
+                else if ( typePtr[1] == 'r' || typePtr[1] == 'R' ) {
+                    type = HDS_REAL;
+                }
+            }
+            else {
+                Tcl_AppendResult( interp, "Unknown data type: ", objv[3], 
                                   (char *) NULL );
                 return TCL_ERROR;
             }
@@ -378,9 +428,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
         /* Re-create various workspaces, if needed */
         if ( spPtr->dataPtr != NULL && nel > spPtr->numPoints ) {
-            if ( spPtr->dataPtrDisp ) {
-                ckfree( (char *) spPtr->dataPtr );
-            }
+            ckfree( (char *) spPtr->dataPtr );
             ckfree( (char *) spPtr->coordPtr );
             ckfree( (char *) spPtr->tmpPtr[0] );
             ckfree( (char *) spPtr->tmpPtr[1] );
@@ -388,10 +436,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         }
         if ( spPtr->dataPtr == NULL ) {
             i = sizeof( double ) * nel;
-            if ( adr == 0 ) {
-                spPtr->dataPtr = (double *) ckalloc( i );
-                spPtr->dataPtrDisp = 1;
-            }
+            spPtr->dataPtr = (double *) ckalloc( i );
             spPtr->coordPtr = (double *)ckalloc( i );
             spPtr->tmpPtr[0] = (double *) ckalloc( i );
             spPtr->tmpPtr[1] = (double *) ckalloc( i );
@@ -403,7 +448,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->ymin =  DBL_MAX;
 
         if ( adr == 0 ) {
-            /* Read doubles as strings */
+            /* Read doubles as strings, no BAD values allowed */
             for ( i = 0; i < nel; i++ ) {
                 if ( Tcl_GetDoubleFromObj( interp, objv[i],
                                            &spPtr->dataPtr[i] ) != TCL_OK ) {
@@ -414,12 +459,124 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
         else {
-            /* Given memory address */
-            spPtr->dataPtr = (double *) adr;
-            spPtr->dataPtrDisp = 0;
+            /* Given memory address, check for type and AST__BAD values and 
+             * convert/replace with our bad value. */
+            
+            dataPtr = spPtr->dataPtr;
+            switch (type) 
+            {
+                case HDS_DOUBLE : {
+                    double *fromPtr = (double *) adr;
+                    double value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADD ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_REAL : {
+                    float *fromPtr = (float *) adr;
+                    float value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADR ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_INTEGER : {
+                    int *fromPtr = (int *) adr;
+                    int value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADI ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_WORD : {
+                    short *fromPtr = (short *) adr;
+                    short value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADW ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_UWORD : {
+                    unsigned short *fromPtr = (unsigned short *) adr;
+                    unsigned short value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADUW ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_BYTE : {
+                    char *fromPtr = (char *) adr;
+                    char value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADB ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+
+                case HDS_UBYTE : {
+                    unsigned char *fromPtr = (unsigned char *) adr;
+                    unsigned char value;
+                    for ( i = 1; i < nel; i++ ) {
+                        value = *fromPtr++;
+                        if ( value == VAL__BADUB ) {
+                            *dataPtr++ = spPtr->badvalue;
+                        }
+                        else {
+                            *dataPtr++ = (double) value;
+                        }
+                    }
+                }
+                break;
+            }
+
+            /* Get range of data */
+            dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
-                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
+                spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                dataPtr++;
             }
         }
 
@@ -447,7 +604,6 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
     Tk_Window tkwin;
     Tk_ConfigSpec *specPtr;
 
-
 #if DEBUG
     fprintf( stderr, "SPConfigure() \n" );
 #endif
@@ -465,8 +621,6 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
     for ( specPtr = configSpecs; specPtr->type != TK_CONFIG_END; specPtr++ ) {
         if ( specPtr->specFlags & TK_CONFIG_OPTION_SPECIFIED ) {
             /* All will do for now! */
-
-            fprintf( stderr, "Plot regeneration requested (configure)\n" );
             spPtr->newplot = 1;
             break;
         }
@@ -493,7 +647,7 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
 #if DEBUG
     fprintf( stderr, "SPDelete() \n" );
 #endif
-    if ( spPtr->dataPtr != NULL && spPtr->dataPtrDisp ) {
+    if ( spPtr->dataPtr != NULL ) {
         ckfree( (char *) spPtr->dataPtr );
     }
     if ( spPtr->coordPtr != NULL ) {
@@ -506,6 +660,10 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
         ckfree( (char *) spPtr->tmpPtr[1] );
     }
     spPtr->numPoints = 0;
+
+    if ( spPtr->framesets[0] != NULL ) {
+       astAnnul( spPtr->framesets[0] );
+    }
 
     if ( spPtr->polyline != NULL ) {
         RtdLineDelete( canvas, spPtr->polyline, display );
@@ -749,7 +907,8 @@ static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
 /**
  * SPScale --
  *
- *      This procedure is invoked to scale an item.
+ *      This procedure is invoked to scale an item. If the arguments are
+ *      set to -1, then factors that fill the canvas will be used.
  *
  * Results:
  *      None.
@@ -767,11 +926,33 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
 #if DEBUG
     fprintf( stderr, "SPScale() \n" );
 #endif
-    /* Scale all coordinates and set their related values */
-    spPtr->x = originX + scaleX * ( spPtr->x - originX );
-    spPtr->y = originY + scaleY * ( spPtr->y - originY );
-    spPtr->width *= scaleX;
-    spPtr->height *= scaleY;
+    if ( scaleX < 0.0 ) {
+        int ixo, iyo, iwidth, iheight;
+        int xborder, yborder;
+        Tk_Window tkwin;
+        tkwin = Tk_CanvasTkwin( canvas );
+        ixo = Tk_X( tkwin );
+        iyo = Tk_Y( tkwin );
+        iwidth = Tk_Width( tkwin );
+        iheight = Tk_Height( tkwin );
+
+        /* Need a border */
+        xborder = (int) ( iwidth * spPtr->border );
+        yborder = (int) ( iheight * spPtr->border );
+
+        spPtr->x = (double) ixo + xborder;
+        spPtr->y = (double) iyo + yborder;
+        spPtr->height = (double) iheight - 2 * yborder;
+        spPtr->width = (double) iwidth - 2 * xborder;
+    }
+    else {
+
+        /* Scale all coordinates and set their related values */
+        spPtr->x = originX + scaleX * ( spPtr->x - originX );
+        spPtr->y = originY + scaleY * ( spPtr->y - originY );
+        spPtr->width *= scaleX;
+        spPtr->height *= scaleY;
+    }
 
     ComputeBBox( canvas, spPtr );
     return;
@@ -862,7 +1043,14 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    ptr[0] = (AstFrameSet *) longResult;
+
+    /* Release old frameset, before accepting new */
+    if ( ptr[0] != NULL ) {
+       astAnnul( ptr[0] );
+    }
+
+    /* Make a clone of the frameset so that the original can be released */
+    ptr[0] = (AstFrameSet *) astClone( (AstFrameSet *) longResult );
     ptr[1] = (AstFrameSet *) NULL;
     return TCL_OK;
 }
