@@ -13,7 +13,7 @@ include_MESSAGES = ONE_ERR one_err.h
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-C_ROUTINES = one_exec.c  one_find_file.c  one_scrsz.c
+C_ROUTINES = one_exec.c  one_find_file.c  one_shell_echo.c one_scrsz.c
 
 BUILT_SOURCES = $(include_MESSAGES)
 

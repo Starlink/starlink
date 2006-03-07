@@ -19,9 +19,9 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {234.2}
 \newcommand{\stardocauthors}   {R.T.Platon \& T. Jenness}
-\newcommand{\stardocdate}      {22 September 2000}
+\newcommand{\stardocdate}      {7th March 2006}
 \newcommand{\stardoctitle}     {ONE -- Odds and Ends Library}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {User's Guide}
 \newcommand{\stardocabstract}  {
 This library is a set of Fortran and C routines
@@ -573,6 +573,8 @@ The contents of the library are (in alphabetical order):\\
 \noteroutine{ONE\_SCRSZ( WIDTH, HEIGHT, STATUS )}
     {A Fortran callable function to obtain the size of the output screen.
     Taken from CONVERT, KAPPA and IRCAMPACK.}
+\noteroutine{ONE\_SHELL\_ECHO( FILESPEC, FILENAME, STATUS )}
+    {Expans shell metacharacters in a string without file globbing.}
 \section{Routines descriptions}
 There follows a full description of the library routines in alphabetical order:
 
@@ -781,6 +783,53 @@ There follows a full description of the library routines in alphabetical order:
    }
    \sstnotes{
       This is the UNIX version.
+   }
+}
+\sstroutine{
+   ONE\_SHELL\_ECHO
+}{
+   Interpret shell metacharacters in a string, without file globbing.
+}{
+   \sstdescription{
+      This routine is intended to expand shell metacharacters within 
+      a supplied file name, in the case where the file may not already
+      exist. Any wild card characters within the string are ignored (i.e.
+      there is no file globbing).
+   }
+   \sstinvocation{
+      CALL ONE\_SHELL\_ECHO( FILESPEC, FILENAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILESPEC = CHARACTER (Given)
+      }{
+         The file specification to be echoed.
+      }
+      \sstsubsection{
+         FILENAME = CHARACTER (Returned)
+      }{
+         The result of expanding any shell metacharacters (except wild
+         cards) within FILESPEC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         A status code as follows
+         \sstitemlist{
+
+            \sstitem
+            SAI\_\_OK for success
+
+            \sstitem
+            ONE\_\_LENGTHERR - Bad parameter length
+
+            \sstitem
+            ONE\_\_PIPEERR  - Pipe error
+
+            \sstitem
+            ONE\_\_MALLOCERR - Malloc error
+         }
+      }
    }
 }
 \end{document}

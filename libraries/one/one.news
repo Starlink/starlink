@@ -36,6 +36,9 @@
    - An explicit command for linking ADAM tasks with the ONE 
      library is now available: one_link_adam
 
+   - Added ONE_SHELL_ECHO to to return the result of expanding a string 
+     containing shell metacharacters, but with file globbing.
+
 3 V1.0
 
    - Initial release. Includes ONE_EXEC, ONE_FIND_FILE and ONE_SCRSZ
