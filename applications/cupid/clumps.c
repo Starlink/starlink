@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "star/ndg.h"
 #include "ast.h"
 #include "star/kaplibs.h"
 #include "star/grp.h"
@@ -538,10 +539,6 @@ void clumps() {
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-
-/*   astSetWatchId( 117755 ); */
-
-
 /* Initialise things to safe values. */
    mask = 0;
    rmask = NULL;
@@ -554,8 +551,12 @@ void clumps() {
 /* Start an NDF context */
    ndfBegin();
 
-/* Get an identifier for the input NDF. */
-   ndfAssoc( "IN", "UPDATE", &indf, status );
+/* Get an identifier for the input NDF. We use NDG (via kpg1_Rgndf)
+   instead of calling ndfAssoc directly since NDF/HDS has problems with
+   file names containing spaces, which NDG does not have. */
+   kpg1Rgndf( "IN", 1, 1, "", &grp, &size, status );
+   ndgNdfas( grp, 1, "UPDATE", &indf, status );
+   grpDelet( &grp, status );
 
 /* Get the dimensions of the NDF, and count the significant ones. */
    ndfDim( indf, NDF__MXDIM, dim, &ndim, status );
