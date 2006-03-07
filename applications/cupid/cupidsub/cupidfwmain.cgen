@@ -173,7 +173,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    the start of a walk. Any initial section of the walk which has an
    average gradient (measured over 4 steps) less than this value is not 
    assigned to any clump. */
-   flat_slope = cupidConfigD( config, "FLATSLOPE", 2.0*rms );
+   flat_slope = cupidConfigD( config, "FLATSLOPE", rms );
 
 /* Fill the supplied "ipa" array with -1 for all pixels which are below the
    threshold, are bad, or are at the edge of the array. Fill all other

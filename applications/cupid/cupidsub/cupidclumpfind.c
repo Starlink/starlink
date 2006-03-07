@@ -113,11 +113,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
    int skip[3];         /* Pointer to array of axis skips */
-   double *group_min;   /* Array holding group minima */
-   int sorted;          /* Has array been sorted? */
-   double t;            /* Temporary storage */
-   int ngroup;          /* Number of groups used to find minmum data value */
-   int igroup;          /* Group index */
 
 /* Initialise */
    clist = NULL;
@@ -186,71 +181,28 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    pixels found. */
       index = 1;
 
-/* Find the largest good data value in the supplied array. At the same
-   time we form an estimate of the minimum data value in the supplied array
-   excluding abberant points. To do this we divide the data values up into
-   groups and finding the minimum value in each hroup, tyhen taking the
-   median of the minimum values as the global "minimum " value. */
-      ngroup = el/1000;
-      if( ngroup < 20 ) ngroup = 20;
-      if( ngroup > 500 ) ngroup = 500;
-      group_min = astMalloc( sizeof( double )*ngroup );
-      if( group_min ) {
-         for( i = 0; i < ngroup; i++ ) group_min[ i ] = VAL__MAXD;
-         maxd = VAL__MIND;
-         igroup = 0;
+/* Find the largest and mallest good data values in the supplied array. */
+      maxd = VAL__MIND;
+      mind = VAL__MAXD;
 
-         if( type == CUPID__DOUBLE ) {
-            for( i = 0; i < el; i++ ) {
-               dd = ((double *)ipd)[ i ];
-               if( dd != VAL__BADD ) {
-                  if( dd > maxd ) maxd = dd;
-                  if( dd < group_min[ igroup ] ) group_min[ igroup ] = dd;
-               }
-               if( ++igroup == ngroup ) igroup = 0;
-            }
-
-         } else {
-            for( i = 0; i < el; i++ ) {
-               fd = ((float *)ipd)[ i ];
-               if( fd != VAL__BADR ) {
-                  if( fd > maxd ) maxd = fd;
-                  if( fd < group_min[ igroup ] ) group_min[ igroup ] = fd;
-               }
-               if( ++igroup == ngroup ) igroup = 0;
-            }
-
-         }
-
-/* Bubble sort the group minima */
-         j = ngroup;
-         sorted = 0;
-         while( --j > 0 && !sorted ) {
-            sorted = 1;
-            for( i = 0; i < j; i++ ) {
-               if( group_min[ i ] > group_min[ i + 1 ] ) {
-                  t = group_min[ i ];
-                  group_min[ i ] = group_min[ i + 1 ];
-                  group_min[ i + 1 ] = t;
-                  sorted = 0;
-               }
+      if( type == CUPID__DOUBLE ) {
+         for( i = 0; i < el; i++ ) {
+            dd = ((double *)ipd)[ i ];
+            if( dd != VAL__BADD ) {
+               if( dd > maxd ) maxd = dd;
+               if( dd < mind ) mind = dd;
             }
          }
 
-/* Use the median of the minima (excluding any groups which had no
-   contributions. */
-         j = 0;
-         for( i = ngroup - 1; i >= 0; i-- ) {
-            if( group_min[ i ] == VAL__MAXD ) {
-               j++;
-            } else {
-               break;
+      } else {
+         for( i = 0; i < el; i++ ) {
+            fd = ((float *)ipd)[ i ];
+            if( fd != VAL__BADR ) {
+               if( fd > maxd ) maxd = fd;
+               if( fd < mind ) mind = fd;
             }
          }
 
-         mind = group_min[ (ngroup - j)/2 ];
-         group_min = astFree( group_min );
-         
       }
 
 /* Get the contour levels at which to check for clumps. */

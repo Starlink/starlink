@@ -159,7 +159,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    minpix = cupidConfigI( rconfig, "MINPIX", 4 );
    noise = cupidConfigD( rconfig, "NOISE", 2*rms );
    thresh = cupidConfigD( rconfig, "THRESH", noise + rms );
-   flatslope = cupidConfigD( rconfig, "FLATSLOPE", 0.5*rms );
+   flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms );
    cathresh = pow( 3, ndim ) - 1.0;
    cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh );
    caiter = cupidConfigI( rconfig, "CAITERATIONS", 1 );
