@@ -73,8 +73,8 @@
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'GRP_PAR'          ! GRP constants
-      INCLUDE 'PSX_ERR'          ! PSX ERROR constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PSX_ERR'          ! PSX ERROR constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -101,19 +101,20 @@
       CHARACTER XLOC*(DAT__SZLOC) ! Locator to IRAS90 extension
       CHARACTER XNAME*(DAT__SZNAM) ! Name of extension containing IRA structure
       INTEGER ADDED              ! No. of elements added to the group
+      INTEGER I                  ! Axis count
       INTEGER IDA                ! IRA identifier for IRAS90 astrometry info
       INTEGER IGRP               ! GRP identifier for a group
       INTEGER INDFC              ! Identifier for NDF to get new WCS component
       INTEGER IPIX               ! Index of PIXEL Frame in IWCS
       INTEGER IRAFRM             ! AST Frame describing IRA sky co-ords
       INTEGER IRAMAP             ! AST Mapping from IRA "image" to sky co-ords
-      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds of supplied NDF
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds
       INTEGER NCARD              ! No. of header cards in the FITS extension
-      INTEGER NDIM               ! No of pixel axes in supplied NDF
+      INTEGER NDIM               ! Number of pixel axes
       INTEGER NENCOD             ! No. of prefered AST encodings supplied
       INTEGER PLACE              ! Place holder for temporary NDF
       INTEGER PNTR               ! Pointer to mapped array of FITS headers
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of supplied NDF
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds
       LOGICAL FLAG               ! Was group expression flagged? (NO)
       LOGICAL THERE              ! Does object exist?
       LOGICAL VERB               ! Give verbose warnings about bad IRAS90/FITS?
@@ -255,13 +256,17 @@
             IF( WRACC ) THEN
                INDFC = INDF
 
-*  Otherwise, create a temporary NDF with the same shape and size as the
-*  supplied NDF. Note, we never map any of the array components of this
-*  NDF which means that its size will be small.
+*  Otherwise, create a temporary NDF to be used as a host for the WCS
+*  FrameSet with the same pixel origin as the supplied NDF, but a size 
+*  of only 1 pixel on each axis.
             ELSE
                CALL NDF_TEMP( PLACE, STATUS )
                CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, 
      :                         STATUS )
+               DO I = 1, NDIM 
+                  UBND( I ) = LBND( I )
+               END DO
+
                CALL NDF_NEW( '_BYTE', NDIM, LBND, UBND, PLACE, INDFC, 
      :                       STATUS )
             END IF
