@@ -468,7 +468,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_DOUBLE : {
                     double *fromPtr = (double *) adr;
                     double value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADD ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -483,7 +483,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_REAL : {
                     float *fromPtr = (float *) adr;
                     float value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADR ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -498,7 +498,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_INTEGER : {
                     int *fromPtr = (int *) adr;
                     int value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADI ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -513,7 +513,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_WORD : {
                     short *fromPtr = (short *) adr;
                     short value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADW ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -528,7 +528,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_UWORD : {
                     unsigned short *fromPtr = (unsigned short *) adr;
                     unsigned short value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADUW ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -543,7 +543,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_BYTE : {
                     char *fromPtr = (char *) adr;
                     char value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADB ) {
                             *dataPtr++ = spPtr->badvalue;
@@ -558,7 +558,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 case HDS_UBYTE : {
                     unsigned char *fromPtr = (unsigned char *) adr;
                     unsigned char value;
-                    for ( i = 1; i < nel; i++ ) {
+                    for ( i = 0; i < nel; i++ ) {
                         value = *fromPtr++;
                         if ( value == VAL__BADUB ) {
                             *dataPtr++ = spPtr->badvalue;

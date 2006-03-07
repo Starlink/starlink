@@ -35,7 +35,7 @@
 #     See individual method declarations below.
 
 #  Inheritance:
-Widget
+#     util::TopLevelWidget
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
@@ -506,6 +506,11 @@ itcl::class gaia::GaiaNDFCube {
          set axis_ 2
          set_step_axis_ 3
          set_display_plane_ $plane_
+
+         #  XXX map in all data for extra speed...
+         #set ndfid [ndf::open "$ndfname_"]
+         #lassign [ndf::map $ndfid] adr nel type
+         #puts "adr=$adr, nel=$nel, type=$type"
       }
    }
 
@@ -747,7 +752,8 @@ itcl::class gaia::GaiaNDFCube {
    protected method add_bindings_ {} {
       global env
       if {! [info exists env(SPLAT_DIR)]} {
-         info_dialog "No SPLAT_DIR variable available. Cannot display spectra"
+         puts stderr "INFO: No SPLAT_DIR variable available. "
+         puts stderr "      Cannot display spectra remotely"
       } else {
          set splat_dir_ $env(SPLAT_DIR)
 
@@ -758,8 +764,15 @@ itcl::class gaia::GaiaNDFCube {
       }
 
       # Local test...
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <Any-Motion> \
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> \
          [code $this display_spectrum_ local %x %y]
+
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
+         [code $this display_spectrum_ local %x %y]
+
+      #  Need this when spectrum is plotted in main window.
+      #$itk_option(-canvas) bind all <B1-Motion> \
+      #   [code $this display_spectrum_ localall %x %y]
    }
 
    protected method display_spectrum_ {action cx cy} {
@@ -803,13 +816,21 @@ itcl::class gaia::GaiaNDFCube {
          }
          $splat_disp_ runwith "${ndfname_}${section}" 0
       } else {
-         #  Display in the spectrum_plot. Devel code.
+         #  Display in the spectrum_plot. Devel code. Add -canvas to display
+         #  elsewhere.
          if { [info exists spectrum_] } {
             if { $spectrum_ == {} } {
-               set spectrum_ [GaiaSpectralPlot $w_.specplot -transient 1]
+               set spectrum_ [GaiaSpectralPlot $w_.specplot \
+                                 -rtdimage $itk_option(-rtdimage) \
+                                 -number $itk_option(-number)]
+               #  Make this a transient of main window, not this one.
+               wm transient $spectrum_ $itk_option(-gaia)
             }
-            $spectrum_ display "${ndfname_}${section}" $axis_ \
-               $itk_option(-autoscale)
+            $spectrum_ display "${ndfname_}${section}" \
+               $axis_ $itk_option(-autoscale)
+            #if { $action == "localall" } {
+            #   $spectrum_ anchor $cx $cy
+            #}
          }
       }
 
@@ -928,7 +949,7 @@ itcl::class gaia::GaiaNDFCube {
    protected variable check_for_cubes_ 1
 
    # The spectrum plot item, variable not initialised unless in development
-   # mode. 
+   # mode.
    protected variable spectrum_
 
    #  Common variables: (shared by all instances)

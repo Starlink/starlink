@@ -152,7 +152,7 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
         result = gaiaSimpleTypeNDF( indf, "DATA", type, NDF__SZTYP+1,
                                     &error_mess );
         if ( result == TCL_OK ) {
-            result = gaiaSimpleMapNDF( indf, "_DOUBLE", "DATA", &dataPtr, 
+            result = gaiaSimpleMapNDF( indf, type, "DATA", &dataPtr, 
                                        &el, &error_mess  );
             if ( result == TCL_OK ) {
                 Tcl_ListObjAppendElement( interp, resultObj, 

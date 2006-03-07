@@ -95,11 +95,23 @@ itcl::class gaia::GaiaSpectralPlot {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
-      #  Create the canvas.
-      itk_component add canvas {
-         canvas $w_.canvas
+      #  Create the canvas, if needed, otherwise use the one given.
+      if { $itk_option(-canvas) == {} } {
+         #  Use a frame to get the apparent size of canvas right.
+         itk_component add canvasframe {
+            frame $w_.canvasframe -relief groove -bd 4
+         }
+         itk_component add canvas {
+            canvas $itk_component(canvasframe).canvas
+         }
+         pack $itk_component(canvasframe) -fill both -expand 1
+         pack $itk_component(canvas) -fill both -expand 1
+         configure -canvas $itk_component(canvas)
+         bind $itk_component(canvasframe) <Configure> [code $this resize %w %h]
       }
-      pack $itk_component(canvas) -fill both -expand 1
+
+      #  Make window resizes, resize the canvas.
+      bind $w_ <Configure> +[code $this fitxy]
    }
 
    #  Destructor:
@@ -119,8 +131,15 @@ itcl::class gaia::GaiaSpectralPlot {
    }
 
    #  Close down.
-   method close {} {
+   public method close {} {
+      reset
       wm withdraw $w_
+   }
+
+   #  Reset so that a new spectrum will be created.
+   public method reset {} {
+      $itk_option(-canvas) delete $spectrum_
+      set spectrum_ {}
    }
 
 
@@ -131,6 +150,8 @@ itcl::class gaia::GaiaSpectralPlot {
    #  fits. Otherwise the existing plot bounds are used.
    public method display {ndfname axis autoscale} {
 
+      puts "display: $ndfname, $axis, $autoscale"
+
       #  Open the NDF and map its data.
       set ndfid [ndf::open "$ndfname"]
       lassign [ndf::map $ndfid] adr nel type
@@ -139,43 +160,67 @@ itcl::class gaia::GaiaSpectralPlot {
          if { $spectrum_ =={} } {
             
             #  Create the spectral_plot, only done once.
-            set spectrum_ [$itk_component(canvas) create spectral_plot \
+            set spectrum_ [$itk_option(-canvas) create spectral_plot \
                               pointer $adr $nel $type \
-                              -x 50 -y 25 -width 600 -height 200 \
+                              -x 50 -y 25 -width 650 -height 200 \
                               -linecolour blue -linewidth 1 \
                               -gridoptions "Grid=0" \
                               -showaxes 1]
          }
 
          #  Set the frameset used by the plot. This also causes a autoscale.
-         $itk_component(canvas) itemconfigure $spectrum_ \
-            -frameset [ndf::getwcs $ndfid $axis]
+         $itk_option(-canvas) itemconfigure $spectrum_ -frameset [ndf::getwcs $ndfid $axis]
          
          #  Also set the NDF data units.
-         $itk_component(canvas) itemconfigure $spectrum_ \
+         $itk_option(-canvas) itemconfigure $spectrum_ \
             -dataunits "[ndf::getc $ndfid units]" \
             -datalabel "[ndf::getc $ndfid label]"
       }
 
       #  Pass in the data.
-      $itk_component(canvas) coords $spectrum_ pointer $adr $nel $type
+      $itk_option(-canvas) coords $spectrum_ pointer $adr $nel $type
 
       #  Finished with the NDF.
       ndf::close $ndfid
    }
 
    #  Make the spectral_plot item scale to fit the full size of the canvas.
-   public method fitxy {} {
-      if { $spectrum_ != {} } {
-         $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
-      }
+   public method fitxy { args } {
+      $itk_option(-canvas) scale $spectrum_ -1 -1 -1 -1
+
+      # Fudge immediate update.
+      $itk_option(-canvas) itemconfigure $spectrum_ -showaxes 1
    }
+
+   #  Set the anchor point for the spectrum.
+   public method anchor {x y} {
+      $itk_option(-canvas) itemconfigure $spectrum_ -x $x -y $y
+   }
+
+   #  Resize the canvas (if we're managing it) to fit the window.
+   public method resize {cw ch} {
+      set fh [expr [winfo height $w_]-10]
+      if { $fh < $ch } {
+         $itk_option(-canvas) configure -height $fh
+      }
+      set fw [expr [winfo width $w_]-10]
+      if { $fw < $cw } {
+         $itk_option(-canvas) configure -width $fw
+      }
+      $itk_option(-canvas) configure -scrollregion "0 0 $fw $fh"
+      fitxy
+    }
+
+
 
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  Name of rtdimage widget.
+   #  Name of RtdImage widget.
    itk_option define -rtdimage rtdimage Rtdimage {} {}
+
+   #  The canvas, could be local or in the main image.
+   itk_option define -canvas canvas Canvas {}
 
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
