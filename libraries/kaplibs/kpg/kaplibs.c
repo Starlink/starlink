@@ -28,8 +28,6 @@
 *        Original version.
 *     03-NOV-2005 (TIMJ):
 *        Update GRP interface
-*     7-MAR-2006 (DSB):
-*        Added KPG1_RGNDF and KPG1_WGNDF.
 *     {enter_further_changes_here}
 */
 
@@ -484,108 +482,6 @@ void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
    F77_FREE_REAL( MASK );
 }
 
-
-/* ----------------------------------------------- */
-
-F77_SUBROUTINE(kpg1_rgndf)( CHARACTER(PARAM), INTEGER(MAXSIZ), INTEGER(MINSIZ),
-                            CHARACTER(TEXT), INTEGER(IGRP), INTEGER(SIZE), 
-                            INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) );
-
-void kpg1Rgndf( const char *param, int maxsiz, int minsiz, const char *text, 
-                Grp **grp, int *size, int *status ){
-
-   DECLARE_CHARACTER_DYN(PARAM);  
-   DECLARE_INTEGER(MAXSIZ);
-   DECLARE_INTEGER(MINSIZ);
-   DECLARE_CHARACTER_DYN(TEXT);  
-   DECLARE_INTEGER(IGRP);
-   DECLARE_INTEGER(SIZE);
-   DECLARE_INTEGER(STATUS);
-
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
-
-   F77_EXPORT_INTEGER( maxsiz, MAXSIZ );
-   F77_EXPORT_INTEGER( minsiz, MINSIZ );
-
-   F77_CREATE_CHARACTER( TEXT, strlen( text ) );
-   F77_EXPORT_CHARACTER( text, TEXT, TEXT_length );
-
-   F77_EXPORT_INTEGER( *status, STATUS );
-
-   F77_CALL(kpg1_rgndf)( CHARACTER_ARG(PARAM),
-                         INTEGER_ARG(&MAXSIZ),
-                         INTEGER_ARG(&MINSIZ),
-                         CHARACTER_ARG(TEXT),
-                         INTEGER_ARG(&IGRP),
-                         INTEGER_ARG(&SIZE),
-                         INTEGER_ARG(&STATUS) 
-                         TRAIL_ARG(PARAM) 
-                         TRAIL_ARG(TEXT) );
-
-
-   F77_FREE_CHARACTER( PARAM );
-   F77_FREE_CHARACTER( TEXT );
-   F77_IMPORT_INTEGER( SIZE, *size );
-   F77_IMPORT_INTEGER( STATUS, *status );
-
-   *grp = grpF2C( IGRP, status );
-
-}
-
-
-/* ----------------------------------------------- */
-
-F77_SUBROUTINE(kpg1_wgndf)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(MAXSIZ), 
-                            INTEGER(MINSIZ), CHARACTER(TEXT), INTEGER(IGRP), 
-                            INTEGER(SIZE), INTEGER(STATUS) TRAIL(PARAM) 
-                            TRAIL(TEXT) );
-
-void kpg1Wgndf( const char *param, Grp *grp0, int maxsiz, int minsiz,  
-                const char *text, Grp **grp, int *size, int *status ){
-
-   DECLARE_CHARACTER_DYN(PARAM);  
-   DECLARE_INTEGER(IGRP0);
-   DECLARE_INTEGER(MAXSIZ);
-   DECLARE_INTEGER(MINSIZ);
-   DECLARE_CHARACTER_DYN(TEXT);  
-   DECLARE_INTEGER(IGRP);
-   DECLARE_INTEGER(SIZE);
-   DECLARE_INTEGER(STATUS);
-
-   F77_EXPORT_INTEGER( grpC2F( grp0, status ), IGRP0 );
- 
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
-
-   F77_EXPORT_INTEGER( maxsiz, MAXSIZ );
-   F77_EXPORT_INTEGER( minsiz, MINSIZ );
-
-   F77_CREATE_CHARACTER( TEXT, strlen( text ) );
-   F77_EXPORT_CHARACTER( text, TEXT, TEXT_length );
-
-   F77_EXPORT_INTEGER( *status, STATUS );
-
-   F77_CALL(kpg1_wgndf)( CHARACTER_ARG(PARAM),
-                         INTEGER_ARG(&IGRP0),
-                         INTEGER_ARG(&MAXSIZ),
-                         INTEGER_ARG(&MINSIZ),
-                         CHARACTER_ARG(TEXT),
-                         INTEGER_ARG(&IGRP),
-                         INTEGER_ARG(&SIZE),
-                         INTEGER_ARG(&STATUS) 
-                         TRAIL_ARG(PARAM) 
-                         TRAIL_ARG(TEXT) );
-
-
-   F77_FREE_CHARACTER( PARAM );
-   F77_FREE_CHARACTER( TEXT );
-   F77_IMPORT_INTEGER( SIZE, *size );
-   F77_IMPORT_INTEGER( STATUS, *status );
-
-   *grp = grpF2C( IGRP, status );
-
-}
 
 
 
