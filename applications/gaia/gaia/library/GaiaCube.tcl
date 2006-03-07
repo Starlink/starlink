@@ -35,7 +35,7 @@
 #     See individual method declarations below.
 
 #  Inheritance:
-#     util::TopLevelWidget
+Widget
 
 #  Authors:
 #     PWD: Peter Draper (STARLINK - Durham University)
@@ -63,6 +63,12 @@ itcl::class gaia::GaiaNDFCube {
    #  Constructor:
    #  ------------
    constructor {args} {
+
+      #  Enable devel code.
+      global env
+      if { [info exists env(GAIA_DEVEL)] } {
+         set spectrum_ {}
+      }
 
       #  Evaluate any options [incr Tk].
       eval itk_initialize $args
@@ -461,6 +467,13 @@ itcl::class gaia::GaiaNDFCube {
          catch {$collapser_ delete_sometime}
          set collapser_ {}
       }
+
+      #  Close spectrum plot.
+      if { [info exists spectrum_] } {
+         if { $spectrum_ != {} && [winfo exists $spectrum_] } {
+            $spectrum_ close
+         }
+      }
    }
 
    #  Methods:
@@ -734,18 +747,22 @@ itcl::class gaia::GaiaNDFCube {
    protected method add_bindings_ {} {
       global env
       if {! [info exists env(SPLAT_DIR)]} {
-         error_dialog "No SPLAT_DIR variable available. Cannot display spectra"
-         return
-      }
-      set splat_dir_ $env(SPLAT_DIR)
+         info_dialog "No SPLAT_DIR variable available. Cannot display spectra"
+      } else {
+         set splat_dir_ $env(SPLAT_DIR)
 
-      #  Button-1 does a lot already so use double click. May clash with
-      #  image regions toolbox....
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <Double-Button-1> \
-         [code $this display_spectrum_ %x %y]
+         #  Button-1 does a lot already so use double click. May clash with
+         #  image regions toolbox....
+         $itk_option(-canvas) bind $itk_option(-rtdimage) <Double-Button-1> \
+            [code $this display_spectrum_ splat %x %y]
+      }
+
+      # Local test...
+      $itk_option(-canvas) bind $itk_option(-rtdimage) <Any-Motion> \
+         [code $this display_spectrum_ local %x %y]
    }
 
-   protected method display_spectrum_ {cx cy} {
+   protected method display_spectrum_ {action cx cy} {
 
       #  Convert click coordinates from canvas coords to grid coords.
       set cx [$itk_option(-canvas) canvasx $cx]
@@ -777,14 +794,24 @@ itcl::class gaia::GaiaNDFCube {
          set section "($ix,$iy,$range)"
       }
 
-      #  Send the section to SPLAT.
-      if { $splat_disp_ == {} } {
-         set splat_disp_ [GaiaForeignExec \#auto \
-                             -application $splat_dir_/splatdisp \
-                             -show_output 0]
+      if { $action == "splat" } {
+         #  Send the section to SPLAT.
+         if { $splat_disp_ == {} } {
+            set splat_disp_ [GaiaForeignExec \#auto \
+                                -application $splat_dir_/splatdisp \
+                                -show_output 0]
+         }
+         $splat_disp_ runwith "${ndfname_}${section}" 0
+      } else {
+         #  Display in the spectrum_plot. Devel code.
+         if { [info exists spectrum_] } {
+            if { $spectrum_ == {} } {
+               set spectrum_ [GaiaSpectralPlot $w_.specplot -transient 1]
+            }
+            $spectrum_ display "${ndfname_}${section}" $axis_ \
+               $itk_option(-autoscale)
+         }
       }
-      $splat_disp_ runwith "${ndfname_}${section}" 0
-
 
       #  XXX Checker code for region spectra.
 #       if { $ardspectra_ == {} } {
@@ -833,6 +860,9 @@ itcl::class gaia::GaiaNDFCube {
    itk_option define -step step Step 1 {
       set step_ $itk_option(-step)
    }
+
+   #  Does spectral plot auto-update ranges.
+   itk_option define -autoscale autoscale AutoScale 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -896,6 +926,10 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
+
+   # The spectrum plot item, variable not initialised unless in development
+   # mode. 
+   protected variable spectrum_
 
    #  Common variables: (shared by all instances)
    #  -----------------
