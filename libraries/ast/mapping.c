@@ -42,6 +42,7 @@ f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all Mappings:
 *
 c     - astDecompose: Decompose a Mapping into two component Mappings
+c     - astTranGrid: Transform a grid of positions
 c     - astInvert: Invert a Mapping
 c     - astLinearApprox: Calculate a linear approximation to a Mapping
 c     - astMapBox: Find a bounding box for a Mapping
@@ -56,6 +57,7 @@ c     - astTran2: Transform 2-dimensional coordinates
 c     - astTranN: Transform N-dimensional coordinates
 c     - astTranP: Transform N-dimensional coordinates held in separate arrays
 f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
+f     - AST_TRANGRID: Transform a grid of positions
 f     - AST_INVERT: Invert a Mapping
 f     - AST_LINEARAPPOX: Calculate a linear approximation to a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
@@ -167,6 +169,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Some speed optimisations to rebinning code.
 *     2-MAR-2006 (DSB):
 *        Use HAVE_LONG_DOUBLE in place of AST_LONG_DOUBLE
+*     7-MAR-2006 (DSB):
+*        Added astTranGrid.
 *class--
 */
 
@@ -439,6 +443,10 @@ static void SpreadNearestF( int, const int *, const int *, const float *, const 
 static void SpreadNearestI( int, const int *, const int *, const int *, const int *, int, const int *, const double *const *, int, int, int, int *, int *, double *);
 static void Tran1( AstMapping *, int, const double [], int, double [] );
 static void Tran2( AstMapping *, int, const double [], const double [], int, double [], double [] );
+static void TranGrid( AstMapping *, int, const int[], const int[], double, int, int, int, int, double * );
+static void TranGridAdaptively( AstMapping *, int, const int[], const int[], const int[], const int[], double, int, int, double *[]  );
+static void TranGridSection( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[] );
+static void TranGridWithBlocking( AstMapping *, const double *, int, const int *, const int *, const int *, const int *, int, double *[]  );
 static void TranN( AstMapping *, int, int, int, const double *, int, int, int, double * );
 static void TranP( AstMapping *, int, int, const double *[], int, int, double *[] );
 static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
@@ -2483,6 +2491,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->TestReport = TestReport;
    vtab->Tran1 = Tran1;
    vtab->Tran2 = Tran2;
+   vtab->TranGrid = TranGrid;
    vtab->TranN = TranN;
    vtab->TranP = TranP;
    vtab->Transform = Transform;
@@ -9266,7 +9275,7 @@ static void RebinAdaptively( AstMapping *this, int ndim_in,
                              lo, hi, npix_out, out, out_var, work );
 
 /* Now set up a second section which covers the remaining half of the
-   original output section. */
+   original input section. */
             lo[ dimx ] = hi[ dimx ] + 1;
             hi[ dimx ] = ubnd[ dimx ];
 
@@ -10172,12 +10181,6 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
    stride = astFree( stride );
 }
 
-
-
-
-
-
-
 /*
 *++
 *  Name:
@@ -10947,10 +10950,6 @@ MAKE_REBINSEQ(I,int,1)
 #undef MAKE_REBIN
 
 
-
-
-
-
 static void RebinSeqF( AstMapping *this, double wlim, int ndim_in,
                      const int lbnd_in[], const int ubnd_in[],
                      const float in[], const float in_var[],
@@ -11201,12 +11200,6 @@ static void RebinSeqF( AstMapping *this, double wlim, int ndim_in,
    simple = astAnnul( simple );
 
 }
-
-
-
-
-
-
 
 static void RebinWithBlocking( AstMapping *this, const double *linear_fit,
                               int ndim_in,
@@ -17918,6 +17911,1329 @@ f        The global status.
    }
 }
 
+static void TranGrid( AstMapping *this, int ncoord_in, const int lbnd[], 
+                      const int ubnd[], double tol, int maxpix, int forward, 
+                      int ncoord_out, int outdim, double *out ) {
+/*
+*++
+*  Name:
+c     astTranGrid 
+f     AST_TRANGRID
+
+*  Purpose:
+*     Transform a grid of positions
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     void astTranGrid( AstMapping *this, int ncoord_in,
+c                       const int lbnd[], const int ubnd[],
+c                       double tol, int maxpix, int forward,
+c                       int ncoord_out, int outdim, double *out );
+f     CALL AST_TRANGRID( THIS, NCOORD_IN, LBND, UBND, TOL, MAXPIX, 
+f                        FORWARD, NCOORD_OUT, OUTDIM, OUT, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function uses the supplied Mapping to transforms a regular square 
+*     grid of points covering a specified box. It attempts to do this
+*     quickly by first approximating the Mapping with a linear transformation 
+*     applied over the whole region of the input grid which is being used. 
+*     If this proves to be insufficiently accurate, the input region is 
+*     sub-divided into two along its largest dimension and the process is 
+*     repeated within each of the resulting sub-regions. This process of
+*     sub-division continues until a sufficiently good linear approximation 
+*     is found, or the region to which it is being applied becomes too small 
+*     (in which case the original Mapping is used directly).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Mapping to be applied.
+c     ncoord_in
+f     NCOORD_IN = INTEGER (Given)
+*        The number of coordinates being supplied for each box corner
+*        (i.e. the number of dimensions of the space in which the
+*        input points reside).
+c     lbnd
+f     LBND( NCOORD_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ncoord_in" elements,
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd
+f     UBND( NCOORD_IN ) = INTEGER (Given)
+c        Pointer to an array of integers, with "ncoord_in" elements,
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd" and "ubnd" together define the shape
+f        Note that LBND and UBND together define the shape
+*        and size of the input grid, its extent along a particular
+c        (j'th) dimension being ubnd[j]-lbnd[j]+1 (assuming the
+c        index "j" to be zero-based). They also define
+f        (J'th) dimension being UBND(J)-LBND(J)+1. They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre.
+c     tol
+f     TOL = DOUBLE PRECISION (Given)
+*        The maximum tolerable geometrical distortion which may be
+*        introduced as a result of approximating non-linear Mappings
+*        by a set of piece-wise linear transformations. This should be
+*        expressed as a displacement within the output coordinate system
+*        of the Mapping.
+*
+*        If piece-wise linear approximation is not required, a value
+*        of zero may be given. This will ensure that the Mapping is
+*        used without any approximation, but may increase execution
+*        time.
+*        
+*        If the value is too high, discontinuities between the linear
+*        approximations used in adjacent panel will be higher. If this 
+*        is a problem, reduce the tolerance value used.
+c     maxpix
+f     MAXPIX = INTEGER (Given)
+*        A value which specifies an initial scale size (in input grid points) 
+*        for the adaptive algorithm which approximates non-linear Mappings
+*        with piece-wise linear transformations. Normally, this should
+*        be a large value (larger than any dimension of the region of
+*        the input grid being used). In this case, a first attempt to
+*        approximate the Mapping by a linear transformation will be
+*        made over the entire input region.
+*
+*        If a smaller value is used, the input region will first be
+c        divided into sub-regions whose size does not exceed "maxpix"
+f        divided into sub-regions whose size does not exceed MAXPIX
+*        grid points in any dimension. Only at this point will attempts
+*        at approximation commence.
+*
+*        This value may occasionally be useful in preventing false
+*        convergence of the adaptive algorithm in cases where the
+*        Mapping appears approximately linear on large scales, but has
+*        irregularities (e.g. holes) on smaller scales. A value of,
+*        say, 50 to 100 grid points can also be employed as a safeguard 
+*        in general-purpose software, since the effect on performance is
+*        minimal.
+*
+*        If too small a value is given, it will have the effect of
+*        inhibiting linear approximation altogether (equivalent to
+c        setting "tol" to zero). Although this may degrade
+f        setting TOL to zero). Although this may degrade
+*        performance, accurate results will still be obtained.
+c     forward
+f     FORWARD = LOGICAL (Given)
+c        A non-zero value indicates that the Mapping's forward
+c        coordinate transformation is to be applied, while a zero
+c        value indicates that the inverse transformation should be
+c        used.
+f        A .TRUE. value indicates that the Mapping's forward
+f        coordinate transformation is to be applied, while a .FALSE.
+f        value indicates that the inverse transformation should be
+f        used.
+c     ncoord_out
+f     NCOORD_OUT = INTEGER (Given)
+*        The number of coordinates being generated by the Mapping for
+*        each output point (i.e. the number of dimensions of the
+*        space in which the output points reside). This need not be
+c        the same as "ncoord_in".
+f        the same as NCOORD_IN.
+c     outdim
+f     OUTDIM = INTEGER (Given)
+c        The number of elements along the second dimension of the "out"
+f        The number of elements along the first dimension of the OUT
+*        array (which will contain the output coordinates). The value
+*        given should not be less than the number of points in the grid.
+c     out
+f     OUT( OUTDIM, NCOORD_OUT ) = DOUBLE PRECISION (Returned)
+c        The address of the first element in a 2-dimensional array of 
+c        shape "[ncoord_out][outdim]", into
+c        which the coordinates of the output (transformed) points will
+c        be written. These will be stored such that the value of
+c        coordinate number "coord" for output point number "point"
+c        will be found in element "out[coord][point]".
+f        An array into which the coordinates of the output
+f        (transformed) points will be written. These will be stored
+f        such that the value of coordinate number COORD for output
+f        point number POINT will be found in element OUT(POINT,COORD).
+*        The points are ordered such that the first axis of the input
+*        grid changes most rapidly. For example, if the input grid is 
+*        2-dimensional and extends from (2,-1) to (3,1), the output
+*        points will be stored in the order (2,-1), (3, -1), (2,0), (3,0),
+*        (2,1), (3,1).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+c     - If the forward coordinate transformation is being applied, the
+c     Mapping supplied must have the value of "ncoord_in" for its Nin
+c     attribute and the value of "ncoord_out" for its Nout attribute. If
+c     the inverse transformation is being applied, these values should
+c     be reversed.
+f     - If the forward coordinate transformation is being applied, the
+f     Mapping supplied must have the value of NCOORD_IN for its Nin
+f     attribute and the value of NCOORD_OUT for its Nout attribute. If
+f     the inverse transformation is being applied, these values should
+f     be reversed.
+*--
+*/
+
+/* Local Variables: */ 
+   AstMapping *simple;           /* Pointer to simplified Mapping */ 
+   double **out_ptr;             /* Pointer to array of output data pointers */
+   int coord;                    /* Loop counter for coordinates */
+   int idim;                     /* Loop counter for coordinate dimensions */ 
+   int npoint;                   /* Number of points in the grid */ 
+
+/* Check the global error status. */ 
+   if ( !astOK ) return; 
+
+/* Calculate the number of points in the grid, and check that the lower and 
+   upper bounds of the input grid are consistent. Report an error if any 
+   pair is not. */ 
+   npoint = 1;
+   for ( idim = 0; idim < ncoord_in; idim++ ) { 
+      if ( lbnd[ idim ] > ubnd[ idim ] ) { 
+         astError( AST__GBDIN, "astTranGrid(%s): Lower bound of " 
+                   "input grid (%d) exceeds corresponding upper bound " 
+                   "(%d).", astGetClass( this ), 
+                   lbnd[ idim ], ubnd[ idim ] ); 
+         astError( AST__GBDIN, "Error in input dimension %d.", 
+                   idim + 1 ); 
+         break; 
+      } else {
+         npoint *= ubnd[ idim ] - lbnd[ idim ] + 1; 
+      }
+   } 
+
+/* Validate the mapping and numbers of points/coordinates. */
+   ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out,
+                    "astTranGrid" );
+
+/* Check that the positional accuracy tolerance supplied is valid and 
+   report an error if necessary. */ 
+   if ( astOK && ( tol < 0.0 ) ) { 
+      astError( AST__PATIN, "astTranGrid(%s): Invalid positional " 
+                "accuracy tolerance (%.*g pixel).", 
+                astGetClass( this ), DBL_DIG, tol ); 
+      astError( AST__PATIN, "This value should not be less than zero." ); 
+   } 
+
+/* Check that the initial scale size in grid points supplied is valid and 
+   report an error if necessary. */ 
+   if ( astOK && ( maxpix < 0 ) ) { 
+      astError( AST__SSPIN, "astTranGrid(%s): Invalid initial scale " 
+                "size in grid points (%d).", astGetClass( this ), maxpix ); 
+      astError( AST__SSPIN, "This value should not be less than zero." ); 
+   } 
+
+/* Validate the output array dimension argument. */
+   if ( astOK && ( outdim < npoint ) ) {
+      astError( AST__DIMIN, "astTranGrid(%s): The output array dimension value "
+                "(%d) is invalid.", astGetClass( this ), outdim );
+      astError( AST__DIMIN, "This should not be less than the number of "
+                "grid points being transformed (%d).", npoint );
+   }
+
+/* If there are sufficient pixels to make it worthwhile, simplify the 
+   Mapping supplied to improve performance. Otherwise, just clone the 
+   Mapping pointer. Note we save a pointer to the original Mapping so 
+   that lower-level functions can use it if they need to report an error. */ 
+   simple = NULL; 
+   unsimplified_mapping = this; 
+   if ( astOK ) { 
+      if ( npoint > 1024 ) { 
+         simple = astSimplify( this ); 
+
+/* Report an error if the required transformation of this simplified 
+   Mapping is not defined. */ 
+         if( astOK ) {
+            if ( forward && !astGetTranForward( simple ) ) { 
+               astError( AST__TRNND, "astTranGrid(%s): A forward coordinate " 
+                         "transformation is not defined by the %s supplied.", 
+                         astGetClass( unsimplified_mapping ), 
+                         astGetClass( unsimplified_mapping ) ); 
+            } else if ( !forward && !astGetTranInverse( simple ) ) { 
+               astError( AST__TRNND, "astTranGrid(%s): An inverse coordinate " 
+                         "transformation is not defined by the %s supplied.", 
+                         astGetClass( unsimplified_mapping ), 
+                         astGetClass( unsimplified_mapping ) ); 
+            }
+         } 
+
+      } else { 
+         simple = astClone( this ); 
+      } 
+
+/* Allocate memory to hold the array of output data pointers. */
+      out_ptr = astMalloc( sizeof( double * ) * (size_t) ncoord_out );
+
+/* Initialise the output data pointers to point into the "out" array. */
+      if ( astOK ) {
+         for ( coord = 0; coord < ncoord_out; coord++ ) {
+            out_ptr[ coord ] = out + coord * outdim;
+         }
+
+/* If required, temporarily invert the Mapping. */
+         if( !forward ) astInvert( simple );
+
+/* Perform the transformation. */
+         TranGridAdaptively( simple, ncoord_in, lbnd, ubnd, lbnd, ubnd, tol, 
+                             maxpix, ncoord_out, out_ptr );
+
+/* If required, uninvert the Mapping. */
+         if( !forward ) astInvert( simple );
+
+      }
+
+/* Free the memory used for the data pointers. */
+      out_ptr = astFree( out_ptr );
+
+/* Annul the pointer to the simplified/cloned Mapping. */ 
+      simple = astAnnul( simple ); 
+   }
+}
+
+static void TranGridAdaptively( AstMapping *this, int ncoord_in, 
+                                const int *lbnd_in, const int *ubnd_in,
+                                const int lbnd[], const int ubnd[], 
+                                double tol, int maxpix, int ncoord_out, 
+                                double *out[] ){
+/*
+*  Name:
+*     TranGridAdaptively
+
+*  Purpose:
+*     Transform grid positions adaptively.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void TranGridAdaptively( AstMapping *this, int ncoord_in, 
+*                              const int *lbnd_in, const int *ubnd_in,
+*                              const int lbnd[], const int ubnd[], 
+*                              double tol, int maxpix, int ncoord_out, 
+*                              double *out[] )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function transforms grid points within a specified section of a 
+*     rectangular grid (with any number of dimensions) using the forward
+*     transformation of the specified Mapping.
+*
+*     This function is very similar to TranGridWithBlocking and TranGridSection
+*     which lie below it in the calling hierarchy. However, this function 
+*     also attempts to adapt to the Mapping supplied and to sub-divide the 
+*     section being transformed into smaller sections within which a linear 
+*     approximation to the Mapping may be used.  This reduces the number of 
+*     Mapping evaluations, thereby improving efficiency particularly when
+*     complicated Mappings are involved.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied. The forward transformation
+*        is used.
+*     ncoord_in
+*        The number of coordinates being supplied for each box corner
+*        (i.e. the number of dimensions of the space in which the
+*        input points reside).
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the whole input grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     lbnd
+*        Pointer to an array of integers, with "ncoord_in" elements,
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+*     ubnd
+*        Pointer to an array of integers, with "ncoord_in" elements,
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+*        Note that "lbnd" and "ubnd" together define the shape
+*        and size of the input grid, its extent along a particular
+*        (j'th) dimension being ubnd[j]-lbnd[j]+1 (assuming the
+*        index "j" to be zero-based). They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre.
+*     tol
+*        The maximum tolerable geometrical distortion which may be
+*        introduced as a result of approximating non-linear Mappings
+*        by a set of piece-wise linear transformations. This should be
+*        expressed as a displacement in pixels in the output grid's
+*        coordinate system.
+*
+*        If piece-wise linear approximation is not required, a value
+*        of zero may be given. This will ensure that the Mapping is
+*        used without any approximation, but may increase execution
+*        time.
+*        
+*        If the value is too high, discontinuities between the linear
+*        approximations used in adjacent panel will be higher. If this 
+*        is a problem, reduce the tolerance value used.
+*     maxpix
+*        A value which specifies an initial scale size (in grid points) 
+*        for the adaptive algorithm which approximates non-linear Mappings
+*        with piece-wise linear transformations. Normally, this should
+*        be a large value (larger than any dimension of the region of
+*        the input grid being used). In this case, a first attempt to
+*        approximate the Mapping by a linear transformation will be
+*        made over the entire input region.
+*
+*        If a smaller value is used, the input region will first be
+*        divided into sub-regions whose size does not exceed "maxpix"
+*        grid points in any dimension. Only at this point will attempts
+*        at approximation commence.
+*
+*        This value may occasionally be useful in preventing false
+*        convergence of the adaptive algorithm in cases where the
+*        Mapping appears approximately linear on large scales, but has
+*        irregularities (e.g. holes) on smaller scales. A value of,
+*        say, 50 to 100 grid points can also be employed as a safeguard 
+*        in general-purpose software, since the effect on performance is
+*        minimal.
+*
+*        If too small a value is given, it will have the effect of
+*        inhibiting linear approximation altogether (equivalent to
+*        setting "tol" to zero). Although this may degrade
+*        performance, accurate results will still be obtained.
+*     ncoord_out
+*        The number of dimensions of the space in which the output points 
+*        reside.
+*     out
+*        Pointer to an array with "ndim_out" elements. Element [i] of
+*        this array is a pointer to an array in which to store the 
+*        transformed values for output axis "i". The points are ordered 
+*        such that the first axis of the input grid changes most rapidly. 
+*        For example, if the input grid is 2-dimensional and extends from 
+*        (2,-1) to (3,1), the output points will be stored in the order 
+*        (2,-1), (3, -1), (2,0), (3,0), (2,1), (3,1).
+
+*/
+                      
+/* Local Variables: */
+   double *flbnd;                /* Array holding floating point lower bounds */
+   double *fubnd;                /* Array holding floating point upper bounds */
+   double *linear_fit;           /* Pointer to array of fit coefficients */
+   int *hi;                      /* Pointer to array of section upper bounds */
+   int *lo;                      /* Pointer to array of section lower bounds */
+   int coord_in;                 /* Loop counter for input coordinates */
+   int dim;                      /* Output section dimension size */
+   int dimx;                     /* Dimension with maximum section extent */
+   int divide;                   /* Sub-divide the output section? */
+   int i;                        /* Loop count */
+   int isLinear;                 /* Is the transformation linear? */
+   int mxdim;                    /* Largest output section dimension size */
+   int npix;                     /* Number of pixels in output section */
+   int npoint;                   /* Number of points for obtaining a fit */
+   int nvertex;                  /* Number of vertices of output section */
+   int toobig;                   /* Section too big (must sub-divide)? */
+   int toosmall;                 /* Section too small to sub-divide? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Further initialisation. */
+   npix = 1;
+   mxdim = 0;
+   dimx = 1;
+   nvertex = 1;
+
+/* Loop through the input grid dimensions. */
+   for ( coord_in = 0; coord_in < ncoord_in; coord_in++ ) {
+
+/* Obtain the extent in each dimension of the input section which is
+   to be rebinned, and calculate the total number of pixels it contains. */
+      dim = ubnd[ coord_in ] - lbnd[ coord_in ] + 1;
+      npix *= dim;
+
+/* Find the maximum dimension size of this input section and note which 
+   dimension has this size. */
+      if ( dim > mxdim ) {
+         mxdim = dim;
+         dimx = coord_in;
+      }
+
+/* Calculate how many vertices the output section has. */
+      nvertex *= 2;
+   }
+   
+/* Calculate how many sample points will be needed (by the astLinearApprox 
+   function) to obtain a linear fit to the Mapping's forward transformation. */
+   npoint = 1 + 4 * ncoord_in + 2 * nvertex;
+
+/* If the number of pixels in the input section is not at least 4
+   times this number, we will probably not save significant time by
+   attempting to obtain a linear fit, so note that the input section
+   is too small. */
+   toosmall = ( npix < ( 4 * npoint ) );
+
+/* Note if the maximum dimension of the input section exceeds the
+   user-supplied scale factor. */
+   toobig = ( maxpix < mxdim );
+
+/* Assume the Mapping is significantly non-linear before deciding
+   whether to sub-divide the output section. */
+   linear_fit = NULL;
+
+/* If the output section is too small to be worth obtaining a linear
+   fit, or if the accuracy tolerance is zero, we will not
+   sub-divide. This means that the Mapping will be used to transform
+   each pixel's coordinates and no linear approximation will be
+   used. */
+   if ( toosmall || ( tol == 0.0 ) ) {
+      divide = 0;
+
+/* Otherwise, if the largest input section dimension exceeds the
+   scale length given, we will sub-divide. This offers the possibility
+   of obtaining a linear approximation to the Mapping over a reduced
+   range of input coordinates (which will be handled by a recursive
+   invocation of this function). */
+   } else if ( toobig ) {
+      divide = 1;
+
+/* If neither of the above apply, then attempt to fit a linear
+   approximation to the forward transformation of the Mapping over 
+   the range of coordinates covered by the input section. We need to 
+   temporarily copy the integer bounds into floating point arrays to 
+   use astLinearApprox. */
+   } else {
+
+/* Allocate memory for floating point bounds and for the coefficient array */
+      flbnd = astMalloc( sizeof( double )*(size_t) ncoord_in );
+      fubnd = astMalloc( sizeof( double )*(size_t) ncoord_in );
+      linear_fit = astMalloc( sizeof( double )*
+                              (size_t) ( ncoord_out*( ncoord_in + 1 ) ) );
+      if( astOK ) {
+
+/* Copy the bounds into these arrays */
+         for( i = 0; i < ncoord_in; i++ ) {
+            flbnd[ i ] = (double) lbnd[ i ];
+            fubnd[ i ] = (double) ubnd[ i ];
+         }
+
+/* Get the linear approximation to the forward transformation. */
+         isLinear = astLinearApprox( this, flbnd, fubnd, tol, linear_fit );
+
+/* Free the coeff array if the inverse transformation is not linear. */
+         if( !isLinear ) linear_fit = astFree( linear_fit );
+
+      } else {
+         linear_fit = astFree( linear_fit );
+      }
+
+/* Free resources */
+      flbnd = astFree( flbnd );
+      fubnd = astFree( fubnd );
+
+/* If a linear fit was obtained, we will use it and therefore do not
+   wish to sub-divide further. Otherwise, we sub-divide in the hope
+   that this may result in a linear fit next time. */
+      divide = !linear_fit;
+   }
+
+/* If no sub-division is required, perform the transformation (in a
+   memory-efficient manner, since the section we are rebinning might
+   still be very large). This will use the linear fit, if obtained
+   above. */
+   if ( astOK ) {
+      if ( !divide ) {
+         TranGridWithBlocking( this, linear_fit, ncoord_in, lbnd_in,
+                               ubnd_in, lbnd, ubnd, ncoord_out, out );
+
+/* Otherwise, allocate workspace to perform the sub-division. */
+      } else {
+         lo = astMalloc( sizeof( int ) * (size_t) ncoord_in );
+         hi = astMalloc( sizeof( int ) * (size_t) ncoord_in );
+         if ( astOK ) {
+
+/* Initialise the bounds of a new input section to match the original
+   input section. */
+            for ( coord_in = 0; coord_in < ncoord_in; coord_in++ ) {
+               lo[ coord_in ] = lbnd[ coord_in ];
+               hi[ coord_in ] = ubnd[ coord_in ];
+            }
+
+/* Replace the upper bound of the section's largest dimension with the
+   mid-point of the section along this dimension, rounded downwards. */
+            hi[ dimx ] =
+               (int) floor( 0.5 * (double) ( lbnd[ dimx ] + ubnd[ dimx ] ) );
+
+/* Rebin the resulting smaller section using a recursive invocation
+   of this function. */
+            TranGridAdaptively( this, ncoord_in, lbnd_in, ubnd_in, lo, hi, 
+                                tol, maxpix, ncoord_out, out );
+
+/* Now set up a second section which covers the remaining half of the
+   original input section. */
+            lo[ dimx ] = hi[ dimx ] + 1;
+            hi[ dimx ] = ubnd[ dimx ];
+
+/* If this section contains pixels, transform it in the same way. */
+            if ( lo[ dimx ] <= hi[ dimx ] ) {
+               TranGridAdaptively( this, ncoord_in, lbnd_in, ubnd_in, lo, hi, 
+                                   tol, maxpix, ncoord_out, out );
+            }
+         }
+
+/* Free the workspace. */
+         lo = astFree( lo );
+         hi = astFree( hi );
+      }
+   }
+
+/* If coefficients for a linear fit were obtained, then free the space
+   they occupy. */
+   if ( linear_fit ) linear_fit = astFree( linear_fit );
+}
+
+static void TranGridSection( AstMapping *this, const double *linear_fit,
+                             int ndim_in, const int *lbnd_in,  
+                             const int *ubnd_in, const int *lbnd, 
+                             const int *ubnd, int ndim_out, double *out[] ){
+/*
+*  Name:
+*     TranGridSection
+
+*  Purpose:
+*     Transform grid points within a section of a rectangular grid.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void TranGridSection( AstMapping *this, const double *linear_fit,
+*                           int ndim_in, const int *lbnd_in,  
+*                           const int *ubnd_in, const int *lbnd, 
+*                           const int *ubnd, int ndim_out, double *out[] )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function transforms grid points within a specified section of a 
+*     rectangular grid (with any number of dimensions) using a specified
+*     Mapping or, alternatively, a linear approximation fitted to the 
+*     Mapping's forward transformation. 
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose forward transformation may be
+*        used to transform the coordinates of points in the input
+*        grid.
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     linear_fit
+*        Pointer to an optional array of double which contains the
+*        coefficients of a linear fit which approximates the above
+*        Mapping's forward coordinate transformation. If this is
+*        supplied, it will be used in preference to the above Mapping
+*        when transforming coordinates. This may be used to enhance
+*        performance in cases where evaluation of the Mapping's
+*        forward transformation is expensive. If no linear fit is
+*        available, a NULL pointer should be supplied.
+*
+*        The way in which the fit coefficients are stored in this
+*        array and the number of array elements are as defined by the
+*        astLinearApprox function.
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     lbnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the input data grid which is to be rebinned.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the input data grid which is to be rebinned.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the input grid which is to be rebinned. This section 
+*        should lie wholly within the extent of the input grid (as defined 
+*        by the "lbnd_out" and "ubnd_out" arrays). Regions of the input 
+*        grid lying outside this section will be ignored.
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     out
+*        Pointer to an array with "ndim_out" elements. Element [i] of
+*        this array is a pointer to an array in which to store the 
+*        transformed values for output axis "i". The points are ordered 
+*        such that the first axis of the input grid changes most rapidly. 
+*        For example, if the input grid is 2-dimensional and extends from 
+*        (2,-1) to (3,1), the output points will be stored in the order 
+*        (2,-1), (3, -1), (2,0), (3,0), (2,1), (3,1).
+
+*  Notes:
+*     - This function does not take steps to limit memory usage if the
+*     grids supplied are large. To resample large grids in a more
+*     memory-efficient way, the ResampleWithBlocking function should
+*     be used.
+*/
+
+/* Local Variables: */
+   AstPointSet *pset_in;         /* Input PointSet for transformation */
+   AstPointSet *pset_out;        /* Output PointSet for transformation */
+   const double *grad;           /* Pointer to gradient matrix of linear fit */
+   const double *zero;           /* Pointer to zero point array of fit */
+   double **ptr_in;              /* Pointer to input PointSet coordinates */
+   double **ptr_out;             /* Pointer to output PointSet coordinates */
+   double *accum;                /* Pointer to array of accumulated sums */
+   double x1;                    /* Interim x coordinate value */
+   double xx1;                   /* Initial x coordinate value */
+   double y1;                    /* Interim y coordinate value */
+   double yy1;                   /* Initial y coordinate value */
+   int *dim;                     /* Pointer to array of output pixel indices */
+   int *offset;                  /* Pointer to array of output pixel offsets */
+   int *stride;                  /* Pointer to array of output grid strides */
+   int coord_in;                 /* Loop counter for input dimensions */
+   int coord_out;                /* Loop counter for output dimensions */
+   int done;                     /* All pixel indices done? */
+   int i1;                       /* Interim offset into "accum" array */
+   int i2;                       /* Final offset into "accum" array */
+   int idim;                     /* Loop counter for dimensions */
+   int ix;                       /* Loop counter for output x coordinate */
+   int iy;                       /* Loop counter for output y coordinate */
+   int neighb;                   /* Number of neighbouring pixels */
+   int npoint;                   /* Number of output points (pixels) */
+   int off1;                     /* Interim pixel offset into output array */
+   int off2;                     /* Interim pixel offset into output array */
+   int off;                      /* Final pixel offset into output array */
+   int point;                    /* Counter for output points (pixels ) */
+   int s;                        /* Temporary variable for strides */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Further initialisation. */
+   pset_in = NULL;
+   ptr_in = NULL;
+   ptr_out = NULL;
+   pset_out = NULL;
+   neighb = 0;
+
+/* Calculate the number of input points, as given by the product of
+   the input grid dimensions. */
+   for ( npoint = 1, coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+      npoint *= ubnd[ coord_in ] - lbnd[ coord_in ] + 1;
+   }
+
+/* Allocate workspace. */
+   offset = astMalloc( sizeof( int ) * (size_t) npoint );
+   stride = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   if ( astOK ) {
+
+/* Calculate the stride for each input grid dimension. */
+      off = 0;
+      s = 1;
+      for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+         stride[ coord_in ] = s;
+         s *= ubnd_in[ coord_in ] - lbnd_in[ coord_in ] + 1;
+      }
+
+/* A linear fit to the Mapping is available. */
+/* ========================================= */
+      if ( linear_fit ) {
+
+/* If a linear fit to the Mapping has been provided, then obtain
+   pointers to the array of gradients and zero-points comprising the
+   fit. */
+         grad = linear_fit + ndim_in;
+         zero = linear_fit;
+
+/* Create a PointSet to hold the output grid coordinates and obtain an
+   array of pointers to its coordinate data. */
+         pset_out = astPointSet( npoint, ndim_out, "" );
+         ptr_out = astGetPoints( pset_out );
+         if ( astOK ) {
+
+/* Initialise the count of input points. */
+            point = 0;
+
+/* Handle the 1-dimensional case optimally. */
+/* ---------------------------------------- */
+            if ( ( ndim_in == 1 ) && ( ndim_out == 1 ) ) {
+
+/* Loop through the pixels of the input grid and transform their x
+   coordinates into the output grid's coordinate system using the
+   linear fit supplied. Store the results in the PointSet created
+   above. */
+               off = lbnd[ 0 ] - lbnd_in[ 0 ];
+               xx1 = zero[ 0 ] + grad[ 0 ] * (double) lbnd[ 0 ];
+
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_out[ 0 ][ point ] = xx1;
+                  xx1 += grad[ 0 ];
+                  offset[ point++ ] = off++;
+               }
+
+/* Handle the 2-dimensional case optimally. */
+/* ---------------------------------------- */
+            } else if ( ( ndim_in == 2 ) && ( ndim_out == 2 ) ) {
+
+/* Loop through the range of y coordinates in the input grid and
+   calculate interim values of the output coordinates using the linear
+   fit supplied. */
+               x1 = zero[ 0 ] + grad[ 1 ] * (double) ( lbnd[ 1 ] - 1 );
+               y1 = zero[ 1 ] + grad[ 3 ] * (double) ( lbnd[ 1 ] - 1 );
+               off1 = stride[ 1 ] * ( lbnd[ 1 ] - lbnd_in[ 1 ] - 1 ) - lbnd_in[ 0 ];
+               for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+                  x1 += grad[ 1 ];
+                  y1 += grad[ 3 ];
+
+/* Also calculate an interim pixel offset into the input array. */
+                  off1 += stride[ 1 ];
+
+/* Now loop through the range of input x coordinates and calculate
+   the final values of the input coordinates, storing the results in
+   the PointSet created above. */
+                  xx1 = x1 + grad[ 0 ] * (double) lbnd[ 0 ];
+                  yy1 = y1 + grad[ 2 ] * (double) lbnd[ 0 ];
+                  off = off1 + lbnd[ 0 ];
+                  for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                     ptr_out[ 0 ][ point ] = xx1;
+                     xx1 += grad[ 0 ];
+                     ptr_out[ 1 ][ point ] = yy1;
+                     yy1 += grad[ 2 ];
+
+/* Also calculate final pixel offsets into the input array. */
+                     offset[ point++ ] = off++;
+                  }
+               }
+
+/* Handle other numbers of dimensions. */
+/* ----------------------------------- */               
+            } else {
+
+/* Allocate workspace. */
+               accum = astMalloc( sizeof( double ) *
+                                 (size_t) ( ndim_in * ndim_out ) );
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_in );
+               if ( astOK ) {
+
+/* Initialise an array of pixel indices for the input grid which refer to the 
+   first pixel which we will rebin. Also calculate the offset of this pixel 
+   within the input array. */
+                  off = 0;
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     dim[ coord_in ] = lbnd[ coord_in ];
+                     off += stride[ coord_in ] *
+                            ( dim[ coord_in ] - lbnd_in[ coord_in ] );
+                  }
+
+/* To calculate each output grid coordinate we must perform a matrix
+   multiply on the input grid coordinates (using the gradient matrix)
+   and then add the zero points. However, since we will usually only
+   be altering one input coordinate at a time (the least
+   significant), we can avoid the full matrix multiply by accumulating
+   partial sums for the most significant input coordinates and only
+   altering those sums which need to change each time. The zero points
+   never change, so we first fill the "most significant" end of the
+   "accum" array with these. */
+                  for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                     accum[ ( coord_out + 1 ) * ndim_in - 1 ] =
+                                                              zero[ coord_out ];
+                  }
+                  coord_in = ndim_in - 1;
+
+/* Now loop to process each input pixel. */
+                  for ( done = 0; !done; point++ ) {
+
+/* To generate the output coordinate that corresponds to the current
+   input pixel, we work down from the most significant dimension
+   whose index has changed since the previous pixel we considered
+   (given by "coord_in"). For each affected dimension, we accumulate
+   in "accum" the matrix sum (including the zero point) for that
+   dimension and all higher input dimensions. We must accumulate a
+   separate set of sums for each output coordinate we wish to
+   produce. (Note that for the first pixel we process, all dimensions
+   are considered "changed", so we start by initialising the whole
+   "accum" array.) */
+                     for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+                        i1 = coord_out * ndim_in;
+                        for ( idim = coord_in; idim >= 1; idim-- ) {
+                           i2 = i1 + idim;
+                           accum[ i2 - 1 ] = accum[ i2 ] +
+                                             dim[ idim ] * grad[ i2 ];
+                        }
+
+/* The output coordinate for each dimension is given by the accumulated
+   sum for input dimension zero (giving the sum over all input
+   dimensions). We do not store this in the "accum" array, but assign
+   the result directly to the coordinate array of the PointSet created
+   earlier. */
+                        ptr_out[ coord_out ][ point ] = accum[ i1 ] +
+                                                      dim[ 0 ] * grad[ i1 ];
+                     }
+
+/* Store the offset of the current pixel in the input array. */
+                     offset[ point ] = off;
+
+/* Now update the array of pixel indices to refer to the next input pixel. */
+                     coord_in = 0;
+                     do {
+
+/* The least significant index which currently has less than its maximum 
+   value is incremented by one. The offset into the input array is updated 
+   accordingly. */
+                        if ( dim[ coord_in ] < ubnd[ coord_in ] ) {
+                           dim[ coord_in ]++;
+                           off += stride[ coord_in ];
+                           break;
+
+/* Any less significant indices which have reached their maximum value
+   are returned to their minimum value and the input pixel offset is
+   decremented appropriately. */
+                        } else {
+                           dim[ coord_in ] = lbnd[ coord_in ];
+                           off -= stride[ coord_in ] *
+                                  ( ubnd[ coord_in ] - lbnd[ coord_in ] );
+
+/* All the output pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
+                           done = ( ++coord_in == ndim_in );
+                        }
+                     } while ( !done );
+                  }
+               }
+
+/* Free the workspace. */
+               accum = astFree( accum );
+               dim = astFree( dim );
+            }
+         }
+
+/* No linear fit to the Mapping is available. */
+/* ========================================== */
+      } else {
+
+/* Create a PointSet to hold the coordinates of the input pixels and
+   obtain a pointer to its coordinate data. */
+         pset_in = astPointSet( npoint, ndim_in, "" );
+         ptr_in = astGetPoints( pset_in );
+         if ( astOK ) {
+
+/* Initialise the count of input points. */
+            point = 0;
+
+/* Handle the 1-dimensional case optimally. */
+/* ---------------------------------------- */
+            if ( ndim_in == 1 ) {
+
+/* Loop through the required range of input x coordinates, assigning
+   the coordinate values to the PointSet created above. Also store a
+   pixel offset into the input array. */
+               for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                  ptr_in[ 0 ][ point ] = (double) ix;
+                  offset[ point++ ] = ix - lbnd_in[ 0 ];
+               }
+
+/* Handle the 2-dimensional case optimally. */
+/* ---------------------------------------- */
+            } else if ( ndim_in == 2 ) {
+
+/* Loop through the required range of input y coordinates,
+   calculating an interim pixel offset into the input array. */
+               off1 = stride[ 1 ] * ( lbnd[ 1 ] - lbnd_in[ 1 ] - 1 ) 
+                      - lbnd_in[ 0 ];
+               for ( iy = lbnd[ 1 ]; iy <= ubnd[ 1 ]; iy++ ) {
+                  off1 += stride[ 1 ];
+
+/* Loop through the required range of input x coordinates, assigning
+   the coordinate values to the PointSet created above. Also store a
+   final pixel offset into the input array. */
+                  off2 = off1 + lbnd[ 0 ];
+                  for ( ix = lbnd[ 0 ]; ix <= ubnd[ 0 ]; ix++ ) {
+                     ptr_in[ 0 ][ point ] = (double) ix;
+                     ptr_in[ 1 ][ point ] = (double) iy;
+                     offset[ point++ ] = off2++;
+                  }
+               }
+
+/* Handle other numbers of dimensions. */
+/* ----------------------------------- */
+            } else {
+
+/* Allocate workspace. */
+               dim = astMalloc( sizeof( int ) * (size_t) ndim_in );
+               if ( astOK ) {
+
+/* Initialise an array of pixel indices for the input grid which
+   refer to the first pixel to be rebinned. Also calculate the offset 
+   of this pixel within the input array. */
+                  off = 0;
+                  for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                     dim[ coord_in ] = lbnd[ coord_in ];
+                     off += stride[ coord_in ] *
+                            ( dim[ coord_in ] - lbnd_in[ coord_in ] );
+                  }
+
+/* Loop to generate the coordinates of each input pixel. */
+                  for ( done = 0; !done; point++ ) {
+
+/* Copy each pixel's coordinates into the PointSet created above. */
+                     for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
+                        ptr_in[ coord_in ][ point ] =
+                                                     (double) dim[ coord_in ];
+                     }
+
+/* Store the offset of the pixel in the input array. */
+                     offset[ point ] = off;
+
+/* Now update the array of pixel indices to refer to the next input
+   pixel. */
+                     coord_in = 0;
+                     do {
+
+/* The least significant index which currently has less than its
+   maximum value is incremented by one. The offset into the input
+   array is updated accordingly. */
+                        if ( dim[ coord_in ] < ubnd[ coord_in ] ) {
+                           dim[ coord_in ]++;
+                           off += stride[ coord_in ];
+                           break;
+
+/* Any less significant indices which have reached their maximum value
+   are returned to their minimum value and the input pixel offset is
+   decremented appropriately. */
+                        } else {
+                           dim[ coord_in ] = lbnd[ coord_in ];
+                           off -= stride[ coord_in ] *
+                                  ( ubnd[ coord_in ] - lbnd[ coord_in ] );
+
+/* All the input pixels have been processed once the most significant
+   pixel index has been returned to its minimum value. */
+                           done = ( ++coord_in == ndim_in );
+                        }
+                     } while ( !done );
+                  }
+               }
+
+/* Free the workspace. */
+               dim = astFree( dim );
+            }
+
+/* When all the input pixel coordinates have been generated, use the
+   Mapping's forward transformation to generate the output coordinates
+   from them. Obtain an array of pointers to the resulting coordinate
+   data. */
+            pset_out = astTransform( this, pset_in, 1, NULL );
+            ptr_out = astGetPoints( pset_out );
+         }
+
+/* Annul the PointSet containing the input coordinates. */
+         pset_in = astAnnul( pset_in );
+      }
+   }
+
+/* Copy the output coordinates into the correct positions within the
+   supplied "out" array. */
+/* ================================================================= */
+   if( astOK ) {
+      for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) {
+         for ( point = 0; point < npoint; point++ ) {
+            out[ coord_out ][ offset[ point ] ] = ptr_out[ coord_out ][ point ];
+         }
+      }
+   }
+
+/* Annul the PointSet used to hold output coordinates. */
+   pset_out = astAnnul( pset_out );
+
+/* Free the workspace. */
+   offset = astFree( offset );
+   stride = astFree( stride );
+}
+
+static void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
+                                  int ndim_in, const int *lbnd_in, 
+                                  const int *ubnd_in, const int *lbnd, 
+                                  const int *ubnd, int ndim_out, 
+                                  double *out[] ){
+/*
+*  Name:
+*     TranGridWithBlocking
+
+*  Purpose:
+*     Transforms positions in a section of a grid in a memory-efficient way.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void TranGridWithBlocking( AstMapping *this, const double *linear_fit,
+*                                int ndim_in, const int *lbnd_in, 
+*                                const int *ubnd_in, const int *lbnd, 
+*                                const int *ubnd, int ndim_out, 
+*                                double *out[] )
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function transforms positions within a specified section of a 
+*     rectangular grid (with any number of dimensions) using the forward
+*     transformation of the supplied Mapping.
+*
+*     This function is very similar to TranGridSection, except that in
+*     order to limit memory usage and to ensure locality of reference,
+*     it divides the input grid up into "blocks" which have a limited
+*     extent along each input dimension. Each block, which will not
+*     contain more than a pre-determined maximum number of pixels, is
+*     then passed to TranGridSection for transformation.
+
+*  Parameters:
+*     this
+*        Pointer to a Mapping, whose forward transformation may be
+*        used to transform the coordinates of pixels in the input
+*        grid into associated positions in the output grid.
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+*     linear_fit
+*        Pointer to an optional array of double which contains the
+*        coefficients of a linear fit which approximates the above
+*        Mapping's forward coordinate transformation. If this is
+*        supplied, it will be used in preference to the above Mapping
+*        when transforming coordinates. This may be used to enhance
+*        performance in cases where evaluation of the Mapping's
+*        forward transformation is expensive. If no linear fit is
+*        available, a NULL pointer should be supplied.
+*
+*        The way in which the fit coefficients are stored in this
+*        array and the number of array elements are as defined by the
+*        astLinearApprox function.
+*     ndim_in
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+*     lbnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input grid along each dimension.
+*     ubnd_in
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the whole input grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+*     lbnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the input data grid which is to be transformed.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the input data grid which is to be transformed.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of the 
+*        section of the input grid which is to be transformed. 
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     out
+*        Pointer to an array with "ndim_out" elements. Element [i] of
+*        this array is a pointer to an array in which to store the 
+*        transformed values for output axis "i". The points are ordered 
+*        such that the first axis of the input grid changes most rapidly. 
+*        For example, if the input grid is 2-dimensional and extends from 
+*        (2,-1) to (3,1), the output points will be stored in the order 
+*        (2,-1), (3, -1), (2,0), (3,0), (2,1), (3,1).
+
+*/
+
+/* Local Constants: */
+   const int mxpix = 2 * 1024;   /* Maximum number of pixels in a block (this
+                                    relatively small number seems to give best
+                                    performance) */
+
+/* Local Variables: */
+   int *dim_block;               /* Pointer to array of block dimensions */
+   int *lbnd_block;              /* Pointer to block lower bound array */
+   int *ubnd_block;              /* Pointer to block upper bound array */
+   int dim;                      /* Dimension size */
+   int done;                     /* All blocks rebinned? */
+   int hilim;                    /* Upper limit on maximum block dimension */
+   int idim;                     /* Loop counter for dimensions */
+   int lolim;                    /* Lower limit on maximum block dimension */
+   int mxdim_block;              /* Maximum block dimension */
+   int npix;                     /* Number of pixels in block */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Allocate workspace. */
+   lbnd_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   ubnd_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   dim_block = astMalloc( sizeof( int ) * (size_t) ndim_in );
+   if ( astOK ) {
+
+/* Find the optimum block size. */
+/* ---------------------------- */
+/* We first need to find the maximum extent which a block of input
+   pixels may have in each dimension. We determine this by taking the
+   input grid extent in each dimension and then limiting the maximum
+   dimension size until the resulting number of pixels is sufficiently
+   small. This approach allows the block shape to approximate (or
+   match) the input grid shape when appropriate. */
+
+/* First loop to calculate the total number of input pixels and the
+   maximum input dimension size. */
+      npix = 1;
+      mxdim_block = 0;
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+         npix *= dim;
+         if ( mxdim_block < dim ) mxdim_block = dim;
+      }
+
+/* If the number of input pixels is too large for a single block, we
+   perform iterations to determine the optimum upper limit on a
+   block's dimension size. Initialise the limits on this result. */
+      if ( npix > mxpix ) {
+         lolim = 1;
+         hilim = mxdim_block;
+
+/* Loop to perform a binary chop, searching for the best result until
+   the lower and upper limits on the result converge to adjacent
+   values. */
+         while ( ( hilim - lolim ) > 1 ) {
+
+/* Form a new estimate from the mid-point of the previous limits. */
+            mxdim_block = ( hilim + lolim ) / 2;
+
+/* See how many pixels a block contains if its maximum dimension is
+   limited to this new value. */
+            for ( npix = 1, idim = 0; idim < ndim_in; idim++ ) {
+               dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+               npix *= ( dim < mxdim_block ) ? dim : mxdim_block;
+            }
+
+/* Update the appropriate limit, according to whether the number of
+   pixels is too large or too small. */
+            *( ( npix <= mxpix ) ? &lolim : &hilim ) = mxdim_block;
+         }
+
+/* When iterations have converged, obtain the maximum limit on the
+   dimension size of a block which results in no more than the maximum
+   allowed number of pixels per block. However, ensure that all block
+   dimensions are at least 2. */
+            mxdim_block = lolim;
+      }
+      if ( mxdim_block < 2 ) mxdim_block = 2;
+
+/* Calculate the block dimensions by applying this limit to the output
+   grid dimensions. */
+      for ( idim = 0; idim < ndim_in; idim++ ) {
+         dim = ubnd[ idim ] - lbnd[ idim ] + 1;
+         dim_block[ idim ] = ( dim < mxdim_block ) ? dim : mxdim_block;
+
+/* Also initialise the lower and upper bounds of the first block of
+   output grid pixels to be rebinned, ensuring that this does not
+   extend outside the grid itself. */
+         lbnd_block[ idim ] = lbnd[ idim ];
+         ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
+                                    ubnd[ idim ] );
+      }
+
+/* Transform each block of input grid positions. */
+/* --------------------------------------------- */
+/* Loop to generate the extent of each block of input grid positions and to
+   transform them. */
+      done = 0;
+      while ( !done && astOK ) {
+
+/* Rebin the current block, accumulating the sum of bad pixels produced. */
+         TranGridSection( this, linear_fit, ndim_in, lbnd_in, ubnd_in,
+                          lbnd_block, ubnd_block, ndim_out, out );
+
+/* Update the block extent to identify the next block of input pixels. */
+         idim = 0;
+         do {
+
+/* We find the least significant dimension where the upper bound of
+   the block has not yet reached the upper bound of the region of the
+   input grid which we are rebinning. The block's position is then
+   incremented by one block extent along this dimension, checking that
+   the resulting extent does not go outside the region being rebinned. */
+            if ( ubnd_block[ idim ] < ubnd[ idim ] ) {
+               lbnd_block[ idim ] = MinI( lbnd_block[ idim ] +
+                                          dim_block[ idim ], ubnd[ idim ] );
+               ubnd_block[ idim ] = MinI( lbnd_block[ idim ] +
+                                          dim_block[ idim ] - 1,
+                                          ubnd[ idim ] );
+               break;
+
+/* If any less significant dimensions are found where the upper bound
+   of the block has reached its maximum value, we reset the block to
+   its lowest position. */
+            } else {
+               lbnd_block[ idim ] = lbnd[ idim ];
+               ubnd_block[ idim ] = MinI( lbnd[ idim ] + dim_block[ idim ] - 1,
+                                          ubnd[ idim ] );
+
+/* All the blocks have been processed once the position along the most
+   significant dimension has been reset. */
+               done = ( ++idim == ndim_out );
+            }
+         } while ( !done );
+      }
+   }
+
+/* Free the workspace. */
+   lbnd_block = astFree( lbnd_block );
+   ubnd_block = astFree( ubnd_block );
+   dim_block = astFree( dim_block );
+}
+
 static void TranN( AstMapping *this, int npoint,
                    int ncoord_in, int indim, const double *in,
                    int forward,
@@ -20296,6 +21612,14 @@ void astTran2_( AstMapping *this,
    if ( !astOK ) return;
    (**astMEMBER(this,Mapping,Tran2))( this, npoint, xin, yin,
                                       forward, xout, yout );
+}
+void astTranGrid_( AstMapping *this, int ncoord_in, const int lbnd[], 
+                   const int ubnd[], double tol, int maxpix, int forward, 
+                   int ncoord_out, int outdim, double *out ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Mapping,TranGrid))( this, ncoord_in, lbnd, ubnd, tol, 
+                                         maxpix, forward, ncoord_out, outdim, 
+                                         out );
 }
 void astTranN_( AstMapping *this, int npoint,
                 int ncoord_in, int indim, const double *in,

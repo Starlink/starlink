@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.22}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {14th February 2006}
+\newcommand{\stardocdate}      {8th March 2006}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -21102,9 +21102,22 @@ f+
 AST\_TUNE
 f-
 has been added which can be used to get and set global AST tuning
-parameters. At the moment there is only one such parameter, called
-``ObjectCaching'', which causes AST to save unused Object memory in a
-pool for later use rather than freeing it.
+parameters. At the moment there are only two such parameter, both of
+which are concerned with memory management within AST.
+
+\item A new method called 
+c+
+astTranGrid
+c-
+f+
+AST\_TRANGRID
+f-
+has been added to the Mapping class. This method creates a regular 
+grid of points covering a rectangular region within the input space of a
+Mapping, and then transforms this set of points into the output space of the
+Mapping, using a piecewise-continuous linear approximation to the Mapping
+if appropriate in order to achive higher speed.
+
 
 \end{enumerate}
 

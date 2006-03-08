@@ -27,6 +27,7 @@
 *     AST_SIMPLIFY
 *     AST_TRAN1
 *     AST_TRAN2
+*     AST_TRANGRID
 *     AST_TRANN
 *     AST_RATE
 
@@ -60,6 +61,8 @@
 *        Added AST_REBIN<X>.
 *     1-SEP-2005 (DSB):
 *        Added AST_REBINSEQ<X>.
+*     8-MAR-2006 (DSB):
+*        Added AST_TRANGRID.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -589,6 +592,35 @@ F77_SUBROUTINE(ast_tran2)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_trangrid)( INTEGER(THIS),
+                              INTEGER(NCOORD_IN),
+                              INTEGER_ARRAY(LBND),
+                              INTEGER_ARRAY(UBND),
+                              DOUBLE(TOL),
+                              INTEGER(MAXPIX),
+                              LOGICAL(FORWARD),
+                              INTEGER(NCOORD_OUT),
+                              INTEGER(OUTDIM),
+                              DOUBLE_ARRAY(OUT),
+                              INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(NCOORD_IN)
+   GENPTR_INTEGER_ARRAY(LBND)
+   GENPTR_INTEGER_ARRAY(UBND) 
+   GENPTR_DOUBLE(TOL)
+   GENPTR_INTEGER(MAXPIX)
+   GENPTR_LOGICAL(FORWARD)
+   GENPTR_INTEGER(NCOORD_OUT)
+   GENPTR_INTEGER(OUTDIM)
+   GENPTR_DOUBLE_ARRAY(OUT)
+
+   astAt( "AST_TRANGRID", NULL, 0 );
+   astWatchSTATUS(
+      astTranGrid( astI2P( *THIS ), *NCOORD_IN, LBND, UBND, *TOL, *MAXPIX,
+                   F77_ISTRUE( *FORWARD ), *NCOORD_OUT, *OUTDIM, OUT );
+   )
+}
+
 F77_SUBROUTINE(ast_trann)( INTEGER(THIS),
                            INTEGER(NPOINT),
                            INTEGER(NCOORD_IN),
@@ -616,6 +648,7 @@ F77_SUBROUTINE(ast_trann)( INTEGER(THIS),
                 *NCOORD_OUT, *OUTDIM, OUT );
    )
 }
+
 F77_DOUBLE_FUNCTION(ast_rate)( INTEGER(THIS),
                                DOUBLE_ARRAY(AT),
                                INTEGER(AX1),
