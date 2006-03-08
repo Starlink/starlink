@@ -336,6 +336,8 @@ sub extract {
 
       # Do the extraction.
       my $ams = new Starlink::AMS::Init(1);
+      $ams->messages( $self->messages );
+      $ams->timeout( $self->timeout );
       if( ! defined $TASK ) {
         $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
       }
@@ -364,6 +366,8 @@ sub extract {
 
     # Just do the extraction.
     my $ams = new Starlink::AMS::Init(1);
+    $ams->messages( $self->messages );
+    $ams->timeout( $self->timeout );
     if( ! defined $TASK ) {
       $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
     }
@@ -430,6 +434,10 @@ sub defaults {
   if( ! defined( $self->filter ) ) { $self->filter( 'N' ); }
   if( ! defined( $self->verbose_type ) ) { $self->verbose_type( 'QUIET' ); }
   if( ! defined( $self->quick ) ) { $self->quick( 0 ); }
+
+# Set the ADAM task parameters if they're not already set.
+  if( ! defined( $self->messages ) ) { $self->messages( 0 ); }
+  if( ! defined( $self->timeout ) ) { $self->timeout( 60 ); }
 }
 
 =item B<checkerboard>
@@ -464,6 +472,29 @@ sub checkerboard {
                               INTERVAL => $args{'interval'} };
   }
   return $self->{CHECKERBOARD};
+}
+
+=item B<messages>
+
+Whether or not to display messages from the EXTRACTOR monolith while
+processing.
+
+  my $messages = $extractor->messages;
+  $extractor->messages( 1 );
+
+If set to true, then messages from the monolith will be printed.
+
+Defaults to false.
+
+=cut
+
+sub messages {
+  my $self = shift;
+  if( @_ ) {
+    my $messages = shift;
+    $self->{MESSAGES} = $messages;
+  }
+  return $self->{MESSAGES};
 }
 
 =item B<quick>
@@ -512,6 +543,27 @@ sub temp_dir {
     $self->{TmpDir} = "/tmp";
   }
   return $self->{TmpDir};
+}
+
+=item B<timeout>
+
+Return or set the ADAM timeout when communicating with the EXTRACTOR
+monolith.
+
+  my $timeout = $extractor->timeout;
+  $extractor->timeout( 120 );
+
+Time is in seconds. Defaults to 60.
+
+=cut
+
+sub timeout {
+  my $self = shift;
+  if( @_ ) {
+    my $timeout = shift;
+    $self->{TIMEOUT} = $timeout;
+  }
+  return $self->{TIMEOUT};
 }
 
 =back
