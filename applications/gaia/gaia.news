@@ -1,5 +1,15 @@
 1 Starlink GAIA update
 
+  Release 2.10-2
+  ==============
+
+  Skycat re-based to 2.4.7. Tcl/Tk to 8.4.11. Changes include single
+  image display for MEFs.
+
+  GAIAIMAGEPICK_DIR variable now selects default directory for Pick Image
+  toolbox.
+
+
   Release 2.9-4 
   =============
 
