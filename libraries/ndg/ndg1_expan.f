@@ -165,6 +165,12 @@
       INTEGER MXSRCH             ! Max length of search list string
       PARAMETER ( MXSRCH = 2048 )
 
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      CHARACTER*1 ESC            ! An escape character
+      PARAMETER (ESC = '\\')
+
 *  Local Variables:
       CHARACTER BN*(GRP__SZNAM)    ! File basename
       CHARACTER BNM*(GRP__SZNAM)   ! Modified file basename
@@ -293,7 +299,7 @@
          J = 1
          DO I = F, L
             IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
-               TMPLT2( J : J ) = '\'
+               TMPLT2( J : J ) = ESC
                J = J + 1
             END IF
             TMPLT2( J : J ) = TEMPLT( I : I )
