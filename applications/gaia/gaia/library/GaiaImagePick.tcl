@@ -39,6 +39,10 @@
 #     02-JUL-1999 (PWD):
 #        Added log filename fields and comment. A date & time comment
 #        is also added to the file.
+#     08-MAR-2006 (PWD):
+#        Make the default directory for the log file selectable by using
+#        the variable GAIAIMAGEPICK_DIR. This can be overridden
+#        by using the chooser.
 #     {enter_changes_here}
 
 #-
@@ -62,6 +66,20 @@ itcl::class gaia::GaiaImagePick {
    #  Called after the options have been evaluated
    method init {} {
       rtd::RtdImagePick::init
+
+      #  Set the default name for the log file. This can be changed to a
+      #  different directory using env(GAIAIMAGEPICK_DIR).
+      global env
+      if { [info exists env(GAIAIMAGEPICK_DIR)] } {
+         if { [file isdirectory $env(GAIAIMAGEPICK_DIR)] } {
+            set logfile_ "$env(GAIAIMAGEPICK_DIR)/$logfile_"
+         } else {
+            puts stderr \
+               "Information: the environment variable GAIAIMAGEPICK_DIR\
+                does not specify an existing directory. \
+                It has been ignored ($env(GAIAIMAGEPICK_DIR))."
+         }
+      }
 
       #  Add a control for selecting the logfile.
       itk_component add logfile {
