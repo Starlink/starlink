@@ -14,10 +14,9 @@
 #     squash  [-i filename] [-l number] [-o filename] [-p] [-u number] 
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     package.  It reads a three-dimensional IFU NDF as input and allows you
-#     to extract a specific spectral range from the cube to form a white-light
-#     image.
+#     This shell script reads a three-dimensional IFU NDF as input and allows 
+#     you to extract a specific spectral range from the cube to form a 
+#     white-light image.
 #
 #  Parameters:
 #     -i filename
@@ -34,6 +33,9 @@
 #       as well as saving it to an NDF file.  [FALSE]
 #     -u number
 #       Upper spectral-axis bound of the region of interest.  
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -64,10 +66,12 @@
 #       output commentary.
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
 #     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 
 # Preliminaries
@@ -149,10 +153,18 @@ if ( ${gotinfile} == "FALSE" ) then
    set infile = ${infile:r}
 endif
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
+echo " "
+echo "      Input NDF:"
+echo "        File: ${inname}.sdf"
+
 # Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "SQUASH_ERR: ${infile}.sdf does not exist."
-   exit  
+if ( ! -e ${inname}.sdf ) then
+   echo "SQUASH_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Find out the cube dimensions.
@@ -163,7 +175,7 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "SQUASH_ERR: ${infile}.sdf is not a datacube."
+   echo "SQUASH_ERR: ${infile} is not a datacube."
    exit  
 endif
 

@@ -14,10 +14,9 @@
 #     step [-i filename] [-l number] [-p] [-s number] [-u number] 
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     package.  It reads a three-dimensional IFU NDF as input and allows you
-#     to step through the datacube in the spectral direction in slices.
-#     The output goes to files and (optionally) to the screen.
+#     This shell script reads a three-dimensional IFU NDF as input and
+#     allows you to step through the datacube in the spectral direction
+#     in slices.  The output goes to files and (optionally) to the screen.
 #
 #  Parameters:
 #     -i filename
@@ -33,6 +32,9 @@
 #       Spectral-axis step size for each passband chunk.
 #     -u number
 #       Upper spectral-axis bound of the region of interest.  
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -72,10 +74,12 @@
 #       full size in quick succession, and thereby permit comparison.  
 #       Surmised the units for a UK data-cube format NDF.  Add options
 #       waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
 #    {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 
 # Preliminaries
@@ -155,13 +159,18 @@ if ( ${gotinfile} == "FALSE" ) then
    set infile = ${infile:r}
 endif
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
+echo " "
 echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+echo "        File: ${inname}.sdf"
 
 # Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "STEP_ERR: ${infile}.sdf does not exist."
-   exit  
+if ( ! -e ${inname}.sdf ) then
+   echo "STEP_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Find out the cube dimensions.
@@ -172,8 +181,8 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "STEP_ERR: ${infile}.sdf is not a datacube."
-   exit  
+   echo "STEP_ERR: ${infile} is not a datacube."
+   exit
 endif
 
 set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
