@@ -2,10 +2,10 @@
 
 bin_SCRIPTS = datacube.csh datacube.icl
 
-dist_bin_SCRIPTS = compare.csh compare_x.csh \
+dist_bin_SCRIPTS = compare.csh compare_x.csh gridspec.csh \
                    multistack.csh passband.csh peakmap.csh \
                    ripper.csh squash.csh stacker.csh step.csh \
-                   velmap.csh
+                   velmap.csh velmoment.csh getcurpos.csh
 
 # stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
