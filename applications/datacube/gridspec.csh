@@ -142,7 +142,7 @@ if ( $#cmpfactors == 1 ) then
    set cmpfactors = ( $cmpfactors[1] $cmpfactors[1] )
 endif
 
-if ( $cmpfactors[1] <= 1 || $cmpfactors[2] <= 1 ) then
+if ( $cmpfactors[1] < 1 || $cmpfactors[2] < 1 ) then
    echo "GRIDSPEC_ERR: compression factors must be positive."
    exit
 endif
