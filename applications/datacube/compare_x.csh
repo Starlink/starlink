@@ -27,6 +27,9 @@
 #    -xdialog path
 #       Path to search for the Xdialog executable, default is /usr/bin
 
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
+
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, University of Exeter)
 #     MJC: Malcolm J. Currie (Starlink, RAL)
@@ -50,7 +53,10 @@
 #       headings in the code.  Attempt removal of files silently.
 #     2005 October 11 (MJC):
 #       Fixed bugs converting the cursor position into negative pixel indices.
-##     {enter_further_changes_here}
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
+#       Use a new script to obtain cursor positions.
+#     {enter_further_changes_here}
 
 #  Required:
 #     GTK+ >v1.2.0 (v1.2.8 recommended)
@@ -63,7 +69,7 @@
 #     http://xdialog.free.fr/
 
 #  License:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #
 #     This program is free software; you can redistribute it and/or modify
 #     it under the terms of the GNU General Public License as published by
@@ -96,12 +102,10 @@ rm -f ${tmpdir}/${user}/comp* >& /dev/null
 
 # Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
-set curfile = "${tmpdir}/${user}/comp_cursor.tmp"
 set colfile = "${tmpdir}/${user}/comp_col"
 set specone = "${tmpdir}/${user}/comp_s1"
 set spectwo = "${tmpdir}/${user}/comp_s2"
 set statsfile = "${tmpdir}/${user}/comp_stats.txt"
-touch ${curfile}
 
 # Set default values for the location of libgtk.a and XDialog.
 set libgtk = /usr/lib
@@ -151,7 +155,6 @@ unalias echo
 
 set plotdev = "xwin"
 gdclear device=${plotdev}
-gdclear device=${plotdev}
 
 # Obtain details of the input cube.
 # =================================
@@ -172,18 +175,21 @@ switch ($?)
       breaksw
 endsw
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
 # Check that the file exists
-if ( ! -e ${infile}.sdf ) then
+if ( ! -e ${inname}.sdf ) then
     
    Xdialog --no-cancel \
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile}.sdf does not exist." 0 0 
+	   --msgbox "${inname}.sdf does not exist." 0 0 
    switch ($?)
       case 0:
-         rm -f ${curfile} >& /dev/null
-         exit  
+         exit
          breaksw
    endsw
 endif
@@ -201,10 +207,9 @@ if ( $ndim != 3 ) then
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile}.sdf is not a datacube." 0 0 
+	   --msgbox "${infile} is not a datacube." 0 0 
    switch ($?)
       case 0:
-         rm -f ${curfile} >& /dev/null
          exit  
          breaksw
    endsw
@@ -249,51 +254,30 @@ display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null
 # ========================================================
 
 # Setup the exit condition.
-set prev_xpix = 1
-set prev_ypix = 1
+set prev_xgrid = 1
+set prev_ygrid = 1
 
 # Loop marker for spectral extraction
 upp_cont:
 
 # Grab an X-Y position.
-   cursor showpixel=true style="Colour(marker)=2" plot=mark \
-          maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-
-# Grab the position.
-   set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-   set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-   set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # Check for the exit conditions.
-   if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+   if ( $prev_xgrid == $xgrid && $prev_ygrid == $ygrid ) then
       goto cleanup
-   else if ( $xpix == 1 && $ypix == 1 ) then
-      rm -f ${curfile} >& /dev/null
-      touch ${curfile}
+   else if ( $xgrid == 1 && $ygrid == 1 ) then
       goto upp_cont
    else
-      set prev_xpix = $xpix
-      set prev_ypix = $ypix
+      set prev_xgrid = $xgrid
+      set prev_ygrid = $ygrid
    endif
-
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
 
 # Extract and plot the selected spectrum.
 # =======================================
 
-   ndfcopy "in=${infile}($xpix,$ypix,) out=${specone} trim=true trimwcs=true"
-   settitle "ndf=${specone} title='Pixel (${xpix},${ypix})'"
+   ndfcopy "in=${infile}($xgrid,$ygrid,) out=${specone} trim=true trimwcs=true"
+   settitle "ndf=${specone} title='Pixel (${xgrid},${ygrid})'"
 
 # Change graphics-database frame.
    picsel label="specone" device=${plotdev}
@@ -310,7 +294,7 @@ upp_cont:
    cat ${statsfile} | tail -14 > ${statsfile}_tail
 
    echo "      Extracting:" > ${statsfile}_final
-   echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
+   echo "        (X,Y) pixel             : ${xgrid},${ygrid}" >> ${statsfile}_final
 
    cat ${statsfile}_tail >> ${statsfile}_final
    rm -f ${statsfile} ${statsfile}_tail >& /dev/null
@@ -335,42 +319,21 @@ upp_cont:
 low_cont:
 
 # Grab an X-Y position.
-   cursor showpixel=true style="Colour(marker)=3" plot=mark \
-          maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-
-# Grab the position.
-   set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-   set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-   set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY -g
 
 # Check for exit conditions.
-   if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+   if ( $prev_xgrid == $xgrid && $prev_ygrid == $ygrid ) then
       goto cleanup
-   else if ( $xpix == 1 && $ypix == 1 ) then
-      rm -f ${curfile} >& /dev/null
-      touch ${curfile}
+   else if ( $xgrid == 1 && $ygrid == 1 ) then
       goto low_cont
    else
-      set prev_xpix = $xpix
-      set prev_ypix = $ypix
+      set prev_xgrid = $xgrid
+      set prev_ygrid = $ygrid
    endif
 
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
-
 # Extract spectrum from the cube.
-   ndfcopy "in=${infile}($xpix,$ypix,) out=${spectwo} trim=true trimwcs=true"
-   settitle "ndf=${spectwo} title='Pixel ($xpix,$ypix)'"
+   ndfcopy "in=${infile}($xgrid,$ygrid,) out=${spectwo} trim=true trimwcs=true"
+   settitle "ndf=${spectwo} title='Pixel ($xgrid,$ygrid)'"
 
 # Change graphics-database frame.
    picsel label="spectwo" device=${plotdev}
@@ -384,7 +347,7 @@ low_cont:
    cat ${statsfile} | tail -14 > ${statsfile}_tail
 
    echo "      Extracting:" > ${statsfile}_final
-   echo "        (X,Y) pixel             : ${xpix},${ypix}" >> ${statsfile}_final
+   echo "        (X,Y) pixel             : ${xgrid},${ygrid}" >> ${statsfile}_final
    cat ${statsfile}_tail >> ${statsfile}_final
    rm -f ${statsfile} ${statsfile}_tail >& /dev/null
 
@@ -404,7 +367,6 @@ goto upp_cont
 # =========
 cleanup:
 
-rm -f ${curfile} >& /dev/null
 rm -f ${colfile}.sdf >& /dev/null
 rm -f ${specone}.sdf >& /dev/null
 rm -f ${spectwo}.sdf >& /dev/null

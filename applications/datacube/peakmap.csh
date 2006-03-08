@@ -13,10 +13,9 @@
 #     peakmap [-c number] [-f] [-i filename] [-o filename] [-p] [-v] [-z/+z]
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA,
-#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
-#     and presents the user with a white-light image of the cube.  You can
-#     then select and X-Y position using the cursor.  The script will extract
+#     This shell script reads a three-dimensional IFU NDF as input and
+#     presents the user with a white-light image of the cube.  You can then
+#     select and X-Y position using the cursor.  The script will extract
 #     and display this spectrum.  You will then be prompted to specify
 #     various fitting parameters, e.g. peak position, using the cursor.  The
 #     script will then attempt to fit the emission line.  The fit will be
@@ -57,7 +56,10 @@
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
-
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA and 
+#     FIGARO packages.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -123,10 +125,13 @@
 #       "spectrum".
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
+#       Use a new script to obtain cursor positions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 
 #-
 
@@ -146,14 +151,11 @@ rm -f ${tmpdir}/${user}/?_?.sdf >& /dev/null
 
 # Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
-set curfile = "${tmpdir}/${user}/pmap_cursor.tmp"
 set fitfile = "${tmpdir}/${user}/pmap_fitgauss.tmp"
 set colfile = "${tmpdir}/${user}/pmap_col"
 set ripfile = "${tmpdir}/${user}/pmap_rip"
 set mapfile = "${tmpdir}/${user}/pmap_map.dat"
 set varfile = "${tmpdir}/${user}/pmap_var.dat"
-
-touch ${curfile}
 
 set plotspec = "FALSE"
 set plotdev = "xwin"
@@ -236,16 +238,18 @@ if ( ${gotinfile} == "FALSE" ) then
    set infile = ${infile:r}
 endif
 
-echo " "
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
 
+echo " "
 echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+echo "        File: ${inname}.sdf"
 
 # Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "PEAKMAP_ERR: ${infile}.sdf does not exist."
-   rm -f ${curfile} >& /dev/null
-   exit  
+if ( ! -e ${inname}.sdf ) then
+   echo "PEAKMAP_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Find out the cube dimensions.
@@ -257,9 +261,8 @@ set ubnd = `parget ubound ndftrace`
 set unit = `parget units ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "PEAKMAP_ERR: ${infile}.sdf is not a datacube."
-   rm -f ${curfile} >& /dev/null
-   exit  
+   echo "PEAKMAP_ERR: ${infile} is not a datacube."
+   exit
 endif
 
 set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
@@ -296,40 +299,20 @@ display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null
 # Grab the X-Y position.
 echo " "
 echo "  Left click on pixel to be extracted"
-   
-cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # We don't clean up the collapsed white-light image here as normal because
 # it will be used later to clone both the AXIS and WCS co-ordinates for the
 # new velocity map.
 
-# Grab the spatial position.
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
-
-# Clean up the cursor temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
-
 # Extract the spectrum.
 # =====================
 echo " "
 echo "      Extracting:"
-echo "        (X,Y) pixel: ${xpix},${ypix}"
+echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-ndfcopy "in=${infile}($xpix,$ypix,) out=${ripfile} trim=true trimwcs=true"
+ndfcopy "in=${infile}($xgrid,$ygrid,) out=${ripfile} trim=true trimwcs=true"
 
 # Check to see if the NDF has an AXIS structure.  If one does not exist,
 # create an array of axis centres, derived from the current WCS Frame,
@@ -381,39 +364,19 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 # --------------------
    echo " "
    echo "  Left click on lower zoom boundary."
-   
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
-   set low_z = $pos[1]
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+   set low_z = $xpos
 
-# Clean up the cursor temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
-   
 # Get the upper limit.
 # --------------------
    echo "  Left click on upper zoom boundary."
-   
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
-   set upp_z = $pos[1]
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+   set upp_z = $xpos
 
    echo " "
    echo "      Zooming:"
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
-
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
 
 # Label for repeated plotting of the spectrum.
 rezoom:
@@ -432,84 +395,32 @@ endif
 
 echo " "
 echo "  Left click on the lower limit of the fitting region."
-   
-cursor showpixel=true style="Colour(curves)=2" plot=vline \
-       maxpos=1 device=${plotdev} >> ${curfile}
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+set low_mask = $xpos
 
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set low_mask = $pos[1]
-
-# Clean up the CURSOR temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
- 
 # Get the upper mask boundary.
 # ----------------------------
 
 echo "  Left click on the upper limit of the fitting region."
-    
-cursor showpixel=true style="Colour(curves)=2" plot=vline \
-       maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set upp_mask = $pos[1]
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+set upp_mask = $xpos
 
 echo " " 
 echo "      Fit Mask:"
 echo "        Lower Mask Boundary: ${low_mask}"
 echo "        Upper Mask Boundary: ${upp_mask}"
 
-# Clean up the CURSOR temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
-
 # Get the continuum values.
 # -------------------------
 
 echo " "
 echo "  Left click on your first estimate of the continuum."
-
-cursor showpixel=true style="Colour(curves)=4" plot=hline \
-       maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for the cursor output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set first_cont = $pos[2]
+source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
+set first_cont = $ypos
 
 echo "  Left click on your second estimate of the continuum."
-
-cursor showpixel=true style="Colour(curves)=4" plot=hline \
-       maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set second_cont = $pos[2]
+source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
+set second_cont = $ypos
 
 echo " "
 echo "      Continuum:"
@@ -518,10 +429,6 @@ echo "        Second Estimate: ${second_cont}"
 
 # Evaluate the average continuum.
 set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
-#set cont = `echo "${first_cont}+${second_cont}" | bc`
-#set scale = `echo "${cont}/2.0" | bc`
-#set remainder = `echo "${cont}%2.0" | bc`
-#set cont = `echo "${scale}+${remainder}" | bc`
 
 echo "        Average Value: ${cont}"
 
@@ -530,86 +437,38 @@ echo "        Average Value: ${cont}"
 
 echo " " 
 echo "  Left click on the line peak."
-
-cursor showpixel=true style="Colour(marker)=3" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set position = $pos[1]
-set peak = $pos[2]
+source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+set position = $xpos
+set peak = $ypos
 
 echo " "
 echo "      Line Position:"
 echo "        Peak Position: ${position}"
 echo "        Peak Height: ${peak} ${unit}"
 
-# Clean up the CURSOR temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
-
 # Get the fwhm left side.
 # -----------------------
 
 echo " " 
 echo "  Left click on the left hand edge of the FWHM."
-
-cursor showpixel=true style="Colour(marker)=3" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set fwhm_low = $pos[1]
-
-# Clean up the CURSOR temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
+source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+set fwhm_low = $xpos
 
 # Get the fwhm right side.
 # ------------------------
 
 echo "  Left click on the right hand edge of the FWHM."
 echo " "
-
-cursor showpixel=true style="Colour(marker)=3" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-set fwhm_upp = $pos[1]
+source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+set fwhm_upp = $xpos
 
 echo "      FWHM:"
 echo "        Lower Bound: ${fwhm_low}"
 echo "        Upper Bound: ${fwhm_upp}"
 
-# Clean up the CURSOR temporary file.
-rm -f ${curfile} >& /dev/null
-touch ${curfile}
-
 # Evaluate the fwhm.
 # ------------------
 
-#set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
 set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
 echo "        FWHM: ${fwhm}"
 echo " "
@@ -925,37 +784,16 @@ if ( ${forcefit} == "FALSE" ) then
 # Grab the X-Y position.
          echo " "
          echo "  Left click on pixel to be extracted."
-   
-         cursor showpixel=true style="Colour(marker)=2" plot=mark \
-             maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = \
-           `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-         set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-         set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
-
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # Extract the spectrum.
 # =====================
          echo " "
          echo "      Extracting:"
-         echo "        (X,Y) pixel: ${xpix},${ypix}"
+         echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-         ndfcopy in="${infile}($xpix,$ypix,)" out=${ripfile} \
+         ndfcopy in="${infile}($xgrid,$ygrid,)" out=${ripfile} \
                  trim=true trimwcs=true
 
 # Check to see if the NDF has an AXIS component.  If one does not exist,
@@ -1003,39 +841,19 @@ manual_refit:
 # --------------------
             echo " "
             echo "  Left click on lower zoom boundary"
-   
-            cursor showpixel=true style="Colour(curves)=3" plot=vline \
-                   maxpos=1 device=${plotdev} >> ${curfile}
-            while ( ! -e ${curfile} ) 
-               sleep 1
-            end
-            set pos = `parget lastpos cursor`
-            set low_z = $pos[1]
-
-# Clean up the CURSOR temporary file.
-            rm -f ${curfile} >& /dev/null
-            touch ${curfile}
+            source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+            set low_z = $xpos
    
 # Get the upper limit.
 # --------------------
             echo "  Left click on upper zoom boundary"
-   
-            cursor showpixel=true style="Colour(curves)=3" plot=vline \
-                   maxpos=1 device=${plotdev} >> ${curfile}
-            while ( ! -e ${curfile} ) 
-               sleep 1
-            end
-            set pos = `parget lastpos cursor`
-            set upp_z = $pos[1]
+            source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+            set upp_z = $xpos
 
             echo " "
             echo "      Zooming:"
             echo "        Lower Boundary: ${low_z}"
             echo "        Upper Boundary: ${upp_z}"
-
-# Clean up the CURSOR temporary file.
-            rm -f ${curfile} >& /dev/null
-            touch ${curfile}
 
 # Label for repeated fitting of the Gaussian.
 manual_rezoom:
@@ -1052,82 +870,30 @@ manual_rezoom:
 # ----------------------------
          echo " "
          echo "  Left click on the lower limit of the fitting region."
-   
-         cursor showpixel=true style="Colour(curves)=2" plot=vline \
-                maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set low_mask = $pos[1]
-
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+         set low_mask = $xpos
  
 # Get the upper mask boundary.
 # ----------------------------
          echo "  Left click on the upper limit of the fitting region."
-    
-         cursor showpixel=true style="Colour(curves)=2" plot=vline \
-                maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set upp_mask = $pos[1]
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+         set upp_mask = $xpos
 
          echo " " 
          echo "      Fit Mask:"
          echo "        Lower Mask Boundary: ${low_mask}"
          echo "        Upper Mask Boundary: ${upp_mask}"
 
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
-
 # Get the continuum values.
 # -------------------------
          echo " "
          echo "  Left click on your first estimate of the continuum."
-
-         cursor showpixel=true style="Colour(curves)=4" plot=hline \
-                maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set first_cont = $pos[2]
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
+         set first_cont = $ypos
 
          echo "  Left click on your second estimate of the continuum."
-
-         cursor showpixel=true style="Colour(curves)=4" plot=hline \
-                maxpos=1 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-           sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set second_cont = $pos[2]
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 4 -a Y
+         set second_cont = $ypos
 
          echo " "
          echo "      Continuum:"
@@ -1136,10 +902,6 @@ manual_rezoom:
 
 # Derive the average continuum.
          set cont = `calc exp="0.5*((${first_cont})+(${second_cont}))" prec=${prec}`
-#        set cont = `echo "${first_cont}+${second_cont}" | bc`
-#        set scale = `echo "${cont}/2.0" | bc`
-#        set remainder = `echo "${cont}%2.0" | bc`
-#        set cont = `echo "${scale}+${remainder}" | bc`
 
          echo "        Average Value: ${cont}"
 
@@ -1147,82 +909,35 @@ manual_rezoom:
 # ----------------------
          echo " " 
          echo "  Left click on the line peak"
-
-         cursor showpixel=true style="Colour(marker)=3" plot=mark \
-                maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set position = $pos[1]
-         set peak = $pos[2]
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+         set position = $xpos
+         set peak = $ypos
 
          echo " "
          echo "      Line Position:"
          echo "        Peak Position: ${position}"
          echo "        Peak Height: ${peak} ${unit}"
 
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
-
 # Get the fwhm left side.
 # -----------------------
          echo " " 
          echo "  Left click on the left-hand edge of the FWHM"
-
-         cursor showpixel=true style="Colour(marker)=3" plot=mark \
-                maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab position.
-         set pos = `parget lastpos cursor`
-         set fwhm_low = $pos[1]
-
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+         set fwhm_low = $xpos
 
 # Get the fwhm right side.
 # ------------------------
          echo "  Left click on the right-hand edge of the FWHM"
          echo " "
-
-         cursor showpixel=true style="Colour(marker)=3" plot=mark \
-                maxpos=1 marker=2 device=${plotdev} >> ${curfile}
-
-# Wait for CURSOR output then get spectral-unit,continuum measurement from 
-# the temporary file created by KAPPA:CURSOR.
-         while ( ! -e ${curfile} ) 
-            sleep 1
-         end
-
-# Grab the position.
-         set pos = `parget lastpos cursor`
-         set fwhm_upp = $pos[1]
+         source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a XY
+         set fwhm_upp = $xpos
 
          echo "      FWHM:"
          echo "        Lower Bound: ${fwhm_low}"
          echo "        Upper Bound: ${fwhm_upp}"
 
-# Clean up the CURSOR temporary file.
-         rm -f ${curfile} >& /dev/null
-         touch ${curfile}
-
 # Evaluate the fwhm.
 # ------------------
-#        set fwhm_low = `echo ${fwhm_low} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#        set fwhm_upp = `echo ${fwhm_upp} | sed 's/E/\\*10\\^/' | sed 's/+//'`
-#        set fwhm = `echo "scale = 15; ${fwhm_upp}-${fwhm_low}" | bc`
          set fwhm = `calc exp="(${fwhm_upp})-(${fwhm_low})" prec=${prec}`
          echo "        FWHM: ${fwhm}"
          echo " "
@@ -1304,16 +1019,16 @@ manual_rezoom:
 
 # Report the peak_height and peak_err values.
          if ( ${dovar} == "TRUE" ) then
-            echo  "        (X,Y) Pixel: ${xpix}:${ypix}"
+            echo  "        (X,Y) Pixel: ${xgrid}:${ygrid}"
             echo -n "        Peak Height: $peak_height " 
          else
-            echo "        (X,Y) Pixel: ${xpix},${ypix}"
+            echo "        (X,Y) Pixel: ${xgrid},${ygrid}"
             echo "        Peak Height: $peak_height ${unit}" 
          endif
          echo " "
 
 # Change the pixel value.
-         set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
+         set pixel = "${xgrid}:${xgrid},${ygrid}:${ygrid}"
          chpix in=${outfile}_tmp out=${outfile} comp="Data"\
                newval=${peak_height} section=\'${pixel}\'
 
@@ -1339,7 +1054,7 @@ manual_rezoom:
             mv -f ${outfile}.sdf ${outfile}_tmp.sdf 
 
 # Change the pixel value.
-            set pixel = "${xpix}:${xpix},${ypix}:${ypix}"
+            set pixel = "${xgrid}:${xgrid},${ygrid}:${ygrid}"
             chpix in=${outfile}_tmp out=${outfile} comp="Variance" \
                   newval=${peak_err} section=\'${pixel}\'
 
@@ -1405,7 +1120,6 @@ endif
 # ========
 cleanup:
 
-rm -f ${curfile} >& /dev/null
 rm -f ${colfile}.sdf >& /dev/null
 rm -f ${ripfile}.sdf >& /dev/null
 rm -f ${fitfile} >& /dev/null

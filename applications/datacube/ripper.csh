@@ -13,8 +13,7 @@
 #     ripper [-i filename] [-o filename] [-p]
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     package.  It reads a three-dimensional IFU NDF datacube as input, 
+#     This shell script reads a three-dimensional IFU NDF datacube as input, 
 #     presents you with a white-light image of the cube and allows you to
 #     select an X-Y position using the cursor.  It then extracts (and
 #     optionally displays) the spectrum for that X-Y position.
@@ -30,6 +29,9 @@
 #     -p
 #       The script will plot the extracted spectrum to the current display 
 #       as well as saving it to an NDF file. [FALSE] 
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -57,10 +59,13 @@
 #       Fixed bug converting the cursor position into negative pixel indices.
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
+#       Use a new script to obtain cursor positions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 
 # Preliminaries
@@ -79,15 +84,13 @@ rm -f ${tmpdir}/${user}/rip* >& /dev/null
 # Do variable initialisation.
 set tmpuser = "${tmpdir}/${user}"
 if ( ! -e $tmpuser ) mkdir $tmpuser >& /dev/null
-set tmpfile = "${tmpdir}/${user}/rip_cursor.tmp"
 set colfile = "${tmpdir}/${user}/rip_col"
-touch $tmpfile
 
 set plotspec = "false"
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
 
-# Handle any command-line arguements.
+# Handle any command-line arguments.
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
@@ -128,14 +131,18 @@ if ( ${gotinfile} == "FALSE" ) then
    set infile = ${infile:r}
 endif
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
+echo " "
 echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+echo "        File: ${inname}.sdf"
 
 # Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "RIPPER_ERR: ${infile}.sdf does not exist."
-   rm -f ${tmpfile} >& /dev/null
-   exit  
+if ( ! -e ${inname}.sdf ) then
+   echo "RIPPER_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Find out the cube dimensions.
@@ -146,9 +153,8 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "RIPPER_ERR: ${infile}.sdf is not a datacube."
-   rm -f ${tmpfile} >& /dev/null
-   exit  
+   echo "RIPPER_ERR: ${infile} is not a datacube."
+   exit
 endif
 
 set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
@@ -181,8 +187,8 @@ display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
 # ========================================================
 
 # Setup exit condition.
-set prev_xpix = 1
-set prev_ypix = 1
+set prev_xgrid = 1
+set prev_ygrid = 1
 
 # Loop marker for spectral extraction.
 extract:
@@ -190,28 +196,16 @@ extract:
 # Grab X-Y position.
 echo " "
 echo "  Left click to extract spectrum."
-
-cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL"
-
-# Grab the position.
-set pos = `parget lastpos cursor`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # Check for the exit conditions.
-if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+if ( $prev_xgrid == $xgrid && $prev_ygrid == $ygrid ) then
    goto cleanup
-else if ( $xpix == 1 && $ypix == 1 ) then
-   rm -f ${curfile}
-   touch ${curfile}
+else if ( $xgrid == 1 && $ygrid == 1 ) then
    goto extract
 else
-   set prev_xpix = $xpix
-   set prev_ypix = $ypix
+   set prev_xgrid = $xgrid
+   set prev_ygrid = $ygrid
 endif
 
 # Extract and plot the selected spectrum.
@@ -219,7 +213,7 @@ endif
 
 echo " "	 
 echo "      Extracting:"
-echo "        (X,Y) pixel: ${xpix},${ypix}"
+echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 echo " "
 
 # Get the output filename.
@@ -233,8 +227,8 @@ endif
 # Extract the spectrum from the cube.
 echo "      Output NDF:"
 echo "        File: ${outfile}.sdf"
-ndfcopy "in=${infile}($xpix,$ypix,) out=${outfile} trim trimwcs=true"
-settitle "ndf=${outfile} title='Pixel ($xpix,$ypix)'"
+ndfcopy "in=${infile}($xgrid,$ygrid,) out=${outfile} trim trimwcs=true"
+settitle "ndf=${outfile} title='Pixel ($xgrid,$ygrid)'"
 
 # Check to see if the output file has an AXIS structure.
 set axis = `parget axis ndftrace`
@@ -255,6 +249,5 @@ endif
 # =========
 cleanup:
 
-rm -f ${tmpfile} >& /dev/null
 rm -f ${colfile}.sdf >& /dev/null
 rmdir ${tmpdir}/${user} >& /dev/null

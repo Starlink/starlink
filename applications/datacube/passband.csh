@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/csh -x
 #+
 #  Name:
 #     passband.csh
@@ -13,9 +13,8 @@
 #     passband [-i filename] [-o filename] [-z/+z]
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA,
-#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
-#     and presents you with a white-light image of the cube.  You can then
+#     This shell script reads a three-dimensional IFU NDF as input and
+#     presents you with a white-light image of the cube.  You can then
 #     select and X-Y position using the cursor.  The script will extract
 #     and display this spectrum next to the white-light image.  You can
 #     then select a spectral range using the cursor and the script will
@@ -35,6 +34,9 @@
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -63,10 +65,13 @@
 #       Fixed bug converting the cursor position into negative pixel indices.
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
+#       Use a new script to obtain cursor positions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 
 # Preliminaries
@@ -84,12 +89,10 @@ rm -f ${tmpdir}/${user}/pass* >& /dev/null
 
 # Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
-set curfile = "${tmpdir}/${user}/pass_cursor.tmp"
 set colfile = "${tmpdir}/${user}/pass_col"
 set pasfile = "${tmpdir}/${user}/pass_pas"
 set spectral = "${tmpdir}/${user}/pass_rip"
 set statsfile = "${tmpdir}/${user}/pass_stats.txt"
-touch ${curfile}
 
 set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
@@ -144,14 +147,18 @@ if ( ${gotinfile} == "FALSE" ) then
    echo " "
 endif
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
+echo " "
 echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+echo "        File: ${inname}.sdf"
 
 # Check that it exists.
-if ( ! -e ${infile}.sdf ) then
-   echo "PASSBAND_ERR: ${infile}.sdf does not exist."
-   rm -f ${curfile} >& /dev/null
-   exit  
+if ( ! -e ${inname}.sdf ) then
+   echo "PASSBAND_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Find out the cube dimensions.
@@ -162,9 +169,8 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "PASSBAND_ERR: ${infile}.sdf is not a datacube."
-   rm -f ${curfile} >& /dev/null
-   exit  
+   echo "PASSBAND_ERR: ${infile} is not a datacube."
+   exit
 endif
 
 set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
@@ -182,7 +188,7 @@ echo "        Total pixels     : $pixnum"
 # Collapse the white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile} out=${colfile} axis=3 estimator=mean" >& /dev/null 
 settitle "ndf=${colfile} title='White-light Image'"
 
 # Setup the graphics window.
@@ -198,58 +204,37 @@ display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null
 # ========================================================
 
 # Setup the exit condition.
-set prev_xpix = 1
-set prev_ypix = 1
+set prev_xgrid = 1
+set prev_ygrid = 1
 
 # Loop marker for spectral extraction.
 extract:
 
-# Grab the X-Y position.
+# Select the X-Y position using the cursor.  Plots a cross at the chosen
+# pixel position.  Pixel co-ordinates returned in $xgrid and $ygrid.
 echo " "
 echo "  Left click to extract spectrum."
-  
-cursor showpixel=true style="Colour(marker)=2" plot=mark \
-       maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output then get X-Y co-ordinates from 
-# the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-
-# Grab the position.
-set pos=`parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # Check for exit condtions.
-if ( $prev_xpix == $xpix && $prev_ypix == $ypix ) then
+if ( $prev_xgrid == $xgrid && $prev_ygrid == $ygrid ) then
    goto cleanup
-else if ( $xpix == 1 && $ypix == 1 ) then
-   rm -f ${curfile}
-   touch ${curfile}
+else if ( $xgrid == 1 && $ygrid == 1 ) then
    goto extract
 else
-   set prev_xpix = $xpix
-   set prev_ypix = $ypix
+   set prev_xgrid = $xgrid
+   set prev_ygrid = $ygrid
 endif
-
-# Clean up the CURSOR temporary file.
-rm -f ${curfile}
-touch ${curfile}
 
 # Extract the spectrum.
 # =====================
 echo " "
 echo "      Extracting:"
-echo "        (X,Y) pixel             : ${xpix},${ypix}"
+echo "        (X,Y) pixel             : ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube and give it an identifiable TITLE.
-ndfcopy "in=${infile}($xpix,$ypix,) out=${spectral} trim=true trimwcs=true" >& /dev/null
-settitle "ndf=${spectral} title='Pixel (${xpix},${ypix})'"
+ndfcopy "in=${infile}($xgrid,$ygrid,) out=${spectral} trim=true trimwcs=true" >& /dev/null
+settitle "ndf=${spectral} title='Pixel (${xgrid},${ygrid})'"
 
 # Obtain the zoom range interactively.
 # ====================================
@@ -279,29 +264,17 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 # --------------------
    echo " "
    echo "  Left click on lower zoom boundary."
-   
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
-   set low_z = $pos[1]
 
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile}
-   touch ${curfile}
-   
+# Returns cursor position in $pos.
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+   set low_z = $xpos
+
 # Get the upper limit.
 # --------------------
    echo "  Left click on upper zoom boundary."
-   
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
+
+# Returns cursor position in $pos.
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
    set upp_z = $pos[1]
 
    echo " "
@@ -309,14 +282,9 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
 
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile}
-   touch ${curfile}
- 
 # Replot the spectrum.
    linplot ${spectral} xleft=${low_z} xright=${upp_z} mode=histogram \
            device=${plotdev} style="Colour(curves)=1" >& /dev/null
-
 endif
 
 # Obtain the spectral range interactively.
@@ -327,39 +295,23 @@ endif
 echo " "
 echo "  Left click on lower boundary."
    
-cursor showpixel=true style="Colour(curves)=2" plot=vline \
-       maxpos=1 device=${plotdev} >> ${curfile}
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-set pos = `parget lastpos cursor`
-set low = $pos[1]
+# Returns cursor position in $pos.
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+set low = $xpos
 
-# Clean up the CURSOR temporary file.
-rm -f ${curfile}
-touch ${curfile}
-   
 # Get the upper limit.
 # --------------------
 
 echo "  Left click on upper boundary."
    
-cursor showpixel=true style="Colour(curves)=2" plot=vline \
-       maxpos=1 device=${plotdev} >> ${curfile}
-while ( ! -e ${curfile} ) 
-   sleep 1
-end
-set pos = `parget lastpos cursor`
-set upp = $pos[1]
+# Returns cursor position in $pos.
+source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a X
+set upp = $xpos
 
 echo " "
 echo "      Passband:"
 echo "        Lower Boundary: ${low}"
 echo "        Upper Boundary: ${upp}"
-
-# Clean up the CURSOR temporary file.
-rm -f ${curfile}
-touch ${curfile}
 
 # Create the passband image.
 # ==========================
@@ -374,7 +326,7 @@ echo "        White-light image: ${dims[1]} x ${dims[2]}"
 echo "        ${slabel} : ${low}--${upp} $sunits"
 
 # Collapse the white-light image.
-collapse "in=${infile} out=${pasfile} " \
+collapse "in=${infile} out=${pasfile} estimator=sum" \
          "axis=3 low=${low} high=${upp}" >& /dev/null 
 settitle "ndf=${pasfile} title='$low--$upp'"
 
@@ -431,7 +383,6 @@ endif
 # ========
 
 cleanup:
-rm -f ${curfile} >&/dev/null 
 rm -f ${colfile}.sdf >&/dev/null
 rm -f ${pasfile}.sdf >&/dev/null
 rm -f ${spectral}.sdf >&/dev/null

@@ -14,10 +14,9 @@
 #     multistack [-g number] [-i filename] [-n number] [-o number] [-z/+z] 
 #
 #  Description:
-#     This shell script sits onto of a collection of A-tasks from the KAPPA
-#     and FIGARO packages.  It reads a three-dimensional IFU NDF as input
-#     and presents you with a white-light image of the cube.   You can
-#     then select a number of X-Y positions using the cursor.  The script
+#     This shell script reads a three-dimensional IFU NDF as input and
+#     presents you with a white-light image of the cube.   You can then
+#     select a number of X-Y positions using the cursor.  The script
 #     will then group these spectra creating an average spectrum for each
 #     group.  It then displays the average spectra in a `stack', where each
 #     group spectrum plotted offset vertically from the previous one in the
@@ -40,7 +39,9 @@
 #     +z 
 #       The program will not prompt for a zoom before requesting the region
 #       of interest. [FALSE]
-
+#
+#  Implementation Status:
+#     This script invokes a collection of A-tasks from the KAPPA package.
 #
 #  Authors:
 #     AALLAN: Alasdair Allan (Starlink, Keele University)
@@ -66,10 +67,13 @@
 #       define the lower y bound of the plot rather than fix at zero.
 #     2005 November 3 (MJC):
 #       Add options waste disposal.
+#     2006 March 2 (MJC):
+#       Allow for NDF sections to be supplied with the input filename.
+#       Use a new script to obtain cursor positions.
 #     {enter_further changes_here}
 #
 #  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
+#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 
 # Preliminaries
@@ -87,9 +91,7 @@ rm -f ${tmpdir}/${user}/mstk* >& /dev/null
 
 # Do variable initialisation.
 mkdir ${tmpdir}/${user} >& /dev/null
-set curfile = "${tmpdir}/${user}/mstk_cursor.tmp"
 set colfile = "${tmpdir}/${user}/mstk_col"
-touch ${curfile}
 
 set gotinfile = "FALSE"
 set gotgrp = "FALSE"
@@ -97,7 +99,7 @@ set gotnum = "FALSE"
 set gotoff = "FALSE"
 set gotzoom = "ASK"
 
-# Handle any command-line arguements.
+# Handle any command-line arguments.
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
@@ -154,17 +156,18 @@ if ( ${gotinfile} == "FALSE" ) then
    set infile = ${infile:r}
 endif
 
+# Obtain the name sans any section.
+set inname = `echo $infile | \
+              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
+
 echo " "
-
 echo "      Input NDF:"
-echo "        File: ${infile}.sdf"
+echo "        File: ${inname}.sdf"
 
-# check that it exists
-
-if ( ! -e ${infile}.sdf ) then
-   echo "STACKER_ERR: ${infile}.sdf does not exist."
-   rm -f ${curfile} >& /dev/null
-   exit  
+# Check that it exists.
+if ( ! -e ${inname}.sdf ) then
+   echo "MULTISTACKER_ERR: ${inname}.sdf does not exist."
+   exit
 endif
 
 # Check that it exists.
@@ -175,9 +178,8 @@ set lbnd = `parget lbound ndftrace`
 set ubnd = `parget ubound ndftrace`
 
 if ( $ndim != 3 ) then
-   echo "STACKER_ERR: ${infile}.sdf is not a datacube."
-   rm -f ${curfile} >& /dev/null
-   exit  
+   echo "MULTISTACKER_ERR: ${infile} is not a datacube."
+   exit
 endif
 
 set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
@@ -244,35 +246,16 @@ while ( $grpcount <= $numgrp )
 # Grab an X-Y position.
       echo " "
       echo "  Left click on pixel to be extracted."
-   
-      cursor showpixel=true style="Colour(marker)=2" plot=mark \
-             maxpos=1 marker=2 device=${plotdev} frame="PIXEL" >> ${curfile}
-
-# Wait for CURSOR output.
-      while ( ! -e ${curfile} ) 
-         sleep 1
-      end
-
-# Grab the position.
-      set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
-
-# Get the pixel co-ordinates and convert to grid indices.  The
-# exterior NINT replaces the bug/feature -0 result with the desired 0.
-      set xpix = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
-      set ypix = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
-
-# Clean up the CURSOR temporary file.
-      rm -f ${curfile} >& /dev/null
-      touch ${curfile}
+      source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
 # Extract the spectrum.
 # ---------------------
       echo " "
       echo "      Extracting:"
-      echo "        (X,Y) pixel: ${xpix},${ypix}"
+      echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from cube.
-      ndfcopy in="${infile}($xpix,$ypix,)" out=${specfile} trim=true \
+      ndfcopy in="${infile}($xgrid,$ygrid,)" out=${specfile} trim=true \
               trimwcs=true
 
 # Add the current spectrum to the group spectrum.
@@ -386,41 +369,19 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 # --------------------
    echo " "
    echo "  Left click on lower zoom boundary."
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+   set low_z = $xpos
 
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
-   set low_z = $pos[1]
-
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
-   
 # Get the upper limit.
 # --------------------
    echo "  Left click on upper zoom boundary."
-   
-   cursor showpixel=true style="Colour(curves)=3" plot=vline \
-          maxpos=1 device=${plotdev} >> ${curfile}
-
-   while ( ! -e ${curfile} ) 
-      sleep 1
-   end
-   set pos = `parget lastpos cursor`
-   set upp_z = $pos[1]
+   source ${DATACUBE_DIR}/getcurpos.csh -ci 3 -a X
+   set upp_z = $xpos
 
    echo " "
    echo "      Zooming:"
    echo "        Lower Boundary: ${low_z}"
    echo "        Upper Boundary: ${upp_z}"
-
-# Clean up the CURSOR temporary file.
-   rm -f ${curfile} >& /dev/null
-   touch ${curfile}
 
 # Create the zoomed plot.
 # -----------------------
