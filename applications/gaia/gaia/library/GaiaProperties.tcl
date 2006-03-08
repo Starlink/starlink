@@ -133,7 +133,7 @@ itcl::class gaia::GaiaProperties {
                   set value [string trim $value]
                   set_property $key $value
                } else {
-                  puts stderr "Error reading global properties: $line"
+                  puts stderr "Information: reading global properties: $line"
                }
             }
          } elseif { $llen < 0 } {

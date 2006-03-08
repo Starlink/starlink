@@ -752,8 +752,8 @@ itcl::class gaia::GaiaNDFCube {
    protected method add_bindings_ {} {
       global env
       if {! [info exists env(SPLAT_DIR)]} {
-         puts stderr "INFO: No SPLAT_DIR variable available. "
-         puts stderr "      Cannot display spectra remotely"
+         puts stderr "Information: No SPLAT_DIR variable available. \
+                      Cannot display spectra remotely"
       } else {
          set splat_dir_ $env(SPLAT_DIR)
 
