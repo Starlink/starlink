@@ -168,9 +168,11 @@
 #     2006 March 2 (MJC):
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.  Recognise
-#       SKY-DSBSPECTRUM.
+#       SKY-DSBSPECTRUM.  Corrected contour-mode value typo's and set
+#       axis units for ripped file in the loop.
 #     2006 March 6 (MJC):
-#       Switched lower percentile for display from 15 to 2.
+#       Switched lower percentile for display from 15 to 2.  Allow -c
+#       to be zero to mean no contours overlaid.  
 #     {enter_further_changes_here}
 
 #  Copyright:
