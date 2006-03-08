@@ -58,9 +58,9 @@ endif
 # List the test progs
 
 # Build the progs
-g95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
-g95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
-g95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+f95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
+f95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+f95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the main regression tester
 regression >& regression.out
@@ -80,8 +80,8 @@ endif
 
 # Run the other test progs
 echo "" 
-foreach prog (testrebin testnormmap teststc testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
-g95 -fno-second-underscore -w -o $prog -g $prog.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `prm_link` `chr_link` `err_link`
+foreach prog (testrebin testtrangrid testnormmap teststc testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
+f95 -fno-second-underscore -w -o $prog -g $prog.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `prm_link` `chr_link` `err_link`
 $prog
 #rm $prog
 end
