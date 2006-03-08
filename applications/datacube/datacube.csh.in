@@ -56,6 +56,10 @@
 #        equivalents.
 #     2005 October 31 (MJC):
 #        Add wcsadd definition.
+#     2005 October 31 (MJC):
+#        Add wcsadd definition.
+#     2006 March 2 (MJC):
+#        Add clinplot, compave, gridspec, and velmoment definitions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -66,6 +70,8 @@
 #  Define aliases for the scripts.
 alias compare         source ${DATACUBE_DIR}/compare.csh
 alias dat_compare     source ${DATACUBE_DIR}/compare.csh
+alias gridspec        source ${DATACUBE_DIR}/gridspec.csh
+alias dat_gridspec    source ${DATACUBE_DIR}/gridspec.csh
 alias multistack      source ${DATACUBE_DIR}/multistack.csh
 alias dat_multistack  source ${DATACUBE_DIR}/multistack.csh
 alias passband        source ${DATACUBE_DIR}/passband.csh
@@ -82,6 +88,8 @@ alias step            source ${DATACUBE_DIR}/step.csh
 alias dat_step        source ${DATACUBE_DIR}/step.csh
 alias velmap          source ${DATACUBE_DIR}/velmap.csh
 alias dat_velmap      source ${DATACUBE_DIR}/velmap.csh
+alias velmoment       source ${DATACUBE_DIR}/velmoment.csh
+alias dat_velmoment   source ${DATACUBE_DIR}/velmoment.csh
 
 #  Define aliases for scripts dependant on XDialog an GTK+
 alias xcompare        source ${DATACUBE_DIR}/compare_x.csh
@@ -97,8 +105,10 @@ alias cadd            ${KAPPA_DIR}/cadd
 alias cdiv            ${KAPPA_DIR}/cdiv 
 alias chpix           ${KAPPA_DIR}/chpix
 alias collapse        ${KAPPA_DIR}/collapse
-alias cursor          ${KAPPA_DIR}/cursor
+alias clinplot        ${KAPPA_DIR}/clinplot
+alias compave         ${KAPPA_DIR}/compave
 alias contour         ${KAPPA_DIR}/contour
+alias cursor          ${KAPPA_DIR}/cursor
 alias display         ${KAPPA_DIR}/display 
 alias gdclear         ${KAPPA_DIR}/gdclear
 alias linplot         ${KAPPA_DIR}/linplot 
