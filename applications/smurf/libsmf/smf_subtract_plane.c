@@ -122,12 +122,12 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
   size_t nframes = 0;      /* Number of frames */
   size_t npts;             /* Number of data points */
-  size_t base;             /* ?? */
+  size_t base;             /* Starting point for index into arrays */
   int z;                   /* Counter */
-  double sky = 0;          /* Sky power to be subtracted */
-  double sky0 = 0;         /* Sky power fit - intercept */
-  double dskyel = 1;       /* Sky power fit - elev gradient */
-  double dskyaz = 0;       /* Sky power fit - azimuth gradient */
+  double sky;              /* Sky power to be subtracted */
+  double sky0;             /* Sky power fit - intercept */
+  double dskyel;           /* Sky power fit - elev gradient */
+  double dskyaz;           /* Sky power fit - azimuth gradient */
   double chisq;            /* Chi-squared from the linear regression fit */
 
   gsl_matrix *azel;        /* Matrix of input positions */
@@ -174,9 +174,6 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   xout = smf_malloc( npts, sizeof(double), 0, status );
   yout = smf_malloc( npts, sizeof(double), 0, status );
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
-  /* Also allocate space for sky power and weights arrays */
-  psky = smf_malloc( npts, sizeof(double), 0, status );
-  weight = smf_malloc( npts, sizeof(double), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
      since we need to free memory */
@@ -223,14 +220,16 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
     /* Check fit type */
     if ( strncmp( fittype, "MEAN", 4 ) == 0 ) {
       /* Calculate average of all pixels in current timeslice */
-      sky = 0;
+      sky0 = 0;
       for (i=0; i < npts; i++ ) {
 	index = indices[i] + base;
 	if (indata[index] != VAL__BADD) {
-	  sky += indata[index];
+	  sky0 += indata[index];
 	}
       }
-      sky /= npts;
+      sky0 /= npts;
+      dskyaz = 0.0;
+      dskyel = 0.0;
     } else {
       if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
 	ncoeff = 3;
@@ -291,11 +290,8 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       index = indices[i] + base;
       if (indata[index] != VAL__BADD) {
 
-	/* Calculate sky value as a function of position if not using
-	   MEAN */
-	if ( strncmp( fittype, "MEAN", 4 ) != 0 ) {
-	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
-	}
+	/* Calculate sky value as a function of position */
+	sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
 	/* Subtract sky value; no need to update variance */
 	indata[index] -= sky;
       }
