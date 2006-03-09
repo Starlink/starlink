@@ -101,6 +101,13 @@
       INTEGER CHR_LEN
       LOGICAL CTG1_MATCH
 
+*  Local Constants:
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      CHARACTER ESC*1            ! Single backslash
+      PARAMETER( ESC = '\\' )    
+
 *  Local Variables:
       CHARACTER BN*50              ! File basename
       CHARACTER DIR*(GRP__SZNAM)   ! Directory field
@@ -205,7 +212,7 @@
          J = 1
          DO I = F, L
             IF( TEMPLT( I : I ) .EQ. ' ' ) THEN
-               TMPLT2( J : J ) = '\'
+               TMPLT2( J : J ) = ESC
                J = J + 1
             END IF
             TMPLT2( J : J ) = TEMPLT( I : I )

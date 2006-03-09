@@ -105,6 +105,12 @@
       INTEGER SZTYP              ! Max. length of a foreign file type
       PARAMETER ( SZTYP = 15 )
 
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      CHARACTER ESC*1            ! Single backslash
+      PARAMETER( ESC = '\\' )    
+
 *  Local Variables:
       CHARACTER ALTTYP*20          ! Second choice file type from CAT_FORMATS_OUT
       CHARACTER BN1*50             ! Supplied file base name
@@ -239,7 +245,7 @@
          J = 1
          DO II = F, L
             IF( NAME( II : II ) .EQ. ' ' ) THEN
-               TMPLT2( J : J ) = '\'
+               TMPLT2( J : J ) = ESC
                J = J + 1
             END IF
             TMPLT2( J : J ) = NAME( II : II )
