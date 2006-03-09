@@ -38,11 +38,11 @@
 *        of the following values:
 *
 *        - "ORIGIN" --- The compression boxes are placed so that the
-*        origin of the pixel co-ordinate Frame in the input NDF
-*        corresponds to a corner of a compression box. This results in 
-*        the pixel origin being retain in the output NDF. For instance,
-*        if a pair of 2-dimensional images which have previously been
-*        aligned in pixel co-ordinates are compressed, then using this
+*        origin of the pixel co-ordinate Frame (i.e. pixel coords (0,0)) in 
+*        the input NDF corresponds to a corner of a compression box. This 
+*        results in the pixel origin being retained in the output NDF. For 
+*        instance, if a pair of 2-dimensional images which have previously
+*        been aligned in pixel co-ordinates are compressed, then using this
 *        option ensures that the compressed images will also be aligned
 *        in pixel co-ordinates.
 *
