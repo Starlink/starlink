@@ -53,38 +53,46 @@ typedef struct SPItem  {
     Tk_Item header;             /* Mandatory Tk header information */
     AstFrameSet *framesets[2];  /* The FrameSets associated with item */
     AstPlot *plot;              /* The AstPlot for drawing regions */
-    int newplot;                /* Whether to regenerate plot */
-    Tk_Item *polyline;          /* rtdPolyline item context */
     Tcl_Interp *interp;         /* The Tcl interpreter */
+    Tk_Anchor tkanchor;         /* Where to anchor relative to (x,y). */
+    Tk_Item *polyline;          /* rtdPolyline item context */
+    XColor *linecolour;         /* Foreground color for polyline */
     char *datalabel;            /* The data units label */
     char *dataunits;            /* The data units */
     char *options;              /* AST options used when drawing item */
+    char *tagPtr;               /* All tags in use for item */
     char utag[22];              /* Unique tag for AST graphics we create */
     double *coordPtr;           /* Coordinates for each data value */
     double *dataPtr;            /* Data values */
-    double badvalue;            /* The value to replace AST__BAD with */
     double *tmpPtr[2];          /* Temporary arrays for transformed
-                                 *  coordinates etc. */
+                                 * coordinates etc. */
+    double badvalue;            /* The value to replace AST__BAD with */
     double height;              /* Height of item */
     double width;               /* Width of item */
-    double border;              /* Fraction border for plot axes, only used
-                                   when autoscaling using scale command */
     double x, y;                /* Coordinates of item reference point */
+    double xborder;             /* Fractional border for X plot axes, only
+                                 * used when autoscaling using scale command */
     double xmax;                /* Maximum physical X coordinate for plot */
     double xmin;                /* Minimum physical X coordinate for plot */
+    double yborder;             /* Fractional border for Y plot axes, only
+                                 * used when autoscaling using scale command */
     double ymax;                /* Maximum physical Y coordinate for plot */
     double ymin;                /* Minimum physical Y coordinate for plot */
+    int fixedscale;             /* If set do not scale item with canvas */
+    int linewidth;              /* Width of polyline */
+    int newplot;                /* Whether to regenerate plot */
     int numPoints;              /* Number of data values */
     int showaxes;               /* Whether to show the grid */
-    int linewidth;              /* Width of polyline */
-    XColor *linecolour;         /* Foreground color for polyline */
 } SPItem;
 
 static int tagCounter = 0;      /* Counter for creating unique tags */
 
 /* Item canvas tags */
+static int CanvasTagsParseProc( ClientData clientData, Tcl_Interp *interp,
+                                Tk_Window tkwin, CONST char *value,
+                                char *widgRec, int offset );
 static Tk_CustomOption tagsOption = {
-    Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
+    CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
 };
 
 /* FrameSet handling */
@@ -101,45 +109,52 @@ static Tk_CustomOption framesetOption = {
 /* Configuration options */
 static Tk_ConfigSpec configSpecs[] = {
 
-    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
-     (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
-
-    {TK_CONFIG_DOUBLE, "-x", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
-     "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_DOUBLE, "-width", (char *) NULL, (char *) NULL,
-     "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
-     "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_BOOLEAN, "-showaxes", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_STRING, "-gridoptions", (char *) NULL, (char *) NULL,
-     "", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
-
-    {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
-     "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
-
-    {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
-     "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
+     "northwest", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_DOUBLE, "-badvalue", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT},
 
+    {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
+     "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+
+    {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
+     "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
+
+    {TK_CONFIG_BOOLEAN, "-fixedscale", (char *) NULL, (char *) NULL,
+     "0", Tk_Offset(SPItem, fixedscale), TK_CONFIG_DONT_SET_DEFAULT},
+
     {TK_CONFIG_CUSTOM, "-frameset", (char *) NULL, (char *) NULL,
      (char *) NULL, Tk_Offset(SPItem, framesets), TK_CONFIG_NULL_OK,
      &framesetOption},
+
+    {TK_CONFIG_STRING, "-gridoptions", (char *) NULL, (char *) NULL,
+     "DrawTitle=0", Tk_Offset(SPItem, options), TK_CONFIG_NULL_OK},
+
+    {TK_CONFIG_DOUBLE, "-height", (char *) NULL, (char *) NULL,
+     "100.0", Tk_Offset(SPItem, height), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_COLOR, "-linecolour", (char *) NULL, (char *) NULL,
      "black", Tk_Offset(SPItem, linecolour), TK_CONFIG_NULL_OK},
 
     {TK_CONFIG_PIXELS, "-linewidth", (char *) NULL, (char *) NULL,
      "1", Tk_Offset(SPItem, linewidth), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_BOOLEAN, "-showaxes", (char *) NULL, (char *) NULL,
+     "1", Tk_Offset(SPItem, showaxes), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
+     (char *) NULL, Tk_Offset(SPItem, tagPtr), TK_CONFIG_NULL_OK,
+     &tagsOption},
+
+    {TK_CONFIG_DOUBLE, "-width", (char *) NULL, (char *) NULL,
+     "100.0", Tk_Offset(SPItem, width), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_DOUBLE, "-x", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
+     "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
      (char *) NULL, 0, 0}
@@ -168,6 +183,7 @@ static void   SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
 static void   SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
                            double deltaY );
 
+static void CorrectAnchor( SPItem *spPtr, double *x, double *y );
 static void ClearSubItems( Tk_Canvas canvas, SPItem *spPtr );
 static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr );
 static void GeneratePlotFrameSet( SPItem *spPtr );
@@ -247,31 +263,36 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
      * Carry out initialization that is needed in order to clean
      * up after errors during the the remainder of this procedure.
      */
-    spPtr->dataPtr = NULL;
     spPtr->badvalue = 0.0;
     spPtr->coordPtr = NULL;
-    spPtr->tmpPtr[0] = NULL;
-    spPtr->tmpPtr[1] = NULL;
-    spPtr->numPoints = 0;
+    spPtr->dataPtr = NULL;
+    spPtr->datalabel = NULL;
+    spPtr->dataunits = NULL;
+    spPtr->fixedscale = 0;
     spPtr->framesets[0] = NULL;
     spPtr->framesets[1] = NULL;
-    spPtr->dataunits = NULL;
-    spPtr->datalabel = NULL;
-    spPtr->x = 0.0;
-    spPtr->y = 0.0;
-    spPtr->width = 100.0;
     spPtr->height = 100.0;
-    spPtr->border = 0.05;
     spPtr->interp = interp;
-    spPtr->options = NULL;
-    spPtr->plot = NULL;
-    spPtr->newplot = 1;
-    spPtr->polyline = NULL;
     spPtr->linecolour = None;
     spPtr->linewidth = 1;
+    spPtr->newplot = 1;
+    spPtr->numPoints = 0;
+    spPtr->options = NULL;
+    spPtr->plot = NULL;
+    spPtr->polyline = NULL;
+    spPtr->tagPtr = NULL;
+    spPtr->tkanchor = TK_ANCHOR_NW;
+    spPtr->tmpPtr[0] = NULL;
+    spPtr->tmpPtr[1] = NULL;
+    spPtr->width = 100.0;
+    spPtr->x = 0.0;
+    spPtr->xborder = 0.07;
+    spPtr->y = 0.0;
+    spPtr->yborder = 0.17;
 
     /* Create a unique tag for AST graphic elements */
     sprintf( spPtr->utag, "gaiaSpectralPlot%d", tagCounter++ );
+    spPtr->tagPtr = strdup( spPtr->utag );
 
     /*
      * Count the number of values and then parse them into a point
@@ -385,7 +406,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         nel = objc;
         adr = 0L;
         if ( strcmp( Tcl_GetString( objv[0] ), "pointer" ) == 0 ) {
-            
+
             /*  Memory address, sort this out. */
             if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ||
                  Tcl_GetIntFromObj( interp, objv[2], &nel ) != TCL_OK ) {
@@ -420,7 +441,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 }
             }
             else {
-                Tcl_AppendResult( interp, "Unknown data type: ", objv[3], 
+                Tcl_AppendResult( interp, "Unknown data type: ", objv[3],
                                   (char *) NULL );
                 return TCL_ERROR;
             }
@@ -459,11 +480,11 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
         else {
-            /* Given memory address, check for type and AST__BAD values and 
+            /* Given memory address, check for type and AST__BAD values and
              * convert/replace with our bad value. */
-            
+
             dataPtr = spPtr->dataPtr;
-            switch (type) 
+            switch (type)
             {
                 case HDS_DOUBLE : {
                     double *fromPtr = (double *) adr;
@@ -602,7 +623,9 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
+    Tk_Item *header;
     Tk_ConfigSpec *specPtr;
+    int i;
 
 #if DEBUG
     fprintf( stderr, "SPConfigure() \n" );
@@ -669,8 +692,11 @@ static void SPDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
         RtdLineDelete( canvas, spPtr->polyline, display );
     }
 
-    /* Delete amy grid items */
+    /* Delete any grid items */
     ClearSubItems( canvas, spPtr );
+    if ( spPtr->tagPtr != NULL ) {
+        free( spPtr->tagPtr );
+    }
 }
 
 /**
@@ -690,7 +716,6 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
-    char *tags;
     double basebox[4];
     double xin[2];
     double xout[2];
@@ -726,7 +751,9 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         }
         GeneratePlotFrameSet( spPtr );
 
-        /* Graphics limits are bounding box */
+        /* Graphics limits are bounding box, note these are corrected for the
+         * anchor position and we reserve a little for making sure the
+         * graphics are cleared (polyline seems to spill over edge). */
         graphbox[0] = spPtr->header.x1;
         graphbox[1] = spPtr->header.y2;
         graphbox[2] = spPtr->header.x2;
@@ -761,7 +788,9 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
         if ( spPtr->showaxes ) {
-            astTk_Tag( spPtr->utag );        /* Unique tag for grid items */
+                                             /* Make sure of the canvas */
+            astTk_SetCanvas( Tk_PathName( Tk_CanvasTkwin( canvas ) ) );
+            astTk_Tag( spPtr->tagPtr );      /* Includes unique tag */
             ClearSubItems( canvas, spPtr );  /* Remove last grid */
             astGrid( spPtr->plot );          /* Draw grid */
             astTk_Tag( NULL );               /* Stop tagging */
@@ -769,30 +798,22 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     }
 
     /* Finally the spectrum, for speed we use direct control of a
-     * rtd_polyline instance.  */
-    {
-        /* Convert coordinates into canvas from current. */
-        astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
-                  spPtr->dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
+     * rtd_polyline instance.  First convert coordinates into canvas from
+     * current. */
+    astTran2( spPtr->plot, spPtr->numPoints, spPtr->coordPtr,
+              spPtr->dataPtr, 0, spPtr->tmpPtr[0], spPtr->tmpPtr[1] );
 
-        /* Set line coordinates */
-        RtdLineQuickSetCoords( spPtr->interp, canvas, spPtr->polyline,
-                               spPtr->tmpPtr[0], spPtr->tmpPtr[1],
-                               spPtr->numPoints );
+    /* Set line coordinates */
+    RtdLineQuickSetCoords( spPtr->interp, canvas, spPtr->polyline,
+                           spPtr->tmpPtr[0], spPtr->tmpPtr[1],
+                           spPtr->numPoints );
 
-        //astShow( spPtr->plot );
+    RtdLineSetColour( display, spPtr->polyline, spPtr->linecolour );
+    RtdLineSetWidth( display, spPtr->polyline, spPtr->linewidth );
 
-        //for ( i = 0; i < spPtr->numPoints; i++ ) {
-        //    printf( "%f,%f\n", spPtr->tmpPtr[0][i], spPtr->tmpPtr[1][i] );
-        //}
-
-        RtdLineSetColour( display, spPtr->polyline, spPtr->linecolour );
-        RtdLineSetWidth( display, spPtr->polyline, spPtr->linewidth );
-
-        /* Do the draw */
-        RtdLineDisplay( canvas, spPtr->polyline, display, drawable, x, y,
-                        width, height );
-    }
+    /* Do the draw. */
+    RtdLineDisplay( canvas, spPtr->polyline, display, drawable, x, y,
+                    width, height );
 
     /* Reset AST if any errors occurred, don't want next draw to fail
      * as well. */
@@ -908,7 +929,8 @@ static int SPToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
  * SPScale --
  *
  *      This procedure is invoked to scale an item. If the arguments are
- *      set to -1, then factors that fill the canvas will be used.
+ *      set to -1, then factors that fill the canvas will be used. Scaling
+ *      can also be inhibited by setting the fixedscale option to 1.
  *
  * Results:
  *      None.
@@ -924,9 +946,17 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
 #if DEBUG
-    fprintf( stderr, "SPScale() \n" );
+    fprintf( stderr, "SPScale(%f,%f,%f,%f) \n", 
+             originX, originY, scaleX, scaleY );
 #endif
+    
+    /* Do not scale, if we want to be fixed in size */
+    if ( spPtr->fixedscale ) {
+        return;
+    }
+
     if ( scaleX < 0.0 ) {
+        /* Autoscale */
         int ixo, iyo, iwidth, iheight;
         int xborder, yborder;
         Tk_Window tkwin;
@@ -936,17 +966,16 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
         iwidth = Tk_Width( tkwin );
         iheight = Tk_Height( tkwin );
 
-        /* Need a border */
-        xborder = (int) ( iwidth * spPtr->border );
-        yborder = (int) ( iheight * spPtr->border );
+        /* Need a border, leaves no room for the title  */
+        xborder = (int) ( iwidth * spPtr->xborder );
+        yborder = (int) ( iheight * spPtr->yborder );
 
-        spPtr->x = (double) ixo + xborder;
-        spPtr->y = (double) iyo + yborder;
-        spPtr->height = (double) iheight - 2 * yborder;
+        spPtr->x = (double) ixo + xborder;           /* For symmetric y gaps */
+        spPtr->y = (double) iyo;                     /* + yborder; */
+        spPtr->height = (double) iheight - yborder ; /* - yborder;*/
         spPtr->width = (double) iwidth - 2 * xborder;
     }
     else {
-
         /* Scale all coordinates and set their related values */
         spPtr->x = originX + scaleX * ( spPtr->x - originX );
         spPtr->y = originY + scaleY * ( spPtr->y - originY );
@@ -1012,12 +1041,18 @@ static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr )
 {
     Tk_Window tkwin;
+    double x, y;
+
     tkwin = Tk_CanvasTkwin( canvas );
 #if DEBUG
-    fprintf( stderr, "ComputeBBox: %d\n" );
+    fprintf( stderr, "ComputeBBox() \n" );
 #endif
-    spPtr->header.x1 = spPtr->header.x2 = spPtr->x;
-    spPtr->header.y1 = spPtr->header.y2 = spPtr->y;
+    x = spPtr->x;
+    y = spPtr->y;
+    CorrectAnchor( spPtr, &x, &y );
+
+    spPtr->header.x1 = spPtr->header.x2 = x;
+    spPtr->header.y1 = spPtr->header.y2 = y;
     spPtr->header.x2 += spPtr->width;
     spPtr->header.y2 += spPtr->height;
 
@@ -1025,6 +1060,90 @@ static void ComputeBBox( Tk_Canvas canvas, SPItem *spPtr )
     fprintf( stderr, "\t %d,%d,%d,%d \n", spPtr->header.x1, spPtr->header.y1,
                                           spPtr->header.x2, spPtr->header.y2 );
 #endif
+}
+
+
+/*
+ *--------------------------------------------------------------
+ *
+ * CorrectAnchor--
+ *
+ *      This procedure is called to shift the x,y position to
+ *      correct for any requested anchors. Note this doesn't
+ *      correct for any scale factors.
+ *
+ *--------------------------------------------------------------
+ */
+static void CorrectAnchor( SPItem *spPtr, double *x, double *y )
+{
+#if DEBUG
+    fprintf( stderr, "CorrectAnchor: %d, %d \n", *x, *y );
+#endif
+    switch ( spPtr->tkanchor ) {
+        case TK_ANCHOR_NW:
+            /* Default for all anchors */
+        break;
+
+        case TK_ANCHOR_N:
+            *x -= (double) spPtr->width * 0.5;
+        break;
+
+        case TK_ANCHOR_NE:
+            *x -= (double) spPtr->width;
+        break;
+
+        case TK_ANCHOR_W:
+            *y -= (double) spPtr->height * 0.5;
+        break;
+
+        case TK_ANCHOR_E:
+            *x -= (double) spPtr->width;
+            *y -= (double) spPtr->height * 0.5;
+        break;
+
+        case TK_ANCHOR_SW:
+            *y -= (double) spPtr->height;
+        break;
+
+        case TK_ANCHOR_S:
+            *x -= (double) spPtr->width * 0.5;
+            *y -= (double) spPtr->height;
+        break;
+
+        case TK_ANCHOR_SE:
+            *x -= (double) spPtr->width;
+            *y -= (double) spPtr->height;
+        break;
+
+        case TK_ANCHOR_CENTER:
+            *x -= (double) spPtr->width * 0.5;
+            *y -= (double) spPtr->height * 0.5;
+        break;
+    }
+#if DEBUG
+    fprintf( stderr, "             : %d, %d \n", *x, *y );
+#endif
+}
+
+/**
+ * CanvasParseProc --
+ *
+ *      Provide parsing for -tags option, want to keep string copy so don't
+ *      use standard Tk_CanvasParseProc directly.
+ */
+static int CanvasTagsParseProc( ClientData clientData, Tcl_Interp *interp,
+                                Tk_Window tkwin, CONST char *value,
+                                char *widgRec, int offset )
+{
+    SPItem *spPtr = (SPItem *) widgRec;
+    if ( spPtr->tagPtr != NULL ) {
+        free( spPtr->tagPtr );
+    }
+    spPtr->tagPtr = (char *) malloc( strlen(value) + strlen(spPtr->utag) + 2 );
+    strcpy( spPtr->tagPtr, spPtr->utag );
+    strcat( spPtr->tagPtr, " " );
+    strcat( spPtr->tagPtr, value );
+    Tk_CanvasTagsParseProc(clientData, interp, tkwin, value, widgRec, offset);
 }
 
 /**
@@ -1037,21 +1156,20 @@ static int FrameSetParseProc( ClientData clientData, Tcl_Interp *interp,
                               char *widgRec, int offset )
 {
     long longResult;
-    AstFrameSet **ptr;
-    ptr = (AstFrameSet **)( widgRec + offset );
+    SPItem *spPtr = (SPItem *) widgRec;
 
     if ( Tcl_ExprLong( interp, value, &longResult ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
     /* Release old frameset, before accepting new */
-    if ( ptr[0] != NULL ) {
-       astAnnul( ptr[0] );
+    if ( spPtr->framesets[0] != NULL ) {
+        astAnnul( spPtr->framesets[0] );
     }
 
     /* Make a clone of the frameset so that the original can be released */
-    ptr[0] = (AstFrameSet *) astClone( (AstFrameSet *) longResult );
-    ptr[1] = (AstFrameSet *) NULL;
+    spPtr->framesets[0] = (AstFrameSet *) astClone((AstFrameSet *)longResult);
+    spPtr->framesets[1] = (AstFrameSet *) NULL;
     return TCL_OK;
 }
 
@@ -1065,12 +1183,12 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
                                 char *widgRec, int offset,
                                 Tcl_FreeProc **freeProcPtr )
 {
-    AstFrameSet **ptr;
-    char *p;
     long longResult;
-    *ptr = (AstFrameSet *)(widgRec + offset);
-    p = (char *) ckalloc(24);
-    Tcl_PrintDouble( (Tcl_Interp *) NULL, (long) *ptr, p );
+    SPItem *spPtr = (SPItem *) widgRec;
+    char *p = (char *) ckalloc( 24 );
+
+    Tcl_PrintDouble( (Tcl_Interp *) NULL, (long) spPtr->framesets[0], p );
+
     *freeProcPtr = TCL_DYNAMIC;
     return p;
 }
@@ -1283,4 +1401,5 @@ static void MakeSpectral( SPItem *spPtr )
     }
     astEnd;
 }
+
 

@@ -41,6 +41,7 @@
 extern "C" {
 #endif
     int astTk_Init( Tcl_Interp *, const char * );
+    int astTk_SetCanvas( const char * );
     void astTk_Tag( const char * );
     void astTk_AddColour( const int, const char * );
     void astTk_LineType( int, int );

@@ -765,21 +765,28 @@ itcl::class gaia::GaiaNDFCube {
 
       # Local test...
       $itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> \
-         [code $this display_spectrum_ local %x %y]
+         [code $this display_spectrum_ localdrag %x %y]
 
       $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
-         [code $this display_spectrum_ local %x %y]
+         [code $this display_spectrum_ localstart %x %y]
 
-      #  Need this when spectrum is plotted in main window.
-      #$itk_option(-canvas) bind all <B1-Motion> \
-      #   [code $this display_spectrum_ localall %x %y]
+      # Bindings when display over main image as well.
+      $itk_option(-canvas) bind all <B1-Motion> \
+         [code $this display_spectrum_ localdrag %x %y]
+
+      $itk_option(-canvas) bind all <1> \
+         [code $this display_spectrum_ localstart %x %y]
+
    }
 
-   protected method display_spectrum_ {action cx cy} {
+   #  Display a spectrum in the plot. Action can be "splat", "localstart" or
+   #  "localdrag", for display in SPLAT, start a spectral display (sets the
+   #  initial scale of a drag), or update during a drag.
+   protected method display_spectrum_ {action ccx ccy} {
 
       #  Convert click coordinates from canvas coords to grid coords.
-      set cx [$itk_option(-canvas) canvasx $cx]
-      set cy [$itk_option(-canvas) canvasy $cy]
+      set cx [$itk_option(-canvas) canvasx $ccx]
+      set cy [$itk_option(-canvas) canvasy $ccy]
       $itk_option(-rtdimage) convert coords $cx $cy canvas ix iy image
 
       #  Use origins to get pixel indices.
@@ -825,12 +832,18 @@ itcl::class gaia::GaiaNDFCube {
                                  -number $itk_option(-number)]
                #  Make this a transient of main window, not this one.
                wm transient $spectrum_ $itk_option(-gaia)
+
+               #  Display in main window as well.
+               $spectrum_ configure -canvas $itk_option(-canvas)
             }
-            $spectrum_ display "${ndfname_}${section}" \
-               $axis_ $itk_option(-autoscale)
-            #if { $action == "localall" } {
-            #   $spectrum_ anchor $cx $cy
-            #}
+
+            #  Also autoscale when single click, so that we are not fixed for
+            #  all time.
+            if { $itk_option(-autoscale) || $action == "localstart" } {
+               $spectrum_ display "${ndfname_}${section}" $axis_ 1 $cx $cy
+            } else {
+               $spectrum_ display "${ndfname_}${section}" $axis_ 0 $cx $cy
+            }
          }
       }
 
@@ -883,7 +896,7 @@ itcl::class gaia::GaiaNDFCube {
    }
 
    #  Does spectral plot auto-update ranges.
-   itk_option define -autoscale autoscale AutoScale 1
+   itk_option define -autoscale autoscale AutoScale 0
 
    #  Protected variables: (available to instance)
    #  --------------------

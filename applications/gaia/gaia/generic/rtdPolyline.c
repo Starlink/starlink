@@ -808,13 +808,14 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
     if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
-                linePtr->numPoints, linePtr->splineSteps, pointPtr,
-                (double *) NULL);
+                                      linePtr->numPoints, 
+                                      linePtr->splineSteps, pointPtr,
+                                      (double *) NULL);
     } else {
         for (i = 0, coordPtr = linePtr->coordPtr, pPtr = pointPtr;
                 i < linePtr->numPoints;  i += 1, coordPtr += 2, pPtr++) {
             Tk_CanvasDrawableCoords(canvas, coordPtr[0], coordPtr[1],
-                    &pPtr->x, &pPtr->y);
+                                    &pPtr->x, &pPtr->y);
         }
     }
 
@@ -829,8 +830,8 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         Tk_CanvasSetStippleOrigin(canvas, linePtr->gc);
         Tk_CanvasSetStippleOrigin(canvas, linePtr->arrowGC);
     }
-    XDrawLines(display, drawable, linePtr->gc, pointPtr, numPoints,
-            CoordModeOrigin);
+    XDrawLines( display, drawable, linePtr->gc, pointPtr, numPoints,
+                CoordModeOrigin );
     if (pointPtr != staticPoints) {
         ckfree((char *) pointPtr);
     }
@@ -841,11 +842,11 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
     if (linePtr->firstArrowPtr != NULL) {
         TkFillPolygon(canvas, linePtr->firstArrowPtr, PTS_IN_ARROW,
-                display, drawable, linePtr->gc, NULL);
+                      display, drawable, linePtr->gc, NULL);
     }
     if (linePtr->lastArrowPtr != NULL) {
         TkFillPolygon(canvas, linePtr->lastArrowPtr, PTS_IN_ARROW,
-                display, drawable, linePtr->gc, NULL);
+                      display, drawable, linePtr->gc, NULL);
     }
     if (linePtr->fillStipple != None) {
         XSetTSOrigin(display, linePtr->gc, 0, 0);

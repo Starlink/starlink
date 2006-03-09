@@ -231,7 +231,8 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
  *        The Tcl interpreter that was used to create the canvas.
  *     const char *thecanvas
  *        The Tk name of the canvas (i.e. that returned by the
- *        "canvas" command).
+ *        "canvas" command). Note this can be changed later using the
+ *        astTk_SetCanvas function.
 
  *  Returned Value:
  *     A value of 0 is returned if an error occurs, and 1 is returned
@@ -242,12 +243,10 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     int i;         /* Loop variable */
 
     /*  Record the names of the canvas and its interpreter */
-    if ( thecanvas != NULL ) {
-        (void) strncpy( Canvas, thecanvas, WIDLEN - 1);
-    } else {
-        astError( AST__GRFER, "NULL canvas name not allowed\n");
+    if ( ! astTk_SetCanvas( thecanvas ) ) {
         return 0;
     }
+
     if ( theinterp != NULL ) {
         Interp = theinterp;
     } else {
@@ -288,6 +287,45 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     /*  Return here if all O.K. */
     return 1;
 }
+
+/*
+ *+
+ *  Name:
+ *     astTk_SetCanvas
+
+ *  Purpose:
+ *     Re-establishes the canvas used to draw the graphics.
+
+ *  Synopsis:
+ *     #include "grf_tkcan.h"
+ *     int astTk_SetCanvas( const char *thecanvas )
+
+ *  Description:
+ *      This routine sets the name of the canvas used to draw and 
+ *      display the graphics. It may be invoked after astTk_Init 
+ *      to change the canvas used to draw graphics.
+
+ *  Parameters:
+ *     const char *thecanvas
+ *        The Tk name of the canvas (i.e. that returned by the
+ *        "canvas" command).
+
+ *  Returned Value:
+ *     A value of 0 is returned if an error occurs, and 1 is returned
+ *     otherwise.
+
+ *-
+ */
+int astTk_SetCanvas( const char *thecanvas )
+{
+    if ( thecanvas == NULL ) {
+        astError( AST__GRFER, "NULL canvas name not allowed\n");
+        return 0;
+    }
+    (void) strncpy( Canvas, thecanvas, WIDLEN - 1 );
+    return 1;
+}
+
 
 void astTk_Tag( const char *newtag ) {
 /*
@@ -509,7 +547,7 @@ int astGLine( int n, const float *x, const float *y ) {
  *     The segments option allows the creation of the line graphics as
  *     part of the same canvas "rtd_segment" item (including lines
  *     from subsequent calls, until either the graphics configuration
- *     or canvas tag is changed, or a limit for the number of segmenrs
+ *     or canvas tag is changed, or a limit for the number of segments
  *     per item is exceeded). This is so that when global canvas
  *     orientation changes are necessary (such as when tracking image
  *     rescaling, flipping etc.) as many of the lines as possible are
