@@ -31,8 +31,8 @@
 *     method, the mean sky power is calculated and subtracted from
 *     each data point. In the second method, the (assumed linear)
 *     gradient in the sky emission is calculated and subtracted. The
-*     third method will offer a full 2-D plane-fitting procedure to
-*     allow for azimuthal variations as well.
+*     third method offers a full 2-D plane-fitting procedure to allow
+*     for azimuthal variations as well.
 
 *  Notes:
 *     At the moment there is a lot of duplicated code between this
@@ -48,6 +48,8 @@
 *        Initial test version
 *     2006-03-07 (AGG):
 *        Use GSL for linear regression
+*     2006-03-09 (AGG):
+*        Use GSL multifit for both 1-D and 2-D calculations
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -79,7 +81,6 @@
 #include <stdio.h>
 #include <string.h>
 /* GSL includes */
-#include <gsl/gsl_fit.h>
 #include <gsl/gsl_multifit.h>
 
 /* Starlink includes */
@@ -98,7 +99,7 @@
 #include "sc2da/sc2math.h"
 
 /* Simple default string for errRep */
-#define FUNC_NAME "smf_fit_skyplane"
+#define FUNC_NAME "smf_subtract_plane"
 
 void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
@@ -117,20 +118,25 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   double *xout = NULL;     /* X coordinates of output */
   double *yin = NULL;      /* Y coordinates of input */
   double *yout = NULL;     /* Y coordinates of output */
-  double *psky = NULL;     /* Sky power array */
-  double *weight = NULL;   /* Weights array */
   size_t *indices;
 
   size_t nframes = 0;      /* Number of frames */
   size_t npts;             /* Number of data points */
   size_t base;             /* ?? */
-  int z;                   /* ?? */
+  int z;                   /* Counter */
   double sky = 0;          /* Sky power to be subtracted */
   double sky0 = 0;         /* Sky power fit - intercept */
-  double dsky = 1;         /* Sky power fit - gradient */
-  double elev;             /* Elevation (radians) */
-  double cov[3];           /* Covariance matrix, cov00, cov01 & cov11 */
+  double dskyel = 1;       /* Sky power fit - elev gradient */
+  double dskyaz = 0;       /* Sky power fit - azimuth gradient */
   double chisq;            /* Chi-squared from the linear regression fit */
+
+  gsl_matrix *azel;        /* Matrix of input positions */
+  gsl_vector *psky;        /* Vector containing sky brightness */
+  gsl_vector *weight;      /* Weights for sky brightness vector */
+  gsl_vector *skyfit;      /* Solution vector */
+  gsl_matrix *mcov;        /* Covariance matrix */
+  gsl_multifit_linear_workspace *work; /* Workspace */
+  size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -225,39 +231,60 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 	}
       }
       sky /= npts;
-    } else if ( strncmp( fittype, "SLOP", 4 ) == 0 ) {
+    } else {
+      if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
+	ncoeff = 3;
+      } else if ( strncmp( fittype, "SLOP", 4 ) == 0 ) {
+	ncoeff = 2;
+      } else {
+	*status = SAI__ERROR;
+	msgSetc("F", fittype);
+	errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
+      }
+      /* Allocate workspace */
+      work = gsl_multifit_linear_alloc( npts, ncoeff );
+      azel = gsl_matrix_alloc( npts, ncoeff );
+      psky = gsl_vector_alloc( npts );
+      weight = gsl_vector_alloc( npts );
+      skyfit = gsl_vector_alloc( ncoeff );
+      mcov = gsl_matrix_alloc( ncoeff, ncoeff );
 
-      /* Fit straight line to elevation/sky brightness data.
-	 Note: in this calculation, the X array is the elevation, yout
-	 and the Y array is the sky brightness, psky.
-	 First, fill the psky and weights arrays */
+      /* Fill the matrix, vectors and weights arrays */
       for ( i=0; i<npts; i++) {
 	index = indices[i] + base;
+	gsl_matrix_set( azel, i, 0, 1.0 );
+	gsl_matrix_set( azel, i, 1, yout[indices[i]] );
+	if (ncoeff == 3)
+	  gsl_matrix_set( azel, i, 2, xout[indices[i]] );
+	gsl_vector_set( psky, i, indata[index] );
+	/* Set weights accordingly */
 	if (indata[index] != VAL__BADD) {
-	  psky[i] = indata[index];
-	  weight[i] = 1;
+	  gsl_vector_set( weight, i, 1.0);
 	} else {
-	  weight[i] = 0;
+	  gsl_vector_set( weight, i, 1.0);
 	}
       }
+      /* Carry out fit */
+      gsl_multifit_wlinear( azel, weight, psky, skyfit, mcov, &chisq, work);
 
-      /* Carry out linear regression fit */
-      gsl_fit_wlinear( yout, 1, weight, 1, psky, 1, npts, 
-		      &sky0, &dsky, &cov[0], &cov[1], &cov[2], &chisq );
-      /* Goodness-of-fit data for debugging... */
-      /* Todo... */
+      /* Retrieve solution */
+      sky0 = gsl_vector_get(skyfit, 0);
+      dskyel = gsl_vector_get(skyfit, 1);
+      if ( ncoeff == 3 ) {
+	dskyaz = gsl_vector_get(skyfit, 2);
+      } else {
+	dskyaz = 0.0;
+      }
 
-      /* Other debugging info: check sign of gradient... */
+      /* Free up workspace */
+      gsl_multifit_linear_free( work );
+      gsl_matrix_free( azel );
+      gsl_vector_free( psky );
+      gsl_vector_free( weight );
+      gsl_vector_free( skyfit );
+      gsl_matrix_free( mcov );
 
-    } else if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
-      *status = SAI__ERROR;
-      msgSetc("F", fittype);
-      errRep(FUNC_NAME, "Sorry, FIT type, ^F not supported yet", status);
-    } else {
-      *status = SAI__ERROR;
-      msgSetc("F", fittype);
-      errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
-    }
+    } 
 
     /* Subtract fit from timeslice */
     for (i=0; i < npts; i++ ) {
@@ -266,17 +293,11 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
 
 	/* Calculate sky value as a function of position if not using
 	   MEAN */
-	if ( strncmp( fittype, "SLOP", 4 ) == 0 ) {
-	  elev = yout[indices[i]];
-	  sky = sky0 + dsky * elev;
-	} else if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
-	  sky = 1;
+	if ( strncmp( fittype, "MEAN", 4 ) != 0 ) {
+	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
 	}
+	/* Subtract sky value; no need to update variance */
 	indata[index] -= sky;
-
-	if (vardata != NULL && vardata[index] != VAL__BADD) {
-	  vardata[index] *= 1;
-	}
       }
     }
 
