@@ -45,6 +45,8 @@
  *        Import token name
  *      3-MAR-2006 (TIMJ):
  *        Copy from emsSeti
+ *      8-MAR-2006 (TIMJ):
+ *        Use C99 formats
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -54,11 +56,23 @@
  */
 
 /* Include Statements: */
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
+#if HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
 #include <string.h>                    /* String handling library functions */
 #include "ems_par.h"                   /* ems_ public constant definitions */
 #include "ems_sys.h"                   /* ems_ private macro definitions */
 #include "ems.h"                       /* ems_ function prototypes */
 #include "ems1.h"                      /* ems_ internal function prototypes */
+
+#ifdef PRIi64
+#define EMSFMT PRIi64
+#else
+#define EMSFMT "lld"
+#endif
 
 /* Function Definitons: */
 void emsSeti64( const char *token, int64_t ivalue ){
@@ -67,10 +81,10 @@ void emsSeti64( const char *token, int64_t ivalue ){
    char str[EMS__SZTOK+1];
 
    TRACE("emsSeti64");
-   DEBUG("emsSeti64","emsSeti64: %lld", ivalue);
+   DEBUG("emsSeti64","emsSeti64: %" EMSFMT, ivalue);
 
 /*  Construct the message token string. */
-   sprintf( str, "%lld", ivalue );
+   sprintf( str, "%" EMSFMT, ivalue );
    ems1Stok( token, str );
  
    return;
