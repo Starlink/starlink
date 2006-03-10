@@ -57,7 +57,7 @@
       INTEGER J1ARR(11),J2ARR(11),NFLD
       CHARACTER NAME*10
 
-      INTEGER L,NUC,I,IOUT,N,J1,J2
+      INTEGER L,NUC,I,IOUT,N,J1,J2,IERR
       CHARACTER T,C
 
 
@@ -77,7 +77,8 @@
 *  Input and identify a data record
 
       DO WHILE (T.EQ.'*')
-         READ (LUI,'(A)',END=999) INBUF
+         READ (LUI,'(A)',IOSTAT=IERR) INBUF
+         IF ( IERR .NE. 0 ) GOTO 999
 
 *     Continue unless all blanks
          IF (INBUF.NE.' ') THEN
