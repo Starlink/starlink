@@ -7336,6 +7336,16 @@ each individual graphics database picture.  The shorter axis of each
 picture has length 1.0 in this \xref{Frame}{sun210}{Frame}.
 \end{description}
 
+When two Frames are joined together to form a compound Frame describing a
+co-ordinate space of higher dimensionality, the default Domain name for
+the compound Frame is formed from the individual Domain names, separated
+by a hyphen. For instance, the WCS FrameSet associated with a spectral
+cube will often contain a (compound) Frame with the Domain name
+``SKY-SPECTRUM''. Thus you should also avoid Domain names which contain 
+a hyphen, particularly if they also contain any of the reserved Domain
+names listed above.
+
+
 \subsection{\xlabel{se_scs}Specifying a Co-ordinate Frame\label{se:scs}}
 Several applications (\htmlref{WCSFRAME}{WCSFRAME},
 \htmlref{CURSOR}{CURSOR}, \htmlref{LISTMAKE}{LISTMAKE}, \emph{etc.}) have
