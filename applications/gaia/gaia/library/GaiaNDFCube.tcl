@@ -507,7 +507,7 @@ itcl::class gaia::GaiaNDFCube {
          set_step_axis_ 3
          set_display_plane_ $plane_
 
-         #  XXX map in all data for extra speed...
+         #  XXX map in all data for extra speed... When to release?
          #set ndfid [ndf::open "$ndfname_"]
          #lassign [ndf::map $ndfid] adr nel type
          #puts "adr=$adr, nel=$nel, type=$type"
@@ -764,11 +764,11 @@ itcl::class gaia::GaiaNDFCube {
       }
 
       # Local test...
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> \
-         [code $this display_spectrum_ localdrag %x %y]
+      #$itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> \
+      #   [code $this display_spectrum_ localdrag %x %y]
 
-      $itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
-         [code $this display_spectrum_ localstart %x %y]
+      #$itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
+      #   [code $this display_spectrum_ localstart %x %y]
 
       # Bindings when display over main image as well.
       $itk_option(-canvas) bind all <B1-Motion> \
@@ -842,7 +842,7 @@ itcl::class gaia::GaiaNDFCube {
             if { $itk_option(-autoscale) || $action == "localstart" } {
                $spectrum_ display "${ndfname_}${section}" $axis_ 1 $cx $cy
             } else {
-               $spectrum_ display "${ndfname_}${section}" $axis_ 0 $cx $cy
+               $spectrum_ display "${ndfname_}${section}" $axis_ 0
             }
          }
       }
