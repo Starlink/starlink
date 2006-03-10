@@ -148,41 +148,43 @@ itcl::class gaia::GaiaSpectralPlot {
    #  If autoscale
    #  is true, then the plot should be rescaled so that the spectrum
    #  fits. Otherwise the existing plot bounds are used.
-   public method display {ndfname axis autoscale {x 0} {y 0}} {
+   public method display {ndfname axis autoscale {x {}} {y {}}} {
 
       #  Open the NDF and map its data.
       set ndfid [ndf::open "$ndfname"]
       lassign [ndf::map $ndfid] adr nel type
 
-      if { $autoscale || $spectrum_ == {} } {
-         if { $spectrum_ == {} } {
+      #  Create the main spectral_plot.
+      if { $spectrum_ == {} } {
+         set autoscale 1
+         set spectrum_ [$itk_component(canvas) create spectral_plot \
+                           pointer $adr $nel $type \
+                           -x 25 -y 5 -width 650 -height 200 \
+                           -linecolour blue -linewidth 1 \
+                           -gridoptions "Grid=0,DrawTitle=0" \
+                           -showaxes 1]
+      }
 
-            #  Create the main spectral_plot, only done once.
-            set spectrum_ [$itk_component(canvas) create spectral_plot \
-                              pointer $adr $nel $type \
-                              -x 25 -y 5 -width 650 -height 200 \
-                              -linecolour blue -linewidth 1 \
-                              -gridoptions "Grid=0,DrawTitle=0" \
-                              -showaxes 1]
-         }
-         if { $itk_option(-canvas) != {} && $spectrum2_ == {} } {
-            set spectrum2_ [$itk_option(-canvas) create spectral_plot \
-                               pointer $adr $nel $type \
-                               -x 0 -y 0 -width 200 -height 200 \
-                               -linecolour blue -linewidth 1 \
-                               -showaxes 0 -anchor "center" \
-                               -tags $itk_option(-ast_tag) \
-                               -fixedscale 1]
-         }
+      #  Create the secondary plot, put this at the given x and y.
+      if { $itk_option(-canvas) != {} && $spectrum2_ == {} } {
+         set autoscale 1
+         set spectrum2_ [$itk_option(-canvas) create spectral_plot \
+                            pointer $adr $nel $type \
+                            -x $x -y $y -width 200 -height 200 \
+                            -linecolour blue -linewidth 1 \
+                            -showaxes 0 -anchor "center" \
+                            -tags $itk_option(-ast_tag) \
+                            -fixedscale 1]
+      }
 
-         #  Set the frameset used by the plot. This also causes a autoscale.
+      #  When autoscaling (or just created one of the plots), set the frameset
+      #  and the NDF data units.
+      if { $autoscale } {
          set frameset [ndf::getwcs $ndfid $axis]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          if { $spectrum2_ != {} } {
             $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
          }
-
-         #  Also set the NDF data units.
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits "[ndf::getc $ndfid units]" \
             -datalabel "[ndf::getc $ndfid label]"
@@ -191,10 +193,14 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Pass in the data.
       $itk_component(canvas) coords $spectrum_ pointer $adr $nel $type
       if { $spectrum2_ != {} } {
-         if { $x != 0 || $y != 0 } {
-            #$itk_option(-canvas) itemconfigure $spectrum2_ -x $x -y $y
-         }
          $itk_option(-canvas) coords $spectrum2_ pointer $adr $nel $type
+
+         #  Translate the secondary plot.
+         if { $x != {} && $y != {} } { 
+            set dx [expr $x - [$itk_option(-canvas) itemcget $spectrum2_ -x]]
+            set dy [expr $y - [$itk_option(-canvas) itemcget $spectrum2_ -y]]
+            $itk_option(-canvas) move $spectrum2_ $dx $dy
+         }
       }
 
       #  Finished with the NDF.
