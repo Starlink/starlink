@@ -25,8 +25,8 @@ TESTS = amsmastertest
 check_PROGRAMS = amsmaster amsslave
 amsmaster_SOURCES = amsmaster.c
 amsslave_SOURCES = amsslave.c
-amsmaster_LDADD = `$(srcdir)/ams_link_adam`
-amsslave_LDADD = `$(srcdir)/ams_link_adam`
+amsmaster_LDADD = libams_adam.la ../msp/libmsp.la ../sock/libsock.la ../atimer/libatimer.la `cnf_link_adam`
+amsslave_LDADD = libams_adam.la ../msp/libmsp.la ../sock/libsock.la ../atimer/libatimer.la `cnf_link_adam`
 amsmastertest: amsmaster amsslave
 	rm -f $@
 	echo "#! /bin/sh -" >$@
