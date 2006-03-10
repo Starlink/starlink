@@ -110,7 +110,7 @@ static Tk_CustomOption framesetOption = {
 static Tk_ConfigSpec configSpecs[] = {
 
     {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
-     "northwest", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
+     "nw", Tk_Offset(SPItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_DOUBLE, "-badvalue", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT},
@@ -331,8 +331,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     }
 
     /* Create the polyline we're going to use for drawing the spectrum, this
-     * is used directly for speed (avoid round-tripping to strings and
-     * back. XXX that wouldn't be true for Tcl_Obj lists? */
+     * is used directly for speed. */
     {
         Tcl_Obj *dummyObjs[4];
         Tcl_Obj *obj = Tcl_NewDoubleObj( 0.0 );
