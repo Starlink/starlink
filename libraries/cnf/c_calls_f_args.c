@@ -3,10 +3,17 @@
    given to it from C, thereby making sure that the Runtime library
    has been initialised. */
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "f77.h"
+
+#if HAVE_FC_MAIN
+void FC_MAIN ( void ) {}
+#endif
 
 F77_SUBROUTINE(ftestarg)(char *, int);
 
