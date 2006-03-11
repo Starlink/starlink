@@ -56,6 +56,9 @@
 #     2006 March 2 (MJC):
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
+#     2006 March 9 (MJC):
+#       Corrected the NDF name extraction when both the file extension and an
+#       NDF section are supplied.  Added a check for a degenerate third axis.
 #     {enter_further_changes_here}
 
 #  Required:
@@ -165,7 +168,6 @@ set infile =\
 
 switch ($?)
    case 0:
-      set infile = ${infile:r}
       breaksw
    case 1:
       goto cleanup
@@ -179,14 +181,25 @@ endsw
 set inname = `echo $infile | \
               awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
 
-# Check that the file exists
-if ( ! -e ${inname}.sdf ) then
+# Obtain the section, if present.
+set ndf_section = `echo $infile | \
+      awk '{if (index($0,"(") > 0) print substr($0,index($0,"(")); else print ""}'`
+
+# This must occur after stripping the section, as the section
+# specification must come after the file extension in file names 
+# presented to the NDF library (cf. SSN/20).  Also this step is
+# necessary when the version of KAPPA does not support the .sdf file
+# extension being supplied in the name.
+set infile = ${inname:r}
+
+# Check that the file exists.
+if ( ! -e ${infile}.sdf ) then
     
    Xdialog --no-cancel \
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${inname}.sdf does not exist." 0 0 
+	   --msgbox "${infile}.sdf does not exist." 0 0 
    switch ($?)
       case 0:
          exit
@@ -195,8 +208,7 @@ if ( ! -e ${inname}.sdf ) then
 endif
 
 # Find out the cube dimensions.
-
-ndftrace ${infile} >& /dev/null
+ndftrace ${infile}${ndf_section} >& /dev/null
 set ndim = `parget ndim ndftrace`
 set dims = `parget dims ndftrace`
 set lbnd = `parget lbound ndftrace`
@@ -207,7 +219,20 @@ if ( $ndim != 3 ) then
            --buttons-style text \
            --title "Error" \
            --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
-	   --msgbox "${infile} is not a datacube." 0 0 
+	   --msgbox "${infile}.sdf is not a datacube." 0 0 
+   switch ($?)
+      case 0:
+         exit  
+         breaksw
+   endsw
+
+# Check for a degenerate third axis.
+else if ( $dims[3] == 1 ) then
+   Xdialog --no-cancel \
+           --buttons-style text \
+           --title "Error" \
+           --icon /usr/share/doc/Xdialog-1.5.0/samples/warning.xpm \
+	   --msgbox "${infile}.sdf${ndf_section} is not a datacube." 0 0 
    switch ($?)
       case 0:
          exit  
@@ -229,7 +254,7 @@ Xdialog --left --buttons-style text \
 # ===========================
 
 # Collapse the white-light image.
-collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
 
 # Setup the graphics window.
 gdclear device=${plotdev}
