@@ -12,8 +12,8 @@
 #     C-shell script.
 
 #  Usage:
-#     velmap [-c number] [-f] [-i filename] [-o filename] [-p] [-r number] 
-#            [-s system] [-v] [-z/+z]
+#     velmap [-c number] [-ci index] [-f] [-i filename] [-o filename] [-p]
+#            [-r number] [-s system] [-v] [-z/+z]
 
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF and presents 
@@ -40,6 +40,13 @@
 #     -c number
 #       Number of contours in the white-light image.  Set to fewer
 #       than 1 means no contours are overlaid.  [15]
+#     -ci index
+#       The palette colour index of the contours.  It should be an
+#       integer in the range 0 to 15.  It is best to choose an index
+#       corresponding to white, or black or another dark colour to make
+#       the contours stand out from other elements of the plot.  0 is
+#       the background colour.  KAPPA:GDSTATE will list the current
+#       palette colours.  [0]
 #     -f
 #       Force the script to accept the first attempt to fit a Gaussian to
 #       the line. This is a dangerous option, if the fit is poor, or
@@ -77,7 +84,10 @@
 
 #  Notes:
 #     -  The velocity map display scales between the 2 and 98 percentiles.
-
+#     The map uses a false-colour spectrum-like colour table so that
+#     low-velocity regions appear in blue and high-velocity regions
+#     appear in red.
+#
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA and
 #     Figaro packages.
@@ -173,6 +183,9 @@
 #     2006 March 6 (MJC):
 #       Switched lower percentile for display from 15 to 2.  Allow -c
 #       to be zero to mean no contours overlaid.  
+#     2006 March 9 (MJC):
+#       Added -ci option.  Corrected the NDF name extraction when both
+#       the file extension and an NDF section are supplied.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -218,6 +231,7 @@ set component = 1
 set numcont = 15
 
 # Other defaults.
+set ci = 0
 set plotdev = "xwin"
 set fitgood = "yes"
 set velsys = "VOPT"
@@ -235,6 +249,12 @@ while ( $#args > 0 )
       else if ( $numcont > 100 ) then
          set numcont = 15
       endif
+      shift args
+      breaksw
+   case -ci:    # colour index of contours
+      shift args
+      set ci = `calc exp="nint($args[1])"`
+      if ( $ci < 0 || $ci > 15 ) set ci = 0
       shift args
       breaksw
    case -f:    # force fit?
@@ -301,20 +321,23 @@ unalias echo
 if ( ${gotinfile} == "FALSE" ) then
    echo -n "NDF input file: "
    set infile = $<
-   set infile = ${infile:r}
 endif
 
 # Obtain the name sans any section.
 set inname = `echo $infile | \
               awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
 
+# This must come after stripping the section, which comes after the
+# file extension.
+set infile = ${inname:r}
+
 echo " "
 echo "      Input NDF:"
-echo "        File: ${inname}.sdf"
+echo "        File: ${infile}.sdf"
 
 # Check that it exists.
-if ( ! -e ${inname}.sdf ) then
-   echo "VELMAP_ERR: ${inname}.sdf does not exist."
+if ( ! -e ${infile}.sdf ) then
+   echo "VELMAP_ERR: ${infile}.sdf does not exist."
    exit
 endif
 
@@ -981,7 +1004,7 @@ if ( ${plotspec} == "TRUE" ) then
       echo "        Contour: White-light image with equally spaced contours." 
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equa" \
               "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
-              "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
+              "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
    endif
    echo " "
 endif
@@ -1002,7 +1025,7 @@ if ( ${forcefit} == "FALSE" ) then
          echo "        Contour: White-light image with equally spaced contours." 
          contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
                  "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
-                 "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
+                 "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null 
       endif
    endif
    while ( ${loop_var} == 1 )
@@ -1390,7 +1413,7 @@ manual_rezoom:
             echo "        Contour: White-light image with equally spaced contours." 
             contour "ndf=${colfile} device=${plotdev} clear=no mode=equa"\
                     "keypos=[0.025,1] keystyle='Digits(2)=4,Size=1.2' "\
-                   "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null
+                   "axes=no ncont=${numcont} pens='colour=${ci}' margin=!" >& /dev/null
          endif
          echo " "
 
