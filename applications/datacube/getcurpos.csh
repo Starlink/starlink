@@ -61,6 +61,8 @@
 #  History:
 #     2006 March 2 (MJC):
 #       Original version.
+#     2006 March 9 (MJC):
+#       Validate colour index.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -97,7 +99,8 @@ while ( $#args > 0 )
       breaksw
    case -ci:    # colour index of cross or line
       shift args
-      set ci = $args[1]
+      set ci = `calc exp="nint($args[1])"`
+      if ( $ci < 0 || $ci > 15 ) set ci = 2
       shift args
       breaksw
    case -d:    # graphics device
