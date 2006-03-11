@@ -48,7 +48,7 @@
 *        in pixel co-ordinates.
 *
 *        - "FIRST" --- The compression boxes are placed so that the
-*        first pixel in the input NDF (for instance, the bottom left
+*        first pixel in the input NDF (for instance, the bottom-left
 *        pixel in a 2-dimensional image) corresponds to the first pixel
 *        in a compression box. This can result in the pixel origin being
 *        shifted by up to one compression box in the output image. Thus,
@@ -59,7 +59,7 @@
 *        width of an image to produce a 1-dimensional array).
 *
 *        - "LAST" --- The compression boxes are placed so that the
-*        last pixel in the input NDF (for instance, the top right
+*        last pixel in the input NDF (for instance, the top-right
 *        pixel in a 2-dimensional image) corresponds to the last pixel
 *        in a compression box. See the "FIRST" option above for further 
 *        comments.
@@ -214,11 +214,12 @@
 *        resampling tasks.
 *     9-DEC-1999 (DSB):
 *        Corrected propagation of WCS (an erroneous shift was previously
-*        introduced if the lower bounds of the input NDF were not (1,1) ).
+*        introduced if the lower bounds of the input NDF were not 
+*        (1,1)).
 *     25-APR-2000 (DSB):
 *        Added parameters TRIM and ALIGN.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes}
 
 *  Bugs:
