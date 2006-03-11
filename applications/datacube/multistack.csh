@@ -70,6 +70,10 @@
 #     2006 March 2 (MJC):
 #       Allow for NDF sections to be supplied with the input filename.
 #       Use a new script to obtain cursor positions.
+#     2006 March 9 (MJC):
+#       Corrected the NDF name extraction when both the file extension and 
+#       an NDF section are supplied; this is via the new checkndf script that
+#       also checks for a degenerate third axis.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -149,47 +153,10 @@ unalias echo
 # Obtain details of the input cube.
 # =================================
 
-# Get the input filename.
-if ( ${gotinfile} == "FALSE" ) then
-   echo -n "NDF input file: "
-   set infile = $<
-   set infile = ${infile:r}
-endif
-
-# Obtain the name sans any section.
-set inname = `echo $infile | \
-              awk '{if (index($0,"(") > 0) print substr($0,1,index($0,"(")-1); else print $0}'`
-
-echo " "
-echo "      Input NDF:"
-echo "        File: ${inname}.sdf"
-
-# Check that it exists.
-if ( ! -e ${inname}.sdf ) then
-   echo "MULTISTACKER_ERR: ${inname}.sdf does not exist."
-   exit
-endif
-
-# Check that it exists.
-ndftrace ${infile} >& /dev/null
-set ndim = `parget ndim ndftrace`
-set dims = `parget dims ndftrace`
-set lbnd = `parget lbound ndftrace`
-set ubnd = `parget ubound ndftrace`
-
-if ( $ndim != 3 ) then
-   echo "MULTISTACKER_ERR: ${infile} is not a datacube."
-   exit
-endif
-
-set bnd = "${lbnd[1]}:${ubnd[1]}, ${lbnd[2]}:${ubnd[2]}, ${lbnd[3]}:${ubnd[3]}"
-@ pixnum = $dims[1] * $dims[2] * $dims[3]
-
-echo "      Shape:"
-echo "        No. of dimensions: ${ndim}"
-echo "        Dimension size(s): ${dims[1]} x ${dims[2]} x ${dims[3]}"
-echo "        Pixel bounds     : ${bnd}"
-echo "        Total pixels     : $pixnum"
+# Obtain the NDF if it is not supplied on the command line.  Validate that
+# the NDF exists and is a cube.  Obtain $infile, $ndf_section, and $dims.
+source ${DATACUBE_DIR}/checkndf.csh -s multistack
+if ( $status == 1 ) exit
 
 # Show the white-light image.
 # ===========================
@@ -197,7 +164,7 @@ echo "        Total pixels     : $pixnum"
 # Collapse white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
-collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
+collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
 
 # Setup the plot device.
 set plotdev = "xwin"
