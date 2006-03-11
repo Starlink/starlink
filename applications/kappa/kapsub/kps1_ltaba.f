@@ -13,11 +13,11 @@
 *     CALL KPS1_LTABA( NINTS, FULL, IMDSET, PENS, STATUS )
 
 *  Description:
-*     This routine is a service routine for LUTABLE. It performs
-*     all the work of LUTABLE, using the supplied work arrays in place of
+*     This routine is a service routine for LUTABLE.  It performs all
+*     the work of LUTABLE, using the supplied work arrays in place of
 *     the fixed size arrays which used to be used. Most of the LUTABLE 
-*     parameter names are hard-wired into this routine. See the prologue
-*     in lutable.f for parameter details.
+*     parameter names are hard-wired into this routine.  See the
+*     prologue in lutable.f for parameter details.
 
 *  Arguments:
 *     NINTS = INTEGER (Given)
@@ -25,11 +25,12 @@
 *        lowest entry has index zero (the background colour), and the
 *        highest has index NINTS - 1.
 *     FULL = LOGICAL (Given)
-*        Full colour table is to be saved?
+*        Full colour table is to be used?
 *     IMDSET( 3, 0:NINTS - 1 ) = REAL (Returned)
-*        Lookup table that will be used for the image-display colour table
+*        Lookup table that will be used for the image-display colour
+*        table.
 *     PENS( 0:NINTS - 1 ) = INTEGER (Returned)
-*        Entries in the colour table assigned to each pen
+*        Entries in the colour table assigned to each pen.
 *     STATUS = INTEGER (Given)
 *        Global status value.
 
@@ -41,14 +42,16 @@
 
 *  History:
 *     10-OCT-2001 (DSB):
-*        Original version, extracted from lutable.f. Also added check that
-*        greyscale colour tables do not have a hint of colour about them due 
-*        to different resolutions on the three primarty colours.
+*        Original version, extracted from lutable.f.  Also added check 
+*        that greyscale colour tables do not have a hint of colour about 
+*        them due to different resolutions on the three primary colours.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx calls.
 *        Also remove fourth workspace for the revised KPS1_HEQPx API.
+*      2006 March 9 (MJC):
+*        Correct colour-index offset when the palette is being used.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,15 +121,15 @@
                                  ! standard colour-set block
       DOUBLE PRECISION DMAXV     ! Minimum value in the array
       DOUBLE PRECISION DMINV     ! Maximum value in the array
-      CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after processing (not
-                                 ! used)
+      CHARACTER DTYPE * ( NDF__SZFTP ) ! Type of the image after 
+                                 ! processing (not used)
       INTEGER EL                 ! Number of elements in the input array
       LOGICAL EXL1ST             ! First time to get an external LUT?
       LOGICAL FIRST              ! First time through the loop?
       REAL FROB                  ! Fraction of standard coloured blocks
                                  ! that will have an extra index
-      REAL PGPCOL( NPRICL )      ! Used to transfer the colour of one pen
-                                 ! to the image-display colour table
+      REAL PGPCOL( NPRICL )      ! Used to transfer the colour of one 
+                                 ! pen to the image-display colour table
       INTEGER HIST( NUMBIN )     ! Array containing histogram for
                                  ! percentiles
       INTEGER I                  ! General variable
@@ -171,8 +174,8 @@
       LOGICAL REFOBJ             ! Is there a reference object?
       REAL RMAXV                 ! Minimum value in the array
       REAL RMINV                 ! Maximum value in the array
-      REAL RNINTS                ! Scaling factor to convert lookup table
-                                 ! to range 0 to 1
+      REAL RNINTS                ! Scaling factor to convert lookup 
+                                 ! table to range 0 to 1
       INTEGER SDIM( NDIM )       ! Indices of significant axes
       REAL SHADE                 ! Type of shading emphasis
       INTEGER SLBND( NDIM )      ! Lower bounds of significant axes
@@ -218,7 +221,7 @@
       IF( FULL ) THEN
          CIOFF = 0
       ELSE
-         CIOFF = CTM__RSVPN
+         CIOFF = CTM__RSVPN - 1
       END IF
 
 *  Find the available number of colour indices and a useful expression
@@ -491,7 +494,7 @@
 *  Call a routine appropriate for the data type.
             CALL ERR_MARK
             IF( ITYPE .EQ. '_REAL' ) THEN
-               CALL KPS1_HEQPR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPS1_HEQPR( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
@@ -500,7 +503,7 @@
      :                          %VAL( CNF_PVAL( WPNTR3 ) ), STATUS )
 
             ELSE IF( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_HEQPD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
+               CALL KPS1_HEQPD( BAD, EL, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                          SHADE,
      :                          REAL( PERVAL( 2 ) ),
      :                          REAL( PERVAL( 1 ) ), ANINTS, PENS,
@@ -772,12 +775,12 @@
                 END DO
 
 *  If we want a greyscale (positive or negative), we now check that the
-*  pens actually in use by PGPLOT are all grey. They may not be since 
-*  some devices have finer resolution on some colours. For example, a 16
-*  bit TrueColour X window will have 5 bits for two colours and 6 bits
-*  for the other. The 6-bit colour can be set twice as accurately as the 
-*  5-bit colours, resulting in the "grey" scale having a tendancy to
-*  be shaded in favour of the 6-bit colour.
+*  pens actually in use by PGPLOT are all grey.  They may not be since 
+*  some devices have finer resolution on some colours.  For example, a
+*  16-bit TrueColour X window will have 5 bits for two colours and 6 
+*  bits for the other.  The 6-bit colour can be set twice as accurately
+*  as the 5-bit colours, resulting in the "grey" scale having a tendency
+*  to be shaded in favour of the 6-bit colour.
                IF( LUT(1:2) .EQ. 'GR' .OR. LUT(1:2) .EQ. 'NE' ) THEN
 
 *  Check each pgplot pen.
