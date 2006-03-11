@@ -2613,7 +2613,7 @@ package kappa {
             vpath DEFAULT
             ppath DEFAULT
             default TRUE
-            prompt {Modify mappings to accomodate new attribute value?}
+            prompt {Modify mappings to accommodate new attribute value?}
             helpkey *
          }
 
