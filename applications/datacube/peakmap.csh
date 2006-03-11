@@ -57,6 +57,10 @@
 #       The program will not prompt for a zoom before requesting the region
 #       of interest.  [FALSE]
 #
+#  Notes:
+#     -  The velocity map display scales between the 15 and 98 percentiles.
+#     The map uses a false-colour lookup table. 
+#
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA and 
 #     FIGARO packages.
