@@ -10,7 +10,8 @@
 #     C-shell script.
 #
 #  Usage:
-#     getcurpos -a axes [-ci index] [-d device] [-f frame] [-g]
+#     source ${DATACUBE_DIR}/getcurpos.csh -a axes [-ci index] 
+#            [-d device] [-f frame] [-g]
 #
 #  Description:
 #     This shell script activates the cursor upon a selected graphics 
@@ -39,12 +40,16 @@
 #       If present, this indicates that the returned value(s) should be
 #       in pixel grid co-ordinates.  This overrides option -f.
 #
-#  Returned Variables:
-#     $xpos  -- the X co-ordinate for "XY" and "X" provided -g is not set.
-#     $ypos  -- the Y co-ordinate for "XY" and "Y" provided -g is not set.
-#     $xgrid -- the X co-ordinate for "XY" and "X" when -g is set.
-#     $ygrid -- the Y co-ordinate for "XY" and "Y" when -g is set.
-#
+#  Shell Variables:
+#     $xgrid = INTEGER (Returned)
+#        The X grid index for "XY" and "X" when -g is set.
+#     $xpos = REAL (Returned)
+#        The X co-ordinate for "XY" and "X" provided -g is not set.
+#     $ygrid = INTEGER (Returned)
+#        The Y grid index for "XY" and "Y" when -g is set.
+#     $ypos = REAL (Returned)
+#        The Y co-ordinate for "XY" and "Y" provided -g is not set.
+
 #  Notes:
 #      -  It is assumed that the co-ordinate Frame is stored in the AGI
 #      database.  Normally the current Frame is used.
@@ -62,7 +67,10 @@
 #     2006 March 2 (MJC):
 #       Original version.
 #     2006 March 9 (MJC):
-#       Validate colour index.
+#       Validate colour index.  Renamed "Returned Variables" to "Shell
+#       Variables" and reformatted to give access and data type. 
+#       Correct the Usage.  Use internal variable names (gcp_ prefix) to
+#       avoid potential classhes with variables from calling script.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -79,43 +87,43 @@ onintr cleanup
 set user = `whoami`
 set tmpdir = "/tmp"
 if ( ! -e ${tmpdir}/${user} ) mkdir ${tmpdir}/${user} >& /dev/null
-set curfile = "${tmpdir}/${user}/getcurpos.tmp"
-touch $curfile
+set gcp_curfile = "${tmpdir}/${user}/getcurpos.tmp"
+touch $gcp_curfile
 
 # Options.
-set ci = 2
-set dir = "X"
-set grid = 0
-set coframe = ""
-set graphdev = "xwin"
+set gcp_ci = 2
+set gcp_dir = "X"
+set gcp_grid = 0
+set gcp_coframe = ""
+set gcp_graphdev = "xwin"
 
 set args = ($argv[1-])
 while ( $#args > 0 )
    switch ($args[1])
    case -a:    # co-ordinate axis/axes required
       shift args
-      set dir = $args[1]
+      set gcp_dir = $args[1]
       shift args
       breaksw
    case -ci:    # colour index of cross or line
       shift args
-      set ci = `calc exp="nint($args[1])"`
-      if ( $ci < 0 || $ci > 15 ) set ci = 2
+      set gcp_ci = `calc exp="nint($args[1])"`
+      if ( $gcp_ci < 0 || $gcp_ci > 15 ) set gcp_ci = 2
       shift args
       breaksw
    case -d:    # graphics device
       shift args
-      set graphdev = $args[1]
+      set gcp_graphdev = $args[1]
       shift args
       breaksw
    case -f:    # co-ordinate frame
       shift args
-      set coframe = $args[1]
+      set gcp_coframe = $args[1]
       shift args
       breaksw
    case -g:    # return grid indices
       shift args
-      set grid = 1
+      set gcp_grid = 1
       breaksw
    case *:     # rubbish disposal
       shift args
@@ -124,48 +132,48 @@ while ( $#args > 0 )
 end
 
 # Validate parameters.
-set dir = `echo $dir | awk '{print toupper($0)}'`
-if ( $dir != "X" &&  $dir != "XY" && $dir != "Y" ) then
-   set dir = "X"
+set gcp_dir = `echo $gcp_dir | awk '{print toupper($0)}'`
+if ( $gcp_dir != "X" &&  $gcp_dir != "XY" && $gcp_dir != "Y" ) then
+   set gcp_dir = "X"
 endif
 
-set coframe = `echo $coframe | awk '{print toupper($0)}'`
-if ( $grid == 1 ) set coframe = "PIXEL"
+set gcp_coframe = `echo $gcp_coframe | awk '{print toupper($0)}'`
+if ( $gcp_grid == 1 ) set gcp_coframe = "PIXEL"
 
-if ( $graphdev == "" ) set graphdev = "xwin"
+if ( $gcp_graphdev == "" ) set gcp_graphdev = "xwin"
 
 # Obtain a position using the cursor.
-if ( $dir == "XY" ) then
-   if ( "$coframe" == "" ) then
-      cursor showpixel=true style="Colour(marker)=${ci}" plot=mark \
-             maxpos=1 marker=2 device=${graphdev} >> ${curfile}
+if ( $gcp_dir == "XY" ) then
+   if ( "$gcp_coframe" == "" ) then
+      cursor showpixel=true style="Colour(marker)=${gcp_ci}" plot=mark \
+             maxpos=1 marker=2 device=${gcp_graphdev} >> ${gcp_curfile}
    else
-      cursor showpixel=true style="Colour(marker)=${ci}" plot=mark \
-             maxpos=1 marker=2 device=${graphdev} frame=${coframe} >> ${curfile}
+      cursor showpixel=true style="Colour(marker)=${gcp_ci}" plot=mark \
+             maxpos=1 marker=2 device=${gcp_graphdev} frame=${gcp_coframe} >> ${gcp_curfile}
    endif
 
-else if ( $dir == "X" ) then
-   if ( "$coframe" == "" ) then
-      cursor showpixel=true style="Colour(curves)=${ci}" plot=vline \
-             maxpos=1 device=${graphdev} >> ${curfile}
+else if ( $gcp_dir == "X" ) then
+   if ( "$gcp_coframe" == "" ) then
+      cursor showpixel=true style="Colour(curves)=${gcp_ci}" plot=vline \
+             maxpos=1 device=${gcp_graphdev} >> ${gcp_curfile}
    else
-      cursor showpixel=true style="Colour(marker)=${ci}" plot=vline \
-             maxpos=1 device=${graphdev} frame=${coframe} >> ${curfile}
+      cursor showpixel=true style="Colour(marker)=${gcp_ci}" plot=vline \
+             maxpos=1 device=${gcp_graphdev} frame=${gcp_coframe} >> ${gcp_curfile}
    endif
 
 else
-   if ( "$coframe" == "" ) then
-      cursor showpixel=true style="Colour(curves)=${ci}" plot=hline \
-             maxpos=1 device=${graphdev} >> ${curfile}
+   if ( "$gcp_coframe" == "" ) then
+      cursor showpixel=true style="Colour(curves)=${gcp_ci}" plot=hline \
+             maxpos=1 device=${gcp_graphdev} >> ${gcp_curfile}
    else
-      cursor showpixel=true style="Colour(marker)=${ci}" plot=hline \
-             maxpos=1 device=${graphdev} frame=${coframe} >> ${curfile}
+      cursor showpixel=true style="Colour(marker)=${gcp_ci}" plot=hline \
+             maxpos=1 device=${gcp_graphdev} frame=${gcp_coframe} >> ${gcp_curfile}
    endif
 endif
 
 # Wait for CURSOR output then get X-Y co-ordinates from 
 # the temporary file created by KAPPA:CURSOR.
-while ( ! -e ${curfile} ) 
+while ( ! -e ${gcp_curfile} ) 
    sleep 1
 end
 
@@ -174,20 +182,20 @@ set pos = `parget lastpos cursor | awk '{split($0,a," ");print a[1], a[2]}'`
 
 # Get the pixel co-ordinates and convert to grid indices.  The
 # exterior NINT replaces the bug/feature -0 result with the desired 0.
-if ( $grid == 1 ) then
+if ( $gcp_grid == 1 ) then
    set xgrid = `calc exp="nint(nint($pos[1]+0.5))" prec=_REAL`
    set ygrid = `calc exp="nint(nint($pos[2]+0.5))" prec=_REAL`
 
-else if ( $dir == "XY" ) then
+else if ( $gcp_dir == "XY" ) then
    set xpos = $pos[1]
    set ypos = $pos[2]
-else if ( $dir == "X" ) then
+else if ( $gcp_dir == "X" ) then
    set xpos = $pos[1]
-else if ( $dir == "Y" ) then
+else if ( $gcp_dir == "Y" ) then
    set ypos = $pos[2]
 endif
 
 # Clean up the cursor temporary file.
-rm -f ${curfile} >& /dev/null
+rm -f ${gcp_curfile} >& /dev/null
 
 exit
