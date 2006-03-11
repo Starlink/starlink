@@ -60,6 +60,8 @@
 #        Add wcsadd definition.
 #     2006 March 2 (MJC):
 #        Add clinplot, compave, gridspec, and velmoment definitions.
+#     2006 March 9 (MJC):
+#        Add lutspec definition.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -112,8 +114,9 @@ alias cursor          ${KAPPA_DIR}/cursor
 alias display         ${KAPPA_DIR}/display 
 alias gdclear         ${KAPPA_DIR}/gdclear
 alias linplot         ${KAPPA_DIR}/linplot 
-alias lutgrey         ${KAPPA_DIR}/lutable mapping=linear coltab=grey
 alias lutcol          ${KAPPA_DIR}/lutable mapping=linear coltab=colour
+alias lutgrey         ${KAPPA_DIR}/lutable mapping=linear coltab=grey
+alias lutspec         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut
 alias ndfcopy         ${KAPPA_DIR}/ndfcopy
 alias ndftrace        ${KAPPA_DIR}/ndftrace
 alias paldef          ${KAPPA_DIR}/paldef
