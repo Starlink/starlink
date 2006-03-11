@@ -187,6 +187,8 @@
 #       Added -ci option.  Corrected the NDF name extraction when both
 #       the file extension and an NDF section are supplied; this is via the
 #       new checkndf script that also checks for a degenerate third axis.
+#     2006 March 10 (MJC):
+#       Switched from "colour" to spectrum colour table.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -957,7 +959,7 @@ echo " "
 
 # Check to see if we need to plot the output velocity map.
 if ( ${plotspec} == "TRUE" ) then
-   lutcol device=${plotdev}
+   lutspec device=${plotdev}
    echo "      Plotting:"
    echo "        Display: Velocity map using percentile scaling." 
    display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
@@ -978,7 +980,7 @@ endif
 set loop_var = 1
 if ( ${forcefit} == "FALSE" ) then
    if ( ${plotspec} == "FALSE" ) then
-      lutcol device=${plotdev}
+      lutspec device=${plotdev}
       echo "      Plotting:"
       echo "        Display: Velocity map using percentile scaling." 
       display "${outfile} device=${plotdev} mode=per percentiles=[2,98]"\
@@ -1365,7 +1367,7 @@ manual_rezoom:
 
 # Plot the new velocity map.
 # ==========================
-         lutcol device=${plotdev}
+         lutspec device=${plotdev}
          echo " "
          echo "      Plotting:"
          echo "        Display: Velocity map using percentile scaling." 
