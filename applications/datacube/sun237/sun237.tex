@@ -17,7 +17,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {237.2}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2005 October 20}
+\newcommand{\stardocdate}      {2006 March 10}
 \newcommand{\stardoctitle}     {DATACUBE --- An IFS datacube manipulation package}
 \newcommand{\stardocversion}   {version 1.1}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -176,6 +176,29 @@
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
+
+% an environment for references (for the SST sstdiytopic command).
+\newenvironment{refs}{\vspace{-4ex} % normally 3ex
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                                 }{\end{list}}
+
+
+% Shorthands for hypertext links.
+% -------------------------------
+
+\newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
+\newcommand{\Figaroref}{{\FIGARO}{sun86}{}}
+\newcommand{\KAPPA}{{\footnotesize KAPPA}\normalsize}
+\newcommand{\KAPPAref}{\xref{\KAPPA}{sun95}{}}
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -704,8 +727,7 @@ co-operation and contributions.
    Compares multiple extracted spectra from a three-dimensional IFU NDF
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{}, and \xref{FIGARO}{sun86}{} packages.  It
+      This shell script
       reads a three-dimensional IFU NDF as input and presents you with
       a white light image of the cube.  You can then select an $X$-$Y$
       position using the cursor.  The script will extract and display
@@ -717,6 +739,98 @@ co-operation and contributions.
    \sstusage{
       compare
    }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file should
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      and \FIGAROref\ packages.
+   }
+}
+\newpage
+\sstroutine{
+   gridspec
+}{
+   Averages groups of neighbouring spectra of a three-dimensional IFU
+   NDF and then plots these averaged spectra in a grid
+}{
+   \sstdescription{
+      This shell script reads a three-dimensional IFU NDF as input and
+      if you request zooming the script presents you with a white-light
+      image of the cube.   You can then select the lower and upper
+      spatial limits to plot using the cursor.  You can instead supply
+      an NDF section with the filename to define both spatial and
+      spectral limits to plot.
+
+      The script averages spectra in the chosen region by specified
+      compression factors in the spatial domain.  It then displays the
+      average spectra in a grid, where the exterior axes indicate the
+      spatial co-ordinates of the averaged spectra, and the interior axes
+      the data values against spectra co-ordinates.
+   }
+   \sstusage{
+      gridspec [-b string] [-i filename] [-z/$+$z]
+   }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+
+         \sstitem
+         {\bf{\tt{-b}}} {\em string}\\
+           The number of spectra to block average along the $X$ and $Y$ axes
+           respectively.  This should be a comma-separated list or a single
+           number; the latter case applies the same compression factor to
+           both spatial axes.  The numbers must be positive integers.
+           {\tt [2]}
+
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file should
+           be a three-dimensional NDF.  By default the script will prompt for the
+           input file.
+
+         \sstitem
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt to select a region to zoom
+           before prompting for the region of interest.  {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
+           The program will not prompt for a zoom before requesting the region
+           of interest. {\tt [FALSE]}
+      }
+   }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The compression is trimmed, so that only compression-factor
+         multiples of original pixels are included in the plot. 
+
+         \sstitem
+         A feature of the compression is that you may obtain one fewer
+         pixel in the graph than expected.  Try slightly enlarging or
+         shifting the grid region to circumvent this.
+
+         \sstitem
+         The spatial averaging is aligned to obtain the expected number
+         of pixels irrespective of the pixel origin of the input cube.
+         Note that this may not be suitable if you wish to preserve alignment
+         with another compressed dataset.  See
+         \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} parameter ALIGN for more 
+         details.
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -726,8 +840,7 @@ co-operation and contributions.
    plots these averaged spectra in a stack
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      This shell script 
       reads a three-dimensional IFU NDF as input and presents you with
       a white-light image of the cube.  You can then select a number
       of $X$-$Y$ positions using the cursor.  The script will then
@@ -770,6 +883,9 @@ co-operation and contributions.
            of interest. {\tt [FALSE]}
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -778,8 +894,7 @@ co-operation and contributions.
    Displays multiple passband images from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      This shell script 
       reads a three-dimensional IFU NDF as input and presents you with
       a white-light image of the cube.  You can then select and
       $X$-$Y$ position using the cursor.  The script will extract and
@@ -815,6 +930,9 @@ co-operation and contributions.
            of interest. {\tt [FALSE]}
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -823,8 +941,7 @@ co-operation and contributions.
    Builds a map of emission-line strength from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      This shell script 
       reads a three-dimensional IFU NDF as input and presents the user
       with a white-light image of the cube.  You can then select and
       $X$-$Y$ position using the cursor.  The script will extract and
@@ -837,10 +954,10 @@ co-operation and contributions.
       within the cube, building a two-dimensional NDF image of the
       strength of the line.
 
-      If you do not force the fit to be considered ``good'' by using the -f
-      command-line option, the script will offer the opportunity to manually
-      refit the spectral feature for individual pixels, such as those that
-      were unsuccessfully fitted by the automatic procedure.
+      If you do not force the fit to be considered ``good'' by using the 
+      {\tt -f} command-line option, the script will offer the opportunity to
+      manually refit the spectral feature for individual pixels, such as 
+      those that were unsuccessfully fitted by the automatic procedure.
    }
    \sstusage{
       peakmap [-f] [-i filename] [-o filename] [-c number] [-p] [-v] [-z/+z]
@@ -890,6 +1007,18 @@ co-operation and contributions.
            of interest. {\tt[ FALSE]}
       }
    }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The velocity map display scales between the 15 and 98 percentiles.
+         The map uses a false-colour lookup table. 
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      and \FIGAROref\ packages.
+   }
 }
 \newpage
 \sstroutine{
@@ -898,8 +1027,7 @@ co-operation and contributions.
    Extracts a one-dimensional spectrum from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      This shell script reads a three-dimensional IFU
       NDF datacube as input, presents you with a white-light image of
       the cube and allows you to select an $X$-$Y$ position using the
       cursor.  It then extracts (and optionally displays) the spectrum
@@ -928,6 +1056,9 @@ co-operation and contributions.
            as well as saving it to an NDF file. {\tt [FALSE]}
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -937,8 +1068,7 @@ co-operation and contributions.
    IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      This shell script reads a three-dimensional IFU
       NDF as input and allows you to extract a specific spectral range
       from the cube to form a white-light image.
    }
@@ -974,6 +1104,9 @@ co-operation and contributions.
            Upper spectral-axis bound of the region of interest.  
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -982,8 +1115,7 @@ co-operation and contributions.
    Plots a stack of spectra extracted from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
+      This shell script 
       reads a three-dimensional IFU NDF datacube as input and presents
       you with a white-light image of the cube.  You can then select a
       number of $X$-$Y$ position using the cursor.  The script will
@@ -1021,6 +1153,9 @@ co-operation and contributions.
            of interest. {\tt [FALSE]}
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -1030,8 +1165,7 @@ co-operation and contributions.
    in the spectral direction using \xref{KAPPA:DISPLAY}{sun95}{DISPLAY} to display the output.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} package.  It reads a three-dimensional IFU
+      This shell script reads a three-dimensional IFU
       NDF as input and allows you to step through the datacube in the
       spectral direction in slices. The output goes to files and
       (optionally) to the screen.
@@ -1067,6 +1201,9 @@ co-operation and contributions.
            Upper spectral-axis bound of the region of interest.  
       }
    }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 \newpage
 \sstroutine{
@@ -1075,28 +1212,32 @@ co-operation and contributions.
    Builds a velocity map of an emission line from a three-dimensional IFU NDF.
 }{
    \sstdescription{
-      This shell script sits onto of a collection of A-tasks from the
-      \xref{KAPPA}{sun95}{} and \xref{FIGARO}{sun86}{} packages.  It
-      reads a three-dimensional IFU NDF as input and presents you with
-      a white-light image of the cube.  You can then select and $X$-$Y$
-      position using the cursor.  The script will extract and display
-      this spectrum.  You will then be prompted to specify various
-      fitting parameters, such as the peak position, using the cursor.
-      The script will then attempt to fit the emission line.  The fit
-      will be displayed and you are consulted regarding the goodness
-      of fit.  If you consider the fit good enough, the script will
-      attempt to perform similar fits to all spectra within the cube,
-      building a two-dimensional NDF image of the velocity of the
-      line.
+      This shell script reads a three-dimensional IFU NDF and presents 
+      you with a white-light image of the cube.  You can then select an
+      X-Y position using the cursor.  The script will extract and display
+      this spectrum.  You will then be prompted to specify various fitting 
+      parameters, such as the peak position, using the cursor.  The script 
+      will then attempt to fit the emission line.  The fit will be 
+      displayed and you are consulted regarding the goodness of fit.  If
+      you consider the fit good enough, the script will attempt to perform
+      similar fits to all spectra within the cube, building a two-dimensional
+      NDF image of the velocity of the line.  You may view this image
+      drawn with a key (option {\tt -d}), and overlay a contour plot of the 
+      white-light image (option {\tt -c}).
 
-      If you do not force the fit to be considered ``good'' by using the -f
+      If you do not force the fit to be considered `good' by using the {\tt -f}
       command-line option, the script will offer the opportunity to manually
       refit the spectral feature for individual pixels, such as those that
-      were not fitted by the automatic procedure.
+      were not fitted by the automatic procedure.  In this case the
+      velocity map will be plotted and replotted after the new fit, 
+      regardless of the {\tt -p} option.
    }
    \sstusage{
-      velmap [-c number] [-f] [-i filename] [-o filename] [-p] [-r number] 
-             \goodbreak [-s system] [-v] [-z/+z]
+      \begin{refs}
+      \item
+      velmap [-c number] [-ci index] [-f] [-i filename] [-o filename] [-p]
+             [-r number] [-s system] [-v] [-z/+z]
+      \end{refs}
    }
    \sstdiytopic{
       Command-line Arguments
@@ -1104,7 +1245,17 @@ co-operation and contributions.
       \ssthitemlist{
          \sstitem
          {\bf{\tt{-c}}} {\em number}\\
-           Number of contours in the white-light image.  {\tt [15]}
+           Number of contours in the white-light image.  Set to fewer
+           than 1 means no contours are overlaid.  {\tt [15]}
+
+         \sstitem
+         {\bf{\tt{-ci}}} {\em index}\\
+           The palette colour index of the contours.  It should be an
+           integer in the range {\tt 0} to {\tt 15}.  It is best to choose 
+           an index corresponding to white, or black or another dark colour
+           to make the contours stand out from other elements of the plot.
+           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE} 
+           will list the current palette colours.  {\tt [0]}
 
          \sstitem
          {\bf{\tt{-f}}}\\
@@ -1160,10 +1311,203 @@ co-operation and contributions.
            of interest. {\tt [FALSE]}
       }
    }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The velocity map display scales between the 2 and 98 percentiles.
+         The map uses a false-colour spectrum-like colour table so that
+         low-velocity regions appear in blue and high-velocity regions
+         appear in red.
+
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ 
+      and \FIGAROref\ packages.
+   }
+}
+\newpage
+\sstroutine{
+   velmoment
+}{
+   Builds a velocity map from a three-dimensional IFU NDF from the
+   intensity-weighted spectral co-ordinates
+}{
+   \sstdescription{
+      This shell script processes a three-dimensional IFU NDF to form
+      a velocity map.
+
+      If you request zooming the script first presents you with a
+      white-light image of the cube.  You can then select the lower
+      and upper spatial limits to plot using the cursor.  You can
+      instead supply an NDF section with the filename to define both
+      spatial and spectral limits to analyse, and from which to create
+      the output velocity map.  You may average spectra in the chosen
+      region by specifying compression factors in the spatial domain.
+
+      The script then derives the intensity weighted co-ordinate of
+      each spatially averaged spectrum, and converts the data units
+      into a velocity.  You may view this image drawn with a key
+      (option {\tt -d}), and overlay a contour plot of the white-light image
+      (option {\tt -c}).
+   }
+   \sstusage{
+      \begin{refs}
+      \item
+      velmoment [-b string] [-c number] [-ci uindex] [-i filename]
+                [-o filename]\goodbreak [-p] [-r number] [-s system] [-z/$+$z]
+      \end{refs}
+   }
+   \sstdiytopic{
+      Command-line Arguments
+   }{
+      \ssthitemlist{
+         \sstitem
+         {\bf{\tt{-b}}} {\em string}\\
+           The number of spectra to block average along the $X$ and $Y$ axes
+           respectively.  This should be a comma-separated list or a single
+           number; the latter case applies the same compression factor to
+           both spatial axes.  The numbers must be positive integers.
+          {\tt [1]}
+
+         \sstitem
+         {\bf{\tt{-c}}} {\em number}\\
+           Number of contours in the white-light image.  Set to fewer
+           than one means no contours are overlaid.  {\tt [15]}
+
+         \sstitem
+         {\bf{\tt{-ci}}} {\em index}\\
+           The palette colour index of the contours.  It should be an
+           integer in the range {\tt 0} to {\tt 15}.  It is best to choose 
+           an index corresponding to white, or black or another dark colour
+           to make the contours stand out from other elements of the plot.
+           {\tt 0} is the background colour. \xref{KAPPA:GDSTATE}{sun95}{GDSTATE} 
+           will list the current palette colours.  {\tt [0]}
+
+         \sstitem
+         {\bf{\tt{-i}}} {\em filename}\\
+           The script will use this as its input file, the specified file
+           should be a three-dimensional NDF.  By default the script will
+           prompt for the input file.
+
+         \sstitem
+         {\bf{\tt{-o}}} {\em filename}\\
+           The filename for the output NDF of the velocity map.
+
+         \sstitem
+         {\bf{\tt{-p}}}\\
+           The script will plot the final image map to the current display
+           as well as saving it to an NDF file.  Additionally it will over-
+           plot the white-light image as a contour map for comparison.
+           {\tt [FALSE]}
+
+         \sstitem
+         {\bf{\tt{-r}}} {\em number}\\
+           Rest-frame spectral unit of the line being fitted.
+
+         \sstitem
+         {\bf{\tt{-s}}} {\em system}\\
+           The co-ordinate system for velocities.  Allowed values are:
+           \begin{description}
+           \item[{\tt "VRAD"}] -- radio velocity;
+           \item[{\tt "VOPT"}] -- optical velocity;
+           \item[{\tt "ZOPT"}] -- redshift; and
+           \item[{\tt "VELO"}] -- relativistic velocity.
+           \end{description}
+           If you supply any other value, the default is used.  {\tt ["VOPT"]}
+
+         \sstitem
+         {\bf{\tt{-z}}}\\
+           The script will automatically prompt to select a region to zoom
+           before prompting for the region of interest.  {\tt [TRUE]}\\
+         {\bf{\tt{+z}}}\\
+           The program will not prompt for a zoom before requesting the region
+           of interest. {\tt [FALSE]}
+      }
+   }
+   \sstnotes{
+      \ssthitemlist{
+
+         \sstitem
+         The compression is trimmed, so that only compression-factor
+         multiples of original pixels are included in the plot. 
+
+         \sstitem
+         The spatial averaging is aligned to obtain the expected number
+         of pixels irrespective of the pixel origin of the input cube.
+         Note that this may not be suitable if you wish to preserve alignment
+         with another compressed dataset.  See \xref{KAPPA:COMPAVE}{sun95}{COMPAVE} 
+         parameter ALIGN for more details.
+
+         \sstitem
+         The velocity map display scales between the 2 and 98 percentiles.
+         The map uses a false-colour spectrum-like colour table so that
+         low-velocity regions appear in blue and high-velocity regions
+         appear in red.
+
+      }
+   }
+   \sstimplementationstatus{
+      This script invokes a collection of A-tasks from the \KAPPAref\ package.
+   }
 }
 
 \newpage
 \section{\xlabel{se_changes}Release Notes---V1.1\label{se:changes}}
+
+\subsection{New Commands}
+The following new scripts have been added:
+
+\begin{description}
+   \item [\htmlref{{\bf gridspec}}{gridspec}] \mbox{}
+       Averages groups of spatially neighbouring spectra of a 
+       three-dimensional IFU NDF and then plots these averaged spectra
+       in a grid.
+   \item [\htmlref{{\bf velmoment}}{velmoment}] \mbox{}
+       Builds a velocity map from the collapsed intensity-weighted 
+       spectral co-ordinates.  It supports spatial compression.
+\end{description}
+
+\subsection{Modified Commands}
+The following applications have been modified:
+
+\begin{itemize}
+
+\item \htmlref{{\bf compare}}{compare} has a {\tt -i} option for the
+input filename for non-interactive scripting.
+
+\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to 
+specify the number of contour levels to plot; this may be zero to
+prevent contours be overlaid. 
+
+\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings 
+in \xref{NDFCOPY}{sun95}{NDFCOPY}.  Ensured that the plots of spectra 
+use the axis co-ordinate system.  Removed unused {\tt -r} option.  Reset
+\xref{KAPPA:DISPLAY}{sun95}{DISPLAY} parameters so that features
+enabled in other scripts, like a key, do not bleed through.
+
+\item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
+measured line displacements from the rest-frame co-ordinate in the
+current spectral system into one of four velocity measurements using
+WCSTRAN.  Also recognises SKY-DSBSPECTRUM Domain.  
+
+Added the {\tt -s} option to define the co-ordinate system of the
+derived velocities.  Ensured that the plots of spectra use the axis
+co-ordinate system.  The script inquires the WCS for the rest-frame
+frequency to avoid unnecessary prompting.
+
+Changed lower percentile for display from 15 to 2.  Use spectrum
+colour table.
+
+Additional {\tt -c} option to specify the number of contours; this may
+be zero to prevent contours be overlaid.  Added {\tt -ci} option to
+specify the colour index of contours.
+
+\end{itemize}
+
+\subsection{General changes}
+
 \begin{itemize}
 
 \item The package applications COPYAXIS, GETBOUND, and PUTAXIS have
@@ -1174,33 +1518,24 @@ parameters), and \xref{SETAXIS in WCS mode}{sun95}{SETAXIS}
 ({\tt setaxis ndf=?~dim=?~mode=wcs comp=Centre} for each dimension)
 respectively.
 
-\item The scripts have been generalised to other spectral co-ordinate
-systems.  Units are reported too.
+\item The scripts have been generalised to spectral co-ordinate
+systems other than Wavelength in \AAngstrom.  Units are reported too.
 
 \item A bug displacing by $+1$ pixel negative pixel indices determined
 by the cursor has been fixed.  It was present in most of the scripts.
 
 \item Spectrum plots now use the histogram style for greater clarity.
 
-\item Additional -c option to specify the number of contours added
-to \htmlref{{\bf peakmap}}{peakmap} and \htmlref{{\bf velmap}}{velmap}.
-
 \item Tidied the scripts.  Changes included the silent removal and
 creation of files, alphabetical ordering of the options, documentation
 of default values of options, corrections to grammar and punctuation,
 avoidance of :r, aligned output, and tab removal.
 
-\item \htmlref{{\bf passband}}{passband} does not dump WCS mappings in NDFCOPY.
-Ensured that the plots of spectra use the axis co-ordinate system.
-Removed unused -r option.
+\item Accepts .sdf extension and/or NDF sections to be supplied
+through new internal routine {\tt checkndf.csh}.
 
-\item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
-measured line displacements from the rest-frame co-ordinate in the
-current spectral system into one of four velocity measurements using
-WCSTRAN.  Added the -s option to define the co-ordinate system of the
-derived velocities.  Ensured that the plots of spectra use the axis
-co-ordinate system.  The script inquires the WCS for the rest-frame
-frequency to avoid unnecessary prompting.
+\item Shortened many scripts through use of internal routine
+{\tt getcurpos.csh} to obtain and mark cursor positions.
 
 \end{itemize}
 
