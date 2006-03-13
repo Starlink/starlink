@@ -260,7 +260,6 @@ static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
         result = gaiaSimpleCGetNDF( indf, Tcl_GetString( objv[2] ),
                                     value, NDF__SZHIS+1, &error_mess );
         if ( result == TCL_OK ) {
-            fprintf( stderr, "value = '%s' (%d)\n", value, strlen(value) );
             Tcl_SetStringObj( resultObj, value, -1 );
         }
         else {
