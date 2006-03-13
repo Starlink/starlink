@@ -5,6 +5,8 @@
     17Feb2005 : add sc2_heat (bdk)
     22Nov2005 : Protect against multiple inclusion (timj)
     28Nov2005 : add typedef for sc2head (timj)
+    06Feb2006 : add filled[2] component to record which values have
+                been set (bdk)
 */
 
 
@@ -15,6 +17,7 @@
 
 struct sc2head
 {
+   unsigned int filled[2];
    float fts_pos;
    double pol_ang;
    int rts_num;

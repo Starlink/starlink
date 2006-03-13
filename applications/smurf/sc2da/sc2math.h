@@ -1,3 +1,7 @@
+#ifndef HEADGEN___src_sc2math_sc2math_h
+#define HEADGEN___src_sc2math_sc2math_h 
+ 
+ 
 /*+  sc2math_convolve - convolve a dataset with a filter */
 
 void sc2math_convolve
@@ -23,6 +27,19 @@ double *variances,        /* variances of fit (returned) */
 int *status               /* global status (given and returned) */
 );
 
+/*+ sc2math_fitsky - fit a sky baseline for each bolometer */
+
+void sc2math_fitsky
+(
+int cliptype,       /* type of sigma clipping (given) */
+int nboll,          /* number of bolometers (given) */
+int nframes,        /* number of frames in scan (given) */
+int ncoeff,         /* number of coefficients (given) */
+double *inptr,      /* measurement values (given) */
+double *coptr,      /* coefficients of fit (returned) */
+int *status         /* global status (given and returned) */
+);
+
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
 void sc2math_flatten
@@ -35,6 +52,19 @@ double *fcal,       /* calibration coefficients (given) */
 double *fpar,       /* calibration parameters (given) */
 double *inptr,      /* measurement values (given and returned) */
 int *status         /* global status (given and returned) */
+);
+
+/*+ sc2math_linfit - straight line fit */
+
+void sc2math_linfit
+(
+int np,               /* number of points (given) */
+double x[],           /* X data (given) */
+double y[],           /* Y data (given) */
+double wt[],          /* weights (given) */
+double *grad,         /* slope (returned) */
+double *cons,         /* offset (returned) */
+int *status           /* global status (given and returned) */
 );
 
 /*+  sc2math_martin - spike removal from chop-scan data */
@@ -143,6 +173,22 @@ double lincal[2],  /* calibration parameters (returned) */
 int *status        /* global status (given and returned) */
 );
 
+/*+ sc2math_sigmaclip - do sigma clipping on a straight-line fit */
+
+void sc2math_sigmaclip
+(
+int type,             /* 0 for double sided clip, 
+                        >0 positive clip, 
+                        <0 negative clip (given) */
+int np,               /* number of points (given) */
+double x[],           /* X data (given) */
+double y[],           /* Y data (given) */
+double wt[],          /* weights (given) */
+double *grad,         /* slope (returned) */
+double *cons,         /* offset (returned) */
+int *status           /* global status (given and returned) */
+);
+
 /*+  sc2math_sinedemod - sine wave demodulate a signal */
 
 void sc2math_sinedemod 
@@ -167,3 +213,6 @@ double *cosine,                /* generated cosine wave (returned) */
 int *status                  /* global status (given and returned) */
 );
 
+ 
+ 
+#endif

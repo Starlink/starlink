@@ -149,6 +149,88 @@ int *status               /* global status (given and returned) */
 
 }
 
+/*+ sc2math_fitsky - fit a sky baseline for each bolometer */
+
+void sc2math_fitsky
+(
+int cliptype,       /* type of sigma clipping (given) */
+int nboll,          /* number of bolometers (given) */
+int nframes,        /* number of frames in scan (given) */
+int ncoeff,         /* number of coefficients (given) */
+double *inptr,      /* measurement values (given) */
+double *coptr,      /* coefficients of fit (returned) */
+int *status         /* global status (given and returned) */
+)
+
+/* Description :
+    For each bolometer, determine an estimated sky level by
+    making a linear fit to timestream with sigma clipping.
+   Authors :
+    B.D.Kelly (bdk@roe.ac.uk)
+
+   History :
+    25Feb2005 : original (bdk)
+    14Jul2005 : add cliptype argument (bdk)
+    13Mar2006 : copied from map.c (agg)
+*/
+
+{
+   double cons;        /* offset for straight-line fit */
+   double grad;        /* gradient of staright-line fit */
+   int i;              /* loop counter */
+   int j;              /* loop counter */
+   double *pos;        /* positions in scan for single bolometer */
+   double *scan;       /* copy of scan for single bolometer */
+   double *wt;         /* weights for single bolometer */
+
+
+   if ( !StatusOkP(status) ) return;
+
+/* provide default values */
+
+   for ( j=0; j<nboll; j++ )
+   {
+      for ( i=0; i<ncoeff; i++ )
+      {
+         coptr[j+i*nboll] = 0.0;
+      }
+   }
+
+   if ( nframes > 10 )
+   {
+      scan = calloc ( nframes, sizeof(double) );
+      pos = calloc ( nframes, sizeof(double) );
+      wt = calloc ( nframes, sizeof(double) );
+
+      for ( i=0; i<nframes; i++ )
+      {
+         pos[i] = (double)i;
+      }
+
+      for ( j=0; j<nboll; j++ )
+      {
+
+/* extract the values for one bolometer */
+
+         for ( i=0; i<nframes; i++ )
+         {
+            scan[i] = inptr[nboll*i+j];
+         }
+
+/* fit a straight line with clipping */
+
+         sc2math_sigmaclip ( cliptype, nframes, pos, scan, wt, &grad, &cons,
+			     status );
+         coptr[j] = cons;
+         coptr[j+nboll] = grad;
+      }
+
+      free ( scan );
+      free ( wt );
+      free ( pos );
+   }
+}
+
 
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
@@ -188,8 +270,6 @@ int *status         /* global status (given and returned) */
    double lincal[2];   /* interpolation coeffs for a bolometer */
    double t;           /* intermediate result */
    double *temp;       /* pointer to storage for a single bolometer */
-   double temp1;
-   double temp2;
 
 
    if ( !StatusOkP(status) ) return;
@@ -197,7 +277,6 @@ int *status         /* global status (given and returned) */
    if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
    {
 
-     printf("Nbol = %d, Nframes = %d\n",nboll,nframes);
       for ( j=0; j<nframes; j++ )
       {
 
@@ -205,16 +284,13 @@ int *status         /* global status (given and returned) */
 
          for ( i=0; i<nboll; i++ )
          {
-	   temp1 = inptr[j*nboll+i];
-	   temp2 = fcal[i+nboll];
-            t =  temp1 - temp2;
-            inptr[j*nboll+i] = fcal[i] 
-               + fcal[i+2*nboll] 
-               + fcal[i+3*nboll] * t 
-               + fcal[i+4*nboll] * t * t
-               + fcal[i+5*nboll] * t * t * t;
+	   t = inptr[j*nboll+i] - fcal[i+nboll];
+	   inptr[j*nboll+i] = fcal[i] 
+	     + fcal[i+2*nboll] 
+	     + fcal[i+3*nboll] * t 
+	     + fcal[i+4*nboll] * t * t
+	     + fcal[i+5*nboll] * t * t * t;
          }
-
       }
    }
    else if ( strcmp ( "TABLE", flatname ) == 0 )
@@ -254,6 +330,64 @@ int *status         /* global status (given and returned) */
 
 }
 
+/*+ sc2math_linfit - straight line fit */
+
+void sc2math_linfit
+(
+int np,               /* number of points (given) */
+double x[],           /* X data (given) */
+double y[],           /* Y data (given) */
+double wt[],          /* weights (given) */
+double *grad,         /* slope (returned) */
+double *cons,         /* offset (returned) */
+int *status           /* global status (given and returned) */
+)                                       
+/* Description :
+    Simple least-squares fit of a straight line. In general the weights
+    are expected to be 1.0 or 0.0, allowing points to be ignored.
+
+   History :
+    20Oct2004 : original (bdk)
+    13Mar2006 : copied from map.c (agg)
+*/
+
+{
+   double xm;           /* X mean */
+   double ym;           /* Y mean */
+   double rp;           /* number of values used (total weight) */
+   double rnum;         /* XY factor */
+   double rden;         /* X squared factor */
+   double ximxm;        /* X differences */
+   int i;
+
+   if ( !StatusOkP(status) ) return;
+
+   xm = 0.0;
+   ym = 0.0;
+   rp = 0.0;
+
+   for ( i=0; i<np; i++ )
+   {
+      xm += x[i] * wt[i];
+      ym += y[i] * wt[i];
+      rp += wt[i];
+   }
+   xm = xm / rp;
+   ym = ym / rp;
+
+   rnum = 0.0;
+   rden = 0.0;
+
+   for ( i=0; i<np; i++ )
+   {
+      ximxm = ( x[i] - xm ) * wt[i];
+      rnum += ximxm * y[i];
+      rden += ximxm * ximxm;
+   }
+
+   *grad = rnum / rden;
+   *cons = ym - (*grad) * xm;
+}
 
 
 /*+  sc2math_martin - spike removal from chop-scan data */
@@ -1025,6 +1159,119 @@ int *status        /* global status (given and returned) */
    }
 }
 
+/*+ sc2math_sigmaclip - do sigma clipping on a straight-line fit */
+
+void sc2math_sigmaclip
+(
+int type,             /* 0 for double sided clip, 
+                        >0 positive clip, 
+                        <0 negative clip (given) */
+int np,               /* number of points (given) */
+double x[],           /* X data (given) */
+double y[],           /* Y data (given) */
+double wt[],          /* weights (given) */
+double *grad,         /* slope (returned) */
+double *cons,         /* offset (returned) */
+int *status           /* global status (given and returned) */
+)
+/* Description :
+    Repeatedly fit a straight line to data, locate outliers from the fit
+    and zero-weight them for the next attempt. Stop when no more outliers
+    or down to 70% of original data.
+
+   History :
+    20Oct2004 : original (bdk)
+    14Jul2005 : add type argument (bdk)
+    13Mar2006 : copied from map.c (agg)
+*/
+
+{
+   int found;          /* flag for outlier located */
+   int j;              /* loop counter */
+   double sigma;       /* standard deviation */
+   double rnum;        /* number of values used (total weight) */
+   double diff;        /* residual at a point */
+
+
+   if ( !StatusOkP(status) ) return;
+
+
+/* Initial weighting selects all the points */
+
+   for ( j=0; j<np; j++ )
+   {
+      wt[j] = 1.0;
+   }
+
+/* repeatedly fit removing outliers */
+
+   for ( ; ; )
+   {
+      sc2math_linfit ( np, x, y, wt, grad, cons, status );
+/* calculate scatter in y */
+
+      sigma = 0.0;
+      rnum = 0.0;
+      for ( j=0; j<np; j++ )
+      {
+         diff = y[j] - ( (*cons) + (*grad) * x[j] );
+         sigma += wt[j] * diff * diff;
+         rnum += wt[j];
+      }
+      sigma = sqrt ( sigma / rnum );
+
+      if ( rnum > 0.7 * (double)np )
+      {
+
+/* search for any outliers */
+
+         found = 0;
+
+         if ( type > 0 )
+         {
+            for ( j=0; j<np; j++ )
+            {
+               diff = wt[j] * ( y[j] - ( (*cons) + (*grad) * x[j] ) );
+               if ( diff > 3.5*sigma )
+               {
+                  found = 1;
+                  wt[j] = 0.0;
+               }
+            }
+         }
+         else if ( type == 0 )
+         {
+            for ( j=0; j<np; j++ )
+            {
+               diff = wt[j] * ( y[j] - ( (*cons) + (*grad) * x[j] ) );
+               if ( fabs(diff) > 3.5*sigma )
+               {
+                  found = 1;
+                  wt[j] = 0.0;
+               }
+            }
+         }
+         else
+         {
+            for ( j=0; j<np; j++ )
+            {
+               diff = wt[j] * ( y[j] - ( (*cons) + (*grad) * x[j] ) );
+               if ( (-diff) > 3.5*sigma )
+               {
+                  found = 1;
+                  wt[j] = 0.0;
+               }
+            }
+         }
+
+         if ( found == 0 ) break;
+      }
+      else
+      {
+         break;
+      }
+   }
+}
 
 
 /*+  sc2math_sinedemod - sine wave demodulate a signal */
@@ -1116,3 +1363,4 @@ int *status                  /* global status (given and returned) */
       cosine[j] = (double) cos ( twopi * (double)j / (double)period );
    }
 }
+
