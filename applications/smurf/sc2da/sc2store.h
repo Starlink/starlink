@@ -1,3 +1,7 @@
+#ifndef HEADGEN___src_sc2store_sc2store_h
+#define HEADGEN___src_sc2store_sc2store_h 
+ 
+ 
 /*+ sc2store_compress - compress frame of integers to unsigned short */
 
 void sc2store_compress 
@@ -92,7 +96,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headcremap
 (
-HDSLoc *headloc,     /* HDS locator (given) */
+HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames to be created (given) */
 int *status                   /* global status (given and returned) */
 );
@@ -110,7 +114,7 @@ int *status                   /* global status (given and returned) */
 
 void sc2store_headrmap
 (
-HDSLoc *headloc,     /* HDS locator (given) */
+HDSLoc *headloc,              /* HDS locator (given) */
 int nframes,                  /* number of frames expected (given) */
 int *status                   /* global status (given and returned) */
 );
@@ -120,6 +124,24 @@ int *status                   /* global status (given and returned) */
 void sc2store_headunmap
 (
 int *status                   /* global status (given and returned) */
+);
+
+/*+ sc2store_ndfreadscan - read a single scan from an NDF file */
+
+void sc2store_ndfreadscan
+(
+char *filename,     /* name of input map file (given) */
+char *access,       /* "READ" or "UPDATE" access to data file (given) */
+int flatlen,        /* length of string for flatname (given) */
+int *nframes,       /* number of frames in scan (returned) */
+double **xz,        /* X centre for each frame (returned) */
+double **yz,        /* Y centre for each frame (returned) */
+double **inptr,     /* measurement values (returned) */
+int *nflat,         /* number of flatfield coeffs per pixel (returned) */
+char *flatname,     /* name of flatfield algorithm (returned) */
+double **flatcal,   /* flatfield calibration (returned) */
+double **flatpar,   /* flatfield parameters (returned) */
+int *status         /* global status (given and returned) */
 );
 
 /*+ sc2store_putimage - store constructed image */
@@ -263,3 +285,6 @@ double *fpar,      /* flat-field parameters (given) */
 int *status        /* global status (given and returned) */
 );
 
+ 
+ 
+#endif

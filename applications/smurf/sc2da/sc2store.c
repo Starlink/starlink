@@ -21,6 +21,9 @@
 #include "Dits_Err.h"
 #include "Ers.h"
 
+#include "fhead_par.h"
+#include "fhead.h"
+
 #include "fitsio.h"
 
 #include "dream_par.h"
@@ -887,6 +890,100 @@ int *status                   /* global status (given and returned) */
    }
 }
 
+/*+ sc2store_ndfreadscan - read a single scan from an NDF file */
+
+void sc2store_ndfreadscan
+(
+char *filename,     /* name of input map file (given) */
+char *access,       /* "READ" or "UPDATE" access to data file (given) */
+int flatlen,        /* length of string for flatname (given) */
+int *nframes,       /* number of frames in scan (returned) */
+double **xz,        /* X centre for each frame (returned) */
+double **yz,        /* Y centre for each frame (returned) */
+double **inptr,     /* measurement values (returned) */
+int *nflat,         /* number of flatfield coeffs per pixel (returned) */
+char *flatname,     /* name of flatfield algorithm (returned) */
+double **flatcal,   /* flatfield calibration (returned) */
+double **flatpar,   /* flatfield parameters (returned) */
+int *status         /* global status (given and returned) */
+)
+
+/* Description :
+    Open and read an NDF containing scan data. Copy the data to be
+    returned, including a double version of the bolometer values.
+
+   Authors :
+    B.D.Kelly (bdk@roe.ac.uk)
+
+   History :
+    15Oct2004 : original (bdk)
+    25Feb2005 : keep the file open (bdk)
+    20May2005 : add flatcal (bdk)
+    12Jul2005 : return COPY of flatfield data (bdk)
+    05Oct2005 : use new data interface (bdk)
+    25Jan2006 : add access argument to sc2store_rdtstream (bdk)
+    26Jan2006 : pass-in access argument to sc2store_rdtstream (bdk)
+    13Mar2006 : copied over from map.c (agg)
+*/
+
+{
+   int colsize;            /* number of pixels in column */
+   int *dksquid;           /* pointer to dark SQUID data */
+   double *fcal;           /* pointer to flat field data */
+   static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
+   double *fpar;           /* pointer to flat field parameters */
+   struct sc2head *frhead; /* structure for headers for a frame */
+   int j;                  /* loop counter */
+   int nfits;              /* number of FITS records */
+   int rowsize;            /* number of pixels in row */
+   int *tmptr;             /* pointer to decompressed map data */
+
+   if ( !StatusOkP(status) ) return;
+
+
+/* Read the TSTREAM data */
+
+   sc2store_rdtstream ( filename, access, flatlen, 81, FHEAD__MXREC, &nfits,
+     fitsrec, &colsize, &rowsize, nframes, nflat, flatname, &frhead,
+     &tmptr, &dksquid, &fcal, &fpar, status );
+
+/* Map space for the data to be copied */
+
+   *xz = (double *) calloc ( *nframes, sizeof(double) );
+   *yz = (double *) calloc ( *nframes, sizeof(double) );
+   *inptr = (double *) calloc ( (*nframes)*colsize*rowsize, sizeof(double) );
+   *flatcal = (double *) calloc ( (*nflat)*colsize*rowsize, sizeof(double) );
+   *flatpar = (double *) calloc ( (*nflat), sizeof(double) );
+
+/* Copy flat field data */
+
+   for ( j=0; j<(*nflat)*colsize*rowsize; j++ )
+   {
+      (*flatcal)[j] = fcal[j];
+   }
+
+   for ( j=0; j<(*nflat); j++ )
+   {
+      (*flatpar)[j] = fpar[j];
+   }
+
+/* Extract the per-frame headers */
+
+   for ( j=0; j<*nframes; j++ )
+   {
+      (*xz)[j] = frhead[j].tcs_tr_ac1;      
+      (*yz)[j] = frhead[j].tcs_tr_ac2;      
+   }
+
+/* Convert the data to double */
+
+   for ( j=0; j<(*nframes)*colsize*rowsize; j++ )
+   {
+      (*inptr)[j] = (double)tmptr[j];
+   }
+
+
+}
 
 /*+ sc2store_putimage - store constructed image */
 
@@ -1751,3 +1848,4 @@ int *status        /* global status (given and returned) */
 
    sc2open = 1; 
 }
+
