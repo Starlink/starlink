@@ -76,19 +76,16 @@
 #
 #  Notes:
 #     -  The compression is trimmed, so that only compression-factor
-#     multiples of original pixels are included in the plot.  There
-#     -  A feature of the compression is that you may obtain one fewer
-#     pixel in the graph than expected.  Try slightly enlarging or
-#     shifting the grid region to circumvent this.
-#     -  The velocity map display scales between the 2 and 98 percentiles.
-#     The map uses a false-colour spectrum-like colour table so that
-#     low-velocity regions appear in blue and high-velocity regions 
-#     appear in red.
+#     multiples of original pixels are included in the plot. 
 #     -  The spatial averaging is aligned to obtain the expected number
 #     of pixels irrespective of the pixel origin of the input cube.
 #     Note that this may not be suitable if you wish to preserve alignment
 #     with another compressed dataset.  See KAPPA:COMPAVE parameter ALIGN 
 #     for more details.
+#     -  The velocity map display scales between the 2 and 98 percentiles.
+#     The map uses a false-colour spectrum-like colour table so that
+#     low-velocity regions appear in blue and high-velocity regions 
+#     appear in red.
 #
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA package.
