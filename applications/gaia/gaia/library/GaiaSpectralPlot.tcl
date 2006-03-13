@@ -93,6 +93,20 @@ itcl::class gaia::GaiaSpectralPlot {
       $File add command -label Exit -command [code $this close] \
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
+      $short_help_win_ add_menu_short_help $File \
+         {Exit} {Close this window}
+
+      #  Options are whether to show the secondary plot or not. Also
+      #  requires an extra canvas.
+      set show_plot2_ 0
+      $Options add checkbutton \
+         -label {Show thumbnail plot} \
+         -variable [scope show_plot2_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_plot2_]
+      add_menu_short_help $Options {Show thumbnail plot}  \
+         {Show a thumbnail copy of plot in main window}
 
       #  Create the canvas. Pack inside a frame so that we can get the resize
       #  events and the new geometry to get the apparent size of canvas right.
@@ -166,13 +180,13 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Create the secondary plot, put this at the given x and y.
-      if { $itk_option(-canvas) != {} && $spectrum2_ == {} } {
+      if { $itk_option(-canvas) != {} && $spectrum2_ == {} && $show_plot2_ } {
          set autoscale 1
          set spectrum2_ [$itk_option(-canvas) create spectral_plot \
                             pointer $adr $nel $type \
                             -x $x -y $y -width 200 -height 200 \
                             -linecolour blue -linewidth 1 \
-                            -showaxes 0 -anchor "center" \
+                            -showaxes 0 \
                             -tags $itk_option(-ast_tag) \
                             -fixedscale 1]
       }
@@ -188,6 +202,7 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits "[ndf::getc $ndfid units]" \
             -datalabel "[ndf::getc $ndfid label]"
+         puts "units/label [ndf::getc $ndfid units]/[ndf::getc $ndfid label]"
       }
 
       #  Pass in the data.
@@ -234,6 +249,17 @@ itcl::class gaia::GaiaSpectralPlot {
       fitxy
    }
 
+   #  Handle a change in the show_plot2_ variable.
+   protected method toggle_show_plot2_ {} {
+      if { ! $show_plot2_ && $spectrum2_ != {} } {
+         #  Make spectrum disappear.
+         if { $itk_option(-canvas) != {} } {
+            $itk_option(-canvas) delete $spectrum2_
+         }
+         set spectrum2_ {}
+      }
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -259,6 +285,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The main spectral_plot item.
    protected variable spectrum_ {}
+
+   #  Whether to show the secondary plot.
+   protected variable show_plot2_ 0
 
    #  The secondary spectral_plot item.
    protected variable spectrum2_ {}

@@ -508,9 +508,9 @@ itcl::class gaia::GaiaNDFCube {
          set_display_plane_ $plane_
 
          #  XXX map in all data for extra speed... When to release?
-         #set ndfid [ndf::open "$ndfname_"]
-         #lassign [ndf::map $ndfid] adr nel type
-         #puts "adr=$adr, nel=$nel, type=$type"
+         set ndfid [ndf::open "$ndfname_"]
+         lassign [ndf::map $ndfid] adr nel type
+         puts "adr=$adr, nel=$nel, type=$type"
       }
    }
 

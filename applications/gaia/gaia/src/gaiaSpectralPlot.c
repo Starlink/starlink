@@ -116,7 +116,7 @@ static Tk_ConfigSpec configSpecs[] = {
      "0.0", Tk_Offset(SPItem, badvalue), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_STRING, "-datalabel", (char *) NULL, (char *) NULL,
-     "", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
+     "Data value", Tk_Offset(SPItem, datalabel), TK_CONFIG_NULL_OK},
 
     {TK_CONFIG_STRING, "-dataunits", (char *) NULL, (char *) NULL,
      "", Tk_Offset(SPItem, dataunits), TK_CONFIG_NULL_OK},
