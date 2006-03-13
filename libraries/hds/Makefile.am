@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
+bin_PROGRAMS = hdsdump
 dist_bin_SCRIPTS = hds_link hds_link_adam
 noinst_PROGRAMS = hds_machine dat_par_h dat_par_f make-hds-types
 starhelp_DATA = hds_machine.txt
@@ -37,6 +38,9 @@ hds_machine_LDADD = libhds.la `ems_link` `cnf_link` `starmem_link`
 dat_par_h_SOURCES = dat_par_h.c
 dat_par_f_SOURCES = dat_par_f.c
 make_hds_types_SOURCES = make-hds-types.c
+
+hdsdump_SOURCES = hds_dev/hdsdump.c
+hdsdump_LDADD = libhds.la `ems_link` `cnf_link` `starmem_link`
 
 # Try to make sure that hds_types.h is built early
 # This does not seem to work right in conjunction with BUILT_SOURCES
