@@ -1,6 +1,71 @@
-1 Release_Version
+1 DATACUBE_Version_1.1
 
-  DATACUBE is described in SUN/237, with further information
-  being found in SC/16. These can be viewed with the commands
-  "showme sun237" and "showme sc16" respectively. Online help
-  can be accessed by using the command "cubehelp".
+  A new release of DATACUBE (v1.1) has been made.  Further
+  details can be found in SUN/237.  This can be viewed with 
+  the commands "showme sun237".  The main changes are:
+
+2 New_Commands
+
+The following new scripts have been added:
+
+   o gridspec
+     Averages groups of spatially neighbouring spectra of a 
+     three-dimensional IFU NDF and then plots these averaged spectra
+     in a grid.
+   o velmoment
+     Builds a velocity map from the collapsed intensity-weighted 
+     spectral co-ordinates.  It supports spatial compression.
+
+2 Modified_Commands
+The following applications have been modified:
+
+   o  compare has a -i option for input filename for non-interactive
+      scripting.
+
+   o  peakmap now has -c option to specify the number of contour 
+   levels to plot; this may be zero to prevent contours be overlaid. 
+
+   o  passband  does not dump WCS mappings in NDFCOPY.  Ensured that 
+   the plots of spectra use the axis co-ordinate system.  Removed 
+   unused -r option.  Reset KAPPA:DISPLAY parameters so that features
+   enabled in other scripts, like a key, do not bleed through.
+
+   o  velmap generalised the transformation of the measured line 
+   displacements from the rest-frame co-ordinate in the current 
+   spectral system into one of four velocity measurements using
+   WCSTRAN.  Also recognises SKY-DSBSPECTRUM Domain.  
+
+   Added the {-s option to define the co-ordinate system of the
+   derived velocities.  Ensured that the plots of spectra use the 
+   axis co-ordinate system.  The script inquires the WCS for the 
+   rest-frame frequency to avoid unnecessary prompting.
+
+   Changed lower percentile for display from 15 to 2.  Use spectrum
+   colour table.
+
+   Additional -c option to specify the number of contours; this may
+   be zero to prevent contours be overlaid.  Added -ci option to
+   specify the colour index of contours.
+
+2 General_changes
+
+   o  The package applications COPYAXIS, GETBOUND, and PUTAXIS have
+   been withdrawn.  The scripts that invoked these now call 
+   KAPPA:SETAXIS, NDFTRACE, and SETAXIS respectively.
+
+   o  The scripts have been generalised to spectral co-ordinate systems
+   other than Wavelength in Angstrom.  Units are reported too.
+
+   o  A bug displacing by +1 pixel negative pixel indices determined
+   by the cursor has been fixed.  It was present in most of the 
+   scripts.
+
+   o  Spectrum plots now use the histogram style for greater clarity.
+
+   o  Tidied the scripts.  Changes included the silent removal and
+   creation of files, alphabetical ordering of the options, 
+   documentation of default values of options, corrections to grammar 
+   and punctuation, avoidance of :r, and aligned output.
+
+   o  Accepts .sdf extension and/or NDF sections to be supplied.
+
