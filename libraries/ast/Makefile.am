@@ -63,6 +63,7 @@ GRP_C_ROUTINES = \
     ftimemap.c \
     fsphmap.c \
     ftranmap.c \
+    fswitchmap.c \
     funitmap.c \
     fwcsmap.c \
     fwinmap.c \
@@ -112,6 +113,7 @@ GRP_C_ROUTINES = \
     timeframe.c \
     timemap.c \
     tranmap.c \
+    switchmap.c \
     unit.c \
     unitmap.c \
     wcsmap.c \
@@ -154,6 +156,7 @@ AST_H_FILES = \
           specmap.h \
           sphmap.h \
           timemap.h \
+          switchmap.h \
           tranmap.h \
           unitmap.h \
           wcsmap.h \
