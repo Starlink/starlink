@@ -37,6 +37,9 @@
 *  History:
 *      7-MAR-2006 (DSB)
 *         Original version.
+*      14-MAR-2006 (DSB)
+*         Strip any trailing newline characters from the string before
+*         exporting it as a Fortran string.
 *.
 *-
  */
@@ -202,6 +205,11 @@ F77_SUBROUTINE(one_shell_echo)( CHARACTER(FileSpec), CHARACTER(FileName),
          if( Bytes <= 0 ) break;
          if( Ichar < sizeof(Line) ) FileName[ Ichar++ ] = Char;
       }
+
+/* Remove any newline characters from the end of the string. */
+      while( Ichar && FileName[ Ichar - 1 ] == '\n' ) Ichar--;
+
+/* Terminate the string and export as a Fortran string. */
       FileName[ Ichar ] = '\0';
       cnfExprt( FileName, FileName, NameLength );
    }
