@@ -6,10 +6,13 @@
     02Oct2005 : add SC2STORE_FLATLEN (bdk)
     02Feb2006 : use an enum for the indices (bdk)
     09Feb2006 : make SC2STORE_NUM last item in the enum (bdk)
+    13Mar2006 : add SC2STORE__MAXFITS to replace FHEAD__MXREC (agg)
+    14Mar2006 : protect against multiple includes (agg)
 */
+
+/* Check if these are defined already... */
 #ifndef SC2STORE_PAR_DEFINED
 #define SC2STORE_PAR_DEFINED
-
 
 #define SC2STORE_FLATLEN 17  /* maximum length of flatfield algorithm name */
 #define RTS_TASKS_LEN 80     /* length of string for rts report */
