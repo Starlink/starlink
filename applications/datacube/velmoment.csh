@@ -11,7 +11,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     velmoment [-b string] [-c number] [-ci uindex] [-i filename] 
+#     velmoment [-b string] [-c number] [-ci index] [-i filename] 
 #               [-o filename] [-p] [-r number] [-s system] [-z/+z] 
 #
 #  Description:
