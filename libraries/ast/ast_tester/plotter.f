@@ -32,6 +32,7 @@
       REAL GBOX(4), RANGE, DELTA, ASP
       DOUBLE PRECISION PBOX(4)
 
+      STATUS = 0
 *
 * Check command line arguments have been supplied.
 *
@@ -46,18 +47,17 @@
 *
       OC = AST_TUNE( 'ObjectCaching', 1, STATUS )
       IF( OC .NE. 0 ) THEN
-         WRITE(*,'(A,I2)') 'Default ObjectCaching VALUE is ',OC
+         WRITE(*,'(A,I6)') 'Default ObjectCaching VALUE is ',OC
       END IF
 
       IF( AST_TUNE( 'ObjectCaching', AST__TUNULL, STATUS ) .NE. 1 ) THEN
-         WRITE(*,'(A,I2)') 'Set ObjectCaching VALUE is ',OC
+         WRITE(*,'(A,I6)') 'Set ObjectCaching VALUE is ',OC
       END IF
 
 * 
 * Create a FitsChan to store the FITS headers.
 *
       CALL GETARG( 3, ATTR )
-      STATUS = 0
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, ATTR, STATUS )
 
 *
