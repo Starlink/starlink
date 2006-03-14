@@ -86,6 +86,8 @@ f     The CmpMap class does not define any new routines beyond those
 *        followed by a parallel CmpMap.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     14-MAR-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -150,6 +152,7 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * )
 static double Rate( AstMapping *, double *, int, int );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int CountMappings( AstMapping * );
+static int Equal( AstObject *, AstObject * );
 static int PatternCheck( int, int, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
@@ -161,6 +164,109 @@ static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int GetObjSize( AstObject * );
 /* Member functions. */
 /* ================= */
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two CmpMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     CmpMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two CmpMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a CmpMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the CmpMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpMap *this;        
+   AstCmpMap *that;        
+   int result;
+   int that_inv2;
+   int that_inv1;
+   int this_inv1;
+   int this_inv2;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two CmpMap structures. */
+   this = (AstCmpMap *) this_object;
+   that = (AstCmpMap *) that_object;
+
+/* Check the second object is a CmpMap. We know the first is a
+   CmpMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsACmpMap( that ) ) {
+
+/* Check they are both either parallel or series. */
+      if( that->series == that->series ) {
+   
+/* Temporarily re-instate the Invert flags which the first component
+   Mappings had when the CmpMap was created. */
+         this_inv1 = astGetInvert( this->map1 );
+         astSetInvert( this->map1, this->invert1 );
+         that_inv1 = astGetInvert( that->map1 );
+         astSetInvert( that->map1, that->invert1 );
+
+/* Compare the first component Mappings. */
+         if( astEqual( this->map1, that->map1 ) ) {
+
+/* Temporarily re-instate the Invert flags which the second component
+   Mappings had when the CmpMap was created. */
+            this_inv2 = astGetInvert( this->map2 );
+            astSetInvert( this->map2, this->invert2 );
+            that_inv2 = astGetInvert( that->map2 );
+            astSetInvert( that->map2, that->invert2 );
+
+/* Compare the second component Mappings. */
+            result = astEqual( this->map2, that->map2 );
+
+/* Re-instate the original Invert flags for the second component Mappings. */
+            astSetInvert( this->map2, this_inv2 );
+            astSetInvert( that->map2, that_inv2 );
+         }
+
+/* Re-instate the original Invert flags for the first component Mappings. */
+         astSetInvert( this->map1, this_inv1 );
+         astSetInvert( that->map1, that_inv1 );
+
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -564,6 +670,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->Decompose = Decompose;
    mapping->MapMerge = MapMerge;
    mapping->Simplify = Simplify;
