@@ -3239,20 +3239,14 @@ AstCmpMap *astInitCmpMap_( void *mem, size_t size, int init,
 
 /* Determine in which directions each component Mapping is able to transform
    coordinates. Combine these results to obtain a result for the overall
-   CmpMap. If neither transformation direction is available, then report an
-   error. */
+   CmpMap. */
    map_f = astGetTranForward( map1 ) && astGetTranForward( map2 );
    map_i = astGetTranInverse( map1 ) && astGetTranInverse( map2 );
    if ( astOK ) {
-      if ( !map_f && !map_i ) {
-         astError( AST__INTRD, "astInitCmpMap(%s): The two Mappings supplied "
-                   "are not able to transform coordinates in either the "
-                   "forward or inverse direction once connected together.",
-                   name );
 
 /* If connecting the Mappings in series, check that the number of coordinates
    are compatible and report an error if they are not. */
-      } else if ( series ) {
+      if ( series ) {
          nout1 = astGetNout( map1 );
          nin2 = astGetNin( map2 );
          if ( astOK && ( nout1 != nin2 ) ) {
