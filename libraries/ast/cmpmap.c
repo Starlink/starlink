@@ -87,7 +87,15 @@ f     The CmpMap class does not define any new routines beyond those
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
 *     14-MAR-2006 (DSB):
-*        Override astEqual.
+*        - Override astEqual.
+         - The constructor no longer reports an error if the resulting
+*	 CmpMap cannot transform points in either direction. This is
+*	 because it may be possibleto simplify such a CmpMap and the
+*	 simplified Mapping may have defined transformations. E.g. if a
+*	 Mapping which has only a forward transformation is combined in
+*	 series with its own inverse, the combination will simplify to a
+*	 UnitMap (usually).
+
 *class--
 */
 
