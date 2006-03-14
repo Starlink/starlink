@@ -171,6 +171,14 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Use HAVE_LONG_DOUBLE in place of AST_LONG_DOUBLE
 *     7-MAR-2006 (DSB):
 *        Added astTranGrid.
+*     14-MAR-2006 (DSB):
+*        The constructor no longer reports an error if the resulting
+*	 Mapping cannot transform points in either direction. This is
+*	 because it may be possible to simplify such a Mapping and the
+*	 simplified Mapping may have defined transformations. E.g. if a
+*	 Mapping which has only a forward transformation is combined in
+*	 series with its own inverse, the combination CmpMap will simplify 
+*        to a UnitMap (usually).
 *class--
 */
 
@@ -21199,16 +21207,6 @@ AstMapping *astInitMapping_( void *mem, size_t size, int init,
       astError( AST__BADNO, "astInitMapping(%s): Bad number of output "
                 "coordinates (%d).", name, nout );
       astError( AST__BADNI, "This number should be zero or more." );
-   }
-
-/* Check that the coordinate transformation is defined in at least one
-   direction (forward or inverse) and report an error if it is not. */
-   if ( astOK ) {
-      if ( !tran_forward && !tran_inverse ) {
-         astError( AST__NODEF, "astInitMapping(%s): The coordinate "
-                   "transformation is not defined in either the forward or "
-                   "inverse direction.", name );
-      }
    }
 
 /* Initialise an Object structure (the parent class) as the first component
