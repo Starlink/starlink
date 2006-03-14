@@ -15,7 +15,7 @@
 #define TCS_SOURCE_LEN 32    /* length of string for TCS report */
 #define TCS_TR_SYS_LEN 16    /* length of string for TCS report */
 
-
+#define SC2STORE__MAXFITS 256 /* Maximum number of FITS records */
 
 /* Named indices into the per-frame header arrays */
 
