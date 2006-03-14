@@ -62,7 +62,8 @@ f     The MathMap class does not define any new routines beyond those
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
 *     14-MAR-2006 (DSB):
-*        Add QIF function.
+*        - Add QIF function.
+*        - Override astEqual method.
 *class--
 */
 
@@ -148,6 +149,7 @@ f     The MathMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "error.h"               /* Error reporting facilities */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
+#include "cmpmap.h"              /* Compound Mappings */
 #include "mathmap.h"             /* Interface definition for this class */
 #include "memory.h"              /* Memory allocation facilities */
 #include "object.h"              /* Base Object class */
@@ -496,6 +498,7 @@ static double LogGamma( double );
 static double Poisson( Rcontext *, double );
 static double Rand( Rcontext * );
 static int DefaultSeed( const Rcontext * );
+static int Equal( AstObject *, AstObject * );
 static int GetSeed( AstMathMap * );
 static int GetSimpFI( AstMathMap * );
 static int GetSimpIF( AstMathMap * );
@@ -1446,6 +1449,119 @@ static int DefaultSeed( const Rcontext *context ) {
 /* Return the integer value of the seed (which may involve discarding
    some unwanted bits). */
    return (int) bits;
+}
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two MathMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     MathMap member function (over-rides the astEqual protected
+*     method inherited from the Object class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two MathMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a MathMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the Frames are equivalent, zero otherwise.
+
+*  Notes:
+*     - The two MathMaps are considered equivalent if the combination of
+*     the first in series with the inverse of the second simplifies to a
+*     UnitMap.
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstCmpMap *cmpmap;         /* Pointer to the compound MathMap */
+   AstMathMap *smap;          /* Pointer to the simplified MathMap */
+   AstMathMap *that;          /* Pointer to the second MathMap structure */
+   AstMathMap *this;          /* Pointer to the first MathMap structure */
+   int nin;                   /* Number of inputs */
+   int nout;                  /* Number of outputs */
+   int result;                /* Result value to return */
+   int simpfi1;               /* Original value of this->simpfi */
+   int simpfi2;               /* Original value of that->simpfi */
+   int simpif1;               /* Original value of this->simpif */
+   int simpif2;               /* Original value of that->simpif */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two MathMap structures. */
+   this = (AstMathMap *) this_object;
+   that = (AstMathMap *) that_object;
+
+/* Check the second object is a MathMap. We know the first is a
+   MathMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAMathMap( that ) ) {
+
+/* Check they have the same number of inputs and outputs */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
+
+/* Temporarily set the SimpIF and SIMFI attributes to 1 in both MathMaps. */
+         simpif1 = astGetSimpIF( this );
+         simpfi1 = astGetSimpFI( this );
+         simpif2 = astGetSimpIF( that );
+         simpfi2 = astGetSimpFI( that );
+         astSetSimpIF( this, 1 );
+         astSetSimpFI( this, 1 );
+         astSetSimpIF( that, 1 );
+         astSetSimpFI( that, 1 );
+
+/* Temporarily invert the second MathMap and combine then in series. */
+         astInvert( that );
+         cmpmap = astCmpMap( this, that, 1, "" );
+         astInvert( that );
+
+/* Simplify the CmpMap. */
+         smap = astSimplify( cmpmap );
+
+/* The two MathMaps are equivalent if the simplified CmpMap is a UnitMap. */
+         result = astIsAUnitMap( smap );
+
+/* Free resources. */
+         smap = astAnnul( smap );
+         cmpmap = astAnnul( cmpmap );
+
+/* Reinstate the original values of the SimpIF and SIMFI attributes. */
+         astSetSimpIF( this, simpif1 );
+         astSetSimpFI( this, simpfi1 );
+         astSetSimpIF( that, simpif2 );
+         astSetSimpFI( that, simpfi2 );
+      }
+   }
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
 }
 
 static void EvaluateFunction( Rcontext *rcontext, int npoint,
@@ -3420,6 +3536,7 @@ void astInitMathMapVtab_(  AstMathMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
 
 /* Declare the copy constructor, destructor and class dump function. */
