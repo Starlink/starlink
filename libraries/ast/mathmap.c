@@ -61,6 +61,8 @@ f     The MathMap class does not define any new routines beyond those
 *        method.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     14-MAR-2006 (DSB):
+*        Add QIF function.
 *class--
 */
 
@@ -262,6 +264,9 @@ typedef enum {
    OP_RAND,                      /* Uniformly distributed random number */
    OP_SIGN,                      /* Transfer of sign function */
 
+/* Functions with three arguments. */
+   OP_QIF,                       /* C "question mark" operator "a?b:c" */
+
 /* Functions with variable numbers of arguments. */
    OP_MAX,                       /* Maximum of 2 or more values */
    OP_MIN,                       /* Minimum of 2 or more values */
@@ -402,6 +407,9 @@ static const Symbol symbol[] = {
    { "pow("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_POW      },
    { "rand("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_RAND     },
    { "sign("       ,  5,  0,  1,  1,  0, 19,  1,  1, -1,  2,  OP_SIGN     },
+
+/* Functions with two arguments. */
+   { "qif("        ,  4,  0,  1,  1,  0, 19,  1,  1, -2,  3,  OP_QIF      },
 
 /* Functions with variable numbers of arguments. */
    { "max("        ,  4,  0,  1,  1,  0, 19,  1,  1, -1, -2,  OP_MAX      },
@@ -1524,6 +1532,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    double *work;                 /* Pointer to stack workspace */
    double *xv1;                  /* Pointer to first argument vector */
    double *xv2;                  /* Pointer to second argument vector */
+   double *xv3;                  /* Pointer to third argument vector */
    double *xv;                   /* Pointer to sole argument vector */
    double *y;                    /* Pointer to result */
    double *yv;                   /* Pointer to result vector */
@@ -1539,6 +1548,7 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
    double value;                 /* Value to be assigned to stack vector */
    double x1;                    /* First argument value */
    double x2;                    /* Second argument value */
+   double x3;                    /* Third argument value */
    double x;                     /* Sole argument value */
    int expon1;                   /* First power of 2 exponent */
    int expon2;                   /* Second power of 2 exponent */
@@ -1766,6 +1776,39 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
          y = xv1 + point; \
 \
 /* Perform the processing, which uses the two argument values and then \
+   assigns the result to the appropriate top of stack element. */ \
+         {function;} \
+      } \
+\
+/* Break out of the "case" block. */ \
+      break;
+
+/* Three-argument boolean operation. */
+/* --------------------------------- */
+/* This macro is similar in function to ARG_2B above, except that it
+   takes three values of the stack and puts one back. It performs no
+   checks for bad values. */
+#define ARG_3B(oper,function) \
+\
+/* Test for the required opcode value. */ \
+   case oper: \
+\
+/* Obtain pointers to the top three stack elements (vectors), decreasing \
+   the top of stack index by two. */ \
+      xv3 = stack[ tos-- ]; \
+      xv2 = stack[ tos-- ]; \
+      xv1 = stack[ tos ]; \
+\
+/* Loop to access each vector element, obtaining the value of all 3 \
+   arguments and a pointer to the element which is to receive the \
+   result. */ \
+      for ( point = 0; point < npoint; point++ ) { \
+         x1 = xv1[ point ]; \
+         x2 = xv2[ point ]; \
+         x3 = xv3[ point ]; \
+         y = xv1 + point; \
+\
+/* Perform the processing, which uses the three argument values and then \
    assigns the result to the appropriate top of stack element. */ \
          {function;} \
       } \
@@ -2308,6 +2351,12 @@ static void EvaluateFunction( Rcontext *rcontext, int npoint,
                                 *y = x1 * ran + x2 * ( 1.0 - ran ); )
             ARG_2( OP_SIGN,     *y = ( ( x1 >= 0.0 ) == ( x2 >= 0.0 ) ) ?
                                      x1 : -x1 )
+
+/* Functions with three arguments. */
+/* ------------------------------- */
+/* These evaluate a function of the top three entries on the stack. */
+            ARG_3B( OP_QIF,     *y = ( ( x1 ) ? ( x2 ) : ( x3 ) ) )
+
 
 /* Functions with variable numbers of arguments. */
 /* --------------------------------------------- */
@@ -6358,6 +6407,8 @@ f     - POISSON(X): Random integer-valued sample from a Poisson
 f       distribution with mean X.
 c     - pow(x1, x2): "x1" raised to the power of "x2".
 f     - POW(X1, X2): X1 raised to the power of X2.
+c     - qif(x1, x2, x3): Returns "x2" if "x1" is true, and "x3" otherwise.
+f     - QIF(x1, x2, x3): Returns X2 if X1 is true, and X3 otherwise.
 c     - rand(x1, x2): Random sample from a uniform distribution in the
 c       range "x1" to "x2" inclusive.
 f     - RAND(X1, X2): Random sample from a uniform distribution in the
