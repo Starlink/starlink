@@ -66,8 +66,13 @@
 #       Use a new script to obtain cursor positions.
 #     2006 March 9 (MJC):
 #       Corrected the NDF name extraction when both the file extension and 
-#       an NDF section are supplied; this is via the new checkndf script that
-#       also checks for a degenerate third axis.
+#       an NDF section are supplied; this is via the new checkndf script 
+#       that also checks for a degenerate third axis.
+#     2006 March 10 (MJC):
+#       Find upper limit of the plots' ordinate so as to include all 
+#       spectra fully regardless of the offsets.  Also allow a 2-percent 
+#       margin at the top and bottom of the plot to separate the spectra 
+#       from the axes.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -155,6 +160,7 @@ if ( $status == 1 ) exit
 # Collapse white-light image.
 echo "      Collapsing:"
 echo "        White-light image: ${dims[1]} x ${dims[2]}"
+echo "xollapse in=${infile}${ndf_section} out=${colfile} axis=3" 
 collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
 
 # Setup the plot device.
@@ -226,6 +232,7 @@ echo "      Adding:"
 
 # Add the offset to each spectrum.
 set counter = 1
+set ytop = $ybot
 while ( $counter <= $numspec )
 
    set specfile = "${tmpdir}/${user}/stak_${counter}.sdf" 
@@ -238,9 +245,20 @@ while ( $counter <= $numspec )
 
    cadd in=${specfile} out=${outfile} scalar=${specoff}
 
+# Need to find the maximum value.  It may not be in the
+# last spectrum even though it has the largest offset.
+   stats "${outfile}" >& /dev/null
+   set outmax = `parget maximum stats`
+   set ytop = `calc exp="'max(${outmax},${ytop})'"` 
+
 # Increment the spectrum counter.
    @ counter = $counter + 1
 end
+
+# Give a litte breathing room to separate the curves from the
+# axes.
+set ytop = `calc exp="'${ytop}+0.02*((${ytop})-(${ybot}))'"` 
+set ybot = `calc exp="'${ybot}-0.02*((${ytop})-(${ybot}))'"` 
 
 # Create the multi-spectrum plot.
 # ===============================
@@ -259,7 +277,7 @@ while ( $counter > 0 )
    echo "        Spectrum: ${counter} "
 
    linplot ${outfile} device=${plotdev} style="Colour(curves)=1"\
-           mode=histogram clear=no ybot=${ybot} >& /dev/null
+           mode=histogram clear=no ybot=${ybot} ytop=${ytop} >& /dev/null
 
    @ counter = $counter - 1
 
@@ -312,7 +330,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
 
       linplot ${outfile} xleft=${low_z} xright=${upp_z}\
               device=${plotdev} style="Colour(curves)=1"\
-              mode=histogram clear=no ybot=${ybot} >& /dev/null
+              mode=histogram clear=no ybot=${ybot} ytop=${ytop} >& /dev/null
 
       @ counter = $counter - 1
 
