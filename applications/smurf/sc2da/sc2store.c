@@ -21,9 +21,6 @@
 #include "Dits_Err.h"
 #include "Ers.h"
 
-#include "fhead_par.h"
-#include "fhead.h"
-
 #include "fitsio.h"
 
 #include "dream_par.h"
@@ -930,7 +927,7 @@ int *status         /* global status (given and returned) */
    int colsize;            /* number of pixels in column */
    int *dksquid;           /* pointer to dark SQUID data */
    double *fcal;           /* pointer to flat field data */
-   static char fitsrec[FHEAD__MXREC][81];  /* store for FITS records */
+   static char fitsrec[SC2STORE__MAXFITS][81];  /* store for FITS records */
    double *fpar;           /* pointer to flat field parameters */
    struct sc2head *frhead; /* structure for headers for a frame */
    int j;                  /* loop counter */
@@ -943,7 +940,7 @@ int *status         /* global status (given and returned) */
 
 /* Read the TSTREAM data */
 
-   sc2store_rdtstream ( filename, access, flatlen, 81, FHEAD__MXREC, &nfits,
+   sc2store_rdtstream ( filename, access, flatlen, 81, SC2STORE__MAXFITS, &nfits,
      fitsrec, &colsize, &rowsize, nframes, nflat, flatname, &frhead,
      &tmptr, &dksquid, &fcal, &fpar, status );
 
