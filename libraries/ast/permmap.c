@@ -184,25 +184,17 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    function. */
    if( astIsAPermMap( that ) ) {
 
-/* See if their Invert flags are equal. If not, we to swap all references 
-   to inputs and outputs when dealing with the second PermMap. */
-      swap = ( astGetInvert( this ) != astGetInvert( that ) );
-
-/* Get the effective number of inputs and outputs for both. */
+/* Get the number of inputs and outputs and check they are the same for both. */
       nin = astGetNin( this );
       nout = astGetNout( this );
-      if( swap ) {
-         result = ( astGetNout( that ) == nin ) && 
-                  ( astGetNin( that ) == nout );
-      } else {
-         result = ( astGetNout( that ) == nout ) && 
-                  ( astGetNin( that ) == nin );
-      }
+      if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
 
-/* Check they both have the same number of inputs and outputs. */
-      if( result ) {
+/* See if their Invert flags are equal. If not, we to swap all further 
+   references to inputs and outputs when dealing with the second PermMap. */
+         swap = ( astGetInvert( this ) != astGetInvert( that ) );
 
 /* Compare the input and output permutation arrays. */   
+         result = 1;
          if( swap ) {
             for( i = 0; i < nin; i++ ) {
                if( this->inperm[ i ] != that->outperm[ i ] ) {
