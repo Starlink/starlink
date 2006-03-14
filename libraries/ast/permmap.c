@@ -52,6 +52,8 @@ f     The PermMap class does not define any new routines beyond those
 *        Added methods astGetInPerm and astGetOutPerm.
 *     2-NOV-2004 (DSB):
 *        Added method astGetConstants.
+*     14-MAR-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -107,6 +109,7 @@ AstPermMap *astPermMapId_( int, const int [], int, const int [], const double []
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double *GetConstants( AstPermMap * );
 static double Rate( AstMapping *, double *, int, int );
+static int Equal( AstObject *, AstObject * );
 static int *GetInPerm( AstPermMap * );
 static int *GetOutPerm( AstPermMap * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
@@ -118,6 +121,143 @@ static void Dump( AstObject *, AstChannel * );
 
 /* Member functions. */
 /* ================= */
+
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two PermMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "permmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     PermMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two PermMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a PermMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the PermMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPermMap *that;        
+   AstPermMap *this;        
+   int i;           
+   int ncon;
+   int nin;
+   int nout;
+   int result;
+   int swap;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two PermMap structures. */
+   this = (AstPermMap *) this_object;
+   that = (AstPermMap *) that_object;
+
+/* Check the second object is a PermMap. We know the first is a
+   PermMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAPermMap( that ) ) {
+
+/* See if their Invert flags are equal. If not, we to swap all references 
+   to inputs and outputs when dealing with the second PermMap. */
+      swap = ( astGetInvert( this ) != astGetInvert( that ) );
+
+/* Get the effective number of inputs and outputs for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( swap ) {
+         result = ( astGetNout( that ) == nin ) && 
+                  ( astGetNin( that ) == nout );
+      } else {
+         result = ( astGetNout( that ) == nout ) && 
+                  ( astGetNin( that ) == nin );
+      }
+
+/* Check they both have the same number of inputs and outputs. */
+      if( result ) {
+
+/* Compare the input and output permutation arrays. */   
+         if( swap ) {
+            for( i = 0; i < nin; i++ ) {
+               if( this->inperm[ i ] != that->outperm[ i ] ) {
+                  result = 0;
+                  break;
+               }
+            }
+            if( result ) {
+               for( i = 0; i < nout; i++ ) {
+                  if( this->outperm[ i ] != that->inperm[ i ] ) {
+                     result = 0;
+                     break;
+                  }
+               }
+            }
+         } else {
+            for( i = 0; i < nin; i++ ) {
+               if( this->inperm[ i ] != that->inperm[ i ] ) {
+                  result = 0;
+                  break;
+               }
+            }
+            if( result ) {
+               for( i = 0; i < nout; i++ ) {
+                  if( this->outperm[ i ] != that->outperm[ i ] ) {
+                     result = 0;
+                     break;
+                  }
+               }
+            }
+         }
+
+/* Compare constants. */
+         if( result ) {
+            ncon = astSizeOf( this->constant )/sizeof( double );
+            if( astSizeOf( that->constant )/sizeof( double ) == ncon ) {
+               for( i = 0; i < ncon; i++ ) {
+                  if( this->constant[ i ] != that->constant[ i ] ) {
+                     result = 0;
+                     break;
+                  }
+               }
+            } else {
+               result = 0;
+            }
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
 
 static double *GetConstants( AstPermMap *this ){
 /*
@@ -373,6 +513,7 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -398,6 +539,7 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
 
    parent_transform = mapping->Transform;
@@ -408,6 +550,7 @@ void astInitPermMapVtab_(  AstPermMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
 
