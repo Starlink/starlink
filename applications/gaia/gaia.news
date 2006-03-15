@@ -3,6 +3,10 @@
   Release 2.10-2
   ==============
 
+  Added Second U.S. Naval Observatory CCD Astrograph Catalog (UCAC2).
+  Existing users will need to remove the file $HOME/.skycat/skycat.cfg
+  and re-start GAIA.
+
   Skycat re-based to 2.4.7. Tcl/Tk to 8.4.11. Changes include single
   image display for MEFs.
 
