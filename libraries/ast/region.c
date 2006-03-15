@@ -7050,8 +7050,7 @@ static int RegDummyFS( AstRegion *this ){
 *        Pointer to the Region.
 
 *  Returned Value:
-*     Non-zero if the points all fall on the boundary of the given
-*     Region, to within the tolerance specified. Zero otherwise.
+*     Non-zero if the Region has a dummy FrameSet.
 
 *-
 */
