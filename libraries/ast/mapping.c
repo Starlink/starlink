@@ -172,13 +172,14 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     7-MAR-2006 (DSB):
 *        Added astTranGrid.
 *     14-MAR-2006 (DSB):
-*        The constructor no longer reports an error if the resulting
+*        - The constructor no longer reports an error if the resulting
 *	 Mapping cannot transform points in either direction. This is
 *	 because it may be possible to simplify such a Mapping and the
 *	 simplified Mapping may have defined transformations. E.g. if a
 *	 Mapping which has only a forward transformation is combined in
 *	 series with its own inverse, the combination CmpMap will simplify 
 *        to a UnitMap (usually).
+*        - Reset the "issimple" flag when the Invert flag is changed.
 *class--
 */
 
@@ -20592,7 +20593,7 @@ f     performed with the AST_INVERT routine.
 astMAKE_CLEAR(Mapping,Invert,invert,-CHAR_MAX)
 astMAKE_GET(Mapping,Invert,int,0,( ( this->invert == -CHAR_MAX ) ?
                                    0 : this->invert ))
-astMAKE_SET(Mapping,Invert,int,invert,( value != 0 ))
+astMAKE_SET(Mapping,Invert,int,invert,( this->issimple=0,(value!=0) ))
 astMAKE_TEST(Mapping,Invert,( this->invert != -CHAR_MAX ))
 
 /*

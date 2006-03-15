@@ -162,12 +162,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Local Variables: */
    AstPermMap *that;        
    AstPermMap *this;        
+   int *that_inp;
+   int *that_outp;
+   int *this_inp;
+   int *this_outp;
    int i;           
-   int ncon;
    int nin;
    int nout;
+   int p1;
+   int p2;
    int result;
-   int swap;
 
 /* Initialise. */
    result = 0;
@@ -189,56 +193,74 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
       nout = astGetNout( this );
       if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
 
-/* See if their Invert flags are equal. If not, we to swap all further 
-   references to inputs and outputs when dealing with the second PermMap. */
-         swap = ( astGetInvert( this ) != astGetInvert( that ) );
-
-/* Compare the input and output permutation arrays. */   
+/* Assume the PermMaps are equivalent. */
          result = 1;
-         if( swap ) {
-            for( i = 0; i < nin; i++ ) {
-               if( this->inperm[ i ] != that->outperm[ i ] ) {
-                  result = 0;
-                  break;
-               }
-            }
-            if( result ) {
-               for( i = 0; i < nout; i++ ) {
-                  if( this->outperm[ i ] != that->inperm[ i ] ) {
-                     result = 0;
-                     break;
-                  }
-               }
-            }
+
+/* Get pointers to the effective inperm and outperm array for each PermMap. 
+   If the Invert flags of the two PermMaps are not equal, we swap the
+   arrays for the second PermMap in order to take account of the relative
+   inversion of the second PermMap. */
+         if( astGetInvert( this ) != astGetInvert( that ) ) {
+            this_inp = this->inperm;
+            this_outp = this->outperm;
+            that_inp = that->outperm;
+            that_outp = that->inperm;
          } else {
-            for( i = 0; i < nin; i++ ) {
-               if( this->inperm[ i ] != that->inperm[ i ] ) {
+            this_inp = this->inperm;
+            this_outp = this->outperm;
+            that_inp = that->inperm;
+            that_outp = that->outperm;
+         }
+
+/* Loop round every PermMap input. */
+         for( i = 0; i < nin; i++ ) {
+
+/* See what is fed to this input by the inverse transformation. A zero or
+   positive integer "p" value indicates that the input is fed from the
+   output with the corresponding index. A negative integer "p" value means
+   the input is fed a constant value stored at index (-p-1) in the
+   associated constants array. */
+            p1 = this_inp ? this_inp[ i ] : i;
+            p2 = that_inp ? that_inp[ i ] : i;
+
+/* If the "p" values differ, we may have evidence that the PermMaps are
+   not equivalent. */
+            if( p1 != p2 ) {
+
+/* If either "p" value is zero or positive, then the PermMaps are
+   definitely different since input "i" is fed from differing outputs, or
+   one is fed from an input and the other is fed a constant. */
+               if( p1 >= 0 || p2 >= 0 ) {
                   result = 0;
                   break;
-               }
-            }
-            if( result ) {
-               for( i = 0; i < nout; i++ ) {
-                  if( this->outperm[ i ] != that->outperm[ i ] ) {
-                     result = 0;
-                     break;
-                  }
+
+/* If both "p" values are negative, then both inputs are fed a constant
+   value. The PermMaps differ if these constants differ. */
+               } else if( this->constant[ -p1 - 1 ] != 
+                          that->constant[ -p2 - 1 ] ) {
+                  result = 0;
+                  break;
                }
             }
          }
 
-/* Compare constants. */
+/* If we have not yet discovered any evidence that the PermMaps differ,
+   go on to check each output in the same way that we have just checked the
+   inputs. */
          if( result ) {
-            ncon = astSizeOf( this->constant )/sizeof( double );
-            if( astSizeOf( that->constant )/sizeof( double ) == ncon ) {
-               for( i = 0; i < ncon; i++ ) {
-                  if( this->constant[ i ] != that->constant[ i ] ) {
+            for( i = 0; i < nout; i++ ) {
+               p1 = this_outp ? this_outp[ i ] : i;
+               p2 = that_outp ? that_outp[ i ] : i;
+               if( p1 != p2 ) {
+                  if( p1 >= 0 || p2 >= 0 ) {
+                     result = 0;
+                     break;
+                  } else if( this->constant[ -p1 - 1 ] != 
+                             that->constant[ -p2 - 1 ] ) {
                      result = 0;
                      break;
                   }
                }
-            } else {
-               result = 0;
             }
          }
       }

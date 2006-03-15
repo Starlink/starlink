@@ -217,14 +217,14 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Check the global error status. */
    if ( !astOK ) return result;
 
+/* Obtain pointers to the two SwitchMap structures. */
+   this = (AstSwitchMap *) this_object;
+   that = (AstSwitchMap *) that_object;
+
 /* Check the second object is a SwitchMap. We know the first is a
    SwitchMap since we have arrived at this implementation of the virtual
    function. */
    if( astIsASwitchMap( that ) ) {
-
-/* Obtain pointers to the two SwitchMap structures. */
-      this = (AstSwitchMap *) this_object;
-      that = (AstSwitchMap *) that_object;
 
 /* Check they have the same number of route mappings. */
       nroute = this->nroute;
@@ -417,7 +417,7 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
 
 /* Set the Invert flag back to the value it had when the SwitchMap was
    created. */
-      astSetInvert( this, this->routeinv[ rindex ] );
+      astSetInvert( ret, this->routeinv[ rindex ] );
 
 /* If the SwitchMap has since been inverted, also invert the returned
    route Mapping, so that the forward transformation of the returned 
@@ -505,6 +505,8 @@ static AstMapping *GetSelector( AstSwitchMap *this, int fwd, int *inv ){
          astSetInvert( ret, this->fsinv );
       }
    }
+
+   if( ret && swinv ) astInvert( ret );
 
 /* Return the pointer. */
    return ret;
@@ -1078,7 +1080,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double *outv;
    double *sel;
    int *popmap;
-   int i;
+   int iroute;
+   int ipoint;
    int j;
    int k;
    int maxpop;
@@ -1137,10 +1140,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    nroute = map->nroute;
    popmap = astMalloc( sizeof( int )*nroute );
    if( astOK ) {
-      for( i = 0; i < nroute; i++ ) popmap[ i ] = 0;
+      for( iroute = 0; iroute < nroute; iroute++ ) popmap[ iroute ] = 0;
 
       sel = sel_ptr[ 0 ];
-      for( i = 0; i < npoint; i++ ) {
+      for( ipoint = 0; ipoint < npoint; ipoint++ ) {
          rindex = (int)( *(sel++) + 0.5 ) - 1;
          if( rindex >= 0 && rindex < nroute ) ( popmap[ rindex ] )++;
       }   
@@ -1149,9 +1152,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    Also find the total number of points transformed by any route Mapping. */
       totpop = 0;
       maxpop = 0;
-      for( i = 0; i < nroute; i++ ) {
-         if( popmap[ i ] > maxpop ) maxpop = popmap[ i ];
-         totpop += popmap[ i ];
+      for( iroute = 0; iroute < nroute; iroute++ ) {
+         if( popmap[ iroute ] > maxpop ) maxpop = popmap[ iroute ];
+         totpop += popmap[ iroute ];
       }
 
 /* If some of the points are not transformed by any route Mapping.
@@ -1159,7 +1162,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       if( totpop < npoint ) {
          for( j = 0; j < ncout; j++ ) {
             outv = out_ptr[ j ];
-            for( i = 0; i < npoint; i++ ) *(outv++) = AST__BAD;
+            for( ipoint = 0; ipoint < npoint; ipoint++ ) *(outv++) = AST__BAD;
          }
       }
 
@@ -1175,16 +1178,16 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       if( astOK ) {
 
 /* Loop round each route Mapping. */
-         for( i = 0; i < nroute; i++ ) {
-            rmap = GetRoute( map, (double)( i + 1 ), &rinv );
+         for( iroute = 0; iroute < nroute; iroute++ ) {
+            rmap = GetRoute( map, (double)( iroute + 1 ), &rinv );
 
 /* Construct two PointSets of the correct size to hold the input and
    output points to be processed with the current route Mapping. We
    re-use the memory allocated for the largest route Mapping's PointSet. */
-            if( popmap[ i ] != maxpop ) {
-               ps1a = astPointSet( popmap[ i ], ncin, "" );
+            if( popmap[ iroute ] != maxpop ) {
+               ps1a = astPointSet( popmap[ iroute ], ncin, "" );
                astSetPoints( ps1a, ptr1 );
-               ps2a = astPointSet( popmap[ i ], ncout, "" );
+               ps2a = astPointSet( popmap[ iroute ], ncout, "" );
                astSetPoints( ps2a, ptr2 );
             } else {
                ps1a = astClone( ps1 );
@@ -1195,11 +1198,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transformed using the current route Mapping. */
             sel = sel_ptr[ 0 ];
             k = 0;
-            for( i = 0; i < npoint; i++ ) {
+            for( ipoint = 0; ipoint < npoint; ipoint++ ) {
                rindex = (int)( *(sel++) + 0.5 ) - 1;
-               if( rindex == i ) {
+               if( rindex == iroute ) {
                   for( j = 0; j < ncin; j++ ) {
-                     ptr1[ j ][ k ] = in_ptr[ j ][ i ];
+                     ptr1[ j ][ k ] = in_ptr[ j ][ ipoint ];
                   }
                   k++;
                }
@@ -1212,11 +1215,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    array. */
             sel = sel_ptr[ 0 ];
             k = 0;
-            for( i = 0; i < npoint; i++ ) {
+            for( ipoint = 0; ipoint < npoint; ipoint++ ) {
                rindex = (int)( *(sel++) + 0.5 ) - 1;
-               if( rindex == i ) {
-                  for( j = 0; j < ncin; j++ ) {
-                     out_ptr[ j ][ i ] = ptr2[ j ][ k ];
+               if( rindex == iroute ) {
+                  for( j = 0; j < ncout; j++ ) {
+                     out_ptr[ j ][ ipoint ] = ptr2[ j ][ k ];
                   }
                   k++;
                }
@@ -1365,6 +1368,7 @@ static void Delete( AstObject *obj ) {
    for( i = 0; i < this->nroute; i++ ) {
       this->routemap[ i ] = astAnnul( this->routemap[ i ] );
    }   
+   this->routemap = astFree( this->routemap );
    this->routeinv = astFree( this->routeinv );
 
 /* Clear the remaining SwitchMap variables. */
@@ -1458,11 +1462,6 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                    ival ? "Inv selector used in inverse direction" :
                           "Inv selector used in forward direction" );
    }
-
-/* Number of route Mappings. */
-/* ------------------------- */
-   astWriteInt( channel, "NRoute", set, 0, this->nroute,
-                "Number of route Mappings" );
 
 /* Loop to dump each route Mapping and its invert flag. */
 /* ---------------------------------------------------- */
@@ -2148,6 +2147,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 
 /* Local Variables: */
    AstSwitchMap *new;               
+   AstMapping *rmap;
    int i;
    char buf[ 20 ];
 
@@ -2178,7 +2178,6 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
    partly-built SwitchMap. */
    new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
-
    if ( astOK ) {
 
 /* Read input data. */
@@ -2207,25 +2206,31 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
       new->isinv = astReadInt( channel, "isinv", 0 );
       new->isinv = ( new->isinv != 0 );
 
-/* Number of route Mappings. */
-/* ------------------------- */
-      new->nroute = astReadInt( channel, "nroute", 0 );
-
-/* Create arrays to hold the route Mapping pointers and invert flags. */
-      new->routemap = astMalloc( sizeof( AstMapping *) * ( new->nroute ) );
-      new->routeinv = astMalloc( sizeof( int ) * ( new->nroute ) );
-
 /* Loop to load each route Mapping and its invert flag. */
 /* ---------------------------------------------------- */
-      if( astOK ) {
-         for( i = 0; i < new->nroute; i++ ) {
-            sprintf( buf, "rmap%d", i + 1 );
-            new->routemap[ i ] = astReadObject( channel, buf, NULL );
-            sprintf( buf, "rinv%d", i + 1 );
-            new->routeinv[ i ] = astReadInt( channel, buf, 0 );
-            new->routeinv[ i ] = ( new->routeinv[ i ] != 0 );
+      new->routemap = NULL;
+      new->routeinv = NULL;
+      i = 0;
+      while( astOK ) {
+         sprintf( buf, "rmap%d", i + 1 );
+         rmap = astReadObject( channel, buf, NULL );
+         if( rmap ) {
+            new->routemap = astGrow( new->routemap, i + 1, sizeof( AstMapping *) );
+            new->routeinv = astGrow( new->routeinv, i + 1, sizeof( int ) );
+            if( astOK ) {
+               new->routemap[ i ] = rmap;
+               sprintf( buf, "rinv%d", i + 1 );
+               new->routeinv[ i ] = astReadInt( channel, buf, 0 );
+               new->routeinv[ i ] = ( new->routeinv[ i ] != 0 );
+               i++;
+            }
+         } else {
+            break;
          }
       }
+
+/* Number of route Mappings. */
+      new->nroute = i;
 
 /* If an error occurred, clean up by deleting the new SwitchMap. */
       if ( !astOK ) new = astDelete( new );

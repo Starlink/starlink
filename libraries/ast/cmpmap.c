@@ -87,6 +87,9 @@ f     The CmpMap class does not define any new routines beyond those
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
 *     14-MAR-2006 (DSB):
+*        - When checking for patterns in the simplification process,
+*        require at least 30 samples in the waveform for evidence of a
+*        pattern.
 *        - Override astEqual.
 *        - The constructor no longer reports an error if the resulting
 *	 CmpMap cannot transform points in either direction. This is
@@ -210,13 +213,18 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 */
 
 /* Local Variables: */
-   AstCmpMap *this;        
    AstCmpMap *that;        
+   AstCmpMap *this;        
+   AstMapping *that_mapa;
+   AstMapping *that_mapb;
+   AstMapping *this_mapa;
+   AstMapping *this_mapb;
+   AstMapping *tmap;
    int result;
-   int that_inv2;
-   int that_inv1;
-   int this_inv1;
-   int this_inv2;
+   int that_inva;
+   int that_invb;
+   int this_inva;
+   int this_invb;
 
 /* Initialise. */
    result = 0;
@@ -235,36 +243,59 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Check they are both either parallel or series. */
       if( that->series == that->series ) {
-   
-/* Temporarily re-instate the Invert flags which the first component
-   Mappings had when the CmpMap was created. */
-         this_inv1 = astGetInvert( this->map1 );
-         astSetInvert( this->map1, this->invert1 );
-         that_inv1 = astGetInvert( that->map1 );
-         astSetInvert( that->map1, that->invert1 );
 
-/* Compare the first component Mappings. */
-         if( astEqual( this->map1, that->map1 ) ) {
+/* Get pointers to the component Mappings and set their Invert flags back
+   to the value they had when the CmpMap was constructed, noting the
+   current value first so that it can be re-instated later. */
+         this_mapa = this->map1;
+         this_inva = astGetInvert( this_mapa );
+         astSetInvert( this_mapa, this->invert1 );
 
-/* Temporarily re-instate the Invert flags which the second component
-   Mappings had when the CmpMap was created. */
-            this_inv2 = astGetInvert( this->map2 );
-            astSetInvert( this->map2, this->invert2 );
-            that_inv2 = astGetInvert( that->map2 );
-            astSetInvert( that->map2, that->invert2 );
+         this_mapb = this->map2;
+         this_invb = astGetInvert( this_mapb );
+         astSetInvert( this_mapb, this->invert2 );
 
-/* Compare the second component Mappings. */
-            result = astEqual( this->map2, that->map2 );
+         that_mapa = that->map1;
+         that_inva = astGetInvert( that_mapa );
+         astSetInvert( that_mapa, that->invert1 );
 
-/* Re-instate the original Invert flags for the second component Mappings. */
-            astSetInvert( this->map2, this_inv2 );
-            astSetInvert( that->map2, that_inv2 );
+         that_mapb = that->map2;
+         that_invb = astGetInvert( that_mapb );
+         astSetInvert( that_mapb, that->invert2 );
+
+/* If either CmpMap has been inverted since it was created, then we need
+   to invert the component Mappings. Also, if the component Mappings are
+   combined in series, we need to use them in reverse order, so swap the
+   "a" and "b" pointers. */
+         if( astGetInvert( this ) ) {
+            astInvert( this_mapa );
+            astInvert( this_mapb );
+            if( this->series ) {
+               tmap = this_mapa;
+               this_mapa = this_mapb;
+               this_mapb = tmap;
+            }
          }
 
-/* Re-instate the original Invert flags for the first component Mappings. */
-         astSetInvert( this->map1, this_inv1 );
-         astSetInvert( that->map1, that_inv1 );
+         if( astGetInvert( that ) ) {
+            astInvert( that_mapa );
+            astInvert( that_mapb );
+            if( that->series ) {
+               tmap = that_mapa;
+               that_mapa = that_mapb;
+               that_mapb = tmap;
+            }
+         }
+  
+/* Compare the component Mappings. */
+         result = astEqual( this_mapa, that_mapa ) && 
+                  astEqual( this_mapb, that_mapb );
 
+/* Re-instate the original Invert flags for the second component Mappings. */
+         astSetInvert( this_mapa, this_inva );
+         astSetInvert( this_mapb, this_invb );
+         astSetInvert( that_mapa, that_inva );
+         astSetInvert( that_mapb, that_invb );
       }
    }
    
@@ -3588,8 +3619,9 @@ static int PatternCheck( int val, int check, int **list, int *list_len ){
 
 /* If required, determine the maximum "wavelength" for looping patterns to be 
    checked, and store the earliest list entry to consider. We take 3 complete 
-   patterns as evidence of looping. */
-      if( check ){
+   patterns as evidence of looping, but we only do the check when the
+   list length is at least 30. */
+      if( check && *list_len > 29 ){
          mxwave = iat/3;
          if( mxwave > 50 ) mxwave = 50;
          jlo = iat - 3*mxwave;

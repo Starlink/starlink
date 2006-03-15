@@ -2520,8 +2520,9 @@ void astFlushMemory_( int leak ) {
    if( nact && leak ){
       astError( AST__INTER, "astFlushMemory: %d AST memory blocks have not "
                 "been released (programming error).", nact );
+   } else {
+      printf("astFlushMemory: All AST memory blocks were released correctly.\n" );
    }
-
 }
 
 static void Issue( Memory *mem ) {
