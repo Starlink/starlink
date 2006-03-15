@@ -99,6 +99,7 @@ typedef struct AstRegionVtab {
    AstRegion *(* MapRegion)( AstRegion *, AstMapping *, AstFrame * );
    AstFrame *(* GetRegionFrame)( AstRegion * );
    AstFrame *(* RegFrame)( AstRegion * );
+   AstFrameSet *(* GetRegFS)( AstRegion * );
    AstPointSet *(* RegTransform)( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
    AstPointSet *(* BTransform)( AstRegion *, AstPointSet *, int, AstPointSet * );
    void (* Negate)( AstRegion * );
@@ -247,6 +248,7 @@ AstPointSet *astBndBaseMesh_( AstRegion *, double *, double * );
 AstRegion *astGetUncFrm_( AstRegion *, int );
 AstRegion *astGetDefUnc_( AstRegion * );
 int astOverlapX_( AstRegion *, AstRegion * );
+AstFrameSet *astGetRegFS_( AstRegion * );
 void astSetRegFS_( AstRegion *, AstFrame * );
 double *astRegCentre_( AstRegion *, double *, double **, int, int );
 double *astRegTranPoint_( AstRegion *, double *, int, int );
@@ -387,6 +389,7 @@ astINVOKE(V,astMaskUS_(astCheckRegion(this),(map?astCheckMapping(map):NULL),insi
 #define astRegDummyFS(this) astINVOKE(V,astRegDummyFS_(astCheckRegion(this)))
 #define astRegPins(this,pset,unc,mask) astINVOKE(V,astRegPins_(astCheckRegion(this),astCheckPointSet(pset),unc?astCheckRegion(unc):unc,mask))
 #define astRegTranPoint astRegTranPoint_
+#define astGetRegFS(this) astINVOKE(O,astGetRegFS_(astCheckRegion(this)))
 #define astSetRegFS(this,frm) astINVOKE(V,astSetRegFS_(astCheckRegion(this),astCheckFrame(frm)))
 #define astTestUnc(this) astINVOKE(V,astTestUnc_(astCheckRegion(this)))
 #define astResetCache(this) astINVOKE(V,astResetCache_(astCheckRegion(this)))

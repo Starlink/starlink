@@ -135,6 +135,8 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *        Override astGetObjSize.
 *     2-MAR-2006 (DSB):
 *        Changed AST_LONG_DOUBLE to HAVE_LONG_DOUBLE.
+*     14-MAR-2006 (DSB):
+*        Added astGetRefFS.
 *class--
 
 *  Implementation Notes:
@@ -831,6 +833,7 @@ static void Resolve( AstFrame *, const double [], const double [], const double 
 static void SetAxis( AstFrame *, int, AstAxis * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static AstFrameSet *GetRegFS( AstRegion * );
 static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
 static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
 static int LineContains( AstFrame *, AstLineDef *, int, double * );
@@ -3053,6 +3056,51 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    return result;
 }
 
+static AstFrameSet *GetRegFS( AstRegion *this ) {
+/*
+*+
+*  Name:
+*     astGetRegFS
+
+*  Purpose:
+*     Obtain a pointer to the FrameSet encapsulated within a Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstFrameSet *astGetRegFS( AstRegion *this ) 
+
+*  Class Membership:
+*     Region virtual function 
+
+*  Description:
+*     This function returns a pointer to the FrameSet encapsulated by the
+*     Region. This is a clone, not a deep copy, of the pointer stored
+*     in the Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+
+*  Returned Value:
+*     A pointer to the FrameSet.
+
+*  Notes:
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return the required pointer. */
+   return astClone( this->frameset );
+}
+
 static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
 /*
 *  Name:
@@ -3920,6 +3968,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegPins = RegPins;
    vtab->RegTransform = RegTransform;
    vtab->BTransform = BTransform;
+   vtab->GetRegFS = GetRegFS;
    vtab->SetRegFS = SetRegFS;
    vtab->MaskB = MaskB;
    vtab->MaskD = MaskD;
@@ -11015,6 +11064,10 @@ AstRegion *astGetUnc_( AstRegion *this, int def ){
 void astSetUnc_( AstRegion *this, AstRegion *unc ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,SetUnc))( this, unc );
+}
+AstFrameSet *astGetRegFS_( AstRegion *this ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,GetRegFS))( this );
 }
 void astSetRegFS_( AstRegion *this, AstFrame *frm ){
    if ( !astOK ) return;
