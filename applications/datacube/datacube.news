@@ -22,6 +22,9 @@ The following applications have been modified:
    o  compare has a -i option for input filename for non-interactive
       scripting.
 
+   o  multistack and stacker plot ordinate limits now always
+   make visible all the spectra, regardless of the chosen offset.
+
    o  peakmap now has -c option to specify the number of contour 
    levels to plot; this may be zero to prevent contours be overlaid. 
 
