@@ -11,7 +11,9 @@
 #  Description:
 #     This class creates a top level window that displays and configures
 #     a spectral_plot canvas item. The spectrum displayed is a 1D section
-#     of an NDF.
+#     of an NDF. The section can also be displayed, in a small format, on
+#     another canvas, and have a reference position displayed (usually the
+#     coordinate of an image slice being displayed. 
 
 #  Invocations:
 #
@@ -70,6 +72,10 @@ itcl::class gaia::GaiaSpectralPlot {
       wm title $w_ "GAIA: Spectral plot ($itk_option(-number))"
       wm geometry $w_ 700x300
 
+      #  When window is closed, we want to withdraw all graphics
+      #  interactions.
+      wm protocol $w_ WM_DELETE_WINDOW [code $this close]
+
       #  Add an options menu for setting options that should probably
       #  be defined once only per-session, or infrequently.
       add_menubar
@@ -80,14 +86,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Add window help.
       add_help_button patchusage "On Window..."
-
-      #  Add option to create a new window.
-      $File add command -label {New window} \
-         -command [code $this clone_me_] \
-         -accelerator {Control-n}
-      bind $w_ <Control-n> [code $this clone_me_]
-      $short_help_win_ add_menu_short_help $File \
-         {New window} {Create a clone window}
 
       #  Set the exit menu item.
       $File add command -label Exit -command [code $this close] \
@@ -127,23 +125,27 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Destructor:
    #  -----------
    destructor  {
-
+      reset
    }
 
    #  Methods:
    #  --------
 
-   #  Create a new instance of this object.
-   protected method clone_me_ {} {
-      if { $itk_option(-clone_cmd) != {} } {
-         eval $itk_option(-clone_cmd)
-      }
-   }
-
    #  Close down.
    public method close {} {
       reset
       wm withdraw $w_
+      if { $itk_option(-close_cmd) != {} } {
+         eval $itk_option(-close_cmd)
+      }
+   }
+
+   #  Reopen
+   public method open {} {
+      wm deiconify $w_
+      if { $itk_option(-open_cmd) != {} } {
+         eval $itk_option(-open_cmd)
+      }
    }
 
    #  Reset so that a new spectrum will be created.
@@ -155,7 +157,6 @@ itcl::class gaia::GaiaSpectralPlot {
       set spectrum_ {}
       set spectrum2_ {}
    }
-
 
    #  Display a spectrum, must be a 1D NDF, so usually a section. The axis
    #  defines the WCS axis that should be used for the plot X axis.
@@ -177,6 +178,8 @@ itcl::class gaia::GaiaSpectralPlot {
                            -linecolour blue -linewidth 1 \
                            -gridoptions "Grid=0,DrawTitle=0" \
                            -showaxes 1]
+         make_ref_line_
+         set_to_ref_coord_
       }
 
       #  Create the secondary plot, put this at the given x and y.
@@ -202,7 +205,6 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_component(canvas) itemconfigure $spectrum_ \
             -dataunits "[ndf::getc $ndfid units]" \
             -datalabel "[ndf::getc $ndfid label]"
-         puts "units/label [ndf::getc $ndfid units]/[ndf::getc $ndfid label]"
       }
 
       #  Pass in the data.
@@ -211,7 +213,7 @@ itcl::class gaia::GaiaSpectralPlot {
          $itk_option(-canvas) coords $spectrum2_ pointer $adr $nel $type
 
          #  Translate the secondary plot.
-         if { $x != {} && $y != {} } { 
+         if { $x != {} && $y != {} } {
             set dx [expr $x - [$itk_option(-canvas) itemcget $spectrum2_ -x]]
             set dy [expr $y - [$itk_option(-canvas) itemcget $spectrum2_ -y]]
             $itk_option(-canvas) move $spectrum2_ $dx $dy
@@ -222,10 +224,46 @@ itcl::class gaia::GaiaSpectralPlot {
       ndf::close $ndfid
    }
 
+   #  Make the reference line item. This should be refreshed to the reference
+   #  coordinate as necessary.
+   protected method make_ref_line_ {} {
+      if { $itk_option(-show_ref_line) } {
+         lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
+         if { $x0 != {} } { 
+            set ref_line_ [$itk_component(canvas) create line $x0 $y0 $x0 $y1 \
+                              -width 1 -fill red]
+         }
+      }
+   }
+
+   #  Set the reference line coordinate. Use a special coords that
+   #  takes a world coordinate and returns a canvas coordinate. 
+   public method set_ref_coord {xcoord} {
+      if { $spectrum_ != {} && $ref_line_ != {} } {
+         set xref_ [$itk_component(canvas) coords $spectrum_ convert $xcoord]
+         set_to_ref_coord_
+      }
+   }
+
+   #  Move reference line to the reference coordinate.
+   public method set_to_ref_coord_ {} {
+      if { $spectrum_ != {} && $ref_line_ != {} } {
+         lassign [$itk_component(canvas) coords $ref_line_] x0 y0 x1 y1
+         $itk_component(canvas) move $ref_line_ [expr $xref_ - $x0] 0
+      }
+   }
+
    #  Make the spectral_plot item scale to fit the full size of the canvas.
    public method fitxy { args } {
       $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
 
+      # Resize the reference line.
+      if { $ref_line_ != {} } {
+         $itk_component(canvas) delete $ref_line_
+         make_ref_line_
+         set_to_ref_coord_
+      }
+      
       # Fudge immediate update.
       $itk_component(canvas) itemconfigure $spectrum_ -showaxes 1
    }
@@ -273,12 +311,19 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Identifying number for toolbox (shown in () in window title).
    itk_option define -number number Number 0 {}
 
-   #  Command to execute to create a new instance of this object.
-   itk_option define -clone_cmd clone_cmd Clone_Cmd {}
-
    #  Tag to use for any graphics. Matches the ast_tag value used in GAIA
    #  to avoid the main canvas scaling the plot.
    itk_option define -ast_tag ast_tag Ast_Tag ast_element
+
+   #  Command to execute when the "open" method is invoked.
+   itk_option define -open_cmd open_cmd Open_Cmd {}
+
+   #  Command to execute when the "close" method is invoked.
+   itk_option define -close_cmd close_cmd Close_Cmd {}
+
+   #  Whether to show the coordinate ref line.
+   itk_option define -show_ref_line show_ref_line \
+      Show_Ref_Line 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -291,6 +336,12 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The secondary spectral_plot item.
    protected variable spectrum2_ {}
+
+   #  The reference coordinate, units of the spectral axis.
+   protected variable xref_ 0
+   
+   #  Reference line item.
+   protected variable ref_line_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
