@@ -1830,5 +1830,4 @@ void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
   Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1, 
                              linePtr->header.y1, linePtr->header.x2, 
                              linePtr->header.y2 );
-  /*Tcl_Eval( interp, "update idletasks" );*/
 }

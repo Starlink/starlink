@@ -6345,7 +6345,7 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
 //         coord - return the formatted coordinate of a position along a given
 //                 axis. Second argument is the NDF identifier, the third
 //                 the index of the axis, and the fourth a list of all the
-//                 pixel coordinates  needed to identify the coordinate (so
+//                 pixel coordinates needed to identify the coordinate (so
 //                 the list must have a number for each dimension of the NDF).
 //                 A boolean, optional, final argument can be used to switch
 //                 on trailing label and units strings to the value.
