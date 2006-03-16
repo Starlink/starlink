@@ -1639,6 +1639,269 @@ iraf! {
           }
       }
 
+      action astswitchmap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fsmap {
+            position 1
+            type LITERAL
+            prompt {The forward selector Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ismap {
+            position 2
+            type LITERAL
+            prompt {The inverse selector Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter routemap1 {
+            position 3
+            type LITERAL
+            prompt {The first route Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter routemap2 {
+            position 4
+            type LITERAL
+            prompt {The second route Mapping}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter routemap3 {
+            type LITERAL
+            prompt {Route Mapping number 3}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap4 {
+            type LITERAL
+            prompt {Route Mapping number 4}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap5 {
+            type LITERAL
+            prompt {Route Mapping number 5}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap6 {
+            type LITERAL
+            prompt {Route Mapping number 6}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap7 {
+            type LITERAL
+            prompt {Route Mapping number 7}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap8 {
+            type LITERAL
+            prompt {Route Mapping number 8}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap9 {
+            type LITERAL
+            prompt {Route Mapping number 9}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap10 {
+            type LITERAL
+            prompt {Route Mapping number 10}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap11 {
+            type LITERAL
+            prompt {Route Mapping number 11}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap12 {
+            type LITERAL
+            prompt {Route Mapping number 12}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap13 {
+            type LITERAL
+            prompt {Route Mapping number 13}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap14 {
+            type LITERAL
+            prompt {Route Mapping number 14}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap15 {
+            type LITERAL
+            prompt {Route Mapping number 15}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap16 {
+            type LITERAL
+            prompt {Route Mapping number 16}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap17 {
+            type LITERAL
+            prompt {Route Mapping number 17}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap18 {
+            type LITERAL
+            prompt {Route Mapping number 18}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap19 {
+            type LITERAL
+            prompt {Route Mapping number 19}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap20 {
+            type LITERAL
+            prompt {Route Mapping number 20}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap21 {
+            type LITERAL
+            prompt {Route Mapping number 21}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap22 {
+            type LITERAL
+            prompt {Route Mapping number 22}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap23 {
+            type LITERAL
+            prompt {Route Mapping number 23}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap24 {
+            type LITERAL
+            prompt {Route Mapping number 24}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter routemap25 {
+            type LITERAL
+            prompt {Route Mapping number 25}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter options {
+            position 5
+            type LITERAL
+            prompt {Options for the SwitchMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the SwitchMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
       action asttranmap {
 
          helplib {$ATOOLS_HELP}

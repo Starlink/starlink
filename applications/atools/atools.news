@@ -9,6 +9,10 @@
  high-level interface to the AST library. 
 
 
+  Changes in V1.9
+
+  - New command astswitchmap. Creates an SwitchMap.
+
   Changes in V1.8-1:
 
   - New command astellipse. Creates an Ellipse.
