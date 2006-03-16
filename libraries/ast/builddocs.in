@@ -78,6 +78,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/timeframe.c \
             ${srcdir}/timemap.c \
             ${srcdir}/tranmap.c \
+            ${srcdir}/selectormap.c \
             ${srcdir}/switchmap.c \
             ${srcdir}/unitmap.c \
             ${srcdir}/wcsmap.c \

@@ -33,6 +33,11 @@ SwitchMap represents several alternate Mappings, each of which is used to
 transforms input positions within a different region of the input
 coordinate space.
 
+- A new subclass of Mapping has been added called SelectorMap. A
+SelectorMap tests each input position to see if it falls within one of
+several Regions. If it does, the index of the Region containing the
+input position is returned as the Mapping output.
+
 
 Main Changes in Version 4.1
 ---------------------------
