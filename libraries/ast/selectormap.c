@@ -839,6 +839,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
       for( i = 0; i < in->nreg; i++ ) {
          out->reg[ i ] = astCopy( in->reg[ i ] );
       }
+      out->nreg = in->nreg;
    }
 
 }

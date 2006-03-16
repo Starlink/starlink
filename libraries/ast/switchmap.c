@@ -65,7 +65,14 @@ f     AST_SWITCHMAP
 *
 *     In practice, appropriate selector Mappings should be chosen to
 *     associate a different route Mapping with each region of coordinate 
-*     space. 
+*     space. Note that the SelectorMap class of Mapping is particularly 
+*     appropriate for this purpose.
+*
+*     If a compound Mapping contains a SwitchMap in series with its own
+*     inverse, the combination of the two adjacent SwitchMaps will be 
+*     replaced by a UnitMap when the compound Mapping is simplified using
+c     astSimplify.
+f     AST_SIMPLIFY.
 
 *  Inheritance:
 *     The SwitchMap class inherits from the Mapping class.
@@ -252,19 +259,23 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
                   rmap1 = GetRoute( this, (double) ( i + 1 ), &rinv1 );
                   rmap2 = GetRoute( that, (double) ( i + 1 ), &rinv2 );
                   if( !astEqual( rmap1, rmap2 ) ) result = 0;
-                  astSetInvert( rmap1, rinv1 );
                   astSetInvert( rmap2, rinv2 );
+                  astSetInvert( rmap1, rinv1 );
                }
             }
    
-/* Reinstate the invert flags for the inverse selector Mappings. */
-            if( ismap1 ) astSetInvert( ismap1, isinv1 );
+/* Reinstate the invert flags for the inverse selector Mappings. Ensure
+   this is done in the opposite order to which the selector Mappings were
+   obtained (in case they are in fact the same Mapping). */
             if( ismap2 ) astSetInvert( ismap2, isinv2 );
+            if( ismap1 ) astSetInvert( ismap1, isinv1 );
          }
    
-/* Reinstate the invert flags for the forward selector Mappings. */
-         if( fsmap1 ) astSetInvert( fsmap1, fsinv1 );
+/* Reinstate the invert flags for the forward selector Mappings. Ensure
+   this is done in the oppsote order to which the selector Mappings were
+   obtained (in case they are in fact the same Mapping). */
          if( fsmap2 ) astSetInvert( fsmap2, fsinv2 );
+         if( fsmap1 ) astSetInvert( fsmap1, fsinv1 );
       }
    }
    
@@ -754,9 +765,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    nroute = map->nroute;
 
 /* Temporarily put the Invert flag of all encapsulated Mappings (both
-   route and selector) back to the values thet had when the SwitchMap was
+   route and selector) back to the values they had when the SwitchMap was
    created, noting their current values so that they can be re-instated
-   later. */
+   later. If the SwitchMap itself has been inverted, swap all the original 
+   invert flags. */
    if( map->fsmap ) {
       fsinv_old = astGetInvert( map->fsmap );
       astSetInvert( map->fsmap, map->fsinv );
@@ -773,64 +785,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       }
    }
 
-/* Attempt to simplify the SwitchMap on its own. */
-/* ============================================= */
-
-/* If the SwitchMap is inverted, create an equal SwitchMap which is not 
-   inverted. To do this, invert and swap the selector Mappings, and
-   invert all the route Mappings. */
-   if( ( *invert_list )[ where ] ) {
-      if( map->fsmap ) astInvert( map->fsmap );
-      if( map->ismap ) astInvert( map->ismap );
-      for( i = 0; i < nroute; i++ ) astInvert( map->routemap[ i ] );
-      new = (AstMapping *) astSwitchMap( map->ismap, map->fsmap, nroute, (void **) map->routemap, "" );
-      if( map->fsmap ) astInvert( map->fsmap );
-      if( map->ismap ) astInvert( map->ismap );
-      for( i = 0; i < nroute; i++ ) astInvert( map->routemap[ i ] );
-
-      (void) astAnnul( ( *map_list )[ where ] );
-      ( *map_list )[ where ] = (AstMapping *) new;
-      ( *invert_list )[ where ] = 0;
-      result = where;
-
-/* Otherwise, try to simplify each of the encapsulated Mappings, noting
-   if any simplification takes place. */
-   } else {
-      sfsmap = ( map->fsmap ) ? astSimplify( map->fsmap ) : NULL;
-      sismap = ( map->ismap ) ? astSimplify( map->ismap ) : NULL;
-      simp = ( sfsmap != map->fsmap ) || ( sismap != map->ismap );
-
-      srmap = astMalloc( sizeof( AstMapping * )*nroute );
-      if( astOK ) {
-         for( i = 0; i < nroute; i++ ) {
-            srmap[ i ] = astSimplify( map->routemap[ i ] );
-            simp = simp || ( srmap[ i ] != map->routemap[ i ] );
-         }
-      }
-
-/* If any simplification took place, construct a new SwitchMap from these 
-    simplified Mappings. */
-      if( simp ) { 
-         (void) astAnnul( ( *map_list )[ where ] );
-         ( *map_list )[ where ] = (AstMapping *) astSwitchMap( sfsmap, sismap,
-                                                 nroute, (void **) srmap, "" );
-         result = where;
-      }
-
-/* Release resources. */
-      if( sfsmap ) sfsmap = astAnnul( sfsmap );
-      if( sismap ) sismap = astAnnul( sismap );
-      if( srmap ) {
-         for( i = 0; i < nroute; i++ ) srmap[ i ] = astAnnul( srmap[ i ] );
-         srmap = astFree( srmap );
-      }
-   }
-
 /* If possible, merge the SwitchMap with a neighbouring SwitchMap. */
 /* =============================================================== */
-/* Only do this if no change was made above, and we are combining the
-   Mappings in series. */
-   if( result == -1 && series ) {
+/* Only do this if we are combining the Mappings in series. */
+   if( series ) {
 
 /* Is the higher neighbour a SwitchMap? If so get a pointer to it, and
    note the index of the lower of the two adjacent SwitchMaps. */
@@ -883,6 +841,65 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    modified element. */
             ( *nmap )--;
             result = where;
+         }
+      }
+   }
+
+/* Attempt to simplify the SwitchMap on its own. */
+/* ============================================= */
+/* Only do this if no change was made above. */
+   if( result == -1 ) {
+
+/* If the SwitchMap is inverted, create an equal SwitchMap which is not 
+   inverted. To do this, invert and swap the selector Mappings, and
+   invert all the route Mappings. We use astSetInvert rather than astInvert 
+   because two or more more stored pointers may point to the same Mapping 
+   in which case that Mapping would be inverted more than once with
+   unpredictable results. */
+      if( ( *invert_list )[ where ] ) {
+         if( map->fsmap ) astSetInvert( map->fsmap, !(map->fsinv) );
+         if( map->ismap ) astSetInvert( map->ismap, !(map->isinv) );
+         for( i = 0; i < nroute; i++ ) {
+            astSetInvert( map->routemap[ i ], !(map->routeinv[ i ]) );
+         }
+   
+         new = (AstMapping *) astSwitchMap( map->ismap, map->fsmap, nroute, (void **) map->routemap, "" );
+   
+         (void) astAnnul( ( *map_list )[ where ] );
+         ( *map_list )[ where ] = (AstMapping *) new;
+         ( *invert_list )[ where ] = 0;
+         result = where;
+
+/* Otherwise, try to simplify each of the encapsulated Mappings, noting
+   if any simplification takes place. */
+      } else {
+         sfsmap = ( map->fsmap ) ? astSimplify( map->fsmap ) : NULL;
+         sismap = ( map->ismap ) ? astSimplify( map->ismap ) : NULL;
+         simp = ( sfsmap != map->fsmap ) || ( sismap != map->ismap );
+   
+         srmap = astMalloc( sizeof( AstMapping * )*nroute );
+         if( astOK ) {
+            for( i = 0; i < nroute; i++ ) {
+               srmap[ i ] = astSimplify( map->routemap[ i ] );
+               simp = simp || ( srmap[ i ] != map->routemap[ i ] );
+            }
+         }
+
+/* If any simplification took place, construct a new SwitchMap from these 
+    simplified Mappings. */
+         if( simp ) { 
+            (void) astAnnul( ( *map_list )[ where ] );
+            ( *map_list )[ where ] = (AstMapping *) astSwitchMap( sfsmap, sismap,
+                                                    nroute, (void **) srmap, "" );
+            result = where;
+         }
+
+/* Release resources. */
+         if( sfsmap ) sfsmap = astAnnul( sfsmap );
+         if( sismap ) sismap = astAnnul( sismap );
+         if( srmap ) {
+            for( i = 0; i < nroute; i++ ) srmap[ i ] = astAnnul( srmap[ i ] );
+            srmap = astFree( srmap );
          }
       }
    }
@@ -1001,7 +1018,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
       }
    
 /* Reset the Invert flag for the selector Mapping. */
-      astSetInvert( map, fsinv );
+      astSetInvert( smap, fsinv );
    }
 
 /* Return the result. */
@@ -1177,60 +1194,62 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       ptr2 = astGetPoints( ps2 );
       if( astOK ) {
 
-/* Loop round each route Mapping. */
+/* Loop round each route Mapping which is used by at least 1 point. */
          for( iroute = 0; iroute < nroute; iroute++ ) {
-            rmap = GetRoute( map, (double)( iroute + 1 ), &rinv );
+            if( popmap[ iroute ] >0 ) {
+               rmap = GetRoute( map, (double)( iroute + 1 ), &rinv );
 
 /* Construct two PointSets of the correct size to hold the input and
    output points to be processed with the current route Mapping. We
    re-use the memory allocated for the largest route Mapping's PointSet. */
-            if( popmap[ iroute ] != maxpop ) {
-               ps1a = astPointSet( popmap[ iroute ], ncin, "" );
-               astSetPoints( ps1a, ptr1 );
-               ps2a = astPointSet( popmap[ iroute ], ncout, "" );
-               astSetPoints( ps2a, ptr2 );
-            } else {
-               ps1a = astClone( ps1 );
-               ps2a = astClone( ps2 );
-            }
+               if( popmap[ iroute ] != maxpop ) {
+                  ps1a = astPointSet( popmap[ iroute ], ncin, "" );
+                  astSetPoints( ps1a, ptr1 );
+                  ps2a = astPointSet( popmap[ iroute ], ncout, "" );
+                  astSetPoints( ps2a, ptr2 );
+               } else {
+                  ps1a = astClone( ps1 );
+                  ps2a = astClone( ps2 );
+               }
 
 /* Fill the input PointSet with the input positions which are to be
    transformed using the current route Mapping. */
-            sel = sel_ptr[ 0 ];
-            k = 0;
-            for( ipoint = 0; ipoint < npoint; ipoint++ ) {
-               rindex = (int)( *(sel++) + 0.5 ) - 1;
-               if( rindex == iroute ) {
-                  for( j = 0; j < ncin; j++ ) {
-                     ptr1[ j ][ k ] = in_ptr[ j ][ ipoint ];
+               sel = sel_ptr[ 0 ];
+               k = 0;
+               for( ipoint = 0; ipoint < npoint; ipoint++ ) {
+                  rindex = (int)( *(sel++) + 0.5 ) - 1;
+                  if( rindex == iroute ) {
+                     for( j = 0; j < ncin; j++ ) {
+                        ptr1[ j ][ k ] = in_ptr[ j ][ ipoint ];
+                     }
+                     k++;
                   }
-                  k++;
-               }
-            }   
+               }   
 
 /* Use the route Mapping to transform this PointSet. */
-            astTransform( rmap, ps1a, forward, ps2a );
+               astTransform( rmap, ps1a, forward, ps2a );
 
 /* Copy the axis values from the resulting PointSet back into the results
    array. */
-            sel = sel_ptr[ 0 ];
-            k = 0;
-            for( ipoint = 0; ipoint < npoint; ipoint++ ) {
-               rindex = (int)( *(sel++) + 0.5 ) - 1;
-               if( rindex == iroute ) {
-                  for( j = 0; j < ncout; j++ ) {
-                     out_ptr[ j ][ ipoint ] = ptr2[ j ][ k ];
+               sel = sel_ptr[ 0 ];
+               k = 0;
+               for( ipoint = 0; ipoint < npoint; ipoint++ ) {
+                  rindex = (int)( *(sel++) + 0.5 ) - 1;
+                  if( rindex == iroute ) {
+                     for( j = 0; j < ncout; j++ ) {
+                        out_ptr[ j ][ ipoint ] = ptr2[ j ][ k ];
+                     }
+                     k++;
                   }
-                  k++;
-               }
-            }   
+               }   
 
 /* Free resources. */
-            ps1a = astAnnul( ps1a );
-            ps2a = astAnnul( ps2a );
+               ps1a = astAnnul( ps1a );
+               ps2a = astAnnul( ps2a );
 
 /* Re-instate the Invert flag for the route Mapping. */
-            astSetInvert( rmap, rinv );
+               astSetInvert( rmap, rinv );
+            }
          }
       }
 
@@ -1448,19 +1467,24 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
                           "Fwd selector used in forward direction" );
    }
 
+
 /* Inverse selector Mapping */
 /* ------------------------ */
-   if( this->ismap ) {
-      astWriteObject( channel, "ISMap", 1, 1, this->ismap, 
-                      "Inverse selector Mapping" );
+/* Only do the inverse selector if it is not also the forward selector */
+   if( this->ismap != this->fsmap ) {
+
+      if( this->ismap ) {
+         astWriteObject( channel, "ISMap", 1, 1, this->ismap, 
+                         "Inverse selector Mapping" );
 
 /* Forward selector Invert flag. */
 /* ----------------------------- */
-      ival = this->isinv;
-      set = ( ival != 0 );
-      astWriteInt( channel, "ISInv", set, 0, ival,
-                   ival ? "Inv selector used in inverse direction" :
-                          "Inv selector used in forward direction" );
+         ival = this->isinv;
+         set = ( ival != 0 );
+         astWriteInt( channel, "ISInv", set, 0, ival,
+                      ival ? "Inv selector used in inverse direction" :
+                             "Inv selector used in forward direction" );
+      }
    }
 
 /* Loop to dump each route Mapping and its invert flag. */
@@ -1703,7 +1727,14 @@ f                             STATUS )
 *
 *     In practice, appropriate selector Mappings should be chosen to
 *     associate a different route Mapping with each region of coordinate 
-*     space. 
+*     space. Note that the SelectorMap class of Mapping is particularly 
+*     appropriate for this purpose.
+*
+*     If a compound Mapping contains a SwitchMap in series with its own
+*     inverse, the combination of the two adjacent SwitchMaps will be 
+*     replaced by a UnitMap when the compound Mapping is simplified using
+c     astSimplify.
+f     AST_SIMPLIFY.
 
 *  Parameters:
 c     fsmap
@@ -2202,8 +2233,8 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 
 /* Inverse Selector Mapping and its Invert flag. */
 /* --------------------------------------------- */
-      new->ismap = astReadObject( channel, "ismap", NULL );
-      new->isinv = astReadInt( channel, "isinv", 0 );
+      new->ismap = astReadObject( channel, "ismap", new->fsmap );
+      new->isinv = astReadInt( channel, "isinv", new->fsinv );
       new->isinv = ( new->isinv != 0 );
 
 /* Loop to load each route Mapping and its invert flag. */
