@@ -14,7 +14,7 @@ dnl    The following list must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line). Do not include fsf that has special
 dnl    handling.
-AC_CONFIG_SUBDIRS([caltech heasarc knoxville tclsys ijg])
+AC_CONFIG_SUBDIRS([caltech heasarc knoxville tclsys ijg rit])
 
 AC_CONFIG_FILES(Makefile)
 

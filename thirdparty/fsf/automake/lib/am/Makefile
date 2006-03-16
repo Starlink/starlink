@@ -34,7 +34,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = i686-pc-linux-gnu
+build_triplet = x86_64-unknown-linux-gnu
 subdir = lib/am
 DIST_COMMON = $(dist_am_DATA) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -61,13 +61,13 @@ REAL_INSTALL = install-am
 # Set to : to emit manifest lines, too
 # (don't actually do this here -- it's done within install-manifest below).
 MANIFEST = false
-ACLOCAL = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/aclocal --acdir=m4
-AMTAR = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run tar
+ACLOCAL = perllibdir=/loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake"/lib:./lib" /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/aclocal --acdir=m4
+AMTAR = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run tar
 APIVERSION = 1.9
-AUTOCONF = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoconf
-AUTOHEADER = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run autoheader
-AUTOMAKE = perllibdir=/scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake"/lib:./lib" /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/automake --libdir=lib
-AWK = mawk
+AUTOCONF = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run autoconf
+AUTOHEADER = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run autoheader
+AUTOMAKE = perllibdir=/loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake"/lib:./lib" /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/automake --libdir=lib
+AWK = gawk
 CYGPATH_W = echo
 DEFS = -DPACKAGE_NAME=\"Starlink\ Automake\" -DPACKAGE_TARNAME=\"automake\" -DPACKAGE_VERSION=\"1.9.6-starlink\" -DPACKAGE_STRING=\"Starlink\ Automake\ 1.9.6-starlink\" -DPACKAGE_BUGREPORT=\"ussc@star.rl.ac.uk\" -DPACKAGE=\"automake\" -DVERSION=\"1.9.6-starlink\" 
 ECHO_C = 
@@ -83,7 +83,7 @@ LIBOBJS =
 LIBS = 
 LN = ln
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/missing --run makeinfo
+MAKEINFO = ${SHELL} /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/missing --run makeinfo
 MODIFICATION_DELAY = 2
 PACKAGE = automake
 PACKAGE_BUGREPORT = ussc@star.rl.ac.uk
@@ -95,7 +95,7 @@ PATH_SEPARATOR = :
 PERL = /usr/local/bin/perl
 SET_MAKE = 
 SHELL = /bin/sh
-STAR_MANIFEST_DIR = $(prefix)/manifests
+STAR_MANIFEST_DIR = /export/pwda/pdraper/starlink_cvs/build/manifests
 STRIP = 
 TEX = tex
 VERSION = 1.9.6-starlink
@@ -103,17 +103,17 @@ ac_ct_STRIP =
 am_AUTOCONF = autoconf
 am__leading_dot = .
 bindir = ${exec_prefix}/bin
-build = i686-pc-linux-gnu
+build = x86_64-unknown-linux-gnu
 build_alias = 
-build_cpu = i686
+build_cpu = x86_64
 build_os = linux-gnu
-build_vendor = pc
+build_vendor = unknown
 datadir = ${prefix}/share
 exec_prefix = ${prefix}
 host_alias = 
 includedir = ${prefix}/include
 infodir = ${prefix}/info
-install_sh = /scratch/ptolemy/norman/s/cvs.starlink.ac.uk/trunk/thirdparty/fsf/automake/lib/install-sh
+install_sh = /loc/pwda/pdraper/starlink_cvs/source/thirdparty/fsf/automake/lib/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localstatedir = ${prefix}/var
@@ -121,7 +121,7 @@ mandir = ${prefix}/man
 mkdir_p = mkdir -p -- .
 oldincludedir = /usr/include
 pkgvdatadir = ${datadir}/automake-1.9
-prefix = /home/norman/Scratch/s/cvs.starlink.ac.uk/trunk/STAR/buildsupport
+prefix = /export/pwda/pdraper/starlink_cvs/build/buildsupport
 program_transform_name = s,x,x,
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
