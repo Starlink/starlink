@@ -7214,7 +7214,7 @@ is reserved to refer to two-dimensional Frames which describe
 celestial longitude and latitude (known as
 \xref{`SkyFrames'}{sun210}{SkyFrame}). SPECTRUM is reserved to refer
 to one-dimensional Frames which describe position within a spectrum
-(known as \xref{`SpecFrames'}{sun210}{SpecFrame}).These sub-classes of
+(known as \xref{`SpecFrames'}{sun210}{SpecFrame}).  These sub-classes of
 Frame have additional attributes indicating the particular celestial
 or spectral co-ordinate system in use (\emph{e.g.} equatorial,
 galactic, ecliptic, wavelength, frequency, radio velocity, optical
@@ -11844,7 +11844,7 @@ picture.}
 \menuitem{COLCOMP}{
  Produces a colour composite image from 1, 2 or 3 individual NDFs.}
 \menuitem{COLLAPSE}{
- Reduce the number of axes in an NDF by collapsing it along a nominated axis.}
+ Reduces the number of axes in an NDF by collapsing it along a nominated axis.}
 \menuitem{COMPADD}{
  Reduces the size of an NDF by adding values in rectangular boxes.}
 \menuitem{COMPAVE}{
@@ -12485,7 +12485,7 @@ functions as follows.
 \item {\large\bf Compression and expansion}
 \begin{description}
 \classitem{COLLAPSE}
- Reduce the number of axes in an NDF by collapsing it along a nominated axis.
+ Reduces the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
  Reduces the size of an NDF by adding values in rectangular boxes.
 \classitem{COMPAVE}
@@ -16839,7 +16839,7 @@ XV; PBMPLUS; NETPBM.
 \sstroutine{
    COLLAPSE
 }{
-   Reduce the number of axes in an \textit{n}-dimensional NDF by compressing it
+   Reduces the number of axes in an \textit{n}-dimensional NDF by compressing it
    along a nominated axis
 }{
    \sstdescription{
@@ -17077,7 +17077,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
             \sstitem
             {\tt "ORIGIN"} --- The compression boxes are placed so that the
             origin of the pixel \htmlref{co-ordinate Frame}{se:domains}~  
-            (\emph{i.e.} pixel coords (0,0)) in the input NDF
+            (\emph{i.e.} pixel co-ordinates (0,0)) in the input NDF
             corresponds to a corner of a compression box.  This results in
             the pixel origin being retain in the output NDF.  For instance,
             if a pair of two-dimensional images which have previously been
@@ -17336,7 +17336,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
             \sstitem
             {\tt "ORIGIN"} --- The compression boxes are placed so that the
             origin of the pixel \htmlref{co-ordinate Frame}{se:domains}~  
-            (\emph{i.e.} pixel coords (0,0)) in the input NDF
+            (\emph{i.e.} pixel co-ordinates (0,0)) in the input NDF
             corresponds to a corner of a compression box.  This results in
             the pixel origin being retain in the output NDF.  For instance,
             if a pair of two-dimensional images which have previously been
@@ -40775,7 +40775,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
 \sstroutine{
    SETTITLE
 }{
-   Set a new title for an NDF data structure
+   Sets a new title for an NDF data structure
 }{
    \sstdescription{
       This routine sets a new value for the \htmlref{TITLE component}{apndf:title}~ of 
@@ -44653,7 +44653,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 \sstroutine{
    WCSFRAME
 }{
-   Change the current co-ordinate Frame in the \htmlref{WCS}{apndf:wcs} component of an NDF
+   Changes the current co-ordinate Frame in the \htmlref{WCS}{apndf:wcs} component of an NDF
 }{
    \sstdescription{
       This application displays the current \htmlref{co-ordinate Frame}{se:domains}~  associated
@@ -50439,7 +50439,7 @@ parallel to any face of the cube.
 The following new attributes have been added to the list of attributes
 which can be specified via a STYLE parameter:
 \begin{description}
-   \item [\htmlref{FileInTitle}{FileInTitle}] \mbox{}
+   \item [\htmlref{\att{FileInTitle}}{FileInTitle}] \mbox{}
        If set to a non-zero value, the title specified by the Title
        attribute will be augmented with the name of the NDF being 
        displayed, formatted so that the NDF name appears on a second line.
@@ -50876,7 +50876,7 @@ functions as follows.
 \item {\large\bf Compression and expansion}
 \begin{description}
 \classitem{COLLAPSE}
- Reduce the number of axes in an NDF by collapsing it along a nominated axis.
+ Reduces the number of axes in an NDF by collapsing it along a nominated axis.
 \classitem{COMPADD}
  Reduces the size of an NDF by adding values in rectangular boxes.
 \classitem{COMPAVE}
