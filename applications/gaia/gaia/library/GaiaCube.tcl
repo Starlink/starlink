@@ -446,9 +446,6 @@ itcl::class gaia::GaiaNDFCube {
 
       #  Reveal first page of controls.
       $itk_component(tabnotebook) select 0
-
-      #  Display spectra on mouse click.
-      add_bindings_
    }
 
    #  Destructor:
@@ -472,6 +469,7 @@ itcl::class gaia::GaiaNDFCube {
       if { [info exists spectrum_] } {
          if { $spectrum_ != {} && [winfo exists $spectrum_] } {
             $spectrum_ close
+            remove_spectral_bindings_
          }
       }
    }
@@ -483,6 +481,12 @@ itcl::class gaia::GaiaNDFCube {
    public method close {} {
       stop_
       wm withdraw $w_
+      if { [info exists spectrum_] } {
+         if { $spectrum_ != {} && [winfo exists $spectrum_] } {
+            $spectrum_ close
+            remove_spectral_bindings_
+         }
+      }
    }
 
    #  Open the chosen NDF.
@@ -507,10 +511,13 @@ itcl::class gaia::GaiaNDFCube {
          set_step_axis_ 3
          set_display_plane_ $plane_
 
+         #  Display spectra on mouse click.
+         add_bindings_
+
          #  XXX map in all data for extra speed... When to release?
-         set ndfid [ndf::open "$ndfname_"]
-         lassign [ndf::map $ndfid] adr nel type
-         puts "adr=$adr, nel=$nel, type=$type"
+         # set ndfid [ndf::open "$ndfname_"]
+         # lassign [ndf::map $ndfid] adr nel type
+         # puts "adr=$adr, nel=$nel, type=$type"
       }
    }
 
@@ -568,7 +575,15 @@ itcl::class gaia::GaiaNDFCube {
             set section "(,,$plane_)"
          }
          display_ ${ndfname_}$section
-         $itk_component(indexlabel) configure -value [get_coord_ $plane_]
+         set coord [get_coord_ $plane_]
+         $itk_component(indexlabel) configure -value $coord
+
+         #  Move spectral reference position.
+         if { [info exists spectrum_] } {
+            if { $spectrum_ != {} && $coord != {} } {
+               $spectrum_ set_ref_coord $coord
+            }
+         }
       }
    }
 
@@ -594,12 +609,14 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Get the coordinate of an index along the current axis.
    protected method get_coord_ {index {trail 0}} {
+      #  Need index as a pixel coordinate.
+      set pcoord [expr $index - 0.5]
       if { $axis_ == 1 } {
-         set section [list $index 1 1]
+         set section [list $pcoord 1 1]
       } elseif { $axis_ == 2 } {
-         set section [list 1 $index 1]
+         set section [list 1 $pcoord 1]
       } else {
-         set section [list 1 1 $index]
+         set section [list 1 1 $pcoord]
       }
       set coord {}
       catch {
@@ -749,7 +766,10 @@ itcl::class gaia::GaiaNDFCube {
    }
 
    #  Configure canvas so we get any clicks on the image and can display
+   #  the associated spectra.
    protected method add_bindings_ {} {
+
+      #  SPLAT bindings. May move this into GaiaSpectralPlot.
       global env
       if {! [info exists env(SPLAT_DIR)]} {
          puts stderr "Information: No SPLAT_DIR variable available. \
@@ -763,20 +783,25 @@ itcl::class gaia::GaiaNDFCube {
             [code $this display_spectrum_ splat %x %y]
       }
 
-      # Local test...
-      #$itk_option(-canvas) bind $itk_option(-rtdimage) <B1-Motion> \
-      #   [code $this display_spectrum_ localdrag %x %y]
+      #  Bindings for GaiaSpectralPlot instance.
+      add_spectral_bindings_
+   }
 
-      #$itk_option(-canvas) bind $itk_option(-rtdimage) <1> \
-      #   [code $this display_spectrum_ localstart %x %y]
+   #  Add bindings to main canvas for spectral plot.
+   #  These are single-click and drag-click.
+   protected method add_spectral_bindings_ {} {
 
-      # Bindings when display over main image as well.
       $itk_option(-canvas) bind all <B1-Motion> \
          [code $this display_spectrum_ localdrag %x %y]
 
       $itk_option(-canvas) bind all <1> \
          [code $this display_spectrum_ localstart %x %y]
+   }
 
+   #  Remove bindings from main canvas for spectral plot.
+   protected method remove_spectral_bindings_ {} {
+      $itk_option(-canvas) bind all <B1-Motion> {}
+      $itk_option(-canvas) bind all <1> {}
    }
 
    #  Display a spectrum in the plot. Action can be "splat", "localstart" or
@@ -835,6 +860,11 @@ itcl::class gaia::GaiaNDFCube {
 
                #  Display in main window as well.
                $spectrum_ configure -canvas $itk_option(-canvas)
+            } else {
+               #  Re-display if withdrawn.
+               if { [wm state $spectrum_] == "withdrawn" } {
+                  $spectrum_ open
+               }
             }
 
             #  Also autoscale when single click, so that we are not fixed for
@@ -961,7 +991,7 @@ itcl::class gaia::GaiaNDFCube {
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
 
-   # The spectrum plot item, variable not initialised unless in development
+   # The spectrum plot item, XXX variable not initialised unless in development
    # mode.
    protected variable spectrum_
 
