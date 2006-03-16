@@ -215,16 +215,16 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Local Variables: */
    AstCmpMap *that;        
    AstCmpMap *this;        
-   AstMapping *that_mapa;
-   AstMapping *that_mapb;
-   AstMapping *this_mapa;
-   AstMapping *this_mapb;
-   AstMapping *tmap;
+   AstMapping **that_map_list;        
+   AstMapping **this_map_list;        
+   int *that_invert_list;             
+   int *this_invert_list;             
+   int i;
    int result;
-   int that_inva;
-   int that_invb;
-   int this_inva;
-   int this_invb;
+   int that_inv;
+   int that_nmap;                     
+   int this_inv;
+   int this_nmap;                     
 
 /* Initialise. */
    result = 0;
@@ -244,61 +244,64 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 /* Check they are both either parallel or series. */
       if( that->series == that->series ) {
 
-/* Get pointers to the component Mappings and set their Invert flags back
-   to the value they had when the CmpMap was constructed, noting the
-   current value first so that it can be re-instated later. */
-         this_mapa = this->map1;
-         this_inva = astGetInvert( this_mapa );
-         astSetInvert( this_mapa, this->invert1 );
+/* Decompose the first CmpMap into a sequence of Mappings to be applied in
+   series or parallel, as appropriate, and an associated list of
+   Invert flags. */
+         this_nmap = 0;
+         this_map_list = NULL;
+         this_invert_list = NULL;
+         astMapList( (AstMapping *) this, this->series, astGetInvert( this ), 
+                     &this_nmap, &this_map_list, &this_invert_list );
 
-         this_mapb = this->map2;
-         this_invb = astGetInvert( this_mapb );
-         astSetInvert( this_mapb, this->invert2 );
+/* Similarly decompose the second CmpMap. */
+         that_nmap = 0;
+         that_map_list = NULL;
+         that_invert_list = NULL;
+         astMapList( (AstMapping *) that, that->series, astGetInvert( that ), 
+                     &that_nmap, &that_map_list, &that_invert_list );
 
-         that_mapa = that->map1;
-         that_inva = astGetInvert( that_mapa );
-         astSetInvert( that_mapa, that->invert1 );
+/* Check the decompositions yielded the same number of component
+   Mappings. */
+         if( that_nmap == this_nmap ) {
 
-         that_mapb = that->map2;
-         that_invb = astGetInvert( that_mapb );
-         astSetInvert( that_mapb, that->invert2 );
+/* Check equality of every component. */
+            for( i = 0; i < this_nmap; i++ ) {
 
-/* If either CmpMap has been inverted since it was created, then we need
-   to invert the component Mappings. Also, if the component Mappings are
-   combined in series, we need to use them in reverse order, so swap the
-   "a" and "b" pointers. */
-         if( astGetInvert( this ) ) {
-            astInvert( this_mapa );
-            astInvert( this_mapb );
-            if( this->series ) {
-               tmap = this_mapa;
-               this_mapa = this_mapb;
-               this_mapb = tmap;
+/* Temporarily set the Mapping Invert flags to the required values,
+   saving the original values so that they can be re-instated later.*/
+               this_inv = astGetInvert( this_map_list[ i ] );
+               astSetInvert( this_map_list[ i ], this_invert_list[ i ] );
+               that_inv = astGetInvert( that_map_list[ i ] );
+               astSetInvert( that_map_list[ i ], that_invert_list[ i ] );
+
+/* Compare the two component Mappings for equality. */
+               result = astEqual( this_map_list[ i ], that_map_list[ i ] );
+
+/* Re-instate the original Invert flags. */
+               astSetInvert( this_map_list[ i ], this_inv );
+               astSetInvert( that_map_list[ i ], that_inv );
+
+/* Leave the loop if the Mappings are not equal. */
+               if( !result ) break;
             }
          }
 
-         if( astGetInvert( that ) ) {
-            astInvert( that_mapa );
-            astInvert( that_mapb );
-            if( that->series ) {
-               tmap = that_mapa;
-               that_mapa = that_mapb;
-               that_mapb = tmap;
-            }
+/* Free resources */
+         for( i = 0; i < this_nmap; i++ ) {
+            this_map_list[ i ] = astAnnul( this_map_list[ i ] );
          }
-  
-/* Compare the component Mappings. */
-         result = astEqual( this_mapa, that_mapa ) && 
-                  astEqual( this_mapb, that_mapb );
+         this_map_list = astFree( this_map_list );
+         this_invert_list = astFree( this_invert_list );
 
-/* Re-instate the original Invert flags for the second component Mappings. */
-         astSetInvert( this_mapa, this_inva );
-         astSetInvert( this_mapb, this_invb );
-         astSetInvert( that_mapa, that_inva );
-         astSetInvert( that_mapb, that_invb );
+         for( i = 0; i < that_nmap; i++ ) {
+            that_map_list[ i ] = astAnnul( that_map_list[ i ] );
+         }
+         that_map_list = astFree( that_map_list );
+         that_invert_list = astFree( that_invert_list );
+
       }
    }
-   
+
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = 0;
 
