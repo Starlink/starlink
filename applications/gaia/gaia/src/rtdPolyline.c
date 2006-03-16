@@ -14,7 +14,10 @@
  *    to allow the line coordinates to be supplied via the routine
  *    RtdSetLineCoords, which considerably speeds up coordinate
  *    passing (essential for contour drawing). The canvas type is
- *    renamed to rtd_polyline.
+ *    renamed to rtd_polyline. 
+ *    16 March 2006: Now supports line breaks using the badValue. Only
+ *    works for un-smoother lines and the badValue applies to the Y
+ *    coordinates (data values).
  */
 
 #include <config.h>  /* From skycat util */
@@ -22,15 +25,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <float.h>
 #include <tk.h>
 #include <rtdCanvas.h>
 
 /*  Tk internal functions -- XXX may need changing in future releases */
 extern void   TkIncludePoint _ANSI_ARGS_((Tk_Item *itemPtr, double *pointPtr));
 
-extern void   TkFillPolygon _ANSI_ARGS_((Tk_Canvas canvas, 
-                                         double * coordPtr, int numPoints, 
-                                         Display * display, Drawable drawable, GC gc, 
+extern void   TkFillPolygon _ANSI_ARGS_((Tk_Canvas canvas,
+                                         double * coordPtr, int numPoints,
+                                         Display * display, Drawable drawable, GC gc,
                                          GC outlineGC));
 
 extern int    TkGetMiterPoints _ANSI_ARGS_((double p1[], double p2[],
@@ -72,6 +76,9 @@ typedef struct PolyLineItem  {
                                  * their tips.  The actual endpoints are
                                  * stored in the *firstArrowPtr and
                                  * *lastArrowPtr, if they exist. */
+    double nullValue;           /* Value for missing points, not for smoothed
+                                 * lines, set to -DBL_MAX by default, applies
+                                 * to the Y coordinates only. */
     int width;                  /* Width of line. */
     XColor *fg;                 /* Foreground color for line. */
     Pixmap fillStipple;         /* Stipple bitmap for filling line. */
@@ -171,6 +178,8 @@ static Tk_ConfigSpec configSpecs[] = {
         "black", Tk_Offset(PolyLineItem, fg), TK_CONFIG_NULL_OK},
     {TK_CONFIG_JOIN_STYLE, "-joinstyle", (char *) NULL, (char *) NULL,
         "round", Tk_Offset(PolyLineItem, joinStyle), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_DOUBLE, "-nullvalue", (char *) NULL, (char *) NULL,
+        "1", Tk_Offset(PolyLineItem, nullValue), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_BOOLEAN, "-smooth", (char *) NULL, (char *) NULL,
         "0", Tk_Offset(PolyLineItem, smooth), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_INT, "-splinesteps", (char *) NULL, (char *) NULL,
@@ -258,8 +267,8 @@ int Polyline_Init()
  * RtdLineCreate --
  *
  *    Create an "instance" for indirect use.
- * 
- *    Returns a Tk_Item pointer, which can then be used in 
+ *
+ *    Returns a Tk_Item pointer, which can then be used in
  *    conjunction with another item that is directly managed
  *    by a canvas. All arguments except itemPtr are as passed to the
  *    CreateLine function.
@@ -267,7 +276,7 @@ int Polyline_Init()
  *--------------------------------------------------------------
  *
  */
-int RtdLineCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr, 
+int RtdLineCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr,
                    int objc, Tcl_Obj *CONST objv[] )
 {
     *itemPtr = (Tk_Item *) ckalloc( sizeof(PolyLineItem) );
@@ -333,6 +342,7 @@ static int CreateLine( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     linePtr->canvas = canvas;
     linePtr->numPoints = 0;
     linePtr->coordPtr = NULL;
+    linePtr->nullValue = -DBL_MAX;
     linePtr->width = 1;
     linePtr->fg = None;
     linePtr->fillStipple = None;
@@ -512,7 +522,7 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     tkwin = Tk_CanvasTkwin(canvas);
 
     if (Tk_ConfigureWidget(interp, tkwin, configSpecs, objc,
-                           (CONST84 char **) objv, (char *) linePtr, 
+                           (CONST84 char **) objv, (char *) linePtr,
                            flags|TK_CONFIG_OBJS) != TCL_OK ) {
         return TCL_ERROR;
     }
@@ -806,32 +816,61 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         pointPtr = (XPoint *) ckalloc((unsigned) (numPoints * sizeof(XPoint)));
     }
 
-    if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
-        numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
-                                      linePtr->numPoints, 
-                                      linePtr->splineSteps, pointPtr,
-                                      (double *) NULL);
-    } else {
-        for (i = 0, coordPtr = linePtr->coordPtr, pPtr = pointPtr;
-                i < linePtr->numPoints;  i += 1, coordPtr += 2, pPtr++) {
-            Tk_CanvasDrawableCoords(canvas, coordPtr[0], coordPtr[1],
-                                    &pPtr->x, &pPtr->y);
-        }
-    }
-
     /*
-     * Display line, the free up line storage if it was dynamically
-     * allocated.  If we're stippling, then modify the stipple offset
-     * in the GC.  Be sure to reset the offset when done, since the
-     * GC is supposed to be read-only.
+     * If we're stippling, then modify the stipple offset in the GC (do this
+     * now so that it applies to all the lines we're drawing below). Be sure
+     * to reset the offset when done, since the GC is supposed to be
+     * read-only.
      */
-
     if (linePtr->fillStipple != None) {
         Tk_CanvasSetStippleOrigin(canvas, linePtr->gc);
         Tk_CanvasSetStippleOrigin(canvas, linePtr->arrowGC);
     }
-    XDrawLines( display, drawable, linePtr->gc, pointPtr, numPoints,
-                CoordModeOrigin );
+
+    /*
+     * If there are breaks in the line, indicated by our null value in the Y
+     * coordinate, then we draw the polyline piece-by-piece. Note breaks are
+     * not possible for lines that are smoothed.
+     */
+    if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
+        numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
+                                      linePtr->numPoints,
+                                      linePtr->splineSteps, pointPtr,
+                                      (double *) NULL);
+    } else {
+        int count = 0;
+        pPtr = pointPtr;
+        coordPtr = linePtr->coordPtr;
+        for ( i = 0; i < linePtr->numPoints; i++ ) {
+
+            if ( coordPtr[1] == linePtr->nullValue ) {
+                /* Break, draw what we have so far, ignore isolated points. */
+                if ( count > 1 ) {
+                    XDrawLines( display, drawable, linePtr->gc, pointPtr,
+                                count, CoordModeOrigin );
+                }
+                pPtr = pointPtr;
+                count = 0;
+            }
+            else {
+                Tk_CanvasDrawableCoords( canvas, coordPtr[0], coordPtr[1],
+                                         &pPtr->x, &pPtr->y );
+                count++;
+                pPtr++;
+            }
+            coordPtr += 2;
+        }
+
+        /* Draw what we have left */
+        if ( count > 1 ) {
+            XDrawLines( display, drawable, linePtr->gc, pointPtr, count,
+                        CoordModeOrigin );
+        }
+    }
+
+    /*
+     * Free up line storage if it was dynamically allocated.
+     */
     if (pointPtr != staticPoints) {
         ckfree((char *) pointPtr);
     }
@@ -839,7 +878,6 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     /*
      * Display arrowheads, if they are wanted.
      */
-
     if (linePtr->firstArrowPtr != NULL) {
         TkFillPolygon(canvas, linePtr->firstArrowPtr, PTS_IN_ARROW,
                       display, drawable, linePtr->gc, NULL);
@@ -848,6 +886,7 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         TkFillPolygon(canvas, linePtr->lastArrowPtr, PTS_IN_ARROW,
                       display, drawable, linePtr->gc, NULL);
     }
+
     if (linePtr->fillStipple != None) {
         XSetTSOrigin(display, linePtr->gc, 0, 0);
         XSetTSOrigin(display, linePtr->arrowGC, 0, 0);
@@ -1216,7 +1255,7 @@ ScaleLine( Tk_Canvas canvas, Tk_Item *itemPtr, double originX, double originY,
  */
 
 static void
-TranslateLine( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX, 
+TranslateLine( Tk_Canvas canvas, Tk_Item *itemPtr, double deltaX,
                double deltaY )
 {
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
@@ -1624,7 +1663,7 @@ LineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  */
 
 static int
-ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas, 
+ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
                      PolyLineItem *linePtr, double *arrowPtr )
 {
     Tk_CanvasPsPath(interp, canvas, arrowPtr, PTS_IN_ARROW);
@@ -1666,10 +1705,10 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
  *
  *--------------------------------------------------------------
  */
-void RtdLineSetLastCoords( Tcl_Interp *interp, const double *x, 
+void RtdLineSetLastCoords( Tcl_Interp *interp, const double *x,
                            const double *y, int numPoints )
 {
-    RtdLineQuickSetCoords( interp, lastCanvas_, (Tk_Item *) lastItem_, 
+    RtdLineQuickSetCoords( interp, lastCanvas_, (Tk_Item *) lastItem_,
                            x, y, numPoints );
 }
 
@@ -1685,18 +1724,18 @@ void RtdLineSetLastCoords( Tcl_Interp *interp, const double *x,
  *      The coordinates for the given item will be changed.
  *
  * Notes:
- *      Version of RtdLineSetLastCoords, if you have the item 
+ *      Version of RtdLineSetLastCoords, if you have the item
  *      and canvas (see Polyline_Create()).
  *
  *--------------------------------------------------------------
  */
-void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas, 
-                            Tk_Item *itemPtr, const double *x, 
+void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
+                            Tk_Item *itemPtr, const double *x,
                             const double *y, int numPoints )
 {
     PolyLineItem *linePtr = (PolyLineItem *)itemPtr;
     int i, j;
-    
+
     if ( linePtr->numPoints != numPoints ) {
         if (linePtr->coordPtr != NULL) {
             ckfree((char *) linePtr->coordPtr);
@@ -1709,12 +1748,12 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
         linePtr->coordPtr[i]   = x[j];
         linePtr->coordPtr[i+1] = y[j];
     }
-    
+
     /*
      * Update arrowheads by throwing away any existing arrow-head
      * information and calling ConfigureArrows to recompute it.
      */
-    
+
     if (linePtr->firstArrowPtr != NULL) {
         ckfree((char *) linePtr->firstArrowPtr);
         linePtr->firstArrowPtr = NULL;
@@ -1727,20 +1766,20 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
         ConfigureArrows(canvas, linePtr);
     }
     ComputeLineBbox(canvas, linePtr);
-    
+
     /* Request canvas redraw */
-    Tk_CanvasEventuallyRedraw( canvas, 
-                               linePtr->header.x1, linePtr->header.y1, 
+    Tk_CanvasEventuallyRedraw( canvas,
+                               linePtr->header.x1, linePtr->header.y1,
                                linePtr->header.x2, linePtr->header.y2 );
 }
 
 //  Quick configuration routines.
 
-EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr, 
+EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr,
                               XColor *colour )
 {
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
-    linePtr->fg = colour; 
+    linePtr->fg = colour;
     XSetForeground( display, linePtr->gc, linePtr->fg->pixel );
 }
 
@@ -1750,6 +1789,6 @@ EXTERN void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width )
     XGCValues gcValues;
 
     linePtr->width = width;
-    XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid, 
+    XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid,
                         linePtr->capStyle,linePtr->joinStyle);
 }
