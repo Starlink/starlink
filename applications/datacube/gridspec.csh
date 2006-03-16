@@ -73,6 +73,9 @@
 #       Corrected the NDF name extraction when both the file extension and 
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
+#     2006 March 16 (MJC):
+#       Retain any supplied spectral axis section if a spatial region is
+#       selected by cursor.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -203,7 +206,7 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    gdclear device=${plotdev}
    paldef device=${plotdev}
    lutgrey device=${plotdev}
-   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
 
 # Get the lower limit.
 # --------------------
@@ -239,7 +242,10 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "      Extracting:"
    echo "        Lower (X,Y): ${xl},${yl}"
    echo "        Upper (X,Y): ${xu},${yu}"
-   set bnd = "(${xl}:${xu},${yl}:${yu},)"
+
+# Set the bounds but not forgetting any spectral limits (say to focus
+# on a single line) supplied with the NDF.
+   set bnd = "(${xl}:${xu},${yl}:${yu},${lbnd[3]}:${ubnd[3]})"
 
 # Use the supplied bounds' string from checkndf.csh when
 # there is no graphical selection.

@@ -106,7 +106,8 @@
 #       Formed VOPT velocities for UK data-cube format NDFs that do
 #       not have a SpecFrame.  Collapsed the spatially averaged cube
 #       for the contour plot so that its co-ordinate system matches
-#       the velocity map.
+#       the velocity map.  Retain any supplied spectral axis section
+#       if a spatial region is selected by cursor.
 #     {enter_further changes_here}
 #
 #  Copyright:
