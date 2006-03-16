@@ -11,7 +11,8 @@
 
   Changes in V1.9
 
-  - New command astswitchmap. Creates an SwitchMap.
+  - New command astselectormap. Creates a SelectorMap.
+  - New command astswitchmap. Creates a SwitchMap.
 
   Changes in V1.8-1:
 

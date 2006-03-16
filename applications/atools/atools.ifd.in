@@ -1902,6 +1902,253 @@ iraf! {
 
       }
 
+      action astselectormap {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter reg1 {
+            position 1
+            type LITERAL
+            prompt {The first Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter reg2 {
+            position 2
+            type LITERAL
+            prompt {The second Region}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter reg3 {
+            type LITERAL
+            prompt {Region number 3}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg4 {
+            type LITERAL
+            prompt {Region number 4}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg5 {
+            type LITERAL
+            prompt {Region number 5}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg6 {
+            type LITERAL
+            prompt {Region number 6}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg7 {
+            type LITERAL
+            prompt {Region number 7}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg8 {
+            type LITERAL
+            prompt {Region number 8}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg9 {
+            type LITERAL
+            prompt {Region number 9}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg10 {
+            type LITERAL
+            prompt {Region number 10}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg11 {
+            type LITERAL
+            prompt {Region number 11}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg12 {
+            type LITERAL
+            prompt {Region number 12}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg13 {
+            type LITERAL
+            prompt {Region number 13}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg14 {
+            type LITERAL
+            prompt {Region number 14}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg15 {
+            type LITERAL
+            prompt {Region number 15}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg16 {
+            type LITERAL
+            prompt {Region number 16}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg17 {
+            type LITERAL
+            prompt {Region number 17}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg18 {
+            type LITERAL
+            prompt {Region number 18}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg19 {
+            type LITERAL
+            prompt {Region number 19}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg20 {
+            type LITERAL
+            prompt {Region number 20}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg21 {
+            type LITERAL
+            prompt {Region number 21}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg22 {
+            type LITERAL
+            prompt {Region number 22}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg23 {
+            type LITERAL
+            prompt {Region number 23}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg24 {
+            type LITERAL
+            prompt {Region number 24}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter reg25 {
+            type LITERAL
+            prompt {Region number 25}
+            ppath DEFAULT
+            vpath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the SelectorMap}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the SelectorMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
       action asttranmap {
 
          helplib {$ATOOLS_HELP}
