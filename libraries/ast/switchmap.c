@@ -1762,7 +1762,7 @@ f        AST__NULL
 c     nroute
 f     NROUTE = INTEGER (Given)
 *        The number of supplied route Mappings.
-*     routemaps
+c     routemaps
 f     ROUTEMAPS( NROUTE ) = INTEGER (Given)
 *        An array of pointers to the route Mappings. All the supplied
 *        route Mappings must have common values for the Nin and Nout 
