@@ -102,6 +102,11 @@
 #       the file extension and an NDF section are supplied; this is via 
 #       the new checkndf script that also checks for a degenerate third
 #       axis.
+#     2006 March 16 (MJC):
+#       Formed VOPT velocities for UK data-cube format NDFs that do
+#       not have a SpecFrame.  Collapsed the spatially averaged cube
+#       for the contour plot so that its co-ordinate system matches
+#       the velocity map.
 #     {enter_further changes_here}
 #
 #  Copyright:
@@ -251,6 +256,8 @@ endif
 # the NDF exists and is a cube.  Obtain $infile, $ndf_section, and $dims.
 source ${DATACUBE_DIR}/checkndf.csh -s velmoment
 if ( $status == 1 ) exit
+set lbnd = `parget lbound ndftrace`
+set ubnd = `parget ubound ndftrace`
 
 # Determine if we need to create or select a SPECTRUM-domain WCS Frame.
 # =====================================================================
@@ -261,20 +268,21 @@ set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
 # Check that the current frame is SPECTRUM or SKY-SPECTRUM or
 # SKY-DSBSPECTRUM.   We can re-use the last trace of the input NDF.
+set create_specframe = "TRUE"
 set change_frame = "FALSE"
 set curframe = `parget current ndftrace`
 set domain = `parget fdomain"($curframe)" ndftrace`
 if ( "$domain" != "SPECTRUM" && "$domain" != "SKY-SPECTRUM" && \
      "$domain" != "SKY-DSBSPECTRUM"  ) then
    set change_frame = "TRUE"
+else
+   set create_specframe = "FALSE"
 endif
 
 # Next question: is there a SPECTRUM frame to switch to in order to
 # permit velocity calculations?  Loop through all the WCS Frames, looking
 # for a SPECTRUM (or composite SKY-SPECTRUM or SKY-DSBSPECTRUM).
-set create_specframe = "FALSE"
 if ( $change_frame == "TRUE" ) then
-   set create_specframe = "TRUE"
    set nframe = `parget nframe ndftrace`
    set i = 1
    while ( $i <= $nframe && $create_specframe == "TRUE" )
@@ -302,18 +310,25 @@ if ( $change_frame == "TRUE" ) then
       else
          echo " "
          echo "The input NDF does not have a SKY-SPECTRUM or SKY-DSBSPECTRUM"
-         echo "WCS Domain or it is not echo in the UK data-cube format."
-         echo "Insufficient information to convert the current WCS Frame"
+         echo "WCS Domain, or it is not in the UK data-cube format.  There"
+         echo "is insufficient information to convert the current WCS Frame"
          echo "to one of these and hence transform the spectral axis"
          echo "co-ordinates to type wavelength to calculate velocities."      
          echo " "
 
+         if ( "$slabel" == "" ) then
+            echo "Assuming that the undefined System is Wavelength."
+            set slabel = "Wavelength"
+         endif
          if ( "$sunits" == "" ) then
             echo "Assuming that the undefined unit is Angstrom."
             set sunits = "Angstrom"
          endif
       endif
    endif
+
+# Override the chosen velocity system for this radio-/submm-specific
+# Domain.
 else if ( "$domain" == "SKY-DSBSPECTRUM" ) then
    set velsys = "VRAD"
 endif
@@ -343,9 +358,10 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" || \
      $drawcontours == "TRUE" ) then
 
 # Collapse white-light image.
+   echo " "
    echo "      Collapsing:"
    echo "        White-light image: ${dims[1]} x ${dims[2]}"
-   collapse "in=${infile} out=${colfile} axis=3" >& /dev/null 
+   collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null 
 endif
 
 if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
@@ -391,10 +407,13 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "        Lower (X,Y): ${xl},${yl}"
    echo "        Upper (X,Y): ${xu},${yu}"
    echo " "
-   set bnd = "(${xl}:${xu},${yl}:${yu},)"
 
-# Use the supplied bounds' string from checkndf.csh when
-# there is no graphical selection.
+# Set the bounds but not forgetting any spectral limits (say to focus
+# on a single line) supplied with the NDF.
+   set bnd = "(${xl}:${xu},${yl}:${yu},${lbnd[3]}:${ubnd[3]})"
+
+# Use the supplied bounds' string from checkndf.csh for the cube
+# age when there is no graphical selection of spatial bounds.
 else
    set bnd = "$ndf_section"
 endif
@@ -402,6 +421,14 @@ endif
 # Do the averaging in the selected spatial region.
 if ( $blockave == "TRUE" ) then
    compave "in=${infile}${bnd} compress=[${cmpfac}] out=${cmpfile} trim align=first"
+
+# Create a new white-light image of the selected region.  This is the
+# easiest way to overlay the correct region of the white image on the
+# velocity map, as the pixel scales are different between the original
+# white-light image and the spatially averaged collapsed cube.
+   if ( $drawcontours == "TRUE" ) then
+      collapse "in=${cmpfile} out=${colfile} axis=3" >& /dev/null
+   endif
 else
    set cmpfile = "${infile}${bnd}"
 endif
@@ -440,34 +467,31 @@ echo " "
 # Create the velocity WCS.
 # ========================
 
-# Create a SpecFrame if one is not present, and make it the current
-# frame.  At present the earlier test for a missing SpecFrame only
-# occurs for a UK data-cube format with LAMBDA as the label, so the
-# system is wavelength and units Angstrom.
-if ( $create_specframe == "TRUE" ) then
-#   wcsadd ndf=${cmpfile} frame=axis maptype=unit frmtype=spec \
-#          domain=SPECTRUM attrs="'System=wave,Unit=Angstrom'"  >& /dev/null
+# Deal with the missing SpecFrame later for UK data-cube format
+# NDFs.
+if ( ${create_specframe} == "FALSE" ) then
 
 # The spectrum has a SPECTRUM domain WCS Frame, so select it for
 # velocity calculations.
-else if ( $change_frame == "TRUE" ) then
-    wcsframe "ndf=${cmpfile} frame=${domindex}" >& /dev/null
-endif
+   if ( $change_frame == "TRUE" ) then
+      wcsframe "ndf=${cmpfile} frame=${domindex}" >& /dev/null
+      endif
 
 # Specify the units, in case these weren't known originally.
-axunits "ndf=${cmpfile} units=${sunits} dim=3" >& /dev/null
+   axunits "ndf=${cmpfile} units=${sunits} dim=3" >& /dev/null
 
 # Set the rest-frame value, if it's not already stored in the WCS
 # attributes.  For this to work the current WCS Frame must be a
 # SpecFrame.  At present there is no test.
-if ( ${rest_known} == "FALSE" ) then
-   wcsattrib "ndf=${cmpfile} mode=set name=RestFreq(3) "\
-             "newval='${rest_coord} ${sunits}'" >& /dev/null
-endif
+   if ( ${rest_known} == "FALSE" ) then
+      wcsattrib "ndf=${cmpfile} mode=set name=RestFreq(3) "\
+                "newval='${rest_coord} ${sunits}'" >& /dev/null
+   endif
 
 # Reset the System of the current WCS Frame to velocities in the desired 
 # system.
-wcsattrib "ndf=${cmpfile} mode=set name=System(3) newval=${velsys}"
+   wcsattrib "ndf=${cmpfile} mode=set name=System(3) newval=${velsys}"
+endif
 
 # Create the intensity-weighted image.
 # ====================================
@@ -482,11 +506,33 @@ endif
 ndftrace ${cmpfile} >& /dev/null
 set cdims = `parget dims ndftrace`
 
-echo " "
 echo "      Collapsing:"
 echo "        Intensity-weighted co-ordinate image: ${cdims[1]} x ${cdims[2]}"
 collapse "in=${cmpfile} out=${outfile} axis=3 estimator=iwc" >& /dev/null 
 settitle "ndf=${outfile} title='Intensity-weighted spectral co-ordinate Image'"
+
+# If the supplied NDF was in UK data-cube format and there was no
+# SPECTRUM Domain, the collapsed data will be in the Wavelength system.
+# There are two ways to handle this state.
+#
+# The first is to create a new SpecFrame.  As we have a cube, it would 
+# require ATOOLS  to form a new Compound Frame with some arbitrary spatial
+# co-ordinates and a SpecFrame, both unit mapped from the AXIS Domain 
+# before collapsing.
+#
+# The alternative is to modify the values and units post collapse.
+# This is more restrictive in that it's practicable to offer only
+# a limited selection of velocity systems.  At present the 
+# earlier test for a missing SpecFrame only occurs for a UK data-cube 
+# format with LAMBDA as the label, with Angstrom units so the 
+# converted system is VOPT.
+if ( $create_specframe == "TRUE" ) then
+    setenv KAPPA_REPLACE 1
+    maths ia=${outfile} out=${outfile} exp="'300000.0*(IA/${rest_coord}-1.0)'"
+    unsetenv KAPPA_REPLACE
+
+    setunits ndf=${cmpfile} units="km/s"
+endif
 
 # Plot the output velocity map.
 # =============================
