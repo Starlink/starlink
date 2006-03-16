@@ -41,6 +41,8 @@
 
 #define DEBUG 0
 
+#define DOUBLE_LENGTH 25
+
 /* HDS data types */
 enum { HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, HDS_REAL,
        HDS_DOUBLE };
@@ -68,6 +70,7 @@ typedef struct SPItem  {
                                  * coordinates etc. */
     double badvalue;            /* The value to replace AST__BAD with */
     double height;              /* Height of item */
+    double refcoord;            /* Reference coordinate */
     double width;               /* Width of item */
     double x, y;                /* Coordinates of item reference point */
     double xborder;             /* Fractional border for X plot axes, only
@@ -263,7 +266,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
      * Carry out initialization that is needed in order to clean
      * up after errors during the the remainder of this procedure.
      */
-    spPtr->badvalue = 0.0;
+    spPtr->badvalue = -DBL_MAX;
     spPtr->coordPtr = NULL;
     spPtr->dataPtr = NULL;
     spPtr->datalabel = NULL;
@@ -280,6 +283,7 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     spPtr->options = NULL;
     spPtr->plot = NULL;
     spPtr->polyline = NULL;
+    spPtr->refcoord = 0.0;
     spPtr->tagPtr = NULL;
     spPtr->tkanchor = TK_ANCHOR_NW;
     spPtr->tmpPtr[0] = NULL;
@@ -378,6 +382,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     char *typePtr;
+    char *optionPtr;
     double *dataPtr;
     int i;
     int nel;
@@ -400,11 +405,35 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 	Tcl_SetObjResult( interp, obj );
 	return TCL_OK;
     }
+
+    /*  Look for a request to convert a coordinate */
+    optionPtr = Tcl_GetString( objv[0] );
+    if ( strcmp( optionPtr, "convert" ) == 0 ) {
+        if ( spPtr->plot != NULL ) {
+            double xin[1];
+            double yin[1];
+            double xout[1];
+            double yout[1];
+            Tcl_GetDoubleFromObj( interp, objv[1], &xin[0] );
+            yin[0] = 0.0;
+            astTran2( spPtr->plot, 1, xin, yin, 0, xout, yout );
+            if ( !astOK ) {
+                Tcl_SetObjResult( interp, Tcl_NewDoubleObj( 0.0 ) );
+                astClearStatus;
+            }
+            Tcl_SetObjResult( interp, Tcl_NewDoubleObj( xout[0] ) );
+        }
+        else {
+            Tcl_SetObjResult( interp, objv[1] );
+        }
+        return TCL_OK;
+    }
     else {
+
         /* Could be a list of doubles or a memory address. */
         nel = objc;
         adr = 0L;
-        if ( strcmp( Tcl_GetString( objv[0] ), "pointer" ) == 0 ) {
+        if ( strcmp( optionPtr, "pointer" ) == 0 ) {
 
             /*  Memory address, sort this out. */
             if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ||
@@ -414,7 +443,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 return TCL_ERROR;
             }
 
-            /*  Convert HDS type into local type. */
+            /*  Convert HDS type string into local enum. */
             typePtr = Tcl_GetString( objv[3] );
             type = HDS_DOUBLE;
             if ( typePtr[0] == '_' ) {
@@ -468,19 +497,22 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->ymin =  DBL_MAX;
 
         if ( adr == 0 ) {
-            /* Read doubles as strings, no BAD values allowed */
+            /* Read doubles as strings */
             for ( i = 0; i < nel; i++ ) {
                 if ( Tcl_GetDoubleFromObj( interp, objv[i],
                                            &spPtr->dataPtr[i] ) != TCL_OK ) {
                     return TCL_ERROR;
                 }
-                spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
-                spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                if ( spPtr->dataPtr[i] != spPtr->badvalue ) {
+                    spPtr->ymin = MIN( spPtr->ymin, spPtr->dataPtr[i] );
+                    spPtr->ymax = MAX( spPtr->ymax, spPtr->dataPtr[i] );
+                }
             }
         }
         else {
-            /* Given memory address, check for type and AST__BAD values and
-             * convert/replace with our bad value. */
+            /* Given memory address, convert type into double precision 
+             * and check for VAL__BAD values which are replaced with our 
+             * bad value, -DBL_MAX. */
 
             dataPtr = spPtr->dataPtr;
             switch (type)
@@ -594,8 +626,10 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             /* Get range of data */
             dataPtr = spPtr->dataPtr;
             for ( i = 0; i < nel; i++ ) {
-                spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
-                spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                if ( *dataPtr != spPtr->badvalue ) {
+                    spPtr->ymin = MIN( spPtr->ymin, *dataPtr );
+                    spPtr->ymax = MAX( spPtr->ymax, *dataPtr );
+                }
                 dataPtr++;
             }
         }
@@ -945,10 +979,10 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
 #if DEBUG
-    fprintf( stderr, "SPScale(%f,%f,%f,%f) \n", 
+    fprintf( stderr, "SPScale(%f,%f,%f,%f) \n",
              originX, originY, scaleX, scaleY );
 #endif
-    
+
     /* Do not scale, if we want to be fixed in size */
     if ( spPtr->fixedscale ) {
         return;
@@ -1184,14 +1218,13 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
 {
     long longResult;
     SPItem *spPtr = (SPItem *) widgRec;
-    char *p = (char *) ckalloc( 24 );
+    char *p = (char *) ckalloc( DOUBLE_LENGTH );
 
     Tcl_PrintDouble( (Tcl_Interp *) NULL, (long) spPtr->framesets[0], p );
 
     *freeProcPtr = TCL_DYNAMIC;
     return p;
 }
-
 
 /**
  * ClearSubItems --
@@ -1230,7 +1263,7 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
      */
     tmpPtr = spPtr->tmpPtr[0];
     for ( i = 0; i < spPtr->numPoints; i++ ) {
-        tmpPtr[i] = (double) i + 1;
+        tmpPtr[i] = (double) ( i + 1 );
     }
     astTran1( spPtr->framesets[0], spPtr->numPoints, tmpPtr, 1,
               spPtr->coordPtr );
@@ -1239,8 +1272,10 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     spPtr->xmin = DBL_MAX;
     spPtr->xmax = -DBL_MAX;
     for ( i = 0; i < spPtr->numPoints; i++ ) {
-        spPtr->xmin = MIN( spPtr->xmin, spPtr->coordPtr[i] );
-        spPtr->xmax = MAX( spPtr->xmax, spPtr->coordPtr[i] );
+        if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
+            spPtr->xmin = MIN( spPtr->xmin, spPtr->coordPtr[i] );
+            spPtr->xmax = MAX( spPtr->xmax, spPtr->coordPtr[i] );
+        }
     }
 }
 
