@@ -736,7 +736,7 @@ itcl::class gaia::GaiaAutoAstrom {
          set fitopts "--maxfit=$values_(fitparams)"
 
          #  Maximum number of catalogue objects.
-         set maxobj "--maxobj=[expr int($values_(maxobj))]"
+         set maxobj "--maxobj_query=[expr int($values_(maxobj))]"
 
          #  Verbosity
          if { $values_(verbose) } {
@@ -778,6 +778,13 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Name of solution fits file.
          set fitssolution_ "${solutions_}[incr count_].fits"
+
+         #  Create temporary directory, if needed.
+         if { ! [file isdirectory "autoastrom_tmp"] } {
+            catch {
+               file mkdir "autoastrom_tmp"
+            }
+         }
 
          #  Create the full set of arguments.
          set args \
