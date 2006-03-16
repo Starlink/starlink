@@ -114,6 +114,8 @@ f     The MatrixMap class does not define any new routines beyond those
 *        a ZoomMap.
 *     14-FEB-2006 (DSB):
 *        Correct row/col confusion in CompressMatrix.
+*     15-MAR-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -196,6 +198,7 @@ static AstMatrixMap *MtrRot( AstMatrixMap *, double, const double[] );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double *InvertMatrix( int, int, int, double * );
 static double Rate( AstMapping *, double *, int, int );
+static int Equal( AstObject *, AstObject * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int Ustrcmp( const char *, const char * );
 static int GetTranForward( AstMapping * );
@@ -703,6 +706,134 @@ static void CompressMatrix( AstMatrixMap *this ){
 
 }
 
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two MatrixMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "matrixmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     MatrixMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two MatrixMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a MatrixMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the MatrixMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstMatrixMap *that;        
+   AstMatrixMap *this;        
+   double *that_matrix;
+   double *this_matrix;
+   int i;           
+   int nin;
+   int nout;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two MatrixMap structures. */
+   this = (AstMatrixMap *) this_object;
+   that = (AstMatrixMap *) that_object;
+
+/* Check the second object is a MatrixMap. We know the first is a
+   MatrixMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAMatrixMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      nout = astGetNout( this );
+      if( astGetNout( that ) == nout && astGetNin( that ) == nin ) {
+
+/* Assume the MatrixMaps are equivalent. */
+         result = 1;
+
+/* Ensure both MatrixMaps are stored in full form. */
+         ExpandMatrix( this );
+         ExpandMatrix( that );
+
+/* Get pointers to the arrays holding the elements of the forward matrix
+   for both MatrixMaps. */
+         if( astGetInvert( this ) ) {
+            this_matrix = this->i_matrix;
+         } else {
+            this_matrix = this->f_matrix;
+         }
+
+         if( astGetInvert( that ) ) {
+            that_matrix = that->i_matrix;
+         } else {
+            that_matrix = that->f_matrix;
+         }
+
+/* If either of the above arrays is not available, try to get the inverse
+   matrix arrays. */
+         if( !this_matrix || !that_matrix ) {
+            if( astGetInvert( this ) ) {
+               this_matrix = this->f_matrix;
+            } else {
+               this_matrix = this->i_matrix;
+            }
+   
+            if( astGetInvert( that ) ) {
+               that_matrix = that->f_matrix;
+            } else {
+               that_matrix = that->i_matrix;
+            }
+         }
+
+/* If both arrays are now available compare their elements. */
+         if( this_matrix && that_matrix ) {
+            result = 1;
+            for( i = 0; i < nin*nout; i++ ) {
+               if( !EQUAL( this_matrix[ i ], that_matrix[ i ] ) ){
+                  result = 0;
+                  break;
+               }
+            }
+         }
+
+/* Ensure the supplied MatrixMaps are stored back in compressed form. */
+         CompressMatrix( this );
+         CompressMatrix( that );
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static void ExpandMatrix( AstMatrixMap *this ){
 /*
 *  Name:
@@ -1049,6 +1180,7 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->GetTranForward = GetTranForward;
    mapping->GetTranInverse = GetTranInverse;
    mapping->MapMerge = MapMerge;

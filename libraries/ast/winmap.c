@@ -83,6 +83,8 @@ f     The WinMap class does not define any new routines beyond those
 *        a ZoomMap.
 *     14-FEB-2006 (DSB):
 *        Override astGetObjSize.
+*     15-MAR-2006 (DSB):
+*        Override astEqual.
 *class--
 */
 
@@ -158,6 +160,7 @@ static int GetObjSize( AstObject * );
 static const char *GetAttrib( AstObject *, const char * );
 static double Rate( AstMapping *, double *, int, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
+static int Equal( AstObject *, AstObject * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int WinTerms( AstWinMap *, double **, double ** );
@@ -418,6 +421,119 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 }
 
+static int Equal( AstObject *this_object, AstObject *that_object ) {
+/*
+*  Name:
+*     Equal
+
+*  Purpose:
+*     Test if two WinMaps are equivalent.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     int Equal( AstObject *this, AstObject *that ) 
+
+*  Class Membership:
+*     WinMap member function (over-rides the astEqual protected
+*     method inherited from the astMapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     two WinMaps are equivalent.
+
+*  Parameters:
+*     this
+*        Pointer to the first Object (a WinMap).
+*     that
+*        Pointer to the second Object.
+
+*  Returned Value:
+*     One if the WinMaps are equivalent, zero otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstWinMap *that;        
+   AstWinMap *this;        
+   double *a_that;
+   double *a_this;
+   double *b_that;
+   double *b_this;
+   int i;           
+   int nin;
+   int result;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain pointers to the two WinMap structures. */
+   this = (AstWinMap *) this_object;
+   that = (AstWinMap *) that_object;
+
+/* Check the second object is a WinMap. We know the first is a
+   WinMap since we have arrived at this implementation of the virtual
+   function. */
+   if( astIsAWinMap( that ) ) {
+
+/* Get the number of inputs and outputs and check they are the same for both. */
+      nin = astGetNin( this );
+      if( astGetNin( that ) == nin ) {
+
+/* Assume the WinMaps are equivalent. */
+         result = 1;
+
+/* Compare the shift and scale terms from both WinMaps ignoring the
+   setting of the Invert flag for the moment. */
+         for( i = 0; i < nin; i++ ) {
+            if( !EQUAL( this->a[ i ], that->a[ i ] ) ||
+                !EQUAL( this->b[ i ], that->b[ i ] ) ) {
+               result = 0;
+               break;
+            }
+         }           
+
+/* If the scale and shifts are equal, check the Invert flags are equal. */
+         if( result ) {
+            result= ( astGetInvert( this ) == astGetInvert( that ) );
+
+/* If the scale and shifts differ, there is still a chance that the
+   WinMaps may be equivalent if their Invert flags differ. */
+         } else if( astGetInvert( this ) != astGetInvert( that ) ) {
+
+/* Create copies of the scale and shift terms from the two WinMaps, taking 
+   into account the setting of the Invert attribute. Finding the inverted
+   terms involves arithmetic which introduces rounding errors, so this
+   test is not as reliable as the above direct comparison of terms. */
+            astWinTerms( this, &a_this, &b_this );
+            astWinTerms( that, &a_that, &b_that );
+
+            for( i = 0; i < nin; i++ ) {
+               if( !EQUAL( a_this[ i ], a_that[ i ] ) ||
+                   !EQUAL( b_this[ i ], b_that[ i ] ) ) {
+                  result = 0;
+                  break;
+               }
+            }           
+         }
+      }
+   }
+   
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = 0;
+
+/* Return the result, */
+   return result;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -634,6 +750,7 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
+   object->Equal = Equal;
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
