@@ -1766,7 +1766,7 @@ c     routemaps
 f     ROUTEMAPS( NROUTE ) = INTEGER (Given)
 *        An array of pointers to the route Mappings. All the supplied
 *        route Mappings must have common values for the Nin and Nout 
-*        attributes, and these values defined the number of inputs and
+*        attributes, and these values define the number of inputs and
 *        outputs of the SwitchMap.
 c     options
 f     OPTIONS = CHARACTER * ( * ) (Given)
