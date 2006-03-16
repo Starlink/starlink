@@ -1,0 +1,34 @@
+#  16th March 2006. Accidently committed the following files:
+
+/cvs/thirdparty/fsf/autoconf/doc/autoconf.info,v
+/cvs/thirdparty/fsf/automake/Makefile,v
+/cvs/thirdparty/fsf/automake/aclocal,v
+/cvs/thirdparty/fsf/automake/automake,v
+/cvs/thirdparty/fsf/automake/config.log,v
+/cvs/thirdparty/fsf/automake/config.status,v
+/cvs/thirdparty/fsf/automake/doc/Makefile,v
+/cvs/thirdparty/fsf/automake/lib/Makefile,v
+/cvs/thirdparty/fsf/automake/lib/Automake/Config.pm,v
+/cvs/thirdparty/fsf/automake/lib/Automake/Makefile,v
+/cvs/thirdparty/fsf/automake/lib/Automake/tests/Makefile,v
+/cvs/thirdparty/fsf/automake/lib/am/Makefile,v
+/cvs/thirdparty/fsf/automake/m4/Makefile,v
+/cvs/thirdparty/fsf/automake/tests/Makefile,v
+/cvs/thirdparty/fsf/automake/tests/aclocal-1.9,v
+/cvs/thirdparty/fsf/automake/tests/automake-1.9,v
+/cvs/thirdparty/fsf/automake/tests/defs,v
+/cvs/thirdparty/fsf/libtool/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/cdemo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/demo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/depdemo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/f77demo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/libltdl/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/mdemo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/mdemo2/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/pdemo/acinclude.m4,v
+/cvs/thirdparty/fsf/libtool/tagdemo/acinclude.m4,v
+
+#  Assume this is harmless (except for future package imports),
+#  but keep this list, just in case.
+
+#  Peter W. Draper.
