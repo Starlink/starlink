@@ -35,7 +35,7 @@ export star_extra_items
    cd match-0.8; \
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
-                    $star_extra_items
+                    $star_extra_items"
    echo $cmd; \
    $cmd; \
 )
