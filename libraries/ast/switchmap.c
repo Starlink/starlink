@@ -1481,21 +1481,17 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Inverse selector Mapping */
 /* ------------------------ */
-/* Only do the inverse selector if it is not also the forward selector */
-   if( this->ismap != this->fsmap ) {
-
-      if( this->ismap ) {
-         astWriteObject( channel, "ISMap", 1, 1, this->ismap, 
-                         "Inverse selector Mapping" );
+   if( this->ismap ) {
+      astWriteObject( channel, "ISMap", 1, 1, this->ismap, 
+                      "Inverse selector Mapping" );
 
 /* Forward selector Invert flag. */
 /* ----------------------------- */
-         ival = this->isinv;
-         set = ( ival != 0 );
-         astWriteInt( channel, "ISInv", set, 0, ival,
-                      ival ? "Inv selector used in inverse direction" :
-                             "Inv selector used in forward direction" );
-      }
+      ival = this->isinv;
+      set = ( ival != 0 );
+      astWriteInt( channel, "ISInv", set, 0, ival,
+                   ival ? "Inv selector used in inverse direction" :
+                          "Inv selector used in forward direction" );
    }
 
 /* Loop to dump each route Mapping and its invert flag. */
@@ -2084,8 +2080,8 @@ AstSwitchMap *astInitSwitchMap_( void *mem, size_t size, int init,
          new->ismap = ismap ? astClone( ismap ) : NULL;
 
 /* Save the initial values of the inversion flags for these Mappings. */
-         new->fsinv = astGetInvert( fsmap );
-         new->isinv = astGetInvert( ismap );
+         new->fsinv = fsmap ? astGetInvert( fsmap ) : 0;
+         new->isinv = ismap ? astGetInvert( ismap ) : 0;
 
 /* Create arrays for the route Mappings. */
          new->routemap = astMalloc( sizeof( AstMapping * )*nroute );
@@ -2244,7 +2240,7 @@ AstSwitchMap *astLoadSwitchMap_( void *mem, size_t size,
 
 /* Inverse Selector Mapping and its Invert flag. */
 /* --------------------------------------------- */
-      new->ismap = astReadObject( channel, "ismap", new->fsmap );
+      new->ismap = astReadObject( channel, "ismap", NULL );
       new->isinv = astReadInt( channel, "isinv", new->fsinv );
       new->isinv = ( new->isinv != 0 );
 
