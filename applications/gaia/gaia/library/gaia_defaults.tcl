@@ -80,6 +80,9 @@ proc gaia::setXdefaults {} {
     option add *GaiaImageCtrl.canvasWidth      512
     option add *GaiaImageCtrl.canvasHeight     512
 
+    option add *GaiaSpectralPlot.canvasBackground black
+    option add *GaiaSpectralPlot.background        black
+
     option add *LabelCommandMenu.anchor      w
     option add *LabelCommandMenu.relief      groove
     option add *LabelCommandMenu.indicatorOn 1
