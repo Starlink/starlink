@@ -36,7 +36,7 @@ The following applications have been modified:
    o  velmap generalised the transformation of the measured line 
    displacements from the rest-frame co-ordinate in the current 
    spectral system into one of four velocity measurements using
-   WCSTRAN.  Also recognises SKY-DSBSPECTRUM Domain.  
+   WCSTRAN.  Also recognises the SKY-DSBSPECTRUM Domain.  
 
    Added the {-s option to define the co-ordinate system of the
    derived velocities.  Ensured that the plots of spectra use the 
@@ -70,5 +70,5 @@ The following applications have been modified:
    documentation of default values of options, corrections to grammar 
    and punctuation, avoidance of :r, and aligned output.
 
-   o  Accepts .sdf extension and/or NDF sections to be supplied.
+   o  Accepts .sdf extension and/or allows NDF sections to be supplied.
 
