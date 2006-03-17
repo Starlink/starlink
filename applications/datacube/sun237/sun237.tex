@@ -1389,7 +1389,10 @@ co-operation and contributions.
          {\bf{\tt{-i}}} {\em filename}\\
            The script will use this as its input file, the specified file
            should be a three-dimensional NDF.  By default the script will
-           prompt for the input file.
+           prompt for the input file.  If there are multiple spectral lines
+           present, you should supply an NDF section after the name to
+           restrict the spectral range analysed to a specific line and
+           its environs.
 
          \sstitem
          {\bf{\tt{-o}}} {\em filename}\\
@@ -1446,6 +1449,17 @@ co-operation and contributions.
          low-velocity regions appear in blue and high-velocity regions
          appear in red.
 
+         \sstitem
+         If the cube is compressed spatially, so is the contour map.
+
+         \sstitem
+         For NDFs in the \xref{UK data-cube format}{sc16}{sc16_teifufile}, 
+         where there is no \xref{SPECTRUM or DSBSPECTRUM Domain}{sun95}{se_domains} 
+         in the WCS Frames, the data are first collapsed in their native wavelengths 
+         in {\AA}ngstrom, then the pixel values are converted to VOPT using the simple 
+         formula $c(\lambda-\lambda_{0})/\lambda_{0}$, where $\lambda$ is the 
+         intensity-weighted wavelength, $\lambda_{0}$ is the rest-frame wavelength
+         for the chosen spectral line, and $c$ is the velocity of light in km~s$^{-1}$.
       }
    }
    \sstimplementationstatus{
@@ -1494,7 +1508,7 @@ enabled in other scripts, like a key, do not bleed through.
 \item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
 measured line displacements from the rest-frame co-ordinate in the
 current spectral system into one of four velocity measurements using
-WCSTRAN.  Also recognises SKY-DSBSPECTRUM Domain.  
+WCSTRAN.  Also recognises the \xref{SKY-DSBSPECTRUM Domain}{sun95}{se_domains}.
 
 Added the {\tt -s} option to define the co-ordinate system of the
 derived velocities.  Ensured that the plots of spectra use the axis
