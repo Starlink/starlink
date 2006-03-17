@@ -156,8 +156,14 @@ static Tk_ConfigSpec configSpecs[] = {
     {TK_CONFIG_DOUBLE, "-x", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, x), TK_CONFIG_DONT_SET_DEFAULT},
 
+    {TK_CONFIG_DOUBLE, "-xborder", (char *) NULL, (char *) NULL,
+     "0.03", Tk_Offset(SPItem, xborder), TK_CONFIG_DONT_SET_DEFAULT},
+
     {TK_CONFIG_DOUBLE, "-y", (char *) NULL, (char *) NULL,
      "0.0", Tk_Offset(SPItem, y), TK_CONFIG_DONT_SET_DEFAULT},
+
+    {TK_CONFIG_DOUBLE, "-yborder", (char *) NULL, (char *) NULL,
+     "0.20", Tk_Offset(SPItem, yborder), TK_CONFIG_DONT_SET_DEFAULT},
 
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
      (char *) NULL, 0, 0}
@@ -760,6 +766,8 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
     int iwidth;
     int ixo;
     int iyo;
+    int xborder;
+    int yborder;
 
 #if DEBUG
     fprintf( stderr, "SPDisplay() \n" );
@@ -786,11 +794,15 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
         /* Graphics limits are bounding box, note these are corrected for the
          * anchor position and we reserve a little for making sure the
-         * graphics are cleared (polyline seems to spill over edge). */
-        graphbox[0] = spPtr->header.x1;
-        graphbox[1] = spPtr->header.y2;
-        graphbox[2] = spPtr->header.x2;
-        graphbox[3] = spPtr->header.y1;
+         * graphics around the axes are cleared (otherwise AST draws these
+         * outside the limits and refresh is unpredicable). */
+        xborder = (int) ( spPtr->width * spPtr->xborder );
+        yborder = (int) ( spPtr->height * spPtr->yborder );
+
+        graphbox[0] = spPtr->header.x1 + xborder;
+        graphbox[1] = spPtr->header.y2 - yborder;
+        graphbox[2] = spPtr->header.x2 - xborder;
+        graphbox[3] = spPtr->header.y1;           /* No room for title */
 
         /* Set the limits of the drawing region in physical coordinates. Note
          * these are in the BASE frame of the frameset, not CURRENT
@@ -989,24 +1001,13 @@ static void SPScale( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
     }
 
     if ( scaleX < 0.0 ) {
-        /* Autoscale */
-        int ixo, iyo, iwidth, iheight;
-        int xborder, yborder;
+        /* Autoscale, fit whole of canvas */
         Tk_Window tkwin;
         tkwin = Tk_CanvasTkwin( canvas );
-        ixo = Tk_X( tkwin );
-        iyo = Tk_Y( tkwin );
-        iwidth = Tk_Width( tkwin );
-        iheight = Tk_Height( tkwin );
-
-        /* Need a border, leaves no room for the title  */
-        xborder = (int) ( iwidth * spPtr->xborder );
-        yborder = (int) ( iheight * spPtr->yborder );
-
-        spPtr->x = (double) ixo + xborder;           /* For symmetric y gaps */
-        spPtr->y = (double) iyo;                     /* + yborder; */
-        spPtr->height = (double) iheight - yborder ; /* - yborder;*/
-        spPtr->width = (double) iwidth - 2 * xborder;
+        spPtr->x = Tk_X( tkwin );
+        spPtr->y = Tk_Y( tkwin );
+        spPtr->width = Tk_Width( tkwin );
+        spPtr->height = Tk_Height( tkwin );
     }
     else {
         /* Scale all coordinates and set their related values */
