@@ -95,6 +95,8 @@ f     The SwitchMap class does not define any new routines beyond those
 *  History:
 *     13-MAR-2006 (DSB):
 *        Original version.
+*     17-MAR-2006 (DSB):
+*        Guard against AST__BAD selector values.
 *class--
 */
 
@@ -413,29 +415,32 @@ static AstMapping *GetRoute( AstSwitchMap *this, double sel, int *inv ){
 /* Check the global error status. */
    if ( !astOK ) return ret;
 
+/* Check selector value is good. */
+   if( sel != AST__BAD ) {
+
 /* Convert the supplied floating point selector value into an integer
    index into the array of route Mappings held in the supplied SwitchMap. */
-   rindex = (int)( sel + 0.5 ) - 1;
+      rindex = (int)( sel + 0.5 ) - 1;
 
 /* Return the null pointer if the index is out of range. */
-   if( rindex >= 0 && rindex < this->nroute ) {
+      if( rindex >= 0 && rindex < this->nroute ) {
 
 /* Get the required route Mapping. */
-      ret = ( this->routemap )[ rindex ];
+         ret = ( this->routemap )[ rindex ];
 
 /* Return its original invert flag. */
-      *inv = astGetInvert( ret );
+         *inv = astGetInvert( ret );
 
 /* Set the Invert flag back to the value it had when the SwitchMap was
    created. */
-      astSetInvert( ret, this->routeinv[ rindex ] );
+         astSetInvert( ret, this->routeinv[ rindex ] );
 
 /* If the SwitchMap has since been inverted, also invert the returned
    route Mapping, so that the forward transformation of the returned 
    Mapping implements the forward transformation of the supplied 
    SwitchMap (and vice-versa). */
-      if( astGetInvert( this ) ) astInvert( ret );
-
+         if( astGetInvert( this ) ) astInvert( ret );
+      }
    }
 
 /* Return the pointer. */
@@ -1160,9 +1165,11 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       for( iroute = 0; iroute < nroute; iroute++ ) popmap[ iroute ] = 0;
 
       sel = sel_ptr[ 0 ];
-      for( ipoint = 0; ipoint < npoint; ipoint++ ) {
-         rindex = (int)( *(sel++) + 0.5 ) - 1;
-         if( rindex >= 0 && rindex < nroute ) ( popmap[ rindex ] )++;
+      for( ipoint = 0; ipoint < npoint; ipoint++,sel++ ) {
+         if( *sel != AST__BAD ) {
+            rindex = (int)( *sel + 0.5 ) - 1;
+            if( rindex >= 0 && rindex < nroute ) ( popmap[ rindex ] )++;
+         }
       }   
 
 /* Find the number of points transformed by the most popular route Mapping. 
@@ -1216,13 +1223,15 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    transformed using the current route Mapping. */
                sel = sel_ptr[ 0 ];
                k = 0;
-               for( ipoint = 0; ipoint < npoint; ipoint++ ) {
-                  rindex = (int)( *(sel++) + 0.5 ) - 1;
-                  if( rindex == iroute ) {
-                     for( j = 0; j < ncin; j++ ) {
-                        ptr1[ j ][ k ] = in_ptr[ j ][ ipoint ];
+               for( ipoint = 0; ipoint < npoint; ipoint++,sel++ ) {
+                  if( *sel != AST__BAD ) {
+                     rindex = (int)( *sel + 0.5 ) - 1;
+                     if( rindex == iroute ) {
+                        for( j = 0; j < ncin; j++ ) {
+                           ptr1[ j ][ k ] = in_ptr[ j ][ ipoint ];
+                        }
+                        k++;
                      }
-                     k++;
                   }
                }   
 
@@ -1233,15 +1242,17 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    array. */
                sel = sel_ptr[ 0 ];
                k = 0;
-               for( ipoint = 0; ipoint < npoint; ipoint++ ) {
-                  rindex = (int)( *(sel++) + 0.5 ) - 1;
-                  if( rindex == iroute ) {
-                     for( j = 0; j < ncout; j++ ) {
-                        out_ptr[ j ][ ipoint ] = ptr2[ j ][ k ];
+               for( ipoint = 0; ipoint < npoint; ipoint++,sel++ ) {
+                  if( *sel != AST__BAD ) {
+                     rindex = (int)( *sel + 0.5 ) - 1;
+                     if( rindex == iroute ) {
+                        for( j = 0; j < ncout; j++ ) {
+                           out_ptr[ j ][ ipoint ] = ptr2[ j ][ k ];
+                        }
+                        k++;
                      }
-                     k++;
-                  }
-               }   
+                  }   
+               }
 
 /* Free resources. */
                ps1a = astAnnul( ps1a );
