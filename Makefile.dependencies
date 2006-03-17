@@ -1321,6 +1321,10 @@ $(MANIFESTS)/mag: \
 	cd libraries/mag \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/match:
+	cd thirdparty/rit/match \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/mers: \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \

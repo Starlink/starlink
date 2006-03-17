@@ -35,7 +35,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.8-1</version>
+  <version>1.9-0</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -3415,6 +3415,31 @@ GKS (SUN/83) should be used.</p></abstract>
   </developers>
   -->
   <documentation> sun88</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="match" support="U">
+  <version>0.8</version>
+  <path>thirdparty/rit/match</path>
+  <description>MATCH</description>
+  <abstract><p>
+This package contains software to match one list of objects against
+another list, allowing for arbitrary translation, rotation, scaling,
+and some distortion.
+</p></abstract>
+    <dependencies >
+    
+  </dependencies>
+  <developers>
+    <!-- MATCH is maintained by Michael Richmond http://spiff.rit.edu/match,
+         but we need a local contact in the first instance.-->
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwd</uname>
+      <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
 
