@@ -21,7 +21,8 @@
 
 *  Description:
 *     This application creates a new SwitchMap and optionally initialises its 
-*     attributes. 
+*     attributes. An option is provided to create a SwitchMap from an
+*     output file created by FIGARO:IARC (see parameter IARCFILE).
 *
 *     A SwitchMap is a Mapping which represents a set of alternate
 *     Mappings, each of which is used to transform positions within a 
@@ -97,7 +98,16 @@
 *        inverse transformation. It must have one output, and the number of
 *        inputs must match the number of inputs of each of the supplied 
 *        route Mappings. A null (!) value may be supplied, in which case the 
-*        SwitchMap will have an undefined forward Mapping.
+*        SwitchMap will have an undefined forward Mapping. This parameter
+*        is only used if a null value is supplied for IARCFILE.
+*     IARCFILE = LITERAL (Read) 
+*        The name of a text file containing the coefficients of the polynomial 
+*        fit produced by the FIGARO:IARC command. If a null value (!) is 
+*        supplied, the parameters ISMAP, FSMAP and ROUTEMAP1, etc, are used 
+*        instead to determine the nature of the required SwitchMap. Otherwise, 
+*        the returned SwitchMap will have two inputs and 1 output. The
+*        inputs are channel number and row number (in that order), and
+*        the one output is wavelength in Angstroms. [!]
 *     ISMAP = LITERAL (Read) 
 *        An NDF or text file holding the inverse selector Mapping. If an NDF 
 *        is supplied, the Mapping from the Base Frame to the Current Frame 
@@ -106,7 +116,8 @@
 *        forward transformation. It must have one input, and the number of
 *        outputs must match the number of outputs of each of the supplied 
 *        route Mappings. A null (!) value may be supplied, in which case the 
-*        SwitchMap will have an undefined inverse Mapping.
+*        SwitchMap will have an undefined inverse Mapping. This parameter
+*        is only used if a null value is supplied for IARCFILE.
 *     ROUTEMAP1-ROUTEMAP25 = LITERAL (Given)
 *        A set of 25 parameters associated with the NDFs or text files holding 
 *        the route Mappings. If an NDF is supplied, the Mapping from the Base 
@@ -117,7 +128,8 @@
 *        to be processed then ROUTEMAP1 and ROUTEMAP2 must also be supplied. 
 *        A null value (!) should be supplied to indicate that there are no 
 *        further Mappings. ROUTEMAP3 to ROUTEMAP25 default to null (!).  At 
-*        least one Mapping must be supplied.
+*        least one Mapping must be supplied. These parameters are only used 
+*        if a null value is supplied for IARCFILE.
 *     OPTIONS = LITERAL (Read)
 *        A string containing an optional comma-separated list of attribute 
 *        assignments to be used for initialising the new SwitchMap. 
@@ -131,6 +143,8 @@
 *  History:
 *     14-MAR-2006 (DSB):
 *        Original version.
+*     17-MAR-2006 (DSB):
+*        Added IARCFILE parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -138,12 +152,14 @@
 
 *-
 *  Type Definitions:
-      IMPLICIT NONE              ! no default typing allowed
+      IMPLICIT NONE
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
-      INCLUDE 'PAR_ERR'          ! PAR error constants 
+      INCLUDE 'SAE_PAR'          
+      INCLUDE 'AST_PAR'        
+      INCLUDE 'PAR_ERR'        
+      INCLUDE 'CNF_PAR'      
+      INCLUDE 'GRP_PAR'      
 
 *  Status:
       INTEGER STATUS
@@ -155,14 +171,37 @@
       INTEGER MAXROUTE
       PARAMETER ( MAXROUTE = 25 )
 
+      INTEGER MAXORDER
+      PARAMETER ( MAXORDER = 8 )
+
 *  Local Variables:
+      CHARACTER EL*(GRP__SZNAM)
+      CHARACTER IARCFILE*80
       CHARACTER PARAM*15
+      DOUBLE PRECISION COEFF
+      DOUBLE PRECISION FCOEFF( 4*( MAXORDER + 1 ) )
+      INTEGER BY
+      INTEGER FIN
       INTEGER FSMAP
+      INTEGER I
       INTEGER IAT
+      INTEGER ICO
+      INTEGER IGRP
+      INTEGER INPERM( 2 )
+      INTEGER IPW1
+      INTEGER IPW2
+      INTEGER IROW
       INTEGER ISMAP
+      INTEGER LUTMAP
+      INTEGER NEL
       INTEGER NROUTE
+      INTEGER NROW
+      INTEGER ORDER
+      INTEGER PERMMAP
+      INTEGER PM
       INTEGER RESULT
       INTEGER ROUTEMAPS( MAXROUTE )
+      LOGICAL MORE
 *.
 
 *  Check inherited status.      
@@ -171,50 +210,242 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get the forward selector Mapping.
-      CALL ATL1_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP, 
-     :                 STATUS )
-      IF( STATUS .EQ. PAR__NULL ) THEN
+*  See if the SwitchMap is to be created on the basis of a file containing 
+*  the output from the FIGARO:ARC command. Attempt to get a GRP group holding 
+*  the content of the IARC output file.
+      CALL ATL1_GTGRP( 'IARCFILE', IGRP, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Get the number of elements in the group. 
+         CALL GRP_GRPSZ( IGRP, NEL, STATUS )
+
+*  The first 5 rows are header text. We read the number of rows from the
+*  2nd line, and read the order of the polynomial from the 5th.
+         CALL GRP_GET( IGRP, 2, 1, EL, STATUS )
+         NROW = -1        
+         IF( EL( : 16 ) .EQ. 'Image dimensions' ) THEN
+            BY = INDEX( EL, ' by ' )
+            IF( BY .GT. 0 ) THEN
+               CALL CHR_CTOI( EL( BY + 3 : ), NROW, STATUS )
+               IF( STATUS .NE. SAI__OK ) THEN
+                  CALL MSG_SETC( 'S', EL )
+                  CALL ERR_REP( ' ', 'Failed to read number of rows '//
+     :                          'from string ''^S''.', STATUS )
+                  GO TO 999
+               END IF
+            END IF
+         END IF
+
+         CALL GRP_GET( IGRP, 5, 1, EL, STATUS )
+         ORDER = -1        
+         IF( EL( : 32 ) .EQ. 'Maximum degree polynomial used =' ) THEN
+            CALL CHR_CTOI( EL( 36 : ), ORDER, STATUS )
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL MSG_SETC( 'S', EL )
+               CALL ERR_REP( ' ', 'Failed to read IARC polynomial '//
+     :                       'order from string ''^S''.', STATUS )
+               GO TO 999
+            END IF
+         END IF
+
+         IF( ( ORDER .EQ. -1 .OR. NROW .EQ. -1 ) .AND. 
+     :       STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Unexpected header format in IARC '//
+     :                    'output file.', STATUS )
+            GO TO 999
+         END IF
+
+*  Check the order is usable.
+         IF( ORDER .GT. MAXORDER .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'O', ORDER )
+            CALL MSG_SETI( 'MO', MAXORDER )
+            CALL ERR_REP( ' ', 'Polynomial order (^O) is too big- it '//
+     :                    'must be no more than ^MO.', STATUS )
+            GO TO 999
+         END IF
+
+*  Allocate work space to hold the pointers to the route Mappings (one
+*  for each row). Some of this array may not be used if the supplied file
+*  does not contain a fit for every row.
+         CALL PSX_CALLOC( NROW, '_INTEGER', IPW1, STATUS )
+
+*  Indicate that the above array is currently empty.
+         NROUTE = 0
+
+*  Allocate work space to hold the index of the route Mappings associated
+*  with every row index.
+         CALL PSX_CALLOC( NROW, '_DOUBLE', IPW2, STATUS )
+
+*  Fill this array with AST__BAD values.
+         CALL KPG1_FILLD( AST__BAD, NROW, %VAL( CNF_PVAL( IPW2 ) ), 
+     :                    STATUS )
+
+*  Read every subsequent non-header element in turn. ICO notes which
+*  coefficient we are about to read from a fit (ORDER+1 refers to the row
+*  index, ORDER to the X^ORDER coeff, etc, down to zero which refers to
+*  the constant term).
+         ICO = ORDER + 1
+         FIN = 1
+         DO I = 6, NEL
+            CALL GRP_GET( IGRP, I, 1, EL, STATUS )
+
+*  Each fit is described by an integer row index followed by (ORDER+1)
+*  polynomial coefficient values. However these may be split over several
+*  lines within the IARC outfile. We enter a loop in which we read
+*  numerical values from the start of the line of text, and then remove
+*  the read text. Once the text is empty, we continue to get a new
+*  element from the group.
+            MORE = .TRUE.
+            DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
+
+*  Find the start of the first remaining word in the string, then find
+*  the end of that word.
+               IAT = 1
+               CALL CHR_FIWS( EL, IAT, STATUS )
+               CALL CHR_FIWE( EL, IAT, STATUS)
+
+*  Attempt to read an integer or floating point value from this first word.
+               IF( ICO .EQ. ORDER + 1 ) THEN
+
+                  CALL CHR_CTOI( EL( : IAT ), IROW, STATUS )
+                  IF (STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETC( 'EL', EL )
+                     CALL ERR_REP( ' ', 'Failed to read integer from '//
+     :                             '''^EL''.', STATUS )
+                     GO TO 999
+                  ELSE
+                     ICO = ICO - 1
+                  END IF
+
+               ELSE
+
+                  CALL CHR_CTOD( EL( : IAT ), COEFF, STATUS )
+                  IF (STATUS .NE. SAI__OK ) THEN
+                     CALL MSG_SETC( 'EL', EL )
+                     CALL ERR_REP( ' ', 'Failed to read floating '//
+     :                             'point value from ''^EL''.', STATUS )
+                     GO TO 999
+                  END IF
+
+*  Store the values for this coefficient.
+                  FCOEFF( FIN ) = COEFF
+                  FCOEFF( FIN + 1 ) = 1.0
+                  FCOEFF( FIN + 2 ) = ICO
+                  FCOEFF( FIN + 3 ) = 0.0
+                  FIN = FIN + 4
+
+*  If we have not yet got all the coefficients for this row, move on to get 
+*  the next coefficient.
+                  IF( ICO .GT. 0 ) THEN
+                     ICO = ICO - 1
+
+*  If we have got all the coefficients for this row, create the route
+*  Mapping (a PolyMap). These PolyMaps have no inverse transformation.
+                  ELSE
+                     PM = AST_POLYMAP( 2, 1, ORDER + 1, FCOEFF, 0, 
+     :                                 0.0D0, ' ', STATUS ) 
+
+*  Increment the number of route Mappings, and append the new route 
+*  Mapping pointer in the end of the list in the work array.
+                     NROUTE = NROUTE + 1
+                     CALL KPG1_STORI( NROW, NROUTE, PM, 
+     :                                %VAL( CNF_PVAL( IPW1 ) ), STATUS )
+
+*  Store the index of the route Mapping associated with this row.
+                     CALL KPG1_STORD( NROW, IROW, DBLE( NROUTE ), 
+     :                                %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+
+*  Prepare to start reading the coefficients of the fit for the next row.
+                     ICO = ORDER + 1
+                     FIN = 1
+                  END IF
+               END IF
+
+*  Replace the word with spaces. If this means the text is now entirely blank, 
+*  indicate that we should leave the loop to read another element from the 
+*  group.
+               EL( : IAT ) = ' '
+               IF( EL .EQ. ' ' ) MORE = .FALSE.
+
+            END DO
+         END DO
+
+*  Create a LutMap to use within the forward selector function. This
+*  transforms the row number supplied as the second input of the SwitchMap
+*  into the index of the associated route Mapping.
+         LUTMAP = AST_LUTMAP( NROW, %VAL( CNF_PVAL( IPW2 ) ), 1.0D0, 
+     :                        1.0D0, ' ', STATUS )
+
+*  Create a PermMap which feeds the second of its two inputs to its
+*  single output.
+         INPERM( 1 ) = 0
+         INPERM( 2 ) = 1
+         PERMMAP = AST_PERMMAP( 2, INPERM, 1, 2, 0.0D0, ' ', STATUS )
+
+*  Combine these in series to create the forward selector Mapping.
+         FSMAP = AST_CMPMAP( PERMMAP, LUTMAP, .TRUE., ' ', STATUS )
+
+*  Create the required SwitchMap (it does not define an inverse transformation)
+         RESULT = AST_SWITCHMAP( FSMAP, AST__NULL, NROUTE, 
+     :                           %VAL( CNF_PVAL( IPW1 ) ), ' ', STATUS )
+
+*  Free the work space.
+         CALL PSX_FREE( IPW1, STATUS )
+         CALL PSX_FREE( IPW2, STATUS )
+
+*  If a null value was supplied for IARCFILE, annul the error and get the
+*  required Mappings from the other parameters. 
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         FSMAP = AST__NULL
-      END IF
+
+*  Get the forward selector Mapping.
+         CALL ATL1_GTOBJ( 'FSMAP', 'Mapping', AST_ISAMAPPING, FSMAP, 
+     :                    STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            FSMAP = AST__NULL
+         END IF
 
 *  Get the inverse selector Mapping.
-      CALL ATL1_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP, 
-     :                 STATUS )
-      IF( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         ISMAP = AST__NULL
-      END IF
+         CALL ATL1_GTOBJ( 'ISMAP', 'Mapping', AST_ISAMAPPING, ISMAP, 
+     :                    STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            ISMAP = AST__NULL
+         END IF
 
 *  Get the first two route Mappings. These must be supplied.
-      CALL ATL1_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING, 
-     :                 ROUTEMAPS( 1 ), STATUS )
-      CALL ATL1_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING, 
-     :                 ROUTEMAPS( 2 ), STATUS )
+         CALL ATL1_GTOBJ( 'ROUTEMAP1', 'Mapping', AST_ISAMAPPING, 
+     :                    ROUTEMAPS( 1 ), STATUS )
+         CALL ATL1_GTOBJ( 'ROUTEMAP2', 'Mapping', AST_ISAMAPPING, 
+     :                    ROUTEMAPS( 2 ), STATUS )
 
 *  Loop round getting route Mappings until a null value is supplied. 
 *  These can be omitted.
-      NROUTE = 3
-      DO WHILE( NROUTE .LE. MAXROUTE .AND. STATUS .EQ. SAI__OK )
-         PARAM = 'ROUTEMAP'
-         IAT = 8
-         CALL CHR_PUTI( NROUTE, PARAM, IAT )
-         CALL ATL1_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING, 
-     :                    ROUTEMAPS( NROUTE ), STATUS )
-         IF( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            NROUTE = NROUTE - 1
-            GO TO 10
-         ELSE
-            NROUTE = NROUTE + 1
-         END IF
-      END DO
- 10   CONTINUE
+         NROUTE = 3
+         DO WHILE( NROUTE .LE. MAXROUTE .AND. STATUS .EQ. SAI__OK )
+            PARAM = 'ROUTEMAP'
+            IAT = 8
+            CALL CHR_PUTI( NROUTE, PARAM, IAT )
+            CALL ATL1_GTOBJ( PARAM, 'Mapping', AST_ISAMAPPING, 
+     :                       ROUTEMAPS( NROUTE ), STATUS )
+            IF( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NROUTE = NROUTE - 1
+               GO TO 10
+            ELSE
+               NROUTE = NROUTE + 1
+            END IF
+         END DO
+ 10      CONTINUE
 
 *  Create the required SwitchMap.
-      RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, ' ', 
-     :                        STATUS )
+         RESULT = AST_SWITCHMAP( FSMAP, ISMAP, NROUTE, ROUTEMAPS, ' ', 
+     :                           STATUS )
+
+      END IF
 
 *  Store the required attribute values.
       CALL ATL1_SETOP( 'OPTIONS', RESULT, STATUS )

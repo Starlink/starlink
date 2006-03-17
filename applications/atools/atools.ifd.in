@@ -1643,6 +1643,13 @@ iraf! {
 
          helplib {$ATOOLS_HELP}
 
+         parameter iarcfile {
+            type LITERAL
+            prompt {IARC output file}
+            ppath CURRENT
+            helpkey *
+          }
+
          parameter fsmap {
             position 1
             type LITERAL
