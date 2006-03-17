@@ -38,8 +38,10 @@ f     AST_LUTMAP
 *     The LutMap class inherits from the Mapping class.
 
 *  Attributes:
-*     The LutMap class does not define any new attributes beyond
-*     those which are applicable to all Mappings.
+*     In addition to those attributes common to all Mappings, every
+*     LutMap also has the following attributes:
+*
+*     - LutInterp: The interpolation method to use between table entries.
 
 *  Functions:
 c     The LutMap class does not define any new functions beyond those
@@ -62,6 +64,10 @@ f     The LutMap class does not define any new routines beyond those
 *        method.
 *     12-JAN-2004 (DSB):
 *        Check for AST__BAD values in the supplied lut array.
+*     17-MAR-2006 (DSB):
+*        - MapMerge changed so that a LutMap will cancel with its own
+*        inverse.
+*        - Added attribute LutInterp
 *class--
 */
 
@@ -71,6 +77,9 @@ f     The LutMap class does not define any new routines beyond those
    the header files that define class interfaces that they should make
    "protected" symbols available. */
 #define astCLASS LutMap
+
+#define LINEAR 0
+#define NEAR 1
 
 /* Include files. */
 /* ============== */
@@ -83,6 +92,7 @@ f     The LutMap class does not define any new routines beyond those
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "winmap.h"              /* Linear mappings between windows */
 #include "channel.h"             /* I/O channels */
+#include "unitmap.h"             /* Unit mappings */
 #include "lutmap.h"              /* Interface definition for this class */
 
 /* Error code definitions. */
@@ -93,6 +103,7 @@ f     The LutMap class does not define any new routines beyond those
 /* --------------- */
 #include <float.h>
 #include <math.h>
+#include <limits.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -107,6 +118,10 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
+static int (* parent_testattrib)( AstObject *, const char * );
+static void (* parent_clearattrib)( AstObject *, const char * );
+static void (* parent_setattrib)( AstObject *, const char * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -124,8 +139,165 @@ static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 
+static const char *GetAttrib( AstObject *, const char * );
+static int TestAttrib( AstObject *, const char * );
+static void ClearAttrib( AstObject *, const char * );
+static void SetAttrib( AstObject *, const char * );
+
+static int GetLutInterp( AstLutMap * );
+static int TestLutInterp( AstLutMap * );
+static void ClearLutInterp( AstLutMap * );
+static void SetLutInterp( AstLutMap *, int );
+
 /* Member functions. */
 /* ================= */
+static void ClearAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a LutMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     void ClearAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     LutMap member function (over-rides the astClearAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     LutMap, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the LutMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*/
+
+/* Local Variables: */
+   AstLutMap *this;             /* Pointer to the LutMap structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the LutMap structure. */
+   this = (AstLutMap *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* LutInterp. */
+/* ---------- */
+   if ( !strcmp( attrib, "lutinterp" ) ) {
+      astClearLutInterp( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
+   }
+}
+
+static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a LutMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     LutMap member function (over-rides the protected astGetAttrib
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a LutMap, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the LutMap.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the LutMap, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the LutMap. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max. characters in result buffer */
+
+/* Local Variables: */
+   AstLutMap *this;             /* Pointer to the LutMap structure */
+   const char *result;          /* Pointer value to return */
+   int lutinterp;               /* LutInterp attribute value */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */   
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the LutMap structure. */
+   this = (AstLutMap *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* LutInterp. */
+/* ---------- */
+   if ( !strcmp( attrib, "lutinterp" ) ) {
+      lutinterp = astGetLutInterp( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", lutinterp );
+         result = buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+
+/* Return the result. */
+   return result;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
+}
+
 static int GetLinear( AstMapping *this_mapping ) {
 /*
 *  Name:
@@ -183,50 +355,55 @@ static int GetLinear( AstMapping *this_mapping ) {
 /* Obtain a pointer to the LutMap structure. */
    this = (AstLutMap *) this_mapping;
 
+/* Nearest neighbour LutMaps are not considered to be linear because of
+   the discontinuities at the start and end of the table. */
+   if( astGetLutInterp( this ) != NEAR ) {
+
 /* Obtain the lookup table details. */
-   lut = this->lut;
-   nlut = this->nlut;
+      lut = this->lut;
+      nlut = this->nlut;
 
 /* Loop to identify the largest and smallest values in the lookup
-   table. */
-   lo = DBL_MAX;
-   hi = -DBL_MAX;
-   for ( ilut = 0; ilut < nlut; ilut++ ) {
-      if ( lut[ ilut ] > hi ) hi = lut[ ilut ];
-      if ( lut[ ilut ] < lo ) lo = lut[ ilut ];
-   }
-
+      table. */
+      lo = DBL_MAX;
+      hi = -DBL_MAX;
+      for ( ilut = 0; ilut < nlut; ilut++ ) {
+         if ( lut[ ilut ] > hi ) hi = lut[ ilut ];
+         if ( lut[ ilut ] < lo ) lo = lut[ ilut ];
+      }
+   
 /* Check if the values are all the same (this makes the LutMap
-   linear, although it will have no inverse). */
-   linear = ( hi == lo );
-   if ( !linear ) {
-
+      linear, although it will have no inverse). */
+      linear = ( hi == lo );
+      if ( !linear ) {
+   
 /* Form a tolerance estimate based on the overall range of values in
-   the lookup table. */
-      tol1 = fabs( hi - lo ) * DBL_EPSILON;
-
+      the lookup table. */
+         tol1 = fabs( hi - lo ) * DBL_EPSILON;
+   
 /* Now loop to inspect all the lookup table elements except the first
-   and last. */
-      linear = 1;
-      for ( ilut = 1; ilut < ( nlut - 1 ); ilut++ ) {
-
+      and last. */
+         linear = 1;
+         for ( ilut = 1; ilut < ( nlut - 1 ); ilut++ ) {
+   
 /* Calculate the fractional position of the current element within the
-   table. */
-         fract = ( (double) ilut ) / ( (double) ( nlut - 1 ) );
-
+      table. */
+            fract = ( (double) ilut ) / ( (double) ( nlut - 1 ) );
+   
 /* Calculate the value it should have if the table is linear by
-   interpolating between the first and last values. */
-         interp = lut[ 0 ] * ( 1.0 - fract ) + lut[ nlut - 1 ] * fract;
-
+      interpolating between the first and last values. */
+            interp = lut[ 0 ] * ( 1.0 - fract ) + lut[ nlut - 1 ] * fract;
+   
 /* Form a second tolerance estimate from this interpolated
    value. Select whichever tolerance estimate is larger (this avoids
    problems when values are near zero). */
-         tol2 = fabs( interp ) * DBL_EPSILON;
-         tol = ( tol1 > tol2 ) ? tol1 : tol2;
-
+            tol2 = fabs( interp ) * DBL_EPSILON;
+            tol = ( tol1 > tol2 ) ? tol1 : tol2;
+   
 /* Test for linearity within a small multiple of the tolerance. */
-         linear = ( fabs( lut[ ilut ] - interp ) <= ( 2.0 * tol ) );
-         if ( !linear ) break;
+            linear = ( fabs( lut[ ilut ] - interp ) <= ( 2.0 * tol ) );
+            if ( !linear ) break;
+         }
       }
    }
 
@@ -271,6 +448,7 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
 */
 
 /* Local Variables: */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
 
 /* Check the local error status. */
@@ -290,10 +468,24 @@ void astInitLutMapVtab_(  AstLutMapVtab *vtab, const char *name ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that
    provide virtual methods for this class. */
+   vtab->ClearLutInterp = ClearLutInterp;
+   vtab->GetLutInterp = GetLutInterp;
+   vtab->SetLutInterp = SetLutInterp;
+   vtab->TestLutInterp = TestLutInterp;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
+
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
 
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
@@ -442,11 +634,15 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Local Variables: */
    AstLutMap *map;               /* Pointer to LutMap */
+   AstLutMap *neb;               /* Pointer to neighbouring LutMap */
    AstMapping *new;              /* Pointer to replacement Mapping */
    double a1;                    /* First input coordinate value */
    double a2;                    /* Second input coordinate value */
    double b1;                    /* First output coordinate value */
    double b2;                    /* Second output coordinate value */
+   int equal;                    /* Are LutMaps equal? */
+   int i;                        /* Mapping index */
+   int ilo;                      /* Index of lower LutMap */
    int result;                   /* Result value to return */
    int simpler;                  /* Mapping simplified? */
 
@@ -494,12 +690,215 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             result = where;
          }
       }
+
+/* Otherwise, see if the LutMap is in series with its own inverse. If so
+   the pair of LutMaps can be replaced by a UnitMap. */
+   } else if( series ) {
+
+/* Is the higher neighbour a LutMap? If so get a pointer to it, and
+   note the index of the lower of the two adjacent LutMaps. */
+      if( where < ( *nmap - 1 ) && 
+          astIsALutMap( ( *map_list )[ where + 1 ] ) ){
+         neb = (AstLutMap *) ( *map_list )[ where + 1 ];
+         ilo = where;
+
+/* If not, is the lower neighbour a LutMap? If so get a pointer to it,
+   and note the index of the lower of the two adjacent LutMaps. */
+      } else if( where > 0 && 
+                 astIsALutMap( ( *map_list )[ where - 1 ] ) ){
+         neb = (AstLutMap *) ( *map_list )[ where - 1 ];
+         ilo =  where - 1;
+
+      } else {
+         neb = NULL;
+      }
+
+/* If a neighbouring LutMap was found, we can replace the pair by a
+   UnitMap if the two LutMaps are equal but have opposite values for
+   their Invert flags. Temporarily invert the neighbour, then compare 
+   the two LutMaps for equality, then re-invert the neighbour. */
+      if( neb ) {
+         astInvert( neb );
+         equal = astEqual( map, neb );
+         astInvert( neb );
+
+/* If the two LutMaps are equal but opposite, annul the first of the two 
+   Mappings, and replace it with a UnitMap. Also set the invert flag. */ 
+         if( equal ) {
+            new = (AstMapping *) astUnitMap( 1, "" );
+            (void) astAnnul( ( *map_list )[ ilo ] );
+            ( *map_list )[ ilo ] = new;
+            ( *invert_list )[ ilo ] = 0;
+
+/* Annul the second of the two Mappings, and shuffle down the rest of the 
+   list to fill the gap. */
+            (void) astAnnul( ( *map_list )[ ilo + 1 ] );
+            for ( i = ilo + 2; i < *nmap; i++ ) {
+               ( *map_list )[ i - 1 ] = ( *map_list )[ i ];
+               ( *invert_list )[ i - 1 ] = ( *invert_list )[ i ];
+            }
+
+/* Clear the vacated element at the end. */
+            ( *map_list )[ *nmap - 1 ] = NULL;
+            ( *invert_list )[ *nmap - 1 ] = 0;
+
+/* Decrement the Mapping count and return the index of the first
+   modified element. */
+            ( *nmap )--;
+            result = where;
+         }
+      }
    }
 
 /* If an error occurred, clear the returned result. */
    if ( !astOK ) result = -1;
 
 /* Return the result. */
+   return result;
+}
+
+static void SetAttrib( AstObject *this_object, const char *setting ) {
+/*
+*  Name:
+*     astSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a LutMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     void SetAttrib( AstObject *this, const char *setting )
+
+*  Class Membership:
+*     LutMap member function (over-rides the astSetAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function assigns an attribute value for a LutMap, the
+*     attribute and its value being specified by means of a string of
+*     the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in
+*     lower case with no white space present. The value to the right
+*     of the "=" should be a suitable textual representation of the
+*     value to be assigned and this will be interpreted according to
+*     the attribute's data type.  White space surrounding the value is
+*     only significant for string attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the LutMap.
+*     setting
+*        Pointer to a null-terminated string specifying the new attribute
+*        value.
+*/
+
+/* Local Variables: */
+   AstLutMap *this;              /* Pointer to the LutMap structure */
+   int lutinterp;                /* LutInterp attribute value */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by astSscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the LutMap structure. */
+   this = (AstLutMap *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = (int) strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
+   the setting string and extract the attribute value (or an offset to
+   it in the case of string values). In each case, use the value set
+   in "nc" to check that the entire string was matched. Once a value
+   has been obtained, use the appropriate method to set it. */
+
+/* LutInterp. */
+/* ---------- */
+   if ( nc = 0,
+        ( 1 == astSscanf( setting, "mintick= %d %n", &lutinterp, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLutInterp( this, lutinterp );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a LutMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "lutmap.h"
+*     int TestAttrib( AstObject *this, const char *attrib )
+
+*  Class Membership:
+*     LutMap member function (over-rides the astTestAttrib protected
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a LutMap's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the LutMap.
+*     attrib
+*        Pointer to a null-terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstLutMap *this;             /* Pointer to the LutMap structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the LutMap structure. */
+   this = (AstLutMap *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* LutInterp. */
+/* ---------- */
+   if ( !strcmp( attrib, "lutinterp" ) ) {
+      result = astTestLutInterp( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
+
+/* Return the result, */
    return result;
 }
 
@@ -564,6 +963,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double **ptr_in;              /* Pointer to input coordinate data */
    double **ptr_out;             /* Pointer to output coordinate data */
    double *lut;                  /* Pointer to LUT */
+   double d1;                    /* Offset to I1 value */
+   double d2;                    /* Offset to I2 value */
    double fract;                 /* Fractional interpolation distance */
    double scale;                 /* Normalising scale factor */
    double value_in;              /* Input coordinate value */
@@ -574,6 +975,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    int i2;                       /* Upper adjacent LUT index */
    int i;                        /* New LUT index */
    int ix;                       /* "x" converted to an int */
+   int near;                     /* Perform nearest neighbour interpolation? */
    int nlut;                     /* Number of LUT entries */
    int npoint;                   /* Number of points */
    int point;                    /* Loop counter for points */
@@ -609,6 +1011,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Obtain lookup table details. */
    lut = map->lut;
    nlut = map->nlut;
+   near = ( astGetLutInterp( map ) == NEAR );
 
 /* Forward transformation. */
 /* ----------------------- */
@@ -634,8 +1037,20 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             } else if ( value_in == AST__BAD ) {
                value_out = AST__BAD;
 
-/* Otherwise, identify the lookup table entry corresponding to the
-   input coordinate. */
+/* For nearest-neighbour interpolation, return the value of the lookup table 
+   entry corresponding to the input coordinate. */
+            } else if( near ){
+               x = ( value_in - map->start ) * scale;
+               xi = floor( x + 0.5 );
+               ix = (int) xi;
+               if ( ix < 0 || ix >= nlut ) {
+                  value_out = AST__BAD;
+               } else {
+                  value_out = lut[ ix ];
+               }
+
+/* Otherwise, (for linear interpolation) identify the lookup table entry 
+   corresponding to the input coordinate. */
             } else {
                x = ( value_in - map->start ) * scale;
                xi = floor( x );
@@ -650,8 +1065,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      value_out = AST__BAD;
                   }
 
-/* If the input value lies above the last lookup table entry (or
-   equals it), extrapolate using the last two table values. */
+/* If the input value lies above the last lookup table entry (or equals 
+   it), extrapolate using the last two table values. */
                } else if ( ix >= ( nlut - 1 ) ) {
                   if( lut[ nlut - 1 ] != AST__BAD && 
                       lut[ nlut - 2 ] != AST__BAD ) {
@@ -720,19 +1135,39 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   *( ( ( value_in >= lut[ i ] ) == up ) ? &i1 : &i2 ) = i;
                }
 
+/* Nearest neighbour interpolation: return the closest of i1 or i2. Return 
+   AST__BAD if the supplied value is less than either or greater than
+   either.  */
+               if( near ) {
+                  d1 = lut[ i1 ] - value_in;
+                  d2 = lut[ i2 ] - value_in;
+                  if( ( d1 > 0.0 && d2 > 0.0 ) ||
+                      ( d1 < 0.0 && d2 < 0.0 ) ) {
+                     value_out = AST__BAD;
+
+                  } else if( fabs( d1 ) < fabs( d2 ) ){
+                     value_out = i1;
+                  } else {
+                     value_out = i2;
+                  }
+
+/* Linear interpolation... */
+               } else {
+
 /* We are interested in the lower bracketing table element. If
    necessary, restrict this element's index to lie within the
    table. This causes extrapolation to occur (instead of
    interpolation) if the input value actually lies outside the range
    of the lookup table. */
-               if ( i1 < 0 ) i1 = 0;
-               if ( i1 > ( nlut - 2 ) ) i1 = nlut - 2;
+                  if ( i1 < 0 ) i1 = 0;
+                  if ( i1 > ( nlut - 2 ) ) i1 = nlut - 2;
 
 /* Interpolate (or extrapolate) to derive the output coordinate
    value. */
-               value_out = map->start + map->inc *
+                  value_out = map->start + map->inc *
                            ( (double) i1 + ( ( value_in - lut[ i1 ] ) /
                                              ( lut[ i1 + 1 ] - lut[ i1 ] ) ) );
+               }
             }
 
 /* Assign the output coordinate value. */
@@ -749,6 +1184,51 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Return a pointer to the output PointSet. */
    return result;
 }
+
+/* Functions which access class attributes. */
+/* ---------------------------------------- */
+/* Implement member functions to access the attributes associated with
+   this class using the macros defined for this purpose in the
+   "object.h" file. For a description of each attribute, see the class
+   interface (in the associated .h file). */
+
+/*
+*att++
+*  Name:
+*     LutInterp
+
+*  Purpose:
+*     Look-up table interpolation method.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer.
+
+*  Description:
+*     This attribute indicates the method to be used when finding the
+*     output value of a LutMap for an input value part way between two 
+*     table entries. If it is set to 0 (the default) then linear
+*     interpolation is used. Otherwise, nearest neighbour interpolation
+*     is used.
+*
+*     Using nearest neighbour interpolation causes AST__BAD to be returned 
+*     for any point which falls outside the bounds of the table. Linear 
+*     interpolation results in an extrapolated value being returned based 
+*     on the two end entries in the table.
+
+*  Applicability:
+*     LutMap
+*        All LutMaps have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(LutMap,LutInterp,lutinterp,-INT_MAX)
+astMAKE_GET(LutMap,LutInterp,int,LINEAR,( ( this->lutinterp == -INT_MAX ) ?
+                                          LINEAR : this->lutinterp ))
+astMAKE_SET(LutMap,LutInterp,int,lutinterp,(( value == LINEAR ) ? LINEAR : NEAR ))
+astMAKE_TEST(LutMap,LutInterp,( this->lutinterp != -INT_MAX ))
 
 /* Copy constructor. */
 /* ----------------- */
@@ -860,6 +1340,8 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    AstLutMap *this;              /* Pointer to the LutMap structure */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    int ilut;                     /* Loop counter for table elements */
+   int ival;                     /* Integer value */
+   int set;                      /* Attribute value set? */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -882,6 +1364,11 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Element spacing. */
    astWriteDouble( channel, "Incr", ( this->inc != 1.0 ), 1, this->inc,
                    "Input value increment between elements" );
+
+/* Interpolation method */
+   set = TestLutInterp( this );
+   ival = set ? GetLutInterp( this ) : astGetLutInterp( this );
+   astWriteInt( channel, "LutInt", set, 1, ival, "Interpolation method" );
 
 /* Lookup table contents. */
    for ( ilut = 0; ilut < this->nlut; ilut++ ) {
@@ -960,8 +1447,8 @@ f        An array containing the
 *        lookup table entries.
 c     start
 f     START = DOUBLE PRECISION (Given)
-*        The input coordinate value which corresponds with the first
-*        lookup table entry.
+*        The input coordinate value which corresponds to the first lookup 
+*        table entry.
 c     inc
 f     INC = DOUBLE PRECISION (Given)
 *        The lookup table spacing (the increment in input coordinate
@@ -1264,6 +1751,7 @@ AstLutMap *astInitLutMap_( void *mem, size_t size, int init,
          new->nlut = nlut;
          new->start = start;
          new->inc = inc;
+         new->lutinterp = LINEAR;
 
 /* Allocate memory and store the lookup table. */
          new->lut = astStore( NULL, lut, sizeof( double ) * (size_t) nlut );
@@ -1420,6 +1908,10 @@ AstLutMap *astLoadLutMap_( void *mem, size_t size,
 
 /* Input coordinate value increment. */
       new->inc = astReadDouble( channel, "incr", 1.0 );
+
+/* Interpolation method */
+      new->lutinterp = astReadInt( channel, "lutint", LINEAR );
+      if ( TestLutInterp( new ) ) SetLutInterp( new, new->lutinterp );
 
 /* Allocate memory to hold the lookup table elements. */
       new->lut = astMalloc( sizeof( double ) * (size_t) new->nlut );

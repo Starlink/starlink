@@ -137,6 +137,7 @@ typedef struct AstLutMap {
    double last_inv_in;          /* Last input value (inverse transfm.) */
    double last_inv_out;         /* Last output value (inverse transfm.) */
    int nlut;                    /* Number of table entries */
+   int lutinterp;               /* Interpolation method */
 } AstLutMap;
 
 /* Virtual function table. */
@@ -153,6 +154,10 @@ typedef struct AstLutMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   int (*GetLutInterp)( AstLutMap * );
+   int (* TestLutInterp)( AstLutMap * );
+   void (* ClearLutInterp)( AstLutMap * );
+   void (* SetLutInterp)( AstLutMap *, int );
 
 } AstLutMapVtab;
 #endif
@@ -185,6 +190,12 @@ AstLutMap *astLoadLutMap_( void *, size_t, AstLutMapVtab *, const char *, AstCha
 
 /* Prototypes for member functions. */
 /* -------------------------------- */
+# if defined(astCLASS)           /* Protected */
+   int astGetLutInterp_( AstLutMap * );
+   int astTestLutInterp_( AstLutMap * );
+   void astClearLutInterp_( AstLutMap * );
+   void astSetLutInterp_( AstLutMap *, int );
+#endif
 
 /* Function interfaces. */
 /* ==================== */
@@ -231,5 +242,15 @@ astINVOKE(O,astLoadLutMap_(mem,size,vtab,name,astCheckChannel(channel)))
 /* Here we make use of astCheckLutMap to validate LutMap pointers
    before use.  This provides a contextual error report if a pointer
    to the wrong sort of Object is supplied. */
+#if defined(astCLASS)            /* Protected */
+#define astClearLutInterp(this) \
+        astINVOKE(V,astClearLutInterp_(astCheckLutMap(this)))
+#define astGetLutInterp(this) \
+        astINVOKE(V,astGetLutInterp_(astCheckLutMap(this)))
+#define astSetLutInterp(this,value) \
+        astINVOKE(V,astSetLutInterp_(astCheckLutMap(this),value))
+#define astTestLutInterp(this) \
+        astINVOKE(V,astTestLutInterp_(astCheckLutMap(this)))
+#endif
 
 #endif
