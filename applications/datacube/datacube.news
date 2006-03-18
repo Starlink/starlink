@@ -30,8 +30,7 @@ The following applications have been modified:
 
    o  passband  does not dump WCS mappings in NDFCOPY.  Ensured that 
    the plots of spectra use the axis co-ordinate system.  Removed 
-   unused -r option.  Reset KAPPA:DISPLAY parameters so that features
-   enabled in other scripts, like a key, do not bleed through.
+   unused -r option.
 
    o  velmap generalised the transformation of the measured line 
    displacements from the rest-frame co-ordinate in the current 
@@ -64,6 +63,10 @@ The following applications have been modified:
    scripts.
 
    o  Spectrum plots now use the histogram style for greater clarity.
+
+   o  Reset KAPPA:DISPLAY parameters in a few scripts, so that 
+   features enabled in other scripts, like a key, do not bleed 
+   through.
 
    o  Tidied the scripts.  Changes included the silent removal and
    creation of files, alphabetical ordering of the options, 
