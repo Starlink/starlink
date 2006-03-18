@@ -47,9 +47,6 @@
 #  Notes:
 #     -  The compression is trimmed, so that only compression-factor
 #     multiples of original pixels are included in the plot.  There
-#     -  A feature of the compression is that you may obtain one fewer
-#     pixel in the graph than expected.  Try slightly enlarging or
-#     shifting the grid region to circumvent this.
 #     -  The spatial averaging is aligned to obtain the expected number
 #     of pixels irrespective of the pixel origin of the input cube.
 #     Note that this may not be suitable if you wish to preserve alignment
