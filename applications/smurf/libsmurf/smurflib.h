@@ -30,6 +30,8 @@
 *        Add makemap
 *     2006-02-16 (AGG):
 *        Add remsky
+*     2006-03-16 (AGG):
+*        Add qlmakemap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -62,6 +64,7 @@
 void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_makemap( int * );
+void smurf_qlmakemap( int * );
 void smurf_remsky( int * );
 
 #endif /* SMURF_LIB_DEFINED */

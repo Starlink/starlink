@@ -12,7 +12,7 @@ bin_MONOLITHS = smurf_mon
 smurf_mon_SOURCES = smurf_mon.c $(DA_FILES) $(WVM_FILES)
 
 # Tasks
-smurf_mon_TASKS = extinction flatfield makemap remsky
+smurf_mon_TASKS = extinction flatfield makemap remsky qlmakemap
 
 DA_FILES = sc2da/sc2store.c sc2da/sc2math.c sc2da/smurf_ers.c \
 sc2da/sc2ast.c

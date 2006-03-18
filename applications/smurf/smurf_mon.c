@@ -56,12 +56,14 @@
 *        Switch on AST memory caching (instead of Object caching).
 *     2006-03-02 (TIMJ):
 *        Clear out sc2ast cache
+*     2006-03-16 (AGG):
+*        Add qlmakemap
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council and the University of British Columbia.  All Rights
+*     Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -70,13 +72,13 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -161,6 +163,8 @@ void smurf_mon( int * status ) {
     smurf_flatfield( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
     smurf_makemap( status );
+  } else if (strcmp( taskname, "QLMAKEMAP" ) == 0 ) {
+    smurf_qlmakemap( status );
   } else if (strcmp( taskname, "REMSKY" ) == 0 ) {
     smurf_remsky( status );
   } else {
