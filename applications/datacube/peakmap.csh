@@ -136,6 +136,10 @@
 #       Corrected the NDF name extraction when both the file extension and 
 #       an NDF section are supplied; this is via the new checkndf script that
 #       also checks for a degenerate third axis.
+#     2006 March 16 (MJC):
+#       Use any supplied spectral-axis section when ripping each spectrum for 
+#       line fitting.  Reset KAPPA;DISPLAY parameters.
+
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -264,7 +268,7 @@ collapse "in=${infile}${ndf_section} out=${colfile} axis=3" >& /dev/null
 gdclear device=${plotdev}
 paldef device=${plotdev}
 lutgrey device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================
@@ -285,7 +289,7 @@ echo "      Extracting:"
 echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-ndfcopy "in=${infile}($xgrid,$ygrid,) out=${ripfile} trim=true trimwcs=true"
+ndfcopy "in=${infile}($xgrid,$ygrid,${lbnd[3]}:${ubnd[3]}) out=${ripfile} trim trimwcs"
 
 # Check to see if the NDF has an AXIS structure.  If one does not exist,
 # create an array of axis centres, derived from the current WCS Frame,
@@ -558,8 +562,8 @@ while( $y <= ${ubnd[2]} )
 
 # Extract the spectrum at the current spatial position.
       set specfile = "${tmpdir}/${user}/s${x}_${y}"
-      ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
-              "trim=true trimwcs=true"
+      ndfcopy "in=${infile}($x,$y,${lbnd[3]}:${ubnd[3]}) out=${specfile}" \
+              "trim trimwcs"
 
 # Fit the Gaussian to the spectrum.
       fitgauss \
@@ -720,7 +724,7 @@ if ( ${plotspec} == "TRUE" ) then
    echo "      Plotting:"
    echo "        Display: Line-strength map using percentile scaling." 
    display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-           "axes=yes margin=!" >& /dev/null
+           "axes=yes margin=!" reset >& /dev/null
    echo "        Contour: White-light image with equally spaced contours." 
    contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
            "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
@@ -737,7 +741,7 @@ if ( ${forcefit} == "FALSE" ) then
       echo "      Plotting:"
       echo "        Display: Line-strength map using percentile scaling." 
       display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-              "axes=yes margin=!" >& /dev/null
+              "axes=yes margin=!" reset >& /dev/null
       echo "        Contour: White-light image with equally spaced contours." 
       contour "ndf=${colfile} device=${plotdev} clear=no mode=equi"\
               "axes=no ncont=${numcont} pens='colour=2' margin=!" >& /dev/null 
@@ -766,8 +770,8 @@ if ( ${forcefit} == "FALSE" ) then
          echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-         ndfcopy in="${infile}($xgrid,$ygrid,)" out=${ripfile} \
-                 trim=true trimwcs=true
+         ndfcopy in="${infile}($xgrid,$ygrid,${lbnd[3]}:${ubnd[3]})" out=${ripfile} \
+                 trim trimwcs
 
 # Check to see if the NDF has an AXIS component.  If one does not exist,
 # create an array of axis centres, derived from the current WCS Frame.
@@ -1057,7 +1061,7 @@ manual_rezoom:
          echo "      Plotting:"
          echo "        Display: Line strength map using percentile scaling." 
          display "${outfile} device=${plotdev} mode=per percentiles=[15,98]"\
-                 "axes=yes margin=!" >& /dev/null
+                 "axes=yes margin=!" reset >& /dev/null
 
 # Cleanup temporary peakmap files, salvage ${outfile}_tmp in the case
 # where there is no existing $outfile (i.e. CHPIX has not run).
