@@ -189,6 +189,10 @@
 #       new checkndf script that also checks for a degenerate third axis.
 #     2006 March 10 (MJC):
 #       Switched from "colour" to spectrum colour table.
+#     2006 March 16 (MJC):
+#       Corrected the logic when deciding whether or not to create a new
+#       SpecFrame.  Use any supplied spectral-axis section when ripping
+#       each spectrum for display and line fitting.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -225,6 +229,7 @@ set gotinfile = "FALSE"
 set gotoutfile = "FALSE"
 set gotrest = "FALSE"
 set gotzoom = "ASK"
+set forcefit = "FALSE"
 set plotspec = "FALSE"
 
 # The SPECDRE extension is used to store the Gaussian fit.
@@ -356,20 +361,21 @@ set sunits = `wcsattrib ndf=${infile} mode=get name="Unit(3)"`
 
 # Check that the current frame is SPECTRUM or SKY-SPECTRUM or
 # SKY-DSBSPECTRUM.   We can re-use the last trace of the ripped spectrum.
+set create_specframe = "TRUE"
 set change_frame = "FALSE"
 set curframe = `parget current ndftrace`
 set domain = `parget fdomain"($curframe)" ndftrace`
 if ( "$domain" != "SPECTRUM" && "$domain" != "SKY-SPECTRUM" && \
      "$domain" != "SKY-DSBSPECTRUM" ) then
    set change_frame = "TRUE"
+else
+   set create_specframe = "FALSE"
 endif
 
 # Next question: is there a SPECTRUM frame to switch to in order to
 # permit velocity calculations?  Loop through all the WCS Frames, looking
 # for a SPECTRUM (or composite SKY-SPECTRUM or SKY-DSBSPECTRUM).
-set create_specframe = "FALSE"
 if ( $change_frame == "TRUE" ) then
-   set create_specframe = "TRUE"
    set nframe = `parget nframe ndftrace`
    set i = 1
    while ( $i <= $nframe && $create_specframe == "TRUE" )
@@ -395,9 +401,10 @@ if ( $change_frame == "TRUE" ) then
          endif
       else
          echo " "
-         echo "The input NDF does not have an SPECTRUM WCS Domain or it is not "
-         echo "in the UK data-cube format.  Will convert the current frame to a "
-         echo "SPECTRUM of type wavelength to calculate velocities."      
+         echo "The input NDF does not have an SPECTRUM or DSBSPECTRUM "
+         echo "WCS Domain or it is not in the UK data-cube format.  Will "
+         echo "convert the current frame to a SPECTRUM of with System
+         echo Â"set to Wavelength to calculate VOPT velocities."      
          echo " "
 
          if ( "$sunits" == "" ) then
@@ -428,7 +435,7 @@ echo "      Extracting:"
 echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-ndfcopy "in=${infile}($xgrid,$ygrid,) out=${ripfile} trim=true trimwcs=true"
+ndfcopy "in=${infile}(${xgrid},${ygrid},${lbnd[3]}:${ubnd[3]}) out=${ripfile} trim trimwcs"
 
 # Check to see if the NDF has an AXIS structure.  If one does not exist,
 # create an array of axis centres, derived from the current WCS Frame,
@@ -727,8 +734,8 @@ while( $y <= ${ubnd[2]} )
       
 # Extract the spectrum at the current spatial position.
       set specfile = "${tmpdir}/${user}/s${x}_${y}"
-      ndfcopy "in=${infile}($x,$y,) out=${specfile}" \
-              "trim=true trimwcs=true"
+      ndfcopy "in=${infile}(${x},${y},${lbnd[3]}:${ubnd[3]}) out=${specfile} " \
+              "trim trimwcs"
 
 # Create a SpecFrame if one is not present, and make it the current
 # frame.  At present the earlier test for a missing SpecFrame only
@@ -1017,8 +1024,8 @@ if ( ${forcefit} == "FALSE" ) then
          echo "        (X,Y) pixel: ${xgrid},${ygrid}"
 
 # Extract the spectrum from the cube.
-         ndfcopy in="${infile}($xgrid,$ygrid,)" out=${ripfile} \
-                 trim=true trimwcs=true
+         ndfcopy in="${infile}(${xgrid},${ygrid},${lbnd[3]}:${ubnd[3]})" \
+                 out=${ripfile} trim trimwcs
 
 # Check to see if the NDF has an AXIS component.  If one does not exist,
 # create an array of axis centres, derived from the current WCS Frame.
