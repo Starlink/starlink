@@ -51,7 +51,10 @@
 #     -i filename
 #       The script will use this as its input file, the specified file 
 #       should be a three-dimensional NDF.  By default the script will 
-#       prompt for the input file.
+#       prompt for the input file.  If there are multiple spectral lines
+#       present, you should supply an NDF section after the name to
+#       restrict the spectral range analysed to a specific line and 
+#       its environs.
 #     -o filename
 #       The filename for the output NDF of the velocity map.
 #     -p
@@ -86,6 +89,14 @@
 #     The map uses a false-colour spectrum-like colour table so that
 #     low-velocity regions appear in blue and high-velocity regions 
 #     appear in red.
+#     -  If the cube is compressed spatially, so is the contour map.
+#     -  For NDFs in the UK data-cube format, where there is no SPECTRUM
+#     or DSBSPECTRUM Domain in the WCS Frames, the data are first 
+#     collapsed in their native wavelengths in Angstrom, then the pixel 
+#     values are converted to VOPT using the simple formula 
+#     c * (w -R) / R, where w is the intensity-weighted wavelength, R is 
+#     the rest-frame wavelength for the chosen spectral line, and c is the
+#     velocity of light in km/s.
 #
 #  Implementation Status:
 #     This script invokes a collection of A-tasks from the KAPPA package.
@@ -106,8 +117,9 @@
 #       Formed VOPT velocities for UK data-cube format NDFs that do
 #       not have a SpecFrame.  Collapsed the spatially averaged cube
 #       for the contour plot so that its co-ordinate system matches
-#       the velocity map.  Retain any supplied spectral axis section
-#       if a spatial region is selected by cursor.
+#       the velocity map.  Retain any supplied spectral-axis section
+#       if a spatial region is selected by cursor.  Corrected the logic
+#       when deciding whether or not to create a new SpecFrame. 
 #     {enter_further changes_here}
 #
 #  Copyright:
