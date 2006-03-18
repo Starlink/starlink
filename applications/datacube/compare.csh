@@ -146,7 +146,7 @@ piclabel device=${plotdev} label="spectwo"
 
 # Display the collapsed image.
 picsel label="whitelight" device=${plotdev}
-display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >&/dev/null 
+display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >&/dev/null 
 
 # Obtain the spatial position of the spectrum graphically.
 # ========================================================

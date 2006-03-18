@@ -196,7 +196,7 @@ if ( ${pltimg} == "TRUE" ) then
    gdclear device=${plotdev}
    paldef device=${plotdev}
    lutgrey device=${plotdev}
-   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" >& /dev/null
+   display "${colfile} device=${plotdev} mode=SIGMA sigmas=[-3,2]" reset >& /dev/null
 endif
 
 # Create the output NDF.
