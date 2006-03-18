@@ -16,18 +16,26 @@
 %     Research Council. All Rights Reserved.
 %
 %  History:
-%     01-SEP-2000 (AALLAN) 
+%     01-SEP-2000 (AALLAN):
 %        Original version.
-%     24-NOV_2000 (AALLAN)
+%     24-NOV_2000 (AALLAN):
 %        Added VIMOS information
-%     30-DEC-2000 (AALLAN)
+%     30-DEC-2000 (AALLAN):
 %        Cleanup for release
-%     02-JAN-2001 (AALLAN)
+%     02-JAN-2001 (AALLAN):
 %        Release version
-%     2005 October 24 (MJC)
+%     2005 October 24 (MJC):
 %        Update for revised DATACUBE and KAPPA.  Correct typographical
 %        errors, spelling and punctuation.  Standardised the style.
-
+%     2006 March 17 (MJC):
+%        Velocity-map section now comprises an introduction, then two 
+%        paragraphs for the fitting and moments, the latter including
+%        an illustration added now.  Include CLINPLOT in relevant
+%        KAPPA visualisation tasks.  Mention COLLAPSE use for velocity
+%        maps, and PERMAXES in the SPECDRE context.  Added remark that
+%        DATACUBE is not limited to Wavelength.  Notified the existence
+%        of getcurpos.csh in the C-shell scripts section. Further 
+%        spelling and typo's corrected.
 %-
 
 % ? Specify used packages
@@ -47,7 +55,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {16.2}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2005 October 24}
+\newcommand{\stardocdate}      {2006 March 17}
 \newcommand{\stardoctitle}     {The IFU Data-Product Cookbook}
 \newcommand{\stardocabstract}
 {This cookbook is a collection of material covering IFU data reduction and analysis. Along 
@@ -1418,13 +1426,13 @@ itself.  The two most important utilities available to do this within
 \KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE} and
 \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} applications.  {\bf collapse} can
 be used to produce \htmlref{white-light and passband}{sc16_vis} images\latexonly{ (see 
-Section~\ref{sc16_vis})}, while {\bf ndfcopy} can extract a single spectrum or 
+Section~\ref{sc16_vis})} and velocity maps, while {\bf ndfcopy} can extract a single spectrum or 
 \htmlref{arbitrary cube sections}{sc16_vis} \latexonly{ (again see Section~\ref{sc16_vis} for
 details)}.
 
 \begin{itemize}
 \item{\xref{{\bf collapse}}{sun95}{COLLAPSE}}\\
-Reduce the number of axes in an $N$-dimensional NDF by compressing it along a nominated axis 
+Reduces the number of axes in an $N$-dimensional NDF by compressing it along a nominated axis 
 \item{\xref{{\bf compadd}}{sun95}{COMPADD}}\\
 Reduces the size of an NDF by adding values in rectangular boxes 
 \item{\xref{{\bf compave}}{sun95}{COMPAVE}}\\
@@ -1532,7 +1540,7 @@ Sets a new value for one or all of an NDF's axis-normalisation flags
 \item{\xref{{\bf setorigin}}{sun95}{SETORIGIN}}\\
 Sets a new pixel origin for an NDF 
 \item{\xref{{\bf settitle}}{sun95}{SETTITLE}}\\
-Set a new title for an NDF data structure 
+Sets a new title for an NDF data structure 
 \item{\xref{{\bf settype}}{sun95}{SETTYPE}}\\
 Sets a new numeric type for the data and variance components of an NDF
 \item{\xref{{\bf setunits}}{sun95}{SETUNITS}}\\
@@ -1545,11 +1553,13 @@ Sets new values for the variance component of an NDF data structure
 
 Combined with the \htmlref{graphics devices commands}{sc16_graphics}\latexonly{ (see
 Section~\ref{sc16_graphics})} the following applications, especially
-{\bf display}, {\bf linplot} and {\bf contour} act as the backbone
+{\bf clinplot}, {\bf display}, {\bf linplot} and {\bf contour} act as the backbone
 for image display, and some complex effects can be generated using
 these simple tasks.
 
-\begin{itemize}  
+\begin{itemize}
+\item{\xref{{\bf clinplot}}{sun95}{CLINPLOT}}\\
+Draws a spatial grid of line plots for an axis of a cube NDF  
 \item{\xref{{\bf contour}}{sun95}{CONTOUR}}\\
 Contours a two-dimensional NDF 
 \item{\xref{{\bf cursor}}{sun95}{CURSOR}}\\
@@ -1582,7 +1592,7 @@ along with the following tasks from \CCDPACKref.
 
 \begin{itemize}
 \item{\xref{{\bf makemos}}{sun139}{MAKEMOS}}\\
-Make a mosaic by combining and (optionally) normalising a set of images 
+Makes a mosaic by combining and (optionally) normalising a set of images 
 \item{\xref{{\bf drizzle}}{sun139}{DRIZZLE}}\\
 Resamples and mosaics using the drizzling algorithm
 \end{itemize}
@@ -1596,8 +1606,10 @@ a whole cube at once and work on each row in turn.  A possible problem
 at this stage is that many of these applications expect the
 spectroscopic axis to be the first in the cube, whereas for the
 current generation of IFU data cubes the spectral axis is typically the
-third axis in the cube.  A full list of \xref{\SPECDRE\ 
-applications}{sun86}{classifspecdre} can be found in SUN/86. 
+third axis in the cube.  \KAPPA\ \xref{{\bf permaxes}}{sun95}{PERMAXES}
+can reconfigure the cube as needed by the various packages.   A full 
+list of \xref{\SPECDRE\ applications}{sun86}{classifspecdre} can be 
+found in SUN/86. 
 
 One of the fundamental building blocks of spectral analysis is
 gaussian fitting, amougst other tools, \FIGARO\ provides the
@@ -1627,7 +1639,7 @@ fitting parameters have also been specified: the continuum level
 \verb+${fwhm}+ and the line centre \verb+${position}+.  By specifying
 \verb+ncomp=1 cf=0 pf=0 wf=0+ we have told the application that we
 want it to fit a single gaussian with the central line position, peak
-height and fwhm being free to vary.
+height and FWHM being free to vary.
 
 In addition we have turned off user interaction with the application,
 by setting the following parameters, \verb+reguess=no+,
@@ -1646,7 +1658,7 @@ peakmap}}{sun237}{peakmap} scripts are based around the \SPECDRE\
 
 For data with a significantly varying continuum \xref{{\bf
 mfittrend}}{sun95}{MFITTREND} is available in \KAPPA\ to fit and
-remove the continuum signal and make {\bf fitgauss}'s job easier.
+remove the continuum signal thereby making {\bf fitgauss}'s job easier.
 
 \subsection{\label{sc16_graphics}Dealing with Graphical Devices\xlabel{sc16_graphics}}
 
@@ -1756,7 +1768,7 @@ Starlink applications look at co-ordinate systems and your data in
 general.
 
 Starlink applications therefore tend to deal with co-ordinate
-`Frames'.  For instance, the PIXEL frame is the frame in which your
+`Frames'.  For instance, the PIXEL Frame is the frame in which your
 data is considered in the physical pixels with a specified origin,
 \emph{i.e.}\ for a simple two-dimensional example, your data frame may
 have an $x$ size of 100 pixels and a $y$ size of 150 pixels with the
@@ -1794,11 +1806,11 @@ Manages attribute values associated with the WCS component of an NDF
 \item{\xref{{\bf wcscopy}}{sun95}{WCSCOPY}}\\ 
 Copies WCS information from one NDF to another 
 \item{\xref{{\bf wcsframe}}{sun95}{WCSFRAME}}\\ 
-Change the current co-ordinate Frame in the WCS component of an NDF 
+Changes the current co-ordinate Frame in the WCS component of an NDF 
 \item{\xref{{\bf wcsremove}}{sun95}{WCSREMOVE}}\\
-Remove co-ordinate Frames from the WCS component of an NDF 
+Removes co-ordinate Frames from the WCS component of an NDF 
 \item{\xref{{\bf wcstran}}{sun95}{WCSTRAN}}\\
-Transform a position from one NDF co-ordinate Frame to another 
+Transforms a position from one NDF co-ordinate Frame to another 
 \end{itemize}
 
 while \CCDPACK\ has
@@ -1896,7 +1908,7 @@ current `default' frame which applications accessing the NDF will
 report co-ordinates from (the CURRENT frame of the NDF can be changed
 using the \KAPPA\ \xref{{\bf wcsframe}}{sun95}{WCSFRAME} command and is
 usually the last accessed frame in the extension).  In this case we can
-see that the current frame is the SKY\_SPECTRUM frame, with extent
+see that the current frame is the SKY-SPECTRUM frame, with extent
 5:36:51 to 5:36:53.0 in right ascension, $-$7:26:14 to $-$7:25:44 in
 declination, and 345.762 to 345.8139 Ghz in frequency.
 
@@ -2063,7 +2075,11 @@ variance arrays) may be lost when running the Starlink software from
 
 \subsection{\xlabel{sc16_vis}Visualisation using the DATACUBE scripts\label{sc16_vis}}
 
-The scripts shipped within the \DATACUBE\ package are described in \xref{SUN/237}{sun237}{}.
+The scripts shipped within the \DATACUBE\ package are described in 
+\xref{SUN/237}{sun237}{}.  The example dataset has a spectral axis in
+the wavelength system with units of {\AA}ngstrom, however \DATACUBE\ can
+handle other spectral systems and units, as supported by the \FITSref\
+standard.
 
 \subsubsection{How do I create a white-light image?}
 
@@ -2242,9 +2258,9 @@ shell script to carry out this task.
            Total pixels     : 423801
            Wavelength bounds : 4526:10089.8 Angstrom
 
-   Lower lambda bound: 5000
-   Upper lambda bound: 8000
-   Lambda step size: 1000
+   Lower Wavelength-axis bound: 5000
+   Upper Wavelength-axis bound: 8000
+   Wavelength step size: 1000
 
         Stepping:
            Range: 5000--8000 Angstrom
@@ -2558,14 +2574,32 @@ get three mean spectra plotted as a stack in the final display.
 \subsubsection{\label{sc16_velmap}How do I create a velocity map?\xlabel{sc16_velmap}}
 
 The \DATACUBE\ package provides the \xref{{\bf
-velmap}}{sun237}{velmap} shell script to manage this fairly complex
-task.  It allows you to select the highest signal-to-noise spectrum
-from a white-light image.  You can then interactively fit a line in
-this spectrum.  The script will attempt to automatically fit the
-same line in all the remaining spectra in the cube, calculate the
-Doppler velocity of this line from a rest-frame co-ordinate you
-provide or is read from the NDF WCS, and create a velocity map of that
-line in the cube.  See 
+velmap}}{sun237}{velmap} and \xref{{\bf velmoment}}{sun237}{velmoment}
+shell scripts to manage this fairly complex task.  {\bf velmap} fits
+Gaussians to a selected line, and involves some graphical interaction
+to select the template spectrum, and initial fitting parameters. For
+data well characterised by a Gaussian, {\bf velmap} can produce
+excellent results.  However, it is an expensive algorithm to apply to
+each spatial pixel.  Also Gaussian fitting is not appropriate for all
+data. 
+
+The alternative offered {\bf velmoment} collapses along the spectral
+axis by deriving the intensity-weighted mean co-ordinate, and converts
+this to a velocity.  This is turbo-charged compared with fitting.  The
+downside is that the results will not be as accurate as line fitting,
+and care must be taken to select regions of the spectra populated by a
+single significant emission line.
+
+\paragraph{\label{sc16_velfit}\latexonly{\vspace*{0.8em}}By
+fitting\latexonly{\newline}\xlabel{sc16_velfit}}
+
+\hspace*{-2.1ex}\xref{{\bf velmap}}{sun237}{velmap} allows you to select the highest 
+signal-to-noise spectrum from a white-light image.  You can then 
+interactively fit a line in this spectrum.  The script will attempt to 
+automatically fit the same line in all the remaining spectra in the
+cube, calculate the Doppler velocity of this line from a rest-frame
+co-ordinate you provide or is read from the NDF WCS, and create a
+velocity map of that line in the cube.  See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
@@ -2686,6 +2720,90 @@ routine.  However, you are not restricted to just refitting those points
 where the script was unable to obtain a fit, you may manually refit
 any data point in the velocity map.
 
+\paragraph{\label{sc16_velmoment}\latexonly{\vspace*{0.8em}}By
+moments\latexonly{\newline}\xlabel{sc16_velmoment}}
+
+\hspace*{-2.1ex}The second script for generating a velocity map is \xref{{\bf
+velmoment}}{sun237}{velmoment}.  This first allows you to select a
+region of interest.  For large regions or noisy spectra you can also
+request spatial averaging ({\tt -b} option) to reduce the spatial
+dimensions by integer factors.  If your dataset has a WCS
+\xref{SPECTRUM or DSBSPECTRUM Domain}{sun95}{se_domains}, {\bf velmoment}
+then switches co-ordinate system to one of four velocities, such as
+optical or radio.  It can also cope with NDFs in the
+\htmlref{UK data-cube format}{sc16_teifufile} too.
+
+Then comes the heart of the script---the 
+\xref{{\bf collapse}}{sun237}{COLLAPSE} task acting upon the spectral
+axis.  It derives the intensity-weighted velocity moment.  For simple
+spectra, {\emph i.e.} a single or dominant emission line, {\bf
+collapse} finds a representative velocity for the line.
+
+The final stage is to display the map of the velocities.  It uses a
+colour table that runs from blue to red in order to give a visual clue
+of the relative motions.  You may choose to superimpose optional
+contours of the white-light image upon the velocity map.
+
+Here is an example.  Rather than supply a spatial subset as in the
+{\bf velmap} example, we choose to select the spatial region for
+analysis by interacting with a 2$\times$2 spatially averaged ({\tt -b
+2}) `white-light' image that the script presents.  The wavelength
+bounds in the NDF section {\tt 5300.:5750.} restricts the spectral
+compression to the range 5300 to 5750 {\AA}ngstrom and brackets the
+[O{\sc{III}}] line.  This means that the 'white-light' image is
+effectively a map of the [O{\sc{III}}] emission.  The script converts the
+intensity-weighted wavelengths into velocities that it displays with a
+key and suitable colour map.  Finally it overlays a ten-level contour
+plot of [O{\sc{III}}] map on the velocity map.  See
+\begin{htmlonly}
+the figure.
+\end{htmlonly}
+\latexonly{Figure~\ref{sc16_velmoment_fig}.}  Below is an
+example.
+
+\myfig{sc16_velmoment.eps}{height=0.4\textheight}{sc16_velmoment.gif}{sc16_velmoment_fig}{The
+{\bf velmoment} script, operating on a sub-cube of the 3C~27 observation
+consisting of the central core of the galaxy.}
+
+
+\small\begin{verbatim}
+
+   % velmoment -b 2 -i ifu_file"(,,5300.:5750.)" -r 5007 -p -c 10
+ 
+         Input NDF:
+           File: ifu_file.sdf
+         Shape:
+           No. of dimensions: 3
+           Dimension size(s): 59 x 110 x 79
+           Pixel bounds     : 1:59, 1:110, 135:213
+           Total pixels     : 512710
+ 
+   Display white-light image to select subset (yes/no): y
+         Collapsing:
+           White-light image: 59 x 110
+ 
+     Left click on lower zoom boundary.
+     Left click on upper zoom boundary.
+ 
+         Zooming:
+         Extracting:
+           Lower (X,Y): 14,56
+           Upper (X,Y): 46,97
+ 
+         Rest Wavelength :
+           Wavelength  : 5007 Angstrom
+ 
+   NDF output file: moment
+ 
+         Collapsing:
+           Intensity-weighted co-ordinate image: 16 x 21
+         Plotting:
+           Display: Velocity map using percentile scaling.
+           Contour: White-light image with equally spaced contours.
+
+\end{verbatim}\normalsize
+
+
 \subsubsection{How do I create line-strength map?}
 
 The \DATACUBE\ \xref{{\bf peakmap}}{sun237}{peakmap} script will
@@ -2742,7 +2860,7 @@ Mosaicking IFU data cubes poses unique problems.  Firstly the
 field of view of all the current generation of instruments can be
 measured in arcseconds, far too small for the traditional approach of
 image registration to allow the cubes to be matched up the $x$,$y$
-plane, additionally, the wavelength callibration of the two cubes you
+plane, additionally, the wavelength calibration of the two cubes you
 wish to mosaic may be entirely different, certainly the case for cubes
 coming from different instruments.
 
@@ -2792,7 +2910,7 @@ the figure).
 \latexonly{Figure~\ref{sc16_mosaic_fig}).}  It should be noted that {\bf makemos} pays
 {\em no attention} to the WCS information in the third axis (being
 designed for two-dimensional CCD frames) which is why having an
-identical wavelength callibration over the same number of pixels is
+identical wavelength calibration over the same number of pixels is
 rather crucial.
 
 Alternatively use can be made of the \CCDPACK\ 
@@ -2853,6 +2971,9 @@ a floating-point value, whereas we require an integer pixel index.  We
 therefore use \xref{{\bf calc}}{sun95}{CALC} to convert from co-ordinates to
 indices by adding 0.5 and finding the nearest integer.
 
+This functionality has been encapsulated within the script
+{\tt \$DATACUBE\_DIR/getcurpos.csh}.
+
 \subsection{How do I get real world co-ordinate positions using the cursor?}
 
 A similar, but slightly easier, problem is to grab real world
@@ -2879,6 +3000,10 @@ Here we run the \xref{{\bf cursor}}{sun95}{CURSOR} application, again
 creating a lock file to stop further execution of the script.  We then
 delete the lock file and retrieve the cursor position using
 \xref{{\bf parget}}{sun95}{PARGET}.
+
+This functionality has been encapsulated within the script
+{\tt \$DATACUBE\_DIR/getcurpos.csh}.
+
 
 \subsection{How do I overplot contours from one image on to another?}
 
