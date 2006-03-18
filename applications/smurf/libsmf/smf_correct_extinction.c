@@ -241,7 +241,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
       newtwvm[0] = hdr->sc2head->wvm_t12;
       newtwvm[1] = hdr->sc2head->wvm_t42;
       newtwvm[2] = hdr->sc2head->wvm_t78;
-      /* Hves any of the temperatures changed? */
+      /* Have any of the temperatures changed? */
       if (newtwvm[0] != oldtwvm[0]) {
 	newtau = 1;
 	oldtwvm[0] = newtwvm[0];
@@ -251,12 +251,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
       } else if (newtwvm[2] != oldtwvm[2]) {
 	newtau = 1;
 	oldtwvm[2] = newtwvm[2];
-      } else {
-	newtau = 0;
-      }
-      /* KLUDGE!!! until simulator writes unchanging values for 1.2 s */
-      if ( k%240 == 0 || quick == 0) {
-	newtau = 1;
       } else {
 	newtau = 0;
       }
