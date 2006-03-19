@@ -3419,7 +3419,7 @@ GKS (SUN/83) should be used.</p></abstract>
 </component>
 
 <component id="match" support="U">
-  <version>0.8</version>
+  <version>0.8-0</version>
   <path>thirdparty/rit/match</path>
   <description>MATCH</description>
   <abstract><p>
