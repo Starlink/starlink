@@ -188,6 +188,20 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Background} \
          {Change the background colour of the plot} \
 
+      #  Choose a font for axes labels.
+      $Options add cascade -label "Axes font" \
+         -menu [menu $Options.font]
+      foreach {index xname desc} $fontmap_ {
+         $Options.font add radiobutton \
+            -variable [scope itk_option(-axes_font)] \
+            -value $index \
+            -font $xname \
+            -label $desc \
+            -command [code $this apply_gridoptions]
+      }
+      add_menu_short_help $Options {Axes font} \
+         {Change the font used for axes labelling} \
+
       #  Create the canvas. Pack inside a frame so that we can get the resize
       #  events and the new geometry to get the apparent size of canvas right.
       itk_component add canvasframe {
@@ -255,12 +269,12 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Print canvas, use a print dialog.
    public method print {} {
-      utilReUseWidget util::CanvasPrint $w_.print \
-         -canvas $itk_component(canvas) \
-         -transient 1 \
-         -pagewidth 7.5i
-
-      $itk_component(canvas) postscript -file check.ps
+      busy {
+         utilReUseWidget gaia::GaiaCanvasPrint $w_.print \
+            -canvas $itk_component(canvas) \
+            -transient 1 \
+            -pagewidth 7.5i
+      }
    }
 
    #  Display a spectrum, must be a 1D NDF, so usually a section. The axis
@@ -401,7 +415,7 @@ itcl::class gaia::GaiaSpectralPlot {
          set spectrum2_ {}
       }
    }
-   
+
    #  Apply the current grid options.
    public method apply_gridoptions {} {
       if { $spectrum_ != {} } {
@@ -443,7 +457,8 @@ itcl::class gaia::GaiaSpectralPlot {
           DrawTitle=0,\
           Colour=$axescolour_,\
           LogPlot(1)=$itk_option(-log_x_axis),\
-          LogPlot(2)=$itk_option(-log_y_axis)"
+          LogPlot(2)=$itk_option(-log_y_axis),\
+          Font=$itk_option(-axes_font)"
    }
 
    #  Set the colour of the spectral line.
@@ -508,6 +523,9 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Whether to log data axis.
    itk_option define -log_y_axis log_y_axis Log_Y_Axis 0
 
+   #  The font to use when drawing the axes (AST integer).
+   itk_option define -axes_font axes_font Axes_Font 0
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -530,36 +548,59 @@ itcl::class gaia::GaiaSpectralPlot {
    #  defined in grf_tkcan, plus some extra greys for the background
    #  choice. The grey indices are fakes, others are AST ones.
    protected variable fullcolours_ {
-      0 "#fff"
-      101 grey90 102 grey80 103 grey70 104 grey60 105 grey50 106 grey40
-      107 grey30 108 grey20 109 grey10
-      1 "#000"
-      2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      0 "white"
+      101 "grey90" 102 "grey80" 103 "grey70" 104 "grey60" 105 "grey50"
+      106 "grey40" 107 "grey30" 108 "grey20" 109 "grey10"
+      1 "black"
+      2 "red" 3 "green" 4 "blue" 5 "#0ff" 6 "#f0f"
       7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
       13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"
    }
 
    #  AST colours
    protected variable simplecolours_ {
-      0 "#fff" 1 "#000" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      0 "white" 1 "black" 2 "red" 3 "green" 4 "blue" 5 "#0ff" 6 "#f0f"
       7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
       13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"
    }
 
    #  Current colour of the line.
-   protected variable linecolour_ "#00f"; #blue
+   protected variable linecolour_ "blue"
 
    #  Current background colour.
-   protected variable background_ "#000"; #black
+   protected variable background_ "black"
 
    #  Current axes colour.
-   protected variable axescolour_ 0 ;     #white
+   protected variable axescolour_ 0 ;     # AST index of white
 
    #  Current reference line colour.
-   protected variable reflinecolour_ "#f00";  #red
+   protected variable reflinecolour_ "red"
 
    #  The gridoptions that are currently in use.
    protected variable gridoptions_ {}
+
+   #  Names of the fonts that we will use and their AST indices.
+   #  A text string to very briefly describe the font is also set.
+   #  XXX cut and paste from GaiaAstGrid.tcl, should share.
+   protected variable fontmap_ {
+      0  "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
+      1  "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
+      2  "-adobe-helvetica-bold-r-normal--*-140-*-*-*-*-*-*"   "bold"
+      3  "-adobe-helvetica-bold-o-normal--*-140-*-*-*-*-*-*"   "bold"
+      4  "-adobe-helvetica-medium-r-normal--*-120-*-*-*-*-*-*" "medium"
+      5  "-adobe-helvetica-medium-o-normal--*-120-*-*-*-*-*-*" "medium"
+      6  "-adobe-helvetica-bold-r-normal--*-120-*-*-*-*-*-*"   "bold"
+      7  "-adobe-helvetica-bold-o-normal--*-120-*-*-*-*-*-*"   "bold"
+      8  "-adobe-times-medium-r-normal--*-120-*-*-*-*-*-*"     "medium"
+      9  "-adobe-times-medium-i-normal--*-120-*-*-*-*-*-*"     "medium"
+      10 "-adobe-times-bold-r-normal--*-120-*-*-*-*-*-*"       "bold"
+      11 "-adobe-times-bold-i-normal--*-120-*-*-*-*-*-*"       "bold"
+      12 "-adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      13 "-adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*"       "fixed-width"
+      14 "-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      15 "-adobe-courier-bold-o-*-*-*-120-*-*-*-*-*-*"         "fixed-width"
+      17 "-adobe-helvetica-bold-r-*-*-20-120-*-*-*-*-*-*"      "large screen"
+   }
 
    #  Common variables: (shared by all instances)
    #  -----------------
