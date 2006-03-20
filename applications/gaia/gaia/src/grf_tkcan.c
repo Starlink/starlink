@@ -257,7 +257,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     /*  Set the default configuration information. */
     ConfigInfo.style = 1.0;
     ConfigInfo.width = 1.0;
-    /*ConfigInfo.size = 1.0;*/
+    ConfigInfo.size = 1.0;
     ConfigInfo.font = 0;
     ConfigInfo.colour = 0;
     ConfigInfo.smooth = 0;
