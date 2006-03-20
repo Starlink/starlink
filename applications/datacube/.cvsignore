@@ -1,3 +1,14 @@
+config.guess
+config.sub
+*.tar.gz
+install-sh
+ltmain.sh
+missing
+sun237.aux
+sun237.dvi
+sun237.lof
+sun237.log
+sun237.toc
 make.log
 make.log.err
 datacube_mon.ifl
