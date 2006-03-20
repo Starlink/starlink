@@ -828,7 +828,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                  graphbox[2], graphbox[3] );
 #endif
         spPtr->plot = astPlot( spPtr->framesets[1], graphbox, basebox,
-                               spPtr->options );
+                               (spPtr->options == NULL ? "" : spPtr->options));
 
         /* And plot the grid axes, this is also only required when the
          * framesets change. */
