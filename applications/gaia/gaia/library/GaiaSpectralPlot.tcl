@@ -101,8 +101,27 @@ itcl::class gaia::GaiaSpectralPlot {
       $short_help_win_ add_menu_short_help $File \
          {Close} {Close this window}
 
-      #  Options are whether to show the secondary plot or not. Also
-      #  requires an extra canvas.
+      #  Use log for pliot axes.
+      $Options add checkbutton \
+         -label {Log X axis} \
+         -variable [scope itk_option(-log_x_axis)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this apply_gridoptions]
+      add_menu_short_help $Options {Log X axis}  \
+         {Try to use a log scale for X axis (fails when range includes zero)}
+
+      $Options add checkbutton \
+         -label {Log Y axis} \
+         -variable [scope itk_option(-log_y_axis)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this apply_gridoptions]
+      add_menu_short_help $Options {Log Y axis}  \
+         {Try to use a log scale for Y axis (fails when range includes zero)}
+
+      #  Whether to show the secondary plot or not. Also requires an
+      #  extra canvas.
       set show_plot2_ 0
       $Options add checkbutton \
          -label {Show thumbnail plot} \
@@ -182,6 +201,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Make resizes, resize the canvas and arrange for a fit.
       bind $itk_component(canvas) <Configure> [code $this resize %w %h]
+
+      #  Set first set of grid options.
+      update_gridoptions_
    }
 
    #  Destructor:
@@ -255,12 +277,11 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
          set autoscale 1
-         set gridoptions "Grid=0,DrawTitle=0,Colour=$axescolour_"
          set spectrum_ [$itk_component(canvas) create spectral_plot \
                            pointer $adr $nel $type \
                            -x 25 -y 5 -width 650 -height 200 \
                            -linecolour $linecolour_ -linewidth 1 \
-                           -gridoptions $gridoptions \
+                           -gridoptions $gridoptions_ \
                            -showaxes 1]
          make_ref_line_
          set_to_ref_coord_
@@ -380,6 +401,15 @@ itcl::class gaia::GaiaSpectralPlot {
          set spectrum2_ {}
       }
    }
+   
+   #  Apply the current grid options.
+   public method apply_gridoptions {} {
+      if { $spectrum_ != {} } {
+         update_gridoptions_
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -gridoptions $gridoptions_
+      }
+   }
 
    #  Add the graphics menu and populate it.
    protected method make_graphics_menu_ {} {
@@ -406,6 +436,16 @@ itcl::class gaia::GaiaSpectralPlot {
          [code $itk_component(draw) deselect_objects]
    }
 
+   #  Update the applicable gridoptions.
+   protected method update_gridoptions_ {} {
+      set gridoptions_ \
+         "Grid=0,\
+          DrawTitle=0,\
+          Colour=$axescolour_,\
+          LogPlot(1)=$itk_option(-log_x_axis),\
+          LogPlot(2)=$itk_option(-log_y_axis)"
+   }
+
    #  Set the colour of the spectral line.
    public method set_linecolour {colour} {
       set linecolour_ $colour
@@ -418,11 +458,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Set the colour of the axes.
    public method set_axescolour {colour} {
       set axescolour_ $colour
-      if { $spectrum_ != {} } {
-         set gridoptions "Grid=0,DrawTitle=0,Colour=$axescolour_"
-         $itk_component(canvas) itemconfigure $spectrum_ \
-            -gridoptions $gridoptions
-      }
+      apply_gridoptions
    }
 
    #  Set the colour of the reference line.
@@ -465,6 +501,12 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Whether to show the coordinate ref line.
    itk_option define -show_ref_line show_ref_line \
       Show_Ref_Line 1
+
+   #  Whether to log coordintae axis.
+   itk_option define -log_x_axis log_x_axis Log_X_Axis 0
+
+   #  Whether to log data axis.
+   itk_option define -log_y_axis log_y_axis Log_Y_Axis 0
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -515,6 +557,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Current reference line colour.
    protected variable reflinecolour_ "#f00";  #red
+
+   #  The gridoptions that are currently in use.
+   protected variable gridoptions_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
