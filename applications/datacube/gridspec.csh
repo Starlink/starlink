@@ -220,6 +220,10 @@ if ( ${zoomit} == "yes" || ${zoomit} == "y" ) then
    echo "  Left click on upper zoom boundary."
    source ${DATACUBE_DIR}/getcurpos.csh -ci 2 -a XY -g
 
+# Find out the cube dimensions.
+   set lbnd = `parget lbound ndftrace`
+   set ubnd = `parget ubound ndftrace`
+
 # Get the pixel co-ordinates and convert to grid indices.  The
 # exterior NINT replaces the bug/feature -0 result with the desired 0.
    set x2 = $xgrid
@@ -265,6 +269,11 @@ gdclear device=${plotdev}
 
 echo " "
 echo "      Plotting:"
+if ( $blockave == "TRUE" ) then
+   echo "        Clinplot: Grid of spectra, averaged $cmpfactors[1] x $cmpfactors[2]"
+else
+   echo "        Clinplot: Grid of spectra
+endif
 
 clinplot ndf=${cmpfile} device=${plotdev} lpstyle="colour(curve)=red" \
          axes extaxes axes lpmargin="[0.4,0.15,0.15,0.4]" \
