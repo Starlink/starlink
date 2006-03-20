@@ -139,8 +139,6 @@ static int              LineToArea _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, double *rectPtr));
 static double           LineToPoint _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, double *coordPtr));
-static int              LineToPostscript _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, Tk_Item *itemPtr, int prepass));
 static int              ParseArrowShape _ANSI_ARGS_((ClientData clientData,
                             Tcl_Interp *interp, Tk_Window tkwin, char *value,
                             char *recordPtr, int offset));
@@ -206,12 +204,12 @@ Tk_ItemType tkPolyLineType = {
     configSpecs,                        /* configSpecs */
     ConfigureLine,                      /* configureProc */
     LineCoords,                         /* coordProc */
-    DeleteLine,                         /* deleteProc */
+    RtdLineDelete,                      /* deleteProc */
     RtdLineDisplay,                     /* displayProc */
     TK_CONFIG_OBJS,                     /* alwaysRedraw & flags */
     LineToPoint,                        /* pointProc */
     LineToArea,                         /* areaProc */
-    LineToPostscript,                   /* postscriptProc */
+    RtdLineToPostscript,                /* postscriptProc */
     ScaleLine,                          /* scaleProc */
     TranslateLine,                      /* translateProc */
     (Tk_ItemIndexProc *) NULL,          /* indexProc */
@@ -1511,7 +1509,7 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
 /*
  *--------------------------------------------------------------
  *
- * LineToPostscript --
+ * RtdLineToPostscript --
  *
  *      This procedure is called to generate Postscript for
  *      line items.
@@ -1529,9 +1527,9 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
  *--------------------------------------------------------------
  */
 
-static int
-LineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
-                  int prepass )
+int
+RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
+                     int prepass )
 {
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
     char buffer[200];
