@@ -85,7 +85,7 @@ itcl::class gaia::GaiaSpectralPlot {
       configure_menubutton Options -underline 0
 
       #  Add window help.
-      add_help_button patchusage "On Window..."
+      add_help_button spectralplot "On Window..."
 
       #  Add print option.
       $File add command -label Print -command [code $this print] \
@@ -94,12 +94,12 @@ itcl::class gaia::GaiaSpectralPlot {
       $short_help_win_ add_menu_short_help Print \
          {Print} {Print window to file or printer}
 
-      #  Set the exit menu item.
-      $File add command -label Exit -command [code $this close] \
+      #  Set the close menu item.
+      $File add command -label Close -command [code $this close] \
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
       $short_help_win_ add_menu_short_help $File \
-         {Exit} {Close this window}
+         {Close} {Close this window}
 
       #  Options are whether to show the secondary plot or not. Also
       #  requires an extra canvas.
@@ -179,16 +179,18 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       pack $itk_component(canvasframe) -fill both -expand 1
       pack $itk_component(canvas) -fill both -expand 1
-      bind $itk_component(canvasframe) <Configure> [code $this resize %w %h]
 
-      #  Make window resizes, resize the canvas.
-      bind $w_ <Configure> [code $this fitxy %w %h]
+      #  Make resizes, resize the canvas and arrange for a fit.
+      bind $itk_component(canvas) <Configure> [code $this resize %w %h]
    }
 
    #  Destructor:
    #  -----------
    destructor  {
-      reset
+      #  No need to fail now, application is exiting.
+      catch {
+         reset
+      }
    }
 
    #  Methods:
@@ -219,8 +221,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Reset so that a new spectrum will be created.
    public method reset {} {
-      $itk_component(canvas) delete $spectrum_
-      if { $itk_option(-canvas) != {} } {
+      if { [info exists itk_component(canvas)] && $spectrum_ != {} } {
+         $itk_component(canvas) delete $spectrum_
+      }
+      if { $itk_option(-canvas) != {} && $spectrum2_ != {} } {
          $itk_option(-canvas) delete $spectrum2_
       }
       set spectrum_ {}
@@ -334,16 +338,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Make the spectral_plot item scale to fit the full size of the canvas.
    public method fitxy { args } {
-
-      #  Trap simple move and do nothing.
-      if { $args != {} } {
-         lassign $args w h
-         if { $w == $lastw_ && $h == $lasth_ } {
-            return
-         }
-         set lastw_ $w
-         set lasth_ $h
-      }
       $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
 
       # Resize the reference line.
@@ -491,13 +485,13 @@ itcl::class gaia::GaiaSpectralPlot {
    protected variable ref_line_ {}
 
    #  Colours, two sets full and simple. These are the AST colours
-   #  defined in grf_tkcan, plus some extra greys for the background 
+   #  defined in grf_tkcan, plus some extra greys for the background
    #  choice. The grey indices are fakes, others are AST ones.
    protected variable fullcolours_ {
-      0 "#fff" 
-      101 grey90 102 grey80 103 grey70 104 grey60 105 grey50 106 grey40 
+      0 "#fff"
+      101 grey90 102 grey80 103 grey70 104 grey60 105 grey50 106 grey40
       107 grey30 108 grey20 109 grey10
-      1 "#000" 
+      1 "#000"
       2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
       7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
       13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"
@@ -521,10 +515,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Current reference line colour.
    protected variable reflinecolour_ "#f00";  #red
-
-   #  Last width and height from <Configure> event.
-   protected variable lastw_ 0
-   protected variable lasth_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
