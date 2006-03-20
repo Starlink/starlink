@@ -72,7 +72,7 @@ itcl::class rtd::RtdImagePrint {
 		 -variable $w_.color \
 		 -value mono] \
 	    -side left -fill x -expand 1
-	::set $w_.color gray
+	::set $w_.color color
 
 	# rotate options 
 	pack [frame $w_.rotate -borderwidth 5] \
