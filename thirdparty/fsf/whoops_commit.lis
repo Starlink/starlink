@@ -1,4 +1,6 @@
-#  16th March 2006. Accidently committed the following files:
+#  16th March 2006. Accidently committed the following files.
+#  These are re-generated during the build process so are now
+#  removed. They will require removal from future imports.
 
 /cvs/thirdparty/fsf/autoconf/doc/autoconf.info,v
 /cvs/thirdparty/fsf/automake/Makefile,v
@@ -27,8 +29,5 @@
 /cvs/thirdparty/fsf/libtool/mdemo2/acinclude.m4,v
 /cvs/thirdparty/fsf/libtool/pdemo/acinclude.m4,v
 /cvs/thirdparty/fsf/libtool/tagdemo/acinclude.m4,v
-
-#  Assume this is harmless (except for future package imports),
-#  but keep this list, just in case.
 
 #  Peter W. Draper.
