@@ -36,6 +36,8 @@
 %        DATACUBE is not limited to Wavelength.  Notified the existence
 %        of getcurpos.csh in the C-shell scripts section. Further 
 %        spelling and typo's corrected.
+%    2006 March 19 (MJC):
+%        Add section on gridspec with illustrated example.
 %-
 
 % ? Specify used packages
@@ -2570,6 +2572,71 @@ plotted in a stack as before, as seen in the following example.
 
 Here we request three groups of four spectra each, \emph{i.e.}\ we'll
 get three mean spectra plotted as a stack in the final display.
+
+\subsubsection{\label{sc16_gridmap}How do I create a grid of
+spectra?\xlabel{sc16_gridmap}}
+
+For an overview visual inspection of the spectra in a cube, it is useful
+to plot many spectra simultaneously, albeit at a lower resolution, in
+their respective spatial locations.  While \KAPPA\ provides the
+\xref{clinplot}{sun95}{CLINPLOT} command to make such a grid, sometimes
+the sheer number of spatial pixels can make the spectra unreadable and
+will take some time to plot.  Therefore the \DATACUBE\ package
+provides the \xref{{\bf gridspec}}{sun237}{gridspec} shell script.  It
+has an option to average the spectra in the spatial domain, thereby
+reducing the number of spectra plotted by several times, generating
+more practical graphics quicker.   See
+\begin{htmlonly}
+the figure.
+\end{htmlonly}
+\latexonly{Figure~\ref{sc16_gridspec_fig}.}  Below is an
+example.  The {\tt -z} option requests that the white-light image be
+shown and a subset of the cube selected with the cursor. The {\tt -b}
+option sets the spatial blocking factor.  Different factors may be
+given for $x$ and $y$, the two values separated by a comma.
+
+\small\begin{verbatim}
+   % gridspec -b 4 -i ifu_file -z
+
+         Input NDF:
+           File: ifu_file.sdf
+         Shape:
+           No. of dimensions: 3
+           Dimension size(s): 59 x 110 x 961
+           Pixel bounds     : 1:59, 1:110, 1:961
+           Total pixels     : 6236890
+
+         Collapsing:
+           White-light image: 59 x 110
+
+     Left click on lower zoom boundary.
+     Left click on upper zoom boundary.
+
+          Zooming:
+          Extracting:
+            Lower (X,Y): 20,61
+            Upper (X,Y): 42,82
+
+          Plotting:
+            Clinplot: Grid of spectra, averaged 4 x 4
+               
+\end{verbatim}\normalsize
+
+\myfig{sc16_gridspec.eps}{height=0.4\textheight}{sc16_gridspec.gif}{sc16_gridspec_fig}{The
+{\bf gridspec} script, operating on a subset of the 3C~27 observation
+consisting of the central core of the galaxy, averaging sixteen
+spectra in the cube for each spectrum plotted.  The exterior axes
+indicate the average spatial co-ordinates of each block of averaged
+spectra.}
+
+A useful strategy is to select a blocking factor that gives no more
+than ten plots\footnote{This is a guide figure.  The limit will
+depend on your hardware and the size of your plotting window.  It will
+be more for a higher-resolution hardcopy.} along an axis.  Then focus
+on regions of interest---you either supply an NDF section or select
+from the white-light image---by decreasing the blocking, and thus
+increasing both the spatial and spectral plotting resolutions.
+
 
 \subsubsection{\label{sc16_velmap}How do I create a velocity map?\xlabel{sc16_velmap}}
 
