@@ -1048,7 +1048,9 @@ static void SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr,
  *      This procedure is called to generate Postscript for the item.
  *
  * Results:
- *      Always returns TCL_OK. The drawing is done by the component items.
+ *      Most of the drawing will be done by the AST components
+ *      which the canvas should manage. We need to get the polyline to draw
+ *      itself.
  *
  * Side effects:
  *      None.
@@ -1056,7 +1058,8 @@ static void SPTranslate( Tk_Canvas canvas, Tk_Item *itemPtr,
 static int SPToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
                            Tk_Item *itemPtr, int prepass )
 {
-    return TCL_OK;
+    return RtdLineToPostscript( interp, canvas, ((SPItem *)itemPtr)->polyline,
+                                prepass );
 }
 
 /**
