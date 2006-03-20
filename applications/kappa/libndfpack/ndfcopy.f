@@ -168,6 +168,10 @@
 *     2005 September 12 (MJC):
 *        Removed diagnostic ast_show and used 72-character wrap for
 *        comments.
+*     20-MAR-2006 (DSB):
+*        Check if the NDF identifier is for a base or section before
+*        using NDF_LOC to copy AXIS components. Re-write variable 
+*        comments to avoid multiline comments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,21 +200,20 @@
       CHARACTER COMP(3)*(DAT__SZNAM) ! NDF array component names
       CHARACTER LOC1*(DAT__SZLOC) ! Locator to the output NDF
       CHARACTER LOC2*(DAT__SZLOC) ! Locator to output AXIS array
-      CHARACTER LOC2C*(DAT__SZLOC) ! Locator to a single output AXIS
-                                 ! structure
+      CHARACTER LOC2C*(DAT__SZLOC)! Loc. for a single o/p AXIS structure
       CHARACTER LOC3*(DAT__SZLOC) ! Locator to the input NDF
       CHARACTER LOC4*(DAT__SZLOC) ! Locator to input AXIS array
-      CHARACTER LOC4C*(DAT__SZLOC) ! Locator to a single input AXIS
-                                 ! structure
+      CHARACTER LOC4C*(DAT__SZLOC)! Loc. for a single i/p AXIS structure
       CHARACTER LOC5*(DAT__SZLOC)! Locator to AXIS component
+      CHARACTER LOC6*(DAT__SZLOC)! Locator to AXIS component
       CHARACTER NAME*(DAT__SZNAM)! Name of AXIS component
       CHARACTER TTL*80           ! Frame title
       CHARACTER TYPE*(DAT__SZTYP)! Numerical type of array component
+      INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER EL                 ! No. of elements in mapped array
       INTEGER I                  ! Loop index
       INTEGER IAXIS( NDF__MXDIM )! Current Frame axes to retain
-      INTEGER CAXES( NDF__MXDIM )! Non-degenerate current Frame axes
       INTEGER ICURR              ! Index of original current Frame
       INTEGER IERR               ! Index of first numerical error
       INTEGER IP1                ! Pointer to mapped input array
@@ -235,18 +238,18 @@
       INTEGER NFC                ! Number of frame axes
       INTEGER OLDAX              ! Old output axis index
       INTEGER OPERM( NDF__MXDIM )! Input axis index for each output axis
+      INTEGER PLACE              ! Place holder for a temporary NDF
       INTEGER PM                 ! Axis permutation Mapping
       INTEGER SIGDIM             ! No. of significant pixel indices
       INTEGER SLBND( NDF__MXDIM )! Significant axis lower bounds
       INTEGER SUBND( NDF__MXDIM )! Significant axis upper bounds
       INTEGER UBND( NDF__MXDIM ) ! Template NDF upper bounds
-      LOGICAL BAD                ! Any bad values in the array
-                                 ! component?
+      LOGICAL BAD                ! Bad values in the array component?
+      LOGICAL ISBAS              ! Is the NDF identifier for a base NDF?
       LOGICAL THERE              ! Does object exists?
       LOGICAL TRIM               ! Remove insignificant pixel axes?
       LOGICAL TRMWCS             ! Remove corresponding WCS axes?
-      LOGICAL USEPRM             ! Use a PermMap to select current
-                                 ! Frame axes?
+      LOGICAL USEPRM             ! Use PermMap to select Frame axes?
 
       DATA COMP /'DATA', 'VARIANCE', 'QUALITY' /
 *.
@@ -472,9 +475,22 @@
             CALL DAT_NEW( LOC1, 'AXIS', 'AXIS', 1, SIGDIM, STATUS ) 
             CALL DAT_FIND( LOC1, 'AXIS', LOC2, STATUS )
 
-*  Get a locator to the array of AXIS structures in the input NDF.
-            CALL NDF_LOC( NDF1, 'READ', LOC3, STATUS ) 
+*  Get a locator to the array of AXIS structures in the input NDF. If the
+*  supplied NDF is not a base NDF we need to take a copy of it so that
+*  NDF_LOC will return a locator for a structure describing the slected
+*  section rather than the base NDF.
+            CALL NDF_ISBAS( NDF1, ISBAS, STATUS )
+            IF( .NOT. ISBAS ) THEN
+               CALL NDF_TEMP( PLACE, STATUS )
+               CALL NDF_SCOPY( NDF1, 'AXIS,NOEXTENSION()', PLACE, 
+     :                         NDFT, STATUS )
+               CALL NDF_LOC( NDFT, 'READ', LOC3, STATUS ) 
+            ELSE
+               CALL NDF_LOC( NDF1, 'READ', LOC3, STATUS ) 
+            END IF
+
             CALL DAT_FIND( LOC3, 'AXIS', LOC4, STATUS ) 
+
 
 *  Loop round each re-ordered axis in the output NDF.
             DO NEWAX = 1, SIGDIM
