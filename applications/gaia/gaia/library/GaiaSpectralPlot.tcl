@@ -13,7 +13,7 @@
 #     a spectral_plot canvas item. The spectrum displayed is a 1D section
 #     of an NDF. The section can also be displayed, in a small format, on
 #     another canvas, and have a reference position displayed (usually the
-#     coordinate of an image slice being displayed. 
+#     coordinate of an image slice being displayed.
 
 #  Invocations:
 #
@@ -87,6 +87,13 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Add window help.
       add_help_button patchusage "On Window..."
 
+      #  Add print option.
+      $File add command -label Print -command [code $this print] \
+         -accelerator {Control-p}
+      bind $w_ <Control-p> [code $this print]
+      $short_help_win_ add_menu_short_help Print \
+         {Print} {Print window to file or printer}
+
       #  Set the exit menu item.
       $File add command -label Exit -command [code $this close] \
          -accelerator {Control-c}
@@ -106,20 +113,76 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Show thumbnail plot}  \
          {Show a thumbnail copy of plot in main window}
 
+      #  Choose a colour for the spectral line.
+      $Options add cascade -label "Line color" \
+         -menu [menu $Options.line]
+      foreach {index colour} $simplecolours_ {
+         $Options.line add radiobutton \
+             -background $colour \
+             -variable [scope linecolour_] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_linecolour $colour]
+      }
+      add_menu_short_help $Options {Line color} \
+         {Change the colour of the spectral line}
+
+      #  Choose a colour for the all the axis and labels.
+      $Options add cascade -label "Axes color" \
+         -menu [menu $Options.axes]
+      foreach {index colour} $simplecolours_ {
+         $Options.axes add radiobutton \
+            -background $colour \
+            -variable [scope axescolour_] \
+            -value $index \
+            -label {    } \
+            -command [code $this set_axescolour $index]
+      }
+      add_menu_short_help $Options {Axes color} \
+          {Change the colour of the plot axes}
+
+      #  Choose a colour for the reference line.
+      $Options add cascade -label "Ref line color" \
+         -menu [menu $Options.refline]
+      foreach {index colour} $simplecolours_ {
+         $Options.refline add radiobutton \
+            -background $colour \
+            -variable [scope reflinecolour_] \
+            -value $colour \
+            -label {    } \
+            -command [code $this set_reflinecolour $colour]
+      }
+      add_menu_short_help $Options {Ref line color} \
+          {Change the colour of the reference line}
+
+      #  Choose a colour for the background.
+      $Options add cascade -label "Background" \
+         -menu [menu $Options.back]
+      foreach {index colour} $fullcolours_ {
+         $Options.back add radiobutton \
+            -background $colour \
+            -variable [scope background_] \
+            -value $colour \
+            -label {    } \
+            -command [code $this set_background $colour]
+      }
+      add_menu_short_help $Options {Background} \
+         {Change the background colour of the plot} \
+
       #  Create the canvas. Pack inside a frame so that we can get the resize
       #  events and the new geometry to get the apparent size of canvas right.
       itk_component add canvasframe {
          frame $w_.canvasframe -relief groove -bd 4
       }
       itk_component add canvas {
-         canvas $itk_component(canvasframe).canvas
+         ::canvas $itk_component(canvasframe).canvas
       }
       pack $itk_component(canvasframe) -fill both -expand 1
       pack $itk_component(canvas) -fill both -expand 1
       bind $itk_component(canvasframe) <Configure> [code $this resize %w %h]
 
       #  Make window resizes, resize the canvas.
-      bind $w_ <Configure> +[code $this fitxy]
+      bind $w_ <Configure> [code $this fitxy %w %h]
    }
 
    #  Destructor:
@@ -130,6 +193,11 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Methods:
    #  --------
+
+   #  Called after constructor completes.
+   public method init {} {
+      make_graphics_menu_
+   }
 
    #  Close down.
    public method close {} {
@@ -146,6 +214,7 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $itk_option(-open_cmd) != {} } {
          eval $itk_option(-open_cmd)
       }
+      after idle [code $this fitxy]
    }
 
    #  Reset so that a new spectrum will be created.
@@ -156,6 +225,16 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       set spectrum_ {}
       set spectrum2_ {}
+   }
+
+   #  Print canvas, use a print dialog.
+   public method print {} {
+      utilReUseWidget util::CanvasPrint $w_.print \
+         -canvas $itk_component(canvas) \
+         -transient 1 \
+         -pagewidth 7.5i
+
+      $itk_component(canvas) postscript -file check.ps
    }
 
    #  Display a spectrum, must be a 1D NDF, so usually a section. The axis
@@ -172,11 +251,12 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
          set autoscale 1
+         set gridoptions "Grid=0,DrawTitle=0,Colour=$axescolour_"
          set spectrum_ [$itk_component(canvas) create spectral_plot \
                            pointer $adr $nel $type \
                            -x 25 -y 5 -width 650 -height 200 \
-                           -linecolour blue -linewidth 1 \
-                           -gridoptions "Grid=0,DrawTitle=0" \
+                           -linecolour $linecolour_ -linewidth 1 \
+                           -gridoptions $gridoptions \
                            -showaxes 1]
          make_ref_line_
          set_to_ref_coord_
@@ -188,9 +268,8 @@ itcl::class gaia::GaiaSpectralPlot {
          set spectrum2_ [$itk_option(-canvas) create spectral_plot \
                             pointer $adr $nel $type \
                             -x $x -y $y -width 200 -height 200 \
-                            -linecolour blue -linewidth 1 \
-                            -showaxes 0 \
-                            -tags $itk_option(-ast_tag) \
+                            -linecolour $linecolour_ -linewidth 1 \
+                            -showaxes 0 -tags $itk_option(-ast_tag) \
                             -fixedscale 1]
       }
 
@@ -229,15 +308,15 @@ itcl::class gaia::GaiaSpectralPlot {
    protected method make_ref_line_ {} {
       if { $itk_option(-show_ref_line) } {
          lassign [$itk_component(canvas) bbox $spectrum_] x0 y0 x1 y1
-         if { $x0 != {} } { 
+         if { $x0 != {} } {
             set ref_line_ [$itk_component(canvas) create line $x0 $y0 $x0 $y1 \
-                              -width 1 -fill red]
+                              -width 1 -fill $reflinecolour_]
          }
       }
    }
 
    #  Set the reference line coordinate. Use a special coords that
-   #  takes a world coordinate and returns a canvas coordinate. 
+   #  takes a world coordinate and returns a canvas coordinate.
    public method set_ref_coord {xcoord} {
       if { $spectrum_ != {} && $ref_line_ != {} } {
          set xref_ [$itk_component(canvas) coords $spectrum_ convert $xcoord]
@@ -255,6 +334,16 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Make the spectral_plot item scale to fit the full size of the canvas.
    public method fitxy { args } {
+
+      #  Trap simple move and do nothing.
+      if { $args != {} } {
+         lassign $args w h
+         if { $w == $lastw_ && $h == $lasth_ } {
+            return
+         }
+         set lastw_ $w
+         set lasth_ $h
+      }
       $itk_component(canvas) scale $spectrum_ -1 -1 -1 -1
 
       # Resize the reference line.
@@ -263,7 +352,7 @@ itcl::class gaia::GaiaSpectralPlot {
          make_ref_line_
          set_to_ref_coord_
       }
-      
+
       # Fudge immediate update.
       $itk_component(canvas) itemconfigure $spectrum_ -showaxes 1
    }
@@ -298,6 +387,64 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  Add the graphics menu and populate it.
+   protected method make_graphics_menu_ {} {
+      itk_component add draw {
+         gaia::StarCanvasDraw $w_.draw \
+            -canvas $itk_component(canvas) \
+            -transient 1 \
+            -center 0 \
+            -withdraw 1 \
+            -clipping 0 \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -withtoolbox 1 \
+            -show_object_menu 1 \
+            -ignore_tag $itk_option(-ast_tag)
+      }
+
+      # Add menu and populate it.
+      set Graphics [add_menubutton "Graphics" left]
+      configure_menubutton Graphics -underline 0
+      $itk_component(draw) add_menuitems $Graphics
+
+      # Clicking on the canvas deselects other objects?
+      $itk_component(canvas) bind <1> \
+         [code $itk_component(draw) deselect_objects]
+   }
+
+   #  Set the colour of the spectral line.
+   public method set_linecolour {colour} {
+      set linecolour_ $colour
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -linecolour $linecolour_
+      }
+   }
+
+   #  Set the colour of the axes.
+   public method set_axescolour {colour} {
+      set axescolour_ $colour
+      if { $spectrum_ != {} } {
+         set gridoptions "Grid=0,DrawTitle=0,Colour=$axescolour_"
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -gridoptions $gridoptions
+      }
+   }
+
+   #  Set the colour of the reference line.
+   public method set_reflinecolour {colour} {
+      set reflinecolour_ $colour
+      if { $ref_line_ != {} } {
+         $itk_component(canvas) itemconfigure $ref_line_ \
+            -fill $reflinecolour_
+      }
+   }
+
+   #  Set the colour of the canvas background.
+   public method set_background {colour} {
+      $itk_component(canvas) configure -background $colour
+      set background_ $colour
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -339,9 +486,45 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  The reference coordinate, units of the spectral axis.
    protected variable xref_ 0
-   
+
    #  Reference line item.
    protected variable ref_line_ {}
+
+   #  Colours, two sets full and simple. These are the AST colours
+   #  defined in grf_tkcan, plus some extra greys for the background 
+   #  choice. The grey indices are fakes, others are AST ones.
+   protected variable fullcolours_ {
+      0 "#fff" 
+      101 grey90 102 grey80 103 grey70 104 grey60 105 grey50 106 grey40 
+      107 grey30 108 grey20 109 grey10
+      1 "#000" 
+      2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
+      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"
+   }
+
+   #  AST colours
+   protected variable simplecolours_ {
+      0 "#fff" 1 "#000" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
+      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"
+   }
+
+   #  Current colour of the line.
+   protected variable linecolour_ "#00f"; #blue
+
+   #  Current background colour.
+   protected variable background_ "#000"; #black
+
+   #  Current axes colour.
+   protected variable axescolour_ 0 ;     #white
+
+   #  Current reference line colour.
+   protected variable reflinecolour_ "#f00";  #red
+
+   #  Last width and height from <Configure> event.
+   protected variable lastw_ 0
+   protected variable lasth_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
