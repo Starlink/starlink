@@ -336,7 +336,10 @@ sub extract {
 
       # Do the extraction.
       my $ams = new Starlink::AMS::Init(1);
-      $ams->messages( $self->messages );
+      my $set_messages = $ams->messages;
+      if( ! defined( $set_messages ) ) {
+        $ams->messages( $self->messages );
+      }
       $ams->timeout( $self->timeout );
       if( ! defined $TASK ) {
         $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
@@ -366,7 +369,10 @@ sub extract {
 
     # Just do the extraction.
     my $ams = new Starlink::AMS::Init(1);
-    $ams->messages( $self->messages );
+    my $set_messages = $ams->messages;
+    if( ! defined( $set_messages ) ) {
+      $ams->messages( $self->messages );
+    }
     $ams->timeout( $self->timeout );
     if( ! defined $TASK ) {
       $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
