@@ -260,11 +260,17 @@ itcl::class gaia::GaiaSpectralPlot {
       if { [info exists itk_component(canvas)] && $spectrum_ != {} } {
          $itk_component(canvas) delete $spectrum_
       }
+      set spectrum_ {}
+
       if { $itk_option(-canvas) != {} && $spectrum2_ != {} } {
          $itk_option(-canvas) delete $spectrum2_
       }
-      set spectrum_ {}
       set spectrum2_ {}
+
+      if { [info exists itk_component(canvas)] && $ref_line_ != {} } {
+         $itk_component(canvas) delete $ref_line_
+      }
+      set ref_line_ {}
    }
 
    #  Print canvas, use a print dialog.
@@ -493,9 +499,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  Name of RtdImage widget.
-   itk_option define -rtdimage rtdimage Rtdimage {} {}
 
    #  The canvas, could be local or in the main image.
    itk_option define -canvas canvas Canvas {}
