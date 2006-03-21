@@ -1475,6 +1475,8 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     int current;
     int caxis;
     int i;
+    int ncoords_out;
+    int nframes;
     int pixel;
     int status = SAI__OK;
 
@@ -1492,7 +1494,8 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     base = astGetI( frameSet, "Base" );
     current = astGetI( frameSet, "Current" );
     pixel = 0;
-    for ( i = 1; i <= ncoords; i++ ) {
+    nframes = astGetI( frameSet, "Nframe" );
+    for ( i = 1; i <= nframes; i++ ) {
         astSetI( frameSet, "Current", i );
         domain = (char *)astGetC( frameSet, "Domain" );
         if ( strcasecmp( domain, "PIXEL" ) == 0 ) {
@@ -1514,16 +1517,18 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
 
     //  Transform the position from pixel coordinates to world coordinates for
     //  this position, and a position one pixel offset along the given axis.
+    ncoords_out = astGetI( frameSet, "naxes" );
+
     coords[axis-1] += 1.0;
-    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords, 1, out1  );
+    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords_out, 1, out1  );
     coords[axis-1] -= 1.0;
-    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords, 1, out2  );
+    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords_out, 1, out2  );
 
     //  Select the axis with the largest shift as equivalent in world
     //  coordinates.
     caxis = axis;
     diff = 0.0;
-    for ( i = 0; i < ncoords; i++ ) {
+    for ( i = 0; i < ncoords_out; i++ ) {
         tmp = fabs( out1[i] - out2[i] );
         if ( tmp > diff ) {
             caxis = i + 1;
