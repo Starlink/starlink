@@ -551,6 +551,8 @@ f     - Title: The Plot title drawn using AST_GRID
 *        comparing label values.
 *     17-FEB-2006 (DSB)
 *        Added escape sequences "%h+" and "%g+".
+*     21-MAR-2006 (DSB)
+*        Added extra status checks in TickMarks.
 *class--
 */
 
@@ -23814,18 +23816,19 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    vary the number of digits used in the label in order to produce
    distinct labels. If no value has been set for the axis FOrmat,we are
    also free to vary the number of digits. */
+   digset = 0;
    if( fmtset ) {
-      digset = 1;
       fmt = astGetFormat( frame, axis );
-      a = fmt;
-      while( (a = strchr( a, '.' )) ){
-         if( *(++a) == '*' ) {
-            digset = 0;
-            break;
+      if( fmt ) {
+         digset = 1;
+         a = fmt;
+         while( (a = strchr( a, '.' )) ){
+            if( *(++a) == '*' ) {
+               digset = 0;
+               break;
+            }
          }
       }
-   } else {
-      digset = 0;
    }
 
 /* If the axis precision has been specified, either through the Format string 
@@ -23849,7 +23852,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* If no precision has been specified for the axis, we need to find a
    Digits value which gives different labels, but without using any more 
    digits than necessary. */
-   } else {
+   } else if( astOK ){
 
 /* Reserve memory to hold pointers to an initial set of labels formatted
    with the default digits value. */
@@ -23936,7 +23939,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    } 
 
 /* If suitable labels were found... */
-   if( ok ) {
+   if( ok && astOK ) {
 
 /* Store the used gap size. */
       *gap = used_gap;
