@@ -640,6 +640,21 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
 
+        /* Check if data has no range, in that case just add +/- 1, so we canb
+         * plot something. During interactive updates that's better than
+         * throwing an error. */
+        if ( spPtr->ymin == spPtr->ymax ) {
+            if ( spPtr->ymin == spPtr->badvalue ) {
+                /* All bad */
+                spPtr->ymin = -1.0;
+                spPtr->ymax =  1.0;
+            }
+            else {
+                spPtr->ymin -= 1.0;
+                spPtr->ymax += 1.0;
+            }
+        }
+
     }
     return TCL_OK;
 }
@@ -1279,6 +1294,21 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
         if ( spPtr->coordPtr[i] != spPtr->badvalue ) {
             spPtr->xmin = MIN( spPtr->xmin, spPtr->coordPtr[i] );
             spPtr->xmax = MAX( spPtr->xmax, spPtr->coordPtr[i] );
+        }
+    }
+
+    /* Check if coordinates have no range, in that case just add +/- 1, so we
+     * can plot something. During interactive updates that's better than
+     * throwing an error. */
+    if ( spPtr->xmin == spPtr->xmax ) {
+        if ( spPtr->xmin == DBL_MAX ) {
+            /* All bad */
+            spPtr->xmin = -1.0;
+            spPtr->xmax =  1.0;
+        }
+        else {
+            spPtr->xmin -= 1.0;
+            spPtr->xmax += 1.0;
         }
     }
 }
