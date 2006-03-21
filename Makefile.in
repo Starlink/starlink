@@ -29,6 +29,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/cnf \
 	$(MANIFESTS)/coco \
 	$(MANIFESTS)/convert \
+	$(MANIFESTS)/cupid \
 	$(MANIFESTS)/datacube \
 	$(MANIFESTS)/daophot \
 	$(MANIFESTS)/dipso \
