@@ -184,7 +184,7 @@ sub messages {
     }
 
   }
-  return $Starlink::AMS::Core::msg_hide;
+  return ( ! $Starlink::AMS::Core::msg_hide );
 }
 
 =item errors
