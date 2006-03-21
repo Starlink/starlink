@@ -170,6 +170,9 @@
 //        Added direct NDF access commands. These are used to access cubes.
 //     14-DEC-2005 (PWD):
 //        Various update for Skycat 2.7.4.
+//     21-MAR-2006 (PWD): 
+//        Removed direct NDF access commands. These are now available
+//        via the ndf:: commands. See gaiaNDFTcl.
 //-
 
 #include <config.h>   /* Skycat util */
@@ -288,7 +291,6 @@ public:
     { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
     { "iscompound",    &StarRtdImage::isCompoundCmd,    0, 0 },
     { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
-    { "ndf",           &StarRtdImage::ndfCmd,           1, 6 },
     { "origin",        &StarRtdImage::originCmd,        2, 3 },
     { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
     { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
@@ -6324,156 +6326,6 @@ int StarRtdImage::slalibCmd( int argc, char *argv[] )
     }
     return TCL_OK;
 }
-
-//+
-//   StarRtdImage::ndfCmd
-//
-//   Purpose:
-//      Provide direct access to NDFs. Used for querying the underlying NDF
-//      without the 2D bias of the mainstream NDF access codes.
-//
-//   Arguments:
-//      First argument is the action to take and can be one of:
-//         open - open an NDF by name. The second argument is the name
-//                returns the NDF identifier if successful.
-//         close - close a previously opened NDF. Second argument is the NDF
-//                 identifier.
-//         query - make a query about an NDF. Second argument is the NDF
-//                 identifier and the third the query type. Currently only
-//                 "bounds" is supported. The result of this is a list of
-//                 pairs of lower and upper bounds.
-//         coord - return the formatted coordinate of a position along a given
-//                 axis. Second argument is the NDF identifier, the third
-//                 the index of the axis, and the fourth a list of all the
-//                 pixel coordinates needed to identify the coordinate (so
-//                 the list must have a number for each dimension of the NDF).
-//                 A boolean, optional, final argument can be used to switch
-//                 on trailing label and units strings to the value.
-//-
-int StarRtdImage::ndfCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::ndfCmd" << std::endl;
-#endif
-    int result = TCL_OK;
-    char *error_mess;
-    int ndfid;
-
-    if ( strcmp( "open", argv[0] ) == 0 ) {
-        result = gaiaSimpleOpenNDF( argv[1], &ndfid, &error_mess );
-        if ( result == TCL_OK ) {
-            set_result( ndfid );
-        }
-        else {
-            error( error_mess );
-            free( error_mess );
-        }
-
-    }
-    else if ( strcmp( "close", argv[0] ) == 0 ) {
-        if ( Tcl_GetInt( interp_, argv[1], &ndfid ) == TCL_OK ) {
-            result = gaiaSimpleCloseNDF( &ndfid );
-        }
-        else {
-            result = TCL_ERROR;
-            error( argv[1], ": is not an integer" );
-        }
-    }
-    else if ( strcmp( "query", argv[0] ) == 0 ) {
-        if ( Tcl_GetInt( interp_, argv[1], &ndfid ) == TCL_OK ) {
-            if ( strcmp( "bounds", argv[2] ) == 0 ) {
-                int lbnd[7];
-                int ubnd[7];
-                int ndim;
-                result = gaiaSimpleQueryBounds( ndfid, 7, lbnd, ubnd,
-                                                &ndim, &error_mess );
-                if ( result == TCL_OK ) {
-                    // Create the result list.
-                    set_result( lbnd[0] );
-                    append_element( ubnd[0] );
-                    for ( int i = 1; i < ndim; i++ ) {
-                        append_element( lbnd[i] );
-                        append_element( ubnd[i] );
-                    }
-                }
-                else {
-                    error( error_mess );
-                    free( error_mess );
-                }
-            }
-            else if ( strcmp( "coord", argv[2] ) == 0 ) {
-                // Next arguments are the axis that the coordinate it required
-                // for followed by a list of all the pixel coordinates that
-                // specify the position.
-                int axis;
-                if ( ( Tcl_GetInt( interp_, argv[3], &axis ) == TCL_OK ) ) {
-                    char **listArgv;
-                    int ncoords;
-                    double coords[7];
-                    if ( Tcl_SplitList( interp_, argv[4], &ncoords,
-                                        &listArgv ) == TCL_OK ) {
-                        for ( int i = 0; i < ncoords; i++ ) {
-                            if ( Tcl_GetDouble( interp_, listArgv[i],
-                                                &coords[i] ) != TCL_OK ) {
-                                error( listArgv[i],
-                                       "is not a valid number" );
-                                result = TCL_ERROR;
-                                break;
-                            }
-                        }
-
-                        //  Optional sixth element is whether to append the
-                        //  label and units.
-                        int trailed = 0;
-                        if ( argc >= 6 ) {
-                            if ( *argv[5] == '1' ) {
-                                trailed = 1;
-                            }
-                        }
-
-                        if ( result != TCL_ERROR ) {
-                            char *coord;
-                            result = gaiaSimpleQueryCoord( ndfid, axis,
-                                                           coords, trailed,
-                                                           ncoords,
-                                                           &coord,
-                                                           &error_mess );
-                            if ( result == TCL_OK ) {
-                                set_result( coord );
-                            }
-                            else {
-                                error( error_mess );
-                                free( error_mess );
-                            }
-                        }
-                    }
-                    else {
-                        result = TCL_ERROR;
-                        error( argv[4], " is not a list of pixel coordinates");
-                    }
-                }
-                else {
-                    result = TCL_ERROR;
-                    error( "ndf query axis not an integer" );
-                }
-            }
-            else {
-                result = TCL_ERROR;
-                error( argv[0], ":unknown ndf query subcommand" );
-            }
-        }
-        else {
-            result = TCL_ERROR;
-            error( argv[1], ": is not an integer" );
-        }
-    }
-    else {
-        result = TCL_ERROR;
-        error( argv[0], ":Unknown ndf subcommand" );
-    }
-    return result;
-}
-
 
 
 //  ==================================

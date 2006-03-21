@@ -306,9 +306,6 @@ class StarRtdImage : public Skycat
    //  Set the always merge attribute.
    int astalwaysmergeCmd( int argc, char *argv[] );
 
-   //  Direct NDF access.
-   int ndfCmd( int argc, char *argv[] );
-
    //  Configure the bias images.
    int biasimageCmd( int argc, char *argv[] );
 

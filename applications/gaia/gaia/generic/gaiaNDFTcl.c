@@ -3,13 +3,13 @@
  *      gaiaNDFTcl
  *
  *   Purpose:
- *      Simple, as needed, access to NDFs from Tcl scripts.
+ *      Simple, that's without 2D bias, access to NDFs from Tcl scripts.
  *
  *   Language:
  *      C
  *
  *   Authors:
- *      PWD: Peter W. Draper, Starlink - University of Durham
+ *      PWD: Peter W. Draper, JAC - University of Durham
  *
  *   History:
  *      2-MAR-2006 (PWD):
@@ -25,6 +25,7 @@
 #include <ndf.h>
 #include <gaiaNDF.h>
 
+/* Local prototypes */
 static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] );
 static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
@@ -38,12 +39,20 @@ static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] );
 
+static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] );
+
+static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
+                         int objc, Tcl_Obj *CONST objv[] );
+
+static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
+
 /**
  * Register all the NDF access commands.
  */
 int Ndf_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "ndf::open", gaiaNdfOpen,
+    Tcl_CreateObjCommand( interp, "ndf::bounds", gaiaNdfBounds,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -51,11 +60,7 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::map", gaiaNdfMap,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "ndf::getwcs", gaiaNdfGtWcs,
+    Tcl_CreateObjCommand( interp, "ndf::coord", gaiaNdfCoord,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -63,6 +68,33 @@ int Ndf_Init( Tcl_Interp *interp )
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "ndf::getwcs", gaiaNdfGtWcs,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::map", gaiaNdfMap,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::open", gaiaNdfOpen,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    return TCL_OK;
+}
+
+/*
+ * Import an NDF identifier from a Tcl_Obj. Returns TCL_ERROR if fails.
+ */
+static int importNDFIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf )
+{
+    Tcl_Obj *resultObj;
+
+    if ( Tcl_GetIntFromObj( interp, obj, indf ) != TCL_OK ) {
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_SetStringObj( resultObj, " not an NDF identifier" , -1 );
+        return TCL_ERROR;
+    }
     return TCL_OK;
 }
 
@@ -103,9 +135,9 @@ static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
 {
+    Tcl_Obj *resultObj;
     int indf;
     int result;
-    Tcl_Obj *resultObj;
 
     /* Check arguments, only allow one, the ndf identifier */
     if ( objc != 2 ) {
@@ -114,19 +146,16 @@ static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the identifier */
-    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) == TCL_OK ) {
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+        /* Close NDF */
         result = gaiaSimpleCloseNDF( &indf );
-    }
-    else {
-        resultObj = Tcl_GetObjResult( interp );
-        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
-        result = TCL_ERROR;
     }
     return result;
 }
 
 /**
- * Map the NDF data array in the NDF's data type. The result is a memory 
+ * Map the NDF data array in the NDF's data type. The result is a memory
  * address (long int), the number of elements mapped and the data type.
  */
 static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
@@ -147,17 +176,18 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the identifier */
-    resultObj = Tcl_GetObjResult( interp );
-    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) == TCL_OK ) {
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+        resultObj = Tcl_GetObjResult( interp );
         result = gaiaSimpleTypeNDF( indf, "DATA", type, NDF__SZTYP+1,
                                     &error_mess );
         if ( result == TCL_OK ) {
-            result = gaiaSimpleMapNDF( indf, type, "DATA", &dataPtr, 
+            result = gaiaSimpleMapNDF( indf, type, "DATA", &dataPtr,
                                        &el, &error_mess  );
             if ( result == TCL_OK ) {
-                Tcl_ListObjAppendElement( interp, resultObj, 
+                Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewLongObj( (long) dataPtr ) );
-                Tcl_ListObjAppendElement( interp, resultObj, 
+                Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewIntObj( el ) );
                 Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewStringObj( type, -1 ) );
@@ -168,16 +198,12 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
             free( error_mess );
         }
     }
-    else {
-        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
-        result = TCL_ERROR;
-    }
     return result;
 }
 
 /**
  * Return the address of the NDF WCS component. This is an AST FrameSet.
- * 
+ *
  * Can return a WCS for a specific axis using option second argument.
  */
 static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
@@ -198,11 +224,11 @@ static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the identifier */
-    resultObj = Tcl_GetObjResult( interp );
-    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) != TCL_OK ) {
-        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result != TCL_OK ) {
         return TCL_ERROR;
     }
+    resultObj = Tcl_GetObjResult( interp );
 
     /* Get the axis */
     axis = -1;
@@ -254,8 +280,9 @@ static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the identifier */
-    resultObj = Tcl_GetObjResult( interp );
-    if ( Tcl_GetIntFromObj( interp, objv[1], &indf ) == TCL_OK ) {
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+        resultObj = Tcl_GetObjResult( interp );
         value[0] = '\0';
         result = gaiaSimpleCGetNDF( indf, Tcl_GetString( objv[2] ),
                                     value, NDF__SZHIS+1, &error_mess );
@@ -267,9 +294,139 @@ static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
             free( error_mess );
         }
     }
-    else {
-        Tcl_SetStringObj( resultObj, "not an integer" , -1 );
-        result = TCL_ERROR;
+    return result;
+}
+
+/**
+ * Get the bounds of an NDF. Returns a list of lower and upper pixel indices.
+ */
+static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
+                          int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    int i;
+    int indf;
+    int lbnd[NDF__MXDIM];
+    int ndim;
+    int result;
+    int ubnd[NDF__MXDIM];
+
+    /* Check arguments, need the ndf identifier */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, objc, objv, "ndf_identifier" );
+        return TCL_ERROR;
+    }
+
+    /* Get the NDF identifier */
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+        resultObj = Tcl_GetObjResult( interp );
+        result = gaiaSimpleQueryBounds( indf, NDF__MXDIM, lbnd, ubnd, &ndim,
+                                        &error_mess );
+        if ( result == TCL_OK ) {
+            for ( i = 0; i < ndim; i++ ) {
+                Tcl_ListObjAppendElement( interp, resultObj,
+                                          Tcl_NewIntObj( lbnd[i] ) );
+                Tcl_ListObjAppendElement( interp, resultObj,
+                                          Tcl_NewIntObj( ubnd[i] ) );
+            }
+        }
+        if ( result != TCL_OK ) {
+            Tcl_SetStringObj( resultObj, error_mess, -1 );
+            free( error_mess );
+        }
     }
     return result;
 }
+
+/**
+ * Return the formatted coordinate of a position along a given axis.
+ *
+ * The second argument is the NDF identifier, the third the index of the axis,
+ * and the fourth a list of all the pixel indices needed to identify the
+ * coordinate (so the list must have a number for each dimension of the NDF).
+ * A boolean, optional, final argument can be used to switch on trailing label
+ * and units strings to the value.
+ */
+static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
+                         int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj **listObjv;
+    Tcl_Obj *resultObj;
+    char *coord;
+    char *error_mess;
+    double coords[NDF__MXDIM];
+    int axis;
+    int i;
+    int indf;
+    int ncoords;
+    int result;
+    int trailed;
+
+    /* Check arguments */
+    if ( objc != 4 && objc != 5 ) {
+        Tcl_WrongNumArgs( interp, objc, objv,
+                          "ndf_identifier axis {c1 c2 .. cn} [boolean]" );
+        return TCL_ERROR;
+    }
+
+    /* Import NDF identifier */
+    result = importNDFIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+
+        /* Next arguments are the axis that the coordinate is required for
+         * followed by a list of all the pixel indices that specify the
+         * position. */
+        resultObj = Tcl_GetObjResult( interp );
+        if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) == TCL_OK ) {
+            if ( Tcl_ListObjGetElements( interp, objv[3], &ncoords, &listObjv )
+                 == TCL_OK ) {
+                for ( i = 0; i < ncoords; i++ ) {
+                    if ( Tcl_GetDoubleFromObj( interp, listObjv[i],
+                                               &coords[i] ) != TCL_OK ) {
+                        Tcl_SetStringObj( resultObj,
+                                          "is not a valid number", -1 );
+                        result = TCL_ERROR;
+                        break;
+                    }
+                }
+
+                /* Optional fourth element is whether to append the label and
+                 * units. */
+                trailed = 0;
+                if ( objc == 5 ) {
+                    if ( Tcl_GetBooleanFromObj( interp, objv[4], &trailed )
+                         != TCL_OK ) {
+                        result = TCL_ERROR;
+                        Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
+                    }
+                }
+                if ( result != TCL_ERROR ) {
+                    result = gaiaSimpleQueryCoord( indf, axis, coords,
+                                                   trailed, ncoords, &coord,
+                                                   &error_mess );
+                    if ( result == TCL_OK ) {
+                        Tcl_SetStringObj( resultObj, coord, -1 );
+                    }
+                    else {
+                        Tcl_SetStringObj( resultObj, error_mess, -1 );
+                        free( error_mess );
+                    }
+                }
+            }
+            else {
+                result = TCL_ERROR;
+                Tcl_SetStringObj( resultObj,
+                                  " is not a list of pixel indices", -1 );
+            }
+        }
+        else {
+            result = TCL_ERROR;
+            Tcl_SetStringObj( resultObj, "axis value not an integer", -1 );
+        }
+    }
+    return result;
+}
+
+
