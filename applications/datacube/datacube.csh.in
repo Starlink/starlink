@@ -62,6 +62,8 @@
 #        Add clinplot, compave, gridspec, and velmoment definitions.
 #     2006 March 9 (MJC):
 #        Add lutspec definition.
+#     2006 March 22 (MJC):
+#        Add maths and setunits definitions.
 #     {enter_further_changes_here}
 #
 #  Copyright:
@@ -117,6 +119,7 @@ alias linplot         ${KAPPA_DIR}/linplot
 alias lutcol          ${KAPPA_DIR}/lutable mapping=linear coltab=colour
 alias lutgrey         ${KAPPA_DIR}/lutable mapping=linear coltab=grey
 alias lutspec         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut
+alias maths         ${KAPPA_DIR}/maths
 alias ndfcopy         ${KAPPA_DIR}/ndfcopy
 alias ndftrace        ${KAPPA_DIR}/ndftrace
 alias paldef          ${KAPPA_DIR}/paldef
@@ -129,6 +132,7 @@ alias setaxis         ${KAPPA_DIR}/setaxis
 alias setorigin       ${KAPPA_DIR}/setorigin
 alias setmagic        ${KAPPA_DIR}/setmagic
 alias settitle        ${KAPPA_DIR}/settitle
+alias setunits        ${KAPPA_DIR}/settitle
 alias stats           ${KAPPA_DIR}/stats
 alias wcsadd          ${KAPPA_DIR}/wcsadd
 alias wcsattrib       ${KAPPA_DIR}/wcsattrib
