@@ -96,10 +96,9 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
 
 /* Move the supplied PixelSet structure to the end of the cache so that
    it can be re-used. */
-   i = cupid_ps_cache_size++;
-   cupid_ps_cache = astGrow( cupid_ps_cache, cupid_ps_cache_size, 
+   cupid_ps_cache = astGrow( cupid_ps_cache, cupid_ps_cache_size + 1, 
                              sizeof( CupidPixelSet * ) );
-   cupid_ps_cache[ i ] = ps;
+   if( astOK ) cupid_ps_cache[ cupid_ps_cache_size++ ] = ps;
 
 /* Return a NULL pointer. */
    return NULL;
