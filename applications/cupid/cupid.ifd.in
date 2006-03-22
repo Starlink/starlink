@@ -356,6 +356,10 @@ package cupid {
      Type cupidhelp for help on CUPID commands.
      Type "showme sun??" to browse the hypertext documentation.
 
+     Note, CUPID is new software and is still under active development.
+     Modifications and bug fixes will be made regularly. (22/3/06)
+    
+
    }
 
 }
