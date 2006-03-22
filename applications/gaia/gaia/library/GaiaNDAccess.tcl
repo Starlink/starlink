@@ -85,8 +85,8 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Parse specification to determine data type and get an access name.
    protected method parse_name_ {} {
-
-      #  Release previous data file, if any.
+      
+      #  Release previous dataset, if any.
       close
 
       $namer_ configure -imagename $dataset
@@ -94,17 +94,20 @@ itcl::class gaia::GaiaNDAccess {
          set type_ "ndf"
       } else {
          set type_ "fits"
+         error {Cannot access FITS files that are not 2D. \
+                You should convert this file to an NDF first using the \
+                ndf2fits command in the CONVERT package.}
       }
-
+      
       #  Open the dataset.
       open_
    }
-
+   
    #  Open the dataset. Wraps two methods, one for NDFs and one for FITS files.
    #  These should be light-weight accesses that just get meta-data at this
    #  stage.
    protected method open_ {} {
-      set handle_ [${type_}::open [$namer_ ndfname]]
+      set handle_ [${type_}::open [$namer_ ndfname 0]]
    }
    
    #  Close the dataset, if open.

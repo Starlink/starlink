@@ -307,7 +307,7 @@ itcl::class gaia::Gaia {
       after 0 [code $image_ center]
 
       #  Check if any post display tasks are required.
-      after 0 [file_loaded_]
+      file_loaded_
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -1170,7 +1170,15 @@ itcl::class gaia::Gaia {
          if { $naxis1 != 1 && $naxis2 != 1 && $naxis3 != 1 } {
             #  Load it into cube browser.
             make_toolbox opencube 0 1
-            $itk_component(opencube) configure -ndfcube $itk_option(-file)
+            set msg {}
+            set result [catch {$itk_component(opencube) configure \
+                                  -ndfcube $itk_option(-file)} msg]
+            if { $result != 0 } {
+               $itk_component(opencube) close
+               if { $msg != {} } {
+                  info_dialog "$msg"
+               }
+            }
          }
       }
    }
