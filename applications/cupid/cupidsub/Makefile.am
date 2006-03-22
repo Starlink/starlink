@@ -65,7 +65,8 @@ $(CGENERIC_ROUTINES:.cgen=.c):
 	echo "#undef CGEN_CODE_TYPE" >> $@
 	echo "" >> $@
 
-
+# Need to distribute the generic files
+EXTRA_DIST = $(CGENERIC_ROUTINES)
 
 
 

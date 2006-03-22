@@ -16,7 +16,7 @@ cupid_mon_SOURCES = \
 	$(PRIVATE_INCLUDES)
 
 cupid_mon_LDADD = $(LDADD) cupidsub/libcupidsub.la `$(srcdir)/cupid_link_adam`
-cupid_mon_LDFLAGS = -static
+## cupid_mon_LDFLAGS = -static
 cupid_mon_TASKS = clumps cupidhelp makeclumps
 
 CSRC = 
@@ -52,7 +52,7 @@ sun255.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
 	export PATH ;\
 	for f in $(cupid_mon_TASKS:=.c); do \
 	   $(prolat) in=$${f} atask nodocument nopage single out=$${f}.latex ;\
-   	   ./make_quickdes $${f} ;\
+	   ./make_quickdes $${f} ;\
 	done
 	cat *.latex > tasks.tex
 	cat *.quickdes > list.tex
@@ -70,7 +70,8 @@ cupid.csh cupid.sh cupid.icl $(cupid_mon_TASKS:=.ifl): cupid.ifd
 	@IFD2STAR@ cupid
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(HELP_SOURCES) cupid.star-hlp cupidtest.sh cupid.h.source
+EXTRA_DIST = $(HELP_SOURCES) cupid.star-hlp cupidtest.sh cupid.h.source \
+	sun255.tex sun_master.tex
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = cupid.csh cupid.sh cupid.icl cupid.h
