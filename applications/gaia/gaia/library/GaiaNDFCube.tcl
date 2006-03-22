@@ -492,13 +492,13 @@ itcl::class gaia::GaiaNDFCube {
    protected method set_chosen_ndf_ { args } {
       set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
       if { [$namer exists] } {
-         if { $accessor_ != {} } {
-            accessor_ close
+         if { $accessor_ == {} } {
+            set accessor_ [GaiaNDAccess \#auto]
          }
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
-         set accessor_ [GaiaNDAccess \#auto -dataset "$ndfname_"]
+         $accessor_ configure -dataset "$ndfname_"
          set bounds_ [$accessor_ bounds]
          if { [llength $bounds_] != 6 } {
             set ndims [expr [llength $bounds_]/2]
