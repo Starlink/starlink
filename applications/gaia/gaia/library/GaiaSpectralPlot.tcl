@@ -218,6 +218,9 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Set first set of grid options.
       update_gridoptions_
+
+      #  Add the graphics menu.
+      make_graphics_menu_
    }
 
    #  Destructor:
@@ -231,11 +234,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Methods:
    #  --------
-
-   #  Called after constructor completes.
-   public method init {} {
-      make_graphics_menu_
-   }
 
    #  Close down.
    public method close {} {
@@ -305,6 +303,10 @@ itcl::class gaia::GaiaSpectralPlot {
                            -showaxes 1]
          make_ref_line_
          set_to_ref_coord_
+
+         # Clicking on the plot deselects other graphics.
+         $itk_component(canvas) bind $spectrum_ <1> \
+            +[code $itk_component(draw) deselect_objects]
       }
 
       #  Create the secondary plot, put this at the given x and y.
@@ -450,10 +452,6 @@ itcl::class gaia::GaiaSpectralPlot {
       set Graphics [add_menubutton "Graphics" left]
       configure_menubutton Graphics -underline 0
       $itk_component(draw) add_menuitems $Graphics
-
-      # Clicking on the canvas deselects other objects?
-      $itk_component(canvas) bind <1> \
-         [code $itk_component(draw) deselect_objects]
    }
 
    #  Update the applicable gridoptions.
