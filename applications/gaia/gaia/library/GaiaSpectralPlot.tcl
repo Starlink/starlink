@@ -289,8 +289,8 @@ itcl::class gaia::GaiaSpectralPlot {
    public method display {ndfname axis autoscale {x {}} {y {}}} {
 
       #  Open the NDF and map its data.
-      set ndfid [ndf::open "$ndfname"]
-      lassign [ndf::map $ndfid] adr nel type
+      set accessor [GaiaNDAccess \#auto -dataset "$ndfname"]
+      lassign [$accessor map] adr nel type
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
@@ -323,14 +323,14 @@ itcl::class gaia::GaiaSpectralPlot {
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units.
       if { $autoscale } {
-         set frameset [ndf::getwcs $ndfid $axis]
+         set frameset [$accessor getwcs $axis]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          if { $spectrum2_ != {} } {
             $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
          }
          $itk_component(canvas) itemconfigure $spectrum_ \
-            -dataunits "[ndf::getc $ndfid units]" \
-            -datalabel "[ndf::getc $ndfid label]"
+            -dataunits [$accessor getc units] \
+            -datalabel [$accessor getc label]
       }
 
       #  Pass in the data.
@@ -347,7 +347,7 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Finished with the NDF.
-      ndf::close $ndfid
+      $accessor close
    }
 
    #  Make the reference line item. This should be refreshed to the reference

@@ -448,9 +448,11 @@ itcl::class gaia::GaiaNDFCube {
    #  Destructor:
    #  -----------
    destructor  {
+
       # Close and release NDF.
-      if { $id_ != 0 } {
-         ndf::close $id_
+      if { $accessor_ != {} } {
+         $accessor_ close
+         set accessor_ {}
       }
 
       #  Stop animation.
@@ -490,14 +492,14 @@ itcl::class gaia::GaiaNDFCube {
    protected method set_chosen_ndf_ { args } {
       set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
       if { [$namer exists] } {
-         if { $id_ != 0 } {
-            ndf::close $id_
+         if { $accessor_ != {} } {
+            accessor_ close
          }
 
          $namer absolute
          set ndfname_ [$namer ndfname 0]
-         set id_ [ndf::open "$ndfname_"]
-         set bounds_ [ndf::bounds $id_]
+         set accessor_ [GaiaNDAccess \#auto -dataset "$ndfname_"]
+         set bounds_ [$accessor_ bounds]
          if { [llength $bounds_] != 6 } {
             set ndims [expr [llength $bounds_]/2]
             error_dialog "Not a cube, must have 3 dimensions (has $ndims)"
@@ -510,10 +512,9 @@ itcl::class gaia::GaiaNDFCube {
          #  Display spectra on mouse click.
          add_bindings_
 
-         #  XXX map in all data for extra speed... When to release?
-         #set ndfid [ndf::open "$ndfname_"]
-         #lassign [ndf::map $ndfid] adr nel type
-         #puts "adr=$adr, nel=$nel, type=$type"
+         #  Map in all data, this makes it immediately available within
+         #  application 
+         lassign [$accessor_ map] adr nel type
       }
    }
 
@@ -616,7 +617,7 @@ itcl::class gaia::GaiaNDFCube {
       }
       set coord {}
       catch {
-         set coord [ndf::coord $id_ $axis_ $section $trail]
+         set coord [$accessor_ coord $axis_ $section $trail]
       }
       return $coord
    }
@@ -927,6 +928,9 @@ itcl::class gaia::GaiaNDFCube {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  Data access object.
+   protected variable accessor_ {}
+
    #  The bounds of the NDF, 3 pairs of upper and lower values.
    protected variable bounds_ {}
 
@@ -956,9 +960,6 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The current axis.
    protected variable axis_ 1
-
-   #  The current NDF identifier.
-   protected variable id_ 0
 
    #  Id of the animation thread.
    protected variable afterId_ {}

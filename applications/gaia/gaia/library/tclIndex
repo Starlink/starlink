@@ -125,6 +125,7 @@ set auto_index(::gaia::GaiaPolDisp::draw2) [list source [file join $dir GaiaPolD
 set auto_index(::gaia::GaiaPolDisp::StackDump) [list source [file join $dir GaiaPolDisp.tcl]]
 set auto_index(::gaia::GaiaImageName) [list source [file join $dir GaiaImageName.tcl]]
 set auto_index(::gaia::GaiaPhotomList) [list source [file join $dir GaiaPhotomList.tcl]]
+set auto_index(::gaia::GaiaNDAccess) [list source [file join $dir GaiaNDAccess.tcl]]
 set auto_index(::gaia::StarArdAnnRect) [list source [file join $dir StarArdAnnRect.tcl]]
 set auto_index(::gaia::GaiaPolUCols) [list source [file join $dir GaiaPolUCols.tcl]]
 set auto_index(wm) [list source [file join $dir debug.tcl]]
