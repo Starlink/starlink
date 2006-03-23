@@ -65,7 +65,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 *        is zero. The index within this array at which a pointer to a
 *        particular PixelSet is stored should equal the index value
 *        stored within the PixelSet structure (this makes it easy and
-*        fast to get a pointer to aPixelSet with a particular index value).
+*        fast to get a pointer to a PixelSet with a particular index value).
 *        Elements of the array which are not used should hold NULL.
 *     clevel
 *        The data value at which to scan the supplied data array.
@@ -138,9 +138,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    CupidPixelSet **ret;  /* The returned pointer */
    CupidPixelSet *ops;   /* Pointer to neighbouring PixelSet */
    CupidPixelSet *ps;    /* Pointer to new PixelSet */
-   CupidPixelSet *psn;   /* Pointer to neighbouring PixelSet */
+   int *new_indices;     /* Array of new clump index values */
    int *pa;              /* Pointer to next index value */
-   int dec_index;        /* Decrement last used index? */
    int edge;             /* Pixel at upper or lower bound on any axis? */
    int hindex;           /* Next available index on entry */
    int i1[27];           /* List of adjoining PixelSet indices at this level */
@@ -152,8 +151,9 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    int iy;               /* GRID index on 2nd axis */
    int iz;               /* GRID index on 3rd axis */
    int j;                /* Loop count */
-   int more;             /* Should we continue looping? */
+   int new_index;        /* New index for a clump */
    int n1;               /* No. of adjoining PixelSets at this level */
+   int n2;               /* No. of adjoining PixelSets at higher levels */
    int new_clumps;       /* Number of new clumps found at this level */
    int total_pop;        /* Number of pixels checked at this level */
    int x[3];             /* GRID coords of current pixel */
@@ -166,10 +166,10 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
 
-/* Note the next available index value. This value is used to
-   differentiate between PixelSets created at the current contour level
-   and those created at higher contour levels (PixelSets created at higher 
-   contour levels will have indices less than hindex). */
+/* Note the next available index value. This value is saved now so that
+   we can differentiate later between PixelSets created at the current 
+   contour level and those created at higher contour levels (PixelSets 
+   created at higher contour levels will have indices less than hindex). */
    hindex = *index;   
 
 /* Scan the data array for good pixels which are above (or at) the supplied 
@@ -207,60 +207,30 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    different types of PixelSets; those which were identified at this contour
    level, and those which were identified at higher contour levels. */
                      cupidCFNebs( ipa, i, x, ndim, dims, skip, hindex, 
-                                  naxis, &n1, &il1,  i1, &il2, ret );
-
-/* If this pixel adjoins a PixelSet defined at a higher contour level,
-   save a pointer to the adjoining PixelSet. */
-                     psn = ( il2 != CUPID__CFNULL ) ? ret[ il2 ] : NULL;
+                                  naxis, &n1, &il1,  i1, &n2, &il2, ret );
 
 /* If none of the neighbours of this pixel are assigned to a PixelSet which 
-   was identified at this contour level, then start a new PixelSet.*/
+   was identified at this contour level, then we start a new PixelSet. */
                      if( n1 == 0 ) {
 
 /* Find the index value to use. We re-use indices for any PixelSets which
    have been transferred into some other PixelSet. This keeps the size of
    the "ret" array to a minimum and prevents us exceeding the largest allowed
    index value. */
-                        while( *index > hindex && !ret[ *index - 1 ] ) (*index)--;
+                        while( *index > hindex && !ret[ *index - 1 ] ) 
+                                                              (*index)--;
 
-/* If "newok" indicates that we cannot start any new clumps at this
-   contour level, then we ignore this pixel unless it adjoins a PixelSet
-   defined at a higher contour level. */
-                        if( newok || psn ) {
-
-/* Issue a warning and leave the loop if we are using too many PixelSets. The 
-   limit is set by the need to be able to pack two indices into a single "int" 
-   in order to store the actual PixelSet index plus a neighbouring PixelSet 
-   index in a single "int". The packing and unpacking are handled by macros 
-   cupidMergeSet, cupidMergeNeb and cupidMergeIndex. The lower 14 bits of a 
-   packed "int" hold the index of the PixelSet containing the pixel. Therefore,
-   the index of any PixelSet cannot exceed 2^14. */
-                           if( *index >= CUPID__MAXINDEX ) {
-                              msgBlank( status );
-                              msgOut( "", "WARNING: Too many contiguous pixel "
-                                      "sets needed. Pixels at lower contour "
-                                      "levels may have been ignored. Try using "
-                                      "larger contour intervals, a higher "
-                                      "minimum contour level or a smaller image.",
-                                      status );
-                              msgBlank( status );
-                              goto L10;
-
-/* Otherwise, allocate memory for a new PixelSet structure and initialise
-   it. Also, put the new PixelSet pointer into the relevant element of the
-   returned array, extending the array if necessary. */
-                           } else {
-                              ps = cupidCFMakePS( *index );
-                              ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
+/* Allocate memory for a new PixelSet structure and initialise it. Also, put 
+   the new PixelSet pointer into the relevant element of the returned array, 
+   extending the array if necessary. */
+                        ps = cupidCFMakePS( *index );
+                        ret = astGrow( ret, ++(*index), sizeof( CupidPixelSet * ) );
+                        if( ret && ps ) {
+                           ret[ ps->index ] = ps;
       
-                              if( ret && ps ) {
-                                 ret[ ps->index ] = ps;
-   
 /* Add the current pixel to this new PixelSet. */
-                                 cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, 
-                                                  edge, psn );
-                              }
-                           }
+                           cupidCFAddPixel( ipa, ps, i, x, (double ) *pd,
+                                            edge );
                         }
 
 /* If one or more of the neighbours of this pixel are assigned to PixelSets
@@ -268,8 +238,7 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
    the PixelSet with the lowest index. */
                      } else {
                         ps = ret[ il1 ];
-                        cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, edge, 
-                                         psn );
+                        cupidCFAddPixel( ipa, ps, i, x, (double ) *pd, edge );
 
 /* If this pixel touches other PixelSets identified at this contour level, 
    then transfer the pixels contained in them all into the PixelSet with 
@@ -279,7 +248,8 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
                               ops = ret[ i1[ ii ] ];
                               if( ops && ops != ps ) {
                                  cupidCFXfer( ops, ps, ipa, skip );
-                                 ret[ i1[ ii ] ] = cupidCFFreePS( ops, NULL, nel );
+                                 ret[ i1[ ii ] ] = cupidCFFreePS( ops, NULL, 
+                                                                  nel );
                               }
                            }
                         }
@@ -298,14 +268,11 @@ CupidPixelSet **CGEN_FUNCTION(cupidCFScan)( CGEN_TYPE *ipd, int *ipa, int nel,
       }
    }
 
-L10:
-
 /* Now check each of the new PixelSets created above. If the last used
    index is freed, then decrement the last used index in "*index" so that we
    can re-use the index. This keeps the size of the "ret" array down. */
-   dec_index = 1;
-   new_clumps = 0;
    total_pop = 0;
+   new_clumps = 0;
    for( i = *index - 1; i >= hindex; i-- ) {
       ps = ret[ i ];
       if( ps ) {
@@ -318,10 +285,26 @@ L10:
             msgOut( "", "   New PixelSet: index ^I population ^P", status );
          }
 
-/* If the new PixelSet does not touch any of the existing PixelSets (i.e. the 
-   clumps found at higher contour levels), then it is a new clump, so
-   tell the user and leave it in the returned list of clumps. */
-         if( ps->nnb == 0 ) {
+/* Attempt to erode the new PixelSet by transferring pixels from the PixelSet
+   into adjoining PixelSets defined at a higher contour level. The loop 
+   continues until all pixels that adjoin another PixelSet have been 
+   transferred out of the new PixelSet.*/
+         while( 1 ) {
+            if( !cupidCFErode( ps, ipa, ndim, dims, skip, naxis, ret ) ) break;
+         }
+
+/* If the PixelSet is now empty, free the resources used by the PixelSet.
+   If this PixelSet is currently the last in the list, decrement the length
+   of the list. */
+         if( ps->pop == 0 ) {
+            ret[ i ] = cupidCFFreePS( ps, NULL, nel );
+            if( i == *index - 1 ) (*index)--;
+            if( ilevel > 3 ) msgOut( "", "      Transferred to adjoining "
+                                     "PixelSets", status );
+
+/* If Pixels remain in the PixelSet then it is a new clump, so tell the user 
+   and leave it in the returned list of clumps. */
+         } else if( newok ) {
             if( ilevel > 3 ) {
                msgSetd( "V", ps->vpeak );
                msgSeti( "C", ps->peak[ 0 ] + slbnd[ 0 ] - 1 );
@@ -332,56 +315,21 @@ L10:
                msgOut( "", "      Retained as a new peak: pos (^C): value ^V", 
                        status );
             }
-            dec_index = 0;
             new_clumps++;
-   
-/* If the new PixelSet touches just one of the existing PixelSets, then 
-   it is an extension of that clump. Transfer all the pixels in the new 
-   PixelSet into the existing clump. */
-         } else if( ps->nnb == 1 ) {
 
-            if( ilevel > 3 ) {
-               msgSeti( "J", ps->nb[ 0 ]->index );
-               msgSeti( "P", ps->nb[ 0 ]->pop );
-               msgOut( "", "      Transferred to index ^J: new population ^P", status );
-            }
-
-            cupidCFXfer( ps, ps->nb[ 0 ], ipa, skip );
-   
-/* Release the resources used by the PixelSet structure. */
-            ret[ i ] = cupidCFFreePS( ps, NULL, nel );
-            if( dec_index ) (*index)--;
-   
-/* If a new PixelSet has been created which touches two or more of the 
-   existing PixelSets, then we loop round extending each of the existing 
-   clumps by one pixel on each pass. The pixels in the new PixelSet
-   which are encompassed by such a clump extension are move from the new 
-   PixelSet to the extended clump. Finally, release the resources used by
-   the PixelSet structure. */
+/* If no new clumps are allowed, tell the user, and free the clump. */   
          } else {
-            more = 1;
-            while( more ) {
-               more = 0;
-               for( j = 0; j < ps->nnb; j++ ) {
-                  ops = ps->nb[ j ];
-                  if( CGEN_FUNCTION(cupidCFXtend)( ps, ops, ipd, ipa, ndim, dims, 
-                                                   skip, 3, ret ) ) more = 1;
-                  if( ilevel > 3 && ops ) {
-                     msgSeti( "I", ps->index );
-                     msgSeti( "J", ops->index );
-                     msgOut( "", "      Index ^J extended into index ^I:", status );
-                     msgSeti( "P", ps->pop );
-                     msgSeti( "I", ps->index );
-                     msgOut( "", "         Index ^I now contains ^P pixels", status );
-                     msgSeti( "P", ops->pop );
-                     msgSeti( "J", ops->index );
-                     msgOut( "", "         Index ^J now contains ^P pixels", status );
-                  }
-               }
-            }
             ret[ i ] = cupidCFFreePS( ps, NULL, nel );
-            if( dec_index ) (*index)--;
+            if( i == *index - 1 ) (*index)--;
+            if( ilevel > 3 ) msgOut( "", "      Ignored (no new clumps "
+                                     "can be started at this contour level).",
+                                     status );
          } 
+
+/* If a null PixelSet pointer was encountered at the end of the list,
+   reduced the length of the list by 1. */
+      } else if( i == *index - 1 ){
+         (*index)--;
       }
    }
 
@@ -394,6 +342,61 @@ L10:
       msgOut( "", "   ^P checked, ^N found", status );
       msgBlank( status );
    }
+
+/* Rationalise the use of index values in order to make unused slots in
+   the returned array free. First allocate an array to hold the
+   translation from old index values to new. */
+   new_indices = astMalloc( sizeof(int)*( *index ) );
+   if( new_clumps && new_indices ) {
+
+/* Loop over the array of clump pointers. "i" is the original index of a
+   clump and "new_index" is the new index for the clump. */
+      new_index = 0;
+      for( i = 0; i < *index; i++ ) {
+
+/* If this index is not used, we jump over it. */
+         if( ret[ i ] ) {
+
+/* Save the new index corresponding to the current old index. */
+            new_indices[ i ] = new_index;
+
+/* If the index value associated with the clump is about to change, tell
+   the user if requested. */
+            if( i != new_index ) {
+               if( ilevel > 3 ) {
+                  msgSeti( "I", i );
+                  msgSeti( "J", new_index );
+                  msgOut( "", "   Changing index ^I to index ^J", status );
+               }
+   
+/* Change the index value stored in the PixelSet structure.*/
+               ret[ i ]->index = new_index;
+   
+/* Move the PixelSet to its new position in the array of PixelSets. */
+               ret[ new_index ] = ret[ i ];
+               ret[ i ] = NULL;
+            }
+
+/* Indicate that the slot is now in use. */
+            new_index++;
+         }
+      }
+
+/* If any indices have changed, change the old index values to the new in
+   the ipa array. */
+      if( new_index < *index ) {
+         pa = ipa;
+         for( ii = 0; ii < nel; ii++, pa++ ) {
+            if( *pa != CUPID__CFNULL ) *pa = new_indices[ *pa ];
+         }
+
+/* Save the new array length */
+         *index = new_index;
+      }
+   }
+
+/* Free resources. */
+   new_indices = astFree( new_indices );
 
 /* Return the expanded list of clumps. */
    return ret;

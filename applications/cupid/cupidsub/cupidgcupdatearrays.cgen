@@ -15,11 +15,10 @@
 extern CupidGC cupidGC;
 
 void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, int ndim,
-                                           int *dims, double *par, double rms,
-                                           double mlim, int imax, int ilevel, 
-                                           int *lbnd, int *cndf, int iclump, 
-                                           int diag, double mean_peak ){
-
+                                         int *dims, double *par, double rms,
+                                         double mlim, int imax, int ilevel, 
+                                         int *lbnd, HDSLoc **ndfs, int iclump, 
+                                         int diag, double mean_peak ){
 /*
 *  Name:
 *     cupidGCUpdateArrays<X>
@@ -29,10 +28,10 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 *  Synopsis:
 *     void cupidGCUpdateArrays<X>( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel, 
-*                                    int ndim, int *dims, double *par, 
-*                                    double rms, double mlim, int imax, 
-*                                    int ilevel, int *lbnd, int *cndf, 
-*                                    int iclump, int diag, double mean_peak )
+*                                  int ndim, int *dims, double *par, 
+*                                  double rms, double mlim, int imax, 
+*                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
+*                                  int iclump, int diag, double mean_peak )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -67,10 +66,13 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *     lbnd
 *        Pointer to array holding the pixel indices of the first pixel in
 *        the user-supplied NDF.
-*     cndf
-*        Pointer to an int in which to put an identifier for an NDF 
-*        describing the clump. This pointer may be NULL in which case 
-*        no NDF is created.
+*     ndfs
+*        Pointer to a location containing an HDS locator for an array of
+*        NDF structures. If the HDS locator is NULL on entry a new HDS
+*        object is created and its locator stored in place of the NULL 
+*        pointer. The array of NDF structures is extended by one, and the
+*        new NDF in thre array describes the supplied clump. If the
+*        supplied pointer is NULL, no HDS array or NDF is created.
 *     iclump
 *        Clump index.
 *     diag
@@ -369,7 +371,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    }
 
 /* If required, create an NDF holding the clump data values. */
-   if( cndf ) {
+   if( ndfs ) {
 
 /* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {
@@ -415,7 +417,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       }
 
 /* Create the NDF. */
-      cupidGCNdfClump( cndf, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
+      cupidGCNdfClump( ndfs, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
                        extra );
 

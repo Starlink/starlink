@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "star/kaplibs.h"
 #include "star/grp.h"
+#include "star/hds.h"
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
@@ -498,7 +499,7 @@ void clumps() {
    AstMapping *map;             /* Current->base Mapping from WCS FrameSet */
    AstMapping *tmap;            /* Unused Mapping */
    Grp *grp;                    /* GRP identifier for configuration settings */
-   int *clist;                  /* List of NDF identifiers for individual clump */
+   HDSLoc *ndfs;                /* Array of NDFs, one for each clump */
    HDSLoc *xloc;                /* HDS locator for CUPID extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
    char *value;                 /* Pointer to GRP element buffer */
@@ -523,7 +524,7 @@ void clumps() {
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
-   int nclump;                  /* Number of elements in "clist" */
+   int nclump;                  /* Number of elements in "ndfs" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
@@ -550,7 +551,7 @@ void clumps() {
 /* Initialise things to safe values. */
    mask = 0;
    rmask = NULL;
-   clist = NULL;
+   ndfs = NULL;
    xloc = NULL;
 
 /* Start an AST context */
@@ -742,19 +743,19 @@ void clumps() {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      clist = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
+      ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
                                 keymap, velax, ilevel, &nclump ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
-      clist = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
+      ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
-      clist = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
+      ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
-      clist = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
+      ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
                               keymap, velax, ilevel, &nclump ); 
       
    } else if( *status == SAI__OK ) {
@@ -827,7 +828,7 @@ void clumps() {
 /* Create any output NDF by summing the contents of the NDFs describing the 
    found clumps, and then adding on a background level (for GaussClumps). This 
    also fills the above mask array if required. */
-      cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, clist, 
+      cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
                          nclump, rmask, ipo, method, &bg );
 
 /* Create an CUPID extension in the NDF if none already exists, or get a
@@ -872,7 +873,7 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
-      cupidStoreClumps( "OUTCAT", xloc, clist, nclump, nsig, 
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nclump, nsig, 
                         "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */
@@ -888,10 +889,8 @@ void clumps() {
 /* Tidy up */
 L999:
 
-/* Release the memory containing the list of NDF identifiers describing the 
-   clumps. The actual identifiers should already have been freed in
-   cupidStoreClumps. */
-   clist = astFree( clist );
+/* Release the HDS object containing the list of NDFs describing the clumps. */
+   datAnnul( &ndfs, status );
 
 /* If an error has occurred, delete the Quality component if a mask was
    being created, and also delete the CUPID extension. */

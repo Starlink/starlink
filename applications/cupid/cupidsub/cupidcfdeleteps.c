@@ -38,16 +38,6 @@ CupidPixelSet *cupidCFDeletePS( CupidPixelSet *ps ){
 *     {note_any_bugs_here}
 */      
 
-/* Free the array used to hold pointers to neighbouring PixelSets. We do
-   not free the neighbouring PixelSet structures themselves. */
-   ps->nb = astFree( ps->nb );
-
-/* Free the arrays used to hold pointers to the above lists. */
-   ps->nbl = astFree( ps->nbl );
-
-/* Free the array used to hold the list sizes. */
-   ps->sznbl = astFree( ps->sznbl );
-
 /* Free the meory holding the PixelSet itself, and return a NULL pointer. */
    return astFree( ps );
 

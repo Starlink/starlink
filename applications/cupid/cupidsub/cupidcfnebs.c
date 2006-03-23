@@ -18,8 +18,9 @@
    lowest such index yet encountered. */
 #define CHECK_NEIGHBOUR \
          if( ipa[ iv ] != CUPID__CFNULL ) { \
-            clump_index = cupidMergeSet( ipa[ iv ] ); \
+            clump_index = ipa[ iv ]; \
             if( clump_index < hindex ) { \
+               (*n2)++; \
 \
                if( *il2 == CUPID__CFNULL ) { \
                   *il2 = clump_index; \
@@ -99,7 +100,7 @@
 
 void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
                   int skip[3], int hindex, int naxis, int *n1, int *il1,  
-                  int i1[27], int *il2, CupidPixelSet **clumps ){
+                  int i1[27], int *n2, int *il2, CupidPixelSet **clumps ){
 /*
 *  Name:
 *     cupidCFNebs
@@ -110,7 +111,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *  Synopsis:
 *     void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3], 
 *                     int skip[3], int hindex, int naxis, int *n1, 
-*                     int *il1, int i1[27], int *il2, CupidPixelSet **clumps )
+*                     int *il1, int i1[27], int *n2, int *il2, CupidPixelSet **clumps )
 
 *  Description:
 *     This function returns information about which, if any, PixelSets 
@@ -163,6 +164,9 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 *        The first "*n1" elements of this array will be returned holding
 *        the indices of all PixelSets defined at the current contour level 
 *        which adjoin the pixel specified by "iv". 
+*     n2
+*        Location at which to return the number of PixelSets defined at
+*        a higher contour level which adjoin the pixel specified by "iv".
 *     i12
 *        Location at which to return the index of a PixelSet defined at a
 *        higher contour level which adjoins the pixel specified by "iv". 
@@ -201,6 +205,7 @@ void cupidCFNebs( int *ipa, int iv, int x[3], int ndim, int dims[3],
 
 /* Initialise */
    *n1 = 0;
+   *n2 = 0;
    *il1 = INT_MAX;
    *il2 = CUPID__CFNULL;
 

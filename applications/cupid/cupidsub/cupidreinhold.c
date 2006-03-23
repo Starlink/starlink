@@ -4,9 +4,10 @@
 #include "ast.h"
 #include "prm_par.h"
 #include "ndf.h"
+#include "star/hds.h"
 #include <math.h>
 
-int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
                      int ilevel, int *nclump ){
 /*
@@ -18,7 +19,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the REINHOLD algorithm.
 
 *  Synopsis:
-*     int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
+*     HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, 
 *                          void *ipd, double *ipv, double rms, 
 *                          AstKeyMap *config, int velax, int *nclump )
 
@@ -62,14 +63,12 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to an int to receive the number of clumps found.
 
 *  Retured Value:
-*     A pointer to a dynamically allocated array, which should
-*     be freed using astFree when no longer needed. It will contain a
-*     list of NDF identifiers. The number of identifiers in the list is 
-*     given by the value returned in "*nclump". Each NDF will hold the
-*     data values associated with a single clump and will be the smallest 
-*     possible NDF that completely contains the corresponding clump.
-*     Pixels not in the clump will be set bad. The pixel origin is set to
-*     the same value as the supplied NDF.
+*     A locator for a new HDS object which is an array of NDF structures.
+*     The number of NDFs in the array is given by the value returned in 
+*     "*nclump". Each NDF will hold the data values associated with a single 
+*     clump and will be the smallest possible NDF that completely contains 
+*     the corresponding clump. Pixels not in the clump will be set bad. The 
+*     pixel origin is set to the same value as the supplied NDF.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -86,18 +85,19 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
    AstKeyMap *rconfig;  /* Configuration parameters for this algorithm */
+   HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double cathresh;     /* Threshold for second cellular automata */
    double noise;        /* Noise level */
    double flatslope;    /* Minimum significant slope at edge of a peak */
    double thresh;       /* Minimum peak value to be considered */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
-   int *clist;          /* Pointer to the array of returned NDF identifiers */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
    int *m1;             /* Pointer to mask array */
    int *m2;             /* Pointer to mask array */
    int *m3;             /* Pointer to mask array */
    int *mask2;          /* Pointer to array marking out edge pixels */
    int *mask;           /* Pointer to array marking out edge pixels */
+   int *nrem;           /* Pointer to array marking out edge pixels */
    int *pa;             /* Pointer to next element in the pixel assignment array */
    int caiter;          /* The number of CA iterations to perform */
    int dims[3];         /* Pointer to array of array dimensions */
@@ -114,11 +114,11 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
-   clist = NULL;
+   ret = NULL;
    *nclump = 0;
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return clist;
+   if( *status != SAI__OK ) return ret;
 
 /* Say which method is being used. */
    if( ilevel > 0 ) {
@@ -232,12 +232,9 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       m1 = m3;
    }
 
-/* Allocate the maximum amount of memory needed to hold the returned NDF 
-   identifiers. Some of the original clump identifiers may no longer be
-   in use since the cleaning up of the clumps performed above may have
-   removed some clumps altogether. Therefore the number of returned NDFs
-   may be less than "maxid". */
-   clist = astMalloc( sizeof( int )*( maxid + 1 ) );
+/* Allocate an array used to store the number of pixels remaining in each 
+   clump. */
+   nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
 
 /* Determine the bounding box of every clump. First allocate memory to
    hold the bounding boxes. */
@@ -246,9 +243,8 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    if( cubnd ) {
 
 /* Initialise a list to hold zero for every clump id. These values are
-   used to count the number fo pixels remaining in each clump. This uses the
-   returned array as temporarily used as work space. */
-      for( i = 0; i <= maxid; i++ ) clist[ i ] = 0;
+   used to count the number of pixels remaining in each clump. */
+      for( i = 0; i <= maxid; i++ ) nrem[ i ] = 0;
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
@@ -266,7 +262,7 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                if( *pa >= 0 ) {
 
 /* Increment the number of pixels in this clump. */
-                  ++( clist[ *pa ] );
+                  ++( nrem[ *pa ] );
 
 /* Get the index within the clbnd and cubnd arrays of the current bounds
    on the x axis for this clump. */
@@ -295,11 +291,10 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round creating an NDF describing each clump with more than "minpix"
    pixels, counting them. */
       for( i = 0; i <= maxid; i++ ) {
-         if( clist[ i ] > minpix ) {
-            clist[ (*nclump)++ ] = cupidNdfClump( type, ipd, m1, el, ndim, 
-                                                  dims, skip, slbnd, i, 
-                                                  clbnd + 3*i, cubnd + 3*i, 
-                                                  NULL );
+         if( nrem[ i ] > minpix ) {
+            ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
+                                 i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
+            (*nclump)++;
          }
       }
 
@@ -315,10 +310,8 @@ int *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          msgBlank( status );
       }         
 
-/* For safety, fill any unused trailing elements in "clist" with NDF__NOID. */
-      for( i = *nclump; i <= maxid; i++ ) clist[ i ] = NDF__NOID;     
-
 /* Free resources */
+      nrem = astFree( nrem );
       clbnd = astFree( clbnd );
       cubnd = astFree( cubnd );
    }
@@ -336,8 +329,8 @@ L10:;
    mask = astFree( mask );
    mask2 = astFree( mask2 );
 
-/* Return the list of clump structure locators. */
-   return clist;
+/* Return the list of clump NDFs. */
+   return ret;
 
 }
 

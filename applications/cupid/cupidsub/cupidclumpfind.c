@@ -2,9 +2,10 @@
 #include "mers.h"
 #include "cupid.h"
 #include "ast.h"
+#include "star/hds.h"
 #include "prm_par.h"
 
-int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                      double *ipv, double rms, AstKeyMap *config, int velax,
                      int ilevel, int *nclump ){
 /*
@@ -16,7 +17,7 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the CLUMPFIND algorithm.
 
 *  Synopsis:
-*     int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
+*     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
 *                          void *ipd, double *ipv, double rms, 
 *                          AstKeyMap *config, int velax, int *nclump )
 
@@ -62,14 +63,12 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to an int to receive the number of clumps found.
 
 *  Retured Value:
-*     A pointer to a dynamically allocated array, which should
-*     be freed using astFree when no longer needed. It will contain a
-*     list of NDF identifiers. The number of identifiers in the list is 
-*     given by the value returned in "*nclump". Each NDF will hold the
-*     data values associated with a single clump and will be the smallest 
-*     possible NDF that completely contains the corresponding clump.
-*     Pixels not in the clump will be set bad. The pixel origin is set to
-*     the same value as the supplied NDF.
+*     A locator for a new HDS object which is an array of NDF structures.
+*     The number of NDFs in the array is given by the value returned in 
+*     "*nclump". Each NDF will hold the data values associated with a single 
+*     clump and will be the smallest possible NDF that completely contains 
+*     the corresponding clump. Pixels not in the clump will be set bad. The 
+*     pixel origin is set to the same value as the supplied NDF.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -88,9 +87,8 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    AstKeyMap *cfconfig; /* Configuration parameters for this algorithm */
    CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
-   int *clist;          /* Pointer to the array of returned NDF identifiers */
+   HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *levels;      /* Pointer to array of contour levels */
-   double *mlist;       /* Pointer to list holding model valus */
    double clevel;       /* Current data level */
    double dd;           /* Data value */   
    double maxd;         /* Maximum value in data array */
@@ -98,7 +96,6 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    double mind;         /* Minimum value in data array */
    float fd;            /* Data value */   
    int *ipa;            /* Pointer to pixel assignment array */
-   int *plist;          /* Pointer to list holding pixel indices */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
@@ -115,11 +112,11 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
-   clist = NULL;
+   ret = NULL;
    *nclump = 0;
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return clist;
+   if( *status != SAI__OK ) return ret;
 
 /* Say which method is being used. */
    if( ilevel > 0 ) {
@@ -162,9 +159,9 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       skip[ i ] = 0;
    }
 
-/* Allocate work array to hold an index associated with each pixel in the
-   data array. This index is associated with one of the clumps returned
-   by cupidCFScan. */
+/* Allocate work array to hold an index value for each pixel in the
+   data array. Each different index value corresponds to one of the 
+   clumps returned by cupidCFScan. */
    ipa = astMalloc( sizeof( int )*el );
    if( ipa ) {
 
@@ -172,8 +169,8 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    yet been assigned to any PixelSet. */
       for( i = 0; i < el; i++ ) ipa[ i ] = CUPID__CFNULL;
 
-/* Initialise the number of clumps and initialise a pointer to the
-   PixelSet structures which describe the clumps. */
+/* Initialise an array to hold the pointers to the PixelSet structures which 
+   describe the clumps. */
       clumps = astMalloc( sizeof( CupidPixelSet *) );
       if( clumps ) clumps[ 0 ] = NULL;
 
@@ -223,10 +220,10 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Scan the data array at a new contour level. This extends clumps found
    at a higher contour level, and adds any new clumps found at this contour
-   level. New clumps are stored at the end of the returned array. if the
+   level. New clumps are stored at the end of the returned array. If the
    current contour level is higher than the maximum of the remaining
-   unassigned pixel values, there is no poin in doing this can since it will
-   find no pixels. */
+   unassigned pixel values, there is no point in doing this scan since it 
+   will find no pixels. */
          if( clevel <= maxrem ) {
             clumps = cupidCFScan( type, ipd, ipa, el, ndim, dims, skip, 
                                   clumps, clevel, &index, naxis, ilevel,
@@ -240,76 +237,31 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Mark end of contour levels. */
       if( ilevel > 1 ) msgBlank( status );
 
-/* Shuffle non-null clump pointers to the start of the "clumps" array,
-   and count them. */
-      j = 0;
-      for( i = 0; i < index; i++ ) {
-         if( clumps[ i ] ) {
-            if( j < i ) {
-               clumps[ j ] = clumps[ i ];
-               clumps[ i ] = NULL;
-            }
-            j++;
-         }
-      }
-      *nclump = j;
-
-/* Sort them into descending peak value order using a bubble sort algorithm. */
-      more = 1;
-      while( more ) {
-         j--;
-         more = 0;
-         for( i = 0; i < j; i++ ) {
-            if( clumps[ i ]->vpeak < clumps[ i + 1 ]->vpeak ) {
-               ps = clumps[ i + 1 ];
-               clumps[ i + 1 ] = clumps[ i ];
-               clumps[ i ] = ps;
-               more = 1;
-            }
-         }
-      }
-
-/* Create the list of NDFs to be returned. */
-      clist = astMalloc( sizeof( int )*(*nclump) );
-      if( clist ) {
-         mlist = NULL;
-         plist = NULL;
-
 /* Get the minimum number of pixels allowed in a clump.*/
-         minpix = cupidConfigI( cfconfig, "MINPIX", 16 );
+      minpix = cupidConfigI( cfconfig, "MINPIX", 16 );
 
 /* Loop round each clump */
-         i = -1;
-         nminpix = 0;
-         nedge = 0;
-         for( ii = 0; ii < *nclump; ii++ ) {
-            ps = clumps[ ii ];
+      nminpix = 0;
+      nedge = 0;
+      *nclump = 0;
+      for( ii = 0; ii < index; ii++ ) {
+         ps = clumps[ ii ];
 
-/* Ignore clumps which contain less than MinPix pixels, or touch an edge,
-   or contain bad pixels. */
-            if( ps ){
-               if( ps->pop < minpix ){
-                  nminpix++;
+/* Free and count clumps which contain less than MinPix pixels, or touch an 
+   edge. */
+         if( ps ){
+            if( ps->pop < minpix ){
+               nminpix++;
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
-               } else if( ps->edge ){
-                  nedge++; 
+            } else if( ps->edge ){
+               nedge++; 
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
-/* Otherwise, create an NDF describing the clump. */
-               } else {
-                  clist[ ++i ] = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
-                                              skip, slbnd, ps->index, ps->lbnd,
-                                              ps->ubnd, NULL );
-               }
+            } else {
+               (*nclump)++;
             }
          }
-
-/* Adjust the number of clumps returned to exclude any which contain
-   fewer than 4 pixels, or touch bad pixels or edges. */
-         *nclump = i + 1; 
-
-/* Free resources */
-         mlist = astFree( mlist );
-         plist = astFree( plist );
       }
 
 /* Tell the user how clumps are being returned. */
@@ -347,6 +299,44 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
       if( ilevel > 0 ) msgBlank( status );
 
+/* Shuffle non-null clump pointers to the start of the "clumps" array,
+   and count them. */
+      j = 0;
+      for( i = 0; i < index; i++ ) {
+         if( clumps[ i ] ) {
+            if( j < i ) {
+               clumps[ j ] = clumps[ i ];
+               clumps[ i ] = NULL;
+            }
+            j++;
+         }
+      }
+      *nclump = j;
+
+/* Sort them into descending peak value order using a bubble sort algorithm. */
+      more = 1;
+      while( more ) {
+         j--;
+         more = 0;
+         for( i = 0; i < j; i++ ) {
+            if( clumps[ i ]->vpeak < clumps[ i + 1 ]->vpeak ) {
+               ps = clumps[ i + 1 ];
+               clumps[ i + 1 ] = clumps[ i ];
+               clumps[ i ] = ps;
+               more = 1;
+            }
+         }
+      }
+
+/* Loop round each clump, creating an NDF to describe the clump. These are
+   stored in the returned HDS object. */
+      for( ii = 0; ii < *nclump; ii++ ) {
+         ps = clumps[ ii ];
+         ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
+                              skip, slbnd, ps->index, ps->lbnd,
+                              ps->ubnd, NULL, ret );
+      }
+
 /* Free resources */
       for( i = 0; i < index; i++ ) {
          if( clumps[ i ] ) clumps[ i ] = cupidCFFreePS( clumps[ i ], NULL, 0 );
@@ -372,8 +362,8 @@ int *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupid_ps_cache = astFree( cupid_ps_cache );
    cupid_ps_cache_size = 0;
 
-/* Return the list of clump structure locators. */
-   return clist;
+/* Return the list of clump NDFs. */
+   return ret;
 
 }
 

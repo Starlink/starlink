@@ -57,12 +57,8 @@ CupidPixelSet *cupidCFMakePS( int index ){
    if( cupid_ps_cache_size == 0 ) {
       ret = astMalloc( sizeof( CupidPixelSet ) );
       if( ret ) {
-         ret->nnb = 0;
          ret->pop = 0;
          ret->edge = 0;
-         ret->nb = NULL;
-         ret->sznbl = NULL;
-         ret->nbl = NULL;
          ret->vpeak = -DBL_MAX;
          ret->index = index;
       }

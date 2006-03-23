@@ -4,7 +4,7 @@
 CGENERIC_ROUTINES = cupidgcfindmax.cgen cupidrms.cgen \
 cupidgcsetinit.cgen cupidgcupdatearrays.cgen cupidgcfit.cgen \
 cupidgcprofwidth.cgen cupidgcdump.cgen cupidsumclumps.cgen \
-cupidcfscan.cgen cupidcfclump.cgen cupidcfxtend.cgen \
+cupidcfscan.cgen cupidcfclump.cgen \
 cupidrcheckface.cgen cupidrcopyline.cgen cupidrinitedges.cgen \
 cupidfwmain.cgen cupidndfclump.cgen
 
@@ -19,7 +19,7 @@ BUILT_SOURCES = $(BUILT_C_ROUTINES)
 C_ROUTINES = cupidclumpfind.c cupidgaussclumps.c cupidconfigD.c \
 cupidconfigI.c cupidgclistclump.c cupidgcmodel.c cupidgcchisq.c \
 cupidgccalcf.c cupidgccalcg.c cupidranval.c cupiddumpd.c \
-cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \
+cupidcferode.c cupidstoreconfig.c cupidstoreclumps.c cupiddatcopy.c \
 cupidcfdeleteps.c cupidcffreeps.c cupidcfxfer.c cupidcfaddpixel.c \
 cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c \
 cupidcfmakeps.c cupidreinhold.c cupidredges.c cupidrca.c \
@@ -28,7 +28,7 @@ cupidgcndfclump.c $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la
 
-libcupidsub_la_SOURCES = $(C_ROUTINES)
+libcupidsub_la_SOURCES = $(C_ROUTINES) $(CGENERIC_ROUTINES)
 
 AM_CFLAGS = -I..
 

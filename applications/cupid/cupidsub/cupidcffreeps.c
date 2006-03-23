@@ -57,9 +57,7 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
    if( ipa && *status == SAI__OK ) {
       int n = 0;
       for( i = 0; i < nel; i++ ) {
-         if( cupidMergeSet( ipa[ i ] ) == ps->index ) {
-            n++;
-         }
+         if( ipa[ i ] == ps->index ) n++;
       }
 
       if( n ) {
@@ -79,16 +77,10 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *ps, int *ipa, int nel){
    }
 
 
-/* Free the lists of neighbouring pixel indices. */
-   for( i = 0; i < ps->nnb; i++ ) {
-      ps->nbl[ i ] = astFree( ps->nbl[ i ] );
-   }
-
 /* Put all scalar fields back to their initial values in prepreation for
    the PixelSet pointer being re-issued by cupidMakePS. Dynamic memory
    referenced by the PixelSet is not freed, so that it can be reused
    later. */
-   ps->nnb = 0;
    ps->pop = 0;
    ps->edge = 0;
    ps->vpeak = -DBL_MAX;

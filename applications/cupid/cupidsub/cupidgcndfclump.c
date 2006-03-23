@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 
-void cupidGCNdfClump( int *cndf, double sum, double *par, double rms, 
+void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
                     int ndim, int *lbox, int *ubox, int list_size, 
                     double *mlist, int *plist, int *lbnd, int iclump,
                     int *dax, AstKeyMap *extra ){
@@ -19,7 +19,7 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
 *     Create an NDF containing a description of a single clump.
 
 *  Synopsis:
-*     void cupidGCNdfClump( int *cndf, double sum, double *par, double rms, 
+*     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
 *                         int ndim, int *lbox, int *ubox, int list_size, 
 *                         double *mlist, int *plist, int *lbnd, int iclump,
 *                         int *dax, AstKeyMap *extra )
@@ -35,9 +35,11 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
 *     - Any supplied extra information.
 
 *  Parameters:
-*     cndf
-*        Pointer to an int in which to put the identifier for the newly 
-*        created temporary NDF.
+*     obj
+*        A pointer to a locator for an HDS array of NDF objects. The array 
+*        will be extended to accomodate the new NDF. If NULL is supplied a
+*        new temporary HDS object is created, and the locator stored at the
+*        given address.
 *     sum
 *        The integrated intensity in the clump. Note, unlike par[0] and
 *        par[1], this value should not be normalised to the RMS noise.
@@ -111,6 +113,7 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
    char *fwhm[] = { "FWHM1", "FWHM2", "FWHM3" };
    char *vgrad[] = { "VGRAD1", "VGRAD2", "VGRAD3" };
 
+   HDSLoc *cloc;                /* Cell locator */
    HDSLoc *dloc;                /* Component locator */
    HDSLoc *xloc;                /* Extension locator */
    const char *key;             /* KeyMap key name */
@@ -125,6 +128,7 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
    int eub[ 3 ];                /* The upper NDF limit on each external axis */
    int eubox[ 3 ];              /* The upper box limit on each external axis */
    int i;                       /* Point index */
+   int indf;                    /* NDF identifier */
    int iv;                      /* 1D vector index for current data value */
    int j;                       /* Axis index */
    int lb[ 3 ];                 /* Lower pixel index bounds of NDF */
@@ -132,11 +136,32 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
    int ok;                      /* Pixel within clump NDF? */
    int place;                   /* NDF place holder */
    int pv;                      /* Pixel offset */
+   int size;                    /* No of elements in NDF array */
    int step[ 3 ];               /* The step size on each internal axis */
    int ub[ 3 ];                 /* Upper pixel index bounds of NDF */
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
+
+/* If no array was supplied create one of length 1. */
+   if( !(*obj) ) {
+      size = 1;
+      datTemp( "NDF", 1, &size, obj, status );
+
+/* Otherwise, get the number of NDFs already in the supplied array of
+   NDFs, and increase it by 1. */
+   } else {
+      datSize( *obj, (size_t *) &size, status );
+      size++;
+      datAlter( *obj, 1, &size, status );
+   }
+
+/* Get a locator for the new cell. */
+   cloc = NULL;
+   datCell( *obj, 1, &size, &cloc, status );
+
+/* Begin an NDF context */
+   ndfBegin();
 
 /* Find the pixel index bounds of the NDF and the step between adjacent
    pixels on each axis. */
@@ -160,16 +185,16 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
      estep[ dax[ i ] ] = step[ i ];
    }      
 
-/* Create a place holder for a temporary NDF. The NDF will be copied to a 
-   permanent location before the program exits. */
-   ndfTemp( &place, status );
+/* Create a place holder for the new NDF within the new cell. The NDF will be 
+   copied to its final resting place before the program exits. */
+   ndfPlace( cloc, " ", &place, status );
 
 /* Create the NDF to receive the clump values. The size of this NDF is the 
    minimum needed to contain the clump. */
-   ndfNew( "_DOUBLE", ndim, elb, eub, &place, cndf, status );
+   ndfNew( "_DOUBLE", ndim, elb, eub, &place, &indf, status );
 
 /* Map the NDFs Data array, filling it with bad values. */
-   ndfMap( *cndf, "DATA", "_DOUBLE", "WRITE/BAD", (void *) &ipd, &el, status );
+   ndfMap( indf, "DATA", "_DOUBLE", "WRITE/BAD", (void *) &ipd, &el, status );
    if( ipd ) {
 
 /* Store every supplied model value in the NDF data array. */
@@ -193,13 +218,13 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
       }
 
 /* Unmap the NDFs Data array. */
-      ndfUnmap( *cndf, "DATA", status );
+      ndfUnmap( indf, "DATA", status );
    }
 
 /* If required, create a Cupid extension in the NDF. */
    if( par || extra ) {
       xloc = NULL;  
-      ndfXnew( *cndf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+      ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* First do Gaussian parameters. */
       if( par ) {
@@ -298,5 +323,12 @@ void cupidGCNdfClump( int *cndf, double sum, double *par, double rms,
 /* Release the extension locator. */
       datAnnul( &xloc, status );
    }
+
+/* End the NDF context */
+   ndfEnd( status );
+
+/* Release the cell locator. */
+   datAnnul( &cloc, status );
+
 }
 

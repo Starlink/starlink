@@ -12,7 +12,7 @@
 #define FELLWALKER  4
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
-                                    int *lbnd, int *ubnd, int nel, int *clist, 
+                                    int *lbnd, int *ubnd, int nel, HDSLoc *obj,
                                     int nclump, float *rmask, void *out, 
                                     char *method, double *bg ){
 /*
@@ -25,7 +25,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
-*                             int *ubnd, int nel, int *clist, int nclump,
+*                             int *ubnd, int nel, HDSLoc *obj, int nclump,
 *                             float *rmask, void *out, char *method,
 *                             double *bg )
 
@@ -51,10 +51,10 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *        The upper bounds on the pixel axes of "out".
 *     nel
 *        Number of pixels in each of "out" and "rmask".
-*     clist
-*        A pointer to an array of "nclump" NDF identifiers. 
+*     obj
+*        A locator for an HDS array containing "nclump" NDF structures.
 *     nclump
-*        The number of identifiers in "clist".
+*        The number of NDFs in "obj".
 *     rmask
 *        The array to receive the mask. A value of 1.0 will be stored in
 *        every pixel which inside a clump. All other pixels will be set
@@ -101,6 +101,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 /* Local Variables: */
    CGEN_TYPE *pd;       /* Pointer to next element of the "out" array */
+   HDSLoc *cloc;        /* Locator for a cell of the NDF array */
    double *ipd;         /* Pointer to data array in clump NDF */
    double *m;           /* Pointer to next clump data value */
    double sumi;         /* Sum of input data values */
@@ -181,8 +182,14 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    }
 
 /* Loop round all non-NULL clumps. */
-   for( j = 0; j < nclump; j++ ) {
-      indf = clist[ j ];
+   for( j = 1; j <= nclump; j++ ) {
+      cloc = NULL;
+      datCell( obj, 1, &j, &cloc, status );
+      errBegin( status );
+      ndfFind( cloc, " ", &indf, status );
+      errEnd( status );
+      datAnnul( &cloc, status );
+
       if( indf == NDF__NOID ) continue;
 
 /* Get the bounds and dimensions of the clump's NDF. */
@@ -220,7 +227,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 /* For ClumpFind, etc, store the clump index. */
                   } else {
-                     pi[ ii ] = j + 1;
+                     pi[ ii ] = j;
                   }               
                }
          
@@ -241,10 +248,10 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
                ii += step[ k ];
             }
          }
-
-/* Unmap its DATA component. */
-         ndfUnmap( indf, "DATA", status );
       }
+
+/* Annul the NDF identifier. */
+      ndfAnnul( &indf, status );
    }
 
 /* The GaussClumps algorithm requires a constant background to be added

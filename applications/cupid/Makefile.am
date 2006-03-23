@@ -4,12 +4,13 @@ SUBDIRS = cupidsub
 
 dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl
 
-dist_noinst_SCRIPTS = cupid_link_adam make_h
+dist_noinst_SCRIPTS = cupid_link_adam make_doc make_h
 
 bin_MONOLITHS = cupid_mon
 
 
 cupid_mon_SOURCES = \
+        cupid.h \
         cupid_mon.c \
 	$(cupid_mon_TASKS:=.c) \
 	$(CSRC) \
@@ -71,7 +72,7 @@ cupid.csh cupid.sh cupid.icl $(cupid_mon_TASKS:=.ifl): cupid.ifd
 
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(HELP_SOURCES) cupid.star-hlp cupidtest.sh cupid.h.source \
-	sun255.tex sun_master.tex
+       sun_master.tex
 
 ##  Need to add generated files as BUILT_SOURCES.
 BUILT_SOURCES = cupid.csh cupid.sh cupid.icl cupid.h

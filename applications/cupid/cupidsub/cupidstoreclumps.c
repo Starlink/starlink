@@ -13,7 +13,7 @@
 /* Local Constants: */
 #define MAXCAT   50   /* Max length of catalogue name */
 
-void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist, 
+void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
                        int nclump, int ndim, const char *ttl ){
 /*
 *  Name:
@@ -23,7 +23,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 *     Store properties of all clumps found by the CLUMPS command.
 
 *  Synopsis:
-*     void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist, 
+*     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
 *                            int nclump, int ndim, const char *ttl )
 
 *  Description:
@@ -37,10 +37,10 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 *     xloc
 *        HDS locator for the CUPID extension of the NDF in which to store
 *        the clump properties. May be NULL.
-*     clist
-*        A pointer to an array of "nclump" NDF identifiers. 
+*     obj
+*        A locator for an HDS array containing "nclump" NDF structures.
 *     nclump
-*        The number of identifiers in "clist".
+*        The number of NDFs in "obj".
 *     ndim
 *        The number of pixel axes in the data.
 *     ttl
@@ -65,6 +65,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
    AstFrameSet *iwcs;           /* FrameSet to be stored in output catalogue */
    AstMapping *map;             /* Mapping from "frm1" to "frm2" */
    HDSLoc *aloc;                /* Locator for array of Clump structures */
+   HDSLoc *ncloc;               /* Locator for array cell */
    HDSLoc *cloc;                /* Locator for array cell */
    HDSLoc *dloc;                /* Locator for cell value */
    char attr[ 15 ];             /* AST attribute name */
@@ -75,10 +76,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
    double *tab;                 /* Pointer to catalogue table */
    int i;                       /* Index of next locator */
    int icol;                    /* Zero based column index */
-   int indf;                    /* Identifier for copied NDF */
+   int indf;                    /* Identifier for supplied NDF */
+   int indf2;                   /* Identifier for copied NDF */
    int irow;                    /* One-based row index */
    int ncpar;                   /* Number of clump parameters */
-   int nrow;                    /* Number of non-NULL NDFs in clist */
+   int nrow;                    /* Number of non-NULL NDFs */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
 
@@ -88,8 +90,17 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 /* Count the number of non-null identifiers supplied. This is the number
    of rows there will be in the catalogue. */
    nrow = 0;
-   for( i = 0; i < nclump; i++ ) {
-      if( clist[ i ] != NDF__NOID ) nrow++;
+   for( i = 1; i <= nclump; i++ ) {
+      ncloc = NULL;
+      datCell( obj, 1, &i, &ncloc, status );
+      errBegin( status );
+      ndfFind( ncloc, " ", &indf, status );
+      errEnd( status );
+      datAnnul( &ncloc,status );
+      if( indf != NDF__NOID ) {
+         nrow++;
+         ndfAnnul( &indf, status );
+      }
    }
 
 /* If we are writing the information to an NDF extension, create an array 
@@ -115,8 +126,16 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 /* Loop round the non-null identifiers, keeping track of the one-based row 
    number corresponding to each one. */
    irow = 0;
-   for( i = 0; i < nclump && *status == SAI__OK; i++ ) {
-      if( clist[ i ] != NDF__NOID ) {
+   for( i = 1; i <= nclump && *status == SAI__OK; i++ ) {
+      ncloc = NULL;
+      datCell( obj, 1, &i, &ncloc, status );
+
+      errBegin( status );
+      ndfFind( ncloc, " ", &indf, status );
+      errEnd( status );
+
+      datAnnul( &ncloc,status );
+      if( indf != NDF__NOID ) {
          irow++;
 
 /* Calculate the clump parameters from the clump data values stored in the 
@@ -124,7 +143,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
    information which is the same for every clump (the parameter names, the 
    indices of the parameters holding the clump central position, and the 
    number of parameters). */
-         cpars = cupidClumpDesc( clist[ i ], cpars, &names, &ncpar );
+         cpars = cupidClumpDesc( indf, cpars, &names, &ncpar );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 
@@ -159,13 +178,14 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, int *clist,
 /* Store the supplied NDF in a component called "MODEL" of the CLUMP
    structure. */
                ndfPlace( cloc, "MODEL", &place, status );
-               ndfCopy( clist[ i ], &place, &indf, status );
-               ndfAnnul( &indf, status );
+               ndfCopy( indf, &place, &indf2, status );
+               ndfAnnul( &indf2, status );
 
 /* Free the locator to the CLUMP structure. */
                datAnnul( &cloc, status );
             }
          }
+         ndfAnnul( &indf, status );
       }
    }
 

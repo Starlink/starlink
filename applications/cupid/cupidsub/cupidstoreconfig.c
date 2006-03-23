@@ -92,6 +92,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config ){
       el = 1;
       for( i = 0; i < n; i++ ) {
          subs[ 0 ]= i + 1;
+         cloc = NULL;
          datCell( aloc, 1, subs, &cloc, status );
          grpGet( grp, subs[ 0 ], 1, &pname, GRP__SZNAM + 1, status );
          nc = astChrLen( pname );

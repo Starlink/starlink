@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "cupid.h"
+#include "star/hds.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -16,9 +17,9 @@
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
 
-int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
-                       double *ipv, double rms, AstKeyMap *config, int velax,
-                       int ilevel, int *nclump ){
+HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
+                          double *ipv, double rms, AstKeyMap *config, int velax,
+                          int ilevel, int *nclump ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -28,9 +29,9 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     the GAUSSCLUMPS algorithm.
 
 *  Synopsis:
-*     int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
-*                            void *ipd, double *ipv, double rms, 
-*                            AstKeyMap *config, int velax, int *nclump )
+*     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
+*                               void *ipd, double *ipv, double rms, 
+*                               AstKeyMap *config, int velax, int *nclump )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -90,14 +91,12 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Pointer to an int to receive the number of clumps found.
 
 *  Retured Value:
-*     A pointer to a dynamically allocated array, which should
-*     be freed using astFree when no longer needed. It will contain a
-*     list of NDF identifiers. The number of identifiers in the list is 
-*     given by the value returned in "*nclump". Each NDF will hold the
-*     data values associated with a single clump and will be the smallest 
-*     possible NDF that completely contains the corresponding clump.
-*     Pixels not in the clump will be set bad. The pixel origin is set to
-*     the same value as the supplied NDF.
+*     A locator for a new HDS object which is an array of NDF structures.
+*     The number of NDFs in the array is given by the value returned in 
+*     "*nclump". Each NDF will hold the data values associated with a single 
+*     clump and will be the smallest possible NDF that completely contains 
+*     the corresponding clump. Pixels not in the clump will be set bad. The 
+*     pixel origin is set to the same value as the supplied NDF.
 
 *  Notes:
 *     - The specific form of algorithm used here is informed by a Fortran
@@ -133,7 +132,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char buf[30];        /* File name buffer */
-   int *clist;          /* Pointer to the array of returned NDF identifiers */
+   HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
    double chisq;        /* Chi-squared value of most recently fitted Gaussian */
    double mean_peak;    /* The mean of the values within "peaks" */
@@ -165,11 +164,11 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    void *res;           /* Pointer to residuals array */
 
 /* Initialise */
-   clist = NULL;
+   ret = NULL;
    *nclump = 0;
 
 /* Abort if an error has already occurred. */
-   if( *status != SAI__OK ) return clist;
+   if( *status != SAI__OK ) return ret;
 
 /* Say which method is being used. */
    if( ilevel > 0 ) {
@@ -335,20 +334,14 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Reset the number of failed fits since the last good fit. */
                   nskip = 0;
 
-/* Extend the returned array of clump NDFs to include room for the new 
-   one. */
-                  clist = astGrow( clist, iclump, sizeof( int ) );
-                  if( clist ) clist[ iclump - 1 ] = NDF__NOID;
-
 /* Remove the model fit (excluding the background) from the residuals
    array. This also creates an NDF containing the data values associated
-   with the clump. An identifier for this new clump NDF is added into the 
-   "clist" array. The standard deviation of the new residuals is 
+   with the clump. This NDF is stored in the HDS array of NDFs in the
+   returned HDS object. The standard deviation of the new residuals is 
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
-                                       clist + ( iclump - 1 ), iclump, 
-                                       diag, mean_peak );
+                                       &ret, iclump, diag, mean_peak );
 
 /* Dump the modified residuals if required. */
                   if( ilevel > 5 ) {
@@ -486,7 +479,7 @@ int *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    gcconfig = astAnnul( gcconfig );
 
 /* Return the list of clump NDFs. */
-   return clist;
+   return ret;
 
 }
 
