@@ -307,7 +307,7 @@ itcl::class gaia::Gaia {
       after 0 [code $image_ center]
 
       #  Check if any post display tasks are required.
-      file_loaded_
+      after 0 [code $this file_loaded_]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -1179,6 +1179,11 @@ itcl::class gaia::Gaia {
                   info_dialog "$msg"
                }
             }
+         }
+      } else {
+         #  Make sure toolbox is withdrawn.
+         if { [info exists itk_component(opencube)] } { 
+            $itk_component(opencube) close
          }
       }
    }
