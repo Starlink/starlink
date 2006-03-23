@@ -106,7 +106,7 @@ David S. Berry (dsb@ast.man.ac.uk)
 GAIA is derived from SkyCat version [skycat_version]
 Copyright (C) 1996-2001 ESO - European Southern Observatory
 
-Authors: 
+Authors:
 Allan Brighton (abrighton@gemini.edu)
 Thomas Herlin (therlin@eso.org)
 Miguel Albrecht (malbrech@eso.org)
@@ -364,7 +364,7 @@ itcl::class gaia::Gaia {
    #  Add help for GAIA and SkyCat. Gets called a lot from base classes, so
    #  make sure done just once.
    public method add_help_menu {} {
-      if { ! $help_menu_done_ } { 
+      if { ! $help_menu_done_ } {
          set help_menu_done_ 1
          global ::gaia_dir
          set m [add_help_button index "Help topics index..." \
@@ -1148,7 +1148,7 @@ itcl::class gaia::Gaia {
       if { $filename != {} } {
          configure -file $filename
       }
-      if { $itk_option(-file) == {} } { 
+      if { $itk_option(-file) == {} } {
          return
       }
       if { ! $itk_option(-check_for_cubes) } {
@@ -1176,13 +1176,13 @@ itcl::class gaia::Gaia {
             if { $result != 0 } {
                $itk_component(opencube) close
                if { $msg != {} } {
-                  info_dialog "$msg"
+                  info_dialog "$msg" $w_
                }
             }
          }
       } else {
          #  Make sure toolbox is withdrawn.
-         if { [info exists itk_component(opencube)] } { 
+         if { [info exists itk_component(opencube)] } {
             $itk_component(opencube) close
          }
       }
@@ -1867,7 +1867,7 @@ window gives you access to this."
 
    #  Check any images that are opened to see if they are cubes.
    itk_option define -check_for_cubes check_for_cubes Check_For_Cubes 1
-  
+
    # -- Protected variables --
 
    #  Application name.
