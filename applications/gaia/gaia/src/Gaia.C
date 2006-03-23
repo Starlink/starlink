@@ -101,7 +101,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
       return TCL_ERROR;
     }
 
-    //  SWIG NDF interface.
+    //  Simple NDF interface.
     if ( Ndf_Init(interp) != TCL_OK ) {
         return TCL_ERROR;
     }
@@ -175,4 +175,3 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
     return TCL_OK;
 }
-
