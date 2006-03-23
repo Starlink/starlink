@@ -71,6 +71,8 @@
 *     31-JAN-2006 (TIMJ):
 *        Use ERR_MARK/RLSE and annul status if HDS_INFOI fails for any
 *        reason.
+*     23-MAR-2006 (TIMJ):
+*        Enable AST Memory Cache
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,6 +87,7 @@
       INCLUDE  'SAE_PAR'          ! SSE global definitions
       INCLUDE  'GRP_PAR'          ! GRP definitions
       INCLUDE  'DAT_PAR'          ! DAT definitions
+      INCLUDE  'AST_PAR'          ! AST_TUNE definition
 
 *  Status:
       INTEGER  STATUS
@@ -98,6 +101,7 @@
       CHARACTER NAME * ( 15 )     ! Task name from the command
       INTEGER IPOSN               ! Position in string
       INTEGER LSTAT               ! Local status
+      INTEGER MEMCACHE            ! Previous state of AST memory cache
       INTEGER NGRP0               ! Number of active GRP groups on entry
       INTEGER NGRP1               ! Number of active GRP groups on exit
       INTEGER NLOC0               ! Number of active locators on entry
@@ -110,6 +114,9 @@
 
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Configure AST to cache memory for performance
+      MEMCACHE = AST_TUNE( 'MemoryCaching', 1, STATUS )
 
 *  Note the current number of active GRP identifiers.
       CALL GRP_INFOI( GRP__NOID, 0, 'NGRP', NGRP0, STATUS )
@@ -580,6 +587,9 @@
       IF (LSTAT .NE. SAI__OK) CALL ERR_ANNUL( LSTAT )
 
       CALL ERR_RLSE
+
+*  Clear the AST memory cache
+      MEMCACHE = AST_TUNE( 'MemoryCaching', MEMCACHE, STATUS )
 
 *  End and return.
 
