@@ -197,6 +197,12 @@ static char *errMessage( int *status )
     return result_message;
 }
 
+/**
+ * ===================================
+ * Simple Skycat-like access routines.
+ * ===================================
+ */
+
 /*
  *  Name:
  *     gaiaAccessNDF
@@ -563,9 +569,11 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
     return 1;
 }
 
-/*  ===================================== */
-/*  Multiple NDFs per container interface */
-/*  ===================================== */
+/**
+ *  =====================================
+ *  Multiple NDFs per container interface
+ *  =====================================
+ */
 
 /*
  *   Name:
@@ -1232,8 +1240,8 @@ void *gaiaCloneMNDF( const void *handle )
  *  =============================================
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================
- *
- *  These are only used to query NDF bounds, so that we can section up cubes.
+ * 
+ *  These are the "cube" and "spectral" access routines.
  */
 
 /**
@@ -1565,4 +1573,3 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     emsRlse();
     return 0;
 }
-

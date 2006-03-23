@@ -34,7 +34,7 @@
 #include <ast.h>
 #include <grf_tkcan.h>
 #include <rtdCanvas.h>
-#include <prm_par.h>
+#include <gaiaArray.h>
 
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
@@ -42,10 +42,6 @@
 #define DEBUG 0
 
 #define DOUBLE_LENGTH 25
-
-/* HDS data types */
-enum { HDS_UBYTE, HDS_BYTE, HDS_UWORD, HDS_WORD, HDS_INTEGER, HDS_REAL,
-       HDS_DOUBLE };
 
 /*
  * Define a structure for containing all the necessary information
@@ -449,33 +445,11 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 return TCL_ERROR;
             }
 
-            /*  Convert HDS type string into local enum. */
-            typePtr = Tcl_GetString( objv[3] );
-            type = HDS_DOUBLE;
-            if ( typePtr[0] == '_' ) {
-                if ( typePtr[1] == 'u' || typePtr[1] == 'U' ) {
-                    if ( typePtr[2] == 'b' || typePtr[2] == 'B' ) {
-                        type = HDS_UBYTE;
-                    }
-                    else {
-                        type = HDS_UWORD;
-                    }
-                }
-                else if ( typePtr[1] == 'b' || typePtr[1] == 'B' ) {
-                    type = HDS_BYTE;
-                }
-                else if ( typePtr[1] == 'w' || typePtr[1] == 'W' ) {
-                    type = HDS_WORD;
-                }
-                else if ( typePtr[1] == 'i' || typePtr[1] == 'I' ) {
-                    type = HDS_INTEGER;
-                }
-                else if ( typePtr[1] == 'r' || typePtr[1] == 'R' ) {
-                    type = HDS_REAL;
-                }
-            }
-            else {
-                Tcl_AppendResult( interp, "Unknown data type: ", objv[3],
+            /*  Convert HDS type string into gaiaArray enum. */
+            type = gaiaArrayHDSType( Tcl_GetString( objv[3] ) );
+            if ( type == HDS_UNKNOWN ) { 
+                Tcl_AppendResult( interp, "Unknown data type: ", 
+                                  Tcl_GetString( objv[3] ),
                                   (char *) NULL );
                 return TCL_ERROR;
             }
@@ -503,7 +477,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         spPtr->ymin =  DBL_MAX;
 
         if ( adr == 0 ) {
-            /* Read doubles as strings */
+            /* Read doubles from each word */
             for ( i = 0; i < nel; i++ ) {
                 if ( Tcl_GetDoubleFromObj( interp, objv[i],
                                            &spPtr->dataPtr[i] ) != TCL_OK ) {
@@ -516,118 +490,11 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
         else {
-            /* Given memory address, convert type into double precision 
-             * and check for VAL__BAD values which are replaced with our 
-             * bad value, -DBL_MAX. */
-
-            dataPtr = spPtr->dataPtr;
-            switch (type)
-            {
-                case HDS_DOUBLE : {
-                    double *fromPtr = (double *) adr;
-                    double value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADD ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_REAL : {
-                    float *fromPtr = (float *) adr;
-                    float value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADR ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_INTEGER : {
-                    int *fromPtr = (int *) adr;
-                    int value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADI ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_WORD : {
-                    short *fromPtr = (short *) adr;
-                    short value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADW ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_UWORD : {
-                    unsigned short *fromPtr = (unsigned short *) adr;
-                    unsigned short value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADUW ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_BYTE : {
-                    char *fromPtr = (char *) adr;
-                    char value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADB ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-
-                case HDS_UBYTE : {
-                    unsigned char *fromPtr = (unsigned char *) adr;
-                    unsigned char value;
-                    for ( i = 0; i < nel; i++ ) {
-                        value = *fromPtr++;
-                        if ( value == VAL__BADUB ) {
-                            *dataPtr++ = spPtr->badvalue;
-                        }
-                        else {
-                            *dataPtr++ = (double) value;
-                        }
-                    }
-                }
-                break;
-            }
+            /* Given memory address, convert type into double precision and
+             * check for BAD values which are replaced with our bad value,
+             * -DBL_MAX. */
+            gaiaArrayToDouble( (void *) adr, nel, type, spPtr->badvalue, 
+                               spPtr->dataPtr );
 
             /* Get range of data */
             dataPtr = spPtr->dataPtr;
