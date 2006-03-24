@@ -114,7 +114,7 @@ itcl::class gaia::GaiaImageSpectrum {
       #  Add the graph
       itk_component add graph {
 	  blt::graph $w_.graph \
-	      -width 5i \
+	      -width 6i \
 	      -height 3i \
 	      -borderwidth 3 \
 	      -relief groove \
@@ -160,7 +160,7 @@ itcl::class gaia::GaiaImageSpectrum {
 
       # Tk frame for X,Y positions.
       itk_component add fpos {
-         frame $w_.fpos -relief flat
+         frame $w_.fpos -relief flat -padx 10
       }
 
       # Tk label for X position.
@@ -179,7 +179,18 @@ itcl::class gaia::GaiaImageSpectrum {
       }
       pack $itk_component(xpos) $itk_component(yval) \
          $itk_component(val) -fill x -expand 1 -side left
-      pack $itk_component(fpos) -fill none -expand 0
+
+      #  Add logscale option for Y axis.
+      itk_component add logscale {
+         checkbutton $itk_component(fpos).logscale -text "Log y axis" \
+            -variable [scope logscale_] \
+            -offvalue 0 \
+            -onvalue 1 \
+            -command [code $this set_logscale_]
+      }
+      pack $itk_component(logscale) -fill none -expand 1
+
+      pack $itk_component(fpos) -fill x -expand 1
    }
 
    #  Create an NDF or text file with the slice contents.
@@ -285,10 +296,18 @@ itcl::class gaia::GaiaImageSpectrum {
       }
    }
 
+   #  Set the logscale as requested.
+   method set_logscale_ {} {
+      $graph_ yaxis configure -logscale $logscale_
+   }
+
    #  BLT vectors.
    protected variable vVector_ {}
    protected variable iVector_ {}
 
    #  Image name controller.
    protected variable namer_ {}
+
+   #  Log scale status.
+   protected variable logscale_ 0
 }
