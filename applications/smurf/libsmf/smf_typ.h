@@ -45,6 +45,8 @@
 *        - Add smfHead.isCloned
 *     2006-02-17 (AGG):
 *        Add ncoeff and poly for scanfit polynomial coefficients
+*     2006-03-23 (AGG):
+*        Add nframes and curframe to smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,12 +116,13 @@ typedef struct smfFile {
 
 typedef struct smfHead {
   sc2head *sc2head;         /* Pointer to current sc2head */
-  AstFrameSet * wcs;        /* Frameset for a particular time slice */
+  AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
-  dim_t curslice;           /* Index corresponding to current timeslice */
-  int isCloned;            /* If false, allsc2heads is owned by this
-                              struct, if true it should not be freed */
-  sc2head *allsc2heads;    /* Array of sc2heads for every time slice */ 
+  dim_t curframe;           /* Index corresponding to current frame */
+  dim_t nframes;            /* Number of frames in smfData */
+  int isCloned;             /* If false, allsc2heads is owned by this
+			       struct, if true it should not be freed */
+  sc2head *allsc2heads;     /* Array of sc2heads for every time slice */ 
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw
