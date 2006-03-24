@@ -23,7 +23,7 @@
 *  Description:
 *     This routine sets new values for the variance component of an NDF
 *     data structure. The new values can be copied from a specified
-*     component of a second NDF or can generated from the supplied NDF's 
+*     component of a second NDF or can be generated from the supplied NDF's 
 *     data array by means of a Fortran-like arithmetic expression.  Any 
 *     previous variance information is over-written with the new values.
 *     Alternatively, if a `null' value (!) is given for the variance,
