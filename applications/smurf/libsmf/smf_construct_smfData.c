@@ -17,7 +17,7 @@
 *                      smfHead * hdr, 
 *		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 *		       const dim_t dims[], int ndims,
-*		       int virtual, int * status );
+*		       int virtual, int ncoeff, double *poly, int * status );
 
 *  Arguments:
 *     tofill = smfData * (Given)
@@ -45,6 +45,10 @@
 *        Number of dimensions in dims[]. Maximum of NDF__MXDIM.
 *     virtual = int (Given)
 *        Boolean indicating whether this is a virtual smfData.
+*     ncoeff = int (Given)
+*        Number of coefficients in scanfit polynomial
+*     poly = double * (Given)
+*        Pointer to array of polynomial coefficients
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,11 +71,14 @@
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-01-26 (TIMJ):
 *        Initial version
+*     2006-03-23 (AGG):
+*        Add scanfit polynomial variables
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -119,7 +126,7 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 		       const dim_t dims[], int ndims,
-		       int virtual, int * status ) {
+		       int virtual, int ncoeff, double *poly, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
@@ -179,6 +186,8 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       for (i = 0; i < ndims; i++ ) {
 	(data->dims)[i] = dims[i];
       }
+      data->ncoeff = ncoeff;
+      data->poly = poly;
     }
   }
 
