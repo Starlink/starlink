@@ -573,7 +573,7 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
 
             //  Open image.
             imio = NDFIO::read( fullname, component() );
-            delete fullname;
+            delete[] fullname;
 
         } else {
 
