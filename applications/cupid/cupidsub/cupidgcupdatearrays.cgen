@@ -71,7 +71,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        NDF structures. If the HDS locator is NULL on entry a new HDS
 *        object is created and its locator stored in place of the NULL 
 *        pointer. The array of NDF structures is extended by one, and the
-*        new NDF in thre array describes the supplied clump. If the
+*        new NDF in the array describes the supplied clump. If the
 *        supplied pointer is NULL, no HDS array or NDF is created.
 *     iclump
 *        Clump index.

@@ -6,8 +6,8 @@
 #include "prm_par.h"
 
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
-                     double *ipv, double rms, AstKeyMap *config, int velax,
-                     int ilevel, int *nclump ){
+                        double *ipv, double rms, AstKeyMap *config, int velax,
+                        int ilevel ){
 /*
 *  Name:
 *     cupidClumpFind
@@ -18,8 +18,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 *  Synopsis:
 *     HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, 
-*                          void *ipd, double *ipv, double rms, 
-*                          AstKeyMap *config, int velax, int *nclump )
+*                             void *ipd, double *ipv, double rms, 
+*                             AstKeyMap *config, int velax, int ilevel )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -51,7 +51,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        array. The elements should be stored in Fortran order. The data 
 *        type of this array is "double".
 *     rms
-*        The global RMS error in the data array.
+*        The default value for the global RMS error in the data array.
 *     config
 *        An AST KeyMap holding tuning parameters for the algorithm.
 *     velax
@@ -59,15 +59,12 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display.
-*     nclump
-*        Pointer to an int to receive the number of clumps found.
 
 *  Retured Value:
 *     A locator for a new HDS object which is an array of NDF structures.
-*     The number of NDFs in the array is given by the value returned in 
-*     "*nclump". Each NDF will hold the data values associated with a single 
-*     clump and will be the smallest possible NDF that completely contains 
-*     the corresponding clump. Pixels not in the clump will be set bad. The 
+*     Each NDF will hold the data values associated with a single clump 
+*     and will be the smallest possible NDF that completely contains the 
+*     corresponding clump. Pixels not in the clump will be set bad. The 
 *     pixel origin is set to the same value as the supplied NDF.
 
 *  Authors:
@@ -106,6 +103,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int minpix;          /* Minimum number of pixels in a clump */
    int more;            /* Any remaining unsorted elements/ */
    int naxis;           /* Defines whether two pixels are neighbours or not */
+   int nclump;          /* Number of clumps found */
    int nedge;           /* Number of clumps with edge pixels */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
@@ -113,7 +111,6 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise */
    ret = NULL;
-   *nclump = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -142,6 +139,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the value which defines whether two pixels are neighbours or not.
    The default value is equalto the number of axes in the data array. */
    naxis = cupidConfigI( cfconfig, "NAXIS", ndim );
+
+/* Get the RMS noise level to use. */
+   rms = cupidConfigD( cfconfig, "RMS", rms );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
@@ -243,7 +243,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Loop round each clump */
       nminpix = 0;
       nedge = 0;
-      *nclump = 0;
+      nclump = 0;
       for( ii = 0; ii < index; ii++ ) {
          ps = clumps[ ii ];
 
@@ -259,19 +259,19 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
             } else {
-               (*nclump)++;
+               nclump++;
             }
          }
       }
 
 /* Tell the user how clumps are being returned. */
       if( ilevel > 0 ) {
-         if( *nclump == 0 ) {
+         if( nclump == 0 ) {
             msgOut( "", "No usable clumps found", status );
-         } else if( *nclump == 1 ){
+         } else if( nclump == 1 ){
             msgOut( "", "One usable clump found", status );
          } else {
-            msgSeti( "N", *nclump );
+            msgSeti( "N", nclump );
             msgOut( "", "^N usable clumps found", status );
          }
 
@@ -311,7 +311,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             j++;
          }
       }
-      *nclump = j;
+      nclump = j;
 
 /* Sort them into descending peak value order using a bubble sort algorithm. */
       more = 1;
@@ -330,7 +330,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Loop round each clump, creating an NDF to describe the clump. These are
    stored in the returned HDS object. */
-      for( ii = 0; ii < *nclump; ii++ ) {
+      for( ii = 0; ii < nclump; ii++ ) {
          ps = clumps[ ii ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
                               skip, slbnd, ps->index, ps->lbnd,

@@ -14,7 +14,7 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int nclump, int ndim, const char *ttl ){
+                       int ndim, const char *ttl ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -24,7 +24,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int nclump, int ndim, const char *ttl )
+*                            int ndim, const char *ttl )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -38,9 +38,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        HDS locator for the CUPID extension of the NDF in which to store
 *        the clump properties. May be NULL.
 *     obj
-*        A locator for an HDS array containing "nclump" NDF structures.
-*     nclump
-*        The number of NDFs in "obj".
+*        A locator for an HDS array the clump NDF structures.
 *     ndim
 *        The number of pixel axes in the data.
 *     ttl
@@ -80,36 +78,23 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int indf2;                   /* Identifier for copied NDF */
    int irow;                    /* One-based row index */
    int ncpar;                   /* Number of clump parameters */
-   int nrow;                    /* Number of non-NULL NDFs */
+   int nndf;                    /* Total number of NDFs */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
-/* Count the number of non-null identifiers supplied. This is the number
-   of rows there will be in the catalogue. */
-   nrow = 0;
-   for( i = 1; i <= nclump; i++ ) {
-      ncloc = NULL;
-      datCell( obj, 1, &i, &ncloc, status );
-      errBegin( status );
-      ndfFind( ncloc, " ", &indf, status );
-      errEnd( status );
-      datAnnul( &ncloc,status );
-      if( indf != NDF__NOID ) {
-         nrow++;
-         ndfAnnul( &indf, status );
-      }
-   }
+/* Get the total number of NDFs supplied. */
+   datSize( obj, (size_t *) &nndf, status );
 
 /* If we are writing the information to an NDF extension, create an array 
-   of "nrow" Clump structures in the extension, and get a locator to it. */
+   of "nndf" Clump structures in the extension, and get a locator to it. */
    if( xloc ) {
       aloc = NULL;
       datThere( xloc, "CLUMPS", &there, status );
       if( there ) datErase( xloc, "CLUMPS", status );
-      datNew( xloc, "CLUMPS", "CLUMP", 1, &nrow, status );
+      datNew( xloc, "CLUMPS", "CLUMP", 1, &nndf, status );
       datFind( xloc, "CLUMPS", &aloc, status );
    } else {
       aloc = NULL;
@@ -126,7 +111,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Loop round the non-null identifiers, keeping track of the one-based row 
    number corresponding to each one. */
    irow = 0;
-   for( i = 1; i <= nclump && *status == SAI__OK; i++ ) {
+   for( i = 1; i <= nndf && *status == SAI__OK; i++ ) {
       ncloc = NULL;
       datCell( obj, 1, &i, &ncloc, status );
 
@@ -149,14 +134,14 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    parameters. In this table, all the values for column 1 come first, 
    followed by all the values for column 2, etc (this is the format required 
    by KPG1_WRLST). */ 
-         if( !tab ) tab = astMalloc( sizeof(double)*nrow*ncpar );
+         if( !tab ) tab = astMalloc( sizeof(double)*nndf*ncpar );
          if( tab ) {
 
 /* Put the clump parameters into the table. */
             t = tab + irow - 1;
             for( icol = 0; icol < ncpar; icol++ ) {
                *t = cpars[ icol ];
-               t += nrow;
+               t += nndf;
             }
 
 /* If required, put the clump parameters into the current CLUMP structure. */
@@ -233,7 +218,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       astSetI( iwcs, "CURRENT", 1 );
    
 /* Create the output catalogue */
-      kpg1Wrlst( param, nrow, nrow, ncpar, tab, AST__BASE, iwcs,
+      kpg1Wrlst( param, nndf, nndf, ncpar, tab, AST__BASE, iwcs,
                  ttl, 1, NULL, 1, status );
    
 /* End the AST context. */

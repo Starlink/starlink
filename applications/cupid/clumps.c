@@ -205,7 +205,9 @@ void clumps() {
 *        used. If the NDF has no Variance component, the suggested default 
 *        is based on the differences between neighbouring pixel values. Any 
 *        pixel-to-pixel correlation in the noise can result in this estimate 
-*        being too low. 
+*        being too low. The value supplied for this parameter will be ignored 
+*        if the RMS noise level is also given in the configuration file 
+*        specified by parameter CONFIG.
 
 *  Use of CUPID Extension:
 *     This application will create an NDF extension called "CUPID" in the 
@@ -308,6 +310,8 @@ void clumps() {
 *     GaussClumps algorithm. The algorithm will terminate when "Npad" 
 *     consecutive clumps have been fitted all of which have peak values less 
 *     than the threshold value specified by the "Thresh" parameter. [10]
+*     - GaussClumps.RMS: The global RMS noise level in the data. The
+*     defaultvalue is the value supplied for parameter RMS. []
 *     - GaussClumps.S0: The Chi-square stiffness parameter "S0" which 
 *     encourages the peak amplitude of each fitted gaussian to be below 
 *     the corresponding maximum value in the observed data (see the Stutski 
@@ -409,6 +413,8 @@ void clumps() {
 *     to be adjacent to the central pixel. For one dimensional data, a
 *     value of 1 is always used for "Naxis", and each pixel simply has 2 
 *     adjacent pixels, one on either side. []
+*     - ClumpFind.RMS: The global RMS noise level in the data. The
+*     defaultvalue is the value supplied for parameter RMS. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See also
 *     "DeltaT". [2*RMS]
@@ -451,6 +457,8 @@ void clumps() {
 *     cellular automata replaces each output pixel by the most commonly 
 *     occuring value within a 3x3x3 cube (or 2x2 square for 2D data) of input 
 *     pixels centred on the output pixel. [1]
+*     - Reinhold.RMS: The global RMS noise level in the data. The
+*     defaultvalue is the value supplied for parameter RMS. []
 
 *  FellWalker Configuration Parameters:
 *     The FellWalker algorithm uses the following configuration parameters. 
@@ -475,6 +483,8 @@ void clumps() {
 *     - FellWalker.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. No walk will start from a pixel with 
 *     data value less than this value. [2*RMS]
+*     - FellWalker.RMS: The global RMS noise level in the data. The
+*     defaultvalue is the value supplied for parameter RMS. []
 
 *  Authors:
 *     DSB: David S. Berry
@@ -493,6 +503,7 @@ void clumps() {
 
 /* Local Variables: */
    AstFrameSet *iwcs;           /* Pointer to the WCS FrameSet */
+   AstKeyMap *aconfig;          /* Pointer to KeyMap holding algorithm settings */
    AstKeyMap *config;           /* Pointer to KeyMap holding used config settings */
    AstKeyMap *config2;          /* Pointer to KeyMap holding used config settings */
    AstKeyMap *keymap;           /* Pointer to KeyMap holding all config settings */
@@ -524,7 +535,6 @@ void clumps() {
    int indf;                    /* Identifier for input NDF */
    int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
-   int nclump;                  /* Number of elements in "ndfs" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
    int nsig;                    /* Number of significant pixel axes */
@@ -744,19 +754,19 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                                keymap, velax, ilevel, &nclump ); 
+                                keymap, velax, ilevel ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump ); 
+                              keymap, velax, ilevel ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump ); 
+                              keymap, velax, ilevel ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel, &nclump ); 
+                              keymap, velax, ilevel ); 
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -768,29 +778,36 @@ void clumps() {
    errBegin( status );
    parGet0l( "REPCONF", &repconf, status );
    if( repconf ) {
-
-/* Create a GRP group containing the required text. */
-      grp = NULL;
-      kpg1Kygrp( keymap, &grp, status );
-      grpGrpsz( grp, &size, status );
-
       msgBlank( status );
       msgOut( "", "Current configuration:", status );
-      value = buffer;
-      for( i = 1; i <= size; i++ ) {
-         grpGet( grp, i, 1, &value, GRP__SZNAM, status );
-         msgSetc( "V", value );
-         msgOut( "", "   ^V", status );
+
+/* Get a KeyMap containing the parameters specific to the chosen
+   algorithm. */
+      if( astMapGet0A( keymap, method, &aconfig ) ) {     
+
+/* Create a GRP group containing a text form of the KeyMap. */
+         grp = NULL;
+         kpg1Kygrp( aconfig, &grp, status );
+         grpGrpsz( grp, &size, status );
+
+/* Display the values, including the algorithm name. */
+         value = buffer;
+         for( i = 1; i <= size; i++ ) {
+            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
+            msgSetc( "A", method );
+            msgSetc( "V", value );
+            msgOut( "", "   ^A.^V", status );
+         }
+         msgBlank( status );
+
+/* Delete the GRP group. */
+         if( grp ) grpDelet( &grp, status );      
       }
-      msgBlank( status );
-
-      if( grp ) grpDelet( &grp, status );      
-
    }    
    errEnd( status );
 
 /* Skip the rest if no clumps were found. */
-   if( nclump ) {
+   if( ndfs ) {
 
 /* See if an output NDF is to be created. If not, annull the error. If so,
    map the data array. */
@@ -829,7 +846,7 @@ void clumps() {
    found clumps, and then adding on a background level (for GaussClumps). This 
    also fills the above mask array if required. */
       cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
-                         nclump, rmask, ipo, method, &bg );
+                      rmask, ipo, method, &bg );
 
 /* Create an CUPID extension in the NDF if none already exists, or get a
    locator for the existing extension otherwise. */
@@ -873,8 +890,7 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nclump, nsig, 
-                        "Output from CUPID:CLUMPS" );
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */
       if( mask ) {

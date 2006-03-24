@@ -6,3 +6,27 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V0.0-3:
+
+ - The reporting of the current configuration at the end of the CLUMPS
+ command now includes each parameter only once.
+
+ - The value supplied for the "RMS" program parameter can now be
+ over-ridden by supplying a different value in the configuration file.
+ The used RMS value is included in the displayed configuration at the end
+ of the CLUMPS command.
+
+
+Changes introduced at V0.0-2:
+
+ - All algorithms have been re-worked slightly to avoid a limit of 2048
+ on the total number of usable clumps which can be found. This limit was 
+ imposed by the ARY library. The total number of usable clumps is now
+ unlimited.
+
+ - The ClumpFind algorithm has been re-worked to avoid a limit of about
+ 8000 on the total number of candidate clumps (many of these would
+ usually be rejected as being too small). The total number of candidate
+ clumps is now unlimited.
+
+

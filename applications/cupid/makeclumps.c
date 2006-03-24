@@ -377,7 +377,7 @@ void makeclumps() {
 
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
-   cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, obj, nclump,
+   cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, obj, 
                    NULL, ipd2, "GAUSSCLUMPS", &back );
 
 /* Add Gaussian noise to the data. */
@@ -395,7 +395,7 @@ void makeclumps() {
    ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* Store the clump properties in the output catalogue. */
-   cupidStoreClumps( "OUTCAT", xloc, obj, nclump, ndim, 
+   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, 
                      "Output from CUPID:MAKECLUMPS" );
 
 /* Relase the extension locator.*/

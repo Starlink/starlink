@@ -13,8 +13,8 @@
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
-                                    int nclump, float *rmask, void *out, 
-                                    char *method, double *bg ){
+                                    float *rmask, void *out, char *method, 
+                                    double *bg ){
 /*
 *  Name:
 *     cupidSumClumps
@@ -25,9 +25,8 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
-*                             int *ubnd, int nel, HDSLoc *obj, int nclump,
-*                             float *rmask, void *out, char *method,
-*                             double *bg )
+*                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
+*                             void *out, char *method, double *bg )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
@@ -52,9 +51,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *     nel
 *        Number of pixels in each of "out" and "rmask".
 *     obj
-*        A locator for an HDS array containing "nclump" NDF structures.
-*     nclump
-*        The number of NDFs in "obj".
+*        A locator for an HDS array the clump NDF structures.
 *     rmask
 *        The array to receive the mask. A value of 1.0 will be stored in
 *        every pixel which inside a clump. All other pixels will be set
@@ -119,6 +116,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    int indf;            /* NDF identifier for clump image */
    int j;               /* Clump loop count */
    int k;               /* Axis loop count */
+   int nclump;          /* Number of clump NDFs supplied */
    int nsum;            /* Number of values summed in sumi and sumo */
    int step[ 3 ];       /* 1D step between adjacent pixels on each axis */
    int yy[ 3 ];         /* nD pixel coords of current "out" pixel */
@@ -182,6 +180,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    }
 
 /* Loop round all non-NULL clumps. */
+   datSize( obj, (size_t *) &nclump, status );
    for( j = 1; j <= nclump; j++ ) {
       cloc = NULL;
       datCell( obj, 1, &j, &cloc, status );
