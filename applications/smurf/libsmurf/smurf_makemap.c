@@ -57,6 +57,8 @@
 *        - Broke up mapbounds/regridding into subroutines smf_mapbounds and
 *          smf_rebinmap
 *        - fits header written to output using ndfputwcs
+*     2006-03-23 (AGG):
+*        Update to take account of new API for rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -116,7 +118,10 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   void *data_index[1];       /* Array of pointers to mapped arrays in ndf */
+  smfData *data=NULL;           /* pointer to  SCUBA2 data struct */
+  smfFile *file=NULL;           /* SCUBA2 data file information */
   int flag;                  /* Flag */
+  dim_t i;                      /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
@@ -124,6 +129,7 @@ void smurf_makemap( int *status ) {
   int ondf;                  /* output NDF identifier */
   AstFrameSet *outframeset=NULL; /* Frameset containing sky->output mapping */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
+  char *pname=NULL;             /* Name of currently opened data file */
   int size;                  /* Number of files in input group */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
@@ -163,8 +169,63 @@ void smurf_makemap( int *status ) {
 
   /* Regrid the data */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Regrid data", status);
-  smf_rebinmap(igrp, size, outframeset, lbnd_out, ubnd_out, 
-	       map, variance, weights, status );
+  for(i=1; i<=size; i++ ) {
+    /* Read data from the ith input file in the group */      
+    smf_open_file( igrp, i, "READ", 1, &data, status );
+
+    if( *status == SAI__OK ) {
+      file = data->file;
+      pname =  file->name;
+      msgSetc("FILE", pname);
+      msgSeti("THISFILE", i);
+      msgSeti("NUMFILES", size);
+      msgOutif(MSG__VERB, " ", 
+	       "SMF_REBINMAP: Processing ^THISFILE/^NUMFILES ^FILE",
+	       status);
+    } else {
+      file = data->file;
+      pname =  file->name;
+      msgSetc("FILE", pname);
+      errRep( "smf_rebinmap", "Couldn't open input file ^FILE", status );
+    }
+
+    /* Check that the data dimensions are 3 (for time ordered data) */
+    if( *status == SAI__OK ) {
+      if( data->ndims != 3 ) {
+	msgSetc("FILE", pname);
+	msgSeti("THEDIMS", data->ndims);
+	*status = SAI__ERROR;
+	errRep("smf_rebinmap", 
+	       "^FILE data has ^THEDIMS dimensions, should be 3.", 
+	       status);
+      }
+    }
+
+    /* Check that the input data type is double precision */
+    if( *status == SAI__OK ) 
+      if( data->dtype != SMF__DOUBLE) {
+	msgSetc("FILE", pname);
+	msgSetc("DTYPE", smf_dtype_string( data, status ));
+	*status = SAI__ERROR;
+	errRep("smurf_makemap", 
+	       "^FILE has ^DTYPE data type, should be DOUBLE.",
+	       status);
+      }
+
+    /* Rebin the data onto the output grid */
+    smf_rebinmap(data, i, size, outframeset, lbnd_out, ubnd_out, 
+		 map, variance, weights, status );
+
+    /* Close the data file */
+    /*    if( data != NULL ) {
+      smf_close_file( &data, status);
+      data = NULL;
+      }*/
+    /* Break out of loop over data files if bad status */
+    if (*status != SAI__OK) {
+      errRep("smurf_makemap", "Rebinning step failed", status);
+    }
+  }
 
   /* Write FITS header */
   ndfPtwcs( outframeset, ondf, status );
@@ -181,7 +242,6 @@ void smurf_makemap( int *status ) {
   smf_free( weights, status );
   grpDelet( &igrp, status);
   
-
   ndfEnd( status );
   
   msgOutif(MSG__VERB," ","Map written.", status);
