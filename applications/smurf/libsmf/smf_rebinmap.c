@@ -44,6 +44,7 @@
 *  Authors:
 *     Edward Chapin (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -52,6 +53,8 @@
 *     2006-02-13 (TIMJ):
 *        Use astSetC rather than astSet
 *        Avoid an additional dereference
+*     2006-03-23 (AGG):
+*        Updated API: now takes a smfData rather than a Grp
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -94,7 +97,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
+void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status ) {
 
@@ -102,19 +105,17 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   AstMapping *bolo2sky=NULL;    /* Mapping bolo->celestial coordinates */
   AstCmpMap *bolo2map=NULL;     /* Combined mapping bolo->map coordinates */
   double  *boldata;             /* Pointer to bolometer data */
-  smfData *data=NULL;           /* pointer to  SCUBA2 data struct */
   smfFile *file=NULL;           /* SCUBA2 data file information */
   smfHead *hdr=NULL;            /* Pointer to data header this time slice */
-  dim_t i;                      /* Loop counter */
   dim_t j;                      /* Loop counter */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
-  int nbolo=0;                  /* # of bolometers in the sub-array */
+  int nbol = 0;                 /* # of bolometers in the sub-array */
   char *pname=NULL;             /* Name of currently opened data file */
   int rebinflags;               /* Control the rebinning procedure */
   struct sc2head *sc2hdr=NULL;  /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;     /* Mapping celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
-  const char *system;           /* System */
+  const char *system;           /* Coordinate system */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -122,133 +123,80 @@ void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
   /* Get the system from the outframeset */
   system = astGetC( outframeset, "system" );
 
-  for(i=1; i<=size; i++ ) {
-    /* Read data from the ith input file in the group */      
-    smf_open_file( igrp, i, "READ", 1, &data, status );
-    
-    if( *status == SAI__OK ) {
-      file = data->file;
-      pname =  file->name;
-      msgSetc("FILE", pname);
-      msgSeti("THISFILE", i);
-      msgSeti("NUMFILES", size);
-      msgOutif(MSG__VERB, " ", 
-	       "SMF_REBINMAP: Processing ^THISFILE/^NUMFILES ^FILE",
-	       status);
-    }
-    else
-      errRep( "smf_rebinmap", "Couldn't open input file.", status );
+  nbol = (data->dims)[0] * (data->dims)[1];
 
-    /* Check that the data dimensions are 3 (for time ordered data) */
-    if( *status == SAI__OK ) {
-      if( data->ndims != 3 ) {
-	msgSetc("FILE", pname);
-	msgSeti("THEDIMS", data->ndims);
-	*status = SAI__ERROR;
-	errRep("smf_rebinmap", 
-	       "^FILE data has ^THEDIMS dimensions, should be 3.", 
-	       status);
-      }  else {
-	/* # bolometers */
-	nbolo = (data->dims)[0] * (data->dims)[1];
-      }
-    }
-
-    /* Check that the input data type is double precision */
-    if( *status == SAI__OK ) 
-      if( data->dtype != SMF__DOUBLE) {
-	msgSetc("FILE", pname);
-	msgSetc("DTYPE",smf_dtype_string( data, status ));
-	*status = SAI__ERROR;
-	errRep("smurf_makemap", 
-	       "^FILE has ^DTYPE data type, should be DOUBLE.",
-	       status);
-      }
-
-    if( *status == SAI__OK) {
-            
-      /* Loop over all time slices in the data */      
-      for( j=0; j<(data->dims)[2]; j++ ) {
+  /* Loop over all time slices in the data */      
+  for( j=0; j<(data->dims)[2]; j++ ) {
 	
-	smf_tslice_ast( data, j, 1, status);
+    smf_tslice_ast( data, j, 1, status);
 	
-	if( *status == SAI__OK ) {
-	  hdr = data->hdr;
-	  sc2hdr = hdr->sc2head;
+    if( *status == SAI__OK ) {
+      hdr = data->hdr;
+      sc2hdr = hdr->sc2head;
 	  
-	  /* Calculate bounds in the input array */
+      /* Calculate bounds in the input array */
+      lbnd_in[0] = 0;
+      lbnd_in[1] = 0;
+      ubnd_in[0] = (data->dims)[0]-1;
+      ubnd_in[1] = (data->dims)[1]-1;
 
-	  lbnd_in[0] = 0;
-	  lbnd_in[1] = 0;
-	  ubnd_in[0] = (data->dims)[0]-1;
-	  ubnd_in[1] = (data->dims)[1]-1;
+      /* Get bolo -> sky mapping 
+	 Set the System attribute for the SkyFframe in input WCS 
+	 FrameSet and extract the IN_PIXEL->Sky mapping. */	  
 
-	  /* Get bolo -> sky mapping 
-	     Set the System attribute for the SkyFframe in input WCS 
-	     FrameSet and extract the IN_PIXEL->Sky mapping. */	  
-
-	  astSetC( hdr->wcs, "SYSTEM", system );
-	  bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
-				    AST__CURRENT );
+      astSetC( hdr->wcs, "SYSTEM", system );
+      bolo2sky = astGetMapping( data->hdr->wcs, AST__BASE, 
+				AST__CURRENT );
 	  
-	  /* Create sky to output grid mapping 
-	     using the base coordinates to get the coordinates of the 
-	     tangent point if it hasn't been done yet. */
+      /* Create sky to output grid mapping 
+	 using the base coordinates to get the coordinates of the 
+	 tangent point if it hasn't been done yet. */
 	  
-	  if( sky2map == NULL ) { 
-	    /* Extract the Sky->REF_PIXEL mapping. */
-	    astSetC( outframeset, "SYSTEM", system );
-	    sky2map = astGetMapping( outframeset, AST__CURRENT, 
-				     AST__BASE );
-	  }
-	  
-	  /* Concatenate Mappings to get IN_PIXEL->REF_PIXEL Mapping */
-	  bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
-
-
-	  /*  Rebin this time slice*/
-	  rebinflags = 0;
-	  if( (i == 1) && (j == 0) )                    /* Flags start rebin */
-	    rebinflags = rebinflags | AST__REBININIT;
-
-	  if( (i == size) && (j == (data->dims)[2]-1) ) /* Flags end rebin */
-	    rebinflags = rebinflags | AST__REBINEND;
-	  
-	  boldata = (data->pntr)[0];
-	  astRebinSeqD(bolo2map,0.0,
-		       2,lbnd_in, ubnd_in,
-		       &(boldata[j*nbolo]),
-		       NULL, 
-		       AST__NEAREST, NULL, rebinflags, 0.1, 1000000, VAL__BADD,
-		       2,lbnd_out,ubnd_out,
-		       lbnd_in, ubnd_in,
-		       map, variance, weights);
-	  
-
-	  /* clean up ast objects */
-	  bolo2sky = astAnnul( bolo2sky );
-	  bolo2map = astAnnul( bolo2map );
-
-	}
-
-	/* Break out of loop over time slices if bad status */
-	if (*status != SAI__OK) goto CLEANUP;
-
+      if( sky2map == NULL ) { 
+	/* Extract the Sky->REF_PIXEL mapping. */
+	astSetC( outframeset, "SYSTEM", system );
+	sky2map = astGetMapping( outframeset, AST__CURRENT, 
+				 AST__BASE );
       }
+	  
+      /* Concatenate Mappings to get IN_PIXEL->REF_PIXEL Mapping */
+      bolo2map = astCmpMap( bolo2sky, sky2map, 1, "" );
+
+      /*  Rebin this time slice*/
+      rebinflags = 0;
+      if( (index == 1) && (j == 0) )                    /* Flags start rebin */
+	rebinflags = rebinflags | AST__REBININIT;
+
+      if( (index == size) && (j == (data->dims)[2]-1) ) /* Flags end rebin */
+	rebinflags = rebinflags | AST__REBINEND;
+	  
+      boldata = (data->pntr)[0];
+      astRebinSeqD(bolo2map, 0.0,
+		   2, lbnd_in, ubnd_in,
+		   &(boldata[j*nbol]),
+		   NULL, 
+		   AST__NEAREST, NULL, rebinflags, 0.1, 1000000, VAL__BADD,
+		   2,lbnd_out,ubnd_out,
+		   lbnd_in, ubnd_in,
+		   map, variance, weights);
+
+      /* clean up ast objects */
+      bolo2sky = astAnnul( bolo2sky );
+      bolo2map = astAnnul( bolo2map );
     }
 
-    /* Close the data file */
-    if( data != NULL ) {
-      smf_close_file( &data, status);
-      data = NULL;
-    }
-
-    /* Break out of loop over data files if bad status */
+    /* Break out of loop over time slices if bad status */
     if (*status != SAI__OK) goto CLEANUP;
   }
 
+  /* Close the data file */
+  if( data != NULL ) {
+    smf_close_file( &data, status);
+    data = NULL;
+  }
+
+
   /* Clean Up */
- 
  CLEANUP:
   if (sky2map) sky2map  = astAnnul( sky2map );
   if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
