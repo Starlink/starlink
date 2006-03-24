@@ -513,6 +513,7 @@ CreateFrame(clientData, interp, objc, objv, type, appName)
     className = colormapName = screenName = visualName = useOption = NULL;
     colormap = None;
     for (i = 2; i < objc; i += 2) {
+        length = 0;
 	arg = Tcl_GetStringFromObj(objv[i], (int *) &length);
 	if (length < 2) {
 	    continue;
