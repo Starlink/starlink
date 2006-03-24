@@ -785,6 +785,7 @@ FrameWidgetObjCmd(clientData, interp, objc, objv)
 	     */
 
 	    for (i = 2; i < objc; i++) {
+                length = 0;
 		char *arg = Tcl_GetStringFromObj(objv[i], (int *) &length);
 		if (length < 2) {
 		    continue;
