@@ -16,7 +16,7 @@
 *     pntr = smf_construct_smfHead( smfHead * tofill,
 *              AstFrameSet * wcs, AstFitsChan * fitshdr,
 *	       struct sc2head * allsc2heads,
-*              dim_t curslice, int * status );
+*              dim_t curframe, int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -30,9 +30,11 @@
 *     allsc2heads = sc2head* (Given)
 *        Pointer to array of time series information for all time slices.
 *        Should be at least "curslice" in size.
-*     curslice = dim_t (Given)
+*     curframe = dim_t (Given)
 *        Current time index corresponding to the associated WCS. sc2head
 *        will be set to this location.
+*     nframes = dim_t (Given)
+*        Number of frames (timeslices) in data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,6 +69,8 @@
 *     2006-01-27 (TIMJ):
 *        Replace sc2head with allsc2heads. sc2head now indexed
 *        into allsc2heads.
+*     2006-03-23 (AGG):
+*        curslice changed to curframe, nframes added
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,7 +118,7 @@ smfHead *
 smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
 		       struct sc2head * allsc2heads,
-		       dim_t curslice, int * status ) {
+		       dim_t curframe, dim_t nframes, int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -128,9 +132,10 @@ smf_construct_smfHead( smfHead * tofill,
   if (*status == SAI__OK) {
     hdr->wcs = wcs;
     hdr->fitshdr = fitshdr;
-    hdr->curslice = curslice;
+    hdr->curframe = curframe;
+    hdr->nframes = nframes;
     hdr->allsc2heads = allsc2heads;
-    hdr->sc2head = &(allsc2heads[curslice]);
+    hdr->sc2head = &(allsc2heads[curframe]);
     hdr->isCloned = 1;
   }
 

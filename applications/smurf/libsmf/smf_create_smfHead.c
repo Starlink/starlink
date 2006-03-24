@@ -41,6 +41,8 @@
 *     2006-01-27 (TIMJ):
 *        sc2head now pointer. Add allsc2heads as pointer.
 *        initialise isCloned
+*     2006-03-23 (AGG):
+*        curslice changed to curframe, nframes added
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,7 +104,8 @@ smf_create_smfHead( int * status ) {
   /* Initialise smfHead */
   hdr->wcs = NULL;
   hdr->fitshdr = NULL;
-  hdr->curslice = 0;
+  hdr->curframe = 0;
+  hdr->nframes = 0;
   hdr->sc2head = NULL;
   hdr->allsc2heads = NULL;
   hdr->isCloned = 0;
