@@ -69,6 +69,9 @@
 *        Add smf_subtract_poly
 *     2006-02-24 (AGG):
 *        Add smf_subtract_plane
+*     2006-03-23 (AGG):
+*        Update API for smf_rebinmap, smf_construct_smfData, smf_construct_smfHead
+*        Add smf_mapbounds approx, smf_deepcopy_smfHead & smf_deepcopy_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -127,7 +130,7 @@ smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, void * pntr[3], 
 		       const dim_t dims[], int ndims,
-		       int virtual, int * status );
+		       int virtual, int ncoeff, double *poly, int * status );
 smfDA *
 smf_construct_smfDA( smfDA * tofill, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
@@ -140,7 +143,11 @@ smfHead *
 smf_construct_smfHead( smfHead * tofill,
 		       AstFrameSet * wcs, AstFitsChan * fitshdr,
 		       struct sc2head * allsc2heads,
-		       dim_t curslice, int * status );
+		       dim_t curframe, dim_t nframes, int * status );
+
+smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
+
+smfData * smf_deepcopy_smfData ( const smfData *old, int * status);
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
@@ -200,7 +207,11 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
 		    double lat_0, int flag, double pixsize, int *lbnd_out, 
 		    int *ubnd_out, AstFrameSet **outframeset, int *status );
 
-void smf_rebinmap( Grp *igrp,  int size, AstFrameSet *outframeset,
+void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0, 
+		    double lat_0, int flag, double pixsize, int *lbnd_out, 
+		    int *ubnd_out, AstFrameSet **outframeset, int *status );
+
+void smf_rebinmap( smfData *data, int index, int size, AstFrameSet *outframeset,
                    int *lbnd_out, int *ubnd_out, double *map, double *variance,
 		   double *weights, int *status );
 
