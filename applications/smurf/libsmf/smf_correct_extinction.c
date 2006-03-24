@@ -293,9 +293,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick, 
 	  extcorr = exp(airmass*tau);
 	}
 	indata[index] *= extcorr;
-	if (vardata != NULL && vardata[index] != VAL__BADD) {
+	/*	if (vardata != NULL && vardata[index] != VAL__BADD) {
 	  vardata[index] *= extcorr*extcorr;
-	}
+	  }*/
 	/*    printf( "Zenith distance: %f, Airmass: %f El: %f\n",zd, airmass);*/
 	/*    printf("Index: %" DIM_T_FMT "  Data: %f  Correction: %f\n",
 	      index, indata[index], (exp(airmass*tau)));*/
