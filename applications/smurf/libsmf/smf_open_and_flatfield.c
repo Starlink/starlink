@@ -51,6 +51,8 @@
 *        Copies input data to output file when passed flatfielded data
 *     2006-03-03 (AGG):
 *        Trap the case that ogrp is NULL
+*     2006-03-23 (AGG):
+*        Creates copy of smfData with smf_deepcopy_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,6 +115,13 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   char *pname;              /* Pointer to input filename */
   size_t npts;              /* Number of data points */
 
+  size_t i;
+  smfHead *hdr;
+  void *opntr[3];
+  double *datapntr;
+  AstFitsChan *fitshdr;
+  sc2head *sc2hdr;
+
   if ( *status != SAI__OK ) return;
 
   /* What if ogrp == NULL? for makemap */
@@ -133,8 +142,9 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   }
 
   /* Open the input without header information. This is required
-     because sc2store can not open two files at once */
-  smf_open_file( igrp, index, "READ", 0, &data, status);
+     because sc2store can not open two files at once 
+     22-Mar-2006: no longer true? hdr needed anyway */
+  smf_open_file( igrp, index, "READ", 1, &data, status);
   if ( *status != SAI__OK) {
     errRep("", "Unable to open input file", status);
   }
@@ -164,8 +174,16 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     if ( data->ndims == 3) {
       npts *= (data->dims)[2];
     }
+    /* What if ffdata is NULL? */
     msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
-    memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
+    if ( *ffdata == NULL ) {
+
+      *ffdata = smf_deepcopy_smfData( data, status );
+
+    } else {
+      memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
+    }
+
   }
 
   /* Free resources for input data */
