@@ -90,7 +90,7 @@ void smf_subtract_poly(smfData *data, int *status) {
   int nbol;                   /* Number of bolometers */
   int nframes;                /* Number of time slices */
 
-  double *outdata;            /* Pointer to output data array */
+  double *outdata = NULL;            /* Pointer to output data array */
   double baseline = 0.0;      /* Baseline level to be subtracted */
 
   double *poly;
@@ -130,7 +130,6 @@ void smf_subtract_poly(smfData *data, int *status) {
 	/*	printf("poly = %g\n",poly[i+ nbol*k]);*/
 	baseline += poly[i + nbol*k] * (double)pow(j, k);
       }
-      /*      printf("baseline = %g\n",baseline);*/
       outdata[i + nbol*j] -= baseline;
     }
 
@@ -138,6 +137,6 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Store polynomial-subtracted data */
   (data->pntr)[0] = outdata;
 
-  smf_history_write( data, FUNC_NAME, "Lots of nonsense", status);
+  /*smf_history_write( data, FUNC_NAME, "Lots of nonsense", status);*/
 
 }
