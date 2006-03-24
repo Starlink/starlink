@@ -68,6 +68,8 @@
 *        Add needwcs flag to API.
 *     2006-02-11 (AGG):
 *        Add "extra_frames" parameter to sc2ast_createwcs calls.
+*     2006-03-23 (AGG):
+*        Store current frame in smfData
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -181,7 +183,7 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   /* Simply assign sc2head to the correct slice of allsc2heads */
   sc2tmp = &((hdr->allsc2heads)[index]);
   hdr->sc2head = sc2tmp;
-
+  hdr->curframe = index;
   /* Create and store FrameSet only if the WCS info is wanted */
   if (needwcs) {
 
