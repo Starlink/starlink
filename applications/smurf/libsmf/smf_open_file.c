@@ -73,7 +73,9 @@
 *     2006-02-17 (AGG):
 *        Add reading of SCANFIT coefficients
 *     2006-03-03 (AGG):
-*        Return a NULL pointer if the group us undefined
+*        Return a NULL pointer if the group is undefined
+*     2006-03-23 (AGG);
+*        Store the number of frames (timeslices) in the smfData struct
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -295,6 +297,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	if ( !isTseries ) {
 	  ndfGtwcs( indf, &iwcs, status);
 	  hdr->wcs = iwcs;
+	  hdr->nframes = 1;
 	} else {
 	  /* Need to get the location of the extension for sc2head parsing */
 	  ndfXloc( indf, "FRAMEDATA", "READ", &xloc, status );
@@ -309,6 +312,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  for (i=0; i<ndfdims[2]; i++) {
 	    sc2store_headget(i, &(sc2tmp[i]), status);
 	  }
+	  hdr->nframes = ndfdims[2];
 	  /* Unmap the headers */
 	  sc2store_headunmap( status );
 
@@ -409,6 +413,8 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 	  msgSeti( "DIMS", ndfdims[2]);
 	  *status = SAI__ERROR;
 	  errRep( "smf_open_file", "Number of input timeslices not equal to the number of output timeslices (^NF != ^DIMS)",status);
+	} else {
+	  hdr->nframes = nframes;
 	}
 
 	/* Set flag to indicate data read by sc2store_() */

@@ -62,6 +62,8 @@
 *     2006-01-27 (TIMJ):
 *        - No longer have xloc member in smfFile
 *        - use smf_create_smfHead rather than smf_malloc
+*     2006-03-23 (AGG):
+*        Store number of frames (timeslices) in smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -194,6 +196,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	  hdr = smf_malloc( 1, sizeof( smfHead ), 1, status );
 	  /* Copy old hdr into the new hdr and store in *odata */
 	  memcpy( hdr, ihdr, sizeof( smfHead ) );
+	  hdr->nframes = nframes;
 	  (*odata)->hdr = hdr; 
 	} else {
 	  /* OK, we have a header. Do we have WCS? */
@@ -230,6 +233,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	    }
 	  }
 	}
+	hdr->nframes = nframes;
 
 
 	/* Does the flatfield (smfDA) struct exist? */
@@ -296,6 +300,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       nboll = ((*odata)->dims)[0]*((*odata)->dims)[1];
       nframes = ((*odata)->dims)[2];
       npts = nboll * nframes;
+      hdr->nframes = nframes;
 
       /* Store pointer to input data */
       ipntr[0] = (idata->pntr)[0];
@@ -387,6 +392,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 	    }
 	  }
 	}
+	hdr->nframes = nframes;
 
 	/* Does the flatfield (smfDA) struct exist? */
 	da = (*odata)->da;
