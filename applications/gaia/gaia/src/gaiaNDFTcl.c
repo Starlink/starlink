@@ -26,24 +26,20 @@
 #include <gaiaNDF.h>
 
 /* Local prototypes */
-static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
-                        int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
-                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
-                       int objc, Tcl_Obj *CONST objv[] );
-
-static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
-                         int objc, Tcl_Obj *CONST objv[] );
-
-static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
-                        int objc, Tcl_Obj *CONST objv[] );
-
-static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp, 
                           int objc, Tcl_Obj *CONST objv[] );
-
-static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp, 
+                        int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp, 
                          int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp, 
+                         int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp, 
+                         int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp, 
+                       int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp, 
+                        int objc, Tcl_Obj *CONST objv[] );
 
 static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
 
@@ -428,5 +424,3 @@ static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
     }
     return result;
 }
-
-

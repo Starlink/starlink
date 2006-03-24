@@ -1554,7 +1554,8 @@ void StarWCS::constructWarning( const char *encoding, int failed,
         const char *str = os.str().c_str();
 
         //  os falls out of scope so we need a copy.
-        warnings_ = strcpy( new char[ strlen( str ) + 1 ], str );
+        warnings_ = new char[ strlen(str) + 1 ];
+        strcpy( warnings_, str );
     }
 }
 

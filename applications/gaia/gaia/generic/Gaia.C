@@ -31,6 +31,7 @@ extern "C" {
     int Tcladam_Init(Tcl_Interp *interp);
     int GaiaCat_Init(Tcl_Interp *interp);
     int Ndf_Init(Tcl_Interp *interp);
+    int Array_Init(Tcl_Interp *interp);
 }
 
 //  Generated code for bitmaps used in tcl scripts.
@@ -103,6 +104,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     //  Simple NDF interface.
     if ( Ndf_Init(interp) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    //  Array handling interface.
+    if ( Array_Init(interp) != TCL_OK ) {
         return TCL_ERROR;
     }
 

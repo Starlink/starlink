@@ -22,9 +22,18 @@ extern "C" {
     void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue, 
                             double *outPtr );
 
-    /*  Get a section of an existing array */
-    void gaiaArraySection( void *dataPtr, char dataType, int ndim, int dims[],
-                           int lbnd[], int ubnd[], void **sectionPtr );
+    /* Get an image section from a cube */
+    void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
+                             int axis, int index, void **outPtr,
+                                 int cnfmalloc );
+        
+    /* Get a spectrum (line of data) from a cube */
+    void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
+                                    int axis, int index1, int index2,
+                                    int cnfmalloc, void **outPtr, int *nel );
+
+    /* Get strides for indexing an ND array */ 
+    void gaiaArrayGetStrides( int ndims, int dims[], int strides[] );
 
 #ifdef __cplusplus
 }
