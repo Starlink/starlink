@@ -11,6 +11,11 @@ Changes introduced at V0.0-3:
  - The reporting of the current configuration at the end of the CLUMPS
  command now includes each parameter only once.
 
+ - The default value for ClumpFind.DeltaT is now set to twice the RMS noise 
+ level no matter how many contouts this would produce. Previously, the 
+ default value was higher than 2*RMS if necessary in order to limit the 
+ number of contours to 100.
+
  - The value supplied for the "RMS" program parameter can now be
  over-ridden by supplying a different value in the configuration file.
  The used RMS value is included in the displayed configuration at the end

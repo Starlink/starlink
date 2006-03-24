@@ -371,11 +371,8 @@ void clumps() {
 *     spikes being interpreted as real peaks, whilst large values can result 
 *     in some real peaks being missed and merged in with neighbouring peaks. 
 *     The default value of two times the RMS noise level (as specified by
-*     the ADAM parameter RMS) is usually considered to be optimal, 
-*     although this obviously depends on the RMS noise level being correct. 
-*     If the default value of twice the RMS would produce more than 100 
-*     contours, the default value is increased so that it would produce 100 
-*     contours. []
+*     the ADAM parameter RMS) is usually considered to be optimal, although 
+*     this obviously depends on the RMS noise level being correct. []
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 

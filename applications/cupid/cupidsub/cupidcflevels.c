@@ -125,12 +125,9 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
                  "(Tlow=^TLOW) is below the minimum value in the data "
                  "array (^MIND).", status );
 
-/* Otherwise, find the TDELTA value which would give 100 contours. */
+/* Otherwise, use 2*RMS as the default. */
       } else {
-         cdelta = ( maxd - clow )/100 ;
-
-/* If this is less than 2*RMS we use 2*RMS as the default. */
-         if( cdelta < 2.0*rms ) cdelta = 2.0*rms; 
+         cdelta = 2.0*rms; 
 
 /* Get the contour interval using the above default. */
          cdelta = cupidConfigD( config, "DELTAT", cdelta );
