@@ -13,6 +13,7 @@
   GAIAIMAGEPICK_DIR variable now selects default directory for Pick Image
   toolbox.
 
+  The image slice now has a option to display the Y axis using a log scale.
 
   Release 2.9-4 
   =============
