@@ -2,6 +2,9 @@
 
    A new release of KAPPA (v1.5) has been made.  The main changes are:
 
+   o  SETVAR now provides the option to copy values from another NDF
+   into the Variance component of the NDF being modified.
+
    o  A new application called WCSMOSAIC has been added.  This command
    mosaics a group of input NDFs using the associated WCS information
    to align them.

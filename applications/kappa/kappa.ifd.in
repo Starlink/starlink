@@ -2316,6 +2316,22 @@ package kappa {
 
          helplib {$KAPPA_HELP}
    
+         parameter comp {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            default DATA
+            prompt {Array component containing variance values}
+            helpkey *
+          }
+
+         parameter from {
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {NDF containing existing variance values}
+            helpkey *
+          }
+
          parameter ndf {
             position 1
             type NDF

@@ -22,10 +22,10 @@
 
 *  Description:
 *     This routine sets new values for the variance component of an NDF
-*     data structure. The data structure is accessed in `update' mode,
-*     and new variance values are generated from the NDF's data array
-*     by means of a Fortran-like arithmetic expression.  Any previous
-*     variance information is over-written with the new values.
+*     data structure. The new values can be copied from a specified
+*     component of a second NDF or can generated from the supplied NDF's 
+*     data array by means of a Fortran-like arithmetic expression.  Any 
+*     previous variance information is over-written with the new values.
 *     Alternatively, if a `null' value (!) is given for the variance,
 *     then any pre-existing variance information is erased.
 
@@ -33,6 +33,20 @@
 *     ndf variance
 
 *  ADAM Parameters:
+*     COMP = LITERAL (Read)
+*        The name of an NDF array component within the NDF specified by
+*        parameter FROM. The values in this array component are used as
+*        the new variance values to be stored in the Variance component 
+*        of the NDF specified by parameter NDF. The supplied value must
+*        be one of "Data" or "Variance".
+*     FROM = NDF (Read)
+*        An NDF data structure containing the values to be used as the
+*        new Variance values. The NDF component from which to read the
+*        new variance values is specified by parameter COMP. If NDF is
+*        not contained completely within FROM, then the Variance
+*        component of NDF will be padded with bad values. If a null 
+*        (!) value is supplied, the new Variance values are determined 
+*        by the expression given for parameter VARIANCE. [!]
 *     NDF = NDF (Read and Write)
 *        The NDF data structure whose variance values are to be
 *        modified.
@@ -53,6 +67,10 @@
 *     setvar ngc4709 data
 *        This sets the variance component within the NDF structure
 *        ngc4709 to equal its corresponding data-array component.
+*     setvar ngc4709 from=noise comp=data
+*        This sets the variance component within the NDF structure
+*        ngc4709 to equal the values in the Data array of the NDF
+*        structure noise.
 *     setvar ndf=arcspec "data - 0.31"
 *        This sets the variance component within the NDF structure
 *        arcspec to be its corresponding data-array component less a
@@ -76,6 +94,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (JAC, UCLan)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
@@ -90,6 +109,8 @@
 *        Made usage and examples lowercase.  Added Related Applications.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     21-MAR-2004 (TIMJ):
+*        Added parameters FROM and COMP.
 *     {enter_further_changes_here}
 
 
@@ -119,19 +140,30 @@
       PARAMETER ( SZEXP = 132 )
 
 *  Local Variables:
-      CHARACTER * ( 4 ) INV( 1 ) ! Inverse transformation
-      CHARACTER * ( DAT__SZLOC ) LOCTR ! Transformation locator
-      CHARACTER * ( NDF__SZFRM ) FORM ! Form of the NDF variance
-      CHARACTER * ( NDF__SZTYP ) TYPE ! DATA/VARIANCE numeric type
-      CHARACTER * ( SZEXP ) EXPRS ! Variance expression
-      CHARACTER * ( SZEXP + 21 ) FOR( 1 ) ! Forward transformation
+      CHARACTER COMP*8           ! NDF array component to read
+      CHARACTER EXPRS*( SZEXP )  ! Variance expression
+      CHARACTER FOR( 1 )*( SZEXP + 21 ) ! Forward transformation
+      CHARACTER FORM*( NDF__SZFRM )! Form of the NDF variance
+      CHARACTER INV( 1 )*4       ! Inverse transformation
+      CHARACTER LOCTR*( DAT__SZLOC )! Transformation locator
+      CHARACTER TYPE*( NDF__SZTYP )! DATA/VARIANCE numeric type
       INTEGER DPNTR( 1 )         ! Pointer to mapped data component
       INTEGER EL                 ! Number of mapped values
+      INTEGER IERR               ! Index of first error element 
       INTEGER IMAP               ! Compiled mapping identifier
-      INTEGER INDF               ! NDF identifier
+      INTEGER INDF               ! Identifier for NDF to be modified
+      INTEGER INDF2              ! Identifier for NDF to be read
+      INTEGER INDF3              ! Identifier for NDF section to be read
+      INTEGER IPIN               ! Pointer to input array
+      INTEGER IPOUT              ! Pointer to output array
+      INTEGER LBND( NDF__MXDIM ) ! NDF lower pixel bounds
       INTEGER LEXP               ! Length of variance expression
+      INTEGER NDIM               ! The number of NDF pixel axes
+      INTEGER NERR               ! Total number of error elements
+      INTEGER UBND( NDF__MXDIM ) ! NDF upper pixel bounds
       INTEGER VPNTR( 1 )         ! Pointer to mapped variance component
       LOGICAL BAD                ! Bad pixel flag
+      LOGICAL THERE              ! Is the component defined?
 
 *.
 
@@ -150,84 +182,148 @@
       CALL NDF_TYPE( INDF, 'Data', TYPE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Obtain the expression relating variance values to data values.
-         EXPRS = 'DATA'
-         CALL PAR_GET0C( 'VARIANCE', EXPRS, STATUS )
+*  Obtain the NDF structure containing the new Variance values. 
+         CALL LPG_ASSOC( 'FROM', 'READ', INDF2, STATUS )
+         IF( STATUS .EQ. SAI__OK ) THEN 
 
-*  If a null expression was given, then no variance component is
-*  required, so annul the error and reset the variance component.
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            CALL NDF_RESET( INDF, 'Variance', STATUS )
+*  Determine which array component is to be copied.
+            CALL PAR_CHOIC( 'COMP', 'Data', 'Data,Variance', .FALSE., 
+     :                      COMP, STATUS )
 
-*  Otherwise, set up the required transformation and create a temporary
-*  transformation structure.
-         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
-            LEXP = MAX( 1, CHR_LEN( EXPRS ) )
-            FOR( 1 ) = 'VARIANCE = MAX( 0, ' // EXPRS( : LEXP ) // ' )'
-            INV( 1 ) = 'DATA'
-            CALL TRN_NEW( 1, 1, FOR, INV, '_REAL:',
-     :                    'DATA --> VARIANCE', ' ', ' ', LOCTR, STATUS )
+*  Check that the required component exists and report an error if it
+*  does not.
+            CALL NDF_STATE( INDF2, COMP, THERE, STATUS )
+            IF ( ( STATUS .EQ. SAI__OK ) .AND. ( .NOT. THERE ) ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'COMP', COMP )
+               CALL NDF_MSG( 'NDF', INDF2 )
+               CALL ERR_REP( 'SETVAR_NOCOMP', 'The ^COMP component is'//
+     :                       ' undefined in the NDF structure ^NDF', 
+     :                       STATUS )
+            END IF
 
-*  Compile the transformation to give a mapping identifier.  Then delete
-*  the temporary transformation structure.
-            CALL TRN_COMP( LOCTR, .TRUE., IMAP, STATUS )
-            CALL TRN1_ANTMP( LOCTR, STATUS )
-
-*  Add context information at this point if an error occurs.
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_REP( 'SETVAR_COMP',
-     :         'Error in %VARIANCE expression.', STATUS )
-
-*  Reset any pre-existing variance component and set its data type to
-*  match the NDF's data component.
-            ELSE
-               CALL NDF_RESET( INDF, 'Variance', STATUS )
-               CALL NDF_STYPE( TYPE, INDF, 'Variance', STATUS )
+*  Get a section of the "FROM" NDF which matches the bounds of the "NDF" NDF.
+            CALL NDF_BOUND( INDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+            CALL NDF_SECT( INDF2, NDIM, LBND, UBND, INDF3, STATUS )
 
 *  Determine the numerical precision required to calculate the new
 *  variance values.
-               IF ( TYPE .NE. '_DOUBLE' ) THEN
-                  TYPE =  '_REAL'
-               END IF
+            IF ( TYPE .NE. '_DOUBLE' ) THEN
+               TYPE =  '_REAL'
+            END IF
+   
+*  Disable automatic quality masking and map the selected component of
+*  the "FROM" NDF.
+            CALL NDF_SQMF( .FALSE., INDF3, STATUS )
+            CALL KPG1_MAP( INDF3, COMP, TYPE, 'READ', IPIN, EL, 
+     :                     STATUS )
 
+*  Disable automatic quality masking and map the Variance component of
+*  the "NDF" NDF.
+            CALL NDF_SQMF( .FALSE., INDF, STATUS )
+            CALL KPG1_MAP( INDF, 'Variance', TYPE, 'WRITE', IPOUT, EL, 
+     :                     STATUS )
+
+*  Copy the array values.
+            IF( TYPE .EQ. '_REAL' ) THEN
+               CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                        %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR, 
+     :                        STATUS ) 
+
+            ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+               CALL VEC_DTOD( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ), 
+     :                        %VAL( CNF_PVAL( IPOUT ) ), IERR, NERR, 
+     :                        STATUS ) 
+            END IF
+
+*  If a null value was supplied for "FROM", annul the error and continue
+*  to use the VARIANCE expression to specify the new Variance values.
+         ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  Obtain the expression relating variance values to data values.
+            EXPRS = 'DATA'
+            CALL PAR_GET0C( 'VARIANCE', EXPRS, STATUS )
+   
+*  If a null expression was given, then no variance component is
+*  required, so annul the error and reset the variance component.
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               CALL NDF_RESET( INDF, 'Variance', STATUS )
+   
+*  Otherwise, set up the required transformation and create a temporary
+*  transformation structure.
+            ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+               LEXP = MAX( 1, CHR_LEN( EXPRS ) )
+               FOR( 1 ) = 'VARIANCE = MAX( 0, ' // EXPRS( : LEXP ) // 
+     :                    ' )'
+               INV( 1 ) = 'DATA'
+               CALL TRN_NEW( 1, 1, FOR, INV, '_REAL:',
+     :                       'DATA --> VARIANCE', ' ', ' ', LOCTR, 
+     :                       STATUS )
+   
+*  Compile the transformation to give a mapping identifier.  Then delete
+*  the temporary transformation structure.
+               CALL TRN_COMP( LOCTR, .TRUE., IMAP, STATUS )
+               CALL TRN1_ANTMP( LOCTR, STATUS )
+   
+*  Add context information at this point if an error occurs.
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_REP( 'SETVAR_COMP',
+     :            'Error in %VARIANCE expression.', STATUS )
+   
+*  Reset any pre-existing variance component and set its data type to
+*  match the NDF's data component.
+               ELSE
+                  CALL NDF_RESET( INDF, 'Variance', STATUS )
+                  CALL NDF_STYPE( TYPE, INDF, 'Variance', STATUS )
+   
+*  Determine the numerical precision required to calculate the new
+*  variance values.
+                  IF ( TYPE .NE. '_DOUBLE' ) THEN
+                     TYPE =  '_REAL'
+                  END IF
+   
 *  Disable automatic quality masking and map the data array and
 *  variance array for reading and writing, respectively.
-               CALL NDF_SQMF( .FALSE., INDF, STATUS )
-               CALL KPG1_MAP( INDF, 'Data', TYPE, 'READ', DPNTR, EL,
-     :                       STATUS )
-               CALL KPG1_MAP( INDF, 'Variance', TYPE, 'WRITE', VPNTR, 
-     :                       EL, STATUS )
-
+                  CALL NDF_SQMF( .FALSE., INDF, STATUS )
+                  CALL KPG1_MAP( INDF, 'Data', TYPE, 'READ', DPNTR, EL,
+     :                          STATUS )
+                  CALL KPG1_MAP( INDF, 'Variance', TYPE, 'WRITE', VPNTR, 
+     :                          EL, STATUS )
+   
 *  See if bad pixels need to be checked for during the calculations.
-               CALL NDF_BAD( INDF, 'Data', .FALSE., BAD, STATUS )
-
+                  CALL NDF_BAD( INDF, 'Data', .FALSE., BAD, STATUS )
+   
 *  Calculate the new variance values, using the appropriate precision.
-
+   
 *  Real...
-               IF ( TYPE .EQ. '_REAL' ) THEN
-                  CALL TRN_TR1R( BAD, EL, 
-     :                           %VAL( CNF_PVAL( DPNTR( 1 ) ) ), IMAP,
-     :                           %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
-     :                           STATUS )
-
+                  IF ( TYPE .EQ. '_REAL' ) THEN
+                     CALL TRN_TR1R( BAD, EL, 
+     :                              %VAL( CNF_PVAL( DPNTR( 1 ) ) ), 
+     :                              IMAP, 
+     :                              %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
+     :                              STATUS )
+   
 *  Double precision...
-               ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-                  CALL TRN_TR1D( BAD, EL, 
-     :                           %VAL( CNF_PVAL( DPNTR( 1 ) ) ), IMAP,
-     :                           %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
-     :                           STATUS )
-               END IF
-
+                  ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
+                     CALL TRN_TR1D( BAD, EL, 
+     :                              %VAL( CNF_PVAL( DPNTR( 1 ) ) ), 
+     :                              IMAP,
+     :                              %VAL( CNF_PVAL( VPNTR( 1 ) ) ), 
+     :                              STATUS )
+                  END IF
+   
 *  Annul the compiled mapping.
-               CALL TRN_ANNUL( IMAP, STATUS )
-
+                  CALL TRN_ANNUL( IMAP, STATUS )
+   
 *  Set the variance component's bad pixel flag to .TRUE., since bad
 *  pixels may now be present unless the output NDF is primitive.
-               CALL NDF_FORM( INDF, 'Variance', FORM, STATUS )
-
-               IF ( FORM .NE. 'PRIMITIVE' ) THEN
-                  CALL NDF_SBAD( .TRUE., INDF, 'Variance', STATUS )
+                  CALL NDF_FORM( INDF, 'Variance', FORM, STATUS )
+   
+                  IF ( FORM .NE. 'PRIMITIVE' ) THEN
+                     CALL NDF_SBAD( .TRUE., INDF, 'Variance', STATUS )
+                  END IF
                END IF
             END IF
          END IF

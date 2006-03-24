@@ -41031,10 +41031,10 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
    \sstdescription{
       This routine sets new values for the 
       \htmlref{VARIANCE}{apndf:variance}~ component of an \NDFref{NDF}
-      data structure.  The data structure is accessed in `update' mode,
-      and new variance values are generated from the NDF's data array
-      by means of a Fortran-like arithmetic expression.  Any previous
-      variance information is over-written with the new values.
+      data structure.  The new values can be copied from a specified
+      component of a second NDF or can generated from the supplied NDF's 
+      data array by means of a Fortran-like arithmetic expression.  Any 
+      previous variance information is over-written with the new values.
       Alternatively, if a `null' value ({\tt{!}}) is given for the
       variance, then any pre-existing variance information is erased.
    }
@@ -41042,6 +41042,26 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
       setvar ndf variance
    }
    \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The name of an NDF array component within the NDF specified by
+         parameter FROM. The values in this array component are used as
+         the new variance values to be stored in the Variance component 
+         of the NDF specified by parameter NDF. The supplied value must
+         be one of ``Data'' or ``Variance''.
+      }
+      \sstsubsection{
+         FROM = NDF (Read)
+      }{
+         An NDF data structure containing the values to be used as the
+         new Variance values. The NDF component from which to read the
+         new variance values is specified by parameter COMP. If NDF is
+         not contained completely within FROM, then the Variance
+         component of NDF will be padded with bad values. If a null 
+         ({\tt{!}}) value is supplied, the new Variance values are determined 
+         by the expression given for parameter VARIANCE. {\tt [!]}
+      }
       \sstsubsection{
          NDF = NDF (Read and Write)
       }{
@@ -50568,6 +50588,12 @@ The following applications have been modified:
          ACC parameter for WCSALIGN, have been reduced to 0.05, in order to
          reduce artifacts when transforming large images with flux
          conservation.
+      \end{itemize}
+
+   \item [\htmlref{SETVAR}{SETVAR}] \mbox{}
+      \begin{itemize}
+         \item Now provides the option to copy values from another NDF into 
+               the Variance component of the NDF being modified.
       \end{itemize}
 
    \item [\htmlref{SLIDE}{SLIDE}] \mbox{}
