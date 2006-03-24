@@ -109,7 +109,7 @@
 *        Made usage and examples lowercase.  Added Related Applications.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
-*     21-MAR-2004 (TIMJ):
+*     21-MAR-2004 (DSB):
 *        Added parameters FROM and COMP.
 *     {enter_further_changes_here}
 
