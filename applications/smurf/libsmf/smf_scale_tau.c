@@ -42,6 +42,8 @@
 *        Change floats to doubles
 *     2006-02-03 (AGG):
 *        API change: filter is now a string
+*     2006-03-23 (AGG):
+*        Limit filter pattern match to a single character
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,11 +93,11 @@ double smf_scale_tau( const double tauwvm, const char *filter, int *status ) {
   /* Note these are tau_CSO to SCUBA tau_filter conversions.... */
   /* Also note that we are assuming that the filter names start with
      850 or 450. This may or may not be true... */
-  if ( strncmp( filter, "850", 3) == 0 ) {
+  if ( strncmp( filter, "8", 1) == 0 ) {
     /* Long wave */
     a = 4.02;
     b = 0.001;
-  } else if ( strncmp( filter, "450", 3) == 0 ) {
+  } else if ( strncmp( filter, "4", 1) == 0 ) {
     /* Short wave */
     a = 26.2;
     b = 0.014;
