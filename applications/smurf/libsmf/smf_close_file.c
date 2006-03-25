@@ -139,6 +139,9 @@ void smf_close_file( smfData ** data, int * status ) {
     }
 
     smf_free( file, status );
+  } else {
+    /* no file - data is ours to free */
+    freedata = 1;
   }
 
   /* Tidy up the header */
