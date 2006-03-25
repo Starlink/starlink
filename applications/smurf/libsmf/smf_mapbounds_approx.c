@@ -88,6 +88,7 @@
 */
 
 #include <stdio.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -104,37 +105,25 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
 			   int *ubnd_out, AstFrameSet **outframeset, int *status ) {
 
   /* Local Variables */
-  AstMapping *bolo2sky=NULL;   /* Mapping bolo->celestial coordinates */
-  AstCmpMap *bolo2map=NULL;    /* Combined mapping bolo->map coordinates */
   smfData *data=NULL;          /* pointer to  SCUBA2 data struct */
   smfFile *file=NULL;          /* SCUBA2 data file information */
   AstFitsChan *fitschan=NULL;  /* Fits channels to construct WCS header */
-  char fitshd[8][81];          /* Strings for each fits channel */
   smfHead *hdr=NULL;           /* Pointer to data header this time slice */
   dim_t i;                     /* Loop counter */
-  dim_t j;                     /* Loop counter */
   dim_t k;                     /* Loop counter */
   char *pname=NULL;            /* Name of currently opened data file */
-  struct sc2head *sc2hdr=NULL; /* Pointer to sc2head for this time slice */
   AstMapping *sky2map=NULL;    /* Mapping celestial->map coordinates */
-  int startboundcheck=1;       /* Flag for first check of map dimensions */
-  char wcssystem[81];          /* String containing system attribute */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
-  double x_map[4];             /* Projected X-coordinates of corner bolos */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
-  double y_map[4];             /* Projected X-coordinates of corner bolos */ 
 
   double mapwdth;
   double maphght;
   double mapx;
   double mapy;
-  double mappa;
+  double mappa = 0;
   int hghtpix;
   int wdthpix;
   int temp;
-  double rlon_0;
-  double rlat_0;
-  double rpixsize;
   int dxpix;
   int dypix;
 
@@ -184,7 +173,7 @@ void smf_mapbounds_approx( Grp *igrp,  int size, char *system, double lon_0,
       smf_fits_getD( hdr, "MAP_X", &mapx, status );
       smf_fits_getD( hdr, "MAP_Y", &mapy, status );
       /* Not yet used: must be converted to radians */
-      smf_fits_getD( hdr, "MAP_PA", &mappa, status ); 
+      /*      smf_fits_getD( hdr, "MAP_PA", &mappa, status ); */
       mappa *= AST__DD2R;
       wdthpix = (int) ( ( mapwdth*cos(mappa) + maphght*sin(mappa) ) / pixsize);
       hghtpix = (int) ( ( maphght*cos(mappa) + mapwdth*sin(mappa) ) / pixsize);
