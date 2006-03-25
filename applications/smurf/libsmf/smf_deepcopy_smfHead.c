@@ -42,6 +42,8 @@
 *  History:
 *     2006-03-23 (AGG):
 *        Initial version.
+*     2006-03-24 (AGG):
+*        Trap NULL allsc2heads
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,12 +104,16 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
   fitshdr = astCopy(old->fitshdr);
 
-  allsc2heads = smf_malloc( 1, nframes*sizeof(struct sc2head), 0, status);
-  if (  allsc2heads == NULL) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME,"Unable to allocate memory for allsc2heads", status);
+  /* Only allocate space for allsc2heads if we have a non-NULL input
+     allsc2heads */
+  if ( old->allsc2heads != NULL) {
+    allsc2heads = smf_malloc( 1, nframes*sizeof(struct sc2head), 0, status);
+    if (  allsc2heads == NULL) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME,"Unable to allocate memory for allsc2heads", status);
+    }
+    memcpy( allsc2heads, old->allsc2heads, nframes*sizeof(struct sc2head) );
   }
-  memcpy( allsc2heads, old->allsc2heads, nframes*sizeof(struct sc2head) );
 
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, NULL, fitshdr, allsc2heads, curframe, nframes, status );
