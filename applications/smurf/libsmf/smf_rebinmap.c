@@ -190,10 +190,10 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
   }
 
   /* Close the data file */
-  if( data != NULL ) {
+  /*  if( data != NULL ) {
     smf_close_file( &data, status);
     data = NULL;
-  }
+    }*/
 
 
   /* Clean Up */
@@ -202,7 +202,7 @@ void smf_rebinmap( smfData *data,  int index, int size, AstFrameSet *outframeset
   if (bolo2sky) bolo2sky = astAnnul( bolo2sky );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
 
-  if( data != NULL )
-    smf_close_file( &data, status);
+  /*  if( data != NULL )
+      smf_close_file( &data, status);*/
 
 }
