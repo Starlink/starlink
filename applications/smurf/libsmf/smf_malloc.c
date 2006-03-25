@@ -98,7 +98,7 @@ smf_malloc( size_t nelem, size_t bperel, int zero, int * status ) {
     msgSeti( "NEL", nelem );
     msgSeti( "BP" , bperel );
     if ( nelem == 0 ) {
-      errRep( FUNC_NAME, "Attempt to allocate zero elements of sisze ^BP bytes "
+      errRep( FUNC_NAME, "Attempt to allocate zero elements of size ^BP bytes "
 	      "(possible programming error)", status);      
     } else {
       errRep( FUNC_NAME, "Attempt to allocate ^NEL elements of zero bytes "
