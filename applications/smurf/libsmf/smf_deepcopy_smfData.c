@@ -123,6 +123,8 @@ smf_deepcopy_smfData( const smfData *old, int * status ) {
       if ( (old->pntr)[i] != NULL ) {
 	pntr[i] = smf_malloc( npts, sizeof( double ), 0, status);
 	memcpy( pntr[i], (old->pntr)[i], npts*sizeof( double ));
+      } else {
+        pntr[i] = NULL;
       }
     }
   }
