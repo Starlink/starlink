@@ -53,6 +53,8 @@
 *        Trap the case that ogrp is NULL
 *     2006-03-23 (AGG):
 *        Creates copy of smfData with smf_deepcopy_smfData
+*     2006-03-24 (AGG):
+*        Set data type correctly for case of NULL ffdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,7 +141,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
 
     /* Close output file */
     ndfAnnul( &outndf, status);
-  }
+  } 
 
   /* Open the input without header information. This is required
      because sc2store can not open two files at once 
@@ -151,8 +153,15 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   /* Open the output file for write. If the output grp is NULL then
      ffdata is returned NULL */
   smf_open_file( ogrp, index, "WRITE", 1, ffdata, status);
+
   if ( *status == SAI__ERROR) {
     errRep("", "Unable to open output file", status);
+  }
+
+  /* how many elements in the data array? */
+  npts = (data->dims)[0] * (data->dims)[1];
+  if ( data->ndims == 3) {
+    npts *= (data->dims)[2];
   }
 
   /* Check whether the input data are flatfielded */
@@ -165,15 +174,21 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       msgSetc("FILE", pname);
       msgOutif(MSG__VERB, " ", "Flatfielding file ^FILE", status);
     }
+    /* If ffdata is NULL then populate a struct to work with */
+    if ( *ffdata == NULL ) {
+      printf("Fudging\n");
+      *ffdata = smf_deepcopy_smfData( data, status );
+      /* Change data type to DOUBLE */
+      ((*ffdata)->pntr)[0] = astRealloc(((*ffdata)->pntr)[0], npts * sizeof(double));;
+      (*ffdata)->dtype = SMF__DOUBLE;
+    } 
     /* Flatfield the data */
+      printf("doing flatfield\n");
     smf_flatfield( data, ffdata, status );
   } else if ( *status == SMF__FLATN ) {
-    errAnnul( status );
     /* Just copy input to output file */
-    npts = (data->dims)[0] * (data->dims)[1];
-    if ( data->ndims == 3) {
-      npts *= (data->dims)[2];
-    }
+    errAnnul( status );
+
     /* What if ffdata is NULL? */
     msgOutif(MSG__VERB, FUNC_NAME, "Data FF: Copying to output file ", status);
     if ( *ffdata == NULL ) {
@@ -181,6 +196,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       *ffdata = smf_deepcopy_smfData( data, status );
 
     } else {
+      printf("using memcpy\n");
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
 
