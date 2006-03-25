@@ -76,6 +76,8 @@
 *        Return a NULL pointer if the group is undefined
 *     2006-03-23 (AGG);
 *        Store the number of frames (timeslices) in the smfData struct
+*     2006-03-24 (TIMJ):
+*        Fix bug where allsc2heads wasn't being set
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -186,7 +188,6 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
     *data = NULL;
     return;
   }
-
   /* Return the NDF identifier */
   ndgNdfas( igrp, index, mode, &indf, status );
   /* Determine the dimensions of the DATA component */
@@ -345,11 +346,7 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
       }
 
       /* decide if we are storing header information */
-      if (withHdr) {
-	sc2tmp = hdr->allsc2heads;
-      } else {
-	sc2tmp = NULL;
-      }
+      sc2tmp = NULL;
 
       /* Read time series data from file */
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN, maxlen, maxfits, 
@@ -363,9 +360,11 @@ void smf_open_file( Grp * igrp, int index, char * mode, int withHdr,
 
 	/* Free header info if no longer needed */
 	if (!withHdr && sc2tmp != NULL) {
-	  /* can not ues smf_free */
+	  /* can not use smf_free */
 	  free( sc2tmp );
 	  sc2tmp = NULL;
+	} else {
+	  hdr->allsc2heads = sc2tmp;
 	}
 
 	/* Tdata is malloced by rdtstream for our use */
