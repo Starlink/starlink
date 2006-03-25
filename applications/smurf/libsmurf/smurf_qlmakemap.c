@@ -174,6 +174,10 @@ void smurf_qlmakemap( int *status ) {
 	errRep("smurf_makemap", "Rebinning step failed", status);
       }
     }
+    if( data != NULL ) {
+      smf_close_file( &data, status);
+      data = NULL;
+    }
   }
   /* Write FITS header */
   ndfPtwcs( outframeset, ondf, status );

@@ -217,10 +217,10 @@ void smurf_makemap( int *status ) {
 		 map, variance, weights, status );
 
     /* Close the data file */
-    /*    if( data != NULL ) {
+    if( data != NULL ) {
       smf_close_file( &data, status);
       data = NULL;
-      }*/
+    }
     /* Break out of loop over data files if bad status */
     if (*status != SAI__OK) {
       errRep("smurf_makemap", "Rebinning step failed", status);
