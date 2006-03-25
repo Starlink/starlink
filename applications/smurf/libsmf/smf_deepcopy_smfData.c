@@ -42,6 +42,8 @@
 *  History:
 *     2006-03-23 (AGG):
 *        Initial version.
+*     2006-03-24 (TIMJ):
+*        Deal with different data types and quality
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,21 +90,21 @@
 smfData *
 smf_deepcopy_smfData( const smfData *old, int * status ) {
 
-  smfData *new = NULL;   /* New Header */
-  smfHead *hdr;
-  smfFile *file = NULL;
-  smfDA *da = NULL;
-  smf_dtype dtype;
-  dim_t dims[NDF__MXDIM];
-  int ndims;
-  int virtual;
-  double *poly = NULL;
-  dim_t ncoeff = 0;
-  void *pntr[3];
+  smfDA *da = NULL;       /* New smfDA */
+  dim_t dims[NDF__MXDIM]; /* Dimensions of each axis of data array */
+  smf_dtype dtype;        /* Data type */
+  smfFile *file = NULL;   /* New smfFile */
+  smfHead *hdr = NULL;    /* New smfHead */
+  int i;                  /* Loop counter */
+  size_t nbytes;          /* number of bytes in data type */
+  dim_t ncoeff = 0;       /* Number of coefficients */
+  int ndims;              /* Number of dimensions in data array */
+  smfData *new = NULL;    /* New smfData */
+  int npts;               /* Number of data points */
+  void *pntr[3];          /* Data, variance and quality arrays */
+  double *poly = NULL;    /* Polynomial coefficients */
+  int virtual;            /* Is it a virtual smfData? */
 
-  int i;
-  int npts;
-  
   if (*status != SAI__OK) return NULL;
 
   /* Copy elements */
@@ -118,23 +120,34 @@ smf_deepcopy_smfData( const smfData *old, int * status ) {
     npts *= dims[2];
   }
 
-  for (i=0; i<3; i++) {
-    if ( dtype == SMF__DOUBLE ) {
-      if ( (old->pntr)[i] != NULL ) {
-	pntr[i] = smf_malloc( npts, sizeof( double ), 0, status);
-	memcpy( pntr[i], (old->pntr)[i], npts*sizeof( double ));
-      } else {
-        pntr[i] = NULL;
-      }
+
+  /* DATA and VARIANCE */
+  for (i=0; i<2; i++) {
+    if ( (old->pntr)[i] != NULL ) {
+      nbytes = smf_dtype_size(old, status);
+      pntr[i] = smf_malloc( npts, nbytes, 0, status);
+      memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
+    } else {
+      pntr[i] = NULL;
     }
   }
+  /* quality */
+  if ( (old->pntr)[2] != NULL ) {
+    pntr[2] = smf_malloc( npts, 1, 0, status);
+    memcpy( pntr[2], (old->pntr)[2], npts );
+  } else {
+    pntr[2] = NULL;
+  }
 
+  /* Redefine npts */
   npts = dims[0]*dims[1]*ncoeff;
   poly = smf_malloc( npts, sizeof(double), 0, status);
   memcpy( poly, old->poly, npts*sizeof(double));
 
+  /* Create the new smfHead */
   hdr = smf_deepcopy_smfHead( old->hdr, status );
 
+  /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, dims, ndims, 
 			       virtual, ncoeff, poly, status);
 
