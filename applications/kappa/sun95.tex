@@ -13228,10 +13228,10 @@ KAPPA: \htmlref{CADD}{CADD},
       \sstsubsection{
          SIGTOTAL = \_DOUBLE (Write)
       }{
-         The standard deviation on the total data sum.  Only created if If variances are
-         available this is the RMS value of the standard deviations
-         associated with each included pixel value.  If variances are not
-         available, it is the standard deviation of the pixel values
+         The standard deviation on the total data sum.  Only created if
+         variances are available this is the RMS value of the standard
+         deviations associated with each included pixel value.  If variances
+         are not available, it is the standard deviation of the pixel values
          divided by the square root of the number of good pixels in
          the aperture.
       }
@@ -13987,11 +13987,11 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
    Sets a new label value for an axis within an NDF data structure
 }{
    \sstdescription{
-      This routine sets a new value for a label component of an
+      This routine sets a new value for a LABEL component of an
       existing \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
-      mode and any pre-existing label component is over-written with a
+      mode and any pre-existing LABEL component is over-written with a
       new value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
-      LABEL parameter, then the NDF's axis label component will be
+      LABEL parameter, then the NDF's axis LABEL component will be
       erased.  If an AXIS structure does not exist, a new one whose
       centres are pixel co-ordinates is created.
    }
@@ -14011,13 +14011,13 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
       \sstsubsection{
          NDF = NDF (Read and Write)
       }{
-         The NDF data structure in which an axis label component is to
+         The NDF data structure in which an axis LABEL component is to
          be modified.
       }
       \sstsubsection{
          LABEL = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's axis label component
+         The value to be assigned to the NDF's axis LABEL component
          (\emph{e.g.} {\tt "Wavelength"} or {\tt "Fibre index"}).  LABEL describes the
          quantity measured along the axis.  This value may later be
          used by other applications for labelling graphs or as a
@@ -14029,20 +14029,20 @@ KAPPA: \htmlref{SETAXIS}{SETAXIS}.
       \sstexamplesubsection{
          axlabel ngc253 "Offset from nucleus" 2
       }{
-         Sets the label component of the second axis dimension of the
+         Sets the LABEL component of the second axis dimension of the
          NDF structure ngc253 to have the value {\tt "Offset from nucleus"}.
       }
       \sstexamplesubsection{
          axlabel ndf=spect label=Wavelength
       }{
-         Sets the axis label component of the one-dimensional NDF
+         Sets the axis LABEL component of the one-dimensional NDF
          structure spect to have the value {\tt "Wavelength"}.
       }
       \sstexamplesubsection{
          axlabel datafile label=! dim=3
       }{
          By specifying a null value ({\tt{!}}), this example erases any
-         previous value of the label component for the third dimension
+         previous value of the LABEL component for the third dimension
          in the NDF structure datafile.
       }
    }
@@ -14060,11 +14060,11 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
    Sets a new units value for an axis within an NDF data structure
 }{
    \sstdescription{
-      This routine sets a new value for a units component of an
+      This routine sets a new value for a UNITS component of an
       existing \NDFref{NDF} \htmlref{AXIS}{apndf:axis}~ data structure.  The NDF is accessed in update
-      mode and any pre-existing units component is over-written with a
+      mode and any pre-existing UNITS component is over-written with a
       new value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
-      UNITS parameter, then the NDF's axis units component will be
+      UNITS parameter, then the NDF's axis UNITS component will be
       erased.  If an AXIS structure does not exist, a new one whose
       centres are pixel co-ordinates is created.
    }
@@ -14084,13 +14084,13 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
       \sstsubsection{
          NDF = NDF (Read and Write)
       }{
-         The NDF data structure in which an axis units component is to
+         The NDF data structure in which an axis UNITS component is to
          be modified.
       }
       \sstsubsection{
          UNITS = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's axis units component
+         The value to be assigned to the NDF's axis UNITS component
          (\emph{e.g.} {\tt "Pixels"} or {\tt "km/s"}).  UNITS describes the physical units
          of the quantity measured along the axis.  This value may later
          be used by other applications for labelling graphs and other
@@ -14102,20 +14102,20 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
       \sstexamplesubsection{
          axunits ngc253 "arcsec" 2
       }{
-         Sets the units component of the second axis dimension of the
+         Sets the UNITS component of the second axis dimension of the
          NDF structure ngc253 to have the value {\tt "arcsec"}.
       }
       \sstexamplesubsection{
          axunits ndf=spect units=Angstrom
       }{
-         Sets the axis units component of the one-dimensional NDF
+         Sets the axis UNITS component of the one-dimensional NDF
          structure spect to have the value {\tt "Angstrom"}.
       }
       \sstexamplesubsection{
          axunits datafile units=! dim=3
       }{
          By specifying a null value ({\tt{!}}), this example erases any
-         previous value of the units component for the third dimension
+         previous value of the UNITS component for the third dimension
          in the NDF structure datafile.
       }
    }
@@ -14301,16 +14301,19 @@ KAPPA: \htmlref{CONVOLVE}{CONVOLVE},
 
          \sstitem
          This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
-         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, 
+         \htmlref{WCS}{apndf:wcs} and \htmlref{HISTORY}{apndf:history}~ components of the input NDF
          and propagates all \htmlref{extensions}{apndf:extensions}.  In addition, if the mean
          estimator is used, the \htmlref{VARIANCE}{apndf:variance}~ component is also processed.
          If the median estimator is used, then the output NDF will have
-         no \htmlref{VARIANCE}{apndf:variance}~ component, even if there is a VARIANCE component
-         in the input NDF.
+         no \htmlref{VARIANCE}{apndf:variance}~ component, even if there is a 
+         VARIANCE component in the input NDF.
 
          \sstitem
-         Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
-         The \htmlref{bad-pixel flag}{setbad:badpixelflag}~ is also written for the data and variance arrays. 
+         Processing of \htmlref{bad pixels}{se:masking} and automatic 
+         \htmlref{quality masking}{se:qualitymask} are supported.
+         The \htmlref{bad-pixel flag}{setbad:badpixelflag}~ is also written for the data 
+         and variance arrays. 
 
          \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
@@ -14975,7 +14978,7 @@ KAPPA: \htmlref{ADD}{ADD},
          CERROR = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, errors in the centroided position will be calculated.
-         The input NDF must contain a Variance component in order to
+         The input NDF must contain a VARIANCE component in order to
          compute errors. {\tt [FALSE]}
       }
       \sstsubsection{
@@ -18478,7 +18481,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
    \sstdescription{
       This application creates a two-dimensional output \NDFref{NDF} containing
       artificial data of various forms (see parameter MODE).  The output
-      NDF can, optionally, have a Variance component describing the noise
+      NDF can, optionally, have a VARIANCE component describing the noise
       in the Data array (see parameter VARIANCE), and additionally a
       randomly generated pattern of bad pixels (see parameter BADPIX).
       Bad columns or rows of pixels can also be generated
@@ -18681,7 +18684,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, a Variance component is added to the output NDF
+         If {\tt TRUE}, a VARIANCE component is added to the output NDF
          representing the noise added to the field.  If a null ({\tt{!}}) value is
          supplied, a default is used which is {\tt TRUE} for modes which include
          noise, and {\tt FALSE} for modes which do not include any noise. {\tt [!]}
@@ -18700,7 +18703,7 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
       \sstitemlist{
 
          \sstitem
-         The Data and \htmlref{Variance components}{apndf:variance} of the output NDF have a numerical
+         The DATA and \htmlref{VARIANCE components}{apndf:variance} of the output NDF have a numerical
          type of {\tt "\_REAL"} (single-precision floating point).
 
          \sstitem
@@ -19808,7 +19811,7 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       \sstexamplesubsection{
          display mode=fa axes style="$\wedge$sty,grid=1" margin=0.2 clear out=video $\backslash$
       }{
-         Displays the current NDF data component with annotated axes
+         Displays the current NDF DATA component with annotated axes
          after clearing the current picture on the current graphics device
          device.  The appearance of the axes is specified in the text
          file {\tt sty}, but this is modified by setting the \htmlattref{Grid}{Grid}~ attribute
@@ -19821,14 +19824,14 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
       \sstexamplesubsection{
          display video noscale $\backslash$
       }{
-         Displays the data component of the NDF called video (created
+         Displays the DATA component of the NDF called video (created
          in the previous example) without scaling within the current
          picture on the current graphics device.
       }
       \sstexamplesubsection{
          display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
       }{
-         Displays the variance component of NDF cgs4a on the xwindows
+         Displays the VARIANCE component of NDF cgs4a on the xwindows
          device, scaling between 1 and 5.2.
       }
       \sstexamplesubsection{
@@ -21837,11 +21840,11 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
 
             \sstitem
             If BUNIT is present its value will appear as the NDF's 
-            \htmlref{units component}{apndf:units}.
+            \htmlref{UNITS component}{apndf:units}.
 
             \sstitem
             If OBJECT is present its value will appear as the NDF's
-            \htmlref{title component}{apndf:units}.
+            \htmlref{TITLE component}{apndf:units}.
 
             \sstitem
             If the BLANK item is present in the header, undefined pixels
@@ -22739,11 +22742,11 @@ KAPPA: \htmlref{FITSDIN}{FITSDIN},
 
             \sstitem
             If BUNIT is present its value will appear as the NDF's 
-            \htmlref{units component}{apndf:units}.
+            \htmlref{UNITS component}{apndf:units}.
 
             \sstitem
             If OBJECT is present its value will appear as the NDF's 
-            \htmlref{title component}{apndf:title}.
+            \htmlref{TITLE component}{apndf:title}.
 
             \sstitem
             If the BLANK item is present in the header, undefined pixels
@@ -25213,7 +25216,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       \sstitemlist{
 
          \sstitem
-         A \htmlref{history component}{apndf:history} is created if it
+         A \htmlref{HISTORY component}{apndf:history} is created if it
          does not exist within the NDF.  The width of the history record is
          72 characters.
 
@@ -25301,7 +25304,7 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       and can also erase the history information.
 
       The level is called the history update mode and it is a permanent
-      attribute of the \htmlref{history component}{apndf:history}~ of the NDF, and remains with
+      attribute of the \htmlref{HISTORY component}{apndf:history}~ of the NDF, and remains with
       the NDF and any NDF created therefrom until the history is erased
       or the update mode is modified (say by this task).
    }
@@ -25375,7 +25378,7 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
       \sstitemlist{
 
          \sstitem
-         A history component is created if it does not exist within the
+         A HISTORY component is created if it does not exist within the
          NDF, except for MODE={\tt "Erase"}.
 
          \sstitem
@@ -30641,13 +30644,13 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
       \sstsubsection{
          UNITS = \_LOGICAL (Read)
       }{
-         Specifies whether the units component of the (alphabetically)
+         Specifies whether the UNITS component of the (alphabetically)
          first input NDF or the template NDF will be propagated to the
          output NDF.  By default this component is not propagated since,
          in most cases, the units of the output data will differ from
          those of any of the input data structures.  In simple cases,
          however, the units may be unchanged, and this parameter then
-         allows the units component to be preserved.  This parameter is
+         allows the UNITS component to be preserved.  This parameter is
          ignored if the expression does not contain a token to at least
          one input NDF structure and LIKE={\tt{!}}.  {\tt [FALSE]}
       }
@@ -30670,7 +30673,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
       }{
-         Specifies whether values for the variance component of the
+         Specifies whether values for the VARIANCE component of the
          output NDF should be calculated.  If this parameter is set to
          {\tt TRUE} (the normal default), then output variance values will be
          calculated if any of the input NDFs contain variance
@@ -30820,7 +30823,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
       use of other applications (ADD, SUB, \emph{etc.}) is therefore
       recommended, particularly if variance calculations are required.
 
-      The main value of the variance estimation algorithm used here
+      The main value of the variance-estimation algorithm used here
       arises when the expression to be evaluated is too complicated, or
       too infrequently used, to justify the work of deriving a direct
       formula for the variance.  It is also of value when the data
@@ -30846,7 +30849,7 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
       If output variance values are being calculated and the QUICK
       parameter is set to {\tt TRUE}, then the execution time will be
       multiplied by an approximate factor ($N+$1), where \textit{n} is the number
-      of input NDFs which contain a variance component.  If QUICK is set
+      of input NDFs which contain a VARIANCE component.  If QUICK is set
       to {\tt FALSE}, then the execution time will be multiplied by an
       approximate factor ($2N+$1).
    }
@@ -31849,7 +31852,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       The data represented by each curve can be either a row or column
       (chosen using parameter ABSAXS) of any array component within the
       supplied NDF (see parameter COMP). Vertical error bars may be drawn if
-      the NDF contains a Variance component (see parameter ERRBAR).  The
+      the NDF contains a VARIANCE component (see parameter ERRBAR).  The
       vertical axis of the plot represents array value (or the logarithm of
       the array value - see parameter YLOG).  The horizontal axis represents
       position, and may be annotated using an axis selected from the Current
@@ -31929,7 +31932,7 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          ERRBAR = \_LOGICAL (Read)
       }{
          {\tt TRUE} if vertical error bars are to be drawn.  This is only
-         possible if the NDF contains a Variance component, and parameter
+         possible if the NDF contains a VARIANCE component, and parameter
          COMP is set to {\tt "Data"}.  The length of the error bars (in terms of
          standard deviations) is set by parameter SIGMA.  The appearance
          of the error bars (width, colour, \emph{etc.}) can be controlled using
@@ -32436,14 +32439,14 @@ plot (9k).
       current \htmlref{co-ordinate Frame}{se:domains}~  of the input NDFs.
 
       In array mode (SINGLE={\tt FALSE}), statistics are calculated for each
-      pixel in one of the array components (Data, Variance or Quality)
+      pixel in one of the array components (DATA, VARIANCE or QUALITY)
       accumulated over all the input NDFs and written to an output
       NDF; each pixel of the output NDF is a result of combination
       of pixels with the same Pixel co-ordinates in all the input NDFs.
-      If SMODE={\tt "Mean"} then the output NDF has a Data component giving
-      the pixel averages of the input NDFs, and a Variance component
+      If SMODE={\tt "Mean"} then the output NDF has a DATA component giving
+      the pixel averages of the input NDFs, and a VARIANCE component
       giving the variances.  If SMODE={\tt "Median"}, then the output NDF
-      has only a Data component, which gives the medians.  The data type
+      has only a DATA component, which gives the medians.  The data type
       of the output arrays will be of a floating point type even if
       the input arrays were of an integer type.  The input NDFs
       must all have the same number of dimensions, but need not all
@@ -32514,7 +32517,7 @@ plot (9k).
          OUT = NDF (Read)
       }{
          The name of an NDF to receive the results.  Each pixel of
-         the Data (and perhaps Variance) component represents the
+         the DATA (and perhaps VARIANCE) component represents the
          statistics of the corresponding pixels of the input NDFs.
          Only used if SINGLE={\tt FALSE}.
       }
@@ -32544,11 +32547,11 @@ plot (9k).
          The way in which the input arrays should be processed in order
          to generate the output NDF.  It may be {\tt "Mean"} or {\tt "Median"}.
          If it is {\tt "Mean"} (the default) then OUT will be an NDF in which
-         the Data component gives the averages of the pixels of the
-         selected component of the input NDFs, and the Variance component
+         the DATA component gives the averages of the pixels of the
+         selected component of the input NDFs, and the VARIANCE component
          gives their variances.  If it is {\tt "Median"} then then OUT will
-         have a Data component giving the medians of the input pixels,
-         and it will have no variance component.  {\tt ["Mean"]}
+         have a DATA component giving the medians of the input pixels,
+         and it will have no VARIANCE component.  {\tt ["Mean"]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -32608,8 +32611,8 @@ plot (9k).
          mstats idat$*$ ostats comp=variance
       }{
          This does the same as the first example except that statistics
-         are calculated on the Variance components of all the input
-         NDFs.  Thus the pixels of the Variance component of ostats
+         are calculated on the VARIANCE components of all the input
+         NDFs.  Thus the pixels of the VARIANCE component of ostats
          will be the variances of the variances of the input data.
       }
       \sstexamplesubsection{
@@ -32632,7 +32635,7 @@ plot (9k).
       \sstexamplesubsection{
          mstats in="arr1,arr2,arr3" out=middle smode=median
       }{
-         This example calculates the medians of the data components of
+         This example calculates the medians of the DATA components of
          the three named NDFs and writes them into a new NDF called
          middle.
       }
@@ -33253,7 +33256,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
       \sstsubsection{
          VARIANCE = \_LOGICAL (Write)
       }{
-         Whether or not the NDF contains a VARIANCE array.
+         Whether or not the NDF contains a variance array.
       }
       \sstsubsection{
          WCS = \_LOGICAL (Write)
@@ -33345,12 +33348,12 @@ KAPPA: \htmlref{FITSLIST}{FITSLIST},
       replacement value is constrained to be non-negative.
 
       Magic values are replaced by random values if the parameter SIGMA
-      is given a non-zero value.  If both Data and Variance components
+      is given a non-zero value.  If both DATA and VARIANCE components
       are being processed, then the random values are only stored in
-      the Data component; a constant value equal to SIGMA squared is
-      used to replace all magic values in the variance component.  If
-      only a single component is being processed (whether it be Data,
-      Variance, or Error), then the random values are used to replace
+      the DATA component; a constant value equal to SIGMA squared is
+      used to replace all magic values in the VARIANCE component.  If
+      only a single component is being processed (whether it be DATA,
+      VARIANCE, or Error), then the random values are used to replace
       the magic values.  If random values are generated which will not
       fit into the allowed numeric range of the output NDF, then they
       are discarded and new random values are obtained instead.  This
@@ -34158,7 +34161,7 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          outset neb1 nebm "15:23:43.2 -22:23:34.2" "10:0" inside comp=var
       }{
          This copies NDF neb1 to nebm, setting pixels bad in the
-         VARIANCE array if they fall inside the specified circle.  Assuming
+         variance array if they fall inside the specified circle.  Assuming
          the current co-ordinate Frame of neb1 is a SKY Frame describing RA
          and DEC, the aperture is centred at RA 15:23:43.2 and
          DEC -22:23:34.2, and has a diameter of 10 arcminutes.
@@ -38877,7 +38880,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          NDFs have defined \htmlref{VARIANCE}{apndf:variance}~ components.  If
          any of the supplied input NDFs do not have defined VARIANCE components, then no
          variances are copied.  Note, if a null input NDF is given then
-         the corresponding output VARIANCE values are set bad. {\tt [TRUE]}
+         the corresponding output variance values are set bad. {\tt [TRUE]}
       }
    }
    \sstexamples{
@@ -39881,7 +39884,7 @@ KAPPA: \htmlref{FITSIMP}{FITSIMP},
       \sstsubsection{
          LABEL = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's label component.  This
+         The value to be assigned to the NDF's LABEL component.  This
          should describe the type of quantity represented in the NDF's
          data array (\emph{e.g.} {\tt "Surface Brightness"} or {\tt "Flux Density"}).
          The value may later be used by other applications, for instance to
@@ -39898,20 +39901,20 @@ KAPPA: \htmlref{FITSIMP}{FITSIMP},
       \sstexamplesubsection{
          setlabel ngc1068 "Surface Brightness"
       }{
-         Sets the label component of the NDF structure ngc1068 to be
+         Sets the LABEL component of the NDF structure ngc1068 to be
          {\tt "Surface Brightness"}.
       }
       \sstexamplesubsection{
          setlabel ndf=datastruct label="Flux Density"
       }{
-         Sets the label component of the NDF structure datastruct to be
+         Sets the LABEL component of the NDF structure datastruct to be
          {\tt "Flux Density"}.
       }
       \sstexamplesubsection{
          setlabel raw\_data label=!
       }{
          By specifying a null value ({\tt{!}}), this example erases any
-         previous value of the label component in the NDF structure
+         previous value of the LABEL component in the NDF structure
          raw\_data.
       }
    }
@@ -40796,7 +40799,7 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's title component (\emph{e.g.}
+         The value to be assigned to the NDF's TITLE component (\emph{e.g.}
          {\tt "NGC1068 with a B filter"} or {\tt "Ice band in HD123456"}).  This
          value may later be used by other applications as a heading for
          graphs and other forms of display where the NDF's data values
@@ -40807,20 +40810,20 @@ KAPPA: \htmlref{QUALTOBAD}{QUALTOBAD},
       \sstexamplesubsection{
          settitle ngc1068 "NGC1068 with a B filter"
       }{
-         Sets the title component of the NDF structure ngc1068 to be
+         Sets the TITLE component of the NDF structure ngc1068 to be
          {\tt "NGC1068 with a B filter"}.
       }
       \sstexamplesubsection{
          settitle ndf=myspec title="Ice band, short integration"
       }{
-         Sets the title component of the NDF structure myspec to be
+         Sets the TITLE component of the NDF structure myspec to be
          {\tt "Ice band, short integration"}.
       }
       \sstexamplesubsection{
          settitle dat123 title=!
       }{
          By specifying a null value ({\tt{!}}), this example erases any
-         previous value of the title component in the NDF structure
+         previous value of the TITLE component in the NDF structure
          dat123.
       }
    }
@@ -40834,12 +40837,12 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
 \sstroutine{
    SETTYPE
 }{
-   Sets a new numeric type for the data and variance components of
+   Sets a new numeric type for the DATA and VARIANCE components of
    an NDF
 }{
    \sstdescription{
       This application allows the \htmlref{numeric type}{ap:HDStypes}~ of
-      the data and variance components of an \NDFref{NDF} to be 
+      the DATA and VARIANCE components of an \NDFref{NDF} to be 
       changed.  The NDF is accessed in update mode and the values stored 
       in these components are converted in situ to the new type.  No other
       attributes of the NDF are changed.
@@ -40889,7 +40892,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
          VARIANCE = \_LOGICAL (Read)
       }{
          If a {\tt TRUE} value is given for this parameter, then the numeric
-         type of the NDF's \htmlref{variance}{apndf:variance}~ array will 
+         type of the NDF's \htmlref{VARIANCE}{apndf:variance}~ array will 
          be changed.  Otherwise, this component's type will remain 
          unchanged. {\tt [TRUE]}
       }
@@ -40907,12 +40910,12 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
       }{
          Converts the data array in the NDF structure inst.run1 to be
          stored as word (\emph{i.e.} Fortran INTEGER$*$2) values.  No change is
-         made to the variance component.
+         made to the VARIANCE component.
       }
       \sstexamplesubsection{
          settype hd26571 \_double complex
       }{
-         Causes the data and variance components of the NDF structure
+         Causes the DATA and VARIANCE components of the NDF structure
          hd26571 to be altered so as to hold complex values using
          double precision numbers.  The existing pixel values are
          converted to this new type.
@@ -40938,9 +40941,9 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
    \sstdescription{
       This routine sets a new value for the \htmlref{UNITS component}{apndf:units}~ of an
       existing \NDFref{NDF} data structure.  The NDF is accessed in update mode
-      and any pre-existing units component is over-written with a new
+      and any pre-existing UNITS component is over-written with a new
       value.  Alternatively, if a `null' value ({\tt{!}}) is given for the
-      UNITS parameter, then the NDF's units component will be erased.
+      UNITS parameter, then the NDF's UNITS component will be erased.
 
       There is also an option to modify the pixel values within the NDF
       to reflect the change in units (see parameter MODIFY).
@@ -40952,7 +40955,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
       \sstsubsection{
          NDF = NDF (Read and Write)
       }{
-         The NDF data structure whose units component is to be
+         The NDF data structure whose UNITS component is to be
          modified.
       }
       \sstsubsection{
@@ -40974,7 +40977,7 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
       \sstsubsection{
          UNITS = LITERAL (Read)
       }{
-         The value to be assigned to the NDF's units component (\emph{e.g.}
+         The value to be assigned to the NDF's UNITS component (\emph{e.g.}
          {\tt "J/(m$*$$*$2$*$Angstrom$*$s)"} or {\tt "count/s"}).  This value may later be used
          by other applications for labelling graphs and other forms of
          display where the NDF's data values are shown.  The suggested
@@ -40985,31 +40988,31 @@ KAPPA: \htmlref{SETLABEL}{SETLABEL},
       \sstexamplesubsection{
          setunits ngc1342 "count/s"
       }{
-         Sets the units component of the NDF structure ngc1342 to have
+         Sets the UNITS component of the NDF structure ngc1342 to have
          the value {\tt "count/s"}.  The pixel values are not changed.
       }
       \sstexamplesubsection{
          setunits ndf=spect units="J/(m$*$$*$2$*$Angstrom$*$s)"
       }{
-         Sets the units component of the NDF structure spect to have
+         Sets the UNITS component of the NDF structure spect to have
          the value {\tt "J/(m$*$$*$2$*$Angstrom$*$s)"}.  The pixel values are not changed.
       }
       \sstexamplesubsection{
          setunits datafile units=!
       }{
          By specifying a null value ({\tt{!}}), this example erases any
-         previous value of the units component in the NDF structure
+         previous value of the UNITS component in the NDF structure
          datafile.  The pixel values are not changed.
       }
       \sstexamplesubsection{
          setunits ndf=spect units="MJy" modify
       }{
-         Sets the units component of the NDF structure spect to have
+         Sets the UNITS component of the NDF structure spect to have
          the value {\tt "MJy"}.  If possible, the pixel values are changed from
-         their old units to the new units.  For instance, if the units
+         their old units to the new units.  For instance, if the UNITS
          component of the NDF was original {\tt "J/(m$*$$*$2$*$s$*$GHz)"}, the DATA
-         values will be multiplied by 1.0E11, and the VARIANCE values by
-         1.0E22.  However, if the original units component was (say) {\tt "K"}
+         values will be multiplied by 1.0E11, and the variance values by
+         1.0E22.  However, if the original UNITS component was (say) {\tt "K"}
          (Kelvin) then an error would be reported since there is no
          direct conversion from Kelvin to Megajansky.
       }
@@ -41025,7 +41028,7 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
 \sstroutine{
    SETVAR
 }{
-   Sets new values for the variance component of an NDF data
+   Sets new values for the VARIANCE component of an NDF data
    structure
 }{
    \sstdescription{
@@ -41043,24 +41046,24 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
    }
    \sstparameters{
       \sstsubsection{
-         COMP = LITERAL (Read)
+         COMP = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The name of an NDF array component within the NDF specified by
-         parameter FROM. The values in this array component are used as
-         the new variance values to be stored in the Variance component 
-         of the NDF specified by parameter NDF. The supplied value must
-         be one of ``Data'' or ``Variance''.
+         parameter FROM.  The values in this array component are used as
+         the new variance values to be stored in the VARIANCE component 
+         of the NDF specified by parameter NDF.  The supplied value must
+         be one of {\tt "Data"} or {\tt "Variance"}.  {\tt ["Data"]} 
       }
       \sstsubsection{
          FROM = NDF (Read)
       }{
          An NDF data structure containing the values to be used as the
-         new Variance values. The NDF component from which to read the
-         new variance values is specified by parameter COMP. If NDF is
-         not contained completely within FROM, then the Variance
-         component of NDF will be padded with bad values. If a null 
-         ({\tt{!}}) value is supplied, the new Variance values are determined 
-         by the expression given for parameter VARIANCE. {\tt [!]}
+         new variance values.  The NDF component from which to read the
+         new variance values is specified by parameter COMP.  If NDF is
+         not contained completely within FROM, then the VARIANCE
+         component of NDF will be padded with bad values.  If a null 
+         ({\tt{!}}) value is supplied, the new variance values are 
+         determined by the expression given for parameter VARIANCE. {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -41080,7 +41083,7 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
          been subtracted.
 
          If a `null' value ({\tt{!}}) is given for this parameter, then
-         no new variance component will be created and any pre-existing
+         no new VARIANCE component will be created and any pre-existing
          variance values will be erased.
       }
    }
@@ -41088,20 +41091,20 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
       \sstexamplesubsection{
          setvar ngc4709 data
       }{
-         This sets the variance component within the NDF structure
+         This sets the VARIANCE component within the NDF structure
          ngc4709 to equal its corresponding data-array component.
       }
       \sstexamplesubsection{
          setvar ndf=arcspec "data - 0.31"
       }{
-         This sets the variance component within the NDF structure
+         This sets the VARIANCE component within the NDF structure
          arcspec to be its corresponding data-array component less a
          constant 0.31.
       }
       \sstexamplesubsection{
          setvar cube4 Variance=!
       }{
-         This erases the values of the variance component within
+         This erases the values of the VARIANCE component within
          the NDF structure cube4, if it exists.
       }
    }
@@ -41118,8 +41121,8 @@ KAPPA: \htmlref{AXUNITS}{AXUNITS},
          precision if appropriate) and are constrained to be non-negative.
 
          \sstitem
-         The data type of the variance component is set to match that of
-         the data component.
+         The data type of the VARIANCE component is set to match that of
+         the DATA component.
       }
    }
    \sstdiytopic{
@@ -41447,8 +41450,8 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       \sstitemlist{
 
          \sstitem
-         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all 
-    4     \htmlref{extensions}{apndf:extensions}~ are propagated.  
+         The \htmlref{LABEL}{apndf:label}, \htmlref{UNITS}{apndf:units}, and \htmlref{HISTORY}{apndf:history}~ components, and all
+         \htmlref{extensions}{apndf:extensions}~ are propagated.  
          \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE parameter.  DATA,
          \htmlref{VARIANCE}{apndf:variance}, \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are propagated after appropriate modification. 
          The \htmlref{QUALITY}{apndf:quality}~ component is also
@@ -47114,7 +47117,7 @@ NDF.  In the case of {\tt example.sdf}, is a one-dimensional array of
 real type with 856 elements. It can have up to seven dimensions.  It
 is particularly referenced via parameter names IN, OUT, and NDF.
 
-If neither origin nor bad-pixel flag were present, the data component could
+If neither origin nor bad-pixel flag were present, the DATA component could
 have been a one-dimensional array like this,
 
 \begin{verbatim}
@@ -47558,10 +47561,10 @@ and hypertext.
     by ARDGEN, to define regions of an NDF to mask.  It therefore
     allows regions to be excluded from subsequent data processing.
 
-  \item [\htmlref{AXLABEL}{AXLABEL}]  Sets a new label component for an
+  \item [\htmlref{AXLABEL}{AXLABEL}]  Sets a new LABEL component for an
     NDF axis.
 
-  \item [\htmlref{AXUNITS}{AXUNITS}]  Sets a new units component for an
+  \item [\htmlref{AXUNITS}{AXUNITS}]  Sets a new UNITS component for an
     NDF axis.
 
   \item [\htmlref{CALC}{CALC}]  Evaluates a Fortran-like mathematical
@@ -49007,7 +49010,7 @@ The following applications have been modified:
             new PENS and MODE parameters.
 
             \item Vertical error bars can now be displayed if the
-            supplied NDF has a Variance component (see new parameter
+            supplied NDF has a VARIANCE component (see new parameter
             ERRBAR).
 
             \item If the display is not cleared (using parameter CLEAR),
@@ -49355,7 +49358,7 @@ other.  For instance, if \htmlref{CREFRAME}{CREFRAME} were used twice to
 create two small frames of Gaussian noise with no delay inbetween, then the
 resulting images could previously have been identical.  Another affected
 application is \htmlref{CENTROID}{CENTROID}; estimates of the variance of
-the centroid positionswill now be rather different because previous estimates 
+the centroid positions will now be rather different because previous estimates 
 were based on correlated random shifts.
 
 \item Several significant memory leaks have been fixed.
@@ -49403,8 +49406,8 @@ name is defined.
 \section{Release Notes---V0.15-9}
 
 More applications have been changed to enable them to make use
-of the NDF \htmlref{WCS}{apndf:wcs} component, which stores descriptions of world
-co-ordinate systems within NDF data structures.  More graphics 
+of the NDF \htmlref{WCS}{apndf:wcs} component, which stores descriptions
+of world co-ordinate systems within NDF data structures.  More graphics 
 applications have also been changed to use the STYLE parameter 
 system introduced in V0.13 to control the detailed appearance of
 the plot.  In some cases, these have involved major changes, 
@@ -49844,7 +49847,7 @@ The following applications have been modified:
    \item [\htmlref{CREFRAME}{CREFRAME}] \mbox{}
       \begin{itemize}
          \item Now produces an NDF data structure instead of an IMAGE
-         structure.  The NDF may include a Variance component.
+         structure.  The NDF may include a VARIANCE component.
          \item The Gaussian positions can now be saved in an output
          positions list using the new parameter OUTCAT.
          \item Parameter OUTPIC has been replaced by OUT.
@@ -50593,7 +50596,8 @@ The following applications have been modified:
    \item [\htmlref{SETVAR}{SETVAR}] \mbox{}
       \begin{itemize}
          \item Now provides the option to copy values from another NDF into 
-               the Variance component of the NDF being modified.
+         the \htmlref{VARIANCE}{apndf:variance}~ component of the NDF being 
+         modified.
       \end{itemize}
 
    \item [\htmlref{SLIDE}{SLIDE}] \mbox{}
@@ -51000,9 +51004,9 @@ functions as follows.
 \classitem{SETQUAL}
  Assigns a specified quality to selected pixels within an NDF.
 \classitem{SETTYPE}
- Sets a new numeric type for the data and variance components of an NDF.
+ Sets a new numeric type for the DATA and VARIANCE components of an NDF.
 \classitem{SETVAR}
- Sets new values for the variance component of an NDF data structure.
+ Sets new values for the VARIANCE component of an NDF data structure.
 \classitem{SHOWQUAL}
  Displays the named qualities stored in an NDF QUALITY component.
 \end{description}
