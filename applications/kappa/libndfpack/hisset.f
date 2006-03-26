@@ -24,7 +24,7 @@
 *     and can also erase the history information.
 *
 *     The level is called the history update mode and it is a permanent
-*     attribute of the history component of the NDF, and remains with
+*     attribute of the HISTORY component of the NDF, and remains with
 *     the NDF and any NDF created therefrom until the history is erased
 *     or the update mode is modified (say by this task).
 
@@ -70,7 +70,7 @@
 *        called test42, so that only brief information is recorded.
 
 *  Notes:
-*     -  A history component is created if it does not exist within the
+*     -  A HISTORY component is created if it does not exist within the
 *     NDF, except for MODE="Erase".
 *     -  The task records the new history update mode within the
 *     history records, even if MODE="Disabled" provided the mode has
@@ -124,7 +124,7 @@
       CHARACTER * ( MSG__SZMSG ) PROMPT ! Confirmation prompt string
       CHARACTER * ( NDF__SZHUM ) TEMP ! Temporary history update mode
       CHARACTER * ( NDF__SZHIS ) TEXT( 1 ) ! History text
-      LOGICAL THERE              ! History component present?
+      LOGICAL THERE              ! HISTORY component present?
 
 *.
 
@@ -139,7 +139,7 @@
      :                'Verbose,Normal,Quiet,Disabled,Erase', .FALSE.,
      :                NEW, STATUS )
 
-*  Check whether or not there is a history component present.
+*  Check whether or not there is a HISTORY component present.
       CALL NDF_STATE( INDF, 'History', THERE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -155,7 +155,7 @@
 *  Obtain confirmation.
                CALL PAR_GET0L( 'OK', OK, STATUS )
 
-*  If confirmation was given, then erase the history component.
+*  If confirmation was given, then erase the HISTORY component.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   IF ( OK ) THEN
                      CALL NDF_RESET( INDF, 'History', STATUS )
@@ -170,8 +170,8 @@
                END IF
             END IF
 
-*  If history component creation or modification is required, then
-*  ensure that a history component exists.
+*  If HISTORY component creation or modification is required, then
+*  ensure that a HISTORY component exists.
          ELSE
             IF ( .NOT. THERE ) THEN
                CALL NDF_HCRE( INDF, STATUS )

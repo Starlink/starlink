@@ -36,12 +36,12 @@
 *     replacement value is constrained to be non-negative.
 *
 *     Magic values are replaced by random values if the parameter SIGMA
-*     is given a non-zero value.  If both Data and Variance components
+*     is given a non-zero value.  If both DATA and VARIANCE components
 *     are being processed, then the random values are only stored in
-*     the Data component; a constant value equal to SIGMA squared is
-*     used to replace all magic values in the variance component.  If
-*     only a single component is being processed (whether it be Data,
-*     Variance, or Error), then the random values are used to replace
+*     the DATA component; a constant value equal to SIGMA squared is
+*     used to replace all magic values in the VARIANCE component.  If
+*     only a single component is being processed (whether it be DATA,
+*     VARIANCE, or Error), then the random values are used to replace
 *     the magic values.  If random values are generated which will not
 *     fit into the allowed numeric range of the output NDF, then they
 *     are discarded and new random values are obtained instead.  This
@@ -170,7 +170,7 @@
 *     3-SEP-2002 (DSB):
 *        Do not report an error if the input has no bad pixels.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     01-OCT-2004 (PWD):
 *        Moved CNF_PAR into declarations.
 *     {enter_further_changes_here}

@@ -399,7 +399,7 @@
 *        number 2 (i.e. dashed lines).
 *     display mode=fa axes style="^sty,grid=1" margin=0.2 clear 
 *             out=video \
-*        Displays the current NDF data component with annotated axes
+*        Displays the current NDF DATA component with annotated axes
 *        after clearing the current picture on the current graphics
 *        device. The appearance of the axes is specified in the text 
 *        file sty, but this is modified by setting the Grid attribute
@@ -409,11 +409,11 @@
 *        standard deviations of the image around its mean.  The scaled 
 *        data are stored in an NDF called video.
 *     display video noscale \
-*        Displays the data component of the NDF called video (created
+*        Displays the DATA component of the NDF called video (created
 *        in the previous example) without scaling within the current
 *        picture on the current graphics device.
 *     display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
-*        Displays the variance component of NDF cgs4a on the xwindows
+*        Displays the VARIANCE component of NDF cgs4a on the xwindows
 *        device, scaling between 1 and 5.2.
 *     display mydata centre="12:23:34 -22:12:23" xmagn=2 badcol="red" \
 *        Displays the NDF called mydata centred on the position 
@@ -439,9 +439,9 @@
 *     the image display.  Note that the default values for parameters
 *     LOW and HIGH are the minimum and maximum values in the compressed
 *     floating-point data.
-*     -  If no Title is specified via the STYLE parameter, then the Title
+*     -  If no Title is specified via the STYLE parameter, then the TITLE
 *     component in the NDF is used as the default title for the annotated 
-*     axes. If the NDF does not have a Title component, then the default 
+*     axes. If the NDF does not have a TITLE component, then the default 
 *     title is taken from current co-ordinate Frame in the NDF. If this
 *     has not been set explicitly, then the name of the NDF is used as the
 *     default title.

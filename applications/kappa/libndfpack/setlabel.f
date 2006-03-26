@@ -16,7 +16,7 @@
 *     CALL SETLABEL( STATUS )
 
 *  Description:
-*     This routine sets a new value for the label component of an
+*     This routine sets a new value for the LABEL component of an
 *     existing NDF data structure. The NDF is accessed in update mode
 *     and any pre-existing label is over-written with a new value.
 *     Alternatively, if a `null' value (!) is given for the LABEL
@@ -27,7 +27,7 @@
 
 *  ADAM Parameters:
 *     LABEL = LITERAL (Read)
-*        The value to be assigned to the NDF's label component. This
+*        The value to be assigned to the NDF's LABEL component. This
 *        should describe the type of quantity represented in the NDF's
 *        data array (e.g. "Surface Brightness" or "Flux Density"). The
 *        value may later be used by other applications, for instance to
@@ -42,14 +42,14 @@
 
 *  Examples:
 *     setlabel ngc1068 "Surface Brightness"
-*        Sets the label component of the NDF structure ngc1068 to be
+*        Sets the LABEL component of the NDF structure ngc1068 to be
 *        "Surface Brightness".
 *     setlabel ndf=datastruct label="Flux Density"
-*        Sets the label component of the NDF structure datastruct to be
+*        Sets the LABEL component of the NDF structure datastruct to be
 *        "Flux Density".
 *     setlabel raw_data label=!
 *        By specifying a null value (!), this example erases any
-*        previous value of the label component in the NDF structure
+*        previous value of the LABEL component in the NDF structure
 *        raw_data.
 
 *  Related Applications:

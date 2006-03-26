@@ -27,14 +27,14 @@
 *     current co-ordinate Frame of the input NDFs.
 *
 *     In array mode (SINGLE=FALSE), statistics are calculated for each
-*     pixel in one of the array components (Data, Variance or Quality)
+*     pixel in one of the array components (DATA, VARIANCE or QUALITY)
 *     accumulated over all the input NDFs and written to an output
 *     NDF; each pixel of the output NDF is a result of combination
 *     of pixels with the same Pixel co-ordinates in all the input NDFs.
-*     If SMODE="Mean" then the output NDF has a Data component giving
-*     the pixel averages of the input NDFs, and a Variance component
+*     If SMODE="Mean" then the output NDF has a DATA component giving
+*     the pixel averages of the input NDFs, and a VARIANCE component
 *     giving the variances.  If SMODE="Median", then the output NDF 
-*     has only a Data component, which gives the medians.  The data type
+*     has only a DATA component, which gives the medians.  The data type
 *     of the output arrays will be of a floating point type even if
 *     the input arrays were of an integer type.  The input NDFs 
 *     must all have the same number of dimensions, but need not all 
@@ -88,14 +88,14 @@
 *        a value is given which does not end with a minus sign. All the
 *        images given in this way are concatenated into a single group.
 *     MEAN = _DOUBLE (Write)
-*        An output parameter to which is written the mean pixel value, if
-*        SINGLE=TRUE.
+*        An output parameter to which is written the mean pixel value,
+*        if SINGLE=TRUE.
 *     MEDIAN = _DOUBLE (Write)
-*        An output parameter to which is written the median pixel value, if
-*        SINGLE=TRUE.
+*        An output parameter to which is written the median pixel value,
+*        if SINGLE=TRUE.
 *     OUT = NDF (Read)
 *        The name of an NDF to receive the results.  Each pixel of
-*        the Data (and perhaps Variance) component represents the
+*        the DATA (and perhaps VARIANCE) component represents the
 *        statistics of the corresponding pixels of the input NDFs.
 *        Only used if SINGLE=FALSE.
 *     POS = LITERAL (Read)
@@ -116,11 +116,11 @@
 *        The way in which the input arrays should be processed in order
 *        to generate the output NDF.  It may be "Mean" or "Median".
 *        If it is "Mean" (the default) then OUT will be an NDF in which
-*        the Data component gives the averages of the pixels of the 
-*        selected component of the input NDFs, and the Variance component 
+*        the DATA component gives the averages of the pixels of the 
+*        selected component of the input NDFs, and the VARIANCE component 
 *        gives their variances.  If it is "Median" then then OUT will 
-*        have a Data component giving the medians of the input pixels,
-*        and it will have no variance component.  ["Mean"]
+*        have a DATA component giving the medians of the input pixels,
+*        and it will have no VARIANCE component.  ["Mean"]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF.  ["KAPPA - Mstats"]
 *     TRIM = _LOGICAL (Read)
@@ -151,8 +151,8 @@
 *        each dimension.
 *     mstats idat* ostats comp=variance
 *        This does the same as the first example except that statistics
-*        are calculated on the Variance components of all the input
-*        NDFs.  Thus the pixels of the Variance component of "ostats" 
+*        are calculated on the VARIANCE components of all the input
+*        NDFs.  Thus the pixels of the VARIANCE component of "ostats" 
 *        will be the variances of the variances of the input data.
 *     mstats m31* single=true pos="0:42:38,40:52:20" 
 *        This example is analysing the pixel brightness at the indicated
@@ -166,7 +166,7 @@
 *        For those in which the pixel at the selected position is
 *        bad or falls outside the NDF, this is also indicated.
 *     mstats in="arr1,arr2,arr3" out=middle smode=median
-*        This example calculates the medians of the data components of
+*        This example calculates the medians of the DATA components of
 *        the three named NDFs and writes them into a new NDF called
 *        "middle".
 
@@ -182,7 +182,7 @@
 *     26-NOV-2001 (MBT):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes}
 
 *  Bugs:

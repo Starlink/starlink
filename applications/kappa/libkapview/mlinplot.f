@@ -32,7 +32,7 @@
 *     The data represented by each curve can be either a row or column
 *     (chosen using parameter ABSAXS) of any array component within the
 *     supplied NDF (see parameter COMP). Vertical error bars may be drawn if 
-*     the NDF contains a Variance component (see parameter ERRBAR). The 
+*     the NDF contains a VARIANCE component (see parameter ERRBAR). The 
 *     vertical axis of the plot represents array value (or the logarithm of 
 *     the array value - see parameter YLOG). The horizontal axis represents
 *     position, and may be annotated using an axis selected from the Current 
@@ -96,7 +96,7 @@
 *        The plotting device. [current graphics device]
 *     ERRBAR = _LOGICAL (Read)
 *        TRUE if vertical error bars are to be drawn. This is only
-*        possible if the NDF contains a Variance component, and parameter
+*        possible if the NDF contains a VARIANCE component, and parameter
 *        COMP is set to "Data". The length of the error bars (in terms of 
 *        standard deviations) is set by parameter SIGMA. The appearance
 *        of the error bars (width, colour, etc) can be controlled using
@@ -369,7 +369,7 @@
 *        and right edges of the main plot for each curve. The vertical
 *        position of these lines corresponds to the zero point for the
 *        corresponding curve. The right hand marker is annotated with the 
-*        curve label (see parameter LABELS). The appearance of these
+*        curve label (see parameter LABELS).  The appearance of these
 *        markers can be controlled using the parameter STYLE. [TRUE]
 
 *  Examples:
@@ -402,16 +402,16 @@
 *     mlinplot rcw3_b1 space=free offset=[0.,2.0E-4,4.0E-4,6.0E-4,0.1] \
 *        Plot the currently selected rows of the 2-dimensional NDF
 *        file, rcw3_b1. The base lines are set at 0.0 for the first row, 
-*        2.0E-4 for the second, 4.0E-4 for the third, 6.0E-4 for the fourth 
-*        and 0.1 for the fifth.
+*        2.0E-4 for the second, 4.0E-4 for the third, 6.0E-4 for the 
+*        fourth and 0.1 for the fifth.
 
 *  Notes:
-*     -  If no Title is specified via the STYLE parameter, then the Title
+*     -  If no Title is specified via the STYLE parameter, then the TITLE
 *     component in the NDF is used as the default title for the annotated 
-*     axes. If the NDF does not have a Title component, then the default 
-*     title is taken from current co-ordinate Frame in the NDF. If this
-*     has not been set explicitly, then the name of the NDF is used as the
-*     default title.
+*     axes.  If the NDF does not have a TITLE component, then the default 
+*     title is taken from current co-ordinate Frame in the NDF.  If this
+*     has not been set explicitly, then the name of the NDF is used as
+*     the default title.
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the 
 *     annotated axes, data plot, and optional key; a KEY picture to store 

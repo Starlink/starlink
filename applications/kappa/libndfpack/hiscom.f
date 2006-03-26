@@ -82,7 +82,7 @@
 *        records.
 
 *  Notes:
-*     -  A history component is created if it does not exist within the
+*     -  A HISTORY component is created if it does not exist within the
 *     NDF.  The width of the history record is 72 characters.
 *     -  An error will result if the current history update mode of the
 *     NDF is "Disabled", and no commentary is written.  Otherwise the
@@ -153,7 +153,7 @@
       CHARACTER * ( 132 ) PARBUF ! Comment record (length limited by
                                  ! parameter system)
       INTEGER PLINES             ! Number of lines in current paragraph
-      LOGICAL THERE              ! History component present?
+      LOGICAL THERE              ! HISTORY component present?
       LOGICAL WRAP               ! Wrap history?
 
 *.
@@ -178,10 +178,10 @@
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Check whether or not there is a history component present.
+*  Check whether or not there is a HISTORY component present.
          CALL NDF_STATE( INDF, 'History', THERE, STATUS )
 
-*  There can be no comment until the history component exists.
+*  There can be no comment until the HISTORY component exists.
          IF ( .NOT. THERE ) CALL NDF_HCRE( INDF, STATUS )
             
 *  Obtain the history update mode.

@@ -273,7 +273,7 @@
 *     with bad-pixel values.  Make a dummy NDF data array if there is
 *     no FITS array.  Convert IEEE data to their Vax representations.
 *     Create axis structures if there is axis data in the FITS header.
-*     Create the title and units components.
+*     Create the TITLE and UNITS components.
 *     -  If there is an extension immediately following set the flag
 *     to indicate that the record has been read and loop back to
 *     process the sub-file, otherwise loop to the next file number.
@@ -302,10 +302,10 @@
 
 *     -  For simple or group format FITS:
 *        -  IEEE floating point is supported.
-*        -  If BUNIT is present its value will appear as the NDF's units
-*        component.
+*        -  If BUNIT is present its value will appear as the NDF's
+*        UNITS component.
 *        -  If OBJECT is present its value will appear as the NDF's
-*        title component.
+*        TITLE component.
 *        -  If the BLANK item is present in the header, undefined pixels
 *        are converted from the BLANK value to Starlink-standard bad
 *        value during data conversion.

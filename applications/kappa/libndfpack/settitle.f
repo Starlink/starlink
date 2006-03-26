@@ -16,7 +16,7 @@
 *     CALL SETTITLE( STATUS )
 
 *  Description:
-*     This routine sets a new value for the title component of an
+*     This routine sets a new value for the TITLE component of an
 *     existing NDF data structure. The NDF is accessed in update mode
 *     and any pre-existing title is over-written with a new value.
 *     Alternatively, if a "null" value (!) is given for the TITLE
@@ -29,7 +29,7 @@
 *     NDF = NDF (Read and Write)
 *        The NDF data structure whose title is to be modified.
 *     TITLE = LITERAL (Read)
-*        The value to be assigned to the NDF's title component (e.g.
+*        The value to be assigned to the NDF's TITLE component (e.g.
 *        "NGC1068 with a B filter" or "Ice band in HD123456").  This
 *        value may later be used by other applications as a heading for
 *        graphs and other forms of display where the NDF's data values
@@ -41,14 +41,14 @@
 
 *  Examples:
 *     settitle ngc1068 "NGC1068 with a B filter"
-*        Sets the title component of the NDF structure ngc1068 to be
+*        Sets the TITLE component of the NDF structure ngc1068 to be
 *        "NGC1068 with a B filter".
 *     settitle ndf=myspec title="Ice band, short integration"
-*        Sets the title component of the NDF structure myspec to be
+*        Sets the TITLE component of the NDF structure myspec to be
 *        "Ice band, short integration".
 *     settitle dat123 title=!
 *        By specifying a null value (!), this example erases any
-*        previous value of the title component in the NDF structure
+*        previous value of the TITLE component in the NDF structure
 *        dat123.
 
 *  Related Applications:

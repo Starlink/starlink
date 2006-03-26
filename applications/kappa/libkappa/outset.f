@@ -69,7 +69,7 @@
 *        at pixel co-ordinates (13.5, 201.3) and has a diameter of 20 pixels. 
 *     outset neb1 nebm "15:23:43.2 -22:23:34.2" "10:0" inside comp=var
 *        This copies NDF "neb1" to "nebm", setting pixels bad in the
-*        VARIANCE array if they fall inside the specified circle. Assuming 
+*        variance array if they fall inside the specified circle. Assuming 
 *        the current co-ordinate Frame of neb1 is a SKY Frame describing RA 
 *        and DEC, the aperture is centred at RA 15:23:43.2 and 
 *        DEC -22:23:34.2, and has a diameter of 10 arc-minutes.

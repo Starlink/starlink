@@ -180,7 +180,7 @@
 *     UNITS = LITERAL (Write)
 *        The units of the NDF.
 *     VARIANCE = _LOGICAL (Write)
-*        Whether or not the NDF contains a VARIANCE array.
+*        Whether or not the NDF contains a variance array.
 *     WCS = _LOGICAL (Write)
 *        Whether or not the NDF has any WCS co-ordinate Frames, over
 *        and above the default GRID, PIXEL and AXIS Frames.

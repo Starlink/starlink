@@ -251,7 +251,7 @@
 *        NDFs have defined VARIANCE components.  If any of the supplied
 *        input NDFs do not have defined VARIANCE components, then no
 *        variances are copied.  Note, if a null input NDF is given then
-*        the corresponding output VARIANCE values are set bad. [TRUE]
+*        the corresponding output variance values are set bad. [TRUE]
 
 *  Examples:
 *     segment in1=m51a in2=m51b out=m51_comp incat1=coords mode=cat

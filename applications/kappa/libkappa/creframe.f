@@ -22,7 +22,7 @@
 *  Description:
 *     This application creates a 2-dimensional output NDF containing
 *     artificial data of various forms (see parameter MODE). The output 
-*     NDF can, optionally, have a Variance component describing the noise 
+*     NDF can, optionally, have a VARIANCE component describing the noise 
 *     in the Data array (see parameter VARIANCE), and additionally a 
 *     randomly generated pattern of bad pixels (see parameter BADPIX). 
 *     Bad columns or rows of pixels can also be generated 
@@ -129,7 +129,7 @@
 *        Upper pixel bounds of the output NDF. Only accessed if parameter 
 *        LIKE is set to null (!). 
 *     VARIANCE = _LOGICAL (Read)
-*        If TRUE, a Variance component is added to the output NDF
+*        If TRUE, a VARIANCE component is added to the output NDF
 *        representing the noise added to the field. If a null (!) value is
 *        supplied, a default is used which is TRUE for modes which include 
 *        noise, and FALSE for modes which do not include any noise. [!]
@@ -142,7 +142,7 @@
 *        be two bad columns added to the resulting data.  
 
 *  Implementation Status:
-*     - The Data and Variance components of the output NDF have a numerical
+*     - The DATA and VARIANCE components of the output NDF have a numerical
 *     type of "_REAL" (single precision floating point).
 *     - This routine does not assign values to any of the following 
 *     components in the output NDF: LABEL, UNITS, QUALITY, AXIS, WCS.

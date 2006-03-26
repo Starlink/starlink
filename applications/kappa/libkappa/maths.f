@@ -99,7 +99,7 @@
 *        global parameter.  In other cases, constants should normally be
 *        given literally as part of the expression, as in "IZ**2.77".
 *     QUICK = _LOGICAL (Read)
-*        Specifies the method by which values for the variance
+*        Specifies the method by which values for the VARIANCE
 *        component of the output NDF are calculated.  The algorithm used
 *        to determine these values involves perturbing each of the
 *        input NDF data arrays in turn by an appropriate amount, and
@@ -127,13 +127,13 @@
 *        than the corresponding LBOUND.  The number of values required
 *        is the number of pixel co-ordinate axes in the expression.
 *     UNITS = _LOGICAL (Read)
-*        Specifies whether the units component of the (alphabetically)
+*        Specifies whether the UNITS component of the (alphabetically)
 *        first input NDF or the template NDF will be propagated to the
 *        output NDF.  By default this component is not propagated since,
 *        in most cases, the units of the output data will differ from
 *        those of any of the input data structures.  In simple cases,
 *        however, the units may be unchanged, and this parameter then
-*        allows the units component to be preserved.  This parameter is
+*        allows the UNITS component to be preserved.  This parameter is
 *        ignored if the expression does not contain a token to at least
 *        one input NDF structure and LIKE=!.  [FALSE]
 *     VA-VZ = NDF (Read)
@@ -150,7 +150,7 @@
 *        The first would use just the variance array, whilst the second
 *        would read both data and variance arrays.
 *     VARIANCE = _LOGICAL (Read)
-*        Specifies whether values for the variance component of the
+*        Specifies whether values for the VARIANCE component of the
 *        output NDF should be calculated.  If this parameter is set to
 *        TRUE (the normal default), then output variance values will be
 *        calculated if any of the input NDFs contain variance
@@ -221,7 +221,7 @@
 
 *  Notes:
 *     -  The alphabetically first input NDF is regarded as the primary
-*     input dataset. NDF components whose values are not changed by
+*     input dataset.  NDF components whose values are not changed by
 *     this application will be propagated from this NDF to the output.
 *     The same propagation rules apply to the LIKE template NDF,
 *     except that the output NDF does have inherit any variance
@@ -269,7 +269,7 @@
 *     use of other applications (ADD, SUB, etc.) is therefore
 *     recommended, particularly if variance calculations are required.
 *
-*     The main value of the variance estimation algorithm used here
+*     The main value of the variance-estimation algorithm used here
 *     arises when the expression to be evaluated is too complicated, or
 *     too infrequently used, to justify the work of deriving a direct
 *     formula for the variance.  It is also of value when the data
@@ -294,7 +294,7 @@
 *     If output variance values are being calculated and the QUICK
 *     parameter is set to TRUE, then the execution time will be
 *     multiplied by an approximate factor (N+1), where N is the number
-*     of input NDFs which contain a variance component.  If QUICK is set
+*     of input NDFs which contain a VARIANCE component.  If QUICK is set
 *     to FALSE, then the execution time will be multiplied by an
 *     approximate factor (2N+1).
 

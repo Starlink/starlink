@@ -89,7 +89,7 @@
 *        the current Frame of the NDF.  
 *     CERROR = _LOGICAL (Read)
 *        If TRUE, errors in the centroided position will be calculated.
-*        The input NDF must contain a Variance component in order to 
+*        The input NDF must contain a VARIANCE component in order to 
 *        compute errors. [FALSE]
 *     COIN =  FILENAME (Read)
 *        Name of a text file containing the initial guesses at the 

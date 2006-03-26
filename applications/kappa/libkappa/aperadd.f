@@ -117,12 +117,12 @@
 *        divided by the square root of the number of good pixels in 
 *        the aperture.
 *     SIGTOTAL = _DOUBLE (Write)
-*        The standard deviation on the total data sum. Only created if If variances are
-*        available this is the RMS value of the standard deviations
-*        associated with each included pixel value. If variances are not
-*        available, it is the standard deviation of the pixel values
-*        divided by the square root of the number of good pixels in 
-*        the aperture.
+*        The standard deviation on the total data sum.  Only created if
+*        variances are available this is the RMS value of the standard 
+*        deviations associated with each included pixel value.  If 
+*        variances are not available, it is the standard deviation of 
+*        the pixel values divided by the square root of the number of 
+*        good pixels in the aperture.
 *     TOTAL = _DOUBLE (Write)
 *        The total of the pixel values within the aperture.
 *     USEAXIS = GROUP (Read)
