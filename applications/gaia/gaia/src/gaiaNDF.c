@@ -406,83 +406,41 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
    ndfNchnk( ndfid, MXPIX, &nchunk, &status );
 
    /*  Using the appropriate data type, access the NDF chunks and copy
-    *  data.
+    *  data. Use a macro to save repetition.
     */
+#define CHUNK_COPY(fromtype,totype)                                  \
+   fromtype *fromPtr;                                                \
+   totype *toPtr = *data;                                            \
+   for ( i = 1; i <= nchunk; i++ ) {                                 \
+      ndfChunk( ndfid, MXPIX, i, &chunkid, &status );                \
+      ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );\
+      fromPtr = (fromtype *)ptr[0];                                  \
+      for( j = 0; j < el; j++ ) {                                    \
+          *toPtr++ = (totype) *fromPtr++;                            \
+      }                                                              \
+   }                                                                 \
+
    if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
-      double *fromPtr;
-      double *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (double *)ptr[0];
-         for( j = 0; j < el; j++ ) {
-             *toPtr++ = *fromPtr++;
-         }
-      }
+       CHUNK_COPY(double, double)
    }
    else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
-      float *fromPtr;
-      float *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (float *)ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
+       CHUNK_COPY(float, float)
    }
    else if ( strncmp( dtype, "_INTEGER", 8 ) == 0 ) {
-      int *fromPtr;
-      int *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (int *)ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
+       CHUNK_COPY(int, int)
    }
-   else if ( strncmp( dtype, "_WORD", 5 ) == 0 ||
-               strncmp( dtype, "_UWORD", 6 ) == 0 ) {
-      unsigned short *fromPtr;
-      unsigned short *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned short *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
+   else if ( strncmp( dtype, "_WORD", 5 ) == 0 ) {
+       CHUNK_COPY(short, short)
+   }
+   else if ( strncmp( dtype, "_UWORD", 5 ) == 0 ) {
+       CHUNK_COPY(unsigned short, unsigned short)
    }
    else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
-
-      /*  Cannot represent this type, so mapping is to short */
-      unsigned char *fromPtr;
-      unsigned short *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned char *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = (unsigned short) *fromPtr++;
-         }
-      }
+      /*  Cannot display this type, so mapping is to short */
+      CHUNK_COPY(char, short)
    }
    else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
-
-      unsigned char *fromPtr;
-      unsigned char *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned char *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
+       CHUNK_COPY(unsigned char, unsigned char)
    }
 
    /* If an error occurred return an error message */
@@ -1240,7 +1198,7 @@ void *gaiaCloneMNDF( const void *handle )
  *  =============================================
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================
- * 
+ *
  *  These are the "cube" and "spectral" access routines.
  */
 
@@ -1279,7 +1237,7 @@ int gaiaSimpleCloseNDF( int *ndfid )
 /**
  * Query the data type of a component.
  */
-int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type, 
+int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type,
                        int type_length, char **error_mess )
 {
    int status = SAI__OK;
@@ -1298,9 +1256,9 @@ int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type,
 }
 
 /**
- * Query a character component (label, units, title). 
+ * Query a character component (label, units, title).
  */
-int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value, 
+int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value,
                        int value_length, char **error_mess )
 {
    int status = SAI__OK;
