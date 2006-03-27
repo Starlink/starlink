@@ -114,10 +114,17 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *fwconfig; /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
+   double *pd;          /* Pointer to next element of data array */
+   double *peakvals;    /* Pointer to array holding clump peak values */
+   double mindip;       /* Minimum dip between distinct peaks */
+   double minhgt;       /* Min allowed height for a clump peak */
+   double noise;        /* Background data value */
+   double pv;           /* Pixel value */
+   float *pf;           /* Pointer to next element of data array */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
    int *ipa;            /* Pointer to clump assignment array */
-   int *nrem;           /* Pointer to array marking out edge pixels */
+   int *nrem;           /* Pointer to array holding clump populations */
    int *pa;             /* Pointer to next element of the ipa array */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
@@ -128,6 +135,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int maxid;           /* Largest id for any peak (smallest is zero) */
    int minpix;          /* Minimum total size of a clump in pixels */
    int nclump;          /* Number of clumps found */
+   int nlow;            /* Number of clumps with low peaks */
+   int nsmall;          /* Number of clumps with too few pixels */
    int skip[3];         /* Pointer to array of axis skips */
 
 /* Initialise */
@@ -197,6 +206,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    clump. */
    nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
 
+/* Allocate an array used to store the peak value in every clump. */
+   peakvals = astMalloc( sizeof( double )*( maxid + 1 ) );
+
 /* Determine the bounding box of every clump. First allocate memory to
    hold the bounding boxes. */
    clbnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
@@ -206,9 +218,23 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the minimum allowed number of pixels in a clump. */
       minpix = cupidConfigI( fwconfig, "MINPIX", 16 );
 
+/* Get the lowest data value to be considered. */
+      noise = cupidConfigD( config, "NOISE", 2.0*rms );
+
+/* Get the minimum dip between two adjoining peaks necessary for the two
+   peaks to be considered distinct. */
+      mindip = cupidConfigD( config, "MINDIP", 2.0*rms );
+
+/* Get the lowest allowed clump peak value. */
+      minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise );
+
 /* Initialise a list to hold zero for every clump id. These values are
-   used to count the number of pixels remaining in each clump. */
-      for( i = 0; i <= maxid; i++ ) nrem[ i ] = 0;
+   used to count the number of pixels remaining in each clump. Also
+   initialise the peak values to a very negative value. */
+      for( i = 0; i <= maxid; i++ ) {
+         nrem[ i ] = 0;
+         peakvals[ i ] = VAL__MIND;
+      }
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
@@ -217,16 +243,32 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Loop round every pixel in the final pixel assignment array. */
+      if( type == CUPID__DOUBLE ) {
+         pd = (double *) ipd;
+      } else {
+         pf = (float *) ipd;
+      }
       pa = ipa;
       for( iz = 1; iz <= dims[ 2 ]; iz++ ){
          for( iy = 1; iy <= dims[ 1 ]; iy++ ){
             for( ix = 1; ix <= dims[ 0 ]; ix++, pa++ ){
+
+/* Get the data value at this pixel */
+               if( type == CUPID__DOUBLE ) {
+                  pv = *(pd++);
+               } else {
+                  pv = (double) *(pf++);
+               }
 
 /* Skip pixels which are not in any clump. */
                if( *pa >= 0 ) {
 
 /* Increment the number of pixels in this clump. */
                   ++( nrem[ *pa ] );
+
+/* If this pixel value is larger than the current peak value for this
+   clump, record it. */
+                  if( pv > (double) peakvals[ *pa ] ) peakvals[ *pa ] = pv;
 
 /* Get the index within the clbnd and cubnd arrays of the current bounds
    on the x axis for this clump. */
@@ -254,8 +296,16 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Loop round creating an NDF describing each clump with more than "minpix"
    pixels, counting them. */
+      nsmall = 0;
+      nlow = 0;
       for( i = 0; i <= maxid; i++ ) {
-         if( nrem[ i ] > minpix ) {
+         if( nrem[ i ] <= minpix ) {
+            nsmall++;
+
+         } else if( peakvals[ i ] < minhgt ) {
+            nlow++;
+
+         } else {
             ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
                                  i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
          }
@@ -271,6 +321,20 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             msgSeti( "N", nclump );
             msgOut( "", "^N usable clumps found", status );
          }
+         if( ilevel > 1 ) {
+            if( nsmall == 1 ){
+               msgOut( "", "One clump rejected because it contains too few pixels", status );
+            } else {
+               msgSeti( "N", nsmall );
+               msgOut( "", "^N clumps rejected because they contain too few pixels", status );
+            }
+            if( nlow == 1 ){
+               msgOut( "", "One clump rejected because its peak is too low", status );
+            } else {
+               msgSeti( "N", nlow );
+               msgOut( "", "^N clumps rejected because the peaks are too low", status );
+            }
+         }        
          msgBlank( status );
       }         
 
@@ -290,6 +354,8 @@ L10:;
 /* Free resources */
    fwconfig = astAnnul( fwconfig );
    ipa = astFree( ipa );
+   nrem = astFree( nrem );
+   peakvals = astFree( peakvals );
 
 /* Return the list of clump NDFs. */
    return ret;

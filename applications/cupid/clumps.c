@@ -472,10 +472,14 @@ void clumps() {
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
 *     than this value, then the peaks are considered to be part of the
 *     same clump. [2.0*RMS]
+*     - FellWalker.MinHeight: If the peak value in a clump is less than
+*     this value then the clump is not included in the returned list of 
+*     clumps. The default value is equal to the sum of the values used for 
+*     MinDip and Noise. []
 *     - FellWalker.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
-*     as real clumps. [4]
+*     as real clumps. [16]
 *     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
 *     local maximum which is checked for higher pixel values. The
 *     neighbourhood checked is  square or cube with side equal to twice the
@@ -812,7 +816,8 @@ void clumps() {
 /* See if an output NDF is to be created. If not, annull the error. If so,
    map the data array. */
       ipo = NULL;
-      ndfProp( indf, "AXIS,WCS,QUALITY", "OUT", &indf2, status );
+      ndfProp( indf, "AXIS,WCS,QUALITY,NOEXTENSION(CUPID)", "OUT", &indf2, 
+               status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
 

@@ -6,6 +6,7 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+
 Changes introduced at V0.0-4:
 
  - The FellWalker algorithm algorithm has been changed so that the
@@ -20,6 +21,12 @@ Changes introduced at V0.0-4:
  adjoing peaks from being merged is given by a new configuration parameter 
  called FellWalker.MinDip. This reduces the number of distinct clumps 
  typically identified by the FellWalker algorithm.
+
+ - The FellWalker algorithm algorithm has been changed so that only those
+ clumps which have a peak data value above a specified value are accepted.
+ The limiting data value is specified by the new configuration parameter 
+ FellWalker.MinHeight.
+
 
 Changes introduced at V0.0-3:
 
