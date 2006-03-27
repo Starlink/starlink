@@ -39,12 +39,27 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     pixels which were traversed in following the route to this peak are 
 *     assigned to the same clump. If the peak has not yet been assigned to a
 *     clump, then it, and all the traversed pixels, are assigned to a new
-*     clump. If the route commences with a low gradient section (average
-*     gradient lower than a given value) then the initial section of the
-*     route (up to the point where the gradient exceeds the low gradient 
-*     limit) is not assigned to the clump, but is instead given a special
-*     value which prevents the pixels being re-used as the start point
-*     for a new "walk".
+*     clump. If the route commences at "sea level" and starts with a low 
+*     gradient section (average gradient lower than a given value) then 
+*     the initial section of the route (up to the point where the gradient 
+*     exceeds the low gradient limit) is not assigned to the clump, but is 
+*     instead given a special value which prevents the pixels being re-used 
+*     as the start point for a new "walk".
+*
+*     If the high data values in a clump form a plateau with slight
+*     undulations, then the above algorithm may create a separate clump
+*     for each undulation. This is probably inappropriate, especially if
+*     the  dips between the undulations are less than or are comparable to 
+*     the noise level in the data. This situation can arise for instance
+*     if the pixel-to-pixel noise is correlated on a scale equal to or
+*     larger than the value of the MaxJump configuration parameter. To
+*     avoid this, adjoining clumps are merged together if the dip between
+*     them is less than a specified value. Specifically, if two clumps
+*     with peak values PEAK1 and PEAK2, where PEAK1 is less than PEAK2, 
+*     are adjacent to each other, and if the pixels along the interface 
+*     between the two clumps all have data values which are larger than 
+*     "PEAK1 - MinDip" (where MinDip is the value of the MinDip
+*     configuration parameter), then the two clumps are merged together.
 
 *  Parameters:
 *     type

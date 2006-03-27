@@ -469,6 +469,9 @@ void clumps() {
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
 *     be included in the clump. [1.0*RMS]
+*     - FellWalker.MinDip: If the dip between two adjacent peaks is less
+*     than this value, then the peaks are considered to be part of the
+*     same clump. [2.0*RMS]
 *     - FellWalker.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 

@@ -6,6 +6,21 @@
  and  analyse clumps of emission within 2- or 3- dimensional 
  data arrays.
 
+Changes introduced at V0.0-4:
+
+ - The FellWalker algorithm algorithm has been changed so that the
+ initial flat section of a walk is only ignored if the walk starts at or
+ close to the background level. This fixes a problem in which pixels with
+ a large data value (well above the background level) were not assigned to 
+ any clump if they occurred within a flat area between higher peaks.
+
+ - The FellWalker algorithm has been modified so that neighbouring clumps
+ are merged together into a single clump unless there is a significant dip
+ between the peaks of the clumps. The depth of the dip needed to prevent 
+ adjoing peaks from being merged is given by a new configuration parameter 
+ called FellWalker.MinDip. This reduces the number of distinct clumps 
+ typically identified by the FellWalker algorithm.
+
 Changes introduced at V0.0-3:
 
  - The reporting of the current configuration at the end of the CLUMPS

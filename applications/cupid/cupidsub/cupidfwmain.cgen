@@ -36,11 +36,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *     traversed in following the route to this peak are assigned to that same 
 *     clump. If the peak has not yet been assigned to a clump, then it, and 
 *     all the traversed pixels, are assigned to a new clump. If the route 
-*     commences with a low gradient section (average gradient lower than a 
-*     given value) then the initial section of the route (up to the point 
-*     where the gradient exceeds the low gradient limit) is not assigned to 
-*     the clump, but is instead flag as "unusable" to prevent other
-*     routes using them.
+*     commences at "sea level" and starts with a low gradient section (average 
+*     gradient lower than a given value) then the initial section of the route 
+*     (up to the point where the gradient exceeds the low gradient limit) is 
+*     not assigned to the clump, but is instead flag as "unusable" to prevent 
+*     other routes using them.
 
 *  Parameters:
 *     array
@@ -66,7 +66,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        algorithm.
 *     ipa
 *        Pointer to the array to receive the index of the clump to which
-*        each data pixel isassigned. 
+*        each data pixel is assigned. The lowest clump index is 0. Pixels
+*        not in a clump are assigned -1.
 
 *  Returned Value:
 *     The largest clump index stored in "ipa" on return.
@@ -94,10 +95,12 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Local Variables: */
    CGEN_TYPE *pd;  /* Pointer to next "array" value */
+   double *peak_values; /* Pointer to array holding peak value in each clump */
    double flat[ 4 ];/* Array containing most recent data values along route */
    double flat_slope;/* Lowest gradient which marks the start of the walk */
    double g;       /* Gradient from central pixel to neighbouring pixel */
    double h;       /* Pixel data value (i.e. "height" of a pixel) */
+   double sea_level;/* Data values less than this are at "sea level" */
    double maxg;    /* Maximum gradient found so far */
    double noise;   /* Data value at which each route commences */
    int *m1;        /* Pointer to input array */
@@ -175,6 +178,12 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    assigned to any clump. */
    flat_slope = cupidConfigD( config, "FLATSLOPE", rms );
 
+/* Walks which start at low level are ignored until they achieve the
+   gradient specified by FLATSLOPE. Walks which start at high level are
+   used in their entirety. Store the data value which marks the break
+   between high and low level. */
+   sea_level = noise + 2*rms;
+
 /* Fill the supplied "ipa" array with -1 for all pixels which are below the
    threshold, are bad, or are at the edge of the array. Fill all other
    pixels with zero to indicate that the pixel is "usable but not yet 
@@ -227,6 +236,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
       nsz = ( ndim > 2 ) ? maxjump : 0;
       nsy = ( ndim > 1 ) ? maxjump : 0;
       nsx = maxjump;
+
+/* Initialise the pointer to an array holding the peak value in every clump. */
+      peak_values = NULL;
       
 /* Scan through the "work" array, looking for usable pixels which have not
    yet been assigned to a clump (i.e. have a value of zero in "work"). */
@@ -254,13 +266,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    to one, and then loop until we have reached the peak. Whilst walking, we 
    initially keep a record of the average gradient over the last 4 steps. 
    We count how many steps we travel before we encounter an average gradient 
-   above the gradient limit. */
+   above the gradient limit. However, this initial flat section is only
+   ignored if the walk starts from "sea level". Walks which start at a
+   higher altitude are used in their entirety. */
                   route[ 0 ] = iv;
                   route_length = 1;
 
                   nflat = 0;                  
                   iflat = 0;
-                  got_flat = 0;
+
+                  got_flat = ( (double) array[ iv ] > sea_level );
 
                   while( clump_index == -1 ) {         
 
@@ -433,7 +448,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    the new clump index. */
                      if( iv == nv ) {
                         clump_index = work[ iv ];
-                        if( clump_index < 1 ) clump_index = ++ret;
+                        if( clump_index < 1 ) {
+                           clump_index = ++ret;
+                           peak_values = astGrow( peak_values, ret + 1,
+                                                  sizeof( double ) );
+                        }
+
+/* Update the peak value in the clump */
+                        if( astOK ) {
+                           peak_values[ clump_index ] = (double) array[ iv ];
+                        }
 
 /* Otherwise, if the next pixel on the route is already assigned to a
    clump, we now know what peak we are heading towards so use that clump 
@@ -491,7 +515,13 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    "ipa" array. */
    if( m2 != ipa ) memcpy( ipa, m2, sizeof( int )*nel );
 
+/* Amalgamate adjoining clumps if there is no significant dip between the
+   clumps. */
+   CGEN_FUNCTION(cupidFWJoin)( array, nel, ndim, dims, skip, rms, config, 
+                               ipa, peak_values, &ret );
+
 /* Free resources. */
+   peak_values = astFree( peak_values );
    work = astFree( work );
    route = astFree( route );
 

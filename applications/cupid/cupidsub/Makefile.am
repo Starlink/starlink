@@ -6,7 +6,7 @@ cupidgcsetinit.cgen cupidgcupdatearrays.cgen cupidgcfit.cgen \
 cupidgcprofwidth.cgen cupidgcdump.cgen cupidsumclumps.cgen \
 cupidcfscan.cgen cupidcfclump.cgen \
 cupidrcheckface.cgen cupidrcopyline.cgen cupidrinitedges.cgen \
-cupidfwmain.cgen cupidndfclump.cgen
+cupidfwmain.cgen cupidndfclump.cgen cupidfwjoin.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)

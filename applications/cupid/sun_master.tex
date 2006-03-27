@@ -880,7 +880,11 @@ In some cases, the initial part of a walk may be over very flat
 ``terrain''. The significant part of a walk is considered to start when
 the average gradient (taken over a 4 step length) first reaches the value
 of configuration parameter FlatSlope. Any pixels visited prior to this point
-are deemed not to be in any clump.
+are deemed not to be in any clump. However, this only applies if the
+walk starts at or close to ``sea level''. For walks which start from a 
+higher level (\emph{i.e.} from a pixel which has a data value greater than 
+the selected background level plus twice the RMS noise level), the entire
+length of the walk is used, including any initial flat section.
 
 Once all pixels in the data array have been considered as potential
 starts for such a walk, an array will have been created which holds an
@@ -889,10 +893,26 @@ noise on the boundaries between clumps, a cellular automata can be used
 to smooth the boundaries. This replaces each clump identifier by the most
 commonly occurring value within a 3x3 square (or 3x3x3 cube for 3D data)
 of neighbours. The number of times which this cleaning process should be
-applied is specified by configuration parameter CleanIter. The results of 
-this cleaning process are the final clump allocations for every data pixel, 
-from which the catalogue of clump parameters is produced.
+applied is specified by configuration parameter CleanIter. 
 
+If the high data values in a clump form a plateau with slight
+undulations, then the above algorithm may create a separate clump for
+each undulation. This is probably inappropriate, especially if the dips
+between the undulations are less than or are comparable to the noise
+level in the data. This situation can arise for instance if the
+pixel-to-pixel noise is correlated on a scale equal to or larger than the
+value of the MaxJump configuration parameter. To avoid this, adjoining
+clumps are merged together if the dip between them is less than a
+specified value. Specifically, if two clumps with peak values PEAK1 and
+PEAK2, where PEAK1 is less than PEAK2, are adjacent to each other, and if
+the pixels along the interface between the two clumps all have data
+values which are larger than ``PEAK1 - MinDip'' (where MinDip is the
+value of the MinDip configuration parameter), then the two clumps are
+merged together.
+
+The results of this merging process are the final clump allocations for
+every data pixel, from which the catalogue of clump parameters is
+produced.
 
 \newpage
 \appendix
