@@ -845,7 +845,7 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 	    # results, and the version is kept in special file).
 	
 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
+		system=MP-RAS-`awk '{print $3}' /etc/.relid`
 	    fi
 	    if test "`uname -s`" = "AIX" ; then
 		system=AIX-`uname -v`.`uname -r`
@@ -1194,9 +1194,9 @@ dnl AC_CHECK_TOOL(AR, ar)
 	    # is kind of overkill but it works.
 	    # Disable inlining only when one of the
 	    # files in compat/*.c is being linked in.
-	    if test x"${LIBOBJS}" != x ; then
-	        CFLAGS="$CFLAGS -fno-inline"
-	    fi
+	    #if test x"${LIBOBJS}" != x ; then
+	    #    CFLAGS="$CFLAGS -fno-inline"
+	    #fi
 
 	    # XIM peeking works under XFree86.
 	    AC_DEFINE(PEEK_XCLOSEIM)
@@ -2250,7 +2250,7 @@ AC_DEFUN(SC_BLOCKING_STYLE, [
 	    # results, and the version is kept in special file).
 	
 	    if test -r /etc/.relid -a "X`uname -n`" = "X`uname -s`" ; then
-		system=MP-RAS-`awk '{print $3}' /etc/.relid'`
+		system=MP-RAS-`awk '{print $3}' /etc/.relid`
 	    fi
 	    if test "`uname -s`" = "AIX" ; then
 		system=AIX-`uname -v`.`uname -r`
