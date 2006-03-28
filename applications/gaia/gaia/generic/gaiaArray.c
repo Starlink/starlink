@@ -22,10 +22,15 @@
  */
 #include <sys/types.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <gaiaArray.h>
 #include <prm_par.h>
 #include <cnf.h>
+
+#define MIN(a,b) ( (a) < (b) ? (a) : (b) )
+#define MAX(a,b) ( (a) > (b) ? (a) : (b) )
+
 
 /**
  * Convert an HDS data type into a local enum value. Returns HDS_UNKNOWN if
@@ -167,7 +172,7 @@ void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
  *     inPtr
  *         Pointer to the cube.
  *     type
- *         The data type (HDS_?).
+ *         The data type (one of the HDS_? enums).
  *     dims[3]
  *         The dimensions of the cube.
  *     axis
@@ -327,6 +332,9 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
  *     axis
  *         The axis that will be extracted. One of 0, 1, 2. Extracting from
  *         the first axis is fastest.
+ *     arange[2]
+ *         A range (lower and upper indices) along axis for the extraction,
+ *         NULL if whole of axis is to be returned.
  *     index1
  *     index2
  *         The indices of the spectrum to extract (these are along the two
@@ -337,37 +345,91 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
  *     outPtr
  *         a pointer to a pointer that will point at the extracted spectrum on
  *         exit. This memory is allocated using malloc or cnfMalloc as
- *         determined by the final argument. Freeing it is the responsibility
- *         of the caller.
- *     nel 
+ *         determined by the cnfMalloc argument. Freeing it is the
+ *         responsibility of the caller, or you can call gaiaArrayFree.
+ *     nel
  *         the number of elements extracted
+ *
+ *  Notes:
+ *     If the spectrum isn't within the array bounds then an empty spectrum
+ *     (full of zeros) will be returned.
  */
 void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
-                                int axis, int index1, int index2,
-                                int cnfmalloc, void **outPtr, int *nel )
+                                int axis, int arange[2], int index1,
+                                int index2, int cnfmalloc, void **outPtr,
+                                int *nel )
 {
-    if ( axis == 0 ) {
+    size_t length;
+    int outside = 0;
+    int upper;
+    int lower;
+
+    /* Allocate memory for spectrum. Only need "arange" spanning values when
+     * that is set. */
+    if ( arange == NULL ) {
+        lower = 0;
+        upper = dims[axis];
+        *nel = (size_t) dims[axis];
+    }
+    else {
+        lower = MAX( 0,          MIN( arange[0], arange[1] ) );
+        upper = MIN( dims[axis], MAX( arange[1], arange[0] ) );
+        if ( lower == upper ) {
+            upper++;
+        }
+        *nel = upper - lower;
+    }
+    length = *nel * gaiaArraySizeOf( type );
+    if ( cnfmalloc == 1 ) {
+        *outPtr = cnfMalloc( length );
+    }
+    else {
+        *outPtr = malloc( length );
+    }
+
+    /* Check bounds. */
+    if ( index1 < 0 || index2 < 0 ) {
+        outside = 1;
+    }
+    else {
+        if ( axis == 0 ) {
+            if ( index1 > dims[1] || index2 > dims[2] ) {
+                outside = 1;
+            }
+        }
+        else if ( axis == 1 ) {
+            if ( index1 > dims[0] || index2 > dims[2] ) {
+                outside = 1;
+            }
+        }
+        else if ( axis == 2 ) {
+            if ( index1 > dims[0] || index2 > dims[1] ) {
+                outside = 1;
+            }
+        }
+    }
+
+    if ( outside ) {
+
+        /* Out of bounds, so return empty spectrum */
+        memset( *outPtr, 0, length );
+    }
+    else if ( axis == 0 ) {
 
         /* If we're extracting from the first dimension then this is just a
-         * memcpy. */
+         * memcpy of a contiguous piece of memory. */
         char *ptr;
         int strides[3];
-        size_t length;
         size_t offset;
 
-        *nel = (size_t) dims[axis];
-        length = *nel * gaiaArraySizeOf( type );
-
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
-        }
-
-        /* Get the offset into cube of first pixel */
+        /* Get the offset into cube of first pixel on the line. */
         gaiaArrayGetStrides( 3, dims, strides );
         offset = (size_t) strides[1] * index1 + (size_t) strides[2] * index2;
+
+        /* Correct for arange offset. */
+        offset += lower;
+
+        /* Set the address of first pixel. */
         ptr = ((char *) inPtr) + offset;
 
         /* And copy the memory */
@@ -376,21 +438,17 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
     else {
 
         /* Noncontiguous memory, so need to pick it out pixel by pixel */
-        int axis1;
-        int axis2;
         int i;
         int indices[3];
         int j;
         int k;
-        int l;
         int offset;
         int strides[3];
-        size_t length;
 
-        /* Get the strides for stepping around dimensions */
+        /* Get the strides for stepping around cube with these dimensions. */
         gaiaArrayGetStrides( 3, dims, strides );
 
-        /* Set up indices to select the spectrum */
+        /* Set up indices to select the spectral line. */
         indices[0] = index1;
         if ( axis == 1 ) {
             indices[1] = 0;
@@ -401,31 +459,20 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
             indices[2] = 0;
         }
 
-        /* Allocate the memory */
-        *nel = (size_t) dims[axis];
-        length = *nel * gaiaArraySizeOf( type );
-
-        if ( cnfmalloc == 1 ) {
-            *outPtr = cnfMalloc( length );
-        }
-        else {
-            *outPtr = malloc( length );
-        }
-
         /* Copy the spectrum, use type switch to keep pointer arithmetic
-         * simple. Use macro to define repeated code. */
-#define EXTRACT_AND_COPY(type)                  \
-{                                               \
-    type *fromPtr = (type *) inPtr;             \
-    type *toPtr = (type *) *outPtr;             \
-    for ( i = 0; i < *nel; i++ ) {                \
-        offset = 0;                             \
-        indices[axis] = i;                      \
-        for ( j = 0; j < 3; j++ ) {             \
-            offset += strides[j] * indices[j];  \
-        }                                       \
-        toPtr[i] = fromPtr[offset];             \
-    }                                           \
+         * simple and a macro to define repeated code. */
+#define EXTRACT_AND_COPY(type)                      \
+{                                                   \
+    type *fromPtr = (type *) inPtr;                 \
+    type *toPtr = (type *) *outPtr;                 \
+    for ( k = 0, i = lower; i < upper; k++, i++ ) { \
+        offset = 0;                                 \
+        indices[axis] = i;                          \
+        for ( j = 0; j < 3; j++ ) {                 \
+            offset += strides[j] * indices[j];      \
+        }                                           \
+        toPtr[k] = fromPtr[offset];                 \
+    }                                               \
 }
         switch ( type )
         {
@@ -479,5 +526,18 @@ void gaiaArrayGetStrides( int ndims, int dims[], int strides[] )
     for ( i = 0; i < ndims; i++ ) {
         strides[i] = count;
         count *= dims[i];
+    }
+}
+
+/**
+ * Free data previously allocated by these routines.
+ */
+void gaiaArrayFree( void *ptr, int cnfMalloc )
+{
+    if ( cnfMalloc ) {
+        cnfFree( ptr );
+    }
+    else {
+        free( ptr );
     }
 }
