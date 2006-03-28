@@ -13,8 +13,8 @@
 #     that don't have 2 dimensions. Superficially it is datatype independent,
 #     supporting access to NDF and FITS data, relying on the ndf:: and
 #     fits:: (too be written) Tcl commands. Sections of the data can be
-#     generated for passing into GAIA/Skycat for display as images and
-#     spectra.
+#     directly extracted from cubes for passing into GAIA/Skycat for display
+#     as images and spectra. 
 
 #  Invocations:
 #
@@ -92,11 +92,13 @@ itcl::class gaia::GaiaNDAccess {
       $namer_ configure -imagename $dataset
       if { "[$namer_ type]" == ".sdf" } {
          set type_ "ndf"
+         set cnfmap_ 1
       } else {
          set type_ "fits"
          error {Cannot access FITS files that are not 2D. \
                 You should convert this file to an NDF first using the \
                 ndf2fits command in the CONVERT package.}
+         set cnfmap_ 0
       }
       
       #  Open the dataset.
@@ -118,12 +120,17 @@ itcl::class gaia::GaiaNDAccess {
          set addr_ 0
          set nel_ 0
          set hdstype_ {}
+         set cnfmap_ 0
+         set dims_ {}
       }
    }
 
    #  Get the dimensions of the full data. Returns a list of integers.
    public method dims {} {
-      return [${type_}::dims $handle_]
+      if { $dims_ == {} } {
+         set dims_ [${type_}::dims $handle_]
+      }
+      return $dims_
    }
 
    #  Get the pixel ranges/bounds of the full data. Returns pairs of
@@ -159,9 +166,32 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Return a WCS describing the coordinates of a given WCS axis. Note axes
    #  may or may not be fixed to a given dataset axis, that isn't worried
-   #  about here.
-   public method getwcs {axis} {
-      return [${type_}::getwcs $handle_ $axis]
+   #  about here. The shift value is used when an offset in grid position
+   #  along the axis is required (set to 0 for no effect). Usually this will
+   #  be the alow value used in a call to getspectrum.
+   public method getaxiswcs {axis shift} {
+      return [${type_}::getwcs $handle_ $axis $shift]
+   }
+
+   #  Return the address of a spectral line of data. This will only 
+   #  work for cubes and requires that the complete data are mapped first. 
+   #  The axis is the spectral axis along which the line will be extracted.
+   #  The alow and ahigh values define a range along the axis to extract (-1
+   #  for end points). The p1 and p2 positions, are array coordinates of the
+   #  spectrum along  the other two dimensions (increasing dimension order).
+   public method getspectrum {axis alow ahigh p1 p2} {
+      if { $addr_ != {} } {
+         set dims_ [dims]
+         lassign [eval "array::getspectrum $addr_ $hdstype_ $dims_ $axis \
+                     $alow $ahigh $p1 $p2 $cnfmap_"] adr nel
+         return "$adr $nel $hdstype_"
+      }
+   }
+
+   #  Free data allocated by any of the get methods (spectra and image
+   #  sections).
+   public method release {adr} {
+      array::release $adr $cnfmap_
    }
 
    #  Configuration options: (public variables)
@@ -183,6 +213,9 @@ itcl::class gaia::GaiaNDAccess {
    #  Data access type, one of "ndf" or "fits".
    protected variable type_ {}
 
+   #  The dimensionality of the data (list).
+   protected variable dims_ {}
+
    #  The handle to the opened dataset. NDF or FITS identifier.
    protected variable handle_ {}
 
@@ -194,6 +227,10 @@ itcl::class gaia::GaiaNDAccess {
 
    #  The HDS data type of the dataset data.
    protected variable hdstype_ {}
+
+   #  Whether mapped data should be registered with CNF (required for some
+   #  NDF actions).
+   protected variable cnfmap_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
