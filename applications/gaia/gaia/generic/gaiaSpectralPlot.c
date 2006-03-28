@@ -383,7 +383,6 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                      int objc, Tcl_Obj *CONST objv[] )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-    char *typePtr;
     char *optionPtr;
     double *dataPtr;
     int i;
@@ -507,19 +506,18 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
 
-        /* Check if data has no range, in that case just add +/- 1, so we canb
+        /* Check if data has no range, in that case just add +/- 1, so we can
          * plot something. During interactive updates that's better than
          * throwing an error. */
-        if ( spPtr->ymin == spPtr->ymax ) {
-            if ( spPtr->ymin == spPtr->badvalue ) {
-                /* All bad */
-                spPtr->ymin = -1.0;
-                spPtr->ymax =  1.0;
-            }
-            else {
-                spPtr->ymin -= 1.0;
-                spPtr->ymax += 1.0;
-            }
+        if ( spPtr->ymin == spPtr->ymax ) { 
+            /* No range */
+            spPtr->ymin -= 1.0;
+            spPtr->ymax += 1.0;
+        }
+        else if ( spPtr->ymin == DBL_MAX ) {
+            /* All bad */
+            spPtr->ymin = -1.0;
+            spPtr->ymax =  1.0;
         }
 
     }
@@ -544,9 +542,7 @@ static int SPConfigure( Tcl_Interp *interp, Tk_Canvas canvas,
 {
     SPItem *spPtr = (SPItem *) itemPtr;
     Tk_Window tkwin;
-    Tk_Item *header;
     Tk_ConfigSpec *specPtr;
-    int i;
 
 #if DEBUG
     fprintf( stderr, "SPConfigure() \n" );
@@ -636,18 +632,12 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                        int height )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
-    Tk_Window tkwin;
     double basebox[4];
     double xin[2];
     double xout[2];
     double yin[2];
     double yout[2];
     float graphbox[4];
-    int i;
-    int iheight;
-    int iwidth;
-    int ixo;
-    int iyo;
     int xborder;
     int yborder;
 
@@ -1063,6 +1053,7 @@ static int CanvasTagsParseProc( ClientData clientData, Tcl_Interp *interp,
     strcat( spPtr->tagPtr, " " );
     strcat( spPtr->tagPtr, value );
     Tk_CanvasTagsParseProc(clientData, interp, tkwin, value, widgRec, offset);
+    return TCL_OK;
 }
 
 /**
@@ -1102,7 +1093,6 @@ static char *FrameSetPrintProc( ClientData clientData, Tk_Window tkwin,
                                 char *widgRec, int offset,
                                 Tcl_FreeProc **freeProcPtr )
 {
-    long longResult;
     SPItem *spPtr = (SPItem *) widgRec;
     char *p = (char *) ckalloc( DOUBLE_LENGTH );
 
@@ -1167,16 +1157,15 @@ static void GeneratePlotFrameSet( SPItem *spPtr )
     /* Check if coordinates have no range, in that case just add +/- 1, so we
      * can plot something. During interactive updates that's better than
      * throwing an error. */
-    if ( spPtr->xmin == spPtr->xmax ) {
-        if ( spPtr->xmin == DBL_MAX ) {
-            /* All bad */
-            spPtr->xmin = -1.0;
-            spPtr->xmax =  1.0;
-        }
-        else {
-            spPtr->xmin -= 1.0;
-            spPtr->xmax += 1.0;
-        }
+    if ( spPtr->xmin == spPtr->xmax ) { 
+        /* No range */
+        spPtr->xmin -= 1.0;
+        spPtr->xmax += 1.0;
+    }
+    else if ( spPtr->xmin == DBL_MAX ) {
+        /* All bad */
+        spPtr->xmin = -1.0;
+        spPtr->xmax =  1.0;
     }
 }
 
