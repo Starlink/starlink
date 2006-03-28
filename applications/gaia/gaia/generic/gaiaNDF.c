@@ -1326,9 +1326,11 @@ int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
 
 /**
  * Get an AST frameset that describes the coordinates of a given axis.
- * Axes are in the AST sense, i.e. start at 1.
+ * Axes are in the AST sense, i.e. start at 1. The offset value is a shift
+ * that should be applied to the GRID coordinates (useful when the NDF data
+ * has been sectioned outside of the NDF library, this is the origin).
  */
-int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs,
+int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, AstFrameSet **iwcs,
                           char **error_mess )
 {
    AstFrame *tmpframe;
@@ -1337,7 +1339,6 @@ int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs,
    int iaxes[1];
    int nin;
    int nout;
-   int status = SAI__OK;
 
    astBegin;
    if ( gaiaSimpleWCSNDF( ndfid, &fullwcs, error_mess ) == 1 ) {
@@ -1360,17 +1361,28 @@ int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs,
    else if ( iaxes[0] < 1 ) {
        iaxes[0] = 1;
    }
-
-   /* If base frame has more than one axis then select the given
-    * one.  This is easy, just pick a frame with the appropriate
-    * axes and put it back, note that we have to pick the current
-    * frame, so swap things around a little. */
+   
+   /* If the base frame has more than one axis then select the given one.
+    * This is easy, just pick a frame with the appropriate axes and put it
+    * back, note that we have to pick the current frame, so swap things 
+    * around a little. */
    if ( nin != 1 ) {
        astInvert( *iwcs );
        joined = NULL;
        tmpframe = astPickAxes( *iwcs, 1, iaxes, &joined );
        astAddFrame( *iwcs, AST__CURRENT, joined, tmpframe );
        astInvert( *iwcs );
+
+       /* If we have an offset to apply to the GRID coordinates (these will be
+        * the base frame). Then add in a ShiftMap. */
+       if ( offset != 0 ) {
+           double shift[1];
+           AstShiftMap *map;
+           shift[0] = (double) -offset;
+           map = astShiftMap( 1, shift, "" );
+           astRemapFrame( *iwcs, AST__BASE, map );
+           astAnnul( map );
+       }
    }
 
    /* Select an axis in the current frame and tack this onto the
@@ -1392,6 +1404,24 @@ int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs,
    return 0;
 }
 
+/**
+ * Query the dimensions of an NDF.
+ */
+int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
+                         char **error_mess )
+{
+    int status = SAI__OK;
+    emsMark();
+    ndfDim( ndfid, ndimx, dims, ndim, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = errMessage( &status );
+        ndfid = NDF__NOID;
+        emsRlse();
+        return 1;
+    }
+    emsRlse();
+    return 0;
+}
 
 /**
  * Query the bounds of an NDF.
