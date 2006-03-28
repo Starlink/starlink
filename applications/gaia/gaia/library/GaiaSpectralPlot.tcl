@@ -281,16 +281,20 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
-   #  Display a spectrum, must be a 1D NDF, so usually a section. The axis
-   #  defines the WCS axis that should be used for the plot X axis.
-   #  If autoscale
-   #  is true, then the plot should be rescaled so that the spectrum
-   #  fits. Otherwise the existing plot bounds are used.
-   public method display {ndfname axis autoscale {x {}} {y {}}} {
+   #  Display a spectrum. The data is wrapped by an instance of GaiaNDAccess.
+   #
+   #  The axis defines the WCS axis that should be used for the plot X axis.
+   #  If autoscale is true, then the plot should be rescaled so that the
+   #  spectrum fits. Otherwise the existing plot bounds are used.
+   #  The alow and ahigh arguments are the range along the axis to extract
+   #  and p1 and p2 the positions of the spectrum along the remaining two axes.
+   public method display \
+      {accessor axis alow ahigh p1 p2 autoscale {x {}} {y {}}} {
 
-      #  Open the NDF and map its data.
-      set accessor [GaiaNDAccess \#auto -dataset "$ndfname"]
-      lassign [$accessor map] adr nel type
+      #  Get the spectral data from the accessor.
+      #  XXXX Note assumes WCS & data array axes are aligned and in same order.
+      lassign [$accessor getspectrum [expr $axis - 1] $alow $ahigh $p1 $p2] \
+         adr nel type
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
@@ -301,12 +305,13 @@ itcl::class gaia::GaiaSpectralPlot {
                            -linecolour $linecolour_ -linewidth 1 \
                            -gridoptions $gridoptions_ \
                            -showaxes 1]
-         make_ref_line_
-         set_to_ref_coord_
-
-         # Clicking on the plot deselects other graphics.
+         #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
+         
+         #  Make a reference line.
+         make_ref_line_
+         set_to_ref_coord_
       }
 
       #  Create the secondary plot, put this at the given x and y.
@@ -323,7 +328,7 @@ itcl::class gaia::GaiaSpectralPlot {
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units.
       if { $autoscale } {
-         set frameset [$accessor getwcs $axis]
+         set frameset [$accessor getaxiswcs $axis $alow]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          if { $spectrum2_ != {} } {
             $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
@@ -346,8 +351,8 @@ itcl::class gaia::GaiaSpectralPlot {
          }
       }
 
-      #  Finished with the NDF.
-      $accessor close
+      #  Finished with the spectral data.
+      $accessor release $adr
    }
 
    #  Make the reference line item. This should be refreshed to the reference
@@ -539,7 +544,7 @@ itcl::class gaia::GaiaSpectralPlot {
    #  The secondary spectral_plot item.
    protected variable spectrum2_ {}
 
-   #  The reference coordinate, units of the spectral axis.
+   #  The reference coordinate, canvas coords.
    protected variable xref_ 0
 
    #  Reference line item.
