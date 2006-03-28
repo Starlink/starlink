@@ -295,6 +295,7 @@ int RtdLineDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
     if ( itemPtr != NULL ) {
         ckfree( (char *) itemPtr );
     }
+    return TCL_OK;
 }
 
 /*
@@ -1784,9 +1785,8 @@ EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr,
 EXTERN void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width )
 {
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
-    XGCValues gcValues;
 
     linePtr->width = width;
     XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid,
-                        linePtr->capStyle,linePtr->joinStyle);
+                        linePtr->capStyle, linePtr->joinStyle );
 }
