@@ -25,14 +25,20 @@
 #include <gaiaArray.h>
 
 /* Local prototypes */
-static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
 
 /**
  * Register all the array commands.
  */
 int Array_Init( Tcl_Interp *interp )
 {
+    Tcl_CreateObjCommand( interp, "array::release", gaiaArrayRelease,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "array::getspectrum", gaiaArraySpectrum,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
@@ -40,21 +46,29 @@ int Array_Init( Tcl_Interp *interp )
 }
 
 /**
- * Extract a line of data from a cube. 
- * 
- * The cube must be available as a memory address, the arguments are the
- * memory address (a long), followed by the cube type (HDS string), the
- * dimensions (three arguments), the axis that the spectrum lies along, the
- * indices of the remaining two dimensions (increasing order), and a boolean
- * indicating whether the extracted data should be registered with CNF so that
- * it can be released by CNF (NDF's will require this).
- * 
- * The result is the memory address of the extracted line.
+ * Extract a line of data from a cube.
+ *
+ * The cube must be available as a memory address, the arguments are:
+ *
+ *   1)     the memory address (a long)
+ *   2)     the cube type (HDS string)
+ *   3&4&5) the cube dimensions (three arguments)
+ *   6)     the axis that the spectrum lies along
+ *   7&8)   the lower and upper bounds along axis line (-1's for all)
+ *   9&10)  indices of the other two dimensions (increasing order), these
+ *          define the "position" of the line
+ *   11)    a boolean indicating whether the extracted data should be
+ *          registered with CNF so that it can be released by CNF (NDF's will
+ *          require this).
+ *
+ * The result is the memory address of the extracted line and the number of
+ * elements extracted.
  */
 static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
+    int arange[2];
     int axis;
     int cnfMalloc;
     int dims[3];
@@ -66,15 +80,16 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     void *outPtr;
 
     /* Check arguments */
-    if ( objc != 10 ) {
-        Tcl_WrongNumArgs( interp, objc, objv, "address data_type "
-                          "dim1 dim2 dim3 axis index1 index2 cnf_reg" );
+    if ( objc != 12 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address data_type "
+                          "dim1 dim2 dim3 axis axis_lower axis_upper "
+                          "index1 index2 cnf_register" );
         return TCL_ERROR;
     }
 
     /* Get cube memory address */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read data pointer", 
+        Tcl_AppendResult( interp, "Failed to read data pointer",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -86,43 +101,93 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     if ( ( Tcl_GetIntFromObj( interp, objv[3], &dims[0] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[4], &dims[1] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[5], &dims[2] ) != TCL_OK ) ) {
-        Tcl_AppendResult( interp, "Failed to read cube dimensions", 
-                          (char *) NULL );
-        return TCL_ERROR;
-    }
-    
-    /* Axis of spectrum */
-    if ( Tcl_GetIntFromObj( interp, objv[6], &axis ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read spectral axis", 
+        Tcl_AppendResult( interp, "Failed to read cube dimensions",
                           (char *) NULL );
         return TCL_ERROR;
     }
 
+    /* Axis of spectrum */
+    if ( Tcl_GetIntFromObj( interp, objv[6], &axis ) != TCL_OK ) {
+        Tcl_AppendResult( interp, "Failed to read spectral axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Range of axis */
+    if ( ( Tcl_GetIntFromObj( interp, objv[7], &arange[0] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[8], &arange[1] ) != TCL_OK ) ) {
+        Tcl_AppendResult( interp, "Failed to read axis ranges",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+    if ( arange[0] == -1 ) {
+        arange[0] = 0;
+    }
+    if ( arange[1] == -1 ) {
+        arange[1] = dims[axis];
+    }
+
     /* Indices of spectrum */
-    if ( ( Tcl_GetIntFromObj( interp, objv[7], &index1 ) != TCL_OK ) ||
-         ( Tcl_GetIntFromObj( interp, objv[8], &index2 ) != TCL_OK ) ) {
-        Tcl_AppendResult( interp, "Failed to read spectral indices", 
+    if ( ( Tcl_GetIntFromObj( interp, objv[9], &index1 ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[10], &index2 ) != TCL_OK ) ) {
+        Tcl_AppendResult( interp, "Failed to read spectral indices",
                           (char *) NULL );
         return TCL_ERROR;
     }
 
     /* CNF registered memory */
-    if ( Tcl_GetBooleanFromObj( interp, objv[9], &cnfMalloc ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read spectral axis", 
+    if ( Tcl_GetBooleanFromObj( interp, objv[11], &cnfMalloc ) != TCL_OK ) {
+        Tcl_AppendResult( interp, "Failed to read spectral axis",
                           (char *) NULL );
         return TCL_ERROR;
     }
 
     /* Extraction */
-    
-    gaiaArraySpectrumFromCube( (void *) adr, type, dims, axis, index1, index2,
-                               cnfMalloc, &outPtr, &nel );
-    
+
+    gaiaArraySpectrumFromCube( (void *) adr, type, dims, axis, arange, 
+                               index1, index2, cnfMalloc, &outPtr, &nel );
+
     /* Export address as result and number of elements extracted */
     resultObj = Tcl_GetObjResult( interp );
-    Tcl_ListObjAppendElement( interp, resultObj, 
+    Tcl_ListObjAppendElement( interp, resultObj,
                               Tcl_NewLongObj( (long) outPtr ) );
     Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewIntObj( nel ) );
 
+    return TCL_OK;
+}
+
+/**
+ * Release previously allocated memory. The arguments are a memory address and
+ * whether this memory was registered with CNF.
+ */
+static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] )
+{
+    int cnfMalloc;
+    long adr;
+
+    /* Check arguments */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address cnf_free" );
+        return TCL_ERROR;
+    }
+
+    /* Get memory address */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, "Failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* CNF registered memory */
+    if ( Tcl_GetBooleanFromObj( interp, objv[2], &cnfMalloc ) != TCL_OK ) {
+        Tcl_AppendResult( interp, "Failed to read spectral axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Free memory */
+    gaiaArrayFree( (void *)adr, cnfMalloc );
+    
     return TCL_OK;
 }
