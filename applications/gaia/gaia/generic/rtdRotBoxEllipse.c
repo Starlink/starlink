@@ -232,19 +232,19 @@ Tk_ItemType rtdEllipseType = {
 
 Tk_ItemType rtdRotBoxType = {
     "rtd_rotbox",                 /* name */
-    sizeof(BoxEllItem),          /* itemSize */
+    sizeof(BoxEllItem),           /* itemSize */
     CreateBoxEll,                 /* createProc */
     configSpecs,                  /* configSpecs */
-    ConfigureBoxEll,             /* configureProc */
-    BoxEllCoords,                /* coordProc */
-    DeleteBoxEll,                /* deleteProc */
-    DisplayBoxEll,               /* displayProc */
+    ConfigureBoxEll,              /* configureProc */
+    BoxEllCoords,                 /* coordProc */
+    DeleteBoxEll,                 /* deleteProc */
+    DisplayBoxEll,                /* displayProc */
     0,                            /* alwaysRedraw */
-    RotBoxToPoint,                  /* pointProc */
-    EllipseToArea,               /* areaProc */
+    RotBoxToPoint,                /* pointProc */
+    RotBoxToArea,                 /* areaProc */
     RotBoxToPostscript,           /* postscriptProc */
-    ScaleBoxEll,                 /* scaleProc */
-    TranslateBoxEll,             /* translateProc */
+    ScaleBoxEll,                  /* scaleProc */
+    TranslateBoxEll,              /* translateProc */
     (Tk_ItemIndexProc *) NULL,    /* indexProc */
     (Tk_ItemCursorProc *) NULL,   /* cursorProc */
     (Tk_ItemSelectionProc *) NULL,/* selectionProc */
