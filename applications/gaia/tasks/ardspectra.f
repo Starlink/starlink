@@ -95,11 +95,7 @@
       INTEGER UBNDI( 3 )        ! Upper bounds of ARD mask
       INTEGER UBNDS( 3 )        ! Upper bounds of spectral section
       LOGICAL BAD               ! Whether input data has BAD pixels
-      LOGICAL EXISTS            ! Whether variance component exists
       LOGICAL FIXORI            ! Whether to set origin to 1,1.
-      LOGICAL FULL              ! Whether to report variance component stats
-      LOGICAL ONELIN            ! Whether results are on one line.
-      LOGICAL SIMPLE            ! Whether complex ARD descriptions are used
       REAL TRCOEF( 1 )          ! ARD description transformation
 *.
 

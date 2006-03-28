@@ -24,16 +24,20 @@ extern "C" {
 
     /* Get an image section from a cube */
     void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
-                             int axis, int index, void **outPtr,
+                                 int axis, int index, void **outPtr,
                                  int cnfmalloc );
         
     /* Get a spectrum (line of data) from a cube */
     void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
-                                    int axis, int index1, int index2,
-                                    int cnfmalloc, void **outPtr, int *nel );
+                                    int axis, int arange[2], int index1,
+                                    int index2, int cnfmalloc, void **outPtr,
+                                    int *nel );
 
     /* Get strides for indexing an ND array */ 
     void gaiaArrayGetStrides( int ndims, int dims[], int strides[] );
+
+    /* Free memory we've allocated */
+    void gaiaArrayFree( void *ptr, int cnfMalloc );
 
 #ifdef __cplusplus
 }

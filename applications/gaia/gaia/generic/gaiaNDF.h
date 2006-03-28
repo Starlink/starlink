@@ -102,6 +102,10 @@ extern "C" {
     int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value, 
                            int value_length, char **error_mess );
 
+    /* Query the dimensions of an opened NDF */
+    int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim, 
+                             char **error_mess );
+
     /* Query the pixel bounds of an opened NDF */
     int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
                                int *ndim, char **error_mess );
@@ -119,8 +123,8 @@ extern "C" {
     int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess );
 
     /* Get a frameset for a specified axis */
-    int gaiaSimpleAxisWCSNDF( int ndfid, int axis, AstFrameSet **iwcs, 
-                              char **error_mess );
+    int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, 
+                              AstFrameSet **iwcs, char **error_mess );
 
 #ifdef __cplusplus
 }

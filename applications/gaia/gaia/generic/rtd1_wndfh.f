@@ -131,20 +131,14 @@
       PARAMETER( SZVAL = 68 )
 
 *  Local Variables:
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Data type of the axis centres
       CHARACTER C*1             ! Accommodates character string
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
-      DOUBLE PRECISION DEND     ! End value for an axis-centre array
-      DOUBLE PRECISION DINCRE   ! Incremental value for axis array
-      DOUBLE PRECISION DREFVL   ! Value of reference pixel
-      DOUBLE PRECISION DSTART   ! Start value for an axis-centre array
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER I                 ! Loop variable
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER NCHAR             ! Length of a character string
       INTEGER NDIM              ! Number of dimensions
-      INTEGER NELM              ! Number of elements
       INTEGER NSIG              ! Number of significant dimensions
       INTEGER UBND( NDF__MXDIM ) ! NDF upper bounds
       LOGICAL BAD               ! Data array has BAD pixels

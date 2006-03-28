@@ -148,10 +148,6 @@
       PARAMETER( SZVAL = 70 )   ! Columns 11 to 80
 
 *  Local Variables:
-      CHARACTER * ( 1 ) C       ! Accommodates character string
-      CHARACTER * ( SZKEY ) CDELT ! Keyword name of CDELTn
-      CHARACTER * ( SZKEY ) CRPIX ! Keyword name of CRPIXn
-      CHARACTER * ( SZKEY ) CRVAL ! Keyword name of CRVALn
       CHARACTER * ( SZFITS ) FITSTR ! FITS string
       CHARACTER * ( DAT__SZLOC ) FTLOC ! Locator to NDF FITS extension
       CHARACTER * ( DAT__SZLOC ) FTLOCI ! Locator to element of NDF FITS extension
@@ -160,8 +156,6 @@
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER I                 ! Loop variable
       INTEGER IWCS              ! NDF WCS identifier
-      INTEGER J                 ! Loop variable
-      INTEGER NCHAR             ! Length of a character string
       INTEGER NCOMP             ! No. of components
       INTEGER NDIM              ! Number of dimensions
       LOGICAL BANNER            ! Part of the FITSIO banner header?

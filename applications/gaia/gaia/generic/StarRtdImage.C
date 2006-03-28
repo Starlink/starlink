@@ -4706,7 +4706,7 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
 	    return TCL_ERROR;
         }
 
-	if ( numNDFs > sizeof( ndfList ) / sizeof( int ) ) {
+	if ( numNDFs > (int) sizeof( ndfList ) / sizeof( int ) ) {
 	    return fmt_error( "StarRtdImage::ndfCmdDisplay: too many "
                               "NDFs: %d (max 256)", numNDFs );
         }
@@ -6125,7 +6125,6 @@ int StarRtdImage::resetBltVector( const int num, const double *valueArr,
 //-
 int StarRtdImage::swapNeeded()
 {
-    int swap = 0;
     ImageIO imio = image_->image();
     return swapNeeded( imio );
 }

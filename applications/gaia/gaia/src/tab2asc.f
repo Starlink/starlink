@@ -70,7 +70,6 @@
 *  Local variables:
       CHARACTER * ( 132 ) INNAM ! Name of input catalogue
       CHARACTER * ( 132 ) OUTNAM ! Name of output catalogue
-      INTEGER IDCOL             ! Position of identifier column
       LOGICAL EXISTS            ! TRUE if file exists
       INTEGER IFIN              ! FIO identifier
       INTEGER IFOUT             ! FIO identifier
