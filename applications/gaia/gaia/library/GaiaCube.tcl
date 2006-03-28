@@ -493,7 +493,7 @@ itcl::class gaia::GaiaNDFCube {
       set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
       if { [$namer exists] } {
          if { $accessor_ == {} } {
-            set accessor_ [GaiaNDAccess \#auto]
+            set accessor_ [uplevel #0 GaiaNDAccess \#auto]
          }
 
          $namer absolute
@@ -804,39 +804,42 @@ itcl::class gaia::GaiaNDFCube {
    #  Display a spectrum in the plot. Action can be "splat", "localstart" or
    #  "localdrag", for display in SPLAT, start a spectral display (sets the
    #  initial scale of a drag), or update during a drag.
-   protected method display_spectrum_ {action ccx ccy} {
+   protected method display_spectrum_ {action cx cy} {
 
       #  Convert click coordinates from canvas coords to grid coords.
-      set cx [$itk_option(-canvas) canvasx $ccx]
-      set cy [$itk_option(-canvas) canvasy $ccy]
-      $itk_option(-rtdimage) convert coords $cx $cy canvas ix iy image
-
-      #  Use origins to get pixel indices.
-      if { $axis_ == 1 } {
-         set xo [lindex $bounds_ 2]
-         set yo [lindex $bounds_ 4]
-      } elseif { $axis_ == 2 } {
-         set xo [lindex $bounds_ 0]
-         set yo [lindex $bounds_ 4]
-      } else {
-         set xo [lindex $bounds_ 0]
-         set yo [lindex $bounds_ 2]
-      }
-      set ix [expr round($ix-1+$xo)]
-      set iy [expr round($iy-1+$yo)]
-
-      #  Create the right section. Use collapse coords as bounds on the
-      #  spectral axis.
-      set range "$lower_collapse_bound_:$upper_collapse_bound_"
-      if { $axis_ == 1 } {
-         set section "($range,$ix,$iy)"
-      } elseif { $axis_ == 2 } {
-         set section "($ix,$range,$iy)"
-      } else {
-         set section "($ix,$iy,$range)"
-      }
+      set ccx [$itk_option(-canvas) canvasx $cx]
+      set ccy [$itk_option(-canvas) canvasy $cy]
+      $itk_option(-rtdimage) convert coords $ccx $ccy canvas iix iiy image
 
       if { $action == "splat" } {
+
+         #  Use origins to get pixel indices.
+         if { $axis_ == 1 } {
+            set xo [lindex $bounds_ 2]
+            set yo [lindex $bounds_ 4]
+         } elseif { $axis_ == 2 } {
+            set xo [lindex $bounds_ 0]
+            set yo [lindex $bounds_ 4]
+         } else {
+            set xo [lindex $bounds_ 0]
+            set yo [lindex $bounds_ 2]
+         }
+      
+         #  Correct to pixel indices.
+         set ix [expr round($iix-1+$xo)]
+         set iy [expr round($iiy-1+$yo)]
+
+         #  Create the right section. Use collapse coords as bounds on the
+         #  spectral axis.
+         set range "$lower_collapse_bound_:$upper_collapse_bound_"
+         if { $axis_ == 1 } {
+            set section "($range,$ix,$iy)"
+         } elseif { $axis_ == 2 } {
+            set section "($ix,$range,$iy)"
+         } else {
+            set section "($ix,$iy,$range)"
+         }
+
          #  Send the section to SPLAT.
          if { $splat_disp_ == {} } {
             set splat_disp_ [GaiaForeignExec \#auto \
@@ -844,9 +847,9 @@ itcl::class gaia::GaiaNDFCube {
                                 -show_output 0]
          }
          $splat_disp_ runwith "${ndfname_}${section}" 0
+
       } else {
-         #  Display in the spectrum_plot. Devel code. Add -canvas to display
-         #  elsewhere.
+         #  Display in the spectrum_plot.
          if { [info exists spectrum_] } {
             if { $spectrum_ == {} } {
                set spectrum_ [GaiaSpectralPlot $w_.specplot \
@@ -864,12 +867,36 @@ itcl::class gaia::GaiaNDFCube {
                }
             }
 
+            #  Correct collapse bounds to grid indices (note C indices).
+            if { $axis_ == 1 } {
+               set zo [lindex $bounds_ 0]
+            } elseif { $axis_ == 2 } {
+               set zo [lindex $bounds_ 2]
+            } else {
+               set zo [lindex $bounds_ 4]
+            }
+            set alow [expr round($lower_collapse_bound_-$zo)]
+            set ahigh [expr round($upper_collapse_bound_-$zo+1)]
+            
+            #  ix and iy are integers.
+            set ix [expr round($iix)]
+            set iy [expr round($iiy)]
+            
             #  Also autoscale when single click, so that we are not fixed for
             #  all time.
             if { $itk_option(-autoscale) || $action == "localstart" } {
-               $spectrum_ display "${ndfname_}${section}" $axis_ 1 $cx $cy
+               $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                  $ix $iy 1 $ccx $ccy
+
+               #  Set first-time reference position.
+               set coord [$itk_component(indexlabel) cget -value]
+               if { $coord != {} } {
+                  update; # force redraw.
+                  $spectrum_ set_ref_coord $coord
+               }
             } else {
-               $spectrum_ display "${ndfname_}${section}" $axis_ 0
+               $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                  $ix $iy 0
             }
          }
       }
