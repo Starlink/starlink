@@ -288,13 +288,12 @@ itcl::class gaia::GaiaSpectralPlot {
    #  spectrum fits. Otherwise the existing plot bounds are used.
    #  The alow and ahigh arguments are the range along the axis to extract
    #  and p1 and p2 the positions of the spectrum along the remaining two axes.
-   public method display \
-      {accessor axis alow ahigh p1 p2 autoscale {x {}} {y {}}} {
+   public method display {accessor axis alow ahigh p1 p2 autoscale 
+                          {x {}} {y {}}} {
 
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      lassign [$accessor getspectrum [expr $axis - 1] $alow $ahigh $p1 $p2] \
-         adr nel type
+      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2] adr nel type
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
@@ -328,7 +327,7 @@ itcl::class gaia::GaiaSpectralPlot {
       #  When autoscaling (or just created one of the plots), set the frameset
       #  and the NDF data units.
       if { $autoscale } {
-         set frameset [$accessor getaxiswcs $axis $alow]
+         set frameset [$accessor getaxiswcs $axis [expr $alow -1]]
          $itk_component(canvas) itemconfigure $spectrum_ -frameset $frameset
          if { $spectrum2_ != {} } {
             $itk_option(-canvas) itemconfigure $spectrum2_ -frameset $frameset
