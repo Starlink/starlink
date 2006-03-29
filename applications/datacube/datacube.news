@@ -40,7 +40,7 @@ The following applications have been modified:
    displacements from the rest-frame co-ordinate in the current 
    spectral system into one of four velocity measurements using
    WCSTRAN.  Added a SpecFrame to achieve this functionality for
-   UK data-cube files.
+   UK data-cube files.  Also recognises the SKY-DSBSPECTRUM Domain.
 
    Added the -s option to define the co-ordinate system of the
    derived velocities.  Ensured that the plots of spectra use the 
@@ -76,7 +76,8 @@ The following applications have been modified:
    o  Tidied the scripts.  Changes included the silent removal and
    creation of files, alphabetical ordering of the options, 
    documentation of default values of options, corrections to grammar 
-   and punctuation, avoidance of :r, and aligned output.
+   and punctuation, avoidance of :r, command-line rubbish disposal,
+   and aligned output.
 
    o  Accepts .sdf extension and/or allows NDF sections to be supplied.
 
