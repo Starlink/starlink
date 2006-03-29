@@ -109,6 +109,28 @@ sub new {
 
 =over 4
 
+=item B<bestfitlog>
+
+Retrieve or set the filename to write information about the best fit
+to.
+
+  my $bestfitlog = $astrom->bestfitlog;
+  $astrom->bestfitlog( 'bestfit.log' );
+
+This method will write the file to the current working directory. If
+undefined, which is the default, no log will be written.
+
+=cut
+
+sub bestfitlog {
+  my $self = shift;
+  if( @_ ) {
+    my $bestfitlog = shift;
+    $self->{BESTFITLOG} = $bestfitlog;
+  }
+  return $self->{BESTFITLOG};
+}
+
 =item B<catalog>
 
 Retrieve or set the catalogue used to get an astrometric solution.
@@ -356,7 +378,7 @@ sub solve {
     }
   }
 
-  print "ASTROM binary is in $astrom_bin\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM binary is in $astrom_bin\n" if ( $DEBUG  );
 
   # We need a temporary file for the astrom input file.
   ( undef, my $astrom_input ) = tempfile( DIR => $self->temp );
@@ -406,20 +428,20 @@ sub solve {
     unlink "$astrom_input.orig";
   }
 
-  print "ASTROM input catalog is in $astrom_input\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM input catalog is in $astrom_input\n" if ( $DEBUG  );
 
   # We need a base filename for the FITS files. ASTROM will automatically
   # append NN.fits, where NN is the fit number.
   ( undef, my $output_fitsbase ) = tempfile( DIR => $self->temp );
-  print "ASTROM FITS file base name is $output_fitsbase\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM FITS file base name is $output_fitsbase\n" if ( $DEBUG  );
 
   # And we need temporary files to hold the report, the summary, and the log.
   ( undef, my $output_report ) = tempfile( DIR => $self->temp );
   ( undef, my $output_summary ) = tempfile( DIR => $self->temp );
   ( undef, my $output_log ) = tempfile( DIR => $self->temp );
-  print "ASTROM output report file is in $output_report\n" if ( $DEBUG || $self->verbose );
-  print "ASTROM output summary file is in $output_summary\n" if ( $DEBUG || $self->verbose );
-  print "ASTROM output log file is in $output_log\n" if ( $DEBUG || $self->verbose );
+  print "ASTROM output report file is in $output_report\n" if ( $DEBUG  );
+  print "ASTROM output summary file is in $output_summary\n" if ( $DEBUG  );
+  print "ASTROM output log file is in $output_log\n" if ( $DEBUG  );
 
 
   # Now we are good to go. Set up the parameter list for ASTROM.
@@ -464,7 +486,7 @@ sub solve {
     next if $fit > $self->maxcoeff;
     next if ! defined( $fits_files[$fits{$fit}] );
     $highest_num = $fits{$fit};
-    print "Using $fit coefficient model\n" if ( $DEBUG || $self->verbose );
+    print "Using $fit coefficient model\n" if ( $DEBUG  );
     last;
   }
 
@@ -479,7 +501,7 @@ sub solve {
   if( defined( $self->keepfits ) ) {
     my $fitsfile = $self->keepfits;
     copy( $highest, $fitsfile ) or croak "Could not copy FITS-WCS file from $highest to $fitsfile: $!";
-    print "FITS-WCS file stored in $fitsfile\n" if ( $DEBUG || $self->verbose );
+    print "FITS-WCS file stored in $fitsfile\n" if ( $DEBUG  );
   }
 
   # Open the log file, parse it, and return an array of hashes for
