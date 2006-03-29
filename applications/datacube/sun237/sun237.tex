@@ -1486,10 +1486,6 @@ The following applications have been modified:
 \item \htmlref{{\bf compare}}{compare} has a {\tt -i} option for the
 input filename for non-interactive scripting.
 
-\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to 
-specify the number of contour levels to plot; this may be zero to
-prevent contours be overlaid. 
-
 \item \htmlref{{\bf multistack}}{multistack} and
 \htmlref{{\bf stacker}}{stacker} plot ordinate limits now always
 make visible all the spectra, regardless of the chosen offset.
@@ -1498,10 +1494,20 @@ make visible all the spectra, regardless of the chosen offset.
 in \xref{NDFCOPY}{sun95}{NDFCOPY}.  Ensured that the plots of spectra 
 use the axis co-ordinate system.  Removed unused {\tt -r} option. 
 
+\item \htmlref{{\bf peakmap}}{peakmap} now has {\tt -c} option to 
+specify the number of contour levels to plot; this may be zero to
+prevent contours be overlaid. 
+
+\item \htmlref{{\bf step}}{step} now plots the image slices in an 
+optimally shaped grid rather than full size in quick succession, and
+thereby permits comparison of the slices. 
+
 \item \htmlref{{\bf velmap}}{velmap} generalised the transformation of the
 measured line displacements from the rest-frame co-ordinate in the
 current spectral system into one of four velocity measurements using
-WCSTRAN.  Also recognises the \xref{SKY-DSBSPECTRUM Domain}{sun95}{se_domains}.
+WCSTRAN.  Added a SpecFrame to achieve this functionality for
+UK data-cube files.  Also recognises the 
+\xref{SKY-DSBSPECTRUM Domain}{sun95}{se_domains}.
 
 Added the {\tt -s} option to define the co-ordinate system of the
 derived velocities.  Ensured that the plots of spectra use the axis
@@ -1509,7 +1515,7 @@ co-ordinate system.  The script inquires the WCS for the rest-frame
 frequency to avoid unnecessary prompting.
 
 Changed lower percentile for display from 15 to 2.  Use spectrum
-colour table.
+colour table.  Added a velocity key.
 
 Additional {\tt -c} option to specify the number of contours; this may
 be zero to prevent contours be overlaid.  Added {\tt -ci} option to
@@ -1544,7 +1550,8 @@ do not bleed through.
 \item Tidied the scripts.  Changes included the silent removal and
 creation of files, alphabetical ordering of the options, documentation
 of default values of options, corrections to grammar and punctuation,
-avoidance of :r, aligned output, and tab removal.
+avoidance of :r, aligned output, command-line rubbish disposal,
+and tab removal.
 
 \item Accepts .sdf extension and/or NDF sections to be supplied
 through new internal routine {\tt checkndf.csh}.
