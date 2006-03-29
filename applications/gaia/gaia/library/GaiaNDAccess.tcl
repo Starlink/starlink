@@ -140,14 +140,14 @@ itcl::class gaia::GaiaNDAccess {
       return [${type_}::bounds $handle_]
    }
 
-   #  Return the formatted coordinate of a position along a given axis.
+   #  Return the coordinate of a position along a given axis.
    #
    #  The arguments are the index of the axis, a list of all the pixel indices
-   #  needed to identify the coordinate, and an optional boolean argument that
-   #  determines if to add a trailing label and units strings to the return
-   #  value.
-   public method coord {axis indices {trail 0} } {
-      return [${type_}::coord $handle_  $axis $indices $trail]
+   #  needed to identify the coordinate, and an optional boolean arguments that
+   #  determines whether to format the value (using astFormat) and if to add
+   #  trailing label and units strings.
+   public method coord {axis indices {formatted 1} {trail 0} } {
+      return [${type_}::coord $handle_ $axis $indices $formatted $trail]
    }
 
    #  Map in the dataset "data component". Returns the address, number of
@@ -175,10 +175,11 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Return the address of a spectral line of data. This will only 
    #  work for cubes and requires that the complete data are mapped first. 
-   #  The axis is the spectral axis along which the line will be extracted.
-   #  The alow and ahigh values define a range along the axis to extract (-1
-   #  for end points). The p1 and p2 positions, are array coordinates of the
-   #  spectrum along  the other two dimensions (increasing dimension order).
+   #  The axis is the spectral axis along which the line will be extracted
+   #  (1,2,3). The alow and ahigh values define a range along the axis to
+   #  extract (-1 for end points). The p1 and p2 positions, are grid
+   #  coordinates of the spectrum along  the other two dimensions (increasing
+   #  dimension order). 
    public method getspectrum {axis alow ahigh p1 p2} {
       if { $addr_ != {} } {
          set dims_ [dims]
