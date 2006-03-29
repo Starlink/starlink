@@ -1570,6 +1570,54 @@ sub solve {
 # ASTROM.
     $self->maxfit( $prev_maxfit );
 
+# Summarise the fits we obtained to the file pointed to by
+# bestfitlog().
+    if( defined( $self->bestfitlog ) ) {
+
+      open my $bestfit_fh, ">", $self->bestfitlog or croak "Could not open " . $self->bestfitlog . " for writing: $!";
+      print $bestfit_fh "    n nterms         centre        prms       q FITS-WCS\n";
+      foreach my $k ( 0..$#{@$results} ) {
+        if( $results->[$k]->{STATUS} ) {
+          next if $results->[$k]->{nterms} > $self->maxfit;
+          printf $bestfit_fh ("%5d %3d %11.11s %12.12s %4.1f %7.7s %s\n",
+                              $k,
+                              $results->[$k]->{nterms},
+                              $results->[$k]->{rasex},
+                              $results->[$k]->{decsex},
+                              ( defined( $results->[$k]->{prms} ) ?
+                                $results->[$k]->{prms} :
+                                -1 ),
+                              ( defined( $results->[$k]->{'q'} ) ?
+                                $results->[$k]->{'q'} :
+                                "--" ),
+                              ( length( $results->[$k]->{wcs} ) > 32 ?
+                                "...".substr( $results->[$k]->{wcs}, -29 ) :
+                                $results->[$k]->{wcs} ) );
+        } else {
+          printf $bestfit_fh ( "%5d NO FIT\n", $k );
+        }
+      }
+      for ( my $k = $#{@$results}; $k >= 0; $k-- ) {
+        my %lastastrom = %{$results->[$k]};
+        if( $lastastrom{STATUS} ) {
+          next if $lastastrom{nterms} > $self->maxfit;
+          printf $bestfit_fh ( "Astrom: best fit: %d of %d\n",
+                               $k+1, $#{@$results}+1 );
+          foreach my $kw ( sort keys %lastastrom ) {
+            printf $bestfit_fh "\t%s => %s\n", $kw, $lastastrom{$kw};
+          }
+          last;
+        } else {
+          printf $bestfit_fh ("Astrom: Fit %d of %d rejected",
+                              $k+1, $#{@$results} + 1 );
+          print $bestfit_fh " (", $lastastrom{nterms}, " terms)"
+            if defined( $lastastrom{nterms} );
+          print $bestfit_fh "\n";
+        }
+      }
+      close $bestfit_fh;
+    }
+
 # Get the results for the desired fit.
     my $result;
     foreach my $res ( @$results ) {
