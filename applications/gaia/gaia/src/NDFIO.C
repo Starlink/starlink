@@ -110,6 +110,12 @@ NDFIO::~NDFIO() {
    if ( NDFinfo_ ) {
       gaiaReleaseMNDF( NDFinfo_ );
    }
+
+   //  Release the header, this has been allocated by CNF.
+   if ( header_.ptr() != NULL ) {
+       cnfFree( header_.ptr() );
+   }
+
 }
 
 //+
@@ -465,7 +471,8 @@ int NDFIO::makeDisplayable( int index, const char *component )
       int readonly = gaiaGetReadMNDF( NDFinfo_, index );
       if ( ! readonly ) {
           
-          //  Use CNF managed memory so that it is registered.
+          //  Use CNF managed memory so that it is registered. Note this
+          //  memory currently leaks.
           indata = cnfMalloc( tsize );
       }
 
@@ -486,6 +493,9 @@ int NDFIO::makeDisplayable( int index, const char *component )
          height_ = height;
          bitpix_ = bitpix;
          data_ = data;
+         if ( header_.ptr() != NULL ) {
+             cnfFree( header_.ptr() );
+         }
          header_ = header;
 
          //  This is now the current NDF and component.
