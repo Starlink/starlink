@@ -112,8 +112,8 @@ extern "C" {
 
     /* Query the coordinate of a position along the given axis. */
     int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, 
-                              int ncoords, int trailed, char **coord,
-                              char **error_mess );
+                              int ncoords, int trailed, int format, 
+                              char **coord, char **error_mess );
 
     /* Map in an array component */
     int gaiaSimpleMapNDF( int ndfid, char *type, const char* component, 
