@@ -32,18 +32,23 @@ The following applications have been modified:
    the plots of spectra use the axis co-ordinate system.  Removed 
    unused -r option.
 
+   o  step now plots the image slices in an optimally shaped grid
+   rather than full size in quick succession, and thereby permits
+   comparison of the slices. 
+
    o  velmap generalised the transformation of the measured line 
    displacements from the rest-frame co-ordinate in the current 
    spectral system into one of four velocity measurements using
-   WCSTRAN.  Also recognises the SKY-DSBSPECTRUM Domain.  
+   WCSTRAN.  Added a SpecFrame to achieve this functionality for
+   UK data-cube files.
 
-   Added the {-s option to define the co-ordinate system of the
+   Added the -s option to define the co-ordinate system of the
    derived velocities.  Ensured that the plots of spectra use the 
    axis co-ordinate system.  The script inquires the WCS for the 
    rest-frame frequency to avoid unnecessary prompting.
 
    Changed lower percentile for display from 15 to 2.  Use spectrum
-   colour table.
+   colour table.  Added a velocity key.
 
    Additional -c option to specify the number of contours; this may
    be zero to prevent contours be overlaid.  Added -ci option to
