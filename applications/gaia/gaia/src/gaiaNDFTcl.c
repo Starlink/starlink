@@ -26,21 +26,21 @@
 #include <gaiaNDF.h>
 
 /* Local prototypes */
-static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
                        int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp, 
+static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] );
 
 static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
@@ -254,7 +254,7 @@ static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
     }
     else {
         /* WCS for one axis, plus grid offset */
-        result = gaiaSimpleAxisWCSNDF( indf, axis, offset, &iwcs, 
+        result = gaiaSimpleAxisWCSNDF( indf, axis, offset, &iwcs,
                                        &error_mess );
     }
 
@@ -390,13 +390,14 @@ static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Return the formatted coordinate of a position along a given axis.
+ * Return the coordinate of a position along a given axis.
  *
  * The second argument is the NDF identifier, the third the index of the axis,
  * and the fourth a list of all the pixel indices needed to identify the
  * coordinate (so the list must have a number for each dimension of the NDF).
- * A boolean, optional, final argument can be used to switch on trailing label
- * and units strings to the value.
+ * The fifth argument defines whether to format the result (using astFormat),
+ * otherwise it is returned as a double. The final is a boolean used to switch
+ * on the addition of trailing label and units strings.
  */
 static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
@@ -407,6 +408,7 @@ static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
     char *error_mess;
     double coords[NDF__MXDIM];
     int axis;
+    int format;
     int i;
     int indf;
     int ncoords;
@@ -414,9 +416,9 @@ static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
     int trailed;
 
     /* Check arguments */
-    if ( objc != 4 && objc != 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv,
-                          "ndf_identifier axis {c1 c2 .. cn} [boolean]" );
+    if ( objc != 6 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier axis \
+                          {c1 c2 .. cn} ?trail_units? ?format?" );
         return TCL_ERROR;
     }
 
@@ -441,19 +443,26 @@ static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
                     }
                 }
 
-                /* Optional fourth element is whether to append the label and
-                 * units. */
-                trailed = 0;
-                if ( objc == 5 ) {
-                    if ( Tcl_GetBooleanFromObj( interp, objv[4], &trailed )
-                         != TCL_OK ) {
-                        result = TCL_ERROR;
-                        Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
-                    }
+                /* Whether to format value. */
+                format = 1;
+                if ( Tcl_GetBooleanFromObj( interp, objv[4], &format )
+                     != TCL_OK ) {
+                    result = TCL_ERROR;
+                    Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
                 }
+
+                /* Final element is whether to append the label and units. */
+                trailed = 0;
+                if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed )
+                     != TCL_OK ) {
+                    result = TCL_ERROR;
+                    Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
+                }
+
                 if ( result != TCL_ERROR ) {
                     result = gaiaSimpleQueryCoord( indf, axis, coords,
-                                                   trailed, ncoords, &coord,
+                                                   trailed, format,
+                                                   ncoords, &coord,
                                                    &error_mess );
                     if ( result == TCL_OK ) {
                         Tcl_SetStringObj( resultObj, coord, -1 );

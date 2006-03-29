@@ -1446,30 +1446,32 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
  * Query the equivalent world coordinate of a pixel coordinate along the
  * given axis.
  *
- * Returns a formatted value pointed at by *coord that has the value (trailed
- * by the axis units and label if requested). The position along the axis is
- * identified using ncoords pixel coordinates, where ncoords must match the
- * dimensionality of the NDF. The coordinate returned is matched to the
- * requested axis by being the coordinate with the largest change wrt to a
- * single pixel step. We need to use this logic as the relationship between
- * the NDF axes and the world coordinates may not be straight-forward. Note
- * that the value returned by the coord argument should be immediately copied.
+ * Returns a coordinate value in *coord that may be formatted and trailed by
+ * the axis units and label. The position along the axis is identified using
+ * ncoords pixel coordinates, where ncoords must match the dimensionality of
+ * the NDF. The coordinate returned is matched to the requested axis by being
+ * the coordinate with the largest change wrt to a single pixel step. We need
+ * to use this logic as the relationship between the NDF axes and the world
+ * coordinates may not be straight-forward. Note that the value returned by
+ * the coord argument should be immediately copied.
  */
 int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
-                          int ncoords, char **coord, char **error_mess )
+                          int formatted, int ncoords, char **coord, 
+                          char **error_mess )
 {
     AstFrameSet *frameSet = NULL;
+    static char buf[256];              /* Static as may be returned */
     char *domain;
-    char *units;
     char *label;
-    static char buf[256];
+    char *units;
+    static char lcoord[30];            /* Static as may be returned */
     double diff;
-    double tmp;
     double out1[7];
     double out2[7];
+    double tmp;
     int base;
-    int current;
     int caxis;
+    int current;
     int i;
     int ncoords_out;
     int nframes;
@@ -1532,8 +1534,16 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
         }
     }
 
-    //  Format the value along that axis.
-    *coord = (char *) astFormat( frameSet, caxis, out2[caxis - 1] );
+    //  Format the value along that axis, if requested, otherwise just write
+    //  out the double.
+    if ( formatted ) {
+        *coord = (char *) astFormat( frameSet, caxis, out2[caxis - 1] );
+    }
+    else {
+        sprintf( lcoord, "%.17g", out2[caxis -1] );
+        *coord = lcoord;
+    }
+
     if ( ! astOK ) {
         astClearStatus;
         *coord = NULL;
