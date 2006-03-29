@@ -372,6 +372,11 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *      <canvas> coords <item> \
  *         "pointer" memory_address number_of_elements hds_type
+ * 
+ *   A special feature (should be moved into some generic interface) is to
+ *   convert an X coordinate into a canvas coordinate, using the plot. This
+ *   uses the format:
+ *      <canvas> coords <item> "convert" coordinate.
  *
  * Results:
  *      Returns TCL_OK or TCL_ERROR, and sets interp->result.
