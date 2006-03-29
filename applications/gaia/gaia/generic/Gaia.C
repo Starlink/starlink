@@ -17,9 +17,10 @@ static const char* const rcsId="@(#) $Id$";
 #include <cstdlib>
 #include <csignal>
 #include <iostream>
-#include "tcl.h"
+#include <tcl.h>
 
 extern "C" {
+#include <ast.h>
     int StarRtd_Init(Tcl_Interp *interp);
     int Ellipse_Init();
     int Word_Init();
@@ -111,6 +112,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     if ( Array_Init(interp) != TCL_OK ) {
         return TCL_ERROR;
     }
+
+
+    //  AST tuning.
+    astTune( "MemoryCaching", 1 );
+    astTune( "ObjectCaching", 1 );
 
     // The gaia_library path can be found in several places.  Here is the order
     // in which the are searched.
