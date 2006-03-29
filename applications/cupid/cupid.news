@@ -7,6 +7,18 @@
  data arrays.
 
 
+Changes introduced at V0.0-5:
+
+ - The MASK parameter has been removed. The Quality mask is now always
+  written to the output NDF.
+
+ - The OUT parameter is no longer optional.
+
+ - The input NDF is now accessed in READ mode rather than UPDATE mode.
+
+ - The clump information is now written to the CUPID extension of the
+ output NDF rather than the input NDF.
+
 Changes introduced at V0.0-4:
 
  - The FellWalker algorithm algorithm has been changed so that the

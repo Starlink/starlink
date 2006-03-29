@@ -30,26 +30,26 @@ package cupid {
          parameter in {
             position 1
             type NDF
-            access UPDATE
+            access READ
             vpath PROMPT
             ppath GLOBAL
-            association <->GLOBAL.DATA_ARRAY
+            association <-GLOBAL.DATA_ARRAY
             prompt {Input NDF}
             helpkey *
           }
 
          parameter out {
+            position 2
             type NDF
             access WRITE
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF}
-            default !
             helpkey *
           }
 
          parameter outcat {
-            position 2
+            position 3
             type LITERAL
             access WRITE
             prompt {Output catalogue}
@@ -58,24 +58,13 @@ package cupid {
           }
 
          parameter method {
-            position 3
+            position 4
             type LITERAL
             access READ
             vpath CURRENT,DEFAULT
             ppath CURRENT,DEFAULT
             prompt {Clump identification algorithm}
             default GaussClumps
-            helpkey *
-          }
-
-         parameter mask {
-            position 4
-            type _LOGICAL
-            access READ
-            vpath CURRENT,DEFAULT
-            ppath CURRENT,DEFAULT
-            prompt {Create a mask in the input NDF?}
-            default TRUE
             helpkey *
           }
 

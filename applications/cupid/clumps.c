@@ -67,22 +67,27 @@ void clumps() {
 *     in several different ways:
 *
 *     - A pixel mask identifying pixels as background pixels or clump
-*     pixels can be written to the Quality array of the input NDF (see 
-*     parameter MASK).
-*
-*     - An output catalogue containing clump parameters can be created (see
-*     parameter OUTCAT).
+*     pixels is written to the Quality array of the output NDF (see 
+*     parameter OUT). Two quality bits will be used; one is set if and only 
+*     if the pixel is contained within one or more clumps, the other is set 
+*     if and only if the pixel is not contained within any clump. These two 
+*     quality bits have names associated with them which can be used with 
+*     the KAPPA applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The 
+*     names used are "CLUMP" and "BACKGROUND". 
 *
 *     - Information about each clump, including a minimal cut-out image
 *     of the clump and the clump parameters, is written to the CUPID 
-*     extension of the input NDF (see the section "Use of CUPID Extension" 
+*     extension of the output NDF (see the section "Use of CUPID Extension" 
 *     below). 
+*
+*     - An output catalogue containing clump parameters can be created (see
+*     parameter OUTCAT).
 *
 *     The algorithm used to identify the clumps (GaussCLumps, ClumpFind,
 *     etc) can be specified (see parameter METHOD).
 
 *  Usage:
-*     clumps in outcat method mask
+*     clumps in out outcat method 
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
@@ -118,23 +123,7 @@ void clumps() {
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
 *     IN = NDF (Update)
-*        The 1, 2 or 3 dimensional NDF to be analysed. Information about
-*        the identified clumps and the configuration parameters used will 
-*        be stored in the CUPID extension of the supplied NDF, and so the 
-*        NDF must not be write protected. See "Use of CUPID Extension"
-*        below for further details about the information stored in the CUPID
-*        extension. Other applications within the CUPID package can be used 
-*        to display this information in various ways.
-*     MASK = _LOGICAL (Read)
-*        If true, then a Quality component is added to the supplied NDF
-*        (replacing any existing Quality component) indicating if each pixel 
-*        is inside or outside a clump. Two quality bits will be used; one is 
-*        set if and only if the pixel is contained within one or more clumps,
-*        the other is set if and only if the pixel is not contained within 
-*        any clump. These two quality bits have names associated with
-*        them which can be used with the KAPPA applications SETQUAL, 
-*        QUALTOBAD, REMQUAL, SHOWQUAL. The names used are "CLUMP" and
-*        "BACKGROUND". [current value]
+*        The 1, 2 or 3 dimensional NDF to be analysed. 
 *     METHOD = LITERAL (Read)
 *        The algorithm to use. Each algorithm is described in more detail
 *        in the "Algorithms:" section below. Can be one of:
@@ -147,18 +136,22 @@ void clumps() {
 *        Each algorithm has a collection of extra tuning values which are
 *        set via the CONFIG parameter.   [current value]
 *     OUT = NDF (Write)
-*        An optional output NDF which has the same shape and size as the
-*        input NDF. The information written to this NDF depends on the value 
-*        of the METHOD parameter. If METHOD is GaussClumps, the output NDF 
-*        receives the sum of all the fitted Gaussian clump models including
-*        a global background level chosen to make the mean output value
-*        equal to the mean input value. If METHOD is ClumpFind, FellWalker or 
-*        Reinhold, each pixel in 
-*        the output is the integer index of clump to which the pixel has been 
-*        assigned. Bad values are stored for pixels which are not part of
-*        any clump. No output NDF will be produced if a null (!) value is 
-*        supplied. Otherwise, the output NDF will inherit the AXIS, WCS and 
-*        QUALITY components (plus any extensions) from the input NDF. [!]
+*        The output NDF which has the same shape and size as the input NDF. 
+*        Information about the identified clumps and the configuration 
+*        parameters used will be stored in the CUPID extension of this NDF.
+*        See "Use of CUPID Extension" below for further details about the 
+*        information stored in the CUPID extension. Other applications within 
+*        the CUPID package can be used to display this information in 
+*        various ways. The information written to the DATA array of this NDF 
+*        depends on the value of the METHOD parameter. If METHOD is 
+*        GaussClumps, the output NDF receives the sum of all the fitted 
+*        Gaussian clump models including a global background level chosen to 
+*        make the mean output value equal to the mean input value. If METHOD 
+*        is ClumpFind, FellWalker or Reinhold, each pixel in the output is 
+*        the integer index of clump to which the pixel has been assigned. 
+*        Bad values are stored for pixels which are not part of any clump. 
+*        The output NDF will inherit the AXIS and WCS components (plus any 
+*        extensions) from the input NDF.
 *     OUTCAT = FILENAME (Write)
 *        An optional output catalogue in which to store the clump parameters.
 *        No catalogue will be produced if a null (!) value is supplied. The
@@ -231,7 +224,7 @@ void clumps() {
 *     identify the clumps (see parameter CONFIG).
 *
 *     - QUALITY_NAMES: Defines the textual names used to identify background 
-*     and clump pixels within the Quality mask. See parameter MASK.
+*     and clump pixels within the Quality mask. 
 
 *  Algorithms:
 *     - GaussClumps: Based on the algorithm described by Stutski & Gusten 
@@ -537,7 +530,6 @@ void clumps() {
    int ilevel;                  /* Interaction level */
    int indf2;                   /* Identifier for output NDF */
    int indf;                    /* Identifier for input NDF */
-   int mask;                    /* Write a mask to the supplied NDF? */
    int n;                       /* Number of values summed in "sum" */
    int ndim;                    /* Total number of pixel axes */
    int nfr;                     /* Number of Frames within WCS FrameSet */
@@ -547,7 +539,6 @@ void clumps() {
    int size;                    /* Size of the "grp" group */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */
-   int there;                   /* Extension exists? */
    int type;                    /* Integer identifier for data type */
    int var;                     /* Does the i/p NDF have a Variance component? */
    int vax;                     /* Index of the velocity WCS axis (if any) */
@@ -563,7 +554,6 @@ void clumps() {
    if( *status != SAI__OK ) return;
 
 /* Initialise things to safe values. */
-   mask = 0;
    rmask = NULL;
    ndfs = NULL;
    xloc = NULL;
@@ -578,7 +568,7 @@ void clumps() {
    instead of calling ndfAssoc directly since NDF/HDS has problems with
    file names containing spaces, which NDG does not have. */
    kpg1Rgndf( "IN", 1, 1, "", &grp, &size, status );
-   ndgNdfas( grp, 1, "UPDATE", &indf, status );
+   ndgNdfas( grp, 1, "READ", &indf, status );
    grpDelet( &grp, status );
 
 /* Get the dimensions of the NDF, and count the significant ones. */
@@ -813,74 +803,52 @@ void clumps() {
 /* Skip the rest if no clumps were found. */
    if( ndfs ) {
 
-/* See if an output NDF is to be created. If not, annull the error. If so,
-   map the data array. */
+/* Create the output NDF and map the data array. */
       ipo = NULL;
-      ndfProp( indf, "AXIS,WCS,QUALITY,NOEXTENSION(CUPID)", "OUT", &indf2, 
+      ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
                status );
-      if( *status == PAR__NULL ) {
-         errAnnul( status );
+      if( !strcmp( method, "GAUSSCLUMPS" ) ) {
+         ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
+         ndfSbad( 1, indf2, "DATA", status );
 
-      } else if( method ){
-         if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-            ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
-            ndfSbad( 1, indf2, "DATA", status );
+      } else if( !strcmp( method, "CLUMPFIND" ) ||
+                 !strcmp( method, "REINHOLD" ) ||
+                 !strcmp( method, "FELLWALKER" ) ) {
+         ndfStype( "_INTEGER", indf2, "DATA", status );
+         ndfMap( indf2, "DATA", "_INTEGER", "WRITE", &ipo, &el, status );
+         ndfSbad( 1, indf2, "DATA", status );
 
-         } else if( !strcmp( method, "CLUMPFIND" ) ||
-                    !strcmp( method, "REINHOLD" ) ||
-                    !strcmp( method, "FELLWALKER" ) ) {
-            ndfStype( "_INTEGER", indf2, "DATA", status );
-            ndfMap( indf2, "DATA", "_INTEGER", "WRITE", &ipo, &el, status );
-            ndfSbad( 1, indf2, "DATA", status );
-
-         } else {
-            ndfDelet( &indf2, status );
-         }
-      }
-
-/* If required allocate room for a mask holding bad values for points which 
-   are not inside any clump. */
-      parGet0l( "MASK", &mask, status );
-      if( *status == SAI__OK && mask ) {
-         rmask = astMalloc( sizeof( float )*(size_t) el );
       } else {
-         mask = 0;
+         ndfDelet( &indf2, status );
       }
+
+/* Allocate room for a mask holding bad values for points which are not 
+   inside any clump. */
+      rmask = astMalloc( sizeof( float )*(size_t) el );
 
 /* Create any output NDF by summing the contents of the NDFs describing the 
    found clumps, and then adding on a background level (for GaussClumps). This 
-   also fills the above mask array if required. */
+   also fills the above mask array. */
       cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
                       rmask, ipo, method, &bg );
 
-/* Create an CUPID extension in the NDF if none already exists, or get a
-   locator for the existing extension otherwise. */
-      there = 0;
-      ndfXstat( indf, "CUPID", &there, status );
-      if( there ) {
-         ndfXloc( indf, "CUPID", "UPDATE", &xloc, status );  
-      } else {
-         ndfXnew( indf, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
-      }
+/* Create a CUPID extension in the output NDF. */
+      ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
-/* If a quality mask is being added to the input NDF... */
-      if( mask ) {
-
-/* Delete any existing quality name information from the supplied NDF, and 
+/* Delete any existing quality name information from the output NDF, and 
    create a structure to hold new quality name info. */
-         irqDelet( indf, status ); 
-         irqNew( indf, "CUPID", &qlocs, status );
+      irqDelet( indf2, status ); 
+      irqNew( indf2, "CUPID", &qlocs, status );
 
 /* Add in two quality names; "CLUMP"and "BACKGROUND". */
-         irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
-                   status );
-         irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
-                   status );
+      irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump", 
+                status );
+      irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump", 
+                status );
 
 /* Transfer the pixel mask to the NDF quality array. */
-         irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
-         irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
-      }
+      irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
+      irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
 
 /* Store the configuration parameters relating to the used algorithm in the 
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
@@ -898,10 +866,8 @@ void clumps() {
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */
-      if( mask ) {
-         rmask = astFree( rmask );
-         irqRlse( &qlocs, status );
-      }
+      rmask = astFree( rmask );
+      irqRlse( &qlocs, status );
 
 /* Relase the extension locator.*/
       datAnnul( &xloc, status );
@@ -913,12 +879,12 @@ L999:
 /* Release the HDS object containing the list of NDFs describing the clumps. */
    datAnnul( &ndfs, status );
 
-/* If an error has occurred, delete the Quality component if a mask was
-   being created, and also delete the CUPID extension. */
+/* If an error has occurred, delete the Quality component and also delete the 
+   CUPID extension. */
    if( *status != SAI__OK ) {
       errBegin( status );
-      if( mask ) ndfReset( indf, "QUALITY", status );
-      ndfXdel( indf, "CUPID", status );
+      ndfReset( indf2, "QUALITY", status );
+      ndfXdel( indf2, "CUPID", status );
       errEnd( status );
    }
 
