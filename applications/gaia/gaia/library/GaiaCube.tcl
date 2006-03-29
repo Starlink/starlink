@@ -507,13 +507,12 @@ itcl::class gaia::GaiaNDFCube {
          }
          set axis_ 2
          set_step_axis_ 3
-         set_display_plane_ $plane_
 
          #  Display spectra on mouse click.
          add_bindings_
 
          #  Map in all data, this makes it immediately available within
-         #  application 
+         #  application
          lassign [$accessor_ map] adr nel type
       }
    }
@@ -526,6 +525,7 @@ itcl::class gaia::GaiaNDFCube {
          set plane_max_ [lindex $bounds_ [expr (${axis_}-1)*2+1]]
 
          $itk_component(index) configure -from $plane_min_ -to $plane_max_
+         $itk_component(index) configure -value $plane_min_
 
          $itk_component(lower) configure -from $plane_min_ -to $plane_max_
          $itk_component(upper) configure -from $plane_min_ -to $plane_max_
@@ -544,17 +544,18 @@ itcl::class gaia::GaiaNDFCube {
          set_collapse_upper_bound_ $plane_max_
 
          #  Label and units.
-         set vlu [get_coord_ $plane_ 1]
+         set vlu [get_coord_ $plane_ 1 1]
          set trail [lassign $vlu value]
          $itk_component(indextype) configure -value $trail
 
          set plane_ $plane_min_
-         set_display_plane_ [expr (${plane_max_}- ${plane_min_})/2]
+         set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2]
       }
    }
 
    #  Set the plane to display and display it.
    protected method set_display_plane_ { newvalue } {
+
       if { $newvalue != $plane_ && $ndfname_ != {} } {
          if { $newvalue >= $plane_max_ } {
             set plane_ $plane_max_
@@ -572,13 +573,20 @@ itcl::class gaia::GaiaNDFCube {
             set section "(,,$plane_)"
          }
          display_ ${ndfname_}$section
-         set coord [get_coord_ $plane_]
+         set coord [get_coord_ $plane_ 1 0]
          $itk_component(indexlabel) configure -value $coord
+
+         #  Make sure position show in slide matches this (note feedback is
+         #  avoided as $newvalue == $plane_).
+         $itk_component(index) configure -value $plane_
 
          #  Move spectral reference position.
          if { [info exists spectrum_] } {
-            if { $spectrum_ != {} && $coord != {} } {
-               $spectrum_ set_ref_coord $coord
+            if { $spectrum_ != {} } {
+               set coord [get_coord_ $plane_ 0 0]
+               if { $coord != {} } {
+                  $spectrum_ set_ref_coord $coord
+               }
             }
          }
       }
@@ -595,17 +603,17 @@ itcl::class gaia::GaiaNDFCube {
    #  Set the animation lower bound.
    protected method set_lower_bound_ {bound} {
       set lower_bound_ $bound
-      $itk_component(lowerlabel) configure -value [get_coord_ $bound]
+      $itk_component(lowerlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Set the animation upper bound.
    protected method set_upper_bound_ {bound} {
       set upper_bound_ $bound
-      $itk_component(upperlabel) configure -value [get_coord_ $bound]
+      $itk_component(upperlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Get the coordinate of an index along the current axis.
-   protected method get_coord_ {index {trail 0}} {
+      protected method get_coord_ {index {formatted 1} {trail 0}} {
       #  Need index as a pixel coordinate.
       set pcoord [expr $index - 0.5]
       if { $axis_ == 1 } {
@@ -617,7 +625,7 @@ itcl::class gaia::GaiaNDFCube {
       }
       set coord {}
       catch {
-         set coord [$accessor_ coord $axis_ $section $trail]
+         set coord [$accessor_ coord $axis_ $section $formatted $trail]
       }
       return $coord
    }
@@ -657,7 +665,6 @@ itcl::class gaia::GaiaNDFCube {
    #  Increment the displayed section by one.
    protected method increment_ {} {
       if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
-         $itk_component(index) configure -value [expr ${plane_}+1]
          set_display_plane_ [expr ${plane_}+$step_]
          if { $plane_ == $lower_bound_ } {
             #  At lower edge, running backwards, need to let it step below.
@@ -702,13 +709,13 @@ itcl::class gaia::GaiaNDFCube {
    #  Set the collapse lower bound.
    protected method set_collapse_lower_bound_ {bound} {
       set lower_collapse_bound_ $bound
-      $itk_component(collowerlabel) configure -value [get_coord_ $bound]
+      $itk_component(collowerlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    #  Set the collapse upper bound.
    protected method set_collapse_upper_bound_ {bound} {
       set upper_collapse_bound_ $bound
-      $itk_component(colupperlabel) configure -value [get_coord_ $bound]
+      $itk_component(colupperlabel) configure -value [get_coord_ $bound 1 0]
    }
 
    # Set the combination type
@@ -824,7 +831,7 @@ itcl::class gaia::GaiaNDFCube {
             set xo [lindex $bounds_ 0]
             set yo [lindex $bounds_ 2]
          }
-      
+
          #  Correct to pixel indices.
          set ix [expr round($iix-1+$xo)]
          set iy [expr round($iiy-1+$yo)]
@@ -867,7 +874,7 @@ itcl::class gaia::GaiaNDFCube {
                }
             }
 
-            #  Correct collapse bounds to grid indices (note C indices).
+            #  Correct collapse bounds to grid indices.
             if { $axis_ == 1 } {
                set zo [lindex $bounds_ 0]
             } elseif { $axis_ == 2 } {
@@ -875,13 +882,13 @@ itcl::class gaia::GaiaNDFCube {
             } else {
                set zo [lindex $bounds_ 4]
             }
-            set alow [expr round($lower_collapse_bound_-$zo)]
-            set ahigh [expr round($upper_collapse_bound_-$zo+1)]
-            
-            #  ix and iy are integers.
+            set alow [expr round($lower_collapse_bound_+1-$zo)]
+            set ahigh [expr round($upper_collapse_bound_+1-$zo)]
+
+            #  Make sure ix and iy are integers (zoomed images).
             set ix [expr round($iix)]
             set iy [expr round($iiy)]
-            
+
             #  Also autoscale when single click, so that we are not fixed for
             #  all time.
             if { $itk_option(-autoscale) || $action == "localstart" } {
@@ -889,9 +896,9 @@ itcl::class gaia::GaiaNDFCube {
                   $ix $iy 1 $ccx $ccy
 
                #  Set first-time reference position.
-               set coord [$itk_component(indexlabel) cget -value]
+               set coord [get_coord_ $plane_ 0 0]
                if { $coord != {} } {
-                  update; # force redraw.
+                  update; # Force redraw to get underlying plot right.
                   $spectrum_ set_ref_coord $coord
                }
             } else {
