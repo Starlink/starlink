@@ -53,9 +53,10 @@ int Array_Init( Tcl_Interp *interp )
  *   1)     the memory address (a long)
  *   2)     the cube type (HDS string)
  *   3&4&5) the cube dimensions (three arguments)
- *   6)     the axis that the spectrum lies along
- *   7&8)   the lower and upper bounds along axis line (-1's for all)
- *   9&10)  indices of the other two dimensions (increasing order), these
+ *   6)     the axis that the spectrum lies along, 1, 2 or 3.
+ *   7&8)   the lower and upper bounds along axis line (-1's for all), grid
+ *          indices.
+ *   9&10)  grid indices of the other two dimensions (increasing order), these
  *          define the "position" of the line
  *   11)    a boolean indicating whether the extracted data should be
  *          registered with CNF so that it can be released by CNF (NDF's will
@@ -113,6 +114,9 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
+    /* Correct to array indices (these are 0 based). */
+    axis--;
+
     /* Range of axis */
     if ( ( Tcl_GetIntFromObj( interp, objv[7], &arange[0] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[8], &arange[1] ) != TCL_OK ) ) {
@@ -120,11 +124,20 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+
+    /* Correct to array indices from grid ones and set to either end if values
+     * are -1 */ 
     if ( arange[0] == -1 ) {
         arange[0] = 0;
     }
+    else {
+        arange[0]--;
+    }
     if ( arange[1] == -1 ) {
         arange[1] = dims[axis];
+    }
+    else {
+        arange[1]--;
     }
 
     /* Indices of spectrum */
@@ -134,6 +147,10 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+    
+    /* Correct to zero-based array indices from grid indices */
+    index1--;
+    index2--;
 
     /* CNF registered memory */
     if ( Tcl_GetBooleanFromObj( interp, objv[11], &cnfMalloc ) != TCL_OK ) {
