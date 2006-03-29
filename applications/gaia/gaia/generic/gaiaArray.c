@@ -132,7 +132,7 @@ void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
         break;
 
         case HDS_REAL:
-            CONVERT_AND_COPY(float,VAL__BADD)
+            CONVERT_AND_COPY(float,VAL__BADR)
         break;
 
         case HDS_INTEGER:
@@ -373,10 +373,7 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
     }
     else {
         lower = MAX( 0,          MIN( arange[0], arange[1] ) );
-        upper = MIN( dims[axis], MAX( arange[1], arange[0] ) );
-        if ( lower == upper ) {
-            upper++;
-        }
+        upper = MIN( dims[axis], MAX( arange[1], arange[0] ) ) + 1;
         *nel = upper - lower;
     }
     length = *nel * gaiaArraySizeOf( type );
@@ -393,17 +390,17 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
     }
     else {
         if ( axis == 0 ) {
-            if ( index1 > dims[1] || index2 > dims[2] ) {
+            if ( index1 >= dims[1] || index2 >= dims[2] ) {
                 outside = 1;
             }
         }
         else if ( axis == 1 ) {
-            if ( index1 > dims[0] || index2 > dims[2] ) {
+            if ( index1 >= dims[0] || index2 >= dims[2] ) {
                 outside = 1;
             }
         }
         else if ( axis == 2 ) {
-            if ( index1 > dims[0] || index2 > dims[1] ) {
+            if ( index1 >= dims[0] || index2 >= dims[1] ) {
                 outside = 1;
             }
         }
@@ -429,15 +426,15 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
         /* Correct for arange offset. */
         offset += lower;
 
-        /* Set the address of first pixel. */
-        ptr = ((char *) inPtr) + offset;
+        /* Set the address of first pixel, remember to include sizeof(type). */
+        ptr = ((char *) inPtr) + ( offset * gaiaArraySizeOf( type ) );
 
         /* And copy the memory */
         memcpy( *outPtr, ptr, length );
     }
     else {
 
-        /* Noncontiguous memory, so need to pick it out pixel by pixel */
+        /* Non-contiguous memory, so need to pick it out pixel by pixel */
         int i;
         int indices[3];
         int j;
