@@ -171,7 +171,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
                               TRAIL_ARG(ndfname)
            );
        if ( status != SAI__OK ) {
-           *error_mess = gaiaUtilsErrMessage( &status );
+           *error_mess = gaiaUtilsErrMessage();
            emsRlse();
            return 0;
        }
@@ -257,7 +257,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    F77_FREE_CHARACTER( fhead );
 
    if ( status != SAI__OK ) {
-      *error_mess = gaiaUtilsErrMessage( &status );
+      *error_mess = gaiaUtilsErrMessage();
       emsRlse();
       return 0;
    }
@@ -370,7 +370,7 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-      *error_mess = gaiaUtilsErrMessage( &status );
+      *error_mess = gaiaUtilsErrMessage();
       ndfEnd( &status );
       emsRlse();
       return 0;
@@ -416,7 +416,7 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-      *error_mess = gaiaUtilsErrMessage( &status );
+      *error_mess = gaiaUtilsErrMessage();
       ndfEnd( &status );
       emsRlse();
       return 0;
@@ -616,7 +616,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         }
         else {
             /*  Some other error occured, just let it go */
-            emess = gaiaUtilsErrMessage( &status );
+            emess = gaiaUtilsErrMessage();
         }
     }
     else {
@@ -1113,7 +1113,7 @@ int gaiaNDFOpen( char *ndfname, int *ndfid, char **error_mess )
     emsMark();
     ndfOpen( NULL, ndfname, "READ", "OLD", ndfid, &place, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         ndfid = NDF__NOID;
         emsRlse();
         return TCL_ERROR;
@@ -1147,7 +1147,7 @@ int gaiaNDFType( int ndfid, const char* component, char *type,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = gaiaUtilsErrMessage( &status );
+       *error_mess = gaiaUtilsErrMessage();
        emsRlse();
        return TCL_ERROR;
    }
@@ -1168,7 +1168,7 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = gaiaUtilsErrMessage( &status );
+       *error_mess = gaiaUtilsErrMessage();
        emsRlse();
        return TCL_ERROR;
    }
@@ -1193,7 +1193,7 @@ int gaiaNDFMap( int ndfid, char *type, const char* component, void **data,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = gaiaUtilsErrMessage( &status );
+       *error_mess = gaiaUtilsErrMessage();
        ndfid = NDF__NOID;
        emsRlse();
        return TCL_ERROR;
@@ -1212,7 +1212,7 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
     ndfBegin();
     ndfUnmap( ndfid, component, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         ndfEnd( &status );
         emsRlse();
         return TCL_ERROR;
@@ -1236,7 +1236,7 @@ int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = gaiaUtilsErrMessage( &status );
+       *error_mess = gaiaUtilsErrMessage();
        *iwcs = (AstFrameSet *) NULL;
        emsRlse();
        return TCL_ERROR;
@@ -1335,7 +1335,7 @@ int gaiaNDFQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
     emsMark();
     ndfDim( ndfid, ndimx, dims, ndim, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         ndfid = NDF__NOID;
         emsRlse();
         return TCL_ERROR;
@@ -1354,7 +1354,7 @@ int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
     emsMark();
     ndfBound( ndfid, ndimx, lbnd, ubnd, ndim, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         ndfid = NDF__NOID;
         emsRlse();
         return TCL_ERROR;
@@ -1403,7 +1403,7 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
 
     ndfGtwcs( ndfid, &frameSet, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         emsRlse();
         *coord = NULL;
         return TCL_ERROR;

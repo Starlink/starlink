@@ -71,6 +71,7 @@
 #include "sae_par.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "gaiaUtils.h"
 
 /*  Function prototypes */
 
@@ -111,7 +112,6 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
    char *opPtr;
    char *opStr;
    char buffer[TCL_DOUBLE_SPACE+2];
-   char param[EMS__SZPAR];
    double *xin;
    double *yin;
    double *xout;
@@ -300,24 +300,14 @@ int centroidCmd( struct StarImageInfo *info, char *args, char **errStr )
       Tcl_SetResult( info->interp, opPtr, TCL_DYNAMIC );
       result = 1;
 
-   } else {
+   } 
+   else {
       /*  Centroid routine exited in error, so get the error from EMS
           and return it as errStr. */
-      opStr = (char *) NULL;
-      used = 0;
-      while ( status != SAI__OK ) {
-         opStr = realloc( (void *)opStr, (size_t) EMS__SZMSG * sizeof(char) );
-         opPtr = opStr + used;
-         ems_stat_c( &status );
-         ems_eload_c( param, &i, opPtr, &j, &status);
-         used += j;
-         opStr[used++] ='\n';
-      }
-      opStr[used] = '\0';
-      *errStr = opStr;
+       *errStr = gaiaUtilsErrMessage();
 
-      /*  Set success of routine to false. */
-      result = 0;
+       /*  Set success of routine to false. */
+       result = 0;
    }
    ems_rlse_c();
    Tcl_Free( (char *) listArgv );

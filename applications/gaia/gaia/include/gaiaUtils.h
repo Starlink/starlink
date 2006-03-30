@@ -9,8 +9,8 @@
 extern "C" {
 #endif
 
-    /* Constructor an error message string from an ADAM status. */
-    char *gaiaUtilsErrMessage( int *status );
+    /* Construct an error message string from the current ADAM status. */
+    char *gaiaUtilsErrMessage();
 
 #ifdef __cplusplus
 }

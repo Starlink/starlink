@@ -48,7 +48,6 @@ static int gaiaHDSTclTune( ClientData clientData, Tcl_Interp *interp,
 {
     char *what;
     char *error_mess;
-    int result;
     int value;
 
     /* Check arguments */

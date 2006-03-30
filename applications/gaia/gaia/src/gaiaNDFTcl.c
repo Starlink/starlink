@@ -24,6 +24,7 @@
 #include <tcl.h>
 #include <ndf.h>
 #include <gaiaNDF.h>
+#include <gaiaHDS.h>
 
 /* Local prototypes */
 static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,

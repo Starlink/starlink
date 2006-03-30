@@ -25,6 +25,7 @@
 #include <gaiaHDS.h>
 #include <gaiaUtils.h>
 #include <star/hds.h>
+#include <ems.h>
 
 /**
  * Set a HDS tuning parameter.
@@ -35,7 +36,7 @@ int gaiaHDSTune( char *what, int value, char **error_mess )
     emsMark();
     hdsTune( what, value, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         emsRlse();
         return 1;
     }
@@ -52,7 +53,7 @@ int gaiaHDSGTune( char *what, int *value, char **error_mess )
     emsMark();
     hdsGtune( what, value, &status );
     if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
+        *error_mess = gaiaUtilsErrMessage();
         emsRlse();
         return 1;
     }

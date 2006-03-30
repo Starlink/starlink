@@ -85,6 +85,7 @@
 #include "sae_par.h"
 #include "ems.h"
 #include "ems_par.h"
+#include "gaiaUtils.h"
 
 #define MAXFILE 132
 #define FRACTION 0.05
@@ -159,17 +160,13 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
     /* Local C variables: */
     byte *qualPtr;
     char *atPtr;
-    char *opPtr;
-    char *opStr;
     char *ptr;
-    char param[EMS__SZPAR];
-    int i, j;
+    int i;
     int keep, x1, y1, x2, y2;
     int release;
     int result;
     int size;
     int undo;
-    int used;
     int usepart;
     int variance;
     void *image;
@@ -181,7 +178,6 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
 
     /* Runtime initialisations. */
     qualPtr = (byte *)NULL;
-    opStr = (char *)NULL;
     result = 1;
     scale = 1.0f;
     nFit = 3;
@@ -436,18 +432,7 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         if ( status != SAI__OK ) {
 
             /*  Get the error from EMS and return it as errStr. */
-            opStr = (char *) NULL;
-            used = 0;
-            while ( status != SAI__OK ) {
-                opStr = realloc( (void *)opStr, (size_t) EMS__SZMSG * sizeof(char) );
-                opPtr = opStr + used;
-                ems_stat_c( &status );
-                ems_eload_c( param, &i, opPtr, &j, &status);
-                used += j;
-                opStr[used++] ='\n';
-            }
-            opStr[used] = '\0';
-            *errStr = opStr;
+            *errStr = gaiaUtilsErrMessage();
 
             /*  Set success of routine to false. */
             result = 0;
