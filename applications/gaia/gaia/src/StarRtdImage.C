@@ -173,6 +173,8 @@
 //     21-MAR-2006 (PWD): 
 //        Removed direct NDF access commands. These are now available
 //        via the ndf:: commands. See gaiaNDFTcl.
+//     30-MAR-2006 (PWD):
+//        Added updateImageDataCmd.
 //-
 
 #include <config.h>   /* Skycat util */
@@ -250,63 +252,62 @@ public:
     int min_args;                                      // Min number of args
     int max_args;                                      // Max number of args
 } subcmds_[] = {
-    { "astaddcolour",  &StarRtdImage::astaddcolourCmd,  2, 2 },
-    { "astalwaysmerge",&StarRtdImage::astalwaysmergeCmd,1, 1 },
-    { "astassign",     &StarRtdImage::astassignCmd,     7, 7 },
-    { "astbootstats",  &StarRtdImage::astbootstatsCmd,  4, 4 },
-    { "astcarlin",     &StarRtdImage::astcarlinCmd,     1, 1 },
-    { "astcelestial",  &StarRtdImage::astcelestialCmd,  0, 0 },
-    { "astcopy",       &StarRtdImage::astcopyCmd,       1, 1 },
-    { "astcreate",     &StarRtdImage::astcreateCmd,     0, 0 },
-    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,    2, 3 },
-    { "astdelete",     &StarRtdImage::astdeleteCmd,     1, 1 },
-    { "astdomains",    &StarRtdImage::astdomainsCmd,    0, 0 },
-    { "astfix",        &StarRtdImage::astfixCmd,        0, 0 },
-    { "astfontresize", &StarRtdImage::astfontresizeCmd, 1, 1 },
-    { "astget",        &StarRtdImage::astgetCmd,        1, 1 },
-    { "astmilli",      &StarRtdImage::astmilliCmd,      1, 1 },
-    { "astpix2cur",    &StarRtdImage::astpix2curCmd,    2, 2 },
-    { "astpix2wcs",    &StarRtdImage::astpix2wcsCmd,    2, 4 },
-    { "astread",       &StarRtdImage::astreadCmd,       1, 1 },
-    { "astrefine",     &StarRtdImage::astrefineCmd,     4, 4 },
-    { "astreplace",    &StarRtdImage::astreplaceCmd,    0, 0 },
-    { "astreset",      &StarRtdImage::astresetCmd,      1, 1 },
-    { "astrestore",    &StarRtdImage::astrestoreCmd,    0, 1 },
-    { "astset",        &StarRtdImage::astsetCmd,        2, 2 },
-    { "aststore",      &StarRtdImage::aststoreCmd,      2, 4 },
-    { "astsystem",     &StarRtdImage::astsystemCmd,     2, 3 },
-    { "asttran2",      &StarRtdImage::asttran2Cmd,      2, 2 },
-    { "astwarnings",   &StarRtdImage::astwarningsCmd,   0, 0 },
-    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,    2, 2 },
-    { "astwrite",      &StarRtdImage::astwriteCmd,      1, 3 },
-    { "biasimage",     &StarRtdImage::biasimageCmd,     0, 3 },
-    { "blankcolor",    &StarRtdImage::blankcolorCmd,    1, 1 },
-    { "colorramp",     &StarRtdImage::colorrampCmd,     0, 2 },
-    { "contour",       &StarRtdImage::contourCmd,       1, 6 },
-    { "dump",          &StarRtdImage::dumpCmd,          1, 2 },
-    { "foreign",       &StarRtdImage::foreignCmd,       2, 2 },
-    { "fullname",      &StarRtdImage::fullNameCmd,      0, 0 },
-    { "gband",         &StarRtdImage::gbandCmd,         6, 6 },
-    { "globalstats",   &StarRtdImage::globalstatsCmd,   2, 2 },
-    { "hdu",           &StarRtdImage::hduCmd,           0, 6 },
-    { "iscompound",    &StarRtdImage::isCompoundCmd,    0, 0 },
-    { "isfits",        &StarRtdImage::isfitsCmd,        0, 0 },
-    { "origin",        &StarRtdImage::originCmd,        2, 3 },
-    { "percentiles",   &StarRtdImage::percentCmd,       1, 1 },
-    { "plotgrid",      &StarRtdImage::plotgridCmd,      0, 2 },
-    { "readonly",      &StarRtdImage::readonlyCmd,      0, 1 },
-    { "remote",        &StarRtdImage::remoteCmd,        0, 1 },
-    { "remotetcl",     &StarRtdImage::remoteTclCmd,     1,  1},
-    { "slalib",        &StarRtdImage::slalibCmd,        1, 10},
-    { "slice",         &StarRtdImage::sliceCmd,        11, 11},
-    { "urlget",        &StarRtdImage::urlgetCmd,        1, 1 },
-    { "usingxshm",     &StarRtdImage::usingxshmCmd,     0, 0 },
-    { "xyprofile",     &StarRtdImage::xyProfileCmd,    14, 14}
+    { "astaddcolour",    &StarRtdImage::astaddcolourCmd,    2, 2 },
+    { "astalwaysmerge",  &StarRtdImage::astalwaysmergeCmd,  1, 1 },
+    { "astassign",       &StarRtdImage::astassignCmd,       7, 7 },
+    { "astbootstats",    &StarRtdImage::astbootstatsCmd,    4, 4 },
+    { "astcarlin",       &StarRtdImage::astcarlinCmd,       1, 1 },
+    { "astcelestial",    &StarRtdImage::astcelestialCmd,    0, 0 },
+    { "astcopy",         &StarRtdImage::astcopyCmd,         1, 1 },
+    { "astcreate",       &StarRtdImage::astcreateCmd,       0, 0 },
+    { "astcur2pix",      &StarRtdImage::astcur2pixCmd,      2, 3 },
+    { "astdelete",       &StarRtdImage::astdeleteCmd,       1, 1 },
+    { "astdomains",      &StarRtdImage::astdomainsCmd,      0, 0 },
+    { "astfix",          &StarRtdImage::astfixCmd,          0, 0 },
+    { "astfontresize",   &StarRtdImage::astfontresizeCmd,   1, 1 },
+    { "astget",          &StarRtdImage::astgetCmd,          1, 1 },
+    { "astmilli",        &StarRtdImage::astmilliCmd,        1, 1 },
+    { "astpix2cur",      &StarRtdImage::astpix2curCmd,      2, 2 },
+    { "astpix2wcs",      &StarRtdImage::astpix2wcsCmd,      2, 4 },
+    { "astread",         &StarRtdImage::astreadCmd,         1, 1 },
+    { "astrefine",       &StarRtdImage::astrefineCmd,       4, 4 },
+    { "astreplace",      &StarRtdImage::astreplaceCmd,      0, 0 },
+    { "astreset",        &StarRtdImage::astresetCmd,        1, 1 },
+    { "astrestore",      &StarRtdImage::astrestoreCmd,      0, 1 },
+    { "astset",          &StarRtdImage::astsetCmd,          2, 2 },
+    { "aststore",        &StarRtdImage::aststoreCmd,        2, 4 },
+    { "astsystem",       &StarRtdImage::astsystemCmd,       2, 3 },
+    { "asttran2",        &StarRtdImage::asttran2Cmd,        2, 2 },
+    { "astwarnings",     &StarRtdImage::astwarningsCmd,     0, 0 },
+    { "astwcs2pix",      &StarRtdImage::astwcs2pixCmd,      2, 2 },
+    { "astwrite",        &StarRtdImage::astwriteCmd,        1, 3 },
+    { "biasimage",       &StarRtdImage::biasimageCmd,       0, 3 },
+    { "blankcolor",      &StarRtdImage::blankcolorCmd,      1, 1 },
+    { "colorramp",       &StarRtdImage::colorrampCmd,       0, 2 },
+    { "contour",         &StarRtdImage::contourCmd,         1, 6 },
+    { "dump",            &StarRtdImage::dumpCmd,            1, 2 },
+    { "foreign",         &StarRtdImage::foreignCmd,         2, 2 },
+    { "fullname",        &StarRtdImage::fullNameCmd,        0, 0 },
+    { "gband",           &StarRtdImage::gbandCmd,           6, 6 },
+    { "globalstats",     &StarRtdImage::globalstatsCmd,     2, 2 },
+    { "hdu",             &StarRtdImage::hduCmd,             0, 6 },
+    { "iscompound",      &StarRtdImage::isCompoundCmd,      0, 0 },
+    { "isfits",          &StarRtdImage::isfitsCmd,          0, 0 },
+    { "origin",          &StarRtdImage::originCmd,          2, 3 },
+    { "percentiles",     &StarRtdImage::percentCmd,         1, 1 },
+    { "plotgrid",        &StarRtdImage::plotgridCmd,        0, 2 },
+    { "readonly",        &StarRtdImage::readonlyCmd,        0, 1 },
+    { "remote",          &StarRtdImage::remoteCmd,          0, 1 },
+    { "remotetcl",       &StarRtdImage::remoteTclCmd,       1, 1 },
+    { "slice",           &StarRtdImage::sliceCmd,          11, 11},
+    //{ "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
+    { "urlget",          &StarRtdImage::urlgetCmd,          1, 1 },
+    { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
+    { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
 };
 
 
-// XXXXXXX new commands needed (overrides) biasimageCmd, infoCmd. What is
-// bltgraphCmd?
+// XXX new 2.4.7 commands needed (overrides) biasimageCmd, infoCmd.
 
 //+
 //  starRtdImageType
@@ -323,9 +324,7 @@ static Tk_ImageType starRtdImageType = {
     TkImage::DisplayImage,               /* displayProc */
     TkImage::FreeImage,                  /* freeProc */
     TkImage::DeleteImage,                /* deleteProc */
-#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
     (Tk_ImagePostscriptProc *) NULL,     /* postscriptProc */
-#endif
     (Tk_ImageType *) NULL                /* nextPtr */
 };
 
@@ -386,14 +385,10 @@ extern "C" int StarRtd_Init( Tcl_Interp *interp )
 int StarRtdImage::CreateImage( Tcl_Interp *interp,
                                char *name,
                                int argc,
-#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
                                Tcl_Obj *CONST objv[], // Argument objects for
                                                       // options (not
                                                       // including image name
                                                       // or type)
-#else
-                               char *argv[],
-#endif
                                Tk_ImageType *typePtr,
                                Tk_ImageMaster master,
                                ClientData *clientDataPtr )
@@ -402,13 +397,11 @@ int StarRtdImage::CreateImage( Tcl_Interp *interp,
     cout << "Called StarRtdImage::CreateImage" << endl;
 #endif
 
-#if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
-    // just generate an argv from the objv argument
+    // Generate an argv from the objv argument
     char* argv[64];  // there shouldn't be more than a few options...
     for(int i = 0; i < argc; i++)
 	argv[i] = Tcl_GetString(objv[i]);
     argv[argc] = NULL;
-#endif
 
     //  Now Create the image.
     StarRtdImage *im = new StarRtdImage( interp, name, argc, argv, master,
@@ -1075,7 +1068,6 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 		}
 		break;
 
-#if _HAVE_R6
 	    case RTD_OPTION(usexsync):
 		if (usingXSync_ && usexsync()) {
 		    /*
@@ -1086,7 +1078,6 @@ int StarRtdImage::configureImage(int argc, char* argv[], int flags)
 		    // fprintf(stderr, "Raising priority of client %s\n", name());
 		}
 		break;
-#endif  // _HAVE_R6
 
 	    case RTD_OPTION(displaymode):
 	    case RTD_OPTION(shm_header):
@@ -6255,77 +6246,6 @@ int StarRtdImage::astalwaysmergeCmd( int argc, char *argv[] )
     }
     return TCL_OK;
 }
-
-//+
-//   StarRtdImage::slalibCmd
-//
-//   Purpose:
-//      Offers access to a limited set of SLALIB and related routines.
-//
-//   Arguments:
-//      Name of the method to invoke, followed by any necessary
-//      arguments.
-//
-//   Result:
-//      A string value. An error is thrown if the request cannot be
-//      supported.
-//-
-int StarRtdImage::slalibCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::slalibCmd" << std::endl;
-#endif
-
-    //  First argument is name of SLALIB routine.
-    if ( strcmp( argv[0], "slaobs" ) == 0 ) {
-
-        //  Other arguments should be observation index and/or
-        //  observation station. Use -1 to get list of observatories.
-        int n = 0;
-        char c[11];
-        char name[41];
-        double w, p, h;
-        if ( argc >= 2 ) {
-            if ( Tcl_GetInt( interp_, argv[1], &n) != TCL_OK ) {
-                return error( argv[1], " is not an integer");
-            }
-        }
-        if ( argc >= 3 ) {
-            strncpy( c, argv[2], 11 );
-        }
-        else {
-            c[0] = '\0';
-        }
-        slaObs( n, c, name, &w, &p, &h );
-
-        // Construct a list return of all the parameters.
-        char result[ 60 + TCL_DOUBLE_SPACE * 3 ];
-        sprintf( result, "{%s} {%s} {%f} {%f} {%f}", c, name, w, p, h );
-        set_result( result );
-    }
-    else if ( strcmp( argv[0], "dateobs2je" ) == 0 ) {
-
-        //  Convert a DATE-OBS FITS date string to a Julian Epoch. Two
-        //  arguments are needed, the name of the keyword (so that
-        //  old-style DATE is allowed) and the complete FITS card.
-        if ( argc != 3 ) {
-            return error( "wrong number of arguments, should "
-                          "be FITS-keyword FITS-card" );
-        }
-        double value;
-        if ( hgetdate( argv[2], argv[1], &value ) ) {
-            set_result( value );
-        }
-        else {
-            return error( argv[2], ": doesn't contain a date" );
-        }
-    }
-    else {
-        return error( argv[0], " : unknown slalib subcommand" );
-    }
-    return TCL_OK;
-}
-
 
 //  ==================================
 //  UKIRT quick look member functions.
