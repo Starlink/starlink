@@ -52,6 +52,7 @@
 
 *  Authors:
 *     Tim Jenness (TIMJ)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +60,8 @@
 *        Initial version.
 *     2006-01-26 (TIMJ):
 *        No longer have dksquid.
+*     2006-03-29 (AGG)
+*        Use smf_create_smfDA to create an empty smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,20 +115,26 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
   da = tofill;
   if (*status != SAI__OK) return da;
 
+  /* If we have a null pointer then create the barebones smfDA
+     struct */
   if (tofill == NULL) {
-    da = smf_malloc( 1, sizeof(smfDA), 0, status );
+    da = smf_create_smfDA( status );
   }
 
   if (*status == SAI__OK) {
     da->flatcal = flatcal;
     da->flatpar = flatpar;
+    da->nflat = nflat;
     if (flatname != NULL) {
       strncpy(da->flatname, flatname, SC2STORE_FLATLEN);
       (da->flatname)[SC2STORE_FLATLEN-1] = '\0';
     } else {
       (da->flatname)[0] = '\0';
     }
-    da->nflat = 0;
+  } else {
+    msgOutif(MSG__VERB, FUNC_NAME, 
+	     "Unable to allocate memory for new smfDA", status);
+    return NULL;
   }
 
   return da;
