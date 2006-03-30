@@ -93,6 +93,22 @@ itcl::class gaia::GaiaNDFCube {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
+      #  Add the Options menu.
+      set Options [add_menubutton "Options" left]
+      configure_menubutton Options -underline 0
+      
+      #  Whether to mmap cube or load directly into memory, usually
+      #  mmap'd. Control-l forces direct load, if not already done.
+      $Options add checkbutton -label "Mmap cube" \
+         -command [code $this load_cube_ 0] \
+         -accelerator {Control-l} \
+         -variable [scope itk_option(-usemmap)] \
+         -onvalue 1 \
+         -offvalue 0
+      bind $w_ <Control-l> [code $this configure -usemmap 1]
+      add_menu_short_help $Options {Mmap cube}  \
+         {When selected quickly access cube data, otherwise read fully}
+
       #  Add window help.
       add_help_button ndfcube "On Window..."
       add_short_help $itk_component(menubar).help \
@@ -493,7 +509,7 @@ itcl::class gaia::GaiaNDFCube {
       set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
       if { [$namer exists] } {
          if { $accessor_ == {} } {
-            set accessor_ [uplevel #0 GaiaNDAccess \#auto]
+            set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
          }
 
          $namer absolute
@@ -513,7 +529,26 @@ itcl::class gaia::GaiaNDFCube {
 
          #  Map in all data, this makes it immediately available within
          #  application
-         lassign [$accessor_ map] adr nel type
+         load_cube_ 1
+      }
+   }
+
+   #  Load the cube data, using the current mmap mode. Only happens when force
+   #  is true, os if a change the mmap mode of the cube is needed.
+   #  Controlling the mmap mode can force file i/o to be is used to load all
+   #  the cube into malloc'd memory, which speeds the spectral
+   #  readout. Otherwise mmap is used, which may give an initially slow
+   #  spectral readout for large cubes. 
+   protected method load_cube_ { force } {
+      if { $accessor_ == {} } {
+         return 
+      }
+      if { [$accessor_ cget -usemmap] != $itk_option(-usemmap) || $force } { 
+         busy {
+            $accessor_ unmap
+            $accessor_ configure -usemmap $itk_option(-usemmap)
+            lassign [$accessor_ map] adr nel type
+         }
       }
    }
 
@@ -632,6 +667,7 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Start the animation.
    protected method start_ {} {
+      set initial_seconds_ [clock clicks -milliseconds]
       if { $afterId_ == {} } {
          if { $lower_bound_ > $upper_bound_ } {
             set temp $lower_bound_
@@ -643,9 +679,10 @@ itcl::class gaia::GaiaNDFCube {
          increment_
       }
    }
-
+   protected variable initial_seconds_ 0
    #  Stop the animation.
    protected method stop_ {} {
+      puts "time taken: [expr [clock clicks -milliseconds] - $initial_seconds_]"
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
@@ -856,11 +893,12 @@ itcl::class gaia::GaiaNDFCube {
          $splat_disp_ runwith "${ndfname_}${section}" 0
 
       } else {
-         #  Display in the spectrum_plot.
+         #  Display in the spectrum_plot. Note show short help in this window.
          if { [info exists spectrum_] } {
             if { $spectrum_ == {} } {
                set spectrum_ [GaiaSpectralPlot $w_.specplot \
-                                 -number $itk_option(-number)]
+                                 -number $itk_option(-number) \
+                                 -shorthelpwin [scope $short_help_win_]]
 
                #  Make this a transient of main window, not this one.
                wm transient $spectrum_ $itk_option(-gaia)
@@ -892,8 +930,10 @@ itcl::class gaia::GaiaNDFCube {
             #  Also autoscale when single click, so that we are not fixed for
             #  all time.
             if { $itk_option(-autoscale) || $action == "localstart" } {
-               $spectrum_ display $accessor_ $axis_ $alow $ahigh \
-                  $ix $iy 1 $ccx $ccy
+               busy {
+                  $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                     $ix $iy 1 $ccx $ccy
+               }
 
                #  Set first-time reference position.
                set coord [get_coord_ $plane_ 0 0]
@@ -902,8 +942,10 @@ itcl::class gaia::GaiaNDFCube {
                   $spectrum_ set_ref_coord $coord
                }
             } else {
-               $spectrum_ display $accessor_ $axis_ $alow $ahigh \
-                  $ix $iy 0
+               busy {
+                  $spectrum_ display $accessor_ $axis_ $alow $ahigh \
+                     $ix $iy 0
+               }
             }
          }
       }
@@ -958,6 +1000,10 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Does spectral plot auto-update ranges.
    itk_option define -autoscale autoscale AutoScale 0
+
+   #  Whether to use file mapping (quick startup), or direct io (fast 
+   #  spectral display).
+   itk_option define -usemmap usemmap UseMmap 1
 
    #  Protected variables: (available to instance)
    #  --------------------
