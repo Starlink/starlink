@@ -114,9 +114,10 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
 
 
-    //  AST tuning.
+    //  AST tuning. MemoryCaching give 3-4% speed up, ObjectCaching
+    //  is not noticable, so consensus is leave off.
     astTune( "MemoryCaching", 1 );
-    astTune( "ObjectCaching", 1 );
+    //astTune( "ObjectCaching", 1 );
 
     // The gaia_library path can be found in several places.  Here is the order
     // in which the are searched.
