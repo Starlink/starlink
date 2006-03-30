@@ -297,9 +297,6 @@ class StarRtdImage : public Skycat
    //  Enable readouts etc. to show milli-arcsec precision.
    int astmilliCmd( int argc, char *argv[] );
 
-   //  Access to some SLALIB routines.
-   int slalibCmd( int argc, char *argv[] );
-
    //  Set the CarLin attribute of FITS channels.
    int astcarlinCmd( int argc, char *argv[] );
 
