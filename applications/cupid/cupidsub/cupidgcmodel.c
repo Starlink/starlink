@@ -18,7 +18,7 @@ extern CupidGC cupidGC;
 
 
 double cupidGCModel( int ndim, double *x, double *par, int what, 
-                        int newx, int newp ){
+                     int newx, int newp ){
 /*
 *  Name:
 *     cupidGCModel
@@ -28,7 +28,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 *  Synopsis:
 *     double cupidGCModel( int ndim, double *x, double *par, int what, 
-*                             int newx, int newp )
+*                          int newx, int newp )
 
 *  Description:
 *     This function evaluates the Gaussian model defined by the supplied
@@ -91,7 +91,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *     - Stutski & Gusten take account of instrumental smoothing only in so
 *     far as they increase the supplied clump FWHM. This implementation
 *     also reduces the peak value by a corresponding factor, since smoothing 
-*     will reduce the peak value in a clump.
+*     will reduce the peak value in a clump. Thus par[ 0 ] represents the
+*     intrinsic peak value rather than the observed peak value.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -120,6 +121,9 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    static double dx1_sq;   /* Total FWHM in pixels on axis 1, squared */
    static double em;       /* Scalar argument to exp function  */
    static double expv;     /* Value of exp function */
+   static double f3;       /* Constant for gradient wrt p[3] */
+   static double f5;       /* Constant for gradient wrt p[5] */
+   static double f8;       /* Constant for gradient wrt p[8] */
    static double m;        /* Finalmodel value */
    static double peak;     /* Peak value after instrumental smoothing */
    static double peakfactor;  /* Peak value factor */
@@ -142,6 +146,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The total FWHM in pixels on axis 0, squared. */
       t = par[ 3 ]*par[ 3 ];
       dx0_sq = cupidGC.beam_sq + t;
+      f3 = cupidGC.beam_sq/( par[ 3 ]*dx0_sq );
 
 /* The peak value factor (thsi takes account of the reduction in peak
    value caused by the instrumental smoothing). */
@@ -153,6 +158,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* The total FWHM in pixels on axis 1, squared. */
          t = par[ 5 ]*par[ 5 ];
          dx1_sq = cupidGC.beam_sq + t;
+         f5 = cupidGC.beam_sq/( par[ 5 ]*dx1_sq );
 
 /* The peak value factor */
          peakfactor_sq *= t/dx1_sq;       
@@ -168,6 +174,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
             t = par[ 8 ]*par[ 8 ];
             dv_sq = cupidGC.velres_sq + t;
             peakfactor_sq *= t/dv_sq;       
+            f8 = cupidGC.velres_sq/( par[ 8 ]*dv_sq );
          }     
       }
 
@@ -315,7 +322,24 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    required parameter, convert it to the rate of change of the model value 
    with respect to the required parameter, or report an error. */
       if( demdp != VAL__BADD ) {
-         ret = -peak*expv*K*demdp;
+         ret = -K*demdp;
+
+/* The clump size parameters (3, 5 and 8) affect the peak value of the
+   clump because of the effect of instrumental smoothing. Add on
+   appropriate terms. */
+         if( what == 3 ) {         
+            ret += f3;
+
+         } else if( what == 5 ) {         
+            ret += f5;
+
+         } else if( what == 8 ) {         
+            ret += f8;
+         }
+
+/* Apply the final scaling */
+         ret *= peak*expv;
+
       } else {
          *status = SAI__ERROR;
          msgSeti( "W", what );

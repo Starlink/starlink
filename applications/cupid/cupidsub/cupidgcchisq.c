@@ -103,6 +103,9 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    double *py;             /* Pointer to next data value to use */
    double back_term;       /* chi squared term to stop large shifts in bg level */
    double dx_sq;           /* Smoothed beam width */
+   double f3;              /* Beam smoothing factor for p[3] */
+   double f5;              /* Beam smoothing factor for p[5] */
+   double f8;              /* Beam smoothing factor for p[8] */
    double g;               /* Rat eof change of model value */
    double gback_term;      /* Gradient term to stop large shifts in bg level */
    double m;               /* Model value */
@@ -188,14 +191,19 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
       t = par[ 3 ]*par[ 3 ];
       dx_sq = cupidGC.beam_sq + t;
       peakfactor = t/dx_sq;       
+      f3 = par[ 0 ]*cupidGC.beam_sq/( par[ 3 ]*dx_sq );
+
       if( ndim > 1 ) {
          t = par[ 5 ]*par[ 5 ];
          dx_sq = cupidGC.beam_sq + t;
          peakfactor *= t/dx_sq;       
+         f5 = par[ 0 ]*cupidGC.beam_sq/( par[ 5 ]*dx_sq );
+
          if( ndim > 2 ) {
             t = par[ 8 ]*par[ 8 ];
             dx_sq = cupidGC.velres_sq + t;
             peakfactor *= t/dx_sq;       
+            f8 = par[ 0 ]*cupidGC.beam_sq/( par[ 8 ]*dx_sq );
          }     
       }
 
@@ -204,6 +212,10 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
       } else {
          peakfactor = 0.0;
       }
+
+      f3 *= peakfactor;
+      f5 *= peakfactor;
+      f8 *= peakfactor;
 
 /* The difference between the model peak value (after being reduced to
    take account of instrumental smoothing) and the data peak value. */
@@ -437,7 +449,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    the extra terms added to chi squared by the Stutski & Gusten paper,
    then we have extra terms to add to the gradient found above. */
       if( what == 0 ) {
-         ret += 2*cupidGC.sa*pdiff;
+         ret += 2*cupidGC.sa*pdiff*peakfactor;
 
       } else if( what == 1 ) {
          ret += 2*cupidGC.sa*pdiff + gback_term;
@@ -445,11 +457,21 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
       } else if( what == 2 ) {
          if( cupidGC.beam_sq > 0.0 ) ret += 2*cupidGC.sc4*x0_off/cupidGC.beam_sq;
 
+      } else if( what == 3 ) {
+         ret += 2*cupidGC.sa*pdiff*f3;
+
       } else if( what == 4 ) {
          if( cupidGC.beam_sq > 0.0 ) ret += 2*cupidGC.sc4*x1_off/cupidGC.beam_sq;
 
+      } else if( what == 5 ) {
+         ret += 2*cupidGC.sa*pdiff*f5;
+
       } else if( what == 7 ) {
          if( cupidGC.velres_sq > 0.0 ) ret += 2*cupidGC.sc4*v_off/cupidGC.velres_sq;
+
+      } else if( what == 8 ) {
+         ret += 2*cupidGC.sa*pdiff*f8;
+
       }
 
    }

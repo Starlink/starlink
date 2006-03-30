@@ -153,7 +153,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
          if( dx == 0.0 ) dx = 1.0E-6;
          x[ i ] += dx;
          cupidGCcalcf( n, x, &nf, &f );
-         printf("Par %d: %g %g %g\n", i, f, f0, dx );
+         printf("Par %d: %g %g %g %g\n", i, f, f0, f - f0, dx );
          printf("        %g %g\n", (f - f0)/dx, g[ i ] ); 
          x[ i ] -= dx;
          getchar();
