@@ -58,6 +58,7 @@
 #include "dat_err.h"
 #include "ndf.h"
 #include "gaiaNDF.h"
+#include "gaiaUtils.h"
 
 /*  Maximum number of pixels to copy during chunking. */
 #define MXPIX 2000000
@@ -117,86 +118,6 @@ extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId),
                                    LOGICAL(haveQual),
                                    POINTER(q) );
 
-/*  Local prototypes */
-static char *errMessage( int *status );
-
-/*
- *  Name:
- *     errMessage
- *
- *  Purpose:
- *     Copy the current EMS error message into a dynamic string for
- *     returning. Make sure status is set before calling this and
- *     release the memory used for the string when complete. On
- *     return status is reset to SAI__OK and the error stack is
- *     empty.
- */
-static char *errMessage( int *status )
-{
-    char buffer[EMS__SZMSG+1];
-    char param[EMS__SZPAR+1];
-    char *result_message = NULL;
-    char *result_copy = NULL;
-    int status_copy;
-    int buffer_length = 0;
-    int mess_length = 0;
-    int param_length = 0;
-
-    if ( status != SAI__OK ) {
-        /* Need to get error message in one pass. Since we don't know how
-           big this is going to be we need to realloc memory used */
-
-        /* Recover error status from EMS */
-        emsStat( &status_copy );
-
-        /* Loop until all error has been read */
-        while ( status_copy != SAI__OK ) {
-
-            /* Load error message and start reading it */
-            emsEload( param, &param_length, buffer, &buffer_length,
-                      &status_copy );
-
-            /* If all read then stop */
-            if ( status_copy != SAI__OK ) {
-
-                /* Else initialise or increase the result buffer to
-                   make room for new part, plus 2 for newline and
-                   null. */
-                mess_length += ( buffer_length + 2 );
-                result_copy = (char *) realloc( (void *) result_message,
-                                                (size_t) mess_length );
-                if ( result_copy == NULL ) {
-
-                    /* Realloc failed so use the fragment already
-                       recovered in  result_message */
-                    status_copy = SAI__OK;
-                }
-                else {
-                    /* Realloc suceeded */
-                    result_message = result_copy;
-
-                    /* Add a newline to end of string to wrap last
-                       line, unless this is first, in which initialise
-                       it */
-                    if ( mess_length == ( buffer_length + 2 ) ) {
-                        result_message[0] = '\0';
-                    }
-                    else {
-                        strcat( result_message, "\n" );
-                    }
-
-                    /* Concatenate buffer into result string */
-                    strncat( result_message, buffer, buffer_length );
-                }
-            }
-        }
-    }
-    else {
-        result_message = strdup( "Bad status value (gaiaNDF:errMessage)" );
-    }
-    return result_message;
-}
-
 /**
  * ===================================
  * Simple Skycat-like access routines.
@@ -246,7 +167,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
                               TRAIL_ARG(ndfname)
            );
        if ( status != SAI__OK ) {
-           *error_mess = errMessage( &status );
+           *error_mess = gaiaUtilsErrMessage( &status );
            emsRlse();
            return 0;
        }
@@ -332,7 +253,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    F77_FREE_CHARACTER( fhead );
 
    if ( status != SAI__OK ) {
-      *error_mess = errMessage( &status );
+      *error_mess = gaiaUtilsErrMessage( &status );
       emsRlse();
       return 0;
    }
@@ -445,7 +366,7 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-      *error_mess = errMessage( &status );
+      *error_mess = gaiaUtilsErrMessage( &status );
       ndfEnd( &status );
       emsRlse();
       return 0;
@@ -491,7 +412,7 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-      *error_mess = errMessage( &status );
+      *error_mess = gaiaUtilsErrMessage( &status );
       ndfEnd( &status );
       emsRlse();
       return 0;
@@ -517,7 +438,7 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
     emsMark();
     ndfUnmap( ndfid, component, &status );
     if ( status != SAI__OK ) {
-        *error_mess = errMessage( &status );
+        *error_mess = gaiaUtilsErrMessage( &status );
         ndfEnd( &status );
         emsRlse();
         return 0;
@@ -717,7 +638,7 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         }
         else {
             /*  Some other error occured, just let it go */
-            emess = errMessage( &status );
+            emess = gaiaUtilsErrMessage( &status );
         }
     }
     else {
@@ -1213,7 +1134,7 @@ int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
     emsMark();
     ndfOpen( NULL, ndfname, "READ", "OLD", ndfid, &place, &status );
     if ( status != SAI__OK ) {
-        *error_mess = errMessage( &status );
+        *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
         return 1;
@@ -1247,7 +1168,7 @@ int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = errMessage( &status );
+       *error_mess = gaiaUtilsErrMessage( &status );
        emsRlse();
        return 1;
    }
@@ -1268,7 +1189,7 @@ int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = errMessage( &status );
+       *error_mess = gaiaUtilsErrMessage( &status );
        emsRlse();
        return 1;
    }
@@ -1293,7 +1214,7 @@ int gaiaSimpleMapNDF( int ndfid, char *type, const char* component,
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = errMessage( &status );
+       *error_mess = gaiaUtilsErrMessage( &status );
        ndfid = NDF__NOID;
        emsRlse();
        return 1;
@@ -1315,7 +1236,7 @@ int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
-       *error_mess = errMessage( &status );
+       *error_mess = gaiaUtilsErrMessage( &status );
        *iwcs = (AstFrameSet *) NULL;
        emsRlse();
        return 1;
@@ -1414,7 +1335,7 @@ int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
     emsMark();
     ndfDim( ndfid, ndimx, dims, ndim, &status );
     if ( status != SAI__OK ) {
-        *error_mess = errMessage( &status );
+        *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
         return 1;
@@ -1433,7 +1354,7 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
     emsMark();
     ndfBound( ndfid, ndimx, lbnd, ubnd, ndim, &status );
     if ( status != SAI__OK ) {
-        *error_mess = errMessage( &status );
+        *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
         return 1;
@@ -1482,7 +1403,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
 
     ndfGtwcs( ndfid, &frameSet, &status );
     if ( status != SAI__OK ) {
-        *error_mess = errMessage( &status );
+        *error_mess = gaiaUtilsErrMessage( &status );
         emsRlse();
         *coord = NULL;
         return 1;

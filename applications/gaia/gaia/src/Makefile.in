@@ -40,7 +40,8 @@ CSRCS =  \
  ast_tclerr.c patch.c gaiaNDF.c writeslice.c centroid.c rotated.c \
  rtdRotBoxEllipse.c rtdDtrn.c rtdSegment.c grf_tkcan.c \
  rtdMark.c rtdWord.c rtdPolyline.c dencode.c slasubs.c \
- gaiaSpectralPlot.c gaiaNDFTcl.c gaiaArray.c gaiaArrayTcl.c
+ gaiaSpectralPlot.c gaiaNDFTcl.c gaiaArray.c gaiaArrayTcl.c \
+ gaiaHDS.c
 
 FSRCS =  \
  ardstat.f asc2tab.f autocrop.f cat2tab.f gai1_bswapb.f gai1_bswapd.f \
