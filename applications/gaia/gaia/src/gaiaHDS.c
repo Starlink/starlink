@@ -42,3 +42,20 @@ int gaiaHDSTune( char *what, int value, char **error_mess )
     emsRlse();
     return 0;
 }
+
+/**
+ * Get a HDS tuning parameter.
+ */
+int gaiaHDSGTune( char *what, int *value, char **error_mess )
+{
+    int status = SAI__OK;
+    emsMark();
+    hdsGtune( what, value, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage( &status );
+        emsRlse();
+        return 1;
+    }
+    emsRlse();
+    return 0;
+}
