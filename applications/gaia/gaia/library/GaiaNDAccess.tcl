@@ -12,7 +12,7 @@
 #     This class is designed to handle the access and description of datasets
 #     that don't have 2 dimensions. Superficially it is datatype independent,
 #     supporting access to NDF and FITS data, relying on the ndf:: and
-#     fits:: (too be written) Tcl commands. Sections of the data can be
+#     fits:: (to be written) Tcl commands. Sections of the data can be
 #     directly extracted from cubes for passing into GAIA/Skycat for display
 #     as images and spectra. 
 
@@ -151,10 +151,21 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Map in the dataset "data component". Returns the address, number of
-   #  elements and the data type (these are in the HDS format).
+   #  elements and the data type (these are in the HDS format). The mapping
+   #  uses mmap, if possible and requested.
    public method map {} {
-      lassign [${type_}::map $handle_] addr_ nel_ hdstype_
+      lassign [${type_}::map $handle_ $usemmap] addr_ nel_ hdstype_
       return [list $addr_ $nel_ $hdstype_]
+   }
+
+   #  Unmap in the dataset "data component", if mapped.
+   public method unmap {} {
+      if { $addr_ != 0 } {
+         ${type_}::unmap $handle_
+         set addr_ 0
+         set nel_ 0
+         set hdstype_ 0
+      }
    }
 
    #  Return the value of a "character component" of the dataset. These may be 
@@ -204,6 +215,12 @@ itcl::class gaia::GaiaNDAccess {
          parse_name_
       }
    }
+
+   #  Sets the "mapping mode" to be used when reading in the data
+   #  component. By default (1) this is "mmap", assuming the underlying system
+   #  supports if, otherwise file i/o and malloc should be used. If changed
+   #  after a mmap it is the callers responsibility to unmap and remap.
+   public variable usemmap 1
 
    #  Protected variables: (available to instance)
    #  --------------------
