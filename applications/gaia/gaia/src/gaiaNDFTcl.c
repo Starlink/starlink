@@ -100,8 +100,12 @@ static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf )
     Tcl_Obj *resultObj;
 
     if ( Tcl_GetIntFromObj( interp, obj, indf ) != TCL_OK ) {
+
+        /* Replace result with our message */
         resultObj = Tcl_GetObjResult( interp );
-        Tcl_SetStringObj( resultObj, " not an NDF identifier" , -1 );
+        Tcl_SetStringObj( resultObj, Tcl_GetString( obj ), -1 );
+        Tcl_AppendStringsToObj( resultObj, " : not an NDF identifier" , 
+                                (char *)NULL );
         return TCL_ERROR;
     }
     return TCL_OK;
@@ -195,10 +199,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 
         /* Mmap mode. */
         result = Tcl_GetBooleanFromObj( interp, objv[2], &mmap );
-        if ( result != TCL_OK ) {
-            Tcl_SetStringObj( resultObj, "not a boolean" , -1 );
-        }
-        else {
+        if ( result == TCL_OK ) {
             result = gaiaNDFType( indf, "DATA", type, NDF__SZTYP+1,
                                   &error_mess );
             if ( result == TCL_OK ) {
@@ -308,11 +309,9 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
     offset = 0;
     if ( objc == 4 ) {
         if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
-            Tcl_SetStringObj( resultObj, "not an integer" , -1 );
             return TCL_ERROR;
         }
         if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
-            Tcl_SetStringObj( resultObj, "not an integer" , -1 );
             return TCL_ERROR;
         }
     }
@@ -497,7 +496,6 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
         /* Next arguments are the axis that the coordinate is required for
          * followed by a list of all the pixel indices that specify the
          * position. */
-        resultObj = Tcl_GetObjResult( interp );
         if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) == TCL_OK ) {
             if ( Tcl_ListObjGetElements( interp, objv[3], &ncoords, &listObjv )
                  == TCL_OK ) {
@@ -516,7 +514,6 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                 if ( Tcl_GetBooleanFromObj( interp, objv[4], &format )
                      != TCL_OK ) {
                     result = TCL_ERROR;
-                    Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
                 }
 
                 /* Final element is whether to append the label and units. */
@@ -524,9 +521,9 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                 if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed )
                      != TCL_OK ) {
                     result = TCL_ERROR;
-                    Tcl_SetStringObj( resultObj, "is not a boolean", -1 );
                 }
 
+                resultObj = Tcl_GetObjResult( interp );
                 if ( result != TCL_ERROR ) {
                     result = gaiaNDFQueryCoord( indf, axis, coords,
                                                 trailed, format,
@@ -543,13 +540,10 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
             }
             else {
                 result = TCL_ERROR;
-                Tcl_SetStringObj( resultObj,
-                                  " is not a list of pixel indices", -1 );
             }
         }
         else {
             result = TCL_ERROR;
-            Tcl_SetStringObj( resultObj, "axis value not an integer", -1 );
         }
     }
     return result;

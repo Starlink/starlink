@@ -90,7 +90,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 
     /* Get cube memory address */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read data pointer",
+        Tcl_AppendResult( interp, ": failed to read data pointer",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -102,14 +102,14 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     if ( ( Tcl_GetIntFromObj( interp, objv[3], &dims[0] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[4], &dims[1] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[5], &dims[2] ) != TCL_OK ) ) {
-        Tcl_AppendResult( interp, "Failed to read cube dimensions",
+        Tcl_AppendResult( interp, ": failed to read cube dimensions",
                           (char *) NULL );
         return TCL_ERROR;
     }
 
     /* Axis of spectrum */
     if ( Tcl_GetIntFromObj( interp, objv[6], &axis ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read spectral axis",
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -120,7 +120,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     /* Range of axis */
     if ( ( Tcl_GetIntFromObj( interp, objv[7], &arange[0] ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[8], &arange[1] ) != TCL_OK ) ) {
-        Tcl_AppendResult( interp, "Failed to read axis ranges",
+        Tcl_AppendResult( interp, ": failed to read axis ranges",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -143,7 +143,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     /* Indices of spectrum */
     if ( ( Tcl_GetIntFromObj( interp, objv[9], &index1 ) != TCL_OK ) ||
          ( Tcl_GetIntFromObj( interp, objv[10], &index2 ) != TCL_OK ) ) {
-        Tcl_AppendResult( interp, "Failed to read spectral indices",
+        Tcl_AppendResult( interp, ": failed to read spectral indices",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -154,7 +154,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 
     /* CNF registered memory */
     if ( Tcl_GetBooleanFromObj( interp, objv[11], &cnfMalloc ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read spectral axis",
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
                           (char *) NULL );
         return TCL_ERROR;
     }
@@ -191,14 +191,14 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
 
     /* Get memory address */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read data pointer",
+        Tcl_AppendResult( interp, ": failed to read data pointer",
                           (char *) NULL );
         return TCL_ERROR;
     }
 
     /* CNF registered memory */
     if ( Tcl_GetBooleanFromObj( interp, objv[2], &cnfMalloc ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read spectral axis",
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
                           (char *) NULL );
         return TCL_ERROR;
     }

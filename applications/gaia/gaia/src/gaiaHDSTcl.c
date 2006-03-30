@@ -61,8 +61,6 @@ static int gaiaHDSTclTune( ClientData clientData, Tcl_Interp *interp,
 
     /* Get value. */
     if ( Tcl_GetIntFromObj( interp, objv[2], &value ) != TCL_OK ) {
-        Tcl_AppendResult( interp, "Failed to read integer",
-                          (char *) NULL );
         return TCL_ERROR;
     }
 
