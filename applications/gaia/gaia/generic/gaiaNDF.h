@@ -14,7 +14,7 @@ extern "C" {
 
 #include <ast.h>
 
-/*  Simple NDF interface */
+/*  Single NDF interface */
 /*  ==================== */
 
    /*  Open an NDF */
@@ -36,10 +36,6 @@ extern "C" {
    /*  Map an NDF data component */
    int gaiaMapNDF( int ndfid, void **data, const char *component,
                    char **error_message );
-
-   /*  Unmap an NDF data component */
-   int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess );
-
 
 /*  Multiple NDFs per container interface */
 /*  ===================================== */
@@ -84,47 +80,49 @@ extern "C" {
 /*
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================
- *  These are only used to query NDF bounds, so that we can section up cubes,
- *  plus some toys for playing around (see gaiaNDFTcl.c).
  */
 
     /* Open an NDF and return the identifier */
-    int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess );
+    int gaiaNDFOpen( char *ndfname, int *ndfid, char **error_mess );
 
     /* Close an NDF */
-    int gaiaSimpleCloseNDF( int *ndfid );
+    int gaiaNDFClose( int *ndfid );
 
     /* Get the data type of a component */
-    int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type, 
-                           int type_length, char **error_mess );
+    int gaiaNDFType( int ndfid, const char* component, char *type, 
+                     int type_length, char **error_mess );
 
     /* Get the value of a character component */
-    int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value, 
-                           int value_length, char **error_mess );
+    int gaiaNDFCGet( int ndfid, const char* component, char *value, 
+                     int value_length, char **error_mess );
 
     /* Query the dimensions of an opened NDF */
-    int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim, 
-                             char **error_mess );
+    int gaiaNDFQueryDims( int ndfid, int ndimx, int dims[], int *ndim, 
+                          char **error_mess );
 
     /* Query the pixel bounds of an opened NDF */
-    int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
-                               int *ndim, char **error_mess );
+    int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[], 
+                            int *ndim, char **error_mess );
 
     /* Query the coordinate of a position along the given axis. */
-    int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, 
-                              int ncoords, int trailed, int format, 
-                              char **coord, char **error_mess );
+    int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int ncoords, 
+                           int trailed, int format, char **coord, 
+                           char **error_mess );
 
     /* Map in an array component */
-    int gaiaSimpleMapNDF( int ndfid, char *type, const char* component, 
-                          void **data, int *el, char **error_mess );
+    int gaiaNDFMap( int ndfid, char *type, const char* component, void **data,
+                    int *el, char **error_mess );
+
+   /*  Unmap an NDF data component */
+   int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess );
+
 
     /* Get the NDF WCS component as an AST frameset */
-    int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess );
+    int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess );
 
     /* Get a frameset for a specified axis */
-    int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, 
-                              AstFrameSet **iwcs, char **error_mess );
+    int gaiaNDFGtAxisWacs( int ndfid, int axis, int offset, 
+                           AstFrameSet **iwcs, char **error_mess );
 
 #ifdef __cplusplus
 }
