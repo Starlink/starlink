@@ -22,17 +22,19 @@ static const char* const rcsId="@(#) $Id$";
 extern "C" {
 #include <ast.h>
     int StarRtd_Init(Tcl_Interp *interp);
+
+    int Array_Init(Tcl_Interp *interp);
     int Ellipse_Init();
-    int Word_Init();
+    int GaiaCat_Init(Tcl_Interp *interp);
     int Mark_Init();
-    int Segment_Init();
+    int Ndf_Init(Tcl_Interp *interp);
     int Polyline_Init();
     int RotBox_Init();
+    int Segment_Init();
+    int Sla_Init(Tcl_Interp *interp);
     int SpectralPlot_Init();
     int Tcladam_Init(Tcl_Interp *interp);
-    int GaiaCat_Init(Tcl_Interp *interp);
-    int Ndf_Init(Tcl_Interp *interp);
-    int Array_Init(Tcl_Interp *interp);
+    int Word_Init();
 }
 
 //  Generated code for bitmaps used in tcl scripts.
@@ -113,6 +115,10 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
         return TCL_ERROR;
     }
 
+    //  Simple SLALIB-like commands.
+    if ( Sla_Init(interp) != TCL_OK ) {
+        return TCL_ERROR;
+    }
 
     //  AST tuning. MemoryCaching give 3-4% speed up, ObjectCaching
     //  is not noticable, so consensus is leave off.
