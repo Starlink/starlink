@@ -63,6 +63,10 @@
 /*  Maximum number of pixels to copy during chunking. */
 #define MXPIX 2000000
 
+/*  TCL_OK and TCL_ERROR */
+#define TCL_OK 0
+#define TCL_ERROR 1
+
 /*
  *  Structure to store information about an NDF.
  */
@@ -420,32 +424,6 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    ndfEnd( &status );
    emsRlse();
    return 1;
-}
-
-/*
- *   Name:
- *      gaiaNDFUnmap
- *
- *   Purpose:
- *      Unmaps the named NDF component.
- *
- *   Notes:
- *      Component name can be "*" which unmaps everything.
- */
-int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
-{
-    int status = SAI__OK;
-    emsMark();
-    ndfUnmap( ndfid, component, &status );
-    if ( status != SAI__OK ) {
-        *error_mess = gaiaUtilsErrMessage( &status );
-        ndfEnd( &status );
-        emsRlse();
-        return 0;
-    }
-    ndfEnd( &status );
-    emsRlse();
-    return 1;
 }
 
 /**
@@ -1120,13 +1098,14 @@ void *gaiaCloneMNDF( const void *handle )
  *  Straight-forward NDF access, with no 2D bias.
  *  =============================================
  *
- *  These are the "cube" and "spectral" access routines.
+ *  These are the "cube" and "spectral" access routines. Note these all return
+ *  0 for success and 1 for failure to match the TCL_OK and TCL_ERROR values.
  */
 
 /**
  * Open an NDF and return the identifier.
  */
-int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
+int gaiaNDFOpen( char *ndfname, int *ndfid, char **error_mess )
 {
     int place;
     int status = SAI__OK;
@@ -1137,29 +1116,29 @@ int gaiaSimpleOpenNDF( char *ndfname, int *ndfid, char **error_mess )
         *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
-        return 1;
+        return TCL_ERROR;
     }
     emsRlse();
-    return 0;
+    return TCL_OK;
 }
 
 /**
  * Close an NDF.
  */
-int gaiaSimpleCloseNDF( int *ndfid )
+int gaiaNDFClose( int *ndfid )
 {
     int status = SAI__OK;
     emsMark();
     ndfAnnul( ndfid, &status );
     emsRlse();
-    return 0;
+    return TCL_OK;
 }
 
 /**
  * Query the data type of a component.
  */
-int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type,
-                       int type_length, char **error_mess )
+int gaiaNDFType( int ndfid, const char* component, char *type, 
+                 int type_length, char **error_mess )
 {
    int status = SAI__OK;
 
@@ -1170,17 +1149,17 @@ int gaiaSimpleTypeNDF( int ndfid, const char* component, char *type,
    if ( status != SAI__OK ) {
        *error_mess = gaiaUtilsErrMessage( &status );
        emsRlse();
-       return 1;
+       return TCL_ERROR;
    }
    emsRlse();
-   return 0;
+   return TCL_OK;
 }
 
 /**
  * Query a character component (label, units, title).
  */
-int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value,
-                       int value_length, char **error_mess )
+int gaiaNDFCGet( int ndfid, const char* component, char *value,
+                 int value_length, char **error_mess )
 {
    int status = SAI__OK;
 
@@ -1191,18 +1170,18 @@ int gaiaSimpleCGetNDF( int ndfid, const char* component, char *value,
    if ( status != SAI__OK ) {
        *error_mess = gaiaUtilsErrMessage( &status );
        emsRlse();
-       return 1;
+       return TCL_ERROR;
    }
    emsRlse();
-   return 0;
+   return TCL_OK;
 }
 
 /**
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
-int gaiaSimpleMapNDF( int ndfid, char *type, const char* component,
-                      void **data, int *el, char **error_mess )
+int gaiaNDFMap( int ndfid, char *type, const char* component, void **data, 
+                int *el, char **error_mess )
 {
    int status = SAI__OK;
    void *ptr[1];
@@ -1217,17 +1196,38 @@ int gaiaSimpleMapNDF( int ndfid, char *type, const char* component,
        *error_mess = gaiaUtilsErrMessage( &status );
        ndfid = NDF__NOID;
        emsRlse();
-       return 1;
+       return TCL_ERROR;
    }
    emsRlse();
-   return 0;
+   return TCL_OK;
 }
+
+/*
+ * Unmap the named NDF component.
+ */
+int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
+{
+    int status = SAI__OK;
+    emsMark();
+    ndfBegin();
+    ndfUnmap( ndfid, component, &status );
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage( &status );
+        ndfEnd( &status );
+        emsRlse();
+        return TCL_ERROR;
+    }
+    ndfEnd( &status );
+    emsRlse();
+    return TCL_OK;
+}
+
 
 /**
  * Get the AST frameset that defines the NDF WCS. Returns the address of the
  * frameset.
  */
-int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
+int gaiaNDFGtWcs( int ndfid, AstFrameSet **iwcs, char **error_mess )
 {
    int status = SAI__OK;
 
@@ -1239,10 +1239,10 @@ int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
        *error_mess = gaiaUtilsErrMessage( &status );
        *iwcs = (AstFrameSet *) NULL;
        emsRlse();
-       return 1;
+       return TCL_ERROR;
    }
    emsRlse();
-   return 0;
+   return TCL_OK;
 }
 
 /**
@@ -1251,8 +1251,8 @@ int gaiaSimpleWCSNDF( int ndfid, AstFrameSet **iwcs, char **error_mess )
  * that should be applied to the GRID coordinates (useful when the NDF data
  * has been sectioned outside of the NDF library, this is the origin).
  */
-int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, AstFrameSet **iwcs,
-                          char **error_mess )
+int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, AstFrameSet **iwcs,
+                      char **error_mess )
 {
    AstFrame *tmpframe;
    AstFrameSet *fullwcs;
@@ -1262,9 +1262,9 @@ int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, AstFrameSet **iwcs,
    int nout;
 
    astBegin;
-   if ( gaiaSimpleWCSNDF( ndfid, &fullwcs, error_mess ) == 1 ) {
+   if ( gaiaNDFGtWcs( ndfid, &fullwcs, error_mess ) == 1 ) {
        astEnd;
-       return 1;
+       return TCL_ERROR;
    }
 
    /* Determine the current number of input and output axes and
@@ -1320,16 +1320,16 @@ int gaiaSimpleAxisWCSNDF( int ndfid, int axis, int offset, AstFrameSet **iwcs,
    if ( ! astOK ) {
        *error_mess = strdup( "Failed to extract AST frameset for an axis" );
        astClearStatus;
-       return 1;
+       return TCL_ERROR;
    }
-   return 0;
+   return TCL_OK;
 }
 
 /**
  * Query the dimensions of an NDF.
  */
-int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
-                         char **error_mess )
+int gaiaNDFQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
+                      char **error_mess )
 {
     int status = SAI__OK;
     emsMark();
@@ -1338,17 +1338,17 @@ int gaiaSimpleQueryDims( int ndfid, int ndimx, int dims[], int *ndim,
         *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
-        return 1;
+        return TCL_ERROR;
     }
     emsRlse();
-    return 0;
+    return TCL_OK;
 }
 
 /**
  * Query the bounds of an NDF.
  */
-int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
-                           int *ndim, char **error_mess )
+int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
+                        int *ndim, char **error_mess )
 {
     int status = SAI__OK;
     emsMark();
@@ -1357,10 +1357,10 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
         *error_mess = gaiaUtilsErrMessage( &status );
         ndfid = NDF__NOID;
         emsRlse();
-        return 1;
+        return TCL_ERROR;
     }
     emsRlse();
-    return 0;
+    return TCL_OK;
 }
 
 /**
@@ -1376,9 +1376,9 @@ int gaiaSimpleQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
  * coordinates may not be straight-forward. Note that the value returned by
  * the coord argument should be immediately copied.
  */
-int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
-                          int formatted, int ncoords, char **coord, 
-                          char **error_mess )
+int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
+                       int formatted, int ncoords, char **coord, 
+                       char **error_mess )
 {
     AstFrameSet *frameSet = NULL;
     static char buf[256];              /* Static as may be returned */
@@ -1406,7 +1406,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
         *error_mess = gaiaUtilsErrMessage( &status );
         emsRlse();
         *coord = NULL;
-        return 1;
+        return TCL_ERROR;
     }
 
     //  Find the PIXEL domain.
@@ -1428,7 +1428,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
         *error_mess = strdup( "Cannot locate the PIXEL domain" );
         *coord = NULL;
         emsRlse();
-        return 1;
+        return TCL_ERROR;
     }
 
     //  This becomes the BASE frame.
@@ -1473,7 +1473,7 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
         astSetI( frameSet, "Base", base );
         frameSet = (AstFrameSet *) astAnnul( frameSet );
         errRlse();
-        return 1;
+        return TCL_ERROR;
     }
 
     //  Add the axis units and label if requested.
@@ -1490,5 +1490,5 @@ int gaiaSimpleQueryCoord( int ndfid, int axis, double *coords, int trailed,
     astSetI( frameSet, "Base", base );
     frameSet = (AstFrameSet *) astAnnul( frameSet );
     emsRlse();
-    return 0;
+    return TCL_OK;
 }
