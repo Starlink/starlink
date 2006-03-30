@@ -43,7 +43,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 *        is 3 all elements are used. All axis values are represented in GRID 
 *        pixels: 
 *
-*           xpar[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
+*           xpar[0]: Intrinsic peak intensity of clump ("a0" in Stutski & Gusten)
 *           xpar[1]: Constant intensity offset ("b0" in Stutski & Gusten)
 *           xpar[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
 *           xpar[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
@@ -93,36 +93,38 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
 */      
 
 /* Local Variables: */
+   double *par;            /* Pointer to parameter array to be used */
    double *pim;            /* Pointer for next initial model value */
    double *pm;             /* Pointer for storing next model value */
    double *pr;             /* Pointer for storing next scaled residual */
-   double *pu;             /* Pointer for storing next unscaled residual */
    double *prs;            /* Pointer for storing next absolute residual */
+   double *pu;             /* Pointer for storing next unscaled residual */
    double *pw;             /* Pointer to next weight value to use */
    double *py;             /* Pointer to next data value to use */
+   double back_term;       /* chi squared term to stop large shifts in bg level */
+   double dx_sq;           /* Smoothed beam width */
    double g;               /* Rat eof change of model value */
+   double gback_term;      /* Gradient term to stop large shifts in bg level */
    double m;               /* Model value */
    double res;             /* Difference between data and model value */
    double ret;             /* Returned value */
    double rr;              /* A factor for the residual to suppress -ve residuals */
    double t;               /* Temporary storage */
    double wf;              /* Weight factor */
-   double ypar[ 11 ];      /* "xpar" ordered as if bckgnd is being fitted */
-   double *par;            /* Pointer to parameter array to be used */
    double wsum;            /* Sum of weights */
    double x[ 3 ];          /* Next pixel position at which to get model value */ 
+   double ypar[ 11 ];      /* "xpar" ordered as if bckgnd is being fitted */
    int dbg;                /* Has background changed? */
    int i;                  /* Parameter index */
    int iax;                /* Axis index */
    int iel;                /* Index of pixel within section currently being fitted */ 
    int what;               /* "xwhat" value assuming bckgnd is being fitted */
-   double back_term;       /* chi squared term to stop large shifts in bg level */
-   double gback_term;      /* Gradient term to stop large shifts in bg level */
  
    static int nwm;         /* Number of times the weights have been modified */
    static double bg;       /* Last times background value */
    static double chisq;    /* Total modified chi squared */  
    static double pdiff;    /* Difference between model and data peak values */
+   static double peakfactor;/* Smoothing factor for peak value */
    static double v_off;    /* Offset on vel axis from data to model peak */
    static double x0_off;   /* Offset on axis 0 from data to model peak */
    static double x1_off;   /* Offset on axis 1 from data to model peak */
@@ -181,8 +183,31 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
          if( ndim > 2 && par[ 8 ] <= 0.0 ) return ret;
       }
 
-/* The difference between the model peak value and the data peak value. */
-      pdiff = par[ 0 ] + par[ 1 ] - cupidGC.ymax;
+/* Get the factor by which to correct the peak amplitude of the model to
+   take account of the smoothing by the instrumental beam. */
+      t = par[ 3 ]*par[ 3 ];
+      dx_sq = cupidGC.beam_sq + t;
+      peakfactor = t/dx_sq;       
+      if( ndim > 1 ) {
+         t = par[ 5 ]*par[ 5 ];
+         dx_sq = cupidGC.beam_sq + t;
+         peakfactor *= t/dx_sq;       
+         if( ndim > 2 ) {
+            t = par[ 8 ]*par[ 8 ];
+            dx_sq = cupidGC.velres_sq + t;
+            peakfactor *= t/dx_sq;       
+         }     
+      }
+
+      if( peakfactor > 0.0 ) {
+         peakfactor = sqrt( peakfactor );
+      } else {
+         peakfactor = 0.0;
+      }
+
+/* The difference between the model peak value (after being reduced to
+   take account of instrumental smoothing) and the data peak value. */
+      pdiff = peakfactor*par[ 0 ] + par[ 1 ] - cupidGC.ymax;
 
 /* The offset from the model centre to the data peak */
       x0_off = par[ 2 ] - cupidGC.x_max[ 0 ];
@@ -249,7 +274,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
             }
          }
 
-/* Remeber the background value for next time. */
+/* Remember the background value for next time. */
          bg = par[ 1 ];
 
 /* Save the residual and model value at this pixel */

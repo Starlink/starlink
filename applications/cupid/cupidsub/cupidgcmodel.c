@@ -122,6 +122,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    static double expv;     /* Value of exp function */
    static double m;        /* Finalmodel value */
    static double peak;     /* Peak value after instrumental smoothing */
+   static double peakfactor;  /* Peak value factor */
    static double sinv;     /* Sin of spatial rotation angle */
    static double v_off;    /* Offset on vel axis from "x" to model peak */
    static double vt_off;   /* Total offset on vel axis from "x" to model peak */
@@ -171,8 +172,12 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
       }
 
 /* The peak value */
-      if( peakfactor_sq > 0.0 ) peak = par[ 0 ]*sqrt( peakfactor_sq );
-
+      if( peakfactor_sq > 0.0 ) {
+         peakfactor = sqrt( peakfactor_sq );
+      } else {
+         peakfactor = 0.0;
+      }
+      peak = par[ 0 ]*peakfactor;
    }
 
 /* If neccessary, re-calculate cached items which depend both on "x" and
@@ -234,7 +239,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 /* Need to calculate the gradient if a gradient is required. */
    } else if( what == 0 ) {
-      ret = expv;
+      ret = peakfactor*expv;
 
    } else if( what == 1 ) {
       ret = 1.0;
