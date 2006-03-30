@@ -1233,8 +1233,7 @@ itcl::class gaia::GaiaAutoAstrom {
                set value [get_fits_value_ $key]
             }
             if { $value != {} } {
-               set values_(date) [$itk_option(-rtdimage) slalib \
-                                     dateobs2je $key "$key = '$value'"]
+               set values_(date) [sla::dateobs2je $key "$key = '$value'"]
                set havedate 1
             }
          }
@@ -1355,7 +1354,7 @@ itcl::class gaia::GaiaAutoAstrom {
             set cbreak 0
             incr ccount
          }
-         lassign [$tmpimage slalib slaobs $n] name description w p h
+         lassign [sla::obs $n] name description w p h
          if { "$description" != "?" } {
             $itk_component(telescope) add \
                -label "$description" \
