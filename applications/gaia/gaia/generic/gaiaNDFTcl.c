@@ -26,22 +26,24 @@
 #include <gaiaNDF.h>
 
 /* Local prototypes */
-static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
-                        int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
-                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
-                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp,
-                        int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
-                         int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
-                       int objc, Tcl_Obj *CONST objv[] );
-static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
-                        int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
+static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
+                            int objc, Tcl_Obj *CONST objv[] );
 
 static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
 
@@ -50,35 +52,39 @@ static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
  */
 int Ndf_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "ndf::bounds", gaiaNdfBounds,
+    Tcl_CreateObjCommand( interp, "ndf::bounds", gaiaNDFTclBounds,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::close", gaiaNdfClose,
+    Tcl_CreateObjCommand( interp, "ndf::close", gaiaNDFTclClose,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::coord", gaiaNdfCoord,
+    Tcl_CreateObjCommand( interp, "ndf::coord", gaiaNDFTclCoord,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::dims", gaiaNdfDims,
+    Tcl_CreateObjCommand( interp, "ndf::dims", gaiaNDFTclDims,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::getc", gaiaNdfCGet,
+    Tcl_CreateObjCommand( interp, "ndf::getc", gaiaNDFTclCGet,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::getwcs", gaiaNdfGtWcs,
+    Tcl_CreateObjCommand( interp, "ndf::getwcs", gaiaNDFTclGtWcs,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::map", gaiaNdfMap,
+    Tcl_CreateObjCommand( interp, "ndf::map", gaiaNDFTclMap,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::open", gaiaNdfOpen,
+    Tcl_CreateObjCommand( interp, "ndf::open", gaiaNDFTclOpen,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::unmap", gaiaNDFTclUnMap,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -103,7 +109,7 @@ static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf )
 /**
  * Open an NDF. The result is an NDF identifier (integer)
  */
-static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] )
 {
     char *error_mess;
@@ -122,7 +128,7 @@ static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
 
     /* And open it */
     resultObj = Tcl_GetObjResult( interp );
-    if ( gaiaSimpleOpenNDF( name, &indf, &error_mess ) == TCL_OK ) {
+    if ( gaiaNDFOpen( name, &indf, &error_mess ) == TCL_OK ) {
         Tcl_SetIntObj( resultObj, indf );
         return TCL_OK;
     }
@@ -134,7 +140,7 @@ static int gaiaNdfOpen( ClientData clientData, Tcl_Interp *interp,
 /**
  * Close an NDF.
  */
-static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
 {
     int indf;
@@ -150,25 +156,98 @@ static int gaiaNdfClose( ClientData clientData, Tcl_Interp *interp,
     result = importNdfIdentifier( interp, objv[1], &indf );
     if ( result == TCL_OK ) {
         /* Close NDF */
-        result = gaiaSimpleCloseNDF( &indf );
+        result = gaiaNDFClose( &indf );
     }
     return result;
 }
 
 /**
- * Map the NDF data array in the NDF's data type. The result is a memory
- * address (long int), the number of elements mapped and the data type.
+ * Map the NDF data array in the NDF's data type, using file mapping as
+ * requested. The result is a memory address (long int), the number of
+ * elements mapped and the data type.
  */
-static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                        int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
     char *error_mess;
+    char *error_mess2;
     char type[NDF__SZTYP+1];
     int el;
     int indf;
+    int oldmmap;
+    int mmap;
     int result;
     void *dataPtr;
+
+    /* Check arguments, allow two, the ndf identifier and whether to use file
+     * mapping  */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier ?usemmap?" );
+        return TCL_ERROR;
+    }
+
+    /* Get the identifier */
+    result = importNdfIdentifier( interp, objv[1], &indf );
+    if ( result == TCL_OK ) {
+        resultObj = Tcl_GetObjResult( interp );
+
+        /* Mmap mode. */
+        result = Tcl_GetBooleanFromObj( interp, objv[2], &mmap );
+        if ( result != TCL_OK ) {
+            Tcl_SetStringObj( resultObj, "not a boolean" , -1 );
+        }
+        else {
+            result = gaiaNDFType( indf, "DATA", type, NDF__SZTYP+1,
+                                  &error_mess );
+            if ( result == TCL_OK ) {
+                /* Set mmap tuning, 0 for off, 1 for on, don't handle tuning
+                   errors as these should be none fatal. */
+                if ( gaiaHDSGTune( "MAP", &oldmmap, &error_mess2 ) != TCL_OK ){
+                    free( error_mess2 );
+                }
+                if ( gaiaHDSTune( "MAP", mmap, &error_mess2 ) != TCL_OK ) {
+                    free( error_mess2 );
+                }
+
+                /* Map data */
+                result = gaiaNDFMap( indf, type, "DATA", &dataPtr, &el, 
+                                     &error_mess  );
+
+                /* Restore default MAP mode */
+                if ( gaiaHDSTune( "MAP", oldmmap, &error_mess2 ) != TCL_OK ) {
+                    free( error_mess2 );
+                }
+
+                /* Construct result */
+                if ( result == TCL_OK ) {
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewLongObj((long)dataPtr));
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewIntObj( el ) );
+                    Tcl_ListObjAppendElement( interp, resultObj,
+                                              Tcl_NewStringObj( type, -1 ) );
+                }
+            }
+            if ( result != TCL_OK ) {
+                Tcl_SetStringObj( resultObj, error_mess, -1 );
+                free( error_mess );
+            }
+        }
+    }
+    return result;
+}
+
+/**
+ * Unmap the NDF data array.
+ */
+static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
+                       int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *resultObj;
+    char *error_mess;
+    int indf;
+    int result;
 
     /* Check arguments, only allow one, the ndf identifier */
     if ( objc != 2 ) {
@@ -179,22 +258,11 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
     /* Get the identifier */
     result = importNdfIdentifier( interp, objv[1], &indf );
     if ( result == TCL_OK ) {
-        resultObj = Tcl_GetObjResult( interp );
-        result = gaiaSimpleTypeNDF( indf, "DATA", type, NDF__SZTYP+1,
-                                    &error_mess );
-        if ( result == TCL_OK ) {
-            result = gaiaSimpleMapNDF( indf, type, "DATA", &dataPtr,
-                                       &el, &error_mess  );
-            if ( result == TCL_OK ) {
-                Tcl_ListObjAppendElement( interp, resultObj,
-                                          Tcl_NewLongObj( (long) dataPtr ) );
-                Tcl_ListObjAppendElement( interp, resultObj,
-                                          Tcl_NewIntObj( el ) );
-                Tcl_ListObjAppendElement( interp, resultObj,
-                                          Tcl_NewStringObj( type, -1 ) );
-            }
-        }
+
+        /* Unmap */
+        result = gaiaNDFUnmap( indf, "DATA", &error_mess );
         if ( result != TCL_OK ) {
+            resultObj = Tcl_GetObjResult( interp );
             Tcl_SetStringObj( resultObj, error_mess, -1 );
             free( error_mess );
         }
@@ -209,7 +277,7 @@ static int gaiaNdfMap( ClientData clientData, Tcl_Interp *interp,
  * arguments. The third argument is an offset for the GRID domain and is used
  * when a section of a WCS is required (0 when not needed).
  */
-static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
 {
     AstFrameSet *iwcs;
@@ -250,12 +318,11 @@ static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
 
     if ( axis == -1 ) {
         /* Full WCS */
-        result = gaiaSimpleWCSNDF( indf, &iwcs, &error_mess );
+        result = gaiaNDFGtWcs( indf, &iwcs, &error_mess );
     }
     else {
         /* WCS for one axis, plus grid offset */
-        result = gaiaSimpleAxisWCSNDF( indf, axis, offset, &iwcs,
-                                       &error_mess );
+        result = gaiaNDFGtAxisWcs( indf, axis, offset, &iwcs, &error_mess );
     }
 
     /* Export the WCS as a long containing the address */
@@ -272,7 +339,7 @@ static int gaiaNdfGtWcs( ClientData clientData, Tcl_Interp *interp,
 /**
  * Return the value of an NDF character component.
  */
-static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
@@ -292,8 +359,8 @@ static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
         value[0] = '\0';
-        result = gaiaSimpleCGetNDF( indf, Tcl_GetString( objv[2] ),
-                                    value, NDF__SZHIS+1, &error_mess );
+        result = gaiaNDFCGet( indf, Tcl_GetString( objv[2] ), value, 
+                              NDF__SZHIS+1, &error_mess );
         if ( result == TCL_OK ) {
             Tcl_SetStringObj( resultObj, value, -1 );
         }
@@ -309,7 +376,7 @@ static int gaiaNdfCGet( ClientData clientData, Tcl_Interp *interp,
  * Get the dimensions of an NDF. Returns a list of values, one for each NDF
  * dimension.
  */
-static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
@@ -330,8 +397,8 @@ static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp,
     result = importNdfIdentifier( interp, objv[1], &indf );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
-        result = gaiaSimpleQueryDims( indf, NDF__MXDIM, dims, &ndim,
-                                      &error_mess );
+        result = gaiaNDFQueryDims( indf, NDF__MXDIM, dims, &ndim,
+                                   &error_mess );
         if ( result == TCL_OK ) {
             for ( i = 0; i < ndim; i++ ) {
                 Tcl_ListObjAppendElement( interp, resultObj,
@@ -349,7 +416,7 @@ static int gaiaNdfDims( ClientData clientData, Tcl_Interp *interp,
 /**
  * Get the bounds of an NDF. Returns a list of lower and upper pixel indices.
  */
-static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
                           int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
@@ -371,8 +438,8 @@ static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
     result = importNdfIdentifier( interp, objv[1], &indf );
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
-        result = gaiaSimpleQueryBounds( indf, NDF__MXDIM, lbnd, ubnd, &ndim,
-                                        &error_mess );
+        result = gaiaNDFQueryBounds( indf, NDF__MXDIM, lbnd, ubnd, &ndim,
+                                     &error_mess );
         if ( result == TCL_OK ) {
             for ( i = 0; i < ndim; i++ ) {
                 Tcl_ListObjAppendElement( interp, resultObj,
@@ -399,7 +466,7 @@ static int gaiaNdfBounds( ClientData clientData, Tcl_Interp *interp,
  * otherwise it is returned as a double. The final is a boolean used to switch
  * on the addition of trailing label and units strings.
  */
-static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
+static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj **listObjv;
@@ -460,10 +527,10 @@ static int gaiaNdfCoord( ClientData clientData, Tcl_Interp *interp,
                 }
 
                 if ( result != TCL_ERROR ) {
-                    result = gaiaSimpleQueryCoord( indf, axis, coords,
-                                                   trailed, format,
-                                                   ncoords, &coord,
-                                                   &error_mess );
+                    result = gaiaNDFQueryCoord( indf, axis, coords,
+                                                trailed, format,
+                                                ncoords, &coord,
+                                                &error_mess );
                     if ( result == TCL_OK ) {
                         Tcl_SetStringObj( resultObj, coord, -1 );
                     }
