@@ -22,7 +22,9 @@
  */
 
 #include <gaiaUtils.h>
+#include <sae_par.h>
 #include <ems.h>
+#include <ems_par.h>
 
 /*
  *  Name:
