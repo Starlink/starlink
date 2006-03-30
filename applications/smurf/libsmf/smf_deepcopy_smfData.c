@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     new = smf_deepcopy_smfData( const smfData *old, int * status );
+*     new = smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status );
 
 *  Arguments:
 *     old = const smfData* (Given)
 *        Pointer to smfData to be copied
+*     rawconvert = const int (Given)
+*        Flag to denote whether to convert integer to double
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -44,6 +46,9 @@
 *        Initial version.
 *     2006-03-24 (TIMJ):
 *        Deal with different data types and quality
+*     2006-03-28 (AGG):
+*        Change API to allow copying of raw integer data to a double
+*        output array
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,21 +93,24 @@
 #define FUNC_NAME "smf_deepcopy_smfData"
 
 smfData *
-smf_deepcopy_smfData( const smfData *old, int * status ) {
+smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status ) {
 
   smfDA *da = NULL;       /* New smfDA */
   dim_t dims[NDF__MXDIM]; /* Dimensions of each axis of data array */
   smf_dtype dtype;        /* Data type */
   smfFile *file = NULL;   /* New smfFile */
   smfHead *hdr = NULL;    /* New smfHead */
-  int i;                  /* Loop counter */
+  size_t i;                  /* Loop counter */
+  size_t j;                  /* Loop counter */
   size_t nbytes;          /* number of bytes in data type */
   dim_t ncoeff = 0;       /* Number of coefficients */
   int ndims;              /* Number of dimensions in data array */
   smfData *new = NULL;    /* New smfData */
   int npts;               /* Number of data points */
+  double *outdata;            /* Pointer to output DATA */
   void *pntr[3];          /* Data, variance and quality arrays */
   double *poly = NULL;    /* Polynomial coefficients */
+  int *tstream;               /* Pointer to raw time series data */
   int virtual;            /* Is it a virtual smfData? */
 
   if (*status != SAI__OK) return NULL;
@@ -120,18 +128,31 @@ smf_deepcopy_smfData( const smfData *old, int * status ) {
     npts *= dims[2];
   }
 
-
   /* DATA and VARIANCE */
   for (i=0; i<2; i++) {
     if ( (old->pntr)[i] != NULL ) {
-      nbytes = smf_dtype_size(old, status);
-      pntr[i] = smf_malloc( npts, nbytes, 0, status);
-      memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
+      /* Check if we are converting from integer to double */
+      if (rawconvert && (old->dtype == SMF__INTEGER) ) {
+	nbytes = sizeof(double);
+	dtype = SMF__DOUBLE;
+	pntr[i] = smf_malloc( npts, nbytes, 0, status);
+	outdata = pntr[i];
+	tstream = (old->pntr)[i];
+	/* Input data are ints: must re-cast as double */
+	for (j=0; j<npts; j++) {
+	  outdata[j] = (double)tstream[j];
+	}
+	pntr[i] = outdata;
+      } else {
+	nbytes = smf_dtype_size(old, status);
+	pntr[i] = smf_malloc( npts, nbytes, 0, status);
+	memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
+      }
     } else {
       pntr[i] = NULL;
     }
   }
-  /* quality */
+  /* Quality */
   if ( (old->pntr)[2] != NULL ) {
     pntr[2] = smf_malloc( npts, 1, 0, status);
     memcpy( pntr[2], (old->pntr)[2], npts );
