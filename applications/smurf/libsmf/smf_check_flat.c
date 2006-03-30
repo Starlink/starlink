@@ -22,9 +22,11 @@
 *        Pointer to global status.
 
 *  Description:
+
 *     This subroutine determines whether the data have been
 *     flatfielded by testing for the existence of the da component in
-*     the smfData struct. Returns a status of SMF__FLATN if true.
+*     the smfData struct, and if the data type is double. Returns a
+*     status of SMF__FLATN if either is true.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -37,6 +39,8 @@
 *        Update API prototype to reflect const input struct
 *     2006-01-25 (AGG):
 *        Minor change to logic on checking existence of smfDA
+*     2006-03-29 (AGG):
+*        Add check on data type
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -75,20 +79,24 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+#define FUNC_NAME "smf_check_flat"
+
 void smf_check_flat ( const smfData *data, int *status ) {
 
   smfDA *da;
+  smf_dtype dtype;
 
   if ( *status != SAI__OK ) return;
 
   /* Retrieve the smfDa struct */
   da = data->da;
+  dtype = data->dtype;
 
   /* Data need flatfielding if da is defined */
-  if ( da == NULL ) {
+  if ( da == NULL || dtype == SMF__DOUBLE) {
     /* No raw data struct => data flatfielded */
     *status = SMF__FLATN;
-    errRep(" ", "Data are already flatfielded", status);
+    errRep(FUNC_NAME, "Data are already flatfielded", status);
   }
   
 }
