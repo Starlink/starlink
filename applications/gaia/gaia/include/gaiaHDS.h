@@ -12,6 +12,9 @@ extern "C" {
     /* Set an HDS tuning parameter */
     int gaiaHDSTune( char *what, int value, char **error_mess );
 
+    /* Get an HDS tuning parameter */
+    int gaiaHDSGTune( char *what, int *value, char **error_mess );
+
 #ifdef __cplusplus
 }
 #endif
