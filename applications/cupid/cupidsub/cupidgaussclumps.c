@@ -19,7 +19,7 @@ CupidGC cupidGC;
 
 HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                           double *ipv, double rms, AstKeyMap *config, int velax,
-                          int ilevel ){
+                          int ilevel, double beamcorr[ 3 ] ){
 /*
 *  Name:
 *     cupidGaussClumps
@@ -31,7 +31,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, 
 *                               void *ipd, double *ipv, double rms, 
-*                               AstKeyMap *config, int velax, int ilevel )
+*                               AstKeyMap *config, int velax, int ilevel,
+*                               double beamcorr[ 3 ] )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -87,6 +88,11 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display.
+*     beamcorr
+*        An array in which is returned the FWHM (in pixels) describing the
+*        instrumental smoothing along each pixel axis. The clump widths
+*        stored in the output catalogue are reduced to correct for this
+*        smoothing.
 
 *  Retured Value:
 *     A locator for a new HDS object which is an array of NDF structures.
@@ -186,6 +192,14 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    so that it can be searched for any value which cannot be found in the
    "gcconfig" KeyMap. */
    astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
+
+/* Return the instrumental smoothing FWHMs */
+   beamcorr[ 0 ] = cupidConfigD( gcconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 1 ] = beamcorr[ 0 ];
+   if( ndim == 3 ) {
+      beamcorr[ 2 ] = beamcorr[ 0 ];
+      beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0 );
+   }
 
 /* See if extra diagnostic info is required. */
    diag = cupidConfigI( gcconfig, "DIAG", 0 );

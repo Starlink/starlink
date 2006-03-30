@@ -53,7 +53,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *        used, if "ndim" is 3 all elements are used. All axis values are 
 *        represented in GRID pixels: 
 *
-*           par[0]: Peak intensity of clump ("a0" in Stutski & Gusten)
+*           par[0]: Intrinsic peak intensity of clump ("a0" in Stutski & Gusten)
 *           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
 *           par[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
 *           par[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
@@ -87,6 +87,12 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *  Returned Value:
 *     The model value or gradient.
 
+*  Notes:
+*     - Stutski & Gusten take account of instrumental smoothing only in so
+*     far as they increase the supplied clump FWHM. This implementation
+*     also reduces the peak value by a corresponding factor, since smoothing 
+*     will reduce the peak value in a clump.
+
 *  Authors:
 *     DSB: David S. Berry
 *     {enter_new_authors_here}
@@ -102,6 +108,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 /* Local Variables: */
    double demdp;           /* Rate of change of "em" wrt par[what] */
+   double peakfactor_sq;   /* Square of the peak value factor */
+   double t;               /* Temporary value */
    double ret;             /* Returned value */
 
    static double X0;       /* Rotated spatial axis 0 offset */
@@ -113,6 +121,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    static double em;       /* Scalar argument to exp function  */
    static double expv;     /* Value of exp function */
    static double m;        /* Finalmodel value */
+   static double peak;     /* Peak value after instrumental smoothing */
    static double sinv;     /* Sin of spatial rotation angle */
    static double v_off;    /* Offset on vel axis from "x" to model peak */
    static double vt_off;   /* Total offset on vel axis from "x" to model peak */
@@ -130,13 +139,22 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    if( newp ) {
 
 /* The total FWHM in pixels on axis 0, squared. */
-      dx0_sq = cupidGC.beam_sq + par[ 3 ]*par[ 3 ];
+      t = par[ 3 ]*par[ 3 ];
+      dx0_sq = cupidGC.beam_sq + t;
+
+/* The peak value factor (thsi takes account of the reduction in peak
+   value caused by the instrumental smoothing). */
+      peakfactor_sq = t/dx0_sq;       
 
 /* The rest are only calculated for 2 or 3 dimensions */
       if( ndim > 1 ) {
 
 /* The total FWHM in pixels on axis 1, squared. */
-         dx1_sq = cupidGC.beam_sq + par[ 5 ]*par[ 5 ];
+         t = par[ 5 ]*par[ 5 ];
+         dx1_sq = cupidGC.beam_sq + t;
+
+/* The peak value factor */
+         peakfactor_sq *= t/dx1_sq;       
 
 /* Trig functions */
          cosv = cos( par[ 6 ] );
@@ -146,9 +164,15 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
          if( ndim > 2 ) {
 
 /* The total FWHM in pixels on the velocity axis, squared. */
-            dv_sq = cupidGC.velres_sq + par[ 8 ]*par[ 8 ];
+            t = par[ 8 ]*par[ 8 ];
+            dv_sq = cupidGC.velres_sq + t;
+            peakfactor_sq *= t/dv_sq;       
          }     
       }
+
+/* The peak value */
+      if( peakfactor_sq > 0.0 ) peak = par[ 0 ]*sqrt( peakfactor_sq );
+
    }
 
 /* If neccessary, re-calculate cached items which depend both on "x" and
@@ -200,7 +224,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
       expv = exp( -K*em );
 
 /* The total model value. */
-      m = par[ 0 ]*expv + par[ 1 ];
+      m = peak*expv + par[ 1 ];
 
    }
 
@@ -286,7 +310,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
    required parameter, convert it to the rate of change of the model value 
    with respect to the required parameter, or report an error. */
       if( demdp != VAL__BADD ) {
-         ret = -par[ 0 ]*expv*K*demdp;
+         ret = -peak*expv*K*demdp;
       } else {
          *status = SAI__ERROR;
          msgSeti( "W", what );

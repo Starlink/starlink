@@ -173,9 +173,13 @@ void clumps() {
 *        If the data has less than 3 pixel axes, then the columns
 *        describing the missing axes will not be present in the catalogue.
 *
-*        The "size" of the clump on an axis is the RMS deviation of each 
-*        pixel centre from the clump centroid, where each pixel is
-*        weighted by the correspinding pixel data value.
+*        The "size" of the clump on an axis is the beam-corrected RMS 
+*        deviation of each pixel centre from the clump centroid, where each 
+*        pixel is weighted by the corresponding pixel data value. The 
+*        beam-correction reduces the measured widths to take account of
+*        the smoothing introduced by the instrumental beam. The peak
+*        value is also beam-corrected. Beam sizes are specified by
+*        configuration parameters FWHMBeam and VeloRes.
 *
 *        For the GaussClump algorithm, the Sum and Area values refer 
 *        to the part of the Gaussian within the level defined by the
@@ -365,6 +369,9 @@ void clumps() {
 *     The default value of two times the RMS noise level is usually considered 
 *     to be optimal, although this obviously depends on the RMS noise level 
 *     being correct. [2*RMS]
+*     - ClumpFind.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
+*     clump widths written to the output catalogue are reduced (in
+*     quadrature) by this amount. [2.0]
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 
@@ -407,12 +414,18 @@ void clumps() {
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See also
 *     "DeltaT". [2*RMS]
+*     - ClumpFind.VeloRes: The velocity resolution of the instrument, in
+*     channels. The velocity width of each clump written to the output 
+*     catalogue is reduced (in quadrature) by this amount. [2.0]
 
 *  Reinhold Configuration Parameters:
 *     The Reinhold algorithm uses the following configuration parameters. 
 *     Values for these parameters can be specified using the CONFIG parameter. 
 *     Default values are shown in square brackets:
 *
+*     - Reinhold.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
+*     clump widths written to the output catalogue are reduced (in
+*     quadrature) by this amount. [2.0]
 *     - Reinhold.MinLen: The minimum number of pixels spanned by a peak
 *     along any one dimension in order for the peak to be considered
 *     significant. If a peak is spanned by fewer than this number of pixels 
@@ -449,6 +462,9 @@ void clumps() {
 *     pixels centred on the output pixel. [1]
 *     - Reinhold.RMS: The global RMS noise level in the data. The
 *     defaultvalue is the value supplied for parameter RMS. []
+*     - Reinhold.VeloRes: The velocity resolution of the instrument, in
+*     channels. The velocity width of each clump written to the output 
+*     catalogue is reduced (in quadrature) by this amount. [2.0]
 
 *  FellWalker Configuration Parameters:
 *     The FellWalker algorithm uses the following configuration parameters. 
@@ -462,6 +478,9 @@ void clumps() {
 *     - FellWalker.FlatSlope: Any initial section to a walk which has an
 *     average gradient (measured over 4 steps) less than this value will not 
 *     be included in the clump. [1.0*RMS]
+*     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
+*     clump widths written to the output catalogue are reduced (in
+*     quadrature) by this amount. [2.0]
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
 *     than this value, then the peaks are considered to be part of the
 *     same clump. [2.0*RMS]
@@ -481,6 +500,9 @@ void clumps() {
 *     data value less than this value. [2*RMS]
 *     - FellWalker.RMS: The global RMS noise level in the data. The
 *     defaultvalue is the value supplied for parameter RMS. []
+*     - FellWalker.VeloRes: The velocity resolution of the instrument, in
+*     channels. The velocity width of each clump written to the output 
+*     catalogue is reduced (in quadrature) by this amount. [2.0]
 
 *  Authors:
 *     DSB: David S. Berry
@@ -518,6 +540,7 @@ void clumps() {
    const char *lab;             /* AST Label attribute for an axis */
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
+   double beamcorr[ 3 ];        /* Beam width corrections */
    double bg;                   /* Background level */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
@@ -619,7 +642,7 @@ void clumps() {
             }
          }
 
-/* If no SpecFrame was found, look for an axis labelcontaining a letter
+/* If no SpecFrame was found, look for an axis label containing a letter
    "V". */
          if( vax == 0 ) {
             for( i = 1; i <= 3; i++ ) {
@@ -747,19 +770,19 @@ void clumps() {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
-                                keymap, velax, ilevel ); 
+                                keymap, velax, ilevel, beamcorr ); 
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel ); 
+                              keymap, velax, ilevel, beamcorr ); 
       
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel ); 
+                              keymap, velax, ilevel, beamcorr ); 
       
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, ilevel ); 
+                              keymap, velax, ilevel, beamcorr ); 
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
@@ -862,7 +885,8 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, "Output from CUPID:CLUMPS" );
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
+                        "Output from CUPID:CLUMPS" );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );

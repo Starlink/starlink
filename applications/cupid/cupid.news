@@ -9,6 +9,26 @@
 
 Changes introduced at V0.0-5:
 
+ - The clump parameters returned in the catalogue now are corrected for
+ the effects of smoothing by the instrumental beam. That is, the values
+ in the clump size columns are now slightly smaller (i.e. the burring
+ produced by the beam is removed), and the values in the peak value
+ column are slightly higher (i.e. the reduction in peak value caused by
+ the beam size is removed). This means that the catalogue values reflect
+ the properties of the clump *before* the instrumental smoothing. The
+ degree of smoothing introduced by the beam is specified by the
+ configuration parameters, FWHMBeam and VeloRes. Previously, only the
+ GaussClumps algorithm had these configuration parameters, but now all
+ algorithms have them.
+
+ - The GaussClumps algorithm has been changed slightly to correct for the
+ tendency of the instrumental smoothing to reduce the peak clump value
+ (the tendency to of the instrumental smoothing to increase clump size was
+ already corrected for).
+
+
+Changes introduced at V0.0-5:
+
  - The MASK parameter has been removed. The Quality mask is now always
   written to the output NDF.
 
@@ -32,6 +52,7 @@ Changes introduced at V0.0-5:
  configuration parameters have been changed from 3.0 to 2.0 in order to make 
  them more comparable to the defaults for the equivalent parameters for the 
  other algorithms.
+
 
 Changes introduced at V0.0-4:
 

@@ -14,7 +14,7 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int ndim, const char *ttl ){
+                       int ndim, double beamcorr[ 3 ], const char *ttl ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -24,7 +24,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int ndim, const char *ttl )
+*                            int ndim, double beamcorr[ 3 ], const char *ttl )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -41,6 +41,10 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        A locator for an HDS array the clump NDF structures.
 *     ndim
 *        The number of pixel axes in the data.
+*     beamcorr
+*        An array holding the FWHM (in pixels) describing the instrumental 
+*        smoothing along each pixel axis. The clump widths stored in the 
+*        output catalogue are reduced to correct for this smoothing.
 *     ttl
 *        The title for the output catalogue (if any).
 
@@ -128,7 +132,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    information which is the same for every clump (the parameter names, the 
    indices of the parameters holding the clump central position, and the 
    number of parameters). */
-         cpars = cupidClumpDesc( indf, cpars, &names, &ncpar );
+         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 

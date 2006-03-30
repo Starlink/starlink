@@ -9,7 +9,7 @@
 
 HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                          double *ipv, double rms, AstKeyMap *config, int velax,
-                         int ilevel ){
+                         int ilevel, double beamcorr[ 3 ] ){
 /*
 *  Name:
 *     cupidFellWalker
@@ -21,7 +21,8 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Synopsis:
 *     HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, 
 *                              void *ipd, double *ipv, double rms, 
-*                              AstKeyMap *config, int velax, int ilevel )
+*                              AstKeyMap *config, int velax, int ilevel,
+*                              double beamcorr[ 3 ] )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -90,6 +91,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        used if "ndim" is 3. 
 *     ilevel
 *        Amount of screen information to display (in range zero to 6).
+*     beamcorr
+*        An array in which is returned the FWHM (in pixels) describing the
+*        instrumental smoothing along each pixel axis. The clump widths
+*        stored in the output catalogue are reduced to correct for this
+*        smoothing.
 
 *  Retured Value:
 *     A locator for a new HDS object which is an array of NDF structures.
@@ -169,6 +175,14 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    so that it can be searched for any value which cannot be found in the
    "fwconfig" KeyMap. */
    astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
+
+/* Return the instrumental smoothing FWHMs */
+   beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0 );
+   beamcorr[ 1 ] = beamcorr[ 0 ];
+   if( ndim == 3 ) {
+      beamcorr[ 2 ] = beamcorr[ 0 ];
+      beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0 );
+   }
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to

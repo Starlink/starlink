@@ -99,37 +99,28 @@ void makeclumps() {
 *        includes an NDF holding an of the individual clump.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
-*        There will be one row per clump, and a subset of the following 
-*        columns will be included, depending on the number of pixel axes
-*        in the output array:
+*        There will be one row per clump, with the following columns:
 *
-*           - Peak intensity of the clump, above the background level.
-*           See parameter PEAK.
-*           - The pixel coordinate of the clump centre on axis 1.
-*           - The intrinsic FWHM of the clump on axis 1, measured in
-*           pixels. This excludes any instrumental blurring specified by 
-*           BEAMFWHM or VELFWHM. See parameter FWHM1.
-*           - The pixel coordinate of the clump centre on axis 2.
-*           - The intrinsic FWHM of the clump on axis 2, measured in
-*           pixels. This excludes any instrumental blurring specified by 
-*           BEAMFWHM. See parameter FWHM2.
-*           - The spatial position angle of the major axis of the clump,
-*           measured in degrees, positive from the first pixel axis to the 
-*           second pixel axis. See parameter ANGLE.
-*           - The pixel coordinate of the clump centre on axis 3.
-*           - The intrinsic FWHM of the clump on axis 3, measured in
-*           pixels. This excludes any instrumental blurring specified by 
-*           VELFWHM. See parameter FWHM3.
-*           - The projection of the internal velocity gradient vector
-*           onto pixel axis 1, measured in dimensionless units of
-*           "velocity pixels per spatial pixel". See parameter VGRAD1.
-*           - The projection of the internal velocity gradient vector
-*           onto pixel axis 2, measured in dimensionless units of
-*           "velocity pixels per spatial pixel". See parameter VGRAD2.
+*        - PeakX: The PIXEL X coordinates of the clump peak value.
+*        - PeakY: The PIXEL Y coordinates of the clump peak value.
+*        - PeakZ: The PIXEL Z coordinates of the clump peak value.
+*        - CenX: The PIXEL X coordinates of the clump centroid.
+*        - CenY: The PIXEL Y coordinates of the clump centroid.
+*        - CenZ: The PIXEL Z coordinates of the clump centroid.
+*        - SizeX: The size of the clump along the X axis, in pixels.
+*        - SizeY: The size of the clump along the Y axis, in pixels.
+*        - SizeZ: The size of the clump along the Z axis, in pixels.
+*        - Sum: The total data sum in the clump.
+*        - Peak: The peak value in the clump.
+*        - Area: The total number of pixels falling within the clump.
 *
-*        The output catalogue will contain the first three of these columns
-*        if the output array is 1-dimensional, the first six if it is
-*        2-dimensional, and all of them if it is 3-dimensional.
+*        If the data has less than 3 pixel axes, then the columns
+*        describing the missing axes will not be present in the catalogue.
+*
+*        The "size" of the clump on an axis is the RMS deviation of each 
+*        pixel centre from the clump centroid, where each pixel is
+*        weighted by the correspinding pixel data value. This excludes
+*        the instrumental smoothing specified by BEAMFWHM and VELFWHM.
 *     PARDIST = LITERAL (Read)
 *        The shape of the distribution from which clump parameter values are 
 *        chosen. Can be "Normal" or "Uniform". The distribution for each
@@ -199,6 +190,7 @@ void makeclumps() {
    HDSLoc *xloc;                 /* HDS locator for CUPID extension */
    char text[ 8 ];               /* Value of PARDIST parameter */
    double back;                  /* Background level */
+   double beamcorr[ 3 ];         /* Beam widths */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
    float *ipd2;                  /* Pointer to data array */
@@ -395,7 +387,10 @@ void makeclumps() {
    ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* Store the clump properties in the output catalogue. */
-   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, 
+   beamcorr[ 0 ] = beamfwhm;
+   beamcorr[ 1 ] = beamfwhm;
+   beamcorr[ 3 ] = velfwhm;
+   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, beamcorr,
                      "Output from CUPID:MAKECLUMPS" );
 
 /* Relase the extension locator.*/
