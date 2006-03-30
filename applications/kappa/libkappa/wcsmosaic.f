@@ -84,6 +84,12 @@
 *        variances are based on the variances in the input NDFs, and the
 *        output NDF will contain variances only if all input NDFs
 *        contain variances. [FALSE]
+*     ILEVEL = _INTEGER (Read)
+*        Controls the amount of information displayed on the screen. If
+*        set to 1, no information will be displayed while the command
+*        is executing. If set to 2, the interpolation method being used 
+*        will be displayed. If set to 3, the name of each input NDF will
+*        also be displayed as it is processed. [2]
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality).  This should be
 *        given as a comma-separated list, in which each list element
@@ -252,6 +258,8 @@
 *  History:
 *     14-SEP-2005 (DSB):
 *        Original version, based on WCSALIGN.
+*     30-MAR-2006 (DSB):
+*        Added ILEVEL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -276,6 +284,7 @@
 
 *  Local Variables:
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
+      CHARACTER MESS*60          ! Message text
       CHARACTER METHOD*13        ! Interpolation method to use.
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
       DOUBLE PRECISION PARAMS( 2 ) ! Param. values passed to 
@@ -286,6 +295,7 @@
       INTEGER FLAGS              ! Flags for AST_REBINSEQ
       INTEGER I                  ! Index into input and output groups
       INTEGER IGRP1              ! GRP id. for group holding input NDFs
+      INTEGER ILEVEL             ! Information level
       INTEGER INDF1              ! NDF id. for the input NDF
       INTEGER INDF2              ! NDF id. for the output NDF
       INTEGER INDFR              ! NDF id. for the reference NDF
@@ -318,7 +328,6 @@
                                  ! variance?
       LOGICAL USEVAR             ! Use input variances to create output
                                  ! variance?
-      LOGICAL VERB               ! Verbose output
       REAL ERRLIM                ! Positional accuracy in pixels
       REAL WLIM                  ! Minimum good output weight
       REAL D,V
@@ -337,6 +346,9 @@
 *  Get a group containing the names of the NDFs to be processed.
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
      :                 IGRP1, SIZE, STATUS )
+
+*  Get the level of screen information to display.
+      CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
 
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -391,22 +403,18 @@
       NPAR = 0
       IF( METHOD( 1 : 1 ) .EQ. 'N' ) THEN
          METHOD_CODE = AST__NEAREST
-         CALL MSG_OUT( 'WCSMOSAIC_MSG1', 
-     :                 '  Using nearest neighbour binning.', 
-     :                 STATUS ) 
-
+         MESS = '  Using nearest neighbour binning.'
+ 
       ELSE IF( METHOD( 1 : 2 ) .EQ. 'BI' ) THEN
          METHOD_CODE = AST__LINEAR
-         CALL MSG_OUT( 'WCSMOSAIC_MSG2', 
-     :                 '  Using bi-linear binning.', STATUS ) 
+         MESS = '  Using bi-linear binning.'
 
       ELSE IF( METHOD( 1 : 1 ) .EQ. 'G' ) THEN
          NPAR = 2
          PARAMS( 1 ) = 0.0
          PARAMS( 2 ) = 2.0
          METHOD_CODE = AST__GAUSS
-         CALL MSG_OUT( 'WCSMOSAIC_MSG3', 
-     :                 '  Using a Gaussian binning kernel.', STATUS ) 
+         MESS = '  Using a Gaussian binning kernel.'
 
       ELSE IF ( METHOD( 1 : 4 ) .EQ. 'SINC' ) THEN
          NPAR = 2
@@ -415,25 +423,21 @@
 
          IF ( METHOD( 5 : 5 ) .EQ. 'S' ) THEN
             METHOD_CODE = AST__SINCSINC
-            CALL MSG_OUT( 'WCSMOSAIC_MSG4', 
-     :                    '  Using sincsinc binning kernel.', STATUS ) 
+            MESS = '  Using sincsinc binning kernel.'
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
             METHOD_CODE = AST__SINCCOS
-            CALL MSG_OUT( 'WCSMOSAIC_MSG5', 
-     :                    '  Using sinccos binning kernel.', STATUS ) 
+            MESS = '  Using sinccos binning kernel.'
 
          ELSE IF( METHOD( 5 : 5 ) .EQ. 'G' ) THEN
             METHOD_CODE = AST__SINCGAUSS
             PARAMS( 2 ) = 1.0
-            CALL MSG_OUT( 'WCSMOSAIC_MSG6', 
-     :                    '  Using sincgauss binning kernel.', STATUS ) 
+            MESS = '  Using sincgauss binning kernel.'
 
          ELSE
             NPAR = 1
             METHOD_CODE = AST__SINC
-            CALL MSG_OUT( 'WCSMOSAIC_MSG7', 
-     :                    '  Using sinc binning kernel.', STATUS ) 
+            MESS = '  Using sinc binning kernel.'
 
          END IF
 
@@ -444,17 +448,19 @@
 
          IF( METHOD( 5 : 5 ) .EQ. 'C' ) THEN
             METHOD_CODE = AST__SOMBCOS
-            CALL MSG_OUT( 'WCSMOSAIC_MSG8', 
-     :                    '  Using sombcos binning kernel.', STATUS ) 
+            MESS = '  Using sombcos binning kernel.'
 
          ELSE
             NPAR = 1
             METHOD_CODE = AST__SOMB
-            CALL MSG_OUT( 'WCSMOSAIC_MSG9', 
-     :                    '  Using somb binning kernel.', STATUS ) 
+            MESS = '  Using somb binning kernel.'
 
          END IF
 
+      END IF
+
+      IF( ILEVEL .GE. 2 ) THEN 
+         CALL MSG_OUT( 'WCSMOSAIC_MSG1', MESS, STATUS )
       END IF
 
 *  If required, set the dynamic defaults for PARAMS, then get new 
@@ -512,9 +518,6 @@
          CALL PSX_CALLOC( EL, '_DOUBLE', IPW, STATUS )
       END IF
 
-*  See if verbose output is needed.
-      CALL KPG1_VERB( VERB, 'KAPPA', STATUS )
-
 *  Abort if an error has occurred.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -526,10 +529,10 @@
 
 *  If required, tell the user which input NDF is currently being
 *  processed.
-         IF( VERB ) THEN
+         IF( ILEVEL .GE. 3 ) THEN
             CALL MSG_BLANK( STATUS )
             CALL NDF_MSG( 'NDF', INDF1 )
-            CALL MSG_OUT( 'WCSMOSAIC_MSG10', '  Processing ^NDF...', 
+            CALL MSG_OUT( 'WCSMOSAIC_MSG2', '  Processing ^NDF...', 
      :                    STATUS )
          END IF
 
@@ -616,7 +619,7 @@
       END DO
 
 *  Display a blank line.
-      IF( VERB ) CALL MSG_BLANK( STATUS )
+      IF( ILEVEL .GE. 3 ) CALL MSG_BLANK( STATUS )
 
 *  Set the bad pixel flags for the output DATA and VARIANCE arrays.
       CALL NDF_SBAD( .TRUE., INDF2, 'DATA', STATUS )
