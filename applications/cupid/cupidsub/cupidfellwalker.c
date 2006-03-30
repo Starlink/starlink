@@ -123,18 +123,22 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    float *pf;           /* Pointer to next element of data array */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
+   int *igood;          /* Pointer to array holding usable clump indices */
    int *ipa;            /* Pointer to clump assignment array */
    int *nrem;           /* Pointer to array holding clump populations */
    int *pa;             /* Pointer to next element of the ipa array */
    int dims[3];         /* Pointer to array of array dimensions */
    int el;              /* Number of elements in array */
    int i;               /* Loop count */
+   int ii;              /* Temp storage */
    int ix;              /* Grid index on 1st axis */
    int iy;              /* Grid index on 2nd axis */
    int iz;              /* Grid index on 3rd axis */
+   int j;               /* Loop count */
    int maxid;           /* Largest id for any peak (smallest is zero) */
    int minpix;          /* Minimum total size of a clump in pixels */
-   int nclump;          /* Number of clumps found */
+   int more;            /* Continue looping? */
+   int ngood;           /* Number of good clumps */
    int nlow;            /* Number of clumps with low peaks */
    int nsmall;          /* Number of clumps with too few pixels */
    int skip[3];         /* Pointer to array of axis skips */
@@ -210,9 +214,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    peakvals = astMalloc( sizeof( double )*( maxid + 1 ) );
 
 /* Determine the bounding box of every clump. First allocate memory to
-   hold the bounding boxes. */
+   hold the bounding boxes, etc. */
    clbnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
    cubnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
+   igood = astMalloc( sizeof( int )*( maxid + 1 ) );
    if( cubnd ) {
 
 /* Get the minimum allowed number of pixels in a clump. */
@@ -294,10 +299,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Loop round creating an NDF describing each clump with more than "minpix"
-   pixels, counting them. */
+/* Loop round counting the clumps which are too small or too low. Put the
+   indices of usableclumps into another array. */
       nsmall = 0;
       nlow = 0;
+      ngood = 0;
       for( i = 0; i <= maxid; i++ ) {
          if( nrem[ i ] <= minpix ) {
             nsmall++;
@@ -306,19 +312,17 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             nlow++;
 
          } else {
-            ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
-                                 i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
+            igood[ ngood++ ] = i;
          }
       }
 
       if( ilevel > 0 ) {
-         datSize( ret, (size_t *) &nclump, status );
-         if( nclump == 0 ) {
+         if( ngood == 0 ) {
             msgOut( "", "No usable clumps found", status );
-         } else if( nclump == 1 ){
+         } else if( ngood == 1 ){
             msgOut( "", "One usable clump found", status );
          } else {
-            msgSeti( "N", nclump );
+            msgSeti( "N", ngood );
             msgOut( "", "^N usable clumps found", status );
          }
          if( ilevel > 1 ) {
@@ -338,9 +342,32 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          msgBlank( status );
       }         
 
+/* Sort the clump indices into descending order of peak value. */
+      more = 1;
+      while( more ) {
+         j--;
+         more = 0;
+         for( i = 0; i < j; i++ ) {
+            if( peakvals[ igood[ i ] ] < peakvals[ igood[ i + 1 ] ] ) {
+               ii = igood[ i + 1 ];
+               igood[ i + 1 ] = igood[ i ];
+               igood[ i ] = ii;
+               more = 1;
+            }
+         }
+      }
+
+/* Loop round creating an NDF describing each usable clump. */
+      for( j = 0; j < ngood; j++ ) {
+         i = igood[ j ];
+         ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd, 
+                              i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
+      }
+
 /* Free resources */
       clbnd = astFree( clbnd );
       cubnd = astFree( cubnd );
+      igood = astFree( igood );
    }
 
 L10:;

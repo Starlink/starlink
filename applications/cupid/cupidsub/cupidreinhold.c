@@ -158,7 +158,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    minlen = cupidConfigI( rconfig, "MINLEN", 4 );
    minpix = cupidConfigI( rconfig, "MINPIX", 16 );
    noise = cupidConfigD( rconfig, "NOISE", 2*rms );
-   thresh = cupidConfigD( rconfig, "THRESH", noise + rms );
+   thresh = cupidConfigD( rconfig, "THRESH", noise + 2*rms );
    flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms );
    cathresh = pow( 3, ndim ) - 1.0;
    cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh );

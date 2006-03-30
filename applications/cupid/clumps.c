@@ -277,7 +277,7 @@ void clumps() {
 *
 *     - GaussClumps.FwhmBeam: The FWHM of the instrument beam, in
 *     pixels. The fitted Gaussians are not allowed to be smaller than the
-*     instrument beam. This prevents noise spikes being fitted. [3.0]
+*     instrument beam. This prevents noise spikes being fitted. [2.0]
 *     - GaussClumps.FwhmStart: An initial guess at the ratio of the typical 
 *     observed clump size to the instrument beam width. This is used to
 *     determine the starting point for the algorithm which finds the best
@@ -326,11 +326,10 @@ void clumps() {
 *     & Gusten paper). [1.0]
 *     - GaussClumps.Thresh: Gives the minimum peak amplitude of clumps to
 *     be fitted by the GaussClumps algorithm (see also GaussClumps.NPad).
-*     The value should be supplied as a multiple of the RMS noise level.
-*     (see ADAM parameter RMS). [20.0]
+*     The value should be supplied as a multiple of the RMS noise level. [2.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity FWHM of each clump is not allowed to be
-*     smaller than this value. Only used for 3D data. [3.0]
+*     smaller than this value. Only used for 3D data. [2.0]
 *     - GaussClumps.VeloStart: An initial guess at the ratio of the typical 
 *     observed clump velocity width to the velocity resolution. This is used to
 *     determine the starting point for the algorithm which finds the best
@@ -363,21 +362,21 @@ void clumps() {
 *     spaced by "DeltaT". Note, small values of DeltaT can result in noise 
 *     spikes being interpreted as real peaks, whilst large values can result 
 *     in some real peaks being missed and merged in with neighbouring peaks. 
-*     The default value of two times the RMS noise level (as specified by
-*     the ADAM parameter RMS) is usually considered to be optimal, although 
-*     this obviously depends on the RMS noise level being correct. []
+*     The default value of two times the RMS noise level is usually considered 
+*     to be optimal, although this obviously depends on the RMS noise level 
+*     being correct. [2*RMS]
 *     - ClumpFind.Level<n>: The n'th data value at which to contour the
 *     data array (where <n> is an integer). Values should be given for 
 *     "Level1", "Level2", "Level3", etc. Any number of contours can be 
 *     supplied, but there must be no gaps in the progression of values for 
 *     <n>. The values will be sorted into descending order before being 
-*     used. If "Level1" is not supplied, the contour levels are instead 
-*     determined automatically using parameters "Tlow" and "DeltaT". Note 
-*     clumps found at higher contour levels are traced down to the lowest 
-*     supplied contour level, but any new clumps which are initially found 
-*     at the lowest contour level are ignored. That is, clumps must have 
-*     peaks which exceed the second lowest contour level to be included in 
-*     the returned catalogue. []
+*     used. If "Level1" is not supplied (the default), then contour levels 
+*     are instead determined automatically using parameters "Tlow" and 
+*     "DeltaT". Note clumps found at higher contour levels are traced down 
+*     to the lowest supplied contour level, but any new clumps which are 
+*     initially found at the lowest contour level are ignored. That is, clumps 
+*     must have peaks which exceed the second lowest contour level to be 
+*     included in the returned catalogue. []
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
@@ -404,7 +403,7 @@ void clumps() {
 *     value of 1 is always used for "Naxis", and each pixel simply has 2 
 *     adjacent pixels, one on either side. []
 *     - ClumpFind.RMS: The global RMS noise level in the data. The
-*     defaultvalue is the value supplied for parameter RMS. []
+*     default value is the value supplied for parameter RMS. []
 *     - ClumpFind.Tlow: The lowest level at which to contour the data
 *     array. Only accessed if no value is supplied for "Level1". See also
 *     "DeltaT". [2*RMS]
@@ -426,7 +425,8 @@ void clumps() {
 *     considered to be in the noise. A peak is considered to end when the 
 *     peak value dips below the "noise" value. [2*RMS]
 *     - Reinhold.Thresh: The smallest significant peak height. Peaks which 
-*     have a maximum data value less than this value are ignored. ["noise"+RMS]
+*     have a maximum data value less than this value are ignored. 
+*     [Noise+2*RMS]
 *     - Reinhold.FlatSlope: A peak is considered to end when the slope of a
 *     profile through the peak drops below this value. The value should be 
 *     given as a change in data value between adjacent pixels. [1.0*RMS]
@@ -467,8 +467,7 @@ void clumps() {
 *     same clump. [2.0*RMS]
 *     - FellWalker.MinHeight: If the peak value in a clump is less than
 *     this value then the clump is not included in the returned list of 
-*     clumps. The default value is equal to the sum of the values used for 
-*     MinDip and Noise. []
+*     clumps. [MinDip+Noise]
 *     - FellWalker.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
@@ -877,7 +876,7 @@ void clumps() {
 L999:
 
 /* Release the HDS object containing the list of NDFs describing the clumps. */
-   datAnnul( &ndfs, status );
+   if( ndfs ) datAnnul( &ndfs, status );
 
 /* If an error has occurred, delete the Quality component and also delete the 
    CUPID extension. */

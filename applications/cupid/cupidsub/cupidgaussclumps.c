@@ -229,7 +229,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Set the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
-      peak_thresh = cupidConfigD( gcconfig, "THRESH", 20.0 );
+      peak_thresh = cupidConfigD( gcconfig, "THRESH", 2.0 );
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */

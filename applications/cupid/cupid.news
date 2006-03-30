@@ -19,6 +19,20 @@ Changes introduced at V0.0-5:
  - The clump information is now written to the CUPID extension of the
  output NDF rather than the input NDF.
 
+ - The default value for the Reinhold.Thresh configuration parameter has
+ been changed from "Noise+RMS" to "Noise+2*RMS" in order to make it the
+ same as the defaults for the equivalent parameters for the other
+ algorithms.
+
+ - The default value for the GaussClumps.Thresh configuration parameter has
+ been changed from 20 to 2 in order to make it the same as the defaults for 
+ the equivalent parameters for the other algorithms.
+
+ - The default values for the GaussClumps.VeloRes and GaussClumps.FWHMBeam 
+ configuration parameters have been changed from 3.0 to 2.0 in order to make 
+ them more comparable to the defaults for the equivalent parameters for the 
+ other algorithms.
+
 Changes introduced at V0.0-4:
 
  - The FellWalker algorithm algorithm has been changed so that the

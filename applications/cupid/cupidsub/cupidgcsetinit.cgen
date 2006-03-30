@@ -156,11 +156,11 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
       fvel = cupidConfigD( config, "VELOSTART", VAL__BADD );
 
 /* Get the FHWM of the instrument beam, in pixels, and store its square. */
-      beamfwhm = cupidConfigD( config, "FWHMBEAM", 3.0 );
+      beamfwhm = cupidConfigD( config, "FWHMBEAM", 2.0 );
       cupidGC.beam_sq = beamfwhm*beamfwhm;
 
 /* Get the velocity resolution, in pixels (=channels), and store its square. */
-      velres = cupidConfigD( config, "VELORES", 3.0 );
+      velres = cupidConfigD( config, "VELORES", 2.0 );
       cupidGC.velres_sq = velres*velres;
 
 /* Get the Chi-square stiffness parameter "Sa" which encourages the peak
