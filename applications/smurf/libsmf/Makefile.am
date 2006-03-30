@@ -19,7 +19,7 @@ smf_create_smfData.c smf_create_smfFile.c smf_create_smfHead.c \
 smf_create_smfDA.c \
 smf_construct_smfFile.c smf_construct_smfHead.c smf_construct_smfDA.c \
 smf_construct_smfData.c \
-smf_deepcopy_smfHead.c smf_deepcopy_smfData.c \
+smf_deepcopy_smfHead.c smf_deepcopy_smfData.c smf_deepcopy_smfDA.c \
 smf_mapbounds.c smf_mapbounds_approx.c smf_rebinmap.c \
 smf_calc_wvm.c smf_subtract_poly.c smf_subtract_plane.c
 

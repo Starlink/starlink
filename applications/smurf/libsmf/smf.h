@@ -72,6 +72,8 @@
 *     2006-03-23 (AGG):
 *        Update API for smf_rebinmap, smf_construct_smfData, smf_construct_smfHead
 *        Add smf_mapbounds approx, smf_deepcopy_smfHead & smf_deepcopy_smfData
+*     2006-03-28 (AGG):
+*        Update API for smf_deepcopy_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,9 +147,12 @@ smf_construct_smfHead( smfHead * tofill,
 		       struct sc2head * allsc2heads,
 		       dim_t curframe, dim_t nframes, int * status );
 
+
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
-smfData * smf_deepcopy_smfData ( const smfData *old, int * status);
+smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert, int * status);
+
+smfDA * smf_deepcopy_smfDA ( const smfDA *old, int * status);
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
