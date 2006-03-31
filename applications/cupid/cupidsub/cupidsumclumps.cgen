@@ -13,8 +13,7 @@
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
-                                    float *rmask, void *out, char *method, 
-                                    double *bg ){
+                                    float *rmask, void *out, char *method ){
 /*
 *  Name:
 *     cupidSumClumps
@@ -26,16 +25,12 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
 *                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
-*                             void *out, char *method, double *bg )
+*                             void *out, char *method )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps
 *     in "out", and stores a mask in "rmask" identifying the pixels which
-*     are inside a clump. In the case of the GaussClumps algorithm, a constant 
-*     background value is added to the returned "out" array so that the mean 
-*     value in "out" equals the mean of the corresponding pixels in "in".
-*     If "in" is not supplied then the background value added is the
-*     supplied value of "*bg".
+*     are inside a clump. 
 
 *  Parameters:
 *     in
@@ -59,20 +54,14 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *        "out" and the pixels are assumed to be in fortran order. May be NULL.
 *     out
 *        Pointer to the start of the array to receive the sum of the clump 
-*        intensities plus (for GaussClumps) a constant background value. The 
-*        supplied array must be the same size as the user supplied NDF ("in") 
-*        and the pixels are assumed to be in fortran order. May be NULL.
-*        Note the data type for this array is determined by the algorithm in 
-*        use ("_DOUBLE" for gaussclumps, "_INTEGER" for others), and need not 
-*        be the same as the data type of "in".
+*        intensities. The supplied array must be the same size as the user 
+*        supplied NDF ("in") and the pixels are assumed to be in fortran 
+*        order. May be NULL. Note the data type for this array is determined 
+*        by the algorithm in use ("_DOUBLE" for gaussclumps, "_INTEGER" for 
+*        others), and need not be the same as the data type of "in".
 *     method
-*        The name of the algorithm being used (e.g. "CLUMPFIND",
-*        "GAUSSCLUMPS", etc)
-*     bg
-*        Pointer to double in which to store the background value added
-*        onto the output array (this will be zero unless the GaussClumps 
-*        algorithm is being used). If "in" is NULL, then the value on
-*        entry is used as the background value.
+*        The name of the algorithm being used (e.g. "CLUMPFIND", "GAUSSCLUMPS",
+*        etc).
 
 *  Notes:
 *     - This function can be invoked using the generic cupidSumClumps macro 
@@ -101,8 +90,6 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    HDSLoc *cloc;        /* Locator for a cell of the NDF array */
    double *ipd;         /* Pointer to data array in clump NDF */
    double *m;           /* Pointer to next clump data value */
-   double sumi;         /* Sum of input data values */
-   double sumo;         /* Sum of output data values */
    float *r;            /* Pointer to next element of the "rmask" array */
    int *pi;             /* Pointer to next element of the "out" array */
    int alg;             /* Specifies the algorithm */
@@ -117,7 +104,6 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    int j;               /* Clump loop count */
    int k;               /* Axis loop count */
    int nclump;          /* Number of clump NDFs supplied */
-   int nsum;            /* Number of values summed in sumi and sumo */
    int step[ 3 ];       /* 1D step between adjacent pixels on each axis */
    int yy[ 3 ];         /* nD pixel coords of current "out" pixel */
 
@@ -251,42 +237,6 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );
-   }
-
-/* The GaussClumps algorithm requires a constant background to be added
-   to the output model. This is chosen so that the mean of the good model
-   values equals the mean of the corresponding input values. */
-   if( alg == GAUSSCLUMPS && out ) {
-
-      if( in ) {
-         sumi = 0.0;
-         sumo = 0.0; 
-         nsum = 0;
-      
-         pd = (CGEN_TYPE *) out;
-         for( i = 0; i < nel; i++, pd++ ) {
-            if( in[ i ] != CGEN_BAD ) {
-               sumi += in[ i ];
-               sumo += *pd;
-               nsum++;
-            } else {
-               *pd = CGEN_BAD;
-            }
-         }
-
-         if( nsum > 0 ) *bg = ( sumi - sumo )/nsum;
-
-         if( ilevel > 2 ) {
-            msgSetd( "BG", *bg );
-            msgOut( "", "Estimated background level = ^BG", status );
-         }
-
-      }
-
-      pd = (CGEN_TYPE *) out;
-      for( i = 0; i < nel; i++, pd++ ) {
-         if( *pd != CGEN_BAD ) *pd += *bg;
-      }
    }
 }
 

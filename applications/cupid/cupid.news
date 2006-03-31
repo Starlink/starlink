@@ -7,7 +7,26 @@
  data arrays.
 
 
-Changes introduced at V0.0-5:
+Changes introduced at V0.0-7:
+
+ - The GaussClumps algorithm no longer includes clumps in the output
+ catalogue or image if they touch an edge of the data array. This brings
+ it into line with the other algorithms.
+
+ - The output NDF created by the GaussClumps algorithm no longer includes
+ the constant background level which was previously added in order to
+ make the mean of the output data array equal to the mean of theinput data
+ array. This brings it into line with the other algorithms which assume
+ zero background level.
+
+ - The BACK parameter has been removed from the MAKECLUMPS command. This
+ is fall into line with the assumption of zero background level made by
+ the clump finding algorithms.
+
+ - Added test_data.sdf and test_data.FIT as standard test files.
+
+
+Changes introduced at V0.0-6:
 
  - The clump parameters returned in the catalogue now are corrected for
  the effects of smoothing by the instrumental beam. That is, the values

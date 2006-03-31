@@ -60,8 +60,6 @@ void makeclumps() {
 *        additional information. Note, angles are always taken from a
 *        uniform distribution, irrespective of the setting of PARDIST. 
 *        [current value]
-*     BACK = _REAL (Read)
-*        The constant background level. [current value]
 *     BEAMFWHM = _REAL (Read)
 *        The spatial FHWM (Full Width at Half Max) of the instrumental beam, 
 *        in pixels. The generated clumps are smoothed with a Gaussian beam
@@ -189,7 +187,6 @@ void makeclumps() {
    HDSLoc *obj;                  /* HDS array of NDF structures */
    HDSLoc *xloc;                 /* HDS locator for CUPID extension */
    char text[ 8 ];               /* Value of PARDIST parameter */
-   double back;                  /* Background level */
    double beamcorr[ 3 ];         /* Beam widths */
    double par[ 11 ];             /* Clump parameters */
    float *d;                     /* Pointer to next output element */
@@ -254,7 +251,6 @@ void makeclumps() {
    normal = strcmp( text, "NORMAL" ) ? 0 : 1;
 
    parGet0r( "TRUNC", &trunc, status );
-   parGet0d( "BACK", &back, status );
    parGet0i( "NCLUMP", &nclump, status );
    parGet0r( "RMS", &rms, status );
 
@@ -339,7 +335,7 @@ void makeclumps() {
 
 /* Determine the parameter values to use for the clump. */
       par[ 0 ] = cupidRanVal( normal, peak );
-      par[ 1 ] = back;
+      par[ 1 ] = 0.0;
       par[ 2 ] = (int) cupidRanVal( 0, pos1 );
       par[ 3 ] = cupidRanVal( normal, fwhm1 );
 
@@ -370,7 +366,7 @@ void makeclumps() {
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
    cupidSumClumps( CUPID__FLOAT, NULL, 0, ndim, lbnd, ubnd, nel, obj, 
-                   NULL, ipd2, "GAUSSCLUMPS", &back );
+                   NULL, ipd2, "GAUSSCLUMPS" );
 
 /* Add Gaussian noise to the data. */
    if( *status == SAI__OK ) {

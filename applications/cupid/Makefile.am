@@ -2,7 +2,9 @@
 
 SUBDIRS = cupidsub 
 
-dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl
+dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl $(DATA_FILES) 
+
+DATA_FILES = test_data.sdf test_data.FIT
 
 dist_noinst_SCRIPTS = cupid_link_adam make_doc make_h
 

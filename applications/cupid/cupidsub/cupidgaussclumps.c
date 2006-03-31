@@ -159,6 +159,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int iter;            /* Continue finding more clumps? */
    int maxclump;        /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
+   int nclump;          /* Number of usable clumps */
    int niter;           /* Iterations performed so far */
    int npad;            /* No. of peaks below threshold for temination */
    int npeak;           /* The number of elements in the "peaks" array. */
@@ -444,14 +445,25 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Tell the user how clumps are being returned. */
    if( ilevel > 0 ) {
-      if( ilevel > 1 ) msgBlank( status );
-      if( iclump == 0 ) {
+      datSize( ret, (size_t *) &nclump, status );
+      if( nclump == 0 ) {
          msgOut( "", "No usable clumps found", status );
-      } else if( iclump == 1 ){
+      } else if( nclump == 1 ){
          msgOut( "", "One usable clump found", status );
       } else {
-         msgSeti( "N", iclump );
+         msgSeti( "N", nclump );
          msgOut( "", "^N usable clumps found", status );
+      }
+
+      if( ilevel > 1 ) {
+         if( iclump - nclump == 1 ) {
+            msgOut( "", "1 clump rejected because it touches an edge of "
+                    "the data array", status );
+         } else if( iclump - nclump > 1 ) {
+            msgSeti( "N", iclump - nclump );
+            msgOut( "", "^N clumps rejected because they touch an edge of "
+                    "the data array", status );
+         }
       }
    }
 

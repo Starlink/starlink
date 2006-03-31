@@ -72,7 +72,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        object is created and its locator stored in place of the NULL 
 *        pointer. The array of NDF structures is extended by one, and the
 *        new NDF in the array describes the supplied clump. If the
-*        supplied pointer is NULL, no HDS array or NDF is created.
+*        supplied pointer is NULL, no HDS array or NDF is created. No NDF
+*        is created for clumps which touch the edge of the data array.
 *     iclump
 *        Clump index.
 *     diag
@@ -370,8 +371,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       CGEN_FUNCTION(cupidGCDump)( res, ndim, dims, name );   
    }
 
-/* If required, create an NDF holding the clump data values. */
-   if( ndfs ) {
+/* If required, create an NDF holding the clump data values so long as
+   the clump does not touch the edge of the data array. */
+   if( ndfs && area_off == 0 ) {
 
 /* Modify the box to exclude the border of bad pixels. */
       for( jax = 0; jax < ndim; jax++ ) {

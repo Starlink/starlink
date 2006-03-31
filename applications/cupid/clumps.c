@@ -541,7 +541,6 @@ void clumps() {
    const char *sys;             /* AST System attribute for an axis */
    double *ipv;                 /* Pointer to Variance array */
    double beamcorr[ 3 ];        /* Beam width corrections */
-   double bg;                   /* Background level */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
@@ -849,10 +848,9 @@ void clumps() {
       rmask = astMalloc( sizeof( float )*(size_t) el );
 
 /* Create any output NDF by summing the contents of the NDFs describing the 
-   found clumps, and then adding on a background level (for GaussClumps). This 
-   also fills the above mask array. */
+   found clumps. This also fills the above mask array. */
       cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
-                      rmask, ipo, method, &bg );
+                      rmask, ipo, method );
 
 /* Create a CUPID extension in the output NDF. */
       ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );

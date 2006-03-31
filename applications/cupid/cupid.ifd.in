@@ -152,16 +152,6 @@ package cupid {
             helpkey *
           }
 
-         parameter back {
-            type _REAL
-            access READ
-            vpath CURRENT,DEFAULT
-            ppath CURRENT,DEFAULT
-            prompt {Constant background value}
-            default 1.0 
-            helpkey *
-          }
-
          parameter beamfwhm {
             type _REAL
             access READ
