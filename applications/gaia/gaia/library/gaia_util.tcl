@@ -104,3 +104,12 @@ proc gaiaReUseWidget {type w raise args} {
       uplevel "$type $w $args"
    }
 }
+
+#  Apply a binding to all children (useful for meta-widgets that don't offer a
+#  bind method).
+proc gaiaBindChildren {win sequence script} {
+   ::bind $win $sequence $script
+   foreach subWin [winfo children $win] {
+      gaiaBindChildren $subWin $sequence $script
+   }
+}

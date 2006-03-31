@@ -23,6 +23,7 @@
 #                            scale and just keep the arrows. Also
 #                            added option to constrain the upper and
 #                            lower value limits.
+#                 31 Mar 06  Added bindscale method.
 
 
 itk::usual LabelEntryScale {}
@@ -146,6 +147,20 @@ itcl::class util::LabelEntryScale {
            $itk_component(scale) config -from $from -to $to
            scaleCmd $v
         }
+    }
+   
+    #  Add a binding to all widgets related to scale. If a binding exists
+    #  already this one will be appended to it.
+    public method bindscale {sequence script} {
+       bind $itk_component(scale) $sequence +"$script"
+       bind $itk_component(left) $sequence +"$script"
+       bind $itk_component(right) $sequence +"$script"
+    }
+
+    #  Add a binding to all widgets related to entry field. If a binding
+    #  exists already this one will be appended to it.
+    public method bindentry {sequence script} {
+       bind $itk_component(entry) $sequence +"$script"
     }
 
     
