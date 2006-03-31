@@ -128,6 +128,10 @@ class StarRtdImage : public Skycat
 #endif
                             Tk_ImageType*, Tk_ImageMaster, ClientData* );
 
+
+   //  Replace the image data.
+   int updateImageDataCmd( int argc, char *argv[] );
+
    //  Run a foreign procedure.
    int foreignCmd( int argc, char *argv[] );
 

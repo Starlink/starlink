@@ -27,6 +27,8 @@
 /* Local prototypes */
 static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] );
 static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 
@@ -42,6 +44,11 @@ int Array_Init( Tcl_Interp *interp )
     Tcl_CreateObjCommand( interp, "array::getspectrum", gaiaArraySpectrum,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "array::getimage", gaiaArrayImage,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     return TCL_OK;
 }
 
@@ -126,7 +133,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Correct to array indices from grid ones and set to either end if values
-     * are -1 */ 
+     * are -1 */
     if ( arange[0] == -1 ) {
         arange[0] = 0;
     }
@@ -147,7 +154,7 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
-    
+
     /* Correct to zero-based array indices from grid indices */
     index1--;
     index2--;
@@ -161,8 +168,104 @@ static int gaiaArraySpectrum( ClientData clientData, Tcl_Interp *interp,
 
     /* Extraction */
 
-    gaiaArraySpectrumFromCube( (void *) adr, type, dims, axis, arange, 
+    gaiaArraySpectrumFromCube( (void *) adr, type, dims, axis, arange,
                                index1, index2, cnfMalloc, &outPtr, &nel );
+
+    /* Export address as result and number of elements extracted */
+    resultObj = Tcl_GetObjResult( interp );
+    Tcl_ListObjAppendElement( interp, resultObj,
+                              Tcl_NewLongObj( (long) outPtr ) );
+    Tcl_ListObjAppendElement( interp, resultObj, Tcl_NewIntObj( nel ) );
+
+    return TCL_OK;
+}
+
+/**
+ * Extract an image plane from a data cube.
+ *
+ * The cube must be available as a memory address, the arguments are:
+ *
+ *   1)     the memory address (a long)
+ *   2)     the cube type (HDS string)
+ *   3&4&5) the cube dimensions (three arguments)
+ *   6)     the axis that image lies perpendicular to.
+ *   7)     the grid index of the image plane along the axis.
+ *   8)     a boolean indicating whether the extracted data should be
+ *          registered with CNF so that it can be released by CNF
+ *          (NDF's will require this).
+ *
+ * The result is the memory address of the extracted plane and the number of
+ * elements extracted.
+ */
+static int gaiaArrayImage( ClientData clientData, Tcl_Interp *interp,
+                           int objc, Tcl_Obj *CONST objv[] )
+{
+    Tcl_Obj *resultObj;
+    int axis;
+    int cnfMalloc;
+    int dims[3];
+    int index;
+    int nel;
+    int type;
+    long adr;
+    void *outPtr;
+
+    /* Check arguments */
+    if ( objc != 9 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address data_type "
+                          "dim1 dim2 dim3 axis index cnf_register" );
+        return TCL_ERROR;
+    }
+
+    /* Get cube memory address */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read data pointer",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Data type */
+    type = gaiaArrayHDSType( Tcl_GetString( objv[2] ) );
+
+    /* Cube dimensions */
+    if ( ( Tcl_GetIntFromObj( interp, objv[3], &dims[0] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[4], &dims[1] ) != TCL_OK ) ||
+         ( Tcl_GetIntFromObj( interp, objv[5], &dims[2] ) != TCL_OK ) ) {
+        Tcl_AppendResult( interp, ": failed to read cube dimensions",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Anti-axis of image plane */
+    if ( Tcl_GetIntFromObj( interp, objv[6], &axis ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read image axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Correct to array indices (these are 0 based). */
+    axis--;
+
+    /* Index of image plane */
+    if ( Tcl_GetIntFromObj( interp, objv[7], &index ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read image index",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Correct to array indices */
+    index--;
+
+    /* CNF registered memory */
+    if ( Tcl_GetBooleanFromObj( interp, objv[8], &cnfMalloc ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to read spectral axis",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
+    /* Extraction */
+    gaiaArrayImageFromCube( (void *) adr, type, dims, axis, index, cnfMalloc, 
+                            &outPtr, &nel );
 
     /* Export address as result and number of elements extracted */
     resultObj = Tcl_GetObjResult( interp );
@@ -205,6 +308,6 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
 
     /* Free memory */
     gaiaArrayFree( (void *)adr, cnfMalloc );
-    
+
     return TCL_OK;
 }

@@ -299,7 +299,7 @@ public:
     { "remote",          &StarRtdImage::remoteCmd,          0, 1 },
     { "remotetcl",       &StarRtdImage::remoteTclCmd,       1, 1 },
     { "slice",           &StarRtdImage::sliceCmd,          11, 11},
-    //{ "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
+    { "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
 };
@@ -723,35 +723,27 @@ StarWCS* StarRtdImage::getStarWCSPtr( ImageData* image )
 }
 
 //+
-//   StarRtdImage::astcelestialCmd
+//   StarRtdImage::updateImageDataCmd.
 //
-//   Return if coordinate system is celestial or not.
+//   Replace and update the image data. Requires the address of some 
+//   memory that contains data of exactly the same size and data type as that
+//   already in use. If that's not true then undefined things will happen.  
+//
+//   The only argument is a memory address stored in a long.
 //-
-int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
+int StarRtdImage::updateImageDataCmd( int argc, char *argv[] )
 {
-    if ( isCelestial() ) {
-        set_result( 1 );
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::updateImageDataCmd" << std::endl;
+#endif
+    long adr;
+    if ( Tcl_ExprLong( interp_, argv[0], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
     }
-    else {
-        set_result( 0 );
-    }
-    return TCL_OK;
-}
+    size_t size = image_->data().length();
+    Mem data = Mem( (void *)adr, size, 0 );
 
-//+
-//   StarRtdImage::isCelestial
-//
-//   Return if coordinate system is celestial.
-//-
-int StarRtdImage::isCelestial()
-{
-    StarWCS* wcsp = getStarWCSPtr();
-    if ( wcsp ) {
-        return wcsp->isCelestial();
-    }
-    else {
-        return 0;
-    }
+    return updateImageNewData( data );
 }
 
 //+
@@ -1585,6 +1577,38 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
     return TCL_OK;
+}
+
+//+
+//   StarRtdImage::astcelestialCmd
+//
+//   Return if coordinate system is celestial or not.
+//-
+int StarRtdImage::astcelestialCmd( int argc, char *argv[] )
+{
+    if ( isCelestial() ) {
+        set_result( 1 );
+    }
+    else {
+        set_result( 0 );
+    }
+    return TCL_OK;
+}
+
+//+
+//   StarRtdImage::isCelestial
+//
+//   Return if coordinate system is celestial.
+//-
+int StarRtdImage::isCelestial()
+{
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( wcsp ) {
+        return wcsp->isCelestial();
+    }
+    else {
+        return 0;
+    }
 }
 
 //+

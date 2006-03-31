@@ -180,29 +180,30 @@ void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
  *         fastest.
  *     index
  *         The index of the plane that will be extracted (along axis "axis").
+ *     cnfmalloc
+ *         Whether to use cnfMalloc to allocate the image data. Otherwise
+ *         malloc will be used.
  *     outPtr
  *         a pointer to a pointer that will point at the extracted image on
  *         exit. This memory is allocated using malloc or cnfMalloc as
  *         determined by the final argument. Freeing it is the responsibility
  *         of the caller.
- *     cnfmalloc
- *         Whether to use cnfMalloc to allocate the image data. Otherwise
- *         malloc will be used.
+ *     nel 
+ *         number of elements extracted (number of type elements in outPtr).
  */
 void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
-                             int axis, int index, void **outPtr,
-                             int cnfmalloc )
+                             int axis, int index, int cnfmalloc, 
+                             void **outPtr, int *nel )
 {
     if ( axis == 2 ) {
 
         /* If we're losing the last dimension, then this is just a memcpy. */
         char *ptr;
         size_t length;
-        size_t nel;
         size_t offset;
 
-        nel = (size_t) dims[0] * (size_t) dims[1];
-        length = nel * gaiaArraySizeOf( type );
+        *nel = (size_t) dims[0] * (size_t) dims[1];
+        length = (*nel) * gaiaArraySizeOf( type );
 
         if ( cnfmalloc == 1 ) {
             *outPtr = cnfMalloc( length );
@@ -211,8 +212,8 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
             *outPtr = malloc( length );
         }
 
-        /* Get the offset into cube of first pixel */
-        offset = (size_t) index * (size_t) dims[0] * (size_t) dims[1];
+        /* Get the offset into cube of first pixel (in bytes). */
+        offset = length * (size_t) index;
         ptr = ((char *) inPtr) + offset;
 
         /* And copy the memory */
@@ -231,7 +232,6 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
         int offset;
         int strides[3];
         size_t length;
-        size_t nel;
 
         /* Pick out axes we're keeping and set the index of the image to pick
          * out along axis "axis" */
@@ -246,8 +246,8 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
         }
 
         /* Allocate the memory */
-        nel = (size_t) dims[axis1] * (size_t) dims[axis2];
-        length = nel * gaiaArraySizeOf( type );;
+        *nel = (size_t) dims[axis1] * (size_t) dims[axis2];
+        length = (*nel) * gaiaArraySizeOf( type );;
 
         if ( cnfmalloc == 1 ) {
             *outPtr = cnfMalloc( length );
@@ -274,7 +274,7 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
             for ( l = 0; l < 3; l++ ) {           \
                 offset += strides[l] * indices[l];\
             }                                     \
-            toPtr[k] = fromPtr[offset];           \
+            toPtr[k++] = fromPtr[offset];         \
         }                                         \
     }                                             \
 }
@@ -376,7 +376,7 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
         upper = MIN( dims[axis], MAX( arange[1], arange[0] ) ) + 1;
         *nel = upper - lower;
     }
-    length = *nel * gaiaArraySizeOf( type );
+    length = (*nel) * gaiaArraySizeOf( type );
     if ( cnfmalloc == 1 ) {
         *outPtr = cnfMalloc( length );
     }

@@ -24,8 +24,8 @@ extern "C" {
 
     /* Get an image section from a cube */
     void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
-                                 int axis, int index, void **outPtr,
-                                 int cnfmalloc );
+                                 int axis, int index, int cnfmalloc, 
+                                 void **outPtr, int *nel );
         
     /* Get a spectrum (line of data) from a cube */
     void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
