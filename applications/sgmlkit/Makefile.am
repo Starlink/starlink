@@ -6,7 +6,8 @@ nobase_dist_pkglib_SCRIPTS = lib/img-eqlist.pl
 # are no longer used (and may no longer work); the contents of dsssl/sl/xml
 # are not installed as they are an experiment which was never completed.
 nobase_dist_pkglib_DATA = \
-	lib/plainhtml.bst lib/plainlatex.bst lib/postprocess-bbl.sed \
+	lib/plainhtml.bst lib/plaintexml.bst \
+	lib/postprocess-bbl.sed \
 	lib/icons.tar \
 	$(SL_COMMON) \
 	$(SL_HLP) \
