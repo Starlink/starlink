@@ -165,6 +165,13 @@ itcl::class gaia::GaiaNDFCube {
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
+      #  Button release on scale part of widget updates the image to a proper
+      #  section. Return in entry part does same.
+      $itk_component(index) bindscale <ButtonRelease-1> \
+         [code $this display_current_section_]
+      $itk_component(index) bindentry <Return> \
+         [code $this display_current_section_]
+
       #  Index coordinate.
       itk_component add indexlabel {
          LabelValue $w_.indexlabel \
@@ -347,7 +354,7 @@ itcl::class gaia::GaiaNDFCube {
 
       itk_component add stop {
          button $itk_component(animation).stop -text Stop \
-            -command [code $this stop_]
+            -command [code $this stop_ 1]
       }
       pack $itk_component(stop) -side right -expand 1 -pady 3 -padx 3
       add_short_help $itk_component(stop) {Stop animation}
@@ -465,14 +472,15 @@ itcl::class gaia::GaiaNDFCube {
    #  -----------
    destructor  {
 
-      # Close and release NDF.
+      #  Close and release NDF. Don't release the slice memory, that should be
+      #  done safely by now, otherwise best left hanging.
       if { $accessor_ != {} } {
          $accessor_ close
          set accessor_ {}
       }
 
       #  Stop animation.
-      stop_
+      stop_ 0
 
       #  Release collapser task.
       if { $collapser_ != {} } {
@@ -494,7 +502,7 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Close window.
    public method close {} {
-      stop_
+      stop_ 1
       wm withdraw $w_
       if { [info exists spectrum_] } {
          if { $spectrum_ != {} && [winfo exists $spectrum_] } {
@@ -584,12 +592,13 @@ itcl::class gaia::GaiaNDFCube {
          $itk_component(indextype) configure -value $trail
 
          set plane_ $plane_min_
-         set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2]
+         set_display_plane_ [expr ( $plane_max_ + $plane_min_ ) / 2] 1
       }
    }
 
-   #  Set the plane to display and display it.
-   protected method set_display_plane_ { newvalue } {
+   #  Set the plane to display and display it. When regen is true a new slice
+   #  is displayed, otherwise just the image data is updated.
+   protected method set_display_plane_ { newvalue {regen 0} } {
 
       if { $newvalue != $plane_ && $ndfname_ != {} } {
          if { $newvalue >= $plane_max_ } {
@@ -599,15 +608,31 @@ itcl::class gaia::GaiaNDFCube {
          } else {
             set plane_ $newvalue
          }
+         
+         if { $regen || ![info exists spectrum_] } {
+            #  Display a section from the NDF (forced in non-devel mode).
+            display_current_section_
 
-         if { $axis_ == 1 } {
-            set section "($plane_,,)"
-         } elseif { $axis_ == 2 } {
-            set section "(,$plane_,)"
          } else {
-            set section "(,,$plane_)"
+            #  Just extract this plane from the cube and update the image.
+            #  Correct plane to grid indices.
+            if { $axis_ == 1 } {
+               set zo [lindex $bounds_ 0]
+            } elseif { $axis_ == 2 } {
+               set zo [lindex $bounds_ 2]
+            } else {
+               set zo [lindex $bounds_ 4]
+            }
+            set zp [expr round($plane_+1-$zo)]
+            lassign [$accessor_ getimage $axis_ $zp] adr nel type
+            $itk_option(-rtdimage) updateimagedata $adr
+
+            # Release memory from last time and save pointer.
+            if { $last_slice_adr_ != 0 } {
+               $accessor_ release $last_slice_adr_
+            }
+            set last_slice_adr_ $adr
          }
-         display_ ${ndfname_}$section
          set coord [get_coord_ $plane_ 1 0]
          $itk_component(indexlabel) configure -value $coord
 
@@ -624,6 +649,24 @@ itcl::class gaia::GaiaNDFCube {
                }
             }
          }
+      }
+   }
+
+   #  Display the current NDF section and release the memory slice.
+   protected method display_current_section_ {} {
+
+      if { $axis_ == 1 } {
+         set section "($plane_,,)"
+      } elseif { $axis_ == 2 } {
+         set section "(,$plane_,)"
+      } else {
+         set section "(,,$plane_)"
+      }
+      display_ ${ndfname_}$section
+
+      if { $last_slice_adr_ != 0 } {
+         $accessor_ release $last_slice_adr_
+         set last_slice_adr_ 0
       }
    }
 
@@ -680,18 +723,28 @@ itcl::class gaia::GaiaNDFCube {
       }
    }
    protected variable initial_seconds_ 0
-   #  Stop the animation.
-   protected method stop_ {} {
-      puts "time taken: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+
+   #  Stop the animation. If dispsection is true display the current NDF
+   #  section and release slice memory.
+   protected method stop_ { {dispsection 0} } {
+      
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
+         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+      }
+      if { $dispsection } {
+         display_current_section_
       }
    }
 
    #  Set the animation delay.
    protected method set_delay_ {delay} {
-      configure -delay $delay
+      if { $delay <= 0 } {
+         configure -delay 1
+      } else {
+         configure -delay $delay
+      }
    }
 
    #  Set the animation step.
@@ -714,7 +767,7 @@ itcl::class gaia::GaiaNDFCube {
          #  Check that we have a range, otherwise this will call increment_
          #  causing an eval depth exception.
          if { $lower_bound_ == $upper_bound_ } {
-            stop_
+            stop_ 1
          } else {
             #  Force temporary halt as visual clue that end has arrived.
             update idletasks
@@ -737,7 +790,7 @@ itcl::class gaia::GaiaNDFCube {
                }
                increment_
             } else {
-               stop_
+               stop_ 1
             }
          }
       }
@@ -951,21 +1004,18 @@ itcl::class gaia::GaiaNDFCube {
       }
 
       #  XXX Checker code for region spectra.
-#       if { $ardspectra_ == {} } {
-#          global gaia_dir
-#          set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
-#       }
-#       set arddesc "CIRCLE($ix,$iy,20)"
-#       echo "$ardspectra_  runwiths \
-#           in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-#       $ardspectra_  runwiths \
-#          "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
-
-#       catch {
-#          echo "$splat_disp_ runwith GaiaArdSpectrum"
-#          $splat_disp_ runwith "GaiaArdSpectrum"
-#       } msg
-#       puts "msg = $msg"
+      #       if { $ardspectra_ == {} } {
+      #          global gaia_dir
+      #          set ardspectra_ [GaiaApp \#auto -application $gaia_dir/ardspectra]
+      #       }
+      #       set arddesc "CIRCLE($ix,$iy,20)"
+      #       echo "$ardspectra_  runwiths in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+      #       $ardspectra_  runwiths "in=$ndfname_ fixorigin=t region=\"$arddesc\" out=GaiaArdSpectrum"
+      #       catch {
+      #          echo "$splat_disp_ runwith GaiaArdSpectrum"
+      #          $splat_disp_ runwith "GaiaArdSpectrum"
+      #       } msg
+      #       puts "msg = $msg"
    }
 
    #  Configuration options: (public variables)
@@ -984,7 +1034,7 @@ itcl::class gaia::GaiaNDFCube {
    #  The canvas. Used for displaying spectra.
    itk_option define -canvas canvas Canvas {}
 
-   #  The rtdimage instance. Used for coordinate conversions.
+   #  The rtdimage instance.
    itk_option define -rtdimage rtdimage RtdImage {}
 
    #  Filters for selecting files.
@@ -1065,9 +1115,12 @@ itcl::class gaia::GaiaNDFCube {
    #  Check for cubes setting of GAIA.
    protected variable check_for_cubes_ 1
 
-   # The spectrum plot item, XXX variable not initialised unless in development
-   # mode.
+   #  The spectrum plot item, XXX variable not initialised unless in
+   #  development mode.
    protected variable spectrum_
+
+   #  Memory used for last slice. Free this when not needed.
+   protected variable last_slice_adr_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
