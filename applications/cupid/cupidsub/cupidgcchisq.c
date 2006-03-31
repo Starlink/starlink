@@ -103,9 +103,6 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    double *py;             /* Pointer to next data value to use */
    double back_term;       /* chi squared term to stop large shifts in bg level */
    double dx_sq;           /* Smoothed beam width */
-   double f3;              /* Beam smoothing factor for p[3] */
-   double f5;              /* Beam smoothing factor for p[5] */
-   double f8;              /* Beam smoothing factor for p[8] */
    double g;               /* Rat eof change of model value */
    double gback_term;      /* Gradient term to stop large shifts in bg level */
    double m;               /* Model value */
@@ -126,6 +123,9 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp ){
    static int nwm;         /* Number of times the weights have been modified */
    static double bg;       /* Last times background value */
    static double chisq;    /* Total modified chi squared */  
+   static double f3;       /* Beam smoothing factor for p[3] */
+   static double f5;       /* Beam smoothing factor for p[5] */
+   static double f8;       /* Beam smoothing factor for p[8] */
    static double pdiff;    /* Difference between model and data peak values */
    static double peakfactor;/* Smoothing factor for peak value */
    static double v_off;    /* Offset on vel axis from data to model peak */

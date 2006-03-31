@@ -3,6 +3,7 @@
 #include "mers.h"
 #include "star/pda.h"
 #include <math.h>
+#include <stdio.h>
 
 /* Local constants: */
 #define LV 71+CUPID__GCNP3*(CUPID__GCNP3+15)/2

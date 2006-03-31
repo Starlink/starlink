@@ -99,13 +99,16 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    double *py;            /* Pointer to next data value in work array */
    double d2;             /* Sum of squared offsets */
    double d;              /* 1D offset from clumpt centre */
-   double wmax;           /* Largest weight value */
+   double dx_sq;          /* Smoothed beam width */
    double fbeam_used;     /* Used value for "fbeam" */
    double fvel_used;      /* Used value for "fvel" */
    double fwhm_obs[ 3 ];  /* Observed FWHM on each pixel axis */
    double off;            /* Base line offset for the data value */
+   double peakfactor;     /* Smoothing factor for peak value */
    double sv;             /* Sum of variance reciprocals */
+   double t;              /* Temporary value */
    double v;              /* Variance reciprocal */
+   double wmax;           /* Largest weight value */
    double xx[ 3 ];        /* Internal coords of current pixel */
    double yy[ 3 ];        /* External coords of current pixel */
    int ax_max[ 3 ];       /* Peak posn on axis 0 */
@@ -475,6 +478,25 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
    cupidGC.ymax /= rms;
    par[ 1 ] /= rms;
    par[ 0 ] /= rms;
+
+/* Get the factor by which to correct the peak amplitude of the model to
+   take account of the smoothing by the instrumental beam. */
+   t = par[ 3 ]*par[ 3 ];
+   dx_sq = cupidGC.beam_sq + t;
+   peakfactor = t/dx_sq;       
+   if( ndim > 1 ) {
+      t = par[ 5 ]*par[ 5 ];
+      dx_sq = cupidGC.beam_sq + t;
+      peakfactor *= t/dx_sq;       
+      if( ndim > 2 ) {
+         t = par[ 8 ]*par[ 8 ];
+         dx_sq = cupidGC.velres_sq + t;
+         peakfactor *= t/dx_sq;       
+      }     
+   }
+
+/* Do the correction. */
+   if( peakfactor > 0.0 ) par[ 0 ] /= sqrt( peakfactor );
 
 /* Set up extra diagnostic info. */
    cupidGC.initmodel = astGrow( cupidGC.initmodel, cupidGC.nel, sizeof( double ) );
