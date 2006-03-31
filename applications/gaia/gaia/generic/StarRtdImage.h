@@ -252,9 +252,6 @@ class StarRtdImage : public Skycat
                            double ratio = 1., double angle = 0.0,
                            const char *label = NULL, const char *label_tags = NULL);
 
-   //  Get a file from the WWW.
-   int urlgetCmd( int argc, char *argv[] );
-
    //  Set the colour of blank pixels.
    int blankcolorCmd( int argc, char *argv[] );
 

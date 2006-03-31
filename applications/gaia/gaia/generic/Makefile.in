@@ -34,7 +34,7 @@ X_INCLUDE     	= @XINCSW@
 CPPSRCS =  \
  GaiaSkySearch.C StarRtdImage.C Gaia.C NDFIO.C StarWCS.C GaiaLocalCatalog.C  \
  StarFitsIO.C bitmaps.C Contour.C colormaps.C GaiaRtdRemote.C \
- XYProfile.C RegionStats.C
+ XYProfile.C RegionStats.C GaiaUtilsTcl.C
 
 CSRCS =  \
  ast_tclerr.c patch.c gaiaNDF.c writeslice.c centroid.c rotated.c \

@@ -19,26 +19,30 @@ static const char* const rcsId="@(#) $Id$";
 #include <iostream>
 #include <tcl.h>
 
+/* This one has C++ linkage */
+int GaiaUtils_Init( Tcl_Interp *interp );
+
+/* And these C linkage */
 extern "C" {
 #include <ast.h>
-    int StarRtd_Init(Tcl_Interp *interp);
+    int StarRtd_Init( Tcl_Interp *interp );
 
-    int Array_Init(Tcl_Interp *interp);
+    int Array_Init( Tcl_Interp *interp );
     int Ellipse_Init();
-    int GaiaCat_Init(Tcl_Interp *interp);
+    int GaiaCat_Init( Tcl_Interp *interp );
     int Mark_Init();
-    int Ndf_Init(Tcl_Interp *interp);
+    int Ndf_Init( Tcl_Interp *interp );
     int Polyline_Init();
     int RotBox_Init();
     int Segment_Init();
-    int Sla_Init(Tcl_Interp *interp);
+    int Sla_Init( Tcl_Interp *interp );
     int SpectralPlot_Init();
-    int Tcladam_Init(Tcl_Interp *interp);
+    int Tcladam_Init( Tcl_Interp *interp );
     int Word_Init();
 }
 
 //  Generated code for bitmaps used in tcl scripts.
-void defineGaiaBitmaps(Tcl_Interp*);
+void defineGaiaBitmaps( Tcl_Interp *interp );
 
 //  Generated code for colormaps.
 void defineGaiaColormaps();
@@ -49,74 +53,79 @@ void defineGaiaColormaps();
  */
 extern "C" int Gaia_Init( Tcl_Interp *interp )
 {
-    //  Set up Tcl package.
-    if (Tcl_PkgProvide(interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
+    /*  Set up the Gaia Tcl package. */
+    if ( Tcl_PkgProvide( interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
 	return TCL_ERROR;
     }
 
-    //  Define bitmaps used by Tcl library.
-    defineGaiaBitmaps(interp);
+    /*  Define bitmaps used by Tcl library. */
+    defineGaiaBitmaps( interp );
 
-    //  Define colormaps added by GAIA.
+    /*  Define colormaps added by GAIA. */
     defineGaiaColormaps();
 
-    // initialize the new image type and Tcl commands
-    if (StarRtd_Init(interp) != TCL_OK)
+    /* Initialize the new rtd_image type */
+    if ( StarRtd_Init( interp ) != TCL_OK)
 	return TCL_ERROR;
 
-    /* Add rtd_ellipse item to canvases */
-    if (Ellipse_Init() != TCL_OK) {
+    /* Add rtd_ellipse and rtd_rotbox items to canvases */
+    if ( Ellipse_Init() != TCL_OK ) {
 	return TCL_ERROR;
     }
-    if (RotBox_Init() != TCL_OK) {
+    if ( RotBox_Init() != TCL_OK ) {
 	return TCL_ERROR;
     }
 
     /* Add rtd_mark and rtd_word items to canvases */
-    if (Word_Init() != TCL_OK) {
+    if ( Word_Init() != TCL_OK ) {
 	return TCL_ERROR;
     }
-    if (Mark_Init() != TCL_OK) {
-	return TCL_ERROR;
-    }
-
-    /*  Add rtd_segment for drawing many lines as segments */
-    if (Segment_Init() != TCL_OK) {
+    if ( Mark_Init() != TCL_OK ) {
 	return TCL_ERROR;
     }
 
-    /*  Add rtd_polyline for drawing many polyline at speed */
-    if (Polyline_Init() != TCL_OK) {
+    /*  Add rtd_segment canvas item for drawing many lines as segments */
+    if ( Segment_Init() != TCL_OK ) {
 	return TCL_ERROR;
     }
 
-    /* Add spectral_plot for interactive spectral drawing */
-    if (SpectralPlot_Init() != TCL_OK) {
+    /*  Add rtd_polyline canvas item for drawing many polylines at speed */
+    if ( Polyline_Init() != TCL_OK ) {
+	return TCL_ERROR;
+    }
+
+    /* Add spectral_plot canavs item for interactive spectral drawing */
+    if ( SpectralPlot_Init() != TCL_OK ) {
         return TCL_ERROR;
     }
 
     /* Add Starlink task control commands*/
-    if (Tcladam_Init(interp) != TCL_OK) {
+    if ( Tcladam_Init( interp ) != TCL_OK ) {
 	return TCL_ERROR;
     }
 
     //  Add GaiaCat command.
-    if (GaiaCat_Init(interp) != TCL_OK) {
-      return TCL_ERROR;
+    if ( GaiaCat_Init( interp ) != TCL_OK ) {
+        return TCL_ERROR;
     }
 
     //  Simple NDF interface.
-    if ( Ndf_Init(interp) != TCL_OK ) {
+    if ( Ndf_Init( interp ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
     //  Array handling interface.
-    if ( Array_Init(interp) != TCL_OK ) {
+    if ( Array_Init( interp ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
     //  Simple SLALIB-like commands.
-    if ( Sla_Init(interp) != TCL_OK ) {
+    if ( Sla_Init( interp ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    //  Local utility commands.
+    if ( GaiaUtils_Init( interp ) ) {
         return TCL_ERROR;
     }
 

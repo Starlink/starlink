@@ -213,7 +213,6 @@
 #include "Contour.h"
 #include "XYProfile.h"
 #include "RegionStats.h"
-#include "HTTP.h"
 #include "ast.h"
 #include "grf_tkcan.h"
 #include "tcl_err.h"
@@ -301,7 +300,6 @@ public:
     { "remotetcl",       &StarRtdImage::remoteTclCmd,       1, 1 },
     { "slice",           &StarRtdImage::sliceCmd,          11, 11},
     //{ "updateimagedata", &StarRtdImage::updateImageDataCmd, 1, 1 },
-    { "urlget",          &StarRtdImage::urlgetCmd,          1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
 };
@@ -496,7 +494,7 @@ StarRtdImage::~StarRtdImage()
 //     TCL status.
 //-
 
-int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
+int StarRtdImage::call( const char *name, int len, int argc, char *argv[] )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::call (" << name  << ")" << std::endl;
@@ -3371,40 +3369,6 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
     os << ends;
     int result = eval( os.str().c_str() );
     return result;
-}
-
-//+
-//   StarRtdImage::urlgetCmd
-//
-//   Purpose:
-//       Gets a file from a specified URL and returns it as
-//       a result.
-//
-//    Notes:
-//       This command is provided to allow access to the HTTP class
-//       (which for instance supports proxies), which does not have a
-//       Tcl interface.
-//-
-int StarRtdImage::urlgetCmd( int argc, char *argv[] )
-{
-#ifdef _DEBUG_
-    cout << "Called StarRtdImage::urlgetCmd (" << argv[0] << ")" << std::endl;
-#endif
-
-    //  Create a HTTP object to do the transaction.
-    HTTP http;
-
-    //  Now get the file.
-    int nlines = 0;
-    char *result = http.get( argv[0], nlines, 1 );
-
-    //  And return its content.
-    if ( result != NULL ) {
-        set_result( result );
-        return TCL_OK;
-    } else {
-        return TCL_ERROR;
-    }
 }
 
 //+
