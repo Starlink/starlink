@@ -350,6 +350,8 @@
 *        Added parameters CATFRAME and CATEPOCH.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     31-MAR-2006 (DSB):
+*        Move call to KPG1_PGCLS to "tidy up" section.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -773,10 +775,8 @@
  998     CONTINUE
          IF( IPW3 .NE. 0 ) CALL PSX_FREE( IPW3, STATUS )
 
-*  End the PGPLOT buffering context (if started), shutdown PGPLOT and the 
-*  graphics database.
+*  End the PGPLOT buffering context (if started).
          IF( PGBUF ) CALL PGEBUF 
-         CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
 
       END IF
 
@@ -809,6 +809,11 @@
 *  Shutdown procedure.
 *  ===================
   999 CONTINUE
+
+*  Shutdown PGPLOT and the graphics database.
+      IF( PLOT .NE. 'NONE' .OR. LABEL ) THEN
+         CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+      END IF
 
 *  Release work arrays.
       IF( IPW0 .NE. 0 ) CALL PSX_FREE( IPW0, STATUS )
