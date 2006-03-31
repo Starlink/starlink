@@ -42,7 +42,7 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #     <dt>--html<dd>generate HTML (the default).
 #     <dt>--htmlsingle<dd>generate HTML in a single file.  Not really
 #           supported, so not often tested.
-#     <dt>--latex<dd>generate LaTeX.
+#     <dt>--texml<dd>generate LaTeX via TeXML.
 #     <dt>--packagedir=my-dir<dd>package up the generated files into a
 #           directory called `my-dir'.  The default directory is based
 #           on the input filename.
@@ -60,12 +60,6 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #     <dt>--quiet<dd>Don't chatter (not completely silent, since it
 #           doesn't suppress output from TeX).
 #     <dt>--options=opt,opt,...<dd>set format-specific options.
-#	    <p>With <code>--latex</code>: options are
-#	    <code>cts-sect</code> and <code>cts-appx</code>, which suppresses
-#	    any page-break between sections in the main text and
-#	    appendices; and <code>onepass-latex</code>, which generates
-#	    LaTeX which should need only a single pass to produce a
-#	    table of contents.
 #	    <p>With <code>--html</code>: options are <code>nonorm</code>,
 #	    <code>simplenorm</code> and <code>sgmlnorm</code>.  These control
 #	    how much the generated HTML files are normalised.  In the
@@ -93,11 +87,6 @@ ident_string='Starlink SGML Kit, release @PACKAGE_VERSION@'
 #       HTML files, bundling the result into a tarball
 #       <code>mydocs.tar</code>, rather than the default based on the
 #       source file's name.
-#     <example>
-#       sgml2docs --latex --options=cts-sect,cts-appx docfile.sgml
-#     <examplenote>
-#       Converts the document to a bundle of files which may be
-#       LaTeXed.  The page breaks between sections are suppressed.
 #       
 #  <diytopic>Environment
 #     <p>Requires that <code>dvi2bitmap</code> is in the <code>PATH</code>  The
@@ -218,19 +207,18 @@ trap tidyup 0
 
 # Start parsing the arguments
 
-USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
+USAGE="Usage: $0 [--texml] [--html] [--htmlsingle]\
 	[--packagedir=directory] [--tarball=file.tar] [--jadeflags=flags]\
 	[--ignore-manifest] [--quiet]\
 	[--help] [--debug] [--version] [-n]\
 	[--options=options...]\
 	sgml-file\
-    (--latex options: cts-sect, cts-appx, onepass)\
     (--html options: sgmlnorm, simplenorm, nonorm)"
 
 while [ $# -gt 0 ]; do
     case $1 in
 	--html) TARGETFORMAT=0 ;;
-	--latex) TARGETFORMAT=1 ;;
+        --latex) echo "The --latex option is no longer supported; use --texml instead" >&2; exit 1;;
         --texml) TARGETFORMAT=2 ;;
 	--htmlsingle) TARGETFORMAT=0; 
 	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
@@ -320,8 +308,6 @@ $VERBOSE && echo "$PROGNAME:I: processing as $srctype"
 case $TARGETFORMAT in
     0)  $VERBOSE && echo "$PROGNAME:I: Target HTML...";
 	PACKAGEEXT='.htx' ;;
-    1)  $VERBOSE && echo "$PROGNAME:I: Target LaTeX...";
-	PACKAGEEXT='.latex' ;;
     2)  $VERBOSE && echo "$PROGNAME:I: Target TeXML...";
         PACKAGEEXT='.texml' ;;
     *) echo $USAGE; exit 1 ;;
@@ -523,55 +509,10 @@ if [ $TARGETFORMAT -eq 0 ]; then
     fi
     echo $srcroot.html >> MANIFEST
 
-
-elif [ $TARGETFORMAT -eq 1 ]; then
-    # Generate LaTeX
-
-    if [ -n "$OPTIONS" ]; then
-	for o in `echo $OPTIONS | sed 's/,/ /g'`; do
-	    case $o in
-		cts-sect) JADEFLAGS="$JADEFLAGS -V section-samepage" ;;
-		cts-appx) JADEFLAGS="$JADEFLAGS -V appendix-samepage" ;;
-		onepass)  JADEFLAGS="$JADEFLAGS -V onepass-latex" ;;
-		*) echo "$PROGNAME:E: LaTeX options (cts-sect|cts-appx|onepass)" ;
-		   exit 1 ;;
-	    esac
-	done
-	if $DEBUGGING; then
-	    echo "$PROGNAME:I: JADEFLAGS (post-options)=$JADEFLAGS"
-	fi
-    fi
-
-    $DEBUGGING && echo $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
-	-d $STYLESHEET/latex/slback.dsl#back.main \
-	$usedecl $SGMLSRC \
-	'>' $tempdest
-    $run $JADE -t sgml -iLaTeX.entities -iOnly.paper $JADEFLAGS \
-	-d $STYLESHEET/latex/slback.dsl#back.main \
-	$usedecl $SGMLSRC \
-	> $tempdest
-    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
-
-    # If there was no backmatter, then don't invoke BibTeX
-    if [ -r $ROOT.latexbib.aux ]; then
-	$run $BIBTEX $ROOT.latexbib
-    fi
-
-    # Generate the final file
-    $DEBUGGING && echo $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
-	    -d $STYLESHEET/latex/sl.dsl#latex \
-	    $usedecl $SGMLSRC \
-	    '>' $tempdest
-    $run $JADE -t latex -iLaTeX.entities -iOnly.paper $JADEFLAGS \
-	    -d $STYLESHEET/latex/sl.dsl#latex \
-	    $usedecl $SGMLSRC \
-	    > $tempdest
-
-    if $USEMANIFEST; then
-	test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
-    else
-	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
-    fi
+# TARGETFORMAT -eq 1 used to generated LaTeX directly, but required a version
+# of openjade which had been patched to allow a 'latex' value to the -t option.
+# This was never incorporated into the openjade mainline, so it seems
+# safest to remove the possibility here.
 
 elif [ $TARGETFORMAT -eq 2 ]; then
     # Generate TeXML
@@ -595,6 +536,12 @@ elif [ $TARGETFORMAT -eq 2 ]; then
     if [ -r $ROOT.texmlbib.aux ]; then
 	$DEBUGGING && echo $BIBTEX $ROOT.texmlbib
 	$run $BIBTEX $ROOT.texmlbib
+        sed -e '/% *$/{:a
+N
+s/% *\n *//
+t a
+}' -e 's/&/&amp;/g' -e 's/[{}\]//g' $ROOT.texmlbib.bbl >t
+        mv t $ROOT.texmlbib.bbl
     fi
 
     # Generate the XML file
@@ -627,7 +574,7 @@ fi
 
 # Package up the generated files into a tarball named after the source
 # file.  There are either one or two fields on each line of the
-# manifest (see file .../{html,latex}/sl.dsl).  If there is only one field,
+# manifest (see file .../{html,texml}/sl.dsl).  If there is only one field,
 # then this is a generated file.  If there are two fields, then
 # the first is the sysid of the figure as referred to by the
 # generated material, which will have no path, and the second is the sysid as
