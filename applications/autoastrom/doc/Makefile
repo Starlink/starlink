@@ -5,10 +5,10 @@
 #
 # $Id$
 
-
+LATEX=pdflatex
 SGML2DOCS=$(STARLINK_SGML_DIR)/bin/sgml2docs
 
-all: sun242.tar-htx sun242.tar-tex
+all: sun242.tar-htx sun242.tar-texml
 
 sun242.tar-htx: sun242.xml #ReleaseNotes
 	BIBINPUTS=$$PWD \
@@ -19,9 +19,19 @@ sun242.tar-htxsingle: sun242.xml #ReleaseNotes
 		$(SGML2DOCS) --htmlsingle --packagedir sun242.htxsingle \
 		--tarball=$@ sun242.xml
 
-sun242.tar-tex: sun242.xml #ReleaseNotes
+sun242.tar-texml: sun242.xml
 	BIBINPUTS=$$PWD \
-		$(SGML2DOCS) --latex --tarball=$@ sun242.xml
+	  $(SGML2DOCS) --texml --tarball=$@ sun242.xml
+
+sun242.pdf: sun242.tar-texml
+	rm -Rf $@ sun242.texml
+	tar xf sun242.tar-texml
+	cd sun242.texml; \
+	  $(LATEX) sun242; \
+	  if grep 'Rerun to get cross-references' sun242.log >/dev/null; then \
+	    $(LATEX) sun242; \
+	  fi
+	ln sun242.texml/sun242.pdf ./sun242.pdf
 
 # unbuild is a Starlink conventional target, equivalent to tidy here.
 unbuild: tidy
@@ -31,4 +41,5 @@ tidy:
 	rm -Rf sun242.htx sun242.latex
 
 clean: tidy
-	rm -f sun242.tar-htx sun242.tar-tex
+	rm -f sun242.tar-htx sun242.tar-texml sun242.pdf
+	rm -Rf sun242.texml
