@@ -208,8 +208,7 @@ void clumps() {
 
 *  Use of CUPID Extension:
 *     This application will create an NDF extension called "CUPID" in the 
-*     input NDF (unless there is already one there), and add the following 
-*     components to it, erasing any of the same name which already exist:
+*     output NDF and will add the following components to it:
 * 
 *     - CLUMPS: This a an array of CLUMP structures, one for each clump
 *     identified by the selected algorithm. Each such structure contains 
@@ -220,9 +219,10 @@ void clumps() {
 *     which are not contained within the clump are set bad. So for instance,
 *     if the input array "fred.sdf" is 2-dimensional, and an image of it has 
 *     been displayed using KAPPA:DISPLAY, then the outline of clump number 9
-*     (say) can be overlayed on the image by doing 
+*     (say) in the output image "fred2.sdf" can be overlayed on the image 
+*     by doing:
 *
-*     contour noclear "fred.more.cupid.clumps(9).model" mode=good
+*     contour noclear "fred2.more.cupid.clumps(9).model" mode=good
 *
 *     - CONFIG: Lists the algorithm configuration parameters used to
 *     identify the clumps (see parameter CONFIG).
