@@ -152,6 +152,9 @@ if( defined( $optionset{keeptemps} ) ) {
   $autoastrom_params{keeptemps} = $optionset{keeptemps};
 }
 if( defined( $optionset{match} ) ) {
+  if( lc( $optionset{match} ) eq 'match' ) {
+    $optionset{match} = 'RITMatch';
+  }
   $autoastrom_params{match} = $optionset{match};
 }
 if( defined( $optionset{matchcatalogue} ) ) {
