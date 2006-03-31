@@ -357,6 +357,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }         
 
 /* Sort the clump indices into descending order of peak value. */
+      j = ngood;
       more = 1;
       while( more ) {
          j--;

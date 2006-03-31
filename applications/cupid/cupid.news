@@ -9,6 +9,9 @@
 
 Changes introduced at V0.0-7:
 
+ - ClumpFind, Reinhold and FellWalker all now sort the output catalogue
+ into descending peak value order.
+
  - The GaussClumps algorithm no longer includes clumps in the output
  catalogue or image if they touch an edge of the data array. This brings
  it into line with the other algorithms.

@@ -89,12 +89,17 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Local Variables: */
    AstKeyMap *rconfig;  /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
+   double *pd;          /* Pointer to next element of data array */
+   double *peakvals;    /* Pointer to array holding clump peak values */
    double cathresh;     /* Threshold for second cellular automata */
-   double noise;        /* Noise level */
    double flatslope;    /* Minimum significant slope at edge of a peak */
+   double noise;        /* Noise level */
+   double pv;           /* Pixel value */
    double thresh;       /* Minimum peak value to be considered */
+   float *pf;           /* Pointer to next element of data array */
    int *clbnd;          /* Array holding lower axis bounds of all clumps */
    int *cubnd;          /* Array holding upper axis bounds of all clumps */
+   int *igood;          /* Pointer to array holding usable clump indices */
    int *m1;             /* Pointer to mask array */
    int *m2;             /* Pointer to mask array */
    int *m3;             /* Pointer to mask array */
@@ -107,13 +112,17 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int el;              /* Number of elements in array */
    int fixiter;         /* The number of CA iterations to perform */
    int i;               /* Loop count */
+   int ii;              /* Loop count */
    int ix;              /* Grid index on 1st axis */
    int iy;              /* Grid index on 2nd axis */
    int iz;              /* Grid index on 3rd axis */
+   int j;               /* Loop count */
    int maxid;           /* Largest id for any peak (smallest is zero) */
    int minlen;          /* Minimum size of a clump in pixels along one dimension*/
    int minpix;          /* Minimum total size of a clump in pixels */
-   int nclump;          /* Number of clumps found */
+   int more;            /* Continue looping?*/
+   int ngood;           /* Number of good clumps */
+   int nsmall;          /* Number of clumps that are too small */
    int peakval;         /* Minimum value used to flag peaks */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -248,15 +257,23 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    clump. */
    nrem = astMalloc( sizeof( int )*( maxid + 1 ) );
 
+/* Allocate an array used to store the peak value in every clump. */
+   peakvals = astMalloc( sizeof( double )*( maxid + 1 ) );
+
 /* Determine the bounding box of every clump. First allocate memory to
    hold the bounding boxes. */
    clbnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
    cubnd = astMalloc( sizeof( int )*( maxid + 1 )*3 );
-   if( cubnd ) {
+   igood = astMalloc( sizeof( int )*( maxid + 1 ) );
+   if( igood ) {
 
 /* Initialise a list to hold zero for every clump id. These values are
-   used to count the number of pixels remaining in each clump. */
-      for( i = 0; i <= maxid; i++ ) nrem[ i ] = 0;
+   used to count the number of pixels remaining in each clump. Also
+   initialise the peak values to a very negative value. */
+      for( i = 0; i <= maxid; i++ ) {
+         nrem[ i ] = 0;
+         peakvals[ i ] = VAL__MIND;
+      }
 
 /* Initialise the bounding boxes. */
       for( i = 0; i < 3*( maxid + 1 ); i++ ) {
@@ -265,16 +282,32 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Loop round every pixel in the final pixel assignment array. */
+      if( type == CUPID__DOUBLE ) {
+         pd = (double *) ipd;
+      } else {
+         pf = (float *) ipd;
+      }
       pa = m1;
       for( iz = 1; iz <= dims[ 2 ]; iz++ ){
          for( iy = 1; iy <= dims[ 1 ]; iy++ ){
             for( ix = 1; ix <= dims[ 0 ]; ix++, pa++ ){
+
+/* Get the data value at this pixel */
+               if( type == CUPID__DOUBLE ) {
+                  pv = *(pd++);
+               } else {
+                  pv = (double) *(pf++);
+               }
 
 /* Skip pixels which are not in any clump. */
                if( *pa >= 0 ) {
 
 /* Increment the number of pixels in this clump. */
                   ++( nrem[ *pa ] );
+
+/* If this pixel value is larger than the current peak value for this
+   clump, record it. */
+                  if( pv > (double) peakvals[ *pa ] ) peakvals[ *pa ] = pv;
 
 /* Get the index within the clbnd and cubnd arrays of the current bounds
    on the x axis for this clump. */
@@ -300,33 +333,69 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          }
       }
 
-/* Loop round creating an NDF describing each clump with more than "minpix"
-   pixels, counting them. */
+/* Loop round counting the clumps which are too small or too low. Put the
+   indices of usable clumps into another array. */
+      nsmall = 0;
+      ngood = 0;
       for( i = 0; i <= maxid; i++ ) {
-         if( nrem[ i ] > minpix ) {
-            ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
-                                 i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
+         if( nrem[ i ] <= minpix ) {
+            nsmall++;
+         } else {
+            igood[ ngood++ ] = i;
          }
       }
 
-      if( ilevel > 0 && ret ) {
-         datSize( ret, (size_t *) &nclump, status );
-         if( nclump == 0 ) {
+      if( ilevel > 0 ) {
+         if( ngood == 0 ) {
             msgOut( "", "No usable clumps found", status );
-         } else if( nclump == 1 ){
+         } else if( ngood == 1 ){
             msgOut( "", "One usable clump found", status );
          } else {
-            msgSeti( "N", nclump );
+            msgSeti( "N", ngood );
             msgOut( "", "^N usable clumps found", status );
          }
+         if( ilevel > 1 ) {
+            if( nsmall == 1 ){
+               msgOut( "", "One clump rejected because it contains too few pixels", status );
+            } else {
+               msgSeti( "N", nsmall );
+               msgOut( "", "^N clumps rejected because they contain too few pixels", status );
+            }
+         }        
          msgBlank( status );
       }         
 
+/* Sort the clump indices into descending order of peak value. */
+      j = ngood;
+      more = 1;
+      while( more ) {
+         j--;
+         more = 0;
+         for( i = 0; i < j; i++ ) {
+            if( peakvals[ igood[ i ] ] < peakvals[ igood[ i + 1 ] ] ) {
+               ii = igood[ i + 1 ];
+               igood[ i + 1 ] = igood[ i ];
+               igood[ i ] = ii;
+               more = 1;
+            }
+         }
+      }
+
+/* Loop round creating an NDF describing each usable clump. */
+      for( j = 0; j < ngood; j++ ) {
+         i = igood[ j ];
+         ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd, 
+                              i, clbnd + 3*i, cubnd + 3*i, NULL, ret );
+      }
+
 /* Free resources */
-      nrem = astFree( nrem );
       clbnd = astFree( clbnd );
       cubnd = astFree( cubnd );
+      igood = astFree( igood );
    }
+
+   peakvals = astFree( peakvals );
+   nrem = astFree( nrem );
 
 L10:;
 
