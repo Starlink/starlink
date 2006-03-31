@@ -134,7 +134,7 @@ if( defined( $optionset{defects} ) ) {
   $autoastrom_params{defects} = $optionset{defects};
 }
 if( defined( $optionset{detectedcatalogue} ) ) {
-  $autoastrom_params{detectedcatalogue} = $optionset{detectedcatalogue};
+  $autoastrom_params{detected_catalogue} = $optionset{detectedcatalogue};
 }
 if( defined( $optionset{insert} ) ) {
   $autoastrom_params{insert} = $optionset{insert};
