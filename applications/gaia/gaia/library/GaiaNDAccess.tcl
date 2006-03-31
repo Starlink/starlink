@@ -200,6 +200,19 @@ itcl::class gaia::GaiaNDAccess {
       }
    }
 
+   #  Return the address of an image plane. This will only work for cubes 
+   #  and requires that the complete data are mapped first. The axis is the
+   #  spectral axis along which the image will be extracted (1,2,3), the 
+   #  index value selects the plane along that axis.
+   public method getimage {axis index} {
+      if { $addr_ != {} } {
+         set dims_ [dims]
+         lassign [eval "array::getimage $addr_ $hdstype_ $dims_ $axis \
+                     $index $cnfmap_"] adr nel
+         return "$adr $nel $hdstype_"
+      }
+   }
+
    #  Free data allocated by any of the get methods (spectra and image
    #  sections).
    public method release {adr} {
