@@ -289,7 +289,7 @@ by BibTeX.
 	      (process-node-list citations)
 	      (if bibname
 		  (make fi data: (string-append "\\bibdata{" bibname "}
-\\bibstyle{plainlatex}
+\\bibstyle{plaintexml}
 "))
 		  (error "Citations but no BIBLIOGRAPHY in document"))
 	      ;;(if (node-list-empty? bibelement)
