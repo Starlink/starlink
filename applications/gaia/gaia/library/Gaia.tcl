@@ -1566,7 +1566,7 @@ itcl::class gaia::Gaia {
    #  The match string should be set to something new in the
    #  default file.
    public proc check_config_file { config_file } {
-      set newmatch "*2MASS*"
+      set newmatch "*UCAC2*"
 
       #  Search the file for the string match.
       set ok 0
@@ -1702,7 +1702,7 @@ window gives you access to this."
 
    #  Retrieve the ESO config file, returning its content as the result.
    protected method get_eso_config_ {} {
-      return [[$image_ get_image] urlget $itk_option(-eso_config_file)]
+      return [gaiautils::urlget $itk_option(-eso_config_file)]
    }
 
    #  Invoked an attempt to load ESO config file is completed. If
