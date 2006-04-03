@@ -507,6 +507,9 @@ itcl::class gaia::GaiaNDFCube {
             $spectrum_ close
             remove_spectral_bindings_
          }
+         if { $position_mark_ != {} } {
+            $itk_option(-canvas) delete $position_mark_
+         }
       }
    }
 
@@ -522,6 +525,10 @@ itcl::class gaia::GaiaNDFCube {
             $spectrum_ close
             remove_spectral_bindings_
          }
+         if { $position_mark_ != {} } {
+            $itk_option(-canvas) delete $position_mark_
+         }
+         set position_mark_ {}
       }
    }
 
@@ -959,7 +966,8 @@ itcl::class gaia::GaiaNDFCube {
          $splat_disp_ runwith "${ndfname_}${section}" 0
 
       } else {
-         #  Display in the spectrum_plot. Note show short help in this window.
+         #  Display in the spectrum_plot. Note show short help in this window
+         #  to save real estate.
          if { [info exists spectrum_] } {
             if { $spectrum_ == {} } {
                set spectrum_ [GaiaSpectralPlot $w_.specplot \
@@ -971,10 +979,18 @@ itcl::class gaia::GaiaNDFCube {
 
                #  Display in main window as well.
                $spectrum_ configure -canvas $itk_option(-canvas)
+
+               #  Create the marker for the image position.
+               create_position_marker_ $ccx $ccy
             } else {
                #  Re-display if withdrawn.
                if { [wm state $spectrum_] == "withdrawn" } {
                   $spectrum_ open
+               }
+               
+               #  Re-create the marker for the image position.
+               if { $position_mark_ == {} } {
+                  create_position_marker_ $ccx $ccy
                }
             }
 
@@ -992,6 +1008,9 @@ itcl::class gaia::GaiaNDFCube {
             #  Make sure ix and iy are integers (zoomed images).
             set ix [expr round($iix)]
             set iy [expr round($iiy)]
+
+            #  Move position marker on the image.
+            $itk_option(-canvas) coords $position_mark_ $ccx $ccy
 
             #  Also autoscale when single click, so that we are not fixed for
             #  all time.
@@ -1029,6 +1048,22 @@ itcl::class gaia::GaiaNDFCube {
       #          $splat_disp_ runwith "GaiaArdSpectrum"
       #       } msg
       #       puts "msg = $msg"
+   }
+   
+   #  Create the spectral position marker. This initially gets the scale of
+   #  the rtdimage so that it is usually visible for most zooms.  
+   #  XXX need to make these sizes and colours configurable.
+   protected method create_position_marker_ { cx cy } { 
+      lassign [$itk_option(-rtdimage) scale] xs ys
+      if { $xs < 0 } {
+         set scale [expr abs(1.0/$xs)]
+      } else {
+         set scale $xs
+      }
+      puts "scale = $scale, xs = $xs"
+      set position_mark_ [$itk_option(-canvas) create rtd_mark \
+                             $cx $cy -type cross -scale $scale \
+                             -size 5 -outline blue]
    }
 
    #  Configuration options: (public variables)
@@ -1131,6 +1166,9 @@ itcl::class gaia::GaiaNDFCube {
    #  The spectrum plot item, XXX variable not initialised unless in
    #  development mode.
    protected variable spectrum_
+
+   #  The position marker that corresponds to the spectrum.
+   protected variable position_mark_ {}
 
    #  Memory used for last slice. Free this when not needed.
    protected variable last_slice_adr_ 0
