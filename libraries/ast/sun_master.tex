@@ -21128,6 +21128,21 @@ SelectorMap tests each input position to see if it falls within one of
 several Regions. If it does, the index of the Region containing the
 input position is returned as the Mapping output.
 
+\item The behaviour of the
+c+
+astConvert
+c-
+f+
+AST\_CONVERT
+f-
+method when trying to align a CmpFrame with another Frame has been
+modified. If no conversion between positions in the Frame and CmpFrame 
+can be found, an attempt is now made to find a conversion between the
+Frame and one of two component Frames contained within the CmpFrame. Thus
+is should now be possible to align a SkyFrame with a CmpFrame containing a
+SkyFrame and a SpecFrame (for instance). The returned Mapping produces bad
+values for the extra axes (i.e. for the SpecFrame axis in the above example).
+
 \end{enumerate}
 
 
