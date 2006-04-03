@@ -115,7 +115,7 @@ itcl::class gaia::GaiaNDFCube {
       bind $w_ <Control-l> [code $this configure -usemmap 1]
       add_menu_short_help $Options {Memory map cube data}  \
          {Access cube data using mmap(), otherwise read fully into RAM}
-      
+
       #  If memory mapping not available, then also disable this option.
       if { ! $canmmap } {
          $Options entryconfigure {Memory map cube data} -state disabled
@@ -128,7 +128,7 @@ itcl::class gaia::GaiaNDFCube {
          -onvalue 1 \
          -offvalue 0
       add_menu_short_help $Options {Autoscale}  \
-         {Continuously change data limits, 
+         {Continuously change data limits,
             otherwise fixed by last click (faster)}
 
       #  Add window help.
@@ -996,7 +996,7 @@ itcl::class gaia::GaiaNDFCube {
                if { [wm state $spectrum_] == "withdrawn" } {
                   $spectrum_ open
                }
-               
+
                #  Re-create the marker for the image position.
                if { $position_mark_ == {} } {
                   create_position_marker_ $ccx $ccy
@@ -1058,21 +1058,16 @@ itcl::class gaia::GaiaNDFCube {
       #       } msg
       #       puts "msg = $msg"
    }
-   
-   #  Create the spectral position marker. This initially gets the scale of
-   #  the rtdimage so that it is usually visible for most zooms.  
-   #  XXX need to make these sizes and colours configurable.
-   protected method create_position_marker_ { cx cy } { 
-      lassign [$itk_option(-rtdimage) scale] xs ys
-      if { $xs < 0 } {
-         set scale [expr abs(1.0/$xs)]
-      } else {
-         set scale $xs
-      }
-      puts "scale = $scale, xs = $xs"
+
+   #  Create the spectral position marker.
+   #  XXX refactor into GaiaSpectralPlot. Should be same colour as reference
+   #  line.
+   protected method create_position_marker_ { cx cy } {
+
+      #  Note fixscale so that always same size, regardless of zoom.
       set position_mark_ [$itk_option(-canvas) create rtd_mark \
-                             $cx $cy -type cross -scale $scale \
-                             -size 5 -outline blue]
+                             $cx $cy -type cross -scale 1 \
+                             -fixscale 1 -size 7 -outline red]
    }
 
    #  Configuration options: (public variables)
