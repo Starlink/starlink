@@ -38,6 +38,8 @@
  *     28-MAR-2000 (PWD):
  *        Added -scale as a configuration option. Fixing this
  *        allows creation at different "scales" to be harmonized.
+ *     03-APR-2006 (PWD):
+ *        Added -fixscale to switch off scaling of size by scale method.
  *-
  *.
  */
@@ -64,18 +66,19 @@ typedef enum {
 
 typedef struct MarkItem  {
     Tk_Item header;                /* Mandatory Tk header information */
-    char *type;                    /* The type of marker as a string */
+    GC fillGC;                     /* Graphics context */
+    GC outlineGC;                  /* Graphics context */
     Marker shape;                  /* The type of marker */
+    Pixmap fillStipple;            /* Stipple bitmap (if used) */
+    Tk_Anchor tkanchor;            /* Where to anchor marker relative to (x,y). */
+    XColor *fillColor;             /* Colour of fill (if used) */
+    XColor *outlineColor;          /* Colour of lines*/
+    char *type;                    /* The type of marker as a string */
+    double scale;                  /* Current scale factor */
     double x, y;                   /* Coordinates of reference point */
+    int fixscale;                  /* Whether to scale the scale value */
     int size;                      /* Size of marker */
     int width;                     /* Width of marker */
-    double scale;                  /* Current scale factor */
-    Tk_Anchor tkanchor;            /* Where to anchor marker relative to (x,y). */
-    XColor *outlineColor;          /* Colour of lines*/
-    XColor *fillColor;             /* Colour of fill (if used) */
-    Pixmap fillStipple;            /* Stipple bitmap (if used) */
-    GC outlineGC;                  /* Graphics context */
-    GC fillGC;                     /* Graphics context */
 } MarkItem;
 
 /*
@@ -87,36 +90,28 @@ static Tk_CustomOption tagsOption = {
 };
 
 static Tk_ConfigSpec configSpecs[] = {
-
-    {TK_CONFIG_STRING, "-type", (char *) NULL, (char *) NULL,
-     "circle", Tk_Offset(MarkItem, type), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL,
-     "east", Tk_Offset(MarkItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL,
-     "black", Tk_Offset(MarkItem, outlineColor), 0},
-
-    {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL,
-     (char *) NULL, Tk_Offset(MarkItem, fillColor), TK_CONFIG_NULL_OK},
-
-    {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL,
-     (char *) NULL, Tk_Offset(MarkItem, fillStipple), TK_CONFIG_NULL_OK},
-
-    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
-     (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
-
-    {TK_CONFIG_INT, "-size", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(MarkItem, size), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_INT, "-width", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(MarkItem, width), TK_CONFIG_DONT_SET_DEFAULT},
-
-    {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL,
-     "1", Tk_Offset(MarkItem, scale), TK_CONFIG_DONT_SET_DEFAULT},
-
+    {TK_CONFIG_ANCHOR, "-anchor", (char *) NULL, (char *) NULL, "e", 
+                       Tk_Offset(MarkItem, tkanchor), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL, (char *) NULL, 
+                       Tk_Offset(MarkItem, fillStipple), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_BOOLEAN, "-fixscale", (char *) NULL, (char *) NULL, "0", 
+                        Tk_Offset(MarkItem, fixscale), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL, (char *) NULL, 
+                      Tk_Offset(MarkItem, fillColor), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_COLOR, "-outline", (char *) NULL, (char *) NULL, "black", 
+                      Tk_Offset(MarkItem, outlineColor), 0},
+    {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL, (char *) NULL, 
+                       0, TK_CONFIG_NULL_OK, &tagsOption},
+    {TK_CONFIG_DOUBLE, "-scale", (char *) NULL, (char *) NULL, "1", 
+                       Tk_Offset(MarkItem, scale), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_INT, "-size", (char *) NULL, (char *) NULL, "1", 
+                    Tk_Offset(MarkItem, size), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_INT, "-width", (char *) NULL, (char *) NULL, "1", 
+                    Tk_Offset(MarkItem, width), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_STRING, "-type", (char *) NULL, (char *) NULL, "circle", 
+                       Tk_Offset(MarkItem, type), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_END, (char *) NULL, (char *) NULL, (char *) NULL,
-     (char *) NULL, 0, 0}
+                    (char *) NULL, 0, 0}
 };
 
 /*
@@ -236,17 +231,18 @@ static int CreateMark( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
      * up after errors during the the remainder of this procedure.
      */
 
-    markPtr->type = NULL;
+    markPtr->fillColor = NULL;
+    markPtr->fillGC = None;
+    markPtr->fillStipple = None;
+    markPtr->fixscale = 0;
+    markPtr->outlineColor = NULL;
+    markPtr->outlineGC = None;
+    markPtr->scale = 1.0;
     markPtr->shape = CIRCLE;
     markPtr->size = 7;
-    markPtr->width = 1;
-    markPtr->scale = 1.0;
     markPtr->tkanchor = TK_ANCHOR_CENTER;
-    markPtr->outlineColor = NULL;
-    markPtr->fillColor = NULL;
-    markPtr->fillStipple = None;
-    markPtr->outlineGC = None;
-    markPtr->fillGC = None;
+    markPtr->type = NULL;
+    markPtr->width = 1;
 
     /*
      * Process the arguments to fill in the item record.
@@ -808,7 +804,8 @@ static int MarkToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
  *
  * ScaleMark --
  *
- *      This procedure is invoked to rescale a marker.
+ *      This procedure is invoked to rescale a marker. If fixscale
+ *      is set then only the position is scaled.
  *
  * Results:
  *      None.
@@ -820,7 +817,7 @@ static int MarkToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *areaPtr )
  *              x' = originX + scaleX*(x-originX)
  *              y' = originY + scaleY*(y-originY)
  *
- *      The mark is also scaled to scaleX.
+ *      The mark is also scaled to scaleX, if fixscale is set.
  *
  *--------------------------------------------------------------
  */
@@ -833,7 +830,9 @@ static void ScaleMark( Tk_Canvas canvas, Tk_Item *itemPtr, double originX,
 
     markPtr->x = originX + scaleX*(markPtr->x - originX);
     markPtr->y = originY + scaleY*(markPtr->y - originY);
-    markPtr->scale *= scaleX;
+    if ( ! markPtr->fixscale ) {
+        markPtr->scale *= scaleX;
+    }
     ComputeMarkBbox(canvas, markPtr);
     return;
 }
