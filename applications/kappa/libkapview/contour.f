@@ -520,6 +520,9 @@
 *        - Ignore blank titles supplied in STYLE.
 *     6-FEB-2006 (DSB):
 *        Use KPG1_ASTTL to get the title.
+*     3-APR-2006 (DSB):
+*        Removed the warning about loss of precision when contour _DOUBLE
+*        data (at the request of TimJ).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -649,10 +652,7 @@
 *  data provided the dynamic range is not too small.
       CALL NDF_MTYPE( '_REAL', INDF, INDF, COMP, ITYPE, DTYPE, STATUS )
       IF( STATUS .EQ. NDF__TYPNI ) THEN
-         CALL ERR_FLUSH( STATUS )
-         CALL MSG_OUT( 'PRECLOSS', 'The loss of precision may not be '//
-     :                 'serious so continuing to process in _REAL.', 
-     :                 STATUS )
+         CALL ERR_ANNUL( STATUS )
          ITYPE = '_REAL'
       END IF
 
