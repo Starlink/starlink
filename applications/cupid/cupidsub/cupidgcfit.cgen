@@ -232,16 +232,16 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 /* Check the size of the fitted model is significant. */
    if( cupidGC.fixback ) {
-      if( x[ 2 ] < 0.1 ) ret = 0;
+      if( x[ 2 ] < 0.5 ) ret = 0;
       if( cupidGC.ndim > 1 ) {
-         if( x[ 4 ] < 0.1 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 7 ] < 0.1 ) ret = 0;
+         if( x[ 4 ] < 0.5 ) ret = 0;
+         if( cupidGC.ndim > 2 ) if( x[ 7 ] < 0.5 ) ret = 0;
       }
    } else {
-      if( x[ 3 ] < 0.1 ) ret = 0;
+      if( x[ 3 ] < 0.5 ) ret = 0;
       if( cupidGC.ndim > 1 ) {
-         if( x[ 5 ] < 0.1 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.1 ) ret = 0;
+         if( x[ 5 ] < 0.5 ) ret = 0;
+         if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
       }
    }
 

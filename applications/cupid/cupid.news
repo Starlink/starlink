@@ -11,6 +11,9 @@ Changes introduced at V0.0-8:
 
  - The output catalogue now inherits any WCS FrameSet from the input NDF.
 
+ - Clumps which span only a single pixel along any pixel axis are now
+ rejected.
+
 Changes introduced at V0.0-7:
 
  - ClumpFind, Reinhold and FellWalker all now sort the output catalogue

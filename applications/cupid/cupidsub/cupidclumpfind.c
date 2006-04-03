@@ -111,6 +111,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int naxis;           /* Defines whether two pixels are neighbours or not */
    int nclump;          /* Number of clumps found */
    int nedge;           /* Number of clumps with edge pixels */
+   int nthin;           /* Number of clumps that span only a single pixel */
    int nlevels;         /* Number of values in "levels" */
    int nminpix;         /* Number of clumps with < MinPix pixels */
    int skip[3];         /* Pointer to array of axis skips */
@@ -258,11 +259,12 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       nminpix = 0;
       nedge = 0;
       nclump = 0;
+      nthin = 0;
       for( ii = 0; ii < index; ii++ ) {
          ps = clumps[ ii ];
 
 /* Free and count clumps which contain less than MinPix pixels, or touch an 
-   edge. */
+   edge, or have any degenerate axes. */
          if( ps ){
             if( ps->pop < minpix ){
                nminpix++;
@@ -270,6 +272,12 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
             } else if( ps->edge ){
                nedge++; 
+               clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
+
+            } else if( ps->lbnd[ 0 ] == ps->ubnd[ 0 ] || 
+                       ( ps->lbnd[ 1 ] == ps->ubnd[ 1 ] && ndim > 1 ) || 
+                       ( ps->lbnd[ 2 ] == ps->ubnd[ 2 ] && ndim > 2 ) ) {
+               nthin++;           
                clumps[ ii ] = cupidCFFreePS( ps, NULL, 0 );
 
             } else {
@@ -307,6 +315,16 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                msgSeti( "N", nedge );
                msgOut( "", "^N clumps rejected because they touch an edge of "
                        "the data array", status );
+            }
+
+            if( nthin == 1 ) {
+               msgOut( "", "1 clump rejected because it spans only a single "
+                       "pixel along one or more axes", status );
+
+            } else if( nthin > 1 ) {
+               msgSeti( "N", nthin );
+               msgOut( "", "^N clumps rejected because they spans only a single "
+                       "pixel along one or more axes", status );
             }
          }
       }

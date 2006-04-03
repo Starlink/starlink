@@ -123,6 +123,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int more;            /* Continue looping?*/
    int ngood;           /* Number of good clumps */
    int nsmall;          /* Number of clumps that are too small */
+   int nthin;           /* Number of clumps that span only a single pixel */
    int peakval;         /* Minimum value used to flag peaks */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -337,9 +338,18 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    indices of usable clumps into another array. */
       nsmall = 0;
       ngood = 0;
+      nthin = 0;
       for( i = 0; i <= maxid; i++ ) {
+         j = 3*i;
+
          if( nrem[ i ] <= minpix ) {
             nsmall++;
+
+         } else if( clbnd[ j ] == cubnd[ j ] || 
+                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
+                  ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) {
+            nthin++;           
+
          } else {
             igood[ ngood++ ] = i;
          }
@@ -361,7 +371,16 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                msgSeti( "N", nsmall );
                msgOut( "", "^N clumps rejected because they contain too few pixels", status );
             }
-         }        
+            if( nthin == 1 ) {
+               msgOut( "", "1 clump rejected because it spans only a single "
+                       "pixel along one or more axes", status );
+
+            } else if( nthin > 1 ) {
+               msgSeti( "N", nthin );
+               msgOut( "", "^N clumps rejected because they spans only a single "
+                       "pixel along one or more axes", status );
+            }
+         }
          msgBlank( status );
       }         
 

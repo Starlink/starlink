@@ -146,6 +146,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int more;            /* Continue looping? */
    int ngood;           /* Number of good clumps */
    int nlow;            /* Number of clumps with low peaks */
+   int nthin;           /* Number of clumps that span only a single pixel */
    int nsmall;          /* Number of clumps with too few pixels */
    int skip[3];         /* Pointer to array of axis skips */
 
@@ -318,12 +319,19 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       nsmall = 0;
       nlow = 0;
       ngood = 0;
+      nthin = 0;
       for( i = 0; i <= maxid; i++ ) {
+         j = 3*i;
          if( nrem[ i ] <= minpix ) {
             nsmall++;
 
          } else if( peakvals[ i ] < minhgt ) {
             nlow++;
+
+         } else if( clbnd[ j ] == cubnd[ j ] || 
+                  ( clbnd[ j + 1 ] == cubnd[ j + 1 ] && ndim > 1 ) || 
+                  ( clbnd[ j + 2 ] == cubnd[ j + 2 ] && ndim > 2 ) ) {
+            nthin++;           
 
          } else {
             igood[ ngood++ ] = i;
@@ -351,6 +359,15 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
             } else {
                msgSeti( "N", nlow );
                msgOut( "", "^N clumps rejected because the peaks are too low", status );
+            }
+            if( nthin == 1 ) {
+               msgOut( "", "1 clump rejected because it spans only a single "
+                       "pixel along one or more axes", status );
+
+            } else if( nthin > 1 ) {
+               msgSeti( "N", nthin );
+               msgOut( "", "^N clumps rejected because they spans only a single "
+                       "pixel along one or more axes", status );
             }
          }        
          msgBlank( status );

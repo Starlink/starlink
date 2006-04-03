@@ -224,7 +224,7 @@ void clumps() {
 *     (say) in the output image "fred2.sdf" can be overlayed on the image 
 *     by doing:
 *
-*     contour noclear "fred2.more.cupid.clumps(9).model" mode=good
+*     contour noclear "fred2.more.cupid.clumps(9).model" mode=good labpos=\!
 *
 *     - CONFIG: Lists the algorithm configuration parameters used to
 *     identify the clumps (see parameter CONFIG).
