@@ -71,6 +71,8 @@ f     The DSBSpecFrame class does not define any new routines beyond those
 *        GetImageFreq.
 *     2-DEC-2005 (DSB):
 *        Change default Domain from SPECTRUM to DSBSPECTRUM 
+*     3-APR-2006 (DSB):
+*        Fix memory leak in astLoadDSBSpecFrame.
 *class--
 
 *  Implementation Deficiencies:
@@ -2623,6 +2625,7 @@ AstDSBSpecFrame *astLoadDSBSpecFrame_( void *mem, size_t size,
                       "\"%s\".", astGetClass( channel ), text );
          }
          if ( TestSideBand( new ) ) SetSideBand( new, new->sideband );
+         text = astFree( text );
       }
 
 /* If an error occurred, clean up by deleting the new DSBSpecFrame. */
