@@ -14,7 +14,8 @@
 #define MAXCAT   50   /* Max length of catalogue name */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int ndim, double beamcorr[ 3 ], const char *ttl ){
+                       int ndim, double beamcorr[ 3 ], const char *ttl,
+                       AstFrameSet *iwcs ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -24,7 +25,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int ndim, double beamcorr[ 3 ], const char *ttl )
+*                            int ndim, double beamcorr[ 3 ], const char *ttl, 
+*                            AstFrameSet *iwcs )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -47,6 +49,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        output catalogue are reduced to correct for this smoothing.
 *     ttl
 *        The title for the output catalogue (if any).
+*     iwcs
+*        The WCS FrameSet from the input data, or NULL.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -64,7 +68,6 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Local Variables: */
    AstFrame *frm1;              /* Frame describing clump parameters */
    AstFrame *frm2;              /* Frame describing clump centres */
-   AstFrameSet *iwcs;           /* FrameSet to be stored in output catalogue */
    AstMapping *map;             /* Mapping from "frm1" to "frm2" */
    HDSLoc *aloc;                /* Locator for array of Clump structures */
    HDSLoc *ncloc;               /* Locator for array cell */
@@ -72,6 +75,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    HDSLoc *dloc;                /* Locator for cell value */
    char attr[ 15 ];             /* AST attribute name */
    char cat[ MAXCAT + 1 ];      /* Catalogue name */
+   const char *dom;             /* Pointer to domain string */
    const char **names;          /* Component names */
    double *cpars;               /* Array of parameters for a single clump */
    double *t;                   /* Pointer to next table value */
@@ -82,6 +86,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int indf2;                   /* Identifier for copied NDF */
    int irow;                    /* One-based row index */
    int ncpar;                   /* Number of clump parameters */
+   int ifrm;                    /* Frame index */
+   int nfrm;                    /* Total number of Frames */
    int nndf;                    /* Total number of NDFs */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
@@ -198,28 +204,63 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          astSetC( frm1, attr, names[ icol ] );
       }
    
+/* Create a Mapping (a PermMap) from the Frame representing the "ncpar" clump
+   parameters, to the "ndim" Frame representing clump centre pixel positions. 
+   The inverse transformation supplies bad values for the other parameters. */
+      map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, "" );
+   
+/* If no WCS FrameSet was supplied.... */
+      if( !iwcs ) {
+
 /* Create a Frame with "ndim" axes describing the pixel coords at the
    clump centre. */
-      frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
-      astSetC( frm2, "Symbol(1)", "P1" );
-      if( ndim > 1 ) {
-         astSetC( frm2, "Symbol(2)", "P2" );
-         if( ndim > 2 ) astSetC( frm2, "Symbol(3)", "P3" );
-      }
-   
-/* Create a Mapping (a PermMap) from the Frame representing the "ncpar" clump
-   parameters, to the "ndim" Frame representing clump centre positions. The
-   inverse transformation supplies bad values for the other parameters. */
-      map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, "" );
+         frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
+         astSetC( frm2, "Symbol(1)", "P1" );
+         if( ndim > 1 ) {
+            astSetC( frm2, "Symbol(2)", "P2" );
+            if( ndim > 2 ) astSetC( frm2, "Symbol(3)", "P3" );
+         }
    
 /* Create a FrameSet to store in the output catalogue. It has two Frames,
    the base Frame has "ncpar" axes - each axis describes one of the table
    columns. The current Frame has 2 axes and describes the clump (x,y)
    position. The ID value of FIXED_BASE is a special value recognised by 
    kpg1Wrlst. */
-      iwcs = astFrameSet( frm1, "ID=FIXED_BASE" );
-      astAddFrame( iwcs, AST__BASE, map, frm2 );
-      astSetI( iwcs, "CURRENT", 1 );
+         iwcs = astFrameSet( frm1, "ID=FIXED_BASE" );
+         astAddFrame( iwcs, AST__BASE, map, frm2 );
+         astSetI( iwcs, "CURRENT", 1 );
+
+/* If a WCS FrameSet was supplied, add in "frm1" as the base Frame,
+   connecting it to the original PIXEL Frame using "map". */
+      } else {
+
+
+/* Loop round all Frames in the FrameSet, looking for one with Domain
+   PIXEL (also remove the GRID and AXIS Frames). */
+         nfrm = astGetI( iwcs, "NFrame" );
+         for( ifrm = 0; ifrm < nfrm; ifrm++ ) {
+            dom = astGetC( astGetFrame( iwcs, ifrm ), "Domain" );
+            if( dom ){
+               if( !strcmp( dom, "PIXEL" ) ) {
+
+/* When found add in the new Frame and make it the base Frame. Then
+   re-instate the original current Frame. */
+                  astInvert( map );
+                  astAddFrame( iwcs, ifrm, map, frm1 );
+                  astSetI( iwcs, "Base", astGetI( iwcs, "Current" ) );
+
+/* Remove the Frames introduced by the NDF library. */
+               } else if( !strcmp( dom, "AXIS" ) ||
+                          !strcmp( dom, "GRID" ) ) {
+                  astRemoveFrame( iwcs, ifrm );
+               }
+            }
+         }
+
+/* Set the ID attribute of the FrameSet to "FIXED_BASE" in order to force
+   kpg1_wrlst to write out the positions in the original base Frame. */
+         astSet( iwcs, "ID=FIXED_BASE" );
+      }
    
 /* Create the output catalogue */
       kpg1Wrlst( param, nndf, nndf, ncpar, tab, AST__BASE, iwcs,

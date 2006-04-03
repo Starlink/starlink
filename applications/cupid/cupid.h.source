@@ -189,7 +189,7 @@ void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidREdges( int, double *, int *, int *, int, double, double, double, double );
 void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, int, int, int, int *[3] );
-void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, double[3], const char * );
+void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, double[3], const char *, AstFrameSet * );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
 

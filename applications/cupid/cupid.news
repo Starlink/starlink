@@ -7,6 +7,10 @@
  data arrays.
 
 
+Changes introduced at V0.0-8:
+
+ - The output catalogue now inherits any WCS FrameSet from the input NDF.
+
 Changes introduced at V0.0-7:
 
  - ClumpFind, Reinhold and FellWalker all now sort the output catalogue

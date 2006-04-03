@@ -173,6 +173,8 @@ void clumps() {
 *        If the data has less than 3 pixel axes, then the columns
 *        describing the missing axes will not be present in the catalogue.
 *
+*        The catalogue inherits any WCS information from the input NDF.
+*
 *        The "size" of the clump on an axis is the beam-corrected RMS 
 *        deviation of each pixel centre from the clump centroid, where each 
 *        pixel is weighted by the corresponding pixel data value. The 
@@ -546,6 +548,7 @@ void clumps() {
    float *rmask;                /* Pointer to cump mask array */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int el;                      /* Number of array elements mapped */
+   int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
    int ilevel;                  /* Interaction level */
@@ -883,8 +886,9 @@ void clumps() {
 
 /* Store the clump properties in the CUPID extension and output catalogue
    (if needed). */
+      ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
-                        "Output from CUPID:CLUMPS" );
+                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );
