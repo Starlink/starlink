@@ -122,6 +122,15 @@ itcl::class gaia::GaiaNDFCube {
          set itk_option(-usemmap) 0
       }
 
+      #  Whether to constantly update the spectrum data limits.
+      $Options add checkbutton -label "Autoscale" \
+         -variable [scope itk_option(-autoscale)] \
+         -onvalue 1 \
+         -offvalue 0
+      add_menu_short_help $Options {Autoscale}  \
+         {Continuously change data limits, 
+            otherwise fixed by last click (faster)}
+
       #  Add window help.
       add_help_button ndfcube "On Window..."
       add_short_help $itk_component(menubar).help \
