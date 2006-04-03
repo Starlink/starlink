@@ -73,7 +73,10 @@ void clumps() {
 *     if and only if the pixel is not contained within any clump. These two 
 *     quality bits have names associated with them which can be used with 
 *     the KAPPA applications SETQUAL, QUALTOBAD, REMQUAL, SHOWQUAL. The 
-*     names used are "CLUMP" and "BACKGROUND". 
+*     names used are "CLUMP" and "BACKGROUND". For instance, to overlay
+*     the outline of a set of 2D clumps held in NDF "fred" on a previously 
+*     displayed 2D image, do "qualtobad fred fred2 background" followed by 
+*     "contour noclear mode=good fred2".
 *
 *     - Information about each clump, including a minimal cut-out image
 *     of the clump and the clump parameters, is written to the CUPID 
