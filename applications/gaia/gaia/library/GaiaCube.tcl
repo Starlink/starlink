@@ -96,18 +96,31 @@ itcl::class gaia::GaiaNDFCube {
       #  Add the Options menu.
       set Options [add_menubutton "Options" left]
       configure_menubutton Options -underline 0
-      
+
+      #  If file mapping is not available, then set value off.
+      set canmmap 1
+      if { [hds::gtune MAP] != "1" } {
+         configure -usemmap 0
+         set canmmap 0
+      }
+
       #  Whether to mmap cube or load directly into memory, usually
       #  mmap'd. Control-l forces direct load, if not already done.
-      $Options add checkbutton -label "Mmap cube" \
+      $Options add checkbutton -label "Memory map cube data" \
          -command [code $this load_cube_ 0] \
          -accelerator {Control-l} \
          -variable [scope itk_option(-usemmap)] \
          -onvalue 1 \
          -offvalue 0
       bind $w_ <Control-l> [code $this configure -usemmap 1]
-      add_menu_short_help $Options {Mmap cube}  \
-         {When selected quickly access cube data, otherwise read fully}
+      add_menu_short_help $Options {Memory map cube data}  \
+         {Access cube data using mmap(), otherwise read fully into RAM}
+      
+      #  If memory mapping not available, then also disable this option.
+      if { ! $canmmap } {
+         $Options entryconfigure {Memory map cube data} -state disabled
+         set itk_option(-usemmap) 0
+      }
 
       #  Add window help.
       add_help_button ndfcube "On Window..."
@@ -542,16 +555,16 @@ itcl::class gaia::GaiaNDFCube {
    }
 
    #  Load the cube data, using the current mmap mode. Only happens when force
-   #  is true, os if a change the mmap mode of the cube is needed.
+   #  is true, or if a change the mmap mode of the cube is needed.
    #  Controlling the mmap mode can force file i/o to be is used to load all
    #  the cube into malloc'd memory, which speeds the spectral
    #  readout. Otherwise mmap is used, which may give an initially slow
-   #  spectral readout for large cubes. 
+   #  spectral readout for large cubes.
    protected method load_cube_ { force } {
       if { $accessor_ == {} } {
-         return 
+         return
       }
-      if { [$accessor_ cget -usemmap] != $itk_option(-usemmap) || $force } { 
+      if { [$accessor_ cget -usemmap] != $itk_option(-usemmap) || $force } {
          busy {
             $accessor_ unmap
             $accessor_ configure -usemmap $itk_option(-usemmap)
@@ -608,7 +621,7 @@ itcl::class gaia::GaiaNDFCube {
          } else {
             set plane_ $newvalue
          }
-         
+
          if { $regen || ![info exists spectrum_] } {
             #  Display a section from the NDF (forced in non-devel mode).
             display_current_section_
@@ -727,7 +740,7 @@ itcl::class gaia::GaiaNDFCube {
    #  Stop the animation. If dispsection is true display the current NDF
    #  section and release slice memory.
    protected method stop_ { {dispsection 0} } {
-      
+
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
@@ -1051,7 +1064,7 @@ itcl::class gaia::GaiaNDFCube {
    #  Does spectral plot auto-update ranges.
    itk_option define -autoscale autoscale AutoScale 0
 
-   #  Whether to use file mapping (quick startup), or direct io (fast 
+   #  Whether to use file mapping (quick startup), or direct io (fast
    #  spectral display).
    itk_option define -usemmap usemmap UseMmap 1
 
