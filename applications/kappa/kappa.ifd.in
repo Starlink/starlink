@@ -2327,8 +2327,10 @@ package kappa {
          parameter from {
             type NDF
             access READ
-            vpath PROMPT
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
             prompt {NDF containing existing variance values}
+            default !
             helpkey *
           }
 
