@@ -30,6 +30,7 @@ extern "C" {
     int Array_Init( Tcl_Interp *interp );
     int Ellipse_Init();
     int GaiaCat_Init( Tcl_Interp *interp );
+    int Hds_Init( Tcl_Interp *interp );
     int Mark_Init();
     int Ndf_Init( Tcl_Interp *interp );
     int Polyline_Init();
@@ -111,6 +112,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     //  Simple NDF interface.
     if ( Ndf_Init( interp ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    //  HDS commands.
+    if ( Hds_Init( interp ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
