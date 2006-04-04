@@ -15,6 +15,9 @@
 # P.W.Draper 19 Jan 00   added concat to bindtags, itk ones were
 #                        being lost. Removed extra ] from ]] in title string.
 #            18 Nov 03   Now accepts a list of catalogues to display.
+#            04 Apr 06   Catch {wm deiconify $w_.init} as init window maybe 
+#                        embedded in GAIA
+#
 
 set skycat_usage {
 Usage: skycat ?fitsFile? ?-option value ...?
@@ -124,7 +127,8 @@ itcl::class skycat::SkyCat {
 	    # the logo uses up colors: the update forces the destroy and frees the colors
 	    update 
 	    $itk_component(image) alloccolors 60
-	    wm deiconify $w_
+            # Sometimes $w_.init is an embedded window.
+	    catch {wm deiconify $w_}
 	}
 	
         if {"$itk_option(-catalog)" != ""} {
