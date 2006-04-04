@@ -331,7 +331,6 @@ itcl::class gaia::Gaia {
          place $w  -relx 0.5 -rely 0.5 -anchor s
       } else {
          set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
-         #DEBUG         rtd_set_cmap $w
          wm title $w "$appname_ loading..."
          wm withdraw $w_
       }
@@ -357,8 +356,8 @@ itcl::class gaia::Gaia {
       }
 
       if { ! $itk_option(-tabbedgaia) } {
-         tkwait visibility $w
-      }
+         ::tkwait visibility $w
+      } 
    }
 
    #  Add help for GAIA and SkyCat. Gets called a lot from base classes, so
