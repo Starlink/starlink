@@ -112,10 +112,9 @@ NDFIO::~NDFIO() {
    }
 
    //  Release the header, this has been allocated by CNF.
-   if ( header_.ptr() != NULL ) {
+   if ( header_.ptr() != NULL && header_.refcnt() <= 1 ) {
        cnfFree( header_.ptr() );
    }
-
 }
 
 //+
@@ -188,7 +187,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component )
 
                 // Copy the header. Use CNF memory so it can be passed to
                 // Fortran.
-                hsize = (size_t)header_length * (size_t)header_records + 1;
+                hsize = (size_t)header_length * (size_t)header_records;
                 hdata = cnfMalloc( hsize );
                 memcpy( hdata, inheader, hsize );
                 header = Mem( hdata, hsize, 0 );
@@ -483,7 +482,7 @@ int NDFIO::makeDisplayable( int index, const char *component )
          data = Mem( indata, tsize, 0 );
 
          // Copy the header.
-         hsize = (size_t)header_length * (size_t)header_records + 1;
+         hsize = (size_t)header_length * (size_t)header_records;
          hdata = cnfMalloc( hsize );
          memcpy( hdata, inheader, hsize );
          header = Mem( hdata, hsize, 0 );
@@ -493,7 +492,10 @@ int NDFIO::makeDisplayable( int index, const char *component )
          height_ = height;
          bitpix_ = bitpix;
          data_ = data;
-         if ( header_.ptr() != NULL ) {
+         if ( header_.ptr() != NULL && header_.refcnt() <= 1 ) {
+             //  Last reference to this memory about to go (refcnt is
+             //  decremented by the assignment operator to follow), so OK
+             //  to free.
              cnfFree( header_.ptr() );
          }
          header_ = header;
