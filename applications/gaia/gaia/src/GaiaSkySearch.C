@@ -439,7 +439,6 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
         for ( i = 0; i < ncolumn; i++ ) {
             os << sizes[i] << " ";
         }
-        os << ends;
         set_result( os.str().c_str() );
         delete [] sizes;
     }

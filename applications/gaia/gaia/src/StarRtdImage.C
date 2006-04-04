@@ -1009,7 +1009,6 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             else {
                 message << "Image saved" << std::endl;
             }
-            message << ends;
             set_result( message.str().c_str() );
         }
         return result;
@@ -3340,7 +3339,6 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
     if (label && strlen(label))
         make_label(os, label, cx, cy, label_tags, fg);
 
-    os << ends;
     int result = eval( os.str().c_str() );
     return result;
 }
@@ -3390,7 +3388,6 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
     if (label && strlen(label))
         make_label(os, label, cx, cy, label_tags, fg);
 
-    os << ends;
     int result = eval( os.str().c_str() );
     return result;
 }
@@ -4655,7 +4652,6 @@ int StarRtdImage::ndfCmdList( int argc, char *argv[], NDFIO *ndf )
            << " {" << hasqual << "}"
            << "} ";
     }
-    os << ends;
     set_result( os.str().c_str() );
     return TCL_OK;
 }
@@ -4721,7 +4717,10 @@ int StarRtdImage::ndfCmdDisplay( int argc, char *argv[], NDFIO *ndf )
     image_ = NULL;
     updateViews();
 
-    // Create an image composed of all of the requested image extensions
+    // Create an image composed of all of the requested image extensions.
+    // Note the copy of imio created here is really a container-file per NDF
+    // (see gaiaCloneMNDF). That's probably not optimal, but is reasonably
+    // light-weight. 
     image_ = ImageData::makeCompoundImage( name(), imio, ndfList, numNDFs,
                                            biasimage_->biasInfo(), verbose() );
     if ( ! image_) {
