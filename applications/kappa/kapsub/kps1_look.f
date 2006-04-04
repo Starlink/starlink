@@ -158,22 +158,28 @@
 *  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Format every value, using CHR to get the most compact format. Find
-*  the maximum field width needed to format any value.
-      VWID = 0
-      DO IY = YLO, YHI
-         DO IX = XLO, XHI
-            IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
-               JAT = BADLEN
-            ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
-               JAT = OUTLEN
-            ELSE
-               CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
-     :                                    STATUS ), LINE, JAT )
-            END IF
-            VWID = MAX( VWID, JAT )
+*  For CLIST and CGLIST format, assume the maximum possible field width.
+      IF( FORMAT .EQ. 'CLIST' .OR. FORMAT .EQ. 'CGLIST' ) THEN
+         VWID = VAL__SZD
+
+*  For other formats, format every value, using CHR to get the most compact 
+*  format. Find the maximum field width needed to format any value.
+      ELSE
+         VWID = 0
+         DO IY = YLO, YHI
+            DO IX = XLO, XHI
+               IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                  JAT = BADLEN
+               ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                  JAT = OUTLEN
+               ELSE
+                  CALL CHR_CTOC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+     :                                       STATUS ), LINE, JAT )
+               END IF
+               VWID = MAX( VWID, JAT )
+            END DO
          END DO
-      END DO
+      END IF
 
 *  Find the maximum field width for a pixel index.
       CALL CHR_ITOC( XLO, LINE, IAT )
