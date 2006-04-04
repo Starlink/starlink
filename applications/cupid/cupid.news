@@ -7,12 +7,26 @@
  data arrays.
 
 
+Changes introduced at V0.0-9:
+
+ - A further filter is now applied to the clump list to reject clumps
+ which are smaller than the beam size specified by configuration
+ parameters FWHMBeam and VeloRes. Note, the reported clump sizes are
+ smaller than the observed clump sizes because they are corrected for the
+ smoothing produced by the instrument beam. The new filter is applied
+ before this correction, and so clumps sizes smaller than the beam size
+ may still be reported. The main effect of this filter is to remove
+ clumps which were previously reported as having zero size.
+
+
+
 Changes introduced at V0.0-8:
 
  - The output catalogue now inherits any WCS FrameSet from the input NDF.
 
  - Clumps which span only a single pixel along any pixel axis are now
  rejected.
+
 
 Changes introduced at V0.0-7:
 

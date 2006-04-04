@@ -446,23 +446,16 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Tell the user how clumps are being returned. */
    if( ilevel > 0 ) {
       datSize( ret, (size_t *) &nclump, status );
-      if( nclump == 0 ) {
-         msgOut( "", "No usable clumps found", status );
-      } else if( nclump == 1 ){
-         msgOut( "", "One usable clump found", status );
-      } else {
-         msgSeti( "N", nclump );
-         msgOut( "", "^N usable clumps found", status );
-      }
+      if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
 
       if( ilevel > 1 ) {
          if( iclump - nclump == 1 ) {
             msgOut( "", "1 clump rejected because it touches an edge of "
-                    "the data array", status );
+                    "the data array.", status );
          } else if( iclump - nclump > 1 ) {
             msgSeti( "N", iclump - nclump );
             msgOut( "", "^N clumps rejected because they touch an edge of "
-                    "the data array", status );
+                    "the data array.", status );
          }
       }
    }
@@ -471,15 +464,13 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    attempts there have been to fit a Gaussian peak). */
    if( ilevel > 3 ) {
       if( niter == 1 ){
-         msgOut( "", "No fit attempted", status );
+         msgOut( "", "No fit attempted.", status );
       } else {
          msgSeti( "M", niter - iclump );
          msgSeti( "N", niter );
-         msgOut( "", "Fits attempted for ^N candidate clumps (^M failed)", status );
+         msgOut( "", "Fits attempted for ^N candidate clumps (^M failed).", status );
       }
    }
-
-   if( ilevel > 0 ) msgBlank( status );
 
 /* Remove the secondary KeyMap added to the KeyMap containing configuration 
    parameters for this algorithm. This prevents the values in the secondary 

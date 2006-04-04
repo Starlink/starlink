@@ -245,7 +245,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                                   ilev < nlevels - 1, slbnd, &maxrem );
 
          } else if( ilevel > 2 ) {
-            msgOut( "", "   No pixels found at this contour level", status );
+            msgOut( "", "   No pixels found at this contour level.", status );
          }
       }
 
@@ -288,48 +288,39 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Tell the user how clumps are being returned. */
       if( ilevel > 0 ) {
-         if( nclump == 0 ) {
-            msgOut( "", "No usable clumps found", status );
-         } else if( nclump == 1 ){
-            msgOut( "", "One usable clump found", status );
-         } else {
-            msgSeti( "N", nclump );
-            msgOut( "", "^N usable clumps found", status );
-         }
+         if( nclump == 0 ) msgOut( "", "No usable clumps found.", status );
 
          if( ilevel > 1 ) {
             msgSeti( "M", minpix );
             if( nminpix == 1 ) {
                msgOut( "", "1 clump rejected because it contains fewer "
-                       "than MinPix (^M) pixels", status );
+                       "than MinPix (^M) pixels.", status );
             } else if( nminpix > 1 ) {
                msgSeti( "N", nminpix );
                msgOut( "", "^N clumps rejected because they contain fewer "
-                       "than MinPix (^M) pixels", status );
+                       "than MinPix (^M) pixels.", status );
             }
    
             if( nedge == 1 ) {
                msgOut( "", "1 clump rejected because it touches an edge of "
-                       "the data array", status );
+                       "the data array.", status );
             } else if( nedge > 1 ) {
                msgSeti( "N", nedge );
                msgOut( "", "^N clumps rejected because they touch an edge of "
-                       "the data array", status );
+                       "the data array.", status );
             }
 
             if( nthin == 1 ) {
                msgOut( "", "1 clump rejected because it spans only a single "
-                       "pixel along one or more axes", status );
+                       "pixel along one or more axes.", status );
 
             } else if( nthin > 1 ) {
                msgSeti( "N", nthin );
                msgOut( "", "^N clumps rejected because they spans only a single "
-                       "pixel along one or more axes", status );
+                       "pixel along one or more axes.", status );
             }
          }
       }
-
-      if( ilevel > 0 ) msgBlank( status );
 
 /* Shuffle non-null clump pointers to the start of the "clumps" array,
    and count them. */

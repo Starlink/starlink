@@ -215,7 +215,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Abort if no clumps found. */
    if( maxid < 0 ) {
       if( ilevel > 0 ) {
-         msgOut( "", "No usable clumps found", status );
+         msgOut( "", "No usable clumps found.", status );
          msgBlank( status );
       }
       goto L10;
@@ -339,38 +339,30 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
       if( ilevel > 0 ) {
-         if( ngood == 0 ) {
-            msgOut( "", "No usable clumps found", status );
-         } else if( ngood == 1 ){
-            msgOut( "", "One usable clump found", status );
-         } else {
-            msgSeti( "N", ngood );
-            msgOut( "", "^N usable clumps found", status );
-         }
+         if( ngood == 0 ) msgOut( "", "No usable clumps found.", status );
          if( ilevel > 1 ) {
             if( nsmall == 1 ){
-               msgOut( "", "One clump rejected because it contains too few pixels", status );
+               msgOut( "", "One clump rejected because it contains too few pixels.", status );
             } else {
                msgSeti( "N", nsmall );
-               msgOut( "", "^N clumps rejected because they contain too few pixels", status );
+               msgOut( "", "^N clumps rejected because they contain too few pixels.", status );
             }
             if( nlow == 1 ){
-               msgOut( "", "One clump rejected because its peak is too low", status );
+               msgOut( "", "One clump rejected because its peak is too low.", status );
             } else {
                msgSeti( "N", nlow );
-               msgOut( "", "^N clumps rejected because the peaks are too low", status );
+               msgOut( "", "^N clumps rejected because the peaks are too low.", status );
             }
             if( nthin == 1 ) {
                msgOut( "", "1 clump rejected because it spans only a single "
-                       "pixel along one or more axes", status );
+                       "pixel along one or more axes.", status );
 
             } else if( nthin > 1 ) {
                msgSeti( "N", nthin );
                msgOut( "", "^N clumps rejected because they spans only a single "
-                       "pixel along one or more axes", status );
+                       "pixel along one or more axes.", status );
             }
          }        
-         msgBlank( status );
       }         
 
 /* Sort the clump indices into descending order of peak value. */

@@ -1,4 +1,5 @@
 #include "sae_par.h"
+#include "prm_par.h"
 #include "star/hds.h"
 #include "star/kaplibs.h"
 #include "par.h"
@@ -15,7 +16,7 @@
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
                        int ndim, double beamcorr[ 3 ], const char *ttl,
-                       AstFrameSet *iwcs ){
+                       AstFrameSet *iwcs, int ilevel ){
 /*
 *  Name:
 *     cupidStoreClumps
@@ -26,7 +27,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
 *                            int ndim, double beamcorr[ 3 ], const char *ttl, 
-*                            AstFrameSet *iwcs )
+*                            AstFrameSet *iwcs, int ilevel )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -51,6 +52,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        The title for the output catalogue (if any).
 *     iwcs
 *        The WCS FrameSet from the input data, or NULL.
+*     ilevel
+*        The level of information to display.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -79,9 +82,11 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    const char **names;          /* Component names */
    double *cpars;               /* Array of parameters for a single clump */
    double *t;                   /* Pointer to next table value */
+   double *tj;                  /* Pointer to next table entry to write*/
    double *tab;                 /* Pointer to catalogue table */
    int i;                       /* Index of next locator */
    int icol;                    /* Zero based column index */
+   int iclump;                  /* Usable clump index */
    int indf;                    /* Identifier for supplied NDF */
    int indf2;                   /* Identifier for copied NDF */
    int irow;                    /* One-based row index */
@@ -89,6 +94,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int ifrm;                    /* Frame index */
    int nfrm;                    /* Total number of Frames */
    int nndf;                    /* Total number of NDFs */
+   int nbad;                    /* No. of clumps smaller than the beam size */
+   int ok;                      /* Is the clump larger than the beam size? */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
 
@@ -114,6 +121,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    for a single clump. */
    cpars = NULL;
 
+/* Indicate we have not yet found any clumps smaller than the beam size. */
+   nbad = 0;
+
+/* Number of CLUMP structures created so far. */
+   iclump = 0;
+
 /* Indicate that no memory has yet been allocated to store the full table
    of parameters for all clumps. */
    tab = NULL;
@@ -138,7 +151,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    information which is the same for every clump (the parameter names, the 
    indices of the parameters holding the clump central position, and the 
    number of parameters). */
-         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar );
+         cpars = cupidClumpDesc( indf, beamcorr, cpars, &names, &ncpar, &ok );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 
@@ -147,19 +160,24 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          if( !tab ) tab = astMalloc( sizeof(double)*nndf*ncpar );
          if( tab ) {
 
-/* Put the clump parameters into the table. */
+/* Count the number of lumps which are smaller than the beam size. */
+            if( !ok ) nbad++;
+
+/* Put the clump parameters into the table. Store bad values if the clump
+   is too small. */
             t = tab + irow - 1;
             for( icol = 0; icol < ncpar; icol++ ) {
-               *t = cpars[ icol ];
+               *t = ok ? cpars[ icol ] : VAL__BADD;
                t += nndf;
             }
 
 /* If required, put the clump parameters into the current CLUMP structure. */
-            if( aloc ) {
-
+            if( aloc && ok ) {
+                   
 /* Get an HDS locator for the next cell in the array of CLUMP structures. */
+               iclump++;
                cloc = NULL;
-               datCell( aloc, 1, &irow, &cloc, status );
+               datCell( aloc, 1, &iclump, &cloc, status );
 
 /* Store each clump parameter in a component of this CLUMP structure. */
                dloc = NULL;
@@ -184,6 +202,34 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       }
    }
 
+/* Tell the user how many usable clumps there are and how many were rejected 
+   due to being smaller than the beam size. */
+   if( ilevel > 1 ) {
+      if( nbad == 1 ) {
+         msgOut( "", "1 further clump rejected because it "
+                 "is smaller than the beam width.", status );
+      } else if( nbad > 1 ) {
+         msgSeti( "N", nbad );
+         msgOut( "", "^N further clumps rejected because "
+                 "they are smaller than the beam width.", status );
+      }
+   }
+
+   if( ilevel > 0 ) {
+      if( iclump == 0 ) {
+         msgOut( "", "No usable clumps found.", status );
+      } else if( iclump == 1 ){
+         msgOut( "", "One usable clump found.", status );
+      } else {
+         msgSeti( "N", iclump );
+         msgOut( "", "^N usable clumps found.", status );
+      }
+      msgBlank( status );
+   }
+
+/* Resize the array pf clump structures */
+   if( aloc && nbad > 0 ) datAlter( aloc, 1, &iclump, status );
+
 /* See if an output catalogue is to be created. If not, annull the null
    parameter error. */
    parGet0c( param, cat, MAXCAT, status );
@@ -192,6 +238,25 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
   
 /* Otherwise create the catalogue. */
    } else if( tab && *status == SAI__OK ) {
+
+/* Remove any rows in the table which descibe clumps smaller than the
+   beam size (these will have been set to bad values above). The good
+   rows are shuffled down to fill the gaps left by the bad rows. */
+      iclump = 0;
+      for( irow = 0; irow < nndf; irow++ ) {
+         if( tab[ irow ] != VAL__BADD ) {
+            if( irow != iclump ) {
+               t = tab + irow;
+               tj = tab + iclump;
+               for( icol = 0; icol < ncpar; icol++ ) {
+                  *tj = *t;
+                  tj += nndf;
+                  t += nndf;
+               }
+            }
+            iclump++;
+         } 
+      }
 
 /* Start an AST context. */
       astBegin;
@@ -263,7 +328,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       }
    
 /* Create the output catalogue */
-      kpg1Wrlst( param, nndf, nndf, ncpar, tab, AST__BASE, iwcs,
+      kpg1Wrlst( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
                  ttl, 1, NULL, 1, status );
    
 /* End the AST context. */

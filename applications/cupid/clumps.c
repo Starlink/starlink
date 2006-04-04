@@ -795,38 +795,6 @@ void clumps() {
               "implemented.", status );
    }
 
-/* Report the configuration (if any). */
-   errBegin( status );
-   parGet0l( "REPCONF", &repconf, status );
-   if( repconf ) {
-      msgBlank( status );
-      msgOut( "", "Current configuration:", status );
-
-/* Get a KeyMap containing the parameters specific to the chosen
-   algorithm. */
-      if( astMapGet0A( keymap, method, &aconfig ) ) {     
-
-/* Create a GRP group containing a text form of the KeyMap. */
-         grp = NULL;
-         kpg1Kygrp( aconfig, &grp, status );
-         grpGrpsz( grp, &size, status );
-
-/* Display the values, including the algorithm name. */
-         value = buffer;
-         for( i = 1; i <= size; i++ ) {
-            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
-            msgSetc( "A", method );
-            msgSetc( "V", value );
-            msgOut( "", "   ^A.^V", status );
-         }
-         msgBlank( status );
-
-/* Delete the GRP group. */
-         if( grp ) grpDelet( &grp, status );      
-      }
-   }    
-   errEnd( status );
-
 /* Skip the rest if no clumps were found. */
    if( ndfs ) {
 
@@ -891,7 +859,8 @@ void clumps() {
    (if needed). */
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
-                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL );
+                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL,
+                        ilevel );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );
@@ -900,6 +869,38 @@ void clumps() {
 /* Relase the extension locator.*/
       datAnnul( &xloc, status );
    }
+
+/* Report the configuration (if any). */
+   errBegin( status );
+   parGet0l( "REPCONF", &repconf, status );
+   if( repconf ) {
+      msgBlank( status );
+      msgOut( "", "Current configuration:", status );
+
+/* Get a KeyMap containing the parameters specific to the chosen
+   algorithm. */
+      if( astMapGet0A( keymap, method, &aconfig ) ) {     
+
+/* Create a GRP group containing a text form of the KeyMap. */
+         grp = NULL;
+         kpg1Kygrp( aconfig, &grp, status );
+         grpGrpsz( grp, &size, status );
+
+/* Display the values, including the algorithm name. */
+         value = buffer;
+         for( i = 1; i <= size; i++ ) {
+            grpGet( grp, i, 1, &value, GRP__SZNAM, status );
+            msgSetc( "A", method );
+            msgSetc( "V", value );
+            msgOut( "", "   ^A.^V", status );
+         }
+         msgBlank( status );
+
+/* Delete the GRP group. */
+         if( grp ) grpDelet( &grp, status );      
+      }
+   }    
+   errEnd( status );
 
 /* Tidy up */
 L999:

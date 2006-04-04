@@ -5,7 +5,7 @@
 #include <math.h>
 
 double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-                        const char ***names, int *ncpar ){
+                        const char ***names, int *ncpar, int *ok ){
 /*
 *  Name:
 *     cupidClumpDesc
@@ -15,7 +15,7 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 
 *  Synopsis:
 *     double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars, 
-*                             const char ***names, int *ncpar )
+*                             const char ***names, int *ncpar, int *ok )
 
 *  Description:
 *     This function calculates the parameters describing a single clump,
@@ -59,6 +59,10 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 *     ncpar
 *        Pointer to an int in which to return the number of parameters
 *        describing the clump.
+*     ok
+*        Pointer to an int in which to return a flag indicating if the
+*        clump can be used or not. This will be set to zero if the clump
+*        size is zero after correction for the effect of beam smoothing.
 
 *  Returned Value:
 *     A pointer to the array holding the returned clump parameters. This
@@ -112,6 +116,7 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
 
 /* Initialise. */
    ret = cpars;
+   *ok = 0;
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -234,7 +239,8 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
          v0 = sx2/s - ret[ ndim ]*ret[ ndim ];
          v = v0 - beamcorr[ 0 ]*beamcorr[ 0 ]/5.5451774;
          peakfactor = v0/v;
-         ret[ 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
+         *ok = ( v > 0 );
+         ret[ 2*ndim ] = ( *ok ) ? sqrt( v ) : 0.0;
 
          if( ndim > 1 ) {
             ret[ 1 ] = py - 0.5;
@@ -243,7 +249,12 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
             v0 = sy2/s - ret[ 1 + ndim ]*ret[ 1 + ndim ];
             v = v0 - beamcorr[ 1 ]*beamcorr[ 1 ]/5.5451774;
             peakfactor *= v0/v;
-            ret[ 1 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
+            if( v > 0 ) {
+               ret[ 1 + 2*ndim ] = sqrt( v );
+            } else {
+               ret[ 1 + 2*ndim ] = 0.0;
+               *ok = 0;
+            }
 
             if( ndim > 2 ) {
                ret[ 2 ] = pz - 0.5; 
@@ -252,7 +263,13 @@ double *cupidClumpDesc( int indf, double beamcorr[ 3 ], double *cpars,
                v0 = sz2/s - ret[ 2 + ndim ]*ret[ 2 + ndim ];
                v = v0 - beamcorr[ 2 ]*beamcorr[ 2 ]/5.5451774;
                peakfactor *= v0/v;
-               ret[ 2 + 2*ndim ] = ( v > 0 ) ? sqrt( v ) : 0.0;
+
+               if( v > 0 ) {
+                  ret[ 2 + 2*ndim ] = sqrt( v );
+               } else {
+                  ret[ 2 + 2*ndim ] = 0.0;
+                  *ok = 0;
+               }
             }
          }
 
