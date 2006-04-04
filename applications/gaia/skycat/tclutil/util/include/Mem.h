@@ -22,6 +22,8 @@
  *                            constructors. Starlink fortran 64 bit
  *                            interoperability requires that addresses may be
  *                            changed.
+ *                  04/04/06  Added "refcnt" member so that owner can control
+ *                            when to release memory.
  */
 
 #include <cstdio>
@@ -29,11 +31,11 @@ class Mem_Map;
 
 // internal struct used for reference counting
 struct MemRep {
-    size_t size;			// size in bytes
+    size_t size;		// size in bytes
     int owner;			// true if we should delete the shm when no longer needed
     int refcnt;			// count of the number of reference to this memory area
     void* ptr;			// pointer to memory area
-    int newmem;               // memory allocated using "new"
+    int newmem;                 // memory allocated using "new"
     int shmId;			// shared memory id, or 0 if not shared
     int shmNum;                 // shm buffer number, if multi-buffering
     int semId;                  // Semaphore ID for locking shm
@@ -148,6 +150,9 @@ public:
     int operator!=(const Mem& m) const {
 	return m.rep_ != rep_ || m.offset_ != offset_ || m.length_ != length_;
     }
+
+    //  reference counts of memory
+    int refcnt();
 
     // return true if the memory is shared
     int shared() const {return shmId() >= 0;}

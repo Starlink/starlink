@@ -21,6 +21,8 @@
  * pbiereic        17/02/03  Added 'using namespace std'.
  * Peter W. Draper 03/09/04  New addr arguments for Mem and Mem_Rep
  *                           constructors. 
+ *                 04/04/06  Added "refcnt" member so that owner can control
+ *                           when to release memory.
  */
 static const char* const rcsId="@(#) $Id: Mem.C,v 1.4 2005/02/02 01:43:00 brighton Exp $";
 
@@ -671,6 +673,16 @@ Mem& Mem::operator=(const Mem& m)
     return *this;
 }
 
+/*
+ * return the current reference count.
+ */
+int Mem::refcnt()
+{
+    if ( rep_ ) {
+        return rep_->refcnt;
+    }
+    return 0;
+}
 
 /*
  * force the memory to be shared (1) or not shared (0)
