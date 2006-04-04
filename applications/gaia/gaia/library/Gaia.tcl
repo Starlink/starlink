@@ -1182,7 +1182,7 @@ itcl::class gaia::Gaia {
       } else {
          #  Make sure toolbox is withdrawn.
          if { [info exists itk_component(opencube)] } {
-            $itk_component(opencube) close
+            $itk_component(opencube) close 0
          }
       }
    }

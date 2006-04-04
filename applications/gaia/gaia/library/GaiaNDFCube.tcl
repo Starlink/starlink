@@ -525,9 +525,10 @@ itcl::class gaia::GaiaNDFCube {
    #  Methods:
    #  --------
 
-   #  Close window.
-   public method close {} {
-      stop_ 1
+   #  Close window. If image is being replaced set dispsection false to 
+   #  avoid the section being loaded.
+   public method close { {dispsection 1} } {
+      stop_ $dispsection
       wm withdraw $w_
       if { [info exists spectrum_] } {
          if { $spectrum_ != {} && [winfo exists $spectrum_] } {
