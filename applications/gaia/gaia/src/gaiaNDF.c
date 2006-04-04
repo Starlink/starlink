@@ -1078,7 +1078,7 @@ void *gaiaCloneMNDF( const void *handle )
             /*  And copy the headers. */
             newState->header = cnfCreat( current->hlen * 80 );
             memcpy( newState->header, current->header,
-                    current->hlen * 80 );
+                    current->hlen * 80  );
 
             /*  And add this to the new super structure. */
             if ( first ) {

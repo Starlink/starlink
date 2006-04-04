@@ -1550,8 +1550,10 @@ void StarWCS::constructWarning( const char *encoding, int failed,
         astClear( fitschan, "Card" );
     }
     if ( nwarns > 0 || encoding || failed ) {
-        os << ends;
-        const char *str = os.str().c_str();
+        std::string istring = os.str();  /* Keep reference in scope so memory
+                                          * is not freed immediately as in 
+                                          * os.str().c_str(). */
+        const char *str = istring.c_str();
 
         //  os falls out of scope so we need a copy.
         warnings_ = new char[ strlen(str) + 1 ];
