@@ -56,6 +56,8 @@
 *        listed in "fortran order" - the lower left pixel first, and the
 *        upper right pixel last. 
 *
+*        - "CGLIST" -- Like CLIST except bad pixels are omitted.
+*
 *        - "VLIST" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The 
 *        pixels are listed in "fortran order" - the lower left pixel first, 
@@ -83,6 +85,8 @@
 *  History:
 *     22-OCT-2001 (DSB):
 *        Original version.
+*     4-APR-2006 (DSB):
+*        Added CGList format.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -303,6 +307,39 @@
 
                CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, STATUS )
 
+            END DO
+         END DO
+
+*  "CGLIST": Like CLIST except bad pixels are omitted.
+      ELSE IF( FORMAT .EQ. 'CGLIST' ) THEN
+         DO IY = YLO, YHI
+            DO IX = XLO, XHI
+               IF( ARRAY( IX, IY ) .NE.VAL__BADD ) THEN
+                  LINE = ' '
+         
+                  IAT = 0
+                  CALL CHR_PUTI( IX, LINE, IAT )
+                  IAT = XWID
+         
+                  JAT = IAT
+                  CALL CHR_PUTI( IY, LINE, JAT )
+                  IAT = IAT + YWID
+         
+                  IF( ARRAY( IX, IY ) .EQ. VAL__BADD ) THEN
+                     CALL CHR_PUTC( BADTXT, LINE, IAT )
+         
+                  ELSE IF( ARRAY( IX, IY ) .EQ. OUTVAL ) THEN
+                     CALL CHR_PUTC( OUTTXT, LINE, IAT )
+         
+                  ELSE
+                     CALL CHR_PUTC( AST_FORMAT( FRM, 1, ARRAY( IX, IY ), 
+     :                                          STATUS ), LINE, IAT )
+                  END IF
+         
+                  CALL KPG1_REPRT( LINE( : IAT ), QUIET, LOG, FD, 
+     :                             STATUS )
+
+               END IF
             END DO
          END DO
 

@@ -28500,6 +28500,10 @@ KAPPA: \htmlref{LOG10}{LOG10},
             upper-right pixel last.
 
             \sstitem
+            {\tt "cglist"} --- Like {\tt "clist"} except that bad pixel
+            are omitted from the list.
+
+            \sstitem
             {\tt "vlist"} --- Each row of textual output consists of just the
             pixel data value.  No headers or blank lines are included.  The
             pixels are listed in `Fortran order'---the lower-left pixel first,
@@ -50563,6 +50567,12 @@ The following applications have been modified:
          have a good value in the NDF Data array (the ``Pixel'' option
          stores all pixel centres, whether the pixel values are good or 
          bad).
+      \end{itemize}
+
+   \item [\htmlref{LOOK}{LOOK}] \mbox{}
+      \begin{itemize}
+         \item Now FORMAT option ``cglist'' added. This is like ``clist''
+         except that bad values are not included in the list.
       \end{itemize}
 
    \item [\htmlref{PARGET}{PARGET}] \mbox{}

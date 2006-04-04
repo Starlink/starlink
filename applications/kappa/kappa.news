@@ -66,6 +66,9 @@
    heights called "Scale".  This sets a specified number of contour 
    levels to be equally spaced between two pixel values that you supply.
 
+   o  LOOK parameter FORMAT has an extra option "cglist". This is like 
+   "clist" except that bad values are not included in the list.
+
 Changes introduced in version 1.4-2
 
    o  The NDFTRACE application now displays the bounds of the NDF within 

@@ -84,6 +84,9 @@
 *        listed in "Fortran order" - the lower left pixel first, and the
 *        upper right pixel last. 
 *
+*        - "cglist" -- Like "clist" except bad pixels are omitted from
+*        the list.
+*
 *        - "vlist" -- Each row of textual output consists of just the
 *        pixel data value. No headers or blank lines are included. The 
 *        pixels are listed in "Fortran order" - the lower-left pixel
@@ -256,6 +259,8 @@
 *        Original NDF/AST version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     4-APR-2006 (DSB):
+*        Added CGlist format.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -419,8 +424,8 @@
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
 
 *  Obtain the formatting method to use.
-      CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,Region', 
-     :                .FALSE., FORMAT, STATUS )
+      CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,'//
+     :                'Region,CGlist', .FALSE., FORMAT, STATUS )
 
 *  Create a 1D Frame and set its style. The AST_FORMAT method for axis 1 of
 *  this Frame is used to format the data values.
