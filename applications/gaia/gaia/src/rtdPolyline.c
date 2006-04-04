@@ -204,7 +204,7 @@ Tk_ItemType tkPolyLineType = {
     configSpecs,                        /* configSpecs */
     ConfigureLine,                      /* configureProc */
     LineCoords,                         /* coordProc */
-    RtdLineDelete,                      /* deleteProc */
+    DeleteLine,                         /* deleteProc */
     RtdLineDisplay,                     /* displayProc */
     TK_CONFIG_OBJS,                     /* alwaysRedraw & flags */
     LineToPoint,                        /* pointProc */
