@@ -59,8 +59,8 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
 /* Function Prototypes:							    */
 /* ===================							    */
       int rec_adopt_record( const struct HAN *han, const struct HAN *par );
-      int rec_alloc_mem( int size, void **pntr );
-      int rec_alloc_xmem( int size, void **pntr );
+      int rec_alloc_mem( size_t size, void **pntr );
+      int rec_alloc_xmem( size_t size, void **pntr );
       void rec_attach_file( int expand, const char *file, INT file_len,
 			    char state, char mode, struct RCL *rcl,
 			    struct HAN *han );
@@ -68,8 +68,8 @@ extern const struct RID rec_gl_ridzero;	/* Null record ID		    */
       int rec_count_files( int * count );
       int rec_create_record( const struct HAN *par, struct RCL *rcl,
 	   		     struct HAN *han );
-      int rec_deall_mem( int size, void **pntr );
-      int rec_deall_xmem( int size, void **pntr );
+      int rec_deall_mem( size_t size, void **pntr );
+      int rec_deall_xmem( size_t size, void **pntr );
       int rec_delete_record( const struct HAN *han );
       void rec_end_wild( struct WLD **context );
       int rec_extend_record( const struct HAN *han, INT_BIG extent );
