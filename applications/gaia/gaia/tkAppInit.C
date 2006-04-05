@@ -102,10 +102,6 @@ main( int argc, char *argv[] )
 extern "C" int
 Tcl_AppInit(Tcl_Interp *interp)
 {
-    Tk_Window main;
-
-    main = Tk_MainWindow(interp);
-
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
