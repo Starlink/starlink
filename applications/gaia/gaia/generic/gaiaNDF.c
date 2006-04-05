@@ -1137,7 +1137,7 @@ int gaiaNDFClose( int *ndfid )
 /**
  * Query the data type of a component.
  */
-int gaiaNDFType( int ndfid, const char* component, char *type, 
+int gaiaNDFType( int ndfid, const char* component, char *type,
                  int type_length, char **error_mess )
 {
    int status = SAI__OK;
@@ -1180,7 +1180,7 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
-int gaiaNDFMap( int ndfid, char *type, const char* component, void **data, 
+int gaiaNDFMap( int ndfid, char *type, const char* component, void **data,
                 int *el, char **error_mess )
 {
    int status = SAI__OK;
@@ -1282,10 +1282,10 @@ int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, AstFrameSet **iwcs,
    else if ( iaxes[0] < 1 ) {
        iaxes[0] = 1;
    }
-   
+
    /* If the base frame has more than one axis then select the given one.
     * This is easy, just pick a frame with the appropriate axes and put it
-    * back, note that we have to pick the current frame, so swap things 
+    * back, note that we have to pick the current frame, so swap things
     * around a little. */
    if ( nin != 1 ) {
        astInvert( *iwcs );
@@ -1370,14 +1370,15 @@ int gaiaNDFQueryBounds( int ndfid, int ndimx, int lbnd[], int ubnd[],
  * Returns a coordinate value in *coord that may be formatted and trailed by
  * the axis units and label. The position along the axis is identified using
  * ncoords pixel coordinates, where ncoords must match the dimensionality of
- * the NDF. The coordinate returned is matched to the requested axis by being
+ * the NDF (at least up to ncoords axes, axes beyond that are handled as
+ * dummies). The coordinate returned is matched to the requested axis by being
  * the coordinate with the largest change wrt to a single pixel step. We need
  * to use this logic as the relationship between the NDF axes and the world
  * coordinates may not be straight-forward. Note that the value returned by
  * the coord argument should be immediately copied.
  */
 int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
-                       int formatted, int ncoords, char **coord, 
+                       int formatted, int ncoords, char **coord,
                        char **error_mess )
 {
     AstFrameSet *frameSet = NULL;
@@ -1386,6 +1387,8 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
     char *label;
     char *units;
     static char lcoord[30];            /* Static as may be returned */
+    double static_coords_in[7];
+    double *coords_in;
     double diff;
     double out1[7];
     double out2[7];
@@ -1394,6 +1397,7 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
     int caxis;
     int current;
     int i;
+    int ncoords_in;
     int ncoords_out;
     int nframes;
     int pixel;
@@ -1409,9 +1413,25 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
         return TCL_ERROR;
     }
 
-    //  Find the PIXEL domain.
-    base = astGetI( frameSet, "Base" );
+    /* Check dimensionality, if more than ncoords then pad up, if less them
+     * drop them off. */
     current = astGetI( frameSet, "Current" );
+    base = astGetI( frameSet, "Base" );
+    astSetI( frameSet, "Current", base );
+    ncoords_in = astGetI( frameSet, "naxes" );
+    astSetI( frameSet, "Current", current );
+    if ( ncoords_in == ncoords ) {
+        coords_in = coords;
+    }
+    else if ( ncoords_in > ncoords ) {
+        coords_in = static_coords_in;
+        memcpy( coords_in, coords, ncoords * sizeof( double ) );
+        for ( i = ncoords; i < ncoords_in; i++ ) {
+            coords_in[i] = AST__BAD;
+        }
+    }
+
+    /*  Find the PIXEL domain. */
     pixel = 0;
     nframes = astGetI( frameSet, "Nframe" );
     for ( i = 1; i <= nframes; i++ ) {
@@ -1431,20 +1451,21 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
         return TCL_ERROR;
     }
 
-    //  This becomes the BASE frame.
+    /*  This becomes the BASE frame. */
     astSetI( frameSet, "Base", pixel );
 
-    //  Transform the position from pixel coordinates to world coordinates for
-    //  this position, and a position one pixel offset along the given axis.
+    /*  Transform the position from pixel coordinates to world coordinates for
+     *  this position, and a position one pixel offset along the given
+     *  axis. */
     ncoords_out = astGetI( frameSet, "naxes" );
 
-    coords[axis-1] += 1.0;
-    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords_out, 1, out1  );
-    coords[axis-1] -= 1.0;
-    astTranN( frameSet, 1, ncoords, 1, coords, 1, ncoords_out, 1, out2  );
+    coords_in[axis-1] += 1.0;
+    astTranN( frameSet, 1, ncoords_in, 1, coords_in, 1, ncoords_out, 1, out1 );
+    coords_in[axis-1] -= 1.0;
+    astTranN( frameSet, 1, ncoords_in, 1, coords_in, 1, ncoords_out, 1, out2 );
 
-    //  Select the axis with the largest shift as equivalent in world
-    //  coordinates.
+    /*  Select the axis with the largest shift as equivalent in world
+     *  coordinates. */
     caxis = axis;
     diff = 0.0;
     for ( i = 0; i < ncoords_out; i++ ) {
@@ -1455,8 +1476,8 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
         }
     }
 
-    //  Format the value along that axis, if requested, otherwise just write
-    //  out the double.
+    /*  Format the value along that axis, if requested, otherwise just write
+     *  out the double. */
     if ( formatted ) {
         *coord = (char *) astFormat( frameSet, caxis, out2[caxis - 1] );
     }
@@ -1476,7 +1497,7 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
         return TCL_ERROR;
     }
 
-    //  Add the axis units and label if requested.
+    /*  Add the axis units and label if requested. */
     if ( trailed ) {
         sprintf( buf, "unit(%d)", caxis );
         units = (char *) astGetC( frameSet, buf );
@@ -1486,7 +1507,7 @@ int gaiaNDFQueryCoord( int ndfid, int axis, double *coords, int trailed,
         *coord = buf;
     }
 
-    //  Restore the base frame.
+    /*  Restore the base frame. */
     astSetI( frameSet, "Base", base );
     frameSet = (AstFrameSet *) astAnnul( frameSet );
     emsRlse();

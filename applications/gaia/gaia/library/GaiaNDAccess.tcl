@@ -126,9 +126,10 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Get the dimensions of the full data. Returns a list of integers.
-   public method dims {} {
+   #  if trunc is true then any trailing redundant axes are trimmed.
+   public method getdims {trunc} {
       if { $dims_ == {} } {
-         set dims_ [${type_}::dims $handle_]
+         set dims_ [${type_}::getdims $handle_ $trunc]
       }
       return $dims_
    }
@@ -136,8 +137,8 @@ itcl::class gaia::GaiaNDAccess {
    #  Get the pixel ranges/bounds of the full data. Returns pairs of
    #  integers, one for each dimension. For FITS files the lower bound will
    #  always be 1.
-   public method bounds {} {
-      return [${type_}::bounds $handle_]
+   public method getbounds {} {
+      return [${type_}::getbounds $handle_]
    }
 
    #  Return the coordinate of a position along a given axis.
@@ -146,8 +147,8 @@ itcl::class gaia::GaiaNDAccess {
    #  needed to identify the coordinate, and an optional boolean arguments that
    #  determines whether to format the value (using astFormat) and if to add
    #  trailing label and units strings.
-   public method coord {axis indices {formatted 1} {trail 0} } {
-      return [${type_}::coord $handle_ $axis $indices $formatted $trail]
+   public method getcoord {axis indices {formatted 1} {trail 0} } {
+      return [${type_}::getcoord $handle_ $axis $indices $formatted $trail]
    }
 
    #  Map in the dataset "data component". Returns the address, number of
@@ -190,10 +191,12 @@ itcl::class gaia::GaiaNDAccess {
    #  (1,2,3). The alow and ahigh values define a range along the axis to
    #  extract (-1 for end points). The p1 and p2 positions, are grid
    #  coordinates of the spectrum along  the other two dimensions (increasing
-   #  dimension order). 
-   public method getspectrum {axis alow ahigh p1 p2} {
+   #  dimension order). The trunc argument provides for the removal of any
+   #  trailing redundant axes (that axes of size 1, the first three must be
+   #  significant).
+   public method getspectrum {axis alow ahigh p1 p2 trunc} {
       if { $addr_ != {} } {
-         set dims_ [dims]
+         set dims_ [getdims $trunc]
          lassign [eval "array::getspectrum $addr_ $hdstype_ $dims_ $axis \
                      $alow $ahigh $p1 $p2 $cnfmap_"] adr nel
          return "$adr $nel $hdstype_"
@@ -204,9 +207,11 @@ itcl::class gaia::GaiaNDAccess {
    #  and requires that the complete data are mapped first. The axis is the
    #  spectral axis along which the image will be extracted (1,2,3), the 
    #  index value selects the plane along that axis.
-   public method getimage {axis index} {
+   #  The trunc argument provides for the removal of any trailing redundant
+   #  axes (that axes of size 1, the first three must be significant).
+   public method getimage {axis index trunc} {
       if { $addr_ != {} } {
-         set dims_ [dims]
+         set dims_ [getdims $trunc]
          lassign [eval "array::getimage $addr_ $hdstype_ $dims_ $axis \
                      $index $cnfmap_"] adr nel
          return "$adr $nel $hdstype_"

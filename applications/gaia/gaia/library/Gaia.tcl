@@ -1161,7 +1161,7 @@ itcl::class gaia::Gaia {
       set rtdimage [$image_ get_image]
       set naxis3 [$rtdimage fits get NAXIS3]
       set naxis4 [$rtdimage fits get NAXIS4]
-      if { $naxis4 == {} && $naxis3 != {} } {
+      if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} } {
          set naxis1 [$rtdimage fits get NAXIS1]
          set naxis2 [$rtdimage fits get NAXIS2]
 

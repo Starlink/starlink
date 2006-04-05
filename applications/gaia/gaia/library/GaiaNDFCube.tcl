@@ -553,10 +553,23 @@ itcl::class gaia::GaiaNDFCube {
          $namer absolute
          set ndfname_ [$namer ndfname 0]
          $accessor_ configure -dataset "$ndfname_"
-         set bounds_ [$accessor_ bounds]
-         if { [llength $bounds_] != 6 } {
-            set ndims [expr [llength $bounds_]/2]
-            error_dialog "Not a cube, must have 3 dimensions (has $ndims)"
+         set bounds_ [$accessor_ getbounds]
+         set ndims [expr [llength $bounds_]/2]
+
+         #  Allow fourth dimension, as long as it is redundant.
+         if { $ndims == 4 } {
+            if { [expr [lindex $bounds_ 7] - [lindex $bounds_ 6]] == 0 } {
+               set close_section_ ",1)"
+               set bounds_ [lrange $bounds_ 0 5]
+               set ndims 3
+            }
+         } else {
+            #  Sections just close with parenthesis.
+            set close_section_ ")"
+         }
+         if { $ndims != 3 } {
+            error_dialog \
+               "Not a cube, must have 3 significant dimensions (has $ndims)"
             return
          }
          set axis_ 2
@@ -654,7 +667,7 @@ itcl::class gaia::GaiaNDFCube {
                set zo [lindex $bounds_ 4]
             }
             set zp [expr round($plane_+1-$zo)]
-            lassign [$accessor_ getimage $axis_ $zp] adr nel type
+            lassign [$accessor_ getimage $axis_ $zp 1] adr nel type
             $itk_option(-rtdimage) updateimagedata $adr
 
             # Release memory from last time and save pointer.
@@ -686,11 +699,11 @@ itcl::class gaia::GaiaNDFCube {
    protected method display_current_section_ {} {
 
       if { $axis_ == 1 } {
-         set section "($plane_,,)"
+         set section "($plane_,,$close_section_"
       } elseif { $axis_ == 2 } {
-         set section "(,$plane_,)"
+         set section "(,$plane_,$close_section_"
       } else {
-         set section "(,,$plane_)"
+         set section "(,,${plane_}${close_section_}"
       }
       display_ ${ndfname_}$section
 
@@ -721,7 +734,7 @@ itcl::class gaia::GaiaNDFCube {
    }
 
    #  Get the coordinate of an index along the current axis.
-      protected method get_coord_ {index {formatted 1} {trail 0}} {
+   protected method get_coord_ {index {formatted 1} {trail 0}} {
       #  Need index as a pixel coordinate.
       set pcoord [expr $index - 0.5]
       if { $axis_ == 1 } {
@@ -733,7 +746,7 @@ itcl::class gaia::GaiaNDFCube {
       }
       set coord {}
       catch {
-         set coord [$accessor_ coord $axis_ $section $formatted $trail]
+         set coord [$accessor_ getcoord $axis_ $section $formatted $trail]
       }
       return $coord
    }
@@ -761,7 +774,10 @@ itcl::class gaia::GaiaNDFCube {
       if { $afterId_ != {} } {
          after cancel $afterId_
          set afterId_ {}
-         puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+         if { [info exists spectrum_] } {
+            #  DEBUG.
+            puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
+         }
       }
       if { $dispsection } {
          display_current_section_
@@ -847,11 +863,11 @@ itcl::class gaia::GaiaNDFCube {
    protected method collapse_ {} {
       set range "$lower_collapse_bound_:$upper_collapse_bound_"
       if { $axis_ == 1 } {
-         set section "($range,,)"
+         set section "($range,,$close_section_"
       } elseif { $axis_ == 2 } {
-         set section "(,$range,)"
+         set section "(,$range,$close_section_"
       } else {
-         set section "(,,$range)"
+         set section "(,,${range}${close_section_}"
       }
 
       #  Now startup the COLLAPSE application.
@@ -960,11 +976,11 @@ itcl::class gaia::GaiaNDFCube {
          #  spectral axis.
          set range "$lower_collapse_bound_:$upper_collapse_bound_"
          if { $axis_ == 1 } {
-            set section "($range,$ix,$iy)"
+            set section "($range,$ix,${iy}${close_section_}"
          } elseif { $axis_ == 2 } {
-            set section "($ix,$range,$iy)"
+            set section "($ix,$range,${iy}${close_section_})"
          } else {
-            set section "($ix,$iy,$range)"
+            set section "($ix,$iy,${range}${close_section_}"
          }
 
          #  Send the section to SPLAT.
@@ -1177,6 +1193,10 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Memory used for last slice. Free this when not needed.
    protected variable last_slice_adr_ 0
+
+   #  The terminator characters for closing a section. May specify 
+   #  a final redundant axis.
+   protected variable close_section_ ")"
 
    #  Common variables: (shared by all instances)
    #  -----------------

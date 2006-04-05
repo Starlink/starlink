@@ -293,7 +293,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2] adr nel type
+      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr nel type
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {

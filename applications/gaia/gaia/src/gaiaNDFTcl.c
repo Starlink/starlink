@@ -53,23 +53,23 @@ static int importNdfIdentifier( Tcl_Interp *interp, Tcl_Obj *obj, int *indf );
  */
 int Ndf_Init( Tcl_Interp *interp )
 {
-    Tcl_CreateObjCommand( interp, "ndf::bounds", gaiaNDFTclBounds,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
     Tcl_CreateObjCommand( interp, "ndf::close", gaiaNDFTclClose,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
-    Tcl_CreateObjCommand( interp, "ndf::coord", gaiaNDFTclCoord,
-                          (ClientData) NULL,
-                          (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "ndf::dims", gaiaNDFTclDims,
+    Tcl_CreateObjCommand( interp, "ndf::getbounds", gaiaNDFTclBounds,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "ndf::getc", gaiaNDFTclCGet,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::getcoord", gaiaNDFTclCoord,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "ndf::getdims", gaiaNDFTclDims,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
@@ -374,7 +374,7 @@ static int gaiaNDFTclCGet( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Get the dimensions of an NDF. Returns a list of values, one for each NDF
- * dimension.
+ * dimension. Trailing redundant axes may be removed, if requested.
  */
 static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
                         int objc, Tcl_Obj *CONST objv[] )
@@ -386,10 +386,12 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
     int dims[NDF__MXDIM];
     int ndim;
     int result;
+    int trunc;
 
-    /* Check arguments, need the ndf identifier */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier" );
+    /* Check arguments, need the ndf identifier and whether to trim redundant
+     * axes. */
+    if ( objc != 2 && objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier [?trunc?]" );
         return TCL_ERROR;
     }
 
@@ -400,6 +402,24 @@ static int gaiaNDFTclDims( ClientData clientData, Tcl_Interp *interp,
         result = gaiaNDFQueryDims( indf, NDF__MXDIM, dims, &ndim,
                                    &error_mess );
         if ( result == TCL_OK ) {
+            
+            /* Need to truncate? */
+            trunc = 0;
+            if ( objc == 3 ) {
+                Tcl_GetBooleanFromObj( interp, objv[2], &trunc );
+            }
+            if ( trunc ) {
+                /* Remove any trailing dimensions of size 1, note always keep
+                 * at least one. */
+                for ( i = ndim - 1; i > 0; i-- ) {
+                    if ( dims[i] != 1 ) {
+                        ndim = i + 1;
+                        break;
+                    }
+                }
+            }
+
+            /* Add dimensions to result */
             for ( i = 0; i < ndim; i++ ) {
                 Tcl_ListObjAppendElement( interp, resultObj,
                                           Tcl_NewIntObj( dims[i] ) );
@@ -461,10 +481,11 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
  *
  * The second argument is the NDF identifier, the third the index of the axis,
  * and the fourth a list of all the pixel indices needed to identify the
- * coordinate (so the list must have a number for each dimension of the NDF).
- * The fifth argument defines whether to format the result (using astFormat),
- * otherwise it is returned as a double. The final is a boolean used to switch
- * on the addition of trailing label and units strings.
+ * coordinate (so the list must have a number for each dimension of the NDF if
+ * that isn'r true then any extra dimensions will be given the coordinate
+ * AST__BAD).  The fifth argument defines whether to format the result (using
+ * astFormat), otherwise it is returned as a double. The final is a boolean
+ * used to switch on the addition of trailing label and units strings.
  */
 static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                          int objc, Tcl_Obj *CONST objv[] )
