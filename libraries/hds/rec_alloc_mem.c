@@ -20,7 +20,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error codes                       */
 
-   int rec_alloc_mem( int size, void **pntr )
+   int rec_alloc_mem( size_t size, void **pntr )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -36,7 +36,7 @@
 /*    This function allocates memory for use as workspace.                  */
 
 /* Parameters:                                                              */
-/*    int size                                                              */
+/*    size_t size                                                           */
 /*       The amount of memory required, in bytes.                           */
 /*    void **pntr                                                           */
 /*       Address of a pointer to the allocated workspace. A null pointer    */
@@ -79,6 +79,8 @@
 /*       effectively.                                                       */
 /*    23-FEB-2006 (TIMJ):                                                   */
 /*       use starmem                                                        */
+/*    04-APR-2006 (TIMJ):                                                   */
+/*       use size_t                                                         */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -116,14 +118,14 @@
 /* required and allocate them from the global page pool.                    */
       if ( size >= REC__BIGMEM )
       {
-         npage = 1 + ( size - 1 ) / 512;
+	npage = 1 + ( (int)size - 1 ) / 512;
          systat = LIB$GET_VM_PAGE( &npage, &base );
 
 /* If an error occurred, set the global status and report it.               */
          if ( !( systat & STS$M_SUCCESS ) )
          {
             hds_gl_status = DAT__NOMEM;
-            ems_seti_c( "NBYTES", size );
+            emsSeti( "NBYTES", (int)size );
             emsSyser( "MESSAGE", systat );
             emsRep( "REC_ALLOC_MEM_1",
                        "Unable to obtain a block of ^NBYTES bytes of memory - \
@@ -144,14 +146,14 @@
 
 /* Allocate the required memory using malloc.                               */
       {
-         *pntr = starMalloc( (size_t) size );
+         *pntr = starMalloc( size );
 
 /* If allocation failed, then report an error.                              */
          if ( *pntr == NULL )
          {
             hds_gl_status = DAT__NOMEM;
             emsSyser( "MESSAGE", errno );
-            ems_seti_c( "NBYTES", size );
+            dat1emsSetBigu( "NBYTES", (UINT_BIG)size );
             emsRep( "REC_ALLOC_MEM_2",
                        "Unable to obtain a block of ^NBYTES bytes of memory - \
 ^MESSAGE",

@@ -18,7 +18,7 @@
 #include "dat_err.h"             /* DAT__ error code definitions            */
 #include "f77.h"                 /* Fortran <--> C interface facilities     */
 
-   int rec_deall_xmem( int size, void **pntr )
+   int rec_deall_xmem( size_t size, void **pntr )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -52,13 +52,36 @@
 /*    null (in the latter case the routine has no effect), since an invalid */
 /*    pointer value cannot be detected.                                     */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1999 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
 /*    16-FEB-1999 (RFWS):                                                   */
 /*       Original version, adapted from rec_deall_mem.                      */
+/*    04-APR-2006 (TIMJ):                                                   */
+/*       use size_t                                                         */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -90,7 +113,7 @@
 /* allocated and return them to the global page pool.                       */
       if ( size >= REC__BIGMEM )
       {
-         npage = 1 + ( size - 1 ) / 512;
+	npage = 1 + ( (int)size - 1 ) / 512;
          base = (unsigned int) *pntr;
          systat = LIB$FREE_VM_PAGE( &npage, &base );
 
@@ -100,7 +123,7 @@
          {
             emsBegin( &hds_gl_status );
             hds_gl_status = DAT__NOMEM;
-            ems_seti_c( "NBYTES", size );
+            emsSeti( "NBYTES", (int)size );
             emsSyser( "MESSAGE", systat );
             emsRep( "REC_DEALL_XMEM_1",
                        "Unable to release a block of ^NBYTES bytes of memory "

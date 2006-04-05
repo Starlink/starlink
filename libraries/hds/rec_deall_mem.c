@@ -18,7 +18,7 @@
 #include "rec1.h"                /* Internal rec_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
 
-   int rec_deall_mem( int size, void **pntr )
+   int rec_deall_mem( size_t size, void **pntr )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -35,7 +35,7 @@
 /*    rec_alloc_mem.                                                        */
 
 /* Parameters:                                                              */
-/*    int size                                                              */
+/*    size_t size                                                           */
 /*       The amount of memory allocated in bytes.                           */
 /*    void **pntr                                                           */
 /*       Address of a pointer to the allocated memory. A null pointer is    */
@@ -87,6 +87,8 @@
 /*       effectively.                                                       */
 /*    23-FEB-2006 (TIMJ):                                                   */
 /*       use starmem                                                        */
+/*    04-APR-2006 (TIMJ):                                                   */
+/*       use size_t                                                         */
 /*    {@enter_further_changes_here@}                                        */
 
 /* Bugs:                                                                    */
@@ -118,7 +120,7 @@
 /* allocated and return them to the global page pool.                       */
       if ( size >= REC__BIGMEM )
       {
-         npage = 1 + ( size - 1 ) / 512;
+	npage = 1 + ( (int)size - 1 ) / 512;
          base = (unsigned int) *pntr;
          systat = LIB$FREE_VM_PAGE( &npage, &base );
 
@@ -128,7 +130,7 @@
          {
             emsBegin( &hds_gl_status );
             hds_gl_status = DAT__NOMEM;
-            ems_seti_c( "NBYTES", size );
+            emsSeti( "NBYTES", (int)size );
             emsSyser( "MESSAGE", systat );
             emsRep( "REC_DEALL_MEM_1",
                        "Unable to release a block of ^NBYTES bytes of memory - \

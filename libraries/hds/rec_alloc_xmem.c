@@ -20,7 +20,7 @@
 #include "dat_err.h"             /* DAT__ error codes                       */
 #include "f77.h"                 /* Fortran <--> C interface facilities     */
 
-   int rec_alloc_xmem( int size, void **pntr )
+   int rec_alloc_xmem( size_t size, void **pntr )
    {
 /*+                                                                         */
 /* Name:                                                                    */
@@ -40,7 +40,7 @@
 /*    interface.                                                            */
 
 /* Parameters:                                                              */
-/*    int size                                                              */
+/*    size_t size                                                           */
 /*       The amount of memory required, in bytes.                           */
 /*    void **pntr                                                           */
 /*       Address of a pointer to the allocated workspace. A null pointer    */
@@ -50,13 +50,36 @@
 /*    int rec_alloc_xmem                                                    */
 /*       The global status value current on exit.                           */
 
+/* Copyright:                                                               */
+/*    Copyright (C) 1991 Science & Engineering Research Council             */
+/*    Copyright (C) 2006 Particle Physics and Astronomy Research Council    */
+
+/*  Licence:                                                                */
+/*     This program is free software; you can redistribute it and/or        */
+/*     modify it under the terms of the GNU General Public License as       */
+/*     published by the Free Software Foundation; either version 2 of       */
+/*     the License, or (at your option) any later version.                  */
+
+/*     This program is distributed in the hope that it will be              */
+/*     useful, but WITHOUT ANY WARRANTY; without even the implied           */
+/*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR              */
+/*     PURPOSE. See the GNU General Public License for more details.        */
+
+/*     You should have received a copy of the GNU General Public            */
+/*     License along with this program; if not, write to the Free           */
+/*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,       */
+/*     MA 02111-1307, USA                                                   */
+
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
+/*    TIMJ: Tim Jenness (JAC, Hawaii)                                       */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
 /*    16-FEB-1999 (RFWS):                                                   */
 /*       Original version, adapted from rec_alloc_mem.                      */
+/*    04-APR-2006 (TIMJ):                                                   */
+/*       use size_t                                                         */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -94,14 +117,14 @@
 /* required and allocate them from the global page pool.                    */
       if ( size >= REC__BIGMEM )
       {
-         npage = 1 + ( size - 1 ) / 512;
+	npage = 1 + ( (int)size - 1 ) / 512;
          systat = LIB$GET_VM_PAGE( &npage, &base );
 
 /* If an error occurred, set the global status and report it.               */
          if ( !( systat & STS$M_SUCCESS ) )
          {
             hds_gl_status = DAT__NOMEM;
-            ems_seti_c( "NBYTES", size );
+            emsSeti( "NBYTES", (int)size );
             emsSyser( "MESSAGE", systat );
             emsRep( "REC_ALLOC_XMEM_1",
                        "Unable to obtain a block of ^NBYTES bytes of memory - \
@@ -122,14 +145,14 @@
 
 /* Allocate the required memory using cnfMalloc, so that it is exportable. */
       {
-         *pntr = cnfMalloc( (size_t) size );
+         *pntr = cnfMalloc( size );
 
 /* If allocation failed, then report an error.                              */
          if ( *pntr == NULL )
          {
             hds_gl_status = DAT__NOMEM;
             emsSyser( "MESSAGE", errno );
-            ems_seti_c( "NBYTES", size );
+            dat1emsSetBigu( "NBYTES", (UINT_BIG)size );
             emsRep( "REC_ALLOC_XMEM_2",
                        "Unable to obtain a block of ^NBYTES bytes of memory "
                        "- ^MESSAGE", &hds_gl_status );
