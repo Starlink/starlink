@@ -176,6 +176,7 @@ int cupidCFErode( CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet
 int cupidCFXtend( CupidPixelSet *, CupidPixelSet *, int *, int, int *, int[3], int, CupidPixelSet ** );
 int cupidConfigI( AstKeyMap *, const char *, int );
 int cupidRFillClumps( int *, int *, int, int, int[ 3 ], int[ 3 ], int );
+int cupidDefMinPix( int, double *, double, double );
 void cupidCFAddPixel( int *, CupidPixelSet *, int, int[3], double, int );
 void cupidCFMerge( CupidPixelSet *, CupidPixelSet *, int *, int[3], int *, int **, int, CupidPixelSet ** );
 void cupidCFNebs( int *, int, int x[], int, int [3], int[3], int, int, int *, int *, int[27], int *, int *, CupidPixelSet ** );

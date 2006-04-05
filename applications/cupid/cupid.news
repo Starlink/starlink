@@ -7,6 +7,14 @@
  data arrays.
 
 
+Changes introduced at V0.0-10:
+
+ - The default value for the MinPix configuration parameter (that
+ specified the minimum number of pixels in a clump) has been modified
+ so that it corresponds to one beam area. However, if the beam area is 
+ less than 16 pixels, then the old default of 16 is retained.
+
+
 Changes introduced at V0.0-9:
 
  - A further filter is now applied to the clump list to reject clumps

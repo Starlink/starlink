@@ -180,7 +180,6 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get various configuration parameters. */
    rms = cupidConfigD( rconfig, "RMS", rms );
    minlen = cupidConfigI( rconfig, "MINLEN", 4 );
-   minpix = cupidConfigI( rconfig, "MINPIX", 16 );
    noise = cupidConfigD( rconfig, "NOISE", 2*rms );
    thresh = cupidConfigD( rconfig, "THRESH", noise + 2*rms );
    flatslope = cupidConfigD( rconfig, "FLATSLOPE", rms );
@@ -188,6 +187,10 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh );
    caiter = cupidConfigI( rconfig, "CAITERATIONS", 1 );
    fixiter = cupidConfigI( rconfig, "FIXCLUMPSITERATIONS", 1 );
+
+/* Get the minimum allowed number of pixels in a clump. */
+   minpix = cupidDefMinPix( ndim, beamcorr, noise, thresh );
+   minpix = cupidConfigI( rconfig, "MINPIX", minpix );
 
 /* Convert CATHRESH from a number of pixels to a fraction. */
    cathresh = cathresh/pow( 3, ndim );

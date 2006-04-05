@@ -235,9 +235,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    igood = astMalloc( sizeof( int )*( maxid + 1 ) );
    if( cubnd ) {
 
-/* Get the minimum allowed number of pixels in a clump. */
-      minpix = cupidConfigI( fwconfig, "MINPIX", 16 );
-
 /* Get the lowest data value to be considered. */
       noise = cupidConfigD( config, "NOISE", 2.0*rms );
 
@@ -247,6 +244,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the lowest allowed clump peak value. */
       minhgt = cupidConfigD( fwconfig, "MINHEIGHT", mindip + noise );
+
+/* Get the minimum allowed number of pixels in a clump. */
+      minpix = cupidDefMinPix( ndim, beamcorr, noise, minhgt );
+      minpix = cupidConfigI( fwconfig, "MINPIX", minpix );
 
 /* Initialise a list to hold zero for every clump id. These values are
    used to count the number of pixels remaining in each clump. Also

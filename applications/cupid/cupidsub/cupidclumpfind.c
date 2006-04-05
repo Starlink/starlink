@@ -253,7 +253,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       if( ilevel > 1 ) msgBlank( status );
 
 /* Get the minimum number of pixels allowed in a clump.*/
-      minpix = cupidConfigI( cfconfig, "MINPIX", 16 );
+      minpix = cupidDefMinPix( ndim, beamcorr, levels[ nlevels - 1 ],
+                                               levels[ nlevels - 2 ] );
+      minpix = cupidConfigI( cfconfig, "MINPIX", minpix );
 
 /* Loop round each clump */
       nminpix = 0;

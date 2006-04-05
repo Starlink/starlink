@@ -1,16 +1,16 @@
-#include "sae_par.h"
-#include "mers.h"
-#include "ndf.h"
-#include "star/ndg.h"
-#include "ast.h"
-#include "star/kaplibs.h"
-#include "star/grp.h"
-#include "star/hds.h"
-#include "par.h"
+#include "sae_par.h" 
+#include "mers.h" 
+#include "ndf.h" 
+#include "star/ndg.h" 
+#include "ast.h" 
+#include "star/kaplibs.h" 
+#include "star/grp.h" 
+#include "star/hds.h" 
+#include "par.h" 
 #include "prm_par.h"
-#include "cupid.h"
-#include <math.h>
-#include <string.h>
+#include "cupid.h" 
+#include <math.h> 
+#include <string.h> 
 #include <stdio.h>
 
 
@@ -392,7 +392,10 @@ void clumps() {
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
-*     as real clumps. [16]
+*     as real clumps. The default value is based on the supplied values
+*     for the other parameters that specify the minimum peak height, the
+*     background level and the instrumental beam widths, limited to be at
+*     least 16 pixels. []
 *     - ClumpFind.Naxis: Controls the way in which contiguous areas of
 *     pixels are located when contouring the data. When a pixel is found
 *     to be at or above a contour level, the adjacent pixels are also checked.
@@ -438,7 +441,10 @@ void clumps() {
 *     - Reinhold.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
-*     as real clumps. [16]
+*     as real clumps. The default value is based on the supplied values
+*     for the other parameters that specify the minimum peak height, the
+*     background level and the instrumental beam widths, limited to be at
+*     least 16 pixels. []
 *     - Reinhold.Noise: Defines the data value below which pixels are 
 *     considered to be in the noise. A peak is considered to end when the 
 *     peak value dips below the "noise" value. [2*RMS]
@@ -495,7 +501,10 @@ void clumps() {
 *     - FellWalker.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
-*     as real clumps. [16]
+*     as real clumps. The default value is based on the supplied values
+*     for the other parameters that specify the minimum peak height, the
+*     background level and the instrumental beam widths, limited to be at
+*     least 16 pixels. []
 *     - FellWalker.MaxJump: Defines the extent of the neighbourhood about a
 *     local maximum which is checked for higher pixel values. The
 *     neighbourhood checked is  square or cube with side equal to twice the

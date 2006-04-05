@@ -24,7 +24,7 @@ cupidcfdeleteps.c cupidcffreeps.c cupidcfxfer.c cupidcfaddpixel.c \
 cupidcflevels.c cupiddumpi.c cupidclumpdesc.c cupidcfnebs.c \
 cupidcfmakeps.c cupidreinhold.c cupidredges.c cupidrca.c \
 cupidrfillline.c cupidrfillclumps.c cupidrca2.c cupidfellwalker.c \
-cupidgcndfclump.c $(BUILT_C_ROUTINES)
+cupidgcndfclump.c cupiddefminpix.c $(BUILT_C_ROUTINES)
 
 noinst_LTLIBRARIES = libcupidsub.la
 
