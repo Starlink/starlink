@@ -10,7 +10,7 @@
 void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
                     int ndim, int *lbox, int *ubox, int list_size, 
                     double *mlist, int *plist, int *lbnd, int iclump,
-                    int *dax, AstKeyMap *extra ){
+                    int *dax, AstKeyMap *extra, int bad ){
 /*
 *  Name:
 *     cupidGCNdfClump
@@ -22,7 +22,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *     void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms, 
 *                         int ndim, int *lbox, int *ubox, int list_size, 
 *                         double *mlist, int *plist, int *lbnd, int iclump,
-*                         int *dax, AstKeyMap *extra )
+*                         int *dax, AstKeyMap *extra, int bad )
 
 *  Description:
 *     This function creates a temporary NDF and stores the integrated 
@@ -94,6 +94,9 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *     extra
 *        An AstKeyMap holding extra diagnositic information to add to the
 *        clump structure.
+*     bad
+*        Set the Unit component of the NDF to "BAD". This is used as a
+*        flag to indicate that the clump touches any areas of bad
 
 *  Authors:
 *     DSB: David S. Berry
@@ -323,6 +326,9 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 /* Release the extension locator. */
       datAnnul( &xloc, status );
    }
+
+/* If requiredm set the Unit component to "BAD". */
+   if( bad ) ndfCput( "BAD", indf, "Unit", status );
 
 /* End the NDF context */
    ndfEnd( status );

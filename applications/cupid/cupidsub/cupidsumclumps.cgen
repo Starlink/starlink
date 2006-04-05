@@ -88,6 +88,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 /* Local Variables: */
    CGEN_TYPE *pd;       /* Pointer to next element of the "out" array */
    HDSLoc *cloc;        /* Locator for a cell of the NDF array */
+   char unit[ 10 ];     /* NDF Unit component */
    double *ipd;         /* Pointer to data array in clump NDF */
    double *m;           /* Pointer to next clump data value */
    float *r;            /* Pointer to next element of the "rmask" array */
@@ -95,6 +96,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    int alg;             /* Specifies the algorithm */
    int cdim[ 3 ];       /* Pixel axis dimensions within clump NDF */
    int clbnd[ 3 ];      /* Lower pixel bounds of clump NDF */
+   int clump_index;     /* Index for current clump */
    int cndim;           /* Number of pixel axes in clump NDF */
    int cubnd[ 3 ];      /* Upper pixel bounds of clump NDF */
    int el;              /* Number of pixels in clump NDF */
@@ -166,6 +168,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
    }
 
 /* Loop round all non-NULL clumps. */
+   clump_index = 0;
    datSize( obj, (size_t *) &nclump, status );
    for( j = 1; j <= nclump; j++ ) {
       cloc = NULL;
@@ -176,6 +179,17 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
       datAnnul( &cloc, status );
 
       if( indf == NDF__NOID ) continue;
+
+/* Also ignore any NDFs which have a value of "BAD" for thr "Unit"
+   component. This isused as a flag for unusable clumps (e.g. clumps
+   that are smaller than the beam width or that touch areas of bad
+   pixels). */
+      unit[ 0 ]= 0;
+      ndfCget( indf, "Unit", unit, 9, status );
+      if( !strcmp( unit, "BAD" ) ) continue;
+
+/* Increment the index to associate with this clump. */
+      clump_index++;
 
 /* Get the bounds and dimensions of the clump's NDF. */
       ndfBound( indf, 3, clbnd, cubnd, &cndim, status );
@@ -212,7 +226,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
 /* For ClumpFind, etc, store the clump index. */
                   } else {
-                     pi[ ii ] = j;
+                     pi[ ii ] = clump_index;
                   }               
                }
          

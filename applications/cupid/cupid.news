@@ -14,6 +14,8 @@ Changes introduced at V0.0-10:
  so that it corresponds to one beam area. However, if the beam area is 
  less than 16 pixels, then the old default of 16 is retained.
 
+ - Clumps are now rejected if they touch or contain any bad pixels.
+
 
 Changes introduced at V0.0-9:
 

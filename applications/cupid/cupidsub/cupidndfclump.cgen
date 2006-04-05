@@ -77,6 +77,8 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 *     An HDS locator to the array of NDFs.
 
 *  Notes:
+*     - The returned NDF will have its Unit component set to BAD if the
+*     clump touches any areas of bad pixels in the input data array.
 *     - This function can be invoked using the generic cupidNdfClump macro 
 *     defined in cupid.h. This macro has the same parameter list as 
 *     cupidNdfClump<X> except that an extra parameter is added to the start 
@@ -106,6 +108,7 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
    double *out;              /* Pointer to output NDF Data array */
    double *pout;             /* Pointer to next output pixel */
    double dval;              /* Double value to store */
+   int bad;                  /* Does the clump touch any areas of bad pixels?*/
    int el;                   /* Number of elements mapped */
    int i;                    /* KeyMap index */
    int indf;                 /* NDF identifier */
@@ -173,6 +176,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* Store a pointer to the next output pixel value */
       pout = out;
 
+/* Assume the clump does not touch any areas of bad pixels. */
+      bad = 0;
+
 /* Step round every pixel within the clump bounding box. (ix,iy,iz)
    represent GRID indices within the input array. */
       for( iz = clbnd[ 2 ]; iz <= cubnd[ 2 ]; iz++ ) {
@@ -184,6 +190,17 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 /* If this pixel is in the clump, store the input data in the output.*/
                if( ipa[ ivinx ] == index ) {
                   *pout = ipd[ ivinx ];
+
+/* Check the input data pixel on either side of the current pixel on the
+   first pixel axis. If either is bad, set a flag indicating that the
+   clump touches an area of bad pixels. We assume that no clumps touch the 
+   edge of the main array (meaning we do not need to check ivinx). */
+                  if( !bad ) {
+                     if( ipd[ ivinx - 1 ] == CGEN_BAD ||
+                         ipd[ ivinx + 1 ] == CGEN_BAD ) bad = 1;
+                  }             
+
+/* If this pixel is in the clump, store a bad value in the output.*/
                } else {                  
                   *pout = VAL__BADD;
                }
@@ -201,6 +218,10 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* Unmap the NDFs Data array. */
       ndfUnmap( indf, "DATA", status );
+
+/* If the clump touches any areas of bad pixels, set the NDFs Unit
+   component to "BAD". */
+      if( bad ) ndfCput( "BAD", indf, "Unit", status );
    }
 
 /* If required, create a Cupid extension in the NDF, storing any extra 

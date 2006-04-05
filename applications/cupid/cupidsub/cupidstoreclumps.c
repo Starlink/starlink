@@ -76,6 +76,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    HDSLoc *ncloc;               /* Locator for array cell */
    HDSLoc *cloc;                /* Locator for array cell */
    HDSLoc *dloc;                /* Locator for cell value */
+   char unit[ 10 ];             /* String for NDF Unit component */
    char attr[ 15 ];             /* AST attribute name */
    char cat[ MAXCAT + 1 ];      /* Catalogue name */
    const char *dom;             /* Pointer to domain string */
@@ -84,18 +85,20 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    double *t;                   /* Pointer to next table value */
    double *tj;                  /* Pointer to next table entry to write*/
    double *tab;                 /* Pointer to catalogue table */
+   int bad;                     /* Does clump touch an area of bad pixels? */
    int i;                       /* Index of next locator */
-   int icol;                    /* Zero based column index */
    int iclump;                  /* Usable clump index */
-   int indf;                    /* Identifier for supplied NDF */
-   int indf2;                   /* Identifier for copied NDF */
-   int irow;                    /* One-based row index */
-   int ncpar;                   /* Number of clump parameters */
+   int icol;                    /* Zero based column index */
    int ifrm;                    /* Frame index */
+   int indf2;                   /* Identifier for copied NDF */
+   int indf;                    /* Identifier for supplied NDF */
+   int irow;                    /* One-based row index */
+   int nbad;                    /* No. of clumps touching an area of bad pixels */
+   int ncpar;                   /* Number of clump parameters */
    int nfrm;                    /* Total number of Frames */
    int nndf;                    /* Total number of NDFs */
-   int nbad;                    /* No. of clumps smaller than the beam size */
-   int ok;                      /* Is the clump larger than the beam size? */
+   int nsmall;                  /* No. of clumps smaller than the beam size */
+   int ok;                      /* Is the clump usable? */
    int place;                   /* Place holder for copied NDF */
    int there;                   /* Does component exist?*/
 
@@ -122,6 +125,10 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    cpars = NULL;
 
 /* Indicate we have not yet found any clumps smaller than the beam size. */
+   nsmall = 0;
+
+/* Indicate we have not yet found any clumps that touch any areas of
+   bad pixels. */
    nbad = 0;
 
 /* Number of CLUMP structures created so far. */
@@ -146,6 +153,18 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       if( indf != NDF__NOID ) {
          irow++;
 
+/* The Unit component of the NDF will be set to "BAD" if the clump
+   touches any areas of bad pixels in the input data array. Count how
+   many of these clumps there are. */
+         unit[ 0 ] = 0;
+         ndfCget( indf, "Unit", unit, 9, status );
+         if( !strcmp( unit, "BAD" ) ){
+            bad = 1;
+            nbad++;
+         } else {
+            bad = 0;
+         }
+
 /* Calculate the clump parameters from the clump data values stored in the 
    NDF. This allocates memory if needed, and also returns some global
    information which is the same for every clump (the parameter names, the 
@@ -160,8 +179,16 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          if( !tab ) tab = astMalloc( sizeof(double)*nndf*ncpar );
          if( tab ) {
 
-/* Count the number of lumps which are smaller than the beam size. */
-            if( !ok ) nbad++;
+/* Count the number of lumps which are smaller than the beam size. Also
+   set the Unit component of the NDF to "BAD" to indicate that the clump
+   shouldnot be used. */
+            if( bad ){
+               ok = 0;
+
+            } else if( !ok ) {
+               ndfCput( "BAD", indf, "Unit", status );
+               nsmall++;
+            }
 
 /* Put the clump parameters into the table. Store bad values if the clump
    is too small. */
@@ -205,13 +232,23 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Tell the user how many usable clumps there are and how many were rejected 
    due to being smaller than the beam size. */
    if( ilevel > 1 ) {
-      if( nbad == 1 ) {
+
+      if( nsmall == 1 ) {
          msgOut( "", "1 further clump rejected because it "
                  "is smaller than the beam width.", status );
-      } else if( nbad > 1 ) {
-         msgSeti( "N", nbad );
+      } else if( nsmall > 1 ) {
+         msgSeti( "N", nsmall );
          msgOut( "", "^N further clumps rejected because "
                  "they are smaller than the beam width.", status );
+      }
+
+      if( nbad == 1 ) {
+         msgOut( "", "1 further clump rejected because it touches "
+                 "an area of bad pixels.", status );
+      } else if( nbad > 1 ) {
+         msgSeti( "N", nbad );
+         msgOut( "", "^N further clumps rejected because they touch "
+                 "areas of bad pixels.", status );
       }
    }
 
@@ -228,7 +265,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    }
 
 /* Resize the array pf clump structures */
-   if( aloc && nbad > 0 ) datAlter( aloc, 1, &iclump, status );
+   if( aloc && iclump < nndf ) datAlter( aloc, 1, &iclump, status );
 
 /* See if an output catalogue is to be created. If not, annull the null
    parameter error. */

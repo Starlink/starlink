@@ -74,6 +74,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        new NDF in the array describes the supplied clump. If the
 *        supplied pointer is NULL, no HDS array or NDF is created. No NDF
 *        is created for clumps which touch the edge of the data array.
+*        The new NDF will have a Unit value of"BAD" if the clump touches
+*        any areas of bad pixel sin the supplied data array.
 *     iclump
 *        Clump index.
 *     diag
@@ -125,6 +127,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    int *pnext;            /* Pointer to next element in plist */
    int area;              /* Total area of clump in pixels */
    int area_off;          /* Area of clump outside the data array, in pixels */
+   int bad;               /* Does the clump include any bad pixels? */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
@@ -190,6 +193,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
 /* Now loop over increasingly larger layers until a layer is found over which 
    the model Gaussian does not exceed the user-supplied limit. */   
+   bad = 0;
    more = 1;
    first = 1;
    peakok = 0;
@@ -277,6 +281,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Subtract the model value from the residuals (if good). */
                         if( res && res[ j ] != CGEN_BAD ) res[ j ] -= (CGEN_TYPE) m;
 
+/* Set a flag if the corresponding input data pixel is bad. */
+                        if( ipd && ipd[ j ] == CGEN_BAD ) bad = 1;
+
 /* Add this model value and its associated pixel indices into the lists */
                         ilist = list_size++;
                         mlist = astGrow( mlist, list_size, sizeof( double ) );
@@ -360,8 +367,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
       msgOut( "", "   Integrated clump intensity: ^V (in ^N pixels)", status );
 
       if( area_off ) {
-         msgSeti( "N", area_off );
          msgOut( "", "   (the clump overlaps the edge of the data array)", status );
+      }else if( bad ) {
+         msgOut( "", "   (the clump touches an area of bad pixels)", status );
       }
    }
 
@@ -421,7 +429,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Create the NDF. */
       cupidGCNdfClump( ndfs, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
-                       extra );
+                       extra, bad );
 
 /* Free resources */
       if( extra ) extra = astAnnul( extra );

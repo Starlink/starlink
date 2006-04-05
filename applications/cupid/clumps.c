@@ -826,17 +826,25 @@ void clumps() {
          ndfDelet( &indf2, status );
       }
 
+/* Create a CUPID extension in the output NDF. */
+      ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
+
+/* Store the clump properties in the CUPID extension and output catalogue
+   (if needed). This may reject further clumps (such clumps will have the
+   "Unit" component set to "BAD"). */
+      ndfState( indf, "WCS", &gotwcs, status );
+      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
+                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL,
+                        ilevel );
+
 /* Allocate room for a mask holding bad values for points which are not 
    inside any clump. */
       rmask = astMalloc( sizeof( float )*(size_t) el );
 
 /* Create any output NDF by summing the contents of the NDFs describing the 
-   found clumps. This also fills the above mask array. */
+   found and usable clumps. This also fills the above mask array. */
       cupidSumClumps( type, ipd, ilevel, nsig, slbnd, subnd, el, ndfs, 
                       rmask, ipo, method );
-
-/* Create a CUPID extension in the output NDF. */
-      ndfXnew( indf2, "CUPID", "CUPID_EXT", 0, NULL, &xloc, status );
 
 /* Delete any existing quality name information from the output NDF, and 
    create a structure to hold new quality name info. */
@@ -863,13 +871,6 @@ void clumps() {
          astAnnul( config2 );
          astAnnul( config );
       }
-
-/* Store the clump properties in the CUPID extension and output catalogue
-   (if needed). */
-      ndfState( indf, "WCS", &gotwcs, status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
-                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL,
-                        ilevel );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );

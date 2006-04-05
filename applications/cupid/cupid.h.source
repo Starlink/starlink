@@ -185,7 +185,7 @@ void cupidDatCopy( HDSLoc *, HDSLoc * );
 void cupidDumpD( double *, int, int *, int * );
 void cupidDumpI( int *, int, int *, int * );
 void cupidGCListClump( int, int, double *, double, int *, int, double );
-void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap * );
+void cupidGCNdfClump( HDSLoc **, double, double *, double, int, int *, int *, int, double *, int *, int *, int, int *, AstKeyMap *, int );
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );
 void cupidREdges( int, double *, int *, int *, int, double, double, double, double );
