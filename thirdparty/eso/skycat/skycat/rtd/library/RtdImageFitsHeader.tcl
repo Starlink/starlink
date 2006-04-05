@@ -10,6 +10,7 @@
 # pbiereic    14/08/01   Created
 # pbiereic    17/02/03   fixed problems with tabnotebook, packing order
 #                        and labels of tabsets
+# pdraper     05/04/06   treat HISTORY like COMMENT
 
 itk::usual RtdImageFitsHeader {}
 
@@ -338,6 +339,9 @@ itcl::class rtd::RtdImageFitsHeader {
 	set key [string range $line 0 6]
 	if { [lempty $key] || "$key" == "COMMENT" } {
 	    return [list COMMENT {} [string trim [string range $line 7 end]]]
+	}
+	if { [lempty $key] || "$key" == "HISTORY" } {
+            return [list HISTORY {} [string trim [string range $line 7 end]]]
 	}
 	lassign [split $line =] l1 l2
 	if { [lempty $l1] } { return "" }
