@@ -6,25 +6,14 @@ use Config;
 use strict;
 use vars qw/ %StarConfig /;
 
-# For location of Starlink libraries and incs - unless $ENV{STARLINK}
-if (exists $ENV{STARLINK}) {
-    print "Using \$STARLINK override of $ENV{STARLINK}\n";
-    %StarConfig = (
-		   Star_Inc => $ENV{STARLINK}.'/include',
-		   Star_Lib => $ENV{STARLINK}.'/lib',
-		  );
-} else {
-  # Try looking up the config system
-  eval "use Starlink::Config;";
-  if ($@) {
-    print "Could not find Starlink::Config - using /star\n";
-    %StarConfig = (
-		   Star_Inc => '/star/include',
-		   Star_Lib => '/star/lib',
-		  );
-  } else {
-    print "Found Starlink in $StarConfig{Star}\n";
-  }
+# Try looking up the config system
+eval "use Starlink::Config qw/ :override :verbose/;";
+if ($@) {
+  print "Could not find Starlink::Config - using /star\n";
+  %StarConfig = (
+		 Star_Inc => '/star/include',
+		 Star_Lib => '/star/lib',
+		);
 }
 
 # This is the list of libraries required to use ems

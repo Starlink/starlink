@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 # For location of Starlink libraries and incs
-eval "use Starlink::Config;";
+eval "use Starlink::Config qw/ :override :verbose /;";
 if ($@) {
   print "Could not find Starlink::Config - using /star\n";
   %StarConfig = (
