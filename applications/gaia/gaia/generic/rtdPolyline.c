@@ -831,11 +831,14 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
      * coordinate, then we draw the polyline piece-by-piece. Note breaks are
      * not possible for lines that are smoothed.
      */
-    if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
-        numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
-                                      linePtr->numPoints,
-                                      linePtr->splineSteps, pointPtr,
-                                      (double *) NULL);
+    if ( ( linePtr->smooth) && ( linePtr->numPoints > 2 ) ) {
+        numPoints = TkMakeBezierCurve( canvas, linePtr->coordPtr,
+                                       linePtr->numPoints,
+                                       linePtr->splineSteps, pointPtr,
+                                       (double *) NULL );
+
+        XDrawLines( display, drawable, linePtr->gc, pointPtr, numPoints,
+                    CoordModeOrigin );
     } else {
         int count = 0;
         pPtr = pointPtr;
