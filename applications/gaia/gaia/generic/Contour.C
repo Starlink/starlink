@@ -232,7 +232,7 @@ void Contour::setPrefs( const char *prefs[], const int nprefs )
    if ( nprefs > 0 ) {
       prefs_ = new char *[nprefs];
       for ( int i = 0; i < nprefs; i++ ) {
-         prefs_[i] = new char[strlen(prefs[i])];
+         prefs_[i] = new char[strlen(prefs[i])+1];
          strcpy( prefs_[i], prefs[i] );
       }
       nprefs_ = nprefs;
@@ -263,7 +263,7 @@ char *Contour::getPrefs( const int ipref )
       if ( userBuffer_ != (char *) NULL ) {
          delete userBuffer_;
       }
-      userBuffer_ = new char[strlen(prefs_[ipref])];
+      userBuffer_ = new char[strlen(prefs_[ipref])+1];
       return userBuffer_;
    }
    return NULL;
