@@ -68,7 +68,7 @@
 #include <define.h>  //  From skycat util
 
 #include <cstring>
-#include <ostream>
+#include <iostream>
 #include <sstream>
 #include <cstdlib>
 #include <cctype>
