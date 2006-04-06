@@ -197,3 +197,4 @@ void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, 
 void clumps( void );
 void cupidhelp( void );
 void makeclumps( void );
+void makesnr( void );

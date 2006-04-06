@@ -13,6 +13,18 @@ Changes introduced at V0.0-11:
  algorithms. It specified the maximum number of bad pixels which may 
  adjoin a clump. If this number is exceeded, the clump is excluded.
 
+ - A new application called "makesnr" has been added to the cupid
+ package. This creates a signal-to-noise NDF by dividing the Data array
+ of the input NDF by the square root of its Variance array. Pixels with
+ Variances below a given value are set bad in the output. The cleverness
+ lies in the choice of the default value for this limit Variance value.
+ This application has been added to facilitate running the CLUMPS command
+ on a signal-to-noise array rather than a simple signal array, thus
+ allowing spatial variation in the noise level to be taken into account
+ when finding clumps. If the data is going to be smoothed before finding
+ clumps, the smoothing should be applied to the SNR array rather than the
+ original array.
+
 
 Changes introduced at V0.0-10:
 

@@ -20,7 +20,7 @@ cupid_mon_SOURCES = \
 
 cupid_mon_LDADD = $(LDADD) cupidsub/libcupidsub.la `$(srcdir)/cupid_link_adam`
 ## cupid_mon_LDFLAGS = -static
-cupid_mon_TASKS = clumps cupidhelp makeclumps
+cupid_mon_TASKS = clumps cupidhelp makeclumps makesnr
 
 CSRC = 
 
@@ -89,9 +89,9 @@ dist_starnews_DATA = cupid.news
 MISC_FILES = dtask_applic.lo cupid.shl history.help \
 cupid_mon version.dat cupid.csh cupid.icl cupid.sh
 
-IFC_FILES = clumps.ifc makeclumps.ifc cupidhelp.ifc cupid_mon.ifc
+IFC_FILES = clumps.ifc makeclumps.ifc makesnr.ifc cupidhelp.ifc cupid_mon.ifc
 
-IFL_FILES = clumps.ifl makeclumps.ifl cupidhelp.ifl cupid_mon.ifl
+IFL_FILES = $(IFC_FILES:.ifc=.ifl) 
 
 MAINTAINERCLEANFILES = cupid.h 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES) cupid.h
