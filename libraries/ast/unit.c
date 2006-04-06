@@ -55,6 +55,8 @@
 *        insensitive match for multiplier/unit label.
 *     1-MAR-2006 (DSB):
 *        Replace astSetPermMap within DEBUG blocks by astBeginPM/astEndPM.
+*     6-APR-2006 (DSB):
+*        Modify CleanExp to convert "MJY/STER" to standard form ("MJy/sr").
 */
 
 /* Module Macros. */
@@ -213,6 +215,7 @@ static int ReplaceNode( UnitNode *, UnitNode *, UnitNode * );
 static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
 static int DimAnal( UnitNode *, double[NQUANT], double * );
+static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
 static int SplitUnit( const char *, int, const char *, int, Multiplier **, int * );
 static UnitNode *ModifyPrefix( UnitNode * );
@@ -380,6 +383,17 @@ static const char *CleanExp( const char *exp ) {
             t = astFree( t );
          }
          l = s - t + 11;
+
+/* Convert "STER" to "sr". */
+      } else if( !Ustrcmp( t, "STER" ) ) {
+         tok[ i ] = astStore( NULL, "sr", 3 );
+         l = 2;
+         t = astFree( t );
+
+/* If the word ends with "JY" and is preceeded by a single character, change 
+   to "<start>Jy". Should be OK for things like "MJY". */
+      } else if( l == 3 && !strcmp( t + 1, "JY" ) ) {
+         tok[ i ][ 2 ] = 'y';
 
 /* If the word begins with "nano" (case-insensitive) change "nano" to
    "n". Such changes are usually handled by SplitUnit, but we need to
@@ -5693,6 +5707,89 @@ const char *astUnitNormaliser_( const char *in ){
    return result;
 }
 
+static int Ustrcmp( const char *a, const char *b ){
+/*
+*  Name:
+*     Ustrcmp
+
+*  Purpose:
+*     A case blind version of strcmp.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     static int Ustrcmp( const char *a, const char *b )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     Returns 0 if there are no differences between the two strings, and 1 
+*     otherwise. Comparisons are case blind.
+
+*  Parameters:
+*     a
+*        Pointer to first string.
+*     b
+*        Pointer to second string.
+
+*  Returned Value:
+*     Zero if the strings match, otherwise one.
+
+*  Notes:
+*     -  This function does not consider the sign of the difference between
+*     the two strings, whereas "strcmp" does.
+*     -  This function attempts to execute even if an error has occurred. 
+
+*/
+
+/* Local Variables: */
+   const char *aa;         /* Pointer to next "a" character */
+   const char *bb;         /* Pointer to next "b" character */
+   int ret;                /* Returned value */
+
+/* Initialise the returned value to indicate that the strings match. */
+   ret = 0;
+
+/* Initialise pointers to the start of each string. */
+   aa = a;
+   bb = b;
+
+/* Loop round each character. */
+   while( 1 ){
+
+/* We leave the loop if either of the strings has been exhausted. */
+      if( !(*aa ) || !(*bb) ){
+
+/* If one of the strings has not been exhausted, indicate that the
+   strings are different. */
+         if( *aa || *bb ) ret = 1;
+
+/* Break out of the loop. */
+         break;
+
+/* If neither string has been exhausted, convert the next characters to
+   upper case and compare them, incrementing the pointers to the next
+   characters at the same time. If they are different, break out of the
+   loop. */
+      } else {
+
+         if( toupper( (int) *(aa++) ) != toupper( (int) *(bb++) ) ){
+            ret = 1;
+            break;
+         }
+
+      }
+
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
 static int Ustrncmp( const char *a, const char *b, size_t n ){
 /*
 *  Name:
@@ -5709,7 +5806,7 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 *     static int Ustrncmp( const char *a, const char *b, size_t n )
 
 *  Class Membership:
-*     UNit member function.
+*     Unit member function.
 
 *  Description:
 *     Returns 0 if there are no differences between the first "n"
