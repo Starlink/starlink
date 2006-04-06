@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     newda = smf_deepcopy_smfDA( const smfDA *oldda, int * status );
+*     newda = smf_deepcopy_smfDA( const smfData *old, int * status );
 
 *  Arguments:
-*     old = const smfDA* (Given)
-*        Pointer to smfDA to be copied
+*     old = const smfData* (Given)
+*        Pointer to smfData containing smfDA to be copied
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -40,6 +40,8 @@
 *  History:
 *     2006-03-29 (AGG):
 *        Initial version.
+*     2006-04-05 (AGG):
+*        Change API to accept a smfData instead of smfDA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,22 +86,37 @@
 #define FUNC_NAME "smf_deepcopy_smfDA"
 
 smfDA *
-smf_deepcopy_smfDA( const smfDA *oldda, int * status ) {
+smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
 
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN];/* name of flatfield algorithm */
   int nflat;              /* number of flat coeffs per bol */
+  int nbol;               /* Number of bolometers */
 
   smfDA *newda = NULL;             /* Pointer to new smfDA struct */
+  smfDA *oldda = NULL;             /* Pointer to new smfDA struct */
 
   if (*status != SAI__OK) return NULL;
 
+  /* Retrieve smfDA to copy */
+  oldda = old->da;
+
   /* Copy elements */
-  flatcal = oldda->flatcal;
-  flatpar = oldda->flatpar;
   nflat = oldda->nflat;
+
+  /* Need the number of bolometers */
+  nbol = (old->dims)[0] * (old->dims)[1];
+  /* Allocate space for and copy contents of pointers */
+  flatcal = smf_malloc( nbol * nflat, sizeof(double), 0, status );
+  if ( flatcal != NULL ) {
+    memcpy( flatcal, oldda->flatcal, sizeof(double)*nbol*nflat );
+  }
+  flatpar = smf_malloc( nflat, sizeof(double), 0, status );
+  if ( flatpar != NULL ) {
+    memcpy( flatpar, oldda->flatpar, sizeof(double)*nflat);
+  }
 
   if (oldda->flatname != NULL) {
     strncpy(flatname, oldda->flatname, SC2STORE_FLATLEN);
