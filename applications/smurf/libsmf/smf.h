@@ -73,7 +73,14 @@
 *        Update API for smf_rebinmap, smf_construct_smfData, smf_construct_smfHead
 *        Add smf_mapbounds approx, smf_deepcopy_smfHead & smf_deepcopy_smfData
 *     2006-03-28 (AGG):
-*        Update API for smf_deepcopy_smfData
+*        Update API for smf_deepcopy_smfData, add smf_deepcopy_smfDA
+*     2006-03-30 (AGG):
+*        Add smf_deepcopy_smfFile
+*     2006-04-05 (AGG):
+*        - Change API for smf_deepcopy_smfDA to accept a smfData
+*          rather than smfDA
+*        - Add smf_check_smfData, smf_check_smfDA, smf_check_smfFile and
+*          smf_check_smfHead
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -114,6 +121,14 @@ double smf_calc_wvm( const smfHead *hdr, int *status );
 
 void smf_check_flat ( const smfData *data, int *status );
 
+void smf_check_smfData ( const smfData *idata, smfData *odata, int *status );
+
+void smf_check_smfDA ( const smfData *idata, smfData *odata, int *status );
+
+void smf_check_smfFile ( const smfData *idata, smfData *odata, int *status );
+
+void smf_check_smfHead ( const smfData *idata, smfData *odata, int *status );
+
 void smf_clone_data ( const smfData *idata, smfData **odata, int *status );
 
 void smf_close_file( smfData **, int *status);
@@ -152,7 +167,9 @@ smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
 smfData * smf_deepcopy_smfData ( const smfData *old, const int rawconvert, int * status);
 
-smfDA * smf_deepcopy_smfDA ( const smfDA *old, int * status);
+smfDA * smf_deepcopy_smfDA ( const smfData *old, int * status);
+
+smfFile * smf_deepcopy_smfFile ( const smfFile *old, int * status );
 
 int smf_dtype_check( const smfData* data, const char * type, smf_dtype itype,
 		     int *status );
