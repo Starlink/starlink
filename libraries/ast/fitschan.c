@@ -659,6 +659,8 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        Override astGetObjSize.
 *     28-FEB-2006 (DSB):
 *        Correct documentation typo ("NCards" -> "Ncard").
+*     5-APR-2006 (DSB):
+*        Modify SpecTrans to convert CTYPE="LAMBDA" to CTYPE="WAVE".
 *class--
 */
 
@@ -22841,8 +22843,10 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *
 *     20) Common case insensitive CUNIT values: "Hz", "Angstrom", "km/s",
 *     "M/S"
-
+*
 *     21) Various translations specific to the FITS-CLASS encoding.
+*
+*     21) CTYPE == "LAMBDA" changed to CTYPE = "WAVE"
 
 *  Parameters:
 *     this
@@ -24005,7 +24009,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Translate AIPS spectral CTYPE values to FITS-WCS paper III equivalents. 
    These are of the form AAAA-BBB, where "AAAA" can be "FREQ", "VELO" (=VRAD!) 
    or "FELO" (=VOPT-F2W), and BBB can be "LSR", "LSD", "HEL" (=*Bary*centric!) 
-   or "GEO". */
+   or "GEO". Also convert "LAMBDA" to "WAVE". */
       for( j = 0; j < naxis; j++ ) {
          if( GetValue2( ret, this, FormatKey( "CTYPE", j + 1, -1, s ),
                        AST__STRING, (void *) &cval, 0, method, 
@@ -24014,6 +24018,11 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                SetValue( ret, FormatKey( "CTYPE", j + 1, -1, ' ' ),
                          (void *) &astype, AST__STRING, NULL );
                SetValue( ret, "SPECSYS", (void *) &assys, AST__STRING, NULL );
+               break;
+            } else if( !strcmp( cval, "LAMBDA  " ) ) {
+               cval = "WAVE";
+               SetValue( ret, FormatKey( "CTYPE", j + 1, -1, ' ' ),
+                         (void *) &cval, AST__STRING, NULL );
                break;
             }
          }
