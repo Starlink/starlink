@@ -118,30 +118,6 @@
 void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
 
   int checkflatstatus = 0;    /* Local variable for storing status */
-  int i;                      /* Loop counter */
-  int indims;                 /* Number of dimensions in input data */
-  int j;                      /* Loop counter */
-  int nbol;                   /* Number of bolometers */
-  int ndims;                  /* Number of dimensions in output data */
-  int nframes;                /* Number of time slices */
-  int npts;                   /* Total number of data points */
-  int nbytes;
-
-  smfDA *ida = NULL;          /* da struct for input data */
-  smfDA *da = NULL;           /* da struct for input data */
-  smfFile *file = NULL;       /* file struct for input data */
-  smfHead *hdr = NULL;        /* hdr struct for input data */
-
-  AstFrame *skyframe = NULL;
-  AstFrameSet *owcs;
-  AstFrameSet *iwcs;
-  smfHead *ihdr = NULL;        /* hdr struct for input data */
-
-  void *ipntr[3];             /* Input D, Q and V arrays */
-  void *opntr[3];             /* Output D, Q and V arrays */
-  double *outdata;            /* Pointer to output DATA */
-  int *tstream;               /* Pointer to raw time series data */
-  smf_dtype dtype;            /* Data type */
 
   if ( *status != SAI__OK ) return;
 
