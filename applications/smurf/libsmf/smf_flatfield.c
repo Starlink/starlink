@@ -64,6 +64,9 @@
 *        - use smf_create_smfHead rather than smf_malloc
 *     2006-03-23 (AGG):
 *        Store number of frames (timeslices) in smfData
+*     2006-04-06 (AGG):
+*        Major changes: all checking of data structures is done within
+*        the new smf_check_smf*** routines.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,112 +156,15 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
     /* check *odata */
     if ( *odata == NULL) {
       msgOutif(MSG__VERB, FUNC_NAME, 
-	       "OK, data are flatfielded but odata is NULL", status);
+	       "OK, data are flatfielded and output struct is NULL: cloning input", status);
       /* If NULL then we need to clone idata to odata i.e. copy the
 	 pointer ONLY */
       smf_clone_data( idata, odata, status );
     } else {
       msgOutif(MSG__VERB, FUNC_NAME,
 	       "OK, data are flatfielded and odata exists", status);
-      /* Check dimensions and type */
-      /* If it's not been set already, set dtype to DOUBLE */
-      if ( (*odata)->dtype == SMF__NULL ) {
-	(*odata)->dtype = SMF__DOUBLE;
-      }
-      dtype = (*odata)->dtype;
-
-      indims = idata->ndims;
-      if ( !(*odata)->ndims ) {
-	(*odata)->ndims = indims;
-      }
-      ndims = (*odata)->ndims;
-      nbol = ((*odata)->dims)[0]*((*odata)->dims)[1];
-      nframes = ((*odata)->dims)[2];
-      npts = nbol * nframes;
-      /* Check the data type */
-      if ( dtype != SMF__DOUBLE ) {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, 
-		"Output data type is not set to _DOUBLE, possible programming error",
-		status);
-      } else if ( ndims != indims ) {
-        msgSeti( "NDIMS", ndims);
-        msgSeti( "IDIMS", indims);
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, 
-		"Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
-      } else {
-	/* Check if the data array(s) exist */
-	opntr[0] = ((*odata)->pntr)[0];
-	if (opntr[0] == NULL) {
-	  /* Allocate space for output data, copy over input data */
-	  ipntr[0] = (idata->pntr)[0];
-	  opntr[0] = smf_malloc( npts, sizeof( double ), 0, status );
-	  memcpy( opntr[0], ipntr[0], npts*sizeof( double ) );
-	}
-	/* All's well so start populating the rest of the *odata
-	   struct if necessary */
-	/* Does the header (hdr) exist? */
-	hdr = (*odata)->hdr;
-	ihdr = idata->hdr;
-	if ( hdr == NULL) {
-	  hdr = smf_deepcopy_smfHead( ihdr, status);
-	} else {
-	  /* OK, we have a header. Do we have WCS? */
-	  iwcs = ihdr->wcs;
-	  /* If INPUT WCS is null then we have time series data and we
-	     can forget about the WCS info for now */
-	  if (iwcs == NULL) {
-	    msgOutif(MSG__VERB, FUNC_NAME, 
-		     "Aha, we must have time series data: don't copy WCS as it is created later", 
-		     status);
-	  } else {
-	    owcs = hdr->wcs;
-	    if ( owcs == NULL ) {
-	      msgOutif(MSG__VERB, FUNC_NAME, "Output data struct has no WCS, copying from input", status);
-	      /* Copy over WCS from input */
-	      owcs = astCopy(iwcs);
-	      hdr->wcs = owcs;
-	    } else {
-	      /* Check if we have a sky frame */
-	      /* astFindFrame returns AST__NULL if a skyframe is not present */
-	      skyframe = astFindFrame( owcs, astSkyFrame(""), "");
-	      /* If no sky frame, overwrite current WCS with a copy of
-		 the input WCS info using astCopy */
-	      if (skyframe == AST__NULL) {
-		msgOutif(MSG__VERB, FUNC_NAME, 
-			 "Output FrameSet exists but does not have a SKYFRAME; copying WCS info from input data", 
-			 status);
-		owcs = astCopy(ihdr->wcs);
-		hdr->wcs = owcs;
-	      } else {
-		msgOutif(MSG__VERB, FUNC_NAME, 
-			 "Output FrameSet has a SKYFRAME", status);
-	      }
-	    }
-	    hdr->nframes = nframes;
-	  }
-	}
-
-	/* Does the flatfield (smfDA) struct exist? */
-	da = (*odata)->da;
-	ida = idata->da;
-	if ( da == NULL && ida != NULL ) {
-	  da = smf_malloc( 1, sizeof( smfDA ), 0, status );
-	  /* Copy flatfield info into *odata */
-	  memcpy( da, idata->da, sizeof( smfDA ) );
-	  (*odata)->da = da;
-	}
-
-	/* Does the file (smfFile) struct exist? */
-	file = (*odata)->file;
-	if ( file == NULL ) {
-	  file = smf_malloc( 1, sizeof( smfFile ), 0, status );
-	  /* Copy file info */
-	  memcpy( file, idata->file, sizeof( smfFile ) );
-	  (*odata)->file = file;
-	}
-      }
+      /* Check and set */
+      smf_check_smfData( idata, *odata, status );
     }
   } else if ( *status == SAI__OK ) { 
 
@@ -283,115 +189,12 @@ void smf_flatfield ( const smfData *idata, smfData **odata, int *status ) {
       /* OK, *odata exists */
       msgOutif(MSG__VERB, FUNC_NAME,"Data not FF, odata exists", status);
 
-      /* To proceed we must know that the data type is correct */
-      dtype = (*odata)->dtype;
-      /* And that the input and output dimensions are equal */
-      ndims = (*odata)->ndims; 
-      indims = idata->ndims; 
+      /* Check and set */
+      smf_check_smfData( idata, *odata, status );
 
-      if ( dtype != SMF__DOUBLE ) {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, "Output data type is not set to _DOUBLE", status);
-      } else if ( ndims != indims ) {
-        msgSeti( "NDIMS", ndims);
-        msgSeti( "IDIMS", indims);
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
-      } else {
+      /* Apply flatfield calibration */
+      smf_flatten( *odata, status);
 
-	/* All's well so start populating the *odata struct */
-	/* Does the header (hdr) exist? */
-	hdr = (*odata)->hdr;
-	ihdr = idata->hdr;
-	if ( hdr == NULL ) {
-	  hdr = smf_deepcopy_smfHead( ihdr, status);
-	  (*odata)->hdr = hdr; 
-	} else if (ihdr != NULL) {
-	  /* OK, we have a header. Do we have WCS? */
-	  iwcs = ihdr->wcs;
-	  /* If INPUT WCS is null then we have time series data and we
-	     can forget about the WCS info for now */
-	  if (iwcs == NULL) {
-	    msgOutif(MSG__VERB, "", 
-		     "Aha, we must have time series data: don't copy WCS as it is created later", 
-		     status);
-	  } else {
-	    owcs = hdr->wcs;
-	    if ( owcs == NULL ) {
-	      msgOutif(MSG__VERB, FUNC_NAME, 
-		       "Output data has no WCS, copying from input", status);
-	      /* Copy over WCS from input */
-	      owcs = astCopy(iwcs);
-	      hdr->wcs = owcs;
-	    } else {
-	      /* Check if the output WCS has a sky frame */
-	      /* astFindFrame returns AST__NULL if a skyframe is not present */
-	      skyframe = astFindFrame( owcs, astSkyFrame(""), "");
-	      /* If no sky frame, copy the input WCS info using astCopy */
-	      if (skyframe == AST__NULL) {
-		msgOutif(MSG__VERB, FUNC_NAME, 
-			 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input", 
-			 status);
-		owcs = astCopy(ihdr->wcs);
-		hdr->wcs = owcs;
-	      } else {
-		msgOutif(MSG__VERB, FUNC_NAME, "Output FrameSet has a SKYFRAME", status);
-	      }
-	    }
-	  }
-	}
-	/* Set the number of frames */
-	hdr->nframes = nframes;
-
-	/* Does the flatfield (smfDA) struct exist? */
-	da = (*odata)->da;
-	if ( da == NULL ) {
-	  da = smf_deepcopy_smfDA( idata->da, status );
-	  (*odata)->da = da;
-	}
-
-	npts = ((*odata)->dims)[0] * ((*odata)->dims)[1] *((*odata)->dims)[2];
-
-	/* Check that the data array is present and of the right type */
-	for (i=0; i<2; i++) {
-	  if ( (idata->pntr)[i] != NULL ) {
-	    /* We must convert from integer to double for data and
-	       variance (if it exists) */
-	    if ( idata->dtype == SMF__INTEGER ) {
-	      nbytes = sizeof(double);
-	      dtype = SMF__DOUBLE;
-	      opntr[i] = smf_malloc( npts, nbytes, 0, status);
-	      outdata = opntr[i];
-	      tstream = (idata->pntr)[i];
-	      /* Input data are ints: must re-cast as double */
-	      for (j=0; j<npts; j++) {
-		outdata[j] = (double)tstream[j];
-	      }
-	      opntr[i] = outdata;
-	    } else {
-	      if ( *status == SAI__OK ) {
-		*status = SAI__ERROR;
-		errRep(FUNC_NAME, "Error: input data are not of type INTEGER (possible programming error)", status);
-	      }
-	    }
-	  }
-	}
-	/* Quality */
-	if ( (idata->pntr)[2] != NULL ) {
-	  opntr[2] = smf_malloc( npts, 1, 0, status);
-	  memcpy( opntr[2], (idata->pntr)[2], npts );
-	} else {
-	  opntr[2] = NULL;
-	}
-	/* Store pointers to D, V and Q */
-	for ( i=0; i<3; i++) {
-	  ((*odata)->pntr)[i] = opntr[i];
-	}
-
-	/* Apply flatfield calibration */
-	smf_flatten( *odata, status);
-
-      }
     }
   } else {
     msgOut(FUNC_NAME, 
