@@ -180,7 +180,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 
       if( indf == NDF__NOID ) continue;
 
-/* Also ignore any NDFs which have a value of "BAD" for thr "Unit"
+/* Also ignore any NDFs which have a value of "BAD" for the "Unit"
    component. This isused as a flag for unusable clumps (e.g. clumps
    that are smaller than the beam width or that touch areas of bad
    pixels). */

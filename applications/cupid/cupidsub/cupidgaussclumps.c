@@ -157,6 +157,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    int imax;            /* Index of element with largest residual */
    int ipeak;           /* Index within "peaks" at which to store the new peak */
    int iter;            /* Continue finding more clumps? */
+   int maxbad;          /* Max number of bad pixels allowed in a clump */
    int maxclump;        /* Max no. of clumps */
    int maxskip;         /* Max no. of failed fits between good fits */
    int nclump;          /* Number of usable clumps */
@@ -249,6 +250,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
       mlim = cupidConfigD( gcconfig, "MODELLIM", 3.0 );
+
+/* Get the max allowed number of bad pixels in a clump. */
+      maxbad = cupidConfigI( gcconfig, "MAXBAD", 4 );
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
@@ -355,7 +359,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    returned. */
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims,
                                        x, rms, mlim, imax, ilevel, slbnd,    
-                                       &ret, iclump, diag, mean_peak );
+                                       &ret, iclump, diag, mean_peak,
+                                       maxbad );
 
 /* Dump the modified residuals if required. */
                   if( ilevel > 5 ) {

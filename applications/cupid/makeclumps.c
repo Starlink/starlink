@@ -356,7 +356,7 @@ void makeclumps() {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0, lbnd, &obj, i, 0, 0.0 );
+                            0, lbnd, &obj, i, 0, 0.0, 0 );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];

@@ -7,6 +7,13 @@
  data arrays.
 
 
+Changes introduced at V0.0-11:
+
+ - A new configuration parameter called MaxBad has been added to all
+ algorithms. It specified the maximum number of bad pixels which may 
+ adjoin a clump. If this number is exceeded, the clump is excluded.
+
+
 Changes introduced at V0.0-10:
 
  - The default value for the MinPix configuration parameter (that
@@ -15,7 +22,7 @@ Changes introduced at V0.0-10:
  less than 16 pixels, then the old default of 16 is retained.
 
  - Clumps are now rejected if they touch or contain any bad pixels.
-
+ (but see the MaxBad configuration parameter added at V0.0-11).
 
 Changes introduced at V0.0-9:
 

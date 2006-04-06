@@ -293,6 +293,9 @@ void clumps() {
 *     fitting Gaussian for each clump. If no value is supplied, the
 *     initial guess at the clump size is based on the local profile
 *     around the pixel with peak value. []
+*     - GaussClumps.MaxBad: The maximum number of bad pixels which may be
+*     included in a clump. Clumps will not be excluded if they contain
+*     more bad pixels than this value [4]
 *     - GaussClumps.MaxClumps: Specifies a termination criterion for
 *     the GaussClumps algorithm. The algorithm will terminate when
 *     "MaxClumps" clumps have been identified, or when one of the other 
@@ -389,6 +392,10 @@ void clumps() {
 *     initially found at the lowest contour level are ignored. That is, clumps 
 *     must have peaks which exceed the second lowest contour level to be 
 *     included in the returned catalogue. []
+*     - GaussClumps.MaxBad: The maximum number of pixels in a clump that
+*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     pixels adjacent to a bad pixel exceeds this value, the clump is 
+*     excluded. [4]
 *     - ClumpFind.MinPix: The lowest number of pixel which a clump can
 *     contain. If a candidate clump has fewer than this number of pixels, 
 *     it will be ignored. This prevents noise spikes from being interpreted 
@@ -434,6 +441,10 @@ void clumps() {
 *     - Reinhold.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
 *     clump widths written to the output catalogue are reduced (in
 *     quadrature) by this amount. [2.0]
+*     - ReinholdClumps.MaxBad: The maximum number of pixels in a clump that
+*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     pixels adjacent to a bad pixel exceeds this value, the clump is 
+*     excluded. [4]
 *     - Reinhold.MinLen: The minimum number of pixels spanned by a peak
 *     along any one dimension in order for the peak to be considered
 *     significant. If a peak is spanned by fewer than this number of pixels 
@@ -492,6 +503,10 @@ void clumps() {
 *     - FellWalker.FwhmBeam: The FWHM of the instrument beam, in pixels. The 
 *     clump widths written to the output catalogue are reduced (in
 *     quadrature) by this amount. [2.0]
+*     - FellWalker.MaxBad: The maximum number of pixels in a clump that
+*     are allowed to be adjacent to a bad pixel. If the number fo clump
+*     pixels adjacent to a bad pixel exceeds this value, the clump is 
+*     excluded. [4]
 *     - FellWalker.MinDip: If the dip between two adjacent peaks is less
 *     than this value, then the peaks are considered to be part of the
 *     same clump. [2.0*RMS]

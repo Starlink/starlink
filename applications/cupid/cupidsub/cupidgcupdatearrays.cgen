@@ -18,7 +18,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
                                          int *dims, double *par, double rms,
                                          double mlim, int imax, int ilevel, 
                                          int *lbnd, HDSLoc **ndfs, int iclump, 
-                                         int diag, double mean_peak ){
+                                         int diag, double mean_peak, int maxbad ){
 /*
 *  Name:
 *     cupidGCUpdateArrays<X>
@@ -31,7 +31,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *                                  int ndim, int *dims, double *par, 
 *                                  double rms, double mlim, int imax, 
 *                                  int ilevel, int *lbnd, HDSLoc **ndfs, 
-*                                  int iclump, int diag, double mean_peak )
+*                                  int iclump, int diag, double mean_peak,
+*                                  int maxbad )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -74,14 +75,16 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 *        new NDF in the array describes the supplied clump. If the
 *        supplied pointer is NULL, no HDS array or NDF is created. No NDF
 *        is created for clumps which touch the edge of the data array.
-*        The new NDF will have a Unit value of"BAD" if the clump touches
-*        any areas of bad pixel sin the supplied data array.
+*        The new NDF will have a Unit value of "BAD" if the clump touches
+*        too many areas of bad pixels in the supplied data array.
 *     iclump
 *        Clump index.
 *     diag
 *        Include extra diagnostic information in output catalogue?
 *     mean_peak
 *        The mean value of the most recent fitted peak values.
+*     maxbad
+*        Largest allowed number of bad pixels in a clump.
 
 *  Notes:
 *     - This function can be invoked using the generic cupidGCUpdateArrays macro 
@@ -127,7 +130,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
    int *pnext;            /* Pointer to next element in plist */
    int area;              /* Total area of clump in pixels */
    int area_off;          /* Area of clump outside the data array, in pixels */
-   int bad;               /* Does the clump include any bad pixels? */
+   int bad;               /* No of pixels that touch areas of bad pixels */
    int extend[ 3 ][ 2 ];  /* Flags indicating which box faces to extend */
    int face_done;         /* Has the face been evaluated? */
    int first;             /* Is this is the first model evaluation? */
@@ -281,8 +284,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Subtract the model value from the residuals (if good). */
                         if( res && res[ j ] != CGEN_BAD ) res[ j ] -= (CGEN_TYPE) m;
 
-/* Set a flag if the corresponding input data pixel is bad. */
-                        if( ipd && ipd[ j ] == CGEN_BAD ) bad = 1;
+/* Increment the count of bad pixels in the clump. */
+                        if( ipd && ipd[ j ] == CGEN_BAD ) bad++;
 
 /* Add this model value and its associated pixel indices into the lists */
                         ilist = list_size++;
@@ -368,8 +371,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 
       if( area_off ) {
          msgOut( "", "   (the clump overlaps the edge of the data array)", status );
-      }else if( bad ) {
-         msgOut( "", "   (the clump touches an area of bad pixels)", status );
+      } else if( bad > maxbad ) {
+         msgOut( "", "   (the clump contains too many bad pixels)", status );
       }
    }
 
@@ -429,7 +432,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, int nel
 /* Create the NDF. */
       cupidGCNdfClump( ndfs, sum, diag ? par : NULL, rms, ndim, lbox, ubox, 
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax, 
-                       extra, bad );
+                       extra, ( bad > maxbad ) );
 
 /* Free resources */
       if( extra ) extra = astAnnul( extra );

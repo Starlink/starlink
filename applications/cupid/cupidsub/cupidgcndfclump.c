@@ -96,7 +96,8 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
 *        clump structure.
 *     bad
 *        Set the Unit component of the NDF to "BAD". This is used as a
-*        flag to indicate that the clump touches any areas of bad
+*        flag to indicate that the clump touches too many areas of bad
+*        pixels.
 
 *  Authors:
 *     DSB: David S. Berry
@@ -327,7 +328,7 @@ void cupidGCNdfClump( HDSLoc **obj, double sum, double *par, double rms,
       datAnnul( &xloc, status );
    }
 
-/* If requiredm set the Unit component to "BAD". */
+/* If required set the Unit component to "BAD". */
    if( bad ) ndfCput( "BAD", indf, "Unit", status );
 
 /* End the NDF context */

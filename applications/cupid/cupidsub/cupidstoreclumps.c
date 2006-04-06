@@ -181,7 +181,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 /* Count the number of lumps which are smaller than the beam size. Also
    set the Unit component of the NDF to "BAD" to indicate that the clump
-   shouldnot be used. */
+   should not be used. */
             if( bad ){
                ok = 0;
 
@@ -243,12 +243,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
       }
 
       if( nbad == 1 ) {
-         msgOut( "", "1 further clump rejected because it touches "
-                 "an area of bad pixels.", status );
+         msgOut( "", "1 further clump rejected because it includes "
+                 "too many bad pixels.", status );
       } else if( nbad > 1 ) {
          msgSeti( "N", nbad );
-         msgOut( "", "^N further clumps rejected because they touch "
-                 "areas of bad pixels.", status );
+         msgOut( "", "^N further clumps rejected because they include "
+                 "too many bad pixels.", status );
       }
    }
 
