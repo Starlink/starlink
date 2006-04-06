@@ -9,6 +9,9 @@
 
 Changes introduced at V0.0-11:
 
+ - The CLUMPS command has been renamed as FINDCLUMPS. However, CLUMPS 
+ will still be recognised as an alias for FINDCLUMPS.
+
  - A new configuration parameter called MaxBad has been added to all
  algorithms. It specified the maximum number of bad pixels which may 
  adjoin a clump. If this number is exceeded, the clump is excluded.

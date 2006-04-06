@@ -86,14 +86,14 @@ void makeclumps() {
 *        NDF (an error is reported if the number of values supplied for LBND 
 *        and UBND differ).
 *     NCLUMP = _INTEGER (Read)
-*        The number fo clumps to create.
+*        The number of clumps to create.
 *     OUT = NDF (Write)
 *        The NDF to receive the simulated data, including instrumental
 *        blurring and noise.
 *     MODEL = NDF (Write)
 *        The NDF to receive the simulated data, excluding noise. A CUPID
 *        extension is added to this NDF, containing information about each 
-*        clump in the same format as produced by the CLUMPS command. This 
+*        clump in the same format as produced by the FINDCLUMPS command. This 
 *        includes an NDF holding an of the individual clump.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.

@@ -194,7 +194,7 @@ void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, double[3], const c
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
 
-void clumps( void );
+void findclumps( void );
 void cupidhelp( void );
 void makeclumps( void );
 void makesnr( void );

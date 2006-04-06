@@ -95,8 +95,8 @@ void cupid_mon( int *adam_status ) {
    "alink". */
 
 /* Identifies emission clumps within a 2- or 3D NDF. */
-   if( !strcmp( name, "CLUMPS" ) ) {
-      clumps();
+   if( !strcmp( name, "FINDCLUMPS" ) ) {
+      findclumps();
 
 /* Give help on CUPID commands. */
    } else if( !strcmp( name, "CUPIDHELP" ) ) {

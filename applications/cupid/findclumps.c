@@ -42,11 +42,11 @@ fptrap (int i)
 #endif
 
 
-void clumps() {
+void findclumps() {
 /*
 *+
 *  Name:
-*     CLUMPS
+*     FINDCLUMPS
 
 *  Purpose:
 *     Identify clumps of emission within a 1, 2 or 3 dimensional NDF.
@@ -58,7 +58,7 @@ void clumps() {
 *     ADAM A-task
 
 *  Synopsis:
-*     void clumps();
+*     void findclumps();
 
 *  Description:
 *     This application identifies clumps of emission within a 1, 2 or 3 
@@ -90,7 +90,7 @@ void clumps() {
 *     etc) can be specified (see parameter METHOD).
 
 *  Usage:
-*     clumps in out outcat method 
+*     findclumps in out outcat method 
 
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read)
@@ -215,7 +215,7 @@ void clumps() {
 *     This application will create an NDF extension called "CUPID" in the 
 *     output NDF and will add the following components to it:
 * 
-*     - CLUMPS: This a an array of CLUMP structures, one for each clump
+*     - FINDCLUMPS: This a an array of CLUMP structures, one for each clump
 *     identified by the selected algorithm. Each such structure contains 
 *     the same clump parameters that are written to the catalogue via
 *     parameter OUTCAT. It also contains a component called MODEL which
@@ -635,9 +635,9 @@ void clumps() {
          *status = SAI__ERROR;
          ndfMsg( "NDF", indf );
          msgSeti( "NSIG", nsig );
-         errRep( "CLUMPS_ERR2", "\"^NDF\" has ^NSIG significant "
+         errRep( "FINDCLUMPS_ERR2", "\"^NDF\" has ^NSIG significant "
                  "pixel axes", status );
-         errRep( "CLUMPS_ERR4", "This application requires 1, 2 or 3 "
+         errRep( "FINDCLUMPS_ERR4", "This application requires 1, 2 or 3 "
                  "significant pixel axes", status );
       }
       goto L999;
@@ -746,7 +746,7 @@ void clumps() {
 
       } else {
          *status = SAI__ERROR;
-         errRep( "CLUMPS_ERR1", "The supplied data contains insufficient "
+         errRep( "FINDCLUMPS_ERR1", "The supplied data contains insufficient "
                  "good Variance values to continue.", status );
       }         
 
@@ -761,7 +761,7 @@ void clumps() {
    parGet0d( "RMS", &rms, status );
 
 /* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
+   parChoic( "METHOD", "GAUSSFINDCLUMPS", "GAUSSFINDCLUMPS,CLUMPFIND,REINHOLD,"
              "FELLWALKER", 1, method, 15,  status );
 
 /* Abort if an error has occurred. */
@@ -797,7 +797,7 @@ void clumps() {
    if( grp ) grpDelet( &grp, status );      
 
 /* Switch for each method */
-   if( !strcmp( method, "GAUSSCLUMPS" ) ) {
+   if( !strcmp( method, "GAUSSFINDCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms, 
                                 keymap, velax, ilevel, beamcorr ); 
 
@@ -815,7 +815,7 @@ void clumps() {
       
    } else if( *status == SAI__OK ) {
       msgSetc( "METH", method );
-      errRep( "CLUMPS_ERR1", "Requested Method ^METH has not yet been "
+      errRep( "FINDCLUMPS_ERR1", "Requested Method ^METH has not yet been "
               "implemented.", status );
    }
 
@@ -826,7 +826,7 @@ void clumps() {
       ipo = NULL;
       ndfProp( indf, "AXIS,WCS,NOEXTENSION(CUPID)", "OUT", &indf2, 
                status );
-      if( !strcmp( method, "GAUSSCLUMPS" ) ) {
+      if( !strcmp( method, "GAUSSFINDCLUMPS" ) ) {
          ndfMap( indf2, "DATA", itype, "WRITE", &ipo, &el, status );
          ndfSbad( 1, indf2, "DATA", status );
 
@@ -849,7 +849,7 @@ void clumps() {
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
       cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, beamcorr, 
-                        "Output from CUPID:CLUMPS", gotwcs ? iwcs : NULL,
+                        "Output from CUPID:FINDCLUMPS", gotwcs ? iwcs : NULL,
                         ilevel );
 
 /* Allocate room for a mask holding bad values for points which are not 
@@ -951,7 +951,7 @@ L999:
 /* If an error has occurred, issue another error report identifying the 
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
-      errRep( "CLUMPS_ERR", "CLUMPS: Failed to identify clumps of emission "
+      errRep( "FINDCLUMPS_ERR", "FINDCLUMPS: Failed to identify clumps of emission "
               "within a 1, 2 or 3-D NDF.", status );
    }
 

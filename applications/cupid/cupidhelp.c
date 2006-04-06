@@ -51,7 +51,7 @@ void cupidhelp(){
 *        -  enter a topic and/or subtopic name(s) to display the help for 
 *           that topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
-*           in turn is a subtopic of CLUMPS;
+*           in turn is a subtopic of FINDCLUMPS;
 *        -  press the RETURN key to see more text at a "Press RETURN to 
 *           continue ..." request;
 *        -  press the RETURN key at topic and subtopic prompts to move up 
@@ -62,9 +62,9 @@ void cupidhelp(){
 *        -  enter a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
 *        -  enter an ellipsis "..." to display all the text below the
-*           current point in the hierarchy.  For example, "CLUMPS..."
-*           displays information on the CLUMPS topic as well as
-*           information on all the subtopics under CLUMPS.
+*           current point in the hierarchy.  For example, "FINDCLUMPS..."
+*           displays information on the FINDCLUMPS topic as well as
+*           information on all the subtopics under FINDCLUMPS.
 *
 *     You can abbreviate any topic or subtopic using the following
 *     rules.
