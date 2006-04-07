@@ -50,6 +50,8 @@
 *        Use GSL for linear regression
 *     2006-03-09 (AGG):
 *        Use GSL multifit for both 1-D and 2-D calculations
+*     2006-04-07 (AGG):
+*        Refactor code to omit AST calls where possible
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,8 +140,32 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   gsl_multifit_linear_workspace *work; /* Workspace */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
 
+  size_t needast = 0; /* Flag to specify if astrometry is needed for fit */
+  size_t fitmean = 0;
+  size_t fitslope = 0;
+  size_t fitplane = 0;
+
   /* Check status */
   if (*status != SAI__OK) return;
+
+  /* Set some flags depending on desired FIT type */
+  if ( strncmp( fittype, "MEAN", 4 ) == 0 ) {
+    needast = 0;
+    fitmean = 1;
+    ncoeff = 1; /* Not needed :-) */
+  } else if ( strncmp( fittype, "SLOP", 4 ) == 0 )  {
+    needast = 1;
+    fitslope = 1;
+    ncoeff = 2;
+  } else  if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
+    needast = 0;
+    fitplane = 1;
+    ncoeff = 3;
+  } else {
+    *status = SAI__ERROR;
+    msgSetc("F", fittype);
+    errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
+   }
 
   /* Do we have 2-D image or 3-D timeseries data? */
   if (data->ndims == 2) {
@@ -171,8 +197,10 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
      rather than one point at a time */
   xin = smf_malloc( npts, sizeof(double), 0, status );
   yin = smf_malloc( npts, sizeof(double), 0, status );
-  xout = smf_malloc( npts, sizeof(double), 0, status );
-  yout = smf_malloc( npts, sizeof(double), 0, status );
+  if ( needast ) {
+    xout = smf_malloc( npts, sizeof(double), 0, status );
+    yout = smf_malloc( npts, sizeof(double), 0, status );
+  }
   indices = smf_malloc( npts, sizeof(size_t), 0, status );
 
   /* Jump to the cleanup section if status is bad by this point
@@ -194,31 +222,34 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   /* Loop over timeslice index */
   for ( k=0; k<nframes; k++) {
     /* Call tslice_ast to update the header for the particular
-       timeslice. */
-    smf_tslice_ast( data, k, 1, status ); /* Never in quick mode */
-    /* Retrieve header info */
-    hdr = data->hdr;
+       timeslice */
+    smf_tslice_ast( data, k, 1, status ); /* We're never in quick mode here */
 
-    /* Set coordinate frame to AzEl */
-    wcs = hdr->wcs;
-    /* Check current frame and store it */
-    origsystem = astGetC( wcs, "SYSTEM");
-    /* Select the AZEL system : what if wcs == NULL? */
-    if (wcs != NULL) 
-      astSetC( wcs, "SYSTEM", "AZEL" );
-    if (!astOK) {
-      if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Error from AST", status);
+    /* If we need the astrometry... */
+    if ( needast ) {
+      /* Retrieve header info */
+      hdr = data->hdr;
+      /* Set coordinate frame to AzEl */
+      wcs = hdr->wcs;
+      /* Check current frame and store it */
+      origsystem = astGetC( wcs, "SYSTEM");
+      /* Select the AZEL system : what if wcs == NULL? */
+      if (wcs != NULL) 
+	astSetC( wcs, "SYSTEM", "AZEL" );
+      if (!astOK) {
+	if (*status == SAI__OK) {
+	  *status = SAI__ERROR;
+	  errRep( FUNC_NAME, "Error from AST", status);
+	}
       }
+      /* Transfrom from pixels to AZEL */
+      astTran2(wcs, npts, xin, yin, 1, xout, yout );
     }
-    /* Transfrom from pixels to AZEL */
-    astTran2(wcs, npts, xin, yin, 1, xout, yout );
 
     /* Offset into 3d data array */
     base = npts * k; 
     /* Check fit type */
-    if ( strncmp( fittype, "MEAN", 4 ) == 0 ) {
+    if ( fitmean ) {
       /* Calculate average of all pixels in current timeslice */
       sky0 = 0;
       for (i=0; i < npts; i++ ) {
@@ -231,15 +262,6 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       dskyaz = 0.0;
       dskyel = 0.0;
     } else {
-      if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
-	ncoeff = 3;
-      } else if ( strncmp( fittype, "SLOP", 4 ) == 0 ) {
-	ncoeff = 2;
-      } else {
-	*status = SAI__ERROR;
-	msgSetc("F", fittype);
-	errRep(FUNC_NAME, "Unknown FIT type, ^F: programming error?", status);
-      }
       /* Allocate workspace */
       work = gsl_multifit_linear_alloc( npts, ncoeff );
       azel = gsl_matrix_alloc( npts, ncoeff );
@@ -252,15 +274,18 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       for ( i=0; i<npts; i++) {
 	index = indices[i] + base;
 	gsl_matrix_set( azel, i, 0, 1.0 );
-	gsl_matrix_set( azel, i, 1, yout[indices[i]] );
-	if (ncoeff == 3)
-	  gsl_matrix_set( azel, i, 2, xout[indices[i]] );
+	if ( fitslope ) {
+	  gsl_matrix_set( azel, i, 1, yout[indices[i]] );
+	} else  if ( fitplane ) {
+	  gsl_matrix_set( azel, i, 1, yin[indices[i]] );
+	  gsl_matrix_set( azel, i, 2, xin[indices[i]] );
+	}
 	gsl_vector_set( psky, i, indata[index] );
 	/* Set weights accordingly */
 	if (indata[index] != VAL__BADD) {
 	  gsl_vector_set( weight, i, 1.0);
 	} else {
-	  gsl_vector_set( weight, i, 1.0);
+	  gsl_vector_set( weight, i, 0.0);
 	}
       }
       /* Carry out fit */
@@ -283,7 +308,7 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       gsl_vector_free( skyfit );
       gsl_matrix_free( mcov );
 
-    } 
+    }
 
     /* Subtract fit from timeslice */
     for (i=0; i < npts; i++ ) {
@@ -291,21 +316,26 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
       if (indata[index] != VAL__BADD) {
 
 	/* Calculate sky value as a function of position */
-	sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
+	if (fitslope) {
+	  sky = sky0 + dskyel * yout[indices[i]] + dskyaz * xout[indices[i]];
+	} else {
+	  sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
+	}
 	/* Subtract sky value; no need to update variance */
 	indata[index] -= sky;
       }
     }
 
-    /* Reset coordinate frame to that on entry */
-    /* Restore coordinate frame to original */
-    if ( *status == SAI__OK) {
-      astSetC( wcs, "SYSTEM", origsystem );
-      /* Check AST status */
-      if (!astOK) {
-	if (*status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep( FUNC_NAME, "Error from AST", status);
+    /* Reset coordinate frame to that on entry if necessary */
+    if (needast) {
+      if ( *status == SAI__OK) {
+	astSetC( wcs, "SYSTEM", origsystem );
+	/* Check AST status */
+	if (!astOK) {
+	  if (*status == SAI__OK) {
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, "Error from AST", status);
+	  }
 	}
       }
     }
@@ -315,8 +345,10 @@ void smf_subtract_plane(smfData *data, const char *fittype, int *status) {
   CLEANUP:
   smf_free(xin,status);
   smf_free(yin,status);
-  smf_free(xout,status);
-  smf_free(yout,status);
+  if ( needast ) {
+    smf_free(xout,status);
+    smf_free(yout,status);
+  }
   smf_free(indices,status);
 
 }
