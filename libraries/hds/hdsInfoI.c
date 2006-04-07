@@ -63,6 +63,9 @@
 *       - If "!EXTINCTION,EXTINCTION" is requested then they will
 *         match everything, since the test is performed on each
 *         component separately.
+*       - Only valid hds locators are counted. If there is an internal
+*         error tracing a locator, it is ignored and that locator is
+*         not included in the count.
 
 *  Authors
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -74,6 +77,8 @@
 *     26-JAN-2006 (TIMJ):
 *        - Move into separate file.
 *        - Add "extra" information
+*     14-FEB-2006 (TIMJ):
+*        Do not set status to bad if hdsTrace returns bad status.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -240,6 +245,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
       lcp          = dat_ga_wlq;
       locator.check    = DAT__LOCCHECK;
       *result = 0;
+      emsMark;
       for (i=0; i<dat_gl_wlqsize; i++)
       {
          data = &lcp->data;
@@ -254,7 +260,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 		       file.body, &tracestat,
 		       STR_K_LENGTH, STR_K_LENGTH);
 	     if (!_ok(tracestat)) {
-               *status   = tracestat;
+	       emsAnnul(&tracestat);
 	     } else {
 	       /* Good trace - now compare and contrast */
 	       /* we can match on more than one item */
@@ -287,6 +293,7 @@ hdsInfoI(const HDSLoc* loc, const char *topic_str, const char * extra_str,
 	 }
 	 lcp = lcp->flink;
       }
+      emsRlse;
    }
    return hds_gl_status;
 }
