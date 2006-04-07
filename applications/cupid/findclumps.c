@@ -125,7 +125,7 @@ void findclumps() {
 *        should be in the range 0 to 6. A value of zero will suppress all 
 *        screen output. Larger values give more information (the precise 
 *        information displayed depends on the algorithm being used). [1]
-*     IN = NDF (Update)
+*     IN = NDF (Read)
 *        The 1, 2 or 3 dimensional NDF to be analysed. 
 *     METHOD = LITERAL (Read)
 *        The algorithm to use. Each algorithm is described in more detail

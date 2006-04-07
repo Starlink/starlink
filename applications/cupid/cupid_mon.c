@@ -106,11 +106,6 @@ void cupid_mon( int *adam_status ) {
    } else if( !strcmp( name, "MAKECLUMPS" ) ) {
       makeclumps();
 
-/* Create a signal-to-noise NDF. */
-   } else if( !strcmp( name, "MAKESNR" ) ) {
-      makesnr();
-
-
 
 
 /* Add new commands here... */

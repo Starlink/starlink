@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-12:
+
+ - The MAKESNR command has been moved from CUPID to KAPPA.
+
+
+
 Changes introduced at V0.0-11:
 
  - The CLUMPS command has been renamed as FINDCLUMPS. However, CLUMPS 
