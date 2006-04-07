@@ -13,7 +13,7 @@
 
 void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim, 
                                     int *lbnd, int *ubnd, int nel, HDSLoc *obj,
-                                    float *rmask, void *out, char *method ){
+                                    float *rmask, void *out, const char *method ){
 /*
 *  Name:
 *     cupidSumClumps
@@ -25,7 +25,7 @@ void CGEN_FUNCTION(cupidSumClumps)( CGEN_TYPE *in, int ilevel, int ndim,
 *  Synopsis:
 *     void cupidSumClumps<X>( CGEN_TYPE *in, int ilevel, int ndim, int *lbnd, 
 *                             int *ubnd, int nel, HDSLoc *obj, float *rmask, 
-*                             void *out, char *method )
+*                             void *out, const char *method )
 
 *  Description:
 *     This function stores an image of the sum of all the found clumps

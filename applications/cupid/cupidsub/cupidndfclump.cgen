@@ -221,7 +221,9 @@ HDSLoc *CGEN_FUNCTION(cupidNdfClump)( CGEN_TYPE *ipd, int *ipa, int nel,
 
 /* If the number of contacts between the clump and any areas of bad
    pixels is too high, set the NDFs Unit component to "BAD". */
-      if( bad > maxbad ) ndfCput( "BAD", indf, "Unit", status );
+      if( bad > maxbad ) {
+         ndfCput( "BAD", indf, "Unit", status );
+      }
    }
 
 /* If required, create a Cupid extension in the NDF, storing any extra 

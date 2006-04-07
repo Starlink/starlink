@@ -11,6 +11,12 @@ Changes introduced at V0.0-12:
 
  - The MAKESNR command has been moved from CUPID to KAPPA.
 
+ - A new command called EXTRACTCLUMPS has been added to the CUPID package.
+ This uses the pixel mask created by FINDCLUMPS (when using methods
+ ClumpFind, Reinhold or FellWalker) to extract clump parameters from
+ another data array. For instance, if FINDCLUMPS is run on an SNR array,
+ EXTRACTCLUMPS can then be used to calculate the parameters of the
+ corresponding clumps in the original data array.
 
 
 Changes introduced at V0.0-11:

@@ -193,7 +193,9 @@ void cupidRFillLine( int *, int *, int, int, int[ 3 ], int[ 3 ], int[ 3 ], int, 
 void cupidStoreClumps( const char *, HDSLoc *, HDSLoc *, int, double[3], const char *, AstFrameSet *, int );
 void cupidStoreConfig( HDSLoc *, AstKeyMap * );
 void cupidSumClumps( int dtype, int ndim, int *lbnd, int *ubnd, int nel, int *, int, double, float *, void *, char * );
+AstKeyMap *cupidRetrieveConfig( HDSLoc * );
 
 void findclumps( void );
 void cupidhelp( void );
 void makeclumps( void );
+void extractclumps( void );

@@ -4,6 +4,70 @@ package cupid {
 
    executable cupid_mon {
 
+      action extractclumps {
+
+         helplib {$CUPID_HELP}
+
+         parameter data {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Input data NDF}
+            helpkey *
+          }
+
+         parameter fwhmbeam {
+            type _DOUBLE
+            access READ
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Spatial beam width in pixels}
+            helpkey *
+          }
+
+         parameter mask {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input mask NDF}
+            helpkey *
+          }
+
+         parameter out {
+            position 3
+            type NDF
+            access WRITE
+            vpath PROMPT
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Output mask NDF}
+            helpkey *
+          }
+
+         parameter outcat {
+            position 4
+            type LITERAL
+            access WRITE
+            prompt {Output catalogue}
+            association ->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter velores {
+            type _DOUBLE
+            access READ
+            ppath DYNAMIC
+            vpath DYNAMIC
+            prompt {Velocity resolution in channels}
+            helpkey *
+          }
+
+      }
+
       action findclumps {
          alias {clumps}
 

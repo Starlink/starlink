@@ -106,6 +106,10 @@ void cupid_mon( int *adam_status ) {
    } else if( !strcmp( name, "MAKECLUMPS" ) ) {
       makeclumps();
 
+/* Extract clump parameters from another image */
+   } else if( !strcmp( name, "EXTRACTCLUMPS" ) ) {
+      extractclumps();
+
 
 
 /* Add new commands here... */
