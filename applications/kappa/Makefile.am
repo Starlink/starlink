@@ -113,7 +113,7 @@ maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
-kaphelp mfittrend
+kaphelp mfittrend makesnr
 
 KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
@@ -251,7 +251,7 @@ expon.ifc ffclean.ifc fillbad.ifc fitsurface.ifc \
 flip.ifc fourier.ifc gausmooth.ifc glitch.ifc \
 globals.ifc histat.ifc histeq.ifc histogram.ifc \
 kstest.ifc laplace.ifc logar.ifc look.ifc \
-lucy.ifc makesurface.ifc manic.ifc maths.ifc \
+lucy.ifc makesnr.ifc makesurface.ifc manic.ifc maths.ifc \
 median.ifc mstats.ifc mult.ifc noglobals.ifc \
 nomagic.ifc normalize.ifc numb.ifc outset.ifc \
 parget.ifc paste.ifc permaxes.ifc pixdupe.ifc \
@@ -271,7 +271,7 @@ flip.ifl fourier.ifl gausmooth.ifl glitch.ifl \
 globals.ifl histat.ifl histeq.ifl histogram.ifl \
 kaphelp.ifl kapversion.ifl kstest.ifl \
 laplace.ifl listmake.ifl listshow.ifl logar.ifl \
-look.ifl lucy.ifl makesurface.ifl manic.ifl \
+look.ifl lucy.ifl makesnr.ifl makesurface.ifl manic.ifl \
 maths.ifl median.ifl mstats.ifl mult.ifl \
 noglobals.ifl nomagic.ifl normalize.ifl numb.ifl \
 outset.ifl parget.ifl paste.ifl permaxes.ifl \

@@ -2,6 +2,10 @@
 
    A new release of KAPPA (v1.5) has been made.  The main changes are:
 
+   o  A new application called MAKESNR has been added. This command
+   creates a signal-to-noise array from an NDF with defined VARIANCE
+   component, rejecting unusably small variances.
+
    o  SETVAR now provides the option to copy values from another NDF
    into the Variance component of the NDF being modified.
 

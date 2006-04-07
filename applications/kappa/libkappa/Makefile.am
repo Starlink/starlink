@@ -2,7 +2,7 @@
 noinst_LTLIBRARIES = libkappa.la
 noinst_DATA = kapmon.hlp
 
-libkappa_la_SOURCES = $(F_ROUTINES)
+libkappa_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 F1_ROUTINES = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f \
 calpol.f cdiv.f centroid.f chpix.f cmult.f collapse.f compadd.f	       \
@@ -24,17 +24,24 @@ F3_ROUTINES = kaphelp.f
 
 F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
+C_ROUTINES = makesnr.c
+
 wcsalign.f: KAP_ERR
 
 KAP_ERR: ../KAP_ERR
 	$(LN_S) ../KAP_ERR ./KAP_ERR
 
 # Create help for this library
-kapmon.hlp: $(F_ROUTINES)
+kapmon.hlp: $(F_ROUTINES) $(C_ROUTINES)
+	-rm -f kapmon.hlp.1 kapmon.hlp.2 kapmon.hlp
 	cat $(F_ROUTINES) > all.f
-	-rm -f kapmon.hlp
 	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
-	@PROHLP@ in=all.f out=kapmon.hlp single=no
+	@PROHLP@ in=all.f out=kapmon.hlp.1 single=no
 	-rm all.f
+	cat $(C_ROUTINES) > all.c
+	PATH="$(PATH):$(STARLINK)/bin/sst"; export PATH; \
+	@PROHLP@ in=all.c out=kapmon.hlp.2 single=no
+	-rm all.c
+	cat kapmon.hlp.1 kapmon.hlp.2 > kapmon.hlp
 
 CLEANFILES = kapmon.hlp KAP_ERR
