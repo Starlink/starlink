@@ -175,7 +175,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>0.0-11</version>
+  <version>0.0-12</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -855,7 +855,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.5</version>
+  <version>1.5-1</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
