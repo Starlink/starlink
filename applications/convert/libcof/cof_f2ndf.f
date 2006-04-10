@@ -1,6 +1,6 @@
-      SUBROUTINE COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, PROFIT,
-     :                      PROXTI, CONTNR, NENCOD, ENCODS, WCSATT,
-     :                      STATUS )
+      SUBROUTINE COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, USETYP,
+     :                      PROFIT, PROXTI, CONTNR, NENCOD, ENCODS, 
+     :                      WCSATT, STATUS )
 *+
 *  Name:
 *     COF_F2NDF
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, PROFIT, PROXTI, 
-*    :                CONTNR, NENCOD, ENCODS, WCSATT, STATUS )
+*     CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, USETYP, PROFIT,
+*                     PROXTI, CONTNR, NENCOD, ENCODS, WCSATT, STATUS )
 
 *  Description:
 *     This routine converts a FITS file into an NDF.  It can process an
@@ -62,6 +62,14 @@
 *        type on tape to _REAL or _DOUBLE in the NDF.  The choice of
 *        floating-point data type depends on the number of significant
 *        digits in the BSCALE and BZERO keywords.
+*     USETYP = LOGICAL (Given)
+*        Specifies the HDS primitive data type of the NDF data and 
+*        variance arrays.  It should be one of the HDS primitive types.
+*        This data type overrides the data type of rescaled data (see
+*        argument FMTCNV) given by the precision of the BSCALE and BZERO
+*        keywords.  Care should be exercised that the chosen type
+*        supports the dynamic range of the data, especially if 
+*        FMTCNV=.TRUE.
 *     PROFIT = LOGICAL (Given)
 *        If .TRUE., the FITS headers are written to the NDF's FITS
 *        extension. 
@@ -259,56 +267,61 @@
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV to argument list for COF_STYPE call.
 *     28-MAR-2000 (AJC):
-*        Open file with COF_FTOPR to handle multi-extension FITS.
-*        Also prevent PROEXTS if single extension is specified.
-*        Don't set up data conversion if no data array (FTPSCL crashes).
-*        Fairly major revision
-*          Use NHDU as extension number set in COF_FTOPR (0-n not 1-n)
-*            - alters reference in error messages and logfile captions.
-*          Rename FIRST to PRMRY as first is not necessarily primary now.
-*          Increment NHDU and move to next extension at end of loop.
-*          Get mandatory headers and check for non-standard files earlier
-*            in loop as require DARRAY.
+*        Open file with COF_FTOPR to handle multi-extension FITS.  Also 
+*        prevent PROEXTS if single extension is specified.  Don't set up
+*        data conversion if no data array (FTPSCL crashes).
+*        Fairly major revision:
+*          -  Use NHDU as extension number set in COF_FTOPR (0-n not 
+*          1-n); alters reference in error messages and logfile
+*          captions.
+*          -  Rename FIRST to PRMRY as first is not necessarily primary 
+*          now.
+*          -  Increment NHDU and move to next extension at end of loop.
+*          - Get mandatory headers and check for non-standard files
+*          earlier in loop as require DARRAY.
 *      4-APR-2000 (AJC):
-*        Add EXTABLE handling
-*        Use COF_CHKXT to check for required extension
+*        Add EXTABLE handling.  Use COF_CHKXT to check for required 
+*        extension.
 *     30-JUN-2000 (AJC):
-*        Allow top-level NDF to be created
-*        Use COF_EXTNF to report unused specifiers
+*        Allow top-level NDF to be created.  Use COF_EXTNF to report 
+*        unused specifiers.
 *     12-JUL-2000 (AJC):
-*        Correctly obtain parent locator for all multip
-*        Type NDF_CONTAINER for top-level of multip EXTABLE output
+*        Correctly obtain parent locator for all multip.  Type 
+*        NDF_CONTAINER for top-level of multip EXTABLE output.
 *     15-AUG-2000 (AJC):
-*        Use %VAL(CNF_PVAL(PNTR)) construct
-*        Extract code into COF_NEEDXT
-*        Add header merging.
+*        Use %VAL(CNF_PVAL(PNTR)) construct.  Extract code into 
+*        COF_NEEDXT.  Add header merging.
 *     30-AUG-2000 (AJC):
 *        Correct NDF_EXT_n to FITS_EXT_n in description
 *      5-SEP-2000 (AJC):
-*        Allow NDFNAM EXTNi.name with i, . and name optional
-*        Implement NDFNAM EXTNi.name for tables also
+*        Allow NDFNAM EXTNi.name with i, . and name optional.  Also
+*        implement NDFNAM EXTNi.name for tables.
 *      7-DEC-2000 (AJC):
 *        Create FITS_HEADER containing _CHARACTER array, not NDF, for
-*        FITS HDUs with no data array
+*        FITS HDUs with no data array.
 *     12-DEC-2000 (AJC):
-*        Separate Data scaling to COF_DOSCAL
+*        Separate data scaling into COF_DOSCL.
 *      5-JAN-2001 (AJC):
-*        Check for attempt to add second NDF component to a FITS_HEADER
+*        Check for attempt to add second NDF component to a FITS_HEADER.
 *      3-FEB-2001 (AJC):
-*        Don't call FTWCS if NDIM=0
+*        Don't call FTWCS if NDIM=0.
 *      1_MAY-2001 (AJC):
-*        Allocate NHEAD+1 logicals for RETAIN (allows for blank between last
-*        HISTORY record and END
+*        Allocate NHEAD+1 logicals for RETAIN (allows for blank between
+*        last HISTORY record and END.
 *     20-FEB-2002 (DSB):
 *        Added argument WCSATT.
 *     20-DEC-2002 (AJC):
-*        Added the MERGED flag as the answer given by the CFITSIO routine
-*        FTGHSP seems to incorrectly count the END card for the merged header
-*        so the count must be adjusted.
+*        Added the MERGED flag as the answer given by the CFITSIO 
+*        routine FTGHSP seems to incorrectly count the END card for the
+*        merged header so the count must be adjusted.
 *     2003 May 3 (MJC):
 *        Added support for INES IUE spectra.
 *     2004 September 10 (TIMJ):
-*        Initialise some variables that were causing valgrind trouble
+*        Initialise some variables that were causing valgrind trouble.
+*     2006 April 7 (MJC):
+*        Add USETYP argument.  Put the local variables into order and
+*        various tidying steps.
+*        
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -332,6 +345,7 @@
       LOGICAL LOGHDR
       INTEGER FDL
       LOGICAL FMTCNV
+      CHARACTER * ( * ) USETYP
       LOGICAL PROFIT
       LOGICAL PROXTI
       LOGICAL CONTNR
@@ -351,13 +365,15 @@
       PARAMETER( FITSOK = 0 )
 
 *  Global Variables:
-      INCLUDE 'F2NDF1_CMN'        ! EXTABLE variables
-*     Symbolic constants defined
+      INCLUDE 'F2NDF1_CMN'       ! EXTABLE variables
+*
+*     Symbolic Constants defined:
 *        MAXCMP = INTEGER
 *           The maximum number of components allowed
 *        MAXEXT = INTEGER
 *           The maximum number of extension sets allowed
-*     Global variables declared
+*
+*     Global Variables declared:
 *        NCMP = INTEGER
 *           Number of component lines in EXTABLE
 *        NEXTS = INTEGER
@@ -374,22 +390,21 @@
 *           Transformation codes from EXTABLE
 
       INCLUDE 'F2NDF2_CMN'        ! EXTABLE variables
-*     Global variables declared
+*
+*     Global Variables declared:
 *        NPHEAD = INTEGER
 *           The number of saved primary header cards
 
 *  Local Variables:
-      LOGICAL BAD                ! True if bad values may be present in
-                                 ! array
-      LOGICAL EXTABL             ! TRUE if using an EXTABLE
-      LOGICAL NEWNDF             ! TRUE if NDF needs sizing
+      CHARACTER * ( DAT__SZLOC ) ALOC ! Locator to an NDF FITS Airlock
+      LOGICAL BAD                ! Bad values may be present in array?
       INTEGER BITPIX             ! FITS file's BITPIX
       INTEGER BLOCSZ             ! Block size of FITS file (or blocking
                                  ! factor if <11)
-      LOGICAL PROEXT             ! Local version of PROXTI argument (may alter)
       CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
       CHARACTER * ( 48 ) COMENT  ! FITS header comment
       CHARACTER * ( 8 ) COMP     ! NDF array component name
+      CHARACTER * ( DAT__SZTYP ) CTYPE ! Type of component
       LOGICAL DARRAY             ! True if the current HDU contains a
                                  ! data array
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
@@ -397,10 +412,10 @@
       CHARACTER * ( DAT__SZLOC ) ELOC ! Locator to NDF extension (MORE)
                                  ! structure
       CHARACTER * ( 80 ) ERRMSG  ! FITSIO error message
+      LOGICAL EXTABL             ! Using an EXTABLE?
       CHARACTER * ( 12 ) EXTNAM  ! NDF-extension name
       LOGICAL EXTEND             ! Value of FITS EXTEND keyword
       LOGICAL EXNDF              ! FITS file originated from an NDF?
-      LOGICAL PRMRY              ! Processing the primary HDU
       LOGICAL FIRST              ! Processing the first HDU
                                  ! (Also used in flushing errors.)
       INTEGER FSTAT              ! FITSIO error status
@@ -415,6 +430,9 @@
       CHARACTER * ( NDF__SZFTP ) HDUCLA ! Classification of HDU
       INTEGER HDUTYP             ! HDU type (primary, IMAGE, ASCII or
                                  ! binary table)
+      INTEGER I, J               ! Loop counters
+      INTEGER ICMP               ! Component number in EXTABLE
+      INTEGER IEXT               ! Extension-set number in EXTABLE
       INTEGER IGROUP             ! Loop counter for random groups
       LOGICAL ISNDF              ! If a genuine NDF is created
       CHARACTER * ( NDF__SZTYP ) ITYPE ! NDF implementation data type
@@ -426,6 +444,8 @@
       INTEGER NDFS(MAXEXT)       ! NDFs for each extn set in EXTABLE
       INTEGER NDFE               ! Identifier of effective NDF
       INTEGER NDIM               ! Number of dimensions
+      LOGICAL NEEDED             ! Extension needed?
+      LOGICAL NEWNDF             ! NDF needs sizing?
       INTEGER NHDU               ! Count of header and data unit
       INTEGER NHEAD              ! Number of FITS header cards
       LOGICAL NONSDA             ! True if the current HDU contains a
@@ -435,21 +455,18 @@
       INTEGER PLACE              ! NDF placeholder for <NDF> extension
       CHARACTER * ( DAT__SZLOC ) PLOC ! Locator to NDF top-level
       INTEGER PNTR( 1 )          ! Pointer to NDF array
+      LOGICAL PRMRY              ! Processing the primary HDU?
+      LOGICAL PROEXT             ! Local version of PROXTI argument (may
+                                 ! alter)
       INTEGER REPNTR             ! Pointer to header-propagation flags
       LOGICAL SIMPLE             ! True if the FITS file is simple
       CHARACTER * ( 6 ) SPENAM   ! Name of special type of FITS file
+      LOGICAL THERE              ! NDF already created?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
       LOGICAL VALID              ! True if the NDF identifier is valid
       LOGICAL WRTEXT             ! True if write NDF FITS extension
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
-      CHARACTER * ( DAT__SZLOC ) ALOC ! Locator to an NDF FITS Airlock
-      CHARACTER * ( DAT__SZTYP ) CTYPE ! Type of component
       CHARACTER * ( 20 ) XTENS   ! Type of FITS extension
-      INTEGER I, J               ! Loop counters
-      INTEGER IEXT               ! Extension-set number in EXTABLE
-      INTEGER ICMP               ! Component number in EXTABLE
-      LOGICAL NEEDED             ! If extension needed
-      LOGICAL THERE              ! If NDF already created
 *.
 
 *  Check the inherited global status.
@@ -471,16 +488,17 @@
       MULTIP = .FALSE.
 
       IF ( EXTABL ) THEN
-*  Initialize the DONE flag array - we do it here afresh for each FITS file.
-*  This keeps a record of which extensions in EXTABLE have been done - to
-*  avoid repetitive checks and confirm completion at the end.
+
+*  Initialize the DONE flag array.  We do it here afresh for each FITS
+*  file---this keeps a record of which extensions in EXTABLE have been
+*  done---to avoid repetitive checks and confirm completion at the end.
 *  Blank means not required so treat as done.
          DO J = 1, NEXTS
             DO I = 1, NCMP
-               IF ( EXTNS(I,J) .EQ. ' ' ) THEN
-                  DONE(I,J) = .TRUE.
+               IF ( EXTNS( I, J ) .EQ. ' ' ) THEN
+                  DONE( I, J ) = .TRUE.
                ELSE
-                  DONE(I,J) = .FALSE.
+                  DONE( I, J ) = .FALSE.
                END IF
             END DO
          END DO
@@ -503,7 +521,7 @@
 *  Get the length of the filename.
       NCF = CHR_LEN( FILNAM )
 
-*  Open the FITS file with read access.  NHDU is returned nagative if
+*  Open the FITS file with read access.  NHDU is returned negative if
 *  there was no extension specified, or to the specified extension
 *  number (0 indicates the Primary HDU).
       CALL COF_FTOPR( FUNITH, FILNAM(1:NCF), EXTABL .OR. CONTNR, BLOCSZ,
@@ -513,9 +531,9 @@
 *  Set the initial Header and Data Unit number.
       IF ( NHDU .LT. 0 ) THEN
 
-*  If no extension specifier, NHDU is 0 (Primary).
-*  Force propagate extensions if an EXTABLE is specified;
-*  otherwise use the given value of the PROEXTS parameter.
+*  If no extension specifier, NHDU is 0 (Primary).  Force propagation of
+*  extensions if an EXTABLE is specified; otherwise use the given value 
+*  of the PROEXTS parameter.
          IF ( EXTABL ) THEN
             PROEXT = .TRUE.
          ELSE
@@ -622,15 +640,14 @@
                CALL COF_NDXT( FUNITH, NHDU, NEEDED, IEXT, ICMP, LOOP,
      :                        STATUS )
                IF ( .NOT. NEEDED ) GOTO 888
-            END IF  ! EXTABLE specified
+            END IF
 
 *  Obtain the type of the current extension.
             IF ( .NOT. PRMRY ) THEN
                CALL FTGKYS( FUNITD, 'XTENSION', XTENS, COMENT, FSTAT )
                IF ( FSTAT .NE. FITSOK ) THEN
-                  BUFFER = 
-     :              'Error obtaining the extension name from '/
-     :              /'FITS file '//FILNAM(1:NCF )//'.'
+                  BUFFER =  'Error obtaining the extension name from '/
+     :                      /'FITS file '//FILNAM(1:NCF )//'.'
                   CALL COF_FIOER( FSTAT, 'COF_F2NDF_GKYS', 'FTGKYS',
      :                            BUFFER, STATUS )
                   GOTO 999
@@ -683,11 +700,12 @@
                   GOTO 999
                END IF
 
-
 *  Data scaling.
 *  =============
 *  Check that the HDU has a data array---otherwise setting the scaling
-*  fails.
+*  fails.  COF_DOSCL sets the scale factors from the BSCALE and BZERO
+*  keywords, and returns the data type based upon the precision of the
+*  keywords, or a null value if either BSCALE or BZERO is absent.
                IF ( DARRAY ) THEN
                   CALL COF_DOSCL( FUNITH, FUNITD, FMTCNV, TYPE, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -696,7 +714,13 @@
      :                 'for FITS file ^FILE.', STATUS )
                      GO TO 999
                   END IF
-               END IF  ! Data array present
+               END IF
+
+*  Override the type, but retain scaling.  This might be a problem if
+*  a one- or two-byte integer type is selected.
+               IF ( USETYP .NE. ' ' ) THEN
+                  TYPE = USETYP
+               END IF
 
 *  Former NDF?
 *  ===========
@@ -718,21 +742,22 @@
 *  counter is zero.  This is what certain FITSIO routines expect.
                GCMIN = 0
 
-*  Set MULTIP if we want to create a series of NDFs in the container file.
-*  For random groups, when the number is one, then a normal NDF can be created.
+*  Set MULTIP if we want to create a series of NDFs in the container 
+*  file.  For random groups, when the number is one, then a normal NDF
+*  can be created.
                MULTIP = CONTNR
      :                  .OR. ( GCOUNT .GT. 1 .AND. NONSDA )
      :                  .OR. EXTABL
                IF ( MULTIP ) THEN
 
-*  We want a series of NDFs in the container file.
-*  Get a locator for the dummy NDF already created.
+*  We want a series of NDFs in the container file.  Get a locator for 
+*  the dummy NDF already created.
                   CALL NDF_LOC( NDF, 'WRITE', PLOC, STATUS )
 
 *  Delete any existing dummy data array, unless the NDF is to be at the
 *  top level.
                   IF ( CONTNR .OR. 
-     :              .NOT. (EXTABL .AND. ( NDFNMS(1) .EQ. '*' )) ) THEN
+     :                .NOT. (EXTABL .AND. ( NDFNMS(1) .EQ. '*' )) ) THEN
 
                      CALL DAT_THERE( PLOC, 'DATA_ARRAY', THERE, STATUS )
                      IF ( STATUS .EQ. SAI__OK ) THEN
@@ -742,7 +767,7 @@
 
 *  Re-type the container file for EXTABLE output.
                      IF ( CONTNR .OR. EXTABL )
-     :                  CALL DAT_RETYP( PLOC, 'NDF_CONTAINER', STATUS )
+     :                 CALL DAT_RETYP( PLOC, 'NDF_CONTAINER', STATUS )
 
                   END IF
 
@@ -750,20 +775,20 @@
                   GCMIN = 1
 
 *  After a random-group, it is not clear where any extensions should
-*  go, so ensure that the loop ends.  A random-group dataset with
-*  other FITS extensions attached is extremely unlikely to cause
-*  difficulties given that random-groups were hardly used anyway,
-*  almost entirely in the radio-astronomy community, who then developed
-*  the original binary tables long before FITS extensions were
-*  ratified, and switched to that more-efficient data structure.
+*  go, so ensure that the loop ends.  A random-group dataset with other
+*  FITS extensions attached is extremely unlikely to cause difficulties 
+*  given that random-groups were hardly used anyway, almost entirely in 
+*  the radio-astronomy community, who then developed the original binary
+*  tables long before FITS extensions were ratified, and switched to 
+*  that more-efficient data structure.
 *
 *  However if it's MULTIP because of an EXTABLE do not end loop.
 !                  IF ( .NOT. EXTABL ) LOOP = .FALSE.
                   IF ( NONSDA ) LOOP = .FALSE.
 
                ELSE
-*  Prepare for a simple and 1-element random-groups primary HDU, or
-*  an IMAGE extension as an NDF extension.
+*  Prepare for a simple and 1-element random-groups primary HDU, or an
+*  IMAGE extension as an NDF extension.
 
 *  Ensure that the number of group NDFs to process is 0 unless it is a
 *  single group random-groups FITS file (it is unlikely but not
@@ -869,9 +894,9 @@
 
                   ELSE IF ( EXTABL ) THEN
 
-*  We have an EXTABLE - each extension set produces an NDF in the 
-*  container file. ICMP and IEXT point to the component and extension set
-*  respectively in the EXTABLE arrays
+*  We have an EXTABLE; each extension set produces an NDF in the 
+*  container file. ICMP and IEXT point to the component and extension
+*  set respectively in the EXTABLE arrays.
 
 *  Get the name of the component NDF, as set by COF_EXTAB.
                      NDFNAM = NDFNMS( IEXT )
@@ -884,11 +909,10 @@
 
                      ELSE
 
-*  We require a component NDF.  If the NDF isn't there already,
-*  create a new NDF in the container file via an NDF placeholder from
-*  the top-level locator.  The data type and bounds will be changed
-*  below once they are known.  Save the NDF pointer in an array for
-*  re-use.
+*  We require a component NDF.  If the NDF isn't there already, create a
+*  new NDF in the container file via an NDF placeholder from the
+*  top-level locator.  The data type and bounds will be changed below
+*  once they are known.  Save the NDF pointer in an array for re-use.
                         CALL DAT_THERE( PLOC, NDFNAM, THERE, STATUS )
                         IF ( STATUS .EQ. SAI__OK ) THEN
                            IF ( .NOT. THERE ) THEN
@@ -896,7 +920,8 @@
      :                                        STATUS )
                               CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE,
      :                                      NDFE, STATUS )
-                              CALL NDF_CLONE( NDFE, NDFS(IEXT), STATUS )
+                              CALL NDF_CLONE( NDFE, NDFS( IEXT ),
+     :                                        STATUS )
 
                            ELSE
                               CALL CMP_TYPE( PLOC, NDFNAM, CTYPE,
@@ -906,18 +931,18 @@
      :                             ( CTYPE .NE. 'NDF' ) ) THEN
                                  STATUS = SAI__ERROR
                                  CALL ERR_REP( 'COF_F2NDF_CMPER1',
-     :                            'Error in EXTABLE.', STATUS )
+     :                             'Error in EXTABLE.', STATUS )
                                  CALL MSG_SETC( 'NDF', NDFNMS(IEXT) )
                                  CALL ERR_REP( 'COF_F2NDF_CMPER2',
-     :                            'Attempt to use a FITS HDU with no '//
-     :                            'data array in constructing ^NDF.',
-     :                             STATUS )
+     :                            'Attempt to use a FITS HDU with no '/
+     :                            /'data array in constructing ^NDF.',
+     :                            STATUS )
 
                               ELSE
 
 *  We require to add a component to an existing NDF.
                                  NEWNDF = .FALSE.
-                                 CALL NDF_CLONE( NDFS(IEXT), NDFE,
+                                 CALL NDF_CLONE( NDFS( IEXT ), NDFE,
      :                                           STATUS )
                               END IF
                            END IF
@@ -925,10 +950,10 @@
                      END IF
 
 *  Get the required component name.
-                     COMP = COMPS(ICMP)
+                     COMP = COMPS( ICMP )
 
 *  If it's an extension, create the NDF extension name.
-                     IF ( COMP(1:4) .EQ. 'EXTN' ) THEN
+                     IF ( COMP( 1:4 ) .EQ. 'EXTN' ) THEN
                         CALL COF_GXTNM( NHDU, COMP, EXTNAM, STATUS )
 
                         COMP = 'DATA'
@@ -988,7 +1013,7 @@
                      WRTEXT = ( COMP .EQ. 'DATA' ) .AND. PROFIT
                   ELSE
                      WRTEXT = ( ( PRMRY .AND. .NOT. MULTIP ) .OR.
-     :                          ( XTENS .EQ. 'IMAGE' .AND.
+     :                          ( XTENS .EQ. 'IMAGE' .AND. 
      :                            .NOT. EXNDF ) .OR.
      :                          ( IGROUP .GT .0 ) )
      :                        .AND. PROFIT
@@ -1008,14 +1033,15 @@
                      CALL COF_NHEAD( FUNITH, FILNAM, NHEAD, STATUS )
                      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Create the mask and assign .TRUE. to all of its elements.
-*  Allocate one more than the number given by COF_NHEAD in case there is a
-*  blank after the last HISTORY record and before the END.
-*  (CFITSIO FTGHSP doesn't count END or preceding blanks.)
+*  Create the mask and assign .TRUE. to all of its elements.  Allocate 
+*  one more than the number given by COF_NHEAD in case there is a
+*  blank after the last HISTORY record and before the END.  (CFITSIO 
+*  FTGHSP doesn't count END or preceding blanks.)
                      CALL PSX_CALLOC( NHEAD+1, '_LOGICAL', REPNTR,
      :                                STATUS )
                      CALL CON_CONSL( .TRUE., NHEAD+1, 
-     :                               %VAL( CNF_PVAL(REPNTR) ), STATUS )
+     :                               %VAL( CNF_PVAL( REPNTR ) ), 
+     :                               STATUS )
                   END IF
 
 *  Deal with the NDF-style history records in the headers, assuming the
@@ -1026,7 +1052,8 @@
 *  using FITS files with Starlink tasks.
                   IF ( EXNDF .AND. COMP .EQ. 'DATA' ) THEN
                      CALL COF_CHISR( FUNITH, NDFE, NHEAD,
-     :                               %VAL( CNF_PVAL(REPNTR) ), STATUS )
+     :                               %VAL( CNF_PVAL( REPNTR ) ),
+     :                               STATUS )
                   END IF
 
 *  Read the main header into the FITS extension of the NDF.  The FITS
@@ -1035,7 +1062,8 @@
                      IF ( MERGED ) NHEAD = NHEAD - 1
                      CALL COF_WFEXF( FUNITH, NDFE, IGROUP, PCOUNT,
      :                               FILNAM, NHEAD, 
-     :                               %VAL( CNF_PVAL(REPNTR) ), STATUS )
+     :                               %VAL( CNF_PVAL( REPNTR ) ),
+     :                               STATUS )
                   END IF
 
 *  Free the work space.
@@ -1049,7 +1077,7 @@
 *  Modify the shape and type of the NDF, now that it is known.
 *  ===========================================================
 
-*  Test whether or not there is a data array present.  The zero'th group
+*  Test whether or not there is a data array present.  The zeroth group
 *  is a simple array and is merely filled with dummy data, so test for
 *  this.
                   IF ( DARRAY .AND. ( IGROUP .GT. 0 .OR.
@@ -1057,9 +1085,9 @@
                      CALL COF_STYPE( NDFE, COMP, TYPE, BITPIX, FMTCNV, 
      :                               ITYPE, STATUS )
 
-*  Specify the bounds of the NDF array component unless it has
-*  already been done, in which case check for compatibility.
-                     IF ( NEWNDF) THEN
+*  Specify the bounds of the NDF array component unless it has already
+*  been done, in which case check for compatibility.
+                     IF ( NEWNDF ) THEN
                         CALL COF_SBND( FUNITH, NDFE, 'LBOUND', .FALSE.,
      :                                 STATUS )
                      ELSE
@@ -1076,8 +1104,8 @@
 *  Copy the data values into the array component.
 *  ==============================================
 
-*  First map the input array component with the desired data type.
-*  Any type conversion will be performed by the FITSIO array-reading
+*  First map the input array component with the desired data type.  Any
+*  type conversion will be performed by the FITSIO array-reading 
 *  routine.
                      CALL NDF_MAP( NDFE, COMP, ITYPE, 'WRITE', PNTR, EL,
      :                             STATUS )
@@ -1089,23 +1117,28 @@
 *  have bad pixels.
                      IF ( ITYPE .EQ. '_UBYTE' ) THEN
                         CALL FTGPVB( FUNITD, IGROUP, 1, EL, VAL__BADUB,
-     :                    %VAL(CNF_PVAL(PNTR(1))), BAD, FSTAT )
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
+     :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                         CALL FTGPVI( FUNITD, IGROUP, 1, EL, VAL__BADW,
-     :                    %VAL(CNF_PVAL(PNTR(1))), BAD, FSTAT )
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
+     :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                         CALL FTGPVJ( FUNITD, IGROUP, 1, EL, VAL__BADI,
-     :                    %VAL(CNF_PVAL(PNTR(1))), BAD, FSTAT )
+     :                               %VAL( CNF_PVAL( PNTR(1) ) ), BAD,
+     :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
                         CALL FTGPVE( FUNITD, IGROUP, 1, EL, VAL__BADR,
-     :                    %VAL(CNF_PVAL(PNTR(1))), BAD, FSTAT )
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
+     :                               FSTAT )
 
                      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                         CALL FTGPVD( FUNITD, IGROUP, 1, EL, VAL__BADD,
-     :                    %VAL(CNF_PVAL(PNTR(1))), BAD, FSTAT )
+     :                               %VAL( CNF_PVAL( PNTR( 1 ) ) ), BAD,
+     :                               FSTAT )
 
                      END IF
 
@@ -1240,7 +1273,7 @@
                      CALL NDF_LOC( NDF, 'WRITE', PLOC, STATUS )
 
 *  Delete any existing dummy data array and re-type the container file 
-*  (assume it's already done if there is no data array.
+*  (assume it's already done if there is no data array).
                      CALL DAT_THERE( PLOC, 'DATA_ARRAY', THERE, STATUS )
                      IF ( ( STATUS .EQ. SAI__OK ) .AND. THERE ) THEN
                         CALL DAT_ERASE( PLOC, 'DATA_ARRAY', STATUS )
@@ -1259,20 +1292,20 @@
                         COMP = COMPS( ICMP )
                      ELSE
 
-*  Otherwise use the default FITS_EXT_n
+*  Otherwise use the default FITS_EXT_n.
                         COMP = 'EXTN'
                      END IF
 
 *  If it's an extension, create the NDF extension name.
 *  Tables must be associated with NDF extensions.
-                     IF ( COMP(1:4) .EQ. 'EXTN' ) THEN
+                     IF ( COMP( 1:4 ) .EQ. 'EXTN' ) THEN
                         CALL COF_GXTNM( NHDU, COMP, EXTNAM, STATUS )
                      ELSE
                         STATUS = SAI__ERROR
-                        CALL MSG_SETI( 'NHDU', NHDU )                        
+                        CALL MSG_SETI( 'NHDU', NHDU )
                         CALL ERR_REP( 'COF_F2NDF_INV',
-     :                    'FITS extension ^NHDU: table not '//
-     :                    'associated with NDF extension.', STATUS )
+     :                    'FITS extension ^NHDU: table not '/
+     :                    /'associated with NDF extension.', STATUS )
                         GOTO 999
                      END IF
 
@@ -1293,8 +1326,8 @@
 
             END IF  ! Binary or ASCII table
 
-*  Clean up FITS units---if a merged header was in use, delete it and restore
-*  the original FUNITH value.
+*  Clean up FITS units---if a merged header was in use, delete it and
+*  restore the original FUNITH value.
             IF ( FUNITH .NE. FUNITD ) THEN
                FSTATC = FITSOK
                CALL FTCLOS( FUNITH, FSTATC )
@@ -1302,7 +1335,7 @@
             END IF
 
 *  Get next HDU if required
-888         CONTINUE
+  888       CONTINUE
 
 *  Prepare for next FITS extension if more required
             IF ( LOOP ) THEN
