@@ -13,27 +13,15 @@
 *     CALL COF_DOSCL( FUNITH, FUNITD, FMTCNV, TYPE, STATUS )
 
 *  Description:
-*     This routine converts a FITS file into an NDF.  It can process an
-*     arbitrary FITS file to produce an NDF, using NDF extensions to
-*     store information conveyed in table and image components of the
-*     FITS file.  While no information is lost, in many common cases
-*     this would prove inconvenient especially as no meaning is attached
-*     to the NDF extension components.  Therefore, this routine
-*     recognises certain data products (currently IUE, ISO, and 2dF),
-*     and provides tailored conversions that map the FITS data better
-*     on to the NDF.  For instance, an image extension storing data
-*     errors will have its data array transferred to the NDF's VARIANCE
-*     (after being squared).  In addition, FITS2NDF can restore NDFs
-*     converted to FITS by the sister task NDF2FITS.
-
-*     Details of the supported formats and rules for processing them,
-*     and the general-case processing rules are described below.
+*     This routine sets the scale and offset of a FITS data array
+*     for FITSIO, and obtains the data type of the scaled 
+*     floating-point array.
 
 *  Arguments:
 *     FUNITH = INTEGER (Given)
-*        The FITS unit number associated with the header
-*        This may differ from that associated with the data if a merged
-*        header has been constructed.
+*        The FITS unit number associated with the header.  This may
+*        differ from that associated with the data if a merged header 
+*        has been constructed.
 *     FUNITD = INTEGER (Given)
 *        The FITS unit number associated with the data.
 *     FMTCNV = LOGICAL (Given)
@@ -51,9 +39,12 @@
 *        type on tape to _REAL or _DOUBLE in the NDF.  The choice of
 *        floating-point data type depends on the number of significant
 *        digits in the BSCALE and BZERO keywords.
-*     TYPE = CHARACTER*(NDF__SZTYP) (Given and returned)
-*        Given as the type of the NDF component - returned = ' ' if BSCALE
-*        and BZERO are to be used in scaling.
+*     TYPE = CHARACTER * ( NDF__SZTYP ) (Given and returned)
+*        Given as the type of the NDF component.  It is returned as the 
+*        effective data type for the data array based upon keywords
+*        BSCALE and BZERO.  It is either '_REAL' or '_DOUBLE' if the
+*        scale and offset do not take their defaults of one and zero
+*        respectively, and TYPE is returned blank otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -70,7 +61,9 @@
 
 *  History:
 *     12-DEC-2000 (AJC):
-*        Original version extracted from COF_F2NDF
+*        Original version extracted from COF_F2NDF.
+*     2006 April 7 (MJC):
+*        Correct the prologue's overall and TYPE descriptions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,9 +79,10 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
 
 *  Arguments Given:
-      INTEGER FUNITH             ! FITS unit for the (merged?) FITS header
+      INTEGER FUNITH             ! FITS unit for the (merged?) FITS 
+                                 ! header
       INTEGER FUNITD             ! FITS unit for the FITS file
-      LOGICAL FMTCNV             ! If format conversion required
+      LOGICAL FMTCNV             ! Format conversion required?
       CHARACTER * ( NDF__SZTYP ) TYPE ! NDF array's data type
 
 *  Status:
@@ -97,8 +91,8 @@
 *  External References:
 
 *  Local Constants:
-      INTEGER   FITSOK           ! Value of good FITSIO status
-      PARAMETER( FITSOK = 0 )
+      INTEGER FITSOK             ! Value of good FITSIO status
+      PARAMETER ( FITSOK = 0 )
 
 *  Global Variables:
 
@@ -131,31 +125,29 @@
 *  then the data type can be set to the null string.  This instructs
 *  later routines like COF_STYPC to use the data type specified by the
 *  FITSIO data-type code (based on BITPIX).
-         CALL COF_DSTYP( FUNITH, 'BSCALE', 'BZERO', TYPE,
-     :                            STATUS )
+         CALL COF_DSTYP( FUNITH, 'BSCALE', 'BZERO', TYPE, STATUS )
 
 *  If the header and data FUNITs are different, set the scaling factors
 *  explicitly for the data unit according to the header unit just in case
 *  it inherited them from the primary.
 *  Get BSCALE, BZERO from the merged header.
          IF ( FUNITH .NE. FUNITD ) THEN
-            CALL COF_GKEYD(
-     :        FUNITH, 'BSCALE', SCAPRE, SCALE, COMENT,
-     :                    STATUS )
+            CALL COF_GKEYD( FUNITH, 'BSCALE', SCAPRE, SCALE, COMENT,
+     :                      STATUS )
             IF ( .NOT. SCAPRE ) SCALE = 1.0D0
 
-            CALL COF_GKEYD(
-     :                    FUNITH, 'BZERO', SCAPRE, OFFSET, COMENT,
-     :                    STATUS )
+            CALL COF_GKEYD( FUNITH, 'BZERO', SCAPRE, OFFSET, COMENT,
+     :                      STATUS )
             IF ( .NOT. SCAPRE ) OFFSET = 0.0D0
-*  And set scaling of the original HDU
+
+*  And set scaling of the original HDU.
             CALL FTPSCL( FUNITD, SCALE, OFFSET, FSTAT )
          END IF
 
-*  To prevent scaling, the scale and offset must be set to
-*  one and zero respectively.  Note that this does not affect the
-*  keywords in the header of the input FITS file.  Note that the values
-*  are double precision.
+*  To prevent scaling, the scale and offset must be set to one and zero
+*  respectively.  Note that this does not affect the keywords in the 
+*  header of the input FITS file.  Note that the values are double
+*  precision.
       ELSE
          CALL FTPSCL( FUNITD, 1.0D0, 0.0D0, FSTAT )
 
@@ -164,14 +156,14 @@
 *  data-type code (based on BITPIX).
          TYPE = ' '
 
-      END IF  ! FMTCNV
+      END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
          BUFFER = 'Error defaulting the scale and offset '
          CALL COF_FIOER( FSTAT, 'COF_F2NDF_SCOF', 'FTPSCL', BUFFER,
-     :         STATUS )
+     :                   STATUS )
       END IF
 
       END
