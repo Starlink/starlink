@@ -18,14 +18,15 @@
 *     This sets the data type for an NDF array component.  A preferred
 *     type value is used, unless the component is the QUALITY (in which
 *     case the routine returns without action). The type may also be 
-*     undefined, in which case the supplied FITS BITPIX defines the data 
+*     undefined, in which case the supplied FITS BITPIX defines the data
 *     type.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF to be converted from the FITS file.
 *     COMP = CHARACTER * ( * ) (Given)
-*        The array component.  It must be 'Data', 'Quality' or 'Variance'.
+*        The array component.  It must be 'Data', 'Quality' or
+*        'Variance'.
 *     TYPE = CHARACTER * ( * ) (Given)
 *        The data type of the component.  If this is null, the BITPIX
 *        defines the data type.
@@ -53,7 +54,8 @@
 *        Original version.
 *     10-DEC-1998 (DSB):
 *        Return without action if COMP is 'Quality', since calling
-*        NDF_STYPE would cause an error to be reported by the NDF library.
+*        NDF_STYPE would cause an error to be reported by the NDF
+*        library.
 *     8-JAN-1999 (DSB):
 *        Added FMTCNV argument.
 *     {enter_changes_here}
@@ -94,9 +96,9 @@
 *  For DATA or VARIANCE components...
       ELSE
 
-*  Determine the data type of the output array component. A null supplied 
-*  type means use the data type of the FITS file (converted to floating
-*  point if format conversion is being performed).
+*  Determine the data type of the output array component.  A null
+*  supplied type means use the data type of the FITS file (converted to
+*  floating point if format conversion is being performed).
          IF ( TYPE .EQ. ' ' ) THEN
             CALL COF_BP2HT( BITPIX, FMTCNV, ITYPE, STATUS )
 
