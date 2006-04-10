@@ -31,6 +31,9 @@
 *     file, and choose the data type of the data and variance arrays.
 *     You can control whether or not to propagate extensions and
 *     history information.
+*
+*     The application also accepts NDFs stored as top-level components 
+*     of an HDS container file.
 
 *  Usage:
 *     ndf2fits in out [comp] [bitpix] [origin]
@@ -82,14 +85,25 @@
 *        line is required to enter the information at a prompt then 
 *        place a "-" at the end of each line where a continuation line
 *        is desired.  ["A"]
+*     CONTAINER = _LOGICAL (Read)
+*        If TRUE, the supplied IN files are any multi-NDF HDS container
+*        files, in which the NDFs reside as top-level components.  This
+*        option is primarily intended to support the UKIRT format, where
+*        the NDFs are named .In, n >=1, and one named HEADER containing 
+*        global metadata in its FITS airlock.  The .In NDFs may also 
+*        contain FITS airlocks, storing metadata pertinent to that NDF, 
+*        such as observation times.  The individual NDFs often represent
+*        separate integrations nodded along a slit or spatially.  Note 
+*        that this is not a group, so a single value applies to all the 
+*        supplied input files.  [FALSE]
 *     ENCODING = LITERAL (Read)
 *        Controls the FITS keywords which will be used to encode the 
 *        World Co-ordinate System (WCS) information within the FITS 
-*        header. The value supplied should be one of the encodings listed
-*        in the "World Co-ordinate Systems" section below. In addition, 
-*        the value "Auto" may also be supplied, in which case a suitable
-*        default encoding is chosen based on the contents of the NDFs
-*        FITS extension and WCS component.  ["Auto"]
+*        header.  The value supplied should be one of the encodings 
+*        listed in the "World Co-ordinate Systems" section below.  In 
+*        addition, the value "Auto" may also be supplied, in which case 
+*        a suitable default encoding is chosen based on the contents of
+*        the NDFs FITS extension and WCS component.  ["Auto"]
 *     IN = LITERAL (Read)
 *        The names of the NDFs to be converted into FITS format.  It
 *        may be a list of NDF names or direction specifications
@@ -99,6 +113,14 @@
 *        character is "^".  If extra prompt lines are required, append
 *        the continuation character "-" to the end of the line. 
 *        Comments in the indirection file begin with the character "#".
+*     MERGE = _LOGICAL (Read)
+*        Whether or not to merge the FITS-airlocks' headers of the 
+*        header NDF of a UKIRT multi-NDF container file with its sole 
+*        data NDF into the primary HDU.  This parameter is only used
+*        when CONTAINER is TRUE; and when the container file only has
+*        two component NDFs: one data NDF of arbitrary name, and the
+*        other called HEADER that stores the global headers of the
+*        dataset. [TRUE]
 *     NATIVE = _LOGICAL (Read)
 *        If a TRUE value is given for parameter NATIVE, then World
 *        Co-ordinate System (WCS) information will be written to the 
@@ -122,14 +144,14 @@
 *        The names for the output FITS files.  These may be enclosed in
 *        double quotes and specified as a list of comma-separated names,
 *        or they may be created automatically on the basis of the input
-*        NDF names. To do this, the string supplied for this parameter
-*        should include an asterisk "*". This character is a token which 
-*        represents the name of the corresponding input NDF, but with a 
-*        file type of ".fit" instead of ".sdf", and with no directory
-*        specification. Thus, simply supplying "*" for this parameter
-*        will create a group of output files in the current directory
-*        with the same names as the input NDFs, but with file type
-*        ".fit". You can also specify some simple editing to be
+*        NDF names.  To do this, the string supplied for this parameter
+*        should include an asterisk "*".  This character is a token
+*        that represents the name of the corresponding input NDF, but 
+*        with a file type of ".fit" instead of ".sdf", and with no 
+*        directory specification.  Thus, simply supplying "*" for this
+*        parameter will create a group of output files in the current
+*        directory with the same names as the input NDFs, but with file
+*        type ".fit".  You can also specify some simple editing to be
 *        performed.  For instance, "new-*|.fit|.fits|" will add the
 *        string "new-" to the start of every file name, and will
 *        substitute the string ".fits" for the original string ".fit".
@@ -194,6 +216,17 @@
 *        other encodings may cause information to be lost).  Only
 *        applications based on the AST library (such as FITS2NDF) 
 *        are able to interpret native encodings.
+*     ndf2fits u20040730_00675 merge container accept
+*        This converts the UIST container file u20040730_00675.sdf to 
+*        FITS file u20040730_00675.fit, merging its .I1 and .HEADER
+*        structures into a single NDF before the conversion.  The output
+*        file has only one header and data unit.
+*     ndf2fits in=c20011204_00016 out=cgs4_16.fit container
+*        This converts the CGS4 container file c20011204_00016.sdf to
+*        the multiple-extension FITS file cgs4_16.fit.  The primary HDU 
+*        has the global metadata from the .HEADER's FITS airlock.  The 
+*        four integrations in I1, I2, I3, and I4 components of the
+*        container file are converted to FITS IMAGE extensions.
 
 *  Notes:
 *     The rules for the conversion are as follows:
@@ -290,6 +323,20 @@
 *     EXTTYPE, EXTSHAPE and EXTLEVEL keywords (see above) are written
 *     to the binary-table header.
 
+*     There are additional rules if a multi-NDF container file is being
+*     converted (see parameter CONTAINER).  This excludes the case where
+*     there are but two NDFs---one data and the other just 
+*     headers---that have already been merged (see parameter MERGE):
+*     -  For multiple NDFs a header-only HDU may be created followed by
+*     an IMAGE extension containing the data array (or whichever other
+*     array is first specified by COMP).
+*     -  BITPIX for the header HDU is set to an arbitrary 8.
+*     -  Additional keywords are written for each IMAGE extension.
+*        HDSNAME --- is the NDF name for a component NDF in a multi-NDF
+*          container file, for example "I2".
+*        HDSTYPE --- is set to "NDF" for a component NDF in a multi-NDF
+*          container file.
+
 *  World Co-ordinate Systems:
 *     Any co-ordinate system information stored in the WCS component of
 *     the NDF is written to the FITS header using one of the following
@@ -326,13 +373,14 @@
 *        This encoding uses CROTAi and CDELTi keywords to describe axis
 *        rotation and scaling.
 *
-*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which allows
-*        the use of a wider range of celestial projections, as used by
-*        the AIPS++ project.
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
+*        allows the use of a wider range of celestial projections, as
+*        used by the AIPS++ project.
 *	    
-*        "FITS-CLASS" --- This uses the conventions of the CLASS project.
-*        CLASS is a software package for reducing single-dish radio and
-*        sub-mm spectroscopic data. It supports double sideband spectra. See 
+*        "FITS-CLASS" --- This uses the conventions of the CLASS 
+*        project.  CLASS is a software package for reducing single-dish
+*        radio and sub-mm spectroscopic data.  It supports double 
+*        sideband spectra.  See 
 *        http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
@@ -455,13 +503,17 @@
 *        ENCODING=AUTO) is now chosen on the basis of the contents of 
 *        the FITS extension (because DSS and FITS-WCS can both now
 *        be used to encode a TAN projection and so we need to look at
-*        what encoding was used in the original data to make the choice).
+*        what encoding was used in the original data to make the 
+*        choice).
 *     21-AUG-2000 (DSB):
 *        Converted to use NDG to access the input NDFs.
 *     11-JUL-2004 (DSB):
 *        Added FITS-AIPS++ encoding.
 *     27-AUG-2004 (DSB):
 *        Added FITS-CLASS encoding.
+*     2006 April 5 (MJC):
+*        Extended for multi-NDF container files, and UKIRT's format
+*        in particular.  Added CONTAINER and MERGE parameters.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -506,29 +558,54 @@
       INTEGER BITPIX             ! BITPIX code
       INTEGER BPGRP              ! Group identifier of BITPIXs
       CHARACTER * ( 3 ) CBP      ! Character form of a BITPIX value
-      LOGICAL CFLAG              ! True if a group requires further
-                                 ! input via continuation lines
+      LOGICAL CFLAG              ! A group requires further input via 
+                                 ! continuation lines?
+      CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a component
+      CHARACTER * ( DAT__SZNAM ) CNAME ! Component name
+      CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
       CHARACTER * ( 3 ) COMPS    ! Array-component code
       LOGICAL DATSEL             ! True if DATA component was selected
       CHARACTER * ( 15 ) ENCOD   ! FITS encoding requested for WCS info
       INTEGER FGROUP             ! Group identifier of default list of
                                  ! FITS files
       CHARACTER * ( 255 ) FILNAM ! Name of FITS file
-      LOGICAL GOOD               ! True if all group values are valid
+      LOGICAL FCLOSE             ! Close the FITS file after conversion?
+      CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to a container file
+      LOGICAL FOPEN              ! Open the FITS file before conversion?
+      LOGICAL GOOD               ! All group values are valid?
+      LOGICAL HDRHDU             ! HDU of only headers?
+      LOGICAL HDRPRS             ! .HEADER NDF is present in multi-NDF
+                                 ! container file?
+      CHARACTER * ( 255 ) HDSNAM ! Name of HDS container file
       INTEGER I                  ! Loop counter
+      INTEGER ICOMP              ! Top-level components loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
       INTEGER IGRP2              ! Group identifier of input NDFs
       INTEGER IGRP3              ! Group identifier of input purged NDFs
+      INTEGER INDF               ! NDF loop counter
+      CHARACTER * ( 9 ) ITEM     ! Form of input data for messages
+      LOGICAL MERGE              ! Merge .I1 & .HEADER in primary HDU?
+      LOGICAL MULTI              ! Input files are multi-NDF containers?
       INTEGER NAC                ! Number of COMP values
       INTEGER NAPRES             ! Number of array components requested
                                  ! and present in the NDF
-      LOGICAL NATIVE             ! Include a NATIVE encoding of WCS info?
+      LOGICAL NATIVE             ! Include a NATIVE encoding of WCS
+                                 ! info?
       INTEGER NBP                ! Number of BITPIX values
+      INTEGER NCOMP              ! Number of top-level components
       INTEGER NDF                ! NDF identifier
+      INTEGER NDFHDR             ! NDF identifier for .HEADER
+      CHARACTER * ( DAT__SZLOC ) NDFLOC ! Locator to an NDF
+      INTEGER NDFTMP             ! NDF identifier for temporary NDF
+      INTEGER NGROUP             ! Group identifier of list of NDFs in
+                                 ! container file
       INTEGER NIFILE             ! Number of NDF files
+      INTEGER NITC               ! Number of characters in item
       INTEGER NOFILE             ! Number of output files
+      INTEGER NONDF              ! Number of NDFs in container file
       INTEGER OGROUP             ! Group identifier of output FITS files
       CHARACTER * ( 68 ) ORIGIN  ! Place of origin of the FITS file
+      INTEGER PLACE              ! Place holder for temporary NDF
       LOGICAL PROEXT             ! True if the other extensions are
                                  ! propagated
       LOGICAL PROFIT             ! True if the FITS extension is
@@ -547,11 +624,58 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  NDFs of HDS container files?
+      CALL PAR_GET0L( 'CONTAINER', MULTI, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         MULTI = .FALSE.
+      END IF
+
+      IF ( MULTI ) THEN
+         ITEM = 'HDS files'
+         NITC = 9
+      ELSE
+         ITEM = 'NDFs'
+         NITC = 4
+      END IF
+
 *  Get file list and check the number of specifications.
 *  =====================================================
-*  Get a group containing the names of the NDFs to be processed.
-      CALL CON_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
-     :                 IGRP2, NIFILE, STATUS )
+
+*  Get a group containing the names of the NDFs or HDS container files
+*  to be processed.
+      IF ( MULTI ) THEN
+
+*  Form a group.
+         CALL GRP_NEW( 'Input HDS files', IGRP2, STATUS )
+
+*  Allow for continuation lines.
+         CFLAG = .TRUE.
+         DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
+
+*  Get the list of output file names from the environment.  Allow
+*  modification of the input file names.
+            CALL GRP_GROUP( 'IN', GRP__NOID, IGRP2, NIFILE, ADDED, 
+     :                      CFLAG, STATUS )
+
+*  Cancel the parameter association in order to get more group values
+*  through the parameter, unless there are no more to obtain.
+            IF ( CFLAG ) THEN
+               CALL PAR_CANCL( 'OUT', STATUS )
+               CALL MSG_OUT( 'NDF2FITS_MOREIN',
+     :                       '  Give more '//ITEM( :NITC)//'...',
+     :                       STATUS )
+            END IF
+         END DO
+
+*  Or obtain the NDFs in separate files.  We could use this for both,
+*  but later we need to known the number of files, not just the number
+*  of NDFs they contain.
+      ELSE
+         CALL CON_RGNDF( 'IN', 0, 1, 
+     :                   '  Give more '//ITEM( :NITC)//'...', 
+     :                   IGRP2, NIFILE, STATUS )
+      END IF
 
 *  Tidy up and exit if something went wrong.
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -559,20 +683,20 @@
          GOTO 999
       END IF
 
-*  Purge any duplication from the NDFs.
+*  Purge any duplication from the list of files.
       CALL GRP_PURGE( IGRP2, IGRP3, STATUS )
 
 *  Finished with the second group so delete it.
       CALL GRP_DELET( IGRP2, STATUS )
 
-*  Find the number of NDFs after the purge.
+*  Find the number of files after the purge.
       CALL GRP_GRPSZ( IGRP3, NIFILE, STATUS )
 
 *  Report an error if the group is empty.
       IF( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'NDF2FITS_NOFILES', 'NDF2FITS: No usable '//
-     :                 'input NDFs supplied.', STATUS )
+     :                 'input '//ITEM( :NITC )//' supplied.', STATUS )
       END IF
 
 *  Tidy up and exit if something went wrong.
@@ -582,14 +706,17 @@
       END IF
 
 *  At this point the output group contains the paths and names of the
-*  NDFs to be processed.  Tell the user how many have been found to help
-*  them supply the appropriate number of BITPIX and output file names.
+*  NDFs/HDS container files to be processed.  Tell the user how many 
+*  have been found to help them supply the appropriate number of BITPIX 
+*  and output file names.
       CALL MSG_SETI( 'NF', NIFILE )
       IF ( NIFILE .NE. 1 ) THEN
-         CALL MSG_OUTIF( MSG__NORM, 'NOFILES', '^NF NDFs selected.',
+         CALL MSG_SETC( 'FILE', ITEM( :NITC ) )
+         CALL MSG_OUTIF( MSG__NORM, 'NOFILES', '^NF ^FILE selected.',
      :                   STATUS )
       ELSE
-         CALL MSG_OUTIF( MSG__NORM, 'NOFILES', '^NF NDF selected.',
+         CALL MSG_SETC( 'FILE', ITEM( :NITC-1 ) )
+         CALL MSG_OUTIF( MSG__NORM, 'NOFILES', '^NF ^FILE selected.',
      :                   STATUS )
       END IF
 
@@ -599,10 +726,10 @@
 *  Create a new group to contain the output file names.
       CALL GRP_NEW( 'Default output files', FGROUP, STATUS )
 
-*  For the group containing the list of NDFs, substitute the ".fit"
-*  file extension for the existing ".sdf" extension, and remove any
-*  section-defining text.  Store the modified names in the group
-*  just created.
+*  For the group containing the list of NDFs or container files, 
+*  substitute the ".fit" file extension for the existing ".sdf" 
+*  extension, and remove any section-defining text.  Store the modified 
+*  names in the group just created.
       CALL CON_GEXCH( IGRP3, '.fit', FGROUP, STATUS )
 
 *  Tidy up and exit.
@@ -652,7 +779,8 @@
          CALL MSG_SETI( 'NO', NOFILE )
          CALL ERR_REP( 'NDF2FITS_FILECOUNT',
      :     'NDF2FITS: The number of output files (^NO) does not '/
-     :     /'equal the number of input NDFs (^NI).', STATUS )
+     :     /'equal the number of input '//ITEM( :NITC)//' (^NI).', 
+     :     STATUS )
 
 *  Tidy up and exit.
          CALL GRP_DELET( OGROUP, STATUS )
@@ -734,11 +862,12 @@
 *  remainder.  If there are too many, an error results.
       IF ( NBP .GT. NIFILE ) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETC( 'FILE', ITEM( :NITC ) )
          CALL MSG_SETI( 'NI', NIFILE )
          CALL MSG_SETI( 'NB', NBP )
          CALL ERR_REP( 'NDF2FITS_FILECOUNT',
      :     'NDF2FITS: The number of BITPIX values (^NB) exceeds '/
-     :     /'the number of input NDFs (^NI).', STATUS )
+     :     /'the number of input ^FILE (^NI).', STATUS )
 
 *  Tidy up and exit.
          CALL GRP_DELET( BPGRP, STATUS )
@@ -835,7 +964,8 @@
             CALL MSG_SETI( 'NA', NAC )
             CALL ERR_REP( 'NDF2FITS_FILECOUNT',
      :        'NDF2FITS: The number of COMP values (^NA) exceeds '/
-     :        /'the number of input NDFs (^NI).', STATUS )
+     :        /'the number of input '//ITEM( :NITC )//' (^NI).', 
+     :        STATUS )
 
 *  Tidy up and exit.
             CALL GRP_DELET( ACGRP, STATUS )
@@ -884,13 +1014,13 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Get the AST encoding to use when converting WCS information to FITS
-*  headers. If a null "auto" is supplied, the choice is made automatically.
-*  Convert the "auto" string to a blank string which is recognised by the 
-*  lower level routines.
+*  headers.  If a null "auto" is supplied, the choice is made
+*  automatically.  Convert the "auto" string to a blank string which is
+*  recognised by the lower level routines.
       CALL PAR_CHOIC( 'ENCODING', 'Auto', 'Auto,FITS-IRAF,FITS-WCS,'//
      :                'FITS-PC,FITS-AIPS,FITS-AIPS++,FITS-CLASS,DSS,'//
      :                'NATIVE', .FALSE., ENCOD, STATUS )
-      IF( ENCOD .EQ. 'AUTO' ) ENCOD = ' '
+      IF ( ENCOD .EQ. 'AUTO' ) ENCOD = ' '
 
 *  See if a NATIVE encoding of the WCS component is to be included in
 *  the FITS header, along with the encoding selected above.
@@ -898,27 +1028,113 @@
 
 *  Process each file.
 *  ==================
+      MERGE = .FALSE.
       DO IFILE = 1, NIFILE
+
+*  Form a group of top-level NDFs in the HDS container file.
+*  =========================================================
+         IF ( MULTI ) THEN
+
+*  Open the current container file.
+            CALL GRP_GET( IGRP3, IFILE, 1, HDSNAM, STATUS )
+            CALL HDS_OPEN( HDSNAM, 'READ', FLOC, STATUS )
+
+*  Count the number of NDFs.
+            CALL DAT_NCOMP( FLOC, NCOMP, STATUS )
+
+*  Can we reduce the number of NDFs to one by merging a .HEADER
+*  with .I1 data NDF?
+            CALL DAT_THERE( FLOC, 'HEADER', HDRPRS, STATUS )
+            IF ( NCOMP .EQ. 2 ) THEN
+               IF ( HDRPRS ) THEN
+                  CALL PAR_GET0L( 'MERGE', MERGE, STATUS )
+
+*  Merge the NDFs, by copying the .I1 NDF to a temporary NDF.
+                  IF ( MERGE ) THEN
+
+*  Import the HEADER NDF.
+                     CALL NDF_FIND( FLOC, 'HEADER', NDFHDR, STATUS ) 
+
+*  Find the name of the other NDF.
+                     ICOMP = 1
+                     HDSNAM = 'HEADER'
+                     DO WHILE ( HDSNAM .EQ. 'HEADER' .AND. 
+     :                          ICOMP .LE. NCOMP )
+                        CALL DAT_INDEX( FLOC, ICOMP, CLOC, STATUS )
+                        CALL DAT_NAME( CLOC, HDSNAM, STATUS )
+                        CALL DAT_ANNUL( CLOC, STATUS )
+                        ICOMP = ICOMP + 1
+                     END DO
+
+*  Import the data NDF.
+                     CALL NDF_FIND( FLOC, HDSNAM, NDF, STATUS ) 
+
+*  Make a copy of the other NDF in a temporary NDF that by definition
+*  can be edited.
+                     CALL NDF_TEMP( PLACE, STATUS )
+                     CALL NDF_COPY( NDF, PLACE, NDFTMP, STATUS )
+                     CALL COF_MGHDR( NDFTMP, NDFHDR, STATUS )
+                     CALL NDF_ANNUL( NDFHDR, STATUS )
+                  END IF
+
+               END IF
+            END IF
+
+*  Given the single merged NDF, we can pass this through tot he
+*  conversion subroutine directly, otherwise form a group of
+*  named NDF components.
+            IF ( MERGE ) THEN
+               NONDF = 1
+            ELSE
+               NONDF = 0
+
+*  Create a new group to contain the NDF names at the top level of the
+*  HDS container output file names.
+               CALL GRP_NEW( 'Input NDFs', NGROUP, STATUS )
+
+*  The HEADER NDF has not been merged.  We want to write this one first
+*  in the primary HDU as global metadata applicable to all the data
+*  NDFs.
+               IF ( HDRPRS ) THEN
+                  CALL GRP_PUT1( NGROUP, 'HEADER', 0, STATUS )
+                  NONDF = 1
+               END IF
+
+*  Test each component for being an NDF.
+               DO ICOMP = 1, NCOMP
+                  CALL DAT_INDEX( FLOC, ICOMP, CLOC, STATUS )
+                  CALL DAT_TYPE( CLOC, CTYPE, STATUS )
+                  CALL DAT_NAME( CLOC, CNAME, STATUS )
+            
+                  IF ( CTYPE .EQ. 'NDF' .AND.
+     :                 CNAME .NE. 'HEADER' ) THEN
+                  
+* This is a valid NDF, so append its name to the group.
+                     CALL GRP_PUT1( NGROUP, CNAME, 0, STATUS )
+                     NONDF = NONDF + 1
+                  END IF
+                  CALL DAT_ANNUL( CLOC, STATUS )
+               END DO
+            END IF
+         ELSE
+            HDRPRS = .FALSE.
+         END IF             
 
 *  Obtain the values for the parameters.
 *  =====================================
 
-*  Find the output NDF name.
+*  Find the output filename.
          CALL GRP_GET( OGROUP, IFILE, 1, FILNAM, STATUS )
 
 *  Find the BITPIX and convert it to an integer value.
          CALL GRP_GET( BPGRP, IFILE, 1, CBP, STATUS )
          CALL CHR_CTOI( CBP, BITPIX, STATUS )
 
-*  Find the arrays to propagate to the NDF.
+*  Find the arrays to propagate from the NDF.
          CALL GRP_GET( ACGRP, IFILE, 1, COMPS, STATUS )
 
-*  Access the NDF.
-*  ===============
-         CALL NDG_NDFAS( IGRP3, IFILE, 'READ', NDF, STATUS )
-
-*  Generate the component list.
-*  ============================
+*  Generate the component list (part I).
+*  =====================================
 
 *  Convert the code meaning all to the code for each of the array
 *  components.
@@ -934,7 +1150,9 @@
          DATSEL = INDEX( COMPS, 'D' ) .NE. 0
 
 *  Find what arrays are present in the NDF.  Initialise the counter of
-*  the array components.
+*  the array components.  We know that the DATA is always present so
+*  does not depend on the NDF within a container file, so we can
+*  set that outside the multi-NDF loop.
          IF ( DATSEL ) THEN
             NAPRES = 1
             ARRPRE( NAPRES ) = 'DATA'
@@ -942,27 +1160,61 @@
             NAPRES = 0
          END IF
 
+*  Loop around the NDFs.
+*  =====================
+
+*  For a simple NDF this will be just once.
+         DO INDF = 1, NONDF
+            FOPEN = INDF .EQ. 1
+            FCLOSE = INDF .EQ. NONDF
+            HDRHDU = HDRPRS .AND. .NOT. MERGE .AND. INDF .EQ. 1
+
+*  Access the NDF.
+*  ===============
+            IF ( MULTI ) THEN
+
+*  Access the merged NDF directly.
+               IF ( MERGE ) THEN
+                  NDF = NDFTMP
+               ELSE
+
+*  Obtain the component name.
+                  CALL GRP_GET( NGROUP, INDF, 1, CNAME, STATUS )
+
+*  Import the NDF.
+                  CALL NDF_FIND( FLOC, CNAME, NDF, STATUS )
+               END IF
+
+*  Normal case of single-NDF file.  Obtain the NDF identifier for
+*  the current file.
+            ELSE
+               CALL NDG_NDFAS( IGRP3, IFILE, 'READ', NDF, STATUS )
+            END IF
+
+*  Generate the component list (part II).
+*  ======================================
+
 *  See whether or not variance is requested, and is present.
-         IF ( VARSEL ) THEN
-            CALL NDF_STATE( NDF, 'VARIANCE', VARPRE, STATUS )
+            IF ( VARSEL .AND. .NOT. HDRHDU ) THEN
+               CALL NDF_STATE( NDF, 'VARIANCE', VARPRE, STATUS )
 
 *  It is so add it to the list of components.
-            IF ( VARPRE ) THEN
-               NAPRES = NAPRES + 1
-               ARRPRE( NAPRES ) = 'VARIANCE'
+               IF ( VARPRE ) THEN
+                  NAPRES = NAPRES + 1
+                  ARRPRE( NAPRES ) = 'VARIANCE'
+               END IF
             END IF
-         END IF
 
 *  See whether or not variance is requested, and is present.
-         IF ( QUASEL ) THEN
-            CALL NDF_STATE( NDF, 'QUALITY', QUAPRE, STATUS )
+            IF ( QUASEL .AND. .NOT. HDRHDU ) THEN
+               CALL NDF_STATE( NDF, 'QUALITY', QUAPRE, STATUS )
 
 *  It is so add it to the list of components.
-            IF ( QUAPRE ) THEN
-               NAPRES = NAPRES + 1
-               ARRPRE( NAPRES ) = 'QUALITY'
+               IF ( QUAPRE ) THEN
+                  NAPRES = NAPRES + 1
+                  ARRPRE( NAPRES ) = 'QUALITY'
+               END IF
             END IF
-         END IF
 
 *  Report inconsistencies between the requested and present components.
 *  ====================================================================
@@ -971,110 +1223,136 @@
 *  -----------------
 
 *  See if any of the requested arrays is present.
-         IF ( NAPRES .EQ. 0 ) THEN
-            STATUS = SAI__ERROR
+            IF ( NAPRES .EQ. 0 . AND. .NOT. HDRHDU ) THEN
+               STATUS = SAI__ERROR
 
 *  Create tokens for the error message.  The data array will always be
 *  present in an NDF, and so would have caused an error when it was
 *  opened, so only test for the QUALITY and VARIANCE arrays.
-            CALL MSG_SETI( 'I', IFILE )
-            CALL MSG_SETC( 'TH', CHR_NTH( IFILE ) )
-            CALL NDF_MSG( 'INDF', NDF )
-            IF ( VARSEL .AND. QUASEL ) THEN
-               CALL ERR_REP( 'NDF2FITS_NOCOMPB',
-     :           'Neither of the selected VARIANCE and QUALITY '/
-     :           /'array components are present in the ^I^TH NDF '/
-     :           /'(^INDF).', STATUS )
+               CALL MSG_SETI( 'I', IFILE )
+               CALL MSG_SETC( 'TH', CHR_NTH( IFILE ) )
+               CALL NDF_MSG( 'INDF', NDF )
+               IF ( VARSEL .AND. QUASEL ) THEN
+                  CALL ERR_REP( 'NDF2FITS_NOCOMPB',
+     :              'Neither of the selected VARIANCE and QUALITY '/
+     :              /'array components are present in the ^I^TH '/
+     :              /ITEM( :NITC-1 )//'(^INDF).', STATUS )
 
-            ELSE IF ( VARSEL ) THEN
-               CALL ERR_REP( 'NDF2FITS_NOCOMPV',
-     :           'The selected VARIANCE array component is not '/
-     :           /'present in the ^I^TH NDF (^INDF).', STATUS )
+               ELSE IF ( VARSEL ) THEN
+                  CALL ERR_REP( 'NDF2FITS_NOCOMPV',
+     :             'The selected VARIANCE array component is not '/
+     :              /'present in the ^I^TH '//ITEM( :NITC-1 )/
+     :              /' (^INDF).', STATUS )
 
-            ELSE IF ( QUASEL ) THEN
-               CALL ERR_REP( 'NDF2FITS_NOCOMPQ',
-     :           'The selected QUALITY array component is not '/
-     :           /'present in the ^I^TH NDF (^INDF).', STATUS )
-            END IF
+               ELSE IF ( QUASEL ) THEN
+                  CALL ERR_REP( 'NDF2FITS_NOCOMPQ',
+     :              'The selected QUALITY array component is not '/
+     :              /'present in the ^I^TH '//ITEM( :NITC-1 )/
+     :              /' (^INDF).', STATUS )
+               END IF
 
 *  Indicate that the FITS file has not been produced.
-            CALL ERR_REP( 'NDF2FITS_NOCOMP',
-     :        'The output FITS file has not been produced.', STATUS )
+               IF ( ( MULTI .AND. INDF .EQ. 1 ) .OR. .NOT. MULTI ) THEN
+                  CALL ERR_REP( 'NDF2FITS_NOCOMP',
+     :              'The output FITS file has not been produced.', 
+     :              STATUS )
 
 *  Flush the error, as this needs to be regarded as fatal by the
 *  on-the-fly conversion, but there may be further NDFs to convert
 *  outside of this context.
-            CALL ERR_FLUSH( STATUS )
+                  CALL ERR_FLUSH( STATUS )
 
 *  Leave a blank line to separate sets of error messages and warnings.
-            CALL MSG_BLANK( STATUS )
-
+                  CALL MSG_BLANK( STATUS )
+               END IF
 
 *  Some but not all are missing.
 *  -----------------------------
-
 *  Issue a warning error message if not all of the requested array
 *  components are present, but continue to process.
-         ELSE IF ( ( QUASEL .AND. .NOT. QUAPRE ) .OR.
-     :             ( VARSEL .AND. .NOT. VARPRE ) ) THEN
+            ELSE IF ( ( ( QUASEL .AND. .NOT. QUAPRE ) .OR.
+     :                  ( VARSEL .AND. .NOT. VARPRE ) ) .AND.
+     :                 .NOT. HDRHDU ) THEN
 
 *  Assign some tokens to make the error messages more useful.
-            CALL MSG_SETI( 'I', IFILE )
-            CALL MSG_SETC( 'TH', CHR_NTH( IFILE ) )
-            CALL NDF_MSG( 'NDF', NDF )
+               CALL MSG_SETI( 'I', IFILE )
+               CALL MSG_SETC( 'TH', CHR_NTH( IFILE ) )
+               CALL NDF_MSG( 'NDF', NDF )
 
 *  The text of the warning message depends on which components were
 *  selected, but were not present in the NDF.
-            IF ( ( QUASEL .AND. .NOT. QUAPRE ) .AND.
-     :           ( VARSEL .AND. .NOT. VARPRE ) ) THEN
-              CALL MSG_OUT( 'NDFCOMPS_ERR',
-     :           'The ^I^TH NDF (^NDF) does not have the selected '/
-     :           /'QUALITY and VARIANCE components.', STATUS )
+               IF ( ( QUASEL .AND. .NOT. QUAPRE ) .AND.
+     :              ( VARSEL .AND. .NOT. VARPRE ) ) THEN
+                  CALL MSG_OUT( 'NDFCOMPS_ERR',
+     :              'The ^I^TH '//ITEM( :NITC-1 )//' (^NDF) does not '/
+     :              /'have the selected QUALITY and VARIANCE '/
+     :              /'components.', STATUS )
 
-            ELSE IF ( QUASEL .AND. .NOT. QUAPRE ) THEN
-               CALL MSG_OUT( 'NDFCOMPS_ERR',
-     :            'The ^I^TH NDF (^NDF) does not have the selected '/
-     :            /'QUALITY component.', STATUS )
+               ELSE IF ( QUASEL .AND. .NOT. QUAPRE ) THEN
+                  CALL MSG_OUT( 'NDFCOMPS_ERR',
+     :              'The ^I^TH '//ITEM( :NITC-1 )//' (^NDF) does not '/
+     :              /'have the selected QUALITY component.', STATUS )
 
-            ELSE IF ( VARSEL .AND. .NOT. VARPRE ) THEN
-               CALL MSG_OUT( 'NDFCOMPS_ERR',
-     :           'The ^I^TH NDF (^NDF) does not have the selected '/
-     :           /'VARIANCE component.', STATUS )
+               ELSE IF ( VARSEL .AND. .NOT. VARPRE ) THEN
+                  CALL MSG_OUT( 'NDFCOMPS_ERR',
+     :              'The ^I^TH '//ITEM( :NITC-1 )//' (^NDF) does not '/
+     :              /'have the selected VARIANCE component.', STATUS )
 
-            END IF
+               END IF
 
 *  Indicate that the FITS file will be produced regardless.
-            CALL MSG_OUT( 'NDF2FITS_NOCOMP2',
-     :        'The output FITS file will be produced for the '/
-     :        /'remaining array components that were specified.',
-     :        STATUS )
+               CALL MSG_OUT( 'NDF2FITS_NOCOMP2',
+     :           'The output FITS file will be produced for the '/
+     :           /'remaining array components that were specified.',
+     :           STATUS )
 
 *  Leave a blank line to separate sets of error messages and warnings.
-            CALL MSG_BLANK( STATUS )
+               CALL MSG_BLANK( STATUS )
 
 *  Convert the NDF.
 *  ================
 
 *  Finally convert the NDF to the FITS file, as best we can.
-            CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
-     :                      NATIVE, STATUS )
-         ELSE
+               CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, 
+     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS,
+     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+
+*  There are no arrays to transfer to the FITS file for the .HEADER
+*  NDF.
+            ELSE IF ( HDRHDU ) THEN
+
+*  Although strictly there are no arrays present, the routine COF_NDF2F
+*  called later uses it for an adjustable-array size.  So we pass a
+*  standard but dummy name.  We also use a dummy BITPIX if the special 
+*  value 0 is used, as it will not be changed to an actual BITPIX since
+*  we are not procesing a data array for the header NDF.
 
 *  Convert the NDF to the FITS file.
-            CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX, BLOCKF,
-     :                      ORIGIN, PROFIT, PROEXT, PROHIS, ENCOD, 
-     :                      NATIVE, STATUS )
-         END IF
+               CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32,
+     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS, 
+     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+            ELSE
 
+*  Convert the NDF to the FITS file.
+               CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
+     :                         BLOCKF, ORIGIN, PROFIT, PROEXT, PROHIS, 
+     :                         ENCOD, NATIVE, FOPEN, FCLOSE, STATUS )
+            END IF
+ 
 *  Tidy the NDF.
-         CALL NDF_ANNUL( NDF, STATUS )
+            CALL NDF_ANNUL( NDF, STATUS )
+
+*  End the multi-NDF loop.
+         END DO
+
+*  End the file loop.
       END DO
 
 *  Delete the groups.
       CALL GRP_DELET( ACGRP, STATUS )
       CALL GRP_DELET( BPGRP, STATUS )
       CALL GRP_DELET( OGROUP, STATUS )
+      IF ( MULTI .AND. .NOT. MERGE ) CALL GRP_DELET( NGROUP, STATUS )
       CALL GRP_DELET( IGRP3, STATUS )
 
  999  CONTINUE
