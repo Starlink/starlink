@@ -847,7 +847,7 @@ new( class, lut, start, inc, options )
   int nlut;
   double * clut;
  CODE:
-  nlut = av_len( lut );
+  nlut = av_len( lut ) + 1;
   clut = pack1D( newRV_noinc((SV*)lut), 'd' );
   ASTCALL(
    RETVAL = astLutMap( nlut, clut, start, inc, options );
@@ -900,9 +900,9 @@ new( class, nin, nout, matrix, options )
   int form;
   double * cmatrix;
  CODE:
-  len = av_len( matrix );
+  len = av_len( matrix ) + 1;
   /* determine form from number of elements */
-  if (len == -1) {
+  if (len == 0) {
     form = 2;
   } else if (len == nin || len == nout ) {
     form = 1;
@@ -958,8 +958,8 @@ new( class, disco, pcdcen, options )
   int len;
   double * cpcdcen;
  CODE:
-  len = av_len( pcdcen );
-  if (len != 1 ) {
+  len = av_len( pcdcen ) + 1;
+  if (len != 2 ) {
     Perl_croak(aTHX_ "Must supply two values to PcdCen");
   }
   cpcdcen = pack1D(newRV_noinc((SV*)pcdcen), 'd');
@@ -987,22 +987,22 @@ new( class, inperm, outperm, constant, options )
   int nin;
   int nout;
  CODE:
-  nin = av_len( inperm );
-  if (nin == -1 ) {
+  nin = av_len( inperm ) + 1;
+  if (nin == 0 ) {
     /* no values */
     cinperm = NULL;
   } else {
     cinperm = pack1D(newRV_noinc((SV*)inperm), 'i' );
   }
-  nout = av_len( outperm );
-  if (nout == -1 ) {
+  nout = av_len( outperm ) + 1;
+  if (nout == 0 ) {
     /* no values */
     coutperm = NULL;
   } else {
     coutperm = pack1D(newRV_noinc((SV*)outperm), 'i' );
   }
-  len = av_len( constant );
-  if (len == -1 ) {
+  len = av_len( constant ) + 1;
+  if (len == 0 ) {
     /* no values */
     cconstant = NULL;
   } else {
@@ -1040,7 +1040,7 @@ new( class, shift, options )
 #ifndef HASSHIFTMAP  
    Perl_croak(aTHX_ "ShiftMap: Please upgrade to AST V3.x or greater");
 #else 
-  ncoord = av_len( shift );
+  ncoord = av_len( shift ) + 1;
   cshift = pack1D(newRV_noinc((SV*)shift), 'd');
   ASTCALL(
    RETVAL = astShiftMap( ncoord, cshift, options);

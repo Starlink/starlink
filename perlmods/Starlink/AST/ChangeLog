@@ -1,3 +1,7 @@
+2006-04-10  Tim Jenness  <tjenness@cpan.org>
+
+	* AST.xs: Fix argument counting in PermMap, ShiftMap and LutMap
+
 2005-09-22  Tim Jenness  <tjenness@cpan.org>
 
 	* README: Update for v0.04
