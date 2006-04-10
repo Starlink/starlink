@@ -46,9 +46,9 @@
 *        The value of the ORIGIN card.
 *     ENCOD = CHARACTER * ( * ) (Given)
 *        The encoding to use. If this is blank, then a default encoding 
-*        is chosen based on the contents of the FITS extension. The
-*        supplied string should be a recognised AST encoding such as 'DSS', 
-*        'FITS-WCS', 'NATIVE', etc (or a blank string).
+*        is chosen based on the contents of the FITS extension.  The
+*        supplied string should be a recognised AST encoding such as 
+*        'DSS', 'FITS-WCS', 'NATIVE', etc (or a blank string).
 *     NATIVE = LOGICAL (Given)
 *        Include a NATIVE encoding of the WCS info in the header?
 *     STATUS = INTEGER (Given and Returned)
@@ -140,8 +140,10 @@
 *     23-OCT-2000 (AJC):
 *        Ignore all after END (could be garbage)
 *     30-NOV-2000 (AJC):
-*        Correctly omit airlock ORIGIN card from output if ORIGIN argument
-*         is not default or blank.
+*        Correctly omit airlock ORIGIN card from output if ORIGIN
+*        argument is not default or blank.
+*     2006 April 5 (MJC):
+*        Allow for COMP='HEADER'.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -164,10 +166,10 @@
       CHARACTER * ( * ) COMP     ! The array component
       INTEGER   FUNIT            ! Logical-unit number of FITS file
       INTEGER   BITPIX           ! Bits per pixel
-      LOGICAL   PROPEX           ! Propagate FITS extension, when true
+      LOGICAL   PROPEX           ! Propagate FITS extension?
       CHARACTER * ( * ) ORIGIN   ! The ORIGIN card value
       CHARACTER * ( * ) ENCOD    ! The AST encoding to use for WCS info
-      LOGICAL   NATIVE           ! Include a NATIVE encoding of WCS info?
+      LOGICAL   NATIVE           ! Include NATIVE encoding of WCS info?
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -194,11 +196,10 @@
 
 *  Local Variables:
       INTEGER   ADIM             ! Axis loop counter
-      LOGICAL   AXIFND           ! True if NDF contains a linear axis
-                                 ! comps.
-      LOGICAL   AXLFND           ! True if NDF contains axis label
+      LOGICAL   AXIFND           ! NDF contains a linear axis comps.?
+      LOGICAL   AXLFND           ! NDF contains axis label?
       REAL      AXROT            ! Rotation angle of an axis
-      LOGICAL   AXUFND           ! True if NDF contains axis units
+      LOGICAL   AXUFND           ! NDF contains axis units?
       LOGICAL   BANNER           ! Part of the FITSIO banner header?
       CHARACTER C*1              ! Accommodates character string
       CHARACTER CDELT * ( SZKEY ) ! Keyword name of CDELTn
@@ -207,7 +208,7 @@
       CHARACTER CRPIX * ( SZKEY ) ! Keyword name of CRPIXn
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
-      LOGICAL   FITSPR           ! True if FITS extension is present
+      LOGICAL   FITSPR           ! FITS extension is present?
       CHARACTER FITSTR * ( SZFITS ) ! FITS header
       INTEGER   FSTAT            ! FITSIO status
       CHARACTER FTLOC * ( DAT__SZLOC ) ! Locator to NDF FITS extension
@@ -216,19 +217,18 @@
       INTEGER   I                ! Loop variable
       INTEGER   J                ! Loop variable
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
-      LOGICAL   LABFND           ! True if NDF LABEL found
+      LOGICAL   LABFND           ! NDF LABEL found?
       CHARACTER LORIGN * ( SZVAL ) ! Local value of the ORIGIN argument
       LOGICAL   MANDAT           ! Not a mandatory header?
       INTEGER   NCHAR            ! Length of a character string
-      INTEGER   NCOMP            ! No. of components
+      INTEGER   NCOMP            ! Number of components
       INTEGER   NDIM             ! Number of dimensions
       CHARACTER NULL * ( 1 )     ! ASCII null character
-      LOGICAL   PRORIG           ! True if to use supplied ORIGIN
-                                 ! argument
-      LOGICAL   ROTAX( DAT__MXDIM ) ! True if an axis is rotated in the
-                                 ! FITS extension
-      LOGICAL   TITFND           ! True if NDF TITLE found
-      LOGICAL   UNTFND           ! True if NDF UNITS found
+      LOGICAL   PRORIG           ! Use supplied ORIGIN argument
+      LOGICAL   ROTAX( DAT__MXDIM ) ! An axis is rotated in the FITS
+                                 !FITS extension
+      LOGICAL   TITFND           ! NDF TITLE found?
+      LOGICAL   UNTFND           ! NDF UNITS found?
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
 
 *.
@@ -291,7 +291,7 @@
       CALL FTPKYS( FUNIT, 'HDUCLAS2', COMP, 'Array component subclass',
      :             FSTAT )
 
-      IF ( COMP .NE. 'DATA' ) THEN
+      IF ( COMP .NE. 'DATA' .AND. COMP .NE. 'HEADER' ) THEN
 
 *  Write the NDF's component name.
          CALL FTPKYS( FUNIT, 'EXTNAME', COMP, 'Array component',

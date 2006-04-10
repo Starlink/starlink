@@ -24,7 +24,7 @@
 
 *     The keywords are:
 *        o  NAXIS, and NAXISn are derived from the dimensions of 
-*           the NDF data array.
+*           the NDF data array, unless COMP='HEADER', whereupon NAXIS=0.
 *        o  For an NDF whose origin is not 1 along each axis, LBOUNDn
 *           cards are written. (These are not part of the standard.)
 *        o  The OBJECT, LABEL, and BUNIT keywords are derived from
@@ -36,16 +36,19 @@
 *        o  DATE and ORIGIN cards are written.
 *        o  For integer DATA types a BLANK card is written using the
 *           standard bad value corresponding to the type of the FITS
-*           array (except for the QUALITY array).
+*           array (except for the QUALITY array), unless COMP='HEADER'.
 *        o  Dummy BSCALE and BZERO cards are written with values 1.0 and
-*           0.0 respectively.
+*           0.0 respectively unless COMP='HEADER'
 *        o  The standard order of the FITS keywords is preserved.
 
 *  Arguments:
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF.
 *     COMP = CHARACTER * ( * ) (Given)
-*        The array component to write to the HDU.
+*        The array component to write to the HDU.  A special value of
+*        'HEADER' is also recognised; this indicates that no
+*        array-related headers such as BSCALE, BZEROm, and BLANK should
+*        be written, and sets keyword NAXIS to 0.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
 *     NFLAGS = INTEGER (Given)
@@ -57,8 +60,8 @@
 *     ORIGIN = CHARACTER * ( * ) (Given)
 *        The value of the ORIGIN card.
 *     PROPEX = LOGICAL (Given)
-*        Will the NDF FITS extension, if present, be folded into the output
-*        FITS header?
+*        Will the NDF FITS extension, if present, be folded into the
+*        output FITS header?
 *     CMPTHE( NFLAGS ) = LOGICAL (Returned)
 *        The flags when set to true indicate that certain optional NDF
 *        components have been used to write descriptors to the NDF.
@@ -90,7 +93,9 @@
 *        has a WCS component or if the FITS extension has usable WCS
 *        information. Added argument PROPEX.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 5 (MJC):
+*        Allow for COMP='HEADER'.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,7 +120,8 @@
                                   ! presence of certain components
       INTEGER   BITPIX            ! Bits per pixel
       CHARACTER * ( * ) ORIGIN    ! The value of the ORIGIN card
-      LOGICAL PROPEX              ! Propagate contents of FITS extension?
+      LOGICAL PROPEX              ! Propagate contents of FITS 
+                                  ! extension?
 
 *  Arguments Returned:
       LOGICAL   CMPTHE( NFLAGS )
@@ -151,12 +157,11 @@
 *  Local Variables:
       INTEGER   APNTR( NDF__MXDIM ) ! Pointers to NDF axis arrays
       CHARACTER * ( NDF__SZTYP ) ATYPE ! Data type of the axis centres
-      LOGICAL   AXIFND            ! True if NDF contains a linear axis
-                                  ! comps.
-      LOGICAL   AXLFND            ! True if NDF contains axis label
-      LOGICAL   AXUFND            ! True if NDF contains axis units
+      LOGICAL   AXIFND            ! NDF contains a linear axis comps.?
+      LOGICAL   AXLFND            ! NDF contains axis label?
+      LOGICAL   AXUFND            ! NDF contains axis units?
       CHARACTER C*1               ! Accommodates character string
-      LOGICAL   DEFORG            ! True if NDF pixel origins are all 1
+      LOGICAL   DEFORG            ! NDF pixel origins are all 1?
       DOUBLE PRECISION DEND       ! End value for an axis-centre array
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       DOUBLE PRECISION DINCRE     ! Incremental value for axis array
@@ -169,17 +174,17 @@
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
       LOGICAL   LABFND            ! True if NDF LABEL found
       INTEGER   LBND( NDF__MXDIM ) ! NDF lower bounds
-      LOGICAL   LINEAR            ! True if an axis is linear
+      LOGICAL   LINEAR            ! An axis is linear?
       INTEGER   NCHAR             ! Length of a character string
       INTEGER   NDECIM            ! Number of decimals to output to
                                   ! header
       INTEGER   NDIM              ! Number of dimensions
       INTEGER   NELM              ! Number of elements
       REAL      START             ! Start value for an axis structure
-      LOGICAL   THERE             ! True if NDF has FITS extension
-      LOGICAL   TITFND            ! True if NDF TITLE found
+      LOGICAL   THERE             ! NDF has FITS extension?
+      LOGICAL   TITFND            ! NDF TITLE found?
       INTEGER   UBND( NDF__MXDIM ) ! NDF upper bounds
-      LOGICAL   UNTFND            ! True if NDF UNITS found
+      LOGICAL   UNTFND            ! NDF UNITS found?
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
 
 *  Declare and define the NUM_ type conversion functions.
@@ -212,6 +217,10 @@
 *  Obtain the NDF bounds.
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
 
+*  A header-only NDF has dummy dimensions, as there must always be an 
+*  NDF, but we want no dimensions in the HDU.
+      IF ( COMP .EQ. 'HEADER' ) NDIM = 0
+
 *  Write the mandatory headers.
 *  ============================
       CALL FTPHPR( FUNIT, SIMPLE, BITPIX, NDIM, DIMS, PCOUNT, GCOUNT,
@@ -228,7 +237,6 @@
 
 *  Handle axis header cards.
 *  =========================
-*  -------------------------
 *      
 *  If the NDF has a WCS component do not propagate the AXIS information.
       CALL NDF_STATE( NDF, 'WCS', GOTWCS, STATUS )
@@ -597,52 +605,55 @@
 *  Write dummy scale and offset cards.
 *  ===================================
 
-      CALL FTPKYD( FUNIT, 'BSCALE', 1.0D0, 1,
-     :             'True_value = BSCALE * FITS_value + BZERO', FSTAT )
+      IF ( COMP .NE. 'HEADER' ) THEN
+         CALL FTPKYD( FUNIT, 'BSCALE', 1.0D0, 1,
+     :                'True_value = BSCALE * FITS_value + BZERO',
+     :                FSTAT )
 
-      CALL FTPKYD( FUNIT, 'BZERO', 0.0D0, 1,
-     :             'True_value = BSCALE * FITS_value + BZERO', FSTAT )
+         CALL FTPKYD( FUNIT, 'BZERO', 0.0D0, 1,
+     :                'True_value = BSCALE * FITS_value + BZERO',
+     :                 FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-      IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR5', 'FTPKYD',
-     :                    'Error writing the BSCALE or BZERO '/
-     :                    /'header card.', STATUS )
-         GOTO 999
-      END IF
-
+         IF ( FSTAT .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR5', 'FTPKYD',
+     :                       'Error writing the BSCALE or BZERO '/
+     :                       /'header card.', STATUS )
+            GOTO 999
+         END IF
 
 *  Write a dummy blank keyword.
 *  ============================
 
-      IF ( BITPIX .GT. 0 .AND. COMP .NE. 'QUALITY' ) THEN
+         IF ( BITPIX .GT. 0 .AND. COMP .NE. 'QUALITY' ) THEN
 
 *  Write the BLANK card to the FITS header.  The actual value may be
 *  changed later.  This just reserves a place in the header.  This
 *  assumes that the user has not have set up private bad values in the
 *  NDF and set BLANK in the NDF's FITS extension.
-         IF ( BITPIX .EQ. 32 ) THEN
-            CALL FTPKYJ( FUNIT, 'BLANK', VAL__BADI, 'Bad value', FSTAT )
+            IF ( BITPIX .EQ. 32 ) THEN
+               CALL FTPKYJ( FUNIT, 'BLANK', VAL__BADI, 'Bad value',
+     :                      FSTAT )
 
-         ELSE IF ( BITPIX .EQ. 16 ) THEN
-            CALL FTPKYJ( FUNIT, 'BLANK', NUM_WTOI( VAL__BADW ), 
-     :                   'Bad value', FSTAT )
+            ELSE IF ( BITPIX .EQ. 16 ) THEN
+               CALL FTPKYJ( FUNIT, 'BLANK', NUM_WTOI( VAL__BADW ), 
+     :                      'Bad value', FSTAT )
 
-         ELSE IF ( BITPIX .EQ. 8 ) THEN
-            CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ), 
-     :                   'Bad value', FSTAT )
-         END IF
+            ELSE IF ( BITPIX .EQ. 8 ) THEN
+               CALL FTPKYJ( FUNIT, 'BLANK', NUM_UBTOI( VAL__BADUB ), 
+     :                      'Bad value', FSTAT )
+            END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-         IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR6', 'FTPKYJ',
-     :                       'Error writing the BLANK header card.',
-     :                       STATUS )
-            GOTO 999
+            IF ( FSTAT .GT. FITSOK ) THEN
+               CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR6', 'FTPKYJ',
+     :                          'Error writing the BLANK header card.',
+     :                          STATUS )
+               GOTO 999
+            END IF
          END IF
-
       END IF
 
   999 CONTINUE
