@@ -123,7 +123,7 @@ interface FITS2NDF
       type        'LITERAL'
       vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
-      default     ' '
+      default     !
       prompt      'HDS data type of NDF'
       helpkey     '*'
    endparameter
