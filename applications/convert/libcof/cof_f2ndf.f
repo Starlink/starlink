@@ -728,7 +728,6 @@
                IF ( USETYP .NE. ' ' ) THEN
                   CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
                   CALL COF_TYPSZ( USETYP, NBUTYP, STATUS )
-                  TYPE = USETYP
                   IF ( NBUTYP .LT. NBFTYP .OR. ( TYPE .EQ. '_REAL' .AND.
      :                 USETYP .EQ. '_INTEGER' ) ) THEN
                      CALL MSG_SETC( 'UT', USETYP )
@@ -738,6 +737,8 @@
      :                 /'loss of precision and dynamic range.  The '/
      :                 /'FITS file suggests type ^FT.', STATUS )
                   END IF
+
+                  TYPE = USETYP
                END IF
 
 *  Former NDF?
