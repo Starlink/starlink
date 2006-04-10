@@ -321,7 +321,9 @@
 *     2006 April 7 (MJC):
 *        Add USETYP argument.  Put the local variables into order and
 *        various tidying steps.
-*        
+*     2006 April 10 (MJC):
+*        Added warning message when the chosen data type has less 
+*        precision and dynamic range than expected from the file.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -338,6 +340,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
       INCLUDE 'CNF_PAR'          ! CNF definitions
+      INCLUDE 'MSG_PAR'          ! Message-system constants
 
 *  Arguments Given:
       INTEGER NDF
@@ -439,6 +442,8 @@
       LOGICAL LOOP               ! Loop for another FITS extension?
       LOGICAL MERGED             ! If headers have been merged
       LOGICAL MULTIP             ! More than one data array?
+      INTEGER NBFTYP             ! Number of bytes in FITS-implied type
+      INTEGER NBUTYP             ! Number of bytes in user-selected type
       INTEGER NC                 ! Number of characters
       INTEGER NCF                ! Number of characters in filename
       INTEGER NDFS(MAXEXT)       ! NDFs for each extn set in EXTABLE
@@ -717,9 +722,22 @@
                END IF
 
 *  Override the type, but retain scaling.  This might be a problem if
-*  a one- or two-byte integer type is selected.
+*  a one- or two-byte integer type is selected.  Oh the other hand the
+*  precision of BSCALE and BZERO may be spurious _DOUBLE.  Warn the user
+*  if there is a potential loss of precision or dynamic range.
                IF ( USETYP .NE. ' ' ) THEN
+                  CALL COF_TYPSZ( TYPE, NBFTYP, STATUS )
+                  CALL COF_TYPSZ( USETYP, NBUTYP, STATUS )
                   TYPE = USETYP
+                  IF ( NBUTYP .LT. NBFTYP .OR. ( TYPE .EQ. '_REAL' .AND.
+     :                 USETYP .EQ. '_INTEGER' ) ) THEN
+                     CALL MSG_SETC( 'UT', USETYP )
+                     CALL MSG_SETC( 'FT', TYPE )
+                     CALL MSG_OUTIF( MSG__NORM, 'COF_F2NDF_PREC',
+     :                 'The chosen data ^UT type may result in a '/
+     :                 /'loss of precision and dynamic range.  The '/
+     :                 /'FITS file suggests type ^FT.', STATUS )
+                  END IF
                END IF
 
 *  Former NDF?
