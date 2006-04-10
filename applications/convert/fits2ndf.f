@@ -43,9 +43,9 @@
 *     processing rules are described in the "Notes".
 
 *     Both NDF and FITS use the term extension, and they mean different
-*     things. Thus to avoid confusion in the descriptions below, the term
-*     `sub-file' is used to refer to a FITS IMAGE, TABLE or BINTABLE
-*     Header and Data Unit (HDU).
+*     things.  Thus to avoid confusion in the descriptions below, the
+*     term `sub-file' is used to refer to a FITS IMAGE, TABLE or
+*     BINTABLE Header and Data Unit (HDU).
 
 *  Usage:
 *     fits2ndf in out
@@ -83,11 +83,11 @@
 *           scheme described in the paper "Representation of celestial
 *           co-ordinates in FITS"
 *           (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).  It
-*           is very similar to \texttt{"FITS-IRAF"} but supports a wider range of
-*           projections and co-ordinate systems.  Once the standard has 
-*           been agreed, this encoding should be understood by any
-*           FITS-WCS  compliant software and it is likely to be adopted
-*           widely for FITS data in future. 
+*           is very similar to \texttt{"FITS-IRAF"} but supports a wider
+*           range of projections and co-ordinate systems.  Once the
+*           standard has been agreed, this encoding should be understood
+*           by any FITS-WCS compliant software and it is likely to be
+*           adopted widely for FITS data in future. 
 *
 *        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi,
 *           PCiiijjj,  etc, as described in a previous (now superseded)
@@ -103,13 +103,14 @@
 *           with AIPS.  This encoding uses CROTAi and CDELTi keywords to
 *           describe axis rotation and scaling.
 *
-*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which allows
-*           the use of a wider range of celestial projections, as used by
-*           the AIPS++ project.
+*        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
+*           allows the use of a wider range of celestial projections, 
+*           as used by the AIPS++ project.
 *	    
-*        "FITS-CLASS" --- This uses the conventions of the CLASS project.
-*           CLASS is a software package for reducing single-dish radio and
-*           sub-mm spectroscopic data. It supports double sideband spectra. See 
+*        "FITS-CLASS" --- This uses the conventions of the CLASS
+*           project.  CLASS is a software package for reducing 
+*           single-dish radio and sub-mm spectroscopic data.  It 
+*           supports double-sideband spectra.  See 
 *           http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
@@ -117,7 +118,7 @@
 *	    
 *        "NATIVE" --- This is the native system used by the AST library
 *           (see SUN/210) and provides a loss-free method for 
-*           transferring WCS information between AST-based applications. 
+*           transferring WCS information between AST-based applications.
 *           It allows more complicated WCS information to be stored and
 *           retrieved than any of the other encodings.
 *
@@ -194,7 +195,7 @@
 *                 maintain correct sub-file set alignment for later
 *                 sub-file specifiers.)  If the last character of
 *                 'sub-file_specifiers' is comma, it indicates an 
-*                 omitted specifier at the end.  Note that if a sub-file 
+*                 omitted specifier at the end.  Note that if a sub-file
 *                 is not specified for the DATA component of an NDF, an
 *                 error will be reported at closedown.
 *           'transformation_code' (case-insensitive) is a character
@@ -305,15 +306,15 @@
 *        data type depends on the number of significant digits in the
 *        BSCALE and BZERO keywords.
 *
-*        FMTCNV must be enclosed in double quotes and may be a list of
-*        comma-separated values to be applied to each conversion in
-*        turn.  An error results if more values than the number of
-*        input FITS files are supplied.  If too few are given, the last
-*        value in the list applied to all the conversions; thus a
-*        single value is applied to all the input files.  If more than
-*        one line is required to enter the information at a prompt then
-*        place a "-" at the end of each line where a continuation line
-*        is desired.  ["TRUE"]
+*        FMTCNV may be a list of comma-separated values, enclosed in
+*        double quotes, to be applied to each conversion in turn.  An
+*        error results if more values than the number of input FITS
+*        files are supplied.  If too few are given, the last value in
+*        the list applied to all the conversions; thus a single value
+*        is applied to all the input files.  If more than one line is
+*        required to enter the information at a prompt then place a 
+*        "-" at the end of each line where a continuation line is
+*        desired.  ["TRUE"]
 *     IN = LITERAL (Read)
 *        The names of the FITS-format files to be converted to NDFs.
 *        It may be a list of file names or indirection specifications
@@ -357,12 +358,12 @@
 *        NDF, which becomes just an HDS container and no longer an NDF.
 *     PROEXTS = _LOGICAL (Read)
 *        This governs how any extensions within the FITS file are
-*        processed in the general case.  If TRUE, any FITS-file extension
-*        is propagated to the NDF as an NDF extension called FITS_EXT_n,
-*        where n is the number of the extension.  If FALSE, any FITS-file
-*        extensions are ignored.  The "Notes" of the general conversion
-*        contain details of where and in what form the various FITS-file
-*        extensions are stored in the NDF.
+*        processed in the general case.  If TRUE, any FITS-file 
+*        extension is propagated to the NDF as an NDF extension called
+*        FITS_EXT_n, where n is the number of the extension.  If FALSE, 
+*        any FITS-file extensions are ignored.  The "Notes" of the
+*        general conversion contain details of where and in what form 
+*        the various FITS-file extensions are stored in the NDF.
 *
 *        This parameter is ignored when the supplied FITS file is one
 *        of the special formats, including one defined by an EXTABLE but
@@ -380,6 +381,33 @@
 *        FITS extension will appear as a primary header and may include
 *        cards inherited from the primary HDU; otherwise the FITS header
 *        is written verbatim.  [TRUE]
+*     TYPE = LITERAL (Read)
+*        The data type of the output NDF's data and variance arrays.  It
+*        must be one of the following HDS types: "_BYTE", "_WORD", 
+*        "_REAL", "_INTEGER", "_DOUBLE", "_UBYTE", "_UWORD" 
+*        corresponding to signed byte, signed word, real, integer, 
+*        double precision, unsigned byte, and unsigned word.  See SUN/92
+*        for further details.  An unambiguous abbreviation may be given.
+*        TYPE is ignored when COMP = "Quality" since the QUALITY 
+*        component must comprise unsigned bytes (equivalent to 
+*        TYPE = "_UBYTE") to be a valid NDF.  The suggested default is
+*        the current value.  Note that setting TYPE may result in a loss
+*        of precision, and should be used with care.
+*
+*        A null value (!) or blank requests that the type be propagated 
+*        from the FITS (using the BITPIX keyword); or if FMTCNV is TRUE,
+*        the type is either _REAL or _DOUBLE depending on the precision 
+*        of the BSCALE and BZERO keywords. 
+*
+*        TYPE may be a list of comma-separated values enclosed in 
+*        double quotes, that are applied to each conversion in turn.  An
+*        error results if more values than the number of input FITS 
+*        files are supplied.  If too few are given, the last value in 
+*        the list is applied to all the conversions; thus a single value
+*        is applied to all the input files.  If more than one line is 
+*        required to enter the information at a prompt then place a "-"
+*        at the end of each line where a continuation line is desired.
+*        [!]
 *     WCSATTRS = LITERAL (Read)
 *        A comma-separated list of keyword=value pairs which modify 
 *        the way WCS information is extracted from the FITS headers. 
@@ -483,7 +511,7 @@
 *     The general rules are as follows.
 *
 *     -  The primary data array of the FITS file becomes the NDF's data
-*     array. There is an option using parameter FMTCNV to convert
+*     array.  There is an option using parameter FMTCNV to convert
 *     integer data to floating point using the values of FITS keywords
 *     BSCALE and BZERO.
 *     -  Any integer array elements with value equal to the FITS
@@ -863,8 +891,10 @@
 *        Added FITS-AIPS++ encoding.
 *     27-AUG-2004 (DSB):
 *        Added FITS-CLASS encoding.
+*     2006 April 7 (MJC):
+*        Added TYPE parameter.  Move obtaining FMTCNV group to a
+*        subroutine.  Wrap long lines.
 *     {enter_further_changes_here}
-
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -898,16 +928,19 @@
       INTEGER BLOCKF             ! Blocking factor
       PARAMETER ( BLOCKF = 1 )
 
-      INTEGER MAXCOD             ! No. of known AST encodings.
+      INTEGER MAXCOD             ! Number of known AST encodings
       PARAMETER ( MAXCOD = 6 )
 
 *  Local Variables:
       INTEGER ADDED              ! Number of items added to a group
-      LOGICAL CFLAG              ! True if a group requires further
-                                 ! input via continuation lines
+      LOGICAL CFLAG              ! A group requires further input via
+                                 ! continuation lines?
+      LOGICAL CONTNR             ! FITS HDU's are to be written as
+                                 ! components of an HDS container file?
       INTEGER ENCGRP             ! Group identifier of ENCODINGS
-      CHARACTER * ( GRP__SZNAM ) ENCODS( MAXCOD ) ! AST encodings for WCS 
-                                 ! component
+      CHARACTER * ( GRP__SZNAM ) ENCODS( MAXCOD ) ! AST encodings for
+                                 ! WCS component
+      INTEGER EXTLEN             ! Length extension part of FSPEC
       INTEGER FCGRP              ! Group identifier of FMTCNVs
       INTEGER FDL                ! FIle descriptor for logfile
       LOGICAL FILEXS             ! FITS file exists
@@ -917,10 +950,9 @@
       CHARACTER * ( 255 ) FSPEC  ! File specification
       INTEGER FLEN               ! Length of filename part of FSPEC
       LOGICAL FOUND              ! Found a wildcarded file?
-      INTEGER EXTLEN             ! Length extension part of FSPEC
       CHARACTER * ( 255 ) IFSPEC ! Individual File specification
       INTEGER IPOSN              ! String index
-      LOGICAL GOOD               ! True if all group values are valid
+      LOGICAL GOOD               ! All group values are valid?
       INTEGER I                  ! Loop counter
       INTEGER IFILE              ! Loop counter for each input NDF
       CHARACTER * ( FIO__SZFNM ) INFILE ! Input-file name
@@ -930,9 +962,8 @@
                                  ! files
       INTEGER ISTAT              ! Find-file status
       INTEGER IWILD              ! Counter of the wild-carded files
-      LOGICAL LEAVE              ! True if the FITS-file testing is
-                                 ! finished
-      LOGICAL LOGHDR             ! True if there is an open logfile
+      LOGICAL LEAVE              ! The FITS-file testing is finished?
+      LOGICAL LOGHDR             ! There is an open logfile?
       INTEGER LP                 ! Loop counter
       INTEGER NDF                ! NDF identifier
       CHARACTER * ( 255 ) NDFNAM ! Name of NDF
@@ -947,9 +978,9 @@
       INTEGER PLACE              ! NDF placeholder
       LOGICAL PROEXT             ! True if the other FITS extensions are
                                  ! propagated to NDF extensions
-      LOGICAL CONTNR             ! True if FITS HDU's are to be written as
-                                 ! components of an HDS container file.
-      LOGICAL PROFIT             ! True if the FITS extension is created
+      LOGICAL PROFIT             ! The FITS extension is created?
+      INTEGER TGROUP             ! Group identifier of output types
+      CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
       INTEGER TSTAT              ! Temporary status
       CHARACTER WCSATT*255       ! Attributes for the WCS FitsChan
 *.
@@ -1034,8 +1065,8 @@
          DO WHILE ( .NOT. LEAVE )
 
 *  Get a single FITS file that matches this specification.
-            FOUND = ONE_FIND_FILE( FSPEC(1:FLEN), .TRUE., INFILE, IWILD,
-     :           STATUS )
+            FOUND = ONE_FIND_FILE( FSPEC( 1:FLEN ), .TRUE., INFILE,
+     :                             IWILD, STATUS )
 
 *  Check if a file has been found. Status can tell us this.
             IF ( STATUS .EQ. SAI__OK ) THEN
@@ -1049,10 +1080,10 @@
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'MXFNC', FIO__SZFNM )
                   CALL MSG_SETC( 'FNAME', INFILE )
-                  CALL ERR_REP( 'FITSDIN_TRUNC',
-     :              'File ^FNAME cannot be opened - the name may have'//
-     :              ' been truncated to the maximum ^MXFNC characters.'
-     :              , STATUS )
+                  CALL ERR_REP( 'FITS2NDF_TRUNC',
+     :              'File ^FNAME cannot be opened - the name may have'/
+     :              /' been truncated to the maximum ^MXFNC '/
+     :              /'characters.', STATUS )
                   CALL ERR_RLSE
                   GOTO 999
                END IF
@@ -1062,8 +1093,8 @@
                IFSPEC = ' '
                IPOSN = 0
                CALL CHR_APPND( INFILE, IFSPEC, IPOSN )
-               CALL CHR_APPND(
-     :            FSPEC(FLEN+1:FLEN+EXTLEN), IFSPEC, IPOSN )
+               CALL CHR_APPND( FSPEC( FLEN+1:FLEN+EXTLEN ), IFSPEC,
+     :                         IPOSN )
                CALL GRP_GRPEX( IFSPEC, GRP__NOID, IGRP2, NIFILE, 
      :                         ADDED, CFLAG, STATUS )
 
@@ -1072,8 +1103,8 @@
 *  Tidy up the file system when the list of files is exhausted.
                CALL ONE_FIND_FILE_END( IWILD, STATUS )
 
-*  No files bad status should now be reset to good
-               IF (STATUS .EQ. ONE__NOFILES ) CALL ERR_ANNUL(STATUS)
+*  No files bad status should now be reset to good.
+               IF ( STATUS .EQ. ONE__NOFILES ) CALL ERR_ANNUL( STATUS )
 
 *  Go to the next GRP expression.
                LEAVE = .TRUE.
@@ -1108,11 +1139,11 @@
          STATUS = SAI__ERROR
          IF( FSPEC .NE. ' ' ) THEN
             CALL MSG_SETC( 'SPEC', FSPEC )
-            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '//
-     :                   'matching the specification "^SPEC".', STATUS )
+            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '/
+     :        /'matching the specification "^SPEC".', STATUS )
          ELSE
-            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '//
-     :                  'matching the supplied specification.', STATUS )
+            CALL ERR_REP( 'FITSDIN_NOFILES', 'No input files found '/
+     :        /'matching the supplied specification.', STATUS )
          END IF
 
          GOTO 999
@@ -1131,8 +1162,8 @@
 *  Report an error if the group is empty.
       IF( NIFILE .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'FITS2NDF_NOFILES', 'FITS2NDF: No usable '//
-     :                 'input FITS files supplied.', STATUS )
+         CALL ERR_REP( 'FITS2NDF_NOFILES', 'FITS2NDF: No usable '/
+     :                 /'input FITS files supplied.', STATUS )
       END IF
 
 *  Tidy up and exit if something went wrong.
@@ -1222,95 +1253,28 @@
 
 *  Get the FMTCNVs.
 *  ================
+
 *  Loop until all values are acceptable.
-      GOOD = .FALSE.
-  100 CONTINUE
-      IF ( .NOT. GOOD ) THEN
+      CALL COF_GETFC( 'FMTCNV', NIFILE, FCGRP, STATUS )
 
-*  Create a new group to contain the input FMTCNVs.
-         CALL GRP_NEW( 'FMTCNV values', FCGRP, STATUS )
-
-*  Allow for continuation lines.
-         CFLAG = .TRUE.
-         DO WHILE ( CFLAG .AND. STATUS .EQ. SAI__OK )
-
-*  Get the list of FMTCNVs from the environment.
-            CALL GRP_GROUP( 'FMTCNV', GRP__NOID, FCGRP, NFC, ADDED,
-     :                      CFLAG, STATUS )
-
-*  Cancel the parameter association in order to get more group values
-*  through the parameter, unless there are no more to obtain.
-            IF ( CFLAG ) CALL PAR_CANCL( 'FMTCNV', STATUS )
-         END DO
-
-*  Tidy up and exit.
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL GRP_DELET( FCGRP, STATUS )
-            CALL GRP_DELET( OGROUP, STATUS )
-            CALL GRP_DELET( IGRP3, STATUS )
-            GOTO 999
-         END IF
-
-*  Assume that the values are good for the moment.
-         GOOD = .TRUE.
-
-*  Validate the values.  First get each value, convert it to a logical
-*  and then test that the conversion was successful.
-         DO I = 1, NFC
-            CALL GRP_GET( FCGRP, I, 1, FMTCON, STATUS )
-            CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-*  Annul the error status.
-               CALL ERR_ANNUL( STATUS )
-*  Display an informational message, including the incorrect string.
-               CALL MSG_SETI( 'I', I )
-               CALL MSG_SETC( 'TH', CHR_NTH( I ) )
-               CALL MSG_SETC( 'GM', FMTCON )
-               CALL MSG_OUT( 'FMTCNV_ERR',
-     :           'The ^I^TH value "^GM" is not one of the acceptable '/
-     :           /'logical values for FMTCNV.', STATUS )
-
-*  Let the user have another go.  So cancel the parameter value and
-*  delete the group.
-               CALL PAR_CANCL( 'FMTCNV', STATUS )
-               CALL GRP_DELET( FCGRP, STATUS )
-               GOOD = .FALSE.
-               GOTO 100
-            END IF
-         END DO
+*  Tidy up and exit if there has been an error.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL GRP_DELET( OGROUP, STATUS )
+         CALL GRP_DELET( IGRP3, STATUS )
+         GOTO 999
       END IF
 
-*  There are some special cases.  A single value means apply it to all
-*  files.  If there are too few, the last value is used for the
-*  remainder.  If there are too many, an error results.
-      IF ( NFC .GT. NIFILE ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NI', NIFILE )
-         CALL MSG_SETI( 'NFC', NFC )
-         CALL ERR_REP( 'FITS2NDF_FILECOUNT',
-     :     'FITS2NDF: The number of FMTCNV values (^NFC) exceeds '/
-     :     /'the number of input files (^NI).', STATUS )
+*  Get the TYPEs.
+*  ==============
+*  Loop until all values are acceptable.
+      CALL COF_GETYP( 'TYPE', NIFILE, TGROUP, STATUS )
 
 *  Tidy up and exit.
+      IF ( STATUS .NE. SAI__OK ) THEN
          CALL GRP_DELET( FCGRP, STATUS )
          CALL GRP_DELET( OGROUP, STATUS )
          CALL GRP_DELET( IGRP3, STATUS )
          GOTO 999
-
-*  Extend the group by duplication to give the same number of values
-*  as input files.  The last value is duplicated.
-      ELSE IF ( NFC .LT. NIFILE ) THEN
-        
-*  Obtain the last value.
-         CALL GRP_GET( FCGRP, NFC, 1, FMTCON, STATUS )
-
-*  Extend the original group by adding the required number of values.
-*  This may not be as efficient as having an array but it avoids getting
-*  workspace or having a fixed-length array.
-         DO I = NFC + 1, NIFILE
-            CALL GRP_GRPEX( FMTCON, GRP__NOID, FCGRP, NFC, ADDED,
-     :                      CFLAG, STATUS )
-         END DO
       END IF
 
 *  Obtain some global parameter values.
@@ -1329,8 +1293,8 @@
 *  Abort if there has been an error.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get a group from parameter ENCODINGS holding the AST encodings to use 
-*  when creating the WCS component from the FITS header.
+*  Get a group from parameter ENCODINGS holding the AST encodings to 
+*  use when creating the WCS component from the FITS header.
       CALL GRP_NEW( 'AST Encodings', ENCGRP, STATUS )
       CALL GRP_SETCS( ENCGRP, .FALSE., STATUS )
 
@@ -1343,16 +1307,16 @@
 
 *  If a NULL parameter value was given for ENCODINGS annul the error,
 *  and find the real number of values in the group.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL GRP_GRPSZ( ENCGRP, NENCOD, STATUS )
       END IF
 
 *  Limit the number of encodings used to MAXCOD.
-      IF( NENCOD .GT. MAXCOD ) THEN
-         CALL MSG_OUTIF( MSG__NORM, 'ENCODINGS', 'Only the first ^MX '//
-     :                   'values for parameter %ENCODINGS will be '//
-     :                   'used.', STATUS )
+      IF ( NENCOD .GT. MAXCOD ) THEN
+         CALL MSG_OUTIF( MSG__NORM, 'ENCODINGS', 'Only the first ^MX '/
+     :                   /'values for parameter %ENCODINGS will be '/
+     :                   /'used.', STATUS )
          NENCOD = MAXCOD
       END IF
 
@@ -1360,7 +1324,7 @@
       CALL GRP_GET( ENCGRP, 1, NENCOD, ENCODS, STATUS )
 
 * Get any extra attributes for the FitsChan.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN 
          CALL PAR_GET0C( 'WCSATTRS', WCSATT, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -1368,8 +1332,8 @@
          END IF
       END IF
 
-*  Get the EXTABLE information
-*  (Assumes this is good for all FITS files).
+*  Get the EXTABLE information.  (Assumes this is good for all FITS
+*  files).
       CALL COF_EXTAB( STATUS )
 
 *  Process each file.
@@ -1388,6 +1352,10 @@
 *  Find the FMTCNV and convert it to a logical value.
          CALL GRP_GET( FCGRP, IFILE, 1, FMTCON, STATUS )
          CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
+
+*  Find the output data type.
+         CALL GRP_GET( TGROUP, IFILE, 1, TYPE, STATUS )
+         CALL CHR_UCASE( TYPE )
 
 *  Access the NDF.
 *  ===============
@@ -1408,8 +1376,8 @@
 *  ======================
 
 *  Convert the FITS file into an NDF as best we can.
-         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, PROFIT, 
-     :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT, 
+         CALL COF_F2NDF( FILNAM, NDF, LOGHDR, FDL, FMTCNV, TYPE, PROFIT,
+     :                   PROEXT, CONTNR, NENCOD, ENCODS, WCSATT,
      :                   STATUS )
 
 *  Tidy the NDF.  Some of the options create a series of NDFs in the
@@ -1431,6 +1399,7 @@
       END DO
 
 *  Delete the groups.
+      CALL GRP_DELET( TGROUP, STATUS )
       CALL GRP_DELET( FCGRP, STATUS )
       CALL GRP_DELET( OGROUP, STATUS )
       CALL GRP_DELET( IGRP3, STATUS )
