@@ -74,6 +74,9 @@
 *        to dimensions in TDIMn cards for _CHAR arrays.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
+*     2006 April 7 (MJC):
+*        Use the correct FITISO routine names in two COF_FIOER calls.
+*        Some tidying.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -128,7 +131,8 @@
       CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
       CHARACTER * ( MXSLEN ) CVALUE ! Character component value
       INTEGER DIMS( DAT__MXDIM + 1) ! Component and structure dimensions
-                                    ! +1 allows for string length for_CHAR array
+                                 ! +1 allows for string length for_CHAR 
+                                 ! array
       DOUBLE PRECISION DVALUE    ! D.p. component value
       INTEGER EL                 ! Number of array elements
       CHARACTER * ( FITSCH ) EXTNAM  ! Name of the component
@@ -251,7 +255,6 @@
 
          END IF
 
-
 *  Don't create a new extension if there was something wrong with the
 *  component.
          IF ( STATUS .NE. SAI__OK ) GOTO 999
@@ -323,9 +326,9 @@
 *  This is only necessary when the object is multi-dimensional.  
          IF ( NDIM .GT. 1 ) THEN
          
-*  If the type is _CHAR*n, we must adjust the dimensions to make the first 
-*  equal the number of characters per element - as required by the rAw
-*  convention for TFORM.
+*  If the type is _CHAR*n, we must adjust the dimensions to make the 
+*  first equal the number of characters per element, as required by the 
+*  rAw convention for TFORM.
             IF ( TYPE(1:6) .EQ. '_CHAR*' ) THEN
                DO I = NDIM, 1, -1
                   DIMS(I+1) = DIMS(I)
@@ -373,7 +376,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTPKYJ',
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTPKYS',
      :        'Error writing extension type in header.', STATUS )
             GOTO 999
          END IF
@@ -385,7 +388,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8', 'FTPKYJ',
+            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8', 'FTPKYS',
      :        'Error writing extension shape in header.', STATUS )
             GOTO 999
          END IF
@@ -735,8 +738,8 @@
                CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
 
 *  There is no null character value, so set to be blank by convention.
-*  Since this is really a fault in the NDF, the user can suffer
-*  a little by calling the FITSIO routine for every element, instead of
+*  Since this is really a fault in the NDF, the user can suffer a
+*  little by calling the FITSIO routine for every element, instead of
 *  getting workspace and filling it with blank values.
                IF ( STATUS .EQ. DAT__UNSET ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -787,8 +790,8 @@
                CALL DAT_MAPV( LOC, TYPE, 'READ', OPNTR, EL, STATUS )
 
 *  There is no null logical value, so set to be true by convention.
-*  Since this is really a fault in the NDF, the user can suffer
-*  a little by calling the FITSIO routine for every element, instead of
+*  Since this is really a fault in the NDF, the user can suffer a
+*  little by calling the FITSIO routine for every element, instead of
 *  getting workspace and filling it with TRUE values.
                IF ( STATUS .EQ. DAT__UNSET ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -919,11 +922,11 @@
 *  Obtain the data type.
                   CALL DAT_TYPE( LOC, EXTTYP, STATUS )
 
-*  Need to determine the shape of the full array.
-*  Test whether or not the supplementary locator to a full array structure
-*  is valid.
+*  Need to determine the shape of the full array.  Test whether or not 
+*  the supplementary locator to a full array structure is valid.
                   CALL DAT_VALID( ALOC, VALID, STATUS )
                   IF ( VALID ) THEN
+
 *  Obtain the data shape of the full array of structures.
                      CALL DAT_SHAPE( ALOC, DAT__MXDIM, DIMS, NDIM,
      :                               STATUS )
@@ -1052,16 +1055,18 @@
 *  FITSIO does not permit cards to be placed after a named card; 
 *  it requires that we read that named card first.
                         CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
-*  Get a locator to the object so that we can determine its shape and type.
-*  This information was obtained before, but inquiring again avoids
-*  having large dimension arrays.  Release the locator at the end.
+
+*  Get a locator to the object so that we can determine its shape and 
+*  type.  This information was obtained before, but inquiring again 
+*  avoids having large dimension arrays.  Release the locator at the 
+*  end.
                         CALL DAT_INDEX( LOC, MDCOMP( ICMD ), LCMP,
      :                                  STATUS )
                         CALL DAT_TYPE( LCMP, TYPE, STATUS )
-*  Get the dimensions
-*  If the type is _CHAR*n, we must adjust the dimensions to make the first 
-*  equal the number of characters per element - as required by the rAw
-*  convention for TFORM.
+
+*  Get the dimensions.  If the type is _CHAR*n, we must adjust the 
+*  dimensions to make the first equal the number of characters per
+*  element, as required by the rAw convention for TFORM.
                         IF( TYPE(1:6) .EQ. '_CHAR*' ) THEN
                            CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS(2),
      :                                   NDIM, STATUS )
@@ -1073,13 +1078,14 @@
                         END IF
 
                         CALL DAT_ANNUL( LCMP, STATUS )
+
 *  Insert the TDIMn card.
                         CALL FTPTDM( FUNIT, MDCOMP( ICMD ), NDIM, DIMS,
      :                               FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.  Specify from which routine the error arose.
-*  Form the name of the TDIMn keyword along the way.
+*  warnings.  Specify from which routine the error arose.  Form the 
+*  name of the TDIMn keyword along the way.
                         IF ( FSTAT .GT. FITSOK ) THEN
                            NC = 4
                            CRDNAM = 'TDIM'
@@ -1466,12 +1472,11 @@
                               END IF
                            END IF
 
-*  Map each array using the appropriate type and write it to the
-*  binary table.  Certain data types (_BYTE and _UWORD) are not
-*  available in FITS.  These must be converted to the next higher
-*  integer data type.  HDS undefined values are assigned the table
-*  undefined value.  A new error context is used handle undefined values
-*  transparently.
+*  Map each array using the appropriate type and write it to the binary
+*  table.  Certain data types (_BYTE and _UWORD) are not available in 
+*  FITS.  These must be converted to the next higher integer data type. 
+*  HDS undefined values are assigned the table undefined value.  A new 
+*  error context is used handle undefined values transparently.
 
 *  Byte is converted to word for the binary table.
                            IF ( TYPE .EQ. '_BYTE' ) THEN
@@ -1521,7 +1526,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNI( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        VAL__BADW,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNI'
@@ -1557,7 +1562,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNJ( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        VAL__BADI,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNJ'
@@ -1599,7 +1604,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCNE( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        VAL__BADR,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCNE'
@@ -1617,7 +1622,7 @@
                                  ROUTIN = 'FTPCLU'
                               ELSE
                                  CALL FTPCND( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        VAL__BADD,
      :                                        FSTAT )
                                  ROUTIN = 'FTPCND'
@@ -1629,8 +1634,8 @@
      :                                       OPNTR, EL, STATUS )
 
 *  There is no null logical value, so set to be true by convention.
-*  Since this is really a fault in the NDF, the user can suffer
-*  a little by calling the FITSIO routine for every element, instead of
+*  Since this is really a fault in the NDF, the user can suffer a
+*  little by calling the FITSIO routine for every element, instead of
 *  getting workspace and filling it with TRUE values.
                               IF ( STATUS .EQ. DAT__UNSET ) THEN
                                  CALL ERR_ANNUL( STATUS )
@@ -1640,7 +1645,7 @@
                                  END DO
                               ELSE
                                  CALL FTPCLL( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ), 
+     :                                        %VAL( CNF_PVAL( OPNTR ) ),
      :                                        FSTAT )
                                  ROUTIN = 'FTPCLL'
                               END IF
