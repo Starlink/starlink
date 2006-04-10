@@ -23,6 +23,8 @@
 #        Replaced ENCODINGS by NATIVE.
 #     22-JUN-1999 (DSB):
 #        Added ENCODING.
+#     2006 April 5 (MJC):
+#        Added CONTAINER and MERGE.
 #     {enter_further_changes_here}
 
 #-
@@ -53,6 +55,15 @@ interface NDF2FITS
       default     'A'
    endparameter
 
+   parameter      CONTAINER      # Input file(s) is(are) multi-NDF?
+      type        '_LOGICAL'
+      prompt      'Are the input files multi-NDF containers?
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
    parameter      ENCODING       # Encoding to use for WCS info
       type        'LITERAL'
       vpath       'DEFAULT'
@@ -74,7 +85,16 @@ interface NDF2FITS
       helpkey     '*'
    endparameter
 
-   parameter      NATIVE          # Produce a NATIVE WCS encoding?
+   parameter      MERGE          # Merge FITS airlocks in multi-NDF?
+      type        '_LOGICAL'
+      prompt      'Merge the .HEADER NDF with the data NDF?'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      NATIVE         # Produce a NATIVE WCS encoding?
       type        '_LOGICAL'
       prompt      'Include a native WCS encoding in the FITS header?'
       vpath       'CURRENT,DEFAULT'
