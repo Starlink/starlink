@@ -121,7 +121,7 @@ interface FITS2NDF
 
    parameter      TYPE           # Output data type
       type        'LITERAL'
-      vpath       'CURRENT,DEFAULT'
+      vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
       default     ' '
       prompt      'HDS data type of NDF'
