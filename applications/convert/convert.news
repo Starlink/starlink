@@ -1,3 +1,12 @@
+1 CONVERT_Version_1.5-7
+
+ FITS2NDF has a new TYPE group parameter to set the data type of 
+ the NDF, overriding the value propagated from the FITS BITPIX, or
+ BSCALE asnd BZERO precision when FMTCNV is TRUE.
+
+ NDF2FITS now supports multi-NDFs HDS container files through the
+ new CONTAINER and MERGE parameters.
+
 1 CONVERT_Version_1.5-6
 
  FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS

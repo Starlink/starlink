@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2005 February 21}
+\newcommand{\stardocdate}      {2006 April 10}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-6}
+\newcommand{\stardocversion}   {Version 1.5-7}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2295,15 +2295,15 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          floating-point data type depends on the number of significant
          digits in the BSCALE and BZERO keywords.
 
-         FMTCNV must be enclosed in double quotes and may be a list of
-         comma-separated values to be applied to each conversion in
-         turn.  An error results if more values than the number of
-         input FITS files are supplied.  If too few are given, the last
-         value in the list applied to all the conversions; thus a
-         single value is applied to all the input files.  If more than
-         one line is required to enter the information at a prompt then
-         place a \texttt{"-"} at the end of each line where a continuation line
-         is desired.  \texttt{["TRUE"]}
+         FMTCNV may be a list of comma-separated values, enclosed in
+	 double quotes, to be applied to each conversion in turn. An
+	 error results if more values than the number of input FITS
+	 files are supplied.  If too few are given, the last value in
+	 the list applied to all the conversions; thus a single value
+	 is applied to all the input files.  If more than one line is
+	 required to enter the information at a prompt then place a
+	 \texttt{"-"} at the end of each line where a continuation
+	 line is desired.  \texttt{["TRUE"]}
       }
       \sstsubsection{
          IN = LITERAL (Read)
@@ -2385,11 +2385,41 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
          If TRUE, the headers of the FITS file are written to the NDF's
          FITS extension.  If a specific FITS sub-file has been specified or
-         parameter CONTAINER is TRUE or an EXTABLE is in use, the FITS
+         parameter CONTAINER is \texttt{TRUE} or an EXTABLE is in use, the FITS
          extension will appear as a primary header and may include cards
          inherited from the primary HDU; otherwise the FITS header is
          written verbatim. \texttt{[TRUE]}
       }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output NDF's data and variance arrays.  It
+         must be one of the following HDS types: \texttt{"\_BYTE"}, 
+         \texttt{"\_WORD"}, \texttt{"\_REAL"}, \texttt{"\_INTEGER"},
+         \texttt{"\_DOUBLE"}, \texttt{"\_UBYTE"}, \texttt{"\_UWORD"} 
+         corresponding to signed byte, signed word, real, integer, 
+         double precision, unsigned byte, and unsigned word.  See SUN/92
+         for further details.  An unambiguous abbreviation may be given.
+         TYPE is ignored when COMP = \texttt{"Quality"} since the QUALITY 
+         component must comprise unsigned bytes (equivalent to 
+         TYPE = \texttt{"_UBYTE"}) to be a valid NDF.  The suggested 
+         default is the current value.  Note that setting TYPE may 
+         result in a loss of precision, and should be used with care.
+
+         A null value (\texttt{!}) or blank requests that the type be
+	 propagated from the FITS (using the BITPIX keyword); or if
+	 FMTCNV is \texttt{TRUE}, the type is either \_REAL or \_DOUBLE
+	 depending on the precision of the BSCALE and BZERO keywords.
+
+         TYPE may be a list of comma-separated values enclosed in 
+         double quotes, that are applied to each conversion in turn.  An
+         error results if more values than the number of input FITS 
+         files are supplied.  If too few are given, the last value in 
+         the list is applied to all the conversions; thus a single value
+         is applied to all the input files.  If more than one line is 
+         required to enter the information at a prompt then place a
+         \texttt{"-"} at the end of each line where a continuation line
+         is desired.  \texttt{[!]}
       \sstsubsection{
          WCSATTRS = LITERAL (Read)
       }{
@@ -4114,6 +4144,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       file, and choose the data type of the data and variance arrays.
       You can control whether or not to propagate extensions and
       history information.
+
+      The application also accepts NDFs stored as top-level components 
+      of an HDS container file.
    }
    \sstusage{
       ndf2fits in out [comp] [bitpix] [origin]
@@ -4177,6 +4210,21 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          line is desired.  \texttt{["A"]}
       }
       \sstsubsection{
+         CONTAINER = \_LOGICAL (Read)
+      }{
+         If \textt{TRUE}, the supplied IN files are any multi-NDF HDS 
+         container files, in which the NDFs reside as top-level 
+         components.  This option is primarily intended to support 
+         the UKIRT format where the NDFs are named .I$n$, 
+         $n >=1$, and one named HEADER containing global metadata in 
+         its FITS airlock.  The .I$n$ NDFs
+         may also contain FITS airlocks, storing metadata pertinent to
+         that NDF, such as observation times.  The individual NDFs often
+         represent separate integrations nodded along a slit or
+         spatially.  Note that this is not a group, so a single value
+         applies to all the supplied input files.  \texttt{[FALSE]}
+      }
+      \sstsubsection{
          ENCODING = LITERAL (Read)
       }{
          Controls the FITS keywords which will be used to encode the 
@@ -4204,14 +4252,6 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          Comments in the indirection file begin with the character \hash.
       }
       \sstsubsection{
-         ORIGIN = LITERAL (Read)
-      }{
-         The origin of the FITS files.  This becomes the value of the
-         ORIGIN keyword in the FITS headers.  If a null value is given
-         it defaults to \texttt{"Starlink Project, U.K."}.
-         \texttt{[!]}
-      }
-      \sstsubsection{
          NATIVE = \_LOGICAL (Read)
       }{
          If a \texttt{TRUE} value is given for parameter NATIVE, then World
@@ -4230,6 +4270,25 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          to reconstruct the full details of the WCS information. 
          The other non-native encodings will usually result in some 
          information being lost. \texttt{[FALSE]}
+      }
+      \sstsubsection{
+         MERGE = \_LOGICAL (Read)
+      }{
+         Whether or not to merge the FITS-airlocks' headers of the 
+         header NDF of a UKIRT multi-NDF container file with its sole 
+         data NDF into the primary HDU.  This parameter is only used
+         when CONTAINER is \texttt{TRUE}; and when the container file only has
+         two component NDFs: one data NDF of arbitrary name, and the
+         other called HEADER that stores the global headers of the
+         dataset. \texttt{[TRUE]}
+      }
+      \sstsubsection{
+         ORIGIN = LITERAL (Read)
+      }{
+         The origin of the FITS files.  This becomes the value of the
+         ORIGIN keyword in the FITS headers.  If a null value is given
+         it defaults to \texttt{"Starlink Project, U.K."}.
+         \texttt{[!]}
       }
       \sstsubsection{
          OUT = LITERAL (Write)
@@ -4323,7 +4382,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          called \texttt{jvp1.fit} and \texttt{jvp2.fit} respectively.  
          The data type of the FITS primary data array is signed integer words
          in \texttt{jvp1.fit}, and double-precision floating point in
-         \texttt{jvp2.fit}. The FITS extension in each NDFs is merged into the
+         \texttt{jvp2.fit}.  The FITS extension in each NDFs is merged into the
          FITS header of the corresponding FITS file.
       }
       \sstexamplesubsection{
@@ -4337,8 +4396,26 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          The native encoding provides a `loss-free'
          means of transferring co-ordinate system information (\textit{i.e.}\
          no information is lost; other encodings may cause information to be 
-         lost). Only applications based on the AST library (such as 
+         lost).  Only applications based on the AST library (such as 
          \htmlref{FITS2NDF}{FITS2NDF}) are able to interpret native encodings.
+      }
+      \sstexamplesubsection{
+         ndf2fits u20040730_00675 merge container accept
+      }{
+         This converts the UIST container file \texttt{u20040730_00675.sdf}
+         to FITS file \texttt{u20040730_00675.fit}, merging its .I1 and 
+         .HEADER structures into a single NDF before the conversion.  The 
+         output file has only one header and data unit.
+      }
+      \sstexamplesubsection{
+         ndf2fits in=c20011204_00016 out=cgs4_16.fit container
+      }{
+         This converts the CGS4 container file 
+         \texttt{c20011204_00016.sdf} to the multiple-extension FITS 
+         file \texttt{cgs4_16.fit}.  The primary HDU has the global 
+         metadata from the .HEADER's FITS airlock.  The 
+         four integrations in I1, I2, I3, and I4 components of the
+         container file are converted to FITS IMAGE extensions.
       }
    }
    \sstnotes{
@@ -4454,8 +4531,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               bad values actually present in the array; this is for the same
               efficiency reasons as before.  The END card terminates the FITS header.
 
-           \sstitem
-              HISTORY --- HISTORY headers are propagated from the FITS
+            \sstitem
+            HISTORY --- HISTORY headers are propagated from the FITS
               extension when PROFITS is \texttt{TRUE}, and from the NDF
               history component when PROHIS is \texttt{TRUE}.
 
@@ -4485,6 +4562,29 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          to the binary-table header.
 
       }
+      There are additional rules if a multi-NDF container file is being
+      converted (see parameter CONTAINER).  This excludes the case where
+      there are but two NDFs---one data and the other just 
+      headers---that have already been merged (see parameter MERGE):
+      \ssthitemlist{
+
+         \sstitem
+            For multiple NDFs a header-only HDU may be created followed 
+            by an IMAGE extension containing the data array (or 
+            whichever other array is first specified by COMP).
+         \sstitem
+            BITPIX for the header HDU is set to an arbitrary 8.
+         \sstitem
+            Additional keywords are written for each IMAGE extension.
+         \ssthitemlist{
+            \sstitem
+             HDSNAME --- is the NDF name for a component NDF in a multi-NDF
+               container file, for example \tezxttt{I2}.
+             \sstitem
+             HDSTYPE --- is set to \texttt{NDF} for a component NDF in a multi-NDF
+               container file.
+         }
+      }      
    }
    \sstdiytopic{
       \label{world_coordinate_systems}World Co-ordinate Systems
@@ -6944,7 +7044,16 @@ on double-sideband spectra.
 \section{Release Notes -- V1.5-6}
 
 FITSGZ is a new on-the-fly conversion format for GZIP-compressed FITS
-files.  The recognised extensions are {\tt fits.gz}, {\tt fit.gz}, and
-{\tt fts.gz}.
+files.  The recognised extensions are \texttt{fits.gz}, \texttt{fit.gz}, and
+\texttt{fts.gz}.
+
+\section{Release Notes -- V1.5-7}
+
+\htmlref{FITS2NDF}{FITS2NDF} has a new TYPE group parameter to set the
+data type of the NDF, overriding the value propagated from the FITS
+BITPIX, or BSCALE asnd BZERO precision when FMTCNV is \texttt{TRUE}.
+
+\htmlref{NDF2FITS}{NDF2FITS} now supports multi-NDFs HDS container files
+through the new CONTAINER and MERGE parameters.
 
 \end{document}
