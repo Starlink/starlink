@@ -23,8 +23,6 @@ figaro5_LDADD = $(LDADD) \
 ../fig/libfig.la \
 ../jty/libjty.la \
 ../tio/libfigtio.la \
-../dsa/libdsa.la \
-../dta/libdta.la \
 ../par/libfigpar.la \
 ../gen/libfiggen.la \
 ../ich/libfigich.la \
