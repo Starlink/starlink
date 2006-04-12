@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, 
      :                       NDIM1, LBND1, UBND1, DIN, VIN, CIN, WIN,
-     :                       NDIM2, LBND2, UBND2, DOUT, VOUT, WORK1, 
-     *                       WORK2, WORK3, STATUS )
+     :                       NDIM2, LBND2, UBND2, USEWRK, DOUT, VOUT, 
+     *                       WORK1, WORK2, WORK3, STATUS )
 *+
 *  Name:
 *     KPS1_CLPS<T>
@@ -16,7 +16,8 @@
 *  Invocation:
 *     CALL KPS1_CLPS<T>( AXIS, LO, HI, VAR, METH, WLIM, NEL2, NDIM1, 
 *                      LBND1, UBND1, DIN, VIN, CIN, WIN, NDIM2, LBND2,
-*                      UBND2, DOUT, VOUT, WORK1, WORK2, WORK3, STATUS )
+*                      UBND2, USEWRK, DOUT, VOUT, WORK1, WORK2, WORK3,
+*                      STATUS )
 
 *  Description:
 *     This routine collapses the supplied data and variance arrays
@@ -67,6 +68,10 @@
 *        The lower pixel index bounds of the output array.
 *     UBND2( NDIM2 ) = INTEGER (Given)
 *        The upper pixel index bounds of the output array.
+*     USEWRK = LOGICAL (Given)
+*        Whether or not to use the work arrays.  This should be set
+*        .TRUE. if there are significant (i.e. >1) higher dimensions
+*        than the collapse axis.
 *     DOUT( * ) = <TYPE> (Returned)
 *        The output data values.
 *     VOUT( * ) = <TYPE> (Returned)
@@ -135,6 +140,9 @@
 *        Obtain the pixel-index workspace for methods 31 and 32.
 *     2006 February 13 (MJC):
 *        Better initialisation of START to avoid valgrind warning.
+*     2006 April 11 (MJC):
+*        Make USEWRK an argument for efficiency when higher dimensions
+*        are degenerate.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -169,6 +177,7 @@
       INTEGER NDIM2
       INTEGER LBND2( NDIM2 )
       INTEGER UBND2( NDIM2 )
+      LOGICAL USEWRK
 
 *  Arguments Returned:
       <TYPE> DOUT( * )
@@ -209,7 +218,6 @@
       LOGICAL USECO              ! Method uses the co-ordinate array?
       LOGICAL USEIND             ! Method uses the pixel-index array?
       LOGICAL USEWID             ! Method uses the width array?
-      LOGICAL USEWRK             ! Use the work arrays?
 
 *.
 
@@ -299,7 +307,6 @@
 *  re-arrange the input data and variance values since the CCDPACK
 *  combination routines used at the end of this routine can access them
 *  in "natural" order.
-      USEWRK = ( AXIS .NE. NDIM1 ) 
       START = 1
       IF( .NOT. USEWRK ) THEN
 
