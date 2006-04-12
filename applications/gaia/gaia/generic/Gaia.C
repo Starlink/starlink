@@ -19,8 +19,9 @@ static const char* const rcsId="@(#) $Id$";
 #include <iostream>
 #include <tcl.h>
 
-/* This one has C++ linkage */
+/* These have C++ linkage */
 int GaiaUtils_Init( Tcl_Interp *interp );
+int Fits_Init( Tcl_Interp *interp );
 
 /* And these C linkage */
 extern "C" {
@@ -112,6 +113,11 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 
     //  Simple NDF interface.
     if ( Ndf_Init( interp ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    //  Simple FITS interface.
+    if ( Fits_Init( interp ) != TCL_OK ) {
         return TCL_ERROR;
     }
 
