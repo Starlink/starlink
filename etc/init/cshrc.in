@@ -445,14 +445,14 @@ else
 endif
 
 #
-#   Period
+#   Period now in bin/
 #
 
-if (-e @bindir@/period/period_main ) then
-   alias period @bindir@/period/period_main
-else
-   alias period '@staretcdir@/notinst period'
-endif
+#if (-e @bindir@/period/period_main ) then
+#   alias period @bindir@/period/period_main
+#else
+#   alias period '@staretcdir@/notinst period'
+#endif
 
 #
 #   Photom
