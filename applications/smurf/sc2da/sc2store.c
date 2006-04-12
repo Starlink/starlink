@@ -59,8 +59,8 @@ static char *sc2store_names[SC2STORE_NUM][2] =
    { "_CHAR*80", "RTS_TASKS" },
    { "_CHAR*80", "RTS_ERRS" },
    { "_DOUBLE", "SC2_HEAT" },
-   { "_DOUBLE", "SMU_AZ_OFF_X" },
-   { "_DOUBLE", "SMU_AZ_OFF_Y" },
+   { "_DOUBLE", "SMU_AZ_JIG_X" },
+   { "_DOUBLE", "SMU_AZ_JIG_Y" },
    { "_DOUBLE", "SMU_X" },
    { "_DOUBLE", "SMU_Y" },
    { "_DOUBLE", "SMU_Z" },
@@ -644,8 +644,8 @@ int *status                   /* global status (given and returned) */
    memcpy ( head->rts_errs, 
      (char *)sc2store_ptr[RTS_ERRS]+RTS_ERRS_LEN*frame, RTS_ERRS_LEN );
    head->sc2_heat = ((double *)sc2store_ptr[SC2_HEAT])[frame];
-   head->smu_az_off_x = ((double *)sc2store_ptr[SMU_AZ_OFF_X])[frame];
-   head->smu_az_off_y = ((double *)sc2store_ptr[SMU_AZ_OFF_Y])[frame];
+   head->smu_az_jig_x = ((double *)sc2store_ptr[SMU_AZ_JIG_X])[frame];
+   head->smu_az_jig_y = ((double *)sc2store_ptr[SMU_AZ_JIG_Y])[frame];
    head->smu_x = ((double *)sc2store_ptr[SMU_X])[frame];
    head->smu_y = ((double *)sc2store_ptr[SMU_Y])[frame];
    head->smu_z = ((double *)sc2store_ptr[SMU_Z])[frame];
@@ -776,8 +776,8 @@ int *status                   /* global status (given and returned) */
    memcpy ( (char *)sc2store_ptr[RTS_ERRS]+RTS_ERRS_LEN*frame, 
      head.rts_errs, RTS_ERRS_LEN );
    ((double *)sc2store_ptr[SC2_HEAT])[frame] = head.sc2_heat;
-   ((double *)sc2store_ptr[SMU_AZ_OFF_X])[frame] = head.smu_az_off_x;
-   ((double *)sc2store_ptr[SMU_AZ_OFF_Y])[frame] = head.smu_az_off_y;
+   ((double *)sc2store_ptr[SMU_AZ_JIG_X])[frame] = head.smu_az_jig_x;
+   ((double *)sc2store_ptr[SMU_AZ_JIG_Y])[frame] = head.smu_az_jig_y;
    ((double *)sc2store_ptr[SMU_X])[frame] = head.smu_x;
    ((double *)sc2store_ptr[SMU_Y])[frame] = head.smu_y;
    ((double *)sc2store_ptr[SMU_Z])[frame] = head.smu_z;

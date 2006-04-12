@@ -43,8 +43,9 @@ int subnum,             /* subarray number, 0-7 (given). If -1 is
                            supplied the cached AST objects will be freed. */
 double az,              /* Boresight azimuth in radians (given) */
 double el,              /* Boresight elevation in radians (given) */
+double az_jig_x,        /* SMU azimuth jiggle offset radians (given) */ 
+double az_jig_y,        /* SMU elevation jiggle offset radians (given) */ 
 double tai,             /* TAI (supplied as a Modified Julian Date) */
-int extra_frames,       /* Ignored (i.e. no longer used) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -64,6 +65,7 @@ int *status             /* global status (given and returned) */
      B.D.Kelly (bdk@roe.ac.uk)
      Tim Jenness (timj@jach.hawaii.edu)
      D.S. Berry (dsb@ast.man.ac.uk)
+     E.Chapin (echapin@phas.ubc.ca)
 
    History :
      01Apr2005 : original (bdk)
@@ -95,6 +97,7 @@ int *status             /* global status (given and returned) */
                     Frames (dsb)
      1Mar2006  : Check for (subnum==-1) before checking inherited status (dsb)
      2Mar2006  : const constant arrays (timj)
+     12Apr2006 : added jig_az_x/y, remove extra_frames from interface (ec)
 */
 
 {
@@ -108,6 +111,9 @@ int *status             /* global status (given and returned) */
    AstZoomMap *radmap;
    AstZoomMap *zoommap;
    AstShiftMap *zshiftmap;
+
+   double az_eff;                  /* effective az including jiggle offset */
+   double el_eff;                  /* effective el including jiggle offset */
 
    double a;                       /* subarray angle */
    const double rotangle[8] =
@@ -203,8 +209,8 @@ int *status             /* global status (given and returned) */
    calling this function with the sub-frame number set to -1. */
    static AstMapping *map_cache[ 8 ] = { NULL, NULL, NULL, NULL, NULL, NULL, 
                                          NULL, NULL };
-   static AstFrameSet *frameset_cache[ 8 ] = { NULL, NULL, NULL, NULL, NULL, NULL, 
-                                               NULL, NULL };
+   static AstFrameSet *frameset_cache[ 8 ] = { NULL, NULL, NULL, NULL, NULL, 
+					       NULL, NULL, NULL };
 
 /* Cache the SkyFrame used to represent final spherical (Az,El) coords */
    static AstSkyFrame *skyframe = NULL;
@@ -360,9 +366,14 @@ int *status             /* global status (given and returned) */
       astExempt( frameset_cache[ subnum ] );
    }
 
+/* Calculate the effective az/el of the tangent point including the small
+   offsets of the SMU jiggle pattern - currently using a quick KLUDGE! */
+   az_eff = az + az_jig_x/cos(el); /* lousy approx. at high elevations */
+   el_eff = el + az_jig_y;
+
 /* Create a Mapping from these Cartesian Nasmyth coords (in rads) to spherical 
    AzEl coords (in rads). */
-   azelmap = sc2ast_maketanmap( az, el, azel_cache, status );
+   azelmap = sc2ast_maketanmap( az_eff, el_eff, azel_cache, status );
 
 /* Combine this with the cached Mapping (from GRID coords for the subarray to
    Cartesian Nasmyth coords in rads), to get the total Mapping from GRID 
@@ -858,7 +869,7 @@ int *status             /* global status (given and returned) */
 
   tai = sc2ast_kludgemodjuldate( ra, status );
   
-  sc2ast_createwcs( subnum, temp_az, temp_el, tai, 0, fset, status );
+  sc2ast_createwcs( subnum, temp_az, temp_el, 0, 0, tai, fset, status );
 }
 
 

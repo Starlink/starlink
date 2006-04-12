@@ -26,8 +26,8 @@ struct sc2head
    char rts_tasks[81];
    char rts_errs[81];
    double sc2_heat;
-   double smu_az_off_x;
-   double smu_az_off_y;
+   double smu_az_jig_x;
+   double smu_az_jig_y;
    double smu_x;
    double smu_y;
    double smu_z;

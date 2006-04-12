@@ -34,6 +34,7 @@
 *     Tim Jenness (JAC, Hawaii)
 *     David Berry (JAC, UCLan)
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +59,8 @@
 *        Clear out sc2ast cache
 *     2006-03-16 (AGG):
 *        Add qlmakemap
+*     2006-04-12 (EC):
+*        Modified call to createwcs for new interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -174,7 +177,7 @@ void smurf_mon( int * status ) {
   }
 
   /* Clear the sc2ast cache */
-  sc2ast_createwcs(-1, 0.0, 0.0, 0.0, 0, NULL,status);
+  sc2ast_createwcs(-1, 0.0, 0.0, 0.0, 0.0, 0.0, NULL,status);
 
   /* Free AST resources */
   astEnd;

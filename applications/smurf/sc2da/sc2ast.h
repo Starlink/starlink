@@ -1,12 +1,18 @@
+#ifndef HEADGEN___src_sc2ast_sc2ast_h
+#define HEADGEN___src_sc2ast_sc2ast_h 
+ 
+ 
 /*+ sc2ast_createwcs - create WCS description */
 
 void sc2ast_createwcs
 (
-int subnum,             /* subarray number, 0-7 (given) */
-double az,              /* Azimuth in radians (given) */
-double el,              /* Elevation in radians (given) */
-double tai,             /* TAI (supplied as an MJD) */
-int extra_frames,       /* Add intermediate Frames to returned FrameSet? */
+int subnum,             /* subarray number, 0-7 (given). If -1 is
+                           supplied the cached AST objects will be freed. */
+double az,              /* Boresight azimuth in radians (given) */
+double el,              /* Boresight elevation in radians (given) */
+double az_jig_x,        /* SMU azimuth jiggle offset radians (given) */ 
+double az_jig_y,        /* SMU elevation jiggle offset radians (given) */ 
+double tai,             /* TAI (supplied as a Modified Julian Date) */
 AstFrameSet **fset,     /* constructed frameset (returned) */
 int *status             /* global status (given and returned) */
 );
@@ -64,6 +70,38 @@ AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
 
+/*+ sc2ast_kludgemodjuldate - kludge for the modified julian date */
+
+double sc2ast_kludgemodjuldate
+( 
+double ra,           /* Right Ascension in radians (given) */
+int *status          /* global status (given and returned) */
+);
+
+/*+ sc2ast_telpos - get telescope position and orientation */
+
+void sc2ast_telpos
+( 
+double ra,           /* Right Ascension in radians (given) */
+double dec,          /* Declination in radians (given) */
+double lst,          /* local sidereal time in radians (given) */
+double *az,          /* Azimuth in radians (returned) */
+double *el,          /* Elevation in radians (returned) */
+double *p            /* Parallactic angle in radians (returned) */
+);
+
+/*+ sc2ast_createwcs_compat - create WCS descriptionusing old parameters */
+
+void sc2ast_createwcs_compat
+(
+int subnum,             /* subarray number, 0-7 (given) */
+double ra,              /* Right Ascension of the telescope boresight */
+double dec,             /* Declination of the telescope boresight */
+double el,              /* Boresight elevation in radians (given) */
+double p,               /* No longer used (pass any dummy value) */
+AstFrameSet **fset,     /* constructed frameset (returned) */
+int *status             /* global status (given and returned) */
+);
 
 /*+ sc2ast_maketanmap - create a Mapping representing a tangent plane 
                         projection */
@@ -76,4 +114,6 @@ AstMapping *cache[ 2 ],   /* Cached Mappings (supply as NULL on 1st call) */
 int *status               /* global status (given and returned) */
 );
 
-
+ 
+ 
+#endif
