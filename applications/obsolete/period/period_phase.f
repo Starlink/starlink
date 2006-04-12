@@ -94,7 +94,7 @@ C-----------------------------------------------------------------------------
          ELSE
             IF ( NPTSARRAY(SLOTOUT).NE.0 )
      :         CALL PERIOD_DEALL(YPTR(SLOTOUT))
-            CALL PERIOD_ALLOC('_DOUBLE', NBIN*MXCOL, YPTR(SLOTOUT))
+            CALL PERIOD_ALLOC('_DOUBLE', NDATA*MXCOL, YPTR(SLOTOUT))
          END IF
 
          YSLOT1 = YPTR(SLOT)
