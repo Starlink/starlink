@@ -23,8 +23,9 @@
 
 #include <tcl.h>
 #include <ndf.h>
-#include <gaiaNDF.h>
-#include <gaiaHDS.h>
+#include "gaiaNDF.h"
+#include "gaiaHDS.h"
+#include "gaiaArray.h"
 
 /* Local prototypes */
 static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
@@ -168,21 +169,22 @@ static int gaiaNDFTclClose( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Map the NDF data array in the NDF's data type, using file mapping as
- * requested. The result is a memory address (long int), the number of
- * elements mapped and the data type.
+ * requested. The result is a memory address (long int) of an ARRAYinfo
+ * structure.
  */
 static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                        int objc, Tcl_Obj *CONST objv[] )
 {
-    Tcl_Obj *resultObj;
+    ARRAYinfo *arrayInfo;
     char *error_mess;
     char *error_mess2;
-    char type[NDF__SZTYP+1];
+    char ctype[NDF__SZTYP+1];
     int el;
     int indf;
     int oldmmap;
     int mmap;
     int result;
+    int type;
     void *dataPtr;
 
     /* Check arguments, allow two, the ndf identifier and whether to use file
@@ -195,13 +197,13 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
     /* Get the identifier */
     result = importNdfIdentifier( interp, objv[1], &indf );
     if ( result == TCL_OK ) {
-        resultObj = Tcl_GetObjResult( interp );
 
         /* Mmap mode. */
         result = Tcl_GetBooleanFromObj( interp, objv[2], &mmap );
         if ( result == TCL_OK ) {
-            result = gaiaNDFType( indf, "DATA", type, NDF__SZTYP+1,
+            result = gaiaNDFType( indf, "DATA", ctype, NDF__SZTYP+1,
                                   &error_mess );
+            type = gaiaArrayHDSType( ctype );
             if ( result == TCL_OK ) {
                 /* Set mmap tuning, 0 for off, 1 for on, don't handle tuning
                    errors as these should be none fatal. */
@@ -213,7 +215,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                 }
 
                 /* Map data */
-                result = gaiaNDFMap( indf, type, "DATA", &dataPtr, &el, 
+                result = gaiaNDFMap( indf, ctype, "DATA", &dataPtr, &el, 
                                      &error_mess  );
 
                 /* Restore default MAP mode */
@@ -223,16 +225,17 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 
                 /* Construct result */
                 if ( result == TCL_OK ) {
-                    Tcl_ListObjAppendElement( interp, resultObj,
-                                              Tcl_NewLongObj((long)dataPtr));
-                    Tcl_ListObjAppendElement( interp, resultObj,
-                                              Tcl_NewIntObj( el ) );
-                    Tcl_ListObjAppendElement( interp, resultObj,
-                                              Tcl_NewStringObj( type, -1 ) );
+                    arrayInfo = gaiaArrayCreateInfo( dataPtr, type, el, 
+                                                     0, 0, 0 );
+                    Tcl_SetObjResult( interp,Tcl_NewLongObj((long)arrayInfo));
+                }
+                else {
+                    Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
+                    free( error_mess );
                 }
             }
             if ( result != TCL_OK ) {
-                Tcl_SetStringObj( resultObj, error_mess, -1 );
+                Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
                 free( error_mess );
             }
         }
@@ -246,14 +249,14 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
 static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
                        int objc, Tcl_Obj *CONST objv[] )
 {
-    Tcl_Obj *resultObj;
     char *error_mess;
     int indf;
     int result;
+    long adr;
 
-    /* Check arguments, only allow one, the ndf identifier */
-    if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier" );
+    /* Check arguments, need two, the ndf identifier and ARRAYinfo address */
+    if ( objc != 3 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "ndf_identifier address" );
         return TCL_ERROR;
     }
 
@@ -264,10 +267,14 @@ static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
         /* Unmap */
         result = gaiaNDFUnmap( indf, "DATA", &error_mess );
         if ( result != TCL_OK ) {
-            resultObj = Tcl_GetObjResult( interp );
-            Tcl_SetStringObj( resultObj, error_mess, -1 );
+            Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
             free( error_mess );
         }
+    }
+    
+    /* Free the ARRAYinfo struct */
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) == TCL_OK ) {
+        gaiaArrayFreeInfo( (ARRAYinfo *)adr );
     }
     return result;
 }
@@ -298,8 +305,7 @@ static int gaiaNDFTclGtWcs( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the identifier */
-    result = importNdfIdentifier( interp, objv[1], &indf );
-    if ( result != TCL_OK ) {
+    if( importNdfIdentifier( interp, objv[1], &indf ) != TCL_OK ) {
         return TCL_ERROR;
     }
     resultObj = Tcl_GetObjResult( interp );

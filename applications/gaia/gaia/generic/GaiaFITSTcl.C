@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <strings.h>
 
 #include <tcl.h>
 extern "C" {
@@ -47,23 +48,23 @@ typedef struct FITSinfo FITSinfo;
 
 /* Local prototypes */
 static int GaiaFITSTclBounds( ClientData clientData, Tcl_Interp *interp,
-                             int objc, Tcl_Obj *CONST objv[] );
+                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
-                           int objc, Tcl_Obj *CONST objv[] );
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclClose( ClientData clientData, Tcl_Interp *interp,
-                            int objc, Tcl_Obj *CONST objv[] );
+                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
-                            int objc, Tcl_Obj *CONST objv[] );
+                             int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclDims( ClientData clientData, Tcl_Interp *interp,
-                           int objc, Tcl_Obj *CONST objv[] );
+                            int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] );
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
-                          int objc, Tcl_Obj *CONST objv[] );
-static int GaiaFITSTclOpen( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] );
-static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
+static int GaiaFITSTclOpen( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
+static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
+                             int objc, Tcl_Obj *CONST objv[] );
 
 static int GetFITSDimsOrBounds( Tcl_Interp *interp, int objc,
                                 Tcl_Obj *CONST objv[], int bounds );
@@ -217,21 +218,21 @@ static int GaiaFITSTclClose( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Map the FITS data array in the native type, using file mapping as
- * requested. The result is a memory address (long int), the number of
- * elements mapped and the data type. Note the data is raw and no byte
- * swapping will be applied (FITS is bigendian).
+ * requested. The result is a memory address (long int) of an ARRAYinfo
+ * struct. Note the data is raw and no byte swapping will be applied.
  */
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
+    ARRAYinfo *arrayInfo;
     FITSinfo *info;
-    Tcl_Obj *resultObj;
-    char const *type;
+    int blank;
+    int haveblank;
+    int type;
     size_t el;
 
     /* Check arguments, allow two, the FITS identifier and whether to use file
-     * mapping, this may not be very useful if the data requires byte
-     * swapping. */
+     * mapping. */
     if ( objc != 3 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier ?usemmap?" );
         return TCL_ERROR;
@@ -246,7 +247,7 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
     if ( Tcl_GetBooleanFromObj( interp, objv[2], &info->mmap ) != TCL_OK ) {
         return TCL_ERROR;
     }
-    type = gaiaArrayTypeToHDS( gaiaArrayFITSType( info->handle->bitpix() ) );
+    type = gaiaArrayFITSType( info->handle->bitpix() );
 
     /* Get the data array Mem object */
     if ( GaiaFITSDataMem( info->handle, &info->dataPtr ) == TCL_OK ) {
@@ -263,21 +264,24 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
         for ( int i = 0; i < info->ndims; i++ ) {
             el *= info->dims[i];
         }
-        fprintf( stderr, "el = %d\n", el );
         if ( ! info->mmap ) {
             info->dataCopy = malloc( el * info->handle->pixelSize() );
             memcpy( info->dataCopy, ptr, el * info->handle->pixelSize() );
             ptr = info->dataCopy;
         }
 
+        /* Get the BLANK value, if set */
+        if ( GaiaFITSHGet( info->handle, "BLANK", &blank ) == TCL_OK ) {
+            haveblank = 1;
+        }
+        else {
+            haveblank = 0;
+            blank = 0;
+        }
+
         /* Construct result */
-        resultObj = Tcl_GetObjResult( interp );
-        Tcl_ListObjAppendElement( interp, resultObj,
-                                  Tcl_NewLongObj( (long) ptr ) );
-        Tcl_ListObjAppendElement( interp, resultObj,
-                                  Tcl_NewIntObj( (int) el ) );
-        Tcl_ListObjAppendElement( interp, resultObj,
-                                  Tcl_NewStringObj( type , -1 ) );
+        arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, haveblank, blank );
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long)arrayInfo ) );
         return TCL_OK;
     }
 
@@ -292,10 +296,12 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
     FITSinfo *info;
+    long adr;
 
-    /* Check arguments, only allow one, the FITS identifier */
+    /* Check arguments, need two , the FITS identifier and ARRAYinfo memory
+     * address */
     if ( objc != 2 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier" );
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier address" );
         return TCL_ERROR;
     }
 
@@ -314,6 +320,12 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
             info->dataCopy = NULL;
         }
     }
+
+    /* Free the ARRAYinfo struct */
+    if ( Tcl_GetLongFromObj( interp, objv[2], &adr ) == TCL_OK ) {
+        gaiaArrayFreeInfo( (ARRAYinfo *)adr );
+    }
+
     return TCL_OK;
 }
 
@@ -361,6 +373,7 @@ static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Get the full WCS, if not already done. */
+    result = TCL_OK;
     if ( info->wcs == NULL ) {
         result = GaiaFITSGtWcs( info->handle, &info->wcs, info->dims,
                                 &info->ndims );
@@ -406,8 +419,18 @@ static int GaiaFITSTclCGet( ClientData clientData, Tcl_Interp *interp,
     if ( result == TCL_OK ) {
         resultObj = Tcl_GetObjResult( interp );
         value[0] = '\0';
-        result = GaiaFITSHGet( info->handle, Tcl_GetString( objv[2] ), value,
-                               80 );
+
+        /* We test for some special keywords that are used by the NDF
+         * library. These are "units" and "label". Transform these
+         * into the obvious FITS equivalents. */
+        char *keyword = Tcl_GetString( objv[2] );
+        if ( strcasecmp( keyword, "units" ) == 0 ) {
+            keyword = "BUNIT";
+        }
+        else if ( strcasecmp( keyword, "label" ) == 0 ) {
+            keyword = "OBJECT";
+        }
+        result = GaiaFITSHGet( info->handle, keyword, value, 80 );
         if ( result == TCL_OK ) {
             Tcl_SetStringObj( resultObj, value, -1 );
         }
@@ -448,9 +471,7 @@ static int GetFITSDimsOrBounds( Tcl_Interp *interp, int objc,
 {
     FITSinfo *info;
     Tcl_Obj *resultObj;
-    int dims[MAX_DIMS];
     int i;
-    int ndim;
     int result;
 
     /* Check arguments, need the fits identifier and whether to trim redundant

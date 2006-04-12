@@ -32,9 +32,9 @@
 #include <float.h>
 #include <tk.h>
 #include <ast.h>
-#include <grf_tkcan.h>
-#include <rtdCanvas.h>
-#include <gaiaArray.h>
+#include "grf_tkcan.h"
+#include "rtdCanvas.h"
+#include "gaiaArray.h"
 
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
@@ -366,12 +366,12 @@ static int SPCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
  *
  *   This procedure is invoked to process the "coords" widget command.
  *   This reads an list of doubles that are the spectral coordinates,
- *   or accepts a pointer to a list of already available values in one of the
- *   HDS types (_BYTE, _UBYTE, _WORD, _UWORD, _INTEGER, _REAL _DOUBLE).
- *   In the latter case you should use the format:
+ *   or accepts a pointer to an ARRAYinfo structure of already available 
+ *   values in one of the HDS types (_BYTE, _UBYTE, _WORD, _UWORD, 
+ *   _INTEGER, _REAL _DOUBLE). In the latter case you should use the format:
  *
  *      <canvas> coords <item> \
- *         "pointer" memory_address number_of_elements hds_type
+ *         "pointer" memory_address_of_ARRAYinfo
  * 
  *   A special feature (should be moved into some generic interface) is to
  *   convert an X coordinate into a canvas coordinate, using the plot. This
@@ -388,6 +388,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                      int objc, Tcl_Obj *CONST objv[] )
 {
     SPItem *spPtr = (SPItem *) itemPtr;
+    ARRAYinfo *arrayInfo;
     char *optionPtr;
     double *dataPtr;
     int i;
@@ -442,21 +443,13 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         if ( strcmp( optionPtr, "pointer" ) == 0 ) {
 
             /*  Memory address, sort this out. */
-            if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ||
-                 Tcl_GetIntFromObj( interp, objv[2], &nel ) != TCL_OK ) {
-                Tcl_AppendResult( interp, "Failed to read data pointer",
+            if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+                Tcl_AppendResult( interp, "Failed to read ARRAYinfo pointer",
                                   (char *) NULL );
                 return TCL_ERROR;
             }
-
-            /*  Convert HDS type string into gaiaArray enum. */
-            type = gaiaArrayHDSType( Tcl_GetString( objv[3] ) );
-            if ( type == HDS_UNKNOWN ) { 
-                Tcl_AppendResult( interp, "Unknown data type: ", 
-                                  Tcl_GetString( objv[3] ),
-                                  (char *) NULL );
-                return TCL_ERROR;
-            }
+            arrayInfo = (ARRAYinfo *) adr;
+            nel = arrayInfo->el;
         }
 
         /* Re-create various workspaces, if needed */
@@ -494,11 +487,10 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
         }
         else {
-            /* Given memory address, convert type into double precision and
+            /* Given ARRAYinfo address, convert type into double precision and
              * check for BAD values which are replaced with our bad value,
              * -DBL_MAX. */
-            gaiaArrayToDouble( (void *) adr, nel, type, spPtr->badvalue, 
-                               spPtr->dataPtr );
+            gaiaArrayToDouble( arrayInfo, spPtr->badvalue, spPtr->dataPtr );
 
             /* Get range of data */
             dataPtr = spPtr->dataPtr;
