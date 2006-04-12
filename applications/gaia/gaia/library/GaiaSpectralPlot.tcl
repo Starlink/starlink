@@ -293,13 +293,13 @@ itcl::class gaia::GaiaSpectralPlot {
 
       #  Get the spectral data from the accessor.
       #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr nel type
+      lassign [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1] adr
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
          set autoscale 1
          set spectrum_ [$itk_component(canvas) create spectral_plot \
-                           pointer $adr $nel $type \
+                           pointer $adr \
                            -x 25 -y 5 -width 650 -height 200 \
                            -linecolour $linecolour_ -linewidth 1 \
                            -gridoptions $gridoptions_ \
@@ -317,7 +317,7 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $itk_option(-canvas) != {} && $spectrum2_ == {} && $show_plot2_ } {
          set autoscale 1
          set spectrum2_ [$itk_option(-canvas) create spectral_plot \
-                            pointer $adr $nel $type \
+                            pointer $adr \
                             -x $x -y $y -width 200 -height 200 \
                             -linecolour $linecolour_ -linewidth 1 \
                             -showaxes 0 -tags $itk_option(-ast_tag) \
@@ -338,9 +338,9 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Pass in the data.
-      $itk_component(canvas) coords $spectrum_ pointer $adr $nel $type
+      $itk_component(canvas) coords $spectrum_ pointer $adr
       if { $spectrum2_ != {} } {
-         $itk_option(-canvas) coords $spectrum2_ pointer $adr $nel $type
+         $itk_option(-canvas) coords $spectrum2_ pointer $adr
 
          #  Translate the secondary plot.
          if { $x != {} && $y != {} } {
