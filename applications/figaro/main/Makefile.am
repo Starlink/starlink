@@ -17,7 +17,7 @@ check_res.f check_statii.f check_tols.f chkenv.f chkparr.f cla_med.f \
 clone_it.f clone_match.f clone_mode.f clone_plot.f comb_centrd.f \
 comb_contin.f comb_menu.f comb_spacing.f comb_window.f compare.f \
 contin_corr.f contrl_cpoly2.f control_cpoly.f cop_2_1d_err.f \
-cophdr2hds.f copy_res.f copyit.f correct.f correct2.f \
+copy_res.f copyit.f correct.f correct2.f \
 count.f create_ext.f crres.f csub_st.f darsort.f data_window.f \
 decode_status.f decodetolfail.f delete_fit.f delta_fit.f \
 describe_fit.f diagnosis_plt.f disp_window.f display_line.f \
@@ -26,15 +26,15 @@ e_cpolyrl.f e_npoly.f e_rej.f edit_list.f encode_contrl.f epolya.f \
 extr3.f extr_pos.f fill_cent.f fill_ext.f fill_map.f fill_map2.f \
 fill_out.f fill_params.f fillim.f find_lines.f find_vig.f \
 fit_cpolb.f fit_cpoly.f fit_edit.f fit_glbase.f fit_line.f \
-flavours.f flux_mark.f free_ext.f get_block.f get_centre.f \
+flavours.f flux_mark.f get_block.f get_centre.f \
 get_flux.f get_lincnt.f get_line_ids.f get_parnum.f get_peak.f \
-get_substr.f get_template.f get_wave.f getres.f getrow.f \
+get_template.f get_wave.f getres.f getrow.f \
 getx_template.f gety_template.f grvel.f gryplt.f hardcopy_plot.f \
 hartman.f hpfil.f identify_line.f iflab.f init_res.f init_tols.f \
 intrpl.f intrpl_s.f iroutp.f itplbv2.f line_plot.f \
 line_plot_sub.f line_show.f line_vplot.f linepick.f list_lines.f \
 long_edit.f long_opts.f look.f manual_menu.f manual_mode.f \
-map_data.f map_data2.f map_ext.f map_res.f mk_synth_data.f \
+map_data.f map_data2.f map_res.f mk_synth_data.f \
 modify_params.f morepts.f new_anal.f new_arc.f new_comb.f \
 ofill_params.f oget_parnum.f one_line.f output_fit.f outsub.f \
 pick_lines.f pick_regions.f pick_regions3.f pldiagnosis.f \
