@@ -255,6 +255,9 @@
 *        Correct the bounds for blocking.  Use an NDF section to define
 *        the number of blocks when the compression is derived from only
 *        part of the collapse axis.
+*     2006 April 11 (MJC):
+*        Obtain bounds for each block passed to KPS1_CLPSx, rather
+*        than the full array.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -917,6 +920,11 @@
             IPIN( 2 ) = IPIN( 1 )
             IPOUT( 2 ) = IPOUT( 1 )
          END IF
+
+*  Obtain the bounds of the blocks.
+         CALL NDF_BOUND( IBL, NDF__MXDIM, LBNDS, UBNDS, NDIM, STATUS )
+         CALL NDF_BOUND( OBL, NDF__MXDIM, LBNDO, UBNDO, NDIMO, STATUS )
+
 
 *  Allocate work space, unless the last axis is being collapsed (in
 *  which case no work space is needed).
