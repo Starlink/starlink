@@ -257,7 +257,8 @@
 *        part of the collapse axis.
 *     2006 April 11 (MJC):
 *        Obtain bounds for each block passed to KPS1_CLPSx, rather
-*        than the full array.
+*        than the full array.  Do not use workspace if higher
+*        dimensions are 1.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -334,6 +335,8 @@
                                  ! array
       INTEGER EL2                ! Number of elements in an output
                                  ! mapped array
+      LOGICAL HIGHER             ! Significant dimensions above collapse
+                                 ! axis?
       INTEGER I                  ! Loop count
       INTEGER IAXIS              ! Index of collapse axis within current
                                  ! Frame
@@ -662,6 +665,16 @@
          UBNDO( I ) = UBND( AXES( I ) )
       END DO
 
+*  Determine whether or not there are significant dimensions above
+*  the collapse axis.
+      HIGHER = JAXIS .NE. NDIM
+      IF ( HIGHER ) THEN
+         HIGHER = .FALSE.
+         DO I = JAXIS + 1, NDIM
+            HIGHER = HIGHER .OR. ( UBND( I ) - LBND( I ) ) .NE. 0
+         END DO
+      END IF
+
 *  Adjust output NDF to its new shape.
 *  ===================================
 
@@ -928,7 +941,7 @@
 
 *  Allocate work space, unless the last axis is being collapsed (in
 *  which case no work space is needed).
-         IF( JAXIS .NE. NDIM ) THEN
+         IF ( HIGHER ) THEN
             CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW1, STATUS )
             IF( VAR ) THEN
                CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW2, STATUS )
@@ -958,7 +971,7 @@
 
 *  Allocate work space, unless the last pixel axis is being collapsed 
 *  (in which case no work space is needed).
-            IF ( JAXIS .NE. NDIM ) THEN
+            IF ( HIGHER ) THEN
                CALL PSX_CALLOC( EL2 * AEL, ITYPE, IPW3, STATUS )
             END IF
 
@@ -1013,8 +1026,9 @@
      :                       %VAL( CNF_PVAL( IPIN( 1 ) ) ),
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
-     :                       %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
-     :                       UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                       %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO,
+     :                       UBNDO, HIGHER,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       %VAL( CNF_PVAL( IPW1 ) ), 
      :                       %VAL( CNF_PVAL( IPW2 ) ), 
@@ -1027,7 +1041,8 @@
      :                       %VAL( CNF_PVAL( IPIN( 2 ) ) ), 
      :                       %VAL( CNF_PVAL( IPCO ) ),
      :                       %VAL( CNF_PVAL( IPWID ) ), NDIMO, LBNDO, 
-     :                       UBNDO, %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
+     :                       UBNDO, HIGHER,
+     :                       %VAL( CNF_PVAL( IPOUT( 1 ) ) ), 
      :                       %VAL( CNF_PVAL( IPOUT( 2 ) ) ),
      :                       %VAL( CNF_PVAL( IPW1 ) ), 
      :                       %VAL( CNF_PVAL( IPW2 ) ), 
@@ -1041,7 +1056,7 @@
          END IF
 
 *  Free the work space.
-         IF ( JAXIS .NE. NDIM ) THEN
+         IF ( HIGHER ) THEN
             CALL PSX_FREE( IPW1, STATUS )
             IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
          END IF
@@ -1049,12 +1064,12 @@
          IF ( ESTIM .EQ. 'COMAX' .OR. ESTIM .EQ. 'COMIN' .OR.
      :        ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
              CALL PSX_FREE( IPCO, STATUS )
-             IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
+             IF ( HIGHER ) CALL PSX_FREE( IPW3, STATUS )
          END IF
          
          IF ( ESTIM .EQ. 'INTEG' ) THEN
             CALL PSX_FREE( IPWID, STATUS )
-            IF ( JAXIS .NE. NDIM ) CALL PSX_FREE( IPW3, STATUS )
+            IF ( HIGHER ) CALL PSX_FREE( IPW3, STATUS )
          END IF
 
 *   Close NDF context.
