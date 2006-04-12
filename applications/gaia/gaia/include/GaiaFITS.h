@@ -29,5 +29,6 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 /* Get a FITS card value */
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value,
                   int value_length );
+int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value );
 
 #endif
