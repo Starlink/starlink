@@ -234,7 +234,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
                     free( error_mess );
                 }
             }
-            if ( result != TCL_OK ) {
+            else {
                 Tcl_SetResult( interp, error_mess, TCL_VOLATILE );
                 free( error_mess );
             }

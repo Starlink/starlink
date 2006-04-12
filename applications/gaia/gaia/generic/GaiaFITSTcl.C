@@ -300,7 +300,7 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, need two , the FITS identifier and ARRAYinfo memory
      * address */
-    if ( objc != 2 ) {
+    if ( objc != 3 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier address" );
         return TCL_ERROR;
     }
