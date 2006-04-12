@@ -62,6 +62,8 @@ C      data/work array(s) and/or use of such arrays (KPD), October 2001
 
 *  Type Definitions:                  ! No implicit typing
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 *   PLT declarations.
       INTEGER MXCOL, MXSLOT
@@ -302,10 +304,14 @@ C      Dynamically allocate memory.
          STATUS=0
          READWRITE=0
          CALL FTOPEN(UNIT,FILENAME,READWRITE,BLOCKSIZE,STATUS)
-         CALL PERIOD_OGIPEXTNS(%VAL(XIPTR), %VAL(YIPTR),
-     :                         %VAL(HDTPTR), %VAL(OKAYPTR),
-     :                         %VAL(HDCPTR), %VAL(HDCCPTR),
-     :                         %VAL(HDC2PTR), %VAL(EXTNPTR),
+         CALL PERIOD_OGIPEXTNS(%VAL(CNF_PVAL(XIPTR)), 
+     :                         %VAL(CNF_PVAL(YIPTR)),
+     :                         %VAL(CNF_PVAL(HDTPTR)), 
+     :                         %VAL(CNF_PVAL(OKAYPTR)),
+     :                         %VAL(CNF_PVAL(HDCPTR)), 
+     :                         %VAL(CNF_PVAL(HDCCPTR)),
+     :                         %VAL(CNF_PVAL(HDC2PTR)), 
+     :                         %VAL(CNF_PVAL(EXTNPTR)),
      :                         HEAD1, EXTENS, UNIT)
 
 *      Close down the file.      
@@ -339,7 +345,7 @@ C      Dynamically allocate memory.
             GOTO 150
          END IF
 
-         OKCUREXT = PERIOD_GET1DINT(CUREXT, %VAL(OKAYPTR),
+         OKCUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(OKAYPTR)),
      :                              EXTENS)
 
          IF(OKCUREXT.EQ.1) THEN
@@ -351,9 +357,9 @@ C      Dynamically allocate memory.
             GOTO 150
          END IF
 
-         XICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(XIPTR), 
+         XICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(XIPTR)), 
      :                              EXTENS)
-         YICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(YIPTR), 
+         YICUREXT = PERIOD_GET1DINT(CUREXT, %VAL(CNF_PVAL(YIPTR)), 
      :                              EXTENS)
 
          CALL PERIOD_DEALL(OKAYPTR)
@@ -605,7 +611,8 @@ C      Dynamically allocate memory.
 
 *               Store the values.
                   CALL PERIOD_OGIPSTORE(DVAL1, DVAL2, DVAL3,
-     :                                  THISROW, %VAL(JUNK2PTR),
+     :                                  THISROW, 
+     :                                  %VAL(CNF_PVAL(JUNK2PTR)),
      :                                  NUMROWS, MXCOL)
                END IF
 
@@ -618,9 +625,11 @@ C      Dynamically allocate memory.
 
          IFAIL = 0
 
-         CALL PERIOD_OGIPSORTCYCLE(%VAL(YSLOT1), NUMROWS, MXCOL,
-     :                             %VAL(JUNK2PTR), %VAL(JUNK1PTR),
-     :                             %VAL(KEYPTR), IFAIL)
+         CALL PERIOD_OGIPSORTCYCLE(%VAL(CNF_PVAL(YSLOT1)), 
+     :                             NUMROWS, MXCOL,
+     :                             %VAL(CNF_PVAL(JUNK2PTR)), 
+     :                             %VAL(CNF_PVAL(JUNK1PTR)),
+     :                             %VAL(CNF_PVAL(KEYPTR)), IFAIL)
 
          IF ( IFAIL.EQ.1 ) THEN
 

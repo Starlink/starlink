@@ -19,6 +19,8 @@ C=============================================================================
  
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
@@ -120,11 +122,13 @@ C-----------------------------------------------------------------------------
 
             YSLOT1 = YPTR(SLOT)
 
-            CALL PERIOD_INIT2D(0.0D0, %VAL(YSLOT1), NUMPTS, 3)
+            CALL PERIOD_INIT2D(0.0D0, %VAL(CNF_PVAL(YSLOT1)), 
+     :                         NUMPTS, 3)
 
             INTERVAL = (ENDPT-STARTPT)/(DFLOAT(NUMPTS)-1.0D0)
 
-            CALL PERIOD_FAKEPERIOD(%VAL(YSLOT1), NUMPTS, 3, PERIOD,
+            CALL PERIOD_FAKEPERIOD(%VAL(CNF_PVAL(YSLOT1)), 
+     :                             NUMPTS, 3, PERIOD,
      :                             AMPLITUDE, ZEROPT, GAMMA, MAXSIN,
      :                             NUMSIN, STARTPT, INTERVAL)
 
@@ -172,9 +176,11 @@ C-----------------------------------------------------------------------------
 
             YSLOT1 = YPTR(SLOT)
 
-            CALL PERIOD_INIT2D(0.0D0, %VAL(YSLOT1), NUMPTS, 3)
+            CALL PERIOD_INIT2D(0.0D0, %VAL(CNF_PVAL(YSLOT1)), 
+     :                         NUMPTS, 3)
 
-            CALL PERIOD_FAKECHAOS(%VAL(YSLOT1), NUMPTS, 3, COEFF,
+            CALL PERIOD_FAKECHAOS(%VAL(CNF_PVAL(YSLOT1)), 
+     :                            NUMPTS, 3, COEFF,
      :                            INITVAL, STARTPT, ENDPT)
 
             INFILEARRAY(SLOT) = 'Data File = Fake Chaotic Data'

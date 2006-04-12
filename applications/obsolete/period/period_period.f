@@ -1,4 +1,3 @@
- 
       SUBROUTINE PERIOD_PERIOD(YPTR, MXCOL, MXSLOT, NPTSARRAY, 
      :                         INFILEARRAY, YERRORARRAY, DETRENDARRAY, 
      :                         SIG,LOG,LOGUNIT)
@@ -21,6 +20,8 @@ C==============================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PERIOD_PERIOD declarations.
@@ -174,8 +175,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
  
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+     :                                   MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
 
                      IF ( SLOT.EQ.SLOTOUT ) THEN
@@ -184,7 +186,9 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+     :                                   NDATA,
+     :                                   MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -200,7 +204,8 @@ C-----------------------------------------------------------------------------
 C chisq - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
  
-                     CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE,
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), NDATA, 
+     :                                  AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
                      WRITE (*, *) ' '
@@ -232,24 +237,29 @@ C-----------------------------------------------------------------------------
                   LOOP = 1
                   DO 250 FREQ = FMIN, FMAX, FINT
 
-                     CALL PERIOD_SETXYEDATA(%VAL(YSLOT1), NDATA, MXCOL,
+                     CALL PERIOD_SETXYEDATA(%VAL(CNF_PVAL(YSLOT1)),
+     :                                      NDATA, MXCOL,
      :                                      SAMPLE, YERRORARRAY(SLOT),
-     :                                      %VAL(XDATAPTR),
-     :                                      %VAL(YDATAPTR),
-     :                                      %VAL(YRANPTR),
-     :                                      %VAL(YERRPTR),
-     :                                      %VAL(ERANPTR))
+     :                                      %VAL(CNF_PVAL(XDATAPTR)),
+     :                                      %VAL(CNF_PVAL(YDATAPTR)),
+     :                                      %VAL(CNF_PVAL(YRANPTR)),
+     :                                      %VAL(CNF_PVAL(YERRPTR)),
+     :                                      %VAL(CNF_PVAL(ERANPTR)))
 
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                                %VAL(YERRPTR), NDATA, ZEROPT, 
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                                %VAL(CNF_PVAL(YDATAPTR)),
+     :                                %VAL(CNF_PVAL(YERRPTR)), NDATA, 
+     :                                ZEROPT, 
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 292
 
-                     CALL PERIOD_SINFIT(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                                  %VAL(YERRPTR), NDATA, 1.0D0, 
+                     CALL PERIOD_SINFIT(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                                  %VAL(CNF_PVAL(YDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YERRPTR)), NDATA, 
+     :                                  1.0D0, 
      :                                  GAMMA, KVEL, PHASE, VAR, NP, F, 
      :                                  IFAIL)
 
@@ -277,7 +287,8 @@ C-----------------------------------------------------------------------------
  
                      IF ( SAMPLE.EQ.1 ) THEN
 
-                        CALL PERIOD_LOADOUTONE(%VAL(YSLOT2), MAXPTS,
+                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                         MAXPTS,
      :                                         MXCOL, COUNTER, FREQ,
      :                                         F/(DFLOAT(NP)-3.0D0))
                      END IF
@@ -285,7 +296,8 @@ C-----------------------------------------------------------------------------
 C                    WK2(COUNTER) = F/(DFLOAT(NP)-3.0D0)
 
                      RVAL1 = F/(DFLOAT(NP)-3.0D0)
-                     CALL PERIOD_PUT1D(RVAL1, COUNTER, %VAL(WK2PTR),
+                     CALL PERIOD_PUT1D(RVAL1, COUNTER, 
+     :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
  250              CONTINUE
  
@@ -317,9 +329,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(YSLOT2), MAXPTS, MXCOL,
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WK2PTR),
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
                      IF ( SAMPLE.GT.1 ) THEN
@@ -334,8 +348,10 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 260 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YANDESHUFFLE(SEED, %VAL(YRANPTR),
-     :                                           %VAL(ERANPTR), NDATA)
+                        CALL PERIOD_YANDESHUFFLE(SEED, 
+     :                              %VAL(CNF_PVAL(YRANPTR)),
+     :                              %VAL(CNF_PVAL(ERANPTR)),
+     :                              NDATA)
  260                 CONTINUE
 
                   END IF
@@ -427,8 +443,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
  
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                   NDATA, MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
 
                      IF ( SLOT.EQ.SLOTOUT ) THEN
@@ -437,7 +454,8 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), NDATA,
+     :                                   MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -467,14 +485,18 @@ C-----------------------------------------------------------------------------
 C ft - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                  SAMPLE, %VAL(XDATAPTR),
-     :                                  %VAL(YDATAPTR),
-     :                                  %VAL(YRANPTR))
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+     :                                  MXCOL,
+     :                                  SAMPLE, 
+     :                                  %VAL(CNF_PVAL(XDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YRANPTR)))
  
-                  CALL PERIOD_FT(%VAL(XDATAPTR), %VAL(YDATAPTR),
+                  CALL PERIOD_FT(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                           %VAL(CNF_PVAL(YDATAPTR)),
      :                           NDATA, MAXPTS, FMIN, FMAX, FINT,
-     :                           %VAL(WK1PTR), %VAL(WK2PTR), NOUT,
+     :                           %VAL(CNF_PVAL(WK1PTR)), 
+     :                           %VAL(CNF_PVAL(WK2PTR)), NOUT,
      :                           SAMPLE)
  
 C-----------------------------------------------------------------------------
@@ -483,8 +505,10 @@ C-----------------------------------------------------------------------------
  
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(YSLOT2), NOUT, MXCOL,
-     :                                      %VAL(WK1PTR), %VAL(WK2PTR),
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                      NOUT, MXCOL,
+     :                                      %VAL(CNF_PVAL(WK1PTR)), 
+     :                                      %VAL(CNF_PVAL(WK2PTR)),
      :                                      MAXPTS)
 
                      YERRORARRAY(SLOTOUT) = .FALSE.
@@ -509,9 +533,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(YSLOT2), MAXPTS, MXCOL,
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                     MAXPTS, MXCOL,
      :                                     NOUT, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WK2PTR),
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
                      IF ( SAMPLE.GT.1 ) THEN
@@ -526,7 +552,8 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 360 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, %VAL(YRANPTR),
+                        CALL PERIOD_YSHUFFLE(SEED, 
+     :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  360                 CONTINUE
 
@@ -608,8 +635,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
  
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                   NDATA, MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
 
                      IF ( SLOT.EQ.SLOTOUT ) THEN
@@ -618,7 +646,8 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), NDATA,
+     :                                   MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -645,16 +674,19 @@ C-----------------------------------------------------------------------------
 C scargle - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                  SAMPLE, %VAL(XDATAPTR),
-     :                                  %VAL(YDATAPTR),
-     :                                  %VAL(YRANPTR))
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                  NDATA, MXCOL,
+     :                                  SAMPLE, 
+     :                                  %VAL(CNF_PVAL(XDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YRANPTR)))
  
 C------------------------------------------------------------------------------
 C Compute the mean and variance of the data.
 C------------------------------------------------------------------------------
 
-                  CALL PERIOD_MOMENT(%VAL(YDATAPTR), NDATA, AVE,
+                  CALL PERIOD_MOMENT(%VAL(CNF_PVAL(YDATAPTR)), NDATA, 
+     :                               AVE,
      :                               ADEV, SDEV, VARI)
 
                   IF ( VARI.EQ.0.0D0 ) THEN
@@ -664,17 +696,20 @@ C------------------------------------------------------------------------------
                      GO TO 492
                   END IF
 
-                  CALL PERIOD_PREPSCARGLE(%VAL(XDATAPTR),
-     :                                    %VAL(YDATAPTR), NDATA, FMAX,
+                  CALL PERIOD_PREPSCARGLE(%VAL(CNF_PVAL(XDATAPTR)),
+     :                                    %VAL(CNF_PVAL(YDATAPTR)), 
+     :                                    NDATA, FMAX,
      :                                    FINT, NWK, XMIN, XDIF, OFAC,
      :                                    HIFAC, NFREQ)
 
                   CALL PERIOD_ALLOC('_DOUBLE', NWK, WORK1PTR)
                   CALL PERIOD_ALLOC('_DOUBLE', NWK, WORK2PTR)
 
-                  CALL PERIOD_SCARGLE(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                                NDATA, %VAL(WORK1PTR),
-     :                                %VAL(WORK2PTR), NWK, NOUT,
+                  CALL PERIOD_SCARGLE(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                                %VAL(CNF_PVAL(YDATAPTR)),
+     :                                NDATA, %VAL(CNF_PVAL(WORK1PTR)),
+     :                                %VAL(CNF_PVAL(WORK2PTR)), NWK, 
+     :                                NOUT,
      :                                IFAIL, FMIN, FMAX, FINT, SAMPLE,
      :                                AVE, VARI, XMIN, XDIF,
      :                                OFAC, HIFAC, NFREQ)
@@ -693,9 +728,10 @@ C-----------------------------------------------------------------------------
  
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(YSLOT2), NOUT, MXCOL,
-     :                                      %VAL(WORK1PTR),
-     :                                      %VAL(WORK2PTR), NWK)
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+     :                           NOUT, MXCOL,
+     :                           %VAL(CNF_PVAL(WORK1PTR)),
+     :                           %VAL(CNF_PVAL(WORK2PTR)), NWK)
 
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
@@ -720,9 +756,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(YSLOT2), MAXPTS, MXCOL,
-     :                                     NOUT, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WORK2PTR), NWK)
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+     :                           MAXPTS, MXCOL,
+     :                           NOUT, STAT, MAXPERMS+1,
+     :                           SAMPLE, 
+     :                           %VAL(CNF_PVAL(WORK2PTR)), NWK)
 
                      IF ( SAMPLE.GT.1 ) THEN
                         WRITE (*, 99004) SAMPLE - 1
@@ -736,7 +774,8 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 460 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, %VAL(YRANPTR),
+                        CALL PERIOD_YSHUFFLE(SEED, 
+     :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  460                 CONTINUE
 
@@ -841,8 +880,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
  
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                   NDATA, MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
                      FMIN = 0.0D0
 
@@ -852,7 +892,8 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), NDATA,
+     :                                   MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -880,15 +921,18 @@ C-----------------------------------------------------------------------------
 C clean - Loop through trial frequencies.
 C-----------------------------------------------------------------------------
 
-                  CALL PERIOD_SETXYDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                  SAMPLE, %VAL(XDATAPTR),
-     :                                  %VAL(YDATAPTR),
-     :                                  %VAL(YRANPTR))
+                  CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+     :                                  MXCOL,
+     :                                  SAMPLE, 
+     :                                  %VAL(CNF_PVAL(XDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YRANPTR)))
  
-                  CALL PERIOD_CLEAN(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                              NDATA, MAXPTS, FMIN, FMAX, FINT,
-     :                              NCL, GAIN, %VAL(WK1PTR),
-     :                              %VAL(WK2PTR), NOUT, SAMPLE)
+                  CALL PERIOD_CLEAN(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                        %VAL(CNF_PVAL(YDATAPTR)),
+     :                        NDATA, MAXPTS, FMIN, FMAX, FINT,
+     :                        NCL, GAIN, %VAL(CNF_PVAL(WK1PTR)),
+     :                        %VAL(CNF_PVAL(WK2PTR)), NOUT, SAMPLE)
 
                   IF ( NOUT.EQ.0 ) THEN
                      WRITE (*, *) BELL
@@ -904,9 +948,12 @@ C-----------------------------------------------------------------------------
  
                   IF ( SAMPLE.EQ.1 ) THEN
 
-                     CALL PERIOD_LOADOUTALL(%VAL(YSLOT2), NOUT,
-     :                                      MXCOL, %VAL(WK1PTR),
-     :                                      %VAL(WK2PTR), MAXPTS)
+                     CALL PERIOD_LOADOUTALL(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                      NOUT,
+     :                                      MXCOL, 
+     :                                      %VAL(CNF_PVAL(WK1PTR)),
+     :                                      %VAL(CNF_PVAL(WK2PTR)), 
+     :                                      MAXPTS)
 
                      YERRORARRAY(SLOTOUT) = .FALSE.
                      DETRENDARRAY(SLOTOUT) = .FALSE.
@@ -931,9 +978,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DNMX30
 
-                     CALL PERIOD_SIGINFOGT(%VAL(YSLOT2), MAXPTS, MXCOL,
+                     CALL PERIOD_SIGINFOGT(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                     MAXPTS, MXCOL,
      :                                     NOUT, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WK2PTR),
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
                      IF ( SAMPLE.GT.1 ) THEN
@@ -948,7 +997,8 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 560 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, %VAL(YRANPTR),
+                        CALL PERIOD_YSHUFFLE(SEED, 
+     :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  560                 CONTINUE
 
@@ -1038,8 +1088,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
  
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     ;                                   NDATA, MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
                      WRITE (*, *) ' '
 
                      IF ( SLOT.EQ.SLOTOUT ) THEN
@@ -1048,7 +1099,8 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+     :                                   NDATA, MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -1064,7 +1116,8 @@ C-----------------------------------------------------------------------------
 C string - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
  
-                     CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE,
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     :                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
                      WRITE (*, *) ' '
@@ -1095,20 +1148,25 @@ C-----------------------------------------------------------------------------
                   LOOP = 1
                   DO 650 FREQ = FMIN, FMAX, FINT
 
-                     CALL PERIOD_SETXYDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                     SAMPLE, %VAL(XDATAPTR),
-     :                                     %VAL(YDATAPTR),
-     :                                     %VAL(YRANPTR))
+                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                     NDATA, MXCOL,
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(XDATAPTR)),
+     :                                     %VAL(CNF_PVAL(YDATAPTR)),
+     :                                     %VAL(CNF_PVAL(YRANPTR)))
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                                %VAL(YERRPTR), NDATA, ZEROPT,
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                                %VAL(CNF_PVAL(YDATAPTR)),
+     :                                %VAL(CNF_PVAL(YERRPTR)), 
+     :                                NDATA, ZEROPT,
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 692
 
-                     CALL PERIOD_STRING(%VAL(XDATAPTR),
-     :                                  %VAL(YDATAPTR), NDATA, STRING, 
+                     CALL PERIOD_STRING(%VAL(CNF_PVAL(XDATAPTR)),
+     :                                  %VAL(CNF_PVAL(YDATAPTR)), 
+     :                                  NDATA, STRING, 
      :                                  IFAIL)
 
                      IF ( IFAIL.EQ.1 ) THEN
@@ -1134,14 +1192,16 @@ C-----------------------------------------------------------------------------
 
                      IF ( SAMPLE.EQ.1 ) THEN
 
-                        CALL PERIOD_LOADOUTONE(%VAL(YSLOT2), MAXPTS,
+                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                         MAXPTS,
      :                                         MXCOL, COUNTER, FREQ,
      :                                         STRING)
                      END IF
  
 C                    WK2(COUNTER) = STRING
 
-                     CALL PERIOD_PUT1D(STRING, COUNTER, %VAL(WK2PTR),
+                     CALL PERIOD_PUT1D(STRING, COUNTER, 
+     :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
  650              CONTINUE
  
@@ -1173,9 +1233,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(YSLOT2), MAXPTS, MXCOL,
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+     :                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WK2PTR),
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
                      IF ( SAMPLE.GT.1 ) THEN
@@ -1190,7 +1252,8 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 660 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, %VAL(YRANPTR),
+                        CALL PERIOD_YSHUFFLE(SEED, 
+     ;                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
  660                 CONTINUE
 
@@ -1300,8 +1363,9 @@ C-----------------------------------------------------------------------------
 
                      CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
 
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   1, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                   NDATA, MXCOL,
+     :                                   1, %VAL(CNF_PVAL(DATAPTR)))
 
                      WRITE (*, *) ' '
 
@@ -1311,7 +1375,8 @@ C-----------------------------------------------------------------------------
                         MAXPTS = 0
                      ENDIF
 
-                     CALL PERIOD_AUTOLIM(%VAL(DATAPTR), NDATA, MAXPTS,
+                     CALL PERIOD_AUTOLIM(%VAL(CNF_PVAL(DATAPTR)), 
+     :                                   NDATA, MAXPTS,
      :                                   MINFREQ, MAXFREQ, FINTERVAL,
      :                                   FMIN, FMAX, FINT, IFAIL)
 
@@ -1327,7 +1392,8 @@ C-----------------------------------------------------------------------------
 C pdm - Set zero point to be the mean observation time.
 C-----------------------------------------------------------------------------
 
-                     CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE,
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     :                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      ZEROPT = AVE
 
@@ -1335,10 +1401,12 @@ C-----------------------------------------------------------------------------
 C pdm - Calculate variance of whole dataset.
 C-----------------------------------------------------------------------------
 
-                     CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                   2, %VAL(DATAPTR))
+                     CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     ;                                   NDATA, MXCOL,
+     :                                   2, %VAL(CNF_PVAL(DATAPTR)))
 
-                     CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE,
+                     CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     ;                                  NDATA, AVE,
      :                                  ADEV, SDEV, VARI)
                      WRITE (*, *) ' '
                      WRITE (*, *) ' '
@@ -1371,19 +1439,24 @@ C-----------------------------------------------------------------------------
 
                   DO 750 FREQ = FMIN, FMAX+TOLFACT, FINT
 
-                     CALL PERIOD_SETXYDATA(%VAL(YSLOT1), NDATA, MXCOL,
-     :                                     SAMPLE, %VAL(XDATAPTR),
-     :                                     %VAL(YDATAPTR),
-     :                                     %VAL(YRANPTR))
+                     CALL PERIOD_SETXYDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     ;                                     NDATA, MXCOL,
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(XDATAPTR)),
+     :                                     %VAL(CNF_PVAL(YDATAPTR)),
+     :                                     %VAL(CNF_PVAL(YRANPTR)))
                      PERIOD = 1.0D0/FREQ
 
-                     CALL PERIOD_FOLD(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                                %VAL(YERRPTR), NDATA, ZEROPT,
+                     CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                                %VAL(CNF_PVAL(YDATAPTR)),
+     :                                %VAL(CNF_PVAL(YERRPTR)), 
+     ;                                NDATA, ZEROPT,
      :                                PERIOD, IFAIL)
 
                      IF ( IFAIL.EQ.1 ) GO TO 792
 
-                     CALL PERIOD_PDM(%VAL(XDATAPTR), %VAL(YDATAPTR),
+                     CALL PERIOD_PDM(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                               %VAL(CNF_PVAL(YDATAPTR)),
      :                               NDATA, NBIN, WBIN, VARI,
      :                               PDM, MAXPTS, IFAIL)
 
@@ -1410,14 +1483,16 @@ C-----------------------------------------------------------------------------
 
                      IF ( SAMPLE.EQ.1 ) THEN
 
-                        CALL PERIOD_LOADOUTONE(%VAL(YSLOT2), MAXPTS,
+                        CALL PERIOD_LOADOUTONE(%VAL(CNF_PVAL(YSLOT2)),
+     :                                         MAXPTS,
      :                                         MXCOL, COUNTER, FREQ,
      :                                         PDM)
                      END IF
 
 C                    WK2(COUNTER) = PDM
 
-                     CALL PERIOD_PUT1D(PDM, COUNTER, %VAL(WK2PTR),
+                     CALL PERIOD_PUT1D(PDM, COUNTER, 
+     :                                 %VAL(CNF_PVAL(WK2PTR)),
      :                                 MAXPTS)
  750              CONTINUE
 
@@ -1447,9 +1522,11 @@ C-----------------------------------------------------------------------------
                   IF ( LSIG ) THEN
                      STAT(SAMPLE) = DPMX30
 
-                     CALL PERIOD_SIGINFOLT(%VAL(YSLOT2), MAXPTS, MXCOL,
+                     CALL PERIOD_SIGINFOLT(%VAL(CNF_PVAL(YSLOT2)), 
+     ;                                     MAXPTS, MXCOL,
      :                                     COUNTER, STAT, MAXPERMS+1,
-     :                                     SAMPLE, %VAL(WK2PTR),
+     :                                     SAMPLE, 
+     :                                     %VAL(CNF_PVAL(WK2PTR)),
      :                                     MAXPTS)
 
                      IF ( SAMPLE.GT.1 ) THEN
@@ -1464,7 +1541,8 @@ C-----------------------------------------------------------------------------
                      RANDOM = PERIOD_RAN1(SEED)
                      DO 760 J = 1, 1 + IDINT(RANDOM*2.0D0)
 
-                        CALL PERIOD_YSHUFFLE(SEED, %VAL(YRANPTR),
+                        CALL PERIOD_YSHUFFLE(SEED, 
+     :                                       %VAL(CNF_PVAL(YRANPTR)),
      :                                       NDATA)
 
  760                 CONTINUE
@@ -1585,8 +1663,10 @@ C-----------------------------------------------------------------------------
 C           IF ( FMIN.LE.0.D0 ) FMIN = Y(1, 1, SLOT)
 C           IF ( FMAX.LE.0.D0 ) FMAX = Y(NDATA, 1, SLOT)
 
-            RVAL1 = PERIOD_GET2D(1, 1, %VAL(YSLOT1), NDATA, MXCOL)
-            RVAL2 = PERIOD_GET2D(NDATA, 1, %VAL(YSLOT1), NDATA, MXCOL)
+            RVAL1 = PERIOD_GET2D(1, 1, %VAL(CNF_PVAL(YSLOT1)), 
+     :                           NDATA, MXCOL)
+            RVAL2 = PERIOD_GET2D(NDATA, 1, %VAL(CNF_PVAL(YSLOT1)), 
+     :                           NDATA, MXCOL)
             IF ( FMIN.LE.0.D0 ) FMIN = RVAL1
             IF ( FMAX.LE.0.D0 ) FMAX = RVAL2
 
@@ -1641,11 +1721,11 @@ C-----------------------------------------------------------------------------
                PEAK = DNMX30
                TROUGH = DPMX30
                DO 840 I = 1, NDATA
-                  RVAL1 = PERIOD_GET2D(I, 1, %VAL(YSLOT1),
+                  RVAL1 = PERIOD_GET2D(I, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                                 NDATA, MXCOL)
                   IF ( RVAL1.LT.FMIN ) GO TO 840
                   IF ( RVAL1.GT.FMAX ) GO TO 845
-                  RVAL2 = PERIOD_GET2D(I, 2, %VAL(YSLOT1),
+                  RVAL2 = PERIOD_GET2D(I, 2, %VAL(CNF_PVAL(YSLOT1)),
      :                                 NDATA, MXCOL)
                   IF ( LPEAK ) THEN
                      IF ( RVAL2.GT.PEAK ) THEN
@@ -1661,7 +1741,7 @@ C-----------------------------------------------------------------------------
 
                ELMAX = MAX0(EL-1, 1)
                ELMIN = MIN0(EL+1, NDATA)
-               RVAL1 = PERIOD_GET2D(EL, 1, %VAL(YSLOT1),
+               RVAL1 = PERIOD_GET2D(EL, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                              NDATA, MXCOL)
                IF ( RVAL1.EQ.0.0D0 ) THEN
                   WRITE (*, *) BELL
@@ -1671,9 +1751,9 @@ C-----------------------------------------------------------------------------
                ELSE
                   PERIOD = 1.0D0/RVAL1
                END IF
-               RVAL2 = PERIOD_GET2D(ELMIN, 1, %VAL(YSLOT1),
+               RVAL2 = PERIOD_GET2D(ELMIN, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                              NDATA, MXCOL)
-               RVAL3 = PERIOD_GET2D(ELMAX, 1, %VAL(YSLOT1),
+               RVAL3 = PERIOD_GET2D(ELMAX, 1, %VAL(CNF_PVAL(YSLOT1)),
      :                              NDATA, MXCOL)
                PERROR = 0.5D0*DABS((1.0D0/RVAL2)
      :                              -(1.0D0/RVAL3))
@@ -1691,7 +1771,7 @@ C-----------------------------------------------------------------------------
                         ERRNOISE = DSQRT((SIGNOISE*(1.0D0-SIGNOISE))
      :                                             /SIG(1,SLOT))
                      END IF
-                     RVAL3 = PERIOD_GET2D(EL, 3, %VAL(YSLOT1),
+                     RVAL3 = PERIOD_GET2D(EL, 3, %VAL(CNF_PVAL(YSLOT1)),
      :                                    NDATA, MXCOL)
                      SIGPERIOD = RVAL3/SIG(1, SLOT)
                      IF ( SIGPERIOD.EQ.0.0D0 ) THEN

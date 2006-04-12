@@ -23,6 +23,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C=============================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -150,10 +152,12 @@ C-----------------------------------------------------------------------------
 
                   REWIND (UNIT=IUNIT)
 
-                  CALL PERIOD_READANTARES(%VAL(YSLOT1), NUMROWS,
-     :                                    MXCOL, %VAL(HJDPTR),
-     :                                    %VAL(VELPTR),
-     :                                    %VAL(SIGVELPTR), IUNIT)
+                  CALL PERIOD_READANTARES(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                    NUMROWS,
+     :                                    MXCOL, %VAL(CNF_PVAL(HJDPTR)),
+     :                                    %VAL(CNF_PVAL(VELPTR)),
+     :                                    %VAL(CNF_PVAL(SIGVELPTR)), 
+     :                                    IUNIT)
 
                   CALL PERIOD_DEALL(SIGVELPTR)
                   CALL PERIOD_DEALL(VELPTR)
@@ -291,10 +295,13 @@ C-----------------------------------------------------------------------------
 
             IFAIL = 0
 
-            CALL PERIOD_INPUTSORTCYCLE(%VAL(YSLOT1), NUMROWS, MXCOL,
-     :                                 %VAL(JUNK2PTR), NUMCOLS, XCOL,
+            CALL PERIOD_INPUTSORTCYCLE(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                 NUMROWS, MXCOL,
+     :                                 %VAL(CNF_PVAL(JUNK2PTR)), 
+     :                                 NUMCOLS, XCOL,
      :                                 YCOL, YERROR, YCOLERR,
-     :                                 %VAL(JUNK1PTR), %VAL(KEYPTR),
+     :                                 %VAL(CNF_PVAL(JUNK1PTR)), 
+     :                                 %VAL(CNF_PVAL(KEYPTR)),
      :                                 IUNIT, IFAIL)
 
             CALL PERIOD_DEALL(KEYPTR)

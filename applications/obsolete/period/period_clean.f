@@ -45,6 +45,8 @@ C===========================================================================
  
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+
 C-----------------------------------------------------------------------------
 C PERIOD_CLEAN declarations.
 C-----------------------------------------------------------------------------
@@ -80,10 +82,16 @@ C----------------------------------------------------------------------------
  
       CALL PERIOD_PERFORMCLEAN(XDATA, YDATA, NDATA, MAXPTS, FMIN,
      :                         FMAX, FINT, NCL, GAIN, FREQUENCY,
-     :                         POWER, NOUT, INFO, %VAL(ONESPTR),
-     :                         %VAL(WFREQPTR), %VAL(DFREQPTR),
-     :                         %VAL(DPTR), %VAL(WPTR), %VAL(RPTR),
-     :                         %VAL(BPTR), %VAL(CPTR), %VAL(SPTR))
+     :                         POWER, NOUT, INFO, 
+     :                         %VAL(CNF_PVAL(ONESPTR)),
+     :                         %VAL(CNF_PVAL(WFREQPTR)), 
+     :                         %VAL(CNF_PVAL(DFREQPTR)),
+     :                         %VAL(CNF_PVAL(DPTR)), 
+     :                         %VAL(CNF_PVAL(WPTR)), 
+     :                         %VAL(CNF_PVAL(RPTR)),
+     :                         %VAL(CNF_PVAL(BPTR)), 
+     :                         %VAL(CNF_PVAL(CPTR)), 
+     :                         %VAL(CNF_PVAL(SPTR)))
 
       CALL PERIOD_DEALL(SPTR)
       CALL PERIOD_DEALL(CPTR)

@@ -26,6 +26,8 @@ C===========================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -101,7 +103,8 @@ C-----------------------------------------------------------------------------
 C        IF ( DABS(ZEROPT).LT.DPMN30 ) ZEROPT=Y(1,1,SLOT)
 
          IF ( DABS(ZEROPT).LT.DPMN30 )
-     :      ZEROPT = PERIOD_GET2D(1, 1, %VAL(YSLOT1), NDATA, MXCOL)
+     :      ZEROPT = PERIOD_GET2D(1, 1, %VAL(CNF_PVAL(YSLOT1)), 
+     :                            NDATA, MXCOL)
 
          CALL PERIOD_ALLOC('_DOUBLE', NDATA, XDATAPTR)
          CALL PERIOD_ALLOC('_DOUBLE', NDATA, YDATAPTR)
@@ -111,12 +114,16 @@ C-----------------------------------------------------------------------------
 C Fold and sort data.
 C-----------------------------------------------------------------------------
  
-         CALL PERIOD_SETXYIFERR(%VAL(YSLOT1), NDATA, MXCOL,
-     :                          YERRORARRAY(SLOT), %VAL(XDATAPTR),
-     :                          %VAL(YDATAPTR), %VAL(YERRPTR))
+         CALL PERIOD_SETXYIFERR(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL,
+     :                          YERRORARRAY(SLOT), 
+     :                          %VAL(CNF_PVAL(XDATAPTR)),
+     :                          %VAL(CNF_PVAL(YDATAPTR)), 
+     :                          %VAL(CNF_PVAL(YERRPTR)))
 
-         CALL PERIOD_FOLD(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                    %VAL(YERRPTR), NDATA, ZEROPT, PERIOD, IFAIL)
+         CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                    %VAL(CNF_PVAL(YDATAPTR)),
+     :                    %VAL(CNF_PVAL(YERRPTR)), 
+     :                    NDATA, ZEROPT, PERIOD, IFAIL)
 
          IF ( IFAIL.EQ.1 ) GO TO 650
  
@@ -124,8 +131,10 @@ C-----------------------------------------------------------------------------
 C Fit data.
 C-----------------------------------------------------------------------------
  
-         CALL PERIOD_SINFIT(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                      %VAL(YERRPTR), NDATA, 1.0D0, GAMMA, KVEL,
+         CALL PERIOD_SINFIT(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                      %VAL(CNF_PVAL(YDATAPTR)),
+     :                      %VAL(CNF_PVAL(YERRPTR)), 
+     :                      NDATA, 1.0D0, GAMMA, KVEL,
      :                      PHASE, VAR, NP, F, IFAIL)
 
          IF ( IFAIL.EQ.1 ) THEN
@@ -202,7 +211,8 @@ C-----------------------------------------------------------------------------
 C NOTE: In period_putfitdata, original loop "0,NDATA" has been amended
 C       by KPD to be "1,NDATA" - to avoid array-bound exception!
 
-         CALL PERIOD_PUTFITDATA(%VAL(YSLOT2), NDATA, MXCOL, GAMMA,
+         CALL PERIOD_PUTFITDATA(%VAL(CNF_PVAL(YSLOT2)), 
+     :                          NDATA, MXCOL, GAMMA,
      :                          KVEL, PHASE)
 
          YERRORARRAY(SLOTOUT) = .FALSE.

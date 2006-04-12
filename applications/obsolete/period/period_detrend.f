@@ -21,6 +21,8 @@ C===========================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -118,11 +120,12 @@ C-----------------------------------------------------------------------------
 
             CALL PERIOD_ALLOC('_DOUBLE', NDATA*3, XPTR)
 
-            CALL PERIOD_SETX(%VAL(YSLOT1), NDATA, MXCOL,
-     :                       YERRORARRAY(SLOT), %VAL(XPTR))
+            CALL PERIOD_SETX(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL,
+     :                       YERRORARRAY(SLOT), %VAL(CNF_PVAL(XPTR)))
 
             NORM = 1
-            CALL PERIOD_LSQUAR(%VAL(XPTR), NDATA, NPOLY, PFT, CHISQ,
+            CALL PERIOD_LSQUAR(%VAL(CNF_PVAL(XPTR)), NDATA, NPOLY, 
+     :                         PFT, CHISQ,
      :                         XM, NORM)
 
             CALL PERIOD_DEALL(XPTR)
@@ -155,8 +158,9 @@ C            ELSE IF ( CHISQ.EQ.-3.0D0 ) THEN
 
             YSLOT2 = YPTR(SLOTOUT)
 
-            CALL PERIOD_PUTYPOLY(%VAL(YSLOT1), NDATA, MXCOL, PFT,
-     :                           MAXPOLY, NPOLY, %VAL(YSLOT2))
+            CALL PERIOD_PUTYPOLY(%VAL(CNF_PVAL(YSLOT1)), 
+     :                           NDATA, MXCOL, PFT,
+     :                           MAXPOLY, NPOLY, %VAL(CNF_PVAL(YSLOT2)))
 
             DETRENDARRAY(SLOTOUT) = .TRUE.
             YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)
@@ -167,10 +171,11 @@ C            ELSE IF ( CHISQ.EQ.-3.0D0 ) THEN
 
             CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
 
-            CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL, 2,
-     :                          %VAL(DATAPTR))
+            CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL, 2,
+     :                          %VAL(CNF_PVAL(DATAPTR)))
 
-            CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE, ADEV, SDEV,
+            CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     :                         NDATA, AVE, ADEV, SDEV,
      :                         VAR)
 
             CALL PERIOD_DEALL(DATAPTR)
@@ -192,8 +197,10 @@ C            ELSE IF ( CHISQ.EQ.-3.0D0 ) THEN
 
             YSLOT2 = YPTR(SLOTOUT)
 
-            CALL PERIOD_PUTYMEAN(%VAL(YSLOT1), NDATA, MXCOL, AVE, SDEV,
-     :                           YERRORARRAY(SLOT), %VAL(YSLOT2))
+            CALL PERIOD_PUTYMEAN(%VAL(CNF_PVAL(YSLOT1)), 
+     :                           NDATA, MXCOL, AVE, SDEV,
+     :                           YERRORARRAY(SLOT), 
+     :                           %VAL(CNF_PVAL(YSLOT2)))
 
             DETRENDARRAY(SLOTOUT) = .TRUE.
             YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)

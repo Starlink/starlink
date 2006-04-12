@@ -19,6 +19,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -141,31 +143,35 @@ C-----------------------------------------------------------------------------
 
          CALL PERIOD_ALLOC('_DOUBLE', NDATA, DATAPTR)
 
-         CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL, 2,
-     :                       %VAL(DATAPTR))
+         CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                       NDATA, MXCOL, 2,
+     :                       %VAL(CNF_PVAL(DATAPTR)))
 
-         CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE, ADEV, SDEV,
-     :                      VAR)
+         CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     :                      NDATA, AVE, ADEV, SDEV, VAR)
 
          DMEAN = AVE
          DSDEV = SDEV
 
          N = NDATA - 1
 
-         CALL PERIOD_SETDATASQRT(%VAL(YSLOT1), NDATA, MXCOL, N,
-     :                           %VAL(DATAPTR))
+         CALL PERIOD_SETDATASQRT(%VAL(CNF_PVAL(YSLOT1)), 
+     :                           NDATA, MXCOL, N,
+     :                           %VAL(CNF_PVAL(DATAPTR)))
 
-         CALL PERIOD_MOMENT(%VAL(DATAPTR), N, AVE, ADEV, SDEV, VAR)
+         CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), 
+     :                      N, AVE, ADEV, SDEV, VAR)
 
          ISDEV = SDEV
 
          IF ( YERRORARRAY(SLOT) ) THEN
 
-            CALL PERIOD_SETDATA(%VAL(YSLOT1), NDATA, MXCOL, 3,
-     :                          %VAL(DATAPTR))
+            CALL PERIOD_SETDATA(%VAL(CNF_PVAL(YSLOT1)), 
+     :                          NDATA, MXCOL, 3,
+     :                          %VAL(CNF_PVAL(DATAPTR)))
 
-            CALL PERIOD_MOMENT(%VAL(DATAPTR), NDATA, AVE, ADEV, SDEV,
-     :                         VAR)
+            CALL PERIOD_MOMENT(%VAL(CNF_PVAL(DATAPTR)), NDATA, AVE, 
+     :                         ADEV, SDEV, VAR)
 
             EMEAN = AVE
             ESDEV = SDEV
@@ -203,10 +209,12 @@ C-----------------------------------------------------------------------------
 
             IFAIL = 0
 
-            CALL PERIOD_NOISEOLD(%VAL(YSLOT1), NDATA, MXCOL, ISET, IDUM,
+            CALL PERIOD_NOISEOLD(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+     :                           MXCOL, ISET, IDUM,
      :                           NOISE, DSDEV, NSIG, RANDOM, ERRORS,
      :                           ESDEV, ESIG, REGULAR, ISDEV, RSIG,
-     :                           YERRORARRAY(SLOT), %VAL(YSLOT2), IFAIL)
+     :                           YERRORARRAY(SLOT), 
+     :                           %VAL(CNF_PVAL(YSLOT2)), IFAIL)
 
             IF ( IFAIL.EQ.1 ) GO TO 700
 
@@ -234,9 +242,11 @@ C-----------------------------------------------------------------------------
 
             IFAIL = 0
 
-            CALL PERIOD_NOISENEW(%VAL(YSLOT1), NDATA, MXCOL, ISET, IDUM,
+            CALL PERIOD_NOISENEW(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL, 
+     :                           ISET, IDUM,
      :                           DSDEV, DMEAN, RANDOM, ESDEV, EMEAN,
-     :                           YERRORARRAY(SLOT), %VAL(YSLOT2))
+     :                           YERRORARRAY(SLOT), 
+     :                           %VAL(CNF_PVAL(YSLOT2)))
 
             NPTSARRAY(SLOTOUT) = NPTSARRAY(SLOT)
             YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)

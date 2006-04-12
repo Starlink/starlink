@@ -12,6 +12,8 @@ C===========================================================================
  
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+ 
 C-----------------------------------------------------------------------------
 C PLT declarations.
 C-----------------------------------------------------------------------------
@@ -88,9 +90,10 @@ C-----------------------------------------------------------------------------
 C Add, subtract, multiply or divide sine curve.
 C-----------------------------------------------------------------------------
  
-         CALL PERIOD_MODSINECURVE(%VAL(YSLOT1), NDATA, MXCOL,
-     :                            PERIOD, AMPLITUDE, ZEROPT,
-     :                            GAMMA, OPTION, %VAL(YSLOT2))
+         CALL PERIOD_MODSINECURVE(%VAL(CNF_PVAL(YSLOT1)), 
+     :               NDATA, MXCOL,
+     :               PERIOD, AMPLITUDE, ZEROPT,
+     :               GAMMA, OPTION, %VAL(CNF_PVAL(YSLOT2)))
 
          DETRENDARRAY(SLOTOUT) = .FALSE.
          YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)

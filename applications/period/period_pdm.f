@@ -22,6 +22,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PERIOD_PDM declarations.
@@ -43,8 +45,9 @@ C-----------------------------------------------------------------------------
  
       CALL PERIOD_PERFORMPDM(XDATA, YDATA, NDATA, NBIN, WBIN,
      :                       VARI, PDM, MAXPTS, IFAIL,
-     :                       %VAL(NPTSPTR), %VAL(SAMPLEPTR),
-     :                       %VAL(SVARPTR))
+     :                       %VAL(CNF_PVAL(NPTSPTR)), 
+     :                       %VAL(CNF_PVAL(SAMPLEPTR)),
+     :                       %VAL(CNF_PVAL(SVARPTR)))
 
 
       CALL PERIOD_DEALL(SVARPTR)

@@ -18,6 +18,7 @@ C===========================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -105,7 +106,8 @@ C-----------------------------------------------------------------------------
 C        IF ( DABS(ZEROPT).LT.DPMN30 ) ZEROPT = Y(1,1,SLOT)
 
          IF ( DABS(ZEROPT).LT.DPMN30 )
-     :      ZEROPT = PERIOD_GET2D(1, 1, %VAL(YSLOT1), NDATA, MXCOL)
+     :      ZEROPT = PERIOD_GET2D(1, 1, %VAL(CNF_PVAL(YSLOT1)), 
+     :                            NDATA, MXCOL)
  
 C-----------------------------------------------------------------------------
 C Fold and sort data.
@@ -115,12 +117,15 @@ C-----------------------------------------------------------------------------
          CALL PERIOD_ALLOC('_DOUBLE', NDATA, YDATAPTR)
          CALL PERIOD_ALLOC('_DOUBLE', NDATA, YERRPTR)
 
-         CALL PERIOD_SETXYERR(%VAL(YSLOT1), NDATA, MXCOL,
-     :                        %VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                        %VAL(YERRPTR))
+         CALL PERIOD_SETXYERR(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL,
+     :                        %VAL(CNF_PVAL(XDATAPTR)), 
+     :                        %VAL(CNF_PVAL(YDATAPTR)),
+     :                        %VAL(CNF_PVAL(YERRPTR)))
 
-         CALL PERIOD_FOLD(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                    %VAL(YERRPTR), NDATA, ZEROPT, PERIOD, 
+         CALL PERIOD_FOLD(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                    %VAL(CNF_PVAL(YDATAPTR)),
+     :                    %VAL(CNF_PVAL(YERRPTR)), 
+     :                    NDATA, ZEROPT, PERIOD, 
      :                    IFAIL)
 
          IF ( IFAIL.EQ.1 ) GO TO 600
@@ -135,11 +140,13 @@ C-----------------------------------------------------------------------------
             CALL PERIOD_ALLOC('_DOUBLE', NBIN, YBINPTR)
             CALL PERIOD_ALLOC('_DOUBLE', NBIN, EBINPTR)
 
-            CALL PERIOD_PHASEBIN(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                           %VAL(YERRPTR), NDATA,
-     :                           %VAL(XBINPTR), %VAL(YBINPTR),
-     :                           %VAL(EBINPTR), NBIN,
-     :                           %VAL(YSLOT2), MXCOL)
+            CALL PERIOD_PHASEBIN(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                           %VAL(CNF_PVAL(YDATAPTR)),
+     :                           %VAL(CNF_PVAL(YERRPTR)), NDATA,
+     :                           %VAL(CNF_PVAL(XBINPTR)), 
+     :                           %VAL(CNF_PVAL(YBINPTR)),
+     :                           %VAL(CNF_PVAL(EBINPTR)), NBIN,
+     :                           %VAL(CNF_PVAL(YSLOT2)), MXCOL)
 
             YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)
             DETRENDARRAY(SLOTOUT) = .FALSE.
@@ -153,8 +160,10 @@ C-----------------------------------------------------------------------------
 
          ELSE
 
-            CALL PERIOD_PUTXYERR(%VAL(XDATAPTR), %VAL(YDATAPTR),
-     :                           %VAL(YERRPTR), %VAL(YSLOT2),
+            CALL PERIOD_PUTXYERR(%VAL(CNF_PVAL(XDATAPTR)), 
+     :                           %VAL(CNF_PVAL(YDATAPTR)),
+     :                           %VAL(CNF_PVAL(YERRPTR)), 
+     :                           %VAL(CNF_PVAL(YSLOT2)),
      :                           NDATA, MXCOL)
 
             YERRORARRAY(SLOTOUT) = YERRORARRAY(SLOT)

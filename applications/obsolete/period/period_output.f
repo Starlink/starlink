@@ -17,6 +17,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -68,7 +70,8 @@ C-----------------------------------------------------------------------------
 
             YSLOT1 = YPTR(SLOT)
 
-            CALL PERIOD_PERFORMOUTPUT(%VAL(YSLOT1), NDATA, MXCOL,
+            CALL PERIOD_PERFORMOUTPUT(%VAL(CNF_PVAL(YSLOT1)), 
+     :                                NDATA, MXCOL,
      :                                YERRORARRAY(SLOT), IUNIT)
 
             CLOSE (UNIT=IUNIT)

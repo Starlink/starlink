@@ -13,6 +13,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C===========================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
       INTEGER NDATA
       DOUBLE PRECISION XDATA(NDATA), YDATA(NDATA), YERR(NDATA)
@@ -37,8 +39,10 @@ C Fold data.
 C-----------------------------------------------------------------------------
 
       CALL PERIOD_FOLDSORTCYCLE(XDATA, YDATA, YERR, NDATA,
-     :                          %VAL(XWORKPTR), %VAL(YWORKPTR),
-     :                          %VAL(EWORKPTR), %VAL(KEYPTR),
+     :                          %VAL(CNF_PVAL(XWORKPTR)), 
+     :                          %VAL(CNF_PVAL(YWORKPTR)),
+     :                          %VAL(CNF_PVAL(EWORKPTR)), 
+     :                          %VAL(CNF_PVAL(KEYPTR)),
      :                          ZEROPT, PERIOD)
  
       CALL PERIOD_DEALL(KEYPTR)

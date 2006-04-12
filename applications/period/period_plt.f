@@ -20,6 +20,8 @@ C=============================================================================
       IMPLICIT NONE
 
       INCLUDE "mnmxvl.h"
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -80,9 +82,12 @@ C-----------------------------------------------------------------------------
             DMXY=DNMX38
             DMIY=DPMX38
 
-            CALL PERIOD_PLTXYERR(%VAL(XRPTR), %VAL(YRPTR),
-     :                           %VAL(ER1PTR), %VAL(ER2PTR),
-     :                           %VAL(YSLOT1), NPTS, MXCOL,
+            CALL PERIOD_PLTXYERR(%VAL(CNF_PVAL(XRPTR)), 
+     :                           %VAL(CNF_PVAL(YRPTR)),
+     :                           %VAL(CNF_PVAL(ER1PTR)), 
+     :                           %VAL(CNF_PVAL(ER2PTR)),
+     :                           %VAL(CNF_PVAL(YSLOT1)), 
+     :                           NPTS, MXCOL,
      :                           YERRORARRAY(SLOT), DMIX, DMIY,
      :                           DMXX, DMXY)
 
@@ -147,13 +152,15 @@ C-----------------------------------------------------------------------------
 *         Plot Y error bars. 
             CALL PGSCI(2)
             IF (YERRORARRAY(SLOT)) THEN
-               CALL PGERRY(NPTS,%VAL(XRPTR),%VAL(ER2PTR),
-     :                     %VAL(ER1PTR),.001)
+               CALL PGERRY(NPTS,%VAL(CNF_PVAL(XRPTR)),
+     :                     %VAL(CNF_PVAL(ER2PTR)),
+     :                     %VAL(CNF_PVAL(ER1PTR)),.001)
                CALL PGSCI(1)      
             END IF
 
 *         Plot data.
-            CALL PGPOINT(NPTS,%VAL(XRPTR),%VAL(YRPTR),2)
+            CALL PGPOINT(NPTS,%VAL(CNF_PVAL(XRPTR)),
+     :                   %VAL(CNF_PVAL(YRPTR)),2)
 
 *         Show user name.
             CALL PGIDEN

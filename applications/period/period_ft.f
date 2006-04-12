@@ -23,6 +23,8 @@ C===========================================================================
  
       IMPLICIT NONE
 
+      INCLUDE 'CNF_PAR'
+
 C-----------------------------------------------------------------------------
 C PERIOD_FT declarations.
 C-----------------------------------------------------------------------------
@@ -43,7 +45,8 @@ C-----------------------------------------------------------------------------
  
       CALL PERIOD_PERFORMFT(XDATA, YDATA, NDATA, MAXPTS, FMIN, FMAX,
      :                      FINT, FREQUENCY, POWER, NOUT, INFO,
-     :                      %VAL(FT_REALPTR), %VAL(FT_IMAGPTR))
+     :                      %VAL(CNF_PVAL(FT_REALPTR)), 
+     :                      %VAL(CNF_PVAL(FT_IMAGPTR)))
 
       CALL PERIOD_DEALL(FT_IMAGPTR)
       CALL PERIOD_DEALL(FT_REALPTR)

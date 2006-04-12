@@ -15,6 +15,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C=============================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -129,9 +131,10 @@ C-----------------------------------------------------------------------------
                   WRITE (*, *) '** OK: Slot number = ', SLOT
                   WRITE (*, *) '** OK: ', INFILEARRAY(SLOT)(1:61)
 
-                  CALL PERIOD_DATASTATUS(%VAL(YSLOT1), NDATA, MXCOL,
+                  CALL PERIOD_DATASTATUS(%VAL(CNF_PVAL(YSLOT1)), NDATA, 
+     :                                   MXCOL,
      :                                   YERRORARRAY(SLOT), MXSLOT,
-     :                                   %VAL(DATAPTR))
+     :                                   %VAL(CNF_PVAL(DATAPTR)))
 
                   CALL PERIOD_DEALL(DATAPTR)
 

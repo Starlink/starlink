@@ -14,6 +14,8 @@ C  data/work array(s) and/or use of such arrays (KPD), October 2001
 C==============================================================================
  
       IMPLICIT NONE
+
+      INCLUDE 'CNF_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -68,8 +70,8 @@ C-----------------------------------------------------------------------------
          YSLOT2 = YPTR(SLOTOUT)
          COUNTER = COUNTER + 1
 
-         CALL PERIOD_SETUPWINDOW(%VAL(YSLOT1), NDATA, MXCOL,
-     :                           WINDOW, EWINDOW, %VAL(YSLOT2))
+         CALL PERIOD_SETUPWINDOW(%VAL(CNF_PVAL(YSLOT1)), NDATA, MXCOL,
+     :               WINDOW, EWINDOW, %VAL(CNF_PVAL(YSLOT2)))
 
          YERRORARRAY(SLOTOUT) = .FALSE.
          DETRENDARRAY(SLOTOUT) = .FALSE.
