@@ -172,7 +172,6 @@
 *  Map these pixel co-ordinates into AXIS co-ordinates.
              CALL AST_TRAN1( MAP5, EL, %VAL( CNF_PVAL( IP ) ), .TRUE.,
      :                      CENTRE, STATUS )
-      print *, CENTRE
          END IF
 
 *  Unmap the Axis Centre array.
