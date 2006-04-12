@@ -83,7 +83,7 @@ int GaiaFITSParseName( const char *spec, char *name, int name_length,
     if ( left && right ) {
         left = '\0';
         right = '\0';
-        sscanf( left + 1, "%d", *hdu );
+        sscanf( left + 1, "%d", hdu );
     }
     else {
         /* Primary HDU is 1. */
@@ -173,14 +173,22 @@ int GaiaFITSGtWcs( StarFitsIO *fitsio, AstFrameSet **iwcs,
 }
 
 /** 
- * Get the value of a FITS keyword.
+ * Get the value of a FITS keyword. Returns the empty string if not found.
  */
 int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, char *value, 
                   int value_length )
 {
-    char *result = fitsio->get( keyword, value, value_length );
-    if ( result[0] == '\0' ) {
-        return TCL_ERROR;
-    }
+    fitsio->get( keyword, value, value_length );
     return TCL_OK;
+}
+
+/** 
+ * Get the integer value of a FITS keyword. Returns TCL_ERROR if not found.
+ */
+int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value )
+{
+    if ( fitsio->get( keyword, *value ) ) {
+        return TCL_OK;
+    }
+    return TCL_ERROR;
 }
