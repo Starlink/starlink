@@ -761,9 +761,9 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Matching algorithm.
          if { $values_(usematch) } {
-            set matchargs "--match=match"
+            set matchargs "--match=RITMatch"
          } else {
-            set matchargs "--match=findoff"
+            set matchargs "--match=FINDOFF"
          }
 
          #  Defect removal.
