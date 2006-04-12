@@ -550,6 +550,13 @@ itcl::class gaia::GaiaNDFCube {
             set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
          }
 
+         #  Is this an NDF cube?
+         if { [$namer type] == ".sdf" } {
+            set isndf_ 1
+         } else {
+            set isndf_ 0
+         }
+
          $namer absolute
          set ndfname_ [$namer ndfname 0]
          $accessor_ configure -dataset "$ndfname_"
@@ -598,7 +605,7 @@ itcl::class gaia::GaiaNDFCube {
          busy {
             $accessor_ unmap
             $accessor_ configure -usemmap $itk_option(-usemmap)
-            lassign [$accessor_ map] adr nel type
+            lassign [$accessor_ map] adr
          }
       }
    }
@@ -667,8 +674,9 @@ itcl::class gaia::GaiaNDFCube {
                set zo [lindex $bounds_ 4]
             }
             set zp [expr round($plane_+1-$zo)]
-            lassign [$accessor_ getimage $axis_ $zp 1] adr nel type
-            $itk_option(-rtdimage) updateimagedata $adr
+            lassign [$accessor_ getimage $axis_ $zp 1] adr
+            lassign [$accessor_ getinfo $adr] realadr nel type
+            $itk_option(-rtdimage) updateimagedata $realadr
 
             # Release memory from last time and save pointer.
             if { $last_slice_adr_ != 0 } {
@@ -697,6 +705,10 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Display the current NDF section and release the memory slice.
    protected method display_current_section_ {} {
+      
+      # Don't do this anything but NDFs, sectioning is slow... 
+      # XXX need something similar for FITS cubes.
+      if { ! $isndf_ } return
 
       if { $axis_ == 1 } {
          set section "($plane_,,$close_section_"
@@ -1135,6 +1147,9 @@ itcl::class gaia::GaiaNDFCube {
 
    #  The name of the NDF.
    protected variable ndfname_ {}
+
+   #  Is this an NDF.
+   protected variable isndf_ 1
 
    #  The current plane along the current axis.
    protected variable plane_ 1

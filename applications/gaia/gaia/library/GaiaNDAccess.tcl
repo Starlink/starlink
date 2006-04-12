@@ -95,9 +95,6 @@ itcl::class gaia::GaiaNDAccess {
          set cnfmap_ 1
       } else {
          set type_ "fits"
-         error {Cannot access FITS files that are not 2D. \
-                You should convert this file to an NDF first using the \
-                ndf2fits command in the CONVERT package.}
          set cnfmap_ 0
       }
       
@@ -118,8 +115,6 @@ itcl::class gaia::GaiaNDAccess {
          ${type_}::close $handle_
          set handle_ {}
          set addr_ 0
-         set nel_ 0
-         set hdstype_ {}
          set cnfmap_ 0
          set dims_ {}
       }
@@ -155,17 +150,15 @@ itcl::class gaia::GaiaNDAccess {
    #  elements and the data type (these are in the HDS format). The mapping
    #  uses mmap, if possible and requested.
    public method map {} {
-      lassign [${type_}::map $handle_ $usemmap] addr_ nel_ hdstype_
-      return [list $addr_ $nel_ $hdstype_]
+      set addr_ [${type_}::map $handle_ $usemmap]
+      return $addr_
    }
 
    #  Unmap in the dataset "data component", if mapped.
    public method unmap {} {
       if { $addr_ != 0 } {
-         ${type_}::unmap $handle_
+         ${type_}::unmap $handle_ $addr_
          set addr_ 0
-         set nel_ 0
-         set hdstype_ 0
       }
    }
 
@@ -197,9 +190,9 @@ itcl::class gaia::GaiaNDAccess {
    public method getspectrum {axis alow ahigh p1 p2 trunc} {
       if { $addr_ != {} } {
          set dims_ [getdims $trunc]
-         lassign [eval "array::getspectrum $addr_ $hdstype_ $dims_ $axis \
-                     $alow $ahigh $p1 $p2 $cnfmap_"] adr nel
-         return "$adr $nel $hdstype_"
+         lassign [eval "array::getspectrum $addr_ $dims_ $axis $alow $ahigh \
+                                           $p1 $p2 $cnfmap_"] adr
+         return $adr
       }
    }
 
@@ -212,9 +205,9 @@ itcl::class gaia::GaiaNDAccess {
    public method getimage {axis index trunc} {
       if { $addr_ != {} } {
          set dims_ [getdims $trunc]
-         lassign [eval "array::getimage $addr_ $hdstype_ $dims_ $axis \
-                     $index $cnfmap_"] adr nel
-         return "$adr $nel $hdstype_"
+         lassign [eval "array::getimage $addr_ $dims_ $axis \
+                                        $index $cnfmap_"] adr
+         return $adr
       }
    }
 
@@ -222,6 +215,12 @@ itcl::class gaia::GaiaNDAccess {
    #  sections).
    public method release {adr} {
       array::release $adr $cnfmap_
+   }
+
+   #  Return the underlying information about an accessor array. This
+   #  is the real memory address, number of elements and HDS data type.
+   public method getinfo {adr} {
+      return [array::getinfo $adr]
    }
 
    #  Configuration options: (public variables)
@@ -258,16 +257,10 @@ itcl::class gaia::GaiaNDAccess {
    #  The memory address of the dataset data component.
    protected variable addr_ 0
 
-   #  The number of elements in the dataset data component.
-   protected variable nel_ 0
-
-   #  The HDS data type of the dataset data.
-   protected variable hdstype_ {}
-
    #  Whether mapped data should be registered with CNF (required for some
    #  NDF actions).
    protected variable cnfmap_ 0
-
+   
    #  Common variables: (shared by all instances)
    #  -----------------
 
