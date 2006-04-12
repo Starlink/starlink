@@ -20,17 +20,67 @@
  *      {enter_changes_here}
  *-
  */
+#include <stdio.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <gaiaArray.h>
 #include <prm_par.h>
 #include <cnf.h>
+#include "byteswap.h"
 
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 
+/* The type "long" may have 64 bits, need to know this for byte-swapping
+ * macros */
+#if SIZEOF_LONG == 8
+#define FITS_ULONG unsigned long
+#define FITS_UINT unsigned int
+#else
+#define FITS_ULONG unsigned long long
+#define FITS_UINT unsigned long
+#endif
+
+/* Local types as HDS type strings, static for simple export */
+static char *hdstypes[] = {
+    "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_REAL", "_DOUBLE"
+};
+
+/* Local prototypes */
+static void gaiaArrayDataNormalise( void *inPtr, int type, int nel, 
+                                    int isfits, int haveblank, int inBlank );
+
+/**
+ * Create an ARRAYinfo structure for a data array. If blank isn't set for your
+ * data just set haveblank to 0. Note that NaN will be used for FITS floating
+ * point values, so you should set haveblank 1 for those.
+ */
+ARRAYinfo *gaiaArrayCreateInfo( void *ptr, int type, long el, int isfits,
+                                int haveblank, int blank )
+{
+    ARRAYinfo *info = (ARRAYinfo *) malloc( sizeof( ARRAYinfo ) );
+    info->ptr = ptr;
+    info->type = type;
+    info->el = el;
+    info->isfits = isfits;
+    info->haveblank = haveblank;
+    info->blank = blank;
+
+    return info;
+}
+
+/**
+ * Free an ARRAYinfo structure.
+ */
+void gaiaArrayFreeInfo( ARRAYinfo *info )
+{
+    if ( info != NULL ) {
+        free( info );
+    }
+}
 
 /**
  * Convert an HDS data type into a local enum value. Returns HDS_UNKNOWN if
@@ -71,6 +121,59 @@ int gaiaArrayHDSType( char *typePtr )
 }
 
 /**
+ * Convert a FITS bitpix into a local enum value. Returns HDS_UNKNOWN if
+ * the type cannot be understood (should be _BYTE, _UBYTE, _WORD, _UWORD,
+ * _INTEGER, _REAL or _DOUBLE).
+ */
+int gaiaArrayFITSType( int bitpix )
+{
+    int type = HDS_UNKNOWN;
+
+    switch (bitpix)
+    {
+    case -8:
+        /* This is not standard */
+        type = HDS_BYTE;
+        break;
+    case 8:
+        type = HDS_UBYTE;
+        break;
+    case -16:
+        type = HDS_UWORD;
+        break;
+    case 16:
+        type = HDS_WORD;
+        break;
+    case -32:
+        type = HDS_REAL;
+        break;
+    case 32:
+        type = HDS_INTEGER;
+        break;
+    case -64:
+        type = HDS_DOUBLE;
+        break;
+    case 64:
+        /* This is not supported, should be HDS_LONG... */
+        type = HDS_UNKNOWN;
+        break;
+    }
+    return type;
+}
+
+/**
+ * Convert a local enum type into an HDS string type. Returns _UBYTE if type
+ * is not known.
+ */
+char const *gaiaArrayTypeToHDS( int type )
+{
+    if ( type >= 0 && type < 7 ) {
+        return hdstypes[type];
+    }
+    return "_UBYTE";
+}
+
+/**
  *  Return the sizeof() of a known type.
  */
 static size_t gaiaArraySizeOf( int type )
@@ -101,12 +204,16 @@ static size_t gaiaArraySizeOf( int type )
 }
 
 /**
- *  Convert an array from a supported type into double precision. Any BAD
- *  values to be replaced with the given value.
+ *  Convert an array from a supported type into double precision and return
+ *  the result in a simple pre-allocated array. Any HDS BAD values to be
+ *  replaced with the given value. Assumes data are in native representation,
+ *  that's machine byte order and have HDS bad values.
  */
-void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
-                        double *outPtr )
+void gaiaArrayToDouble( ARRAYinfo *info, double badValue, double *outPtr )
 {
+    void *inPtr = info->ptr;
+    int nel = info->el;
+    int type = info->type;
 
     /* Define loop as macro to save typing and maintenance */
 #define CONVERT_AND_COPY(type,badFlag)    \
@@ -164,15 +271,15 @@ void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
  *
  *  Purpose:
  *     Given an array of 3 significant dimensions, in a supported data type,
- *     extract a 2D image section and return the data in that section. The
- *     dataType should be one of the enumerations HDS_ defined in gaiaArray.h
- *     (these correspond to the HDS data types).
+ *     extract a 2D image section and return the data in that section in a
+ *     simple array. The dataType should be one of the enumerations HDS_
+ *     defined in gaiaArray.h (these correspond to the HDS data types). No
+ *     changes to the underlying data representation are made (no byte
+ *     swapping or bad value transformations).
  *
  *  Arguments:
- *     inPtr
- *         Pointer to the cube.
- *     type
- *         The data type (one of the HDS_? enums).
+ *     info
+ *         Pointer to the cube ARRAYinfo structure.
  *     dims[3]
  *         The dimensions of the cube.
  *     axis
@@ -188,13 +295,16 @@ void gaiaArrayToDouble( void *inPtr, int nel, int type, double badValue,
  *         exit. This memory is allocated using malloc or cnfMalloc as
  *         determined by the final argument. Freeing it is the responsibility
  *         of the caller.
- *     nel 
+ *     nel
  *         number of elements extracted (number of type elements in outPtr).
  */
-void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
-                             int axis, int index, int cnfmalloc, 
-                             void **outPtr, int *nel )
+void gaiaArrayImageFromCube( ARRAYinfo *info, int dims[3], int axis,
+                             int index, int cnfmalloc, void **outPtr,
+                             int *nel )
 {
+    void *inPtr = info->ptr;
+    int type = info->type;
+
     if ( axis == 2 ) {
 
         /* If we're losing the last dimension, then this is just a memcpy. */
@@ -318,15 +428,13 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
  *
  *  Purpose:
  *     Given an array of 3 significant dimensions, in a supported data type,
- *     extract a 1D spectral section and return the data in that section. The
- *     dataType should be one of the enumerations HDS_ defined in gaiaArray.h
- *     (these correspond to the HDS data types).
+ *     extract a 1D spectral section and return the data in that section in a
+ *     simple array. The returned data will be byte-swapped and bad-value
+ *     transformed if necessary.
  *
  *  Arguments:
- *     inPtr
- *         Pointer to the cube.
- *     type
- *         The data type (HDS_?).
+ *     info
+ *         Pointer to the cube structure.
  *     dims[3]
  *         The dimensions of the cube.
  *     axis
@@ -354,15 +462,16 @@ void gaiaArrayImageFromCube( void *inPtr, char type, int dims[3],
  *     If the spectrum isn't within the array bounds then an empty spectrum
  *     (full of zeros) will be returned.
  */
-void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
-                                int axis, int arange[2], int index1,
-                                int index2, int cnfmalloc, void **outPtr,
-                                int *nel )
+void gaiaArraySpectrumFromCube( ARRAYinfo *info, int dims[3], int axis,
+                                int arange[2], int index1, int index2,
+                                int cnfmalloc, void **outPtr, int *nel )
 {
-    size_t length;
+    int lower;
     int outside = 0;
     int upper;
-    int lower;
+    size_t length;
+    void *inPtr = info->ptr;
+    int type = info->type;
 
     /* Allocate memory for spectrum. Only need "arange" spanning values when
      * that is set. */
@@ -497,6 +606,11 @@ void gaiaArraySpectrumFromCube( void *inPtr, char type, int dims[3],
         }
     }
 #undef EXTRACT_AND_COPY
+
+    /* Normalise the data to remove byte-swapping and unrecognised 
+     * BAD values */
+    gaiaArrayDataNormalise( *outPtr, type, *nel, info->isfits, 
+                            info->haveblank, info->blank );
 }
 
 /**
@@ -527,14 +641,185 @@ void gaiaArrayGetStrides( int ndims, int dims[], int strides[] )
 }
 
 /**
- * Free data previously allocated by these routines.
+ * Free data previously allocated by these routines and associated with an 
+ * ARRAYinfo structure.
  */
-void gaiaArrayFree( void *ptr, int cnfMalloc )
+void gaiaArrayFree( ARRAYinfo *info, int cnfMalloc )
 {
-    if ( cnfMalloc ) {
-        cnfFree( ptr );
+    if ( info->ptr != NULL ) {
+        if ( cnfMalloc ) {
+            cnfFree( info->ptr );
+        }
+        else {
+            free( info->ptr );
+        }
+        info->ptr = NULL;
     }
     else {
-        free( ptr );
+        fprintf( stderr, "gaiaArray: attempt to double free %p\n", info );
+    }
+}
+
+/**
+ *  Normalise an array if this machine does not have native FITS ordering and
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones.
+ */
+void gaiaArrayNormalise( ARRAYinfo *info )
+{
+    gaiaArrayDataNormalise( info->ptr, info->type, info->el, 
+                            info->isfits, info->haveblank, info->blank );
+}
+ 
+/**
+ *  Normalise an array if this machine does not have native FITS ordering and
+ *  the data is in FITS format. Also transform FITS bad values into HDS ones.
+ */
+static void gaiaArrayDataNormalise( void *inPtr, int type, int nel, 
+                                    int isfits, int haveblank, int inBlank )
+{
+    int i;
+    
+    /*  Only applies to FITS data */
+    if ( ! isfits ) return;
+
+    /* Byte swap first, note we do this using macros that require integers,
+     * so cannot merge with bad checking. */
+#if BIGENDIAN
+    /* Nothing to do */
+#else
+    switch ( type )
+    {
+        case HDS_DOUBLE: {
+            double *ptr = (double *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                ptr[i] = SWAP_DOUBLE( ptr[i] );
+            }
+        }
+        break;
+
+        case HDS_REAL: {
+            float *ptr = (float *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                ptr[i] = SWAP_FLOAT( ptr[i] );
+            }
+        }
+        break;
+
+        case HDS_INTEGER: {
+            int *ptr = (int *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                ptr[i] = SWAP_INT( ptr[i] );
+            }
+        }
+        break;
+
+        case HDS_WORD: {
+            short *ptr = (short *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                ptr[i] = SWAP_SHORT( ptr[i] );
+            }
+        }
+        break;
+
+        case HDS_UWORD: {
+            unsigned short *ptr = (unsigned short *)inPtr;
+            unsigned short value;
+            for ( i = 0; i < nel; i++ ) {
+                value = ptr[i];
+                ptr[i] = SWAP16( value );
+            }
+        }
+        break;
+    }
+#endif
+
+    if ( isfits ) return;
+
+    /* BAD value transformation. */
+    switch ( type )
+    {
+        case HDS_DOUBLE: {
+            double *ptr = (double *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( isnan( ptr[i] ) ) {
+                    ptr[i] = VAL__BADD;
+                }
+            }
+        }
+        break;
+
+        case HDS_REAL: {
+            float *ptr = (float *)inPtr;
+            for ( i = 0; i < nel; i++ ) {
+                if ( isnan( ptr[i] ) ) {
+                    ptr[i] = VAL__BADR;
+                }
+            }
+        }
+        break;
+
+        case HDS_INTEGER: {
+            if ( haveblank ) {
+                int *ptr = (int *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == inBlank ) {
+                        ptr[i] = VAL__BADI;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_WORD: {
+            if ( haveblank ) {
+                short blank = (short) inBlank;
+                short *ptr = (short *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == blank ) {
+                        ptr[i] = VAL__BADW;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_UWORD: {
+            if ( haveblank ) {
+                unsigned short blank = (unsigned short) inBlank;
+                unsigned short *ptr = (unsigned short *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == blank ) {
+                        ptr[i] = VAL__BADUW;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_BYTE: {
+            if ( haveblank ) {
+                char blank = (char) inBlank;
+                char *ptr = (char *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == blank ) {
+                        ptr[i] = VAL__BADB;
+                    }
+                }
+            }
+        }
+        break;
+
+        case HDS_UBYTE: {
+            if ( haveblank ) {
+                unsigned char blank = (unsigned char) inBlank;
+                unsigned char *ptr = (unsigned char *)inPtr;
+                for ( i = 0; i < nel; i++ ) {
+                    if ( ptr[i] == blank ) {
+                        ptr[i] = VAL__BADUB;
+                    }
+                }
+            }
+        }
+        break;
     }
 }
