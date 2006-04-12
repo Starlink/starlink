@@ -23,9 +23,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <tcl.h>
-#include <gaiaArray.h>
+#include <fitshead.h>
+#include "gaiaArray.h"
+#include "slasubs.h"
 
 /* Local prototypes */
 static int gaiaSlaObs( ClientData clientData, Tcl_Interp *interp,
@@ -124,7 +127,6 @@ static int gaiaSlaDateObs2Je( ClientData clientData, Tcl_Interp *interp,
         Tcl_WrongNumArgs( interp, 1, objv, "FITS-keyword FITS-card" );
         return TCL_ERROR;
     }
-
     result = hgetdate( Tcl_GetString( objv[2] ), Tcl_GetString( objv[1] ), 
                        &value );
     if ( result == 0 ) {
