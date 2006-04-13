@@ -81,6 +81,7 @@ ary_test_SOURCES = ary_test.f
 ary_test_LDADD = libary.la `hds_link` `err_link` `chr_link` `prm_link`
 
 dist_starnews_DATA = ary.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = ary_err.msg
 
