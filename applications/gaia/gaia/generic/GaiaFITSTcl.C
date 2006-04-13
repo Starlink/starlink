@@ -151,7 +151,6 @@ static long exportFITSHandle( StarFitsIO *handle )
     info->wcs = NULL;
     info->mmap = 1;
     info->dataCopy = NULL;
-    info->wcs = NULL;
     info->ndims = 0;
 
     return (long) info;
@@ -220,6 +219,8 @@ static int GaiaFITSTclClose( ClientData clientData, Tcl_Interp *interp,
  * Map the FITS data array in the native type, using file mapping as
  * requested. The result is a memory address (long int) of an ARRAYinfo
  * struct. Note the data is raw and no byte swapping will be applied.
+ * 
+ * The access mode is currently ignored.
  */
 static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
@@ -231,10 +232,11 @@ static int GaiaFITSTclMap( ClientData clientData, Tcl_Interp *interp,
     int type;
     size_t el;
 
-    /* Check arguments, allow two, the FITS identifier and whether to use file
-     * mapping. */
-    if ( objc != 3 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier ?usemmap?" );
+    /* Check arguments, allow three, the FITS identifier, whether to use file
+     * mapping and the access mode. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "fits_identifier ?usemmap? access" );
         return TCL_ERROR;
     }
 
@@ -331,45 +333,22 @@ static int GaiaFITSTclUnMap( ClientData clientData, Tcl_Interp *interp,
 
 /**
  * Return the address of the FITS WCS component. This is an AST FrameSet.
- *
- * Can return a WCS for a specific axis using optional second and third
- * arguments. The third argument is an offset for the GRID domain and is used
- * when a section of a WCS is required (0 when not needed).
  */
 static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
 {
-    AstFrameSet *iwcs;
     FITSinfo *info;
-    Tcl_Obj *resultObj;
-    char *error_mess;
-    int axis;
-    int offset;
     int result;
 
-    /* Check arguments, only allow one or three, the fits identifier and an
-     * axis number plus offset */
-    if ( objc != 2 && objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier [axis offset]" );
+    /* Check arguments, only allow one the fits identifier */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier" );
         return TCL_ERROR;
     }
 
     /* Import the identifier */
     if ( importFITSIdentifier( interp, objv[1], &info ) != TCL_OK ) {
         return TCL_ERROR;
-    }
-    resultObj = Tcl_GetObjResult( interp );
-
-    /* Get the axis and offset */
-    axis = -1;
-    offset = 0;
-    if ( objc == 4 ) {
-        if ( Tcl_GetIntFromObj( interp, objv[2], &axis ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
-        if ( Tcl_GetIntFromObj( interp, objv[3], &offset ) != TCL_OK ) {
-            return TCL_ERROR;
-        }
     }
 
     /* Get the full WCS, if not already done. */
@@ -378,21 +357,13 @@ static int GaiaFITSTclGtWcs( ClientData clientData, Tcl_Interp *interp,
         result = GaiaFITSGtWcs( info->handle, &info->wcs, info->dims,
                                 &info->ndims );
     }
-    iwcs = info->wcs;
-
-    if ( axis != -1 && result == TCL_OK ) {
-        /* WCS for one axis, plus grid offset */
-        result = gaiaUtilsGtAxisWcs( info->wcs, axis, offset, &iwcs, 
-                                     &error_mess );
-    }
 
     /* Export the WCS as a long containing the address */
     if ( result == TCL_OK ) {
-        Tcl_SetLongObj( resultObj, (long) iwcs );
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) info->wcs ) );
     }
     else {
-        free( error_mess );
-        Tcl_SetResult( interp, "Failed to read WCS", TCL_VOLATILE );
+        Tcl_SetResult( interp, "Failed to read FITS WCS", TCL_VOLATILE );
     }
     return result;
 }
