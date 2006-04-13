@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libperiod.la
 dist_noinst_INCLUDES = PIVARS
 
 period_SOURCES = period_main.f
-period_LDADD = libperiod.la `$(srcdir)/period_link`
+period_LDADD = libperiod.la `fio_link` `$(srcdir)/period_link`
 
 starnewsdir = $(datadir)/doc/@PACKAGE_NAME@-@PACKAGE_VERSION@
 dist_starnews_DATA = period.news
@@ -36,5 +36,5 @@ period_setx.f period_setxydata.f period_setxyedata.f period_setxyerr.f \
 period_setxyiferr.f period_shellsort.f period_siginfogt.f	       \
 period_siginfolt.f period_sine.f period_sinfit.f period_spread.f       \
 period_status.f period_string.f period_strip.f period_subcmp.f	       \
-period_window.f period_yandeshuffle.f period_yshuffle.f
-
+period_window.f period_yandeshuffle.f period_yshuffle.f                \
+period_writebell.f
