@@ -21,8 +21,6 @@ C===========================================================================
       DOUBLE PRECISION XWORK(NDATA), YWORK(NDATA), EWORK(NDATA)
       DOUBLE PRECISION ZEROPT, PERIOD
       INTEGER I
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
 
 C-----------------------------------------------------------------------------
