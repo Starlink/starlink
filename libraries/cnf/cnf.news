@@ -5,6 +5,7 @@
  o Now uses the starmem library for memory allocation.
  o Add cnfRealloc routine (like realloc but guarantees the pointer
    is registered)
+ o Officially released under the GNU Public Licence.
 
  CNF Version 4.1 is released.
 

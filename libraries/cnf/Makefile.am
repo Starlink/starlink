@@ -75,5 +75,6 @@ c_calls_f_args_SOURCES = c_calls_f_args.c f_receive_args.f
 c_calls_f_args_LDADD = libcnfrtl.la @FCLIBS@ `starmem_link`
 
 dist_starnews_DATA = cnf.news
+dist_pkgdata_DATA = LICENCE
 
 
