@@ -54,6 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,6 +73,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +90,8 @@
 *        Added TYPE argument.
 *     28-SEP-1990 (RFWS):
 *        Added calls to ERR_MARK and ERR_RLSE.
+*     13-APR-2006 (TIMJ):
+*        Seems that FIO__ENDFL is also a valid "end of file" status.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -316,7 +320,8 @@
 *  Arrive here if an end of prologue line was read, or an error was
 *  encountered. Annul end-of-file errors.
 99    CONTINUE
-      IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+      IF ( STATUS .EQ. FIO__EOF 
+     :     .OR. STATUS .EQ. FIO__ENDFL) CALL ERR_ANNUL( STATUS )
       CALL ERR_RLSE
 
       END
