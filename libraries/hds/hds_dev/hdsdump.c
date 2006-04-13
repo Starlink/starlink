@@ -51,7 +51,7 @@ main(int argc, char **argv)
       perror("hds file open error");
       exit(1);
    } else
-      printf("\nHDS dump - BKM 20060124 - file %s\n\n", argv[1] );
+      printf("\nHDS dump - BKM 20060404 - file %s\n\n", argv[1] );
    if( fread( block, 1, REC__SZBLK, fp) != REC__SZBLK ) {
       perror("HCB block read error");
       exit(1);
@@ -104,7 +104,8 @@ main(int argc, char **argv)
       for( chip=0; chip < REC__MXCHIP ; chip+=rcl.size ) {
          ptr = block + REC__SZCBM + (chip * REC__SZCHIP ); 
          rec1_unpack_rcl( ptr, &rcl );
-         if ( !rcl.size ) {
+         if ( !rcl.size || rcl.active > 1 || rcl.active <= 0 ||
+              rcl.class <= 0 || rcl.class > 4 || rcl.dlen <0 ) {
              rcl.size = 1;
              continue;
          }    
@@ -152,14 +153,18 @@ main(int argc, char **argv)
                   fread( tblk, 1, REC__SZBLK, fp );
                   ptr = tblk;
                }
-               else
+               if(odl.naxes == 0) {
+                  odl.naxes = 1;
                   odl.axis[0] = 1;
-               for(i=0; i<odl.axis[0]; i++){
-                  dat1_unpack_srv( ptr, &rid );
-                  printf("  (%lld,%d)\n",rid.bloc, rid.chip );
-                  if( (int) rid.bloc != cur_block )
-                     add_block( (int) rid.bloc);
-                  ptr += (rcl.extended ? 8: 4);
+               }
+               for(i=0; i<odl.naxes; i++) {
+                  for(j=0; j<odl.axis[i]; j++) {
+                     dat1_unpack_srv( ptr, &rid );
+                     printf("  (%lld,%d)\n",rid.bloc, rid.chip );
+                     if( (int) rid.bloc != cur_block )
+                        add_block( (int) rid.bloc);
+                     ptr += (rcl.extended ? 8: 4);
+                  }
                }
                break;
             case DAT__COMPONENT:
