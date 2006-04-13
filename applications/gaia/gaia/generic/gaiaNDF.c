@@ -128,7 +128,7 @@ extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId),
  * ===================================
  */
 
-/*
+/**
  *  Name:
  *     gaiaAccessNDF
  *
@@ -191,7 +191,7 @@ int gaiaAccessNDF( const char *filename, int *type, int *width, int *height,
    }
 }
 
-/*
+/**
  *  Name:
  *     gaiaWriteNDF
  *
@@ -265,7 +265,7 @@ int gaiaWriteNDF( const char *filename, int type, int width, int height,
    return 1;
 }
 
-/*
+/**
  *  Name:
  *     gaiaFreeNDF
  *
@@ -301,7 +301,7 @@ int gaiaFreeNDF( int ndfid )
    return 1;
 }
 
-/*
+/**
  *   Name:
  *      gaiaCopyComponent
  *
@@ -380,13 +380,13 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
    return 1;
 }
 
-/*
+/**
  *   Name:
  *      gaiaMapComponent
  *
  *   Purpose:
- *      Map an NDF data component for READ access, returning a pointer
- *      to the mapped memory. The memory must be unmapped either
+ *      Map an NDF data component for the given access access, returning a
+ *      pointer to the mapped memory. The memory must be unmapped either
  *      directly or by annuling the NDF identifier, before the program
  *      exits.
  *
@@ -395,7 +395,7 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
  *      made instead.
  */
 int gaiaMapComponent( int ndfid, void **data, const char* component,
-                      char **error_mess )
+                      const char *access, char **error_mess )
 {
    char dtype[NDF__SZTYP+1];
    int el;
@@ -411,7 +411,7 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    if ( strncmp( dtype, "_BYTE", 7 ) == 0 ) {
       strcpy( dtype, "_WORD" );
    }
-   ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status );
+   ndfMap( ndfid, component, dtype, access, ptr, &el, &status );
    *data = ptr[0];
 
    /* If an error occurred return an error message */
@@ -425,6 +425,58 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    emsRlse();
    return 1;
 }
+
+/**
+ *  Name:
+ *     gaiaCreateNDF.
+ *
+ *  Purpose:
+ *     Create a new simple NDF.
+ *
+ *  Description:
+ *     Create a new NDF with the given type (HDS format), width and height. 
+ *     Add the given WCS (NULL for none). The components can be accessed using
+ *     gaiaMapComponent.
+ */
+int gaiaCreateNDF( const char *filename, int width, int height, 
+                   const char *type, AstFrameSet *wcs, 
+                   int *indf, char **error_mess )
+{
+    int lbnd[2];
+    int ndim;
+    int place;
+    int status = SAI__OK;
+    int ubnd[2];
+
+    emsMark();
+
+    /* Open NDF, also creates it */
+    ndfOpen( NULL, filename, "WRITE", "NEW", indf, &place, &status );
+
+    /* Create the NDF */
+    ndim = 2;
+    lbnd[0] = 1;
+    ubnd[0] = width;
+    lbnd[1] = 1;
+    ubnd[1] = height;
+    ndfNew( type, ndim, lbnd, ubnd, &place, indf, &status );
+
+    /* Insert the WCS */
+    if ( wcs != NULL ) {
+        ndfPtwcs( wcs, *indf, &status );
+    }
+
+    /* If an error occurred construct the message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return 0;
+    }
+    emsRlse();
+    return 1;
+}
+
+
 
 /**
  *  =====================================
@@ -922,7 +974,7 @@ int gaiaGetMNDF( const void *handle, int index, const char *component,
        *  to the readonly status */
        if ( current->readonly ) {
            return gaiaMapComponent( current->ndfid, data, component,
-                                    error_mess );
+                                    "READ", error_mess );
        } else {
            return gaiaCopyComponent( current->ndfid, data, component,
                                      error_mess );
@@ -1180,15 +1232,16 @@ int gaiaNDFCGet( int ndfid, const char* component, char *value,
  * Map an NDF component with a given data type. Returns data and number of
  * elements.
  */
-int gaiaNDFMap( int ndfid, char *type, const char* component, void **data,
-                int *el, char **error_mess )
+int gaiaNDFMap( int ndfid, char *type, const char *access, 
+                const char* component, void **data, int *el, 
+                char **error_mess )
 {
    int status = SAI__OK;
    void *ptr[1];
 
    /* Do the mapping */
    emsMark();
-   ndfMap( ndfid, component, type, "READ", ptr, el, &status );
+   ndfMap( ndfid, component, type, access, ptr, el, &status );
    *data = ptr[0];
 
    /* If an error occurred return an error message */
@@ -1209,15 +1262,12 @@ int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess )
 {
     int status = SAI__OK;
     emsMark();
-    ndfBegin();
     ndfUnmap( ndfid, component, &status );
     if ( status != SAI__OK ) {
         *error_mess = gaiaUtilsErrMessage();
-        ndfEnd( &status );
         emsRlse();
         return TCL_ERROR;
     }
-    ndfEnd( &status );
     emsRlse();
     return TCL_OK;
 }
@@ -1261,7 +1311,7 @@ int gaiaNDFGtAxisWcs( int ndfid, int axis, int offset, AstFrameSet **iwcs,
        return TCL_ERROR;
    }
    result = gaiaUtilsGtAxisWcs( fullwcs, axis, offset, iwcs, error_mess );
-   astAnnul( fullwcs );
+   fullwcs = (AstFrameSet *) astAnnul( fullwcs );
    return result;
 }
 
