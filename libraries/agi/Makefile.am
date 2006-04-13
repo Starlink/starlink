@@ -90,5 +90,6 @@ CLEANFILES = AGI_ERR fac_1501_err
 
 EXTRA_DIST = agi_err.msg
 
-
+dist_starnews_DATA = agi.news
+dist_pkgdata_DATA = LICENCE
 

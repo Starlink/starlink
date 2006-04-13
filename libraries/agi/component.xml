@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="agi" support="S">
-  <version>2.1-1</version>
+  <version>2.1-2</version>
   <path>libraries/agi</path>
   <description>Applications Graphics Interface Library</description>
   <abstract><p>AGI and AGP interface.</p></abstract>
