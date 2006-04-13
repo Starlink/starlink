@@ -39,6 +39,8 @@
 *        Original version.
 *     14-Aug-2001 (KPD)
 *        Original (DAOPHOT) version adapted for PERIOD
+*     13-APR-2006 (BEC)
+*        Replace setting BELL using DATA with direct use of CHAR.
 *-
 *  Type Definitions:
       IMPLICIT NONE
@@ -54,11 +56,13 @@
       INTEGER STATUS
       CHARACTER*1 BELL
 
-      DATA BELL /7/
 *.
  
 *  Initialise the status variable.
       STATUS = 0
+
+*  Initialise the bell.
+      BELL = CHAR(7)
 
 *  Allocate memory.
       CALL PSX_CALLOC( SIZE, TYPE, PNTR, STATUS )
