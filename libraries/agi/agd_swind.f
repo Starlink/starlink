@@ -5,17 +5,17 @@
      :                       PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGD_SWIND
 *
-*  Purpose :
+*  Purpose:
 *     Save an IDI window in the database
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGD_SWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF, PNAME,
 *    :                COMENT, WX1, WX2, WY1, WY2, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Save an IDI window as a picture in the database. The new picture
 *     must be equal in size or smaller than the current picture in the
 *     database. The window coordinates define the size of the
@@ -29,7 +29,7 @@
 *     created then a valid picture identifier is returned and the new
 *     picture becomes the current picture.
 *
-*  Arguments :
+*  Arguments:
 *     DISPID = INTEGER (Given)
 *        Display identifier
 *     MEMID = INTEGER (Given)
@@ -59,7 +59,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check IDI has been activated.
 *     Update the zoom and scroll factors for the current device.
@@ -77,10 +77,30 @@
 *     Save the window as a picture in the database.
 *     Get a picture identifier and save the details in the common blocks.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1990, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Jun 1990 (NE):
 *        Original version
 *     Mar 1991 (NE):

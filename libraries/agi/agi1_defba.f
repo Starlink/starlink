@@ -4,16 +4,16 @@
      :                        STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_1DEFBA
 *
-*  Purpose :
+*  Purpose:
 *     Define the coordinates of the base picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_1DEFBA( WKNAME, AGINAM, DEVICE, NDC, WORLD, STATUS )
 *
-*  Description :
+*  Description:
 *     This defines the coordinate system of the base picture for the
 *     given workstation. The coordinate system is obtained from the
 *     GKS desciption of the device and therfore the workstation name
@@ -21,7 +21,7 @@
 *     The device, normalised device and world coordinates of the base
 *     picture are returned.
 *
-*  Arguments :
+*  Arguments:
 *     WKNAME = CHARACTER * ( * ) (Given)
 *        Workstation name
 *     AGINAM = CHARACTER * ( * ) (Given)
@@ -35,7 +35,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get the GKS workstation identifier for the current picture.
 *     If GKS is closed then open it.
@@ -47,10 +47,30 @@
 *     Close GKS if it was opened in this routine.
 *     Define the device, ndc and world coordinates for the base picture.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Oct 1988 (NE):
 *        Original version
 *     Jun 1990 (NE):

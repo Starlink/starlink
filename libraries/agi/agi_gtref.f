@@ -3,16 +3,16 @@
       SUBROUTINE AGI_GTREF ( PICID, MODE, DATREF, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_GTREF
 *
-*  Purpose :
+*  Purpose:
 *     Get a reference object from a picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_GTREF ( PICID, MODE, DATREF, STATUS )
 *
-*  Description :
+*  Description:
 *     This returns a reference to a data object which has been stored
 *     in the database. The picture identifier signifies which picture
 *     to obtain the reference from. If this identifier is negative then
@@ -22,7 +22,7 @@
 *     this should be annulled in the application using REF_ANNUL to
 *     ensure the file is properly closed.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier
 *     MODE = CHARACTER*(*) (Given)
@@ -32,7 +32,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Annul the output string if it is a valid HDS locator.
 *     Obtain the workstation id and picture number from the picture id.
@@ -40,10 +40,30 @@
 *     Check the reference object is there and of the correct type.
 *     Get the data locator from the reference object.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton  (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1989 (NE):
 *        Original version
 *     Mar 1991 (NE):

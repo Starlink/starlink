@@ -3,16 +3,16 @@
       SUBROUTINE AGI_1GWNAM ( INAME, PACKGE, AGINAM, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_1GWNAM
 *
-*  Purpose :
+*  Purpose:
 *     Translate the given name into an AGI workstation name
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_1GWNAM( INAME, PACKGE, AGINAM, STATUS )
 *
-*  Description :
+*  Description:
 *     This routine converts the workstation name given by INAME into
 *     a name suitable for use by AGI. The mechanism of this routine
 *     is not really important, it can be changed to suit a particular
@@ -29,7 +29,7 @@
 *     should be searched. If a blank string is entered, all packages
 *     are searched.
 *
-*  Arguments :
+*  Arguments:
 *     INAME = CHARACTER*(*) (Given)
 *        Name of workstation to translate
 *     PACKGE = CHARACTER*(*) (Given)
@@ -39,7 +39,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Convert the package name to upper case.
 *     See if the GKS part of GNS can convert the device name into an
@@ -47,10 +47,30 @@
 *     If not then see if the IDI part of GNS can perform the conversion.
 *     If both have failed then return an error.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Jun 1990 (NE):

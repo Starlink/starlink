@@ -4,16 +4,16 @@
      :                        STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_1DEFBA
 *
-*  Purpose :
+*  Purpose:
 *     Define the coordinates of the base picture (Native PGPLOT)
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_1DEFBA( WKNAME, AGINAM, DEVICE, NDC, WORLD, STATUS )
 *
-*  Description :
+*  Description:
 *     This defines the coordinate system of the base picture for the
 *     given workstation. The coordinate system is calculated to be the
 *     same as that used by GKS to enable interoperability of AGI database 
@@ -24,7 +24,7 @@
 *     GKS compatible representations of the device, normalised device and 
 *     world coordinates of the base picture are returned.
 
-*  Arguments :
+*  Arguments:
 *     WKNAME = CHARACTER * ( * ) (Given)
 *        Workstation name
 *     AGINAM = CHARACTER * ( * ) (Given but not used)
@@ -41,11 +41,27 @@
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *
-*  Authors :
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     BKM: Brian McIlwrath (Starlink, RAL)
 *     DSB: David Berry (Starlink)
 *
-*  History :
+*  History:
 *     Dec 1999 (BKM):
 *        Original version
 *     1-NOV-2001 (DSB):

@@ -3,16 +3,16 @@
       SUBROUTINE AGI_ASSOC( PARAM, ACMODE, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_ASSOC
 *
-*  Purpose :
+*  Purpose:
 *     Associate an AGI device with an ADAM parameter
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_ASSOC( PARAM, ACMODE, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Associate an AGI device with a parameter in the ADAM environment
 *     and return an identifier to the current picture. If there are no
 *     pictures on the device then a base picture is created and made
@@ -24,7 +24,7 @@
 *     'READ' and 'UPDATE' access do not clear the display, but 'WRITE'
 *     access does.
 *
-*  Arguments :
+*  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        Name of the parameter used for accessing the device
 *     ACMODE = CHARACTER*(*) (Given)
@@ -34,7 +34,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Reset the PICID then check status on entry.
 *     If the reference counter is zero initialise the common blocks.
 *     Increment the reference counter.
@@ -45,10 +45,30 @@
 *     Fetch the current picture from the database.
 *     Store the information in the common block.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Jul 1989 (NE):

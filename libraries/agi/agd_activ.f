@@ -3,33 +3,53 @@
       SUBROUTINE AGD_ACTIV ( STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGD_ACTIV
 *
-*  Purpose :
+*  Purpose:
 *     Initialise IDI
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGD_ACTIV( STATUS )
 *
-*  Description :
+*  Description:
 *     Initialise IDI. This has to be called before any other AGD or
 *     IDI routines. An error is returned if this or any other graphics
 *     interface is already active.
 *
-*  Arguments :
+*  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check that no other graphics packages are active.
 *     Initialise the IDI-related common blocks.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1990, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     June 1990 (NE):
 *        Original version
 *     April 1991 (NE):

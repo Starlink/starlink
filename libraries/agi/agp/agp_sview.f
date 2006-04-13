@@ -3,17 +3,17 @@
       SUBROUTINE AGP_SVIEW ( PICNAM, COMENT, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGP_SVIEW
 *
-*  Purpose :
+*  Purpose:
 *     Save the current PGPLOT viewport in the database
 *     (Native PGPLOT version)
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGP_SVIEW( PICNAM, COMENT, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Save the current PGPLOT viewport as a picture in the database.
 *     The new picture must be equal in size or smaller than the current
 *     picture in the database. The name of the picture and a comment are
@@ -22,7 +22,7 @@
 *     picture was successfully created then a valid picture identifier
 *     is returned and the new picture becomes the current picture.
 *
-*  Arguments :
+*  Arguments:
 *     PICNAM = CHARACTER*(*) (Given)
 *        Name of picture
 *     COMENT = CHARACTER*(*) (Given)
@@ -32,7 +32,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get the details of the current picture.
 *     Check PGPLOT has been activated.
@@ -50,12 +50,28 @@
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils
 *
-*  Authors :
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE:  Nick Eaton (Durham University)
 *     BKM: Brian McIlwrath (Starlink, RAL)
 *     DSB: David Berry (Starlink)
 *
-*  History :
+*  History:
 *     Oct 1988 (NE):
 *        Original version
 *     Oct 1992 (NE):

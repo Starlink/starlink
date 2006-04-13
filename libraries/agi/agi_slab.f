@@ -3,16 +3,16 @@
       SUBROUTINE AGI_SLAB ( PICID, LABEL, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_SLAB
 *
-*  Purpose :
+*  Purpose:
 *     Store label in picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_SLAB ( PICID, LABEL, STATUS )
 *
-*  Description :
+*  Description:
 *     Store a label in the picture referenced by the identifier. If the
 *     picture identifier is negative then the current picture is used
 *     to store the label. If a label already exists for the picture
@@ -23,7 +23,7 @@
 *     before being processed, although it is stored as supplied. An
 *     empty label string will delete any label stored for that picture.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier
 *     LABEL = CHARACTER*(AGI__SZLAB) (Given)
@@ -31,7 +31,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get details of the specified picture.
 *     Get a locator to the label structure.
@@ -39,10 +39,30 @@
 *     Delete any labels that match the given one.
 *     Put the label in its correct place.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     December 1989 (NE):
 *        Original version
 *-

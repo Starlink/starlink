@@ -3,16 +3,16 @@
       SUBROUTINE AGI_SROOT ( STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_SROOT
 *
-*  Purpose :
+*  Purpose:
 *     Select the root picture for searching
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_SROOT( STATUS )
 *
-*  Description :
+*  Description:
 *     The root picture is selected for searching operations. The root
 *     picture contains all other pictures (including the base picture)
 *     and can be used to recall any picture whether it lies within the
@@ -24,17 +24,37 @@
 *     called while the root picture is selected will use the current
 *     picture.
 *
-*  Arguments :
+*  Arguments:
 *    STATUS = INTEGER (Given and Returned)
 *       The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     A flag in the common block is set.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     July 1990 (NE):
 *        Original version
 *-

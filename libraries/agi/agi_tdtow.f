@@ -3,16 +3,16 @@
       SUBROUTINE AGI_TDTOW ( PICID, NXY, DX, DY, WX, WY, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_TDTOW
 *
-*  Purpose :
+*  Purpose:
 *     Transform data to world coordinates
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_TDTOW( PICID, NXY, DX, DY, WX, WY, STATUS )
 *
-*  Description :
+*  Description:
 *     Transform a set of data coordinates into world coordinates
 *     using a transformation stored in the database. The picture
 *     identifier signifies which picture contains the required
@@ -21,7 +21,7 @@
 *     is found then the identity transformation is used, i.e. the
 *     world coordinates equal the data coordinates.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier
 *     NXY = INTEGER (Given)
@@ -37,7 +37,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check the input status and the number of points in the arrays.
 *     Obtain the workstation id and picture number from the picturee id.
 *     Look in the cache for this picture.
@@ -50,10 +50,30 @@
 *        Put the transformation identifier in the cache.
 *     Perform the transformation.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Sep 1989 (NE):
 *        Original version
 *     Aug 1990 (NE):

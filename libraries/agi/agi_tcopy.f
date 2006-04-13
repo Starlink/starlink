@@ -3,16 +3,16 @@
       SUBROUTINE AGI_TCOPY ( TRNLOC, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_TCOPY
 *
-*  Purpose :
+*  Purpose:
 *     Copy a transformation structure to the database
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_TCOPY( TRNLOC, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     The transformation pointed to by the HDS locator is stored in
 *     the database. The picture identifier signifies which picture is
 *     to receive the transformation structure. If this identifier is
@@ -22,7 +22,7 @@
 *     the world coordinates of the database picture, as if it had been
 *     created with a call to AGI_TNEW.
 *
-*  Arguments :
+*  Arguments:
 *     TRNLOC = CHARACTER*(DAT__SZLOC) (Given)
 *        Locator to the transformation structure
 *     PICID = INTEGER (Given)
@@ -30,7 +30,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Verify the supplied transformation.
 *     Verify the number of data and world coordinates.
@@ -39,10 +39,30 @@
 *     Check that there is no existing transformation structure.
 *     Copy the transformation structure to the database
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Jul 1992 (NE):
 *        Original version
 *-

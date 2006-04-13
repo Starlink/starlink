@@ -3,22 +3,22 @@
       SUBROUTINE AGI_ISAMP ( PICID, LSAME, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_ISAMP
 *
-*  Purpose :
+*  Purpose:
 *     Inquire if two pictures are the same
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_ISAMP( PICID, LSAME, STATUS )
 *
-*  Description :
+*  Description:
 *     Inquire if a picture identifier references the same picture as
 *     the current picture. The picture referenced by the given picture
 *     identifier is compared with the current picture to see if they
 *     point to the same picture in the database.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier.
 *     LSAME = LOGICAL (Returned)
@@ -26,16 +26,36 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get the workstation name and picture number of the current picture.
 *     Get the workstation name and picture number of the given picture.
 *     Compare the names and numbers.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     30-JAN-1992 (NE):
 *        Original version
 *-

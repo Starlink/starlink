@@ -3,20 +3,20 @@
       SUBROUTINE AGI_ISAMD ( PICID, LSAME, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_ISAMD
 *
-*  Purpose :
+*  Purpose:
 *     Inquire if pictures are on same device
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_ISAMD( PICID, LSAME, STATUS )
 *
-*  Description :
+*  Description:
 *     Inquire if the given picture is on the same device as the current
 *     picture.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier
 *     LSAME = LOGICAL (Returned)
@@ -24,16 +24,36 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get the workstation name of the current picture.
 *     Get the workstation name of the given picture.
 *     Compare the names.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *-

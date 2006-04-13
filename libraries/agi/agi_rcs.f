@@ -3,16 +3,16 @@
       SUBROUTINE AGI_RCS ( PNAME, PSTART, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_RCS
 *
-*  Purpose :
+*  Purpose:
 *     Recall succeeding picture of specified name
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_RCS( PNAME, PSTART, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Recall the picture succeeding the given one on the current device
 *     that has the specified name and lies within the bounds of the
 *     current picture. The search is started at the picture identified
@@ -22,7 +22,7 @@
 *     name. This picture becomes the current picture. If no picture
 *     fulfills the conditions an error is returned.
 *
-*  Arguments :
+*  Arguments:
 *     PNAME = CHARACTER*(*) (Given)
 *        Name of picture
 *     PSTART = INTEGER (Given)
@@ -32,7 +32,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get details of the current picture.
 *     Read the contents of the current picture.
@@ -47,10 +47,30 @@
 *     Get a new picture identifier and store the details in the
 *     common block.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Dec 1989 (NE):

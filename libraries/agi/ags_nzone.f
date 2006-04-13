@@ -3,16 +3,16 @@
       SUBROUTINE AGS_NZONE ( NEWZON, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGS_NZONE
 *
-*  Purpose :
+*  Purpose:
 *     Create a new SGS zone from the current picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGS_NZONE ( NEWZON, STATUS )
 *
-*  Description :
+*  Description:
 *     Create a new SGS zone from the current picture. The zone will be
 *     created with the coordinate system of the current picture.
 *     If the device associated with the current picture is not already
@@ -20,13 +20,13 @@
 *     will be cleared if the access mode is 'WRITE' (in AGI_ASSOC or
 *     AGI_OPEN).
 *
-*  Arguments :
+*  Arguments:
 *     NEWZON = INTEGER (Returned)
 *        SGS zone identifier of new zone
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check SGS has been activated.
 *     Get the details of the current picture.
@@ -48,7 +48,7 @@
 *        Clear the zone.
 *     Endif
 *
-*  Implementation Deficiencies :
+*  Implementation Deficiencies:
 *     (1) This assumes that if there is an open GKS workstation then SGS
 *     has been opened.
 *     (2) SGS_OPNWK is used to switch between workstations if the
@@ -61,10 +61,30 @@
 *     (3) The base zones are stored in an array indexed by the GKS
 *     workstation id returned from SGS_ICURW.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     May 1989 (NE):

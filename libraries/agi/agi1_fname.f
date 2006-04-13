@@ -3,16 +3,16 @@
       SUBROUTINE AGI_1FNAME ( FNAME, LNAME, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_1FNAME
 *
-*  Purpose :
+*  Purpose:
 *     Return the name of the database file
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_1FNAME( FNAME, LNAME, STATUS )
 *
-*  Description :
+*  Description:
 *     Return the name of the database file. The file extension is
 *     not included in the name. At present the name contains the
 *     current node name obtained through a POSIX call, unless the
@@ -21,7 +21,7 @@
 *     This routine can be changed by any supporter of AGI to return
 *     a suitable file name.
 *
-*  Arguments :
+*  Arguments:
 *     FNAME = CHARACTER*(*) (Returned)
 *        File name
 *     LNAME = INTEGER (Returned)
@@ -29,17 +29,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get directory name from AGI_USER if defined otherwise from HOME
 *     Get the node name from AGI_NODE if defined otherwise from system
 *     Construct the full file name
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (RAL)
 *
-*  History :
+*  History:
 *     Jul 1990 (NE):
 *         Original version
 *     Dec 1991 (NE):

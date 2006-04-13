@@ -3,36 +3,56 @@
       SUBROUTINE AGI_CANCL ( PARAM, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_CANCL
 *
-*  Purpose :
+*  Purpose:
 *     Cancel the ADAM device parameter
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_CANCL( PARAM, STATUS )
 *
-*  Description :
+*  Description:
 *     Cancel the association of the ADAM device parameter with AGI. Any
 *     picture identifiers associated with this parameter are annulled.
 *     This routine is executed regardless of the given value of status.
 *
-*  Arguments :
+*  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        Name of the parameter used for accessing the device
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Do not check the inherited status.
 *     Annul all identifiers that use this parameter
 *     Cancel the parameter.
 *     Decrement the reference counter.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Dec 1989 (NE):

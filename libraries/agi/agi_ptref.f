@@ -3,16 +3,16 @@
       SUBROUTINE AGI_PTREF ( DATREF, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_PTREF
 *
-*  Purpose :
+*  Purpose:
 *     Store a reference object in a picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_PTREF( DATREF, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     This creates a reference to a data object in the database. The
 *     argument can be either an HDS locator or any character string
 *     reference. If the string is a valid HDS locator then a reference
@@ -23,7 +23,7 @@
 *     current picture is used. If a reference already exists for the
 *     given picture then an error is returned.
 *
-*  Arguments :
+*  Arguments:
 *     DATREF = CHARACTER*(*) (Given)
 *        String containing reference object
 *     PICID = INTEGER (Given)
@@ -31,17 +31,37 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check if the given reference is a valid HDS locator or not.
 *     Obtain the workstation id and picture number from the picture id.
 *     Get a locator to the required picture.
 *     If the picture was found then create the reference object.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1989, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1989 (NE):
 *        Original version
 *     Mar 1991 (NE):

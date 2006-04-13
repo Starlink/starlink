@@ -4,17 +4,17 @@
      :                       NEWX1, NEWX2, NEWY1, NEWY2, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_NUPIC
 *
-*  Purpose :
+*  Purpose:
 *     Create a new picture in the database
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_NUPIC( WX1, WX2, WY1, WY2, PNAME, COMENT,
 *    :                NEWX1, NEWX2, NEWY1, NEWY2, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Create a new picture in the database. The extent of the new
 *     picture is defined in the world coordinate system of the current
 *     picture. The world coordinates of this new picture are set to the
@@ -22,7 +22,7 @@
 *     converted to upper case. The new picture is selected as the
 *     current one and a picture identifier returned.
 *
-*  Arguments :
+*  Arguments:
 *     WX1 = REAL (Given)
 *        Current world coordinate of left edge of picture
 *     WX2 = REAL (Given)
@@ -48,7 +48,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get the details of the current picture.
 *     Read the contents of the current picture.
@@ -57,10 +57,30 @@
 *     Save the new picture in the database.
 *     Get a picture identifier and save the details in the common block.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Dec 1989 (NE):

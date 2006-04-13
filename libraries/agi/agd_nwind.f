@@ -4,16 +4,16 @@
      :                       STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGD_NWIND
 *
-*  Purpose :
+*  Purpose:
 *     Define an IDI window from the current picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGD_NWIND( MEMID, DISPID, XSIZE, YSIZE, XOFF, YOFF, STATUS )
 *
-*  Description :
+*  Description:
 *     Define an IDI window in the given memory from the current picture.
 *     The window coordinates define the size of the rectangular area in
 *     pixels and the offset of its bottom left corner from the memory
@@ -26,7 +26,7 @@
 *     If the device is already open then the display identifier will be
 *     the same as previously and the device will not be cleared.
 *
-*  Arguments :
+*  Arguments:
 *     MEMID = INTEGER (Given)
 *        Memory identifier
 *     DISPID = INTEGER (Returned)
@@ -42,7 +42,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check IDI has been activated.
 *     Update the zoom and scroll factors for the current device.
@@ -66,10 +66,30 @@
 *        Endif
 *     Endif
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1990, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Jun 1990 (NE):
 *        Original version
 *     Nov 1990 (NE):

@@ -6,20 +6,20 @@
 *  Name:
 *     AGD_DEASS
 *
-*  Purpose :
+*  Purpose:
 *     Deassociate a device from AGI and IDI.
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGD_DEASS( PARAM, PARCAN, STATUS )
 *
-*  Description :
+*  Description:
 *     This is a wrap-up routine to deassociate a device from the AGI
 *     database and to close down IDI. The picture current when
 *     AGD_ASSOC was called is reinstated. This routine calls AGD_DEACT,
 *     AGI_END and either AGI_CANCL or AGI_ANNUL. This routine is
 *     executed regardless of the given value of status.
 *
-*  Arguments :
+*  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The name of the ADAM parameter associated with the device.
 *     PARCAN = LOGICAL (Given)
@@ -28,7 +28,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Algorithm :
+*  Algorithm:
 *     Record the input status and begin an error context.
 *     Deactivate the IDI interface.
 *     End the AGI context.
@@ -40,10 +40,30 @@
 *     Endif
 *     Reinstate the input status.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      7-JUL-1992 (NE):
 *        Original version.
 *-

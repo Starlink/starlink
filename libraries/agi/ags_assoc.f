@@ -7,13 +7,13 @@
 *  Name:
 *     AGS_ASSOC
 *
-*  Purpose :
+*  Purpose:
 *     Associate a device with AGI and SGS.
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGS_ASSOC( PARAM, ACMODE, PNAME, PICID, NEWZON, STATUS )
 *
-*  Description :
+*  Description:
 *     This is a wrap-up routine to associate a device with the AGI
 *     database via the ADAM parameter system and open SGS on it. An
 *     SGS zone corresponding to the current picture in the database
@@ -22,7 +22,7 @@
 *     is called to recall the last picture of that name. This routine
 *     should be matched by a closing call to AGS_DEASS.
 *
-*  Arguments :
+*  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The name of the ADAM parameter for accessing device names
 *     ACMODE = CHARACTER*(*) (Given)
@@ -36,7 +36,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Open AGI through the parameter system.
 *     Begin an AGI context.
@@ -44,11 +44,31 @@
 *     Activate the SGS interface.
 *     Return a new zone corresponding to the current database picture.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     10-MAR-1991 (MJC):
 *        Original version.
 *      6-JUL-1992 (NE):

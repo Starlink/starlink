@@ -3,22 +3,22 @@
       SUBROUTINE AGI_1GWNAM ( INAME, PACKGE, AGINAM, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_1GWNAM
 *
-*  Purpose :
+*  Purpose:
 *     Translate the given name into an AGI workstation name
 *     Replacement routine for native PGPLOT version of AGI
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_1GWNAM( INAME, PACKGE, AGINAM, STATUS )
 *
-*  Description :
+*  Description:
 *     This routine converts the workstation name given by INAME into
 *     a name suitable for use by AGI. This version of the routine is
 *     specific to native-PGPLOT and is used in the AGP library only. 
 *
-*  Arguments :
+*  Arguments:
 *     INAME = CHARACTER*(*) (Given but may be modified)
 *        Name of workstation to translate
 *     PACKGE = CHARACTER*(*) (Given)
@@ -31,12 +31,28 @@
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
 *
-*  Authors :
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *     BKM: Brian McIlwrath (Starlink,RAL)
 *     DSB: David Berry (Starlink)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version for SGS/IDI/Starlink PGPLOT
 *     Dec 1999 (BKM);

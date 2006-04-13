@@ -3,16 +3,16 @@
       SUBROUTINE AGS_SZONE ( PNAME, COMENT, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGS_SZONE
 *
-*  Purpose :
+*  Purpose:
 *     Save the current SGS zone in the database
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGS_SZONE( PNAME, COMENT, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Save the current SGS zone as a picture in the database. The new
 *     picture must be equal in size or smaller than the current picture
 *     in the database. The name of the picture and a comment are used to
@@ -21,7 +21,7 @@
 *     successfully created then a valid picture identifier is returned
 *     and the new picture becomes the current picture.
 *
-*  Arguments :
+*  Arguments:
 *     PNAME = CHARACTER*(*) (Given)
 *        Name of picture
 *     COMENT = CHARACTER*(*) (Given)
@@ -31,7 +31,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Check SGS has been activated.
 *     Obtain an AGI name for the current SGS workstation.
@@ -46,10 +46,30 @@
 *     Save the zone as a picture in the database.
 *     Get a picture identifier and save the details in the common block.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1991, 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Jul 1988 (NE):
 *        Original version
 *     Jun 1989 (NE):

@@ -7,14 +7,14 @@
 *  Name:
 *     AGD_ASSOC
 *
-*  Purpose :
+*  Purpose:
 *     Associate a device with AGI and IDI.
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGD_ASSOC ( PARAM, ACMODE, PNAME, MEMID, PICID, DISPID,
 *    :                 XSIZE, YSIZE, XOFF, YOFF, STATUS )
 *
-*  Description :
+*  Description:
 *     This is a wrap-up routine to associate a device with the AGI
 *     database via the ADAM parameter system and open IDI on it.
 *     The size and position of an IDI window corresponding to the
@@ -24,7 +24,7 @@
 *     picture of that name. This routine should be matched by a closing
 *     call to AGD_DEASS.
 *
-*  Arguments :
+*  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The name of the ADAM parameter for accessing device names
 *     ACMODE = CHARACTER*(*) (Given)
@@ -48,7 +48,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Open AGI through the parameter system.
 *     Begin an AGI context.
@@ -56,10 +56,30 @@
 *     Activate the IDI interface.
 *     Return a window corresponding to the current database picture.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *      7-JUL-1992 (NE):
 *        Original version.
 *     29-JUL-1992 (NE):

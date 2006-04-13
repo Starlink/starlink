@@ -3,16 +3,16 @@
       SUBROUTINE AGI_IPOBS ( PICID, LOBS, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_IPOBS
 *
-*  Purpose :
+*  Purpose:
 *     Is current picture obscured by another?
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_IPOBS( PICID, LOBS, STATUS )
 *
-*  Description :
+*  Description:
 *     Inquire if the current picture is obscured, either totally or
 *     partially by another picture. Obscured means that a picture
 *     intersects the current picture and was created more recently.
@@ -22,7 +22,7 @@
 *     picture identifier corresponds to a valid picture then the current
 *     one is only tested against the given one.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier.
 *     LOBS = LOGICAL (Returned)
@@ -30,7 +30,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get details of the current picture.
 *     Get a locator to the top level database structure.
@@ -54,10 +54,30 @@
 *     Endif
 *     Tidy up.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1989, 1990, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Original version
 *     Jul 1989 (NE):

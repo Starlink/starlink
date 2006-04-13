@@ -3,16 +3,16 @@
       SUBROUTINE AGI_MORE ( PICID, ACMODE, MORLOC, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_MORE
 *
-*  Purpose :
+*  Purpose:
 *     Return an HDS locator to a MORE structure
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_MORE( PICID, ACMODE, MORLOC, STATUS )
 *
-*  Description :
+*  Description:
 *     An HDS locator that points to a MORE structure in the database
 *     is returned. A MORE structure can be associated with any picture
 *     and it can be used to store any application specific information.
@@ -27,7 +27,7 @@
 *     structure or how the information is used. The application is also
 *     responsible for annulling the returned locator.
 *
-*  Arguments :
+*  Arguments:
 *     PICID = INTEGER (Given)
 *        Picture identifier
 *     ACMODE = CHARACTER*(*) (Given)
@@ -37,7 +37,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Convert the acces mode to upper case.
 *     Get details of the specified picture.
@@ -55,10 +55,30 @@
 *        Endif
 *     Endif
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Jul 1992 (NE):
 *        Original version
 *-

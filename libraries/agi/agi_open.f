@@ -3,16 +3,16 @@
       SUBROUTINE AGI_OPEN ( WKNAME, ACMODE, PICID, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_OPEN
 *
-*  Purpose :
+*  Purpose:
 *     Open an AGI device in a non-ADAM environment
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_OPEN( WKNAME, ACMODE, PICID, STATUS )
 *
-*  Description :
+*  Description:
 *     Open an AGI device and return an identifier to the current picture.
 *     If there are no pictures on the device then a base picture is
 *     created and made current. If the size of the display window has
@@ -23,7 +23,7 @@
 *     created; 'READ' and 'UPDATE' access do not clear the display, but
 *     'WRITE' access does.
 *
-*  Arguments :
+*  Arguments:
 *     WKNAME = CHARACTER*(*) (Given)
 *        Name of the device to open
 *     ACMODE = CHARACTER*(*) (Given)
@@ -33,7 +33,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     If this is the first time this routine has run then
 *        Initialise the common blocks and graphics package flags.
@@ -49,10 +49,30 @@
 *     Endif
 *     Put the details of the picture in the common block.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990, 1991 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Aug 1988 (NE):
 *        Orignal version
 *     Jun 1990 (NE):

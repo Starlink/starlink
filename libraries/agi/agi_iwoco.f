@@ -3,19 +3,19 @@
       SUBROUTINE AGI_IWOCO ( WX1, WX2, WY1, WY2, STATUS )
 
 *+
-*  Name :
+*  Name:
 *     AGI_IWOCO
 *
-*  Purpose :
+*  Purpose:
 *     Inquire world coordinates of current picture
 *
-*  Invocation :
+*  Invocation:
 *     CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS )
 *
-*  Description :
+*  Description:
 *     Return the world coordinate limits of the current picture.
 *
-*  Arguments :
+*  Arguments:
 *     WX1 = REAL (Returned)
 *        World coordinate of left edge of picture
 *     WX2 = REAL (Returned)
@@ -27,15 +27,35 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 *
-*  Algorithm :
+*  Algorithm:
 *     Check status on entry.
 *     Get details of the current picture.
 *     Read the contents of the current picture.
 *
-*  Authors :
+*  Copyright:
+*     Copyright (C) 1988, 1990 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
 *     NE: Nick Eaton (Durham University)
 *
-*  History :
+*  History:
 *     Oct 1988 (NE):
 *        Original version
 *     Jun 1990 (NE):
