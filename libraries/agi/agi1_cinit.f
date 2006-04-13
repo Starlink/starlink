@@ -1,52 +1,78 @@
 ************************************************************************
-*+  AGI_1CINIT - Initialise the AGI common blocks.
 
       SUBROUTINE AGI_1CINIT ( STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1CINIT
+
+*  Purpose:
+*     Initialise the AGI common blocks.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1CINIT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Initialise the AGI common blocks which contain the references to
 *     the picture identifiers. The definitions are held in the INCLUDE
 *     file 'AGI_PFREE'.
-*
-*    Invocation :
-*     CALL AGI_1CINIT( STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     Set the variables to zero of blank strings.
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
 *     Dec 1989  Added CIDIID
 *     Jul 1990  Added CROOT
 *     Oct 1990  Added picture deferral
 *     Nov 1990  Added nest level and clear flags
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_pfree'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER I
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

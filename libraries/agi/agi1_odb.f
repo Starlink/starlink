@@ -1,53 +1,83 @@
 ************************************************************************
-*+  AGI_1ODB - Open the database
 
       SUBROUTINE AGI_1ODB ( STATUS )
 
-*    Description :
-*     Open the databas
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1ODB
+
+*  Purpose:
+*     Open the database.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1ODB( STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Open the databas
+
+*  Algorithm:
 *     Check status on entry.
 *     Open the database file if present.
 *     If file is not found then
 *        Create a new database file.
 *     Endif.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     July 1989  Read database locator from common block
 *     July 1990  Call AGI_1FNAME and HDS_TUNE
 *     Dec  1991  Removed call to HDS_TUNE
 *     Mar  1992  Define file extension using AGI__ENAME parameter
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
       CHARACTER FNAME * 64
 
       INTEGER LEXT, LNAME
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

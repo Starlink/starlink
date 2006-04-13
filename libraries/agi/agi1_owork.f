@@ -1,59 +1,88 @@
 ************************************************************************
-*+  AGI_1OWORK - Open workstation structure
 
       SUBROUTINE AGI_1OWORK ( WKNAME, WKSLOC, STATUS )
 
-*    Description :
-*     Open a workstation structure
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1OWORK
+
+*  Purpose:
+*     Open workstation structure.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1OWORK ( WKNAME, WKSLOC, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Open a workstation structure
+
+*  Algorithm:
 *     Check status on entry.
 *     Find out if the workstation is already open.
 *     If it is not then
 *        Create a new workstation structure and get a locator to it.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     Amended July 1989  Read database locator from common block
 *     Amended January 1993  Create header structure
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation
       CHARACTER * ( * ) WKNAME
 
-*    Export :
 
+*  Arguments Returned:
 *     Locator to workstation
       CHARACTER * ( DAT__SZLOC ) WKSLOC
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
 *    Global variables
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
       CHARACTER * ( DAT__SZLOC ) HENLOC
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

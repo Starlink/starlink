@@ -1,37 +1,62 @@
 ************************************************************************
-*+  AGI_1WARPR - Write the a 4 element real array to the database
 
       SUBROUTINE AGI_1WARPR ( PICLOC, PTYPE, PVAL, STATUS )
 
-*    Description :
-*     Write the contents of a 4 element real array to the database
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1WARPR
+
+*  Purpose:
+*     Write the a 4 element real array to the database.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1WARPR( PICLOC, PTYPE, PVAL, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Write the contents of a 4 element real array to the database
+
+*  Algorithm:
 *     Check status on entry.
 *     If the given parameter is not present then
 *        Create the parameter.
 *     Endif
 *     Write the contents of the array into the parameter field.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
@@ -41,17 +66,22 @@
 *     Array containing values
       REAL PVAL( 4 )
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
       CHARACTER * ( DAT__SZLOC ) PARLOC
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

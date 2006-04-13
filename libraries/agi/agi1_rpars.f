@@ -1,47 +1,72 @@
 ************************************************************************
-*+  AGI_1RPARS - Read the parameters defining the picture
 
       SUBROUTINE AGI_1RPARS ( PICLOC, PNAME, COMENT, DEVICE, NDC, WORLD,
      :                        MEMID, FOUND, STATUS )
 
-*    Description :
-*     Read the parameters that describe the picture on the workstation
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1RPARS
+
+*  Purpose:
+*     Read the parameters defining the picture.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *      CALL AGI_1RPARS( PICLOC, PNAME, COMENT, DEVICE, NDC, WORLD,
 *     :                 MEMID, FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Read the parameters that describe the picture on the workstation
+
+*  Algorithm:
 *     Check status on entry.
 *     Read each of the parameters in turn.
-*
-*    Deficiencies :
+
+*  Implementation Deficiencies:
 *     This does not check that the parameter was found, so the output
 *     arguments may be undefined. The found argument is returned false
 *     if any of the parameters were not found.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     June 1990  Added MEMID parameter
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
-*    Export :
 
+*  Arguments Returned:
 *     Name of picture
       CHARACTER * ( * ) PNAME
 
@@ -63,12 +88,16 @@
 *     Flag indicating if parameter has been found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND1, FOUND2, FOUND3, FOUND4, FOUND5, FOUND6
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .EQ. SAI__OK ) THEN

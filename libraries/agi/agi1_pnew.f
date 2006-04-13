@@ -1,17 +1,32 @@
 ************************************************************************
-*+  AGI_1PNEW - Save current picture parameters
 
       SUBROUTINE AGI_1PNEW ( WKNAME, PNAME, COMENT, DEVICE, NDC,
      :                       WORLD, MEMID, PICNUM, STATUS )
 
-*    Description :
-*     Save current picture parameters in the database and in the cache
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1PNEW
+
+*  Purpose:
+*     Save current picture parameters.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1PNEW( WKNAME, PNAME, COMENT, DEVICE, NDC, WORLD,
-*    :                MEMID, PICNUM, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Save current picture parameters in the database and in the cache
+
+*  Algorithm:
 *     Check status on entry.
 *     Get a locator to the top level database structure.
 *     Get a locator to the workstation.
@@ -20,29 +35,38 @@
 *     Create a new picture containing the passed parameters.
 *     Indicate this is the active picture.
 *     Write this picture into the cache.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
 *     Jul 1989  Read database locator from common block
 *     Nov 1989  PNAME - Remove leading blanks and change to upper case
 *     Jun 1990  Added MEMID parameter
 *     Sep 1990  Removed inquiries to the number of pictures
 *     Jan 1993  Initialise header block if necessary
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation
       CHARACTER * ( * ) WKNAME
 
@@ -64,22 +88,27 @@
 *     Memory identifier
       INTEGER MEMID
 
-*    Export :
 
+*  Arguments Returned:
 *     Number of picture in array of pictures
       INTEGER PICNUM
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_cache'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER POINT
 
       CHARACTER * ( AGI__SZNAM ) LNAME
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .EQ. SAI__OK ) THEN

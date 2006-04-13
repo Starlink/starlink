@@ -1,9 +1,28 @@
 ************************************************************************
-*+  AGI_1FRETN - Return a member to the free list
 
       SUBROUTINE AGI_1FRETN ( FRELEN, FREEID, FRELIS, NEXFRE, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1FRETN
+
+*  Purpose:
+*     Return a member to the free list.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1FRETN ( FRELEN, FREEID, FRELIS, NEXFRE )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Return a member to the free list. The FRELIS and NEXFRE are
 *     updated. If the element is already free then an error status is
 *     returned. The FRELIS element pointed to by FREEID is filled with
@@ -24,45 +43,47 @@
 *                                        -----------------
 *                                        | FRELIS(6) | 3 |
 *                                        -----------------
-*
-*    Invocation :
-*     CALL AGI_1FRETN ( FRELEN, FREEID, FRELIS, NEXFRE )
-*
-*    Method :
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Import :
 
+*  Arguments Given:
 *     Length of the array containing the free list.
       INTEGER FRELEN
 
 *     Indicator to free member
       INTEGER FREEID
 
-*    Import-Export :
 
+*  Arguments Given and Returned:
 *     Array containing the free list
       INTEGER FRELIS( FRELEN )
 
 *     Pointer indicating next free in free list array
       INTEGER NEXFRE
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*-
+
+*.
+
 
 *   Check that the given member is already free
       IF ( FRELIS( FREEID ) .LT. -1 ) THEN

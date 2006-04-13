@@ -1,63 +1,88 @@
 ************************************************************************
-*+  AGS_1GKSNM - Make up a GKS name string from the wkid and conid
 
       SUBROUTINE AGS_1GKSNM ( WKID, CONID, GNAME, STRLEN, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGS_1GKSNM
+
+*  Purpose:
+*     Make up a GKS name string from the wkid and conid.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGS_1GKSNM( WKID, CONID, GNAME, STRLEN, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     This routine makes up a GKS name from the workstation id and
 *     the connection id. The name is made up as 'GKS_<wkid>_<conid>'.
 *     The resulting name can be used to open SGS on the particular
 *     device.
-*
-*    Invocation :
-*     CALL AGS_1GKSNM( WKID, CONID, GNAME, STRLEN, STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Convert the workstation and connection identifiers to character
 *     strings.
 *     Append these onto the prefix and calculate the string length.
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
 *     Nov 1989  Changed CHR_LDBLNK to CHR_LDBLK
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     GKS workstation identifier
       INTEGER WKID
 
 *     GKS connection identifier
       INTEGER CONID
 
-*    Export :
 
+*  Arguments Returned:
 *     GKS name for the device
       CHARACTER * ( * ) GNAME
 
 *     Length of name string
       INTEGER STRLEN
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER CHR_LEN, CI2, WI2
       CHARACTER SCONID * 20, SWKID * 20
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

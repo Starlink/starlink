@@ -1,56 +1,85 @@
 ************************************************************************
-*+  AGI_1RPARI - Read the contents of an integer parameter
 
       SUBROUTINE AGI_1RPARI ( PICLOC, PTYPE, FOUND, PVAL, STATUS )
 
-*    Description :
-*     Read the contents of an integer parameter
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1RPARI
+
+*  Purpose:
+*     Read the contents of an integer parameter.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1RPARI( PICLOC, PTYPE, FOUND, PVAL, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Read the contents of an integer parameter
+
+*  Algorithm:
 *     Check status on entry.
 *     If the given parameter is there then
 *        Read the contents of the array.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1990
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
 *     Name of parameter to read
       CHARACTER * ( * ) PTYPE
 
-*    Export :
 
+*  Arguments Returned:
 *     Flag to indicate if parameter has been found
       LOGICAL FOUND
 
 *     Content of parameter. Undefined if .NOT. FOUND
       INTEGER PVAL
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       CHARACTER * ( DAT__SZLOC ) PARLOC
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

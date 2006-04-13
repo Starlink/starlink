@@ -1,54 +1,78 @@
 ************************************************************************
-*+  AGI_1RPIC - Read the contents of a picture
 
       SUBROUTINE AGI_1RPIC ( WKNAME, PICNUM, PNAME, COMENT, DEVICE, NDC,
      :                       WORLD, MEMID, FOUND, STATUS )
 
-*    Description :
-*     Read the contents of a picture from the cache or the database
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1RPIC
+
+*  Purpose:
+*     Read the contents of a picture.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1RPIC( WKNAME, PICNUM, PNAME, COMENT, DEVICE, NDC,
-*    :                WORLD, MEMID, FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Read the contents of a picture from the cache or the database
+
+*  Algorithm:
 *     Check status on entry.
 *     Look in the cache for the picture.
 *     If not there look in the database.
 *     If not there flag an error.
-*
-*    Deficiencies :
+
+*  Implementation Deficiencies:
 *     If the picture is found this does not guarantee that all the
 *     parameters are properly defined.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     June 1989  Allow for the extra FIFO's
 *     July 1989  Read database locator from common block
 *     June 1990  Added MEMID parameter
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation
       CHARACTER * ( * ) WKNAME
 
 *     Number of picture in array of pictures to be read.
       INTEGER PICNUM
 
-*    Export :
 
+*  Arguments Returned:
 *     Name of picture
       CHARACTER * ( * ) PNAME
 
@@ -70,19 +94,24 @@
 *     Flag to indicate if picture was found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_cache'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL PFOUND
 
       INTEGER I, J, JJ, K, POINT
 
       CHARACTER * ( DAT__SZLOC ) PICLOC, PSTLOC, WKSLOC
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

@@ -1,55 +1,83 @@
 ************************************************************************
-*+  AGI_1FPAR - Find a parameter in a picture
 
       SUBROUTINE AGI_1FPAR ( PICLOC, PTYPE, PARLOC, FOUND, STATUS )
 
-*    Description :
-*     Find a parameter in a picture structure.
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1FPAR
+
+*  Purpose:
+*     Find a parameter in a picture.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1FPAR ( PICLOC, PTYPE, PARLOC, FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Find a parameter in a picture structure.
+
+*  Algorithm:
 *     Initialise the returned variable
 *     Check status on entry.
 *     If parameter is in picture structure then
 *        Get the locator to the parameter.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     September 1990  Initialise FOUND
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture structure
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
 *     Name of parameter to find
       CHARACTER * ( * ) PTYPE
 
-*    Export :
 
+*  Arguments Returned:
 *     Locator to parameter. Undefined if .NOT. FOUND
       CHARACTER * ( DAT__SZLOC ) PARLOC
 
 *     Flag to indicate if parameter has been found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*-
+
+*.
+
 
 *   Initialise the returned variable
       FOUND = .FALSE.

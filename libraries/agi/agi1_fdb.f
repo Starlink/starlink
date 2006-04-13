@@ -1,15 +1,31 @@
 ************************************************************************
-*+  AGI_1FDB - Find the database
 
       SUBROUTINE AGI_1FDB ( FOUND, STATUS )
 
-*    Description :
-*     Get a locator to the database container file if it is there.
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1FDB
+
+*  Purpose:
+*     Find the database.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1FDB ( FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Get a locator to the database container file if it is there.
+
+*  Algorithm:
 *     Check status on entry.
 *     If this is the first call to AGI_1FDB then
 *        See if HDS has been started
@@ -24,49 +40,64 @@
 *     Else see if a database file exists
 *        Open the database file
 *        Set found to false if an error has occured in this section
-*        
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     July 1989  Store database locator in common block
 *     July 1990  Call AGI_1FNAME
 *     Dec  1991  Remove calls to EXC_1LEVEL and HDS_TUNE
 *     Mar  1992  Define file extension using AGI__ENAME parameter
 *     Oct  1993  Remove unused variable
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
 
-*    Export :
 
+*  Arguments Returned:
 *    Flag to indicate if database has been found.
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FIRST, STATE
 
       CHARACTER FNAME * 64
 
       INTEGER LEXT, LNAME
 
-*    Local data :
+
+*  Local Data:
       DATA FIRST /.TRUE./
       SAVE FIRST
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

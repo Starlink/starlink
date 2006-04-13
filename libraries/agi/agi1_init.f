@@ -1,45 +1,74 @@
 ************************************************************************
-*+  AGI_1INIT - Initialise the dynamic cache
 
       SUBROUTINE AGI_1INIT
 
-*    Description :
+*+
+*  Name:
+*     AGI_1INIT
+
+*  Purpose:
 *     Initialise the dynamic cache.
-*
-*    Invocation :
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1INIT
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Initialise the dynamic cache.
+
+*  Algorithm:
 *     For every record in the cache
 *        Indicate the element of the FIFO array to be empty = -1.
 *        Make the forward and inverse transformation numbers = 0.
 *     Enddo
 *     Initialise the FIFO pointer to be FIFLEN - 1.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     June 1989  Allowed for the increased number of FIFO's
 *     August 1990  Initialise number of pictures
 *     January 1993  Initialise CHEAD
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_cache'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER I, J
-*-
+
+*.
+
 
 *   Initialise the number of pictures and the workstation flag
       CNUMPS = 0

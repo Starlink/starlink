@@ -1,57 +1,87 @@
 ************************************************************************
-*+  AGI_1WPACT - Indicate which is the currently active picture.
 
       SUBROUTINE AGI_1WPACT ( WKNAME, VALUE, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1WPACT
+
+*  Purpose:
 *     Indicate which is the currently active picture.
-*
-*    Invocation :
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1WPACT( WKNAME, VALUE, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Indicate which is the currently active picture.
+
+*  Algorithm:
 *     Check status on entry.
 *     Get a locator to the top level database structure.
 *     Get a loctor to the workstation.
 *     Get a locator to the picture active element.
 *     Store the current active picture in here.
 *     Tidy up
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     Amended July 1989  Read database locator from common block
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of the workstation
       CHARACTER * ( * ) WKNAME
 
 *     Number of currently active picture
       INTEGER VALUE
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
       CHARACTER * ( DAT__SZLOC ) TMPLOC, WKSLOC
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .EQ. SAI__OK ) THEN

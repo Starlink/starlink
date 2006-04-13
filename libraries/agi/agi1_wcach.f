@@ -1,43 +1,67 @@
 ************************************************************************
-*+  AGI_1WCACH - Write the contents of a picture into the cache
 
       SUBROUTINE AGI_1WCACH( WKNAME, PICNUM, PNAME, COMENT, DEVICE, NDC,
      :                       WORLD, MEMID, POINT, STATUS )
 
-*    Description :
-*     Write the contents of a picture into the dynamic cache
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1WCACH
+
+*  Purpose:
+*     Write the contents of a picture into the cache.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1WCACH( WKNAME, PICNUM, PNAME, COMENT, DEVICE, NDC,
-*    :                 WORLD, MEMID, POINT, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Write the contents of a picture into the dynamic cache
+
+*  Algorithm:
 *     Check status on entry.
 *     Update the cache pointer.
 *     Delete any compiled transformations at the new pointer.
 *     Write the picture contents into the cache.
 *     Indicate that the transformations have not been compiled.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     June 1989  Amended to allow for the extra FIFO's
 *     Sept 1989  Annul compiled transforms in the cache
 *     June 1990  Added MEMID parameter
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation
       CHARACTER * ( * ) WKNAME
 
@@ -62,22 +86,27 @@
 *     Memory identifier
       INTEGER MEMID
 
-*    Export :
 
+*  Arguments Returned:
 *     Cache pointer to current fifo entry
       INTEGER POINT
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_cache'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER I, J, K
 
       CHARACTER * ( AGI__SZNAM ) TPNAME
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

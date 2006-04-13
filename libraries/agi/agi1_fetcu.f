@@ -1,66 +1,94 @@
 ************************************************************************
-*+  AGI_1FETCU - Fetch the current picture from the database
 
       SUBROUTINE AGI_1FETCU ( WKNAME, AGINAM, CURPIC, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1FETCU
+
+*  Purpose:
+*     Fetch the current picture from the database.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1FETCU( WKNAME, AGINAM, CURPIC, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Fetch the current picture from the database. If there is no
 *     current picture then a base picture is created. The size of the
 *     base picture is checked against the expected size of the display
 *     and if they are different the database is cleared and a new base
 *     picture is created
-*
-*    Invocation :
-*     CALL AGI_1FETCU( WKNAME, AGINAM, CURPIC, STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     Look in the database for the device, creating a new entry if needed.
 *     Look to see if there is a current picture.
 *     If the size of the base picture is different from that expected for
 *     this device delete all pictures in the database and create a new
 *     base picture.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     March 1991
 *     March 1991  Check size of base picture with size of display
 *     February 1992  Update current number of pictures in common block
 *     Jnauary 1993  Clear out cache if header block has changed
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
       INCLUDE 'AGI_PAR'
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
       INCLUDE 'agi_cache'
 
-*    Import :
 
+*  Arguments Given:
 *     Workstation name
       CHARACTER * ( * ) WKNAME
 
 *     AGI name
       CHARACTER * ( * ) AGINAM
 
-*    Export :
 
+*  Arguments Returned:
 *     Number of currently active picture
       INTEGER CURPIC
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND, HFOUND, YESNO
 
       INTEGER BASMID, IHEAD, I, J, MEMID
@@ -71,7 +99,9 @@
       CHARACTER * ( DAT__SZLOC ) PICLOC, PSTLOC, WKSLOC
       CHARACTER * ( DAT__SZNAM ) BASNAM
       CHARACTER * ( AGI__CMAX ) BASCOM
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .EQ. SAI__OK ) THEN

@@ -1,55 +1,85 @@
 ************************************************************************
-*+  AGI_1RARPR - Read a real 4 element array
 
       SUBROUTINE AGI_1RARPR ( PICLOC, PTYPE, FOUND, PVAL, STATUS )
 
-*    Description :
-*     Read the contents of a real 4 element array
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1RARPR
+
+*  Purpose:
+*     Read a real 4 element array.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1RARPR( PICLOC, PTYPE, FOUND, PVAL, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Read the contents of a real 4 element array
+
+*  Algorithm:
 *     Check status on entry.
 *     If the given parameter is there then
 *        Read the contents of the array.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
 *     Name of parameter to read
       CHARACTER * ( * ) PTYPE
 
-*    Export :
 
+*  Arguments Returned:
 *     Flag to indicate if parameter has been found
       LOGICAL FOUND
 
 *     Array of values. Undefined if .NOT. FOUND
       REAL PVAL( 4 )
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       CHARACTER * ( DAT__SZLOC ) PARLOC
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

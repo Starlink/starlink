@@ -1,15 +1,31 @@
 ************************************************************************
-*+  AGI_1OPIC - Open a picture structure
 
       SUBROUTINE AGI_1OPIC ( WKSLOC, PICNUM, PICLOC, STATUS )
 
-*    Description :
-*     Open a picture in the picture structure
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1OPIC
+
+*  Purpose:
+*     Open a picture structure.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1OPIC( WKSLOC, PICNUM, PICLOC, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Open a picture in the picture structure
+
+*  Algorithm:
 *     Check status on entry
 *     Inquire the number of pictures in the picture structure.
 *     If the picture structure does not exist then
@@ -19,52 +35,65 @@
 *     Endif
 *     Get a locator to the new picture.
 *     Annul the picture structure locator.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Jul 1988
 *     Dec 1989  Added label structure
 *     Sep 1990  Changed PICNUM to an export argument
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
       INCLUDE 'AGI_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to workstation
       CHARACTER * ( DAT__SZLOC ) WKSLOC
 
-*    Export :
 
+*  Arguments Returned:
 *     Number of picture in workstation structure.
       INTEGER PICNUM
 
 *     Locator to newly created picture
       CHARACTER * (DAT__SZLOC ) PICLOC
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
 
+*  Local Variables:
       LOGICAL FOUND
 
       INTEGER SIZE
 
       CHARACTER * ( DAT__SZLOC ) LABLOC, LSTLOC, PSTLOC
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .EQ. SAI__OK ) THEN

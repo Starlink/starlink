@@ -1,17 +1,33 @@
 ************************************************************************
-*+  AGD_UPDAT - Update the IDI zoom and scroll factors for the device
 
       SUBROUTINE AGD_UPDAT ( STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGD_UPDAT
+
+*  Purpose:
+*     Update the IDI zoom and scroll factors for the device.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGD_UPDAT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     This updates the IDI zoom and scroll factors for the current
 *     device. These are held in common blocks and not written out until
 *     the end of the session, unless the device has changed.
-*
-*    Invocation :
-*     CALL AGD_UPDAT( STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     Check IDI has been activated.
 *     Verify the IDI display identifier of the current picture.
@@ -22,42 +38,50 @@
 *     Verify the memories on this device.
 *     Read the zoom and scroll factors into the common blocks.
 *     Update the display identifier in the common blocks.
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     June 1990
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
       INCLUDE 'AGI_ERR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_idips'
       INCLUDE 'agi_locs'
       INCLUDE 'agi_pfree'
 
-*    Local variables :
+
+*  Local Variables:
       CHARACTER STRING * 64
 
       INTEGER DISPID, ISTAT, J, JMEM, LENSTR, MEMS( MXMEMS )
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .NE. SAI__OK ) GOTO 99

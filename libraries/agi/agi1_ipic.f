@@ -1,44 +1,69 @@
 ************************************************************************
-*+  AGI_1IPIC - Inquire the number of pictures on a workstation
 
       SUBROUTINE AGI_1IPIC ( WKSLOC, PSTLOC, TOTNUM, FOUND, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1IPIC
+
+*  Purpose:
+*     Inquire the number of pictures on a workstation.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1IPIC ( WKSLOC, PSTLOC, TOTNUM, FOUND, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Inquire the number of pictures on a workstation. Return the
 *     picture structure locator if it was found.
-*
-*    Invocation :
-*     CALL AGI_1IPIC ( WKSLOC, PSTLOC, TOTNUM, FOUND, STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     If picture structure is present then
 *        Get the locator to the picture structure.
 *        Inquire how many pictures are in the picture structure.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to workstation
       CHARACTER * ( DAT__SZLOC ) WKSLOC
 
-*    Export :
 
+*  Arguments Returned:
 *     Locator to picture structure. Undefined if .NOT. FOUND
       CHARACTER * ( DAT__SZLOC ) PSTLOC
 
@@ -48,9 +73,12 @@
 *     Flag to indicate if picture structure has been found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

@@ -1,49 +1,75 @@
 ************************************************************************
-*+  AGD_1IINIT - Initialise the IDI parameter common blocks.
 
       SUBROUTINE AGD_1IINIT ( STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGD_1IINIT
+
+*  Purpose:
+*     Initialise the IDI parameter common blocks.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGD_1IINIT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Initialise the IDI parameter common blocks which contain the
 *     values of the zoom and scroll factors for the memories.
 *     The definitions are held in the INCLUDE file 'AGI_IDIPS'.
-*
-*    Invocation :
-*     CALL AGD_1IINIT( STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Set all thje values to zero. For the zoom and scroll factors
 *     these are valid vaules which indicate the default display;
 *     i.e. no zoom and the display origin in the bottom left hand
 *     corner.
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     June 1990
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_idips'
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER I
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

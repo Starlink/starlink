@@ -1,17 +1,33 @@
 ************************************************************************
-*+  AGD_1SIDIP - Store IDI parameters in the database
 
       SUBROUTINE AGD_1SIDIP ( STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGD_1SIDIP
+
+*  Purpose:
+*     Store IDI parameters in the database.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGD_1SIDIP( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Store the current IDI zoom and scroll factors in the database.
 *     The IDI display identifier is used to identify which workstation
 *     structure is to be the recipient.
-*
-*    Invocation :
-*     CALL AGD_1SIDIP( STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     Verify the common block identifiers.
 *     Find the correct workstation by matching the IDI display identifiers.
@@ -24,46 +40,54 @@
 *        Create a structure.
 *     Endif
 *     Fill the structure with the values from the common blocks.
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     June 1990
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
       INCLUDE 'AGI_PAR'
       INCLUDE 'AGI_ERR'
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_idips'
       INCLUDE 'agi_locs'
       INCLUDE 'agi_pfree'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND, YESNO
 
       INTEGER IDIMS( 2 ), IDIPAR( 3, MXMEMS ), J, JMEMS, NDIM, PICID
 
       CHARACTER * ( DAT__SZLOC ) ISTLOC, WKSLOC
       CHARACTER * ( DAT__SZNAM ) WKNAME
-*-
+
+*.
+
 
 *   Check status on entry
       IF ( STATUS .NE. SAI__OK ) GOTO 99

@@ -1,41 +1,61 @@
 ************************************************************************
-*+  AGI_1WPARS - Write all the parameters into a picture structure
 
       SUBROUTINE AGI_1WPARS ( PICLOC, PNAME, COMENT, DEVICE, NDC, WORLD,
      :                        MEMID, STATUS )
 
-*    Description :
-*     Write all the parameters into a picture structure
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1WPARS
+
+*  Purpose:
+*     Write all the parameters into a picture structure.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1WPARS ( PICLOC, PNAME, COMENT, DEVICE, NDC, WORLD,
-*    :                  MEMID, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Write all the parameters into a picture structure
+
+*  Algorithm:
 *     Check status on entry.
 *     Write each of the parameters in turn.
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Oct 1988
 *     Jun 1990  Added MEMID parameter
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
@@ -57,9 +77,12 @@
 *     Memory identifier
       INTEGER MEMID
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

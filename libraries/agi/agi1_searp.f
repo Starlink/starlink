@@ -1,22 +1,38 @@
 ************************************************************************
-*+  AGI_1SEARP - Search the picture array for a picture
 
       SUBROUTINE AGI_1SEARP( WKNAME, PNAME, PSTART, DIRECN, PICNUM,
      :                       ONAME, COMENT, DEVICE, NDC, WORLD, MEMID,
      :                       STATUS )
 
-*    Description :
+
+*+
+*  Name:
+*     AGI_1SEARP
+
+*  Purpose:
+*     Search the picture array for a picture.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1SEARP( WKNAME, PNAME, PSTART, DIRECN, PICNUM, ONAME,
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     This searches through the database looking for a picture of the
 *     given name. The starting point and direction of the search are
 *     defined by PSTART and DIRECN. If a picture of the correct name
 *     is found then the picture number is returned. The contents of
 *     the picture are also returned.
-*
-*    Invocation :
-*     CALL AGI_1SEARP( WKNAME, PNAME, PSTART, DIRECN, PICNUM, ONAME,
-*    :                 COMENT, DEVICE, NDC, WORLD, MEMID, STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Check status on entry.
 *     Convert the name into uppercase and remove leading blanks.
 *     Test for an empty name string.
@@ -40,13 +56,14 @@
 *        Indicate the correct picture number.
 *     Endif
 *     Tidy up
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
 *     Peter W. Draper ( DUVAD::PWD )
 *     David S. Berry (dsb@ast.man.ac,uk)
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Jul 1988
 *     Jun 1989  Allow for search of cache
 *     Jul 1989  Read database locator from common block
@@ -55,24 +72,31 @@
 *     Aug 1990  Added number of pictures
 *     Jan 1993  Initialise header block if necessary
 *     Jul 2005  Stop nasty jump "GOTO 10" into IF/ELSE/ENDIF block.
-*               Compilers rightly stop accepting this.
+*        Compilers rightly stop accepting this.
 *     Feb 2006  Initialise FOUND to avoid valgrind complaining
-*               Initialise TPNAME to blank to avoid valgrind complaining
-*               and use CHR_LEN for robustness.
+*        Initialise TPNAME to blank to avoid valgrind complaining
+*        and use CHR_LEN for robustness.
+*     {enter_further_changes_here}
 
-*    endhistory
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
       INCLUDE 'AGI_ERR'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation
       CHARACTER * ( * ) WKNAME
 
@@ -85,14 +109,14 @@
 *     Indicator of direction of search
       CHARACTER DIRECN
 
-*    Import-Export :
 
+*  Arguments Given and Returned:
 *     Import - Number of picture to start search if relevant
 *     Export - Number of picture with given name
       INTEGER PICNUM
 
-*    Export :
 
+*  Arguments Returned:
 *     Name of picture found from search
       CHARACTER * ( * ) ONAME
 
@@ -111,16 +135,20 @@
 *     Memory identifier
       INTEGER MEMID
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_cache'
 
-*    External References :
+
+*  External References:
       INTEGER CHR_LEN
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL EMPTY, FOUND, GOTONE, PFOUND, WKSHUT, YESNO
       LOGICAL NASTY
 
@@ -129,7 +157,9 @@
       CHARACTER * ( DAT__SZLOC ) PICLOC, PSTLOC, WKSLOC
       CHARACTER * ( AGI__SZNAM ) TPNAME
       CHARACTER * ( AGI__CMAX ) PVAL
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 

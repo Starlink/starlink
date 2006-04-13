@@ -1,9 +1,28 @@
 ************************************************************************
-*+  AGI_1FNEXT - Get next member from free list
 
       SUBROUTINE AGI_1FNEXT ( FRELEN, FRELIS, NEXFRE, FREEID, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1FNEXT
+
+*  Purpose:
+*     Get next member from free list.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1FNEXT( FRELEN, FRELIS, NEXFRE, FREEID, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Get the next member from the free list. If there are no more
 *     free then return an error in STATUS. The next free element in
 *     the free list is copied from NEXFRE into FREEID and NEXFRE is
@@ -24,47 +43,49 @@
 *                                                     ------------------
 *                                                     | FRELIS(6) | -2 |
 *                                                     ------------------
-*
-*    Invocation :
-*     CALL AGI_1FNEXT( FRELEN, FRELIS, NEXFRE, FREEID, STATUS )
-*
-*    Method :
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Import :
 
+*  Arguments Given:
 *     Length of the array containing the free list.
       INTEGER FRELEN
 
-*    Import-Export :
 
+*  Arguments Given and Returned:
 *     Array containing the free list
       INTEGER FRELIS( FRELEN )
 
 *     Pointer indicating next free in free list array
       INTEGER NEXFRE
 
-*    Export :
 
+*  Arguments Returned:
 *     Indicator to free member
       INTEGER FREEID
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*-
+
+*.
+
 
 *   If there are no more free members then return an error status
       IF ( NEXFRE .LT. 0 ) THEN

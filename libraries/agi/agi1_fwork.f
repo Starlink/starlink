@@ -1,56 +1,85 @@
 ************************************************************************
-*+  AGI_1FWORK - Find a locator to a workstation
 
       SUBROUTINE AGI_1FWORK ( WKNAME, WKSLOC, FOUND, STATUS )
 
-*    Description :
-*     Find the workstation specified by WKNAME.
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1FWORK
+
+*  Purpose:
+*     Find a locator to a workstation.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1FWORK( WKNAME, WKSLOC, FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Find the workstation specified by WKNAME.
+
+*  Algorithm:
 *     Initialise the returned variable.
 *     Check status on entry.
 *     If given workstation is in database then
 *        Get the locator to the workstation.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     July 1989  Read database locator from common block
 *     September 1990  Initialise FOUND
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Name of workstation to find
       CHARACTER * ( * ) WKNAME
 
-*    Export :
 
+*  Arguments Returned:
 *     Locator to workstation. Undefined if .NOT. FOUND
       CHARACTER * ( DAT__SZLOC ) WKSLOC
 
 *     Flag to indicate if workstation has been found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
-*-
+
+*.
+
 
 *   Initialise the returned variable
       FOUND = .FALSE.

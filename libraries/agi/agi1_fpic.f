@@ -1,15 +1,31 @@
 ************************************************************************
-*+  AGI_1FPIC - Find a picture in a picture structure
 
       SUBROUTINE AGI_1FPIC ( PSTLOC, PICNUM, PICLOC, FOUND, STATUS )
 
-*    Description :
-*     Find a picture in a picture stucture.
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1FPIC
+
+*  Purpose:
+*     Find a picture in a picture structure.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1FPIC( PSTLOC, PICNUM, PICLOC, FOUND, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Find a picture in a picture stucture.
+
+*  Algorithm:
 *     Check status on entry.
 *     Inquire the current number of pictures in the array of pictures.
 *     If number less than given picture number
@@ -18,45 +34,58 @@
 *     Else
 *        Get locator to picture cell.
 *     Endif
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
 *     David Berry
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
 *     Feb 2006: Initialise the returned value of FOUND before checking status
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture structure
       CHARACTER * ( DAT__SZLOC ) PSTLOC
 
 *     Requested picture number in array of pictures
       INTEGER PICNUM
 
-*    Export :
 
+*  Arguments Returned:
 *     Locator to picture. Undefined in .NOT. FOUND
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
 *     Flag to indicate if picture has been found
       LOGICAL FOUND
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+
+*  Local Variables:
       INTEGER SIZE
-*-
+
+*.
+
 
       FOUND = .FALSE.
       IF ( STATUS .EQ. SAI__OK ) THEN

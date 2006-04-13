@@ -1,16 +1,32 @@
 ************************************************************************
-*+  AGD_1IIDIP - Recover IDI parameters from the current workstation
 
       SUBROUTINE AGD_1IIDIP ( MEMID, XSCRL, YSCRL, ZOOMF, STATUS )
 
-*    Description :
+*+
+*  Name:
+*     AGD_1IIDIP
+
+*  Purpose:
+*     Recover IDI parameters from the current workstation.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGD_1IIDIP( MEMID, XSCRL, YSCRL, ZOOMF, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Get the IDI memory zoom and scroll factors for the current
 *     workstation from the common block or from the database.
-*
-*    Invocation :
-*     CALL AGD_1IIDIP( MEMID, XSCRL, YSCRL, ZOOMF, STATUS )
-*
-*    Method :
+
+*  Algorithm:
 *     Initialise the returned values.
 *     Check status on entry.
 *     Verify the memory identifier.
@@ -26,35 +42,40 @@
 *           Read the values from the structure.
 *        Endif
 *     Endif
-*
-*    Deficiencies :
-*     <description of any deficiencies>
-*
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     June 1990
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'agi_nam'
       INCLUDE 'AGI_PAR'
       INCLUDE 'AGI_ERR'
 
-*    Import :
+
+*  Arguments Given:
 *     IDI memory identifier
       INTEGER MEMID
 
-*    Export :
+
+*  Arguments Returned:
 *     X-scoll
       INTEGER XSCRL
 
@@ -64,22 +85,27 @@
 *     Zoom factor
       INTEGER ZOOMF
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_idips'
       INCLUDE 'agi_locs'
       INCLUDE 'agi_pfree'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND, YESNO
 
       INTEGER DISPID, IDIMS( 2 ), IDIPAR( 3, MXMEMS ), J, NDIM
 
       CHARACTER * ( DAT__SZLOC ) ISTLOC, WKSLOC
       CHARACTER * ( DAT__SZNAM ) WKNAME
-*-
+
+*.
+
 
 *   Initialise the returned values
       XSCRL = 0

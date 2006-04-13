@@ -1,9 +1,28 @@
 ************************************************************************
-*+  AGI_1FINIT - Initialise a free list.
 
       SUBROUTINE AGI_1FINIT ( FRELEN, FRELIS, NEXFRE )
 
-*    Description :
+*+
+*  Name:
+*     AGI_1FINIT
+
+*  Purpose:
+*     Initialise a free list.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL AGI_1FINIT( FRELEN, FRELIS, NEXFRE )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Initialise a free list so that NEXFRE and FRELIS indicate the
 *     sequence of elements from 1 to FRELEN. The free list is terminated
 *     with a -1 to indicate no more free elements. The initialisation is
@@ -17,42 +36,44 @@
 *                                      ------------------
 *                                      | FRELIS(N) | -1 |
 *                                      ------------------
-*
-*    Invocation :
-*     CALL AGI_1FINIT( FRELEN, FRELIS, NEXFRE )
-*
-*    Method :
-*
-*    Deficiencies :
-*
-*    Bugs :
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     Aug 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Import :
 
+*  Arguments Given:
 *     Length of the array containing the free list.
       INTEGER FRELEN
 
-*    Export :
 
+*  Arguments Returned:
 *     Array containing the free list
       INTEGER FRELIS( FRELEN )
 
 *     Pointer indicating next free in free list array
       INTEGER NEXFRE
 
-*    Local Constants :
+
+*  Local Constants:
       INTEGER I
-*-
+
+*.
+
 
 *   Make NEXFRE point to first member of free list
       NEXFRE = 1

@@ -1,39 +1,64 @@
 ************************************************************************
-*+  AGI_1WPARC - Fill a parameter with a character string
 
       SUBROUTINE AGI_1WPARC ( PICLOC, PTYPE, PVAL, STATUS )
 
-*    Description :
-*     Fill a parameter with a parameter string
-*
-*    Invocation :
+*+
+*  Name:
+*     AGI_1WPARC
+
+*  Purpose:
+*     Fill a parameter with a character string.
+
+*  Language:
+*     VAX Fortran
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
 *     CALL AGI_1WPARC( PICLOC, PTYPE, PVAL, STATUS )
-*
-*    Method :
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     Fill a parameter with a parameter string
+
+*  Algorithm:
 *     Check status on entry.
 *     Check that the input string is less than AGI__CMAX long.
 *     If the parameter structure is not found then
 *        Create one.
 *     Endif
 *     Put the character string into the parameter entry.
-*
-*    Authors :
+
+*  Authors:
 *     Nick Eaton  ( DUVAD::NE )
-*
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     July 1988
-*    endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *
-*    Type Definitions :
+
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'AGI_PAR'
 
-*    Import :
 
+*  Arguments Given:
 *     Locator to picture
       CHARACTER * ( DAT__SZLOC ) PICLOC
 
@@ -43,20 +68,25 @@
 *     Character string to write to parameter
       CHARACTER * ( * ) PVAL
 
-*    Status :
+
+*  Status:
       INTEGER STATUS
 
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'agi_locs'
 
-*    Local variables :
+
+*  Local Variables:
       LOGICAL FOUND
 
       INTEGER CLEN
 
       CHARACTER * ( DAT__SZLOC ) PARLOC
       CHARACTER * ( AGI__SZNAM ) PNAME
-*-
+
+*.
+
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
