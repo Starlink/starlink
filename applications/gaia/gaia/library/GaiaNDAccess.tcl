@@ -148,9 +148,11 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Map in the dataset "data component". Returns the address, number of
    #  elements and the data type (these are in the HDS format). The mapping
-   #  uses mmap, if possible and requested.
-   public method map {} {
-      set addr_ [${type_}::map $handle_ $usemmap]
+   #  uses mmap, if possible and requested and the given access mode, 
+   #  one of "READ", "UPDATE" or "WRITE". Clearly this must match what access
+   #  the file supports.
+   public method map { {access "READ"} } {
+      set addr_ [${type_}::map $handle_ $usemmap $access]
       return $addr_
    }
 
@@ -175,7 +177,8 @@ itcl::class gaia::GaiaNDAccess {
    #  along the axis is required (set to 0 for no effect). Usually this will
    #  be the alow value used in a call to getspectrum.
    public method getaxiswcs {axis shift} {
-      return [${type_}::getwcs $handle_ $axis $shift]
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::getaxiswcs $wcs $axis $shift]
    }
 
    #  Return the address of a spectral line of data. This will only 

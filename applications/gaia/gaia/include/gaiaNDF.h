@@ -35,7 +35,13 @@ extern "C" {
 
    /*  Map an NDF data component */
    int gaiaMapNDF( int ndfid, void **data, const char *component,
-                   char **error_message );
+                   const char *type, char **error_message );
+
+   /*  Create a very simple NDF. */
+   int gaiaCreateNDF( const char *filename, int width, int height, 
+                      const char *type, AstFrameSet *wcs, int *indf, 
+                      char **error_mess );
+
 
 /*  Multiple NDFs per container interface */
 /*  ===================================== */
@@ -110,8 +116,9 @@ extern "C" {
                            char **error_mess );
 
     /* Map in an array component */
-    int gaiaNDFMap( int ndfid, char *type, const char* component, void **data,
-                    int *el, char **error_mess );
+    int gaiaNDFMap( int ndfid, char *type, const char *access, 
+                    const char* component, void **data, int *el, 
+                    char **error_mess );
 
    /*  Unmap an NDF data component */
    int gaiaNDFUnmap( int ndfid, const char *component, char **error_mess );
