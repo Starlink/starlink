@@ -13,7 +13,7 @@
 *     VAX Fortran
 
 *  Type of Module:
-*     ADAM A-task
+*     Subroutine
 
 *  Invocation:
 *     CALL AGI_1FETCU( WKNAME, AGINAM, CURPIC, STATUS )
@@ -36,6 +36,26 @@
 *     If the size of the base picture is different from that expected for
 *     this device delete all pictures in the database and create a new
 *     base picture.
+
+*  Copyright:
+*     Copyright (C) 1991, 1992, 1993 Science & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     Nick Eaton  ( DUVAD::NE )
