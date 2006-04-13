@@ -29,25 +29,29 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 1990, 1994 Science & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
-*     This program is free software; you can redistribute it and/or modify it under
-*     the terms of the GNU General Public License as published by the Free Software
-*     Foundation; either version 2 of the License, or (at your option) any later
-*     version.
-*     
-*     This program is distributed in the hope that it will be useful,but WITHOUT ANY
-*     WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-*     PARTICULAR PURPOSE. See the GNU General Public License for more details.
-*     
-*     You should have received a copy of the GNU General Public License along with
-*     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-*     Place,Suite 330, Boston, MA  02111-1307, USA
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of the
+*     License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful,but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +63,8 @@
 *        Improved the handling of blank lines in prologues.
 *     28-SEP-1990 (RFWS):
 *        Added calls to ERR_MARK and ERR_RLSE.
+*     13-APR-2006 (TIMJ):
+*        Check for ENDFL as well as EOF
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -258,7 +264,8 @@
 *  Arrive here if a start of prologue line is read, or if an error is
 *  encountered. Annul end-of-file errors.
 99    CONTINUE
-      IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+      IF ( STATUS .EQ. FIO__EOF .OR.
+     :     STATUS .EQ. FIO__ENDFL ) CALL ERR_ANNUL( STATUS )
       CALL ERR_RLSE
 
       END
