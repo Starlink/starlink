@@ -32,15 +32,16 @@
 
 #define TCL_OK 0
 #define TCL_ERROR 1
+#define MAXDIM 7
 
 /*
  *  Name:
  *     gaiaUtilsErrMessage
  *
  *  Purpose:
- *     Copy the current EMS error message into a dynamic string for returning. 
+ *     Copy the current EMS error message into a dynamic string for returning.
  *     Make sure status is set before calling this and release the memory used
- *     for the string when complete. On return status is reset to SAI__OK and 
+ *     for the string when complete. On return status is reset to SAI__OK and
  *     the error stack is empty.
  */
 char *gaiaUtilsErrMessage()
@@ -75,7 +76,7 @@ char *gaiaUtilsErrMessage()
             result_copy = (char *) realloc( (void *) result_message,
                                             (size_t) mess_length );
             if ( result_copy == NULL ) {
-                
+
                 /* Realloc failed so use the fragment already recovered in
                  * result_message */
                 status_copy = SAI__OK;
@@ -83,7 +84,7 @@ char *gaiaUtilsErrMessage()
             else {
                 /* Realloc suceeded */
                 result_message = result_copy;
-                
+
                 /* Add a newline to end of string to wrap last line, unless
                  * this is first, in which initialise it */
                 if ( mess_length == ( buffer_length + 2 ) ) {
@@ -92,7 +93,7 @@ char *gaiaUtilsErrMessage()
                 else {
                     strcat( result_message, "\n" );
                 }
-                
+
                 /* Concatenate buffer into result string */
                 strncat( result_message, buffer, buffer_length );
             }
@@ -134,10 +135,10 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
    else if ( iaxes[0] < 1 ) {
        iaxes[0] = 1;
    }
-   
+
    /* If the base frame has more than one axis then select the given one.
     * This is easy, just pick a frame with the appropriate axes and put it
-    * back, note that we have to pick the current frame, so swap things 
+    * back, note that we have to pick the current frame, so swap things
     * around a little. */
    if ( nin != 1 ) {
        astInvert( *iwcs );
@@ -154,7 +155,6 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
            shift[0] = (double) -offset;
            map = astShiftMap( 1, shift, "" );
            astRemapFrame( *iwcs, AST__BASE, map );
-           astAnnul( map );
        }
    }
 
@@ -191,7 +191,7 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
  * current frame ones may not be straight-forward. Note that the value
  * returned by the coord argument should be immediately copied.
  */
-int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords, 
+int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
                          int trailed, int formatted, int ncoords, char **coord,
                          char **error_mess )
 {
@@ -212,10 +212,9 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
     static char buf[256];              /* Static as may be returned */
     static char lcoord[30];            /* Static as may be returned */
 
-
-    /* 
-     * Check dimensionality, if more than ncoords then pad up, if less 
-     * then drop them off. 
+    /*
+     * Check dimensionality, if more than ncoords then pad up, if less
+     * then drop them off.
      */
     current = astGetI( frameset, "Current" );
     base = astGetI( frameset, "Base" );
@@ -283,5 +282,175 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
     if ( ! astOK ) {
         astClearStatus;
     }
+    return TCL_OK;
+}
+
+/**
+ * Return a 2D WCS that describes the coordinates of an image plane extracted
+ * from a cube or higher.
+ *
+ * The arguments are the WCS and the two axis that are to be retained. The
+ * axes correspond to the base frame, not the current frame. The length values
+ * should be the "size" of the axes (image width and height for instance).
+ */
+int gaiaUtilsGt2DWcs( AstFrameSet *fullwcs, int axis1, int axis2, int length1,
+                      int length2, AstFrameSet **iwcs, char **error_mess )
+{
+    AstFrame *baseframe;
+    AstFrame *currentframe;
+    AstFrame *newframe;
+    AstMapping *map;
+    double in1[2][1];
+    double in2[2][1];
+    double out1[MAXDIM][1];
+    double out2[MAXDIM][1];
+    double zero[MAXDIM];
+    int i;
+    int ibase;
+    int icurrent;
+    int iframe;
+    int inperm[MAXDIM];
+    int izero;
+    int n;
+    int nbase;
+    int ncurrent;
+    int outperm[MAXDIM];
+
+    astBegin;
+
+    /* Find out how many dimensions the current and base frames have. */
+    baseframe = (AstFrame *) astGetFrame( fullwcs, AST__BASE );
+    currentframe = (AstFrame *) astGetFrame( fullwcs, AST__CURRENT );
+    nbase = astGetI( baseframe, "Naxes" );
+    ncurrent = astGetI( currentframe, "Naxes" );
+
+    /* Impossible cases */
+    if ( nbase > MAXDIM || ncurrent > MAXDIM ) {
+        *error_mess = strdup( "WCS has two many dimensions (max 7)" );
+        astEnd;
+        return TCL_ERROR;
+    }
+
+    if ( axis1 > nbase || axis2 > nbase ) {
+        *error_mess = strdup( "WCS has too few dimensions for 2D extraction" );
+        astEnd;
+        return TCL_ERROR;
+    }
+
+    if ( axis1 == axis2 ) {
+        *error_mess = strdup( "2D selected axes cannot be the same" );
+        astEnd;
+        return TCL_ERROR;
+    }
+
+    /* Make a copy of the WCS for modification */
+    *iwcs = (AstFrameSet *) astCopy( fullwcs );
+
+    /* Check for nothing to do. */
+    if ( nbase == 2 && ncurrent == 2 ) {
+        astExport( *iwcs );
+        astEnd;
+        return TCL_OK;
+    }
+
+    /* Indices of the frames to modify */
+    ibase = astGetI( *iwcs, "Base" );
+    icurrent = astGetI( *iwcs, "Current" );
+
+    /* Pick out the axes from the base frame */
+    outperm[0] = axis1;
+    outperm[1] = axis2;
+    newframe = (AstFrame *) astPickAxes( baseframe, 2, outperm, NULL );
+
+    /* Create a mapping for this permutation that doesn't have <bad>
+     * values as the result. */
+    for ( i = 0; i < MAXDIM; i++ ) {
+        zero[i] = 0.0;
+        inperm[i] = -1;
+    }
+    inperm[axis1] = 1;
+    inperm[axis2] = 2;
+    map = (AstMapping *) astPermMap( nbase, inperm, 2, outperm, zero, "" );
+
+    /* Now add this frame to the FrameSet and make it the base one. Also
+     * reinstate the currentframe as the current frame. */
+    astAddFrame( *iwcs, ibase, map, newframe );
+    iframe = astGetI( *iwcs, "Current" );
+    astSetI( *iwcs, "Base", iframe );
+    astSetI( *iwcs, "Current", icurrent );
+
+    /* Now deal with currentframe. In an attempt to make sure we pick the
+     * correct axes that correspond to those chosen we try a transformation to
+     * see which axes are jiggled. Note this takes two goes as any other axes
+     * can be fixed at a given value (and will be returned as this, say a
+     * constant frequency) so we need a genuine movement on the image to
+     * detect the correct axes. */
+    in1[0][0] = 0.0;
+    in1[1][0] = 0.0;
+    for ( i = 0; i < MAXDIM; i++ ) {
+        out1[i][0] = 0.0;
+    }
+    astTranN( *iwcs, 1, 2, 1, (double *)in1, 1, ncurrent, 1, (double *)out1 );
+
+    in2[0][0] = length1;
+    in2[1][0] = length2;
+    for ( i = 0; i < MAXDIM; i++ ) {
+        out2[i][0] = 0.0;
+    }
+    astTranN( *iwcs, 1, 2, 1, (double *)in2, 1, ncurrent, 1, (double *)out2 );
+
+    /* Check to see which dimensions have jiggled. */
+    n = 0;
+    for ( i = 0; i < ncurrent; i++ ) {
+        if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
+            n++;
+        }
+    }
+    if ( ! astOK ) {
+        astClearStatus;
+    }
+
+    if ( n != 2 ) {
+        *error_mess = strdup( "Failed to pick out world coordinates" );
+        astEnd;
+        return TCL_ERROR;
+    }
+
+    /* Choose the selected axes from the currentframe. */
+    n = 0;
+    izero = -1;
+    for ( i = 0; i < ncurrent; i++ ) {
+        if ( fabs( out1[i][0] - out2[i][0] ) > DBL_EPSILON ) {
+            outperm[n++] = i + 1;
+            inperm[i] = n;
+        }
+        else {
+            if ( out1[i][0] != AST__BAD ) { // Single valued coordinate
+                zero[abs(izero) - 1] = out1[i][0];
+            }
+            else {
+                zero[abs(izero) - 1] = 0.0;
+            }
+            inperm[i] = izero--;
+        }
+    }
+    newframe = (AstFrame *) astPickAxes( currentframe, 2, outperm, NULL );
+
+    /* Create a mapping for this permutation that doesn't have <bad>
+     * values as the result. */
+    map = (AstMapping *)astPermMap( ncurrent, inperm, 2, outperm, zero, "" );
+
+    /* Now add this frame to the FrameSet. */
+    astAddFrame( *iwcs, icurrent, map, newframe );
+
+    /* If the above went well then assume we're in the clear, otherwise
+     * indicate an error. */
+    if ( !astOK ) {
+        astClearStatus;
+        astEnd;
+        return TCL_ERROR;
+    }
+    astExport( *iwcs );
+    astEnd;
     return TCL_OK;
 }
