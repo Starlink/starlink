@@ -20,11 +20,16 @@ C
 C Converted to Double Precision (KPD), August 2001
 C Modified to incorporate dynamic memory allocation for major
 C  data/work array(s) and/or use of such arrays (KPD), October 2001
+C
+C Brad Cavanagh, 13-APR-2006: Replaced non-standard TYPE parameter to OPEN
+C  with STATUS.
 C=============================================================================
  
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
+
+      INCLUDE 'SAE_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -44,11 +49,10 @@ C-----------------------------------------------------------------------------
       DOUBLE PRECISION JUNK(1), DUMMY
       INTEGER NUMCOLS, NUMROWS, IFAIL, XCOL, YCOL, YCOLERR
       INTEGER SLOT, FIRSTSLOT, LASTSLOT, IUNIT
-      INTEGER KEYPTR, YSLOT1
+      INTEGER KEYPTR, YSLOT1, STATUS
       CHARACTER*72 INFILEARRAY(MXSLOT), INFILE
       CHARACTER*1 BELL, REPLY, FLAG*6, STRING
       LOGICAL YERRORARRAY(MXSLOT), YERROR, DETRENDARRAY(MXSLOT)
-      DATA BELL, IUNIT/7, 12/
 
 
 C-----------------------------------------------------------------------------
@@ -58,6 +62,8 @@ C-----------------------------------------------------------------------------
       NUMROWS=0
       NUMCOLS=0
       YERROR=.FALSE.
+      STATUS=SAI__OK
+      CALL FIO_GUNIT( IUNIT, STATUS )
 
 C-----------------------------------------------------------------------------
 C Select slots to load.
@@ -70,7 +76,7 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
          IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Maximum slot number = ', MXSLOT
             GO TO 400
          END IF
@@ -88,7 +94,7 @@ C-----------------------------------------------------------------------------
             IF ( INFILEARRAY(SLOT)(1:1).EQ.' ' ) GO TO 400
             INFILE = INFILEARRAY(SLOT)
             INFILEARRAY(SLOT) = 'Data File = ' // INFILEARRAY(SLOT)
-            OPEN (UNIT=IUNIT, FILE=INFILE, TYPE='OLD', 
+            OPEN (UNIT=IUNIT, FILE=INFILE, STATUS='OLD', 
      :            FORM='FORMATTED', ERR=110)
 
             MXROW = 1
@@ -98,7 +104,7 @@ C-----------------------------------------------------------------------------
      :                           IUNIT, IFAIL)
 
             IF ( IFAIL.EQ.1 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Something wrong with input file.'
                CLOSE (UNIT=IUNIT)
                GO TO 400
@@ -173,12 +179,12 @@ C-----------------------------------------------------------------------------
                   GO TO 400
                END IF
             ELSE IF ( NUMCOLS.EQ.1 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Only one column found.'
                CLOSE (UNIT=IUNIT)
                GO TO 400
             ELSE IF ( NUMCOLS.EQ.2 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** WARNING: Only two columns found.'
                WRITE (*, *) 
      :                    '** WARNING: Will assume there are no errors.'
@@ -332,5 +338,6 @@ C-----------------------------------------------------------------------------
       END IF
 
  400  CONTINUE
+      CALL FIO_PUNIT( IUNIT, STATUS )
       RETURN
       END
