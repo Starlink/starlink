@@ -192,3 +192,4 @@ int GaiaFITSHGet( StarFitsIO *fitsio, char *keyword, int *value )
     }
     return TCL_ERROR;
 }
+
