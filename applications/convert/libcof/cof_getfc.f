@@ -134,18 +134,29 @@
 *  Assume that the values are good for the moment.
          GOOD = .TRUE.
 
-*  Validate the values.  First get each value, convert it to a logical
-*  and then test that the conversion was successful.
+*  Validate the values.  First get each value.  Command-line
+*  keywords can appear instead of the values.  So recognise the
+*  command-line keyword presence meaning TRUE and no<keyword> meaning 
+*  FALSE.  Update the group values.
          DO I = 1, NFC
             CALL GRP_GET( GRPID, I, 1, FMTCON, STATUS )
             CALL CHR_UCASE( FMTCON )
-            IF ( FMTCON .EQ. 'FMTCN' ) THEN
+            IF ( FMTCON .EQ. PARNAM( 1:5 ) ) THEN
                FMTCON = 'TRUE'
-            ELSE IF ( FMTCON .EQ. 'NOFMT' ) THEN
+            ELSE IF ( FMTCON .EQ. 'NO'//PARNAM( 1:3 ) ) THEN
                FMTCON = 'FALSE'
             END IF
-            CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
+            CALL ERR_MARK
+            CALL GRP_PUT( GRPID, 1, FMTCON, I, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               FMTCON = 'TRUE'
+            ENDIF
+            CALL ERR_RLSE( STATUS )
 
+*  Convert the group value to a logical and then test that the 
+*  conversion was successful.
+            CALL CHR_CTOL( FMTCON, FMTCNV, STATUS )
             IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Annul the error status.
