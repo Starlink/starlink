@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LFTPS<T>( X, Y, V, ORDER, BONLY, A, B )
+*     CALL KPS1_LFTPS( X, Y, V, ORDER, BONLY, A, B )
 
 *  Description
 *     This routine adds a point into the cumulative sums for KPS1_LFTx
@@ -35,11 +35,14 @@
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-SEP-2005 (PWD):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variable and correct invocation.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -48,7 +51,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE             ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
 
@@ -64,10 +67,9 @@
       DOUBLE PRECISION B( ORDER + 1 )
 
 *  Local Variables:
-      DOUBLE PRECISION W        ! Weight, inverse variance.
-      INTEGER I                 ! Loop index
-      INTEGER J                 ! Loop index
-      INTEGER K                 ! Loop index
+      DOUBLE PRECISION W         ! Weight, inverse variance.
+      INTEGER J                  ! Loop index
+      INTEGER K                  ! Loop index
 *.
 
       W = 1.0D0 / V
