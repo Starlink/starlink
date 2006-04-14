@@ -11,7 +11,7 @@
 
 #include "hds1.h"                /* Global definitions for HDS              */
 #include "rec.h"                 /* Public rec_ definitions                 */
-#include "rec1.h"                /* Pricate rec_ definitions                */
+#include "rec1.h"                /* Private rec_ definitions                */
 #include "str.h"                 /* Character string import/export macros   */
 #include "dat1.h"                /* Internal dat_ definitions               */
 #include "dat_err.h"             /* DAT__ error code definitions            */
@@ -86,27 +86,14 @@ datMove(HDSLoc **locator1,
       _call(DAT__ACCON)
 
 /* Import the second locator and return if it points to anything other than
-   a single structure object.   */
+   a single structure object.
+   Note - sets hds_gl_64bit appropiately for lcp2 */
 
    _call(dat1_import_loc(locator2, &lcp2 ));
    data2 = &lcp2->data;
    if (!data2->struc || data2->naxes != 0)
       _call(DAT__OBJIN)
 
-/* Check that lcp1 and lcp2 refer to the same HDS version files */
-/* TO BE FIXED - bkm - 20030306                                 */
-
-/* Set operating 64-bit mode to that of lcp2 */
-   hds_gl_64bit =  (rec_ga_fcv[(&data2->han)->slot].hds_version > REC__VERSION3); 
-   if(rec_ga_fcv[(&data2->han)->slot].hds_version !=
-     rec_ga_fcv[(&data1->han)->slot].hds_version) {
-     *status = DAT__INCHK;
-     hds_gl_status = *status;
-     emsRep(context_name, context_message " HDS error - cannot cope with "
-            "record move between different HDS version files",
-	    status );
-    }
-     
 /* Validate the object's new name.      */
 
    _call( dau_check_name( &name, nambuf ))
@@ -208,6 +195,7 @@ datMove(HDSLoc **locator1,
    else                           /* NB, pro_exit won't have been called */
    {
       rec_get_rid( &data1->han, &rid1 );
+      hds_gl_64bit = rcl1.extended;
       dat1_pack_crv( &rid1, 0, crv1 );
       _call( dat1_move_object( 1, &data1->han, crv1, &han[ 0 ],
                                crv + ncomp*SZCRV ) )
@@ -216,11 +204,13 @@ datMove(HDSLoc **locator1,
 /* Bump the component count in the destination object and release the CRV. */
 
    ++ncomp;
+   hds_gl_64bit = rec_ga_fcv[han[0].slot].hds_version > REC__VERSION3;
    dat1_put_ncomp( &han[0], ncomp );
    rec_release_data( &han[0], rcl.dlen, 0, 'U', &crv );
 
 /* Read the Record Control Label of component record and adjust the count. */
 
+   hds_gl_64bit = rec_ga_fcv[han[1].slot].hds_version > REC__VERSION3;
    rec_get_rcl( &han[1], &rcl );
    dat1_get_ncomp( &han[1], &ncomp );
    --ncomp;
@@ -380,6 +370,7 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
 
    for ( comp=0; comp<ncomp; comp++ )
    {
+      SET_64BIT_MODE(src);
       dat1_unpack_crv( src_crv, comp, &rid1 );
       rec_get_handle( &rid1, src, &src1 );
       _invoke( rec_get_rcl( &src1,&rcl1 ))
@@ -392,10 +383,15 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    for write access automatically sets it active - it should be active if
    the domain it was copied from is active.     */
 
+      SET_64BIT_MODE(des);
       _invoke( rec_create_record( des, &rcl1, &des1 ))
+      SET_64BIT_MODE(src);
       _invoke( dat1_get_odl( &src1,&odl1 ))
+      SET_64BIT_MODE(des);
       _invoke( dat1_put_odl( &des1,&odl1 ))
+      SET_64BIT_MODE(src);
       _invoke( rec_locate_data( &src1, rcl1.dlen, 0, 'R', &spntr1 ) )
+      SET_64BIT_MODE(des);
       _invoke( rec_locate_data( &des1, rcl1.dlen, 0, 'W', &dpntr1 ) )
       _chmove( rcl1.dlen, spntr1, dpntr1);
       if (!active)
@@ -405,6 +401,7 @@ int dat1_move_object(int ncomp, struct HAN *src, unsigned char *src_crv,
    Record Vector.       */
 
       rec_get_rid( &des1, &rid1 );
+      SET_64BIT_MODE(des);
       dat1_pack_crv( &rid1, comp, des_crv );
 
 /* If the component is primitive this is all that is necessary. If it is
