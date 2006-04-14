@@ -22,7 +22,7 @@
 *  Description:
 *     This routine expands the size of an NDF structure by duplicating
 *     each input pixel a specified number of times along each dimension,
-*     to create a new NDF structure. Each block of output pixels
+*     to create a new NDF structure.  Each block of output pixels
 *     (formed by duplicating a single input pixel) can optionally be
 *     masked, for instance to set selected pixels within each output
 *     block bad.
@@ -43,31 +43,31 @@
 *     IMASK() = INTEGER (Read)
 *        Only used if a null (!) value is supplied for parameter MASK. 
 *        If accessed, the number of values supplied for this parameter
-*        should equal the number of pixel axes in the output NDF. A mask
-*        array is then created which has bad values at every element
-*        except for the element with indices given by IMASK, which is
-*        set the value 1.0. See parameter MASK for a description of the
-*        use of the mask array. If a null (!) value is supplied for
-*        IMASK, then no mask is used, and every output pixel in an
-*        output block is set to the value of the corresponding input
-*        pixel. [!]
+*        should equal the number of pixel axes in the output NDF.  A 
+*        mask array is then created which has bad values at every 
+*        element except for the element with indices given by IMASK, 
+*        which is set to the value 1.0.  See parameter MASK for a 
+*        description of the use of the mask array.  If a null (!) value
+*        is supplied for IMASK, then no mask is used, and every output
+*        pixel in an output block is set to the value of the
+*        corresponding input pixel.  [!]
 *     IN  = NDF (Read)
 *        Input NDF structure to be expanded.
 *     MASK = NDF (Read)
-*        An input NDF structure holding the mask to be used. If a null
+*        An input NDF structure holding the mask to be used.  If a null
 *        (!) value is supplied, parameter IMASK will be used to
-*        determine the mask. If supplied, the NDF Data array will be
+*        determine the mask.  If supplied, the NDF Data array will be
 *        trimmed or padded (with bad values) to create an array in which
 *        the lengths of the pixel axes are equal to the values supplied
-*        for parameter EXPAND. Each block of pixels in the output array
+*        for parameter EXPAND.  Each block of pixels in the output array
 *        (i.e. the block of output pixels which are created from a
 *        single input pixel) are multiplied by this mask array before
-*        being stored in the output NDF. [!]
+*        being stored in the output NDF.  [!]
 *     OUT = NDF (Write)
 *        Output NDF structure.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
-*        propagates the title from the input NDF to the output NDF. [!]
+*        propagates the title from the input NDF to the output NDF.  [!]
 
 *  Examples:
 *     pixdupe aa bb 2
@@ -83,7 +83,7 @@
 *        This expands the NDF called cube1 by having three pixels for
 *        each pixel along the first axis and duplicating along the
 *        third axis, and stores the enlarged data in the NDF called
-*        cube2.  The title of cube2 is {\tt "Reconfigured cube"}.
+*        cube2.  The title of cube2 is "Reconfigured cube".
 
 *  Related Applications:
 *     KAPPA: COMPADD, COMPAVE, COMPICK, PIXDUPE.
@@ -119,6 +119,8 @@
 *        Use CNF_PVAL
 *     11-NOV-2004 (DSB):
 *        Added parameters MASK and IMASK.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -141,8 +143,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix component of linear mapping
-      DOUBLE PRECISION OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix 
+                                 ! component of linear mapping
+      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of 
+                                 ! linear mapping
       INTEGER ACTVAL             ! Actual number of compression factors
       INTEGER AEXPND( NDF__MXDIM ) ! Axis expansion factors
       INTEGER AIDIMS( NDF__MXDIM ) ! Axis expansion dimensions of input
@@ -159,7 +163,6 @@
                                  ! components
       INTEGER IDIMS( NDF__MXDIM )! Dimensions of input NDF
       INTEGER IMASK( NDF__MXDIM )! Indices of the good mask pixel
-      INTEGER ISHIFT( NDF__MXDIM )! Shift required to align pixel coords
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDM( NDF__MXDIM ) ! Lower bounds of mask NDF
@@ -167,9 +170,9 @@
       INTEGER NCD                ! No. of characters in dimension list
       INTEGER NDFI               ! Identifier to the input NDF
       INTEGER NDFM               ! Identifier to the mask NDF
-      INTEGER NDFMS              ! Identifier for a section of the mask NDF
+      INTEGER NDFMS              ! Identifier for a section of mask NDF
       INTEGER NDFO               ! Identifier to the output NDF
-      INTEGER NDFS               ! Identifier to the section of the input
+      INTEGER NDFS               ! Identifier to the section of input 
                                  ! NDF
       INTEGER NDIM               ! Dimensionality of the NDF
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
@@ -302,7 +305,7 @@
 
 *  If an NDF was obtained, take a section of it which matches the
 *  expansion factors  and get a pointer to its data array.
-      IF( STATUS .EQ. SAI__OK ) THEN
+      IF ( STATUS .EQ. SAI__OK ) THEN
          USEMSK = .TRUE.
 
          DO I = 1, NDF__MXDIM
@@ -314,26 +317,26 @@
          CALL KPG1_MAP( NDFMS, 'Data', '_REAL', 'READ', PNTRM, EL, 
      :                  STATUS )
 
-*  If a null value was supplied, annul the error and get the indicies of 
+*  If a null value was supplied, annul the error and get the indices of 
 *  the one good mask pixel. 
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CALL PAR_EXACI( 'IMASK', NDIM, IMASK, STATUS )
 
 *  If a null value was supplied for IMASK, do not use a mask.
-         IF( STATUS .EQ. PAR__NULL ) THEN    
+         IF ( STATUS .EQ. PAR__NULL ) THEN    
             CALL ERR_ANNUL( STATUS )
             USEMSK = .FALSE.
          ELSE 
             USEMSK = .TRUE.
 
-*  Ensure all the indices are within the range of the expansion box. At the
-*  same time store the number of elements in the mask array.
+*  Ensure all the indices are within the range of the expansion box.  At
+*  the same time store the number of elements in the mask array.
             EL = 1
             DO I = 1, NDIM
-               IF( IMASK( I ) .LT. 1 ) THEN
+               IF ( IMASK( I ) .LT. 1 ) THEN
                   IMASK( I ) = 1
-               ELSE IF( IMASK( I ) .GT. EXPAND( I ) ) THEN
+               ELSE IF ( IMASK( I ) .GT. EXPAND( I ) ) THEN
                   IMASK( I ) = EXPAND( I )
                END IF
                EL = EL * EXPAND( I ) 
@@ -344,7 +347,7 @@
                IMASK( I ) = 1
             END DO
    
-*  Get work space to hold the mask array
+*  Get work space to hold the mask array.
             CALL PSX_CALLOC( EL, '_REAL', PNTRM, STATUS )
    
 *  Create the mask.
@@ -357,10 +360,10 @@
 *  Expand the data array.
 *  ======================
 
-*  Without masking the values and quality are merely duplicated, so there is 
-*  no need to test for bad values.  Hence we can switch off automatic quality
-*  masking too.
-      IF( .NOT. USEMSK ) CALL NDF_SQMF( .FALSE., NDFI, STATUS )
+*  Without masking the values and quality are merely duplicated, so 
+*  there is no need to test for bad values.  Hence we can switch off
+*  automatic quality masking too.
+      IF ( .NOT. USEMSK ) CALL NDF_SQMF( .FALSE., NDFI, STATUS )
 
 *  Find the data type of the data array.
       CALL NDF_TYPE( NDFI, 'Data', ITYPE, STATUS )
@@ -801,8 +804,8 @@
   999 CONTINUE
 
 *  Free workspace.
-      IF( USEMSK .AND. NDFM .EQ. NDF__NOID ) CALL PSX_FREE( PNTRM, 
-     :                                                      STATUS )
+      IF ( USEMSK .AND. NDFM .EQ. NDF__NOID ) CALL PSX_FREE( PNTRM, 
+     :                                                       STATUS )
 
 *  Tidy the NDF system.
       CALL NDF_END( STATUS )

@@ -4,7 +4,7 @@
 *     ROTATE
 
 *  Purpose:
-*     Rotates a 2-dimensional NDF about its centre through any angle.
+*     Rotates a two-dimensional NDF about its centre through any angle.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,30 +20,33 @@
 *        The global status.
 
 *  Description:
-*     This routine rotates a 2-dimensional array stored in an NDF data
+*     This routine rotates a two-dimensional array stored in an NDF data
 *     structure by an arbitrary angle.  The rotation angle can be chosen
-*     automatically to make north vertical in the output NDF (see parameter
-*     ANGLE). The origin of the rotation is around the point (0,0) in pixel 
-*     co-ordinates.  The output array dimensions just accommodate the rotated 
-*     array.  Output pixels can  be generated from the input array by one of 
-*     two methods: nearest-neighbour substitution or by bi-linear interpolation.  
-*     The latter is slower, but gives better results. Output pixels not 
-*     corresponding to input pixels take the bad value.
+*     automatically to make north vertical in the output NDF (see 
+*     parameter ANGLE).  The origin of the rotation is around the point
+*     (0,0) in pixel co-ordinates.  The output array dimensions just
+*     accommodate the rotated array.  Output pixels can be generated 
+*     from the input array by one of two methods: nearest-neighbour
+*     substitution or by bi-linear interpolation.  The latter is slower,
+*     but gives better results.  Output pixels not corresponding to 
+*     input pixels take the bad value.
 
 *  Usage:
 *     rotate in out angle
 
 *  ADAM Parameters:
-*     ANGLE  = _REAL (Read)
+*     ANGLE = _REAL (Read)
 *        Number of clockwise degrees by which the data array is to be
-*        rotated.  It must lie between -360 and 360 degrees.  The suggested
-*        default is the current value. If a null (!) value is supplied,
-*        then the rotation angle is chosen to make north vertical. If the
-*        current co-ordinate Frame in the input NDF is not a celestial co-ordinate
-*        frame, then the rotation angle is chosen to make the second axis
-*        of the current Frame vertical.
+*        rotated.  It must lie between -360 and 360 degrees.  The 
+*        suggested default is the current value.  If a null (!) value is
+*        supplied, then the rotation angle is chosen to make north
+*        vertical.  If the current co-ordinate Frame in the input NDF
+*        is not a celestial co-ordinate frame, then the rotation angle
+*        is chosen to make the second axis of the current Frame
+*        vertical.
 *     IN = NDF (Read)
-*        NDF structure containing the 2-dimensional array to be rotated.
+*        NDF structure containing the two-dimensional array to be 
+*        rotated.
 *     NNMETH = _LOGICAL (Read)
 *        If TRUE, the nearest-neighbour method will be used to evaluate
 *        the output data-array pixels.  This is only accessed when the
@@ -54,32 +57,32 @@
 *        This parameter is only accessed when NNMETH is FALSE and ANGLE
 *        is not a multiple of 90 degrees.  Strictly, the quality values
 *        are undefined by the bi-linear interpolation and hence cannot
-*        be propagated.  However, QUALITY = TRUE offers an approximation 
-*        to the quality array by propagating the nearest-neighbour quality 
-*        to the output NDF. [FALSE]
+*        be propagated.  However, QUALITY = TRUE offers an approximation
+*        to the quality array by propagating the nearest-neighbour
+*        quality to the output NDF.  [FALSE]
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
-*        of the NDF supplied for parameter IN to be used instead. [!]
+*        of the NDF supplied for parameter IN to be used instead.  [!]
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the current co-ordinate Frame of the 
-*        NDF has more than 2 axes. A group of two strings should be
-*        supplied specifying the 2 axes which are to be used when
-*        determining the rotation angle needed to make north vertical. Each
-*        axis can be specified either by its integer index within the current 
-*        Frame (in the range 1 to the number of axes in the current Frame), or
-*        by its symbol string. A list of acceptable values is displayed if an 
-*        illegal value is supplied. If a null (!) value is supplied, the axes 
-*        with the same indices as the 2 used pixel axes within the NDF
-*        are used. [!]
+*        USEAXIS is only accessed if the current co-ordinate Frame of
+*        the NDF has more than two axes.  A group of two strings should
+*        be supplied specifying the two axes which are to be used when
+*        determining the rotation angle needed to make north vertical. 
+*        Each axis can be specified either by its integer index within
+*        the current Frame (in the range 1 to the number of axes in the
+*        current Frame), or by its symbol string.  A list of acceptable
+*        values is displayed if an illegal value is supplied.  If a null
+*        (!) value is supplied, the axes with the same indices as the 
+*        two used pixel axes within the NDF are used.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        A TRUE value causes variance values to be used as weights for
 *        the pixel values in bi-linear interpolation, and also causes 
-*        output variances to be created. This parameter is ignored if 
-*        ANGLE is a multiple of 90 degrees or NNMETH=TRUE; in these cases 
-*        the variance array is merely propagated.  If a null (!) value is 
-*        supplied, the value used is TRUE if the input NDF has a VARIANCE 
-*        component, and FALSE otherwise.  Note that following this operation 
-*        the errors are no longer independent. [!]
+*        output variances to be created.  This parameter is ignored if 
+*        ANGLE is a multiple of 90 degrees or NNMETH=TRUE; in these
+*        cases the variance array is merely propagated.  If a null (!)
+*        value is supplied, the value used is TRUE if the input NDF has
+*        a VARIANCE component, and FALSE otherwise.  Note that following
+*        this operation the errors are no longer independent.  [!]
 
 *  Notes:
 *     -  Bad pixels are ignored in the bi-linear interpolation.  If all
@@ -88,32 +91,35 @@
 *  Examples:
 *     rotate ns ew 90
 *        This rotates the array components in the NDF called ns by 90
-*        degrees clockwise around pixel co-ordinates [0,0] and stores the 
-*        result in the NDF called ew.  The former x axis becomes the new
-*        y axis, and the former y axis becomes the new x axis. The former 
-*        y-axis arrays are also reversed in the process.
+*        degrees clockwise around pixel co-ordinates [0,0] and stores 
+*        the result in the NDF called ew.  The former x axis becomes the
+*        new y axis, and the former y axis becomes the new x axis.  The
+*        former y-axis arrays are also reversed in the process.
 *     rotate m31 m31r angle=!
 *        This rotates the NDF called m31 so that north is vertical and
-*        stores the results in an NDF called m31r. This assumes that the
-*        current WCS Frame in the input NDF is a celestial coordinate Frame.
+*        stores the results in an NDF called m31r.  This assumes that 
+*        the current WCS Frame in the input NDF is a celestial 
+*        co-ordinate Frame.
 *     rotate angle=180 out=sn in=ns
 *        This rotates the array components in the NDF called ns by 180
-*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
-*        the result in the NDF called sn.  The axis arrays are flipped in 
-*        the output NDF.
+*        degrees clockwise around the pixel co-ordinates [0,0], and 
+*        stores the result in the NDF called sn.  The axis arrays are
+*        flipped in the output NDF.
 *     rotate f1 f1r 37.2 novariance
 *        This rotates the array components in the NDF called f1 by 37.2
-*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
-*        the result in the NDF called f1r.  The original axis information 
-*        is lost.  Bi-linear interpolation is used without variance 
-*        information.  No quality or variance information is propagated.
+*        degrees clockwise around the pixel co-ordinates [0,0], and
+*        stores the result in the NDF called f1r.  The original axis 
+*        information is lost.  Bi-linear interpolation is used without
+*        variance information.  No quality or variance information is
+*        propagated.
 *     rotate f1 f1r 106 nnmeth title="Reoriented features map"
 *        This rotates the array components in the NDF called f1 by 106
-*        degrees clockwise around the pixel co-ordinates [0,0], and stores 
-*        the result in the NDF called f1r.  The original axis information 
-*        is lost.  The resultant array components, all of which are 
-*        propagated, are calculated by the nearest-neighbour method. The 
-*        title of the output NDF is "Reoriented features map".
+*        degrees clockwise around the pixel co-ordinates [0,0], and 
+*        stores the result in the NDF called f1r.  The original axis
+*        information is lost.  The resultant array components, all of 
+*        which are propagated, are calculated by the nearest-neighbour
+*        method.  The title of the output NDF is "Reoriented features 
+*        map".
 
 *  Related Applications:
 *     KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
@@ -122,13 +128,13 @@
 *     The propagation rules depend on parameters ANGLE and NNMETH.
 *
 *     -  For rotations that are multiples of 90-degrees, VARIANCE,
-*     QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
-*     NDF are propagated to the output NDF.  The axis and WCS components 
-*     are switched and flipped as appropriate.
+*     QUALITY, AXIS, HISTORY, LABEL WCS, and UNITS components of the 
+*     input NDF are propagated to the output NDF.  The axis and WCS
+*     components are switched and flipped as appropriate.
 *     -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
-*     LABEL, WCS and UNITS components of the input NDF are propagated to 
-*     the output NDF.
-*     -  For the linear interpolation method HISTORY, LABEL, WCS and
+*     LABEL, WCS, and UNITS components of the input NDF are propagated
+*     to the output NDF.
+*     -  For the linear interpolation method HISTORY, LABEL, WCS, and
 *     UNITS components of the input NDF are propagated to the output
 *     NDF.  In addition if parameter VARIANCE is TRUE, variance
 *     information is derived from the input variance; and if parameter
@@ -152,8 +158,9 @@
 *     1995 May 14 (MJC):
 *        Original NDF version.
 *     12-JUN-1998 (DSB):
-*        Added propagation of the NDF WCS component. Fixed bug which
-*        prevented 2-D slices from n-D cubes being processed.
+*        Added propagation of the NDF WCS component.  Fixed bug which
+*        prevented two-dimensional slices from n-dimensional cubes 
+*        being processed.
 *     30-JUN-1999 (TDCA):
 *        Allowed rotation around an arbitary point.
 *     02-JUL-1999 (TDCA):
@@ -164,10 +171,12 @@
 *     15-FEB-2002 (DSB):
 *        Added option to rotate north to vertical.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     24-AUG-2005 (DSB):
-*        Corrected to work with 1D NDFs. Also treat zero rotation as a
-*        special case.
+*        Corrected to work with one-dimensional NDFs.  Also treat zero 
+*        rotation as a special case.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -212,12 +221,17 @@
      :  C(2),                    ! Third point
      :  ANGLED,                  ! Rotation angle 
      :  COSANG,                  ! Cosine of rotation angle
-     :  IXC,                     ! X pix. coord. at centre of input array
-     :  IYC,                     ! Y pix. coord. at centre of input array
-     :  MATRIX( NDF__MXDIM*NDF__MXDIM ), ! Rotation matrix for i/p -> o/p mapping
+     :  IXC,                     ! X pixel co-ord. at centre of input 
+                                 ! array
+     :  IYC,                     ! Y pixel co-ord. at centre of input 
+                                 ! array
+     :  MATRIX( NDF__MXDIM*NDF__MXDIM ), ! Rotation matrix for 
+                                 ! i/p -> o/p mapping
      :  OFFSET( NDF__MXDIM ),    ! Offset vector for i/p -> o/p mapping
-     :  OXC,                     ! X pix. coord. at centre of output array
-     :  OYC,                     ! Y pix. coord. at centre of output array
+     :  OXC,                     ! X pixel co-ord. at centre of output
+                                 ! array
+     :  OYC,                     ! Y pixel co-ord. at centre of output 
+                                 ! array
      :  SINANG,                  ! Sine of rotation angle
      :  XP(2),                   ! Axis 1 values
      :  YP(2)                    ! Axis 2 values
@@ -243,9 +257,9 @@
       INTEGER I                  ! Loop counter
       INTEGER ICOMP              ! Loop counter for array components
       INTEGER IDIM               ! Total number of dimensions
-      INTEGER IDIMS( 2 )         ! Dimensions of input array
       INTEGER IERR               ! Location of first conversion error
-      INTEGER ISHIFT( 2 )        ! Extra shift required to align pivot points
+      INTEGER ISHIFT( 2 )        ! Extra shift required to align pivot
+                                 ! points
       INTEGER IWCS               ! WCS FrameSet for input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output array
       INTEGER LONG               ! Longer dimension of input array
@@ -258,7 +272,6 @@
       LOGICAL NRAFLG             ! Non-right angle rotation requested?
       INTEGER NUMRA              ! Number of clockwise right angles to
                                  ! be applied
-      INTEGER ODIMS( 2 )         ! Dimensions of output array
       INTEGER PNTRI( 2 )         ! Pointer to mapped input arrays
       INTEGER PNTRO( 2 )         ! Pointer to mapped output arrays
       LOGICAL QUAL               ! Propagate quality?
@@ -297,10 +310,10 @@
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Get an AST pointer to a FrameSet describing the co-ordinate Frames
-*  present in the NDF's WCS component. Modify it to ensure that the Base,
-*  PIXEL and Current frames all have 2 dimensions. The NDF must have no
-*  more than 2 significant dimensions (i.e. axes spanning more than 1
-*  pixel). A single significant axis is allowed.
+*  present in the NDF's WCS component.  Modify it to ensure that the
+*  Base, PIXEL and Current frames all have two dimensions.  The NDF must
+*  have no more than two significant dimensions (i.e. axes spanning more
+*  than one pixel).  A single significant axis is allowed. 
       CALL KPG1_ASGET( NDFI, NDIM, .FALSE., .TRUE., .TRUE., SDIM, 
      :                 SLBNDI, SUBNDI, IWCS, STATUS )
 
@@ -313,11 +326,11 @@
 *  will be modified below.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDO, UBNDO, IDIM, STATUS )
 
-*  Ensure we are using at least 2 pixel axes.
-      IF( IDIM .LT. 2 ) IDIM =2
+*  Ensure we are using at least two pixel axes.
+      IF ( IDIM .LT. 2 ) IDIM = 2
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Find the rotation parameters.
 *  =============================
@@ -328,13 +341,13 @@
 
 *  If a null value was supplied, annull the error and find the angle 
 *  between the second significant pixel axis and north.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
-*  If the current WCS Frame is a celestial coord Frame, get the index of
-*  the latitude axis. Otherwise, use the second axis.
+*  If the current WCS Frame is a celestial co-ord Frame, get the index 
+*  of the latitude axis.  Otherwise, use the second axis.
          CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-         IF( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
+         IF ( AST_ISASKYFRAME( CFRM, STATUS ) ) THEN
             IAXIS = AST_GETI( CFRM, 'LATAXIS', STATUS )
          ELSE
             IAXIS = 2
@@ -358,7 +371,7 @@
      :                              STATUS )
          C( 3 - IAXIS ) = A( 3 - IAXIS )
 
-*  Convert A and C back into GRID coords.
+*  Convert A and C back into GRID co-ords.
          XP( 1 ) = A( 1 )
 	 YP( 1 ) = A( 2 )
          XP( 2 ) = C( 1 )
@@ -375,18 +388,18 @@
          ANGLED = AST_AXANGLE( AST_GETFRAME( IWCS, AST__BASE, STATUS ), 
      :                         A, B, 2, STATUS )
 
-* Check the angle is OK. If so, convert to degrees. Otherwise report an
-* error.
-         IF( ANGLED .NE. AST__BAD ) THEN
+*  Check the angle is OK.  If so, convert to degrees.  Otherwise report
+*  an error.
+         IF ( ANGLED .NE. AST__BAD ) THEN
             ANGLE = REAL( -ANGLED/DTOR )
-            IF( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
+            IF ( ANGLE .LT. 0.0 ) ANGLE = 360 + ANGLE
             CALL MSG_BLANK( STATUS )
             CALL MSG_SETR( 'A', ANGLE )
             CALL MSG_OUT( 'ROTATE_MSG1', '  Rotating by ^A degrees', 
      :                    STATUS )
             CALL MSG_BLANK( STATUS )
          ELSE
-            IF( STATUS .EQ. SAI__OK ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL ERR_REP( 'ROTATE_ERR1', 'Rotation angle is '//
      :                       'undefined.', STATUS )
@@ -488,10 +501,10 @@
             CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
 
 *  Decide whether or not to process the VARIANCE array.
-            IF( STATUS .EQ. SAI__OK ) THEN
+            IF ( STATUS .EQ. SAI__OK ) THEN
                CALL PAR_DEF0L( 'VARIANCE', VAR, STATUS )
                CALL PAR_GET0L( 'VARIANCE', VAR, STATUS )
-               IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
+               IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
             END IF
          
 *  Decide whether or not to process the QUALITY array.
@@ -868,7 +881,7 @@
      :                                STATUS )
                   END IF
  
-*  Tidy up the workspace
+*  Tidy up the workspace.
                   CALL PSX_FREE( WKPNTR, STATUS )
                END IF
 
@@ -938,49 +951,49 @@
                         CALL KPG1_FLIPB( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL KPG1_FLIPUB( 1, EL, 
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPG1_FLIPD( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPG1_FLIPI( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                         CALL KPG1_FLIPR( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
   
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                         CALL KPG1_FLIPW( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL KPG1_FLIPUW( 1, EL, 
-     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
                      END IF
 
@@ -1020,21 +1033,21 @@
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL VEC_UBTOUB( .FALSE., EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL VEC_UWTOUW( .FALSE., EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                         CALL VEC_WTOW( .FALSE., EL, 
      :                                 %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                 %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                 IERR, NERR,
      :                                 STATUS )
 
@@ -1085,48 +1098,48 @@
                         CALL KPG1_FLIPB( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL KPG1_FLIPUB( 1, EL, 
-     :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
+     :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
                         CALL KPG1_FLIPD( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                1, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                1, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                STATUS )
  
                      ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
                         CALL KPG1_FLIPI( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_REAL' ) THEN
                         CALL KPG1_FLIPR( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
   
                      ELSE IF ( TYPE .EQ. '_WORD' ) THEN
                         CALL KPG1_FLIPW( 1, EL, 
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
  
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL KPG1_FLIPUW( 1, EL, 
      :   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
      :                                   1, 
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   STATUS )
                      END IF
 
@@ -1167,14 +1180,14 @@
                      ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                         CALL VEC_UBTOUB( .FALSE., EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   IERR, NERR,
      :                                   STATUS )
 
                      ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
                         CALL VEC_UWTOUW( .FALSE., EL,
      :                                   %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                                   %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                                   IERR, NERR,
      :                                   STATUS )
 
@@ -1255,19 +1268,20 @@
       END IF
 
 *  Propagate the WCS component, incorporating a linear mapping between
-*  pixel coordinates. This mapping is described by a matrix and an offset
-*  vector. Initialise the matrix to hold a unit matrix, and the offset
-*  vector to be zero vector. The matrix is declared as a 1-d array because
-*  the dimensionality of the output NDF is only known at run time.
-*  Therefore we have to do the conversion from row and column numbers to
-*  a 1-d vectorised index explicitly. Row I, column J of the matrix is
-*  stored in element I + IDIM*( J - 1 ).
-      DO I = 1, IDIM*IDIM
+*  pixel co-ordinates.  This mapping is described by a matrix and an
+*  offset vector.  Initialise the matrix to hold a unit matrix, and the 
+*  offset vector to be zero vector.  The matrix is declared as a 
+*  one-dimensional array because the dimensionality of the output NDF is
+*  only known at run time.  Therefore we have to do the conversion from 
+*  row and column numbers to a one-dimensional vectorised index 
+*  explicitly.  Row I, column J of the matrix is stored in element 
+*  I + IDIM * ( J - 1 ).
+      DO I = 1, IDIM * IDIM
          MATRIX( I ) = 0.0D0
       END DO
 
       DO I = 1, IDIM
-         MATRIX( I + IDIM*( I - 1 ) ) = 1.0D0
+         MATRIX( I + IDIM * ( I - 1 ) ) = 1.0D0
          OFFSET( I ) = 0.0D0
       END DO
 
@@ -1277,27 +1291,27 @@
       COSANG = DBLE( COS( ANGLE * DTOR ) )
       SINANG = DBLE( SIN( ANGLE * DTOR ) )
 
-      M( 1 ) = SDIM( 1 ) + IDIM*( SDIM( 1 ) - 1 )
-      M( 2 ) = SDIM( 1 ) + IDIM*( SDIM( 2 ) - 1 )
-      M( 3 ) = SDIM( 2 ) + IDIM*( SDIM( 1 ) - 1 )
-      M( 4 ) = SDIM( 2 ) + IDIM*( SDIM( 2 ) - 1 )
+      M( 1 ) = SDIM( 1 ) + IDIM * ( SDIM( 1 ) - 1 )
+      M( 2 ) = SDIM( 1 ) + IDIM * ( SDIM( 2 ) - 1 )
+      M( 3 ) = SDIM( 2 ) + IDIM * ( SDIM( 1 ) - 1 )
+      M( 4 ) = SDIM( 2 ) + IDIM * ( SDIM( 2 ) - 1 )
 
       MATRIX( M( 1 ) ) = COSANG
       MATRIX( M( 2 ) ) = -SINANG
       MATRIX( M( 3 ) ) = SINANG
       MATRIX( M( 4 ) ) = COSANG
 
-*  Calculate the pixel coordinates on the significant axes at the centre of 
-*  the output image
-      OXC = 0.5D0*DBLE( UBNDO( SDIM( 1 ) ) + LBNDO( SDIM( 1 ) ) - 1 )
-      OYC = 0.5D0*DBLE( UBNDO( SDIM( 2 ) ) + LBNDO( SDIM( 2 ) ) - 1 )
-      IXC = 0.5D0*DBLE( SUBNDI( 1 ) + SLBNDI( 1 ) - 1 )
-      IYC = 0.5D0*DBLE( SUBNDI( 2 ) + SLBNDI( 2 ) - 1 )
+*  Calculate the pixel co-ordinates on the significant axes at the
+*  centre of the output image.
+      OXC = 0.5D0 * DBLE( UBNDO( SDIM( 1 ) ) + LBNDO( SDIM( 1 ) ) - 1 )
+      OYC = 0.5D0 * DBLE( UBNDO( SDIM( 2 ) ) + LBNDO( SDIM( 2 ) ) - 1 )
+      IXC = 0.5D0 * DBLE( SUBNDI( 1 ) + SLBNDI( 1 ) - 1 )
+      IYC = 0.5D0 * DBLE( SUBNDI( 2 ) + SLBNDI( 2 ) - 1 )
 
-*  Calculate the pixel offsets produced by the rotation on the significant
-*  axes.
-      OFFSET( SDIM( 1 ) ) = OXC - IXC*COSANG - IYC*SINANG
-      OFFSET( SDIM( 2 ) ) = OYC + IXC*SINANG - IYC*COSANG
+*  Calculate the pixel offsets produced by the rotation on the 
+*  significant axes.
+      OFFSET( SDIM( 1 ) ) = OXC - IXC * COSANG - IYC * SINANG
+      OFFSET( SDIM( 2 ) ) = OYC + IXC * SINANG - IYC * COSANG
 
 *  Calculate shift required to align old and new pivot points.
       ISHIFT( SDIM( 1 ) ) = NINT( - OFFSET( SDIM( 1 ) ) )
