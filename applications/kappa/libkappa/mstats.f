@@ -63,29 +63,31 @@
 *        always present, a missing component will be treated as having 
 *        all pixels set to the `bad' value.  ["Data"]
 *     ILEVEL = _INTEGER (Read)
-*        The interactive level of the routine (only used if SINGLE=TRUE). If 
-*        it is 1, nothing is reported on the screen. If is is 2 or 3, the 
-*        statistics are reported. If is is 3, the individual pixel values 
-*        are also reported. It should lie between 1 and 3. [2]
+*        The interactive level of the routine (only used if 
+*        SINGLE=TRUE).  If it is 1, nothing is reported on the screen. 
+*        If is is 2 or 3, the  statistics are reported.  If is is 3, 
+*        the individual pixel values are also reported.  It should lie 
+*        between 1 and 3.  [2]
 *     IN = NDF (Read)
 *        A group of input NDFs.  They may have different shapes, but 
 *        must all have the same number of dimensions.  This should 
 *        be given as a comma separated list, in which each list element 
-*        can be:
+*        can be one of the following.
 *
-*        - an NDF name, optionally containing wild-cards and/or regular 
-*        expressions ("*", "?", "[a-z]" etc.). 
+*        - An NDF name, optionally containing wild-cards and/or regular 
+*        expressions ("*", "?", "[a-z]" etc.).
 *
-*        - the name of a text file, preceded by an up-arrow character "^".
-*        Each line in the text file should contain a comma separated list
-*        of elements, each of which can in turn be an NDF name (with
-*        optional wild-cards, etc), or another file specification
-*        (preceded by an up-arrow). Comments can be included in the file 
-*        by commencing lines with a hash character "#".
+*        - The name of a text file, preceded by an up-arrow character 
+*        "^".  Each line in the text file should contain a 
+*        comma-separated list of elements, each of which can in turn be 
+*        an NDF name (with optional wild-cards, etc.), or another file 
+*        specification (preceded by an up-arrow).  Comments can be 
+*        included in the file by commencing lines with a hash character 
+*        "#".
 *
 *        If the value supplied for this parameter ends with a minus
 *        sign "-", then the user is re-prompted for further input until
-*        a value is given which does not end with a minus sign. All the
+*        a value is given which does not end with a minus sign.  All the
 *        images given in this way are concatenated into a single group.
 *     MEAN = _DOUBLE (Write)
 *        An output parameter to which is written the mean pixel value,
@@ -102,7 +104,7 @@
 *        In Single pixel mode (SINGLE=TRUE), this parameter gives the
 *        position in the current co-ordinate Frame at which the
 *        statistics should be calculated (supplying a colon ":" will 
-*        display details of the required co-ordinate Frame). The 
+*        display details of the required co-ordinate Frame).  The 
 *        position should be supplied as a list of formatted axis values 
 *        separated by spaces or commas.  The pixel covering this point
 *        in each input array, if any, will be used.
@@ -117,23 +119,23 @@
 *        to generate the output NDF.  It may be "Mean" or "Median".
 *        If it is "Mean" (the default) then OUT will be an NDF in which
 *        the DATA component gives the averages of the pixels of the 
-*        selected component of the input NDFs, and the VARIANCE component 
-*        gives their variances.  If it is "Median" then then OUT will 
-*        have a DATA component giving the medians of the input pixels,
-*        and it will have no VARIANCE component.  ["Mean"]
+*        selected component of the input NDFs, and the VARIANCE 
+*        component gives their variances.  If it is "Median" then then
+*        OUT will have a DATA component giving the medians of the input 
+*        pixels, and it will have no VARIANCE component.  ["Mean"]
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF.  ["KAPPA - Mstats"]
 *     TRIM = _LOGICAL (Read)
-*        This parameter controls the shape of the output NDF.  
-*        If TRIM=TRUE, then the output NDF is the shape of the 
-*        intersection of all the input NDFs, i.e. only pixels which 
-*        appear in all the input arrays will be represented in the output.
-*        If TRIM=FALSE, the output is the shape of the union of the
-*        inputs, i.e. every pixel which appears in the input arrays
-*        will be represented in the output.  [TRUE]
+*        This parameter controls the shape of the output NDF.  If 
+*        TRIM=TRUE, then the output NDF is the shape of the intersection
+*        of all the input NDFs, i.e. only pixels which appear in all the
+*        input arrays will be represented in the output.  If TRIM=FALSE,
+*        the output is the shape of the union of the inputs, i.e. every
+*        pixel which appears in the input arrays will be represented in 
+*        the output.  [TRUE]
 *     VAR = _DOUBLE (Write)
-*        An output parameter to which is written the variance of the pixel
-*        values, if SINGLE=TRUE.
+*        An output parameter to which is written the variance of the 
+*        pixel values, if SINGLE=TRUE.
 
 *  Examples:
 *     mstats idat* ostats
@@ -176,6 +178,7 @@
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -183,6 +186,9 @@
 *        Original version.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variables, correct punctuation, and wrapped long
+*        lines.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -191,14 +197,14 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! No default typing allowed
+      IMPLICIT NONE              ! No default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'       ! Global SSE definitions
-      INCLUDE  'AST_PAR'       ! AST constants and functions
-      INCLUDE  'NDF_PAR'       ! NDF constants
-      INCLUDE  'DAT_PAR'       ! HDS system constants
-      INCLUDE  'CNF_PAR'       ! For CNF_PVAL function
+      INCLUDE  'SAE_PAR'         ! Global SSE definitions
+      INCLUDE  'AST_PAR'         ! AST constants and functions
+      INCLUDE  'NDF_PAR'         ! NDF constants
+      INCLUDE  'DAT_PAR'         ! HDS system constants
+      INCLUDE  'CNF_PAR'         ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -206,37 +212,36 @@
 *  Local Variables:
       CHARACTER COMP * ( DAT__SZNAM ) ! Name of NDF component for stats
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS type of output data arrays
-      CHARACTER SMODE * ( 8 )  ! Calculation mode - 'mean' or 'median'
-      CHARACTER STRIM * ( 8 )  ! Trim parameter to pass to NDF_MBNDN
-      DOUBLE PRECISION DATUM   ! Value of pixel
-      DOUBLE PRECISION MEAN    ! Average value
-      DOUBLE PRECISION MED     ! Median value
-      DOUBLE PRECISION SUM     ! Running total of pixel values
-      DOUBLE PRECISION SUM2    ! Running total of pixel values squared
-      DOUBLE PRECISION VAR     ! Variance value
-      INTEGER EL               ! Number of pixels in mapped array
-      INTEGER I                ! Loop variable
-      INTEGER IGRP             ! GRP identifier for the group of input NDFs
-      INTEGER ILEVEL           ! The interaction level
-      INTEGER IPDAT            ! Pointer to data array
-      INTEGER IPNDF            ! Pointer to array of NDF identifiers
-      INTEGER IPODAT           ! Pointer to output data array
-      INTEGER IPOVAR           ! Pointer to output variance array
-      INTEGER IPPTR            ! Pointer to array of pointers to mapped arrays
-      INTEGER IPWORK           ! Pointer to workspace array
+      CHARACTER SMODE * ( 8 )    ! Calculation mode - 'mean' or 'median'
+      CHARACTER STRIM * ( 8 )    ! Trim parameter to pass to NDF_MBNDN
+      DOUBLE PRECISION DATUM     ! Value of pixel
+      DOUBLE PRECISION MEAN      ! Average value
+      DOUBLE PRECISION MED       ! Median value
+      DOUBLE PRECISION SUM       ! Running total of pixel values
+      DOUBLE PRECISION SUM2      ! Running total of pixel values squared
+      DOUBLE PRECISION VAR       ! Variance value
+      INTEGER EL                 ! Number of pixels in mapped array
+      INTEGER I                  ! Loop variable
+      INTEGER IGRP               ! GRP identifier for input-NDFs group
+      INTEGER ILEVEL             ! The interaction level
+      INTEGER IPDAT              ! Pointer to data array
+      INTEGER IPNDF              ! Pointer to array of NDF identifiers
+      INTEGER IPODAT             ! Pointer to output data array
+      INTEGER IPOVAR             ! Pointer to output variance array
+      INTEGER IPPTR              ! Pointer to array of pointers to 
+                                 ! mapped arrays
+      INTEGER IPWORK             ! Pointer to workspace array
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel bounds of output NDF
-      INTEGER NDIM             ! Dimensionality of output NDF
-      INTEGER NGOOD            ! Number of non-bad pixels
-      INTEGER NGOOD1           ! Number of pixels used
-      INTEGER NNDF             ! The number of input NDFs
-      INTEGER ONDF             ! NDF identifier of output NDF
-      INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of output NDF
-      LOGICAL SINGLE           ! Are we in SINGLE or ARRAY mode?
-      LOGICAL TRIM             ! Will be trim or pad arrays?
+      INTEGER NGOOD              ! Number of non-bad pixels
+      INTEGER NGOOD1             ! Number of pixels used
+      INTEGER NNDF               ! The number of input NDFs
+      INTEGER ONDF               ! NDF identifier of output NDF
+      LOGICAL SINGLE             ! Are we in SINGLE or ARRAY mode?
+      LOGICAL TRIM               ! Will be trim or pad arrays?
 
 *.
 
-*  Check the global status.
+*  Check the global inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start an AST context.
@@ -258,7 +263,7 @@
      :                .FALSE., COMP, STATUS )
 
 *  Single pixel mode.
-*  =================
+*  ==================
       IF ( SINGLE ) THEN
 
 *  Allocate some work space.
@@ -326,7 +331,7 @@
          CALL PSX_FREE( IPDAT, STATUS )
 
 *  Array mode.
-*  ==========
+*  ===========
       ELSE
 
 *  See whether we want mean and variance or median.
