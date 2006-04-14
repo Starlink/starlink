@@ -22,7 +22,7 @@
 *  Description:
 *     This application re-orders the pixel axes of an NDF, together with
 *     all related information (AXIS structures, and the axes of all 
-*     coordinate Frames stored in the WCS component of the NDF).
+*     co-ordinate Frames stored in the WCS component of the NDF).
 
 *  Usage:
 *     permaxes in out perm
@@ -33,41 +33,42 @@
 *     OUT = NDF (Write)
 *        The output NDF data structure.
 *     PERM() = _INTEGER (Read)
-*        A list of integers defining how the pixel axes are to be permuted. 
-*        The list must contain one element for each pixel axis in the NDF.
-*        The first element is the index of the pixel axis within the input 
-*        NDF which is to become axis 1 in the output NDF. The second element
-*        is the index of the pixel axis within the input NDF which is to 
-*        become axis 2 in the output NDF, etc. Axes are numbered from 1.
+*        A list of integers defining how the pixel axes are to be 
+*        permuted.  The list must contain one element for each pixel
+*        axis in the NDF.  The first element is the index of the pixel 
+*        axis within the input NDF which is to become axis 1 in the 
+*        output NDF.  The second element is the index of the pixel axis 
+*        within the input NDF which is to become axis 2 in the output 
+*        NDF, etc.  Axes are numbered from 1.
 *     TITLE = LITERAL (Read)
 *        A title for the output NDF.  A null value will cause the title
-*        of the NDF supplied for parameter IN to be used instead. [!]
+*        of the NDF supplied for parameter IN to be used instead.  [!]
 
 *  Notes:
-*     - If any WCS coordinate Frame has more axes then the number of pixel
-*     axes in the NDF, then the high numbered surplus axes in the WCS Frame 
-*     are left unchanged.
-*     - If any WCS coordinate Frame has fewer axes then the number of pixel
-*     axes in the NDF, then the Frame is left unchanged if the specified
-*     permutation would change any of the high numbered surplus pixel axes.
-*     A warning message is issued if this occurs.
+*     - If any WCS co-ordinate Frame has more axes then the number of
+*     pixel axes in the NDF, then the high numbered surplus axes in the
+*     WCS Frame are left unchanged.
+*     - If any WCS co-ordinate Frame has fewer axes then the number of
+*     pixel axes in the NDF, then the Frame is left unchanged if the 
+*     specified permutation would change any of the high numbered 
+*     surplus pixel axes.  A warning message is issued if this occurs.
 
 *  Examples:
 *     permaxes a b [2,1]
-*        Swaps the axes in the 2-dimensional NDF called "a", to produce a
-*        new 2-dimensional NDF called "b".
+*        Swaps the axes in the 2-dimensional NDF called "a", to produce
+*        a new two-dimensional NDF called "b".
 *     permaxes a b [3,1,2]
-*        Creates a new 3-dimensional NDF called "b" in which axis 1
-*        corresponds to axis 3 in the input 3-dimension NDF called "a",
-*        axis 2 corresponds to input axis 1, axis 3 corresponds to input 
-*        axis 2. 
+*        Creates a new three-dimensional NDF called "b" in which axis 1
+*        corresponds to axis 3 in the input three-dimensional NDF called
+*        "a", axis 2 corresponds to input axis 1, axis 3 corresponds to 
+*        input axis 2. 
 
 *  Related Applications:
 *     KAPPA: ROTATE, FLIP; Figaro: IREVX, IREVY, IROT90.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of the
 *     input NDF and propagates all extensions.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -85,7 +86,9 @@
 *     15-MAR-2001 (DSB):
 *        Take surplus axes into account.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,8 +117,10 @@
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the NDF array
       CHARACTER TYPE*( NDF__SZTYP ) ! Array component numeric type
       CHARACTER VALUE*80         ! Axis character component value
-      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix component of linear mapping
-      DOUBLE PRECISION OFFSET( NDF__MXDIM )   ! Translation component of linear mapping
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Matrix 
+                                 ! component of linear mapping
+      DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Translation component of 
+                                 ! linear mapping
       INTEGER DIM( NDF__MXDIM )  ! Input NDF dimension sizes
       INTEGER DIMO( NDF__MXDIM ) ! Output NDF dimension sizes
       INTEGER EL                 ! Number of elements mapped
@@ -141,8 +146,7 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel index bounds in input 
       INTEGER UBNDO( NDF__MXDIM )! Upper pixel index bounds in output
       LOGICAL BAD                ! Bad-pixel flag
-      LOGICAL NORM               ! Axis normalization flag
-      LOGICAL THERE              ! Whether component is defined
+      LOGICAL THERE              ! Component is defined?
 
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
@@ -285,8 +289,8 @@
 *  Process the axis arrays.
 *  =======================
 
-*  Loop to process each axis. I refers to the output NDF, and IDIM refers
-*  to the input NDF.
+*  Loop to process each axis.  I refers to the output NDF, and IDIM
+*  refers to the input NDF.
       DO I = 1, NDIM
          IDIM = PERM( I )
 
@@ -375,7 +379,7 @@
 *  Propagate the WCS component.
 *  ============================
 *  Set up a matrix and offset vector describing the linear mapping from 
-*  input pixel coordinates to output pixel coordinates. First of all
+*  input pixel co-ordinates to output pixel co-ordinates.  First of all
 *  set the matrix and vector to a unit transformation.
       DO I = 1, NDIM*NDIM
          MATRIX( I ) = 0.0D0
@@ -390,14 +394,15 @@
       CALL KPG1_ASPRP( NDIM, INDF1, INDF2, MATRIX, OFFSET, STATUS )
 
 *  We now need to permute axes in all the WCS Frames (except the Base
-*  GRID Frame). To do this make each Frame in the frameSet current in
-*  turn and then permute the axes of the FrameSet using AST_PERMAXES. Doing 
-*  it this way (rather than simply getting a pointer to each Frame and using
-*  AST_PERMAXES on the Frame) is better because the FrameSet class
-*  includes code for automatically modifying the Mappings in the FrameSet to
-*  take account of any changes in the Frames properties ("integrity
-*  checking"). If we used AST_PERMAXES on the Frame instead of the
-*  FrameSet, we would have to manually remap each frame using a PermMap.
+*  GRID Frame).  To do this make each Frame in the frameSet current in
+*  turn and then permute the axes of the FrameSet using AST_PERMAXES.
+*  Doing it this way (rather than simply getting a pointer to each Frame
+*  and using AST_PERMAXES on the Frame) is better because the FrameSet 
+*  class includes code for automatically modifying the Mappings in the
+*  FrameSet to take account of any changes in the Frames properties
+*  ("integrity checking").  If we used AST_PERMAXES on the Frame instead
+*  of the FrameSet, we would have to manually remap each frame using a
+*  PermMap.
 
 *  Get the output WCS FrameSet.
       CALL KPG1_GTWCS( INDF2, IWCS, STATUS )
@@ -406,8 +411,8 @@
       ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
       IBASE = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  Pad the permutation array with values which leave any surplus WCS axes
-*  unchanged.
+*  Pad the permutation array with values which leave any surplus WCS 
+*  axes unchanged.
       DO I = NDIM + 1, NDF__MXDIM
          PERM( I ) = I
       END DO

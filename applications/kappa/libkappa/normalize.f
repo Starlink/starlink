@@ -50,63 +50,64 @@
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
-*        plot. The width of the margins left for the annotation may be 
-*        controlled using parameter MARGIN. The appearance of the axes 
-*        (colours, fonts, etc) can be controlled using the parameter
-*        STYLE. [TRUE]
+*        plot.  The width of the margins left for the annotation may be 
+*        controlled using parameter MARGIN.  The appearance of the axes 
+*        (colours, founts, etc,) can be controlled using the parameter
+*        STYLE.  [TRUE]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
-*        drawn. If CLEAR is FALSE not only is the existing plot retained, 
-*        but also an attempt is made to align the new picture with the
-*        existing picture. Thus you can generate a composite plot within 
-*        a single set of axes, say using different colours or modes to 
-*        distinguish data from different datasets. [TRUE]
+*        drawn.  If CLEAR is FALSE not only is the existing plot
+*        retained, but also an attempt is made to align the new picture
+*        with the existing picture.  Thus you can generate a composite 
+*        plot within a single set of axes, say using different colours 
+*        or modes to distinguish data from different datasets.  [TRUE]
 *     DATARANGE( 2 ) = _REAL (Read)
 *        This parameter may be used to override the auto-scaling
-*        feature.  If given, two real numbers should be supplied
+*        feature.   If given, two real numbers should be supplied
 *        specifying the lower and upper data values in IN2, between
 *        which data will be used.  If a null (!) value is supplied, the 
-*        values used are the auto-scaled values, calculated according to 
-*        the value of PCRANGE. Note, this parameter controls the range of 
-*        data used in the fitting algorithm. The range of data displayed 
-*        in the plot can be specified separately using parameters XLEFT, 
-*        XRIGHT, YBOT and YTOP. [!]
+*        values used are the auto-scaled values, calculated according to
+*        the value of PCRANGE. Note, this parameter controls the range
+*        of data used in the fitting algorithm.  The range of data 
+*        displayed in the plot can be specified separately using 
+*        parameters XLEFT, XRIGHT, YBOT, and YTOP. [!]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation on which to produce the plot.  If a
-*        null value (!) is supplied no plot will be made. [Current graphics 
-*        device]
+*        null value (!) is supplied no plot will be made. 
+*        [Current graphics device]
 *     IN1 = NDF (Read)
 *        The NDF to be normalised.
 *     IN2 = NDF (Read)
 *        The NDF to which IN1 will be normalised. 
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given 
-*        as fractions of the corresponding dimension of the current picture. 
-*        Four values may be given, in the order - bottom, right, top, left. 
-*        If less than four values are given, extra values are used equal to 
-*        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. If a null (!) value is supplied, the
-*        value used is 0.15 (for all edges) if annotated axes are produced, 
-*        and zero otherwise. [current value]
+*        as fractions of the corresponding dimension of the current 
+*        picture.  Four values may be given, in the order: bottom,
+*        right, top, left.  If less than four values are given, extra
+*        values are used equal to the first supplied value.  If these 
+*        margins are too narrow any axis annotation may be clipped.  If
+*        a null (!) value is supplied, the value used is 0.15 (for all 
+*        edges) if annotated axes are produced, and zero otherwise. 
+*        [current value]
 *     MARKER = _INTEGER (Read)
-*        Specifies the symbol with which each position should be marked in
-*        the plot. It should be given as an integer PGPLOT marker type. For 
-*        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives 
-*        an asterisk, 7 gives a triangle. The value must be larger than or 
-*        equal to -31. [current value]
+*        Specifies the symbol with which each position should be marked
+*        in the plot.  It should be given as an integer PGPLOT-marker 
+*        type.  For instance, 0 gives a box, 1 gives a dot, 2 gives a
+*        cross, 3 gives an asterisk, 7 gives a triangle.  The value must
+*        be larger than or equal to -31.  [current value]
 *     MINPIX = _INTEGER (Read)
 *        The minimum number of good pixels required in a bin before it
 *        contributes to the fitted line.  It must be in the range 1 to
-*        the number of pixels per bin. [2]
+*        the number of pixels per bin.  [2]
 *     NBIN = _INTEGER (Read)
 *        The number of bins to use when binning the scatter plot prior
-*        to fitting a straight line, in the range 2 to 10000. [50]
+*        to fitting a straight line, in the range 2 to 10000.  [50]
 *     NITER = _INTEGER (Read)
 *        The number of iterations performed to reject bad data values
-*        in the range 0 to 100. [2]
+*        in the range 0 to 100.  [2]
 *     NSIGMA = _REAL (Read)
 *        The number of standard deviations at which bad data is
-*        rejected.  It must lie in the range 0.1 to 1.0E6. [3.0]
+*        rejected.  It must lie in the range 0.1 to 1.0E6.  [3.0]
 *     OFFSET = _REAL (Write)
 *        An output parameter giving the offset in the linear
 *        normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
@@ -117,80 +118,82 @@
 *     PCRANGE( 2 ) = _REAL (Read)
 *        This parameter takes two real values in the range 0 to 100 and
 *        is used to modify the action of the auto-scaling algorithm
-*        which selects the data to use in the fitting algorithm. The two 
-*        values correspond to the percentage points in the histogram of 
-*        IN2 at which the lower and upper cuts on data value are placed.  
-*        With the default value, the plots will omit those pixels which 
-*        lie in the lower and upper 2 percent intensity range of IN2. 
-*        Note, this parameter controls the range of data used in the 
-*        fitting algorithm. The range of data displayed in the plot can
-*        be specified separately using parameters XLEFT, XRIGHT, YBOT and
-*        YTOP. [2,98]
+*        which selects the data to use in the fitting algorithm.  The 
+*        two values correspond to the percentage points in the histogram
+*        of IN2 at which the lower and upper cuts on data value are 
+*        placed.  With the default value, the plots will omit those 
+*        pixels that lie in the lower and upper two-percent intensity 
+*        range of IN2.  Note, this parameter controls the range of data
+*        used in the fitting algorithm.  The range of data displayed in
+*        the plot can be specified separately using parameters XLEFT, 
+*        XRIGHT, YBOT, and YTOP.  [2,98]
 *     SLOPE = _REAL (Write)
 *        An output parameter giving the slope of the linear
 *        normalisation expression: IN1 = SLOPE * IN2 + OFFSET.
 *     STYLE = LITERAL (Read)
-*        A group of attribute settings describing the plotting style to use 
-*        when drawing the annotated axes, data values, error bars, and
-*        best fitting line. 
+*        A group of attribute settings describing the plotting style to
+*        use when drawing the annotated axes, data values, error bars,
+*        and best-fitting line. 
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text 
+*        file preceded by an up-arrow character "^".  Such text files 
+*        should contain further comma-separated lists which will be read
+*        and interpreted in the same manner.  Attribute settings are 
+*        applied in the order in which they occur within the list, with
+*        later settings overriding any earlier settings given for the 
+*        same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *        
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute. Default values will be
 *        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the 
+*        available attributes.  Any unrecognised attributes are ignored 
+*        (no error is reported). 
 *
-*        The appearance of the best fitting straight line is controlled by 
-*        the attributes Colour(Curves), Width(Curves), etc (the synonym Line
-*        may be used in place of Curves). The appearance of markers is 
-*        controlled by Colour(Markers), Width(Markers), etc (the synonym 
-*        Symbols may be used in place of Markers). The appearance of the 
-*        error bars is controlled using Colour(ErrBars), Width(ErrBars), 
-*        etc. Note, Size(ErrBars) controls the length of the serifs (i.e.
-*        the cross pieces at each end of the error bar), and defaults to
-*        1.0. [current value]
+*        The appearance of the best-fitting straight line is controlled 
+*        by the attributes Colour(Curves), Width(Curves), etc. (the 
+*        synonym Linemay be used in place of Curves).  The appearance of
+*        markers is controlled by Colour(Markers), Width(Markers), etc.
+*        (the synonym Symbols may be used in place of Markers).  The 
+*        appearance of the error bars is controlled using 
+*        Colour(ErrBars), Width(ErrBars), etc.  Note, Size(ErrBars) 
+*        controls the length of the serifs (i.e. the cross pieces at 
+*        each end of the error bar), and defaults to 1.0. 
+*        [current value]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN1 to be used
-*        instead. [!]
+*        instead.  [!]
 *     XLEFT = _REAL (Read)
 *        The axis value to place at the left hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, the value used 
-*        is the minimum data value used by the fitting algorithm from IN2 
-*        (with a small margin). The value supplied may be greater than or 
-*        less than the value supplied for XRIGHT. [!]
+*        axis of the plot.  If a null (!) value is supplied, the value 
+*        used is the minimum data value used by the fitting algorithm 
+*        from IN2 (with a small margin).  The value supplied may be 
+*        greater than or less than the value supplied for XRIGHT.  [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal
-*        axis of the plot. If a null (!) value is supplied, the value used 
-*        is the maximum data value used by the fitting algorithm from IN2 
-*        (with a small margin). The value supplied may be greater than or 
-*        less than the value supplied for XLEFT. [!]
+*        axis of the plot.  If a null (!) value is supplied, the value 
+*        used is the maximum data value used by the fitting algorithm
+*        from IN2 (with a small margin).  The value supplied may be 
+*        greater than or less than the value supplied for XLEFT.  [!]
 *     YBOT = _REAL (Read)
-*        The axis value to place at the bottom end of the vertical axis of 
-*        the plot. If a null (!) value is supplied, the value used is
-*        the minimum data value used by the fitting algorithm from IN1 (with 
-*        a small margin). The value supplied may be greater than or less than 
-*        the value supplied for YTOP. []
+*        The axis value to place at the bottom end of the vertical axis
+*        of the plot.  If a null (!) value is supplied, the value used
+*        is the minimum data value used by the fitting algorithm from 
+*        IN1 (with a small margin).  The value supplied may be greater
+*        than or less than the value supplied for YTOP.  []
 *     YTOP = _REAL (Read)
 *        The axis value to place at the top end of the vertical axis of 
-*        the plot. If a null (!) value is supplied, the value used is
+*        the plot.  If a null (!) value is supplied, the value used is
 *        the maximum data value used by the fitting algorithm from IN1 
-*        (with a small margin). The value supplied may be greater than or 
-*        less than the value supplied for YBOT. [!]
+*        (with a small margin).  The value supplied may be greater than
+*        or less than the value supplied for YBOT.  [!]
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -204,7 +207,8 @@
 *        normalize.sdf parameter file (as in the all the examples below
 *        except where noted).  The NDF cl123c is the normalised version
 *        of the input cl123a.
-*     normalize cl123a cl123b style="'size(errba)=0,title=Gain calibration'"
+*     normalize cl123a cl123b 
+*               style="'size(errba)=0,title=Gain calibration'"
 *        This normalises NDF cl123a to the NDF cl123b.  A plot of the
 *        fit is made on the current graphics device with the title
 *        "Gain calibration".  The error bars are drawn with no serifs.
@@ -217,8 +221,8 @@
 *        cl123c is the normalised version of the input cl123a.
 *     normalize in2=old in1=new out=! device=xwindows style=^normstyle
 *        This normalises NDF new to the NDF old.  A plot of the fit is
-*        made on the xwindows device, using the plotting style defined in
-*        text file normstyle.  No output NDF is produced.
+*        made on the xwindows device, using the plotting style defined
+*        in text file normstyle.  No output NDF is produced.
 *     normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
 *        This normalises NDF new to the NDF old.  It has five iterations
 *        to reject outliers from the linear regression, and forms the
@@ -229,19 +233,19 @@
 *        the input new.
 
 *  Notes:
-*     -  The application stores two pictures in the graphics database in 
-*     the following order: a FRAME picture containing the annotated axes 
-*     and data plot, and a DATA picture containing just the data plot.
-*     Note, the FRAME picture is only created if annotated axes have been 
-*     drawn, or if non-zero margins were specified using parameter 
-*     MARGIN. The world co-ordinates in the DATA picture will correspond
-*     to data value in the two NDFs.
+*     -  The application stores two pictures in the graphics database 
+*     in the following order: a FRAME picture containing the annotated 
+*     axes and data plot, and a DATA picture containing just the data 
+*     plot.  Note, the FRAME picture is only created if annotated axes 
+*     have been drawn, or if non-zero margins were specified using 
+*     parameter MARGIN.  The world co-ordinates in the DATA picture will
+*     correspond to data values in the two NDFs.
 
 *  Implementation Status:
 *     -  The routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
-*     and propagates all extensions to the output NDF.  All propagated
-*     components come from the NDF to be normalised.
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
+*     NDF, and propagates all extensions to the output NDF.  All 
+*     propagated components come from the NDF to be normalised.
 *     -  At the moment, variance values are not used in the fitting
 *     algorithm but are modified in the output NDF to take account of
 *     the scaling introduced by the normalisation.  (A later version may
@@ -305,6 +309,8 @@
 *        Use CNF_PVAL.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -331,10 +337,10 @@
       PARAMETER ( HISIZE = 1000 )
 
 *  Local Variables:
-      INTEGER  DEFMIN            ! Default for minimum number of pixels
       INTEGER  ISTAT             ! Temporary status value
       INTEGER  MAXPOS( 2 )       ! Position of maximum in IN2 data array
-      INTEGER  MINPIX            ! Min. no. of good pixels per bin when fitting
+      INTEGER  MINPIX            ! Minimum number of good pixels per bin
+                                 ! when fitting
       INTEGER  MINPOS( 2 )       ! Position of minimum in IN2 data array
       INTEGER  NBAD2             ! No. of bad pixels in IN2 data array
       INTEGER  NBIN              ! No. of bins to use when fitting
@@ -342,15 +348,22 @@
       INTEGER  NDF1S             ! NDF section identifier for input IN1
       INTEGER  NDF2S             ! NDF section identifier for input IN2
       INTEGER  NDFOUT            ! NDF identifier for OUT
-      INTEGER  NEL1B             ! No. of elements mapped from base NDF of IN1
-      INTEGER  NELS              ! No. of elements mapped from the NDF sections
-      INTEGER  NITER             ! No. of rejection iterations to perform 
+      INTEGER  NEL1B             ! Number of elements mapped from base 
+                                 ! NDF of IN1
+      INTEGER  NELS              ! Number of elements mapped from the 
+                                 ! NDF sections
+      INTEGER  NITER             ! Number of rejection iterations to 
+                                 ! perform 
       INTEGER  PNT1BD( 1 )       ! Pointer to mapped base IN1 data array
-      INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance array
-      INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data array
-      INTEGER  PNT2S( 1 )        ! Pointer to mapped IN2 section data array
+      INTEGER  PNT1BV( 1 )       ! Pointer to mapped base IN1 variance
+                                 ! array
+      INTEGER  PNT1S( 1 )        ! Pointer to mapped IN1 section data
+                                 ! array
+      INTEGER  PNT2S( 1 )        ! Pointer to mapped IN2 section data
+                                 ! array
       INTEGER  PNTOD( 1 )        ! Pointer to mapped output data array
-      INTEGER  PNTOV( 1 )        ! Pointer to mapped output variance array
+      INTEGER  PNTOV( 1 )        ! Pointer to mapped output variance 
+                                 ! array
       INTEGER  PNTW0             ! Pointer to temporary work space
       INTEGER  PNTW1             ! Pointer to temporary work space
       INTEGER  PNTW2             ! Pointer to temporary work space
@@ -360,12 +373,13 @@
       LOGICAL  BAD               ! Any bad pixels found?
       LOGICAL  DEFIND            ! NDF component is in a defined state?
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
-      LOGICAL  VAR1              ! True if IN1 has a defined variance component
+      LOGICAL  VAR1              ! IN1 has a defined variance component?
       REAL     DRANGE( 2 )       ! Limits on IN2 data values to be used
-      REAL     DRDEF( 2 )        ! Suggested default limits on IN2 values
-      REAL     MAX2              ! Max. value in IN2 data array
-      REAL     MIN2              ! Min. value in IN2 data array
-      REAL     NSIGMA            ! No. of std.devs to clip at
+      REAL     DRDEF( 2 )        ! Suggested default limits on IN2 
+                                 ! values
+      REAL     MAX2              ! Maximum value in IN2 data array
+      REAL     MIN2              ! Minimum value in IN2 data array
+      REAL     NSIGMA            ! Number of standard dev's to clip at
       REAL     OFFSET            ! Constant offset in final fit
       REAL     PCDEF( 2 )        ! Suggested default percentage range
       REAL     PCRANG( 2 )       ! Percentage range for autoscaling
@@ -477,7 +491,7 @@
 *  histogram.
       CALL PSX_FREE( PNTW0, STATUS )
 
-*  Obtain a data range to limit the data to be fitted. Only pixels for
+*  Obtain a data range to limit the data to be fitted.  Only pixels for
 *  which the IN2 data value is inside the given range are used. The
 *  auto-scaled range calculated above is used as the dynamic default.
       CALL PAR_GDR1R( 'DATARANGE', 2, DRDEF, VAL__MINR, VAL__MAXR,
@@ -512,14 +526,14 @@
          GOTO 999
       END IF
 
-*  Call KPS1_NMPLT to calculate the linear function which normalises IN1 to
-*  IN2.
+*  Call KPS1_NMPLT to calculate the linear function which normalises
+*  IN1 to IN2.
       CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ), 
      :                 %VAL( CNF_PVAL( PNT1S( 1 ) ) ), NELS,
      :             DRANGE( 1 ), DRANGE( 2 ), NBIN, NITER, NSIGMA,
      :             MINPIX, NDF2S, NDF1S, %VAL( CNF_PVAL( PNTW1 ) ), 
      :             %VAL( CNF_PVAL( PNTW2 ) ),
-     :             %VAL( CNF_PVAL( PNTW3 ) ), %VAL( CNF_PVAL( PNTW4 ) ), 
+     :             %VAL( CNF_PVAL( PNTW3 ) ), %VAL( CNF_PVAL( PNTW4 ) ),
      :             %VAL( CNF_PVAL( PNTW5 ) ),
      :             SLOPE, OFFSET, STATUS )
 
