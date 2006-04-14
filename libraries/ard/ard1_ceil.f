@@ -25,7 +25,7 @@
 *        The smallest integer larger than or equal to the supplied value.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councls.
+*     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:

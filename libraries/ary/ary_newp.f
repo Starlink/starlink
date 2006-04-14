@@ -64,7 +64,7 @@
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
-*     Copyright (C) 1996 Central Laboratory of the Research Councls.
+*     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:

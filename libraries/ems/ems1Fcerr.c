@@ -30,7 +30,7 @@
 
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
-*     Copyright (C) 1995, 1996, 1998, 1999, 2001 Central Laboratory of the Research Councls.
+*     Copyright (C) 1995, 1996, 1998, 1999, 2001 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Engineering Research Council.
 *     All Rights Reserved.
 

@@ -41,7 +41,7 @@
 *        element to be used on the next invocation.
 
 *  Copyright:
-*     Copyright (C) 1998, 1999 Central Laboratory of the Research Councls.
+*     Copyright (C) 1998, 1999 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:

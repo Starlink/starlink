@@ -35,7 +35,7 @@
 *
 *  Copyright:
 *     Copyright (C) 1989, 1990, 1991 Science & Engineering Research Council.
-*     Copyright (C) 2004 Central Laboratory of the Research Councls.
+*     Copyright (C) 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:

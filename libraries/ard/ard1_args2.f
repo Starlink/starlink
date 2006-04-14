@@ -43,7 +43,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councls.
+*     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
 *  Licence:
