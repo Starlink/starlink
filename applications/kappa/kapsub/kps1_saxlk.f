@@ -14,7 +14,7 @@
  
 *  Description:
 *     This routine copies the entire array of AXIS structures from INDF2
-*     to INDF1. These axis arrays are extrapolated as necessary by the
+*     to INDF1.  These axis arrays are extrapolated as necessary by the
 *     NDF library.
  
 *  Arguments:
@@ -28,13 +28,17 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
 *     16 MAY 2000 (DSB):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variables, including CNF_PVAL, and wrapped 
+*        long lines.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -48,7 +52,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       INTEGER INDF1
@@ -58,34 +61,34 @@
       INTEGER STATUS             ! Global status
  
 *  Local Constants:
-      INTEGER NCCOMP             ! No. of character components
+      INTEGER NCCOMP             ! Number of character components
       PARAMETER ( NCCOMP = 2 )
-      INTEGER NACOMP             ! No. of array components
+      INTEGER NACOMP             ! Number of array components
       PARAMETER ( NACOMP = 3 )
  
 *  Local Variables:
-      CHARACTER ACOMPS( NACOMP )*8 ! AXIS array components
-      CHARACTER CCOMPS( NCCOMP )*5 ! AXIS character components
-      CHARACTER COMP*8             ! AXIS component name
+      CHARACTER ACOMPS( NACOMP )*( 8 ) ! AXIS array components
+      CHARACTER CCOMPS( NCCOMP )*( 5 ) ! AXIS character components
+      CHARACTER COMP*8           ! AXIS component name
       CHARACTER TYPE*( NDF__SZTYP )! Array numeric type
-      CHARACTER VALUE*256          ! Character component value
-      INTEGER EL                   ! No. of elements in an axis array
-      INTEGER IAX                  ! Axis index
-      INTEGER ICOMP                ! Component index
-      INTEGER IERR                 ! Index of first numerical error
-      INTEGER INDF2S               ! NDF identifier for source section
-      INTEGER IP1                  ! Pointer to destination array
-      INTEGER IP2                  ! Pointer to source array
-      INTEGER LBND( NDF__MXDIM )   ! Lower axis bounds of destination
-      INTEGER NDIM                 ! No. of axes in destination
-      INTEGER NERR                 ! No. of numerical errors
-      INTEGER UBND( NDF__MXDIM )   ! Upper axis bounds of destination
-      INTEGER VLEN                 ! Length of character component
-      LOGICAL NORM                 ! Axis normalization error
-      LOGICAL THERE                ! Is the component there?
+      CHARACTER VALUE*( 256 )    ! Character-component value
+      INTEGER EL                 ! No. of elements in an axis array
+      INTEGER IAX                ! Axis index
+      INTEGER ICOMP              ! Component index
+      INTEGER INDF2S             ! NDF identifier for source section
+      INTEGER IP1                ! Pointer to destination array
+      INTEGER IP2                ! Pointer to source array
+      INTEGER LBND( NDF__MXDIM ) ! Lower axis bounds of destination
+      INTEGER NDIM               ! Number of axes in destination
+      INTEGER UBND( NDF__MXDIM ) ! Upper axis bounds of destination
+      INTEGER VLEN               ! Length of character component
+      LOGICAL NORM               ! Axis normalization error
+      LOGICAL THERE              ! Is the component there?
 
+*  Local Data:
       DATA CCOMPS / 'LABEL', 'UNITS' /
       DATA ACOMPS / 'CENTRE', 'WIDTH', 'VARIANCE' /
+
 *.
  
 *  Check the inherited global status.
@@ -108,8 +111,8 @@
          DO ICOMP = 1, NACOMP
             COMP = ACOMPS( ICOMP )
 
-*  Pass on if this axis does not have the a defined AXIS component in the 
-*  source section.
+*  Pass on if this axis does not have the a defined AXIS component in 
+*  the source section.
             CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS ) 
             IF( THERE ) THEN
 
@@ -134,8 +137,8 @@
          DO ICOMP = 1, NCCOMP
             COMP = CCOMPS( ICOMP )
 
-*  Pass on if this axis does not have the a defined AXIS component in the 
-*  source section.
+*  Pass on if this axis does not have the a defined AXIS component in 
+*  the source section.
             CALL NDF_ASTAT( INDF2S, COMP, IAX, THERE, STATUS ) 
             IF( THERE ) THEN
 
