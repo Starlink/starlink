@@ -59,7 +59,7 @@
 
 *  Copyright:
 *     Copyright (C) 1988, 1989, 1990, 1993 Science & Engineering Research Council.
-*     Copyright (C) 2005, 2006 Particls Physics & Engineering Research Council.
+*     Copyright (C) 2005, 2006 Particle Physics & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
