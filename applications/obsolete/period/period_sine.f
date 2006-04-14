@@ -30,9 +30,8 @@ C-----------------------------------------------------------------------------
       INTEGER FIRSTOUT, IFAIL, COUNTER, SLOTOUT
       INTEGER YSLOT1, YSLOT2
       LOGICAL DETRENDARRAY(MXSLOT), YERRORARRAY(MXSLOT)
-      CHARACTER*1 BELL, OPTION
+      CHARACTER*1 OPTION
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Select input and output data slots.
@@ -52,7 +51,7 @@ C-----------------------------------------------------------------------------
      :                     ' and gamma : '
       READ (*, *, ERR=100) PERIOD, AMPLITUDE, ZEROPT, GAMMA
       IF ( PERIOD.LE.0.0D0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Invalid value for PERIOD.'
          GO TO 100
       END IF
@@ -69,7 +68,7 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 400
          END IF

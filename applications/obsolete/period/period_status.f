@@ -36,8 +36,7 @@ C-----------------------------------------------------------------------------
       INTEGER NDATA, YSLOT1
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT), LOG
       CHARACTER*72 INFILEARRAY(MXSLOT), LOGFILE, STRING(50), DUMMY
-      CHARACTER*1 , CONTINUE, BELL, OPTION
-      DATA BELL/7/
+      CHARACTER*1 , CONTINUE, OPTION
  
       
 C-----------------------------------------------------------------------------
@@ -57,7 +56,7 @@ C-----------------------------------------------------------------------------
  
       IF ( OPTION.EQ.'L' ) THEN
          IF ( .NOT.LOG ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: No log file has been opened.'
             GO TO 300
          END IF
@@ -94,7 +93,7 @@ C-----------------------------------------------------------------------------
  150     CONTINUE
  200     CONTINUE
          IF ( I.EQ.1 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Log file is empty.'
          END IF
 C-----------------------------------------------------------------------------
@@ -110,7 +109,7 @@ C-----------------------------------------------------------------------------
 
          IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
             IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Maximum slot number = ', MXSLOT
                GO TO 300
             END IF

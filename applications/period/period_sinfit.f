@@ -66,8 +66,6 @@ C============================================================================
       DOUBLE PRECISION KVEL,GAM,PHI0, QTWOPI
       DOUBLE PRECISION XX,SN,CN,WW,W1,C1,C2,C3,C4,C5,C6,DET,F,SQ
       DOUBLE PRECISION SW,SY,SY2,SS,SS2,SYS,SYC,SC,SSC,SC2
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
 C----------------------------------------------------------------------------
 C Set dummy variables to 0.0D0, to accumulate sums.
@@ -76,7 +74,7 @@ C----------------------------------------------------------------------------
       QTWOPI = 4.0D0*DATAN(1.0D0)
       IF ( PERIOD.LE.0.0D0 ) THEN
          IFAIL = 1
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_SINFIT failed.'
          WRITE (*, *) '** ERROR: Period is less than or equal to zero.'
          RETURN
@@ -119,7 +117,7 @@ C----------------------------------------------------------------------------
          END IF
  100  CONTINUE
       IF ( NP.LE.3 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_SINFIT failed.'
          WRITE (*, *) 
      :              '** ERROR: <= 3 valid points for a 3 parameter fit.'
@@ -144,7 +142,7 @@ C----------------------------------------------------------------------------
       DET = SW*C1 + SS*C2 + SC*C3
       IF ( DABS(DET).LT.1.0D-24 ) THEN
          IFAIL = 1
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_SINFIT failed.'
          WRITE (*, *) '** ERROR: ABS(DETERMINANT) < 1.D-24.'
          RETURN
@@ -174,7 +172,7 @@ C----------------------------------------------------------------------------
       KVEL = DSQRT(SQ)
       IF ( KVEL.EQ.0.0D0 ) THEN
          IFAIL = 1
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_SINFIT failed.'
          WRITE (*, *) '** ERROR: KVEL = 0. Windowed data?'
          RETURN

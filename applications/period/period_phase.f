@@ -41,8 +41,6 @@ C-----------------------------------------------------------------------------
       INTEGER YSLOT1, YSLOT2
       LOGICAL DETRENDARRAY(MXSLOT), YERRORARRAY(MXSLOT)
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
 
 C-----------------------------------------------------------------------------
@@ -78,7 +76,7 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 700
          END IF
@@ -87,7 +85,7 @@ C-----------------------------------------------------------------------------
 
          IF ( SLOT.EQ.SLOTOUT ) THEN
             IF ( NBIN .GT.NDATA ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Number of phase bins ' //
      :                      'should not exceed ', NDATA
                GO TO 700

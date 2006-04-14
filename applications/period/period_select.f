@@ -13,8 +13,6 @@ C=============================================================================
  
       INTEGER FIRSTSLOT, LASTSLOT, MXSLOT, IFAIL
       INTEGER FIRSTOUT, LASTOUT
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Select input and output data
@@ -26,7 +24,7 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.EQ.0 .OR. LASTSLOT.EQ.0 ) GO TO 300
       IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Maximum slot number =', MXSLOT
          GO TO 300
       END IF
@@ -36,10 +34,10 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=200) FIRSTOUT, LASTOUT
       IF ( FIRSTOUT.EQ.0 .OR. LASTOUT.EQ.0 ) THEN
       ELSE IF ( FIRSTOUT.GT.MXSLOT .OR. LASTOUT.GT.MXSLOT ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Maximum slot number =', MXSLOT
       ELSE IF ( (LASTOUT-FIRSTOUT).NE.(LASTSLOT-FIRSTSLOT) ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Unequal number of input and' // 
      :                ' output slots.'
       ELSE

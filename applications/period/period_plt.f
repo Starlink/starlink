@@ -38,9 +38,7 @@ C-----------------------------------------------------------------------------
       INTEGER MXSLOT, FIRSTSLOT, LASTSLOT, SLOT
       INTEGER YPTR(MXSLOT), NPTSARRAY(MXSLOT), YSLOT1
       LOGICAL YERRORARRAY(MXSLOT)
-      CHARACTER*1 BELL
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
       DOUBLE PRECISION DMIX, DMIY, DMXX, DMXY, DRNG
       REAL MIX,MIY,MXX,MXY
 
@@ -55,7 +53,7 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
          IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Maximum slot number = ', MXSLOT
             GO TO 200
          END IF
@@ -64,7 +62,7 @@ C-----------------------------------------------------------------------------
             NPTS = NPTSARRAY(SLOT)
 
             IF ( NPTS.EQ.0 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Slot empty =', SLOT
                GO TO 200
             END IF

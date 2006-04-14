@@ -26,8 +26,6 @@ C-----------------------------------------------------------------------------
       DOUBLE PRECISION STRING
       DOUBLE PRECISION YMAX, YMIN
       DOUBLE PRECISION XDIFF, YDIFF, LENGTH
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Find the maximum and minimum data points.
@@ -45,7 +43,7 @@ C If YMAX = YMIN (ie. if windowed data), report an error and abort.
 C-----------------------------------------------------------------------------
  
       IF ( YMIN.EQ.YMAX ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: YMIN .EQ. YMAX in PERIOD_STRING.'
          IF ( YMIN.EQ.1.0D0 ) WRITE (*, *) 
      :                         '** ERROR: Cannot process windowed data.'

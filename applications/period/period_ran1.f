@@ -20,12 +20,10 @@ C============================================================================
       DOUBLE PRECISION RM1,RM2
       INTEGER IDUM, IFF, IX1, IX2, IX3, J
       INTEGER M1, M2, M3, IA1, IA2, IA3, IC1, IC2, IC3
-      CHARACTER*1 BELL
       DATA M1, IA1, IC1/259200, 7141, 54773/
       DATA M2, IA2, IC2/134456, 8121, 28411/
       DATA M3, IA3, IC3/243000, 4561, 51349/
       DATA IFF/0/
-      DATA BELL/7/
 
       SAVE IX1,IX2,IX3,IFF,R
       
@@ -54,7 +52,7 @@ C============================================================================
       IX3 = MOD(IA3*IX3+IC3, M3)
       J = 1 + (97*IX3)/M3
       IF ( J.GT.97 .OR. J.LT.1 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_RAN1 failed. J = ',J
          GO TO 100
       END IF

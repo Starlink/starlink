@@ -33,10 +33,8 @@ C-----------------------------------------------------------------------------
       INTEGER COUNTER, SLOTOUT
       INTEGER YSLOT1, YSLOT2
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
-      CHARACTER*1 BELL
       CHARACTER*72 INFILEARRAY(MXSLOT)
       DATA WINDOW, EWINDOW/1.0D0, 0.0D0/
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Select input and output data slots.
@@ -53,7 +51,7 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 200
          END IF

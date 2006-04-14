@@ -34,8 +34,6 @@ C-----------------------------------------------------------------------------
       DOUBLE PRECISION NOM, DENOM
       DOUBLE PRECISION AVE, ADEV, SDEV
       DOUBLE PRECISION SAMPLE(NDATA*3), SVAR(NBIN)
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
  
 C-----------------------------------------------------------------------------
@@ -112,12 +110,12 @@ C-----------------------------------------------------------------------------
   40  CONTINUE
 
       IF ( DENOM.EQ.0.0D0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR:  No points in bin in PERIOD_PDM.'
          IFAIL = 1
          GO TO 300
       ELSE IF ( VARI.EQ.0.0D0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR:  Zero variance in PERIOD_PDM.'
          IFAIL = 1
          GO TO 300
