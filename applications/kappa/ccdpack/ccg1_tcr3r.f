@@ -1,6 +1,6 @@
       SUBROUTINE CCG1_TCR3R( RMIN, RMAX, STACK, NPIX, NLINES, VARS,
-     :                         MINPIX, RESULT, WRK1, WRK2, NCON, POINT,
-     :                         USED, STATUS )
+     :                       MINPIX, RESULT, WRK1, WRK2, NCON, POINT,
+     :                       USED, STATUS )
 *+
 *  Name:
 *     CCG1_TCR3
@@ -57,6 +57,7 @@
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
 *     BRADC: Brad Cavanagh (JAC)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,8 @@
 *        Original version.
 *     11-OCT-2004 (BRADC):
 *        No longer use NUM_CMN.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,7 +116,6 @@
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
       DOUBLE PRECISION VAL       ! Weighted mean
-      DOUBLE PRECISION VAR       ! Population variance
       DOUBLE PRECISION SUM1      ! Weight sums
       DOUBLE PRECISION SUM2      ! Weighted value sums
       INTEGER NGOOD              ! Number of good pixels
