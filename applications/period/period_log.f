@@ -19,15 +19,14 @@ C-----------------------------------------------------------------------------
       INTEGER LOGUNIT, I, NUMENT
       LOGICAL LOG, EXIST
       CHARACTER*72 LOGFILE, JUNK
-      CHARACTER*1 BELL, REPLY
-      DATA BELL/7/
+      CHARACTER*1 REPLY
       DATA NUMENT/1000000/
  
       IF ( LOG ) THEN
 
          IF ( EXIST ) THEN
 
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Log file has already been opened.'
             GO TO 100
 
@@ -42,7 +41,7 @@ C-----------------------------------------------------------------------------
             READ (*, '(A)', ERR=40) REPLY
             CALL PERIOD_CASE(REPLY, .TRUE.)
             IF ( REPLY.EQ.'O' ) THEN
-               OPEN (UNIT=LOGUNIT, FILE=LOGFILE, TYPE='OLD', ERR=20)
+               OPEN (UNIT=LOGUNIT, FILE=LOGFILE, STATUS='OLD', ERR=20)
                EXIST = .TRUE.
                DO 50 I = 1, NUMENT
                   READ (LOGUNIT, '(A)', END=60) JUNK
@@ -57,7 +56,7 @@ C-----------------------------------------------------------------------------
 
             ELSE
 
-               OPEN (UNIT=LOGUNIT, FILE=LOGFILE, TYPE='NEW', ERR=20)
+               OPEN (UNIT=LOGUNIT, FILE=LOGFILE, STATUS='NEW', ERR=20)
                EXIST = .TRUE.
                WRITE (*, *) ' '
                WRITE (*, *) '** OK: Opened new log file = ', 
@@ -78,7 +77,7 @@ C-----------------------------------------------------------------------------
 
       ELSE
 
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: No log file has been opened.'
          GO TO 100
 
