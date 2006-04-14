@@ -12,4 +12,6 @@ A new routine ARD_PLOT has been added which will draw a curve on a
 graphics device around the boundary of a supplied 2-dimensional ARD 
 description.
 
+ARD is now released under the GPL.
+
 Full details are available in SUN/183.

@@ -61,4 +61,4 @@ ADAM_F_ROUTINES = ard_group.f
 BLOCKDATA = ard1_init.f
 
 dist_starnews_DATA = ard.news
-
+dist_pkgdata_DATA = LICENCE
