@@ -19,6 +19,8 @@ C===========================================================================
       IMPLICIT NONE
 
       INCLUDE 'CNF_PAR'
+
+      INCLUDE 'SAE_PAR'
  
 C-----------------------------------------------------------------------------
 C PLT declarations.
@@ -32,10 +34,16 @@ C PERIOD_OUTPUT declarations.
 C-----------------------------------------------------------------------------
  
       INTEGER FIRSTSLOT, LASTSLOT, SLOT, IUNIT
-      INTEGER NDATA, YSLOT1
+      INTEGER NDATA, YSLOT1, STATUS
       LOGICAL YERRORARRAY(MXSLOT)
-      CHARACTER*1 BELL, OUTFILE*32
-      DATA BELL, IUNIT/7, 12/
+      CHARACTER*32 OUTFILE
+
+C-----------------------------------------------------------------------------
+C Initialise variables
+C-----------------------------------------------------------------------------
+
+      STATUS = SAI__OK
+      CALL FIO_GUNIT( IUNIT, STATUS )
  
 C-----------------------------------------------------------------------------
 C Select slots to output.
@@ -48,7 +56,7 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.NE.0 .AND. LASTSLOT.NE.0 ) THEN
          IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Maximum slot number =', MXSLOT
             GO TO 200
          END IF
@@ -57,7 +65,7 @@ C-----------------------------------------------------------------------------
             NDATA = NPTSARRAY(SLOT)
 
             IF ( NDATA.EQ.0 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Slot empty =', SLOT
                GO TO 200
             END IF
@@ -84,5 +92,6 @@ C-----------------------------------------------------------------------------
       END IF
  
  200  CONTINUE
+      CALL FIO_PUNIT( IUNIT, STATUS )
       RETURN
       END
