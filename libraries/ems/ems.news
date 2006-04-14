@@ -4,6 +4,7 @@
   * Add emsSetu - unsigned int
   * Add emsSetp - pointer location
   * Add emsSeti64 - 64 bit integer
+  * Release under the GPL.
 
 2.0-8
 

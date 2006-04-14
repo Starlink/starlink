@@ -81,3 +81,6 @@ EXTRA_DIST = ems_err.msg
 
 CLEANFILES = EMS_ERR ems_err.h
 
+dist_starnews_DATA = ems.news
+dist_pkgdata_DATA = LICENCE
+
