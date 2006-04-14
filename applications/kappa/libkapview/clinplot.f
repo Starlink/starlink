@@ -371,7 +371,7 @@
 *        [current value]
 *     SHAPE = LITERAL (Read)
 *        Specifies the way in which errors are represented.  SHAPE
-*        can take the following values:
+*        can take the following values.
 *
 *        - "Bars" -- Bars with serifs (i.e. cross pieces at each end) 
 *        are drawn joining the x error limits and the y error limits. 
