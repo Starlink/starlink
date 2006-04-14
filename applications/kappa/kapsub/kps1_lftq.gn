@@ -5,8 +5,8 @@
 *     KPG1_LFTx
 
 *  Purpose:
-*     Fit polynomials to all lines of data that lie parallel to
-*     an axis. Quickest version, no weights or bad pixels.
+*     Fits polynomials to all lines of data that lie parallel to
+*     an axis.  Quickest version, no weights or bad pixels.
 
 *  Language:
 *     Starlink Fortran 77
@@ -17,11 +17,12 @@
 
 *  Description
 *     This routine fits polynomials, of a given order, to all lines of
-*     data that lie parallel to a given axis, and lie within ranges along
-*     that axis. The fits are not weighted and the data must not contain
-*     any BAD pixels. When these conditions are true lines can be fitted
-*     with less workspace requirements and speed ups because the A matrix is
-*     the same for all lines (and AS is just size (ORDER+1,ORDER+1)).
+*     data that lie parallel to a given axis, and lie within ranges 
+*     along that axis.  The fits are not weighted and the data must not 
+*     contain any bad pixels.  When these conditions are true lines can 
+*     be fitted with less workspace requirements and speed ups because 
+*     the A matrix is the same for all lines (and AS is just size 
+*     (ORDER+1,ORDER+1)).
 *
 *     The polynomial coefficients are returned in the BS array.
 
@@ -31,15 +32,15 @@
 *     AXIS = INTEGER (Given)
 *        The axis defining the lines to be fit.
 *     RANGES( NRANGE ) = INTEGER (Given)
-*        Pairs of array coordinates along the axis. Only data within
+*        Pairs of array co-ordinates along the axis. Only data within
 *        these ranges will be used in the fit.
 *     NRANGE = INTEGER (Given)
 *        The number of values in RANGES, must be an even number.
 *     DATS( * ) = ? (Given and Returned)
-*        The data with dimensions DIMS. The fit will be subtracted from
+*        The data with dimensions DIMS.  The fit will be subtracted from
 *        this if requested.
 *     DIMS( NDF__MXDIM ) = INTEGER (Given)
-*        The dimensions of the input data. Extra dimension should have
+*        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
 *     AS( ORDER + 1, ORDER + 1 ) = DOUBLE PRECISION (Returned)
 *        Workspace for least squares A matrix.
@@ -50,7 +51,7 @@
 *        Since there are ORDER + 1 of these for each line, the size of
 *        the last dimension of this should be the product of all the
 *        dimensions that are not the fit axis.  The coefficients will be
-*        accessed in Fortran order for the axis. For instance if the
+*        accessed in Fortran order for the axis.  For instance if the
 *        third axis is fit in a cube then this array has an effective
 *        shape of (ORDER+1,NX,NY), if the second axis is chosen then the
 *        shape is (ORDER+1,NX,NZ) etc.
@@ -67,20 +68,21 @@
 *     efficiency to supply dummy (=1) higher dimensions.
 *
 *     - To work as quickly as possible the fits are performed by running
-*     over the data in fast order and accumulating the least squares
-*     matrices for each line as and when the data are encountered. The
-*     solutions are then determined in a single separate section. In
+*     over the data in fast order and accumulating the least-squares
+*     matrices for each line as and when the data are encountered.  The
+*     solutions are then determined in a single separate section.  In
 *     this version the A sums are the same for all lines (since they
 *     depend only on the ordinates and they have the same values for
 *     every line).
 *
 *     - There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
 *     base and arrays supplied to the routine must have the data type
 *     specified.
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -89,6 +91,8 @@
 *     18-JAN-2006 (PWD):
 *        Re-write counters into main loop so that the limits
 *        are used correctly.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -124,8 +128,7 @@
 *  Local Variables:
       <TYPE> TVAL               ! The current data value
       DOUBLE PRECISION DVAL     ! The current data value
-      DOUBLE PRECISION DVAR     ! The current variance.
-      DOUBLE PRECISION X        ! The pixel coordinate
+      DOUBLE PRECISION X        ! The pixel co-ordinate
       INTEGER B                 ! Pixel index of work arrays
       INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
       INTEGER I( 7 )            ! Equivalences of I1-I7 loop variables
@@ -138,8 +141,8 @@
       INTEGER LLBND( NDF__MXDIM ) ! Loop lower bounds
       INTEGER LUBND( NDF__MXDIM ) ! Loop upper bounds
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides
-      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding the axis
-      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding the axis
+      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
+      INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
       INTEGER WEL               ! Workspace elements
 
 *  Equivalences so we can index loop variables by AXIS.
@@ -180,7 +183,8 @@
       END DO
       DIMSB( NDF__MXDIM ) = 0
 
-*  Create strides for this new dimensionality and count workspace elements.
+*  Create strides for this new dimensionality and count workspace
+*  elements.
       STRIDB( 1 ) = 1
       WEL = 1
       DO J = 2, NDF__MXDIM - 1
@@ -236,10 +240,11 @@
          END DO
       END DO
 
-*  Now Loop over all input pixels within the ranges. Note we use a fully
-*  expanded set of dimensions as we need to run over the values in fast
-*  order and maintain an additional stepping over the workspace sums.
-*  (The workspace stepping is done using B and the data array IP7-1).
+*  Now loop over all input pixels within the ranges.  Note we use a 
+*  fully expanded set of dimensions as we need to run over the values 
+*  in fast order and maintain an additional stepping over the workspace 
+*  sums. (The workspace stepping is done using B and the data array 
+*  IP7-1).
 
 *  Outer loop is over the bounds along the selected axis.
       DO LB = 1, NRANGE, 2
@@ -291,8 +296,8 @@
          END DO
       END DO
 
-*  Solve linear equations and get the polynomial coefficients. Note that
-*  A is just inverted once this time. The inversion also relies
+*  Solve linear equations and get the polynomial coefficients.  Note 
+*  that A is just inverted once this time.  The inversion also relies
 *  on WRK2 being unmodified.
       CALL KPS1_LFTSV( ORDER, AS, .TRUE., BS( 1, 1 ), WRK1, WRK2, 
      :                 STATUS )

@@ -8,7 +8,7 @@
 *     KPS1_RS1<T>
 
 *  Purpose:
-*     Resample one dimension of an array by squashing or stretching.
+*     Resamples one dimension of an array by squashing or stretching.
 
 *  Language:
 *     Starlink Fortran 77
@@ -22,8 +22,8 @@
 
 *  Description:
 *     This routine resamples a data and associated variance, quality and
-*     axis arrays by applying a linear transformation to it along a single 
-*     dimension.
+*     axis arrays by applying a linear transformation to it along a 
+*     single dimension.
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -37,7 +37,8 @@
 *     INTERP = INTEGER (Given)
 *        The resampling scheme as passed to AST_RESAMPLE<T>.
 *     PARAMS( * ) = DOUBLE PRECISION (Given)
-*        The auxiliary resampling parameters as passed to AST_RESAMPLE<T>.
+*        The auxiliary resampling parameters as passed to 
+*        AST_RESAMPLE<T>.
 *     HASVAR = LOGICAL (Given)
 *        Whether the variance is to be resampled.
 *     HASQUA = LOGICAL (Given)
@@ -53,8 +54,8 @@
 *     AXI( * ) = DOUBLE PRECISION (Given)
 *        The input AXIS Centre array (only used if HASAXI is true).
 *     BAD = LOGICAL (Given and Returned)
-*        On input, a true value indicates that the input data 
-*        (and variance) arrays may contain bad pixels.  On exit, it will 
+*        On input, a .TRUE. value indicates that the input data 
+*        (and variance) arrays may contain bad pixels.  On exit, it will
 *        be set only if the output data (and variance) arrays actually
 *        do contain bad pixels.
 *     DATWKI( * ) = <TYPE> (Returned)
@@ -87,12 +88,16 @@
 *  Authors:
 *     MBT: Mark Taylor (Starlink)
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 
 *  History:
 *     3-JAN-2002 (MBT):
 *        Original version.
 *     16-JAN-2002 (DSB):
 *        Added propagation of Quality and AXIS Centres.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
+*     {enter_further_changes_here}
 
 *-
 
@@ -144,15 +149,14 @@
       INTEGER I                  ! Loop variable
       INTEGER IO                 ! Offset into array
       INTEGER J                  ! Loop variable
-      INTEGER K                  ! Loop variable
       INTEGER MAP                ! AST Mapping for 1d resample
       INTEGER MAXPIX             ! Maximum linear approximation scale
       INTEGER NBAD               ! Number of bad pixels
       INTEGER OFFI               ! Offset into input arrays
       INTEGER OFFO               ! Offset into output arrays
       INTEGER POS( NDF__MXDIM )  ! Position in arrays
-      INTEGER STRIDI( NDF__MXDIM ) ! Per-dimension strides for input arrays
-      INTEGER STRIDO( NDF__MXDIM ) ! Per-dimension strides for output arrays
+      INTEGER STRIDI( NDF__MXDIM ) ! Per-dimension strides, input arrays
+      INTEGER STRIDO( NDF__MXDIM ) ! Per-dimension strides, output arrays
       LOGICAL DONE               ! Loop completion flag
 
 *.
@@ -200,7 +204,8 @@
       DONE = .FALSE.
       DO WHILE ( .NOT. DONE )
  
-*  Copy the line we will resample from the input arrays into work buffers.
+*  Copy the line we will resample from the input arrays into work
+*  buffers.
          IO = OFFI
          IF ( HASVAR ) THEN
             DO I = 1, DIMI( IDIM )
@@ -263,7 +268,8 @@
          END IF
       END DO
 
-*  Update information about whether the output array contains bad pixels.
+*  Update information about whether the output array contains bad
+*  pixels.
       BAD = NBAD .GT. 0
 
 *  Resample the Quality array.
@@ -289,7 +295,8 @@
          DONE = .FALSE.
          DO WHILE ( .NOT. DONE )
  
-*  Copy the line we will resample from the input arrays into work buffers.
+*  Copy the line we will resample from the input arrays into work
+*  buffers.
             IO = OFFI
             DO I = 1, DIMI( IDIM )
                QUAWKI( I ) = QUAI( IO )
@@ -301,7 +308,7 @@
      :                                    QUAWKI, QUAWKI, INTERP, 
      :                                    AST_NULL, PARAMS, FLAGS, TOL, 
      :                                    MAXPIX, VAL__BADUB, 1, 1, 
-     :                                    DIMO( IDIM ), 1, DIMO( IDIM ), 
+     :                                    DIMO( IDIM ), 1, DIMO( IDIM ),
      :                                    QUAWKO, QUAWKO, STATUS )
 
 *  Copy the resampled line from work buffers into the output arrays.

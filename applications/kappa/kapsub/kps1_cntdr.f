@@ -34,21 +34,21 @@
 *  Arguments:
 *     IPLOT = INTEGER (Given)
 *        An AST pointer to the Plot through which the graphics will be
-*        produced. The Current Frame should describe the GRID coordinates
-*        of the array to be contoured.
+*        produced.  The Current Frame should describe the GRID 
+*        co-ordinates of the array to be contoured.
 *     IGRP = INTEGER (Given)
-*        A GRP identifier for a group containing descriptions of the pens
-*        to be used to draw each contour. If this is supplied as GRP__NOID
-*        then all contours are drawn using the "Curves" attributes (eg
-*        Colour(Curves), Width(Curves), etc ) in the supplied Plot. If a
-*        group is supplied, then each element in the group should be a
-*        comma separated list of AST attribute settings to be established
-*        prior to drawing a contour. Element 1 in the group is used for
-*        the first contour, element 2 for the second, etc. If the end of
-*        the group is reached before all contours have been drawn, then 
-*        another pass is made through the group starting at element 1
-*        again. Any attributes not specified default to their values in
-*        the Plot.
+*        A GRP identifier for a group containing descriptions of the 
+*        pens to be used to draw each contour.  If this is supplied as 
+*        GRP__NOID, then all contours are drawn using the "Curves" 
+*        attributes (e.g. Colour(Curves), Width(Curves), etc.) in the 
+*        supplied Plot.  If a group is supplied, then each element in
+*        the group should be a comma-separated list of AST attribute 
+*        settings to be established prior to drawing a contour.  Element
+*        1 in the group is used for the first contour, element 2 for
+*        the second, etc.  If the end of the group is reached before all
+*        contours have been drawn, then another pass is made through the
+*        group starting at element 1 again.  Any attributes not
+*        specified default to their values in the Plot.
 *     DIM1 = INTEGER (Given)
 *        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
@@ -56,10 +56,10 @@
 *     ARRAY( DIM1, DIM2 ) = REAL (Given)
 *        Two-dimensional array to be contoured.
 *     XLL = INTEGER (Given)
-*        The x co-ordinate of the lower left pixel of the selected
+*        The x co-ordinate of the lower-left pixel of the selected
 *        sub-array.
 *     YLL = INTEGER (Given)
-*        The y co-ordinate of the lower left pixel of the selected
+*        The y co-ordinate of the lower-left pixel of the selected
 *        sub-array.
 *     XSIZE = INTEGER (Given)
 *        The x size of the sub-array to be contoured.
@@ -73,11 +73,12 @@
 *        Are contour statistics required?
 *     FAST = LOGICAL (Given)
 *        If .TRUE., then contours are drawn using straight lines as the 
-*        basic drawing element. Otherwise, the basic drawing element are
-*        geodesic curves in the Current coordinate system of the supplied
-*        Plot. This is much slower to draw, but may be useful when a
-*        severly non-linear or discontinuous mapping exists between grid 
-*        coordinates in the array, and graphics coordinates.
+*        basic drawing element.  Otherwise, the basic drawing elements
+*        are geodesic curves in the Current coordinate system of the 
+*        supplied Plot.  This is much slower to draw, but may be useful 
+*        when a severly non-linear or discontinuous mapping exists 
+*        between grid co-ordinates in the array, and graphics
+*        co-ordinates.
 *     DONE( XSIZE, YSIZE ) = LOGICAL (Returned)
 *        Workspace to store log of pixels which have already been
 *        contoured.
@@ -85,8 +86,8 @@
 *        If an element is .TRUE., the contour level corresponding to
 *        that element has been used.
 *     CNTLEN( NCONT ) = REAL (Returned)
-*        If STATS is .TRUE., this returns the total length of contours at
-*        each level actually used.
+*        If STATS is .TRUE., this returns the total length of contours
+*        at each level actually used.
 *     CNTCLS( NCONT ) = INTEGER (Returned)
 *        If STATS is .TRUE., this returns the number of closed contours
 *        at each level actually used.
@@ -172,6 +173,8 @@
 *        Modified to use AST for drawing the contours.
 *     20-AUG-2001 (DSB):
 *        Added argument CNTPEN.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -218,15 +221,18 @@
 
 *  Local Constants:
       INTEGER MAXPTS             ! Maximum number of positions in each
-      PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a contour
+      PARAMETER ( MAXPTS = 10000 ) ! axis that define the locus of a 
+                                 ! contour
 
       INTEGER NCELL              ! Number of pixels in a cell
       PARAMETER ( NCELL = 4 )
 
 *  Local Variables:
-      CHARACTER DOMAIN*40        ! Domain of Current Frame in supplied Plot
-      CHARACTER PENDEF*(GRP__SZNAM)! AST attribute settings for current pen
-      DOUBLE PRECISION ATTRS( 20 )! PGPLOT graphics attributes on entry
+      CHARACTER DOMAIN*( 40 )    ! Domain of Current Frame in supplied 
+                                 ! Plot
+      CHARACTER PENDEF*( GRP__SZNAM ) ! AST attribute settings
+                                 ! for current pen
+      DOUBLE PRECISION ATTRS( 20 ) ! PGPLOT graphics attributes on entry
       INTEGER DIST               ! Distance between two x,y positions
       INTEGER I                  ! Loop counter through columns
       INTEGER ICONT              ! Counter to index contour levels
@@ -236,14 +242,16 @@
       INTEGER IMOVE( NCELL )     ! X directions to move from the cell
                                  ! side where a contour leaves
       INTEGER IPEN               ! Current pen number
-      INTEGER IPLOTT             ! AST pointer to Plot with current pen set
+      INTEGER IPLOTT             ! AST pointer to Plot with current pen 
+                                 ! set
       INTEGER IX                 ! X element numbers of current pixel in
                                  ! full-size array
       INTEGER IY                 ! Y element numbers of current pixel in
                                  ! full-size array
       INTEGER J                  ! Loop counter through lines
       INTEGER J1                 ! Index at start of attribute setting
-      INTEGER J2                 ! Index of comma at end of attribute setting
+      INTEGER J2                 ! Index of comma at end of attribute 
+                                 ! setting
       INTEGER JJ                 ! Y element numbers of current pixel in
                                  ! sub-array
       INTEGER JMOVE( NCELL )     ! Y directions to move from the cell
@@ -264,7 +272,6 @@
       LOGICAL BADPIX             ! Cell contains one or more invalid
                                  ! pixels?
       LOGICAL CONFUS             ! Cell is confused?
-      LOGICAL DSHTHR             ! Is there a threshold?
       LOGICAL LINEND             ! At end of a line?
       LOGICAL OFFIMG             ! Outside the sub-array?
       LOGICAL SAME               ! Two x-y positions are the same?
@@ -324,9 +331,9 @@
 *  Report an error if the Current Frame in the supplied Plot does not
 *  have a Domain value of GRID.
       DOMAIN = AST_GETC( IPLOT, 'DOMAIN', STATUS )
-      IF( DOMAIN .NE. 'GRID' )THEN
+      IF ( DOMAIN .NE. 'GRID' ) THEN
 
-         IF( STATUS .EQ. SAI__OK ) THEN
+         IF ( STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETC( 'DOM', DOMAIN )
             STATUS = SAI__ERROR
             CALL ERR_REP( 'KPS1_CNTDR_1', 'KPS1_CNTDR: Current Frame '//
@@ -339,15 +346,16 @@
 
       END IF
 
-*  Simplify the Plot. This adds a new Current Frame into the Plot, so note 
-*  the index of the original Current Frame so that it can be re-instated later.
-*  This can help to speed up the drawing, and also avoids the possibility
-*  of the Mapping going via a Frame in which the positions are undefined.
+*  Simplify the Plot.  This adds a new Current Frame into the Plot, so 
+*  note the index of the original Current Frame so that it can be
+*  re-instated later.  This can help to speed up the drawing, and also 
+*  avoids the possibility of the Mapping going via a Frame in which the
+*  positions are undefined.
       ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
       CALL KPG1_ASSIM( IPLOT, STATUS )
 
 *  Store the number of pens supplied in the GRP group.
-      IF( IGRP .NE. GRP__NOID ) THEN
+      IF ( IGRP .NE. GRP__NOID ) THEN
          CALL GRP_GRPSZ( IGRP, NPEN, STATUS )
       ELSE
          NPEN = 0
@@ -360,24 +368,25 @@
       DO ICONT = 1, NCONT
          CVAL = CONT( ICONT )
 
-*  If different pens are being used, produce a modified Plot which draws 
+*  If different pens are being used, produce a modified Plot which draws
 *  curves with the pen style supplied for this contour. 
-         IF( NPEN .GT. 0 ) THEN
+         IF ( NPEN .GT. 0 ) THEN
 
-*  Take a deep copy of the supplied Plot. This Plot will be modify using the
-*  supplied attribute settings. A copy is used so that the original plotting
-*  attributes can be re-instated later.
+*  Take a deep copy of the supplied Plot. This Plot will be modify using
+*  the supplied attribute settings.  A copy is used so that the original
+*  plotting attributes can be re-instated later.
             IPLOTT = AST_COPY( IPLOT, STATUS )
 
 *  Get the next list of AST Attribute settings from the group. 
             CALL GRP_GET( IGRP, IPEN, 1, PENDEF, STATUS )
 
 *  Abort if an error has occurred.
-            IF( STATUS .NE. SAI__OK ) GO TO 999
+            IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Loop round each comma-delimited attribute in the definitions, translating 
-*  colour names and any defined synonyms, and storing it in the Plot.
-            IF( PENDEF .NE. ' ' ) THEN
+*  Loop round each comma-delimited attribute in the definitions,
+*  translating colour names and any defined synonyms, and storing it in
+*  the Plot.
+            IF ( PENDEF .NE. ' ' ) THEN
                J1 = 1
                DO WHILE( J1 .LE. GRP__SZNAM )
                   J2 = J1
@@ -388,7 +397,7 @@
                END DO
 
 *  Issue a context message if anything went wrong setting the pen.
-               IF( STATUS .NE. SAI__OK ) THEN
+               IF ( STATUS .NE. SAI__OK ) THEN
                   CALL MSG_SETI( 'I', ICONT )
                   CALL MSG_SETC( 'I', CHR_NTH( ICONT ) )               
                   CALL ERR_REP( 'KPS1_CNTDR_1', 'Unable to set the '//
@@ -401,7 +410,7 @@
 *  Increment the index of the next pen to use, cycling back to the start
 *  when the end is reached.
             IPEN = IPEN + 1
-            IF( IPEN .GT. NPEN ) IPEN = 1
+            IF ( IPEN .GT. NPEN ) IPEN = 1
 
 *  If the same pen is being used for all contours, just clone the
 *  supplied Plot pointer.
@@ -418,7 +427,7 @@
 *  If using FAST drawing mode, establish the new PGPLOT attributes,
 *  saving the old in ATTRS. If not using fast drawing mode, AST will 
 *  establish them when AST_CURVE is called to draw the contour.
-         IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
+         IF ( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .TRUE., ATTRS,
      :                               STATUS )
 
 *  Initialise record of contour levels actually used.
@@ -449,7 +458,8 @@
 *  Note this cell has been looked at.
                   DONE( I, J ) = .TRUE.
 
-*  Find the position of the current pixel in the full two-dimensional array.
+*  Find the position of the current pixel in the full two-dimensional
+*  array.
                   IX = I + XLL - 1
                   IY = J + YLL - 1
 
@@ -651,15 +661,17 @@
 *  Flush the buffers used by KPG1_ASCRV.
          CALL KPG1_ASCRV( IPLOTT, FAST, 0, 0.0, 0.0, STATUS )
 
-*  If using FAST drawing mode, re-establish the old PGPLOT plotting attributes.
-         IF( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS, 
+*  If using FAST drawing mode, re-establish the old PGPLOT plotting 
+*  attributes.
+         IF ( FAST ) CALL KPG1_PGSTY( IPLOTT, 'CURVES', .FALSE., ATTRS, 
      :                               STATUS )
 
-*  Flush the buffer holding PGPLOT output produced while drawing this contour.
+*  Flush the buffer holding PGPLOT output produced while drawing this
+*  contour.
          CALL PGEBUF 
 
-*  Annul the temporary copy of the supplied Plot which was used to do the
-*  drawing.
+*  Annul the temporary copy of the supplied Plot which was used to do
+*  the drawing.
          CALL AST_ANNUL( IPLOTT, STATUS )
 
 *  End of the contour-level loop.
@@ -667,8 +679,8 @@
 
  999  CONTINUE
 
-*  Remove the Current Frame added by KPG1_ASSIM and re-instate the original 
-*  Current Frame.
+*  Remove the Current Frame added by KPG1_ASSIM and re-instate the
+*  original Current Frame.
       CALL AST_REMOVEFRAME( IPLOT, AST__CURRENT, STATUS )
       CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 

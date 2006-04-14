@@ -7,7 +7,7 @@
 *     KPS1_MLPML
 
 *  Purpose:
-*     Draw a set of data curves.
+*     Draws a set of data curves.
 
 *  Language:
 *     Starlink Fortran 77
@@ -19,26 +19,27 @@
 
 *  Description:
 *     This routine draws a set of data curves (e.g. a data value and a 
-*     position, or two data values). Errors in both data values may be 
-*     represented by error bars. No annotated asxes are drawn. The calling 
-*     routine should do this if required by passing the supplied Plot 
-*     (IPLOT) to routine KPG1_ASGRD.
+*     position, or two data values).  Errors in both data values may be 
+*     represented by error bars.  No annotated asxes are drawn.  The 
+*     calling routine should do this if required by passing the supplied
+*     Plot (IPLOT) to routine KPG1_ASGRD.
 *
-*     PGPLOT should be active, and the viewport should correspond to the 
-*     DATA picture in which the plot is to be drawn. PGPLOT world co-ordinates
-*     within the viewport should be GRAPHICS co-ordinates (millimetres from the
-*     bottom left corner of the view surface).
+*     PGPLOT should be active, and the viewport should correspond to 
+*     the DATA picture in which the plot is to be drawn.  PGPLOT world 
+*     co-ordinates within the viewport should be GRAPHICS co-ordinates 
+*     (millimetres from the bottom-left corner of the view surface).
 *
 *     The Plotting style is accessed using the environment parameter
-*     specified by PARAM1, and may include the following synonyms for graphical
-*     elements: 
-*        "Err(Bars)" - Specifies colour, etc for error bars. Size(errbars)
-*                      scales the size of the serifs used if ERSHAP=1 (i.e.
-*                      a size value of 1.0 produces a default size).
-*        "Sym(bols)" - Specifies colour, etc for markers (used in modes 3
-*                      and 5).
-*        "Lin(es)" - Specifies colour, etc for lines (used in modes 1, 2,
-*                    4 and 5).
+*     specified by PARAM1, and may include the following synonyms for 
+*     graphical elements. 
+*        "Err(Bars)": Specifies colour, etc for error bars. 
+*                     Size(errbars) scales the size of the serifs used 
+*                     if ERSHAP=1 (i.e. a size value of 1.0 produces a 
+*                     default size).
+*        "Sym(bols)": Specifies colour, etc. for markers (used in modes
+*                     3 and 5).
+*        "Lin(es)"  : Specifies colour, etc. for lines (used in modes 
+*                     1, 2, 4 and 5).
 
 *  Arguments:
 *     NDISP = INTEGER (Given)
@@ -53,29 +54,29 @@
 *        The index of the last grid point to be used.
 *     X( N, NDISP ) = DOUBLE PRECISION (Given) 
 *        The X value at each point, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface).
+*        millimetres from the bottom-left corner of the view surface).
 *     Y( N, NDISP ) = DOUBLE PRECISION (Given) 
 *        The Y value at each point, in PGPLOT world co-ordinate (i.e.
-*        millimetres from the bottom left corner of the view surface).
+*        millimetres from the bottom-left corner of the view surface).
 *     XERROR = LOGICAL (Given)
 *        Display X error bars?
 *     YERROR = LOGICAL (Given)
 *        Display Y error bars?
 *     XBAR( N, 2, NDISP ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each horizontal error bar, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
-*        accessed if XERROR is .TRUE.
+*        Row 1 contains the lower limit and row 2 contains the upper 
+*        limit for each horizontal error bar, in PGPLOT world 
+*        co-ordinate (i.e. millimetres from the bottom-left corner of 
+*        the view surface).  Only  accessed if XERROR is .TRUE.
 *     YBAR( N, 2, NDISP ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each vertical error bar, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
-*        accessed if YERROR is .TRUE.
+*        Row 1 contains the lower limit and row 2 contains the upper
+*        limit for each vertical error bar, in PGPLOT world co-ordinate 
+*        (i.e. millimetres from the bottom-left corner of the view 
+*        surface).  Only accessed if YERROR is .TRUE.
 *     XSTEP( N, 2, NDISP ) = DOUBLE PRECISION (Given) 
-*        Row 1 contains the lower limit and row 2 contains the upper limit 
-*        for each horizontal step, in PGPLOT world co-ordinate (i.e. 
-*        millimetres from the bottom left corner of the view surface). Only 
-*        accessed if MODE is 4.
+*        Row 1 contains the lower limit and row 2 contains the upper 
+*        limit for each horizontal step, in PGPLOT world co-ordinate 
+*        (i.e. millimetres from the bottom-left corner of the view 
+*        surface).  Only accessed if MODE is 4.
 *     PARAM1 = CHARACTER * ( * ) (Given)
 *        The name of the style parameter to be used when obtaining the
 *        plotting style.
@@ -83,54 +84,58 @@
 *        The name of the parameter to be used when obtaining the
 *        individual pen defintions for each curve.
 *     IPLOT = INTEGER (Given)
-*        An AST Plot which can be used to do the drawing. The Base Frame
-*        should be GRAPHICS co-ordinates (millimetres from the bottom
-*        left corner of the PGPLOT view surface). The Current Frame should 
-*        be the Frame in which annotation is required.
+*        An AST Plot which can be used to do the drawing.  The Base 
+*        Frame should be GRAPHICS co-ordinates (millimetres from the 
+*        bottom-left corner of the PGPLOT view surface).  The Current 
+*        Frame should be the Frame in which annotation is required.
 *     MODE = INTEGER (Given)
-*        Determines the way in which the data points are represented:
-*           1 - A "staircase" histogram, in which each horizontal line is
-*               centred on the X position.
+*        Determines the way in which the data points are represented.
+*           1 - A "staircase" histogram, in which each horizontal line
+*               is centred on the X position.
 *           2 - The points are joined by straight lines.
 *           3 - A marker is placed at each point (see MTYPE).
 *           4 - Mark each point with a horizontal line of width given by
 *               XW.
-*           5 - A "chain" in which each point is marker by a marker and also 
-*               join by straight lines to its neighbouring points.
+*           5 - A "chain" in which each point is marker by a marker and 
+*               also join by straight lines to its neighbouring points.
 *     MTYPE = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is 3 or 5.
 *     ERSHAP = INTEGER (Given)
-*        Determines the way in which error bars are drawn:
-*           1 - X and Y errors are represented by horizontal and vertical
-*               lines respectively. Serifs are drawn at the ends of each
-*               line. The size of these sreifs is controlled by the
-*               size(errbar) plotting attribute.
+*        Determines the way in which error bars are drawn.
+*           1 - X and Y errors are represented by horizontal and 
+*               vertical lines respectively.  Serifs are drawn at the 
+*               ends of each line.  The size of these serifs is 
+*               controlled by the Size(Errbar) plotting attribute.
 *           2 - A cross is drawn joining the corners of the box
 *               encompassing the X and Y errors.
-*           3 - A Diamond is drawn joining the ends of the horizontal and
-*               vertical error bars which would have been drawn if ERSHAP
-*               had been 1.
+*           3 - A Diamond is drawn joining the ends of the horizontal 
+*               and vertical error bars which would have been drawn if 
+*               ERSHAP had been 1.
+*
 *        These will all produce the same result (i.e. a single straight
 *        line) if errors are available only on one axis (see XERROR and 
-*        YERROR). Not accessed if XERROR and YERROR are both .FALSE.
+*        YERROR).  Not accessed if XERROR and YERROR are both .FALSE.
 *     FREQ = INTEGER (Given)
-*        The frequency at which errors are to be plotted. A value of 1
+*        The frequency at which errors are to be plotted.  A value of 1
 *        means "plot errors for every point", 2 means "plot errors for
-*        every second point", etc. Not accessed if XERROR and YERROR are 
-*        both .FALSE.
+*        every second point", etc.  Not accessed if XERROR and YERROR 
+*        are  both .FALSE.
 *     APP = CHARACTER * ( * ) (Given)
 *        The name of the calling application in the form
-*        <package>_<application> (eg "KAPPA_DISPLAY").
+*        <package>_<application> (e.g. "KAPPA_DISPLAY").
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-AUG-1999 (DSB):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -143,7 +148,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_PAR'          ! AST constants and function 
+                                 ! declarations
       INCLUDE 'GRP_PAR'          ! GRP constants 
 
 *  Arguments Given:
@@ -176,16 +182,20 @@
       PARAMETER ( NAT = 11 )   
 
 *  Local Variables:
-      CHARACTER ATTNAM( NAT )*20 ! Names of attributes used by this routine
-      CHARACTER PENDEF*(GRP__SZNAM)! AST attribute settings for current pen
+      CHARACTER ATTNAM( NAT )*20 ! Names of attributes used by this 
+                                 ! routine
+      CHARACTER PENDEF*( GRP__SZNAM ) ! AST attribute settings for 
+                                 ! current pen
       DOUBLE PRECISION ATTR( 20 )! Saved graphics attribute values
       INTEGER I                  ! Position index
-      INTEGER IGRP               ! GRP identifier for group holding pen defn.s
+      INTEGER IGRP               ! GRP identifier for pen definitions
       INTEGER IPEN               ! Index of current pen definition
       INTEGER J1                 ! Index at start of attribute setting
-      INTEGER J2                 ! Index of comma at end of attribute setting
+      INTEGER J2                 ! Index of comma at end of attribute 
+                                 ! setting
       INTEGER K                  ! Line index
-      INTEGER NPEN               ! No. of pen defintions supplied in IGRP
+      INTEGER NPEN               ! Number of pen defintions supplied in 
+                                 ! IGRP
       LOGICAL BADAT              ! Was attribute setting string invalid?
       LOGICAL DOWN               ! Is the pen down on the paper?
       LOGICAL DRAWC              ! Can line C be drawn?
@@ -194,16 +204,18 @@
       LOGICAL GOODY              ! Is current Y value good?
       LOGICAL GOODY0             ! Was previous Y value good?
       LOGICAL MIDX               ! Is middle X value good?
-      LOGICAL OK                 ! Are there any points within the window?
       REAL ATT0( NAT )           ! Original Plot attributes on entry
       REAL ATT1( NAT )           ! Plot attributes supplied by PARAM1
       REAL ERR                   ! Error bar limit value
       REAL RVAL                  ! General REAL variable
       REAL RX                    ! Single precision central X position
-      REAL RX0                   ! Previous single precision central X position
-      REAL RXC                   ! X half way from previous to current position
+      REAL RX0                   ! Previous single-precision central X 
+                                 ! position
+      REAL RXC                   ! X half way from previous to current 
+                                 ! position
       REAL RY                    ! Single precision central Y position
-      REAL RY0                   ! Previous single precision central Y position
+      REAL RY0                   ! Previous single-precision central Y
+                                 ! position
       REAL SERIF                 ! Length of serif bar
       REAL WX1                   ! Lower X limit of PGPLOT window
       REAL WX2                   ! Higher X limit of PGPLOT window
@@ -216,8 +228,8 @@
 
 
       DATA ATTNAM /'COLOUR(AXES)',    'WIDTH(AXES)',    'STYLE(AXES)', 
-     :             'COLOUR(MARKERS)', 'WIDTH(MARKERS)', 'FONT(MARKERS)', 
-     :             'STYLE(MARKERS)',  'COLOUR(CURVES)', 'WIDTH(CURVES)', 
+     :             'COLOUR(MARKERS)', 'WIDTH(MARKERS)', 'FONT(MARKERS)',
+     :             'STYLE(MARKERS)',  'COLOUR(CURVES)', 'WIDTH(CURVES)',
      :             'STYLE(CURVES)',   'SIZE(AXES)' /
 
 *.
@@ -246,29 +258,31 @@
 *  =================================================================
 
 *  Save the plotting attributes for the AST graphical elements which may
-*  be changed by this routine, so that we can re-instate before we return.
-*  Clear any set attibute values so that new values can be used later.
+*  be changed by this routine, so that we can re-instate before we 
+*  return.  Clear any set attibute values so that new values can be 
+*  used later.
       DO I = 1, NAT
          ATT0( I ) = AST_GETR( IPLOT, ATTNAM( I ), STATUS )
          CALL AST_CLEAR( IPLOT, ATTNAM( I ), STATUS )
       END DO
 
 *  Establish synonyms for AST graphical element names to be recognised
-*  during the following call to KPG1_ASSET. The symbols marking each position
-*  are drawn as AST "markers" using AST_MARK. The lines joining the given 
-*  positions are drawn as AST "Curves" using AST_CURVE. The error bars are 
-*  also drawn using AST_CURVE and therefore we need to use a different 
-*  element (i.e. not "Curves") to represent them, since "Curves" is
-*  already being used to represent the lines joining positions. We
-*  arbitrarily use "Axes" to represent error bars. The Axes attributes
-*  will be copied to the Curves attributes prior to drawing the error bars.
+*  during the following call to KPG1_ASSET.  The symbols marking each 
+*  position are drawn as AST "markers" using AST_MARK.  The lines 
+*  joining the given positions are drawn as AST "Curves" using 
+*  AST_CURVE.   The error bars are also drawn using AST_CURVE and 
+*  therefore we need to use a different  element (i.e. not "Curves") to 
+*  represent them, since "Curves" is already being used to represent the
+*  lines joining positions.  We arbitrarily use "Axes" to represent
+*  error bars.  The Axes attributes will be copied to the Curves 
+*  attributes prior to drawing the error bars.
       CALL KPG1_ASPSY( '(ERR*BARS)', '(AXES)', STATUS )
       CALL KPG1_ASPSY( '(SYM*BOLS)', '(MARKERS)', STATUS )
       CALL KPG1_ASPSY( '(LIN*ES)', '(CURVES)', STATUS )
 
 *  Set the attributes of the supplied Plot using the supplied parameter 
-*  to access a plotting style. The above synonyms are recognised and 
-*  translated into the corresponding AST attribute names. Colour names 
+*  to access a plotting style.  The above synonyms are recognised and 
+*  translated into the corresponding AST attribute names.  Colour names 
 *  are also translated into colour indices.
       CALL KPG1_ASSET( APP, PARAM1, IPLOT, STATUS )
 
@@ -281,7 +295,7 @@
 *  Get the drawing attributes to use for each contour.
       CALL KPS1_MLPPN( PARAM2, IGRP, STATUS )
 
-*  Store the number of pen definitions supplied in the GRP group. These
+*  Store the number of pen definitions supplied in the GRP group.  These
 *  definitions will override the attributes set by the previous call to
 *  KPG1_ASSET.
       IF( IGRP .NE. GRP__NOID ) THEN
@@ -323,8 +337,9 @@
 *  Abort if an error has occurred.
             IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Loop round each comma-delimited attribute in the definitions, translating 
-*  colour names and any defined synonyms, and storing it in the Plot.
+*  Loop round each comma-delimited attribute in the definitions,
+*  translating colour names and any defined synonyms, and storing it in
+*  the Plot.
             IF( PENDEF .NE. ' ' ) THEN
                J1 = 1
                DO WHILE( J1 .LE. GRP__SZNAM )
@@ -334,7 +349,7 @@
      :                             .TRUE., IPLOT, BADAT, STATUS )
                   J1 = J2 + 1
 
-*  Annull any error which occurred while setting the pen.
+*  Annul any error which occurred while setting the pen.
                   IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
       
                END DO
@@ -350,7 +365,8 @@
 *  =======================================
          IF( MODE .EQ. 1 ) THEN
 
-*  Set up the correct PGPLOT attributes for the type of curve being drawn.
+*  Set up the correct PGPLOT attributes for the type of curve being
+*  drawn.
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
 *  Indicate that the pen is initially up.
@@ -363,7 +379,7 @@
 *  Loop round each X/Y position in the given range.
             DO I = ILO, IHI
 
-*  Save the single precision version of the current position. Set flags
+*  Save the single precision version of the current position.  Set flags
 *  indicating if they are good.
                GOODX = ( X( I, K ) .NE. AST__BAD )
                IF( GOODX ) RX = REAL( X( I, K ) )
@@ -371,19 +387,19 @@
                GOODY = ( Y( I, K ) .NE. AST__BAD )
                IF( GOODY ) RY = REAL( Y( I, K ) )
 
-*  See if the mid X position between this point and the previous point is
-*  defined. If so, store it.
+*  See if the mid X position between this point and the previous point
+*  is defined.  If so, store it.
                MIDX = GOODX .AND. GOODX0
                IF( MIDX ) RXC = 0.5*( RX + RX0 )
 
-*  On each pass through this loop three lines may be drawn; A) a horizontal 
-*  line from the previous position (I-1), half way towards the current
-*  position (I); B) a vertical line from the end of A) to the Y value of
-*  the current position; C) a horizontal line from the end of B) to the
-*  current position. 
+*  On each pass through this loop three lines may be drawn; A) a 
+*  horizontal line from the previous position (I-1), half way towards 
+*  the current position (I); B) a vertical line from the end of A) to 
+*  the Y value of the current position; C) a horizontal line from the
+*  end of B) to the current position. 
 
-*  To draw C) the mid X position must be good and the current position must 
-*  have a good Y value.
+*  To draw C) the mid X position must be good and the current position 
+*  must have a good Y value.
                DRAWC = ( MIDX .AND. GOODY )
 
 *  If possible draw line A). To draw A), the mid X position must be 
@@ -436,7 +452,8 @@
 *  ==============================================
          ELSE IF( MODE .EQ. 2 ) THEN
 
-*  Set up the correct PGPLOT attributes for the type of curve being drawn.
+*  Set up the correct PGPLOT attributes for the type of curve being 
+*  drawn.
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
 *  Indicate the pen is initially up.
@@ -460,8 +477,8 @@
 
                   END IF
 
-*  If the pen was originally up, and both X and Y are good at the current 
-*  position, put the pen down.
+*  If the pen was originally up, and both X and Y are good at the 
+*  current position, put the pen down.
                ELSE IF( X( I, K ) .NE. AST__BAD .AND. 
      :                  Y( I, K ) .NE. AST__BAD ) THEN
                   CALL PGMOVE( REAL( X( I, K ) ), REAL( Y( I, K ) ) )
@@ -478,7 +495,8 @@
 *  ============================================
          ELSE IF( MODE .EQ. 3 ) THEN
 
-*  Set up the correct PGPLOT attributes for the type of curve being drawn.
+*  Set up the correct PGPLOT attributes for the type of curve being 
+*  drawn.
             CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
 
 *  Draw a marker at each good X/Y position in the given range.
@@ -497,7 +515,8 @@
 *  ==============================================
          ELSE IF( MODE .EQ. 4 ) THEN
 
-*  Set up the correct PGPLOT attributes for the type of curve being drawn.
+*  Set up the correct PGPLOT attributes for the type of curve being 
+*  drawn.
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
 *  Draw a line at each position which has good values for the upper and 
@@ -519,8 +538,8 @@
 *  =================================================================
          ELSE IF( MODE .EQ. 5 ) THEN
 
-*  Set up the correct PGPLOT attributes for the type of curve being drawn.
-*  First the curves.
+*  Set up the correct PGPLOT attributes for the type of curve being 
+*  drawn.  First the curves.
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTR, STATUS )
 
 *  Indicate the pen is initially up.
@@ -544,8 +563,8 @@
 
                   END IF
 
-*  If the pen was originally up, and both X and Y are good at the current 
-*  position, put the pen down.
+*  If the pen was originally up, and both X and Y are good at the 
+*  current position, put the pen down.
                ELSE IF( X( I, K ) .NE. AST__BAD .AND. 
      :                  Y( I, K ) .NE. AST__BAD ) THEN
                   CALL PGMOVE( REAL( X( I, K ) ), REAL( Y( I, K ) ) )
@@ -558,9 +577,9 @@
 *  Re-instate the original PGPLOT attributes.
             CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTR, STATUS )
 
-*  Now draw the markers. Set PGPLOT attributes to match the plotting style 
-*  used by the Plot for drawing markers. Save the current PGPLOT attribute 
-*  values in ATTR.
+*  Now draw the markers.  Set PGPLOT attributes to match the plotting 
+*  style used by the Plot for drawing markers.  Save the current PGPLOT 
+*  attribute values in ATTR.
             CALL KPG1_PGSTY( IPLOT, 'MARKERS', .TRUE., ATTR, STATUS )
 
 *  Draw a marker at each good X/Y position in the given range.
@@ -591,16 +610,16 @@
 *  ====================================
          IF( XERROR .OR. YERROR ) THEN
 
-*  Set PGPLOT attributes to match the plotting style used by the Plot for 
-*  drawing Axes. Save the current PGPLOT attribute values in ATTR.
+*  Set PGPLOT attributes to match the plotting style used by the Plot
+*  for drawing Axes.  Save the current PGPLOT attribute values in ATTR.
             CALL KPG1_PGSTY( IPLOT, 'AXES', .TRUE., ATTR, STATUS )
 
-*  Get the size of the serif for error bars. This is scaled by the 
-*  "size(errbars)" attribute which is a synonym for "size(axes)".
+*  Get the size of the serif for error bars.  This is scaled by the 
+*  "Size(Errbars)" attribute which is a synonym for "Size(Axes)".
             SERIF = AST_GETR( IPLOT, 'SIZE(AXES)', STATUS )*0.02*
      :                        MIN( ABS( WX2 - WX1 ), ABS( WY2 - WY1 ) )
 
-*  Loop round positions which have good X and Y values. Step over FREQ
+*  Loop round positions which have good X and Y values.  Step over FREQ
 *  positions each time.
             DO I = ILO + FREQ/2, IHI, FREQ
                IF( X( I, K ) .NE. AST__BAD .AND. 
@@ -646,8 +665,8 @@
    
                   END IF
 
-*  If ERSHAP specifies a diagonal cross, draw a poly line from bottom left 
-*  to centre, to top right corner of the error box,
+*  If ERSHAP specifies a diagonal cross, draw a poly line from 
+*  the bottom-left on to centre, to top-right corner of the error box.
                   IF( ERSHAP .EQ. 2 ) THEN 
                      IF( XERROR ) THEN
                         CALL PGMOVE( XLO, YLO )
@@ -743,8 +762,8 @@
 *  Release resources used to store the synonyms.
       CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
-*  Re-instate the original plotting attributes for the AST graphical elements 
-*  which may have been changed by this routine.
+*  Re-instate the original plotting attributes for the AST graphical 
+*  elements that may have been changed by this routine.
       DO I = 1, NAT
          CALL AST_SETR( IPLOT, ATTNAM( I ), ATT0( I ), STATUS )
       END DO

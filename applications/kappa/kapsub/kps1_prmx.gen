@@ -4,7 +4,7 @@
 *     KPS1_PRMX<T>
  
 *  Purpose:
-*     Copy an array, permuting the axes.
+*     Copies an array, permuting the axes.
  
 *  Language:
 *     Starlink Fortran 77
@@ -24,10 +24,10 @@
 *     DIMO( NDIM ) = INTEGER (Given)
 *        Output array dimensions.
 *     PERM( NDIM ) = INTEGER (Given)
-*        The first element is the index of the pixel axis within the input 
-*        which is to become axis 1 in the output. The second element is the 
-*        index of the pixel axis within the input which is to become axis 2 
-*        in the output, etc. Axes are numbered from 1.
+*        The first element is the index of the pixel axis within the 
+*        input that is to become axis 1 in the output.  The second 
+*        element is the index of the pixel axis within the input that is
+*        to become axis 2 in the output, etc.  Axes are numbered from 1.
 *     IN( * ) = <TYPE> (Given)
 *        The input array.
 *     OUT( * ) = <TYPE> (Given)
@@ -37,11 +37,14 @@
  
 *  Authors:
 *     DSB: David S. Berry (DSB)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
 *     6-FEB-2001 (DSB):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -75,9 +78,9 @@
       INTEGER J                  ! Index of output pixel
       INTEGER K                  ! Index of input pixel
       INTEGER IOUT( NDF__MXDIM + 1 ) ! Output pixel indices
-      INTEGER IIN( NDF__MXDIM + 1 )  ! Input pixel indices
       INTEGER STEPI( NDF__MXDIM + 1 )! Input steps indexed by input axis
-      INTEGER STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output axis
+      INTEGER STEP( NDF__MXDIM + 1 ) ! Input steps indexed by output
+                                 ! axis
 
 *.
  
@@ -90,18 +93,18 @@
       EL = 1
       DO I = 1, NDIM
          STEPI( I ) = EL
-         EL = EL*DIM( I )
+         EL = EL * DIM( I )
          IOUT( I ) = 1
       END DO
 
-*  Permute the step array so that it is indexed by output axis instead of
-*  input axis.
+*  Permute the step array so that it is indexed by output axis instead 
+*  of input axis.
       DO I = 1, NDIM
          STEP( I ) = STEPI( PERM( I ) )
       END DO
 
-*  Initialise the vector index within the input array of the current output
-*  pixel.
+*  Initialise the vector index within the input array of the current 
+*  output pixel.
       K = 1
 
 *  Do each output value.

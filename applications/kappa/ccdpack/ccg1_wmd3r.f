@@ -1,6 +1,6 @@
       SUBROUTINE CCG1_WMD3R( ORDDAT, WEIGHT, NVAL, PBAD, NITER,
-     :                         TOLL, NSIGMA, COVEC, XMODE,
-     :                         FVAR, USED, NUSED, STATUS )
+     :                       TOLL, NSIGMA, COVEC, XMODE,
+     :                       FVAR, USED, NUSED, STATUS )
 *+
 *  Name:
 *     CCG1_WMD3R
@@ -105,6 +105,8 @@
 *        Added description and more comments.
 *     1-JUN-1992 (PDRAPER):
 *        Added order statistics for improved variance estimation.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,7 +124,6 @@
 *  Arguments Given:
       INTEGER NVAL
       INTEGER NITER
-      INTEGER NMAT
       REAL ORDDAT( NVAL )
       REAL WEIGHT( NVAL )
       DOUBLE PRECISION COVEC( * )
@@ -144,7 +145,8 @@
       DOUBLE PRECISION D         ! Data value
       DOUBLE PRECISION DATA      ! Work variable
       DOUBLE PRECISION DEV       ! Deviation from the current mean
-      DOUBLE PRECISION DEV2      ! Deviation from the current mean squared, weighted
+      DOUBLE PRECISION DEV2      ! Deviation from the current mean 
+                                 ! squared, weighted
       DOUBLE PRECISION DEVLIM    ! Maximum deviation to be included
       DOUBLE PRECISION DTOLL     ! TOLL as DBLE
       DOUBLE PRECISION DW        ! Weight as DBLE
@@ -153,7 +155,8 @@
       DOUBLE PRECISION EX        ! Probability of a point being good
       DOUBLE PRECISION IVAR      ! Initial population variance
       DOUBLE PRECISION PBNORM    ! Normalised probability
-      DOUBLE PRECISION PROB      ! Fractional probability of a point being good data
+      DOUBLE PRECISION PROB      ! Fractional probability of a point 
+                                 ! being good data
       DOUBLE PRECISION SUMA      ! Sum zero-order moment
       DOUBLE PRECISION SUMB      ! Sum weighted zero-order moment
       DOUBLE PRECISION SUMC      ! Sum first-order moment
