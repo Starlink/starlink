@@ -27,8 +27,8 @@
 *     tools (see below).
 *
 *     The data values in each of the input NDFs which are to be mapped
-*     onto zero intensity and full intensity can be given manually using
-*     parameters RLOW, RHIGH, GLOW, GHIGH, BLOW and BHIGH, but by
+*     on to zero intensity and full intensity can be given manually 
+*     using parameters RLOW, RHIGH, GLOW, GHIGH, BLOW and BHIGH, but by
 *     default they are evaluated automatically. This is done by finding
 *     specified percentile points within the data histograms of each of
 *     the input images (see parameter PERCENTILES).
@@ -232,6 +232,8 @@
 *        Use CNF_PVAL.
 *     2006 February 24 (MJC):
 *        Added new CUMUL argument set to .FALSE. to KPG1_GHSTx call.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -285,8 +287,8 @@
       INTEGER I                ! Loop count
       INTEGER IAX              ! Axis index
       INTEGER INDF( 3 )        ! Input NDF identifiers
-      INTEGER INDFL            ! Identifier for output NDF containing LUT
-      INTEGER INDFO            ! Identifier for output NDF containing image
+      INTEGER INDFL            ! Identifier output NDF containing LUT
+      INTEGER INDFO            ! Identifier output NDF containing image
       INTEGER INDFS            ! Identifier for input NDF section
       INTEGER IPBHST           ! Pointer to work space
       INTEGER IPGHST           ! Pointer to work space
@@ -313,10 +315,9 @@
       INTEGER SUBND( 2, 3 )    ! Upper bounds of significant axes
       INTEGER UBND( NDF__MXDIM )! Upper bounds of input NDF
       INTEGER UBNDO( 2 )       ! Upper bounds of output image
-      INTEGER UP               ! Highest colour index for the image
       LOGICAL BAD              ! The array may contain bad pixels?
       LOGICAL GOT( 3 )         ! Which input NDFs were supplied?
-      LOGICAL POSTIV           ! The scaling of the array is to be positive?
+      LOGICAL POSTIV           ! Scaling of the array is to be positive?
       REAL DUMMY               ! Used to swap percentiles
       REAL HI( 3 )             ! Upper scaling limits
       REAL LO( 3 )             ! Lower scaling limits
@@ -366,9 +367,9 @@
          GOT( R ) = .FALSE.
 
 *  Otherwise, set a flag to indicate that we do have the Red image, 
-*  update the overlap area common to all the input images obtained so far, 
-*  store the colour of this input image and increment the number of input 
-*  images obtained so far. 
+*  update the overlap area common to all the input images obtained so 
+*  far, store the colour of this input image and increment the number 
+*  of input images obtained so far. 
       ELSE
          GOT( R ) = .TRUE.
 
@@ -477,8 +478,8 @@
             CALL NDF_BOUND( INDF( I ), NDF__MXDIM, LBND, UBND, NDIM,
      :                      STATUS ) 
 
-*  Replace the bounds for the axes being used within this input NDF with 
-*  the bounds of the overlap region.
+*  Replace the bounds for the axes being used within this input NDF 
+*  with the bounds of the overlap region.
             DO J = 1, 2
                IAX = SDIM( J, I )
                LBND( IAX ) = LBNDO( J )
@@ -493,7 +494,7 @@
             INDF( I ) = INDFS
 
 *  Map the DATA array of the section.
-            CALL NDF_MAP( INDF( I ), 'DATA', '_REAL', 'READ', IPIN( I ), 
+            CALL NDF_MAP( INDF( I ), 'DATA', '_REAL', 'READ', IPIN( I ),
      :                    EL, STATUS )
 
 *  If the upper and lower scaling limits were supplied on the command
@@ -537,9 +538,9 @@
                   PERVAL( 2 ) = DUMMY
                END IF
 
-*  Set the dynamic defaults for the scaling limits. We do this so that the 
-*  default values will appear in any parameter prompts which are issued
-*  (assuming PPATH=DYNAMIC in the interface file).
+*  Set the dynamic defaults for the scaling limits.  We do this so that
+*  the default values will appear in any parameter prompts which are 
+*  issued (assuming PPATH=DYNAMIC in the interface file).
                CALL PAR_DEF0R( PARLO( I ), PERVAL( 1 ), STATUS )
                CALL PAR_DEF0R( PARHI( I ), PERVAL( 2 ), STATUS )
 
@@ -550,8 +551,8 @@
                CALL PAR_GET0R( PARLO( I ), LO( I ), STATUS )
 
 *  If a null value was supplied, annul the error and use the dynamic
-*  default. We do it like this, rather than just setting VPATH=DYNAMIC in
-*  the interface file to facilitate automatic re-invocation of the
+*  default.  We do it like this, rather than just setting VPATH=DYNAMIC 
+*  in the interface file to facilitate automatic re-invocation of the
 *  application for process groups of NDFs (see lpg_again.f).
                IF( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -586,13 +587,13 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Create the output NDF to contain the integer colour indices. Propagate
-*  the section from the first supplied input NDF.
+*  Create the output NDF to contain the integer colour indices.
+*  Propagate the section from the first supplied input NDF.
       CALL LPG_PROP( INDF( FIRST ), 'AXIS,WCS,NOLABEL,NOTITLE', 'OUT',
      :               INDFO, STATUS ) 
 
-*  Annul the error if a null value was supplied. We can still create the
-*  PPM version of the image.
+*  Annul the error if a null value was supplied.  We can still create 
+*  the PPM version of the image.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
@@ -669,7 +670,8 @@
 *  Check no error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Attempt to open a file to contain the PPM version of the composite image.
+*  Attempt to open a file to contain the PPM version of the composite
+*  image.
       CALL FIO_ASSOC( 'PPM', 'WRITE', 'LIST', 80, FD, STATUS )
 
 *  Annul the error if a null value was given.
@@ -679,8 +681,8 @@
 *  Otherwise, create the PPM output.
       ELSE
 
-*  If an output NDF was not created, get the BAD colour as a named colour,
-*  and find the corresponding RGB values.
+*  If an output NDF was not created, get the BAD colour as a named 
+*  colour, and find the corresponding RGB values.
          IF( INDFO .EQ. NDF__NOID ) THEN
             CALL PAR_GET0C( 'BADCOL', BADCOL, STATUS )
             CALL KPG1_NMCOL( BADCOL, RGBBAD( R ), RGBBAD( G ), 

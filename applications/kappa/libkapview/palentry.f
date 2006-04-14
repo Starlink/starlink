@@ -35,7 +35,7 @@
 *  ADAM Parameters:
 *     COLOUR() = LITERAL (Read)
 *        A colour to be added to the palette at the entry given by
-*        parameter PALNUM.  It is either:
+*        parameter PALNUM.  It is one of the following options.
 
 *          o  A named colour from the standard colour set, which may
 *          be abbreviated.  If the abbreviated name is ambiguous the
@@ -47,11 +47,12 @@
 *          commas or spaces.  Each value must lie in the range 0.0--1.0.
 *          For example, "0.7,0.7,1.0" would give a pale blue.
 *
-*          o  An HTML colour code such as #ff002d. The leading #
+*          o  An HTML colour code such as #ff002d.  The leading #
 *          character can be replaced if required by a "@" character.
 *
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used.  [Current image-display device]
+*        Name of the image display to be used. 
+*        [Current image-display device]
 *     PALNUM = _INTEGER (Read)
 *        The number of the palette entry whose colour is to be
 *        modified.  PALNUM must lie in the range zero to the minimum
@@ -70,7 +71,7 @@
 *  Notes:
 *     - The effects of this command will only be immediately apparent
 *     when run on X windows which have 256 colours (or other similar 
-*     pseudocolour devices). On other devices (for instance, X windows
+*     pseudocolour devices).  On other devices (for instance, X windows
 *     with more than 256 colours) the effects will only become apparent 
 *     when subsequent graphics applications are run.
 
@@ -97,9 +98,11 @@
 *     22-JUL-1999 (TDCA):
 *        Modified to use PGPLOT.
 *     1-OCT-1999 (DSB):
-*        Tidied up. Use KPG1_PGOPN instead of AGP_ASSOC.
+*        Tidied up.  Use KPG1_PGOPN instead of AGP_ASSOC.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,8 +125,8 @@
       PARAMETER ( NPRICL = 3 )
 
 *  Local Variables:
-      INTEGER DOWN               ! Lowest available colour index
-      INTEGER PALNUM             ! Palette entry number to have its colour changed
+      INTEGER PALNUM             ! Palette entry number to have its 
+                                 ! colour changed
       INTEGER IPIC               ! AGI identifier for current picture
       INTEGER UP                 ! Highest available colour index
       REAL RGBINT( NPRICL )      ! RGB intensities of the chosen colour
@@ -153,10 +156,11 @@
       IF ( STATUS .EQ. SAI__OK ) CALL PGSCR( PALNUM, RGBINT( 1 ), 
      :                                       RGBINT( 2 ), RGBINT( 3 ) )
 
-*  Save the modified palette entry in the adam directory so that it can be 
-*  read back again by subsequent applications (PGPLOT resets the colour 
-*  palette when it opens a device, so the palette then needs to be 
-*  re-instated). Other elements in the saved palette are left unchanged. 
+*  Save the modified palette entry in the parameter-file directory so 
+*  that it can be read back again by subsequent applications (PGPLOT 
+*  resets the colour palette when it opens a device, so the palette then
+*  needs to be re-instated).  Other elements in the saved palette are 
+*  left unchanged. 
       CALL KPG1_PLSAV( PALNUM, PALNUM, .FALSE., STATUS )
 
 *  Shut down the graphics system.
@@ -164,8 +168,8 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'PALENTRY_ERR', 'PALENTRY: Unable to enter '//
-     :                 'a colour into the palette.', STATUS )
+         CALL ERR_REP( 'PALENTRY_ERR', 'PALENTRY: Unable to enter '/
+     :                 /'a colour into the palette.', STATUS )
       END IF
 
       END

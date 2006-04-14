@@ -79,7 +79,7 @@
 *        another line plot within the current picture.  If a null (!)
 *        value is supplied, a value of TRUE will be used if and only if
 *        a mapping can be found between the existing and the new plots. 
-*        A value of FALSE will be used otherwise. [!]
+*        A value of FALSE will be used otherwise.  [!]
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        plot.  If a null (!) value is supplied, the value used is 
@@ -89,7 +89,7 @@
 *        The width of the margins left for the annotation may be
 *        controlled using parameter MARGIN.  The appearance of the axes
 *        (colours, founts, etc.) can be controlled using the parameter
-*        STYLE. [!]
+*        STYLE.  [!]
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is 
 *        drawn.  If CLEAR is FALSE not only is the existing plot
@@ -119,16 +119,16 @@
 *        "Variance" and causes the square root of the variance values
 *        to be displayed).  If "Quality" is specified, then the quality
 *        values are treated as numerical values (in the range 0 to
-*        255). ["Data"]
+*        255).  ["Data"]
 *     DEVICE = DEVICE (Read)
-*        The plotting device. [current graphics device]
+*        The plotting device.  [current graphics device]
 *     ERRBAR = _LOGICAL (Read)
 *        TRUE if error bars are to be drawn.  The error bars can
 *        comprise either or both of the data and axis-centre errors,
 *        depending on what is available in the supplied dataset.  The
 *        parameter SHAPE controls the appearance of the error bars, and
 *        XSIGMA and YSIGMA control their lengths.  The ERRBAR parameter 
-*        is ignored unless the parameter COMP is set to "Data". [FALSE]
+*        is ignored unless the parameter COMP is set to "Data".  [FALSE]
 *     FREQ = _INTEGER (Read)
 *        The frequency at which error bars are to be plotted.  For
 *        instance, a value of 2 would mean that alternate points have
@@ -152,7 +152,7 @@
 *        using parameter KEYSTYLE.  If a null (!) value is supplied, a 
 *        key is produced if the current co-ordinate Frame of the 
 *        supplied NDF has two or more axes, but no key is produced if it
-*        only has one axis. [!]
+*        only has one axis.  [!]
 *     KEYSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style to 
 *        use for the key (see parameter KEY). 
@@ -176,7 +176,7 @@
 *        defaulted if a null value (!) is supplied.  See section 
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). [current value] 
+*        (no error is reported).  [current value]
 *     LMODE = LITERAL (Read)
 *        LMODE specifies how the defaults for parameters YBOT and YTOP
 *        (the  lower and upper limit of the vertical axis of the plot) 
@@ -185,7 +185,7 @@
 *        must specify the method to use.  If supplied, the other two 
 *        sub-strings should be numerical values as described below 
 *        (default values will be used if these sub-strings are not 
-*        provided).  The following methods are available:
+*        provided).  The following methods are available.
 *
 *        - "Range" -- The minimum and maximum data values (including any
 *        error bars) are used as the defaults for YBOT and YTOP.  No
@@ -236,17 +236,17 @@
 *        margins are too narrow any axis annotation may be clipped.  If
 *        a null (!) value is supplied, the value used is 0.15 (for all
 *        edges) if either annotated axes or a key are produced, and
-*        zero otherwise. [current value]
+*        zero otherwise.  [current value]
 *     MARKER = _INTEGER (Read)
 *        This parameter is only accessed if parameter MODE is set to
 *        "Chain" or "Mark".  It specifies the symbol with which each
 *        position should be marked, and should be given as an integer 
 *        PGPLOT marker type.  For instance, 0 gives a box, 1 gives a 
 *        dot, 2 gives a cross, 3 gives an asterisk, 7 gives a triangle.
-*        The value must be larger than or equal to -31. [current value]
+*        The value must be larger than or equal to -31.  [current value]
 *     MODE = LITERAL (Read)
 *        Specifies the way in which data values are represented. MODE
-*        can take the following values:
+*        can take the following values.
 *
 *        - "Histogram" -- An histogram of the points is plotted in the
 *        style of a "staircase" (with vertical lines only joining the y 
@@ -270,7 +270,7 @@
 *        NDF structure containing the array to be plotted.
 *     SHAPE = LITERAL (Read)
 *        Specifies the way in which errors are represented.  SHAPE
-*        can take the following values:
+*        can take the following values.
 *
 *        - "Bars" -- Bars with serifs (i.e. cross pieces at each end) 
 *        are drawn joining the x error limits and the y error limits. 
@@ -344,7 +344,7 @@
 *        introduce a non-monotonic jump in axis value (from 0h to 24h,
 *        or 24h to 0h).  If a null (!) value is supplied, the value used
 *        is 1 if the current co-ordinate Frame in the NDF is
-*        one-dimensional and 0 otherwise. [!]
+*        one-dimensional and 0 otherwise.  [!]
 *     XLEFT = LITERAL (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis.  If a null (!) value is supplied, the value used is the
@@ -352,10 +352,10 @@
 *        to include any horizontal error bar).  The value supplied may 
 *        be greater than or less than the value supplied for XRIGHT.  A 
 *        formatted value for the quantity specified by parameter USEAXIS
-*        should be supplied.  See also parameter ALIGN. [!]
+*        should be supplied.  See also parameter ALIGN.  [!]
 *     XMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the X axis is mapped
-*        on to the plot.  The options are:
+*        on to the plot.  The options are as follows
 *
 *        - "Pixel" -- The mapping is such that pixel index within the
 *        input NDF increases linearly across the plot.
@@ -384,11 +384,11 @@
 *        to include any horizontal error bar).  The value supplied may 
 *        be greater than or less than the value supplied for XLEFT.  A 
 *        formatted value for the quantity specified by parameter USEAXIS
-*        should be supplied.  See also parameter ALIGN. [!]
+*        should be supplied.  See also parameter ALIGN.  [!]
 *     XSIGMA = LITERAL (Read)
 *        If horizontal error bars are produced (see parameter ERRBAR), 
 *        then XSIGMA gives the number of standard deviations that the 
-*        error bars are to represent. [current value]
+*        error bars are to represent.  [current value]
 *     YBOT = LITERAL (Read)
 *        The axis value to place at the bottom end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
@@ -396,10 +396,10 @@
 *        greater than or less than the value supplied for YTOP.  If
 *        parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
-*        See also parameter ALIGN. [!]
+*        See also parameter ALIGN.  [!]
 *     YMAP = LITERAL (Read)
 *        Specifies how the quantity represented by the Y axis is mapped
-*        on to the screen.  The options are:
+*        on to the screen.  The options are as follows.
 *
 *        - "Linear" -- The data values are mapped linearly on to the
 *        screen.
@@ -422,7 +422,7 @@
 *     YSIGMA = LITERAL (Read)
 *        If vertical error bars are produced (see parameter ERRBAR), 
 *        then YSIGMA gives the number of standard deviations that the 
-*        error bars are to represent. [current value]
+*        error bars are to represent.  [current value]
 *     YTOP = LITERAL (Read)
 *        The axis value to place at the top end of the vertical
 *        axis.  If a null (!) value is supplied, the value used is
@@ -430,7 +430,7 @@
 *        greater than or less than the value supplied for YBOT.  If
 *        parameter YMAP is set to "ValueLog", then the supplied value
 *        should be the logarithm (base 10) of the bottom data value.
-*        See also parameter ALIGN. [!]
+*        See also parameter ALIGN.  [!]
 
 *  Examples:
 *     linplot spectrum 
@@ -453,7 +453,7 @@
 *        one-dimensional NDF called ironarc on the current graphics 
 *        device.  The plot has a title of "Fe Arc variance". If the
 *        data is from a dual sideband instrument, the image sideband
-*        would normally be annotated along the top edge of the plot, but 
+*        would normally be annotated along the top edge of the plot, but
 *        the inclusion of "drawdsb=0" in the style value prevents this.
 *     linplot prof useaxis=dec xleft="23:30:22" xright="23:30:45"
 *        This plots data values versus declination for those elements of
@@ -503,15 +503,15 @@
 
 *  Notes:
 *     -  If the horizontal axis is described by a DSBSpecFrame (a
-*     description of the coordinates attached to a dual-sideband 
+*     description of the co-ordinates attached to a dual-sideband 
 *     spectrum) in the NDF's WCS FrameSet, then the unselected sideband 
 *     will be annotated along the top edge of the plot.
-*     -  If no Title is specified via the STYLE parameter, then the Title
-*     component in the NDF is used as the default title for the annotated 
-*     axes. If the NDF does not have a Title component, then the default 
-*     title is taken from current co-ordinate Frame in the NDF. If this
-*     has not been set explicitly, then the name of the NDF is used as the
-*     default title.
+*     -  If no Title is specified via the STYLE parameter, then the 
+*     Title component in the NDF is used as the default title for the
+*     annotated axes.  If the NDF does not have a Title component, then
+*     the default title is taken from current co-ordinate Frame in the
+*     NDF.  If this has not been set explicitly, then the name of the
+*     NDF is used as the default title.
 *     -  Default axis errors and widths are used, if none are present in
 *     the NDF. The defaults are the constants 0 and 1 respectively.
 *     -  The application stores a number of pictures in the graphics
@@ -573,6 +573,8 @@
 *        Ignore blank titles supplied in STYLE.
 *     6-FEB-2006 (DSB):
 *        Use KPG1_ASTTL to get the title.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -581,153 +583,159 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE            ! no default typing allowed
+      IMPLICIT NONE              ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Global SSE definitions
-      INCLUDE 'PRM_PAR'        ! VAL__ constants
-      INCLUDE 'NDF_PAR'        ! NDF constants
-      INCLUDE 'AST_PAR'        ! AST constants and function declarations
-      INCLUDE 'PAR_ERR'        ! PAR error constants
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'AST_PAR'          ! AST constants and function 
+                                 ! declarations
+      INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
 
-*  External References:
-      INTEGER CHR_LEN          ! Used length of a string
-
 *  Local Constants:
-      INTEGER NDIM             ! Dimensionality of input array
-      PARAMETER( NDIM = 1 )    ! One-dimensional data
+      INTEGER NDIM               ! Dimensionality of input array
+      PARAMETER( NDIM = 1 )      ! One-dimensional data
 
-      REAL KW                  ! Width of key picture as fraction of
-      PARAMETER ( KW = 0.1 )   ! current picture.
+      REAL KW                    ! Width of key picture as fraction of
+      PARAMETER ( KW = 0.1 )     ! current picture.
 
 *  Local Variables:
-      CHARACTER CIAXIS*8       ! String obtained for parameter USEAXIS
-      CHARACTER COMP*8         ! Component to be displayed
-      CHARACTER KEYLN1*80      ! First line of key text
-      CHARACTER KEYLN2*80      ! Second line of key text
-      CHARACTER MCOMP*8        ! Component to be mapped
-      CHARACTER NDFNAM*255     ! Full NDF specification 
-      CHARACTER TEXT*255       ! A general text string
-      CHARACTER UNITS*20       ! Units of the data
-      CHARACTER XMAP*8         ! How to map the X axis on to the screen
-      CHARACTER YMAP*8         ! How to map the Y axis on to the screen
-      DOUBLE PRECISION BL( 2 ) ! "W.w. want" X/Y values at bottom-left 
-                               ! corner
-      DOUBLE PRECISION BLG( 2 )! "Uniform" X/Y values at bottom-left 
-                               ! corner
-      DOUBLE PRECISION BOX( 4 )! Bounds of DATA picture 
-      DOUBLE PRECISION DVAL    ! General double precision value
+      CHARACTER CIAXIS*( 8 )     ! String obtained for parameter USEAXIS
+      CHARACTER COMP*( 8 )       ! Component to be displayed
+      CHARACTER KEYLN1*( 80 )    ! First line of key text
+      CHARACTER KEYLN2*( 80 )    ! Second line of key text
+      CHARACTER MCOMP*( 8 )      ! Component to be mapped
+      CHARACTER NDFNAM*( 255 )   ! Full NDF specification 
+      CHARACTER TEXT*( 255 )     ! A general text string
+      CHARACTER UNITS*( 20 )     ! Units of the data
+      CHARACTER XMAP*( 8 )       ! How to map the X axis on to the
+                                 ! screen
+      CHARACTER YMAP*( 8 )       ! How to map the Y axis on to the 
+                                 ! screen
+      DOUBLE PRECISION BL( 2 )   ! "W.w. want" X/Y values at 
+                                 ! bottom-left corner
+      DOUBLE PRECISION BLG( 2 )  ! "Uniform" X/Y values at bottom-left 
+                                 ! corner
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of DATA picture 
+      DOUBLE PRECISION DVAL      ! General double precision value
       DOUBLE PRECISION FN( NDF__MXDIM ) ! End position in current Frame
       DOUBLE PRECISION ST( NDF__MXDIM ) ! Start position in current 
-                               ! Frame
-      DOUBLE PRECISION TR( 2 ) ! "W.w. want" X/Y values at top-right 
-                               ! corner
-      DOUBLE PRECISION TRG( 2 )! "Uniform" X/Y values at top-right 
-                               !corner
-      DOUBLE PRECISION TXTPOS( 2 )! Key text centre position
-      DOUBLE PRECISION XSMAX   ! Max X after inclusion of axis widths
-      DOUBLE PRECISION XSMIN   ! Min X after inclusion of axis widths
-      INTEGER AXMAP            ! Point to NDFs AXIS->GRID Mapping
-      INTEGER AXMAPS( 2 )      ! Axis mappings for displayed data plot
-      INTEGER DIAXIS           ! Default value for USEAXIS
-      INTEGER DIM              ! Number of elements in the input array
-      INTEGER DPFS             ! FrameSet connecting old and new 
-                               ! DATAPLOT Frames
-      INTEGER EL               ! Number of mapped elements 
-      INTEGER FREQ             ! Interval between error bars
-      INTEGER FSET             ! Pointer to FrameSet 
-      INTEGER I                ! General variable
-      INTEGER IAT              ! No. of characters in a string
-      INTEGER IAXFR            ! Index of effective AXIS Frame in IWCS
-      INTEGER IAXIS            ! Index of axis used to annotate 
-                               ! horizontal axis
-      INTEGER ICURR0           ! Index of original current Frame in Plot
-      INTEGER IHI              ! Index of last array element to use
-      INTEGER ILO              ! Index of first array element to use
-      INTEGER IMODE            ! Mode identifier
-      INTEGER INDF             ! NDF identifier for input NDF
-      INTEGER IPAWID           ! Pointer to supplied x axis widths
-      INTEGER IPIC0            ! AGI id. for original current picture
-      INTEGER IPICD            ! AGI id. for DATA picture
-      INTEGER IPICD0           ! Existing picture ID
-      INTEGER IPICF            ! AGI id. for new FRAME picture
-      INTEGER IPICK            ! AGI id. for the KEY picture
-      INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
-      INTEGER IPLOTK           ! Pointer to AST Plot for KEY picture
-      INTEGER IPSTEP           ! Pointer to x axis widths in "w.w. want"
-      INTEGER IPXBAR           ! Pointer to x error bar limits in "w.w.
-                               ! want"
-      INTEGER IPXCEN           ! Pointer to x centres in "w.w. want" 
-                               ! Frame
-      INTEGER IPXDAT           ! Pointer to supplied x axis centres
-      INTEGER IPXVAR           ! Pointer to supplied x centre variances
-      INTEGER IPYBAR           ! Pointer to y error bar limits in "w.w.
-                               ! want"
-      INTEGER IPYCEN           ! Pointer to y data values in "w.w. want"
-                               ! Frame
-      INTEGER IPYDAT           ! Pointer to supplied y data values
-      INTEGER IPYVAR           ! Pointer to supplied y data variances
-      INTEGER ISHAPE           ! Identifier for error bar shape
-      INTEGER IWCS             ! Pointer to the WCS FrameSet from the
-                               ! NDF
-      INTEGER MAP              ! Pointer to "w.w. got"->"w.w. want"
-                               ! Mapping 
-      INTEGER MONO             ! 0: Not monotonic, +1: increase. -1: 
-                               ! decrease
-      INTEGER MTYPE            ! PGPLOT marker type
-      INTEGER NAX              ! No. of axes in current Frame
-      INTEGER NAXNDF           ! No. of pixel axes in the base NDF
-      INTEGER NC               ! No. of characters in NDFNAM
-      INTEGER NCU              ! Number of characters in the units
-      INTEGER NFRM             ! Frame index increment between IWCS and
-                               ! IPLOT
-      INTEGER NMARG            ! No. of margin values given
-      INTEGER NVAL             ! No. of axis values supplied
-      INTEGER PMAP             ! PermMap pointer
+                                 ! Frame
+      DOUBLE PRECISION TR( 2 )   ! "W.w. want" X/Y values at top-right 
+                                 ! corner
+      DOUBLE PRECISION TRG( 2 )  ! "Uniform" X/Y values at top-right 
+                                 ! corner
+      DOUBLE PRECISION TXTPOS( 2 ) ! Key text centre position
+      DOUBLE PRECISION XSMAX     ! Max X after inclusion of axis widths
+      DOUBLE PRECISION XSMIN     ! Min X after inclusion of axis widths
+      INTEGER AXMAP              ! Point to NDFs AXIS->GRID Mapping
+      INTEGER AXMAPS( 2 )        ! Axis mappings for displayed data plot
+      INTEGER DIAXIS             ! Default value for USEAXIS
+      INTEGER DIM                ! Number of elements in the input array
+      INTEGER DPFS               ! FrameSet connecting old and new 
+                                 ! DATAPLOT Frames
+      INTEGER EL                 ! Number of mapped elements 
+      INTEGER FREQ               ! Interval between error bars
+      INTEGER FSET               ! Pointer to FrameSet 
+      INTEGER I                  ! General variable
+      INTEGER IAT                ! No. of characters in a string
+      INTEGER IAXFR              ! Index of effective AXIS Frame in IWCS
+      INTEGER IAXIS              ! Index of axis used to annotate 
+                                 ! horizontal axis
+      INTEGER ICURR0             ! Index of original current Frame in 
+                                 ! Plot
+      INTEGER IHI                ! Index of last array element to use
+      INTEGER ILO                ! Index of first array element to use
+      INTEGER IMODE              ! Mode identifier
+      INTEGER INDF               ! NDF identifier for input NDF
+      INTEGER IPAWID             ! Pointer to supplied x axis widths
+      INTEGER IPIC0              ! AGI id. for original current picture
+      INTEGER IPICD              ! AGI id. for DATA picture
+      INTEGER IPICD0             ! Existing picture ID
+      INTEGER IPICF              ! AGI id. for new FRAME picture
+      INTEGER IPICK              ! AGI id. for the KEY picture
+      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
+      INTEGER IPSTEP             ! Pointer to x axis widths in "w.w. 
+                                 ! want"
+      INTEGER IPXBAR             ! Pointer to x error bar limits in 
+                                 ! "w.w. want"
+      INTEGER IPXCEN             ! Pointer to x centres in "w.w. want" 
+                                 ! Frame
+      INTEGER IPXDAT             ! Pointer to supplied x axis centres
+      INTEGER IPXVAR             ! Pointer to supplied x centre
+                                 ! variances
+      INTEGER IPYBAR             ! Pointer to y error bar limits in 
+                                 ! "w.w. want"
+      INTEGER IPYCEN             ! Pointer to y data values in "w.w. 
+                                 ! want" Frame
+      INTEGER IPYDAT             ! Pointer to supplied y data values
+      INTEGER IPYVAR             ! Pointer to supplied y data variances
+      INTEGER ISHAPE             ! Identifier for error bar shape
+      INTEGER IWCS               ! Pointer to the WCS FrameSet from the
+                                 ! NDF
+      INTEGER MAP                ! Pointer to "w.w. got"->"w.w. want"
+                                 ! Mapping 
+      INTEGER MONO               ! 0: Not monotonic, +1: increase. -1: 
+                                 ! decrease
+      INTEGER MTYPE              ! PGPLOT marker type
+      INTEGER NAX                ! No. of axes in current Frame
+      INTEGER NAXNDF             ! No. of pixel axes in the base NDF
+      INTEGER NC                 ! No. of characters in NDFNAM
+      INTEGER NCU                ! Number of characters in the units
+      INTEGER NFRM               ! Frame index increment between IWCS
+                                 ! and IPLOT
+      INTEGER NMARG              ! No. of margin values given
+      INTEGER NVAL               ! No. of axis values supplied
+      INTEGER PMAP               ! PermMap pointer
       INTEGER PERM( NDF__MXDIM ) ! Dummy axis permutation array
-      INTEGER SDIM( NDIM )     ! The significant NDF axes
-      INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
-      INTEGER SUBND( NDIM )    ! Significant upper bounds of the image
-      INTEGER WCSMAP           ! Mapping from NDF GRID to current Frame
-      INTEGER WWGOT            ! Index of "what we've got" Frame in FSET
-      INTEGER WWWANT           ! Index of "what we want" Frame in FSET
-      LOGICAL ALIGN            ! Should new X axis be aligned with 
-                               ! existing X axis?
-      LOGICAL AXES             ! Produce annotated axes?
-      LOGICAL BAD              ! Bad values found?
-      LOGICAL DIST             ! Show distance instead of axis value?
-      LOGICAL ERRBAR           ! Display error bars?
-      LOGICAL FRSTEP           ! Free pointer to x-axis widths in "w.w.
-                               ! want"?
-      LOGICAL FRXBAR           ! Free pointer to x-error-bar limits in 
-                               ! "w.w. want"
-      LOGICAL FRXCEN           ! Free pointer to x centres in "w.w. 
-                               ! want" Frame
-      LOGICAL FRYBAR           ! Free pointer to y error-bar limits in 
-                               ! "w.w. want"
-      LOGICAL FRYCEN           ! Free pointer to y data values in "w.w. 
-                               ! want" Frame
-      LOGICAL KEY              ! Key of the contour heights to be 
-                               ! produced?
-      LOGICAL NEWPIC           ! Is new Plot aligned with existing DATA
-                               ! picture?
-      LOGICAL NOINV            ! Did any mapping not have an inverse?
-      LOGICAL OLDPIC           ! Was an existing DATA picture found?
-      LOGICAL THERE            ! Does object exist?
-      LOGICAL XVAR             ! Display x axis centre variances?
-      LOGICAL YVAR             ! Display y data variances?
-      REAL HGT                 ! Height of text with horizontal baseline
-      REAL LNSP                ! Line spacing in millimetres
-      REAL MARGIN( 4 )         ! Width of margins round DATA picture
-      REAL UP(2)               ! Up vector
-      REAL X1, X2, Y1, Y2      ! Bounds of PGPLOT window
-      REAL XCH                 ! Height of text with vertical baseline
-      REAL XSIGMA              ! No. of std. devn's for X error bars
-      REAL YSIGMA              ! No. of std. devn's for Y error bars
+      INTEGER SDIM( NDIM )       ! The significant NDF axes
+      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
+      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
+      INTEGER WCSMAP             ! Mapping from NDF GRID to current 
+                                 ! Frame
+      INTEGER WWGOT              ! Index of "what we've got" Frame in 
+                                 ! FSET
+      INTEGER WWWANT             ! Index of "what we want" Frame in FSET
+      LOGICAL ALIGN              ! Should new X axis be aligned with 
+                                 ! existing X axis?
+      LOGICAL AXES               ! Produce annotated axes?
+      LOGICAL BAD                ! Bad values found?
+      LOGICAL DIST               ! Show distance instead of axis value?
+      LOGICAL ERRBAR             ! Display error bars?
+      LOGICAL FRSTEP             ! Free pointer to x-axis widths in 
+                                 ! "w.w. want"?
+      LOGICAL FRXBAR             ! Free pointer to x-error-bar limits in
+                                 ! "w.w. want"
+      LOGICAL FRXCEN             ! Free pointer to x centres in "w.w. 
+                                 ! want" Frame
+      LOGICAL FRYBAR             ! Free pointer to y error-bar limits in
+                                 ! "w.w. want"
+      LOGICAL FRYCEN             ! Free pointer to y data values in 
+                                 ! "w.w. want" Frame
+      LOGICAL KEY                ! Key of the contour heights to be 
+                                 ! produced?
+      LOGICAL NEWPIC             ! Is new Plot aligned with existing
+                                 ! DATA picture?
+      LOGICAL NOINV              ! Did any mapping not have an inverse?
+      LOGICAL OLDPIC             ! Was an existing DATA picture found?
+      LOGICAL THERE              ! Does object exist?
+      LOGICAL XVAR               ! Display x axis centre variances?
+      LOGICAL YVAR               ! Display y data variances?
+      REAL HGT                   ! Height of text with horizontal 
+                                 ! baseline
+      REAL LNSP                  ! Line spacing in millimetres
+      REAL MARGIN( 4 )           ! Width of margins round DATA picture
+      REAL UP(2)                 ! Up vector
+      REAL X1, X2, Y1, Y2        ! Bounds of PGPLOT window
+      REAL XCH                   ! Height of text with vertical baseline
+      REAL XSIGMA                ! No. of std. devn's for X error bars
+      REAL YSIGMA                ! No. of std. devn's for Y error bars
 
 *.
 
