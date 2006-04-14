@@ -48,7 +48,7 @@
 *        Specifies the value to use where the interleaving does not
 *        fill the array, say because the shapes of the input NDFs are
 *        not the same, or have additional shifts of origin.  Allowed
-*        values are "Bad" or "Zero".   ["Bad"]
+*        values are "Bad" or "Zero".  ["Bad"]
 *     IN = NDF (Read)
 *        A group of input NDFs to be interweaved.  They may have 
 *        different shapes, but must all have the same number of
@@ -75,7 +75,7 @@
 *        Output NDF structure.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
-*        propagates the title from the input NDF to the output NDF. [!]
+*        propagates the title from the input NDF to the output NDF.  [!]
 *     TRIM = _LOGICAL (Read)
 *        This parameter controls the shape of the output NDF before the
 *        application of the expansion.  If TRIM=TRUE, then the output
@@ -140,6 +140,8 @@
 *        Use only axis centres from the primary NDF and linearly
 *        interpolate between these in the output NDF.  This is to
 *        avoid non-monotonic axes.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -202,7 +204,6 @@
       INTEGER J                  ! Loop counter for the dimensions
       INTEGER LARR               ! Loop counter for array components
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
-      INTEGER LBNDM( NDF__MXDIM ) ! Lower bounds of mask NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM )! Matrix
                                  ! component of linear mapping

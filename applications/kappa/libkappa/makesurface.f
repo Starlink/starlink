@@ -48,13 +48,13 @@
 *        the new NDF.  If a null response (!) is given, the label,
 *        units, axis labels, and axis units are taken from the IN NDF.
 *        The task prompts for the data type and bounds, using those of
-*        the IN NDF as defaults, and the axis ranges. [!]
+*        the IN NDF as defaults, and the axis ranges.  [!]
 *     OUT = NDF (Write)
 *        The new NDF to contain the surface fit.
 *     TITLE = LITERAL (Read)
 *        A title for the new NDF.  If a null response (!) is given,
 *        the title will be propagated either from LIKE, or from IN
-*        if LIKE=!. [!]
+*        if LIKE=!.  [!]
 *     TYPE = LITERAL (Read)
 *        Data type for the new NDF (if LIKE=!).  It must be one of
 *        the following: "_DOUBLE", "_REAL", "_INTEGER", "_WORD",
@@ -111,10 +111,10 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
-*     VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
-*     data structure and propagates all extensions.  However, neither
-*     QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
-*     null.
+*     VARIANCE, LABEL, TITLE, UNITS, WCS, and HISTORY components of an 
+*     NDF data structure and propagates all extensions.  However,
+*     neither QUALITY nor a SURFACEFIT extension is propagated when 
+*     LIKE is not null.
 *     -  All non-complex numeric data types can be handled.  Processing
 *     is performed in single- or double-precision floating point, as
 *     appropriate.
@@ -157,7 +157,9 @@
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,7 +205,8 @@
       CHARACTER * ( DAT__SZTYP ) FTYPE ! Type of FIT structure
       INTEGER I                  ! Loop counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Implementation data type
-      CHARACTER * ( DAT__SZTYP ) INTYPE ! Data type of NDF containing coefficients
+      CHARACTER * ( DAT__SZTYP ) INTYPE ! Data type of NDF containing 
+                                 ! coefficients
       CHARACTER * ( 40 ) LABEL   ! Data label of NDF
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER LIKEID             ! ID of template NDF
@@ -212,7 +215,6 @@
       INTEGER NCOEF              ! Number of Chebyshev coefficients used
       INTEGER NDFI               ! ID of NDF containing coefficients
       INTEGER NDFO               ! ID of new NDF to contain surface
-      INTEGER NDFW               ! ID of temporary workspace NDF
       INTEGER NDIM               ! Number of dimensions
       INTEGER NXPAR              ! Number of fitting parameters in x
                                  ! direction
@@ -390,10 +392,10 @@
      :                                 STATUS )
 
 *  Determine the bounds of the axes of the template NDF.
-                        CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ), 
+                        CALL KPG1_AXBND( XDIM, %VAL( CNF_PVAL( XPTR ) ),
      :                                   XMIN, XMAX,
      :                                   STATUS )
-                        CALL KPG1_AXBND( YDIM, %val( cnf_pval( YPTR ) ), 
+                        CALL KPG1_AXBND( YDIM, %VAL( CNF_PVAL( YPTR ) ),
      :                                   YMIN, YMAX,
      :                                   STATUS )
 
@@ -426,7 +428,7 @@
 *  LIKE=!
                   ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
 
-*  Annul the PAR__NULL error. (Note that ERR_ANNUL will only annul
+*  Annul the PAR__NULL error.  (Note that ERR_ANNUL will only annul
 *  errors back to the last ERR_MARK).
                      CALL ERR_ANNUL( STATUS )
                      CALL ERR_RLSE
