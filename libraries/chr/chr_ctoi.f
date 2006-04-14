@@ -33,7 +33,7 @@
 *  Copyright:
 *     Copyright (C) 1982, 1984, 1988, 1989, 1990, 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councls.
-*     Copyright (C) 2006 Particls Physics & Engineering Research Council.
+*     Copyright (C) 2006 Particle Physics & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
