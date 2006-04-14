@@ -724,6 +724,8 @@
 *        (as opposed to those derived from the transformed CENTRE
 *        co-ordinates) to avoid rounding losing a row/and or a line
 *        from the plot.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -859,7 +861,6 @@
       INTEGER INDF             ! NDF identifier for input NDF
       INTEGER INDFI            ! NDF identifier for image section
                                ! two-dimensional section
-      INTEGER INDFS            ! NDF identifier for specrum section
       INTEGER IPAWID           ! Pointer to supplied x-axis widths
       INTEGER IPIC             ! Horizontal index of current spectrum
       INTEGER IPLOTI           ! Pointer to AST spatial Plot DATA
@@ -979,7 +980,6 @@
       INTEGER SUBND( NDIM )    ! Significant upper bounds of the cube
       CHARACTER TEXT*( 255 )   ! A general text string
       LOGICAL THERE            ! Does object exist?
-      CHARACTER TITLE*( 255 )  ! Default title for the plot
       DOUBLE PRECISION TR( 2 ) ! "W.w. want" X/Y values at top-right 
                                ! corner
       DOUBLE PRECISION TRG( 2 )! "Uniform" X/Y values at top-right 

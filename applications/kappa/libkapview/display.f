@@ -52,13 +52,14 @@
 *        TRUE if labelled and annotated axes are to be drawn around the
 *        image.  These display co-ordinates in the current co-ordinate 
 *        Frame of the supplied NDF, and may be changed using application
-*        WCSFRAME (see also parameter USEAXIS). The width of the margins
-*        left for the annotation may be controlled using parameter
-*        MARGIN.  The appearance of the axes (colours, founts, etc.) 
-*        can be controlled using the STYLE parameter. [current value]
+*        WCSFRAME (see also parameter USEAXIS).  The width of the 
+*        margins left for the annotation may be controlled using 
+*        parameter MARGIN.  The appearance of the axes (colours, founts, 
+*        etc.) can be controlled using the STYLE parameter. 
+*        [current value]
 *     BADCOL = LITERAL (Read)
 *        The colour with which to mark any bad (i.e. missing) pixels in
-*        the display.  There are a number of options described below:
+*        the display.  There are a number of options described below.
 *
 *        - "MAX" -- The maximum colour index used for the display of the
 *        image.
@@ -114,7 +115,7 @@
 *        defaulted if a null value (!) is supplied.  See section 
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). [current value] 
+*        (no error is reported).  [current value]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the data pixel to be placed at the centre
 *        of the image, in the current co-ordinate Frame of the NDF 
@@ -122,7 +123,7 @@
 *        co-ordinate Frame).  The position should be supplied as a list 
 *        of formatted axis values separated by spaces or commas.  See 
 *        also parameter USEAXIS.  A null (!) value causes the centre of 
-*        the image to be used. [!]
+*        the image to be used.  [!]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the current picture is to be cleared before the image 
 *        is displayed. [current value]
@@ -132,18 +133,18 @@
 *        alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255). ["Data"]
+*        the range 0 to 255).  ["Data"]
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device used to display the image.
 *        The device must have at least 24 colour indices or greyscale 
-*        intensities. [current graphics device]
+*        intensities.  [current graphics device]
 *     FILL = _LOGICAL (Read)
 *        If FILL is set to TRUE, then the image will be "stretched" to 
 *        fill the current picture in both directions.  This can be 
 *        useful when displaying images with markedly different
 *        dimensions, such as two-dimensional spectra.  The dynamic
 *        default is TRUE if the array being displayed is 
-*        one-dimensional, and FALSE otherwise. []
+*        one-dimensional, and FALSE otherwise.  []
 *     HIGH = _DOUBLE (Read)
 *        The data value corresponding to the highest pen in the colour 
 *        table.  All larger data values are set to the highest colour
@@ -164,7 +165,7 @@
 *        KEYSTYLE, and its horizontal position can be controlled using 
 *        parameter KEYPOS.  If the key is required in a different 
 *        location, set KEY=NO and use application LUTVIEW after 
-*        displaying the image. [TRUE]
+*        displaying the image.  [TRUE]
 *     KEYPOS = _REAL (Read)
 *        A value giving the gap between the right-hand edge of the
 *        display and the left-hand edge of the key, given as a fraction
@@ -253,7 +254,7 @@
 *        produced. [current value]
 *     MODE = LITERAL (Read)
 *        The method by which the maximum and minimum data values to be 
-*        displayed are chosen.  The options are:
+*        displayed are chosen.  The options are as follows.
 *
 *        - "Faint" -- The image is scaled between the mean data value 
 *        minus one standard deviation and the mean data value plus seven
@@ -284,10 +285,10 @@
 *        edges and is better for lookup tables with blocks of colour.
 *        If NN is FALSE linear interpolation is used, and this is
 *        suitable for smoothly varying colour tables.  NN is ignored
-*        unless LUT is not null. [FALSE]
+*        unless LUT is not null.  [FALSE]
 *     NUMBIN  =  _INTEGER (Read)
 *        The number of histogram bins used to compute percentiles for
-*        scaling. (Percentiles mode) [2048]
+*        scaling. (Percentiles mode)  [2048]
 *     OUT = NDF (Write)
 *        A scaled copy of the displayed section of the image. Values in 
 *        this output image are integer colour indices shifted to exclude
@@ -296,7 +297,7 @@
 *        output NDF is intended to be used as the input data in 
 *        conjunction with SCALE=FALSE.  If a null value (!) is supplied,
 *        no output NDF will be created.  This parameter is not accessed 
-*        when SCALE=FALSE. [!]
+*        when SCALE=FALSE.  [!]
 *     PERCENTILES( 2 ) = _REAL (Read)
 *        The percentiles that define the scaling limits. For example,
 *        [25,75] would scale between the quartile values. (Percentile
@@ -350,7 +351,7 @@
 *        defaulted if a null value (!) is supplied.  See section 
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored 
-*        (no error is reported). [current value] 
+*        (no error is reported).  [current value] 
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of 
 *        the NDF has more than two axes.  A group of two strings should
@@ -361,7 +362,7 @@
 *        in the current Frame), or by its symbol string.  A list of
 *        acceptable values is displayed if an illegal value is supplied.
 *        If a null (!) value is supplied, the axes with the same indices
-*        as the two used pixel axes within the NDF are used. [!]
+*        as the two used pixel axes within the NDF are used.  [!]
 *     XMAGN = _REAL (Read)
 *        The horizontal magnification for the image.  The default
 *        value of 1.0 corresponds to 'normal' magnification in which the
@@ -369,7 +370,7 @@
 *        A value larger than 1.0 makes each data pixel wider.  If this
 *        results in the image being wider than the available space then
 *        the the image will be clipped to display fewer pixels.  See
-*        also parameters YMAGN, CENTRE and FILL. [1.0]
+*        also parameters YMAGN, CENTRE, and FILL.  [1.0]
 *     YMAGN = _REAL (Read)
 *        The vertical magnification for the image.  The default
 *        value of 1.0 corresponds to 'normal' magnification in which the
@@ -377,7 +378,7 @@
 *        A value larger than 1.0 makes each data pixel taller.  If this
 *        results in the image being taller than the available space then
 *        the image will be clipped to display fewer pixels.  See also
-*        parameters XMAGN, CENTRE and FILL.  If a null (!) value is
+*        parameters XMAGN, CENTRE, and FILL.  If a null (!) value is
 *        supplied, the value used is the value supplied for XMAGN. [!]
 
 *  Arguments:
@@ -439,12 +440,12 @@
 *     the image display.  Note that the default values for parameters
 *     LOW and HIGH are the minimum and maximum values in the compressed
 *     floating-point data.
-*     -  If no Title is specified via the STYLE parameter, then the TITLE
-*     component in the NDF is used as the default title for the annotated 
-*     axes. If the NDF does not have a TITLE component, then the default 
-*     title is taken from current co-ordinate Frame in the NDF. If this
-*     has not been set explicitly, then the name of the NDF is used as the
-*     default title.
+*     -  If no Title is specified via the STYLE parameter, then the 
+*     TITLE component in the NDF is used as the default title for the 
+*     annotated axes.  If the NDF does not have a TITLE component, then 
+*     the default title is taken from current co-ordinate Frame in the
+*     NDF.  If this has not been set explicitly, then the name of the 
+*     NDF is used as the default title.
 *     -  The application stores a number of pictures in the graphics
 *     database in the following order: a FRAME picture containing the 
 *     annotated axes, the image area, and the border; a DATA picture 
@@ -554,6 +555,8 @@
 *        Ignore blank titles supplied in STYLE.
 *     6-FEB-2006 (DSB):
 *        Use KPG1_ASTTL to get the title.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -565,133 +568,142 @@
       IMPLICIT NONE
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'        ! Global SSE definitions
-      INCLUDE 'NDF_PAR'        ! NDF_ constants
-      INCLUDE 'PRM_PAR'        ! NUM_ constants
-      INCLUDE 'AST_PAR'        ! AST_ constants
-      INCLUDE 'PAR_ERR'        ! Parameter-system error definitions
-      INCLUDE 'PAR_PAR'        ! Parameter-system constants
-      INCLUDE 'CTM_PAR'        ! Colour-table management constants
-      INCLUDE 'CNF_PAR'        ! For CNF_PVAL function
+      INCLUDE 'SAE_PAR'          ! Global SSE definitions
+      INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'PRM_PAR'          ! NUM_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
+      INCLUDE 'PAR_ERR'          ! Parameter-system error definitions
+      INCLUDE 'PAR_PAR'          ! Parameter-system constants
+      INCLUDE 'CTM_PAR'          ! Colour-table management constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
 
 *  External References:
-      INTEGER CHR_LEN          ! Used length of a string
-      INTEGER KPG1_CEIL        ! Smallest integer .GE. a given floating 
-                               ! value
-      INTEGER KPG1_FLOOR       ! Largest integer .LE. a given floating
-                               ! value
+      INTEGER KPG1_CEIL          ! Smallest integer .GE. a given 
+                                 ! floating value
+      INTEGER KPG1_FLOOR         ! Largest integer .LE. a given floating
+                                 ! value
 
 *  Local Constants:
-      REAL KW                  ! Width of key picture as a fraction of
-      PARAMETER ( KW = 0.13 )  ! the width of the current picture
+      REAL KW                    ! Width of key picture as a fraction of
+      PARAMETER ( KW = 0.13 )    ! the width of the current picture
 
-      INTEGER MINCOL           ! Minimum number of colour indices on
-                               ! device to be classed as an image
-                               ! display
+      INTEGER MINCOL             ! Minimum number of colour indices on
+                                 ! device to be classed as an image
+                                 ! display
       PARAMETER ( MINCOL = 8 + CTM__RSVPN )
 
-      INTEGER NDIM             ! Dimensionality required
+      INTEGER NDIM               ! Dimensionality required
       PARAMETER( NDIM = 2 )
 
 *  Local Variables:
-      CHARACTER COMP*8         ! Component to be displayed
+      CHARACTER COMP*8           ! Component to be displayed
       CHARACTER FORM*( NDF__SZFRM ) ! Form of the output data array
-      CHARACTER LABEL*255      ! Label for key
-      CHARACTER MCOMP*8        ! Component to be mapped
-      CHARACTER NDFNAM*255     ! Full NDF specification 
-      CHARACTER OTYPE*( NDF__SZTYP )! Processing type of the output
-                               ! image
-      CHARACTER TITLE*255      ! Default title for the plot
-      DOUBLE PRECISION BOX( 4 )! Bounds of image in pixel co-ordinates
-      DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords at image centre
-      DOUBLE PRECISION DHI     ! Upper displayed data value limit
-      DOUBLE PRECISION DLO     ! Lower displayed data value limit
-      DOUBLE PRECISION GC( 2 ) ! GRID co-ords at image centre
-      INTEGER BPCI             ! Bad-pixel colour index
-      INTEGER DIMS( NDIM )     ! Dimensions of input array
-      INTEGER EL               ! Number of elements in the mapped array
-      INTEGER I                ! General variable
-      INTEGER IPICK            ! AGI identifier for KEY picture
-      INTEGER IERR             ! Position of first conversion error
-      INTEGER INDF1            ! NDF identifier for input NDF
-      INTEGER INDF2            ! NDF identifier for displayed NDF
-                               ! section
-      INTEGER INDF3            ! NDF identifier for output NDF
-      INTEGER INDF4            ! NDF identifier for NDF containing LUT
-      INTEGER IPCOL            ! Pointer to colour index array
-      INTEGER IPIC0            ! AGI id. for original current picture
-      INTEGER IPICD            ! AGI id. for DATA picture
-      INTEGER IPICF            ! AGI id. for new FRAME picture
-      INTEGER IPLOT            ! Pointer to AST Plot for DATA picture
-      INTEGER IPWORK           ! Pointer to work array for key
-      INTEGER IWCS             ! Pointer to WCS FrameSet from the NDF
-      INTEGER LBND( NDF__MXDIM )! Lower pixel-index bounds of the image
-      INTEGER LDIMS( NDIM )    ! Dimensions of LUT arrays
-      INTEGER LEL              ! Number of elements in i/p and o/p LUT 
-                               ! arrays
-      INTEGER LP               ! Lowest pen with which to display image
-      INTEGER LPNTR( 1 )       ! Pointer to input colour table
-      INTEGER NC               ! Number of characters in NDFNAM
-      INTEGER NDIMS            ! Total number of NDF dimensions
-      INTEGER NERR             ! Number of conversion errors
-      INTEGER NFRM             ! Frame index increment between IWCS and
-                               ! IPLOT
-      INTEGER NMARG            ! No. of margin values given
-      INTEGER NX               ! First dimension of colour index array
-      INTEGER NY               ! Second dimension of colour index array
-      INTEGER OPNTR( 1 )       ! Pointer to output array data
-      INTEGER SDIM( NDIM )     ! The significant NDF axes
-      INTEGER SLBND( NDIM )    ! Significant lower bounds of the image
-      INTEGER STATE            ! State of a parameter
-      INTEGER SUBND( NDIM )    ! Significant upper bounds of the image
-      INTEGER UBND( NDF__MXDIM )! Upper pixel-index bounds of the image
-      INTEGER UP               ! Highest pen with which to display image
-      INTEGER WDIM( NDIM )     ! Dimensions in pixels of PGPLOT window
-      INTEGER WILBND( NDIM )   ! Lower pixel-index bounds of NDF section
-      INTEGER WIUBND( NDIM )   ! Upper pixel-index bounds of NDF section
-      LOGICAL ALIGN            ! DATA picture aligned with a previous
-                               ! picture?
-      LOGICAL AXES             ! Annotated axes are to be drawn?
-      LOGICAL BAD              ! Bad pixels are present in the image?
-      LOGICAL BORDER           ! Border to be drawn?
-      LOGICAL DEVCAN           ! Cancel DEVICE parameter?
-      LOGICAL KEY              ! Produce a colour ramp as a key?
-      LOGICAL NN               ! Map the LUT via nearest-neighbour
-                               ! method?
-      LOGICAL SCALE            ! Does the input array need to be scaled?
-      REAL ASP0                ! Aspect ratio of the available space
-      REAL ASPD                ! Aspect ratio of the data array
-      REAL ASPECT              ! Aspect ratio of the DATA picture
-      REAL DEFMAR              ! Default MARGIN value
-      REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
-      REAL GUBND( NDIM )       ! High grid co-ord bounds of PGPLOT
-                               ! window
-      REAL KEYPOS              ! Horizontal position of key
-      REAL KWID                ! Width to reserve for the KEY (if any)
-      REAL MARGIN( 4 )         ! Width of margins round DATA picture
-      REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
-      REAL OPUBND( NDIM )      ! High pixel co-ord bounds of NDF overlap
-      REAL PCLBND( NDIM )      ! Low pixel co-ord bounds of PGPLOT
-                               ! window
-      REAL PCUBND( NDIM )      ! High pixel co-ord bounds of PGPLOT
-                               ! window
-      REAL WPLBND( NDIM )      ! Low pixel co-ord bounds of NDF section
-      REAL WPUBND( NDIM )      ! High pixel co-ord bounds of NDFsection
-      REAL X1, X2, Y1, Y2      ! Bounds of current picture viewport in
-                               ! millimetres
-      REAL XMAGN               ! X magnification
-      REAL XTENT               ! Extent in X of the PGPLOT window in 
-                               ! NDF pixels
-      REAL XVMAG               ! X magnification factor for viewport
-      REAL XWMAG               ! X magnification factor for window
-      REAL YMAGN               ! y magnification
-      REAL YTENT               ! Extent in Y of the PGPLOT window in 
-                               ! NDF pixels
-      REAL YVMAG               ! Y magnification factor for viewport
-      REAL YWMAG               ! Y magnification factor for window
+      CHARACTER LABEL*255        ! Label for key
+      CHARACTER MCOMP*8          ! Component to be mapped
+      CHARACTER NDFNAM*255       ! Full NDF specification 
+      CHARACTER OTYPE*( NDF__SZTYP ) ! Processing type of the output
+                                 ! image
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of image in pixel co-ordinates
+      DOUBLE PRECISION CC( 2 )   ! Current Frame co-ords at image centre
+      DOUBLE PRECISION DHI       ! Upper displayed data value limit
+      DOUBLE PRECISION DLO       ! Lower displayed data value limit
+      DOUBLE PRECISION GC( 2 )   ! GRID co-ords at image centre
+      INTEGER BPCI               ! Bad-pixel colour index
+      INTEGER DIMS( NDIM )       ! Dimensions of input array
+      INTEGER EL                 ! Number of elements in the mapped 
+                                 ! array
+      INTEGER I                  ! General variable
+      INTEGER IPICK              ! AGI identifier for KEY picture
+      INTEGER IERR               ! Position of first conversion error
+      INTEGER INDF1              ! NDF identifier for input NDF
+      INTEGER INDF2              ! NDF identifier for displayed NDF
+                                 ! section
+      INTEGER INDF3              ! NDF identifier for output NDF
+      INTEGER INDF4              ! NDF identifier for NDF containing LUT
+      INTEGER IPCOL              ! Pointer to colour index array
+      INTEGER IPIC0              ! AGI id. for original current picture
+      INTEGER IPICD              ! AGI id. for DATA picture
+      INTEGER IPICF              ! AGI id. for new FRAME picture
+      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IPWORK             ! Pointer to work array for key
+      INTEGER IWCS               ! Pointer to WCS FrameSet from the NDF
+      INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds of the image
+      INTEGER LDIMS( NDIM )      ! Dimensions of LUT arrays
+      INTEGER LEL                ! Number of elements in i/p and o/p
+                                 ! LUT arrays
+      INTEGER LP                 ! Lowest pen with which to display
+                                 ! image
+      INTEGER LPNTR( 1 )         ! Pointer to input colour table
+      INTEGER NC                 ! Number of characters in NDFNAM
+      INTEGER NDIMS              ! Total number of NDF dimensions
+      INTEGER NERR               ! Number of conversion errors
+      INTEGER NFRM               ! Frame index increment between IWCS
+                                 ! and IPLOT
+      INTEGER NMARG              ! Number of margin values given
+      INTEGER NX                 ! First dimension of colour-index array
+      INTEGER NY                 ! Second dimension, colour-index array
+      INTEGER OPNTR( 1 )         ! Pointer to output array data
+      INTEGER SDIM( NDIM )       ! The significant NDF axes
+      INTEGER SLBND( NDIM )      ! Significant lower bounds of the image
+      INTEGER STATE              ! State of a parameter
+      INTEGER SUBND( NDIM )      ! Significant upper bounds of the image
+      INTEGER UBND( NDF__MXDIM ) ! Upper pixel-index bounds of the image
+      INTEGER UP                 ! Highest pen with which to display 
+                                 ! image
+      INTEGER WDIM( NDIM )       ! Dimensions in pixels of PGPLOT window
+      INTEGER WILBND( NDIM )     ! Lower pixel-index bounds of NDF 
+                                 ! section
+      INTEGER WIUBND( NDIM )     ! Upper pixel-index bounds of NDF 
+                                 ! section
+      LOGICAL ALIGN              ! DATA picture aligned with a previous
+                                 ! picture?
+      LOGICAL AXES               ! Annotated axes are to be drawn?
+      LOGICAL BAD                ! Bad pixels are present in the image?
+      LOGICAL BORDER             ! Border to be drawn?
+      LOGICAL DEVCAN             ! Cancel DEVICE parameter?
+      LOGICAL KEY                ! Produce a colour ramp as a key?
+      LOGICAL NN                 ! Map the LUT via nearest-neighbour
+                                 ! method?
+      LOGICAL SCALE              ! Does the input array need to be 
+                                 ! scaled?
+      REAL ASP0                  ! Aspect ratio of the available space
+      REAL ASPD                  ! Aspect ratio of the data array
+      REAL ASPECT                ! Aspect ratio of the DATA picture
+      REAL DEFMAR                ! Default MARGIN value
+      REAL GLBND( NDIM )         ! Low grid co-ord bounds of PGPLOT 
+                                 ! window
+      REAL GUBND( NDIM )         ! High grid co-ord bounds of PGPLOT
+                                 ! window
+      REAL KEYPOS                ! Horizontal position of key
+      REAL KWID                  ! Width to reserve for the KEY (if any)
+      REAL MARGIN( 4 )           ! Width of margins round DATA picture
+      REAL OPLBND( NDIM )        ! Low pixel co-ord bounds of NDF 
+                                 ! overlap
+      REAL OPUBND( NDIM )        ! High pixel co-ord bounds of NDF 
+                                 ! overlap
+      REAL PCLBND( NDIM )        ! Low pixel co-ord bounds of PGPLOT
+                                 ! window
+      REAL PCUBND( NDIM )        ! High pixel co-ord bounds of PGPLOT
+                                 ! window
+      REAL WPLBND( NDIM )        ! Low pixel co-ord bounds of NDF 
+                                 ! section
+      REAL WPUBND( NDIM )        ! High pixel co-ord bounds of NDF
+                                 ! section
+      REAL X1, X2, Y1, Y2        ! Bounds of current picture viewport in
+                                 ! millimetres
+      REAL XMAGN                 ! X magnification
+      REAL XTENT                 ! Extent in X of the PGPLOT window in 
+                                 ! NDF pixels
+      REAL XVMAG                 ! X magnification factor for viewport
+      REAL XWMAG                 ! X magnification factor for window
+      REAL YMAGN                 ! Y magnification
+      REAL YTENT                 ! Extent in Y of the PGPLOT window in 
+                                 ! NDF pixels
+      REAL YVMAG                 ! Y magnification factor for viewport
+      REAL YWMAG                 ! Y magnification factor for window
 
 *.
 

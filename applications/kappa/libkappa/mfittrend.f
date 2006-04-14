@@ -48,7 +48,7 @@
 *        value is supplied.  If the axes of the current Frame are not
 *        parallel to the NDF pixel axes, then the pixel axis which is
 *        most nearly parallel to the specified current Frame axis will
-*        be used.  AXIS defaults to the last axis. [!]
+*        be used.  AXIS defaults to the last axis.  [!]
 *     IN = NDF (Read & Write)
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
@@ -73,7 +73,7 @@
 *        values along each data line to be used.  The units of these
 *        ranges is determined by the current axis of the world
 *        co-ordinate system that corresponds to the trend axis.  Up to
-*        ten pairs of values are allowed. [!]
+*        ten pairs of values are allowed.  [!]
 *     SUBTRACT = _LOGICAL (Read)
 *        Whether not to subtract the trends from the input NDF or not. 
 *        If not, then the trends will be evaluated and written to a new 
@@ -127,6 +127,7 @@
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  Copyright:
@@ -135,6 +136,8 @@
 *  History:
 *     14-SEP-2005 (PWD):
 *        Original version, some parts from COLLAPSE.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -165,8 +168,6 @@
 *  Local Variables:
       CHARACTER * ( 255 ) TTLC  ! Title of original current Frame
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
-      DOUBLE PRECISION AXHIGH   ! High bound of axis in current Frame
-      DOUBLE PRECISION AXLOW    ! Low bound of axis in current Frame
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
                                 ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
@@ -184,7 +185,6 @@
       DOUBLE PRECISION PRJMAX   ! Maximum vector length projected onto 
                                 ! an axis
       INTEGER AREA              ! Area of axes orthogonal to fit axis
-      INTEGER AXES( NDF__MXDIM )! A list of axis indices
       INTEGER CFRM              ! Current frame
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
       INTEGER EL                ! Number of mapped elements
@@ -194,10 +194,8 @@
       INTEGER IPAS              ! Pointer to workspace
       INTEGER IPBS              ! Pointer to coefficients
       INTEGER IPDAT( 1 )        ! Pointer to NDF data component
-      INTEGER IPIN( 1 )         ! Pointer to mapped data
       INTEGER IPIX              ! Index of PIXEL Frame within WCS 
                                 ! FrameSet
-      INTEGER IPOUT( 1 )        ! Pointer to mapped data
       INTEGER IPTMP( 1 )        ! Pointer to temporary NDF component
       INTEGER IPVAR( 1 )        ! Pointer to NDF variance component
       INTEGER IPWRK1            ! Pointer to workspace
@@ -216,13 +214,12 @@
       INTEGER OUTNDF            ! NDF identifier of output NDF
       INTEGER RANGES( 20 )      ! The fit ranges pixels
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
-      LOGICAL BAD               ! Need to check for bad pixels?
-      LOGICAL HASBAD            ! Input NDF may have BAD pixels
-      LOGICAL HAVVAR            ! Have a variance component
-      LOGICAL MODIN             ! Modify input NDF by subtracting fits
-      LOGICAL SUBTRA            ! Whether to subtract fit from data
+      LOGICAL HASBAD            ! Input NDF may have BAD pixels?
+      LOGICAL HAVVAR            ! Have a variance component?
+      LOGICAL MODIN             ! Modify input NDF by subtracting fits?
+      LOGICAL SUBTRA            ! Subtract fit from data?
       LOGICAL USEALL            ! Use the entire axis?
-      LOGICAL USEVAR            ! Use variance as weights in fits.
+      LOGICAL USEVAR            ! Use variance as weights in fits?
 
 *.
 
@@ -304,8 +301,8 @@
       MAP = AST_GETMAPPING( IWCS, IPIX, AST__CURRENT, STATUS )
 
 *  Report an error if the Mapping is not defined in either direction.
-      IF( .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) .AND.
-     :    STATUS .EQ. SAI__OK ) THEN
+      IF ( .NOT. AST_GETL( MAP, 'TRANINVERSE', STATUS ) .AND.
+     :     STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )
@@ -314,8 +311,8 @@
      :                 '(^T) to pixel co-ordinates is not defined.',
      :                 STATUS )
 
-      ELSE IF( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
-     :         STATUS .EQ. SAI__OK ) THEN
+      ELSE IF ( .NOT. AST_GETL( MAP, 'TRANFORWARD', STATUS ) .AND.
+     :          STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INNDF )
          CALL MSG_SETC( 'T', TTLC )

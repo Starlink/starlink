@@ -83,22 +83,22 @@
 *        contributing to each output pixel.  If FALSE, the output 
 *        variances are based on the variances in the input NDFs, and the
 *        output NDF will contain variances only if all input NDFs
-*        contain variances. [FALSE]
+*        contain variances.  [FALSE]
 *     ILEVEL = _INTEGER (Read)
 *        Controls the amount of information displayed on the screen. If
 *        set to 1, no information will be displayed while the command
 *        is executing. If set to 2, the interpolation method being used 
 *        will be displayed. If set to 3, the name of each input NDF will
-*        also be displayed as it is processed. [2]
+*        also be displayed as it is processed.  [2]
 *     IN = NDF (Read)
 *        A group of input NDFs (of any dimensionality).  This should be
 *        given as a comma-separated list, in which each list element
-*        can be:
+*        can be one of the following options.
 *
-*        - an NDF name, optionally containing wild-cards and/or regular 
+*        - An NDF name, optionally containing wild-cards and/or regular 
 *        expressions ("*", "?", "[a-z]" etc.). 
 *
-*        - the name of a text file, preceded by an up-arrow character
+*        - The name of a text file, preceded by an up-arrow character
 *        "^".  Each line in the text file should contain a
 *        comma-separated list of elements, each of which can in turn be
 *        an NDF name (with optional wild-cards, etc.), or another file
@@ -114,7 +114,7 @@
 *        An array of values giving the lower pixel-index bound on each
 *        axis for the output NDF.  The suggested default values just
 *        encompass all the input data.  A null value (!) also results in
-*        these same defaults being used. [!]
+*        these same defaults being used.  [!]
 *     MAXPIX = _INTEGER (Read)
 *        A value which specifies an initial scale size in pixels for the
 *        adaptive algorithm which approximates non-linear Mappings with
@@ -184,7 +184,7 @@
 *        the spatial frequencies in the sample positions and in the
 *        pixel-centre positions.  For these reasons, if you want to use
 *        the output variances, you are generally safer using
-*        nearest-neighbour interpolation. [current value]
+*        nearest-neighbour interpolation.  [current value]
 *     OUT = NDF (Write)
 *        The output NDF.
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -207,7 +207,7 @@
 *        value is 1.0, and the run-time default value is 2.0.  For the 
 *        Gauss and SincGauss scheme, it specifies the full-width at 
 *        half-maximum (FWHM) of the Gaussian envelope.  The minimum 
-*        value is 0.1, and the run-time default is 1.0. []
+*        value is 0.1, and the run-time default is 1.0.  []
 *     REF = NDF (Read)
 *        The NDF to which all the input NDFs are to be aligned.  If a
 *        null value is supplied for this parameter, the first NDF
@@ -216,7 +216,7 @@
 *        An array of values giving the upper pixel-index bound on each
 *        axis for the output NDF.  The suggested default values just
 *        encompass all the input data.  A null value (!) also results in
-*        these same defaults being used. [!]
+*        these same defaults being used.  [!]
 *     WLIM = _REAL (Read)
 *        This parameter specifies the minimum number of good pixels
 *        that must contribute to an output pixel for the output pixel
@@ -260,6 +260,8 @@
 *        Original version, based on WCSALIGN.
 *     30-MAR-2006 (DSB):
 *        Added ILEVEL.
+*     2006 April 12 (MJC):
+*        Remove unused variables.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -330,8 +332,7 @@
                                  ! variance?
       REAL ERRLIM                ! Positional accuracy in pixels
       REAL WLIM                  ! Minimum good output weight
-      REAL D,V
-      REAL*8 W
+
 *.
 
 *  Check inherited global status.
