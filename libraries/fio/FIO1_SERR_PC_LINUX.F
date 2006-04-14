@@ -1,15 +1,54 @@
+
+*+
+*  Name:
+*    FIO1_SERR_PC_LINUX.F
+
+*  Purpose:
+*    Generic error code handling.
+
+*  Description:
+*    The bodies for the routine fio1_serr.f_pc_linux. The default
+*    case is for g77 as we can detect g95 using it's __G95__ macro (which
+*    is set to the major version so we #ifdef for it, not #if). 
+*
+*    To extend for other compilers (gfortran?) we will need to add 
+*    some checks (parse the output from $CC -v?) to configure.ac that work
+*    out the compiler type.
+
+*  Copyright:
+*     Copyright (C) 2005 Particle Physics & Engineering Research Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*    PWD: Peter Draper (Durham)
+
+*  History:
+*    2005-SEP-12 (PWD):
+*       First version.
+
+*-
+
 #if HAVE_CONFIG_H
 #   include <config.h>
 #endif
 
 *
-* The bodies for the routine fio1_serr.f_pc_linux. The default
-* case is for g77 as we can detect g95 using it's __G95__ macro (which
-* is set to the major version so we #ifdef for it, not #if). 
-*
-* To extend for other compilers (gfortran?) we will need to add 
-* some checks (parse the output from $CC -v?) to configure.ac that work
-* out the compiler type.
 *
 
 #if defined(__G95__)

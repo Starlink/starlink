@@ -1,7 +1,11 @@
 FIO Version 1.5-3 is released.
 
-This version corrects problems arising from the use of a single BLOCK_DATA
-segment with two different shared libraries.
+ o  This version corrects problems arising from the use of a single BLOCK_DATA
+    segment with two different shared libraries.
+
+ o  Now released under the GPL.
+
+ o  Error code generation now works with g95
 
 FIO Version 1.5-2 is released.
 

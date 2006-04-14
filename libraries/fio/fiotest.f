@@ -1,5 +1,12 @@
       SUBROUTINE FIOTEST(STATUS)
+*+
+*  Name:
+*    fiotest
+
+*  Purpose:
 *    Task to test the FIO package
+
+*  Description:
 *    A fairly thorough test of the FIO package is performed.
 *    Messages chart the progress - some deliberate errors are introduced
 *    but the terminating message will say whether or not the test was
@@ -7,10 +14,36 @@
 *    Two files CREATEFILE.DAT and NEWFILE.DAT are created and should be
 *    listed after the run as a final check on the carriage control
 *    settings.
-*
-*    Author: A.Chipperfield (RLVAD::AJC)
-*    18.2.88: Include environment layer (RLVAD::AJC)
-*    28.6.88: Add FORM argument and test unformatted (RLVAD::AJC)
+
+*  Copyright:
+*     Copyright (C) 1988, 1992 Science & Engineering Research Council.
+*     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     A.Chipperfield (RLVAD::AJC)
+
+*  History:
+*    18-FEB-1988 (AJC):
+*        Include environment layer
+*    28-JUN-1988 (AJC):
+**       Add FORM argument and test unformatted (RLVAD::AJC)
 *     3-APR-1992 (PMA):
 *        Change ERR_OUT to ERR_REP.
 *        Change SAI_PAR to sae_par.
@@ -18,6 +51,7 @@
 *     8-NOV-2000 (AJC):
 *        Correct args for MSG_SETx
 *        Cosmetic changes
+
 *-
       IMPLICIT NONE
       

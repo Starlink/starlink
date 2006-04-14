@@ -127,6 +127,7 @@ fiotest_SOURCES = fiotest.f
 fiotest_LDADD = `$(srcdir)/fio_link_adam`
 
 dist_starnews_DATA = fio.news
+dist_pkgdata_DATA = LICENCE
 
 EXTRA_DIST = sun_iosdef_sun_solaris sun_iosdef_sun fio1_serr.f_apple_darwin \
              fio1_serr.f_dec_osf fio1_serr.fdefault fio1_serr.f_linux_gnu \
