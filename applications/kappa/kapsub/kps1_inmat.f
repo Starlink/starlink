@@ -40,6 +40,9 @@
 *  History:
 *     2005 August 11 (MJC):
 *        Original version based upon MBT's KPS1_MSA.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
+*     {enter_further_changes_here}
 *-
 
 *  Type Definitions:
@@ -64,7 +67,6 @@
 
 *  Local Variables:
       INTEGER DIM( NDF__MXDIM )  ! Dimensions of NDF
-      CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
       INTEGER I                  ! Loop variable
       CHARACTER NAME * ( GRP__SZNAM ) ! NDF name
       INTEGER NDIMC              ! Dimensionality of current NDF

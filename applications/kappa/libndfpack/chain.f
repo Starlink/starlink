@@ -76,7 +76,9 @@
 *     1997 June 14 (MJC):
 *        Original version.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,7 +130,6 @@
                                  ! number
       INTEGER NDFI( NDFMAX )     ! Identifiers for input NDFs
       INTEGER NDFO               ! Identifier for output NDF
-      INTEGER NDIM               ! Number of dimensions (not used)
       INTEGER NUMNDF             ! Number of input NDFs
       INTEGER ODIMS( NDF__MXDIM ) ! Dimensions of output array
       INTEGER OFFSET( NDF__MXDIM ) ! Offsets of an input NDF wrt output

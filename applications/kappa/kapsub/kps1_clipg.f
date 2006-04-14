@@ -113,6 +113,8 @@
 *        Set the bounds for the FRAME around the current DATA picture,
 *        and not assume that the DATA picture is at the lower-left of
 *        the grid.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -159,7 +161,6 @@
       CHARACTER CLBNUM*( 9 )     ! Label number
       REAL EXPIC                 ! Equivalent number of pictures in x
       REAL EYPIC                 ! Equivalent number of pictures in x
-      INTEGER I                  ! Loop counter
       CHARACTER LABEL*( DAT__SZNAM ) ! AGI picture label
       INTEGER LABNUM             ! Label number
       INTEGER NCLBNO             ! No. of characters in label number

@@ -29,11 +29,14 @@
 
 *  Authors:
 *     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-SEP-2005 (PWD):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variable.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -50,7 +53,6 @@
       DOUBLE PRECISION X
 
 *  Local variables:
-      DOUBLE PRECISION YF       ! Eval
       INTEGER I                 ! Do-loop increment variables
 
 *.
