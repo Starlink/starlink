@@ -39,8 +39,6 @@ C-----------------------------------------------------------------------------
       DOUBLE PRECISION OMEGA, FREQ
       DOUBLE PRECISION EXPO, C, S
       DOUBLE PRECISION TOLFACT
-      CHARACTER*1 BELL
-      DATA BELL/7/
       DATA ISTEP/50/
  
  
@@ -61,7 +59,8 @@ C  short by FINT. This is a consequence of using non-integer Do Loop
 C  variables! (KPD)
       TOLFACT = FINT*1.0D-4
 
-      DO 20 FREQ = FMIN, FMAX+TOLFACT, FINT
+      FREQ = FMIN
+      DO 20 WHILE ( FREQ .LE. ( FMAX+TOLFACT ) )
          
 C-----------------------------------------------------------------------------
 C Initialise sums for each new frequency. The real part of the Fourier
@@ -120,6 +119,8 @@ C-----------------------------------------------------------------------------
          END IF
 
          COUNTER = COUNTER + 1
+
+         FREQ = FREQ + FINT
 
   20  CONTINUE
       NOUT = COUNTER - 1
