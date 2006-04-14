@@ -21,10 +21,10 @@
 *  Description:
 *     Intensities which are valid in each input vector and lie within
 *     the data range to be used in vector A are binned according to the
-*     intensity in vector A. A mean and standard deviation for the B
-*     intensities are found for each bin. A straight line is fitted to
+*     intensity in vector A.  A mean and standard deviation for the B
+*     intensities are found for each bin.  A straight line is fitted to
 *     this binned data to determine the slope and intercept, from which
-*     the B vector may be normalized to the A vector. Iterations are
+*     the B vector may be normalized to the A vector.  Iterations are
 *     performed to reject bad data by repeating the binning and line
 *     fitting procedure, rejecting pixels whose B intensities deviate
 *     by more than a specified number of standard deviations from the
@@ -72,7 +72,8 @@
 *     VARLIM( NBIN ) = REAL (Given and Returned)
 *        Work space.
 *     SLOPE = REAL (Returned)
-*        The slope of the line fitted in the expression B=SLOPE*A+OFFSET.
+*        The slope of the line fitted in the expression 
+*        B=SLOPE*A+OFFSET.
 *     OFFSET = REAL (Returned)
 *        The constant C in B=SLOPE*A+OFFSET.
 *     STATUS = INTEGER (Given and Returned)
@@ -91,13 +92,15 @@
 *        Graphics added.
 *     1990 Oct 4 (MJC):
 *        Added extra arguments MINTIC, MAJTIC and OUTTIC to be passed
-*        onto the  NCRBCK routine. Removed tabs.  Corrected the variance
+*        onto the NCRBCK routine.  Removed tabs.  Corrected the variance
 *        equations.
 *     17-JUN-1999 (DSB):
 *        Change name from NMPLOT to KPS1_NMPLT. 
 *        Remove graphics arguments from arguments list.
 *        Re-format comments, declarations, etc.
 *        Use AST/PGPLOT for graphics.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,9 +125,7 @@
       INTEGER NBIN         
       INTEGER NITER        
       REAL SIGLIM       
-      REAL MAJTIC( 2 )  
       INTEGER MINPIX       
-      REAL MINTIC( 2 )  
       INTEGER NDFA         
       INTEGER NDFB         
 
@@ -143,44 +144,41 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER NDFNAM*255    ! Base name of NDF (possibly with HDS comp. path)
-      CHARACTER XL*255       ! Default X axis label
-      CHARACTER YL*255       ! Default Y axis label
-      DOUBLE PRECISION ABOT  ! Lowest vector A value actually used
-      DOUBLE PRECISION ATOP  ! Highest vector A value actually used
+      CHARACTER NDFNAM*( 255 )   ! Base name of NDF (possibly with HDS 
+                                 ! component path)
+      CHARACTER XL*( 255 )       ! Default Xaxis label
+      CHARACTER YL*( 255 )       ! Default Y-axis label
+      DOUBLE PRECISION ABOT      ! Lowest vector A value actually used
+      DOUBLE PRECISION ATOP      ! Highest vector A value actually used
       DOUBLE PRECISION FINISH( 2 ) ! End of best fitting line
       DOUBLE PRECISION START( 2 ) ! Start of best fitting line
-      DOUBLE PRECISION WT    ! Weight for current bin
-      DOUBLE PRECISION WTSUM ! Sum of bin weights
-      DOUBLE PRECISION X     ! Mean vector A value over a bin
-      DOUBLE PRECISION X2SUM ! Sum of X*X values
-      DOUBLE PRECISION XSUM  ! Sum of X values
-      DOUBLE PRECISION XYSUM ! Sum of X*Y values
-      DOUBLE PRECISION Y     ! Mean vector B value in a bin
-      DOUBLE PRECISION YSUM  ! Sum of Y values
-      INTEGER I              ! Loop index
-      INTEGER IBIN           ! Current bin
-      INTEGER IPLOT          ! AST Plot pointer
-      INTEGER ITER           ! Iteration counter
-      INTEGER LENXL          ! Used length of XL
-      INTEGER LENYL          ! Used length of YL
-      INTEGER NDATA          ! No. of non-empty bins
-      INTEGER NMLEN          ! Used length of NDFNAM
-      INTEGER NPIX           ! No. of vector B values used
-      REAL A                 ! Vector A value
-      REAL A0                ! Bin no. for zero A value
-      REAL A1                ! No. of bins in unit A value
-      REAL AAMAX             ! Max. allowed value from vector A
-      REAL AAMIN             ! Min. allowed value from vector A
-      REAL B                 ! Vector B value
-      REAL BFIT              ! Expected vector B value
-      REAL DET               ! Denominator of normal equations
-      REAL Q0                ! Min. possible variance for a bin
-      REAL WTMAX             ! Max. allowed bin weight
-      REAL XMAX              ! Upper X axis limit for plot
-      REAL XMIN              ! Lower X axis limit for plot
-      REAL YMAX              ! Upper Y axis limit for plot
-      REAL YMIN              ! Lower Y axis limit for plot
+      DOUBLE PRECISION WT        ! Weight for current bin
+      DOUBLE PRECISION WTSUM     ! Sum of bin weights
+      DOUBLE PRECISION X         ! Mean vector A value over a bin
+      DOUBLE PRECISION X2SUM     ! Sum of X*X values
+      DOUBLE PRECISION XSUM      ! Sum of X values
+      DOUBLE PRECISION XYSUM     ! Sum of X*Y values
+      DOUBLE PRECISION Y         ! Mean vector B value in a bin
+      DOUBLE PRECISION YSUM      ! Sum of Y values
+      INTEGER I                  ! Loop index
+      INTEGER IBIN               ! Current bin
+      INTEGER IPLOT              ! AST Plot pointer
+      INTEGER ITER               ! Iteration counter
+      INTEGER LENXL              ! Used length of XL
+      INTEGER LENYL              ! Used length of YL
+      INTEGER NDATA              ! Number of non-empty bins
+      INTEGER NMLEN              ! Used length of NDFNAM
+      INTEGER NPIX               ! Number of vector B values used
+      REAL A                     ! Vector A value
+      REAL A0                    ! Bin number for zero A value
+      REAL A1                    ! Number of bins in unit A value
+      REAL AAMAX                 ! Max. allowed value from vector A
+      REAL AAMIN                 ! Min. allowed value from vector A
+      REAL B                     ! Vector B value
+      REAL BFIT                  ! Expected vector B value
+      REAL DET                   ! Denominator of normal equations
+      REAL Q0                    ! Min. possible variance for a bin
+      REAL WTMAX                 ! Max. allowed bin weight
 *.
 
 *  Check inherited global status.
@@ -353,13 +351,13 @@
          CALL MSG_OUT( 'REPORT', ' ', STATUS )
 
 *  On the final iteration, plot the fit if required.
-         IF( ITER .EQ. NITER .AND. STATUS .EQ. SAI__OK ) THEN
+         IF ( ITER .EQ. NITER .AND. STATUS .EQ. SAI__OK ) THEN
  
 *  Remove bins with no data in and form the values to plot. 
             NDATA = 0
             DO I = 1, NBIN
  
-               IF( NSUM( I ) .GE. MINPIX ) THEN
+               IF ( NSUM( I ) .GE. MINPIX ) THEN
                   NDATA = NDATA + 1
 
                   ASUM( NDATA ) = ASUM( I ) / DBLE( NSUM( I ) )
@@ -394,9 +392,9 @@
      :                       VAL__BADR, 'KAPPA_NORMALIZE', .TRUE., 
      :                       .FALSE., IPLOT, STATUS )
 
-*  If a Plot was produced, we need to draw the best fitting straight line
-*  over it.
-            IF( IPLOT .NE. AST__NULL ) THEN
+*  If a Plot was produced, we need to draw the best fitting straight 
+*  line over it.
+            IF ( IPLOT .NE. AST__NULL ) THEN
 
 *  Get the data co-ordinates at the start and end of the line.
                START( 1 ) = DBLE( ASUM( 1 )  )

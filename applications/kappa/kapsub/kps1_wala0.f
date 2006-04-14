@@ -6,7 +6,7 @@
 *     KPS1_WALA0
 
 *  Purpose:
-*     Process a single pair of input and output NDFs for WCSALIGN.
+*     Processes a single pair of input and output NDFs for WCSALIGN.
 
 *  Language:
 *     Starlink Fortran 77
@@ -18,17 +18,17 @@
 
 *  Description:
 *     This routine first finds the Mapping from the input pixel
-*     co-ordinates to the reference (and hence output) pixel co-ordinates.
-*     If the user has explicitly specified bounds for the output image,
-*     these are used, otherwise the bounds of the output image which
-*     just include the input image are calculated and used instead. The
-*     WCS FrameSet is now created for the output NDF. This is a copy of
-*     the reference FrameSet, but modified to take account of any
-*     difference in the pixel origins between the reference and output
-*     NDFs. Finally, the output NDF is resampled or rebinned using the 
-*     specified method. If nearest-neighbour is the chosen method, and 
-*     the input NDF contains a QUALITY array, then this array is copied 
-*     to the output.
+*     co-ordinates to the reference (and hence output) pixel 
+*     co-ordinates.  If the user has explicitly specified bounds for the
+*     output image, these are used, otherwise the bounds of the output 
+*     image which just include the input image are calculated and used 
+*     instead.  The WCS FrameSet is now created for the output NDF.  
+*     This is a copy of the reference FrameSet, but modified to take 
+*     account of any difference in the pixel origins between the 
+*     reference and output NDFs.  Finally, the output NDF is resampled
+*     or rebinned using the specified method.  If nearest-neighbour is 
+*     the chosen method, and the input NDF contains a QUALITY array, 
+*     then this array is copied to the output.
 
 *  Arguments:
 *     NDIM2 = INTEGER (Given)
@@ -38,11 +38,11 @@
 *     INDF2 = INTEGER (Given)
 *        Identifier for the output NDF.
 *     MAP = INTEGER (Given)
-*        AST pointer to the Mapping from input pixel coords to reference
-*        pixel coords.
+*        AST pointer to the Mapping from input pixel co-ordinates to 
+*        reference pixel co-ordinates.
 *     MAP4 = INTEGER (Given)
-*        AST pointer to the Mapping from input grid coords to input
-*        pixel coords.
+*        AST pointer to the Mapping from input grid co-ordinates to 
+*        input pixel co-ordinates.
 *     IWCSR = INTEGER (Given)
 *        AST pointer for the WCS FrameSet from the reference NDF.
 *     METHOD = INTEGER (Given)
@@ -52,16 +52,17 @@
 *        An optional array containing ay additonal parameter values
 *        required by the sub-pixel interpolation scheme.
 *     AUTOBN = LOGICAL (Given)
-*        If .TRUE. then default bounds will be found for the output NDF. 
-*        Otherwise, the bounds supplied in XY1 and XY2 will be used.
+*        If .TRUE., then default bounds will be found for the output 
+*        NDF.  Otherwise, the bounds supplied in XY1 and XY2 will be 
+*        used.
 *     XY1( NDIM2 ) = INTEGER (Given)
-*        The indices of the bottom left pixel in the output NDF. Ignored if
-*        AUTOBN is .TRUE. The number of values in the array should equal 
-*        the number of pixel axes in the output NDF.
+*        The indices of the bottom-left pixel in the output NDF.  It is
+*        ignored if AUTOBN is .TRUE.  The number of values in the array 
+*        should equal the number of pixel axes in the output NDF.
 *     XY2( NDIM2 ) = INTEGER (Given)
-*        The indices of the top right pixel in the output NDF. Ignored if
-*        AUTOBN is .TRUE. The number of values in the array should equal 
-*        the number of pixel axes in the output NDF.
+*        The indices of the top-right pixel in the output NDF.  It is
+*        ignored if AUTOBN is .TRUE.  The number of values in the array 
+*        should equal the number of pixel axes in the output NDF.
 *     ERRLIM = REAL (Given)
 *        The position accuracy required when re-sampling the input NDF.
 *        Given as a number of pixels.
@@ -70,8 +71,8 @@
 *        which approximates non-linear Mappings with piece-wise linear
 *        transformations.
 *     REBIN = LOGICAL (Given)
-*        Calculate output pixel values by rebinning? Otherwise they will
-*        be calculated by resampling.
+*        Calculate output pixel values by rebinning?  Otherwise they
+*        will be calculated by resampling.
 *     CONSRV = LOGICAL (Given)
 *        Conserve flux whilst resampling?
 *     WLIM = REAL (Given)
@@ -83,29 +84,32 @@
 *     DSB: David Berry (STARLINK)
 *     TDCA: Tim Ash (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-OCT-1998 (DSB):
-*        Original version, based on IRAS90:SALIA0
+*        Original version, based on IRAS90:SALIA0.
 *     1-JUL-1999 (TDCA):
-*        Modified to use AST_RESAMPLE<X>
+*        Modified to use AST_RESAMPLE<X>.
 *     5-AUG-1999 (DSB):
 *        Tidied up.
 *     19-SEP-2001 (DSB):
 *        Allow use with 1-dimensional NDFs by changing kpg1_asget EXACT
-*        argument to .false.
+*        argument to .FALSE.
 *     31-OCT-2002 (DSB):
 *        Make N-dimensional.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     19-JUL-2005 (DSB):
 *        Add argument REBIN.
 *     11-AUG-2005 (DSB):
 *        Add argument CONSRV.
 *     29-NOV-2005 (DSB):
 *        Add argument AUTOBN.
-*     {enter_changes_here}
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -118,7 +122,8 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_PAR'          ! AST constants and function 
+                                 ! declarations
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
@@ -145,51 +150,57 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER DOMLST*50          ! List of preferred alignment domains
       CHARACTER DTYPE*(NDF__SZFTP) ! Data type
       CHARACTER TY_IN*(NDF__SZTYP) ! Numeric type for processing
-      DOUBLE PRECISION DUMMY( 1 )  ! Dummy array.
-      DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower pixel co-ord bounds in input
-      DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower pixel co-ord bounds in output
-      DOUBLE PRECISION PUBND1( NDF__MXDIM ) ! Upper pixel co-ord bounds in input
-      DOUBLE PRECISION PUBND2( NDF__MXDIM ) ! Upper pixel co-ord bounds in output
-      DOUBLE PRECISION TOL         ! Max tolerable geometrical distort.
-      DOUBLE PRECISION XL( NDF__MXDIM )     ! I/p position of output lower bound
-      DOUBLE PRECISION XU( NDF__MXDIM )     ! I/p position of output upper bound
+      DOUBLE PRECISION DUMMY( 1 ) ! Dummy array
+      DOUBLE PRECISION PLBND1( NDF__MXDIM ) ! Lower pixel co-ord bounds 
+                                 ! in input
+      DOUBLE PRECISION PLBND2( NDF__MXDIM ) ! Lower pixel co-ord bounds 
+                                  ! in output
+      DOUBLE PRECISION PUBND1( NDF__MXDIM ) ! Upper pixel co-ord bounds
+                                 ! in input
+      DOUBLE PRECISION PUBND2( NDF__MXDIM ) ! Upper pixel co-ord bounds
+                                 ! in output
+      DOUBLE PRECISION TOL       ! Max. tolerable geometrical distortion
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! I/p position of output lower 
+                                 ! bound
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! I/p position of output upper 
+                                 ! bound
       INTEGER BAD_PIXELS         ! Value returned from AST_RESAMPLE<x>
       INTEGER EL                 ! No. of elements in a mapped array
       INTEGER FLAGS              ! Sum of AST__USEBAD and AST__USEVAR
       INTEGER I                  ! Loop count
-      INTEGER IAT                ! No. of characters in string
       INTEGER IPD1               ! Pointer to input data array
       INTEGER IPD2               ! Pointer to output data array
-      INTEGER IPIX1              ! Index of PIXEL Frame in input NDF FrameSet
-      INTEGER IPIX2              ! Index of PIXEL Frame in output NDF FrameSet
-      INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF FrameSet
+      INTEGER IPIX2              ! Index of PIXEL Frame in output NDF 
+                                 ! FrameSet
+      INTEGER IPIXR              ! Index of PIXEL Frame in ref. NDF 
+                                 ! FrameSet
       INTEGER IPQ1               ! Pointer to input quality array
       INTEGER IPQ2               ! Pointer to output quality array
       INTEGER IPV1               ! Pointer to input variance array
       INTEGER IPV2               ! Pointer to output variance array
-      INTEGER IWCS1              ! AST pointer to input WCS FrameSet
-      INTEGER IWCS2              ! AST pointer to original output WCS FrameSet
-      INTEGER IWCSR2             ! AST pointer to new output WCS FrameSet
+      INTEGER IWCS2              ! AST pointer to original output WCS 
+                                 ! FrameSet
+      INTEGER IWCSR2             ! AST pointer to new output WCS 
+                                 ! FrameSet
       INTEGER J                  ! Loop count
-      INTEGER LBND1( NDF__MXDIM )         ! Lower bounds of input NDF
-      INTEGER LBND2( NDF__MXDIM )         ! Lower bounds of output NDF
-      INTEGER LGRID1( NDF__MXDIM )        ! Lower bounds of input grid co-ords
-      INTEGER LGRID2( NDF__MXDIM )        ! Lower bounds of output grid co-ords
+      INTEGER LBND1( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER LBND2( NDF__MXDIM ) ! Lower bounds of output NDF
+      INTEGER LGRID1( NDF__MXDIM ) ! Lower bounds of input grid co-ords
+      INTEGER LGRID2( NDF__MXDIM ) ! Lower bounds of output grid co-ords
       INTEGER MAP2               ! AST Mapping (o/p PIXEL -> o/p GRID)
       INTEGER MAP3               ! AST Mapping (ref. GRID -> o/p GRID)
       INTEGER MAP5               ! AST Mapping (i/p GRID -> o/p GRID)
       INTEGER MAPR               ! AST Mapping (ref. GRID -> ref. PIXEL)
       INTEGER NDIM1              ! No. of pixel axes in input NDF
-      INTEGER NFRM               ! No. of Frames in input NDF FrameSet
       INTEGER RESULT             ! Dummy value returned from AST_RESAMPLE<x>
-      INTEGER UBND1( NDF__MXDIM )         ! Upper bounds of input NDF
-      INTEGER UBND2( NDF__MXDIM )         ! Upper bounds of output NDF
-      INTEGER UGRID1( NDF__MXDIM )        ! Upper bounds of input grid co-ords
-      INTEGER UGRID2( NDF__MXDIM )        ! Upper bounds of output grid co-ords 
-      LOGICAL BAD_DV             ! Bad pixels present in DATA/VARIANCE arrays?
+      INTEGER UBND1( NDF__MXDIM ) ! Upper bounds of input NDF
+      INTEGER UBND2( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER UGRID1( NDF__MXDIM ) ! Upper bounds of input grid co-ords
+      INTEGER UGRID2( NDF__MXDIM ) ! Upper bounds of output grid co-ords
+      LOGICAL BAD_DV             ! Bad pixels present in DATA/VARIANCE 
+                                 ! arrays?
       LOGICAL QUAL               ! Are quality values to be copied?
       LOGICAL VAR                ! Are variance values to be copied?
 *.
@@ -203,8 +214,8 @@
 *  Get the pixel bounds of the input NDF.
       CALL NDF_BOUND( INDF1, NDF__MXDIM, LBND1, UBND1, NDIM1, STATUS ) 
 
-*  Get the number of pixel axes in the input NDF (may not be the same as the
-*  number in the output NDF).
+*  Get the number of pixel axes in the input NDF (may not be the same 
+*  as the number in the output NDF).
       NDIM1 = AST_GETI( MAP, 'Nin', STATUS )
 
 *  Find the index of the PIXEL Frame in the reference NDF.
@@ -231,7 +242,8 @@
             PUBND1( I ) = DBLE( UBND1( I ) )
          END DO
 
-*  Find the bounds on each axis of the corresponding area in the output image.
+*  Find the bounds on each axis of the corresponding area in the output 
+*  image.
          DO I = 1, NDIM2
             CALL AST_MAPBOX( MAP, PLBND1, PUBND1, .TRUE., I, 
      :                       PLBND2( I ), PUBND2( I ), XL, XU, STATUS ) 
@@ -283,14 +295,13 @@
 *  Store WCS information in the output NDF.
 *  ========================================
 
-*  We now create the WCS FrameSet for the output NDF. This will be a copy
-*  of the reference FrameSet, modified to take account of any difference
-*  in the pixel origins between the reference and output NDFs. We do this
-*  by taking a copy of the reference WCS FrameSet and then re-mapping the 
-*  GRID Frame in the copy. The Mapping used is the mapping from reference
-*  GRID Frame to output GRID Frame, going via the common PIXEL Frame.
-
-*  Get the default WCS FrameSet for the output NDF.
+*  We now create the WCS FrameSet for the output NDF.  This will be a 
+*  copy of the reference FrameSet, modified to take account of any 
+*  difference in the pixel origins between the reference and output 
+*  NDFs.  We do this by taking a copy of the reference WCS FrameSet and
+*  then re-mapping the GRID Frame in the copy.  The Mapping used is the 
+*  mapping from reference GRID Frame to output GRID Frame, going via the
+*  common PIXEL Frame.  Get the default WCS FrameSet for the output NDF.
       CALL NDF_GTWCS( INDF2, IWCS2, STATUS )
 
 *  Find the PIXEL Frame.
@@ -335,13 +346,13 @@
 *  Set TOL (DOUBLE) to ERRLIM (REAL)
       TOL = ERRLIM
 
-*  Map the DATA component of the input and output NDF. Rebinning is only
-*  available in _INTEGER, _REAL or _DOUBLE. Resampling can gandle any
-*  numeric data type.
+*  Map the DATA component of the input and output NDF.  Rebinning is
+*  only available in _INTEGER, _REAL or _DOUBLE.  Resampling can handle
+*  any numeric data type.
       IF( .NOT. REBIN ) THEN
          CALL NDF_TYPE( INDF1, 'DATA', TY_IN, STATUS )
       ELSE
-         CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF1, INDF1, 'DATA', 
+         CALL NDF_MTYPE( '_INTEGER,_REAL,_DOUBLE', INDF1, INDF1, 'DATA',
      :                   TY_IN, DTYPE, STATUS )
       END IF
 
@@ -365,7 +376,7 @@
       CALL NDF_BAD( INDF1, 'DATA,VARIANCE', .FALSE., BAD_DV, STATUS )
       IF( BAD_DV ) FLAGS = FLAGS + AST__USEBAD 
 
-*  Call the appropriate resampling routine
+*  Call the appropriate resampling routine.
       IF( .NOT. REBIN ) THEN
          IF ( TY_IN .EQ. '_INTEGER' ) THEN
             BAD_PIXELS = AST_RESAMPLEI( MAP5, NDIM1, LGRID1, UGRID1,
@@ -416,7 +427,7 @@
      :                                %VAL( CNF_PVAL( IPD1 ) ), 
      :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                                AST_NULL, PARAMS, FLAGS, TOL, 
-     :                                MAXPIX, VAL__BADUB, NDIM2, LGRID2, 
+     :                                MAXPIX, VAL__BADUB, NDIM2, LGRID2,
      :                                UGRID2, LGRID2, UGRID2, 
      :                                %VAL( CNF_PVAL( IPD2 ) ), 
      :                                %VAL( CNF_PVAL( IPV2 ) ),
@@ -438,7 +449,7 @@
      :                                %VAL( CNF_PVAL( IPD1 ) ), 
      :                                %VAL( CNF_PVAL( IPV1 ) ), METHOD,
      :                                AST_NULL, PARAMS, FLAGS, TOL, 
-     :                                MAXPIX, VAL__BADUW, NDIM2, LGRID2, 
+     :                                MAXPIX, VAL__BADUW, NDIM2, LGRID2,
      :                                UGRID2, LGRID2, UGRID2, 
      :                                %VAL( CNF_PVAL( IPD2 ) ), 
      :                                %VAL( CNF_PVAL( IPV2 ) ),
@@ -447,9 +458,9 @@
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'TY', TY_IN )
-            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported'//
-     :             ' resampling data type ''^TY'' (programming error).', 
-     :             STATUS )
+            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: '//
+     :        'Unsupported resampling data type ''^TY'' (programming '//
+     :        'error).', STATUS )
          END IF
 
 *  Call the appropriate rebinning routine
@@ -487,9 +498,9 @@
          ELSE IF( STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'TY', TY_IN )
-            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: Unsupported'//
-     :             ' rebinning data type ''^TY'' (programming error).', 
-     :             STATUS )
+            CALL ERR_REP( 'KPS1_WALA0_ERR2', 'KPS1_WALA0: '//
+     :        'Unsupported rebinning data type ''^TY'' (programming '//
+     :        'error).', STATUS )
          END IF
 
          BAD_PIXELS = 1
@@ -502,7 +513,7 @@
          CALL NDF_SBAD( .TRUE., INDF2, 'VARIANCE', STATUS )
       END IF
 
-*  Resample QUALITY arrays if appropriate
+*  Resample QUALITY arrays if appropriate.
       CALL NDF_STATE( INDF1, 'QUAL', QUAL, STATUS )
       IF ( ( METHOD .EQ. AST__NEAREST ) .AND. QUAL .AND. 
      :     .NOT. REBIN ) THEN

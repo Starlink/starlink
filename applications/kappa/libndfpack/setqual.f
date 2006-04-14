@@ -22,31 +22,31 @@
 *  Description:
 *     This routine assigns (or optionally removes) the quality
 *     specified by parameter QNAME to (or from) selected pixels in an
-*     NDF. For more information about using quality within KAPPA see 
+*     NDF.  For more information about using quality within KAPPA see 
 *     the appendix "Using Quality Names" within SUN/95.
 *
 *     The user can select the pixels to be operated on in one of three
-*     ways (see parameter SELECT):
+*     ways (see parameter SELECT).
 *
-*     - By giving a `mask' NDF. Pixels with bad values in the mask NDF 
+*     - By giving a `mask' NDF.  Pixels with bad values in the mask NDF 
 *     will be selected from the corresponding input NDF.
 *
 *     - By giving a list of pixel indices for the pixels which are to
 *     be selected.
 *
-*     - By giving an ARD file  containing a description of the regions of 
-*     the NDF which are to be selected. The ARD system (see SUN/183) uses a
-*     textual language to describe geometric regions of an array. Text
-*     files containing ARD description suitable for use with this
+*     - By giving an ARD file containing a description of the regions of
+*     the NDF which are to be selected.  The ARD system (see SUN/183) 
+*     uses a textual language to describe geometric regions of an array.
+*     Text files containing ARD description suitable for use with this
 *     routine can be created interactively using the routine ARDGEN.
 *
 *     The operation to be performed on the pixels is specified by
-*     parameter FUNCTION. The given quality may be assigned to or
-*     removed from pixels within the NDF. The pixels operated on
+*     parameter FUNCTION.  The given quality may be assigned to or
+*     removed from pixels within the NDF.  The pixels operated on
 *     can either be those selected by the user (as described above),
 *     or those not selected.  The quality of all other pixels is left
 *     unchanged (unless the parameter FUNCTION is given the value NS+HU
-*     or NU+HS). Thus for instance if pixel (1,1) already held the
+*     or NU+HS).  Thus for instance if pixel (1,1) already held the
 *     quality specified by QNAME, and the quality was then assigned to
 *     pixel (2,2) this would not cause the quality to be removed from
 *     pixel (1,1).
@@ -57,15 +57,16 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of the ARD file containing a description of the parts
-*        of the NDF to be `selected'. The ARD parameter is only prompted 
-*        for if the SELECT parameter is given the value "ARD". The co-ordinate 
-*        system in which positions within this file are given should be 
-*        indicated by including suitable COFRAME or WCS statements within 
-*        the file (see SUN/183), but will default to pixel co-ordinates
-*        in the absence of any such statements. For instance, starting the 
-*        file with a line containing the text "COFRAME(SKY,System=FK5)" would
-*        indicate that positions are specified in RA/DEC (FK5,J2000). The
-*        statement "COFRAME(PIXEL)" indicates explicitly that positions are 
+*        of the NDF to be `selected'.  The ARD parameter is only 
+*        prompted for if the SELECT parameter is given the value "ARD".
+*        The co-ordinate system in which positions within this file are 
+*        given should be indicated by including suitable COFRAME or WCS 
+*        statements within the file (see SUN/183), but will default to 
+*        pixel co-ordinates in the absence of any such statements.  For 
+*        instance, starting the file with a line containing the text 
+*        "COFRAME(SKY,System=FK5)" would indicate that positions are 
+*        specified in RA/DEC (FK5,J2000).  The statement 
+*        "COFRAME(PIXEL)" indicates explicitly that positions are 
 *        specified in pixel co-ordinates. 
 *     COMMENT = LITERAL (Read)
 *        A comment to store with the quality name.  This parameter is
@@ -74,47 +75,48 @@
 *     FUNCTION = LITERAL (Read)
 *        This parameter specifies what function is to be performed on
 *        the "selected" pixels specified using parameters MASK, LIST or
-*        ARD. It can take any of the values "HS", "HU", "NS", "NU",
-*        "HS+NU" or "HU+NS"
+*        ARD.  It can take any of the values "HS", "HU", "NS", "NU",
+*        "HS+NU" or "HU+NS".
 *
-*        - HS:  Ensure that the quality specified by QNAME is held by
-*             all the selected pixels. The quality of all other
-*             pixels is left un-changed.
+*        - "HS" -- Ensure that the quality specified by QNAME is held by
+*                  all the selected pixels. The quality of all other
+*                  pixels is left unchanged.
 *
-*        - HU:  Ensure that the quality specified by QNAME is held by all
-*             the pixels which have not been selected. The quality of
-*             the selected pixels is left un-changed.
+*        - "HU" -- Ensure that the quality specified by QNAME is held by
+*                 all the pixels that have not been selected.  The 
+*                 quality of the selected pixels is left unchanged.
 *
-*        - NS:  Ensure that the quality specified by QNAME is not held by
-*             any of the selected pixels. The quality of all other
-*             pixels is left un-changed.
+*        - "NS" -- Ensure that the quality specified by QNAME is not 
+*                 held by any of the selected pixels.  The quality of 
+*                 all other pixels is left unchanged.
 *
-*        - NU:  Ensure that the quality specified by QNAME is not held by
-*             any of the pixels which have not been selected. The
-*             quality of the selected pixels is left un-changed.
+*        - "NU" -- Ensure that the quality specified by QNAME is not 
+*                  held by any of the pixels that have not been 
+*                  selected.  The quality of the selected pixels is left
+*                  unchanged.
 *
-*        - HS+NU:  Ensure that the quality specified by QNAME is held by
-*             all the selected pixels and not held by any of the other
-*             pixels.
+*        - "HS+NU" -- Ensure that the quality specified by QNAME is held
+*                  by all the selected pixels and not held by any of 
+*                  the other pixels.
 *
-*        - HU+NS:  Ensure that the quality specified by QNAME is held by
-*             all the pixels which have not been selected and not held
-*             by any of the selected pixels.
-*                                                                   ["HS"]
+*        - "HU+NS" -- Ensure that the quality specified by QNAME is 
+*                  held by all the pixels that have not been selected 
+*                  and not held by any of the selected pixels.
+*        ["HS"]
 *     LIST = LITERAL (Read)
 *        A group of pixels positions within the input NDF listing the
-*        pixels which are to be `selected' (see parameter FUNCTION).
+*        pixels that are to be `selected' (see parameter FUNCTION).
 *        Each position should be giving as a list of pixel indices 
 *        (eg X1, Y1, X2, Y2,...  for a two dimensional NDF). LIST is 
 *        only prompted for if parameter SELECT is given the value LIST.
 *     MASK = NDF (Read)
 *        A mask NDF used to define the `selected' pixels within the 
-*        input NDF (see parameter FUNCTION). The mask should be aligned
-*        pixel-for-pixel with the input NDF.  Pixels which are bad in
-*        the mask NDF are `selected'. The quality of any pixels which
-*        lie outside the bounds of the mask NDF are left unaltered.  This 
-*        parameter is only prompted for if the parameter SELECT is given 
-*        the value MASK.
+*        input NDF (see parameter FUNCTION).  The mask should be aligned
+*        pixel-for-pixel with the input NDF.  Pixels that are bad in
+*        the mask NDF are `selected'. The quality of any pixels that
+*        lie outside the bounds of the mask NDF are left unaltered.
+*        This parameter is only prompted for if the parameter SELECT is
+*        given the value MASK.
 *     NDF = NDF (Update)
 *        The NDF in which the quality information is to be stored. 
 *     QNAME = LITERAL (Read)
@@ -124,8 +126,8 @@
 *        already defined within the NDF.
 *     SELECT = LITERAL (Read)
 *        This parameter determines how the pixels are selected, and can
-*        take the values "Mask", "List" or "ARD" (see parameters MASK, LIST
-*        and ARD). ["Mask"]
+*        take the values "Mask", "List" or "ARD" (see parameters MASK, 
+*        LIST, and ARD). ["Mask"]
 *     XNAME = LITERAL (Read)
 *        If an NDF already contains any quality name definitions then
 *        new quality names are put in the same extension as the old
@@ -138,7 +140,7 @@
 *        If a new NDF extension is created to hold quality names (see
 *        parameter XNAME), then parameter XTYPE is used to obtain the
 *        HDS data type for the created extension. The run time default
-*        is to give the extension a type identical to its name.       []
+*        is to give the extension a type identical to its name.  []
 
 *  Examples:
 *     setqual m51 saturated "Saturated pixels" m51_cut
@@ -174,17 +176,21 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-OCT-1991 (DSB):
 *        Original version.
 *     12-DEC-1994 (DSB):
-*        Added facility to specify selected pixels using an ARD description.
+*        Added facility to specify selected pixels using an ARD 
+*        description.
 *     16-JAN-2002 (DSB):
 *        Brought into KAPPA.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -222,7 +228,7 @@
       INTEGER AUBNDI( NDF__MXDIM )! Upper bounds of included area (ARD)
       INTEGER BIT                ! The quality bit corresponding to the
                                  ! quality name in range 1-8.
-      CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment to store with
+      CHARACTER COMMNT*(IRQ__SZCOM) ! Descriptive comment to store with
                                  ! the supplied quality name.
       LOGICAL CONT               ! ARD description to continue?
       INTEGER ELMASK             ! No. of elements in mapped DATA
@@ -236,8 +242,7 @@
       LOGICAL FOUND              ! True if requested NDF extension
                                  ! exists within the input NDF.
       CHARACTER FUNC*2           ! Value of parameter FUNCTION.
-      CHARACTER HSTORY*(IRQ__SZQNM+40)! History record added to NDF.
-      INTEGER I                  ! Loop count.
+      INTEGER I                  ! Loop count
       INTEGER IGRP1              ! Identifier for group holding pixel
                                  ! indices.
       INTEGER IGRP2              ! Identifier for group holding ARD
@@ -246,41 +251,39 @@
       INTEGER IPLIST             ! Pointer to the list of pixel
                                  ! positions.
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
-      INTEGER IPMASK             ! Pointer to the used mask.
+      INTEGER IPMASK             ! Pointer to the used mask
       INTEGER IWCS               ! NDF WCS FrameSet
-      INTEGER LBND( NDF__MXDIM ) ! Lower bounds for input NDF.
-      CHARACTER LOCS(5)*(DAT__SZLOC)! Locators used to access quality
-                                 ! name information in the input NDF.
-      INTEGER LQNAME             ! Length of the quality name string.
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds for input NDF
+      CHARACTER LOCS(5)*(DAT__SZLOC) ! Locators used to access quality
+                                 ! name information in the input NDF
+      INTEGER LQNAME             ! Length of the quality name string
       INTEGER NC                 ! No. of pixel positions store in
-                                 ! the input text file.
-      INTEGER NDFIN              ! NDF identifier for input NDF.
-      INTEGER NDFMSK             ! NDF identifier for mask NDF.
-      INTEGER NDIM               ! No. of dimensions in input NDF.
-      INTEGER NIN                ! The total number of NDFs to be
-                                 ! processed.
+                                 ! the input text file
+      INTEGER NDFIN              ! NDF identifier for input NDF
+      INTEGER NDFMSK             ! NDF identifier for mask NDF
+      INTEGER NDIM               ! Number of dimensions in input NDF
       INTEGER NINDEX             ! The total number of pixel indices 
                                  ! obtained.
       CHARACTER QNAME*(IRQ__SZQNM)! Supplied quality name.
       INTEGER REGVAL             ! Highest value in ARD mask
-      CHARACTER SELECT*4         ! Value of parameter SELECT.
+      CHARACTER SELECT*4         ! Value of parameter SELECT
       INTEGER SET                ! The number of pixels which hold the 
-                                 ! quality.
+                                 ! quality
       LOGICAL THERE              ! True if quality name is already 
-                                 ! defined within the input NDF.
+                                 ! defined within the input NDF
       INTEGER UBND( NDF__MXDIM ) ! Upper bounds for input NDF.
       LOGICAL VALUE              ! If FIXED is true, then VALUE is true
                                  ! if all pixel shold the quality, and 
                                  ! false if no pixels hold the quality.
       CHARACTER XLOC*(DAT__SZLOC) ! Locator for the NDF extension
                                  ! containing quality name information
-                                 ! in the input NDF.
+                                 ! in the input NDF
       CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing
                                  ! quality name information in the
-                                 ! input NDF.
+                                 ! input NDF
       CHARACTER XTYPE*(DAT__SZTYP) ! HDS type for the NDF extension
                                  ! containing quality name information
-                                 ! in the input NDF.
+                                 ! in the input NDF
 *.
 
 *  Check inherited global status.

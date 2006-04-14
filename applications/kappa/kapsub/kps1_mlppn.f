@@ -30,11 +30,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+
 *     {enter_new_authors_here}
 
 *  History:
 *     12-AUG-1999 (DSB):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:

@@ -369,6 +369,8 @@
 *        default attributes.
 *     2006 March 3 (MJC):
 *        Created tokens for an error message.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -394,8 +396,8 @@
       EXTERNAL AST_ISAMAPPING    ! AST function to classify Object type
 
 *  Local Constants:
-      INTEGER MAXEXP             ! Maximum number of expressions for MathMap
-      PARAMETER( MAXEXP = 100 )
+      INTEGER MAXEXP             ! Maximum number of expressions for 
+      PARAMETER( MAXEXP = 100 )  ! MathMap
 
 *  Local Variables:
       CHARACTER ATTRIB*20        ! Attribute name
@@ -403,24 +405,34 @@
       CHARACTER DOM0*40          ! Domain for basis Frame
       CHARACTER FRMTYP*16        ! Type of Frame to add
       CHARACTER MAPTYP*16        ! Type of transformation to add
-      CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions for MathMap
-      CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions for MathMap
+      CHARACTER FOREXP( MAXEXP ) * ( GRP__SZNAM ) ! Forward expressions 
+                                 ! for MathMap
+      CHARACTER INVEXP( MAXEXP ) * ( GRP__SZNAM ) ! Inverse expressions 
+                                 ! for MathMap
       DOUBLE PRECISION CENTRE( 2 ) ! Pincushion distortion centre
       DOUBLE PRECISION DET       ! Matrix determinant
       DOUBLE PRECISION DIAG( NDF__MXDIM ) ! Diagonal matrix elements
       DOUBLE PRECISION DISCO     ! Pincushion distortion coefficient
-      DOUBLE PRECISION INA( NDF__MXDIM ) ! Corner "A" of window in input Frame
-      DOUBLE PRECISION INB( NDF__MXDIM ) ! Corner "B" of window in input Frame
-      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix (no offset)
-      DOUBLE PRECISION MTEST( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix (no offset)
+      DOUBLE PRECISION INA( NDF__MXDIM ) ! Corner "A" of window in input
+                                 ! Frame
+      DOUBLE PRECISION INB( NDF__MXDIM ) ! Corner "B" of window in input
+                                 ! Frame
+      DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix 
+                                 ! (no offset)
+      DOUBLE PRECISION MTEST( NDF__MXDIM*NDF__MXDIM ) ! Pure matrix 
+                                 ! (no offset)
       DOUBLE PRECISION OFFSET( NDF__MXDIM ) ! Pixel offset vector
       DOUBLE PRECISION OTEST( NDF__MXDIM )  ! Pixel offset vector
-      DOUBLE PRECISION OUTA( NDF__MXDIM )! Corner "A" of window in output Frame
-      DOUBLE PRECISION OUTB( NDF__MXDIM )! Corner "B" of window in output Frame
+      DOUBLE PRECISION OUTA( NDF__MXDIM )! Corner "A" of window in 
+                                 ! output Frame
+      DOUBLE PRECISION OUTB( NDF__MXDIM )! Corner "B" of window in 
+                                 ! output Frame
       DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! Translation coefficients
-      DOUBLE PRECISION TR( NDF__MXDIM*( NDF__MXDIM + 1 ) ) ! Mapping co-effs
+      DOUBLE PRECISION TR( NDF__MXDIM*( NDF__MXDIM + 1 ) ) ! Mapping 
+                                 ! co-effs
       DOUBLE PRECISION ZOOM      ! Scaling factor for ZoomMap
-      INTEGER ACTVAL             ! No. of transformation co-efficients supplied
+      INTEGER ACTVAL             ! No. of transformation coefficients 
+                                 ! supplied
       INTEGER AXES( NDF__MXDIM ) ! Axis selection array
       INTEGER FRMB               ! Pointer to basis Frame
       INTEGER FRMN               ! Pointer to new Frame
@@ -431,20 +443,26 @@
       INTEGER INDF               ! NDF identifier for NDF being modified
       INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER J                  ! Column index
-      INTEGER K                  ! Index within supplied list of co-efficients
+      INTEGER K                  ! Index within supplied list of 
+                                 ! coefficients
       INTEGER L                  ! Index within vectorised matrix array
       INTEGER MAP                ! Pointer to old->new Mapping
-      INTEGER MTRMAP             ! MatrixMap implied by given co-efficients
-      INTEGER NAXB               ! No. of axes in basis Frame
-      INTEGER NCOEF              ! Required no. of transformation co-efficients 
+      INTEGER MTRMAP             ! MatrixMap implied by given 
+                                 ! coefficients
+      INTEGER NAXB               ! Number of axes in basis Frame
+      INTEGER NCOEF              ! Required number of transformation 
+                                 ! coefficients 
       INTEGER NEXP               ! Number of expressions got so far
-      INTEGER NFEXP              ! Number of expressions for forward transforms
-      INTEGER NIEXP              ! Number of expressions for inverse transforms
+      INTEGER NFEXP              ! Number of expressions for forward 
+                                 ! transforms
+      INTEGER NIEXP              ! Number of expressions for inverse
+                                 ! transforms
       INTEGER RESULT             ! Pointer to result FrameSet
       INTEGER SING               ! Non-zero if matrix is singular
-      INTEGER WINMAP             ! WinMap implied by given co-efficients
+      INTEGER WINMAP             ! WinMap implied by given coefficients
       INTEGER WORK( NDF__MXDIM ) ! Work space
-      LOGICAL FIBOTH             ! Do we have both forward and inverse mappings?
+      LOGICAL FIBOTH             ! Do we have both forward and inverse 
+                                 ! mappings?
       LOGICAL SIMPFI             ! SimpFI attribute of MathMap
       LOGICAL SIMPIF             ! SimpIF attribute of MathMap
 
@@ -480,20 +498,21 @@
          CALL PAR_GDR0I( 'NAXES', -1, 1, VAL__MAXI, .FALSE., NAXB,
      :                   STATUS )
 
-*  If we are adding a new Frame to a WCS FrameSet, we need to extract some 
-*  information about the FrameSet.
+*  If we are adding a new Frame to a WCS FrameSet, we need to extract 
+*  some information about the FrameSet.
       ELSE
 
 *  Get the WCS FrameSet associated with the NDF.
          CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Get the existing Frame which is to be used as the basis for the new Frame. 
-*  The selected Frame becomes the Current Frame.
+*  Get the existing Frame which is to be used as the basis for the new 
+*  Frame.   The selected Frame becomes the Current Frame.
          CALL NDF_MSG( 'NDF', INDF )
          CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', 
      :                    .TRUE., '^NDF', STATUS )
 
-*  Get its index, get a pointer to it, and save the number of axes in it.
+*  Get its index, get a pointer to it, and save the number of axes in 
+*  it.
          IBASIS = AST_GETI( IWCS, 'CURRENT', STATUS )
          FRMB = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          NAXB = AST_GETI( FRMB, 'NAXES', STATUS )
@@ -528,8 +547,9 @@
 *  Create a Mapping representing a general linear transformation.
       ELSE IF ( MAPTYP .EQ. 'LINEAR' ) THEN
 
-*  Get the co-efficients of the linear transformation from the basis
-*  Frame to the new Frame. Ensure the exact required number are supplied.
+*  Get the coefficients of the linear transformation from the basis
+*  Frame to the new Frame.  Ensure the exact required number are 
+*  supplied.
          ACTVAL = 0
          NCOEF = ( NAXB + 1 )*NAXB
          DO WHILE( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) 
@@ -537,19 +557,20 @@
             IF( ACTVAL .NE. NCOEF .AND. STATUS .EQ. SAI__OK ) THEN
                CALL MSG_SETI( 'N', NCOEF )
                CALL MSG_OUT( 'WCSADD_MSG1', 'Please supply exactly '//
-     :                       '^N co-efficient values (or a null '//
+     :                       '^N coefficient values (or a null '//
      :                       'value) for parameter %TR.', STATUS )
                CALL PAR_CANCL( 'TR', STATUS )
             END IF
          END DO
 
-*  If a null value was given, annul the error and create a unit MatrixMap.
+*  If a null value was given, annul the error and create a unit 
+*  MatrixMap.
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             MAP = AST_MATRIXMAP( NAXB, NAXB, 2, 0.0D0, ' ', STATUS ) 
 
 *  Otherwise, if no error has occurred, extract the offset and matrix
-*  from the supplied list of co-efficients.         
+*  from the supplied list of coefficients.         
          ELSE
 
 *  Extract the offset into a separate vector, making two copies.
@@ -634,7 +655,8 @@
 *  Copy the expressions into a local array.
          CALL GRP_GET( IGRP, 1, NFEXP, FOREXP, STATUS ) 
 
-*  Similarly, get the algebraic expressions for the inverse transformation.
+*  Similarly, get the algebraic expressions for the inverse 
+*  transformation.
          CALL KPG1_GTGRP( 'INVEXP', IGRP, NIEXP, STATUS )
          DO WHILE( NIEXP .LT. NAXB .AND. STATUS .EQ. SAI__OK ) 
             CALL MSG_SETI( 'N', NAXB )
@@ -775,10 +797,10 @@
 *  Allow the user to modify the attributes of the Frame.
             CALL KPG1_ASSET( 'WCSADD', 'ATTRS', FRMN, STATUS )
 
-*  Transfer the values of attributes which have been set in the basis Frame 
-*  to the new Frame, and modify the Mapping. We temporarily clear the Domain 
-*  in the basis Frame (if set) so that we can transfer attribute values
-*  to Frames with other Domains.
+*  Transfer the values of attributes which have been set in the basis 
+*  Frame to the new Frame, and modify the Mapping.  We temporarily clear
+*  the Domain in the basis Frame (if set) so that we can transfer
+*  attribute values to Frames with other Domains.
             IF( AST_TEST( FRMB, 'Domain', STATUS ) ) THEN
                DOM0 = AST_GETC( FRMB, 'Domain', STATUS )
                CALL AST_CLEAR( FRMB, 'Domain', STATUS )
@@ -819,8 +841,8 @@
 *  Note the current Domain in the Frame.
          DOM0 = AST_GETC( FRMN, 'Domain', STATUS )
 
-*  If the new Frame has active Unit attributes, check all Unit attributes
-*  have non-blank values.
+*  If the new Frame has active Unit attributes, check that all Unit 
+*  attributes have non-blank values.
          IF( AST_GETACTIVEUNIT( FRMN, STATUS ) ) THEN
             ATTRIB = 'Unit('
             DO I = 1, AST_GETI( FRMN, 'Naxes', STATUS )
@@ -840,7 +862,7 @@
              END DO
          END IF
 
-*  Get the Domain for the new Frame. If the current Domain is non-blank
+*  Get the Domain for the new Frame.  If the current Domain is non-blank
 *  and different to the Domain of the basis Frame, use it as the dynamic
 *  default.
          DOM = AST_GETC( FRMN, 'Domain', STATUS ) 
@@ -878,7 +900,7 @@
          CALL ERR_ANNUL( STATUS )
       
 *  If we do not have an NDF, cancel the parameter and try once more to 
-*  create an output file. We do this because the default value for
+*  create an output file.  We do this because the default value for
 *  MAPOUT in the ifl file is a null.
          IF( INDF .EQ. NDF__NOID ) THEN
             CALL PAR_CANCL( 'MAPOUT', STATUS )

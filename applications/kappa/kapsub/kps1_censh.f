@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_CENSH( CERROR, CFRM, NPOS, ID, LOGPOS, FDL, QUIET, 
+      SUBROUTINE KPS1_CENSH( CERROR, CFRM, NPOS, ID, LOGPOS, FDL, QUIET,
      :                       NDIMS, NAXC, GUESS, OUTCO, FDO, NWAS, 
      :                       ERROR, PIXPOS, CURPOS, CURWAS, I, STATUS ) 
 *+
@@ -6,7 +6,7 @@
 *     KPS1_CENSH
 
 *  Purpose:
-*     Format and display a centroid position.
+*     Formats and displays a centroid position.
 
 *  Language:
 *     Starlink Fortran 77
@@ -22,14 +22,14 @@
 
 *  Arguments:
 *     CERROR = INTEGER (Given) 
-*        Should the error on the centroid positions be found and dislayed?
-*        This requires the DNF to have a variance component.
+*        Should the error on the centroid positions be found and 
+*        displayed?  This requires the DNF to have a variance component.
 *     CFRM = INTEGER (Given) 
 *        A pointer to the current Frame of the NDF. 
 *     NPOS = INTEGER (Given) 
 *        The number of centroid positions to be found.
 *     ID = INTEGER (Given) 
-*        An integer identifier for the position to be displayed with the 
+*        An integer identifier for the position to be displayed with the
 *        centroid position.
 *     LOGPOS = LOGICAL (Given) 
 *        Should the results be written to a log file?
@@ -37,16 +37,17 @@
 *        The file descriptor for the log file. Ignored if LOGPOS is
 *        .FALSE.
 *     QUIET = INTEGER (Given) 
-*        If .FALSE., the results are written to standard output. If .TRUE.
-*        nothing is written to standard output.
+*        If .FALSE., the results are written to standard output.  If 
+*        .TRUE. nothing is written to standard output.
 *     NDIMS = INTEGER (Given) 
 *        The number of significant axes in the NDF (i.e. axes spanning
 *        more than a single pixel).
 *     NAXC = INTEGER (Given) 
 *        The number of axes in CFRM.
 *     GUESS = LOGICAL (Given)
-*        Should the original guess positions be included in the information
-*        displayed on the screen and/or written to the log file?
+*        Should the original guess positions be included in the 
+*        information displayed on the screen and/or written to the log 
+*        file?
 *     OUTCO = LOGICAL (Given) 
 *        Should the pixel co-ordinates of the centroids be written to an
 *        output text file?
@@ -56,8 +57,8 @@
 *     NWAS = INTEGER (Given) 
 *        The first dimension of the CURWAS array. 
 *     ERROR( NPOS, NAXC ) = DOUBLE PRECISION (Given) 
-*        The errors on the centroid positions, given in the current Frame
-*        of the NDF.
+*        The errors on the centroid positions, given in the current 
+*        Frame of the NDF.
 *     PIXPOS( NPOS, NDIMS ) = DOUBLE PRECISION (Given) 
 *        The centroid positions, given in the PIXEL Frame of the NDF.
 *     CURPOS( NPOS, NAXC ) = DOUBLE PRECISION (Given) 
@@ -65,8 +66,8 @@
 *        Normalized using AST_NORM on return.
 *     CURWAS( NWAS, NAXC ) = DOUBLE PRECISION (Given) 
 *        The initial guesses at the centroid positions, in the current 
-*        Frame. Only accessed if GUESS is .TRUE. Normalized using AST_NORM on 
-*        return.
+*        Frame.  Only accessed if GUESS is .TRUE.  Normalized using 
+*        AST_NORM on return.
 *     I = INTEGER (Given)
 *        The index of the position to be displayed (i.e. the first array
 *        index within the arrays ERROR, PIXPOS, CURPOS and CURWAS).
@@ -75,6 +76,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -82,6 +84,8 @@
 *        Original version.
 *     20-OCT-2000 (DSB):
 *        Normalize current frame positions.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,22 +124,18 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-
 *  Local Constants: 
       INTEGER MXBUF              ! Length of screen buffer
       PARAMETER ( MXBUF = 80 )
 
 *  Local Variables:
-      CHARACTER AXVAL*50         ! A formatted axis value
       CHARACTER LINE1*(MXBUF)    ! Buffer for output text
       CHARACTER LINE2*(MXBUF)    ! Buffer for output text
       CHARACTER LINE3*(MXBUF)    ! Buffer for output text
       DOUBLE PRECISION POS( NDF__MXDIM )! Work space for a position
-      INTEGER IAT1               ! Number of characters currently in LINE1
-      INTEGER IAT2               ! Number of characters currently in LINE2
-      INTEGER IAT3               ! Number of characters currently in LINE3
+      INTEGER IAT1               ! No. of characters currently in LINE1
+      INTEGER IAT2               ! No. of characters currently in LINE2
+      INTEGER IAT3               ! No. of characters currently in LINE3
       INTEGER J                  ! Axis index
       LOGICAL OK                 ! Is this position OK?
 *.
@@ -143,8 +143,9 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Write the pixel co-ordinates at the centroid to the output co-ordinate 
-*  file if required, so long as all pixel axis values are good.
+*  Write the pixel co-ordinates at the centroid to the output 
+*  co-ordinate file if required, so long as all pixel axis values are
+*  good.
       IF( OUTCO ) THEN
 
          OK = .TRUE.

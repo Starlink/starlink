@@ -5,7 +5,7 @@
 *     KPS1_ZPDEC
 
 *  Purpose:
-*     Decode a record from a ZAPLIN steering file.
+*     Decodes a record from a ZAPLIN steering file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -15,24 +15,29 @@
 *                      OK, STATUS )
 
 *  Description:
-*     This routine extracts field from a line of text read from a zaplin
-*     steering file, classifies the type of region described by the line,
-*     and returns the corresponding axis values in the supplied Frame.
+*     This routine extracts field from a line of text read from a ZAPLIN
+*     steering file, classifies the type of region described by the 
+*     line, and returns the corresponding axis values in the supplied 
+*     Frame.
 
 *  Arguments:
 *     FNAME = CHARACTER * ( * ) (Given)
-*        The name of the text file from which the supplied text was read.
-*        Used only in error messages.
+*        The name of the text file from which the supplied text was 
+*        read.  Used only in error messages.
 *     FRM = INTEGER (Given)
-*        A pointer to the AST Frame to be used to unformat the axis values.
+*        A pointer to the AST Frame to be used to unformat the axis 
+*        values.
 *     TEXT = CHARACTER * ( * ) (Given)
-*        The text read from the file. It should contain no leading spaces.
+*        The text read from the file.  It should contain no leading 
+*        spaces.
 *     POS( 2, 2 ) = DOUBLE PRECISION (Given and Returned)
 *        On entry, this array should hold two typical positions on the
-*        image. On exit, it holds the positions read from the text. First 
-*        index is position number, and second index is axis number.
+*        image.  On exit, it holds the positions read from the text.
+*        The first index is position number, and the second index is 
+*        axis number.
 *     NP = INTEGER (Returned)
-*        The number of positions read from the line. Either 0, 1 or 2.
+*        The number of positions read from the line.  Allowed values
+*        are 0, 1 or 2.
 *     REGION = LOGICAL (Returned)
 *        Does the text represent a region?
 *     LINE = LOGICAL (Returned)
@@ -45,16 +50,19 @@
 *        The global status.
 
 *  Notes:
-*     - No error is reported if an illegally formatted line is supplied, 
+*     - No error is reported if an illegally formatted line is supplied,
 *     but NP is returned as 0 (OK is still returned .TRUE.).
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-JAN-2000 (DSB):
 *        Original version.
+*     2006 April 12 (MJC):
+*        Remove unused variables and wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -67,7 +75,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_PAR'          ! AST constants and function
+                                 ! declarations
 
 *  Arguments Given:
       CHARACTER FNAME*(*)
@@ -88,16 +97,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER ATTR*10          ! Axis label
-      CHARACTER DOM*10           ! Domain of supplied Frame
-      CHARACTER LC*1             ! First character in 3rd word
+      CHARACTER ATTR*( 10 )      ! Axis label
+      CHARACTER LC*( 1 )         ! First character in 3rd word
       DOUBLE PRECISION AXVAL( 2 )! Axis values
       INTEGER AX( 2 )            ! Axis indices for first two values
       INTEGER F                  ! Index of first character
       INTEGER I                  ! Loop index
       INTEGER IAX                ! Axis index to use
       INTEGER L                  ! Index of last character
-      INTEGER NC                 ! No. of characters used
+      INTEGER NC                 ! Number of characters used
 *.
 
 *  Initialise
@@ -190,13 +198,15 @@
                   END IF
 
 *  If the text specifies a set of lines, store the axis values obtained
-*  above in the correct place (the other axis retains its suppled values).
+*  above in the correct place (the other axis retains its suppled 
+*  values).
                ELSE IF( LINE ) THEN
                   POS( 1, 2 ) = AXVAL( 1 )
                   POS( 2, 2 ) = AXVAL( 2 )
 
-*  If the text specifies a set of columns, store the axis values obtained
-*  above in the correct place (the other axis retains its supplied values).
+*  If the text specifies a set of columns, store the axis values 
+*  obtained above in the correct place (the other axis retains its 
+*  supplied values).
                ELSE
                   POS( 1, 1 ) = AXVAL( 1 )
                   POS( 2, 1 ) = AXVAL( 2 )
