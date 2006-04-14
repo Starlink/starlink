@@ -20,85 +20,91 @@
 *        The global status.
 
 *  Description:
-*     This application reports positions contained in a catalogue. The
-*     catalogue should have the form of a positions list as produced (for
-*     instance) by applications LISTMAKE and CURSOR. By default all positions 
-*     in the catalogue are reported, but a subset may be reported by 
-*     specifying a range of "position identifiers" (see parameters FIRST 
-*     and LAST). 
+*     This application reports positions contained in a catalogue.  The
+*     catalogue should have the form of a positions list as produced,
+*     for instance, by applications LISTMAKE and CURSOR.  By default all
+*     positions in the catalogue are reported, but a subset may be
+*     reported by specifying a range of "position identifiers" (see
+*     parameters FIRST and LAST). 
 *
-*     Positions may be reported in a range of co-ordinate Frames dependant 
-*     on the information stored in the supplied positions list (see parameter 
-*     FRAME). The selected positions are written to an output parameter 
-*     (parameter POSNS), and may also be written to an output positions
-*     list (see parameter OUTCAT). The formatted screen output can be saved 
-*     in a logfile (see parameter LOGFILE). The formats used to report the 
-*     axis values can be controlled using parameter STYLE.
+*     Positions may be reported in a range of co-ordinate Frames
+*     dependent on the information stored in the supplied positions 
+*     list (see parameter FRAME).  The selected positions are written
+*     to an output parameter (parameter POSNS), and may also be written 
+*     to an output positions list (see parameter OUTCAT).  The formatted
+*     screen output can be saved in a logfile (see parameter LOGFILE). 
+*     The formats used to report the axis values can be controlled 
+*     using parameter STYLE.
 *
 *     Graphics may also be drawn marking the selected positions (see
-*     parameters PLOT and LABEL). The supplied positions are aligned with the 
-*     picture specified by parameter NAME. If possible, this alignment occurs 
-*     within the  co-ordinate Frame specified using parameter FRAME. If this 
-*     is not possible, alignment may occur in some other suitable Frame. A 
-*     message is displayed indicating the Frame in which alignment occurred.
-*     If the supplied positions are aligned succesfully with a picture, then 
-*     the range of Frames in which the positions may be reported on the screen 
-*     is extended to include all those associated with the picture.
+*     parameters PLOT and LABEL).  The supplied positions are aligned 
+*     with the picture specified by parameter NAME.  If possible, this
+*     alignment occurs  within the co-ordinate Frame specified using 
+*     parameter FRAME.  If this is not possible, alignment may occur in
+*     some other suitable Frame.  A message is displayed indicating the
+*     Frame in which alignment occurred.  If the supplied positions are 
+*     aligned successfully with a picture, then the range of Frames in
+*     which the positions may be reported on the screen is extended to
+*     include all those associated with the picture.
 
 *  Usage:
 *     listshow incat [frame] [first] [last] [plot] [device]
 
 *  ADAM Parameters:
 *     CATFRAME = LITERAL (Read)
-*        A string determining the co-ordinate Frame in which positions are 
-*        to be stored in the output catalogue associated with parameter
-*        OUTCAT. See parameter FRAME for a description of the allowed
-*        values for this parameter. If a null (!) value is supplied, the
-*        positions will be stored in a SKY Frame, if a SKY Frame is 
-*        available within the input catalogue. Otherwise, they will be 
-*        stored in PIXEL co-ordinates, if a PIXEL Frame is available
-*        within the input catalogue. Otherwise, they are stored in the
-*        Frame used to specify positions within the input catalogue. [!]
+*        A string determining the co-ordinate Frame in which positions
+*        are to be stored in the output catalogue associated with
+*        parameter OUTCAT.  See parameter FRAME for a description of the
+*        allowed values for this parameter.  If a null (!) value is
+*        supplied, the positions will be stored in a SKY Frame, if a 
+*        SKY Frame is available within the input catalogue.  Otherwise,
+*        they will be stored in PIXEL co-ordinates, if a PIXEL Frame is
+*        available within the input catalogue.  Otherwise, they are
+*        stored in the Frame used to specify positions within the input
+*        catalogue. [!]
 *     CATEPOCH = DOUBLE PRECISION (Read)
 *        The epoch at which the sky positions stored in the output
-*        catalogue were determined. It will only be accessed if an epoch
-*        value is needed to qualify the co-ordinate Frame specified by 
-*        COLFRAME. If required, it should be given as a decimal years 
-*        value, with or without decimal places ("1996.8" for example). 
-*        Such values are interpreted as a Besselian epoch if less than 
-*        1984.0 and as a Julian epoch otherwise. 
+*        catalogue were determined.  It will only be accessed if an 
+*        epoch value is needed to qualify the co-ordinate Frame 
+*        specified by COLFRAME.  If required, it should be given as a
+*        decimal years value, with or without decimal places ("1996.8",
+*        for example).  Such values are interpreted as a Besselian epoch
+*        if less than 1984.0 and as a Julian epoch otherwise. 
 *     CLOSE = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Poly". If TRUE, polgons will be closed by joining 
-*        the first position to the last position. [Current value]
+*        "Chain" or "Poly".  If TRUE, polgons will be closed by joining 
+*        the first position to the last position.  [Current value]
 *     DESCRIBE = LOGICAL (Read)
-*        If TRUE, a detailed description of the co-ordinate Frame in which 
-*        the positions will be reported is displayed before the 
-*        positions. [Current value]
+*        If TRUE, a detailed description of the co-ordinate Frame in 
+*        which the positions will be reported is displayed before the 
+*        positions.  [Current value]
 *     DEVICE = DEVICE (Read)
 *        The graphics workstation.  Only accessed if parameter PLOT
-*        indicates that graphics are required. [The current graphics device]
+*        indicates that graphics are required.  
+*        [The current graphics device]
 *     DIM = _INTEGER (Write)
-*        The number of axes for each position written to output parameter 
-*        POSNS.
+*        The number of axes for each position written to output 
+*        parameter POSNS.
 *     EPOCH = DOUBLE PRECISION (Read)
 *        If an IRAS90 Sky Co-ordinate System specification is supplied
 *        (using parameter FRAME) for a celestial co-ordinate system, 
-*        then an epoch value is needed to qualify it. This is the epoch at 
-*        which the supplied sky positions were determined. It should be
-*        given as a decimal years value, with or without decimal places 
-*        ("1996.8" for example). Such values are interpreted as a Besselian 
-*        epoch if less than 1984.0 and as a Julian epoch otherwise. 
+*        then an epoch value is needed to qualify it.  This is the epoch
+*        at which the supplied sky positions were determined.  It should
+*        be given as a decimal years value, with or without decimal
+*        places ("1996.8" for example).  Such values are interpreted as
+*        a Besselian epoch if less than 1984.0 and as a Julian epoch 
+*        otherwise. 
 *     FIRST = INTEGER (Read)
-*        The identifier for the first position to be displayed. Positions
-*        are only displayed which have identifiers in the range given by
-*        parameters FIRST and LAST. If a null (!) value is supplied, the 
-*        value used is the lowest identifier value in the positions list. [!]
+*        The identifier for the first position to be displayed. 
+*        Positions are only displayed which have identifiers in the
+*        range given by parameters FIRST and LAST.  If a null (!) value
+*        is supplied, the value used is the lowest identifier value in
+*        the positions list.  [!]
 *     FRAME = LITERAL (Read)
-*        A string determining the co-ordinate Frame in which positions are 
-*        to be reported. This application can report positions in
-*        any of the co-ordinate Frames stored with the positions list. The
-*        string supplied for FRAME can be one of the following:
+*        A string determining the co-ordinate Frame in which positions
+*        are to be reported.  This application can report positions in
+*        any of the co-ordinate Frames stored with the positions list.
+*        The string supplied for FRAME can be one of the following.
 *
 *        - A Domain name such as SKY, AXIS, PIXEL, etc. 
 *
@@ -108,102 +114,106 @@
 *        EQUAT(J2000) (see SUN/163).
 *
 *        If a null value (!) is supplied, positions are reported in the 
-*        co-ordinate Frame which was current when the positions list was 
-*        created. The user is re-prompted if the specified Frame is not
-*        available within the positions list. The range of Frames available
-*        will include all those read from the supplied positions list. In 
-*        addition, if a graphics device is opened (i.e. if parameter PLOT
-*        is set to anything other than NONE), then all the Frames associated 
-*        with the picture specified by parameter NAME will also be available. 
-*        [!]
+*        co-ordinate Frame which was current when the positions list was
+*        created.  The user is re-prompted if the specified Frame is not
+*        available within the positions list.  The range of Frames 
+*        available will include all those read from the supplied 
+*        positions list.  In addition, if a graphics device is opened 
+*        (i.e. if parameter PLOT is set to anything other than NONE), 
+*        then all the Frames associated with the picture specified by
+*        parameter NAME will also be available.  [!]
 *     GEODESIC = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Poly". It specifies whether the curves drawn between
-*        positions should be stright lines, or should be geodesic curves.
-*        In many co-ordinate Frames geodesic curves will be simple straight 
-*        lines. However, in others (such as the majority of celestial 
-*        co-ordinates Frames) geodesic curves will be more complex curves 
-*        tracing the shortest path between two positions in a non-linear 
-*        projection. [FALSE]
+*        "Chain" or "Poly".  It specifies whether the curves drawn
+*        between positions should be stright lines, or should be 
+*        geodesic curves.  In many co-ordinate Frames geodesic curves 
+*        will be simple straight lines.  However, in others (such as the
+*        majority of celestial co-ordinate Frames) geodesic curves will
+*        be more complex curves tracing the shortest path between two 
+*        positions in a non-linear projection.  [FALSE]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list such as produced by 
 *        applications LISTMAKE, CURSOR, etc. 
 *     JUST = LITERAL (Read)
-*        A string specifying the justification to be used when displaying 
-*        text strings at the supplied positions. This parameter is 
-*        only accessed if parameter PLOT is set to "Text". The supplied
-*        string should contain two characters; the first should be "B",
-*        "C" or "T", meaning bottom, centre or top. The second should be
-*        "L", "C" or "R", meaning left, centre or right. The text is
-*        displayed so that the supplied position is at the specified 
-*        point within the displayed text string. [CC]
+*        A string specifying the justification to be used when 
+*        displaying text strings at the supplied positions.  This 
+*        parameter is only accessed if parameter PLOT is set to "Text". 
+*        The supplied string should contain two characters; the first
+*        should be "B", "C", or "T", meaning bottom, centre, or top
+*        respectively.  The second should be "L", "C", or "R", meaning 
+*        left, centre, or right respectively.  The text is displayed so 
+*        that the supplied position is at the specified point within 
+*        the displayed text string.  ["CC"]
 *     LABEL = LOGICAL (Read)
-*        If TRUE the positions are labelled with the corresponding integer
-*        identifiers on the graphics device specified by parameter DEVICE.
-*        The offset from each position to the centre of the corresponding 
-*        label is controlled using the "NumLabGap(1)" and "NumLabGap(2)"
-*        plotting attributes, and the appearance of the labels is
-*        controlled using attributes "Colour(NumLab)", "Size(NumLab)", etc.
-*        These attributes may be specified using parameter STYLE. [FALSE]
+*        If TRUE the positions are labelled with the corresponding
+*        integer identifiers on the graphics device specified by 
+*        parameter DEVICE.  The offset of each position from the centre
+*        of the corresponding label is controlled using the
+*        "NumLabGap(1)" and "NumLabGap(2)" plotting attributes, and the
+*        appearance of the labels is controlled using attributes
+*        "Colour(NumLab)", "Size(NumLab)", etc.  These attributes may be
+*        specified using parameter STYLE.  [FALSE]
 *     LAST = INTEGER (Read)
-*        The identifier for the last position to be displayed. Positions
-*        are only displayed which have identifiers in the range given by
-*        parameters FIRST and LAST. parameters FIRST and LAST. If a null (!) 
-*        value is supplied, the value used is the highest identifier value 
-*        in the positions list. [!]
+*        The identifier for the last position to be displayed.
+*        Positions are only displayed which have identifiers in the
+*        range given by parameters FIRST and LAST.  If a null (!) value
+*        is supplied, the value used is the highest identifier value 
+*        in the positions list.  [!]
 *     LOGFILE = FILENAME (Write)
-*        The name of the text file in which the formatted co-ordinates of 
-*        the selected positions may be stored. This is intended primarily 
-*        for recording the screen output, and not for communicating 
-*        positions to subsequent applications. A null string (!) means that 
-*        no file is created.  [!]
+*        The name of the text file in which the formatted co-ordinates
+*        of the selected positions may be stored.  This is intended
+*        primarily for recording the screen output, and not for
+*        communicating positions to subsequent applications.  A null
+*        string (!) means that no file is created.  [!]
 *     MARKER = INTEGER (Read)
 *        This parameter is only accessed if parameter PLOT is set to
-*        "Chain" or "Mark". It specifies the type of marker with which each
-*        position should be marked, and should be given as an integer 
-*        PGPLOT marker type. For instance, 0 gives a box, 1 gives a dot, 
-*        2 gives a cross, 3 gives an asterisk, 7 gives a triangle. The 
-*        value must be larger than or equal to -31. [current value]
+*        "Chain" or "Mark".  It specifies the type of marker with which 
+*        each position should be marked, and should be given as an
+*        integer PGPLOT marker type.  For instance, 0 gives a box, 1
+*        gives a dot, 2 gives a cross, 3 gives an asterisk, 7 gives a
+*        triangle.  The value must be larger than or equal to -31.
+*        [current value]
 *     NAME = LITERAL (Read)
-*        Determines the graphics database picture with which the supplied
-*        positions are to be aligned. Only accessed if parameter PLOT
-*        indicates that some graphics are to be produced. A search is made
-*        for the most recent picture with the specified name (eg DATA,
-*        FRAME or KEY) within the current picture. If no such picture can 
-*        be found, or if a null value is supplied, the current picture itself 
-*        is used. The name BASE can also be supplied as a special case, which 
-*        causes the BASE picture to be used even though it will not in
-*        general fall within the current picture. ["DATA"]
+*        Determines the graphics database picture with which the 
+*        supplied positions are to be aligned.  Only accessed if 
+*        parameter PLOT indicates that some graphics are to be produced.
+*        A search is made for the most recent picture with the 
+*        specified name (e.g. DATA, FRAME or KEY) within the current 
+*        picture.  If no such picture can be found, or if a null value
+*        is supplied, the current picture itself is used.  The name BASE
+*        can also be supplied as a special case, which causes the BASE 
+*        picture to be used even though it will not in general fall
+*        within the current picture.  ["DATA"]
 *     NUMBER = _INTEGER (Write)
 *        The number of positions selected.
 *     OUTCAT = FILENAME (Write)
-*        The output catalogue in which to store the selected positions. 
-*        If a null value is supplied, no output catalogue is produced. See
-*        parameter COLFRAME. [!]
+*        The output catalogue in which to store the selected positions.
+*        If a null value is supplied, no output catalogue is produced.
+*        See parameter COLFRAME.  [!]
 *     PLOT = LITERAL (Read)
 *        The type of graphics to be used to mark the positions on the
-*        graphics device specified by parameter DEVICE. The appearance of 
-*        these graphics (colour, size, etc ) is controlled by the STYLE 
-*        parameter. PLOT can take any of the following values:
+*        graphics device specified by parameter DEVICE.  The appearance
+*        of these graphics (colour, size, etc.) is controlled by the 
+*        STYLE parameter.  PLOT can take any of the following values.
 *
 *        - "None" -- No graphics are produced.
 *       
-*        - "Mark" -- Each position is marked with a marker of type specified
-*        by parameter MARKER.
+*        - "Mark" -- Each position is marked with a marker of type
+*        specified by parameter MARKER.
 *
 *        - "Poly" -- Causes each position to be joined by a line to the 
-*        previous position.  These lines may be simple straight lines or
-*        geodesic curves (see parameter GEODESIC). The polygons may
-*        optionally be closed by joining the last position to the first (see
-*        parameter CLOSE).
+*        previous position.   These lines may be simple straight lines 
+*        or geodesic curves (see parameter GEODESIC).  The polygons may
+*        optionally be closed by joining the last position to the first
+*        (see parameter CLOSE).
 *
-*        - "Chain" -- This is a combination of "Mark" and "Poly". Each 
-*        position is marked by a marker and joined by a line to the previous 
-*        position. Parameters MARKER, GEODESIC and CLOSE are used to
-*        specify the markers and lines to use.
+*        - "Chain" -- This is a combination of "Mark" and "Poly".  Each 
+*        position is marked by a marker and joined by a line to the
+*        previous position.  Parameters MARKER, GEODESIC and CLOSE are
+*        used to specify the markers and lines to use.
 *
-*        - "Box" -- A rectangular box with edges parallel to the edges of
-*        the graphics device is drawn between each pair of positions.
+*        - "Box" -- A rectangular box with edges parallel to the edges
+*        of the graphics device is drawn between each pair of positions.
 *
 *        - "Vline" -- A vertial line is drawn through each position, 
 *        extending the entire height of the selected picture.
@@ -213,123 +223,133 @@
 *
 *        - "Cross" -- A combination of "Vline" and "Hline".
 *
-*        - "Text" -- A text string is used to mark each position. The string 
-*        is drawn horizontally with the justification specified by parameter 
-*        JUST.  The strings to use for each position are specified using 
-*        parameter STRINGS.
+*        - "Text" -- A text string is used to mark each position.  The
+*        string is drawn horizontally with the justification specified 
+*        by parameter JUST.  The strings to use for each position are
+*        specified using parameter STRINGS.
 *
-*        - "Blank" -- The graphics device is opened and the picture specified 
-*        by parameter NAME is found, but no actual graphics are drawn to mark 
-*        the positions. This can be usefull if you just want to transform 
-*        the supplied positions into one of the co-ordinate Frames associated 
-*        with the picture, without drawing anything (see parameter FRAME).
+*        - "Blank" -- The graphics device is opened and the picture
+*        specified by parameter NAME is found, but no actual graphics
+*        are drawn to mark the positions.  This can be useful if you 
+*        just want to transform the supplied positions into one of the
+*        co-ordinate Frames associated with the picture, without drawing
+*        anything (see parameter FRAME).
 *
 *        Each position may also be separately labelled with its integer 
-*        identifier value by giving a TRUE value for parameter LABEL. [None]
+*        identifier value by giving a TRUE value for parameter LABEL.
+*        ["None"]
 *     POSNS() = _DOUBLE (Write)
 *        The unformatted co-ordinates of the positions selected by
 *        parameters FIRST and LAST, in the co-ordinate Frame selected by
-*        FRAME. The axis values are stored as a 1-dimensional vector. All
-*        the axis 1 values for the selected positions are stored first, 
-*        followed by the axis 2 values, etc. The number of positions in 
-*        the vector is written to the output parameter NUMBER, and the
-*        number of axes per position is written to the output parameter 
-*        DIM. The axis values may not be in the same units as the 
-*        formatted values shown on the screen. For instance, unformatted 
-*        celestial co-ordinate values are stored in units of radians. 
+*        FRAME.  The axis values are stored as a 1-dimensional vector. 
+*        All the axis-1 values for the selected positions are stored
+*        first, followed by the axis-2 values, etc.  The number of 
+*        positions in the vector is written to the output parameter
+*        NUMBER, and the number of axes per position is written to the
+*        output parameter DIM.  The axis values may not be in the same
+*        units as the formatted values shown on the screen.  For 
+*        instance, unformatted celestial co-ordinate values are stored 
+*        in units of radians.  
 *     QUIET = LOGICAL (Read)
-*        If TRUE then the positions are not displayed on the screen while 
-*        The application is running. Output parameters and files are still 
-*        created. If a null (!) value is supplied, the value used is TRUE
-*        if any graphics or labels are being plotted (see parameters PLOT 
-*        and LABEL), and FALSE otherwise. [!]
+*        If TRUE then the positions are not displayed on the screen
+*        while the application is running.  Output parameters and files
+*        are still created.  If a null (!) value is supplied, the value
+*        used is TRUE if any graphics or labels are being plotted (see
+*        parameters PLOT and LABEL), and FALSE otherwise.  [!]
 *     STRINGS = LITERAL (Read)
-*        A group of text strings which are used to mark the supplied positions 
-*        if parameter PLOT is set to "TEXT". The first string in the group 
-*        is used to mark the first position, the second string is used to 
-*        mark the second position, etc. If more positions are given than there 
-*        are strings in the group, then the extra positions will be marked 
-*        with an integer value indicating the index within the list of 
-*        supplied positions (note, these integers may be different to the 
-*        position identifiers in the supplied positions list - if you want to 
-*        see the position identifiers, use parameter LABEL). If a null value 
-*        (!) is given for the parameter, then all positions will be marked 
-*        with integer indices, starting at 1.
+*        A group of text strings which are used to mark the supplied
+*        positions if parameter PLOT is set to "TEXT".  The first 
+*        string in the group is used to mark the first position, the 
+*        second string is used to mark the second position, etc.  If 
+*        more positions are given than there are strings in the group, 
+*        then the extra positions will be marked with an integer value 
+*        indicating the index within the list of supplied positions. 
+*        (Note, these integers may be different from the position
+*        identifiers in the supplied positions list; if you want to see
+*        the position identifiers, use parameter LABEL.)  If a null
+*        value (!) is given for the parameter, then all positions will
+*        be marked with integer indices, starting at 1.
 *
 *        A comma-separated list should be given in which each element is
-*        either a marker string, or the name of a text file preceded by an 
-*        up-arrow character "^". Such text files should contain further 
-*        comma-separated lists which will be read and interpreted in the 
-*        same manner. Note, strings within text files can be separated by
-*        new lines as well as commas.
+*        either a marker string, or the name of a text file preceded by
+*        an up-arrow character "^".  Such text files should contain
+*        further comma-separated lists which will be read and 
+*        interpreted in the same manner.  Note, strings within text 
+*        files can be separated by new lines as well as commas.
 *     STYLE = LITERAL (Read)
 *        A group of attribute settings describing the style to use when
 *        formatting the co-ordinate values displayed on the screen, and 
-*        when drawing the graphics specified by parameter PLOT. 
+*        when drawing the graphics specified by parameter PLOT.  
 *
 *        A comma-separated list of strings should be given in which each
-*        string is either an attribute setting, or the name of a text file
-*        preceded by an up-arrow character "^". Such text files should
-*        contain further comma-separated lists which will be read and 
-*        interpreted in the same manner. Attribute settings are applied in 
-*        the order in which they occur within the list, with later settings
-*        over-riding any earlier settings given for the same attribute.
+*        string is either an attribute setting, or the name of a text 
+*        file preceded by an up-arrow character "^".  Such text files
+*        should contain further comma-separated lists which will be 
+*        read and interpreted in the same manner.  Attribute settings
+*        are applied in the order in which they occur within the list,
+*        with later settings overriding any earlier settings given for
+*        the same attribute.
 *
 *        Each individual attribute setting should be of the form:
 *
 *           <name>=<value>
 *
-*        where <name> is the name of a plotting attribute, and <value> is
-*        the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
-*        defaulted if a null value (!) is supplied. See section "Plotting
-*        Attributes" in SUN/95 for a description of the available
-*        attributes. Any unrecognised attributes are ignored (no error is
-*        reported). 
+*        where <name> is the name of a plotting attribute, and <value>
+*        is the value to assign to the attribute.  Default values will
+*        be used for any unspecified attributes.  All attributes will be
+*        defaulted if a null value (!) is supplied.  See section
+*        "Plotting Attributes" in SUN/95 for a description of the
+*        available attributes.  Any unrecognised attributes are ignored
+*        (no error is reported). 
 *
 *        In addition to the attributes which control the appearance of
 *        the graphics (Colour, Font, etc), the following attributes may
-*        be set in order to control the appearance of the formatted axis 
-*        values reported on the screen: Format, Digits, Symbol, Unit. These
-*        may be suffixed with an axis number (eg "Digits(2)") to refer to 
-*        the values displayed for a specific axis. [current value]
+*        be set in order to control the appearance of the formatted axis
+*        values reported on the screen: Format, Digits, Symbol, Unit. 
+*        These may be suffixed with an axis number (e.g. "Digits(2)") to
+*        refer to the values displayed for a specific axis.
+*        [current value]
 
 *  Examples:
 *     listshow stars pixel
 *        This displays the pixel co-ordinates of all the positions
-*        stored in the FITS binary catalogue stars.fit. They are all written 
-*        to the output parameter POSNS as well as to the screen.
+*        stored in the FITS binary catalogue stars.fit.  They are all 
+*        written to the output parameter POSNS as well as to the screen.
 *     listshow star outcat=star-gal catframe=gal quiet
 *        This copies a position list from catalogue "star" to a new
-*        catalogue called "star-gal". The positions are stored in galactic 
-*        co-ordinates in the output catalogue. Nothing is displayed on
-*        the screen.
+*        catalogue called "star-gal".  The positions are stored in
+*        galactic co-ordinates in the output catalogue.  Nothing is 
+*        displayed on the screen.
 *     listshow stars.fit equat(J2010) first=3 last=3 quiet
-*        This extracts position 3 from the catalogue stars.fit transforming
-*        it into FK5 equatorial RA/DEC co-ordinates (referenced to the
-*        J2010 equinox) if possible. The RA/DEC values (in radians) are
-*        written to the output parameter POSNS, but not to the screen.
+*        This extracts position 3 from the catalogue stars.fit 
+*        transforming it into FK5 equatorial RA/DEC co-ordinates
+*        (referenced to the J2010 equinox), if possible.  The RA/DEC 
+*        values (in radians) are written to the output parameter POSNS,
+*        but not to the screen.
 *     listshow stars_2.txt style="digits(1)=5,digits(2)=7"
 *        This lists the positions in the STL format catalogue contained
-*        in text file stars_2.txt in their original co-ordinate Frame. By 
-*        default, 5 digits are used to format axis 1 values, and 7 to format 
-*        axis 2 values. These defaults are over-ridden if the attributes 
-*        Format(1) and/or Format(2) are assigned values in the description 
-*        of the current Frame stored in the positions list.
-*     listshow s.txt plot=marker marker=3 style="colour(marker)=red,size=2"
-*        This marks the positions in s.txt on the currently selected graphics 
-*        device using PGPLOT marker 3 (an asterisk). The positions are aligned
-*        with the most recent DATA picture in the current picture. The markers 
-*        are red and are twice the default size. The positions are not 
-*        reported on the screen.
+*        in text file stars_2.txt in their original co-ordinate Frame.
+*        By default, five digits are used to format axis-1 values, and 7
+*        to format axis-2 values.  These defaults are overridden if the
+*        attributes Format(1) and/or Format(2) are assigned values in
+*        the description of the current Frame stored in the positions
+*        list.
+*     listshow s.txt plot=marker marker=3 
+*              style="colour(marker)=red,size=2"
+*        This marks the positions in s.txt on the currently selected 
+*        graphics device using PGPLOT marker 3 (an asterisk).  The 
+*        positions are aligned with the most recent DATA picture in the
+*        current picture.  The markers are red and are twice the 
+*        default size.  The positions are not reported on the screen.
 
 *  Notes:
-*     -  This application uses the conventions of the CURSA package (SUN/190)
-*     for determining the formats of input and output catalogues. If a file 
-*     type of .fits is given, then the catalogue is assumed to be a FITS 
-*     binary table. If a file type of .txt is given, then the catalogue is 
-*     assumed to be stored in a text file in "Small Text List" (STL) format. 
-*     If no file type is given, then ".fit" is assumed. 
+*     -  This application uses the conventions of the CURSA package
+*     (SUN/190) for determining the formats of input and output
+*     catalogues.  If a file type of .fits is given, then the catalogue
+*     is assumed to be a FITS binary table.  If a file type of .txt is
+*     given, then the catalogue is assumed to be stored in a text file
+*     in "Small Text List" (STL) format.  If no file type is given, then
+*     ".fit" is assumed. 
 
 *  Related Applications:
 *     KAPPA: CURSOR, LISTMAKE; CURSA: XCATVIEW, CATSELECT.
@@ -337,6 +357,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -352,6 +373,9 @@
 *        Use CNF_PVAL
 *     31-MAR-2006 (DSB):
 *        Move call to KPG1_PGCLS to "tidy up" section.
+*     2006 April 12 (MJC):
+*        Remove unused variables, corrected typo's and punctuation, and
+*        wrapped long lines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -364,7 +388,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'AST_PAR'          ! AST constants and function
+                                 ! declarations
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
@@ -385,33 +410,39 @@
       INTEGER FIRST              ! Lowest position identifier to display
       INTEGER FSTPOS             ! Position of lowest identifier
       INTEGER I                  ! Loop count
-      INTEGER IBASE              ! Index of Base Frame in IWCS
-      INTEGER IFRM               ! Index of Frame  for positions 
-      INTEGER IGRP1              ! GRP identifier for formatted co-ordinate values
-      INTEGER IGRP2              ! GRP identifier for marker strings group
+      INTEGER IGRP1              ! GRP identifier for formatted 
+                                 ! co-ordinate values
+      INTEGER IGRP2              ! GRP identifier for marker strings
+                                 ! group
       INTEGER IMARK              ! PGPLOT marker type
       INTEGER IPIC               ! AGI id for selected picture
       INTEGER IPIC0              ! Current (input) picture identifier
       INTEGER IPID               ! Pointer to original identifiers
       INTEGER IPLOT              ! AST pointer to Plot 
       INTEGER IPPOS              ! Pointer to original positions
-      INTEGER IPW0               ! Pointer to array holding selected identifiers 
-      INTEGER IPW1               ! Pointer to array holding selected positions
-      INTEGER IPW2               ! Pointer to array holding selected positions
-      INTEGER IPW3               ! Pointer to array holding GRAPHICS positions
+      INTEGER IPW0               ! Pointer to array holding selected
+                                 ! identifiers 
+      INTEGER IPW1               ! Pointer to array holding selected
+                                 ! positions
+      INTEGER IPW2               ! Pointer to array holding selected
+                                 ! positions
+      INTEGER IPW3               ! Pointer to array holding GRAPHICS
+                                 ! positions
       INTEGER IWCS               ! AST pointer to FrameSet
       INTEGER L                  ! Length of a string
-      INTEGER LAST               ! Highest position identifier to display
+      INTEGER LAST               ! Highest position identifier to
+                                 ! display
       INTEGER LSTPOS             ! Position of highest identifier
-      INTEGER MAP                ! AST pointer to original -> requested mapping
+      INTEGER MAP                ! AST pointer to original -> requested
+                                 ! mapping
       INTEGER NBAX               ! No. of axes in original Frame
       INTEGER NFRM               ! Number of Frames in Plot
       INTEGER NDISP              ! Number of selected positions
-      INTEGER NINVAL             ! No. of invalid identifiers
+      INTEGER NINVAL             ! Number of invalid identifiers
       INTEGER NPOS               ! Total number of positions
-      INTEGER NRAX               ! No. of axes in requested Frame
-      INTEGER NSTR               ! No. of marker strings supplied
-      INTEGER SIZE               ! No. of elements in group
+      INTEGER NRAX               ! Number of axes in requested Frame
+      INTEGER NSTR               ! Number of marker strings supplied
+      INTEGER SIZE               ! Number of elements in group
       LOGICAL CLOSE              ! Close the polygon?
       LOGICAL DESC               ! Describe each Coordinate Frame?
       LOGICAL GEO                ! Draw geodesic polygon?
@@ -458,9 +489,10 @@
          CALL PAR_GET0L( 'GEODESIC', GEO, STATUS )
       END IF
 
-*  For text graphics, get a group of strings to be displayed. If a null 
+*  For text graphics, get a group of strings to be displayed.  If a null
 *  value is supplied, annul the error and store a null GRP identifier to
-*  indicate that integers starting at 1 should be used to mark each position.
+*  indicate that integers starting at 1 should be used to mark each
+*  position.
       IF( PLOT .EQ. 'TEXT' .AND. STATUS .EQ. SAI__OK ) THEN
          CALL KPG1_GTGRP( 'STRINGS', IGRP2, NSTR, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
@@ -488,15 +520,15 @@
       CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
       IF( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
 
-*  Get the input positions list. A pointer to a FrameSet is returned,
+*  Get the input positions list.  A pointer to a FrameSet is returned,
 *  together with pointers to positions and identifiers, and a title.
 *  The positions are returned in the Base Frame of this FrameSet.
       IWCS = AST__NULL
       CALL KPG1_RDLST( 'INCAT', .FALSE., IWCS, NPOS, NBAX, IPPOS, IPID,
      :                 TITLE, ' ', STATUS )
 
-*  Give a suitable message, store zero for NUMBER, and abort if the file 
-*  was empty.
+*  Give a suitable message, store zero for NUMBER, and abort if the 
+*  file was empty.
       IF( NPOS .EQ. 0 ) THEN
 
          IF( .NOT. QUIET ) THEN
@@ -511,14 +543,14 @@
 
       END IF
 
-*  Take a copy of the Base Frame in which the positions are defined. Also
-*  note its index.
+*  Take a copy of the Base Frame in which the positions are defined. 
+*  Also note its index.
       BFRM = AST_COPY( AST_GETFRAME( IWCS, AST__BASE, STATUS ), STATUS )
       BINDEX = AST_GETI( IWCS, 'BASE', STATUS )
 
-*  If we have access to a graphics picture, add in any co-ordinate Frames
-*  stored in the picture.
-*  ======================================================================
+*  If we have access to a graphics picture, add in any co-ordinate 
+*  Frames stored in the picture.
+*  ===============================================================
 
 *  If the positions are being displayed on the screen...
       IF( ( PLOT .NE. 'NONE' .OR. LABEL ) .AND. 
@@ -534,7 +566,7 @@
             PGBUF = .TRUE.
          END IF
 
-*  Get the name of the picture to use, convert to upper case and remove 
+*  Get the name of the picture to use, convert to uppercase and remove 
 *  blanks.
          CALL PAR_GET0C( 'NAME', PICNAM, STATUS )
          CALL CHR_UCASE( PICNAM )
@@ -554,13 +586,14 @@
 *  Otherwise...
          ELSE
 
-*  See if the current picture has the specified name or contains a picture
-*  with the specified NAME. If found, the picture becomes the current picture 
-*  and its AGI id is returned. If not found an error will be reported.
+*  See if the current picture has the specified name or contains a 
+*  picture with the specified NAME.  If found, the picture becomes the
+*  current picture and its AGI identifier is returned.  If it's not
+*  found, an error will be reported.
             CALL KPG1_AGFND( PICNAM, IPIC, STATUS )
 
-*  If no picture was found, annul the error and use the original current 
-*  picture.
+*  If no picture was found, annul the error and use the original 
+*  current picture.
             IF( STATUS .NE. SAI__OK ) THEN
                CALL ERR_ANNUL( STATUS )
                IPIC = IPIC0
@@ -570,8 +603,8 @@
 
 *  Set the PGPLOT viewport and AST Plot for the current picture.
 *  The PGPLOT viewport is set equal to the selected picture, with 
-*  world co-ordinates giving millimetres from the bottom left corner 
-*  of the view surface. The returned Plot may include a Frame with 
+*  world co-ordinates giving millimetres from the bottom-left corner 
+*  of the view surface.  The returned Plot may include a Frame with 
 *  Domain AGI_DATA representing AGI DATA co-ordinates (defined by a 
 *  TRANSFORM structure stored with the picture in the database).
          CALL KPG1_GDGET( -1, AST__NULL, .TRUE., IPLOT, STATUS )
@@ -581,8 +614,8 @@
 
 *  Merge the FrameSet read from the positions list with the Plot 
 *  obtained from the AGI database, aligning them in a suitable common 
-*  Frame. By preference, the Current Frame in the positions list is
-*  used. The Current Frame in the FrameSet becomes the Current 
+*  Frame.  By preference, the Current Frame in the positions list is
+*  used.  The Current Frame in the FrameSet becomes the Current 
 *  Frame in the Plot
          CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', .FALSE., 2, STATUS )
 
@@ -590,20 +623,21 @@
          CALL AST_ANNUL( IWCS, STATUS )
          IWCS = AST_CLONE( IPLOT, STATUS )
 
-*  Modify BINDEX so that it gives the index within IPLOT of the Frame in 
-*  which positions were supplied. The Frames in IWCS are added onto the
-*  end of the Plot by KPG1_ASMRG, so the index just increases by the number
-*  of Frames in the Plot.
+*  Modify BINDEX so that it gives the index within IPLOT of the Frame
+*  in which positions were supplied.  The Frames in IWCS are added on 
+*  to the end of the Plot by KPG1_ASMRG, so the index just increases by
+*  the number of Frames in the Plot.
          BINDEX = BINDEX + NFRM
          
       END IF
 
-*  Set the Current Frame in the FrameSet to the requested Frame. If the
-*  requested Frame is not available in the positions list, re-prompt for 
-*  a new FRAME until an available Frame is obtained. Note, if the Current
-*  Frame is a SKY Frame, this call will change the Frame if the user requests
-*  a different sky co-ordinate system. For this reason, we took a copy of
-*  the Current Frame above, rather than just saving its index.
+*  Set the Current Frame in the FrameSet to the requested Frame.  If the
+*  requested Frame is not available in the positions list, re-prompt for
+*  a new FRAME until an available Frame is obtained.  Note, if the 
+*  Current Frame is a SKY Frame, this call will change the Frame if the
+*  user requests a different sky co-ordinate system.  For this reason,
+*  we took a copy of the Current Frame above, rather than just saving
+*  its index.
       CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, 'PIXEL', 'AXIS', 
      :                 .TRUE., 'positions list ''$INCAT''', STATUS )
 
@@ -622,12 +656,12 @@
      :                 NINVAL, LAST,
      :                 FIRST, LSTPOS, FSTPOS, STATUS )
 
-*  Get the first position identifier to be displayed. Use a dynamic
+*  Get the first position identifier to be displayed.  Use a dynamic
 *  default equal to the lowest identifier in the positions list.
       CALL PAR_GDR0I( 'FIRST', FIRST, FIRST, LAST, .TRUE., FIRST, 
      :                STATUS )
 
-*  Get the last position identifier to be displayed. Use a dynamic
+*  Get the last position identifier to be displayed.  Use a dynamic
 *  default equal to the highest identifier in the positions list.
       CALL PAR_GDR0I( 'LAST', LAST, FIRST, LAST, .TRUE., LAST, 
      :                STATUS )
@@ -653,15 +687,16 @@
  
       END IF
 
-*  Allocate a work array to hold the identifiers for the selected positions.
+*  Allocate a work array to hold the identifiers for the selected
+*  positions.
       CALL PSX_CALLOC( NDISP, '_INTEGER', IPW0, STATUS )
 
 *  Allocate a work array to hold the selected positions in the original
 *  Frame.
       CALL PSX_CALLOC( NBAX*NDISP, '_DOUBLE', IPW1, STATUS )
 
-*  Allocate a work array to hold the selected positions in the requested 
-*  Frame.
+*  Allocate a work array to hold the selected positions in the
+*  requested Frame.
       CALL PSX_CALLOC( NRAX*NDISP, '_DOUBLE', IPW2, STATUS )
 
 *  Abort if an error occurred.
@@ -676,9 +711,9 @@
      :                 STATUS )
 
 *  Map the positions from the original Frame into the requested Frame.
-      CALL AST_TRANN( MAP, NDISP, NBAX, NDISP, %VAL( CNF_PVAL( IPW1 ) ), 
-     :                .TRUE.,
-     :                NRAX, NDISP, %VAL( CNF_PVAL( IPW2 ) ), STATUS )
+      CALL AST_TRANN( MAP, NDISP, NBAX, NDISP, %VAL( CNF_PVAL( IPW1 ) ),
+     :                .TRUE., NRAX, NDISP, %VAL( CNF_PVAL( IPW2 ) ),
+     :                STATUS )
 
 *  Create an output positions list if required.
       IF( TITLE .EQ. ' ' ) THEN
@@ -752,10 +787,10 @@
 
       END IF
 
-*  Produce any required graphics or labels. The device was opened earlier
-*  and a Plot created (now pointed to by IWCS).
+*  Produce any required graphics or labels.  The device was opened
+*  earlier and a Plot created (now pointed to by IWCS).
       IF( ( PLOT .NE. 'NONE' .OR. LABEL ) .AND. 
-     :     STATUS .EQ. SAI__OK ) THEN
+     :    STATUS .EQ. SAI__OK ) THEN
 
 *  KPS1_LSHPL may need work space to hold the GRAPHICS positions.
          CALL PSX_CALLOC( 2*NDISP, '_DOUBLE', IPW3, STATUS )
@@ -780,10 +815,9 @@
 
       END IF
 
-*  Create a a logfile containing formatted values if required.
-*  We first put a "#" at the start of all comment lines and 
-*  remove the "#" from the position identifiers. Also add some leading
-*  spaces.
+*  Create a a logfile containing formatted values if required.  We first
+*  put a "#" at the start of all comment lines and remove the "#" from 
+* the position identifiers.  Also add some leading spaces.
       DO I = 1, SIZE
          CALL GRP_GET( IGRP1, I, 1, TEXT, STATUS ) 
 
