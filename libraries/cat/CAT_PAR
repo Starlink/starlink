@@ -10,9 +10,6 @@
 *     INCLUDE FILE.
 *  Description:
 *     External parametric constants for the CAT library.
-*  Copyright:
-*     Copyright (C) 9999 Particls Physics & Engineering Research Council.
-*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -29,6 +26,11 @@
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
 *     02111-1307, USA
+
+*  Copyright:
+*     Copyright (C) 1993, 1994 Science & Engineering Research Council.
+*     Copyright (C) 1995, 1996, 1997, 1998, 1999 Central Laboratory of the Research Councls.
+*     All Rights Reserved.
 
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
