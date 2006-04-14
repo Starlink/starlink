@@ -75,8 +75,7 @@
 *     FUNCTION = LITERAL (Read)
 *        This parameter specifies what function is to be performed on
 *        the "selected" pixels specified using parameters MASK, LIST or
-*        ARD.  It can take any of the values "HS", "HU", "NS", "NU",
-*        "HS+NU" or "HU+NS".
+*        ARD.  It can take any of the following values. 
 *
 *        - "HS" -- Ensure that the quality specified by QNAME is held by
 *                  all the selected pixels. The quality of all other
