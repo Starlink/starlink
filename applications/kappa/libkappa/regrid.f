@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application uses a specified Mapping to re-grid the pixel
-*     positions in an NDF. The specified Mapping should transform pixel 
+*     positions in an NDF.  The specified Mapping should transform pixel
 *     co-ordinates in the input NDF into the corresponding pixel 
 *     co-ordinates in the output NDF. 
 *
@@ -42,21 +42,21 @@
 *  ADAM Parameters:
 *     CONSERVE = _LOGICAL (Read)
 *        Only accessed when using the resampling algorithm (i.e. if 
-*        REBIN is set FALSE). If set TRUE, then the output pixel values 
+*        REBIN is set FALSE).  If set TRUE, then the output pixel values
 *        will be scaled in such a way as to preserve (approximately) the
-*        total data value in a feature on the sky. The scaling factor is
-*        the ratio of the output pixel size to the input pixel size.
+*        total data value in a feature on the sky.  The scaling factor
+*        is the ratio of the output pixel size to the input pixel size.
 *        This option can only be used if the Mapping is successfully
-*        approximated by one or more linear transformations. Thus an
+*        approximated by one or more linear transformations.  Thus an
 *        error will be reported if it used when the TOL parameter is 
 *        set to zero (which stops the use of linear approximations), or 
 *        if the Mapping is too non-linear to be approximated by a
-*        piece-wise linear transformation. The ratio of output to input 
+*        piece-wise linear transformation.  The ratio of output to input
 *        pixel size is evaluated once for each panel of the piece-wise
 *        linear approximation to the Mapping, and is assumed to be 
-*        constant for all output pixels in the panel. Flux conservation
+*        constant for all output pixels in the panel.  Flux conservation
 *        can only be approximate when using the resampling algorithm.
-*        For accurate flux conservation set REBIN to TRUE. [FALSE]
+*        For accurate flux conservation set REBIN to TRUE.  [FALSE]
 *     IN = NDF (Read)
 *        The NDF to be transformed.
 *     LBOUND( ) = _INTEGER (Read)
@@ -64,11 +64,11 @@
 *        values must be equal to the number of dimensions in the output 
 *        NDF.  If a null value is supplied, default bounds will be used 
 *        which are just low enough to fit in all the transformed pixels 
-*        of the input NDF. [!]
+*        of the input NDF.  [!]
 *     MAPPING = FILENAME (Read)
 *        The name of a file containing the Mapping to be used, or null
 *        (!) if the input NDF is to be mapped into its own current
-*        Frame. If a file is supplied, the forward direction of the
+*        Frame.  If a file is supplied, the forward direction of the
 *        Mapping should transform pixel co-ordinates in the input NDF
 *        into the corresponding pixel co-ordinates in the output NDF.
 *        The file may be one of the following.
@@ -93,7 +93,7 @@
 *
 *        If a null (!) value is supplied, the Mapping used is the
 *        Mapping from pixel co-ordinates in the input NDF to the
-*        current Frame in the input NDF. The output NDF will then have
+*        current Frame in the input NDF.  The output NDF will then have
 *        pixel co-ordinates which match the co-ordinates of the current
 *        Frame of the input NDF (apart from possible additional scalings
 *        as specified by the SCALE parameter).
@@ -103,23 +103,23 @@
 *        of neighbouring output pixels (if rebinning). For details of
 *        these schemes, see the descriptions of routines AST_RESAMPLEx
 *        and AST_REBINx in SUN/210. METHOD can take the following
-*        values:
+*        values.
 *
 *        - "Linear" -- When resampling, the output pixel values are 
 *        calculated by bi-linear interpolation among the four nearest
-*        pixels values in the input NDF. When rebinning, the input pixel
-*        value is divided bi-linearly between the four nearest output
-*        pixels.  Produces smoother output NDFs than the
+*        pixels values in the input NDF.  When rebinning, the input
+*        pixel value is divided bi-linearly between the four nearest 
+*        output pixels.  Produces smoother output NDFs than the
 *        nearest-neighbour scheme, but is marginally slower.
 *
 *        - "Nearest" -- When resampling, the output pixel values are
-*        assigned the value  of the single nearest input pixel. When
-*        rebinning,the input pixel value is assigned completely to the
+*        assigned the value of the single nearest input pixel.  When
+*        rebinning, the input pixel value is assigned completely to the
 *        single nearest output pixel.
 *
 *        - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
 *        offset from the interpolation point (resampling) or transformed
-*        input pixel centre (rebinning), and sinc(z)=sin(z)/z. Use of 
+*        input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of 
 *        this scheme is not recommended.
 *
 *        - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
@@ -127,10 +127,10 @@
 *        effect on NDFs between the bi-linear and nearest-neighbour
 *        schemes. 
 *         
-*        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel. Gives
+*        - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
 *        similar results to the "Sincsinc" scheme.
 *
-*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel. Good 
+*        - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
 *        results can be obtained by matching the FWHM of the
 *        envelope function to the point-spread function of the
 *        input data (see parameter PARAMS).
@@ -138,10 +138,10 @@
 *        - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
 *        offset from the interpolation point (resampling) or transformed
 *        input pixel centre (rebinning), and somb(z)=2*J1(z)/z (J1 is
-*        the first-order Bessel function of the first kind. This scheme
+*        the first-order Bessel function of the first kind.  This scheme
 *        is similar to the "Sinc" scheme.
 *
-*        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel. This
+*        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
 *        scheme is similar to the "SincCos" scheme.
 *
 *        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only 
@@ -159,17 +159,17 @@
 *        nearest neighbour need to be treated with care since the
 *        spatial smoothing produced by these methods introduces 
 *        correlations in the variance estimates. Also, the degree of 
-*        smoothing produced varies across the NDF. This is because a 
+*        smoothing produced varies across the NDF.  This is because a 
 *        sample taken at a pixel centre will have no contributions from
 *        the neighbouring pixels, whereas a sample taken at the corner
 *        of a pixel will have equal contributions from all four
 *        neighbouring pixels, resulting in greater smoothing and lower
-*        noise. This effect can produce complex Moire patterns in the
+*        noise.  This effect can produce complex Moire patterns in the
 *        output variance estimates, resulting from the interference of
 *        the spatial frequencies in the sample positions and in the
-*        pixel-centre positions. For these reasons, if you want to use
+*        pixel-centre positions.  For these reasons, if you want to use
 *        the output variances, you are generally safer using
-*        nearest-neighbour interpolation. [current value]
+*        nearest-neighbour interpolation.  [current value]
 *     OUT = NDF (Write)
 *        The transformed NDF.
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -187,38 +187,39 @@
 *        [0]
 *
 *        PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
-*        SincCos, and SincGauss schemes. For the SombCos, SincSinc, and
+*        SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
 *        SincCos schemes, it specifies the number of pixels at which the
-*        envelope of the function goes to zero. The minimum value is
-*        1.0, and the run-time default value is 2.0. For the Gauss and
+*        envelope of the function goes to zero.  The minimum value is
+*        1.0, and the run-time default value is 2.0.  For the Gauss and
 *        SincGauss scheme, it specifies the full-width at half-maximum
-*        (FWHM) of the Gaussian envelope. The minimum value is 0.1, and
-*        the run-time default is 1.0. On astronomical NDFs and spectra, 
-*        good results are often obtained by approximately matching the
-*        FWHM of the envelope function, given by PARAMS(2), to the
-*        point-spread function of the input data. []
+*        (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
+*        the run-time default is 1.0.  On astronomical images and 
+*        spectra, good results are often obtained by approximately 
+*        matching the FWHM of the envelope function, given by PARAMS(2),
+*        to the point-spread function of the input data.  []
 *     REBIN = _LOGICAL (Read)
 *        Determines the algorithm used to calculate the output pixel
-*        values. If a TRUE value is given, a rebinning algorithm is
+*        values.  If a TRUE value is given, a rebinning algorithm is
 *        used.  Otherwise, a resampling algorithm is used. See the
 *        "Choice of Algorithm" below.  [current value]
 *     SCALE( ) = _DOUBLE (Read)
 *        Axis scaling factors which are used to modify the supplied
 *        Mapping.  If the number of supplied values is less than the
 *        number of output axes associated with the Mapping, the final
-*        supplied value is duplicated for the missing axes. In effect,
+*        supplied value is duplicated for the missing axes.  In effect,
 *        transformed input co-ordinate axis values would be multiplied
 *        by these factors to obtain the corresponding output pixel
-*        co-ordinates. If a null (!) value is supplied for SCALE, then
+*        co-ordinates.  If a null (!) value is supplied for SCALE, then
 *        default values are used which depends on the value of parameter
-*        MAPPING. If a null value is supplied for MAPPING then the
+*        MAPPING.  If a null value is supplied for MAPPING then the
 *        default scaling factors are chosen so that pixels retain their
-*        original size (very roughly) after transformation. If as
+*        original size (very roughly) after transformation.  If as
 *        non-null value is supplied for MAPPING then the default
-*        scaling factor used is 1.0 for each axis (i.e. no scaling). [!]
+*        scaling factor used is 1.0 for each axis (i.e. no scaling).
+*        [!]
 *     TITLE = LITERAL (Read)
 *        A Title for the output NDF structure.  A null value (!)
-*        propagates the title from the input NDF to the output NDF. [!]
+*        propagates the title from the input NDF to the output NDF.  [!]
 *     TOL = _DOUBLE (Read)
 *        The maximum tolerable geometrical distortion which may be
 *        introduced as a result of approximating non-linear Mappings 
@@ -234,15 +235,15 @@
 *        values must be equal to the number of dimensions of the output
 *        NDF.  If a null value is supplied, default bounds will be used 
 *        which are just high enough to fit in all the transformed
-*        pixels of the input NDF. [!]
+*        pixels of the input NDF.  [!]
 *     WLIM = _REAL (Read)
 *        This parameter is only used if REBIN is set TRUE. It specifies
 *        the  minimum number of good pixels which must contribute to an
-*        output pixel for the output pixel to be valid. Note, 
+*        output pixel for the output pixel to be valid.  Note, 
 *        fractional values are allowed. A null (!) value causes a very
 *        small positive value to be used resulting in output pixels
 *        being set bad only if they receive no significant contribution
-*        from any input pixel. [!]
+*        from any input pixel.  [!]
 
 *  Examples:
 *     regrid sg28948 sg28948r mapping=rotate.ast
@@ -260,7 +261,8 @@
 *        factor will be applied to give the output NDF a similar size 
 *        to the input one.  The output NDF will be just large enough 
 *        to hold the transformed copies of all the pixels from NDF flat.
-*     regrid flat distorted mapping=! scale=1 method=sinccos params=[0,3]
+*     regrid flat distorted mapping=! scale=1 method=sinccos 
+*            params=[0,3]
 *        As the previous example, but the additional scaling factor will
 *        not be applied even in the case of large size discrepancy,
 *        and a sinc*cos one-dimensional resampling kernel is used which
@@ -288,21 +290,21 @@
 *
 *     The resampling algorithm steps through every pixel in the output
 *     image, sampling the input image at the corresponding position and
-*     storing the sampled input value in the output pixel. The method
+*     storing the sampled input value in the output pixel.  The method
 *     used for sampling the input image is determined by the METHOD
-*     parameter. The rebinning algorithm steps through every pixel in
+*     parameter.  The rebinning algorithm steps through every pixel in
 *     the input image, dividing the input pixel value between a group
 *     of neighbouring output pixels, incrementing these output pixel
-*     values by their allocated share of the input pixel value. The way 
+*     values by their allocated share of the input pixel value.  The way
 *     in which the input sample is divided between the output pixels 
 *     is determined by the METHOD parameter.
 
 *     The two algorithms behaviour quite differently if the
 *     transformation from input to output includes any significant
-*     change of scale. In general, resampling will not alter the pixel
+*     change of scale.  In general, resampling will not alter the pixel
 *     values associated with a source, even if the pixel size changes.
 *     On the other hand, the rebinning algorithm will change the pixel
-*     values in order to correct for a change in pixel size. Thus,
+*     values in order to correct for a change in pixel size.  Thus,
 *     rebinning conserves the total data value within a given region
 *     where as resampling, in general, does not (but see the discussion
 *     of the CONSERVE parameter below).
@@ -320,19 +322,19 @@
 *     the rebinning algorithm if the output image has smaller pixels
 *     than the input image.  Such holes occur at output pixels which
 *     receive no contributions from any input pixels, and will be filled
-*     with the value zero in the output image. If this problem occurs
+*     with the value zero in the output image.  If this problem occurs
 *     the solution is probably to change the width of the pixel
 *     spreading function by assigning a larger value to PARAMS(1) and/or
 *     PARAMS(2) (depending on the specific METHOD value being used).
 *
 *     Both algorithms have the capability to introduce artificial
-*     artifacts into the output image. These have various causes
+*     artefacts into the output image.  These have various causes
 *     described below.
 *
 *     - Particularly sharp features in the input can cause rings around
-*     the corresponding features in the output image. This can be
+*     the corresponding features in the output image.  This can be
 *     minimised by suitable settings for the METHOD and PARAMS 
-*     parameters. In general such rings can be minimised by using a
+*     parameters.  In general such rings can be minimised by using a
 *     wider interpolation kernel (if resampling) or spreading function
 *     (if rebinning), at the cost of degraded resolution.
 *
@@ -341,22 +343,22 @@
 *     caused by a beating effect between the input pixel positions and 
 *     the output pixel's position, and their nature and strength depend
 *     critically upon the nature of the Mapping and the spreading
-*     function being used. In general, the nearest-neighbour spreading 
+*     function being used.  In general, the nearest-neighbour spreading 
 *     function demonstrates this effect more clearly than the other
-*     functions, and for this reason should be used with caution. Again,
-*     wider spreading functions reduce the effect at the cost of
-*     degraded resolution. Note, the resampling algorithm is not subject
-*     to these artifacts. For this reason, you may prefer to use the
-*     resampling algorithm with the CONSERVE parameter set to TRUE. This
-*     causes the resampling algorithm to perform approximate flux
-*     conservation.
+*     functions, and for this reason should be used with caution. 
+*     Again, wider spreading functions reduce the effect at the cost of
+*     degraded resolution.  Note, the resampling algorithm is not 
+*     subject to these artefacts.  For this reason, you may prefer to 
+*     use the resampling algorithm with the CONSERVE parameter set to 
+*     TRUE.  This causes the resampling algorithm to perform 
+*     approximate flux conservation.
 *
 *     - The approximation of the Mapping using a piece-wise linear
-*     transformation (controlled by parameter TOL) can produce artifacts
-*     at the joints between the panels of the approximation. These can
+*     transformation (controlled by parameter TOL) can produce artefacts
+*     at the joints between the panels of the approximation.  These can
 *     occur when using the rebinning algorithm, or when using the
-*     resampling algorithm with CONSERVE set to TRUE. They are caused by
-*     the discontinuities  between the adjacent panels of the
+*     resampling algorithm with CONSERVE set to TRUE.  They are caused 
+*     by the discontinuities between the adjacent panels of the
 *     approximation, and can be minimised by reducing the value assigned
 *     to the TOL parameter. 
 *
@@ -367,8 +369,8 @@
 *     values are statistically independent and that their variance
 *     estimates may simply be summed (with appropriate weighting 
 *     factors) when several input pixels contribute to an output data 
-*     value. If this assumption is not valid, then the output error
-*     estimates may be biased. In addition, note that the statistical
+*     value.  If this assumption is not valid, then the output error
+*     estimates may be biased.  In addition, note that the statistical
 *     errors on neighbouring output data values (as well as the 
 *     estimates of those errors) may often be correlated, even if the
 *     above assumption about the input data is correct, because of
@@ -379,13 +381,14 @@
 
 *  Implementation Status:
 *     -  The LABEL, UNITS, and HISTORY components, and all extensions
-*     are propagated. TITLE is controlled by the TITLE parameter. DATA,
+*     are propagated.  TITLE is controlled by the TITLE parameter. DATA,
 *     VARIANCE, and WCS are propagated after appropriate modification. 
 *     The QUALITY component is also propagated if Nearest-Neighbour
-*     interpolation is being used. The AXIS component is not propagated.
+*     interpolation is being used.  The AXIS component is not 
+*     propagated.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
-*     -  All non-complex numeric data types can be handled. If REBIN is
+*     -  All non-complex numeric data types can be handled.  If REBIN is
 *     TRUE, the data type will be converted to one of _INTEGER, _DOUBLE
 *     or _REAL for processing.
 *     -  There can be an arbitrary number of NDF dimensions.
@@ -404,22 +407,25 @@
 *     10-DEC-2001 (MBT):
 *        Original version.
 *     8-Jan-2002 (DSB):
-*        Prologue modified. Some parameter defaults and logic changed. Allow 
-*        the extra scale factor to be different for each axis. Protect
-*        against AST__BAD values being returned by AST_TRAN.
+*        Prologue modified.  Some parameter defaults and logic changed.
+*        Allow the extra scale factor to be different for each axis. 
+*        Protect against AST__BAD values being returned by AST_TRAN.
 *     15-Jan-2001 (DSB):
-*        Modified propagation of WCS to use KPG1_ASFIX. Re-named
-*        from RESAMPLE to REGRID. Propagate QUALITY if Nearest Neighbour
-*        interpolation is being used.
+*        Modified propagation of WCS to use KPG1_ASFIX.  Re-named
+*        from RESAMPLE to REGRID.  Propagate QUALITY if 
+*        nearest-neighbour interpolation is being used.
 *     6-MAR-2003 (DSB):
-*        Changed the AST_RESAMPLE MAXPIX parameter from a fixed value of
-*        50 to 1 larger than the largest output dimension (for extra speed).
+*        Changed the AST_RESAMPLE MAXPIX parameter from a fixed value
+*        of 50 to one larger than the largest output dimension (for 
+*        extra speed).
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     19-JUL-2005 (DSB):
 *        Add REBIN parameter.
 *     11-AUG-2005 (DSB):
 *        Added CONSERVE parameter and Sombrero methods.
+*     2006 April 12 (MJC):
+*        Remove unused variable and wrapped long lines (including code).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -442,16 +448,20 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given real
-      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given real
+      INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
+                                 ! real
+      INTEGER KPG1_CEIL          ! Most negative integer .GE. a given 
+                                 ! real
       EXTERNAL AST_ISAMAPPING
 
 *  Local Variables:
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER METHOD * ( 16 )  ! Name of resampling scheme
-      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input array
-      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input array
+      DOUBLE PRECISION DLBNDI( NDF__MXDIM ) ! Lower bounds of input 
+                                 ! array
+      DOUBLE PRECISION DUBNDI( NDF__MXDIM ) ! Upper bounds of input 
+                                 ! array
       DOUBLE PRECISION LPO       ! Lower bound in output array
       DOUBLE PRECISION PARAMS( 4 ) ! Additional parameters for resampler
       DOUBLE PRECISION PT1I( NDF__MXDIM ) ! First input point
@@ -460,7 +470,8 @@
       DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
       DOUBLE PRECISION SCALE( NDF__MXDIM ) ! Axis scale factors
       DOUBLE PRECISION SCVAL     ! Value of a single axis scale factor
-      DOUBLE PRECISION TOL       ! Tolerance for linear transform approximation
+      DOUBLE PRECISION TOL       ! Tolerance for linear transform 
+                                 ! approximation
       DOUBLE PRECISION UPO       ! Upper bound in output array
       DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lowest value
       DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of highest value
@@ -478,32 +489,40 @@
       INTEGER IPVARO             ! Pointer to output Variance array
       INTEGER JFRM               ! Index of Frame for joining FrameSets
       INTEGER LBDEF( NDF__MXDIM ) ! Default value for LBOUND
-      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel co-ordinates
+      INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel 
+                                 ! co-ordinates
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER MAPHI              ! Half-pixel shift Mapping at input end
-      INTEGER MAPHIO             ! Mapping with half-pixel shifts at both ends
-      INTEGER MAPHO              ! Half-pixel shift Mapping at output end
+      INTEGER MAPHIO             ! Mapping with half-pixel shifts at 
+                                 ! both ends
+      INTEGER MAPHO              ! Half-pixel shift Mapping at output 
+                                 ! end
       INTEGER MAPIO              ! Mapping from input to output NDF
       INTEGER MAPJ               ! Mapping to perform extra scalings
-      INTEGER MAPX               ! Basic Mapping to use (without extra scaling)
-      INTEGER MAXPIX             ! Max size of linear approximation region
+      INTEGER MAPX               ! Basic Mapping to use (without extra
+                                 ! scaling)
+      INTEGER MAXPIX             ! Maximum size of linear approximation 
+                                 ! region
       INTEGER NBAD               ! Number of bad pixels
       INTEGER NDFI               ! NDF identifier of input NDF
       INTEGER NDFO               ! NDF identifier of output NDF
       INTEGER NDIMI              ! Number of dimensions of input NDF
       INTEGER NDIMO              ! Number of dimensions of output NDF
-      INTEGER NPARAM             ! Number of parameters required for resampler
+      INTEGER NPARAM             ! Number of parameters required for
+                                 ! resampler
       INTEGER NSCALE             ! Number of supplied scale factors
       INTEGER UBDEF( NDF__MXDIM ) ! Default value for UBOUND
-      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel co-ordinates
+      INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel 
+                                 ! co-ordinates
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
       INTEGER WCSI               ! WCS FrameSet of input NDF
-      INTEGER WCSO               ! WCS FrameSet of the output NDF
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL CONSRV             ! Conserve flux whilst resampling?
       LOGICAL CURENT             ! Resample into current Frame?
-      LOGICAL HASQUA             ! Does the input NDF have Quality component?
-      LOGICAL HASVAR             ! Does the input NDF have Variance component?
+      LOGICAL HASQUA             ! Does the input NDF have QUALITY
+                                 ! component?
+      LOGICAL HASVAR             ! Does the input NDF have VARIANCE 
+                                 ! component?
       LOGICAL MORE               ! Continue looping?
       LOGICAL REBIN              ! Create output pixels by rebinning?
       LOGICAL SCEQU              ! Are all axis scale factors equal?
@@ -528,15 +547,15 @@
 *  Get its dimensions.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIMI, STATUS )
 
-*  See if it has a Variance component.
+*  See if it has a VARIANCE component.
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
 *  Obtain its WCS component.
       CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
-*  Attempt to get an externally supplied Mapping - read it from a file.
+*  Attempt to get an externally supplied Mapping; read it from a file.
 *  N.B. do not tell ATL1_GTOBJ to look for a Mapping, since in this 
 *  case it will extract the Mapping from a FrameSet for us, which
-*  we need to do for ourselves if it is going to be done. If a null 
+*  we need to do for ourselves if it is going to be done.  If a null 
 *  value is supplied, annul the error and indicate that the NDF is 
 *  to be mapped into its own current Frame.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -546,8 +565,9 @@
          CURENT = .TRUE.
          MAPX = WCSI
 
-*  In the event of any other error, write an explanatory comment (ATL1_GTOBJ
-*  does not generate very user-friendly messages) and bail out.
+*  In the event of any other error, write an explanatory comment 
+*  (ATL1_GTOBJ does not generate very user-friendly messages) and bail
+*  out.
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'REGRID_ERR1', 'REGRID: $MAPPING does not '//
      :                 'contain an AST Object.', STATUS )
@@ -562,7 +582,7 @@
      :                 STATUS )
          GO TO 999
 
-*  A usable external Mapping has been supplied. Indicate that we will
+*  A usable external Mapping has been supplied.  Indicate that we will
 *  not be mapping the NDF into its own current Frame.
       ELSE
          CURENT = .FALSE.
@@ -585,7 +605,8 @@
           END IF
       END IF
 
-*  Check the base Frame of the Mapping has the right number of dimensions.
+*  Check the base Frame of the Mapping has the right number of
+*  dimensions.
       IF ( AST_GETI( MAPX, 'Nin', STATUS ) .NE. NDIMI ) THEN
          CALL MSG_SETI( 'NAX', AST_GETI( MAPX, 'Nin', STATUS ) )
          CALL MSG_SETI( 'NDIM', NDIMI )
@@ -721,8 +742,8 @@
 *  Add an additional scaling factor to the Mapping.
 *  ================================================
 
-*  Get the values of the scale factors from the parameter system. If a null
-*  (!) is supplied, annul the error and calculate default values.
+*  Get the values of the scale factors from the parameter system.  If 
+*  a null (!) is supplied, annul the error and calculate default values.
       IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL PAR_GET1D( 'SCALE', NDIMO, SCALE, NSCALE, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN 
@@ -741,9 +762,10 @@
 *  same size; if they are then SCALE will default to unity, if not 
 *  then it will default to some size-equalising factor for each axis.  
 *  First set up the corners in the base Frame of a single pixel at teh
-*  centre of th einput image.
+*  centre of the input image.
             DO I = 1, NDIMI
-               PT1I( I ) = 0.5D0 * DBLE( LBNDI( I ) + UBNDI( I ) ) - 0.5D0
+               PT1I( I ) = 0.5D0 * 
+     :                     DBLE( LBNDI( I ) + UBNDI( I ) ) - 0.5D0
                PT2I( I ) = PT1I( I ) + 1D0
             END DO
 
@@ -754,9 +776,9 @@
             END DO
 
 *  Find the scaling factors which result in the transformed and scaled
-*  pixel having a size of unity on each axis. Ignore values between 0.25
-*  and 4. If any transformed position is bad, use a scaling factor of 
-*  1.0 for that axis.
+*  pixel having a size of unity on each axis.  Ignore values between 
+*  0.25 and 4.  If any transformed position is bad, use a scaling 
+*  factor of 1.0 for that axis.
             SCVAL = 0.0
             DO I = 1, NDIMO
                IF( PT1O( I ) .NE. AST__BAD .AND. 
@@ -834,7 +856,7 @@
 
 *  Generate the actual mapping from the input to output array, by
 *  combining the Mapping from base to current frames and the Mapping
-*  created above. Simplify it.
+*  created above.  Simplify it.
          MAPIO = AST_SIMPLIFY( AST_CMPMAP( MAPX, MAPJ, .TRUE., ' ',
      :                                     STATUS ), STATUS )
 
@@ -869,7 +891,7 @@
      :                UBNDO, STATUS )
 
 *  Do a check that there is some overlap between the requested range
-*  and the resampled image of the NDF. Also, set the initial scale size 
+*  and the resampled image of the NDF.  Also, set the initial scale size
 *  for the Mapping linear approximation algorithm to be equal to the 
 *  largest dimension (see AST_RESAMPLE<X> documentation).
       MAXPIX = 50
@@ -902,7 +924,7 @@
       CALL NDF_SBND( NDIMO, LBNDO, UBNDO, NDFO, STATUS )
 
 *  Determine a data type which can be used for operations on the
-*  Data and possibly Variance components of the NDF.
+*  Data and possibly VARIANCE components of the NDF.
       IF( REBIN ) THEN
          CALL NDF_MTYPN( '_INTEGER,_REAL,_DOUBLE', 1, NDFI, 
      :                   'DATA,VARIANCE', ITYPE, DTYPE, STATUS )
@@ -912,7 +934,7 @@
      :                DTYPE, STATUS )
       END IF
 
-*  Set the Data and possibly Variance component data types.
+*  Set the Data and possibly VARIANCE component data types.
       CALL NDF_STYPE( ITYPE, NDFO, 'DATA', STATUS )
       IF ( HASVAR ) THEN
          CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
@@ -932,7 +954,7 @@
 *  Find out if there may be bad pixels in the mapped Data array.
       CALL NDF_BAD( NDFI, 'DATA', .FALSE., BAD, STATUS )
 
-*  Map the Variance component of the input and output NDFs if we are
+*  Map the VARIANCE component of the input and output NDFs if we are
 *  processing variances.
       IF ( HASVAR ) THEN
          CALL NDF_MAP( NDFI, 'VARIANCE', ITYPE, 'READ', IPVARI, ELI,
@@ -941,7 +963,7 @@
      :                 ELO, STATUS )
 
 *  Unless we already know of bad values in the Data component, see 
-*  whether the Variance component may contain them.
+*  whether the VARIANCE component may contain them.
          IF ( .NOT. BAD ) THEN
             CALL NDF_BAD( NDFI, 'VARIANCE', .FALSE., BAD, STATUS )
          END IF
@@ -950,7 +972,7 @@
          FLAGS = FLAGS + AST__USEVAR
       END IF
 
-*  If either the Data or Variance component of the input NDF may have
+*  If either the DATA or VARIANCE component of the input NDF may have
 *  bad values, record this fact.
       IF ( BAD ) THEN
          FLAGS = FLAGS + AST__USEBAD
@@ -967,7 +989,7 @@
 
 *  Since AST_RESAMPLE<X> requires the centre of pixels to be represented
 *  by integers (the LBND and UBND arrays) it is necessary to add a 
-*  half-pixel shift onto both ends of the Mapping prior to executing
+*  half-pixel shift on to both ends of the Mapping prior to executing
 *  the resample.  First construct a Mapping which transforms minus a 
 *  half pixel in every input dimension.
       DO I = 1, NDIMI
@@ -978,7 +1000,8 @@
       END DO
       MAPHI = AST_WINMAP( NDIMI, PT1I, PT2I, PT1O, PT2O, ' ', STATUS )
 
-*  Then one which transforms plus a half-pixel in every output dimension.
+*  Then one which transforms plus a half-pixel in every output 
+*  dimension.
       DO I = 1, NDIMO
          PT1I( I ) = 0D0
          PT2I( I ) = 1D0
