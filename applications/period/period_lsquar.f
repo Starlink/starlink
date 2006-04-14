@@ -63,9 +63,7 @@ C NMAX   =  MAXIMUM ALLOWED NUMBER OF COEFFICIENTS (DUE TO DIMENSION
 C           STATEMENTS).
 C-------------------------------------------------------------------------------
  
-      CHARACTER*1 BELL
       DATA EPS, NMAX/1.D-6, 50/
-      DATA BELL/7/
 
       RITE = .FALSE.
       ITEST=0
@@ -75,7 +73,7 @@ C Test input data.
 C-------------------------------------------------------------------------------
  
       IF ( (NUMBER.LE.0.OR.N.GT.NUMBER) .OR. N.LE.0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_LSQUAR failed.'
          WRITE (*, *) '** ERROR: Number of points = ', NUMBER
          WRITE (*, *) '** ERROR: Number of coefficients = ', N
@@ -85,7 +83,7 @@ C-------------------------------------------------------------------------------
          CHISQ = -3.0D0
          RETURN
       ELSE IF ( N.GT.NMAX ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: PERIOD_LSQUAR failed.'
          WRITE (*, *) '** ERROR: Number of coefficients = ', N
          WRITE (*, *) '** ERROR: Maximum number of coefficients' // 

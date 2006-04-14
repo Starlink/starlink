@@ -19,8 +19,7 @@ C=============================================================================
       DOUBLE PRECISION JUNK1(NUMROWS), JUNK2(NUMROWS, MXCOL)
       INTEGER KEY(NUMROWS)
       INTEGER IFAIL, I, K
-      CHARACTER*1 BELL, SORT
-      DATA BELL/7/
+      CHARACTER*1 SORT
  
  
 *     Store the data in case sort is not needed.
@@ -35,7 +34,7 @@ C=============================================================================
 
       DO 40 I = 2, NUMROWS
          IF ( IPARRAY(I, 1).LT.IPARRAY(I-1, 1) ) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) '** WARNING: x-axis data is not in ' // 
      :                 'ascending order!'
             WRITE(*,*) ' '

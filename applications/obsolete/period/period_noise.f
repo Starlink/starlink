@@ -44,9 +44,8 @@ C-----------------------------------------------------------------------------
       INTEGER DATAPTR
       INTEGER YSLOT1, YSLOT2
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
-      CHARACTER*1 BELL, NOISE, ERRORS, REPLY, REGULAR, OPTION
+      CHARACTER*1 NOISE, ERRORS, REPLY, REGULAR, OPTION
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
  
  
 C-----------------------------------------------------------------------------
@@ -132,7 +131,7 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 700
          END IF
@@ -186,7 +185,7 @@ C-----------------------------------------------------------------------------
          IF ( OPTION.EQ.' ' .OR. OPTION.EQ.'O' ) THEN
             IF ( ERRORS.EQ.'Y' ) THEN
                IF ( YERRORARRAY(SLOT) ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** WARNING: Data already has errors.'
  525              CONTINUE
                   WRITE (*, '(X,A,$)') 

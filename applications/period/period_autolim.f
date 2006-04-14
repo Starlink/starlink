@@ -28,8 +28,6 @@ C=============================================================================
       DOUBLE PRECISION MINFREQ, MAXFREQ, FINTERVAL
       DOUBLE PRECISION FMIN, FMAX, FINT
       DOUBLE PRECISION OTI, STI, PPB
-      CHARACTER*1 BELL
-      DATA BELL/7/
       DATA PPB/4.0D0/
  
 C-----------------------------------------------------------------------------
@@ -64,7 +62,7 @@ C-----------------------------------------------------------------------------
          IF ( DABS(STI).GT.DPMN30 ) THEN 
             FMAX = 0.5D0/STI
          ELSE
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Smallest time interval in data'
             WRITE (*, *) '** ERROR: is zero.'
             IFAIL = 1
@@ -79,7 +77,7 @@ C-----------------------------------------------------------------------------
          IF ( DABS(OTI).GT.DPMN30 ) THEN 
             FINT = 1.0D0/(PPB*OTI)
          ELSE
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Overall time interval in data'
             WRITE (*, *) '** ERROR: is zero.'
             IFAIL = 1
@@ -102,14 +100,14 @@ C Check frequency limits.
 C-----------------------------------------------------------------------------
  
       IF ( FMAX.LE.FMIN ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Maximum frequency not greater than'
          WRITE (*, *) '** ERROR: minimum frequency in PERIOD_AUTOLIM.'
          IFAIL = 1
       ELSE
          IF ( MAXPTS.GT.0 ) THEN
             IF ( IDINT((FMAX-FMIN)/FINT).GE.MAXPTS ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Frequency interval too small'
                WRITE (*, *) '** ERROR: in PERIOD_AUTOLIM.'
                IFAIL = 1

@@ -19,11 +19,9 @@ C-------------------------------------------------------------------------------
       INTEGER          N,J
       DOUBLE PRECISION AVE,ADEV,SDEV,VAR
       DOUBLE PRECISION S,DATA(N)
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
       IF ( N.LE.1 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: N must be at least 2 in PERIOD_MOMENT.'
          GO TO 300
       END IF

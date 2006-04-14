@@ -31,9 +31,8 @@ C-----------------------------------------------------------------------------
       INTEGER IFAIL, XCOL, YCOL, YCOLERR
       INTEGER I, K, N, IUNIT
       INTEGER KEY(NUMROWS)
-      CHARACTER*1 BELL, SORT
+      CHARACTER*1 SORT
       LOGICAL YERROR
-      DATA BELL/7/
 
  
 C-----------------------------------------------------------------------------
@@ -58,7 +57,7 @@ C-----------------------------------------------------------------------------
  
       DO 40 I = 2, NUMROWS
          IF ( IPARRAY(I, 1).LT.IPARRAY(I-1 ,1) ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** WARNING: x-axis data not in ' // 
      :                   'ascending order at line number =', I
             WRITE (*, *) ' '

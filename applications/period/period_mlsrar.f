@@ -37,8 +37,6 @@ C=============================================================================
       DOUBLE PRECISION EPS, SG1, AMX, ABSA, T, XI, CX, SUM
       DOUBLE PRECISION BDMTX(N, N), V(N), F(N), A(N, N), X(50)
       DOUBLE PRECISION SING,XT(50),R,TEMP
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
       RITE = .FALSE.
       IF ( ITER.LT.0 ) RITE = .TRUE.
@@ -178,7 +176,7 @@ C-------------------------------------------------------------------------------
       GO TO 600
  1500 CONTINUE
       IF ( RITE ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** WARNING: In PERIOD_MLSRAR.'
          WRITE (*, *) '** WARNING: Diagonal term = ', IM1
          WRITE (*, *) '** WARNING: reduced to zero.'

@@ -42,8 +42,7 @@ C-----------------------------------------------------------------------------
       INTEGER J, SLOT, FIRSTSLOT, LASTSLOT
       INTEGER YSLOT1
       LOGICAL YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
-      CHARACTER*72 INFILEARRAY(MXSLOT), BELL*1, OPTION*1
-      DATA BELL/7/
+      CHARACTER*72 INFILEARRAY(MXSLOT), OPTION*1
  
 C-----------------------------------------------------------------------------
 C Select slots to process.
@@ -56,7 +55,7 @@ C-----------------------------------------------------------------------------
       READ (*, *, ERR=100) FIRSTSLOT, LASTSLOT
       IF ( FIRSTSLOT.EQ.0 .OR. LASTSLOT.EQ.0 ) GO TO 800
       IF ( FIRSTSLOT.GT.MXSLOT .OR. LASTSLOT.GT.MXSLOT ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Maximum slot number = ', MXSLOT
          GO TO 800
       END IF
@@ -81,7 +80,7 @@ C-----------------------------------------------------------------------------
          READ (*, *, ERR=250) NUMSIN
          IF ( NUMSIN.LE.0 ) GO TO 250
          IF ( NUMSIN.GT.MAXSIN ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Maximum number of sine curves = ', 
      :                   MAXSIN
             GO TO 800
@@ -105,7 +104,7 @@ C-----------------------------------------------------------------------------
             READ (*, *, ERR=360) PERIOD(J), AMPLITUDE(J), ZEROPT(J), 
      :                           GAMMA(J)
             IF ( PERIOD(J).LE.0.0D0 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Invalid value for the period.'
                WRITE (*, *) ' '
                GO TO 360
@@ -152,7 +151,7 @@ C-----------------------------------------------------------------------------
          WRITE (*, '(X,A,$)') 'Enter LAMBDA : '
          READ (*, *, ERR=500) COEFF
          IF ( COEFF.LT.0.0D0 .OR. COEFF.GT.4.0D0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: LAMBDA must lie between 0 and 4.'
             GO TO 800
          END IF

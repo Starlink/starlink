@@ -30,7 +30,7 @@ C-----------------------------------------------------------------------------
  
       INTEGER I, J
       LOGICAL PERIOD_PARSE
-      CHARACTER*1 BELL, KEY
+      CHARACTER*1 KEY
       CHARACTER*12 COMMAND
       CHARACTER*72 STRING
        
@@ -52,7 +52,6 @@ C-----------------------------------------------------------------------------
 C Declare data arrays.
 C-----------------------------------------------------------------------------
  
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Get the help file path - GJP June 1995
@@ -67,7 +66,7 @@ C  Translate the environment variable/logical name.
       STATUS=0
       CALL PSX_GETENV( LIBNAM, PATH, STATUS )
       IF ( STATUS .NE. 0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) ' '
          WRITE (*, *) '** ERROR: Problems encountered while' 
          WRITE (*, *) '          looking at environmental variable'
@@ -230,7 +229,7 @@ C-----------------------------------------------------------------------------
 C   Jump out point for help subject unknown.
 C   This is only reached when none of the above statements are 
 C   satisfied.
-      WRITE (*, *) BELL
+      CALL PERIOD_WRITEBELL()
       WRITE (*, *) ' '
       WRITE (*, *) '** ERROR: Help command ',COMMAND 
       WRITE (*, *) '          has not been recognised.'
@@ -280,7 +279,7 @@ C   Fall through location.
       
 C   Jump out point if the help file could not be opened.
  4000 CONTINUE
-      WRITE (*, *) BELL
+      CALL PERIOD_WRITEBELL()
       WRITE (*, *) '** ERROR: Could not open HELP file ',NAME1 
       WRITE (*, *) ' '
       WRITE (*, *) 'Does environmental variable ',LIBNAM

@@ -45,9 +45,8 @@ C-----------------------------------------------------------------------------
       LOGICAL    YERRORARRAY(MXSLOT), DETRENDARRAY(MXSLOT)
       DOUBLE PRECISION PFT(MAXPOLY), CHISQ
       DOUBLE PRECISION XM(MAXPOLY, 2*MAXPOLY+3)
-      CHARACTER*1  BELL, OPTION, REPLY
+      CHARACTER*1  OPTION, REPLY
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
  
  
 C-----------------------------------------------------------------------------
@@ -70,12 +69,12 @@ C-----------------------------------------------------------------------------
          WRITE (*, '(X,A,$)') 'Enter order of polynomial : '
          READ (*, *, ERR=150) NPOLY
          IF ( NPOLY.GT.MAXPOLY ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Maximum polynomial order = ', 
      :                   MAXPOLY
             GO TO 400
          ELSE IF ( NPOLY.LE.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Minimum polynomial order = 1'
             GO TO 400
          END IF
@@ -87,13 +86,13 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 400
          END IF
 
          IF ( DETRENDARRAY(SLOT) ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** WARNING: Slot already detrended = ', SLOT
  160        CONTINUE
             WRITE (*, '(X,A,$)') '** WARNING: Are you sure you want' // 
@@ -109,7 +108,7 @@ C-----------------------------------------------------------------------------
 
          IF ( OPTION.EQ.'P' ) THEN
             IF ( NPOLY.GE.NDATA ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) 
      :                   '** ERROR: Number of polynomial terms greater '
      :                   // 'than or equal'
@@ -132,19 +131,19 @@ C-----------------------------------------------------------------------------
 
 C            IF ( CHISQ.EQ.-1.0D0 ) THEN
             IF ( DABS(CHISQ+1).LT.DPMN30 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Singular matrix in' // 
      :                      ' PERIOD_LSQUAR.'
                GO TO 400
 C            ELSE IF ( CHISQ.EQ.-2.0D0 ) THEN
             ELSE IF ( DABS(CHISQ+2).LT.DPMN30 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Overflow or divide check' // 
      :                      ' occurred in PERIOD_LSQUAR.'
                GO TO 400
 C            ELSE IF ( CHISQ.EQ.-3.0D0 ) THEN
             ELSE IF ( DABS(CHISQ+3).LT.DPMN30 ) THEN 
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Invalid parameters input' // 
      :                      ' to PERIOD_LSQUAR.'
                GO TO 400
@@ -184,7 +183,7 @@ C            ELSE IF ( CHISQ.EQ.-3.0D0 ) THEN
             WRITE (*, *) '** OK: Y data mean = ', AVE
             WRITE (*, *) '** OK: Y data standard deviation = ', SDEV
             IF ( SDEV.EQ.0.0D0 ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: Standard deviation is zero.'
                GO TO 400
             END IF

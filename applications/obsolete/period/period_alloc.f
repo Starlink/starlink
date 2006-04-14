@@ -40,7 +40,7 @@
 *     14-Aug-2001 (KPD)
 *        Original (DAOPHOT) version adapted for PERIOD
 *     13-APR-2006 (BEC)
-*        Replace setting BELL using DATA with direct use of CHAR.
+*        Replace direct BELL write with call to PERIOD_WRITEBELL.
 *-
 *  Type Definitions:
       IMPLICIT NONE
@@ -54,22 +54,18 @@
  
 *  Local variables :
       INTEGER STATUS
-      CHARACTER*1 BELL
 
 *.
  
 *  Initialise the status variable.
       STATUS = 0
 
-*  Initialise the bell.
-      BELL = CHAR(7)
-
 *  Allocate memory.
       CALL PSX_CALLOC( SIZE, TYPE, PNTR, STATUS )
 
 *  Deal with errors.
       IF ( STATUS .NE. 0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** ERROR: Failure in dynamic allocation ' //
      :                'of memory; aborting PERIOD'
          STOP

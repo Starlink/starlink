@@ -25,8 +25,7 @@ C===========================================================================
       DOUBLE PRECISION DSDEV, ESDEV, ISDEV
       DOUBLE PRECISION PERIOD_GASDEV
       LOGICAL YERROR
-      CHARACTER*1 BELL, NOISE, ERRORS, REGULAR
-      DATA BELL/7/
+      CHARACTER*1 NOISE, ERRORS, REGULAR
 
 
 C-----------------------------------------------------------------------------
@@ -52,7 +51,7 @@ C-----------------------------------------------------------------------------
          IF ( ERRORS.EQ.'Y' ) THEN
             IF ( ESIG.EQ.0.0D0 ) THEN
                IF ( OPARRAY(I, 2).LT.0.0D0 ) THEN
-                  WRITE (*, *) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE (*, *) '** ERROR: Square root of' // 
      :                         ' negative number in PERIOD_NOISE.'
                   IFAIL = 1

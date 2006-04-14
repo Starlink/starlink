@@ -26,8 +26,6 @@ C=============================================================================
       CHARACTER*40 STRING2
       CHARACTER*72 JUNK
       CHARACTER*80 COMMENT, STRING
-      CHARACTER*1 BELL
-      DATA BELL/7/
  
  
       EXTENSO = 0
@@ -123,7 +121,7 @@ C=============================================================================
 
 *   Warn the user of the lack of suitable OGIP extensions.
       IF(EXTENSO.EQ.0)THEN
-         WRITE(*,*) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE(*,*) ' '
          WRITE(*,*) 
      :    '** WARNING: No extensions of HDUCLASS OGIP found!'

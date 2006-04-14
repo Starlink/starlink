@@ -51,9 +51,8 @@ C-----------------------------------------------------------------------------
       INTEGER XDATAPTR, YDATAPTR, YERRPTR
       INTEGER YSLOT1, YSLOT2
       LOGICAL DETRENDARRAY(MXSLOT), YERRORARRAY(MXSLOT), LOG
-      CHARACTER*1 BELL, REPLY
+      CHARACTER*1 REPLY
       CHARACTER*72 INFILEARRAY(MXSLOT)
-      DATA BELL/7/
  
 C-----------------------------------------------------------------------------
 C Select input and output data slots.
@@ -91,7 +90,7 @@ C-----------------------------------------------------------------------------
          NDATA = NPTSARRAY(SLOT)
 
          IF ( NDATA.EQ.0 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Slot empty =', SLOT
             GO TO 800
          END IF
@@ -138,7 +137,7 @@ C-----------------------------------------------------------------------------
      :                      PHASE, VAR, NP, F, IFAIL)
 
          IF ( IFAIL.EQ.1 ) THEN
-            WRITE (*, *) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE (*, *) '** ERROR: Sine fit unsuccessful.'
             GO TO 650
          END IF
@@ -169,7 +168,7 @@ C-----------------------------------------------------------------------------
          CALL PERIOD_CASE(REPLY, .TRUE.)
          IF ( REPLY.EQ.'Y' ) THEN
             IF ( .NOT.LOG ) THEN
-               WRITE (*, *) BELL
+               CALL PERIOD_WRITEBELL()
                WRITE (*, *) '** ERROR: No log file has been opened.'
                GO TO 550
             END IF

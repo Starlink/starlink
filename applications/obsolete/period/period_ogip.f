@@ -78,7 +78,6 @@ C      data/work array(s) and/or use of such arrays (KPD), October 2001
       INTEGER YSLOT1, THISROW, IFAIL
       INTEGER OKCUREXT, XICUREXT, YICUREXT
       CHARACTER*72 INFILEARRAY(MXSLOT) 
-      CHARACTER*1 BELL
       LOGICAL YERRORARRAY(MXSLOT), YERROR, DETRENDARRAY(MXSLOT)
  
 *   Local variables.     
@@ -143,8 +142,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
       INTEGER YIPTR                 ! Pntr to no. of columns in an extension
 *.
 
-*   Set the BELL and unit numbers.
-      BELL=CHAR(7)
+*   Set the unit number.
       UNIT=12
 
 *   Set names for the two type of table that might be found.
@@ -179,7 +177,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
          READWRITE=0
          CALL FTOPEN(UNIT,FILENAME,READWRITE,BLOCKSIZE,STATUS)
          IF(STATUS.NE.0) THEN 
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) '** ERROR: Could not open/read the file.'
             WRITE(*,*) ' '
@@ -189,7 +187,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
 *      Find the number of keywords in the first HDU.
          CALL FTGHSP(UNIT,NKEYS,NSPACE,STATUS)
          IF((STATUS.NE.0).OR.(NKEYS.EQ.0)) THEN 
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :         '** ERROR: Could not find any keywords in the HDU.'
@@ -209,7 +207,7 @@ C     INTEGER YI(26)                ! Number of columns in an extension
          CALL FTGREC(UNIT,1,REC1,STATUS)
          CALL PERIOD_CASE(REC1, .TRUE.)
          IF((REC1(1:6).NE.'SIMPLE').OR.(REC1(30:30).NE.'T')) THEN 
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :         '** ERROR: File is not simple FITS.'
@@ -283,7 +281,7 @@ C      Determine number of extensions, prior to dynamic array allocation
 
 *      Abort due to lack of suitable extensions.
          IF(EXTENS.EQ.0)THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) '** ERROR: No extensions found!'
             WRITE(*,*) ' '
@@ -337,7 +335,7 @@ C      Dynamically allocate memory.
          END IF
 
          IF((CUREXT.LT.0).OR.(CUREXT.GT.EXTENS)) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :       '** ERROR: No extension of that number!'
@@ -349,7 +347,7 @@ C      Dynamically allocate memory.
      :                              EXTENS)
 
          IF(OKCUREXT.EQ.1) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :       '** ERROR: That extension is unusable!'
@@ -404,7 +402,7 @@ C      Dynamically allocate memory.
          IF(COLNX.EQ.0) GOTO 900
 
          IF((COLNX.LT.0).OR.(COLNX.GT.XICUREXT)) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :       '** ERROR: No column of that number!'
@@ -421,7 +419,7 @@ C      Dynamically allocate memory.
          IF(COLNY.EQ.0) GOTO 900
 
          IF((COLNY.LT.0).OR.(COLNY.GT.XICUREXT)) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) 
      :       '** ERROR: No column of that number!'
@@ -444,7 +442,7 @@ C      Dynamically allocate memory.
             IF(COLNZ.NE.0) THEN      
                YERROR=.TRUE.
                IF((COLNZ.LT.0).OR.(COLNZ.GT.XICUREXT)) THEN
-                  WRITE(*,*) BELL
+                  CALL PERIOD_WRITEBELL()
                   WRITE(*,*) ' '
                   WRITE(*,*) 
      :             '** ERROR: No column of that number!'
@@ -465,7 +463,7 @@ C      Dynamically allocate memory.
          READ (*,*,ERR=400) SLOT
          IF(SLOT.EQ.0) GOTO 900      
          IF((SLOT.LT.0).OR.(SLOT.GT.MXSLOT)) THEN
-             WRITE(*,*) BELL
+             CALL PERIOD_WRITEBELL()
              WRITE(*,*) ' '
              WRITE(*,*) '** ERROR: Maximum slot number=', MXSLOT
              WRITE(*,*) ' '
@@ -533,7 +531,7 @@ C      Determine number of data values, prior to dynamic array allocation
 *      Deal with a bad number of rows read.
          WRITE(*,*) 'Read ',NUMROWS,' out of ',YICUREXT
          IF(NUMROWS.LT.4) THEN
-            WRITE(*,*) BELL
+            CALL PERIOD_WRITEBELL()
             WRITE(*,*) ' '
             WRITE(*,*) '** ERROR: Too few valid rows were found.'
             WRITE(*,*) ' '

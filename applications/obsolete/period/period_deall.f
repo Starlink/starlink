@@ -26,6 +26,8 @@
 *     7-JUN-2000 (MBT):
 *        Original version.
 *     14-Aug-2001 (KPD) version adapted for PERIOD
+*     13-APR-2006 (BEC):
+*        Replace direct BELL write with call to PERIOD_WRITEBELL.
 *-
 *  Type Definitions:
       IMPLICIT NONE
@@ -35,9 +37,7 @@
  
 *  Local variables :
       INTEGER STATUS
-      CHARACTER*1 BELL
 
-      DATA BELL /7/
 
 *.
  
@@ -49,7 +49,7 @@
 
 *  Deal with errors.
       IF ( STATUS .NE. 0 ) THEN
-         WRITE (*, *) BELL
+         CALL PERIOD_WRITEBELL()
          WRITE (*, *) '** WARNING: Failure to deallocate ' //
      :                'dynamically allocated memory'
       END IF
